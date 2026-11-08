@@ -83,7 +83,7 @@ export const NarrowScene: React.FC = () => {
           </span>
         </Note>
         <Note at={feedsAt - 2} x={C_X} y={y(366)}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             after a filter, salary &gt; {KEEP}
           </span>
         </Note>
@@ -185,7 +185,7 @@ export const NarrowScene: React.FC = () => {
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a child needs many parents: a shuffle</span>
         </Note>
         <Note at={manyAt + 6} x={(WP_X + BLOCK_W + WC_X) / 2 - 80} y={y(372)} width={160} style={{ textAlign: "center" }}>
-          <span style={{ ...label(21, ACCENT_INK), opacity: ease(frame, forcesAt, 10) }}>shuffle</span>
+          <span style={{ ...label(24, ACCENT_INK), opacity: ease(frame, forcesAt, 10) }}>shuffle</span>
         </Note>
         {/* A hairline between the two panels. */}
         <div style={{ position: "absolute", left: 900, top: y(330), width: 1.5, height: y(860) - y(330), background: `color-mix(in srgb, ${INK_SOFT} 30%, transparent)`, opacity: ease(frame, wideAt - 6, 12) }} />

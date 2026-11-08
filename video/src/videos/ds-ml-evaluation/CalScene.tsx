@@ -91,18 +91,18 @@ export const CalScene: React.FC = () => {
           />
           {[0, 0.5, 1].map((v) => (
             <React.Fragment key={v}>
-              <text x={at(xs, v)} y={y(PLOT.bottom) + 30} textAnchor="middle" style={svgText({ ...label(19, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
+              <text x={at(xs, v)} y={y(PLOT.bottom) + 30} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
                 {v}
               </text>
-              <text x={PLOT.left - 12} y={at(ys, v) + 6} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
+              <text x={PLOT.left - 12} y={at(ys, v) + 6} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
                 {v * 100}%
               </text>
             </React.Fragment>
           ))}
-          <text x={PLOT.right} y={y(PLOT.bottom) + 60} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
+          <text x={PLOT.right} y={y(PLOT.bottom) + 60} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
             the model&apos;s score
           </text>
-          <text x={PLOT.left} y={y(PLOT.top) - 18} textAnchor="start" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
+          <text x={PLOT.left} y={y(PLOT.top) - 18} textAnchor="start" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
             share actually positive
           </text>
         </Svg>
@@ -157,14 +157,14 @@ export const CalScene: React.FC = () => {
           </span>
         </Note>
         <Note at={lineAt - 2} x={NOTE_X} y={y(792)}>
-          <span style={{ ...note(30, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={lineAt + 4}>back on the line</Mark>
           </span>
         </Note>
 
         {/* ── How it is measured: this plot, or one number ── */}
         <Note at={diagramAt - 2} x={PLOT.left} y={y(PLOT.top) - h(80)}>
-          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={diagramAt + 4}>a reliability diagram</Mark>
           </span>
         </Note>

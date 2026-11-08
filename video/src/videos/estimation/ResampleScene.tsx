@@ -130,7 +130,7 @@ export const ResampleScene: React.FC = () => {
       </Headline>
       <Spot id="estimation-boot" at={bootstrapsAt - 6} left={1590} top={y(84)} width={150} height={210} />
       <Note at={correlationAt - 2} x={92} y={y(232)} out={treatAt - 8}>
-        <span style={{ ...body(30, true), color: INK_SOFT, whiteSpace: "nowrap" }}>
+        <span style={{ ...body(28, true), color: INK_SOFT, whiteSpace: "nowrap" }}>
           Or of a correlation?{" "}
           <span style={{ opacity: ease(frame, uglyAt - 4, 12) }}>The formula is ugly, or there isn’t one.</span>
         </span>
@@ -140,11 +140,11 @@ export const ResampleScene: React.FC = () => {
           doesn't exist. */}
       <Ink at={formulaWordAt - 4} dur={14} out={treatAt - 8} style={{ left: 1100, top: y(262), whiteSpace: "nowrap", display: "flex", gap: 64 }}>
         <div>
-          <div style={label(20, INK_SOFT)}>a mean’s standard error</div>
+          <div style={label(24, INK_SOFT)}>a mean’s standard error</div>
           <div style={{ ...headline(48), marginTop: 6 }}>s ÷ √n</div>
         </div>
         <div style={{ opacity: ease(frame, uglyAt - 4, 12) }}>
-          <div style={label(20, INK_SOFT)}>a median’s</div>
+          <div style={label(24, INK_SOFT)}>a median’s</div>
           <div style={{ ...headline(48), marginTop: 6, color: EST_INK, opacity: ease(frame, existAt - 4, 12) }}>?</div>
         </div>
       </Ink>
@@ -174,25 +174,25 @@ export const ResampleScene: React.FC = () => {
       <Axis scale={X} base={y(AXIS1)} ticks={[0, 5, 10, 15, 20]} at={yourSampleAt - 6} />
       {/* Above the tail's dots, clear of the 15.2-minute wait under it. */}
       <Note at={skewedAt - 2} x={sx(X, 14)} y={y(STRIP) - 80}>
-        <span style={{ ...note(22, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>a long tail to the right</span>
+        <span style={{ ...note(24, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>a long tail to the right</span>
       </Note>
 
       {active >= 0 ? <Resample index={active} draw={draws[active]} /> : null}
       <Ink at={drawAt - 6} dur={12} out={fastFrom} style={{ left: 160, top: y(RES_BASE) - 64, whiteSpace: "nowrap" }}>
-        <span style={label(21, INK_SOFT)}>
+        <span style={label(24, INK_SOFT)}>
           Resample {active >= 0 ? active + 1 : 1}: {BOOT.n} draws
           <span style={{ opacity: ease(frame, replacementAt - 4, 10) }}>, with replacement</span>
         </span>
       </Ink>
       {/* Right of the 15.2-minute stack, over a stretch resample 1 leaves empty. */}
       <Note at={twiceAt - 2} x={1420} y={y(RES_BASE) - 64} out={averageAt}>
-        <span style={{ ...note(22, INK), ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), ...halo, whiteSpace: "nowrap" }}>
           drawn twice: {BOOT.timesDrawn.filter((t) => t === 2).length}
           <span style={{ opacity: ease(frame, threeAt - 2, 10) }}>, three times: {BOOT.timesDrawn.filter((t) => t === 3).length}</span>
         </span>
       </Note>
       <Note at={notAt - 2} x={1420} y={y(RES_BASE) - 30} out={averageAt}>
-        <span style={{ ...note(22, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>never drawn: {BOOT.neverDrawn}, hollow above</span>
+        <span style={{ ...note(24, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>never drawn: {BOOT.neverDrawn}, hollow above</span>
       </Note>
 
       {/* ── Fig. 8: the averages ── */}
@@ -229,47 +229,47 @@ export const ResampleScene: React.FC = () => {
         <FallingAverage key={i} index={i} at={d.fall} />
       ))}
       <Ink at={distributionAt - 4} dur={14} style={{ left: sx(XZ, 8.12), top: y(HIST_BASE) - h(HIST_H * 0.55), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, EST_INK), fontWeight: 500 }}>the bootstrap distribution</span>
+        <span style={{ ...note(24, EST_INK), fontWeight: 500 }}>the bootstrap distribution</span>
       </Ink>
       {/* The spread the narration reads out: one standard error either side of
           the middle, under the axis where it can be seen. */}
       <Bracket x0={sx(XZ, center - BOOT.bootSe)} x1={sx(XZ, center + BOOT.bootSe)} y={seY} at={spreadAt - 2} color={INK} width={2.4} up />
       <Note at={fourEightAt - 2} x={sx(XZ, center + BOOT.bootSe) + 10} y={seY - 14}>
-        <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>±1 SE</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>±1 SE</span>
       </Note>
       <Rule x={sx(XZ, BOOT.lo)} y0={y(HIST_BASE)} y1={y(HIST_BASE) - h(HIST_H) - 56} at={sixOneAt - 4} color={INK} width={2.2} />
       <Rule x={sx(XZ, BOOT.hi)} y0={y(HIST_BASE)} y1={y(HIST_BASE) - h(HIST_H) - 56} at={eightOhAt - 4} color={INK} width={2.2} />
       <IntervalBar x0={sx(XZ, BOOT.lo)} x1={sx(XZ, BOOT.hi)} y={y(HIST_BASE) - h(HIST_H) - 50} at={sixOneAt} dur={18} color={INK} width={4} tick={10} />
       <Note at={eightOhAt} x={sx(XZ, BOOT.hi) + 14} y={y(HIST_BASE) - h(HIST_H) - 66}>
-        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           middle 95%: {fmt(BOOT.lo)} to {fmt(BOOT.hi)}
         </span>
       </Note>
       <IntervalBar x0={sx(XZ, BOOT.tLo)} x1={sx(XZ, BOOT.tHi)} y={y(HIST_BASE) - h(HIST_H) - 18} at={tAt - 4} dur={16} color={INK_SOFT} width={2.4} tick={8} dash="6 5" />
       <Note at={tAt} x={sx(XZ, BOOT.tHi) + 14} y={y(HIST_BASE) - h(HIST_H) - 32}>
-        <span style={{ ...note(21, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>
           t-interval: {fmt(BOOT.tLo)} to {fmt(BOOT.tHi)}
         </span>
       </Note>
 
       {/* ── Right column: the count, and the two standard errors ── */}
       <div style={{ position: "absolute", left: COL, top: y(560), opacity: ease(frame, averageAt - 4, 12) }}>
-        <div style={label(21, INK_SOFT)}>Resamples</div>
+        <div style={label(24, INK_SOFT)}>Resamples</div>
         <div style={{ ...headline(72), ...TABULAR, marginTop: 4, color: k >= BOOT.B ? INK : EST_INK }}>
           {k.toLocaleString("en-US")}
         </div>
       </div>
       <Ink at={spreadAt - 4} dur={14} style={{ left: COL, top: y(690), width: 420 }}>
         <div style={{ height: 1, background: HAIRLINE, marginBottom: 12 }} />
-        <div style={label(21, INK_SOFT)}>Standard error</div>
+        <div style={label(24, INK_SOFT)}>Standard error</div>
       </Ink>
       <Ink at={fourEightAt - 4} dur={14} style={{ left: COL, top: y(738), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
         <span style={{ ...headline(52), color: EST_INK }}>{fmt(BOOT.bootSe)}</span>
-        <span style={body(26, true)}>the bootstrap’s spread</span>
+        <span style={body(28, true)}>the bootstrap’s spread</span>
       </Ink>
       <Ink at={formulaAt - 4} dur={14} style={{ left: COL, top: y(800), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
         <span style={{ ...headline(52), opacity: ease(frame, fourNineAt - 4, 10) }}>{fmt(BOOT.formulaSe)}</span>
-        <span style={body(26, true)}>the formula, s ÷ √{BOOT.n}</span>
+        <span style={body(28, true)}>the formula, s ÷ √{BOOT.n}</span>
       </Ink>
       <Note at={longAt - 4} x={COL} y={y(880)} out={payoffAt - 6}>
         <span style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>For a mean, the long way round.</span>

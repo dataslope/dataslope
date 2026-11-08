@@ -133,7 +133,7 @@ export const DailyScene: React.FC = () => {
 
           {/* A concrete workflow, in four bins. */}
           <Note at={concreteAt} x={X0} y={binTop - 46}>
-            <span style={{ ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A concrete workflow</span>
+            <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A concrete workflow</span>
           </Note>
           {bins.slice(1).map((b, i) => (
             <ColumnRule key={b.title} x={X0 + (i + 1) * (BIN_W + BIN_GAP) - BIN_GAP / 2} top={binTop} height={h(212)} at={b.at} />
@@ -156,7 +156,7 @@ export const DailyScene: React.FC = () => {
               >
                 <div style={{ ...note(28, INK), fontWeight: 500, marginBottom: 18, whiteSpace: "nowrap" }}>{b.title}</div>
                 {b.items.map((it) => (
-                  <div key={it.text} style={{ ...note(26, INK), marginBottom: 12, whiteSpace: "nowrap", opacity: ease(frame, it.at - 2, 10) }}>
+                  <div key={it.text} style={{ ...note(28, INK), marginBottom: 12, whiteSpace: "nowrap", opacity: ease(frame, it.at - 2, 10) }}>
                     {it.text}
                   </div>
                 ))}
@@ -172,7 +172,7 @@ export const DailyScene: React.FC = () => {
           </span>
         </Note>
         <Note at={metrAt} x={X0} y={y(318)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             METR&apos;s 2025 randomized trial: <Num>{METR.developers}</Num> experienced open-source developers, <Num>{METR.tasks}</Num> tasks
           </span>
         </Note>
@@ -180,12 +180,12 @@ export const DailyScene: React.FC = () => {
           <line x1={ZERO} x2={ZERO} y1={measuredTop - h(30)} y2={feltTop + barH + h(18)} stroke={INK} strokeWidth={2} />
         </svg>
         <Note at={metrAt + 10} x={ZERO} y={measuredTop - h(30) - 34} width={0}>
-          <div style={{ position: "absolute", left: -100, width: 200, ...note(20, INK_SOFT), textAlign: "center", whiteSpace: "nowrap" }}>no change</div>
+          <div style={{ position: "absolute", left: -100, width: 200, ...note(24, INK_SOFT), textAlign: "center", whiteSpace: "nowrap" }}>no change</div>
         </Note>
         {/* Measured: took longer. */}
         <div style={{ position: "absolute", left: ZERO, top: measuredTop, width: MEASURED * PCT * m, height: barH, background: BAR, borderRadius: "0 6px 6px 0" }} />
         <Note at={longerAt + 8} x={ZERO + MEASURED * PCT + 18} y={measuredTop + barH / 2 - 17}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>
               <Num>{MEASURED}</Num>% longer
             </b>
@@ -209,7 +209,7 @@ export const DailyScene: React.FC = () => {
           }}
         />
         <Note at={estimatingAt} x={ZERO - FELT * PCT - 18} y={feltTop + barH / 2 - 17} align="right">
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             felt<span style={{ opacity: ease(frame, fasterAt - 2, 10) }}>
               , <b>about <Num>{FELT}</Num>% faster</b>
             </span>
@@ -234,13 +234,13 @@ export const DailyScene: React.FC = () => {
           </div>
         </Note>
         <Note at={sinceAt} x={X0} y={y(800)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             METR has since said the result reflects early-2025 tools
             <span style={{ opacity: ease(frame, speedupAt - 2, 10) }}>; its later data points toward a speedup.</span>
           </span>
         </Note>
         <Ink at={lessonAt} dur={14} style={{ left: X0, top: y(846) }}>
-          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             The lesson that lasts: the gap between how fast a tool feels and how fast it is.
           </span>
         </Ink>

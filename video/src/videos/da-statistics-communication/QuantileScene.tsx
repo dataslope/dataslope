@@ -174,22 +174,22 @@ export const QuantileScene: React.FC = () => {
 
         {/* ── What the words mean ── */}
         <Note at={cutAt - 2} x={X0} y={y(286)} out={out6}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>90th percentile</b>: the value with <span style={{ opacity: ease(frame, ninetyAt - 2, 10) }}>about 90% of the data at or below it</span>
           </span>
         </Note>
         <Note at={quartilesAt - 2} x={X0} y={y(328)} out={out6}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>quartiles</b>: the cuts at 25, 50 and 75
           </span>
         </Note>
         <Note at={fenceAt - 2} x={X0} y={y(286)} out={lookAt - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>IQR rule</b>: below Q1 − 1.5 × IQR, or above Q3 + 1.5 × IQR
           </span>
         </Note>
         <Note at={zAt - 2} x={X0} y={y(328)} out={lookAt - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>z-score</b>: (x − mean) ÷ standard deviation
           </span>
         </Note>
@@ -199,12 +199,12 @@ export const QuantileScene: React.FC = () => {
           </span>
         </Note>
         <Note at={typoAt - 2} x={X0} y={y(328)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>an outlier can be a typo, or the most important row you have</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>an outlier can be a typo, or the most important row you have</span>
         </Note>
 
         {/* ── Thirteen amounts, in order ── */}
         <Note at={Math.min(asked6 - 6, thirteenAt) - 2} x={X0} y={top + cellH / 2 - 16}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>amount</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>amount</span>
         </Note>
         <Row
           values={S.map((s) => String(s.v))}
@@ -250,26 +250,26 @@ export const QuantileScene: React.FC = () => {
           <line x1={p90X} x2={p90X} y1={top - 36} y2={top - 6} stroke={INK} strokeWidth={3.2} />
         </Svg>
         <Note at={p90At - 2} x={p90X - 300} width={600} y={top - h(76)} out={out6} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             90th percentile <Num>{fmt(AMOUNTS.p90, 1)}</Num>
           </span>
         </Note>
         <Note at={nobodyAt} x={p90X + 30} y={bottom + h(24)} out={out6}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>not in the data:</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>not in the data:</span>
         </Note>
         <Note at={interpAt - 2} x={p90X + 30} y={bottom + h(24) + 30} out={out6}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Num>{AMOUNTS.p90at.percent}%</Num> of the way
           </span>
           <br />
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap", opacity: ease(frame, betweenAt, 10) }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, betweenAt, 10) }}>
             from <Num>{AMOUNTS.p90at.between[0]}</Num> to <Num>{AMOUNTS.p90at.between[1]}</Num>
           </span>
         </Note>
         <Note at={rulesAt - 2} x={p90X + 30} y={bottom + h(24) + 108} out={out6}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>other tools,</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>other tools,</span>
           <br />
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>other rules</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>other rules</span>
         </Note>
 
         {/* ── Question 7: the fences ── */}
@@ -294,7 +294,7 @@ export const QuantileScene: React.FC = () => {
 
         {/* ── The z-scores ── */}
         <Note at={zAt + 4} x={X0} y={zTop + cellH / 2 - 16}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>z</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>z</span>
         </Note>
         <Row
           values={S.map((s) => (s.z < 0 ? `−${fmt(-s.z)}` : fmt(s.z)))}
@@ -311,7 +311,7 @@ export const QuantileScene: React.FC = () => {
           ]}
         />
         <Note at={meanAt - 2} x={STRIP_X} y={zTop + cellH + h(14)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
             the two drag the mean to <b>{fmt(AMOUNTS.mean, 1)}</b>
             <span style={{ opacity: ease(frame, stdAt - 2, 10) }}>
               {" "}
@@ -320,23 +320,23 @@ export const QuantileScene: React.FC = () => {
           </span>
         </Note>
         <Note at={twoAt - 2} x={STRIP_X} y={zTop + cellH + h(62)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             |z| &gt; 2: {AMOUNTS.zOver2.join(" and ")}
           </span>
         </Note>
         <Note at={threeAt} x={STRIP_X + 420} y={zTop + cellH + h(62)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             |z| &gt; 3: {AMOUNTS.zOver3.length ? AMOUNTS.zOver3.join(" and ") : "nothing"}
           </span>
         </Note>
         <Note at={hideAt - 2} x={STRIP_X + 840} y={zTop + cellH + h(62)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             the outliers hide themselves<span style={{ opacity: ease(frame, maskingAt - 2, 10) }}>: <b>masking</b></span>
           </span>
         </Note>
         {/* Which rule, then: one built on quartiles, which the outliers can't move. */}
         <Note at={reachAt - 2} x={STRIP_X} y={zTop + cellH + h(112)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             so use the IQR rule
             <span style={{ opacity: ease(frame, medianZAt - 2, 10) }}>, or a z-score built on the median</span>
             <span style={{ opacity: ease(frame, stillAt - 2, 10), color: INK, fontWeight: 500 }}>: quartiles don&apos;t move</span>

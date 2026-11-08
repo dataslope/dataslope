@@ -46,7 +46,7 @@ const geo = (c: Ctx, x: number, top: number, cols: readonly string[], rows: read
 /** A query's name over a result table, set as code. */
 const CodeName: React.FC<{ g: TableGeometry; at: number; children: React.ReactNode }> = ({ g, at, children }) => (
   <Ink at={at} dur={12} style={{ left: g.x, top: g.top - 38, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{children}</span>
   </Ink>
 );
 
@@ -108,10 +108,10 @@ const Union: React.FC<{ c: Ctx }> = ({ c }) => {
       </CodeName>
       <DataTable g={ag2} cols={numeric(RAPID.unionAll.cols)} at={allAt} rows={RAPID.unionAll.rows.map((cells, i) => ({ cells, at: allAt + 4 + i * 3 }))} bands={dup(RAPID.unionAll.rows).map((row, k) => ({ row, at: allAt + 18 + k * 4 }))} />
       <Note at={fasterAt - 4} x={ag2.right + 40} y={ag2.top + c.h(60)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>keeps every row, and it&apos;s faster:</span>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>keeps every row, and it&apos;s faster:</span>
       </Note>
       <Note at={checkAt - 2} x={ag2.right + 40} y={ag2.top + c.h(100)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>it skips the duplicate check</span>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>it skips the duplicate check</span>
       </Note>
     </>
   );
@@ -255,17 +255,17 @@ const Coalesce: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={errorAt - 2} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(30)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
           Dividing by 0: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>an error</span> in most databases.
         </span>
       </Note>
       <Note at={byNullAt - 2} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(76)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Dividing by null: just null.</span>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>Dividing by null: just null.</span>
       </Note>
       {/* The engine these ran in is one of the strict ones: its own words for
           the same division without NULLIF. */}
       <Note at={byNullAt + 12} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(122)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Postgres, which ran these:{" "}
           <Mono color={ACCENT_INK}>
             {RAPID.divideByZero.kind}: {RAPID.divideByZero.message}
@@ -480,7 +480,7 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
         out={allAt - 4}
       />
       <Note at={twelveAt - 2} x={rg.right + 40} y={rg.top + c.h(10)} out={allAt - 4}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
           <Term at={twelveAt - 2}>
             <span style={TABULAR}>{pairs}</span>
           </Term>
@@ -503,7 +503,7 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
           it runs. */}
       <Listing lines={RAPID.groupByAll.lines} x={R_X} top={c.T} width={760} size={22} at={allAt - 2} marks={[{ line: allLine, at: allAt + 8 }]} />
       <Note at={everyAt - 2} x={R_X} y={c.T + allH + c.h(50)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
           = <Mono>GROUP BY region</Mono>: every selected column you didn&apos;t aggregate
         </span>
       </Note>
@@ -593,7 +593,7 @@ const Dedupe: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Ink at={rowNumberAt} dur={12} style={{ left: listX, top: c.T - 38, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK_SOFT) }}>
+        <span style={{ ...note(24, INK_SOFT) }}>
           <span style={{ fontFamily: MONO, fontWeight: 500, fontVariantLigatures: "none" }}>ROW_NUMBER()</span>: a window function, Part 4
         </span>
       </Ink>
@@ -633,12 +633,12 @@ const Cross: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {regions.map((r, j) => (
         <Ink key={r} at={at + j * 2} dur={10} style={{ left: gx + j * cw, top: c.T, width: cw, textAlign: "center" }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK }}>{r}</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{r}</span>
         </Ink>
       ))}
       {products.map((p, i) => (
         <Ink key={p} at={at + 4 + i * 2} dur={10} style={{ left: R_X, top: gy + i * ch + ch / 2 - 16 }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK }}>{p}</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{p}</span>
         </Ink>
       ))}
       {products.flatMap((_, i) =>

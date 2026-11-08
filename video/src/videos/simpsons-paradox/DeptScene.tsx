@@ -54,7 +54,7 @@ export const DeptScene: React.FC = () => {
       </div>
       <FigLabel n="2" title="Share admitted, by department" at={start - 8} x={120} y={y(196)} />
       <Note at={start} x={1800} y={y(196) + 2} align="right" from="right">
-        <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
+        <span style={{ ...note(24, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
           <Swatch group="men" /> {NAME.men}
           <span style={{ width: 14 }} />
           <Swatch group="women" /> {NAME.women}
@@ -80,7 +80,7 @@ export const DeptScene: React.FC = () => {
       />
 
       <Ink at={fourAt - 4} dur={14} style={{ left: GAP_X, top: y(240) }}>
-        <span style={label(20, INK_SOFT)}>Women minus men</span>
+        <span style={label(24, INK_SOFT)}>Women minus men</span>
       </Ink>
 
       {DEPTS.map((d, i) => {
@@ -129,10 +129,10 @@ export const DeptScene: React.FC = () => {
               align={trailAbove ? "left" : "right"}
               style={trailAbove ? { transform: "translateX(-50%)" } : undefined}
             >
-              <span style={{ ...note(21, COLOR_INK[trail]), fontWeight: 500 }}>{Math.round(d[trail].rate * 100)}%</span>
+              <span style={{ ...note(24, COLOR_INK[trail]), fontWeight: 500 }}>{Math.round(d[trail].rate * 100)}%</span>
             </Note>
             <Note at={at + 6} x={px(d[lead].rate) + radius(d[lead].applied) + 10} y={cy - 14}>
-              <span style={{ ...note(21, COLOR_INK[lead]), fontWeight: 500 }}>{Math.round(d[lead].rate * 100)}%</span>
+              <span style={{ ...note(24, COLOR_INK[lead]), fontWeight: 500 }}>{Math.round(d[lead].rate * 100)}%</span>
             </Note>
 
             <Note at={gapAt} x={GAP_X} y={cy - 19}>
@@ -147,7 +147,7 @@ export const DeptScene: React.FC = () => {
               >
                 {signed(d.gap)}
               </span>
-              <span style={{ ...note(20, INK_SOFT), marginLeft: 8 }}>points</span>
+              <span style={{ ...note(24, INK_SOFT), marginLeft: 8 }}>points</span>
             </Note>
           </React.Fragment>
         );

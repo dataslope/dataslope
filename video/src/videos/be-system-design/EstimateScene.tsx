@@ -118,7 +118,7 @@ export const EstimateScene: React.FC = () => {
             opacity: ease(frame, trickAt, 12),
           }}
         >
-          <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>1,000,000</Num> a day ÷ <Num>86,400</Num> s
             <span style={{ color: BLUE_INK, fontWeight: 500, opacity: ease(frame, twelveAt, 10) }}>
               {" "}

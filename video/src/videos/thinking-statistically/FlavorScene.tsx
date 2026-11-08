@@ -107,8 +107,8 @@ export const FlavorScene: React.FC = () => {
         {NAMES.map((name, i) => (
           <Ink key={name} at={codeAt[i] - 4} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
             <Mark at={quantitiesAt - 2 + i * 5} out={honestAt + i * 3}>
-              <span style={{ ...note(30, INK), fontWeight: 500 }}>{i + 1}</span>
-              <span style={note(30, INK_SOFT)}> = {name}</span>
+              <span style={{ ...note(28, INK), fontWeight: 500 }}>{i + 1}</span>
+              <span style={note(28, INK_SOFT)}> = {name}</span>
             </Mark>
           </Ink>
         ))}
@@ -165,7 +165,7 @@ export const FlavorScene: React.FC = () => {
                 top: CHIP + 10,
                 transform: "translateX(-50%)",
                 whiteSpace: "nowrap",
-                ...note(21, asLabels > 0.5 ? INK : INK_SOFT),
+                ...note(24, asLabels > 0.5 ? INK : INK_SOFT),
                 fontWeight: lerp(500, 600, asLabels),
               }}
             >
@@ -178,7 +178,7 @@ export const FlavorScene: React.FC = () => {
 
       {/* The computer's view of the column: integers, as pandas stores them. */}
       <Ink at={computerAt - 4} dur={14} style={{ left: DTYPE_X, top: y(CHIP_Y) + 4, whiteSpace: "nowrap" }}>
-        <div style={label(20, INK_SOFT)}>stored as whole numbers</div>
+        <div style={label(24, INK_SOFT)}>stored as whole numbers</div>
         {/* A gray house badge that turns the highlighter's yellow on "stored". */}
         <div
           style={{
@@ -199,10 +199,10 @@ export const FlavorScene: React.FC = () => {
           line at one size, above the mean it gives. */}
       <div style={{ position: "absolute", left: 160, top: y(624), display: "flex", alignItems: "baseline", gap: 28, whiteSpace: "nowrap" }}>
         <Ink at={avgAt - 4} dur={14} style={{ position: "relative" }}>
-          <span style={label(22, INK_SOFT)}>Mean of the column</span>
+          <span style={label(24, INK_SOFT)}>Mean of the column</span>
         </Ink>
         <Ink at={mathAt - 2} dur={26} out={honestAt - 2} style={{ position: "relative" }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, color: INK }}>
+          <span style={{ fontFamily: MONO, fontSize: 24, color: INK }}>
             ({FLAVORS.answers.join(" + ")}) ÷ {FLAVORS.answers.length}
           </span>
         </Ink>
@@ -211,7 +211,7 @@ export const FlavorScene: React.FC = () => {
         <Strike at={noAt}>{mean}</Strike>
       </Ink>
       <Note at={noAt + 6} x={160} y={y(826)}>
-        <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>names no flavor at all</span>
+        <span style={{ ...body(34, true), color: INK, whiteSpace: "nowrap" }}>names no flavor at all</span>
       </Note>
       </div>
 
@@ -229,8 +229,8 @@ export const FlavorScene: React.FC = () => {
             whiteSpace: "nowrap",
           }}
         >
-          <span style={{ ...note(22, INK), fontWeight: 500 }}>{NAMES[col]}</span>
-          <span style={note(22, INK_SOFT)}> {FLAVORS.counts[NAMES[col]]}</span>
+          <span style={{ ...note(24, INK), fontWeight: 500 }}>{NAMES[col]}</span>
+          <span style={note(24, INK_SOFT)}> {FLAVORS.counts[NAMES[col]]}</span>
         </div>
       ))}
       <div

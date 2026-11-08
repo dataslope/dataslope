@@ -163,7 +163,7 @@ export const GapScene: React.FC = () => {
       <Spot id="thinking-statistically-dice" at={diceAt} out={exitAt} left={1570} top={y(112)} width={200} height={170} />
 
       <Ink at={couldAt - 4} dur={18} style={{ left: 96, top: y(258), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(38, true), color: INK }}>Could this just be luck?</span>
+        <span style={{ ...body(34, true), color: INK }}>Could this just be luck?</span>
       </Ink>
 
       <AbsoluteFill style={{ opacity: groupsOp }}>
@@ -172,7 +172,7 @@ export const GapScene: React.FC = () => {
       {/* ── The two groups ── */}
       {(["A", "B"] as const).map((g, i) => (
         <Ink key={g} at={groupsAt - 6 + i * 6} dur={12} style={{ left: 160, top: y(i ? STRIP_B : STRIP_A) - 14 }}>
-          <span style={label(22, INK)}>
+          <span style={label(24, INK)}>
             <Mark at={bothAt + i * 6} out={noRealAt + 10}>
               Group {g}
             </Mark>
@@ -204,13 +204,13 @@ export const GapScene: React.FC = () => {
       <Axis scale={X} base={y(AXIS)} ticks={[10, 30, 50, 70, 90]} at={groupsAt - 6} />
       {/* What the axis measures, in the column the group names use. */}
       <Ink at={groupsAt} dur={12} style={{ left: 160, top: y(AXIS) + 5, whiteSpace: "nowrap" }}>
-        <span style={label(22, INK)}>Score</span>
+        <span style={label(24, INK)}>Score</span>
       </Ink>
 
       {/* The one way both groups are made: fifty, plus or minus luck. */}
       <TruthLine x={sx(X, GAPS.mu)} bottom={y(AXIS)} top={y(STRIP_A - 56)} at={fiftyAt - 4} />
       <Note at={fiftyAt} x={sx(X, GAPS.mu)} y={y(AXIS + 44)} from="up">
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           Every score: {GAPS.mu}, plus or minus luck
         </span>
       </Note>
@@ -246,7 +246,7 @@ export const GapScene: React.FC = () => {
                   background: PAPER,
                   padding: "0 6px",
                   borderRadius: 4,
-                  ...note(23, STAT_INK),
+                  ...note(24, STAT_INK),
                   ...TABULAR,
                   fontWeight: 500,
                 }}
@@ -269,13 +269,13 @@ export const GapScene: React.FC = () => {
           right: 1920 - ZERO_X + 12,
           top: y(392),
           opacity: panelIn,
-          ...note(22, INK_SOFT),
+          ...note(24, INK_SOFT),
           whiteSpace: "nowrap",
         }}
       >
         B ahead
       </div>
-      <div style={{ position: "absolute", left: ZERO_X + 12, top: y(392), opacity: panelIn, ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: ZERO_X + 12, top: y(392), opacity: panelIn, ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
         <Mark at={aheadAt + 4} out={againMoreAt}>
           A ahead
         </Mark>
@@ -305,7 +305,7 @@ export const GapScene: React.FC = () => {
         />
       </Svg>
       <Note at={zeroAt - 2} x={ZERO_X} y={y(782)} from="up">
-        <span style={{ ...label(21, INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...label(24, INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           zero
         </span>
       </Note>
@@ -325,7 +325,7 @@ export const GapScene: React.FC = () => {
                 left: 1290,
                 top: rowY - 14,
                 opacity: Math.min(1, g * 2),
-                ...note(21, INK_SOFT),
+                ...note(24, INK_SOFT),
               }}
             >
               {k + 1}
@@ -347,7 +347,7 @@ export const GapScene: React.FC = () => {
                 top: rowY - 15,
                 opacity: ease(frame, draws[k].bar + 6, 8),
                 whiteSpace: "nowrap",
-                ...note(23, STAT_INK),
+                ...note(24, STAT_INK),
                 fontWeight: 500,
               }}
             >

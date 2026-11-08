@@ -66,7 +66,7 @@ export const body = (size: number, italic = false): React.CSSProperties => ({
 
 /** Inter semibold in sentence case: kickers, figure numbers and axis
  *  titles. Never tracked capitals, which shout and blur at small sizes. */
-export const label = (size = 21, color: string = INK_SOFT): React.CSSProperties => ({
+export const label = (size = 24, color: string = INK_SOFT): React.CSSProperties => ({
   fontFamily: SANS,
   fontSize: size,
   fontWeight: 500,
@@ -77,7 +77,7 @@ export const label = (size = 21, color: string = INK_SOFT): React.CSSProperties 
  *  Inter's tabular feature also sets the hyphen in a digit-wide slot, so
  *  "p-value" read "p - value" in every note while it was on. Give a number
  *  that must not shift as it changes (a counter, a column) TABULAR. */
-export const note = (size = 21, color: string = INK): React.CSSProperties => ({
+export const note = (size = 24, color: string = INK): React.CSSProperties => ({
   fontFamily: SANS,
   fontSize: size,
   fontWeight: 500,

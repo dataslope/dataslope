@@ -127,7 +127,7 @@ export const AdmitScene: React.FC = () => {
       <Drift from={totalAt} to={end + 30} amount={0.02} origin={[960, 600]}>
         <FigLabel n="6" title="Share admitted, two made-up departments" at={famousAt - 4} x={160} y={y(262)} />
         <Note at={admissionsAt - 2} x={1760} y={y(262) + 2} align="right" from="right">
-          <span style={{ ...note(21, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
             {(["men", "women"] as const).map((g) => (
               <React.Fragment key={g}>
                 <span style={{ width: 16, height: 16, borderRadius: "50%", background: GROUP_COLOR[g], display: "inline-block" }} /> {NAME[g]}
@@ -163,12 +163,12 @@ export const AdmitScene: React.FC = () => {
           />
         </Svg>
         {[0, 0.25, 0.5, 0.75, 1].map((s) => (
-          <div key={s} style={{ position: "absolute", left: px(s), top: y(810), transform: "translateX(-50%)", opacity: grid, ...note(20, INK_SOFT) }}>
+          <div key={s} style={{ position: "absolute", left: px(s), top: y(810), transform: "translateX(-50%)", opacity: grid, ...note(24, INK_SOFT) }}>
             {Math.round(s * 100)}%
           </div>
         ))}
         <Ink at={bothAt - 6} dur={12} style={{ left: GAP_X, top: y(330) - 30 }}>
-          <span style={label(20, INK_SOFT)}>Women minus men</span>
+          <span style={label(24, INK_SOFT)}>Women minus men</span>
         </Ink>
 
         {/* A guide for each row, drawn as the narration names the departments. */}
@@ -214,10 +214,10 @@ export const AdmitScene: React.FC = () => {
           return (
             <React.Fragment key={r.name}>
               <Ink at={i === 0 ? overallAt - 4 : splitAt + 2 + (i - 1) * 8} dur={12} style={{ left: 160, top: cy - 34, whiteSpace: "nowrap" }}>
-                <div style={{ ...body(38, true), color: INK }}>
+                <div style={{ ...body(34, true), color: INK }}>
                   <Marker at={i === 0 ? totalAt - 4 : deptAt - 4 + i * 4}>{r.name}</Marker>
                 </div>
-                <div style={note(20, INK_SOFT)}>{r.sub}</div>
+                <div style={note(24, INK_SOFT)}>{r.sub}</div>
               </Ink>
               {/* Where each group's applications went: the big dots. */}
               {i > 0
@@ -265,14 +265,14 @@ export const AdmitScene: React.FC = () => {
                     y={cy - 15}
                     align={right ? "left" : "right"}
                   >
-                    <span style={{ ...note(22, GROUP_INK[g]), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>{pct(r.cells[g].rate)}</span>
+                    <span style={{ ...note(24, GROUP_INK[g]), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>{pct(r.cells[g].rate)}</span>
                   </Note>
                 );
               })}
               <Note at={r.gapAt} x={GAP_X} y={cy - 19}>
                 <span
                   style={{
-                    ...note(26, GROUP_INK[lead]),
+                    ...note(28, GROUP_INK[lead]),
                     fontWeight: 500,
                     padding: "0 8px",
                     marginLeft: -8,
@@ -304,18 +304,18 @@ export const AdmitScene: React.FC = () => {
         ))}
 
         <Note at={dragsAt + 2} x={px(0.72)} y={rowY(0) + 40}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>line width: share of each group&apos;s applicants</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>line width: share of each group&apos;s applicants</span>
         </Note>
         <Ring x={px(DEPTS[1].women.rate)} y={rowY(2)} at={turnsAt - 2} color={GROUP_COLOR.women} r0={radius(600)} r1={radius(600) + 50} />
 
         {/* Where each group applied. */}
         <Note at={sevenAt - 2} x={px(DEPTS[1].women.rate) + radius(600) + 76} y={rowY(2) + 26}>
-          <span style={{ ...note(22, GROUP_INK.women), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(24, GROUP_INK.women), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             {DEPTS[1].women.applied} of {POOLED.women.applied} women applied here
           </span>
         </Note>
         <Note at={menMixAt - 2} x={px(DEPTS[0].men.rate) - radius(600) - 24} y={rowY(1) + 34} align="right">
-          <span style={{ ...note(22, GROUP_INK.men), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(24, GROUP_INK.men), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             {DEPTS[0].men.applied} of {POOLED.men.applied} men applied here
           </span>
         </Note>

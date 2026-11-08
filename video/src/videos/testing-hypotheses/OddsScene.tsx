@@ -121,7 +121,7 @@ export const OddsScene: React.FC = () => {
         {[0.2, 0.4, 0.6].map((v) => (
           <div
             key={v}
-            style={{ position: "absolute", right: 1920 - X.x0 + 14, top: py(v) - 13, opacity: ease(frame, oddsFrom + 6, 12), ...note(20, INK_SOFT) }}
+            style={{ position: "absolute", right: 1920 - X.x0 + 14, top: py(v) - 13, opacity: ease(frame, oddsFrom + 6, 12), ...note(24, INK_SOFT) }}
           >
             {pct(v, 0)}
           </div>
@@ -132,7 +132,7 @@ export const OddsScene: React.FC = () => {
           </Label>
         </Note>
         <Note at={sixtyAt - 2} x={last[0] - 16} y={last[1] - 58} align="right">
-          <span style={{ ...note(36, STAT_INK), fontWeight: 500, ...halo }}>
+          <span style={{ ...note(34, STAT_INK), fontWeight: 500, ...halo }}>
             <Count at={sixtyAt - 2} from={0.05} to={AT_LEAST.p[19]} dur={22} format={(v) => pct(v, 0)} />
           </span>
         </Note>
@@ -163,7 +163,7 @@ export const OddsScene: React.FC = () => {
               ))}
           </Svg>
           {[0, 0.5, 1].map((v) => (
-            <div key={v} style={{ position: "absolute", right: 1920 - PK.x0 + 12, top: pky(v) - 13, opacity: ease(frame, peekAt, 12), ...note(20, INK_SOFT) }}>
+            <div key={v} style={{ position: "absolute", right: 1920 - PK.x0 + 12, top: pky(v) - 13, opacity: ease(frame, peekAt, 12), ...note(24, INK_SOFT) }}>
               {v}
             </div>
           ))}
@@ -181,7 +181,7 @@ export const OddsScene: React.FC = () => {
 
         {/* ── The cure: decide before you look ── */}
         <Ink at={cureAt - 4} dur={16} style={{ left: B.x0, top: y(290), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(38, true), color: INK }}>
+          <span style={{ ...body(34, true), color: INK }}>
             Decide <Mark at={lookCureAt - 4}>before you look</Mark>:
           </span>
         </Ink>
@@ -207,7 +207,7 @@ export const OddsScene: React.FC = () => {
         <FigLabel n="12" title="The same test, against a raised bar" at={raiseAt - 4} x={B.x0} y={y(640)} />
         <Ink at={raiseAt - 2} dur={14} style={{ left: B.x0, top: y(640) + 44, whiteSpace: "nowrap" }}>
           <Label size={24}>Or raise the bar:</Label>
-          <span style={{ ...note(26, STAT_INK), fontWeight: 500, marginLeft: 14, opacity: ease(frame, sharingAt - 4, 12) }}>
+          <span style={{ ...note(28, STAT_INK), fontWeight: 500, marginLeft: 14, opacity: ease(frame, sharingAt - 4, 12) }}>
             0.05 ÷ 20 = {AT_LEAST.bonferroni}
           </span>
           <span style={{ ...label(24, INK_SOFT), marginLeft: 12, opacity: ease(frame, sharingAt + 4, 12) }}>(Bonferroni)</span>

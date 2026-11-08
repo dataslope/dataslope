@@ -75,7 +75,7 @@ export const SwitchScene: React.FC = () => {
   const target = BG.x1 + BG.w / 2 + (BG.x2 - BG.x1) * swing;
   const fill = ease(frame, backfillAt, 26);
   const bgTop = y(BG.top);
-  const tagStyle: React.CSSProperties = { fontFamily: MONO, fontSize: 20, fontWeight: 500, fontVariantLigatures: "none" };
+  const tagStyle: React.CSSProperties = { fontFamily: MONO, fontSize: 24, fontWeight: 500, fontVariantLigatures: "none" };
 
   return (
     <AbsoluteFill>
@@ -100,11 +100,11 @@ export const SwitchScene: React.FC = () => {
 
         {/* The tiny space, and a second model's kitten searched in it. */}
         <Note at={tinyAt - 2} x={T.x} y={y(T.top) - 34}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>a tiny space from the How LLMs Work course: five words, three numbers each</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>a tiny space from the How LLMs Work course: five words, three numbers each</span>
         </Note>
         {["word", ...SWITCH.axes, "from its kitten"].map((t, j) => (
           <Note key={t} at={(j === 4 ? searchAt : spaceAt) + j * 2} x={colX(j) + 12} y={y(T.top) + 8}>
-            <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{t}</span>
+            <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{t}</span>
           </Note>
         ))}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, spaceAt, 12) }}>
@@ -145,7 +145,7 @@ export const SwitchScene: React.FC = () => {
         })}
         {/* The second model's kitten. */}
         <Note at={pretendAt} x={T.x} y={qTop}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             a second model, same meanings
             <span style={{ opacity: ease(frame, axesAt - 2, 10) }}>, axes in another order: {SWITCH.newAxes.join(", ")}</span>
           </span>
@@ -169,9 +169,9 @@ export const SwitchScene: React.FC = () => {
           </div>
         ))}
         <Note at={truckAt + 4} x={T.x} y={qTop + 112}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             nearest: {nearest}
-            <span style={{ ...note(25, INK_SOFT), fontWeight: 500 }}> (the old model&apos;s own kitten lands nearest {SWITCH.nearestSame})</span>
+            <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}> (the old model&apos;s own kitten lands nearest {SWITCH.nearestSame})</span>
           </span>
         </Note>
 
@@ -203,7 +203,7 @@ export const SwitchScene: React.FC = () => {
           <span style={{ color: BLUE_INK }}>
             index v1
             <br />
-            <span style={{ fontWeight: 500, fontSize: 22 }}>old model</span>
+            <span style={{ fontWeight: 500, fontSize: 24 }}>old model</span>
             <br />
             <span style={{ ...tagStyle, opacity: ease(frame, tagAt + 4, 10) }}>model=old-v1</span>
           </span>
@@ -212,7 +212,7 @@ export const SwitchScene: React.FC = () => {
           <span style={{ color: OK_INK }}>
             index v2
             <br />
-            <span style={{ fontWeight: 500, fontSize: 22 }}>new model</span>
+            <span style={{ fontWeight: 500, fontSize: 24 }}>new model</span>
             <br />
             <span style={{ ...tagStyle, opacity: ease(frame, tagAt + 8, 10) }}>model=new-v2</span>
           </span>

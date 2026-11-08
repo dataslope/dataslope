@@ -143,7 +143,7 @@ export const WhereScene: React.FC = () => {
       />
       {/* Under the struck rows, while they are still on the page. */}
       <Note at={vanishedAt - 2} out={collapseAt} x={STAGE.tableX + 14} y={full.bottom + h(14)} from="up">
-        <span style={{ ...body(32, true), color: LOST_INK }}>{VANISHED.join(" and ")} vanished.</span>
+        <span style={{ ...body(34, true), color: LOST_INK }}>{VANISHED.join(" and ")} vanished.</span>
       </Note>
 
       {ILLUSTRATIONS ? (

@@ -125,12 +125,12 @@ export const ShuffleScene: React.FC = () => {
           <React.Fragment key={k}>
             <Machine x={RED_X} top={y(ROW_TOPS[i])} width={BOX_W} height={boxH} at={keyAt + i * 3} />
             <Note at={keyAt + 2 + i * 3} x={RED_X} y={mid(i) - 14} width={BOX_W} style={{ textAlign: "center" }}>
-              <span style={{ ...label(22, DEPT_INK[k]), fontWeight: 500 }}>{k}</span>
+              <span style={{ ...label(24, DEPT_INK[k]), fontWeight: 500 }}>{k}</span>
             </Note>
           </React.Fragment>
         ))}
         <Note at={movesAt} x={RED_X} y={y(ROW_TOPS[0]) - h(40)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             one partition per key<span style={{ opacity: ease(frame, fetchAt, 10) }}>: reduce tasks</span>
           </span>
         </Note>
@@ -138,7 +138,7 @@ export const ShuffleScene: React.FC = () => {
           <React.Fragment key={m}>
             <Machine x={MAP_X} top={y(ROW_TOPS[m])} width={BOX_W} height={boxH} at={mapAt + m * 3} />
             <Note at={mapAt + 2 + m * 3} x={MAP_X} y={mid(m) - 14} width={BOX_W} style={{ textAlign: "center" }}>
-              <span style={{ ...label(22, INK), fontWeight: 500 }}>map task {m + 1}</span>
+              <span style={{ ...label(24, INK), fontWeight: 500 }}>map task {m + 1}</span>
             </Note>
             <Arrow from={[MAP_X + BOX_W + 6, mid(m)]} to={[DISK_X - 8, mid(m)]} at={diskAt + m * 3} dur={8} width={1.8} head={10} />
             <Disk x={DISK_X} top={mid(m) - DISK_H / 2} at={diskAt + 4 + m * 3} w={DISK_W} />
@@ -157,13 +157,13 @@ export const ShuffleScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={diskAt + 4} x={DISK_X - 30} y={y(ROW_TOPS[2]) + boxH + h(20)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>serialized to local disk</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>serialized to local disk</span>
         </Note>
         <Note at={netAt} x={600} y={y(ROW_TOPS[2]) + boxH + h(20)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the network</span>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the network</span>
         </Note>
         <Note at={fewerAt - 2} x={1080} y={y(ROW_TOPS[0]) + h(16)}>
-          <span style={{ ...note(27, OK_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             Tuning Spark:
             <br />
             fewer shuffles<span style={{ opacity: ease(frame, lessAt, 10) }}>, less data in each</span>
@@ -172,12 +172,12 @@ export const ShuffleScene: React.FC = () => {
 
         {/* ── The page's latency chart ── */}
         <Note at={chartAt} x={MAP_X} y={y(LAD_TOP) - h(50)}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             Latency, order of magnitude <span style={{ color: INK_SOFT, fontWeight: 500 }}>(nanoseconds, log scale)</span>
           </span>
         </Note>
         <Note at={secondAt - 2} x={SCALED_X} y={y(LAD_TOP) - h(64)}>
-          <span style={{ ...label(21, INK_SOFT), display: "block", lineHeight: 1.25, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), display: "block", lineHeight: 1.25, whiteSpace: "nowrap" }}>
             if the fastest cache
             <br />
             took one second
@@ -196,7 +196,7 @@ export const ShuffleScene: React.FC = () => {
               {gridRuns(xOf(t)).map(([a, b]) => (
                 <line key={a} x1={xOf(t)} x2={xOf(t)} y1={a} y2={b} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
               ))}
-              <text x={xOf(t)} y={rowY(LADDER.levels.length - 1) + rowH + 28} textAnchor="middle" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
+              <text x={xOf(t)} y={rowY(LADDER.levels.length - 1) + rowH + 28} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
                 {t >= 1e6 ? `${t / 1e6}M` : t >= 1000 ? `${t / 1000}k` : String(t)}
               </text>
             </g>
@@ -220,10 +220,10 @@ export const ShuffleScene: React.FC = () => {
           return (
             <React.Fragment key={l.name}>
               <Note at={at} x={NAME_R} y={rowY(i) + rowH / 2 - 14} align="right">
-                <span style={{ ...label(21, i === MEM || hot ? INK : INK_SOFT), whiteSpace: "nowrap" }}>{l.name}</span>
+                <span style={{ ...label(24, i === MEM || hot ? INK : INK_SOFT), whiteSpace: "nowrap" }}>{l.name}</span>
               </Note>
               <Note at={at + 8} x={xOf(l.ns) + 14} y={rowY(i) + rowH / 2 - 14}>
-                <span style={{ ...note(20, hot ? ACCENT_INK : INK_SOFT), whiteSpace: "nowrap" }}>
+                <span style={{ ...note(24, hot ? ACCENT_INK : INK_SOFT), whiteSpace: "nowrap" }}>
                   <Num>{nsText(l.ns)}</Num>
                   {ratio ? (
                     <span style={{ opacity: ease(frame, ratio.at, 10), fontWeight: 500 }}>
@@ -234,7 +234,7 @@ export const ShuffleScene: React.FC = () => {
                 </span>
               </Note>
               <Note at={secondAt + 2 + i * 2} x={SCALED_X} y={rowY(i) + rowH / 2 - 14}>
-                <span style={{ ...note(21, i === NET ? ACCENT_INK : i === L1 ? INK : INK_SOFT), fontWeight: i === NET || i === L1 ? 500 : 500, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(24, i === NET ? ACCENT_INK : i === L1 ? INK : INK_SOFT), fontWeight: i === NET || i === L1 ? 500 : 500, whiteSpace: "nowrap" }}>
                   {/* The network's "almost six days" takes the trap's red
                       highlight, where a ring once sat round it. */}
                   {i === NET ? (

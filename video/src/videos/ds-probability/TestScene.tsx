@@ -38,7 +38,7 @@ const Count: React.FC<{ b: Box; at: number; color?: string; children: React.Reac
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...note(26, color),
+          ...note(28, color),
           ...TABULAR,
           fontWeight: 500,
           whiteSpace: "nowrap",
@@ -173,23 +173,23 @@ export const TestScene: React.FC = () => {
 
         {/* The three numbers a positive needs, named where they sit. */}
         <Note at={sensAt + 2} x={TP.x} y={y(TP.y) - BOX_H / 2 - 40}>
-          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>sensitivity, on the sick</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>sensitivity, on the sick</span>
         </Note>
         {/* Sensitivity's other half: the healthy it clears. The 5% on the
             branch is what it does not. Figures only take TABULAR, so the
             hyphen in "false-positive" keeps its own width. */}
         <Note at={specAt + 2} x={WELL.x} y={y(FP.y) + BOX_H / 2 + 14}>
-          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             specificity, on the healthy: <span style={TABULAR}>{pct(TEST.specificity)}</span> cleared
           </span>
         </Note>
         <Note at={clearsAt + 8} x={WELL.x} y={y(FP.y) + BOX_H / 2 + 48}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             false-positive rate = 1 − specificity = <span style={TABULAR}>{pct(TEST.fpRate)}</span>
           </span>
         </Note>
         <Note at={baseAt + 2} x={ROOT.x} y={y(ROOT.y) - BOX_H / 2 - 40}>
-          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the base rate</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the base rate</span>
         </Note>
 
         {/* ── Every positive, one dot each ── */}
@@ -219,7 +219,7 @@ export const TestScene: React.FC = () => {
           </span>
         </Note>
         <Note at={sixAt} x={GRID.x} y={gridBottom + 68}>
-          <span style={{ ...note(36, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(34, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             {TEST.truePos} of {TEST.positives}: <span style={{ background: HIGHLIGHT, padding: "0 6px", borderRadius: 4 }}>one in six</span>, about{" "}
             {pct(TEST.posteriorFloat)}
           </span>

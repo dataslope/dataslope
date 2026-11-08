@@ -289,7 +289,7 @@ export const Chip: React.FC<{
         opacity: p * (1 - o) * (1 - d),
         transform: `translate(${(1 - p) * 16 + o * 16}px, ${0}px) scale(${1 + glow * 0.04})`,
         transformOrigin: "50% 50%",
-        ...label(22, INK),
+        ...label(24, INK),
         fontWeight: 500,
         whiteSpace: "nowrap",
       }}
@@ -472,7 +472,7 @@ export const Listing: React.FC<{
 // ── The database table, after WhyNormalization's kit ─────────────────────────
 
 export type TCell = string | null;
-export const HEAD_SIZE = 21;
+export const HEAD_SIZE = 24;
 export const BODY_SIZE = 24;
 const PAD = 18;
 /** JetBrains Mono's advance, in em. */
@@ -849,7 +849,7 @@ export const FigKey: React.FC<{ entries: readonly KeyEntry[]; right: number; top
           >
             {e.badge ? <Badge size={21}>{e.badge}</Badge> : null}
             {e.end ? <EndGlyph kind={e.end} /> : null}
-            <span style={{ ...note(21, INK_SOFT) }}>{e.text}</span>
+            <span style={{ ...note(24, INK_SOFT) }}>{e.text}</span>
           </span>
         );
       })}

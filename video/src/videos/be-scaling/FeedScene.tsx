@@ -165,7 +165,7 @@ export const FeedScene: React.FC = () => {
                   padding: "3px 9px",
                   borderRadius: 7,
                   background: BAR,
-                  ...label(19, PAPER),
+                  ...label(24, PAPER),
                   fontWeight: 500,
                   opacity: drop(i) * (1 - ease(frame, feedOut, 10)),
                 }}
@@ -281,7 +281,7 @@ export const FeedScene: React.FC = () => {
           <Node key={k} x={G.store.x + k * (G.store.w + G.store.gap)} y={y(G.store.mid) - G.store.h / 2} w={G.store.w} h={G.store.h} at={designAt + 16 + k} tone="data" lit={lit(6)} />
         ))}
         <Ink at={designAt + 20} dur={12} style={{ left: G.store.x, top: y(G.store.mid) + G.store.h / 2 + 12, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(20, BLUE_INK), fontWeight: 500 }}>8 shards, each with followers</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500 }}>8 shards, each with followers</span>
         </Ink>
         {/* Every arrow between them. */}
         <Flow points={[[G.client.x + G.client.w + 6, gm], [G.limit.x - 8, gm]]} at={designAt + 4} color={edge} width={edgeW} glow={api} head={12} />
@@ -318,7 +318,7 @@ export const FeedScene: React.FC = () => {
           head={12}
         />
         <Ink at={apiAt + 4} dur={14} style={{ left: G.cache.x + G.cache.w + 50, top: y(G.cache.mid) - 18, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK), fontWeight: 500 }}>
+          <span style={{ ...note(24, INK), fontWeight: 500 }}>
             every arrow: <Mark at={apiAt + 6}>an API</Mark>
           </span>
         </Ink>

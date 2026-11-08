@@ -431,7 +431,7 @@ export const FormulaBar: React.FC<{
         opacity: p * (1 - d) * (1 - o),
       }}
     >
-      {cell ? <span style={{ ...label(19, INK_SOFT), minWidth: 34 }}>{cell}</span> : null}
+      {cell ? <span style={{ ...label(24, INK_SOFT), minWidth: 34 }}>{cell}</span> : null}
       <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: Math.max(19, Math.round(size * 0.9)), color: INK_SOFT, fontWeight: 500 }}>fx</span>
       <span style={{ flex: "0 1 auto", overflow: "hidden", display: "grid" }}>
         <span style={{ ...layer, opacity: 1 - rw }}>

@@ -184,7 +184,7 @@ export const Step: React.FC<{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...label(21, INK),
+          ...label(24, INK),
           fontWeight: 500,
         }}
       >

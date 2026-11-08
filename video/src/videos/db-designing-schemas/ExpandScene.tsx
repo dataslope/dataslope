@@ -181,7 +181,7 @@ export const ExpandScene: React.FC = () => {
               {i + 1}
             </span>
             <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <span style={{ ...label(26, INK), fontWeight: 500 }}>{p.title}</span>
+              <span style={{ ...label(28, INK), fontWeight: 500 }}>{p.title}</span>
               <span style={{ ...body(24, true), color: INK_SOFT }}>
                 {i === 1 ? (
                   <>

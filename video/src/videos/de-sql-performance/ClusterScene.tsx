@@ -119,7 +119,7 @@ export const ClusterScene: React.FC = () => {
         </Note>
         {/* Where the term comes from: the engines that keep one. */}
         <Note at={enginesAt} x={X0} y={ug.rowTop(users.length) + h(118)}>
-          <div style={{ ...note(22, INK), width: 800 }}>
+          <div style={{ ...note(24, INK), width: 800 }}>
             <span style={{ fontWeight: 500 }}>SQL Server and MySQL&rsquo;s InnoDB keep one.</span>
             <span style={{ opacity: ease(frame, innoAt, 10) }}>
               {" "}
@@ -130,7 +130,7 @@ export const ClusterScene: React.FC = () => {
 
         {/* ── Right: Postgres keeps none; CLUSTER sorts once ── */}
         <Note at={pgAt} x={R_X} y={y(TOP) - h(6)}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Postgres: no clustered index</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>Postgres: no clustered index</span>
         </Note>
         <Listing lines={CLUSTER.sql} x={R_X} top={y(TOP) + h(40)} width={R_W} size={21} at={commandAt - 2} marks={[{ line: "CLUSTER", at: commandAt + 8 }]} />
         <PageStrip
@@ -144,16 +144,16 @@ export const ClusterScene: React.FC = () => {
             { pages: [CLUSTER.newPage], at: lastAt, color: inkOf.red },
           ]}
         />
-        <div style={{ position: "absolute", left: R_X, top: stripY + h(64), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, twentyAt - 6, 12) }}>
+        <div style={{ position: "absolute", left: R_X, top: stripY + h(64), ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, twentyAt - 6, 12) }}>
           orders, page by page: customer 42&rsquo;s rows
         </div>
         <Note at={twentyAt + 6} x={R_X} y={stripY + h(104)} out={afterAt + 2}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             before: on <b>{CLUSTER.pagesBefore.length}</b> pages
           </span>
         </Note>
         <Note at={shareAt} x={R_X} y={stripY + h(104)}>
-          <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), whiteSpace: "nowrap" }}>
             after: all <Num>20</Num> on page <Num>{page}</Num>
           </span>
         </Note>
@@ -161,7 +161,7 @@ export const ClusterScene: React.FC = () => {
           <div style={{ ...note(24, ACCENT_INK), width: R_W, opacity: ease(frame, lastAt, 10) }}>
             a new order for 42 lands on page <Num>{thousands(CLUSTER.newPage)}</Num>, the last
           </div>
-          <div style={{ ...note(22, INK_SOFT), width: R_W, marginTop: h(10) }}>
+          <div style={{ ...note(24, INK_SOFT), width: R_W, marginTop: h(10) }}>
             CLUSTER runs once; Postgres doesn&rsquo;t keep the order
           </div>
         </Note>

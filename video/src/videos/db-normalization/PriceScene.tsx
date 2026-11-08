@@ -85,30 +85,30 @@ export const PriceScene: React.FC = () => {
           </span>
         </Ink>
         <Note at={countAt + 8} x={RIGHT} y={y(BODY_Y) + 104}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>of {lines.toLocaleString("en-US")} order lines disagree</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>of {lines.toLocaleString("en-US")} order lines disagree</span>
         </Note>
         <Tick x={RIGHT + 210} y={y(BODY_Y) + 34} at={rightAt} size={40} />
         <Note at={roseAt} x={RIGHT} y={y(BODY_Y) + 150}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             {lower.toLocaleString("en-US")} of them below today&apos;s price
           </span>
         </Note>
         <Note at={paidAt - 2} x={RIGHT} y={y(BODY_Y) + 190}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>each one, what the customer paid</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>each one, what the customer paid</span>
         </Note>
 
         {/* Two questions with different answers. */}
         <Note at={nameAt - 2} x={g.xs[1] + 16} y={bottom + 20} from="up">
-          <span style={{ ...label(22, BLUE_INK), whiteSpace: "nowrap" }}>What does it cost now?</span>
+          <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap" }}>What does it cost now?</span>
         </Note>
         <Note at={nameAt + 8} x={g.xs[2] + 16} y={bottom + 60} from="up">
-          <span style={{ ...label(22, ACCENT_INK), whiteSpace: "nowrap" }}>What did they pay that day?</span>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>What did they pay that day?</span>
         </Note>
         <Note at={syncAt - 2} x={RIGHT} y={y(BODY_Y) + 290}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>A copy: keep it in sync.</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>A copy: keep it in sync.</span>
         </Note>
         <Note at={historyAt - 2} x={RIGHT} y={y(BODY_Y) + 334}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             History: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>never fix it.</span>
           </span>
         </Note>

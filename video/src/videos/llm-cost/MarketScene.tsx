@@ -130,7 +130,7 @@ export const MarketScene: React.FC = () => {
           ["Input price", BAR_X, "left"],
         ].map(([t, x, a], k) => (
           <Note key={t as string} at={marketAt - 6 + k * 2} x={x as number} y={y(HEAD_Y)} align={a as "left" | "right"} from="up">
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
           </Note>
         ))}
         <Hairline x={X0} y={y(HEAD_Y) + 36} w={TABLE_R - X0} at={marketAt - 4} color={INK_SOFT} />
@@ -222,32 +222,32 @@ export const MarketScene: React.FC = () => {
           {/* Each stat is a label, its number, and under the number what
               it counts: three lines, each one size and one face. */}
           <Ink at={fiveAt - 4} dur={14} style={{ left: SIDE_X, top: y(352), whiteSpace: "nowrap" }}>
-            <span style={label(23, INK_SOFT)}>Output against input</span>
+            <span style={label(24, INK_SOFT)}>Output against input</span>
           </Ink>
           <Ink at={fiveAt} dur={16} style={{ left: SIDE_X, top: y(380), whiteSpace: "nowrap" }}>
             <span style={{ ...headline(92), color: OUTPUT_INK }}>5x</span>
           </Ink>
           <Note at={tenRowsAt - 2} x={SIDE_X} y={y(484)}>
-            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               in {FIVES} of {RATES.length} rows
               <span style={{ fontWeight: 500, opacity: ease(frame, neverAt - 2, 14) }}> and never less</span>
             </span>
           </Note>
 
           <Ink at={cheapestAt - 4} dur={14} style={{ left: SIDE_X, top: y(568), whiteSpace: "nowrap" }}>
-            <span style={label(23, INK_SOFT)}>Cheapest input to dearest</span>
+            <span style={label(24, INK_SOFT)}>Cheapest input to dearest</span>
           </Ink>
           <Ink at={hundredthAt - 2} dur={16} style={{ left: SIDE_X, top: y(596), whiteSpace: "nowrap" }}>
             <span style={{ ...headline(92), color: POINT_INK }}>{SPREAD}x</span>
           </Ink>
           <Note at={tenDollarsAt - 2} x={SIDE_X} y={y(700)}>
-            <span style={{ ...note(25, INK), ...TABULAR, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>
               {usd(minIn)} to {usd(maxIn)}
             </span>
           </Note>
 
           <Ink at={pickAt - 4} dur={18} style={{ left: SIDE_X, top: y(790), width: 480 }}>
-            <span style={{ ...body(33, true), color: INK }}>
+            <span style={{ ...body(34, true), color: INK }}>
               The model you pick moves the bill more than any <Marked at={trickAt}>prompt trick.</Marked>
             </span>
           </Ink>
@@ -262,7 +262,7 @@ export const MarketScene: React.FC = () => {
           ["Out", F6_R, "right"],
         ].map(([t, x, a], k) => (
           <Note key={t as string} at={thresholdAt + k * 2} x={x as number} y={y(HEAD_Y)} align={a as "left" | "right"} from="up">
-            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
           </Note>
         ))}
         <Hairline x={F6_X} y={y(HEAD_Y) + 36} w={F6_R - F6_X} at={thresholdAt} color={INK_SOFT} />
@@ -284,18 +284,18 @@ export const MarketScene: React.FC = () => {
                 }}
               />
               <Note at={at} x={F6_X} y={ry}>
-                <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>{t.model}</span>
+                <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{t.model}</span>
               </Note>
               <Note at={at + 2} x={F6_THRESH_R} y={ry} align="right">
-                <span style={{ ...note(22, INK), ...TABULAR, whiteSpace: "nowrap" }}>{int(t.threshold)}</span>
+                <span style={{ ...note(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>{int(t.threshold)}</span>
               </Note>
               <Note at={at + 3} x={F6_IN_R} y={ry} align="right">
-                <span style={{ ...note(22, INK), fontWeight: t === gpt6 ? 500 : 500, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(24, INK), fontWeight: t === gpt6 ? 500 : 500, whiteSpace: "nowrap" }}>
                   {t === gpt6 ? <Marked at={doubleAt - 2}>{`${t.inMult}x`}</Marked> : `${t.inMult}x`}
                 </span>
               </Note>
               <Note at={at + 4} x={F6_R} y={ry} align="right">
-                <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>{t.outMult}x</span>
+                <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{t.outMult}x</span>
               </Note>
               <Hairline x={F6_X} y={ry + h(ROW_DY) - 14} w={F6_R - F6_X} at={at + 2} color={RULE} />
             </React.Fragment>
@@ -304,7 +304,7 @@ export const MarketScene: React.FC = () => {
 
         {/* The lesson's oversized prompt on GPT-6.1 Sol. */}
         <Ink at={solAt - 4} dur={14} style={{ left: F6_X, top: y(AXIS_Y - 92), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>
+          <span style={label(24, INK_SOFT)}>
             {OVERSIZED.model}, a {int(OVERSIZED.tokens)}-token prompt
           </span>
         </Ink>
@@ -324,18 +324,18 @@ export const MarketScene: React.FC = () => {
         />
         <Guide x={axX(OVERSIZED.threshold)} y0={y(AXIS_Y - 62)} y1={y(AXIS_Y) + 4} at={promptAt + 4} color={INK} />
         <Note at={promptAt + 8} x={axX(OVERSIZED.threshold) - 10} y={y(AXIS_Y) + 10} align="right">
-          <span style={{ ...note(21, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>line at {int(OVERSIZED.threshold)}</span>
+          <span style={{ ...note(24, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>line at {int(OVERSIZED.threshold)}</span>
         </Note>
         <Note at={dollarAt - 4} x={F6_X} y={y(AXIS_Y + 50)}>
-          <span style={{ ...note(27, POINT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, POINT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
             <Marked at={sheetAt - 2}>{usd(OVERSIZED.above)}</Marked>
-            <span style={{ ...note(25, INK), fontWeight: 500 }}>
+            <span style={{ ...note(24, INK), fontWeight: 500 }}>
               : all {int(OVERSIZED.tokens)} tokens at {gpt6.inMult}x
             </span>
           </span>
         </Note>
         <Note at={sixtyAt - 4} x={F6_X} y={y(AXIS_Y + 96)}>
-          <span style={{ ...note(25, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
             not <Strike at={sixtyAt + 6}>{usd(OVERSIZED.headline)}</Strike> at the headline rate
           </span>
         </Note>

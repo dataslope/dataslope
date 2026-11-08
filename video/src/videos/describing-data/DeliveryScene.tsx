@@ -152,10 +152,10 @@ export const DeliveryScene: React.FC = () => {
 
       <Drift from={deliveryFrom} to={eighteenAt + 50} scale={0.02} origin={[960, y(AXIS)]}>
         <Ink at={twoAt - 4} dur={12} style={{ left: 160, top: y(STEADY) - 15 }}>
-          <span style={label(23, INK)}>Steady</span>
+          <span style={label(24, INK)}>Steady</span>
         </Ink>
         <Ink at={twoAt + 2} dur={12} style={{ left: 160, top: y(ERRATIC) - 15, opacity: 1 - zoom }}>
-          <span style={label(23, INK)}>Erratic</span>
+          <span style={label(24, INK)}>Erratic</span>
         </Ink>
 
         {/* The shared average. */}
@@ -270,7 +270,7 @@ export const DeliveryScene: React.FC = () => {
       {/* ── The working, beside the zoomed rows: distances, then squares ── */}
       <div style={{ position: "absolute", inset: 0, opacity: column }}>
         <Ink at={distanceAt - 2} dur={14} style={{ left: COL_X - 60, top: rowY(0) - h(ROW_STEP) - 26, width: 120, textAlign: "center", whiteSpace: "nowrap" }}>
-          <span style={label(22, INK)}>
+          <span style={label(24, INK)}>
             <Mark at={squareAt - 4} out={nineAt - 6}>{sq < 0.5 ? "Distance" : "Squared"}</Mark>
           </span>
         </Ink>
@@ -310,7 +310,7 @@ export const DeliveryScene: React.FC = () => {
                   width: 60,
                   textAlign: "center",
                   opacity: a,
-                  ...note(26, lift > 0 ? STAT_INK : INK),
+                  ...note(28, lift > 0 ? STAT_INK : INK),
                   ...TABULAR,
                   fontWeight: 500,
                 }}
@@ -343,12 +343,12 @@ export const DeliveryScene: React.FC = () => {
       {/* Divide, then root: each a line of one size, the working in weight
           and color, the words after it in the soft ink. */}
       <Ink at={countAt - 4} dur={14} style={{ left: 160, top: y(WORK_Y) + 44, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(21, INK_SOFT) }}>
+        <span style={{ ...note(24, INK_SOFT) }}>
           {DELIVERY.steady.length} deliveries, minus one
         </span>
       </Ink>
       <Ink at={nineAt - 4} dur={16} style={{ left: 160, top: y(WORK_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, INK), fontWeight: 500 }}>
+        <span style={{ ...note(28, INK), fontWeight: 500 }}>
           {fmt(DELIVERY.sumSquares, 0)} ÷ {DELIVERY.divisor} = {fmt(DELIVERY.variance, 2)}{" "}
           <span style={{ color: INK_SOFT, fontWeight: 500 }}>
             square minutes, the <Mark at={varianceAt - 2}>variance</Mark>
@@ -369,7 +369,7 @@ export const DeliveryScene: React.FC = () => {
         }}
       />
       <Ink at={rootAt - 2} dur={16} style={{ left: 1010, top: y(WORK_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, STAT_INK), fontWeight: 500 }}>
+        <span style={{ ...note(28, STAT_INK), fontWeight: 500 }}>
           √{fmt(DELIVERY.variance, 2)} ≈ {fmt(DELIVERY.steadySd, 1)}{" "}
           <span style={{ color: INK_SOFT, fontWeight: 500 }}>
             minutes, the <Mark at={sdAt - 2}>standard deviation</Mark>

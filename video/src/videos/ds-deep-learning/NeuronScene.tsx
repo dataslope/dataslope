@@ -160,7 +160,7 @@ export const NeuronScene: React.FC = () => {
             alignItems: "center",
             justifyContent: "center",
             opacity: ease(frame, sigAt - 4, 10) * (1 - ease(frame, q1Out, 10)) * (1 - lit * 0.55),
-            ...label(26, INK),
+            ...label(28, INK),
             fontWeight: 500,
           }}
         >
@@ -174,7 +174,7 @@ export const NeuronScene: React.FC = () => {
         <Cells values={[[NEURON.a.toFixed(3)]]} x={OUT_X} y={y(NY) - h(CELL_H) / 2} w={120} h={h(CELL_H)} at={aAt - 2} out={leaveAt + 4} size={30} color={OK_INK} />
         <Cells values={[[String(NEURON.z)]]} x={OUT_X} y={y(NY) - h(CELL_H) / 2} w={120} h={h(CELL_H)} at={leaveAt + 14} out={q1Out} size={30} color={INK} />
         <Note at={regAt - 2} x={ACT_X - 20} y={y(NY) + h(70)} out={q1Out}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>without it: just linear regression</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>without it: just linear regression</span>
         </Note>
 
         {/* ── Question 2: two layers, then one matrix, then a non-linearity ── */}
@@ -226,7 +226,7 @@ export const NeuronScene: React.FC = () => {
           look={() => ({ tint: { color: CELL_OK, at: sameAt + 2 } })}
         />
         <Note at={everyAt - 2} x={1240} y={midOf(ROWS.b) - h(36)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same, for every input</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same, for every input</span>
         </Note>
         <Note at={tenAt} x={1240} y={midOf(ROWS.b) + h(4)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>ten layers: still one matrix</span>
@@ -276,12 +276,12 @@ export const NeuronScene: React.FC = () => {
           look={() => ({ tint: { color: CELL_MARK, at: becomesAt + 2 } })}
         />
         <Note at={depthAt - 2} x={1400} y={midOf(ROWS.c) - h(18)}>
-          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={whichAt}>now depth adds something</Mark>
           </span>
         </Note>
         <Note at={curvedAt - 2} x={1400} y={midOf(ROWS.c) + h(22)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             curved boundaries,{" "}
             <span style={{ opacity: ease(frame, anyAt - 2, 10) }}>almost any function</span>
           </span>

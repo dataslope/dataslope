@@ -196,7 +196,7 @@ export const HookScene: React.FC = () => {
 
       {/* Why it matters, at the right end of the figure's label row. */}
       <Ink at={mixingAt - 2} dur={14} style={{ right: 1920 - 1800, top: y(figY), whiteSpace: "nowrap" }}>
-        <span style={note(22, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Mix them up,{" "}
           <span style={{ opacity: ease(frame, intervalsAt - 2, 12) }}>
             and confidence intervals get <Marker at={misreadAt}>misread</Marker>.

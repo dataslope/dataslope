@@ -165,7 +165,7 @@ export const RateScene: React.FC = () => {
           {[0, 20, 40, 60].map((t) => (
             <g key={t}>
               <line x1={ax(t)} x2={ax(t)} y1={axY} y2={axY + 7} stroke={INK} strokeWidth={1.2} />
-              <text x={ax(t)} y={axY + 30} textAnchor="middle" style={svgText({ ...note(20, t === 60 ? INK : INK_SOFT), fontWeight: t === 60 ? 500 : 500 })}>
+              <text x={ax(t)} y={axY + 30} textAnchor="middle" style={svgText({ ...note(24, t === 60 ? INK : INK_SOFT), fontWeight: t === 60 ? 500 : 500 })}>
                 {t} s
               </text>
             </g>
@@ -182,10 +182,10 @@ export const RateScene: React.FC = () => {
           })}
         </Svg>
         <Ink at={fiftyNineAt + 4} dur={12} out={rowsOut} style={{ left: ax(59) - 200, top: axY - 64, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>10 at 59 s</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500 }}>10 at 59 s</span>
         </Ink>
         <Ink at={sixtyOneAt + 4} dur={12} out={rowsOut} style={{ left: ax(61) + 34, top: axY - 64, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>10 at 61 s</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500 }}>10 at 61 s</span>
         </Ink>
 
         {/* ── Four limiters, a row each. ── */}
@@ -197,10 +197,10 @@ export const RateScene: React.FC = () => {
         ].map(([name, sub, at, subAt], i) => (
           <React.Fragment key={i}>
             <Ink at={(at as number) - 2} dur={12} out={rowsOut} style={{ left: X0, top: rowY(i) - 4, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(22, INK), fontWeight: 500 }}>{name as string}</span>
+              <span style={{ ...label(24, INK), fontWeight: 500 }}>{name as string}</span>
             </Ink>
             <Ink at={subAt as number} dur={12} out={rowsOut} style={{ left: X0, top: rowY(i) + 28, whiteSpace: "nowrap" }}>
-              <span style={note(20, INK_SOFT)}>{sub as string}</span>
+              <span style={note(24, INK_SOFT)}>{sub as string}</span>
             </Ink>
           </React.Fragment>
         ))}

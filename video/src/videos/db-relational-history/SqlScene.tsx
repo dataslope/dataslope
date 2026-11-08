@@ -106,13 +106,13 @@ export const SqlScene: React.FC = () => {
       {/* ── Fig. 3: could matching values be fast? ── */}
       <FigLabel n="3" title="Could matching values be fast enough?" at={doubtedAt - 6} x={96} y={y(290)} out={lanesOut} />
       <Ink at={imsAt - 4} dur={14} out={lanesOut} style={{ left: 96, top: LANE_A - 16, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(23, INK) }}>Follow a pointer, as IMS does</span>
+        <span style={{ ...label(24, INK) }}>Follow a pointer, as IMS does</span>
       </Ink>
       <Ink at={fortuneAt - 2} dur={14} out={lanesOut} style={{ left: 96, top: LANE_A + 18, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(21, INK_SOFT) }}>IBM&apos;s big earner</span>
+        <span style={{ ...note(24, INK_SOFT) }}>IBM&apos;s big earner</span>
       </Ink>
       <Ink at={matchingAt - 6} dur={14} out={lanesOut} style={{ left: 96, top: LANE_B - 16, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(23, INK) }}>Match a value</span>
+        <span style={{ ...label(24, INK) }}>Match a value</span>
       </Ink>
       <Svg opacity={1 - ease(frame, lanesOut, 12)}>
         {[LANE_A, LANE_B].map((ly, i) => (
@@ -152,7 +152,7 @@ export const SqlScene: React.FC = () => {
       ) : null}
       <Tick x={enoughX + 40} y={LANE_B} at={couldAt + 8} out={lanesOut} />
       <Ink at={couldAt + 10} dur={12} out={lanesOut} style={{ left: enoughX + 72, top: LANE_B - 16, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(23, KEY_INK), fontWeight: 500 }}>It could.</span>
+        <span style={{ ...note(24, KEY_INK), fontWeight: 500 }}>It could.</span>
       </Ink>
       <Card
         x={LANE_X0}
@@ -231,7 +231,7 @@ export const SqlScene: React.FC = () => {
           as part of its line. */}
       <Ink at={ownedAt - 2} dur={14} out={sqlAt - 6} style={{ left: 910, top: y(520), whiteSpace: "nowrap" }}>
         {/* A red house badge, set at a stamp's tilt. */}
-        <div style={{ ...label(26), ...badgeStyle("red", 26), transform: "rotate(-5deg)" }}>That name is taken</div>
+        <div style={{ ...label(28), ...badgeStyle("red", 26), transform: "rotate(-5deg)" }}>That name is taken</div>
       </Ink>
       <Spot
         id="db-relational-history-plane"
@@ -256,12 +256,12 @@ export const SqlScene: React.FC = () => {
         }}
       />
       <Ink at={diedAt - 2} dur={16} style={{ left: 96, top: y(782), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(30, true), color: INK }}>
+        <span style={{ ...body(28, true), color: INK }}>
           Raymond Boyce died in <Mark at={seventyFourAt - 2}>1974</Mark>, still in his <Mark at={twentiesAt - 2}>twenties</Mark>.
         </span>
       </Ink>
       <Ink at={livesAt - 2} dur={18} style={{ left: 96, top: y(842), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(23, INK_SOFT) }}>
+        <span style={{ ...note(24, INK_SOFT) }}>
           His name lives on in <Mark at={normalAt}>Boyce–Codd normal form</Mark>, 1974.
         </span>
       </Ink>

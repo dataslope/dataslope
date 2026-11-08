@@ -32,7 +32,7 @@ const Worked: React.FC<{
   const r = ease(frame, resultAt, 12);
   if (p <= 0) return null;
   const cap = (text: string, col: number, opacity = 1) => (
-    <span style={{ gridRow: 1, gridColumn: col, justifySelf: "center", ...note(20, INK_SOFT), opacity, whiteSpace: "nowrap" }}>
+    <span style={{ gridRow: 1, gridColumn: col, justifySelf: "center", ...note(24, INK_SOFT), opacity, whiteSpace: "nowrap" }}>
       {text}
     </span>
   );
@@ -137,7 +137,7 @@ export const MorphScene: React.FC = () => {
       <Worked j={THE} x={940} top={y(EQ_Y)} at={theAt - 4} resultAt={timesZeroAt} color={ACCENT_INK} />
 
       <Note at={highAt} x={120} y={y(FOOT_Y)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           <span style={{ background: HIGHLIGHT, color: INK, padding: "0 6px", marginLeft: -6 }}>
             Every word in only one of the {spell(N)} documents
           </span>{" "}

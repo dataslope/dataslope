@@ -91,11 +91,11 @@ export const PairsScene: React.FC = () => {
           ))}
         </Svg>
         {[120, 140, 160].map((v) => (
-          <div key={v} style={{ position: "absolute", right: 1920 - 214, top: vy(v) - 13, opacity: ease(frame, patientsAt, 12), ...note(20, INK_SOFT) }}>
+          <div key={v} style={{ position: "absolute", right: 1920 - 214, top: vy(v) - 13, opacity: ease(frame, patientsAt, 12), ...note(24, INK_SOFT) }}>
             {v}
           </div>
         ))}
-        <div style={{ position: "absolute", right: 1920 - 214, top: vy(174) - 13, opacity: ease(frame, patientsAt + 4, 12), ...label(21, INK_SOFT) }}>
+        <div style={{ position: "absolute", right: 1920 - 214, top: vy(174) - 13, opacity: ease(frame, patientsAt + 4, 12), ...label(24, INK_SOFT) }}>
           mmHg
         </div>
         {[
@@ -227,7 +227,7 @@ export const PairsScene: React.FC = () => {
           </span>
           <span
             style={{
-              ...note(36, STAT_INK),
+              ...note(34, STAT_INK),
               fontWeight: 500,
               marginLeft: 28,
               opacity: ease(frame, billionAt - 6, 12),
@@ -242,7 +242,7 @@ export const PairsScene: React.FC = () => {
           </Label>
         </Note>
         <Note at={controlAt - 2} x={colX(1, ONE) + 20} y={vy(PAIRED.after[ONE]) - 14}>
-          <span style={{ ...label(22, STAT_INK), ...halo, whiteSpace: "nowrap", display: "inline-block", transform: `scale(${1 + 0.05 * sameGlow})` }}>
+          <span style={{ ...label(24, STAT_INK), ...halo, whiteSpace: "nowrap", display: "inline-block", transform: `scale(${1 + 0.05 * sameGlow})` }}>
             their own control
           </span>
         </Note>

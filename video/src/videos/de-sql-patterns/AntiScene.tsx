@@ -144,7 +144,7 @@ export const AntiScene: React.FC = () => {
             </span>
           </Ink>
           <Note at={passesAt - 2} x={LIST_X} y={whyY + 3 * lineGap + h(8)} out={existsAt - 4}>
-            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Not true, so no customer ever passes.</span>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>Not true, so no customer ever passes.</span>
           </Note>
 
           {/* ── Two that work ── */}
@@ -194,16 +194,16 @@ export const AntiScene: React.FC = () => {
             bands={[{ row: 0, at: fourAt + 4, color: MARK_OK }]}
           />
           <Note at={blockAt} x={LIST_X} y={y(TOP) + exceptH + h(30)}>
-            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
               A set difference: a row goes only if an equal row is on the right.
             </span>
             <br />
-            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
               The guest order&apos;s <Mono>NULL</Mono> equals no customer&apos;s id.
             </span>
           </Note>
           <Note at={joinBackAt - 2} x={LIST_X} y={y(TOP) + exceptH + h(124)}>
-            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>
               Only the key comes back: join <Mono>customers</Mono> for the name.
             </span>
           </Note>

@@ -229,9 +229,9 @@ export const HashScene: React.FC = () => {
             dur={16}
             style={{ left: resultX + 6 * CODE * 0.6 + 40, top: pipeY, height: 50, display: "flex", alignItems: "center", gap: "0.45em", whiteSpace: "nowrap" }}
           >
-            <span style={{ ...body(30, true), color: INK }}>bucket 999,999</span>
-            <span style={{ ...body(30, true), color: INK_SOFT }}>of</span>
-            <span style={{ position: "relative", ...headline(32), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums", marginLeft: "0.15em" }}>
+            <span style={{ ...body(28, true), color: INK }}>bucket 999,999</span>
+            <span style={{ ...body(28, true), color: INK_SOFT }}>of</span>
+            <span style={{ position: "relative", ...headline(34), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums", marginLeft: "0.15em" }}>
               {/* The highlight reaches 0.1em past the number, so the number
                   keeps 0.15em of margin: a full space between it and "of". */}
               <span
@@ -255,7 +255,7 @@ export const HashScene: React.FC = () => {
             return (
               <React.Fragment key={i}>
                 <Ink at={at} dur={12} style={{ left: s.x, top: y(B_CELLS) - 32, width: CELL_W, textAlign: "center" }}>
-                  <span style={{ ...note(19, isTarget && landed > 0 ? SET_INK : INK_SOFT), fontWeight: isTarget ? 500 : 500 }}>
+                  <span style={{ ...note(24, isTarget && landed > 0 ? SET_INK : INK_SOFT), fontWeight: isTarget ? 500 : 500 }}>
                     {commas(s.index)}
                   </span>
                 </Ink>
@@ -293,10 +293,10 @@ export const HashScene: React.FC = () => {
           {/* ── The times, ListVsSet's ── */}
           <Note at={timedAt} x={LEFT} y={y(TIME_Y)}>
             <span style={{ display: "flex", gap: 40, alignItems: "baseline", whiteSpace: "nowrap" }}>
-              <span style={{ ...note(30, LIST_INK), fontWeight: 500, opacity: ease(frame, msAt - 2, 10) }}>
+              <span style={{ ...note(28, LIST_INK), fontWeight: 500, opacity: ease(frame, msAt - 2, 10) }}>
                 list <span style={{ fontVariantNumeric: "tabular-nums" }}>{HASH.listMs.toFixed(2)}</span> ms
               </span>
-              <span style={{ ...note(30, SET_INK), fontWeight: 500, opacity: ease(frame, nsAt - 2, 10) }}>
+              <span style={{ ...note(28, SET_INK), fontWeight: 500, opacity: ease(frame, nsAt - 2, 10) }}>
                 set <span style={{ fontVariantNumeric: "tabular-nums" }}>{HASH.setNs.toFixed(1)}</span> ns
               </span>
               <Source>a million numbers, timed in CPython 3.13 for the course video “List or set?”</Source>
@@ -353,7 +353,7 @@ export const HashScene: React.FC = () => {
           </span>
         </Note>
         <Note at={setAt + 10} x={X0 + 330 + 160} y={barsY + 2 * h(58) + h(10)}>
-          <span style={{ ...note(26, SET_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, SET_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             one hash lookup each; every key is new, so nothing to compare
           </span>
         </Note>
@@ -365,8 +365,8 @@ export const HashScene: React.FC = () => {
 /** A panel's letter and title, in one line. */
 const RowTitle: React.FC<{ at: number; y: number; letter: string; color: string; title: string }> = ({ at, y, letter, color, title }) => (
   <Ink at={at} dur={16} style={{ left: LEFT, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 40 }}>
-    <span style={label(22, color)}>{letter}</span>
-    <span style={{ ...body(32, true), color: INK }}>{title}</span>
+    <span style={label(24, color)}>{letter}</span>
+    <span style={{ ...body(34, true), color: INK }}>{title}</span>
   </Ink>
 );
 
@@ -374,7 +374,7 @@ const RowTitle: React.FC<{ at: number; y: number; letter: string; color: string;
 const Counter: React.FC<{ at: number; y: number; value: number; color: string }> = ({ at, y, value, color }) => (
   <Note at={at} x={RIGHT} y={y - 8} align="right" from="right">
     <div style={{ display: "flex", alignItems: "baseline", gap: 58, justifyContent: "flex-end" }}>
-      <span style={label(21, INK_SOFT)}>comparisons</span>
+      <span style={label(24, INK_SOFT)}>comparisons</span>
       <span style={{ ...headline(46), color, fontVariantNumeric: "tabular-nums lining-nums", minWidth: "4.6em", textAlign: "right" }}>
         {commas(value)}
       </span>
@@ -418,7 +418,7 @@ const Cell: React.FC<{ x: number; y: number; at: number; value: number | null; t
         alignItems: "center",
         justifyContent: "center",
         fontFamily: MONO,
-        fontSize: 26,
+        fontSize: 28,
         color: inkOf.orange,
       }}
     >

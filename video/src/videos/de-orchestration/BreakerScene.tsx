@@ -196,10 +196,10 @@ export const BreakerScene: React.FC = () => {
           <circle cx={badX} cy={midY} r={106 + 8 * ring} fill="none" stroke={ACCENT} strokeWidth={2.4} opacity={ease(frame, oneAt, 10) * (0.5 + 0.5 * ring)} strokeDasharray="6 5" />
         </svg>
         <Note at={oneAt + 6} x={badX - 100} y={midY + h(116)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>stays one bad table</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>stays one bad table</span>
         </Note>
         <Note at={spreadAt + 4} x={downX - 92} y={downY(DOWN.length - 1) + h(40)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>downstream untouched</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>downstream untouched</span>
         </Note>
         <Note at={fastAt + 4} x={X0} y={y(262)}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
@@ -211,15 +211,15 @@ export const BreakerScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>in services, the point isn&apos;t failing faster:</span>
         </Note>
         <Note at={loadAt} x={X0} y={y(800)}>
-          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>stop the load on what can&apos;t recover under it</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>stop the load on what can&apos;t recover under it</span>
         </Note>
 
         {/* The name's home: a failing dependency, a model. */}
-        <div style={{ position: "absolute", left: TX0, top: errTop - h(44), ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
+        <div style={{ position: "absolute", left: TX0, top: errTop - h(44), ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
           error rate at the dependency
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, modelAt, 10) }}> · a service&apos;s breaker, a model</span>
         </div>
-        <div style={{ position: "absolute", left: TX0, top: reqTop - h(44), ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
+        <div style={{ position: "absolute", left: TX0, top: reqTop - h(44), ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
           requests per second reaching it
         </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: chartIn }}>
@@ -242,7 +242,7 @@ export const BreakerScene: React.FC = () => {
           {[0, 0.5, 1].map((r) => (
             <g key={r}>
               <line x1={TX0} x2={TX1} y1={ey(r)} y2={ey(r)} stroke={r === BREAKER.trip ? ACCENT : INK_SOFT} strokeWidth={r === BREAKER.trip ? 1.8 : 1} strokeDasharray={r === BREAKER.trip ? "6 5" : r ? "2 6" : undefined} opacity={r === BREAKER.trip ? ease(frame, tripsAt, 10) : r ? 0.5 : 1} />
-              <text x={TX0 - 12} y={ey(r) + 7} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
+              <text x={TX0 - 12} y={ey(r) + 7} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
                 {`${r * 100}%`}
               </text>
             </g>
@@ -250,17 +250,17 @@ export const BreakerScene: React.FC = () => {
           {[0, 100, 200, 300].filter((v) => v <= yMax).map((v) => (
             <g key={v}>
               <line x1={TX0} x2={TX1} y1={ry(v)} y2={ry(v)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray={v ? "2 6" : undefined} opacity={v ? 0.5 : 1} />
-              <text x={TX0 - 12} y={ry(v) + 7} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
+              <text x={TX0 - 12} y={ry(v) + 7} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
                 {v}
               </text>
             </g>
           ))}
           {[0, 30, 60, 90, 120].map((t) => (
-            <text key={t} x={tx(t)} y={reqBot + 28} textAnchor="middle" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
+            <text key={t} x={tx(t)} y={reqBot + 28} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
               {t}
             </text>
           ))}
-          <text x={TX1} y={reqBot + 56} textAnchor="end" style={svgText({ ...label(19, INK_SOFT) })}>
+          <text x={TX1} y={reqBot + 56} textAnchor="end" style={svgText({ ...label(24, INK_SOFT) })}>
             seconds
           </text>
           {/* Retries alone. */}
@@ -271,12 +271,12 @@ export const BreakerScene: React.FC = () => {
           <path d={path(BREAKER.allowed, tNow, ry)} fill="none" stroke={OK} strokeWidth={3} />
         </svg>
         <Note at={tripsAt + 8} x={TX1 + 12} y={ey(BREAKER.trip) - 15}>
-          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             trips at <Num>{BREAKER.trip * 100}</Num>%
           </span>
         </Note>
         <Note at={nothingAt + 8} x={tx(firstOpen.t0)} y={ry(yMax) - h(4)} from="up">
-          <span style={{ ...label(20, INK), ...halo, fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), ...halo, fontWeight: 500, whiteSpace: "nowrap" }}>
             open <Num>{BREAKER.openFor}</Num> s at a time: nothing gets through
           </span>
         </Note>
@@ -299,24 +299,24 @@ export const BreakerScene: React.FC = () => {
           ))}
         </svg>
         <Note at={probeAt + 12} x={tx(failedProbe.t0 + 0.5) - 8} y={reqBot + h(70) - 12} align="right">
-          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>half-open: probe fails</span>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>half-open: probe fails</span>
         </Note>
         <Note at={probeAt + 36} x={tx(lastProbe.t0 + 0.5) + 8} y={reqBot + h(104) - 12}>
-          <span style={{ ...label(20, OK_INK), whiteSpace: "nowrap" }}>half-open: probe passes, closed</span>
+          <span style={{ ...label(24, OK_INK), whiteSpace: "nowrap" }}>half-open: probe passes, closed</span>
         </Note>
         <Note at={probeAt + 46} x={TX1 + 12} y={ry(BREAKER.offered) - 14}>
-          <span style={{ ...label(20, OK_INK), whiteSpace: "nowrap" }}>with a breaker</span>
+          <span style={{ ...label(24, OK_INK), whiteSpace: "nowrap" }}>with a breaker</span>
         </Note>
         <Note at={threeAt} x={TX1 + 12} y={ry(BREAKER.retryOffered[N - 1]) - 14}>
-          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             retries only, peak <Num>{BREAKER.retryPeak}</Num>
           </span>
         </Note>
         <Note at={neverAt + 20} x={TX1 + 12} y={ey(BREAKER.retryEndErrorRate) - 14}>
-          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>never recovers</span>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>never recovers</span>
         </Note>
         <Note at={probeAt + 46} x={TX1 + 12} y={ey(BREAKER.endErrorRate) - 26}>
-          <span style={{ ...label(20, BLUE_INK), whiteSpace: "nowrap" }}>recovers</span>
+          <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap" }}>recovers</span>
         </Note>
       </Drift>
     </AbsoluteFill>

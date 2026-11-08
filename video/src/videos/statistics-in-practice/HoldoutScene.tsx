@@ -145,21 +145,21 @@ export const HoldoutScene: React.FC = () => {
       {/* ── Labels ── */}
       <Ink at={seventyAt - 2} dur={14} out={dataAt - 6} style={{ left: LEFT_X - 8, top: y(LEFT_Y + 12 * PITCH), whiteSpace: "nowrap" }}>
         <span style={{ ...note(24, INK), fontWeight: 500 }}>{HOLDOUT.nExplore} bills to explore</span>
-        <span style={{ ...note(22, INK_SOFT), marginLeft: 12 }}>{Math.round((1 - HOLDOUT.share) * 100)}%</span>
+        <span style={{ ...note(24, INK_SOFT), marginLeft: 12 }}>{Math.round((1 - HOLDOUT.share) * 100)}%</span>
       </Ink>
       <Ink at={dataAt - 2} dur={14} style={{ left: LEFT_X - 8, top: y(LEFT_Y + 12 * PITCH), whiteSpace: "nowrap" }}>
         <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>The data stays on this side.</span>
       </Ink>
       <Ink at={lockedAt - 2} dur={14} style={{ left: box.x0, top: box.y1 + 14, whiteSpace: "nowrap" }}>
         <span style={{ ...note(24, INK), fontWeight: 500 }}>{HOLDOUT.nHeld} locked away</span>
-        <span style={{ ...note(22, INK_SOFT), marginLeft: 12 }}>{Math.round(HOLDOUT.share * 100)}%</span>
+        <span style={{ ...note(24, INK_SOFT), marginLeft: 12 }}>{Math.round(HOLDOUT.share * 100)}%</span>
       </Ink>
       <Check x={box.x0 + 2} y={box.y1 + 76} at={onceAt - 4} />
       <Ink at={onceAt - 2} dur={14} style={{ left: box.x0 + 44, top: box.y1 + 56, whiteSpace: "nowrap" }}>
         <span style={{ ...note(24, INK), fontWeight: 500 }}>tested once</span>
       </Ink>
       <Ink at={sayAt - 4} dur={14} style={{ left: box.x0 + 200, top: box.y1 + 58, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK_SOFT) }}>on bills that never shaped the hunch</span>
+        <span style={{ ...note(24, INK_SOFT) }}>on bills that never shaped the hunch</span>
       </Ink>
       <Ink at={whateverAt - 4} dur={14} style={{ left: box.x0 + 44, top: box.y1 + 100, whiteSpace: "nowrap" }}>
         <span style={{ ...note(24, INK), fontWeight: 500 }}>

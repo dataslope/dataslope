@@ -74,9 +74,9 @@ export const UpdateScene: React.FC = () => {
 
       {/* Postgres's whole answer: one row changed, nothing else said. */}
       <Ink at={swapAt + 4} dur={14} style={{ left: RIGHT_X, top: y(BODY_Y) + 6 }}>
-        <div style={label(21, INK_SOFT)}>Postgres replies</div>
+        <div style={label(24, INK_SOFT)}>Postgres replies</div>
         <div style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK, marginTop: 14 }}>{UPDATE_TAG}</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 14 }}>One row changed, and no warning.</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 14 }}>One row changed, and no warning.</div>
       </Ink>
 
       <DbTable
@@ -93,10 +93,10 @@ export const UpdateScene: React.FC = () => {
       />
       <Bracket x={right + 18} y0={g.rowTop(0) + 10} y1={g.rowTop(2) - 10} at={twoAt + 6} />
       <Note at={twoAt + 10} x={RIGHT_X} y={g.rowTop(0) + 8}>
-        <div style={{ ...body(36), color: ACCENT_INK, whiteSpace: "nowrap" }}>Two emails for Ada.</div>
+        <div style={{ ...body(34), color: ACCENT_INK, whiteSpace: "nowrap" }}>Two emails for Ada.</div>
       </Note>
       <Note at={whichAt - 2} x={RIGHT_X} y={g.rowTop(1) + 8}>
-        <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Which one is right? The table can&apos;t say.</div>
+        <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Which one is right? The table can&apos;t say.</div>
       </Note>
     </AbsoluteFill>
   );

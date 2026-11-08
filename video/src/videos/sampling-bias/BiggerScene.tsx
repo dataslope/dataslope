@@ -107,7 +107,7 @@ export const BiggerScene: React.FC = () => {
               x={PX.x0 - 56}
               y={y(ly(t)) + 7}
               textAnchor="end"
-              style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
+              style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
             >
               {t}
             </text>
@@ -120,7 +120,7 @@ export const BiggerScene: React.FC = () => {
               x={lx(s)}
               y={y(SCORE.base) + 30}
               textAnchor="middle"
-              style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
+              style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
             >
               {s.toLocaleString("en-US")}
             </text>
@@ -135,7 +135,7 @@ export const BiggerScene: React.FC = () => {
           opacity: ease(frame, biggerFrom, 14),
         }}
       >
-        <span style={label(19, INK_SOFT)}>Customers in each sample (log scale)</span>
+        <span style={label(24, INK_SOFT)}>Customers in each sample (log scale)</span>
       </div>
 
       {/* The truth, across every size. */}
@@ -151,8 +151,8 @@ export const BiggerScene: React.FC = () => {
         />
       </svg>
       <Note at={biggerFrom + 12} x={PX.x1 + 56} y={y(truthY) - 16}>
-        <span style={{ ...note(21, INK_SOFT), ...halo }}>true average </span>
-        <span style={{ ...note(22, INK), fontWeight: 500, ...halo }}>{fmt(TRUE_MEAN)}</span>
+        <span style={{ ...note(24, INK_SOFT), ...halo }}>true average </span>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo }}>{fmt(TRUE_MEAN)}</span>
       </Note>
 
       {/* Where 95 in 100 averages fall, by method. */}
@@ -171,11 +171,11 @@ export const BiggerScene: React.FC = () => {
       ))}
 
       <Note at={steadierAt + 6} x={930} y={y(668)}>
-        <span style={{ ...note(21, INK_SOFT), ...halo }}>Shaded: where 95 in 100 averages land</span>
+        <span style={{ ...note(24, INK_SOFT), ...halo }}>Shaded: where 95 in 100 averages land</span>
       </Note>
       <Note at={paceAt - 2} x={930} y={y(584)}>
-        <div style={{ ...label(21, INK), ...halo }}>The scatter, from 50 to 20,000 a sample:</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 6, ...halo }}>
+        <div style={{ ...label(24, INK), ...halo }}>The scatter, from 50 to 20,000 a sample:</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 6, ...halo }}>
           <b style={{ color: RANDOM_INK }}>{Math.round(TIGHTENING.random)} times</b> tighter at random,{" "}
           <b style={{ color: EASY_INK }}>{Math.round(TIGHTENING.convenience)}</b> the easy way
         </div>
@@ -183,12 +183,12 @@ export const BiggerScene: React.FC = () => {
 
       {/* End labels. */}
       <Note at={closingAt - 2} x={PX.x1 + 56} y={y(truthY) + 14}>
-        <span style={{ ...note(22, RANDOM_INK), fontWeight: 500, ...halo }}>random {fmt(LARGEST.random.center)}</span>
+        <span style={{ ...note(24, RANDOM_INK), fontWeight: 500, ...halo }}>random {fmt(LARGEST.random.center)}</span>
       </Note>
       <Note at={wrongAt - 2} x={PX.x1 + 56} y={y(ly(LARGEST.convenience.center)) - 16}>
         <span
           style={{
-            ...note(22, EASY_INK),
+            ...note(24, EASY_INK),
             fontWeight: 500,
             ...halo,
             display: "inline-block",
@@ -202,7 +202,7 @@ export const BiggerScene: React.FC = () => {
 
       {/* "One customer in ten", just over the column it describes. */}
       <Note at={oneInTenAt - 2} x={last} y={y(ly(LARGEST.convenience.max)) - 66} from="up">
-        <span style={{ display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap", ...note(21, INK_SOFT), ...halo }}>
+        <span style={{ display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap", ...note(24, INK_SOFT), ...halo }}>
           1 customer in {Math.round(POP_SIZE / LARGEST.n)}
         </span>
       </Note>
@@ -210,7 +210,7 @@ export const BiggerScene: React.FC = () => {
       {/* "Still almost ten points high", at the largest size. */}
       <VBracket x={last + 34} y0={y(truthY)} y1={y(ly(LARGEST.convenience.center))} at={steadyFrom + 4} />
       <Note at={highAt - 4} x={last + 56} y={y(ly((TRUE_MEAN + LARGEST.convenience.center) / 2)) - 17}>
-        <div style={{ ...note(26, EASY_INK), fontWeight: 500, ...halo }}>
+        <div style={{ ...note(28, EASY_INK), fontWeight: 500, ...halo }}>
           {fmt(LARGEST.convenience.center - TRUE_MEAN)} points high
         </div>
       </Note>

@@ -124,7 +124,7 @@ export const CloseScene: React.FC = () => {
           Two ways to miss.
         </Ink>
         <Note at={twoFrom + 10} x={96} y={y(258)}>
-          <span style={{ ...body(32, true), color: INK }}>
+          <span style={{ ...body(34, true), color: INK }}>
             Each sample:{" "}
             <Marker at={moreDataAt} out={methodFrom}>
               {perSample}
@@ -136,10 +136,10 @@ export const CloseScene: React.FC = () => {
 
       {/* The rule, top right, a line at a time. */}
       <div style={{ position: "absolute", inset: 0, opacity: back(sampleItAt) }}>
-        <Ink at={shrinksAt + 4} dur={18} style={{ left: 1000, top: y(160), ...body(36), color: INK, whiteSpace: "nowrap" }}>
+        <Ink at={shrinksAt + 4} dur={18} style={{ left: 1000, top: y(160), ...body(34), color: INK, whiteSpace: "nowrap" }}>
           More data shrinks the scatter.
         </Ink>
-        <Ink at={movesAt - 2} dur={18} style={{ left: 1000, top: y(216), ...body(36, true), color: RANDOM_INK, whiteSpace: "nowrap" }}>
+        <Ink at={movesAt - 2} dur={18} style={{ left: 1000, top: y(216), ...body(34, true), color: RANDOM_INK, whiteSpace: "nowrap" }}>
           Only a better method moves the center.
         </Ink>
       </div>
@@ -168,8 +168,8 @@ export const CloseScene: React.FC = () => {
             ...halo,
           }}
         >
-          <span style={note(21, INK_SOFT)}>true average </span>
-          <span style={{ ...note(22, INK), fontWeight: 500 }}>{fmt(TRUE_MEAN)}</span>
+          <span style={note(24, INK_SOFT)}>true average </span>
+          <span style={{ ...note(24, INK), fontWeight: 500 }}>{fmt(TRUE_MEAN)}</span>
         </div>
 
         {/* The pile, and once it has moved, where the easy way left it. */}
@@ -212,13 +212,13 @@ export const CloseScene: React.FC = () => {
             ...halo,
           }}
         >
-          <div style={label(21, INK)}>Variance</div>
+          <div style={label(24, INK)}>Variance</div>
           <div style={{ ...note(24, INK), fontWeight: 500 }}>&plusmn; {fmt(shownSpread)}</div>
-          <div style={note(20, INK_SOFT)}>one standard deviation</div>
+          <div style={note(24, INK_SOFT)}>one standard deviation</div>
         </div>
         <Note at={varianceAt} x={640} y={y(600)} out={biasAt}>
-          <div style={{ ...body(30, true), color: INK }}>how far one sample&rsquo;s</div>
-          <div style={{ ...body(30, true), color: INK }}>
+          <div style={{ ...body(28, true), color: INK }}>how far one sample&rsquo;s</div>
+          <div style={{ ...body(28, true), color: INK }}>
             average <Marker at={theNextAt - 2}>strays from the next</Marker>
           </div>
         </Note>
@@ -262,18 +262,18 @@ export const CloseScene: React.FC = () => {
             ...halo,
           }}
         >
-          <span style={note(21, RANDOM_INK)}>bias </span>
-          <span style={{ ...note(22, RANDOM_INK), fontWeight: 500 }}>+{fmt(MOVED.center - TRUE_MEAN)} points</span>
+          <span style={note(24, RANDOM_INK)}>bias </span>
+          <span style={{ ...note(24, RANDOM_INK), fontWeight: 500 }}>+{fmt(MOVED.center - TRUE_MEAN)} points</span>
         </div>
         <Note at={movesAt + 2} x={sx(X, CLOSE.narrow.hi) + 20} y={y(BASE - 140)}>
-          <div style={{ ...note(21, EASY_INK), ...halo }}>the easy way,</div>
-          <div style={{ ...note(21, EASY_INK), ...halo }}>still at {fmt(NARROW.center)}</div>
+          <div style={{ ...note(24, EASY_INK), ...halo }}>the easy way,</div>
+          <div style={{ ...note(24, EASY_INK), ...halo }}>still at {fmt(NARROW.center)}</div>
         </Note>
         {/* Up as "centered" is said, and kept until the pile starts to move,
             which would cross it. */}
         <Note at={centeredAt} x={640} y={y(600)} out={betterAt - 4}>
-          <div style={{ ...body(30, true), color: INK }}>where the averages</div>
-          <div style={{ ...body(30, true), color: EASY_INK }}>center, right or wrong</div>
+          <div style={{ ...body(28, true), color: INK }}>where the averages</div>
+          <div style={{ ...body(28, true), color: EASY_INK }}>center, right or wrong</div>
         </Note>
       </div>
     </AbsoluteFill>

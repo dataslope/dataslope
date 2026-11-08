@@ -108,7 +108,7 @@ export const LearnScene: React.FC = () => {
                   strokeWidth={2}
                   strokeDasharray="3 7"
                 />
-                <text x={p.b.right} y={at(ysOf(p.b), LEARN.noise) - 10} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
+                <text x={p.b.right} y={at(ysOf(p.b), LEARN.noise) - 10} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
                   the noise: {fmt(LEARN.noise)}
                 </text>
               </Svg>
@@ -137,7 +137,7 @@ export const LearnScene: React.FC = () => {
             </span>
           </Note>
           <Note at={biasAt - 2} x={LEFT.left} y={y(LEFT.bottom) + h(76)} out={end - 8}>
-            <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               bias: more data won&apos;t help
               {/* What will, in the right answer's green. */}
               <span style={{ color: OK_INK, opacity: ease(frame, flexAt - 2, 10) }}>; a more flexible model will</span>
@@ -152,7 +152,7 @@ export const LearnScene: React.FC = () => {
             <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the gap</span>
           </Note>
           <Note at={varianceAt - 2} x={RIGHT.left} y={y(RIGHT.bottom) + h(76)} out={end - 8}>
-            <span style={{ ...note(27, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               variance: <Mark at={cureAt}>more data helps</Mark>
             </span>
           </Note>

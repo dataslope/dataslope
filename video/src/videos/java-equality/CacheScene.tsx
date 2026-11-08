@@ -128,31 +128,31 @@ export const CacheScene: React.FC = () => {
           alignItems: "baseline",
           gap: "0.6em",
           whiteSpace: "nowrap",
-          fontSize: 30,
+          fontSize: 28,
         }}
       >
         <Ink at={autoAt - 4} dur={14} style={{ position: "relative" }}>
           <Code line={DECL} size={30} />
         </Ink>
         <Ink at={valueOfAt - 6} dur={14} style={{ position: "relative" }}>
-          <span style={{ ...body(32, true), color: INK_SOFT }}>compiles to</span>
+          <span style={{ ...body(34, true), color: INK_SOFT }}>compiles to</span>
         </Ink>
         <Ink at={valueOfAt} dur={16} style={{ position: "relative" }}>
           <Code line={CALL} size={30} />
         </Ink>
       </div>
       <Note at={valueOfAt + 14} x={LEFT} y={y(JAVAP)}>
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           javap shows one <Mono>Integer.valueOf</Mono> call for each of the {VALUE_OF_CALLS} boxings in Fig. 3.
         </span>
       </Note>
 
       {/* Heads, and the line between stack and heap. */}
       <Ink at={insideAt - 6} dur={14} style={{ left: CELL_X - 16, top: y(HEADS) }}>
-        <span style={label(21, INK_SOFT)}>Stack frame</span>
+        <span style={label(24, INK_SOFT)}>Stack frame</span>
       </Ink>
       <Ink at={cachedAt - 8} dur={14} style={{ left: HEAP_X, top: y(HEADS) }}>
-        <span style={label(21, INK_SOFT)}>Heap</span>
+        <span style={label(24, INK_SOFT)}>Heap</span>
       </Ink>
       <div
         style={{
@@ -181,8 +181,8 @@ export const CacheScene: React.FC = () => {
 
       {/* The cache. */}
       <Ink at={cachedAt - 4} dur={16} style={{ left: STRIP_X, top: y(CACHE_LABEL), whiteSpace: "nowrap" }}>
-        <span style={label(21, INK)}>Integer cache</span>
-        <span style={{ ...note(21, INK_SOFT), marginLeft: "0.7em" }}>
+        <span style={label(24, INK)}>Integer cache</span>
+        <span style={{ ...note(24, INK_SOFT), marginLeft: "0.7em" }}>
           one object for each of {CACHE.count} values
           <InkSlot at={lowAt}>
             , from {CACHE.low} to {CACHE.high}
@@ -238,7 +238,7 @@ export const CacheScene: React.FC = () => {
       />
       <Note at={sameAt + 4} x={LAST.x + BOX_W + 40} y={mid("a") - 22}>
         <Verdict expr="a == b" value={BOXED.aSameB} size={30} />
-        <div style={{ ...note(20, INK_SOFT), marginTop: 12 }}>one cached object</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 12 }}>one cached object</div>
       </Note>
 
       {/* x and y: two new objects. */}
@@ -264,18 +264,18 @@ export const CacheScene: React.FC = () => {
       <Note at={differAt - 2} x={VERDICT_X} y={mid("x") - 20}>
         <div style={{ display: "flex", alignItems: "baseline", gap: "0.8em" }}>
           <Verdict expr="x == y" value={BOXED.xSameY} size={30} />
-          <span style={note(20, INK_SOFT)}>two objects</span>
+          <span style={note(24, INK_SOFT)}>two objects</span>
         </div>
       </Note>
       <Note at={differAt + 10} x={VERDICT_X} y={mid("y") - 20}>
         <div style={{ display: "flex", alignItems: "baseline", gap: "0.8em" }}>
           <Verdict expr="x.equals(y)" value={BOXED.xEqualsY} size={30} />
-          <span style={note(20, INK_SOFT)}>same value</span>
+          <span style={note(24, INK_SOFT)}>same value</span>
         </div>
       </Note>
 
       <Note at={highAt + 24} x={LEFT} y={y(FOOT)}>
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           The default range on OpenJDK {JAVA_MAJOR}. Run with <Mono>{CACHE_RAISED.flag}</Mono> and it reaches{" "}
           {CACHE_RAISED.high}, so <Mono>x == y</Mono> in Fig. 3 prints <Mono>{String(CACHE_RAISED.xEqualsY)}</Mono>.
         </span>
@@ -318,7 +318,7 @@ const HeapCell: React.FC<{
         alignItems: "center",
         justifyContent: "center",
         fontFamily: MONO,
-        fontSize: 30,
+        fontSize: 28,
         fontWeight: 500,
         color: NUMBER_INK,
         fontVariantLigatures: "none",

@@ -172,11 +172,11 @@ export const LeversScene: React.FC = () => {
             {/* The numerals are set in the list's own face, so each line is one
                 size and one family. */}
             <div style={{ position: "absolute", left: X0, top: ry, opacity: slot * 0.25 * (1 - ease(frame, at - 6, 8)) }}>
-              <span style={{ ...body(32), color: INK_SOFT, fontWeight: 500 }}>{i + 1}</span>
+              <span style={{ ...body(34), color: INK_SOFT, fontWeight: 500 }}>{i + 1}</span>
             </div>
             <Ink at={at - 6} dur={14} style={{ left: X0, top: ry, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 24 }}>
-              <span style={{ ...body(32), color: POINT_INK, fontWeight: 500, width: 34 }}>{i + 1}</span>
-              <span style={{ ...body(32), color: INK }}>{text}</span>
+              <span style={{ ...body(34), color: POINT_INK, fontWeight: 500, width: 34 }}>{i + 1}</span>
+              <span style={{ ...body(34), color: INK }}>{text}</span>
             </Ink>
           </React.Fragment>
         );
@@ -185,7 +185,7 @@ export const LeversScene: React.FC = () => {
       <Note at={fiveAt - 4} x={TEXT_X + 360} y={listY(2) + 6}>
         <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <Square color={OUTPUT} glow={pulse(frame, fiveAt + 8, 20)} />
-          <span style={{ ...note(26, INK_SOFT), margin: "0 8px" }}>=</span>
+          <span style={{ ...note(28, INK_SOFT), margin: "0 8px" }}>=</span>
           {Array.from({ length: OUTPUT_WORTH }, (_, k) => (
             <Square key={k} color={INPUT} glow={pulse(frame, fiveAt + 4 + k * 3, 16)} />
           ))}
@@ -194,7 +194,7 @@ export const LeversScene: React.FC = () => {
       {/* Lever 6's exception: a whole document pasted every turn is a retrieval problem. */}
       <Arrow from={[TEXT_X + 392, listY(5) + 36]} to={[TEXT_X + 392, listY(5) + 4]} at={topAt - 4} dur={10} color={POINT_INK} width={2.6} />
       <Note at={topAt - 2} x={TEXT_X + 410} y={listY(5) + 6}>
-        <span style={{ ...note(25, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>retrieval goes to the top</span>
+        <span style={{ ...note(24, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>retrieval goes to the top</span>
       </Note>
       {/* Fig. 14 makes way at "passes", and the levers come back for the close. */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, passesFrom + 4, 12) }}>
@@ -211,7 +211,7 @@ export const LeversScene: React.FC = () => {
 
       {/* Lever 5: about half off. */}
       <Note at={halfAt - 4} x={TEXT_X + 460} y={listY(4) + 8}>
-        <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>about half off</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>about half off</span>
       </Note>
 
       {/* ── The art, while no figure needs the right half ── */}
@@ -236,7 +236,7 @@ export const LeversScene: React.FC = () => {
           return (
             <div key={row.thinking} style={{ position: "absolute", inset: 0, opacity: fade }}>
               <Note at={at} x={RX} y={ry - 40}>
-                <span style={{ ...note(25, INK), ...TABULAR, whiteSpace: "nowrap" }}>{int(row.thinking)} thinking tokens</span>
+                <span style={{ ...note(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>{int(row.thinking)} thinking tokens</span>
               </Note>
               <HBar x={RX} y={ry} w={px(inC)} h={h(40)} at={at} dur={6} fill={INPUT} radius={2} />
               <HBar x={RX + px(inC)} y={ry} w={px(ansC)} h={h(40)} at={at + 2} dur={6} fill={OUTPUT} radius={2} />
@@ -246,7 +246,7 @@ export const LeversScene: React.FC = () => {
               <Note at={at + 12} x={RX + px(inC + ansC + thinkC) + 14} y={ry + h(20) - 19}>
                 <span style={{ display: "flex", alignItems: "baseline", gap: 12, whiteSpace: "nowrap" }}>
                   <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>{usd(row.cost, 5)}</span>
-                  <span style={{ ...note(26, INK), fontWeight: 500, ...TABULAR }}>{row.times.toFixed(1)}x</span>
+                  <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR }}>{row.times.toFixed(1)}x</span>
                 </span>
               </Note>
             </div>
@@ -265,11 +265,11 @@ export const LeversScene: React.FC = () => {
           return (
             <React.Fragment key={t.model}>
               <Note at={cheapestAt + 2 + i * 3} x={RX} y={ry}>
-                <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>{NAME[t.model]}</span>
+                <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{NAME[t.model]}</span>
               </Note>
               <HBar x={F12_BAR_X} y={ry + 4} w={w} h={h(24)} at={at} dur={18} fill={COST} />
               <Note at={at + 10} x={F12_BAR_X + w + 12} y={ry}>
-                <span style={{ ...note(23, markAt[t.model] ? POINT_INK : INK), fontWeight: markAt[t.model] ? 500 : 500, ...TABULAR, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(24, markAt[t.model] ? POINT_INK : INK), fontWeight: markAt[t.model] ? 500 : 500, ...TABULAR, whiteSpace: "nowrap" }}>
                   {markAt[t.model] ? <Marked at={markAt[t.model]}>{usd(t.month)}</Marked> : usd(t.month)}
                 </span>
               </Note>
@@ -285,14 +285,14 @@ export const LeversScene: React.FC = () => {
           width={2.6}
         />
         <Note at={haikuAt + 6} x={RX} y={f12Y(ROUTE.tiers.length) - 4}>
-          <span style={{ ...note(25, POINT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, POINT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
             Routed to {NAME.haiku}: {usd(ROUTE.saving)} a month saved
           </span>
         </Note>
 
         {/* Still resent in full: the provider recognises the prefix and reads it back. */}
         <Note at={resendAt - 4} x={RX} y={y(F13_Y + 168)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             every turn still sent in full
             <span style={{ opacity: ease(frame, readsAt - 6, 12), color: CACHED_INK }}>, the prefix read back</span>
           </span>
@@ -309,7 +309,7 @@ export const LeversScene: React.FC = () => {
           return (
             <React.Fragment key={r.name}>
               <Note at={r.at - 4} x={RX} y={ry}>
-                <span style={{ ...note(23, r.ink), fontWeight: 500, whiteSpace: "nowrap" }}>{r.name}</span>
+                <span style={{ ...note(24, r.ink), fontWeight: 500, whiteSpace: "nowrap" }}>{r.name}</span>
               </Note>
               {/* "Resend it all" swells the full bar; "recognizes" swells the cached one. */}
               <HBar
@@ -340,7 +340,7 @@ export const LeversScene: React.FC = () => {
 
       {/* "Passes what?" */}
       <Note at={whatAt - 2} x={TEXT_X} y={listY(6) - 6}>
-        <span style={{ ...body(30, true), color: POINT_INK }}>
+        <span style={{ ...body(28, true), color: POINT_INK }}>
           Passes what? <span style={{ opacity: ease(frame, testAt - 4, 12) }}>A test.</span>
         </span>
       </Note>
@@ -442,7 +442,7 @@ const RetrievalFig: React.FC<{
         );
       })}
       <Note at={documentAt + 6} x={x} y={top + cardH + 14}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           the whole document
           <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, everyTurnAt - 4, 12) }}>, sent every turn</span>
         </span>
@@ -485,7 +485,7 @@ const RetrievalFig: React.FC<{
         />
       ))}
       <Note at={threeAt + 10} x={smallX} y={smallTop + smallH + 14}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>three paragraphs would do</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>three paragraphs would do</span>
       </Note>
       <Note at={retrievalAt - 2} x={smallX} y={smallTop - 42}>
         <span style={{ ...note(24, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>retrieval: send only these</span>

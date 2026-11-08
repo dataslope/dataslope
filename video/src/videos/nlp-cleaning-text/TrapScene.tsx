@@ -200,7 +200,7 @@ export const TrapScene: React.FC = () => {
                   marks={r.word === "never" ? [{ at: isntAt, out: reviewAt }] : []}
                 />
                 <Ink at={readAt[r.word] + 4} dur={12} style={{ left: X0 + 150, top: top + chipH / 2 - 17, whiteSpace: "nowrap" }}>
-                  <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: r.isStop ? ACCENT_INK : INK_SOFT }}>
+                  <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: r.isStop ? ACCENT_INK : INK_SOFT }}>
                     {r.isStop ? "True" : "False"}
                   </span>
                 </Ink>

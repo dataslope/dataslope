@@ -235,7 +235,7 @@ export const Call: React.FC<{ at: number; x: number; y: number; children: React.
         top: y + 2,
         opacity: p * (1 - o),
         fontFamily: MONO,
-        fontSize: 21,
+        fontSize: 24,
         fontWeight: 500,
         color: INK_SOFT,
         whiteSpace: "nowrap",
@@ -280,12 +280,12 @@ export const LabelEnd: React.FC<{
         whiteSpace: "nowrap",
       }}
     >
-      <span style={{ opacity: p, fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>
+      <span style={{ opacity: p, fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>
         {call}
       </span>
       {/* The count at 22px beside the 21px call: one line, one size. */}
       {count ? (
-        <span style={{ ...note(22, countColor), fontWeight: 500, opacity: c, transform: `translateY(${(1 - c) * 6}px)`, display: "inline-block" }}>
+        <span style={{ ...note(24, countColor), fontWeight: 500, opacity: c, transform: `translateY(${(1 - c) * 6}px)`, display: "inline-block" }}>
           {count}
         </span>
       ) : null}

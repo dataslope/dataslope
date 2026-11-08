@@ -59,7 +59,7 @@ export const ShareScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 2} dur={14} style={{ left: 124, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Transform, then divide</span>
+        <span style={label(24, ACCENT_INK)}>Transform, then divide</span>
       </Ink>
       <div style={{ position: "absolute", left: 118, top: y(146), display: "flex", gap: "0.26em", ...headline(66) }}>
         <Ink at={start + 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
@@ -134,14 +134,14 @@ export const ShareScene: React.FC = () => {
       <Note at={pctAt - 4} x={NOTE_X} y={exMid - 44}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 16, whiteSpace: "nowrap" }}>
           <span style={{ ...headline(64), color: DEPT_INK[EXAMPLE.dept] }}>{pct(SHARES[ex])}</span>
-          <span style={{ ...body(30), opacity: ease(frame, engAt - 4, 12) }}>
+          <span style={{ ...body(28), opacity: ease(frame, engAt - 4, 12) }}>
             {EXAMPLE.salary} of engineering&apos;s {TOTALS[ex]}
           </span>
         </div>
       </Note>
 
       <Note at={engAt + 14} x={A_X} y={y(ROW0 + 7 * RH + 18)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Within each department, the shares add up to {pct(Math.min(...SHARE_SUMS))}.
         </span>
       </Note>

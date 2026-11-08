@@ -117,7 +117,7 @@ export const DipScene: React.FC = () => {
           lit={socketLit + pulse(frame, sendAt, 20)}
           radius={8}
         >
-          <span style={{ ...label(20, OK_INK), fontWeight: 500, textAlign: "center", lineHeight: 1.15 }}>
+          <span style={{ ...label(24, OK_INK), fontWeight: 500, textAlign: "center", lineHeight: 1.15 }}>
             sends a
             <br />
             message

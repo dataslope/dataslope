@@ -102,7 +102,7 @@ const SurveyBar: React.FC<{ top: number; pct: number; at: number; children: Reac
             position: "absolute",
             left: w * grow + 14,
             top: -1,
-            ...note(30, BLUE_INK),
+            ...note(28, BLUE_INK),
             fontWeight: 500,
             lineHeight: "38px",
             whiteSpace: "nowrap",
@@ -124,8 +124,8 @@ const Moved: React.FC<{ at: number; title: string; part: React.ReactNode }> = ({
   const p = ease(frame, at - 2, 14);
   return (
     <div style={{ opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
-      <div style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{title}</div>
-      <div style={{ ...label(22, BLUE_INK), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, at + 12, 12) }}>{part}</div>
+      <div style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...label(24, BLUE_INK), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, at + 12, 12) }}>{part}</div>
     </div>
   );
 };
@@ -252,7 +252,7 @@ export const AiScene: React.FC = () => {
             top: rootTop,
             height: ROOT_LINE,
             textAlign: "center",
-            ...note(32, INK),
+            ...note(34, INK),
             fontWeight: 500,
             lineHeight: `${ROOT_LINE}px`,
             opacity: ease(frame, roundAt - 2, 12),
@@ -277,7 +277,7 @@ export const AiScene: React.FC = () => {
               width: COL_W,
               top: headTop,
               textAlign: "center",
-              ...note(30, INK),
+              ...note(28, INK),
               fontWeight: 500,
               opacity: headIn(head.at),
               transform: `translateY(${(1 - headIn(head.at)) * 8}px)`,
@@ -304,7 +304,7 @@ export const AiScene: React.FC = () => {
             width: COL_W,
             top: y(CAPTION_Y),
             textAlign: "center",
-            ...note(22, INK_SOFT),
+            ...note(24, INK_SOFT),
             opacity: ease(frame, gradeAt - 2, 12),
           }}
         >
@@ -317,11 +317,11 @@ export const AiScene: React.FC = () => {
             width: COL_W,
             top: y(CAPTION_Y),
             textAlign: "center",
-            ...note(22, INK_SOFT),
+            ...note(24, INK_SOFT),
             opacity: ease(frame, practiceAt - 2, 12),
           }}
         >
-          algorithm practice still matters: <span style={label(22, BLUE_INK)}>Part {partOf("be-algorithms")}</span>
+          algorithm practice still matters: <span style={label(24, BLUE_INK)}>Part {partOf("be-algorithms")}</span>
         </div>
         {allowed.map((f, i) => (
           <FormatRow key={f.text} c={0} i={i} format={f} out={cardsOut} />
@@ -336,7 +336,7 @@ export const AiScene: React.FC = () => {
             width: COL_W,
             textAlign: "center",
             top: y(ROWS_Y) + 2 * h(ROW_STEP) + 18,
-            ...label(22, BLUE_INK),
+            ...label(24, BLUE_INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, allowedEnd - 10, 12) * (1 - ease(frame, cardsOut, 12)),
           }}
@@ -362,8 +362,8 @@ export const AiScene: React.FC = () => {
         />
         {/* Level with the middle of the survey beside it. */}
         <div style={{ position: "absolute", left: TAKE_X, top: surveyTop + 136, opacity: panel }}>
-          <div style={{ ...note(26, INK), whiteSpace: "nowrap", opacity: ease(frame, finishAt - 2, 12) }}>An assistant can finish a take-home,</div>
-          <div style={{ ...note(26, INK), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, unseenAt - 2, 12) }}>
+          <div style={{ ...note(28, INK), whiteSpace: "nowrap", opacity: ease(frame, finishAt - 2, 12) }}>An assistant can finish a take-home,</div>
+          <div style={{ ...note(28, INK), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, unseenAt - 2, 12) }}>
             and <Mark at={unseenAt + 2}>nobody sees how.</Mark>
           </div>
         </div>
@@ -385,16 +385,16 @@ export const AiScene: React.FC = () => {
 
         {/* Karat's survey, sourced, with the page's caveat. */}
         <div style={{ position: "absolute", left: SURVEY_X, top: surveyTop, opacity: panel }}>
-          <div style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, karatAt - 2, 12) }}>
+          <div style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, karatAt - 2, 12) }}>
             Karat, <i>Engineering Interview Trends {KARAT.year}</i>
           </div>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>
             <span style={{ opacity: ease(frame, leadersAt - 2, 12) }}>
               <Num>{KARAT.leaders}</Num> engineering leaders.
             </span>{" "}
             <span style={{ opacity: ease(frame, sellsAt - 2, 12) }}>Karat sells interviewing services,</span>
           </div>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 4, whiteSpace: "nowrap", opacity: ease(frame, vendorAt - 2, 12) }}>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 4, whiteSpace: "nowrap", opacity: ease(frame, vendorAt - 2, 12) }}>
             so read these as <Mark at={vendorAt + 2}>one vendor&apos;s survey</Mark>
           </div>
         </div>

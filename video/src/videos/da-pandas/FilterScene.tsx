@@ -182,7 +182,7 @@ export const FilterScene: React.FC = () => {
           <Note key={op} at={opAt[k]} x={X0 + k * 170} y={g.rowTop(FILTER.frame.rows.length) + h(36)}>
             <span style={{ ...note(28, INK), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
               {/* Within 12% of its word's size: one line, one size. */}
-              <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 500, color: INK }}>{op}</span>
+              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK }}>{op}</span>
               {word}
             </span>
           </Note>

@@ -169,7 +169,7 @@ export const Entity: React.FC<{
           borderBottom: filled > 0 ? `1.5px solid ${INK}` : undefined,
           fontFamily: SANS,
           fontWeight: 500,
-          fontSize: 25,
+          fontSize: 24,
           letterSpacing: "-0.01em",
           color: INK,
           whiteSpace: "nowrap",
@@ -212,7 +212,7 @@ export const Entity: React.FC<{
                 flex: "none",
                 fontFamily: SANS,
                 fontWeight: 500,
-                fontSize: 19,
+                fontSize: 24,
                 color: BLUE_INK,
                 whiteSpace: "nowrap",
               }}
@@ -225,11 +225,11 @@ export const Entity: React.FC<{
                 </React.Fragment>
               ))}
             </span>
-            <span style={{ fontFamily: MONO, fontSize: 21, color: INK, whiteSpace: "nowrap", flex: "1 1 auto", overflow: "hidden" }}>
+            <span style={{ fontFamily: MONO, fontSize: 24, color: INK, whiteSpace: "nowrap", flex: "1 1 auto", overflow: "hidden" }}>
               {c.name}
             </span>
             {c.type ? (
-              <span style={{ fontFamily: MONO, fontSize: 19, color: INK_SOFT, whiteSpace: "nowrap" }}>{c.type}</span>
+              <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT, whiteSpace: "nowrap" }}>{c.type}</span>
             ) : null}
           </div>
         );
@@ -342,7 +342,7 @@ export const Relation: React.FC<{
             top: at2[1],
             opacity: labelIn * (1 - gone) * (1 - dimmed),
             whiteSpace: "nowrap",
-            ...note(21, INK_SOFT),
+            ...note(24, INK_SOFT),
             ...halo,
           }}
         >

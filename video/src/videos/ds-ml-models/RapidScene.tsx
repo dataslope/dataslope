@@ -185,7 +185,7 @@ const Scale13: React.FC<{ c: Ctx }> = ({ c }) => {
                 left: R_X,
                 top: top + c.h(8),
                 opacity: p,
-                ...note(22, INK),
+                ...note(24, INK),
                 whiteSpace: "nowrap",
               }}
             >
@@ -214,7 +214,7 @@ const Scale13: React.FC<{ c: Ctx }> = ({ c }) => {
                 left: R_X + 240 + W * b.v * p,
                 top: top + c.h(6),
                 opacity: p,
-                ...note(23, b.color),
+                ...note(24, b.color),
                 fontWeight: 500,
                 ...TABULAR,
               }}
@@ -312,7 +312,7 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {kinds.map((k, i) => (
         <Note key={k.name} at={k.at} x={R_X} y={c.y(360) + i * c.h(52)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b style={{ display: "inline-block", width: 150 }}>{k.name}</b>
             {k.text}
           </span>
@@ -332,7 +332,7 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
           <span
             style={{
               fontFamily: MONO,
-              fontSize: 21,
+              fontSize: 24,
               fontWeight: 500,
               color: BLUE_INK,
               whiteSpace: "nowrap",
@@ -483,12 +483,12 @@ export const RapidScene: React.FC = () => {
           />
         </Svg>
         <Note at={nextFrom} x={gx} y={gy - h(70)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             every model here, built from parts you can point to
           </span>
         </Note>
         <Note at={learnsAt} x={gx + 560} y={gy - h(4)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Mark at={learnsAt + 4}>a neural network learns its own</Mark>
           </span>
         </Note>

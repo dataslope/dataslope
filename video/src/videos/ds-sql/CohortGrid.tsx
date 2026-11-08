@@ -51,11 +51,11 @@ export const CohortGrid: React.FC<{
 
   return (
     <div style={{ position: "absolute", inset: 0, opacity: p * (1 - d) * (1 - o) }}>
-      <div style={{ position: "absolute", left: x0, top: top - 58, ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>months since first active</div>
+      <div style={{ position: "absolute", left: x0, top: top - 58, ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>months since first active</div>
       {Array.from({ length: cols }, (_, c) => (
         <div
           key={c}
-          style={{ position: "absolute", left: x0 + c * cell, top: top - 30, width: cell, textAlign: "center", ...label(20, INK_SOFT), ...TABULAR }}
+          style={{ position: "absolute", left: x0 + c * cell, top: top - 30, width: cell, textAlign: "center", ...label(24, INK_SOFT), ...TABULAR }}
         >
           {c}
         </div>
@@ -125,7 +125,7 @@ export const CohortGrid: React.FC<{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...note(23, v >= 60 ? PAPER : INK),
+                ...note(24, v >= 60 ? PAPER : INK),
                 fontWeight: 500,
                 ...TABULAR,
               }}
@@ -146,7 +146,7 @@ export const CohortGrid: React.FC<{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            ...note(22, INK_SOFT),
+            ...note(24, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, blankNote.at, 12),
           }}

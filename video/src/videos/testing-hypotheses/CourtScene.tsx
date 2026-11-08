@@ -89,7 +89,7 @@ export const CourtScene: React.FC = () => {
         </Label>
       </Ink>
       <Ink at={defendantAt - 4} dur={16} style={{ left: 140, top: y(380), width: 340 }}>
-        <span style={{ ...body(32, true), color: INK_SOFT }}>
+        <span style={{ ...body(34, true), color: INK_SOFT }}>
           The null is the defendant.
         </span>
       </Ink>
@@ -102,7 +102,7 @@ export const CourtScene: React.FC = () => {
         ].map(([t, x]) => (
           <div
             key={t as string}
-            style={{ position: "absolute", left: x as number, top: y(HEAD_Y), opacity: ease(frame, courtFrom, 12), ...label(22, INK_SOFT) }}
+            style={{ position: "absolute", left: x as number, top: y(HEAD_Y), opacity: ease(frame, courtFrom, 12), ...label(24, INK_SOFT) }}
           >
             {t}
           </div>
@@ -120,7 +120,7 @@ export const CourtScene: React.FC = () => {
         {ROWS.map((r, i) => (
           <React.Fragment key={i}>
             <Ink at={r.at} dur={14} style={{ left: COURT_X, top: rowY(i) + 6, whiteSpace: "nowrap" }}>
-              <span style={{ ...body(38, true), color: INK }}>{r.court}</span>
+              <span style={{ ...body(34, true), color: INK }}>{r.court}</span>
             </Ink>
             <Ink at={r.testAt} dur={14} style={{ left: TEST_X, top: rowY(i) + 10, whiteSpace: "nowrap" }}>
               <div style={{ transform: `scale(${1 + 0.05 * (i === 1 ? barGlow : i === 3 ? failGlow : 0)})`, transformOrigin: "0 50%" }}>
@@ -154,7 +154,7 @@ export const CourtScene: React.FC = () => {
 
         {/* The cell that matters most. */}
         <Ink at={neverAt - 2} dur={16} style={{ left: COURT_X, top: rowY(4) + 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(38, true), color: STAT_INK }}>is not innocent</span>
+          <span style={{ ...body(34, true), color: STAT_INK }}>is not innocent</span>
         </Ink>
         <Ink at={proveAt - 4} dur={16} style={{ left: TEST_X, top: rowY(4) + 10, whiteSpace: "nowrap" }}>
           <Label size={32} color={STAT_INK}>

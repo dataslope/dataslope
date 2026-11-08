@@ -235,7 +235,7 @@ export const DayStrip: React.FC<{
                 top: g.top + g.cellH + h(8),
                 width: g.cell,
                 textAlign: "center",
-                ...label(20, INK_SOFT),
+                ...label(24, INK_SOFT),
                 fontVariantNumeric: "tabular-nums",
                 opacity: p,
               }}
@@ -299,7 +299,7 @@ const Span: React.FC<{ g: StripGeometry; span: StripSpan }> = ({ g, span }) => {
         />
       </svg>
       <Ink at={span.at + 6} dur={12} style={{ left: x0, top: y + h(10), width: x1 - x0, textAlign: "center", whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, span.ink ?? INK), fontWeight: 500 }}>{span.label}</span>
+        <span style={{ ...note(24, span.ink ?? INK), fontWeight: 500 }}>{span.label}</span>
       </Ink>
     </div>
   );

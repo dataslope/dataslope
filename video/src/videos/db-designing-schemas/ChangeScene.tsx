@@ -151,7 +151,7 @@ export const ChangeScene: React.FC = () => {
             width: CHIP_W - 24,
             boxSizing: "border-box",
             justifyContent: "center",
-            ...label(21, INK_SOFT),
+            ...label(24, INK_SOFT),
           }}
         >
           v6 and on
@@ -215,7 +215,7 @@ export const ChangeScene: React.FC = () => {
         }}
       />
       <Ink at={schemaAt - 2} dur={14} style={{ left: frameBox.right - 210, top: frameBox.bottom + 12, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(21, INK_SOFT) }}>the live schema</span>
+        <span style={{ ...label(24, INK_SOFT) }}>the live schema</span>
       </Ink>
       <div style={{ position: "absolute", left: from[0] - 5, top: from[1] - 5, width: 10, height: 10, borderRadius: 5, background: INK, opacity: ease(frame, leanAt[0] - 6, 8) }} />
     </AbsoluteFill>

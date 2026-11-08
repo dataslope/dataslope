@@ -138,13 +138,13 @@ export const CondScene: React.FC = () => {
         })}
         {/* Both stay true: each line says which faces it counts over. */}
         <Note at={rollAt + 16} x={X0} y={y(DIE.y + DIE.size + 34)} out={out1}>
-          <span style={{ ...math(38, `color-mix(in srgb, ${INK_SOFT} ${quiet * 100}%, ${INK})`), ...ROW }}>
+          <span style={{ ...math(34, `color-mix(in srgb, ${INK_SOFT} ${quiet * 100}%, ${INK})`), ...ROW }}>
             <P>six</P> = {COND.pSix}
           </span>
           <span style={{ ...note(24, INK_SOFT), opacity: quiet, whiteSpace: "nowrap" }}>out of all six faces</span>
         </Note>
         <Note at={sixAt + 2} x={X0} y={y(DIE.y + DIE.size + 96)} out={out1}>
-          <span style={{ ...math(38, OK_INK), ...ROW }}>
+          <span style={{ ...math(34, OK_INK), ...ROW }}>
             <P>
               six
               <Given />
@@ -242,19 +242,19 @@ export const CondScene: React.FC = () => {
             it is in the theorem) and what you want (the answer, in green). */}
         <Note at={diseaseAt} x={X0} y={y(590)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            <span style={math(30, INK)}>
+            <span style={math(28, INK)}>
               <V>A</V>
             </span>{" "}
             = disease,
-            <span style={{ ...math(30, INK), marginLeft: 26 }}>
+            <span style={{ ...math(28, INK), marginLeft: 26 }}>
               <V>B</V>
             </span>{" "}
             = positive
           </span>
         </Note>
         <Note at={knowAt + 2} x={X0} y={y(650)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>you know </span>
-          <span style={math(36, INK)}>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>you know </span>
+          <span style={math(34, INK)}>
             <Mark at={knowAt + 10}>
               <P>
                 positive
@@ -267,10 +267,10 @@ export const CondScene: React.FC = () => {
         {/* The bridge points at what the next question computes: washed green
             on "that test", and swelling on "with numbers". */}
         <Note at={wantAt + 2} x={X0} y={y(720)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>you want </span>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>you want </span>
           <span
             style={{
-              ...math(36, OK_INK),
+              ...math(34, OK_INK),
               display: "inline-block",
               transform: `scale(${1 + 0.07 * pulse(frame, numbersAt, 22)})`,
               transformOrigin: "0 50%",

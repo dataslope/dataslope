@@ -120,7 +120,7 @@ export const IsntScene: React.FC = () => {
             line in two sizes and two faces. */}
         <Ink at={dataAt - 4} dur={16} style={{ left: LEFT, top: y(530), whiteSpace: "nowrap" }}>
           <Cond a="data" b={<H0 />} color={DATA_INK} />
-          <div style={{ ...label(22, DATA_INK), marginTop: GLOSS_DY, opacity: ease(frame, givenAt, 12) }}>the p-value</div>
+          <div style={{ ...label(24, DATA_INK), marginTop: GLOSS_DY, opacity: ease(frame, givenAt, 12) }}>the p-value</div>
         </Ink>
         <Ink
           at={nullGivenAt - 4}
@@ -128,10 +128,10 @@ export const IsntScene: React.FC = () => {
           style={{ left: LEFT, top: y(530) + COND_STEP, whiteSpace: "nowrap", transform: `translateX(${Math.sin(shake * Math.PI * 3) * 6}px)` }}
         >
           <Cond a={<H0 />} b="data" color={INK} />
-          <div style={{ ...label(22, INK_SOFT), marginTop: GLOSS_DY, opacity: ease(frame, givenDataAt, 12) }}>not the p-value</div>
+          <div style={{ ...label(24, INK_SOFT), marginTop: GLOSS_DY, opacity: ease(frame, givenDataAt, 12) }}>not the p-value</div>
         </Ink>
         <Ink at={fallacyAt - 4} dur={18} style={{ left: LEFT, top: y(530) + 2 * COND_STEP, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(32, true), color: INK_SOFT }}>
+          <span style={{ ...body(34, true), color: INK_SOFT }}>
             Swapping them: <Mark at={fallacyEndAt}>the prosecutor&apos;s fallacy</Mark>
           </span>
         </Ink>
@@ -162,7 +162,7 @@ export const IsntScene: React.FC = () => {
               />
             </Svg>
             <Note at={dataAt + 2} x={TABLE_X + 780} y={y(NW.base) - 96} align="right">
-              <span style={{ ...body(30, true), color: DATA_INK, whiteSpace: "nowrap" }}>
+              <span style={{ ...body(28, true), color: DATA_INK, whiteSpace: "nowrap" }}>
                 P( data <span style={{ color: INK_SOFT }}>|</span> <H0 /> )
               </span>
             </Note>
@@ -182,7 +182,7 @@ export const IsntScene: React.FC = () => {
         {/* ── Fig. 7: a tiny fixed effect, a growing sample ── */}
         <FigLabel n="7" title={`A true effect of ${TINY.effect} SD, never changed`} at={norAt + 2} x={TABLE_X} y={y(310)} />
         {["Per group", "Effect", "p-value, as printed"].map((t, i) => (
-          <div key={t} style={{ position: "absolute", left: COLS[i], top: y(365), opacity: ease(frame, holdAt - 4 + i * 3, 12), ...label(21, INK_SOFT) }}>
+          <div key={t} style={{ position: "absolute", left: COLS[i], top: y(365), opacity: ease(frame, holdAt - 4 + i * 3, 12), ...label(24, INK_SOFT) }}>
             {t}
           </div>
         ))}
@@ -219,10 +219,10 @@ export const IsntScene: React.FC = () => {
           const loud = spoken.includes(i);
           return (
             <React.Fragment key={r.n}>
-              <div style={{ position: "absolute", left: COLS[0], top: ry, opacity: ease(frame, growAt - 4 + i * 3, 10), ...note(30, INK), fontWeight: 500 }}>
+              <div style={{ position: "absolute", left: COLS[0], top: ry, opacity: ease(frame, growAt - 4 + i * 3, 10), ...note(28, INK), fontWeight: 500 }}>
                 {fmt(r.n, 0)}
               </div>
-              <div style={{ position: "absolute", left: COLS[1], top: ry, opacity: ease(frame, fixedAt - 2 + i * 2, 10), ...note(30, INK_SOFT) }}>
+              <div style={{ position: "absolute", left: COLS[1], top: ry, opacity: ease(frame, fixedAt - 2 + i * 2, 10), ...note(28, INK_SOFT) }}>
                 {TINY.effect}
               </div>
               <div
@@ -231,7 +231,7 @@ export const IsntScene: React.FC = () => {
                   left: COLS[2],
                   top: ry,
                   opacity: a * (loud ? 1 : 0.7),
-                  ...note(30, r.p < 0.05 ? STAT_INK : INK),
+                  ...note(28, r.p < 0.05 ? STAT_INK : INK),
                   fontWeight: 500,
                   transform:
                     i === 0 ? `scale(${1 + 0.12 * firstGlow})` : i === 2 ? `scale(${1 + 0.12 * thirdGlow})` : i >= 3 ? `scale(${1 + 0.12 * zeroGlow})` : undefined,

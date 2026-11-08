@@ -55,7 +55,7 @@ export const MemoScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 12} dur={14} style={{ left: 124, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>The fix</span>
+        <span style={label(24, ACCENT_INK)}>The fix</span>
       </Ink>
       <Ink at={start - 10} dur={22} style={{ left: 118, top: y(150), ...headline(84), whiteSpace: "nowrap" }}>
         Write each answer <span style={headline(84, true)}>down.</span>
@@ -94,14 +94,14 @@ export const MemoScene: React.FC = () => {
         ]}
       />
       <Note at={checkAt + 8} x={LIST_X} y={listingBottom + 22} from="up">
-        <span style={note(21, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Lines 4 and 5 check the table before computing. Line 6 stores the result after.
         </span>
       </Note>
 
       {/* The memo vector after fibMemo(5): -1 means nothing stored yet. */}
       <Ink at={tableAt - 6} dur={14} style={{ left: TABLE_X, top: top, whiteSpace: "nowrap" }}>
-        <span style={label(22, INK_SOFT)}>
+        <span style={label(24, INK_SOFT)}>
           <Mono color={MEMO_INK}>memo</Mono> during <Mono color={INK}>{`fibMemo(${TREE_N})`}</Mono>
         </span>
       </Ink>
@@ -114,7 +114,7 @@ export const MemoScene: React.FC = () => {
         const rowTop = tableTop + i * (cellH + 6);
         return (
           <div key={i} style={{ position: "absolute", left: TABLE_X, top: rowTop, height: cellH, display: "flex", alignItems: "center", opacity: appear }}>
-            <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT, width: INDEX_W }}>memo[{i}]</span>
+            <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT, width: INDEX_W }}>memo[{i}]</span>
             <div
               style={{
                 width: CELL_W,
@@ -126,7 +126,7 @@ export const MemoScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: MONO,
-                fontSize: 26,
+                fontSize: 28,
                 fontWeight: 500,
                 color: shown === -1 ? INK_SOFT : MEMO_INK,
                 position: "relative",
@@ -141,7 +141,7 @@ export const MemoScene: React.FC = () => {
         );
       })}
       <Note at={afterAt + 8} x={TABLE_X} y={tableTop + MEMO_TABLE.length * (cellH + 6) + 14} from="up" width={380}>
-        <span style={note(20, INK_SOFT)}>0 and 1 never go in: line 2 answers them first.</span>
+        <span style={note(24, INK_SOFT)}>0 and 1 never go in: line 2 answers them first.</span>
       </Note>
     </AbsoluteFill>
   );

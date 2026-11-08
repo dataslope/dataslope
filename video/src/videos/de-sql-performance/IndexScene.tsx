@@ -38,7 +38,7 @@ const Node: React.FC<{ x: number; y: number; keys: readonly string[]; at: number
             x={x - w / 2 + i * slot + slot / 2}
             y={y + 29}
             textAnchor="middle"
-            style={svgText({ fontFamily: MONO, fontSize: 21, fontWeight: hot === i ? 500 : 400, color: k === "…" ? INK_SOFT : INK })}
+            style={svgText({ fontFamily: MONO, fontSize: 24, fontWeight: hot === i ? 500 : 400, color: k === "…" ? INK_SOFT : INK })}
           >
             {k}
           </text>
@@ -136,7 +136,7 @@ export const IndexScene: React.FC = () => {
 
         {/* ── Right: the B-tree, schematic ── */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: 1 - treeOut }}>
-          <text x={R_X} y={tY - 14} style={svgText({ ...label(21, INK_SOFT) })} opacity={ease(frame, treeAt, 12)}>
+          <text x={R_X} y={tY - 14} style={svgText({ ...label(24, INK_SOFT) })} opacity={ease(frame, treeAt, 12)}>
             B-tree on customer_id (drawn)
           </text>
           {/* Each edge starts inside its parent (the node, drawn after, covers
@@ -154,7 +154,7 @@ export const IndexScene: React.FC = () => {
           <Node x={leafX} y={leafY} keys={["41", "42", "43", "…"]} at={treeAt + 8} hot={1} hotAt={findsAt + 4} />
         </svg>
         <div
-          style={{ position: "absolute", left: leafX + 140, top: leafY + 6, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, pointsAt, 12) * (1 - treeOut) }}
+          style={{ position: "absolute", left: leafX + 140, top: leafY + 6, ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, pointsAt, 12) * (1 - treeOut) }}
         >
           each key points at its rows
         </div>
@@ -181,23 +181,23 @@ export const IndexScene: React.FC = () => {
           ticks={[{ pages: INDEX.pages42, at: twentyAt + 8, out: lowAt }]}
           sweep={{ from: scansAt, to: scansAt + 40 }}
         />
-        <div style={{ position: "absolute", left: R_X, top: stripY + h(64), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, pointsAt, 12) }}>
+        <div style={{ position: "absolute", left: R_X, top: stripY + h(64), ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, pointsAt, 12) }}>
           orders, page by page: <Num>{thousands(INDEX.pages)}</Num> pages
         </div>
         <Note at={outOfAt} x={R_X} y={stripY + h(100)} out={lowAt}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             reads <b>{INDEX.heapBlocks}</b> of them
           </span>
         </Note>
         <Note at={passAt} x={R_X} y={stripY + h(100)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             reads them all, in order: one pass
           </span>
         </Note>
 
         {/* ── An unselective filter: the index on status goes unused ── */}
         <Note at={nineAt} x={X0} y={y(TOP) - h(46)}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             An index on <SmallMono>status</SmallMono> exists; <Num>{thousands(INDEX.shipped)}</Num> rows are shipped
           </span>
         </Note>
@@ -212,17 +212,17 @@ export const IndexScene: React.FC = () => {
           marks={[{ line: "Seq Scan", text: "Seq Scan", at: scansAt }]}
         />
         <Note at={scansAt + 6} x={R_X} y={y(TREE_TOP) + h(20)}>
-          <div style={{ ...note(26, INK), width: 560 }}>
+          <div style={{ ...note(28, INK), width: 560 }}>
             With 9 rows in 10 matching, jumping from the index to each row costs more than reading every page once.
           </div>
         </Note>
 
         {/* ── What each index costs a write ── */}
         <Note at={costsAt} x={X0} y={barsTop}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             Inserting <Num>10,000</Num> rows: write-ahead log records
           </span>
-          <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8) }}>
+          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8) }}>
             every change is written to this log first, so its records count the writes
           </div>
         </Note>

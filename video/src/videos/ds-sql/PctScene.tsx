@@ -125,7 +125,7 @@ export const PctScene: React.FC = () => {
           {[100, 300, 1000, 3000].map((t) => (
             <g key={t}>
               <line x1={px(t)} x2={px(t)} y1={sy + 22} y2={sy + 30} stroke={INK_SOFT} strokeWidth={1.4} />
-              <text x={px(t)} y={sy + 54} textAnchor="middle" fill={INK_SOFT} style={{ ...label(19, INK_SOFT), ...TABULAR }}>
+              <text x={px(t)} y={sy + 54} textAnchor="middle" fill={INK_SOFT} style={{ ...label(24, INK_SOFT), ...TABULAR }}>
                 {t >= 1000 ? `${t / 1000} s` : `${t} ms`}
               </text>
             </g>
@@ -147,7 +147,7 @@ export const PctScene: React.FC = () => {
             );
           })}
         </svg>
-        <div style={{ position: "absolute", left: AX_X0 - 10, top: sy + h(70), ...label(19, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, twelveAt + 4, 12) }}>
+        <div style={{ position: "absolute", left: AX_X0 - 10, top: sy + h(70), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, twelveAt + 4, 12) }}>
           12 request times, made up for this video (log scale)
         </div>
         <Marker at={meanAt + 2} out={whyAt} ms={PCT.mean} y={sy} color={ACCENT_INK}>
@@ -158,7 +158,7 @@ export const PctScene: React.FC = () => {
             position: "absolute",
             left: px(sorted[faster[0]]) - 10,
             top: sy - h(70),
-            ...note(22, OK_INK),
+            ...note(24, OK_INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, slowerAt + 6, 12) * (1 - ease(frame, contAt, 10)),
           }}
@@ -176,7 +176,7 @@ export const PctScene: React.FC = () => {
             position: "absolute",
             left: px(p90) + 10,
             top: sy + h(80),
-            ...note(22, INK),
+            ...note(24, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, nineAt, 12),
           }}
@@ -193,7 +193,7 @@ export const PctScene: React.FC = () => {
             stroke={ACCENT}
             strokeWidth={2.6}
           />
-          <text x={(px(p90) + px(HI)) / 2} y={sy - 122} textAnchor="middle" style={svgText({ ...label(19, ACCENT_INK), fontWeight: 500 })}>
+          <text x={(px(p90) + px(HI)) / 2} y={sy - 122} textAnchor="middle" style={svgText({ ...label(24, ACCENT_INK), fontWeight: 500 })}>
             the slow tail
           </text>
         </svg>
@@ -215,7 +215,7 @@ export const PctScene: React.FC = () => {
             position: "absolute",
             left: X0,
             top: resTop + listingHeight(M.lines.length, SIZE) + h(18),
-            ...note(22, INK_SOFT),
+            ...note(24, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, discAt + 6, 12) * (1 - ease(frame, whyAt, 10)),
           }}

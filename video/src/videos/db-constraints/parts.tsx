@@ -517,7 +517,7 @@ export const TypeMark: React.FC<{ layout: EntityLayout; row: string; at: number;
 
 // ── The data table (after WhyNormalization's kit) ────────────────────────────
 
-export const HEAD_SIZE = 22;
+export const HEAD_SIZE = 24;
 export const BODY_SIZE = 28;
 const PAD = 20;
 const ADVANCE = 0.6;
@@ -858,7 +858,7 @@ export const ErrorBox: React.FC<{
           background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
           padding: "14px 22px 16px",
           fontFamily: MONO,
-          fontSize: 22,
+          fontSize: 24,
           lineHeight: 1.45,
           whiteSpace: "pre-wrap",
           color: INK,
@@ -894,7 +894,7 @@ export const Tag: React.FC<{ x: number; top: number; at: number; children: strin
   out,
 }) => (
   <Ink at={at} dur={12} out={out} style={{ left: x, top, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color }}>{children}</span>
   </Ink>
 );
 

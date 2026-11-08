@@ -96,7 +96,7 @@ export const FitScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={nameAt - 4} dur={14} style={{ left: 120, top: y(104) }}>
-        <span style={label(22, ACCENT_INK)}>Overfitting</span>
+        <span style={label(24, ACCENT_INK)}>Overfitting</span>
       </Ink>
       <Ink at={hookAt - 6} dur={20} style={{ left: 114, top: y(148), ...headline(76), whiteSpace: "nowrap" }}>
         Perfect on the data it learned,
@@ -136,7 +136,7 @@ export const FitScene: React.FC = () => {
       {/* The curve the points came from, and how far the noise moved each. */}
       <Curve id="of-truth" pts={truthPts} box={box} reveal={sweep(curveAt - 2, 26)} color={INK_SOFT} width={2.4} dash="9 8" />
       <Note at={curveAt + 12} x={px(1.05) - 200} y={py(1.0) - 58} width={400} style={{ textAlign: "center" }} from="up">
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...halo }}>the curve they came from</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...halo }}>the curve they came from</span>
       </Note>
       {noise > 0 ? (
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: noise }}>
@@ -177,7 +177,7 @@ export const FitScene: React.FC = () => {
 
       {/* What the degree-eleven curve does between and past the points. */}
       <Note at={wobbleAt} x={px(3.64)} y={py(0.62)} align="right" from="up">
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           wobbles between points
         </span>
       </Note>
@@ -191,16 +191,16 @@ export const FitScene: React.FC = () => {
         color={ACCENT_INK}
       />
       <Note at={offAt} x={px(3.68)} y={box.top + 6} align="right" from="right">
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>off the chart</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>off the chart</span>
       </Note>
       <Note at={offAt + 4} x={px(0.24)} y={box.base - 40}>
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>off the chart</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>off the chart</span>
       </Note>
 
       {/* The training error of each fit, in the order they are drawn. */}
       <Ink at={lineAt - 8} dur={14} style={{ left: COL_X, top: y(420), width: COL_W }}>
-        <div style={label(22, INK)}>Training error</div>
-        <div style={{ ...note(20, INK_SOFT), marginTop: 6 }}>Mean squared error on the {N_TRAIN} points</div>
+        <div style={label(24, INK)}>Training error</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>Mean squared error on the {N_TRAIN} points</div>
         <div style={{ height: 1.6, background: INK, marginTop: 14 }} />
       </Ink>
       {SHOWN.map((d) => {
@@ -211,7 +211,7 @@ export const FitScene: React.FC = () => {
               <Swatch color={FIT_COLOR[d]} />
               <div>
                 <div style={{ ...body(34), color: INK, lineHeight: 1.1 }}>Degree {d}</div>
-                <div style={{ ...note(20, INK_SOFT), marginTop: 4 }}>{WORDS[d]}</div>
+                <div style={{ ...note(24, INK_SOFT), marginTop: 4 }}>{WORDS[d]}</div>
               </div>
               <div style={{ flex: 1 }} />
               <div style={{ position: "relative", ...headline(46), color: FIT_INK[d] }}>

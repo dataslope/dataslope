@@ -103,8 +103,8 @@ export const CvScene: React.FC = () => {
 
       {/* a: who is held out in each round. */}
       <Ink at={splitAt - 8} dur={14} style={{ left: 120, top: y(300), display: "flex", alignItems: "baseline", gap: 14 }}>
-        <span style={label(22, INK_SOFT)}>a</span>
-        <span style={{ ...body(30, true), color: INK }}>Who is held out, round by round</span>
+        <span style={label(24, INK_SOFT)}>a</span>
+        <span style={{ ...body(28, true), color: INK }}>Who is held out, round by round</span>
       </Ink>
       {ROUNDS.map((k) => {
         const rowAt = splitAt + k * 4;
@@ -113,7 +113,7 @@ export const CvScene: React.FC = () => {
         return (
           <React.Fragment key={k}>
             <Ink at={rowAt - 2} dur={12} style={{ left: 120, top: cy - 15 }}>
-              <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Round {k + 1}</span>
+              <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Round {k + 1}</span>
             </Ink>
             <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
               {POINTS.map((p, j) => {
@@ -132,7 +132,7 @@ export const CvScene: React.FC = () => {
         );
       })}
       <Note at={fourAt - 4} x={DOT_X(0) - DOT_R} y={y(ROUND_Y(FOLDS - 1)) + 44}>
-        <span style={{ ...note(21, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
           <Dot color={TRAIN_COLOR} /> fitted on
           <span style={{ width: 22 }} />
           <span style={{ display: "inline-flex", alignItems: "center", gap: 10, opacity: ease(frame, fifthAt - 2, 10) }}>
@@ -143,8 +143,8 @@ export const CvScene: React.FC = () => {
 
       {/* b: the error averaged over the five rounds. */}
       <Ink at={rotateAt - 4} dur={14} style={{ left: 1080, top: y(300), display: "flex", alignItems: "baseline", gap: 14 }}>
-        <span style={label(22, INK_SOFT)}>b</span>
-        <span style={{ ...body(30, true), color: INK }}>Average error on the held-out fold</span>
+        <span style={label(24, INK_SOFT)}>b</span>
+        <span style={{ ...body(28, true), color: INK }}>Average error on the held-out fold</span>
       </Ink>
       <Grid
         box={box}
@@ -154,7 +154,7 @@ export const CvScene: React.FC = () => {
         at={rotateAt}
       />
       <Ink at={rotateAt + 6} dur={14} style={{ left: X.x0, top: box.base + 52, width: X.x1 - X.x0, textAlign: "center" }}>
-        <span style={label(20, INK_SOFT)}>Polynomial degree</span>
+        <span style={label(24, INK_SOFT)}>Polynomial degree</span>
       </Ink>
       <Curve id="of-cv" pts={cvPts} box={box} reveal={cvReveal} color={NEW_COLOR} width={4} />
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
@@ -174,13 +174,13 @@ export const CvScene: React.FC = () => {
         />
       </svg>
       <Note at={lowestAt + 2} x={sx(X, best.degree) + 22} y={by(box, 0.026) - 13}>
-        <span style={{ ...note(22, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(24, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           lowest, {fmt(best.cv, 3)} at degree {best.degree}
         </span>
       </Note>
       <Note at={againAt} x={sx(X, exitDegree("cv", TOP_VALUE)) + 22} y={by(box, 0.3) - 14}>
-        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...halo }}>the new points agree:</div>
-        <div style={{ ...note(21, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 4, ...halo }}>
+        <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...halo }}>the new points agree:</div>
+        <div style={{ ...note(24, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 4, ...halo }}>
           lowest at degree {BEST.test}
         </div>
       </Note>

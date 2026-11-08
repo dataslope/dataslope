@@ -383,7 +383,7 @@ export const GhostRow: React.FC<{ e: EntityLayout; index: number; name: string; 
         opacity: p * (1 - o),
         transform: `translateX(${(1 - p) * -12}px)`,
         fontFamily: MONO,
-        fontSize: 21,
+        fontSize: 24,
         color: ACCENT_INK,
       }}
     >
@@ -528,7 +528,7 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
                 fontFamily: SANS,
                 fontWeight: 500,
                 // 20px, within 12% of the 22px step beside it.
-                fontSize: 20,
+                fontSize: 24,
                 color: fill > 0.5 ? PAPER : INK,
                 transform: `scale(${1 + sw * 0.25})`,
                 opacity: lerp(1, lerp(0.55, 1, Math.max(lit, done)), rail),
@@ -538,7 +538,7 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
             </div>
             <span
               style={{
-                ...label(22, INK),
+                ...label(24, INK),
                 fontWeight: lit * rail > 0.5 ? 500 : 500,
                 opacity: labelOp,
                 position: "relative",
@@ -567,7 +567,7 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
 
 // ── A database table, drawn as rows and cells (after WhyNormalization's kit) ─
 
-export const HEAD_SIZE = 22;
+export const HEAD_SIZE = 24;
 export const BODY_SIZE = 26;
 const PAD = 20;
 /** JetBrains Mono's advance, in em. */
@@ -841,7 +841,7 @@ export const ErrorBox: React.FC<{
         background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
         padding: "14px 22px 16px",
         fontFamily: MONO,
-        fontSize: 21,
+        fontSize: 24,
         lineHeight: 1.45,
         whiteSpace: "pre-wrap",
         color: INK,

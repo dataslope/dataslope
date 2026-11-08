@@ -118,12 +118,12 @@ export const NoiseScene: React.FC = () => {
           <Note at={threeAt + 8} x={CHART.x0 + 12} y={at(ys, NOISE.band[1]) - h(36)}>
             {/* The band is two standard deviations either side (check.mjs);
                 the ±3% beside the chart is one, so the band says its width. */}
-            <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               its normal band: ±2 standard deviations, about ±{Math.round(NOISE.sdShare * 200)}%
             </span>
           </Note>
           <Note at={dipAt + 6} x={at(xs, days + 1) + 10} align="right" y={at(ys, NOISE.band[0]) + h(14)}>
-            <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={insideAt}>today: −2%, inside it</Mark>
             </span>
           </Note>
@@ -135,7 +135,7 @@ export const NoiseScene: React.FC = () => {
             <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>an ordinary day: about ±3%</span>
           </Note>
           <Note at={threeAt + 6} x={SIDE_X} y={y(412)}>
-            <span style={{ ...label(21, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
               standard deviation {(NOISE.sdShare * 100).toFixed(1)}% of {num(NOISE.mean)}
             </span>
           </Note>
@@ -154,7 +154,7 @@ export const NoiseScene: React.FC = () => {
             <Note key={r.text} at={r.at - 2} x={SIDE_X} y={y(614) + i * h(54)}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <Tick at={r.at + 4} size={28} />
-                <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>{r.text}</span>
+                <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>{r.text}</span>
               </div>
             </Note>
           ))}

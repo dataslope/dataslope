@@ -134,12 +134,12 @@ export const TrapScene: React.FC = () => {
 
         {/* ── Which one to use ── */}
         <Note at={onlyAt - 2} x={X0} y={y(LIST_Y) + onH + 30}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             Only the big orders? <Mark at={fineAt}><Mono>WHERE</Mono> is fine</Mark>.
           </span>
         </Note>
         <Note at={keepAt - 2} x={X0} y={y(LIST_Y) + onH + 80}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             Every customer? <Mark at={inOnAt} color={MARK_OK}>Filter in <Mono>ON</Mono></Mark>.
           </span>
         </Note>

@@ -73,7 +73,7 @@ const Value: React.FC<{ text: string; zero: boolean; accent?: boolean; style?: R
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      ...note(30, accent ? ACCENT_INK : zero ? INK_SOFT : INK),
+      ...note(28, accent ? ACCENT_INK : zero ? INK_SOFT : INK),
       fontWeight: accent ? 500 : zero ? 450 : 500,
       ...style,
     }}
@@ -130,7 +130,7 @@ export const DocTable: React.FC<TableProps> = ({ g, at, morph, frame: frameIn = 
             textAlign: "center",
             opacity: ease(frame, at + j * 0.8, 12),
             transform: `translateY(${(1 - ease(frame, at + j * 0.8, 12)) * 8}px)`,
-            ...label(22, INK),
+            ...label(24, INK),
             fontWeight: 500,
           }}
         >
@@ -167,8 +167,8 @@ export const DocTable: React.FC<TableProps> = ({ g, at, morph, frame: frameIn = 
                 gap: 2,
               }}
             >
-              <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Doc {i + 1}</span>
-              {sub ? <span style={{ ...note(20, INK_SOFT), opacity: s, whiteSpace: "nowrap" }}>{sub.text(i)}</span> : null}
+              <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>Doc {i + 1}</span>
+              {sub ? <span style={{ ...note(24, INK_SOFT), opacity: s, whiteSpace: "nowrap" }}>{sub.text(i)}</span> : null}
             </div>
             {row.map((count, j) => {
               const t = clamp01(morph ? morph(i, j) : 0);
@@ -213,7 +213,7 @@ export const DocTable: React.FC<TableProps> = ({ g, at, morph, frame: frameIn = 
                         opacity: struck,
                         // Within 12% of the value beside it (30px), so the
                         // cell reads as one line of figures.
-                        ...note(27, INK_SOFT),
+                        ...note(28, INK_SOFT),
                       }}
                     >
                       <span style={{ position: "relative" }}>
@@ -310,7 +310,7 @@ export const IdfRow: React.FC<{ g: TableGeo; at: number; lit?: readonly number[]
           top: top + height / 2,
           transform: "translateY(-50%)",
           opacity: p,
-          ...label(22, INK_SOFT),
+          ...label(24, INK_SOFT),
           whiteSpace: "nowrap",
         }}
       >
@@ -330,7 +330,7 @@ export const IdfRow: React.FC<{ g: TableGeo; at: number; lit?: readonly number[]
             alignItems: "center",
             justifyContent: "center",
             opacity: ease(frame, at + 2 + j * 0.8, 10),
-            ...note(26, j === THE ? ACCENT_INK : INK_SOFT),
+            ...note(28, j === THE ? ACCENT_INK : INK_SOFT),
             fontWeight: j === THE ? 500 : 500,
           }}
         >
@@ -381,7 +381,7 @@ export const DocPips: React.FC<{ word: number; p: number; size?: number }> = ({ 
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            ...note(20, has ? INK : INK_SOFT),
+            ...note(24, has ? INK : INK_SOFT),
             fontWeight: 500,
           }}
         >

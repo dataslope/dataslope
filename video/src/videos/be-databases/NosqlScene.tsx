@@ -38,7 +38,7 @@ const MiniTable: React.FC<{
     <g opacity={p}>
       <rect x={x} y={y} width={w} height={headH + rows * rowH} rx={6} fill={PAPER} stroke={BAR} strokeWidth={2} />
       <rect x={x} y={y} width={w} height={headH} rx={6} fill={`color-mix(in srgb, ${BAR} 18%, ${PAPER})`} />
-      <text x={x + 14} y={y + 24} style={svgText({ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: INK })}>
+      <text x={x + 14} y={y + 24} style={svgText({ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK })}>
         {name}
       </text>
       {Array.from({ length: rows }, (_, i) => (
@@ -83,13 +83,13 @@ const Shape: React.FC<{ x: number; y: number; at: number; name: string; pattern:
       >
         {children}
       </div>
-      <div style={{ ...label(23, INK), fontWeight: 500, marginTop: 14, whiteSpace: "nowrap" }}>{name}</div>
-      <div style={{ ...note(21, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>{pattern}</div>
+      <div style={{ ...label(24, INK), fontWeight: 500, marginTop: 14, whiteSpace: "nowrap" }}>{name}</div>
+      <div style={{ ...note(24, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>{pattern}</div>
     </div>
   );
 };
 
-const mono = (color: string = INK): React.CSSProperties => ({ fontFamily: MONO, fontSize: 19, fontWeight: 500, color, whiteSpace: "pre", fontVariantLigatures: "none", lineHeight: "26px" });
+const mono = (color: string = INK): React.CSSProperties => ({ fontFamily: MONO, fontSize: 24, fontWeight: 500, color, whiteSpace: "pre", fontVariantLigatures: "none", lineHeight: "26px" });
 
 /**
  * Question 1, with system design's SQL-or-NoSQL question under it. Left,
@@ -187,7 +187,7 @@ export const NosqlScene: React.FC = () => {
         {/* ── Phase 1, left: relational ── */}
         <div style={{ opacity: out1 }}>
           <Ink at={relAt - 2} dur={14} style={{ left: X0, top: y(COL_HEAD), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(26, INK), fontWeight: 500 }}>Relational</span>
+            <span style={{ ...label(28, INK), fontWeight: 500 }}>Relational</span>
           </Ink>
           <Svg>
             <MiniTable x={cust.x} y={tTop} w={cust.w} rows={4} rowH={rowH} name="customers" at={relAt} lit={{ rows: [1], at: joinsAt, color: BAR }} />
@@ -217,7 +217,7 @@ export const NosqlScene: React.FC = () => {
             />
           </Svg>
           <Note at={txnAt + 8} x={bracketX + 26} y={rowMid(2) - h(15)}>
-            <span style={{ ...note(22, OK_INK), whiteSpace: "nowrap", fontWeight: 500 }}>one transaction</span>
+            <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", fontWeight: 500 }}>one transaction</span>
           </Note>
           <div style={{ position: "absolute", left: X0, top: tTop + 34 + 5 * rowH + h(40), display: "flex", gap: "0.7em", fontSize: 24, whiteSpace: "nowrap" }}>
             {[
@@ -232,7 +232,7 @@ export const NosqlScene: React.FC = () => {
             ))}
           </div>
           <Note at={safeAt} x={X0} y={tTop + 34 + 5 * rowH + h(96)}>
-            <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the safe default for most applications</span>
+            <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the safe default for most applications</span>
           </Note>
         </div>
 
@@ -243,10 +243,10 @@ export const NosqlScene: React.FC = () => {
             <ColumnRule key={k} x={R_X + k * (SHAPE_W + SHAPE_GAP) - SHAPE_GAP / 2} top={y(SHAPES_TOP)} bottom={y(SHAPES_TOP) + SHAPE_H + h(82)} at={k === 1 ? kvAt : wideAt} />
           ))}
           <Ink at={noAt - 2} dur={14} style={{ left: R_X, top: y(COL_HEAD), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(26, INK), fontWeight: 500 }}>NoSQL</span>
+            <span style={{ ...label(28, INK), fontWeight: 500 }}>NoSQL</span>
           </Ink>
           <Note at={machinesAt} x={R_X + 120} y={y(COL_HEAD) + 4}>
-            <span style={{ ...note(22, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 12 }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 12 }}>
               writes spread across machines
               {[0, 1, 2].map((k) => (
                 <span
@@ -297,7 +297,7 @@ export const NosqlScene: React.FC = () => {
             </div>
           </Shape>
           <Note at={patternAt} x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP) - h(40)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>one access pattern, known in advance, at huge volume</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>one access pattern, known in advance, at huge volume</span>
           </Note>
           <Note at={priceAt} x={R_X} y={y(SHAPES_TOP) + SHAPE_H + h(122)}>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The price: weaker consistency, limited joins</span>
@@ -311,12 +311,12 @@ export const NosqlScene: React.FC = () => {
         <Cylinder x={sqlX} y={store.y} w={store.w} at={coreAt - 2} title="SQL" size={26} />
         <Cylinder x={noX} y={store.y} w={store.w} at={logsAt - 2} title="NoSQL" size={26} />
         <Note at={coreAt + 6} x={sqlX + store.w / 2} y={underY} style={{ transform: "translateX(-50%)" }}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             core transactions: <b>orders, payments</b>
           </span>
         </Note>
         <Note at={logsAt + 6} x={noX + store.w / 2} y={underY} style={{ transform: "translateX(-50%)" }}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             high volume: <b>logs, sessions, feeds</b>
           </span>
         </Note>
@@ -326,15 +326,15 @@ export const NosqlScene: React.FC = () => {
         <Flow points={[[newQ.x - 8, newMid], [sqlC + 200, newMid]]} at={relNewAt} color={inkOf.yellow} width={2.6} dash="9 7" />
         <Svg opacity={ease(frame, joinAt - 4, 12)}>
           <line x1={sqlC - 30} y1={newMid} x2={sqlC + 40} y2={newMid} stroke={OK} strokeWidth={3} pathLength={1} strokeDasharray={`${ease(frame, joinAt, 12)} 1`} />
-          <text x={sqlC - 85} y={newMid + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 19, fontWeight: 500, color: INK })}>
+          <text x={sqlC - 85} y={newMid + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK })}>
             orders
           </text>
-          <text x={sqlC + 95} y={newMid + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 19, fontWeight: 500, color: INK })}>
+          <text x={sqlC + 95} y={newMid + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK })}>
             users
           </text>
         </Svg>
         <Note at={joinAt + 4} x={sqlC - 140} y={newMid + h(40)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a join</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a join</span>
         </Note>
         <Cylinder x={copyX} y={copyY} w={copy.w} at={copiedAt} tone="look" title="a copy" size={22} />
         {/* From NoSQL's painted right edge to the copy's left one (each art keeps a 2.5% margin). */}
@@ -351,7 +351,7 @@ export const NosqlScene: React.FC = () => {
           dash="9 7"
         />
         <Note at={copiedAt + 6} x={copyX - 30} y={copyY - h(60)}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>arranged for the new one</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>arranged for the new one</span>
         </Note>
       </Drift>
     </AbsoluteFill>

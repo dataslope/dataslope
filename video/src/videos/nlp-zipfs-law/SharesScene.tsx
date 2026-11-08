@@ -138,7 +138,7 @@ export const SharesScene: React.FC = () => {
           ))}
         </Svg>
         {LOG_TICKS.map((v) => (
-          <div key={v} style={{ position: "absolute", left: logX(v), top: aTop + sH + 12, transform: "translateX(-50%)", opacity: ease(frame, from + 8, 12), ...note(20, INK_SOFT), ...TABULAR }}>
+          <div key={v} style={{ position: "absolute", left: logX(v), top: aTop + sH + 12, transform: "translateX(-50%)", opacity: ease(frame, from + 8, 12), ...note(24, INK_SOFT), ...TABULAR }}>
             {fmt(v, 0)}
           </div>
         ))}
@@ -168,7 +168,7 @@ export const SharesScene: React.FC = () => {
           ))}
         </Svg>
         {[...PLAIN_TICKS, EMMA.distinct].map((v) => (
-          <div key={v} style={{ position: "absolute", left: plainX(v - 0.5), top: bTop + sH + 12, transform: "translateX(-50%)", opacity: ease(frame, from + 20, 12), ...note(20, INK_SOFT), ...TABULAR }}>
+          <div key={v} style={{ position: "absolute", left: plainX(v - 0.5), top: bTop + sH + 12, transform: "translateX(-50%)", opacity: ease(frame, from + 20, 12), ...note(24, INK_SOFT), ...TABULAR }}>
             {v === EMMA.distinct ? <Mark at={vocabAt + 4}>{fmt(v, 0)}</Mark> : fmt(v, 0)}
           </div>
         ))}

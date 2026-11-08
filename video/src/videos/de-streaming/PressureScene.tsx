@@ -188,7 +188,7 @@ export const PressureScene: React.FC = () => {
           {/* Folds away once the second consumer takes a partition, so "consumer 1" re-centres. */}
           <span
             style={{
-              ...label(20, ACCENT_INK),
+              ...label(24, ACCENT_INK),
               display: "block",
               overflow: "hidden",
               height: 26 * (1 - ease(frame, takesAt + 6, 12)),
@@ -237,13 +237,13 @@ export const PressureScene: React.FC = () => {
           head={12}
         />
         <Note at={idleAt} x={cons.x} y={mid(last) + cons.h / 2 + h(12)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>on one partition, it would sit idle</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>on one partition, it would sit idle</span>
         </Note>
         <Bracket x0={markX(bottom.read)} x1={markX(bottom.written)} y={laneTop(last) + laneH + h(16)} at={lagAt} out={clearsAt + 10}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>consumer lag</span>
         </Bracket>
         <Note at={distAt + 2} x={X0} y={laneTop(last) + laneH + h(28)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             lag = latest offset
             <Bar color={INK} />
             minus committed offset
@@ -261,7 +261,7 @@ export const PressureScene: React.FC = () => {
         <Note at={droppedAt} x={cons.x + cons.w + 24} y={both + h(14)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             and nothing is dropped
-            <span style={{ ...label(22, INK_SOFT), fontWeight: 500, opacity: ease(frame, retentionAt, 10) }}>, within retention</span>
+            <span style={{ ...label(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, retentionAt, 10) }}>, within retention</span>
           </span>
         </Note>
         {/* A push-based system pushes back instead. */}
@@ -278,7 +278,7 @@ export const PressureScene: React.FC = () => {
           head={13}
         />
         <Note at={slowAt - 2} x={LANE.x + 40} y={loopY - h(38)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>push-based: "slow down" goes back to the producer</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>push-based: "slow down" goes back to the producer</span>
         </Note>
 
         {/* The model: lag, second by second. */}
@@ -293,15 +293,15 @@ export const PressureScene: React.FC = () => {
           at={modelAt}
         />
         <Note at={modelAt + 2} x={X0} y={sy.b - h(4)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>model</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>model</span>
         </Note>
         <Note at={hundredAt} x={X0} y={sy.b + h(36)}>
-          <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             in: about <Num>{BACKPRESSURE.rate}</Num> a second
           </span>
         </Note>
         <Note at={eightyAt} x={X0} y={sy.b + h(70)}>
-          <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             handled: <Num>{BACKPRESSURE.one}</Num> a second
           </span>
         </Note>
@@ -315,7 +315,7 @@ export const PressureScene: React.FC = () => {
           </span>
         </Note>
         <Note at={takesAt + 4} x={joinX + 16} y={sy.b - h(26)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             a second consumer takes partition <Num>1</Num>
           </span>
         </Note>

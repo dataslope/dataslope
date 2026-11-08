@@ -90,7 +90,7 @@ export const AccessScene: React.FC = () => {
           <span style={head(22, INK)}>permissions on every chunk</span>
         </Note>
         <Note at={queryAt - 2} x={CARD.x} y={y(CARD.top) - 52}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             filtered at query time, inside the search,
             <span style={{ opacity: ease(frame, identityAt - 2, 10) }}>
               {" "}for{" "}
@@ -124,8 +124,8 @@ export const AccessScene: React.FC = () => {
                 transform: `translateX(${(1 - p) * -12 + drop * 24}px)`,
               }}
             >
-              <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.title}</span>
-              <span style={{ fontFamily: MONO, fontSize: 20, color: BLUE_INK, fontWeight: 500, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
+              <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.title}</span>
+              <span style={{ fontFamily: MONO, fontSize: 24, color: BLUE_INK, fontWeight: 500, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
                 readers: {c.readers}
               </span>
             </div>
@@ -139,10 +139,10 @@ export const AccessScene: React.FC = () => {
           </span>
         </Note>
         <Note at={changeAt - 2} x={CARD.x} y={cardY(CHUNKS.length) + 56}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             a permission changes upstream
             <span style={{ opacity: ease(frame, updateAt - 2, 10) }}>
-              : update the <span style={{ fontFamily: MONO, fontSize: 20, color: BLUE_INK, fontVariantLigatures: "none" }}>readers</span>
+              : update the <span style={{ fontFamily: MONO, fontSize: 24, color: BLUE_INK, fontVariantLigatures: "none" }}>readers</span>
             </span>
             <span style={{ opacity: ease(frame, noEmbedAt - 2, 10), color: INK_SOFT }}>, not the vectors</span>
           </span>
@@ -166,7 +166,7 @@ export const AccessScene: React.FC = () => {
             borderRadius: 10,
             border: `2px solid ${INK_SOFT}`,
             background: PAPER,
-            ...note(22, INK),
+            ...note(24, INK),
             lineHeight: 1.6,
             opacity: ease(frame, redactAt - 2, 10),
           }}
@@ -178,7 +178,7 @@ export const AccessScene: React.FC = () => {
           ].map((r, i) => (
             <div key={r.k} style={{ whiteSpace: "nowrap", display: "flex", gap: 10 }}>
               <span>{r.k}</span>
-              <span style={{ position: "relative", fontFamily: MONO, fontSize: 20, fontVariantLigatures: "none" }}>
+              <span style={{ position: "relative", fontFamily: MONO, fontSize: 24, fontVariantLigatures: "none" }}>
                 {r.v}
                 <span
                   style={{
@@ -200,7 +200,7 @@ export const AccessScene: React.FC = () => {
           <span style={{ color: BLUE_INK }}>embedding model</span>
         </Box>
         <Note at={apiAt - 2} x={RIGHT_X + 600} y={y(CARD.top) + 86}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: 0.4 + 0.6 * red }}>an outside API</span>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: 0.4 + 0.6 * red }}>an outside API</span>
         </Note>
 
         {/* Deletion, made real. */}
@@ -220,13 +220,13 @@ export const AccessScene: React.FC = () => {
             <Note at={t.at - 2} x={RIGHT_X + 396} y={delTop - 6 + i * 56}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <Tick at={t.at + 6} size={26} />
-                <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{t.text}</span>
+                <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{t.text}</span>
               </div>
             </Note>
           </React.Fragment>
         ))}
         <Note at={notJustAt - 2} x={RIGHT_X} y={delTop + 186}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={notJustAt + 4} color={MARK_BAD}>
               not just the source row
             </Mark>

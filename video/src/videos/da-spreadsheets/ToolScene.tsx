@@ -35,7 +35,7 @@ const Column: React.FC<{ x: number; top: number; title: React.ReactNode; titleAt
   if (o >= 1) return null;
   return (
     <div style={{ position: "absolute", inset: 0, opacity: 1 - o }}>
-      <div style={{ position: "absolute", left: x, top, ...label(26, INK), opacity: ease(frame, titleAt, 12) }}>{title}</div>
+      <div style={{ position: "absolute", left: x, top, ...label(28, INK), opacity: ease(frame, titleAt, 12) }}>{title}</div>
       {items.map((it, i) => {
         const p = ease(frame, it.at - 2, 12);
         if (p <= 0) return null;
@@ -150,7 +150,7 @@ export const ToolScene: React.FC = () => {
         {/* As tall as the two lists, from their headings to their third lines. */}
         <ColumnRule x={RULE_X} top={y(LIST_Y)} height={54 + 2 * h(PITCH) + 38} at={asked - 2} out={out9} />
         <Note at={outgrowAt + 10} x={RIGHT_X + 24} y={y(LIST_Y) + h(54) + h(PITCH) * 3} out={out9}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>sheets slow down well before a million rows</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>sheets slow down well before a million rows</span>
         </Note>
         <Note at={weeklyAt - 2} x={X0} y={y(LIST_Y) + h(54) + h(PITCH) * 4 + h(20)} out={out9}>
           <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
@@ -183,7 +183,7 @@ export const ToolScene: React.FC = () => {
           fills={[{ r: textRow, c: 0, at: textNumAt, color: MARK_BAD }]}
         />
         <Note at={textNumAt + 4} x={g.right + 24} y={g.rowTop(textRow)}>
-          <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             typed as text: it sits <b>left</b>, where numbers sit right
           </span>
         </Note>

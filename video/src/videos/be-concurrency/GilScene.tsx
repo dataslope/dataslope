@@ -63,7 +63,7 @@ const Slice: React.FC<{ t: number; x: number; y: number; w: number; h: number; a
       }}
     >
       {kind === "run" && w > 60 ? <KeyGlyph size={30} color={th.ink} /> : null}
-      {text ? <span style={{ ...label(20, th.ink), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, at + 6, 10) }}>{text}</span> : null}
+      {text ? <span style={{ ...label(24, th.ink), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, at + 6, 10) }}>{text}</span> : null}
     </div>
   );
 };
@@ -154,7 +154,7 @@ export const GilScene: React.FC = () => {
 
         {/* ── Page 1: one key ─────────────────────────────────────────── */}
         <Note at={cpyAt} x={X0} y={y(290)} out={page1Out}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             CPython&apos;s <b style={{ color: BLUE_INK }}>global interpreter lock</b>
             <span style={{ opacity: ease(frame, oneAt, 10) }}>: only its holder runs Python bytecode</span>
           </span>
@@ -162,7 +162,7 @@ export const GilScene: React.FC = () => {
         {cpuY.map((ly, i) => (
           <React.Fragment key={i}>
             <Note at={singleAt + i * 3} x={X0} y={ly + laneH / 2 - 14} out={page1Out}>
-              <span style={{ ...label(21, THREAD[i].ink), fontWeight: 500, whiteSpace: "nowrap" }}>thread {i + 1}</span>
+              <span style={{ ...label(24, THREAD[i].ink), fontWeight: 500, whiteSpace: "nowrap" }}>thread {i + 1}</span>
             </Note>
             {CPU_TURNS.map((t, k) => (
               <Slice key={k} t={i} x={LANE_X + k * SLICE} y={ly} w={SLICE} h={laneH} at={oneAt + k * 7} kind={t === i ? "run" : "block"} dim={ease(frame, page1Out, 10)} />
@@ -176,7 +176,7 @@ export const GilScene: React.FC = () => {
         </Note>
         {ioY.map((ly, i) => (
           <Note key={i} at={ioAt + i * 3} x={X0} y={ly + laneH / 2 - 14} out={page1Out}>
-            <span style={{ ...label(21, THREAD[i].ink), fontWeight: 500, whiteSpace: "nowrap" }}>thread {i + 1}</span>
+            <span style={{ ...label(24, THREAD[i].ink), fontWeight: 500, whiteSpace: "nowrap" }}>thread {i + 1}</span>
           </Note>
         ))}
         {IO_RUNS.map((r, k) => (
@@ -193,15 +193,15 @@ export const GilScene: React.FC = () => {
         <Spot id="key" at={gilAt} out={memAt - 8} left={1360} top={y(400)} width={210} height={h(190)} />
         <Node x={BOX.x} y={y(BOX.top)} w={BOX.w} h={h(BOX.h)} at={memAt} tone="plain" fill="transparent" out={page1Out} stroke={frame >= oneLockAt + 4 ? 2.5 : 1.5} line={frame >= oneLockAt + 4 ? OK : HAIRLINE} />
         <Note at={memAt + 4} x={BOX.x + 24} y={y(BOX.top) + h(14)} out={page1Out}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>the interpreter: memory management</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>the interpreter: memory management</span>
         </Note>
         {OBJECTS.map((o, k) => {
           const x = BOX.x + 30 + k * 160;
           return (
             <React.Fragment key={o.name}>
               <Note at={countsAt + k * 4} x={x} y={y(BOX.top + 84)} width={140} from="up" out={page1Out} style={{ textAlign: "center" }}>
-                <div style={{ ...label(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{o.name}</div>
-                <div style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", marginTop: 6 }}>
+                <div style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{o.name}</div>
+                <div style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", marginTop: 6 }}>
                   refs: <Num>{o.refs}</Num>
                 </div>
               </Note>
@@ -231,13 +231,13 @@ export const GilScene: React.FC = () => {
 
         {/* ── Page 2: four instructions, then processes ───────────────── */}
         <Note at={notSafeAt} x={X0} y={y(290)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             And it <b style={{ color: ACCENT_INK }}>doesn&apos;t</b> make the counter safe
           </span>
         </Note>
         <Listing lines={SRC} x={X0} top={srcTop} width={LIST_W} size={SIZE + 2} at={notSafeAt + 4} />
         <Note at={fourAt - 4} x={X0} y={srcTop + listingHeight(1, SIZE + 2) + h(16)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             compiles to <Num>{BYTECODE.count}</Num> instructions (Python 3.14, read with dis)
           </span>
         </Note>
@@ -256,17 +256,17 @@ export const GilScene: React.FC = () => {
           <path d={`M${brX},${opsTop + 8} h14 V${opsTop + opsH - 8} h-14`} fill="none" stroke={ACCENT} strokeWidth={2.6} strokeLinejoin="round" />
         </svg>
         <Note at={oneInstrAt} x={brX + 36} y={opsTop + h(6)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>The GIL runs one at a time</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>The GIL runs one at a time</span>
         </Note>
         <Note at={nothingAt} x={brX + 36} y={opsTop + h(52)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             nothing promises
             <br />
             the four run together
           </span>
         </Note>
         <Note at={stillAt} x={brX + 36} y={opsTop + h(150)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.4em" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.4em" }}>
             <LockGlyph size={24} color={OK} />
             <span style={{ background: MARK_OK, padding: "0 4px", borderRadius: 4 }}>the lock is still needed</span>
           </span>
@@ -274,7 +274,7 @@ export const GilScene: React.FC = () => {
 
         <VRule x={1068} top={y(330)} height={pRow(2) + h(112) - y(330)} at={procAt} />
         <Note at={procAt} x={P_X} y={y(290)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             CPU-bound: <b style={{ color: OK_INK }}>processes</b>
           </span>
         </Note>
@@ -282,9 +282,9 @@ export const GilScene: React.FC = () => {
           <React.Fragment key={j}>
             {j > 0 ? <div style={{ position: "absolute", left: P_X, top: pRow(j) + h(46) - h(14), width: 660, height: 1, background: HAIRLINE, opacity: ease(frame, procAt + 4 + j * 4, 10) }} /> : null}
             <Note at={procAt + 4 + j * 4} x={P_X} y={pRow(j) + h(46) + h(66) / 2 - 15}>
-              <span style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 21 }}>
-                <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>process {j + 1}</span>
-                <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, ownAt + j * 3, 10) }}>own interpreter, own GIL</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24 }}>
+                <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>process {j + 1}</span>
+                <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, ownAt + j * 3, 10) }}>own interpreter, own GIL</span>
                 <span style={{ opacity: ease(frame, ownAt + 6 + j * 3, 10) }}>
                   <KeyGlyph size={30} color={THREAD[j].ink} />
                 </span>

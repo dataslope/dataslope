@@ -81,7 +81,7 @@ export const AmortScene: React.FC = () => {
   const count = ease(frame, addAt + 4, 24);
   const perAppend = AMORTIZED.copiesPerAppend * count;
   const at = AMORTIZED.copiesPerAppendAt;
-  const tick = svgText({ fontFamily: SANS, fontSize: 20, fontWeight: 500, color: INK_SOFT, ...TABULAR });
+  const tick = svgText({ fontFamily: SANS, fontSize: 24, fontWeight: 500, color: INK_SOFT, ...TABULAR });
 
   return (
     <AbsoluteFill>
@@ -146,11 +146,11 @@ export const AmortScene: React.FC = () => {
           {sweep > 0 && sweep < 1 ? <line x1={px(k)} x2={px(k)} y1={top - 20} y2={base} stroke={INK_SOFT} strokeWidth={1.6} strokeDasharray="4 4" /> : null}
         </Svg>
         {/* Legend, at the right end of the chart's own line. */}
-        <div style={{ position: "absolute", left: 830, top: top - 64, display: "flex", alignItems: "center", gap: 14, fontSize: 21, opacity: ease(frame, doublesAt, 12), whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: 830, top: top - 64, display: "flex", alignItems: "center", gap: 14, fontSize: 24, opacity: ease(frame, doublesAt, 12), whiteSpace: "nowrap" }}>
           <span style={{ width: 30, borderTop: `3px solid ${BAR}` }} />
-          <span style={label(21, BLUE_INK)}>list</span>
+          <span style={label(24, BLUE_INK)}>list</span>
           <span style={{ width: 30, marginLeft: 12, borderTop: `3px dashed ${INK_SOFT}` }} />
-          <span style={label(21, INK_SOFT)}>doubling</span>
+          <span style={label(24, INK_SOFT)}>doubling</span>
         </div>
 
         <VRule x={1130} top={top - 64} bottom={base + 80} at={roomAt} />
@@ -166,9 +166,9 @@ export const AmortScene: React.FC = () => {
           Copies per append: <span style={{ ...TABULAR, color: BLUE_INK }}>{perAppend.toFixed(1)}</span>
           <span style={{ color: OK_INK, opacity: ease(frame, constAt, 10) }}> constant</span>
         </Line>
-        <div style={{ position: "absolute", left: RX, top: y(536), display: "flex", gap: 28, fontSize: 22, whiteSpace: "nowrap", opacity: ease(frame, anyAt, 10) }}>
+        <div style={{ position: "absolute", left: RX, top: y(536), display: "flex", gap: 28, fontSize: 24, whiteSpace: "nowrap", opacity: ease(frame, anyAt, 10) }}>
           {(["1000", "1000000", "2000000"] as const).map((len) => (
-            <span key={len} style={note(22, INK_SOFT)}>
+            <span key={len} style={note(24, INK_SOFT)}>
               at <Num>{int(Number(len))}</Num>: <b style={{ color: INK }}><Num>{at[len].toFixed(1)}</Num></b>
             </span>
           ))}

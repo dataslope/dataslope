@@ -46,7 +46,7 @@ const Worked: React.FC<{
   // A what-if names itself in the blue its result takes, where a box once
   // held it apart.
   const cap = (text: string, col: number, opacity = 1, color = INK_SOFT, weight = 500) => (
-    <span style={{ gridRow: 1, gridColumn: col, justifySelf: "center", ...note(20, color), fontWeight: weight, opacity, whiteSpace: "nowrap" }}>{text}</span>
+    <span style={{ gridRow: 1, gridColumn: col, justifySelf: "center", ...note(24, color), fontWeight: weight, opacity, whiteSpace: "nowrap" }}>{text}</span>
   );
   const val = (col: number, children: React.ReactNode, c: string = INK, opacity = 1) => (
     <span style={{ gridRow: 2, gridColumn: col, justifySelf: "center", ...headline(44), color: c, opacity, whiteSpace: "nowrap" }}>
@@ -190,13 +190,13 @@ export const MorphScene: React.FC = () => {
       />
 
       <Note at={tieAt - 2} out={ruleAt - 6} x={X0} y={y(FOOT_Y)}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Doc 1’s top four tie at {num(TOP_SCORE)}, <Mark at={onSaysAt - 2}><i>on</i> included</Mark>: each is in one document of{" "}
           {spell(N)}.
         </span>
       </Note>
       <Note at={noListAt - 2} x={X0} y={y(FOOT_Y)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           No stopword list: rarity alone silenced <i>the</i>.
         </span>
       </Note>

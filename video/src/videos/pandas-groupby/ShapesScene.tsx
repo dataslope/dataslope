@@ -66,7 +66,7 @@ export const ShapesScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 2} dur={14} style={{ left: 124, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>The part most people miss</span>
+        <span style={label(24, ACCENT_INK)}>The part most people miss</span>
       </Ink>
       {/* One line in two inks; the second half follows the first in the flow. */}
       <div style={{ position: "absolute", left: 118, top: y(146), display: "flex", gap: "0.26em", ...headline(66) }}>
@@ -140,7 +140,7 @@ export const ShapesScene: React.FC = () => {
         <Count value={TOTALS.length} text="rows out" />
       </Note>
       <Note at={orderAt + 2} x={T_X + 190} y={y(ROW0 + 7 * RH + 22)}>
-        <span style={{ ...body(26, true), whiteSpace: "nowrap" }}>indexed {TOTAL_INDEX[0]} to {TOTAL_INDEX[TOTAL_INDEX.length - 1]}, like the frame</span>
+        <span style={{ ...body(28, true), whiteSpace: "nowrap" }}>indexed {TOTAL_INDEX[0]} to {TOTAL_INDEX[TOTAL_INDEX.length - 1]}, like the frame</span>
       </Note>
     </AbsoluteFill>
   );

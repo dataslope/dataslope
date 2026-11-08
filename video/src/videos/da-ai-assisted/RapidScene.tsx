@@ -57,7 +57,7 @@ const Prompt: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={at - 4} x={R_X} y={c.T - c.h(40)}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>a prompt</span>
+        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>a prompt</span>
       </Note>
       <TextPanel lines={PROMPT} x={R_X} top={c.T} width={980} size={size} mono at={at - 2} lineAt={cue}>
         {/* The two lines that matter most. */}
@@ -109,13 +109,13 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {/* The question, as the words someone types, with its label 12px under it. */}
       <div style={{ position: "absolute", left: R_X, top: T, width: 300, opacity: askP, transform: `translateY(${(1 - askP) * 8}px)` }}>
-        <div style={{ ...note(26, INK), fontWeight: 500, lineHeight: "34px", textWrap: "balance" }}>&ldquo;Which region grew fastest?&rdquo;</div>
-        <div style={{ ...label(20, INK_SOFT), lineHeight: "26px", marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, askAt + 2, 14) }}>a question in plain words</div>
+        <div style={{ ...note(28, INK), fontWeight: 500, lineHeight: "34px", textWrap: "balance" }}>&ldquo;Which region grew fastest?&rdquo;</div>
+        <div style={{ ...label(24, INK_SOFT), lineHeight: "26px", marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, askAt + 2, 14) }}>a question in plain words</div>
       </div>
       {/* Over the stack, so the layers read as what the tool stands on, not as
           what the question turns into. */}
       <Note at={metricsAt - 2} x={layerX} y={T - c.h(40)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>what it has to stand on to answer correctly</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>what it has to stand on to answer correctly</span>
       </Note>
       {layers.map((l, i) => {
         const p = ease(frame, l.at - 2, 12);
@@ -129,7 +129,7 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
                 position: "absolute",
                 left: layerX,
                 top: T + i * rowP,
-                ...note(26, INK),
+                ...note(28, INK),
                 fontWeight: 500,
                 lineHeight: `${rowH}px`,
                 whiteSpace: "nowrap",
@@ -147,7 +147,7 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>on messy raw tables: confidently wrong, at scale</span>
       </Note>
       <Note at={jobAt - 2} x={layerX} y={below + c.h(52)}>
-        <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the analyst builds these, and checks the answers</span>
+        <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the analyst builds these, and checks the answers</span>
       </Note>
     </>
   );
@@ -176,7 +176,7 @@ const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>5,000 open-ended survey answers</span>
       </Note>
       <Note at={llmAt - 2} x={R_X} y={c.T + c.h(44)}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>An LLM as a first-pass labeler you measure</span>
+        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>An LLM as a first-pass labeler you measure</span>
       </Note>
       {steps.map((s, i) => {
         // A step said in two parts shows its second as it is said.
@@ -185,7 +185,7 @@ const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
         return (
           <Note key={s.text} at={s.at - 2} x={R_X} y={c.T + c.h(102) + i * c.h(54)}>
             <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-              <span style={{ ...label(26, BLUE_INK), ...TABULAR, marginRight: 14 }}>{i + 1}</span>
+              <span style={{ ...label(28, BLUE_INK), ...TABULAR, marginRight: 14 }}>{i + 1}</span>
               {lead}
               {rest ? <span style={{ opacity: ease(frame, (s.restAt ?? 0) - 2, 10) }}>{rest}</span> : null}
             </span>
@@ -263,7 +263,7 @@ export const RapidScene: React.FC = () => {
           <Mark at={rowAt + 2}>what one row means</Mark>, and <Mark at={rightAt + 2}>how you know the number is right</Mark>.
         </Ink>
         <div style={{ position: "absolute", left: R_X, top: closeY, width: 1000, height: 1, background: HAIRLINE, opacity: ease(frame, trackAt - 4, 12) }} />
-        <Ink at={trackAt} dur={18} style={{ left: R_X, top: closeY + 20, ...body(30, true), color: INK_SOFT, whiteSpace: "nowrap" }}>
+        <Ink at={trackAt} dur={18} style={{ left: R_X, top: closeY + 20, ...body(28, true), color: INK_SOFT, whiteSpace: "nowrap" }}>
           That&apos;s the whole Data Analyst track.
         </Ink>
         <Ink at={bankAt - 2} dur={18} style={{ left: R_X, top: closeY + h(64), ...body(34, true), color: INK, whiteSpace: "nowrap" }}>

@@ -117,7 +117,7 @@ export const RanksScene: React.FC = () => {
           ))}
         </Svg>
         {["Queue A", "Queue B"].map((t, g) => (
-          <div key={t} style={{ position: "absolute", left: 120, top: y(ROWS[g]) - 15, opacity: ease(frame, queuesAt - 4 + g * 6, 12), ...label(22, g ? DATA_INK : INK) }}>
+          <div key={t} style={{ position: "absolute", left: 120, top: y(ROWS[g]) - 15, opacity: ease(frame, queuesAt - 4 + g * 6, 12), ...label(24, g ? DATA_INK : INK) }}>
             {t}
           </div>
         ))}
@@ -227,7 +227,7 @@ export const RanksScene: React.FC = () => {
               top: y(RANK_Y) + 46,
               transform: "translateX(-50%)",
               opacity: ease(frame, ranksAt, 12),
-              ...note(20, INK_SOFT),
+              ...note(24, INK_SOFT),
             }}
           >
             {r}
@@ -244,7 +244,7 @@ export const RanksScene: React.FC = () => {
           </Label>
         </Note>
         <Note at={nothingAt - 4} x={WELCH_X} y={y(AXIS) + 46}>
-          <span style={{ ...note(26, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
             means {fmt(MWU.meanA, 0)} and {fmt(MWU.meanB, 0)}: Welch&apos;s t-test, p = <Mark at={sevenAt - 2}>{fmt(MWU.welchP, 2)}</Mark>
           </span>
         </Note>
@@ -255,7 +255,7 @@ export const RanksScene: React.FC = () => {
           </Label>
         </Note>
         <Note at={p033At - 4} x={rankX(MEAN_RANK[1]) + 16} y={y(RANK_Y) - 128}>
-          <span style={{ ...note(26, DATA_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, DATA_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
             Mann-Whitney, p = {fmt(MWU.mwuP, 3)}
           </span>
         </Note>
@@ -265,7 +265,7 @@ export const RanksScene: React.FC = () => {
           </Label>
         </Note>
         <Note at={standsAt - 4} x={RX1} y={y(RANK_Y) - 70} align="right">
-          <span style={{ ...label(22, STAT_INK), ...halo, display: "inline-block", transform: `scale(${1 + 0.06 * farGlow})`, transformOrigin: "100% 50%" }}>
+          <span style={{ ...label(24, STAT_INK), ...halo, display: "inline-block", transform: `scale(${1 + 0.06 * farGlow})`, transformOrigin: "100% 50%" }}>
             the six monsters: ranks {Math.min(...OUT_RANKS)} to {Math.max(...OUT_RANKS)}
           </span>
         </Note>
@@ -311,7 +311,7 @@ export const RanksScene: React.FC = () => {
         </Label>
       </Note>
       <Ink at={everyAt + 14} dur={18} style={{ left: 160, top: y(300), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(36, true), color: INK_SOFT }}>The one narrow question every test here answers.</span>
+        <span style={{ ...body(34, true), color: INK_SOFT }}>The one narrow question every test here answers.</span>
       </Ink>
       <NextLine at={seemsAt - 4} x={160} y={y(780)} width={640}>
         how big is the effect?

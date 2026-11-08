@@ -71,7 +71,7 @@ const JudgeLabel: React.FC<{ x: number; top: number; at: number }> = ({ x, top, 
   if (p <= 0.001) return null;
   const box = judgeBox(x, top);
   return (
-    <div style={{ position: "absolute", left: x, width: JUDGE_COL, top: box.top + JUDGE_H + 30, textAlign: "center", opacity: p, ...label(26, INK) }}>
+    <div style={{ position: "absolute", left: x, width: JUDGE_COL, top: box.top + JUDGE_H + 30, textAlign: "center", opacity: p, ...label(28, INK) }}>
       the judge
     </div>
   );
@@ -184,7 +184,7 @@ export const TuringScene: React.FC = () => {
         ))}
         <Tick x={doorB[0] + 150} y={floor + 34} at={passesAt} />
       </div>
-      <div style={{ position: "absolute", left: 96, top: y(820), display: "flex", gap: "0.3em", ...headline(38, true), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: 96, top: y(820), display: "flex", gap: "0.3em", ...headline(34, true), whiteSpace: "nowrap" }}>
         <Ink at={chatbotAt - 2} style={{ position: "relative" }}>
           Every chatbot since has been
         </Ink>

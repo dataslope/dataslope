@@ -87,16 +87,16 @@ export const HurtScene: React.FC = () => {
 
         {/* ── It helps selective reads ── */}
         <Note at={helpsAt} x={X0} y={y(HELPS_Y) + 6}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>Helps selective reads:</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>Helps selective reads:</span>
         </Note>
-        <div style={{ position: "absolute", left: 410, top: y(HELPS_Y) + 6, display: "flex", alignItems: "baseline", gap: "0.5em", fontSize: 23, whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: 410, top: y(HELPS_Y) + 6, display: "flex", alignItems: "baseline", gap: "0.5em", fontSize: 24, whiteSpace: "nowrap" }}>
           {[
             { at: eqAt, text: "equality" },
             { at: rangesAt, text: "ranges" },
             { at: joinsAt, text: "joins" },
             { at: sortsAt, text: "sorts on the column" },
           ].map((p, i) => (
-            <span key={p.text} style={{ ...note(23, OK_INK), fontWeight: 500, opacity: ease(frame, p.at, 10) }}>
+            <span key={p.text} style={{ ...note(24, OK_INK), fontWeight: 500, opacity: ease(frame, p.at, 10) }}>
               {i > 0 ? <span style={{ color: INK_SOFT, fontWeight: 500, marginRight: "0.5em" }}>·</span> : null}
               {p.text}
             </span>
@@ -105,7 +105,7 @@ export const HurtScene: React.FC = () => {
 
         {/* ── Left: most rows match, and the index sits unused ── */}
         <Note at={nothingAt} x={X0} y={lTop}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <SmallMono>is_active</SmallMono>: true for <b>{thousands(HURT.active)}</b> of <Num>{thousands(OPENING.users)}</Num> users
           </span>
         </Note>
@@ -153,7 +153,7 @@ export const HurtScene: React.FC = () => {
         {/* ── Right: what every index costs ── */}
         <ColumnRule x={950} top={lTop} bottom={lTop + h(440)} at={costsAt} />
         <Note at={costsAt} x={R_X} y={lTop}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Num>10,000</Num> inserts: write-ahead log records
           </span>
         </Note>
@@ -179,11 +179,11 @@ export const HurtScene: React.FC = () => {
           ink={ACCENT_INK}
         />
         <Note at={eachAt} x={R_X} y={lTop + h(196)}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>each insert also writes into every index</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>each insert also writes into every index</span>
         </Note>
 
         <Note at={spaceAt} x={R_X} y={lTop + h(250)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>On disk</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>On disk</span>
         </Note>
         <Bar
           x={R_X}
@@ -215,7 +215,7 @@ export const HurtScene: React.FC = () => {
           ink={ACCENT_INK}
         />
         <Note at={biggerAt} x={R_X + BAR_W + 120} y={lTop + h(392)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>bigger</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>bigger</span>
         </Note>
 
         {/* ── The rule ── */}

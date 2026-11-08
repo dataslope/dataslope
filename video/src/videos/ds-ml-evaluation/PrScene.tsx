@@ -105,10 +105,10 @@ export const PrScene: React.FC = () => {
         <Curve points={precision} x={xs} y={ys} at={precAt + 2} dur={24} color={BAR} width={3.6} clip={clip} />
         <Curve points={recall} x={xs} y={ys} at={recAt + 2} dur={24} color={WARM} width={3.6} clip={clip} />
         <Note at={precAt + 20} x={PLOT.right + 14} y={at(ys, precision[precision.length - 1][1]) - h(14)}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>precision</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500 }}>precision</span>
         </Note>
         <Note at={recAt + 20} x={PLOT.right + 14} y={at(ys, recall[recall.length - 1][1]) - h(16)}>
-          <span style={{ ...label(21, WARM_INK), fontWeight: 500 }}>recall</span>
+          <span style={{ ...label(24, WARM_INK), fontWeight: 500 }}>recall</span>
         </Note>
         <Svg opacity={mP}>
           <line x1={mx} x2={mx} y1={y(PLOT.top)} y2={y(PLOT.bottom)} stroke={HIGHLIGHT} strokeWidth={10} />
@@ -139,26 +139,26 @@ export const PrScene: React.FC = () => {
 
         {/* ── When to favor each ── */}
         <Note at={missAt - 2} x={RIGHT_X} y={y(610)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             favor <b style={{ color: WARM_INK }}>recall</b> when a miss is costly
           </span>
           <br />
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>a disease screen, fraud</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a disease screen, fraud</span>
         </Note>
         <Note at={alarmAt - 2} x={RIGHT_X} y={y(700)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             favor <b style={{ color: BLUE_INK }}>precision</b> when a false alarm is
           </span>
           <br />
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>a spam filter</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a spam filter</span>
         </Note>
         <Note at={f1At - 2} x={RIGHT_X} y={y(800)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>F1</b>: the harmonic mean of the two
           </span>
           <br />
           {/* The harmonic mean, written out: it sits near the smaller of the two. */}
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, f1At + 20, 10) }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, f1At + 20, 10) }}>
             2 × precision × recall ÷ (precision + recall)
           </span>
         </Note>

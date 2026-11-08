@@ -89,11 +89,11 @@ export const PredictScene: React.FC = () => {
       <FigLabel n="3" title="The novel's top ten, against one over the rank from the top word" at={from} x={96} y={y(286)} />
       <Ink at={predictionAt} style={{ left: 1824 - 520, top: y(286) + 2, width: 520, display: "flex", justifyContent: "flex-end", gap: 12, alignItems: "center", whiteSpace: "nowrap" }}>
         <Swatch color={LAW} dashed />
-        <span style={{ ...note(21, INK_SOFT), fontWeight: 500 }}>predicted from “to”</span>
+        <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>predicted from “to”</span>
         <span style={{ width: 14 }} />
         <span style={{ opacity: ease(frame, inEmmaAt - 2, 10), display: "inline-flex", gap: 12, alignItems: "center" }}>
           <Swatch color={DATA} />
-          <span style={{ ...note(21, DATA_INK), fontWeight: 500 }}>Emma</span>
+          <span style={{ ...note(24, DATA_INK), fontWeight: 500 }}>Emma</span>
         </span>
       </Ink>
 
@@ -217,7 +217,7 @@ export const PredictScene: React.FC = () => {
                   top: emmaBarY(9) + BAR_H + 7,
                   transform: "translateX(-50%)",
                   opacity: p,
-                  ...note(20, POINT_INK),
+                  ...note(24, POINT_INK),
                   fontWeight: 500,
                 }}
               >

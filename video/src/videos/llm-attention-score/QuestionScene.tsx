@@ -235,7 +235,7 @@ export const QuestionScene: React.FC = () => {
         <Tag size={21}>itself</Tag>
       </Fade>
       <Fade at={winAt} style={{ left: (trX + itX) / 2 - 110, top: R - 134 }}>
-        <span style={{ ...label(22, POINT_INK), whiteSpace: "nowrap" }}>the biggest weight?</span>
+        <span style={{ ...label(24, POINT_INK), whiteSpace: "nowrap" }}>the biggest weight?</span>
       </Fade>
       <Spot id="llm-meaning-trophy" at={trophyAt - 4} left={1440} top={y(390)} width={340} height={334} />
 

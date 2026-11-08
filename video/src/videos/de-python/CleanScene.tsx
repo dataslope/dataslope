@@ -181,7 +181,7 @@ export const CleanScene: React.FC = () => {
           marks={[{ line: lineOf(PO, "Bob"), at: bobAt + 6, color: MARK_OK }]}
         />
         <Note at={droppedAt + 4} x={RIGHT_X + 580} y={outTop + h(4)} out={out13}>
-          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             <Mono>bad row</Mono>: gone
           </span>
         </Note>
@@ -283,7 +283,7 @@ export const CleanScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>what won&apos;t parse becomes NaN, not an error</span>
         </Note>
         <Note at={leftAt} x={X0} y={y(TOP) + numH + h(70)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={leftAt + 4} color={MARK_OK}>
               <Mono>nums.isna().sum()</Mono>: <Num>{CLEAN.leftCount}</Num> left
             </Mark>

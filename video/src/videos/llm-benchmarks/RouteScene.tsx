@@ -92,7 +92,7 @@ export const RouteScene: React.FC = () => {
           return (
             <React.Fragment key={t.name}>
               <Ink at={at} dur={12} style={{ left: X0, top: ry - 17, whiteSpace: "nowrap" }}>
-                <span style={{ ...label(26, INK), fontWeight: 500 }}>
+                <span style={{ ...label(28, INK), fontWeight: 500 }}>
                   <Marked at={i === 0 ? cheapestAt - 2 : 1e9}>{tierName(t.name)}</Marked>
                 </span>
               </Ink>
@@ -124,7 +124,7 @@ export const RouteScene: React.FC = () => {
           );
         })}
         <Ink at={passesAt - 2} dur={12} style={{ left: GATE_X - 22, top: y(ROW_Y[0]) - 66, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, TRAP_INK) }}>passes?</span>
+          <span style={{ ...label(24, TRAP_INK) }}>passes?</span>
         </Ink>
         {/* "Somebody has to write the test": the column becomes one blank test. */}
         <Svg opacity={gateBox}>
@@ -140,19 +140,19 @@ export const RouteScene: React.FC = () => {
           />
         </Svg>
         <Ink at={testAt - 2} dur={14} style={{ left: GATE_X - 30, top: y(ROW_Y[3]) + 46, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, TRAP_INK) }}>the test</span>
+          <span style={{ ...label(24, TRAP_INK) }}>the test</span>
         </Ink>
         <Ink at={hookFrom + 22} dur={14} style={{ left: X0, top: y(ROW_Y[3]) + 46, whiteSpace: "nowrap" }}>
-          <span style={note(21, INK_SOFT)}>USD, October 2026</span>
+          <span style={note(24, INK_SOFT)}>USD, October 2026</span>
         </Ink>
 
         {/* ── Fig. 2: the launch table ── */}
         <FigLabel n="2" title="A launch table" at={launchAt - 6} x={TABLE_X} y={y(300)} />
         <Ink at={tableAt - 6} dur={14} style={{ left: TABLE_X, top: y(HEAD_Y) - 14, width: TABLE_W }}>
           <div style={{ position: "relative", height: 30 }}>
-            <span style={{ ...label(22, INK_SOFT), position: "absolute", left: 0 }}>Benchmark</span>
-            <span style={{ ...label(22, A_INK), position: "absolute", left: COLS[1] - TABLE_X }}>Model A</span>
-            <span style={{ ...label(22, B_INK), position: "absolute", left: COLS[2] - TABLE_X }}>Model B</span>
+            <span style={{ ...label(24, INK_SOFT), position: "absolute", left: 0 }}>Benchmark</span>
+            <span style={{ ...label(24, A_INK), position: "absolute", left: COLS[1] - TABLE_X }}>Model A</span>
+            <span style={{ ...label(24, B_INK), position: "absolute", left: COLS[2] - TABLE_X }}>Model B</span>
           </div>
         </Ink>
         <Svg opacity={ease(frame, tableAt - 4, 12)}>
@@ -166,13 +166,13 @@ export const RouteScene: React.FC = () => {
             <React.Fragment key={s.name}>
               <Ink at={at} dur={14} style={{ left: TABLE_X, top: ly - 16, width: TABLE_W }}>
                 <div style={{ position: "relative", height: 34 }}>
-                  <span style={{ ...label(26, INK), fontWeight: 500, position: "absolute", left: 0, whiteSpace: "nowrap" }}>
+                  <span style={{ ...label(28, INK), fontWeight: 500, position: "absolute", left: 0, whiteSpace: "nowrap" }}>
                     <Marked at={markAt}>{s.name}</Marked>
                   </span>
-                  <span style={{ ...note(26, A_INK), fontWeight: 500, position: "absolute", left: COLS[1] - TABLE_X, ...TABULAR }}>
+                  <span style={{ ...note(28, A_INK), fontWeight: 500, position: "absolute", left: COLS[1] - TABLE_X, ...TABULAR }}>
                     {fmt(s.a, 1)}
                   </span>
-                  <span style={{ ...note(26, B_INK), position: "absolute", left: COLS[2] - TABLE_X, ...TABULAR }}>{fmt(s.b, 1)}</span>
+                  <span style={{ ...note(28, B_INK), position: "absolute", left: COLS[2] - TABLE_X, ...TABULAR }}>{fmt(s.b, 1)}</span>
                 </div>
               </Ink>
               <Svg opacity={ease(frame, at + 4, 12)}>
@@ -182,7 +182,7 @@ export const RouteScene: React.FC = () => {
           );
         })}
         <Ink at={scoresAt + 10} dur={14} style={{ left: TABLE_X, top: y(LINE_Y[2]) + 56, whiteSpace: "nowrap" }}>
-          <span style={note(21, INK_SOFT)}>percent of questions right</span>
+          <span style={note(24, INK_SOFT)}>percent of questions right</span>
         </Ink>
         {/* "...that looks like one": the table offered as the test. */}
         <Arrow from={[TABLE_X - 24, y(548)]} to={[GATE_X + GATE_W + 34, y(548)]} at={looksAt - 4} dur={14} color={TRAP} />

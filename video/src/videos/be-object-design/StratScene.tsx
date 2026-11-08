@@ -93,10 +93,10 @@ export const StratScene: React.FC = () => {
 
         {/* The shipment, which asks whichever card it holds. */}
         <Box x={SHIP.x} y={shipTop} w={SHIP.w} h={SHIP.h} at={shipAt} tone="plain" title="Shipment" lit={pulse(frame, notEditedAt, 24)}>
-          <span style={{ ...note(22, INK_SOFT), fontWeight: 500, opacity: ease(frame, parcelAt, 10), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, parcelAt, 10), whiteSpace: "nowrap" }}>
             a parcel weighing <b style={{ color: BLUE_INK }}>{SHIPPING.weight}</b>
           </span>
-          <span style={{ ...note(22, INK_SOFT), fontWeight: 500, opacity: ease(frame, asksAt, 10), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, asksAt, 10), whiteSpace: "nowrap" }}>
             asks its card for the cost
           </span>
         </Box>

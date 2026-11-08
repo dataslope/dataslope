@@ -104,12 +104,12 @@ export const TailScene: React.FC = () => {
           {[0, 50, 100, 150, 200, 250, 300].map((t) => (
             <g key={t} opacity={ease(frame, sampleAt + 4, 12)}>
               <line x1={sx(t)} x2={sx(t)} y1={base} y2={base + 7} stroke={INK} strokeWidth={1.2} />
-              <text x={sx(t)} y={base + 32} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
+              <text x={sx(t)} y={base + 32} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
                 {t}
               </text>
             </g>
           ))}
-          <text x={HX1} y={base + 62} textAnchor="end" style={svgText({ ...label(20, INK_SOFT) })} opacity={ease(frame, sampleAt + 8, 12)}>
+          <text x={HX1} y={base + 62} textAnchor="end" style={svgText({ ...label(24, INK_SOFT) })} opacity={ease(frame, sampleAt + 8, 12)}>
             milliseconds
           </text>
           {rule(P.marks.median, medianAt, rowA - 4, INK)}

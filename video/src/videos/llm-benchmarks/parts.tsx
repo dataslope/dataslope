@@ -406,7 +406,7 @@ export const Track: React.FC<{
         {ticks.map((v) => (
           <g key={v}>
             <line x1={X(v)} x2={X(v)} y1={y + 2} y2={y + 9} stroke={INK_SOFT} strokeWidth={1.4} />
-            <text x={X(v)} y={y + 32} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
+            <text x={X(v)} y={y + 32} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500, ...TABULAR })}>
               {v}
             </text>
           </g>
@@ -463,7 +463,7 @@ export const Tag: React.FC<{
   return (
     <div
       style={{
-        ...label(22),
+        ...label(24),
         ...badge,
         position: "absolute",
         left: x,

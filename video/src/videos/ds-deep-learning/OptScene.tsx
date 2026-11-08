@@ -208,13 +208,13 @@ export const OptScene: React.FC = () => {
                     <svg width={34} height={14} style={{ overflow: "visible" }}>
                       <line x1={0} x2={34} y1={7} y2={7} stroke={r.color} strokeWidth={4} />
                     </svg>
-                    <span style={{ ...note(30, r.ink), fontWeight: 500, whiteSpace: "nowrap" }}>
+                    <span style={{ ...note(28, r.ink), fontWeight: 500, whiteSpace: "nowrap" }}>
                       {r.key === "adam" ? <Mark at={defaultAt}>{r.name}</Mark> : r.name}
                     </span>
                   </div>
                 </Note>
                 <Note at={nameAt[r.key] + 4} x={LEG_X + 48} y={top + h(40)}>
-                  <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+                  <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
                     {r.key === "sgd" ? (
                       <span style={{ opacity: ease(frame, batchAt - 2, 10) }}>here, plain steps on the exact gradient</span>
                     ) : r.key === "momentum" ? (
@@ -228,7 +228,7 @@ export const OptScene: React.FC = () => {
                   </span>
                 </Note>
                 <Note at={(r.key === "sgd" ? threeAt : otherAt + (i - 1) * 4) - 2} x={1720} y={top} align="right" width={180}>
-                  <span style={{ ...note(30, r.ink), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{OPT.dist[r.key].toFixed(2)}</span>
+                  <span style={{ ...note(28, r.ink), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{OPT.dist[r.key].toFixed(2)}</span>
                 </Note>
               </React.Fragment>
             );

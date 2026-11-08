@@ -256,7 +256,7 @@ export const StairsScene: React.FC = () => {
               alignItems: "center",
               paddingLeft: 18,
               opacity: p * (1 - o),
-              ...note(22, isNew ? mix(INK, PAPER, fill) : INK),
+              ...note(24, isNew ? mix(INK, PAPER, fill) : INK),
               fontWeight: isNew ? 500 : undefined,
             }}
           >
@@ -323,7 +323,7 @@ export const StairsScene: React.FC = () => {
       {/* Up close, turn one: the system prompt and the first message. */}
       <Leader points={[[ZX - 12, zoomed.ty(SYSTEM / 2)], [zoomed.x(1) + zoomed.bar + 4, zoomed.ty(SYSTEM / 2)]]} at={sysAt - 4} out={twoAt - 6} color={INK_SOFT} />
       <Note at={sysAt - 2} out={twoAt - 6} x={ZX} y={zoomed.ty(SYSTEM / 2) - 17}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
           system prompt, <b style={{ fontWeight: 600 }}>{int(SYSTEM)}</b> tokens
         </span>
       </Note>
@@ -334,7 +334,7 @@ export const StairsScene: React.FC = () => {
         color={INK_SOFT}
       />
       <Note at={yourAt} out={twoAt - 6} x={ZX} y={zoomed.ty(SYSTEM + USER / 2) - 57}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
           your first message, <b style={{ fontWeight: 600 }}>{int(USER)}</b>
         </span>
       </Note>
@@ -347,7 +347,7 @@ export const StairsScene: React.FC = () => {
         color={INK_SOFT}
       />
       <Note at={againAt + 6} out={zLabelsOut} x={ZX} y={zoomed.ty(TURNS[1].resent / 2) - 17}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
           turn one, sent again: <b style={{ fontWeight: 600 }}>{int(TURNS[1].resent)}</b>
         </span>
       </Note>
@@ -361,7 +361,7 @@ export const StairsScene: React.FC = () => {
         right={false}
       />
       <Note at={replyAt + 2} out={zLabelsOut} x={ZX} y={zoomed.ty(TURNS[1].resent + TURNS[1].newSlice / 2) - 34}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap", display: "block", ...TABULAR }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap", display: "block", ...TABULAR }}>
           the reply, {int(REPLY)}, and your next message, {int(USER)}
         </span>
       </Note>
@@ -372,7 +372,7 @@ export const StairsScene: React.FC = () => {
       {/* Turn forty. */}
       <Note at={countAt - 4} out={areaFrom - 12} x={RX - 14} y={lastTop - 30}>
         <span style={{ display: "block", ...headline(46), ...TABULAR, whiteSpace: "nowrap" }}>{int(LAST.sent)}</span>
-        <span style={{ display: "block", marginTop: 8, ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>tokens in turn 40's request</span>
+        <span style={{ display: "block", marginTop: 8, ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>tokens in turn 40's request</span>
       </Note>
 
       {/* ── The area ── */}
@@ -440,7 +440,7 @@ export const StairsScene: React.FC = () => {
         />
       </Svg>
       <Note at={sameAt - 6} x={CHART.x0 + 18} y={L + (full.base - L) / 2 - 15}>
-        <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the system prompt, the same every turn</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the system prompt, the same every turn</span>
       </Note>
       <Leader points={[[700, L - 330], [930, L - 150]]} at={chatAt - 2} out={doubleAt - 4} color={TRI_INK} />
       <Note at={chatAt} out={doubleAt - 4} x={440} y={L - 376}>
@@ -456,7 +456,7 @@ export const StairsScene: React.FC = () => {
       <Note at={longAt + 4} x={RX} y={y(500) + 40}>
         <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
           <span style={{ ...headline(54), color: LINE_EDGE, ...TABULAR }}>×2</span>
-          <span style={note(22, INK_SOFT)}>twice as long</span>
+          <span style={note(24, INK_SOFT)}>twice as long</span>
         </span>
       </Note>
       <div style={{ position: "absolute", left: RX, top: y(660) }}>
@@ -467,7 +467,7 @@ export const StairsScene: React.FC = () => {
       <Note at={fourAt} x={RX} y={y(660) + 40}>
         <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
           <span style={{ ...headline(54), color: TRI_INK, ...TABULAR }}>×4</span>
-          <span style={note(22, INK_SOFT)}>twice as long and tall</span>
+          <span style={note(24, INK_SOFT)}>twice as long and tall</span>
         </span>
       </Note>
 
@@ -480,11 +480,11 @@ export const StairsScene: React.FC = () => {
           doubles and the forty-turn bracket takes its place. */}
       <Bracket x0={CHART.x0} x1={x20 - 2} y={full.base + 50} at={twentyAt - 2} out={longAt - 4} color={INK} up />
       <Note at={twentyAt} out={longAt - 4} x={(CHART.x0 + x20) / 2 - 50} y={full.base + 58}>
-        <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>20 turns</span>
+        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>20 turns</span>
       </Note>
       <Bracket x0={CHART.x0} x1={x40} y={full.base + 50} at={longAt} color={INK} up />
       <Note at={longAt + 4} x={(CHART.x0 + x40) / 2 - 50} y={full.base + 58}>
-        <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>40 turns</span>
+        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>40 turns</span>
       </Note>
       <Svg>
         {/* The rectangle: twenty turns, and its copy beside it. */}
@@ -533,7 +533,7 @@ export const StairsScene: React.FC = () => {
         const cy = (c.pts[0][1] + c.pts[1][1] + c.pts[2][1]) / 3;
         return (
           <Note key={i} at={i === 0 ? c.at + 4 : c.at + 16} x={cx - 9} y={cy - 18} from="up" style={{ opacity: landed < 0.95 ? 0 : undefined }}>
-            <span style={{ ...note(30, TRI_INK), fontWeight: 500, ...halo }}>{c.n}</span>
+            <span style={{ ...note(28, TRI_INK), fontWeight: 500, ...halo }}>{c.n}</span>
           </Note>
         );
       })}

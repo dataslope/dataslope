@@ -84,7 +84,7 @@ export const ManyScene: React.FC = () => {
       />
       <Axis scale={HIST_X} base={base} ticks={TICKS} format={(v) => (v === 0 ? "0" : dec(v, v % 1 ? 1 : 0))} at={start - 4} size={20} />
       <Note at={start} x={(HIST_X.x0 + HIST_X.x1) / 2} y={base + 48} style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Correlation of the two walks in a pair, r</span>
+        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Correlation of the two walks in a pair, r</span>
       </Note>
 
       <Layer opacity={tail}>
@@ -107,7 +107,7 @@ export const ManyScene: React.FC = () => {
 
       {/* The pair from Fig. 2, found among the ten thousand. */}
       <Note at={pairsAt + 20} x={mx} y={labelTop} align="left" style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...note(20, INK), whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...halo }}>
           Fig. 2’s pair, <b style={{ fontWeight: 600 }}>{dec(R_WALKS)}</b>
         </span>
       </Note>
@@ -115,7 +115,7 @@ export const ManyScene: React.FC = () => {
 
       {/* The share past a half, for these walks and for walks ten times longer. */}
       <Note at={fiveAt} x={TABLE_X} y={row(0) - 62}>
-        <span style={label(20, INK_SOFT)}>Pairs past ±0.5</span>
+        <span style={label(24, INK_SOFT)}>Pairs past ±0.5</span>
       </Note>
       <Layer opacity={ease(frame, fiveAt, 12)}>
         <line x1={TABLE_X} x2={TABLE_X + TABLE_W} y1={row(0) - 16} y2={row(0) - 16} stroke={INK} strokeWidth={1.6} />
@@ -142,7 +142,7 @@ export const ManyScene: React.FC = () => {
         <Note key={r.name} at={r.at} x={TABLE_X} y={row(i)} width={TABLE_W}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             {r.key}
-            <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>{r.name}</span>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{r.name}</span>
             <span style={{ ...headline(56), color: r.ink, marginLeft: "auto" }}>{pct(r.value)}</span>
           </div>
         </Note>

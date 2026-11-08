@@ -75,10 +75,10 @@ export const HookScene: React.FC = () => {
         {/* The hook: one question, asked twice. */}
         <Clear at={knowAt - 8}>
           <Note at={askAt + 2} x={X0} y={y(300) + 14}>
-            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Can I return a jacket after 45 days?</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Can I return a jacket after 45 days?</span>
           </Note>
           <Note at={twiceAt + 2} x={X0 + 640} y={y(312)}>
-            <span style={label(21, INK_SOFT)}>the same model, asked twice</span>
+            <span style={label(24, INK_SOFT)}>the same model, asked twice</span>
           </Note>
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: arrow }}>
             {[0, 1].map((k) => {
@@ -104,13 +104,13 @@ export const HookScene: React.FC = () => {
             Sorry, returns close 30 days after purchase.
           </Reply>
           <Note at={sureAt} x={X0} y={y(CARD_Y + 150)}>
-            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>both sound sure of themselves</span>
+            <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>both sound sure of themselves</span>
           </Note>
           <Note at={policyAt} x={X0 + CARD_W + CARD_GAP} y={y(CARD_Y + 150)}>
-            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the refund policy: 30 days</span>
+            <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the refund policy: 30 days</span>
           </Note>
           <Note at={decideAt} x={X0} y={y(700)}>
-            <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(34, INK), whiteSpace: "nowrap" }}>
               which version ships? <span style={{ opacity: ease(frame, measureAt - 2, 10) }}>That&apos;s </span>
               <span style={{ opacity: ease(frame, measureAt - 2, 10) }}>
                 <Mark at={measureAt + 4}>a measurement problem.</Mark>
@@ -125,7 +125,7 @@ export const HookScene: React.FC = () => {
 
         {/* The plan: what you know, what's new, and how the page splits. */}
         <Note at={knowAt + 4} x={X0} y={y(ROW_KNOW - 44)}>
-          <span style={label(22, INK_SOFT)}>you already know</span>
+          <span style={label(24, INK_SOFT)}>you already know</span>
         </Note>
         {known.map((c, i) => (
           <Tag key={c.text} x={X0 + [0, 260, 470, 618][i]} y={y(ROW_KNOW)} at={c.at - 2} size={28} tone="blue">
@@ -133,7 +133,7 @@ export const HookScene: React.FC = () => {
           </Tag>
         ))}
         <Note at={newAt} x={X0} y={y(ROW_NEW - 44)}>
-          <span style={{ ...label(22, INK), fontWeight: 500 }}>what&apos;s new</span>
+          <span style={{ ...label(24, INK), fontWeight: 500 }}>what&apos;s new</span>
         </Note>
         {fresh.map((c, i) => (
           <Tag key={c.text} x={X0 + [0, 290, 708][i]} y={y(ROW_NEW)} at={c.at - 2} size={28}>
@@ -141,7 +141,7 @@ export const HookScene: React.FC = () => {
           </Tag>
         ))}
         <Note at={nineAt} x={X0} y={y(680)}>
-          <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(34, INK), whiteSpace: "nowrap" }}>
             9 questions:{" "}
             <span style={{ opacity: ease(frame, sevenAt - 2, 10) }}>
               <Mark at={sevenAt + 4}>7 worked through</Mark>

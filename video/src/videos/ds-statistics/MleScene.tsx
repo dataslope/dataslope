@@ -212,7 +212,7 @@ export const MleScene: React.FC = () => {
         />
         <Svg opacity={ease(frame, byNAt - 2, 10)}>
           {rows.map((r, i) => (
-            <text key={r.n} x={vx(i)} y={y(V_BASE) + 32} textAnchor="middle" fill={INK_SOFT} style={{ ...label(20, INK_SOFT), ...TABULAR }}>
+            <text key={r.n} x={vx(i)} y={y(V_BASE) + 32} textAnchor="middle" fill={INK_SOFT} style={{ ...label(24, INK_SOFT), ...TABULAR }}>
               n = {r.n}
             </text>
           ))}

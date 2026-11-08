@@ -133,7 +133,7 @@ export const HookScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>one neuron</span>
         </Note>
         <Note at={backAt + 4} x={LX[2] - 60} y={y(nodeY(2, 0)) - h(122)} out={netOut}>
-          <span style={{ ...note(23, ACCENT), fontWeight: 500, whiteSpace: "nowrap" }}>← the error, travelling back</span>
+          <span style={{ ...note(24, ACCENT), fontWeight: 500, whiteSpace: "nowrap" }}>← the error, travelling back</span>
         </Note>
 
         {/* How much of the error reaches each layer. */}
@@ -157,7 +157,7 @@ export const HookScene: React.FC = () => {
           );
         })}
         <Note at={deepAt + 4} x={LX[0] - 18} y={y(BAR_TOP) + h(BAR_H) + h(12)} out={netOut}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>how much of the error reaches each layer</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>how much of the error reaches each layer</span>
         </Note>
 
         {/* ── The round: fifteen neurons, twelve worked through ── */}
@@ -192,7 +192,7 @@ export const HookScene: React.FC = () => {
                   width: 60,
                   textAlign: "center",
                   opacity: p * (1 - dim),
-                  ...label(19, i === 0 && lit > 0 ? INK : INK_SOFT),
+                  ...label(24, i === 0 && lit > 0 ? INK : INK_SOFT),
                   fontWeight: 500,
                   ...TABULAR,
                 }}

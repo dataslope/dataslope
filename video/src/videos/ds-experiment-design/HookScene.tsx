@@ -111,13 +111,13 @@ export const HookScene: React.FC = () => {
           </g>
         </svg>
         <Note at={startAt + 12} x={X0} y={y(LINE_Y) + h(22)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>before launch</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>before launch</span>
         </Note>
         <Note at={startAt + 16} x={LAUNCH_X - 60} y={y(LINE_Y) + h(22)} width={120} style={{ textAlign: "center" }}>
-          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>launch</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>launch</span>
         </Note>
         <Note at={startAt + 18} x={LINE_END} y={y(LINE_Y) + h(22)} width={200} align="right">
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>live</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>live</span>
         </Note>
 
         {/* Live: two versions, and users split between them at random. */}
@@ -134,7 +134,7 @@ export const HookScene: React.FC = () => {
                 position: "absolute",
                 left: c.x,
                 top: y(DOTS_Y) - h(60),
-                ...label(21),
+                ...label(24),
                 ...badgeStyle(c.tone, 21),
                 opacity: p,
                 transform: `translateY(${(1 - p) * 10}px)`,
@@ -185,7 +185,7 @@ export const HookScene: React.FC = () => {
               <span
                 key={d.text}
                 style={{
-                  ...note(22),
+                  ...note(24),
                   ...DECISION_BADGE,
                   background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, ${DECISION_BADGE.background})` : DECISION_BADGE.background,
                   opacity: p,
@@ -198,7 +198,7 @@ export const HookScene: React.FC = () => {
           })}
         </div>
         <Note at={undoAt - 2} x={DOTS_X} y={y(LINE_Y) + h(70)}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a mistake is hard to undo once it's live</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a mistake is hard to undo once it's live</span>
         </Note>
 
         {/* The round. */}
@@ -208,12 +208,12 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={elevenAt - 2} x={X0} y={y(778)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <b style={{ color: BLUE_INK }}>11</b> worked through on <span style={{ opacity: ease(frame, simAt - 2, 10) }}>simulated experiments</span>
           </span>
         </Note>
         <Note at={briefAt - 2} x={X0} y={y(822)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <b style={{ color: OK_INK }}>3</b> brief ones at the end
           </span>
         </Note>

@@ -204,10 +204,10 @@ export const ShapScene: React.FC = () => {
                           ? `color-mix(in srgb, ${ACCENT} ${14 * idLit}%, transparent)`
                           : undefined,
                       ...(r === null
-                        ? { ...label(19, INK), fontWeight: 500 }
+                        ? { ...label(24, INK), fontWeight: 500 }
                         : r === "distinct"
-                          ? { ...label(19, INK_SOFT), ...TABULAR }
-                          : { ...note(21, INK), ...TABULAR }),
+                          ? { ...label(24, INK_SOFT), ...TABULAR }
+                          : { ...note(24, INK), ...TABULAR }),
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -233,13 +233,13 @@ export const ShapScene: React.FC = () => {
           ))}
         </div>
         <Note at={asked + 6} x={X0 + 580} y={y(TABLE_TOP) + 5 * h(ROW) + h(8)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             distinct values
           </span>
         </Note>
         <Note at={asked + 6} x={X0} y={y(TABLE_TOP) + 6 * h(ROW) + h(6)}>
           <span
-            style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}
+            style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}
           >
             <Mark at={madeAt}>made up for this video</Mark>:{" "}
             {SHAP.n.toLocaleString("en-US")} customers
@@ -253,7 +253,7 @@ export const ShapScene: React.FC = () => {
         >
           <span
             style={{
-              ...label(20, ACCENT_INK),
+              ...label(24, ACCENT_INK),
               fontWeight: 500,
               whiteSpace: "nowrap",
             }}
@@ -265,7 +265,7 @@ export const ShapScene: React.FC = () => {
         {/* ── Both importances, as each feature's share of the total ── */}
         <Note at={impAt} x={X0} y={y(BARS_TOP) - h(46)}>
           <span
-            style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}
+            style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
             share of importance:{" "}
             <span style={{ color: BLUE_INK }}>the forest&apos;s impurity</span>
@@ -288,7 +288,7 @@ export const ShapScene: React.FC = () => {
                   left: X0,
                   top: top + h(6),
                   opacity: p,
-                  ...note(22, isId ? ACCENT_INK : INK),
+                  ...note(24, isId ? ACCENT_INK : INK),
                   fontWeight: 500,
                   whiteSpace: "nowrap",
                 }}
@@ -313,7 +313,7 @@ export const ShapScene: React.FC = () => {
                   left: BAR_X + barScale(imp[i]) * p + 10,
                   top: top - h(3),
                   opacity: p,
-                  ...label(19, isId ? ACCENT_INK : BLUE_INK),
+                  ...label(24, isId ? ACCENT_INK : BLUE_INK),
                   fontWeight: 500,
                   ...TABULAR,
                 }}
@@ -338,7 +338,7 @@ export const ShapScene: React.FC = () => {
                   left: BAR_X + barScale(sh[i]) * q + 10,
                   top: top + h(23),
                   opacity: q,
-                  ...label(19, OK_INK),
+                  ...label(24, OK_INK),
                   fontWeight: 500,
                   ...TABULAR,
                 }}
@@ -367,7 +367,7 @@ export const ShapScene: React.FC = () => {
           />
         </Svg>
         <Note at={driveAt} x={BAR_X + barScale(imp[0]) + 70} y={y(BARS_TOP)}>
-          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             which really drives churn
           </span>
         </Note>
@@ -375,7 +375,7 @@ export const ShapScene: React.FC = () => {
         {/* ── One customer's prediction, split ── */}
         <Note at={splitsAt} x={WF_X} y={y(WF_TOP) - h(50)}>
           <span
-            style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}
+            style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
             one customer: the chance of churning, feature by feature
           </span>
@@ -397,7 +397,7 @@ export const ShapScene: React.FC = () => {
                 x={at(wx, v)}
                 y={y(WF_TOP) + 6 * h(WF_ROW) + 24}
                 textAnchor="middle"
-                style={svgText({ ...label(19, INK_SOFT), ...TABULAR })}
+                style={svgText({ ...label(24, INK_SOFT), ...TABULAR })}
               >
                 {fmt(v, 1)}
               </text>
@@ -444,7 +444,7 @@ export const ShapScene: React.FC = () => {
                   left: WF_X,
                   top: top + h(14),
                   opacity: p,
-                  ...note(22, INK),
+                  ...note(24, INK),
                   fontWeight: i === 0 || i === 5 ? 500 : 500,
                   whiteSpace: "nowrap",
                 }}
@@ -490,7 +490,7 @@ export const ShapScene: React.FC = () => {
         <Note at={finalAt + 8} x={WF_X} y={y(WF_TOP) + 6 * h(WF_ROW) + h(46)}>
           <span
             style={{
-              ...label(20, INK_SOFT),
+              ...label(24, INK_SOFT),
               whiteSpace: "nowrap",
               background: PAPER,
             }}
@@ -506,7 +506,7 @@ export const ShapScene: React.FC = () => {
           x={X0}
           y={y(BARS_TOP) + 4 * h(BAR_ROW) + h(4)}
         >
-          <span style={{ ...label(20, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             <span style={{ fontWeight: 500 }}>
               permutation importance, on held-out rows:
             </span>{" "}
@@ -534,7 +534,7 @@ export const ShapScene: React.FC = () => {
         >
           <span
             style={{
-              ...label(19, OK_INK),
+              ...label(24, OK_INK),
               fontWeight: 500,
               whiteSpace: "nowrap",
             }}

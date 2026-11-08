@@ -38,7 +38,7 @@ export const RuleScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 5} dur={14} style={{ left: LEFT + 4, top: y(262) }}>
-        <span style={label(22, ACCENT_INK)}>The rule</span>
+        <span style={label(24, ACCENT_INK)}>The rule</span>
       </Ink>
 
       <Ink at={eqAt - 4} dur={16} style={{ ...codeCell, top: y(330) }}>

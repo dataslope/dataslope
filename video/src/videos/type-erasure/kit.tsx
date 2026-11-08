@@ -370,7 +370,7 @@ export const Terminal: React.FC<{
           {r.tag ? (
             <span
               style={{
-                ...note(20, r.tag.color ?? INK_SOFT),
+                ...note(24, r.tag.color ?? INK_SOFT),
                 fontWeight: 500,
                 opacity: ease(frame, r.tag.at, 10),
               }}
@@ -394,7 +394,7 @@ export const FileTab: React.FC<{ at: number; x: number; y: number; name: string;
 }) => (
   <Ink at={at} dur={14} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
     <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{name}</span>
-    {children ? <span style={note(21, INK_SOFT)}>{children}</span> : null}
+    {children ? <span style={note(24, INK_SOFT)}>{children}</span> : null}
   </Ink>
 );
 

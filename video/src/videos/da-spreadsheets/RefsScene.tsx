@@ -216,12 +216,12 @@ export const RefsScene: React.FC = () => {
           out={out7}
         />
         <Note at={lockAt} x={X0 + 1090} y={g.bottom + h(46)} out={out7}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>$F</b>: the column stays on the regions
           </span>
         </Note>
         <Note at={rowAt} x={X0 + 1090} y={g.bottom + h(84)} out={out7}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>$1</b>: the row stays on the months
           </span>
         </Note>

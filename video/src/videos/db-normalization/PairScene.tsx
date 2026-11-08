@@ -186,19 +186,19 @@ export const PairScene: React.FC = () => {
             />
           </Svg>
           <Ink at={pairAt} dur={12} style={{ left: X0 + 4, top: bracketY - 46, whiteSpace: "nowrap" }}>
-            <span style={label(21, BLUE_INK)}>the key</span>
+            <span style={label(24, BLUE_INK)}>the key</span>
           </Ink>
           {/* Quantity needs the whole pair; the name needs half of it. */}
           <DepArrow from={[bracketMid, bracketY]} to={[center(I.qty), g.top - 6]} level={g.top - 72} at={wholeAt - 2} color={BLUE_INK} />
           <Ink at={quantityAt} dur={12} style={{ left: center(I.qty) + 18, top: g.top - 112, whiteSpace: "nowrap" }}>
-            <span style={label(21, BLUE_INK)}>needs the whole pair</span>
+            <span style={label(24, BLUE_INK)}>needs the whole pair</span>
           </Ink>
           <DepArrow from={[center(I.product), bottom + 8]} to={[center(I.name), bottom + 6]} level={bottom + 62} at={halfAt - 4} color={ACCENT} />
           <Ink at={nameAt} dur={12} style={{ left: center(I.name) + 18, top: bottom + 22, whiteSpace: "nowrap" }}>
-            <span style={label(21, ACCENT_INK)}>needs half</span>
+            <span style={label(24, ACCENT_INK)}>needs half</span>
           </Ink>
           <Ink at={partialAt} dur={14} style={{ left: center(I.product) - 10, top: bottom + 76, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500 }}>a partial dependency</span>
+            <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>a partial dependency</span>
           </Ink>
 
           {/* The two dependencies, written out as they are said. */}
@@ -236,7 +236,7 @@ export const PairScene: React.FC = () => {
             {RENAME_BAD.tag}
           </Reply>
           <Note at={rowsAt + 6} x={RIGHT + 150} y={g.top + LIST_DROP + listH + 24}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>one name, {tenRows.length} rows</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>one name, {tenRows.length} rows</span>
           </Note>
         </Fade>
 
@@ -282,10 +282,10 @@ export const PairScene: React.FC = () => {
             {RENAME_BAD.tag}
           </Reply>
           <Note at={oneRowAt + 14} x={products.x + 150} y={y(FIX_Y) + listH + 82}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>before the split</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>before the split</span>
           </Note>
           <Note at={inFrom} x={items.x} y={items.bottom + 24}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>keeps only what needs the whole pair</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>keeps only what needs the whole pair</span>
           </Note>
         </Fade>
       </Drift>

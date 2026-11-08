@@ -126,7 +126,7 @@ export const LibraryScene: React.FC = () => {
             dim={notAt}
           />
           <Note at={threeAt} x={copies.left} y={copies.bottom + 22} out={lentAt + 6}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Three copies: three rows here.</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Three copies: three rows here.</span>
           </Note>
 
           <Entity
@@ -155,15 +155,15 @@ export const LibraryScene: React.FC = () => {
             label="makes"
           />
           <Note at={pointsAt + 4} x={loans.left} y={loans.bottom + 18}>
-            <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               <Mark at={tellAt - 2}>A loan points at a copy, not a title.</Mark>
             </span>
           </Note>
           <Note at={titleAt + 2} x={books.left} y={books.bottom + 18} out={copyAt}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>The title, as the catalog lists it</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The title, as the catalog lists it</span>
           </Note>
           <Note at={copyAt + 4} x={copies.left} y={copies.bottom + 22} out={threeAt - 2}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>The copy, as it sits on the shelf</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The copy, as it sits on the shelf</span>
           </Note>
         </div>
       </Drift>

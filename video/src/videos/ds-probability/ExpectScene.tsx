@@ -169,7 +169,7 @@ export const ExpectScene: React.FC = () => {
         {DIE.squares.map((s, i) => (
           <React.Fragment key={i}>
             <Note at={squaredAt + 8 + i * 2} x={SQ.x0 + i * SQ.pitch} width={SQ.w} y={y(SQ.base) + 10} out={out6} from="up" style={{ textAlign: "center" }}>
-              <span style={{ ...label(22, INK_SOFT), ...TABULAR }}>{i + 1}</span>
+              <span style={{ ...label(24, INK_SOFT), ...TABULAR }}>{i + 1}</span>
             </Note>
             {/* A bar whose top sits just under the variance line (2.25) takes
                 its value inside, so the dashed line crosses no figure. */}
@@ -182,13 +182,13 @@ export const ExpectScene: React.FC = () => {
               from="up"
               style={{ textAlign: "center" }}
             >
-              <span style={{ ...label(21, INK), ...TABULAR }}>{fmt(s)}</span>
+              <span style={{ ...label(24, INK), ...TABULAR }}>{fmt(s)}</span>
             </Note>
           </React.Fragment>
         ))}
         {/* The definition the bars compute, in both forms the page gives. */}
         <Ink at={squaredAt + 2} dur={22} out={out6} style={{ left: X0, top: y(760) }}>
-          <span style={math(36)}>
+          <span style={math(34)}>
             Var(<V>X</V>) ={" "}
             <E>
               (<V>X</V> −{" "}
@@ -212,7 +212,7 @@ export const ExpectScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>squared distance from 3.5</span>
         </Note>
         <Note at={averagedAt + 6} x={SQ.x0 + 2 * SQ.pitch - 40} y={y(SQ.base) - h(DIE.varFloat * SQ.unit) - 64} out={out6}>
-          <span style={math(36, OK_INK)}>
+          <span style={math(34, OK_INK)}>
             Var(<V>X</V>) = {DIE.var} ≈ {fmt(DIE.varFloat)}
           </span>
         </Note>
@@ -262,7 +262,7 @@ export const ExpectScene: React.FC = () => {
                     <ellipse cx={x} cy={(top + bottom) / 2} rx={RING.rx} ry={(bottom - top) / 2} fill="none" stroke={OK} strokeWidth={4} opacity={ring} />
                   ) : null}
                   {/* Clear of the match's ring, which reaches foot + 11. */}
-                  <text x={x} y={foot + 40} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 500, fill: INK_SOFT }}>
+                  <text x={x} y={foot + 40} textAnchor="middle" style={{ ...label(24, INK_SOFT), fontWeight: 500, fill: INK_SOFT }}>
                     {i + 1}
                   </text>
                 </g>
@@ -314,7 +314,7 @@ export const ExpectScene: React.FC = () => {
                     strokeWidth={6}
                     strokeLinejoin="round"
                     paintOrder="stroke"
-                    style={{ ...label(21, INK), fontWeight: 500, fill: INK, ...TABULAR }}
+                    style={{ ...label(24, INK), fontWeight: 500, fill: INK, ...TABULAR }}
                   >
                     {hat + 1}
                   </text>
@@ -355,29 +355,29 @@ export const ExpectScene: React.FC = () => {
           {HATS.share.map((s, k) => (
             <React.Fragment key={k}>
               <Note at={shufflesAt + 4 + k * 2} x={HIST.x0 + k * HIST.pitch} width={HIST.w} y={y(HIST.base) + 10} from="up" style={{ textAlign: "center" }}>
-                <span style={{ ...label(22, INK_SOFT), ...TABULAR }}>{k}</span>
+                <span style={{ ...label(24, INK_SOFT), ...TABULAR }}>{k}</span>
               </Note>
               {s > 0.05 ? (
                 <Note at={shufflesAt + 10 + k * 2} x={HIST.x0 + k * HIST.pitch - 20} width={HIST.w + 40} y={y(HIST.base) - h(s * HIST.unit) - 32} from="up" style={{ textAlign: "center" }}>
                   {/* The average's line stands at 0.997, through bar 1's label; the
                       paper behind the label carries the line under it. */}
-                  <span style={{ ...label(20, INK), ...TABULAR, background: PAPER, padding: "0 4px" }}>{pct(s)}</span>
+                  <span style={{ ...label(24, INK), ...TABULAR, background: PAPER, padding: "0 4px" }}>{pct(s)}</span>
                 </Note>
               ) : null}
             </React.Fragment>
           ))}
           <Note at={shufflesAt + 2} x={HIST.x0 - 16} y={y(HIST.base) + 46}>
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>matches in a shuffle</span>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>matches in a shuffle</span>
           </Note>
           <Note at={shufflesAt + 18} x={HIST.x0 + HATS.mean * HIST.pitch + HIST.w / 2 + 14} y={y(HIST.base) - h(0.47 * HIST.unit) - 4}>
-            <span style={{ ...label(23, OK_INK), ...TABULAR, whiteSpace: "nowrap" }}>average {HATS.mean}</span>
+            <span style={{ ...label(24, OK_INK), ...TABULAR, whiteSpace: "nowrap" }}>average {HATS.mean}</span>
           </Note>
 
           <Note at={varAt} x={X0} y={y(HATS_ROW.y + 226)}>
-            <span style={{ ...math(32, INK) }}>
+            <span style={{ ...math(34, INK) }}>
               Var(<V>X</V> + <V>Y</V>) = Var(<V>X</V>) + Var(<V>Y</V>)
             </span>
-            <span style={{ ...note(26, INK), fontWeight: 500, marginLeft: 16, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), fontWeight: 500, marginLeft: 16, whiteSpace: "nowrap" }}>
               only when <Mark at={uncorrAt}>uncorrelated</Mark>
             </span>
           </Note>

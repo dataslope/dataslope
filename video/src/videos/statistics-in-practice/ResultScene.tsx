@@ -140,20 +140,20 @@ export const ResultScene: React.FC = () => {
         <React.Fragment key={a.g}>
           <Grid x={a.x} top={top} converted={a.set} fill={fill} lit={a.lit} color={a.color} />
           <Ink at={sixAt} dur={14} style={{ left: a.x, top: top + gridH + 14, whiteSpace: "nowrap" }}>
-            <span style={{ ...label(22, INK) }}>
+            <span style={{ ...label(24, INK) }}>
               {a.g}: {a.name}
             </span>
           </Ink>
           <Ink at={a.at - 4} dur={12} style={{ left: a.x, top: top + gridH + 50, whiteSpace: "nowrap" }}>
             {/* The count, its gloss and the rate share one line, so they are
                 set within a size of each other. */}
-            <span style={{ ...note(26, INK), ...TABULAR, fontWeight: 500 }}>
+            <span style={{ ...note(28, INK), ...TABULAR, fontWeight: 500 }}>
               <Count to={a.k} at={a.at - 4} dur={26} format={num} />
             </span>
             <span style={{ ...note(24, INK_SOFT), marginLeft: 10 }}>of {num(EXPERIMENT.n)} bought</span>
           </Ink>
           <Ink at={a.rateAt - 4} dur={12} style={{ left: a.x + 300, top: top + gridH + 50, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(26, INK), fontWeight: 500 }}>{fmt(pp(a.rate))}%</span>
+            <span style={{ ...note(28, INK), fontWeight: 500 }}>{fmt(pp(a.rate))}%</span>
           </Ink>
         </React.Fragment>
       ))}
@@ -170,7 +170,7 @@ export const ResultScene: React.FC = () => {
               top: top + gridH + 8,
               opacity: p,
               transform: `translateY(${(1 - p) * 10}px)`,
-              ...label(20, i ? PAPER : INK),
+              ...label(24, i ? PAPER : INK),
               padding: "4px 16px",
               borderRadius: i ? 20 : 5,
               background: i ? BAR : `color-mix(in srgb, ${INK_SOFT} 22%, ${PAPER})`,
@@ -183,12 +183,12 @@ export const ResultScene: React.FC = () => {
         );
       })}
       <Ink at={oldButtonAt} dur={10} style={{ left: (GRID_X[0] + COLS * CELL + GRID_X[1]) / 2 - 10, top: top + gridH / 2 - 14, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(20, INK_SOFT) }}>vs</span>
+        <span style={{ ...note(24, INK_SOFT) }}>vs</span>
       </Ink>
 
       {/* ── The lift, and its interval ── */}
       <Ink at={liftAt - 6} dur={14} style={{ left: LIFT.x0, top: y(LIFT_ROW - 72), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK), fontWeight: 500 }}>The lift, B minus A, in percentage points</span>
+        <span style={{ ...label(24, INK), fontWeight: 500 }}>The lift, B minus A, in percentage points</span>
       </Ink>
       <Axis
         scale={LIFT}
@@ -242,17 +242,17 @@ export const ResultScene: React.FC = () => {
         <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>about a fifth more sales</span>
       </Note>
       <Note at={oneAt - 4} x={sx(LIFT, pp(EXPERIMENT.ciLow))} y={rowY + 18} from="up">
-        <span style={{ ...note(21, STAT_INK), fontWeight: 500, display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500, display: "inline-block", transform: "translateX(-50%)", ...halo }}>
           {fmt(pp(EXPERIMENT.ciLow))}
         </span>
       </Note>
       <Note at={threeAt - 4} x={sx(LIFT, pp(EXPERIMENT.ciHigh))} y={rowY + 18} from="up">
-        <span style={{ ...note(21, STAT_INK), fontWeight: 500, display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500, display: "inline-block", transform: "translateX(-50%)", ...halo }}>
           {fmt(pp(EXPERIMENT.ciHigh))}
         </span>
       </Note>
       <Note at={liftAt + 6} x={sx(LIFT, 0) - 12} y={y(LIFT_ROW - 34)} align="right">
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>no difference</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>no difference</span>
       </Note>
 
       {/* ── The report: all four, never the p-value alone ── */}
@@ -277,14 +277,14 @@ export const ResultScene: React.FC = () => {
       {CARD.map((c, i) => (
         <React.Fragment key={c.name}>
           <Ink at={c.at - 2} dur={14} style={{ left: CARD_X, top: y(CARD_Y[i]), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(21, INK_SOFT) }}>{c.name}</span>
+            <span style={{ ...label(24, INK_SOFT) }}>{c.name}</span>
           </Ink>
           <Ink at={c.at + 4} dur={14} style={{ left: CARD_X, top: y(CARD_Y[i]) + 32, whiteSpace: "nowrap" }}>
             <span style={{ ...note(28, i === 2 ? INK : STAT_INK), fontWeight: 500 }}>{c.value}</span>
           </Ink>
           {c.extra ? (
             <Ink at={c.extraAt} dur={14} style={{ left: CARD_X, top: y(CARD_Y[i]) + 72, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(21, INK_SOFT) }}>{c.extra}</span>
+              <span style={{ ...note(24, INK_SOFT) }}>{c.extra}</span>
             </Ink>
           ) : null}
           <Svg opacity={0.5 * ease(frame, c.at + 6, 12)}>
@@ -293,13 +293,13 @@ export const ResultScene: React.FC = () => {
         </React.Fragment>
       ))}
       <Ink at={tenThousandAt - 2} dur={12} style={{ left: CARD_X + 140, top: y(CARD_Y[2]) + 38, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(21, INK_SOFT) }}>three in ten thousand</span>
+        <span style={{ ...note(24, INK_SOFT) }}>three in ten thousand</span>
       </Ink>
       <Ink at={fourAt - 4} dur={14} out={aloneAt - 8} style={{ left: CARD_X, top: y(CARD_END + 14), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, INK), fontWeight: 500 }}>Report all four together.</span>
+        <span style={{ ...note(28, INK), fontWeight: 500 }}>Report all four together.</span>
       </Ink>
       <Ink at={aloneAt - 4} dur={14} style={{ left: CARD_X, top: y(CARD_END + 14), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, STAT_INK), fontWeight: 500 }}>Never the p-value alone.</span>
+        <span style={{ ...note(28, STAT_INK), fontWeight: 500 }}>Never the p-value alone.</span>
       </Ink>
     </AbsoluteFill>
   );

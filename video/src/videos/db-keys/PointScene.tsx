@@ -98,13 +98,13 @@ export const PointScene: React.FC = () => {
           <Tag color={INK} size={21}>
             parent
           </Tag>
-          <span style={{ ...note(21, INK_SOFT), marginLeft: 12 }}>the table pointed at</span>
+          <span style={{ ...note(24, INK_SOFT), marginLeft: 12 }}>the table pointed at</span>
         </Note>
         <Note at={childAt - 2} x={orders.x} y={orders.y - 50} from="up">
           <Tag color={KEY_INK} size={21}>
             child
           </Tag>
-          <span style={{ ...note(21, INK_SOFT), marginLeft: 12 }}>holds the pointer</span>
+          <span style={{ ...note(24, INK_SOFT), marginLeft: 12 }}>holds the pointer</span>
         </Note>
 
         {/* The many side: the crow's foot swells as it is named. */}
@@ -112,12 +112,12 @@ export const PointScene: React.FC = () => {
           <circle cx={o[0] - 22} cy={o[1]} r={34} fill="none" stroke={ACCENT} strokeWidth={2.4} />
         </Svg>
         <Note at={manyAt - 2} x={midX + 16} y={o[1] + 18}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Mark at={manyAt}>many orders</Mark>
           </span>
         </Note>
         <Note at={manyAt + 6} x={midX - 16} y={c[1] - 46} align="right">
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>one customer</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>one customer</span>
         </Note>
 
         {/* The struck copies stay to the end, with "Just customer_id" under them. */}
@@ -146,7 +146,7 @@ export const PointScene: React.FC = () => {
                 transform: `translateY(${(1 - p) * -10}px)`,
               }}
             >
-              <span style={{ fontFamily: MONO, fontSize: 21, color: INK_SOFT }}>
+              <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT }}>
                 <Strike at={copiesAt + 4 + i * 4}>{name}</Strike>
               </span>
             </div>

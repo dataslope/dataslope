@@ -63,7 +63,7 @@ const NucleusBar: React.FC<{ nuc: Nucleus; top: number; height: number; at: numb
                 justifyContent: nuc.kept.length === 1 ? "flex-start" : "center",
                 paddingLeft: nuc.kept.length === 1 && i === 0 ? 12 : 0,
                 overflow: "hidden",
-                ...note(21, isKept ? BLUE_INK : INK_SOFT),
+                ...note(24, isKept ? BLUE_INK : INK_SOFT),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
@@ -128,7 +128,7 @@ export const TopPScene: React.FC = () => {
 
       {/* Bar A: the distribution at T = 1.5, one segment per token. */}
       <Ink at={start - 4} dur={14} style={{ left: A0, top: barA - 40 }}>
-        <span style={label(20)}>At T = {HOT.t}</span>
+        <span style={label(24)}>At T = {HOT.t}</span>
       </Ink>
       {TOKENS.map((_, i) => {
         const x = px(startsA[i]);
@@ -149,7 +149,7 @@ export const TopPScene: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   paddingLeft: 14,
-                  ...note(23, TEXT[i]),
+                  ...note(24, TEXT[i]),
                   fontWeight: 500,
                 }}
               >
@@ -162,7 +162,7 @@ export const TopPScene: React.FC = () => {
             </Ink>
             {isRock ? (
               <Note at={start + 10} x={A1 + 14} y={barA + bh / 2 - 15}>
-                <span style={{ ...note(23, TEXT[i]), fontWeight: 500 }}>
+                <span style={{ ...note(24, TEXT[i]), fontWeight: 500 }}>
                   <Struck at={dropAt + 2}>
                     {TOKENS[i]} {pct(HOT.probs[i])}
                   </Struck>
@@ -183,7 +183,7 @@ export const TopPScene: React.FC = () => {
               <line x1={x} x2={x} y1={barA + bh} y2={barA + bh + 14} stroke={INK} strokeWidth={1.6} />
             </Svg>
             <Note at={at} x={x} y={barA + bh + 18} from="up" style={{ transform: "translateX(-50%)" }}>
-              <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+              <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 {k === 0 ? "" : "+ "}
                 <span style={{ color: TEXT[tok] }}>{TOKENS[tok]}</span> = {pct(HOT.topP.running[k])}
               </span>
@@ -205,12 +205,12 @@ export const TopPScene: React.FC = () => {
         />
       </Svg>
       <Note at={ninetyAt} x={px(TOP_P)} y={barA - 48} from="up" style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>p = {TOP_P}</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>p = {TOP_P}</span>
       </Note>
 
       {/* Bar B: what is left, rescaled to sum to one, and drawn from. */}
       <Ink at={keepsAt - 4} dur={14} style={{ left: A0, top: barB - 40 }}>
-        <span style={label(20)}>Kept, rescaled to 100%, then drawn from</span>
+        <span style={label(24)}>Kept, rescaled to 100%, then drawn from</span>
       </Ink>
       {KEPT.map((tok, k) => {
         const x = px(startsB[tok]);
@@ -227,7 +227,7 @@ export const TopPScene: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 paddingLeft: 14,
-                ...note(23, TEXT[tok]),
+                ...note(24, TEXT[tok]),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
@@ -238,17 +238,17 @@ export const TopPScene: React.FC = () => {
         );
       })}
       <Note at={cutAt} x={A1 + 14} y={barB + bh / 2 - 15}>
-        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500 }}>rock 0%</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>rock 0%</span>
       </Note>
 
       {/* Fig. 4: the same rule on the lesson's own six-token block. */}
       <FigLabel n="4" title="The same cut, in a sure context and a torn one" at={adaptsAt - 6} x={X0} y={y(616)} />
       <Ink at={sureAt - 4} dur={12} style={{ left: X0, top: sureY + nh / 2 - 16 }}>
-        <span style={{ ...label(22, INK), fontWeight: 500 }}>Sure</span>
+        <span style={{ ...label(24, INK), fontWeight: 500 }}>Sure</span>
       </Ink>
       <NucleusBar nuc={NUCLEUS.confident} top={sureY} height={nh} at={sureAt - 2} keptAt={oneAt} />
       <Ink at={tornAt - 4} dur={12} style={{ left: X0, top: tornY + nh / 2 - 16 }}>
-        <span style={{ ...label(22, INK), fontWeight: 500 }}>Torn</span>
+        <span style={{ ...label(24, INK), fontWeight: 500 }}>Torn</span>
       </Ink>
       <NucleusBar nuc={NUCLEUS.uncertain} top={tornY} height={nh} at={tornAt - 2} keptAt={sixAt} />
       {[sureY, tornY].map((ty, k) => (
@@ -257,10 +257,10 @@ export const TopPScene: React.FC = () => {
         </Svg>
       ))}
       <Note at={oneAt} x={N1 + 16} y={sureY + nh / 2 - 15}>
-        <span style={{ ...note(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>keeps {NUCLEUS.confident.kept.length} of 6</span>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>keeps {NUCLEUS.confident.kept.length} of 6</span>
       </Note>
       <Note at={sixAt} x={N1 + 16} y={tornY + nh / 2 - 15}>
-        <span style={{ ...note(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>keeps {NUCLEUS.uncertain.kept.length} of 6</span>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>keeps {NUCLEUS.uncertain.kept.length} of 6</span>
       </Note>
       </Drift>
     </AbsoluteFill>

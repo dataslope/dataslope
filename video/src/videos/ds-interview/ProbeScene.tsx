@@ -105,7 +105,7 @@ export const ProbeScene: React.FC = () => {
                   {/* The column's number, a house badge as a disc: blue tint, no ring. */}
                   <div
                     style={{
-                      ...label(22),
+                      ...label(24),
                       ...badgeStyle("blue", 22),
                       ...TABULAR,
                       width: 48,
@@ -119,7 +119,7 @@ export const ProbeScene: React.FC = () => {
                   >
                     {i + 1}
                   </div>
-                  <div style={{ ...note(32, INK), fontWeight: 500, lineHeight: 1.15, marginTop: 18, minHeight: 74 }}>{c.name}</div>
+                  <div style={{ ...note(34, INK), fontWeight: 500, lineHeight: 1.15, marginTop: 18, minHeight: 74 }}>{c.name}</div>
                   <div style={{ marginTop: 22 }}>
                     {c.items.map((it, k) => {
                       const q = ease(frame, it.at - 2, 12);
@@ -127,7 +127,7 @@ export const ProbeScene: React.FC = () => {
                         <div
                           key={k}
                           style={{
-                            ...note(26, INK_SOFT),
+                            ...note(28, INK_SOFT),
                             lineHeight: 1.3,
                             marginTop: k ? 18 : 0,
                             opacity: q,

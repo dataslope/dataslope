@@ -107,12 +107,12 @@ export const ConcScene: React.FC = () => {
 
         <div style={{ position: "absolute", inset: 0, opacity: lanesDim }}>
           <Note at={dealAt} x={X0} y={y(290)}>
-            <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
               <b style={{ color: BLUE_INK }}>Concurrency</b>: <Band at={dealAt + 8}>dealing with</Band> many tasks at once
             </span>
           </Note>
           <Note at={parAt} x={X0} y={y(342)}>
-            <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
               <b style={{ color: BLUE_INK }}>Parallelism</b>: <Band at={instantAt}>doing</Band> many at the same instant
             </span>
           </Note>
@@ -125,7 +125,7 @@ export const ConcScene: React.FC = () => {
               <React.Fragment key={i}>
                 {/* The core's lane: a hairline under it. */}
                 <div style={{ position: "absolute", left: LANE_X, top: ly + laneH + 6, width: ROUNDS * 3 * STEP, height: 1, background: HAIRLINE, opacity: o }} />
-                <div style={{ position: "absolute", left: X0, top: ly + laneH / 2 - 14, opacity: o, ...label(21, i === 0 || frame < moreAt ? INK : BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+                <div style={{ position: "absolute", left: X0, top: ly + laneH / 2 - 14, opacity: o, ...label(24, i === 0 || frame < moreAt ? INK : BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                   core {i + 1}
                 </div>
               </React.Fragment>
@@ -161,23 +161,23 @@ export const ConcScene: React.FC = () => {
                   overflow: "hidden",
                 }}
               >
-                <span style={{ ...label(22, th.ink), fontWeight: 500 }}>{"ABC"[t]}</span>
+                <span style={{ ...label(24, th.ink), fontWeight: 500 }}>{"ABC"[t]}</span>
               </div>
             );
           })}
           <Flow points={[[LANE_X, y(632)], [LANE_X + ROUNDS * 3 * STEP, y(632)]]} at={turnsAt} color={INK_SOFT} width={2} head={13} />
           <Note at={turnsAt + 6} x={LANE_X + ROUNDS * 3 * STEP + 16} y={y(632) - 15}>
-            <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>time</span>
+            <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>time</span>
           </Note>
 
           <Note at={asyncAt} x={X0} y={y(680)}>
-            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               Async code on one thread: <b style={{ color: BLUE_INK }}>concurrent</b>
               <span style={{ opacity: ease(frame, notParAt, 10) }}>, not parallel</span>
             </span>
           </Note>
           <Note at={procAt} x={X0} y={y(730)}>
-            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               Processes across cores: <b style={{ color: BLUE_INK, opacity: ease(frame, bothAt, 10) }}>both</b>
             </span>
           </Note>
@@ -187,7 +187,7 @@ export const ConcScene: React.FC = () => {
 
         {/* Amdahl's law: the page's chart. */}
         <Note at={followAt + 2} x={CX0} y={y(292)}>
-          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>What more cores buy: speedup, by the share that can&apos;t be split</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>What more cores buy: speedup, by the share that can&apos;t be split</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: axes }}>
           <defs>
@@ -198,21 +198,21 @@ export const ConcScene: React.FC = () => {
           {[0, 5, 10, 15, 20, 25].map((v) => (
             <g key={v}>
               <line x1={CX0} x2={cx1} y1={cy(v)} y2={cy(v)} stroke={ds("gray", 200)} strokeWidth={1} />
-              <text x={CX0 - 12} y={cy(v) + 7} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
+              <text x={CX0 - 12} y={cy(v) + 7} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
                 {v}x
               </text>
             </g>
           ))}
           <line x1={CX0} x2={cx1} y1={cy(0)} y2={cy(0)} stroke={INK} strokeWidth={1.6} />
           {[1, 10, 100, 1000].map((c) => (
-            <text key={c} x={cx(c)} y={cy(0) + 28} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
+            <text key={c} x={cx(c)} y={cy(0) + 28} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
               {c}
             </text>
           ))}
-          <text x={cx1 + 34} y={cy(0) + 28} textAnchor="start" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
+          <text x={cx1 + 34} y={cy(0) + 28} textAnchor="start" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
             cores
           </text>
-          <text x={CX0} y={cy(TOP) - 16} textAnchor="start" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
+          <text x={CX0} y={cy(TOP) - 16} textAnchor="start" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
             speedup
           </text>
           <g clipPath="url(#be5-amdahl)">
@@ -233,23 +233,23 @@ export const ConcScene: React.FC = () => {
           {dot > 0 ? <circle cx={cx(s.cores)} cy={cy(s.speedup)} r={8 * dot} fill={BAR} stroke="white" strokeWidth={2.5} /> : null}
         </svg>
         <Note at={followAt + 22} x={cx1 + 14} y={cy(ceiling(0.25)) - 14}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             25% serial: <Num>{ceiling(0.25)}</Num>x
           </span>
         </Note>
         <Note at={followAt + 22} x={cx(33) + 16} y={cy(TOP) - 30}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             1% serial: <Num>{ceiling(0.01)}</Num>x
           </span>
         </Note>
         <Note at={fiveAt + 10} x={cx1 + 14} y={cy(s.ceiling) - 30}>
-          <div style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>5% serial</div>
-          <div style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 4, opacity: ceil }}>
+          <div style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>5% serial</div>
+          <div style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 4, opacity: ceil }}>
             caps at <Num>{s.ceiling}</Num>x
           </div>
         </Note>
         <Note at={seventeenAt - 4} x={cx(s.cores) + 16} y={cy(s.speedup) + 14}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{fmt1(s.speedup)}</Num>x on <Num>{s.cores}</Num> cores
           </span>
         </Note>

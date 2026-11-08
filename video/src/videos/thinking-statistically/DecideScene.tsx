@@ -114,7 +114,7 @@ export const DecideScene: React.FC = () => {
 
       {/* ── Summaries ── */}
       {["The column holds", "Its honest summary", "For example"].map((t, i) => (
-        <div key={t} style={{ position: "absolute", left: COLS[i], top: y(HEAD_Y), opacity: heads * close, ...label(21, INK_SOFT) }}>
+        <div key={t} style={{ position: "absolute", left: COLS[i], top: y(HEAD_Y), opacity: heads * close, ...label(24, INK_SOFT) }}>
           {t}
         </div>
       ))}
@@ -137,7 +137,7 @@ export const DecideScene: React.FC = () => {
               )}
             </span>
             {/* Under the kind, not beside it: one line, one size. */}
-            <div style={{ ...note(22, INK_SOFT), marginTop: 4 }}>{r.scale}</div>
+            <div style={{ ...note(24, INK_SOFT), marginTop: 4 }}>{r.scale}</div>
           </Ink>
           <Ink at={r.sumAt} dur={14} style={{ left: COLS[1], top: rowY(i) + 14, whiteSpace: "nowrap" }}>
             <span style={{ ...note(28, INK), fontWeight: 500 }}>
@@ -180,7 +180,7 @@ export const DecideScene: React.FC = () => {
       {/* ── Tests ── */}
       <div style={{ position: "absolute", inset: 0, opacity: (1 - focus) * close }}>
         <Ink at={testAt - 4} dur={14} style={{ left: COLS[0], top: y(TEST_Y), whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>And later, the test</span>
+          <span style={label(24, INK_SOFT)}>And later, the test</span>
         </Ink>
         {TESTS.map((t, i) => (
           <div

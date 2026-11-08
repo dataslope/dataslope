@@ -65,7 +65,7 @@ export const ProbeScene: React.FC = () => {
                   name's 38, so the line keeps one size. */}
               <span
                 style={{
-                  ...label(35, BLUE_INK),
+                  ...label(34, BLUE_INK),
                   ...badgeStyle("blue", 35),
                   width: 60,
                   height: 60,
@@ -80,7 +80,7 @@ export const ProbeScene: React.FC = () => {
               >
                 {i + 1}
               </span>
-              <span style={{ ...note(38, INK), fontWeight: 500, width: 360, whiteSpace: "nowrap" }}>{r.name}</span>
+              <span style={{ ...note(34, INK), fontWeight: 500, width: 360, whiteSpace: "nowrap" }}>{r.name}</span>
               <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap", opacity: d }}>{r.detail}</span>
             </div>
           );

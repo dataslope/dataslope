@@ -97,7 +97,7 @@ export const HookScene: React.FC = () => {
           }}
         >
           <div style={{ height: HEAD_H, display: "flex", alignItems: "center", borderBottom: `1px solid ${HAIRLINE}` }}>
-            <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>Last night&apos;s runs</span>
+            <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>Last night&apos;s runs</span>
           </div>
           {JOBS.map((j, i) => {
             const p = ease(frame, startAt + 6 + i * 4, 10);
@@ -118,9 +118,9 @@ export const HookScene: React.FC = () => {
                   opacity: p,
                 }}
               >
-                <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>{j.time}</span>
-                <span style={{ ...note(29, INK), fontWeight: 500, flex: 1 }}>{j.name}</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 10, ...note(26, OK_INK), fontWeight: 500, opacity: ease(frame, ok, 8) }}>
+                <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>{j.time}</span>
+                <span style={{ ...note(28, INK), fontWeight: 500, flex: 1 }}>{j.name}</span>
+                <span style={{ display: "flex", alignItems: "center", gap: 10, ...note(28, OK_INK), fontWeight: 500, opacity: ease(frame, ok, 8) }}>
                   success
                   {frame >= ok ? <Tick at={ok} size={26} /> : <span style={{ width: 26 }} />}
                 </span>
@@ -156,7 +156,7 @@ export const HookScene: React.FC = () => {
             transform: `translateY(${(1 - dashP) * 16}px)`,
           }}
         >
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Orders dashboard · 06:00</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Orders dashboard · 06:00</span>
         </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: dashP * (1 - dim) }}>
           {DAYS.map((d, i) => {
@@ -192,7 +192,7 @@ export const HookScene: React.FC = () => {
               width: BAR_W + 40,
               top: base + h(10),
               textAlign: "center",
-              ...label(20, d.v === 0 ? ACCENT_INK : INK_SOFT),
+              ...label(24, d.v === 0 ? ACCENT_INK : INK_SOFT),
               opacity: dashP * (1 - dim),
             }}
           >
@@ -200,7 +200,7 @@ export const HookScene: React.FC = () => {
           </div>
         ))}
         <Note at={yestAt + 2} x={DASH_X} y={top + cardH + h(22)} out={roundAt}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>June 3 never loaded: still yesterday&apos;s numbers</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>June 3 never loaded: still yesterday&apos;s numbers</span>
         </Note>
 
         {/* The round. */}
@@ -214,7 +214,7 @@ export const HookScene: React.FC = () => {
           </Pill>
         ))}
         <Note at={fourteenAt - 4} x={X0} y={y(740)}>
-          <span style={{ ...note(32, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(34, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Orchestration and reliability:{" "}
             <span style={{ color: BLUE_INK }}>
               <Num>14</Num> questions
@@ -222,7 +222,7 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={elevenAt - 2} x={X0} y={y(800)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: BLUE_INK }}>
               <Num>11</Num>
             </b>{" "}
@@ -230,7 +230,7 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={threeAt - 2} x={X0 + 330} y={y(800)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>
               <Num>3</Num>
             </b>{" "}

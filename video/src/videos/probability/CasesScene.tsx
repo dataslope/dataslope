@@ -123,7 +123,7 @@ export const CasesScene: React.FC = () => {
           <React.Fragment key={r}>
             <Ink at={at} dur={12} style={{ left: 160, top: ry + 14, whiteSpace: "nowrap" }}>
               <span style={{ ...note(24, INK) }}>Car behind {c.car + 1}</span>
-              <div style={{ ...note(21, INK_SOFT), opacity: ease(frame, stayWins ? oneInAt - 2 : otherAt + 4, 10) }}>1 in 3</div>
+              <div style={{ ...note(24, INK_SOFT), opacity: ease(frame, stayWins ? oneInAt - 2 : otherAt + 4, 10) }}>1 in 3</div>
             </Ink>
             {/* The painted doors: the host's swings open onto its dark room;
                 the car's flashes gold; the one he leaves shut glows gold. */}
@@ -173,7 +173,7 @@ export const CasesScene: React.FC = () => {
                   top: ry + h(MINI.h) + 12,
                   transform: "translateX(-50%)",
                   opacity: ease(frame, d === 0 && !stayWins ? goatAt - 2 : at + 6, 10),
-                  ...note(19, d === c.car ? GOLD_INK : INK_SOFT),
+                  ...note(24, d === c.car ? GOLD_INK : INK_SOFT),
                   fontWeight: d === c.car ? 500 : 500,
                   whiteSpace: "nowrap",
                 }}
@@ -204,12 +204,12 @@ export const CasesScene: React.FC = () => {
         {[1, 10, 100, 1000, 10_000, 100_000].map((k) => (
           <g key={k}>
             <line x1={gx(k)} x2={gx(k)} y1={y(CH.base) + 1} y2={y(CH.base) + 7} stroke={INK} strokeWidth={1.2} />
-            <text x={gx(k)} y={y(CH.base) + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+            <text x={gx(k)} y={y(CH.base) + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
               {k >= 1000 ? `${k / 1000}k` : k}
             </text>
           </g>
         ))}
-        <text x={CH.x1} y={y(CH.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+        <text x={CH.x1} y={y(CH.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
           games played (log scale)
         </text>
         {[1 / 3, 2 / 3].map((p) => (
@@ -249,7 +249,7 @@ export const CasesScene: React.FC = () => {
       </Note>
       {/* How many games have been played, counting up as the lines run. */}
       {/* One line, one size: the count stands out by weight and color. */}
-      <div style={{ position: "absolute", right: 1920 - CH.x1, top: y(CH.top) - 2, opacity: ease(frame, playAt - 4, 10), whiteSpace: "nowrap", ...note(30, INK_SOFT) }}>
+      <div style={{ position: "absolute", right: 1920 - CH.x1, top: y(CH.top) - 2, opacity: ease(frame, playAt - 4, 10), whiteSpace: "nowrap", ...note(28, INK_SOFT) }}>
         games <span style={{ color: INK, fontWeight: 500, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
       </div>
 
@@ -276,7 +276,7 @@ export const CasesScene: React.FC = () => {
         </Ink>
       ))}
       <Ink at={labelsAt - 4} dur={12} style={{ left: CH.x0, top: y(826), whiteSpace: "nowrap" }}>
-        <span style={label(22, INK_SOFT)}>
+        <span style={label(24, INK_SOFT)}>
           Outcomes so far
           <span style={{ opacity: ease(frame, numbersAt - 2, 10), color: STAT_INK }}>: no average of these</span>
         </span>

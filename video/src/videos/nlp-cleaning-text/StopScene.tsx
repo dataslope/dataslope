@@ -86,7 +86,7 @@ export const StopScene: React.FC = () => {
         <div style={{ ...headline(104), ...TABULAR, color: INK }}>
           <Mark at={elseAt}>{STOPLIST.count}</Mark>
         </div>
-        <div style={{ ...body(32), color: INK_SOFT, marginTop: 12 }}>words on the list</div>
+        <div style={{ ...body(34), color: INK_SOFT, marginTop: 12 }}>words on the list</div>
       </Ink>
 
       {/* Fig. 10: the fox sentence, filtered. */}
@@ -123,7 +123,7 @@ export const StopScene: React.FC = () => {
       })}
 
       <Ink at={searchAt - 4} dur={16} style={{ left: X0, top: y(NOTE_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(36), color: INK }}>
+        <span style={{ ...body(34), color: INK }}>
           For search and topics, a <span style={{ fontStyle: SERIF_ITALIC }}>clear win.</span>
         </span>
       </Ink>

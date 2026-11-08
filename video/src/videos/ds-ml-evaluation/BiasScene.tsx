@@ -114,13 +114,13 @@ export const BiasScene: React.FC = () => {
           <Curve points={curve("9")} x={fx} y={fy} at={nineAt + 2} dur={34} color={ACCENT} width={3} clip={fitBox} dim={threeAt} />
           <Curve points={curve("3")} x={fx} y={fy} at={threeAt} dur={24} color={OK} width={4} clip={fitBox} />
           <Note at={biasAt - 2} x={FIT.left} y={y(FIT.bottom) + h(14)} dim={nineAt}>
-            <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>degree 1: bias</span>
+            <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>degree 1: bias</span>
           </Note>
           <Note at={varianceAt - 2} x={FIT.left + 210} y={y(FIT.bottom) + h(14)} dim={threeAt}>
-            <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>degree 9: variance</span>
+            <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>degree 9: variance</span>
           </Note>
           <Note at={threeAt + 2} x={FIT.left + 470} y={y(FIT.bottom) + h(14)}>
-            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>degree 3: between them</span>
+            <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>degree 3: between them</span>
           </Note>
         </Fade>
 
@@ -140,10 +140,10 @@ export const BiasScene: React.FC = () => {
         <Curve points={trainPts} x={ex} y={ey} at={trainAt} dur={26} color={BAR} width={3.4} clip={errBox} dots={6} />
         <Curve points={valPts} x={ex} y={ey} at={valAt} dur={climbAt + 10 - valAt} color={INK} width={3.4} clip={errBox} dots={6} />
         <Note at={trainAt + 16} x={at(ex, 5.6)} y={at(ey, BIAS.train[5]) - h(40)}>
-          <span style={{ ...note(23, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>training error</span>
+          <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>training error</span>
         </Note>
         <Note at={climbAt} x={at(ex, 6.6) - 20} y={at(ey, BIAS.val[6]) - h(16)} align="right">
-          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>validation error</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>validation error</span>
         </Note>
         <Svg opacity={bestP}>
           <circle cx={bestX} cy={bestY} r={(13 + 6 * swell) * bestP} fill="none" stroke={OK} strokeWidth={3.4} />
@@ -151,7 +151,7 @@ export const BiasScene: React.FC = () => {
         {/* Right of the ring, in the clear band between the training line and
             the axis, not in the tick-label column. */}
         <Note at={bestAt - 2} x={bestX + 24} y={bestY + h(30)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>lowest: degree 3</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>lowest: degree 3</span>
         </Note>
 
         {/* ── Question 2: the gap at degree 9, up off the top of the chart ── */}
@@ -180,7 +180,7 @@ export const BiasScene: React.FC = () => {
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{fmt(lastVal)}</span>
         </Note>
         <Note at={gapAt + 4} x={ERR.left} y={y(ERR.bottom) + h(84)}>
-          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>good on training data, poor on held-out data</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>good on training data, poor on held-out data</span>
         </Note>
 
         {/* ── The fixes, where the fits were ── */}
@@ -191,7 +191,7 @@ export const BiasScene: React.FC = () => {
             <Note key={f.text} at={f.at - 2} x={FIT.left} y={rowY} dim={isReg ? undefined : ownAt}>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 <Tick at={f.at + 2} size={26} color={OK} />
-                <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
+                <span style={{ ...note(34, INK), whiteSpace: "nowrap" }}>
                   {isReg ? <Mark at={oneAt}>{f.text}</Mark> : f.text}
                   {f.gloss ? <span style={{ ...note(24, INK_SOFT) }}>{f.gloss}</span> : null}
                 </span>
@@ -205,7 +205,7 @@ export const BiasScene: React.FC = () => {
           </span>
         </Note>
         <Note at={fixAt} x={FIT.left} y={y(FIT.top) - h(56)} dim={ownAt}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>to fix it</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>to fix it</span>
         </Note>
       </Drift>
     </AbsoluteFill>

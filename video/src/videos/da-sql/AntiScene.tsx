@@ -163,7 +163,7 @@ export const AntiScene: React.FC = () => {
           </span>
         </Ink>
         <Note at={passesAt - 2} x={LIST_X} y={whyY + 3 * lineGap + h(8)} out={existsAt - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             Not true, so no customer ever passes.
           </span>
         </Note>
@@ -196,12 +196,12 @@ export const AntiScene: React.FC = () => {
 
         {/* ── Why that WHERE is safe, and NOT IN mended ── */}
         <Note at={safeAt - 2} x={LIST_X} y={leftTop + leftH + h(18)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mono>IS NULL</Mono> is the one test that <Mark at={keepsAt}>keeps the unmatched rows</Mark>.
           </span>
         </Note>
         <Note at={keepNotInAt - 2} x={LIST_X} y={leftTop + leftH + h(62)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             Or keep <Mono>NOT IN</Mono>, with <Mark at={filterAt}><Mono>{guard}</Mono></Mark> inside.
           </span>
         </Note>

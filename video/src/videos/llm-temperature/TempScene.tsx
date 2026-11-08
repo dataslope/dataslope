@@ -100,7 +100,7 @@ export const TempScene: React.FC = () => {
             right: 1920 - GRID_X[0] + 14,
             top: base - full * s - 13,
             opacity: chart,
-            ...note(20, INK_SOFT),
+            ...note(24, INK_SOFT),
           }}
         >
           {Math.round(s * 100)}%
@@ -140,7 +140,7 @@ export const TempScene: React.FC = () => {
                 top: base + 62,
                 textAlign: "center",
                 opacity: ease(frame, orderAt - 6 + i * 2, 12) * scaledIn,
-                ...note(22, INK),
+                ...note(24, INK),
               }}
             >
               {signed(LOGITS[i] / Math.max(t, 1e-6))}
@@ -155,7 +155,7 @@ export const TempScene: React.FC = () => {
           top: base + 62,
           whiteSpace: "nowrap",
           opacity: ease(frame, orderAt - 8, 12) * scaledIn,
-          ...label(20),
+          ...label(24),
         }}
       >
         Score ÷ T
@@ -163,12 +163,12 @@ export const TempScene: React.FC = () => {
 
       {/* The temperature, its formula and its dial. */}
       <Ink at={start} dur={16} style={{ left: PANEL, top: y(286) }}>
-        <span style={{ ...note(30, INK), fontWeight: 500 }}>
+        <span style={{ ...note(28, INK), fontWeight: 500 }}>
           <Mono>softmax(logits / T)</Mono>
         </span>
       </Ink>
       <Ink at={start + 4} dur={14} style={{ left: PANEL, top: y(368) }}>
-        <span style={label(21)}>Temperature</span>
+        <span style={label(24)}>Temperature</span>
       </Ink>
       <Ink at={start + 6} dur={16} style={{ left: PANEL - 4, top: y(404) }}>
         <span style={{ ...headline(104), fontVariantNumeric: "tabular-nums lining-nums", whiteSpace: "nowrap" }}>
@@ -191,7 +191,7 @@ export const TempScene: React.FC = () => {
             top: y(600) + 22,
             transform: "translateX(-50%)",
             opacity: ease(frame, start + 10, 12),
-            ...note(20, INK_SOFT),
+            ...note(24, INK_SOFT),
           }}
         >
           {v}
@@ -200,19 +200,19 @@ export const TempScene: React.FC = () => {
 
       {/* What each stretch of the dial does, one note at a time. */}
       <Ink at={orderAt - 4} out={belowAt - 6} dur={16} style={{ left: PANEL, top: y(690), width: 570 }}>
-        <div style={{ ...body(30), color: INK, textWrap: "balance" }}>The order never changes. Only the shape does.</div>
+        <div style={{ ...body(28), color: INK, textWrap: "balance" }}>The order never changes. Only the shape does.</div>
       </Ink>
       <Ink at={belowAt + 2} out={zeroAt - 6} dur={16} style={{ left: PANEL, top: y(690), width: 570 }}>
-        <div style={{ ...body(30), color: INK, textWrap: "balance" }}>Below 1, the gaps between scores grow, and the top token pulls ahead.</div>
+        <div style={{ ...body(28), color: INK, textWrap: "balance" }}>Below 1, the gaps between scores grow, and the top token pulls ahead.</div>
       </Ink>
       <Ink at={zeroAt + 2} out={aboveAt - 6} dur={16} style={{ left: PANEL, top: y(690), width: 570 }}>
-        <div style={{ ...body(30), color: INK, textWrap: "balance" }}>
+        <div style={{ ...body(28), color: INK, textWrap: "balance" }}>
           At 0, there is no draw: always the top token.{" "}
           <span style={{ color: ACCENT_INK, opacity: ease(frame, greedyAt - 4, 12) }}>Greedy decoding.</span>
         </div>
       </Ink>
       <Ink at={aboveAt + 2} dur={16} style={{ left: PANEL, top: y(690), width: 570 }}>
-        <div style={{ ...body(30), color: INK, textWrap: "balance" }}>Above 1, the gaps shrink, and the bars even out.</div>
+        <div style={{ ...body(28), color: INK, textWrap: "balance" }}>Above 1, the gaps shrink, and the bars even out.</div>
       </Ink>
     </AbsoluteFill>
   );

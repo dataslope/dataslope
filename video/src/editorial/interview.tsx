@@ -82,7 +82,7 @@ export const QuestionCard: React.FC<{
   return (
     <>
       <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, ACCENT_INK), fontWeight: 500 }}>{kicker ?? `Question ${n}`}</span>
+        <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>{kicker ?? `Question ${n}`}</span>
       </Ink>
       {/* Balanced, so a question that wraps breaks into even lines rather than
           leaving one word on the last; the line count is the same either way. */}
@@ -168,7 +168,7 @@ export const RapidFire: React.FC<{
               <span
                 style={{
                   position: "relative",
-                  ...label(21, current > 0.5 ? ACCENT_INK : INK_SOFT),
+                  ...label(24, current > 0.5 ? ACCENT_INK : INK_SOFT),
                   ...TABULAR,
                   width: 30,
                   textAlign: "right",
@@ -180,7 +180,7 @@ export const RapidFire: React.FC<{
               <span
                 style={{
                   position: "relative",
-                  ...note(23, INK),
+                  ...note(24, INK),
                   fontWeight: current > 0.5 ? 500 : 500,
                   whiteSpace: "nowrap",
                   opacity: 0.42 + 0.58 * Math.max(current, done),
@@ -232,10 +232,10 @@ export const InterviewKit: React.FC = () => {
           What&apos;s the difference between <QMono>WHERE</QMono> and <QMono>HAVING</QMono>?
         </QuestionCard>
         <RapidFire items={items} x={120} top={380} rowH={46} width={520} at={24} end={150} />
-        <div style={{ position: "absolute", left: 760, top: 360, ...note(21, INK_SOFT) }}>
+        <div style={{ position: "absolute", left: 760, top: 360, ...note(24, INK_SOFT) }}>
           The current answer appears here
         </div>
-        <div style={{ position: "absolute", left: 120, top: 330, ...label(21, INK) }}>Rapid fire</div>
+        <div style={{ position: "absolute", left: 120, top: 330, ...label(24, INK) }}>Rapid fire</div>
       </AbsoluteFill>
     </LayoutContext.Provider>
   );

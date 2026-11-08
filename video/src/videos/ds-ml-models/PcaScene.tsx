@@ -234,7 +234,7 @@ export const PcaScene: React.FC = () => {
           >
             <span
               style={{
-                ...label(20, INK),
+                ...label(24, INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
                 background: PAPER,
@@ -247,7 +247,7 @@ export const PcaScene: React.FC = () => {
           <Note at={rightAt + 6} x={ox + 12} y={pb.top + h(10)} out={out9}>
             <span
               style={{
-                ...label(20, INK),
+                ...label(24, INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
                 background: PAPER,
@@ -265,7 +265,7 @@ export const PcaScene: React.FC = () => {
           >
             <span
               style={{
-                ...label(20, INK),
+                ...label(24, INK),
                 whiteSpace: "nowrap",
                 display: "flex",
                 gap: 18,
@@ -295,7 +295,7 @@ export const PcaScene: React.FC = () => {
             y={pb.top + pb.height + h(14)}
             out={out9}
           >
-            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
               <span style={{ color: INK, fontWeight: 500 }}>component 1</span>{" "}
               ={" "}
               {loadings.map((l, i) => (
@@ -311,7 +311,7 @@ export const PcaScene: React.FC = () => {
           <Note at={irisAt} x={sb.left} y={sb.top - h(54)} out={out9}>
             <span
               style={{
-                ...label(22, INK),
+                ...label(24, INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
@@ -370,7 +370,7 @@ export const PcaScene: React.FC = () => {
                     top: at(barY, 0) + 8,
                     opacity:
                       ease(frame, irisAt, 10) * (1 - ease(frame, out9, 10)),
-                    ...label(19, INK_SOFT),
+                    ...label(24, INK_SOFT),
                     ...TABULAR,
                   }}
                 >
@@ -397,7 +397,7 @@ export const PcaScene: React.FC = () => {
           >
             <span
               style={{
-                ...note(25, OK_INK),
+                ...note(24, OK_INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
@@ -428,7 +428,7 @@ export const PcaScene: React.FC = () => {
             y={sb.top + sb.height + h(44)}
             out={out9}
           >
-            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
               needs centered data
               <span style={{ opacity: ease(frame, straightAt, 10) }}>
                 , finds only straight-line structure
@@ -466,7 +466,7 @@ export const PcaScene: React.FC = () => {
             y={at(ly, 1) + h(22)}
             out={shellOut}
           >
-            <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap" }}>
               by 20 dimensions, <span style={TABULAR}>{pct(shell20, 0)}</span> of
               it: the middle is empty
             </span>
@@ -487,7 +487,7 @@ export const PcaScene: React.FC = () => {
           <Note at={shellOut + 10} x={cb.left + 20} y={cb.top + h(4)}>
             <span
               style={{
-                ...label(20, INK_SOFT),
+                ...label(24, INK_SOFT),
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -578,7 +578,7 @@ export const PcaScene: React.FC = () => {
           </Note>
 
           <Note at={apartAt} x={COL} y={y(380)}>
-            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
               distances stop telling points apart
             </span>
           </Note>
@@ -590,7 +590,7 @@ export const PcaScene: React.FC = () => {
           <Note at={fixesAt} x={COL} y={y(530)}>
             <span
               style={{
-                ...note(26, INK),
+                ...note(28, INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
               }}

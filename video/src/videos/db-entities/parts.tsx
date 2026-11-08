@@ -334,7 +334,7 @@ export const RowType: React.FC<{ layout: EntityLayout; row: number; at: number; 
         padding: `0 ${ENTITY.pad}px`,
         boxSizing: "border-box",
         fontFamily: MONO,
-        fontSize: 19,
+        fontSize: 24,
         color: INK_SOFT,
         whiteSpace: "nowrap",
         opacity: p,

@@ -21,7 +21,7 @@ export const pathOf = (pts: readonly (readonly [number, number])[]) =>
 
 const TEXT: React.CSSProperties = {
   fontFamily: SANS,
-  fontSize: 20,
+  fontSize: 24,
   fontWeight: 500,
   fill: INK_SOFT,
   fontVariantNumeric: "tabular-nums",

@@ -127,10 +127,10 @@ export const IslandsScene: React.FC = () => {
           />
           {/* The breaks are labelled once the key's column is open beside them. */}
           <Note at={stillAt + 12} x={kg.right + 14} y={kg.rowTop(3) - h(18)} out={out}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>gap</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>gap</span>
           </Note>
           <Note at={stillAt + 16} x={kg.right + 14} y={kg.rowTop(5) - h(18)} out={out}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>gap</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>gap</span>
           </Note>
 
           <TableName g={kg} at={catchAt} >
@@ -207,10 +207,10 @@ export const IslandsScene: React.FC = () => {
             bands={ISLANDS.dedupedIslands.rows.map((_, row) => ({ row, at: dedupAt + 16 + row * 3, color: MARK_OK }))}
           />
           <Note at={dedupAt + 8} x={RESULT_X} y={dg.rowTop(3) + h(20)}>
-            <div style={{ ...note(23, OK_INK), whiteSpace: "nowrap" }}>
+            <div style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
               <QMono>{dedupSelect}</QMono> first
             </div>
-            <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 8 }}>back to three islands</div>
+            <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: 8 }}>back to three islands</div>
           </Note>
           <Note at={threeAt + 10} x={RESULT_X} y={rg.rowTop(3) + h(20)} out={out}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -218,7 +218,7 @@ export const IslandsScene: React.FC = () => {
             </span>
           </Note>
           <Note at={keyAt} x={X0} y={kg.rowTop(K.rows.length) + h(18)} out={out}>
-            <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               <QMono>grp</QMono>: one per island
             </span>
           </Note>

@@ -69,7 +69,7 @@ export const TrapScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Working with NULL in Postgres</span>
+        <span style={label(24, ACCENT_INK)}>Working with NULL in Postgres</span>
       </Ink>
       <Ink
         at={open + 2}
@@ -167,11 +167,11 @@ export const TrapScene: React.FC = () => {
         color={UNKNOWN_INK}
       />
       <Note at={accountAt - 2} x={NOTE_X} y={nullMid - 30} width={290}>
-        <div style={{ ...note(21, INK), fontWeight: 500 }}>A guest order</div>
-        <div style={{ ...note(20, INK_SOFT) }}>placed with no account</div>
+        <div style={{ ...note(24, INK), fontWeight: 500 }}>A guest order</div>
+        <div style={{ ...note(24, INK_SOFT) }}>placed with no account</div>
       </Note>
       <Note at={nullAt - 2} x={NOTE_X} y={nullMid + 40} width={290} from="up">
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           so its <Mono color={INK}>customer_id</Mono> is{" "}
           <Mono color={UNKNOWN_INK} weight={500}>
             NULL
@@ -181,7 +181,7 @@ export const TrapScene: React.FC = () => {
 
       {/* What came back, against what was expected. */}
       <Ink at={returnsAt - 6} dur={14} style={{ left: LEFT + 4, top: y(RESULT_LABEL_Y) }}>
-        <span style={label(21, INK_SOFT)}>What Postgres returns</span>
+        <span style={label(24, INK_SOFT)}>What Postgres returns</span>
       </Ink>
       <Table
         x={LEFT}
@@ -197,10 +197,10 @@ export const TrapScene: React.FC = () => {
         }}
       />
       <Ink at={expectAt - 4} dur={18} style={{ left: 440, top: y(RESULT_Y) + 4, width: 560 }}>
-        <div style={{ ...body(32, true), color: INK }}>We expected Grace and Mae.</div>
+        <div style={{ ...body(34, true), color: INK }}>We expected Grace and Mae.</div>
       </Ink>
       <Note at={errorAt - 2} x={440} y={y(RESULT_Y) + 60} from="up">
-        <span style={note(21, INK_SOFT)}>No error, and no warning.</span>
+        <span style={note(24, INK_SOFT)}>No error, and no warning.</span>
       </Note>
     </AbsoluteFill>
   );

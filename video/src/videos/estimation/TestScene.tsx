@@ -108,7 +108,7 @@ export const TestScene: React.FC = () => {
         dash="7 6"
       />
       <Note at={leavesAt} x={zeroX + 12} y={y(318)}>
-        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           zero: no difference
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, viewsAt + 8, 12) }}>. The test asks: is it inside?</span>
         </span>
@@ -135,7 +135,7 @@ export const TestScene: React.FC = () => {
         <span style={{ ...note(24, INK), fontWeight: 500, ...halo }}>{signed(clear.hi)}</span>
       </Note>
       <Note at={significantAt - 4} x={sx(X, clear.lo)} y={y(ROW1) + 26}>
-        <span style={{ ...note(23, INK), ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), ...halo, whiteSpace: "nowrap" }}>
           leaves out zero: significant at the{" "}
           <Marked at={fiveAt - 2} color={HIGHLIGHT}>
             5% level
@@ -144,7 +144,7 @@ export const TestScene: React.FC = () => {
       </Note>
       {/* Why 5% goes with 95%: the test and the interval draw the same line. */}
       <Note at={togetherAt - 4} x={sx(X, clear.lo)} y={y(ROW1) + 60}>
-        <span style={{ ...note(21, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>
           a{" "}
           <Marked at={pairTestAt - 2} color={HIGHLIGHT}>
             5% test
@@ -193,22 +193,22 @@ export const TestScene: React.FC = () => {
         <span style={{ ...note(24, INK), fontWeight: 500, ...halo }}>{signed(straddle.hi)}</span>
       </Note>
       <Note at={noEffectAt - 6} x={zeroX + 26} y={y(ROW2) + 30}>
-        <span style={{ ...note(23, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>includes zero: can’t rule out no effect</span>
+        <span style={{ ...note(24, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>includes zero: can’t rule out no effect</span>
       </Note>
       <Note at={bigAt - 2} x={zeroX + 26} y={y(ROW2) + 64}>
-        <span style={{ ...note(23, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>includes eight: can’t rule out a big one</span>
+        <span style={{ ...note(24, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>includes eight: can’t rule out a big one</span>
       </Note>
       <Note at={proofAt - 4} x={sx(X, 12)} y={y(ROW2) - 80}>
-        <span style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>Not proof of nothing:</span>
+        <span style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>Not proof of nothing:</span>
       </Note>
       <Note at={moreDataAt - 4} x={sx(X, 12)} y={y(ROW2) - 42}>
-        <span style={{ ...body(30, true), color: EST_INK, whiteSpace: "nowrap" }}>a call for more data.</span>
+        <span style={{ ...body(28, true), color: EST_INK, whiteSpace: "nowrap" }}>a call for more data.</span>
       </Note>
 
       {/* ── What only the interval shows: how big ── */}
       <Bracket x0={sx(X, clear.lo)} x1={sx(X, clear.hi)} y={y(ROW1) - 40} at={howBigAt - 4} color={EST} />
       <Note at={howBigAt} x={sx(X, clear.estimate)} y={y(ROW1) - 84} from="up">
-        <span style={{ ...note(22, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(24, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           and how big it might be
         </span>
       </Note>
@@ -218,8 +218,8 @@ export const TestScene: React.FC = () => {
 
       {/* ── The formula all of it leaned on ── */}
       <Ink at={formulaFrom - 4} dur={16} style={{ left: 160, top: y(830), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT) }}>Every interval so far:</span>
-        <span style={{ ...note(30, INK), fontWeight: 500, marginLeft: 18, opacity: ease(frame, formulaAt - 4, 12) }}>
+        <span style={{ ...label(24, INK_SOFT) }}>Every interval so far:</span>
+        <span style={{ ...note(28, INK), fontWeight: 500, marginLeft: 18, opacity: ease(frame, formulaAt - 4, 12) }}>
           <Marked at={seAt - 2} color={HIGHLIGHT}>
             standard error
           </Marked>{" "}

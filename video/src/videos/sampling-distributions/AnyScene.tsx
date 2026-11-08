@@ -112,7 +112,7 @@ export const AnyScene: React.FC = () => {
 
       {/* The name, at the end. */}
       <Note at={nameAt - 2} x={1180} y={y(118)} width={640}>
-        <span style={label(22, INK_SOFT)}>That width has a name</span>
+        <span style={label(24, INK_SOFT)}>That width has a name</span>
       </Note>
       <Ink at={seAt - 4} dur={20} style={{ left: 1176, top: y(156), ...headline(64, true), color: INK, whiteSpace: "nowrap" }}>
         the standard error.
@@ -133,13 +133,13 @@ export const AnyScene: React.FC = () => {
 
       {/* Column heads. */}
       <Note at={centerAt - 2} x={COL_CENTER} y={y(338)}>
-        <span style={label(20, INK_SOFT)}>Center</span>
+        <span style={label(24, INK_SOFT)}>Center</span>
       </Note>
       <Note at={widthAt - 2} x={COL_SPREAD} y={y(338)}>
-        <span style={{ ...label(20, INK_SOFT), opacity: 1 - named }}>Spread</span>
+        <span style={{ ...label(24, INK_SOFT), opacity: 1 - named }}>Spread</span>
       </Note>
       <div style={{ position: "absolute", left: COL_SPREAD, top: y(338), opacity: named }}>
-        <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>Standard error</span>
+        <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>Standard error</span>
       </div>
 
       {/* The mean's row, as the bridge asks about its shape: lit, with its
@@ -161,7 +161,7 @@ export const AnyScene: React.FC = () => {
 
       {/* The population. */}
       <Ink at={popAt} dur={14} style={{ left: ROW_X, top: y(POP_ROW.base - 44) }}>
-        <span style={{ ...body(32, true), color: INK }}>Population</span>
+        <span style={{ ...body(34, true), color: INK }}>Population</span>
       </Ink>
       <Bars
         counts={LOPSIDED.hist.counts}
@@ -175,7 +175,7 @@ export const AnyScene: React.FC = () => {
       />
       <Axis scale={X} base={y(POP_ROW.base)} ticks={[]} at={takeAt} />
       <Note at={lopsidedAt + 6} x={sx(X, 120)} y={y(POP_ROW.base - 62)}>
-        <span style={{ ...note(22, INK_SOFT), ...halo }}>
+        <span style={{ ...note(24, INK_SOFT), ...halo }}>
           <Marker at={tailAt - 2}>a long tail to the right</Marker>
           <span style={{ opacity: ease(frame, incomesAt - 2, 12) }}>, like incomes</span>
         </span>
@@ -194,7 +194,7 @@ export const AnyScene: React.FC = () => {
             <Ink at={at - 8} dur={14} style={{ left: ROW_X, top: y(base - 44) }}>
               <span
                 style={{
-                  ...body(32, true),
+                  ...body(34, true),
                   color: r === 0 && meanRow > 0 ? `color-mix(in srgb, ${ACCENT_INK} ${Math.round(meanRow * 100)}%, ${INK})` : INK,
                 }}
               >
@@ -239,12 +239,12 @@ export const AnyScene: React.FC = () => {
               tick={8}
             />
             <Note at={centerAt + r * 3} x={COL_CENTER} y={y(base - 58)}>
-              <span style={{ ...note(26, INK), fontWeight: 500 }}>{fmt(s.center, 1)}</span>
+              <span style={{ ...note(28, INK), fontWeight: 500 }}>{fmt(s.center, 1)}</span>
             </Note>
             <Note at={widthAt + r * 3} x={COL_SPREAD} y={y(base - 58)}>
               <span
                 style={{
-                  ...note(26, ACCENT_INK),
+                  ...note(28, ACCENT_INK),
                   fontWeight: 500,
                   display: "inline-block",
                   transformOrigin: "left center",
@@ -271,7 +271,7 @@ export const AnyScene: React.FC = () => {
 
       {/* "The maximum lands far out, wide and lopsided." */}
       <Note at={farAt} x={sx(X, 175)} y={y(STAT_ROWS[2] - 92)}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, ...halo }}>far out, wide, and lopsided</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, ...halo }}>far out, wide, and lopsided</span>
       </Note>
     </AbsoluteFill>
   );

@@ -63,22 +63,22 @@ export const CountsScene: React.FC = () => {
         width={2}
       />
       <Note at={twoAt + 8} x={colX(THE) + 4} y={y(NOTE_Y)}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           {THE_COUNT} in every row
         </span>
       </Note>
       <Note at={moreAt + 2} x={colX(2) + 4} y={y(NOTE_Y)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Every other word: {OTHER_COUNTS.join(" or ")} where it appears, 0 elsewhere
         </span>
       </Note>
 
       {SAME ? (
         <Ink at={sameAt - 2} dur={20} style={{ left: 120, top: y(VERDICT_Y), width: 1300 }}>
-          <div style={{ ...body(36, true), color: INK, lineHeight: 1.25 }}>
+          <div style={{ ...body(34, true), color: INK, lineHeight: 1.25 }}>
             The same in all three rows, so this column cannot tell Doc 1 from Doc 3.
           </div>
-          <div style={{ ...note(21, INK_SOFT), marginTop: 18 }}>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 18 }}>
             Counts of the lesson&apos;s <span style={{ fontFamily: MONO, color: INK }}>.split()</span> tokens.
             {LENGTH ? ` Every document is ${spell(LENGTH)} words long.` : null}
           </div>

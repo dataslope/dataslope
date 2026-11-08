@@ -88,7 +88,7 @@ export const GateScene: React.FC = () => {
           return (
             <React.Fragment key={r.sql}>
               <Ink at={kinds[i].at - 4} dur={14} style={{ left: X0, top: blockY(i), whiteSpace: "nowrap" }}>
-                <span style={{ ...label(22, INK), fontWeight: 500 }}>{kinds[i].label}</span>
+                <span style={{ ...label(24, INK), fontWeight: 500 }}>{kinds[i].label}</span>
               </Ink>
               {/* The rule it broke, in the diagram's own marks, as Postgres names it. */}
               <Note at={nameAt[i] - 2} x={X0 + BOX_W} y={blockY(i) - 2} align="right">
@@ -103,13 +103,13 @@ export const GateScene: React.FC = () => {
                     transformOrigin: "100% 50%",
                   }}
                 >
-                  <span style={note(21, INK_SOFT)}>breaks</span>
+                  <span style={note(24, INK_SOFT)}>breaks</span>
                   <Badge size={21}>{tag.badge}</Badge>
-                  <span style={{ fontFamily: MONO, fontSize: 21, color: INK }}>{tag.text}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 24, color: INK }}>{tag.text}</span>
                 </span>
               </Note>
               <Ink at={kinds[i].at} dur={16} style={{ left: X0, top: blockY(i) + 38, width: BOX_W }}>
-                <div style={{ background: LISTING_PAPER, borderTop: `2px solid ${INK}`, padding: "6px 20px", whiteSpace: "nowrap", fontSize: 22 }}>
+                <div style={{ background: LISTING_PAPER, borderTop: `2px solid ${INK}`, padding: "6px 20px", whiteSpace: "nowrap", fontSize: 24 }}>
                   <Strike at={errAt(i) + 4} tilt={-0.3}>
                     <Code line={r.sql} size={22} />
                   </Strike>
@@ -130,8 +130,8 @@ export const GateScene: React.FC = () => {
         })}
         {/* What the tables hold afterwards: what they held before. */}
         <Note at={brokeAt + 6} x={X0} y={blockY(2) + 212}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(21, INK_SOFT), marginRight: 14 }}>Afterwards</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, INK_SOFT), marginRight: 14 }}>Afterwards</span>
             {COUNTS_AFTER.customers} customers, {COUNTS_AFTER.orders} orders and {COUNTS_AFTER.order_items} order lines, as before.{" "}
             <span style={{ color: ACCENT_INK }}>Not one bad row got in.</span>
           </span>

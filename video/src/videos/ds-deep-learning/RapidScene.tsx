@@ -47,15 +47,15 @@ const Loss: React.FC<{ c: Ctx }> = ({ c }) => {
         </Note>
       ))}
       <Note at={robustAt - 2} x={COLS[2]} y={c.y(430) + 3 * c.h(66) - c.h(16)}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>or a robust loss, for outliers</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>or a robust loss, for outliers</span>
       </Note>
       <Note at={stallsAt - 2} x={COLS[0]} y={c.y(730)}>
-        <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           squared error on a sigmoid output: <Mark at={stallsAt + 6}>stalls once it saturates</Mark>
         </span>
       </Note>
       <Note at={stallsAt + 10} x={COLS[0]} y={c.y(776)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>saturated: on a flat end of the curve, where the gradient is nearly 0</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>saturated: on a flat end of the curve, where the gradient is nearly 0</span>
       </Note>
     </>
   );
@@ -86,7 +86,7 @@ const Init: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={equalAt - 2} x={R_X + 40} y={c.y(330)}>
-        <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           every weight equal: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>the units stay copies</span>
         </span>
       </Note>
@@ -110,7 +110,7 @@ const Init: React.FC<{ c: Ctx }> = ({ c }) => {
             lineHeight: "28px",
             textAlign: "right",
             fontFamily: SANS,
-            fontSize: 21,
+            fontSize: 24,
             fontWeight: 500,
             color: INK_SOFT,
             whiteSpace: "nowrap",
@@ -122,7 +122,7 @@ const Init: React.FC<{ c: Ctx }> = ({ c }) => {
             "1"
           ) : (
             <>
-              10<sup style={{ fontSize: 19, lineHeight: 0 }}>{v < 0 ? `−${-v}` : v}</sup>
+              10<sup style={{ fontSize: 24, lineHeight: 0 }}>{v < 0 ? `−${-v}` : v}</sup>
             </>
           )}
         </div>
@@ -191,7 +191,7 @@ const Epoch: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one batch → one update: an iteration</span>
       </Note>
       <Note at={iterAt + 6} x={bar.x} y={bar.y + bar.h + c.h(54)}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>batch: the examples behind one update; iteration: the update</span>
+        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>batch: the examples behind one update; iteration: the update</span>
       </Note>
       <Note at={tenAt - 2} x={bar.x} y={c.y(760)}>
         <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
@@ -203,7 +203,7 @@ const Epoch: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={makeAt + 6} x={bar.x + W} y={bar.y + bar.h + c.h(14)} align="right" width={300}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>the last batch holds {EPOCH.lastBatch}</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>the last batch holds {EPOCH.lastBatch}</span>
       </Note>
     </>
   );

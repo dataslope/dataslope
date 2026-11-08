@@ -149,8 +149,8 @@ export const ThinkScene: React.FC = () => {
         <div style={{ width: "100%", height: "100%", background: ds("gray", 50), borderTop: `2px solid ${INK}` }} />
       </Ink>
       <Ink at={writesAt - 2} dur={12} style={{ left: X0 + 24, top: top + 14, display: "flex", gap: 18, alignItems: "baseline", whiteSpace: "nowrap" }}>
-        <span style={label(22, THINK_INK)}>Thinking</span>
-        <span style={{ ...note(22, THINK_INK), fontWeight: 500, opacity: ease(frame, thinkingAt - 2, 10), ...TABULAR }}>
+        <span style={label(24, THINK_INK)}>Thinking</span>
+        <span style={{ ...note(24, THINK_INK), fontWeight: 500, opacity: ease(frame, thinkingAt - 2, 10), ...TABULAR }}>
           {THINKING_TOKENS} tokens
         </span>
       </Ink>
@@ -165,9 +165,9 @@ export const ThinkScene: React.FC = () => {
         <line x1={X0 + 24} x2={X0 + BOX_W - 24} y1={answerTop - 20} y2={answerTop - 20} stroke={THINK} strokeWidth={1.4} strokeDasharray="4 4" />
       </Svg>
       <Ink at={beforeAt - 2} dur={14} style={{ left: X0 + 24, top: answerTop, display: "flex", gap: 18, alignItems: "baseline", whiteSpace: "nowrap" }}>
-        <span style={label(22, INK)}>Answer</span>
+        <span style={label(24, INK)}>Answer</span>
         <span style={{ fontFamily: MONO, fontSize: SIZE, color: INK, fontWeight: 500 }}>{ANSWER}</span>
-        <span style={{ ...note(22, INK), fontWeight: 500, opacity: ease(frame, thinkingAt + 6, 10), ...TABULAR }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, opacity: ease(frame, thinkingAt + 6, 10), ...TABULAR }}>
           {ANSWER_TOKENS} tokens
         </span>
       </Ink>
@@ -177,7 +177,7 @@ export const ThinkScene: React.FC = () => {
         <div style={{ ...body(34), color: INK }}>Same next-token machine.</div>
       </Ink>
       <Ink at={nothingAt - 2} dur={14} style={{ left: RIGHT_X, top: y(408), width: 560 }}>
-        <div style={{ ...body(30, true) }}>Nothing new inside.</div>
+        <div style={{ ...body(28, true) }}>Nothing new inside.</div>
       </Ink>
       <Ink at={trainingAt - 6} dur={14} style={{ left: RIGHT_X, top: y(476), width: 560 }}>
         <div style={{ ...body(34), color: INK }}>
@@ -194,12 +194,12 @@ export const ThinkScene: React.FC = () => {
         <React.Fragment key={r.text}>
           <Tick at={r.at - 2} x={RIGHT_X + 16} y={y(r.yy) + 20} />
           <Ink at={r.at - 2} dur={12} style={{ left: RIGHT_X + 44, top: y(r.yy), width: 520 }}>
-            <div style={{ ...body(30), color: INK }}>{r.text}</div>
+            <div style={{ ...body(28), color: INK }}>{r.text}</div>
           </Ink>
         </React.Fragment>
       ))}
       <Note at={habitsAt - 2} x={RIGHT_X} y={y(722)} width={560}>
-        <div style={{ ...body(30, true), color: GOOD_INK }}>So checking its own work gets reinforced.</div>
+        <div style={{ ...body(28, true), color: GOOD_INK }}>So checking its own work gets reinforced.</div>
       </Note>
     </AbsoluteFill>
   );

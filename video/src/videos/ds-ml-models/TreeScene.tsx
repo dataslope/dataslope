@@ -224,7 +224,7 @@ export const TreeScene: React.FC = () => {
         <Note at={speciesAt} x={LEFT} y={y(330)}>
           <span
             style={{
-              ...label(22, INK),
+              ...label(24, INK),
               whiteSpace: "nowrap",
               display: "flex",
               gap: 26,
@@ -268,13 +268,13 @@ export const TreeScene: React.FC = () => {
           align="right"
           from="up"
         >
-          <span style={{ ...label(21, INK), ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>
             <b style={{ color: C0 }}>{counts.left[0]}</b> ·{" "}
             <b style={{ color: C1 }}>{counts.left[1]}</b>
           </span>
         </Note>
         <Note at={triesAt + 6} x={at(sx, cut) + 14} y={y(366)} from="up">
-          <span style={{ ...label(21, INK), ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>
             <b style={{ color: C0 }}>{counts.right[0]}</b> ·{" "}
             <b style={{ color: C1 }}>{counts.right[1]}</b>
           </span>
@@ -348,7 +348,7 @@ export const TreeScene: React.FC = () => {
           x={LEFT}
           y={y(GINI_TOP) + h(GINI_H) + h(12)}
         >
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
             entropy (information gain) also picks{" "}
             {fmt(TREE.entropy.best[0], 2)}
             <span
@@ -387,7 +387,7 @@ export const TreeScene: React.FC = () => {
           ]}
         />
         <Note at={chanceAt} x={COL + 160} y={y(330) + h(128)} width={320}>
-          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             chance two random flowers differ
           </span>
         </Note>
@@ -415,7 +415,7 @@ export const TreeScene: React.FC = () => {
         >
           <span
             style={{
-              ...note(23, INK),
+              ...note(24, INK),
               fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,
@@ -465,7 +465,7 @@ export const TreeScene: React.FC = () => {
         >
           <span
             style={{
-              ...note(25, OK_INK),
+              ...note(24, OK_INK),
               fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,

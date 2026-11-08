@@ -108,12 +108,12 @@ export const SprtScene: React.FC = () => {
           <line x1={BOX.left} x2={BOX.left + (BOX.right - BOX.left) * bounds} y1={at(ys, SPRT.lower)} y2={at(ys, SPRT.lower)} stroke={INK} strokeWidth={2.6} strokeDasharray="8 6" />
         </Svg>
         <Note at={boundsAt + 6} x={BOX.right - 6} y={at(ys, SPRT.upper) - h(40)} width={620} align="right">
-          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             stop: an effect · {upperLog} = {SPRT.upper.toFixed(2)}
           </span>
         </Note>
         <Note at={boundsAt + 10} x={BOX.right - 6} y={at(ys, SPRT.lower) + h(18)} width={620} align="right">
-          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             stop: favors no effect · {lowerLog} = −{(-SPRT.lower).toFixed(2)}
           </span>
         </Note>
@@ -129,26 +129,26 @@ export const SprtScene: React.FC = () => {
 
         {/* The two hypotheses, and what 2,000 runs each way cost. */}
         <Note at={h0At - 2} x={COL_X} y={y(340)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>H₀</b> no effect
           </span>
         </Note>
         <Note at={h1At - 2} x={COL_X} y={y(384)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>H₁</b> the effect designed for, 0.2 SD
           </span>
         </Note>
         <Note at={runAt} x={COL_X} y={y(470)}>
-          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>2,000 runs each way</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>2,000 runs each way</span>
         </Note>
         <Note at={wrongAt} x={COL_X} y={y(514)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
             false positives <b style={{ color: ACCENT_INK }}>{pct(SPRT.falsePositive, 1)}</b>
-            <span style={{ ...note(25, INK_SOFT), opacity: ease(frame, builtAt, 10) }}> · built for 2.5%</span>
+            <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, builtAt, 10) }}> · built for 2.5%</span>
           </span>
         </Note>
         <Note at={realAt} x={COL_X} y={y(590)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>pairs needed when the effect is real</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>pairs needed when the effect is real</span>
         </Note>
         {bars.map((b, i) => {
           const p = ease(frame, b.at - 4, 14);
@@ -156,7 +156,7 @@ export const SprtScene: React.FC = () => {
           const top = y(640) + i * h(92);
           return (
             <React.Fragment key={b.text}>
-              <div style={{ position: "absolute", left: COL_X, top, ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: p }}>
+              <div style={{ position: "absolute", left: COL_X, top, ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: p }}>
                 {b.text}
                 <span style={{ color: b.ink, opacity: ease(frame, bothAt + i * 6, 10) }}> · power {pct(b.power, 1)}</span>
               </div>
@@ -164,7 +164,7 @@ export const SprtScene: React.FC = () => {
                 style={{ position: "absolute", left: COL_X, top: top + h(30), width: (xb(b.v) - COL_X) * p, height: h(34), background: b.color, opacity: 0.85, borderRadius: 3 }}
               />
               <Note at={b.at} x={xb(b.v) + 12} y={top + h(30)}>
-                <span style={{ ...note(26, b.ink), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+                <span style={{ ...note(28, b.ink), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
                   {i === 0 ? <Mark at={cheaperAt - 4}>{String(b.v)}</Mark> : b.v}
                 </span>
               </Note>

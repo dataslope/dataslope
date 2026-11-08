@@ -126,7 +126,7 @@ export const RulesScene: React.FC = () => {
 
         {/* What the rules buy: customer 1 names exactly one row. */}
         <Note at={pointerAt + 8} x={X0} y={g.rowTop(1) + h(30)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mono color={KEY_INK}>customer_id = 1</Mono>
             <span style={{ color: INK }}>
               {" "}

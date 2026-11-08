@@ -207,7 +207,7 @@ export const BpeScene: React.FC = () => {
             left: X0,
             top: y(CORPUS_Y),
             fontFamily: MONO,
-            fontSize: 21,
+            fontSize: 24,
             fontWeight: 500,
             color: INK_SOFT,
             whiteSpace: "nowrap",
@@ -300,7 +300,7 @@ export const BpeScene: React.FC = () => {
           color={INK_SOFT}
         />
         <Note at={fourAt} x={tileX(0)} y={rowY(3) + TILE_H + 20}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>four pieces: wid never earned a merge</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>four pieces: wid never earned a merge</span>
         </Note>
 
         {/* Fig. 9: the first count of neighbouring pairs, the lesson's top five. */}
@@ -324,15 +324,15 @@ export const BpeScene: React.FC = () => {
             >
               <ChipFace text={p.pair[0]} size={24} focus={Math.min(1, hit)} />
               <ChipFace text={p.pair[1]} size={24} focus={Math.min(1, hit)} />
-              <span style={{ ...note(26, hit > 0.5 ? FOCUS_INK : INK), marginLeft: 14, fontWeight: 500, ...TABULAR }}>
+              <span style={{ ...note(28, hit > 0.5 ? FOCUS_INK : INK), marginLeft: 14, fontWeight: 500, ...TABULAR }}>
                 {p.count}
               </span>
-              <span style={{ ...note(21, INK_SOFT) }}>{i === 0 ? "times" : ""}</span>
+              <span style={{ ...note(24, INK_SOFT) }}>{i === 0 ? "times" : ""}</span>
             </div>
           );
         })}
         <Note at={sevenAt} x={RX} y={y(LIST_Y) + 5 * h(LIST_STEP + 6) + 4} out={writeAt - 2}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>five lows and two lowers: seven</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>five lows and two lowers: seven</span>
         </Note>
 
         {/* Fig. 10: the merges, in the order learned. That list is the tokenizer. */}
@@ -360,17 +360,17 @@ export const BpeScene: React.FC = () => {
                 transform: `translateX(${(1 - p) * -14}px)`,
               }}
             >
-              <span style={{ ...label(22, lit > 0.3 ? FOCUS_INK : ACCENT_INK), width: 30, textAlign: "right", ...TABULAR }}>{i + 1}</span>
+              <span style={{ ...label(24, lit > 0.3 ? FOCUS_INK : ACCENT_INK), width: 30, textAlign: "right", ...TABULAR }}>{i + 1}</span>
               <span style={{ width: 190, display: "inline-flex", gap: 8, alignItems: "baseline", justifyContent: "flex-end" }}>
                 <Sym text={m.a} size={24} />
-                <span style={{ ...note(22, INK_SOFT) }}>+</span>
+                <span style={{ ...note(24, INK_SOFT) }}>+</span>
                 <Sym text={m.b} size={24} />
               </span>
               <InlineArrow width={34} size={24} />
               <ChipFace text={m.a + m.b} size={22} focus={Math.max(clamp01(hot), lit)} />
-              <span style={{ ...note(21, INK_SOFT), marginLeft: 6, ...TABULAR }}>×{m.count}</span>
+              <span style={{ ...note(24, INK_SOFT), marginLeft: 6, ...TABULAR }}>×{m.count}</span>
               {i === 0 ? (
-                <span style={{ ...note(21, INK_SOFT), marginLeft: 14, whiteSpace: "nowrap", opacity: ease(frame, firstAt + 4, 12) }}>
+                <span style={{ ...note(24, INK_SOFT), marginLeft: 14, whiteSpace: "nowrap", opacity: ease(frame, firstAt + 4, 12) }}>
                   o w tied: first counted wins
                 </span>
               ) : null}
@@ -378,7 +378,7 @@ export const BpeScene: React.FC = () => {
           );
         })}
         <Note at={orderAt - 2} x={RX + 42} y={y(LIST_Y) + MERGES.length * h(LIST_STEP) + 2}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>new text: split, then replay these in order</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>new text: split, then replay these in order</span>
         </Note>
       </Drift>
     </AbsoluteFill>

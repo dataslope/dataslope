@@ -116,7 +116,7 @@ export const PgScene: React.FC = () => {
             alignItems: "center",
             paddingLeft: 18,
             overflow: "hidden",
-            ...note(23, BLUE_INK),
+            ...note(24, BLUE_INK),
             fontWeight: 500,
             whiteSpace: "nowrap",
             opacity: grow,
@@ -139,7 +139,7 @@ export const PgScene: React.FC = () => {
             alignItems: "center",
             paddingLeft: 18,
             overflow: "hidden",
-            ...note(23, INK),
+            ...note(24, INK),
             fontWeight: 500,
             whiteSpace: "nowrap",
             opacity: growRight,
@@ -173,7 +173,7 @@ export const PgScene: React.FC = () => {
         />
         {/* What the search line does. */}
         <Note at={inPgAt + 16} x={X0 + 790} y={listTop + 16 + lineOf(QUERY, "ORDER BY") * 43 + 6}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             ← <span style={{ fontFamily: MONO, fontVariantLigatures: "none", color: INK }}>&lt;=&gt;</span> is cosine distance to{" "}
             <span style={{ fontFamily: MONO, color: INK }}>$1</span>, the query&apos;s vector
           </span>
@@ -182,14 +182,14 @@ export const PgScene: React.FC = () => {
           <Note key={r.text} at={r.at - 2} x={X0} y={listTop + sqlListingHeight(QUERY.length, 24) + 26 + i * 44}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <Tick at={r.at + 4} size={24} />
-              <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.text}</span>
+              <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.text}</span>
             </div>
           </Note>
         ))}
 
         {/* The caveat: Question 8's trap. */}
         <Note at={caveatAt - 2} x={X0} y={listTop + sqlListingHeight(QUERY.length, 24) + 26 + reasons.length * 44 + 8}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             with an approximate index,{" "}
             <span style={{ opacity: ease(frame, afterAt - 2, 10) }}>
               <span style={{ fontFamily: MONO, fontVariantLigatures: "none" }}>WHERE</span> runs after the search
@@ -203,20 +203,20 @@ export const PgScene: React.FC = () => {
           <span style={head(23, INK)}>a dedicated vector database</span>
         </Note>
         <Note at={costAt - 2} x={RIGHT_X} y={listTop - 18}>
-          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>earns its operational cost with</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>earns its operational cost with</span>
         </Note>
         {earns.map((r, i) => (
           <Note key={r.text} at={r.at - 2} x={RIGHT_X} y={listTop + 30 + i * 52}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <Tick at={r.at + 4} size={24} />
-              <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.text}</span>
+              <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.text}</span>
             </div>
           </Note>
         ))}
 
         {/* What an interviewer wants. */}
         <Note at={leanAt - 2} x={RIGHT_X} y={y(630) + 18}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>the answer they want</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>the answer they want</span>
         </Note>
         <Note at={leanAt} x={RIGHT_X} y={y(630) + 58}>
           <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap", lineHeight: 1.5 }}>

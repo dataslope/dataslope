@@ -140,7 +140,7 @@ export const LateScene: React.FC = () => {
           ]}
         />
         <Note at={beforeAt + 8} x={gd.x} y={gd.rowTop(2) + h(10)} out={insteadAt + 4}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             no customer <Num>77</Num> yet
           </span>
         </Note>

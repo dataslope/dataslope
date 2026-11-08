@@ -83,7 +83,7 @@ export const InsertScene: React.FC = () => {
         marks={[{ row: ghost, col: F.id, at: noIdAt, color: MARK_BAD }]}
       />
       <Note at={refusedAt + 8} x={RIGHT_X} y={g.rowMid(ghost) - 15}>
-        <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>Refused, so Alan is not stored</span>
+        <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>Refused, so Alan is not stored</span>
       </Note>
     </AbsoluteFill>
   );

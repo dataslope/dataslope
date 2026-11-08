@@ -102,7 +102,7 @@ export const KindsScene: React.FC = () => {
                 width: BOX_W + 20,
                 top: stripY + boxH / 2 + h(10),
                 textAlign: "center",
-                ...label(19, i < LAUNCH ? INK_SOFT : INK),
+                ...label(24, i < LAUNCH ? INK_SOFT : INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
                 opacity: ease(frame, stripAt + i, 10),
@@ -130,7 +130,7 @@ export const KindsScene: React.FC = () => {
           <line x1={bx(LAUNCH) - GAP / 2} x2={bx(LAUNCH) - GAP / 2} y1={stripY - boxH / 2 - h(30)} y2={stripY + boxH / 2 + h(44)} stroke={INK} strokeWidth={2} strokeDasharray="4 4" />
         </svg>
         <Note at={stripAt + 10} x={bx(LAUNCH) + 4} y={stripY - boxH / 2 - h(40)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>pipeline starts</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>pipeline starts</span>
         </Note>
 
         {/* A retry: one failed task, inside today's run. */}
@@ -165,7 +165,7 @@ export const KindsScene: React.FC = () => {
             <line x1={zoomX + 120} x2={cx(TODAY)} y1={zoomY + h(26)} y2={stripY - boxH / 2} stroke={INK_SOFT} strokeWidth={1.4} strokeDasharray="3 4" />
           </svg>
           <Note at={retryAt} x={zoomX + 274} y={zoomY - h(96)} align="right">
-            <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               retry: <span style={{ fontWeight: 500 }}>one failed task, the same run</span>
             </span>
           </Note>
@@ -191,7 +191,7 @@ export const KindsScene: React.FC = () => {
             head={10}
           />
           <Note at={rerunAt} x={cx(RERUN) - 180} y={stripY - h(118) - boxH / 2 - h(46)}>
-            <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               rerun: <span style={{ fontWeight: 500, opacity: ease(frame, fixAt, 10) }}>a finished date, after a fix</span>
             </span>
           </Note>
@@ -199,7 +199,7 @@ export const KindsScene: React.FC = () => {
 
         {/* A backfill: the dates that never ran, or a range again. */}
         <Note at={backAt} x={X_START} y={stripY - boxH / 2 - h(96)}>
-          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             backfill: <span style={{ fontWeight: 500, opacity: ease(frame, neverAt, 10) }}>dates that never ran</span>
           </span>
         </Note>
@@ -220,9 +220,9 @@ export const KindsScene: React.FC = () => {
           all three: safe only on idempotent tasks
         </Pill>
         <Note at={sameAt} x={X_START + 640} y={y(806)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             the same end state however often they run
-            <span style={{ ...label(23, INK_SOFT), opacity: ease(frame, partAt, 10) }}> · Part 6</span>
+            <span style={{ ...label(24, INK_SOFT), opacity: ease(frame, partAt, 10) }}> · Part 6</span>
           </span>
         </Note>
       </Drift>

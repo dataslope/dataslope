@@ -124,14 +124,14 @@ export const ZScene: React.FC = () => {
               <line key={k} x1={zx(k)} x2={zx(k)} y1={base} y2={base + 7} stroke={INK} strokeWidth={1.2} />
             ))}
           </Svg>
-          <div style={{ position: "absolute", left: 96, top: base + 10, opacity: ease(frame, zFrom, 14), ...label(21, INK_SOFT) }}>Score</div>
+          <div style={{ position: "absolute", left: 96, top: base + 10, opacity: ease(frame, zFrom, 14), ...label(24, INK_SOFT) }}>Score</div>
           {TICKS.map((k) => (
             <Centered
               key={k}
               x={zx(k)}
               y={base + 12}
               opacity={ease(frame, zFrom + 2, 12)}
-              style={k === 2 && frame >= hundredThirtyAt - 2 ? askNote(24) : { ...note(22, INK_SOFT) }}
+              style={k === 2 && frame >= hundredThirtyAt - 2 ? askNote(24) : { ...note(24, INK_SOFT) }}
             >
               {mu + k * sigma}
             </Centered>
@@ -149,13 +149,13 @@ export const ZScene: React.FC = () => {
                 x={zx(k)}
                 y={zY + 32}
                 textAnchor="middle"
-                style={{ fontFamily: SANS, fontSize: 22, fontWeight: 500, fill: k === 2 && drop >= 1 ? ASK_INK : INK_SOFT }}
+                style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: k === 2 && drop >= 1 ? ASK_INK : INK_SOFT }}
               >
                 {k > 0 ? `+${k}` : k < 0 ? `−${Math.abs(k)}` : "0"}
               </text>
             ))}
           </Svg>
-          <div style={{ position: "absolute", left: 96, top: zY + 10, opacity: ease(frame, zScoreAt, 14), ...label(21, INK_SOFT) }}>z</div>
+          <div style={{ position: "absolute", left: 96, top: zY + 10, opacity: ease(frame, zScoreAt, 14), ...label(24, INK_SOFT) }}>z</div>
 
           {/* Thirty points: two steps of fifteen. */}
           <Bracket x0={zx(0)} x1={x130} y={py(pdf(mu)) - h(30)} at={thirtyAt - 4} color={ASK} up />
@@ -183,12 +183,12 @@ export const ZScene: React.FC = () => {
 
           {/* A position, not a chance; the area is the percentile. */}
           <Note at={percentAt - 4} x={x130 + 30} y={y(380)}>
-            <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               not a <Strike at={percentAt + 4}>2% chance</Strike>
             </span>
           </Note>
           <Note at={lookAt} x={x130 + 30} y={y(426)}>
-            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>the area to its left:</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the area to its left:</span>
           </Note>
           <Centered x={zx(-0.6)} y={py(pdf(mu - 0.6 * sigma)) + h(70)} opacity={ease(frame, sevenAt - 10, 8)} style={{ ...askNote(38), ...halo }}>
             <Count at={sevenAt - 10} dur={16} to={Z.below} suffix="%" />
@@ -198,7 +198,7 @@ export const ZScene: React.FC = () => {
           </Note>
         </div>
         <Note at={reallyAt - 2} x={x130 + 30} y={y(512)}>
-          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             only if the data <span style={{ color: ASK_INK }}>really is normal</span>
           </span>
         </Note>

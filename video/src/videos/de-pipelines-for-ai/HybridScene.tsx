@@ -57,9 +57,9 @@ const Row: React.FC<{ x: number; y: number; rank: number; id: string; at: number
         transform: `translateX(${(1 - p) * -10}px)`,
       }}
     >
-      <span style={{ ...label(21, INK_SOFT), ...TABULAR, fontWeight: 500, width: 22, textAlign: "right" }}>{rank}</span>
-      <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{id}</span>
-      <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>{children ?? tickets[id]}</span>
+      <span style={{ ...label(24, INK_SOFT), ...TABULAR, fontWeight: 500, width: 22, textAlign: "right" }}>{rank}</span>
+      <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{id}</span>
+      <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{children ?? tickets[id]}</span>
     </div>
   );
 };
@@ -133,7 +133,7 @@ export const HybridScene: React.FC = () => {
           What is hybrid search, and when do embeddings alone fail?
         </QuestionCard>
         <Note at={meaningAt} x={X0} y={y(240)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             embeddings capture meaning
             <span style={{ opacity: ease(frame, blurAt - 2, 10) }}>
               , but <Mark at={blurAt + 4}>blur exact tokens</Mark>:
@@ -148,7 +148,7 @@ export const HybridScene: React.FC = () => {
 
         {/* The search. */}
         <Note at={setupAt} x={X0} y={y(312)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             search the tickets for{" "}
             {/* The query as a house badge in the mono face; the highlighter's
                 yellow lays over its tint while the search is said. */}
@@ -156,7 +156,7 @@ export const HybridScene: React.FC = () => {
               style={{
                 ...badgeStyle("gray", 25),
                 fontFamily: MONO,
-                fontSize: 23,
+                fontSize: 24,
                 fontVariantLigatures: "none",
                 background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * ease(frame, searchAt, 10) * (1 - ease(frame, fourthAt, 12))}%, ${badgeStyle("gray").background})`,
               }}
@@ -183,7 +183,7 @@ export const HybridScene: React.FC = () => {
         ))}
 
         <Note at={generalAt - 2} x={COLS[0]} y={rowY(5) + 24}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>1 to 3: tickets about errors in general</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>1 to 3: tickets about errors in general</span>
         </Note>
 
         {/* The three rankings side by side: a hairline centred in each gap,
@@ -214,16 +214,16 @@ export const HybridScene: React.FC = () => {
           <Row key={id} x={COLS[1]} y={rowY(i)} rank={i + 1} id={id} at={bm25At + 2 + i * 3} lit={id === CODE ? oneAt : undefined} />
         ))}
         <Note at={tfidfAt - 2} x={COLS[1]} y={rowY(5) + 24}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             like TF-IDF&apos;s{" "}
             {/* The formula in the line's own face and size: one line, one face. */}
-            <span style={{ ...note(22, INK), fontWeight: 500 }}>
+            <span style={{ ...note(24, INK), fontWeight: 500 }}>
               idf = ln(<i>N</i> / <i>df</i>)
             </span>
           </span>
         </Note>
         <Note at={rarityAt} x={COLS[1]} y={rowY(5) + 66}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap", lineHeight: 1.5 }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", lineHeight: 1.5 }}>
             “error”: in {idf.error.df} of {idf.N} tickets → <b style={TABULAR}>{idf.error.idf.toFixed(2)}</b>
             <br />
             <span style={{ opacity: ease(frame, oneAt - 2, 10) }}>
@@ -242,7 +242,7 @@ export const HybridScene: React.FC = () => {
           </span>
         </Note>
         <Note at={fuseAt + 2} x={COLS[2]} y={rowY(5) + 24}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", lineHeight: 1.45 }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", lineHeight: 1.45 }}>
             <b style={{ color: INK }}>ranks, not scores</b>: a BM25 score
             <br />
             and a similarity aren&apos;t on one scale
@@ -252,16 +252,16 @@ export const HybridScene: React.FC = () => {
           const parts = [f.vectorRank, f.keywordRank].filter((r): r is number => r !== null);
           return (
             <Row key={f.ticket} x={COLS[2]} y={rowY(i)} rank={i + 1} id={f.ticket} at={summedAt + 4 + i * 4} ok={f.ticket === CODE ? winsAt : undefined}>
-              <span style={{ ...math(23, INK), ...TABULAR }}>
+              <span style={{ ...math(24, INK), ...TABULAR }}>
                 {parts.map((r) => `1/${HYBRID.k + r}`).join(" + ")} = {f.score.toFixed(4)}
               </span>
             </Row>
           );
         })}
         <Note at={sixtyAt - 2} x={COLS[2]} y={rowY(3) + 6}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             each list gives{" "}
-            <span style={{ ...note(23, INK), ...TABULAR }}>
+            <span style={{ ...note(24, INK), ...TABULAR }}>
               1 / ({HYBRID.k} + <i>rank</i>)
             </span>
             <span style={{ opacity: ease(frame, summedAt - 2, 10) }}>, summed</span>

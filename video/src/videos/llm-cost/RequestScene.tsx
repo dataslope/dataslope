@@ -102,7 +102,7 @@ export const RequestScene: React.FC = () => {
         style={{ transform: `scaleY(${1 + tokPulse * 0.4})` }}
       />
       <Note at={inAt} x={X0 + REQUEST.in * PX_PER_TOKEN + 14} y={y(TOKENS_Y) + h(15) - 16}>
-        <span style={{ ...note(25, INPUT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{int(REQUEST.in)} in</span>
+        <span style={{ ...note(24, INPUT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{int(REQUEST.in)} in</span>
       </Note>
       <HBar
         x={640}
@@ -115,7 +115,7 @@ export const RequestScene: React.FC = () => {
         style={{ transform: `scaleY(${1 + tokPulse * 0.4})` }}
       />
       <Note at={outAt} x={640 + REQUEST.out * PX_PER_TOKEN + 14} y={y(TOKENS_Y) + h(15) - 16}>
-        <span style={{ ...note(25, OUTPUT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{int(REQUEST.out)} out</span>
+        <span style={{ ...note(24, OUTPUT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{int(REQUEST.out)} out</span>
       </Note>
 
       {/* The table. */}
@@ -125,7 +125,7 @@ export const RequestScene: React.FC = () => {
         [`Per ${int(REQUEST.volume)} requests`, BAR_X, "left", hundredAt - 6],
       ].map(([t, x, a, at]) => (
         <Note key={t as string} at={at as number} x={x as number} y={y(HEAD_Y)} align={a as "left" | "right"} from="up">
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
         </Note>
       ))}
       <Hairline x={X0} y={y(HEAD_Y) + 36} w={1800 - X0} at={supportAt + 2} color={INK_SOFT} />
@@ -191,7 +191,7 @@ export const RequestScene: React.FC = () => {
         {/* The multiple, and under it what it spans: two lines, so each is
             one size and one face. */}
         <span style={{ display: "block", ...headline(54), color: POINT_INK }}>{Math.round(maxV / minV)}x</span>
-        <span style={{ display: "block", marginTop: 8, ...note(25, INK) }}>
+        <span style={{ display: "block", marginTop: 8, ...note(24, INK) }}>
           {NAME[tiers[haikuRow].model]} to {NAME[tiers[fableRow].model]}
         </span>
       </Ink>

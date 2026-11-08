@@ -115,7 +115,7 @@ export const ActScene: React.FC = () => {
           <rect x={xs.a} y={ys.b} width={(xs.b - xs.a) / 2} height={ys.a - ys.b} fill={`color-mix(in srgb, ${ACCENT} 8%, transparent)`} />
         </Svg>
         <Note at={stuckAt + 2} x={BOX.left + 24} y={y(BOX.top) + h(18)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             stuck here, a ReLU unit stops learning
             <br />
             <span style={{ opacity: ease(frame, dyingAt - 2, 10) }}>the dying ReLU problem</span>
@@ -129,7 +129,7 @@ export const ActScene: React.FC = () => {
               <svg width={44} height={14} style={{ overflow: "visible" }}>
                 <line x1={0} x2={44} y1={7} y2={7} stroke={row.color} strokeWidth={4} strokeDasharray={row.dash} />
               </svg>
-              <span style={{ ...note(26, row.ink), fontWeight: 500, whiteSpace: "nowrap" }}>{row.text}</span>
+              <span style={{ ...note(28, row.ink), fontWeight: 500, whiteSpace: "nowrap" }}>{row.text}</span>
             </div>
           </Note>
         ))}

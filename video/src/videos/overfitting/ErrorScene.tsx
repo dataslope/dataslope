@@ -108,7 +108,7 @@ export const ErrorScene: React.FC = () => {
           display: "flex",
           alignItems: "center",
           gap: 12,
-          ...note(21, INK_SOFT),
+          ...note(24, INK_SOFT),
           whiteSpace: "nowrap",
         }}
       >
@@ -131,7 +131,7 @@ export const ErrorScene: React.FC = () => {
         at={start - 4}
       />
       <Ink at={start + 4} dur={14} style={{ left: X.x0, top: box.base + 52, width: X.x1 - X.x0, textAlign: "center" }}>
-        <span style={label(20, INK_SOFT)}>Polynomial degree</span>
+        <span style={label(24, INK_SOFT)}>Polynomial degree</span>
       </Ink>
 
       <Curve id="of-err-test" pts={testPts} box={box} reveal={testReveal} color={NEW_COLOR} width={4} />
@@ -164,12 +164,12 @@ export const ErrorScene: React.FC = () => {
       </svg>
 
       <Note at={threeAt + 2} x={px(best.degree) + 24} y={py(0.072) - 14}>
-        <span style={{ ...note(22, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(24, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           lowest, {fmt(best.test, 3)} at degree {best.degree}
         </span>
       </Note>
       <Note at={zeroAt} x={X.x1 + 6} y={py(0) - 50} align="right" from="right">
-        <span style={{ ...note(22, TRAIN_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(24, TRAIN_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           {fmt(last.train, 3)} at degree {last.degree}
         </span>
       </Note>
@@ -177,7 +177,7 @@ export const ErrorScene: React.FC = () => {
         <div style={{ ...note(24, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           {fmt(last.test, 1)} at degree {last.degree}, off the chart
         </div>
-        <div style={{ ...note(21, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", ...halo }}>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", ...halo }}>
           {Math.round(RATIO)} times its lowest
         </div>
       </Note>

@@ -81,7 +81,7 @@ export const MisreadScene: React.FC = () => {
 
       {/* ── 1. "A 95% chance the true mean is in this interval" ── */}
       <Ink at={misreadFrom - 8} dur={12} style={{ left: LEFT, top: y(ROWS[0] - 40) }}>
-        <span style={label(21, INK_SOFT)}>Misreading 1</span>
+        <span style={label(24, INK_SOFT)}>Misreading 1</span>
       </Ink>
       {quote(
         misreadFrom - 4,
@@ -99,10 +99,10 @@ export const MisreadScene: React.FC = () => {
         ROWS[0],
       )}
       <Note at={movesAt - 2} x={LEFT} y={y(ROWS[0] + 64)}>
-        <span style={{ ...note(25, INK) }}>The true mean never moves.</span>
+        <span style={{ ...note(24, INK) }}>The true mean never moves.</span>
       </Note>
       <Note at={drawnAt - 2} x={LEFT} y={y(ROWS[0] + 102)}>
-        <span style={{ ...note(25, INK) }}>
+        <span style={{ ...note(24, INK) }}>
           Once the interval is drawn,{" "}
           <span style={{ opacity: ease(frame, inAt - 2, 10) }}>it’s in</span>
           <span style={{ opacity: ease(frame, outAt - 2, 10) }}>, or it’s out.</span>
@@ -115,35 +115,35 @@ export const MisreadScene: React.FC = () => {
       </Svg>
       <Rule x={muX} y0={y(ROWS[0] + 130)} y1={y(ROWS[0] + 20)} at={neverAt} dur={16} color={INK} width={2.4} dash="7 6" />
       <Note at={movesAt} x={muX - 12} y={y(ROWS[0] + 2)} align="right" from="right">
-        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           the true mean, <Mu /> = ${USERS.mu}: fixed
         </span>
       </Note>
       <Note at={randomAt - 2} x={sx(NARROW, USERS.hi) + 18} y={y(ROWS[0] + 56)}>
-        <span style={{ ...note(22, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>nothing random left</span>
+        <span style={{ ...note(24, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>nothing random left</span>
       </Note>
       <Note at={inAt - 2} x={muX + 12} y={y(ROWS[0] + 84)}>
-        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>in</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>in</span>
       </Note>
 
       <div style={{ position: "absolute", left: LEFT, right: 160, top: y(ROWS[1] - 50), height: 1, background: HAIRLINE, opacity: 0.6 * ease(frame, dataFrom - 6, 12) }} />
 
       {/* ── 2. "95% of the data falls inside" ── */}
       <Ink at={dataFrom - 6} dur={12} style={{ left: LEFT, top: y(ROWS[1] - 26) }}>
-        <span style={label(21, INK_SOFT)}>Misreading 2</span>
+        <span style={label(24, INK_SOFT)}>Misreading 2</span>
       </Ink>
       {quote(dataFrom - 2, onlyAt - 2, <>“95% of the {<Marked at={dataAt - 2} color={HIGHLIGHT} out={onlyAt}>data</Marked>} falls inside.”</>, ROWS[1] + 6)}
       <Note at={elevenAt - 2} x={LEFT} y={y(ROWS[1] + 70)}>
-        <span style={{ ...note(25, INK) }}>
+        <span style={{ ...note(24, INK) }}>
           Only <b>{USERS.insideCi}</b> of the {USERS.n} users spend inside it.
         </span>
       </Note>
       <Note at={averageAt - 2} x={LEFT} y={y(ROWS[1] + 108)}>
-        <span style={{ ...note(25, INK) }}>It pins down their average, not any one person.</span>
+        <span style={{ ...note(24, INK) }}>It pins down their average, not any one person.</span>
       </Note>
       <Axis scale={WIDE} base={y(ROWS[1] + 140)} ticks={[10, 30, 50, 70, 90]} format={(v) => `$${v}`} at={dataAt - 6} />
       <Note at={backAt} x={WIDE.x0} y={y(ROWS[1] + 30)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the same {USERS.n} users</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the same {USERS.n} users</span>
       </Note>
       <Svg>
         <rect
@@ -189,13 +189,13 @@ export const MisreadScene: React.FC = () => {
         tick={10}
       />
       <Note at={elevenAt} x={sx(WIDE, USERS.hi) + 16} y={y(ROWS[1] + 20)}>
-        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           the interval: {USERS.insideCi} of {USERS.n} inside
         </span>
       </Note>
       <Bracket x0={sx(WIDE, USERS.twoSdLo)} x1={sx(WIDE, USERS.twoSdHi)} y={y(ROWS[1] + 186)} at={averageAt} color={DATA} up width={2.4} />
       <Note at={personAt - 4} x={(sx(WIDE, USERS.twoSdLo) + sx(WIDE, USERS.twoSdHi)) / 2} y={y(ROWS[1] + 194)} from="up">
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           where the people are: {USERS.insideTwoSd} of {USERS.n} within two spreads of the average
         </span>
       </Note>
@@ -204,23 +204,23 @@ export const MisreadScene: React.FC = () => {
 
       {/* ── 3. "A wider interval is safer" ── */}
       <Ink at={saferFrom - 6} dur={12} style={{ left: LEFT, top: y(ROWS[2] - 2) }}>
-        <span style={label(21, INK_SOFT)}>Misreading 3</span>
+        <span style={label(24, INK_SOFT)}>Misreading 3</span>
       </Ink>
       {quote(saferFrom - 2, isntAt - 2, <>“A wider interval is safer.”</>, ROWS[2] + 30)}
       <Note at={preciseAt - 6} x={LEFT} y={y(ROWS[2] + 92)}>
-        <span style={{ ...note(25, INK) }}>Wider just means less precise.</span>
+        <span style={{ ...note(24, INK) }}>Wider just means less precise.</span>
       </Note>
       <Axis scale={NARROW} base={y(ROWS[2] + 140)} ticks={[40, 45, 50, 55, 60]} format={(v) => `$${v}`} at={saferFrom} />
       <IntervalBar x0={sx(NARROW, USERS.lo)} x1={sx(NARROW, USERS.hi)} y={y(ROWS[2] + 56)} at={saferFrom + 2} color={INK} width={3.4} tick={10} />
       <Note at={saferFrom + 6} x={sx(NARROW, USERS.lo) - 14} y={y(ROWS[2] + 56) - 14} align="right">
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>95%</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>95%</span>
       </Note>
       <IntervalBar x0={sx(NARROW, USERS.vagueLo)} x1={sx(NARROW, USERS.vagueHi)} y={y(ROWS[2] + 100)} at={isntAt} dur={20} color={EST} width={3.4} tick={10} />
       <Note at={isntAt + 6} x={sx(NARROW, USERS.vagueLo) - 14} y={y(ROWS[2] + 100) - 14} align="right">
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>99.99%</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>99.99%</span>
       </Note>
       <Note at={preciseAt - 2} x={sx(NARROW, USERS.vagueHi) + 14} y={y(ROWS[2] + 100) - 14}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           {money(USERS.vagueLo)} to {money(USERS.vagueHi)}
         </span>
       </Note>

@@ -218,7 +218,7 @@ export const PlanBox: React.FC<{
   const lineH = Math.round(size * 1.7);
   return (
     <div style={{ position: "absolute", left: x, top, width, opacity: p * (1 - o) * (1 - d) }}>
-      <div style={{ ...label(19, INK_SOFT), marginBottom: 10, whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...label(24, INK_SOFT), marginBottom: 10, whiteSpace: "nowrap" }}>{title}</div>
       <div
         style={{
           background: ds("gray", 50),

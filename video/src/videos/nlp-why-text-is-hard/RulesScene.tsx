@@ -124,10 +124,10 @@ export const RulesScene: React.FC = () => {
 
         {/* A real rule: NLTK's stopword list. */}
         <Ink at={stopAt - 2} dur={16} style={{ left: COL_X[0], top: y(ROW_Y[0]) + 52, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK_SOFT) }}>like NLTK's stopword list, {STOPWORDS.count} words:</span>
+          <span style={{ ...note(24, INK_SOFT) }}>like NLTK's stopword list, {STOPWORDS.count} words:</span>
         </Ink>
         <Ink at={stopAt + 4} dur={16} style={{ left: COL_X[0], top: y(ROW_Y[0]) + 84, whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: MONO, fontSize: 21, color: INK }}>{STOPWORDS.first.slice(0, 4).join(", ")}, …</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, color: INK }}>{STOPWORDS.first.slice(0, 4).join(", ")}, …</span>
         </Ink>
         {/* As the narration turns to the pipeline, learning steps back. */}
         <div

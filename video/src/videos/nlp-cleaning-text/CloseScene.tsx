@@ -102,7 +102,7 @@ export const CloseScene: React.FC = () => {
       })}
 
       <Ink at={cleaningAt - 4} dur={18} style={{ left: X0, top: y(NOTE_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(38), color: INK }}>
+        <span style={{ ...body(34), color: INK }}>
           Know what you threw away, and whether your task <span style={{ fontStyle: SERIF_ITALIC }}>needed</span> it.
         </span>
       </Ink>

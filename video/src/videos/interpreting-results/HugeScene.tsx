@@ -147,18 +147,18 @@ export const HugeScene: React.FC = () => {
         <Axis scale={X} base={y(BASE)} ticks={[40, 70, 100, 130, 160]} at={thereAt - 4} />
         {(["A", "B"] as const).map((g, i) => (
           <Note key={g} at={(i ? peopleAt : groupsAt) + 4} x={i ? sx(X, 121) + 18 : sx(X, 79) - 18} y={i ? py(121) - 30 : py(79) - 30} align={i ? "left" : "right"}>
-            <span style={{ ...label(22, COLOR_INK[i]), ...halo, whiteSpace: "nowrap" }}>Group {g}</span>
+            <span style={{ ...label(24, COLOR_INK[i]), ...halo, whiteSpace: "nowrap" }}>Group {g}</span>
           </Note>
         ))}
 
         <Note at={scoreAt - 2} x={X.x1} y={y(BASE) + 40} align="right">
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>score</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>score</span>
         </Note>
 
         {/* One standard deviation, under the left half of the curves. */}
         <Bracket x0={sx(X, 100 - 15)} x1={sx(X, 100)} y={y(BASE) + 52} at={fifteenAt - 4} up width={lerp(2.2, 3.6, spreadBold)} />
         <Note at={fifteenAt} x={(sx(X, 85) + sx(X, 100)) / 2} y={y(BASE) + 62} from="up">
-          <span style={{ ...note(21, INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
             spread: about 15 points
           </span>
         </Note>
@@ -193,7 +193,7 @@ export const HugeScene: React.FC = () => {
           color={HAIRLINE}
         />
         <Note at={seventhAt + 2} x={LX.x0 - 6} y={loupeTop + 8}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the two averages, enlarged</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the two averages, enlarged</span>
         </Note>
         <Bracket x0={sx(LX, mx[0])} x1={sx(LX, mx[1])} y={loupeTop + 70} at={seventhAt + 6} up={false} tick={10} />
         <Note at={seventhAt + 8} x={(sx(LX, mx[0]) + sx(LX, mx[1])) / 2} y={loupeTop + 82} from="up">
@@ -233,12 +233,12 @@ export const HugeScene: React.FC = () => {
       </div>
       <Ring x={RIGHT + 170} y={y(ROW1) + 78} at={passingAt - 2} r0={40} r1={130} />
       <Note at={sigAt - 2} x={RIGHT} y={y(ROW1) + 126}>
-        <span style={{ ...note(26, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: 1 - pDim }}>
+        <span style={{ ...note(28, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: 1 - pDim }}>
           <Marker at={realAt - 2}>yes: significant</Marker>
         </span>
       </Note>
       <Note at={dataAt - 2} x={RIGHT} y={y(ROW1) + 172}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           and it shrinks as the sample <Marker at={passesAt - 2}>grows</Marker>
         </span>
       </Note>
@@ -263,12 +263,12 @@ export const HugeScene: React.FC = () => {
         d = {fmt(HUGE.d, 3)}
       </div>
       <Note at={percentAt + 6} x={RIGHT} y={y(ROW2) + 126}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           the gap, {fmt(HUGE.gap, 2)}, over the spread, <Marker at={deviationAt - 2}>{fmt(HUGE.sd, 1)}</Marker>
         </span>
       </Note>
       <Note at={smallAt - 2} x={RIGHT} y={y(ROW2) + 166}>
-        <span style={{ ...note(26, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no: negligible</span>
+        <span style={{ ...note(28, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no: negligible</span>
       </Note>
     </AbsoluteFill>
   );

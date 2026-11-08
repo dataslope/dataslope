@@ -175,9 +175,9 @@ export const OrderScene: React.FC = () => {
             transform: `translateY(${(1 - list) * 10}px)`,
           }}
         >
-          <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>NLTK's stopwords, {STOPWORDS.count} of them</div>
+          <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>NLTK's stopwords, {STOPWORDS.count} of them</div>
           <div style={{ fontFamily: MONO, fontSize: 24, color: INK, marginTop: 10, whiteSpace: "nowrap" }}>{LISTED.join(", ")}, …</div>
-          <div style={{ ...note(22, INK), marginTop: 10, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(24, INK), marginTop: 10, whiteSpace: "nowrap" }}>
             <Mark at={lowercaseAt - 2}>all lowercase</Mark>
           </div>
         </div>
@@ -189,7 +189,7 @@ export const OrderScene: React.FC = () => {
       <RowName text="then filter" at={aRemoveAt - 4} top={top(ROW_Y.a2)} markAt={stepsAt + 4} />
       <ChipLine row={ORDER.a.filtered} top={top(ROW_Y.a2)} at={goneAt + 2} good={endNearAt} />
       <Ink at={endNearAt + 2} dur={14} style={{ left: ROW_RIGHT + 40, top: top(ROW_Y.a2) + 8, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(30, true), color: GOOD_INK }}>every the is gone</span>
+        <span style={{ ...body(28, true), color: GOOD_INK }}>every the is gone</span>
       </Ink>
 
       {/* ── Order B: filter, then lowercase ── */}
@@ -206,12 +206,12 @@ export const OrderScene: React.FC = () => {
         flash={(c) => (theCols.includes(c) ? wrongAt + theCols.indexOf(c) * 3 : undefined)}
       />
       <Ink at={crashedAt - 2} dur={14} style={{ left: ROW_RIGHT + 40, top: top(ROW_Y.b2) + 8, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(30, true), color: BAD_INK }}>
+        <span style={{ ...body(28, true), color: BAD_INK }}>
           no error, <Mark at={wrongAt - 2}>just wrong</Mark>
         </span>
       </Ink>
       <Ink at={silentAt - 4} dur={14} style={{ left: ROW_RIGHT + 40, top: top(ROW_Y.b2) + 56, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK_SOFT) }}>order bugs are silent</span>
+        <span style={{ ...note(24, INK_SOFT) }}>order bugs are silent</span>
       </Ink>
 
       {/* "Where one word ends": a cursor hops from gap to gap along the

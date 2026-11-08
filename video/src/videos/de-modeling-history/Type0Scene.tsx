@@ -150,10 +150,10 @@ export const Type0Scene: React.FC = () => {
           marks={[{ row: 0, col: T.cols.indexOf("signup_date"), at: standsAt + 2, color: MARK_OK }]}
         />
         <Note at={nothingAt + 8} x={g.right + 24} y={g.rowTop(1) + h(8)} out={standsAt + 18}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>ignored</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>ignored</span>
         </Note>
         <Note at={standsAt + 26} x={TABLE_X} y={g.rowTop(1) + h(20)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the first value stands</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the first value stands</span>
         </Note>
 
         {/* In a Type 2 dimension: each new version copies the date. */}
@@ -174,14 +174,14 @@ export const Type0Scene: React.FC = () => {
           ]}
         />
         <Note at={sourceAt} x={TABLE_X} y={gm.rowTop(M.rows.length) + h(16)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             the source sent {sent}: ignored
           </span>
         </Note>
 
         {/* Types are per column: one row, each column with its own. */}
         <Note at={perAt} x={X0} y={stripY - h(42)}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>one customer row, a type per column</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>one customer row, a type per column</span>
         </Note>
         {/* Three columns of plain text, a column's name over its type,
             with a hairline in each gap that inks in with the column to its
@@ -198,7 +198,7 @@ export const Type0Scene: React.FC = () => {
                   <div style={{ marginTop: 12 }}>
                     <span
                       style={{
-                        ...label(21, INK),
+                        ...label(24, INK),
                         fontWeight: 500,
                         whiteSpace: "nowrap",
                         padding: "1px 6px",

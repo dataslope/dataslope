@@ -329,17 +329,17 @@ export const CurveScene: React.FC = () => {
       {LIN_TICKS.map((v) => (
         <div
           key={`l${v}`}
-          style={{ position: "absolute", left: CX0 - 30, top: linY(v), transform: "translate(-100%, -50%)", opacity: axesIn * linTicksO, ...note(20, INK_SOFT), ...TABULAR }}
+          style={{ position: "absolute", left: CX0 - 30, top: linY(v), transform: "translate(-100%, -50%)", opacity: axesIn * linTicksO, ...note(24, INK_SOFT), ...TABULAR }}
         >
           {fmt(v, 0)}
         </div>
       ))}
       {LOG_TICKS.map((v, i) => (
         <React.Fragment key={`g${v}`}>
-          <div style={{ position: "absolute", left: CX0 - 30, top: logY(v), transform: "translate(-100%, -50%)", opacity: logTicksO, ...note(20, INK_SOFT), ...TABULAR }}>
+          <div style={{ position: "absolute", left: CX0 - 30, top: logY(v), transform: "translate(-100%, -50%)", opacity: logTicksO, ...note(24, INK_SOFT), ...TABULAR }}>
             <Mark at={tenAt + i * 5} out={straightensAt}>{fmt(v, 0)}</Mark>
           </div>
-          <div style={{ position: "absolute", left: logX(v), top: CY1 + 14, transform: "translateX(-50%)", opacity: logTicksO, ...note(20, INK_SOFT), ...TABULAR }}>
+          <div style={{ position: "absolute", left: logX(v), top: CY1 + 14, transform: "translateX(-50%)", opacity: logTicksO, ...note(24, INK_SOFT), ...TABULAR }}>
             <Mark at={tenAt + i * 5} out={straightensAt}>{fmt(v, 0)}</Mark>
           </div>
         </React.Fragment>
@@ -367,14 +367,14 @@ export const CurveScene: React.FC = () => {
             top: CY1 + 12,
             transform: "translateX(-50%)",
             opacity: barIn(i + 1) * wordsOut,
-            ...label(20, INK),
+            ...label(24, INK),
             fontWeight: 500,
           }}
         >
           {i === 0 ? <Mark at={toAt - 2}>{r.word}</Mark> : r.word}
         </div>
       ))}
-      <div style={{ position: "absolute", left: linX(0.5), top: CY1 + 14, transform: "translateX(-50%)", opacity: ease(frame, countsAt + 6, 10) * linTicksO, ...note(20, INK_SOFT), ...TABULAR }}>
+      <div style={{ position: "absolute", left: linX(0.5), top: CY1 + 14, transform: "translateX(-50%)", opacity: ease(frame, countsAt + 6, 10) * linTicksO, ...note(24, INK_SOFT), ...TABULAR }}>
         1
       </div>
       {tickSets.map(({ s, o, ticks }) =>
@@ -384,7 +384,7 @@ export const CurveScene: React.FC = () => {
                 <Svg opacity={o}>
                   <line x1={linX(v - 0.5)} x2={linX(v - 0.5)} y1={CY1 + 1} y2={CY1 + 8} stroke={INK} strokeWidth={1.2} />
                 </Svg>
-                <div style={{ position: "absolute", left: linX(v - 0.5), top: CY1 + 14, transform: "translateX(-50%)", opacity: o, ...note(20, INK_SOFT), ...TABULAR }}>
+                <div style={{ position: "absolute", left: linX(v - 0.5), top: CY1 + 14, transform: "translateX(-50%)", opacity: o, ...note(24, INK_SOFT), ...TABULAR }}>
                   {niceRank(v)}
                 </div>
               </React.Fragment>
@@ -399,7 +399,7 @@ export const CurveScene: React.FC = () => {
           top: CY1 + 14,
           transform: "translateX(-50%)",
           opacity: counterOn * linTicksO,
-          ...note(20, DATA_INK),
+          ...note(24, DATA_INK),
           fontWeight: 500,
           ...TABULAR,
         }}

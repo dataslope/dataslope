@@ -111,7 +111,7 @@ export const FilterScene: React.FC = () => {
           Why do metadata filters make vector search harder?
         </QuestionCard>
         <Note at={simAt - 2} x={X0} y={y(244)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             the index is built for similarity
             <span style={{ opacity: ease(frame, yourAt - 2, 10) }}>
               , <Mark at={yourAt + 4}>not for your filter</Mark>
@@ -160,7 +160,7 @@ export const FilterScene: React.FC = () => {
         </svg>
         <QueryMark x={px(Q.x)} y={py(Q.y)} at={postAt} />
         <Note at={yourAt + 4} x={SC.x} y={top + SC.h + 20}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: 7, background: DATA, marginRight: 8 }} />
             this user&apos;s tenant
             <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: 6, background: QUIET, margin: "0 8px 0 24px" }} />
@@ -168,26 +168,26 @@ export const FilterScene: React.FC = () => {
           </span>
         </Note>
         <Note at={postAt} x={SC.x} y={top + SC.h + 60} dim={preAt}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>post-filter</b>: the ten nearest
             <span style={{ opacity: ease(frame, dropsAt - 2, 10) }}>, then drop the rest</span>
             <span style={{ opacity: ease(frame, fewerAt - 2, 10), color: ACCENT_INK, fontWeight: 500 }}>: 0 of 10 left</span>
           </span>
         </Note>
         <Note at={preAt} x={SC.x} y={top + SC.h + 100}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>pre-filter</b>: this tenant first, a full ten
             <span style={{ opacity: ease(frame, correctAt - 2, 10), color: OK_INK, fontWeight: 500 }}>, correct</span>
           </span>
         </Note>
         <Note at={smallAt - 2} x={SC.x} y={top + SC.h + 140}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             a small subset: scan it exactly
             <span style={{ opacity: ease(frame, bigAt - 2, 10) }}> · too big to scan: use the index</span>
           </span>
         </Note>
         <Note at={builtAt - 2} x={SC.x} y={top + SC.h + 176}>
-          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             but it wasn&apos;t built for the subset
             <span style={{ opacity: ease(frame, skipAt - 2, 10) }}>: most points it visits are skipped</span>
           </span>
@@ -195,7 +195,7 @@ export const FilterScene: React.FC = () => {
 
         {/* The simulation's 200 searches. */}
         <Note at={sameAt - 2} x={GRID.x} y={gridTop - 112}>
-          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             the same simulation
             <span style={{ opacity: ease(frame, tenantsAt - 2, 10), fontWeight: 500 }}>: {FILTER.tenants} tenants</span>
             <span style={{ opacity: ease(frame, keepAt - 2, 10), fontWeight: 500 }}>, top {FILTER.k} kept to one</span>
@@ -226,7 +226,7 @@ export const FilterScene: React.FC = () => {
           </span>
         </Note>
         <Note at={emptyAt + 6} x={GRID.x} y={gridTop + 10 * (GRID.cell + GRID.gap) + 62}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: 3, background: DATA, marginRight: 8, verticalAlign: "-1px" }} />
             the rest found one
           </span>

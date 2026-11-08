@@ -96,7 +96,7 @@ export const IdemScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={sameAt - 2} x={X0} y={top}>
-          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mark at={sameAt + 4}>the same final state</Mark>
             <FadeIn at={manyAt}>, however many times it runs</FadeIn>
           </span>
@@ -117,7 +117,7 @@ export const IdemScene: React.FC = () => {
           h={h}
         />
         <Note at={rerunAt} x={OUT_X} y={rows - h(4)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the same two events, sent twice</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the same two events, sent twice</span>
         </Note>
 
         <Way
@@ -132,7 +132,7 @@ export const IdemScene: React.FC = () => {
           h={h}
         />
         <Note at={upsertAt + 6} x={OUT_X} y={rows + h(ROW) - h(4)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             an upsert: update the row if its key exists, insert it if not
           </span>
         </Note>
@@ -149,7 +149,7 @@ export const IdemScene: React.FC = () => {
           h={h}
         />
         <Note at={addAt} x={OUT_X} y={rows + 2 * h(ROW) - h(4)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>payments of {IDEM.amounts.join(" and ")}</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>payments of {IDEM.amounts.join(" and ")}</span>
         </Note>
         <Note at={setAt} x={X0} y={rows + 3 * h(ROW) - h(10)}>
           <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
@@ -162,7 +162,7 @@ export const IdemScene: React.FC = () => {
         {/* The same rule at warehouse scale (no narration: the line is the
             data engineer's form of the answer). */}
         <Note at={setAt + 30} x={OUT_X} y={rows + 3 * h(ROW) - h(4)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             in a warehouse: overwrite the day&apos;s partition, or <Mono>MERGE</Mono> on the key
           </span>
         </Note>

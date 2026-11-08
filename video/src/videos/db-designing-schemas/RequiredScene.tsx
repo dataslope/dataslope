@@ -97,7 +97,7 @@ export const RequiredScene: React.FC = () => {
             borderBottom: `1px solid ${HAIRLINE}`,
             background: ds("gray", 50),
             fontFamily: MONO,
-            fontSize: 26,
+            fontSize: 28,
             lineHeight: 1.5,
             color: INK,
             whiteSpace: "pre",
@@ -139,11 +139,11 @@ export const RequiredScene: React.FC = () => {
       ))}
       {/* "Priority": the new requirement, beside the table it lands on. */}
       <Ink at={priorityAt - 2} dur={14} out={stepsAt - 4} style={{ left: g.x + g.width + 30, top: g.top + 8, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(30, true), color: INK_SOFT }}>every task needs one</span>
+        <span style={{ ...body(28, true), color: INK_SOFT }}>every task needs one</span>
       </Ink>
       <ErrorBox x={X} top={g.rowTop(TASKS.length) + 40} width={1000} at={refusesAt - 2} out={ghostOut} message={ONE_STEP.message} detail={ONE_STEP.detail} />
       <Ink at={brokenAt - 4} dur={14} out={ghostOut} style={{ left: X, top: g.rowTop(TASKS.length) + 150, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(30, true), color: INK }}>broken the moment it existed</span>
+        <span style={{ ...body(28, true), color: INK }}>broken the moment it existed</span>
       </Ink>
 
       {/* ── The four steps ── */}
@@ -169,7 +169,7 @@ export const RequiredScene: React.FC = () => {
                 fontWeight: 500,
                 // The number, the step and its note share a line, so their
                 // sizes stay within 12% of each other: 22, 24 and 22.
-                fontSize: 22,
+                fontSize: 24,
               }}
             >
               {i + 1}
@@ -178,14 +178,14 @@ export const RequiredScene: React.FC = () => {
               <span style={{ position: "absolute", left: "-0.2em", right: "-0.2em", top: "0.05em", bottom: "-0.05em", background: HIGHLIGHT, borderRadius: "0.14em", opacity: lit }} />
               <span style={{ position: "relative" }}>{s.title}</span>
             </span>
-            <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, (s.detailAt ?? s.at) + 4, 12) }}>{s.detail}</span>
+            <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, (s.detailAt ?? s.at) + 4, 12) }}>{s.detail}</span>
           </Ink>
         );
       })}
       <Ping x={g.xs[4] + 60} y={g.top + g.headH / 2} at={makeAt + 2} color={KEY} r={34} />
 
       <Ink at={decisionAt - 2} dur={16} style={{ left: X, top: g.rowTop(TASKS.length) + 44, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(32, true), color: INK }}>
+        <span style={{ ...body(34, true), color: INK }}>
           A backfill decides what the old rows <Mark at={meanAt - 2}>mean</Mark>.
         </span>
       </Ink>

@@ -168,7 +168,7 @@ export const IndexScene: React.FC = () => {
           ]}
         />
         <Note at={pagesAt + 8} x={X0} y={planTop + h(196)} out={levelsAt - 4}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             hit + read: <Num>{thousands(INDEX.seqBuffers.hit)}</Num> + <Num>{thousands(INDEX.seqBuffers.read)}</Num> = <b>{thousands(INDEX.seqPages)}</b> pages, for <b>1</b> row
           </span>
         </Note>
@@ -210,7 +210,7 @@ export const IndexScene: React.FC = () => {
 
         {/* log n against n, under the plan */}
         <Note at={logAt} x={X0} y={planTop + h(196)} out={kindAt - 4}>
-          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             index: <i>O</i>(log <i>n</i>)
             <span style={{ color: INK_SOFT }}> against </span>
             scan: <i>O</i>(<i>n</i>)
@@ -218,7 +218,7 @@ export const IndexScene: React.FC = () => {
         </Note>
 
         {/* ── Right: the table, page by page ── */}
-        <div style={{ position: "absolute", right: 1920 - (R_X + R_W), top: gridTop - h(40), ...label(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, findAt, 12) }}>
+        <div style={{ position: "absolute", right: 1920 - (R_X + R_W), top: gridTop - h(40), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, findAt, 12) }}>
           users: <Num>{thousands(INDEX.pages)}</Num> pages, <span style={{ color: INK }}>{INDEX.size}</span>
         </div>
         <PageGrid
@@ -240,7 +240,7 @@ export const IndexScene: React.FC = () => {
           ]}
         />
         <Note at={keepAt + 4} x={R_X + 40} y={gridBottom + h(18)} out={structAt}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             every page read, <b>1</b> row kept: the first page holds it
           </span>
         </Note>
@@ -272,7 +272,7 @@ export const IndexScene: React.FC = () => {
           ))}
         </Svg>
         <Note at={levelsAt} x={R_X + 20} y={lv[0] + NODE_H / 2 - h(15)} out={treeOut}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>3 levels</b> deep
           </span>
         </Note>
@@ -289,7 +289,7 @@ export const IndexScene: React.FC = () => {
           out={treeOut}
         />
         <Note at={rangesAt + 10} x={leafX[4] + NODE_W / 2 + 18} y={lv[2] + NODE_H + h(2)} out={treeOut}>
-          <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>a range</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>a range</span>
         </Note>
         {/* From the leaf to the one table page. */}
         <Flow
@@ -315,7 +315,7 @@ export const IndexScene: React.FC = () => {
         {/* ── A hash index ── */}
         <Listing lines={INDEX.hashCreate} x={R_X} top={y(TOP) - h(4)} width={R_W} size={19} at={hashAt} />
         <Svg opacity={ease(frame, hashAt, 12)}>
-          <text x={hashBox.x + hashBox.w / 2} y={hashBox.y + hashBox.h / 2 + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 23, fontWeight: 500, color: INK })}>
+          <text x={hashBox.x + hashBox.w / 2} y={hashBox.y + hashBox.h / 2 + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK })}>
             hash(email)
           </text>
           {Array.from({ length: BUCKETS }, (_, i) => {
@@ -340,7 +340,7 @@ export const IndexScene: React.FC = () => {
         </Svg>
         <Flow points={[[hashBox.x + hashBox.w - 30, hashBox.y + hashBox.h + 6], [bucketX(eqBucket) + bucketW / 2, bucketY - 10]]} at={straightAt} color={OK} width={3} out={rangeAt} />
         <Note at={straightAt + 6} x={hashBox.x + hashBox.w + 36} y={hashTop + h(10)} out={rangeAt}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>equality:</b> one bucket
           </span>
         </Note>
@@ -356,10 +356,10 @@ export const IndexScene: React.FC = () => {
           />
         ))}
         <Note at={rangeAt + 10} x={hashBox.x + hashBox.w + 36} y={hashTop + h(10)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: ACCENT_INK }}>a range:</b>
           </span>
-          <div style={{ ...note(22, INK), whiteSpace: "nowrap", marginTop: h(6) }}>scattered buckets, nothing to walk</div>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(6) }}>scattered buckets, nothing to walk</div>
         </Note>
       </Drift>
     </AbsoluteFill>

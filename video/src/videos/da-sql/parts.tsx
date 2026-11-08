@@ -466,10 +466,10 @@ export const NoRows: React.FC<{ x: number; top: number; at: number; col: string;
   return (
     <Ink at={at} dur={14} out={out} style={{ left: x, top, opacity: 1 - d }}>
       <div style={{ borderTop: `2px solid ${INK}`, borderBottom: `1.5px solid ${INK}`, width: 260 }}>
-        <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK_SOFT, padding: "10px 20px", borderBottom: `1px solid ${HAIRLINE}` }}>
+        <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, padding: "10px 20px", borderBottom: `1px solid ${HAIRLINE}` }}>
           {col}
         </div>
-        <div style={{ ...note(22, INK_SOFT), padding: "12px 20px" }}>0 rows</div>
+        <div style={{ ...note(24, INK_SOFT), padding: "12px 20px" }}>0 rows</div>
       </div>
     </Ink>
   );
@@ -856,7 +856,7 @@ export const TableName: React.FC<{ g: TableGeometry; at: number; children: React
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   return (
     <Ink at={at} dur={12} out={out} style={{ left: g.x, top: g.top - 38, whiteSpace: "nowrap", opacity: 1 - d }}>
-      <span style={{ ...label(21, INK), fontWeight: 500 }}>{children}</span>
+      <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
     </Ink>
   );
 };

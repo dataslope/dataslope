@@ -30,7 +30,7 @@ const RowName: React.FC<{ at: number; expandAt: number; x: number; y: number; na
   return (
     <Note at={at} x={x} y={y}>
       <div style={{ ...label(44, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</div>
-      <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, expandAt, 12) }}>{words}</div>
+      <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, expandAt, 12) }}>{words}</div>
       {tag ? (
         <div style={{ marginTop: 10, opacity: ease(frame, tag.at, 10) }}>
           <span style={{ ...badgeStyle("green", 20), fontFamily: SANS, background: strongTint("green") }}>{tag.text}</span>
@@ -145,7 +145,7 @@ export const EtlScene: React.FC = () => {
           }}
         />
         <Note at={rawAt} x={WH.x + 18} y={WH.top + 8}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>warehouse</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>warehouse</span>
         </Note>
         <Flow points={[[SRC_X + SRC_W + 6, lmid], [raw.x - 8, lmid]]} at={rawAt} color={BAR} />
         <Node x={raw.x} y={ly + h(8)} w={raw.w} h={BOX_H} at={rawAt + 4} title="raw tables" sub="as loaded" lit={rawLit} />
@@ -159,7 +159,7 @@ export const EtlScene: React.FC = () => {
           cheap, elastic compute
         </Pill>
         <Note at={fastAt} x={WH.x + 516} y={WH.top - 46}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>so transforming in place is fast</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>so transforming in place is fast</span>
         </Note>
         {/* New logic: back from the raw tables into the transform, with no new extract. */}
         <Flow

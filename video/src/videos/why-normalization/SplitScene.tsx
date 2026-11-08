@@ -123,7 +123,7 @@ export const SplitScene: React.FC = () => {
         dur={14}
         style={{ left: og.xs[O.customer], top: y(CAPTION_Y) + 2, width: og.widths[O.customer], textAlign: "right" }}
       >
-        <span style={{ ...label(21, KEY_INK), whiteSpace: "nowrap", paddingRight: 20 }}>foreign key</span>
+        <span style={{ ...label(24, KEY_INK), whiteSpace: "nowrap", paddingRight: 20 }}>foreign key</span>
       </Ink>
       <Ink at={splitAt} dur={14} style={{ left: cg.x, top: y(CAPTION_Y) }}>
         <span style={label(24, INK)}>

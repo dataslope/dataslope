@@ -142,14 +142,14 @@ export const VaultScene: React.FC = () => {
 
         {/* What `_hk` is: the business key, hashed. */}
         <Note at={hubsAt + 18} x={X0} y={hubC.y - h(44)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <span style={{ fontWeight: 500, color: INK }}>customer_hk</span>: a hash of customer_id
           </span>
         </Note>
 
         {/* The three kinds, named under the diagram's middle. */}
         <Note at={threeAt} x={midX} y={midTop}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>three kinds of table</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>three kinds of table</span>
         </Note>
         {[
           { at: hubsAt, name: "hubs", what: "business keys" },
@@ -179,14 +179,14 @@ export const VaultScene: React.FC = () => {
         {/* When to choose it. */}
         {whenNotes.map((w, i) => (
           <Note key={w.head} at={w.at - 2} x={NOTES_X} y={y(TOP) + h(10) + i * h(170)}>
-            <div style={{ ...note(26, w.ink), fontWeight: 500, whiteSpace: "nowrap" }}>{w.head}</div>
+            <div style={{ ...note(28, w.ink), fontWeight: 500, whiteSpace: "nowrap" }}>{w.head}</div>
             {w.lines.map((l, j) => (
-              <div key={l} style={{ ...label(22, i === 2 ? INK : INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, lineAt[i][j], 10) }}>
+              <div key={l} style={{ ...label(24, i === 2 ? INK : INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, lineAt[i][j], 10) }}>
                 {l}
               </div>
             ))}
             {i === 0 ? (
-              <div style={{ ...label(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, priceAt, 10) }}>
+              <div style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, priceAt, 10) }}>
                 price: <span style={{ opacity: 0.4 + 0.6 * ease(frame, joinsAt, 10) }}>a stack of joins</span>
               </div>
             ) : null}

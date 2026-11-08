@@ -72,7 +72,7 @@ const Stream: React.FC<{ at: number; x: number; top: number; width: number; heig
               alignItems: "center",
               gap: 12,
               fontFamily: MONO,
-              fontSize: 21,
+              fontSize: 24,
               color: INK,
               opacity: fade,
               whiteSpace: "nowrap",
@@ -257,12 +257,12 @@ export const OltpScene: React.FC = () => {
         {/* ── Between them: the job ── */}
         <KeyArrow from={[orders.right + 56, y(CHIP_TOP) + h(100)]} to={[R_X - 30, y(CHIP_TOP) + h(100)]} at={moveAt + 2} color={OK} />
         <Note at={moveAt + 8} x={orders.right + 56} y={y(CHIP_TOP) + h(100) - 52}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>reshape</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>reshape</span>
         </Note>
         {/* Under the arrow, a hairline and 28px of white before the words
             (README: room under a rule). */}
         <Note at={jobAt} x={orders.right + 56} y={y(CHIP_TOP) + h(100) + 18}>
-          <div style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER, borderTop: `1px solid ${HAIRLINE}`, paddingTop: 28 }}>
+          <div style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER, borderTop: `1px solid ${HAIRLINE}`, paddingTop: 28 }}>
             the data
             <br />
             engineer&apos;s job

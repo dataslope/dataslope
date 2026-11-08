@@ -185,8 +185,8 @@ export const HourScene: React.FC = () => {
                   opacity: ease(frame, p.named, 10),
                 }}
               >
-                <span style={{ ...label(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{p.phase}</span>
-                <span style={{ ...note(20, INK), whiteSpace: "nowrap" }}>{p.time}</span>
+                <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{p.phase}</span>
+                <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{p.time}</span>
               </div>
             </React.Fragment>
           );
@@ -194,10 +194,10 @@ export const HourScene: React.FC = () => {
 
         {/* Minutes under the bar; 50 and 55 arrive with the total. */}
         <Note at={sixtyAt} x={xAt(0)} y={y(TICK_Y)}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>0</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>0</span>
         </Note>
         <Note at={sixtyAt + 6} x={xAt(60)} y={y(TICK_Y)} align="right">
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Num>60</Num> min
           </span>
         </Note>
@@ -234,7 +234,7 @@ export const HourScene: React.FC = () => {
           <path d={`M${xAt(HOUR.lo)},${y(TOTAL_Y)} L${xAt(HOUR.hi)},${y(TOTAL_Y)} L${xAt(HOUR.hi)},${y(TOTAL_Y) - 10}`} fill="none" stroke={INK} strokeWidth={2} strokeDasharray="5 5" />
         </svg>
         <Note at={totalAt + 8} x={xAt(HOUR.lo) - 340} y={y(TOTAL_Y) + 8} width={340} align="right">
-          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{HOUR.lo}</Num> to <Num>{HOUR.hi}</Num> minutes of the <Num>60</Num>
           </span>
         </Note>

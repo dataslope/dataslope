@@ -120,13 +120,13 @@ export const DropScene: React.FC = () => {
           />
         </Svg>
         <Note at={usersAt} x={CHART.x0} y={y(CHART.top) - h(44)}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>daily active users</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>daily active users</span>
         </Note>
         <Note at={dauAt + 10} x={CHART.x0 - 16} align="right" y={vOf(DROP.totalBefore) - h(14)}>
-          <span style={{ ...label(20, INK), ...TABULAR, whiteSpace: "nowrap" }}>{num(DROP.totalBefore)}</span>
+          <span style={{ ...label(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>{num(DROP.totalBefore)}</span>
         </Note>
         <Note at={dauAt + 18} x={CHART.x1 + 14} y={vOf(DROP.totalAfter) - h(14)}>
-          <span style={{ ...label(20, ACCENT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
             {num(DROP.totalAfter)} ({pct(DROP.change)})
           </span>
         </Note>
@@ -141,7 +141,7 @@ export const DropScene: React.FC = () => {
           side="left"
           labelY={y(CHART.bottom) - h(30)}
           label={
-            <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={morningAt}>Android 5.2 released</Mark>
             </span>
           }
@@ -154,10 +154,10 @@ export const DropScene: React.FC = () => {
           </Tag>
         ))}
         <Note at={shapeAt} x={CHART.x0} y={y(BARS.top) + h(74)} out={fakeOut}>
-          <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>each can make that shape on its own</span>
+          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>each can make that shape on its own</span>
         </Note>
         <Note at={ruleAt} x={CHART.x0} y={y(BARS.top) + h(128)} out={fakeOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>rule them out:</b> <span style={{ opacity: ease(frame, yearAt, 10) }}>the same week last year</span>
             <span style={{ opacity: ease(frame, relatedAt, 10) }}>, related metrics</span>
           </span>
@@ -177,7 +177,7 @@ export const DropScene: React.FC = () => {
           return (
             <React.Fragment key={p}>
               <Note at={splitAt + i * 3} x={BARS.x0 - 20} align="right" y={top + h(2)}>
-                <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{p}</span>
+                <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{p}</span>
               </Note>
               <Svg opacity={grow}>
                 <rect x={BARS.x0} y={top} width={b * grow} height={h(BARS.h)} fill={DATA_LIGHT} rx={3} />
@@ -187,7 +187,7 @@ export const DropScene: React.FC = () => {
                 ) : null}
               </Svg>
               <Note at={(p === "Android" ? androidAt : barelyAt) + 6} x={BARS.x0 + b + 16} y={top + h(2)}>
-                <span style={{ ...label(21, lost > 1000 ? ACCENT_INK : INK_SOFT), fontWeight: lost > 1000 ? 500 : 500, ...TABULAR, whiteSpace: "nowrap" }}>
+                <span style={{ ...label(24, lost > 1000 ? ACCENT_INK : INK_SOFT), fontWeight: lost > 1000 ? 500 : 500, ...TABULAR, whiteSpace: "nowrap" }}>
                   {lost > 0 ? `−${num(lost)}` : "no change"}
                 </span>
               </Note>
@@ -195,7 +195,7 @@ export const DropScene: React.FC = () => {
           );
         })}
         <Note at={eightAt} x={BARS.x0} y={y(BARS.top) + 3 * h(BARS.gap) - h(6)}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
             Android: {num(DROP.byPlatform.Android.lost)} of the {num(DROP.lost)} lost
           </span>
         </Note>

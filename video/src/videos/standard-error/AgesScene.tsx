@@ -95,7 +95,7 @@ export const AgesScene: React.FC = () => {
 
       {/* ── The two names, each with what it is the spread of ── */}
       <Ink at={2} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(20, ACCENT_INK)}>
+        <span style={label(24, ACCENT_INK)}>
           <PartName />Two spreads, easily confused
         </span>
       </Ink>
@@ -112,7 +112,7 @@ export const AgesScene: React.FC = () => {
           </span>{" "}
           deviation
         </Ink>
-        <span style={{ display: "flex", alignItems: "baseline", gap: "0.25em", ...body(36, true), color: BLUE_INK }}>
+        <span style={{ display: "flex", alignItems: "baseline", gap: "0.25em", ...body(34, true), color: BLUE_INK }}>
           <Ink at={spreadAt - 2} dur={14} style={{ position: "relative" }}>
             the spread of
           </Ink>
@@ -128,7 +128,7 @@ export const AgesScene: React.FC = () => {
           </span>{" "}
           error
         </Ink>
-        <span style={{ display: "flex", alignItems: "baseline", gap: "0.25em", ...body(36, true), color: ACCENT_INK }}>
+        <span style={{ display: "flex", alignItems: "baseline", gap: "0.25em", ...body(34, true), color: ACCENT_INK }}>
           <Ink at={spreadAt + 4} dur={14} style={{ position: "relative" }}>
             the spread of
           </Ink>
@@ -163,14 +163,14 @@ export const AgesScene: React.FC = () => {
         })}
       </svg>
       <Note at={takeAt + 30} x={160} y={y(826)} out={differentAt}>
-        <span style={note(21, INK_SOFT)}>Each dot is one customer.</span>
+        <span style={note(24, INK_SOFT)}>Each dot is one customer.</span>
       </Note>
 
       {/* The standard deviation: a bracket one SD either side of the average. */}
       <Span x0={sx(X, AGES.mean - AGES.sd)} x1={sx(X, AGES.mean + AGES.sd)} y={y(SD_Y)} at={dataAt} dur={18} color={BLUE_INK} />
       <Note at={halfAt - 2} x={sx(X, AGES.mean + AGES.sd) + 18} y={y(SD_Y - 15)}>
         <div style={{ ...note(24, BLUE_INK), fontWeight: 500 }}>± {fmt(AGES.sd)} years</div>
-        <div style={note(20, INK_SOFT)}>one standard deviation</div>
+        <div style={note(24, INK_SOFT)}>one standard deviation</div>
       </Note>
 
       {/* The average, and the averages other samples would have had. */}
@@ -194,10 +194,10 @@ export const AgesScene: React.FC = () => {
       <Rule x={mx} y0={y(BASE)} y1={y(SE_Y)} at={averageAt - 2} dur={16} color={ACCENT} width={2.6} dash="7 6" />
       {/* Never spoken: it gives way when the standard error takes the row. */}
       <Note at={averageAt + 6} x={sx(X, AGES.mean - AGES.se) - 16} y={y(SE_Y) - 16} align="right" out={howFarAt}>
-        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500 }}>average {fmt(AGES.mean)}</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>average {fmt(AGES.mean)}</span>
       </Note>
       <Note at={differentAt + 8} x={160} y={y(826)}>
-        <span style={note(21, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Faint red lines: the averages of {AGES.others.length} other samples of {AGES.n} from the same population.
         </span>
       </Note>
@@ -206,11 +206,11 @@ export const AgesScene: React.FC = () => {
       <Span x0={sx(X, AGES.mean - AGES.se)} x1={sx(X, AGES.mean + AGES.se)} y={y(SE_Y)} at={howFarAt} dur={12} color={ACCENT} width={3} tick={10} />
       <Note at={seAt} x={sx(X, AGES.mean + AGES.se) + 16} y={y(SE_Y) - 16}>
         <div style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>± {fmt(AGES.se)} years</div>
-        <div style={note(20, INK_SOFT)}>one standard error</div>
+        <div style={note(24, INK_SOFT)}>one standard error</div>
       </Note>
       <Bell at={widthAt - 4} mx={mx} />
       <Note at={widthAt + 4} x={mx + 44} y={y(BELL_BASE - BELL_H - 8)}>
-        <span style={{ ...note(20, ACCENT_INK), fontWeight: 500 }}>its sampling distribution</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>its sampling distribution</span>
       </Note>
     </AbsoluteFill>
   );

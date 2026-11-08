@@ -123,12 +123,12 @@ export const IdfScene: React.FC = () => {
     return (
       <>
         <Ink at={at - 4} style={{ left: RX, top, whiteSpace: "nowrap" }}>
-          <div style={{ ...label(27, INK) }}>
+          <div style={{ ...label(28, INK) }}>
             a match on <span style={{ color: inkColor }}>{name}</span>
           </div>
         </Ink>
         <Ink at={docsAt} style={{ left: RX, top: top + R.docs, whiteSpace: "nowrap" }}>
-          <div style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>{docs}</div>
+          <div style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>{docs}</div>
         </Ink>
         {/* One point a match: the flat score, before her weights. */}
         <div style={{ position: "absolute", left: BAR_X, top: top + R.flat, width: UNIT * bar, height: 26, borderRadius: 4, background: color, opacity: bar > 0 ? before : 0 }} />
@@ -141,7 +141,7 @@ export const IdfScene: React.FC = () => {
           <span style={{ ...headline(44), ...TABULAR, color: INK }}>{ex.weight}</span>
         </Ink>
         <Ink at={weightAt + 12} style={{ left: BAR_X, top: top + R.formula, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK_SOFT) }}>
+          <span style={{ ...note(24, INK_SOFT) }}>
             her weight, about log<sub style={{ fontSize: "0.7em" }}>2</sub>({IDF.N} ÷ {ex.docs}) + 1 ={" "}
             <span style={TABULAR}>{fmt(ex.log2, 2)}</span>
           </span>
@@ -219,7 +219,7 @@ export const IdfScene: React.FC = () => {
           })}
         </svg>
         <Ink at={twoHundredAt - 2} style={{ left: GX, top: GY + 10 * (DH + GAP_Y) + 10, whiteSpace: "nowrap" }}>
-          <div style={{ ...label(23, INK_SOFT) }}>
+          <div style={{ ...label(24, INK_SOFT) }}>
             <span style={{ color: COMMON_INK, fontWeight: 500 }}>{IDF.common.docs}</span> hold the common word,{" "}
             <span style={{ color: DATA_INK, fontWeight: 500 }}>{IDF.rare.docs}</span> hold the rare one
           </div>
@@ -228,7 +228,7 @@ export const IdfScene: React.FC = () => {
         <Ink at={searchAt - 2} dur={16} style={{ left: RX, top: QUERY_Y, whiteSpace: "nowrap" }}>
           {/* The two words as house badges, in the gray and the blue the
               rows and the grid below give them. */}
-          <div style={{ display: "flex", alignItems: "baseline", gap: 14, ...label(23, INK_SOFT) }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 14, ...label(24, INK_SOFT) }}>
             a search for
             <Badge tone="gray" size={23}>
               a common word
@@ -268,10 +268,10 @@ export const IdfScene: React.FC = () => {
           threeAt - 2,
         )}
         <Ink at={muchAt} out={fewerAt - 6} style={{ left: RX, top: CLOSE_Y, whiteSpace: "nowrap" }}>
-          <div style={{ ...headline(36, true), color: INK }}>one match, one point, either way</div>
+          <div style={{ ...headline(34, true), color: INK }}>one match, one point, either way</div>
         </Ink>
       </div>
-      <div style={{ position: "absolute", left: RX, top: CLOSE_Y, display: "flex", gap: "0.3em", ...headline(36, true), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: RX, top: CLOSE_Y, display: "flex", gap: "0.3em", ...headline(34, true), whiteSpace: "nowrap" }}>
         <Ink at={inverseAt - 2} style={{ position: "relative", color: INK }}>
           <Mark at={inverseAt + 4}>inverse document frequency</Mark>,
         </Ink>
@@ -280,7 +280,7 @@ export const IdfScene: React.FC = () => {
         </Ink>
       </div>
       <Ink at={searchEnginesAt} style={{ left: RX, top: CLOSE2_Y, whiteSpace: "nowrap" }}>
-        <div style={{ ...label(23, INK_SOFT) }}>
+        <div style={{ ...label(24, INK_SOFT) }}>
           still weighting search results, <Mark at={todayAt}>half a century on</Mark>
         </div>
       </Ink>

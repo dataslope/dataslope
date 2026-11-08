@@ -105,7 +105,7 @@ export const FitScene: React.FC = () => {
 
         {/* ── The fit ── */}
         <Ink at={knowAt - 4} dur={14} style={{ left: PANEL_X, top: y(430), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>The parameters</span>
+          <span style={label(24, INK_SOFT)}>The parameters</span>
         </Ink>
         {[
           { name: "mean", value: FIT.loc, truth: FIT.trueLoc, digits: 2, at: knowAt, p: mean, yy: 474 },
@@ -132,7 +132,7 @@ export const FitScene: React.FC = () => {
           <span style={code(22, INK)}>stats.norm.fit(sample)</span>
         </Ink>
         <Note at={questionsAt} x={PANEL_X} y={y(624)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>then the model answers questions</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>then the model answers questions</span>
         </Note>
 
         {/* The catch: the skewed incomes get numbers too. */}
@@ -140,7 +140,7 @@ export const FitScene: React.FC = () => {
           <span style={code(22, INK)}>stats.norm.fit(incomes)</span>
         </Ink>
         <Note at={wrongAt} x={PANEL_X} y={y(728)}>
-          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             → {fmt(INCOME.fitLoc, 0)} and {fmt(INCOME.fitScale, 0)}
           </span>
         </Note>

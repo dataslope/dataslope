@@ -112,12 +112,12 @@ export const LadderScene: React.FC = () => {
           ].map((t) => (
             <g key={t.text} opacity={ease(frame, costsAt + 6, 12)}>
               <line x1={lx(t.ns)} x2={lx(t.ns)} y1={axisY} y2={axisY + 7} stroke={INK} strokeWidth={1.2} />
-              <text x={lx(t.ns)} y={axisY + 32} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
+              <text x={lx(t.ns)} y={axisY + 32} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
                 {t.text}
               </text>
             </g>
           ))}
-          <text x={AX1} y={axisY + 62} textAnchor="end" style={svgText({ ...label(20, INK_SOFT) })} opacity={ease(frame, costsAt + 10, 12)}>
+          <text x={AX1} y={axisY + 62} textAnchor="end" style={svgText({ ...label(24, INK_SOFT) })} opacity={ease(frame, costsAt + 10, 12)}>
             log scale
           </text>
         </svg>

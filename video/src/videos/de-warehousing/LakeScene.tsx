@@ -44,7 +44,7 @@ const FileChip: React.FC<{ x: number; y: number; name: string; at: number; lit?:
         background: lit > 0 ? `color-mix(in srgb, ${READ} ${lit * 100}%, ${COLUMN_TINT.sale_id})` : COLUMN_TINT.sale_id,
         boxShadow: `inset 0 0 0 ${1.5 + 1.5 * ring}px ${ring > 0 ? OK : `color-mix(in srgb, ${INK} 35%, transparent)`}`,
         fontFamily: MONO,
-        fontSize: 19,
+        fontSize: 24,
         color: INK,
         whiteSpace: "nowrap",
         opacity: p * (1 - 0.6 * gone),
@@ -120,7 +120,7 @@ export const LakeScene: React.FC = () => {
           column, so no hairline runs between them. */}
       <div style={{ position: "absolute", left: 0, top: 12 - RULE_GAP - 2, width: PANEL_W, height: 2, background: INK }} />
       <div style={{ position: "absolute", left: 0, top: 12, ...headline(42), whiteSpace: "nowrap" }}>{text}</div>
-      <div style={{ position: "absolute", left: 0, top: 64, ...label(20, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, subAt, 10) }}>{sub}</div>
+      <div style={{ position: "absolute", left: 0, top: 64, ...label(24, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, subAt, 10) }}>{sub}</div>
     </div>
   );
 
@@ -140,7 +140,7 @@ export const LakeScene: React.FC = () => {
         opacity: ease(frame, at, 12),
       }}
     >
-      <div style={{ position: "absolute", left: 16, bottom: 12, ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>object storage</div>
+      <div style={{ position: "absolute", left: 16, bottom: 12, ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>object storage</div>
     </div>
   );
 
@@ -192,15 +192,15 @@ export const LakeScene: React.FC = () => {
                   opacity: ease(frame, whAt + 8 + k * 3, 10),
                 }}
               >
-                <div style={{ fontFamily: MONO, fontSize: 19, color: INK, background: PAPER, padding: "2px 4px" }}>{t}</div>
+                <div style={{ fontFamily: MONO, fontSize: 24, color: INK, background: PAPER, padding: "2px 4px" }}>{t}</div>
               </div>
             ))}
-            <div style={{ position: "absolute", left: 22, bottom: 12, ...label(19, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, formatAt, 10) }}>
+            <div style={{ position: "absolute", left: 22, bottom: 12, ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, formatAt, 10) }}>
               its own managed storage and format
             </div>
           </div>
           <Note at={sqlAt} x={px(0)} y={y(NOTES_Y)}>
-            <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>tuned for SQL</span>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>tuned for SQL</span>
           </Note>
 
           {/* ── The lake ── */}
@@ -210,10 +210,10 @@ export const LakeScene: React.FC = () => {
             <FileChip key={f} x={px(1) + 24 + (k % 2) * 220} y={boxY + h(26) + Math.floor(k / 2) * h(52)} name={f} at={filesAt + k * 3} />
           ))}
           <Note at={openAt} x={px(1)} y={y(NOTES_Y)}>
-            <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>open, cheap, flexible</span>
+            <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>open, cheap, flexible</span>
           </Note>
           <Note at={noTxAt} x={px(1)} y={y(NOTES_Y) + h(40)}>
-            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no transactions, no schema enforcement</span>
+            <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no transactions, no schema enforcement</span>
           </Note>
 
           {/* ── The lakehouse: a log over the files ── */}
@@ -246,17 +246,17 @@ export const LakeScene: React.FC = () => {
               opacity: ease(frame, houseAt + 8, 12),
             }}
           >
-            <div style={{ ...label(19, INK_SOFT), marginBottom: 2 }}>transaction log</div>
+            <div style={{ ...label(24, INK_SOFT), marginBottom: 2 }}>transaction log</div>
             {LOG.map((c, k) => {
               const at = commitAt + 4 + k * 6;
               const mark = c.v === "v3" ? current : c.v === "v1" ? travel : 0;
               return (
-                <div key={c.v} style={{ position: "relative", fontFamily: MONO, fontSize: 19, color: INK, whiteSpace: "nowrap", lineHeight: 1.45, opacity: ease(frame, at, 10) }}>
+                <div key={c.v} style={{ position: "relative", fontFamily: MONO, fontSize: 24, color: INK, whiteSpace: "nowrap", lineHeight: 1.45, opacity: ease(frame, at, 10) }}>
                   <span style={{ position: "absolute", left: -6, right: -6, top: 2, bottom: 2, background: READ, opacity: mark, borderRadius: 3 }} />
                   <span style={{ position: "relative" }}>
                     <b>{c.v}</b> {c.text}
                     {c.v === "v3" ? (
-                      <span style={{ ...label(19, OK_INK), opacity: ease(frame, upsertAt, 10) }}> · an upsert</span>
+                      <span style={{ ...label(24, OK_INK), opacity: ease(frame, upsertAt, 10) }}> · an upsert</span>
                     ) : null}
                   </span>
                 </div>
@@ -264,12 +264,12 @@ export const LakeScene: React.FC = () => {
             })}
           </div>
           <Note at={versionAt + 4} x={px(2)} y={y(NOTES_Y)} out={travelAt}>
-            <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               a reader sees <b>v3</b>: files 2, 3 and 4
             </span>
           </Note>
           <Note at={travelAt + 4} x={px(2)} y={y(NOTES_Y)}>
-            <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               time travel: read <b>v1</b>, files 1 and 2
             </span>
           </Note>
@@ -300,20 +300,20 @@ export const LakeScene: React.FC = () => {
             </div>
           ))}
           <Note at={acidAt + 8} x={px(2)} y={y(744)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>ACID: atomic, consistent, isolated, durable</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>ACID: atomic, consistent, isolated, durable</span>
           </Note>
           <Note at={upsertAt + 8} x={px(2)} y={y(770)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>upsert: update the row with that key, or insert it</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>upsert: update the row with that key, or insert it</span>
           </Note>
           <Note at={reliableAt} x={X0} y={y(790)}>
-            <span style={{ ...note(27, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a warehouse&apos;s reliability, on the lake&apos;s open, cheaper storage</span>
+            <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a warehouse&apos;s reliability, on the lake&apos;s open, cheaper storage</span>
           </Note>
         </div>
 
         {/* ── The bridge into Part 10 ── */}
         {/* Its baseline on the Next line's. */}
         <Note at={landsAt} x={X0} y={y(852) + 15}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>All of it assumes the data lands on time, every day.</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>All of it assumes the data lands on time, every day.</span>
         </Note>
         <Spot id="de-warehousing-hamster" at={landsAt} left={1020} top={y(700)} width={183} height={140} />
         <NextLine at={nextAt} x={780} y={y(842)} width={640}>

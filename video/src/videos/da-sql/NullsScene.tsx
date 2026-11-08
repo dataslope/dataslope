@@ -130,7 +130,7 @@ export const NullsScene: React.FC = () => {
           marks={nullRows.map((row) => ({ row, col: 1, at: unknownAt, out: equalsAt, color: MARK_BAD }))}
         />
         <Note at={unknownAt - 2} x={X0} y={tg.rowTop(NULLS.orders.rows.length) + 18} out={q6At}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>A null means unknown.</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>A null means unknown.</span>
         </Note>
 
         {/* ── = NULL against IS NULL: the rows each finds ── */}
@@ -186,12 +186,12 @@ export const NullsScene: React.FC = () => {
           ]}
         />
         <Note at={fasterAt - 4} x={RIGHT_X} y={countsEnd + h(30)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mono>COUNT(1)</Mono> is no faster than <Mono>COUNT(*)</Mono>: engines treat them the same.
           </span>
         </Note>
         <Note at={distinctAt - 2} x={RIGHT_X} y={countsEnd + h(78)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mono>COUNT(DISTINCT discount)</Mono> counts the different values, nulls left out.
           </span>
         </Note>

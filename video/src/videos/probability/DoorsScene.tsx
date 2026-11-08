@@ -130,7 +130,7 @@ export const DoorsScene: React.FC = () => {
         <Door key={i} n={i + 1} x={x} top={top} w={DOOR.w} h={dh} at={threeAt - 4 + i * 5} open={i === 2 ? open3 : 0} pick={i === 0 ? pick : 0} />
       ))}
       <Ink at={carAt - 2} dur={16} style={{ left: DOOR.x[0], top: top + dh + 42, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, INK) }}>
+        <span style={{ ...note(28, INK) }}>
           Behind them: <b style={{ color: GOLD_INK }}>a car</b>
           <span style={{ opacity: ease(frame, goatsAt - 4, 10) }}>, and two goats</span>
         </span>
@@ -146,7 +146,7 @@ export const DoorsScene: React.FC = () => {
         <span style={{ ...label(28, PAPER), display: "inline-block", transform: "translateX(-50%)" }}>goat</span>
       </Note>
       <Ink at={hostAt - 2} dur={14} style={{ left: DOOR.x[0], top: top + dh + 94, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, INK_SOFT) }}>The host knows where the car is, and opens a door with a goat.</span>
+        <span style={{ ...note(28, INK_SOFT) }}>The host knows where the car is, and opens a door with a goat.</span>
       </Ink>
       <Svg>
         {draw > 0 ? (
@@ -161,17 +161,17 @@ export const DoorsScene: React.FC = () => {
         ) : null}
       </Svg>
       <Note at={switchAt} x={(x1 + x2) / 2} y={ay - 30} from="up">
-        <span style={{ ...body(32, true), color: DATA_INK, display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>switch?</span>
+        <span style={{ ...body(34, true), color: DATA_INK, display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>switch?</span>
       </Note>
 
       {/* ── The column, and the letters ── */}
       {/* The goat, small, over the column, with room above "Parade". */}
       <Spot id="probability-goat" at={goatAt - 2} left={1440} top={y(340)} width={118} height={200} />
       <Ink at={ninetyAt - 4} dur={16} style={{ left: 1250, top: y(618), whiteSpace: "nowrap" }}>
-        <span style={label(23, INK_SOFT)}>Parade magazine, 1990</span>
+        <span style={label(24, INK_SOFT)}>Parade magazine, 1990</span>
       </Ink>
       <Ink at={yesAt - 2} dur={16} style={{ left: 1250, top: y(658), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(36, true), color: INK }}>
+        <span style={{ ...body(34, true), color: INK }}>
           {/* Her advice, not her words, so no quotation marks. */}
           Switch:<span style={{ opacity: ease(frame, twoAt - 4, 12) }}> it wins two times in three.</span>
         </span>
@@ -199,7 +199,7 @@ export const DoorsScene: React.FC = () => {
         );
       })}
       <Note at={wrongAt - 4} x={1250} y={y(860) + 18}>
-        <span style={{ ...note(23, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Thousands of letters: she&apos;s wrong.</span>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Thousands of letters: she&apos;s wrong.</span>
       </Note>
     </AbsoluteFill>
   );

@@ -73,9 +73,9 @@ export const MethodsScene: React.FC = () => {
     ) : (
       <Note key={key} at={at} x={x} y={top + 2} width={PROP_W} style={{ textAlign: "center" }}>
         {c === "no" ? (
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>no</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>no</span>
         ) : (
-          <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={at + 6}>not necessarily</Mark>
           </span>
         )}
@@ -110,18 +110,18 @@ export const MethodsScene: React.FC = () => {
         {/* The grid's head: the two properties, each with what it means. */}
         <Note at={safeAt} x={COL.safe} y={head} width={PROP_W} style={{ textAlign: "center" }}>
           <div style={{ ...label(24, INK), fontWeight: 500 }}>safe</div>
-          <div style={{ ...note(19, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>state unchanged</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>state unchanged</div>
         </Note>
         <Note at={idemAt} x={COL.idem} y={head} width={PROP_W + 30} style={{ textAlign: "center" }}>
           <div style={{ ...label(24, INK), fontWeight: 500 }}>idempotent</div>
-          <div style={{ ...note(19, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>twice = once</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>twice = once</div>
         </Note>
         <div style={{ position: "absolute", left: X0, top: head + h(70), width: COL.idem + PROP_W + 30 - X0, height: 1, background: HAIRLINE, opacity: ease(frame, sortAt, 12) }} />
 
         {ROWS.map((r, i) => (
           <React.Fragment key={r.m}>
             <Ink at={r.at} dur={12} style={{ left: X0, top: rowY(i), whiteSpace: "nowrap" }}>
-              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: METHOD_INK }}>{r.m}</span>
+              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: METHOD_INK }}>{r.m}</span>
             </Ink>
             <Ink at={r.at + 4} dur={14} style={{ left: COL.what, top: rowY(i) + 1, whiteSpace: "nowrap" }}>
               <span style={{ ...note(24, INK) }}>{r.what}</span>
@@ -133,7 +133,7 @@ export const MethodsScene: React.FC = () => {
 
         {/* Follow-up one: DELETE twice. */}
         <Note at={secondAt} x={R_X} y={delTop(0) - h(46)}>
-          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>The same DELETE, twice</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>The same DELETE, twice</span>
         </Note>
         {[0, 1].map((i) => {
           const at = secondAt + 4 + i * 10;
@@ -160,14 +160,14 @@ export const MethodsScene: React.FC = () => {
           </span>
         </Note>
         <Note at={stillAt} x={R_X} y={delTop(2) + h(46)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mark at={stateAt}>about state, not the reply</Mark>
           </span>
         </Note>
 
         {/* Follow-up two: two PATCHes, one idempotent and one not. */}
         <Note at={pubAt - 6} x={R_X} y={patchTop(0) - h(46)}>
-          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Two PATCH requests, each sent three times</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Two PATCH requests, each sent three times</span>
         </Note>
         <Msg
           x={R_X}
@@ -180,7 +180,7 @@ export const MethodsScene: React.FC = () => {
         />
         <Note at={isIdemAt} x={R_X + 430} y={patchTop(0) + h(10)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>still published</span>
-          <div style={{ ...note(21, INK_SOFT), marginTop: 2, whiteSpace: "nowrap" }}>nothing changes</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 2, whiteSpace: "nowrap" }}>nothing changes</div>
         </Note>
         <Msg
           x={R_X}
@@ -195,7 +195,7 @@ export const MethodsScene: React.FC = () => {
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             views: <Num>{views}</Num>
           </span>
-          <div style={{ ...note(21, INK_SOFT), marginTop: 2, whiteSpace: "nowrap" }}>climbs every time</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 2, whiteSpace: "nowrap" }}>climbs every time</div>
         </Note>
 
         {/* A hairline between the grid and the follow-ups. */}

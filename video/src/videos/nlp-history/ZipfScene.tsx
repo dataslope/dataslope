@@ -118,7 +118,7 @@ export const ZipfScene: React.FC = () => {
       <div style={{ opacity: 1 - settle * 0.25 }}>
         {COLS.map((c, i) => (
           <Ink key={c.title} at={from + 4 + i * 3} dur={12} style={{ left: colX[i], top: TTOP, width: c.w, textAlign: c.align }}>
-            <span style={{ ...label(21, INK_SOFT) }}>{c.title === "count" ? <Mark at={countedAt}>{c.title}</Mark> : c.title}</span>
+            <span style={{ ...label(24, INK_SOFT) }}>{c.title === "count" ? <Mark at={countedAt}>{c.title}</Mark> : c.title}</span>
           </Ink>
         ))}
         <Svg opacity={ease(frame, from + 6, 12)}>
@@ -135,11 +135,11 @@ export const ZipfScene: React.FC = () => {
           );
           return (
             <React.Fragment key={row.word}>
-              {cell(0, <span style={{ ...note(25, INK_SOFT), ...TABULAR }}>{row.rank}</span>)}
-              {cell(1, <span style={{ ...note(26, INK), fontWeight: 500 }}>{row.word}</span>)}
+              {cell(0, <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>{row.rank}</span>)}
+              {cell(1, <span style={{ ...note(28, INK), fontWeight: 500 }}>{row.word}</span>)}
               {cell(
                 2,
-                <span style={{ ...note(26, DATA_INK), ...TABULAR, fontWeight: 500 }}>
+                <span style={{ ...note(28, DATA_INK), ...TABULAR, fontWeight: 500 }}>
                   {isTop ? <Mark at={(i === 0 ? firstTwoAt : tieAt) - 2}>{fmt(row.count, 0)}</Mark> : fmt(row.count, 0)}
                 </span>,
               )}
@@ -148,16 +148,16 @@ export const ZipfScene: React.FC = () => {
         })}
         {/* The tenth word, two rows on, and what the law expects of it. */}
         {[
-          [0, <span key="r" style={{ ...note(25, INK_SOFT), ...TABULAR }}>{ZIPF.tenth.rank}</span>],
-          [1, <span key="w" style={{ ...note(26, INK), fontWeight: 500 }}>{ZIPF.tenth.word}</span>],
-          [2, <span key="c" style={{ ...note(26, DATA_INK), ...TABULAR, fontWeight: 500 }}>{fmt(ZIPF.tenth.count, 0)}</span>],
+          [0, <span key="r" style={{ ...note(24, INK_SOFT), ...TABULAR }}>{ZIPF.tenth.rank}</span>],
+          [1, <span key="w" style={{ ...note(28, INK), fontWeight: 500 }}>{ZIPF.tenth.word}</span>],
+          [2, <span key="c" style={{ ...note(28, DATA_INK), ...TABULAR, fontWeight: 500 }}>{fmt(ZIPF.tenth.count, 0)}</span>],
         ].map(([k, el]) => (
           <Ink key={k as number} at={tenthAt - 2} dur={12} style={{ left: colX[k as number], top: TTOP + 52 + 8 * ROW, width: COLS[k as number].w, textAlign: COLS[k as number].align }}>
             {el as React.ReactNode}
           </Ink>
         ))}
         <Ink at={tenthAt + 6} dur={14} style={{ left: colX[2] + COLS[2].w + LAW_GAP, top: TTOP + 52 + 8 * ROW + 3, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK_SOFT) }}>
+          <span style={{ ...note(24, INK_SOFT) }}>
             law: ≈ <span style={TABULAR}>{fmt(ZIPF.tenthByLaw, 0)}</span>
           </span>
         </Ink>
@@ -166,7 +166,7 @@ export const ZipfScene: React.FC = () => {
         </Svg>
         {/* What one over the rank expects of the second word, beside what it got. */}
         <Ink at={halfAt - 2} dur={14} style={{ left: colX[2] + COLS[2].w + LAW_GAP, top: TTOP + 52 + ROW + 3, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK_SOFT) }}>
+          <span style={{ ...note(24, INK_SOFT) }}>
             law: ≈ <span style={TABULAR}>{fmt(ZIPF.secondByLaw, 0)}</span>
           </span>
         </Ink>
@@ -203,7 +203,7 @@ export const ZipfScene: React.FC = () => {
         return (
           <React.Fragment key={i}>
             <Ink at={b.at} dur={14} style={{ left: TX0, top: b.top, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>{b.text}</span>
+              <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>{b.text}</span>
             </Ink>
             <div style={{ position: "absolute", left: TX0, top: b.top + 30, width: BAR_W, height: 20, borderRadius: 4, background: LISTING_PAPER, border: `1px solid ${HAIRLINE}`, opacity: ease(frame, b.at, 10), boxSizing: "border-box" }} />
             <div style={{ position: "absolute", left: TX0, top: b.top + 30, width: BAR_W * b.share * p, height: 20, borderRadius: 4, background: b.color, opacity: p > 0 ? 1 : 0 }} />
@@ -261,10 +261,10 @@ export const ZipfScene: React.FC = () => {
       </Svg>
       {TICKS.map((t) => (
         <React.Fragment key={t}>
-          <div style={{ position: "absolute", left: lx(t), top: CY1 + 14, transform: "translateX(-50%)", opacity: ease(frame, rankAt, 14), ...note(20, INK_SOFT), ...TABULAR }}>
+          <div style={{ position: "absolute", left: lx(t), top: CY1 + 14, transform: "translateX(-50%)", opacity: ease(frame, rankAt, 14), ...note(24, INK_SOFT), ...TABULAR }}>
             {fmt(t, 0)}
           </div>
-          <div style={{ position: "absolute", left: CX0 - 16, top: ly(t), transform: "translate(-100%, -50%)", opacity: ease(frame, rankAt, 14), ...note(20, INK_SOFT), ...TABULAR }}>
+          <div style={{ position: "absolute", left: CX0 - 16, top: ly(t), transform: "translate(-100%, -50%)", opacity: ease(frame, rankAt, 14), ...note(24, INK_SOFT), ...TABULAR }}>
             {fmt(t, 0)}
           </div>
         </React.Fragment>

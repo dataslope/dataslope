@@ -114,7 +114,7 @@ export const TypeScene: React.FC = () => {
         const row = card.rows[card.columns.findIndex((c) => c.name === r)];
         return (
           <Note key={r} at={pickAt + i * 6} x={card.right + 18} y={row.mid - 16} dim={moneyAt}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>{what}</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{what}</span>
           </Note>
         );
       })}
@@ -163,7 +163,7 @@ export const TypeScene: React.FC = () => {
                   x={sxi(v)}
                   y={lineY + 40}
                   textAnchor="middle"
-                  style={{ ...note(21, INK_SOFT), fontVariantNumeric: "tabular-nums" }}
+                  style={{ ...note(24, INK_SOFT), fontVariantNumeric: "tabular-nums" }}
                   fill={INK_SOFT}
                 >
                   {v < 0 ? `−${-v}` : v}
@@ -180,7 +180,7 @@ export const TypeScene: React.FC = () => {
                 x={s < 0 ? LINE_X0 - 56 : LINE_X1 + 40}
                 y={lineY + 8}
                 textAnchor="middle"
-                style={{ ...note(26 + k * 16, k > 0.05 ? INK : INK_SOFT), fontWeight: 500 + Math.round(k * 200) }}
+                style={{ ...note(28 + k * 16, k > 0.05 ? INK : INK_SOFT), fontWeight: 500 + Math.round(k * 200) }}
                 fill={k > 0.05 ? INK : INK_SOFT}
                 opacity={ease(frame, bigAt - 8, 10)}
               >
@@ -191,7 +191,7 @@ export const TypeScene: React.FC = () => {
         </Svg>
       ) : null}
       <Note at={valuesAt} x={LINE_X0 - 30} y={lineY + 64} from="up" dim={moneyAt}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           <span style={{ fontFamily: MONO, fontWeight: 500 }}>integer</span>: whole numbers only (about ±2.1 billion)
         </span>
       </Note>
@@ -202,7 +202,7 @@ export const TypeScene: React.FC = () => {
           out={valuesAt}
           style={{ left: (sxi(1) + sxi(2)) / 2 - 50, top: lineY - 92 - manyIn * 10, whiteSpace: "nowrap" }}
         >
-          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 500, color: ACCENT_INK }}>
+          <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: ACCENT_INK }}>
             <Strike at={numberAt + 8} color={ACCENT}>
               {"'many'"}
             </Strike>

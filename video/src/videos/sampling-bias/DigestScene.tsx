@@ -71,7 +71,7 @@ export const DigestScene: React.FC = () => {
 
       {/* The race, as its year is said. */}
       <Ink at={yearAt - 4} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(20, INK_SOFT)}>
+        <span style={label(24, INK_SOFT)}>
           The <Marker at={yearAt + 4}>1936</Marker> presidential race
         </span>
       </Ink>
@@ -101,16 +101,16 @@ export const DigestScene: React.FC = () => {
       <FigLabel n={fig(4)} title="The Literary Digest's poll" at={mailedAt - 6} x={160} y={y(384)} />
       <Ballots mailedAt={tenAt - 4} backAt={backFrom} />
       <Note at={tenAt + 6} x={GRID.x} y={y(GRID.y + COLS * (GRID.cell + GRID.gap) + 12)}>
-        <div style={note(21, INK_SOFT)}>Each square: {PER_SQUARE.toLocaleString("en-US")} ballots mailed</div>
+        <div style={note(24, INK_SOFT)}>Each square: {PER_SQUARE.toLocaleString("en-US")} ballots mailed</div>
       </Note>
       <Note at={backFrom + 4} x={GRID.x} y={y(GRID.y + COLS * (GRID.cell + GRID.gap) + 46)}>
-        <div style={{ ...note(22, INK), fontWeight: 500 }}>
+        <div style={{ ...note(24, INK), fontWeight: 500 }}>
           {RETURNED_SQUARES} came back: nearly {fmt(H.digestReturned / 1e6, 1)} million replies
         </div>
       </Note>
       <Note at={hugeAt + 2} x={GRID.x + COLS * (GRID.cell + GRID.gap) + 24} y={y(GRID.y + 4)} out={callFrom - 12}>
-        <div style={{ ...body(30, true), color: INK }}>A huge sample,</div>
-        <div style={{ ...body(30, true), color: INK }}>
+        <div style={{ ...body(28, true), color: INK }}>A huge sample,</div>
+        <div style={{ ...body(28, true), color: INK }}>
           and a <span style={{ color: EASY_INK }}>self-chosen</span> one.
         </div>
       </Note>
@@ -145,7 +145,7 @@ export const DigestScene: React.FC = () => {
             top: y(SCALE_Y) + 12,
             transform: "translateX(-50%)",
             opacity: scaleIn,
-            ...note(21, INK_SOFT),
+            ...note(24, INK_SOFT),
           }}
         >
           {v}%
@@ -158,16 +158,16 @@ export const DigestScene: React.FC = () => {
           top: y(SCALE_Y) + 44,
           opacity: scaleIn,
           whiteSpace: "nowrap",
-          ...note(20, INK_SOFT),
+          ...note(24, INK_SOFT),
         }}
       >
         Roosevelt&apos;s share
       </div>
       <Note at={callFrom + 6} x={px(50) + 10} y={y(ROWS.digest - 62)} out={lessonFrom - 6}>
-        <span style={{ ...note(20, INK_SOFT), ...halo }}>Roosevelt wins</span>
+        <span style={{ ...note(24, INK_SOFT), ...halo }}>Roosevelt wins</span>
       </Note>
       <Note at={callFrom + 6} x={px(50) - 10} y={y(ROWS.digest - 62)} align="right" from="right" out={lessonFrom - 6}>
-        <span style={{ ...note(20, INK_SOFT), ...halo }}>Landon wins</span>
+        <span style={{ ...note(24, INK_SOFT), ...halo }}>Landon wins</span>
       </Note>
 
       <Row
@@ -242,7 +242,7 @@ export const DigestScene: React.FC = () => {
         </span>
       </Note>
 
-      <Ink at={whoAt - 8} dur={20} style={{ left: LABEL_X, top: y(842), ...body(36, true), color: INK, whiteSpace: "nowrap" }}>
+      <Ink at={whoAt - 8} dur={20} style={{ left: LABEL_X, top: y(842), ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
         Size could not fix <span style={{ color: EASY_INK }}>who was answering.</span>
       </Ink>
     </AbsoluteFill>
@@ -311,7 +311,7 @@ const Row: React.FC<{
         <div style={{ ...label(24, ink) }}>{name}</div>
       </Note>
       <Note at={subAt ?? at + 6} x={LABEL_X} y={y(rowY) + 6}>
-        <div style={note(20, INK_SOFT)}>{sub}</div>
+        <div style={note(24, INK_SOFT)}>{sub}</div>
       </Note>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: ease(frame, at, 12) }}>
         <line x1={SHARE.x0} x2={SHARE.x1} y1={y(rowY)} y2={y(rowY)} stroke={HAIRLINE} strokeWidth={1} opacity={0.6} />
@@ -331,8 +331,8 @@ const Row: React.FC<{
         }}
       >
         {/* One size on the line: the value is set apart by weight and ink. */}
-        {named ? <span style={note(26, INK_SOFT)}>Roosevelt </span> : null}
-        <span style={{ ...note(26, ink), fontWeight: 500 }}>{fmt(value, 1)}%</span>
+        {named ? <span style={note(28, INK_SOFT)}>Roosevelt </span> : null}
+        <span style={{ ...note(28, ink), fontWeight: 500 }}>{fmt(value, 1)}%</span>
       </div>
     </>
   );

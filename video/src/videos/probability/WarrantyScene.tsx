@@ -168,10 +168,10 @@ export const WarrantyScene: React.FC = () => {
 
         {/* ── A million in code ── */}
         <Ink at={millionAt - 4} dur={14} style={{ left: RIGHT, top: y(330), whiteSpace: "nowrap" }}>
-          <span style={note(26, INK)}>
+          <span style={note(28, INK)}>
             <Count at={millionAt - 2} dur={26} to={WARRANTY.sold} format={num} /> sold in code:
           </span>
-          <span style={{ ...note(26, INK), opacity: ease(frame, profitAt - 4, 10) }}>
+          <span style={{ ...note(28, INK), opacity: ease(frame, profitAt - 4, 10) }}>
             {" "}
             average profit <b style={{ color: STAT_INK }}>${fmt(WARRANTY.simProfit)}</b>
           </span>
@@ -214,7 +214,7 @@ export const WarrantyScene: React.FC = () => {
             rowGap: h(14),
             alignItems: "baseline",
             whiteSpace: "nowrap",
-            ...note(26, INK),
+            ...note(28, INK),
           }}
         >
           <Held at={oneLossAt + 2}>No warranty</Held>
@@ -243,7 +243,7 @@ export const WarrantyScene: React.FC = () => {
       </div>
 
       {/* ── The bridge: one variable's summary, and the shapes many share ── */}
-      <div style={{ position: "absolute", left: 160, top: y(770), display: "flex", alignItems: "baseline", gap: "0.3em", whiteSpace: "nowrap", ...label(26, INK) }}>
+      <div style={{ position: "absolute", left: 160, top: y(770), display: "flex", alignItems: "baseline", gap: "0.3em", whiteSpace: "nowrap", ...label(28, INK) }}>
         <Held at={evAt - 2}>E[X]</Held>
         <Held at={varAt - 2}>and Var(X)</Held>
         <Held at={sumAt - 2}>sum up one variable.</Held>
@@ -254,7 +254,7 @@ export const WarrantyScene: React.FC = () => {
       {/* Each name as its shape is drawn, while the bridge is still speaking. */}
       {(["binomial", "normal", "exponential"] as const).map((t, k) => (
         <Note key={t} at={[manyRvAt + 8, shapesAt + 8, namedAt + 4][k]} x={SHAPES.x[k]} y={y(SHAPES.base) + 10}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
         </Note>
       ))}
       <Svg>

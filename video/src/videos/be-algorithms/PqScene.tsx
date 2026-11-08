@@ -155,7 +155,7 @@ export const PqScene: React.FC = () => {
             { x: T.push, t: "push" },
             { x: T.pop, t: "pop" },
           ].map((c) => (
-            <div key={c.t} style={{ position: "absolute", left: c.x, top: tTop, ...label(21, INK_SOFT) }}>
+            <div key={c.t} style={{ position: "absolute", left: c.x, top: tTop, ...label(24, INK_SOFT) }}>
               {c.t}
             </div>
           ))}

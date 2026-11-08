@@ -49,7 +49,7 @@ const under = (c: Ctx, lines: number, top = c.T) => top + listingHeight(lines, S
 /** A query's name over a result, set as code. */
 const CodeName: React.FC<{ x: number; top: number; at: number; children: React.ReactNode }> = ({ x, top, at, children }) => (
   <Ink at={at} dur={12} style={{ left: x, top: top - 36, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{children}</span>
   </Ink>
 );
 
@@ -109,10 +109,10 @@ const Dupes: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={N.rows.flatMap((r, row) => (Number(r[rn]) > 1 ? [{ row, col: rn, at: keepAt + 2 + row, color: MARK }] : []))}
       />
       <Note at={keepAt + 6} x={R_X} y={ng.rowTop(N.rows.length) + c.h(18)}>
-        <div style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+        <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           <QMono>rn &gt; 1</QMono>: the extra copies, as whole rows
         </div>
-        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, keepAt + 12, 10) }}>
+        <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, keepAt + 12, 10) }}>
           the ones to delete; each first copy stays
         </div>
       </Note>
@@ -135,21 +135,21 @@ const Cte: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Listing lines={S.lines} x={R_X} top={c.T} width={600} size={SIZE} at={at - 4} marks={[{ line: lineOf(S.lines, "FROM (SELECT"), at: at + 10 }]} />
       <Note at={at + 10} x={R_X} y={under(c, S.lines.length) - c.h(6)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the step, nested inside</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the step, nested inside</span>
       </Note>
       <Listing lines={C.lines} x={R_X} top={cteTop} width={600} size={SIZE} at={namesAt - 4} marks={[{ line: lineOf(C.lines, "WITH user_totals"), at: namesAt + 8, color: MARK_OK }]} />
       <Note at={twiceAt - 2} x={R_X} y={under(c, C.lines.length, cteTop) - c.h(6)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the step, named first: read top to bottom, usable twice</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the step, named first: read top to bottom, usable twice</span>
       </Note>
       <Note at={sameAt - 4} x={R_X + 680} y={c.T}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>both return</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>both return</span>
       </Note>
       <DataTable g={rg} cols={colsOf(C)} at={sameAt - 2} rows={rowsAt(C.rows, sameAt + 2, 3)} bands={C.rows.map((_, row) => ({ row, at: sameAt + 10 + row * 2, color: MARK_OK }))} />
       <Note at={sameAt + 8} x={R_X + 680} y={rg.rowTop(C.rows.length) + c.h(16)}>
-        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           the page&apos;s orders, totals over <Num>{RAPID.threshold}</Num>
         </div>
-        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>
+        <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>
           ({RAPID.pagePasses === 0 ? "none" : <Num>{RAPID.pagePasses}</Num>} passes the page&apos;s <Num>{RAPID.pageThreshold}</Num>)
         </div>
       </Note>
@@ -257,19 +257,19 @@ const Lag: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={edgesAt} x={g.right + 30} y={g.rowTop(0)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>nothing before the first day:</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>nothing before the first day:</span>
         <br />
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, zeroAt - 2, 10) }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, zeroAt - 2, 10) }}>
           <QMono>LAG(revenue, 1, 0)</QMono> gives 0
         </span>
       </Note>
       <Note at={nullAt} x={g.right + 30} y={g.rowTop(last)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           nothing after: <QMono>LEAD</QMono> gives null
         </span>
       </Note>
       <Note at={deltaAt + 4} x={R_X} y={g.rowTop(L.rows.length) + c.h(22)}>
-        <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
           in a delta, the <Num>{L.rows[0][prev]}</Num> makes day one a jump of <Num>{L.rows[0][delta]}</Num>: leave it null there
         </span>
       </Note>
@@ -317,7 +317,7 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={R.rows.map((_, row) => ({ row, col: rt, at: framedAt + 4 + row * 3, color: MARK_OK }))}
       />
       <Note at={at + 8} x={rg.x} y={rg.rowTop(R.rows.length) + c.h(10)}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>the page&apos;s orders, user 1</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the page&apos;s orders, user 1</span>
       </Note>
       <TableName g={tg} at={leaveAt - 2}>
         no frame written, two rows on one day
@@ -333,8 +333,8 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={rangeAt} x={R_X} y={under(c, R.lines.length) + c.h(10)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>with no frame written:</span>
-        <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>with no frame written:</span>
+        <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
           RANGE BETWEEN UNBOUNDED PRECEDING{"\n"}  AND CURRENT ROW
         </div>
       </Note>
@@ -376,18 +376,18 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <DataTable g={g} cols={colsOf(P, { mobile: { ink: BLUE_INK }, desktop: { ink: BLUE_INK } })} at={groupedAt - 2} rows={rowsAt(P.rows, groupedAt + 2)} />
       <Note at={clauseAt - 4} x={sideX} y={g.rowTop(0) - c.h(34)}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
           a <QMono>PIVOT</QMono> clause
         </span>
       </Note>
       <Note at={clauseAt - 2} x={sideX} y={g.rowTop(0) + c.h(4)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Snowflake, SQL Server, DuckDB</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Snowflake, SQL Server, DuckDB</span>
       </Note>
       <Note at={notAt - 2} x={sideX} y={g.rowTop(0) + c.h(50)}>
-        <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>not Postgres</span>
+        <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>not Postgres</span>
       </Note>
       <Note at={dynamicAt - 2} x={R_X} y={g.rowTop(P.rows.length) + c.h(34)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           unknown values: the <QMono>CASE</QMono> version needs dynamic SQL
         </span>
       </Note>
@@ -426,7 +426,7 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={innerAt - 6} x={R_X} y={c.T - c.h(10)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           4 customers (Di never ordered), 7 orders (order 125 names no customer): a chip per result row
         </span>
       </Note>
@@ -435,7 +435,7 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
         return (
           <React.Fragment key={k.name}>
             <Ink at={k.at - 2} dur={12} style={{ left: R_X, top: rowY(i) + c.h(8), whiteSpace: "nowrap" }}>
-              <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{k.name}</span>
+              <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{k.name}</span>
             </Ink>
             {chips.map((ch, j) => {
               const p = ease(frame, k.at + 2 + j * 2, 8);
@@ -457,7 +457,7 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    ...label(19, INK),
+                    ...label(24, INK),
                     opacity: p,
                     transform: `scale(${0.8 + 0.2 * p})`,
                   }}
@@ -475,7 +475,7 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <Note at={diAt + 6} x={chipsX} y={rowY(4) - c.h(10)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           dashed: a row from one side only, nulls on the other
         </span>
       </Note>
@@ -501,13 +501,13 @@ const Ntile: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Listing lines={Q.lines} x={R_X} top={c.T} width={720} size={SIZE} at={at - 4} marks={[{ line: lineOf(Q.lines, "NTILE(4)"), at: at + 8 }]} />
       <Note at={fourAt - 4} x={R_X} y={top - c.h(36)}>
-        <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
           <QMono>NTILE(4)</QMono>: customers per bucket
         </span>
       </Note>
       <DataTable g={qg} cols={colsOf(q)} at={fourAt - 2} rows={rowsAt(q.rows, fourAt + 2)} />
       <Note at={evenAt - 4} x={R_X + 420} y={top - c.h(36)}>
-        <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
           <QMono>NTILE(5)</QMono>: customers per bucket
         </span>
       </Note>
@@ -549,17 +549,17 @@ const Percent: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={at + 6} x={g.right + 40} y={g.rowTop(0)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           <QMono>pct_rank</QMono> = (rank − 1) / (rows − 1)
         </span>
       </Note>
       <Note at={cumeAt + 4} x={g.right + 40} y={g.rowTop(1) + c.h(6)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           <QMono>cume_dist</QMono> = rows at or before it (ties included) / rows
         </span>
       </Note>
       <Note at={valuesAt + 4} x={g.right + 40} y={g.rowTop(2) + c.h(16)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           the 20s: rank 2 of 4, and 3 of 4 rows at or below
         </span>
       </Note>
@@ -607,7 +607,7 @@ const Coalesce: React.FC<{ c: Ctx }> = ({ c }) => {
         { cells: C.rows[2], at: noneAt + 2 },
       ]} />
       <Note at={nullifAt} x={R_X} y={under(c, C.lines.length, listTop) + c.h(20)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           <QMono>NULLIF(units, 0)</QMono>: a zero divisor becomes null, so <QMono>500 / NULLIF(0, 0)</QMono> is{" "}
           <span style={{ fontStyle: "italic", color: INK_SOFT }}>{N.rows[0][0]}</span>
         </span>
@@ -635,12 +635,12 @@ const Cross: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {regions.map((r, j) => (
         <Ink key={r} at={at + j * 2} dur={10} style={{ left: gx + j * cw, top: c.T, width: cw, textAlign: "center" }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK }}>{r}</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{r}</span>
         </Ink>
       ))}
       {products.map((p, i) => (
         <Ink key={p} at={at + 4 + i * 2} dur={10} style={{ left: R_X, top: gy + i * ch + ch / 2 - 16 }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK }}>{p}</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{p}</span>
         </Ink>
       ))}
       {products.flatMap((_, i) =>
@@ -671,7 +671,7 @@ const Cross: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={purposeAt} x={R_X} y={gy + products.length * ch + c.h(40)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
           On purpose: a planning grid, <Mark at={spineAt}>or a date-by-segment spine</Mark>
         </span>
       </Note>

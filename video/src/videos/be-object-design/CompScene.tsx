@@ -186,7 +186,7 @@ export const CompScene: React.FC = () => {
         <Flow points={[[ADD_ALL.x + ADD_ALL.w + 6, chipMid], [ADD.x - 8, chipMid]]} at={oneAtATimeAt - 4} dur={8} width={2.2} head={12} out={speedsAt + 4} />
         <Flow points={[[ADD.x + ADD.w + 6, chipMid], [ITEMS.x - 8, chipMid]]} at={oneAtATimeAt - 2} dur={8} width={2.2} head={12} out={aOut} />
         <Box x={ITEMS.x} y={chipTop} w={ITEMS.w} h={CHIP_H} at={countsAt + 4} tone="data" out={aOut} align="left">
-          <span style={{ ...note(21, BAR), display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, BAR), display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
             {[0, 1, 2].map((i) => (
               <span key={i} style={{ width: 22, height: 22, borderRadius: 5, background: i < inCart ? ITEM_FILL[i] : "transparent", border: `2px solid ${i < inCart ? ITEM_FILL[i] : ds("blue", 200)}` }} />
             ))}
@@ -349,7 +349,7 @@ export const CompScene: React.FC = () => {
                   position: "absolute",
                   inset: 0,
                   textAlign: "center",
-                  ...label(21, OK_INK),
+                  ...label(24, OK_INK),
                   fontWeight: 500,
                   whiteSpace: "nowrap",
                   opacity: s.k,

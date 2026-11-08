@@ -105,7 +105,7 @@ export const SkewScene: React.FC = () => {
 
         {/* ── The model's eight partitions ── */}
         <Note at={modelAt - 2} x={120} y={y(316)}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             A model: rows per partition by user key, <Num>{count(SKEW.rows)}</Num> rows in <Num>{SKEW.partitions}</Num>
           </span>
         </Note>
@@ -143,12 +143,12 @@ export const SkewScene: React.FC = () => {
           <line x1={X0 - 24} x2={sx(SKEW.partitions - 1) + BAR_W + 24} y1={meanY} y2={meanY} stroke={INK} strokeWidth={2} strokeDasharray="7 6" opacity={ease(frame, avgAt, 12)} />
         </Svg>
         {SKEW.before.map((_, i) => (
-          <div key={i} style={{ position: "absolute", left: sx(i), width: BAR_W, top: sy.a + 8, textAlign: "center", ...label(19, INK_SOFT), opacity: grow(i) }}>
+          <div key={i} style={{ position: "absolute", left: sx(i), width: BAR_W, top: sy.a + 8, textAlign: "center", ...label(24, INK_SOFT), opacity: grow(i) }}>
             {i + 1}
           </div>
         ))}
         <Note at={avgAt + 2} x={sx(2)} y={meanY - h(36)}>
-          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             average <Num>{count(SKEW.mean)}</Num>
             <span style={{ opacity: ease(frame, neverAt, 10), color: INK_SOFT }}>, never moves</span>
           </span>
@@ -162,7 +162,7 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={largestAt + 4} x={sx(MAX_AFTER) + BAR_W / 2 - 110} y={meanY - h(78)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             largest <Num>{count(SKEW.maxAfter)}</Num>
           </span>
         </Note>
@@ -170,7 +170,7 @@ export const SkewScene: React.FC = () => {
         {/* ── What causes it, and the fix ── */}
         <Note at={keyAt - 2} x={R_X} y={y(334)}>
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap" }}>
-            <span style={{ ...note(23, INK_SOFT) }}>one common key:</span>
+            <span style={{ ...note(24, INK_SOFT) }}>one common key:</span>
             {causes.map((c) => (
               <span key={c.text} style={{ opacity: ease(frame, c.at - 2, 10) }}>
                 <Chip tone="orange" size={23}>
@@ -218,11 +218,11 @@ export const SkewScene: React.FC = () => {
         <Note at={twoAt - 2} x={R_X} y={y(604)}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             aggregate in two steps
-            <span style={{ ...note(22, INK_SOFT), fontWeight: 500 }}>, if it can&apos;t combine locally</span>
+            <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>, if it can&apos;t combine locally</span>
           </span>
         </Note>
         <Note at={saltedAt} x={R_X} y={y(644)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>1</b> by salted key
             <span style={{ opacity: ease(frame, thenAt, 10) }}>
               {", then "}
@@ -234,7 +234,7 @@ export const SkewScene: React.FC = () => {
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap", ...note(24, INK) }}>
             <b>in a join:</b>
             <span style={{ opacity: ease(frame, copyAt, 10), display: "flex", gap: 10, alignItems: "center" }}>
-              <span style={{ ...note(22, INK_SOFT) }}>the other side&apos;s</span>
+              <span style={{ ...note(24, INK_SOFT) }}>the other side&apos;s</span>
               <Chip size={26} mono>
                 guest
               </Chip>
@@ -252,18 +252,18 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={matchAt - 2} x={R_X} y={y(740)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every salted row still finds its match</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every salted row still finds its match</span>
         </Note>
         <Note at={nullsAt - 2} x={R_X} y={y(792)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             or: handle nulls and stand-in keys separately
           </span>
         </Note>
         <Note at={aqeAt - 2} x={R_X} y={y(832)}>
-          <span style={{ ...note(23, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap" }}>
             or: adaptive query execution<span style={{ opacity: ease(frame, splitAt, 10) }}> splits skewed join partitions</span>
             <br />
-            <span style={{ ...note(21, INK_SOFT), opacity: ease(frame, splitAt + 8, 10) }}>re-planning while the job runs</span>
+            <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, splitAt + 8, 10) }}>re-planning while the job runs</span>
           </span>
         </Note>
       </Drift>

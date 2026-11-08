@@ -123,7 +123,7 @@ export const CorrScene: React.FC = () => {
         {markerIn > 0 ? <circle cx={sx(S, marker)} cy={y(S_Y)} r={(11 + 4 * Math.min(1, markGlow)) * markerIn} fill={STAT} stroke={PAPER} strokeWidth={2} /> : null}
       </Svg>
       {[-1, 0, 1].map((v) => (
-        <div key={v} style={{ position: "absolute", left: sx(S, v), top: y(S_Y) + 18, transform: "translateX(-50%)", opacity: scaleIn, ...note(22, INK_SOFT) }}>
+        <div key={v} style={{ position: "absolute", left: sx(S, v), top: y(S_Y) + 18, transform: "translateX(-50%)", opacity: scaleIn, ...note(24, INK_SOFT) }}>
           {v < 0 ? "−1" : v}
         </div>
       ))}
@@ -149,7 +149,7 @@ export const CorrScene: React.FC = () => {
       ].map((r, i) => (
         <React.Fragment key={i}>
           <Ink at={r.at} dur={14} style={{ left: S.x0, top: y(S_Y) + 90 + i * 100, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(32, r.color), fontWeight: 500 }}>{r.node}</span>
+            <span style={{ ...note(34, r.color), fontWeight: 500 }}>{r.node}</span>
           </Ink>
           <Ink at={r.at + 10} dur={14} style={{ left: S.x0, top: y(S_Y) + 90 + i * 100 + 44, whiteSpace: "nowrap" }}>
             <Label size={21} color={INK_SOFT} weight={520}>
@@ -165,10 +165,10 @@ export const CorrScene: React.FC = () => {
         <line x1={BOX.x0} x2={BOX.x1} y1={bottom} y2={bottom} stroke={INK} strokeWidth={1.6} opacity={ease(frame, corrFrom + 2, 12)} />
         <line x1={BOX.x0} x2={BOX.x0} y1={bottom} y2={top} stroke={INK} strokeWidth={1.6} opacity={ease(frame, corrFrom + 2, 12)} />
         {/* The two axes' names, at their ends. */}
-        <text x={BOX.x1 + 14} y={bottom + 7} style={{ ...label(21, INK_SOFT), fontStyle: "italic" }} fill={INK_SOFT} opacity={ease(frame, corrFrom + 6, 12)}>
+        <text x={BOX.x1 + 14} y={bottom + 7} style={{ ...label(24, INK_SOFT), fontStyle: "italic" }} fill={INK_SOFT} opacity={ease(frame, corrFrom + 6, 12)}>
           x
         </text>
-        <text x={BOX.x0 - 14} y={top + 7} textAnchor="end" style={{ ...label(21, INK_SOFT), fontStyle: "italic" }} fill={INK_SOFT} opacity={ease(frame, corrFrom + 6, 12)}>
+        <text x={BOX.x0 - 14} y={top + 7} textAnchor="end" style={{ ...label(24, INK_SOFT), fontStyle: "italic" }} fill={INK_SOFT} opacity={ease(frame, corrFrom + 6, 12)}>
           y
         </text>
         {/* The rising curve, sliding into its ranks. */}

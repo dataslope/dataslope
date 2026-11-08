@@ -100,7 +100,7 @@ export const NorthScene: React.FC = () => {
               transform: `translateY(${(1 - card) * 20}px)`,
             }}
           >
-            <div style={{ position: "absolute", left: 0, top: 22, ...label(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>★ north star</div>
+            <div style={{ position: "absolute", left: 0, top: 22, ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>★ north star</div>
             <div style={{ position: "absolute", left: 0, top: 58, ...note(52, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: named }}>
               <span
                 style={{
@@ -113,23 +113,23 @@ export const NorthScene: React.FC = () => {
                 weekly cooks
               </span>
             </div>
-            <div style={{ position: "absolute", left: 0, top: 128, ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, modeAt, 12) }}>
+            <div style={{ position: "absolute", left: 0, top: 128, ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, modeAt, 12) }}>
               people who open a recipe in cooking mode
             </div>
           </div>
           <Note at={pushAt} x={X0} y={y(STAR.top) + h(STAR.h) + h(18)} out={out1}>
-            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>the number every team pushes toward</span>
+            <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>the number every team pushes toward</span>
           </Note>
 
           {/* What a good one does. */}
           <Note at={goodAt - 2} x={CHECKS_X} y={y(STAR.top)} out={out1}>
-            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A good one:</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A good one:</span>
           </Note>
           {checks.map((c, i) => (
             <Note key={c.text} at={c.at - 2} x={CHECKS_X} y={y(STAR.top) + h(64) + i * h(58)} out={out1}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <Tick at={c.at + 4} size={30} />
-                <span style={{ ...note(29, INK), whiteSpace: "nowrap" }}>{c.text}</span>
+                <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>{c.text}</span>
               </div>
             </Note>
           ))}
@@ -137,10 +137,10 @@ export const NorthScene: React.FC = () => {
           {/* The bigger number that says nothing. */}
           <Note at={signupsAt - 2} x={X0} y={y(STAR.top) + h(STAR.h) + h(80)} out={out1}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 22 }}>
-              <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+              <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 <Strike at={nothingAt + 2}>total signups</Strike>
               </span>
-              <span style={{ ...note(27, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, nothingAt, 12) }}>
+              <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, nothingAt, 12) }}>
                 bigger, and says nothing about whether anyone cooks
               </span>
             </div>
@@ -151,10 +151,10 @@ export const NorthScene: React.FC = () => {
             What are guardrail metrics, and why do you need them?
           </QuestionCard>
           <Note at={healthAt - 2} x={CHECKS_X} y={y(STAR.top) + h(20)}>
-            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>guardrails:</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>guardrails:</span>
           </Note>
           <Note at={healthAt + 4} x={CHECKS_X} y={y(STAR.top) + h(70)}>
-            <span style={{ ...note(27, INK_SOFT), whiteSpace: "nowrap" }}>health checks you refuse to harm on the way</span>
+            <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>health checks you refuse to harm on the way</span>
           </Note>
           <Svg opacity={rail}>
             {[0, 14].map((dy) => (

@@ -58,7 +58,7 @@ export const PlausibleScene: React.FC = () => {
       <Headline lead="A plausible continuation of a question" turn="is an answer." at={start - 4} turnAt={answerAt - 2} size={54} />
       <Spot id="llm-generation-parrot" at={start - 2} left={1600} top={y(64)} width={240} height={h(260)} />
       <Ink at={checkAt - 2} dur={18} style={{ left: X0, top: y(220) }}>
-        <span style={{ ...body(32, true), color: INK }}>Whether a real answer exists is not something it can check.</span>
+        <span style={{ ...body(34, true), color: INK }}>Whether a real answer exists is not something it can check.</span>
       </Ink>
 
       <FigLabel n="7" title="Two continuations, one mechanism (the lesson's first block)" at={contAt - 6} x={X0} y={y(318)} />
@@ -68,7 +68,7 @@ export const PlausibleScene: React.FC = () => {
         return (
           <React.Fragment key={c.prompt}>
             <Ink at={(i === 0 ? contAt : questionAt) - 2} dur={16} style={{ left: X0, top, display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
-              <span style={{ ...body(36), color: INK }}>{c.prompt}</span>
+              <span style={{ ...body(34), color: INK }}>{c.prompt}</span>
               {/* The blank, until the continuation lands in it. */}
               <span
                 style={{
@@ -77,14 +77,14 @@ export const PlausibleScene: React.FC = () => {
                   marginLeft: "0.3em",
                   borderBottom: `3px solid ${HAIRLINE}`,
                   opacity: 1 - ease(frame, contIn[i] - 4, 6),
-                  ...body(36),
+                  ...body(34),
                 }}
               >
                 &nbsp;
               </span>
             </Ink>
             <Ink at={contIn[i] - 2} dur={14} style={{ left: X0, top, whiteSpace: "nowrap" }}>
-              <span style={{ ...body(36), color: "transparent" }}>{c.prompt}</span>
+              <span style={{ ...body(34), color: "transparent" }}>{c.prompt}</span>
               <span
                 style={{
                   display: "inline-block",
@@ -92,7 +92,7 @@ export const PlausibleScene: React.FC = () => {
                   padding: "2px 14px 4px",
                   background: tint(BAR, 20),
                   borderBottom: `4px solid ${BAR}`,
-                  ...body(36),
+                  ...body(34),
                   color: BLUE_INK,
                   transform: `scale(${1 + swell * 0.04})`,
                   transformOrigin: "0 50%",
@@ -124,7 +124,7 @@ export const PlausibleScene: React.FC = () => {
       <Note at={knowAt - 6} x={LAMP_X + 44} y={(y(ROW_Y[0]) + y(ROW_Y[1])) / 2 + 12}>
         <div style={{ ...note(24, INK), width: 520 }}>
           No mark for “I actually know this one.”
-          <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>Same fluency either way.</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>Same fluency either way.</div>
         </div>
       </Note>
 
@@ -153,7 +153,7 @@ export const PlausibleScene: React.FC = () => {
         );
       })}
       <Note at={shapeAt - 2} x={X0 + 920} y={y(SLOT_Y) + h(35) - 20}>
-        <span style={{ ...note(26, GOOD_INK), fontWeight: 500 }}>The shape is right.</span>
+        <span style={{ ...note(28, GOOD_INK), fontWeight: 500 }}>The shape is right.</span>
       </Note>
     </AbsoluteFill>
   );

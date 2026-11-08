@@ -48,7 +48,7 @@ const Area: React.FC<{
         padding: "12px 16px",
       }}
     >
-      <div style={{ ...label(20, INK_SOFT) }}>{name}</div>
+      <div style={{ ...label(24, INK_SOFT) }}>{name}</div>
       {chip && cp > 0 ? (
         <div
           style={{
@@ -57,7 +57,7 @@ const Area: React.FC<{
             padding: "6px 14px",
             borderRadius: 6,
             background: MARK_KEY,
-            ...label(22, BLUE_INK),
+            ...label(24, BLUE_INK),
             opacity: cp,
             transform: `translateY(${(1 - cp) * -24}px)`,
           }}
@@ -187,12 +187,12 @@ export const PivotScene: React.FC = () => {
           fills={[{ r: 2, c: 3, at: northAt + 4, color: MARK }]}
         />
         <Note at={sqlAt - 2} x={PANEL_X} y={pg.bottom + h(20)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             in SQL: <Mono color={INK}>SUM(CASE WHEN …)</Mono>
           </span>
         </Note>
         <Note at={twoAt - 2} x={pg.colMid(3) + 70} y={pg.rowTop(2) + 4}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <b>{printed(PIVOT.countGrid[0][2].value)}</b> orders made the {printed(PIVOT.grid[0][2].value)}
           </span>
         </Note>

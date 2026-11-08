@@ -279,7 +279,7 @@ export const SkewScene: React.FC = () => {
                   top: top + 46,
                   opacity: ease(frame, subAt[i] - 4, 12),
                   whiteSpace: "nowrap",
-                  ...label(20, INK_SOFT),
+                  ...label(24, INK_SOFT),
                   fontWeight: 500,
                 }}
               >

@@ -46,17 +46,17 @@ const Wave: React.FC<{
         {[500, 1000].map((v) => (
           <g key={v}>
             <line x1={x} x2={x + PLOT_W} y1={base - (full * v) / RETRY.n} y2={base - (full * v) / RETRY.n} stroke={HAIRLINE} strokeWidth={1} strokeDasharray="3 6" />
-            <text x={x - 14} y={base - (full * v) / RETRY.n + 7} textAnchor="end" style={svgText(note(20, INK_SOFT))}>
+            <text x={x - 14} y={base - (full * v) / RETRY.n + 7} textAnchor="end" style={svgText(note(24, INK_SOFT))}>
               {thousands(v)}
             </text>
           </g>
         ))}
-        <text x={x - 14} y={base + 7} textAnchor="end" style={svgText(note(20, INK_SOFT))}>
+        <text x={x - 14} y={base + 7} textAnchor="end" style={svgText(note(24, INK_SOFT))}>
           0
         </text>
         <line x1={x} x2={x + PLOT_W * axes} y1={base} y2={base} stroke={INK} strokeWidth={2} />
         {[0, 0.5, 1].map((t) => (
-          <text key={t} x={sx(t)} y={base + 32} textAnchor="middle" style={svgText(note(20, INK_SOFT))}>
+          <text key={t} x={sx(t)} y={base + 32} textAnchor="middle" style={svgText(note(24, INK_SOFT))}>
             {t} s
           </text>
         ))}
@@ -145,26 +145,26 @@ export const JitterScene: React.FC = () => {
           </span>
         </Note>
         <Note at={againAt} x={LEFT_X + ((plainBin * RETRY.bin) / SPAN) * PLOT_W - 24} y={y(PLOT_TOP) + 84} align="right">
-          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>and rejected together again</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>and rejected together again</span>
         </Note>
 
         {/* The spread wave: its busiest tenth. */}
         <Note at={n115At - 4} x={jitterBar(RIGHT_X) - 120} y={base - 140} width={240} from="up">
-          <div style={{ ...note(26, INK), fontWeight: 500, textAlign: "center", whiteSpace: "nowrap" }}>
+          <div style={{ ...note(28, INK), fontWeight: 500, textAlign: "center", whiteSpace: "nowrap" }}>
             <Mark at={n115At + 2}>
               <Num>{jitter.busiest}</Num>
             </Mark>
           </div>
-          <div style={{ ...note(20, INK_SOFT), textAlign: "center", whiteSpace: "nowrap" }}>the busiest tenth</div>
+          <div style={{ ...note(24, INK_SOFT), textAlign: "center", whiteSpace: "nowrap" }}>the busiest tenth</div>
         </Note>
 
         <Note at={tenthAt + 20} x={X0} y={y(816)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             Requests per tenth of a second, in a simulation (Python&apos;s random.Random, seed {RETRY.seed}); no provider is called.
           </span>
         </Note>
         <Note at={tenthAt + 30} x={X0} y={y(844)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             The next two waves, after 2 and 4 s: busiest tenths <Num>{RETRY.jitter[1].busiest}</Num> and <Num>{RETRY.jitter[2].busiest}</Num> with jitter,{" "}
             <Num>{thousands(RETRY.plain[1].busiest)}</Num> without.
           </span>

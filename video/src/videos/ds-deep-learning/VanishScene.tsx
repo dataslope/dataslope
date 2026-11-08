@@ -150,15 +150,15 @@ export const VanishScene: React.FC = () => {
               />
             </Svg>
             <Note at={millionAt} x={px(0.3)} y={py(1e-5)}>
-              <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+              <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
                 0.25<sup>10</sup> = {VANISH.ten.toFixed(8)}: under one in a million
               </span>
             </Note>
             <Note at={earlyAt + 2} x={px(0.3)} y={py(1e-5) + h(40)}>
-              <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>the early layers barely learn</span>
+              <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>the early layers barely learn</span>
             </Note>
             <Note at={explodesAt - 2} x={px(10) - 330} y={py(VANISH.tenBig) - h(50)}>
-              <span style={{ ...note(25, WARM_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+              <span style={{ ...note(24, WARM_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
                 1.5<sup>10</sup> = {VANISH.tenBig}: it explodes
               </span>
             </Note>
@@ -176,7 +176,7 @@ export const VanishScene: React.FC = () => {
             <Note key={f.text} at={f.at - 2} x={FIX_X} y={y(FIX_Y) + i * h(FIX_ROW)}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <Tick at={f.at + 2} size={26} />
-                <span style={{ ...note(29, i === 4 ? WARM_INK : INK), whiteSpace: "nowrap" }}>{f.text}</span>
+                <span style={{ ...note(28, i === 4 ? WARM_INK : INK), whiteSpace: "nowrap" }}>{f.text}</span>
               </div>
             </Note>
           ))}

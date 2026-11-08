@@ -82,12 +82,12 @@ export const KindsScene: React.FC = () => {
 
         {/* ── Natural ── */}
         <Ink at={naturalAt - 4} dur={14} style={{ left: LEFT_X, top: y(PANEL_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(30, INK) }}>
+          <span style={{ ...label(28, INK) }}>
             <Mark at={naturalAt}>Natural key</Mark>
           </span>
         </Ink>
         <Note at={alreadyAt - 2} x={LEFT_X} y={y(PANEL_Y) + 50}>
-          <span style={{ ...body(30, true), color: INK_SOFT, whiteSpace: "nowrap" }}>a real-world value the thing already has</span>
+          <span style={{ ...body(28, true), color: INK_SOFT, whiteSpace: "nowrap" }}>a real-world value the thing already has</span>
         </Note>
         {/* The table's frame arrives with "natural key"; its rows with "country code". */}
         <TableName g={countries} at={naturalAt + 10}>
@@ -104,7 +104,7 @@ export const KindsScene: React.FC = () => {
           ]}
         />
         <Note at={japanAt + 2} x={LEFT_X} y={below(countries)}>
-          <span style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>
+          <span style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>
             Readable: <Mono>JP</Mono> is Japan.
           </span>
         </Note>
@@ -114,12 +114,12 @@ export const KindsScene: React.FC = () => {
 
         {/* ── Surrogate ── */}
         <Ink at={surrogateAt - 4} dur={14} style={{ left: RIGHT_X, top: y(PANEL_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(30, INK) }}>
+          <span style={{ ...label(28, INK) }}>
             <Mark at={surrogateAt}>Surrogate key</Mark>
           </span>
         </Ink>
         <Note at={makesAt - 2} x={RIGHT_X} y={y(PANEL_Y) + 50}>
-          <span style={{ ...body(27, true), color: INK_SOFT, whiteSpace: "nowrap" }}>
+          <span style={{ ...body(28, true), color: INK_SOFT, whiteSpace: "nowrap" }}>
             made up by the database: <Mono>GENERATED ALWAYS AS IDENTITY</Mono>
           </span>
         </Note>
@@ -134,7 +134,7 @@ export const KindsScene: React.FC = () => {
           marks={IDENTITY.slim.rows.map((_, i) => ({ row: i, col: 0, at: nameAt + i * 5, color: MARK_KEY }))}
         />
         <Note at={nothingAt - 2} x={RIGHT_X} y={below(customers)}>
-          <span style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>
+          <span style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>
             <Mono>1</Mono> and <Mono>2</Mono> say nothing about Ada or Grace,
             <span style={{ opacity: ease(frame, purposeAt - 2, 10) }}>
               {" "}

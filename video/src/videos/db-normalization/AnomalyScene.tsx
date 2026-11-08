@@ -149,7 +149,7 @@ export const AnomalyScene: React.FC = () => {
           marks={[{ line: 2, at: tooAt + 2 }]}
         />
         <Note at={tooAt + 8} x={RIGHT} y={y(BODY_Y) + listingHeight(LOOKUP.lines.length, 22) + 18}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>({LOOKUP.rows} rows)</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>({LOOKUP.rows} rows)</span>
         </Note>
 
         {/* The three anomalies, each as it is named. */}
@@ -160,10 +160,10 @@ export const AnomalyScene: React.FC = () => {
             <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
               {/* The number in the name's own face and size, set apart by color:
                   a 24px label beside the 36px name read as two sizes on one line. */}
-              <span style={{ ...body(36), color: ACCENT_INK, fontWeight: 500 }}>{k + 1}</span>
-              <span style={{ ...body(36), color: INK }}>{a.name}</span>
+              <span style={{ ...body(34), color: ACCENT_INK, fontWeight: 500 }}>{k + 1}</span>
+              <span style={{ ...body(34), color: INK }}>{a.name}</span>
             </div>
-            <div style={{ ...note(22, INK_SOFT), marginTop: 10 }}>{a.gist}</div>
+            <div style={{ ...note(24, INK_SOFT), marginTop: 10 }}>{a.gist}</div>
           </Ink>
         ))}
       </Drift>

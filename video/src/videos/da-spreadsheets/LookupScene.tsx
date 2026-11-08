@@ -134,7 +134,7 @@ export const LookupScene: React.FC = () => {
           ]}
         />
         <Note at={skuAt - 2} x={X0} y={g.bottom + h(18)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <b>sku</b>: stock-keeping unit, a product&apos;s code
           </span>
         </Note>
@@ -148,7 +148,7 @@ export const LookupScene: React.FC = () => {
               width: c === 2 && frame >= insertAt ? INSERT_W : g.widths[c],
               top: g.top - 34,
               textAlign: "center",
-              ...label(20, c === 2 && frame >= kitchenAt - 2 ? ACCENT_INK : INK_SOFT),
+              ...label(24, c === 2 && frame >= kitchenAt - 2 ? ACCENT_INK : INK_SOFT),
               opacity: ease(frame, byNumberAt + c * 3, 10) * (1 - ease(frame, out3, 10)),
               ...TABULAR,
             }}
@@ -203,12 +203,12 @@ export const LookupScene: React.FC = () => {
         />
         <RangeBox g={g} r0={2} r1={5} c0={0} c1={0} at={searchAt} out={insertAt} color={ACCENT} dash />
         <Note at={naAt + 6} x={BAR_X} y={slot(2) - h(6)} out={out3}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <b style={{ color: ACCENT_INK }}>#N/A</b>: not available, no match found
           </span>
         </Note>
         <Note at={typedAt - 2} x={BAR_X} y={slot(2) + h(40)} out={out3}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>the 3 is typed in</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the 3 is typed in</span>
         </Note>
 
         {/* ── Question 4: INDEX/MATCH ── */}
@@ -238,12 +238,12 @@ export const LookupScene: React.FC = () => {
           out={rangesAt}
         />
         <Note at={zeroAt} x={BAR_X} y={slot(2) - h(6)} out={rangesAt}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <b style={{ color: INK }}>0</b>: exact match, like VLOOKUP&apos;s <Mono>FALSE</Mono>
           </span>
         </Note>
         <Note at={indexAt + 6} x={BAR_X} y={slot(2) + h(40)} out={rangesAt}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <b style={{ color: INK }}>INDEX</b> takes position {position} of A2:A5: {result(A.indexMatchSku)}
           </span>
         </Note>
@@ -259,7 +259,7 @@ export const LookupScene: React.FC = () => {
               display: "flex",
               alignItems: "center",
               // Within the 12% a line allows of the 25px cells beside them.
-              ...label(23, i + 1 === position ? inkOf.teal : INK_SOFT),
+              ...label(24, i + 1 === position ? inkOf.teal : INK_SOFT),
               fontWeight: i + 1 === position ? 500 : 500,
               opacity: ease(frame, matchAt + 8 + i * 3, 10) * (1 - ease(frame, rangesAt, 10)),
               ...TABULAR,
@@ -299,12 +299,12 @@ export const LookupScene: React.FC = () => {
         />
         <RangeBox g={g} r0={2} r1={5} c0={2} c1={2} at={rangesAt + 18} out={out4} color={ds("purple", 500)} shiftAt={shift} />
         <Note at={rangesAt + 16} x={BAR_X} y={slot(2) - h(6)} out={movesAt}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             written before the insert: <b style={{ color: INK }}>C2:C5</b>, the prices
           </span>
         </Note>
         <Note at={movesAt + 4} x={BAR_X} y={slot(2) - h(6)} out={out4}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             after it, Excel rewrites the range: <b style={{ color: INK }}>D2:D5</b>, still the prices
           </span>
         </Note>
@@ -342,17 +342,17 @@ export const LookupScene: React.FC = () => {
         />
         {/* The bridge: the argument question 6 is about, VLOOKUP's, with XLOOKUP gone. */}
         <Note at={forgetAt} x={BAR_X} y={slot(1)}>
-          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             VLOOKUP&apos;s fourth argument: <Mark at={forgetAt + 10}>
               <Mono>FALSE</Mono>
             </Mark>
           </span>
         </Note>
         <Note at={notFoundAt + 6} x={BAR_X} y={slot(2) - h(6)} out={bridgeAt}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>no IFERROR around it</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>no IFERROR around it</span>
         </Note>
         <Note at={exactAt} x={BAR_X} y={slot(2) + h(40)} out={bridgeAt}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>exact match unless you ask otherwise</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>exact match unless you ask otherwise</span>
         </Note>
         <RangeBox g={g} r0={2} r1={5} c0={1} c1={1} at={arraysAt + 6} out={exactAt + 4} color={ds("teal", 500)} />
         <RangeBox g={g} r0={2} r1={5} c0={0} c1={0} at={arraysAt + 10} out={exactAt + 4} color={ds("purple", 500)} />

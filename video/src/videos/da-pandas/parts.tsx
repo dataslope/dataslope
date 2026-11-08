@@ -900,7 +900,7 @@ export const TableName: React.FC<{ g: TableGeometry; at: number; children: React
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   return (
     <Ink at={at} dur={12} out={out} style={{ left: g.x, top: g.top - 38, whiteSpace: "nowrap", opacity: 1 - d }}>
-      <span style={{ ...label(21, INK), fontWeight: 500 }}>{children}</span>
+      <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
     </Ink>
   );
 };

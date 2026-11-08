@@ -106,7 +106,7 @@ export const SeriesScene: React.FC = () => {
                   transform: `translateY(${(1 - pIn) * 14}px)`,
                 }}
               >
-                <div style={{ ...label(19, BLUE_INK), ...TABULAR }}>Part {p.n}</div>
+                <div style={{ ...label(24, BLUE_INK), ...TABULAR }}>Part {p.n}</div>
                 <div style={{ ...note(24, INK), fontWeight: 500, marginTop: 4, lineHeight: 1.12, whiteSpace: "nowrap" }}>
                   {mark ? (
                     <Mark at={mark.at} out={mark.out}>
@@ -116,7 +116,7 @@ export const SeriesScene: React.FC = () => {
                     p.title
                   )}
                 </div>
-                <div style={{ ...note(20, INK_SOFT), marginTop: 6, ...TABULAR }}>{p.questions} questions</div>
+                <div style={{ ...note(24, INK_SOFT), marginTop: 6, ...TABULAR }}>{p.questions} questions</div>
               </div>
               <Hero
                 video={p.video}

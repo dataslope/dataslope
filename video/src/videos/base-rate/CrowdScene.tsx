@@ -138,18 +138,18 @@ export const CrowdScene: React.FC = () => {
       </Ink>
 
       <Note at={hundredAt + 12} x={FIELD.x0} y={y(838)} out={pullAt - 4}>
-        <span style={note(20, INK_SOFT)}>Expected counts, rounded to whole people.</span>
+        <span style={note(24, INK_SOFT)}>Expected counts, rounded to whole people.</span>
       </Note>
 
       {/* The tally: the population split by the condition, then by the test. */}
       <Ink at={splitAt} dur={16} out={pullAt - 4} style={{ left: TX, top: y(262) }}>
-        <div style={label(22, COLOR_INK.hasIt)}>Have it</div>
+        <div style={label(24, COLOR_INK.hasIt)}>Have it</div>
       </Ink>
       <Ink at={tenAt} dur={16} out={pullAt - 4} style={{ left: TX - 4, top: y(296), ...headline(72) }}>
         {num(COUNT.sick)}
       </Ink>
       <Note at={positiveAt} x={TX} y={y(398)} out={pullAt - 4}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, whiteSpace: "nowrap", ...note(22, INK) }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, whiteSpace: "nowrap", ...note(24, INK) }}>
           <Dot color={COLOR.hasIt} />
           <span>
             <b>{num(COUNT.tp)}</b> test positive
@@ -163,13 +163,13 @@ export const CrowdScene: React.FC = () => {
       </Note>
 
       <Ink at={splitAt + 6} dur={16} out={pullAt - 4} style={{ left: TX, top: y(500) }}>
-        <div style={label(22, INK_SOFT)}>Don&apos;t have it</div>
+        <div style={label(24, INK_SOFT)}>Don&apos;t have it</div>
       </Ink>
       <Ink at={tenAt + 4} dur={16} out={pullAt - 4} style={{ left: TX - 4, top: y(534), ...headline(72) }}>
         {num(COUNT.healthy)}
       </Ink>
       <Note at={hundredAt} x={TX} y={y(636)} out={pullAt - 4}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, whiteSpace: "nowrap", ...note(22, INK) }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, whiteSpace: "nowrap", ...note(24, INK) }}>
           <Dot color={COLOR.falseAlarm} />
           <span>
             <b style={{ color: COLOR_INK.falseAlarm }}>{num(COUNT.fp)}</b> flagged by mistake
@@ -201,7 +201,7 @@ export const CrowdScene: React.FC = () => {
       </Ink>
       <Ink at={nineAt - 2} dur={16} style={{ left: 1000, top: y(590), whiteSpace: "nowrap" }}>
         <span style={{ ...headline(64, true), color: COLOR_INK.falseAlarm }}>about {pct(PPV)}</span>
-        <span style={{ ...note(22, INK_SOFT), marginLeft: 18 }}>
+        <span style={{ ...note(24, INK_SOFT), marginLeft: 18 }}>
           {num(COUNT.tp)} of {num(COUNT.positives)}
         </span>
       </Ink>

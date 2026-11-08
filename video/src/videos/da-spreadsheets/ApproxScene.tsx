@@ -88,7 +88,7 @@ export const ApproxScene: React.FC = () => {
         />
         <RangeBox g={tg} r0={2} r1={5} c0={0} c1={0} at={sortedAt} out={codesAt} color={ds("blue", 500)} />
         <Note at={sortedAt + 4} x={X0} y={tg.top - h(36)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>sorted, smallest first</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>sorted, smallest first</span>
         </Note>
         {/* Each mode is named over its own formula: approximate here, exact under FALSE. */}
         <Note at={approxAt - 2} x={BAR_X} y={tg.top - h(4)}>
@@ -113,7 +113,7 @@ export const ApproxScene: React.FC = () => {
         </Note>
         {/* What leaving the argument off means, which differs by function. */}
         <Note at={fallsAt} x={BAR_X} y={tg.top + h(150)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             left off: <b style={{ color: INK }}>VLOOKUP</b> and <b style={{ color: INK }}>MATCH</b> mean approximate, <b style={{ color: INK }}>XLOOKUP</b> means exact
           </span>
         </Note>
@@ -138,7 +138,7 @@ export const ApproxScene: React.FC = () => {
           tone="bad"
         />
         <Note at={notExistAt} x={BAR_X} y={pg.top + h(52)}>
-          <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>{code} isn&apos;t in the list</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>{code} isn&apos;t in the list</span>
         </Note>
         <FormulaBar
           x={BAR_X}

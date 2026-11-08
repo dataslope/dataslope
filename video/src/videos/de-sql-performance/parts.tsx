@@ -424,7 +424,7 @@ export const Bar: React.FC<{
   const w = (value / max) * width * p;
   return (
     <div style={{ position: "absolute", left: x, top: y, opacity: Math.min(1, p * 2) * (1 - o) }}>
-      <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>{text}</div>
+      <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{text}</div>
       <div style={{ position: "relative", marginTop: 10, height: 30, display: "flex", alignItems: "center" }}>
         <div style={{ width: w, height: 30, background: color, borderRadius: 3 }} />
         <span style={{ ...label(24, ink), ...TABULAR, marginLeft: 14, whiteSpace: "nowrap", opacity: ease(frame, at + 12, 10) }}>{shown}</span>

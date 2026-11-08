@@ -148,7 +148,7 @@ export const PresentScene: React.FC = () => {
               transform: `translate(${(1 - ease(frame, appendixAt - 4, 14)) * -24}px, ${(1 - ease(frame, appendixAt - 4, 14)) * -24}px)`,
             }}
           >
-            <div style={{ position: "absolute", right: 22, bottom: 14, ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Appendix: the method</div>
+            <div style={{ position: "absolute", right: 22, bottom: 14, ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Appendix: the method</div>
           </div>
         <div
           style={{
@@ -167,7 +167,7 @@ export const PresentScene: React.FC = () => {
           }}
         />
         <Note at={titleAt - 2} x={sx + pad} y={sy + h(34)} width={sw - 2 * pad}>
-          <span style={{ ...headline(38), display: "block", textWrap: "balance" }}>
+          <span style={{ ...headline(34), display: "block", textWrap: "balance" }}>
             New design lifts purchases by about {LIFT.point}%
           </span>
         </Note>
@@ -180,7 +180,7 @@ export const PresentScene: React.FC = () => {
                 x={at(axis, t)}
                 y={chartY + 70}
                 textAnchor="middle"
-                style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
+                style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
               >
                 {t}%
               </text>
@@ -199,17 +199,17 @@ export const PresentScene: React.FC = () => {
           <circle cx={at(axis, LIFT.point)} cy={chartY} r={13 * Math.min(1, rangeP * 1.4)} fill={BAR} />
         </Svg>
         <Note at={chartAt + 12} x={at(axis, LIFT.point) - 200} width={400} y={chartY - h(56)} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...label(21, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
             lift in purchases: {LIFT.lo}% to {LIFT.hi}%
           </span>
         </Note>
         <Note at={refundsAt - 2} x={sx + pad} y={sy + sh - h(118)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             Excludes refunds.<span style={{ opacity: ease(frame, daysAt - 2, 10) }}> Based on the last 90 days.</span>
           </span>
         </Note>
         <Note at={recommendAt - 2} x={sx + pad} y={sy + sh - h(76)}>
-          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={tieAt + 4} out={q10At}>
               Recommendation: ship the new design to everyone.
             </Mark>
@@ -243,7 +243,7 @@ export const PresentScene: React.FC = () => {
 
         {/* ── Question 9: a number people can picture, in plain words ── */}
         <Note at={anchorAt - 2} x={X0} y={y(LIST_Y)} out={out9} width={860}>
-          <span style={{ ...note(30, INK), display: "block", textWrap: "balance" }}>
+          <span style={{ ...note(28, INK), display: "block", textWrap: "balance" }}>
             &ldquo;Customers who saw the new design were{" "}
             <Mark at={twelveAt}>
               {LIFT.point}% more likely to buy
@@ -261,13 +261,13 @@ export const PresentScene: React.FC = () => {
           </span>
         </Note>
         <Note at={sayAt - 2} x={X0} y={y(LIST_Y) + h(200)} out={out9} width={860}>
-          <span style={{ ...note(30, OK_INK), fontWeight: 500, display: "block", textWrap: "balance" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, display: "block", textWrap: "balance" }}>
             <span style={{ color: INK_SOFT, fontWeight: 500 }}>say: </span>
             &ldquo;We&apos;re highly confident the true lift is between {LIFT.lo}% and {LIFT.hi}%.&rdquo;
           </span>
         </Note>
         <Note at={tieAt - 2} x={X0} y={y(LIST_Y) + h(330)} out={out9}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>then tie it to the decision →</span>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>then tie it to the decision →</span>
         </Note>
 
         {/* ── Question 10: what it rests on, and no false precision ── */}
@@ -281,7 +281,7 @@ export const PresentScene: React.FC = () => {
           ]}
         />
         <Note at={preciseAt - 2} x={X0} y={y(LIST_Y) + 3 * h(PITCH) + h(40)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>no false precision:</span>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>no false precision:</span>
         </Note>
         <Note at={twelveThreeAt - 2} x={X0} y={y(LIST_Y) + 3 * h(PITCH) + h(86)}>
           <span style={{ ...note(34, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>

@@ -132,7 +132,7 @@ export const HashScene: React.FC = () => {
         {nums.map((v, i) => (
           <React.Fragment key={i}>
             <Cell x={AX + i * PITCH_X} y={aTop} at={twoSumAt + 4 + i * 3} value={v} tone={frame >= eachAt - 2 && i === cur ? "look" : "data"} />
-            <div style={{ position: "absolute", left: AX + i * PITCH_X, width: 64, top: aTop + 74, textAlign: "center", ...label(20, INK_SOFT), ...TABULAR, opacity: ease(frame, twoSumAt + 8, 10) }}>
+            <div style={{ position: "absolute", left: AX + i * PITCH_X, width: 64, top: aTop + 74, textAlign: "center", ...label(24, INK_SOFT), ...TABULAR, opacity: ease(frame, twoSumAt + 8, 10) }}>
               {i}
             </div>
           </React.Fragment>
@@ -147,12 +147,12 @@ export const HashScene: React.FC = () => {
           map: number → index
         </Line>
         <div style={{ position: "absolute", left: MAP_X, top: aTop, width: 190, height: 64, boxSizing: "border-box", borderRadius: 8, background: BLUE_FILL, opacity: ease(frame, twoSumAt + 6, 10) }} />
-        <div style={{ position: "absolute", left: MAP_X, width: 190, top: aTop + 14, textAlign: "center", fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, opacity: ease(frame, storeAt + 2, 10) }}>
+        <div style={{ position: "absolute", left: MAP_X, width: 190, top: aTop + 14, textAlign: "center", fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, opacity: ease(frame, storeAt + 2, 10) }}>
           {nums[0]} → 0
         </div>
-        <div style={{ position: "absolute", left: MAP_X, top: aTop + 92, opacity: ease(frame, linearAt - 6, 10), display: "flex", alignItems: "center", gap: 12, fontSize: 26 }}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>returns</span>
-          <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: OK_INK }}>{HASH.twoSum.answer}</span>
+        <div style={{ position: "absolute", left: MAP_X, top: aTop + 92, opacity: ease(frame, linearAt - 6, 10), display: "flex", alignItems: "center", gap: 12, fontSize: 28 }}>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>returns</span>
+          <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: OK_INK }}>{HASH.twoSum.answer}</span>
         </div>
         <Line at={linearAt} x={AX} y={aTop + 214} size={24} weight={500}>
           O(n) time, at the cost of O(n) memory
@@ -218,7 +218,7 @@ export const HashScene: React.FC = () => {
 
         {/* The hash set, answered. */}
         <div style={{ position: "absolute", left: BX, top: y(708), opacity: ease(frame, setAt, 12) }}>
-          <div style={{ ...label(22, INK), fontWeight: 500 }}>A hash set</div>
+          <div style={{ ...label(24, INK), fontWeight: 500 }}>A hash set</div>
           {[
             { at: avgAt, k: "time, on average", v: "O(1)", c: OK_INK },
             { at: spaceAt, k: "space", v: "O(n)", c: INK },

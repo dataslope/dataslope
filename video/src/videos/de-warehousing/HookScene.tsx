@@ -71,7 +71,7 @@ export const HookScene: React.FC = () => {
       <Drift from={from} to={end + 40}>
         <Kicker at={from}>Data engineer interview questions · Warehousing &amp; storage</Kicker>
         <Headline lead="A million sales, written twice." turn="Only how they're stored differs." at={salesAt - 4} turnAt={storedAt} size={60} />
-        <div style={{ position: "absolute", left: X0, top: y(238), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, salesAt + 10, 12) * (1 - ease(frame, dim, 14) * 0.55) }}>
+        <div style={{ position: "absolute", left: X0, top: y(238), ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, salesAt + 10, 12) * (1 - ease(frame, dim, 14) * 0.55) }}>
           <Num>{count(TABLE.rows)}</Num> rows made up for this video, in the page&apos;s six <QCode>sales</QCode> columns
         </div>
         <Spot id="de-warehousing-hamster" at={from + 10} left={1300} top={y(540)} width={520} height={397} />
@@ -80,8 +80,8 @@ export const HookScene: React.FC = () => {
         {sizeLabel(
           csvAt,
           <>
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK }}>sales.csv</span>
-            <span style={{ ...note(26, INK), fontWeight: 500, opacity: ease(frame, csvSizeAt, 10) }}>
+            <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK }}>sales.csv</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, opacity: ease(frame, csvSizeAt, 10) }}>
               <Num>{MB(FILES.csv)}</Num>
             </span>
             <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, csvSizeAt + 6, 10) }}>text, one row after another</span>
@@ -94,8 +94,8 @@ export const HookScene: React.FC = () => {
         {sizeLabel(
           pqAt,
           <>
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK }}>sales.parquet</span>
-            <span style={{ ...note(26, INK), fontWeight: 500, opacity: ease(frame, pqSizeAt, 10) }}>
+            <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK }}>sales.parquet</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, opacity: ease(frame, pqSizeAt, 10) }}>
               <Num>{MB(FILES.parquet)}</Num>
             </span>
             <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, columnarAt, 10) }}>
@@ -120,7 +120,7 @@ export const HookScene: React.FC = () => {
           }}
         >
           the page&apos;s query: revenue and units by <QCode>category</QCode>
-          <span style={{ ...note(22, INK_SOFT) }}>, run in DuckDB, a columnar engine</span>
+          <span style={{ ...note(24, INK_SOFT) }}>, run in DuckDB, a columnar engine</span>
         </div>
         <ReadMark x={X0} y={y(ROW1)} width={CSV_W} height={h(BAR_H)} at={everyAt + 4} out={dim} />
         <ReadMark x={X0 + pqW * skipped} y={y(ROW2)} width={pqW * readShare} height={h(BAR_H)} at={fiveAt} out={dim} />
@@ -151,11 +151,11 @@ export const HookScene: React.FC = () => {
           }}
         >
           read: <Num>{MB(QUERY.parquet.read)}</Num>
-          <span style={{ ...note(22, INK_SOFT), fontWeight: 500 }}> of it, the columns category, units and amount</span>
+          <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}> of it, the columns category, units and amount</span>
         </div>
 
         {/* ── The round: nine questions, seven measured on these rows ── */}
-        <div style={{ position: "absolute", left: X0, top: y(CHIPS_Y) - 44, ...label(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, nineAt - 2, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(CHIPS_Y) - 44, ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, nineAt - 2, 12) }}>
           9 questions
         </div>
         {Array.from({ length: 9 }, (_, i) => {
@@ -180,7 +180,7 @@ export const HookScene: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...label(21, tone > 0.5 ? PAPER : INK),
+                ...label(24, tone > 0.5 ? PAPER : INK),
                 fontWeight: 500,
                 opacity: p,
                 transform: `scale(${p * (1 + 0.12 * pulse(frame, sevenAt + 4 + (q - 2) * 2, 14))})`,

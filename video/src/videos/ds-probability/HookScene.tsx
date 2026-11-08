@@ -111,10 +111,10 @@ export const HookScene: React.FC = () => {
           return p > 0 ? <Person key={i} x={px} y={y(py)} height={PEOPLE_H * p} opacity={p * roomIn} /> : null;
         })}
         <Note at={peopleAt + 30} x={ROOM.x + ROOM.w + 30} y={y(ROOM.y + 20)} out={roomOut}>
-          <span style={{ ...label(26, INK), ...TABULAR, whiteSpace: "nowrap" }}>{BDAY.people} people</span>
+          <span style={{ ...label(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>{BDAY.people} people</span>
         </Note>
         <Note at={sayNoAt} x={ROOM.x + ROOM.w + 30} y={y(ROOM.y + 150)} out={roomOut}>
-          <span style={{ ...note(30, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             {/* Pointed at, not struck: the hook leaves its question open until question 12. */}
             <span style={{ display: "inline-block", transform: `scale(${1 + 0.08 * pulse(frame, wrongAt, 26)})`, transformOrigin: "0 50%" }}>
               Most people say no.
@@ -128,10 +128,10 @@ export const HookScene: React.FC = () => {
           <rect x={X0} y={y(BAR_Y + 52)} width={365 * BAR_PX * bar365} height={h(26)} rx={4} fill={DATA_LIGHT} />
         </Svg>
         <Note at={tinyAt + 4} x={X0 + BDAY.people * BAR_PX + 18} y={y(BAR_Y) - 4} out={roomOut}>
-          <span style={{ ...label(22, INK), ...TABULAR, whiteSpace: "nowrap" }}>23 people</span>
+          <span style={{ ...label(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>23 people</span>
         </Note>
         <Note at={daysAt + 18} x={X0 + 365 * BAR_PX + 18} y={y(BAR_Y + 52) - 4} out={roomOut}>
-          <span style={{ ...label(22, INK), ...TABULAR, whiteSpace: "nowrap" }}>365 days</span>
+          <span style={{ ...label(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>365 days</span>
         </Note>
 
         {/* ── Fourteen questions, dealt ── */}

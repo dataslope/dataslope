@@ -47,7 +47,7 @@ export const Swatch: React.FC<{ i: number; size?: number }> = ({ i, size = 16 })
 
 /** "■ cat  ■ dog  ■ bird  ■ rock", for the right end of a figure label. */
 export const Legend: React.FC = () => (
-  <span style={{ ...note(21), display: "inline-flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
+  <span style={{ ...note(24), display: "inline-flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
     {TOKENS.map((t, i) => (
       <React.Fragment key={t}>
         {i > 0 ? <span style={{ width: 12 }} /> : null}

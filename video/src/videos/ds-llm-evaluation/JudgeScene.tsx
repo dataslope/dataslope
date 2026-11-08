@@ -226,7 +226,7 @@ export const JudgeScene: React.FC = () => {
             </span>
           </Note>
           <Note at={kappaAt} x={R_X} y={y(GRID.top + 190)}>
-            <div style={{ display: "flex", alignItems: "center", gap: 18, ...math(36, INK) }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 18, ...math(34, INK) }}>
               <span style={{ fontStyle: "italic" }}>Cohen&apos;s κ</span>
               <span>=</span>
               <Frac top={<span>{JUDGE.po.toFixed(2)} − {JUDGE.pe.toFixed(2)}</span>} bottom={<span>1 − {JUDGE.pe.toFixed(2)}</span>} />

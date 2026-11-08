@@ -32,7 +32,7 @@ const Chip: React.FC<{ at: number; out?: number; x: number; y: number; value: st
   if (p <= 0 || o >= 1) return null;
   return (
     <div style={{ position: "absolute", left: x, top: y, opacity: p * (1 - o), transform: `translateY(${(1 - p) * 14}px)` }}>
-      <div style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>{children}</div>
+      <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{children}</div>
       <div style={{ ...headline(96), color, ...TABULAR, lineHeight: 1.1 }}>{value}</div>
     </div>
   );
@@ -213,7 +213,7 @@ export const JoinScene: React.FC = () => {
             position: "absolute",
             left: cg.right + 36,
             top: cg.top + (cg.headH - h(28)) / 2,
-            ...label(21, INK_SOFT),
+            ...label(24, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, usersAt, 12),
           }}

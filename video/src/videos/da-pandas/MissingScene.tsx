@@ -144,7 +144,7 @@ export const MissingScene: React.FC = () => {
           marks={filledRows.map((row) => ({ row, col: 1, at: fourAt + 8 }))}
         />
         <Note at={meansAt - 4} x={RIGHT_X} y={fg.rowTop(MISSING.fillna.rows.length) + h(26)} out={out9}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>only if missing means zero</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>only if missing means zero</span>
         </Note>
 
         {/* ── Question 10: forward and backward fill ── */}
@@ -176,10 +176,10 @@ export const MissingScene: React.FC = () => {
           <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap", fontWeight: 500 }}>from the future</span>
         </Note>
         <Note at={chartAt - 2} x={arrowX + 64} y={pg.rowTop(F.rows.length) - h(60)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>fine for a chart</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>fine for a chart</span>
         </Note>
         <Note at={wrongAt - 2} x={arrowX + 64} y={pg.rowTop(F.rows.length) - h(14)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>wrong for anything computed as the day happens</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>wrong for anything computed as the day happens</span>
         </Note>
       </Drift>
     </AbsoluteFill>

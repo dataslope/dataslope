@@ -119,7 +119,7 @@ export const HackScene: React.FC = () => {
                 gap: 2,
               }}
             >
-              <span style={{ ...label(19, INK_SOFT), ...TABULAR }}>test {i + 1}</span>
+              <span style={{ ...label(24, INK_SOFT), ...TABULAR }}>test {i + 1}</span>
               <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: red > 0.5 ? ACCENT_INK : INK, ...TABULAR }}>{fmt(p, 3)}</span>
             </div>
           );
@@ -177,7 +177,7 @@ export const HackScene: React.FC = () => {
         </Svg>
         {LEVELS.map((name, k) => (
           <Note key={k} at={levelAt(k)} x={levelX(k) + 8} y={y(TREE.top) - h(34)}>
-            <span style={{ ...label(20, INK_SOFT) }}>{name}</span>
+            <span style={{ ...label(24, INK_SOFT) }}>{name}</span>
           </Note>
         ))}
         <Note at={thirtyTwoAt} x={levelX(LEVELS.length) + 20} y={(nodeY(5, 15) + nodeY(5, 16)) / 2 - 18}>

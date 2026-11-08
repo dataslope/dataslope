@@ -51,7 +51,7 @@ export const TreeScene: React.FC = () => {
       </Fig>
       {/* The legend, at the right end of the label's line. */}
       <Note at={branchAt} x={1800} y={y(104) + 1} align="right" from="right">
-        <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
+        <span style={{ ...note(24, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
           <Key stroke={INK_SOFT} fill={PAPER} /> <span>first time</span>
           <span style={{ width: 16 }} />
           <Key stroke={NAIVE} fill={`color-mix(in srgb, ${NAIVE} 20%, ${PAPER})`} />
@@ -89,7 +89,7 @@ export const TreeScene: React.FC = () => {
         );
       })}
       <Note at={branchAt + 12} x={120} y={y(levelTop(TREE_DEPTH)) + NODE_H + h(40)} out={pathAt - 6}>
-        <span style={note(22, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           {DISTINCT} different values. {REPEATS} of the {NAIVE_CALLS} calls redo work an earlier call already did.
         </span>
       </Note>
@@ -111,7 +111,7 @@ export const TreeScene: React.FC = () => {
 
       {/* The stack at its deepest: the calls open on that one path. */}
       <Ink at={pathAt - 6} dur={14} style={{ left: SIDE_X, top: y(452), width: SIDE_W, opacity: 1 - stackDim * 0.6 }}>
-        <span style={label(22, INK_SOFT)}>The call stack, at its deepest</span>
+        <span style={label(24, INK_SOFT)}>The call stack, at its deepest</span>
       </Ink>
       {DEEP_PATH.map((i, k) => {
         const p = ease(frame, pathAt + k * pathStep, 8);

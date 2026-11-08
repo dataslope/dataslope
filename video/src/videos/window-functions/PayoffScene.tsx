@@ -180,7 +180,7 @@ export const PayoffScene: React.FC = () => {
       <Ring g={g} from={0} to={0} col={AMOUNT} at={firstAt - 2} out={orderAt - 8} />
       <Ring g={g} from={0} to={0} col={PCT} at={thirdAt - 2} out={orderAt - 8} />
       <Note at={thirdAt} out={orderAt - 8} x={g.x} y={g.rowTop(rows) + h(22)} from="up">
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           <span style={{ color: INK, fontWeight: 500 }}>{FIRST.amount}</span> of North&apos;s {FIRST.total} is{" "}
           <span style={{ color: INK, fontWeight: 500 }}>{FIRST.pct}%</span>, about a third
         </span>
@@ -190,7 +190,7 @@ export const PayoffScene: React.FC = () => {
       <Ring g={g} from={north.last} to={north.last} col={RUN} at={climbsAt - 2} out={overAt + 2} />
       <Ring g={g} from={south.first} to={south.first} col={RUN} at={restartAt - 2} />
       <Note at={overAt + 2} x={g.x} y={g.rowTop(rows) + h(22)} from="up">
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Each region&apos;s running total starts again at its first row
         </span>
       </Note>

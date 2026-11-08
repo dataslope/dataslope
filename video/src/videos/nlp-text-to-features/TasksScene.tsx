@@ -91,7 +91,7 @@ export const TasksScene: React.FC = () => {
         {/* ── Fig. 4: the lesson's table, row by row ── */}
         <FigLabel n="4" title="Task by task, from the lesson’s table" at={start - 2} x={X0} y={y(FIG_Y)} />
         {COLS.map((col) => (
-          <Ink key={col.head} at={start + 2} dur={14} style={{ left: col.x, top: y(HEAD_ROW_Y), ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <Ink key={col.head} at={start + 2} dur={14} style={{ left: col.x, top: y(HEAD_ROW_Y), ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             {col.head}
           </Ink>
         ))}
@@ -107,7 +107,7 @@ export const TasksScene: React.FC = () => {
                   key={k}
                   at={rowAt[i] - 4 + k * 3}
                   dur={14}
-                  style={{ left: COLS[k].x, top: rowTop(i), ...(k === 0 ? label(25, INK) : note(25, INK)), whiteSpace: "nowrap" }}
+                  style={{ left: COLS[k].x, top: rowTop(i), ...(k === 0 ? label(24, INK) : note(24, INK)), whiteSpace: "nowrap" }}
                 >
                   {k === cellAt[i].col ? <Mark at={cellAt[i].at - 2}>{text}</Mark> : text}
                 </Ink>
@@ -118,7 +118,7 @@ export const TasksScene: React.FC = () => {
 
         {/* The authorship row's reason, from the lesson: the rate of function words. */}
         <Note at={wordsAt - 2} x={COLS[1].x} y={rowTop(3) + 40}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             how often <i>the</i>, <i>of</i>, <i>that</i> appear: <Reveal at={fingerprintAt - 2}>a fingerprint</Reveal>
           </span>
         </Note>
@@ -131,10 +131,10 @@ export const TasksScene: React.FC = () => {
         <Arrow from={[X0 + 346, mid - 14]} to={[b.x - 10, flowTop + half / 2 + 4]} at={changeAt + 4} dur={10} color={INK_SOFT} width={2} head={11} />
         <Arrow from={[X0 + 346, mid + 14]} to={[b.x - 10, flowTop + flowH - half / 2 - 4]} at={changeAt + 6} dur={10} color={INK_SOFT} width={2} head={11} />
         <Card at={changeAt + 8} x={b.x} y={flowTop} w={b.w} h={half} line={CHIP_LINE}>
-          <span style={note(23, INK)}>with it</span>
+          <span style={note(24, INK)}>with it</span>
         </Card>
         <Card at={changeAt + 12} x={b.x} y={flowTop + flowH - half} w={b.w} h={half} line={CHIP_LINE}>
-          <span style={note(23, INK)}>without it</span>
+          <span style={note(24, INK)}>without it</span>
         </Card>
         <Arrow from={[b.x + b.w + 8, flowTop + half / 2 + 4]} to={[c.x - 10, mid - 14]} at={measureAt - 4} dur={10} color={INK_SOFT} width={2} head={11} />
         <Arrow from={[b.x + b.w + 8, flowTop + flowH - half / 2 - 4]} to={[c.x - 10, mid + 14]} at={measureAt - 2} dur={10} color={INK_SOFT} width={2} head={11} />
@@ -142,15 +142,15 @@ export const TasksScene: React.FC = () => {
           <span style={label(24, INK)}>measure on your own task</span>
         </Card>
         <Note at={ablationAt - 2} x={c.x + c.w + 40} y={mid - 22}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             That’s an <Mark at={ablationAt + 2}>ablation</Mark>.
           </span>
         </Note>
 
         {/* The lesson's safe default, under the ablation. */}
         <Note at={safeAt - 2} x={X0} y={y(DEFAULT_Y)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(23, INK_SOFT), marginRight: 14 }}>A safe default</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, INK_SOFT), marginRight: 14 }}>A safe default</span>
             tokenize, lowercase, and <Mark at={keepAt - 2}>keep the stopwords</Mark>
             <Reveal at={untilAt - 2} style={{ color: INK_SOFT }}>
               {" until a measurement says to drop them"}

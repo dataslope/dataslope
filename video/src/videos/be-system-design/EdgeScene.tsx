@@ -177,8 +177,8 @@ export const EdgeScene: React.FC = () => {
         </Line>
 
         {/* The verdict. */}
-        <div style={{ position: "absolute", left: X0, top: y(824), display: "flex", alignItems: "baseline", fontSize: 32, opacity: ease(frame, winAt, 14) }}>
-          <span style={{ ...label(32, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: X0, top: y(824), display: "flex", alignItems: "baseline", fontSize: 34, opacity: ease(frame, winAt, 14) }}>
+          <span style={{ ...label(34, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             A read-heavy product with users everywhere:{" "}
             <Mark at={cheapAt} color={HIGHLIGHT}>
               the cheapest large win there is

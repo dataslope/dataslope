@@ -134,19 +134,19 @@ export const SourceScene: React.FC = () => {
         <ErrorBox x={LIST_X} top={listTop + h(118)} width={errW} at={stopsAt} kind={kind} message={message} markAt={countAt} out={nameAt - 2} />
         <Listing lines={named} x={LIST_X} top={listTop} width={600} size={23} at={nameAt} marks={[{ line: 1, at: nameAt + 6, color: MARK_OK }]} />
         <Note at={ignoredAt} x={LIST_X + 640} y={listTop + h(40)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             loads; <span style={{ fontFamily: MONO }}>coupon</span> is ignored
           </span>
         </Note>
 
         {/* The defenses. */}
         <Note at={nameAt} x={DEF_X} y={top - 40}>
-          <span style={{ ...label(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>What keeps downstream whole</span>
+          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>What keeps downstream whole</span>
         </Note>
         <Defense at={nameAt + 4} n={1} y={top + h(4)}>
           Name the columns;
           <br />
-          never <span style={{ fontFamily: MONO, fontSize: 22 }}>SELECT *</span>
+          never <span style={{ fontFamily: MONO, fontSize: 24 }}>SELECT *</span>
         </Defense>
         <Defense at={landAt} n={2} y={top + h(110)}>
           Land raw data schema-on-read

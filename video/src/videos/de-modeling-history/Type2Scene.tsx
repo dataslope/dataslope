@@ -186,7 +186,7 @@ export const Type2Scene: React.FC = () => {
           bands={[{ row: 1, at: isCurrentAt + 4, color: `color-mix(in srgb, ${OK_INK} 10%, transparent)` }]}
         />
         <Note at={overlapAt + 6} x={X0} y={joinTop + listingHeight(P.lines.length, SIZE) + h(80)} out={storesAt}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             {MOVE.bostonTo}, then {MOVE.austinFrom}: no overlap, no gap
           </span>
         </Note>
@@ -232,7 +232,7 @@ export const Type2Scene: React.FC = () => {
           ]}
         />
         <Note at={allAt} x={X0} y={joinTop + listingHeight(P.lines.length, SIZE) + h(28)} out={storesAt}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             Without the <QMono>WHERE</QMono>, all <b><Num>{TYPE2.orders}</Num></b> orders:{" "}
             <b style={{ color: OK_INK, opacity: ease(frame, oneAt, 10) }}>
               <Num>{TYPE2.matched}</Num> rows, one version each
@@ -258,12 +258,12 @@ export const Type2Scene: React.FC = () => {
           ]}
         />
         <Note at={storesAt + 8} x={X0} y={joinTop + listingHeight(P.lines.length, SIZE) + h(28)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             runs once, at load: the fact keeps <b>customer_key</b>
           </span>
         </Note>
         <Note at={todayAt} x={X0} y={joinTop + listingHeight(P.lines.length, SIZE) + h(86)}>
-          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             today&rsquo;s view:{" "}
             <span style={{ color: OK_INK, opacity: ease(frame, isCurrentAt, 10) }}>
               <QMono>WHERE is_current</QMono>

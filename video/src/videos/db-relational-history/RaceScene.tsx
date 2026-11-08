@@ -115,7 +115,7 @@ export const RaceScene: React.FC = () => {
             top: AXIS + 14,
             transform: "translateX(-50%)",
             opacity: ease(frame, raceFrom + 4, 14),
-            ...note(20, INK_SOFT),
+            ...note(24, INK_SOFT),
           }}
         >
           {t}

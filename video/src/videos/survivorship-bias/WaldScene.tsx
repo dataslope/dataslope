@@ -118,7 +118,7 @@ export const WaldScene: React.FC = () => {
       </div>
       <FigLabel n={fig(1)} title="The worked example in Wald's 1943 memos" at={start} x={120} y={y(196)} />
       <Note at={enginesAt} x={1800} y={y(196) + 2} align="right" from="right">
-        <span style={{ ...note(21, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
+        <span style={{ ...note(24, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
           <Swatch kind="area" /> share of the plane
           <span style={{ width: 14 }} />
           <Swatch kind="holes" /> share of the holes on planes that came back
@@ -142,8 +142,8 @@ export const WaldScene: React.FC = () => {
       </svg>
       {/* Kept under the plane, clear of the column the conclusion inks into. */}
       <Note at={exampleAt} x={150} y={y(852)}>
-        <div style={note(20, INK_SOFT)}>Wald's illustrative data: each part's area,</div>
-        <div style={note(20, INK_SOFT)}>
+        <div style={note(24, INK_SOFT)}>Wald's illustrative data: each part's area,</div>
+        <div style={note(24, INK_SOFT)}>
           and {WALD.totalHits} hits on the {WALD.returned} planes that returned
         </div>
       </Note>
@@ -181,7 +181,7 @@ export const WaldScene: React.FC = () => {
               }}
             />
             <Ink at={nameAt} dur={14} style={{ left: NAME_X, top: c - 22 }}>
-              <span style={{ ...headline(38), whiteSpace: "nowrap" }}>{p.name}</span>
+              <span style={{ ...headline(34), whiteSpace: "nowrap" }}>{p.name}</span>
             </Ink>
             <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
               {areaGrow > 0 ? (
@@ -206,10 +206,10 @@ export const WaldScene: React.FC = () => {
               ) : null}
             </svg>
             <Note at={i === 0 ? quarterAt : areaAt + 6} x={VALUE_X} y={c - GAP - THICK / 2 - 13}>
-              <span style={note(20, INK_SOFT)}>{pct(p.areaShare)}</span>
+              <span style={note(24, INK_SOFT)}>{pct(p.areaShare)}</span>
             </Note>
             <Note at={hitsAt + 10} x={VALUE_X} y={c + GAP + THICK / 2 - 13}>
-              <span style={{ ...note(20, BLUE_INK), fontWeight: 500 }}>{pct(p.hitShare)}</span>
+              <span style={{ ...note(24, BLUE_INK), fontWeight: 500 }}>{pct(p.hitShare)}</span>
             </Note>
             {/* A chance, not a share: "39 in 100", as it is said, so the
                 column does not read as a third set of shares. The number
@@ -218,7 +218,7 @@ export const WaldScene: React.FC = () => {
               <div style={{ ...note(spoken ? 34 : 30, spoken ? ACCENT_INK : INK_SOFT), fontWeight: 500, lineHeight: 1, whiteSpace: "nowrap" }}>
                 {Math.round(p.downedByOneHit * 100)}
               </div>
-              <div style={{ ...note(20, INK_SOFT), lineHeight: 1.2, marginTop: 4, whiteSpace: "nowrap" }}>in 100</div>
+              <div style={{ ...note(24, INK_SOFT), lineHeight: 1.2, marginTop: 4, whiteSpace: "nowrap" }}>in 100</div>
             </Note>
           </React.Fragment>
         );
@@ -240,7 +240,7 @@ export const WaldScene: React.FC = () => {
         ) : null}
       </svg>
       <Note at={missingAt + 8} x={BX0} y={y(ROW_Y(0)) + GAP + THICK + 10}>
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500 }}>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>
           Missing
           <span
             style={{
@@ -266,8 +266,8 @@ export const WaldScene: React.FC = () => {
         />
       </svg>
       <Note at={numbersAt} x={EST_X} y={y(262)} align="right" from="right">
-        <div style={label(20, ACCENT_INK)}>Wald's estimate:</div>
-        <div style={label(20, INK_SOFT)}>chance one hit downs it</div>
+        <div style={label(24, ACCENT_INK)}>Wald's estimate:</div>
+        <div style={label(24, INK_SOFT)}>chance one hit downs it</div>
       </Note>
 
       {/* ── What the holes mean ── */}
@@ -282,7 +282,7 @@ export const WaldScene: React.FC = () => {
         }}
       >
         <Ink at={holesAt - 4} dur={16} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <span style={{ ...body(30, true), color: INK }}>The holes mark hits a plane can survive.</span>
+          <span style={{ ...body(28, true), color: INK }}>The holes mark hits a plane can survive.</span>
         </Ink>
         <Ink at={protectAt - 4} dur={16} style={{ position: "relative", whiteSpace: "nowrap" }}>
           <span style={{ ...headline(42, true), color: INK }}>Protect where they aren't.</span>

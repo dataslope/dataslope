@@ -123,7 +123,7 @@ export const LineScene: React.FC = () => {
         {/* The cross sits beside its chart like the ticks; its words go under it, clear of the bars. */}
         <Verdict ok={false} x={COLS[0].x1 + 20} y={y(ROWS[1].top)} at={wrongAt} out={out2} />
         <Note at={wrongAt + 4} out={out2} x={COLS[0].x0} y={y(ROWS[1].base) + h(46)}>
-          <span style={{ ...label(22, ACCENT_INK), whiteSpace: "nowrap" }}>a trend through no order</span>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>a trend through no order</span>
         </Note>
         <PanelTitle x={COLS[1].x0} y={y(ROWS[1].top) - h(62)} at={typesAt} out={out2}>
           As bars, over six issue types
@@ -142,7 +142,7 @@ export const LineScene: React.FC = () => {
               width: 240,
               top: ly - 16,
               textAlign: "center",
-              ...label(21, INK),
+              ...label(24, INK),
               whiteSpace: "nowrap",
               opacity: ease(frame, fiveAt + 18, 10),
               ...TABULAR,
@@ -160,7 +160,7 @@ export const LineScene: React.FC = () => {
           const hot = pair.includes(s.key) ? ease(frame, gapAt, 12) : 0;
           return (
             <React.Fragment key={s.key}>
-              <div style={{ position: "absolute", left: SHARE_X - 160, top: top + 4, width: 140, textAlign: "right", ...note(26, INK), opacity: p }}>
+              <div style={{ position: "absolute", left: SHARE_X - 160, top: top + 4, width: 140, textAlign: "right", ...note(28, INK), opacity: p }}>
                 {s.key}
               </div>
               <div
@@ -174,14 +174,14 @@ export const LineScene: React.FC = () => {
                   boxShadow: hot > 0 ? `0 0 0 ${4 * hot}px ${HIGHLIGHT}` : undefined,
                 }}
               />
-              <div style={{ position: "absolute", left: SHARE_X + s.value * SHARE_UNIT * p + 14, top: top + 4, ...label(23, INK), opacity: ease(frame, sortedAt + 8 + i * 3, 10), ...TABULAR }}>
+              <div style={{ position: "absolute", left: SHARE_X + s.value * SHARE_UNIT * p + 14, top: top + 4, ...label(24, INK), opacity: ease(frame, sortedAt + 8 + i * 3, 10), ...TABULAR }}>
                 {fmt(s.value, s.value % 1 ? 1 : 0)}%
               </div>
             </React.Fragment>
           );
         })}
         <Note at={gapAt + 6} x={SHARE_X} y={y(410) + 5 * h(78) + h(4)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
             {pair[0]} and {pair[1]}: {fmt(PIE.closest.gap, 1)} points apart
           </span>
         </Note>

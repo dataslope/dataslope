@@ -83,7 +83,7 @@ export const BayesScene: React.FC = () => {
         </Held>
         <Held at={shareAt + 4}>
           <div style={label(24, COLOR_INK.hasIt)}>Positive, and have it</div>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 4 }}>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 4 }}>
             {pct(SENSITIVITY)} of the {num(COUNT.sick)} who have it
           </div>
         </Held>
@@ -112,13 +112,13 @@ export const BayesScene: React.FC = () => {
         </Held>
         <Held at={everyoneAt + 4}>
           <div style={label(24, INK)}>Everyone who tests positive</div>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 4 }}>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 4 }}>
             plus {pct(1 - SPECIFICITY)} of the {num(COUNT.healthy)} who don&apos;t
           </div>
         </Held>
       </div>
       <Note at={resultAt + 14} x={160} y={y(520)}>
-        <span style={note(20, INK_SOFT)}>The same in rates: {rates}</span>
+        <span style={note(24, INK_SOFT)}>The same in rates: {rates}</span>
       </Note>
 
       {ILLUSTRATIONS ? (
@@ -145,7 +145,7 @@ export const BayesScene: React.FC = () => {
         return (
           <React.Fragment key={b.key}>
             <Ink at={winAt + 4 + i * 4} dur={14} style={{ left: 160, top: top + h(BARS.height) / 2 - 15 }}>
-              <span style={note(22, INK)}>{b.name}</span>
+              <span style={note(24, INK)}>{b.name}</span>
             </Ink>
             <div
               style={{
@@ -164,11 +164,11 @@ export const BayesScene: React.FC = () => {
         );
       })}
       <Note at={ratioAt} x={BARS.x0} y={y(BARS.top + 2 * BARS.gap + 8)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           <b>{num(ODDS)}</b> people without it for every one with it
         </span>
       </Note>
-      <Ink at={termAt - 4} dur={18} style={{ left: 160, top: y(800), ...body(36), color: INK, whiteSpace: "nowrap" }}>
+      <Ink at={termAt - 4} dur={18} style={{ left: 160, top: y(800), ...body(34), color: INK, whiteSpace: "nowrap" }}>
         <span style={{ background: `linear-gradient(transparent 55%, ${HIGHLIGHT} 55%, ${HIGHLIGHT} 92%, transparent 92%)` }}>
           Base-rate neglect
         </span>{" "}

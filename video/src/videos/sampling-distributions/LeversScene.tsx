@@ -127,10 +127,10 @@ export const LeversScene: React.FC = () => {
 
       {/* In real life there is one sample: the left lever is not there. */}
       <Note at={realAt} x={LEFT.x0 + 470} y={y(372)} width={260}>
-        <span style={{ ...body(30, true), color: INK }}>In real life, you get one sample.</span>
+        <span style={{ ...body(28, true), color: INK }}>In real life, you get one sample.</span>
       </Note>
       <Note at={leverAt - 2} x={RIGHT.x0} y={y(372)} width={290}>
-        <span style={{ ...body(30, true), color: INK }}>Its size is the lever you control.</span>
+        <span style={{ ...body(28, true), color: INK }}>Its size is the lever you control.</span>
       </Note>
     </AbsoluteFill>
   );
@@ -183,8 +183,8 @@ const Panel: React.FC<{ spec: PanelSpec; hold: number; axisAt: number }> = ({ sp
       {/* The printout, a row per state. */}
       <Ink at={times[0]} dur={12} style={{ left: scale.x0, top: y(TABLE_TOP), width: tableW }}>
         <div style={{ position: "relative", height: 30, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(20, INK_SOFT), position: "absolute", left: 0 }}>{spec.head}</span>
-          <span style={{ ...label(20, INK_SOFT), position: "absolute", left: colB - scale.x0 }}>Spread of the averages</span>
+          <span style={{ ...label(24, INK_SOFT), position: "absolute", left: 0 }}>{spec.head}</span>
+          <span style={{ ...label(24, INK_SOFT), position: "absolute", left: colB - scale.x0 }}>Spread of the averages</span>
         </div>
         <div style={{ height: 1.5, background: INK }} />
       </Ink>
@@ -217,7 +217,7 @@ const Panel: React.FC<{ spec: PanelSpec; hold: number; axisAt: number }> = ({ sp
                 opacity: rowIn,
               }}
             />
-            <div style={{ position: "absolute", left: scale.x0, top: y(top) + 2, opacity: rowIn, ...headline(36) }}>
+            <div style={{ position: "absolute", left: scale.x0, top: y(top) + 2, opacity: rowIn, ...headline(34) }}>
               {spec.value(r)}
             </div>
             <div
@@ -226,7 +226,7 @@ const Panel: React.FC<{ spec: PanelSpec; hold: number; axisAt: number }> = ({ sp
                 left: colB,
                 top: y(top) + 2,
                 opacity: rowIn,
-                ...headline(36),
+                ...headline(34),
                 color: ACCENT_INK,
                 ...TABULAR,
               }}

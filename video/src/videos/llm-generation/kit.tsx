@@ -274,5 +274,5 @@ export const Tag: React.FC<{ tone: BadgeTone; children: React.ReactNode; size?: 
 /** Soft ink for the notes that say a figure's numbers are the lesson's
  *  illustration rather than a measurement. */
 export const Illustrative: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={note(20, INK_SOFT)}>{children}</span>
+  <span style={note(24, INK_SOFT)}>{children}</span>
 );

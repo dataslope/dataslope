@@ -26,14 +26,14 @@ const ANSWER_RULE_Y = 545;
  *  box follows the art's own proportions (1536x840 after trimming). */
 const BOOK = { left: 1080, dy: 40, w: 560, h: Math.round((560 * 840) / 1536) };
 
-const head: React.CSSProperties = { fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK_SOFT, whiteSpace: "nowrap" };
+const head: React.CSSProperties = { fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, whiteSpace: "nowrap" };
 
 /** One of Fig. 16's two answers: a heading and a line under it, as plain
  *  text. */
 const Answer: React.FC<{ at: number; y: number; title: string; children: React.ReactNode }> = ({ at, y, title, children }) => (
   <Note at={at} x={RIGHT_X} y={y} width={ANSWER_W} from="right">
     <div style={{ ...label(28, INK), fontWeight: 500 }}>{title}</div>
-    <div style={{ ...body(32), color: INK, marginTop: 12 }}>{children}</div>
+    <div style={{ ...body(34), color: INK, marginTop: 12 }}>{children}</div>
   </Note>
 );
 
@@ -108,7 +108,7 @@ export const LemmaScene: React.FC = () => {
       {/* Fig. 15: the lemmatizer with no part of speech, then with one. */}
       <FigLabel n="15" title="WordNet lemmas, with and without a part of speech" at={from} x={X0} y={y(FIG_Y)} />
       <Ink at={from + 6} dur={12} style={{ left: COL[0], top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-        <span style={label(21, INK_SOFT)}>word</span>
+        <span style={label(24, INK_SOFT)}>word</span>
       </Ink>
       <Ink at={lemmatizerAt} dur={12} style={{ left: COL[1], top: y(HEAD_Y) }}>
         <span style={head}>lemmatize(w)</span>
@@ -141,7 +141,7 @@ export const LemmaScene: React.FC = () => {
               </Tag>
             ) : null}
             <Ink at={posAt} dur={10} style={{ left: posX, top: top + chipH / 2 - 14 }}>
-              <span style={{ ...head, fontSize: 22 }}>pos=&quot;{l.pos}&quot;</span>
+              <span style={{ ...head, fontSize: 24 }}>pos=&quot;{l.pos}&quot;</span>
             </Ink>
           </React.Fragment>
         );
@@ -153,7 +153,7 @@ export const LemmaScene: React.FC = () => {
         <Fade at={speedAt - 4}>for speed,</Fade> <Fade at={machineAt - 4}>when only a machine sees the key</Fade>
         <div style={{ marginTop: 10 }}>
           <Fade at={searchAt - 4}>
-            <span style={label(22, INK_SOFT)}>like a search index</span>
+            <span style={label(24, INK_SOFT)}>like a search index</span>
           </Fade>
         </div>
       </Answer>
@@ -168,7 +168,7 @@ export const LemmaScene: React.FC = () => {
         </Mark>
         <div style={{ marginTop: 10 }}>
           <Fade at={realAt + 14}>
-            <span style={label(22, INK_SOFT)}>given the part of speech</span>
+            <span style={label(24, INK_SOFT)}>given the part of speech</span>
           </Fade>
         </div>
       </Answer>

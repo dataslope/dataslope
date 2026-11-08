@@ -100,7 +100,7 @@ export const ChatScene: React.FC = () => {
             }}
           />
           <Note at={resendsAt} x={chartRight + 18} y={systemY - 14}>
-            <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
               system prompt, {num(CONVERSATION.system)}
             </span>
           </Note>
@@ -144,7 +144,7 @@ export const ChatScene: React.FC = () => {
                     width: BAR_W,
                     top: base + 10,
                     textAlign: "center",
-                    ...label(20, INK_SOFT),
+                    ...label(24, INK_SOFT),
                     opacity: ease(frame, everyTurnAt + i * 3, 8),
                     ...TABULAR,
                   }}
@@ -165,7 +165,7 @@ export const ChatScene: React.FC = () => {
             }}
           />
           <div
-            style={{ position: "absolute", left: BAR_X, top: base + 44, ...label(20, INK_SOFT), opacity: ease(frame, everyTurnAt, 12), whiteSpace: "nowrap" }}
+            style={{ position: "absolute", left: BAR_X, top: base + 44, ...label(24, INK_SOFT), opacity: ease(frame, everyTurnAt, 12), whiteSpace: "nowrap" }}
           >
             turn
           </div>
@@ -177,7 +177,7 @@ export const ChatScene: React.FC = () => {
               display: "flex",
               alignItems: "center",
               gap: 10,
-              ...note(20, INK_SOFT),
+              ...note(24, INK_SOFT),
               whiteSpace: "nowrap",
               opacity: ease(frame, tenAt, 12),
             }}
@@ -204,7 +204,7 @@ export const ChatScene: React.FC = () => {
             }}
           />
           <Note at={sevenAt} x={chartRight + 18} y={lengthY - 16}>
-            <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
               the conversation: {num(CONVERSATION.length)}
             </span>
           </Note>
@@ -212,12 +212,12 @@ export const ChatScene: React.FC = () => {
 
         {/* The bill, counting with the bars. */}
         <div style={{ position: "absolute", left: RX, top: y(FIG_Y) + 4, opacity: billP > 0 ? 1 : 0 }}>
-          <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>input tokens billed</div>
+          <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>input tokens billed</div>
           <div style={{ ...headline(64), color: frame >= fortyAt - 2 ? FOCUS_INK : INK, marginTop: 6, ...TABULAR }}>{num(billed)}</div>
           <div style={{ ...note(24, INK), marginTop: 8, whiteSpace: "nowrap", opacity: ease(frame, sixAt - 2, 12) }}>
             <span style={{ fontWeight: 500, color: FOCUS_INK, ...TABULAR }}>{CONVERSATION.ratio}×</span> the conversation&apos;s length
           </div>
-          <div style={{ ...note(20, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", opacity: ease(frame, lengthAt + 4, 12), ...TABULAR }}>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", opacity: ease(frame, lengthAt + 4, 12), ...TABULAR }}>
             {num(CONVERSATION.billed)} ÷ {num(CONVERSATION.length)}
           </div>
         </div>

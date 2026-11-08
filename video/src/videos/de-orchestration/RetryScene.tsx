@@ -100,7 +100,7 @@ export const RetryScene: React.FC = () => {
         </Note>
         {okItems.map((it, i) => (
           <Note key={it.text} at={it.at - 2} x={X0 + 20} y={y(336) + i * h(44)}>
-            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>· {it.text}</span>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>· {it.text}</span>
           </Note>
         ))}
         <Note at={dontAt} x={X0} y={y(500)}>
@@ -108,7 +108,7 @@ export const RetryScene: React.FC = () => {
         </Note>
         {badItems.map((it, i) => (
           <Note key={it.text} at={it.at - 2} x={X0 + 20} y={y(550) + i * h(44)}>
-            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>· {it.text}</span>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>· {it.text}</span>
           </Note>
         ))}
         <Note at={sameAt} x={X0 + 20} y={y(646)}>
@@ -159,7 +159,7 @@ export const RetryScene: React.FC = () => {
                   stroke={`color-mix(in srgb, ${ACCENT} ${bad * 100}%, ${INK})`}
                   strokeWidth={2.6}
                 />
-                <text x={x} y={lineY + 7} textAnchor="middle" style={svgText({ ...label(20, INK), fontWeight: 500 })}>
+                <text x={x} y={lineY + 7} textAnchor="middle" style={svgText({ ...label(24, INK), fontWeight: 500 })}>
                   {i + 1}
                 </text>
               </g>
@@ -174,7 +174,7 @@ export const RetryScene: React.FC = () => {
           ) : null,
         )}
         <Note at={waitAt[0] - 4} x={LINE_X0 - R} y={lineY - h(84)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>attempts</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>attempts</span>
         </Note>
         {RETRY.waits.map((w, i) => (
           <div
@@ -185,7 +185,7 @@ export const RetryScene: React.FC = () => {
               width: 140,
               top: lineY - h(50),
               textAlign: "center",
-              ...note(23, BLUE_INK),
+              ...note(24, BLUE_INK),
               fontWeight: 500,
               whiteSpace: "nowrap",
               opacity: ease(frame, waitAt[i] + 4, 10),
@@ -200,7 +200,7 @@ export const RetryScene: React.FC = () => {
           </span>
         </Note>
         <Note at={capAt + 10} x={LINE_X0 - R} y={lineY + h(122)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             at least{" "}
             {RETRY.waits.map((w, i) => (
               <React.Fragment key={w}>

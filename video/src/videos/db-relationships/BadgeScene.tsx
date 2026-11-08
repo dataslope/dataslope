@@ -213,7 +213,7 @@ export const BadgeScene: React.FC = () => {
         />
         {/* Who employee 1 is: the Ada the narration names. */}
         <Ink at={adaAt - 2} dur={14} style={{ left: tg.x + tg.width + 28, top: tg.rowTop(0), height: tg.rowH, display: "flex", alignItems: "center" }}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             employee {adaId}, {adaName}
           </span>
         </Ink>
@@ -227,7 +227,7 @@ export const BadgeScene: React.FC = () => {
           pulse={errPulse}
         />
         <Ink at={neverAt} dur={14} style={{ left: RIGHT_X, top: y(ERROR_Y) + 176, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK_SOFT) }}>
+          <span style={{ ...note(24, INK_SOFT) }}>
             The <Mono>UNIQUE</Mono> rule on <Mono>employee_id</Mono> did this, not the picture.
           </span>
         </Ink>

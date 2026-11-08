@@ -88,7 +88,7 @@ export const SmallFilesScene: React.FC = () => {
             width: 300,
             top: y(RULER_Y) - h(46) - row * h(30),
             textAlign: "center",
-            ...note(21, INK),
+            ...note(24, INK),
             whiteSpace: "nowrap",
             opacity: p,
           }}
@@ -119,7 +119,7 @@ export const SmallFilesScene: React.FC = () => {
             position: "absolute",
             left: X0,
             top: gridY - h(40),
-            ...label(22, INK),
+            ...label(24, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, dayAt, 12) * (1 - ease(frame, rewriteAt + 16, 8)),
           }}
@@ -127,7 +127,7 @@ export const SmallFilesScene: React.FC = () => {
           by day <span style={{ color: INK_SOFT, fontWeight: 500 }}>· one Parquet file per day</span>
         </div>
         {/* The same place, once the day files have folded into months. */}
-        <div style={{ position: "absolute", left: X0, top: gridY - h(40), ...label(22, INK), whiteSpace: "nowrap", opacity: ease(frame, rewriteAt + 22, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: gridY - h(40), ...label(24, INK), whiteSpace: "nowrap", opacity: ease(frame, rewriteAt + 22, 12) }}>
           after compaction{" "}
           <span style={{ color: INK_SOFT, fontWeight: 500 }}>
             · <Num>{SMALL.month.files}</Num> files of about <Num>{KB(SMALL.month.avg)}</Num>
@@ -167,7 +167,7 @@ export const SmallFilesScene: React.FC = () => {
 
         {/* ── What a file a day costs ── */}
         <Note at={kbAt} x={PANEL_X} y={gridY} out={fixAt - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>
               <Num>{SMALL.day.files}</Num> files
             </b>{" "}
@@ -185,7 +185,7 @@ export const SmallFilesScene: React.FC = () => {
           </span>
         </Note>
         <Note at={footerAt + 12} x={PANEL_X + 20} y={gridY + h(90)} out={fixAt - 4}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>a footer: the file&apos;s schema and statistics, read before any data</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a footer: the file&apos;s schema and statistics, read before any data</span>
         </Note>
         <Note at={openAt + 4} x={PANEL_X} y={gridY + h(130)} out={fixAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -202,7 +202,7 @@ export const SmallFilesScene: React.FC = () => {
 
         {/* ── Compaction ── */}
         <Note at={fixAt} x={PANEL_X} y={gridY}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Compaction</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Compaction</span>
         </Note>
         <Note at={rewriteAt + 20} x={PANEL_X} y={gridY + h(48)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -216,12 +216,12 @@ export const SmallFilesScene: React.FC = () => {
           </span>
         </Note>
         <Note at={formatAt + 12} x={PANEL_X + 20} y={gridY + h(132)}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>a table format: a log of which files make up the table (Question 9)</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a table format: a log of which files make up the table (Question 9)</span>
         </Note>
 
         {/* ── Prevention ── */}
         <Note at={preventAt} x={PANEL_X} y={gridY + h(188)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Better, prevent them</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Better, prevent them</span>
         </Note>
         <Note at={keyAt} x={PANEL_X} y={gridY + h(232)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -232,7 +232,7 @@ export const SmallFilesScene: React.FC = () => {
         </Note>
 
         {/* ── Every size on one ruler ── */}
-        <div style={{ position: "absolute", left: X0, top: y(RULER_Y) - h(124), ...label(22, INK), whiteSpace: "nowrap", opacity: ease(frame, largeAt - 4, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(RULER_Y) - h(124), ...label(24, INK), whiteSpace: "nowrap", opacity: ease(frame, largeAt - 4, 12) }}>
           file size <span style={{ color: INK_SOFT, fontWeight: 500 }}>· log scale</span>
         </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
@@ -264,7 +264,7 @@ export const SmallFilesScene: React.FC = () => {
         ].map(({ b, t }) => (
           <div
             key={b}
-            style={{ position: "absolute", left: rx(b) - 60, width: 120, top: y(RULER_Y) + 14, textAlign: "center", ...label(19, INK_SOFT), opacity: ease(frame, largeAt - 4, 12) }}
+            style={{ position: "absolute", left: rx(b) - 60, width: 120, top: y(RULER_Y) + 14, textAlign: "center", ...label(24, INK_SOFT), opacity: ease(frame, largeAt - 4, 12) }}
           >
             {t}
           </div>
@@ -279,7 +279,7 @@ export const SmallFilesScene: React.FC = () => {
             width: rx(SMALL.target.hi) - rx(SMALL.target.lo),
             top: y(RULER_Y) - h(46),
             textAlign: "center",
-            ...note(21, OK_INK),
+            ...note(24, OK_INK),
             fontWeight: 500,
             whiteSpace: "nowrap",
             opacity: ease(frame, targetAt + 4, 10),
@@ -292,7 +292,7 @@ export const SmallFilesScene: React.FC = () => {
             position: "absolute",
             left: rx(SMALL.target.hi) + 8,
             top: y(RULER_Y) - h(46),
-            ...note(21, ACCENT_INK),
+            ...note(24, ACCENT_INK),
             fontWeight: 500,
             whiteSpace: "nowrap",
             opacity: ease(frame, largeAt + 4, 10),
@@ -307,7 +307,7 @@ export const SmallFilesScene: React.FC = () => {
             width: 760,
             top: y(RULER_Y) + h(50),
             textAlign: "right",
-            ...note(22, INK_SOFT),
+            ...note(24, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, workersAt, 10),
           }}
@@ -320,7 +320,7 @@ export const SmallFilesScene: React.FC = () => {
             position: "absolute",
             left: X0,
             top: y(RULER_Y) + h(50),
-            ...note(20, INK_SOFT),
+            ...note(24, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, gbAt + 10, 10),
           }}

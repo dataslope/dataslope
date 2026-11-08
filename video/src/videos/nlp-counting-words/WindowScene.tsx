@@ -133,17 +133,17 @@ export const WindowScene: React.FC = () => {
 
       {/* What an n-gram is. */}
       <Ink at={ngramAt - 4} dur={16} style={{ left: X0, top: y(280), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(36), color: INK }}>
+        <span style={{ ...body(34), color: INK }}>
           An <span style={{ fontStyle: SERIF_ITALIC }}>n-gram</span>: <Slot at={rowAt - 2}>n words in a row.</Slot>
         </span>
       </Ink>
       <Note at={bigramAt - 2} x={X0 + 640} y={y(280) + 4}>
-        <div style={{ ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           bigram <span style={{ ...numStyle(26, INK_SOFT) }}>n = 2</span>
         </div>
       </Note>
       <Note at={trigramAt - 2} x={X0 + 900} y={y(280) + 4}>
-        <div style={{ ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           trigram <span style={{ ...numStyle(26, INK_SOFT) }}>n = 3</span>
         </div>
       </Note>
@@ -196,7 +196,7 @@ export const WindowScene: React.FC = () => {
       <Note at={fourAt - 2} x={biRight + 16} y={biY}>
         <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...numStyle(26, ACCENT_INK) }}>
           {WINDOW.bigrams.length}
-          <span style={{ ...label(22, INK_SOFT), marginLeft: 10, fontWeight: 500, opacity: ease(frame, minusAt - 2, 10) }}>
+          <span style={{ ...label(24, INK_SOFT), marginLeft: 10, fontWeight: 500, opacity: ease(frame, minusAt - 2, 10) }}>
             = {tokens.length} − 2 + 1
           </span>
         </div>
@@ -208,7 +208,7 @@ export const WindowScene: React.FC = () => {
       <Note at={triSteps[2] + 6} x={triRight + 16} y={triY}>
         <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...numStyle(26, ACCENT_INK) }}>
           {WINDOW.trigrams.length}
-          <span style={{ ...label(22, INK_SOFT), marginLeft: 10, fontWeight: 500, opacity: ease(frame, minusAt + 4, 10) }}>
+          <span style={{ ...label(24, INK_SOFT), marginLeft: 10, fontWeight: 500, opacity: ease(frame, minusAt + 4, 10) }}>
             = {tokens.length} − 3 + 1
           </span>
         </div>
@@ -216,7 +216,7 @@ export const WindowScene: React.FC = () => {
 
       {/* The count, in words. */}
       <Ink at={numberAt - 4} dur={18} style={{ left: X0, top: y(800), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(38), color: INK }}>
+        <span style={{ ...body(34), color: INK }}>
           n-grams = number of words <Slot at={minusAt - 2}>− n</Slot> <Slot at={plusAt - 2}>+ 1</Slot>
         </span>
       </Ink>

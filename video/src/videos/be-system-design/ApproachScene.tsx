@@ -11,7 +11,7 @@ import { ESTIMATE } from "./data";
 import { Arrow, Drift, InlineArrow, int, Line, Mark, reach, VRule, X0 } from "./parts";
 
 const NF_X = 900;
-const ROW_SIZE = 27;
+const ROW_SIZE = 28;
 const STEPS = [
   { text: "Requirements", cue: null },
   { text: "Estimate the load", cue: "estimate the load" },
@@ -176,7 +176,7 @@ export const ApproachScene: React.FC = () => {
         ))}
 
         {/* The order: requirements first, bottlenecks last. */}
-        <div style={{ position: "absolute", left: X0, top: stepsY, height: 54, display: "flex", alignItems: "center", gap: 18, fontSize: 26 }}>
+        <div style={{ position: "absolute", left: X0, top: stepsY, height: 54, display: "flex", alignItems: "center", gap: 18, fontSize: 28 }}>
           {STEPS.map((s, i) => {
             const at = stepAt[i];
             const p = ease(frame, at, 12);
@@ -199,7 +199,7 @@ export const ApproachScene: React.FC = () => {
                       opacity: lit,
                     }}
                   />
-                  <span style={{ position: "relative", ...note(26, open ? INK_SOFT : INK), fontWeight: 500, fontStyle: open ? "italic" : "normal" }}>
+                  <span style={{ position: "relative", ...note(28, open ? INK_SOFT : INK), fontWeight: 500, fontStyle: open ? "italic" : "normal" }}>
                     {s.text}
                   </span>
                 </span>

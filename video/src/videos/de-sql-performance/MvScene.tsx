@@ -84,7 +84,7 @@ export const MvScene: React.FC = () => {
 
         {/* ── Fast: one row of 366, against the million orders ── */}
         <Note at={dailyAt} x={R_X} y={createTop + h(10)} out={staleAt}>
-          <div style={{ ...label(21, INK_SOFT) }}>
+          <div style={{ ...label(24, INK_SOFT) }}>
             daily_revenue, from <Num>{thousands(SLOW.orders)}</Num> orders
           </div>
           <div style={{ ...headline(72), color: BLUE_INK, marginTop: 12, opacity: ease(frame, daysAt, 10) }}>
@@ -92,7 +92,7 @@ export const MvScene: React.FC = () => {
           </div>
         </Note>
         <Note at={dashAt - 2} x={X0} y={plansTop - h(40)} out={plansOut}>
-          <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>One day, from the view</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>One day, from the view</span>
         </Note>
         <PlanBox lines={MV.dayPlan} x={X0} top={plansTop} width={780} size={PLAN} at={dashAt} out={plansOut} marks={[{ line: "Rows Removed", at: dashAt + 14, color: MARK_OK }]} />
         <Note at={lookupAt} x={X0} y={plansTop + planHeight(MV.dayPlan.length, PLAN) + h(16)} out={plansOut}>
@@ -101,7 +101,7 @@ export const MvScene: React.FC = () => {
           </span>
         </Note>
         <Note at={insteadAt - 2} x={BASE_X} y={plansTop - h(40)} out={plansOut}>
-          <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>The same day, from the orders</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>The same day, from the orders</span>
         </Note>
         <PlanBox lines={MV.basePlan} x={BASE_X} top={plansTop} width={800} size={PLAN} at={insteadAt} out={plansOut} marks={[{ line: "Rows Removed", at: insteadAt + 14, color: MARK_RED }]} />
         <Note at={millionAt} x={BASE_X} y={plansTop + planHeight(MV.basePlan.length, PLAN) + h(16)} out={plansOut}>
@@ -137,17 +137,17 @@ export const MvScene: React.FC = () => {
         <Note at={refreshAt} x={vg.right + 40} y={vg.rowTop(0) - h(10)}>
           <Listing lines={MV.refresh} x={0} top={0} width={560} size={20} at={refreshAt} />
           {/* Beside the listing, not under it: the bridge's rule runs below. */}
-          <div style={{ position: "absolute", left: 560 + 30, top: 0, ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, rerunAt, 10) }}>
+          <div style={{ position: "absolute", left: 560 + 30, top: 0, ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, rerunAt, 10) }}>
             Postgres reruns the whole query;
           </div>
-          <div style={{ position: "absolute", left: 560 + 30, top: h(32), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, backgroundAt, 10) }}>
+          <div style={{ position: "absolute", left: 560 + 30, top: h(32), ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, backgroundAt, 10) }}>
             some warehouses refresh it for you, in the background
           </div>
         </Note>
 
         {/* ── When to use one ── */}
         <Note at={useAt} x={R_X} y={createTop + h(10)}>
-          <div style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Use one when</div>
+          <div style={{ ...label(24, INK), whiteSpace: "nowrap" }}>Use one when</div>
           {[
             { at: expensiveAt, text: "the query is an expensive aggregation" },
             { at: oftenAt, text: "it is read far more than its data changes" },

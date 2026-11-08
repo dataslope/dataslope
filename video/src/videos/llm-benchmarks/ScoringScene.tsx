@@ -118,7 +118,7 @@ export const ScoringScene: React.FC = () => {
 
         {/* 1. Structured output: fields compared exactly. */}
         <Ink at={checkableAt} dur={14} style={{ left: COL_X[0], top: y(GLYPH_Y) + 10, width: COL_W }}>
-          <div style={{ background: PAPER, border: `1.6px solid ${FAINT}`, borderRadius: 10, padding: "18px 22px", fontFamily: MONO, fontSize: 26, lineHeight: 1.7, color: INK }}>
+          <div style={{ background: PAPER, border: `1.6px solid ${FAINT}`, borderRadius: 10, padding: "18px 22px", fontFamily: MONO, fontSize: 28, lineHeight: 1.7, color: INK }}>
             <div>{"{"}</div>
             <div style={{ paddingLeft: 26 }}>
               <span style={{ color: INK_SOFT }}>&quot;queue&quot;:</span> <Marked at={fieldsAt - 2}>&quot;{ticket.expected}&quot;</Marked>
@@ -135,7 +135,7 @@ export const ScoringScene: React.FC = () => {
 
         {/* 2. Properties of the text, each a yes or no: here, of a summary. */}
         <Ink at={summaryAt - 2} dur={12} style={{ left: COL_X[1], top: y(TITLE_Y) + 46, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, INK_SOFT) }}>of a summary</span>
+          <span style={{ ...note(24, INK_SOFT) }}>of a summary</span>
         </Ink>
         {[
           { text: "names the three facts", at: factsAt },
@@ -170,7 +170,7 @@ export const ScoringScene: React.FC = () => {
           </svg>
         </Spot>
         <Ink at={rubricAt - 2} dur={12} style={{ left: COL_X[2] + RUBRIC_W + 40, top: y(GLYPH_Y) + RUBRIC_TOP + RUBRIC_H / 2 - 14, whiteSpace: "nowrap" }}>
-          <span style={note(22, INK_SOFT)}>a rubric</span>
+          <span style={note(24, INK_SOFT)}>a rubric</span>
         </Ink>
         {[
           { w: 160, size: 22 },
@@ -186,7 +186,7 @@ export const ScoringScene: React.FC = () => {
           );
         })}
         <Ink at={longerAt - 2} dur={14} style={{ left: COL_X[2], top: y(GLYPH_Y) + LONGER_Y, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, TRAP_INK), fontWeight: 500 }}>favors longer answers</span>
+          <span style={{ ...note(24, TRAP_INK), fontWeight: 500 }}>favors longer answers</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

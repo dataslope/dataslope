@@ -103,7 +103,7 @@ export const CloseScene: React.FC = () => {
         <Axis scale={X} base={y(AXIS)} ticks={[20, 30, 40, 50, 60, 70, 80]} at={groupsAt - 6} />
         {(["A", "B"] as const).map((g, i) => (
           <Ink key={g} at={groupsAt - 4 + i * 6} dur={12} style={{ left: 160, top: y(i ? ROW_B : ROW_A) - 14 }}>
-            <span style={label(22, INK)}>Group {g}</span>
+            <span style={label(24, INK)}>Group {g}</span>
           </Ink>
         ))}
         <Svg>
@@ -131,12 +131,12 @@ export const CloseScene: React.FC = () => {
         ) : null}
         <Bracket x0={sx(X, CALLBACK.meanA)} x1={sx(X, CALLBACK.meanB)} y={y(BRACKET)} at={gapAt - 2} color={STAT} up />
         <Ink at={gapAt + 4} dur={14} style={{ left: sx(X, CALLBACK.meanB) + 18, top: y(BRACKET) - 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, STAT_INK), fontWeight: 500 }}>B ahead by {fmt(Math.abs(CALLBACK.gap))}</span>
+          <span style={{ ...note(24, STAT_INK), fontWeight: 500 }}>B ahead by {fmt(Math.abs(CALLBACK.gap))}</span>
         </Ink>
         {/* The course's first answer: the two groups were one process. */}
         <Note at={answerFrom + 4} x={X.x1 + 50} y={y((ROW_A + ROW_B) / 2) - 28}>
-          <span style={{ ...note(21, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>both drawn from</span>
-          <span style={{ ...note(21, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>the same process</span>
+          <span style={{ ...note(24, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>both drawn from</span>
+          <span style={{ ...note(24, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>the same process</span>
         </Note>
         <div style={{ position: "absolute", left: 160, top: y(668), display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...body(48, true) }}>
           <Ink at={couldAt - 6} dur={20} style={{ position: "relative" }}>
@@ -154,7 +154,7 @@ export const CloseScene: React.FC = () => {
         <div style={{ position: "absolute", left: 160, top: y(792), display: "flex", gap: 34, whiteSpace: "nowrap" }}>
           {TOOLS.map((t, i) => (
             <Ink key={t} at={toolAt(i)} dur={12} style={{ position: "relative" }}>
-              <span style={{ ...note(26, i === TOOLS.length - 1 ? STAT_INK : INK), fontWeight: 500 }}>{t}</span>
+              <span style={{ ...note(28, i === TOOLS.length - 1 ? STAT_INK : INK), fontWeight: 500 }}>{t}</span>
             </Ink>
           ))}
         </div>

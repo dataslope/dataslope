@@ -453,7 +453,7 @@ export const ErrorBox: React.FC<{
         background: `color-mix(in srgb, ${ACCENT} ${9 + Math.round(pulse * 8)}%, ${PAPER})`,
         padding: "16px 22px 18px",
         fontFamily: MONO,
-        fontSize: 21,
+        fontSize: 24,
         lineHeight: 1.5,
         whiteSpace: "pre-wrap",
         color: INK,

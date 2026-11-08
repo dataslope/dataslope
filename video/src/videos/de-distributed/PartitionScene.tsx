@@ -110,10 +110,10 @@ export const PartitionScene: React.FC = () => {
 
         {/* One partition, one task, one core. */}
         <Note at={unitAt - 2} x={G_X} y={y(300)}>
-          <span style={{ display: "block", whiteSpace: "nowrap", ...note(25, INK) }}>
+          <span style={{ display: "block", whiteSpace: "nowrap", ...note(24, INK) }}>
             a <b style={{ color: BLUE_INK }}>partition</b>: the unit of parallelism
           </span>
-          <span style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", ...note(25, INK), marginTop: 6 }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", ...note(24, INK), marginTop: 6 }}>
             <span style={{ opacity: ease(frame, taskAt, 10) }}>
               one task, on one partition,
             </span>
@@ -123,7 +123,7 @@ export const PartitionScene: React.FC = () => {
 
         {/* The cluster: sixteen cores, and the data. */}
         <Note at={modelAt - 2} x={G_X} y={y(394)}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             A model: <Num>{PARTS.gb}</Num> GB<span style={{ opacity: ease(frame, coresAt, 10) }}> on <Num>{PARTS.cores}</Num> cores</span>
           </span>
         </Note>
@@ -168,13 +168,13 @@ export const PartitionScene: React.FC = () => {
         </Svg>
         {[0, 1, 2, 3].map((r) => (
           <Note key={r} at={execAt + 4 + r * 3} x={EXEC_X + 12} y={rowMid(r) - 13}>
-            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>executor {r + 1}</span>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>executor {r + 1}</span>
           </Note>
         ))}
         <Machine x={DRIVER_X} top={driverTop} width={DRIVER_W} height={h(DRIVER_H)} at={driverAt - 2} out={fewAt - 6} />
         <Note at={driverAt} x={DRIVER_X + 16} y={driverTop + h(10)} out={fewAt - 6}>
-          <span style={{ display: "block", ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>driver</span>
-          <span style={{ display: "block", ...label(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, driverAt + 8, 10) }}>plans the job</span>
+          <span style={{ display: "block", ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>driver</span>
+          <span style={{ display: "block", ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, driverAt + 8, 10) }}>plans the job</span>
         </Note>
         {[0, 1, 2, 3].map((r) => (
           <Curve key={r} from={[DRIVER_X - 4, driverTop + h(DRIVER_H) / 2]} to={[EXEC_X + 136, rowMid(r)]} at={handsAt + r * 2} dur={12} width={1.6} head={9} out={fewAt - 6} />
@@ -201,7 +201,7 @@ export const PartitionScene: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    ...label(20, INK),
+                    ...label(24, INK),
                   }}
                 >
                   {p > 0.6 ? mb(FEW.mb) : null}
@@ -214,7 +214,7 @@ export const PartitionScene: React.FC = () => {
             {Array.from({ length: PARTS.cores - FEW.partitions }, (_, k) => {
               const c = k + FEW.partitions;
               return (
-                <div key={c} style={{ position: "absolute", left: cellX(c), top: cellTop(c) + cellH / 2 - 13, width: CELL_W, textAlign: "center", ...label(20, INK_SOFT) }}>
+                <div key={c} style={{ position: "absolute", left: cellX(c), top: cellTop(c) + cellH / 2 - 13, width: CELL_W, textAlign: "center", ...label(24, INK_SOFT) }}>
                   idle
                 </div>
               );
@@ -269,10 +269,10 @@ export const PartitionScene: React.FC = () => {
           ) : null;
         })}
         <Note at={fewAt - 2} x={R_X} y={caseRow(0)}>
-          <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{FEW.partitions}</Num> partitions of <Num>{mb(FEW.mb)}</Num>
           </span>
-          <span style={{ display: "block", ...note(23, ACCENT_INK), whiteSpace: "nowrap", marginTop: 4 }}>
+          <span style={{ display: "block", ...note(24, ACCENT_INK), whiteSpace: "nowrap", marginTop: 4 }}>
             <span style={{ opacity: ease(frame, idleAt, 10) }}>
               <Num>{FEW.idle}</Num> cores idle
             </span>
@@ -280,19 +280,19 @@ export const PartitionScene: React.FC = () => {
           </span>
         </Note>
         <Note at={manyAt - 2} x={R_X} y={caseRow(1)}>
-          <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{count(MANY.partitions)}</Num> of <Num>{mb(MANY.mb)}</Num>
           </span>
-          <span style={{ display: "block", ...note(23, ACCENT_INK), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, schedAt, 10) }}>
+          <span style={{ display: "block", ...note(24, ACCENT_INK), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, schedAt, 10) }}>
             scheduling costs more than the work
           </span>
         </Note>
         <Note at={fewHundredAt - 2} x={R_X} y={caseRow(2)}>
-          <span style={{ ...note(23, OK_INK), whiteSpace: "nowrap", fontWeight: 500 }}>
+          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", fontWeight: 500 }}>
             target: a few hundred MB a partition
             <span style={{ opacity: ease(frame, twoFourAt, 10) }}>, 2 to 4 × the cores</span>
           </span>
-          <span style={{ display: "block", ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, sixtyAt - 2, 10) }}>
+          <span style={{ display: "block", ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, sixtyAt - 2, 10) }}>
             <Num>{RIGHT.partitions}</Num> of <Num>{mb(RIGHT.mb)}</Num>, <Num>{RIGHT.perCore}</Num> per core
             <span style={{ color: OK_INK, opacity: ease(frame, bothAt, 10) }}> ✓</span>
           </span>
@@ -302,8 +302,8 @@ export const PartitionScene: React.FC = () => {
         <Repartition x={R_X} top={y(702)} at={repAt} labelAt={repAt} h={h} />
         <Coalesce x={R_X + 520} top={y(702)} at={coalAt} labelAt={noShuffleAt} writeAt={writeAt} h={h} />
         <Note at={oneAt - 2} x={R_X + 520} y={y(880)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>coalesce(1)</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>coalesce(1)</span>
             <span style={{ opacity: ease(frame, singleAt - 2, 10) }}>: the steps before it run as one task</span>
           </span>
         </Note>
@@ -391,7 +391,7 @@ const Coalesce: React.FC<{ x: number; top: number; at: number; labelAt: number; 
         })}
       </Svg>
       <Note at={writeAt - 2} x={x2 + MINI_W + 24} y={oldY(1)}>
-        <span style={{ ...note(22, INK_SOFT), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
           cheap: use it
           <br />
           before writing

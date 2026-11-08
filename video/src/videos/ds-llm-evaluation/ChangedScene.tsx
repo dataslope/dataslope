@@ -23,7 +23,7 @@ const Block: React.FC<{ at: number; children: React.ReactNode }> = ({ at: from, 
   const frame = useCurrentFrame();
   const p = ease(frame, from, 14);
   return (
-    <div style={{ ...note(30, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 16}px)` }}>
+    <div style={{ ...note(28, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 16}px)` }}>
       {children}
     </div>
   );
@@ -169,7 +169,7 @@ export const ChangedScene: React.FC = () => {
           ))}
         </div>
         <Note at={loopAt} x={X0} y={y(BASE_Y) + 24 + 36 + 12}>
-          <span style={{ ...label(22, BLUE_INK), fontWeight: 500 }}>the core loop, the same as ever</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500 }}>the core loop, the same as ever</span>
         </Note>
 
         {layers.map((l, i) => (
@@ -185,11 +185,11 @@ export const ChangedScene: React.FC = () => {
           </Layer>
         ))}
         <Note at={layers[0].at - 2} x={X0} y={layerTop(3) - 32}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>layered on top, mostly at mid and senior levels</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>layered on top, mostly at mid and senior levels</span>
         </Note>
         {where.map((w, i) => (
           <Note key={w.text} at={w.at} x={SIDE} y={layerTop(i) + 16} from="right">
-            <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{w.text}</span>
+            <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{w.text}</span>
           </Note>
         ))}
         <Note at={askAt} x={SIDE} y={layerTop(3) - 2} from="right" dim={firstAt}>

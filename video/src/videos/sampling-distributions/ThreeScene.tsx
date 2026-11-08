@@ -249,13 +249,13 @@ export const ThreeScene: React.FC = () => {
 
       {/* ══ Phase 1: the population, at full size ══ */}
       <Ink at={popFrom - 12} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
-        <span style={label(22, INK_SOFT)}>The first distribution</span>
+        <span style={label(24, INK_SOFT)}>The first distribution</span>
       </Ink>
       <Ink at={popFrom - 8} dur={20} out={p1Out} style={{ left: 92, top: y(150), ...headline(92), whiteSpace: "nowrap" }}>
         The population
       </Ink>
       <Ink at={fixedAt - 4} dur={18} out={p1Out} style={{ left: 96, top: y(262), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(36, true), color: INK }}>Wide, fixed, and almost never seen.</span>
+        <span style={{ ...body(34, true), color: INK }}>Wide, fixed, and almost never seen.</span>
       </Ink>
       {ILLUSTRATIONS ? <Basket at={millionAt} out={p1Out} /> : null}
 
@@ -320,20 +320,20 @@ export const ThreeScene: React.FC = () => {
 
       {/* ══ Phase 2: one sample ══ */}
       <Ink at={sampleFrom - 4} dur={14} out={p2Out} style={{ left: RX, top: y(112) }}>
-        <span style={label(22, INK_SOFT)}>The second distribution</span>
+        <span style={label(24, INK_SOFT)}>The second distribution</span>
       </Ink>
       <Ink at={sampleFrom} dur={18} out={p2Out} style={{ left: RX - 4, top: y(146), ...headline(64), whiteSpace: "nowrap" }}>
         One sample
       </Ink>
       <Ink at={pickAt} dur={16} out={p2Out} style={{ left: RX, top: y(236), width: RW }}>
-        <span style={{ ...body(32, true), color: INK }}>Forty customers, picked at random.</span>
+        <span style={{ ...body(34, true), color: INK }}>Forty customers, picked at random.</span>
       </Ink>
       <Note at={snapshotAt - 2} x={RX} y={y(360)} width={RW} out={histAt - 10}>
-        <div style={{ ...body(30, true), color: INK }}>A noisy snapshot of the population.</div>
+        <div style={{ ...body(28, true), color: INK }}>A noisy snapshot of the population.</div>
       </Note>
       <Note at={histAt} x={RX} y={y(360)} width={RW} out={p2Out}>
-        <div style={{ ...body(30), color: INK }}>What a histogram of your data shows.</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 12, opacity: ease(frame, rawValuesAt - 2, 12) }}>
+        <div style={{ ...body(28), color: INK }}>What a histogram of your data shows.</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 12, opacity: ease(frame, rawValuesAt - 2, 12) }}>
           Raw values, one block per customer.
         </div>
       </Note>
@@ -371,7 +371,7 @@ export const ThreeScene: React.FC = () => {
 
       {/* ══ Phase 3: the sampling distribution ══ */}
       <Ink at={thirdFrom - 4} dur={14} out={p3Out} style={{ left: RX, top: y(112) }}>
-        <span style={label(22, INK_SOFT)}>The third distribution</span>
+        <span style={label(24, INK_SOFT)}>The third distribution</span>
       </Ink>
       <Ink at={thirdFrom} dur={20} out={p3Out} style={{ left: RX - 4, top: y(146), ...headline(64), lineHeight: 1.04 }}>
         The sampling
@@ -379,12 +379,12 @@ export const ThreeScene: React.FC = () => {
         distribution
       </Ink>
       <Ink at={kindAt} dur={16} out={p3Out} style={{ left: RX, top: y(300), width: RW }}>
-        <span style={{ ...body(32, true), color: ACCENT_INK }}>One average per sample.</span>
+        <span style={{ ...body(34, true), color: ACCENT_INK }}>One average per sample.</span>
       </Ink>
       {/* Up beside the sample's bars, clear of Fig. 3's tick row and the
           label row under it: the big count on a line of its own. */}
       <div style={{ position: "absolute", left: RX, top: y(400), opacity: counterIn }}>
-        <div style={label(21, INK_SOFT)}>Samples drawn</div>
+        <div style={label(24, INK_SOFT)}>Samples drawn</div>
         <div
           style={{
             ...headline(104),
@@ -399,7 +399,7 @@ export const ThreeScene: React.FC = () => {
       </div>
       <Note at={fiftyAt} x={RX} y={y(790)} width={RW} out={p3Out}>
         <div style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>Centered on ${fmt(PILE.mean)}</div>
-        <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>The population&apos;s average is ${fmt(POPULATION.mean)}.</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>The population&apos;s average is ${fmt(POPULATION.mean)}.</div>
       </Note>
 
       {swelling(
@@ -410,7 +410,7 @@ export const ThreeScene: React.FC = () => {
       )}
       {/* Its own axis while it is built, said in the label row's free end. */}
       <Note at={thirdFrom + 8} x={X.x1} y={y(MEANS_LABEL) + 2} align="right" from="right" out={zoomAt}>
-        <span style={note(22, INK_SOFT)}>on its own axis, zoomed in</span>
+        <span style={note(24, INK_SOFT)}>on its own axis, zoomed in</span>
       </Note>
       <PileAxis scale={PX} z={z} base={y(MEANS_BASE)} at={thirdFrom + 2} />
       {/* Clipped to the axis: on $40-$60 a rare far average has no room. */}
@@ -442,7 +442,7 @@ export const ThreeScene: React.FC = () => {
       {fastSample >= 1 ? <FastDots index={fastSample} /> : null}
       {/* Under the counter, which it follows. */}
       <Note at={thousandAt} x={RX} y={y(592)} from="up" out={piledAt + 10}>
-        <span style={note(22, INK_SOFT)}>each a different {N} of the million</span>
+        <span style={note(24, INK_SOFT)}>each a different {N} of the million</span>
       </Note>
       <Rule
         x={sx(PX, PILE.mean)}
@@ -513,7 +513,7 @@ export const ThreeScene: React.FC = () => {
         />
       </svg>
       <Note at={gapAt} x={RX} y={y(640)} width={RW}>
-        <span style={{ ...body(30, true), color: INK }}>
+        <span style={{ ...body(28, true), color: INK }}>
           That gap is why {N} customers can pin down the average of a million.
         </span>
       </Note>
@@ -662,7 +662,7 @@ const Averaging: React.FC<{
           top: y(MERGE_Y) - 17,
           opacity: labelIn,
           whiteSpace: "nowrap",
-          ...note(26, ACCENT_INK),
+          ...note(28, ACCENT_INK),
           ...TABULAR,
           fontWeight: 500,
           ...halo,
@@ -809,7 +809,7 @@ const PileAxis: React.FC<{ scale: XScale; z: number; base: number; at: number }>
                     x={x}
                     y={base + 26}
                     textAnchor="middle"
-                    style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
+                    style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
                   >
                     {money(v)}
                   </text>
@@ -889,7 +889,7 @@ const WidthTable: React.FC<{ rawAt: number; statAt: number; middleAt: number; te
               opacity: highlight > 0 ? 1 : 0,
             }}
           />
-          <span style={{ position: "relative", display: "inline-block", transformOrigin: "left center", transform: `scale(${nameGrow})`, ...body(32), color: INK }}>
+          <span style={{ position: "relative", display: "inline-block", transformOrigin: "left center", transform: `scale(${nameGrow})`, ...body(34), color: INK }}>
             {name}
           </span>
         </span>
@@ -902,12 +902,12 @@ const WidthTable: React.FC<{ rawAt: number; statAt: number; middleAt: number; te
   return (
     <>
       <Note at={rawAt - 4} x={RX} y={y(282)} width={RW}>
-        <span style={label(21, INK_SOFT)}>Raw values, one per customer</span>
+        <span style={label(24, INK_SOFT)}>Raw values, one per customer</span>
       </Note>
       {row("The population", `± $${fmt(POPULATION.sd)}`, INK, 322, rawAt - 2, 0, tensAt - 2)}
       {row("One sample", `± $${fmt(SAMPLE.sd)}`, INK, 382, rawAt + 2, mark, tensAt + 4, middleAt - 2)}
       <Note at={statAt - 4} x={RX} y={y(466)} width={RW}>
-        <span style={label(21, ACCENT_INK)}>A statistic, one per sample</span>
+        <span style={label(24, ACCENT_INK)}>A statistic, one per sample</span>
       </Note>
       {row("Sample averages", `± $${fmt(PILE.sd)}`, ACCENT_INK, 506, statAt, 0, barelyAt - 2)}
     </>

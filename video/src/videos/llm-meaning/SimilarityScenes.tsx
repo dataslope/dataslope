@@ -183,7 +183,7 @@ export const CosineScene: React.FC = () => {
           left: (short[0] + long[0]) / 2 + 48,
           top: (short[1] + long[1]) / 2 + 22,
           opacity: ease(frame, sevenAt - 2, 10) * (1 - rulerFade * 0.3),
-          ...note(26, INK),
+          ...note(28, INK),
           fontWeight: 500,
           whiteSpace: "nowrap",
           ...halo,
@@ -218,7 +218,7 @@ export const CosineScene: React.FC = () => {
 
       {/* The right-hand column: why length misleads, then the two readings. */}
       <Note at={lengthAt - 4} x={1050} y={y(360)} width={520}>
-        <div style={{ ...body(32), color: INK }}>
+        <div style={{ ...body(34), color: INK }}>
           In an embedding, length mostly tracks <Mark at={commonAt}>how common</Mark> a word is,{" "}
           <span style={{ opacity: ease(frame, meansAt - 6, 10) }}>not what it means.</span>
         </div>
@@ -226,12 +226,12 @@ export const CosineScene: React.FC = () => {
       <Reading x={1050} y={y(530)} at={sevenAt - 6} valueAt={sevenAt} name="Ruler" value={COSINE.euclid.toFixed(3)} />
       <Reading x={1050} y={y(600)} at={saysOneAt - 6} valueAt={saysOneAt} name="Cosine" value={COSINE.cosLong.toFixed(1)} color={POINT_INK} />
       <Note at={fiveAt} out={sevenAt - 14} x={1050} y={y(560)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
           Same direction; one is {COSINE.lengthRatio.toFixed(0)} times longer.
         </span>
       </Note>
       <Note at={matchAt - 2} x={1390} y={y(600) + 10}>
-        <span style={{ ...note(26, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a perfect match</span>
+        <span style={{ ...note(28, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a perfect match</span>
       </Note>
 
       {/* ── Fig. 7: the cosine scale ── */}
@@ -241,7 +241,7 @@ export const CosineScene: React.FC = () => {
         {[-1, 0, 1].map((v) => (
           <g key={v}>
             <line x1={sxOf(v)} x2={sxOf(v)} y1={SY - 8} y2={SY + 8} stroke={INK} strokeWidth={1.6} />
-            <text x={sxOf(v)} y={SY + 38} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 22, fontWeight: 500, fill: INK_SOFT, ...TABULAR }}>
+            <text x={sxOf(v)} y={SY + 38} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT, ...TABULAR }}>
               {num(v, 0)}
             </text>
           </g>
@@ -268,7 +268,7 @@ export const CosineScene: React.FC = () => {
                 top: SY - 58,
                 transform: `translateX(-50%) translateY(${(1 - p) * 8}px)`,
                 opacity: p,
-                ...note(22, POINT_INK),
+                ...note(24, POINT_INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
@@ -340,11 +340,11 @@ export const SearchScene: React.FC = () => {
       </Fade>
       <Fade at={themesAt - 4} style={{ left: 0, top: y(366), width: 1920 }}>
         {SEARCH.axes.map((ax, i) => (
-          <span key={ax} style={{ position: "absolute", left: THEME_X[i], transform: "translateX(-50%)", ...label(21, INK_SOFT), opacity: ease(frame, themesAt - 4 + i * 4, 10) }}>
+          <span key={ax} style={{ position: "absolute", left: THEME_X[i], transform: "translateX(-50%)", ...label(24, INK_SOFT), opacity: ease(frame, themesAt - 4 + i * 4, 10) }}>
             {ax}
           </span>
         ))}
-        <span style={{ position: "absolute", left: SCORE_X, transform: "translateX(-50%)", ...label(21, POINT_INK), opacity: ease(frame, topAt - 4, 10) }}>
+        <span style={{ position: "absolute", left: SCORE_X, transform: "translateX(-50%)", ...label(24, POINT_INK), opacity: ease(frame, topAt - 4, 10) }}>
           Cosine
         </span>
       </Fade>
@@ -376,7 +376,7 @@ export const SearchScene: React.FC = () => {
                 }}
               />
             ) : null}
-            <span style={{ position: "absolute", left: DOC_X, top: 14, ...note(26, INK), fontWeight: isTop && hi > 0.5 ? 500 : 500, whiteSpace: "nowrap" }}>
+            <span style={{ position: "absolute", left: DOC_X, top: 14, ...note(28, INK), fontWeight: isTop && hi > 0.5 ? 500 : 500, whiteSpace: "nowrap" }}>
               {d.text}
             </span>
             {d.vec.map((v, j) => (
@@ -389,7 +389,7 @@ export const SearchScene: React.FC = () => {
                   transform: "translateX(-50%)",
                   fontFamily: MONO,
                   fontWeight: 500,
-                  fontSize: 25,
+                  fontSize: 24,
                   color: v === 0 ? FAINT : INK,
                   opacity: ease(frame, themesAt - 2 + j * 4, 10),
                 }}
@@ -405,7 +405,7 @@ export const SearchScene: React.FC = () => {
                 transform: "translateX(-50%)",
                 fontFamily: MONO,
                 fontWeight: 500,
-                fontSize: 27,
+                fontSize: 28,
                 color: isTop ? POINT_INK : INK,
                 opacity: ease(frame, topAt - 2 + rank(d.text) * 3, 10),
                 ...TABULAR,
@@ -419,8 +419,8 @@ export const SearchScene: React.FC = () => {
 
       {/* The question, as the lesson's query vector. */}
       <Fade at={askAt - 4} style={{ left: 0, top: QY, width: 1920 }}>
-        <span style={{ position: "absolute", left: X0, top: -40, ...label(21, INK_SOFT) }}>Query</span>
-        <span style={{ position: "absolute", left: DOC_X, top: 4, ...body(32), fontStyle: SERIF_ITALIC, color: INK, whiteSpace: "nowrap" }}>
+        <span style={{ position: "absolute", left: X0, top: -40, ...label(24, INK_SOFT) }}>Query</span>
+        <span style={{ position: "absolute", left: DOC_X, top: 4, ...body(34), fontStyle: SERIF_ITALIC, color: INK, whiteSpace: "nowrap" }}>
           How did the company perform <Mark at={financiallyAt}>financially?</Mark>
         </span>
         {SEARCH.query.map((v, j) => (
@@ -433,7 +433,7 @@ export const SearchScene: React.FC = () => {
               transform: "translateX(-50%)",
               fontFamily: MONO,
               fontWeight: 500,
-              fontSize: 25,
+              fontSize: 24,
               color: v === 0 ? FAINT : POINT_INK,
               opacity: ease(frame, askAt + 6 + j * 3, 10),
             }}
@@ -506,7 +506,7 @@ const Box: React.FC<{ x: number; y: number; w: number; at: number; title: string
         background: accent ? `color-mix(in srgb, ${POINT} 6%, ${PAPER})` : PAPER,
       }}
     >
-      <div style={{ ...label(25, accent ? POINT_INK : INK) }}>{title}</div>
+      <div style={{ ...label(24, accent ? POINT_INK : INK) }}>{title}</div>
       {children ? <div style={{ marginTop: 10 }}>{children}</div> : null}
     </div>
   </Fade>
@@ -571,7 +571,7 @@ export const BlindScene: React.FC = () => {
         </Sentence>
       </Fade>
       <Note at={topOfAt} x={X0} y={cardsTop + SENTENCE_DY + LANDED + 100}>
-        <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Almost the same direction, opposite meanings.</span>
+        <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>Almost the same direction, opposite meanings.</span>
       </Note>
 
       {/* ── Fig. 10: a second pass reads what the search found ── */}
@@ -582,7 +582,7 @@ export const BlindScene: React.FC = () => {
         ))}
       </Box>
       <Box x={pipeX[1]} y={PY} w={260} at={readsAt - 4} title="A second pass" accent>
-        <div style={{ ...note(25, INK_SOFT) }}>reads each one</div>
+        <div style={{ ...note(24, INK_SOFT) }}>reads each one</div>
       </Box>
       <Box x={pipeX[2]} y={PY} w={220} at={hitsAt} title="The answer">
         <div style={{ height: 18, marginTop: 4, borderRadius: 4, background: DATA_TINT, border: `1.5px solid ${DATA}`, width: "88%" }} />
@@ -596,13 +596,13 @@ export const BlindScene: React.FC = () => {
         <line x1={X0} x2={X0 + (1800 - X0) * ease(frame, problemAt - 4, 22)} y1={TY - 40} y2={TY - 40} stroke={INK_SOFT} strokeWidth={1.6} />
       </Svg>
       <div style={{ position: "absolute", left: 0, top: TY, width: 1920, display: "flex", justifyContent: "center", alignItems: "center", gap: 16 }}>
-        <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 500, color: INK_SOFT, opacity: around * 0.85, whiteSpace: "pre" }}>
+        <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK_SOFT, opacity: around * 0.85, whiteSpace: "pre" }}>
           The trophy didn&apos;t fit in the suitcase because
         </span>
         <span style={{ opacity: ease(frame, nothingAt - 4, 12), transform: `scale(${1 + 0.08 * pulse(frame, nothingAt, 26)})` }}>
           <TokenChip text="it" size={34} border={POINT} color={POINT_INK} />
         </span>
-        <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 500, color: INK_SOFT, opacity: around * 0.85, whiteSpace: "pre" }}>
+        <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK_SOFT, opacity: around * 0.85, whiteSpace: "pre" }}>
           was too big.
         </span>
       </div>

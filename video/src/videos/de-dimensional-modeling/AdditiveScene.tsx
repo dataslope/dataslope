@@ -53,8 +53,8 @@ const Kind: React.FC<{ at: number; litFrom: number; litTo: number; name: string;
             opacity: lit * 0.8,
           }}
         />
-        <span style={{ position: "relative", ...label(25, INK), fontWeight: 500 }}>{name}</span>
-        <span style={{ position: "relative", ...note(23, INK_SOFT), marginLeft: 12 }}>{eg}</span>
+        <span style={{ position: "relative", ...label(24, INK), fontWeight: 500 }}>{name}</span>
+        <span style={{ position: "relative", ...note(24, INK_SOFT), marginLeft: 12 }}>{eg}</span>
       </div>
       {under ? <div style={{ marginTop: 12, opacity: q, transform: `translateX(${(1 - q) * -18}px)` }}>{under}</div> : null}
     </div>
@@ -183,7 +183,7 @@ export const AdditiveScene: React.FC = () => {
             name="additive"
             eg="an amount"
             noteAt={everyAt}
-            note={<span style={{ ...note(22, OK_INK), fontWeight: 500 }}>sums across every dimension</span>}
+            note={<span style={{ ...note(24, OK_INK), fontWeight: 500 }}>sums across every dimension</span>}
           />
           <Gap at={kindAt[1]} />
           <Kind at={kindAt[1]} litFrom={semiAt} litTo={nonAt} name="semi-additive" eg="a balance" />
@@ -197,7 +197,7 @@ export const AdditiveScene: React.FC = () => {
             name="non-additive"
             eg="a ratio, a distinct count"
             noteAt={ratiosAt}
-            note={<span style={{ ...note(22, INK), fontWeight: 500 }}>don&apos;t sum at all</span>}
+            note={<span style={{ ...note(24, INK), fontWeight: 500 }}>don&apos;t sum at all</span>}
           />
         </div>
 
@@ -238,7 +238,7 @@ export const AdditiveScene: React.FC = () => {
           strikeAt={neverAt}
         />
         <Note at={fortyAt + 4} x={R_X} y={y(540)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>money that never existed</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>money that never existed</span>
         </Note>
         <Verdict
           at={lastAt}
@@ -252,7 +252,7 @@ export const AdditiveScene: React.FC = () => {
           }
         />
         <Note at={averageAt} x={R_X} y={y(652)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>or the average over the period</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>or the average over the period</span>
         </Note>
 
         {/* ── A distinct count: never summed ── */}
@@ -260,7 +260,7 @@ export const AdditiveScene: React.FC = () => {
           const at = d === "Mon" ? monAt : tueAt;
           return (
             <div key={d} style={{ position: "absolute", left: R_X, top: y(732) + k * h(54), display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ ...label(23, INK_SOFT), fontWeight: 500, width: 64, opacity: ease(frame, at - 2, 10) }}>{d}</span>
+              <span style={{ ...label(24, INK_SOFT), fontWeight: 500, width: 64, opacity: ease(frame, at - 2, 10) }}>{d}</span>
               {WHO[d].map((p, i) => (
                 <Who key={p} name={p} at={at + 2 + i * 3} both={both.has(p) ? fourAt : undefined} />
               ))}
@@ -281,11 +281,11 @@ export const AdditiveScene: React.FC = () => {
             opacity: ease(frame, fourAt - 2, 10),
           }}
         >
-          <span style={{ ...label(23, INK_SOFT), fontWeight: 500, width: 64 }}>both</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, width: 64 }}>both</span>
           {everyone.map((p, i) => (
             <Who key={p} name={p} at={fourAt + i * 2} />
           ))}
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, marginLeft: 12 }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, marginLeft: 12 }}>
             <Num>{VISITS_BOTH}</Num> people,{" "}
             <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, sixAt - 2, 10) }}>
               not <Num>{sumOfDays}</Num>

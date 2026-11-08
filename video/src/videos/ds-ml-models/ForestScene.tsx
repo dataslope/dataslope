@@ -221,7 +221,7 @@ export const ForestScene: React.FC = () => {
               left: X0,
               top: y(GRID_TOP) - h(46),
               opacity: gridOn,
-              ...label(22, INK),
+              ...label(24, INK),
               fontWeight: 500,
               whiteSpace: "nowrap",
             }}
@@ -260,7 +260,7 @@ export const ForestScene: React.FC = () => {
           >
             <span
               style={{
-                ...note(25, INK),
+                ...note(24, INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
@@ -279,7 +279,7 @@ export const ForestScene: React.FC = () => {
             out={out5}
           >
             <span
-              style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}
+              style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}
             >
               the usual default: about √{FOREST.features} ≈{" "}
               {fmt(Math.sqrt(FOREST.features), 1)}
@@ -291,7 +291,7 @@ export const ForestScene: React.FC = () => {
             y={y(GRID_TOP) + 5 * h(CELL + GAP) + h(100)}
             out={out5}
           >
-            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
               so the trees stop making the same cuts,
             </span>
           </Note>
@@ -301,7 +301,7 @@ export const ForestScene: React.FC = () => {
             y={y(GRID_TOP) + 5 * h(CELL + GAP) + h(136)}
             out={out5}
           >
-            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
               and their mistakes overlap less
             </span>
           </Note>
@@ -309,7 +309,7 @@ export const ForestScene: React.FC = () => {
           <Note at={heldAt} x={BARS_X} y={y(GRID_TOP) - h(46)} out={out5}>
             <span
               style={{
-                ...label(22, INK),
+                ...label(24, INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
@@ -334,7 +334,7 @@ export const ForestScene: React.FC = () => {
                   x={at(xb, v)}
                   y={y(GRID_TOP) + h(300) + 26}
                   textAnchor="middle"
-                  style={svgText({ ...label(19, INK_SOFT), ...TABULAR })}
+                  style={svgText({ ...label(24, INK_SOFT), ...TABULAR })}
                 >
                   {v}%
                 </text>
@@ -395,7 +395,7 @@ export const ForestScene: React.FC = () => {
           <Note at={gbAt} x={box.left} y={box.top - h(40)} out={gbOut}>
             <span
               style={{
-                ...label(21, INK),
+                ...label(24, INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
@@ -445,7 +445,7 @@ export const ForestScene: React.FC = () => {
             y={box.top + box.height + h(14)}
             out={gbOut}
           >
-            <span style={{ ...label(21, ACCENT_INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>
               red: the negative gradient, what the next tree is fitted to
             </span>
           </Note>
@@ -527,7 +527,7 @@ export const ForestScene: React.FC = () => {
           <Note at={reweightAt + 2} x={box.left} y={box.top - h(40)}>
             <span
               style={{
-                ...label(21, INK),
+                ...label(24, INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
@@ -545,7 +545,7 @@ export const ForestScene: React.FC = () => {
           >
             <span
               style={{
-                ...note(25, ACCENT_INK),
+                ...note(24, ACCENT_INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
@@ -573,7 +573,7 @@ export const ForestScene: React.FC = () => {
             </span>
           </Note>
           <Note at={pseudoAt} x={COL} y={y(370) + h(86)}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
               the pseudo-residuals;{" "}
               <span style={{ opacity: ease(frame, residAt, 10) }}>
                 for squared error, the residuals
@@ -581,7 +581,7 @@ export const ForestScene: React.FC = () => {
             </span>
           </Note>
           <Note at={anyAt} x={COL} y={y(370) + h(122)}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
               but any differentiable loss will do
             </span>
           </Note>

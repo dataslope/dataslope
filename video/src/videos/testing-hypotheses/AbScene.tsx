@@ -120,7 +120,7 @@ export const AbScene: React.FC = () => {
         {bars.map((b, i) => (
           <React.Fragment key={i}>
             <Ink at={b.at - 6} dur={14} style={{ left: 160, top: y(ROW_Y[i]) - 22, whiteSpace: "nowrap" }}>
-              <span style={{ ...body(38, true), color: INK }}>{b.label}</span>
+              <span style={{ ...body(34, true), color: INK }}>{b.label}</span>
             </Ink>
             {b.grow > 0 ? (
               <div
@@ -155,7 +155,7 @@ export const AbScene: React.FC = () => {
                 top: y(ROW_Y[1]) - 14,
                 transform: "translateX(-50%)",
                 opacity: ease(frame, nearlyAt + k * 6, 8),
-                ...note(22, PAPER),
+                ...note(24, PAPER),
                 fontWeight: 500,
               }}
             >
@@ -166,7 +166,7 @@ export const AbScene: React.FC = () => {
         <Note at={manyAt - 4} x={end2} y={y(ROW_Y[1]) - h(BAR_H) / 2 - 46} align="right">
           <span
             style={{
-              ...note(26, STAT_INK),
+              ...note(28, STAT_INK),
               fontWeight: 500,
               display: "inline-block",
               transform: `scale(${1 + 0.1 * manyGlow})`,

@@ -86,7 +86,7 @@ export const BnScene: React.FC = () => {
                   {line.ticks.map((t) => (
                     <g key={t}>
                       <line x1={pos(i, t)} x2={pos(i, t)} y1={y(line.y)} y2={y(line.y) + 7} stroke={INK} strokeWidth={1.2} />
-                      <text x={pos(i, t)} y={y(line.y) + 30} textAnchor="middle" style={svgText({ ...label(19, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
+                      <text x={pos(i, t)} y={y(line.y) + 30} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
                         {t < 0 ? `−${-t}` : t}
                       </text>
                     </g>
@@ -123,7 +123,7 @@ export const BnScene: React.FC = () => {
             mean 0
           </Tagline>
           <Bracket x0={pos(1, -1)} x1={pos(1, 1)} y={y(LINES[1].y) + h(46)} at={zeroAt + 12} color={OK}>
-            <span style={{ ...label(19, OK_INK), fontWeight: 500 }}>± 1</span>
+            <span style={{ ...label(24, OK_INK), fontWeight: 500 }}>± 1</span>
           </Bracket>
 
           {/* The eight dots, dropping from line to line. */}

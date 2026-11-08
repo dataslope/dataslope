@@ -82,9 +82,9 @@ export const HookScene: React.FC = () => {
         <Spot id="de-sql-performance-cheetah" at={from + 10} left={1190} top={y(300)} width={620} height={457} />
 
         {/* ── The table: a thousand squares of a thousand orders ── */}
-        <div style={{ position: "absolute", left: X0, top: y(GRID_TOP) - 44, ...label(22, INK), whiteSpace: "nowrap", opacity: ease(frame, tableAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(GRID_TOP) - 44, ...label(24, INK), whiteSpace: "nowrap", opacity: ease(frame, tableAt, 12) }}>
           orders: <Num>{thousands(SLOW.orders)}</Num> rows
-          <span style={{ ...note(21, INK_SOFT), marginLeft: 16 }}>each square, a thousand</span>
+          <span style={{ ...note(24, INK_SOFT), marginLeft: 16 }}>each square, a thousand</span>
         </div>
         <RowGrid x={X0} top={y(GRID_TOP)} at={ordersAt - 6} />
         <div
@@ -100,7 +100,7 @@ export const HookScene: React.FC = () => {
         >
           <Num>{thousands(SLOW.customers)}</Num> customers, <Num>{SLOW.orders / SLOW.customers}</Num> orders each, spread over 2024
         </div>
-        <div style={{ position: "absolute", left: X0, top: y(GRID_TOP) + 420, ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, runAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(GRID_TOP) + 420, ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, runAt, 12) }}>
           generated, not random: every plan here reruns identically
         </div>
 
@@ -134,7 +134,7 @@ export const HookScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: SANS,
-                fontSize: 22,
+                fontSize: 24,
                 fontWeight: 500,
                 ...TABULAR,
                 opacity: p * (1 - fade),

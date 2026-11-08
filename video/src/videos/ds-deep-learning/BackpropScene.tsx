@@ -63,7 +63,7 @@ const Op: React.FC<{ x: number; w: number; top: number; height: number; at: numb
         opacity: p,
         transform: `translateY(${(1 - p) * 8}px)`,
         fontFamily: MONO,
-        fontSize: 27,
+        fontSize: 28,
         fontWeight: 500,
         color: INK,
         fontVariantLigatures: "none",
@@ -132,7 +132,7 @@ export const BackpropScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={chainAt - 2} x={X0} y={y(300)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             the chain rule, run backward:{" "}
             <span style={{ opacity: ease(frame, sweepAt - 2, 10) }}>
               one sweep gives every weight its gradient,{" "}
@@ -177,7 +177,7 @@ export const BackpropScene: React.FC = () => {
         </Svg>
         {slopes.map((s) => (
           <Tagline key={s.text} x={s.x + s.w / 2} y={y(SLOPE_Y)} width={s.w + 80} align="center" at={s.at - 2} size={23} color={ACCENT_INK}>
-            <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500 }}>{s.text}</span>
+            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>{s.text}</span>
           </Tagline>
         ))}
 
@@ -193,14 +193,14 @@ export const BackpropScene: React.FC = () => {
         <Note at={handAt - 2} x={1000} y={y(PRODUCT_Y)}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Tick at={handAt + 4} size={26} />
-            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>nudging w by hand: {num(B.finiteDiff, 3)}</span>
+            <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>nudging w by hand: {num(B.finiteDiff, 3)}</span>
           </div>
         </Note>
 
         {/* ── The page's own check of the middle slope ── */}
         <Tagline x={X0} y={y(PAGE_Y)} at={pageAt - 4} size={22} color={INK}>
           the page&apos;s check:{" "}
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500 }}>σ′(z) = σ(z)(1 − σ(z))</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>σ′(z) = σ(z)(1 − σ(z))</span>
         </Tagline>
         {["z", "formula", "nudged"].map((name, r) => (
           <Tagline key={name} x={X0} y={y(PAGE_Y) + h(44) + r * h(42)} at={pageAt + r * 3} size={21}>

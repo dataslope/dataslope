@@ -219,7 +219,7 @@ export const Box: React.FC<{
       >
         {title}
       </span>
-      {sub ? <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", lineHeight: 1.15 }}>{sub}</span> : null}
+      {sub ? <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", lineHeight: 1.15 }}>{sub}</span> : null}
     </div>
   );
 };

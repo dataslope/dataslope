@@ -46,8 +46,8 @@ const Layer: React.FC<{
         transform: `translateY(${(1 - p) * 12}px)`,
       }}
     >
-      <div style={{ position: "absolute", left: 20, top: 18, ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</div>
-      {gloss ? <div style={{ position: "absolute", left: 20, top: 56, ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>{gloss}</div> : null}
+      <div style={{ position: "absolute", left: 20, top: 18, ...label(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</div>
+      {gloss ? <div style={{ position: "absolute", left: 20, top: 56, ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{gloss}</div> : null}
       {children}
     </div>
   );
@@ -81,7 +81,7 @@ const ChipRow: React.FC<{ words: readonly string[]; at: number; top: number; tag
                   width: ws[i],
                   top: top + 46,
                   textAlign: "center",
-                  ...note(19, INK_SOFT),
+                  ...note(24, INK_SOFT),
                   opacity: ease(frame, tagAt + i * 3, 10),
                 }}
               >
@@ -159,7 +159,7 @@ export const LayersScene: React.FC = () => {
               top: exTop + 6,
               textAlign: "center",
               fontFamily: MONO,
-              fontSize: 21,
+              fontSize: 24,
               color: INK,
               whiteSpace: "pre",
               opacity: ease(frame, at[0] + 6, 10),
@@ -189,7 +189,7 @@ export const LayersScene: React.FC = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 fontFamily: MONO,
-                fontSize: 21,
+                fontSize: 24,
                 color: INK,
                 opacity: ease(frame, at[4] + 6 + i * 3, 10),
               }}
@@ -227,7 +227,7 @@ export const LayersScene: React.FC = () => {
           ))}
         </div>
         <Ink at={spamAt - 4} dur={18} style={{ left: X0, top: y(UNDER_Y + 86), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(32, true), color: INK_SOFT }}>
+          <span style={{ ...body(34, true), color: INK_SOFT }}>
             A spam filter scores words <Mark at={meanAt - 6}>without knowing what they mean</Mark>.
           </span>
         </Ink>

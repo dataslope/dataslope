@@ -112,18 +112,18 @@ export const MissingScene: React.FC = () => {
           ]}
         />
         <Note at={neverAt - 2} x={EQ_X} y={y(TOP) - h(40)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>never with equals</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>never with equals</span>
         </Note>
         <Listing lines={MISSING.nanEq.lines} x={EQ_X} top={y(TOP)} width={300} size={SIZE} at={neverAt} />
         <Note at={itselfAt - 4} x={EQ_X + 316} y={y(TOP) + h(12)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             → <Mark at={itselfAt + 4} color={MARK_BAD}><Mono>{MISSING.nanEq.value}</Mono></Mark>
           </span>
         </Note>
 
         {/* ── Handle ── */}
         <Note at={dropAt} x={ISNA_X} y={y(FILL_Y) - h(48)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mono>dropna()</Mono> or <Mono>fillna()</Mono>, depending on why
           </span>
         </Note>
@@ -158,14 +158,14 @@ export const MissingScene: React.FC = () => {
           })}
         </svg>
         <Note at={sixtyAt + 10} x={COL_X + 90} y={colTop + h(60)}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{(GAPS.length / cells) * 100}% empty</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{(GAPS.length / cells) * 100}% empty</span>
         </Note>
         <Note at={decisionAt} x={COL_X + 90} y={colTop + h(110)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mark at={decisionAt + 6}>a modeling</Mark>
           </span>
           <br />
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mark at={decisionAt + 12}>decision</Mark>
           </span>
         </Note>

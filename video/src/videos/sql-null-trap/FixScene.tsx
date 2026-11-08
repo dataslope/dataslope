@@ -71,7 +71,7 @@ export const FixScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 14} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Two fixes</span>
+        <span style={label(24, ACCENT_INK)}>Two fixes</span>
       </Ink>
       <Ink
         at={start - 12}
@@ -119,8 +119,8 @@ export const FixScene: React.FC = () => {
               whiteSpace: "nowrap",
             }}
           >
-            <span style={{ ...label(22, ACCENT_INK), fontWeight: 500 }}>{p.letter}</span>
-            <span style={label(22, INK)}>{p.title}</span>
+            <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>{p.letter}</span>
+            <span style={label(24, INK)}>{p.title}</span>
           </Ink>
           <Listing
             lines={p.lines}
@@ -147,7 +147,7 @@ export const FixScene: React.FC = () => {
       <Note at={yesNoAt} x={PANELS[0].x} y={listBottom + 22} width={760} from="up">
         <span
           style={{
-            ...note(21, INK_SOFT),
+            ...note(24, INK_SOFT),
             display: "inline-flex",
             alignItems: "center",
             gap: "0.4em",
@@ -159,7 +159,7 @@ export const FixScene: React.FC = () => {
         </span>
       </Note>
       <Note at={subqueryAt} x={PANELS[1].x} y={listBottom + 22} width={800} from="up">
-        <span style={note(21, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           The list is now <Mono color={INK}>({KNOWN_IDS.join(", ")})</Mono>, with no{" "}
           <Mono color={UNKNOWN_INK} weight={500}>
             NULL

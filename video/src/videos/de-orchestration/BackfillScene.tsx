@@ -143,7 +143,7 @@ export const BackfillScene: React.FC = () => {
           ]}
         />
         <Note at={ownAt} x={X0} y={y(612)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             each date overwrites its own partition: run it once or twice, same table
           </span>
         </Note>
@@ -155,7 +155,7 @@ export const BackfillScene: React.FC = () => {
           </span>
         </Note>
         <Note at={thrAt} x={GRID_X - 44} y={y(652)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             throttled
             <span style={{ opacity: ease(frame, fourAt, 10) }}>
               : <CodeSpan size={21}>max_active_runs={BACKFILL.parallel}</CodeSpan>, <Num>{BACKFILL.waves}</Num> waves
@@ -190,27 +190,27 @@ export const BackfillScene: React.FC = () => {
           })}
           {MONTHS.map((m, i) =>
             i % 3 ? null : (
-            <text key={m} x={GRID_X - 12} y={gridTop + i * h(ROW_PITCH) + h(ROW_CELL) - 1} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })} opacity={ease(frame, runsAt + i * 1.5, 8)}>
+            <text key={m} x={GRID_X - 12} y={gridTop + i * h(ROW_PITCH) + h(ROW_CELL) - 1} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })} opacity={ease(frame, runsAt + i * 1.5, 8)}>
               {m}
             </text>
             ),
           )}
         </svg>
         <Note at={airAt} x={GRID_X - 44} y={y(572)}>
-          <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             Airflow: <CodeSpan>catchup=True</CodeSpan>, a <CodeSpan>start_date</CodeSpan>
             <span style={{ opacity: ease(frame, dagAt, 10) }}> · Dagster: partitioned assets</span>
           </span>
         </Note>
         <Note at={airAt + 24} x={GRID_X - 44} y={y(612)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>catchup runs missed dates; the backfill command reruns past ones</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>catchup runs missed dates; the backfill command reruns past ones</span>
         </Note>
 
         {/* Why the loop: the cost of one run, a model. */}
         <Note at={loopAt} x={X0} y={y(656)}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             rows one run processes
-            <span style={{ ...label(22, INK_SOFT), fontWeight: 500, opacity: ease(frame, modelAt, 10) }}>
+            <span style={{ ...label(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, modelAt, 10) }}>
               {" "}
               · a model, <Num>{count(REFRESH.daily)}</Num> new rows a day, log scale
             </span>
@@ -220,14 +220,14 @@ export const BackfillScene: React.FC = () => {
           {[10_000, 100_000, 1_000_000, 10_000_000].map((v) => (
             <g key={v}>
               <line x1={CH_X0} x2={CH_X1} y1={ly(v)} y2={ly(v)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
-              <text x={CH_X0 - 12} y={ly(v) + 7} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
+              <text x={CH_X0 - 12} y={ly(v) + 7} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
                 {v >= 1e6 ? `${v / 1e6}M` : `${v / 1000}k`}
               </text>
             </g>
           ))}
           <line x1={CH_X0} x2={CH_X1} y1={plotBot} y2={plotBot} stroke={INK} strokeWidth={1.6} />
           {[0, 365, 730].map((d) => (
-            <text key={d} x={dx(d)} y={plotBot + 28} textAnchor="middle" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
+            <text key={d} x={dx(d)} y={plotBot + 28} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
               {d === 0 ? "day 0" : `day ${d}`}
             </text>
           ))}
@@ -246,17 +246,17 @@ export const BackfillScene: React.FC = () => {
           </g>
         </svg>
         <Note at={eightAt + 10} x={CH_X1 + 40} y={ly(REFRESH.daily) - 15}>
-          <span style={{ ...note(23, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             one day&apos;s partition: <Num>{count(REFRESH.daily)}</Num>
           </span>
         </Note>
         <Note at={sixAt} x={CH_X1 + 40} y={ly(REFRESH.fullAtEnd) - 15}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             rebuild everything: <Num>{count(REFRESH.fullAtEnd)}</Num>
           </span>
         </Note>
         <Note at={ratioAt + 4} x={CH_X1 + 40} y={(ly(REFRESH.fullAtEnd) + ly(REFRESH.daily)) / 2 - 18}>
-          <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{REFRESH.ratio}</Num>×
           </span>
         </Note>

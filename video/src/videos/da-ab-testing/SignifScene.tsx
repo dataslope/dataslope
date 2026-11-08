@@ -107,7 +107,7 @@ export const SignifScene: React.FC = () => {
 
         {/* ── Question 8: the same effect, more and more users ── */}
         <Note at={statAt - 2} x={X0} y={y(TOP - 20)} out={out8}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>statistical</b>: unlikely to be noise
           </span>
         </Note>
@@ -115,30 +115,30 @@ export const SignifScene: React.FC = () => {
             about 372px at 26px. */}
         <ColumnRule x={X0 + 465} top={y(TOP - 20)} height={34} at={pracAt - 2} out={out8} />
         <Note at={pracAt - 2} x={X0 + 560} y={y(TOP - 20)} out={out8}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>practical</b>: big enough to matter
           </span>
         </Note>
         <Svg opacity={ease(frame, holdAt - 4, 12) * (1 - ease(frame, out8, 10))}>
           <line x1={P.x0} x2={P.x1} y1={y(P.base)} y2={y(P.base)} stroke={INK} strokeWidth={1.6} />
           <line x1={P.x0} x2={P.x1} y1={alphaY} y2={alphaY} stroke={ACCENT} strokeWidth={1.6} strokeDasharray="6 6" />
-          <text x={P.x1 + 14} y={alphaY + 7} style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: ACCENT_INK }}>
+          <text x={P.x1 + 14} y={alphaY + 7} style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: ACCENT_INK }}>
             0.05
           </text>
           {[0, 0.2, 0.4, 0.6].map((t) => (
-            <text key={t} x={P.x0 - 14} y={ppy(t) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
+            <text key={t} x={P.x0 - 14} y={ppy(t) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
               {t === 0 ? "0" : t.toFixed(1)}
             </text>
           ))}
           {sizes.map((s) => (
-            <text key={s} x={px(s)} y={y(P.base) + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
+            <text key={s} x={px(s)} y={y(P.base) + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
               {s.toLocaleString("en-US")}
             </text>
           ))}
-          <text x={P.x1} y={y(P.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
+          <text x={P.x1} y={y(P.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
             users per group (log scale)
           </text>
-          <text x={P.x0 - 14} y={y(P.top) - 20} textAnchor="start" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
+          <text x={P.x0 - 14} y={y(P.top) - 20} textAnchor="start" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
             p-value
           </text>
           {PRACTICAL.rows.map(([s, p], i) => (
@@ -204,12 +204,12 @@ export const SignifScene: React.FC = () => {
           {[0, 1, 2, 3, 4].map((t) => (
             <g key={t}>
               <line x1={at(ls, t)} x2={at(ls, t)} y1={liftY + 40} y2={liftY + 47} stroke={INK} strokeWidth={1.2} />
-              <text x={at(ls, t)} y={liftY + 72} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
+              <text x={at(ls, t)} y={liftY + 72} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
                 {t === 0 ? "0" : `+${t}`}
               </text>
             </g>
           ))}
-          <text x={LIFT.x1} y={liftY + 100} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
+          <text x={LIFT.x1} y={liftY + 100} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
             lift in conversion, percentage points
           </text>
           <line
@@ -225,12 +225,12 @@ export const SignifScene: React.FC = () => {
           <circle cx={at(ls, EXPERIMENT.lift[0])} cy={liftY} r={13} fill={B_COLOR} />
         </Svg>
         <Note at={betweenAt + 6} x={at(ls, EXPERIMENT.ci[0]) - 40} y={liftY - h(56)}>
-          <span style={{ ...label(20, B_INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(24, B_INK), whiteSpace: "nowrap", ...TABULAR }}>
             {fmt(EXPERIMENT.ci[0])} to {fmt(EXPERIMENT.ci[1])}, around {fmt(EXPERIMENT.lift[0])}
           </span>
         </Note>
         <Note at={plusAt - 4} x={X0} y={liftY + h(130)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
             estimate ± 1.96 standard errors: {fmt(EXPERIMENT.lift[0])} ± {fmt(EXPERIMENT.zc)} × {fmt(EXPERIMENT.se)}
           </span>
         </Note>
@@ -238,7 +238,7 @@ export const SignifScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>standard error: how much the estimate wobbles from run to run</span>
         </Note>
         <Note at={wideAt - 2} x={X0} y={liftY + h(232)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>if it were wide, from a loss to a big win: we&apos;d need more data</span>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>if it were wide, from a loss to a big win: we&apos;d need more data</span>
         </Note>
 
         {/* A hundred 95% intervals around a known truth. */}
@@ -264,7 +264,7 @@ export const SignifScene: React.FC = () => {
           })}
         </Svg>
         <Note at={ninetyFiveAt} x={COV.x0} y={y(COV.top) - h(16)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>100 runs, each with its 95% interval; dashed: the truth</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>100 runs, each with its 95% interval; dashed: the truth</span>
         </Note>
         <Note at={fourAt} x={COV.x0} y={covRowY(COV.rows - 1) + h(20)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>

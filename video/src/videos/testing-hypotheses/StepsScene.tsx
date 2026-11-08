@@ -156,7 +156,7 @@ export const StepsScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={{ ...note(30, on ? STAT_INK : INK_SOFT), fontWeight: 500 }}>{i + 1}</span>
+              <span style={{ ...note(28, on ? STAT_INK : INK_SOFT), fontWeight: 500 }}>{i + 1}</span>
               <Label size={28} color={on ? INK : INK_SOFT} weight={on ? 650 : 520}>
                 {s.text}
               </Label>
@@ -225,7 +225,7 @@ export const StepsScene: React.FC = () => {
         </div>
       </Note>
       <Note at={sevenAt - 2} x={meanX - 14} y={y(STRIP) - h(70) - 8} align="right">
-        <span style={{ ...note(23, STAT_INK), fontWeight: 500, ...halo }}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500, ...halo }}>
           average <Count at={sevenAt - 2} to={STEPS.mean} from={STEPS.claimed} dur={26} format={steps} />
         </span>
       </Note>
@@ -238,7 +238,7 @@ export const StepsScene: React.FC = () => {
           style={{
             display: "inline-block",
             transform: `translateX(-50%) scale(${1 + 0.18 * Math.min(1, gapGlow)})`,
-            ...note(22, STAT_INK),
+            ...note(24, STAT_INK),
             fontWeight: 500,
             whiteSpace: "nowrap",
           }}
@@ -265,7 +265,7 @@ export const StepsScene: React.FC = () => {
             top: y(Z_BASE) + 16,
             transform: "translateX(-50%)",
             opacity: ease(frame, noiseAt + k * 5, 10),
-            ...note(20, k === 0 ? INK : INK_SOFT),
+            ...note(24, k === 0 ? INK : INK_SOFT),
             fontWeight: k === 0 ? 500 : 500,
             whiteSpace: "nowrap",
           }}
@@ -335,7 +335,7 @@ export const StepsScene: React.FC = () => {
         </Label>
       </Note>
       <Note at={threeAt - 2} x={zMirror + 16} y={y(Z_BASE) - h(110)}>
-        <span style={{ ...note(30, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>p = {fmt(STEPS.p, 3)}</span>
+        <span style={{ ...note(28, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>p = {fmt(STEPS.p, 3)}</span>
       </Note>
       {/* The p-value as the narration says it. */}
       <Note at={threeAt + 6} x={zMirror + 16} y={y(Z_BASE) - h(110) + 42}>

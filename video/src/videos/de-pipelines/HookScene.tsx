@@ -86,7 +86,7 @@ export const HookScene: React.FC = () => {
           })}
         </div>
         <Note at={nightAt + 6} x={JOB.x} y={top - h(112)} dim={dim}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every night</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every night</span>
         </Note>
 
         {/* Three tables and a dashboard read what it writes. */}

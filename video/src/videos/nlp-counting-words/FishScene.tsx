@@ -99,16 +99,16 @@ export const FishScene: React.FC = () => {
       })}
 
       <Note at={counterAt - 2} x={X0} y={y(ROWS[1]) + 170}>
-        <div style={{ ...body(30, true), color: INK_SOFT, whiteSpace: "nowrap" }}>To a counter, both are just “fish”.</div>
+        <div style={{ ...body(28, true), color: INK_SOFT, whiteSpace: "nowrap" }}>To a counter, both are just “fish”.</div>
       </Note>
       <Note at={taggingAt - 2} x={X0} y={y(ROWS[1]) + 230}>
-        <div style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>
+        <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>
           <span style={{ fontWeight: 500 }}>Part-of-speech tagging:</span> each word&apos;s <Marked at={jobAt - 2}>job</Marked>, judged
           from the words around it.
         </div>
       </Note>
       <Note at={learnedAt - 2} x={X0} y={y(ROWS[1]) + 288}>
-        <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
           NLTK&apos;s tagger learned from text people <Marked at={handAt - 2}>tagged by hand</Marked>
         </div>
       </Note>

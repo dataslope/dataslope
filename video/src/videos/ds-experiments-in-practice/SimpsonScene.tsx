@@ -98,7 +98,7 @@ export const SimpsonScene: React.FC = () => {
           What is Simpson's paradox in an experiment?
         </QuestionCard>
         <Note at={unevenAt} x={X0} y={y(MIX_TOP) - h(66)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a rollout that went out unevenly (the video's own numbers)</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a rollout that went out unevenly (the video's own numbers)</span>
         </Note>
 
         {/* Each arm's users, by device. */}
@@ -112,7 +112,7 @@ export const SimpsonScene: React.FC = () => {
           const lit = i === 0 ? gotLight : 0;
           return (
             <React.Fragment key={m.arm}>
-              <div style={{ position: "absolute", left: X0, top: top - h(4), ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p }}>
+              <div style={{ position: "absolute", left: X0, top: top - h(4), ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p }}>
                 <span style={{ display: "inline-block", width: 16, height: 16, borderRadius: 8, background: m.color, marginRight: 10 }} />
                 {m.arm}
               </div>
@@ -139,14 +139,14 @@ export const SimpsonScene: React.FC = () => {
                 s.w > 150 ? (
                   <div
                     key={s.text}
-                    style={{ position: "absolute", left: s.left, top: top + h(30) + h(MIX_H) / 2 - 13, ...label(20, s.ink), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR, opacity: ease(frame, m.at + 10, 10) }}
+                    style={{ position: "absolute", left: s.left, top: top + h(30) + h(MIX_H) / 2 - 13, ...label(24, s.ink), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR, opacity: ease(frame, m.at + 10, 10) }}
                   >
                     {s.text}
                   </div>
                 ) : (
                   <div
                     key={s.text}
-                    style={{ position: "absolute", left: X0 + 2, top: top + h(30) + h(MIX_H) + 6, ...label(19, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR, opacity: ease(frame, m.at + 10, 10) }}
+                    style={{ position: "absolute", left: X0 + 2, top: top + h(30) + h(MIX_H) + 6, ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR, opacity: ease(frame, m.at + 10, 10) }}
                   >
                     {s.text}
                   </div>
@@ -163,12 +163,12 @@ export const SimpsonScene: React.FC = () => {
             {[0, 2, 4, 6, 8, 10, 12].map((v) => (
               <g key={v}>
                 <line x1={at(x, v)} x2={at(x, v)} y1={y(400)} y2={y(820)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.45} />
-                <text x={at(x, v)} y={y(820) + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}>
+                <text x={at(x, v)} y={y(820) + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}>
                   {v}%
                 </text>
               </g>
             ))}
-            <text x={x.b} y={y(820) + 58} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
+            <text x={x.b} y={y(820) + 58} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
               converted
             </text>
           </g>
@@ -200,20 +200,20 @@ export const SimpsonScene: React.FC = () => {
           return (
             <React.Fragment key={r.key}>
               <div
-                style={{ position: "absolute", left: PLOT_X0 - 20, top: y(ROW_Y[r.key]) - h(64), ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, r.at - 2, 10) }}
+                style={{ position: "absolute", left: PLOT_X0 - 20, top: y(ROW_Y[r.key]) - h(64), ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, r.at - 2, 10) }}
               >
                 {r.key}
               </div>
-              <div style={{ position: "absolute", right: 1920 - at(x, left) + 22, top: y(ROW_Y[r.key]) - 15, ...label(21, leftIsTreat ? TREAT : INK_SOFT), fontWeight: 500, ...TABULAR, opacity: o }}>
+              <div style={{ position: "absolute", right: 1920 - at(x, left) + 22, top: y(ROW_Y[r.key]) - 15, ...label(24, leftIsTreat ? TREAT : INK_SOFT), fontWeight: 500, ...TABULAR, opacity: o }}>
                 {left}%
               </div>
-              <div style={{ position: "absolute", left: at(x, right) + 22, top: y(ROW_Y[r.key]) - 15, ...label(21, leftIsTreat ? INK_SOFT : TREAT), fontWeight: 500, ...TABULAR, opacity: o }}>
+              <div style={{ position: "absolute", left: at(x, right) + 22, top: y(ROW_Y[r.key]) - 15, ...label(24, leftIsTreat ? INK_SOFT : TREAT), fontWeight: 500, ...TABULAR, opacity: o }}>
                 {right}%
               </div>
               <Note at={r.verdictAt} x={PLOT_X0 + 130} y={y(ROW_Y[r.key]) - h(64)}>
                 <span
                   style={{
-                    ...note(25, r.wins ? OK_INK : ACCENT_INK),
+                    ...note(24, r.wins ? OK_INK : ACCENT_INK),
                     fontWeight: 500,
                     whiteSpace: "nowrap",
                     background: (r.wins ? segLight : totLight) > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(100 * (r.wins ? segLight : totLight))}%, transparent)` : undefined,
@@ -229,7 +229,7 @@ export const SimpsonScene: React.FC = () => {
           );
         })}
         <Note at={becauseAt + 4} x={X0} y={y(700)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             desktop converts less,
             <br />
             and the new checkout got mostly desktop
@@ -237,13 +237,13 @@ export const SimpsonScene: React.FC = () => {
         </Note>
         {/* The answer to the question, under it: the general rule. */}
         <Note at={defAt} x={X0} y={y(262)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>Simpson's paradox:</b> what holds in every segment flips in the total
             <span style={{ opacity: ease(frame, mixAt - 2, 10) }}>, because the arms have a different mix.</span>
           </span>
         </Note>
         <Note at={matchAt} x={X0} y={y(790)} width={760}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500 }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500 }}>
             Randomized arms should match<span style={{ opacity: ease(frame, bugAt - 2, 10) }}>: a gap is a bug, like an SRM.</span>
             <span style={{ opacity: ease(frame, fairAt - 2, 10) }}> Compare within each segment.</span>
           </span>

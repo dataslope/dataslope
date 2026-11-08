@@ -150,7 +150,7 @@ export const RuleScene: React.FC = () => {
               textAnchor="middle"
               style={{
                 fontFamily: SANS,
-                fontSize: 22 + sigmaGlow * 3,
+                fontSize: 24 + sigmaGlow * 3,
                 fontWeight: 500,
                 fill: sigmaGlow > 0.1 ? ASK_INK : INK_SOFT,
               }}
@@ -167,7 +167,7 @@ export const RuleScene: React.FC = () => {
             <line key={k} x1={sx(X, k)} x2={sx(X, k)} y1={y(SCORE_Y)} y2={y(SCORE_Y) + 7} stroke={INK} strokeWidth={1.2} />
           ))}
         </Svg>
-        <div style={{ position: "absolute", left: 96, top: y(SCORE_Y) - 14, opacity: scoreAxis, ...label(21, INK_SOFT) }}>Test scores</div>
+        <div style={{ position: "absolute", left: 96, top: y(SCORE_Y) - 14, opacity: scoreAxis, ...label(24, INK_SOFT) }}>Test scores</div>
         {[-3, -2, -1, 0, 1, 2, 3].map((k) => {
           const v = RULE.mu + k * RULE.sigma;
           const at = k === 0 ? hundredAt : fifteenAt + Math.abs(k) * 3;

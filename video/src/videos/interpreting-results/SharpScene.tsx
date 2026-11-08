@@ -140,8 +140,8 @@ export const SharpScene: React.FC = () => {
           </span>
         </Note>
         <Note at={aimedAt - 2} x={WX0 + WW + 24} y={top + 108}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>if the target came first,</span>
-          <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>about {fmt(SHOTS.expected, 1)} by chance</div>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>if the target came first,</span>
+          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>about {fmt(SHOTS.expected, 1)} by chance</div>
         </Note>
         <Note at={lookingAt - 2} x={160} y={top + wh + 30}>
           <span style={{ ...label(24, INK), whiteSpace: "nowrap", ...halo }}>
@@ -149,7 +149,7 @@ export const SharpScene: React.FC = () => {
           </span>
         </Note>
         <Note at={purposeAt + 4} x={1460} y={y(300) + 400}>
-          <span style={{ ...note(21, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             cherry-picking, on purpose
           </span>
         </Note>

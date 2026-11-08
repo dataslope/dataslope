@@ -52,7 +52,7 @@ const Column: React.FC<{ i: number; at: number; title: string; children: React.R
           transform: `translateY(${(1 - p) * 18}px)`,
         }}
       >
-        <div style={{ ...label(22, BLUE_INK), marginBottom: 12 }}>{`${i + 1} of 3`}</div>
+        <div style={{ ...label(24, BLUE_INK), marginBottom: 12 }}>{`${i + 1} of 3`}</div>
         <div style={{ ...headline(40), marginBottom: 18 }}>{title}</div>
         {children}
       </div>
@@ -100,7 +100,7 @@ export const LoopScene: React.FC = () => {
           <div style={{ ...note(24, INK_SOFT), marginTop: 22, opacity: ease(frame, takeAt - 2, 12) }}>live, or as a take-home</div>
         </Column>
         <Column i={1} at={sheetAt} title="Spreadsheets and statistics">
-          <div style={{ ...note(26, INK), lineHeight: 1.5 }}>a few questions each:</div>
+          <div style={{ ...note(28, INK), lineHeight: 1.5 }}>a few questions each:</div>
           <div style={{ ...note(24, INK_SOFT), lineHeight: 1.5 }}>
             <div>a pivot table, a lookup,</div>
             <div>a median, a p&#8209;value</div>

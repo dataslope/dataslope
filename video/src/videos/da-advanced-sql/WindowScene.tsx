@@ -145,7 +145,7 @@ export const WindowScene: React.FC = () => {
           ]}
         />
         <Note at={groupAt + 16} x={gg.right + 30} y={gg.rowTop(0)} out={keepsAt - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
             {WINDOW.sales.rows.length} rows in, {G.rows.length} out
           </span>
         </Note>
@@ -171,7 +171,7 @@ export const WindowScene: React.FC = () => {
           marks={W.rows.map((_, row) => ({ row, col: totalCol, at: sixAt + 4 + row * 2, color: MARK_OK }))}
         />
         <Note at={sixAt - 2} x={wg.right + 30} y={wg.rowTop(0)} out={out1}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
             {W.rows.length} rows in, {W.rows.length} out
           </span>
         </Note>
@@ -195,7 +195,7 @@ export const WindowScene: React.FC = () => {
               <div
                 style={{
                   fontFamily: MONO,
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: 500,
                   color: BLUE_INK,
                   fontVariantLigatures: "none",
@@ -241,7 +241,7 @@ export const WindowScene: React.FC = () => {
           ]}
         />
         <Note at={againAt + 6} x={rg.right + 30} y={rg.rowTop(southFirst)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mark at={bridgeAt}>starts over at 1</Mark>
           </span>
         </Note>

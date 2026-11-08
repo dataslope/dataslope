@@ -113,7 +113,7 @@ export const Step: React.FC<{
       />
       <span
         style={{
-          ...note(26),
+          ...note(28),
           ...badgeStyle("gray", 26),
           position: "relative",
           width: 40,

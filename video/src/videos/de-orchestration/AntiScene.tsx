@@ -170,7 +170,7 @@ export const AntiScene: React.FC = () => {
 
         {/* The four anti-patterns. */}
         <Note at={fourAt} x={ROWS_X} y={y(ROW_TOP) - h(46)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>four anti-patterns</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>four anti-patterns</span>
         </Note>
         {rows.map((r, i) => (
           <Note key={r.title} at={r.at - 2} x={ROWS_X} y={y(ROW_TOP) + i * h(ROW_H)}>
@@ -196,8 +196,8 @@ export const AntiScene: React.FC = () => {
                 {i + 1}
               </span>
               <div>
-                <div style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.title}</div>
-                <div style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, r.detailAt, 10) }}>{r.detail}</div>
+                <div style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.title}</div>
+                <div style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, r.detailAt, 10) }}>{r.detail}</div>
               </div>
             </div>
           </Note>
@@ -205,7 +205,7 @@ export const AntiScene: React.FC = () => {
 
         {/* The fix for the fourth, as the page writes it. */}
         <Note at={rows[3].at + 4} x={X0} y={listTop - h(40)}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a million rows into the XCom store</span>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a million rows into the XCom store</span>
         </Note>
         <PyListing
           lines={BAD}
@@ -217,7 +217,7 @@ export const AntiScene: React.FC = () => {
           marks={[{ line: lineOf(BAD, "return fetch_million_rows"), at: rows[3].detailAt, color: MARK_BAD }]}
         />
         <Note at={writeAt} x={920} y={listTop - h(40)}>
-          <span style={{ ...label(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the data to storage, the path through XCom</span>
+          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the data to storage, the path through XCom</span>
         </Note>
         <PyListing
           lines={GOOD}

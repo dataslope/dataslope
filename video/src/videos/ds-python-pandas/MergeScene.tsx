@@ -91,7 +91,7 @@ export const MergeScene: React.FC = () => {
 
   const header = (word: string, rest: React.ReactNode, at: number, out?: number) => (
     <Note at={at} x={X0} y={y(HEAD_Y)} out={out}>
-      <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+      <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
         <Mark at={at + 4}>
           <Mono>{word}</Mono>
         </Mark>{" "}

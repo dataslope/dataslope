@@ -40,7 +40,7 @@ const Query: React.FC<{ x: number; y: number; at: number; dim: number }> = ({ x,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        ...label(21, PAPER),
+        ...label(24, PAPER),
         fontWeight: 500,
         transform: `scale(${Math.min(1.2, p)})`,
         opacity: Math.min(1, p) * (1 - ease(frame, dim, 12) * 0.65),
@@ -149,12 +149,12 @@ export const HookScene: React.FC = () => {
 
         {/* Its traffic, then ten times it. */}
         <Ink at={sizedAt} dur={16} style={{ left: X0, top: y(640), whiteSpace: "nowrap", opacity: 1 - ease(frame, dim, 12) * 0.5 }}>
-          <span style={{ ...note(30, INK), fontWeight: 500 }}>
+          <span style={{ ...note(28, INK), fontWeight: 500 }}>
             Sized for about <b style={{ color: BLUE_INK }}><Num>{commas(peak)}</Num></b> redirects a second at peak
           </span>
         </Ink>
         <Ink at={tenAt} dur={16} style={{ left: X0, top: y(700), whiteSpace: "nowrap", opacity: 1 - ease(frame, dim, 12) * 0.5 }}>
-          <span style={{ ...note(30, INK), fontWeight: 500 }}>
+          <span style={{ ...note(28, INK), fontWeight: 500 }}>
             Ten times the traffic:{" "}
             <Mark at={bigAt}>
               <b><Num>{commas(tenfold)}</Num></b> a second
@@ -182,7 +182,7 @@ export const HookScene: React.FC = () => {
                 top: chipsTop,
                 width: CHIP,
                 textAlign: "center",
-                ...label(30, quick ? INK_SOFT : feed ? INK : BLUE_INK),
+                ...label(28, quick ? INK_SOFT : feed ? INK : BLUE_INK),
                 fontWeight: 500,
                 opacity: p,
                 transform: `translateY(${(1 - p) * 10}px)`,
@@ -199,13 +199,13 @@ export const HookScene: React.FC = () => {
           );
         })}
         <Ink at={nineAt + 8} dur={14} style={{ left: X0, top: chipsTop + 50, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK_SOFT) }}>worked through on this diagram</span>
+          <span style={{ ...note(24, INK_SOFT) }}>worked through on this diagram</span>
         </Ink>
         <Ink at={quickAt + 6} dur={14} style={{ left: chipX(9) + 6, top: chipsTop + 50, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK_SOFT) }}>quick</span>
+          <span style={{ ...note(24, INK_SOFT) }}>quick</span>
         </Ink>
         <Ink at={feedAt + 4} dur={14} style={{ left: chipX(11) - 30, top: chipsTop + 50, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK), fontWeight: 500 }}>a news feed</span>
+          <span style={{ ...note(24, INK), fontWeight: 500 }}>a news feed</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

@@ -177,7 +177,7 @@ export const UniformScene: React.FC = () => {
             right: 1920 - TX.x0 + 18,
             top: y(T_ROW0 + i * T_DY) - 13,
             opacity: ease(frame, rowAt(i), 8) * others,
-            ...note(19, INK_SOFT),
+            ...note(24, INK_SOFT),
           }}
         >
           {i + 1}
@@ -189,7 +189,7 @@ export const UniformScene: React.FC = () => {
           right: 1920 - TX.x0 + 18,
           top: y(T_ROW0 + HIT * T_DY) - 15,
           opacity: ease(frame, fourteenAt - 4, 10),
-          ...note(22, STAT_INK),
+          ...note(24, STAT_INK),
           fontWeight: 500,
         }}
       >
@@ -199,7 +199,7 @@ export const UniformScene: React.FC = () => {
       <Note at={pointAt - 2} x={sx(TX, 0.05) + 24} y={y(T_ROW0 + HIT * T_DY) - 16}>
         <span style={{ ...note(24, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           p = {fmt(TWENTY.p[HIT], 3)}
-          <span style={{ ...note(22, STAT_INK), fontWeight: 520, opacity: ease(frame, discoveryAt - 4, 12) }}>
+          <span style={{ ...note(24, STAT_INK), fontWeight: 520, opacity: ease(frame, discoveryAt - 4, 12) }}>
             {" "}· reported as a discovery
           </span>
         </span>

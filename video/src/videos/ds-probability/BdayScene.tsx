@@ -137,7 +137,7 @@ export const BdayScene: React.FC = () => {
 
         {/* ── The complement: each new person misses everyone before them ── */}
         <Note at={complementAt} x={WORK.x} y={y(WORK.noMatch)}>
-          <span style={math(32, INK)}>
+          <span style={math(34, INK)}>
             P(no match) ={" "}
             <Late at={firstAt}>
               {365 - 1}/365
@@ -154,7 +154,7 @@ export const BdayScene: React.FC = () => {
           </span>
         </Note>
         <Note at={fiftyAt} x={WORK.x} y={y(WORK.match)}>
-          <span style={math(32, OK_INK)}>
+          <span style={math(34, OK_INK)}>
             P(match) = 1 − {pct(BDAY.noMatch, 1)} = {pct(BDAY.exact, 1)}
           </span>
         </Note>
@@ -191,7 +191,7 @@ export const BdayScene: React.FC = () => {
           <span style={{ ...label(28, OK_INK), ...TABULAR, whiteSpace: "nowrap" }}>23 people: {pct(BDAY.exact, 1)}</span>
         </Note>
         <Note at={roomsAt + 4} x={at23[0] + 22} y={at23[1] + 52}>
-          <span style={{ ...label(22, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
             {BDAY.rooms.toLocaleString("en-US")} simulated rooms: {pct(BDAY.simulated, 1)}
           </span>
         </Note>

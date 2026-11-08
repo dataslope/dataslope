@@ -144,7 +144,7 @@ export const SpreadScene: React.FC = () => {
               </svg>
             ) : null}
             <Note at={bracketAt + 8} x={x1 + 12} y={Y(y) - 13}>
-              <span style={{ ...note(22, said > 0 ? ACCENT_INK : INK_SOFT), ...halo }}>± {fmt(r.spread)}</span>
+              <span style={{ ...note(24, said > 0 ? ACCENT_INK : INK_SOFT), ...halo }}>± {fmt(r.spread)}</span>
             </Note>
           </React.Fragment>
         );
@@ -163,14 +163,14 @@ export const SpreadScene: React.FC = () => {
         dash="7 6"
       />
       <Note at={tenAt + 2} x={sx(X, 10) + 10} y={Y(BASES[0] - ROW_H - 22)}>
-        <span style={note(21, ACCENT_INK)}>10 min</span>
+        <span style={note(24, ACCENT_INK)}>10 min</span>
       </Note>
 
       {/* The table: simulated spread beside the theorem's prediction. */}
       <Ink at={start + 14} dur={16} style={{ left: TABLE_X, top: Y(TABLE_TOP), width: 530 }}>
         <div style={{ position: "relative", height: 34 }}>
-          <span style={{ ...label(19, INK_SOFT), position: "absolute", left: 0 }}>Sample size</span>
-          <span style={{ ...label(19, INK_SOFT), position: "absolute", left: COLS[1] - TABLE_X }}>
+          <span style={{ ...label(24, INK_SOFT), position: "absolute", left: 0 }}>Sample size</span>
+          <span style={{ ...label(24, INK_SOFT), position: "absolute", left: COLS[1] - TABLE_X }}>
             Simulated spread
           </span>
           {/* σ is defined by the rule below: its column heading waits for
@@ -256,7 +256,7 @@ export const SpreadScene: React.FC = () => {
         );
       })}
       <Note at={numbersFrom + 10} x={TABLE_X} y={Y(TABLE_TOP + 44 + 3 * ROW_STEP + 12)} width={530}>
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Standard deviation of 2,000 averages, in minutes.
         </span>
       </Note>
@@ -265,8 +265,8 @@ export const SpreadScene: React.FC = () => {
       <Ink at={ruleFrom - 4} dur={18} style={{ left: TABLE_X, top: Y(548), width: 530 }}>
         {/* 28px under the rule: room under a rule. */}
         <div style={{ height: 1, background: INK, marginBottom: 28 }} />
-        <div style={label(20, ACCENT_INK)}>The rule</div>
-        <div style={{ ...body(30), color: INK, marginTop: 10 }}>
+        <div style={label(24, ACCENT_INK)}>The rule</div>
+        <div style={{ ...body(28), color: INK, marginTop: 10 }}>
           <Marker at={thatSpreadAt - 2}>Spread of the average</Marker>
         </div>
         <div style={{ ...headline(76, true), marginTop: 6 }}>
@@ -274,7 +274,7 @@ export const SpreadScene: React.FC = () => {
         </div>
         <div
           style={{
-            ...note(21, INK_SOFT),
+            ...note(24, INK_SOFT),
             marginTop: 8,
             transformOrigin: "left center",
             // A slow swell, held through the end of the closing sentence.
@@ -285,12 +285,12 @@ export const SpreadScene: React.FC = () => {
         </div>
       </Ink>
       <Ink at={fourAt - 2} dur={16} style={{ left: TABLE_X, top: Y(800), width: 530 }}>
-        <span style={{ ...body(30, true), color: ACCENT_INK }}>Four times the data, half the spread.</span>
+        <span style={{ ...body(28, true), color: ACCENT_INK }}>Four times the data, half the spread.</span>
       </Ink>
       {merged ? (
         // Where the standalone video says "Next", the merged one names it.
         <Ink at={nextAt - 2} dur={16} style={{ left: TABLE_X, top: Y(858), width: 530 }}>
-          <span style={{ ...body(30, true), color: INK }}>That spread is the standard error.</span>
+          <span style={{ ...body(28, true), color: INK }}>That spread is the standard error.</span>
         </Ink>
       ) : (
         <NextLine at={nextAt} x={TABLE_X} y={Y(858)} width={530}>

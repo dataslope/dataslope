@@ -134,7 +134,7 @@ export const OrderScene: React.FC = () => {
         {STEPS.map((s, i) => (
           <Ink key={s.clause} at={stepAt[i] - 4} dur={12} style={{ left: STEP_X, top: rowY(i), height: h(44), display: "flex", alignItems: "center", gap: 16 }}>
             <StepBadge n={i + 1} />
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
+            <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
               {s.clause}
             </span>
           </Ink>
@@ -283,7 +283,7 @@ const StepBadge: React.FC<{ n: number }> = ({ n }) => (
 /** A figure's small title, over its top. */
 const Caption: React.FC<{ at: number; x: number; top: number; children: React.ReactNode }> = ({ at, x, top, children }) => (
   <Ink at={at} dur={12} style={{ left: x, top, whiteSpace: "nowrap" }}>
-    <span style={label(21, INK_SOFT)}>{children}</span>
+    <span style={label(24, INK_SOFT)}>{children}</span>
   </Ink>
 );
 
@@ -309,7 +309,7 @@ const Group: React.FC<{ region: string; at: number; x: number; top: number; kept
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...label(20, INK),
+          ...label(24, INK),
         }}
       >
         {region}

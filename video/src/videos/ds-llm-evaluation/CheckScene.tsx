@@ -49,9 +49,9 @@ const Cell: React.FC<{ y: number; at: number; code: string; rows?: string; rowsA
         opacity: p,
       }}
     >
-      <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>{code}</span>
+      <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>{code}</span>
       {rows ? (
-        <span style={{ ...label(20, b > 0.5 ? ACCENT_INK : BLUE_INK), fontWeight: 500, ...TABULAR, opacity: r, whiteSpace: "nowrap" }}>{rows}</span>
+        <span style={{ ...label(24, b > 0.5 ? ACCENT_INK : BLUE_INK), fontWeight: 500, ...TABULAR, opacity: r, whiteSpace: "nowrap" }}>{rows}</span>
       ) : null}
     </div>
   );
@@ -109,7 +109,7 @@ export const CheckScene: React.FC = () => {
 
         {/* The notebook. */}
         <Note at={juniorAt} x={NB.x} y={y(NB.top - 46)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             read it like a junior colleague&apos;s notebook
             <span style={{ opacity: ease(frame, slipAt - 2, 10), color: ACCENT_INK }}>, with extra suspicion</span>
           </span>
@@ -125,7 +125,7 @@ export const CheckScene: React.FC = () => {
         />
         <Cell y={cellY(2)} at={juniorAt + 12} code={'df.groupby("segment")["revenue"].mean()'} />
         <Note at={dropsAt + 8} x={NB.x} y={cellY(3) + h(4)}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
             a third of the rows, gone without a word (−{pct(NOTEBOOK.lost)})
           </span>
         </Note>
@@ -138,12 +138,12 @@ export const CheckScene: React.FC = () => {
           <Note key={it.text} at={it.at - 2} x={LIST_X} y={y(LIST_TOP) + i * h(LIST_ROW) + (i > 2 ? h(36) : 0)}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <Tick at={it.at + 6} size={26} />
-              <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{it.text}</span>
+              <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{it.text}</span>
             </div>
           </Note>
         ))}
         <Note at={skewAt} x={LIST_X + 40} y={y(LIST_TOP) + 2 * h(LIST_ROW) + h(38)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             a t-test on skewed revenue
             <br />
             <span style={{ opacity: ease(frame, twentyAt - 2, 10) }}>
@@ -155,7 +155,7 @@ export const CheckScene: React.FC = () => {
         <Note at={reproAt - 2} x={LIST_X} y={y(LIST_TOP) + 5 * h(LIST_ROW) + h(60)}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <Tick at={reproAt + 6} size={30} />
-            <span style={{ ...note(30, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={reproAt + 8} color={MARK_OK}>
                 reproduce the headline number another way
               </Mark>
