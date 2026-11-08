@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { Illustration } from "../../components/Illustration";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
@@ -7,12 +8,17 @@ import { HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../.
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { DIE, HATS, pct } from "./data";
+import { DIE, HATS, pct, VIDEO } from "./data";
 import { Clear, DATA, DATA_LIGHT, DieFace, Drift, Frac, Mark, math, OK, OK_INK, Person, pulse, Svg, V, X0 } from "./parts";
 
 const BEAM = { x0: 170, pitch: 150, y: 540, face: 92 };
 const SQ = { x0: 1150, pitch: 108, w: 72, base: 780, unit: 46 };
-const HATS_ROW = { x0: 150, pitch: 92, y: 560 };
+/** The row of people, low enough that a painted hat over each clears the
+ *  line above the row. */
+const HATS_ROW = { x0: 150, pitch: 92, y: 590 };
+/** The painted hat (ds-probability-hat, 1287x1024), and how far down it the
+ *  baseline of its number sits, on the crown. */
+const HAT = { w: 76, h: Math.round((76 * 1024) / 1287), number: 26 } as const;
 const HIST = { x0: 1160, pitch: 104, w: 76, base: 780, unit: 760 };
 /** Who gets whose hat in the one shuffle drawn: person 5 gets their own. */
 const SHUFFLE = [3, 7, 0, 9, 4, 1, 8, 2, 6, 5];
@@ -66,6 +72,7 @@ export const ExpectScene: React.FC = () => {
   const beamP = ease(frame, asked - 4, 16);
   const fulcrum = ease(frame, balanceAt - 2, 14);
   const gone6 = ease(frame, out6, 10);
+  const row = ease(frame, tenAt - 4, 12);
 
   return (
     <AbsoluteFill>
@@ -230,29 +237,15 @@ export const ExpectScene: React.FC = () => {
             </span>
           </Note>
 
-          <Svg opacity={ease(frame, tenAt - 4, 12)}>
+          <Svg opacity={row}>
             {SHUFFLE.map((hat, i) => {
               const x = HATS_ROW.x0 + i * HATS_ROW.pitch;
               const py = y(HATS_ROW.y);
-              const drop = ease(frame, randomAt + i * 2, 12);
-              const match = hat === i;
-              const ring = match ? ease(frame, ownAt, 12) : 0;
+              const ring = hat === i ? ease(frame, ownAt, 12) : 0;
               return (
                 <g key={i}>
                   {ring > 0 ? <circle cx={x} cy={py - 6} r={44} fill="none" stroke={OK} strokeWidth={4} opacity={ring} /> : null}
                   <Person x={x} y={py} size={64} color={DATA} />
-                  {/* The hat's number is the evidence (who got whose hat), so it
-                      is set at 21px, on a crown wide enough to hold it, and the
-                      brim (py - 62 to py - 56) clears the match's ring (py - 52).
-                      SVG text takes `fill`, not the CSS color label() sets, so it
-                      is given here: ink, which reads on the match's green too. */}
-                  <g transform={`translate(${x},${py - 64 - (1 - drop) * 60})`} opacity={drop}>
-                    <rect x={-27} y={-24} width={54} height={28} rx={6} fill={match && ring > 0.5 ? OK : PAPER} stroke={INK} strokeWidth={2} />
-                    <rect x={-33} y={2} width={66} height={6} rx={3} fill={INK} />
-                    <text x={0} y={-3} textAnchor="middle" style={{ ...label(21, INK), fontWeight: 700, fill: INK }}>
-                      {hat + 1}
-                    </text>
-                  </g>
                   {/* Clear of the match's ring, which reaches py + 38. */}
                   <text x={x} y={py + 62} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 700, fill: INK_SOFT }}>
                     {i + 1}
@@ -261,6 +254,52 @@ export const ExpectScene: React.FC = () => {
               );
             })}
           </Svg>
+          {/* The hats, painted, dropping on "at random". Each carries its
+              number on its crown, since the number is the evidence (who got
+              whose hat): 21px ink in a paper halo, which reads on the red
+              crown and leaves the hat a hat. The match's hat takes a green
+              edge. The brim stops at py - 56, clear of the match's ring
+              (py - 52). */}
+          {SHUFFLE.map((hat, i) => {
+            const drop = ease(frame, randomAt + i * 2, 12);
+            if (drop <= 0) return null;
+            const x = HATS_ROW.x0 + i * HATS_ROW.pitch;
+            const py = y(HATS_ROW.y);
+            const ring = hat === i ? ease(frame, ownAt, 12) : 0;
+            const top = py - 56 - HAT.h - (1 - drop) * 60;
+            const edge = (d: number) => `drop-shadow(${d}px 0 0 ${OK}) drop-shadow(${-d}px 0 0 ${OK}) drop-shadow(0 ${d}px 0 ${OK}) drop-shadow(0 ${-d}px 0 ${OK})`;
+            return (
+              <React.Fragment key={i}>
+                <Illustration
+                  video={VIDEO}
+                  id="ds-probability-hat"
+                  style={{
+                    position: "absolute",
+                    left: x - HAT.w / 2,
+                    top,
+                    width: HAT.w,
+                    height: HAT.h,
+                    opacity: drop * row,
+                    filter: ring > 0 ? edge(2.5 * ring) : undefined,
+                  }}
+                />
+                <Svg opacity={drop * row}>
+                  <text
+                    x={x}
+                    y={top + HAT.number}
+                    textAnchor="middle"
+                    stroke={PAPER}
+                    strokeWidth={6}
+                    strokeLinejoin="round"
+                    paintOrder="stroke"
+                    style={{ ...label(21, INK), fontWeight: 700, fill: INK, ...TABULAR }}
+                  >
+                    {hat + 1}
+                  </text>
+                </Svg>
+              </React.Fragment>
+            );
+          })}
           {SHUFFLE.map((_, i) => (
             <Note key={i} at={chanceAt + i} x={HATS_ROW.x0 + i * HATS_ROW.pitch - 40} width={80} y={y(HATS_ROW.y) + 82} from="up" style={{ textAlign: "center" }}>
               <span style={{ ...math(28, INK) }}>
