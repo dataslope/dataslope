@@ -9,7 +9,7 @@ import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LOGINS } from "./data";
-import { daysBetween, DayStrip, Drift, Headline, Kicker, MARK, pulse, Spot, stripGeometry, X0 } from "./parts";
+import { daysBetween, DayStrip, Drift, Headline, Kicker, MARK, MARK_EDGE, pulse, Spot, stripGeometry, X0 } from "./parts";
 
 const STRIP_Y = 330;
 const CELL = 84;
@@ -109,9 +109,9 @@ export const HookScene: React.FC = () => {
           days={days}
           at={loginsAt}
           marks={[
-            ...missing.map((index, k) => ({ index, at: fourAt + 2 + k * 3, out: streaksAt, color: MARK })),
-            ...missing.map((index, k) => ({ index, at: missingAt + 2 + k * 2, out: longAt, color: MARK })),
-            { index: last, at: latestAt + 2, out: askOut + 20, color: MARK },
+            ...missing.map((index, k) => ({ index, at: fourAt + 2 + k * 3, out: streaksAt, color: MARK, edge: MARK_EDGE })),
+            ...missing.map((index, k) => ({ index, at: missingAt + 2 + k * 2, out: longAt, color: MARK, edge: MARK_EDGE })),
+            { index: last, at: latestAt + 2, out: askOut + 20, color: MARK, edge: MARK_EDGE },
           ]}
           spans={spans}
         />

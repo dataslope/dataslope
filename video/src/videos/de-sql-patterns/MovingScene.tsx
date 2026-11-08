@@ -21,6 +21,7 @@ import {
   listingHeight,
   MARK,
   MARK_BAD,
+  MARK_EDGE,
   MARK_OK,
   QMono,
   stripGeometry,
@@ -164,9 +165,9 @@ export const MovingScene: React.FC = () => {
               { index, at: zerosAt + 4 + k * 3, text: "0", color: OK_INK },
             ])}
             marks={[
-              ...missing.map((index, k) => ({ index, at: missingAt + 2 + k * 2, out: thirteenthAt, color: MARK })),
-              { index: last, at: thirteenthAt + 2, out: q8At, color: MARK },
-              ...missing.map((index, k) => ({ index, at: gapsAt + k * 2, out: zerosAt + 4, color: MARK })),
+              ...missing.map((index, k) => ({ index, at: missingAt + 2 + k * 2, out: thirteenthAt, color: MARK, edge: MARK_EDGE })),
+              { index: last, at: thirteenthAt + 2, out: q8At, color: MARK, edge: MARK_EDGE },
+              ...missing.map((index, k) => ({ index, at: gapsAt + k * 2, out: zerosAt + 4, color: MARK, edge: MARK_EDGE })),
               ...missing.map((index, k) => ({ index, at: zerosAt + 4 + k * 3, out: bridgeAt, color: MARK_OK, edge: OK })),
             ]}
             spans={[

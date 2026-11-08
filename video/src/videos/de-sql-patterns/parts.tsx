@@ -5,6 +5,7 @@ import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { BAR, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
+import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -43,6 +44,9 @@ export {
   type TableGeometry,
 } from "../da-sql/parts";
 export { colsOf, geoOf, RowBracket, rowsAt, type FrameStep } from "../da-advanced-sql/parts";
+
+/** The border a yellow-marked (MARK) day cell takes while its tint is on. */
+export const MARK_EDGE = ds("yellow", 600);
 
 /**
  * Code inside a line of type, at 0.92em of the line (never under 19px), so it
