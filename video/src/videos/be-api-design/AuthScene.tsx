@@ -52,16 +52,18 @@ const tokenLines = () => {
   return lines;
 };
 
+/** The note the clock leads: its font size, which is the clock's size. */
+const CLOCK_TEXT = 23;
+
 /**
- * A clock: Lucide's `clock` icon (ISC licence) on its 24-unit grid, centred
- * on (x, y) with its circle `r` across, and the second hand sweeping round
- * from `at`. The stroke is held at 3px whatever the size (Lucide's absolute
- * stroke width), so a 58px icon keeps the weight of the ink around it.
+ * A clock: Lucide's `clock` icon (ISC licence), drawn at the size of the text
+ * beside it (`size`, its font size, so the icon is 1em) and centred on
+ * (x, y), with Lucide's own stroke. Its second hand sweeps round from `at`.
  */
-const Clock: React.FC<{ x: number; y: number; at: number; r?: number; color?: string }> = ({ x, y, at, r = 24, color = INK }) => {
+const Clock: React.FC<{ x: number; y: number; at: number; size: number; color?: string }> = ({ x, y, at, size, color = INK }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
-  const s = r / 10; // Lucide's clock circle is r = 10 on the 24 grid
+  const s = size / 24;
   const turn = ((frame - at) / 90) * 360;
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p }}>
@@ -69,7 +71,7 @@ const Clock: React.FC<{ x: number; y: number; at: number; r?: number; color?: st
         transform={`translate(${x - 12 * s} ${y - 12 * s}) scale(${s})`}
         fill="none"
         stroke={color}
-        strokeWidth={3 / s}
+        strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
       >
@@ -357,9 +359,10 @@ export const AuthScene: React.FC = () => {
         <Msg x={jx} y={srvTop} w={jReqW} at={locallyAt + 2} size={21} lines={[{ t: "GET /articles/42" }, { t: "Authorization: Bearer eyJhbGciOi…" }]} />
         <Flow points={[[jx + jReqW + 8, srvTop + twoH / 2], [1560, srvTop + twoH / 2]]} at={locallyAt + 8} color={INK_SOFT} width={2.2} head={11} />
         <Msg x={1568} y={srvTop} w={220} at={validAt + 4} tone="bad" size={21} lines={[{ t: "200 OK" }, { t: "still let in", color: ACCENT_INK }]} />
-        <Clock x={jx + 30} y={srvTop + twoH + h(56)} at={validAt + 8} color={ACCENT} />
+        {/* The clock at the note's own size, centred on its line, 10px before it. */}
+        <Clock x={jx + 74 - 10 - CLOCK_TEXT / 2} y={srvTop + twoH + h(40) + (CLOCK_TEXT * 1.3) / 2} size={CLOCK_TEXT} at={validAt + 8} color={ACCENT} />
         <Note at={validAt + 10} x={jx + 74} y={srvTop + twoH + h(40)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(CLOCK_TEXT, INK), whiteSpace: "nowrap" }}>
             valid until <span style={{ fontFamily: MONO, fontWeight: 600 }}>exp</span>, deleted session or not
           </span>
         </Note>
