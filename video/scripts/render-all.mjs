@@ -4,6 +4,7 @@
  *
  *   npm run render:all                         # every video, 4K → out/<id>.mp4
  *   npm run render:all -- --fhd                # 1080p → out/<id>-fhd.mp4
+ *   npm run render:all -- --hd                 # 720p → out/<id>-hd.mp4
  *   npm run render:all -- BaseRate,TfIdf       # just these (id or folder)
  *   npm run render:all -- --dry-run            # list what would render
  *   npm run render:all -- --force              # render even if unchanged
@@ -70,6 +71,11 @@ const MANIFEST = path.join(OUT, ".render-manifest.json");
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
 const fhd = flag("--fhd");
+const hd = flag("--hd");
+if (fhd && hd) {
+  console.error("--fhd and --hd: pick one size.");
+  process.exit(1);
+}
 const dryRun = flag("--dry-run");
 const force = flag("--force");
 /** A flag's value: `--concurrency 12`. */
@@ -95,8 +101,13 @@ if (!X264_PRESETS.includes(x264Preset)) {
 }
 
 // The same settings `npm run render` gets from the CLI and remotion.config.ts.
-const SETTINGS = { scale: fhd ? 1 : 2, codec: "h264", imageFormat: "jpeg", jpegQuality: 92 };
-const outputOf = (id) => path.join(OUT, fhd ? `${id}-fhd.mp4` : `${id}.mp4`);
+// The compositions are 1920x1080, so 2 is 4K, 1 is 1080p and 2/3 is 720p
+// (1280x720 exactly). Each size has its own file, and its own record in the
+// manifest, so rendering one never marks another up to date.
+const SCALE = hd ? 2 / 3 : fhd ? 1 : 2;
+const SUFFIX = hd ? "-hd" : fhd ? "-fhd" : "";
+const SETTINGS = { scale: SCALE, codec: "h264", imageFormat: "jpeg", jpegQuality: 92 };
+const outputOf = (id) => path.join(OUT, `${id}${SUFFIX}.mp4`);
 
 // --- Fingerprinting --------------------------------------------------------
 
