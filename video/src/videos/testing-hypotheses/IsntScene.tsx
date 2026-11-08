@@ -219,7 +219,7 @@ export const IsntScene: React.FC = () => {
           const loud = spoken.includes(i);
           return (
             <React.Fragment key={r.n}>
-              <div style={{ position: "absolute", left: COLS[0], top: ry, opacity: ease(frame, growAt - 4 + i * 3, 10), ...note(30, INK), fontWeight: 650 }}>
+              <div style={{ position: "absolute", left: COLS[0], top: ry, opacity: ease(frame, growAt - 4 + i * 3, 10), ...note(30, INK), fontWeight: 500 }}>
                 {fmt(r.n, 0)}
               </div>
               <div style={{ position: "absolute", left: COLS[1], top: ry, opacity: ease(frame, fixedAt - 2 + i * 2, 10), ...note(30, INK_SOFT) }}>
@@ -232,7 +232,7 @@ export const IsntScene: React.FC = () => {
                   top: ry,
                   opacity: a * (loud ? 1 : 0.7),
                   ...note(30, r.p < 0.05 ? STAT_INK : INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   transform:
                     i === 0 ? `scale(${1 + 0.12 * firstGlow})` : i === 2 ? `scale(${1 + 0.12 * thirdGlow})` : i >= 3 ? `scale(${1 + 0.12 * zeroGlow})` : undefined,
                   transformOrigin: "0 50%",

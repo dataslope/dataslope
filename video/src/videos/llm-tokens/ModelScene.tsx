@@ -135,7 +135,7 @@ export const ModelScene: React.FC = () => {
                   top: rowY(i) + 6,
                   ...note(28, INK),
                   ...TABULAR,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   opacity: ease(frame, barAt(i) + 8, 8),
                 }}
               >
@@ -147,7 +147,7 @@ export const ModelScene: React.FC = () => {
         {/* The rest of the vocabulary: two hundred thousand in all. */}
         <Note at={thousandAt - 2} x={BARS.x} y={rowY(DIST.length) + 6}>
           <div style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            and <span style={{ ...TABULAR, fontWeight: 650, color: FOCUS_INK }}>{num(VOCAB - DIST.length)}</span> more
+            and <span style={{ ...TABULAR, fontWeight: 500, color: FOCUS_INK }}>{num(VOCAB - DIST.length)}</span> more
             tokens, sharing the other {rest.toFixed(2)}
           </div>
           <div style={{ ...note(21, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>

@@ -142,7 +142,7 @@ export const MemoryScene: React.FC = () => {
               from="up"
               style={{ textAlign: "center" }}
             >
-              <span style={{ ...label(24, INK), ...TABULAR, fontWeight: 600 }}>{pct(MEMORY.exact)}</span>
+              <span style={{ ...label(24, INK), ...TABULAR, fontWeight: 500 }}>{pct(MEMORY.exact)}</span>
               {i === 0 ? <div style={{ ...label(21, INK), marginTop: 2 }}>of the bar</div> : null}
             </Note>
           );
@@ -170,11 +170,11 @@ export const MemoryScene: React.FC = () => {
             >
               {w.s} min
             </span>
-            <span style={{ ...note(34, OK_INK), ...TABULAR, fontWeight: 600, whiteSpace: "nowrap" }}>{pct(MEMORY.exact)}</span>
+            <span style={{ ...note(34, OK_INK), ...TABULAR, fontWeight: 500, whiteSpace: "nowrap" }}>{pct(MEMORY.exact)}</span>
           </Note>
         ))}
         <Note at={otherAt} x={TABLE.x} y={y(TABLE.top) + 3 * TABLE.row + 30} width={500}>
-          <span style={{ ...note(26, INK), fontWeight: 600 }}>No other continuous distribution does that.</span>
+          <span style={{ ...note(26, INK), fontWeight: 500 }}>No other continuous distribution does that.</span>
         </Note>
       </Drift>
     </AbsoluteFill>

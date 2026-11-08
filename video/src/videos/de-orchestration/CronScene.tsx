@@ -100,7 +100,7 @@ export const CronScene: React.FC = () => {
 
         {/* Cron: two lines, two times, nothing between them. */}
         <Note at={cronAt} x={X0} y={y(266)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             cron: <span style={{ opacity: ease(frame, setAt, 10) }}>a command at a set time</span>
           </span>
         </Note>
@@ -124,7 +124,7 @@ export const CronScene: React.FC = () => {
           {[0, 1, 2, 3, 4].map((hr) => (
             <g key={hr}>
               <line x1={tx(hr)} x2={tx(hr)} y1={axisY} y2={axisY + 7} stroke={INK} strokeWidth={1.4} />
-              <text x={tx(hr)} y={axisY + 31} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 600 })}>
+              <text x={tx(hr)} y={axisY + 31} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
                 {`0${hr}:00`}
               </text>
             </g>
@@ -165,7 +165,7 @@ export const CronScene: React.FC = () => {
         {(["extract", "transform"] as const).map((k) => (
           <div
             key={k}
-            style={{ position: "absolute", left: X0, top: rowY[k] - 16, ...note(24, INK), fontWeight: 600, opacity: ease(frame, k === "extract" ? extAt : trAt, 10) }}
+            style={{ position: "absolute", left: X0, top: rowY[k] - 16, ...note(24, INK), fontWeight: 500, opacity: ease(frame, k === "extract" ? extAt : trAt, 10) }}
           >
             {k}
           </div>
@@ -174,18 +174,18 @@ export const CronScene: React.FC = () => {
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>02:00: cron fires</span>
         </Note>
         <Note at={longAt + 16} x={tx(2.58) + 14} y={rowY.extract - 14}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>runs long</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>runs long</span>
         </Note>
         <Note at={halfAt - 2} x={tx(2.55) + 14} y={rowY.transform - 14}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>on half the data</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>on half the data</span>
         </Note>
         <Note at={neitherAt} x={X0} y={y(680)}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>cron: no graph, no run history</span>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>cron: no graph, no run history</span>
         </Note>
 
         {/* The orchestrator: the page's DAG. */}
         <Note at={dagAt} x={DAG_X - NODE_W / 2} y={y(236)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             an orchestrator runs a DAG<span style={{ opacity: ease(frame, expandAt, 10) }}>: directed acyclic graph</span>
           </span>
         </Note>

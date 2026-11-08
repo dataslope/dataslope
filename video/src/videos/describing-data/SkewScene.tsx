@@ -264,7 +264,7 @@ export const SkewScene: React.FC = () => {
                 opacity: ease(frame, answerAt[i] - 6, 12),
                 whiteSpace: "nowrap",
                 ...label(28, r.red ? STAT_INK : INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 lineHeight: 1.2,
                 ...halo,
               }}
@@ -298,7 +298,7 @@ export const SkewScene: React.FC = () => {
       })}
       </div>
       <Ink at={dependsAt - 4} dur={16} style={{ left: 960, top: y(330), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK), fontWeight: 560 }}>If the data is…</span>
+        <span style={{ ...label(24, INK), fontWeight: 500 }}>If the data is…</span>
       </Ink>
     </AbsoluteFill>
   );

@@ -62,7 +62,7 @@ export const tokenize = (line: string): Token[] => {
     if (comment) out.push({ text, color: TOKEN_INK.comment });
     else if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
     else if (word && TYPES.has(word)) out.push({ text, color: TOKEN_INK.type });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
@@ -274,8 +274,8 @@ export const Fig: React.FC<{
       gap: 12,
     }}
   >
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>Fig. {n}</span>
-    <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 
@@ -340,7 +340,7 @@ export const Out: React.FC<{ value: boolean; size: number }> = ({ value, size })
     style={{
       fontFamily: MONO,
       fontSize: size,
-      fontWeight: 600,
+      fontWeight: 500,
       color: boolInk(value),
       fontVariantLigatures: "none",
       whiteSpace: "pre",
@@ -483,7 +483,7 @@ export const VarCell: React.FC<{
           opacity: ease(frame, at + 4, 10),
           fontFamily: MONO,
           fontSize: 32,
-          fontWeight: 600,
+          fontWeight: 500,
           color: INK,
         }}
       >
@@ -558,7 +558,7 @@ export const HeapObj: React.FC<{
           style={{
             fontFamily: SANS,
             fontSize: 20,
-            fontWeight: 600,
+            fontWeight: 500,
             color: INK_SOFT,
             lineHeight: 1.1,
           }}
@@ -569,7 +569,7 @@ export const HeapObj: React.FC<{
           style={{
             fontFamily: MONO,
             fontSize: 32,
-            fontWeight: 600,
+            fontWeight: 500,
             color: valueInk,
             lineHeight: 1.2,
             fontVariantLigatures: "none",

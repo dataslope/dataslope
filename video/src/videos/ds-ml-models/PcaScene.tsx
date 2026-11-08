@@ -235,7 +235,7 @@ export const PcaScene: React.FC = () => {
             <span
               style={{
                 ...label(20, INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 background: PAPER,
                 padding: "0 4px",
@@ -248,7 +248,7 @@ export const PcaScene: React.FC = () => {
             <span
               style={{
                 ...label(20, INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 background: PAPER,
                 padding: "0 4px",
@@ -296,7 +296,7 @@ export const PcaScene: React.FC = () => {
             out={out9}
           >
             <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
-              <span style={{ color: INK, fontWeight: 650 }}>component 1</span>{" "}
+              <span style={{ color: INK, fontWeight: 500 }}>component 1</span>{" "}
               ={" "}
               {loadings.map((l, i) => (
                 <React.Fragment key={l.name}>
@@ -312,7 +312,7 @@ export const PcaScene: React.FC = () => {
             <span
               style={{
                 ...label(22, INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -355,7 +355,7 @@ export const PcaScene: React.FC = () => {
                     top: top - h(36),
                     opacity: p,
                     ...note(24, BLUE_INK),
-                    fontWeight: 600,
+                    fontWeight: 500,
                     ...TABULAR,
                   }}
                 >
@@ -398,7 +398,7 @@ export const PcaScene: React.FC = () => {
             <span
               style={{
                 ...note(25, OK_INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -415,7 +415,7 @@ export const PcaScene: React.FC = () => {
             <span
               style={{
                 ...note(24, INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -541,7 +541,7 @@ export const PcaScene: React.FC = () => {
             <span
               style={{
                 ...note(24, BLUE_INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -568,7 +568,7 @@ export const PcaScene: React.FC = () => {
             <span
               style={{
                 ...note(24, ACCENT_INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -591,7 +591,7 @@ export const PcaScene: React.FC = () => {
             <span
               style={{
                 ...note(26, INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >

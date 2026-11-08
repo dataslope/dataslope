@@ -121,8 +121,8 @@ export const SemanticsScene: React.FC = () => {
         {/* Each row's name and rule. */}
         {ROWS.map((r, i) => (
           <Note key={r.name} at={r.at} x={X0} y={cellsTop(i) - h(6)}>
-            <div style={{ ...note(28, INK), fontWeight: 750, whiteSpace: "nowrap" }}>{r.name}</div>
-            <div style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", marginTop: 2 }}>{r.rule}</div>
+            <div style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.name}</div>
+            <div style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", marginTop: 2 }}>{r.rule}</div>
           </Note>
         ))}
 
@@ -140,7 +140,7 @@ export const SemanticsScene: React.FC = () => {
           }}
         />
         <Note at={batchAt + 2} x={cx(5)} y={rowTop(0) - h(40)}>
-          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             one batch: offsets <Num>5</Num> to <Num>9</Num>
           </span>
         </Note>
@@ -184,7 +184,7 @@ export const SemanticsScene: React.FC = () => {
                     top: cellsTop(r) - h(32),
                     textAlign: "center",
                     ...label(20, INK),
-                    fontWeight: 800,
+                    fontWeight: 500,
                     whiteSpace: "nowrap",
                     opacity: p,
                   }}
@@ -205,7 +205,7 @@ export const SemanticsScene: React.FC = () => {
           <line x1={after(9)} x2={after(9)} y1={cellsTop(1) - 8} y2={cellsTop(1) + CELL_H + 8} stroke={BAR} strokeWidth={3} strokeDasharray="5 5" />
         </svg>
         <Note at={figAt + 14} x={after(4) - 60} y={cellsTop(2) + CELL_H + h(14)} out={twiceAt + 30}>
-          <span style={{ ...label(20, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Bar color={BAR} />
             commit
           </span>
@@ -216,7 +216,7 @@ export const SemanticsScene: React.FC = () => {
           <line x1={crashX} x2={crashX} y1={rowTop(0) + h(4)} y2={cellsTop(2) + CELL_H + h(4)} stroke={ACCENT} strokeWidth={3} strokeDasharray="7 6" />
         </svg>
         <Note at={crashAt + 2} x={crashX + 10} y={rowTop(0) - h(40)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>✕ crash after 7</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>✕ crash after 7</span>
         </Note>
 
         {/* Verdicts. */}
@@ -232,18 +232,18 @@ export const SemanticsScene: React.FC = () => {
           </span>
         </Note>
         <Note at={deletedAt} x={VERDICT_X} y={cellsTop(1) + h(36)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>can't save a message retention deleted before it was read</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>can't save a message retention deleted before it was read</span>
         </Note>
         <Note at={effectAt} x={VERDICT_X} y={cellsTop(2) - h(4)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>one effect each on the result</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one effect each on the result</span>
         </Note>
         <Note at={nothingAt} x={VERDICT_X} y={cellsTop(2) + h(36)}>
-          <span style={{ ...label(20, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>may run twice; the second run changes nothing</span>
+          <span style={{ ...label(20, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>may run twice; the second run changes nothing</span>
         </Note>
 
         {/* The model: a thousand messages, twenty batches, three crashes. */}
         <Note at={modelAt} x={X0} y={y(752)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             model: <Num>{count(DELIVERY.messages)}</Num> messages
             <span style={{ opacity: ease(frame, commitEveryAt, 10) }}>
               , a commit every <Num>{DELIVERY.batch}</Num>
@@ -256,7 +256,7 @@ export const SemanticsScene: React.FC = () => {
         {strips.map((st, si) => (
           <React.Fragment key={st.name}>
             <Note at={modelAt + 4 + si * 4} x={X0} y={st.y - h(2)}>
-              <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{st.name}</span>
+              <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{st.name}</span>
             </Note>
             <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
               <rect
@@ -291,7 +291,7 @@ export const SemanticsScene: React.FC = () => {
               })}
             </svg>
             <Note at={st.at + 6} x={STRIP.x + STRIP.w + 24} y={st.y - h(4)}>
-              <span style={{ ...note(25, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+              <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 <Num>{st.text.split(" ")[0]}</Num> {st.text.split(" ").slice(1).join(" ")}
               </span>
             </Note>

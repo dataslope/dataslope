@@ -109,7 +109,7 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {/* The question, as the words someone types, with its label 12px under it. */}
       <div style={{ position: "absolute", left: R_X, top: T, width: 300, opacity: askP, transform: `translateY(${(1 - askP) * 8}px)` }}>
-        <div style={{ ...note(26, INK), fontWeight: 600, lineHeight: "34px", textWrap: "balance" }}>&ldquo;Which region grew fastest?&rdquo;</div>
+        <div style={{ ...note(26, INK), fontWeight: 500, lineHeight: "34px", textWrap: "balance" }}>&ldquo;Which region grew fastest?&rdquo;</div>
         <div style={{ ...label(20, INK_SOFT), lineHeight: "26px", marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, askAt + 2, 14) }}>a question in plain words</div>
       </div>
       {/* Over the stack, so the layers read as what the tool stands on, not as
@@ -130,7 +130,7 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
                 left: layerX,
                 top: T + i * rowP,
                 ...note(26, INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 lineHeight: `${rowH}px`,
                 whiteSpace: "nowrap",
                 opacity: p,
@@ -144,10 +144,10 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <Note at={messyAt - 2} x={layerX} y={below + c.h(4)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>on messy raw tables: confidently wrong, at scale</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>on messy raw tables: confidently wrong, at scale</span>
       </Note>
       <Note at={jobAt - 2} x={layerX} y={below + c.h(52)}>
-        <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the analyst builds these, and checks the answers</span>
+        <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the analyst builds these, and checks the answers</span>
       </Note>
     </>
   );

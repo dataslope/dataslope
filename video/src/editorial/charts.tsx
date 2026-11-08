@@ -104,7 +104,7 @@ export const Axis: React.FC<{
             style={{
               fontFamily: SANS,
               fontSize: 19,
-              fontWeight: 650,
+              fontWeight: 500,
               fill: INK_SOFT,
             }}
           >

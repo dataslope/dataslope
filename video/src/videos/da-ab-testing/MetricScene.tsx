@@ -183,7 +183,7 @@ export const MetricScene: React.FC = () => {
                 style={{
                   ...note(30, INK),
                   whiteSpace: "nowrap",
-                  fontWeight: hot > 0.5 ? 650 : 500,
+                  fontWeight: hot > 0.5 ? 500 : 500,
                   background: hot > 0 ? `color-mix(in srgb, ${ds("yellow", 400)} ${hot * 70}%, transparent)` : undefined,
                   padding: "0 6px",
                   margin: "0 -6px",
@@ -200,7 +200,7 @@ export const MetricScene: React.FC = () => {
           <React.Fragment key={d.key}>
             <Line points={d.values.map((v, m) => [m, v] as const)} x={xs} y={ys} at={drawAt(i)} dur={30} out={out1} color={SERIES[i]} width={3.4} />
             <Note at={decemberAt + i * 4} x={at(xs, last) + 16} y={at(ys, d.values[last]) - 16} out={out1}>
-              <span style={{ ...note(24, SERIES_INK[i]), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>{d.values[last]}</span>
+              <span style={{ ...note(24, SERIES_INK[i]), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{d.values[last]}</span>
             </Note>
             <Note at={drawAt(i) + 20} x={CHART.x0 + 10} y={y(CHART.top) - h(10) + i * h(32)} out={out1}>
               <span style={{ ...note(22, SERIES_INK[i]), whiteSpace: "nowrap" }}>{d.key}</span>
@@ -215,7 +215,7 @@ export const MetricScene: React.FC = () => {
           y1={at(ys, DRIFT.definitions[2].values[last])}
         />
         <Note at={factorAt + 4} x={at(xs, last) + 104} y={(at(ys, DRIFT.definitions[0].values[last]) + at(ys, DRIFT.definitions[2].values[last])) / 2 - 18} out={out1}>
-          <span style={{ ...note(30, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>×{DRIFT.spread}</span>
+          <span style={{ ...note(30, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>×{DRIFT.spread}</span>
         </Note>
 
         {/* ── Question 2: three kinds of metric, as three columns spread
@@ -277,7 +277,7 @@ export const MetricScene: React.FC = () => {
         {/* ── Question 3: one number above the rest ── */}
         <Card x={starX} y={starY} w={400} at={oneAt - 2} color={OK} strong>
           <div style={{ ...label(20, OK_INK) }}>north star</div>
-          <div style={{ ...note(30, INK), fontWeight: 650, opacity: ease(frame, teamsAt - 2, 10) }}>weekly active teams</div>
+          <div style={{ ...note(30, INK), fontWeight: 500, opacity: ease(frame, teamsAt - 2, 10) }}>weekly active teams</div>
         </Card>
         {tactical.map((t, i) => {
           const x = 340 + i * 440;

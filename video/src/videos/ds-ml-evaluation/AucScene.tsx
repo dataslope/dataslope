@@ -46,10 +46,10 @@ const Square: React.FC<{ b: Box; at: number; out?: number; xTitle: string; yTitl
           </text>
         </React.Fragment>
       ))}
-      <text x={b.right} y={bottom + 56} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
+      <text x={b.right} y={bottom + 56} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
         {xTitle}
       </text>
-      <text x={b.left} y={top - 16} textAnchor="start" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
+      <text x={b.left} y={top - 16} textAnchor="start" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
         {yTitle}
       </text>
     </Svg>
@@ -74,7 +74,7 @@ const ChanceLine: React.FC<{ b: Box; level: number; at: number; dash: string; ch
       <Svg>
         <line x1={b.left} x2={b.left + (b.right - b.left) * p} y1={ly} y2={ly} stroke={INK_SOFT} strokeWidth={2} strokeDasharray={dash} />
       </Svg>
-      <div style={{ position: "absolute", left: b.left + 14, top: ly - 32, ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, from + 6, 10) }}>
+      <div style={{ position: "absolute", left: b.left + 14, top: ly - 32, ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, from + 6, 10) }}>
         {children}
       </div>
     </>
@@ -179,7 +179,7 @@ export const AucScene: React.FC = () => {
           <Curve points={CLS.roc} x={xsOf(ROC)} y={ysOf(ROC)} at={rateAt + 4} dur={26} color={BAR} width={3.6} clip={clipOf(ROC)} />
           <Curve points={CLS.rocBalanced} x={xsOf(ROC)} y={ysOf(ROC)} at={sameAt + 6} dur={22} color={INK} width={2.6} dash="8 7" clip={clipOf(ROC)} />
           <Note at={chanceAt - 2} x={at(xsOf(ROC), 0.55)} y={at(ysOf(ROC), 0.42)}>
-            <span style={{ ...label(20, INK_SOFT), fontWeight: 650 }}>chance: 0.5</span>
+            <span style={{ ...label(20, INK_SOFT), fontWeight: 500 }}>chance: 0.5</span>
           </Note>
 
           {/* ── PR ── */}
@@ -251,7 +251,7 @@ export const AucScene: React.FC = () => {
             </div>
           </Note>
           <Note at={honestAt - 2} x={READ_X} y={y(ROC.top) + h(445)}>
-            <span style={{ ...note(27, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(27, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               rare positives: <Mark at={honestAt + 4}>trust PR-AUC</Mark>
             </span>
           </Note>
@@ -283,7 +283,7 @@ export const AucScene: React.FC = () => {
             const ink = p.good ? OK_INK : ACCENT_INK;
             return (
               <React.Fragment key={p.name}>
-                <div style={{ position: "absolute", left: ROC.left, top: rowTop + h(10), ...note(28, INK), fontWeight: 650, opacity: before }}>{p.name}</div>
+                <div style={{ position: "absolute", left: ROC.left, top: rowTop + h(10), ...note(28, INK), fontWeight: 500, opacity: before }}>{p.name}</div>
                 {[
                   { v: p.before, p: before, fill: `color-mix(in srgb, ${INK_SOFT} 35%, ${PAPER})`, tag: "unweighted", ink: INK },
                   { v: p.after, p: after, fill: color, tag: "weighted", ink },
@@ -309,7 +309,7 @@ export const AucScene: React.FC = () => {
                         left: BAR_X + BAR_W * b.v + 14,
                         top: rowTop + k * h(46),
                         ...note(26, b.ink),
-                        fontWeight: 600,
+                        fontWeight: 500,
                         ...TABULAR,
                         opacity: b.p,
                         whiteSpace: "nowrap",

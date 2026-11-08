@@ -165,7 +165,7 @@ export const LatestScene: React.FC = () => {
           </span>
         </Note>
         <Note at={teamAt + 4} x={rg.right + 24} y={rg.rowTop(0) + 8} out={out11}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the newest</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the newest</span>
         </Note>
 
         {/* ── Question 12: the days that aren't there ── */}

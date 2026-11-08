@@ -73,7 +73,7 @@ export const Types46Scene: React.FC = () => {
 
   const bandLabel = (at: number, title: string, sub: string, top: number, more?: React.ReactNode) => (
     <Note at={at} x={X0} y={top + h(44)}>
-      <div style={{ ...note(32, INK), fontWeight: 750, whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...note(32, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{title}</div>
       <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{sub}</div>
       {more}
     </Note>
@@ -86,7 +86,7 @@ export const Types46Scene: React.FC = () => {
     const p = ease(frame, at, 12);
     return (
       <div style={{ position: "absolute", left, top: gr.top - h(40), width: right - left, opacity: p, textAlign: "center" }}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{text}</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{text}</span>
         <div style={{ height: 0, borderTop: `2px solid ${HAIRLINE}`, marginTop: 2, transform: `scaleX(${p})` }} />
       </div>
     );
@@ -116,7 +116,7 @@ export const Types46Scene: React.FC = () => {
             y(BAND4),
             <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 14 }}>
               <div style={{ opacity: ease(frame, kimballAt, 10) }}>Kimball&rsquo;s Type 4:</div>
-              <div style={{ color: INK, fontWeight: 600, marginTop: 4, opacity: ease(frame, miniAt, 10) }}>a mini-dimension (13)</div>
+              <div style={{ color: INK, fontWeight: 500, marginTop: 4, opacity: ease(frame, miniAt, 10) }}>a mini-dimension (13)</div>
             </div>,
           )}
           <TableName g={gm} at={mainAt}>
@@ -198,7 +198,7 @@ export const Types46Scene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>no second join</span>
         </Note>
         <Note at={part1At} x={gr.right + 30} y={gr.rowTop(0) - h(34)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>Type 1: overwriting it</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Type 1: overwriting it</span>
         </Note>
         <Note at={priceAt} x={gr.right + 30} y={gr.rowTop(0) + h(2)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
@@ -206,7 +206,7 @@ export const Types46Scene: React.FC = () => {
             <span style={{ opacity: ease(frame, rewritesAt, 10) }}>
               {" "}a move rewrites
               <br />
-              <span style={{ fontWeight: 650 }}>current_city</span> on every old row
+              <span style={{ fontWeight: 500 }}>current_city</span> on every old row
             </span>
           </span>
         </Note>

@@ -107,7 +107,7 @@ export const StrawScene: React.FC = () => {
                   width: VOC.idW,
                   fontFamily: MONO,
                   fontSize: 26,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   color: g > 0.3 ? FOCUS_INK : INK,
                   opacity: idP,
                   ...TABULAR,
@@ -131,7 +131,7 @@ export const StrawScene: React.FC = () => {
         })}
         <Note at={wholeAt} x={VOC.x} y={rowY(VOCAB_ROWS.length) + 4}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 600 }}>·</span> marks a leading space
+            <span style={{ fontFamily: MONO, fontWeight: 500 }}>·</span> marks a leading space
           </span>
         </Note>
 
@@ -158,7 +158,7 @@ export const StrawScene: React.FC = () => {
               }}
             >
               {split < 0.5 ? (
-                <span style={{ fontFamily: MONO, fontSize: JOIN_SIZE, fontWeight: 600, color: INK, lineHeight: 1.6, fontVariantLigatures: "none" }}>
+                <span style={{ fontFamily: MONO, fontSize: JOIN_SIZE, fontWeight: 500, color: INK, lineHeight: 1.6, fontVariantLigatures: "none" }}>
                   {p.text}
                 </span>
               ) : (
@@ -168,7 +168,7 @@ export const StrawScene: React.FC = () => {
                 style={{
                   fontFamily: MONO,
                   fontSize: 26,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   color: INK_SOFT,
                   opacity: idP,
                   transform: `translateY(${(1 - idP) * -6}px)`,
@@ -200,15 +200,15 @@ export const StrawScene: React.FC = () => {
           }}
         >
           <ChipFace text={SPACED.text} size={WORD.size} focus={Math.min(1, pulse(frame, sentenceAt, 24) + pulse(frame, oneIdAt - 2, 26))} />
-          <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK_SOFT, opacity: ease(frame, oneIdAt - 2, 10), ...TABULAR }}>
+          <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK_SOFT, opacity: ease(frame, oneIdAt - 2, 10), ...TABULAR }}>
             {SPACED.id}
           </span>
           <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, oneIdAt + 4, 10), whiteSpace: "nowrap" }}>one id</span>
         </div>
         {/* The dot is the space: said, and labelled under it. */}
         <Note at={spaceAt + 8} x={WORD.x + 6} y={y(SPACED_Y) + 54}>
-          <span style={{ ...note(22, FOCUS_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 600 }}>·</span> is the space
+          <span style={{ ...note(22, FOCUS_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: MONO, fontWeight: 500 }}>·</span> is the space
           </span>
         </Note>
 
@@ -236,7 +236,7 @@ export const StrawScene: React.FC = () => {
                   textAlign: "center",
                   fontFamily: MONO,
                   fontSize: 38,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   color: r > 0.5 ? FOCUS_INK : INK,
                   borderBottom: isR ? `3px solid color-mix(in srgb, ${FOCUS} ${Math.round(r * 100)}%, transparent)` : "3px solid transparent",
                 }}
@@ -245,7 +245,7 @@ export const StrawScene: React.FC = () => {
               </span>
             );
           })}
-          <span style={{ ...note(26, FOCUS_INK), marginLeft: 22, fontWeight: 650, opacity: ease(frame, rsAt + 18, 10), ...TABULAR }}>
+          <span style={{ ...note(26, FOCUS_INK), marginLeft: 22, fontWeight: 500, opacity: ease(frame, rsAt + 18, 10), ...TABULAR }}>
             {RS} R&apos;s
           </span>
         </div>

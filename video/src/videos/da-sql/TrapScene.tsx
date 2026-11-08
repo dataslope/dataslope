@@ -71,7 +71,7 @@ export const TrapScene: React.FC = () => {
         {/* ── What was asked for ── */}
         <Ink at={everyAt - 2} dur={14} style={{ left: X0, top: y(LIST_Y) - 44, whiteSpace: "nowrap" }}>
           <span style={{ ...note(24, INK_SOFT) }}>
-            The ask: <span style={{ color: INK, fontWeight: 650 }}>every customer</span>, with their orders over 50
+            The ask: <span style={{ color: INK, fontWeight: 500 }}>every customer</span>, with their orders over 50
           </span>
         </Ink>
 

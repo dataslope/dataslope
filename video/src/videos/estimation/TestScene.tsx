@@ -108,7 +108,7 @@ export const TestScene: React.FC = () => {
         dash="7 6"
       />
       <Note at={leavesAt} x={zeroX + 12} y={y(318)}>
-        <span style={{ ...note(22, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           zero: no difference
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, viewsAt + 8, 12) }}>. The test asks: is it inside?</span>
         </span>
@@ -129,10 +129,10 @@ export const TestScene: React.FC = () => {
         <circle cx={sx(X, clear.estimate)} cy={y(ROW1)} r={6.5 * ease(frame, differenceAt + 4, 10)} fill={EST} stroke={PAPER} strokeWidth={1.4} />
       </Svg>
       <Note at={differenceAt + 6} x={sx(X, clear.lo) - 14} y={y(ROW1) - 16} align="right" from="right">
-        <span style={{ ...note(24, INK), fontWeight: 600, ...halo }}>{signed(clear.lo)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo }}>{signed(clear.lo)}</span>
       </Note>
       <Note at={differenceAt + 8} x={sx(X, clear.hi) + 14} y={y(ROW1) - 16}>
-        <span style={{ ...note(24, INK), fontWeight: 600, ...halo }}>{signed(clear.hi)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo }}>{signed(clear.hi)}</span>
       </Note>
       <Note at={significantAt - 4} x={sx(X, clear.lo)} y={y(ROW1) + 26}>
         <span style={{ ...note(23, INK), ...halo, whiteSpace: "nowrap" }}>
@@ -187,16 +187,16 @@ export const TestScene: React.FC = () => {
         />
       </Svg>
       <Note at={minusAt - 2} x={sx(X, straddle.lo) - 22} y={y(ROW2) - 16} align="right" from="right">
-        <span style={{ ...note(24, INK), fontWeight: 600, ...halo }}>{signed(straddle.lo)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo }}>{signed(straddle.lo)}</span>
       </Note>
       <Note at={eightAt - 4} x={sx(X, straddle.hi) + 26} y={y(ROW2) - 16}>
-        <span style={{ ...note(24, INK), fontWeight: 600, ...halo }}>{signed(straddle.hi)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo }}>{signed(straddle.hi)}</span>
       </Note>
       <Note at={noEffectAt - 6} x={zeroX + 26} y={y(ROW2) + 30}>
-        <span style={{ ...note(23, EST_INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>includes zero: can’t rule out no effect</span>
+        <span style={{ ...note(23, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>includes zero: can’t rule out no effect</span>
       </Note>
       <Note at={bigAt - 2} x={zeroX + 26} y={y(ROW2) + 64}>
-        <span style={{ ...note(23, EST_INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>includes eight: can’t rule out a big one</span>
+        <span style={{ ...note(23, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>includes eight: can’t rule out a big one</span>
       </Note>
       <Note at={proofAt - 4} x={sx(X, 12)} y={y(ROW2) - 80}>
         <span style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>Not proof of nothing:</span>
@@ -208,7 +208,7 @@ export const TestScene: React.FC = () => {
       {/* ── What only the interval shows: how big ── */}
       <Bracket x0={sx(X, clear.lo)} x1={sx(X, clear.hi)} y={y(ROW1) - 40} at={howBigAt - 4} color={EST} />
       <Note at={howBigAt} x={sx(X, clear.estimate)} y={y(ROW1) - 84} from="up">
-        <span style={{ ...note(22, EST_INK), fontWeight: 650, ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(22, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           and how big it might be
         </span>
       </Note>
@@ -219,7 +219,7 @@ export const TestScene: React.FC = () => {
       {/* ── The formula all of it leaned on ── */}
       <Ink at={formulaFrom - 4} dur={16} style={{ left: 160, top: y(830), whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT) }}>Every interval so far:</span>
-        <span style={{ ...note(30, INK), fontWeight: 600, marginLeft: 18, opacity: ease(frame, formulaAt - 4, 12) }}>
+        <span style={{ ...note(30, INK), fontWeight: 500, marginLeft: 18, opacity: ease(frame, formulaAt - 4, 12) }}>
           <Marked at={seAt - 2} color={HIGHLIGHT}>
             standard error
           </Marked>{" "}

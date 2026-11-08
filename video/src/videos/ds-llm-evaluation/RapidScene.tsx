@@ -55,7 +55,7 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={nextAt - 2} x={R_X} y={c.y(570)}>
-        <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>track what people do next:</span>
+        <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>track what people do next:</span>
       </Note>
       {signs.map((s, i) => (
         <Tag key={s.text} x={R_X + 30} y={c.y(626) + i * c.h(62)} at={s.at - 2} size={24} tone="green">
@@ -106,19 +106,19 @@ const Contamination: React.FC<{ c: Ctx }> = ({ c }) => {
         {bench > 0 ? <circle cx={cx + 150} cy={cy} r={70 * bench} fill={BAD} opacity={0.6 * ease(frame, memoryAt, 12)} clipPath="url(#contam-clip)" /> : null}
       </svg>
       <Note at={contamAt + 4} x={cx - 110} y={cy - c.h(170)}>
-        <span style={{ ...label(20, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a model&apos;s training data</span>
+        <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a model&apos;s training data</span>
       </Note>
       <Note at={itemsAt + 4} x={cx + 120} y={cy + c.h(84)}>
-        <span style={{ ...label(20, INK), fontWeight: 600, whiteSpace: "nowrap" }}>a benchmark&apos;s test items</span>
+        <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>a benchmark&apos;s test items</span>
       </Note>
       <Note at={memoryAt} x={cx + 250} y={cy - c.h(20)}>
-        <span style={{ ...note(28, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           memory<span style={{ opacity: ease(frame, skillAt - 2, 10) }}>, not skill</span>
         </span>
       </Note>
       {actions.map((a, i) => (
         <Note key={a.text} at={a.at - 2} x={R_X} y={c.y(650) + i * c.h(52)}>
-          <span style={{ ...note(26, i === 0 ? INK : OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, i === 0 ? INK : OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             {a.text}
             {i === actions.length - 1 ? <span style={{ opacity: ease(frame, promptsAt - 2, 10) }}> or put it in few-shot prompts</span> : null}
           </span>
@@ -190,7 +190,7 @@ export const RapidScene: React.FC = () => {
           <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>every round on this track came back to one question</span>
         </Note>
         <Note at={practice[0].at - 6} x={X0} y={y(450)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 600 }}>to practice</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>to practice</span>
         </Note>
         {practice.map((p, i) => (
           <Tag key={p.text} x={X0} y={y(500) + i * h(74)} at={p.at - 2} size={28} tone="blue" lit={i === 2 ? workAt : undefined}>

@@ -81,7 +81,7 @@ export const RestScene: React.FC = () => {
         {/* A resource with a URL, and the methods that act on it. */}
         <Note at={resAt} x={CARD.x} y={cardTop + 4} width={CARD.w} style={{ textAlign: "center" }}>
           <div style={{ ...label(23, BLUE_INK), whiteSpace: "nowrap" }}>a resource</div>
-          <div style={{ fontFamily: MONO, fontSize: 36, fontWeight: 600, color: INK, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, urlAt, 10) }}>/articles/42</div>
+          <div style={{ fontFamily: MONO, fontSize: 36, fontWeight: 500, color: INK, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, urlAt, 10) }}>/articles/42</div>
         </Note>
         <Note at={urlAt + 6} x={CARD.x} y={cardTop + CARD.h + h(12)} width={CARD.w} style={{ textAlign: "center" }}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>its URL names it</span>
@@ -108,22 +108,22 @@ export const RestScene: React.FC = () => {
 
         {/* Paths are nouns, never verbs. */}
         <Note at={nounsAt} x={X0} y={nounTop}>
-          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Paths are nouns</span>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Paths are nouns</span>
         </Note>
         <div style={{ position: "absolute", left: X0, top: nounTop + h(46), display: "flex", alignItems: "center", gap: 14, fontSize: 30, opacity: ease(frame, fortyTwoAt, 10) }}>
           <Tick at={fortyTwoAt + 4} size={28} />
-          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 600, color: OK_INK }}>/articles/42</span>
+          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 500, color: OK_INK }}>/articles/42</span>
         </div>
         <div style={{ position: "absolute", left: X0 + 330, top: nounTop + h(46), display: "flex", alignItems: "center", gap: 14, fontSize: 30, opacity: ease(frame, verbAt, 10) }}>
           <Cross at={verbAt + 8} size={26} />
-          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 600, color: ACCENT_INK }}>
+          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 500, color: ACCENT_INK }}>
             <Strike at={verbAt + 10}>/getArticle</Strike>
           </span>
         </div>
 
         {/* A request that carries everything, to a server that keeps nothing. */}
         <Note at={carriesAt} x={R_X} y={reqTop - h(44)}>
-          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Each request carries everything</span>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Each request carries everything</span>
         </Note>
         <Msg
           x={R_X}
@@ -142,8 +142,8 @@ export const RestScene: React.FC = () => {
         </Node>
         <Note at={meanAt} x={R_X} y={reqTop + reqH + h(26)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 600, color: METHOD_INK }}>GET</span> means read;{" "}
-            <span style={{ fontFamily: MONO, fontWeight: 600 }}>404</span> means not found.
+            <span style={{ fontFamily: MONO, fontWeight: 500, color: METHOD_INK }}>GET</span> means read;{" "}
+            <span style={{ fontFamily: MONO, fontWeight: 500 }}>404</span> means not found.
           </span>
         </Note>
 
@@ -153,7 +153,7 @@ export const RestScene: React.FC = () => {
           const at = last ? guessAt + 14 : guessAt + i * 5;
           return (
             <Note key={p} at={at} x={X0} y={guessTop + i * h(50)}>
-              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: last ? INK : INK_SOFT, whiteSpace: "nowrap" }}>
+              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: last ? INK : INK_SOFT, whiteSpace: "nowrap" }}>
                 {last ? <Mark at={guessAt + 20}>{p}</Mark> : p}
               </span>
             </Note>
@@ -184,7 +184,7 @@ export const RestScene: React.FC = () => {
                 head={12}
               />
               <Note at={at + 10} x={1560} y={srvTop(i) + h(18)}>
-                <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK, whiteSpace: "nowrap" }}>200 OK</span>
+                <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: BLUE_INK, whiteSpace: "nowrap" }}>200 OK</span>
               </Note>
             </React.Fragment>
           );

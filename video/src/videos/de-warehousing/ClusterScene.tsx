@@ -180,7 +180,7 @@ export const ClusterScene: React.FC = () => {
         </div>
         {panel(SORTED_Y, CLUSTER.sorted.groups, likeAt, twoAt, BAR, true, SORTED_STEP)}
         <div style={{ position: "absolute", left: RIGHT, top: y(SORTED_Y) + h(SORTED_STEP) * 2, opacity: ease(frame, twoAt + 4, 12) }}>
-          <div style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{CLUSTER.sorted.overlapping}</Num> of <Num>{CLUSTER.sorted.groups.length}</Num> groups read
           </div>
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -195,13 +195,13 @@ export const ClusterScene: React.FC = () => {
         </div>
         {panel(SHUFFLED_Y, CLUSTER.shuffled.groups, shuffleAt + 4, nothingAt, ACCENT, false, STEP)}
         <div style={{ position: "absolute", left: RIGHT, top: y(SHUFFLED_Y) + h(STEP) * 2, opacity: ease(frame, nothingAt + 4, 12) }}>
-          <div style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{CLUSTER.shuffled.overlapping}</Num> of <Num>{CLUSTER.shuffled.groups.length}</Num> groups read
           </div>
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <Num>{MB(CLUSTER.shuffled.read, 2)}</Num> read
           </div>
-          <div style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, fiveAt, 10) }}>
+          <div style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, fiveAt, 10) }}>
             <Num>{Math.round(ratio)}</Num> times as much
           </div>
         </div>

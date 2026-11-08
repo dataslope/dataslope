@@ -96,7 +96,7 @@ export const RetryScene: React.FC = () => {
 
         {/* What to retry, and what never to. */}
         <Note at={transAt} x={X0} y={y(286)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>retry: transient failures</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>retry: transient failures</span>
         </Note>
         {okItems.map((it, i) => (
           <Note key={it.text} at={it.at - 2} x={X0 + 20} y={y(336) + i * h(44)}>
@@ -104,7 +104,7 @@ export const RetryScene: React.FC = () => {
           </Note>
         ))}
         <Note at={dontAt} x={X0} y={y(500)}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>don&apos;t retry: deterministic failures</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>don&apos;t retry: deterministic failures</span>
         </Note>
         {badItems.map((it, i) => (
           <Note key={it.text} at={it.at - 2} x={X0 + 20} y={y(550) + i * h(44)}>
@@ -112,7 +112,7 @@ export const RetryScene: React.FC = () => {
           </Note>
         ))}
         <Note at={sameAt} x={X0 + 20} y={y(646)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the same failure, every time</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same failure, every time</span>
         </Note>
         <Pill x={X0} y={y(740)} at={idemAt} tone="green" size={24}>
           retry only idempotent tasks
@@ -159,7 +159,7 @@ export const RetryScene: React.FC = () => {
                   stroke={`color-mix(in srgb, ${ACCENT} ${bad * 100}%, ${INK})`}
                   strokeWidth={2.6}
                 />
-                <text x={x} y={lineY + 7} textAnchor="middle" style={svgText({ ...label(20, INK), fontWeight: 600 })}>
+                <text x={x} y={lineY + 7} textAnchor="middle" style={svgText({ ...label(20, INK), fontWeight: 500 })}>
                   {i + 1}
                 </text>
               </g>
@@ -186,7 +186,7 @@ export const RetryScene: React.FC = () => {
               top: lineY - h(50),
               textAlign: "center",
               ...note(23, BLUE_INK),
-              fontWeight: 600,
+              fontWeight: 500,
               whiteSpace: "nowrap",
               opacity: ease(frame, waitAt[i] + 4, 10),
             }}
@@ -195,7 +195,7 @@ export const RetryScene: React.FC = () => {
           </div>
         ))}
         <Note at={capAt + 2} x={LINE_X0 - R} y={lineY + h(66)}>
-          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             each wait doubles, never more than <Num>{RETRY.max}</Num> min
           </span>
         </Note>

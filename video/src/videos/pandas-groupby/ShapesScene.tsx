@@ -84,7 +84,7 @@ export const ShapesScene: React.FC = () => {
 
       {/* ── the frame, where the last scene left it ── */}
       <Ink at={start - 14} dur={10} style={{ left: A_X, top: y(LABEL_Y) }}>
-        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600 }}>df</span>
+        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>df</span>
       </Ink>
       <Header x={A_X} top={y(HEADER_Y)} width={CARD_W} at={start - 14} cols={FRAME_COLS} />
       {ROWS.map((r, i) => (

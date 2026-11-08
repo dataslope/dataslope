@@ -58,10 +58,10 @@ export const tokenize = (line: string): Token[] => {
     if (comment) out.push({ text, color: TOKEN_INK.comment });
     else if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
     else if (word && BUILTINS.has(word)) out.push({ text, color: TOKEN_INK.builtin });
     else if (word) out.push({ text, color: TOKEN_INK.name });
-    else if (ptr) out.push({ text, color: TOKEN_INK.pointer, weight: 800 });
+    else if (ptr) out.push({ text, color: TOKEN_INK.pointer, weight: 500 });
     else out.push({ text, color: TOKEN_INK.punct });
   }
   return out;
@@ -228,8 +228,8 @@ export const Fig: React.FC<{ n: string; at: number; x: number; y: number; childr
   children,
 }) => (
   <Ink at={at} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>Fig. {n}</span>
-    <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 
@@ -354,7 +354,7 @@ export const Val: React.FC<{ children: string; kind?: "int" | "addr"; size?: num
     style={{
       fontFamily: MONO,
       fontSize: size ?? (kind === "int" ? 40 : 24),
-      fontWeight: kind === "int" ? 600 : 500,
+      fontWeight: kind === "int" ? 500 : 500,
       color: kind === "int" ? VALUE_INK : ADDR_INK,
       fontVariantLigatures: "none",
       whiteSpace: "nowrap",
@@ -381,7 +381,7 @@ export const AddrLabel: React.FC<{
 }> = ({ x, y, name, addr, at, nameAt = at, mark = 0, tag }) => {
   const frame = useCurrentFrame();
   const tagP = tag ? markP(frame, tag.at, tag.out) : 0;
-  const nameStyle: React.CSSProperties = { fontFamily: MONO, fontSize: 28, fontWeight: 600, color: INK };
+  const nameStyle: React.CSSProperties = { fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK };
   return (
     <div
       style={{
@@ -404,7 +404,7 @@ export const AddrLabel: React.FC<{
       </span>
       <Ink at={at} dur={14} style={{ position: "relative" }}>
         <span style={{ position: "relative", display: "inline-block" }}>
-          <span style={{ ...note(20, ADDR_INK), fontWeight: 600 }}>
+          <span style={{ ...note(20, ADDR_INK), fontWeight: 500 }}>
             <Marked p={mark}>{addr}</Marked>
           </span>
           {tagP > 0 ? (
@@ -421,7 +421,7 @@ export const AddrLabel: React.FC<{
                 transform: `translate(-50%, ${(1 - tagP) * 8}px)`,
               }}
             >
-              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: ADDR_INK, lineHeight: 1.1 }}>
+              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: ADDR_INK, lineHeight: 1.1 }}>
                 {tag?.text}
               </span>
               <span style={{ width: 2, height: 10, marginTop: 3, background: ADDR }} />

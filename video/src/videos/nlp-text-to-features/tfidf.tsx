@@ -74,7 +74,7 @@ const Value: React.FC<{ text: string; zero: boolean; accent?: boolean; style?: R
       alignItems: "center",
       justifyContent: "center",
       ...note(30, accent ? ACCENT_INK : zero ? INK_SOFT : INK),
-      fontWeight: accent ? 700 : zero ? 450 : 600,
+      fontWeight: accent ? 500 : zero ? 450 : 500,
       ...style,
     }}
   >
@@ -131,7 +131,7 @@ export const DocTable: React.FC<TableProps> = ({ g, at, morph, frame: frameIn = 
             opacity: ease(frame, at + j * 0.8, 12),
             transform: `translateY(${(1 - ease(frame, at + j * 0.8, 12)) * 8}px)`,
             ...label(22, INK),
-            fontWeight: 600,
+            fontWeight: 500,
           }}
         >
           {w}
@@ -331,7 +331,7 @@ export const IdfRow: React.FC<{ g: TableGeo; at: number; lit?: readonly number[]
             justifyContent: "center",
             opacity: ease(frame, at + 2 + j * 0.8, 10),
             ...note(26, j === THE ? ACCENT_INK : INK_SOFT),
-            fontWeight: j === THE ? 700 : 500,
+            fontWeight: j === THE ? 500 : 500,
           }}
         >
           {num(IDF[j])}
@@ -382,7 +382,7 @@ export const DocPips: React.FC<{ word: number; p: number; size?: number }> = ({ 
             alignItems: "center",
             justifyContent: "center",
             ...note(20, has ? INK : INK_SOFT),
-            fontWeight: 600,
+            fontWeight: 500,
           }}
         >
           {i + 1}

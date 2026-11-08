@@ -150,7 +150,7 @@ export const VanishScene: React.FC = () => {
               />
             </Svg>
             <Note at={millionAt} x={px(0.3)} y={py(1e-5)}>
-              <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+              <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
                 0.25<sup>10</sup> = {VANISH.ten.toFixed(8)}: under one in a million
               </span>
             </Note>
@@ -158,7 +158,7 @@ export const VanishScene: React.FC = () => {
               <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>the early layers barely learn</span>
             </Note>
             <Note at={explodesAt - 2} x={px(10) - 330} y={py(VANISH.tenBig) - h(50)}>
-              <span style={{ ...note(25, WARM_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+              <span style={{ ...note(25, WARM_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
                 1.5<sup>10</sup> = {VANISH.tenBig}: it explodes
               </span>
             </Note>

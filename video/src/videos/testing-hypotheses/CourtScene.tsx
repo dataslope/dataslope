@@ -124,7 +124,7 @@ export const CourtScene: React.FC = () => {
             </Ink>
             <Ink at={r.testAt} dur={14} style={{ left: TEST_X, top: rowY(i) + 10, whiteSpace: "nowrap" }}>
               <div style={{ transform: `scale(${1 + 0.05 * (i === 1 ? barGlow : i === 3 ? failGlow : 0)})`, transformOrigin: "0 50%" }}>
-                <Label size={32} weight={600}>
+                <Label size={32} weight={500}>
                   {r.test}
                 </Label>
               </div>

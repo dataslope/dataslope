@@ -105,7 +105,7 @@ export const LineScene: React.FC = () => {
         <BarSet values={V} {...P[1]} at={barsAt - 2} labels={LINE_BAR.weeks} out={out2} />
         <Verdict ok x={COLS[1].x1 + 20} y={y(ROWS[0].top)} at={barsAt + 10} out={out2} />
         <Note at={honestAt - 2} out={out2} x={CHOOSE_X} y={y(ROWS[0].top) - h(4)}>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>both honest, so choose:</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>both honest, so choose:</span>
         </Note>
         <Note at={neighbourAt} out={out2} x={CHOOSE_X} y={y(ROWS[0].top) + h(36)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>bars compare neighbours,</span>

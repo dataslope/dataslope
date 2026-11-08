@@ -8,7 +8,7 @@ import { MONO } from "../../theme/fonts";
  * (README, "One line, one size, one family"), and never under 19px.
  */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: weight ?? 500, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );

@@ -218,7 +218,7 @@ export const Card: React.FC<{
       }}
     >
       {face ? (
-        <span style={{ ...label(Math.round(w * 0.36), ink), ...TABULAR, fontWeight: 600 }}>{n}</span>
+        <span style={{ ...label(Math.round(w * 0.36), ink), ...TABULAR, fontWeight: 500 }}>{n}</span>
       ) : (
         <div
           style={{

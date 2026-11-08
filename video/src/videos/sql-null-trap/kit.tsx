@@ -52,10 +52,10 @@ export const tokenize = (line: string): Token[] => {
     const [text, str, num, word, op] = m;
     if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word === "NULL") out.push({ text, color: UNKNOWN_INK, weight: 700 });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
+    else if (word === "NULL") out.push({ text, color: UNKNOWN_INK, weight: 500 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
-    else if (op) out.push({ text, color: TOKEN_INK.op, weight: 600 });
+    else if (op) out.push({ text, color: TOKEN_INK.op, weight: 500 });
     else out.push({ text, color: TOKEN_INK.punct });
   }
   return out;
@@ -262,8 +262,8 @@ export const Fig: React.FC<{
       gap: 12,
     }}
   >
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>Fig. {n}</span>
-    <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 
@@ -292,7 +292,7 @@ export const TruthWord: React.FC<{
   size?: number;
   weight?: number;
   style?: React.CSSProperties;
-}> = ({ value, size = 24, weight = 650, style }) => {
+}> = ({ value, size = 24, weight = 500, style }) => {
   const t = TRUTH[truthKey(value)];
   return (
     <span
@@ -324,7 +324,7 @@ export const TruthWord: React.FC<{
  *  the unknown's ink, the way a client marks it. */
 export const SqlValue: React.FC<{ value: string | number | null }> = ({ value }) =>
   value === null ? (
-    <span style={{ color: UNKNOWN_INK, fontWeight: 600 }}>NULL</span>
+    <span style={{ color: UNKNOWN_INK, fontWeight: 500 }}>NULL</span>
   ) : (
     <span style={{ color: INK }}>{value}</span>
   );
@@ -403,7 +403,7 @@ export const Table: React.FC<{
             style={{
               fontFamily: MONO,
               fontSize: 24,
-              fontWeight: 600,
+              fontWeight: 500,
               color: INK,
             }}
           >

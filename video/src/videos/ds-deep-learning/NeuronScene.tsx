@@ -99,7 +99,7 @@ export const NeuronScene: React.FC = () => {
 
         {/* ── Question 1: the formula, then one neuron worked ── */}
         <Note at={sumAt - 4} x={X0} y={y(290)} out={q1Out}>
-          <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 600, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+          <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
             a = <Mark at={fAt}>f(</Mark>
             <Mark at={sumAt + 2}>w · x</Mark> <Mark at={biasAt}>+ b</Mark>
             <Mark at={fAt}>)</Mark>
@@ -137,7 +137,7 @@ export const NeuronScene: React.FC = () => {
         <Tagline x={NX} y={y(NY) - h(22)} width={140} align="center" at={inputsAt + 2} out={zAt - 2} size={40} color={INK} weight={500}>
           Σ
         </Tagline>
-        <Tagline x={NX} y={y(NY) - h(20)} width={140} align="center" at={zAt} out={q1Out} size={34} color={INK} weight={600}>
+        <Tagline x={NX} y={y(NY) - h(20)} width={140} align="center" at={zAt} out={q1Out} size={34} color={INK} weight={500}>
           {NEURON.z}
         </Tagline>
         <Tagline x={NX} y={y(NY) + NR + h(74)} width={160} align="center" at={plusAt - 2} out={q1Out} size={22} color={INK}>
@@ -161,7 +161,7 @@ export const NeuronScene: React.FC = () => {
             justifyContent: "center",
             opacity: ease(frame, sigAt - 4, 10) * (1 - ease(frame, q1Out, 10)) * (1 - lit * 0.55),
             ...label(26, INK),
-            fontWeight: 650,
+            fontWeight: 500,
           }}
         >
           sigmoid
@@ -174,7 +174,7 @@ export const NeuronScene: React.FC = () => {
         <Cells values={[[NEURON.a.toFixed(3)]]} x={OUT_X} y={y(NY) - h(CELL_H) / 2} w={120} h={h(CELL_H)} at={aAt - 2} out={leaveAt + 4} size={30} color={OK_INK} />
         <Cells values={[[String(NEURON.z)]]} x={OUT_X} y={y(NY) - h(CELL_H) / 2} w={120} h={h(CELL_H)} at={leaveAt + 14} out={q1Out} size={30} color={INK} />
         <Note at={regAt - 2} x={ACT_X - 20} y={y(NY) + h(70)} out={q1Out}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>without it: just linear regression</span>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>without it: just linear regression</span>
         </Note>
 
         {/* ── Question 2: two layers, then one matrix, then a non-linearity ── */}
@@ -226,7 +226,7 @@ export const NeuronScene: React.FC = () => {
           look={() => ({ tint: { color: CELL_OK, at: sameAt + 2 } })}
         />
         <Note at={everyAt - 2} x={1240} y={midOf(ROWS.b) - h(36)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same, for every input</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same, for every input</span>
         </Note>
         <Note at={tenAt} x={1240} y={midOf(ROWS.b) + h(4)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>ten layers: still one matrix</span>
@@ -276,7 +276,7 @@ export const NeuronScene: React.FC = () => {
           look={() => ({ tint: { color: CELL_MARK, at: becomesAt + 2 } })}
         />
         <Note at={depthAt - 2} x={1400} y={midOf(ROWS.c) - h(18)}>
-          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={whichAt}>now depth adds something</Mark>
           </span>
         </Note>

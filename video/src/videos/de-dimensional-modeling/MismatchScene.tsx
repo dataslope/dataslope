@@ -98,12 +98,12 @@ export const MismatchScene: React.FC = () => {
           What does grain mismatch mean, and how do you fix it?
         </QuestionCard>
         <Note at={sameAt} x={X0} y={y(258)}>
-          <span style={{ ...label(23, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>Two fact tables at two grains</span>
+          <span style={{ ...label(23, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Two fact tables at two grains</span>
         </Note>
 
         {/* ── The two facts ── */}
         <TableName g={sg} at={salesAt}>
-          <Mono>fact_sales</Mono> <span style={{ color: INK_SOFT, fontWeight: 560 }}>· one row per sale</span>
+          <Mono>fact_sales</Mono> <span style={{ color: INK_SOFT, fontWeight: 500 }}>· one row per sale</span>
         </TableName>
         <DataTable
           g={sg}
@@ -113,7 +113,7 @@ export const MismatchScene: React.FC = () => {
           marks={SALES.rows.map((_, i) => ({ row: i, col: amount, at: rollAt + 6 + i * 2, color: MARK_OK }))}
         />
         <TableName g={bg} at={budgetAt}>
-          <Mono>fact_budget</Mono> <span style={{ color: INK_SOFT, fontWeight: 560 }}>· one row per day and region</span>
+          <Mono>fact_budget</Mono> <span style={{ color: INK_SOFT, fontWeight: 500 }}>· one row per day and region</span>
         </TableName>
         <DataTable
           g={bg}
@@ -161,7 +161,7 @@ export const MismatchScene: React.FC = () => {
           );
         })}
         <Note at={repeatsAt + 10} x={ng.right + 36} y={ng.rowTop(1) + 8} out={naiveOut}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             one budget,
             <br />
             three rows
@@ -189,7 +189,7 @@ export const MismatchScene: React.FC = () => {
           const yMid = (sg.rowTop(rows[0]) + sg.rowTop(rows[rows.length - 1] + 1)) / 2;
           return (
             <Note key={d} at={rollAt + 6 + k * 8} x={sg.right + 34} y={yMid - 16}>
-              <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{money(FIXED.rows[k][fSales])}</span>
+              <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{money(FIXED.rows[k][fSales])}</span>
             </Note>
           );
         })}

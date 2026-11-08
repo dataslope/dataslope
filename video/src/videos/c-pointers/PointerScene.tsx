@@ -207,7 +207,7 @@ export const PointerScene: React.FC = () => {
             >
               <span style={label(20, INK_SOFT)}>prints</span>
               <span style={{ fontSize: 26, color: VALUE_INK }}>
-                <Mono weight={600}>{out}</Mono>
+                <Mono weight={500}>{out}</Mono>
               </span>
             </Ink>
           );

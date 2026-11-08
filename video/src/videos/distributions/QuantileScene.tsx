@@ -143,7 +143,7 @@ export const QuantileScene: React.FC = () => {
                   top: py(f(cursor)) + 12,
                   opacity: readout,
                   ...note(22, INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                   ...halo,
                 }}
@@ -208,7 +208,7 @@ export const QuantileScene: React.FC = () => {
           </Ink>
           <Ink at={backwardsAt - 6} dur={14} style={{ left: PANEL_X, top: y(700), whiteSpace: "nowrap" }}>
             <span style={code(24, ASK)}>ppf</span>
-            <span style={{ ...note(23, INK), marginLeft: 12, fontWeight: 600 }}>a share → a time</span>
+            <span style={{ ...note(23, INK), marginLeft: 12, fontWeight: 500 }}>a share → a time</span>
           </Ink>
           <Ink at={backwardsAt + 6} dur={14} style={{ left: PANEL_X, top: y(744), whiteSpace: "nowrap" }}>
             <span style={code(22, INK_SOFT)}>

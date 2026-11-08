@@ -117,11 +117,11 @@ export const HarnessScene: React.FC = () => {
           <div style={{ position: "absolute", left: 8, right: 8, top: 12 + LOOP_LINE, height: LOOP_LINE * 2, background: MARK, opacity: bodyLit * 0.8, borderRadius: 4 }} />
           <div style={{ position: "absolute", left: 8, right: 8, top: 12 + LOOP_LINE * 3, height: LOOP_LINE, background: MARK, opacity: lastLit * 0.8, borderRadius: 4 }} />
           <div style={{ position: "relative" }}>
-            <span style={{ color: KW, fontWeight: 600 }}>for</span> text, expected <span style={{ color: KW, fontWeight: 600 }}>in</span> tickets:
+            <span style={{ color: KW, fontWeight: 500 }}>for</span> text, expected <span style={{ color: KW, fontWeight: 500 }}>in</span> tickets:
           </div>
           <div style={{ position: "relative" }}>
             {"    got = "}
-            <span style={{ color: A, fontWeight: 600 }}>{counting ? pass.name : "model"}</span>
+            <span style={{ color: A, fontWeight: 500 }}>{counting ? pass.name : "model"}</span>
             (text)
           </div>
           <div style={{ position: "relative" }}>
@@ -176,7 +176,7 @@ export const HarnessScene: React.FC = () => {
                 <span style={{ fontFamily: MONO, fontSize: 21, color: INK }}>{t.expected}</span>
               </Ink>
               <Ink at={cheapMark(i) - 4} dur={10} style={{ left: COL.cheap, top: rowY - 13, whiteSpace: "nowrap" }}>
-                <span style={{ fontFamily: MONO, fontSize: 21, color: cheapOk ? INK : TRAP_INK, fontWeight: cheapOk ? 400 : 600 }}>
+                <span style={{ fontFamily: MONO, fontSize: 21, color: cheapOk ? INK : TRAP_INK, fontWeight: cheapOk ? 400 : 500 }}>
                   {cheapOk ? t.cheap : <Marked at={toOtherAt - 2 + i}>{t.cheap}</Marked>}
                 </span>
               </Ink>
@@ -212,7 +212,7 @@ export const HarnessScene: React.FC = () => {
         </Ink>
         {/* The failure list, read: every miss went to one queue. */}
         <Ink at={sevenAt - 2} dur={14} style={{ left: TOTAL_X, top: y(800), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, INK), fontWeight: 600 }}>
+          <span style={{ ...note(23, INK), fontWeight: 500 }}>
             all <span style={TABULAR}>{HARNESS.cheapMisses.length}</span> misses sent to{" "}
             <span style={{ fontFamily: MONO, color: TRAP_INK }}>{MISS_QUEUE}</span>
           </span>

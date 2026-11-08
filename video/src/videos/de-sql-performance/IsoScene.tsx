@@ -31,7 +31,7 @@ const LEVELS = [
 ];
 const ANOMALIES = ["dirty read", "non-repeatable", "phantom"];
 
-const mono = (size: number, color: string = INK) => svgText({ fontFamily: MONO, fontSize: size, fontWeight: 600, color });
+const mono = (size: number, color: string = INK) => svgText({ fontFamily: MONO, fontSize: size, fontWeight: 500, color });
 /** "Postgres default", as a yellow badge beside its row. */
 const DEFAULT_BADGE = badgeStyle("yellow", 20);
 
@@ -60,7 +60,7 @@ const Value: React.FC<{ x: number; y: number; at: number; value: string; tone: B
   return (
     <g opacity={p}>
       <rect x={x - 32} y={y + 17} width={64} height={32} rx={b.borderRadius as number} style={{ fill: String(b.background) }} />
-      <text x={x} y={y + 40} textAnchor="middle" style={{ ...mono(20, String(b.color)), fontWeight: 600 }}>
+      <text x={x} y={y + 40} textAnchor="middle" style={{ ...mono(20, String(b.color)), fontWeight: 500 }}>
         {value}
       </text>
     </g>
@@ -206,7 +206,7 @@ export const IsoScene: React.FC = () => {
             return (
               <g key={lv.name} opacity={p}>
                 {i > 0 ? <line x1={GRID_X} y1={yy - ROW_H + 18} x2={colX(2) + COL_W} y2={yy - ROW_H + 18} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} /> : null}
-                <text x={GRID_X} y={yy} style={svgText({ ...note(23, INK), fontWeight: 650 })}>
+                <text x={GRID_X} y={yy} style={svgText({ ...note(23, INK), fontWeight: 500 })}>
                   {lv.name}
                 </text>
                 {lv.allows.map((allowed, j) => (
@@ -218,7 +218,7 @@ export const IsoScene: React.FC = () => {
                   <g opacity={ease(frame, defaultAt, 10)}>
                     {/* The house's badge, in the highlighter's yellow. */}
                     <rect x={colX(2) + COL_W} y={yy - 25} width={184} height={32} rx={DEFAULT_BADGE.borderRadius as number} style={{ fill: String(DEFAULT_BADGE.background) }} />
-                    <text x={colX(2) + COL_W + 92} y={yy - 2} textAnchor="middle" style={svgText({ ...label(20, String(DEFAULT_BADGE.color)), fontWeight: 600 })}>
+                    <text x={colX(2) + COL_W + 92} y={yy - 2} textAnchor="middle" style={svgText({ ...label(20, String(DEFAULT_BADGE.color)), fontWeight: 500 })}>
                       Postgres default
                     </text>
                   </g>

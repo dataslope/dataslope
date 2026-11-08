@@ -91,10 +91,10 @@ export const LoopScene: React.FC = () => {
         <Column i={0} at={sqlAt} title="A SQL screen">
           <div style={{ fontFamily: MONO, fontSize: 24, color: INK, lineHeight: 1.6, fontVariantLigatures: "none" }}>
             <div>
-              <span style={{ color: BLUE_INK, fontWeight: 600 }}>SELECT</span> region, SUM(amount)
+              <span style={{ color: BLUE_INK, fontWeight: 500 }}>SELECT</span> region, SUM(amount)
             </div>
             <div>
-              <span style={{ color: BLUE_INK, fontWeight: 600 }}>FROM</span> orders …
+              <span style={{ color: BLUE_INK, fontWeight: 500 }}>FROM</span> orders …
             </div>
           </div>
           <div style={{ ...note(24, INK_SOFT), marginTop: 22, opacity: ease(frame, takeAt - 2, 12) }}>live, or as a take-home</div>

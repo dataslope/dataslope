@@ -68,7 +68,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(108), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -284,7 +284,7 @@ export const Chip: React.FC<{
       borderRadius: 6,
       fontFamily: MONO,
       fontSize: size,
-      fontWeight: 600,
+      fontWeight: 500,
       color: ink,
       whiteSpace: "pre",
       background: `color-mix(in srgb, ${color} ${Math.round(18 + glow * 40)}%, ${PAPER})`,

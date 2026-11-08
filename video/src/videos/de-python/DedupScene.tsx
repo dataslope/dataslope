@@ -122,7 +122,7 @@ export const DedupScene: React.FC = () => {
 
         {/* ── 7. The first per user, with a set ── */}
         <TableName g={rg} at={asked - 6} out={out7}>
-          <span style={{ fontFamily: MONO, fontWeight: 600 }}>records</span>
+          <span style={{ fontFamily: MONO, fontWeight: 500 }}>records</span>
         </TableName>
         <DataTable
           g={rg}

@@ -83,7 +83,7 @@ export const FreshScene: React.FC = () => {
 
         {/* The page's block and what it printed. */}
         <Note at={loadAt - 2} x={X0} y={listTop - 40}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             an incremental load, keyed by content: the page&apos;s block, run in Pyodide
           </span>
         </Note>
@@ -120,7 +120,7 @@ export const FreshScene: React.FC = () => {
         </svg>
         {COLS.slice(0, 3).map((c, j) => (
           <Note key={c.t} at={compareAt + j * 3} x={colX(j) + 10} y={tableTop + 8}>
-            <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{c.t}</span>
+            <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{c.t}</span>
           </Note>
         ))}
         {ids.map((id, i) => {
@@ -151,7 +151,7 @@ export const FreshScene: React.FC = () => {
                     top: top + 14,
                     fontFamily: MONO,
                     fontSize: 24,
-                    fontWeight: j === 0 ? 600 : 500,
+                    fontWeight: j === 0 ? 500 : 500,
                     color: v === "—" ? INK_SOFT : INK,
                     fontVariantLigatures: "none",
                     whiteSpace: "nowrap",
@@ -183,7 +183,7 @@ export const FreshScene: React.FC = () => {
 
         {/* The trap. */}
         <Note at={skipAt} x={X0} y={y(870)}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={skipAt + 4} color={MARK_BAD}>skip the deletes</Mark>
             <span style={{ opacity: ease(frame, keepsAt - 2, 10) }}>, and a removed document keeps answering</span>
             <span style={{ opacity: ease(frame, leakAt - 2, 10), color: INK }}>: wrong at best, a data leak at worst</span>

@@ -197,12 +197,12 @@ export const SmallFilesScene: React.FC = () => {
           </span>
         </Note>
         <Note at={timeAt} x={PANEL_X} y={gridY + h(180)} out={fixAt - 4}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>time on files, not data</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>time on files, not data</span>
         </Note>
 
         {/* ── Compaction ── */}
         <Note at={fixAt} x={PANEL_X} y={gridY}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Compaction</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Compaction</span>
         </Note>
         <Note at={rewriteAt + 20} x={PANEL_X} y={gridY + h(48)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -212,7 +212,7 @@ export const SmallFilesScene: React.FC = () => {
         {/* The format runs or schedules the rewrite and commits it atomically: readers never see it half done. */}
         <Note at={formatAt} x={PANEL_X} y={gridY + h(98)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            or a table format, like Delta Lake or Iceberg, <span style={{ color: OK_INK, fontWeight: 650 }}>commits it atomically</span>
+            or a table format, like Delta Lake or Iceberg, <span style={{ color: OK_INK, fontWeight: 500 }}>commits it atomically</span>
           </span>
         </Note>
         <Note at={formatAt + 12} x={PANEL_X + 20} y={gridY + h(132)}>
@@ -221,7 +221,7 @@ export const SmallFilesScene: React.FC = () => {
 
         {/* ── Prevention ── */}
         <Note at={preventAt} x={PANEL_X} y={gridY + h(188)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Better, prevent them</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Better, prevent them</span>
         </Note>
         <Note at={keyAt} x={PANEL_X} y={gridY + h(232)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -280,7 +280,7 @@ export const SmallFilesScene: React.FC = () => {
             top: y(RULER_Y) - h(46),
             textAlign: "center",
             ...note(21, OK_INK),
-            fontWeight: 600,
+            fontWeight: 500,
             whiteSpace: "nowrap",
             opacity: ease(frame, targetAt + 4, 10),
           }}
@@ -293,7 +293,7 @@ export const SmallFilesScene: React.FC = () => {
             left: rx(SMALL.target.hi) + 8,
             top: y(RULER_Y) - h(46),
             ...note(21, ACCENT_INK),
-            fontWeight: 600,
+            fontWeight: 500,
             whiteSpace: "nowrap",
             opacity: ease(frame, largeAt + 4, 10),
           }}

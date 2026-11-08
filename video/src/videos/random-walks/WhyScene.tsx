@@ -181,7 +181,7 @@ export const WhyScene: React.FC = () => {
             key={i}
             style={{
               ...note(24, ACCENT_INK),
-              fontWeight: 650,
+              fontWeight: 500,
               position: "absolute",
               left: CELLS_X - RIGHT + (i + 0.5) * CELL,
               width: CELL,

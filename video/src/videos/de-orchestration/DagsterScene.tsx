@@ -78,7 +78,7 @@ export const DagsterScene: React.FC = () => {
 
         {/* Airflow: tasks, wired by hand. */}
         <Note at={airAt} x={LEFT} y={y(286)}>
-          <span style={{ ...note(30, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Airflow <span style={{ color: INK_SOFT, fontWeight: 500 }}>· task-centric</span>
           </span>
         </Note>
@@ -102,7 +102,7 @@ export const DagsterScene: React.FC = () => {
           />
         ))}
         <Note at={wireAt + 8} x={LEFT} y={cy + h(62)}>
-          <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 600, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+          <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
             load(transform(extract()))
           </span>
         </Note>
@@ -116,7 +116,7 @@ export const DagsterScene: React.FC = () => {
 
         {/* Dagster: assets, the graph worked out from what each reads. */}
         <Note at={dagAt} x={RIGHT_X} y={y(286)}>
-          <span style={{ ...note(30, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Dagster <span style={{ color: INK_SOFT, fontWeight: 500 }}>· asset-centric</span>
           </span>
         </Note>

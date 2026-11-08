@@ -174,7 +174,7 @@ export const CasesScene: React.FC = () => {
                   transform: "translateX(-50%)",
                   opacity: ease(frame, d === 0 && !stayWins ? goatAt - 2 : at + 6, 10),
                   ...note(19, d === c.car ? GOLD_INK : INK_SOFT),
-                  fontWeight: d === c.car ? 700 : 500,
+                  fontWeight: d === c.car ? 500 : 500,
                   whiteSpace: "nowrap",
                 }}
               >
@@ -193,7 +193,7 @@ export const CasesScene: React.FC = () => {
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           The host&apos;s door <b>depends</b>
           <span style={{ opacity: ease(frame, dependsAt + 6, 10) }}> on where the car is</span>
-          <span style={{ opacity: ease(frame, infoAt - 4, 10), color: STAT_INK, fontWeight: 650 }}>, so it carries information.</span>
+          <span style={{ opacity: ease(frame, infoAt - 4, 10), color: STAT_INK, fontWeight: 500 }}>, so it carries information.</span>
         </span>
       </Note>
 
@@ -209,7 +209,7 @@ export const CasesScene: React.FC = () => {
             </text>
           </g>
         ))}
-        <text x={CH.x1} y={y(CH.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
+        <text x={CH.x1} y={y(CH.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
           games played (log scale)
         </text>
         {[1 / 3, 2 / 3].map((p) => (
@@ -238,19 +238,19 @@ export const CasesScene: React.FC = () => {
         ) : null}
       </Svg>
       <Note at={stayAt - 2} x={CH.x1 - 4} y={fy(MONTY.stay) + 12} align="right">
-        <span style={{ ...note(24, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           stay <span style={{ opacity: ease(frame, thirtyAt - 4, 10), ...TABULAR }}>{fmt(liveStay * 100, 1)}%</span>
         </span>
       </Note>
       <Note at={switchAt - 2} x={CH.x1 - 4} y={fy(MONTY.switch) - 46} align="right">
-        <span style={{ ...note(24, DATA_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, DATA_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           switch <span style={{ opacity: ease(frame, sixtyAt - 4, 10), ...TABULAR }}>{fmt((1 - liveStay) * 100, 1)}%</span>
         </span>
       </Note>
       {/* How many games have been played, counting up as the lines run. */}
       {/* One line, one size: the count stands out by weight and color. */}
       <div style={{ position: "absolute", right: 1920 - CH.x1, top: y(CH.top) - 2, opacity: ease(frame, playAt - 4, 10), whiteSpace: "nowrap", ...note(30, INK_SOFT) }}>
-        games <span style={{ color: INK, fontWeight: 600, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
+        games <span style={{ color: INK, fontWeight: 500, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
       </div>
 
       </div>

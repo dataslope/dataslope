@@ -222,7 +222,7 @@ export const NetworkScene: React.FC = () => {
             })}
           </svg>
           <Note at={halfAt + 8} x={X0} y={y(860)}>
-            <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: 7, background: TREAT, marginRight: 8 }} />
               gets the sharing feature
               <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: 7, background: CONTROL, margin: "0 8px 0 24px" }} />
@@ -232,7 +232,7 @@ export const NetworkScene: React.FC = () => {
 
           {/* SUTVA, named. */}
           <Note at={sutvaAt} x={1080} y={y(370)}>
-            <span style={{ ...note(27, INK), fontWeight: 800, whiteSpace: "nowrap" }}>SUTVA</span>
+            <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap" }}>SUTVA</span>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, stableAt, 10) }}>: the stable unit treatment value assumption</span>
           </Note>
 
@@ -254,23 +254,23 @@ export const NetworkScene: React.FC = () => {
           {["sharing", "control"].map((t, i) => (
             <div
               key={t}
-              style={{ position: "absolute", left: BARS.x + i * (BARS.w + BARS.gap) - 20, width: BARS.w + 40, top: y(BARS.base) + h(10), textAlign: "center", ...label(21, INK_SOFT), fontWeight: 600, opacity: barsIn }}
+              style={{ position: "absolute", left: BARS.x + i * (BARS.w + BARS.gap) - 20, width: BARS.w + 40, top: y(BARS.base) + h(10), textAlign: "center", ...label(21, INK_SOFT), fontWeight: 500, opacity: barsIn }}
             >
               {t}
             </div>
           ))}
           <Note at={halfAt + 14} x={BARS.x - 30} y={y(BARS.top) - h(64)}>
-            <span style={{ ...label(19, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>outcome, a sketch with no scale</span>
+            <span style={{ ...label(19, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>outcome, a sketch with no scale</span>
           </Note>
           <Note at={treatedAt + 2} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.5) - h(20)} out={groupsAt + 4}>
-            <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>control gets treated too</span>
+            <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>control gets treated too</span>
           </Note>
           <Note at={shrinkAt + 2} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.5) + h(20)} out={groupsAt + 4}>
             <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>so the difference shrinks</span>
           </Note>
           {/* Balanced, so neither note leaves a word on a line alone. */}
           <Note at={groupsAt + 4} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.62)} width={380}>
-            <span style={{ ...note(25, OK_INK), fontWeight: 600, display: "block", textWrap: "balance" }}>randomize groups that rarely touch</span>
+            <span style={{ ...note(25, OK_INK), fontWeight: 500, display: "block", textWrap: "balance" }}>randomize groups that rarely touch</span>
           </Note>
           <Note at={friendsAt} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.62) + h(80)} width={380}>
             <span style={{ ...note(24, OK_INK), display: "block", textWrap: "balance" }}>
@@ -297,17 +297,17 @@ export const NetworkScene: React.FC = () => {
             })}
           </svg>
           <Note at={poolAt + 4} x={250} y={y(570) + h(184)}>
-            <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <span style={{ color: BLUE_INK }}>● riders</span> and <span style={{ color: WARM_INK }}>■ drivers</span>, one pool
             </span>
           </Note>
           <Note at={cantAt} x={250} y={y(570) - h(214)}>
-            <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>can't split users</span>
+            <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>can't split users</span>
           </Note>
           {/* The sketch beside it: the gap a user split would report. */}
           {skIn > 0 ? (
             <div style={{ position: "absolute", inset: 0, opacity: skIn }}>
-              <div style={{ position: "absolute", left: SK.x - 250, top: y(SK.top) - h(52), ...label(19, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+              <div style={{ position: "absolute", left: SK.x - 250, top: y(SK.top) - h(52), ...label(19, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
                 rides booked under a user split, a sketch with no scale
               </div>
               {[
@@ -317,7 +317,7 @@ export const NetworkScene: React.FC = () => {
                 const top = y(SK.top) + i * h(SK.row);
                 return (
                   <React.Fragment key={r.name}>
-                    <div style={{ position: "absolute", left: SK.x - 250, width: 234, top: top + h(SK.hgt) / 2 - 14, textAlign: "right", ...label(21, INK), fontWeight: 650 }}>{r.name}</div>
+                    <div style={{ position: "absolute", left: SK.x - 250, width: 234, top: top + h(SK.hgt) / 2 - 14, textAlign: "right", ...label(21, INK), fontWeight: 500 }}>{r.name}</div>
                     {r.ghost ? (
                       <div style={{ position: "absolute", left: SK.x, top, width: SK.w * r.ghost, height: h(SK.hgt), borderRadius: 4, border: `2px dashed ${INK_SOFT}`, boxSizing: "border-box", opacity: pulled }} />
                     ) : null}
@@ -326,15 +326,15 @@ export const NetworkScene: React.FC = () => {
                 );
               })}
               <Note at={takesAt + 20} x={SK.x + SK.w * 0.62 + 14} y={y(SK.top) + h(SK.row) + h(SK.hgt) / 2 - 14}>
-                <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>← drivers taken</span>
+                <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>← drivers taken</span>
               </Note>
               <Note at={overAt} x={SK.x} y={y(SK.top) + 2 * h(SK.row) + h(4)}>
-                <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the gap comes out bigger than the real effect</span>
+                <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the gap comes out bigger than the real effect</span>
               </Note>
             </div>
           ) : null}
           <Note at={takesAt} x={150} y={y(570) + h(232)}>
-            <span style={{ ...label(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               a treated rider takes a control rider's driver,
               <br />
               <span style={{ opacity: ease(frame, overAt - 2, 10) }}>so a user split overstates the effect</span>
@@ -342,7 +342,7 @@ export const NetworkScene: React.FC = () => {
           </Note>
         </div>
         <Note at={timeAt} x={TL.x0} y={y(TL.y) - h(110)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>Split time instead: the whole city, hour by hour</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Split time instead: the whole city, hour by hour</span>
         </Note>
         {HOURS.map((isNewHour, i) => {
           const at = blocksFrom + (i / (HOURS.length - 1)) * (blocksTo - blocksFrom);
@@ -366,7 +366,7 @@ export const NetworkScene: React.FC = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   ...label(22, isNewHour ? PAPER : INK),
-                  fontWeight: 750,
+                  fontWeight: 500,
                   opacity: p,
                   transform: `translateY(${(1 - p) * 12}px)`,
                 }}
@@ -405,21 +405,21 @@ export const NetworkScene: React.FC = () => {
           );
         })}
         <Note at={blocksFrom + 4} x={TL.x0} y={y(TL.y) + h(TL.hgt) + h(14)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             one hour each<span style={{ opacity: ease(frame, randomAt, 10) }}>, new or old at random</span>
           </span>
         </Note>
         <Note at={spillAt + 4} x={TL.x0} y={y(TL.y) + h(TL.hgt) + h(60)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             carryover<span style={{ fontWeight: 500 }}>: one hour spills into the next</span>
           </span>
         </Note>
         {/* The first dropped strip, named. */}
         <Note at={washAt} x={TL.x0 + (TL.w + TL.gap) - 6} y={y(TL.y) - h(40)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>↓ washout, dropped</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>↓ washout, dropped</span>
         </Note>
         <Note at={dropAt + 2} x={TL.x0} y={y(TL.y) + h(TL.hgt) + h(108)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             drop each hour's first minutes<span style={{ opacity: ease(frame, hoursAt - 2, 10) }}>; count hours, not users</span>
           </span>
         </Note>

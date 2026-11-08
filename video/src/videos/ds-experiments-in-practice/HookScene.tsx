@@ -97,8 +97,8 @@ export const HookScene: React.FC = () => {
           }}
         >
           <div style={{ height: HEAD_H, display: "flex", alignItems: "center", padding: `0 ${CELL_PAD}px`, borderBottom: `1px solid ${HAIRLINE}` }}>
-            <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>New checkout · A/B test readout</span>
-            <span style={{ marginLeft: 18, display: "inline-flex", alignItems: "center", gap: 8, ...label(20, OK_INK), fontWeight: 600 }}>
+            <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>New checkout · A/B test readout</span>
+            <span style={{ marginLeft: 18, display: "inline-flex", alignItems: "center", gap: 8, ...label(20, OK_INK), fontWeight: 500 }}>
               <span style={{ width: 10, height: 10, borderRadius: 5, background: OK, opacity: live }} />
               live
             </span>
@@ -168,7 +168,7 @@ export const HookScene: React.FC = () => {
                   style={{
                     position: "relative",
                     ...note(30, r.key === "lift" ? OK_INK : r.flag !== undefined && flag > 0.5 ? ACCENT_INK : INK),
-                    fontWeight: 600,
+                    fontWeight: 500,
                     whiteSpace: "nowrap",
                     ...TABULAR,
                   }}
@@ -197,14 +197,14 @@ export const HookScene: React.FC = () => {
         {ROWS.map((r, i) =>
           r.flag === undefined ? null : (
             <Note key={r.key} at={r.flag + 2} x={FLAG_X} y={y(CARD_TOP) + HEAD_H + i * ROW_H + 18} out={roundAt + 4}>
-              <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>← {r.note}</span>
+              <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>← {r.note}</span>
             </Note>
           ),
         )}
 
         {/* The round. */}
         <Note at={fourteenAt - 4} x={X0} y={cardBottom + h(40)}>
-          <span style={{ ...note(32, INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(32, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             Experiments once they're running: <span style={{ color: BLUE_INK }}>14 questions</span>
           </span>
         </Note>

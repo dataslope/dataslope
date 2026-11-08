@@ -56,7 +56,7 @@ const Sym: React.FC<{ text: string; size?: number }> = ({ text, size = 28 }) => 
   const body = text.endsWith(END) ? text.slice(0, -END.length) : text;
   const end = text.endsWith(END);
   return (
-    <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: size, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+    <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: size, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
       {body}
       {end ? <span style={{ fontSize: Math.max(20, size * 0.72), color: INK_SOFT }}>{END}</span> : null}
     </span>
@@ -246,13 +246,13 @@ export const BpeScene: React.FC = () => {
           return (
             <React.Fragment key={w}>
               <div style={{ position: "absolute", left: X0, top: top + 8, opacity: p, display: "flex", alignItems: "baseline", gap: 14 }}>
-                <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: INK }}>{w}</span>
+                <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK }}>{w}</span>
                 <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>×{FREQS[w]}</span>
               </div>
               {/* Before the split: the word, whole. */}
               {splitP < 1 ? (
                 <div style={{ position: "absolute", left: TX, top: top + 8, opacity: p * (1 - splitP) }}>
-                  <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: INK }}>{w}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK }}>{w}</span>
                 </div>
               ) : null}
               {/* The tiles: unchanged ones held, merged ones fused. */}
@@ -324,7 +324,7 @@ export const BpeScene: React.FC = () => {
             >
               <ChipFace text={p.pair[0]} size={24} focus={Math.min(1, hit)} />
               <ChipFace text={p.pair[1]} size={24} focus={Math.min(1, hit)} />
-              <span style={{ ...note(26, hit > 0.5 ? FOCUS_INK : INK), marginLeft: 14, fontWeight: 650, ...TABULAR }}>
+              <span style={{ ...note(26, hit > 0.5 ? FOCUS_INK : INK), marginLeft: 14, fontWeight: 500, ...TABULAR }}>
                 {p.count}
               </span>
               <span style={{ ...note(21, INK_SOFT) }}>{i === 0 ? "times" : ""}</span>

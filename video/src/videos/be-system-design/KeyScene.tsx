@@ -95,18 +95,18 @@ export const KeyScene: React.FC = () => {
                 transform: `translateY(${(1 - p) * 12}px)`,
               }}
             >
-              <span style={{ ...label(23, INK_SOFT), fontWeight: 600 }}>{c.name}</span>
-              <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, c.sub - 4, 10) }}>{c.body}</span>
+              <span style={{ ...label(23, INK_SOFT), fontWeight: 500 }}>{c.name}</span>
+              <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, c.sub - 4, 10) }}>{c.body}</span>
             </div>
           );
         })}
         <VRule x={645} top={cardY} bottom={cardY + 80} at={otherAt - 2} />
-        <Line x={X0} y={cardY - 52} at={apiAt} size={22} weight={650} color={INK_SOFT}>
+        <Line x={X0} y={cardY - 52} at={apiAt} size={22} weight={500} color={INK_SOFT}>
           The API, in two calls
         </Line>
 
         {/* Base 62 of a counted ID. */}
-        <Line x={X0} y={secY} at={keyAt} size={28} weight={600}>
+        <Line x={X0} y={secY} at={keyAt} size={28} weight={500}>
           Base <Num>{KEY.alphabet.length}</Num> of a counted ID
         </Line>
         <div style={{ position: "absolute", left: X0, top: secY + 64, display: "flex", alignItems: "center", gap: "0.6em", fontSize: 26 }}>
@@ -116,11 +116,11 @@ export const KeyScene: React.FC = () => {
           {groups.map((g, i) => (
             <React.Fragment key={g}>
               {i ? <span style={{ ...note(26, INK_SOFT), opacity: ease(frame, groupAt[i], 10) }}>·</span> : null}
-              <span style={{ fontFamily: MONO, fontSize: 27, fontWeight: 600, color: BLUE_INK, opacity: ease(frame, groupAt[i], 10) }}>{g}</span>
+              <span style={{ fontFamily: MONO, fontSize: 27, fontWeight: 500, color: BLUE_INK, opacity: ease(frame, groupAt[i], 10) }}>{g}</span>
             </React.Fragment>
           ))}
         </div>
-        <Line x={X0} y={cellsY + 6} at={idAt} size={26} weight={600}>
+        <Line x={X0} y={cellsY + 6} at={idAt} size={26} weight={500}>
           ID <Num>{int(id.id)}</Num>
         </Line>
         <Arrow
@@ -133,7 +133,7 @@ export const KeyScene: React.FC = () => {
           head={12}
           color={INK_SOFT}
         />
-        <div style={{ position: "absolute", left: cellsX, top: cellsY - 2, display: "flex", fontFamily: MONO, fontSize: 34, fontWeight: 600, color: INK }}>
+        <div style={{ position: "absolute", left: cellsX, top: cellsY - 2, display: "flex", fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK }}>
           {[...id.key].map((ch, i) => (
             <span key={i} style={{ width: cell + 4, textAlign: "center", opacity: ease(frame, idAt + 10 + i * 3, 8) }}>
               {ch}
@@ -152,7 +152,7 @@ export const KeyScene: React.FC = () => {
         <Line x={cellsX} y={cellsY + cell + 30} at={sixAt} size={22} color={INK_SOFT}>
           <Num>{six.len}</Num> characters
         </Line>
-        <Line x={X0} y={y(732)} at={billionAt} size={30} weight={600} color={BLUE_INK}>
+        <Line x={X0} y={y(732)} at={billionAt} size={30} weight={500} color={BLUE_INK}>
           <Num>{KEY.alphabet.length}</Num>
           <sup style={{ fontSize: "0.6em" }}>{six.len}</sup> ≈ <Num>{Math.round(six.keys / 1e9)}</Num> billion keys
         </Line>
@@ -162,21 +162,21 @@ export const KeyScene: React.FC = () => {
 
         {/* Or a hash. */}
         <VRule x={905} top={secY} bottom={y(732) + 84} at={hashAt} />
-        <Line x={RX} y={secY} at={hashAt} size={28} weight={600}>
+        <Line x={RX} y={secY} at={hashAt} size={28} weight={500}>
           Or a hash of the long URL
         </Line>
         <div style={{ position: "absolute", left: RX, top: secY + 60, display: "flex", alignItems: "center", gap: 16, fontSize: 27 }}>
-          <span style={{ ...note(27, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, hashAt + 4, 10) }}>long URL</span>
+          <span style={{ ...note(27, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, hashAt + 4, 10) }}>long URL</span>
           <InlineArrow at={hashAt + 10} w={40} />
-          <span style={{ ...note(27, INK), fontWeight: 650, opacity: ease(frame, hashAt + 14, 10) }}>hash</span>
+          <span style={{ ...note(27, INK), fontWeight: 500, opacity: ease(frame, hashAt + 14, 10) }}>hash</span>
           <InlineArrow at={checkAt - 4} w={40} />
-          <span style={{ ...note(27, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, checkAt, 10) }}>
+          <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, checkAt, 10) }}>
             <Mark at={checkAt + 2} color={HIGHLIGHT}>
               already taken?
             </Mark>
           </span>
           <InlineArrow at={storeAt - 4} w={40} />
-          <span style={{ ...note(27, BLUE_INK), fontWeight: 650, opacity: ease(frame, storeAt, 10) }}>store</span>
+          <span style={{ ...note(27, BLUE_INK), fontWeight: 500, opacity: ease(frame, storeAt, 10) }}>store</span>
         </div>
       </Drift>
     </AbsoluteFill>

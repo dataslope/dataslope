@@ -108,7 +108,7 @@ export const CostScene: React.FC = () => {
           return (
             <React.Fragment key={t.name}>
               <Ink at={accAt(i) - 4} dur={12} style={{ left: X0, top: ry - 17, whiteSpace: "nowrap" }}>
-                <span style={{ ...label(26, INK), fontWeight: 650 }}>
+                <span style={{ ...label(26, INK), fontWeight: 500 }}>
                   {isCheap ? <Marked at={expensiveAt - 2} color={`color-mix(in srgb, ${TRAP} 30%, transparent)`}>{tierName(t.name)}</Marked> : tierName(t.name)}
                 </span>
               </Ink>
@@ -126,10 +126,10 @@ export const CostScene: React.FC = () => {
                 <line x1={X0} x2={BILL.x1 + 120} y1={ry + 38} y2={ry + 38} stroke={HAIRLINE} strokeWidth={0.8} opacity={0.5 * a} />
               </Svg>
               <Ink at={accAt(i) + 8} dur={10} style={{ left: accX(t.accuracy) + 12, top: ry - 16, whiteSpace: "nowrap" }}>
-                <span style={{ ...note(24, ink), fontWeight: 650, ...TABULAR }}>{t.accuracy}%</span>
+                <span style={{ ...note(24, ink), fontWeight: 500, ...TABULAR }}>{t.accuracy}%</span>
               </Ink>
               <Ink at={billAt(i) + 10} dur={10} style={{ left: Math.max(BILL.x0 + 4, billX(t.monthly)) + 12, top: ry - 16, whiteSpace: "nowrap" }}>
-                <span style={{ ...note(24, ink), fontWeight: 650, ...TABULAR }}>{usd(t.monthly)}</span>
+                <span style={{ ...note(24, ink), fontWeight: 500, ...TABULAR }}>{usd(t.monthly)}</span>
               </Ink>
             </React.Fragment>
           );
@@ -157,13 +157,13 @@ export const CostScene: React.FC = () => {
 
         {/* Each step priced per error it avoids, from the same table. */}
         <Ink at={priceAt - 4} dur={14} style={{ left: X0, top: y(748), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(26, INK), fontWeight: 600 }}>
+          <span style={{ ...note(26, INK), fontWeight: 500 }}>
             Sonnet over Haiku:{" "}
             <span style={{ opacity: ease(frame, thirtyAt - 2, 10) }}>
               <span style={TABULAR}>{toSonnet.avoided.toLocaleString("en-US")}</span> fewer errors a month for{" "}
               <span style={TABULAR}>{usd(toSonnet.extra, 2)}</span>,
             </span>{" "}
-            <span style={{ color: A_INK, fontWeight: 600, opacity: ease(frame, fiveAt - 2, 10) }}>
+            <span style={{ color: A_INK, fontWeight: 500, opacity: ease(frame, fiveAt - 2, 10) }}>
               <Marked at={fiveAt}>about {cents(toSonnet.perError ?? 0)} each</Marked>
             </span>
           </span>
@@ -203,7 +203,7 @@ const Gain: React.FC<{ at: number; x: number; y: number; pulseAt: number; align?
       <span
         style={{
           ...note(22, INK),
-          fontWeight: 600,
+          fontWeight: 500,
           display: "inline-block",
           transform: `${align === "right" ? "translateX(-100%) " : ""}scale(${1 + pulse(frame, pulseAt + 4, 16) * 0.05})`,
           transformOrigin: align === "right" ? "100% 50%" : "0 50%",

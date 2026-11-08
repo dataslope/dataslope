@@ -152,7 +152,7 @@ export const PowerScene: React.FC = () => {
         <span
           style={{
             ...note(40, DATA_INK),
-            fontWeight: 600,
+            fontWeight: 500,
             display: "inline-block",
             transform: `scale(${1 + 0.1 * pulse(frame, reallyAt - 2, 24)})`,
             transformOrigin: "0 60%",
@@ -307,7 +307,7 @@ export const PowerScene: React.FC = () => {
             <span
               style={{
                 ...note(24, DATA_INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 ...halo,
                 whiteSpace: "nowrap",
                 display: "inline-block",

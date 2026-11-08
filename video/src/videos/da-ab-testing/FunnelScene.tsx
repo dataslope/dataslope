@@ -194,7 +194,7 @@ export const FunnelScene: React.FC = () => {
                 opacity: p,
                 transform: `scale(${1 + 0.08 * swell})`,
                 ...note(25, INK),
-                fontWeight: hot > 0.5 ? 700 : 500,
+                fontWeight: hot > 0.5 ? 500 : 500,
                 ...TABULAR,
               }}
             >
@@ -232,7 +232,7 @@ export const FunnelScene: React.FC = () => {
                   padding: "2px 10px",
                   borderRadius: 4,
                   background: i === 1 ? `color-mix(in srgb, ${MARK_BAD} ${ease(frame, firstAt, 10) * 100}%, transparent)` : undefined,
-                  fontWeight: i === 1 && frame >= firstAt ? 700 : 500,
+                  fontWeight: i === 1 && frame >= firstAt ? 500 : 500,
                 }}
               >
                 {count(s.lost)}

@@ -149,7 +149,7 @@ export const PipelineScene: React.FC = () => {
         {PIPE.stages.map((s, k) => (
           <React.Fragment key={s.name}>
             <Ink at={labelAt[k]} dur={14} style={{ left: X0, top: rowY(k) + 6, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(22, INK), fontWeight: 600 }}>
+              <span style={{ ...label(22, INK), fontWeight: 500 }}>
                 <Mark at={choosingAt + k * 3} out={hardAt + 30}>
                   {STAGE_LABELS[k]}
                 </Mark>

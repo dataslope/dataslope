@@ -120,7 +120,7 @@ export const WhyScene: React.FC = () => {
 
       {/* Reading: every prompt token goes in together. */}
       <Ink at={promptAt - 6} dur={12} style={{ left: X0, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(25, INPUT_INK), fontWeight: 600 }}>Reading the prompt</span>
+        <span style={{ ...label(25, INPUT_INK), fontWeight: 500 }}>Reading the prompt</span>
       </Ink>
       {rows.map((row, r) => (
         <div key={r} style={{ position: "absolute", left: X0, top: y(LEFT_ROWS[r]), display: "flex", gap: 6 }}>
@@ -138,14 +138,14 @@ export const WhyScene: React.FC = () => {
       ))}
       <Arrow from={[BOX.x - 110, midY]} to={[BOX.x - 12, midY]} at={onceAt - 2} dur={10} color={INPUT} width={3} />
       <Note at={passAt - 4} x={X0} y={y(COUNT_Y)}>
-        <span style={{ ...note(27, INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(27, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
           {prompt.length} tokens, 1 pass
         </span>
       </Note>
 
       {/* Writing: one token out per pass. */}
       <Ink at={answerAt - 4} dur={12} style={{ left: RIGHT_X, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(25, OUTPUT_INK), fontWeight: 600 }}>Writing the answer</span>
+        <span style={{ ...label(25, OUTPUT_INK), fontWeight: 500 }}>Writing the answer</span>
       </Ink>
       <Arrow from={[BOX.x + BOX.w + 12, midY]} to={[RIGHT_X - 12, midY]} at={oneAt - 10} dur={10} color={OUTPUT} width={3} />
       <div style={{ position: "absolute", left: RIGHT_X, top: y(RIGHT_ROW), display: "flex", gap: 6 }}>
@@ -160,7 +160,7 @@ export const WhyScene: React.FC = () => {
       </div>
       {passesDone > 0 ? (
         <div style={{ position: "absolute", left: RIGHT_X, top: y(COUNT_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(27, INK), fontWeight: 600, ...TABULAR }}>
+          <span style={{ ...note(27, INK), fontWeight: 500, ...TABULAR }}>
             {passesDone} {passesDone === 1 ? "token" : "tokens"}, {passesDone} {passesDone === 1 ? "pass" : "passes"}
           </span>
         </div>
@@ -205,7 +205,7 @@ export const WhyScene: React.FC = () => {
         </React.Fragment>
       ))}
       <Note at={waitsAt - 4} x={RIGHT_X + 160 + METER_W + 110} y={y(COUNT_Y) + 88}>
-        <span style={{ ...note(22, OUTPUT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the rest waits</span>
+        <span style={{ ...note(22, OUTPUT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the rest waits</span>
       </Note>
 
       {/* The gap the price reflects. */}

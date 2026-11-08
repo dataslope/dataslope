@@ -145,7 +145,7 @@ export const IndepScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, q5At + 14, 12) }}>independent</span>
         </Ink>
         <Note at={claimAt} x={X0} y={y(540)} out={out4}>
-          <span style={{ ...note(30, INK), fontWeight: 600, whiteSpace: "nowrap" }}>A claim to justify. These break it:</span>
+          <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A claim to justify. These break it:</span>
         </Note>
         <Note at={visitsAt} x={X0 + 24} y={y(600)} out={out4}>
           <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>repeat visits by the same user</span>
@@ -280,10 +280,10 @@ export const IndepScene: React.FC = () => {
             <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, toZeroAt + 8, 12) }}>out of the one face left</span>
           </Note>
           <Note at={farAt} x={COL.x} y={y(COL.far)}>
-            <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>as far from independent as it gets</span>
+            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>as far from independent as it gets</span>
           </Note>
           <Note at={neverAt - 8} x={COL.x} y={y(COL.never)}>
-            <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={neverAt}>exclusive, and each possible: never independent</Mark>
             </span>
           </Note>

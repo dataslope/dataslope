@@ -131,10 +131,10 @@ export const AreaScene: React.FC = () => {
           </Svg>
           {/* Clear of the curve, to its right, over the short waits it names. */}
           <Note at={commonAt - 2} x={sx(X, 1.5)} y={py(f(0.8)) - 40} out={rangesAt}>
-            <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>short waits, common</span>
+            <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>short waits, common</span>
           </Note>
           <Note at={rareAt - 2} x={sx(X, 12.5)} y={py(f(12.5)) - 54} out={rangesAt}>
-            <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>long ones, rare</span>
+            <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>long ones, rare</span>
           </Note>
 
           {/* The area left of eight, then the part left of two lifting off. */}
@@ -198,7 +198,7 @@ export const AreaScene: React.FC = () => {
         {/* The height, which is not a probability. */}
         <Arrow from={[sx(X, 0.45), base - 4]} to={[sx(X, 0.45), py(f(0.45)) + 4]} at={heightAt - 6} dur={14} color={INK} width={2.4} />
         <Note at={heightAt} x={sx(X, 2.6)} y={py(0.19)}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
             the height <span style={{ opacity: ease(frame, cantAt - 2, 10) }}>is not a probability</span>
           </span>
         </Note>

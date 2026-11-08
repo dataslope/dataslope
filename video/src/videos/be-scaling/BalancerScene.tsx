@@ -182,7 +182,7 @@ export const BalancerScene: React.FC = () => {
         <Line at={healthAt} x={X0} y={y(820)} size={22} out={phaseOut}>
           <Mark at={healthAt}>health checks</Mark> pull a dead server out
         </Line>
-        <Line at={availAt} x={X0} y={y(870)} size={22} color={OK_INK} weight={650} out={phaseOut}>
+        <Line at={availAt} x={X0} y={y(870)} size={22} color={OK_INK} weight={500} out={phaseOut}>
           a stateless pool stays highly available
         </Line>
 
@@ -194,7 +194,7 @@ export const BalancerScene: React.FC = () => {
         ].map(([name, at, sub], i) => (
           <React.Fragment key={i}>
             <Ink at={(at as number) - 2} dur={14} out={phaseOut} style={{ left: PANEL_X[i], top: panelTop, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(23, INK), fontWeight: 600 }}>
+              <span style={{ ...label(23, INK), fontWeight: 500 }}>
                 <Mark at={at as number} out={i < 2 ? ([lcAt, chAt][i] as number) : phaseOut - 10}>
                   {name as string}
                 </Mark>
@@ -238,7 +238,7 @@ export const BalancerScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 ...label(20, BLUE_INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 opacity: p * (1 - o),
               }}
             >
@@ -269,7 +269,7 @@ export const BalancerScene: React.FC = () => {
             </div>
           );
         })}
-        <Line at={fewestAt + 10} x={PANEL_X[1]} y={lcRow(3) + h(60)} size={20} color={OK_INK} weight={650} out={phaseOut}>
+        <Line at={fewestAt + 10} x={PANEL_X[1]} y={lcRow(3) + h(60)} size={20} color={OK_INK} weight={500} out={phaseOut}>
           new request: server {lcPick + 1}
         </Line>
         <Line at={slowAt} x={PANEL_X[1]} y={lcRow(3) + h(104)} size={20} color={INK_SOFT} out={phaseOut}>
@@ -281,11 +281,11 @@ export const BalancerScene: React.FC = () => {
           <React.Fragment key={r}>
             <Ink at={at} dur={12} out={phaseOut} style={{ left: PANEL_X[2], top: y(476) + r * h(84), whiteSpace: "nowrap" }}>
               <span style={{ ...note(22, INK), display: "inline-flex", alignItems: "center", gap: 14 }}>
-                <span style={{ fontFamily: MONO, color: BLUE_INK, fontWeight: 600 }}>
+                <span style={{ fontFamily: MONO, color: BLUE_INK, fontWeight: 500 }}>
                   {key.key}
                 </span>
                 <span style={{ color: INK_SOFT }}>→</span>
-                <span style={{ fontWeight: 600, color: INK }}>server {key.ring4 + 1}</span>
+                <span style={{ fontWeight: 500, color: INK }}>server {key.ring4 + 1}</span>
               </span>
             </Ink>
           </React.Fragment>
@@ -298,22 +298,22 @@ export const BalancerScene: React.FC = () => {
         </Line>
 
         {/* ── Why consistent: the simulation. ── */}
-        <Line at={simAt} x={X0} y={y(340)} size={22} weight={650} color={INK}>
+        <Line at={simAt} x={X0} y={y(340)} size={22} weight={500} color={INK}>
           Simulation: <Num>{commas(HASHING.keys)}</Num> short keys, one square each, colored by the server it lands on
         </Line>
-        <Line at={simAt + 6} x={MOD_X} y={y(392)} size={22} weight={600}>
+        <Line at={simAt + 6} x={MOD_X} y={y(392)} size={22} weight={500}>
           Modulo: 3 servers, then 4
         </Line>
         <KeyGrid x={MOD_X} top={y(GRID_TOP)} from={HASHING.grid.mod3} to={HASHING.grid.mod4} at={simAt + 6} sweepAt={switchAt} dimAt={sevAt} />
-        <Line at={sevAt + 4} x={MOD_X} y={y(GRID_TOP) + 416} size={23} weight={600} color={ACCENT_INK}>
+        <Line at={sevAt + 4} x={MOD_X} y={y(GRID_TOP) + 416} size={23} weight={500} color={ACCENT_INK}>
           {pct(HASHING.shareMod)} moved
           <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, coldAt, 10) }}>, each to a cold cache</span>
         </Line>
-        <Line at={ringAt} x={RING_X} y={y(392)} size={22} weight={600}>
+        <Line at={ringAt} x={RING_X} y={y(392)} size={22} weight={500}>
           Hash ring, {HASHING.pointsPerServer} points a server
         </Line>
         <KeyGrid x={RING_X} top={y(GRID_TOP)} from={HASHING.grid.ring3} to={HASHING.grid.ring4} at={ringAt + 2} sweepAt={twentyAt} dimAt={newAt} />
-        <Line at={newAt} x={RING_X} y={y(GRID_TOP) + 416} size={23} weight={600} color={OK_INK}>
+        <Line at={newAt} x={RING_X} y={y(GRID_TOP) + 416} size={23} weight={500} color={OK_INK}>
           {pct(HASHING.shareRing)} moved, all to the new server
         </Line>
 
@@ -354,7 +354,7 @@ export const BalancerScene: React.FC = () => {
           const at = s < 3 ? simAt + 8 + s * 3 : fourthAt;
           return (
             <Ink key={s} at={at} dur={12} style={{ left: 1580, top: y(GRID_TOP) + 40 + s * 40, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(21, s === 3 ? INK : INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, fontWeight: s === 3 ? 700 : 500 }}>
+              <span style={{ ...note(21, s === 3 ? INK : INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, fontWeight: s === 3 ? 500 : 500 }}>
                 <span style={{ width: 20, height: 20, borderRadius: 4, background: SERVER[s] }} />
                 server {s + 1}
                 {s === 3 ? ", added" : ""}

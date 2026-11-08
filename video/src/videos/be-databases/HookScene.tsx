@@ -177,7 +177,7 @@ export const HookScene: React.FC = () => {
           {chips.map((c, i) => (
             <span key={c.name} style={{ ...note(22, INK), opacity: ease(frame, c.at, 10) }}>
               {i > 0 ? <span style={{ color: INK_SOFT, marginRight: "0.5em" }}>·</span> : null}
-              <b>{c.name}</b> <span style={{ ...TABULAR, color: BLUE_INK, fontWeight: 650 }}>{c.rows}</span>
+              <b>{c.name}</b> <span style={{ ...TABULAR, color: BLUE_INK, fontWeight: 500 }}>{c.rows}</span>
             </span>
           ))}
         </div>
@@ -208,7 +208,7 @@ export const HookScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 ...label(deep ? 21 : 19, tone > 0.5 ? PAPER : BLUE_INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 ...TABULAR,
                 opacity: p,
                 transform: `scale(${(0.7 + 0.3 * p) * (1 + 0.12 * glow)})`,
@@ -225,7 +225,7 @@ export const HookScene: React.FC = () => {
             left: sqX(0) + SQ - 14,
             top: sqTop - 16,
             ...label(19, INK),
-            fontWeight: 600,
+            fontWeight: 500,
             background: HIGHLIGHT,
             borderRadius: 999,
             padding: "0 7px",

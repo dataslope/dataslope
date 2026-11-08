@@ -124,15 +124,15 @@ export const AccessScene: React.FC = () => {
                 transform: `translateX(${(1 - p) * -12 + drop * 24}px)`,
               }}
             >
-              <span style={{ ...note(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{c.title}</span>
-              <span style={{ fontFamily: MONO, fontSize: 20, color: BLUE_INK, fontWeight: 600, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
+              <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.title}</span>
+              <span style={{ fontFamily: MONO, fontSize: 20, color: BLUE_INK, fontWeight: 500, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
                 readers: {c.readers}
               </span>
             </div>
           );
         })}
         <Note at={onlyAt - 2} x={CARD.x} y={cardY(CHUNKS.length) + 8}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={onlyAt + 4} color={MARK_OK}>
               only what Dana could open herself
             </Mark>
@@ -200,7 +200,7 @@ export const AccessScene: React.FC = () => {
           <span style={{ color: BLUE_INK }}>embedding model</span>
         </Box>
         <Note at={apiAt - 2} x={RIGHT_X + 600} y={y(CARD.top) + 86}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: 0.4 + 0.6 * red }}>an outside API</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: 0.4 + 0.6 * red }}>an outside API</span>
         </Note>
 
         {/* Deletion, made real. */}
@@ -220,13 +220,13 @@ export const AccessScene: React.FC = () => {
             <Note at={t.at - 2} x={RIGHT_X + 396} y={delTop - 6 + i * 56}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <Tick at={t.at + 6} size={26} />
-                <span style={{ ...note(25, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{t.text}</span>
+                <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{t.text}</span>
               </div>
             </Note>
           </React.Fragment>
         ))}
         <Note at={notJustAt - 2} x={RIGHT_X} y={delTop + 186}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={notJustAt + 4} color={MARK_BAD}>
               not just the source row
             </Mark>

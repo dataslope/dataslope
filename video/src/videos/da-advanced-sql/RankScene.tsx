@@ -157,12 +157,12 @@ export const RankScene: React.FC = () => {
         </Note>
         <Note at={elevenAt - 4} x={X0} y={y(TOP) + listingHeight(RANK.lines.length, SIZE) + h(76)} out={out3}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <QMono>RANK</QMono>: ties share, then it <span style={{ fontWeight: 650 }}>skips</span> (8, 8, 8, 11)
+            <QMono>RANK</QMono>: ties share, then it <span style={{ fontWeight: 500 }}>skips</span> (8, 8, 8, 11)
           </span>
         </Note>
         <Note at={nineAt - 4} x={X0} y={y(TOP) + listingHeight(RANK.lines.length, SIZE) + h(122)} out={out3}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <QMono>DENSE_RANK</QMono>: ties share, <span style={{ fontWeight: 650 }}>no gap</span> (8, 8, 8, 9)
+            <QMono>DENSE_RANK</QMono>: ties share, <span style={{ fontWeight: 500 }}>no gap</span> (8, 8, 8, 9)
           </span>
         </Note>
 

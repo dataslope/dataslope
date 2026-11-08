@@ -237,13 +237,13 @@ export const PressureScene: React.FC = () => {
           head={12}
         />
         <Note at={idleAt} x={cons.x} y={mid(last) + cons.h / 2 + h(12)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>on one partition, it would sit idle</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>on one partition, it would sit idle</span>
         </Note>
         <Bracket x0={markX(bottom.read)} x1={markX(bottom.written)} y={laneTop(last) + laneH + h(16)} at={lagAt} out={clearsAt + 10}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 750 }}>consumer lag</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>consumer lag</span>
         </Bracket>
         <Note at={distAt + 2} x={X0} y={laneTop(last) + laneH + h(28)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             lag = latest offset
             <Bar color={INK} />
             minus committed offset
@@ -251,7 +251,7 @@ export const PressureScene: React.FC = () => {
           </span>
         </Note>
         <Note at={absorbsAt} x={cons.x + cons.w + 24} y={both - h(66)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Kafka absorbs it<span style={{ opacity: ease(frame, durableAt, 10) }}>: the log is durable,</span>
           </span>
         </Note>
@@ -259,9 +259,9 @@ export const PressureScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>so the consumer falls behind</span>
         </Note>
         <Note at={droppedAt} x={cons.x + cons.w + 24} y={both + h(14)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             and nothing is dropped
-            <span style={{ ...label(22, INK_SOFT), fontWeight: 650, opacity: ease(frame, retentionAt, 10) }}>, within retention</span>
+            <span style={{ ...label(22, INK_SOFT), fontWeight: 500, opacity: ease(frame, retentionAt, 10) }}>, within retention</span>
           </span>
         </Note>
         {/* A push-based system pushes back instead. */}
@@ -278,7 +278,7 @@ export const PressureScene: React.FC = () => {
           head={13}
         />
         <Note at={slowAt - 2} x={LANE.x + 40} y={loopY - h(38)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>push-based: "slow down" goes back to the producer</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>push-based: "slow down" goes back to the producer</span>
         </Note>
 
         {/* The model: lag, second by second. */}
@@ -293,15 +293,15 @@ export const PressureScene: React.FC = () => {
           at={modelAt}
         />
         <Note at={modelAt + 2} x={X0} y={sy.b - h(4)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>model</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>model</span>
         </Note>
         <Note at={hundredAt} x={X0} y={sy.b + h(36)}>
-          <span style={{ ...label(20, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             in: about <Num>{BACKPRESSURE.rate}</Num> a second
           </span>
         </Note>
         <Note at={eightyAt} x={X0} y={sy.b + h(70)}>
-          <span style={{ ...label(20, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             handled: <Num>{BACKPRESSURE.one}</Num> a second
           </span>
         </Note>
@@ -310,22 +310,22 @@ export const PressureScene: React.FC = () => {
           <line x1={joinX} x2={joinX} y1={sy.b - 10} y2={sy.a} stroke={OK} strokeWidth={3} strokeDasharray="7 6" opacity={ease(frame, takesAt + 4, 10)} />
         </svg>
         <Note at={elevenAt} x={sAt(sx, BACKPRESSURE.join) - 250} y={sAt(sy, BACKPRESSURE.atJoin) - h(48)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{count(BACKPRESSURE.atJoin)}</Num> at a minute
           </span>
         </Note>
         <Note at={takesAt + 4} x={joinX + 16} y={sy.b - h(26)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             a second consumer takes partition <Num>1</Num>
           </span>
         </Note>
         <Note at={clearsAt + 2} x={sAt(sx, BACKPRESSURE.drainedAtByPartition) + 14} y={sAt(sy, 0) - h(52)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             cleared in <Num>{BACKPRESSURE.drainSecondsByPartition}</Num> s
           </span>
         </Note>
         <Note at={risingAt} x={1460} y={y(660)}>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             rising lag:
             <br />
             more partitions and consumers,

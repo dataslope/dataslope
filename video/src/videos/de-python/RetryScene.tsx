@@ -179,7 +179,7 @@ export const RetryScene: React.FC = () => {
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>s</span>
         </Note>
         <Note at={togetherAt} x={RIGHT_X} y={axisY + h(40)} out={randomAt - 4}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             plain backoff, all six at once
             <FadeIn at={herdAt - 4}>
               : <Mark at={herdAt + 2}>a thundering herd</Mark>
@@ -187,7 +187,7 @@ export const RetryScene: React.FC = () => {
           </span>
         </Note>
         <Note at={randomAt} x={RIGHT_X} y={axisY + h(40)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Code line={jitterLine} size={22} /> <Mark at={spreadAt} color={MARK_OK}>spread out</Mark>
           </span>
         </Note>
@@ -213,7 +213,7 @@ export const RetryScene: React.FC = () => {
           </span>
         </Note>
         <Note at={keyAt} x={X0} y={badTop + h(184)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={keyAt + 6} color={MARK_OK}>send an idempotency key</Mark>
             <FadeIn at={chargesOnceAt - 2}>, and the server charges once</FadeIn>
           </span>

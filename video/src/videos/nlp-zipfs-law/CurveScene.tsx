@@ -344,16 +344,16 @@ export const CurveScene: React.FC = () => {
           </div>
         </React.Fragment>
       ))}
-      <Tag x={CX0 - 14} y={CY0 - 58} at={from + 4} size={20} weight={600}>
+      <Tag x={CX0 - 14} y={CY0 - 58} at={from + 4} size={20} weight={500}>
         times it appears
         <span style={{ opacity: ease(frame, logAt + 20, 12) }}>, log scale</span>
       </Tag>
       {/* Two labels crossfading rather than a hidden suffix, so "rank" ends
           at the axis end on both views. */}
-      <Tag x={CX1} y={CY1 + 62} at={from + 6} out={logAt + 14} align="right" size={20} weight={600}>
+      <Tag x={CX1} y={CY1 + 62} at={from + 6} out={logAt + 14} align="right" size={20} weight={500}>
         rank
       </Tag>
-      <Tag x={CX1} y={CY1 + 62} at={logAt + 18} align="right" size={20} weight={600}>
+      <Tag x={CX1} y={CY1 + 62} at={logAt + 18} align="right" size={20} weight={500}>
         rank, log scale
       </Tag>
 
@@ -368,7 +368,7 @@ export const CurveScene: React.FC = () => {
             transform: "translateX(-50%)",
             opacity: barIn(i + 1) * wordsOut,
             ...label(20, INK),
-            fontWeight: 600,
+            fontWeight: 500,
           }}
         >
           {i === 0 ? <Mark at={toAt - 2}>{r.word}</Mark> : r.word}
@@ -400,7 +400,7 @@ export const CurveScene: React.FC = () => {
           transform: "translateX(-50%)",
           opacity: counterOn * linTicksO,
           ...note(20, DATA_INK),
-          fontWeight: 650,
+          fontWeight: 500,
           ...TABULAR,
         }}
       >
@@ -418,7 +418,7 @@ export const CurveScene: React.FC = () => {
         out={straightensAt - 6}
         size={21}
         color={DATA_INK}
-        weight={650}
+        weight={500}
         style={{ background: PAPER, padding: "0 6px" }}
       >
         to: <span style={TABULAR}>{fmt(EMMA.top[0].count, 0)}</span>
@@ -426,10 +426,10 @@ export const CurveScene: React.FC = () => {
 
       {/* ── More than half the words, flat on the floor ── */}
       <Bracket x0={twiceX0} x1={CX1} y={bracketY} at={halfAt - 2} out={tailOut} color={INK} up={false} />
-      <Tag x={(twiceX0 + CX1) / 2} y={bracketY - 66} at={halfAt} out={tailOut} align="center" size={22} color={INK} weight={650}>
+      <Tag x={(twiceX0 + CX1) / 2} y={bracketY - 66} at={halfAt} out={tailOut} align="center" size={22} color={INK} weight={500}>
         more than half the different words: <span style={TABULAR}>{pct(EMMA.onceOrTwiceShare)}</span>
       </Tag>
-      <Tag x={(twiceX0 + CX1) / 2} y={bracketY - 36} at={onceAt - 2} out={tailOut} align="center" size={21} color={INK_SOFT} weight={600}>
+      <Tag x={(twiceX0 + CX1) / 2} y={bracketY - 36} at={onceAt - 2} out={tailOut} align="center" size={21} color={INK_SOFT} weight={500}>
         used <Mark at={onceAt}>once or twice</Mark>
       </Tag>
       <Svg opacity={0.14 * pulse(frame, floorAt - 4, 40) * (1 - t)}>
@@ -438,10 +438,10 @@ export const CurveScene: React.FC = () => {
 
       {/* ── The law, on log axes ── */}
       {/* In the grid row between 1,000 and 100, clear of both gridlines. */}
-      <Tag x={logX(900)} y={zipfY} at={zipfAt - 2} size={24} color={INK} weight={600} style={HALO}>
+      <Tag x={logX(900)} y={zipfY} at={zipfAt - 2} size={24} color={INK} weight={500} style={HALO}>
         Zipf&apos;s law
       </Tag>
-      <Tag x={logX(900)} y={zipfY + 34} at={overAt - 2} size={21} color={INK_SOFT} weight={600} style={HALO}>
+      <Tag x={logX(900)} y={zipfY + 34} at={overAt - 2} size={21} color={INK_SOFT} weight={500} style={HALO}>
         count falls as one over the rank
         {/* Mounted only once it shows, so the halo never runs on past the
             visible words over the 10,000 gridline. */}
@@ -452,13 +452,13 @@ export const CurveScene: React.FC = () => {
         ) : null}
       </Tag>
       {/* The run's label sits on the 100 gridline under it, haloed. */}
-      <Tag x={(D[0] + C[0]) / 2} y={logY(100) - 14} at={furtherAt + 10} align="center" size={21} color={INK} weight={600} style={HALO}>
+      <Tag x={(D[0] + C[0]) / 2} y={logY(100) - 14} at={furtherAt + 10} align="center" size={21} color={INK} weight={500} style={HALO}>
         <Mark at={stepAlongAt} out={thousandAt - 6}>one step along</Mark>: <Mark at={furtherAt + 8} out={slopeAt}>10×</Mark> the rank
       </Tag>
-      <Tag x={A[0] - 14} y={(A[1] + D[1]) / 2 - 14} at={tenthAt + 2} align="right" size={21} color={INK} weight={600} style={HALO}>
+      <Tag x={A[0] - 14} y={(A[1] + D[1]) / 2 - 14} at={tenthAt + 2} align="right" size={21} color={INK} weight={500} style={HALO}>
         <Mark at={stepDownAt} out={thousandAt - 6}>one step down</Mark>: <Mark at={tenthAt + 2} out={slopeAt}>a tenth</Mark> the count
       </Tag>
-      <Tag x={logX(24)} y={logY(10000) + 8} at={thousandAt} size={21} color={DATA_INK} weight={650} style={HALO}>
+      <Tag x={logX(24)} y={logY(10000) + 8} at={thousandAt} size={21} color={DATA_INK} weight={500} style={HALO}>
         Emma, ranks 1 to <span style={TABULAR}>{fmt(EMMA.fitRanks, 0)}</span>
         <span style={{ opacity: ease(frame, itsSlopeAt, 12) }}>
           : slope <Mark at={pointAt}>{EMMA.slope.toFixed(2).replace("-", "−")}</Mark>

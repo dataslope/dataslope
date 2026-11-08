@@ -182,7 +182,7 @@ export const PowerScene: React.FC = () => {
                   left: BARS.x0 + s.users * unit * p + 16,
                   top: top + 6,
                   ...note(28, s.ink),
-                  fontWeight: 650,
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                   opacity: ease(frame, s.numAt - 2, 10) * (1 - ease(frame, out10, 10)),
                   ...TABULAR,
@@ -209,16 +209,16 @@ export const PowerScene: React.FC = () => {
           <line x1={CURVES.x0} x2={CURVES.x1} y1={base} y2={base} stroke={INK} strokeWidth={1.4} />
           <line x1={at(zs, crit)} x2={at(zs, crit)} y1={base - height - 14} y2={base} stroke={INK} strokeWidth={2} strokeDasharray="6 5" />
           <line x1={at(zs, -crit)} x2={at(zs, -crit)} y1={base - height - 14} y2={base} stroke={INK} strokeWidth={2} strokeDasharray="6 5" />
-          <text x={at(zs, 0)} y={base + 28} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: INK_SOFT }}>
+          <text x={at(zs, 0)} y={base + 28} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
             no effect
           </text>
-          <text x={at(zs, ERRORS.shift)} y={base + 28} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: B_INK }}>
+          <text x={at(zs, ERRORS.shift)} y={base + 28} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: B_INK }}>
             a real effect
           </text>
-          <text x={at(zs, crit)} y={base - height - 24} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, fill: INK_SOFT }}>
+          <text x={at(zs, crit)} y={base - height - 24} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
             declare a winner past here
           </text>
-          <text x={at(zs, -crit)} y={base - height - 24} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, fill: INK_SOFT }}>
+          <text x={at(zs, -crit)} y={base - height - 24} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
             or a loser past here
           </text>
         </Svg>
@@ -261,7 +261,7 @@ export const PowerScene: React.FC = () => {
         <Note at={moveAt + 4} x={X0} y={y(TOP + 48)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             moving the line trades one error for the other
-            <span style={{ opacity: ease(frame, onlyAt - 2, 10), fontWeight: 650 }}>; only more data shrinks both</span>
+            <span style={{ opacity: ease(frame, onlyAt - 2, 10), fontWeight: 500 }}>; only more data shrinks both</span>
           </span>
         </Note>
 
@@ -270,7 +270,7 @@ export const PowerScene: React.FC = () => {
           <line x1={POWER.x0} x2={POWER.x1} y1={y(POWER.base)} y2={y(POWER.base)} stroke={INK} strokeWidth={1.4} />
           <line x1={POWER.x0} x2={POWER.x1} y1={at(pys, ERRORS.power)} y2={at(pys, ERRORS.power)} stroke={OK} strokeWidth={1.6} strokeDasharray="6 6" />
           {/* The power ticks at the right end, clear of question 10's notes on the left. */}
-          <text x={POWER.x1 + 12} y={at(pys, ERRORS.power) + 7} textAnchor="start" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, fill: OK_INK }}>
+          <text x={POWER.x1 + 12} y={at(pys, ERRORS.power) + 7} textAnchor="start" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: OK_INK }}>
             80%
           </text>
           {[0, 1].map((t) => (
@@ -283,11 +283,11 @@ export const PowerScene: React.FC = () => {
               {t.toLocaleString("en-US")}
             </text>
           ))}
-          <text x={POWER.x1} y={y(POWER.base) + 58} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
+          <text x={POWER.x1} y={y(POWER.base) + 58} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
             users per arm (log scale)
           </text>
           {/* At the right end, so question 10's notes on the left never run into it. */}
-          <text x={POWER.x1} y={y(POWER.top) - 24} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
+          <text x={POWER.x1} y={y(POWER.top) - 24} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
             power to catch a lift from {Math.round(SAMPLE.from * 100)}%
           </text>
           {SAMPLE.curves.map((c, i) => (

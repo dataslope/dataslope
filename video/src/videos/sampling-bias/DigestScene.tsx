@@ -104,7 +104,7 @@ export const DigestScene: React.FC = () => {
         <div style={note(21, INK_SOFT)}>Each square: {PER_SQUARE.toLocaleString("en-US")} ballots mailed</div>
       </Note>
       <Note at={backFrom + 4} x={GRID.x} y={y(GRID.y + COLS * (GRID.cell + GRID.gap) + 46)}>
-        <div style={{ ...note(22, INK), fontWeight: 650 }}>
+        <div style={{ ...note(22, INK), fontWeight: 500 }}>
           {RETURNED_SQUARES} came back: nearly {fmt(H.digestReturned / 1e6, 1)} million replies
         </div>
       </Note>
@@ -235,7 +235,7 @@ export const DigestScene: React.FC = () => {
       />
       <Note at={lessonFrom + 4} x={(px(H.digestRooseveltShare) + px(H.resultRooseveltShare)) / 2} y={y(ROWS.digest - 74)} from="up">
         <span style={{ display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap", ...halo }}>
-          <span style={{ ...note(24, EASY_INK), fontWeight: 600 }}>
+          <span style={{ ...note(24, EASY_INK), fontWeight: 500 }}>
             {fmt(H.resultRooseveltShare - H.digestRooseveltShare, 1)} points
           </span>
           <span style={note(24, INK_SOFT)}> off</span>
@@ -332,7 +332,7 @@ const Row: React.FC<{
       >
         {/* One size on the line: the value is set apart by weight and ink. */}
         {named ? <span style={note(26, INK_SOFT)}>Roosevelt </span> : null}
-        <span style={{ ...note(26, ink), fontWeight: 600 }}>{fmt(value, 1)}%</span>
+        <span style={{ ...note(26, ink), fontWeight: 500 }}>{fmt(value, 1)}%</span>
       </div>
     </>
   );

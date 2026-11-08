@@ -131,11 +131,11 @@ export const GeometricScene: React.FC = () => {
           />
         </Svg>
         <Note at={oneAt} x={firstX + 50} y={base - GEOMETRIC.pmf[0] * unit - 18}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>1 call, the likeliest</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>1 call, the likeliest</span>
         </Note>
         <VRule x={meanX} bottom={base} top={base - h(TALL - 120)} at={averageAt - 2} />
         <Note at={callsAt - 2} x={meanX + 12} y={base - h(TALL - 110)}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>average {GEOMETRIC.mean}</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>average {GEOMETRIC.mean}</span>
         </Note>
         <Note at={likeliestAt} x={meanX + 12} y={base - h(TALL - 146)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>but not the likeliest</span>

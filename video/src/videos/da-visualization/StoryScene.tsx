@@ -100,7 +100,7 @@ export const StoryScene: React.FC = () => {
                 left: STEPS_X,
                 top: y(470) + i * h(64),
                 ...note(28, s.strong ? INK : INK_SOFT),
-                fontWeight: s.strong ? 650 : 500,
+                fontWeight: s.strong ? 500 : 500,
                 whiteSpace: "nowrap",
                 opacity: p,
                 transform: `translateX(${(1 - p) * 14}px)`,

@@ -173,8 +173,8 @@ export const FigLabel: React.FC<{
   out?: number;
 }> = ({ n, title, at, x, y, out }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(FIG_SIZE, ACCENT_INK), fontWeight: 600 }}>Fig. {n}</span>
-    <span style={{ ...label(FIG_SIZE, INK), fontWeight: 560 }}>{title}</span>
+    <span style={{ ...label(FIG_SIZE, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(FIG_SIZE, INK), fontWeight: 500 }}>{title}</span>
   </Ink>
 );
 
@@ -251,7 +251,7 @@ export const badgeStyle = (tone: BadgeTone, size = 24): React.CSSProperties => {
     color: ink,
     fontSize: size,
     // Semibold: the owner found bold too heavy for a tinted chip.
-    fontWeight: 600,
+    fontWeight: 500,
     lineHeight: 1.15,
     whiteSpace: "nowrap",
   };

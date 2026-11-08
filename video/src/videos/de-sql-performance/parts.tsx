@@ -49,7 +49,7 @@ export { colsOf, geoOf, rowsAt } from "../da-advanced-sql/parts";
  * 19px. `QMono` is the same thing under the kit's name, for questions.
  */
 export const SmallMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 500, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );
@@ -88,8 +88,8 @@ const tokenize = (line: string): Token[] => {
     const [text, str, num, word] = m;
     if (str) out.push({ text, color: inkOf.green });
     else if (num) out.push({ text, color: inkOf.orange });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: inkOf.purple, weight: 700 });
-    else if (word && TABLES.has(word)) out.push({ text, color: INK, weight: 600 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: inkOf.purple, weight: 500 });
+    else if (word && TABLES.has(word)) out.push({ text, color: INK, weight: 500 });
     else if (word) out.push({ text, color: INK });
     else out.push({ text, color: INK_SOFT });
   }
@@ -223,7 +223,7 @@ const PlanText: React.FC<{ line: string; size: number }> = ({ line, size }) => {
     return (
       <span style={base}>
         {node[1]}
-        <span style={{ color: INK, fontWeight: 600 }}>{node[2]}</span>
+        <span style={{ color: INK, fontWeight: 500 }}>{node[2]}</span>
         {line.slice(node[0].length)}
       </span>
     );
@@ -276,7 +276,7 @@ export const PlanBox: React.FC<{
         }}
       />
       <Ink at={at + 2} dur={12} style={{ left: g.padX, top: 0, height: head, display: "flex", alignItems: "center" }}>
-        <span style={{ fontFamily: MONO, fontSize: size, fontWeight: 600, color: INK_SOFT }}>QUERY PLAN</span>
+        <span style={{ fontFamily: MONO, fontSize: size, fontWeight: 500, color: INK_SOFT }}>QUERY PLAN</span>
       </Ink>
       <div style={{ position: "absolute", left: 0, top: bodyTop - g.padY + Math.round(size * 0.25), right: 0, bottom: 0 }}>
         {marks.map((m, k) => (

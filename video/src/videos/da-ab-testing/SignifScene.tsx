@@ -122,7 +122,7 @@ export const SignifScene: React.FC = () => {
         <Svg opacity={ease(frame, holdAt - 4, 12) * (1 - ease(frame, out8, 10))}>
           <line x1={P.x0} x2={P.x1} y1={y(P.base)} y2={y(P.base)} stroke={INK} strokeWidth={1.6} />
           <line x1={P.x0} x2={P.x1} y1={alphaY} y2={alphaY} stroke={ACCENT} strokeWidth={1.6} strokeDasharray="6 6" />
-          <text x={P.x1 + 14} y={alphaY + 7} style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: ACCENT_INK }}>
+          <text x={P.x1 + 14} y={alphaY + 7} style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: ACCENT_INK }}>
             0.05
           </text>
           {[0, 0.2, 0.4, 0.6].map((t) => (
@@ -135,10 +135,10 @@ export const SignifScene: React.FC = () => {
               {s.toLocaleString("en-US")}
             </text>
           ))}
-          <text x={P.x1} y={y(P.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 650, fill: INK_SOFT }}>
+          <text x={P.x1} y={y(P.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
             users per group (log scale)
           </text>
-          <text x={P.x0 - 14} y={y(P.top) - 20} textAnchor="start" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 650, fill: INK_SOFT }}>
+          <text x={P.x0 - 14} y={y(P.top) - 20} textAnchor="start" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
             p-value
           </text>
           {PRACTICAL.rows.map(([s, p], i) => (
@@ -159,7 +159,7 @@ export const SignifScene: React.FC = () => {
               from="up"
               style={c.place === "above" ? { textAlign: "center" } : undefined}
             >
-              <span style={{ ...note(24, c.color), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>p {pText(p)}</span>
+              <span style={{ ...note(24, c.color), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>p {pText(p)}</span>
             </Note>
           );
         })}
@@ -175,7 +175,7 @@ export const SignifScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>only the sample grew</span>
         </Note>
         <Note at={reportAt - 2} x={P.x0 + 520} y={y(P.top) + h(82)} out={out8}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>report the effect and its range, not just p</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>report the effect and its range, not just p</span>
         </Note>
         <Note at={callAt - 2} x={P.x0 + 520} y={y(P.top) + h(128)} out={out8}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -209,7 +209,7 @@ export const SignifScene: React.FC = () => {
               </text>
             </g>
           ))}
-          <text x={LIFT.x1} y={liftY + 100} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 650, fill: INK_SOFT }}>
+          <text x={LIFT.x1} y={liftY + 100} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
             lift in conversion, percentage points
           </text>
           <line
@@ -267,7 +267,7 @@ export const SignifScene: React.FC = () => {
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>100 runs, each with its 95% interval; dashed: the truth</span>
         </Note>
         <Note at={fourAt} x={COV.x0} y={covRowY(COV.rows - 1) + h(20)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             {COVERAGE.missed} miss
             <span style={{ ...note(24, BLUE_INK), fontWeight: 500 }}>, {COVERAGE.intervals.length - COVERAGE.missed} contain it</span>
           </span>

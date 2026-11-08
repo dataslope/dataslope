@@ -126,7 +126,7 @@ export const MovingScene: React.FC = () => {
   // The spine's average: the same ROWS frame, as it ran over the filled days.
   const spineAvg = SPINE.filledAvg.lines.flatMap((l, i, all) => (l.includes("AVG(daily_value) OVER") ? [l.trim(), all[i + 1].trim().replace(/,$/, "")] : []));
   if (spineAvg.length !== 2 || !spineAvg[1].startsWith("ROWS BETWEEN 6 PRECEDING")) throw new Error("the spine's average is not the ROWS frame");
-  const code: React.CSSProperties = { fontFamily: MONO, fontSize: 20, fontWeight: 600, color: BLUE_INK, whiteSpace: "pre", fontVariantLigatures: "none" };
+  const code: React.CSSProperties = { fontFamily: MONO, fontSize: 20, fontWeight: 500, color: BLUE_INK, whiteSpace: "pre", fontVariantLigatures: "none" };
 
   return (
     <AbsoluteFill>
@@ -151,7 +151,7 @@ export const MovingScene: React.FC = () => {
           {/* ── The metric, on the opening's thirteen days ── */}
           <Ink at={metricAt - 2} dur={12} style={{ left: X0, top: g.top - h(40), whiteSpace: "nowrap" }}>
             <span style={label(21, INK_SOFT)}>
-              <span style={{ fontFamily: MONO, fontWeight: 600 }}>daily_metrics</span>: the video&rsquo;s own values, on user 1&rsquo;s login days
+              <span style={{ fontFamily: MONO, fontWeight: 500 }}>daily_metrics</span>: the video&rsquo;s own values, on user 1&rsquo;s login days
             </span>
           </Ink>
           <DayStrip
@@ -251,7 +251,7 @@ export const MovingScene: React.FC = () => {
           />
           <Note at={calendarAt} x={SUM_X} y={sg.rowTop(3) + h(26)}>
             <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>by the calendar:</div>
-            <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+            <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
               {MOVING.rangeClause.replace(/\)$/, "")}
             </div>
           </Note>

@@ -131,7 +131,7 @@ export const CloseScene: React.FC = () => {
         ) : null}
         <Bracket x0={sx(X, CALLBACK.meanA)} x1={sx(X, CALLBACK.meanB)} y={y(BRACKET)} at={gapAt - 2} color={STAT} up />
         <Ink at={gapAt + 4} dur={14} style={{ left: sx(X, CALLBACK.meanB) + 18, top: y(BRACKET) - 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, STAT_INK), fontWeight: 600 }}>B ahead by {fmt(Math.abs(CALLBACK.gap))}</span>
+          <span style={{ ...note(23, STAT_INK), fontWeight: 500 }}>B ahead by {fmt(Math.abs(CALLBACK.gap))}</span>
         </Ink>
         {/* The course's first answer: the two groups were one process. */}
         <Note at={answerFrom + 4} x={X.x1 + 50} y={y((ROW_A + ROW_B) / 2) - 28}>
@@ -154,7 +154,7 @@ export const CloseScene: React.FC = () => {
         <div style={{ position: "absolute", left: 160, top: y(792), display: "flex", gap: 34, whiteSpace: "nowrap" }}>
           {TOOLS.map((t, i) => (
             <Ink key={t} at={toolAt(i)} dur={12} style={{ position: "relative" }}>
-              <span style={{ ...note(26, i === TOOLS.length - 1 ? STAT_INK : INK), fontWeight: 600 }}>{t}</span>
+              <span style={{ ...note(26, i === TOOLS.length - 1 ? STAT_INK : INK), fontWeight: 500 }}>{t}</span>
             </Ink>
           ))}
         </div>

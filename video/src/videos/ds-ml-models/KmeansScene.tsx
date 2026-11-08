@@ -295,7 +295,7 @@ export const KmeansScene: React.FC = () => {
             >
               {KMEANS.x.length} points · pass {pass}
               <span
-                style={{ color: OK_INK, fontWeight: 650, opacity: settled }}
+                style={{ color: OK_INK, fontWeight: 500, opacity: settled }}
               >
                 {" "}
                 · settled
@@ -328,7 +328,7 @@ export const KmeansScene: React.FC = () => {
             <span
               style={{
                 ...label(22, INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -388,7 +388,7 @@ export const KmeansScene: React.FC = () => {
             <span
               style={{
                 ...note(22, BLUE_INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -400,7 +400,7 @@ export const KmeansScene: React.FC = () => {
             <span
               style={{
                 ...note(22, OK_INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -434,7 +434,7 @@ export const KmeansScene: React.FC = () => {
             <span
               style={{
                 ...label(22, INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -495,7 +495,7 @@ export const KmeansScene: React.FC = () => {
             <span
               style={{
                 ...note(22, OK_INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}

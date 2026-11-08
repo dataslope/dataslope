@@ -150,7 +150,7 @@ export const TailScene: React.FC = () => {
         <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>each square: a hundredth of them</div>
       </Note>
       <Note at={onceAt} x={WX} y={cellTop + waffleSide + 50}>
-        <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ display: "inline-block", width: 18, height: 18, borderRadius: 3, background: ACCENT }} />
           <span style={numStyle(22, ACCENT_INK)}>{fmt(EMMA.hapaxes, 0)}</span>
           <span>used just once</span>
@@ -197,7 +197,7 @@ export const TailScene: React.FC = () => {
       </Note>
       {/* The top ten, too narrow to see apart: named beside the spike. */}
       <Note at={topTenAt - 2} x={X0 + 60} y={top + 40}>
-        <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           the top ten
           <span style={{ opacity: ease(frame, fifthAt - 2, 10) }}>
             : <span style={numStyle(22, ACCENT_INK)}>{Math.round(EMMA.top10Share * 100)}%</span> of all the words
@@ -213,7 +213,7 @@ export const TailScene: React.FC = () => {
       </Note>
       <Leader points={[[X0 + 54, top + 56], [X0 + 4, top + 40]]} at={topTenAt} color={INK_SOFT} width={1.4} />
       <Note at={twoThousandAt - 2} x={onceFrom} y={base - 40}>
-        <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           <span style={numStyle(22, ACCENT_INK)}>{fmt(EMMA.hapaxes, 0)}</span> used just once
         </div>
       </Note>
@@ -257,7 +257,7 @@ export const TailScene: React.FC = () => {
         <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>different words so far</div>
       </Note>
       <Note at={newAt - 2} x={GX1 + 18} y={gy(EMMA.distinct) - 4}>
-        <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           <span style={numStyle(24, ACCENT_INK)}>+{EMMA.newAtEnd}</span> new
         </div>
       </Note>

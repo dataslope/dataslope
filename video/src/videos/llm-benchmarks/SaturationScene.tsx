@@ -106,7 +106,7 @@ export const SaturationScene: React.FC = () => {
 
         {/* ── MMLU ── */}
         <Ink at={frontierAt - 8} dur={12} style={{ left: X0, top: ry(ROWS.mmlu) - 17, whiteSpace: "nowrap", opacity: 1 - skip * 0.45 }}>
-          <span style={{ ...label(26, INK), fontWeight: 600 }}>
+          <span style={{ ...label(26, INK), fontWeight: 500 }}>
             <Strike at={skipAt}>MMLU</Strike>
           </span>
         </Ink>
@@ -133,24 +133,24 @@ export const SaturationScene: React.FC = () => {
           />
         </Svg>
         <Ink at={ninetyTwoAt} dur={12} style={{ left: X(100) + 22, top: ry(ROWS.mmlu) - 17, whiteSpace: "nowrap", opacity: 1 - skip * 0.45 }}>
-          <span style={{ ...note(24, A_INK), fontWeight: 600 }}>
+          <span style={{ ...note(24, A_INK), fontWeight: 500 }}>
             every frontier model, {QUOTED.mmluFrontierAbove} to {QUOTED.mmluCeiling}
           </span>
         </Ink>
         <Ink at={apartAt - 2} dur={12} style={{ left: X(QUOTED.mmluCeiling) - 30, top: ry(ROWS.mmlu) + 34, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, TRAP_INK), fontWeight: 600 }}>ceiling</span>
+          <span style={{ ...note(21, TRAP_INK), fontWeight: 500 }}>ceiling</span>
         </Ink>
         {/* The tell: every frontier model inside the same three points. */}
         <Bracket x0={X(QUOTED.mmluFrontierAbove)} x1={X(QUOTED.mmluCeiling)} y={ry(ROWS.mmlu) - 30} at={threeAt - 4} up={false} color={TRAP} />
         <Ink at={threeAt - 2} dur={12} style={{ left: X(QUOTED.mmluCeiling) + 4, top: ry(ROWS.mmlu) - 72, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, TRAP_INK), fontWeight: 600, display: "inline-block", transform: "translateX(-100%)" }}>
+          <span style={{ ...note(22, TRAP_INK), fontWeight: 500, display: "inline-block", transform: "translateX(-100%)" }}>
             all within {QUOTED.withinPoints} points
           </span>
         </Ink>
 
         {/* ── GPQA Diamond ── */}
         <Ink at={gpqaAt - 4} dur={12} style={{ left: X0, top: ry(ROWS.gpqa) - 17, whiteSpace: "nowrap", opacity: 1 - skipGpqa * 0.45 }}>
-          <span style={{ ...label(26, INK), fontWeight: 600 }}>
+          <span style={{ ...label(26, INK), fontWeight: 500 }}>
             <Strike at={skipAt + 8}>GPQA Diamond</Strike>
           </span>
         </Ink>
@@ -158,7 +158,7 @@ export const SaturationScene: React.FC = () => {
           {bar(QUOTED.gpqaLeaders, ROWS.gpqa, ninetyFiveAt - 8)}
         </Svg>
         <Ink at={ninetyFiveAt} dur={12} style={{ left: X(100) + 22, top: ry(ROWS.gpqa) - 17, whiteSpace: "nowrap", opacity: 1 - skipGpqa * 0.45 }}>
-          <span style={{ ...note(24, A_INK), fontWeight: 600 }}>leaders around {QUOTED.gpqaLeaders}</span>
+          <span style={{ ...note(24, A_INK), fontWeight: 500 }}>leaders around {QUOTED.gpqaLeaders}</span>
         </Ink>
         <Ink at={replaceAt - 2} dur={12} style={{ left: X0, top: ry(ROWS.gpqa) + 18, whiteSpace: "nowrap" }}>
           <span style={note(21, INK_SOFT)}>built to replace MMLU</span>
@@ -166,7 +166,7 @@ export const SaturationScene: React.FC = () => {
 
         {/* ── Humanity's Last Exam: under 10, then about 60 ── */}
         <Ink at={Math.min(fastAt, hleAt - 4)} dur={12} style={{ left: X0, top: ry(ROWS.hle) - 17, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(26, INK), fontWeight: 600 }}>Humanity&apos;s Last Exam</span>
+          <span style={{ ...label(26, INK), fontWeight: 500 }}>Humanity&apos;s Last Exam</span>
         </Ink>
         <Svg>
           <rect
@@ -195,7 +195,7 @@ export const SaturationScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={sixtyAt} dur={12} style={{ left: X(100) + 22, top: ry(ROWS.hle) - 17, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, A_INK), fontWeight: 600 }}>the best near {QUOTED.hleNow}</span>
+          <span style={{ ...note(24, A_INK), fontWeight: 500 }}>the best near {QUOTED.hleNow}</span>
         </Ink>
         <Arrow
           from={[X(QUOTED.hleLaunch) + 10, ry(ROWS.hle) - 42]}
@@ -206,10 +206,10 @@ export const SaturationScene: React.FC = () => {
           width={2}
         />
         <Ink at={monthsAt - 2} dur={12} style={{ left: (X(QUOTED.hleLaunch) + X(QUOTED.hleNow)) / 2, top: ry(ROWS.hle) - 80, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK), fontWeight: 600, display: "inline-block", transform: "translateX(-50%)" }}>20 months later</span>
+          <span style={{ ...note(22, INK), fontWeight: 500, display: "inline-block", transform: "translateX(-50%)" }}>20 months later</span>
         </Ink>
         <Ink at={tellAt - 2} dur={14} style={{ left: X0, top: ry(ROWS.hle) + 126, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK), fontWeight: 600 }}>
+          <span style={{ ...note(24, INK), fontWeight: 500 }}>
             The tell: every model within <span style={{ color: TRAP_INK }}>{QUOTED.withinPoints} points</span>? Skip the row.
           </span>
         </Ink>

@@ -119,7 +119,7 @@ export const ProbeScene: React.FC = () => {
                   >
                     {i + 1}
                   </div>
-                  <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: 1.15, marginTop: 18, minHeight: 74 }}>{c.name}</div>
+                  <div style={{ ...note(32, INK), fontWeight: 500, lineHeight: 1.15, marginTop: 18, minHeight: 74 }}>{c.name}</div>
                   <div style={{ marginTop: 22 }}>
                     {c.items.map((it, k) => {
                       const q = ease(frame, it.at - 2, 12);

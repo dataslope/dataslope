@@ -92,7 +92,7 @@ export const RouteScene: React.FC = () => {
           return (
             <React.Fragment key={t.name}>
               <Ink at={at} dur={12} style={{ left: X0, top: ry - 17, whiteSpace: "nowrap" }}>
-                <span style={{ ...label(26, INK), fontWeight: 600 }}>
+                <span style={{ ...label(26, INK), fontWeight: 500 }}>
                   <Marked at={i === 0 ? cheapestAt - 2 : 1e9}>{tierName(t.name)}</Marked>
                 </span>
               </Ink>
@@ -100,7 +100,7 @@ export const RouteScene: React.FC = () => {
                 <rect x={BAR_X} y={ry - 13} width={w} height={26} rx={3} fill={A} opacity={0.85 + lit * 0.15} />
               </Svg>
               <Ink at={at + 10} dur={12} style={{ left: BAR_X + Math.max(5, t.inPrice * PX_PER_USD) + 14, top: ry - 15, whiteSpace: "nowrap" }}>
-                <span style={{ ...note(24, INK), fontWeight: 600, ...TABULAR }}>${fmt(t.inPrice)}</span>
+                <span style={{ ...note(24, INK), fontWeight: 500, ...TABULAR }}>${fmt(t.inPrice)}</span>
               </Ink>
               {/* The test each tier would have to pass: an empty box, then a question. */}
               <Svg opacity={gateIn}>
@@ -118,7 +118,7 @@ export const RouteScene: React.FC = () => {
                 />
               </Svg>
               <Ink at={whatAt - 2 + i * 3} dur={10} style={{ left: GATE_X + 9, top: ry - 19, whiteSpace: "nowrap" }}>
-                <span style={{ ...label(28, TRAP_INK), fontWeight: 600 }}>?</span>
+                <span style={{ ...label(28, TRAP_INK), fontWeight: 500 }}>?</span>
               </Ink>
             </React.Fragment>
           );
@@ -166,10 +166,10 @@ export const RouteScene: React.FC = () => {
             <React.Fragment key={s.name}>
               <Ink at={at} dur={14} style={{ left: TABLE_X, top: ly - 16, width: TABLE_W }}>
                 <div style={{ position: "relative", height: 34 }}>
-                  <span style={{ ...label(26, INK), fontWeight: 600, position: "absolute", left: 0, whiteSpace: "nowrap" }}>
+                  <span style={{ ...label(26, INK), fontWeight: 500, position: "absolute", left: 0, whiteSpace: "nowrap" }}>
                     <Marked at={markAt}>{s.name}</Marked>
                   </span>
-                  <span style={{ ...note(26, A_INK), fontWeight: 600, position: "absolute", left: COLS[1] - TABLE_X, ...TABULAR }}>
+                  <span style={{ ...note(26, A_INK), fontWeight: 500, position: "absolute", left: COLS[1] - TABLE_X, ...TABULAR }}>
                     {fmt(s.a, 1)}
                   </span>
                   <span style={{ ...note(26, B_INK), position: "absolute", left: COLS[2] - TABLE_X, ...TABULAR }}>{fmt(s.b, 1)}</span>

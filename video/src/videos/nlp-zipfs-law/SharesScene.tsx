@@ -108,7 +108,7 @@ export const SharesScene: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, transform: `translateY(${fig4Dy}px)`, opacity: fig4O }}>
         <FigLabel n="4" title="The top 100 ranks, on two rank axes" at={from} x={96} y={y(318)} />
 
-        <Tag x={SX0} y={aTop - 36} at={from + 2} size={21} weight={650}>
+        <Tag x={SX0} y={aTop - 36} at={from + 2} size={21} weight={500}>
           rank, <Mark at={logAxisAt}>log scale</Mark>
         </Tag>
         {strip(aTop, from, sH)}
@@ -125,11 +125,11 @@ export const SharesScene: React.FC = () => {
             borderRadius: "4px 0 0 4px",
           }}
         />
-        <Tag x={SX0 + 14} y={inStrip(aTop)} at={hundredAt + 4} size={21} color={INK} weight={650}>
+        <Tag x={SX0 + 14} y={inStrip(aTop)} at={hundredAt + 4} size={21} color={INK} weight={500}>
           top 100 ranks: <Mark at={halfAt}>half the width</Mark>
         </Tag>
         {/* What the half width suggests, and the plain axis below answers. */}
-        <Tag x={logX(100) + 16} y={inStrip(aTop)} at={asIfAt - 2} size={21} color={INK_SOFT} weight={600}>
+        <Tag x={logX(100) + 16} y={inStrip(aTop)} at={asIfAt - 2} size={21} color={INK_SOFT} weight={500}>
           as if they were half the vocabulary
         </Tag>
         <Svg opacity={ease(frame, from + 8, 12)}>
@@ -143,7 +143,7 @@ export const SharesScene: React.FC = () => {
           </div>
         ))}
 
-        <Tag x={SX0} y={bTop - 36} at={from + 14} size={21} weight={650}>
+        <Tag x={SX0} y={bTop - 36} at={from + 14} size={21} weight={500}>
           rank, <Mark at={plainAt}>plain scale</Mark>
         </Tag>
         {strip(bTop, from + 12, sH)}
@@ -159,7 +159,7 @@ export const SharesScene: React.FC = () => {
             borderRadius: "4px 0 0 4px",
           }}
         />
-        <Tag x={plainX(100) + 16} y={inStrip(bTop)} at={plainAt + 8} size={21} color={INK} weight={650}>
+        <Tag x={plainX(100) + 16} y={inStrip(bTop)} at={plainAt + 8} size={21} color={INK} weight={500}>
           the same 100 ranks: <Mark at={pointAt}>{pct(EMMA.top100OfDistinct, 1)}</Mark> of the vocabulary
         </Tag>
         <Svg opacity={ease(frame, from + 20, 12)}>
@@ -179,16 +179,16 @@ export const SharesScene: React.FC = () => {
       {/* ── Fig. 5: the two shares, on plain bars ── */}
       <FigLabel n="5" title="Plain shares of the text, and of the vocabulary" at={countAt + 14} x={96} y={y(612)} />
 
-      <Tag x={SX0} y={cTop - 36} at={countAt + 18} size={21} color={INK} weight={650}>
+      <Tag x={SX0} y={cTop - 36} at={countAt + 18} size={21} color={INK} weight={500}>
         all <span style={TABULAR}>{fmt(EMMA.words, 0)}</span> words in the book
       </Tag>
       {strip(cTop, countAt + 18)}
       <div style={{ position: "absolute", left: SX0, top: cTop, width: SW * EMMA.top100Share * cP, height: STRIP_H, background: DATA, borderRadius: "4px 0 0 4px" }} />
-      <Tag x={SX0 + SW * EMMA.top100Share + 16} y={cTop + 6} at={sixtyAt} size={22} color={DATA_INK} weight={650}>
+      <Tag x={SX0 + SW * EMMA.top100Share + 16} y={cTop + 6} at={sixtyAt} size={22} color={DATA_INK} weight={500}>
         the top 100 words: <Mark at={sixtyAt + 6}>{pct(EMMA.top100Share)}</Mark>
       </Tag>
 
-      <Tag x={SX0} y={dTop - 36} at={sevenAt - 2} size={21} color={INK} weight={650}>
+      <Tag x={SX0} y={dTop - 36} at={sevenAt - 2} size={21} color={INK} weight={500}>
         its <span style={TABULAR}>{fmt(EMMA.distinct, 0)}</span> different words
       </Tag>
       {strip(dTop, sevenAt - 2)}
@@ -203,7 +203,7 @@ export const SharesScene: React.FC = () => {
           borderRadius: "0 4px 4px 0",
         }}
       />
-      <Tag x={onceX0 - 16} y={dTop + 6} at={thirtyAt} align="right" size={22} color={ONCE_INK} weight={650}>
+      <Tag x={onceX0 - 16} y={dTop + 6} at={thirtyAt} align="right" size={22} color={ONCE_INK} weight={500}>
         <span style={TABULAR}>{fmt(EMMA.hapaxes, 0)}</span> <Mark at={onceAt}>appear only once</Mark>: {pct(EMMA.hapaxShare)}
       </Tag>
     </AbsoluteFill>

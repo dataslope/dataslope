@@ -239,13 +239,13 @@ export const AnyScene: React.FC = () => {
               tick={8}
             />
             <Note at={centerAt + r * 3} x={COL_CENTER} y={y(base - 58)}>
-              <span style={{ ...note(26, INK), fontWeight: 600 }}>{fmt(s.center, 1)}</span>
+              <span style={{ ...note(26, INK), fontWeight: 500 }}>{fmt(s.center, 1)}</span>
             </Note>
             <Note at={widthAt + r * 3} x={COL_SPREAD} y={y(base - 58)}>
               <span
                 style={{
                   ...note(26, ACCENT_INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   display: "inline-block",
                   transformOrigin: "left center",
                   transform: `scale(${swell(frame, movesAt - 2 + r * 5, 0.16, 20)})`,
@@ -271,7 +271,7 @@ export const AnyScene: React.FC = () => {
 
       {/* "The maximum lands far out, wide and lopsided." */}
       <Note at={farAt} x={sx(X, 175)} y={y(STAT_ROWS[2] - 92)}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, ...halo }}>far out, wide, and lopsided</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, ...halo }}>far out, wide, and lopsided</span>
       </Note>
     </AbsoluteFill>
   );

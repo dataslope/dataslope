@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
  * those are shared with other videos, so this video takes its own. Never
  * under the house floor of 19px.
  */
-const style = (color?: string, weight = 600): React.CSSProperties => ({
+const style = (color?: string, weight = 500): React.CSSProperties => ({
   fontFamily: MONO,
   fontSize: "max(19px, 0.92em)",
   fontStyle: "normal",

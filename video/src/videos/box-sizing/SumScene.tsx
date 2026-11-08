@@ -124,7 +124,7 @@ export const SumScene: React.FC = () => {
         padding={ease(frame, padAt - 4, 14)}
         border={ease(frame, borderAt - 4, 14)}
       >
-        <span style={{ ...note(22, CONTENT_INK), fontWeight: 600 }}>content</span>
+        <span style={{ ...note(22, CONTENT_INK), fontWeight: 500 }}>content</span>
       </BoxDrawing>
 
       {/* Padding and border on both sides, then each strip as it is read. */}

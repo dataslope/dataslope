@@ -131,7 +131,7 @@ export const Cells: React.FC<{
                 justifyContent: "center",
                 fontFamily: MONO,
                 fontSize: size,
-                fontWeight: 600,
+                fontWeight: 500,
                 fontVariantLigatures: "none",
                 color: ink > 0 && lk?.ink ? `color-mix(in srgb, ${lk.ink.color} ${ink * 100}%, ${color})` : color,
                 ...TABULAR,
@@ -176,7 +176,7 @@ export const Tagline: React.FC<{
   align?: "left" | "center" | "right";
   width?: number;
   children: React.ReactNode;
-}> = ({ x, y, at: from, out, dim, size = 21, color = INK_SOFT, weight = 650, align = "left", width, children }) => {
+}> = ({ x, y, at: from, out, dim, size = 21, color = INK_SOFT, weight = 500, align = "left", width, children }) => {
   const frame = useCurrentFrame();
   const o = ease(frame, from, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10)) * (dim === undefined ? 1 : 1 - ease(frame, dim, 12) * 0.65);
   if (o <= 0) return null;

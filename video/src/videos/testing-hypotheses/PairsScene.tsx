@@ -165,7 +165,7 @@ export const PairsScene: React.FC = () => {
           </Label>
         </Note>
         <Note at={p115At - 2} x={COL[0] - 100} y={y(BOTTOM) + 64}>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             as two separate groups: p = {fmt(PAIRED.unpairedP, 3)}
           </span>
         </Note>
@@ -217,18 +217,18 @@ export const PairsScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={tenAt - 4} x={sx(D, PAIRED.meanChange) + 14} y={y(D_STRIP) - h(60) - 40}>
-          <span style={{ ...note(24, STAT_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
             average drop {fmt(PAIRED.meanChange, 1)}
           </span>
         </Note>
         <div style={{ position: "absolute", left: D.x0, top: y(720), opacity: ease(frame, tenAt - 4, 12), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(40, STAT_INK), fontWeight: 600 }}>
+          <span style={{ ...note(40, STAT_INK), fontWeight: 500 }}>
             <span style={{ fontStyle: "italic" }}>t</span> = {fmt(PAIRED.pairedT, 1)}
           </span>
           <span
             style={{
               ...note(36, STAT_INK),
-              fontWeight: 650,
+              fontWeight: 500,
               marginLeft: 28,
               opacity: ease(frame, billionAt - 6, 12),
             }}

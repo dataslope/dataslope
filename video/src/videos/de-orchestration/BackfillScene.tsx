@@ -121,7 +121,7 @@ export const BackfillScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             reprocess history to{" "}
             {reasons.map((r, i) => (
-              <span key={r.text} style={{ opacity: ease(frame, r.at - 2, 8), fontWeight: 650, color: BLUE_INK }}>
+              <span key={r.text} style={{ opacity: ease(frame, r.at - 2, 8), fontWeight: 500, color: BLUE_INK }}>
                 {r.text}
                 {i < reasons.length - 1 ? <span style={{ color: INK, fontWeight: 400 }}>{i === 0 ? ", " : ", or "}</span> : null}
               </span>
@@ -150,7 +150,7 @@ export const BackfillScene: React.FC = () => {
 
         {/* A year of partitions. */}
         <Note at={yearAt} x={GRID_X - 44} y={y(290)}>
-          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             2025: <span style={{ color: BLUE_INK, opacity: ease(frame, runsAt, 10) }}>{BACKFILL.partitions} daily partitions</span>
           </span>
         </Note>
@@ -190,7 +190,7 @@ export const BackfillScene: React.FC = () => {
           })}
           {MONTHS.map((m, i) =>
             i % 3 ? null : (
-            <text key={m} x={GRID_X - 12} y={gridTop + i * h(ROW_PITCH) + h(ROW_CELL) - 1} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 600 })} opacity={ease(frame, runsAt + i * 1.5, 8)}>
+            <text key={m} x={GRID_X - 12} y={gridTop + i * h(ROW_PITCH) + h(ROW_CELL) - 1} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })} opacity={ease(frame, runsAt + i * 1.5, 8)}>
               {m}
             </text>
             ),
@@ -208,7 +208,7 @@ export const BackfillScene: React.FC = () => {
 
         {/* Why the loop: the cost of one run, a model. */}
         <Note at={loopAt} x={X0} y={y(656)}>
-          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             rows one run processes
             <span style={{ ...label(22, INK_SOFT), fontWeight: 500, opacity: ease(frame, modelAt, 10) }}>
               {" "}
@@ -246,17 +246,17 @@ export const BackfillScene: React.FC = () => {
           </g>
         </svg>
         <Note at={eightAt + 10} x={CH_X1 + 40} y={ly(REFRESH.daily) - 15}>
-          <span style={{ ...note(23, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             one day&apos;s partition: <Num>{count(REFRESH.daily)}</Num>
           </span>
         </Note>
         <Note at={sixAt} x={CH_X1 + 40} y={ly(REFRESH.fullAtEnd) - 15}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             rebuild everything: <Num>{count(REFRESH.fullAtEnd)}</Num>
           </span>
         </Note>
         <Note at={ratioAt + 4} x={CH_X1 + 40} y={(ly(REFRESH.fullAtEnd) + ly(REFRESH.daily)) / 2 - 18}>
-          <span style={{ ...note(30, INK), fontWeight: 800, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{REFRESH.ratio}</Num>×
           </span>
         </Note>

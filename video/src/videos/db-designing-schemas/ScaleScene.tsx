@@ -187,7 +187,7 @@ export const ScaleScene: React.FC = () => {
                       background: hot > 0 ? `color-mix(in srgb, ${MARK_BAD} ${Math.round(hot * 100)}%, transparent)` : undefined,
                       fontFamily: MONO,
                       fontSize: HEAD_SIZE,
-                      fontWeight: 600,
+                      fontWeight: 500,
                       color: INK,
                       whiteSpace: "nowrap",
                     }}
@@ -237,7 +237,7 @@ export const ScaleScene: React.FC = () => {
             })}
           </div>
           {/* What it costs, as it is marked. */}
-          <div style={{ position: "absolute", left: STRIP_X, top: stripTop + bottom + 30, display: "flex", gap: "0.4em", ...label(24, INK), fontWeight: 560, whiteSpace: "nowrap" }}>
+          <div style={{ position: "absolute", left: STRIP_X, top: stripTop + bottom + 30, display: "flex", gap: "0.4em", ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <span style={{ opacity: ease(frame, everyAt, 12) }}>
               One email on <Mark at={everyAt + 4}>{EMAIL_ROWS} rows</Mark>,
             </span>

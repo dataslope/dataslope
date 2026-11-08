@@ -116,7 +116,7 @@ export const NormScene: React.FC = () => {
           <ElbowArrow key={r} points={loop(r)} at={joinAt + 4 + k * 4} />
         ))}
         <Note at={joinAt + 10} x={loopX + 18} y={(og.rowMid(0) + cg.rowMid(0)) / 2 - 16}>
-          <span style={{ ...note(23, KEY_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a join</span>
+          <span style={{ ...note(23, KEY_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a join</span>
         </Note>
 
         {/* ── Denormalized: copied onto each order ── */}
@@ -138,10 +138,10 @@ export const NormScene: React.FC = () => {
           swaps={[{ row: 0, col: fEmail, at: rushedAt + 8, value: newEmail }]}
         />
         <Note at={fasterAt} x={RIGHT_X} y={below + h(20)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>no join: faster reads</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no join: faster reads</span>
         </Note>
         <Note at={priceAt} x={RIGHT_X} y={below + h(62)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             costs: storage
             <span style={{ opacity: ease(frame, disagreeAt, 10) }}>, and copies that can disagree</span>
           </span>
@@ -156,15 +156,15 @@ export const NormScene: React.FC = () => {
           </span>
         </Note>
         <Note at={twoAt + 6} x={RIGHT_X} y={below + h(160)}>
-          <span style={{ ...note(30, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>Ada now has two emails.</span>
+          <span style={{ ...note(30, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Ada now has two emails.</span>
         </Note>
 
         {/* ── Where each belongs, one line each, so the warehouse's reason fits under them ── */}
         <Note at={writesAt} x={X0} y={og.rowTop(NORM_ORDERS.rows.length) + h(36)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Normalize: frequent writes that must stay consistent</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Normalize: frequent writes that must stay consistent</span>
         </Note>
         <Note at={readsAt} x={RIGHT_X} y={og.rowTop(NORM_ORDERS.rows.length) + h(36)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Denormalize: reads dominate,
             <span style={{ color: INK, opacity: ease(frame, warehouseAt - 2, 10) }}> like a warehouse</span>
           </span>

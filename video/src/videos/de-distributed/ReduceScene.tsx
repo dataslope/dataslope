@@ -118,7 +118,7 @@ export const ReduceScene: React.FC = () => {
           }),
         )}
         <Note at={afterAt - 2} x={A_X} y={y(856)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{MR.shuffled}</Num> pairs cross
           </span>
         </Note>
@@ -150,7 +150,7 @@ export const ReduceScene: React.FC = () => {
           }),
         )}
         <Note at={sixAt - 2} x={B_X} y={y(856)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{MR.combinedShuffled}</Num> sums cross
           </span>
         </Note>
@@ -166,13 +166,13 @@ export const ReduceScene: React.FC = () => {
         </Note>
         <Note at={millionAt - 2} x={BAR_X} y={y(420)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>groupByKey</span> shuffles <b style={{ color: ACCENT_INK }}><Num>{count(REDUCE.groupByKey)}</Num> values</b>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>groupByKey</span> shuffles <b style={{ color: ACCENT_INK }}><Num>{count(REDUCE.groupByKey)}</Num> values</b>
           </span>
         </Note>
         <div style={{ position: "absolute", left: BAR_X, top: y(462), width: BAR_W * big, height: h(34), background: `color-mix(in srgb, ${ACCENT} 55%, ${PAPER})`, borderRadius: 3 }} />
         <Note at={fourAt - 2} x={BAR_X} y={y(530)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>reduceByKey</span> shuffles <b style={{ color: OK_INK }}><Num>{count(REDUCE.reduceByKey)}</Num> partial counts</b>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>reduceByKey</span> shuffles <b style={{ color: OK_INK }}><Num>{count(REDUCE.reduceByKey)}</Num> partial counts</b>
           </span>
         </Note>
         <div
@@ -187,20 +187,20 @@ export const ReduceScene: React.FC = () => {
           }}
         />
         <Note at={fewerAt - 2} x={BAR_X + 30} y={y(574)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{REDUCE.ratio}</Num> × fewer
           </span>
         </Note>
         {/* Why else, and what to use. */}
         <Note at={hotAt - 2} x={R_X} y={y(660)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             groupByKey: a hot key&apos;s every value
             <br />
             in one task&apos;s memory
           </span>
         </Note>
         <Note at={preferAt - 2} x={R_X} y={y(752)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             prefer <span style={{ fontFamily: MONO, fontSize: 21 }}>reduceByKey</span>
             <span style={{ opacity: ease(frame, dfAt, 10) }}>
               , or <span style={{ fontFamily: MONO, fontSize: 21 }}>groupBy().agg()</span>

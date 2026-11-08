@@ -198,7 +198,7 @@ export const RowsScene: React.FC = () => {
         {sample.rows.map((_, r) => cols.map((__, c) => cell(rowX(r, c), rowY, c, rowStoreAt + 4 + r * 3 + c * 0.6, `r${r}${c}`)))}
         <ReadMark x={rowX(ORDER, 0)} y={rowY} width={cols.length * CW - 4} height={sh} at={onePlaceAt} out={fewAt} />
         <Note at={onePlaceAt + 4} x={rowX(ORDER, 0)} y={rowY + sh + h(10)} out={fewAt}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>one order, one place</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>one order, one place</span>
         </Note>
         {/* A report's column, scattered through the rows. */}
         {sample.rows.map((_, r) => (
@@ -268,7 +268,7 @@ export const RowsScene: React.FC = () => {
           ]}
         />
         <div style={{ position: "absolute", left: BAR_X, top: y(TOP) - 4, ...label(21, INK), whiteSpace: "nowrap", opacity: ease(frame, fiveAt - 6, 12) }}>
-          <span style={{ fontFamily: MONO, fontWeight: 600 }}>sales.parquet</span>
+          <span style={{ fontFamily: MONO, fontWeight: 500 }}>sales.parquet</span>
           <span style={{ color: INK_SOFT, fontWeight: 500 }}>
             {" "}
             · DuckDB read <Num>{MB(QUERY.parquet.read)}</Num>
@@ -281,7 +281,7 @@ export const RowsScene: React.FC = () => {
         <FileBar x={BAR_X} y={y(TOP) + h(34)} width={pqW} height={h(40)} at={fiveAt - 6} segments={PARQUET_SEGMENTS} />
         <ReadMark x={BAR_X + pqW * read.before} y={y(TOP) + h(34)} width={pqW * read.share} height={h(40)} at={fiveAt + 4} />
         <div style={{ position: "absolute", left: BAR_X, top: y(TOP) + h(100), ...label(21, INK), whiteSpace: "nowrap", opacity: ease(frame, mixesAt, 12) }}>
-          <span style={{ fontFamily: MONO, fontWeight: 600 }}>sales.csv</span>
+          <span style={{ fontFamily: MONO, fontWeight: 500 }}>sales.csv</span>
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, wholeAt - 4, 10) }}>
             {" "}
             · DuckDB read all <Num>{MB(QUERY.csv.read)}</Num>

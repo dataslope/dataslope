@@ -153,7 +153,7 @@ export const PointScene: React.FC = () => {
           );
         })}
         <Note at={justAt + 2} x={orders.x} y={copyTop + copies.length * h(ENTITY.row) + 18}>
-          <div style={{ ...label(24, INK), fontWeight: 560, whiteSpace: "nowrap", lineHeight: 1.45 }}>
+          <div style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap", lineHeight: 1.45 }}>
             <div>
               Just <Mono color={KEY_INK}>customer_id</Mono>.
             </div>

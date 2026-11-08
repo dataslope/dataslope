@@ -49,7 +49,7 @@ const under = (c: Ctx, lines: number, top = c.T) => top + listingHeight(lines, S
 /** A query's name over a result, set as code. */
 const CodeName: React.FC<{ x: number; top: number; at: number; children: React.ReactNode }> = ({ x, top, at, children }) => (
   <Ink at={at} dur={12} style={{ left: x, top: top - 36, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{children}</span>
   </Ink>
 );
 
@@ -201,7 +201,7 @@ const Union: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={preferAt - 2} x={ag2.right + 50} y={resultTop + c.h(102)}>
-        <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", fontWeight: 650 }}>the default, unless you need the dedup</span>
+        <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", fontWeight: 500 }}>the default, unless you need the dedup</span>
       </Note>
     </>
   );
@@ -334,7 +334,7 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <Note at={rangeAt} x={R_X} y={under(c, R.lines.length) + c.h(10)}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>with no frame written:</span>
-        <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+        <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
           RANGE BETWEEN UNBOUNDED PRECEDING{"\n"}  AND CURRENT ROW
         </div>
       </Note>
@@ -435,7 +435,7 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
         return (
           <React.Fragment key={k.name}>
             <Ink at={k.at - 2} dur={12} style={{ left: R_X, top: rowY(i) + c.h(8), whiteSpace: "nowrap" }}>
-              <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{k.name}</span>
+              <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{k.name}</span>
             </Ink>
             {chips.map((ch, j) => {
               const p = ease(frame, k.at + 2 + j * 2, 8);
@@ -467,7 +467,7 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
               );
             })}
             <Ink at={k.countAt} dur={10} style={{ left: chipsX + chips.length * (CHIP_W + CHIP_GAP) + 16, top: rowY(i) + c.h(8), whiteSpace: "nowrap" }}>
-              <span style={{ ...note(24, INK), fontWeight: 650 }}>
+              <span style={{ ...note(24, INK), fontWeight: 500 }}>
                 <Num>{chips.length}</Num> rows
               </span>
             </Ink>
@@ -635,12 +635,12 @@ const Cross: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {regions.map((r, j) => (
         <Ink key={r} at={at + j * 2} dur={10} style={{ left: gx + j * cw, top: c.T, width: cw, textAlign: "center" }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK }}>{r}</span>
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK }}>{r}</span>
         </Ink>
       ))}
       {products.map((p, i) => (
         <Ink key={p} at={at + 4 + i * 2} dur={10} style={{ left: R_X, top: gy + i * ch + ch / 2 - 16 }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK }}>{p}</span>
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK }}>{p}</span>
         </Ink>
       ))}
       {products.flatMap((_, i) =>

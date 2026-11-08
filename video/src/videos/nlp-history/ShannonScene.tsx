@@ -47,7 +47,7 @@ const PaperPage: React.FC<{ x: number; top: number; width: number; height: numbe
     >
       <div style={{ position: "absolute", left: pad, right: pad, top: 20, display: "flex", justifyContent: "space-between", ...note(19, INK_SOFT), whiteSpace: "nowrap" }}>
         <span>{SHANNON_PAPER.journal}</span>
-        <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, at + 10, 10) }}>{SHANNON_PAPER.date}</span>
+        <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, at + 10, 10) }}>{SHANNON_PAPER.date}</span>
       </div>
       {/* The masthead rule; what follows it starts 28px below. */}
       <div style={{ position: "absolute", left: pad, right: pad, top: 52, height: 1.5, background: INK }} />
@@ -127,7 +127,7 @@ const ContentsPage: React.FC<{ x: number; top: number; width: number; height: nu
     >
       <div style={{ position: "absolute", left: pad, right: pad, top: 20, display: "flex", justifyContent: "space-between", ...note(19, INK_SOFT), whiteSpace: "nowrap" }}>
         <span>Contents</span>
-        <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, at + 8, 10) }}>Part I: Discrete Noiseless Systems</span>
+        <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, at + 8, 10) }}>Part I: Discrete Noiseless Systems</span>
       </div>
       {/* The masthead rule; what follows it starts 28px below. */}
       <div style={{ position: "absolute", left: pad, right: pad, top: 52, height: 1.5, background: INK }} />
@@ -140,7 +140,7 @@ const ContentsPage: React.FC<{ x: number; top: number; width: number; height: nu
               <div style={{ position: "absolute", left: pad - 10, top: lineTop - 6, width: (width - 2 * pad + 20) * tuck, height: 46, borderRadius: 6, background: HIGHLIGHT }} />
             ) : null}
             <Ink at={at + 8 + i * 5} dur={12} style={{ left: pad, top: lineTop, right: pad, whiteSpace: "nowrap", opacity: isTucked ? 1 : 1 - tuck * 0.55 }}>
-              <div style={{ display: "flex", gap: 18, alignItems: "baseline", ...note(26, INK), fontWeight: isTucked && tuck > 0.5 ? 600 : 400 }}>
+              <div style={{ display: "flex", gap: 18, alignItems: "baseline", ...note(26, INK), fontWeight: isTucked && tuck > 0.5 ? 500 : 400 }}>
                 <span style={{ ...TABULAR, color: INK_SOFT, width: 22, textAlign: "right" }}>{i + 1}.</span>
                 <span>{i === 5 ? <>Choice, Uncertainty and <Mark at={markAt}>Entropy</Mark></> : t}</span>
               </div>
@@ -434,7 +434,7 @@ export const ShannonScene: React.FC = () => {
               }}
             />
             <Ink at={at + 6} style={{ left: TALLY_X + after[w] * UNIT + 16, top: top + 6, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(28, INK), ...TABULAR, fontWeight: 650 }}>{after[w]}</span>
+              <span style={{ ...note(28, INK), ...TABULAR, fontWeight: 500 }}>{after[w]}</span>
             </Ink>
           </React.Fragment>
         );

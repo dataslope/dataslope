@@ -65,7 +65,7 @@ const Stop: React.FC<{ i: number; at: number; title: string; children?: React.Re
           justifyContent: "center",
           textAlign: "center",
           ...note(32, INK),
-          fontWeight: 650,
+          fontWeight: 500,
           lineHeight: 1.15,
           opacity: p,
           transform: `translateY(${(1 - p) * 12}px)`,
@@ -87,7 +87,7 @@ const Stop: React.FC<{ i: number; at: number; title: string; children?: React.Re
           justifyContent: "center",
           ...label(24, String(DISC.color)),
           ...TABULAR,
-          fontWeight: 600,
+          fontWeight: 500,
           transform: `scale(${0.6 + 0.4 * p})`,
           opacity: p,
         }}
@@ -198,7 +198,7 @@ export const LoopScene: React.FC = () => {
           <div style={{ position: "absolute", left: cx(3) - 150, top: below + h(4), lineHeight: 1.7 }}>
             <div style={{ ...mono, opacity: ease(frame, pandasAt - 2, 12) }}>df.groupby(…)</div>
             <div style={{ ...mono, opacity: ease(frame, sqlAt - 2, 12) }}>
-              <span style={{ color: BLUE_INK, fontWeight: 600 }}>SELECT</span> …
+              <span style={{ color: BLUE_INK, fontWeight: 500 }}>SELECT</span> …
             </div>
           </div>
         </Stop>

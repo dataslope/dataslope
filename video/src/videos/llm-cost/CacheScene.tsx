@@ -164,7 +164,7 @@ export const CacheScene: React.FC = () => {
           justifyContent: "center",
           fontFamily: MONO,
           fontSize: 20,
-          fontWeight: 600,
+          fontWeight: 500,
           color: INK,
           opacity: ease(frame, stampAt, 12),
           transform: `translateY(${(1 - ease(frame, stampAt, 14)) * -30}px)`,
@@ -174,10 +174,10 @@ export const CacheScene: React.FC = () => {
         {STAMP}
       </div>
       <Note at={byteAt - 2} x={X0} y={rowY(2) + rh + 14}>
-        <span style={{ ...note(23, POINT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a timestamp on top: new bytes every turn</span>
+        <span style={{ ...note(23, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a timestamp on top: new bytes every turn</span>
       </Note>
       <Note at={fullAt - 2} x={X0 + STAMP_W + PREFIX_W + TAIL_W + 22} y={rowY(2) + rh + 14} align="right">
-        <span style={{ ...note(23, INPUT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>back to full price</span>
+        <span style={{ ...note(23, INPUT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>back to full price</span>
       </Note>
       {/* The exact prefix the cache matches, outlined on turn 2. */}
       <div
@@ -209,11 +209,11 @@ export const CacheScene: React.FC = () => {
         return (
           <React.Fragment key={r.name}>
             <Ink at={r.at} dur={12} style={{ left: X0, top: ry - 2, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(25, r.ink), fontWeight: 600 }}>{r.name}</span>
+              <span style={{ ...label(25, r.ink), fontWeight: 500 }}>{r.name}</span>
             </Ink>
             <HBar x={PRICE_X} y={ry} w={r.w} h={h(32)} at={r.at + 2} dur={16} fill={r.fill} />
             <Note at={r.valueAt - 4} x={PRICE_X + r.w + 16} y={ry + h(16) - 18}>
-              <span style={{ ...note(27, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{usd(r.value, r.digits)}</span>
+              <span style={{ ...note(27, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{usd(r.value, r.digits)}</span>
             </Note>
           </React.Fragment>
         );
@@ -249,7 +249,7 @@ export const CacheScene: React.FC = () => {
         <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>a tenth</span>
       </div>
       <Note at={twentiethAt + 2} x={PRICE_X + FULL_W * CACHE_FRACTION.sonnet + 130} y={y(PRICE_ROW_Y[1]) + h(16) - 16}>
-        <span style={{ ...note(25, CACHED_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a twentieth</span>
+        <span style={{ ...note(25, CACHED_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a twentieth</span>
       </Note>
     </AbsoluteFill>
   );

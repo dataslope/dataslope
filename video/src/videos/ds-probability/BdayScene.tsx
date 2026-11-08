@@ -113,7 +113,7 @@ export const BdayScene: React.FC = () => {
           return p > 0 ? <Person key={i} x={x} y={py} height={RING.person * p} /> : null;
         })}
         <Note at={yesAt} x={90} y={y(320)}>
-          <span style={{ ...note(40, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Yes, just.</span>
+          <span style={{ ...note(40, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Yes, just.</span>
         </Note>
         <Note at={pairsAt + 4} x={RING.cx - 170} width={340} y={cy - 26} from="up" style={{ textAlign: "center" }}>
           <span

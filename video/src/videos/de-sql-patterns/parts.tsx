@@ -61,7 +61,7 @@ export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?
       fontFamily: MONO,
       fontSize: "max(19px, 0.92em)",
       fontStyle: "normal",
-      fontWeight: weight ?? 600,
+      fontWeight: weight ?? 500,
       color,
       fontVariantLigatures: "none",
       wordSpacing: "-0.3em",
@@ -263,7 +263,7 @@ const CellText: React.FC<{ text: string; size: number; color: string; italic?: b
       justifyContent: "center",
       fontFamily: MONO,
       fontSize: size,
-      fontWeight: 600,
+      fontWeight: 500,
       fontStyle: italic ? "italic" : undefined,
       color,
       fontVariantLigatures: "none",
@@ -299,7 +299,7 @@ const Span: React.FC<{ g: StripGeometry; span: StripSpan }> = ({ g, span }) => {
         />
       </svg>
       <Ink at={span.at + 6} dur={12} style={{ left: x0, top: y + h(10), width: x1 - x0, textAlign: "center", whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, span.ink ?? INK), fontWeight: 650 }}>{span.label}</span>
+        <span style={{ ...note(22, span.ink ?? INK), fontWeight: 500 }}>{span.label}</span>
       </Ink>
     </div>
   );

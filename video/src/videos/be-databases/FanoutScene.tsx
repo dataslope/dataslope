@@ -44,7 +44,7 @@ const Chip: React.FC<{ x: number; y: number; amount: number; tone: "data" | "bad
         justifyContent: "center",
         fontFamily: MONO,
         fontSize: 19,
-        fontWeight: 600,
+        fontWeight: 500,
         color: INK,
         fontVariantLigatures: "none",
         opacity,
@@ -211,15 +211,15 @@ export const FanoutScene: React.FC = () => {
         <Note at={checkAt} x={R_X} y={listTop + h(112)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "baseline", gap: "0.4em", fontSize: 24 }}>
             <b>Row counts:</b>
-            <span style={{ color: BLUE_INK, fontWeight: 650 }}>
+            <span style={{ color: BLUE_INK, fontWeight: 500 }}>
               <Num>{FANOUT.orders}</Num>
             </span>
             <span style={{ color: INK_SOFT }}>→</span>
-            <span style={{ color: ACCENT_INK, fontWeight: 650 }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 500 }}>
               <Num>{FANOUT.joinedRows}</Num>
             </span>
             <span style={{ color: INK_SOFT }}>→</span>
-            <span style={{ color: OK_INK, fontWeight: 650 }}>
+            <span style={{ color: OK_INK, fontWeight: 500 }}>
               <Num>{FANOUT.orders}</Num>
             </span>
             <span style={{ color: INK_SOFT, fontWeight: 500 }}>before and after every join</span>
@@ -232,5 +232,5 @@ export const FanoutScene: React.FC = () => {
 
 /** A table or column name inside a label. */
 const SmallCode: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 600, fontVariantLigatures: "none" }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 500, fontVariantLigatures: "none" }}>{children}</span>
 );

@@ -387,7 +387,7 @@ export const PaletteScene: React.FC = () => {
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>about 8% of men have red-green color blindness</span>
         </Note>
         <Note at={aloneAt - 2} x={PANELS[0].x0} y={y(350)}>
-          <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>so color can&apos;t be the only cue</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>so color can&apos;t be the only cue</span>
         </Note>
 
         <PanelTitle x={PANELS[0].x0} y={pTop - h(56)} at={mostAt - 4}>

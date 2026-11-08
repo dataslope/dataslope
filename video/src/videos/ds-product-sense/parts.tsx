@@ -64,7 +64,7 @@ export const Chip: React.FC<{
   out?: number;
   weight?: number;
   children: React.ReactNode;
-}> = ({ x, y, at: from, ink = INK, size = 26, lit, dim, out, weight = 600, children }) => {
+}> = ({ x, y, at: from, ink = INK, size = 26, lit, dim, out, weight = 500, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 12);
   const l = lit === undefined ? 0 : ease(frame, lit, 12);
@@ -185,12 +185,12 @@ export const Step: React.FC<{
           alignItems: "center",
           justifyContent: "center",
           ...label(21, INK),
-          fontWeight: 600,
+          fontWeight: 500,
         }}
       >
         {n}
       </span>
-      <span style={{ position: "relative", ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{children}</span>
+      <span style={{ position: "relative", ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{children}</span>
     </div>
   );
 };

@@ -152,7 +152,7 @@ export const BiggerScene: React.FC = () => {
       </svg>
       <Note at={biggerFrom + 12} x={PX.x1 + 56} y={y(truthY) - 16}>
         <span style={{ ...note(21, INK_SOFT), ...halo }}>true average </span>
-        <span style={{ ...note(22, INK), fontWeight: 600, ...halo }}>{fmt(TRUE_MEAN)}</span>
+        <span style={{ ...note(22, INK), fontWeight: 500, ...halo }}>{fmt(TRUE_MEAN)}</span>
       </Note>
 
       {/* Where 95 in 100 averages fall, by method. */}
@@ -183,13 +183,13 @@ export const BiggerScene: React.FC = () => {
 
       {/* End labels. */}
       <Note at={closingAt - 2} x={PX.x1 + 56} y={y(truthY) + 14}>
-        <span style={{ ...note(22, RANDOM_INK), fontWeight: 600, ...halo }}>random {fmt(LARGEST.random.center)}</span>
+        <span style={{ ...note(22, RANDOM_INK), fontWeight: 500, ...halo }}>random {fmt(LARGEST.random.center)}</span>
       </Note>
       <Note at={wrongAt - 2} x={PX.x1 + 56} y={y(ly(LARGEST.convenience.center)) - 16}>
         <span
           style={{
             ...note(22, EASY_INK),
-            fontWeight: 600,
+            fontWeight: 500,
             ...halo,
             display: "inline-block",
             transformOrigin: "left center",
@@ -210,7 +210,7 @@ export const BiggerScene: React.FC = () => {
       {/* "Still almost ten points high", at the largest size. */}
       <VBracket x={last + 34} y0={y(truthY)} y1={y(ly(LARGEST.convenience.center))} at={steadyFrom + 4} />
       <Note at={highAt - 4} x={last + 56} y={y(ly((TRUE_MEAN + LARGEST.convenience.center) / 2)) - 17}>
-        <div style={{ ...note(26, EASY_INK), fontWeight: 600, ...halo }}>
+        <div style={{ ...note(26, EASY_INK), fontWeight: 500, ...halo }}>
           {fmt(LARGEST.convenience.center - TRUE_MEAN)} points high
         </div>
       </Note>

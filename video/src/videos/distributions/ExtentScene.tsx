@@ -153,7 +153,7 @@ export const ExtentScene: React.FC = () => {
           { x: minX, v: RANGE.min, at: runAt + 4 },
           { x: maxX, v: RANGE.max, at: seventeenEnd - 8 },
         ].map((e) => (
-          <Centered key={e.v} x={e.x} y={stripY + h(JIT + 26)} opacity={ease(frame, e.at, 10)} style={{ ...note(22, INK), fontWeight: 650 }}>
+          <Centered key={e.v} x={e.x} y={stripY + h(JIT + 26)} opacity={ease(frame, e.at, 10)} style={{ ...note(22, INK), fontWeight: 500 }}>
             {fmt(e.v, 1)}
           </Centered>
         ))}

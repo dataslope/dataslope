@@ -153,7 +153,7 @@ export const PlausibleScene: React.FC = () => {
         );
       })}
       <Note at={shapeAt - 2} x={X0 + 920} y={y(SLOT_Y) + h(35) - 20}>
-        <span style={{ ...note(26, GOOD_INK), fontWeight: 650 }}>The shape is right.</span>
+        <span style={{ ...note(26, GOOD_INK), fontWeight: 500 }}>The shape is right.</span>
       </Note>
     </AbsoluteFill>
   );

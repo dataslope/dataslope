@@ -327,7 +327,7 @@ export const CondScene: React.FC = () => {
           </span>
         </Ink>
         <Note at={breaksAt} x={900} y={y(762)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>where intuition breaks</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>where intuition breaks</span>
         </Note>
       </Drift>
     </AbsoluteFill>

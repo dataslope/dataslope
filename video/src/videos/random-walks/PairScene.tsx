@@ -87,10 +87,10 @@ export const PairScene: React.FC = () => {
 
       {/* Each line named at its end, in its own ink. */}
       <Note at={start - 20} x={WALK_X.x1 + 16} y={end(WALK_A) - 16}>
-        <span style={{ ...note(21, COLOR_INK.a), fontWeight: 650, ...halo }}>Walk a</span>
+        <span style={{ ...note(21, COLOR_INK.a), fontWeight: 500, ...halo }}>Walk a</span>
       </Note>
       <Note at={n.beat("pair").to - 6} x={WALK_X.x1 + 16} y={end(WALK_B) - 12}>
-        <span style={{ ...note(21, COLOR_INK.b), fontWeight: 650, ...halo }}>Walk b</span>
+        <span style={{ ...note(21, COLOR_INK.b), fontWeight: 500, ...halo }}>Walk b</span>
       </Note>
 
       <Ink at={corrAt - 4} dur={14} style={{ left: R_X, top: y(380) }}>

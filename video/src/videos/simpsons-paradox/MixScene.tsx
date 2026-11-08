@@ -139,7 +139,7 @@ export const MixScene: React.FC = () => {
                       textAlign: roomy ? "center" : "left",
                       opacity: ease(frame, whereAt + gi * 6 + i * 3 + 8, 10),
                       ...label(roomy ? 26 : 20, roomy ? (onLight(d) ? INK : PAPER) : INK_SOFT),
-                      fontWeight: 600,
+                      fontWeight: 500,
                     }}
                   >
                     {d.dept}
@@ -178,7 +178,7 @@ export const MixScene: React.FC = () => {
           {DEPTS.map((d) => (
             <span key={d.dept} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
               <span style={{ width: 18, height: 18, background: ds("gray", step(d)), display: "inline-block" }} />
-              <span style={{ ...note(21, INK), fontWeight: 650 }}>{d.dept}</span>
+              <span style={{ ...note(21, INK), fontWeight: 500 }}>{d.dept}</span>
               <span style={note(21, INK_SOFT)}>{pct(d.rate, 0)}</span>
             </span>
           ))}

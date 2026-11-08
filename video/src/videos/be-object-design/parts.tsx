@@ -66,7 +66,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -254,7 +254,7 @@ export const Box: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      {title ? <span style={{ ...label(size, c.ink), fontWeight: 600, whiteSpace: "nowrap", textAlign: align }}>{title}</span> : null}
+      {title ? <span style={{ ...label(size, c.ink), fontWeight: 500, whiteSpace: "nowrap", textAlign: align }}>{title}</span> : null}
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: align }}>{sub}</span> : null}
       {children}
     </div>
@@ -332,7 +332,7 @@ export const Pill: React.FC<{
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.62;
   return (
     <Ink at={at} dur={12} out={out} style={{ left: x, top: y + 6, opacity: 1 - d }}>
-      <span style={{ ...label(size, tone === "plain" ? INK_SOFT : TONE[tone].ink), fontWeight: 600, whiteSpace: "nowrap" }}>{children}</span>
+      <span style={{ ...label(size, tone === "plain" ? INK_SOFT : TONE[tone].ink), fontWeight: 500, whiteSpace: "nowrap" }}>{children}</span>
     </Ink>
   );
 };
@@ -411,7 +411,7 @@ export const Value: React.FC<{
         transformOrigin: "0% 50%",
       }}
     >
-      <span style={{ ...label(size, toneInk(tone)), fontWeight: 750, fontVariantNumeric: "tabular-nums lining-nums", whiteSpace: "nowrap" }}>{children}</span>
+      <span style={{ ...label(size, toneInk(tone)), fontWeight: 500, fontVariantNumeric: "tabular-nums lining-nums", whiteSpace: "nowrap" }}>{children}</span>
     </div>
   );
 };

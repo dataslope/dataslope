@@ -41,8 +41,8 @@ const Loss: React.FC<{ c: Ctx }> = ({ c }) => {
         <Note key={r.task} at={r.at - 2} x={COLS[0]} y={c.y(430) + i * c.h(66)}>
           <div style={{ position: "relative", width: 900, ...note(28, INK), whiteSpace: "nowrap" }}>
             <span>{r.task}</span>
-            <span style={{ position: "absolute", left: COLS[1] - COLS[0], color: BLUE_INK, fontWeight: 650 }}>{r.out}</span>
-            <span style={{ position: "absolute", left: COLS[2] - COLS[0], color: OK_INK, fontWeight: 650 }}>{r.loss}</span>
+            <span style={{ position: "absolute", left: COLS[1] - COLS[0], color: BLUE_INK, fontWeight: 500 }}>{r.out}</span>
+            <span style={{ position: "absolute", left: COLS[2] - COLS[0], color: OK_INK, fontWeight: 500 }}>{r.loss}</span>
           </div>
         </Note>
       ))}
@@ -50,7 +50,7 @@ const Loss: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>or a robust loss, for outliers</span>
       </Note>
       <Note at={stallsAt - 2} x={COLS[0]} y={c.y(730)}>
-        <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           squared error on a sigmoid output: <Mark at={stallsAt + 6}>stalls once it saturates</Mark>
         </span>
       </Note>
@@ -87,7 +87,7 @@ const Init: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={equalAt - 2} x={R_X + 40} y={c.y(330)}>
         <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-          every weight equal: <span style={{ color: ACCENT_INK, fontWeight: 650 }}>the units stay copies</span>
+          every weight equal: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>the units stay copies</span>
         </span>
       </Note>
       <Axes x={xs} y={ys} xTicks={[0, 2, 4, 6, 8, 10]} xTitle={`ReLU layers, ${INIT.width} wide`} yTitle="the signal's spread" at={scaleAt - 4} />
@@ -188,7 +188,7 @@ const Epoch: React.FC<{ c: Ctx }> = ({ c }) => {
         <rect x={bar.x} y={bar.y - 8} width={seg} height={bar.h + 16} fill={OK} opacity={ease(frame, batchAt, 10)} />
       </Svg>
       <Note at={batchAt + 2} x={bar.x} y={bar.y + bar.h + c.h(14)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>one batch → one update: an iteration</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one batch → one update: an iteration</span>
       </Note>
       <Note at={iterAt + 6} x={bar.x} y={bar.y + bar.h + c.h(54)}>
         <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>batch: the examples behind one update; iteration: the update</span>

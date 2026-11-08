@@ -177,7 +177,7 @@ export const CvScene: React.FC = () => {
             })}
           </Svg>
           <Bracket x0={lo} x1={hi} y={base + h(62)} at={rangeAt} color={ACCENT}>
-            <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, ...TABULAR }}>
+            <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, ...TABULAR }}>
               {pct(CV.min, 1)} to {pct(CV.max)}
             </span>
           </Bracket>
@@ -191,7 +191,7 @@ export const CvScene: React.FC = () => {
             <line x1={meanX} x2={meanX} y1={top - h(14)} y2={base} stroke={OK} strokeWidth={3.4} />
           </Svg>
           <Note at={meanAt + 2} x={STRIP.left} y={base + h(128)}>
-            <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               five folds, averaged: <span style={TABULAR}>{fmt(CV.mean * 100, 1)}%</span>
             </span>
           </Note>
@@ -239,7 +239,7 @@ export const CvScene: React.FC = () => {
                     left: FOLDS.left + FOLDS.width + 22,
                     top: rowTop + h(4),
                     ...note(26, BLUE_INK),
-                    fontWeight: 650,
+                    fontWeight: 500,
                     ...TABULAR,
                     opacity: ease(frame, (k === 0 ? fifthAt : rowAt) + 4, 10),
                   }}
@@ -285,7 +285,7 @@ export const CvScene: React.FC = () => {
                     }}
                   />
                   <Note at={s.at - 2} x={s.left + 14} y={barTop + h(22)}>
-                    <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{s.name}</span>
+                    <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{s.name}</span>
                   </Note>
                   <Note at={s.at + 4} x={s.left + 14} y={barTop + barH + h(18)}>
                     <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
@@ -345,7 +345,7 @@ const TimeSeries: React.FC<{ at: number; afterAt: number; left: number; top: num
   const rows = 3;
   return (
     <>
-      <div style={{ position: "absolute", left, top, ...label(21, INK), fontWeight: 650, opacity: ease(frame, from, 10), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left, top, ...label(21, INK), fontWeight: 500, opacity: ease(frame, from, 10), whiteSpace: "nowrap" }}>
         time series: validate only on what comes after
       </div>
       {Array.from({ length: rows }, (_, r) =>

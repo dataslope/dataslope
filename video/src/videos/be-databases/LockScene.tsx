@@ -70,7 +70,7 @@ const AccountRow: React.FC<{ x: number; y: number; h: number; id: number; balanc
       }}
     >
       <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>account {id}</span>
-      <span style={{ fontFamily: MONO, fontSize: 22, color: BLUE_INK, fontWeight: 600 }}>{balance}</span>
+      <span style={{ fontFamily: MONO, fontSize: 22, color: BLUE_INK, fontWeight: 500 }}>{balance}</span>
     </div>
   );
 };
@@ -179,7 +179,7 @@ export const LockScene: React.FC = () => {
         {/* ── Left: pessimistic, centred until the optimistic side arrives ── */}
         <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - ease(frame, optAt - 12, 24)) * 460}px)` }}>
         <Note at={pessAt} x={X0} y={y(HEAD_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Pessimistic: lock first</span>
+          <span style={{ ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Pessimistic: lock first</span>
         </Note>
         <AccountRow x={X0} y={rowsTop} h={rowH} id={1} balance={100} at={forUpdateAt} tone={ease(frame, untilAt, 8) > 0.5 ? "held" : "data"} />
         <AccountRow x={X0} y={row2} h={rowH} id={2} balance={LOCK.otherRow?.balance ?? 0} at={forUpdateAt + 4} tone={ease(frame, freeAt + 4, 8) > 0.5 ? "ok" : "data"} />
@@ -199,7 +199,7 @@ export const LockScene: React.FC = () => {
         <Listing lines={LOCK.nowait} x={X0} top={lockTop} width={740} size={20} at={notWaitAt - 2} marks={[{ line: "NOWAIT", text: "NOWAIT", at: notWaitAt + 6 }]} />
         <PgError x={X0} top={lockTop + listingHeight(LOCK.nowait.length, 20) + h(10)} width={704} at={refusesAt} message={LOCK.refused} size={19} />
         <Note at={freeAt + 4} x={X0 + ROW_W + 40} y={row2 + h(8)}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>granted at once</span>
+          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>granted at once</span>
         </Note>
 
         </div>
@@ -208,7 +208,7 @@ export const LockScene: React.FC = () => {
 
         {/* ── Right: optimistic ── */}
         <Note at={optAt} x={R_X} y={y(HEAD_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Optimistic: no lock, a version</span>
+          <span style={{ ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Optimistic: no lock, a version</span>
         </Note>
         <Note at={versionAt} x={R_X} y={y(HEAD_Y) + h(52)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", fontSize: 23 }}>
@@ -255,7 +255,7 @@ export const LockScene: React.FC = () => {
           </span>
         </Note>
         <Note at={nothingAt + 4} x={sg.right + 24} y={sg.rowTop(3) + h(8)}>
-          <span style={{ ...note(21, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>stale</span>
+          <span style={{ ...note(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>stale</span>
         </Note>
       </Drift>
     </AbsoluteFill>

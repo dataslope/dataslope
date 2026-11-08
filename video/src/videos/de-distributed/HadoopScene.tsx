@@ -84,7 +84,7 @@ export const HadoopScene: React.FC = () => {
 
         {/* ── Hadoop: local disk for the shuffle, HDFS after every reduce ── */}
         <Note at={hadoopAt - 2} x={120} y={hMid - h(30)}>
-          <span style={{ ...label(24, INK), fontWeight: 600, display: "block", lineHeight: 1.25 }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, display: "block", lineHeight: 1.25 }}>
             Hadoop
             <br />
             MapReduce
@@ -102,7 +102,7 @@ export const HadoopScene: React.FC = () => {
             <React.Fragment key={i}>
               <Machine x={BOX_X[i]} top={y(H_TOP)} width={BOX_W} height={h(BOX_H)} at={boxAt} fill={`color-mix(in srgb, ${BAR} 8%, ${PAPER})`} />
               <Note at={boxAt + 4} x={BOX_X[i]} y={hMid - 15} width={BOX_W} style={{ textAlign: "center" }}>
-                <span style={{ ...label(23, INK), fontWeight: 650 }}>{s}</span>
+                <span style={{ ...label(23, INK), fontWeight: 500 }}>{s}</span>
               </Note>
               <Arrow from={[BOX_X[i] + BOX_W + 4, hMid]} to={[dx - 6, hMid]} at={dAt - 4} dur={8} color={ink} width={1.8} head={10} />
               <Disk x={dx} top={hMid - DISK_H / 2} at={dAt} hot={isHdfs(i) ? red : 0} />
@@ -110,7 +110,7 @@ export const HadoopScene: React.FC = () => {
                 <Arrow from={[dx + DISK_W + 4, hMid]} to={[nextX - 6, hMid]} at={dAt + 4} dur={8} color={ink} width={1.8} head={10} />
               ) : null}
               <Note at={dAt + 2} x={gap(i) - 100} y={hMid + h(DISK_NOTE)} width={200} style={{ textAlign: "center" }}>
-                <span style={{ ...label(20, isHdfs(i) ? (hot ? ACCENT_INK : INK_SOFT) : INK_SOFT), fontWeight: isHdfs(i) ? 650 : 500, whiteSpace: "nowrap" }}>
+                <span style={{ ...label(20, isHdfs(i) ? (hot ? ACCENT_INK : INK_SOFT) : INK_SOFT), fontWeight: isHdfs(i) ? 500 : 500, whiteSpace: "nowrap" }}>
                   {isHdfs(i) ? (last ? "HDFS" : "HDFS, replicated") : "local disk"}
                 </span>
               </Note>
@@ -118,7 +118,7 @@ export const HadoopScene: React.FC = () => {
           );
         })}
         <Note at={everyAt + 4} x={NOTE_X} y={hMid - h(44)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             every reduce:
             <br />
             HDFS, read back
@@ -129,7 +129,7 @@ export const HadoopScene: React.FC = () => {
 
         {/* ── Spark: the shuffle still on local disk, reduce to map in memory ── */}
         <Note at={sparkAt - 2} x={120} y={sMid - 16}>
-          <span style={{ ...label(24, INK), fontWeight: 600 }}>Spark</span>
+          <span style={{ ...label(24, INK), fontWeight: 500 }}>Spark</span>
         </Note>
         {STEPS.map((s, i) => {
           const boxAt = sparkAt + 2 + i * 3;
@@ -139,7 +139,7 @@ export const HadoopScene: React.FC = () => {
             <React.Fragment key={i}>
               <Machine x={BOX_X[i]} top={y(S_TOP)} width={BOX_W} height={h(BOX_H)} at={boxAt} fill={`color-mix(in srgb, ${BAR} 8%, ${PAPER})`} />
               <Note at={boxAt + 4} x={BOX_X[i]} y={sMid - 15} width={BOX_W} style={{ textAlign: "center" }}>
-                <span style={{ ...label(23, INK), fontWeight: 650 }}>{s}</span>
+                <span style={{ ...label(23, INK), fontWeight: 500 }}>{s}</span>
               </Note>
               {last ? null : isHdfs(i) ? (
                 <Arrow from={[BOX_X[i] + BOX_W + 4, sMid]} to={[BOX_X[i + 1] - 6, sMid]} at={memAt + 4} dur={10} color={BAR} width={2.4} head={11} />
@@ -157,10 +157,10 @@ export const HadoopScene: React.FC = () => {
           );
         })}
         <Note at={memAt + 6} x={gap(1) - 70} y={sMid - h(42)} width={140} style={{ textAlign: "center" }}>
-          <span style={{ ...label(20, BLUE_INK), fontWeight: 650 }}>memory</span>
+          <span style={{ ...label(20, BLUE_INK), fontWeight: 500 }}>memory</span>
         </Note>
         <Note at={memAt + 8} x={NOTE_X} y={sMid - h(28)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             memory between steps,
             <br />
             <span style={{ opacity: ease(frame, shuffleAt, 10) }}>disk only at a shuffle</span>
@@ -186,7 +186,7 @@ export const HadoopScene: React.FC = () => {
         />
         <Arrow from={[BOX_X[0] + BOX_W / 2, loopY + h(20)]} to={[BOX_X[0] + BOX_W / 2, y(S_TOP) - 6]} at={cacheAt + 4} dur={8} color={OK} width={2.4} head={10} />
         <Note at={iterAt + 10} x={(BOX_X[1] + BOX_X[2] + BOX_W) / 2 - 260} y={loopY - 38} width={520} style={{ textAlign: "center" }}>
-          <span style={{ ...label(22, OK_INK), fontWeight: 650, background: PAPER, padding: "0 10px", whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, OK_INK), fontWeight: 500, background: PAPER, padding: "0 10px", whiteSpace: "nowrap" }}>
             iterate<span style={{ opacity: ease(frame, passAt - 2, 10) }}>: every pass reads the cache</span>
           </span>
         </Note>

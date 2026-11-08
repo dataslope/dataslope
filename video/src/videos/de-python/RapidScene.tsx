@@ -204,7 +204,7 @@ const PitfallsBody: React.FC<{ c: Ctx }> = ({ c }) => {
             <span style={{ display: "inline-block", width: 420, ...note(26, ACCENT_INK) }}>
               <Strike at={it.at + 36}>{it.bad}</Strike>
             </span>
-            <span style={{ ...note(26, OK_INK), fontWeight: 600 }}>
+            <span style={{ ...note(26, OK_INK), fontWeight: 500 }}>
               <FadeIn at={it.at + 40}>{it.fix}</FadeIn>
             </span>
           </span>
@@ -270,7 +270,7 @@ export const RapidScene: React.FC = () => {
         </Line>
         <Nights x={R_X + 400} top={y(460) + h(2)} at={nightAt + 8} />
         <Line at={pipelineAt} top={y(520)} color={OK_INK}>
-          <span style={{ fontWeight: 650 }}>a pipeline</span>
+          <span style={{ fontWeight: 500 }}>a pipeline</span>
         </Line>
         <NextLine at={nextAt} x={R_X} y={y(640)} width={900}>
           pipelines and systems

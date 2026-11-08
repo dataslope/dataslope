@@ -105,10 +105,10 @@ export const PrScene: React.FC = () => {
         <Curve points={precision} x={xs} y={ys} at={precAt + 2} dur={24} color={BAR} width={3.6} clip={clip} />
         <Curve points={recall} x={xs} y={ys} at={recAt + 2} dur={24} color={WARM} width={3.6} clip={clip} />
         <Note at={precAt + 20} x={PLOT.right + 14} y={at(ys, precision[precision.length - 1][1]) - h(14)}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 650 }}>precision</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>precision</span>
         </Note>
         <Note at={recAt + 20} x={PLOT.right + 14} y={at(ys, recall[recall.length - 1][1]) - h(16)}>
-          <span style={{ ...label(21, WARM_INK), fontWeight: 650 }}>recall</span>
+          <span style={{ ...label(21, WARM_INK), fontWeight: 500 }}>recall</span>
         </Note>
         <Svg opacity={mP}>
           <line x1={mx} x2={mx} y1={y(PLOT.top)} y2={y(PLOT.bottom)} stroke={HIGHLIGHT} strokeWidth={10} />

@@ -108,7 +108,7 @@ export const ManyScene: React.FC = () => {
       {/* The pair from Fig. 2, found among the ten thousand. */}
       <Note at={pairsAt + 20} x={mx} y={labelTop} align="left" style={{ transform: "translateX(-50%)" }}>
         <span style={{ ...note(20, INK), whiteSpace: "nowrap", ...halo }}>
-          Fig. 2’s pair, <b style={{ fontWeight: 650 }}>{dec(R_WALKS)}</b>
+          Fig. 2’s pair, <b style={{ fontWeight: 600 }}>{dec(R_WALKS)}</b>
         </span>
       </Note>
       <Leader points={[[mx, labelTop + 34], [mx, barTop - 8]]} at={pairsAt + 22} dur={12} color={INK} />

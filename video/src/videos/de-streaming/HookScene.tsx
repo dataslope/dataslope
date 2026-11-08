@@ -102,7 +102,7 @@ export const HookScene: React.FC = () => {
               alignItems: "center",
               justifyContent: "center",
               ...label(21, BLUE_INK),
-              fontWeight: 600,
+              fontWeight: 500,
               opacity: c.o,
             }}
           >
@@ -115,7 +115,7 @@ export const HookScene: React.FC = () => {
 
         {/* What the round tests. */}
         <Note at={testAt} x={X0} y={y(420)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>A streaming round tests</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>A streaming round tests</span>
         </Note>
         {tests.map((t, i) => (
           <Note key={t.cue} at={t.at - 2} x={X0} y={y(466) + i * h(58)}>
@@ -134,13 +134,13 @@ export const HookScene: React.FC = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   fontFamily: SANS,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   ...TABULAR,
                 }}
               >
                 {i + 1}
               </span>
-              <span style={{ ...note(29, INK), fontWeight: 560 }}>
+              <span style={{ ...note(29, INK), fontWeight: 500 }}>
                 {i === 2 ? (
                   <>
                     how to count over time when events arrive{" "}
@@ -158,14 +158,14 @@ export const HookScene: React.FC = () => {
 
         {/* The round. */}
         <Note at={fifteenAt - 2} x={X0} y={planTop}>
-          <span style={{ ...note(34, INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(34, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <span style={TABULAR}>15</span> questions
           </span>
         </Note>
         <Note at={twelveAt - 2} x={X0} y={planTop + h(60)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: BLUE_INK, ...TABULAR }}>12</b> worked through, most on one small stream
-            <span style={{ ...label(25, INK_SOFT), fontWeight: 600, opacity: ease(frame, ownAt, 10) }}> · the video's own</span>
+            <span style={{ ...label(25, INK_SOFT), fontWeight: 500, opacity: ease(frame, ownAt, 10) }}> · the video's own</span>
           </span>
         </Note>
         {STREAM.map((c, i) => (

@@ -184,7 +184,7 @@ export const MarketScene: React.FC = () => {
                 <span style={{ ...note(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>{usd(r.out)}</span>
               </Note>
               <Note at={at + 4} x={RATIO_R} y={ry} align="right">
-                <span style={{ ...note(24, isMore ? OUTPUT_INK : INK), fontWeight: isMore ? 700 : 500, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(24, isMore ? OUTPUT_INK : INK), fontWeight: isMore ? 500 : 500, whiteSpace: "nowrap" }}>
                   {isFive >= 0 ? (
                     <Marked at={Math.round(fiveAt + ((tenRowsAt - fiveAt) * isFive) / Math.max(1, fivesIdx.length - 1))}>{r.ratioPrinted}</Marked>
                   ) : (
@@ -230,7 +230,7 @@ export const MarketScene: React.FC = () => {
           <Note at={tenRowsAt - 2} x={SIDE_X} y={y(484)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               in {FIVES} of {RATES.length} rows
-              <span style={{ fontWeight: 650, opacity: ease(frame, neverAt - 2, 14) }}> and never less</span>
+              <span style={{ fontWeight: 500, opacity: ease(frame, neverAt - 2, 14) }}> and never less</span>
             </span>
           </Note>
 
@@ -290,7 +290,7 @@ export const MarketScene: React.FC = () => {
                 <span style={{ ...note(22, INK), ...TABULAR, whiteSpace: "nowrap" }}>{int(t.threshold)}</span>
               </Note>
               <Note at={at + 3} x={F6_IN_R} y={ry} align="right">
-                <span style={{ ...note(22, INK), fontWeight: t === gpt6 ? 700 : 500, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(22, INK), fontWeight: t === gpt6 ? 500 : 500, whiteSpace: "nowrap" }}>
                   {t === gpt6 ? <Marked at={doubleAt - 2}>{`${t.inMult}x`}</Marked> : `${t.inMult}x`}
                 </span>
               </Note>
@@ -327,7 +327,7 @@ export const MarketScene: React.FC = () => {
           <span style={{ ...note(21, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>line at {int(OVERSIZED.threshold)}</span>
         </Note>
         <Note at={dollarAt - 4} x={F6_X} y={y(AXIS_Y + 50)}>
-          <span style={{ ...note(27, POINT_INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, POINT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
             <Marked at={sheetAt - 2}>{usd(OVERSIZED.above)}</Marked>
             <span style={{ ...note(25, INK), fontWeight: 500 }}>
               : all {int(OVERSIZED.tokens)} tokens at {gpt6.inMult}x

@@ -181,8 +181,8 @@ export const PayoffScene: React.FC = () => {
       <Ring g={g} from={0} to={0} col={PCT} at={thirdAt - 2} out={orderAt - 8} />
       <Note at={thirdAt} out={orderAt - 8} x={g.x} y={g.rowTop(rows) + h(22)} from="up">
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          <span style={{ color: INK, fontWeight: 600 }}>{FIRST.amount}</span> of North&apos;s {FIRST.total} is{" "}
-          <span style={{ color: INK, fontWeight: 600 }}>{FIRST.pct}%</span>, about a third
+          <span style={{ color: INK, fontWeight: 500 }}>{FIRST.amount}</span> of North&apos;s {FIRST.total} is{" "}
+          <span style={{ color: INK, fontWeight: 500 }}>{FIRST.pct}%</span>, about a third
         </span>
       </Note>
 

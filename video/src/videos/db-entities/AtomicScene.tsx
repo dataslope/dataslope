@@ -108,7 +108,7 @@ export const AtomicScene: React.FC = () => {
           <Listing lines={[PACKED.search]} x={X} top={y(560)} width={960} size={22} at={searchAt - 6} lineAt={[searchAt - 2]} />
           {/* One line at one size: Postgres's answer stands out by its ink and weight. */}
           <Ink at={nothingAt - 2} dur={14} style={{ left: X, top: y(650), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
-            <span style={{ fontFamily: MONO, fontSize: 24, color: STAT_INK, fontWeight: 600 }}>({PACKED.found} rows)</span>
+            <span style={{ fontFamily: MONO, fontSize: 24, color: STAT_INK, fontWeight: 500 }}>({PACKED.found} rows)</span>
             <span style={note(24, INK_SOFT)}>though Ada has that number</span>
           </Ink>
         </div>

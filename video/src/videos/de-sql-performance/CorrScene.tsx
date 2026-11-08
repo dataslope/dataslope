@@ -150,7 +150,7 @@ export const CorrScene: React.FC = () => {
         {/* What each form reads: the count from before, and the rewrite's. */}
         <Note at={twiceAt} x={X0} y={y(TOP) + planHeight(CORR.rewritePlan.length, PLAN) + h(36)}>
           <div style={{ ...label(21, INK_SOFT) }}>rows read</div>
-          <div style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, twentyAt, 10) }}>
+          <div style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, twentyAt, 10) }}>
             rewrite: {CORR.rewriteScans} scans × <Num>{thousands(scanRows)}</Num> = <Num>{thousands(rewriteRead)}</Num>
           </div>
           <div style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap", marginTop: h(6), opacity: ease(frame, notAt, 10) }}>
@@ -187,7 +187,7 @@ export const CorrScene: React.FC = () => {
                   style={{
                     fontFamily: MONO,
                     fontSize: 21,
-                    fontWeight: op === "HASH_JOIN" ? 700 : 500,
+                    fontWeight: op === "HASH_JOIN" ? 500 : 500,
                     color: op === "HASH_JOIN" ? OK_INK : INK,
                     opacity: ease(frame, asHashAt - 4 + i * 4, 10),
                   }}
@@ -197,7 +197,7 @@ export const CorrScene: React.FC = () => {
               </React.Fragment>
             ))}
           </div>
-          <div style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap", marginTop: h(18), opacity: ease(frame, readAt, 10) }}>
+          <div style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(18), opacity: ease(frame, readAt, 10) }}>
             Read the plan before you rewrite.
           </div>
         </Note>

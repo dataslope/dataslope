@@ -214,7 +214,7 @@ export const CoverScene: React.FC = () => {
         <Note at={writesAt} x={X0} y={afterTop + h(250)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Every insert writes the wider index too.{" "}
-            <span style={{ color: INK, fontWeight: 650, opacity: ease(frame, fewAt, 10) }}>Cover the few that run constantly.</span>
+            <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, fewAt, 10) }}>Cover the few that run constantly.</span>
           </span>
         </Note>
       </Drift>

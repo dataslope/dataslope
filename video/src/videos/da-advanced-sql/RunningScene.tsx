@@ -139,7 +139,7 @@ export const RunningScene: React.FC = () => {
         </Note>
         <Note at={centeredAt} x={X0} y={y(TOP) + listH + h(90)}>
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>centered, about each day:</span>
-          <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+          <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: BLUE_INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none" }}>
             ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
           </div>
         </Note>
@@ -147,7 +147,7 @@ export const RunningScene: React.FC = () => {
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             rows, not days. <span style={{ color: INK_SOFT }}>If a day can be missing:</span>
           </span>
-          <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none", opacity: ease(frame, intervalAt - 2, 12) }}>
+          <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: BLUE_INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none", opacity: ease(frame, intervalAt - 2, 12) }}>
             {rangeClause}
           </div>
         </Note>

@@ -72,7 +72,7 @@ export const CompareScene: React.FC = () => {
     {
       title: (
         <>
-          Plus <Mono weight={600}>{filterOf(SQL_LINES.where)}</Mono>
+          Plus <Mono weight={500}>{filterOf(SQL_LINES.where)}</Mono>
         </>
       ),
       rows: WHERE.rows,
@@ -83,7 +83,7 @@ export const CompareScene: React.FC = () => {
     {
       title: (
         <>
-          Plus <Mono weight={600}>{filterOf(SQL_LINES.on)}</Mono> in <Mono weight={600}>ON</Mono>
+          Plus <Mono weight={500}>{filterOf(SQL_LINES.on)}</Mono> in <Mono weight={500}>ON</Mono>
         </>
       ),
       rows: ON.rows,
@@ -120,7 +120,7 @@ export const CompareScene: React.FC = () => {
         return (
           <React.Fragment key={i}>
             <Ink at={t.at - 2} dur={14} style={{ left: x + 14, top: y(TITLE_TOP), whiteSpace: "nowrap" }}>
-              <span style={{ ...label(22, INK), fontWeight: 560 }}>{t.title}</span>
+              <span style={{ ...label(22, INK), fontWeight: 500 }}>{t.title}</span>
             </Ink>
             <Table
               x={x}
@@ -210,9 +210,9 @@ export const CompareScene: React.FC = () => {
           <div>
             filter the right table{" "}
             <Underline at={inOnAt - 2} color={KEPT_INK}>
-              in <Mono weight={600}>ON</Mono>
+              in <Mono weight={500}>ON</Mono>
             </Underline>
-            , not in <Mono weight={600}>WHERE</Mono>.
+            , not in <Mono weight={500}>WHERE</Mono>.
           </div>
         </div>
       </Ink>

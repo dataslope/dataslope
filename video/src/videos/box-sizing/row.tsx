@@ -88,7 +88,7 @@ export const Column: React.FC<{
       style={{
         gridArea: "1 / 1",
         ...note(22, CONTENT_INK),
-        fontWeight: 600,
+        fontWeight: 500,
         whiteSpace: "nowrap",
         opacity: o,
       }}

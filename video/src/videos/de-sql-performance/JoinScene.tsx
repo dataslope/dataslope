@@ -18,7 +18,7 @@ const R_X = 1200;
 const DIAG_Y = 780;
 const PANEL_W = 520;
 
-const keyText = (size: number, color: string = INK) => svgText({ fontFamily: MONO, fontSize: size, fontWeight: 600, color });
+const keyText = (size: number, color: string = INK) => svgText({ fontFamily: MONO, fontSize: size, fontWeight: 500, color });
 
 /** A small box with a centred label, in SVG. */
 const Box: React.FC<{ x: number; y: number; w: number; h: number; text: string; fill?: string; stroke?: string; ink?: string; p: number }> = ({
@@ -132,7 +132,7 @@ export const JoinScene: React.FC = () => {
           <div style={{ ...label(21, INK_SOFT) }}>orders into the join</div>
           {/* The count on a line of its own, so it may stay large; what it
               is not, under it at the label's size. */}
-          <div style={{ ...note(40, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(40, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{thousands(JOIN.probe)}</Num>
           </div>
           <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, millionAt, 10) }}>

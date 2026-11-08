@@ -130,7 +130,7 @@ export const HalvesScene: React.FC = () => {
 
       {/* ── Preprocessing ── */}
       <Ink at={cleaningAt - 4} dur={14} style={{ left: LEFT_X, top: y(TITLE_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(44), color: INK, fontWeight: 600 }}>Preprocessing</span>
+        <span style={{ ...body(44), color: INK, fontWeight: 500 }}>Preprocessing</span>
       </Ink>
       <Spot id={ART.conveyor} at={cleaningAt} left={LEFT_X + 20} top={y(TITLE_Y) + 66} width={700} height={300} />
       {STEPS.map((s, i) => (
@@ -159,7 +159,7 @@ export const HalvesScene: React.FC = () => {
 
       {/* ── Analysis ── */}
       <Ink at={analysisAt - 4} dur={14} style={{ left: RIGHT_X, top: y(TITLE_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(44), color: INK, fontWeight: 600 }}>Analysis</span>
+        <span style={{ ...body(44), color: INK, fontWeight: 500 }}>Analysis</span>
       </Ink>
       {["counting", "tagging", "building features"].map((u, i) => (
         <Pill key={u} text={u} x={RIGHT_X} y={y(TITLE_Y + 96 + i * 82)} at={uses[i] - 4} size={26} width={360} />

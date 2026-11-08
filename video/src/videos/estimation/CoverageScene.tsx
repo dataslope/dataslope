@@ -218,10 +218,10 @@ export const CoverageScene: React.FC = () => {
         />
       </Svg>
       <Note at={hundredAt} x={truthX + 12} y={y(POP_BASE - POP_H * 0.45)} out={seeAt - 4}>
-        <span style={{ ...note(22, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>true mean</span>
+        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>true mean</span>
       </Note>
       <Note at={yourAt} x={sx(XI, COVERAGE.intervals[YOURS].hi) + 16} y={rowY(YOURS) - 15}>
-        <span style={{ ...note(22, INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           yours
           <span style={{ fontWeight: 500, color: INK_SOFT, opacity: ease(frame, seeAt, 12) }}>: in, or out?</span>
         </span>
@@ -254,7 +254,7 @@ export const CoverageScene: React.FC = () => {
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Same recipe, unlucky samples.</span>
       </Note>
       <Note at={ninetyFiveAt - 2} x={COL} y={y(620)}>
-        <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>Again and again: about 95 in 100.</span>
+        <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Again and again: about 95 in 100.</span>
       </Note>
       <Spot id="estimation-ring-toss" at={againAndAt - 4} out={sentenceAt - 12} left={COL + 40} top={y(668)} width={200} height={206} />
       <Ink at={sentenceAt - 4} dur={18} style={{ left: COL, top: y(700), width: 430 }}>

@@ -113,7 +113,7 @@ export const PeekScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={threeAt - 6} dur={12} style={{ left: 680, top: y(300), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(64, STAT_INK), ...TABULAR, fontWeight: 600 }}>
+          <span style={{ ...note(64, STAT_INK), ...TABULAR, fontWeight: 500 }}>
             <Count to={DESIGN.perArm} at={threeAt - 4} dur={30} format={num} />
           </span>
         </Ink>
@@ -150,7 +150,7 @@ export const PeekScene: React.FC = () => {
       <FigLabel n="3" title="Two identical arms: the p-value, after every hundred visitors" at={hereAt + 4} x={160} y={y(FIG_Y)} />
       <Ink at={recomputeAt} dur={10} style={{ left: X.x1, top: y(FIG_Y), whiteSpace: "nowrap", transform: "translateX(-100%)" }}>
         <span style={{ ...note(22, INK_SOFT) }}>
-          visitors per arm so far: <span style={{ ...TABULAR, color: INK, fontWeight: 650 }}>{num(reach > 0 ? shownN : 0)}</span>
+          visitors per arm so far: <span style={{ ...TABULAR, color: INK, fontWeight: 500 }}>{num(reach > 0 ? shownN : 0)}</span>
         </span>
       </Ink>
       <Axis
@@ -194,10 +194,10 @@ export const PeekScene: React.FC = () => {
         </Svg>
       ) : null}
       <Note at={identicalAt} x={X.x1 - 12} y={py(PEEKING.alpha) + 4} align="right">
-        <span style={{ ...note(20, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>under {PEEKING.alpha}: &ldquo;significant&rdquo;</span>
+        <span style={{ ...note(20, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>under {PEEKING.alpha}: &ldquo;significant&rdquo;</span>
       </Note>
       <Note at={nothingAt - 2} x={X.x1 - 44} y={py(P_MAX) + 8} align="right">
-        <span style={{ ...note(21, INK_SOFT), fontWeight: 600, ...halo }}>no effect anywhere in this data</span>
+        <span style={{ ...note(21, INK_SOFT), fontWeight: 500, ...halo }}>no effect anywhere in this data</span>
       </Note>
 
       {/* The planned size: the one look that counts, lit when it is named. */}
@@ -222,7 +222,7 @@ export const PeekScene: React.FC = () => {
         </Svg>
       ) : null}
       <Note at={plannedAt} x={PLAN_X} y={py(P_MAX) - 8}>
-        <span style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>planned</span>
+        <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>planned</span>
       </Note>
       <Note at={plannedAt + 4} x={PLAN_X} y={py(P_MAX) + 26}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{num(PEEKING.planned)} per arm</span>
@@ -256,7 +256,7 @@ export const PeekScene: React.FC = () => {
         color={STAT}
       />
       <Note at={firstDipAt + 2} x={pts[FIRST][0] + 12} y={py(0.47) - 30}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           stop here at {num(rows[FIRST].n)}
         </span>
       </Note>
@@ -264,7 +264,7 @@ export const PeekScene: React.FC = () => {
         <span style={{ ...note(22, STAT_INK), whiteSpace: "nowrap", ...halo }}>and you ship noise</span>
       </Note>
       <Note at={nineteenAt - 4} x={pts[last][0] - 16} y={pts[last][1] + 14} align="right">
-        <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>p = {fmt(PEEKING.final)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>p = {fmt(PEEKING.final)}</span>
       </Note>
       <Ring x={pts[last][0]} y={pts[last][1]} at={numberAt - 2} color={INK} />
     </AbsoluteFill>

@@ -46,7 +46,7 @@ const Layer: React.FC<{
         transform: `translateY(${(1 - p) * 12}px)`,
       }}
     >
-      <div style={{ position: "absolute", left: 20, top: 18, ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{name}</div>
+      <div style={{ position: "absolute", left: 20, top: 18, ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</div>
       {gloss ? <div style={{ position: "absolute", left: 20, top: 56, ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>{gloss}</div> : null}
       {children}
     </div>
@@ -195,7 +195,7 @@ export const LayersScene: React.FC = () => {
               }}
             >
               <span>{w}</span>
-              <span style={{ ...TABULAR, fontWeight: 600 }}>{c}</span>
+              <span style={{ ...TABULAR, fontWeight: 500 }}>{c}</span>
             </div>
           ))}
         </Layer>

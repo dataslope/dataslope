@@ -250,19 +250,19 @@ export const OltpScene: React.FC = () => {
         </Note>
         <Note at={wideAt} x={R_X} y={PROP(92)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            wide tables, <span style={{ opacity: ease(frame, appendAt, 10), fontWeight: 650 }}>mostly appended to</span>
+            wide tables, <span style={{ opacity: ease(frame, appendAt, 10), fontWeight: 500 }}>mostly appended to</span>
           </span>
         </Note>
 
         {/* ── Between them: the job ── */}
         <KeyArrow from={[orders.right + 56, y(CHIP_TOP) + h(100)]} to={[R_X - 30, y(CHIP_TOP) + h(100)]} at={moveAt + 2} color={OK} />
         <Note at={moveAt + 8} x={orders.right + 56} y={y(CHIP_TOP) + h(100) - 52}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>reshape</span>
+          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>reshape</span>
         </Note>
         {/* Under the arrow, a hairline and 28px of white before the words
             (README: room under a rule). */}
         <Note at={jobAt} x={orders.right + 56} y={y(CHIP_TOP) + h(100) + 18}>
-          <div style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap", background: PAPER, borderTop: `1px solid ${HAIRLINE}`, paddingTop: 28 }}>
+          <div style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER, borderTop: `1px solid ${HAIRLINE}`, paddingTop: 28 }}>
             the data
             <br />
             engineer&apos;s job

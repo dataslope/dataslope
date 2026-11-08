@@ -193,7 +193,7 @@ export const QQScene: React.FC = () => {
           <span style={label(21, INK_SOFT)}>up: the data's own, sorted</span>
         </Ink>
         <Note at={lineEnd - 6} x={sx(scaleFor(PANELS[0]), 52)} y={yFor(PANELS[0])(36)}>
-          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>on the line: the fit holds</span>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>on the line: the fit holds</span>
         </Note>
 
         {/* The skewed panel's ends. */}

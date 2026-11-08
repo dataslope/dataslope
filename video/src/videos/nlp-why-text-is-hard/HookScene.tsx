@@ -195,7 +195,7 @@ export const HookScene: React.FC = () => {
             out={structureAt - 10}
             style={{ left: STRIP_X + ci * CELL - 7, top: stripTop + cellH + 2, width: 40, textAlign: "center" }}
           >
-            <span style={{ ...note(28, BAD_INK), fontWeight: 600 }}>?</span>
+            <span style={{ ...note(28, BAD_INK), fontWeight: 500 }}>?</span>
           </Ink>
         ))}
 

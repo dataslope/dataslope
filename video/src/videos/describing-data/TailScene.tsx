@@ -101,7 +101,7 @@ export const TailScene: React.FC = () => {
           </Tag>
         ) : null}
         <div style={{ position: "absolute", left: 1570, top: base - h(120), opacity: ease(frame, dotsAt - 2, 10), whiteSpace: "nowrap" }}>
-          <div style={{ ...note(56, STAT_INK), ...TABULAR, fontWeight: 600, lineHeight: 1 }}>{shown}</div>
+          <div style={{ ...note(56, STAT_INK), ...TABULAR, fontWeight: 500, lineHeight: 1 }}>{shown}</div>
           <div style={{ ...note(21, INK_SOFT), marginTop: 8 }}>of {t.n.toLocaleString("en-US")} beyond 4 SD</div>
         </div>
       </React.Fragment>
@@ -171,7 +171,7 @@ export const TailScene: React.FC = () => {
         })}
       </div>
       <Ink at={mistakeAt - 6} dur={16} style={{ left: 1100, top: y(915), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(23, STAT_INK), fontWeight: 600, background: PAPER }}>Far out is not the same as wrong.</span>
+        <span style={{ ...note(23, STAT_INK), fontWeight: 500, background: PAPER }}>Far out is not the same as wrong.</span>
       </Ink>
     </AbsoluteFill>
   );

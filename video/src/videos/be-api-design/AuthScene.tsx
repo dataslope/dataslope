@@ -213,7 +213,7 @@ export const AuthScene: React.FC = () => {
         {PANELS.map((p, i) => (
           <React.Fragment key={p.name}>
             <Note at={diffAt + i * 6} x={p.x} y={headTop} out={leave}>
-              <div style={{ ...label(30, INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+              <div style={{ ...label(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 <Mark at={[sessAt, jwtAt, oauthAt][i]} out={[jwtAt, oauthAt, leave][i]}>
                   {p.name}
                 </Mark>
@@ -265,7 +265,7 @@ export const AuthScene: React.FC = () => {
           <Note key={i} at={thisAt + 4 + i * 4} x={J.x} y={tokenTop + i * 28} out={leave}>
             <span style={{ fontFamily: MONO, fontSize: TOKEN_SIZE, lineHeight: "28px", whiteSpace: "pre", fontVariantLigatures: "none" }}>
               {runs.map((r, k) => (
-                <span key={k} style={{ color: PART_INK[r.kind], fontWeight: r.kind === "dot" ? 800 : 500, background: r.kind === "payload" ? `color-mix(in srgb, ${BAR} ${18 * ease(frame, decodeAt, 10) * (1 - ease(frame, leave, 4))}%, transparent)` : undefined }}>
+                <span key={k} style={{ color: PART_INK[r.kind], fontWeight: r.kind === "dot" ? 500 : 500, background: r.kind === "payload" ? `color-mix(in srgb, ${BAR} ${18 * ease(frame, decodeAt, 10) * (1 - ease(frame, leave, 4))}%, transparent)` : undefined }}>
                   {r.text}
                 </span>
               ))}
@@ -285,8 +285,8 @@ export const AuthScene: React.FC = () => {
               <div key={c.k} style={{ fontFamily: MONO, fontSize: 22, lineHeight: "34px", color: INK, whiteSpace: "pre", opacity: ease(frame, c.at - 4, 10) }}>
                 {c.k === "role" ? (
                   <>
-                    <span style={{ fontWeight: 600 }}>&quot;role&quot;</span>: <Strike at={adminAt + 10}>&quot;{AUTH.claims.role}&quot;</Strike>
-                    <span style={{ color: ACCENT_INK, fontWeight: 600, opacity: ease(frame, adminAt + 16, 10) }}> &quot;admin&quot;</span>
+                    <span style={{ fontWeight: 500 }}>&quot;role&quot;</span>: <Strike at={adminAt + 10}>&quot;{AUTH.claims.role}&quot;</Strike>
+                    <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, adminAt + 16, 10) }}> &quot;admin&quot;</span>
                   </>
                 ) : (
                   <Mark at={c.at + 2}>{claimLine(c.k, c.v)}</Mark>
@@ -297,13 +297,13 @@ export const AuthScene: React.FC = () => {
         </Note>
         <Note at={sigAt} x={J.x} y={claimsTop + h(150)} out={leave}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            the <span style={{ color: PART_INK.signature, fontWeight: 650 }}>signature</span> proves who issued it
+            the <span style={{ color: PART_INK.signature, fontWeight: 500 }}>signature</span> proves who issued it
           </span>
         </Note>
         <Note at={verifiesAt} x={J.x} y={claimsTop + h(194)} out={leave}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 23 }}>
             <Cross at={verifiesAt + 2} size={22} />
-            <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>role changed: it no longer verifies</span>
+            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>role changed: it no longer verifies</span>
           </div>
         </Note>
 
@@ -335,7 +335,7 @@ export const AuthScene: React.FC = () => {
 
         {/* Question 8, sessions: one shared store, and a deleted session. */}
         <Note at={instantAt} x={X0} y={bTop}>
-          <span style={{ ...label(22, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Sessions: revoke at once</span>
+          <span style={{ ...label(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Sessions: revoke at once</span>
         </Note>
         {[0, 1].map((i) => (
           <React.Fragment key={i}>
@@ -354,7 +354,7 @@ export const AuthScene: React.FC = () => {
 
         {/* JWTs: checked locally, valid until they expire. */}
         <Note at={locallyAt} x={jx} y={bTop}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>A JWT, checked locally</span>
+          <span style={{ ...label(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A JWT, checked locally</span>
         </Note>
         <Msg x={jx} y={srvTop} w={jReqW} at={locallyAt + 2} size={21} lines={[{ t: "GET /articles/42" }, { t: "Authorization: Bearer eyJhbGciOi…" }]} />
         <Flow points={[[jx + jReqW + 8, srvTop + twoH / 2], [1560, srvTop + twoH / 2]]} at={locallyAt + 8} color={INK_SOFT} width={2.2} head={11} />
@@ -363,7 +363,7 @@ export const AuthScene: React.FC = () => {
         <Clock x={jx + 74 - 10 - CLOCK_TEXT / 2} y={srvTop + twoH + h(40) + (CLOCK_TEXT * 1.3) / 2} size={CLOCK_TEXT} at={validAt + 8} color={ACCENT} />
         <Note at={validAt + 10} x={jx + 74} y={srvTop + twoH + h(40)}>
           <span style={{ ...note(CLOCK_TEXT, INK), whiteSpace: "nowrap" }}>
-            valid until <span style={{ fontFamily: MONO, fontWeight: 600 }}>exp</span>, deleted session or not
+            valid until <span style={{ fontFamily: MONO, fontWeight: 500 }}>exp</span>, deleted session or not
           </span>
         </Note>
         <Note at={lookupAt} x={jx + 74} y={srvTop + twoH + h(80)}>
@@ -385,15 +385,15 @@ export const AuthScene: React.FC = () => {
 
         {/* The hybrid: short access tokens, a revocable refresh token. */}
         <Note at={hybridAt} x={X0} y={tl.top - h(46)}>
-          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>The common hybrid</span>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>The common hybrid</span>
         </Note>
         <Note at={accessAt} x={X0} y={tl.top}>
-          <span style={{ ...note(22, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             access token, <Num>{minutes}</Num> min
           </span>
         </Note>
         <Note at={refreshAt} x={X0} y={tl.top + h(50)}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>refresh token</span>
+          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>refresh token</span>
         </Note>
         {Array.from({ length: SEG }, (_, i) => {
           const x = tl.x0 + i * segW;
@@ -440,12 +440,12 @@ export const AuthScene: React.FC = () => {
           }}
         />
         <Note at={revokedAt} x={banX + 14} y={tl.top + h(50) + 1}>
-          <span style={{ ...note(21, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <span style={{ opacity: 1 - ease(frame, bannedAt + 8, 6) }}>can be revoked</span>
           </span>
         </Note>
         <Note at={bannedAt + 8} x={banX + 14} y={tl.top + h(50) + 1}>
-          <span style={{ ...note(21, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>revoked</span>
+          <span style={{ ...note(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>revoked</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, bannedAt, 8) }}>
           <line x1={banX} y1={tl.top - 10} x2={banX} y2={tl.top + h(50) + 40} stroke={ACCENT} strokeWidth={2.6} strokeDasharray="6 5" />

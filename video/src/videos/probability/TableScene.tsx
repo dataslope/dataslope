@@ -44,7 +44,7 @@ const Cell: React.FC<{ x: number; y: number; at: number; lit?: number; dim?: num
       <span
         style={{
           ...note(42, INK),
-          fontWeight: bold ? 700 : 500,
+          fontWeight: bold ? 500 : 500,
           padding: "0 10px",
           borderRadius: 6,
           background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, transparent)`,
@@ -249,7 +249,7 @@ export const TableScene: React.FC = () => {
               num(c.bottom)
             )}{" "}
             ={" "}
-            <span style={{ color: STAT_INK, fontWeight: 600 }}>{c.key === "all" ? pct(c.p) : <Sweep at={c.mark}>{pct(c.p)}</Sweep>}</span>
+            <span style={{ color: STAT_INK, fontWeight: 500 }}>{c.key === "all" ? pct(c.p) : <Sweep at={c.mark}>{pct(c.p)}</Sweep>}</span>
           </span>
         </Ink>
       ))}

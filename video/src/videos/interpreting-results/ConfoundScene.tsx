@@ -211,22 +211,22 @@ export const ConfoundScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={nineAt - 2} x={px(CONFOUND.pooled.x1) - 10} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * CONFOUND.pooled.x1) - 80} align="right" dim={fallsAt}>
-          <span style={{ ...note(23, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(23, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             everyone: +{fmt(CONFOUND.pooledPerHour, 1)} mmHg <Marker at={hourAt - 2}>per weekly hour</Marker>
           </span>
         </Note>
         <Note at={hourAt + 6} x={px(70)} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * 40) + 8} from="up" out={colorAt}>
-          <span style={{ ...note(20, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+          <span style={{ ...note(20, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
             one hour
           </span>
         </Note>
         {CONFOUND.fits.map((f, k) => (
           <Note key={k} at={bandAt + k * 4} x={px(f.x1) + 10} y={py(f.intercept + f.slope * f.x1) - 4}>
-            <span style={{ ...note(20, BAND_INK[k]), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>{BAND_NAME[k]}</span>
+            <span style={{ ...note(20, BAND_INK[k]), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>{BAND_NAME[k]}</span>
           </Note>
         ))}
         <Note at={higherAt - 2} x={X.x1 - 10} y={bottom - 56} align="right">
-          <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>older bands: more exercise, higher pressure</span>
+          <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>older bands: more exercise, higher pressure</span>
         </Note>
       </Drift>
       </div>
@@ -267,7 +267,7 @@ export const ConfoundScene: React.FC = () => {
       <Spot id="interpreting-results-coin" at={coinAt - 6} left={1230} top={y(760)} width={180} height={200} />
       <Arrow from={[1390, y(790)]} to={[EXERCISE[0], lowY + 32]} at={coinAt + 4} dur={12} color={STAT} />
       <Note at={randomAt - 2} x={1440} y={y(800)}>
-        <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           randomize who <Marker at={cantAt - 4}>exercises</Marker>
         </span>
       </Note>

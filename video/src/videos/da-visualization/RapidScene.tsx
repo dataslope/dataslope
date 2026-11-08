@@ -392,7 +392,7 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
         const mid = ((k ? cum[k - 1][n - 1] : 0) + cum[k][n - 1]) / 2;
         return (
           <Note key={ch.key} at={stackAt + 10 + k * 2} x={x1 + 12} y={yOf(mid, n - 1) - 13}>
-            <span style={{ ...label(19, k === web ? INK : INK_SOFT), whiteSpace: "nowrap", fontWeight: k === web ? 650 : 500 }}>{ch.key}</span>
+            <span style={{ ...label(19, k === web ? INK : INK_SOFT), whiteSpace: "nowrap", fontWeight: k === web ? 500 : 500 }}>{ch.key}</span>
           </Note>
         );
       })}

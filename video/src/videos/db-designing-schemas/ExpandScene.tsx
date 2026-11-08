@@ -170,7 +170,7 @@ export const ExpandScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: SANS,
-                fontWeight: 600,
+                fontWeight: 500,
                 // Level with the phase's name, not centred on the two lines,
                 // and within 12% of its 26px, so the number and the name read
                 // as one line and the serif note under them as another.
@@ -181,7 +181,7 @@ export const ExpandScene: React.FC = () => {
               {i + 1}
             </span>
             <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <span style={{ ...label(26, INK), fontWeight: 650 }}>{p.title}</span>
+              <span style={{ ...label(26, INK), fontWeight: 500 }}>{p.title}</span>
               <span style={{ ...body(24, true), color: INK_SOFT }}>
                 {i === 1 ? (
                   <>

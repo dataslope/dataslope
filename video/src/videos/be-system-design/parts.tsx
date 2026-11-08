@@ -211,8 +211,8 @@ export const Box: React.FC<{
       <span
         style={{
           ...(mono
-            ? { fontFamily: MONO, fontSize: size * 0.92, fontWeight: 600, fontVariantLigatures: "none", color: t.ink }
-            : { ...note(size, t.ink), fontWeight: 650 }),
+            ? { fontFamily: MONO, fontSize: size * 0.92, fontWeight: 500, fontVariantLigatures: "none", color: t.ink }
+            : { ...note(size, t.ink), fontWeight: 500 }),
           whiteSpace: "nowrap",
           lineHeight: 1.15,
         }}

@@ -204,7 +204,7 @@ export const ShapScene: React.FC = () => {
                           ? `color-mix(in srgb, ${ACCENT} ${14 * idLit}%, transparent)`
                           : undefined,
                       ...(r === null
-                        ? { ...label(19, INK), fontWeight: 600 }
+                        ? { ...label(19, INK), fontWeight: 500 }
                         : r === "distinct"
                           ? { ...label(19, INK_SOFT), ...TABULAR }
                           : { ...note(21, INK), ...TABULAR }),
@@ -254,7 +254,7 @@ export const ShapScene: React.FC = () => {
           <span
             style={{
               ...label(20, ACCENT_INK),
-              fontWeight: 650,
+              fontWeight: 500,
               whiteSpace: "nowrap",
             }}
           >
@@ -265,7 +265,7 @@ export const ShapScene: React.FC = () => {
         {/* ── Both importances, as each feature's share of the total ── */}
         <Note at={impAt} x={X0} y={y(BARS_TOP) - h(46)}>
           <span
-            style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}
+            style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
             share of importance:{" "}
             <span style={{ color: BLUE_INK }}>the forest&apos;s impurity</span>
@@ -289,7 +289,7 @@ export const ShapScene: React.FC = () => {
                   top: top + h(6),
                   opacity: p,
                   ...note(22, isId ? ACCENT_INK : INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                 }}
               >
@@ -314,7 +314,7 @@ export const ShapScene: React.FC = () => {
                   top: top - h(3),
                   opacity: p,
                   ...label(19, isId ? ACCENT_INK : BLUE_INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   ...TABULAR,
                 }}
               >
@@ -339,7 +339,7 @@ export const ShapScene: React.FC = () => {
                   top: top + h(23),
                   opacity: q,
                   ...label(19, OK_INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   ...TABULAR,
                 }}
               >
@@ -375,7 +375,7 @@ export const ShapScene: React.FC = () => {
         {/* ── One customer's prediction, split ── */}
         <Note at={splitsAt} x={WF_X} y={y(WF_TOP) - h(50)}>
           <span
-            style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}
+            style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
             one customer: the chance of churning, feature by feature
           </span>
@@ -445,7 +445,7 @@ export const ShapScene: React.FC = () => {
                   top: top + h(14),
                   opacity: p,
                   ...note(22, INK),
-                  fontWeight: i === 0 || i === 5 ? 650 : 500,
+                  fontWeight: i === 0 || i === 5 ? 500 : 500,
                   whiteSpace: "nowrap",
                 }}
               >
@@ -477,7 +477,7 @@ export const ShapScene: React.FC = () => {
                         ? BLUE_INK
                         : INK,
                   ),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   ...TABULAR,
                   whiteSpace: "nowrap",
                 }}
@@ -507,7 +507,7 @@ export const ShapScene: React.FC = () => {
           y={y(BARS_TOP) + 4 * h(BAR_ROW) + h(4)}
         >
           <span style={{ ...label(20, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 650 }}>
+            <span style={{ fontWeight: 500 }}>
               permutation importance, on held-out rows:
             </span>{" "}
             {SHAP.names.map((name, i) => {
@@ -535,7 +535,7 @@ export const ShapScene: React.FC = () => {
           <span
             style={{
               ...label(19, OK_INK),
-              fontWeight: 650,
+              fontWeight: 500,
               whiteSpace: "nowrap",
             }}
           >

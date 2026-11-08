@@ -141,7 +141,7 @@ export const HookScene: React.FC = () => {
             }}
           >
             <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: BAR_H, background: ds("gray", 50), borderBottom: `1.5px solid ${HAIRLINE}` }} />
-            <span style={{ position: "absolute", left: 22, top: 10, fontFamily: MONO, fontSize: 20, color: INK, fontWeight: 600 }}>limiter.py</span>
+            <span style={{ position: "absolute", left: 22, top: 10, fontFamily: MONO, fontSize: 20, color: INK, fontWeight: 500 }}>limiter.py</span>
             <span style={{ position: "absolute", left: SPLIT - WIN.x + 22, top: 10, ...label(20, INK_SOFT), opacity: paneP }}>assistant</span>
             <div style={{ position: "absolute", left: SPLIT - WIN.x, top: 0, bottom: 0, width: 1.5, background: HAIRLINE, opacity: paneP }} />
           </div>
@@ -282,7 +282,7 @@ export const HookScene: React.FC = () => {
               <React.Fragment key={m.text}>
                 <div style={{ position: "absolute", left: m.to, top: m.mid - 1, width: (LABEL_X - 16 - m.to) * p, height: 2, background: INK }} />
                 <Ink at={m.at} dur={12} style={{ left: LABEL_X, top: m.mid - 18 }}>
-                  <span style={{ ...note(27, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+                  <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                     <Mark at={m.at + 4}>{m.text}</Mark>
                   </span>
                 </Ink>
@@ -302,7 +302,7 @@ export const HookScene: React.FC = () => {
           return (
             <React.Fragment key={g.title}>
               <Ink at={at - 2} dur={12} style={{ left: x0, top: y(GROUP_Y) }}>
-                <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{g.title}</span>
+                <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{g.title}</span>
               </Ink>
               {gi > 0 ? <ColumnRule x={x0 - COL_GAP / 2} top={y(GROUP_Y)} height={y(ROW_Y + 2 * ROW_H) + 30 - y(GROUP_Y)} at={at} /> : null}
               {g.cards.map((title, i) => {
@@ -323,8 +323,8 @@ export const HookScene: React.FC = () => {
                       transform: `translateX(${(1 - p) * -10}px)`,
                     }}
                   >
-                    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600, width: 18 }}>{first + i + 1}</span>
-                    <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{title}</span>
+                    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, width: 18 }}>{first + i + 1}</span>
+                    <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{title}</span>
                   </div>
                 );
               })}

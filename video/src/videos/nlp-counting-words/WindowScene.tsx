@@ -138,12 +138,12 @@ export const WindowScene: React.FC = () => {
         </span>
       </Ink>
       <Note at={bigramAt - 2} x={X0 + 640} y={y(280) + 4}>
-        <div style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           bigram <span style={{ ...numStyle(26, INK_SOFT) }}>n = 2</span>
         </div>
       </Note>
       <Note at={trigramAt - 2} x={X0 + 900} y={y(280) + 4}>
-        <div style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           trigram <span style={{ ...numStyle(26, INK_SOFT) }}>n = 3</span>
         </div>
       </Note>
@@ -175,7 +175,7 @@ export const WindowScene: React.FC = () => {
 
       {/* What the windows framed. */}
       <Ink at={biSteps[0]} dur={12} style={{ left: X0, top: biY, height: tileH(CHIP), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK), fontWeight: 600 }}>bigrams</span>
+        <span style={{ ...label(24, INK), fontWeight: 500 }}>bigrams</span>
       </Ink>
       {chipList(WINDOW.bigrams, biSteps, biY, (i) => (i < 2 ? overlapAt + i * 4 : undefined))}
       {/* "four bigrams": each chip counted in turn. */}
@@ -202,7 +202,7 @@ export const WindowScene: React.FC = () => {
         </div>
       </Note>
       <Ink at={triSteps[0]} dur={12} style={{ left: X0, top: triY, height: tileH(CHIP), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK), fontWeight: 600 }}>trigrams</span>
+        <span style={{ ...label(24, INK), fontWeight: 500 }}>trigrams</span>
       </Ink>
       {chipList(WINDOW.trigrams, triSteps, triY)}
       <Note at={triSteps[2] + 6} x={triRight + 16} y={triY}>

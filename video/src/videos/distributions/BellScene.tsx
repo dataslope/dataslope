@@ -170,12 +170,12 @@ export const BellScene: React.FC = () => {
 
         <Curve d={curve} at={bellAt - 6} dur={30} color={ASK} width={lerp(3.2, 5, glow)} />
         <Note at={bellAt + 6} x={sx(X, 203.5)} y={base - h(150)}>
-          <span style={{ ...note(23, ASK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>a normal, fitted to them</span>
+          <span style={{ ...note(23, ASK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>a normal, fitted to them</span>
         </Note>
 
         <VRule x={mx} bottom={base} top={labelY - 6} at={meanAt - 4} />
         <Note at={ninetyAt - 2} x={mx + 14} y={labelY - 10}>
-          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>mean {fmt(PENGUINS.mean, 1)} mm</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>mean {fmt(PENGUINS.mean, 1)} mm</span>
         </Note>
         <Note at={twoAt} x={mx - 14} y={labelY - 10} align="right">
           {/* The mean's line, at the mean label's size: one line, one size. */}
@@ -183,7 +183,7 @@ export const BellScene: React.FC = () => {
         </Note>
         <Bracket x0={sx(X, PENGUINS.mean)} x1={sx(X, PENGUINS.mean + PENGUINS.sd)} y={sdY} at={sdAt - 2} color={INK} up />
         <Note at={halfAt - 4} x={sx(X, PENGUINS.mean + PENGUINS.sd) + 16} y={sdY - 14}>
-          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>standard deviation, or SD: {fmt(PENGUINS.sd, 1)} mm</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>standard deviation, or SD: {fmt(PENGUINS.sd, 1)} mm</span>
         </Note>
       </Drift>
     </AbsoluteFill>

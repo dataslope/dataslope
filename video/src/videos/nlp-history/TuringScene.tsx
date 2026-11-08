@@ -171,10 +171,10 @@ export const TuringScene: React.FC = () => {
         </Svg>
         <Slip pts={wireA} at={typedAt + 6} period={46} />
         <Slip pts={wireB} at={typedAt + 14} period={52} offset={0.6} />
-        <Tag x={doorA[0]} y={floor + 18} at={personAt} align="center" size={25} color={INK} weight={650}>
+        <Tag x={doorA[0]} y={floor + 18} at={personAt} align="center" size={25} color={INK} weight={500}>
           a hidden person
         </Tag>
-        <Tag x={doorB[0]} y={floor + 18} at={machineAt} align="center" size={25} color={INK} weight={650}>
+        <Tag x={doorB[0]} y={floor + 18} at={machineAt} align="center" size={25} color={INK} weight={500}>
           a hidden machine
         </Tag>
         {[doorA, doorB].map(([x], i) => (

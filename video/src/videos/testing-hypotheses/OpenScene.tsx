@@ -208,7 +208,7 @@ export const OpenScene: React.FC = () => {
               left: sx(C, b.rate * g) + 14,
               top: y(b.yy) - 19,
               ...note(30, b.color),
-              fontWeight: 600,
+              fontWeight: 500,
               whiteSpace: "nowrap",
             }}
           >

@@ -62,7 +62,7 @@ const JoinBadge: React.FC<{ at: number; out?: number; x: number; y: number; n: n
         color: PAPER,
         fontFamily: SANS,
         fontSize: 20,
-        fontWeight: 750,
+        fontWeight: 500,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -229,7 +229,7 @@ export const StarScene: React.FC = () => {
 
         {/* ── The fact table, its grain, measures and keys ── */}
         <Note at={grainAt} x={fact.left} y={fact.top - 44}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             grain: <span style={{ color: INK }}>one row per order line</span>
           </span>
         </Note>
@@ -330,7 +330,7 @@ export const StarScene: React.FC = () => {
           <span style={{ ...note(24, INK) }}>Dashboard tools map straight onto it.</span>
         </Note>
         <Note at={defaultAt} x={NOTE_X} y={y(600)} width={NOTE_W}>
-          <span style={{ ...note(30, OK_INK), fontWeight: 750 }}>The default: a star.</span>
+          <span style={{ ...note(30, OK_INK), fontWeight: 500 }}>The default: a star.</span>
         </Note>
         <Note at={largeAt} x={NOTE_X} y={y(660)} width={NOTE_W}>
           <span style={{ ...note(24, INK_SOFT) }}>

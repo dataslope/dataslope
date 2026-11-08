@@ -138,7 +138,7 @@ export const BiasScene: React.FC = () => {
           <div style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>mostly the unhappiest</div>
         </Note>
         <Note at={survivorAt - 2} x={NOTE_X} y={y(BAR_Y) - h(4)}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>survivorship bias</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>survivorship bias</span>
         </Note>
         <Note at={selfAt - 2} x={NOTE_X} y={y(BAR_Y) + h(34)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
@@ -201,7 +201,7 @@ export const BiasScene: React.FC = () => {
           width={2.4}
           side="left"
           labelY={y(452)}
-          label={<span style={{ ...note(24, INK), fontWeight: 650 }}>everyone {fmt(BIAS.truth)}</span>}
+          label={<span style={{ ...note(24, INK), fontWeight: 500 }}>everyone {fmt(BIAS.truth)}</span>}
         />
         <VLine
           x={sx}
@@ -212,7 +212,7 @@ export const BiasScene: React.FC = () => {
           width={2.4}
           side="right"
           labelY={y(452)}
-          label={<span style={{ ...note(24, ACCENT_INK), fontWeight: 650 }}>stayed {fmt(BIAS.stayed)}</span>}
+          label={<span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>stayed {fmt(BIAS.stayed)}</span>}
         />
         <Dots dots={dots} r={8} opacity={0.55} />
         <Note at={scatterAt} x={NOTE_X} y={y(ROWS[0].y) - 16}>
@@ -225,7 +225,7 @@ export const BiasScene: React.FC = () => {
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>less noise…</span>
         </Note>
         <Bracket x0={tx} x1={sx} y={y(478)} up at={nothingAt} color={ACCENT}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same bias</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same bias</span>
         </Bracket>
         {/* In the plot's empty lower right, clear of the axis row and the notes column. */}
         {[
@@ -234,7 +234,7 @@ export const BiasScene: React.FC = () => {
           { at: exitAt, text: "for those who left: an exit survey" },
         ].map((line, i) => (
           <Note key={line.text} at={line.at - 2} x={1060} y={y(ROWS[1].y) + h(50) + i * 32}>
-            <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{line.text}</span>
+            <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{line.text}</span>
           </Note>
         ))}
       </Drift>

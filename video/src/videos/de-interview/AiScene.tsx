@@ -31,7 +31,7 @@ const Column: React.FC<{ at: number; title: string; children: React.ReactNode }>
   const p = ease(frame, at - 2, 14);
   return (
     <div style={{ width: "fit-content", maxWidth: COL_W, opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>
-      <div style={{ ...note(29, INK), fontWeight: 650, marginBottom: 14, whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...note(29, INK), fontWeight: 500, marginBottom: 14, whiteSpace: "nowrap" }}>{title}</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>{children}</div>
     </div>
   );
@@ -122,7 +122,7 @@ export const AiScene: React.FC = () => {
         <Headline lead="AI has changed this interview" turn="in four ways." at={from + 2} turnAt={fourAt} size={62} />
 
         <div style={{ position: "absolute", left: X0, top: top - 4, width: STEP_X - X0 - 40, opacity: ease(frame, ingestAt - 2, 12) }}>
-          <div style={{ ...note(30, INK), fontWeight: 650 }}>
+          <div style={{ ...note(30, INK), fontWeight: 500 }}>
             Ingestion for <span style={{ opacity: ease(frame, ragAt - 2, 12) }}>RAG</span>
           </div>
           <div style={{ ...note(24, INK_SOFT), marginTop: 4, opacity: ease(frame, expandAt - 2, 12) }}>retrieval-augmented generation</div>

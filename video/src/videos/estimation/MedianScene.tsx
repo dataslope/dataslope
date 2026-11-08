@@ -102,7 +102,7 @@ export const MedianScene: React.FC = () => {
       </Note>
       <Rule x={sx(X, K(MEDIAN.median))} y0={y(STRIP) + h(26)} y1={y(STRIP) - h(30)} at={medianAt - 2} color={EST} width={4} />
       <Note at={honestAt - 4} x={sx(X, K(MEDIAN.median)) - 12} y={y(STRIP) - 52} align="right" from="right">
-        <span style={{ ...note(22, EST_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>median {dollars(MEDIAN.median)}</span>
+        <span style={{ ...note(22, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>median {dollars(MEDIAN.median)}</span>
       </Note>
 
       {/* ── The one word ── */}
@@ -110,10 +110,10 @@ export const MedianScene: React.FC = () => {
         <Slot at={loopAt - 4}>For each of {MEDIAN.B.toLocaleString("en-US")} resamples, record its</Slot>
         <Slot at={loopAt + 2}>
           <Strike at={oneWordAt - 2}>
-            <span style={{ fontWeight: 650 }}>mean</span>
+            <span style={{ fontWeight: 500 }}>mean</span>
           </Strike>
         </Slot>
-        <Slot at={medianWordAt - 4} style={{ color: EST_INK, fontWeight: 600 }}>
+        <Slot at={medianWordAt - 4} style={{ color: EST_INK, fontWeight: 500 }}>
           <Marked at={meanWordAt - 2} color={HIGHLIGHT}>
             median
           </Marked>
@@ -186,7 +186,7 @@ export const MedianScene: React.FC = () => {
         <div style={{ height: 3, marginTop: 4, background: EST, width: `${100 * ease(frame, neededEndAt - 2, 18)}%`, borderRadius: 2 }} />
       </Ink>
       <Note at={rangeFiveAt - 2} x={(sx(XZ, K(MEDIAN.lo)) + sx(XZ, K(MEDIAN.hi))) / 2} y={y(HIST_BASE) - h(HIST_H) - 76} from="up">
-        <span style={{ ...note(22, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           the middle 95%
         </span>
       </Note>

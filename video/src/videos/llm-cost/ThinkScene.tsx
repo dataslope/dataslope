@@ -145,7 +145,7 @@ export const ThinkScene: React.FC = () => {
               <Note at={timesAt[i]} x={ansX1 + px(thinkCost(r.thinking)) * g + 18} y={ry + bh / 2 - 18}>
                 <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
                   <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>{usd(r.cost, 5)}</span>
-                  <span style={{ ...note(26, markAt[i] > 0 ? POINT_INK : INK), fontWeight: 600, ...TABULAR }}>
+                  <span style={{ ...note(26, markAt[i] > 0 ? POINT_INK : INK), fontWeight: 500, ...TABULAR }}>
                     {markAt[i] > 0 ? <Marked at={markAt[i]}>{`${r.times.toFixed(1)}x`}</Marked> : `${r.times.toFixed(1)}x`}
                   </span>
                 </span>
@@ -168,12 +168,12 @@ export const ThinkScene: React.FC = () => {
               </text>
             </g>
           ))}
-          <text x={BAR_X + BAR_MAX + 18} y={axisY + 30} style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
+          <text x={BAR_X + BAR_MAX + 18} y={axisY + 30} style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
             cost per request
           </text>
         </Svg>
         <Note at={longerAt - 6} x={ansX0 - 30} y={axisY + 50}>
-          <span style={{ ...note(24, OUTPUT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same answer in every row</span>
+          <span style={{ ...note(24, OUTPUT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same answer in every row</span>
         </Note>
         {/* The answer's slice glows down the rows as it is named again. */}
         {rows.map((_, i) => {

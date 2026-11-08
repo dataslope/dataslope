@@ -185,7 +185,7 @@ export const TwoPipelinesScene: React.FC = () => {
           ends near x 752), inking with the second. */}
       <ColumnRule x={(752 + ROW_X + 480) / 2} top={y(READ_Y)} height={31} at={saysGoodAt - 2} />
       <Note at={saysGoodAt - 2} x={ROW_X + 480} y={y(READ_Y)}>
-        <span style={{ ...note(24, LOST_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           <span style={{ color: INK_SOFT, fontWeight: 500 }}>How it feels: </span>
           <i>good</i>
         </span>

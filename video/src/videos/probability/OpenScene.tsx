@@ -140,7 +140,7 @@ export const OpenScene: React.FC = () => {
             </Svg>
             {seen ? (
               <Note at={summaryAt} x={x0 + PANEL.w * 0.44 + 14} y={y(PANEL.base - PANEL.tall - 40)} out={halfFrom - 8}>
-                <span style={{ ...note(21, STAT_INK), fontWeight: 650 }}>a summary</span>
+                <span style={{ ...note(21, STAT_INK), fontWeight: 500 }}>a summary</span>
               </Note>
             ) : (
               <div
@@ -232,7 +232,7 @@ export const OpenScene: React.FC = () => {
         color={STAT}
       />
       <Note at={headsAt - 2} x={STRIP.x0 - STRIP.r} y={y(STRIP.y) - STRIP.r - 56}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the first {COIN.streak}: all heads</span>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the first {COIN.streak}: all heads</span>
       </Note>
       <Note at={overAt + 4} x={STRIP.x0 + STRIP.count * STRIP.pitch} y={y(STRIP.y) - 16}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>…</span>
@@ -246,12 +246,12 @@ export const OpenScene: React.FC = () => {
       <div style={{ position: "absolute", left: 160, top: y(790), display: "flex", alignItems: "stretch", gap: 32 }}>
         <Ink at={hundredAt - 4} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
           <div style={note(24, INK_SOFT)}>Flips</div>
-          <Count at={hundredAt - 2} dur={28} to={COIN.flips} format={num} style={{ ...note(40, INK), fontWeight: 650, display: "block" }} />
+          <Count at={hundredAt - 2} dur={28} to={COIN.flips} format={num} style={{ ...note(40, INK), fontWeight: 500, display: "block" }} />
         </Ink>
         <div style={{ width: 1, background: HAIRLINE, opacity: ease(frame, fiftyAt - 6, 14) }} />
         <Ink at={fiftyAt - 6} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <div style={{ ...note(24, DATA), fontWeight: 650 }}>Heads</div>
-          <Count at={fiftyAt - 4} dur={30} to={COIN.heads} format={num} style={{ ...note(40, INK), fontWeight: 650, display: "block" }} />
+          <div style={{ ...note(24, DATA), fontWeight: 500 }}>Heads</div>
+          <Count at={fiftyAt - 4} dur={30} to={COIN.heads} format={num} style={{ ...note(40, INK), fontWeight: 500, display: "block" }} />
         </Ink>
         <div style={{ width: 1, background: HAIRLINE, opacity: ease(frame, pointAt - 4, 16) }} />
         <Ink at={pointAt - 4} dur={16} style={{ position: "relative", whiteSpace: "nowrap" }}>
@@ -259,7 +259,7 @@ export const OpenScene: React.FC = () => {
             Share
             <span style={{ opacity: ease(frame, closeAt - 2, 12) }}>, close to the true 0.5 but not on it</span>
           </div>
-          <div style={{ ...note(40, STAT_INK), fontWeight: 600 }}>{fmt(COIN.pHeads, 4)}</div>
+          <div style={{ ...note(40, STAT_INK), fontWeight: 500 }}>{fmt(COIN.pHeads, 4)}</div>
         </Ink>
       </div>
       {/* A hairline under the count, drawn as the share lands. */}

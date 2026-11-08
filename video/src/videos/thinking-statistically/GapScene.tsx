@@ -248,7 +248,7 @@ export const GapScene: React.FC = () => {
                   borderRadius: 4,
                   ...note(23, STAT_INK),
                   ...TABULAR,
-                  fontWeight: 600,
+                  fontWeight: 500,
                 }}
               >
                 {fmt(mean)}
@@ -261,7 +261,7 @@ export const GapScene: React.FC = () => {
       {/* ── The gaps, A minus B ── */}
       <AbsoluteFill style={{ opacity: panelOp }}>
       <Ink at={scoresAt - 4} dur={14} style={{ left: 1290, top: y(330), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK), fontWeight: 560 }}>The gap, A minus B</span>
+        <span style={{ ...label(24, INK), fontWeight: 500 }}>The gap, A minus B</span>
       </Ink>
       <div
         style={{
@@ -348,7 +348,7 @@ export const GapScene: React.FC = () => {
                 opacity: ease(frame, draws[k].bar + 6, 8),
                 whiteSpace: "nowrap",
                 ...note(23, STAT_INK),
-                fontWeight: 600,
+                fontWeight: 500,
               }}
             >
               {/* "Randomness makes differences": each gap lit as the word lands. */}

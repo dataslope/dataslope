@@ -148,13 +148,13 @@ export const SkewScene: React.FC = () => {
           </div>
         ))}
         <Note at={avgAt + 2} x={sx(2)} y={meanY - h(36)}>
-          <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             average <Num>{count(SKEW.mean)}</Num>
             <span style={{ opacity: ease(frame, neverAt, 10), color: INK_SOFT }}>, never moves</span>
           </span>
         </Note>
         <Note at={guestsAt} x={sx(1) - 4} y={yOf(SKEW.maxBefore) - h(8)} out={spreadAt + 6}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{count(SKEW.maxBefore)}</Num>
             <span style={{ opacity: ease(frame, timesAt, 10) }}>
               , <Num>{SKEW.ratioBefore}</Num> × the average
@@ -162,7 +162,7 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={largestAt + 4} x={sx(MAX_AFTER) + BAR_W / 2 - 110} y={meanY - h(78)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             largest <Num>{count(SKEW.maxAfter)}</Num>
           </span>
         </Note>
@@ -192,7 +192,7 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={waitAt - 2} x={R_X} y={y(470)} out={saltAt}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>every core waits for it</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every core waits for it</span>
         </Note>
         <Note at={suffixAt} x={R_X} y={y(470)}>
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap", ...note(24, INK) }}>
@@ -213,10 +213,10 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={stageAt - 2} x={R_X} y={y(536)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the stage waits for the largest</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the stage waits for the largest</span>
         </Note>
         <Note at={twoAt - 2} x={R_X} y={y(604)}>
-          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             aggregate in two steps
             <span style={{ ...note(22, INK_SOFT), fontWeight: 500 }}>, if it can&apos;t combine locally</span>
           </span>
@@ -252,7 +252,7 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={matchAt - 2} x={R_X} y={y(740)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>every salted row still finds its match</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every salted row still finds its match</span>
         </Note>
         <Note at={nullsAt - 2} x={R_X} y={y(792)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>

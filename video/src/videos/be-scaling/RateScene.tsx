@@ -157,7 +157,7 @@ export const RateScene: React.FC = () => {
         </Line>
 
         {/* ── The trace: ten at 59 s, ten at 61 s, against ten a minute. ── */}
-        <Line at={limitAt} x={X0} y={axY - h(64)} size={22} weight={600} out={rowsOut}>
+        <Line at={limitAt} x={X0} y={axY - h(64)} size={22} weight={500} out={rowsOut}>
           <Mark at={limitAt + 2}>limit: 10 a minute</Mark>
         </Line>
         <Svg opacity={ease(frame, limitAt, 12) * (1 - ease(frame, rowsOut, 10))}>
@@ -165,7 +165,7 @@ export const RateScene: React.FC = () => {
           {[0, 20, 40, 60].map((t) => (
             <g key={t}>
               <line x1={ax(t)} x2={ax(t)} y1={axY} y2={axY + 7} stroke={INK} strokeWidth={1.2} />
-              <text x={ax(t)} y={axY + 30} textAnchor="middle" style={svgText({ ...note(20, t === 60 ? INK : INK_SOFT), fontWeight: t === 60 ? 700 : 500 })}>
+              <text x={ax(t)} y={axY + 30} textAnchor="middle" style={svgText({ ...note(20, t === 60 ? INK : INK_SOFT), fontWeight: t === 60 ? 500 : 500 })}>
                 {t} s
               </text>
             </g>
@@ -182,10 +182,10 @@ export const RateScene: React.FC = () => {
           })}
         </Svg>
         <Ink at={fiftyNineAt + 4} dur={12} out={rowsOut} style={{ left: ax(59) - 200, top: axY - 64, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 600 }}>10 at 59 s</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>10 at 59 s</span>
         </Ink>
         <Ink at={sixtyOneAt + 4} dur={12} out={rowsOut} style={{ left: ax(61) + 34, top: axY - 64, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 600 }}>10 at 61 s</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>10 at 61 s</span>
         </Ink>
 
         {/* ── Four limiters, a row each. ── */}
@@ -197,7 +197,7 @@ export const RateScene: React.FC = () => {
         ].map(([name, sub, at, subAt], i) => (
           <React.Fragment key={i}>
             <Ink at={(at as number) - 2} dur={12} out={rowsOut} style={{ left: X0, top: rowY(i) - 4, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(22, INK), fontWeight: 600 }}>{name as string}</span>
+              <span style={{ ...label(22, INK), fontWeight: 500 }}>{name as string}</span>
             </Ink>
             <Ink at={subAt as number} dur={12} out={rowsOut} style={{ left: X0, top: rowY(i) + 28, whiteSpace: "nowrap" }}>
               <span style={note(20, INK_SOFT)}>{sub as string}</span>
@@ -227,20 +227,20 @@ export const RateScene: React.FC = () => {
         ) : null}
 
         {/* Each row's verdict. */}
-        <Line at={twentyAt} x={NOTE_X} y={rowY(0) - 4} size={21} weight={600} color={ACCENT_INK} out={rowsOut}>
+        <Line at={twentyAt} x={NOTE_X} y={rowY(0) - 4} size={21} weight={500} color={ACCENT_INK} out={rowsOut}>
           <Num>{RATE.fixed.accepted}</Num> of <Num>20</Num> pass
           <span style={{ opacity: ease(frame, twiceAt, 10) }}>: 2× the limit</span>
         </Line>
         <Line at={cheapAt} x={NOTE_X} y={rowY(0) + 28} size={20} color={INK_SOFT} out={rowsOut}>
           for one cheap counter
         </Line>
-        <Line at={refusesAt} x={NOTE_X} y={rowY(1) - 4} size={21} weight={600} color={OK_INK} out={rowsOut}>
+        <Line at={refusesAt} x={NOTE_X} y={rowY(1) - 4} size={21} weight={500} color={OK_INK} out={rowsOut}>
           the second ten refused
         </Line>
         <Line at={estimateAt} x={NOTE_X} y={rowY(1) + 28} size={20} color={INK_SOFT} out={rowsOut}>
           an estimate: assumes an even spread
         </Line>
-        <Line at={burstAt} x={NOTE_X} y={rowY(2) - 4} size={21} weight={600} color={OK_INK} out={rowsOut}>
+        <Line at={burstAt} x={NOTE_X} y={rowY(2) - 4} size={21} weight={500} color={OK_INK} out={rowsOut}>
           a burst of <Num>10</Num>
           <span style={{ opacity: ease(frame, secondAt, 10) }}>, then refused</span>
         </Line>
@@ -248,7 +248,7 @@ export const RateScene: React.FC = () => {
           empty: HTTP 429
           <span style={{ opacity: ease(frame, tooManyAt, 10) }}>, too many requests</span>
         </Line>
-        <Line at={smoothAt} x={NOTE_X} y={rowY(3) - 4} size={21} weight={600} color={OK_INK} out={rowsOut}>
+        <Line at={smoothAt} x={NOTE_X} y={rowY(3) - 4} size={21} weight={500} color={OK_INK} out={rowsOut}>
           a smooth stream out
         </Line>
         <Line at={waitsAt} x={NOTE_X} y={rowY(3) + 28} size={20} color={INK_SOFT} out={rowsOut}>
@@ -256,7 +256,7 @@ export const RateScene: React.FC = () => {
         </Line>
 
         {/* ── The follow-up: each server its own bucket, or one shared. ── */}
-        <Line at={fourAt} x={X0} y={y(330)} size={23} weight={600}>
+        <Line at={fourAt} x={X0} y={y(330)} size={23} weight={500}>
           Four app servers, each with its own bucket
         </Line>
         {[0, 1, 2, 3].map((i) => (
@@ -273,11 +273,11 @@ export const RateScene: React.FC = () => {
         <Line at={handsAt} x={X0} y={y(390) + 160} size={21} color={INK_SOFT}>
           a burst of <Num>{RATE.burst}</Num>, dealt round-robin: ten to each
         </Line>
-        <Line at={fourTimesAt} x={X0} y={y(390) + 196} size={23} weight={600} color={ACCENT_INK}>
+        <Line at={fourTimesAt} x={X0} y={y(390) + 196} size={23} weight={500} color={ACCENT_INK}>
           all <Num>{RATE.localOk}</Num> pass: 4× the limit
         </Line>
         <VRule x={930} top={y(330)} bottom={sharedBox.top + sharedBox.h + 30 + 2 * (CELL + CELL_GAP) + 50} at={shareAt} />
-        <Line at={shareAt} x={1010} y={y(330)} size={23} weight={600} color={OK_INK}>
+        <Line at={shareAt} x={1010} y={y(330)} size={23} weight={500} color={OK_INK}>
           The count in a store they all share
         </Line>
         {[0, 1, 2, 3].map((i) => (
@@ -293,7 +293,7 @@ export const RateScene: React.FC = () => {
             return <div key={k} style={{ width: CELL, height: CELL, borderRadius: 5, background: k < RATE.sharedOk ? OK : ACCENT, opacity: p }} />;
           })}
         </div>
-        <Line at={shareAt + 30} x={1010} y={sharedBox.top + sharedBox.h + 30 + 2 * (CELL + CELL_GAP) + 22} size={23} weight={600} color={OK_INK}>
+        <Line at={shareAt + 30} x={1010} y={sharedBox.top + sharedBox.h + 30 + 2 * (CELL + CELL_GAP) + 22} size={23} weight={500} color={OK_INK}>
           <Num>{RATE.sharedOk}</Num> pass
         </Line>
       </Drift>

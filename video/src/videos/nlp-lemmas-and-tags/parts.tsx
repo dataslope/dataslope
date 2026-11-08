@@ -42,7 +42,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -223,7 +223,7 @@ export const Chip: React.FC<{
         justifyContent: "center",
         fontFamily: MONO,
         fontSize: size,
-        fontWeight: 600,
+        fontWeight: 500,
         lineHeight: 1,
         color: g > 0 ? `color-mix(in srgb, ${INK_SOFT} ${(g * 100).toFixed(0)}%, ${INK})` : INK,
         whiteSpace: "pre",
@@ -260,7 +260,7 @@ export const Tag: React.FC<{
         transform: `translate(${tx}, ${(1 - p) * -6}px)`,
         opacity: p * (1 - o),
         ...note(size, color),
-        fontWeight: 600,
+        fontWeight: 500,
         whiteSpace: "nowrap",
       }}
     >

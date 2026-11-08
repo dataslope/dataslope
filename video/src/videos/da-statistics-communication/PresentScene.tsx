@@ -209,7 +209,7 @@ export const PresentScene: React.FC = () => {
           </span>
         </Note>
         <Note at={recommendAt - 2} x={sx + pad} y={sy + sh - h(76)}>
-          <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={tieAt + 4} out={q10At}>
               Recommendation: ship the new design to everyone.
             </Mark>
@@ -261,7 +261,7 @@ export const PresentScene: React.FC = () => {
           </span>
         </Note>
         <Note at={sayAt - 2} x={X0} y={y(LIST_Y) + h(200)} out={out9} width={860}>
-          <span style={{ ...note(30, OK_INK), fontWeight: 600, display: "block", textWrap: "balance" }}>
+          <span style={{ ...note(30, OK_INK), fontWeight: 500, display: "block", textWrap: "balance" }}>
             <span style={{ color: INK_SOFT, fontWeight: 500 }}>say: </span>
             &ldquo;We&apos;re highly confident the true lift is between {LIFT.lo}% and {LIFT.hi}%.&rdquo;
           </span>
@@ -284,12 +284,12 @@ export const PresentScene: React.FC = () => {
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>no false precision:</span>
         </Note>
         <Note at={twelveThreeAt - 2} x={X0} y={y(LIST_Y) + 3 * h(PITCH) + h(86)}>
-          <span style={{ ...note(34, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(34, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             <Strike at={twelveThreeAt + 8}>{LIFT.precise}% lift</Strike>
           </span>
         </Note>
         <Note at={aboutAt - 2} x={X0 + 300} y={y(LIST_Y) + 3 * h(PITCH) + h(86)}>
-          <span style={{ ...note(34, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(34, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             about {LIFT.point}% ({LIFT.lo}% to {LIFT.hi}%)
           </span>
         </Note>

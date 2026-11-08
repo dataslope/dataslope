@@ -19,7 +19,7 @@ const COL = [500, 790, 1110];
 const RES_X = 1580;
 
 const faint: React.CSSProperties = { ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" };
-const code: React.CSSProperties = { fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none" };
+const code: React.CSSProperties = { fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" };
 
 /** A column head: its step number in the accent, then its name. */
 const Head: React.FC<{ x: number; y: number; n?: string; nAt?: number; at: number; children: React.ReactNode }> = ({
@@ -33,7 +33,7 @@ const Head: React.FC<{ x: number; y: number; n?: string; nAt?: number; at: numbe
   <>
     {n ? (
       <Ink at={nAt ?? at} dur={10} style={{ left: x, top: y, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>{n}</span>
+        <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>{n}</span>
       </Ink>
     ) : null}
     <Ink at={at} dur={14} style={{ left: x + (n ? 26 : 0), top: y, whiteSpace: "nowrap" }}>

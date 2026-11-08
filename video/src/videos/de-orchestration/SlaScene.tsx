@@ -92,7 +92,7 @@ export const SlaScene: React.FC = () => {
           {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((hr) => (
             <g key={hr}>
               <line x1={tx(hr)} x2={tx(hr)} y1={axisY} y2={axisY + 7} stroke={INK} strokeWidth={1.4} />
-              <text x={tx(hr)} y={axisY + 31} textAnchor="middle" style={svgText({ ...label(19, hr === DEADLINE ? INK : INK_SOFT), fontWeight: hr === DEADLINE ? 700 : 500 })}>
+              <text x={tx(hr)} y={axisY + 31} textAnchor="middle" style={svgText({ ...label(19, hr === DEADLINE ? INK : INK_SOFT), fontWeight: hr === DEADLINE ? 500 : 500 })}>
                 {`0${hr}:00`}
               </text>
             </g>
@@ -134,7 +134,7 @@ export const SlaScene: React.FC = () => {
           />
         </svg>
         {NIGHTS.map((nt, i) => (
-          <div key={nt.name} style={{ position: "absolute", left: X0, top: rowY(i) - 15, ...note(23, INK), fontWeight: 600, opacity: ease(frame, drawAt[i], 10) }}>
+          <div key={nt.name} style={{ position: "absolute", left: X0, top: rowY(i) - 15, ...note(23, INK), fontWeight: 500, opacity: ease(frame, drawAt[i], 10) }}>
             {nt.name}
           </div>
         ))}
@@ -144,7 +144,7 @@ export const SlaScene: React.FC = () => {
           </div>
         ) : null}
         <Note at={ordersAt} x={tx(DEADLINE) + 14} y={y(334)}>
-          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <CodeSpan size={22}>daily_orders</CodeSpan> fresh by 06:00 UTC
           </span>
         </Note>
@@ -187,7 +187,7 @@ export const SlaScene: React.FC = () => {
 
         {/* Three ways to enforce it. */}
         <Note at={threeAt} x={X0} y={y(608)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>enforce it three ways</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>enforce it three ways</span>
         </Note>
         {ways.map((w, i) => (
           <Note key={i} at={w.at - 2} x={X0} y={y(650) + i * h(48)}>

@@ -94,7 +94,7 @@ export const ClusterScene: React.FC = () => {
         />
         <Note at={storedAt} x={X0} y={ug.rowTop(users.length) + h(18)} dim={leftDim}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 650 }}>clustered:</span> the rows themselves,
+            <span style={{ fontWeight: 500 }}>clustered:</span> the rows themselves,
           </div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, oneAt, 10) }}>in id order (one per table)</div>
         </Note>
@@ -113,14 +113,14 @@ export const ClusterScene: React.FC = () => {
         ))}
         <Note at={lookupAt + 6} x={ig.x} y={ig.rowTop(index.length) + h(18)} dim={leftDim}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 650 }}>non-clustered:</span> a separate lookup
+            <span style={{ fontWeight: 500 }}>non-clustered:</span> a separate lookup
           </div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, manyAt, 10) }}>(many per table)</div>
         </Note>
         {/* Where the term comes from: the engines that keep one. */}
         <Note at={enginesAt} x={X0} y={ug.rowTop(users.length) + h(118)}>
           <div style={{ ...note(22, INK), width: 800 }}>
-            <span style={{ fontWeight: 650 }}>SQL Server and MySQL&rsquo;s InnoDB keep one.</span>
+            <span style={{ fontWeight: 500 }}>SQL Server and MySQL&rsquo;s InnoDB keep one.</span>
             <span style={{ opacity: ease(frame, innoAt, 10) }}>
               {" "}
               InnoDB stores each table in primary-key order, and its other indexes point at that key.

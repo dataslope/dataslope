@@ -277,7 +277,7 @@ export const FormatsScene: React.FC = () => {
         <div style={{ position: "absolute", left: X0, top: lowY - 44, ...label(22, INK), whiteSpace: "nowrap", opacity: ease(frame, csvAt, 12) }}>
           Over CSV <span style={{ color: INK_SOFT, fontWeight: 500 }}>· the same million sales</span>
         </div>
-        <div style={{ position: "absolute", left: X0, top: lowY, width: 200, fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK, opacity: ease(frame, csvAt + 2, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: lowY, width: 200, fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK, opacity: ease(frame, csvAt + 2, 12) }}>
           sales.csv
         </div>
         <FileBar x={X0 + 210} y={lowY} width={CSV_W} height={h(34)} at={csvAt + 2} pattern={TINTS} />
@@ -285,14 +285,14 @@ export const FormatsScene: React.FC = () => {
           <Num>{MB(FILES.csv)}</Num>
           <span style={{ color: INK_SOFT, opacity: ease(frame, typesAt, 10) }}> · text, no types, no schema</span>
         </div>
-        <div style={{ position: "absolute", left: X0, top: lowY + h(52), width: 200, fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK, opacity: ease(frame, csvAt + 6, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: lowY + h(52), width: 200, fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK, opacity: ease(frame, csvAt + 6, 12) }}>
           sales.parquet
         </div>
         <FileBar x={X0 + 210} y={lowY + h(52)} width={pqW} height={h(34)} at={csvAt + 6} segments={PARQUET_SEGMENTS} />
         <div style={{ position: "absolute", left: X0 + 210 + pqW + 18, top: lowY + h(52), ...note(23, INK), whiteSpace: "nowrap", opacity: ease(frame, csvAt + 14, 12) }}>
           <Num>{MB(FILES.parquet)}</Num>
           <span style={{ color: INK_SOFT, opacity: ease(frame, typesAt + 4, 10) }}> · typed, with a schema</span>
-          <span style={{ fontWeight: 600, color: OK_INK, opacity: ease(frame, quarterAt + 4, 10) }}>
+          <span style={{ fontWeight: 500, color: OK_INK, opacity: ease(frame, quarterAt + 4, 10) }}>
             {" "}
             · under a quarter of the size
           </span>

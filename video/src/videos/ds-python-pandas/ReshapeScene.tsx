@@ -100,7 +100,7 @@ export const ReshapeScene: React.FC = () => {
         {/* ── melt ── */}
         <KeyArrow from={[wg.right + 14, wg.rowMid(0)]} to={[LONG_X - 14, lg.rowMid(1)]} at={meltAt + 2} />
         <Note at={meltAt + 4} x={wg.right + 40} y={wg.rowTop(0) - h(56)}>
-          <span style={{ ...note(26, INK), fontWeight: 650 }}>
+          <span style={{ ...note(26, INK), fontWeight: 500 }}>
             <Mono>.melt()</Mono>
           </span>
         </Note>
@@ -126,7 +126,7 @@ export const ReshapeScene: React.FC = () => {
         {/* ── pivot, back ── */}
         <KeyArrow from={[lg.right + 14, lg.rowMid(1)]} to={[BACK_X - 14, bg.rowMid(0)]} at={pivotAt + 2} />
         <Note at={pivotAt + 4} x={lg.right + 40} y={wg.rowTop(0) - h(56)}>
-          <span style={{ ...note(26, INK), fontWeight: 650 }}>
+          <span style={{ ...note(26, INK), fontWeight: 500 }}>
             <Mono>.pivot()</Mono>
           </span>
         </Note>

@@ -62,12 +62,12 @@ export const ChenScene: React.FC = () => {
         {/* ── The argument, in order: each step's number in its own words' face and
             size, set apart by its ink and weight ── */}
         <Ink at={meansAt - 8} dur={16} style={{ left: 122, top: stepY, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(40), color: STAT_INK, fontWeight: 600, marginRight: 14 }}>1</span>
+          <span style={{ ...body(40), color: STAT_INK, fontWeight: 500, marginRight: 14 }}>1</span>
           <span style={{ ...body(40), color: INK }}>What the data means</span>
         </Ink>
         <Arrow from={[548, stepY + 30]} to={[618, stepY + 30]} at={beforeAt} dur={12} />
         <Ink at={storeAt - 6} dur={16} style={{ left: 650, top: stepY, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(40), color: INK_SOFT, fontWeight: 600, marginRight: 14 }}>2</span>
+          <span style={{ ...body(40), color: INK_SOFT, fontWeight: 500, marginRight: 14 }}>2</span>
           <span style={{ ...body(40), color: INK_SOFT }}>How to store it</span>
         </Ink>
 

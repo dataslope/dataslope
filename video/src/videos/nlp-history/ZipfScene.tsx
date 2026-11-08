@@ -136,10 +136,10 @@ export const ZipfScene: React.FC = () => {
           return (
             <React.Fragment key={row.word}>
               {cell(0, <span style={{ ...note(25, INK_SOFT), ...TABULAR }}>{row.rank}</span>)}
-              {cell(1, <span style={{ ...note(26, INK), fontWeight: 600 }}>{row.word}</span>)}
+              {cell(1, <span style={{ ...note(26, INK), fontWeight: 500 }}>{row.word}</span>)}
               {cell(
                 2,
-                <span style={{ ...note(26, DATA_INK), ...TABULAR, fontWeight: 600 }}>
+                <span style={{ ...note(26, DATA_INK), ...TABULAR, fontWeight: 500 }}>
                   {isTop ? <Mark at={(i === 0 ? firstTwoAt : tieAt) - 2}>{fmt(row.count, 0)}</Mark> : fmt(row.count, 0)}
                 </span>,
               )}
@@ -149,8 +149,8 @@ export const ZipfScene: React.FC = () => {
         {/* The tenth word, two rows on, and what the law expects of it. */}
         {[
           [0, <span key="r" style={{ ...note(25, INK_SOFT), ...TABULAR }}>{ZIPF.tenth.rank}</span>],
-          [1, <span key="w" style={{ ...note(26, INK), fontWeight: 600 }}>{ZIPF.tenth.word}</span>],
-          [2, <span key="c" style={{ ...note(26, DATA_INK), ...TABULAR, fontWeight: 600 }}>{fmt(ZIPF.tenth.count, 0)}</span>],
+          [1, <span key="w" style={{ ...note(26, INK), fontWeight: 500 }}>{ZIPF.tenth.word}</span>],
+          [2, <span key="c" style={{ ...note(26, DATA_INK), ...TABULAR, fontWeight: 500 }}>{fmt(ZIPF.tenth.count, 0)}</span>],
         ].map(([k, el]) => (
           <Ink key={k as number} at={tenthAt - 2} dur={12} style={{ left: colX[k as number], top: TTOP + 52 + 8 * ROW, width: COLS[k as number].w, textAlign: COLS[k as number].align }}>
             {el as React.ReactNode}
@@ -203,7 +203,7 @@ export const ZipfScene: React.FC = () => {
         return (
           <React.Fragment key={i}>
             <Ink at={b.at} dur={14} style={{ left: TX0, top: b.top, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(21, INK_SOFT), fontWeight: 600 }}>{b.text}</span>
+              <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>{b.text}</span>
             </Ink>
             <div style={{ position: "absolute", left: TX0, top: b.top + 30, width: BAR_W, height: 20, borderRadius: 4, background: LISTING_PAPER, border: `1px solid ${HAIRLINE}`, opacity: ease(frame, b.at, 10), boxSizing: "border-box" }} />
             <div style={{ position: "absolute", left: TX0, top: b.top + 30, width: BAR_W * b.share * p, height: 20, borderRadius: 4, background: b.color, opacity: p > 0 ? 1 : 0 }} />
@@ -272,35 +272,35 @@ export const ZipfScene: React.FC = () => {
       <Svg opacity={ease(frame, sevenAt - 2, 10)}>
         <line x1={hapax1} x2={hapax1} y1={CY1 - 8} y2={CY1 + 8} stroke={DATA} strokeWidth={3} />
       </Svg>
-      <Tag x={hapax1} y={ly(1) - 44} at={sevenAt - 2} align="center" size={20} color={DATA_INK} weight={650} style={{ background: PAPER }}>
+      <Tag x={hapax1} y={ly(1) - 44} at={sevenAt - 2} align="center" size={20} color={DATA_INK} weight={500} style={{ background: PAPER }}>
         <span style={TABULAR}>{fmt(ZIPF.distinct, 0)}</span>
       </Tag>
-      <Tag x={(CX0 + CX1) / 2} y={CY1 + 46} at={rankAt + 4} align="center" size={20} weight={600}>
+      <Tag x={(CX0 + CX1) / 2} y={CY1 + 46} at={rankAt + 4} align="center" size={20} weight={500}>
         rank, <Mark at={logAt}>log scale</Mark>
       </Tag>
-      <Tag x={CX0 - 6} y={CY0 - 50} at={rankAt + 4} size={20} weight={600}>
+      <Tag x={CX0 - 6} y={CY0 - 50} at={rankAt + 4} size={20} weight={500}>
         times it appears, <Mark at={logAt + 4}>log scale</Mark>
       </Tag>
-      <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 66} at={lineAt + 6} size={21} color={INK_SOFT} weight={600} style={{ background: PAPER }}>
+      <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 66} at={lineAt + 6} size={21} color={INK_SOFT} weight={500} style={{ background: PAPER }}>
         one over the rank
       </Tag>
-      <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 98} at={lawAt - 2} size={22} color={INK} weight={600} style={{ background: PAPER }}>
+      <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 98} at={lawAt - 2} size={22} color={INK} weight={500} style={{ background: PAPER }}>
         Zipf's law
       </Tag>
-      <Tag x={lx(1) + 18} y={ly(14)} at={sixtyAt - 4} size={22} color={DATA_INK} weight={650}>
+      <Tag x={lx(1) + 18} y={ly(14)} at={sixtyAt - 4} size={22} color={DATA_INK} weight={500}>
         top 100 of <span style={TABULAR}>{fmt(ZIPF.distinct, 0)}</span> words:
       </Tag>
-      <Tag x={lx(1) + 18} y={ly(14) + 30} at={sixtyAt - 2} size={22} color={DATA_INK} weight={650}>
+      <Tag x={lx(1) + 18} y={ly(14) + 30} at={sixtyAt - 2} size={22} color={DATA_INK} weight={500}>
         {fmt(ZIPF.top100Share * 100, 0)}% of the book
       </Tag>
       {/* Left of the run, where the plot is empty, with a short lead to it. */}
       <Svg opacity={ease(frame, appearAt + 4, 12)}>
         <line x1={HAPAX_LABEL + 12} x2={hapax0 - 14} y1={ly(1) - 14} y2={ly(1)} stroke={INK} strokeWidth={1.6} />
       </Svg>
-      <Tag x={HAPAX_LABEL} y={ly(1) - 64} at={differentAt - 2} align="right" size={22} color={INK} weight={650}>
+      <Tag x={HAPAX_LABEL} y={ly(1) - 64} at={differentAt - 2} align="right" size={22} color={INK} weight={500}>
         <span style={TABULAR}>{fmt(ZIPF.hapaxes, 0)}</span> of <span style={TABULAR}>{fmt(ZIPF.distinct, 0)}</span> words
       </Tag>
-      <Tag x={HAPAX_LABEL} y={ly(1) - 34} at={appearAt - 2} align="right" size={22} color={INK} weight={650}>
+      <Tag x={HAPAX_LABEL} y={ly(1) - 34} at={appearAt - 2} align="right" size={22} color={INK} weight={500}>
         appear once
       </Tag>
     </AbsoluteFill>

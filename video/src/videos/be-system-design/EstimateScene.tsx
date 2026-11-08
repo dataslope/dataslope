@@ -97,13 +97,13 @@ export const EstimateScene: React.FC = () => {
         <Spot id="envelope" at={envAt} left={1520} top={y(690)} width={200} height={artH("envelope", 200)} />
 
         {/* Three slots, filled as the beats go. */}
-        <Line x={X0} y={headY} at={qpsHead} size={29} weight={600}>
+        <Line x={X0} y={headY} at={qpsHead} size={29} weight={500}>
           Requests per second<span style={{ color: BLUE_INK, opacity: ease(frame, qpsAt, 10) }}> (QPS)</span>
         </Line>
-        <Line x={ST_X} y={headY} at={stHead} size={29} weight={600} dim={neitherAt}>
+        <Line x={ST_X} y={headY} at={stHead} size={29} weight={500} dim={neitherAt}>
           Storage
         </Line>
-        <Line x={BW_X} y={headY} at={bwHead} size={29} weight={600} dim={neitherAt}>
+        <Line x={BW_X} y={headY} at={bwHead} size={29} weight={500} dim={neitherAt}>
           Bandwidth
         </Line>
 
@@ -118,9 +118,9 @@ export const EstimateScene: React.FC = () => {
             opacity: ease(frame, trickAt, 12),
           }}
         >
-          <span style={{ ...note(27, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>1,000,000</Num> a day ÷ <Num>86,400</Num> s
-            <span style={{ color: BLUE_INK, fontWeight: 600, opacity: ease(frame, twelveAt, 10) }}>
+            <span style={{ color: BLUE_INK, fontWeight: 500, opacity: ease(frame, twelveAt, 10) }}>
               {" "}
               ≈ <Num>{sig(E.millionPerDayQps)}</Num> a second
             </span>
@@ -135,7 +135,7 @@ export const EstimateScene: React.FC = () => {
             </>,
           )}
         </Line>
-        <Line x={X0} y={pair(0) + 48} at={writesAt} size={28} weight={600} color={BLUE_INK}>
+        <Line x={X0} y={pair(0) + 48} at={writesAt} size={28} weight={500} color={BLUE_INK}>
           ≈ <Num>{int(sig(E.writeQps))}</Num> writes a second
         </Line>
         <Line x={X0} y={pair(1)} at={ratioAt} size={25}>
@@ -149,7 +149,7 @@ export const EstimateScene: React.FC = () => {
             )}
           </span>
         </Line>
-        <Line x={X0} y={pair(1) + 48} at={billionAt} size={28} weight={600} color={BLUE_INK}>
+        <Line x={X0} y={pair(1) + 48} at={billionAt} size={28} weight={500} color={BLUE_INK}>
           <Num>{int(E.readsPerDay)}</Num> a day
           <span style={{ opacity: ease(frame, readsAt, 10) }}>
             {" "}
@@ -167,12 +167,12 @@ export const EstimateScene: React.FC = () => {
             )}
           </span>
         </Line>
-        <Line x={X0} y={pair(2) + 48} at={peakQpsAt} size={28} weight={600} color={BLUE_INK} style={{ transform: `scale(${1 + 0.06 * lit})`, transformOrigin: "0 50%" }}>
+        <Line x={X0} y={pair(2) + 48} at={peakQpsAt} size={28} weight={500} color={BLUE_INK} style={{ transform: `scale(${1 + 0.06 * lit})`, transformOrigin: "0 50%" }}>
           <Mark at={peakQpsAt + 6} color={HIGHLIGHT}>
             ≈ <Num>{int(sig(E.peakReadQps))}</Num> redirects a second
           </Mark>
         </Line>
-        <Line x={X0 + 450} y={pair(2) + 48} at={cacheAt} size={28} weight={600} color={OK_INK}>
+        <Line x={X0 + 450} y={pair(2) + 48} at={cacheAt} size={28} weight={500} color={OK_INK}>
           and a cache
         </Line>
 
@@ -187,10 +187,10 @@ export const EstimateScene: React.FC = () => {
         <Line x={ST_X} y={ruleY + 60} at={gbAt - 4} size={27} dim={neitherAt}>
           × <Num>{int(A.newLinksPerDay)}</Num> a day
         </Line>
-        <Line x={ST_X} y={ruleY + 120} at={gbAt} size={27} weight={600} color={BLUE_INK} dim={neitherAt}>
+        <Line x={ST_X} y={ruleY + 120} at={gbAt} size={27} weight={500} color={BLUE_INK} dim={neitherAt}>
           = <Num>{Math.round(E.storagePerDayBytes / 1e9)}</Num> GB a day
         </Line>
-        <Line x={ST_X} y={ruleY + 180} at={tbAt} size={27} weight={600} color={BLUE_INK} dim={neitherAt}>
+        <Line x={ST_X} y={ruleY + 180} at={tbAt} size={27} weight={500} color={BLUE_INK} dim={neitherAt}>
           ≈ <Num>{Math.round(E.storageTotalBytes / 1e12)}</Num> TB in <Num>{A.years}</Num> years
         </Line>
 
@@ -205,7 +205,7 @@ export const EstimateScene: React.FC = () => {
         <Line x={BW_X} y={ruleY + 60} at={mbAt - 6} size={27} dim={neitherAt}>
           × <Num>{int(sig(E.peakReadQps))}</Num> a second
         </Line>
-        <Line x={BW_X} y={ruleY + 120} at={mbAt} size={27} weight={600} color={BLUE_INK} dim={neitherAt}>
+        <Line x={BW_X} y={ruleY + 120} at={mbAt} size={27} weight={500} color={BLUE_INK} dim={neitherAt}>
           ≈ <Num>{Math.round(E.peakBandwidthBytesPerSecond / 1e6)}</Num> MB/s at peak
         </Line>
         <VRule x={962} top={headY} bottom={colBottom} at={stHead} dim={neitherAt} />

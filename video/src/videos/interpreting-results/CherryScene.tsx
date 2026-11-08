@@ -131,7 +131,7 @@ export const CherryScene: React.FC = () => {
         <Dashed x0={X0} y0={py(S[0])} x1={X1} y1={py(S[0])} at={startedAt - 6} dur={22} color={INK_SOFT} width={2} />
         <Bracket x0={X0} x1={X1} y={py(HI) - 16} at={tenYearsAt - 4} up={false} tick={12} />
         <Note at={tenYearsAt} x={(X0 + X1) / 2} y={py(HI) - 52} from="up">
-          <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", background: PAPER, padding: "0 10px" }}>
+          <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", background: PAPER, padding: "0 10px" }}>
             ten years
           </span>
         </Note>
@@ -140,12 +140,12 @@ export const CherryScene: React.FC = () => {
           {lit > 0 ? <path d={partial(winPts, lit)} fill="none" stroke={STAT} strokeWidth={6} strokeLinejoin="round" strokeLinecap="round" /> : null}
         </Svg>
         <Note at={startedAt - 2} x={X1} y={py(S[0]) + 14} align="right">
-          <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             started at {fmt(S[0], 0)}, ended at {fmt(S[S.length - 1], 0)}
           </span>
         </Note>
         <Note at={pctAt - 2} x={px(WANDER.end) + 18} y={py(S[WANDER.end]) - 70}>
-          <span style={{ ...note(24, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             <Marker at={pctAt}>up {WANDER.windowPct}%</Marker> in {WANDER.length} months
           </span>
         </Note>
@@ -183,7 +183,7 @@ export const CherryScene: React.FC = () => {
               {MONTH[(WANDER.start + i) % 12]}
             </div>
             <Note at={everyAt - 4 + i * 4} x={ZX[i] + ZW / 2} y={zbase - h(S[WANDER.start + i] * ZUNIT) - 36} from="up">
-              <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+              <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
                 {fmt(S[WANDER.start + i], 0)}
               </span>
             </Note>

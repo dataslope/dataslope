@@ -242,7 +242,7 @@ export const CleanScene: React.FC = () => {
         {/* The page's clean() above had no try: a non-number id would have
             stopped it. Here the error is caught per row. */}
         <Note at={rejectAt + 8} x={X0} y={fnTop + qrH + h(16) + consoleHeight(CLEAN.quarantine.out.length, 20) + h(22)} out={out13}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             caught per row, so one bad row can&apos;t crash the job
           </span>
         </Note>
@@ -283,7 +283,7 @@ export const CleanScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>what won&apos;t parse becomes NaN, not an error</span>
         </Note>
         <Note at={leftAt} x={X0} y={y(TOP) + numH + h(70)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={leftAt + 4} color={MARK_OK}>
               <Mono>nums.isna().sum()</Mono>: <Num>{CLEAN.leftCount}</Num> left
             </Mark>

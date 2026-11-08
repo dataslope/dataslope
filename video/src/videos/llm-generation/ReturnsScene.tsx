@@ -102,15 +102,15 @@ export const ReturnsScene: React.FC = () => {
       </Ink>
       {/* The accuracy at each end, in the curve's own figures. */}
       <Note at={start + 40} x={px(last)} y={pts[last][1] - 50} align="right">
-        <span style={{ ...note(22, BLUE_INK), fontWeight: 650, ...halo }}>{Math.round(ACCURACY[last] * 100)}%</span>
+        <span style={{ ...note(22, BLUE_INK), fontWeight: 500, ...halo }}>{Math.round(ACCURACY[last] * 100)}%</span>
       </Note>
       <Note at={thirdsAt - 2} x={px(k500) + 16} y={ay((ACCURACY[0] + ACCURACY[k500]) / 2) + 4}>
-        <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           {Math.round(FIRST_500_SHARE * 100)}% of the whole gain
         </span>
       </Note>
       <Note at={nothingAt - 2} x={(px(k8k) + px(last)) / 2} y={ay(ACCURACY[last]) + 34} from="up" style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>+0 points</span>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>+0 points</span>
       </Note>
       <Note at={start + 50} x={X0} y={y(888)}>
         <Illustrative>Stylized numbers, from the lesson. The saturating shape is what is consistently reported.</Illustrative>

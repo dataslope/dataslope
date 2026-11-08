@@ -159,12 +159,12 @@ export const PrivacyScene: React.FC = () => {
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>made up for this video: no real customer in it</span>
         </Note>
         <Note at={breachAt - 2} x={X0} y={top + 4 * pitch + h(40)} out={out5}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>one careless paste can be a reportable data breach</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one careless paste can be a reportable data breach</span>
         </Note>
 
         {/* ── Question 6: what for, what not, how checked ── */}
         <Note at={Math.min(ownAt, asked6) - 6} x={X0} y={top - h(54)}>
-          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>Be specific, and own the result:</span>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Be specific, and own the result:</span>
         </Note>
         {/* A hairline centred in each gap, as tall as the taller of the two
             columns beside it, inking in with the column to its right. */}
@@ -195,9 +195,9 @@ export const PrivacyScene: React.FC = () => {
             opacity: ease(frame, hidingAt - 2, 12),
           }}
         >
-          <div style={{ ...note(28, ACCENT_INK), fontWeight: 650, lineHeight: "36px", whiteSpace: "nowrap" }}>hid it, then couldn&apos;t explain a line</div>
+          <div style={{ ...note(28, ACCENT_INK), fontWeight: 500, lineHeight: "36px", whiteSpace: "nowrap" }}>hid it, then couldn&apos;t explain a line</div>
           <FlexRule at={openlyAt - 2} />
-          <div style={{ ...note(28, OK_INK), fontWeight: 650, lineHeight: "36px", whiteSpace: "nowrap", opacity: ease(frame, openlyAt - 2, 12) }}>
+          <div style={{ ...note(28, OK_INK), fontWeight: 500, lineHeight: "36px", whiteSpace: "nowrap", opacity: ease(frame, openlyAt - 2, 12) }}>
             used it openly, and checked it
           </div>
         </div>

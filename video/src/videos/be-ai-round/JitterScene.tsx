@@ -130,17 +130,17 @@ export const JitterScene: React.FC = () => {
         </Note>
 
         <Note at={withoutAt - 2} x={LEFT_X} y={y(PLOT_TOP - 52)}>
-          <span style={{ ...label(24, INK), fontWeight: 750, whiteSpace: "nowrap" }}>Without jitter</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Without jitter</span>
         </Note>
         <Note at={withAt - 2} x={RIGHT_X} y={y(PLOT_TOP - 52)}>
-          <span style={{ ...label(24, INK), fontWeight: 750, whiteSpace: "nowrap" }}>With a random wait, up to 1 second</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>With a random wait, up to 1 second</span>
         </Note>
         <Wave x={LEFT_X} counts={plain.histogram} at={withoutAt + 2} axesAt={thousandAt} color={ACCENT} />
         <Wave x={RIGHT_X} counts={jitter.histogram} at={withAt + 2} axesAt={thousandAt + 6} color={BAR} mark={{ bin: busiest, at: tenthAt }} stagger={3} />
 
         {/* The single wave: every request in one tenth. */}
         <Note at={sameAt} x={LEFT_X + ((plainBin * RETRY.bin) / SPAN) * PLOT_W - 24} y={y(PLOT_TOP) + 44} align="right">
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             all <Num>{thousands(plain.busiest)}</Num> in the same tenth
           </span>
         </Note>
@@ -150,7 +150,7 @@ export const JitterScene: React.FC = () => {
 
         {/* The spread wave: its busiest tenth. */}
         <Note at={n115At - 4} x={jitterBar(RIGHT_X) - 120} y={base - 140} width={240} from="up">
-          <div style={{ ...note(26, INK), fontWeight: 750, textAlign: "center", whiteSpace: "nowrap" }}>
+          <div style={{ ...note(26, INK), fontWeight: 500, textAlign: "center", whiteSpace: "nowrap" }}>
             <Mark at={n115At + 2}>
               <Num>{jitter.busiest}</Num>
             </Mark>

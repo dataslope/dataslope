@@ -156,7 +156,7 @@ export const BayesScene: React.FC = () => {
                   bottom: "100%",
                   marginBottom: 6,
                   ...note(22, DATA_INK),
-                  fontWeight: 650,
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                   opacity: ease(frame, baseAt + 2, 12),
                 }}
@@ -262,10 +262,10 @@ export const BayesScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={{ ...note(24, DATA_INK), fontWeight: 600 }}>
+              <span style={{ ...note(24, DATA_INK), fontWeight: 500 }}>
                 {i === 0 ? num(TEST.tp) : num(TEST.retestTp)} sick
               </span>
-              <span style={{ ...note(24, STAT_INK), fontWeight: 600, opacity: i === 0 ? 1 : ease(frame, tenAt + 4, 12) }}>
+              <span style={{ ...note(24, STAT_INK), fontWeight: 500, opacity: i === 0 ? 1 : ease(frame, tenAt + 4, 12) }}>
                 {i === 0 ? num(TEST.fp) : num(TEST.retestFp)} false alarms
               </span>
             </div>
@@ -276,7 +276,7 @@ export const BayesScene: React.FC = () => {
                 top: top + h(SHARE.h) / 2 - 22,
                 opacity: ease(frame, i === 0 ? retestFrom + 16 : nineInTenAt, 12),
                 ...note(30, "var(--ds-white)"),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -286,7 +286,7 @@ export const BayesScene: React.FC = () => {
         );
       })}
       <Note at={retestFrom + 16} x={SHARE.x0 + 14} y={y(SHARE.y[0]) + h(SHARE.h) / 2 - 18}>
-        <span style={{ ...note(26, "var(--ds-white)"), fontWeight: 600, whiteSpace: "nowrap" }}>{pct(TEST.treePpv)} real</span>
+        <span style={{ ...note(26, "var(--ds-white)"), fontWeight: 500, whiteSpace: "nowrap" }}>{pct(TEST.treePpv)} real</span>
       </Note>
       <Ink at={ninetyOneAt - 4} dur={16} style={{ left: SHARE.x0, top: y(770), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 22 }}>
         <Big size={96} color={DATA_INK} italic>
@@ -302,7 +302,7 @@ export const BayesScene: React.FC = () => {
           its color and weight. */}
       <Ink at={rareAt + 2} dur={16} style={{ left: 900, top: y(842), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36, true), color: INK_SOFT }}>
-          Here, <span style={{ color: DATA_INK, fontWeight: 600 }}>1 in {num(TEST.oneIn)}</span>.
+          Here, <span style={{ color: DATA_INK, fontWeight: 500 }}>1 in {num(TEST.oneIn)}</span>.
         </span>
       </Ink>
       </div>

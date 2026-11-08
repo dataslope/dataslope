@@ -102,8 +102,8 @@ export const DesignScene: React.FC = () => {
         return (
           <React.Fragment key={s}>
             <Ink at={at} dur={12} style={{ left: STEP_X[i], top: y(STEP_Y), whiteSpace: "nowrap", display: "flex", gap: 10 }}>
-              <span style={{ ...label(22, ACCENT_INK), fontWeight: 600 }}>{i + 1}</span>
-              <span style={{ ...label(22, INK), fontWeight: 600 }}>
+              <span style={{ ...label(22, ACCENT_INK), fontWeight: 500 }}>{i + 1}</span>
+              <span style={{ ...label(22, INK), fontWeight: 500 }}>
                 {i === 1 ? (
                   <Marker at={experimentInAt - 6} color={HIGHLIGHT}>
                     {s}
@@ -181,7 +181,7 @@ export const DesignScene: React.FC = () => {
         </Ink>
         {/* Under the metric it qualifies, 10px down, not on its line. */}
         <Ink at={nowAt - 4} dur={14} style={{ left: 160, top: y(METRIC_Y) + CHOSEN_DY, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>chosen now, before any data</span>
+          <span style={{ ...note(22, STAT_INK), fontWeight: 500 }}>chosen now, before any data</span>
         </Ink>
 
         {/* Ten metrics, and the one that happened to move. */}
@@ -226,7 +226,7 @@ export const DesignScene: React.FC = () => {
           ))}
         </div>
         <Ink at={movesAt - 2} dur={14} style={{ left: 1010, top: y(CHEER_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>and cheer the one that moved</span>
+          <span style={{ ...note(22, STAT_INK), fontWeight: 500 }}>and cheer the one that moved</span>
         </Ink>
       </div>
     </AbsoluteFill>

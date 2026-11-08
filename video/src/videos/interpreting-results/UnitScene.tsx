@@ -217,8 +217,8 @@ export const UnitScene: React.FC = () => {
         <Ring x={AGG.x0 + 230} y={top - 30} at={quoteAt - 2} color={DATA} r0={20} r1={90} />
         <Ring x={IND.x0 + 330} y={top - 30} at={quoteAt + 4} r0={20} r1={90} />
         <Note at={bothAt - 2} x={IND.x1 + 24} y={bottom - 80}>
-          <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>same data,</span>
-          <div style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>different unit</div>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>same data,</span>
+          <div style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>different unit</div>
         </Note>
       </Drift>
     </AbsoluteFill>

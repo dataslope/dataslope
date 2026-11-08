@@ -134,7 +134,7 @@ export const MistakesScene: React.FC = () => {
 
   const running = (at: number, out: number | undefined, k: number, text: string) => (
     <Note at={at} x={X0} y={y(TOP) - h(92)} out={out}>
-      <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+      <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
         <span style={{ ...label(24, INK_SOFT) }}>
           <Num>{k}</Num> ·
         </span>{" "}
@@ -192,7 +192,7 @@ export const MistakesScene: React.FC = () => {
         </Note>
         {/* Why half-open, not an end one second before midnight (check.mjs's lastSecond). */}
         <Note at={precisionAt - 2} x={X0} y={notesTop + h(100)} out={outA}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             half-open is right at any precision
             <span style={{ ...note(23, INK), fontWeight: 400, opacity: ease(frame, secondAt - 2, 10) }}>
               : an end at <Mono>{last[0].slice(11, 19)}</Mono> still drops <Mono color={ACCENT_INK}>{lastTime}</Mono>
@@ -228,7 +228,7 @@ export const MistakesScene: React.FC = () => {
           ]}
         />
         <Note at={halfAt - 2} x={LIST_X} y={pg.rowTop(1) + h(18)} out={outA}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             the assistant misses <Num>{BOUNDARY.missed}%</Num> of January&apos;s revenue
           </span>
         </Note>
@@ -249,7 +249,7 @@ export const MistakesScene: React.FC = () => {
         />
         <DataTable g={ag} cols={colsOf(RATIOS.averaged)} at={averageAt + 4} rows={rowsAt(RATIOS.averaged.rows, twentySixAt - 2)} marks={[{ row: 0, col: 0, at: twentySixAt + 4, color: MARK_BAD }]} />
         <Note at={countsAt - 2} x={X0} y={avgTop + avgH + h(12)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             a {small}-session day counts as much as a {large}-session one
           </span>
         </Note>
@@ -272,7 +272,7 @@ export const MistakesScene: React.FC = () => {
                 <Num>{i + 1}</Num>
               </span>
               {r.text}
-              {r.silent ? <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, opacity: ease(frame, noErrorAt - 2, 10) }}> (silent)</span> : null}
+              {r.silent ? <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, opacity: ease(frame, noErrorAt - 2, 10) }}> (silent)</span> : null}
             </span>
           </Note>
         ))}
@@ -291,7 +291,7 @@ export const MistakesScene: React.FC = () => {
           }}
         />
         <Note at={silentAt - 2} x={REST_X} y={labelY}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the silent ones are the danger</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the silent ones are the danger</span>
         </Note>
         <Note at={inventedAt - 2} x={REST_X} y={loudY}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>

@@ -82,7 +82,7 @@ const Sentence: React.FC<{ marks: { word: string; at: number; color?: string }[]
       {S.slice(i)}
     </span>,
   );
-  return <span style={{ fontFamily: MONO, fontSize: SIZE, fontWeight: 600, color: INK, whiteSpace: "pre" }}>{parts}</span>;
+  return <span style={{ fontFamily: MONO, fontSize: SIZE, fontWeight: 500, color: INK, whiteSpace: "pre" }}>{parts}</span>;
 };
 
 const it = TOKENS.indexOf("it");
@@ -158,7 +158,7 @@ export const QuestionScene: React.FC = () => {
       <Headline
         lead={
           <>
-            What does <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: "0.86em" }}>it</span> mean?
+            What does <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: "0.86em" }}>it</span> mean?
           </>
         }
         at={from}

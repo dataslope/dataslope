@@ -230,7 +230,7 @@ export const ErdScene: React.FC = () => {
         <Pulse x={manyEnd.near[0]} y={lineY} at={footAt} r={8} grow={18} color={STAT_INK} />
 
         <Note at={aloneAt - 4} x={midX} y={lineY - 96} from="up">
-          <span style={{ ...note(23, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(23, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
             The line says as much as the boxes
           </span>
         </Note>

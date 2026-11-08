@@ -75,15 +75,15 @@ export const RulesScene: React.FC = () => {
           }}
         />
         <Ink at={countsAt} dur={14} style={{ left: COL_X[0], top: y(ROW_Y[2] + 92), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK), fontWeight: 600 }}>This course: rules and counts</span>
+          <span style={{ ...label(24, INK), fontWeight: 500 }}>This course: rules and counts</span>
         </Ink>
 
         {/* Column heads */}
         <Ink at={rulesAt - 4} dur={14} style={{ left: COL_X[0], top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(44), color: INK, fontWeight: 600 }}>Rules</span>
+          <span style={{ ...body(44), color: INK, fontWeight: 500 }}>Rules</span>
         </Ink>
         <Ink at={learnedAt - 4} dur={14} style={{ left: COL_X[1], top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(44), color: INK, fontWeight: 600 }}>Learning</span>
+          <span style={{ ...body(44), color: INK, fontWeight: 500 }}>Learning</span>
         </Ink>
         <div
           style={{

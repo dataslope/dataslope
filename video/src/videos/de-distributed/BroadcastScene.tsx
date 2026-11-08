@@ -136,7 +136,7 @@ export const BroadcastScene: React.FC = () => {
 
         {/* ── Broadcast ── */}
         <Note at={shipAt - 2} x={EX_X} y={y(316)}>
-          <span style={{ ...label(27, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Broadcast join</span>
+          <span style={{ ...label(27, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Broadcast join</span>
         </Note>
         <Note at={shipAt} x={SRC_X} y={y(SRC_TOP) - h(34)}>
           <span style={{ ...label(20, inkOf.purple), whiteSpace: "nowrap" }}>small lookup</span>
@@ -160,7 +160,7 @@ export const BroadcastScene: React.FC = () => {
           return (
             <React.Fragment key={k}>
               <Machine x={EX_X} top={y(EX_TOPS[k])} width={EX_W} height={h(EX_H)} at={shipAt + 2 + k * 2} tone="ok" toneAt={noShuffleAt} name={`executor ${k + 1}`} nameSize={19} />
-              <div style={{ position: "absolute", left: LOOK_X + LOOK_W + 10, top: factTop(k) + blockH / 2 - 17, ...label(26, OK_INK), fontWeight: 800, opacity: joined }}>✓</div>
+              <div style={{ position: "absolute", left: LOOK_X + LOOK_W + 10, top: factTop(k) + blockH / 2 - 17, ...label(26, OK_INK), fontWeight: 500, opacity: joined }}>✓</div>
               <div
                 style={{
                   position: "absolute",
@@ -215,7 +215,7 @@ export const BroadcastScene: React.FC = () => {
           );
         })}
         <Note at={noShuffleAt - 2} x={EX_X} y={y(EX_TOPS[3]) + h(EX_H) + h(12)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>joined where it sits: no shuffle</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>joined where it sits: no shuffle</span>
         </Note>
         <Note at={fitsAt - 2} x={NOTE_X} y={y(436)} out={caseAt}>
           <span style={{ ...note(23, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap" }}>
@@ -241,7 +241,7 @@ export const BroadcastScene: React.FC = () => {
             <span style={{ opacity: ease(frame, fiftyAt, 10) }}>
               × <Num>{BROADCAST.executors}</Num> executors
             </span>
-            <span style={{ opacity: ease(frame, gbAt, 10), color: OK_INK, fontWeight: 600 }}>
+            <span style={{ opacity: ease(frame, gbAt, 10), color: OK_INK, fontWeight: 500 }}>
               {" = "}
               <span style={{ position: "relative", padding: "0 4px", borderRadius: 4, background: ease(frame, oneGbAt, 10) > 0 ? HIGHLIGHT : undefined }}>
                 <Num>{BROADCAST.broadcastMB / 1000}</Num> GB
@@ -251,7 +251,7 @@ export const BroadcastScene: React.FC = () => {
         </Note>
         <Note at={thresholdAt - 2} x={NOTE_X} y={y(640)}>
           <span style={{ ...label(20, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>automatic below</span>
-          <span style={{ fontFamily: MONO, fontSize: 19, fontWeight: 600, color: INK, fontVariantLigatures: "none", whiteSpace: "nowrap" }}>
+          <span style={{ fontFamily: MONO, fontSize: 19, fontWeight: 500, color: INK, fontVariantLigatures: "none", whiteSpace: "nowrap" }}>
             spark.sql.autoBroadcastJoinThreshold
           </span>
         </Note>
@@ -269,7 +269,7 @@ export const BroadcastScene: React.FC = () => {
         </Note>
         <Note at={hintAt - 2} x={NOTE_X} y={y(778)}>
           <span style={{ ...label(20, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>or hint it</span>
-          <span style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, color: INK, fontVariantLigatures: "none", whiteSpace: "nowrap" }}>
+          <span style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: INK, fontVariantLigatures: "none", whiteSpace: "nowrap" }}>
             broadcast(small_dim)
           </span>
         </Note>
@@ -277,7 +277,7 @@ export const BroadcastScene: React.FC = () => {
         {/* ── Sort-merge ── */}
         <div style={{ position: "absolute", left: 1010, top: y(330), width: 1.5, height: y(860) - y(330), background: `color-mix(in srgb, ${INK_SOFT} 30%, transparent)`, opacity: ease(frame, q11At, 12) }} />
         <Note at={defaultAt - 2} x={R0} y={y(316)}>
-          <span style={{ ...label(27, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Sort-merge join</span>
+          <span style={{ ...label(27, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Sort-merge join</span>
         </Note>
         {[...FACT, ...DIMS].map((keys, s) => {
           const isDim = s >= 2;
@@ -304,7 +304,7 @@ export const BroadcastScene: React.FC = () => {
                 }}
               >
                 {keys.map((k) => (
-                  <span key={k} style={{ width: CHIP, textAlign: "center", ...note(21, INK), fontWeight: 600 }}>
+                  <span key={k} style={{ width: CHIP, textAlign: "center", ...note(21, INK), fontWeight: 500 }}>
                     {k}
                   </span>
                 ))}
@@ -334,7 +334,7 @@ export const BroadcastScene: React.FC = () => {
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>both sides large</span>
         </Note>
         <Note at={bothAt + 4} x={R0} y={y(SRC_TOPS[3]) + h(66)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>both shuffled</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>both shuffled</span>
         </Note>
         {co.map((c, r) => {
           const p = ease(frame, bothAt + 10 + r * 3, 12);
@@ -395,13 +395,13 @@ export const BroadcastScene: React.FC = () => {
         <Note at={anyAt} x={R0} y={y(790)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             any size
-            <span style={{ opacity: ease(frame, twoTbAt, 10), color: ACCENT_INK, fontWeight: 600 }}>
+            <span style={{ opacity: ease(frame, twoTbAt, 10), color: ACCENT_INK, fontWeight: 500 }}>
               , but here about <Num>{BROADCAST.factTB}</Num> TB shuffled
             </span>
           </span>
         </Note>
         <Note at={smallAt - 2} x={EX_X} y={y(850)}>
-          <span style={{ ...note(25, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             One side small: <span style={{ color: OK_INK }}>broadcast</span>
             <span style={{ opacity: ease(frame, largeAt, 10) }}>
               {" · "}both large: <span style={{ color: OK_INK }}>sort-merge</span>
@@ -429,7 +429,7 @@ const Key: React.FC<{ k: number; color: string; x: number; top: number; h: numbe
       alignItems: "center",
       justifyContent: "center",
       ...note(21, INK),
-      fontWeight: 600,
+      fontWeight: 500,
       opacity: o,
     }}
   >

@@ -74,8 +74,8 @@ const ChipLine: React.FC<{
 /** A row's name at the left: the lane's letter, then the step. */
 const RowName: React.FC<{ lane?: string; text: string; at: number; top: number; markAt?: number }> = ({ lane, text, at, top, markAt }) => (
   <Ink at={at} dur={14} style={{ left: X0, top: top + 10, whiteSpace: "nowrap" }}>
-    <span style={{ ...label(24, INK), fontWeight: 600 }}>
-      {lane ? <span style={{ fontWeight: 800, marginRight: 10 }}>{lane}</span> : <span style={{ display: "inline-block", width: 27 }} />}
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>
+      {lane ? <span style={{ fontWeight: 500, marginRight: 10 }}>{lane}</span> : <span style={{ display: "inline-block", width: 27 }} />}
       {markAt === undefined ? text : <Mark at={markAt}>{text}</Mark>}
     </span>
   </Ink>

@@ -41,7 +41,7 @@ const Query: React.FC<{ x: number; y: number; at: number; dim: number }> = ({ x,
         alignItems: "center",
         justifyContent: "center",
         ...label(21, PAPER),
-        fontWeight: 800,
+        fontWeight: 500,
         transform: `scale(${Math.min(1.2, p)})`,
         opacity: Math.min(1, p) * (1 - ease(frame, dim, 12) * 0.65),
       }}
@@ -149,12 +149,12 @@ export const HookScene: React.FC = () => {
 
         {/* Its traffic, then ten times it. */}
         <Ink at={sizedAt} dur={16} style={{ left: X0, top: y(640), whiteSpace: "nowrap", opacity: 1 - ease(frame, dim, 12) * 0.5 }}>
-          <span style={{ ...note(30, INK), fontWeight: 600 }}>
+          <span style={{ ...note(30, INK), fontWeight: 500 }}>
             Sized for about <b style={{ color: BLUE_INK }}><Num>{commas(peak)}</Num></b> redirects a second at peak
           </span>
         </Ink>
         <Ink at={tenAt} dur={16} style={{ left: X0, top: y(700), whiteSpace: "nowrap", opacity: 1 - ease(frame, dim, 12) * 0.5 }}>
-          <span style={{ ...note(30, INK), fontWeight: 600 }}>
+          <span style={{ ...note(30, INK), fontWeight: 500 }}>
             Ten times the traffic:{" "}
             <Mark at={bigAt}>
               <b><Num>{commas(tenfold)}</Num></b> a second
@@ -164,7 +164,7 @@ export const HookScene: React.FC = () => {
 
         {/* The round: twelve questions. */}
         <Ink at={twelveAt} dur={14} style={{ left: X0, top: y(776), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK), fontWeight: 600 }}>Twelve questions</span>
+          <span style={{ ...label(24, INK), fontWeight: 500 }}>Twelve questions</span>
         </Ink>
         {/* The twelve as plain numerals: nine in the data blue, two quick ones
             in gray, and the news feed set apart, lit on its name. */}
@@ -183,7 +183,7 @@ export const HookScene: React.FC = () => {
                 width: CHIP,
                 textAlign: "center",
                 ...label(30, quick ? INK_SOFT : feed ? INK : BLUE_INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 opacity: p,
                 transform: `translateY(${(1 - p) * 10}px)`,
               }}
@@ -205,7 +205,7 @@ export const HookScene: React.FC = () => {
           <span style={{ ...note(21, INK_SOFT) }}>quick</span>
         </Ink>
         <Ink at={feedAt + 4} dur={14} style={{ left: chipX(11) - 30, top: chipsTop + 50, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK), fontWeight: 650 }}>a news feed</span>
+          <span style={{ ...note(21, INK), fontWeight: 500 }}>a news feed</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

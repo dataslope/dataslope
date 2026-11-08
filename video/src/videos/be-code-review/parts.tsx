@@ -58,7 +58,7 @@ const tokenize = (line: string): Token[] => {
     if (comment) out.push({ text, color: TOKEN_INK.punct });
     else if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -81,7 +81,7 @@ export const Code: React.FC<{ line: string; size?: number; weight?: number }> = 
  * ink, the numbers in `ink` when the value is being judged (red wrong, green
  * right), otherwise in the listing's number orange.
  */
-export const Py: React.FC<{ text: string; size?: number; ink?: string; weight?: number }> = ({ text, size = 22, ink, weight = 600 }) => (
+export const Py: React.FC<{ text: string; size?: number; ink?: string; weight?: number }> = ({ text, size = 22, ink, weight = 500 }) => (
   <span style={{ fontFamily: MONO, fontSize: size, whiteSpace: "pre", fontVariantLigatures: "none", fontWeight: weight }}>
     {[...text.matchAll(/(\d+)|([^\d]+)/g)].map(([t, num], i) => (
       <span key={i} style={{ color: num ? ink ?? TOKEN_INK.number : INK_SOFT }}>
@@ -243,7 +243,7 @@ export const DiffListing: React.FC<{
                 left: g.padX,
                 fontFamily: MONO,
                 fontSize: size,
-                fontWeight: 600,
+                fontWeight: 500,
                 color: r.sign === "+" ? OK_INK : ACCENT_INK,
                 opacity: r.sign === "+" || r.sign === "-" ? signs : 0,
               }}
@@ -277,8 +277,8 @@ export const FileTab: React.FC<{
   const d = on === undefined ? 0 : (1 - Math.max(0, ...on.map(([a, b]) => during(frame, a, b, 10)))) * 0.6;
   return (
     <Ink at={at} dur={14} out={out} style={{ left: x, top, whiteSpace: "nowrap", opacity: 1 - d, display: "flex", alignItems: "baseline", gap: 16, fontSize: size }}>
-      <span style={{ fontFamily: MONO, fontSize: size, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{name}</span>
-      {children ? <span style={{ ...note(size, INK_SOFT), fontWeight: 600 }}>{children}</span> : null}
+      <span style={{ fontFamily: MONO, fontSize: size, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{name}</span>
+      {children ? <span style={{ ...note(size, INK_SOFT), fontWeight: 500 }}>{children}</span> : null}
     </Ink>
   );
 };
@@ -409,7 +409,7 @@ export const Steps: React.FC<{
                 style={{
                   position: "relative",
                   ...note(23, INK),
-                  fontWeight: current > 0.5 ? 650 : 500,
+                  fontWeight: current > 0.5 ? 500 : 500,
                   whiteSpace: "nowrap",
                   flex: "none",
                   opacity: 0.5 + 0.5 * Math.max(current, done),

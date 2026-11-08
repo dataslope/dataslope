@@ -120,7 +120,7 @@ export const HackScene: React.FC = () => {
               }}
             >
               <span style={{ ...label(19, INK_SOFT), ...TABULAR }}>test {i + 1}</span>
-              <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: red > 0.5 ? ACCENT_INK : INK, ...TABULAR }}>{fmt(p, 3)}</span>
+              <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: red > 0.5 ? ACCENT_INK : INK, ...TABULAR }}>{fmt(p, 3)}</span>
             </div>
           );
         })}
@@ -130,7 +130,7 @@ export const HackScene: React.FC = () => {
         <Note at={chanceAt} x={X0} y={y(540)}>
           <span style={{ ...noteText(26, INK), ...TABULAR }}>
             the chance of at least one in 20:{" "}
-            <span style={{ fontFamily: MONO, fontWeight: 600 }}>1 − 0.95²⁰</span>{" "}
+            <span style={{ fontFamily: MONO, fontWeight: 500 }}>1 − 0.95²⁰</span>{" "}
             <span style={{ opacity: ease(frame, pctAt - 2, 10) }}>
               = <Mark at={pctAt + 2} color={MARK_BAD}>{Math.round(HACK.atLeastOne * 100)}%</Mark>
             </span>

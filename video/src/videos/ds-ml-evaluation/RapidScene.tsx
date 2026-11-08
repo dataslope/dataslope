@@ -53,7 +53,7 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
         let acc = 0;
         return (
           <React.Fragment key={r.name}>
-            <div style={{ position: "absolute", left: R_X + 40, top, ...note(25, INK), fontWeight: 650, opacity: p, whiteSpace: "nowrap" }}>
+            <div style={{ position: "absolute", left: R_X + 40, top, ...note(25, INK), fontWeight: 500, opacity: p, whiteSpace: "nowrap" }}>
               {i === 0 ? <Mark at={maeAt}>{r.name}</Mark> : r.name}
             </div>
             {r.vals.map((v, k) => {
@@ -76,7 +76,7 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
                     alignItems: "center",
                     justifyContent: "center",
                     ...label(20, PAPER),
-                    fontWeight: 600,
+                    fontWeight: 500,
                     ...TABULAR,
                   }}
                 >
@@ -88,7 +88,7 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <Note at={dominateAt} x={R_X + 40} y={c.y(600)}>
-        <span style={{ ...note(25, WARM_INK), fontWeight: 650, whiteSpace: "nowrap" }}>squared, the two big misses dominate</span>
+        <span style={{ ...note(25, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>squared, the two big misses dominate</span>
       </Note>
       {/* RMSE's root brings it back to the target's units too: the choice is
           about what a big miss costs, not about units. */}
@@ -161,12 +161,12 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>predict {LOSS.at} for a true positive:</span>
       </Note>
       <Note at={sqAt + 2} x={box.right + 30} y={c.y(box.top) + c.h(56)}>
-        <span style={{ ...note(26, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           squared error <span style={TABULAR}>{fmt(LOSS.sqAt)}</span>
         </span>
       </Note>
       <Note at={xentAt + 2} x={box.right + 30} y={c.y(box.top) + c.h(100)}>
-        <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           cross-entropy <span style={TABULAR}>{fmt(LOSS.xentAt)}</span>
         </span>
       </Note>
@@ -178,19 +178,19 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* The answer, and why: how hard each loss still pushes on the logit
           behind a sigmoid when the model is this wrong. */}
       <Note at={useAt - 2} x={box.right + 30} y={c.y(box.top) + c.h(250)}>
-        <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           <Mark at={useAt + 4}>so use cross-entropy</Mark>
         </span>
       </Note>
       <Note at={gradAt - 2} x={box.right + 30} y={c.y(box.top) + c.h(302)}>
         <div style={{ whiteSpace: "nowrap" }}>
-          <div style={{ ...label(21, INK_SOFT), fontWeight: 650 }}>
+          <div style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>
             gradient at <span style={TABULAR}>{LOSS.at}</span>, behind a sigmoid:
           </div>
-          <div style={{ ...note(24, OK_INK), fontWeight: 650 }}>
+          <div style={{ ...note(24, OK_INK), fontWeight: 500 }}>
             cross-entropy <span style={TABULAR}>{fmt(LOSS.xentGrad)}</span>
           </div>
-          <div style={{ ...note(24, BLUE_INK), fontWeight: 650, opacity: ease(frame, flatAt - 4, 10) }}>
+          <div style={{ ...note(24, BLUE_INK), fontWeight: 500, opacity: ease(frame, flatAt - 4, 10) }}>
             squared error <span style={TABULAR}>{fmt(LOSS.sqGrad)}</span>
             <span style={{ color: ACCENT_INK }}>: flat</span>
           </div>
@@ -223,7 +223,7 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
         </Note>
       ))}
       <Note at={noiseAt - 2} x={R_X + 40} y={c.y(380) + 3 * c.h(72) + c.h(20)}>
-        <span style={{ ...note(32, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(32, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           gap within its noise? <span style={{ opacity: ease(frame, simplerAt - 4, 10) }}><Mark at={simplerAt}>take the simpler one</Mark></span>
         </span>
         <br />

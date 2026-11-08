@@ -95,7 +95,7 @@ export const CiScene: React.FC = () => {
         <Note at={buildAt + 4} x={SIDE_X} y={y(300)} out={clearAt}>
           <span style={{ ...noteText(22, INK_SOFT) }}>
             each one:{" "}
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>
+            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>
               <span style={{ textDecoration: "overline" }}>x</span> ± t*·s/√n
             </span>
           </span>

@@ -158,7 +158,7 @@ export const GradeScene: React.FC = () => {
             </span>
           </Ink>
           <Ink at={droveAt - 2} dur={14} style={{ left: X0 + 660, top: y(306) }}>
-            <span style={{ ...line(30, INK), fontWeight: 600 }}>
+            <span style={{ ...line(30, INK), fontWeight: 500 }}>
               Whether <Mark at={droveAt + 6}>you drove.</Mark>
             </span>
           </Ink>
@@ -181,8 +181,8 @@ export const GradeScene: React.FC = () => {
             </span>
           </Note>
           <Note at={googleAt} x={X0} y={y(636)}>
-            <span style={{ ...label(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-              Google pilot rubric, 2026: <span style={{ fontWeight: 600 }}>the same three skills</span>
+            <span style={{ ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+              Google pilot rubric, 2026: <span style={{ fontWeight: 500 }}>the same three skills</span>
             </span>
           </Note>
           <div style={{ position: "absolute", left: X0, top: y(676), display: "flex", alignItems: "baseline", gap: 18, fontSize: 28 }}>
@@ -191,7 +191,7 @@ export const GradeScene: React.FC = () => {
               return (
                 <React.Fragment key={s.text}>
                   {i > 0 ? <span style={{ ...note(28, INK_SOFT), opacity: p }}>·</span> : null}
-                  <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>{s.text}</span>
+                  <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>{s.text}</span>
                 </React.Fragment>
               );
             })}
@@ -200,7 +200,7 @@ export const GradeScene: React.FC = () => {
 
         {/* What scores well, and the red flags. */}
         <Ink at={signalsAt - 2} dur={12} style={{ left: X0, top: y(ROW_Y - 54) }}>
-          <span style={{ ...label(24, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>What scores well</span>
+          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>What scores well</span>
         </Ink>
         {signals.map((s, i) => (
           <Row key={s.text} x={X0} y={y(ROW_Y + i * ROW_H)} at={s.at} ok dim={guideAt}>
@@ -208,7 +208,7 @@ export const GradeScene: React.FC = () => {
           </Row>
         ))}
         <Ink at={redAt - 2} dur={12} style={{ left: RED_X, top: y(ROW_Y - 54) }}>
-          <span style={{ ...label(24, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>Red flags</span>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Red flags</span>
         </Ink>
         {flags.map((s, i) => (
           <Row key={s.text} x={RED_X} y={y(ROW_Y + i * ROW_H)} at={s.at} ok={false} dim={guideAt}>
@@ -222,8 +222,8 @@ export const GradeScene: React.FC = () => {
         {/* One prep guide's advice: part of it by hand, explained, beats a
             whole solution you can't explain. */}
         <Note at={guideAt} x={X0} y={pastY - h(56)}>
-          <span style={{ ...label(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-            One prep guide&apos;s advice <span style={{ color: INK_SOFT, fontWeight: 600 }}>(interviewing.io)</span>
+          <span style={{ ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            One prep guide&apos;s advice <span style={{ color: INK_SOFT, fontWeight: 500 }}>(interviewing.io)</span>
           </span>
         </Note>
         <Blocks x={X0} y={pastY} at={partAt} built={3} fill={`color-mix(in srgb, ${OK} 22%, ${PAPER})`} line={OK} />

@@ -188,7 +188,7 @@ export const SeriesScene: React.FC = () => {
                     top: 8,
                     textAlign: "center",
                     ...label(24, PAPER),
-                    fontWeight: 600,
+                    fontWeight: 500,
                     opacity: ease(frame, growAt(i) + 14, 10),
                   }}
                 >
@@ -209,7 +209,7 @@ export const SeriesScene: React.FC = () => {
                 <div style={label(19, BLUE_INK)}>
                   Part <Num>{p.n}</Num>
                 </div>
-                <div style={{ ...note(21, INK), fontWeight: 650, marginTop: 2, lineHeight: 1.15, textWrap: "balance" }}>{p.title}</div>
+                <div style={{ ...note(21, INK), fontWeight: 500, marginTop: 2, lineHeight: 1.15, textWrap: "balance" }}>{p.title}</div>
               </div>
               <Spot
                 video={p.video}
@@ -266,7 +266,7 @@ export const SeriesScene: React.FC = () => {
             opacity: ease(frame, bankAt - 2, 10) * (1 - ease(frame, nextAt - 16, 10)),
           }}
         >
-          A bank of <span style={{ fontWeight: 650 }}>{BANK} multiple-choice questions</span>, for the whole track
+          A bank of <span style={{ fontWeight: 500 }}>{BANK} multiple-choice questions</span>, for the whole track
         </div>
 
         <NextLine at={nextAt} x={LEFT} y={y(LINE_Y) + h(6)} width={1000}>

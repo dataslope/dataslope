@@ -111,10 +111,10 @@ export const ResendScene: React.FC = () => {
             {t}
           </text>
         ))}
-        <text x={slotX(turns.length) + SLOT} y={y(BASE) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
+        <text x={slotX(turns.length) + SLOT} y={y(BASE) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
           turn
         </text>
-        <text x={CHART_X0 - 12} y={tokY(Y_MAX) - 4} style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
+        <text x={CHART_X0 - 12} y={tokY(Y_MAX) - 4} style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
           tokens sent
         </text>
       </Svg>
@@ -156,7 +156,7 @@ export const ResendScene: React.FC = () => {
         color={INPUT_INK}
       />
       <Note at={sliceAt - 2} x={slotX(last.turn) - 66} y={tokY(last.input) - 78} align="right">
-        <span style={{ ...note(23, INPUT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INPUT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
           new message, {int(CONVERSATION.user)} tokens
         </span>
       </Note>
@@ -197,7 +197,7 @@ export const ResendScene: React.FC = () => {
               <span
                 style={{
                   ...note(28, POINT_INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   ...TABULAR,
                   whiteSpace: "nowrap",
                   display: "inline-block",

@@ -147,11 +147,11 @@ export const DijkScene: React.FC = () => {
             badgeSide={k === "A" ? "below" : k === "D" ? "below" : k === "B" ? "above" : "below"}
           />
         ))}
-        <Line at={throughCAt + 6} x={140} y={y(700)} size={22} color={INK_SOFT} weight={600}>
+        <Line at={throughCAt + 6} x={140} y={y(700)} size={22} color={INK_SOFT} weight={500}>
           The page prints
         </Line>
-        <Line at={throughCAt + 8} x={320} y={y(700)} size={22} weight={600}>
-          <span style={{ fontFamily: MONO, fontWeight: 600, color: OK_INK }}>{printed}</span>
+        <Line at={throughCAt + 8} x={320} y={y(700)} size={22} weight={500}>
+          <span style={{ fontFamily: MONO, fontWeight: 500, color: OK_INK }}>{printed}</span>
         </Line>
 
         {/* The cost. */}
@@ -161,7 +161,7 @@ export const DijkScene: React.FC = () => {
         <Line at={edgeAt} x={140} y={y(790)} size={24}>
           <Num>E</Num> edges, each a heap push of log V
         </Line>
-        <Line at={timesAt} x={140} y={y(838)} size={30} weight={600} color={OK_INK}>
+        <Line at={timesAt} x={140} y={y(838)} size={30} weight={500} color={OK_INK}>
           O((V + E) log V)
         </Line>
 
@@ -196,7 +196,7 @@ export const DijkScene: React.FC = () => {
               tone={frame >= negSettleAt[k] ? "data" : "plain"}
             />
           ))}
-          <Line at={laterAt + 8} x={R.C[0] + 50} y={R.C[1] + 26} size={22} color={ACCENT_INK} weight={600}>
+          <Line at={laterAt + 8} x={R.C[0] + 50} y={R.C[1] + 26} size={22} color={ACCENT_INK} weight={500}>
             reaches B at <Num>{bf.B}</Num>: too late
           </Line>
         </div>
@@ -205,9 +205,9 @@ export const DijkScene: React.FC = () => {
           <span style={{ width: 22, display: "flex", opacity: ease(frame, wrongAt, 8) }}>
             <Cross at={wrongAt} size={22} />
           </span>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Finalize a node when it leaves the heap:
-            <span style={{ color: ACCENT_INK, fontWeight: 600, opacity: ease(frame, wrongAt, 10) }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, wrongAt, 10) }}>
               {" "}
               B = <Num>{st.B}</Num>
               <span style={{ opacity: ease(frame, soDAt, 10) }}>
@@ -218,14 +218,14 @@ export const DijkScene: React.FC = () => {
         </div>
         <div style={{ position: "absolute", left: 1060, top: y(748), display: "flex", alignItems: "center", gap: 12, fontSize: 24, opacity: ease(frame, bfAt, 10) }}>
           <Tick at={bfAt} size={24} />
-          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Bellman-Ford: B = <Num>{bf.B}</Num>, D = <Num>{bf.D}</Num>
           </span>
         </div>
         <Line at={vMinusAt} x={1094} y={y(796)} size={23} color={INK_SOFT}>
           every edge, V − 1 times: <Num>{DIJKSTRA.bfRounds}</Num> rounds over <Num>{DIJKSTRA.bfEdges}</Num> edges
         </Line>
-        <Line at={vtimesAt} x={1094} y={y(838)} size={23} weight={650}>
+        <Line at={vtimesAt} x={1094} y={y(838)} size={23} weight={500}>
           O(V · E)<span style={{ opacity: ease(frame, rightAt, 10), color: INK_SOFT, fontWeight: 500 }}>: slower, and right</span>
         </Line>
       </Drift>

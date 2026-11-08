@@ -204,7 +204,7 @@ export const WallScene: React.FC = () => {
           );
         })}
         <Ink at={questionsAt - 4} dur={16} style={{ left: 160, top: y(742), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(28, INK), fontWeight: 600 }}>Out come questions.</span>
+          <span style={{ ...note(28, INK), fontWeight: 500 }}>Out come questions.</span>
         </Ink>
         <Ink at={conclusionsAt - 10} dur={14} style={{ left: 480, top: y(742), whiteSpace: "nowrap" }}>
           <span style={{ ...note(28, INK_SOFT) }}>
@@ -254,14 +254,14 @@ export const WallScene: React.FC = () => {
       ) : null}
       <Check x={NOTE_X - 42} y={y(SEALED.y0 + 40)} at={onceAt - 4} />
       <Ink at={onceAt - 2} dur={14} style={{ left: NOTE_X, top: y(SEALED.y0 + 40) - 18, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK), fontWeight: 600 }}>tested once</span>
+        <span style={{ ...note(22, INK), fontWeight: 500 }}>tested once</span>
       </Ink>
       <Ink at={nobodyAt - 4} dur={14} style={{ left: NOTE_X, top: y(SEALED.y0 + 90) - 6, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>on data nobody has seen</span>
       </Ink>
       <Ring x={(SEALED.x0 + SEALED.x1) / 2} y={(y(SEALED.y0) + y(SEALED.y1)) / 2} at={freshAt - 2} r0={60} r1={190} color={BAR} dur={26} />
       <Ink at={claimAt - 6} dur={16} style={{ left: 1060, top: y(742), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(28, INK), fontWeight: 600 }}>Out comes a claim,</span>
+        <span style={{ ...note(28, INK), fontWeight: 500 }}>Out comes a claim,</span>
       </Ink>
       <Ink at={claimAt + 4} dur={16} style={{ left: 1060, top: y(742) + 40, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>with a p-value, an effect size and an interval.</span>
@@ -277,15 +277,15 @@ export const WallScene: React.FC = () => {
         width={4.4}
       />
       <Ink at={suggestedAt - 4} dur={14} style={{ left: THUMB_X[DAY_THUMB], top: y(THUMB_Y[0]) + h(THUMB_H) + 8, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(20, STAT_INK), fontWeight: 650 }}>the same data</span>
+        <span style={{ ...note(20, STAT_INK), fontWeight: 500 }}>the same data</span>
       </Ink>
       <Cross x={WALL_X} y={y(CARD_TO.y) + 32} at={tiltedAt - 4} size={56} />
       <Ink at={veryAt - 4} dur={14} style={{ left: THUMB_X[DAY_THUMB], top: y(THUMB_Y[0]) + h(THUMB_H) + 36, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(24, STAT_INK), fontWeight: 650 }}>picked for looking best</span>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500 }}>picked for looking best</span>
       </Ink>
       {/* Below and right of the cross, whose lower arm ends at x 988, 60 px under the card's top. */}
       <Ink at={tiltedAt - 4} dur={14} style={{ left: 1004, top: y(CARD_TO.y) + 74, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(24, STAT_INK), fontWeight: 650 }}>tilted before it runs:</span>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500 }}>tilted before it runs:</span>
       </Ink>
       <div style={{ position: "absolute", left: 1004, top: y(CARD_TO.y) + 108, display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...note(22, STAT_INK) }}>
         <Ink at={luckFrom - 2} dur={14} style={{ position: "relative" }}>

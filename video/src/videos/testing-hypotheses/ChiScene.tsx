@@ -182,7 +182,7 @@ export const ChiScene: React.FC = () => {
                   top: top + barH + 10,
                   opacity: e,
                   ...note(isMobile ? 22 : 20, isMobile && glow > 0.05 ? STAT_INK : INK_SOFT),
-                  fontWeight: isMobile ? 650 : 500,
+                  fontWeight: isMobile ? 500 : 500,
                   whiteSpace: "nowrap",
                 }}
               >
@@ -195,13 +195,13 @@ export const ChiScene: React.FC = () => {
                     left: x0 + Math.max(obs, exp) * PER + 14,
                     top: top + 2,
                     ...note(28, DATA_INK),
-                    fontWeight: 600,
+                    fontWeight: 500,
                     whiteSpace: "nowrap",
                   }}
                 >
                   <Count at={at} to={obs} dur={16} />
                   {showGap > 0 ? (
-                    <span style={{ position: "relative", display: "inline-block", marginLeft: 12, ...note(26, STAT_INK), fontWeight: 650 }}>
+                    <span style={{ position: "relative", display: "inline-block", marginLeft: 12, ...note(26, STAT_INK), fontWeight: 500 }}>
                       <span style={{ opacity: showGap * (1 - toShare) }}>
                         {gap > 0 ? "+" : "−"}
                         {fmt(Math.abs(gap), 1)}
@@ -225,10 +225,10 @@ export const ChiScene: React.FC = () => {
 
         {/* The statistic: every cell's share, added up. */}
         <div style={{ position: "absolute", left: LABEL_X, top: y(830), opacity: total, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(38, STAT_INK), fontWeight: 600 }}>
+          <span style={{ ...note(38, STAT_INK), fontWeight: 500 }}>
             <Greek>χ</Greek>² = <Count at={twelveAt - 8} to={CHI.chi2} dur={20} format={(v) => fmt(v, 1)} />
           </span>
-          <span style={{ ...note(36, STAT_INK), fontWeight: 650, marginLeft: 30, opacity: ease(frame, pAt - 4, 12) }}>p = {fmt(CHI.p, 3)}</span>
+          <span style={{ ...note(36, STAT_INK), fontWeight: 500, marginLeft: 30, opacity: ease(frame, pAt - 4, 12) }}>p = {fmt(CHI.p, 3)}</span>
         </div>
         <Note at={pAt + 6} x={LABEL_X + 520} y={y(830) + 8}>
           <Label size={22} color={INK_SOFT} weight={520}>

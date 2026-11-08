@@ -58,7 +58,7 @@ const Acid: React.FC<{ c: Ctx }> = ({ c }) => {
           {i > 0 ? <ColumnRule x={x - 27} top={top + c.h(14)} bottom={top + c.h(256)} at={p.at - 4} /> : null}
           <div style={{ position: "absolute", left: x, top, width: 196, opacity: Math.max(0.25, a) }}>
             <div style={{ ...headline(110), color: a > 0.5 ? BLUE_INK : INK_SOFT, lineHeight: 1 }}>{p.letter}</div>
-            <div style={{ ...label(26, INK), fontWeight: 600, marginTop: c.h(20), opacity: a }}>{p.word}</div>
+            <div style={{ ...label(26, INK), fontWeight: 500, marginTop: c.h(20), opacity: a }}>{p.word}</div>
             <div style={{ ...note(23, INK_SOFT), marginTop: c.h(10), opacity: ease(frame, p.at + 8, 10), width: 196 }}>{p.gist}</div>
           </div>
           </React.Fragment>
@@ -113,7 +113,7 @@ const Norm: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={harderAt + 14} x={dg.x} y={dg.rowTop(3) + c.h(14)}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>one copy changed, two stale</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one copy changed, two stale</span>
       </Note>
       <Note at={disagreeAt} x={R_X} y={notesTop}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
@@ -128,7 +128,7 @@ const Norm: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={firstAt} x={R_X} y={notesTop + c.h(100)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           Normalize first<span style={{ opacity: ease(frame, profAt, 10) }}>; denormalize where profiling blames a join</span>
         </span>
       </Note>
@@ -176,7 +176,7 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
         <text x={rx + r * 0.5} y={cy - r - 18} textAnchor="middle" style={svgText(label(22, INK))}>
           orders
         </text>
-        <text x={(lx + rx) / 2} y={cy + 8} textAnchor="middle" style={svgText({ ...label(22, OK_INK), fontWeight: 600 })} opacity={ease(frame, innerRowsAt, 10)}>
+        <text x={(lx + rx) / 2} y={cy + 8} textAnchor="middle" style={svgText({ ...label(22, OK_INK), fontWeight: 500 })} opacity={ease(frame, innerRowsAt, 10)}>
           matches
         </text>
       </Svg>
@@ -197,7 +197,7 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       {RAPID.joins.none.map((name, i) => (
         <Note key={name} at={sixAt + i * 2} x={R_X + 700 + (i % 3) * 100} y={c.y(400) + c.h(136) + Math.floor(i / 3) * c.h(40)}>
-          <span style={{ ...note(22, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>{name}</span>
+          <span style={{ ...note(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</span>
         </Note>
       ))}
       <Note at={rightAt} x={R_X + 700} y={c.y(400) + c.h(250)}>
@@ -253,7 +253,7 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
       <DataTable g={cg} cols={[{ name: "id", ink: BLUE_INK }, { name: "name" }]} rows={[["1", "Ava"], ["2", "Ben"]].map((cells, i) => ({ cells, at: pkAt + 4 + i * 3 }))} at={pkAt} />
       <Note at={uniqueAt} x={cg.x} y={cg.rowTop(2) + c.h(14)}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-          unique, never null<span style={{ color: OK_INK, fontWeight: 650, opacity: ease(frame, autoAt, 10) }}>, indexed for you</span>
+          unique, never null<span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, autoAt, 10) }}>, indexed for you</span>
         </span>
       </Note>
       <TableName g={og} at={fkAt - 4}>
@@ -273,7 +273,7 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
         <KeyArrow key={i} from={[og.right + 8, og.rowMid(i)]} to={[cg.x - 8, cg.rowMid(i)]} at={fkAt + 8 + i * 4} />
       ))}
       <Note at={missingAt + 10} x={og.x} y={og.rowTop(3) + c.h(14)}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>no customer 9: refused</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no customer 9: refused</span>
       </Note>
       <Note at={doesntAt - 4} x={R_X} y={idxTop - c.h(48)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>

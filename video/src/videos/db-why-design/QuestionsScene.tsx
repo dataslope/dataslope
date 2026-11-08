@@ -109,7 +109,7 @@ export const QuestionsScene: React.FC = () => {
             <React.Fragment key={r.q}>
               {/* The number is set as its question is: same face, same size, told apart by ink and weight. */}
               <Ink at={r.at - 6} dur={14} style={{ left: X0, top: rowY(i) - 4, whiteSpace: "nowrap" }}>
-                <span style={{ ...body(38), color: ACCENT_INK, fontWeight: 600 }}>{i + 1}</span>
+                <span style={{ ...body(38), color: ACCENT_INK, fontWeight: 500 }}>{i + 1}</span>
               </Ink>
               <Ink at={r.at - 4} dur={16} style={{ left: Q_X, top: rowY(i) - 4, whiteSpace: "nowrap" }}>
                 <span style={{ ...body(38), color: INK }}>
@@ -117,7 +117,7 @@ export const QuestionsScene: React.FC = () => {
                 </span>
               </Ink>
               <Ink at={r.key - 2} dur={14} style={{ left: R_X, top: rowY(i) + 2, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-                <span style={{ ...label(28, INK), fontWeight: 600 }}>{r.decides}</span>
+                <span style={{ ...label(28, INK), fontWeight: 500 }}>{r.decides}</span>
                 {"badge" in r ? <Badge size={28}>{r.badge}</Badge> : null}
               </Ink>
               {sw > 0 ? (

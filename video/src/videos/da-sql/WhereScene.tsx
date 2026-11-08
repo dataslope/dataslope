@@ -102,7 +102,7 @@ export const WhereScene: React.FC = () => {
           bands={WHERE.totals.rows.flatMap((cells, i) => (kept.has(cells[0]) ? [{ row: i, at: twoAt + 2 + i * 4 }] : []))}
         />
         <Note at={askAt} x={g.right + 24} y={g.top + g.headH + 2 * g.rowH - 16}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap", fontWeight: 650 }}>&gt; 600?</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap", fontWeight: 500 }}>&gt; 600?</span>
         </Note>
 
         {/* ── The sum in WHERE, and Postgres's refusal ── */}

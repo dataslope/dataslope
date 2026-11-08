@@ -211,7 +211,7 @@ export const LogicScene: React.FC = () => {
               <Code line={c.expr} size={EXPR} />
             </Ink>
             <Ink at={wordAt[i] - 2} dur={14} style={{ left: colLeft(i), ...cellRow(ROW2) }}>
-              <TruthWord value={c.value} size={50} weight={680} />
+              <TruthWord value={c.value} size={50} weight={500} />
             </Ink>
             <Ink at={whereAt + i * 4} dur={14} style={{ left: colLeft(i), ...cellRow(ROW3), gap: 18 }}>
               <RowToken
@@ -233,7 +233,7 @@ export const LogicScene: React.FC = () => {
       <Note at={isUnknownAt} x={colLeft(2)} y={y(NOTE_Y)} from="up" width={COL_W}>
         <span style={note(20, INK_SOFT)}>
           Postgres returns{" "}
-          <Mono color={UNKNOWN_INK} weight={600}>
+          <Mono color={UNKNOWN_INK} weight={500}>
             NULL
           </Mono>
         </span>

@@ -189,7 +189,7 @@ export const MechanismScene: React.FC = () => {
         <span style={note(22, INK_SOFT)}>Nothing records where a value is, so each item is checked in turn.</span>
       </Note>
       <Note at={landAt + 2} x={lastX + CELL_W} y={ya(A_CELLS) + CELL_H + 20} align="right" out={notThereAt - 6}>
-        <span style={{ ...note(22, LIST_INK), fontWeight: 650 }}>found at the very end</span>
+        <span style={{ ...note(22, LIST_INK), fontWeight: 500 }}>found at the very end</span>
       </Note>
       <Ink at={notThereAt - 2} dur={16} style={{ left: LEFT, top: ya(A_NOTE), display: "flex", alignItems: "baseline", gap: "0.6em", whiteSpace: "nowrap" }}>
         <Code line="-1 in big_list" size={CODE} />
@@ -254,7 +254,7 @@ export const MechanismScene: React.FC = () => {
         return (
           <React.Fragment key={i}>
             <Ink at={at} dur={12} style={{ left: s.x, top: y(B_CELLS) - 34, width: CELL_W, textAlign: "center" }}>
-              <span style={{ ...note(19, isTarget && landed > 0 ? SET_INK : INK_SOFT), fontWeight: isTarget ? 650 : 500 }}>
+              <span style={{ ...note(19, isTarget && landed > 0 ? SET_INK : INK_SOFT), fontWeight: isTarget ? 500 : 500 }}>
                 {commas(s.index)}
               </span>
             </Ink>

@@ -94,7 +94,7 @@ export const LambdaScene: React.FC = () => {
 
         {/* Lambda: two paths, merged. */}
         <Note at={twoAt} x={X0} y={bY - h(4)}>
-          <span style={{ ...label(32, INK), fontWeight: 800 }}>Lambda</span>
+          <span style={{ ...label(32, INK), fontWeight: 500 }}>Lambda</span>
         </Note>
         <Node x={ev.x} y={eY + h(30)} w={ev.w} h={84} at={twoAt + 4} title="events" />
         <Flow points={[[ev.x + ev.w + 6, eY + h(30) + 30], [LAYER_X - 60, eY + h(30) + 30], [LAYER_X - 60, bY + LH / 2], [LAYER_X - 8, bY + LH / 2]]} at={batchAt - 2} color={BAR} />
@@ -111,7 +111,7 @@ export const LambdaScene: React.FC = () => {
           </Pill>
         ))}
         <Note at={costAt} x={NOTE_X} y={bY + h(10)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             The cost: every piece of logic
             <br />
             <span style={{ opacity: ease(frame, twiceAt, 10) }}>written twice</span>
@@ -121,7 +121,7 @@ export const LambdaScene: React.FC = () => {
 
         {/* Kappa: one path, and a replay. */}
         <Note at={kappaAt} x={X0} y={kY - h(64)}>
-          <span style={{ ...label(32, INK), fontWeight: 800 }}>Kappa</span>
+          <span style={{ ...label(32, INK), fontWeight: 500 }}>Kappa</span>
         </Note>
         <Node x={log.x} y={kY} w={log.w} h={KH} at={kappaAt + 2} title="event log" sub={<span style={{ opacity: ease(frame, kafkaAt, 10) }}>in Kafka, say</span>} />
         <Flow points={[[log.x + log.w + 6, kY + KH / 2], [job.x - 8, kY + KH / 2]]} at={kappaAt + 6} color={BAR} />
@@ -143,7 +143,7 @@ export const LambdaScene: React.FC = () => {
           tail
         />
         <Note at={reprocessAt} x={log.x + 70} y={v2Mid + h(10)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>replay from the start</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>replay from the start</span>
         </Note>
         <Node
           x={job.x}
@@ -172,14 +172,14 @@ export const LambdaScene: React.FC = () => {
           head={12}
         />
         <Note at={switchAt + 4} x={newTable.x} y={v2Y + V2H + h(8)}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             readers switch<span style={{ opacity: ease(frame, catchAt, 10) }}> once it catches up</span>
           </span>
         </Note>
 
         {/* When each fits. */}
         <Note at={simplerAt} x={NOTE_X} y={kY - h(20)}>
-          <div style={{ ...note(25, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>Kappa is simpler, when</div>
+          <div style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Kappa is simpler, when</div>
           <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, semanticsAt, 10) }}>the engine handles batch semantics</div>
           <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, reachesAt, 10) }}>and the log reaches back far enough</div>
         </Note>
@@ -190,7 +190,7 @@ export const LambdaScene: React.FC = () => {
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, windowsAt, 10) }}>event-time windows, exactly-once results</div>
         </Note>
         <Note at={fallbackAt} x={NOTE_X} y={kY + h(152)}>
-          <span style={{ ...note(24, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>Lambda: the fallback when it can't</span>
+          <span style={{ ...note(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Lambda: the fallback when it can't</span>
         </Note>
       </Drift>
     </AbsoluteFill>

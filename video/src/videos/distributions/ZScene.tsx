@@ -149,7 +149,7 @@ export const ZScene: React.FC = () => {
                 x={zx(k)}
                 y={zY + 32}
                 textAnchor="middle"
-                style={{ fontFamily: SANS, fontSize: 22, fontWeight: 600, fill: k === 2 && drop >= 1 ? ASK_INK : INK_SOFT }}
+                style={{ fontFamily: SANS, fontSize: 22, fontWeight: 500, fill: k === 2 && drop >= 1 ? ASK_INK : INK_SOFT }}
               >
                 {k > 0 ? `+${k}` : k < 0 ? `−${Math.abs(k)}` : "0"}
               </text>
@@ -183,7 +183,7 @@ export const ZScene: React.FC = () => {
 
           {/* A position, not a chance; the area is the percentile. */}
           <Note at={percentAt - 4} x={x130 + 30} y={y(380)}>
-            <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               not a <Strike at={percentAt + 4}>2% chance</Strike>
             </span>
           </Note>
@@ -198,7 +198,7 @@ export const ZScene: React.FC = () => {
           </Note>
         </div>
         <Note at={reallyAt - 2} x={x130 + 30} y={y(512)}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             only if the data <span style={{ color: ASK_INK }}>really is normal</span>
           </span>
         </Note>

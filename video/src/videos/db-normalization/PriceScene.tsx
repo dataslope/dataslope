@@ -109,7 +109,7 @@ export const PriceScene: React.FC = () => {
         </Note>
         <Note at={historyAt - 2} x={RIGHT} y={y(BODY_Y) + 334}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            History: <span style={{ color: ACCENT_INK, fontWeight: 600 }}>never fix it.</span>
+            History: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>never fix it.</span>
           </span>
         </Note>
       </Drift>

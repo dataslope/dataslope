@@ -175,7 +175,7 @@ export const TwentyScene: React.FC = () => {
       <TruthLine x={muX} bottom={y(BASE)} top={y(ROW0 - 16)} at={twentyFrom - 40} width={lerp(2, 3.2, muBold)} />
       {/* Already up at the cut, where ParameterScene's mu ends its ride. */}
       <Note at={twentyFrom - 30} x={muX + 12} y={y(ROW0 - 50)}>
-        <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           <Mu inline /> = {KNOWN.mu}
           <span style={{ ...note(21, INK_SOFT), marginLeft: 12, opacity: ease(frame, parameterAt + 4, 10) }}>never moves</span>
         </span>
@@ -233,7 +233,7 @@ export const TwentyScene: React.FC = () => {
         })}
       </Svg>
       <Note at={statisticAt} x={muX - 14} y={y(ROW0 - 50)} align="right" out={summarizeAt - 2}>
-        <span style={{ ...note(23, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(23, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           <XBar inline />: different every time
         </span>
       </Note>
@@ -241,7 +241,7 @@ export const TwentyScene: React.FC = () => {
       {/* ── The averages, gathered: a distribution of their own ── */}
       <AbsoluteFill style={{ opacity: summaries }}>
       <Ink at={variableAt - 16} dur={14} style={{ left: X2.x0, top: y(270), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK), fontWeight: 560 }}>Where the twenty averages land</span>
+        <span style={{ ...label(24, INK), fontWeight: 500 }}>Where the twenty averages land</span>
       </Ink>
       {/* The name the narration gives what the panel shows. */}
       <Ink at={variableAt - 4} dur={16} style={{ left: X2.x0, top: y(318), whiteSpace: "nowrap" }}>
@@ -304,7 +304,7 @@ export const TwentyScene: React.FC = () => {
           transform: "translateX(-50%)",
           whiteSpace: "nowrap",
           ...note(22, STAT_INK),
-          fontWeight: 650,
+          fontWeight: 500,
         }}
       >
         <span style={{ opacity: centerIn }}>center {fmt(CENTER)}</span>
@@ -321,7 +321,7 @@ export const TwentyScene: React.FC = () => {
         dur={10}
       />
       <Note at={drawAt} x={MINE_X} y={y(BASE2 - (SLOTS[0].k + 1) * BLOCK - 86)} from="up">
-        <span style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           one draw
         </span>
       </Note>

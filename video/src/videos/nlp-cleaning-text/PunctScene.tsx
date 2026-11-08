@@ -44,7 +44,7 @@ const Recipe: React.FC<{ at: number; onAt: number; doesAt: number; y: number; ca
 }) => (
   <>
     <Ink at={at} dur={14} style={{ left: X0, top: y - 8, whiteSpace: "nowrap" }}>
-      <div style={{ fontFamily: MONO, fontSize: 23, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{call}</div>
+      <div style={{ fontFamily: MONO, fontSize: 23, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{call}</div>
     </Ink>
     <Ink at={onAt} dur={14} style={{ left: X0, top: y + 24, whiteSpace: "nowrap" }}>
       <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>
@@ -248,8 +248,8 @@ export const PunctScene: React.FC = () => {
           dur={14}
           style={{ left: INSET_X, top: y(NOTE_Y) - 6 + i * 38, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}
         >
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none", width: 330 }}>{r.call}</span>
-          <span style={{ ...note(24, r.color), fontWeight: 650 }}>
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none", width: 330 }}>{r.call}</span>
+          <span style={{ ...note(24, r.color), fontWeight: 500 }}>
             {r.n} {r.n === 1 ? "sentence" : "sentences"}
           </span>
         </Ink>

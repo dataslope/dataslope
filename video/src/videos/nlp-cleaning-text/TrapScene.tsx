@@ -200,7 +200,7 @@ export const TrapScene: React.FC = () => {
                   marks={r.word === "never" ? [{ at: isntAt, out: reviewAt }] : []}
                 />
                 <Ink at={readAt[r.word] + 4} dur={12} style={{ left: X0 + 150, top: top + chipH / 2 - 17, whiteSpace: "nowrap" }}>
-                  <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: r.isStop ? ACCENT_INK : INK_SOFT }}>
+                  <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: r.isStop ? ACCENT_INK : INK_SOFT }}>
                     {r.isStop ? "True" : "False"}
                   </span>
                 </Ink>
@@ -244,9 +244,9 @@ export const TrapScene: React.FC = () => {
           {/* One line, one size: the list's name and the operators at the
               28px of the chips between them. */}
           <Op at={startAt}>
-            <span style={{ ...label(SMALL, INK), fontWeight: 600 }}>NLTK&apos;s list</span>
+            <span style={{ ...label(SMALL, INK), fontWeight: 500 }}>NLTK&apos;s list</span>
           </Op>
-          <Op at={takeAt} style={{ ...label(SMALL, INK), fontWeight: 600, margin: "0 6px" }}>
+          <Op at={takeAt} style={{ ...label(SMALL, INK), fontWeight: 500, margin: "0 6px" }}>
             −
           </Op>
           {CUSTOM.keep.map((w, i) => (
@@ -258,7 +258,7 @@ export const TrapScene: React.FC = () => {
               ghost={!CUSTOM.keepRemoved.includes(w)}
             />
           ))}
-          <Op at={addAt} style={{ ...label(SMALL, INK), fontWeight: 600, margin: "0 6px" }}>
+          <Op at={addAt} style={{ ...label(SMALL, INK), fontWeight: 500, margin: "0 6px" }}>
             +
           </Op>
           {CUSTOM.add.map((w, i) => (

@@ -50,7 +50,7 @@ const NullPanel: React.FC<{ left: number; two: boolean; at: number; tailAt: numb
       {(two ? [crit, -crit] : [crit]).map((c) => (
         <g key={c} opacity={t}>
           <line x1={xs(c)} x2={xs(c)} y1={y(BASE)} y2={y(BASE) - h(PEAK) * 0.7} stroke={INK} strokeWidth={2} strokeDasharray="5 6" />
-          <text x={xs(c)} y={y(BASE) + 30} textAnchor="middle" style={svgText({ ...label(20, INK), fontWeight: 650, fontVariantNumeric: "tabular-nums" })}>
+          <text x={xs(c)} y={y(BASE) + 30} textAnchor="middle" style={svgText({ ...label(20, INK), fontWeight: 500, fontVariantNumeric: "tabular-nums" })}>
             {c > 0 ? c : `−${-c}`}
           </text>
         </g>
@@ -137,7 +137,7 @@ export const SidesScene: React.FC = () => {
             <NullPanel key={pl.left} left={pl.left} two={pl.two} at={pl.two ? twoAt : oneAt} tailAt={pl.two ? eachAt : allAt} />
           ))}
           <Note at={twoAt} x={PANELS[0].left} y={y(320)}>
-            <span style={{ ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={usuallyAt} color={MARK_OK}>
                 two-sided
               </Mark>
@@ -145,7 +145,7 @@ export const SidesScene: React.FC = () => {
             </span>
           </Note>
           <Note at={oneAt} x={PANELS[1].left} y={y(320)}>
-            <span style={{ ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               one-sided<span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, allAt, 10) }}>: all 5% on the predicted side</span>
             </span>
           </Note>
@@ -155,17 +155,17 @@ export const SidesScene: React.FC = () => {
           ].map((r) => (
             <React.Fragment key={r.left}>
               <Note at={r.powerAt} x={r.left} y={y(686)}>
-                <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>power {pct(r.power)}</span>
+                <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>power {pct(r.power)}</span>
               </Note>
               <Note at={r.ok ? regressionAt : neverAt - 2} x={r.left} y={y(734)}>
-                <span style={{ ...note(26, r.ok ? INK : ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+                <span style={{ ...note(26, r.ok ? INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
                   a regression the same size: caught {pct(r.caught)}
                 </span>
               </Note>
             </React.Fragment>
           ))}
           <Note at={usuallyAt - 2} x={PANELS[0].left} y={y(800)}>
-            <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>features can hurt: product tests are usually two-sided</span>
+            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>features can hurt: product tests are usually two-sided</span>
           </Note>
         </Fade>
 
@@ -180,7 +180,7 @@ export const SidesScene: React.FC = () => {
           </span>
         </Note>
         <Note at={nullAt - 2} x={330} y={y(348)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             H<sub style={{ fontSize: "0.8em", verticalAlign: "-0.25em", lineHeight: 0 }}>0</sub>: worse by more than the margin
             <span style={{ opacity: ease(frame, rejectAt - 2, 10) }}>
               {" · "}rejected when the{" "}
@@ -207,7 +207,7 @@ export const SidesScene: React.FC = () => {
           <line x1={at(xs, -NONINF.margin)} x2={at(xs, -NONINF.margin)} y1={y(400)} y2={y(760)} stroke={ACCENT} strokeWidth={2.6} strokeDasharray="7 6" />
         </Svg>
         <Note at={halfAt + 4} x={at(xs, -NONINF.margin) - 12} y={y(404)} width={290} align="right">
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>margin −{NONINF.margin}: worse than this</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>margin −{NONINF.margin}: worse than this</span>
         </Note>
         {intervals.map((r) => {
           const s = ease(frame, r.drawAt - 2, 18);
@@ -235,7 +235,7 @@ export const SidesScene: React.FC = () => {
           );
         })}
         <Note at={notWorseAt - 2} x={330} y={y(820)}>
-          <span style={{ ...note(32, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(32, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={liveAt - 6}>not significant ≠ not worse</Mark>
           </span>
         </Note>

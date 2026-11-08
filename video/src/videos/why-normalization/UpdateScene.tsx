@@ -75,7 +75,7 @@ export const UpdateScene: React.FC = () => {
       {/* Postgres's whole answer: one row changed, nothing else said. */}
       <Ink at={swapAt + 4} dur={14} style={{ left: RIGHT_X, top: y(BODY_Y) + 6 }}>
         <div style={label(21, INK_SOFT)}>Postgres replies</div>
-        <div style={{ fontFamily: MONO, fontSize: 34, fontWeight: 600, color: INK, marginTop: 14 }}>{UPDATE_TAG}</div>
+        <div style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK, marginTop: 14 }}>{UPDATE_TAG}</div>
         <div style={{ ...note(22, INK_SOFT), marginTop: 14 }}>One row changed, and no warning.</div>
       </Ink>
 

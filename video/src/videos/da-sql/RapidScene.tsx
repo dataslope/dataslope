@@ -46,7 +46,7 @@ const geo = (c: Ctx, x: number, top: number, cols: readonly string[], rows: read
 /** A query's name over a result table, set as code. */
 const CodeName: React.FC<{ g: TableGeometry; at: number; children: React.ReactNode }> = ({ g, at, children }) => (
   <Ink at={at} dur={12} style={{ left: g.x, top: g.top - 38, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{children}</span>
   </Ink>
 );
 
@@ -256,7 +256,7 @@ const Coalesce: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <Note at={errorAt - 2} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(30)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          Dividing by 0: <span style={{ color: ACCENT_INK, fontWeight: 650 }}>an error</span> in most databases.
+          Dividing by 0: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>an error</span> in most databases.
         </span>
       </Note>
       <Note at={byNullAt - 2} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(76)}>
@@ -363,7 +363,7 @@ const IndexFigure: React.FC<{ c: Ctx; tableAt: number; storedAt: number; indexAt
       />
       <Note at={storedAt} x={R_X} y={ug.rowTop(n + (insertAt === undefined ? 0 : 1)) + 16}>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <span style={{ fontWeight: 650 }}>clustered:</span> the rows themselves,
+          <span style={{ fontWeight: 500 }}>clustered:</span> the rows themselves,
         </div>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>in id order (one per table)</div>
       </Note>
@@ -389,7 +389,7 @@ const IndexFigure: React.FC<{ c: Ctx; tableAt: number; storedAt: number; indexAt
       )}
       <Note at={lookupAt + 6} x={ig.x} y={ig.rowTop(n + (insertAt === undefined ? 0 : 1)) + 16}>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <span style={{ fontWeight: 650 }}>non-clustered:</span> a separate lookup
+          <span style={{ fontWeight: 500 }}>non-clustered:</span> a separate lookup
         </div>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>(many per table)</div>
       </Note>
@@ -494,7 +494,7 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
           </Term>
           <Term at={seventeenAt - 2}>
             {" = "}
-            <span style={{ ...TABULAR, fontWeight: 650 }}>{rows.length}</span> rows
+            <span style={{ ...TABULAR, fontWeight: 500 }}>{rows.length}</span> rows
           </Term>
         </span>
       </Note>
@@ -594,7 +594,7 @@ const Dedupe: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <Ink at={rowNumberAt} dur={12} style={{ left: listX, top: c.T - 38, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>
-          <span style={{ fontFamily: MONO, fontWeight: 600, fontVariantLigatures: "none" }}>ROW_NUMBER()</span>: a window function, Part 4
+          <span style={{ fontFamily: MONO, fontWeight: 500, fontVariantLigatures: "none" }}>ROW_NUMBER()</span>: a window function, Part 4
         </span>
       </Ink>
       <Listing
@@ -633,12 +633,12 @@ const Cross: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {regions.map((r, j) => (
         <Ink key={r} at={at + j * 2} dur={10} style={{ left: gx + j * cw, top: c.T, width: cw, textAlign: "center" }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK }}>{r}</span>
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK }}>{r}</span>
         </Ink>
       ))}
       {products.map((p, i) => (
         <Ink key={p} at={at + 4 + i * 2} dur={10} style={{ left: R_X, top: gy + i * ch + ch / 2 - 16 }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK }}>{p}</span>
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK }}>{p}</span>
         </Ink>
       ))}
       {products.flatMap((_, i) =>

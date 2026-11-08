@@ -153,7 +153,7 @@ export const ToolScene: React.FC = () => {
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>sheets slow down well before a million rows</span>
         </Note>
         <Note at={weeklyAt - 2} x={X0} y={y(LIST_Y) + h(54) + h(PITCH) * 4 + h(20)} out={out9}>
-          <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             the same manual steps every week? <Mark at={sqlAt}>it belongs in SQL</Mark>
           </span>
         </Note>

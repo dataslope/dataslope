@@ -181,7 +181,7 @@ export const GroupScene: React.FC = () => {
             </Ink>
             {lead && merge > 0 ? (
               <div style={{ position: "absolute", ...cellBox(g, AMOUNT, rt, g.rowH, amountX), opacity: merge }}>
-                <CellText col="total" value={TOTAL[region]} weight={650} />
+                <CellText col="total" value={TOTAL[region]} weight={500} />
               </div>
             ) : null}
           </React.Fragment>

@@ -23,7 +23,7 @@ const ROW = { word: 0, penn: 1, pos: 2, naive: 3, aware: 4, porter: 5 } as const
 const LEGEND_X = 1490;
 const LEGEND_Y = 344;
 const LEGEND_STEP = 64;
-const legendCode: React.CSSProperties = { fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, fontVariantLigatures: "none" };
+const legendCode: React.CSSProperties = { fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, fontVariantLigatures: "none" };
 /** The fix as one call, in Fig. 1's code face. */
 const CALL_SIZE = 28;
 const callFace: React.CSSProperties = {

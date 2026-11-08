@@ -103,7 +103,7 @@ export const ChooseScene: React.FC = () => {
               {/* The model's name in the question's face and size (one line,
                   one size): told apart by italic, weight and the data blue. */}
               <Ink at={r.nameAt - 6} dur={14} style={{ left: NAME_X, top: rowY(i), whiteSpace: "nowrap" }}>
-                <span style={{ ...body(38, true), color: BLUE_INK, fontWeight: 600 }}>{r.name}</span>
+                <span style={{ ...body(38, true), color: BLUE_INK, fontWeight: 500 }}>{r.name}</span>
               </Ink>
               <Svg>
                 <Mini kind={r.kind} x={MINI_X} top={rowY(i) - 6} w={MINI_W} h={h(MINI_H)} p={ease(frame, r.nameAt - 2, 16)} />
@@ -141,7 +141,7 @@ export const ChooseScene: React.FC = () => {
           2.7
         </Centered>
         <Note at={wholeAt + 8} x={LINE_X0 + 4 * PER + 70} y={lineY - 44}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>counting: whole steps</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>counting: whole steps</span>
         </Note>
         <Note at={measuringAt} x={LINE_X0 + 4 * PER + 70} y={lineY - 8}>
           <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>measuring: anything in between</span>

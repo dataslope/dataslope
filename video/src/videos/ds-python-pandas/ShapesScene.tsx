@@ -166,7 +166,7 @@ export const ShapesScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>each region&apos;s largest order</span>
         </Note>
         <Note at={slowAt} x={APPLY_X} y={under(AP.rows.length) + h(40)} out={out3}>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>most flexible, and slowest</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>most flexible, and slowest</span>
         </Note>
 
         {/* ── Question 4: the share, no sum-then-merge ── */}

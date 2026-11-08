@@ -99,7 +99,7 @@ const NodeBox: React.FC<{
           key={i}
           style={{
             ...note(i === 0 ? 24 : 22, i === 0 ? INK : INK_SOFT),
-            fontWeight: i === 0 ? 650 : 500,
+            fontWeight: i === 0 ? 500 : 500,
             whiteSpace: "nowrap",
             ...TABULAR,
           }}
@@ -332,7 +332,7 @@ export const TreeScene: React.FC = () => {
           <span
             style={{
               ...note(24, OK_INK),
-              fontWeight: 600,
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,
             }}
@@ -416,7 +416,7 @@ export const TreeScene: React.FC = () => {
           <span
             style={{
               ...note(23, INK),
-              fontWeight: 650,
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,
               background: PAPER,
@@ -466,7 +466,7 @@ export const TreeScene: React.FC = () => {
           <span
             style={{
               ...note(25, OK_INK),
-              fontWeight: 650,
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,
             }}

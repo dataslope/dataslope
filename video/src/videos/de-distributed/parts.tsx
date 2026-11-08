@@ -45,7 +45,7 @@ export {
  * one size, one family"); never under 19px.
  */
 export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 500, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );
@@ -122,7 +122,7 @@ const cardBox = (dept: Dept, pose: Pose, width: number, height: number): React.C
       : undefined,
 });
 
-const deptText = (dept: Dept, weight = 620): React.CSSProperties => ({
+const deptText = (dept: Dept, weight = 500): React.CSSProperties => ({
   fontFamily: SANS,
   fontSize: 23,
   fontWeight: weight,
@@ -152,7 +152,7 @@ export const PairCard: React.FC<{ dept: Dept; value: number | string; pose: Pose
 }) => (
   <div style={cardBox(dept, pose, width, height)}>
     <span style={{ ...deptText(dept, strong ? 740 : 620), width: 92, paddingLeft: 14, boxSizing: "border-box" }}>{dept}</span>
-    <span style={{ ...numText, flex: 1, textAlign: "right", paddingRight: 16, fontWeight: strong ? 720 : 540 }}>{value}</span>
+    <span style={{ ...numText, flex: 1, textAlign: "right", paddingRight: 16, fontWeight: strong ? 500 : 540 }}>{value}</span>
   </div>
 );
 
@@ -458,7 +458,7 @@ export const Chip: React.FC<{ children: React.ReactNode; tone?: BadgeTone; size?
   <span
     style={{
       ...badgeStyle(tone, size),
-      ...(mono ? { fontFamily: MONO, fontSize: Math.max(19, size * 0.92), fontWeight: 600, fontVariantLigatures: "none" } : { fontFamily: SANS }),
+      ...(mono ? { fontFamily: MONO, fontSize: Math.max(19, size * 0.92), fontWeight: 500, fontVariantLigatures: "none" } : { fontFamily: SANS }),
     }}
   >
     {children}

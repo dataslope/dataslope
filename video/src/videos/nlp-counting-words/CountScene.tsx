@@ -185,7 +185,7 @@ export const CountScene: React.FC = () => {
                 alignItems: "center",
                 opacity: showing,
                 ...numStyle(22, isThe && frame >= eightAt - 2 ? ACCENT_INK : INK),
-                fontWeight: isThe && frame >= eightAt - 2 ? 700 : 600,
+                fontWeight: isThe && frame >= eightAt - 2 ? 500 : 500,
               }}
             >
               {frame >= sweepEnd + 6 ? total : Math.max(1, Math.round(t))}

@@ -130,7 +130,7 @@ export const BlindScene: React.FC = () => {
         </React.Fragment>
       ))}
       <Note at={sameAt - 2} x={px[0]} y={y(MINI.rowY + 2 * MINI.step) + 14}>
-        <span style={{ ...note(26, LOST_INK), fontWeight: 600, whiteSpace: "nowrap" }}>The same bag</span>
+        <span style={{ ...note(26, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The same bag</span>
       </Note>
 
       {/* ── The panels side by side: a hairline in each gap, inking with the

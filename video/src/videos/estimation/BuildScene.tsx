@@ -107,7 +107,7 @@ export const BuildScene: React.FC = () => {
       </Slot>
       <div style={{ height: 44, position: "relative" }}>
         {valueAt !== undefined ? (
-          <Ink at={valueAt} dur={14} style={{ position: "relative", ...note(34, color), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <Ink at={valueAt} dur={14} style={{ position: "relative", ...note(34, color), fontWeight: 500, whiteSpace: "nowrap" }}>
             {value}
           </Ink>
         ) : null}
@@ -150,7 +150,7 @@ export const BuildScene: React.FC = () => {
             </Marked>{" "}
             interval
           </Slot>
-          <div style={{ height: 44, position: "relative", display: "flex", gap: "0.35em", whiteSpace: "nowrap", ...note(34, INK), fontWeight: 600 }}>
+          <div style={{ height: 44, position: "relative", display: "flex", gap: "0.35em", whiteSpace: "nowrap", ...note(34, INK), fontWeight: 500 }}>
             <Ink at={fortySixAt - 2} dur={12} style={{ position: "relative" }}>
               {money(USERS.lo)}
             </Ink>
@@ -163,7 +163,7 @@ export const BuildScene: React.FC = () => {
       <Ink at={marginAt - 4} dur={16} style={{ left: 98, top: y(300), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK_SOFT) }}>
           margin of error: {fmt(USERS.tCrit)} × {money(USERS.se)} ={" "}
-          <span style={{ color: EST_INK, fontWeight: 600, opacity: ease(frame, threeAt - 2, 10) }}>{money(USERS.margin)}</span>
+          <span style={{ color: EST_INK, fontWeight: 500, opacity: ease(frame, threeAt - 2, 10) }}>{money(USERS.margin)}</span>
         </span>
       </Ink>
 
@@ -198,7 +198,7 @@ export const BuildScene: React.FC = () => {
         width={4 + 3 * pulse(frame, thatsAt - 4, 16)}
       />
       <Note at={monthAt - 4} x={sx(X, USERS.xBar) + 12} y={y(STRIP) - h(44) - 18} out={spreadAt - 6}>
-        <span style={{ ...note(22, EST_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           <XBar /> = {money(USERS.xBar)} a month
         </span>
       </Note>
@@ -236,13 +236,13 @@ export const BuildScene: React.FC = () => {
       {/* One standard error, then the margin: 2.01 of them. */}
       <Bracket x0={mx} x1={zx(USERS.xBar + USERS.se)} y={y(BASE) - h(BELL_H * 0.3)} at={howMuchAt - 2} color={INK} />
       <Note at={dollarFiftyAt - 2} x={zx(USERS.xBar + USERS.se) + 10} y={y(BASE) - h(BELL_H * 0.3) - 14}>
-        <span style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>1 SE</span>
+        <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>1 SE</span>
       </Note>
       <Rule x={zx(USERS.xBar - USERS.margin)} y0={y(BASE)} y1={y(BAR_Y) + h(24)} at={twoOhOneAt - 2} color={INK_SOFT} width={1.6} dash="5 5" />
       <Rule x={zx(USERS.xBar + USERS.margin)} y0={y(BASE)} y1={y(BAR_Y) + h(24)} at={twoOhOneAt} color={INK_SOFT} width={1.6} dash="5 5" />
       <Bracket x0={mx} x1={zx(USERS.hi)} y={y(BAR_Y) - h(40)} at={marginAt - 2} color={EST} />
       <Note at={threeAt - 2} x={(mx + zx(USERS.hi)) / 2} y={y(BAR_Y) - h(40) - 38} from="up">
-        <span style={{ ...note(22, EST_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(22, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           margin {money(USERS.margin)}
         </span>
       </Note>
@@ -259,10 +259,10 @@ export const BuildScene: React.FC = () => {
         tick={14}
       />
       <Note at={fortySixAt} x={zx(USERS.lo) - 14} y={y(BAR_Y) - 16} align="right" from="right">
-        <span style={{ ...note(26, INK), fontWeight: 600, ...halo }}>{money(USERS.lo)}</span>
+        <span style={{ ...note(26, INK), fontWeight: 500, ...halo }}>{money(USERS.lo)}</span>
       </Note>
       <Note at={fiftyTwoAt - 4} x={zx(USERS.hi) + 14} y={y(BAR_Y) - 16}>
-        <span style={{ ...note(26, INK), fontWeight: 600, ...halo }}>{money(USERS.hi)}</span>
+        <span style={{ ...note(26, INK), fontWeight: 500, ...halo }}>{money(USERS.hi)}</span>
       </Note>
       <Svg>
         <circle cx={mx} cy={y(BAR_Y)} r={7 * ease(frame, stepAt, 10) * (1 + 0.35 * pulse(frame, easyAt - 2, 16))} fill={EST} stroke={PAPER} strokeWidth={1.6} />
@@ -281,7 +281,7 @@ export const BuildScene: React.FC = () => {
       </Note>
       <Rule x={sx(C, USERS.tCrit)} y0={y(C_Y)} y1={y(C_Y) - h(40)} at={tDistAt - 2} color={EST} width={4 + 3 * pulse(frame, widensAt - 2, 18)} out={meansAt - 8} />
       <Note at={tDistAt} x={sx(C, USERS.tCrit) + 8} y={y(C_Y) - h(40) - 30} from="up" out={meansAt - 8}>
-        <span style={{ ...note(20, EST_INK), fontWeight: 600, whiteSpace: "nowrap" }}>t-distribution: {fmt(USERS.tCrit)}</span>
+        <span style={{ ...note(20, EST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>t-distribution: {fmt(USERS.tCrit)}</span>
       </Note>
 
       {/* The turn: what the 95% means. */}

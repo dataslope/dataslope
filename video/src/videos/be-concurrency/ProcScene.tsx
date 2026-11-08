@@ -97,13 +97,13 @@ export const ProcScene: React.FC = () => {
 
         {/* Threads: one process, one memory. */}
         <Note at={threadsAt} x={L.x} y={y(292)}>
-          <span style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Threads: <span style={{ fontWeight: 500 }}>inside one process, sharing its memory</span>
           </span>
         </Note>
         <Node x={L.x} y={y(L.top)} w={L.w} h={h(L.h)} at={threadsAt + 2} tone="plain" fill="transparent" line={HAIRLINE} stroke={1.5} />
         <Ink at={threadsAt + 6} dur={12} style={{ left: L.x + 40, top: y(L.top) + h(18) }}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             one process<span style={{ opacity: ease(frame, shareAt, 10) }}>: its memory, shared</span>
           </span>
         </Ink>
@@ -133,24 +133,24 @@ export const ProcScene: React.FC = () => {
         <Flow points={[[threadX(0) + 60, threadTop - 8], [cellX(WRITE) + CELL_W / 2 - 14, cellTop + cellH + 8]]} at={writesAt} color={THREAD[0].fill} width={3} />
         <Flow points={[[cellX(WRITE) + CELL_W / 2 + 14, cellTop + cellH + 8], [threadX(1) + 30, threadTop - 8]]} at={readsAt} color={THREAD[1].fill} width={3} />
         <Note at={writesAt + 4} x={threadX(0) - 6} y={y(540)}>
-          <span style={{ ...label(20, THREAD[0].ink), fontWeight: 600 }}>write</span>
+          <span style={{ ...label(20, THREAD[0].ink), fontWeight: 500 }}>write</span>
         </Note>
         <Note at={readsAt + 4} x={threadX(1) + 50} y={y(540)}>
-          <span style={{ ...label(20, THREAD[1].ink), fontWeight: 600 }}>read</span>
+          <span style={{ ...label(20, THREAD[1].ink), fontWeight: 500 }}>read</span>
         </Note>
         {/* Two write the same cell. */}
         <Flow points={[[threadX(1) + 140, threadTop - 8], [cellX(CLASH) + 18, cellTop + cellH + 8]]} at={dangerAt + 6} color={ACCENT} width={3} />
         <Flow points={[[threadX(2) + 85, threadTop - 8], [cellX(CLASH) + CELL_W - 18, cellTop + cellH + 8]]} at={dangerAt + 10} color={ACCENT} width={3} />
         <Note at={cheapAt} x={L.x} y={y(L.top + L.h + 24)} out={dangerAt - 2}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>Talking is cheap: just memory</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Talking is cheap: just memory</span>
         </Note>
         <Note at={corruptAt + 4} x={L.x} y={y(L.top + L.h + 24)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>Two threads, one cell: corrupted state</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Two threads, one cell: corrupted state</span>
         </Note>
 
         {/* Processes: each its own memory. */}
         <Note at={ownAt} x={R_X} y={y(292)}>
-          <span style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Processes: <span style={{ fontWeight: 500 }}>each with its own memory</span>
           </span>
         </Note>
@@ -161,7 +161,7 @@ export const ProcScene: React.FC = () => {
             <React.Fragment key={j}>
               <Node x={pX(j)} y={pTop} w={P_W} h={pH} at={at} tone="plain" fill="transparent" line={dead > 0.5 ? ACCENT : HAIRLINE} stroke={dead > 0.5 ? 2.5 : 1.5} lit={j === 1 ? pulse(frame, crashAt + 4, 20) : 0} />
               <Ink at={at + 4} dur={12} style={{ left: pX(j) + 20, top: pTop + h(16) }}>
-                <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>process {j + 1}</span>
+                <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>process {j + 1}</span>
               </Ink>
               {[0, 1].map((k) => (
                 <Node
@@ -188,15 +188,15 @@ export const ProcScene: React.FC = () => {
         })}
         {/* The crash: one goes down, the others run on. */}
         <Note at={crashAt + 10} x={pX(0)} y={pTop + pH + h(14)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             runs on<span style={{ opacity: ease(frame, parallelAt, 10) }}>, in parallel</span>
           </span>
         </Note>
         <Note at={crashAt + 10} x={pX(1)} y={pTop + pH + h(14)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>crashed alone</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>crashed alone</span>
         </Note>
         <Note at={crashAt + 10} x={pX(2)} y={pTop + pH + h(14)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             runs on<span style={{ opacity: ease(frame, parallelAt, 10) }}>, in parallel</span>
           </span>
         </Note>

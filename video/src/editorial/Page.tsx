@@ -19,11 +19,11 @@ export type EditorialProps = NarratedProps & {
   sfx?: boolean;
 };
 
-/** The house setting: Source Serif 4, and the figures get the whole page. */
+/** The house setting: Inter throughout (titles 500, text 400), and the figures get the whole page. */
 export const EDITORIAL_DEFAULTS = {
   timeline: null,
   captions: false,
-  typeface: "source-serif",
+  typeface: "inter",
 } as const satisfies EditorialProps;
 
 /** How far every scene sits above where it was laid out, in px. The pages
@@ -53,7 +53,11 @@ export const EditorialPage: React.FC<EditorialProps & { children: React.ReactNod
       <SfxContext.Provider value={sfx}>
         <LayoutContext.Provider value={layoutFor(captions)}>
           <AbsoluteFill style={{ background: PAPER, ...typefaceVars(face) }}>
-            <AbsoluteFill style={{ transform: `translateY(${-LIFT}px)` }}>{children}</AbsoluteFill>
+            <AbsoluteFill style={{ transform: `translateY(${-LIFT}px)` }}>
+              {/* Bold is for emphasis only, and Inter's bold is 600. */}
+              <style>{"b, strong { font-weight: 600; }"}</style>
+              {children}
+            </AbsoluteFill>
             <NarrationAudio />
             <PageAudit />
             {captions ? (

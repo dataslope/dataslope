@@ -47,7 +47,7 @@ const Marker: React.FC<{ at: number; out?: number; ms: number; y: number; color:
           left: x + 10,
           top: y - 74,
           ...note(24, color),
-          fontWeight: 650,
+          fontWeight: 500,
           whiteSpace: "nowrap",
           ...TABULAR,
         }}
@@ -193,7 +193,7 @@ export const PctScene: React.FC = () => {
             stroke={ACCENT}
             strokeWidth={2.6}
           />
-          <text x={(px(p90) + px(HI)) / 2} y={sy - 122} textAnchor="middle" style={svgText({ ...label(19, ACCENT_INK), fontWeight: 600 })}>
+          <text x={(px(p90) + px(HI)) / 2} y={sy - 122} textAnchor="middle" style={svgText({ ...label(19, ACCENT_INK), fontWeight: 500 })}>
             the slow tail
           </text>
         </svg>

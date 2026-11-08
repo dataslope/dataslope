@@ -40,7 +40,7 @@ export const OK_INK = inkOf.green;
 export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   // 0.84em of a 21px label is 17.6px, under the house floor, so it never
   // drops below 19px (the Data Engineer review's fixers found it twice).
-  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.84em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.84em)", fontStyle: "normal", fontWeight: 500, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );
@@ -82,7 +82,7 @@ export const QuestionCard: React.FC<{
   return (
     <>
       <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, ACCENT_INK), fontWeight: 600 }}>{kicker ?? `Question ${n}`}</span>
+        <span style={{ ...label(22, ACCENT_INK), fontWeight: 500 }}>{kicker ?? `Question ${n}`}</span>
       </Ink>
       {/* Balanced, so a question that wraps breaks into even lines rather than
           leaving one word on the last; the line count is the same either way. */}
@@ -172,7 +172,7 @@ export const RapidFire: React.FC<{
                   ...TABULAR,
                   width: 30,
                   textAlign: "right",
-                  fontWeight: 600,
+                  fontWeight: 500,
                 }}
               >
                 {item.n}
@@ -181,7 +181,7 @@ export const RapidFire: React.FC<{
                 style={{
                   position: "relative",
                   ...note(23, INK),
-                  fontWeight: current > 0.5 ? 650 : 500,
+                  fontWeight: current > 0.5 ? 500 : 500,
                   whiteSpace: "nowrap",
                   opacity: 0.42 + 0.58 * Math.max(current, done),
                 }}

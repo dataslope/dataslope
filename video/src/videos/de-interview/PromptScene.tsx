@@ -261,7 +261,7 @@ export const PromptScene: React.FC = () => {
                 <div style={{ width: NAME_W, flex: "none" }}>
                   {/* The layer being read carries the highlighter behind its
                       name, its width given back as margin. */}
-                  <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: 1.12 }}>
+                  <div style={{ ...note(32, INK), fontWeight: 500, lineHeight: 1.12 }}>
                     <span
                       style={{
                         padding: "1px 10px 3px",

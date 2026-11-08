@@ -107,7 +107,7 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
           <React.Fragment key={g.name}>
             {i ? <div style={{ ...note(34, INK_SOFT), margin: "50px 44px 0", opacity: ease(frame, g.at, 10) }}>×</div> : null}
             <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "stretch" }}>
-              <div style={{ ...label(21, INK_SOFT), fontWeight: 600, opacity: ease(frame, g.at - 2, 10), whiteSpace: "nowrap" }}>{g.name}</div>
+              <div style={{ ...label(21, INK_SOFT), fontWeight: 500, opacity: ease(frame, g.at - 2, 10), whiteSpace: "nowrap" }}>{g.name}</div>
               {g.values.map((v, j) => (
                 <Chip key={v} at={g.at + 2 + j * 3}>
                   {v}
@@ -118,14 +118,14 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
         ))}
         <div style={{ ...note(42, INK_SOFT), margin: "34px 18px 0 54px", opacity: ease(frame, everyAt, 10) }}>=</div>
         <div style={{ marginTop: 30, opacity: ease(frame, twelveAt - 2, 10), whiteSpace: "nowrap" }}>
-          <div style={{ ...note(46, BLUE_INK), fontWeight: 750 }}>
+          <div style={{ ...note(46, BLUE_INK), fontWeight: 500 }}>
             <Num>{RAPID.junk}</Num>
           </div>
           <div style={{ ...note(26, INK), marginTop: 2 }}>rows in dim_junk</div>
         </div>
       </div>
       <Note at={oneAt} x={R_X} y={c.y(660)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           the fact carries one <QMono>junk_key</QMono> instead of three columns
         </span>
       </Note>
@@ -238,15 +238,15 @@ const Mini: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>age band, income tier: change often</span>
       </Note>
       <Note at={twentyAt} x={dimD.x} y={dimD.bottom + c.h(14)}>
-        <span style={{ ...note(23, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           <Num>5</Num> bands × <Num>4</Num> tiers = <Num>{RAPID.mini}</Num> rows
         </span>
       </Note>
       <Note at={t4At} x={dimD.x} y={dimD.bottom + c.h(56)}>
-        <span style={{ ...note(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Kimball&rsquo;s SCD Type 4</span>
+        <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Kimball&rsquo;s SCD Type 4</span>
       </Note>
       <Note at={stopsAt} x={R_X} y={fact.bottom + c.h(30)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           no new customer version
           <br />
           when a band changes
@@ -331,7 +331,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
         {/* The key's value as the house's badge, at 24px: within 12% of
             the 22px name and the 24px bytes on its line. */}
         <span style={{ ...badgeStyle("gray", 24), fontFamily: MONO }}>{value}</span>
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 600, opacity: ease(frame, bytesAt, 10) }}>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, opacity: ease(frame, bytesAt, 10) }}>
           {kind ? `${kind}, ` : ""}
           <Num>{bytes}</Num> bytes
         </span>
@@ -383,7 +383,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
         const top = b.top;
         return (
           <React.Fragment key={b.name}>
-            <div style={{ position: "absolute", left: R_X, top, height: barH, display: "flex", alignItems: "center", ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, b.at - 4, 10) }}>
+            <div style={{ position: "absolute", left: R_X, top, height: barH, display: "flex", alignItems: "center", ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, b.at - 4, 10) }}>
               {b.name}
             </div>
             <div style={{ position: "absolute", left: BAR_X, top, width: b.v * unit * p, height: barH, background: b.fill, borderRadius: 3 }} />
@@ -396,7 +396,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
                 display: "flex",
                 alignItems: "center",
                 ...note(23, b.ink),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 opacity: ease(frame, b.at + 10, 10),
               }}
@@ -421,8 +421,8 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
             {/* A bracket under the stretch of bar it explains. */}
             <div style={{ height: 8, borderLeft: `2px solid ${sp.ink}`, borderRight: `2px solid ${sp.ink}`, borderBottom: `2px solid ${sp.ink}` }} />
             <div style={{ position: "absolute", left: "50%", top: 14, transform: "translateX(-50%)", textAlign: "center", whiteSpace: "nowrap" }}>
-              <div style={{ ...label(20, sp.ink), fontWeight: 600 }}>{sp.head}</div>
-              <div style={{ ...label(20, sp.ink), fontWeight: 600, opacity: ease(frame, sp.lit, 10) }}>
+              <div style={{ ...label(20, sp.ink), fontWeight: 500 }}>{sp.head}</div>
+              <div style={{ ...label(20, sp.ink), fontWeight: 500, opacity: ease(frame, sp.lit, 10) }}>
                 <Num>{sp.ratio.toFixed(2)}</Num>×
               </div>
             </div>
@@ -505,11 +505,11 @@ export const RapidScene: React.FC = () => {
         </Note>
         {steps.map((s, i) => (
           <Note key={s.text} at={s.at - 2} x={R_X + 24} y={y(440) + i * h(46)}>
-            <span style={{ ...note(25, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>· {s.text}</span>
+            <span style={{ ...note(25, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>· {s.text}</span>
           </Note>
         ))}
         <Note at={codeAt} x={R_X} y={y(600)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Loading the model takes code.</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Loading the model takes code.</span>
         </Note>
         <NextLine at={nextAt} x={R_X} y={y(690)} width={520}>
           Python for data engineering

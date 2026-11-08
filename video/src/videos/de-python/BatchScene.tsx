@@ -132,13 +132,13 @@ export const BatchScene: React.FC = () => {
           </span>
         </Note>
         <Note at={neverAt} x={X0} y={builtinTop + h(44)} out={sinceAt - 4}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same first three, forever</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same first three, forever</span>
         </Note>
 
         {/* The stream, opening into batches of three. */}
         <Note at={sevenAt - 4} x={RIGHT_X} y={blocksTop - h(46)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 600 }}>range(7)</span>, in threes
+            <span style={{ fontFamily: MONO, fontWeight: 500 }}>range(7)</span>, in threes
           </span>
         </Note>
         {Array.from({ length: 7 }, (_, i) => {
@@ -165,7 +165,7 @@ export const BatchScene: React.FC = () => {
                 justifyContent: "center",
                 fontFamily: MONO,
                 fontSize: 26,
-                fontWeight: 600,
+                fontWeight: 500,
                 color: BLUE_INK,
               }}
             >

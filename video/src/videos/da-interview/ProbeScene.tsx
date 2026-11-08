@@ -80,7 +80,7 @@ export const ProbeScene: React.FC = () => {
               >
                 {i + 1}
               </span>
-              <span style={{ ...note(38, INK), fontWeight: 650, width: 360, whiteSpace: "nowrap" }}>{r.name}</span>
+              <span style={{ ...note(38, INK), fontWeight: 500, width: 360, whiteSpace: "nowrap" }}>{r.name}</span>
               <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap", opacity: d }}>{r.detail}</span>
             </div>
           );

@@ -198,7 +198,7 @@ export const HugeScene: React.FC = () => {
         <Bracket x0={sx(LX, mx[0])} x1={sx(LX, mx[1])} y={loupeTop + 70} at={seventhAt + 6} up={false} tick={10} />
         <Note at={seventhAt + 8} x={(sx(LX, mx[0]) + sx(LX, mx[1])) / 2} y={loupeTop + 82} from="up">
           <span
-            style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}
+            style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}
           >
             {fmt(HUGE.gap, 2)}
           </span>
@@ -225,7 +225,7 @@ export const HugeScene: React.FC = () => {
           opacity: ease(frame, pAtWord - 2, 12) * (1 - pDim),
           ...note(52, INK),
           ...TABULAR,
-          fontWeight: 600,
+          fontWeight: 500,
           whiteSpace: "nowrap",
         }}
       >
@@ -233,7 +233,7 @@ export const HugeScene: React.FC = () => {
       </div>
       <Ring x={RIGHT + 170} y={y(ROW1) + 78} at={passingAt - 2} r0={40} r1={130} />
       <Note at={sigAt - 2} x={RIGHT} y={y(ROW1) + 126}>
-        <span style={{ ...note(26, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: 1 - pDim }}>
+        <span style={{ ...note(26, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: 1 - pDim }}>
           <Marker at={realAt - 2}>yes: significant</Marker>
         </span>
       </Note>
@@ -256,7 +256,7 @@ export const HugeScene: React.FC = () => {
           opacity: ease(frame, percentAt - 6, 12),
           ...note(52, INK),
           ...TABULAR,
-          fontWeight: 600,
+          fontWeight: 500,
           whiteSpace: "nowrap",
         }}
       >
@@ -268,7 +268,7 @@ export const HugeScene: React.FC = () => {
         </span>
       </Note>
       <Note at={smallAt - 2} x={RIGHT} y={y(ROW2) + 166}>
-        <span style={{ ...note(26, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>no: negligible</span>
+        <span style={{ ...note(26, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no: negligible</span>
       </Note>
     </AbsoluteFill>
   );

@@ -208,8 +208,8 @@ export const TimeScene: React.FC = () => {
                 <line x1={AX0 - 10} x2={AX0 - 10 + (AX1 - AX0 + 20) * p} y1={a.y} y2={a.y} stroke={INK} strokeWidth={2} />
               </svg>
               <Note at={a.at} x={X0} y={a.y - h(30)}>
-                <div style={{ ...note(25, INK), fontWeight: 750, whiteSpace: "nowrap" }}>{a.name}</div>
-                <div style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, a.subAt, 10) }}>{a.sub}</div>
+                <div style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{a.name}</div>
+                <div style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, a.subAt, 10) }}>{a.sub}</div>
               </Note>
             </React.Fragment>
           );
@@ -252,7 +252,7 @@ export const TimeScene: React.FC = () => {
                 style={svgText({
                   fontFamily: SANS,
                   fontSize: 20,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   color: INK_SOFT,
                   fontVariantNumeric: "tabular-nums",
                   stroke: PAPER,
@@ -280,7 +280,7 @@ export const TimeScene: React.FC = () => {
                   top: prY + h(BAND) - h(46),
                   textAlign: "center",
                   ...note(25, bad > 0.5 ? ACCENT_INK : INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   opacity: prCountIn,
                 }}
               >
@@ -296,7 +296,7 @@ export const TimeScene: React.FC = () => {
                   top: evY - h(BAND) + h(8),
                   textAlign: "center",
                   ...note(25, ease(frame, correctAt, 10) > 0.5 && w < 2 ? OK_INK : INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   opacity: evCountIn,
                 }}
               >
@@ -308,7 +308,7 @@ export const TimeScene: React.FC = () => {
           );
         })}
         <Note at={correctAt} x={AX1 + 14} y={evY - h(BAND) + h(8)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>✓ correct</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>✓ correct</span>
         </Note>
 
         {/* The clicks: a dot on each axis, joined. */}
@@ -349,10 +349,10 @@ export const TimeScene: React.FC = () => {
           ) : null}
         </svg>
         <Note at={deeAt + 4} x={X0} y={y(720)} out={q8Out}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             dee's click: happened at <Num>{dee.t}</Num> s, arrived at <Num>{dee.arrive}</Num> s
           </span>
-          <span style={{ ...label(23, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, wrongAt, 10) }}>
+          <span style={{ ...label(23, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, wrongAt, 10) }}>
             {" "}
             · the click that sat after {aheadOfDee.user}'s from <Num>{aheadOfDee.t}</Num> s in partition <Num>{dee.partition}</Num>
           </span>
@@ -368,25 +368,25 @@ export const TimeScene: React.FC = () => {
           ))}
         </div>
         <Note at={apartAt} x={X0} y={y(766)} out={byArrivalAt}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>each pulls the two apart</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>each pulls the two apart</span>
         </Note>
 
         {/* ── Question 9: the labels that ride on the sweep. ─────────────── */}
         <Note at={allowAt + 4} x={ex(pt) - 40} y={prY + h(BAND) + h(20)} out={q9Out}>
-          <span style={{ ...label(20, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             now: <Num>{pt.toFixed(1)}</Num> s
           </span>
         </Note>
         {wm3 !== null ? (
           <Note at={allowAt + 6} x={ex(Math.max(0, wm3)) + 8} y={evY - h(BAND) - h(34)} out={q9Out}>
-            <span style={{ ...label(20, BLUE_INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               watermark, delay 3: <Num>{Math.max(0, wm3)}</Num> s
             </span>
           </Note>
         ) : null}
         {wm10 !== null ? (
           <Note at={tenAt + 6} x={ex(Math.max(0, wm10)) - 8} y={evY - h(BAND) - h(34)} out={q9Out} align="right">
-            <span style={{ ...label(20, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               delay 10: <Num>{Math.max(0, wm10)}</Num> s
             </span>
           </Note>
@@ -420,7 +420,7 @@ export const TimeScene: React.FC = () => {
             <span style={{ opacity: ease(frame, withFourAt + 4, 8) }}>
               , with <Num>{WATERMARK.firstOnTime}</Num>
             </span>
-            <span style={{ color: ACCENT_INK, fontWeight: 600, opacity: deeLate }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: deeLate }}>
               ; dee's click arrives behind <Num>{WATERMARK.deeBehind}</Num> s: late
             </span>
           </span>
@@ -434,7 +434,7 @@ export const TimeScene: React.FC = () => {
           </span>
         </Note>
         <Note at={buysAt} x={1260} y={y(812)} out={q9Out}>
-          <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             longer delay: more complete, later
             <br />
             <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, stateAt, 10) }}>and more state held</span>
@@ -458,7 +458,7 @@ export const TimeScene: React.FC = () => {
               <>
                 <b>2</b> later than that: a side output
                 <span style={{ opacity: ease(frame, streamAt, 10) }}>, a separate stream</span>
-                <span style={{ color: OK_INK, fontWeight: 600, opacity: ease(frame, silenceAt, 10) }}>, never silently dropped</span>
+                <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, silenceAt, 10) }}>, never silently dropped</span>
               </>
             ),
           },
@@ -466,7 +466,7 @@ export const TimeScene: React.FC = () => {
             at: upsertAt,
             body: (
               <>
-                <b>3</b> the sink upserts<span style={{ color: OK_INK, fontWeight: 600, opacity: ease(frame, replacesAt, 10) }}>: one row, replaced</span>
+                <b>3</b> the sink upserts<span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, replacesAt, 10) }}>: one row, replaced</span>
               </>
             ),
           },
@@ -476,7 +476,7 @@ export const TimeScene: React.FC = () => {
           </Note>
         ))}
         <Note at={mixAt} x={X0} y={y(720) + 3 * h(44) + h(6)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>early, on-time and late results: how late, and how much it matters, decides the mix</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>early, on-time and late results: how late, and how much it matters, decides the mix</span>
         </Note>
         {/* The window's row in the sink: four, then five, in place. */}
         <Box x={1420} y={y(712)} w={380} h={h(64)} at={updateAt} size={24}>
@@ -500,7 +500,7 @@ export const TimeScene: React.FC = () => {
           }}
         />
         <Note at={updateAt + 4} x={1420} y={y(712) + h(74)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>the window's row in the sink</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>the window's row in the sink</span>
         </Note>
         {firings.map((f) => {
           const p = ease(frame, f.at - 2, 10);
@@ -512,7 +512,7 @@ export const TimeScene: React.FC = () => {
                 <path d={`M${ex(f.pt)},${top} l26,9 l-26,9 z`} fill={BLUE_INK} />
               </svg>
               <Note at={f.at} x={ex(f.pt) + 32} y={top + h(4)}>
-                <span style={{ ...label(20, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{f.text}</span>
+                <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{f.text}</span>
               </Note>
             </React.Fragment>
           );

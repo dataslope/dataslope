@@ -235,7 +235,7 @@ export const KnnScene: React.FC = () => {
           <span
             style={{
               ...note(34, INK),
-              fontWeight: 650,
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,
             }}
@@ -313,7 +313,7 @@ export const KnnScene: React.FC = () => {
                 <span
                   style={{
                     ...note(25, BLUE_INK),
-                    fontWeight: 650,
+                    fontWeight: 500,
                     whiteSpace: "nowrap",
                     ...TABULAR,
                   }}
@@ -333,7 +333,7 @@ export const KnnScene: React.FC = () => {
                   <span
                     style={{
                       ...note(25, p.tagInk),
-                      fontWeight: 650,
+                      fontWeight: 500,
                       whiteSpace: "nowrap",
                     }}
                   >

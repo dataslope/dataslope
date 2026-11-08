@@ -92,7 +92,7 @@ export const BigScene: React.FC = () => {
         </Line>
 
         {/* Every pair, and one pass. */}
-        <Line at={loopAt - 2} x={GX} y={gTop - 46} size={22} weight={650}>
+        <Line at={loopAt - 2} x={GX} y={gTop - 46} size={22} weight={500}>
           Double loop: every pair
         </Line>
         <Svg>
@@ -118,7 +118,7 @@ export const BigScene: React.FC = () => {
             );
           })}
         </Svg>
-        <Line at={loopAt + 30} x={GX} y={passTop - 46} size={22} weight={650}>
+        <Line at={loopAt + 30} x={GX} y={passTop - 46} size={22} weight={500}>
           One pass: each item once
         </Line>
         <Svg>
@@ -171,7 +171,7 @@ export const BigScene: React.FC = () => {
                     textAlign: "right",
                     ...note(26, k === 1 && big ? ACCENT_INK : k === 2 ? OK_INK : INK),
                     ...TABULAR,
-                    fontWeight: k === 0 ? 600 : 700,
+                    fontWeight: k === 0 ? 500 : 500,
                     opacity: p,
                     transform: `translateY(${(1 - p) * 8}px)`,
                   }}
@@ -189,7 +189,7 @@ export const BigScene: React.FC = () => {
         })}
 
         {/* The million, modeled at an assumed rate: both on one scale. */}
-        <Line at={modelAt} x={BAR_X} y={y(566)} size={22} color={INK_SOFT} weight={600}>
+        <Line at={modelAt} x={BAR_X} y={y(566)} size={22} color={INK_SOFT} weight={500}>
           Model: <Num>100</Num> million checks a second, an assumption
         </Line>
         <HBar
@@ -220,14 +220,14 @@ export const BigScene: React.FC = () => {
         <Art name="hourglass" at={minutesAt} left={1590} top={y(320)} h={200} />
 
         {/* Why they care, and where the brute force is fine. */}
-        <Line at={whyAt} x={GX} y={y(786)} size={26} weight={600}>
+        <Line at={whyAt} x={GX} y={y(786)} size={26} weight={500}>
           It predicts whether a solution survives its real input.
           <span style={{ opacity: ease(frame, gameAt, 10) }}>
             {" "}
-            The usual game: <span style={{ color: ACCENT_INK, fontWeight: 600 }}>O(n²)</span> → <span style={{ color: OK_INK, fontWeight: 600 }}>O(n)</span>
+            The usual game: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>O(n²)</span> → <span style={{ color: OK_INK, fontWeight: 500 }}>O(n)</span>
           </span>
         </Line>
-        <Line at={dropAt} x={GX} y={y(836)} size={26} weight={600}>
+        <Line at={dropAt} x={GX} y={y(836)} size={26} weight={500}>
           Constants dropped: at <Num>100</Num> the brute force is often fine, and simpler.
           <span style={{ opacity: ease(frame, sayAt, 10), color: INK_SOFT }}> Say where it stops being fine.</span>
         </Line>

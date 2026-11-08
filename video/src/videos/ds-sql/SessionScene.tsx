@@ -117,7 +117,7 @@ export const SessionScene: React.FC = () => {
             return (
               <g key={s} opacity={p}>
                 <path d={`M${a},${ay + 48} L${a},${ay + 56} L${b},${ay + 56} L${b},${ay + 48}`} fill="none" stroke={OK} strokeWidth={3} />
-                <text x={(a + b) / 2} y={ay + 82} textAnchor="middle" fill={OK_INK} style={{ ...label(19, OK_INK), fontWeight: 600 }}>
+                <text x={(a + b) / 2} y={ay + 82} textAnchor="middle" fill={OK_INK} style={{ ...label(19, OK_INK), fontWeight: 500 }}>
                   session {s}
                 </text>
               </g>
@@ -138,7 +138,7 @@ export const SessionScene: React.FC = () => {
                   stroke={hot > 0.5 ? POINT : INK_SOFT}
                   strokeWidth={long ? 2.6 : 1.8}
                 />
-                <text x={mid} y={ay - 54} textAnchor="middle" fill={hot > 0.5 ? INK : INK_SOFT} style={{ ...label(19, hot > 0.5 ? INK : INK_SOFT), fontWeight: long ? 700 : 500, ...TABULAR }}>
+                <text x={mid} y={ay - 54} textAnchor="middle" fill={hot > 0.5 ? INK : INK_SOFT} style={{ ...label(19, hot > 0.5 ? INK : INK_SOFT), fontWeight: long ? 500 : 500, ...TABULAR }}>
                   {long ? `${r[gap]} min` : r[gap]}
                 </text>
               </g>

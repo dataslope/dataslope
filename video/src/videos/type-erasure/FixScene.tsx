@@ -93,7 +93,7 @@ export const FixScene: React.FC = () => {
         <div style={note(22, INK)}>
           Use <Mono>data</Mono> before the check, and tsc says:
         </div>
-        <div style={{ fontFamily: MONO, fontSize: 20, color: ACCENT_INK, fontWeight: 600, marginTop: 8, whiteSpace: "nowrap" }}>
+        <div style={{ fontFamily: MONO, fontSize: 20, color: ACCENT_INK, fontWeight: 500, marginTop: 8, whiteSpace: "nowrap" }}>
           error {UNGUARDED_ERROR.code}: {UNGUARDED_ERROR.message}
         </div>
       </Note>
@@ -101,7 +101,7 @@ export const FixScene: React.FC = () => {
       <Note at={insideAt + 4} x={NOTE_X} y={rowMid(GUARD_INSIDE) - 15} width={NOTE_W}>
         <div style={note(22, INK)}>
           Here <Mono>data</Mono> is a{" "}
-          <span style={{ color: OK_INK, fontWeight: 650, opacity: 0.4 + 0.6 * ease(frame, userAt, 10) }}>
+          <span style={{ color: OK_INK, fontWeight: 500, opacity: 0.4 + 0.6 * ease(frame, userAt, 10) }}>
             <Mono>User</Mono>
           </span>
           , so tsc allows <Mono>data.name</Mono>.

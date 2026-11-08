@@ -312,7 +312,7 @@ export const DeliveryScene: React.FC = () => {
                   opacity: a,
                   ...note(26, lift > 0 ? STAT_INK : INK),
                   ...TABULAR,
-                  fontWeight: 600,
+                  fontWeight: 500,
                 }}
               >
                 <span style={{ position: "absolute", left: 0, right: 0, opacity: 1 - flip }}>{signed(d)}</span>
@@ -334,7 +334,7 @@ export const DeliveryScene: React.FC = () => {
             opacity: ease(frame, zeroAt - 4, 10),
           }}
         />
-        <div style={{ position: "absolute", left: COL_X - 60, top: rowY(9) + h(30), width: 120, textAlign: "center", whiteSpace: "nowrap", ...note(28, STAT_INK), fontWeight: 600 }}>
+        <div style={{ position: "absolute", left: COL_X - 60, top: rowY(9) + h(30), width: 120, textAlign: "center", whiteSpace: "nowrap", ...note(28, STAT_INK), fontWeight: 500 }}>
           <span style={{ opacity: ease(frame, zeroAt - 2, 10) * (1 - sq), position: "absolute", left: 0, right: 0 }}>sum 0</span>
           <span style={{ opacity: ease(frame, twelveAt - 2, 10), position: "absolute", left: 0, right: 0 }}>sum {fmt(DELIVERY.sumSquares, 0)}</span>
         </div>
@@ -348,7 +348,7 @@ export const DeliveryScene: React.FC = () => {
         </span>
       </Ink>
       <Ink at={nineAt - 4} dur={16} style={{ left: 160, top: y(WORK_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, INK), fontWeight: 650 }}>
+        <span style={{ ...note(26, INK), fontWeight: 500 }}>
           {fmt(DELIVERY.sumSquares, 0)} ÷ {DELIVERY.divisor} = {fmt(DELIVERY.variance, 2)}{" "}
           <span style={{ color: INK_SOFT, fontWeight: 500 }}>
             square minutes, the <Mark at={varianceAt - 2}>variance</Mark>
@@ -369,7 +369,7 @@ export const DeliveryScene: React.FC = () => {
         }}
       />
       <Ink at={rootAt - 2} dur={16} style={{ left: 1010, top: y(WORK_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, STAT_INK), fontWeight: 650 }}>
+        <span style={{ ...note(26, STAT_INK), fontWeight: 500 }}>
           √{fmt(DELIVERY.variance, 2)} ≈ {fmt(DELIVERY.steadySd, 1)}{" "}
           <span style={{ color: INK_SOFT, fontWeight: 500 }}>
             minutes, the <Mark at={sdAt - 2}>standard deviation</Mark>

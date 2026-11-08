@@ -156,12 +156,12 @@ export const TestScene: React.FC = () => {
               alignItems: "center",
               justifyContent: "center",
               ...note(30, "var(--ds-white)"),
-              fontWeight: 600,
+              fontWeight: 500,
             }}
           >
             +
           </span>
-          <span style={{ ...note(30, INK), fontWeight: 600 }}>You test positive.</span>
+          <span style={{ ...note(30, INK), fontWeight: 500 }}>You test positive.</span>
         </Ink>
         {/* A thousand people, one of whom has it. */}
         <Ink at={thousandAt - 4} dur={12} style={{ left: FIELD.x0, top: y(FIELD.top) - 40, whiteSpace: "nowrap" }}>
@@ -257,7 +257,7 @@ export const TestScene: React.FC = () => {
               }}
             >
               <div style={{ padding: "6px 20px 8px", borderRadius: 16, background: PILL[i] }}>
-                <div style={{ ...note(i === 0 ? 40 : 34, color), fontWeight: 600, lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}>
+                <div style={{ ...note(i === 0 ? 40 : 34, color), fontWeight: 500, lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}>
                   {big === "count:tp" ? (
                     <Count at={catchesAt} dur={Math.max(12, caughtAt - catchesAt + 6)} to={TEST.tp} format={num} steady />
                   ) : big === "count:fp" ? (
@@ -276,10 +276,10 @@ export const TestScene: React.FC = () => {
         <Pulse x={NODE.healthy[0]} y={y(NODE.healthy[1])} at={dontAt - 2} r={80} color={INK_SOFT} />
         {/* The two rates, on the branches they decide. */}
         <Note at={catchesAt} x={(NODE.sick[0] + NODE.sickPos[0]) / 2 - 16} y={y((NODE.sick[1] + NODE.sickPos[1]) / 2) - 14} align="right">
-          <span style={{ ...note(21, DATA_INK), fontWeight: 650, whiteSpace: "nowrap" }}>99%</span>
+          <span style={{ ...note(21, DATA_INK), fontWeight: 500, whiteSpace: "nowrap" }}>99%</span>
         </Note>
         <Note at={flagsAt + 2} x={(NODE.healthy[0] + NODE.healthyPos[0]) / 2 - 16} y={y((NODE.healthy[1] + NODE.healthyPos[1]) / 2) - 14} align="right">
-          <span style={{ ...note(21, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>1%</span>
+          <span style={{ ...note(21, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>1%</span>
         </Note>
       </div>
 
@@ -306,11 +306,11 @@ export const TestScene: React.FC = () => {
       </Svg>
       <VBracket x={GRID.x0 - 14} y0={y(GRID.top)} y1={slot(TEST.tp - 1)[1] + GRID.pitch / 2} at={sickAt} color={DATA} />
       <Note at={sickAt + 2} x={GRID.x0 - 34} y={y(GRID.top) - 2} align="right">
-        <span style={{ ...note(22, DATA_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{TEST.tp} sick</span>
+        <span style={{ ...note(22, DATA_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{TEST.tp} sick</span>
       </Note>
       <Note at={peopleAt} x={GRID.x0} y={gridBottom + 14}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          <span style={{ color: STAT_INK, fontWeight: 600 }}>{num(TEST.fp)} false alarms</span>, and{" "}
+          <span style={{ color: STAT_INK, fontWeight: 500 }}>{num(TEST.fp)} false alarms</span>, and{" "}
           <Count at={peopleAt} dur={20} to={TEST.positives} format={num} /> positives in all
         </span>
       </Note>
@@ -326,13 +326,13 @@ export const TestScene: React.FC = () => {
       </Ink>
       <Note at={simAt - 2} x={GRID.x0} y={gridBottom + 250}>
         <div style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          Simulated, <Count at={simAt} dur={30} to={TEST.simN} format={num} style={{ fontWeight: 600 }} /> people:
+          Simulated, <Count at={simAt} dur={30} to={TEST.simN} format={num} style={{ fontWeight: 500 }} /> people:
         </div>
         <div style={{ ...note(26, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>
           <span style={{ opacity: ease(frame, simAt + 14, 10) }}>
             {num(TEST.simSickPositive)} sick of {num(TEST.simPositives)} positives,
           </span>{" "}
-          <span style={{ color: STAT_INK, fontWeight: 600, opacity: ease(frame, pointOneAt - 4, 10) }}>{fmt(TEST.simPpv * 100, 1)}%</span>
+          <span style={{ color: STAT_INK, fontWeight: 500, opacity: ease(frame, pointOneAt - 4, 10) }}>{fmt(TEST.simPpv * 100, 1)}%</span>
         </div>
       </Note>
     </AbsoluteFill>

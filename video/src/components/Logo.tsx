@@ -30,7 +30,7 @@ export const Logo: React.FC<{
     <span
       style={{
         fontFamily: SANS,
-        fontWeight: 800,
+        fontWeight: 500,
         fontSize: size * 0.82,
         letterSpacing: "-0.02em",
         color: tone === "dark" ? colors.ink : colors.page,

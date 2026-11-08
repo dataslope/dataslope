@@ -152,7 +152,7 @@ export const IdemScene: React.FC = () => {
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>payments of {IDEM.amounts.join(" and ")}</span>
         </Note>
         <Note at={setAt} x={X0} y={rows + 3 * h(ROW) - h(10)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={setAt + 6} color={MARK_OK}>set values</Mark>;{" "}
             <span style={{ color: ACCENT_INK }}>
               <Strike at={setAt + 14}>add to them</Strike>

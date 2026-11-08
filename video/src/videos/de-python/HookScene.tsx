@@ -185,7 +185,7 @@ export const HookScene: React.FC = () => {
           }}
         />
         <Note at={fitAt} x={X0 + logW + 24} y={memTop + barH / 2 - h(16)} out={lineAt - 6}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>can&apos;t fit</span>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>can&apos;t fit</span>
         </Note>
 
         {/* The for loop: one line at a time */}
@@ -218,7 +218,7 @@ export const HookScene: React.FC = () => {
           </>
         ) : null}
         <Note at={holdsAt} x={X0 + memW + 24} y={memTop + barH / 2 - h(16)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>memory holds one line</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>memory holds one line</span>
         </Note>
 
         {/* ── The two reads, in code ── */}

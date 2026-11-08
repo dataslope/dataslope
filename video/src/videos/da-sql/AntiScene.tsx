@@ -159,7 +159,7 @@ export const AntiScene: React.FC = () => {
         <Ink at={unknownAt - 2} dur={14} out={existsAt - 4} style={{ left: LIST_X, top: whyY + 2 * lineGap, whiteSpace: "nowrap" }}>
           <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT, fontVariantLigatures: "none" }}>
             {ids.map(() => "true AND ").join("")}
-            <span style={{ color: ACCENT_INK, fontWeight: 600 }}>unknown</span>
+            <span style={{ color: ACCENT_INK, fontWeight: 500 }}>unknown</span>
           </span>
         </Ink>
         <Note at={passesAt - 2} x={LIST_X} y={whyY + 3 * lineGap + h(8)} out={existsAt - 4}>

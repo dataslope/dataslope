@@ -163,7 +163,7 @@ export const SensorScene: React.FC = () => {
 
         {/* Poke mode: four slots, four sensors waiting in them. */}
         <Note at={pokeAt} x={X0} y={pokeTop - h(46)}>
-          <span style={{ ...note(25, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             poke mode <span style={{ ...label(23, INK_SOFT) }}>(the default) · a pool of 4 worker slots</span>
           </span>
         </Note>
@@ -202,7 +202,7 @@ export const SensorScene: React.FC = () => {
               left: LANE_X0 + 14,
               top: laneY(pokeTop, i) + laneH / 2 - 13,
               ...label(19, INK),
-              fontWeight: 600,
+              fontWeight: 500,
               whiteSpace: "nowrap",
               opacity: ease(frame, (i === 0 ? holdsAt : fillAt + (i - 1) * 4) + 10, 10),
             }}
@@ -217,12 +217,12 @@ export const SensorScene: React.FC = () => {
           </div>
         ) : null}
         <Note at={nothingAt} x={LANE_X1 + 20} y={laneY(pokeTop, 3) - 2}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>nothing else can run</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>nothing else can run</span>
         </Note>
 
         {/* Reschedule mode: a check takes a slot for a moment and gives it back. */}
         <Note at={resAt} x={X0} y={resTop - h(46)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             reschedule mode <span style={{ ...label(23, INK_SOFT) }}>· the slot is free between checks</span>
           </span>
         </Note>
@@ -257,7 +257,7 @@ export const SensorScene: React.FC = () => {
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>blue: real work, running between</span>
         </Note>
         <Note at={useAt} x={LANE_X1 + 20} y={laneY(resTop, 2) + 2}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             reschedule, or a deferrable sensor
           </span>
         </Note>

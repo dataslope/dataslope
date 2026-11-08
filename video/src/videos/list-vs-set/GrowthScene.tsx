@@ -73,9 +73,9 @@ export const GrowthScene: React.FC = () => {
       {/* The legend, at the right end of the label's line. */}
       <Note at={start - 6} x={1790} y={y(104) + 1} align="right" from="right">
         <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 12 }}>
-          <Swatch color={LIST} /> <span style={{ color: LIST_INK, fontWeight: 650 }}>list</span>
+          <Swatch color={LIST} /> <span style={{ color: LIST_INK, fontWeight: 500 }}>list</span>
           <span style={{ width: 14 }} />
-          <Swatch color={SET} /> <span style={{ color: SET_INK, fontWeight: 650 }}>set</span>
+          <Swatch color={SET} /> <span style={{ color: SET_INK, fontWeight: 500 }}>set</span>
         </span>
       </Note>
 
@@ -127,19 +127,19 @@ export const GrowthScene: React.FC = () => {
         </svg>
       ) : null}
       <Note at={doublesAt} x={hx - 18} y={hy - 66} align="right">
-        <div style={{ ...note(22, LIST_INK), fontWeight: 650, ...halo }}>{fmt(HALF_MILLION.listMs)} ms</div>
+        <div style={{ ...note(22, LIST_INK), fontWeight: 500, ...halo }}>{fmt(HALF_MILLION.listMs)} ms</div>
         <div style={{ ...note(20, INK_SOFT), ...halo }}>at 500,000 items</div>
       </Note>
       <Note at={tooAt} x={mx - 18} y={my - 66} align="right">
-        <div style={{ ...note(22, LIST_INK), fontWeight: 650, ...halo }}>{fmt(MILLION.listMs)} ms</div>
+        <div style={{ ...note(22, LIST_INK), fontWeight: 500, ...halo }}>{fmt(MILLION.listMs)} ms</div>
         <div style={{ ...note(20, INK_SOFT), ...halo }}>at 1,000,000</div>
       </Note>
       <Note at={tooAt + 6} x={mx + 52} y={(hy + my) / 2 - 30}>
-        <div style={{ ...note(24, INK), fontWeight: 600 }}>×{fmt(MILLION.listMs / HALF_MILLION.listMs, 1)} the time</div>
+        <div style={{ ...note(24, INK), fontWeight: 500 }}>×{fmt(MILLION.listMs / HALF_MILLION.listMs, 1)} the time</div>
         <div style={{ ...note(20, INK_SOFT) }}>for ×2 the items</div>
       </Note>
       <Note at={flatAt} x={sx(A, 560_000)} y={y(A_BASE) - 48} from="up">
-        <span style={{ ...note(22, SET_INK), fontWeight: 650, ...halo }}>the set, on the floor at every size</span>
+        <span style={{ ...note(22, SET_INK), fontWeight: 500, ...halo }}>the set, on the floor at every size</span>
       </Note>
 
       {/* ── b: the set alone, in nanoseconds ── */}
@@ -165,7 +165,7 @@ export const GrowthScene: React.FC = () => {
         ))}
       </svg>
       <Ink at={nearAt - 2} dur={16} style={{ left: B.x0 - 84, top: y(B_BASE) + 62, width: B.x1 - B.x0 + 84 }}>
-        <div style={{ ...note(24, SET_INK), fontWeight: 600 }}>
+        <div style={{ ...note(24, SET_INK), fontWeight: 500 }}>
           {fmt(SET_NS_RANGE[0], 1)} to {fmt(SET_NS_RANGE[1], 1)} ns
         </div>
         <div style={{ ...note(21, INK_SOFT), marginTop: 4 }}>at every size, 100k to 1M</div>

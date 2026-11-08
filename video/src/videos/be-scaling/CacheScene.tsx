@@ -80,7 +80,7 @@ export const CacheScene: React.FC = () => {
         <MiniMap at={qAt} stage={1} lit="cache" grow={{ replica: replicaAt }} />
 
         {/* ── The read path, then the write path: steps, lit as said. ── */}
-        <Line at={onReadAt} x={X0} y={y(342)} size={22} weight={600} color={INK_SOFT} dim={dimA}>
+        <Line at={onReadAt} x={X0} y={y(342)} size={22} weight={500} color={INK_SOFT} dim={dimA}>
           On a read
         </Line>
         <StepRow
@@ -98,7 +98,7 @@ export const CacheScene: React.FC = () => {
         <Line at={firstAt} x={X0} y={y(422)} size={22} color={INK_SOFT} dim={dimA}>
           every key&apos;s first request pays <Mark at={firstAt + 2}>the miss</Mark>
         </Line>
-        <Line at={writeAt - 4} x={X0} y={y(482)} size={22} weight={600} color={INK_SOFT} dim={dimA}>
+        <Line at={writeAt - 4} x={X0} y={y(482)} size={22} weight={500} color={INK_SOFT} dim={dimA}>
           On a write
         </Line>
         <StepRow
@@ -121,7 +121,7 @@ export const CacheScene: React.FC = () => {
         </Line>
 
         {/* ── The simulation ── */}
-        <Line at={simAt} x={X0} y={y(640)} size={22} weight={650}>
+        <Line at={simAt} x={X0} y={y(640)} size={22} weight={500}>
           Simulation: <Num>{commas(CACHE.redirects)}</Num> redirects over <Num>{commas(CACHE.links)}</Num> links
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, fewAt, 10) }}>, a few links get most clicks</span>
         </Line>
@@ -138,11 +138,11 @@ export const CacheScene: React.FC = () => {
                 cache holds <b>{SIZE_NAME[i]}</b>
               </span>
               <span style={{ width: w, height: 34, background: BAR, borderRadius: 4, marginLeft: 0 }} />
-              <span style={{ ...note(24, BLUE_INK), fontWeight: 600, marginLeft: 16, whiteSpace: "nowrap" }}>
+              <span style={{ ...note(24, BLUE_INK), fontWeight: 500, marginLeft: 16, whiteSpace: "nowrap" }}>
                 <Num>{pct(s.hitRate * p)}</Num>
               </span>
               {i > 0 ? (
-                <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, marginLeft: 24, whiteSpace: "nowrap", opacity: loss }}>
+                <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, marginLeft: 24, whiteSpace: "nowrap", opacity: loss }}>
                   ×<Num>{(Math.round(s.lossMultiplier * 10) / 10).toFixed(1)}</Num>
                 </span>
               ) : null}
@@ -172,10 +172,10 @@ export const CacheScene: React.FC = () => {
           head={12 + 4 * dead * (1 - replica)}
         />
         <Ink at={deadAt + 6} dur={12} out={replicaAt} style={{ left: D.app.x, top: storeMid + 44, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600 }}>every read reaches the database</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>every read reaches the database</span>
         </Ink>
         <Ink at={replicaAt + 8} dur={12} style={{ left: D.app.x, top: storeMid + 44, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 600 }}>so the cache needs replicas too</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500 }}>so the cache needs replicas too</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

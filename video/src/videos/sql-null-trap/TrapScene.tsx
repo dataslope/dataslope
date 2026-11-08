@@ -167,13 +167,13 @@ export const TrapScene: React.FC = () => {
         color={UNKNOWN_INK}
       />
       <Note at={accountAt - 2} x={NOTE_X} y={nullMid - 30} width={290}>
-        <div style={{ ...note(21, INK), fontWeight: 600 }}>A guest order</div>
+        <div style={{ ...note(21, INK), fontWeight: 500 }}>A guest order</div>
         <div style={{ ...note(20, INK_SOFT) }}>placed with no account</div>
       </Note>
       <Note at={nullAt - 2} x={NOTE_X} y={nullMid + 40} width={290} from="up">
         <span style={note(20, INK_SOFT)}>
           so its <Mono color={INK}>customer_id</Mono> is{" "}
-          <Mono color={UNKNOWN_INK} weight={600}>
+          <Mono color={UNKNOWN_INK} weight={500}>
             NULL
           </Mono>
         </span>

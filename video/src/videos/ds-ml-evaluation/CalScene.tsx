@@ -99,10 +99,10 @@ export const CalScene: React.FC = () => {
               </text>
             </React.Fragment>
           ))}
-          <text x={PLOT.right} y={y(PLOT.bottom) + 60} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
+          <text x={PLOT.right} y={y(PLOT.bottom) + 60} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
             the model&apos;s score
           </text>
-          <text x={PLOT.left} y={y(PLOT.top) - 18} textAnchor="start" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
+          <text x={PLOT.left} y={y(PLOT.top) - 18} textAnchor="start" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
             share actually positive
           </text>
         </Svg>
@@ -143,7 +143,7 @@ export const CalScene: React.FC = () => {
             The weights bought recall
             <span style={{ opacity: ease(frame, brokeAt - 2, 10) }}>
               {" "}
-              and <span style={{ color: ACCENT_INK, fontWeight: 650 }}>broke the probabilities</span>.
+              and <span style={{ color: ACCENT_INK, fontWeight: 500 }}>broke the probabilities</span>.
             </span>
           </span>
         </Note>
@@ -157,14 +157,14 @@ export const CalScene: React.FC = () => {
           </span>
         </Note>
         <Note at={lineAt - 2} x={NOTE_X} y={y(792)}>
-          <span style={{ ...note(30, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={lineAt + 4}>back on the line</Mark>
           </span>
         </Note>
 
         {/* ── How it is measured: this plot, or one number ── */}
         <Note at={diagramAt - 2} x={PLOT.left} y={y(PLOT.top) - h(80)}>
-          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={diagramAt + 4}>a reliability diagram</Mark>
           </span>
         </Note>

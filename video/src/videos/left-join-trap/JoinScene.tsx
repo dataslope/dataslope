@@ -73,7 +73,7 @@ export const JoinScene: React.FC = () => {
             No order has <Mono>customer_id</Mono> {NO_ORDER_IDS.join(" or ")}, so {NO_ORDERS.join(" and ")} match nothing.
           </span>
           <span style={noteText(24)}>
-            They stay, with <Mono color={NULL_INK} weight={600}>NULL</Mono> in every order column.
+            They stay, with <Mono color={NULL_INK} weight={500}>NULL</Mono> in every order column.
           </span>
         </div>
       </Note>

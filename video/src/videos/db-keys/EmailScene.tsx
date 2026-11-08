@@ -183,7 +183,7 @@ export const EmailScene: React.FC = () => {
         <Listing lines={SURROGATE.change.lines} x={SQL_X} top={y(SQL_Y)} width={RIGHT - SQL_X} size={SIZE} at={swapAt + 12} />
         <Reply x={SQL_X} top={y(SQL_Y) + listH + 18} at={throughAt} tag={SURROGATE.change.tag} />
         <Ink at={notKeyAt - 4} dur={16} style={{ left: SQL_X, top: y(SQL_Y) + listH + 96, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 560 }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>
             The email is an attribute now: unique, but nothing points at it.
           </span>
         </Ink>

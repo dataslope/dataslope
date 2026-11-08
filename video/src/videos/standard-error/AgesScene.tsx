@@ -169,7 +169,7 @@ export const AgesScene: React.FC = () => {
       {/* The standard deviation: a bracket one SD either side of the average. */}
       <Span x0={sx(X, AGES.mean - AGES.sd)} x1={sx(X, AGES.mean + AGES.sd)} y={y(SD_Y)} at={dataAt} dur={18} color={BLUE_INK} />
       <Note at={halfAt - 2} x={sx(X, AGES.mean + AGES.sd) + 18} y={y(SD_Y - 15)}>
-        <div style={{ ...note(24, BLUE_INK), fontWeight: 600 }}>± {fmt(AGES.sd)} years</div>
+        <div style={{ ...note(24, BLUE_INK), fontWeight: 500 }}>± {fmt(AGES.sd)} years</div>
         <div style={note(20, INK_SOFT)}>one standard deviation</div>
       </Note>
 
@@ -194,7 +194,7 @@ export const AgesScene: React.FC = () => {
       <Rule x={mx} y0={y(BASE)} y1={y(SE_Y)} at={averageAt - 2} dur={16} color={ACCENT} width={2.6} dash="7 6" />
       {/* Never spoken: it gives way when the standard error takes the row. */}
       <Note at={averageAt + 6} x={sx(X, AGES.mean - AGES.se) - 16} y={y(SE_Y) - 16} align="right" out={howFarAt}>
-        <span style={{ ...note(23, ACCENT_INK), fontWeight: 600 }}>average {fmt(AGES.mean)}</span>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500 }}>average {fmt(AGES.mean)}</span>
       </Note>
       <Note at={differentAt + 8} x={160} y={y(826)}>
         <span style={note(21, INK_SOFT)}>
@@ -205,12 +205,12 @@ export const AgesScene: React.FC = () => {
       {/* The standard error: how far the average moves. */}
       <Span x0={sx(X, AGES.mean - AGES.se)} x1={sx(X, AGES.mean + AGES.se)} y={y(SE_Y)} at={howFarAt} dur={12} color={ACCENT} width={3} tick={10} />
       <Note at={seAt} x={sx(X, AGES.mean + AGES.se) + 16} y={y(SE_Y) - 16}>
-        <div style={{ ...note(24, ACCENT_INK), fontWeight: 600 }}>± {fmt(AGES.se)} years</div>
+        <div style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>± {fmt(AGES.se)} years</div>
         <div style={note(20, INK_SOFT)}>one standard error</div>
       </Note>
       <Bell at={widthAt - 4} mx={mx} />
       <Note at={widthAt + 4} x={mx + 44} y={y(BELL_BASE - BELL_H - 8)}>
-        <span style={{ ...note(20, ACCENT_INK), fontWeight: 600 }}>its sampling distribution</span>
+        <span style={{ ...note(20, ACCENT_INK), fontWeight: 500 }}>its sampling distribution</span>
       </Note>
     </AbsoluteFill>
   );

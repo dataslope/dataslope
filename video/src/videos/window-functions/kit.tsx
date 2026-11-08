@@ -89,9 +89,9 @@ export const tokenize = (line: string): Token[] => {
   for (const m of line.matchAll(/(\d+)|([A-Za-z_]\w*)|(\s+)|(.)/g)) {
     const [text, num, word] = m;
     if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
-    else if (word && FUNCTIONS.has(word)) out.push({ text, color: TOKEN_INK.fn, weight: 600 });
-    else if (word && ALIASES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 650 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
+    else if (word && FUNCTIONS.has(word)) out.push({ text, color: TOKEN_INK.fn, weight: 500 });
+    else if (word && ALIASES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -263,8 +263,8 @@ export const Fig: React.FC<{ n: string; at: number; y: number; x?: number; out?:
   children,
 }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>Fig. {n}</span>
-    <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 
@@ -451,7 +451,7 @@ export const CellText: React.FC<{ col: string; value: string; weight?: number; c
       whiteSpace: "nowrap",
       fontVariantLigatures: "none",
       fontVariantNumeric: "tabular-nums",
-      fontWeight: weight ?? (col === "region" ? 600 : 400),
+      fontWeight: weight ?? (col === "region" ? 500 : 400),
       color: color ?? (col === "region" ? REGION_INK[value as Region] : INK),
     }}
   >

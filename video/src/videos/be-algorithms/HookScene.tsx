@@ -66,10 +66,10 @@ export const HookScene: React.FC = () => {
         <Headline lead="Fast at a hundred." turn="What does a million cost?" at={hundredAt} turnAt={questionAt} />
 
         {/* What the square shows, above it. */}
-        <Line at={hundredAt} x={SQ_X} y={y(286)} size={24} weight={650} out={millionAt}>
+        <Line at={hundredAt} x={SQ_X} y={y(286)} size={24} weight={500} out={millionAt}>
           <Num>100</Num> items
         </Line>
-        <Line at={millionAt + 10} x={SQ_X} y={y(286)} size={24} weight={650}>
+        <Line at={millionAt + 10} x={SQ_X} y={y(286)} size={24} weight={500}>
           <Num>1,000,000</Num> items, a thousand a side
         </Line>
 
@@ -99,21 +99,21 @@ export const HookScene: React.FC = () => {
         {/* Fast, while the hundred fills the box. */}
         <div style={{ position: "absolute", left: SQ_X + DOTS * PITCH + 24, top: top + 90, display: "flex", alignItems: "center", gap: 10, fontSize: 26, opacity: ease(frame, fastAt, 10) * (1 - ease(frame, millionAt, 10)) }}>
           <Tick at={fastAt} size={28} />
-          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>fast</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>fast</span>
         </div>
-        <Line at={millionAt + 28} x={SQ_X + 26} y={top + 10} size={22} weight={600}>
+        <Line at={millionAt + 28} x={SQ_X + 26} y={top + 10} size={22} weight={500}>
           <span style={halo}>← the hundred</span>
         </Line>
 
         <VRule x={(SQ_X + SQ + CHIP_X) / 2} top={top} bottom={top + SQ} at={structureAt - 2} />
 
         {/* Which structure keeps it cheap. */}
-        <Line at={structureAt - 2} x={CHIP_X} y={top + 20} size={26} weight={650}>
+        <Line at={structureAt - 2} x={CHIP_X} y={top + 20} size={26} weight={500}>
           Which structure keeps it cheap?
         </Line>
         <div style={{ position: "absolute", left: CHIP_X, top: top + 76, display: "flex", gap: 14, fontSize: 26, whiteSpace: "nowrap" }}>
           {STRUCTS.map((st, i) => (
-            <span key={st} style={{ ...note(26, BLUE_INK), fontWeight: 600, opacity: ease(frame, structureAt + 6 + i * 5, 10) }}>
+            <span key={st} style={{ ...note(26, BLUE_INK), fontWeight: 500, opacity: ease(frame, structureAt + 6 + i * 5, 10) }}>
               {i ? <span style={{ color: INK_SOFT, fontWeight: 500, marginRight: 14 }}>·</span> : null}
               {st}
             </span>
@@ -121,7 +121,7 @@ export const HookScene: React.FC = () => {
         </div>
 
         {/* The round. */}
-        <Line at={thirtyAt - 2} x={CHIP_X} y={top + 236} size={30} weight={600}>
+        <Line at={thirtyAt - 2} x={CHIP_X} y={top + 236} size={30} weight={500}>
           <span style={{ color: BLUE_INK }}>
             <Num>35</Num> questions
           </span>
@@ -141,7 +141,7 @@ export const HookScene: React.FC = () => {
             </span>
           ))}
         </div>
-        <Line at={quickAt + 10} x={CHIP_X} y={top + 362} size={22} color={INK_SOFT} weight={600}>
+        <Line at={quickAt + 10} x={CHIP_X} y={top + 362} size={22} color={INK_SOFT} weight={500}>
           Each answer: the structure, and its cost, counted
         </Line>
 

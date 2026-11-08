@@ -65,7 +65,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -488,7 +488,7 @@ export const PaperPage: React.FC<{
         }}
       >
         <span>Communications of the ACM</span>
-        <span style={{ opacity: ease(frame, dateAt - 2, 10), color: ACCENT_INK, fontWeight: 650 }}>June 1970</span>
+        <span style={{ opacity: ease(frame, dateAt - 2, 10), color: ACCENT_INK, fontWeight: 500 }}>June 1970</span>
       </div>
       <div style={{ position: "absolute", left: pad, right: pad, top: 54, height: 1.5, background: INK }} />
       <Ink at={titleAt} dur={20} style={{ left: pad, top: 70, width: width - 2 * pad }}>
@@ -613,7 +613,7 @@ export const MovingTable: React.FC<{
               lineHeight: `${headH}px`,
               fontFamily: MONO,
               fontSize: HEAD_SIZE,
-              fontWeight: 600,
+              fontWeight: 500,
               color: INK_SOFT,
               opacity: colOp(j),
             }}
@@ -738,8 +738,8 @@ export const tokenize = (line: string): Token[] => {
     const [text, str, num, word] = m;
     if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
-    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 600 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
+    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -860,10 +860,10 @@ export const ErrorBox: React.FC<{
         }}
       >
         <div>
-          <span style={{ color: ACCENT_INK, fontWeight: 600 }}>ERROR:</span> {message}
+          <span style={{ color: ACCENT_INK, fontWeight: 500 }}>ERROR:</span> {message}
         </div>
         <div style={{ color: INK_SOFT, opacity: detailAt === undefined ? 1 : ease(frame, detailAt, 12) }}>
-          <span style={{ fontWeight: 600 }}>DETAIL:</span> {detail}
+          <span style={{ fontWeight: 500 }}>DETAIL:</span> {detail}
         </div>
       </div>
     </Ink>
@@ -932,7 +932,7 @@ export const Card: React.FC<{
 
 /** Code set inside running text or a label, at the text's own size. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 600, color }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 500, color }}>{children}</span>
 );
 
 /** A small label in Inter, for the tree and the charts. */

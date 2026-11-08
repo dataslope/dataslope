@@ -24,7 +24,7 @@ export { at, Bracket, mulberry32, type Scale, VLine } from "../da-statistics-com
  *  a line's sizes may differ by (`check:frames`), where the 0.88em of the
  *  Mono this video used to take from Parts 1 and 2 is not. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 500, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );

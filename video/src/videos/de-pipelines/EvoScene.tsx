@@ -39,7 +39,7 @@ const FileRow: React.FC<{
       <span style={{ position: "relative", display: "flex", gap: 14, fontFamily: MONO, fontSize: 21, whiteSpace: "nowrap" }}>
         <span style={{ position: "absolute", inset: "-4px -8px", background: HIGHLIGHT, borderRadius: 4, opacity: m, clipPath: `inset(0 ${(1 - m) * 100}% 0 0)` }} />
         {cols.map((c) => (
-          <span key={c} style={{ position: "relative", color: inks[c] ?? INK_SOFT, fontWeight: inks[c] ? 700 : 500 }}>
+          <span key={c} style={{ position: "relative", color: inks[c] ?? INK_SOFT, fontWeight: inks[c] ? 500 : 500 }}>
             {c}
           </span>
         ))}
@@ -190,7 +190,7 @@ export const EvoScene: React.FC = () => {
 
         {/* Parquet: three daily files. */}
         <Note at={parqAt} x={X0} y={tTop - 40} out={gone}>
-          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Parquet, one file a day<span style={{ opacity: ease(frame, schemaAt, 10) }}>: each file keeps its own schema</span>
           </span>
         </Note>
@@ -232,7 +232,7 @@ export const EvoScene: React.FC = () => {
           ]}
         />
         <Note at={goneAt} x={TABLE_X} y={tableBottom + h(24)} out={nameAt + 4}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>by default: coupon dropped, and no error</span>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>by default: coupon dropped, and no error</span>
         </Note>
         <Note at={failsAt} x={TABLE_X} y={tableBottom + h(70)} out={nameAt + 4}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
@@ -240,10 +240,10 @@ export const EvoScene: React.FC = () => {
           </span>
         </Note>
         <Note at={appearsAt + 4} x={TABLE_X} y={tableBottom + h(24)} out={breakAt}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>by name: coupon kept, null for day 1</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>by name: coupon kept, null for day 1</span>
         </Note>
         <Note at={breakAt} x={TABLE_X} y={tableBottom + h(76)} out={gone}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>renames and type changes break readers</span>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>renames and type changes break readers</span>
         </Note>
         <Note at={endAt + 4} x={TABLE_X} y={tableBottom + h(120)} out={gone}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
@@ -261,13 +261,13 @@ export const EvoScene: React.FC = () => {
 
         {/* Avro: a reader resolves each record against its own schema. */}
         <Note at={avroAt + 4} x={X0} y={AY - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Avro, a row format for messages<span style={{ color: OK_INK, opacity: ease(frame, contractAt, 10) }}>: evolution as a contract</span>
           </span>
         </Note>
         <Note at={resolveAt} x={X0} y={AY + h(16)}>
           <span style={{ display: "flex", alignItems: "center", gap: 14, whiteSpace: "nowrap" }}>
-            <span style={{ ...label(22, INK_SOFT), fontWeight: 650 }}>A reader resolves the writer's schema:</span>
+            <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>A reader resolves the writer's schema:</span>
             {resolve.map((r) => (
               <Badge key={r.text} tone="gray" size={22} style={{ fontFamily: SANS, opacity: ease(frame, r.at, 10) }}>
                 {r.text}
@@ -291,7 +291,7 @@ export const EvoScene: React.FC = () => {
           sub={
             <span>
               <span style={{ fontFamily: MONO }}>…, amount, coupon</span>
-              <span style={{ color: OK_INK, fontWeight: 650, opacity: ease(frame, withAt, 10) }}> default null</span>
+              <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, withAt, 10) }}> default null</span>
             </span>
           }
         />
@@ -300,7 +300,7 @@ export const EvoScene: React.FC = () => {
         <Node x={reg.x} y={reg.y} w={reg.w} h={h(reg.h)} at={registryAt + 4} tone="plain" title="schema registry" sub="checks v2 against v1" />
         <Flow points={[[reg.x + reg.w + 6, regMid], [RULE_X - 30, regMid]]} at={backAt - 6} color={INK} width={2.2} head={12} />
         <Note at={backAt - 6} x={RULE_X - 14} y={AY + h(108)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>one rule, set in the registry:</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>one rule, set in the registry:</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, backAt - 6, 10) }}>
           {/* A bracket that gathers the three rules, for the arrow to land on. */}
@@ -313,7 +313,7 @@ export const EvoScene: React.FC = () => {
         </svg>
         {rules.map((r, i) => (
           <Note key={r.name} at={r.at} x={RULE_X} y={ruleY(i)}>
-            <div style={{ ...label(25, INK), fontWeight: 750, whiteSpace: "nowrap" }}>{r.name}</div>
+            <div style={{ ...label(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.name}</div>
             <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 2 }}>
               {r.text}
               {r.reader ? (
@@ -330,7 +330,7 @@ export const EvoScene: React.FC = () => {
           coupon with a default: passes all three
         </Pill>
         <Note at={failsBackAt} x={X0} y={AY + h(382)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>no default: fails backward, so fails full</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no default: fails backward, so fails full</span>
         </Note>
         <Pill x={X0} y={AY + h(438)} at={suitsAt} tone="ok" size={23} solid>
           many services that must agree on one schema

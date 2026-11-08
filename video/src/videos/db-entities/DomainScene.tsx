@@ -118,7 +118,7 @@ export const DomainScene: React.FC = () => {
           </Note>
           {LOOSE_IN.map((row) => (
             <Note key={row} at={onlyAt + 6} x={looseRight + 30} y={top + g.rowMid(row) * S - 15}>
-              <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>gets in</span>
+              <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>gets in</span>
             </Note>
           ))}
         </div>

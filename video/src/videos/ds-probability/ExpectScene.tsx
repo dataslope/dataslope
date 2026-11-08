@@ -238,7 +238,7 @@ export const ExpectScene: React.FC = () => {
             </span>
           </Ink>
           <Note at={evenWhenAt} x={X0 + 640} y={y(334)}>
-            <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={dependAt}>even when the parts depend on each other</Mark>
             </span>
           </Note>
@@ -262,7 +262,7 @@ export const ExpectScene: React.FC = () => {
                     <ellipse cx={x} cy={(top + bottom) / 2} rx={RING.rx} ry={(bottom - top) / 2} fill="none" stroke={OK} strokeWidth={4} opacity={ring} />
                   ) : null}
                   {/* Clear of the match's ring, which reaches foot + 11. */}
-                  <text x={x} y={foot + 40} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 600, fill: INK_SOFT }}>
+                  <text x={x} y={foot + 40} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 500, fill: INK_SOFT }}>
                     {i + 1}
                   </text>
                 </g>
@@ -314,7 +314,7 @@ export const ExpectScene: React.FC = () => {
                     strokeWidth={6}
                     strokeLinejoin="round"
                     paintOrder="stroke"
-                    style={{ ...label(21, INK), fontWeight: 600, fill: INK, ...TABULAR }}
+                    style={{ ...label(21, INK), fontWeight: 500, fill: INK, ...TABULAR }}
                   >
                     {hat + 1}
                   </text>
@@ -377,7 +377,7 @@ export const ExpectScene: React.FC = () => {
             <span style={{ ...math(32, INK) }}>
               Var(<V>X</V> + <V>Y</V>) = Var(<V>X</V>) + Var(<V>Y</V>)
             </span>
-            <span style={{ ...note(26, INK), fontWeight: 600, marginLeft: 16, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, INK), fontWeight: 500, marginLeft: 16, whiteSpace: "nowrap" }}>
               only when <Mark at={uncorrAt}>uncorrelated</Mark>
             </span>
           </Note>

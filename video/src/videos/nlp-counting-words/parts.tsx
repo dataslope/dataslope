@@ -64,7 +64,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -432,7 +432,7 @@ export const TagChip: React.FC<{
           alignItems: "center",
           justifyContent: "center",
           fontFamily: MONO,
-          fontWeight: 600,
+          fontWeight: 500,
           fontSize: size,
           color: f.ink,
           opacity: p,
@@ -447,7 +447,7 @@ export const TagChip: React.FC<{
             marginTop: 8,
             textAlign: "center",
             ...label(glossSize, f.ink),
-            fontWeight: 600,
+            fontWeight: 500,
             whiteSpace: "nowrap",
             opacity: g,
             transform: `translateY(${(1 - g) * 6}px)`,
@@ -490,7 +490,7 @@ export const HBar: React.FC<{
 /** Inter, set for a number beside a bar. */
 export const numStyle = (size = 22, color: string = INK): React.CSSProperties => ({
   ...label(size, color),
-  fontWeight: 600,
+  fontWeight: 500,
   ...TABULAR,
   whiteSpace: "nowrap",
 });

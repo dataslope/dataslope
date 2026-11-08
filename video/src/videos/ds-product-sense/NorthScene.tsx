@@ -100,8 +100,8 @@ export const NorthScene: React.FC = () => {
               transform: `translateY(${(1 - card) * 20}px)`,
             }}
           >
-            <div style={{ position: "absolute", left: 0, top: 22, ...label(22, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>★ north star</div>
-            <div style={{ position: "absolute", left: 0, top: 58, ...note(52, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: named }}>
+            <div style={{ position: "absolute", left: 0, top: 22, ...label(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>★ north star</div>
+            <div style={{ position: "absolute", left: 0, top: 58, ...note(52, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: named }}>
               <span
                 style={{
                   padding: "0 10px",
@@ -123,7 +123,7 @@ export const NorthScene: React.FC = () => {
 
           {/* What a good one does. */}
           <Note at={goodAt - 2} x={CHECKS_X} y={y(STAR.top)} out={out1}>
-            <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>A good one:</span>
+            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A good one:</span>
           </Note>
           {checks.map((c, i) => (
             <Note key={c.text} at={c.at - 2} x={CHECKS_X} y={y(STAR.top) + h(64) + i * h(58)} out={out1}>
@@ -137,7 +137,7 @@ export const NorthScene: React.FC = () => {
           {/* The bigger number that says nothing. */}
           <Note at={signupsAt - 2} x={X0} y={y(STAR.top) + h(STAR.h) + h(80)} out={out1}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 22 }}>
-              <span style={{ ...note(29, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+              <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 <Strike at={nothingAt + 2}>total signups</Strike>
               </span>
               <span style={{ ...note(27, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, nothingAt, 12) }}>
@@ -151,7 +151,7 @@ export const NorthScene: React.FC = () => {
             What are guardrail metrics, and why do you need them?
           </QuestionCard>
           <Note at={healthAt - 2} x={CHECKS_X} y={y(STAR.top) + h(20)}>
-            <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>guardrails:</span>
+            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>guardrails:</span>
           </Note>
           <Note at={healthAt + 4} x={CHECKS_X} y={y(STAR.top) + h(70)}>
             <span style={{ ...note(27, INK_SOFT), whiteSpace: "nowrap" }}>health checks you refuse to harm on the way</span>
@@ -195,13 +195,13 @@ export const NorthScene: React.FC = () => {
             </Tag>
           ))}
           <Note at={gamedAt - 2} x={X0} y={y(RAIL.top) + h(150)}>
-            <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>almost any single number can be gamed:</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>almost any single number can be gamed:</span>
           </Note>
           <Note at={sendAt} x={X0 + 600} y={y(RAIL.top) + h(150)}>
             <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
               more notifications →{" "}
-              <span style={{ color: BLUE_INK, fontWeight: 650, opacity: ease(frame, climbAt, 10) }}>sessions ▲</span>
-              <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, leaveAt, 10) }}>, people quietly leave ▼</span>
+              <span style={{ color: BLUE_INK, fontWeight: 500, opacity: ease(frame, climbAt, 10) }}>sessions ▲</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, leaveAt, 10) }}>, people quietly leave ▼</span>
             </span>
           </Note>
           {/* The guardrail catches the harm, so its line runs from its name to

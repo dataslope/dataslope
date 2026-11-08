@@ -96,7 +96,7 @@ export const DiagramScene: React.FC = () => {
   const sub = (lo: number, hi: number) => (
     <span style={{ position: "relative", display: "inline-block" }}>
       <span style={{ opacity: ease(frame, statelessAt, 10) * (1 - ids) }}>stateless</span>
-      <span style={{ position: "absolute", left: "50%", top: 0, transform: "translateX(-50%)", whiteSpace: "nowrap", color: OK_INK, fontWeight: 650, opacity: ids }}>
+      <span style={{ position: "absolute", left: "50%", top: 0, transform: "translateX(-50%)", whiteSpace: "nowrap", color: OK_INK, fontWeight: 500, opacity: ids }}>
         <Num>{int(lo)}</Num> to <Num>{int(hi)}</Num>
       </span>
     </span>
@@ -134,7 +134,7 @@ export const DiagramScene: React.FC = () => {
           every lookup is by key
         </Line>
         <Box r={B.cache} at={cacheAt + 4} title="Cache" tone="data" tones={[{ at: miss[1] + 9, tone: "bad" }, { at: sixAt + 30, tone: "data" }]} />
-        <Line x={B.cache.cx + B.cache.w / 2 + 30} y={B.cache.cy - 15} at={ratioAt} size={22} color={BLUE_INK} weight={650}>
+        <Line x={B.cache.cx + B.cache.w / 2 + 30} y={B.cache.cy - 15} at={ratioAt} size={22} color={BLUE_INK} weight={500}>
           <Num>{ESTIMATE.assumptions.readsPerWrite}</Num> reads : <Num>1</Num> write
         </Line>
         {(["app1", "app2"] as const).map((k, i) => (
@@ -165,10 +165,10 @@ export const DiagramScene: React.FC = () => {
         <Traveller points={e.clientLb} from={followAt} to={followAt + 12} color={BAR} r={8} out={followAt + 14} />
         <RoundTrip pts={e.lbApp1} from={hit[0]} dur={26} />
         <RoundTrip pts={e.app1Cache} from={hit[1]} dur={26} />
-        <Line x={B.app1.cx + 20} y={B.lb.cy - 2} at={hit[0] + 14} out={pathOut} size={22} weight={650} color={BLUE_INK}>
+        <Line x={B.app1.cx + 20} y={B.lb.cy - 2} at={hit[0] + 14} out={pathOut} size={22} weight={500} color={BLUE_INK}>
           <Num>{HOP_MS}</Num> ms
         </Line>
-        <Line x={B.app1.cx + 56} y={B.cache.cy - 4} at={hit[1] + 14} out={pathOut} size={22} weight={650} color={BLUE_INK} align="right">
+        <Line x={B.app1.cx + 56} y={B.cache.cy - 4} at={hit[1] + 14} out={pathOut} size={22} weight={500} color={BLUE_INK} align="right">
           <Num>{HOP_MS}</Num> ms
         </Line>
         <RoundTrip pts={e.lbApp1} from={miss[0]} dur={18} />
@@ -179,28 +179,28 @@ export const DiagramScene: React.FC = () => {
             <Cross at={miss[1] + 9} size={28} />
           </div>
         ) : null}
-        <Line x={SIDE_A - 18} y={(B.app1.cy + B.store.cy) / 2 - 16} at={miss[2] + 18} out={pathOut} size={22} weight={650} color={BLUE_INK} align="right">
+        <Line x={SIDE_A - 18} y={(B.app1.cy + B.store.cy) / 2 - 16} at={miss[2] + 18} out={pathOut} size={22} weight={500} color={BLUE_INK} align="right">
           + <Num>{HOP_MS}</Num> ms
         </Line>
-        <Line x={SIDE_A - 18} y={B.store.cy - 16} at={ssdAt} out={pathOut} size={22} weight={650} color={BLUE_INK} align="right">
+        <Line x={SIDE_A - 18} y={B.store.cy - 16} at={ssdAt} out={pathOut} size={22} weight={500} color={BLUE_INK} align="right">
           SSD read + <Num>{SSD_MS}</Num> ms
         </Line>
 
         {/* The sums, beside it. */}
-        <Line x={RX} y={y(296)} at={hitAt} out={pathOut} size={26} weight={600}>
+        <Line x={RX} y={y(296)} at={hitAt} out={pathOut} size={26} weight={500}>
           Cache hit
         </Line>
-        <Line x={RX} y={y(296) + 48} at={tripsAt} out={pathOut} size={26} weight={600} color={OK_INK}>
+        <Line x={RX} y={y(296) + 48} at={tripsAt} out={pathOut} size={26} weight={500} color={OK_INK}>
           <Num>2</Num> round trips
           <span style={{ opacity: ease(frame, msAt, 10) }}>
             {" "}
             ≈ <Num>{LADDER.path.hitMs}</Num> ms
           </span>
         </Line>
-        <Line x={RX} y={y(296) + 128} at={missAt} out={pathOut} size={26} weight={600}>
+        <Line x={RX} y={y(296) + 128} at={missAt} out={pathOut} size={26} weight={500}>
           Cache miss
         </Line>
-        <Line x={RX} y={y(296) + 176} at={sixAt} out={pathOut} size={26} weight={600} color={INK}>
+        <Line x={RX} y={y(296) + 176} at={sixAt} out={pathOut} size={26} weight={500} color={INK}>
           <Num>3</Num> trips + SSD ≈ <Num>{LADDER.path.missMs}</Num> ms
         </Line>
         <Line x={RX} y={y(296) + 228} at={sixAt + 8} out={pathOut} size={21} color={INK_SOFT}>
@@ -217,43 +217,43 @@ export const DiagramScene: React.FC = () => {
             <Cross at={failAt + 4} size={28} />
           </div>
         ) : null}
-        <Line x={RX} y={y(296)} at={askAt} size={26} weight={600}>
+        <Line x={RX} y={y(296)} at={askAt} size={26} weight={500}>
           One shared counter
         </Line>
-        <Line x={RX} y={y(296) + 48} at={bottleAt} size={26} weight={650} color={ACCENT_INK} dim={blockAt}>
+        <Line x={RX} y={y(296) + 48} at={bottleAt} size={26} weight={500} color={ACCENT_INK} dim={blockAt}>
           a bottleneck
         </Line>
-        <Line x={RX} y={y(296) + 96} at={failAt} size={26} weight={650} color={ACCENT_INK} dim={blockAt}>
+        <Line x={RX} y={y(296) + 96} at={failAt} size={26} weight={500} color={ACCENT_INK} dim={blockAt}>
           and one more thing to fail
         </Line>
-        <Line x={RX} y={y(296) + 176} at={blockAt} size={26} weight={600} color={OK_INK}>
+        <Line x={RX} y={y(296) + 176} at={blockAt} size={26} weight={500} color={OK_INK}>
           A block of IDs per server
         </Line>
-        <Line x={RX} y={y(296) + 224} at={millionAt} size={26} weight={650} color={OK_INK}>
+        <Line x={RX} y={y(296) + 224} at={millionAt} size={26} weight={500} color={OK_INK}>
           <Num>{int(KEY.idBlock)}</Num> at a time
         </Line>
 
         {/* Counted IDs, consecutive keys. */}
-        <Line x={X0} y={keysY} at={consecAt} size={25} weight={600}>
+        <Line x={X0} y={keysY} at={consecAt} size={25} weight={500}>
           Counted IDs, consecutive keys
         </Line>
         {KEY.counted.map((c, i) => (
           <Line key={c.id} x={X0} y={keysY + 56 + i * 52} at={consecAt + 6 + i * 4} size={24}>
             <Num>{int(c.id)}</Num>
             <span style={{ color: INK_SOFT }}> → </span>
-            <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 24 }}>
+            <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 24 }}>
               {c.key.slice(0, -1)}
               <span style={{ color: frame >= walkAt ? ACCENT_INK : INK }}>{c.key.slice(-1)}</span>
             </span>
           </Line>
         ))}
-        <Line x={X0} y={keysY + 228} at={walkAt + 6} size={23} weight={650} color={ACCENT_INK} width={360}>
+        <Line x={X0} y={keysY + 228} at={walkAt + 6} size={23} weight={500} color={ACCENT_INK} width={360}>
           anyone can walk through them
         </Line>
-        <Line x={X0} y={keysY + 290} at={scrambleAt} size={23} weight={650} color={OK_INK}>
+        <Line x={X0} y={keysY + 290} at={scrambleAt} size={23} weight={500} color={OK_INK}>
           Scramble the ID first,
         </Line>
-        <Line x={X0} y={keysY + 330} at={useHashAt} size={23} weight={650} color={OK_INK}>
+        <Line x={X0} y={keysY + 330} at={useHashAt} size={23} weight={500} color={OK_INK}>
           or use the hash
         </Line>
       </Drift>

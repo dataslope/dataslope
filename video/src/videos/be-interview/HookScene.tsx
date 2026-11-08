@@ -61,7 +61,7 @@ const Row: React.FC<{ i: number; at: number; name: string; part: React.ReactNode
           transform: `translateY(${(1 - p) * -10}px)`,
         }}
       >
-        <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{name}</span>
+        <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</span>
         <span style={{ ...label(22, partColor), whiteSpace: "nowrap", opacity: ease(frame, at + 10, 12) }}>{part}</span>
       </div>
       <div
@@ -213,7 +213,7 @@ export const HookScene: React.FC = () => {
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap", marginLeft: "-0.14em" }}>
+              <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap", marginLeft: "-0.14em" }}>
                 <Mark at={addAt + 2}>Backend roles add</Mark>
               </span>
               <span style={{ ...label(22, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, addAt + 12, 12) }}>

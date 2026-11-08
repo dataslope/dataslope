@@ -244,7 +244,7 @@ export const LoopScene: React.FC = () => {
               <Svg opacity={ease(frame, at, 10)}>
                 <circle cx={px} cy={py} r={7 + 3 * glow} fill={TOKEN} />
               </Svg>
-              <div style={{ position: "absolute", ...place, opacity: ease(frame, at, 12), whiteSpace: "nowrap", ...note(24, INK), fontWeight: 600 }}>
+              <div style={{ position: "absolute", ...place, opacity: ease(frame, at, 12), whiteSpace: "nowrap", ...note(24, INK), fontWeight: 500 }}>
                 {text}
               </div>
             </React.Fragment>
@@ -315,7 +315,7 @@ export const LoopScene: React.FC = () => {
             <span
               style={{
                 ...note(24, INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 display: "inline-block",
                 transform: `scale(${1 + 0.05 * pulse(frame, sureAt - 4 + k * 4, 18)})`,

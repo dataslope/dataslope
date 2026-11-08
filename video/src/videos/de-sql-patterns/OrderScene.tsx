@@ -168,7 +168,7 @@ export const OrderScene: React.FC = () => {
               style={{ left: STEP_X, top: rowY(i), height: h(44), display: "flex", alignItems: "center", gap: 16 }}
             >
               <StepBadge n={i + 1} />
-              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
+              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
                 {s.clause}
               </span>
             </Ink>
@@ -196,7 +196,7 @@ export const OrderScene: React.FC = () => {
             color={ACCENT}
           />
           <Note at={madeAt + 12} x={arrowX + 90} y={rowY(2) + h(14)} out={aliasOut}>
-            <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", fontWeight: 650 }}>
+            <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", fontWeight: 500 }}>
               <Mono>WHERE</Mono> can&apos;t see them
             </span>
           </Note>
@@ -215,7 +215,7 @@ export const OrderScene: React.FC = () => {
             color={OK}
           />
           <Note at={laterAt + 10} x={arrowX + 60} y={rowY(5) + h(18)} out={aliasOut}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap", fontWeight: 650 }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap", fontWeight: 500 }}>
               <Mono>ORDER BY</Mono> can
             </span>
           </Note>
@@ -344,7 +344,7 @@ const Caption: React.FC<{ at: number; out?: number; x: number; top: number; chil
 /** A count beside a row of the funnel, inked on its word. */
 const Count: React.FC<{ at: number; x: number; top: number; children: React.ReactNode }> = ({ at, x, top, children }) => (
   <Ink at={at} dur={10} style={{ left: x, top, whiteSpace: "nowrap" }}>
-    <span style={{ ...note(24, INK), fontWeight: 650 }}>{children}</span>
+    <span style={{ ...note(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 

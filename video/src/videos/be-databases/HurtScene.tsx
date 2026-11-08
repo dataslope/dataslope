@@ -96,7 +96,7 @@ export const HurtScene: React.FC = () => {
             { at: joinsAt, text: "joins" },
             { at: sortsAt, text: "sorts on the column" },
           ].map((p, i) => (
-            <span key={p.text} style={{ ...note(23, OK_INK), fontWeight: 650, opacity: ease(frame, p.at, 10) }}>
+            <span key={p.text} style={{ ...note(23, OK_INK), fontWeight: 500, opacity: ease(frame, p.at, 10) }}>
               {i > 0 ? <span style={{ color: INK_SOFT, fontWeight: 500, marginRight: "0.5em" }}>·</span> : null}
               {p.text}
             </span>
@@ -215,7 +215,7 @@ export const HurtScene: React.FC = () => {
           ink={ACCENT_INK}
         />
         <Note at={biggerAt} x={R_X + BAR_W + 120} y={lTop + h(392)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>bigger</span>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>bigger</span>
         </Note>
 
         {/* ── The rule ── */}

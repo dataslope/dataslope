@@ -117,7 +117,7 @@ export const ExamplesScene: React.FC = () => {
         {STEPS.map((s, i) => (
           <React.Fragment key={s.text}>
             <Tag at={stepAt[i]} x={stepX[i]} y={y(340)} width={s.w}>
-              <span style={{ ...label(22, A_INK), fontWeight: 600, marginRight: 10 }}>{i + 1}</span>
+              <span style={{ ...label(22, A_INK), fontWeight: 500, marginRight: 10 }}>{i + 1}</span>
               {i === 0 ? <Marked at={howAt - 2}>{s.text}</Marked> : s.text}
             </Tag>
             {i > 0 ? (
@@ -152,10 +152,10 @@ export const ExamplesScene: React.FC = () => {
           ))}
         </Svg>
         <Ink at={eightyAt - 2} dur={12} style={{ left: HX0 - 80, top: y(BASE_A) - h(MAX_H) - 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, A_INK), fontWeight: 600 }}>right {SIZES.trueA}% of the time</span>
+          <span style={{ ...note(22, A_INK), fontWeight: 500 }}>right {SIZES.trueA}% of the time</span>
         </Ink>
         <Ink at={sixtyFiveAt - 2} dur={12} style={{ left: HX0 - 80, top: y(BASE_B) - h(MAX_H) - 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, B_INK), fontWeight: 600 }}>right {SIZES.trueB}%</span>
+          <span style={{ ...note(22, B_INK), fontWeight: 500 }}>right {SIZES.trueB}%</span>
         </Ink>
         {/* The axis: correct answers out of 20. */}
         <Svg opacity={ease(frame, sixtyFiveAt, 12)}>
@@ -170,14 +170,14 @@ export const ExamplesScene: React.FC = () => {
         </Ink>
         {/* The runs counter: on screen only while it is counting, and after. */}
         <Ink at={twentyAt - 4} dur={10} style={{ left: sx(20) + SLOT + 20, top: y(BASE_A) - 40, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK), fontWeight: 600 }}>
+          <span style={{ ...note(24, INK), fontWeight: 500 }}>
             <span style={TABULAR}>{shown.toLocaleString("en-US")}</span> runs
           </span>
         </Ink>
 
         {/* The verdict at 20: how often the better one is ahead. */}
         <Ink at={aheadAt - 4} dur={14} style={{ left: RX0 - 30, top: y(318), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK), fontWeight: 600 }}>
+          <span style={{ ...note(24, INK), fontWeight: 500 }}>
             better one ahead in{" "}
             <span style={{ color: A_INK, ...TABULAR }}>
               <Count at={aheadAt - 4} to={SIZES.aWins} dur={16} />
@@ -227,7 +227,7 @@ export const ExamplesScene: React.FC = () => {
               <Svg opacity={ease(frame, at, 10)}>
                 <rect x={x} y={y(RBASE) - bh} width={44} height={bh} rx={2} fill={lit > 0 ? A : FAINT} opacity={0.6 + 0.4 * lit} />
                 <rect x={x + 48} y={y(RBASE) - ch} width={22} height={ch} rx={2} fill={B} />
-                <text x={x + 35} y={y(RBASE) + 28} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 600, ...TABULAR })}>
+                <text x={x + 35} y={y(RBASE) + 28} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
                   {r.n}
                 </text>
               </Svg>
@@ -235,7 +235,7 @@ export const ExamplesScene: React.FC = () => {
                 <span
                   style={{
                     ...note(lit > 0 ? 22 : 20, lit > 0 ? A_INK : INK_SOFT),
-                    fontWeight: lit > 0 ? 700 : 500,
+                    fontWeight: lit > 0 ? 500 : 500,
                     ...TABULAR,
                     display: "inline-block",
                     transform: `translateX(-50%) scale(${1 + swell * 0.08})`,
@@ -253,7 +253,7 @@ export const ExamplesScene: React.FC = () => {
           dur={12}
           style={{ left: RX0 + 4 * RSTEP + 59, top: y(RBASE) - h(RMAX) * (CLOSE_RATES.rates[4].pct / 100) - 30, whiteSpace: "nowrap" }}
         >
-          <span style={{ ...note(20, INK_SOFT), fontWeight: 600, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(20, INK_SOFT), fontWeight: 500, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
             {fmt(CLOSE_RATES.rates[4].pct, 1)}%
           </span>
         </Ink>
@@ -265,7 +265,7 @@ export const ExamplesScene: React.FC = () => {
         <Ink at={closeAt - 4} dur={16} style={{ left: X0, top: y(826), whiteSpace: "nowrap" }}>
           <span style={{ ...body(34, true), color: INK }}>
             Still close after 30? They probably are.{" "}
-            <span style={{ color: A_INK, fontWeight: 600, opacity: ease(frame, costAt - 2, 12) }}>Pick on cost.</span>
+            <span style={{ color: A_INK, fontWeight: 500, opacity: ease(frame, costAt - 2, 12) }}>Pick on cost.</span>
           </span>
         </Ink>
       </Drift>

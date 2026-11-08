@@ -114,7 +114,7 @@ export const FitScene: React.FC = () => {
           <Ink key={r.name} at={r.at} dur={14} style={{ left: PANEL_X, top: y(r.yy), whiteSpace: "nowrap" }}>
             {/* One line, one size: the estimate stands out by color and
                 weight, the truth beside it is set back in the soft ink. */}
-            <span style={{ ...note(28, INK), fontWeight: 600 }}>
+            <span style={{ ...note(28, INK), fontWeight: 500 }}>
               {r.name}{" "}
               {r.p > 0 ? (
                 <span style={askNote(28)}>
@@ -140,7 +140,7 @@ export const FitScene: React.FC = () => {
           <span style={code(22, INK)}>stats.norm.fit(incomes)</span>
         </Ink>
         <Note at={wrongAt} x={PANEL_X} y={y(728)}>
-          <span style={{ ...note(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             → {fmt(INCOME.fitLoc, 0)} and {fmt(INCOME.fitScale, 0)}
           </span>
         </Note>

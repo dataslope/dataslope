@@ -161,7 +161,7 @@ export const CheckScene: React.FC = () => {
         color={INK}
       />
       <Note at={twentyFiveAt} x={sx(X, CHECK.mu + CHECK.sigma) + 16} y={y(POP_BASE - 0.69 * POP_H) - 15}>
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 600, ...halo }}>± {CHECK.sigma}</span>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, ...halo }}>± {CHECK.sigma}</span>
       </Note>
 
       {/* ── The samples ── */}
@@ -199,7 +199,7 @@ export const CheckScene: React.FC = () => {
         width={2.2}
       />
       <Note at={spreadAt + 4} x={sx(X, center + CHECK.measured) + 14} y={y(pileSpanY) - 15}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, ...halo }}>± {fmt(CHECK.measured)}</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, ...halo }}>± {fmt(CHECK.measured)}</span>
       </Note>
 
       {/* ── Right column: the count, then the two spreads side by side ── */}

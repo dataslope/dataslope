@@ -120,25 +120,25 @@ export const DidScene: React.FC = () => {
         <Curve points={line(DID.control)} x={x} y={yS} at={notAt} dur={22} color={CONTROL} dots={5} />
         <Curve points={line(DID.treated)} x={x} y={yS} at={policyAt + 2} dur={22} color={TREAT} dots={5} />
         <Note at={policyAt + 10} x={at(x, split) + 12} y={y(PLOT.top) - h(12)}>
-          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>the policy starts</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the policy starts</span>
         </Note>
         <Note at={policyAt + 8} x={at(x, 12.4) + 12} y={at(yS, DID.treated[11]) - 16}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 750, whiteSpace: "nowrap" }}>treated city</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>treated city</span>
         </Note>
         {/* The evidence for parallel trends: the weeks before the policy. */}
         <Note at={beforeAt - 2} x={at(x, 0.6) + 12} y={y(PLOT.top) + h(58)}>
-          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>before the policy, the two rose together</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>before the policy, the two rose together</span>
         </Note>
         <Note at={beforeAt + 8} x={at(x, 0.6) + 12} y={y(PLOT.top) + h(88)}>
-          <span style={{ ...label(19, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(19, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             the gap between them drifted {fixed(DID.preGap, 2)} a week
           </span>
         </Note>
         <Note at={notAt + 8} x={at(x, 12.4) + 12} y={at(yS, DID.control[11]) - 16}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 750, whiteSpace: "nowrap" }}>comparison city</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>comparison city</span>
         </Note>
         <Note at={simAt} x={PLOT.x0 - 100} y={y(PLOT.base) + h(44)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>simulated</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>simulated</span>
         </Note>
 
         {/* The arithmetic. */}
@@ -147,28 +147,28 @@ export const DidScene: React.FC = () => {
           { text: "comparison city", v: DID.controlChange, at: compAt + 6, ink: INK_SOFT },
         ].map((r, i) => (
           <Note key={r.text} at={r.at} x={SUM_X} y={y(500) + i * h(60)}>
-            <span style={{ display: "inline-flex", width: SUM_W, justifyContent: "space-between", ...note(27, r.ink), fontWeight: 600, ...TABULAR }}>
+            <span style={{ display: "inline-flex", width: SUM_W, justifyContent: "space-between", ...note(27, r.ink), fontWeight: 500, ...TABULAR }}>
               <span>{r.text}</span>
               <span>{fixed(r.v, 1, true)}</span>
             </span>
           </Note>
         ))}
         <Note at={noPolicyAt} x={SUM_X} y={y(500) + h(100)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>(with no policy at all)</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>(with no policy at all)</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           <line x1={SUM_X} x2={SUM_X + SUM_W * ease(frame, diffAt, 12)} y1={y(500) + h(140)} y2={y(500) + h(140)} stroke={INK} strokeWidth={2} />
         </svg>
         <Note at={diffAt + 4} x={SUM_X} y={y(500) + h(156)}>
           <span style={{ display: "inline-flex", width: SUM_W, justifyContent: "space-between", alignItems: "baseline", ...TABULAR }}>
-            <span style={{ ...note(28, OK_INK), fontWeight: 750 }}>DiD</span>
+            <span style={{ ...note(28, OK_INK), fontWeight: 500 }}>DiD</span>
             <span style={{ display: "inline-flex", alignItems: "baseline", gap: 12 }}>
-              <span style={{ ...note(26, OK_INK), fontWeight: 650, ...TABULAR }}>
+              <span style={{ ...note(26, OK_INK), fontWeight: 500, ...TABULAR }}>
                 {fixed(DID.treatedChange, 1)} − {DID.controlChange < 0 ? `(${fixed(DID.controlChange, 1)})` : fixed(DID.controlChange, 1)} =
               </span>
               {/* The answer at the line's own size: weight, the highlight and
                   the swell carry it, not a bigger face. */}
-              <span style={{ ...note(28, OK_INK), fontWeight: 800, display: "inline-block", transform: `scale(${1 + 0.08 * big})`, transformOrigin: "right center" }}>
+              <span style={{ ...note(28, OK_INK), fontWeight: 500, display: "inline-block", transform: `scale(${1 + 0.08 * big})`, transformOrigin: "right center" }}>
                 <Mark at={sixFiveAt + 2}>{fixed(DID.did, 1, true)}</Mark>
               </span>
             </span>
@@ -178,12 +178,12 @@ export const DidScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>true effect in the simulation: +{DID.truth}</span>
         </Note>
         <Note at={parallelAt} x={SUM_X} y={y(780)} width={SUM_W}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600 }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500 }}>
             It rests on parallel trends<span style={{ fontWeight: 500, opacity: ease(frame, togetherAt - 6, 10) }}>: without the policy, the lines move together</span>
           </span>
         </Note>
         <Note at={parallelAt + 10} x={at(x, split) + 30} y={at(yS, counterfactual) + 10}>
-          <span style={{ ...label(19, INK), fontWeight: 650, whiteSpace: "nowrap" }}>without the policy</span>
+          <span style={{ ...label(19, INK), fontWeight: 500, whiteSpace: "nowrap" }}>without the policy</span>
         </Note>
       </Drift>
     </AbsoluteFill>

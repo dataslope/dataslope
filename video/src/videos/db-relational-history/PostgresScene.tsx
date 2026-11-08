@@ -171,13 +171,13 @@ export const PostgresScene: React.FC = () => {
             at: speakAt - 4,
             children: (
               <>
-                speaks POSTQUEL, <span style={{ color: ACCENT_INK, fontWeight: 650 }}>not SQL</span>
+                speaks POSTQUEL, <span style={{ color: ACCENT_INK, fontWeight: 500 }}>not SQL</span>
               </>
             ),
           },
         ]}
       />
-      <Tag x={XS[0] + 2} y={TOP + H + 18} at={afterAt} out={catchAt} size={23} color={ACCENT_INK} weight={650}>
+      <Tag x={XS[0] + 2} y={TOP + H + 18} at={afterAt} out={catchAt} size={23} color={ACCENT_INK} weight={500}>
         post Ingres: after Ingres
       </Tag>
       <Tag x={XS[0] + 2} y={TOP + H + 18} at={wonAt - 4} size={23} color={INK}>
@@ -257,7 +257,7 @@ export const PostgresScene: React.FC = () => {
             at: gaveAt - 2,
             children: (
               <>
-                POSTQUEL swapped for <span style={{ color: KEY_INK, fontWeight: 650 }}>SQL</span>
+                POSTQUEL swapped for <span style={{ color: KEY_INK, fontWeight: 500 }}>SQL</span>
               </>
             ),
           },

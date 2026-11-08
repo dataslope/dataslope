@@ -148,7 +148,7 @@ export const Type2Scene: React.FC = () => {
           />
         ) : null}
         <Note at={txAt + 8} x={X0} y={txBottom + h(14)} out={stmtOut}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             one transaction
             <span style={{ fontWeight: 500, color: INK, opacity: ease(frame, changedAt, 10) }}>, only for a customer whose tracked columns changed</span>
           </span>
@@ -186,7 +186,7 @@ export const Type2Scene: React.FC = () => {
           bands={[{ row: 1, at: isCurrentAt + 4, color: `color-mix(in srgb, ${OK_INK} 10%, transparent)` }]}
         />
         <Note at={overlapAt + 6} x={X0} y={joinTop + listingHeight(P.lines.length, SIZE) + h(80)} out={storesAt}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             {MOVE.bostonTo}, then {MOVE.austinFrom}: no overlap, no gap
           </span>
         </Note>

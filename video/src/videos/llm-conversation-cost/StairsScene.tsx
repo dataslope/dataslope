@@ -257,7 +257,7 @@ export const StairsScene: React.FC = () => {
               paddingLeft: 18,
               opacity: p * (1 - o),
               ...note(22, isNew ? mix(INK, PAPER, fill) : INK),
-              fontWeight: isNew ? 600 : undefined,
+              fontWeight: isNew ? 500 : undefined,
             }}
           >
             {b.text}
@@ -273,7 +273,7 @@ export const StairsScene: React.FC = () => {
         right={false}
       />
       <Note at={everyAt + 2} out={oneAt - 8} x={814} y={(y(BUBBLE_Y) + y(BUBBLE_Y + 5 * BUBBLE_STEP) + BUBBLE_H) / 2 - 34} width={220}>
-        <span style={{ ...note(24, INK), fontWeight: 600 }}>all of it, sent again every turn</span>
+        <span style={{ ...note(24, INK), fontWeight: 500 }}>all of it, sent again every turn</span>
       </Note>
       <Arrow
         from={[1046, (y(BUBBLE_Y) + y(BUBBLE_Y + 5 * BUBBLE_STEP) + BUBBLE_H) / 2]}
@@ -324,7 +324,7 @@ export const StairsScene: React.FC = () => {
       <Leader points={[[ZX - 12, zoomed.ty(SYSTEM / 2)], [zoomed.x(1) + zoomed.bar + 4, zoomed.ty(SYSTEM / 2)]]} at={sysAt - 4} out={twoAt - 6} color={INK_SOFT} />
       <Note at={sysAt - 2} out={twoAt - 6} x={ZX} y={zoomed.ty(SYSTEM / 2) - 17}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
-          system prompt, <b style={{ fontWeight: 650 }}>{int(SYSTEM)}</b> tokens
+          system prompt, <b style={{ fontWeight: 600 }}>{int(SYSTEM)}</b> tokens
         </span>
       </Note>
       <Leader
@@ -335,7 +335,7 @@ export const StairsScene: React.FC = () => {
       />
       <Note at={yourAt} out={twoAt - 6} x={ZX} y={zoomed.ty(SYSTEM + USER / 2) - 57}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
-          your first message, <b style={{ fontWeight: 650 }}>{int(USER)}</b>
+          your first message, <b style={{ fontWeight: 600 }}>{int(USER)}</b>
         </span>
       </Note>
 
@@ -348,7 +348,7 @@ export const StairsScene: React.FC = () => {
       />
       <Note at={againAt + 6} out={zLabelsOut} x={ZX} y={zoomed.ty(TURNS[1].resent / 2) - 17}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
-          turn one, sent again: <b style={{ fontWeight: 650 }}>{int(TURNS[1].resent)}</b>
+          turn one, sent again: <b style={{ fontWeight: 600 }}>{int(TURNS[1].resent)}</b>
         </span>
       </Note>
       <VBracket
@@ -366,7 +366,7 @@ export const StairsScene: React.FC = () => {
         </span>
       </Note>
       <Note at={fiveAt - 2} out={zLabelsOut} x={ZX} y={zoomed.ty(TURNS[1].resent + TURNS[1].newSlice / 2) + 4}>
-        <span style={{ ...note(28, NEW_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>{int(TURNS[1].newSlice)} new tokens</span>
+        <span style={{ ...note(28, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{int(TURNS[1].newSlice)} new tokens</span>
       </Note>
 
       {/* Turn forty. */}
@@ -392,8 +392,8 @@ export const StairsScene: React.FC = () => {
       </Note>
       {/* Two lines broken by hand, so "price" never wraps alone. */}
       <Note at={repliesAt - 2} x={RX} y={y(392)} width={360}>
-        <span style={{ display: "block", ...note(24, OUTPUT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>plus the replies,</span>
-        <span style={{ display: "block", ...note(24, OUTPUT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>at the output price</span>
+        <span style={{ display: "block", ...note(24, OUTPUT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>plus the replies,</span>
+        <span style={{ display: "block", ...note(24, OUTPUT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>at the output price</span>
       </Note>
 
       {/* The cut: a rectangle under the system prompt's line, a triangle over it. */}
@@ -440,11 +440,11 @@ export const StairsScene: React.FC = () => {
         />
       </Svg>
       <Note at={sameAt - 6} x={CHART.x0 + 18} y={L + (full.base - L) / 2 - 15}>
-        <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>the system prompt, the same every turn</span>
+        <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the system prompt, the same every turn</span>
       </Note>
       <Leader points={[[700, L - 330], [930, L - 150]]} at={chatAt - 2} out={doubleAt - 4} color={TRI_INK} />
       <Note at={chatAt} out={doubleAt - 4} x={440} y={L - 376}>
-        <span style={{ ...note(28, TRI_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the chat itself, resent</span>
+        <span style={{ ...note(28, TRI_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the chat itself, resent</span>
       </Note>
 
       {/* The ledger: what each part does when the turns double. */}
@@ -533,7 +533,7 @@ export const StairsScene: React.FC = () => {
         const cy = (c.pts[0][1] + c.pts[1][1] + c.pts[2][1]) / 3;
         return (
           <Note key={i} at={i === 0 ? c.at + 4 : c.at + 16} x={cx - 9} y={cy - 18} from="up" style={{ opacity: landed < 0.95 ? 0 : undefined }}>
-            <span style={{ ...note(30, TRI_INK), fontWeight: 750, ...halo }}>{c.n}</span>
+            <span style={{ ...note(30, TRI_INK), fontWeight: 500, ...halo }}>{c.n}</span>
           </Note>
         );
       })}

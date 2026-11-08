@@ -136,29 +136,29 @@ export const PeekScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={dipAt} x={BOX.right} y={at(ys, 0.05) - h(36)} width={150} align="right">
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>p = 0.05</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>p = 0.05</span>
         </Note>
         {/* The two crossings are named in the open space above the dip, where
             no part of the line runs through them. */}
         <Note at={eightHundredAt} x={at(xs, 800) + 20} y={y(426)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             under 0.05 at 800<span style={{ opacity: ease(frame, twoThousandAt, 8) }}>, and again at 2,000</span>
           </span>
         </Note>
         <Note at={stopAt} x={at(xs, 800) + 20} y={y(470)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             stop at either<span style={{ opacity: ease(frame, noiseAt, 8) }}>: you&apos;ve shipped noise</span>
           </span>
         </Note>
         <Note at={finalAt} x={at(xs, PEEK.planned) - 14} y={at(ys, PEEK.final) + h(16)} width={250} align="right">
-          <span style={{ ...note(25, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(25, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             planned end: {PEEK.final.toFixed(2)}
           </span>
         </Note>
 
         {/* Ten thousand A/A tests, four ways of looking. */}
         <Note at={tenAt} x={COL_X} y={y(360)}>
-          <span style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             {PEEK_RATES.sims.toLocaleString("en-US")} A/A tests, significant when checked…
           </span>
         </Note>
@@ -191,7 +191,7 @@ export const PeekScene: React.FC = () => {
                 <line x1={xr(0.05)} x2={xr(0.05)} y1={top + h(28)} y2={top + h(78)} stroke={INK} strokeWidth={1.8} strokeDasharray="4 5" />
               </Svg>
               <Note at={valueAts[i]} x={Math.max(xr(r.r.rate), xr(0.05) + 6) + 12} y={top + h(36)}>
-                <span style={{ ...note(25, bad ? ACCENT_INK : BLUE_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
+                <span style={{ ...note(25, bad ? ACCENT_INK : BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
                   {pct(r.r.rate, 1)}
                 </span>
               </Note>
@@ -199,7 +199,7 @@ export const PeekScene: React.FC = () => {
           );
         })}
         <Note at={valueAts[0] + 4} x={xr(0.05) - 80} y={y(812)} width={160} style={{ textAlign: "center" }}>
-          <span style={{ ...label(20, INK), fontWeight: 600, whiteSpace: "nowrap" }}>5% promised</span>
+          <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>5% promised</span>
         </Note>
 
         {/* Why the bars grow, and what to do instead. */}
@@ -207,7 +207,7 @@ export const PeekScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>each look: one more chance at a false positive</span>
         </Note>
         <Note at={fixAt} x={COL_X} y={y(896)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             fix n in advance<span style={{ opacity: ease(frame, sequentialAt, 8) }}>, or test sequentially</span>
           </span>
         </Note>

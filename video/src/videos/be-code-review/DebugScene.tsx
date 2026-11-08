@@ -397,7 +397,7 @@ export const DebugScene: React.FC = () => {
         ].map((r, i) => (
           <Note key={i} at={r.at} x={LIST_X} y={B + i * 56} out={aiAt - 6}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              <span style={{ fontWeight: 650 }}>{r.q}</span>
+              <span style={{ fontWeight: 500 }}>{r.q}</span>
               {r.a ? (
                 <FadeIn at={r.aAt}>
                   {" "}

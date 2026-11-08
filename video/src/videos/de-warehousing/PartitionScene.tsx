@@ -53,7 +53,7 @@ const Folder: React.FC<{ x: number; y: number; h: number; name: string; at: numb
           justifyContent: "center",
           fontFamily: MONO,
           fontSize: 21,
-          fontWeight: 600,
+          fontWeight: 500,
           color: INK,
         }}
       >
@@ -186,7 +186,7 @@ export const PartitionScene: React.FC = () => {
           ]}
         />
         <Note at={keyAt} x={PLAN_X} y={y(LIST_Y) + h(110)} out={fnAt - 2}>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <QCode>region</QCode> is not the key: nothing to prune
           </span>
         </Note>
@@ -203,7 +203,7 @@ export const PartitionScene: React.FC = () => {
           </span>
         </div>
         <Note at={badAt} x={X0 + 40} y={y(788)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             not a customer ID
             <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, tinyAt, 10) }}>: millions of tiny folders</span>
           </span>
@@ -226,7 +226,7 @@ export const PartitionScene: React.FC = () => {
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             A function on the key defeats pruning on many engines
             <span style={{ opacity: ease(frame, appliedAt, 10) }}>; DuckDB applies it to each folder&apos;s name</span>
-            <span style={{ color: INK, fontWeight: 650, opacity: ease(frame, checkAt, 10) }}>. Check your engine&apos;s plan.</span>
+            <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, checkAt, 10) }}>. Check your engine&apos;s plan.</span>
           </span>
         </Note>
         {/* The habit that prunes everywhere: the raw key, or a range on it (measured: 3 of 12). */}

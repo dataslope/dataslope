@@ -109,7 +109,7 @@ export const SpofScene: React.FC = () => {
           ))}
         </svg>
         {zones.map((z, i) => (
-          <Line key={z.name} x={z.x0 + 4} y={zoneBot + 14} at={zonesAt + 8 + i * 4} size={22} weight={650} color={INK_SOFT}>
+          <Line key={z.name} x={z.x0 + 4} y={zoneBot + 14} at={zonesAt + 8 + i * 4} size={22} weight={500} color={INK_SOFT}>
             {z.name}
           </Line>
         ))}
@@ -155,7 +155,7 @@ export const SpofScene: React.FC = () => {
         <Arrow points={between(B.client, lbB)} at={standbyAt + 6} dash="7 6" color={INK_SOFT} />
         <Box r={storeB} at={failoverAt} title="Key-value store" sub="replica" tone="data" />
         <Arrow points={between(store, storeB)} at={failoverAt + 6} color={BAR} />
-        <Line x={(COL_A + COL_B) / 2} y={B.store.cy - 54} at={failoverAt + 10} size={21} weight={650} color={INK_SOFT} align="center" width={200}>
+        <Line x={(COL_A + COL_B) / 2} y={B.store.cy - 54} at={failoverAt + 10} size={21} weight={500} color={INK_SOFT} align="center" width={200}>
           failover
         </Line>
         <Arrow points={sideRoute(B.app2, storeB, SIDE_B)} at={failoverAt + 8} dur={16} />
@@ -164,36 +164,36 @@ export const SpofScene: React.FC = () => {
         <Arrow points={between(B.app2, cacheB)} at={cacheReplAt + 16} />
 
         {/* What a single point of failure is. */}
-        <Line x={X0} y={y(300)} at={anyAt} size={26} weight={600}>
+        <Line x={X0} y={y(300)} at={anyAt} size={26} weight={500}>
           Single point of failure
         </Line>
         <Line x={X0} y={y(300) + 56} at={anyAt + 6} size={24} color={INK_SOFT} width={LEFT_W}>
           any component whose failure takes the system down
         </Line>
-        <Line x={X0} y={y(300) + 160} at={threeAt} size={26} weight={600} color={ACCENT_INK}>
+        <Line x={X0} y={y(300) + 160} at={threeAt} size={26} weight={500} color={ACCENT_INK}>
           <Num>3</Num> in this diagram
         </Line>
-        <Line x={X0} y={y(716)} at={everyAt} size={24} weight={650} color={ACCENT_INK} width={340} out={redundAt}>
+        <Line x={X0} y={y(716)} at={everyAt} size={24} weight={500} color={ACCENT_INK} width={340} out={redundAt}>
           every read lands on the store at once
         </Line>
 
         {/* The fixes, ticked as they are said. */}
-        <Line x={RX} y={y(300)} at={redundAt} size={26} weight={600} width={330}>
+        <Line x={RX} y={y(300)} at={redundAt} size={26} weight={500} width={330}>
           Remove each with redundancy
         </Line>
         {fixes.map((f, i) => (
           <div key={f.text} style={{ position: "absolute", left: RX, top: y(300) + 112 + i * 54, display: "flex", alignItems: "center", gap: 12, fontSize: 24, opacity: ease(frame, f.at, 10) }}>
             {frame >= f.at ? <Tick at={f.at + 4} size={22} /> : <span style={{ width: 22 }} />}
-            <span style={{ ...label(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{f.text}</span>
+            <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{f.text}</span>
           </div>
         ))}
         <Line x={RX} y={y(300) + 112 + 4 * 54 + 4} at={dcAt} size={21} color={INK_SOFT} width={330}>
           separate data centers in one region
         </Line>
-        <Line x={RX} y={y(700)} at={noneAt} size={28} weight={600} color={OK_INK} width={330}>
+        <Line x={RX} y={y(700)} at={noneAt} size={28} weight={500} color={OK_INK} width={330}>
           No single machine&apos;s death causes an outage.
         </Line>
-        <Line x={RX} y={y(700) - 44} at={goalAt} size={24} weight={650} color={INK_SOFT}>
+        <Line x={RX} y={y(700) - 44} at={goalAt} size={24} weight={500} color={INK_SOFT}>
           The goal
         </Line>
       </Drift>

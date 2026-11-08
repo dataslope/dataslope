@@ -46,7 +46,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -236,7 +236,7 @@ export const Call: React.FC<{ at: number; x: number; y: number; children: React.
         opacity: p * (1 - o),
         fontFamily: MONO,
         fontSize: 21,
-        fontWeight: 600,
+        fontWeight: 500,
         color: INK_SOFT,
         whiteSpace: "nowrap",
         fontVariantLigatures: "none",
@@ -280,12 +280,12 @@ export const LabelEnd: React.FC<{
         whiteSpace: "nowrap",
       }}
     >
-      <span style={{ opacity: p, fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none" }}>
+      <span style={{ opacity: p, fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>
         {call}
       </span>
       {/* The count at 22px beside the 21px call: one line, one size. */}
       {count ? (
-        <span style={{ ...note(22, countColor), fontWeight: 650, opacity: c, transform: `translateY(${(1 - c) * 6}px)`, display: "inline-block" }}>
+        <span style={{ ...note(22, countColor), fontWeight: 500, opacity: c, transform: `translateY(${(1 - c) * 6}px)`, display: "inline-block" }}>
           {count}
         </span>
       ) : null}
@@ -407,7 +407,7 @@ export const Chip: React.FC<{
         justifyContent: "center",
         fontFamily: MONO,
         fontSize: size,
-        fontWeight: 600,
+        fontWeight: 500,
         lineHeight: 1,
         color: g > 0 ? `color-mix(in srgb, ${INK_SOFT} ${(g * 100).toFixed(0)}%, ${INK})` : INK,
         whiteSpace: "pre",
@@ -487,7 +487,7 @@ export const Tag: React.FC<{
         transform: `translate(${tx}, ${(1 - p) * -6}px)`,
         opacity: p * (1 - o),
         ...note(size, color),
-        fontWeight: 600,
+        fontWeight: 500,
         whiteSpace: "nowrap",
       }}
     >
@@ -596,7 +596,7 @@ export const Result: React.FC<{
   out?: number;
   children: React.ReactNode;
 }> = ({ at, x, y, color = INK, size = 30, out, children }) => (
-  <Ink at={at} dur={16} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", ...note(size, color), fontWeight: 600 }}>
+  <Ink at={at} dur={16} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", ...note(size, color), fontWeight: 500 }}>
     {children}
   </Ink>
 );

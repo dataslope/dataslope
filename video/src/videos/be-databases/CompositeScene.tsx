@@ -181,7 +181,7 @@ export const CompositeScene: React.FC = () => {
                 <g key={i} opacity={p}>
                   <rect x={lastX + 4} y={rowTop(i) + 3} width={bookW - 8} height={h(BOOK_ROW) - 6} rx={3} fill={band} />
                   {i > 0 ? <line x1={lastX} x2={lastX + bookW} y1={rowTop(i)} y2={rowTop(i)} stroke={`color-mix(in srgb, ${INK} 14%, transparent)`} /> : null}
-                  <text x={lastX + 16} y={rowMid(i) + 8} style={svgText({ ...note(23, groupStart ? INK : INK_SOFT), fontWeight: groupStart ? 650 : 500 })}>
+                  <text x={lastX + 16} y={rowMid(i) + 8} style={svgText({ ...note(23, groupStart ? INK : INK_SOFT), fontWeight: groupStart ? 500 : 500 })}>
                     {last}
                   </text>
                   <text x={firstX + 16} y={rowMid(i) + 8} style={svgText(note(23, INK))}>
@@ -275,7 +275,7 @@ export const CompositeScene: React.FC = () => {
                   const fill = read > 0 ? inkOf.yellow : day > 0 ? ACCENT : lit42 > 0 ? BAR : `color-mix(in srgb, ${BAR} 45%, ${PAPER})`;
                   return <rect key={k} x={tick(g, k) - 2.5} y={stripY + 10} width={5} height={stripH - 20} rx={2} fill={fill} />;
                 })}
-                <text x={STRIP_X + g * groupW + groupW / 2} y={stripY + stripH + 30} textAnchor="middle" style={svgText({ ...label(20, g === g42 ? INK : INK_SOFT), fontWeight: g === g42 ? 700 : 600 })}>
+                <text x={STRIP_X + g * groupW + groupW / 2} y={stripY + stripH + 30} textAnchor="middle" style={svgText({ ...label(20, g === g42 ? INK : INK_SOFT), fontWeight: g === g42 ? 500 : 500 })}>
                   {c}
                 </text>
               </g>
@@ -351,25 +351,25 @@ export const CompositeScene: React.FC = () => {
           { line: "Buffers", text: "hit=13", at: thirteenAt, color: MARK_GREEN },
         ]} />
         <Note at={thirteenAt} x={NOTE_X} y={planTop + h(4)} out={dayAt - 4}>
-          <div style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{COMPOSITE.latestPages} pages</div>
+          <div style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{COMPOSITE.latestPages} pages</div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(10), opacity: ease(frame, noSortAt, 10) }}>newest first, no Sort node</div>
         </Note>
         <PlanBox lines={dayShown} x={X0} top={planTop} width={1260} size={19} at={dayAt + 4} out={swapAt - 4} marks={[{ line: "Seq Scan", text: "Seq Scan", at: tableAt, color: MARK_RED }]} />
         <Note at={tableAt + 4} x={NOTE_X} y={planTop + h(4)} out={swapAt - 4}>
-          <div style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>one day, in every run:</div>
+          <div style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one day, in every run:</div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(6) }}>
             <Num>{thousands(COMPOSITE.dayCount)}</Num> orders, read from the table
           </div>
         </Note>
         <PlanBox lines={reverseShown} x={X0} top={planTop} width={1260} size={19} at={sameAt + 4} out={skipAt - 4} marks={[{ line: "Buffers", text: "hit=13 read=1824", at: eighteenAt, color: MARK_RED }]} />
         <Note at={eighteenAt} x={NOTE_X} y={planTop + h(4)} out={ruleAt - 4}>
-          <div style={{ ...note(28, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{thousands(COMPOSITE.reversePages)} pages</div>
+          <div style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{thousands(COMPOSITE.reversePages)} pages</div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(10) }}>for the same ten orders</div>
         </Note>
         <Note at={ruleAt} x={NOTE_X} y={planTop + h(4)} out={skipAt - 4}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Order the columns:</div>
-          <div style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, equalityAt, 10) }}>equality first,</div>
-          <div style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: h(4), opacity: ease(frame, rangeAt, 10) }}>then range or sort</div>
+          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, equalityAt, 10) }}>equality first,</div>
+          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(4), opacity: ease(frame, rangeAt, 10) }}>then range or sort</div>
         </Note>
         <PlanBox lines={skipShown} x={X0} top={planTop} width={1260} size={19} at={statusAt + 4} marks={[
           { line: "Index Only Scan", text: "Index Only Scan", at: withoutAt, color: MARK_GREEN },
@@ -381,7 +381,7 @@ export const CompositeScene: React.FC = () => {
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, fewAt, 10) }}>
             when <SmallMono>status</SmallMono> has few values
           </div>
-          <div style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, neverAt, 10) }}>never touched the table</div>
+          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, neverAt, 10) }}>never touched the table</div>
         </Note>
       </Drift>
     </AbsoluteFill>

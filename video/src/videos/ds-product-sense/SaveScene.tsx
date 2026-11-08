@@ -57,7 +57,7 @@ export const SaveScene: React.FC = () => {
   const tree = ease(frame, jobAt, 20);
   const rowLabel = (text: string, at: number, color: string, top: number) => (
     <Note at={at} x={TREE_X} y={top + h(10)}>
-      <span style={{ ...label(22, color), fontWeight: 600, whiteSpace: "nowrap" }}>{text}</span>
+      <span style={{ ...label(22, color), fontWeight: 500, whiteSpace: "nowrap" }}>{text}</span>
     </Note>
   );
 
@@ -99,7 +99,7 @@ export const SaveScene: React.FC = () => {
             <svg width={26} height={34} style={{ overflow: "visible" }}>
               <Bookmark x={0} y={0} size={32} color={PAPER} />
             </svg>
-            <span style={{ ...note(30, PAPER), fontWeight: 600, whiteSpace: "nowrap" }}>Save for later</span>
+            <span style={{ ...note(30, PAPER), fontWeight: 500, whiteSpace: "nowrap" }}>Save for later</span>
           </div>
           {RECIPES.map((r, i) => {
             const top = y(ROWS.job) + h(110) + i * h(64);
@@ -117,7 +117,7 @@ export const SaveScene: React.FC = () => {
             );
           })}
           <Note at={weekAt + 14} x={X0} y={y(ROWS.job) + h(110) + 4 * h(64) + h(6)}>
-            <span style={{ ...label(21, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>cooked within a week</span>
+            <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>cooked within a week</span>
           </Note>
           <Note at={backAt + 4} x={X0} y={y(ROWS.not) + h(70)}>
             <span style={madeUp()}>recipes made up for this video</span>
@@ -169,7 +169,7 @@ export const SaveScene: React.FC = () => {
           </Tag>
           <Note at={interactionAt} x={TREE_X + ROW_LABEL_W + 330} y={y(ROWS.not) + h(10)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-              <span style={{ color: ACCENT_INK, fontWeight: 650 }}>the interaction</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 500 }}>the interaction</span>
               <span style={{ opacity: ease(frame, valueAt, 10) }}>, not the value</span>
             </span>
           </Note>

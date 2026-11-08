@@ -121,7 +121,7 @@ export const MismatchScene: React.FC = () => {
           return (
             <React.Fragment key={k}>
               <Ink at={thirdAt - 6 + k * 3} dur={10} out={out8} style={{ left: X0, top: ry, whiteSpace: "nowrap", opacity: 1 - (mine ? 0 : boardDim) }}>
-                <span style={{ ...label(24, mine ? A_INK : INK_SOFT), fontWeight: 600 }}>{["1st", "2nd", "3rd"][k]}</span>
+                <span style={{ ...label(24, mine ? A_INK : INK_SOFT), fontWeight: 500 }}>{["1st", "2nd", "3rd"][k]}</span>
               </Ink>
               <Svg opacity={ease(frame, thirdAt - 4 + k * 3, 12) * (1 - ease(frame, out8, 10)) * (1 - (mine ? 0 : boardDim))}>
                 <rect x={X0 + 80} y={ry + 4} width={[420, 390, 370][k]} height={26} rx={3} fill={mine ? A : B} />
@@ -145,7 +145,7 @@ export const MismatchScene: React.FC = () => {
             <Ink at={at} dur={12} style={{ left: X0, top: ry - 20, whiteSpace: "nowrap" }}>
               {/* The numeral in the question's own face, so the line is one
                   size and one family. */}
-              <span style={{ ...body(40), color: A_INK, fontWeight: 600, display: "inline-block", width: 48 }}>{i + 1}</span>
+              <span style={{ ...body(40), color: A_INK, fontWeight: 500, display: "inline-block", width: 48 }}>{i + 1}</span>
               <span style={{ ...body(40), color: INK }}>{last ? <Marked at={lastAt - 2}>{q.q}</Marked> : q.q}</span>
             </Ink>
             <Ink at={at + 8} dur={12} style={{ left: 780, top: ry - 10, whiteSpace: "nowrap" }}>
@@ -161,7 +161,7 @@ export const MismatchScene: React.FC = () => {
       </Ink>
       <Arrow from={[NO_X + 90, y(Q_Y[3]) + 2]} to={[NO_X + 200, y(Q_Y[3]) + 2]} at={findAt - 6} dur={12} color={INK} />
       <Ink at={findAt - 2} dur={14} style={{ left: NO_X + 220, top: y(Q_Y[3]) - 13, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(26, INK), fontWeight: 600, padding: "4px 12px", background: PAPER }}>find out yourself</span>
+        <span style={{ ...label(26, INK), fontWeight: 500, padding: "4px 12px", background: PAPER }}>find out yourself</span>
       </Ink>
     </AbsoluteFill>
   );

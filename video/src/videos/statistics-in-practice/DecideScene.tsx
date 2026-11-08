@@ -115,14 +115,14 @@ export const DecideScene: React.FC = () => {
 
       {/* ── This test ── */}
       <Ink at={decideFrom - 2} dur={14} style={{ left: 320, top: y(OURS) - 62, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK), fontWeight: 600 }}>This test</span>
+        <span style={{ ...label(22, INK), fontWeight: 500 }}>This test</span>
         <span style={{ ...note(21, INK_SOFT), marginLeft: 12 }}>
           {fmt(pp(EXPERIMENT.pA))}% to {fmt(pp(EXPERIMENT.pB))}%
         </span>
       </Ink>
       <Interval lo={pp(EXPERIMENT.ciLow)} hi={pp(EXPERIMENT.ciHigh)} mid={lift} y={y(OURS)} t={ours} />
       <Note at={wholeAt - 4} x={sx(X, pp(EXPERIMENT.ciLow))} y={y(OURS) + 22}>
-        <span style={{ ...note(21, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(21, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           the whole interval clears zero
         </span>
       </Note>
@@ -130,18 +130,18 @@ export const DecideScene: React.FC = () => {
       {/* Its low end: what the size question turns on. */}
       <Ring x={sx(X, pp(EXPERIMENT.ciLow))} y={y(OURS)} at={littleAt - 2} r1={56} />
       <Note at={littleAt} x={sx(X, pp(EXPERIMENT.ciLow))} y={y(OURS) + 58}>
-        <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           but it could be as little as +{fmt(pp(EXPERIMENT.ciLow))}
         </span>
       </Note>
 
       {/* ── The lesson's huge test ── */}
       <Ink at={testAt - 4} dur={14} style={{ left: 320, top: y(HUGE) - 62, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK), fontWeight: 600 }}>A huge test</span>
+        <span style={{ ...label(22, INK), fontWeight: 500 }}>A huge test</span>
       </Ink>
       <Ink at={eightAt - 4} dur={18} style={{ left: 470, top: y(HUGE) - 66, whiteSpace: "nowrap" }}>
         {/* Within a size of "A huge test" beside it: one line, one size. */}
-        <span style={{ ...note(24, INK), fontWeight: 600 }}>
+        <span style={{ ...note(24, INK), fontWeight: 500 }}>
           {fmt(pp(TINY.pA))}% to {fmt(pp(TINY.pB))}%
         </span>
       </Ink>
@@ -188,7 +188,7 @@ export const DecideScene: React.FC = () => {
         </Svg>
       ) : null}
       <Note at={sigAt - 6} x={sx(ZOOM, 0) + 22} y={zoomTop + 6}>
-        <span style={{ ...note(21, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           magnified: {fmt(pp(TINY.ciLow), 3)} to {fmt(pp(TINY.ciHigh), 3)} points, clear of zero too
         </span>
       </Note>
@@ -200,11 +200,11 @@ export const DecideScene: React.FC = () => {
         </Ink>
         <Check x={COL[0] + 20} y={y(OURS)} at={yesAt - 4} />
         <Ink at={yesAt} dur={12} style={{ left: COL[0] + 62, top: y(OURS) - 16, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK), fontWeight: 600 }}>yes</span>
+          <span style={{ ...note(22, INK), fontWeight: 500 }}>yes</span>
         </Ink>
         <Check x={COL[0] + 20} y={y(HUGE)} at={sigAt - 4} />
         <Ink at={realAt - 4} dur={12} style={{ left: COL[0] + 62, top: y(HUGE) - 16, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK), fontWeight: 600 }}>yes, real</span>
+          <span style={{ ...note(22, INK), fontWeight: 500 }}>yes, real</span>
         </Ink>
       </div>
       <Ink at={bigAt - 6} dur={14} style={{ left: COL[1], top: y(HEAD_Y), whiteSpace: "nowrap" }}>
@@ -219,13 +219,13 @@ export const DecideScene: React.FC = () => {
         <span style={{ ...note(22, INK_SOFT) }}>not math</span>
       </Ink>
       <Ink at={onlyAt - 4} dur={16} style={{ left: COL[1], top: y(OURS) + 58, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500 }}>
           ship only if <Marker at={worthAt - 4}>1 point is worth it</Marker>
         </span>
       </Ink>
       <Cross x={COL[1] + 16} y={y(HUGE)} at={worthlessAt - 4} />
       <Ink at={worthlessAt - 2} dur={12} style={{ left: COL[1] + 46, top: y(HUGE) - 16, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>no: worthless</span>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500 }}>no: worthless</span>
       </Ink>
     </AbsoluteFill>
   );

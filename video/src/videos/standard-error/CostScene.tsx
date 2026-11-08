@@ -178,11 +178,11 @@ export const CostScene: React.FC = () => {
               align={mk.align}
               from={mk.align === "left" ? "left" : "right"}
             >
-              <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, ...halo }}>{fmt(se, 1)}</span>
+              <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, ...halo }}>{fmt(se, 1)}</span>
             </Note>
             {mk.n % 400 !== 0 ? (
               <Note at={mk.at} x={px - 60} width={120} y={y(BASE) + 34} from="up" style={{ textAlign: "center" }}>
-                <span style={{ ...note(21, ACCENT_INK), fontWeight: 600 }}>{thousands(mk.n)}</span>
+                <span style={{ ...note(21, ACCENT_INK), fontWeight: 500 }}>{thousands(mk.n)}</span>
               </Note>
             ) : null}
           </React.Fragment>
@@ -206,7 +206,7 @@ export const CostScene: React.FC = () => {
         return (
           <Note key={g.side} at={at} x={g.x} y={y(SQ_BASE) + 14}>
             <div style={{ ...headline(30), ...TABULAR }}>{thousands(people)}</div>
-            <div style={{ ...note(20, ACCENT_INK), fontWeight: 600, marginTop: 2 }}>error {fmt(se, 1)}</div>
+            <div style={{ ...note(20, ACCENT_INK), fontWeight: 500, marginTop: 2 }}>error {fmt(se, 1)}</div>
           </Note>
         );
       })}

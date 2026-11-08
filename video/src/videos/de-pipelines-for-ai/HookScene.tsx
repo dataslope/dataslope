@@ -141,7 +141,7 @@ export const HookScene: React.FC = () => {
           <span style={say(26, INK_SOFT)}>the fundamentals carry over</span>
         </Note>
         <Note at={storeAt - 4} x={X0} y={STEP_Y + 134}>
-          <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             what&apos;s new: <Mark at={storeAt + 2}>the vector store</Mark>
             <span style={{ opacity: ease(frame, billAt - 4, 10) }}>
               , <Mark at={billAt + 2}>the embedding bill</Mark>

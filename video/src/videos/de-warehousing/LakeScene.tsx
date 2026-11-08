@@ -210,10 +210,10 @@ export const LakeScene: React.FC = () => {
             <FileChip key={f} x={px(1) + 24 + (k % 2) * 220} y={boxY + h(26) + Math.floor(k / 2) * h(52)} name={f} at={filesAt + k * 3} />
           ))}
           <Note at={openAt} x={px(1)} y={y(NOTES_Y)}>
-            <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>open, cheap, flexible</span>
+            <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>open, cheap, flexible</span>
           </Note>
           <Note at={noTxAt} x={px(1)} y={y(NOTES_Y) + h(40)}>
-            <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>no transactions, no schema enforcement</span>
+            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no transactions, no schema enforcement</span>
           </Note>
 
           {/* ── The lakehouse: a log over the files ── */}
@@ -306,7 +306,7 @@ export const LakeScene: React.FC = () => {
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>upsert: update the row with that key, or insert it</span>
           </Note>
           <Note at={reliableAt} x={X0} y={y(790)}>
-            <span style={{ ...note(27, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a warehouse&apos;s reliability, on the lake&apos;s open, cheaper storage</span>
+            <span style={{ ...note(27, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a warehouse&apos;s reliability, on the lake&apos;s open, cheaper storage</span>
           </Note>
         </div>
 

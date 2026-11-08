@@ -42,7 +42,7 @@ const Badge: React.FC<{ kind: "yes" | "no" | number; at: number; x: number; y: n
         ) : kind === "no" ? (
           <path d="M-7,-7 L7,7 M7,-7 L-7,7" fill="none" stroke={PAPER} strokeWidth={4} strokeLinecap="round" />
         ) : (
-          <text y={11} textAnchor="middle" style={svgText({ ...body(31), color: String(NUMBER_BADGE.color), fontWeight: 600 })}>
+          <text y={11} textAnchor="middle" style={svgText({ ...body(31), color: String(NUMBER_BADGE.color), fontWeight: 500 })}>
             {kind}
           </text>
         )}

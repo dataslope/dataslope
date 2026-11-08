@@ -61,7 +61,7 @@ const Marker: React.FC<{
           textAlign: align === "center" ? "center" : align === "end" ? "right" : "left",
           opacity: ease(frame, from + 4, 10) * (1 - o),
           ...note(23, color),
-          fontWeight: 650,
+          fontWeight: 500,
           whiteSpace: "nowrap",
           ...TABULAR,
         }}
@@ -204,19 +204,19 @@ export const CoefScene: React.FC = () => {
 
         <Note at={useAt - 2} x={96} y={y(492)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            Spearman for <span style={{ color: OK_INK, fontWeight: 650 }}>monotonic, not straight</span>, or ordinal data
+            Spearman for <span style={{ color: OK_INK, fontWeight: 500 }}>monotonic, not straight</span>, or ordinal data
             <span style={{ color: INK_SOFT, opacity: ease(frame, ordinalAt - 2, 10) }}> (ranked categories, like a 1-to-5 rating)</span>
           </span>
         </Note>
 
         {/* Spearman misses the U as well: a reason to plot first. */}
         <Note at={neitherAt - 2} x={(U_X.a + U_X.b) / 2 - 200} width={400} y={y(586)} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             Spearman: {SHAPE.uSpearman < 0 ? `−${fmt(-SHAPE.uSpearman)}` : fmt(SHAPE.uSpearman)}
           </span>
         </Note>
         <Note at={plotAt - 2} x={(U_X.a + U_X.b) / 2 - 200} width={400} y={y(586) + 40} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>plot the data first</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>plot the data first</span>
         </Note>
       </Drift>
     </AbsoluteFill>

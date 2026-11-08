@@ -110,8 +110,8 @@ export const ScoringScene: React.FC = () => {
               />
             ) : null}
             <Ink at={t.at} dur={14} style={{ left: COL_X[i], top: y(TITLE_Y) - 4, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(28, A_INK), fontWeight: 600, marginRight: 14 }}>{i + 1}</span>
-              <span style={{ ...label(28, INK), fontWeight: 600 }}>{t.text}</span>
+              <span style={{ ...label(28, A_INK), fontWeight: 500, marginRight: 14 }}>{i + 1}</span>
+              <span style={{ ...label(28, INK), fontWeight: 500 }}>{t.text}</span>
             </Ink>
           </React.Fragment>
         ))}
@@ -143,7 +143,7 @@ export const ScoringScene: React.FC = () => {
         ].map((p, i) => (
           <React.Fragment key={p.text}>
             <Ink at={p.at - 4} dur={12} style={{ left: COL_X[1] + 54, top: y(GLYPH_Y) + 24 + i * 96, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(28, INK), fontWeight: 600 }}>{p.text}</span>
+              <span style={{ ...note(28, INK), fontWeight: 500 }}>{p.text}</span>
             </Ink>
             <Svg opacity={ease(frame, propertiesAt - 2, 12)}>
               <rect x={COL_X[1]} y={y(GLYPH_Y) + 22 + i * 96} width={36} height={36} rx={7} fill={PAPER} stroke={INK_SOFT} strokeWidth={2} />
@@ -186,7 +186,7 @@ export const ScoringScene: React.FC = () => {
           );
         })}
         <Ink at={longerAt - 2} dur={14} style={{ left: COL_X[2], top: y(GLYPH_Y) + LONGER_Y, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, TRAP_INK), fontWeight: 600 }}>favors longer answers</span>
+          <span style={{ ...note(23, TRAP_INK), fontWeight: 500 }}>favors longer answers</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

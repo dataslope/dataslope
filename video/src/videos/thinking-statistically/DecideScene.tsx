@@ -140,7 +140,7 @@ export const DecideScene: React.FC = () => {
             <div style={{ ...note(22, INK_SOFT), marginTop: 4 }}>{r.scale}</div>
           </Ink>
           <Ink at={r.sumAt} dur={14} style={{ left: COLS[1], top: rowY(i) + 14, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(28, INK), fontWeight: 600 }}>
+            <span style={{ ...note(28, INK), fontWeight: 500 }}>
               {i === 2 ? (
                 <>
                   {/* "Is its average the typical value? Not always." */}
@@ -155,10 +155,10 @@ export const DecideScene: React.FC = () => {
             </span>
           </Ink>
           <Ink at={r.exAt} dur={14} style={{ left: COLS[2], top: rowY(i) + 14, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(28, STAT_INK), fontWeight: 650 }}>{r.example}</span>
+            <span style={{ ...note(28, STAT_INK), fontWeight: 500 }}>{r.example}</span>
             {i === 2 ? (
               // "Not always": the typical price, well below the mean.
-              <span style={{ ...note(28, INK), fontWeight: 650, opacity: ease(frame, notAlwaysAt - 2, 12) }}>
+              <span style={{ ...note(28, INK), fontWeight: 500, opacity: ease(frame, notAlwaysAt - 2, 12) }}>
                 , median ${fmt(ZIPS.priceMedian)}
               </span>
             ) : null}
@@ -192,7 +192,7 @@ export const DecideScene: React.FC = () => {
             </Ink>
             {/* The test in the line's own face and size, set apart by weight. */}
             <Ink at={t.at - 6} dur={14} style={{ position: "relative" }}>
-              <span style={{ ...note(28, INK), fontWeight: 650 }}>{t.test}</span>
+              <span style={{ ...note(28, INK), fontWeight: 500 }}>{t.test}</span>
             </Ink>
           </div>
         ))}

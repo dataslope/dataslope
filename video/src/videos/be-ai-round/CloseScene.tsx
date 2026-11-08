@@ -87,10 +87,10 @@ export const CloseScene: React.FC = () => {
                 />
               )}
               <Ink at={at + 4} dur={12} style={{ left: x, top: y(ROW_V) + h(ART_H) + h(14), width: COL_W, textAlign: "center" }}>
-                <div style={{ ...label(20, i === ours ? ACCENT_INK : INK_SOFT), fontWeight: 600 }}>
+                <div style={{ ...label(20, i === ours ? ACCENT_INK : INK_SOFT), fontWeight: 500 }}>
                   <Num>{s.n}</Num>
                 </div>
-                <div style={{ ...note(20, INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 2 }}>
+                <div style={{ ...note(20, INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 2 }}>
                   {i === ours ? <Mark at={jobAt}>{s.title}</Mark> : s.title}
                 </div>
               </Ink>
@@ -145,7 +145,7 @@ export const CloseScene: React.FC = () => {
                 transform: `translateY(${(1 - q) * 12}px)`,
               }}
             >
-              <div style={{ ...note(44, BLUE_INK), fontWeight: 750, lineHeight: 1.1 }}>
+              <div style={{ ...note(44, BLUE_INK), fontWeight: 500, lineHeight: 1.1 }}>
                 <Num>{p.count}</Num>
               </div>
               <div style={{ ...note(24, INK), marginTop: 10, whiteSpace: "nowrap" }}>{p.text}</div>

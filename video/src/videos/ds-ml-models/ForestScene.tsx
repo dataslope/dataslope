@@ -222,7 +222,7 @@ export const ForestScene: React.FC = () => {
               top: y(GRID_TOP) - h(46),
               opacity: gridOn,
               ...label(22, INK),
-              fontWeight: 650,
+              fontWeight: 500,
               whiteSpace: "nowrap",
             }}
           >
@@ -261,7 +261,7 @@ export const ForestScene: React.FC = () => {
             <span
               style={{
                 ...note(25, INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -310,7 +310,7 @@ export const ForestScene: React.FC = () => {
             <span
               style={{
                 ...label(22, INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -357,7 +357,7 @@ export const ForestScene: React.FC = () => {
                     top: top + h(10),
                     opacity: p,
                     ...note(24, INK),
-                    fontWeight: 600,
+                    fontWeight: 500,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -380,7 +380,7 @@ export const ForestScene: React.FC = () => {
                     top: top + h(8),
                     opacity: p,
                     ...note(28, b.ink),
-                    fontWeight: 600,
+                    fontWeight: 500,
                     ...TABULAR,
                   }}
                 >
@@ -396,7 +396,7 @@ export const ForestScene: React.FC = () => {
             <span
               style={{
                 ...label(21, INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -528,7 +528,7 @@ export const ForestScene: React.FC = () => {
             <span
               style={{
                 ...label(21, INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -546,7 +546,7 @@ export const ForestScene: React.FC = () => {
             <span
               style={{
                 ...note(25, ACCENT_INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -559,7 +559,7 @@ export const ForestScene: React.FC = () => {
             <span
               style={{
                 ...note(28, INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -589,7 +589,7 @@ export const ForestScene: React.FC = () => {
             <span
               style={{
                 ...note(28, INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -610,7 +610,7 @@ export const ForestScene: React.FC = () => {
             <span
               style={{
                 ...note(24, OK_INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >

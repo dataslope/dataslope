@@ -173,7 +173,7 @@ export const RecursiveScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>pass 3 adds no rows: done</span>
         </Note>
         <Note at={sevenAt} x={TREE_X0} y={bottom + h(70)}>
-          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", fontWeight: 650 }}>
+          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", fontWeight: 500 }}>
             <Num>{people}</Num> people, <Num>{depths.length}</Num> levels
           </span>
         </Note>

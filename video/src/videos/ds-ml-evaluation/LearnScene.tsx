@@ -76,8 +76,8 @@ export const LearnScene: React.FC = () => {
         <div style={{ opacity: 1 - 0.45 * ease(frame, scoringAt, 16) }}>
           <Note at={bothAt - 2} x={LEFT.left} y={y(270)} out={end - 8}>
             <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-              Train on more and more data; track <span style={{ color: BLUE_INK, fontWeight: 650 }}>training</span> and{" "}
-              <span style={{ fontWeight: 650 }}>validation</span> error.
+              Train on more and more data; track <span style={{ color: BLUE_INK, fontWeight: 500 }}>training</span> and{" "}
+              <span style={{ fontWeight: 500 }}>validation</span> error.
             </span>
           </Note>
 
@@ -108,7 +108,7 @@ export const LearnScene: React.FC = () => {
                   strokeWidth={2}
                   strokeDasharray="3 7"
                 />
-                <text x={p.b.right} y={at(ysOf(p.b), LEARN.noise) - 10} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 650 })}>
+                <text x={p.b.right} y={at(ysOf(p.b), LEARN.noise) - 10} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
                   the noise: {fmt(LEARN.noise)}
                 </text>
               </Svg>
@@ -137,7 +137,7 @@ export const LearnScene: React.FC = () => {
             </span>
           </Note>
           <Note at={biasAt - 2} x={LEFT.left} y={y(LEFT.bottom) + h(76)} out={end - 8}>
-            <span style={{ ...note(27, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               bias: more data won&apos;t help
               {/* What will, in the right answer's green. */}
               <span style={{ color: OK_INK, opacity: ease(frame, flexAt - 2, 10) }}>; a more flexible model will</span>
@@ -149,10 +149,10 @@ export const LearnScene: React.FC = () => {
             <line x1={gx} x2={gx} y1={gTrain} y2={gTrain + (gVal - gTrain) * wideP} stroke={ACCENT} strokeWidth={4} strokeLinecap="round" />
           </Svg>
           <Note at={wideAt + 4} x={gx + 16} y={(gTrain + gVal) / 2 - h(16)} out={closesAt + 20}>
-            <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the gap</span>
+            <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the gap</span>
           </Note>
           <Note at={varianceAt - 2} x={RIGHT.left} y={y(RIGHT.bottom) + h(76)} out={end - 8}>
-            <span style={{ ...note(27, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(27, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               variance: <Mark at={cureAt}>more data helps</Mark>
             </span>
           </Note>

@@ -129,7 +129,7 @@ export const AbScene: React.FC = () => {
                   left: X.x0 + (sx(X, b.value) - X.x0) * b.grow + 16,
                   top: y(ROW_Y[i]) - 22,
                   ...note(34, DATA_INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                   ...halo,
                 }}
@@ -156,7 +156,7 @@ export const AbScene: React.FC = () => {
                 transform: "translateX(-50%)",
                 opacity: ease(frame, nearlyAt + k * 6, 8),
                 ...note(22, PAPER),
-                fontWeight: 600,
+                fontWeight: 500,
               }}
             >
               {k + 1}
@@ -167,7 +167,7 @@ export const AbScene: React.FC = () => {
           <span
             style={{
               ...note(26, STAT_INK),
-              fontWeight: 600,
+              fontWeight: 500,
               display: "inline-block",
               transform: `scale(${1 + 0.1 * manyGlow})`,
               transformOrigin: "100% 50%",

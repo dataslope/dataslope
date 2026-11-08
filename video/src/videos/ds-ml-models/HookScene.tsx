@@ -156,7 +156,7 @@ export const HookScene: React.FC = () => {
                 dim={dim}
               >
                 <span
-                  style={{ ...note(44, BLUE_INK), fontWeight: 600, ...TABULAR }}
+                  style={{ ...note(44, BLUE_INK), fontWeight: 500, ...TABULAR }}
                 >
                   {Math.round(p.model.test * 100)}%
                 </span>
@@ -189,7 +189,7 @@ export const HookScene: React.FC = () => {
           <span
             style={{
               ...note(30, INK),
-              fontWeight: 650,
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,
             }}

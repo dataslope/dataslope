@@ -39,7 +39,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -245,7 +245,7 @@ export const Tag: React.FC<{
         whiteSpace: "nowrap",
         fontFamily: label().fontFamily,
         fontSize: size,
-        fontWeight: bold ? 700 : 560,
+        fontWeight: bold ? 500 : 500,
         // Lining figures only: tabular ones set Inter's hyphen a digit wide
         // ("Heavy - tailed"). A number that counts takes TABULAR on its span.
         fontVariantNumeric: "lining-nums",

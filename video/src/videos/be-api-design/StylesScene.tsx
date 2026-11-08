@@ -115,7 +115,7 @@ export const StylesScene: React.FC = () => {
         {heads.map((hd, i) => (
           <React.Fragment key={hd.name}>
             <Note at={hd.at} x={COLS[i]} y={headTop}>
-              <div style={{ ...label(32, INK), fontWeight: 750, whiteSpace: "nowrap" }}>{hd.name}</div>
+              <div style={{ ...label(32, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{hd.name}</div>
               <div style={{ ...note(22, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>{hd.what}</div>
             </Note>
             {lines[i].plus.map(([t, at], k) => (
@@ -144,11 +144,11 @@ export const StylesScene: React.FC = () => {
           return (
             <Note key={t} at={at} x={COLS[0]} y={figTop + h(44) + i * h(46)}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 21 }}>
-                <span style={{ ...label(23, BLUE_INK), fontWeight: 750, width: 22, textAlign: "right" }}>
+                <span style={{ ...label(23, BLUE_INK), fontWeight: 500, width: 22, textAlign: "right" }}>
                   <Num>{i + 1}</Num>
                 </span>
                 <span style={{ fontFamily: MONO, fontSize: 21, color: INK, whiteSpace: "pre" }}>
-                  <span style={{ color: METHOD_INK, fontWeight: 600 }}>GET</span>
+                  <span style={{ color: METHOD_INK, fontWeight: 500 }}>GET</span>
                   {t.slice(3)}
                 </span>
                 <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, tripsAt + i * 4, 8) }}>↻</span>
@@ -163,7 +163,7 @@ export const StylesScene: React.FC = () => {
             {QUERY.map((l, i) => {
               const field = /title|name|text/.test(l);
               return (
-                <div key={i} style={{ fontFamily: MONO, fontSize: Q_SIZE, lineHeight: "30px", whiteSpace: "pre", color: field ? INK : INK_SOFT, fontWeight: field ? 650 : 500, opacity: ease(frame, exactlyAt + i * 3, 8) }}>
+                <div key={i} style={{ fontFamily: MONO, fontSize: Q_SIZE, lineHeight: "30px", whiteSpace: "pre", color: field ? INK : INK_SOFT, fontWeight: field ? 500 : 500, opacity: ease(frame, exactlyAt + i * 3, 8) }}>
                   {field ? (
                     <>
                       {l.match(/^\s*/)![0]}

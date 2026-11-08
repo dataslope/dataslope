@@ -97,18 +97,18 @@ export const MeasureScene: React.FC = () => {
         {/* The rubric: a good reply, line by line, pass or fail, as a ruled
             list of plain text under its label. */}
         <Note at={goodAt - 2} x={CARD.x} y={y(CARD.top + 40)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 600 }}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>
             <span style={{ opacity: 1 - ease(frame, rubricAt, 12) }}>a good reply is</span>
           </span>
         </Note>
         <Note at={rubricAt} x={CARD.x} y={y(CARD.top + 40)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600 }}>the rubric</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>the rubric</span>
         </Note>
         {lines.map((l, i) => (
           <React.Fragment key={l.text}>
             <Note at={l.at - 2} x={CARD.x} y={y(CARD.top + 80) + i * h(CARD.row)}>
               <div style={{ display: "flex", alignItems: "center", gap: 22, width: CARD.w - 60 }}>
-                <span style={{ ...note(28, INK), fontWeight: 600, flex: 1 }}>{l.text}</span>
+                <span style={{ ...note(28, INK), fontWeight: 500, flex: 1 }}>{l.text}</span>
                 <Verdict at={passAt + i * 3} ok />
                 <Verdict at={passAt + 2 + i * 3} ok={false} />
               </div>

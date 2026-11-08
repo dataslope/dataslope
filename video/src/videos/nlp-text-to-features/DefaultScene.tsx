@@ -202,7 +202,7 @@ export const DefaultScene: React.FC = () => {
             y={y(BASE_Y) - h(MAX_H) * (d.v / TOP_V) - 40}
             style={{ transform: "translateX(-50%)" }}
           >
-            <span style={{ ...note(22, d.j === THE && top > 0.5 ? ACCENT_INK : INK), fontWeight: 600 }}>{d.v.toFixed(2)}</span>
+            <span style={{ ...note(22, d.j === THE && top > 0.5 ? ACCENT_INK : INK), fontWeight: 500 }}>{d.v.toFixed(2)}</span>
           </Note>
           <Note at={barsAt - 4 + k * 3} x={CHART_X + k * STEP + BAR_W / 2} y={y(BASE_Y) + 12} style={{ transform: "translateX(-50%)" }}>
             <span style={{ ...body(30, true), color: INK }}>{d.w}</span>
@@ -211,7 +211,7 @@ export const DefaultScene: React.FC = () => {
       ))}
       {DEFAULT_THE_TOPS ? (
         <Note at={topAt} x={CHART_X - 20} y={y(BASE_Y + 76)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <i>{VOCAB[THE]}</i> still scores highest, in every row
           </span>
         </Note>

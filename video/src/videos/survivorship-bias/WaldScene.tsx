@@ -209,13 +209,13 @@ export const WaldScene: React.FC = () => {
               <span style={note(20, INK_SOFT)}>{pct(p.areaShare)}</span>
             </Note>
             <Note at={hitsAt + 10} x={VALUE_X} y={c + GAP + THICK / 2 - 13}>
-              <span style={{ ...note(20, BLUE_INK), fontWeight: 650 }}>{pct(p.hitShare)}</span>
+              <span style={{ ...note(20, BLUE_INK), fontWeight: 500 }}>{pct(p.hitShare)}</span>
             </Note>
             {/* A chance, not a share: "39 in 100", as it is said, so the
                 column does not read as a third set of shares. The number
                 and its "in 100" stack, one size to a line. */}
             <Note at={estAt} x={EST_X} y={c - 31} align="right" from="right">
-              <div style={{ ...note(spoken ? 34 : 30, spoken ? ACCENT_INK : INK_SOFT), fontWeight: 600, lineHeight: 1, whiteSpace: "nowrap" }}>
+              <div style={{ ...note(spoken ? 34 : 30, spoken ? ACCENT_INK : INK_SOFT), fontWeight: 500, lineHeight: 1, whiteSpace: "nowrap" }}>
                 {Math.round(p.downedByOneHit * 100)}
               </div>
               <div style={{ ...note(20, INK_SOFT), lineHeight: 1.2, marginTop: 4, whiteSpace: "nowrap" }}>in 100</div>
@@ -240,7 +240,7 @@ export const WaldScene: React.FC = () => {
         ) : null}
       </svg>
       <Note at={missingAt + 8} x={BX0} y={y(ROW_Y(0)) + GAP + THICK + 10}>
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 650 }}>
+        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500 }}>
           Missing
           <span
             style={{

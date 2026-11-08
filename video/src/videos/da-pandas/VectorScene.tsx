@@ -125,7 +125,7 @@ export const VectorScene: React.FC = () => {
         />
         <Note at={oneCallAt - 2} x={vg.right + 26} y={vg.rowTop(2)} out={out13}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 650 }}>1 call</span>, in compiled C
+            <span style={{ fontWeight: 500 }}>1 call</span>, in compiled C
           </span>
         </Note>
         <Listing lines={VECTOR.applied.lines} x={APPLY_X} top={y(TOP)} width={600} size={SIZE} at={applyAt - 4} out={out13} />
@@ -145,7 +145,7 @@ export const VectorScene: React.FC = () => {
         ))}
         <Note at={millionAt - 2} x={APPLY_X} y={pg.rowTop(rows) + h(30)} out={out13}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            {fmt(VECTOR.calls, 0)} rows, <span style={{ fontWeight: 650 }}>{fmt(VECTOR.calls, 0)} calls</span>
+            {fmt(VECTOR.calls, 0)} rows, <span style={{ fontWeight: 500 }}>{fmt(VECTOR.calls, 0)} calls</span>
           </span>
         </Note>
 
@@ -173,7 +173,7 @@ export const VectorScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Ink at={colAt} dur={12} style={{ left: fg.x + fg.pad, top: under }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK }}>axis=0</span>
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: BLUE_INK }}>axis=0</span>
         </Ink>
         {/* axis=1: across each row, its answer beside it. */}
         {F.rows.map((_, i) => (

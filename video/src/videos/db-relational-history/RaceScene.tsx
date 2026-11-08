@@ -139,18 +139,18 @@ export const RaceScene: React.FC = () => {
         </g>
         <line x1={sx(X, 1973)} x2={sx(X, 1973) + lane(onlyAt - 2, 1973)} y1={LANE_UCB} y2={LANE_UCB} stroke={BAR} strokeWidth={2.4} />
       </Svg>
-      <Tag x={X.x0} y={LANE_IBM - 58} at={raceFrom + 2} dim={onlyAt - 4} size={23} color={INK} weight={650}>
+      <Tag x={X.x0} y={LANE_IBM - 58} at={raceFrom + 2} dim={onlyAt - 4} size={23} color={INK} weight={500}>
         IBM
       </Tag>
       <Tag x={sx(X, 1974)} y={LANE_IBM + 18} at={raceFrom + 10} dim={onlyAt - 4} size={20}>
         System R
       </Tag>
-      <Tag x={X.x0} y={LANE_CO - 58} at={companyAt - 4} dim={onlyAt - 4} size={23} color={INK} weight={650}>
+      <Tag x={X.x0} y={LANE_CO - 58} at={companyAt - 4} dim={onlyAt - 4} size={23} color={INK} weight={500}>
         <Mark at={closelyAt - 2} out={seventyNineAt}>
           A small California company
         </Mark>
       </Tag>
-      <Tag x={X.x0} y={LANE_UCB - 58} at={onlyAt - 2} size={23} color={KEY_INK} weight={650}>
+      <Tag x={X.x0} y={LANE_UCB - 58} at={onlyAt - 2} size={23} color={KEY_INK} weight={500}>
         Berkeley
       </Tag>
       <Dot x={sx(X, 1973)} y={LANE_UCB} at={readingAt - 2} color={BAR} swell={pulse(frame, readingAt + 8, 20)} />
@@ -185,7 +185,7 @@ export const RaceScene: React.FC = () => {
 
       {/* ── The launches ── */}
       <Dot x={sx(X, 1979)} y={LANE_CO} at={seventyNineAt - 2} color={ACCENT} r={13} swell={pulse(frame, buyAt - 2, 20)} dim={onlyAt - 4} />
-      <Tag x={sx(X, 1979) + 24} y={LANE_CO - 52} at={oracleAt - 2} dim={onlyAt - 4} size={26} color={ACCENT_INK} weight={600}>
+      <Tag x={sx(X, 1979) + 24} y={LANE_CO - 52} at={oracleAt - 2} dim={onlyAt - 4} size={26} color={ACCENT_INK} weight={500}>
         Oracle, 1979
       </Tag>
       <Tag x={sx(X, 1979) + 24} y={LANE_CO + 20} at={firstAt - 2} dim={onlyAt - 4} size={21} color={INK}>
@@ -213,11 +213,11 @@ export const RaceScene: React.FC = () => {
         color={INK_SOFT}
         dim={onlyAt - 4}
       />
-      <Tag x={sx(X, 1981) + 16} y={y(330)} at={turingAt - 4} dim={onlyAt - 4} size={22} color={INK} weight={650}>
+      <Tag x={sx(X, 1981) + 16} y={y(330)} at={turingAt - 4} dim={onlyAt - 4} size={22} color={INK} weight={500}>
         Codd wins the Turing Award
       </Tag>
       <Tag x={sx(X, 1973) + 26} y={LANE_UCB + 20} at={readingAt} size={21} color={KEY_INK}>
-        Ingres, 1973: <span style={{ color: INK, fontWeight: 650 }}>spoke QUEL, not SQL</span>
+        Ingres, 1973: <span style={{ color: INK, fontWeight: 500 }}>spoke QUEL, not SQL</span>
       </Tag>
     </AbsoluteFill>
   );

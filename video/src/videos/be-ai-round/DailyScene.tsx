@@ -127,13 +127,13 @@ export const DailyScene: React.FC = () => {
               <span style={{ opacity: ease(frame, copilotAt - 2, 10) }}>
                 <Strike at={poorlyAt}>&ldquo;I use Copilot a lot.&rdquo;</Strike>
               </span>
-              <span style={{ color: ACCENT_INK, fontWeight: 600, opacity: ease(frame, poorlyAt, 10) }}> A vague answer scores poorly.</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, poorlyAt, 10) }}> A vague answer scores poorly.</span>
             </span>
           </Note>
 
           {/* A concrete workflow, in four bins. */}
           <Note at={concreteAt} x={X0} y={binTop - 46}>
-            <span style={{ ...label(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>A concrete workflow</span>
+            <span style={{ ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A concrete workflow</span>
           </Note>
           {bins.slice(1).map((b, i) => (
             <ColumnRule key={b.title} x={X0 + (i + 1) * (BIN_W + BIN_GAP) - BIN_GAP / 2} top={binTop} height={h(212)} at={b.at} />
@@ -154,7 +154,7 @@ export const DailyScene: React.FC = () => {
                   transform: `translateY(${(1 - p) * 12}px)`,
                 }}
               >
-                <div style={{ ...note(28, INK), fontWeight: 750, marginBottom: 18, whiteSpace: "nowrap" }}>{b.title}</div>
+                <div style={{ ...note(28, INK), fontWeight: 500, marginBottom: 18, whiteSpace: "nowrap" }}>{b.title}</div>
                 {b.items.map((it) => (
                   <div key={it.text} style={{ ...note(26, INK), marginBottom: 12, whiteSpace: "nowrap", opacity: ease(frame, it.at - 2, 10) }}>
                     {it.text}
@@ -229,7 +229,7 @@ export const DailyScene: React.FC = () => {
           />
         </svg>
         <Note at={gapAt + 6} x={ZERO - 260} y={gapY + 12} width={520}>
-          <div style={{ ...note(24, INK), fontWeight: 600, textAlign: "center", whiteSpace: "nowrap" }}>
+          <div style={{ ...note(24, INK), fontWeight: 500, textAlign: "center", whiteSpace: "nowrap" }}>
             <Mark at={gapAt + 12}>the gap: felt faster, measured slower</Mark>
           </div>
         </Note>
@@ -240,7 +240,7 @@ export const DailyScene: React.FC = () => {
           </span>
         </Note>
         <Ink at={lessonAt} dur={14} style={{ left: X0, top: y(846) }}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             The lesson that lasts: the gap between how fast a tool feels and how fast it is.
           </span>
         </Ink>

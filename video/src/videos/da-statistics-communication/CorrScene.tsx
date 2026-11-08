@@ -52,7 +52,7 @@ const Node: React.FC<{ x: number; y: number; at: number; color?: string; childre
         alignItems: "center",
         justifyContent: "center",
         ...note(26, color),
-        fontWeight: 600,
+        fontWeight: 500,
       }}
     >
       {children}
@@ -138,12 +138,12 @@ export const CorrScene: React.FC = () => {
         />
         <Dots dots={dots} r={7} />
         <Note at={rAt - 2} x={PLOT.left + 30} y={y(PLOT.top) + h(10)}>
-          <span style={{ ...note(34, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(34, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             r = {fmt(CORR.r)}
           </span>
         </Note>
         <Note at={hotAt + 6} x={PLOT.left + 30} y={y(PLOT.top) + h(62)}>
-          <span style={{ ...note(24, WARM_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, WARM_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             ● the {hotDays} days at 30 °C or hotter
           </span>
         </Note>
@@ -179,7 +179,7 @@ export const CorrScene: React.FC = () => {
           </span>
         </Note>
         <Note at={vanishAt - 2} x={(linkFrom + linkTo) / 2 - 200} width={400} y={linkY + h(16)} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>{fmt(CORR.partial)}</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{fmt(CORR.partial)}</span>
         </Note>
         <Note at={vanishAt + 4} x={(linkFrom + linkTo) / 2 - 200} width={400} y={linkY + h(54)} from="up" style={{ textAlign: "center" }}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>with temperature held fixed</span>
@@ -203,7 +203,7 @@ export const CorrScene: React.FC = () => {
           );
         })}
         <Note at={confounderAt - 2} x={heat.x - 200} width={400} y={heat.y - NODE_H / 2 - h(48)} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>the confounder</span>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the confounder</span>
         </Note>
 
         {/* The other two ways two things move together. */}

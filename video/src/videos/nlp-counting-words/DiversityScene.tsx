@@ -144,7 +144,7 @@ export const DiversityScene: React.FC = () => {
             over <span style={numStyle(24, INK)}>{rep.total}</span> words
           </span>
           <span style={{ opacity: ease(frame, scoreAt - 2, 10) }}>
-            = <span style={{ ...numStyle(28, ACCENT_INK), fontWeight: 600 }}>{fmt(rep.value, 2)}</span>
+            = <span style={{ ...numStyle(28, ACCENT_INK), fontWeight: 500 }}>{fmt(rep.value, 2)}</span>
           </span>
         </div>
       </Note>
@@ -156,7 +156,7 @@ export const DiversityScene: React.FC = () => {
       <Note at={perfectAt - 4} x={LEFT_X} y={y(660) + h(54) + 4}>
         <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
           <span style={numStyle(24, INK)}>{vary.distinct}</span> different over <span style={numStyle(24, INK)}>{vary.total}</span> words ={" "}
-          <span style={{ ...numStyle(28, ACCENT_INK), fontWeight: 600 }}>{fmt(vary.value, 1)}</span>
+          <span style={{ ...numStyle(28, ACCENT_INK), fontWeight: 500 }}>{fmt(vary.value, 1)}</span>
         </div>
       </Note>
 
@@ -176,7 +176,7 @@ export const DiversityScene: React.FC = () => {
       {rows.map((r, i) => (
         <React.Fragment key={r.name}>
           <Ink at={growsAt - 2 + i * 5} dur={12} style={{ left: RX, top: rowY(i), height: h(40), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
-            <span style={{ ...label(22, INK), fontWeight: 600 }}>
+            <span style={{ ...label(22, INK), fontWeight: 500 }}>
               <Marked at={r.at}>{r.name}</Marked> <span style={{ color: INK_SOFT, fontWeight: 500 }}>words</span>
             </span>
           </Ink>

@@ -102,7 +102,7 @@ export const RequestScene: React.FC = () => {
         style={{ transform: `scaleY(${1 + tokPulse * 0.4})` }}
       />
       <Note at={inAt} x={X0 + REQUEST.in * PX_PER_TOKEN + 14} y={y(TOKENS_Y) + h(15) - 16}>
-        <span style={{ ...note(25, INPUT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{int(REQUEST.in)} in</span>
+        <span style={{ ...note(25, INPUT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{int(REQUEST.in)} in</span>
       </Note>
       <HBar
         x={640}
@@ -115,7 +115,7 @@ export const RequestScene: React.FC = () => {
         style={{ transform: `scaleY(${1 + tokPulse * 0.4})` }}
       />
       <Note at={outAt} x={640 + REQUEST.out * PX_PER_TOKEN + 14} y={y(TOKENS_Y) + h(15) - 16}>
-        <span style={{ ...note(25, OUTPUT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{int(REQUEST.out)} out</span>
+        <span style={{ ...note(25, OUTPUT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{int(REQUEST.out)} out</span>
       </Note>
 
       {/* The table. */}
@@ -168,7 +168,7 @@ export const RequestScene: React.FC = () => {
               style={{ transform: `scaleY(${1 + lit * 0.3})` }}
             />
             <Note at={valueAt[t.model] !== undefined ? valueAt[t.model] - 4 : growAt(i) + 14} x={BAR_X + barW(t.perVolume) + 16} y={ry}>
-              <span style={{ ...note(28, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{usd(t.perVolume)}</span>
+              <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{usd(t.perVolume)}</span>
             </Note>
             <Hairline x={X0} y={ry + h(ROW_DY) - 22} w={1800 - X0} at={supportAt + 6 + i * 4} color={RULE} />
           </React.Fragment>

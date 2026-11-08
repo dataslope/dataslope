@@ -44,7 +44,7 @@ const Cell: React.FC<{ x: number; y: number; w: number; h: number; at: number; f
         textAlign: "center",
         opacity: p,
         ...note(23, INK),
-        fontWeight: 650,
+        fontWeight: 500,
       }}
     >
       {children}
@@ -129,13 +129,13 @@ export const CapScene: React.FC = () => {
           ["stay available", "every working node answers", availableAt],
         ].map(([t, sub, at], i) => (
           <Ink key={i} at={(at as number) - 6} dur={14} style={{ left: G.col[i], top: y(G.top) - h(84), width: G.colW, textAlign: "center" }}>
-            <div style={{ ...label(23, INK), fontWeight: 600 }}>{t as string}</div>
+            <div style={{ ...label(23, INK), fontWeight: 500 }}>{t as string}</div>
             <div style={{ ...note(20, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>{sub as string}</div>
           </Ink>
         ))}
         {["network healthy", "during a partition"].map((t, r) => (
           <Ink key={t} at={partitionAt + r * 6} dur={14} style={{ left: G.head, top: row(r), height: rowH, display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
-            <span style={{ ...label(22, r ? ACCENT_INK : INK), fontWeight: 600 }}>{t}</span>
+            <span style={{ ...label(22, r ? ACCENT_INK : INK), fontWeight: 500 }}>{t}</span>
           </Ink>
         ))}
         <Cell x={G.col[0]} y={row(0)} w={G.col[1] + G.colW - G.col[0]} h={rowH} at={availableAt + 6} fill={healthyFill} lit={topLit}>
@@ -157,14 +157,14 @@ export const CapScene: React.FC = () => {
         </Cell>
 
         {/* ── The shortener, per operation ── */}
-        <Line at={choiceAt} x={G.head} y={opsTop} size={22} weight={600}>
+        <Line at={choiceAt} x={G.head} y={opsTop} size={22} weight={500}>
           A choice per operation
         </Line>
         <Line at={labelAt} x={G.head} y={opsTop + h(36)} size={20} color={INK_SOFT}>
           not a label for the database
         </Line>
         {/* Available: the redirect and the new key, each with its notes under it. */}
-        <Line at={redirectAt} x={apX} y={opsTop} size={22} weight={600} color={BLUE_INK}>
+        <Line at={redirectAt} x={apX} y={opsTop} size={22} weight={500} color={BLUE_INK}>
           redirect
         </Line>
         <Line at={notFoundAt} x={apX} y={opsTop + h(34)} size={20} color={INK_SOFT}>
@@ -173,7 +173,7 @@ export const CapScene: React.FC = () => {
         <Line at={takenAt} x={apX} y={opsTop + h(62)} size={20} color={INK_SOFT}>
           a taken-down link still working
         </Line>
-        <Line at={mintAt} x={apX} y={opsTop + h(124)} size={22} weight={600} color={BLUE_INK}>
+        <Line at={mintAt} x={apX} y={opsTop + h(124)} size={22} weight={500} color={BLUE_INK}>
           new key
         </Line>
         <Line at={blockAt} x={apX} y={opsTop + h(158)} size={20} color={INK_SOFT}>
@@ -183,19 +183,19 @@ export const CapScene: React.FC = () => {
           its own block of IDs
         </Line>
         {/* Consistent: the custom alias. */}
-        <Line at={aliasAt} x={cpX} y={opsTop + h(124)} size={22} weight={600} color={BLUE_INK}>
+        <Line at={aliasAt} x={cpX} y={opsTop + h(124)} size={22} weight={500} color={BLUE_INK}>
           custom alias
         </Line>
         <Line at={aliasAt + 6} x={cpX} y={opsTop + h(158)} size={20} color={INK_SOFT}>
           must be unique, so
         </Line>
-        <Line at={majorityAt} x={cpX} y={opsTop + h(186)} size={20} color={ACCENT_INK} weight={650}>
+        <Line at={majorityAt} x={cpX} y={opsTop + h(186)} size={20} color={ACCENT_INK} weight={500}>
           the minority side refuses it
         </Line>
         <VRule x={1225} top={y(316)} bottom={y(900)} at={choiceAt + 2} />
 
         {/* ── The design, split by a partition ── */}
-        <Line at={choiceAt + 2} x={P.left} y={pTop - h(60)} size={21} weight={650} color={INK_SOFT}>
+        <Line at={choiceAt + 2} x={P.left} y={pTop - h(60)} size={21} weight={500} color={INK_SOFT}>
           The shortener, split by a partition
         </Line>
         {[
@@ -221,16 +221,16 @@ export const CapScene: React.FC = () => {
         <Line at={choiceAt + 12} x={P.right} y={pTop + h(190)} size={20} color={INK_SOFT}>
           minority side
         </Line>
-        <Line at={majorityAt + 4} x={P.right} y={pTop + h(96)} size={20} color={ACCENT_INK} weight={600}>
+        <Line at={majorityAt + 4} x={P.right} y={pTop + h(96)} size={20} color={ACCENT_INK} weight={500}>
           alias: refused
         </Line>
 
         {/* ── PACELC ── */}
         <Ink at={healthyAt} dur={14} style={{ left: P.pacelc, top: y(700), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650 }}>and on a healthy network</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>and on a healthy network</span>
         </Ink>
         <Ink at={pacelcAt} dur={16} style={{ left: P.pacelc, top: y(744), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(40, INK), fontWeight: 750, letterSpacing: "0.02em" }}>
+          <span style={{ ...label(40, INK), fontWeight: 500, letterSpacing: "0.02em" }}>
             PAC
             <span style={{ color: BLUE_INK }}>ELC</span>
           </span>

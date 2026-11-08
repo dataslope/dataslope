@@ -65,19 +65,19 @@ const Deps: React.FC<{ c: Ctx }> = ({ c }) => {
         />
         <line x1={tx(4)} x2={tx(4)} y1={aY - c.h(40)} y2={axisY} stroke={INK} strokeWidth={2} strokeDasharray="6 5" opacity={ease(frame, offsetAt, 10)} />
       </svg>
-      <div style={{ position: "absolute", left: R_X, top: aY - 15, ...note(23, INK), fontWeight: 600 }}>pipeline A</div>
-      <div style={{ position: "absolute", left: R_X, top: bY - 15, ...note(23, INK), fontWeight: 600, opacity: ease(frame, offsetAt, 10) }}>pipeline B</div>
+      <div style={{ position: "absolute", left: R_X, top: aY - 15, ...note(23, INK), fontWeight: 500 }}>pipeline A</div>
+      <div style={{ position: "absolute", left: R_X, top: bY - 15, ...note(23, INK), fontWeight: 500, opacity: ease(frame, offsetAt, 10) }}>pipeline B</div>
       <Note at={offsetAt + 4} x={tx(4) + 10} y={aY - c.h(64)}>
         <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>B at 04:00: a cron offset</span>
       </Note>
       <Note at={lateAt + 20} x={tx(4) + 0.9 * PH + 12} y={bY - 14}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>reads A half-done</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>reads A half-done</span>
       </Note>
       <Note at={breaksAt} x={R_X} y={c.y(580)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>breaks the first night A runs late</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>breaks the first night A runs late</span>
       </Note>
       <Note at={opts[0].at - 4} x={R_X} y={c.y(640)}>
-        <span style={{ ...label(22, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>instead, wait on the data:</span>
+        <span style={{ ...label(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>instead, wait on the data:</span>
       </Note>
       {opts.map((o, i) => (
         <Pill key={o.text} x={R_X} y={c.y(684) + i * c.h(54)} at={o.at - 2} tone="green" size={23}>
@@ -145,7 +145,7 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* One alert, actionable: its line in the trap's red over a hairline,
           then its fields. No frame. */}
       <div style={{ position: "absolute", left: cardX, top: cardTop, opacity: ease(frame, alertAt, 12) }}>
-        <div style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", borderBottom: `1px solid ${HAIRLINE}`, paddingBottom: 10 }}>
+        <div style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", borderBottom: `1px solid ${HAIRLINE}`, paddingBottom: 10 }}>
           one alert<span style={{ color: INK, opacity: ease(frame, teamAt, 10) }}> → orders team</span>
         </div>
         {fields.map((f, i) => {
@@ -153,7 +153,7 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
           return (
             <div key={f.k} style={{ display: "flex", gap: 14, marginTop: i ? 10 : 28, opacity: p, alignItems: "baseline" }}>
               <span style={{ ...label(21, INK_SOFT), width: 110 }}>{f.k}</span>
-              <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK, fontVariantLigatures: "none", background: p > 0.5 ? HIGHLIGHT : undefined, padding: "0 6px", borderRadius: 3 }}>{f.v}</span>
+              <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK, fontVariantLigatures: "none", background: p > 0.5 ? HIGHLIGHT : undefined, padding: "0 6px", borderRadius: 3 }}>{f.v}</span>
             </div>
           );
         })}
@@ -174,7 +174,7 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* A retry that healed: no page. */}
       <div style={{ position: "absolute", left: cardX + HEALED_DX, top: cardTop, opacity: ease(frame, pageAt, 12) }}>
         <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>try 1 failed, try 2 ran</div>
-        <div style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 10, opacity: ease(frame, healAt, 10) }}>healed itself: no page</div>
+        <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 10, opacity: ease(frame, healAt, 10) }}>healed itself: no page</div>
       </div>
     </>
   );
@@ -290,7 +290,7 @@ const Observe: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={failAt + 4} x={R_X + 7 * 66 + 20} y={sliceY + 6}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           a 2 a.m. failure:{" "}
-          <span style={{ color: OK_INK, fontWeight: 600, opacity: ease(frame, sliceAt, 10) }}>rerun one slice</span>
+          <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, sliceAt, 10) }}>rerun one slice</span>
         </span>
       </Note>
     </>
@@ -341,7 +341,7 @@ export const RapidScene: React.FC = () => {
           </span>
         </Note>
         <Note at={aiAt} x={X0} y={y(LIST_TOP) + 3 * h(ROW) + h(112)}>
-          <span style={{ ...note(27, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>The newest ones feed AI systems.</span>
+          <span style={{ ...note(27, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The newest ones feed AI systems.</span>
         </Note>
         <NextLine at={nextAt} x={X0} y={y(760)} width={900}>
           pipelines for AI

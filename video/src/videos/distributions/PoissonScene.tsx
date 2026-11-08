@@ -202,7 +202,7 @@ export const PoissonScene: React.FC = () => {
           </Note>
           <VRule x={mx} bottom={base} top={base - h(TALL + 54)} at={meanAt - 4} />
           <Note at={meanAt} x={mx + 34} y={base - h(TALL + 52)}>
-            <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>mean {POISSON.mean}</span>
+            <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>mean {POISSON.mean}</span>
           </Note>
 
           {/* ── The numbers ── */}
@@ -215,14 +215,14 @@ export const PoissonScene: React.FC = () => {
             </span>
           </Ink>
           <Ink at={formulaAt - 6} dur={14} style={{ left: PANEL_X, top: y(540), whiteSpace: "nowrap" }}>
-            <span style={{ ...note(24, INK), fontWeight: 600 }}>
+            <span style={{ ...note(24, INK), fontWeight: 500 }}>
               <Sweep at={formulaAt - 2}>
                 formula <span style={askNote(24)}>{fmt(POISSON.sfAtLeast * 100, 2)}%</span>
               </Sweep>
             </span>
           </Ink>
           <Ink at={simulateAt - 4} dur={14} style={{ left: PANEL_X, top: y(584), whiteSpace: "nowrap" }}>
-            <span style={{ ...note(24, INK), fontWeight: 600 }}>
+            <span style={{ ...note(24, INK), fontWeight: 500 }}>
               simulated <span style={askNote(24)}>{sims >= 1 || frame >= sevenAt - 4 ? `${fmt(POISSON.simulatedAtLeast * 100, 2)}%` : "…"}</span>
             </span>
           </Ink>
@@ -232,7 +232,7 @@ export const PoissonScene: React.FC = () => {
             </span>
           </Note>
           <Ink at={varianceAt - 4} dur={14} style={{ left: PANEL_X, top: y(690), whiteSpace: "nowrap" }}>
-            <span style={{ ...note(24, INK), fontWeight: 600 }}>
+            <span style={{ ...note(24, INK), fontWeight: 500 }}>
               mean {POISSON.mean} = variance {POISSON.variance}
             </span>
           </Ink>

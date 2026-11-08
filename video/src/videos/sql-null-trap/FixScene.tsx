@@ -119,7 +119,7 @@ export const FixScene: React.FC = () => {
               whiteSpace: "nowrap",
             }}
           >
-            <span style={{ ...label(22, ACCENT_INK), fontWeight: 600 }}>{p.letter}</span>
+            <span style={{ ...label(22, ACCENT_INK), fontWeight: 500 }}>{p.letter}</span>
             <span style={label(22, INK)}>{p.title}</span>
           </Ink>
           <Listing
@@ -161,7 +161,7 @@ export const FixScene: React.FC = () => {
       <Note at={subqueryAt} x={PANELS[1].x} y={listBottom + 22} width={800} from="up">
         <span style={note(21, INK_SOFT)}>
           The list is now <Mono color={INK}>({KNOWN_IDS.join(", ")})</Mono>, with no{" "}
-          <Mono color={UNKNOWN_INK} weight={600}>
+          <Mono color={UNKNOWN_INK} weight={500}>
             NULL
           </Mono>{" "}
           to compare against

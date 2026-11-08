@@ -198,7 +198,7 @@ export const PairScene: React.FC = () => {
             <span style={label(21, ACCENT_INK)}>needs half</span>
           </Ink>
           <Ink at={partialAt} dur={14} style={{ left: center(I.product) - 10, top: bottom + 76, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(23, ACCENT_INK), fontWeight: 600 }}>a partial dependency</span>
+            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500 }}>a partial dependency</span>
           </Ink>
 
           {/* The two dependencies, written out as they are said. */}

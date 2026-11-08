@@ -62,8 +62,8 @@ const Tile: React.FC<{
         transform: `translateY(${(1 - p) * 20}px)`,
       }}
     >
-      <div style={{ position: "absolute", left: 0, top: COL.name, ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>{name}</div>
-      <div style={{ position: "absolute", left: 0, top: COL.value, ...note(64, INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: 0, top: COL.name, ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</div>
+      <div style={{ position: "absolute", left: 0, top: COL.value, ...note(64, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
         <span style={lift}>{value}</span>
       </div>
       <div style={{ position: "absolute", left: 0, top: COL.delta, opacity: ease(frame, deltaAt, 10), ...TABULAR, whiteSpace: "nowrap" }}>{delta}</div>
@@ -142,7 +142,7 @@ export const HookScene: React.FC = () => {
             at={signupsAt - 4}
             name="Total signups"
             value={num(HOOK.signups)}
-            delta={<span style={{ ...note(26, INK_SOFT), fontWeight: 650 }}>▲ {num(HOOK.signupsToday)} today</span>}
+            delta={<span style={{ ...note(26, INK_SOFT), fontWeight: 500 }}>▲ {num(HOOK.signupsToday)} today</span>}
             deltaAt={upAt}
             line={signups}
             lineAt={everyAt - 4}
@@ -168,7 +168,7 @@ export const HookScene: React.FC = () => {
             name="Still cooking 4 weeks after joining"
             value={`${HOOK.retentionNow}%`}
             delta={
-              <span style={{ ...note(26, ACCENT_INK), fontWeight: 650 }}>
+              <span style={{ ...note(26, ACCENT_INK), fontWeight: 500 }}>
                 ▼ 2 points, from {HOOK.retentionWas}%
               </span>
             }
@@ -178,7 +178,7 @@ export const HookScene: React.FC = () => {
             lit={onlyAt + 6}
           />
           <Note at={wrongAt} x={col2} y={y(TILE.top) + h(TILE.h) + h(22)}>
-            <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={wrongAt + 4}>the one that can say something is wrong</Mark>
             </span>
           </Note>
@@ -216,10 +216,10 @@ export const HookScene: React.FC = () => {
             })}
           </svg>
           <Note at={elevenAt + 8} x={X0} y={y(SQUARES.top) + SQUARES.size + h(14)}>
-            <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>11 with a figure</span>
+            <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>11 with a figure</span>
           </Note>
           <Note at={threeAt + 6} x={X0 + 11 * (SQUARES.size + SQUARES.gap) + 30} y={y(SQUARES.top) + SQUARES.size + h(14)}>
-            <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>3 in a sentence</span>
+            <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>3 in a sentence</span>
           </Note>
           <Note at={beginAt + 4} x={X0} y={y(SQUARES.top) - 62}>
             <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>

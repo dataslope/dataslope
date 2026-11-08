@@ -124,7 +124,7 @@ export const MonthScene: React.FC = () => {
                 }}
               />
               <Note at={fourAt - 2 + i * 5} x={X0} y={ry}>
-                <span style={{ ...note(25, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{r.name}</span>
+                <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.name}</span>
               </Note>
               <Note at={modelAt - 2 + i * 3} x={MODEL_X} y={ry}>
                 <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>{NAME[r.model]}</span>
@@ -148,7 +148,7 @@ export const MonthScene: React.FC = () => {
                 <span
                   style={{
                     ...note(25, i === dear && frame < summariesAt - 4 ? POINT_INK : INK),
-                    fontWeight: i === dear && frame < summariesAt - 4 ? 700 : 500,
+                    fontWeight: i === dear && frame < summariesAt - 4 ? 500 : 500,
                     ...TABULAR,
                     whiteSpace: "nowrap",
                   }}
@@ -167,7 +167,7 @@ export const MonthScene: React.FC = () => {
                 style={{ transform: `scaleY(${1 + barLit * 0.35})` }}
               />
               <Note at={growAt(i) + 12} x={BAR_X + (r.month / maxMonth) * BAR_MAX + 14} y={ry}>
-                <span style={{ ...note(25, i === dom ? POINT_INK : INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(25, i === dom ? POINT_INK : INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
                   {i === dom ? <Marked at={eightAt - 2}>{usd(r.month)}</Marked> : usd(r.month)}
                 </span>
               </Note>

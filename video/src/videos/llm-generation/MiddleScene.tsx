@@ -120,13 +120,13 @@ export const MiddleScene: React.FC = () => {
           <span style={label(20)}>Where the fact sits in the context</span>
         </Ink>
         <Note at={startAt - 2} x={pts[0][0] + 16} y={pts[0][1] - 46}>
-          <span style={{ ...note(26, BLUE_INK), fontWeight: 650, ...halo }}>{Math.round(first.recall * 100)}%</span>
+          <span style={{ ...note(26, BLUE_INK), fontWeight: 500, ...halo }}>{Math.round(first.recall * 100)}%</span>
         </Note>
         <Note at={endAt - 2} x={pts[pts.length - 1][0] - 16} y={pts[pts.length - 1][1] - 46} align="right">
-          <span style={{ ...note(26, BLUE_INK), fontWeight: 650, ...halo }}>{Math.round(last.recall * 100)}%</span>
+          <span style={{ ...note(26, BLUE_INK), fontWeight: 500, ...halo }}>{Math.round(last.recall * 100)}%</span>
         </Note>
         <Note at={sagsAt - 2} x={xAt(worst.at)} y={yAt(worst.recall) + 22} from="up" style={{ transform: "translateX(-50%)" }}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             {Math.round(worst.recall * 100)}% halfway through
           </span>
         </Note>
@@ -145,7 +145,7 @@ export const MiddleScene: React.FC = () => {
           </Tag>
         </Note>
         <Note at={chaptersAt - 2} x={1490} y={y(640)} width={340}>
-          <div style={{ ...note(23, INK), fontWeight: 600 }}>The three chapters that matter, not the whole manual.</div>
+          <div style={{ ...note(23, INK), fontWeight: 500 }}>The three chapters that matter, not the whole manual.</div>
         </Note>
         <Note at={start + 30} x={1490} y={y(470)} width={340}>
           <Illustrative>Stylized heights, from the lesson. The U shape is the finding that replicates.</Illustrative>

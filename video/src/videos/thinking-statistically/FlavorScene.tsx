@@ -107,7 +107,7 @@ export const FlavorScene: React.FC = () => {
         {NAMES.map((name, i) => (
           <Ink key={name} at={codeAt[i] - 4} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
             <Mark at={quantitiesAt - 2 + i * 5} out={honestAt + i * 3}>
-              <span style={{ ...note(30, INK), fontWeight: 600 }}>{i + 1}</span>
+              <span style={{ ...note(30, INK), fontWeight: 500 }}>{i + 1}</span>
               <span style={note(30, INK_SOFT)}> = {name}</span>
             </Mark>
           </Ink>
@@ -229,7 +229,7 @@ export const FlavorScene: React.FC = () => {
             whiteSpace: "nowrap",
           }}
         >
-          <span style={{ ...note(22, INK), fontWeight: 600 }}>{NAMES[col]}</span>
+          <span style={{ ...note(22, INK), fontWeight: 500 }}>{NAMES[col]}</span>
           <span style={note(22, INK_SOFT)}> {FLAVORS.counts[NAMES[col]]}</span>
         </div>
       ))}

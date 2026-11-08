@@ -35,7 +35,7 @@ const ALLOWS = [
   [false, false, false],
 ];
 
-const mono = (size: number, color: string = INK) => svgText({ fontFamily: MONO, fontSize: size, fontWeight: 600, color });
+const mono = (size: number, color: string = INK) => svgText({ fontFamily: MONO, fontSize: size, fontWeight: 500, color });
 
 /** One event on a lane: a dot and its statement above it. */
 const Event: React.FC<{ x: number; y: number; at: number; out: number; text: string; color?: string }> = ({ x, y, at, out, text, color = INK }) => {
@@ -224,7 +224,7 @@ export const IsoScene: React.FC = () => {
                 {serial > 0 ? <rect x={X0 - 10} y={yy + 6} width={gridW + 10} height={rowH - 12} rx={5} fill={`color-mix(in srgb, ${OK} ${20 * serial}%, transparent)`} /> : null}
                 {isDefault > 0 ? <rect x={X0 - 8} y={yy + 8} width={DEFAULT_MARK_W} height={rowH - 16} rx={4} fill={HIGHLIGHT} opacity={isDefault} /> : null}
                 <line x1={X0} y1={yy + rowH} x2={X0 + LEVEL_W + 120 + (3 * COL_W - 120) * move} y2={yy + rowH} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} />
-                <text x={X0} y={yy + rowH / 2 + 8} style={svgText({ ...note(23, INK), fontWeight: 650 })}>
+                <text x={X0} y={yy + rowH / 2 + 8} style={svgText({ ...note(23, INK), fontWeight: 500 })}>
                   {lv}
                 </text>
                 {i === 1 ? (
@@ -246,7 +246,7 @@ export const IsoScene: React.FC = () => {
                       {struck > 0 ? (
                         <>
                           <line x1={colX(j) - 4} x2={colX(j) - 4 + (w + 8) * struck} y1={yy + rowH / 2 + 1} y2={yy + rowH / 2 - 1} stroke={ACCENT} strokeWidth={3} />
-                          <text x={colX(j) + w + 14} y={yy + rowH / 2 + 8} style={svgText({ ...note(22, OK_INK), fontWeight: 600 })} opacity={struck}>
+                          <text x={colX(j) + w + 14} y={yy + rowH / 2 + 8} style={svgText({ ...note(22, OK_INK), fontWeight: 500 })} opacity={struck}>
                             Postgres: no
                           </text>
                         </>
@@ -332,7 +332,7 @@ export const IsoScene: React.FC = () => {
           <g opacity={ease(frame, retriedAt, 10)}>
             <path d={`M${retry.map(([a, b]) => `${a},${b}`).join(" L")}`} fill="none" stroke={OK} strokeWidth={2.6} pathLength={1} strokeDasharray={`${ease(frame, retriedAt, 18)} 1`} />
             <path d={arrowHead(retry, 13, 7, { filled: true })} fill={OK} opacity={ease(frame, retriedAt + 14, 5)} />
-            <text x={(failX + tx(0.06)) / 2} y={laneA - 90} textAnchor="middle" style={svgText({ ...label(21, OK_INK), fontWeight: 600 })}>
+            <text x={(failX + tx(0.06)) / 2} y={laneA - 90} textAnchor="middle" style={svgText({ ...label(21, OK_INK), fontWeight: 500 })}>
               retry
             </text>
           </g>
@@ -347,9 +347,9 @@ export const IsoScene: React.FC = () => {
         ].map((d) => (
           <Note key={d.head} at={d.at} x={R_X} y={y(GRID_LOW) + h(14)} out={d.out}>
             <div style={{ width: 520 }}>
-              <div style={{ ...note(24, INK), fontWeight: 600 }}>{d.head}</div>
+              <div style={{ ...note(24, INK), fontWeight: 500 }}>{d.head}</div>
               <div style={{ ...note(23, INK), marginTop: h(8) }}>{d.body}</div>
-              {d.foot ? <div style={{ ...note(22, OK_INK), fontWeight: 650, marginTop: h(14), opacity: ease(frame, d.foot.at, 10) }}>{d.foot.text}</div> : null}
+              {d.foot ? <div style={{ ...note(22, OK_INK), fontWeight: 500, marginTop: h(14), opacity: ease(frame, d.foot.at, 10) }}>{d.foot.text}</div> : null}
             </div>
           </Note>
         ))}

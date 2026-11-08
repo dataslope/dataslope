@@ -160,7 +160,7 @@ export const SlowScene: React.FC = () => {
 
         {/* The usual fixes, the index first. */}
         <div style={{ position: "absolute", left: X0, top: planTop + h(186), opacity: 1 - ease(frame, q2At - 4, 10) }}>
-          <div style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap", height: h(52), opacity: ease(frame, indexAt - 2, 12) }}>
+          <div style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", height: h(52), opacity: ease(frame, indexAt - 2, 12) }}>
             Fix: an index on <QMono>customer_id</QMono>
           </div>
           <div style={{ display: "flex", gap: 14, opacity: ease(frame, otherAt - 2, 12) }}>

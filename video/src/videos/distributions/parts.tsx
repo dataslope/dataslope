@@ -44,7 +44,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -89,7 +89,7 @@ export const Head: React.FC<{ parts: readonly HeadPart[]; out?: number; size?: n
 export const code = (size = 24, color: string = INK): React.CSSProperties => ({
   fontFamily: MONO,
   fontSize: size,
-  fontWeight: 600,
+  fontWeight: 500,
   color,
   whiteSpace: "nowrap",
 });
@@ -485,4 +485,4 @@ export const Spot: React.FC<{
 };
 
 /** Shorthand for the house annotation in the ask color, bold. */
-export const askNote = (size = 23): React.CSSProperties => ({ ...note(size, ASK_INK), fontWeight: 600 });
+export const askNote = (size = 23): React.CSSProperties => ({ ...note(size, ASK_INK), fontWeight: 500 });

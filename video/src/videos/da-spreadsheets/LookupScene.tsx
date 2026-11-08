@@ -260,7 +260,7 @@ export const LookupScene: React.FC = () => {
               alignItems: "center",
               // Within the 12% a line allows of the 25px cells beside them.
               ...label(23, i + 1 === position ? inkOf.teal : INK_SOFT),
-              fontWeight: i + 1 === position ? 700 : 500,
+              fontWeight: i + 1 === position ? 500 : 500,
               opacity: ease(frame, matchAt + 8 + i * 3, 10) * (1 - ease(frame, rangesAt, 10)),
               ...TABULAR,
             }}

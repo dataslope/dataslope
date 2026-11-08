@@ -190,7 +190,7 @@ export const KindsScene: React.FC = () => {
           >
             {l.name}
           </div>
-          <div style={{ ...note(23, INK), fontWeight: 650, marginTop: 12 }}>{l.what}</div>
+          <div style={{ ...note(23, INK), fontWeight: 500, marginTop: 12 }}>{l.what}</div>
           <div style={{ ...note(23, INK_SOFT), marginTop: 6 }}>
             <Mark at={likeAt[i] - 2} out={likeAt[i] + 40}>
               like {l.like}
@@ -315,7 +315,7 @@ export const KindsScene: React.FC = () => {
             {ZIPS.zip}
           </span>
           {/* The size of the code beside it: emphasis is the color and the weight. */}
-          <span style={{ ...label(30, STAT_INK), fontWeight: 600, opacity: ease(frame, dontAt - 2, 10) }}>?</span>
+          <span style={{ ...label(30, STAT_INK), fontWeight: 500, opacity: ease(frame, dontAt - 2, 10) }}>?</span>
         </div>
       ) : null}
     </AbsoluteFill>

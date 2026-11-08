@@ -158,7 +158,7 @@ export const GeorgetownScene: React.FC = () => {
           </div>
         ))}
         {/* Set well clear of the dot under them, which pulses on "twelve". */}
-        <Tag x={sx(X, demoYear)} y={AXIS - 92} at={papersAt} align="center" size={23} color={INK} weight={650}>
+        <Tag x={sx(X, demoYear)} y={AXIS - 92} at={papersAt} align="center" size={23} color={INK} weight={500}>
           the demo
         </Tag>
         <Tag x={sx(X, demoYear)} y={AXIS - 66} at={papersAt + 6} align="center" size={20} color={INK_SOFT}>
@@ -176,7 +176,7 @@ export const GeorgetownScene: React.FC = () => {
           <div style={{ ...label(21, INK_SOFT) }}>ALPAC report, {ALPAC_YEAR}</div>
           <div style={{ ...headline(30, true), color: INK, marginTop: 4, lineHeight: 1.15 }}>&ldquo;{ALPAC}&rdquo;</div>
         </Ink>
-        <Tag x={sx(X, ALPAC_YEAR)} y={AXIS - 72} at={fundingAt - 2} align="center" size={23} color={ACCENT_INK} weight={600}>
+        <Tag x={sx(X, ALPAC_YEAR)} y={AXIS - 72} at={fundingAt - 2} align="center" size={23} color={ACCENT_INK} weight={500}>
           funding dried up
         </Tag>
       </div>

@@ -86,7 +86,7 @@ export const RunsScene: React.FC = () => {
       <Note at={closeAt - 4} x={X0} y={y(296)}>
         <span style={{ display: "inline-flex", gap: 26, alignItems: "baseline", whiteSpace: "nowrap" }}>
           {RUN_TOKENS.map((t, i) => (
-            <span key={t} style={{ ...note(22, HUE_INK[i]), fontWeight: 650 }}>
+            <span key={t} style={{ ...note(22, HUE_INK[i]), fontWeight: 500 }}>
               <span style={{ fontFamily: MONO }}>{t}</span> {pct(RUN_PROBS[i])}
             </span>
           ))}
@@ -124,7 +124,7 @@ export const RunsScene: React.FC = () => {
                     transform: `scale(${(0.6 + 0.4 * s) * (1 + swell * 0.06)})`,
                     fontFamily: MONO,
                     fontSize: 26,
-                    fontWeight: 650,
+                    fontWeight: 500,
                     color: HUE_INK[tok],
                   }}
                 >
@@ -201,10 +201,10 @@ export const RunsScene: React.FC = () => {
         />
       ))}
       <Note at={splitAt + 10} x={fxAt(TRUNK + BRANCH - 1) + FTILE} y={trunkY - h(SPLIT) - 40} align="right">
-        <span style={{ ...note(21, INK), fontWeight: 650 }}>one answer</span>
+        <span style={{ ...note(21, INK), fontWeight: 500 }}>one answer</span>
       </Note>
       <Note at={splitAt + 14} x={fxAt(TRUNK + BRANCH - 1) + FTILE} y={trunkY + h(SPLIT) + h(FTILE) + 14} align="right">
-        <span style={{ ...note(21, INK), fontWeight: 650 }}>another</span>
+        <span style={{ ...note(21, INK), fontWeight: 500 }}>another</span>
       </Note>
       </Drift>
     </AbsoluteFill>

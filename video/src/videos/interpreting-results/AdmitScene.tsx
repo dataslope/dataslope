@@ -265,7 +265,7 @@ export const AdmitScene: React.FC = () => {
                     y={cy - 15}
                     align={right ? "left" : "right"}
                   >
-                    <span style={{ ...note(22, GROUP_INK[g]), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>{pct(r.cells[g].rate)}</span>
+                    <span style={{ ...note(22, GROUP_INK[g]), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>{pct(r.cells[g].rate)}</span>
                   </Note>
                 );
               })}
@@ -273,7 +273,7 @@ export const AdmitScene: React.FC = () => {
                 <span
                   style={{
                     ...note(26, GROUP_INK[lead]),
-                    fontWeight: 650,
+                    fontWeight: 500,
                     padding: "0 8px",
                     marginLeft: -8,
                     background: lead === "women" ? HIGHLIGHT : "transparent",
@@ -310,12 +310,12 @@ export const AdmitScene: React.FC = () => {
 
         {/* Where each group applied. */}
         <Note at={sevenAt - 2} x={px(DEPTS[1].women.rate) + radius(600) + 76} y={rowY(2) + 26}>
-          <span style={{ ...note(22, GROUP_INK.women), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(22, GROUP_INK.women), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             {DEPTS[1].women.applied} of {POOLED.women.applied} women applied here
           </span>
         </Note>
         <Note at={menMixAt - 2} x={px(DEPTS[0].men.rate) - radius(600) - 24} y={rowY(1) + 34} align="right">
-          <span style={{ ...note(22, GROUP_INK.men), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(22, GROUP_INK.men), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             {DEPTS[0].men.applied} of {POOLED.men.applied} men applied here
           </span>
         </Note>

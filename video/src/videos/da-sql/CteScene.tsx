@@ -158,12 +158,12 @@ export const CteScene: React.FC = () => {
         {/* ── Which to use ── */}
         <Note at={oneOffAt - 2} x={LIST_X} y={ruleTop} out={q10At - 4}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 650 }}>Subquery:</span> a one-off filter.
+            <span style={{ fontWeight: 500 }}>Subquery:</span> a one-off filter.
           </span>
         </Note>
         <Note at={twiceAt - 2} x={LIST_X} y={ruleTop + h(48)} out={q10At - 4}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 650 }}>
+            <span style={{ fontWeight: 500 }}>
               <Mono>CTE</Mono>:
             </span>{" "}
             a step used twice<Fade at={chainAt}>, a chain of steps,</Fade>

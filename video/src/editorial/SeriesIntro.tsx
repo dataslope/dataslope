@@ -14,7 +14,7 @@ import { Ink } from "./ui";
  *  mark's height. */
 const WORDMARK: React.CSSProperties = {
   fontFamily: SANS,
-  fontWeight: 600,
+  fontWeight: 500,
   fontSize: 96 * 1.38,
   letterSpacing: "-0.025em",
   color: INK,

@@ -172,7 +172,7 @@ export const ChainScene: React.FC = () => {
             <span style={label(22, INK_SOFT)}>The whole chain</span>
           </Ink>
           <Ink at={resultAt} dur={14} style={{ position: "relative" }}>
-            <TruthWord value={GRACE.result} size={28} weight={760} />
+            <TruthWord value={GRACE.result} size={28} weight={500} />
           </Ink>
         </div>
       </div>
@@ -209,7 +209,7 @@ export const ChainScene: React.FC = () => {
         </Ink>
       ))}
       <Note at={neverAt} x={RULES_X} y={y(TERMS_Y) + 118} from="up">
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 650 }}>Either way, never true.</span>
+        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500 }}>Either way, never true.</span>
       </Note>
 
       {/* Fig. 4: every customer through the same chain. */}
@@ -226,7 +226,7 @@ export const ChainScene: React.FC = () => {
           <SqlValue key="n" value={r.name} />,
           <SqlValue key="i" value={r.id} />,
           ...r.terms.map((t, k) => <TruthWord key={k} value={t} size={22} />),
-          <TruthWord key="r" value={r.result} size={22} weight={760} />,
+          <TruthWord key="r" value={r.result} size={22} weight={500} />,
         ])}
         rowAt={CHAIN.map((_, i) => everyFrom - 6 + i * 3)}
         cellAt={(row, col) => (col === notInCol ? (CHAIN[row].result === false ? falseAt : unknownAt) - 2 : undefined)}

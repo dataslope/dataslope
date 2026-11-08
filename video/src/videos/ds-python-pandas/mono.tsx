@@ -8,7 +8,7 @@ import { MONO } from "../../theme/fonts";
  * kit's `QMono` are not. Both of those are shared with other videos, so this
  * video takes its own. Never under the house floor of 19px.
  */
-const style = (color?: string, weight = 600): React.CSSProperties => ({
+const style = (color?: string, weight = 500): React.CSSProperties => ({
   fontFamily: MONO,
   fontSize: "max(19px, 0.92em)",
   fontStyle: "normal",
@@ -28,4 +28,4 @@ export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
 /** The face for code set in a house badge (`Badge` in editorial/ui): mono,
  *  at the badge's own size, no ligatures. */
-export const CODE_BADGE: React.CSSProperties = { fontFamily: MONO, fontWeight: 600, fontVariantLigatures: "none" };
+export const CODE_BADGE: React.CSSProperties = { fontFamily: MONO, fontWeight: 500, fontVariantLigatures: "none" };

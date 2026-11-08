@@ -52,7 +52,7 @@ const BarRow: React.FC<{
           left: LBAR.barX + width + 14,
           top: top + 4,
           ...note(30, focus > 0.5 ? FOCUS_INK : INK),
-          fontWeight: 650,
+          fontWeight: 500,
           opacity: ease(frame, at + 8, 8),
           ...TABULAR,
         }}
@@ -181,7 +181,7 @@ export const FormatScene: React.FC = () => {
                 style={{ position: "absolute", left: f.x, top: y(TEXT_Y), display: "flex", alignItems: "baseline", gap: 14, opacity: ease(frame, f.at - 2, 10) }}
               >
                 <span style={label(24, INK)}>{f.name}</span>
-                <span style={{ ...note(28, INK), fontWeight: 650, ...TABULAR }}>{f.count} tokens</span>
+                <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR }}>{f.count} tokens</span>
               </div>
             ))}
             <div style={{ position: "absolute", left: X0, top: y(TEXT_Y) + 46, opacity: ease(frame, recordsAt, 8) }}>
@@ -209,7 +209,7 @@ export const FormatScene: React.FC = () => {
               />
             </div>
             <Note at={keyAt} x={X0 + CSV_DX} y={y(TEXT_Y) + 46 + h(140)}>
-              <div style={{ ...note(22, FOCUS_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+              <div style={{ ...note(22, FOCUS_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 JSON: the {FORMATS.keys.length} keys on all {FORMATS.jsonKeyNames / FORMATS.keys.length} records
               </div>
               <div style={{ ...note(22, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>CSV: once, in a header</div>
@@ -231,7 +231,7 @@ export const FormatScene: React.FC = () => {
                 value={String(f.json)}
                 focus={rare ? ease(frame, hundredAt - 2, 10) : 0}
               >
-                <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK, whiteSpace: "nowrap" }}>{f.encoding}</div>
+                <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>{f.encoding}</div>
                 <div
                   style={{
                     ...note(20, rare && frame > gptAt ? FOCUS_INK : INK_SOFT),

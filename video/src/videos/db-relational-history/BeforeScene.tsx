@@ -236,7 +236,7 @@ export const BeforeScene: React.FC = () => {
         </Ink>
       ))}
       <Ink at={everyAt} dur={12} style={{ left: 126, top: y(444 + 4 * 58), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 650 }}>
+        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500 }}>
           child 1 is now {last.name}
         </span>
       </Ink>
@@ -339,7 +339,7 @@ export const BeforeScene: React.FC = () => {
         <Ink at={networkAt - 2} dur={14} out={reorgAt - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Network databases: more pointers,
         </Ink>
-        <Ink at={ruleAt - 2} dur={14} out={reorgAt - 6} style={{ position: "relative", whiteSpace: "nowrap", color: INK, fontWeight: 600 }}>
+        <Ink at={ruleAt - 2} dur={14} out={reorgAt - 6} style={{ position: "relative", whiteSpace: "nowrap", color: INK, fontWeight: 500 }}>
           and still a route.
         </Ink>
       </div>

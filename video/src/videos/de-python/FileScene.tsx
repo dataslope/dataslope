@@ -185,7 +185,7 @@ export const FileScene: React.FC = () => {
 
         {/* The for loop's peak stays under it once the bars give way. */}
         <Note at={kbAt + 4} x={X0} y={sTop + listingHeight(S.length, SIZE) + h(14)} out={out3}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             peak <Num>{st.num}</Num> {st.unit}
           </span>
         </Note>
@@ -311,7 +311,7 @@ export const FileScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 ...note(19, lit ? PAPER : done ? BLUE_INK : PAPER),
-                fontWeight: 650,
+                fontWeight: 500,
               }}
             >
               100,000 rows
@@ -329,7 +329,7 @@ export const FileScene: React.FC = () => {
           marks={T.rows.map((_, row) => ({ row, col: 1, at: matchAt + 6 + row * 2, color: MARK_OK }))}
         />
         <Note at={matchAt + 4} x={TOTALS_X} y={tg.rowTop(T.rows.length) + h(14)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same as the whole read</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same as the whole read</span>
         </Note>
 
         <Note at={peaksAt - 4} x={X0} y={pBarsY - h(42)}>
@@ -372,7 +372,7 @@ export const FileScene: React.FC = () => {
           <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap", display: "flex", gap: 16 }}>
             <span>mean of the chunks&apos; means</span>
             <Strike at={offAt + 6}>
-              <span style={{ fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{FILE.meanOfMeans}</span>
+              <span style={{ fontWeight: 500, fontVariantNumeric: "tabular-nums" }}>{FILE.meanOfMeans}</span>
             </Strike>
           </span>
         </Note>
@@ -380,7 +380,7 @@ export const FileScene: React.FC = () => {
           <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap", display: "flex", gap: 16 }}>
             <span>sum ÷ count, at the end</span>
             <Mark at={carryAt + 10} color={MARK_OK}>
-              <span style={{ fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{FILE.meanFolded}</span>
+              <span style={{ fontWeight: 500, fontVariantNumeric: "tabular-nums" }}>{FILE.meanFolded}</span>
             </Mark>
             <span style={{ color: INK_SOFT }}>the true mean</span>
           </span>

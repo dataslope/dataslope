@@ -94,7 +94,7 @@ export const HookScene: React.FC = () => {
                 justifyContent: "center",
                 ...label(28, ink),
                 ...TABULAR,
-                fontWeight: 600,
+                fontWeight: 500,
               }}
             >
               {i + 1}
@@ -106,14 +106,14 @@ export const HookScene: React.FC = () => {
         <Spot id="da-sql-trap" video="da-sql" at={tenAt - 2} left={X0 - 10} top={y(legendY)} width={130} height={130} dim={startAt + 4} />
         <Note at={tenAt + 4} x={X0 + 140} y={y(legendY + 40)} dim={startAt + 4}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
-            <span style={{ color: ACCENT_INK, fontWeight: 650 }}>Seventeen</span> hide a trap, taken{" "}
+            <span style={{ color: ACCENT_INK, fontWeight: 500 }}>Seventeen</span> hide a trap, taken{" "}
             <span style={{ opacity: ease(frame, slowlyAt - 2, 10) }}>slowly</span>
           </span>
         </Note>
         <Spot id="da-sql-stopwatch" video="da-sql" at={fourteenAt - 2} left={X0 - 10} top={y(legendY + 120)} width={130} height={130} dim={startAt + 4} />
         <Note at={fourteenAt + 4} x={X0 + 140} y={y(legendY + 160)} dim={startAt + 4}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 650 }}>Thirteen</span> get one answer each,{" "}
+            <span style={{ fontWeight: 500 }}>Thirteen</span> get one answer each,{" "}
             <span style={{ opacity: ease(frame, rapidAt - 2, 10) }}>rapid fire</span>
           </span>
         </Note>

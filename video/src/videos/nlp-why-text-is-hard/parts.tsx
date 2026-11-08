@@ -63,7 +63,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -348,7 +348,7 @@ export const Chip: React.FC<{
         return (
           <>
             {text.slice(0, badChars.from)}
-            <span style={{ color: mix(INK, BAD_INK, bc), fontWeight: bc > 0.5 ? 700 : 500 }}>{text.slice(badChars.from, badChars.to)}</span>
+            <span style={{ color: mix(INK, BAD_INK, bc), fontWeight: bc > 0.5 ? 500 : 500 }}>{text.slice(badChars.from, badChars.to)}</span>
             {text.slice(badChars.to)}
           </>
         );
@@ -439,8 +439,8 @@ export const Count: React.FC<{
       gap: "0.3em",
     }}
   >
-    <span style={{ ...label(size, color), fontWeight: 600, ...TABULAR }}>{value}</span>
-    {unit ? <span style={{ ...label(size, INK_SOFT), fontWeight: 600 }}>{unit}</span> : null}
+    <span style={{ ...label(size, color), fontWeight: 500, ...TABULAR }}>{value}</span>
+    {unit ? <span style={{ ...label(size, INK_SOFT), fontWeight: 500 }}>{unit}</span> : null}
   </Ink>
 );
 
@@ -464,7 +464,7 @@ export const Py: React.FC<{ line: string; size?: number }> = ({ line, size }) =>
     if (comment) parts.push({ text, color: PY_INK.comment });
     else if (str) parts.push({ text, color: PY_INK.string });
     else if (fn) parts.push({ text, color: PY_INK.fn });
-    else if (word && PY_KEYWORDS.has(word)) parts.push({ text, color: PY_INK.keyword, weight: 700 });
+    else if (word && PY_KEYWORDS.has(word)) parts.push({ text, color: PY_INK.keyword, weight: 500 });
     else if (word) parts.push({ text, color: PY_INK.name });
     else parts.push({ text, color: PY_INK.punct });
   }

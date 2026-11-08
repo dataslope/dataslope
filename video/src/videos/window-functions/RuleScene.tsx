@@ -97,7 +97,7 @@ export const RuleScene: React.FC = () => {
       <Blocks rows={GROUPED.rows} cells={GROUPED.columns.length} top={top1 + 8} at={groupAt} computedAt={perAt} />
       <Ink at={groupAt - 2} dur={16} style={{ left: TEXT_X, top: top1, width: 1000 }}>
         <div style={label(26, INK)}>
-          <Mono weight={600}>GROUP BY</Mono>
+          <Mono weight={500}>GROUP BY</Mono>
         </div>
         <div style={{ ...headline(74), marginTop: 22 }}>One row per group.</div>
       </Ink>
@@ -116,7 +116,7 @@ export const RuleScene: React.FC = () => {
       <Blocks rows={WINDOWED.rows} cells={WINDOWED.columns.length} top={top2 + 8} at={everyAt - 4} computedAt={besideAt} />
       <Ink at={windowAt - 2} dur={16} style={{ left: TEXT_X, top: top2, width: 820 }}>
         <div style={label(26, INK)}>
-          A window function, <Mono weight={600}>OVER (…)</Mono>
+          A window function, <Mono weight={500}>OVER (…)</Mono>
         </div>
         {/* Broken by hand, so no face leaves "it." alone on a line. */}
         <div style={{ ...headline(74, true), color: INK, marginTop: 22, lineHeight: 1.1 }}>

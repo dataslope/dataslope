@@ -130,12 +130,12 @@ export const AbtestScene: React.FC = () => {
         </Note>
         <Svg opacity={ease(frame, asked - 4, 12) * (1 - ease(frame, out6, 10))}>
           <circle cx={userX} cy={forkY} r={26} fill={INK_SOFT} opacity={0.25} />
-          <text x={userX} y={forkY + 58} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 600, fill: INK_SOFT }}>
+          <text x={userX} y={forkY + 58} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT }}>
             users
           </text>
         </Svg>
         <Svg opacity={ease(frame, assignAt - 2, 12) * (1 - ease(frame, out6, 10))}>
-          <text x={userX + 136} y={forkY + 7} textAnchor="start" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: INK_SOFT }}>
+          <text x={userX + 136} y={forkY + 7} textAnchor="start" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
             at random
           </text>
         </Svg>
@@ -179,7 +179,7 @@ export const AbtestScene: React.FC = () => {
           </span>
         </Note>
         <Note at={causationAt - 2} x={X0} y={y(TOP + 480)} out={out6}>
-          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>so a difference is the change: causation</span>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>so a difference is the change: causation</span>
         </Note>
         <Note at={compareAt} x={armX} y={y(TOP + 330)} out={out6}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>same metric, both arms</span>
@@ -189,7 +189,7 @@ export const AbtestScene: React.FC = () => {
         <Svg opacity={ease(frame, pickAt - 4, 12) * (1 - ease(frame, out6, 10))}>
           <line x1={lineX} x2={lineX} y1={rowY(0) - h(24)} y2={rowY(BALANCE.rows.length - 1) + h(22)} stroke={INK} strokeWidth={1.6} strokeDasharray="5 5" />
           {/* Beside the line's top end, so the line never runs through it. */}
-          <text x={lineX + 10} y={rowY(0) - h(26)} textAnchor="start" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, fill: INK_SOFT }}>
+          <text x={lineX + 10} y={rowY(0) - h(26)} textAnchor="start" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
             {BALANCE.threshold}
             <tspan opacity={ease(frame, flagAt - 2, 10)}>: the usual flag</tspan>
           </text>
@@ -292,7 +292,7 @@ export const AbtestScene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>gaps a do-nothing change would give, in standard errors</span>
         </Note>
         <Note at={seAt} x={NULL.x1} width={320} y={base - height * 0.55 - h(80)} align="right">
-          <span style={{ ...note(25, B_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, B_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             ours: <Num>{fmt(EXPERIMENT.z)}</Num>
           </span>
           <br />

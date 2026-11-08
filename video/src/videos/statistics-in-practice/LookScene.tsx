@@ -203,7 +203,7 @@ export const LookScene: React.FC = () => {
               <span
                 style={{
                   ...note(20, k === FRI ? STAT_INK : INK_SOFT),
-                  fontWeight: k === FRI ? 700 : 500,
+                  fontWeight: k === FRI ? 500 : 500,
                   whiteSpace: "nowrap",
                 }}
               >
@@ -237,10 +237,10 @@ export const LookScene: React.FC = () => {
 
         {/* ── The enlarged panel: each day's average, its wobble, then the median ── */}
         <Ink at={standsAt - 8} dur={14} out={medianAt - 4} style={{ left: X2.x0, top: y(330), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK), fontWeight: 560 }}>Average tip, by day</span>
+          <span style={{ ...label(24, INK), fontWeight: 500 }}>Average tip, by day</span>
         </Ink>
         <Ink at={medianAt} dur={14} style={{ left: X2.x0, top: y(330), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK), fontWeight: 560 }}>Median tip, by day</span>
+          <span style={{ ...label(24, INK), fontWeight: 500 }}>Median tip, by day</span>
         </Ink>
         <Axis scale={X2} base={y(AXIS)} ticks={[14, 16, 18, 20]} format={(v) => `${v}%`} at={standsAt - 8} />
         {whisk * overlap > 0 ? (
@@ -314,7 +314,7 @@ export const LookScene: React.FC = () => {
                 whiteSpace: "nowrap",
                 ...note(21, lead ? STAT_INK : INK_SOFT),
                 ...TABULAR,
-                fontWeight: lead ? 700 : 500,
+                fontWeight: lead ? 500 : 500,
                 ...halo,
               }}
             >

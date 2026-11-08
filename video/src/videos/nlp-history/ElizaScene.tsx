@@ -122,7 +122,7 @@ export const ElizaScene: React.FC = () => {
                 </div>
               </Ink>
               <Ink at={isFirst ? handAt - 2 : t + 6} dur={14} style={{ left: PAD, top: top + LINE, whiteSpace: "pre" }}>
-                <div style={{ fontFamily: MONO, fontSize: 30, color: INK, fontWeight: 600 }}>
+                <div style={{ fontFamily: MONO, fontSize: 30, color: INK, fontWeight: 500 }}>
                   ELIZA: <span style={{ fontWeight: 400 }}>{elizaLine}</span>
                 </div>
               </Ink>
@@ -131,7 +131,7 @@ export const ElizaScene: React.FC = () => {
         })}
       </div>
       {/* The reflected words, carried from the input into the reply. */}
-      <Tag x={PX + PW - 24} y={PTOP + PAD + 6} at={handAt + 2} align="right" size={21} color={ACCENT_INK} weight={650} dim={questionAt + 30}>
+      <Tag x={PX + PW - 24} y={PTOP + PAD + 6} at={handAt + 2} align="right" size={21} color={ACCENT_INK} weight={500} dim={questionAt + 30}>
         reflected back
       </Tag>
       <div
@@ -148,7 +148,7 @@ export const ElizaScene: React.FC = () => {
           opacity: 0.9 * (1 - settle * 0.3),
         }}
       />
-      <Tag x={PX} y={PTOP + PH + 34} at={noAt} size={23} color={ACCENT_INK} weight={650}>
+      <Tag x={PX} y={PTOP + PH + 34} at={noAt} size={23} color={ACCENT_INK} weight={500}>
         just patterns and canned replies
       </Tag>
 

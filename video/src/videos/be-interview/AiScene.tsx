@@ -103,7 +103,7 @@ const SurveyBar: React.FC<{ top: number; pct: number; at: number; children: Reac
             left: w * grow + 14,
             top: -1,
             ...note(30, BLUE_INK),
-            fontWeight: 600,
+            fontWeight: 500,
             lineHeight: "38px",
             whiteSpace: "nowrap",
             opacity: ease(frame, at + 16, 10),
@@ -124,7 +124,7 @@ const Moved: React.FC<{ at: number; title: string; part: React.ReactNode }> = ({
   const p = ease(frame, at - 2, 14);
   return (
     <div style={{ opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
-      <div style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{title}</div>
       <div style={{ ...label(22, BLUE_INK), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, at + 12, 12) }}>{part}</div>
     </div>
   );
@@ -253,7 +253,7 @@ export const AiScene: React.FC = () => {
             height: ROOT_LINE,
             textAlign: "center",
             ...note(32, INK),
-            fontWeight: 650,
+            fontWeight: 500,
             lineHeight: `${ROOT_LINE}px`,
             opacity: ease(frame, roundAt - 2, 12),
           }}
@@ -278,7 +278,7 @@ export const AiScene: React.FC = () => {
               top: headTop,
               textAlign: "center",
               ...note(30, INK),
-              fontWeight: 650,
+              fontWeight: 500,
               opacity: headIn(head.at),
               transform: `translateY(${(1 - headIn(head.at)) * 8}px)`,
             }}
@@ -385,7 +385,7 @@ export const AiScene: React.FC = () => {
 
         {/* Karat's survey, sourced, with the page's caveat. */}
         <div style={{ position: "absolute", left: SURVEY_X, top: surveyTop, opacity: panel }}>
-          <div style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, karatAt - 2, 12) }}>
+          <div style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, karatAt - 2, 12) }}>
             Karat, <i>Engineering Interview Trends {KARAT.year}</i>
           </div>
           <div style={{ ...note(22, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>
@@ -453,7 +453,7 @@ export const AiScene: React.FC = () => {
         >
           System design now takes in features that call an LLM:{" "}
           {llmTopics.map((t, k) => (
-            <span key={t.text} style={{ fontWeight: 650, opacity: ease(frame, t.at - 2, 10) }}>
+            <span key={t.text} style={{ fontWeight: 500, opacity: ease(frame, t.at - 2, 10) }}>
               {k ? <span style={{ fontWeight: 500, color: INK_SOFT }}> · </span> : null}
               {t.text}
             </span>

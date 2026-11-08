@@ -153,10 +153,10 @@ export const PromptScene: React.FC = () => {
               align={v >= 0 ? "left" : "right"}
               y={cy + h(BAR_H) / 2 - 15}
             >
-              <span style={{ ...note(23, TEXT[i]), fontWeight: 650 }}>{signed(v)}</span>
+              <span style={{ ...note(23, TEXT[i]), fontWeight: 500 }}>{signed(v)}</span>
             </Note>
             <Note at={dividesAt + i * 4 + 14} x={P0 + (P1 - P0) * p + 14} y={cy + h(BAR_H) / 2 - 15}>
-              <span style={{ ...note(23, TEXT[i]), fontWeight: 650 }}>
+              <span style={{ ...note(23, TEXT[i]), fontWeight: 500 }}>
                 {markAt === undefined ? pct(p) : <Marked at={markAt - 2}>{pct(p)}</Marked>}
               </span>
             </Note>
@@ -166,7 +166,7 @@ export const PromptScene: React.FC = () => {
 
       {/* Softmax: from the scores to the probabilities. */}
       <Ink at={softAt - 4} dur={14} style={{ left: ARROW_X[0], width: ARROW_X[1] - ARROW_X[0], top: mid - 56, textAlign: "center" }}>
-        <span style={{ ...note(28, INK), fontWeight: 600 }}>
+        <span style={{ ...note(28, INK), fontWeight: 500 }}>
           <Mono>softmax</Mono>
         </span>
       </Ink>

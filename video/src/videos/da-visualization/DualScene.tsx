@@ -205,7 +205,7 @@ export const DualScene: React.FC = () => {
           </span>
         </Note>
         <Note at={upAt - 2} x={cx(C.window.end) + 16} y={y(DECADE.top) - h(4)}>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             the window: up <Num>{C.windowPct}%</Num>
           </span>
         </Note>

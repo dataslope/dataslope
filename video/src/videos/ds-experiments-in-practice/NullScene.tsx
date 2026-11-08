@@ -62,13 +62,13 @@ export const NullScene: React.FC = () => {
           The test shows no significant difference. What can you conclude?
         </QuestionCard>
         <Note at={onlyAt - 2} x={X0} y={y(330)}>
-          <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Only that you didn't detect one.{" "}
             <span style={{ color: BLUE_INK, opacity: ease(frame, ciAt, 12) }}>Read the confidence interval.</span>
           </span>
         </Note>
         <Note at={simAt} x={X0} y={y(400)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             simulated: a change that does nothing, on a {NOSIG.base}% conversion rate
           </span>
         </Note>
@@ -93,13 +93,13 @@ export const NullScene: React.FC = () => {
               </g>
             ))}
             <line x1={at(x, 0)} x2={at(x, 0)} y1={y(470)} y2={y(AXIS_Y)} stroke={INK} strokeWidth={1.2} strokeDasharray="3 6" />
-            <text x={x.b} y={y(AXIS_Y) + 62} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 650, fill: INK_SOFT }}>
+            <text x={x.b} y={y(AXIS_Y) + 62} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
               difference, new minus old (percentage points)
             </text>
           </g>
         </svg>
         <Note at={halfAt + 6} x={at(x, -NOSIG.worth)} y={y(470) - h(36)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>± half a point: the smallest lift worth having</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>± half a point: the smallest lift worth having</span>
         </Note>
 
         {tests.map(({ t, row, at: start, ends, verdictAt, ok }) => {
@@ -126,7 +126,7 @@ export const NullScene: React.FC = () => {
                   top: y(row) - 20,
                   textAlign: "right",
                   ...note(26, INK),
-                  fontWeight: 650,
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                   ...TABULAR,
                   opacity: ease(frame, start, 12),
@@ -146,7 +146,7 @@ export const NullScene: React.FC = () => {
                     top: ok ? y(row) - 14 : y(row) - h(52),
                     textAlign: ok ? (j === 0 ? "right" : "left") : "center",
                     ...label(21, INK),
-                    fontWeight: 600,
+                    fontWeight: 500,
                     ...TABULAR,
                     opacity: ease(frame, ends + j * 8, 10),
                   }}
@@ -155,7 +155,7 @@ export const NullScene: React.FC = () => {
                 </div>
               ))}
               <Note at={verdictAt - 2} x={ok ? at(x, t.hi) + 96 : at(x, t.hi) + 40} y={y(row) - 20}>
-                <span style={{ ...note(28, ok ? OK_INK : ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(28, ok ? OK_INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                   {ok ? "no meaningful effect" : "can't tell"}
                 </span>
               </Note>
@@ -163,7 +163,7 @@ export const NullScene: React.FC = () => {
           );
         })}
         <Note at={widerAt} x={at(x, NOSIG.small.lo)} y={y(SMALL_Y) + h(26)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>far wider than half a point</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>far wider than half a point</span>
         </Note>
       </Drift>
     </AbsoluteFill>

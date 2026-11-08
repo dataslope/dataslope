@@ -125,8 +125,8 @@ export const LeversScene: React.FC = () => {
         return (
           <React.Fragment key={p.title}>
             <Ink at={p.at} dur={14} style={{ left: x0, top: y(300), whiteSpace: "nowrap" }}>
-              <span style={{ ...label(26, EST_INK), fontWeight: 600 }}>{k + 1}</span>
-              <span style={{ ...label(26, INK), fontWeight: 600, marginLeft: 12 }}>{p.title}</span>
+              <span style={{ ...label(26, EST_INK), fontWeight: 500 }}>{k + 1}</span>
+              <span style={{ ...label(26, INK), fontWeight: 500, marginLeft: 12 }}>{p.title}</span>
             </Ink>
             <Ink at={k === 0 ? twoHundredAt - 4 : k === 1 ? holdAt - 4 : p.at + 6} dur={14} style={{ left: x0, top: y(344), whiteSpace: "nowrap" }}>
               <span style={note(22, INK_SOFT)}>{p.sub}</span>
@@ -141,14 +141,14 @@ export const LeversScene: React.FC = () => {
               return (
                 <React.Fragment key={r.name}>
                   <Ink at={r.at - 2} dur={12} style={{ left: x0, top: ry - 15, whiteSpace: "nowrap" }}>
-                    <span style={{ ...note(22, INK), fontWeight: 600 }}>{r.name}</span>
+                    <span style={{ ...note(22, INK), fontWeight: 500 }}>{r.name}</span>
                   </Ink>
                   <IntervalBar x0={sx(X, r.lo)} x1={sx(X, r.hi)} y={ry} at={r.at} dur={14} color={INK} width={4} tick={10} />
                   <Svg>
                     <circle cx={sx(X, (r.lo + r.hi) / 2)} cy={ry} r={5 * ease(frame, r.at + 4, 8)} fill={EST} stroke={PAPER} strokeWidth={1} />
                   </Svg>
                   <Note at={r.at + 8} x={sx(X, r.hi) + 12} y={ry - 15}>
-                    <span style={{ ...note(22, lit > 0 ? EST_INK : INK_SOFT), fontWeight: lit > 0 ? 700 : 500, ...halo, whiteSpace: "nowrap" }}>
+                    <span style={{ ...note(22, lit > 0 ? EST_INK : INK_SOFT), fontWeight: lit > 0 ? 500 : 500, ...halo, whiteSpace: "nowrap" }}>
                       <Marked at={r.lit >= 0 ? r.lit - 4 : 1e9} color={HIGHLIGHT}>
                         {fmt(r.width)}
                       </Marked>
@@ -174,7 +174,7 @@ export const LeversScene: React.FC = () => {
           after "doubles too" and the turn into the rate. */}
       <Ink at={noiseEnd + 4} dur={18} style={{ left: PANELS[0], top: y(852), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK) }}>
-          The same recipe: <span style={{ fontWeight: 600 }}>estimate ± critical value × standard error</span>
+          The same recipe: <span style={{ fontWeight: 500 }}>estimate ± critical value × standard error</span>
         </span>
       </Ink>
     </AbsoluteFill>

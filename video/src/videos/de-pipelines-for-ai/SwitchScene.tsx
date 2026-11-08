@@ -63,7 +63,7 @@ export const SwitchScene: React.FC = () => {
     left: colX(j) + 12,
     fontFamily: j === 0 ? note(24).fontFamily : MONO,
     fontSize: j === 0 ? 25 : 23,
-    fontWeight: j === 0 ? 600 : 500,
+    fontWeight: j === 0 ? 500 : 500,
     fontVariantLigatures: "none",
     whiteSpace: "nowrap",
   });
@@ -75,7 +75,7 @@ export const SwitchScene: React.FC = () => {
   const target = BG.x1 + BG.w / 2 + (BG.x2 - BG.x1) * swing;
   const fill = ease(frame, backfillAt, 26);
   const bgTop = y(BG.top);
-  const tagStyle: React.CSSProperties = { fontFamily: MONO, fontSize: 20, fontWeight: 600, fontVariantLigatures: "none" };
+  const tagStyle: React.CSSProperties = { fontFamily: MONO, fontSize: 20, fontWeight: 500, fontVariantLigatures: "none" };
 
   return (
     <AbsoluteFill>
@@ -104,7 +104,7 @@ export const SwitchScene: React.FC = () => {
         </Note>
         {["word", ...SWITCH.axes, "from its kitten"].map((t, j) => (
           <Note key={t} at={(j === 4 ? searchAt : spaceAt) + j * 2} x={colX(j) + 12} y={y(T.top) + 8}>
-            <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{t}</span>
+            <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{t}</span>
           </Note>
         ))}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, spaceAt, 12) }}>
@@ -137,7 +137,7 @@ export const SwitchScene: React.FC = () => {
                   {v.toFixed(1)}
                 </div>
               ))}
-              <div style={{ ...cellStyle(4), top: rowTop(i) + 12, color: isNear ? ACCENT_INK : INK, fontWeight: isNear ? 700 : 500, opacity: dShow }}>
+              <div style={{ ...cellStyle(4), top: rowTop(i) + 12, color: isNear ? ACCENT_INK : INK, fontWeight: isNear ? 500 : 500, opacity: dShow }}>
                 {dist[w.word].toFixed(2)}
               </div>
             </React.Fragment>
@@ -145,7 +145,7 @@ export const SwitchScene: React.FC = () => {
         })}
         {/* The second model's kitten. */}
         <Note at={pretendAt} x={T.x} y={qTop}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             a second model, same meanings
             <span style={{ opacity: ease(frame, axesAt - 2, 10) }}>, axes in another order: {SWITCH.newAxes.join(", ")}</span>
           </span>
@@ -164,12 +164,12 @@ export const SwitchScene: React.FC = () => {
         />
         <div style={{ ...cellStyle(0), top: qTop + 48, color: INK, opacity: ease(frame, kittenAt - 2, 10) }}>kitten</div>
         {SWITCH.kittenNew.map((v, j) => (
-          <div key={j} style={{ ...cellStyle(j + 1), top: qTop + 50, color: INK, fontWeight: 650, opacity: ease(frame, kittenAt + j * 2, 10) }}>
+          <div key={j} style={{ ...cellStyle(j + 1), top: qTop + 50, color: INK, fontWeight: 500, opacity: ease(frame, kittenAt + j * 2, 10) }}>
             {v.toFixed(1)}
           </div>
         ))}
         <Note at={truckAt + 4} x={T.x} y={qTop + 112}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             nearest: {nearest}
             <span style={{ ...note(25, INK_SOFT), fontWeight: 500 }}> (the old model&apos;s own kitten lands nearest {SWITCH.nearestSame})</span>
           </span>

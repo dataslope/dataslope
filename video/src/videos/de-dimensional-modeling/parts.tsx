@@ -141,7 +141,7 @@ export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?
       fontFamily: MONO,
       fontSize: "max(19px, 0.92em)",
       fontStyle: "normal",
-      fontWeight: weight ?? 600,
+      fontWeight: weight ?? 500,
       color,
       fontVariantLigatures: "none",
       wordSpacing: "-0.3em",
@@ -188,7 +188,7 @@ export const PanelHead: React.FC<{
       {/* The rule sits RULE_LIFT above `y`, so the name keeps its place and
           has RULE_ROOM of white under the rule. */}
       <div style={{ height: 2, width: width * p, marginTop: -RULE_LIFT, background: color === INK ? INK : color }} />
-      <div style={{ ...label(26, color), fontWeight: 600, marginTop: RULE_ROOM, opacity: p, whiteSpace: "nowrap" }}>{children}</div>
+      <div style={{ ...label(26, color), fontWeight: 500, marginTop: RULE_ROOM, opacity: p, whiteSpace: "nowrap" }}>{children}</div>
       {sub ? (
         <div style={{ ...note(22, INK_SOFT), marginTop: 6, opacity: ease(frame, subAt ?? at + 8, 12), whiteSpace: "nowrap" }}>{sub}</div>
       ) : null}
@@ -237,7 +237,7 @@ export const Verdict: React.FC<{
       }}
     >
       <span style={{ ...note(size, INK_SOFT) }}>{what}</span>
-      <span style={{ position: "relative", fontFamily: MONO, fontSize: size, fontWeight: 600, color: ink, fontVariantLigatures: "none" }}>
+      <span style={{ position: "relative", fontFamily: MONO, fontSize: size, fontWeight: 500, color: ink, fontVariantLigatures: "none" }}>
         {value}
         {s > 0 ? (
           <span

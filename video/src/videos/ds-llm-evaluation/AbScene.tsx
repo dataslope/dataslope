@@ -16,8 +16,8 @@ const PANEL_W = 800;
 /** A panel's numbered title. */
 const Title: React.FC<{ n: number; x: number; y: number; at: number; children: React.ReactNode }> = ({ n, x, y, at, children }) => (
   <Note at={at} x={x} y={y}>
-    <span style={{ ...note(29, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-      <span style={{ ...note(29, ACCENT_INK), fontWeight: 600, marginRight: 14 }}>{n}</span>
+    <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+      <span style={{ ...note(29, ACCENT_INK), fontWeight: 500, marginRight: 14 }}>{n}</span>
       {children}
     </span>
   </Note>
@@ -143,7 +143,7 @@ export const AbScene: React.FC = () => {
           </Tag>
         ))}
         <Note at={bothAt} x={COL[0] + 110} y={y(ROW[0]) + 160}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>nobody sees both arms</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>nobody sees both arms</span>
         </Note>
 
         {/* 2. More variance. */}
@@ -199,13 +199,13 @@ export const AbScene: React.FC = () => {
           <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>the test, start to finish, one model name</span>
         </Note>
         <Note at={updateAt + 6} x={mid + 12} y={TL.y - 54} from="right">
-          <span style={{ ...label(19, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>updated under the same name</span>
+          <span style={{ ...label(19, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>updated under the same name</span>
         </Note>
         <Note at={halfAt} x={TL.x0} y={TL.y + 50}>
           <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>the treatment changes halfway through</span>
         </Note>
         <Note at={logAt + 6} x={TL.x0} y={TL.y + 86}>
-          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={logAt + 10}>log the version on every request</Mark>
           </span>
         </Note>

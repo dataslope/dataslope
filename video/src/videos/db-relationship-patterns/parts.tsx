@@ -79,7 +79,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -127,14 +127,14 @@ export const Caption: React.FC<{ at: number; x: number; y: number; out?: number;
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
   return (
     <Ink at={at} dur={14} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", opacity: 1 - d }}>
-      <span style={{ ...label(23, INK), fontWeight: 600 }}>{children}</span>
+      <span style={{ ...label(23, INK), fontWeight: 500 }}>{children}</span>
     </Ink>
   );
 };
 
 /** Code set inside running text or a label, at the text's own size. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 600, color }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 500, color }}>{children}</span>
 );
 
 // ── Motion ───────────────────────────────────────────────────────────────────
@@ -348,7 +348,7 @@ export const Chip: React.FC<{
         gap: 2,
       }}
     >
-      <span style={{ fontFamily: SANS, fontWeight: 650, fontSize: 24, color: INK, whiteSpace: "nowrap" }}>{name}</span>
+      <span style={{ fontFamily: SANS, fontWeight: 500, fontSize: 24, color: INK, whiteSpace: "nowrap" }}>{name}</span>
       {sub ? <span style={{ fontFamily: MONO, fontSize: 19, color: INK_SOFT, whiteSpace: "nowrap" }}>{sub}</span> : null}
     </div>
   );
@@ -424,8 +424,8 @@ const tokenize = (line: string): Token[] => {
     if (comment) out.push({ text, color: TOKEN_INK.comment });
     else if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
-    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 600 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
+    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -572,12 +572,12 @@ export const ErrorBox: React.FC<{
       }}
     >
       <div>
-        <span style={{ color: ACCENT_INK, fontWeight: 600 }}>ERROR:</span>
+        <span style={{ color: ACCENT_INK, fontWeight: 500 }}>ERROR:</span>
         {"  "}
         {message}
       </div>
       <div style={{ color: INK_SOFT }}>
-        <span style={{ fontWeight: 600 }}>DETAIL:</span>
+        <span style={{ fontWeight: 500 }}>DETAIL:</span>
         {"  "}
         {detailMark === undefined ? detail : <Mark at={detailMark}>{detail}</Mark>}
       </div>
@@ -597,7 +597,7 @@ export const Reply: React.FC<{ x: number; y: number; at: number; text: string; c
   children,
 }) => (
   <Ink at={at} dur={14} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
-    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color }}>{text}</span>
+    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color }}>{text}</span>
     {children ? <span style={{ ...note(22, INK_SOFT) }}>{children}</span> : null}
   </Ink>
 );
@@ -801,7 +801,7 @@ export const DbTable: React.FC<{
       })}
       <Ink at={at + 2} dur={14} style={{ left: g.x, top: g.top, width: g.width, height: g.headH, display: "flex", alignItems: "center" }}>
         {cols.map((c, j) => (
-          <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: INK_SOFT }}>
+          <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 500, color: INK_SOFT }}>
             {c}
           </div>
         ))}
@@ -927,7 +927,7 @@ export const ColTag: React.FC<{ g: TableGeometry; col: number; at: number; color
   children,
 }) => (
   <Ink at={at} dur={12} out={out} style={{ left: g.xs[col] + PAD, top: g.top - 36, whiteSpace: "nowrap" }}>
-    <span style={{ ...label(20, color), fontWeight: 600 }}>{children}</span>
+    <span style={{ ...label(20, color), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 

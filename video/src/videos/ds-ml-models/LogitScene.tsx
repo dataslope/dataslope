@@ -56,7 +56,7 @@ const Formula: React.FC<{
   <span
     style={{
       ...note(size, color),
-      fontWeight: 600,
+      fontWeight: 500,
       whiteSpace: "nowrap",
       ...TABULAR,
     }}
@@ -288,7 +288,7 @@ export const LogitScene: React.FC = () => {
             <span
               style={{
                 ...note(24, ACCENT_INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -300,7 +300,7 @@ export const LogitScene: React.FC = () => {
             <span
               style={{
                 ...note(24, ACCENT_INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -321,7 +321,7 @@ export const LogitScene: React.FC = () => {
             <span
               style={{
                 ...note(26, ACCENT_INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -387,7 +387,7 @@ export const LogitScene: React.FC = () => {
             <span
               style={{
                 ...note(24, ACCENT_INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -403,7 +403,7 @@ export const LogitScene: React.FC = () => {
             <span
               style={{
                 ...note(28, OK_INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >

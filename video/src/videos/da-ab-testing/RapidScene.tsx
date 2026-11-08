@@ -117,12 +117,12 @@ const Conversion: React.FC<{ c: Ctx }> = ({ c }) => {
 
       <Listing lines={right} x={LX} top={c.y(TOP)} width={580} size={SIZE} at={distinctAt - 4} marks={[{ line: 1, at: distinctAt + 2 }, { line: 2, at: oneAt }, { line: 3, at: overAt }]} />
       <Note at={fourAt - 2} x={valueX} y={c.y(TOP) + listingHeight(right.length, SIZE) / 2 - c.h(26)}>
-        <span style={{ ...note(44, OK_INK), fontWeight: 650, ...TABULAR }}>{value(RAPID.right)}</span>
+        <span style={{ ...note(44, OK_INK), fontWeight: 500, ...TABULAR }}>{value(RAPID.right)}</span>
       </Note>
 
       <Listing lines={wrong} x={LX} top={top2} width={580} size={SIZE} at={withoutAt - 4} marks={[{ line: 1, at: withoutAt + 2, color: MARK_BAD }]} />
       <Note at={sixAt - 2} x={valueX} y={top2 + listingHeight(wrong.length, SIZE) / 2 - c.h(26)}>
-        <span style={{ ...note(44, ACCENT_INK), fontWeight: 650, ...TABULAR }}>{value(RAPID.repeats)}</span>
+        <span style={{ ...note(44, ACCENT_INK), fontWeight: 500, ...TABULAR }}>{value(RAPID.repeats)}</span>
       </Note>
 
       <Note at={zeroAt - 2} x={LX} y={top2 + listingHeight(wrong.length, SIZE) + c.h(24)}>
@@ -173,10 +173,10 @@ const Novelty: React.FC<{ c: Ctx }> = ({ c }) => {
         <circle cx={at(x, 1)} cy={at(y, durable[0])} r={9 * p1} fill={OK} />
       </Svg>
       <Note at={fourteenAt - 2} x={at(x, 1) + 20} y={at(y, novelty[0]) - c.h(18)}>
-        <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{fmt(novelty[0], 0)}%</span>
+        <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{fmt(novelty[0], 0)}%</span>
       </Note>
       <Note at={fourteenAt + 8} x={at(x, 1) + 20} y={at(y, durable[0]) + c.h(8)}>
-        <span style={{ ...note(26, OK_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{fmt(durable[0], 0)}%</span>
+        <span style={{ ...note(26, OK_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{fmt(durable[0], 0)}%</span>
       </Note>
       <Note at={fadesAt + 20} x={at(x, last) + 16} y={at(y, novelty[last - 1]) - c.h(16)}>
         <span style={{ ...label(21, ACCENT_INK), whiteSpace: "nowrap" }}>novelty</span>
@@ -190,11 +190,11 @@ const Novelty: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={longAt - 2} x={at(x, 3)} y={c.y(PLOT.top) + c.h(56)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>run it long enough to settle</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>run it long enough to settle</span>
       </Note>
       {/* Below the 10% gridline, clear of both curves. */}
       <Note at={checkAt - 2} x={at(x, 3)} y={c.y(PLOT.top) + c.h(162)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>and check it holds for users who never saw the old one</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>and check it holds for users who never saw the old one</span>
       </Note>
     </>
   );
@@ -253,12 +253,12 @@ const Cohorts: React.FC<{ c: Ctx }> = ({ c }) => {
       </Svg>
       {/* Left of the dot, under the curve: to its right the curve runs on through the label. */}
       <Note at={janAt} x={at(x, W) - 16} y={at(y, jan.rows[W]) + c.h(6)} align="right">
-        <span style={{ ...note(24, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
           {jan.key}: {fmt(jan.rows[W], 0)}%
         </span>
       </Note>
       <Note at={mayAt} x={at(x, W) + 16} y={at(y, may.rows[W]) - c.h(46)}>
-        <span style={{ ...note(24, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
           {may.key}: {fmt(may.rows[W], 0)}%
         </span>
       </Note>
@@ -307,7 +307,7 @@ const Retention: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Line points={pts(core)} x={x} y={y} at={healthyAt - 2} dur={30} color={OK} />
       <Note at={plateauAt} x={at(x, 7)} y={at(y, core[7]) - c.h(52)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a plateau</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a plateau</span>
       </Note>
       {/* The leaky one shares the healthy one's first two weeks, then falls away. */}
       <Line points={pts(leaky.slice(0, MATCH + 1))} x={x} y={y} at={matchAt - 2} dur={14} color={ACCENT} />
@@ -332,10 +332,10 @@ const Retention: React.FC<{ c: Ctx }> = ({ c }) => {
         <circle cx={at(x, weeks)} cy={at(y, leaky[weeks])} r={dot(twoAt - 2)} fill={ACCENT} />
       </Svg>
       <Note at={thirtyAt} x={at(x, weeks) + 18} y={at(y, core[weeks]) - c.h(18)}>
-        <span style={{ ...note(26, OK_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{fmt(core[weeks], 0)}%</span>
+        <span style={{ ...note(26, OK_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{fmt(core[weeks], 0)}%</span>
       </Note>
       <Note at={twoAt} x={at(x, weeks) + 18} y={at(y, leaky[weeks]) - c.h(18)}>
-        <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{fmt(leaky[weeks], 0)}%</span>
+        <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{fmt(leaky[weeks], 0)}%</span>
       </Note>
     </>
   );

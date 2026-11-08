@@ -102,7 +102,7 @@ export const ClaimsScene: React.FC = () => {
         <Note at={claimingAt - 2} x={X + 700} y={y(LISTING_Y + 6)}>
           {/* Within a step of the listing's 28px code, which it reads along. */}
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            claims <span style={{ color: STAT_INK, fontWeight: 650 }}>no name is longer than {NAME.limit} characters</span>
+            claims <span style={{ color: STAT_INK, fontWeight: 500 }}>no name is longer than {NAME.limit} characters</span>
           </span>
         </Note>
 
@@ -167,7 +167,7 @@ export const ClaimsScene: React.FC = () => {
                 justifyContent: "center",
                 fontFamily: MONO,
                 fontSize: 30,
-                fontWeight: out ? 700 : 500,
+                fontWeight: out ? 500 : 500,
                 color: out ? STAT_INK : INK,
                 opacity: p,
                 transform: `translateY(${(1 - p) * -14}px) scale(${1 + (out ? over * 0.25 : 0)})`,
@@ -185,7 +185,7 @@ export const ClaimsScene: React.FC = () => {
             opacity: ease(frame, nameAt[0] - 2, 8),
             whiteSpace: "nowrap",
             ...note(COUNT_SIZE, landed > NAME.limit ? STAT_INK : INK),
-            fontWeight: 600,
+            fontWeight: 500,
           }}
         >
           {/* One line at one size: the count stands out by its ink and weight. */}

@@ -79,7 +79,7 @@ export const HookScene: React.FC = () => {
             return (
               <span key={c.big} style={{ opacity: p, transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.08 * lit})`, display: "inline-block", whiteSpace: "nowrap" }}>
                 {/* One size for the count and its words: the weight carries the count. */}
-                <span style={{ ...label(28, c.soft ? INK_SOFT : INK), fontWeight: 750, ...TABULAR }}>{c.big}</span>{" "}
+                <span style={{ ...label(28, c.soft ? INK_SOFT : INK), fontWeight: 500, ...TABULAR }}>{c.big}</span>{" "}
                 <span style={{ ...note(28, c.soft ? INK_SOFT : INK) }}>{c.text}</span>
               </span>
             );

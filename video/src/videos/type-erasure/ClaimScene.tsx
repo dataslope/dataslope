@@ -114,7 +114,7 @@ export const ClaimScene: React.FC = () => {
       <Note at={anyAt} x={NOTE_X} y={parseMid - 17} width={700}>
         <div style={note(24, INK)}>
           <Mono>JSON.parse</Mono> returns{" "}
-          <Mono color={ACCENT_INK} weight={600}>
+          <Mono color={ACCENT_INK} weight={500}>
             {JSON_PARSE_RETURNS}
           </Mono>
         </div>
@@ -146,7 +146,7 @@ export const ClaimScene: React.FC = () => {
       <Note at={crashesAt + 10} x={NOTE_X} y={termTop + 18} width={700}>
         <div style={{ ...note(22, INK_SOFT) }}>
           The type said <Mono color={INK}>name</Mono> is a string. At runtime it was{" "}
-          <Mono color={ACCENT_INK} weight={600}>
+          <Mono color={ACCENT_INK} weight={500}>
             null
           </Mono>
           .

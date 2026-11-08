@@ -27,7 +27,7 @@ const Requests: React.FC<{ top: number; at: number; mixed: boolean; label: strin
   if (p <= 0) return null;
   return (
     <div style={{ position: "absolute", left: X0, top, display: "flex", alignItems: "center", gap: 14, opacity: p }}>
-      <span style={{ width: 150, ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{text}</span>
+      <span style={{ width: 150, ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{text}</span>
       <svg width={52} height={52} style={{ overflow: "visible" }}>
         <circle cx={26} cy={16} r={11} fill={INK} />
         <path d="M6,50 Q26,20 46,50 Z" fill={INK} />
@@ -48,7 +48,7 @@ const Requests: React.FC<{ top: number; at: number; mixed: boolean; label: strin
               alignItems: "center",
               justifyContent: "center",
               ...label(21, PAPER),
-              fontWeight: 600,
+              fontWeight: 500,
               opacity: q,
               transform: `scale(${0.6 + 0.4 * q})`,
             }}
@@ -152,11 +152,11 @@ export const UnitScene: React.FC = () => {
 
         <Requests top={y(410)} at={userAt + 6} mixed={false} label="by user" />
         <Note at={userAt + 22} x={X0 + 610} y={y(420)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>one version</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one version</span>
         </Note>
         <Requests top={y(520)} at={requestAt} mixed label="by request" />
         <Note at={bothAt} x={X0 + 610} y={y(530)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>both versions</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>both versions</span>
         </Note>
         <Note at={diluteAt} x={X0} y={y(620)}>
           <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>the measured difference is diluted</span>
@@ -164,7 +164,7 @@ export const UnitScene: React.FC = () => {
 
         {/* The analysis: orders nested in users. */}
         <Note at={respectAt} x={RIGHT_X} y={y(300)}>
-          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>the analysis respects the unit, too</span>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the analysis respects the unit, too</span>
         </Note>
         <Svg opacity={ease(frame, thousandAt - 2, 12)}>
           {ORDERS.map((k, u) => {
@@ -202,7 +202,7 @@ export const UnitScene: React.FC = () => {
           const grow = ease(frame, b.valAt - 6, 16);
           return (
             <React.Fragment key={b.text}>
-              <div style={{ position: "absolute", left: RIGHT_X, top: y(b.top), ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: p }}>
+              <div style={{ position: "absolute", left: RIGHT_X, top: y(b.top), ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p }}>
                 {b.v === UNIT.user ? (
                   <Mark at={wrongAt - 6} color={MARK_OK}>
                     {b.text}
@@ -210,7 +210,7 @@ export const UnitScene: React.FC = () => {
                 ) : (
                   b.text
                 )}
-                <span style={{ ...label(23, b.ink), fontWeight: 650, opacity: ease(frame, b.seAt, 10) }}>
+                <span style={{ ...label(23, b.ink), fontWeight: 500, opacity: ease(frame, b.seAt, 10) }}>
                   {" · standard error "}
                   {b.se.toFixed(2)}
                   {b.v === UNIT.naive ? <span style={{ opacity: ease(frame, smallAt, 10) }}>, too small</span> : null}
@@ -233,19 +233,19 @@ export const UnitScene: React.FC = () => {
                 <line x1={xOf(0.05)} x2={xOf(0.05)} y1={y(b.top) + h(32)} y2={y(b.top) + h(88)} stroke={INK} strokeWidth={2} strokeDasharray="4 5" />
               </Svg>
               <Note at={b.valAt} x={Math.max(xOf(b.v), xOf(0.05) + 6) + 14} y={y(b.top) + h(42)}>
-                <span style={{ ...note(30, b.ink), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>{pct(b.v, 1)} significant</span>
+                <span style={{ ...note(30, b.ink), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{pct(b.v, 1)} significant</span>
               </Note>
             </React.Fragment>
           );
         })}
         <Note at={promiseAt + 2} x={xOf(0.05) - 100} y={y(774)} width={200} style={{ textAlign: "center" }}>
-          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>5% promised</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>5% promised</span>
         </Note>
         <Note at={orderAt} x={RIGHT_X} y={y(830)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>{UNIT.sims.toLocaleString("en-US")} simulated A/A tests</span>
         </Note>
         <Note at={clusterAt} x={RIGHT_X} y={y(872)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>or keep every order, with clustered standard errors</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>or keep every order, with clustered standard errors</span>
         </Note>
       </Drift>
     </AbsoluteFill>

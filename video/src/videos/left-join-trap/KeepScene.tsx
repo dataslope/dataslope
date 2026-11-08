@@ -76,7 +76,7 @@ export const KeepScene: React.FC = () => {
         { x: ORD_X, name: "orders", at: ordAt - 4 },
       ].map((t) => (
         <Ink key={t.name} at={t.at} dur={14} style={{ left: t.x + 14, top: y(TABLE_TOP - 46) }}>
-          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>{t.name}</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{t.name}</span>
         </Ink>
       ))}
       <Table

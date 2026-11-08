@@ -97,7 +97,7 @@ export const FlatScene: React.FC = () => {
         {/* The table and its columns from the first mention of a database; its rows with "a few orders". */}
         <FigLabel n="1" title="One table for everything" at={databaseAt - 4} x={X0} y={y(FIG_Y)} />
         <Note at={databaseAt + 4} x={g.x + g.width} y={y(FIG_Y) + 3} align="right">
-          <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, whiteSpace: "nowrap" }}>{FLAT.table}</span>
+          <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK_SOFT, whiteSpace: "nowrap" }}>{FLAT.table}</span>
         </Note>
         <DbTable
           g={g}
@@ -138,7 +138,7 @@ export const FlatScene: React.FC = () => {
         {/* One line at one size: the reply stands out by its ink and weight. */}
         <Ink at={swapAt + 4} dur={14} style={{ left: RIGHT_X, top: replyTop, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14, fontSize: 22 }}>
           <span style={label(22, INK_SOFT)}>Postgres replied</span>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK }}>UPDATE {FLAT.updated}</span>
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK }}>UPDATE {FLAT.updated}</span>
           <span style={note(22, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
         </Ink>
         <Note at={missesAt + 2} x={RIGHT_X} y={replyTop + 52}>

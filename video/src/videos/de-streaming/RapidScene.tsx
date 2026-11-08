@@ -38,7 +38,7 @@ const Compaction: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={startAt} x={R_X} y={c.y(330)}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>profile updates, keyed by user: the log, oldest first</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>profile updates, keyed by user: the log, oldest first</span>
       </Note>
       {COMPACTION.log.map((r) => {
         const p = ease(frame, startAt + 2 + r.offset * 2, 8);
@@ -46,7 +46,7 @@ const Compaction: React.FC<{ c: Ctx }> = ({ c }) => {
         const keep = r.kept ? ease(frame, latestAt + 2, 10) : 0;
         return (
           <React.Fragment key={r.offset}>
-            <div style={{ position: "absolute", left: cx(r.offset), width: W, top: logY - c.h(34), textAlign: "center", ...label(20, INK_SOFT), fontWeight: 650, ...TABULAR, opacity: p }}>
+            <div style={{ position: "absolute", left: cx(r.offset), width: W, top: logY - c.h(34), textAlign: "center", ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR, opacity: p }}>
               {r.offset}
             </div>
             <Cell x={cx(r.offset)} y={logY} w={W} h={c.h(50)} user={r.user} size={21} opacity={p * (1 - 0.6 * old)} ring={keep > 0 ? OK : undefined} ringP={keep}>
@@ -58,7 +58,7 @@ const Compaction: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <Note at={ageAt} x={R_X} y={logY + c.h(66)}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>by key, not by age</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>by key, not by age</span>
       </Note>
       {COMPACTION.log
         .filter((r) => r.kept)
@@ -68,12 +68,12 @@ const Compaction: React.FC<{ c: Ctx }> = ({ c }) => {
           </Cell>
         ))}
       <Note at={snapAt} x={R_X} y={keptY + c.h(4)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           compacted: <Num>{COMPACTION.kept}</Num> of <Num>{COMPACTION.log.length}</Num>
         </span>
       </Note>
       <Note at={profileAt} x={R_X} y={keptY + c.h(40)}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>each user's latest profile</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>each user's latest profile</span>
       </Note>
       <ElbowArrow
         points={[
@@ -89,7 +89,7 @@ const Compaction: React.FC<{ c: Ctx }> = ({ c }) => {
         a state store, rebuilt from it
       </Box>
       <Note at={noLimitAt} x={R_X} y={c.y(820)}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
           compact: no age limit
           <span style={{ opacity: ease(frame, addOneAt, 10) }}> · compact + delete: both</span>
           <span style={{ opacity: ease(frame, snapshotAt, 10) }}> · a state snapshot: compact only</span>
@@ -132,15 +132,15 @@ const Join: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>batch join: both tables are complete, so it waits for every row</span>
       </Note>
       <Note at={cantAt} x={R_X} y={c.y(372)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           stream join: can't wait<span style={{ opacity: ease(frame, neverAt, 10) }}>; neither side ever ends</span>
         </span>
       </Note>
       <Note at={s2sAt} x={R_X} y={cy - c.h(30) - c.h(34)}>
-        <span style={{ ...label(21, INK), fontWeight: 750, whiteSpace: "nowrap" }}>stream to stream</span>
+        <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>stream to stream</span>
       </Note>
       <Note at={tableAt} x={R_X} y={c.y(690) - c.h(36)}>
-        <span style={{ ...label(21, INK), fontWeight: 750, whiteSpace: "nowrap" }}>stream to table</span>
+        <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>stream to table</span>
       </Note>
       {[
         { name: "clicks", y: cy, ts: CLICKS },
@@ -148,7 +148,7 @@ const Join: React.FC<{ c: Ctx }> = ({ c }) => {
       ].map((s) => (
         <React.Fragment key={s.name}>
           <Note at={s2sAt} x={R_X} y={s.y - c.h(15)}>
-            <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{s.name}</span>
+            <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{s.name}</span>
           </Note>
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
             <line x1={tx(0)} x2={tx(0) + (tx(12) - tx(0)) * ease(frame, s2sAt, 14)} y1={s.y} y2={s.y} stroke={INK} strokeWidth={1.6} />
@@ -172,7 +172,7 @@ const Join: React.FC<{ c: Ctx }> = ({ c }) => {
         }}
       />
       <Note at={bufAt + 6} x={tx(winFrom) + 8} y={cy - c.h(30) - c.h(34)}>
-        <span style={{ ...label(20, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>buffered: the last few seconds of each side</span>
+        <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>buffered: the last few seconds of each side</span>
       </Note>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
         {MATCH.map(([ci, bi], k) => {
@@ -181,7 +181,7 @@ const Join: React.FC<{ c: Ctx }> = ({ c }) => {
         })}
       </svg>
       <Note at={expireAt} x={tx(0)} y={by + c.h(36)}>
-        <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>older: expired by the watermark</span>
+        <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>older: expired by the watermark</span>
       </Note>
       {/* Stream to table: an event enriched from a table kept current. */}
       <Cell x={R_X} y={c.y(690)} w={170} h={c.h(52)} user="ava" size={21} opacity={ease(frame, tableAt, 10)}>
@@ -203,7 +203,7 @@ const Join: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...label(20, USER_INK.ben) }}>ben: plan free</span>
       </Box>
       <Note at={compactAt} x={R_X + 280} y={c.y(660) + c.h(124)}>
-        <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>often a compacted topic</span>
+        <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>often a compacted topic</span>
       </Note>
       <ElbowArrow
         points={[
@@ -323,15 +323,15 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
         {null}
       </Box>
       <Note at={startAt + 6} x={dlq.x + 110} y={dlq.y + c.h(16)}>
-        <span style={{ ...label(21, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>dead-letter queue</span>
+        <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>dead-letter queue</span>
       </Note>
       {kinds.map((k, i) => (
         <Note key={k.text} at={k.at - 2} x={R_X} y={c.y(530) + i * c.h(40)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>· {k.text}</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>· {k.text}</span>
         </Note>
       ))}
       <Note at={flowAt} x={lane.x} y={lane.y - c.h(76)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           the main stream keeps flowing<span style={{ ...label(22, INK_SOFT), opacity: ease(frame, stallAt, 10) }}>, never stalled by one poison message</span>
         </span>
       </Note>
@@ -347,7 +347,7 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
         head={12}
       />
       <Note at={waitAt} x={dlq.x} y={dlq.y + dlq.h + c.h(18)}>
-        <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           inspect, fix<span style={{ opacity: ease(frame, replayAt, 10) }}>, replay</span>
         </span>
       </Note>
@@ -357,7 +357,7 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={vanishAt - 6} x={R_X} y={c.y(764)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a few don't stop everything, and none vanish</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a few don't stop everything, and none vanish</span>
       </Note>
     </>
   );
@@ -413,7 +413,7 @@ export const RapidScene: React.FC = () => {
           </span>
         </Note>
         <Note at={costsAt} x={X0} y={y(LIST_TOP) + 3 * h(ROW) + h(100)}>
-          <span style={{ ...note(27, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>decides what reading it costs.</span>
+          <span style={{ ...note(27, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>decides what reading it costs.</span>
         </Note>
         <NextLine at={nextAt} x={X0} y={y(760)} width={900}>
           data warehousing and storage

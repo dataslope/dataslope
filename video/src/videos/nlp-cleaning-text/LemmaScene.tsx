@@ -26,13 +26,13 @@ const ANSWER_RULE_Y = 545;
  *  box follows the art's own proportions (1536x840 after trimming). */
 const BOOK = { left: 1080, dy: 40, w: 560, h: Math.round((560 * 840) / 1536) };
 
-const head: React.CSSProperties = { fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, whiteSpace: "nowrap" };
+const head: React.CSSProperties = { fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK_SOFT, whiteSpace: "nowrap" };
 
 /** One of Fig. 16's two answers: a heading and a line under it, as plain
  *  text. */
 const Answer: React.FC<{ at: number; y: number; title: string; children: React.ReactNode }> = ({ at, y, title, children }) => (
   <Note at={at} x={RIGHT_X} y={y} width={ANSWER_W} from="right">
-    <div style={{ ...label(28, INK), fontWeight: 600 }}>{title}</div>
+    <div style={{ ...label(28, INK), fontWeight: 500 }}>{title}</div>
     <div style={{ ...body(32), color: INK, marginTop: 12 }}>{children}</div>
   </Note>
 );

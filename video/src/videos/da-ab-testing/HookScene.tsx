@@ -145,7 +145,7 @@ export const HookScene: React.FC = () => {
                 whiteSpace: "nowrap",
                 opacity: ease(frame, measureAt + (l.side < 0 ? 0 : 6), 12),
                 ...note(34, l.ink),
-                fontWeight: 650,
+                fontWeight: 500,
                 ...TABULAR,
               }}
             >
@@ -203,7 +203,7 @@ export const HookScene: React.FC = () => {
                   transform: `translateY(${(1 - p) * 10}px)`,
                 }}
               >
-                <div style={{ ...note(64, r.ink), fontWeight: 600, lineHeight: "64px", ...TABULAR }}>{r.count}</div>
+                <div style={{ ...note(64, r.ink), fontWeight: 500, lineHeight: "64px", ...TABULAR }}>{r.count}</div>
                 <div style={{ ...note(28, r.ink), lineHeight: "36px", marginTop: 8, whiteSpace: "nowrap" }}>{r.text}</div>
               </div>
             </React.Fragment>

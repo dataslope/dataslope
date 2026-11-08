@@ -56,7 +56,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -423,7 +423,7 @@ export const pct = (p: number, digits = 1) => `${fmt(p * 100, digits)}%`;
 export const Label: React.FC<{ size?: number; color?: string; weight?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({
   size = 22,
   color = INK,
-  weight = 600,
+  weight = 500,
   style,
   children,
 }) => <span style={{ ...label(size, color), fontWeight: weight, whiteSpace: "nowrap", ...style }}>{children}</span>;

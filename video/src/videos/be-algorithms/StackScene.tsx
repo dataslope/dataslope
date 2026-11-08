@@ -32,7 +32,7 @@ const Verdict: React.FC<{ at: number; accepts: boolean; right: boolean; x: numbe
   return (
     <div style={{ position: "absolute", left: x - 90, top, width: 180, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 24, opacity: p }}>
       {right ? <Tick at={at} size={24} /> : <Cross at={at} size={22} />}
-      <span style={{ ...note(24, right ? OK_INK : ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{accepts ? "accepts" : "rejects"}</span>
+      <span style={{ ...note(24, right ? OK_INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{accepts ? "accepts" : "rejects"}</span>
     </div>
   );
 };
@@ -58,7 +58,7 @@ const Glyph: React.FC<{ ch: string; x: number; y: number; at: number; mark?: str
         justifyContent: "center",
         fontFamily: MONO,
         fontSize: 72,
-        fontWeight: 600,
+        fontWeight: 500,
         color: INK,
       }}
     >
@@ -125,7 +125,7 @@ export const StackScene: React.FC = () => {
         </QuestionCard>
         <Line at={recentAt} x={96} y={y(262)} size={26} color={INK_SOFT}>
           The most recent thing still open: nesting, undo, backtracking.
-          <span style={{ color: INK, fontWeight: 650, opacity: ease(frame, lifoAt, 10) }}> Last in, first out.</span>
+          <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, lifoAt, 10) }}> Last in, first out.</span>
         </Line>
         <Art name="plates" at={keepsAt} left={1420} top={y(660)} h={170} />
 
@@ -147,7 +147,7 @@ export const StackScene: React.FC = () => {
         <Line at={stringAt + 20} x={SX} y={sTop + 152} size={24} color={INK_SOFT}>
           square: +1 − 1 = 0
         </Line>
-        <Line at={acceptsAt} x={SX} y={sTop + 200} size={24} weight={600} color={ACCENT_INK}>
+        <Line at={acceptsAt} x={SX} y={sTop + 200} size={24} weight={500} color={ACCENT_INK}>
           A counter accepts it
         </Line>
         <Line at={insideAt} x={SX} y={sTop + 240} size={24} weight={500}>
@@ -158,7 +158,7 @@ export const StackScene: React.FC = () => {
         <VRule x={1020} top={sTop - 4} bottom={row(3) + 50} at={counterAt} />
 
         {/* The stack: openers in a column, newest on top. */}
-        <Line at={keepsAt - 2} x={COL_X - 8} y={sTop - 4} size={22} weight={650}>
+        <Line at={keepsAt - 2} x={COL_X - 8} y={sTop - 4} size={22} weight={500}>
           A stack<span style={{ opacity: ease(frame, topAt, 10) }}>: newest on top</span>
         </Line>
         <Svg opacity={ease(frame, keepsAt, 12)}>
@@ -175,12 +175,12 @@ export const StackScene: React.FC = () => {
         <div style={{ position: "absolute", left: COL_X + 145, top: slotY(1) + 20, opacity: ease(frame, matchAt + 8, 8) }}>
           <Cross at={matchAt + 8} size={26} />
         </div>
-        <Line at={rejectedAt - 2} x={COL_X - 8} y={colBase + 18} size={24} weight={600} color={OK_INK}>
+        <Line at={rejectedAt - 2} x={COL_X - 8} y={colBase + 18} size={24} weight={500} color={OK_INK}>
           rejected
         </Line>
 
         {/* The queue: the oldest opener at the front. */}
-        <Line at={queueAt} x={SX} y={qTop - 46} size={22} weight={650}>
+        <Line at={queueAt} x={SX} y={qTop - 46} size={22} weight={500}>
           A queue matches the oldest opener
         </Line>
         {[
@@ -206,10 +206,10 @@ export const StackScene: React.FC = () => {
                   </React.Fragment>
                 );
               })}
-              <div style={{ position: "absolute", left: q.x + 170, top: qTop + 14, fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK_SOFT, opacity: ease(frame, q.at, 10) }}>{q.s}</div>
+              <div style={{ position: "absolute", left: q.x + 170, top: qTop + 14, fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, opacity: ease(frame, q.at, 10) }}>{q.s}</div>
               <div style={{ position: "absolute", left: q.x + 170, top: qTop + 96, display: "flex", alignItems: "center", gap: 10, fontSize: 24, opacity: ease(frame, q.verdictAt, 10) }}>
                 <Cross at={q.verdictAt} size={22} />
-                <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{q.ok ? "accepts" : "rejects"}</span>
+                <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{q.ok ? "accepts" : "rejects"}</span>
               </div>
             </React.Fragment>
           );
@@ -221,7 +221,7 @@ export const StackScene: React.FC = () => {
             { x: COL1, s: crossed.s, at: counterAt },
             { x: COL2, s: nested.s, at: nestedAt - 4 },
           ].map((c) => (
-            <div key={c.s} style={{ position: "absolute", left: c.x - 90, width: 180, textAlign: "center", fontFamily: MONO, fontSize: 28, fontWeight: 600, color: INK, opacity: ease(frame, c.at, 10) }}>
+            <div key={c.s} style={{ position: "absolute", left: c.x - 90, width: 180, textAlign: "center", fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, opacity: ease(frame, c.at, 10) }}>
               {c.s}
             </div>
           ))}
@@ -237,7 +237,7 @@ export const StackScene: React.FC = () => {
         ].map((r, i) => (
           <div
             key={r.name}
-            style={{ position: "absolute", left: TX, top: row(i) + 14, ...note(24, i === 0 ? INK_SOFT : INK), fontWeight: i === 0 ? 500 : 650, opacity: ease(frame, counterAt + i * 3, 10) }}
+            style={{ position: "absolute", left: TX, top: row(i) + 14, ...note(24, i === 0 ? INK_SOFT : INK), fontWeight: i === 0 ? 500 : 500, opacity: ease(frame, counterAt + i * 3, 10) }}
           >
             {r.name}
           </div>
@@ -258,7 +258,7 @@ export const StackScene: React.FC = () => {
         <Verdict at={nestedAt + 10} accepts={nested.stack} right={nested.stack} x={COL2} top={row(3) + 12} />
 
         {/* Depth-first search, the same idea. */}
-        <Line at={dfsAt} x={SX} y={y(866)} size={26} weight={600}>
+        <Line at={dfsAt} x={SX} y={y(866)} size={26} weight={500}>
           Depth-first search is the same idea:{" "}
           <span style={{ opacity: ease(frame, pathAt, 10) }}>the path you&apos;re on is the stack</span>
         </Line>

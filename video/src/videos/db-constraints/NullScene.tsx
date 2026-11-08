@@ -145,13 +145,13 @@ export const NullScene: React.FC = () => {
                 justifyContent: "center",
                 fontFamily: MONO,
                 fontSize: 44,
-                fontWeight: 600,
+                fontWeight: 500,
                 color: INK,
               }}
             >
               {k.show}
             </div>
-            <span style={{ ...note(26, isNull ? ACCENT_INK : INK_SOFT), fontWeight: isNull ? 650 : 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, isNull ? ACCENT_INK : INK_SOFT), fontWeight: isNull ? 500 : 500, whiteSpace: "nowrap" }}>
               {k.says}
             </span>
           </div>

@@ -133,7 +133,7 @@ export const RecScene: React.FC = () => {
 
         {/* ── Question 8: the split ── */}
         <Note at={abAt} x={X0} y={y(330)} out={out8}>
-          <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>an A/B test: users split at random</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>an A/B test: users split at random</span>
         </Note>
         <Svg opacity={usersIn * (1 - ease(frame, out8, 10))}>
           {users.map((u, i) => {
@@ -161,7 +161,7 @@ export const RecScene: React.FC = () => {
                 borderRadius: 12,
                 padding: "14px 18px",
                 ...note(26, arm ? WARM_INK : BLUE_INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -193,7 +193,7 @@ export const RecScene: React.FC = () => {
 
         {/* The size, before launch: DA Part 7's formula. */}
         <Note at={sizeAt} x={RIGHT_X} y={y(SIZE.top) - h(56)} out={out8}>
-          <span style={{ ...note(27, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             users per group <span style={{ ...note(25, INK_SOFT), fontWeight: 500 }}>(80% power, 5% two-sided)</span>
           </span>
         </Note>
@@ -206,13 +206,13 @@ export const RecScene: React.FC = () => {
           return (
             <React.Fragment key={i}>
               <Note at={i === 0 ? baseAt : halfAt} x={RIGHT_X} y={top + h(4)} out={out8}>
-                <span style={{ ...label(22, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{b.text}</span>
+                <span style={{ ...label(22, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{b.text}</span>
               </Note>
               <Svg opacity={1 - ease(frame, out8, 10)}>
                 <rect x={RIGHT_X + 170} y={top} width={(SIZE.w * b.n * p) / longest} height={h(SIZE.h)} fill={b.fill} opacity={0.85} rx={3} />
               </Svg>
               <Note at={(i === 0 ? fifteenAt : fourAt) + 8} x={RIGHT_X + 170 + (SIZE.w * b.n) / longest + 14} y={top + h(4)} out={out8}>
-                <span style={{ ...label(22, b.ink), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
+                <span style={{ ...label(22, b.ink), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
                   {num(b.n)}
                   {i === 1 ? (
                     <>
@@ -228,7 +228,7 @@ export const RecScene: React.FC = () => {
 
         {/* Whole weeks, weekends included. */}
         <Note at={weeksAt} x={X0} y={y(WEEKS.top) - h(44)} out={out8}>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>run whole weeks</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>run whole weeks</span>
         </Note>
         <Svg opacity={1 - ease(frame, out8, 10)}>
           {Array.from({ length: 14 }, (_, i) => {
@@ -259,13 +259,13 @@ export const RecScene: React.FC = () => {
           {reasons.map((r, i) => (
             <Note key={r.text} at={r.at - 2} x={X0} y={y(340) + i * h(70)}>
               <span style={{ ...note(29, INK), whiteSpace: "nowrap" }}>
-                <span style={{ color: ACCENT_INK, fontWeight: 600 }}>✕</span> {r.text}
+                <span style={{ color: ACCENT_INK, fontWeight: 500 }}>✕</span> {r.text}
                 {r.eg ? <span style={{ color: INK_SOFT, opacity: ease(frame, r.egAt, 10) }}> ({r.eg})</span> : null}
               </span>
             </Note>
           ))}
           <Note at={switchAt - 2} x={ALT_X} y={y(340)}>
-            <span style={{ ...note(29, INK), fontWeight: 650, whiteSpace: "nowrap" }}>instead:</span>
+            <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>instead:</span>
           </Note>
           <Tag x={ALT_X} y={y(396)} at={switchAt} size={25} tone="blue">
             randomize whole regions

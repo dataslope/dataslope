@@ -129,13 +129,13 @@ export const GrainScene: React.FC = () => {
         />
         {/* Each column tested against the grain, over its title. */}
         <Note at={everyAt} x={g.x} y={g.top - 84}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>does it make sense per line?</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>does it make sense per line?</span>
         </Note>
         {testRow(qty, qtyAt + 2, true)}
         {testRow(amt, qtyAt + 6, true)}
         {testRow(fee, feeAt + 2, false)}
         <Note at={wholeAt} x={g.right + 30} y={g.rowTop(0) + 6} out={orderGrainAt - 6}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>← per order, not per line</span>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>← per order, not per line</span>
         </Note>
         <Note at={threeAt} x={g.right + 30} y={g.rowTop(1) + 10} out={orderGrainAt - 6}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>order 1001: three lines</span>
@@ -145,7 +145,7 @@ export const GrainScene: React.FC = () => {
         <Note at={fifteenAt} x={g.xs[fee]} y={below + h(26)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mono>SUM(shipping_fee)</Mono> ={" "}
-            <span style={{ fontFamily: "inherit", color: ACCENT_INK, fontWeight: 800, fontSize: 26 }}>{money(total)}</span>
+            <span style={{ fontFamily: "inherit", color: ACCENT_INK, fontWeight: 500, fontSize: 26 }}>{money(total)}</span>
           </span>
         </Note>
         <Note at={fifteenAt + 10} x={g.xs[fee]} y={below + h(72)}>
@@ -154,7 +154,7 @@ export const GrainScene: React.FC = () => {
 
         {/* Where it belongs: a fact at order grain. */}
         <Note at={orderGrainAt - 2} x={ORDERS_X} y={y(GRAIN_Y) + 6}>
-          <span style={{ ...label(22, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             grain: <span style={{ opacity: ease(frame, perOrderAt, 10) }}>one row per order</span>
           </span>
         </Note>
@@ -181,7 +181,7 @@ export const GrainScene: React.FC = () => {
           </span>
         </Note>
         <Note at={catchesAt} x={ORDERS_X} y={og.rowTop(1) + h(118)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Declared first,
             <br />
             the grain catches it.

@@ -182,7 +182,7 @@ export const RowsScene: React.FC = () => {
         {/* One customer: how many orders? Asked at the orders end. */}
         <Ink at={oneCustAt - 4} dur={14} style={{ left: b[0] - 324, top: noteY, width: 300, textAlign: "right", whiteSpace: "nowrap" }}>
           <div style={note(22, INK_SOFT)}>One customer,</div>
-          <div style={{ ...note(24, INK), fontWeight: 600 }}>how many orders?</div>
+          <div style={{ ...note(24, INK), fontWeight: 500 }}>how many orders?</div>
         </Ink>
         <Ink at={zeroAt} dur={14} style={{ left: b[0] - 324, top: noteY + 72, width: 300, textAlign: "right", whiteSpace: "nowrap" }}>
           <span style={{ ...label(26, ACCENT_INK) }}>zero, one or many</span>
@@ -190,7 +190,7 @@ export const RowsScene: React.FC = () => {
         {/* One order: how many customers? Asked at the customers end. */}
         <Ink at={oneOrderAt - 4} dur={14} style={{ left: a[0] + 24, top: noteY, width: 300, whiteSpace: "nowrap" }}>
           <div style={note(22, INK_SOFT)}>One order,</div>
-          <div style={{ ...note(24, INK), fontWeight: 600 }}>how many customers?</div>
+          <div style={{ ...note(24, INK), fontWeight: 500 }}>how many customers?</div>
         </Ink>
         <Ink at={exactlyAt} dur={14} style={{ left: a[0] + 24, top: noteY + 72, width: 300, whiteSpace: "nowrap" }}>
           <span style={{ ...label(26, ACCENT_INK) }}>exactly one</span>
@@ -248,7 +248,7 @@ export const RowsScene: React.FC = () => {
             />
           ))}
           <Ink at={storingAt} dur={14} style={{ left: og.x + og.width + 28, top: og.rowTop(0) + 6 }}>
-            <span style={{ ...note(22, KEY_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(22, KEY_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               both store {CUSTOMERS.rows[0][0]}, Ada&apos;s id
             </span>
           </Ink>

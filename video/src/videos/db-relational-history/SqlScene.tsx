@@ -152,7 +152,7 @@ export const SqlScene: React.FC = () => {
       ) : null}
       <Tick x={enoughX + 40} y={LANE_B} at={couldAt + 8} out={lanesOut} />
       <Ink at={couldAt + 10} dur={12} out={lanesOut} style={{ left: enoughX + 72, top: LANE_B - 16, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(23, KEY_INK), fontWeight: 650 }}>It could.</span>
+        <span style={{ ...note(23, KEY_INK), fontWeight: 500 }}>It could.</span>
       </Ink>
       <Card
         x={LANE_X0}

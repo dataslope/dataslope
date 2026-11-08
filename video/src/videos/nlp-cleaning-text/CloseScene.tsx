@@ -90,7 +90,7 @@ export const CloseScene: React.FC = () => {
             {i > 0 ? <ColumnRule x={x - COL_GAP / 2} top={top + TEXT_TOP} height={TEXT_H} at={colAt[i] + 4} /> : null}
             <Spot id={s.art} at={colAt[i] + 2} left={x + (COL_W - w) / 2} top={top + 22 + (h - hh) / 2} width={w} height={hh} />
             <Ink at={colAt[i] + 4} dur={14} style={{ left: x, top: top + TEXT_TOP, ...line }}>
-              <div style={{ ...label(28, INK), fontWeight: 600, lineHeight: 1.2 }}>{s.name}</div>
+              <div style={{ ...label(28, INK), fontWeight: 500, lineHeight: 1.2 }}>{s.name}</div>
             </Ink>
             <Ink at={lostAt[i] - 2} dur={16} style={{ left: x, top: top + LOST_TOP, ...line }}>
               {/* The name's own face and size, a step lighter. */}

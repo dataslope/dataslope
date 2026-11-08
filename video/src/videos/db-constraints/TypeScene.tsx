@@ -192,7 +192,7 @@ export const TypeScene: React.FC = () => {
       ) : null}
       <Note at={valuesAt} x={LINE_X0 - 30} y={lineY + 64} from="up" dim={moneyAt}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: MONO, fontWeight: 600 }}>integer</span>: whole numbers only (about ±2.1 billion)
+          <span style={{ fontFamily: MONO, fontWeight: 500 }}>integer</span>: whole numbers only (about ±2.1 billion)
         </span>
       </Note>
       {manyIn > 0 ? (
@@ -202,7 +202,7 @@ export const TypeScene: React.FC = () => {
           out={valuesAt}
           style={{ left: (sxi(1) + sxi(2)) / 2 - 50, top: lineY - 92 - manyIn * 10, whiteSpace: "nowrap" }}
         >
-          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 600, color: ACCENT_INK }}>
+          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 500, color: ACCENT_INK }}>
             <Strike at={numberAt + 8} color={ACCENT}>
               {"'many'"}
             </Strike>

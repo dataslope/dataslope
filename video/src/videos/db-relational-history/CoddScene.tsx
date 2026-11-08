@@ -265,7 +265,7 @@ export const CoddScene: React.FC = () => {
         <>
           <Tick x={answerRight + 44} y={ATOP + HEAD_H + ROW_H} at={sameAt} />
           <Ink at={sameAt + 4} dur={12} style={{ left: answerRight + 80, top: ATOP + HEAD_H + ROW_H - 16, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(22, KEY_INK), fontWeight: 650 }}>same answer</span>
+            <span style={{ ...note(22, KEY_INK), fontWeight: 500 }}>same answer</span>
           </Ink>
         </>
       ) : null}

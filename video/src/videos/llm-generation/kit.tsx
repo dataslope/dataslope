@@ -58,7 +58,7 @@ export const Svg: React.FC<{ opacity?: number; children: React.ReactNode }> = ({
 export const Tok: React.FC<{ i: number; size?: number; weight?: number; style?: React.CSSProperties }> = ({
   i,
   size = 34,
-  weight = 600,
+  weight = 500,
   style,
 }) => (
   <span style={{ fontFamily: MONO, fontSize: size, fontWeight: weight, color: TEXT[i], whiteSpace: "nowrap", ...style }}>
@@ -78,7 +78,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: X0, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, ACCENT_INK)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };

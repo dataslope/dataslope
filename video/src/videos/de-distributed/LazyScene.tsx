@@ -141,9 +141,9 @@ export const LazyScene: React.FC = () => {
         </Note>
         <Note at={showAt + 6} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(24)} out={q4At}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600 }}>show()</span> is an action
+            <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500 }}>show()</span> is an action
             <span style={{ opacity: ease(frame, scheduleAt, 10) }}>: compile, schedule</span>
-            <span style={{ opacity: ease(frame, runAt, 10), color: BLUE_INK, fontWeight: 650 }}>, run</span>
+            <span style={{ opacity: ease(frame, runAt, 10), color: BLUE_INK, fontWeight: 500 }}>, run</span>
           </span>
         </Note>
         <Note at={tooAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(80)} out={q4At}>
@@ -163,8 +163,8 @@ export const LazyScene: React.FC = () => {
           </span>
         </Note>
         <Note at={groupedAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(136)} out={q4At}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>groupBy().count()</span> is still a transformation
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>groupBy().count()</span> is still a transformation
           </span>
         </Note>
 
@@ -225,14 +225,14 @@ export const LazyScene: React.FC = () => {
                 zIndex: nd.key === "filter" ? 0 : 1,
               }}
             >
-              <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+              <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 {nd.text}
                 {nd.key === "scan" ? (
                   <span style={{ color: OK_INK, opacity: push }}>, status = active</span>
                 ) : null}
               </span>
               {isShow ? (
-                <span style={{ marginLeft: "auto", ...label(20, BLUE_INK), fontWeight: 600 }}>action</span>
+                <span style={{ marginLeft: "auto", ...label(20, BLUE_INK), fontWeight: 500 }}>action</span>
               ) : run > 0 ? (
                 <span style={{ marginLeft: "auto", ...label(20, BLUE_INK), opacity: run }}>ran</span>
               ) : null}
@@ -285,7 +285,7 @@ export const LazyScene: React.FC = () => {
           </Note>
         ))}
         <Note at={eagerAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(40 + 4 * 46 + 14)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             run step by step, eagerly<span style={{ opacity: ease(frame, noneAt, 10) }}>: none of this is possible</span>
           </span>
         </Note>

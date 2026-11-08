@@ -135,7 +135,7 @@ export const RandomizeScene: React.FC = () => {
         {/* Age's coin-flipped gap lands a hair past that line: noise as well.
             Set in the gap under its row, off the row's connecting line. */}
         <Ink at={noiseAt + 8} dur={14} style={{ left: sx(X, rows[0].randomised) + 14, top: y(rowY(0)) + 11, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(20, BLUE_INK), fontWeight: 600, ...halo }}>a hair over, by chance</span>
+          <span style={{ ...note(20, BLUE_INK), fontWeight: 500, ...halo }}>a hair over, by chance</span>
         </Ink>
         <Axis
           scale={X}
@@ -158,7 +158,7 @@ export const RandomizeScene: React.FC = () => {
               dur={12}
               style={{ left: LABEL_RIGHT, top: y(rowY(i)) - 15, whiteSpace: "nowrap", transform: "translateX(-100%)" }}
             >
-              <span style={{ ...label(22, r.unmeasured ? STAT_INK : INK), fontStyle: r.unmeasured ? "italic" : "normal", fontWeight: 600 }}>
+              <span style={{ ...label(22, r.unmeasured ? STAT_INK : INK), fontStyle: r.unmeasured ? "italic" : "normal", fontWeight: 500 }}>
 {r.key}
               </span>
             </Ink>
@@ -167,7 +167,7 @@ export const RandomizeScene: React.FC = () => {
         {rows.map((r, i) =>
           r.unmeasured ? (
             <Ink key={r.key} at={nobodyAt - 2 + (i - 8) * 6} dur={14} style={{ left: X.x1 + 24, top: y(rowY(i)) - 14, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(20, STAT_INK), fontWeight: 650 }}>unseen in a real test</span>
+              <span style={{ ...note(20, STAT_INK), fontWeight: 500 }}>unseen in a real test</span>
             </Ink>
           ) : null,
         )}
@@ -198,11 +198,11 @@ export const RandomizeScene: React.FC = () => {
         <div style={{ position: "absolute", left: X.x1, top: y(300), transform: "translateX(-100%)", display: "flex", gap: 26, whiteSpace: "nowrap" }}>
           <Ink at={differAt + 2} dur={12} style={{ position: "relative", display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ width: 16, height: 16, borderRadius: 8, background: STAT, display: "inline-block" }} />
-            <span style={{ ...note(21, STAT_INK), fontWeight: 650 }}>users chose</span>
+            <span style={{ ...note(21, STAT_INK), fontWeight: 500 }}>users chose</span>
           </Ink>
           <Ink at={shrinksAt + 2} dur={12} style={{ position: "relative", display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ width: 16, height: 16, borderRadius: 8, background: BAR, display: "inline-block" }} />
-            <span style={{ ...note(21, BLUE_INK), fontWeight: 650 }}>a coin chose</span>
+            <span style={{ ...note(21, BLUE_INK), fontWeight: 500 }}>a coin chose</span>
           </Ink>
         </div>
       </div>
@@ -240,8 +240,8 @@ export const RandomizeScene: React.FC = () => {
           dur={12}
           style={{ left: STEP_X[i], top: y(STEP_Y), whiteSpace: "nowrap", display: "flex", gap: 10, opacity: NEXT.includes(i) || i < NEXT[0] ? 1 : 0.55 }}
         >
-          <span style={{ ...label(22, STAT_INK), fontWeight: 600 }}>{i + 1}</span>
-          <span style={{ ...label(22, INK), fontWeight: 600 }}>
+          <span style={{ ...label(22, STAT_INK), fontWeight: 500 }}>{i + 1}</span>
+          <span style={{ ...label(22, INK), fontWeight: 500 }}>
             {NEXT.includes(i) ? <Marker at={decisionsAt - 4 + (i - NEXT[0]) * 6}>{step}</Marker> : step}
           </span>
         </Ink>

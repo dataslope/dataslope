@@ -166,7 +166,7 @@ export const HeightScene: React.FC = () => {
 
           {/* Labels on the flat block. */}
           <Note at={pointOneAt - 4} x={sx(X, 8.2)} y={py(UNIFORM.pdf) - 44} out={squeezeAt - 6}>
-            <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>height {fmt(UNIFORM.pdf, 1)}</span>
+            <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>height {fmt(UNIFORM.pdf, 1)}</span>
           </Note>
           <Bracket
             x0={sx(X, UNIFORM.a)}
@@ -192,7 +192,7 @@ export const HeightScene: React.FC = () => {
             <span style={label(22, INK_SOFT)}>width × height</span>
           </Ink>
           <Ink at={squeezeAt + 8} dur={14} style={{ left: PANEL_X - 40, top: y(470), whiteSpace: "nowrap" }}>
-            <span style={{ ...note(32, INK), fontWeight: 650 }}>
+            <span style={{ ...note(32, INK), fontWeight: 500 }}>
               <span style={TABULAR}>{fmt(width, 2)}</span> × <span style={TABULAR}>{fmt(height, 2)}</span>
             </span>
           </Ink>
@@ -200,7 +200,7 @@ export const HeightScene: React.FC = () => {
             <span style={{ ...askNote(32), opacity: 1 - areaFlash * 0.3 }}>= area 1</span>
           </Ink>
           <Note at={twoAt - 2} x={sx(X, UNIFORM.narrowScale) + 22} y={py(UNIFORM.narrowPdf) - 16}>
-            <span style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
+            <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
               height {fmt(UNIFORM.narrowPdf, 0)}
             </span>
           </Note>

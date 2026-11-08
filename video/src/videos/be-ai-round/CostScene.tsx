@@ -56,7 +56,7 @@ const Bill: React.FC<{
         overflow: "hidden",
       }}
     >
-      <span style={{ ...label(22, ink), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, at + 16, 10) }}>{text}</span>
+      <span style={{ ...label(22, ink), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, at + 16, 10) }}>{text}</span>
     </div>
   );
   return (
@@ -234,7 +234,7 @@ export const CostScene: React.FC = () => {
         {/* The day's bill: beside the listing, then across the page. */}
         <Bill x={bx} top={btop} px={bpx} input={COST.input} output={COST.output} at={inputAt + 4} height={barH} litInput={largerAt} />
         <Note at={leverAt + 20} x={X0} y={y(BAR_B.v) - 44}>
-          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             As written: <Num>{thousands(COST.daily)}</Num> USD a day
           </span>
         </Note>
@@ -250,7 +250,7 @@ export const CostScene: React.FC = () => {
               return (
                 <React.Fragment key={l.text}>
                   {i > 0 ? <span style={{ ...note(23, INK_SOFT), opacity: p }}>·</span> : null}
-                  <span style={{ ...note(23, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: p }}>{l.text}</span>
+                  <span style={{ ...note(23, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p }}>{l.text}</span>
                 </React.Fragment>
               );
             })}
@@ -261,7 +261,7 @@ export const CostScene: React.FC = () => {
         </Note>
         {nexts.map((l, i) => (
           <Ink key={l.text} at={l.at} dur={12} style={{ left: NEXT_X, top: y(BAR_B.v) + h(-2 + i * 40) }}>
-            <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{l.text}</span>
+            <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{l.text}</span>
           </Ink>
         ))}
 
@@ -279,7 +279,7 @@ export const CostScene: React.FC = () => {
 
         {/* Halve each side, against the original bill. */}
         <Note at={halvePAt - 2} x={X0} y={y(HALF_P) - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Halve the prompt</span>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Halve the prompt</span>
         </Note>
         <Bill
           x={X0}
@@ -292,12 +292,12 @@ export const CostScene: React.FC = () => {
           saved={{ from: X0 + (halfPInput + COST.output) * BAR_B.px + 3, width: fullW - (halfPInput + COST.output) * BAR_B.px - 3 }}
         />
         <Note at={savedPAt - 2} x={X0 + fullW + 24} y={y(HALF_P) + barH / 2 - 17}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             saves <Num>{thousands(COST.halvePromptSaves)}</Num> a day
           </span>
         </Note>
         <Note at={halveAAt - 2} x={X0} y={y(HALF_A) - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Halve the answer</span>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Halve the answer</span>
         </Note>
         <Bill
           x={X0}
@@ -310,7 +310,7 @@ export const CostScene: React.FC = () => {
           saved={{ from: X0 + (COST.input + halfAOutput) * BAR_B.px + 3, width: fullW - (COST.input + halfAOutput) * BAR_B.px - 3 }}
         />
         <Note at={savedAAt - 2} x={X0 + fullW + 24} y={y(HALF_A) + barH / 2 - 17}>
-          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             saves <Num>{COST.halveAnswerSaves}</Num> a day
           </span>
         </Note>

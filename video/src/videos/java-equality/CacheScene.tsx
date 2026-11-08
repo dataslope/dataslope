@@ -319,7 +319,7 @@ const HeapCell: React.FC<{
         justifyContent: "center",
         fontFamily: MONO,
         fontSize: 30,
-        fontWeight: 600,
+        fontWeight: 500,
         color: NUMBER_INK,
         fontVariantLigatures: "none",
       }}

@@ -117,7 +117,7 @@ export const MedianScene: React.FC = () => {
           side="left"
           labelY={labelY}
           label={
-            <span style={{ ...note(28, OK_INK), fontWeight: 650 }}>
+            <span style={{ ...note(28, OK_INK), fontWeight: 500 }}>
               <Mark at={typicalAt} out={gapAt + 30}>
                 median ${fmt(MEDIAN.median)}
               </Mark>
@@ -132,7 +132,7 @@ export const MedianScene: React.FC = () => {
           color={ACCENT}
           side="right"
           labelY={labelY}
-          label={<span style={{ ...note(28, ACCENT_INK), fontWeight: 650 }}>mean ${fmt(MEDIAN.mean)}</span>}
+          label={<span style={{ ...note(28, ACCENT_INK), fontWeight: 500 }}>mean ${fmt(MEDIAN.mean)}</span>}
         />
         <ElbowArrow
           points={[

@@ -149,7 +149,7 @@ export const CorrScene: React.FC = () => {
       ].map((r, i) => (
         <React.Fragment key={i}>
           <Ink at={r.at} dur={14} style={{ left: S.x0, top: y(S_Y) + 90 + i * 100, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(32, r.color), fontWeight: 600 }}>{r.node}</span>
+            <span style={{ ...note(32, r.color), fontWeight: 500 }}>{r.node}</span>
           </Ink>
           <Ink at={r.at + 10} dur={14} style={{ left: S.x0, top: y(S_Y) + 90 + i * 100 + 44, whiteSpace: "nowrap" }}>
             <Label size={21} color={INK_SOFT} weight={520}>
@@ -261,7 +261,7 @@ export const CorrScene: React.FC = () => {
         </Label>
       </Note>
       <Ink at={onXAt - 2} dur={14} style={{ left: px(0, U.xlo, U.xhi), top: py(19, U.ylo, U.yhi), whiteSpace: "nowrap" }}>
-        <span style={{ display: "inline-block", transform: "translateX(-50%)", ...note(40, DATA_INK), fontWeight: 600 }}>y = x²</span>
+        <span style={{ display: "inline-block", transform: "translateX(-50%)", ...note(40, DATA_INK), fontWeight: 500 }}>y = x²</span>
       </Ink>
     </AbsoluteFill>
   );

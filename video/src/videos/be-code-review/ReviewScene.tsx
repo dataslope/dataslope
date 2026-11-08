@@ -50,7 +50,7 @@ const Pair: React.FC<{ name: string; value: string; ink?: string; size?: number 
 
 /** A word set beside a line it classifies, as plain text. */
 const Kind: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{children}</span>
+  <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{children}</span>
 );
 
 /**

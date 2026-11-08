@@ -107,13 +107,13 @@ export const MapReduceScene: React.FC = () => {
           <span style={{ ...label(25, INK_SOFT), whiteSpace: "nowrap" }}>Input splits</span>
         </Note>
         <Note at={phasesAt} x={PAIR_X} y={y(LABEL_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>1 Map</span>
+          <span style={{ ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>1 Map</span>
         </Note>
         <Note at={shuffleWordAt} x={760} y={y(LABEL_Y)}>
-          <span style={{ ...label(26, red > 0.5 ? ACCENT_INK : INK), fontWeight: 600, whiteSpace: "nowrap" }}>Shuffle</span>
+          <span style={{ ...label(26, red > 0.5 ? ACCENT_INK : INK), fontWeight: 500, whiteSpace: "nowrap" }}>Shuffle</span>
         </Note>
         <Note at={phasesAt + 6} x={RED_X} y={y(LABEL_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>2 Reduce</span>
+          <span style={{ ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>2 Reduce</span>
         </Note>
 
         {/* Three machines, each with its split of the frame. */}
@@ -258,7 +258,7 @@ export const MapReduceScene: React.FC = () => {
         </Note>
         <Note at={groupbyAt - 2} x={SUM_X} y={y(842)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            a <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>groupby</span>, across machines
+            a <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>groupby</span>, across machines
           </span>
         </Note>
 
@@ -269,7 +269,7 @@ export const MapReduceScene: React.FC = () => {
           </span>
         </Note>
         <Note at={costAt + 4} x={770} y={y(842)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             the cost<span style={{ opacity: ease(frame, networkAt, 10) }}>: data across the network</span>
           </span>
         </Note>

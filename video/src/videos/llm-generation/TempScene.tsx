@@ -121,7 +121,7 @@ export const TempScene: React.FC = () => {
                 textAlign: "center",
                 opacity: ease(frame, start + 8 + i * 3, 12),
                 ...note(24, TEXT[i]),
-                fontWeight: 650,
+                fontWeight: 500,
               }}
             >
               {markAt === undefined ? pct(p) : <Marked at={markAt - 2} out={markOut}>{pct(p)}</Marked>}

@@ -174,13 +174,13 @@ export const CvScene: React.FC = () => {
         />
       </svg>
       <Note at={lowestAt + 2} x={sx(X, best.degree) + 22} y={by(box, 0.026) - 13}>
-        <span style={{ ...note(22, NEW_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(22, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           lowest, {fmt(best.cv, 3)} at degree {best.degree}
         </span>
       </Note>
       <Note at={againAt} x={sx(X, exitDegree("cv", TOP_VALUE)) + 22} y={by(box, 0.3) - 14}>
         <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...halo }}>the new points agree:</div>
-        <div style={{ ...note(21, NEW_INK), fontWeight: 650, whiteSpace: "nowrap", marginTop: 4, ...halo }}>
+        <div style={{ ...note(21, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 4, ...halo }}>
           lowest at degree {BEST.test}
         </div>
       </Note>

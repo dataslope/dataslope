@@ -169,7 +169,7 @@ export const CloseScene: React.FC = () => {
           }}
         >
           <span style={note(21, INK_SOFT)}>true average </span>
-          <span style={{ ...note(22, INK), fontWeight: 600 }}>{fmt(TRUE_MEAN)}</span>
+          <span style={{ ...note(22, INK), fontWeight: 500 }}>{fmt(TRUE_MEAN)}</span>
         </div>
 
         {/* The pile, and once it has moved, where the easy way left it. */}
@@ -213,7 +213,7 @@ export const CloseScene: React.FC = () => {
           }}
         >
           <div style={label(21, INK)}>Variance</div>
-          <div style={{ ...note(24, INK), fontWeight: 600 }}>&plusmn; {fmt(shownSpread)}</div>
+          <div style={{ ...note(24, INK), fontWeight: 500 }}>&plusmn; {fmt(shownSpread)}</div>
           <div style={note(20, INK_SOFT)}>one standard deviation</div>
         </div>
         <Note at={varianceAt} x={640} y={y(600)} out={biasAt}>
@@ -247,7 +247,7 @@ export const CloseScene: React.FC = () => {
           }}
         >
           <span style={{ ...label(24, ink) }}>Bias </span>
-          <span style={{ ...note(24, ink), fontWeight: 600 }}>
+          <span style={{ ...note(24, ink), fontWeight: 500 }}>
             +{fmt(bias, 0)} points
           </span>
         </div>
@@ -263,7 +263,7 @@ export const CloseScene: React.FC = () => {
           }}
         >
           <span style={note(21, RANDOM_INK)}>bias </span>
-          <span style={{ ...note(22, RANDOM_INK), fontWeight: 600 }}>+{fmt(MOVED.center - TRUE_MEAN)} points</span>
+          <span style={{ ...note(22, RANDOM_INK), fontWeight: 500 }}>+{fmt(MOVED.center - TRUE_MEAN)} points</span>
         </div>
         <Note at={movesAt + 2} x={sx(X, CLOSE.narrow.hi) + 20} y={y(BASE - 140)}>
           <div style={{ ...note(21, EASY_INK), ...halo }}>the easy way,</div>

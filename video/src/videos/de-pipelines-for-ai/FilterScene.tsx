@@ -171,13 +171,13 @@ export const FilterScene: React.FC = () => {
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <b>post-filter</b>: the ten nearest
             <span style={{ opacity: ease(frame, dropsAt - 2, 10) }}>, then drop the rest</span>
-            <span style={{ opacity: ease(frame, fewerAt - 2, 10), color: ACCENT_INK, fontWeight: 600 }}>: 0 of 10 left</span>
+            <span style={{ opacity: ease(frame, fewerAt - 2, 10), color: ACCENT_INK, fontWeight: 500 }}>: 0 of 10 left</span>
           </span>
         </Note>
         <Note at={preAt} x={SC.x} y={top + SC.h + 100}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <b>pre-filter</b>: this tenant first, a full ten
-            <span style={{ opacity: ease(frame, correctAt - 2, 10), color: OK_INK, fontWeight: 650 }}>, correct</span>
+            <span style={{ opacity: ease(frame, correctAt - 2, 10), color: OK_INK, fontWeight: 500 }}>, correct</span>
           </span>
         </Note>
         <Note at={smallAt - 2} x={SC.x} y={top + SC.h + 140}>
@@ -195,7 +195,7 @@ export const FilterScene: React.FC = () => {
 
         {/* The simulation's 200 searches. */}
         <Note at={sameAt - 2} x={GRID.x} y={gridTop - 112}>
-          <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             the same simulation
             <span style={{ opacity: ease(frame, tenantsAt - 2, 10), fontWeight: 500 }}>: {FILTER.tenants} tenants</span>
             <span style={{ opacity: ease(frame, keepAt - 2, 10), fontWeight: 500 }}>, top {FILTER.k} kept to one</span>
@@ -219,7 +219,7 @@ export const FilterScene: React.FC = () => {
           })}
         </svg>
         <Note at={emptyAt - 2} x={GRID.x} y={gridTop + 10 * (GRID.cell + GRID.gap) + 18}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={emptyAt + 4} color={MARK_BAD}>
               {num(empty)} of {num(total)} come back empty: {pct(FILTER.emptyShare)}
             </Mark>

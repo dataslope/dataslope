@@ -149,7 +149,7 @@ export const MontyScene: React.FC = () => {
                   justifyContent: "center",
                   opacity: p * (1 - isOpen),
                   ...label(24, INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   ...TABULAR,
                 }}
               >
@@ -160,10 +160,10 @@ export const MontyScene: React.FC = () => {
         })}
         {/* Under the open door, not over the goat it shows. */}
         <Note at={goatAt + 8} x={DOOR.xs[2]} width={DOOR.w} y={doorTop + doorH + 16} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(30, INK), fontWeight: 650 }}>goat</span>
+          <span style={{ ...note(30, INK), fontWeight: 500 }}>goat</span>
         </Note>
         <Note at={pickAt + 4} x={DOOR.xs[0]} width={DOOR.w} y={doorTop + 40} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(26, INK), fontWeight: 650, background: PAPER, padding: "2px 10px", borderRadius: 6 }}>your pick</span>
+          <span style={{ ...note(26, INK), fontWeight: 500, background: PAPER, padding: "2px 10px", borderRadius: 6 }}>your pick</span>
         </Note>
         <Note at={hostAt + 2} x={DOOR.xs[2]} width={DOOR.w} y={doorTop - 46} from="up" out={thirdAt} style={{ textAlign: "center" }}>
           <span style={{ ...label(22, INK_SOFT) }}>the host opens</span>
@@ -182,7 +182,7 @@ export const MontyScene: React.FC = () => {
           width={3}
         />
         <Note at={takeAt} x={DOOR.xs[0] + DOOR.w / 2 + 20} y={doorTop + doorH + 88}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>switch</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>switch</span>
         </Note>
 
         {/* ── One third on yours, two thirds on the rest ── */}
@@ -225,7 +225,7 @@ export const MontyScene: React.FC = () => {
           return (
             <React.Fragment key={r.name}>
               <Note at={r.at - 2} x={SIM.x} y={top}>
-                <span style={{ ...note(28, INK), fontWeight: 600 }}>{r.name}</span>
+                <span style={{ ...note(28, INK), fontWeight: 500 }}>{r.name}</span>
               </Note>
               <Svg>
                 <rect x={SIM.x} y={top + 44} width={SIM.w * r.share * p} height={SIM.bar} rx={4} fill={r.color} opacity={0.85} />

@@ -219,7 +219,7 @@ const Mode: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* Well clear of the billing bar's count, so the two read as a count
           and a note about it rather than as one line in two sizes. */}
       <Note at={billingAt + 4} x={barX + 3 * unit + 110} y={top + c.h(50)}>
-        <span style={{ ...note(28, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>mode: {RAPID.mode.mode}</span>
+        <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>mode: {RAPID.mode.mode}</span>
       </Note>
       <Note at={twoAt - 2} x={R_X + 40} y={top + c.h(330)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>two peaks in a distribution? check for two groups</span>
@@ -345,7 +345,7 @@ const Population: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Line s={s} y={lineY} ticks={[46, 48, 50, 52, 54, 56]} at={manyAt - 6} />
       <Svg opacity={ease(frame, manyAt + 4, 12)}>
-        <text x={s.b} y={lineY + 62} textAnchor="end" style={{ ...tick(19), fontWeight: 650, fontVariantNumeric: "normal" }}>
+        <text x={s.b} y={lineY + 62} textAnchor="end" style={{ ...tick(19), fontWeight: 500, fontVariantNumeric: "normal" }}>
           each dot: one sample&apos;s average order value, $
         </text>
       </Svg>
@@ -359,7 +359,7 @@ const Population: React.FC<{ c: Ctx }> = ({ c }) => {
         width={2.4}
         side="left"
         labelY={c.y(490)}
-        label={<span style={{ ...note(24, INK), fontWeight: 650 }}>population {fmt(P.mean, 1)}</span>}
+        label={<span style={{ ...note(24, INK), fontWeight: 500 }}>population {fmt(P.mean, 1)}</span>}
       />
       <Svg>
         {dots.map((d, i) => (
@@ -372,7 +372,7 @@ const Population: React.FC<{ c: Ctx }> = ({ c }) => {
       ].map(({ d, at: from }) =>
         d ? (
           <Note key={d.m} at={from - 2} x={d.x - 60} width={120} y={d.y - r - 34} from="up" style={{ textAlign: "center" }}>
-            <span style={{ ...note(22, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>{fmt(d.m, 1)}</span>
+            <span style={{ ...note(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{fmt(d.m, 1)}</span>
           </Note>
         ) : null,
       )}

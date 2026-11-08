@@ -118,12 +118,12 @@ export const NoiseScene: React.FC = () => {
           <Note at={threeAt + 8} x={CHART.x0 + 12} y={at(ys, NOISE.band[1]) - h(36)}>
             {/* The band is two standard deviations either side (check.mjs);
                 the ±3% beside the chart is one, so the band says its width. */}
-            <span style={{ ...label(21, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               its normal band: ±2 standard deviations, about ±{Math.round(NOISE.sdShare * 200)}%
             </span>
           </Note>
           <Note at={dipAt + 6} x={at(xs, days + 1) + 10} align="right" y={at(ys, NOISE.band[0]) + h(14)}>
-            <span style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={insideAt}>today: −2%, inside it</Mark>
             </span>
           </Note>
@@ -140,7 +140,7 @@ export const NoiseScene: React.FC = () => {
             </span>
           </Note>
           <Note at={countAt + 4} x={SIDE_X} y={y(470)}>
-            <span style={{ ...note(28, WARM_INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, WARM_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
               <Mark at={testingAt} color={`color-mix(in srgb, ${WARM} 22%, transparent)`}>
                 {NOISE.beyondTwo} of {NOISE.days} days moved more than 2%
               </Mark>
@@ -148,7 +148,7 @@ export const NoiseScene: React.FC = () => {
           </Note>
 
           <Note at={real[0].at - 4} x={SIDE_X} y={y(560)}>
-            <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>A real shift:</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A real shift:</span>
           </Note>
           {real.map((r, i) => (
             <Note key={r.text} at={r.at - 2} x={SIDE_X} y={y(614) + i * h(54)}>

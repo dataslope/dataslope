@@ -82,7 +82,7 @@ export const TopPScene: React.FC = () => {
                   alignItems: "center",
                   paddingLeft: 14,
                   ...note(23, TEXT[i]),
-                  fontWeight: 650,
+                  fontWeight: 500,
                 }}
               >
                 {inside ? (
@@ -94,7 +94,7 @@ export const TopPScene: React.FC = () => {
             </Ink>
             {isRock ? (
               <Note at={start + 10} x={X1 + 14} y={barA + bh / 2 - 15}>
-                <span style={{ ...note(23, TEXT[i]), fontWeight: 650 }}>
+                <span style={{ ...note(23, TEXT[i]), fontWeight: 500 }}>
                   <Struck at={dropAt + 2}>
                     {TOKENS[i]} {pct(HOT.probs[i])}
                   </Struck>
@@ -115,7 +115,7 @@ export const TopPScene: React.FC = () => {
               <line x1={x} x2={x} y1={barA + bh} y2={barA + bh + 16} stroke={INK} strokeWidth={1.6} />
             </svg>
             <Note at={at} x={x} y={barA + bh + 22} from="up" style={{ transform: "translateX(-50%)" }}>
-              <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+              <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 {k === 0 ? "" : "+ "}
                 <span style={{ color: TEXT[tok] }}>{TOKENS[tok]}</span> = {pct(HOT.topP.running[k])}
               </span>
@@ -141,7 +141,7 @@ export const TopPScene: React.FC = () => {
         />
       </svg>
       <Note at={ninetyAt} x={px(TOP_P)} y={barA - 58} from="up" style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>p = {TOP_P}</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>p = {TOP_P}</span>
       </Note>
 
       {/* Bar B: what is left, rescaled to sum to one, and drawn from. */}
@@ -164,7 +164,7 @@ export const TopPScene: React.FC = () => {
                 alignItems: "center",
                 paddingLeft: 14,
                 ...note(23, TEXT[tok]),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -174,7 +174,7 @@ export const TopPScene: React.FC = () => {
         );
       })}
       <Note at={cutAt} x={X1 + 14} y={barB + bh / 2 - 15}>
-        <span style={{ ...note(23, ACCENT_INK), fontWeight: 650 }}>rock 0%</span>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500 }}>rock 0%</span>
       </Note>
 
       <Note at={cutAt + 10} x={120} y={y(830)}>

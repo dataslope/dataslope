@@ -51,8 +51,8 @@ const pieceMid = (k: number) => (pieceTop(k, 0) + pieceBottom(k)) / 2;
 /** "1  Split": a step's number in the accent and its name in ink. */
 const Step: React.FC<{ n: number; text: string; at: number; x: number; top: number }> = ({ n, text, at, x, top }) => (
   <Ink at={at} dur={14} style={{ left: x, top, display: "flex", alignItems: "baseline", gap: 12, whiteSpace: "nowrap" }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>{n}</span>
-    <span style={{ ...label(24, INK), fontWeight: 600 }}>{text}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>{n}</span>
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>{text}</span>
   </Ink>
 );
 
@@ -140,7 +140,7 @@ export const SplitScene: React.FC = () => {
 
       {/* ── the frame ── */}
       <Ink at={open + 4} dur={12} style={{ left: A_X, top: y(LABEL_Y) }}>
-        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>df</span>
+        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>df</span>
       </Ink>
       <Header x={A_X} top={y(HEADER_Y)} width={CARD_W} at={open + 6} cols={FRAME_COLS} />
       {ROWS.map((r, i) => {
@@ -217,7 +217,7 @@ export const SplitScene: React.FC = () => {
               />
             </svg>
             <Note at={sumAt - 2 + k * 6} x={(ARROW_X0 + ARROW_X1) / 2} y={mid - 40} from="up" style={{ transform: "translateX(-50%)" }}>
-              <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK, opacity: spent }}>sum</span>
+              <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK, opacity: spent }}>sum</span>
             </Note>
             <Arrow from={[ARROW_X0, mid]} to={[ARROW_X1, mid]} at={sumAt + k * 6} opacity={spent} />
             {/* Engineering's answer, while the narration reads it out. */}

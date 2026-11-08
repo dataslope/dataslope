@@ -38,7 +38,7 @@ const Node: React.FC<{ x: number; y: number; keys: readonly string[]; at: number
             x={x - w / 2 + i * slot + slot / 2}
             y={y + 29}
             textAnchor="middle"
-            style={svgText({ fontFamily: MONO, fontSize: 21, fontWeight: hot === i ? 700 : 400, color: k === "…" ? INK_SOFT : INK })}
+            style={svgText({ fontFamily: MONO, fontSize: 21, fontWeight: hot === i ? 500 : 400, color: k === "…" ? INK_SOFT : INK })}
           >
             {k}
           </text>

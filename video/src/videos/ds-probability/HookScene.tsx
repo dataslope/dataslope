@@ -114,7 +114,7 @@ export const HookScene: React.FC = () => {
           <span style={{ ...label(26, INK), ...TABULAR, whiteSpace: "nowrap" }}>{BDAY.people} people</span>
         </Note>
         <Note at={sayNoAt} x={ROOM.x + ROOM.w + 30} y={y(ROOM.y + 150)} out={roomOut}>
-          <span style={{ ...note(30, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             {/* Pointed at, not struck: the hook leaves its question open until question 12. */}
             <span style={{ display: "inline-block", transform: `scale(${1 + 0.08 * pulse(frame, wrongAt, 26)})`, transformOrigin: "0 50%" }}>
               Most people say no.
@@ -158,12 +158,12 @@ export const HookScene: React.FC = () => {
         })}
         <Note at={numbersAt} x={X0} y={y(CARD.y + CARD.h + 30)} dim={leansAt - 4}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <span style={{ ...TABULAR, fontWeight: 650 }}>{WORKED}</span> worked through with numbers
+            <span style={{ ...TABULAR, fontWeight: 500 }}>{WORKED}</span> worked through with numbers
           </span>
         </Note>
         <Note at={quickAt} x={X0 + WORKED * CARD.pitch + SET_ASIDE} y={y(CARD.y + CARD.h + 30)} dim={leansAt - 4}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <span style={{ ...TABULAR, fontWeight: 650 }}>{TOTAL - WORKED}</span> quick ones
+            <span style={{ ...TABULAR, fontWeight: 500 }}>{TOTAL - WORKED}</span> quick ones
           </span>
         </Note>
       </Drift>

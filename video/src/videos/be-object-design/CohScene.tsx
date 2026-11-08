@@ -139,10 +139,10 @@ export const CohScene: React.FC = () => {
                   { at: highAt, value: good ? 0.86 : 0.14, tone: "ok" },
                 ]}
               />
-              <Line x={cx} y={labelY} at={i === 0 ? cohAt + 8 : coupAt + 8} size={22} weight={600} align="center" width={220}>
+              <Line x={cx} y={labelY} at={i === 0 ? cohAt + 8 : coupAt + 8} size={22} weight={500} align="center" width={220}>
                 {name}
               </Line>
-              <Line x={cx} y={labelY + NOTE_DY} at={i === 0 ? purposeAt : lowAt} size={20} color={INK_SOFT} weight={600} align="center" width={220}>
+              <Line x={cx} y={labelY + NOTE_DY} at={i === 0 ? purposeAt : lowAt} size={20} color={INK_SOFT} weight={500} align="center" width={220}>
                 {good ? "high is good" : "low is good"}
               </Line>
             </React.Fragment>
@@ -164,9 +164,9 @@ export const CohScene: React.FC = () => {
             opacity: ease(frame, managerAt, 12) * (1 - split),
           }}
         />
-        <Line x={GOD.x + 22} y={T + 14} at={managerAt} size={25} weight={750} out={splitAt}>
+        <Line x={GOD.x + 22} y={T + 14} at={managerAt} size={25} weight={500} out={splitAt}>
           <span style={{ color: ACCENT }}>Order manager</span>
-          <span style={{ color: INK_SOFT, fontWeight: 600, opacity: ease(frame, godAt, 10) }}> · a god class</span>
+          <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, godAt, 10) }}> · a god class</span>
         </Line>
         {JOBS.map((j, i) => {
           const top = rowTop(i);
@@ -197,7 +197,7 @@ export const CohScene: React.FC = () => {
                 transform: `translateX(${(1 - p) * -10}px)`,
               }}
             >
-              <span style={{ ...note(23, split > 0.5 ? OK_INK : INK), fontWeight: 600, whiteSpace: "nowrap" }}>{j.job}</span>
+              <span style={{ ...note(23, split > 0.5 ? OK_INK : INK), fontWeight: 500, whiteSpace: "nowrap" }}>{j.job}</span>
             </div>
           );
         })}
@@ -209,7 +209,7 @@ export const CohScene: React.FC = () => {
           const mid = rowMid(i);
           return (
             <React.Fragment key={j.why}>
-              <Line x={WHY.x + WHY.w} y={mid - 15} at={at} size={22} weight={650} color={red > 0.5 ? ACCENT : INK_SOFT} align="right" width={WHY.w}>
+              <Line x={WHY.x + WHY.w} y={mid - 15} at={at} size={22} weight={500} color={red > 0.5 ? ACCENT : INK_SOFT} align="right" width={WHY.w}>
                 {j.why}
               </Line>
               <Flow points={[[WHY.x + WHY.w + 16, mid], [GOD.x + 16, mid]]} at={at + 4} dur={8} color={red > 0.5 ? ACCENT : INK} width={2.2} head={12} />
@@ -232,7 +232,7 @@ export const CohScene: React.FC = () => {
           ]}
         />
         <Flow points={[[CHECKOUT.x - 8, ckMid], [GOD.x + GOD.w + 8, ckMid]]} at={touchesAt + 4} color={redFlow > 0.5 ? ACCENT : INK} out={splitAt} />
-        <Line x={GOD.x + GOD.w + 40} y={ckMid - 46} at={touchesAt + 8} size={20} color={INK_SOFT} weight={600} out={splitAt}>
+        <Line x={GOD.x + GOD.w + 40} y={ckMid - 46} at={touchesAt + 8} size={20} color={INK_SOFT} weight={500} out={splitAt}>
           depends on all five
         </Line>
         {JOBS.map((j, i) => (
@@ -250,7 +250,7 @@ export const CohScene: React.FC = () => {
         <ArtSpot id="multitool" at={knifeAt} out={splitAt - 10} left={1590} top={ckMid - 75} h={150} />
 
         {/* How to spot one. */}
-        <Line x={CHECKOUT.x} y={y(752)} at={spotAt} size={22} weight={600}>
+        <Line x={CHECKOUT.x} y={y(752)} at={spotAt} size={22} weight={500}>
           In a review, count
         </Line>
         {[
@@ -266,7 +266,7 @@ export const CohScene: React.FC = () => {
             </Line>
           </React.Fragment>
         ))}
-        <Line x={(GAUGE.xs[0] + GAUGE.xs[1]) / 2} y={solidY} at={solidAt} size={21} color={OK_INK} weight={650} align="center" width={420}>
+        <Line x={(GAUGE.xs[0] + GAUGE.xs[1]) / 2} y={solidY} at={solidAt} size={21} color={OK_INK} weight={500} align="center" width={420}>
           most of SOLID pushes this way
         </Line>
       </Drift>

@@ -125,7 +125,7 @@ export const ShuffleScene: React.FC = () => {
           <React.Fragment key={k}>
             <Machine x={RED_X} top={y(ROW_TOPS[i])} width={BOX_W} height={boxH} at={keyAt + i * 3} />
             <Note at={keyAt + 2 + i * 3} x={RED_X} y={mid(i) - 14} width={BOX_W} style={{ textAlign: "center" }}>
-              <span style={{ ...label(22, DEPT_INK[k]), fontWeight: 600 }}>{k}</span>
+              <span style={{ ...label(22, DEPT_INK[k]), fontWeight: 500 }}>{k}</span>
             </Note>
           </React.Fragment>
         ))}
@@ -138,7 +138,7 @@ export const ShuffleScene: React.FC = () => {
           <React.Fragment key={m}>
             <Machine x={MAP_X} top={y(ROW_TOPS[m])} width={BOX_W} height={boxH} at={mapAt + m * 3} />
             <Note at={mapAt + 2 + m * 3} x={MAP_X} y={mid(m) - 14} width={BOX_W} style={{ textAlign: "center" }}>
-              <span style={{ ...label(22, INK), fontWeight: 650 }}>map task {m + 1}</span>
+              <span style={{ ...label(22, INK), fontWeight: 500 }}>map task {m + 1}</span>
             </Note>
             <Arrow from={[MAP_X + BOX_W + 6, mid(m)]} to={[DISK_X - 8, mid(m)]} at={diskAt + m * 3} dur={8} width={1.8} head={10} />
             <Disk x={DISK_X} top={mid(m) - DISK_H / 2} at={diskAt + 4 + m * 3} w={DISK_W} />
@@ -160,10 +160,10 @@ export const ShuffleScene: React.FC = () => {
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>serialized to local disk</span>
         </Note>
         <Note at={netAt} x={600} y={y(ROW_TOPS[2]) + boxH + h(20)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the network</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the network</span>
         </Note>
         <Note at={fewerAt - 2} x={1080} y={y(ROW_TOPS[0]) + h(16)}>
-          <span style={{ ...note(27, OK_INK), fontWeight: 600, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, OK_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             Tuning Spark:
             <br />
             fewer shuffles<span style={{ opacity: ease(frame, lessAt, 10) }}>, less data in each</span>
@@ -226,7 +226,7 @@ export const ShuffleScene: React.FC = () => {
                 <span style={{ ...note(20, hot ? ACCENT_INK : INK_SOFT), whiteSpace: "nowrap" }}>
                   <Num>{nsText(l.ns)}</Num>
                   {ratio ? (
-                    <span style={{ opacity: ease(frame, ratio.at, 10), fontWeight: 600 }}>
+                    <span style={{ opacity: ease(frame, ratio.at, 10), fontWeight: 500 }}>
                       {" · "}
                       <Num>{count(ratio.n)}</Num> × memory
                     </span>
@@ -234,7 +234,7 @@ export const ShuffleScene: React.FC = () => {
                 </span>
               </Note>
               <Note at={secondAt + 2 + i * 2} x={SCALED_X} y={rowY(i) + rowH / 2 - 14}>
-                <span style={{ ...note(21, i === NET ? ACCENT_INK : i === L1 ? INK : INK_SOFT), fontWeight: i === NET || i === L1 ? 700 : 500, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(21, i === NET ? ACCENT_INK : i === L1 ? INK : INK_SOFT), fontWeight: i === NET || i === L1 ? 500 : 500, whiteSpace: "nowrap" }}>
                   {/* The network's "almost six days" takes the trap's red
                       highlight, where a ring once sat round it. */}
                   {i === NET ? (

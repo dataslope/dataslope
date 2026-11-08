@@ -189,7 +189,7 @@ export const SplitScene: React.FC = () => {
               top: top + (splitY(i) - top) * split - 38,
               opacity: ease(frame, splitAt + 6, 10) * (1 - whatIf * 0.6),
               ...note(28, STAT_INK),
-              fontWeight: 600,
+              fontWeight: 500,
               whiteSpace: "nowrap",
             }}
           >
@@ -204,14 +204,14 @@ export const SplitScene: React.FC = () => {
           top: top + 12,
           opacity: ease(frame, splitAt + 8, 10),
           ...note(21, "var(--ds-white)"),
-          fontWeight: 650,
+          fontWeight: 500,
           whiteSpace: "nowrap",
         }}
       >
         churned
       </div>
       <Note at={fifteenAt} x={(BARS.x[0] + BARS.w + BARS.x[1]) / 2} y={top + H * TABLE.pAll + 10} from="up">
-        <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", textAlign: "center" }}>
+        <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", textAlign: "center" }}>
           everyone
           <br />
           {pct(TABLE.pAll)}
@@ -227,7 +227,7 @@ export const SplitScene: React.FC = () => {
       <Pulse x={BARS.x[1] + BARS.w + 48} y={splitY(1) - 22} at={twentyFourAt - 2} r={34} />
       <VBracket x={STEP_X} y0={splitY(0)} y1={splitY(1)} at={gapAt - 4} color={INK} right />
       <Note at={gapAt} x={STEP_X + 24} y={(splitY(0) + splitY(1)) / 2 - 15}>
-        <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           {Math.round((TABLE.pFree - TABLE.pPaid) * 100)} points
         </span>
       </Note>
@@ -240,10 +240,10 @@ export const SplitScene: React.FC = () => {
       </Ink>
       <Ink at={givenAt - 4} dur={16} style={{ left: RIGHT, top: y(386), whiteSpace: "nowrap" }}>
         <Sweep at={indepWordAt - 2} dur={16} out={testInFrom - 6}>
-          <span style={{ ...note(42, INK), fontWeight: 600 }}>
+          <span style={{ ...note(42, INK), fontWeight: 500 }}>
             P(churn <span style={{ color: INK_SOFT }}>| plan</span>)
           </span>
-          <span style={{ ...note(42, INK), fontWeight: 600, opacity: ease(frame, withoutAt - 4, 12) }}> = P(churn)</span>
+          <span style={{ ...note(42, INK), fontWeight: 500, opacity: ease(frame, withoutAt - 4, 12) }}> = P(churn)</span>
         </Sweep>
       </Ink>
       <Note at={actAt} x={RIGHT} y={y(450)}>
@@ -278,7 +278,7 @@ export const SplitScene: React.FC = () => {
             the answer is the line's own Inter, in the accent and bold. */}
         <span style={{ ...note(30, INK) }}>
           ≈ {STREAK.ten.toFixed(4).replace(/0+$/, "")}, about{" "}
-          <span style={{ color: STAT_INK, fontWeight: 600 }}>
+          <span style={{ color: STAT_INK, fontWeight: 500 }}>
             <Sweep at={oneInAt}>1 in 1,000</Sweep>
           </span>
         </span>

@@ -110,7 +110,7 @@ export const CountsScene: React.FC = () => {
         width={2}
       />
       <Note at={twoAt + 2} x={colX(THE) + 4} y={y(NOTE_Y)}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>{THE_COUNT} in every row</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{THE_COUNT} in every row</span>
       </Note>
       <Note at={twoAt + 10} x={colX(2) + 4} y={y(NOTE_Y)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>

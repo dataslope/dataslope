@@ -196,7 +196,7 @@ export const WindowScene: React.FC = () => {
                 style={{
                   fontFamily: MONO,
                   fontSize: 22,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   color: BLUE_INK,
                   fontVariantLigatures: "none",
                   whiteSpace: "nowrap",

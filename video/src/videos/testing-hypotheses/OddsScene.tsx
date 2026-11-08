@@ -132,7 +132,7 @@ export const OddsScene: React.FC = () => {
           </Label>
         </Note>
         <Note at={sixtyAt - 2} x={last[0] - 16} y={last[1] - 58} align="right">
-          <span style={{ ...note(36, STAT_INK), fontWeight: 600, ...halo }}>
+          <span style={{ ...note(36, STAT_INK), fontWeight: 500, ...halo }}>
             <Count at={sixtyAt - 2} from={0.05} to={AT_LEAST.p[19]} dur={22} format={(v) => pct(v, 0)} />
           </span>
         </Note>
@@ -173,7 +173,7 @@ export const OddsScene: React.FC = () => {
             </Label>
           </Note>
           <Note at={dipsAt + 10} x={PK.x1} y={y(PK_BASE) + 94} align="right">
-            <span style={{ ...note(24, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               dips under 0.05: {dips} {dips === 1 ? "time" : "times"}, with nothing there
             </span>
           </Note>
@@ -207,7 +207,7 @@ export const OddsScene: React.FC = () => {
         <FigLabel n="12" title="The same test, against a raised bar" at={raiseAt - 4} x={B.x0} y={y(640)} />
         <Ink at={raiseAt - 2} dur={14} style={{ left: B.x0, top: y(640) + 44, whiteSpace: "nowrap" }}>
           <Label size={24}>Or raise the bar:</Label>
-          <span style={{ ...note(26, STAT_INK), fontWeight: 600, marginLeft: 14, opacity: ease(frame, sharingAt - 4, 12) }}>
+          <span style={{ ...note(26, STAT_INK), fontWeight: 500, marginLeft: 14, opacity: ease(frame, sharingAt - 4, 12) }}>
             0.05 ÷ 20 = {AT_LEAST.bonferroni}
           </span>
           <span style={{ ...label(24, INK_SOFT), marginLeft: 12, opacity: ease(frame, sharingAt + 4, 12) }}>(Bonferroni)</span>

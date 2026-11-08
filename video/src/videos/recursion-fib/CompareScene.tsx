@@ -67,7 +67,7 @@ export const CompareScene: React.FC = () => {
   });
   const num = (size: number, color: string): React.CSSProperties => ({
     ...note(size, color),
-    fontWeight: 600,
+    fontWeight: 500,
   });
   /** A highlighter swipe behind the n = 50 value of a column. */
   const swipe = (at: number) => ({
@@ -94,7 +94,7 @@ export const CompareScene: React.FC = () => {
         ] as const
       ).map(([key, title, color, ink, at]) => (
         <Ink key={key} at={at} dur={14} style={{ left: GROUP[key][0], top: y(GROUP_Y), width: GROUP[key][1] - GROUP[key][0] }}>
-          <div style={{ ...label(24, ink), fontWeight: 600, paddingBottom: 8, borderBottom: `2px solid ${color}` }}>{title}</div>
+          <div style={{ ...label(24, ink), fontWeight: 500, paddingBottom: 8, borderBottom: `2px solid ${color}` }}>{title}</div>
         </Ink>
       ))}
       {(
@@ -168,7 +168,7 @@ export const CompareScene: React.FC = () => {
       {/* What the columns say, one note under each group. */}
       <Note at={twoAt} x={GROUP.memo[0]} y={y(NOTE_Y)} from="up" width={GROUP.memo[1] - GROUP.memo[0]}>
         <span style={note(21, INK_SOFT)}>
-          Calls: <span style={{ color: MEMO_INK, fontWeight: 650 }}>2n − 1</span> at every n, two more per step.
+          Calls: <span style={{ color: MEMO_INK, fontWeight: 500 }}>2n − 1</span> at every n, two more per step.
         </span>
       </Note>
       <Note at={removesAt} x={GROUP.naive[0]} y={y(NOTE_Y)} from="up" width={GROUP.naive[1] - GROUP.naive[0]}>

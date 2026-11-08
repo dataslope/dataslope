@@ -152,7 +152,7 @@ export const BytesScene: React.FC = () => {
               })}
               <div style={{ position: "absolute", left: COUNT_X, top: top - 2, display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
                 <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, bytesCountAt[i] - 2, 10), ...TABULAR }}>{g.bytes} bytes</span>
-                <span style={{ ...note(26, rare ? FOCUS_INK : INK), fontWeight: 650, opacity: tok, ...TABULAR }}>
+                <span style={{ ...note(26, rare ? FOCUS_INK : INK), fontWeight: 500, opacity: tok, ...TABULAR }}>
                   {g.tokens} {g.tokens === 1 ? "token" : "tokens"}
                 </span>
               </div>

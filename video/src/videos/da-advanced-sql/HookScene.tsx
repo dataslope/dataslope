@@ -92,7 +92,7 @@ export const HookScene: React.FC = () => {
                   top: top + 2,
                   fontFamily: MONO,
                   fontSize: 28,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   color: INK,
                   whiteSpace: "pre",
                   fontVariantLigatures: "none",

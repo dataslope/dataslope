@@ -117,39 +117,39 @@ export const DipScene: React.FC = () => {
           lit={socketLit + pulse(frame, sendAt, 20)}
           radius={8}
         >
-          <span style={{ ...label(20, OK_INK), fontWeight: 600, textAlign: "center", lineHeight: 1.15 }}>
+          <span style={{ ...label(20, OK_INK), fontWeight: 500, textAlign: "center", lineHeight: 1.15 }}>
             sends a
             <br />
             message
           </span>
         </Box>
-        <Line x={dockX} y={mid - PLUG.h / 2 - 40} at={prodAt} size={21} color={INK_SOFT} weight={650} out={testAt + 2}>
+        <Line x={dockX} y={mid - PLUG.h / 2 - 40} at={prodAt} size={21} color={INK_SOFT} weight={500} out={testAt + 2}>
           in production
         </Line>
-        <Line x={dockX} y={mid - PLUG.h / 2 - 40} at={testAt + 8} size={21} color={INK_SOFT} weight={650}>
+        <Line x={dockX} y={mid - PLUG.h / 2 - 40} at={testAt + 8} size={21} color={INK_SOFT} weight={500}>
           in a test
         </Line>
         <Box x={lerp(HOME_X, dockX, emailIn)} y={emailY} w={PLUG.w} h={PLUG.h} at={passedAt + 4} title="Email sender" sub={frame < emailAt ? "the concrete piece" : undefined} subSize={20} tone="data" dim={testAt + 6} />
         <Box x={lerp(HOME_X, dockX, fakeIn)} y={fakeY} w={PLUG.w} h={PLUG.h} at={testAt + 2} title="Recording fake" tone="data" />
 
         {/* What the fake recorded. */}
-        <Line x={CONF.x} y={top + CONF.h + 44} at={recordsAt + 4} size={21} color={INK_SOFT} weight={650}>
+        <Line x={CONF.x} y={top + CONF.h + 44} at={recordsAt + 4} size={21} color={INK_SOFT} weight={500}>
           the fake recorded one message
         </Line>
-        <Line x={CONF.x} y={top + CONF.h + 78} at={recordsAt + 10} size={26} color={BLUE_INK} weight={600}>
+        <Line x={CONF.x} y={top + CONF.h + 78} at={recordsAt + 10} size={26} color={BLUE_INK} weight={500}>
           “{sent}”
         </Line>
         <div style={{ position: "absolute", left: CONF.x + 590, top: top + CONF.h + 80, width: 32, height: 32 }}>
           <Mark2 at={checksAt} kind="tick" size={32} />
         </div>
-        <Line x={CONF.x + 636} y={top + CONF.h + 82} at={checksAt + 2} size={23} color={OK_INK} weight={650}>
+        <Line x={CONF.x + 636} y={top + CONF.h + 82} at={checksAt + 2} size={23} color={OK_INK} weight={500}>
           checked, no mail server
         </Line>
 
         <ArtSpot id="plug" at={lampAt} left={1360} top={y(380)} h={190} />
 
         {/* The arrows, before and after. */}
-        <Line x={B.conf.x} y={rowTop - 48} at={inversionAt} size={21} color={INK_SOFT} weight={600}>
+        <Line x={B.conf.x} y={rowTop - 48} at={inversionAt} size={21} color={INK_SOFT} weight={500}>
           before
         </Line>
         <Box x={B.conf.x} y={rowTop} w={B.conf.w} h={rowH} at={inversionAt} title="Confirmation" size={23} tones={[[noLongerAt + 10, "bad"]]} />
@@ -158,7 +158,7 @@ export const DipScene: React.FC = () => {
         <Mark2 at={noLongerAt + 12} kind="cross" size={30} style={{ left: (B.conf.x + B.conf.w + B.email.x) / 2 - 15, top: rowMid - 50 }} />
 
         <VRule x={(B.email.x + B.email.w + A.conf.x - 14) / 2} top={rowTop - 48} bottom={rowTop + rowH + 50} at={noLongerAt} />
-        <Line x={A.conf.x} y={rowTop - 48} at={noLongerAt} size={21} color={OK_INK} weight={600}>
+        <Line x={A.conf.x} y={rowTop - 48} at={noLongerAt} size={21} color={OK_INK} weight={500}>
           after
         </Line>
         <Box x={A.conf.x} y={rowTop} w={A.conf.w} h={rowH} at={noLongerAt + 4} title="Confirmation" size={23} tone="ok" />
@@ -185,7 +185,7 @@ export const DipScene: React.FC = () => {
           { x: A.conf.x + A.conf.w / 2, t: "policy" },
           { x: A.email.x + A.email.w / 2, t: "detail" },
         ].map((l, i) => (
-          <Line key={i} x={l.x} y={rowTop + rowH + 22} at={policyAt + (i % 2) * 6} size={21} color={INK_SOFT} weight={650} align="center" width={200}>
+          <Line key={i} x={l.x} y={rowTop + rowH + 22} at={policyAt + (i % 2) * 6} size={21} color={INK_SOFT} weight={500} align="center" width={200}>
             {l.t}
           </Line>
         ))}

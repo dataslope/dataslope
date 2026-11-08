@@ -87,7 +87,7 @@ export const CohortGrid: React.FC<{
               display: "flex",
               alignItems: "center",
               ...note(24, INK),
-              fontWeight: 650,
+              fontWeight: 500,
               opacity: 0.45 + 0.55 * lit,
             }}
           >
@@ -126,7 +126,7 @@ export const CohortGrid: React.FC<{
                 alignItems: "center",
                 justifyContent: "center",
                 ...note(23, v >= 60 ? PAPER : INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 ...TABULAR,
               }}
             >

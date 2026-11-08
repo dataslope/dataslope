@@ -90,7 +90,7 @@ export const WhereScene: React.FC = () => {
     <AbsoluteFill>
       <div style={{ position: "absolute", left: 116, top: y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
         <Ink at={start - 14} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          Add a <Mono weight={600}>WHERE</Mono>,
+          Add a <Mono weight={500}>WHERE</Mono>,
         </Ink>
         <Ink
           at={goneAt - 2}
@@ -167,14 +167,14 @@ export const WhereScene: React.FC = () => {
         <Ink at={notTrueAt - 2} dur={14} style={{ position: "relative" }}>
           <span style={noteText(24, INK)}>
             <Mono>
-              <span style={{ color: NULL_INK, fontWeight: 600 }}>NULL</span> &gt; 50
+              <span style={{ color: NULL_INK, fontWeight: 500 }}>NULL</span> &gt; 50
             </Mono>{" "}
-            is <Mono color={NULL_INK} weight={600}>NULL</Mono>: unknown, not true.
+            is <Mono color={NULL_INK} weight={500}>NULL</Mono>: unknown, not true.
           </span>
         </Ink>
         <Ink at={whereKeepsAt - 2} dur={14} style={{ position: "relative" }}>
           <span style={noteText(24, INK)}>
-            <Mono>WHERE</Mono> keeps a row only when its test is <span style={{ color: KEPT_INK, fontWeight: 600 }}>true</span>.
+            <Mono>WHERE</Mono> keeps a row only when its test is <span style={{ color: KEPT_INK, fontWeight: 500 }}>true</span>.
           </span>
         </Ink>
         <Ink at={innerAt - 2} dur={14} style={{ position: "relative" }}>

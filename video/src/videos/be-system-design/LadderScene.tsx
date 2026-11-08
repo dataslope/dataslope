@@ -147,7 +147,7 @@ export const LadderScene: React.FC = () => {
           );
         })}
 
-        <Line x={X0} y={axisY + 104} at={countAt + 4} size={30} weight={600}>
+        <Line x={X0} y={axisY + 104} at={countAt + 4} size={30} weight={500}>
           Count the network hops in a request first.
         </Line>
         <Line x={X0} y={axisY + 150} at={hundredAt} size={24} color={INK_SOFT}>

@@ -10,7 +10,13 @@ import { MONO } from "../../theme/fonts";
 import { MONEY } from "./data";
 import { FIG_Y, Head, Kicker, Mark, MARK, MARK_BAD, OK_INK, pulse, Spot, X0 } from "./parts";
 
-const SIZE = 40;
+/** The figure's two sizes: its data (every cell, mono or not) and its small
+ *  type (column heads and notes), the figure label's 24. */
+/** The figure sits this far above the house figure line, for air between
+ *  the table and the scales below it. */
+const LIFT = 60;
+const SIZE = 34;
+const SMALL = 24;
 /** Columns. Postgres's answer to "= 0.3" sits under its own header, so the
  *  row never reads as a chain of equals signs. */
 const COL = { type: X0, sum: 520, eq: 800, result: 860, test: 1440 } as const;
@@ -43,8 +49,8 @@ export const MoneyScene: React.FC = () => {
   const kindAt = n.word("null-in", "right kind");
   const thereAt = n.word("null-in", "there");
 
-  const rowA = y(530);
-  const rowB = y(670);
+  const rowA = y(530 - LIFT);
+  const rowB = y(670 - LIFT);
   // numeric's band holds its row and the note under it.
   const bandTop = rowB - h(50);
   const bandH = h(124);
@@ -72,7 +78,7 @@ export const MoneyScene: React.FC = () => {
           display: "inline-block",
           fontFamily: MONO,
           fontSize: SIZE,
-          fontWeight: 600,
+          fontWeight: 500,
           color: ok ? OK_INK : ACCENT_INK,
           opacity: p,
           transform: `scale(${0.8 + 0.2 * p + swell * 0.12})`,
@@ -103,7 +109,7 @@ export const MoneyScene: React.FC = () => {
 
       <Kicker at={open - 10}>The first constraint</Kicker>
       <Head lead="Ten cents plus twenty." at={open - 6} turn="Thirty?" turnAt={thirtyAt - 2} />
-      <FigLabel n="5" title="The same sum in two types, and Postgres's answers" at={tenAt - 6} x={X0} y={y(FIG_Y)} />
+      <FigLabel n="5" title="The same sum in two types, and Postgres's answers" at={tenAt - 6} x={X0} y={y(FIG_Y - LIFT)} />
 
       {/* Column titles. */}
       {(
@@ -114,15 +120,15 @@ export const MoneyScene: React.FC = () => {
           [COL.test, "equals 0.3?", thirtyAt - 4],
         ] as const
       ).map(([x, t, at]) => (
-        <Ink key={t} at={at} dur={12} style={{ left: x, top: y(420), whiteSpace: "nowrap", opacity: 1 - dimAll }}>
-          <span style={label(22, INK_SOFT)}>{t}</span>
+        <Ink key={t} at={at} dur={12} style={{ left: x, top: y(420 - LIFT), whiteSpace: "nowrap", opacity: 1 - dimAll }}>
+          <span style={label(SMALL, INK_SOFT)}>{t}</span>
         </Ink>
       ))}
       <div
         style={{
           position: "absolute",
           left: X0,
-          top: y(420) + 40,
+          top: y(420 - LIFT) + 40,
           width: (1680 - X0) * ease(frame, tenAt - 4, 20),
           height: 1,
           background: HAIRLINE,
@@ -144,7 +150,7 @@ export const MoneyScene: React.FC = () => {
       />
 
       {/* ── As a float ── */}
-      {cell(COL.type, rowA, floatsAt - 2, <span style={{ fontSize: 30, color: INK_SOFT }}>double precision</span>, dimAll)}
+      {cell(COL.type, rowA, floatsAt - 2, <span style={{ color: INK_SOFT }}>double precision</span>, dimAll)}
       {cell(COL.sum, rowA, tenAt, "0.1", dimAll)}
       {cell(COL.sum + 96, rowA, twentyAt, "+ 0.2", dimAll)}
       {cell(COL.eq, rowA, approxAt - 4, "=", dimAll)}
@@ -178,7 +184,7 @@ export const MoneyScene: React.FC = () => {
             <span style={{ position: "relative" }}>{digits.slice(3, Math.min(typed, digits.length - 1))}</span>
           </span>
           {typed >= digits.length ? (
-            <span style={{ color: ACCENT_INK, fontWeight: 600 }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 500 }}>
               <Mark at={fourAt} color={MARK_BAD}>
                 {digits.slice(-1)}
               </Mark>
@@ -190,11 +196,11 @@ export const MoneyScene: React.FC = () => {
         {verdict(String(MONEY.floatEquals), falseAt, MONEY.floatEquals)}
       </div>
       <Note at={approxAt - 4} x={COL.result} y={rowA + h(34)} dim={trueAt}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>approximate: a binary fraction</span>
+        <span style={{ ...note(SMALL, INK_SOFT), whiteSpace: "nowrap" }}>approximate: a binary fraction</span>
       </Note>
 
       {/* ── As numeric ── */}
-      {cell(COL.type, rowB, numericAt - 2, <span style={{ fontSize: 30, color: INK_SOFT }}>numeric</span>, dimAll)}
+      {cell(COL.type, rowB, numericAt - 2, <span style={{ color: INK_SOFT }}>numeric</span>, dimAll)}
       {cell(COL.sum, rowB, numericAt + 2, "0.1", dimAll)}
       {cell(COL.sum + 96, rowB, numericAt + 5, "+ 0.2", dimAll)}
       {cell(COL.eq, rowB, exactAt - 4, "=", dimAll)}
@@ -203,7 +209,7 @@ export const MoneyScene: React.FC = () => {
         {verdict(String(MONEY.exactEquals), trueAt, MONEY.exactEquals)}
       </div>
       <Note at={priceAt - 6} x={COL.result} y={rowB + h(34)}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>exact: the type for a price</span>
+        <span style={{ ...note(SMALL, INK_SOFT), whiteSpace: "nowrap" }}>exact: the type for a price</span>
       </Note>
 
       {/* "Does it have to be there at all?": an empty cell, held open. */}
@@ -217,7 +223,7 @@ export const MoneyScene: React.FC = () => {
             borderRadius: 6,
           }}
         />
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>And if there's no value at all?</span>
+        <span style={{ ...note(SIZE, INK), whiteSpace: "nowrap" }}>And if there's no value at all?</span>
       </Ink>
 
       <Spot id="db-constraints-coins" at={open - 6} left={1470} top={y(748)} width={270} height={230} dim={kindAt} />

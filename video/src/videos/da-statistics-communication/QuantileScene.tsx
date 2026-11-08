@@ -64,7 +64,7 @@ const Row: React.FC<{
             {fills.map(({ m, w }, k) => (
               <div key={k} style={{ position: "absolute", inset: 3, background: m.color, opacity: w, borderRadius: 3 }} />
             ))}
-            <span style={{ position: "relative", fontFamily: MONO, fontSize: size, fontWeight: 600, color, ...TABULAR, fontVariantLigatures: "none" }}>
+            <span style={{ position: "relative", fontFamily: MONO, fontSize: size, fontWeight: 500, color, ...TABULAR, fontVariantLigatures: "none" }}>
               {v}
             </span>
           </div>
@@ -194,7 +194,7 @@ export const QuantileScene: React.FC = () => {
           </span>
         </Note>
         <Note at={lookAt - 2} x={X0} y={y(286)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={lastThreeAt}>Look before you delete:</Mark>
           </span>
         </Note>
@@ -250,7 +250,7 @@ export const QuantileScene: React.FC = () => {
           <line x1={p90X} x2={p90X} y1={top - 36} y2={top - 6} stroke={INK} strokeWidth={3.2} />
         </Svg>
         <Note at={p90At - 2} x={p90X - 300} width={600} y={top - h(76)} out={out6} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             90th percentile <Num>{fmt(AMOUNTS.p90, 1)}</Num>
           </span>
         </Note>
@@ -284,7 +284,7 @@ export const QuantileScene: React.FC = () => {
                 <line x1={f.x} x2={f.x} y1={top - 30} y2={top - 30 + (cellH + 46) * p} stroke={INK} strokeWidth={2.6} strokeDasharray="7 5" />
               </Svg>
               <Note at={fencesAt + f.k * 8} x={f.x - 150} width={300} y={top - h(70)} from="up" style={{ textAlign: "center" }}>
-                <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                   fence <Num>{fmt(f.v, 1)}</Num>
                 </span>
               </Note>
@@ -320,12 +320,12 @@ export const QuantileScene: React.FC = () => {
           </span>
         </Note>
         <Note at={twoAt - 2} x={STRIP_X} y={zTop + cellH + h(62)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             |z| &gt; 2: {AMOUNTS.zOver2.join(" and ")}
           </span>
         </Note>
         <Note at={threeAt} x={STRIP_X + 420} y={zTop + cellH + h(62)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             |z| &gt; 3: {AMOUNTS.zOver3.length ? AMOUNTS.zOver3.join(" and ") : "nothing"}
           </span>
         </Note>
@@ -336,7 +336,7 @@ export const QuantileScene: React.FC = () => {
         </Note>
         {/* Which rule, then: one built on quartiles, which the outliers can't move. */}
         <Note at={reachAt - 2} x={STRIP_X} y={zTop + cellH + h(112)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             so use the IQR rule
             <span style={{ opacity: ease(frame, medianZAt - 2, 10) }}>, or a z-score built on the median</span>
             <span style={{ opacity: ease(frame, stillAt - 2, 10), color: INK, fontWeight: 500 }}>: quartiles don&apos;t move</span>

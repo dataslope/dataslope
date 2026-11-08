@@ -128,12 +128,12 @@ export const IdfScene: React.FC = () => {
           </div>
         </Ink>
         <Ink at={docsAt} style={{ left: RX, top: top + R.docs, whiteSpace: "nowrap" }}>
-          <div style={{ ...label(22, INK_SOFT), fontWeight: 560 }}>{docs}</div>
+          <div style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>{docs}</div>
         </Ink>
         {/* One point a match: the flat score, before her weights. */}
         <div style={{ position: "absolute", left: BAR_X, top: top + R.flat, width: UNIT * bar, height: 26, borderRadius: 4, background: color, opacity: bar > 0 ? before : 0 }} />
         <Ink at={at + 6} style={{ left: BAR_X + UNIT + 16, top: top + R.flat - 4, whiteSpace: "nowrap", opacity: before }}>
-          <span style={{ ...note(24, INK), ...TABULAR, fontWeight: 600 }}>1 point</span>
+          <span style={{ ...note(24, INK), ...TABULAR, fontWeight: 500 }}>1 point</span>
         </Ink>
         {/* Her weight, as a bar of its own under it. */}
         <div style={{ position: "absolute", left: BAR_X, top: top + R.weight, width: UNIT * w, height: 34, borderRadius: 5, background: color, opacity: w > 0 ? 1 : 0 }} />
@@ -220,8 +220,8 @@ export const IdfScene: React.FC = () => {
         </svg>
         <Ink at={twoHundredAt - 2} style={{ left: GX, top: GY + 10 * (DH + GAP_Y) + 10, whiteSpace: "nowrap" }}>
           <div style={{ ...label(23, INK_SOFT) }}>
-            <span style={{ color: COMMON_INK, fontWeight: 600 }}>{IDF.common.docs}</span> hold the common word,{" "}
-            <span style={{ color: DATA_INK, fontWeight: 600 }}>{IDF.rare.docs}</span> hold the rare one
+            <span style={{ color: COMMON_INK, fontWeight: 500 }}>{IDF.common.docs}</span> hold the common word,{" "}
+            <span style={{ color: DATA_INK, fontWeight: 500 }}>{IDF.rare.docs}</span> hold the rare one
           </div>
         </Ink>
 

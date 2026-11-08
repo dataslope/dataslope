@@ -151,9 +151,9 @@ export const DesignScene: React.FC = () => {
         {/* The model as a dependency: six risks, then the concerns that
             answer them take their place along the top. */}
         <Ink at={modelAt} dur={14} out={risksOut} style={{ left: X0, top: y(STRIP_Y), display: "flex", alignItems: "baseline", gap: 14, fontSize: 25 }}>
-          <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>The model is</span>
+          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>The model is</span>
           {risks.map((r, i) => (
-            <span key={r.text} style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, r.at - 2, 8) }}>
+            <span key={r.text} style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, r.at - 2, 8) }}>
               {r.text}
               {i < risks.length - 1 ? "," : ""}
             </span>
@@ -170,7 +170,7 @@ export const DesignScene: React.FC = () => {
                 style={{
                   position: "relative",
                   ...note(25, now > 0.5 ? INK : INK_SOFT),
-                  fontWeight: now > 0.5 ? 750 : 600,
+                  fontWeight: now > 0.5 ? 500 : 500,
                   whiteSpace: "nowrap",
                   opacity: p,
                   // The highlight reaches 0.2em past the word: given back as margin.
@@ -260,7 +260,7 @@ export const DesignScene: React.FC = () => {
         <Node x={QUEUE.x} y={queueTop} w={QUEUE.w} h={bh} at={queueAt} title="Queue" sub="long jobs" tone="plain" lit={queueAt} litOut={failAt - 4} />
         <Flow points={[[475, bottom("API") + 6], [475, queueTop - 8]]} at={queueAt + 4} head={13} />
         <Ink at={statusAt} dur={12} style={{ left: QUEUE.x, top: y(732) + 6 }}>
-          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>status endpoint</span>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>status endpoint</span>
         </Ink>
         <Flow
           points={[
@@ -286,7 +286,7 @@ export const DesignScene: React.FC = () => {
             <React.Fragment key={f.text}>
               <div style={{ position: "absolute", left: cacheX + 10, top: fy + 13, width: (LABEL_X - 14 - cacheX - 10) * p, height: 1.6, background: INK_SOFT }} />
               <Ink at={f.at} dur={12} style={{ left: LABEL_X, top: fy }}>
-                <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{f.text}</span>
+                <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{f.text}</span>
               </Ink>
             </React.Fragment>
           );
@@ -303,12 +303,12 @@ export const DesignScene: React.FC = () => {
 
         {/* Structured output: validate, retry or repair. */}
         <Ink at={trustAt} dur={12} style={{ left: BOX.V.x, top: y(800) }}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>never trust the shape</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>never trust the shape</span>
         </Ink>
 
         {/* Cost: a spend alert on the quota. */}
         <Ink at={alertAt} dur={12} style={{ left: BOX.Q.x, top: y(470) }}>
-          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>+ an alert on spend</span>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>+ an alert on spend</span>
         </Ink>
 
         {/* Quality: an eval set, and logs, under the provider. */}

@@ -96,7 +96,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -138,7 +138,7 @@ export const Headline: React.FC<{
  *  space is 0.6em, so `GROUP BY` beside sans text read as a double space; the
  *  word spacing brings it back to about a sans space, as QMono does. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.88em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "0.88em", fontStyle: "normal", fontWeight: weight ?? 500, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );
@@ -242,7 +242,7 @@ export const Tag: React.FC<{ children: React.ReactNode; color?: string; size?: n
       border: `1.5px solid ${color}`,
       color,
       fontFamily: mono ? MONO : undefined,
-      ...(mono ? { fontSize: size, fontWeight: 600 } : label(size, color)),
+      ...(mono ? { fontSize: size, fontWeight: 500 } : label(size, color)),
       lineHeight: 1.25,
       whiteSpace: "nowrap",
       background: PAPER,
@@ -298,8 +298,8 @@ const tokenize = (line: string): Token[] => {
     const [text, str, num, word] = m;
     if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
-    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 600 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
+    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -444,7 +444,7 @@ export const ErrorBox: React.FC<{
           fontVariantLigatures: "none",
         }}
       >
-        <span style={{ color: ACCENT_INK, fontWeight: 600 }}>{kind}:</span>{" "}
+        <span style={{ color: ACCENT_INK, fontWeight: 500 }}>{kind}:</span>{" "}
         {markAt === undefined ? message : <Mark at={markAt}>{message}</Mark>}
       </div>
     </Ink>
@@ -466,7 +466,7 @@ export const NoRows: React.FC<{ x: number; top: number; at: number; col: string;
   return (
     <Ink at={at} dur={14} out={out} style={{ left: x, top, opacity: 1 - d }}>
       <div style={{ borderTop: `2px solid ${INK}`, borderBottom: `1.5px solid ${INK}`, width: 260 }}>
-        <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK_SOFT, padding: "10px 20px", borderBottom: `1px solid ${HAIRLINE}` }}>
+        <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK_SOFT, padding: "10px 20px", borderBottom: `1px solid ${HAIRLINE}` }}>
           {col}
         </div>
         <div style={{ ...note(22, INK_SOFT), padding: "12px 20px" }}>0 rows</div>
@@ -710,7 +710,7 @@ export const DataTable: React.FC<{
               gap: 8,
               fontFamily: MONO,
               fontSize: g.headSize,
-              fontWeight: 600,
+              fontWeight: 500,
               color: INK_SOFT,
             }}
           >
@@ -856,7 +856,7 @@ export const TableName: React.FC<{ g: TableGeometry; at: number; children: React
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   return (
     <Ink at={at} dur={12} out={out} style={{ left: g.x, top: g.top - 38, whiteSpace: "nowrap", opacity: 1 - d }}>
-      <span style={{ ...label(21, INK), fontWeight: 650 }}>{children}</span>
+      <span style={{ ...label(21, INK), fontWeight: 500 }}>{children}</span>
     </Ink>
   );
 };

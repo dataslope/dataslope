@@ -55,7 +55,7 @@ export const TreeScene: React.FC = () => {
           <Key stroke={INK_SOFT} fill={PAPER} /> <span>first time</span>
           <span style={{ width: 16 }} />
           <Key stroke={NAIVE} fill={`color-mix(in srgb, ${NAIVE} 20%, ${PAPER})`} />
-          <span style={{ color: NAIVE_INK, fontWeight: 650 }}>repeat</span>
+          <span style={{ color: NAIVE_INK, fontWeight: 500 }}>repeat</span>
         </span>
       </Note>
 
@@ -144,7 +144,7 @@ export const TreeScene: React.FC = () => {
         );
       })}
       <Note at={deepAt} x={SIDE_X} y={y(STACK_BASE) + h(16)} from="up">
-        <span style={{ ...note(24, INK), fontWeight: 600, opacity: 1 - stackDim * 0.6 }}>{TREE_DEPTH} calls deep</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, opacity: 1 - stackDim * 0.6 }}>{TREE_DEPTH} calls deep</span>
       </Note>
     </AbsoluteFill>
   );

@@ -127,7 +127,7 @@ const Raised: React.FC<{ x: number; top: number; at: number; out: number; call: 
       }}
     >
       <span>{call}</span>
-      <span style={{ color: ACCENT_INK, fontWeight: 600 }}>{kind}</span>
+      <span style={{ color: ACCENT_INK, fontWeight: 500 }}>{kind}</span>
     </div>
   </Note>
 );
@@ -289,7 +289,7 @@ export const IterScene: React.FC = () => {
         <Note at={isAt} x={RIGHT_X + 330} y={twiceTop + liH + h(22)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mark at={itselfAt}>
-              <Mono>iter(rows) is rows</Mono>: <span style={{ color: ACCENT_INK, fontWeight: 650 }}>{ITER.gen.isIter}</span>
+              <Mono>iter(rows) is rows</Mono>: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>{ITER.gen.isIter}</span>
             </Mark>
           </span>
         </Note>
@@ -319,7 +319,7 @@ export const IterScene: React.FC = () => {
           marks={[{ line: 0, at: countedAt + 8, color: MARK_BAD }]}
         />
         <Note at={errorAt} x={RIGHT_X + 330} y={defTop + h(18)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>zero rows loaded, no error</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>zero rows loaded, no error</span>
         </Note>
         <Note at={listFixAt} x={RIGHT_X} y={defTop + consoleHeight(1) + h(40)}>
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>

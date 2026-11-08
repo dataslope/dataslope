@@ -56,7 +56,7 @@ export const RIGHT = 1824;
  * by (check:frames' "one line, one size"), and never under 19px.
  */
 export const SmallMono: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color }) => (
-  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em", color }}>
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 500, fontVariantLigatures: "none", wordSpacing: "-0.3em", color }}>
     {children}
   </span>
 );
@@ -96,8 +96,8 @@ const tokenize = (line: string): Token[] => {
     const [text, str, num, word] = m;
     if (str) out.push({ text, color: inkOf.green });
     else if (num) out.push({ text, color: inkOf.orange });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: inkOf.purple, weight: 700 });
-    else if (word && TABLES.has(word)) out.push({ text, color: INK, weight: 600 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: inkOf.purple, weight: 500 });
+    else if (word && TABLES.has(word)) out.push({ text, color: INK, weight: 500 });
     else if (word) out.push({ text, color: INK });
     else out.push({ text, color: INK_SOFT });
   }
@@ -253,7 +253,7 @@ const PlanText: React.FC<{ line: string; size: number }> = ({ line, size }) => {
     return (
       <span style={base}>
         {node[1]}
-        <span style={{ color: INK, fontWeight: 600 }}>{node[2]}</span>
+        <span style={{ color: INK, fontWeight: 500 }}>{node[2]}</span>
         {line.slice(node[0].length)}
       </span>
     );
@@ -305,7 +305,7 @@ export const PlanBox: React.FC<{
       <div style={{ position: "absolute", left: 0, top: head - 1, width: width * p, height: 1, background: HAIRLINE }} />
       <div style={{ position: "absolute", left: 0, bottom: 0, width: width * p, height: 1.5, background: INK }} />
       <Ink at={at + 2} dur={12} style={{ left: g.padX, top: 0, height: head, display: "flex", alignItems: "center" }}>
-        <span style={{ fontFamily: MONO, fontSize: size, fontWeight: 600, color: INK_SOFT }}>QUERY PLAN</span>
+        <span style={{ fontFamily: MONO, fontSize: size, fontWeight: 500, color: INK_SOFT }}>QUERY PLAN</span>
       </Ink>
       <div style={{ position: "absolute", left: 0, top: planBodyTop(size), right: 0, bottom: 0 }}>
         {marks.map((m, k) => (
@@ -355,7 +355,7 @@ export const PgError: React.FC<{
           fontVariantLigatures: "none",
         }}
       >
-        <span style={{ color: ACCENT_INK, fontWeight: 600 }}>ERROR:</span> {text}
+        <span style={{ color: ACCENT_INK, fontWeight: 500 }}>ERROR:</span> {text}
       </div>
     </Ink>
   );
@@ -433,7 +433,7 @@ export const Node: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      <span style={{ ...label(size, t.ink), fontWeight: 600, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span>
+      <span style={{ ...label(size, t.ink), fontWeight: 500, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span>
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: "center" }}>{sub}</span> : null}
       {children}
     </div>
@@ -518,7 +518,7 @@ export const Pill: React.FC<{
           border: `2px solid ${t.line}`,
           background: t.fill,
           ...label(size, t.ink),
-          fontWeight: 600,
+          fontWeight: 500,
           whiteSpace: "nowrap",
         }}
       >
@@ -672,7 +672,7 @@ export const Cylinder: React.FC<{
   const { art, mid } = CYLINDER[tone];
   const h = cylinderH(w, tone);
   const swap = swapAt === undefined ? 0 : ease(frame, swapAt, 12);
-  const name: React.CSSProperties = { ...label(size, INK), fontWeight: 600, whiteSpace: "nowrap", position: "absolute" };
+  const name: React.CSSProperties = { ...label(size, INK), fontWeight: 500, whiteSpace: "nowrap", position: "absolute" };
   return (
     <div style={{ position: "absolute", left: x, top: y, width: w, height: h, opacity: Math.min(1, p) * (1 - d) * (1 - o), transform: `scale(${0.9 + 0.1 * Math.min(1, p)})` }}>
       {ILLUSTRATIONS ? <Illustration video={VIDEO} id={ART[art].id} style={{ position: "absolute", left: 0, top: 0, width: w, height: h }} /> : null}

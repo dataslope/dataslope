@@ -88,7 +88,7 @@ const Card: React.FC<{
         <span style={note(25, INK_SOFT)}>{what}</span>
       </Ink>
       <Ink at={howAt} dur={14} style={{ left: x, top: y(CARD_Y + 140), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(25, INK), fontWeight: 650 }}>
+        <span style={{ ...note(25, INK), fontWeight: 500 }}>
           {how}
           <span style={{ opacity: ease(frame, how2At, 10) }}>{how2}</span>
         </span>
@@ -274,7 +274,7 @@ export const ParameterScene: React.FC = () => {
           opacity: ease(frame, hundredAt, 14),
           transform: `translateX(${lerp(-100, 0, m)}%)`,
           ...note(lerp(25, 23, m), INK),
-          fontWeight: 650,
+          fontWeight: 500,
           whiteSpace: "nowrap",
           ...halo,
         }}
@@ -321,7 +321,7 @@ export const ParameterScene: React.FC = () => {
         <span
           style={{
             ...note(25, STAT_INK),
-            fontWeight: 600,
+            fontWeight: 500,
             whiteSpace: "nowrap",
             display: "inline-block",
             transform: `scale(${1 + pulse(frame, missAgainAt - 4, 20) * 0.16})`,

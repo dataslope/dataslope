@@ -115,7 +115,7 @@ export const MisreadScene: React.FC = () => {
       </Svg>
       <Rule x={muX} y0={y(ROWS[0] + 130)} y1={y(ROWS[0] + 20)} at={neverAt} dur={16} color={INK} width={2.4} dash="7 6" />
       <Note at={movesAt} x={muX - 12} y={y(ROWS[0] + 2)} align="right" from="right">
-        <span style={{ ...note(22, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           the true mean, <Mu /> = ${USERS.mu}: fixed
         </span>
       </Note>
@@ -123,7 +123,7 @@ export const MisreadScene: React.FC = () => {
         <span style={{ ...note(22, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>nothing random left</span>
       </Note>
       <Note at={inAt - 2} x={muX + 12} y={y(ROWS[0] + 84)}>
-        <span style={{ ...note(22, INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>in</span>
+        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>in</span>
       </Note>
 
       <div style={{ position: "absolute", left: LEFT, right: 160, top: y(ROWS[1] - 50), height: 1, background: HAIRLINE, opacity: 0.6 * ease(frame, dataFrom - 6, 12) }} />
@@ -189,7 +189,7 @@ export const MisreadScene: React.FC = () => {
         tick={10}
       />
       <Note at={elevenAt} x={sx(WIDE, USERS.hi) + 16} y={y(ROWS[1] + 20)}>
-        <span style={{ ...note(22, INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           the interval: {USERS.insideCi} of {USERS.n} inside
         </span>
       </Note>

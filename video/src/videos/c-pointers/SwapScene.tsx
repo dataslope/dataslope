@@ -443,7 +443,7 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
         <span
           style={{
             ...note(22, isPtr ? ADDR_INK : ACCENT_INK),
-            fontWeight: 650,
+            fontWeight: 500,
             opacity: ease(frame, c.doneAt - 2, 10),
           }}
         >
@@ -492,7 +492,7 @@ const FramePanel: React.FC<{ name: string; at: number; top: number; bottom: numb
         dur={12}
         style={{ left: FRAME_LABEL_X, top: boxTop, height: boxH, display: "flex", alignItems: "center" }}
       >
-        <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK_SOFT }}>{name}</span>
+        <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK_SOFT }}>{name}</span>
       </Ink>
     </>
   );

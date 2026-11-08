@@ -141,7 +141,7 @@ export const DrawScene: React.FC = () => {
                     opacity: Math.min(1, s),
                     transform: `scale(${0.6 + 0.4 * s})`,
                     ...note(20, TEXT[tok]),
-                    fontWeight: 650,
+                    fontWeight: 500,
                   }}
                 >
                   {TOKENS[tok]}
@@ -192,7 +192,7 @@ export const DrawScene: React.FC = () => {
             />
           </svg>
           <Note at={rockAt + 2} x={tileX(ROCK_AT) + TILE_W / 2} y={y(ROW_Y(HOT)) + h(TILE_H) + 22} from="up" style={{ transform: "translateX(-50%)" }}>
-            <span style={{ ...note(21, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               Rock, at {(ROWS[HOT].probs[ROCK] * 100).toFixed(1)}%, picked{" "}
               {ROWS[HOT].counts[ROCK] === 1 ? "once" : `${ROWS[HOT].counts[ROCK]} times`}
             </span>

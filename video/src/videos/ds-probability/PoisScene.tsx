@@ -192,7 +192,7 @@ export const PoisScene: React.FC = () => {
         </Note>
         {/* The rule, not just the one example: many trials, a small chance. */}
         <Note at={npAt} x={PLOT.right - 300} y={y(PLOT.top) + 150}>
-          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             many trials, small chance:{" "}
             <span style={math(30)}>
               λ = <V>n</V>

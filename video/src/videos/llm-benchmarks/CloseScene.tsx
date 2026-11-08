@@ -77,10 +77,10 @@ export const CloseScene: React.FC = () => {
           {SCORES.map((s, i) => (
             <Ink key={s.name} at={launchesAt - 4 + i * 3} dur={10} style={{ left: MINI.x, top: y(MINI.y) + i * 54, width: MINI.w }}>
               <div style={{ position: "relative", height: 34 }}>
-                <span style={{ ...label(24, INK), fontWeight: 600, position: "absolute", left: MINI_COLS[0] }}>
+                <span style={{ ...label(24, INK), fontWeight: 500, position: "absolute", left: MINI_COLS[0] }}>
                   {s.name}
                 </span>
-                <span style={{ ...note(24, A_INK), fontWeight: 600, position: "absolute", left: MINI_COLS[1], ...TABULAR }}>{fmt(s.a, 1)}</span>
+                <span style={{ ...note(24, A_INK), fontWeight: 500, position: "absolute", left: MINI_COLS[1], ...TABULAR }}>{fmt(s.a, 1)}</span>
                 <span style={{ ...note(24, B_INK), position: "absolute", left: MINI_COLS[2], ...TABULAR }}>{fmt(s.b, 1)}</span>
               </div>
             </Ink>
@@ -102,7 +102,7 @@ export const CloseScene: React.FC = () => {
 
         {/* Your examples, run one after another. */}
         <Ink at={runAt - 4} dur={12} style={{ left: X0, top: y(CARDS_Y) - 60, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK), fontWeight: 650 }}>
+          <span style={{ ...label(24, INK), fontWeight: 500 }}>
             <Marked at={examplesAt - 2}>your examples</Marked>
           </span>
         </Ink>

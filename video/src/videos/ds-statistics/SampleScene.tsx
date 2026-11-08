@@ -229,17 +229,17 @@ export const SampleScene: React.FC = () => {
           </div>
         </Note>
         <Note at={rootAt} x={RIGHT_X} y={y(530)} out={panelOut}>
-          <div style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
+          <div style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
             SE = SD / √n
           </div>
         </Note>
         <Note at={sevenAt - 2} x={RIGHT_X} y={y(588)} out={panelOut}>
-          <div style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
+          <div style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
             n = 50: {fmt(S.sigma, 2)} / √50 = <Mark at={sevenAt + 2}>{fmt(S.seFormula, 2)}</Mark>
           </div>
         </Note>
         <Note at={fourAt} x={RIGHT_X} y={y(642)} out={panelOut}>
-          <div style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
+          <div style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
             n = 200: {fmt(S.sigma, 2)} / √200 = <Mark at={halfAt + 2}>{fmt(S.se200, 2)}</Mark>
           </div>
         </Note>

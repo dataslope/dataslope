@@ -150,7 +150,7 @@ const Bet: React.FC<{ w: Words; out?: number }> = ({ w, out: dim }) => {
         <line x1={BET_ROW.zero} x2={BET_ROW.zero} y1={y(BET_ROW.top) + 30} y2={y(BET_ROW.top) + 2 * BET_ROW.row + 10} stroke={INK} strokeWidth={2} />
       </Svg>
       <Note at={fortyAt} x={R_X} y={y(BET_ROW.top) + 2 * BET_ROW.row + 24}>
-        <span style={{ ...note(34, ACCENT_INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(34, ACCENT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
           expected value: −$0.40 a play
         </span>
       </Note>

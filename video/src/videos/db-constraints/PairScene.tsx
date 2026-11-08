@@ -302,7 +302,7 @@ export const PairScene: React.FC = () => {
       ).map(([v, at], i) => (
         <Ink key={String(v)} at={at - 2} dur={12} style={{ left: RECAP_X + i * 250, top: y(560), whiteSpace: "nowrap" }}>
           {/* A wrong value as a red house badge. */}
-          <span style={{ ...note(34, ACCENT_INK), ...badgeStyle("red", 34), fontWeight: 600 }}>
+          <span style={{ ...note(34, ACCENT_INK), ...badgeStyle("red", 34), fontWeight: 500 }}>
             <span style={{ fontFamily: MONO }}>{v}</span>
           </span>
         </Ink>

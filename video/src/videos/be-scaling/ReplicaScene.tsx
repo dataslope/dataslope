@@ -83,11 +83,11 @@ export const ReplicaScene: React.FC = () => {
         <MiniMap at={qAt} stage={4} lit="store" grow={{ followers: streamAt }} />
 
         {/* ── Leader and followers ── */}
-        <Line at={copiesAt} x={X0} y={y(340)} size={22} weight={650} color={INK_SOFT} dim={dimTop}>
+        <Line at={copiesAt} x={X0} y={y(340)} size={22} weight={500} color={INK_SOFT} dim={dimTop}>
           copies of the data on several nodes
         </Line>
         <Ink at={writesAt - 2} dur={12} style={{ left: X0, top: lMid - 44, whiteSpace: "nowrap", opacity: 1 - ease(frame, dimTop, 12) * 0.65 }}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 600 }}>writes</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>writes</span>
         </Ink>
         <Flow points={[[X0, lMid], [LEADER.x - 8, lMid]]} at={writesAt} color={BAR} dim={dimTop} />
         <Node
@@ -130,17 +130,17 @@ export const ReplicaScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Ink at={scalesAt + 2} dur={12} style={{ left: READS_X - 70, top: fMid[0] - 50, whiteSpace: "nowrap", opacity: 1 - ease(frame, dimTop, 12) * 0.65 }}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 600 }}>reads</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>reads</span>
         </Ink>
-        <Line at={scalesAt + 8} x={FOLLOW.x + FOLLOW.w + 30} y={fMid[1] + 44} size={22} color={INK} weight={650} dim={dimTop}>
+        <Line at={scalesAt + 8} x={FOLLOW.x + FOLLOW.w + 30} y={fMid[1] + 44} size={22} color={INK} weight={500} dim={dimTop}>
           scales reads
         </Line>
-        <Line at={promotedAt + 6} x={FOLLOW.x} y={fMid[0] - FOLLOW.h / 2 - h(44)} size={21} color={OK_INK} weight={600} dim={dimTop}>
+        <Line at={promotedAt + 6} x={FOLLOW.x} y={fMid[0] - FOLLOW.h / 2 - h(44)} size={21} color={OK_INK} weight={500} dim={dimTop}>
           promoted when the leader dies
         </Line>
 
         {/* ── The catch: replication lag, on a timeline. ── */}
-        <Line at={lagAt} x={X0} y={y(668)} size={23} weight={600} color={INK}>
+        <Line at={lagAt} x={X0} y={y(668)} size={23} weight={500} color={INK}>
           <Mark at={lagAt + 2}>Replication lag</Mark>
         </Line>
         <Svg opacity={ease(frame, lagAt, 12)}>
@@ -157,40 +157,40 @@ export const ReplicaScene: React.FC = () => {
         </Svg>
         {["leader", "follower"].map((t, i) => (
           <Ink key={t} at={lagAt + 2} dur={12} style={{ left: X0, top: (i ? fRow : lRow) - 15, whiteSpace: "nowrap" }}>
-            <span style={{ ...label(21, INK_SOFT), fontWeight: 650 }}>{t}</span>
+            <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>{t}</span>
           </Ink>
         ))}
         <Ink at={createsAt} dur={12} style={{ left: tx(T.create) - 60, top: lRow - 56, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, BLUE_INK), fontWeight: 650 }}>
+          <span style={{ ...note(21, BLUE_INK), fontWeight: 500 }}>
             create <span style={{ fontFamily: MONO }}>aMoY42</span>
           </span>
         </Ink>
         {/* The read: to the follower, not found; then, fixed, to the leader. */}
         <Flow points={[[tx(T.open), fRow + 70], [tx(T.open), fRow + 22]]} at={landsAt} color={ACCENT} width={2.6} head={13} out={leaderAt} />
         <Ink at={opensAt} dur={12} out={leaderAt} style={{ left: tx(T.open) + 18, top: fRow + 40, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK), fontWeight: 650 }}>
+          <span style={{ ...note(21, INK), fontWeight: 500 }}>
             open it
             <span style={{ color: ACCENT_INK, opacity: ease(frame, notFoundAt, 8) }}>: not found</span>
           </span>
         </Ink>
         <Flow points={[[tx(T.open) + 120, fRow + 70], [tx(T.open) + 120, fRow + 40], [tx(T.open) + 40, fRow + 40], [tx(T.open) + 40, lRow + 22]]} at={leaderAt + 4} color={OK} width={2.6} head={13} />
         <Ink at={leaderAt + 10} dur={12} style={{ left: tx(T.open) + 140, top: fRow + 40, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, OK_INK), fontWeight: 650 }}>this user&apos;s reads go to the leader: found</span>
+          <span style={{ ...note(21, OK_INK), fontWeight: 500 }}>this user&apos;s reads go to the leader: found</span>
         </Ink>
-        <Line at={whileAt} x={tx(T.window) - 300} y={lRow - 56} size={21} color={OK_INK} weight={650}>
+        <Line at={whileAt} x={tx(T.window) - 300} y={lRow - 56} size={21} color={OK_INK} weight={500}>
           for a short while after a write
         </Line>
 
         <VRule x={1257} top={y(340)} bottom={y(640)} at={asyncAt} />
 
         {/* ── A lagging follower, promoted. ── */}
-        <Line at={asyncAt} x={LOG.x} y={y(352)} size={22} weight={600} color={INK}>
+        <Line at={asyncAt} x={LOG.x} y={y(352)} size={22} weight={500} color={INK}>
           Asynchronous: promote a lagging follower
         </Line>
         {["leader", "follower"].map((t, r) => (
           <React.Fragment key={t}>
             <Ink at={laggingAt + r * 4} dur={12} style={{ left: LOG.x, top: y(402) + r * h(74), whiteSpace: "nowrap" }}>
-              <span style={{ ...label(20, INK_SOFT), fontWeight: 650 }}>{t}</span>
+              <span style={{ ...label(20, INK_SOFT), fontWeight: 500 }}>{t}</span>
             </Ink>
             {Array.from({ length: 6 }, (_, k) => {
               const missing = r === 1 && k >= 4;
@@ -212,7 +212,7 @@ export const ReplicaScene: React.FC = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     ...label(19, missing ? ACCENT_INK : BLUE_INK),
-                    fontWeight: 600,
+                    fontWeight: 500,
                     opacity: p,
                   }}
                 >
@@ -222,7 +222,7 @@ export const ReplicaScene: React.FC = () => {
             })}
           </React.Fragment>
         ))}
-        <Line at={losesAt} x={LOG.x} y={y(402) + h(148)} size={21} color={ACCENT_INK} weight={600}>
+        <Line at={losesAt} x={LOG.x} y={y(402) + h(148)} size={21} color={ACCENT_INK} weight={500}>
           promoted: w5 and w6 are lost
         </Line>
       </Drift>

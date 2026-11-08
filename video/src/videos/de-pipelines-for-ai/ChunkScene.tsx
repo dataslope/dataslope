@@ -231,7 +231,7 @@ export const ChunkScene: React.FC = () => {
         <Note at={bestAt} x={X0} y={y(820)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             no universal best:{" "}
-            <span style={{ opacity: ease(frame, recallAt - 2, 10), color: OK_INK, fontWeight: 650 }}>
+            <span style={{ opacity: ease(frame, recallAt - 2, 10), color: OK_INK, fontWeight: 500 }}>
               <Mark at={recallAt + 6} color={MARK_OK}>
                 measure retrieval recall on labeled questions
               </Mark>

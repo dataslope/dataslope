@@ -199,7 +199,7 @@ export const DoorsScene: React.FC = () => {
         );
       })}
       <Note at={wrongAt - 4} x={1250} y={y(860) + 18}>
-        <span style={{ ...note(23, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>Thousands of letters: she&apos;s wrong.</span>
+        <span style={{ ...note(23, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Thousands of letters: she&apos;s wrong.</span>
       </Note>
     </AbsoluteFill>
   );

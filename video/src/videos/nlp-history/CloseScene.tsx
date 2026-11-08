@@ -155,7 +155,7 @@ export const CloseScene: React.FC = () => {
                   whiteSpace: "nowrap",
                 }}
               >
-                <span style={{ ...label(24, counting ? DATA_INK : INK), fontWeight: 650 }}>{s.name}</span>
+                <span style={{ ...label(24, counting ? DATA_INK : INK), fontWeight: 500 }}>{s.name}</span>
                 <span style={{ ...label(22, INK_SOFT), fontWeight: 500, ...TABULAR }}> {s.year}</span>
               </Ink>
             </React.Fragment>
@@ -169,7 +169,7 @@ export const CloseScene: React.FC = () => {
         {still.map((l, i) => (
           <Ink key={l.story} at={l.at - 2} dur={16} style={{ left: 96, top: LIST + 40 + i * ROW, whiteSpace: "nowrap" }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: YEAR_GAP }}>
-              <span style={{ ...label(24, DATA_INK), fontWeight: 600, ...TABULAR }}>{storyYear(l.story)}</span>
+              <span style={{ ...label(24, DATA_INK), fontWeight: 500, ...TABULAR }}>{storyYear(l.story)}</span>
               <span style={{ ...headline(34), color: INK }}>
                 {l.text.slice(0, l.text.lastIndexOf(l.markText))}
                 <Mark at={l.mark - 2}>{l.markText}</Mark>
@@ -184,7 +184,7 @@ export const CloseScene: React.FC = () => {
         {warn.map((l, i) => (
           <Ink key={l.story} at={l.at - 2} dur={16} style={{ left: WARN_X, top: LIST + 40 + i * ROW, whiteSpace: "nowrap" }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: YEAR_GAP }}>
-              <span style={{ ...label(24, ACCENT_INK), fontWeight: 600, ...TABULAR }}>{storyYear(l.story)}</span>
+              <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, ...TABULAR }}>{storyYear(l.story)}</span>
               <span style={{ ...headline(34, true), color: INK }}>{l.text}</span>
             </div>
           </Ink>

@@ -112,10 +112,10 @@ export const RateScene: React.FC = () => {
           }}
         >
           <span style={{ opacity: ease(frame, charsAt - 2, 10), whiteSpace: "nowrap" }}>
-            <b style={{ ...TABULAR, fontWeight: 650 }}>{OPENING.chars}</b> characters
+            <b style={{ ...TABULAR, fontWeight: 600 }}>{OPENING.chars}</b> characters
           </span>
           <span style={{ opacity: inked > 0 ? 1 : 0, whiteSpace: "nowrap" }}>
-            <b style={{ ...TABULAR, fontWeight: 650, color: inked === pieces.length ? FOCUS_INK : INK }}>{inked}</b> tokens
+            <b style={{ ...TABULAR, fontWeight: 600, color: inked === pieces.length ? FOCUS_INK : INK }}>{inked}</b> tokens
           </span>
           <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, tokensAt + 6, 12), whiteSpace: "nowrap" }}>
             {OPENING.charsPerToken} characters a token:{" "}

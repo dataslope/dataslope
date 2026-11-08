@@ -126,7 +126,7 @@ export const AnovaScene: React.FC = () => {
           </span>
         </Note>
         <Note at={fAt} x={SIDE_X} y={y(536)}>
-          <div style={{ fontFamily: MONO, fontSize: 30, fontWeight: 600, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
+          <div style={{ fontFamily: MONO, fontSize: 30, fontWeight: 500, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
             F = between / within{" "}
             <span style={{ opacity: ease(frame, valueAt - 2, 10) }}>
               = <Mark at={valueAt + 2}>{fmt(ANOVA.f, 1)}</Mark>

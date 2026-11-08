@@ -150,7 +150,7 @@ export const ThinkScene: React.FC = () => {
       </Ink>
       <Ink at={writesAt - 2} dur={12} style={{ left: X0 + 24, top: top + 14, display: "flex", gap: 18, alignItems: "baseline", whiteSpace: "nowrap" }}>
         <span style={label(22, THINK_INK)}>Thinking</span>
-        <span style={{ ...note(22, THINK_INK), fontWeight: 650, opacity: ease(frame, thinkingAt - 2, 10), ...TABULAR }}>
+        <span style={{ ...note(22, THINK_INK), fontWeight: 500, opacity: ease(frame, thinkingAt - 2, 10), ...TABULAR }}>
           {THINKING_TOKENS} tokens
         </span>
       </Ink>
@@ -166,8 +166,8 @@ export const ThinkScene: React.FC = () => {
       </Svg>
       <Ink at={beforeAt - 2} dur={14} style={{ left: X0 + 24, top: answerTop, display: "flex", gap: 18, alignItems: "baseline", whiteSpace: "nowrap" }}>
         <span style={label(22, INK)}>Answer</span>
-        <span style={{ fontFamily: MONO, fontSize: SIZE, color: INK, fontWeight: 600 }}>{ANSWER}</span>
-        <span style={{ ...note(22, INK), fontWeight: 650, opacity: ease(frame, thinkingAt + 6, 10), ...TABULAR }}>
+        <span style={{ fontFamily: MONO, fontSize: SIZE, color: INK, fontWeight: 500 }}>{ANSWER}</span>
+        <span style={{ ...note(22, INK), fontWeight: 500, opacity: ease(frame, thinkingAt + 6, 10), ...TABULAR }}>
           {ANSWER_TOKENS} tokens
         </span>
       </Ink>

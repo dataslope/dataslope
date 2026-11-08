@@ -119,7 +119,7 @@ export const Box: React.FC<{
   weight?: number;
   mono?: boolean;
   children: React.ReactNode;
-}> = ({ x, y, w, h, at: from, lit, litOut, dim, out, tone = INK_SOFT, fill, dashed, size = 23, weight = 600, mono, children }) => {
+}> = ({ x, y, w, h, at: from, lit, litOut, dim, out, tone = INK_SOFT, fill, dashed, size = 23, weight = 500, mono, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 12);
   const l = lit === undefined ? 0 : ease(frame, lit, 10) * (litOut === undefined ? 1 : 1 - ease(frame, litOut, 12));
@@ -200,7 +200,7 @@ export const say = (size = 24, color: string = INK, weight = 500): React.CSSProp
 /** A small heading over a part of a figure ("Offline ingestion"). */
 export const head = (size = 22, color: string = INK_SOFT): React.CSSProperties => ({
   ...label(size, color),
-  fontWeight: 600,
+  fontWeight: 500,
   whiteSpace: "nowrap",
 });
 

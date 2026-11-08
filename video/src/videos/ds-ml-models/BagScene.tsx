@@ -177,7 +177,7 @@ export const BagScene: React.FC = () => {
           <span
             style={{
               ...note(25, ACCENT_INK),
-              fontWeight: 650,
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,
             }}
@@ -189,7 +189,7 @@ export const BagScene: React.FC = () => {
           <span
             style={{
               ...note(25, OK_INK),
-              fontWeight: 650,
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,
             }}
@@ -200,7 +200,7 @@ export const BagScene: React.FC = () => {
         </Note>
         <Note at={varAt} x={LEFTS[0]} y={under + h(96)}>
           <span
-            style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}
+            style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
             <Mark at={varAt + 2}>cuts variance</Mark>
           </span>
@@ -298,7 +298,7 @@ export const BagScene: React.FC = () => {
             <span
               style={{
                 ...note(25, s.color),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -320,7 +320,7 @@ export const BagScene: React.FC = () => {
         </Note>
         <Note at={biasAt} x={LEFTS[1]} y={under + h(96)}>
           <span
-            style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}
+            style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
             <Mark at={biasAt + 2}>cuts bias</Mark>
           </span>

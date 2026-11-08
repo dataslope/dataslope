@@ -141,7 +141,7 @@ export const DropScene: React.FC = () => {
             this draw {D.outSum.toFixed(2)}
           </Tagline>
           <Note at={expectedAt - 2} x={SUM_X} y={y(R3) + h(64)}>
-            <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+            <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
               averaged over 100,000 draws: {D.meanSum.toFixed(2)}
             </span>
           </Note>
@@ -173,7 +173,7 @@ export const DropScene: React.FC = () => {
             an L2 penalty in the loss<span style={{ opacity: ease(frame, lambdaAt - 2, 10) }}>, λ/2 · ‖w‖², whose gradient is λw</span>
           </Tagline>
           <Note at={penaltyAt} x={X0} y={y(ROW_A) + h(8)}>
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
               w − η(g + <Mark at={gradAt + 4}>λw</Mark>) =
             </span>
           </Note>
@@ -191,7 +191,7 @@ export const DropScene: React.FC = () => {
             weight decay: shrink by {DECAY.shrink}, then the usual step
           </Tagline>
           <Note at={shrinksAt + 2} x={X0} y={y(ROW_B) + h(8)}>
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>(1 − ηλ)w − ηg =</span>
+            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>(1 − ηλ)w − ηg =</span>
           </Note>
           <Cells
             values={[DECAY.decay.map((v) => num(v, 3))]}
@@ -206,7 +206,7 @@ export const DropScene: React.FC = () => {
           <Note at={sameAt + 4} x={790} y={(y(ROW_A) + y(ROW_B)) / 2 + h(10)}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <Tick at={sameAt + 8} size={26} />
-              <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>identical</span>
+              <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>identical</span>
             </div>
           </Note>
           {/* Why Adam breaks the equivalence, then the fix. */}

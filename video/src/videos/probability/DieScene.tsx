@@ -168,7 +168,7 @@ export const DieScene: React.FC = () => {
               transform: "translateX(-50%)",
               opacity: ease(frame, termAt(i) + 4, 8),
               ...note(21, INK_SOFT),
-              fontWeight: 600,
+              fontWeight: 500,
             }}
           >
             {v}
@@ -185,7 +185,7 @@ export const DieScene: React.FC = () => {
               transform: "translateX(-50%)",
               opacity: ease(frame, expectedAt + 4, 12),
               ...note(24, INK_SOFT),
-              fontWeight: 600,
+              fontWeight: 500,
             }}
           >
             {v}
@@ -199,7 +199,7 @@ export const DieScene: React.FC = () => {
               transform: "translateX(-50%)",
               opacity: grow(v),
               ...note(22, INK),
-              fontWeight: 600,
+              fontWeight: 500,
               whiteSpace: "nowrap",
             }}
           >
@@ -213,12 +213,12 @@ export const DieScene: React.FC = () => {
       ))}
       <Pulse x={fxv(DIE.mode)} y={base - h(PMF.unit * 0.25)} at={thatsSixAt - 4} r={40} color={GOLD_DEEP} />
       <Note at={likeliestAt} x={fxv(DIE.mode) - PMF.barW / 2 - 18} y={base - h(PMF.unit * 0.25) - 15} align="right">
-        <span style={{ ...note(22, GOLD_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, GOLD_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           the likeliest roll<span style={{ opacity: ease(frame, thatsSixAt - 4, 10) }}>: six</span>
         </span>
       </Note>
       <Note at={balancesAt + 8} x={eX} y={base + h(60) + 26} from="up">
-        <span style={{ ...note(22, STAT_INK), fontWeight: 600, display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500, display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>
           {fmt(DIE.expected, 1)}
           <span style={{ opacity: ease(frame, faceAt - 2, 10), fontWeight: 500, color: INK }}>, not a face</span>
         </span>
@@ -247,7 +247,7 @@ export const DieScene: React.FC = () => {
       </Ink>
       <Ink at={rollAt - 4} dur={14} style={{ left: RIGHT, top: y(524), whiteSpace: "nowrap" }}>
         <span style={note(26, INK)}>
-          <Count at={rollAt - 2} dur={30} to={DIE.draws} format={num} style={{ fontWeight: 600 }} /> rolls:{" "}
+          <Count at={rollAt - 2} dur={30} to={DIE.draws} format={num} style={{ fontWeight: 500 }} /> rolls:{" "}
           <span style={{ opacity: ease(frame, comesAt - 2, 10) }}>
             mean{" "}
             <b>
@@ -292,7 +292,7 @@ export const DieScene: React.FC = () => {
       </Ink>
       {/* The axis label, once the faces are in. */}
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: ease(frame, expectedAt + 10, 12) * (1 - beam) }}>
-        <text x={PMF.x0 + PMF.pitch * 6} y={base + h(28) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
+        <text x={PMF.x0 + PMF.pitch * 6} y={base + h(28) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
           face
         </text>
       </svg>

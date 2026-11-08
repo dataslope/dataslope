@@ -62,10 +62,10 @@ const Chip: React.FC<{ at: number; x: number; y: number; w: number; h: number; n
         transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`,
       }}
     >
-      <span style={{ ...label(big ? 24 : 20, big ? ACCENT_INK : INK_SOFT), fontWeight: 600 }}>
+      <span style={{ ...label(big ? 24 : 20, big ? ACCENT_INK : INK_SOFT), fontWeight: 500 }}>
         <Num>{n}</Num>
       </span>
-      <span style={{ ...label(big ? 21 : 20, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{name}</span>
+      <span style={{ ...label(big ? 21 : 20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</span>
     </div>
   );
 };
@@ -76,7 +76,7 @@ const Glyph: React.FC<{ kind: string }> = ({ kind }) =>
   kind === "lock" ? (
     <LockGlyph size={46} color={BAR} />
   ) : kind === "counter" ? (
-    <span style={{ ...label(36, BLUE_INK), fontWeight: 750, lineHeight: 1.1 }}>
+    <span style={{ ...label(36, BLUE_INK), fontWeight: 500, lineHeight: 1.1 }}>
       <Num>5</Num>
     </span>
   ) : (
@@ -156,7 +156,7 @@ export const HookScene: React.FC = () => {
 
         <div style={{ position: "absolute", inset: 0, opacity: dim }}>
           <Note at={thousandAt + 6} x={X0} y={y(290)}>
-            <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>One server, one second: a bar for each request</span>
+            <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>One server, one second: a bar for each request</span>
           </Note>
 
           {/* The second itself. */}
@@ -172,12 +172,12 @@ export const HookScene: React.FC = () => {
             />
           </svg>
           <Note at={thousandAt + 10} x={ONE + 12} y={y(300)}>
-            <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>1 second</span>
+            <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>1 second</span>
           </Note>
 
           {/* What a request is made of, over the first bar. */}
           <Note at={waitingAt} x={X0} y={lane - h(38)}>
-            <span style={{ ...label(20, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               work, then <span style={{ fontWeight: 500, color: INK_SOFT }}>waiting</span>
               <span style={{ fontWeight: 500, color: INK_SOFT, opacity: ease(frame, dbAt, 10) }}> on a database</span>
               <span style={{ fontWeight: 500, color: INK_SOFT, opacity: ease(frame, serviceAt, 10) }}>, or another service</span>
@@ -216,7 +216,7 @@ export const HookScene: React.FC = () => {
             }}
           />
           <Note at={serialAt + 2 + (N - 1) * 6} x={serialEnd + 18} y={lane + 2} out={onceAt}>
-            <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>past the second</span>
+            <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>past the second</span>
           </Note>
           <Note at={idleAt - 2} x={X0} y={y(420)} out={onceAt - 2}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -224,7 +224,7 @@ export const HookScene: React.FC = () => {
             </span>
           </Note>
           <Note at={queueAt - 2} x={X0} y={y(470)} out={onceAt - 2}>
-            <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", fontSize: 24, gap: "0.5em" }}>
+            <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", fontSize: 24, gap: "0.5em" }}>
               <span>the queue grows</span>
               <span style={{ display: "inline-flex", gap: 8 }}>
                 {Array.from({ length: queued }, (_, k) => (
@@ -234,7 +234,7 @@ export const HookScene: React.FC = () => {
             </span>
           </Note>
           <Note at={moveAt(N - 1) + 18} x={X0} y={rowY(N) + h(10)} out={sixteenAt - 4}>
-            <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>At once, all six fit inside the second</span>
+            <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>At once, all six fit inside the second</span>
           </Note>
 
           {/* What they share. */}
@@ -243,20 +243,20 @@ export const HookScene: React.FC = () => {
               <span style={{ height: 46, display: "flex", alignItems: "center" }}>
                 <Glyph kind={s.id} />
               </span>
-              <span style={{ ...label(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{s.name}</span>
+              <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{s.name}</span>
             </Note>
           ))}
           {shared.slice(1).map((s) => (
             <VRule key={s.id} x={s.x - 20} top={y(392)} height={h(86)} at={s.at} />
           ))}
           <Note at={bugsAt} x={1000} y={y(560)}>
-            <span style={{ ...note(28, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>That&apos;s where the bugs live.</span>
+            <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>That&apos;s where the bugs live.</span>
           </Note>
         </div>
 
         {/* The round: nine with a figure, seven quickly. */}
         <Note at={nineAt - 2} x={X0} y={y(716)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>Sixteen questions: nine with a figure each</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Sixteen questions: nine with a figure each</span>
         </Note>
         {DEEP.map((name, i) => (
           <React.Fragment key={name}>
@@ -265,7 +265,7 @@ export const HookScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={sevenAt - 2} x={X0} y={y(852)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>and seven quickly, at the end</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>and seven quickly, at the end</span>
         </Note>
         {/* One line: the seven, a middle dot between each. */}
         <div style={{ position: "absolute", left: X0, top: y(884), height: h(44), display: "flex", alignItems: "center", gap: "0.7em", fontSize: 20 }}>
@@ -274,8 +274,8 @@ export const HookScene: React.FC = () => {
             return (
               <React.Fragment key={name}>
                 {i > 0 ? <span style={{ ...label(20, INK_SOFT), opacity: p }}>·</span> : null}
-                <span style={{ ...label(20, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: p }}>
-                  <span style={{ color: INK_SOFT, fontWeight: 600 }}>
+                <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p }}>
+                  <span style={{ color: INK_SOFT, fontWeight: 500 }}>
                     <Num>{10 + i}</Num>
                   </span>{" "}
                   {name}

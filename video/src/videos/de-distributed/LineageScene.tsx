@@ -201,7 +201,7 @@ export const LineageScene: React.FC = () => {
 
         {/* What RDD stands for, and what lineage keeps. */}
         <Note at={rddAt - 2} x={RDD_X} y={y(370)}>
-          <span style={{ ...note(30, INK), fontWeight: 600, whiteSpace: "nowrap" }}>RDD</span>
+          <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>RDD</span>
         </Note>
         <Note at={expandAt - 2} x={RDD_X} y={y(414)}>
           <span style={{ ...note(24, INK), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
@@ -211,7 +211,7 @@ export const LineageScene: React.FC = () => {
           </span>
         </Note>
         <Note at={stepsAt} x={RDD_X} y={y(500)} out={diesAt}>
-          <span style={{ ...note(24, BLUE_INK), fontWeight: 650, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, BLUE_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             keeps the steps
             <br />
             <span style={{ opacity: ease(frame, notDataAt, 10), color: INK_SOFT, fontWeight: 500 }}>not the data</span>
@@ -220,7 +220,7 @@ export const LineageScene: React.FC = () => {
 
         {/* An executor dies. */}
         <Note at={diesAt} x={RDD_X} y={y(500)} out={q14At - 6}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             an executor dies
             <br />
             <span style={{ opacity: ease(frame, aloneAt, 10), color: INK }}>replay that partition alone</span>
@@ -246,7 +246,7 @@ export const LineageScene: React.FC = () => {
 
         {/* ── Caching ── */}
         <Note at={keepsAt + 4} x={COLS[1].x} y={y(ROWS[2]) + bh + h(16)}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <span style={{ fontFamily: MONO, fontSize: 21 }}>.cache()</span>
             <span style={{ opacity: ease(frame, reusesAt, 10) }}>: the next action starts here</span>
           </span>
@@ -256,12 +256,12 @@ export const LineageScene: React.FC = () => {
         </Note>
         <Note at={persistAt - 2} x={COLS[1].x} y={y(ROWS[2]) + bh + h(62)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>cache()</span>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>cache()</span>
             {" is "}
-            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, opacity: ease(frame, diskAt - 2, 10) }}>persist(MEMORY_AND_DISK)</span>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, opacity: ease(frame, diskAt - 2, 10) }}>persist(MEMORY_AND_DISK)</span>
             <span style={{ opacity: ease(frame, pickAt, 10), color: INK_SOFT }}>
-              ; or pick a level: <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK }}>MEMORY_ONLY</span>,{" "}
-              <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK }}>DISK_ONLY</span>
+              ; or pick a level: <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK }}>MEMORY_ONLY</span>,{" "}
+              <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK }}>DISK_ONLY</span>
             </span>
           </span>
         </Note>
@@ -277,18 +277,18 @@ export const LineageScene: React.FC = () => {
         />
         <CacheRow label="with one" top={y(ACT_Y[1])} at={onceAt - 6} countAt={onceAt} reads={1} cached color={OK_INK} h={h} />
         <Note at={paysAt - 2} x={RDD_X} y={y(680)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             pays: several actions
             <br />
             <span style={{ opacity: ease(frame, iterAt, 10) }}>an iterative algorithm</span>
           </span>
         </Note>
         <Note at={onceUsedAt - 2} x={RDD_X} y={y(756)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>used once: wasted memory</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>used once: wasted memory</span>
         </Note>
         <Note at={onceUsedAt + 10} x={RDD_X} y={y(792)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>unpersist()</span> when done
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>unpersist()</span> when done
           </span>
         </Note>
         <Note at={lazyAt - 2} x={RDD_X} y={y(834)}>
@@ -387,7 +387,7 @@ const CacheRow: React.FC<{
           ))}
         </>
       )}
-      <div style={{ position: "absolute", left: 960, top: top + h(4), ...note(24, color), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, countAt, 10) }}>
+      <div style={{ position: "absolute", left: 960, top: top + h(4), ...note(24, color), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, countAt, 10) }}>
         source read {reads === 2 ? "twice" : "once"}
       </div>
     </div>

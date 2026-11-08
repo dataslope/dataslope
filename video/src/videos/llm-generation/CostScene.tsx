@@ -78,7 +78,7 @@ export const CostScene: React.FC = () => {
                 opacity: Math.min(1, s),
                 transform: `translateY(${(1 - Math.min(1, s)) * -20}px)`,
                 ...note(26, BLUE_INK),
-                fontWeight: 650,
+                fontWeight: 500,
               }}
             >
               {kTokens(MONEY.document)}

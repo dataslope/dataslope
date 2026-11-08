@@ -121,7 +121,7 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={nowAt} x={MERGED_X} y={mg.rowTop(M.rows.length) + h(18)} out={out}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             {nAfter} rows, revenue <Mark at={whyAt}>{sumAfter}</Mark>
           </span>
         </Note>

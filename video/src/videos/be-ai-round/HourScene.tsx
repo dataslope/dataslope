@@ -185,7 +185,7 @@ export const HourScene: React.FC = () => {
                   opacity: ease(frame, p.named, 10),
                 }}
               >
-                <span style={{ ...label(22, BLUE_INK), fontWeight: 750, whiteSpace: "nowrap" }}>{p.phase}</span>
+                <span style={{ ...label(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{p.phase}</span>
                 <span style={{ ...note(20, INK), whiteSpace: "nowrap" }}>{p.time}</span>
               </div>
             </React.Fragment>
@@ -214,7 +214,7 @@ export const HourScene: React.FC = () => {
           />
         </svg>
         <Note at={halfAt + 4} x={(buildSeg.x0 + buildSeg.x1) / 2 - 150} y={barTop - 62} width={300} from="up">
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap", display: "block", textAlign: "center" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", display: "block", textAlign: "center" }}>
             <Mark at={halfAt + 8}>
               <Num>{HOUR.build}</Num> of <Num>60</Num>: half
             </Mark>
@@ -234,7 +234,7 @@ export const HourScene: React.FC = () => {
           <path d={`M${xAt(HOUR.lo)},${y(TOTAL_Y)} L${xAt(HOUR.hi)},${y(TOTAL_Y)} L${xAt(HOUR.hi)},${y(TOTAL_Y) - 10}`} fill="none" stroke={INK} strokeWidth={2} strokeDasharray="5 5" />
         </svg>
         <Note at={totalAt + 8} x={xAt(HOUR.lo) - 340} y={y(TOTAL_Y) + 8} width={340} align="right">
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{HOUR.lo}</Num> to <Num>{HOUR.hi}</Num> minutes of the <Num>60</Num>
           </span>
         </Note>
@@ -247,7 +247,7 @@ export const HourScene: React.FC = () => {
           return (
             <React.Fragment key={p.phase}>
               <Ink at={p.named} dur={12} style={{ left: X0, top: y(ROWS_Y[i]), opacity: 1 - d }}>
-                <span style={{ ...label(24, BLUE_INK), fontWeight: 750, whiteSpace: "nowrap" }}>{p.phase}</span>
+                <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{p.phase}</span>
               </Ink>
               <div style={{ position: "absolute", left: TEXT_X, top: y(ROWS_Y[i]) - 1, width: 1380, ...note(24, INK), lineHeight: 1.3, opacity: 1 - d }}>
                 {p.items.map((a) => (

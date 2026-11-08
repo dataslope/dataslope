@@ -69,7 +69,7 @@ export const body = (size: number, italic = false): React.CSSProperties => ({
 export const label = (size = 21, color: string = INK_SOFT): React.CSSProperties => ({
   fontFamily: SANS,
   fontSize: size,
-  fontWeight: 650,
+  fontWeight: 500,
   color,
 });
 

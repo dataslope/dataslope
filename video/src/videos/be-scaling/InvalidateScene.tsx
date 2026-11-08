@@ -18,8 +18,8 @@ const C = { x0: 960, x1: 1760, top: 410, base: 790, max: 0.5, lo: 1, hi: 600 };
  *  plain text. */
 const Copy: React.FC<{ x: number; y: number; at: number; name: string; value: React.ReactNode; out?: number }> = ({ x, y, at, name, value, out }) => (
   <Ink at={at} dur={14} out={out} style={{ left: x, top: y, whiteSpace: "nowrap" }}>
-    <div style={{ ...label(23, BLUE_INK), fontWeight: 600 }}>{name}</div>
-    <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK, marginTop: 10 }}>{value}</div>
+    <div style={{ ...label(23, BLUE_INK), fontWeight: 500 }}>{name}</div>
+    <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, marginTop: 10 }}>{value}</div>
   </Ink>
 );
 
@@ -126,7 +126,7 @@ export const InvalidateScene: React.FC = () => {
         <Line at={driftAt + 6} x={X0} y={y(352) + 72 + h(24)} size={22} color={INK_SOFT} out={phaseOut}>
           the database changed; the cache still says the old value
         </Line>
-        <Line at={ttlAt} x={X0} y={y(600)} size={23} weight={600} out={phaseOut}>
+        <Line at={ttlAt} x={X0} y={y(600)} size={23} weight={500} out={phaseOut}>
           The TTL, the time to live:
         </Line>
         <Line at={longAt} x={X0} y={y(650)} size={23} out={phaseOut}>
@@ -139,7 +139,7 @@ export const InvalidateScene: React.FC = () => {
         <VRule x={800} top={y(352)} bottom={y(730)} at={modelsAt} out={phaseOut} />
 
         {/* ── The page's model: misses and stale reads against the TTL. ── */}
-        <Line at={modelsAt} x={C.x0 - 60} y={y(352)} size={21} weight={650} color={INK_SOFT} out={phaseOut}>
+        <Line at={modelsAt} x={C.x0 - 60} y={y(352)} size={21} weight={500} color={INK_SOFT} out={phaseOut}>
           The page&apos;s model: a key read once a second, changed every two minutes
         </Line>
         <Svg opacity={chartIn * (1 - ease(frame, phaseOut, 10))}>
@@ -161,17 +161,17 @@ export const InvalidateScene: React.FC = () => {
               {t >= 60 ? `${t / 60} min` : `${t} s`}
             </text>
           ))}
-          <text x={(C.x0 + C.x1) / 2} y={y(C.base) + 64} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
+          <text x={(C.x0 + C.x1) / 2} y={y(C.base) + 64} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
             TTL (log scale)
           </text>
           <g clipPath="url(#be-scaling-ttl)">
             <path d={line("miss")} fill="none" stroke={BAR} strokeWidth={3} pathLength={1} strokeDasharray={`${missP} 1`} />
             <path d={line("stale")} fill="none" stroke={ACCENT} strokeWidth={3} pathLength={1} strokeDasharray={`${staleP} 1`} />
           </g>
-          <text x={lx(580)} y={ly(0.07)} textAnchor="end" style={svgText({ ...label(21, BLUE_INK), fontWeight: 600, opacity: missP })}>
+          <text x={lx(580)} y={ly(0.07)} textAnchor="end" style={svgText({ ...label(21, BLUE_INK), fontWeight: 500, opacity: missP })}>
             reads that miss
           </text>
-          <text x={lx(580)} y={ly(0.33)} textAnchor="end" style={svgText({ ...label(21, ACCENT_INK), fontWeight: 600, opacity: staleP })}>
+          <text x={lx(580)} y={ly(0.33)} textAnchor="end" style={svgText({ ...label(21, ACCENT_INK), fontWeight: 500, opacity: staleP })}>
             <tspan x={lx(580)}>reads that</tspan>
             <tspan x={lx(580)} dy={26}>
               are stale
@@ -185,7 +185,7 @@ export const InvalidateScene: React.FC = () => {
           ) : null}
         </Svg>
         <Ink at={fifteenAt} dur={14} out={phaseOut} style={{ left: lx(cross.ttl) - 150, top: ly(0.4) - 40, width: 300, textAlign: "center", whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, INK), fontWeight: 600 }}>
+          <span style={{ ...note(23, INK), fontWeight: 500 }}>
             <Mark at={leastAt}>about {Math.round(cross.ttl)} s</Mark>
             <span style={{ color: BLUE_INK, opacity: ease(frame, missAt, 10) }}> {pct(cross.miss)} miss</span>
             <span style={{ color: ACCENT_INK, opacity: ease(frame, staleAt, 10) }}>, {pct(cross.stale)} stale</span>
@@ -193,11 +193,11 @@ export const InvalidateScene: React.FC = () => {
         </Ink>
 
         {/* ── The shortener: a link taken down for abuse. ── */}
-        <Line at={barelyAt} x={X0} y={y(340)} size={23} weight={600}>
+        <Line at={barelyAt} x={X0} y={y(340)} size={23} weight={500}>
           A short link barely changes: a long TTL,
           <span style={{ color: ACCENT_INK, opacity: ease(frame, takenAt, 10) }}> until one is taken down for abuse</span>
         </Line>
-        <Line at={deleteAt} x={X0} y={y(420)} size={21} weight={600} color={OK_INK}>
+        <Line at={deleteAt} x={X0} y={y(420)} size={21} weight={500} color={OK_INK}>
           delete the cached entry after the database commits
         </Line>
         <StepRow
@@ -209,7 +209,7 @@ export const InvalidateScene: React.FC = () => {
             { text: "delete the cached entry", at: commitsAt + 10, color: OK_INK, lit: [commitsAt + 10, firstAt] },
           ]}
         />
-        <Line at={firstAt} x={X0} y={y(560)} size={21} weight={600} color={ACCENT_INK}>
+        <Line at={firstAt} x={X0} y={y(560)} size={21} weight={500} color={ACCENT_INK}>
           delete it first, and a read in between puts the old value back
         </Line>
         <StepRow
@@ -223,7 +223,7 @@ export const InvalidateScene: React.FC = () => {
           ]}
         />
         <Spot id="timer" at={backstopAt} x={1560} y={y(366)} w={150} />
-        <Line at={backstopAt + 4} x={X0} y={y(690)} size={22} weight={650}>
+        <Line at={backstopAt + 4} x={X0} y={y(690)} size={22} weight={500}>
           The TTL stays as a backstop: a stale entry still expires
         </Line>
 
@@ -251,7 +251,7 @@ export const InvalidateScene: React.FC = () => {
             </span>
             <span>
               batched, for speed
-              <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, crashAt, 10) }}>: a crash loses what it hadn&apos;t written</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, crashAt, 10) }}>: a crash loses what it hadn&apos;t written</span>
             </span>
           </span>
         </Ink>

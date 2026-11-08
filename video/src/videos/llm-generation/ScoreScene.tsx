@@ -166,12 +166,12 @@ export const ScoreScene: React.FC = () => {
               align={v >= 0 ? "left" : "right"}
               y={rowMid(i) - 15}
             >
-              <span style={{ ...note(23, TEXT[i]), fontWeight: 650 }}>
+              <span style={{ ...note(23, TEXT[i]), fontWeight: 500 }}>
                 {scoreMark === undefined ? signed(v) : <Marked at={scoreMark + 2}>{signed(v)}</Marked>}
               </span>
             </Note>
             <Note at={dividesAt + i * 4 + 14} x={P0 + (P1 - P0) * p + 14} y={rowMid(i) - 15}>
-              <span style={{ ...note(23, TEXT[i]), fontWeight: 650 }}>
+              <span style={{ ...note(23, TEXT[i]), fontWeight: 500 }}>
                 {markAt === undefined ? pct(p) : <Marked at={markAt - 2}>{pct(p)}</Marked>}
               </span>
             </Note>
@@ -189,7 +189,7 @@ export const ScoreScene: React.FC = () => {
         />
       </Svg>
       <Note at={gapAt - 2} x={(gapX[0] + gapX[1]) / 2} y={gapY - 32} from="up" style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...note(21, INK), fontWeight: 650 }}>gap {signed(LOGITS[0] - LOGITS[1])}</span>
+        <span style={{ ...note(21, INK), fontWeight: 500 }}>gap {signed(LOGITS[0] - LOGITS[1])}</span>
       </Note>
 
       {/* "Three times dog's share": a bracket beside the cat and dog bars. */}
@@ -202,12 +202,12 @@ export const ScoreScene: React.FC = () => {
         />
       </Svg>
       <Note at={threeAt - 2} x={ratioX + 14} y={(rowMid(0) + rowMid(1)) / 2 - 16}>
-        <span style={{ ...note(23, INK), fontWeight: 600 }}>{CAT_OVER_DOG.toFixed(1)}×</span>
+        <span style={{ ...note(23, INK), fontWeight: 500 }}>{CAT_OVER_DOG.toFixed(1)}×</span>
       </Note>
 
       {/* Softmax: from the scores to the probabilities. */}
       <Ink at={softAt - 4} dur={14} style={{ left: ARROW_X[0], width: ARROW_X[1] - ARROW_X[0], top: mid - 56, textAlign: "center" }}>
-        <span style={{ ...note(28, INK), fontWeight: 600 }}>
+        <span style={{ ...note(28, INK), fontWeight: 500 }}>
           <Mono>softmax</Mono>
         </span>
       </Ink>
@@ -249,7 +249,7 @@ export const ScoreScene: React.FC = () => {
               background: TINT[tok],
               borderBottom: `4px solid ${FILL[tok]}`,
               ...note(26, TEXT[tok]),
-              fontWeight: 650,
+              fontWeight: 500,
             }}
           >
             {TOKENS[tok]}
@@ -259,7 +259,7 @@ export const ScoreScene: React.FC = () => {
       <Arrow from={[X0 + 506, drawY + 26]} to={[X0 + 572, drawY + 26]} at={drawAt(0) - 6} dur={10} />
       {/* The first draw is the 21.6% token: drawn, not picked. */}
       <Note at={diffAt - 2} x={X0 + 590} y={drawY + 62}>
-        <span style={{ ...note(21, TEXT[DRAWS_T1[0]]), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, TEXT[DRAWS_T1[0]]), fontWeight: 500, whiteSpace: "nowrap" }}>
           {pct(AT_T1.probs[DRAWS_T1[0]])}, drawn anyway
         </span>
       </Note>

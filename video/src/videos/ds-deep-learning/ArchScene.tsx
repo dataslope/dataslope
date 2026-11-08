@@ -120,7 +120,7 @@ export const ArchScene: React.FC = () => {
           <Note key={t.head} at={t.at - 2} x={PANELS[i]} y={y(TOP)}>
             {/* One line, one size: the name in weight, what it stands for in
                 the softer ink. */}
-            <span style={{ ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{t.head}</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{t.head}</span>
             {t.what ? <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>{`  ${t.what}`}</span> : null}
           </Note>
         ))}
@@ -180,7 +180,7 @@ export const ArchScene: React.FC = () => {
           what it found
         </Tagline>
         <Note at={sameAt - 2} x={PANELS[0]} y={y(GY) + GRID * CELL + h(24)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>one filter, the same weights everywhere</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one filter, the same weights everywhere</span>
         </Note>
         <Note at={imagesAt - 2} x={PANELS[0]} y={y(GY) + GRID * CELL + h(64)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -258,7 +258,7 @@ export const ArchScene: React.FC = () => {
           </Tagline>
         ))}
         <Note at={onceAt + 4} x={PANELS[2]} y={y(TOK_Y) + h(76)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>every pair at once, in parallel</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every pair at once, in parallel</span>
         </Note>
         <Note at={backboneAt - 2} x={PANELS[2]} y={y(TOK_Y) + h(114)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>the backbone of modern language models</span>

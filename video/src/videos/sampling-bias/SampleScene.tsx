@@ -243,7 +243,7 @@ export const SampleScene: React.FC = () => {
         }}
       >
         <span style={note(22, INK_SOFT)}>True average </span>
-        <span style={{ ...note(24, INK), fontWeight: 600 }}>{SHOWN.truth}</span>
+        <span style={{ ...note(24, INK), fontWeight: 500 }}>{SHOWN.truth}</span>
       </div>
 
       {/* "anyone above seventy-five", then "eleven times as likely". */}
@@ -294,7 +294,7 @@ export const SampleScene: React.FC = () => {
           opacity: ease(frame, sixtyAt - 2, 10) * landed(steps.random.d),
         }}
       >
-        <div style={{ ...note(30, RANDOM_INK), fontWeight: 600 }}>{SHOWN.random}</div>
+        <div style={{ ...note(30, RANDOM_INK), fontWeight: 500 }}>{SHOWN.random}</div>
         <div style={note(20, INK_SOFT)}>at random</div>
       </div>
       <Note at={littleAt - 2} x={160} y={y(690)} out={takeAt}>
@@ -317,7 +317,7 @@ export const SampleScene: React.FC = () => {
           opacity: ease(frame, eightyAt - 2, 10) * landed(steps.easy.d),
         }}
       >
-        <div style={{ ...note(30, EASY_INK), fontWeight: 600 }}>{SHOWN.easy}</div>
+        <div style={{ ...note(30, EASY_INK), fontWeight: 500 }}>{SHOWN.easy}</div>
         <div style={note(20, INK_SOFT)}>the easy way</div>
       </div>
       <Note at={pickedAt} x={160} y={y(690)}>
@@ -337,7 +337,7 @@ export const SampleScene: React.FC = () => {
       />
       <Note at={tenAt} x={(truth2X + easySlot.x) / 2} y={y(FIG2_BASE - 166)} from="up">
         <span style={{ display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap", ...halo }}>
-          <span style={{ ...note(24, EASY_INK), fontWeight: 600 }}>{SHOWN.over} points</span>
+          <span style={{ ...note(24, EASY_INK), fontWeight: 500 }}>{SHOWN.over} points</span>
           <span style={note(24, INK_SOFT)}> too high</span>
         </span>
       </Note>

@@ -151,7 +151,7 @@ export const SparseScene: React.FC = () => {
               <div style={{ ...numStyle(28, inside(i) ? PAPER : INK), textAlign: "center" }}>{pct(s.recur)}</div>
             </Note>
             <Ink at={ngramAt - 2 + i * 3} dur={12} style={{ left: barX(i) - 30, width: BAR_W + 60, top: base + 12, textAlign: "center" }}>
-              <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+              <div style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 {i === 1 ? <Marked at={biSaid - 2}>{NAMES[i]}</Marked> : i === 2 ? <Marked at={triSaid - 2}>{NAMES[i]}</Marked> : NAMES[i]}
               </div>
             </Ink>
@@ -181,7 +181,7 @@ export const SparseScene: React.FC = () => {
             <div style={{ ...body(34, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>That&apos;s sparsity.</div>
           </Note>
           <Note at={sweetAt - 2} x={NOTE_X} y={y(300) + 240} from="right">
-            <div style={{ ...label(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            <div style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               bigrams<span style={{ opacity: ease(frame, plentyAt - 2, 10) }}>, and trigrams with plenty of text:</span>
             </div>
             <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, orderAt - 2, 10) }}>enough order to help,</div>

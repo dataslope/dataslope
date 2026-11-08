@@ -248,7 +248,7 @@ export const DotScene: React.FC = () => {
                 gap: "0.6em",
                 fontFamily: MONO,
                 fontSize: EXPR,
-                fontWeight: 600,
+                fontWeight: 500,
                 color: INK,
                 whiteSpace: "pre",
                 ...TABULAR,
@@ -262,12 +262,12 @@ export const DotScene: React.FC = () => {
               </span>
             </div>
             <div style={{ position: "absolute", left: L.result - 44, top: 6, opacity: sum, display: "flex", gap: 36, alignItems: "baseline" }}>
-              <span style={{ fontFamily: MONO, fontSize: EXPR, fontWeight: 600, color: INK_SOFT }}>=</span>
+              <span style={{ fontFamily: MONO, fontSize: EXPR, fontWeight: 500, color: INK_SOFT }}>=</span>
               <span
                 style={{
                   fontFamily: MONO,
                   fontSize: 32,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   color: INK,
                   borderRadius: 6,
                   boxShadow: i === 2 ? `0 0 0 ${6 * pulse(frame, elevenAgainAt, 30)}px color-mix(in srgb, ${POINT} 35%, transparent)` : undefined,

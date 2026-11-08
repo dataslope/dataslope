@@ -105,7 +105,7 @@ export const CostScene: React.FC = () => {
           {/* One line at one size, the notes' own: the reply stands out by its ink, weight and highlight. */}
           <Ink at={legalFrom - 4} dur={16} style={{ left: X0, top: y(300), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14, fontSize: 24 }}>
             <span style={label(24, INK_SOFT)}>Postgres replied</span>
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>
+            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>
               <Mark at={toldAt - 2}>UPDATE {FLAT.updated}</Mark>
             </span>
             <span style={note(24, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
@@ -167,7 +167,7 @@ export const CostScene: React.FC = () => {
                     }}
                   >
                     <div style={label(20, INK_SOFT)}>{one ? "Ada's email: one fact" : `copy on order ${c.order}`}</div>
-                    <div style={{ fontFamily: MONO, fontSize: 26, color: INK, fontWeight: 600 }}>
+                    <div style={{ fontFamily: MONO, fontSize: 26, color: INK, fontWeight: 500 }}>
                       <span style={{ opacity: swap < 0.5 ? 1 - 2 * swap : 2 * swap - 1 }}>{swap < 0.5 ? OLD_EMAIL : c.email}</span>
                     </div>
                   </div>

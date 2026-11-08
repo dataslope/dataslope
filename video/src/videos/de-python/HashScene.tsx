@@ -255,7 +255,7 @@ export const HashScene: React.FC = () => {
             return (
               <React.Fragment key={i}>
                 <Ink at={at} dur={12} style={{ left: s.x, top: y(B_CELLS) - 32, width: CELL_W, textAlign: "center" }}>
-                  <span style={{ ...note(19, isTarget && landed > 0 ? SET_INK : INK_SOFT), fontWeight: isTarget ? 650 : 500 }}>
+                  <span style={{ ...note(19, isTarget && landed > 0 ? SET_INK : INK_SOFT), fontWeight: isTarget ? 500 : 500 }}>
                     {commas(s.index)}
                   </span>
                 </Ink>
@@ -293,10 +293,10 @@ export const HashScene: React.FC = () => {
           {/* ── The times, ListVsSet's ── */}
           <Note at={timedAt} x={LEFT} y={y(TIME_Y)}>
             <span style={{ display: "flex", gap: 40, alignItems: "baseline", whiteSpace: "nowrap" }}>
-              <span style={{ ...note(30, LIST_INK), fontWeight: 650, opacity: ease(frame, msAt - 2, 10) }}>
+              <span style={{ ...note(30, LIST_INK), fontWeight: 500, opacity: ease(frame, msAt - 2, 10) }}>
                 list <span style={{ fontVariantNumeric: "tabular-nums" }}>{HASH.listMs.toFixed(2)}</span> ms
               </span>
-              <span style={{ ...note(30, SET_INK), fontWeight: 650, opacity: ease(frame, nsAt - 2, 10) }}>
+              <span style={{ ...note(30, SET_INK), fontWeight: 500, opacity: ease(frame, nsAt - 2, 10) }}>
                 set <span style={{ fontVariantNumeric: "tabular-nums" }}>{HASH.setNs.toFixed(1)}</span> ns
               </span>
               <Source>a million numbers, timed in CPython 3.13 for the course video “List or set?”</Source>
@@ -345,7 +345,7 @@ export const HashScene: React.FC = () => {
           ]}
         />
         <Note at={fourAt} x={X0 + 330 + 860 * (HASH.list5k / HASH.list10k) + 260} y={barsY + h(58) + h(10)}>
-          <span style={{ ...note(28, LIST_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, LIST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             twice the keys, four times the work:{" "}
             <Mark at={squaredAt}>
               <span style={{ fontStyle: "italic" }}>O</span>(<span style={{ fontStyle: "italic" }}>n</span>²)
@@ -353,7 +353,7 @@ export const HashScene: React.FC = () => {
           </span>
         </Note>
         <Note at={setAt + 10} x={X0 + 330 + 160} y={barsY + 2 * h(58) + h(10)}>
-          <span style={{ ...note(26, SET_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, SET_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             one hash lookup each; every key is new, so nothing to compare
           </span>
         </Note>

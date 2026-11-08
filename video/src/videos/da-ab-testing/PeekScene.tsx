@@ -116,7 +116,7 @@ export const PeekScene: React.FC = () => {
               strokeWidth={1.6}
               strokeDasharray="6 6"
             />
-            <text x={CHART.x1 + 14} y={alphaY + 7} style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: ACCENT_INK }}>
+            <text x={CHART.x1 + 14} y={alphaY + 7} style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: ACCENT_INK }}>
               0.05
             </text>
           </g>
@@ -130,10 +130,10 @@ export const PeekScene: React.FC = () => {
               {t.toLocaleString("en-US")}
             </text>
           ))}
-          <text x={CHART.x1} y={y(CHART.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 650, fill: INK_SOFT }}>
+          <text x={CHART.x1} y={y(CHART.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
             users per arm, checked every hundred
           </text>
-          <text x={CHART.x0 - 14} y={y(CHART.top) - 18} style={{ fontFamily: SANS, fontSize: 19, fontWeight: 650, fill: INK_SOFT }}>
+          <text x={CHART.x0 - 14} y={y(CHART.top) - 18} style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
             p-value
           </text>
           {path ? <path d={path} fill="none" stroke={A_COLOR} strokeWidth={3} strokeLinejoin="round" /> : null}
@@ -158,10 +158,10 @@ export const PeekScene: React.FC = () => {
           </span>
         </Note>
         <Note at={stoppedAt + 4} x={at(xs, firstCross) + 56} y={y(CHART.top) + h(26)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>&ldquo;Significant! Ship it.&rdquo;</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>&ldquo;Significant! Ship it.&rdquo;</span>
         </Note>
         <Note at={finalAt + 2} x={at(xs, PEEK.planned) - 20} width={260} y={at(ys, PEEK.final) + h(16)} align="right">
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>planned: p = {fmt(PEEK.final, 2)}</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>planned: p = {fmt(PEEK.final, 2)}</span>
         </Note>
         {/* Why, then the fix, in the empty upper right. */}
         <Note at={lookAt - 2} x={X0 + 980} y={y(CHART.top) - h(84)}>

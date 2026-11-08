@@ -212,7 +212,7 @@ export const DashScene: React.FC = () => {
                   style={{
                     ...note(28, INK),
                     lineHeight: `${COLS.lineH}px`,
-                    fontWeight: "strong" in l ? 650 : undefined,
+                    fontWeight: "strong" in l ? 500 : undefined,
                     marginTop: COLS.lineGap,
                     opacity: ease(frame, l.at - 2, 12),
                     whiteSpace: "nowrap",

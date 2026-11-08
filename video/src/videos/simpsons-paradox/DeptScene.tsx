@@ -129,17 +129,17 @@ export const DeptScene: React.FC = () => {
               align={trailAbove ? "left" : "right"}
               style={trailAbove ? { transform: "translateX(-50%)" } : undefined}
             >
-              <span style={{ ...note(21, COLOR_INK[trail]), fontWeight: 600 }}>{Math.round(d[trail].rate * 100)}%</span>
+              <span style={{ ...note(21, COLOR_INK[trail]), fontWeight: 500 }}>{Math.round(d[trail].rate * 100)}%</span>
             </Note>
             <Note at={at + 6} x={px(d[lead].rate) + radius(d[lead].applied) + 10} y={cy - 14}>
-              <span style={{ ...note(21, COLOR_INK[lead]), fontWeight: 600 }}>{Math.round(d[lead].rate * 100)}%</span>
+              <span style={{ ...note(21, COLOR_INK[lead]), fontWeight: 500 }}>{Math.round(d[lead].rate * 100)}%</span>
             </Note>
 
             <Note at={gapAt} x={GAP_X} y={cy - 19}>
               <span
                 style={{
                   ...note(28, COLOR_INK[lead]),
-                  fontWeight: 650,
+                  fontWeight: 500,
                   padding: "0 8px",
                   marginLeft: -8,
                   background: d.gap > 0 ? HIGHLIGHT : "transparent",

@@ -177,7 +177,7 @@ export const FitScene: React.FC = () => {
 
       {/* What the degree-eleven curve does between and past the points. */}
       <Note at={wobbleAt} x={px(3.64)} y={py(0.62)} align="right" from="up">
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           wobbles between points
         </span>
       </Note>
@@ -191,10 +191,10 @@ export const FitScene: React.FC = () => {
         color={ACCENT_INK}
       />
       <Note at={offAt} x={px(3.68)} y={box.top + 6} align="right" from="right">
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>off the chart</span>
+        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>off the chart</span>
       </Note>
       <Note at={offAt + 4} x={px(0.24)} y={box.base - 40}>
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>off the chart</span>
+        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>off the chart</span>
       </Note>
 
       {/* The training error of each fit, in the order they are drawn. */}

@@ -38,7 +38,7 @@ export const RuleScene: React.FC = () => {
       backAt: livesAt + 4,
       back: (
         <>
-          In Fig. 1, <span style={{ color: ADDR_INK, fontWeight: 600 }}>{FIG1.n}</span>
+          In Fig. 1, <span style={{ color: ADDR_INK, fontWeight: 500 }}>{FIG1.n}</span>
         </>
       ),
     },
@@ -49,8 +49,8 @@ export const RuleScene: React.FC = () => {
       backAt: thereAt + 4,
       back: (
         <>
-          In Fig. 1, n&apos;s box: read <span style={{ color: VALUE_INK, fontWeight: 600 }}>42</span>, then wrote{" "}
-          <span style={{ color: VALUE_INK, fontWeight: 600 }}>100</span>
+          In Fig. 1, n&apos;s box: read <span style={{ color: VALUE_INK, fontWeight: 500 }}>42</span>, then wrote{" "}
+          <span style={{ color: VALUE_INK, fontWeight: 500 }}>100</span>
         </>
       ),
     },
@@ -98,7 +98,7 @@ export const RuleScene: React.FC = () => {
               style={{
                 fontFamily: MONO,
                 fontSize: 104,
-                fontWeight: 600,
+                fontWeight: 500,
                 color: ADDR_INK,
                 fontVariantLigatures: "none",
                 lineHeight: 1.1,

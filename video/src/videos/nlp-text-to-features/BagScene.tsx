@@ -214,7 +214,7 @@ const TallyChip: React.FC<{ word: string; count: number; at: number; countAt: nu
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
       <Chip text={word} size={24} at={at} style={{ marginRight: 0 }} />
-      <span style={{ ...note(26, BLUE_INK), ...TABULAR, fontWeight: 600, opacity: c, transform: `translateY(${(1 - c) * 6}px)` }}>
+      <span style={{ ...note(26, BLUE_INK), ...TABULAR, fontWeight: 500, opacity: c, transform: `translateY(${(1 - c) * 6}px)` }}>
         ×{count}
       </span>
     </span>

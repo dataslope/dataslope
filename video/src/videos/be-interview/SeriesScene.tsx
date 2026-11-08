@@ -121,7 +121,7 @@ export const SeriesScene: React.FC = () => {
         <div style={{ position: "absolute", left: 96, top: y(234), ...note(28, INK), whiteSpace: "nowrap" }}>
           <span style={{ opacity: ease(frame, nineAt - 2, 12) }}>Nine videos, </span>
           <span style={{ opacity: ease(frame, totalAt - 2, 12) }}>
-            <span style={{ fontWeight: 650 }}>
+            <span style={{ fontWeight: 500 }}>
               <Num>{QUESTIONS}</Num> of the track&apos;s questions
             </span>
             ,{" "}
@@ -185,7 +185,7 @@ export const SeriesScene: React.FC = () => {
                   top: base - bh - COUNT_H,
                   textAlign: "center",
                   ...note(26, BLUE_INK),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   lineHeight: `${COUNT_H}px`,
                   opacity: ease(frame, riseAt[i] + 10, 10) * keep,
                 }}
@@ -206,7 +206,7 @@ export const SeriesScene: React.FC = () => {
                 <div style={label(20, BLUE_INK)}>
                   Part <Num>{p.n}</Num>
                 </div>
-                <div style={{ ...note(22, INK), fontWeight: 650, marginTop: 2, lineHeight: 1.15, whiteSpace: "nowrap" }}>{p.title}</div>
+                <div style={{ ...note(22, INK), fontWeight: 500, marginTop: 2, lineHeight: 1.15, whiteSpace: "nowrap" }}>{p.title}</div>
               </div>
               <Spot
                 video={p.video}
@@ -236,7 +236,7 @@ export const SeriesScene: React.FC = () => {
               opacity: python * (1 - dimmed(2)),
             }}
           >
-            <div style={{ ...note(24, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <div style={{ ...note(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
               Python fundamentals page<span style={{ opacity: ease(frame, leftOutAt - 2, 12) }}>, left out: it&apos;s syntax</span>
             </div>
             <div style={{ ...note(22, INK_SOFT), marginTop: 14, whiteSpace: "nowrap", opacity: ease(frame, designQAt - 2, 12) }}>
@@ -287,7 +287,7 @@ export const SeriesScene: React.FC = () => {
             opacity: ease(frame, bankAt - 2, 10) * (1 - ease(frame, nextAt - 16, 10)),
           }}
         >
-          A bank of <span style={{ fontWeight: 650 }}><Num>{BANK}</Num> multiple-choice questions</span> for the whole track.
+          A bank of <span style={{ fontWeight: 500 }}><Num>{BANK}</Num> multiple-choice questions</span> for the whole track.
         </div>
 
         <NextLine at={nextAt} x={LEFT} y={y(LINE_Y) + 6} width={1000}>

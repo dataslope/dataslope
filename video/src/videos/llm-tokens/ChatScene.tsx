@@ -204,7 +204,7 @@ export const ChatScene: React.FC = () => {
             }}
           />
           <Note at={sevenAt} x={chartRight + 18} y={lengthY - 16}>
-            <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
+            <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
               the conversation: {num(CONVERSATION.length)}
             </span>
           </Note>
@@ -215,7 +215,7 @@ export const ChatScene: React.FC = () => {
           <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>input tokens billed</div>
           <div style={{ ...headline(64), color: frame >= fortyAt - 2 ? FOCUS_INK : INK, marginTop: 6, ...TABULAR }}>{num(billed)}</div>
           <div style={{ ...note(24, INK), marginTop: 8, whiteSpace: "nowrap", opacity: ease(frame, sixAt - 2, 12) }}>
-            <span style={{ fontWeight: 650, color: FOCUS_INK, ...TABULAR }}>{CONVERSATION.ratio}×</span> the conversation&apos;s length
+            <span style={{ fontWeight: 500, color: FOCUS_INK, ...TABULAR }}>{CONVERSATION.ratio}×</span> the conversation&apos;s length
           </div>
           <div style={{ ...note(20, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", opacity: ease(frame, lengthAt + 4, 12), ...TABULAR }}>
             {num(CONVERSATION.billed)} ÷ {num(CONVERSATION.length)}
@@ -253,7 +253,7 @@ const BridgeChip: React.FC<{ text: string; id: number; glow: number }> = ({ text
       style={{
         fontFamily: MONO,
         fontSize: 48,
-        fontWeight: 600,
+        fontWeight: 500,
         color: glow > 0.4 ? FOCUS_INK : INK,
         fontVariantNumeric: "tabular-nums",
       }}

@@ -162,7 +162,7 @@ export const WeightsScene: React.FC = () => {
                 left: C.dot,
                 top: 4,
                 fontFamily: MONO,
-                fontWeight: 600,
+                fontWeight: 500,
                 fontSize: NUM,
                 color: INK,
                 transform: `scale(${1 + 0.22 * swell + 0.16 * top})`,
@@ -183,7 +183,7 @@ export const WeightsScene: React.FC = () => {
                   left: c.x,
                   top: 4,
                   fontFamily: MONO,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   fontSize: NUM,
                   color: INK,
                   opacity: ease(frame, c.at, 10),
@@ -199,7 +199,7 @@ export const WeightsScene: React.FC = () => {
                 left: C.weight,
                 top: 4,
                 fontFamily: MONO,
-                fontWeight: 600,
+                fontWeight: 500,
                 fontSize: NUM,
                 color: hot > 0.5 ? POINT_INK : INK,
                 opacity: ease(frame, weightIn(i), 10),
@@ -216,7 +216,7 @@ export const WeightsScene: React.FC = () => {
         <line x1={C.weight} x2={C.weight + 120} y1={rowY(3) - 14} y2={rowY(3) - 14} stroke={INK} strokeWidth={1.6} />
       </Svg>
       <Fade at={addUpAt - 2} style={{ left: C.weight, top: rowY(3) - 6, display: "flex", gap: 14, alignItems: "baseline" }}>
-        <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: NUM, color: INK, ...TABULAR }}>1.000</span>
+        <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: NUM, color: INK, ...TABULAR }}>1.000</span>
         <span style={{ ...label(22, INK_SOFT) }}>in all</span>
       </Fade>
 
@@ -225,14 +225,14 @@ export const WeightsScene: React.FC = () => {
         <div style={{ ...body(32), color: INK }}>
           scaled = raw score{" "}
           <Mark at={squareAt}>
-            ÷ <span style={{ fontFamily: MONO, fontWeight: 600 }}>√d</span>
+            ÷ <span style={{ fontFamily: MONO, fontWeight: 500 }}>√d</span>
           </Mark>
         </div>
         <div style={{ ...body(27), color: INK_SOFT, marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, howManyAt - 2, 10) }}>
-          <span style={{ fontFamily: MONO, fontWeight: 600, color: INK }}>d</span>: <Mark at={howManyAt}>how many numbers</Mark> a vector holds
+          <span style={{ fontFamily: MONO, fontWeight: 500, color: INK }}>d</span>: <Mark at={howManyAt}>how many numbers</Mark> a vector holds
         </div>
         <div style={{ ...body(28), color: INK_SOFT, marginTop: 10, opacity: ease(frame, rootTwoAt - 2, 10) }}>
-          here <span style={{ fontFamily: MONO, fontWeight: 600, color: INK }}>d = {D}</span>, so ÷ <Mark at={rootTwoAt}>{ROOT.toFixed(3)}</Mark>
+          here <span style={{ fontFamily: MONO, fontWeight: 500, color: INK }}>d = {D}</span>, so ÷ <Mark at={rootTwoAt}>{ROOT.toFixed(3)}</Mark>
         </div>
       </Note>
       <Note at={stepsAt - 2} x={1390} y={y(640)} width={430}>
@@ -253,7 +253,7 @@ export const WeightsScene: React.FC = () => {
       </Fade>
       <Fade at={squareAt - 2} out={spreadOut} style={{ left: SB, top: SY + 50 }}>
         <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>
-          ÷ <span style={{ fontFamily: MONO, fontWeight: 600 }}>√d</span>
+          ÷ <span style={{ fontFamily: MONO, fontWeight: 500 }}>√d</span>
         </span>
       </Fade>
       {SPREAD.map((sp, i) => {
@@ -285,7 +285,7 @@ export const WeightsScene: React.FC = () => {
                 top: sRow(i) + 1,
                 fontFamily: MONO,
                 fontSize: 26,
-                fontWeight: 600,
+                fontWeight: 500,
                 color: INK,
                 opacity: Math.max(0, (p - 0.7) / 0.3),
                 ...TABULAR,
@@ -330,8 +330,8 @@ export const WeightsScene: React.FC = () => {
               }}
             />
             <div style={{ position: "absolute", left: s.x + 16, top: BY + 13, opacity: ease(frame, addThemAt + 4 + i * 5, 10), display: "flex", gap: 14, alignItems: "baseline", whiteSpace: "nowrap" }}>
-              <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>{TOKENS[i]}</span>
-              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: hot > 0.5 ? POINT_INK : INK, ...TABULAR }}>
+              <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{TOKENS[i]}</span>
+              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: hot > 0.5 ? POINT_INK : INK, ...TABULAR }}>
                 <Swap a={three(rows[i].power)} b={three(rows[i].weight)} swapAt={swapAt + i * 4} />
               </span>
             </div>
@@ -345,10 +345,10 @@ export const WeightsScene: React.FC = () => {
         ))}
       </Svg>
       <Fade at={addThemAt} style={{ left: BX - 6, top: BY + BH + 22 }}>
-        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK_SOFT }}>0</span>
+        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT }}>0</span>
       </Fade>
       <Fade at={totalSaidAt - 2} style={{ left: end - 6, top: BY + BH + 22, transform: "translateX(-60%)" }}>
-        <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
+        <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
           <Swap a={`total ${three(TROPHY.total)}`} b="1" swapAt={swapAt} />
         </span>
       </Fade>
@@ -382,7 +382,7 @@ export const WeightsScene: React.FC = () => {
                 top: GY + 4,
                 fontFamily: MONO,
                 fontSize: 23,
-                fontWeight: 600,
+                fontWeight: 500,
                 color: hot > 0.5 ? POINT_INK : INK_SOFT,
                 opacity: ease(frame, withoutAt + 6 + i * 5, 10),
                 ...TABULAR,

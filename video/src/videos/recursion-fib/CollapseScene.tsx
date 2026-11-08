@@ -54,7 +54,7 @@ export const CollapseScene: React.FC = () => {
           <Key stroke={INK_SOFT} fill={PAPER} /> <span>computed</span>
           <span style={{ width: 16 }} />
           <Key stroke={MEMO} dashed fill={`color-mix(in srgb, ${MEMO} 14%, ${PAPER})`} />
-          <span style={{ color: MEMO_INK, fontWeight: 650 }}>read from the table</span>
+          <span style={{ color: MEMO_INK, fontWeight: 500 }}>read from the table</span>
         </span>
       </Note>
 

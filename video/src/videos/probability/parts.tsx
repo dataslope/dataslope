@@ -55,7 +55,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -337,7 +337,7 @@ export const Coin: React.FC<{
         alignItems: "center",
         justifyContent: "center",
         ...note(Math.round(r * 0.95), heads ? PAPER : INK),
-        fontWeight: 600,
+        fontWeight: 500,
         lineHeight: 1,
       }}
     >
@@ -482,7 +482,7 @@ export const PaintedDoor: React.FC<{
 export const Tag: React.FC<{ size?: number; color?: string; weight?: number; children: React.ReactNode }> = ({
   size = 22,
   color = INK,
-  weight = 600,
+  weight = 500,
   children,
 }) => <span style={{ ...note(size, color), fontWeight: weight, whiteSpace: "nowrap" }}>{children}</span>;
 

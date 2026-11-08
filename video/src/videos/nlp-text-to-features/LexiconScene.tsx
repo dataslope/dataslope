@@ -125,7 +125,7 @@ export const LexiconScene: React.FC = () => {
         />
       ))}
       <Note at={neverAt + 8} x={VERDICT_X} y={y(REVIEW_Y[wrongIdx]) + 52}>
-        <span style={{ ...note(22, LOST_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: wrongMark }}>wrong</span>
+        <span style={{ ...note(22, LOST_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: wrongMark }}>wrong</span>
       </Note>
 
       <Note at={countingAt - 2} x={FIG15_X} y={y(BLIND_Y)}>
@@ -142,7 +142,7 @@ const SignBadge: React.FC<{ at: number; color: string; children: React.ReactNode
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
   return (
-    <span style={{ ...note(22, color), ...TABULAR, fontWeight: 600, opacity: p, transform: `translateY(${(1 - p) * 6}px)`, display: "inline-block" }}>
+    <span style={{ ...note(22, color), ...TABULAR, fontWeight: 500, opacity: p, transform: `translateY(${(1 - p) * 6}px)`, display: "inline-block" }}>
       {children}
     </span>
   );
@@ -185,21 +185,21 @@ const ReviewRow: React.FC<{
               }
               below={
                 scored ? (
-                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 600, opacity: ease(frame, at + k * 2 + 8, 10) }}>
+                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, at + k * 2 + 8, 10) }}>
                     {signed(s.polarity)}
                   </span>
                 ) : isNot ? (
-                  <span style={{ ...note(21, LOST_INK), fontWeight: 600, opacity: ease(frame, notAt + 2, 10) }}>never read</span>
+                  <span style={{ ...note(21, LOST_INK), fontWeight: 500, opacity: ease(frame, notAt + 2, 10) }}>never read</span>
                 ) : null
               }
             />
           );
         })}
       </TokenRow>
-      <div style={{ position: "absolute", left: SUM_X, top: top + 4, ...note(30, INK), ...TABULAR, fontWeight: 600, opacity: sum }}>
+      <div style={{ position: "absolute", left: SUM_X, top: top + 4, ...note(30, INK), ...TABULAR, fontWeight: 500, opacity: sum }}>
         {signed(trace.score)}
       </div>
-      <div style={{ position: "absolute", left: VERDICT_X, top: top + 4, ...note(30, inkFor(trace.label)), fontWeight: 650, opacity: v }}>
+      <div style={{ position: "absolute", left: VERDICT_X, top: top + 4, ...note(30, inkFor(trace.label)), fontWeight: 500, opacity: v }}>
         {struck !== undefined ? <Strike at={struck}>{trace.label}</Strike> : trace.label}
       </div>
     </>

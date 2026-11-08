@@ -130,7 +130,7 @@ export const HookScene: React.FC = () => {
         {chips.map((c, i) => (
           <React.Fragment key={i}>
             <Note at={c.at} x={chipX} y={c.y - 18} out={hookOut}>
-              <span style={{ ...note(27, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{c.text}</span>
+              <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.text}</span>
             </Note>
             <Arrow from={[arrowFromX, c.y]} to={[HOOK_X - 22, top + fnH * (0.34 + i * 0.16)]} at={c.at + 4} out={hookOut} />
           </React.Fragment>

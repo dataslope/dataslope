@@ -105,7 +105,7 @@ export const CompressScene: React.FC = () => {
 
   const name = (top: number, at: number, col: string, sub: React.ReactNode) => (
     <div style={{ position: "absolute", left: X0, top: top - 4, width: BAR_X - X0 - 20, opacity: ease(frame, at, 12) }}>
-      <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>{col}</div>
+      <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{col}</div>
       <div style={{ ...note(20, INK_SOFT), marginTop: 2 }}>{sub}</div>
     </div>
   );
@@ -193,7 +193,7 @@ export const CompressScene: React.FC = () => {
           Parquet&apos;s encodings: dictionary, run-length, delta, bit-packing.
           <span style={{ opacity: ease(frame, rowAt, 10) }}> A row file interleaves every field, which defeats them.</span>
         </div>
-        <div style={{ position: "absolute", left: X0, top: ROW_Y + h(34), ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, fasterAt - 4, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: ROW_Y + h(34), ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, fasterAt - 4, 12) }}>
           Fewer bytes to read: faster scans, not just cheaper storage.
         </div>
 
@@ -208,7 +208,7 @@ export const CompressScene: React.FC = () => {
         {bar(C, FILES.zstd, zstdAt - 4, <><QCode>zstd</QCode> (Zstandard)</>, { tint: COLUMN_TINT.units, sizeAt: zstdAt })}
         {bar(C + h(STEP), FILES.parquet, snappyAt - 4, <><QCode>snappy</QCode>, the default</>, { tint: COLUMN_TINT.category, sizeAt: snappyAt })}
         <Note at={slowerAt} x={BAR_X + w(FILES.zstd) + 380} y={C + (h(BAR_H) - 30) / 2}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>but slower to decompress</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>but slower to decompress</span>
         </Note>
         <Note at={slowLinkAt} x={X0} y={C + h(STEP) * 2 + h(14)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>

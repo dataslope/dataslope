@@ -106,7 +106,7 @@ export const PromptScene: React.FC = () => {
 
         {/* The four ingredients, a color each. */}
         <div style={{ position: "absolute", left: X0, top: y(262), display: "flex", alignItems: "center", gap: 14, fontSize: 24 }}>
-          <span style={{ ...note(24, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, ticketAt - 2, 12) }}>
+          <span style={{ ...note(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, ticketAt - 2, 12) }}>
             What a good ticket for a teammate has:
           </span>
           {chips.map((c) => {
@@ -119,7 +119,7 @@ export const PromptScene: React.FC = () => {
                   borderRadius: 8,
                   background: ingredientBand(c.role),
                   ...note(24, INGREDIENT_INK[c.role]),
-                  fontWeight: 600,
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                   opacity: p,
                   transform: `translateY(${(1 - p) * 10}px)`,
@@ -133,7 +133,7 @@ export const PromptScene: React.FC = () => {
 
         {/* Weak and better, side by side. */}
         <Ink at={weakAt - 2} dur={12} style={{ left: X0, top: y(LABEL_Y) }}>
-          <span style={{ ...label(23, ACCENT_INK), fontWeight: 750 }}>Weak</span>
+          <span style={{ ...label(23, ACCENT_INK), fontWeight: 500 }}>Weak</span>
         </Ink>
         <PromptListing lines={WEAK} x={X0} top={listTop} width={LEFT_W} size={SIZE} at={weakAt} />
         <Note at={wishAt} x={X0} y={listTop + 104}>
@@ -143,7 +143,7 @@ export const PromptScene: React.FC = () => {
         </Note>
         <ColumnRule x={(X0 + LEFT_W + BETTER_X) / 2} top={y(LABEL_Y)} height={y(744) + 100 - y(LABEL_Y)} at={betterAt} />
         <Ink at={betterAt - 2} dur={12} style={{ left: BETTER_X, top: y(LABEL_Y) }}>
-          <span style={{ ...label(23, OK_INK), fontWeight: 750 }}>Better</span>
+          <span style={{ ...label(23, OK_INK), fontWeight: 500 }}>Better</span>
         </Ink>
         <PromptListing lines={BETTER} x={BETTER_X} top={listTop} width={1140} size={SIZE} at={betterAt} marks={marks} />
 
@@ -163,7 +163,7 @@ export const PromptScene: React.FC = () => {
           </div>
         </Note>
         <Note at={nameAt - 2} x={X0} y={y(650)} width={LEFT_W}>
-          <div style={{ ...note(25, INK), fontWeight: 600, lineHeight: 1.35 }}>
+          <div style={{ ...note(25, INK), fontWeight: 500, lineHeight: 1.35 }}>
             Name the answer,
             <br />
             not just the edge.

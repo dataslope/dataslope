@@ -84,7 +84,7 @@ export const StopScene: React.FC = () => {
       {panels.map((p, k) => (
         <React.Fragment key={p.title}>
           <Ink at={p.titleAt} dur={14} style={{ left: BAR_X(k), top: y(340), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(24, INK), fontWeight: 600 }}>{p.title}</span>
+            <span style={{ ...label(24, INK), fontWeight: 500 }}>{p.title}</span>
           </Ink>
           {p.rows.map(([w, c], i) => {
             const at = p.ats[i] - 2;

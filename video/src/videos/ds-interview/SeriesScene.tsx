@@ -107,7 +107,7 @@ export const SeriesScene: React.FC = () => {
                 }}
               >
                 <div style={{ ...label(19, BLUE_INK), ...TABULAR }}>Part {p.n}</div>
-                <div style={{ ...note(24, INK), fontWeight: 650, marginTop: 4, lineHeight: 1.12, whiteSpace: "nowrap" }}>
+                <div style={{ ...note(24, INK), fontWeight: 500, marginTop: 4, lineHeight: 1.12, whiteSpace: "nowrap" }}>
                   {mark ? (
                     <Mark at={mark.at} out={mark.out}>
                       {p.title}
@@ -181,7 +181,7 @@ export const SeriesScene: React.FC = () => {
             opacity: ease(frame, bankAt - 2, 10) * (1 - ease(frame, nextAt - 16, 10)),
           }}
         >
-          A bank of <span style={{ fontWeight: 650 }}>{BANK} multiple-choice questions</span>, for the whole track
+          A bank of <span style={{ fontWeight: 500 }}>{BANK} multiple-choice questions</span>, for the whole track
         </div>
 
         {/* Its rule clears the tiles by about 40px, and the practice lines have

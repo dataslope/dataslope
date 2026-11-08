@@ -83,7 +83,7 @@ export const OrbiterScene: React.FC = () => {
       >
         <div style={label(21, INK_SOFT)}>{who}</div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(30, INK), fontWeight: 650 }}>
+          <span style={{ ...note(30, INK), fontWeight: 500 }}>
             <Mark at={wordAt}>{unit}</Mark>
           </span>
           <span style={{ fontFamily: MONO, fontSize: 28, color: INK_SOFT }}>{sym}</span>
@@ -164,7 +164,7 @@ export const OrbiterScene: React.FC = () => {
               }}
             >
               <span style={{ ...label(24, INK_SOFT) }}>unit</span>
-              <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>none</span>
+              <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>none</span>
             </div>
           </Note>
           {/* ...and what a column would have said in its place: the unit, in its name. */}
@@ -183,7 +183,7 @@ export const OrbiterScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={{ fontFamily: MONO, fontSize: 22, color: INK, fontWeight: 600 }}>
+              <span style={{ fontFamily: MONO, fontSize: 22, color: INK, fontWeight: 500 }}>
                 {COLUMN.name}
                 <Mark at={unitAt}>{COLUMN.unit}</Mark>
               </span>
@@ -192,7 +192,7 @@ export const OrbiterScene: React.FC = () => {
           </Note>
           <Note at={fourAt - 4} x={X0} y={bTop + h(96) + 26}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              1 lbf·s = <span style={{ fontWeight: 600, color: ACCENT_INK }}>{fmt(LBF_S)}</span> N·s, so every value read about{" "}
+              1 lbf·s = <span style={{ fontWeight: 500, color: ACCENT_INK }}>{fmt(LBF_S)}</span> N·s, so every value read about{" "}
               {fmt(LBF_S)} times too small
             </span>
           </Note>

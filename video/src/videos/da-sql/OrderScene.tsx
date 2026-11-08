@@ -134,7 +134,7 @@ export const OrderScene: React.FC = () => {
         {STEPS.map((s, i) => (
           <Ink key={s.clause} at={stepAt[i] - 4} dur={12} style={{ left: STEP_X, top: rowY(i), height: h(44), display: "flex", alignItems: "center", gap: 16 }}>
             <StepBadge n={i + 1} />
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
+            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
               {s.clause}
             </span>
           </Ink>
@@ -142,7 +142,7 @@ export const OrderScene: React.FC = () => {
 
         {/* ── The logical order, not the engine's plan ── */}
         <Note at={logicalAt - 2} x={STEP_X} y={rowY(STEPS.length) + h(10)}>
-          <div style={{ ...note(24, INK), whiteSpace: "nowrap", fontWeight: 650 }}>That&apos;s the logical order.</div>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap", fontWeight: 500 }}>That&apos;s the logical order.</div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, engineAt - 2, 10) }}>
             The engine may plan the work differently, <Mark at={matchAt}>but the answer must match</Mark>.
           </div>
@@ -221,7 +221,7 @@ export const OrderScene: React.FC = () => {
           color={ACCENT}
         />
         <Note at={aliasAt + 12} x={arrowX + 90} y={rowY(2) + h(14)}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", fontWeight: 650 }}>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", fontWeight: 500 }}>
             <Mono>WHERE</Mono> can&apos;t use it
           </span>
         </Note>
@@ -236,7 +236,7 @@ export const OrderScene: React.FC = () => {
           color={OK}
         />
         <Note at={canAt + 10} x={arrowX + 60} y={rowY(5) + h(18)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap", fontWeight: 650 }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", fontWeight: 500 }}>
             <Mono>ORDER BY</Mono> can
           </span>
         </Note>
@@ -290,7 +290,7 @@ const Caption: React.FC<{ at: number; x: number; top: number; children: React.Re
 /** A count beside a row of the funnel, inked on its word. */
 const Count: React.FC<{ at: number; x: number; top: number; children: React.ReactNode }> = ({ at, x, top, children }) => (
   <Ink at={at} dur={10} style={{ left: x, top, whiteSpace: "nowrap" }}>
-    <span style={{ ...note(24, INK), fontWeight: 650 }}>{children}</span>
+    <span style={{ ...note(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 

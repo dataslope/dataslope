@@ -88,7 +88,7 @@ export const GateScene: React.FC = () => {
           return (
             <React.Fragment key={r.sql}>
               <Ink at={kinds[i].at - 4} dur={14} style={{ left: X0, top: blockY(i), whiteSpace: "nowrap" }}>
-                <span style={{ ...label(22, INK), fontWeight: 600 }}>{kinds[i].label}</span>
+                <span style={{ ...label(22, INK), fontWeight: 500 }}>{kinds[i].label}</span>
               </Ink>
               {/* The rule it broke, in the diagram's own marks, as Postgres names it. */}
               <Note at={nameAt[i] - 2} x={X0 + BOX_W} y={blockY(i) - 2} align="right">

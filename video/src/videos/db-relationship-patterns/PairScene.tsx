@@ -121,7 +121,7 @@ export const PairScene: React.FC = () => {
           </Svg>
         ) : null}
         <Ink at={pkAt} dur={14} style={{ left: mid, top: by - 44, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, KEY_INK), fontWeight: 600, display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...label(22, KEY_INK), fontWeight: 500, display: "inline-block", transform: "translateX(-50%)" }}>
             primary key
           </span>
         </Ink>
@@ -156,7 +156,7 @@ export const PairScene: React.FC = () => {
           bands={[{ row: linus, at: rowAt + 4, color: MARK_OK }]}
         />
         <Ink at={identityAt} dur={14} style={{ left: g.x, top: g.rowTop(linus + 2) + 22, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, frame >= rowAt ? OK_INK : INK), fontWeight: 600 }}>
+          <span style={{ ...label(22, frame >= rowAt ? OK_INK : INK), fontWeight: 500 }}>
             <span style={TABULAR}>{count}</span> rows in all
           </span>
         </Ink>
@@ -192,7 +192,7 @@ export const PairScene: React.FC = () => {
           detailMark={existsAt}
         />
         <Ink at={noAt + 10} dur={12} style={{ left: LIST_X, top: listTop + listH + 220, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 600 }}>the second time: still {JT.againCount} rows</span>
+          <span style={{ ...label(22, ACCENT_INK), fontWeight: 500 }}>the second time: still {JT.againCount} rows</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

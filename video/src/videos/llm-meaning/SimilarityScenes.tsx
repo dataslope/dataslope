@@ -75,7 +75,7 @@ const Reading: React.FC<{ x: number; y: number; at: number; valueAt: number; nam
   return (
     <Fade at={at} style={{ left: x, top: y, display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
       <span style={{ ...label(24, INK_SOFT), width: 190 }}>{name}</span>
-      <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 40, color, opacity: ease(frame, valueAt, 10), ...TABULAR }}>{value}</span>
+      <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 40, color, opacity: ease(frame, valueAt, 10), ...TABULAR }}>{value}</span>
     </Fade>
   );
 };
@@ -184,7 +184,7 @@ export const CosineScene: React.FC = () => {
           top: (short[1] + long[1]) / 2 + 22,
           opacity: ease(frame, sevenAt - 2, 10) * (1 - rulerFade * 0.3),
           ...note(26, INK),
-          fontWeight: 650,
+          fontWeight: 500,
           whiteSpace: "nowrap",
           ...halo,
           ...TABULAR,
@@ -231,7 +231,7 @@ export const CosineScene: React.FC = () => {
         </span>
       </Note>
       <Note at={matchAt - 2} x={1390} y={y(600) + 10}>
-        <span style={{ ...note(26, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a perfect match</span>
+        <span style={{ ...note(26, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a perfect match</span>
       </Note>
 
       {/* ── Fig. 7: the cosine scale ── */}
@@ -241,7 +241,7 @@ export const CosineScene: React.FC = () => {
         {[-1, 0, 1].map((v) => (
           <g key={v}>
             <line x1={sxOf(v)} x2={sxOf(v)} y1={SY - 8} y2={SY + 8} stroke={INK} strokeWidth={1.6} />
-            <text x={sxOf(v)} y={SY + 38} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 22, fontWeight: 600, fill: INK_SOFT, ...TABULAR }}>
+            <text x={sxOf(v)} y={SY + 38} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 22, fontWeight: 500, fill: INK_SOFT, ...TABULAR }}>
               {num(v, 0)}
             </text>
           </g>
@@ -269,7 +269,7 @@ export const CosineScene: React.FC = () => {
                 transform: `translateX(-50%) translateY(${(1 - p) * 8}px)`,
                 opacity: p,
                 ...note(22, POINT_INK),
-                fontWeight: 650,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -376,7 +376,7 @@ export const SearchScene: React.FC = () => {
                 }}
               />
             ) : null}
-            <span style={{ position: "absolute", left: DOC_X, top: 14, ...note(26, INK), fontWeight: isTop && hi > 0.5 ? 650 : 500, whiteSpace: "nowrap" }}>
+            <span style={{ position: "absolute", left: DOC_X, top: 14, ...note(26, INK), fontWeight: isTop && hi > 0.5 ? 500 : 500, whiteSpace: "nowrap" }}>
               {d.text}
             </span>
             {d.vec.map((v, j) => (
@@ -388,7 +388,7 @@ export const SearchScene: React.FC = () => {
                   top: 14,
                   transform: "translateX(-50%)",
                   fontFamily: MONO,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   fontSize: 25,
                   color: v === 0 ? FAINT : INK,
                   opacity: ease(frame, themesAt - 2 + j * 4, 10),
@@ -404,7 +404,7 @@ export const SearchScene: React.FC = () => {
                 top: 12,
                 transform: "translateX(-50%)",
                 fontFamily: MONO,
-                fontWeight: 600,
+                fontWeight: 500,
                 fontSize: 27,
                 color: isTop ? POINT_INK : INK,
                 opacity: ease(frame, topAt - 2 + rank(d.text) * 3, 10),
@@ -432,7 +432,7 @@ export const SearchScene: React.FC = () => {
               top: 10,
               transform: "translateX(-50%)",
               fontFamily: MONO,
-              fontWeight: 600,
+              fontWeight: 500,
               fontSize: 25,
               color: v === 0 ? FAINT : POINT_INK,
               opacity: ease(frame, askAt + 6 + j * 3, 10),
@@ -458,7 +458,7 @@ export const SearchScene: React.FC = () => {
         />
       </Svg>
       <Note at={wordAt - 4} x={1640} y={top0 + 10}>
-        <div style={{ ...note(24, POINT_INK), fontWeight: 650, width: 220, whiteSpace: "normal" }}>No word in common with the query</div>
+        <div style={{ ...note(24, POINT_INK), fontWeight: 500, width: 220, whiteSpace: "normal" }}>No word in common with the query</div>
       </Note>
     </AbsoluteFill>
   );
@@ -566,7 +566,7 @@ export const BlindScene: React.FC = () => {
       {/* The second lands from below as the line right under the first, flush with it. */}
       <Fade at={notAt - 8} style={{ left: 0, top: 0 }}>
         <Sentence style={{ left: lerp(X0 + 40, X0, land), top: lerp(cardsTop + SENTENCE_DY + 190, cardsTop + SENTENCE_DY + LANDED, land) }}>
-          The drug is <span style={{ color: POINT_INK, fontWeight: 650, textDecoration: `underline 3px ${POINT}`, textUnderlineOffset: 6 }}>not</span>{" "}
+          The drug is <span style={{ color: POINT_INK, fontWeight: 500, textDecoration: `underline 3px ${POINT}`, textUnderlineOffset: 6 }}>not</span>{" "}
           effective.
         </Sentence>
       </Fade>
@@ -596,13 +596,13 @@ export const BlindScene: React.FC = () => {
         <line x1={X0} x2={X0 + (1800 - X0) * ease(frame, problemAt - 4, 22)} y1={TY - 40} y2={TY - 40} stroke={INK_SOFT} strokeWidth={1.6} />
       </Svg>
       <div style={{ position: "absolute", left: 0, top: TY, width: 1920, display: "flex", justifyContent: "center", alignItems: "center", gap: 16 }}>
-        <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 600, color: INK_SOFT, opacity: around * 0.85, whiteSpace: "pre" }}>
+        <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 500, color: INK_SOFT, opacity: around * 0.85, whiteSpace: "pre" }}>
           The trophy didn&apos;t fit in the suitcase because
         </span>
         <span style={{ opacity: ease(frame, nothingAt - 4, 12), transform: `scale(${1 + 0.08 * pulse(frame, nothingAt, 26)})` }}>
           <TokenChip text="it" size={34} border={POINT} color={POINT_INK} />
         </span>
-        <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 600, color: INK_SOFT, opacity: around * 0.85, whiteSpace: "pre" }}>
+        <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 500, color: INK_SOFT, opacity: around * 0.85, whiteSpace: "pre" }}>
           was too big.
         </span>
       </div>

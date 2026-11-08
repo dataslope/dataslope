@@ -228,10 +228,10 @@ export const CastScene: React.FC = () => {
           ) : null}
         </Svg>
         <Centered x={soloMeanX} y={soloBox.top - h(30) - 34} opacity={soloMarks}>
-          <span style={{ ...note(23, INK), fontWeight: 650 }}>a mean</span>
+          <span style={{ ...note(23, INK), fontWeight: 500 }}>a mean</span>
         </Centered>
         <Centered x={soloMeanX} y={soloBox.top + soloBox.h + h(52)} opacity={soloMarks * ease(frame, varianceAt - 4, 12)}>
-          <span style={{ ...note(23, INK), fontWeight: 650 }}>a variance: how widely it spreads</span>
+          <span style={{ ...note(23, INK), fontWeight: 500 }}>a variance: how widely it spreads</span>
         </Centered>
 
         {/* The row: counts, then measurements. */}
@@ -328,7 +328,7 @@ export const CastScene: React.FC = () => {
           ].map((b) => {
             const shown = 1 - ease(frame, bernoulliOut, 12);
             const top = bBase - bP[b.i] * bUnit - 38;
-            const style = b.word === "yes" ? askNote(24) : { ...note(24, INK), fontWeight: 650 };
+            const style = b.word === "yes" ? askNote(24) : { ...note(24, INK), fontWeight: 500 };
             return (
               <React.Fragment key={b.word}>
                 <Centered x={b.x} y={bBase + 12} opacity={ease(frame, startAt + 6, 12) * shown}>
@@ -403,7 +403,7 @@ export const CastScene: React.FC = () => {
         />
         <VRule x={sixX} bottom={base} top={base - h(TALL + 34)} at={sixAt - 4} opacity={1 - dimBinomial * 0.5} />
         <Note at={sixAt} x={sixX + 14} y={base - h(TALL + 40)} dim={tenAt}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{BINOMIAL.mode}, the likeliest</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{BINOMIAL.mode}, the likeliest</span>
         </Note>
         <Bracket x0={tailX0} x1={tailX1} y={tailTop} at={tenAt + 2} color={ASK} />
         <Note at={tenAt + 4} x={(tailX0 + tailX1) / 2 - 120} y={tailTop - h(56)}>

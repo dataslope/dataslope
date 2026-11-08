@@ -204,7 +204,7 @@ export const FreshScene: React.FC = () => {
           lesson's "a cost decision as well as an accuracy one". */}
       <Note at={accuracyAt - 2} x={COLS[0]} y={long.base + 40} width={360}>
         <span style={{ display: "block", ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the bigger reason left:</span>
-        <span style={{ display: "block", ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>accuracy</span>
+        <span style={{ display: "block", ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>accuracy</span>
       </Note>
 
       {/* The takeaway. */}

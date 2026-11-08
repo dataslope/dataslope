@@ -152,7 +152,7 @@ export const LawScene: React.FC = () => {
               </text>
             </g>
           ))}
-          <text x={CH.x1} y={y(CH.base) + 64} textAnchor="end" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 650, fill: INK_SOFT }}>
+          <text x={CH.x1} y={y(CH.base) + 64} textAnchor="end" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT }}>
             flips so far (log scale)
           </text>
           {[0, 0.25, 0.5, 0.75, 1].map((p) => (
@@ -210,7 +210,7 @@ export const LawScene: React.FC = () => {
       </Svg>
       <Pulse x={fx(4)} y={fy(FOUR)} at={quartersAt - 4} />
       <Note at={quartersAt} x={fx(4) + 16} y={fy(FOUR) - 46}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>4 flips: {pct(FOUR)}</span>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>4 flips: {pct(FOUR)}</span>
       </Note>
       {/* What the line has reached, read out as it is drawn. */}
       {drawn ? (
@@ -225,24 +225,24 @@ export const LawScene: React.FC = () => {
           }}
         >
           {/* One line, one size: the numbers stand out by weight and color. */}
-          after <span style={{ color: INK, fontWeight: 600, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span> flips:{" "}
-          <span style={{ color: DATA_INK, fontWeight: 600, ...TABULAR }}>{head ? pct(head[1]) : ""}</span>
+          after <span style={{ color: INK, fontWeight: 500, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span> flips:{" "}
+          <span style={{ color: DATA_INK, fontWeight: 500, ...TABULAR }}>{head ? pct(head[1]) : ""}</span>
         </div>
       ) : null}
       <Note at={fiveAt} x={CH.x1 + 12} y={fy(0.5) - 15}>
-        <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>true {pct(0.5)}</span>
+        <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>true {pct(0.5)}</span>
       </Note>
 
       {/* The early band's ends, said aloud. */}
       <VBracket x={fx(100) + 12} y0={fy(EARLY.hi)} y1={fy(EARLY.lo)} at={fortyAt} color={STAT} right />
       <Note at={fortyAt + 2} x={fx(100) + 34} y={fy(EARLY.lo) - 14}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>{Math.round(EARLY.lo * 100)}%</span>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{Math.round(EARLY.lo * 100)}%</span>
       </Note>
       <Note at={fiftySixAt - 2} x={fx(100) + 34} y={fy(EARLY.hi) - 14}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>{Math.round(EARLY.hi * 100)}%</span>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{Math.round(EARLY.hi * 100)}%</span>
       </Note>
       <Note at={pointAt} x={fx(1000)} y={fy(LATE.hi) - 74} from="up">
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           within {fmt(LATE_BOUND, 1)} points of {pct(0.5)}
         </span>
       </Note>
@@ -292,7 +292,7 @@ export const LawScene: React.FC = () => {
       })}
       <Leader points={[[landX, landY + LANDED.r + 8], [landX, fy(llnAt(STREAK[2])) - 12]]} at={paidAt + 14} dur={10} color={STAT} />
       <Note at={paidAt + 16} x={landX + 2 * LANDED.pitch + LANDED.r + 14} y={landY - 15}>
-        <span style={{ ...note(21, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           flips {STREAK[0]} to {STREAK_END}
         </span>
       </Note>
@@ -308,7 +308,7 @@ export const LawScene: React.FC = () => {
         <span style={{ ...note(22, INK), lineHeight: 1.35 }}>A streak is never paid back, only swamped.</span>
       </Note>
       <Note at={afterEnd - 6} x={fx(30)} y={y(CH.base) - h(60)}>
-        <span style={{ ...note(21, DATA), fontWeight: 650, whiteSpace: "nowrap" }}>everything after the streak</span>
+        <span style={{ ...note(21, DATA), fontWeight: 500, whiteSpace: "nowrap" }}>everything after the streak</span>
       </Note>
     </AbsoluteFill>
   );

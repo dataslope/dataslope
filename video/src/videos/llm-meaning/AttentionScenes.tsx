@@ -69,7 +69,7 @@ const Sentence: React.FC<{ s: string; marks: { word: string; at: number; color?:
     i = m.i + m.word.length;
   }
   parts.push(s.slice(i));
-  return <span style={{ fontFamily: MONO, fontSize: SIZE, fontWeight: 600, color: INK, whiteSpace: "pre" }}>{parts}</span>;
+  return <span style={{ fontFamily: MONO, fontSize: SIZE, fontWeight: 500, color: INK, whiteSpace: "pre" }}>{parts}</span>;
 };
 
 export const TrophyScene: React.FC = () => {
@@ -144,10 +144,10 @@ export const TrophyScene: React.FC = () => {
         color={POINT}
       />
       <Note at={theTrophyAt + 2} x={X0} y={R1 + 56}>
-        <span style={{ ...note(24, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>it: the trophy</span>
+        <span style={{ ...note(24, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>it: the trophy</span>
       </Note>
       <Note at={suitcaseAt + 2} x={X0} y={R2 + 56}>
-        <span style={{ ...note(24, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>it: the suitcase</span>
+        <span style={{ ...note(24, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>it: the suitcase</span>
       </Note>
       <Note at={aroundAt - 2} x={X0 + 300} y={R2 + 56}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Same token; the words around it decide.</span>
@@ -284,7 +284,7 @@ export const QkvScene: React.FC = () => {
 
 // ═══ Scene 9: one score worked through, and the blend it makes ═════════════
 
-const T_X = { tok: X0, key: 310, value: 500, score: 700, weight: 890 };
+const T_X = { tok: X0, key: 310, value: 500, score: 700, weight: 500 };
 const T_ROW = 78;
 
 /** A number that changes in place through `steps`, each inked on its frame
@@ -303,7 +303,7 @@ const Steps: React.FC<{ steps: readonly { at: number; value: number; digits: num
     <span
       style={{
         fontFamily: MONO,
-        fontWeight: 600,
+        fontWeight: 500,
         fontSize: size,
         color,
         opacity: p,
@@ -335,7 +335,7 @@ const WorkedScore: React.FC<{
   const step = (at: number) => ({ opacity: ease(frame, at, 10) });
   const named = ease(frame, nameAt, 12);
   return (
-    <div style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap", fontFamily: MONO, fontWeight: 600, fontSize: 26, color: INK, ...TABULAR }}>
+    <div style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap", fontFamily: MONO, fontWeight: 500, fontSize: 26, color: INK, ...TABULAR }}>
       <span style={{ ...label(26, INK_SOFT), fontFamily: undefined }}>{token}:</span>
       <span style={{ position: "relative", display: "inline-flex", gap: 14 }}>
         <span style={step(multiplyAt)}>
@@ -454,7 +454,7 @@ export const BlendScene: React.FC = () => {
       <FigLabel n="13" title="The lesson's real vectors, three tokens of two numbers" at={from} x={X0} y={y(FIG_Y)} />
       <Fade at={from + 2} style={{ left: X0, top: QY, display: "flex", alignItems: "center", gap: 20 }}>
         <span style={{ ...label(24, QUERY_INK) }}>
-          Query, from <span style={{ fontFamily: MONO, fontWeight: 600 }}>it</span>
+          Query, from <span style={{ fontFamily: MONO, fontWeight: 500 }}>it</span>
         </span>
         <span
           style={{
@@ -562,7 +562,7 @@ export const BlendScene: React.FC = () => {
       </Svg>
       <Fade at={oneAt - 2} style={{ left: T_X.weight - 134, top: rowTop(3) + 2, display: "flex", gap: 14, alignItems: "baseline" }}>
         <span style={{ ...label(26, INK_SOFT), width: 120, textAlign: "right" }}>Total</span>
-        <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 26, color: INK, ...TABULAR }}>
+        <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 26, color: INK, ...TABULAR }}>
           {A.weightSum.toFixed(3)}
         </span>
       </Fade>
@@ -599,9 +599,9 @@ export const BlendScene: React.FC = () => {
       <Note at={newAt - 2} x={X0} y={workY + 150}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <span style={{ ...label(24, POINT_INK) }}>
-            New vector for <span style={{ fontFamily: MONO, fontWeight: 600 }}>it</span>
+            New vector for <span style={{ fontFamily: MONO, fontWeight: 500 }}>it</span>
           </span>
-          <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 24, color: POINT_INK, ...TABULAR }}>
+          <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 24, color: POINT_INK, ...TABULAR }}>
             {(move < 0.5 ? A.output : B.output).map((v) => v.toFixed(3)).join(", ")}
           </span>
         </div>
@@ -681,7 +681,7 @@ export const BlendScene: React.FC = () => {
               ...halo,
             }}
           >
-            value of <span style={{ fontFamily: MONO, fontWeight: 600 }}>{t}</span>
+            value of <span style={{ fontFamily: MONO, fontWeight: 500 }}>{t}</span>
           </div>
         );
       })}
@@ -891,13 +891,13 @@ export const HeadsScene: React.FC = () => {
         </div>
       </Fade>
       <div style={{ position: "absolute", left: GX, top: GY - 52, opacity: ease(frame, tenAt - 2, 10) }}>
-        <span style={{ ...note(28, INK), fontWeight: 650, ...TABULAR }}>
+        <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR }}>
           {small.n} tokens: <Mark at={fiftyAt}>{small.scores} scores</Mark>
         </span>
       </div>
       <div style={{ position: "absolute", left: GX + big.n * CELL + 24, top: GY + big.n * CELL - 70, opacity: ease(frame, twentyAt - 2, 10) }}>
-        <div style={{ ...note(28, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{big.n} tokens:</div>
-        <div style={{ ...note(28, POINT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap", opacity: ease(frame, hundredAt - 2, 10) }}>
+        <div style={{ ...note(28, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{big.n} tokens:</div>
+        <div style={{ ...note(28, POINT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap", opacity: ease(frame, hundredAt - 2, 10) }}>
           <Mark at={hundredAt + 4}>{big.scores} scores</Mark>
         </div>
       </div>

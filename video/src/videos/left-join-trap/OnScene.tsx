@@ -56,7 +56,7 @@ export const OnScene: React.FC = () => {
     <AbsoluteFill>
       <div style={{ position: "absolute", left: 116, top: y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
         <Ink at={start - 14} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          Move it into <Mono weight={600}>ON</Mono>,
+          Move it into <Mono weight={500}>ON</Mono>,
         </Ink>
         <Ink
           at={backAt - 2}
@@ -110,7 +110,7 @@ export const OnScene: React.FC = () => {
         </Ink>
         <Ink at={backAt + 6} dur={14} style={{ position: "relative" }}>
           <span style={noteText(24)}>
-            {VANISHED.join(" and ")} match none, so their order columns are <Mono color={NULL_INK} weight={600}>NULL</Mono>.
+            {VANISHED.join(" and ")} match none, so their order columns are <Mono color={NULL_INK} weight={500}>NULL</Mono>.
           </span>
         </Ink>
       </div>

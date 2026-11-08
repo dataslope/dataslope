@@ -116,7 +116,7 @@ export const CodesScene: React.FC = () => {
           return (
             <React.Fragment key={c.cls}>
               <Note at={classAt[ci] - 2} x={x} y={colTop} out={out}>
-                <span style={{ fontFamily: MONO, fontSize: 44, fontWeight: 600, color: INK, whiteSpace: "nowrap" }}>
+                <span style={{ fontFamily: MONO, fontSize: 44, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>
                   <span style={{ position: "relative", display: "inline-block" }}>
                     <span style={{ position: "absolute", inset: "0.08em -0.04em 0 -0.04em", background: HIGHLIGHT, borderRadius: 4, opacity: ease(frame, Math.max(digitAt, classAt[ci] - 2), 10) * (1 - ease(frame, fourAt + 30, 12)) }} />
                     <span style={{ position: "relative" }}>{c.cls[0]}</span>
@@ -146,7 +146,7 @@ export const CodesScene: React.FC = () => {
 
         {/* Why it matters: a client branches on the code. */}
         <Note at={rightAt} x={X0} y={whyTop} out={leave}>
-          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>The client's code</span>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>The client's code</span>
         </Note>
         <Note at={inCodeAt} x={X0} y={whyTop + h(50)} out={leave}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 22 }}>

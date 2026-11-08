@@ -75,7 +75,7 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         at={c.w("r-gen", "A discriminative model")}
         top={c.y(360)}
         size={28}
-        weight={600}
+        weight={500}
       >
         Discriminative
       </Line>
@@ -97,7 +97,7 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         at={c.w("r-gen", "A generative model")}
         top={c.y(520)}
         size={28}
-        weight={600}
+        weight={500}
       >
         Generative
       </Line>
@@ -215,7 +215,7 @@ const Scale13: React.FC<{ c: Ctx }> = ({ c }) => {
                 top: top + c.h(6),
                 opacity: p,
                 ...note(23, b.color),
-                fontWeight: 600,
+                fontWeight: 500,
                 ...TABULAR,
               }}
             >
@@ -235,7 +235,7 @@ const Encode: React.FC<{ c: Ctx }> = ({ c }) => {
   const colW = 160;
   return (
     <>
-      <Line at={oneHotAt} top={c.y(352)} size={25} weight={650}>
+      <Line at={oneHotAt} top={c.y(352)} size={25} weight={500}>
         one-hot: a column of 0s and 1s per category
       </Line>
       {[
@@ -260,7 +260,7 @@ const Encode: React.FC<{ c: Ctx }> = ({ c }) => {
                 width: j ? colW : 110,
                 fontFamily: MONO,
                 fontSize: i === 0 ? 19 : 20,
-                fontWeight: i === 0 || cell === "1" ? 700 : 500,
+                fontWeight: i === 0 || cell === "1" ? 500 : 500,
                 color: cell === "1" ? BLUE_INK : i === 0 ? INK : INK_SOFT,
                 fontVariantLigatures: "none",
               }}
@@ -318,7 +318,7 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
           </span>
         </Note>
       ))}
-      <Line at={keepsAt} top={c.y(540)} weight={650}>
+      <Line at={keepsAt} top={c.y(540)} weight={500}>
         RFE (recursive feature elimination), asked for {RFE.names.length} of{" "}
         {RFE.of}, keeps:
       </Line>
@@ -333,7 +333,7 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
             style={{
               fontFamily: MONO,
               fontSize: 21,
-              fontWeight: 600,
+              fontWeight: 500,
               color: BLUE_INK,
               whiteSpace: "nowrap",
               fontVariantLigatures: "none",

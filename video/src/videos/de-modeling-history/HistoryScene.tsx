@@ -124,7 +124,7 @@ export const HistoryScene: React.FC = () => {
         {bands.map((b, i) => (
           <Note key={b.name} at={threeAt + i * 5} x={X0} y={top(i) + h(40)}>
             <div style={{ opacity: 0.4 + 0.6 * ease(frame, b.at - 2, 12) }}>
-              <div style={{ ...note(32, i === 1 && lit > 0.5 ? OK_INK : INK), fontWeight: 750, whiteSpace: "nowrap", marginLeft: i === 1 ? "-0.14em" : undefined }}>
+              <div style={{ ...note(32, i === 1 && lit > 0.5 ? OK_INK : INK), fontWeight: 500, whiteSpace: "nowrap", marginLeft: i === 1 ? "-0.14em" : undefined }}>
                 {i === 1 ? (
                   <Mark at={standardAt} color={MARK_OK}>
                     {b.name}
@@ -140,10 +140,10 @@ export const HistoryScene: React.FC = () => {
         {/* The verdict: Type 2 marked in the right answer's green as the
             standard, Type 1 kept for typos. */}
         <Note at={standardAt + 6} x={X0} y={top(1) + h(VERDICT)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the standard</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the standard</span>
         </Note>
         <Note at={typoAt - 2} x={X0} y={top(0) + h(VERDICT)}>
-          <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>right for a typo</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>right for a typo</span>
         </Note>
 
         {/* ── Type 1 ── */}
@@ -172,7 +172,7 @@ export const HistoryScene: React.FC = () => {
           ]}
         />
         <Note at={movedAt + 4} x={go1.right + 30} y={go1.rowTop(0) + h(4)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             placed in Boston,
             <br />
             now counted for Austin
@@ -239,7 +239,7 @@ export const HistoryScene: React.FC = () => {
             one step back
             <span style={{ opacity: ease(frame, goneAt, 10) }}>
               :{" "}
-              <span style={{ color: ACCENT_INK, fontWeight: 600 }}>Boston is gone</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 500 }}>Boston is gone</span>
             </span>
           </span>
         </Note>

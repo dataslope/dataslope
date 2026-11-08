@@ -41,7 +41,7 @@ const Timer: React.FC<{ x: number; y: number; at: number; size: number }> = ({ x
 };
 
 /** Words in a row, each inking in on its own cue, set apart by middle dots. */
-const WordRow: React.FC<{ x: number; y: number; size?: number; weight?: number; items: readonly { text: string; at: number; ink: string }[] }> = ({ x, y, size = 27, weight = 650, items }) => {
+const WordRow: React.FC<{ x: number; y: number; size?: number; weight?: number; items: readonly { text: string; at: number; ink: string }[] }> = ({ x, y, size = 27, weight = 500, items }) => {
   const frame = useCurrentFrame();
   return (
     <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "baseline", gap: "0.55em", fontSize: size }}>
@@ -142,14 +142,14 @@ export const EdgeScene: React.FC = () => {
           ])}
           at={dynAt}
         />
-        <Line x={X0} y={headY} at={useAt} size={29} weight={600} color={OK_INK}>
+        <Line x={X0} y={headY} at={useAt} size={29} weight={500} color={OK_INK}>
           At the edge: <span style={{ color: INK_SOFT, fontWeight: 500 }}>static or cacheable</span>
         </Line>
         <WordRow x={X0} y={itemY} size={27} items={kinds.map((k) => ({ ...k, ink: INK }))} />
-        <Line x={COL_B} y={headY} at={dynAt} size={29} weight={600} color={BLUE_INK}>
+        <Line x={COL_B} y={headY} at={dynAt} size={29} weight={500} color={BLUE_INK}>
           To the origin
         </Line>
-        <Line x={COL_B} y={itemY + 4} at={dynAt + 4} size={26} weight={600}>
+        <Line x={COL_B} y={itemY + 4} at={dynAt + 4} size={26} weight={500}>
           dynamic, user-specific responses
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, bypassAt, 10) }}> usually bypass it</span>
         </Line>
@@ -158,27 +158,27 @@ export const EdgeScene: React.FC = () => {
         </Line>
 
         {/* The short link's redirect: from the origin's side to the edge. */}
-        <Line x={redirX} y={redirY} at={popularAt + 4} size={26} weight={650} color={BLUE_INK}>
+        <Line x={redirX} y={redirY} at={popularAt + 4} size={26} weight={500} color={BLUE_INK}>
           a popular short link&apos;s redirect, the same for everyone
         </Line>
         {/* The timer at the line's own size, centred on it, 10px before it. */}
         <Timer x={X0 + 72 - 10 - TIMER_TEXT / 2} y={y(616) + (TIMER_TEXT * 1.3) / 2} size={TIMER_TEXT} at={shortAt} />
-        <Line x={X0 + 72} y={y(616)} at={shortAt + 4} size={TIMER_TEXT} weight={600} color={OK_INK}>
+        <Line x={X0 + 72} y={y(616)} at={shortAt + 4} size={TIMER_TEXT} weight={500} color={OK_INK}>
           so keep that time to live short
         </Line>
-        <Line x={COL_B} y={noteY} at={priceAt} size={25} weight={600}>
+        <Line x={COL_B} y={noteY} at={priceAt} size={25} weight={500}>
           The price
         </Line>
-        <Line x={COL_B} y={noteY + 48} at={countAt - 6} size={24} weight={600} color={ACCENT_INK} width={740}>
+        <Line x={COL_B} y={noteY + 48} at={countAt - 6} size={24} weight={500} color={ACCENT_INK} width={740}>
           a click the edge answers never reaches your servers, so they can&apos;t count it
         </Line>
-        <Line x={COL_B} y={noteY + 150} at={downAt} size={24} weight={600} color={ACCENT_INK} width={740}>
+        <Line x={COL_B} y={noteY + 150} at={downAt} size={24} weight={500} color={ACCENT_INK} width={740}>
           a link you take down keeps working there until its time to live runs out
         </Line>
 
         {/* The verdict. */}
         <div style={{ position: "absolute", left: X0, top: y(824), display: "flex", alignItems: "baseline", fontSize: 32, opacity: ease(frame, winAt, 14) }}>
-          <span style={{ ...label(32, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(32, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             A read-heavy product with users everywhere:{" "}
             <Mark at={cheapAt} color={HIGHLIGHT}>
               the cheapest large win there is

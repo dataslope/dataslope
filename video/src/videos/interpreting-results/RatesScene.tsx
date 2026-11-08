@@ -175,7 +175,7 @@ export const RatesScene: React.FC = () => {
                 {w > 0 ? <rect x={RX.x0} y={top} width={w} height={BAR_H} fill={i ? DATA : `color-mix(in srgb, ${DATA} 45%, ${PAPER})`} /> : null}
               </Svg>
               <Note at={(i ? fourAt : threeAt) + 4} x={RX.x0 + w + 14} y={top + 4}>
-                <span style={{ ...note(28, DATA_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(28, DATA_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                   {fmt(rates[i] * 100, 1)}%
                   {/* The count, near the rate's size: one line, one size. */}
                   <span style={{ ...note(26, INK_SOFT), fontWeight: 500, marginLeft: 12 }}>
@@ -202,14 +202,14 @@ export const RatesScene: React.FC = () => {
         </Svg>
         <Note at={fortyAt - 2} x={SAY_X} y={y(BAR_Y[0]) - 30}>
           <div style={label(21, INK_SOFT)}>relative</div>
-          <div style={{ ...note(28, INK), fontWeight: 600, marginTop: 6, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(28, INK), fontWeight: 500, marginTop: 6, whiteSpace: "nowrap" }}>
             <Marker at={biggerAt - 2}>+{Math.round(RATES.uplift * 100)}%</Marker>
             <span style={{ ...note(26, INK_SOFT), fontWeight: 500, marginLeft: 12 }}>{fmt(RATES.ratio, 1)} times the rate</span>
           </div>
         </Note>
         <Note at={pointsAt - 2} x={SAY_X} y={y(BAR_Y[1]) - 2}>
           <div style={label(21, INK_SOFT)}>absolute</div>
-          <div style={{ ...note(28, STAT_INK), fontWeight: 600, marginTop: 6, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(28, STAT_INK), fontWeight: 500, marginTop: 6, whiteSpace: "nowrap" }}>
             <Marker at={ppAt + 4}>+{fmt(RATES.difference * 100, 1)} points</Marker>
           </div>
         </Note>
@@ -277,13 +277,13 @@ export const RatesScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={dAt} x={sx(DX, LIFT)} y={ciY - HIST_TOP - 34} from="up">
-          <span style={{ ...note(24, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
             {pts(LIFT)} points
           </span>
         </Note>
         <Note at={plausiblyAt + 4} x={DX.x1 + 30} y={ciY - 70}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>plausible lifts</span>
-          <div style={{ ...note(21, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, sixAt, 10) }}>
+          <div style={{ ...note(21, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, sixAt, 10) }}>
             the middle 95%
           </div>
         </Note>
@@ -292,7 +292,7 @@ export const RatesScene: React.FC = () => {
           { v: HI, at: sixAt },
         ].map((e) => (
           <Note key={e.v} at={e.at} x={sx(DX, e.v)} y={ciY + 40} from="up">
-            <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", background: PAPER, padding: "0 6px" }}>
+            <span style={{ ...note(22, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", background: PAPER, padding: "0 6px" }}>
               {pts(e.v)}
             </span>
           </Note>
@@ -300,7 +300,7 @@ export const RatesScene: React.FC = () => {
         {/* No lift at all: outside the interval, which is what the p-value says. */}
         <Dashed x0={sx(DX, 0)} y0={ciY} x1={sx(DX, 0)} y1={ciY - HIST_TOP} at={allAt - 6} dur={12} color={INK} width={2.4} />
         <Note at={allAt - 2} x={sx(DX, 0)} y={ciY - HIST_TOP - 34} from="up">
-          <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>no lift</span>
+          <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>no lift</span>
         </Note>
         <Ring x={sx(DX, 0)} y={ciY - HIST_TOP / 2} at={allAt + 2} r0={20} r1={64} />
 
@@ -308,7 +308,7 @@ export const RatesScene: React.FC = () => {
         {trio.map((t, i) => (
           <Ink key={t.q} at={t.at - 4} dur={14} style={{ left: 160 + i * 560, top: y(TRIO_Y), whiteSpace: "nowrap" }}>
             <div style={label(22, INK_SOFT)}>{t.q}</div>
-            <div style={{ ...note(30, INK), ...TABULAR, fontWeight: 600, marginTop: 8 }}>
+            <div style={{ ...note(30, INK), ...TABULAR, fontWeight: 500, marginTop: 8 }}>
               {t.a}
             </div>
           </Ink>

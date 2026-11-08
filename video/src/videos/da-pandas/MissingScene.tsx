@@ -173,7 +173,7 @@ export const MissingScene: React.FC = () => {
           color={ACCENT}
         />
         <Note at={futureAt + 8} x={arrowX + 64} y={pg.rowMid(bfilled[0]) + h(10)}>
-          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap", fontWeight: 650 }}>from the future</span>
+          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap", fontWeight: 500 }}>from the future</span>
         </Note>
         <Note at={chartAt - 2} x={arrowX + 64} y={pg.rowTop(F.rows.length) - h(60)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>fine for a chart</span>

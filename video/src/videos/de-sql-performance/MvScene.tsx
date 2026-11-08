@@ -96,7 +96,7 @@ export const MvScene: React.FC = () => {
         </Note>
         <PlanBox lines={MV.dayPlan} x={X0} top={plansTop} width={780} size={PLAN} at={dashAt} out={plansOut} marks={[{ line: "Rows Removed", at: dashAt + 14, color: MARK_OK }]} />
         <Note at={lookupAt} x={X0} y={plansTop + planHeight(MV.dayPlan.length, PLAN) + h(16)} out={plansOut}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             reads <Num>{thousands(MV.dayRead)}</Num> rows
           </span>
         </Note>
@@ -105,7 +105,7 @@ export const MvScene: React.FC = () => {
         </Note>
         <PlanBox lines={MV.basePlan} x={BASE_X} top={plansTop} width={800} size={PLAN} at={insteadAt} out={plansOut} marks={[{ line: "Rows Removed", at: insteadAt + 14, color: MARK_RED }]} />
         <Note at={millionAt} x={BASE_X} y={plansTop + planHeight(MV.basePlan.length, PLAN) + h(16)} out={plansOut}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             reads <Num>{thousands(MV.baseRead)}</Num> rows
           </span>
         </Note>

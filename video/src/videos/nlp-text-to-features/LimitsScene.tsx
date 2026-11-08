@@ -93,7 +93,7 @@ export const LimitsScene: React.FC = () => {
       {rowLabel("Sarcasm", sarcasmAt - 2, ROW_Y.sarcasm)}
       <TraceRow trace={SARCASM} top={y(ROW_Y.sarcasm)} at={ohAt - 2} verdictAt={scoresAt} struck={winkAt} />
       <Note at={winkAt + 4} x={VERDICT_X} y={y(ROW_Y.sarcasm) + 48}>
-        <span style={{ ...note(21, LOST_INK), fontWeight: 600, whiteSpace: "nowrap" }}>it can’t see the wink</span>
+        <span style={{ ...note(21, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>it can’t see the wink</span>
       </Note>
 
       {/* Context: one word, two senses. Put "unpredictable" in the negative
@@ -113,7 +113,7 @@ export const LimitsScene: React.FC = () => {
         </span>
       </Note>
       <Note at={thrillerAt + 14} x={VERDICT_X} y={y(ROW_Y.context) + 48}>
-        <span style={{ ...note(21, LOST_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a good thriller</span>
+        <span style={{ ...note(21, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a good thriller</span>
       </Note>
 
       {/* Missing words: in neither list, so worth nothing. */}
@@ -194,7 +194,7 @@ const TraceRow: React.FC<{ trace: Trace; top: number; at: number; verdictAt: num
               }
               below={
                 polar ? (
-                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 600, opacity: ease(frame, toneAt + 2, 10) }}>
+                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, toneAt + 2, 10) }}>
                     {signed(s.polarity)}
                   </span>
                 ) : null
@@ -203,10 +203,10 @@ const TraceRow: React.FC<{ trace: Trace; top: number; at: number; verdictAt: num
           );
         })}
       </TokenRow>
-      <div style={{ position: "absolute", left: SUM_X, top: top + 2, ...note(30, INK), ...TABULAR, fontWeight: 600, opacity: ease(frame, verdictAt - 6, 10) }}>
+      <div style={{ position: "absolute", left: SUM_X, top: top + 2, ...note(30, INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, verdictAt - 6, 10) }}>
         {signed(trace.score)}
       </div>
-      <div style={{ position: "absolute", left: VERDICT_X, top: top + 2, ...note(30, inkFor(trace.label)), fontWeight: 650, opacity: ease(frame, verdictAt - 2, 10) }}>
+      <div style={{ position: "absolute", left: VERDICT_X, top: top + 2, ...note(30, inkFor(trace.label)), fontWeight: 500, opacity: ease(frame, verdictAt - 2, 10) }}>
         {struck !== undefined ? <Strike at={struck}>{trace.label}</Strike> : trace.label}
       </div>
     </>

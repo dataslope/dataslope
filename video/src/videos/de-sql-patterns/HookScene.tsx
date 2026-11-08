@@ -101,7 +101,7 @@ export const HookScene: React.FC = () => {
 
         <Ink at={loginsAt - 2} dur={12} style={{ left: X0, top: g.top - h(44), whiteSpace: "nowrap" }}>
           <span style={label(21, INK_SOFT)}>
-            User 1&rsquo;s logins, from the page&rsquo;s <span style={{ fontFamily: MONO, fontWeight: 600 }}>daily_logins</span>
+            User 1&rsquo;s logins, from the page&rsquo;s <span style={{ fontFamily: MONO, fontWeight: 500 }}>daily_logins</span>
           </span>
         </Ink>
         <DayStrip
@@ -189,7 +189,7 @@ export const HookScene: React.FC = () => {
                 justifyContent: "center",
                 fontFamily: SANS,
                 fontSize: 19,
-                fontWeight: 600,
+                fontWeight: 500,
                 ...TABULAR,
                 opacity: p * (1 - fade) * (worked ? 1 : 0.55 + 0.45 * tone),
                 transform: `scale(${p * (1 + 0.15 * pulse(frame, firstAt, 16) * (i === 0 ? 1 : 0))})`,

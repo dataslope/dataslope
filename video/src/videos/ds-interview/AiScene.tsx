@@ -57,7 +57,7 @@ const Panel: React.FC<{ i: number; at: number; title: string; children: React.Re
           transform: `translateY(${(1 - p) * 14}px)`,
         }}
       >
-        <div style={{ ...note(32, INK), fontWeight: 650, marginBottom: 16, whiteSpace: "nowrap" }}>{title}</div>
+        <div style={{ ...note(32, INK), fontWeight: 500, marginBottom: 16, whiteSpace: "nowrap" }}>{title}</div>
         {children}
       </div>
     </>
@@ -190,9 +190,9 @@ export const AiScene: React.FC = () => {
               opacity: ease(frame, checkAt + 6, 12),
             }}
           >
-            <span style={{ color: BLUE_INK, fontWeight: 600 }}>SELECT</span> …
+            <span style={{ color: BLUE_INK, fontWeight: 500 }}>SELECT</span> …
             <span style={{ display: "inline-block", width: 34 }} />
-            <span style={{ color: OK_INK, fontWeight: 600, opacity: checkP, display: "inline-block", transform: `scale(${0.6 + 0.4 * checkP})` }}>✓</span>
+            <span style={{ color: OK_INK, fontWeight: 500, opacity: checkP, display: "inline-block", transform: `scale(${0.6 + 0.4 * checkP})` }}>✓</span>
           </div>
         </Panel>
 

@@ -28,7 +28,7 @@ const find = (list: readonly string[], t: string) => {
 /** The call above a row, in the code face. */
 const Sub: React.FC<{ at: number; y: number; children: React.ReactNode }> = ({ at, y, children }) => (
   <Ink at={at} dur={14} style={{ left: X0, top: y, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none" }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>{children}</span>
   </Ink>
 );
 

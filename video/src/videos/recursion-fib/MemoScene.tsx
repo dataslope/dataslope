@@ -127,7 +127,7 @@ export const MemoScene: React.FC = () => {
                 justifyContent: "center",
                 fontFamily: MONO,
                 fontSize: 26,
-                fontWeight: 600,
+                fontWeight: 500,
                 color: shown === -1 ? INK_SOFT : MEMO_INK,
                 position: "relative",
               }}

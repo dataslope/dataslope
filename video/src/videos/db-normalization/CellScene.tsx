@@ -128,7 +128,7 @@ export const CellScene: React.FC = () => {
           marks={[{ line: 1, at: fiveAt }]}
         />
         <Note at={nobodyAt - 2} x={SEARCH_X} y={y(BODY_Y) + listH + 16}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>({LIST_SEARCH.rows} rows)</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>({LIST_SEARCH.rows} rows)</span>
         </Note>
         <Note at={buriedAt} x={SEARCH_X + 130} y={y(BODY_Y) + listH + 16}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>

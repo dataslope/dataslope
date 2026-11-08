@@ -171,7 +171,7 @@ export const FanoutScene: React.FC = () => {
           ])}
         />
         <Note at={sixAt + 12} x={MERGED_X} y={mg.rowTop(M.rows.length) + h(20)}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             {nAfter} rows, revenue {sumAfter}
           </span>
         </Note>
@@ -194,7 +194,7 @@ export const FanoutScene: React.FC = () => {
         {/* ── The fix: one row per customer, then merge ── */}
         <Listing lines={D.lines} x={X0} top={dTop} width={dW} size={SIZE} at={fixAt - 2} marks={[{ line: 0, at: keepAt + 4, out: gapsAt + 4, color: MARK_OK }]} />
         <Note at={thenAt} x={X0 + dW + 24} y={dTop + h(12)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             → then merge: {nFixed} rows, revenue {sumFixed}
           </span>
         </Note>

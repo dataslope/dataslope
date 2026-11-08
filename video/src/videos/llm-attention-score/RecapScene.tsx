@@ -151,7 +151,7 @@ export const RecapScene: React.FC = () => {
                   style={{
                     fontFamily: MONO,
                     fontSize: 34,
-                    fontWeight: 600,
+                    fontWeight: 500,
                     color: i === 3 || i === 4 ? POINT_INK : INK,
                     marginTop: 10,
                     whiteSpace: "nowrap",

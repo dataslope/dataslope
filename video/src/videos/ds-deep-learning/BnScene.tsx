@@ -123,7 +123,7 @@ export const BnScene: React.FC = () => {
             mean 0
           </Tagline>
           <Bracket x0={pos(1, -1)} x1={pos(1, 1)} y={y(LINES[1].y) + h(46)} at={zeroAt + 12} color={OK}>
-            <span style={{ ...label(19, OK_INK), fontWeight: 650 }}>± 1</span>
+            <span style={{ ...label(19, OK_INK), fontWeight: 500 }}>± 1</span>
           </Bracket>
 
           {/* The eight dots, dropping from line to line. */}
