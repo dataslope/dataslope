@@ -9,24 +9,28 @@ import { Drift, Headline, Kicker, Line, Mark, OK, OK_INK, reach, VRule, X0 } fro
 
 const COL_B = 980;
 
+/** The line the timer leads: its font size, which is the timer's size. */
+const TIMER_TEXT = 26;
+
 /**
- * A timer with a short time left: Lucide's `timer` icon (ISC licence) on its
- * 24-unit grid, its dial centred on (x, y), and inside it the time that is
- * left as a green wedge that shrinks from `at`, the icon's hand riding the
- * wedge's edge. The stroke is held at 3px (Lucide's absolute stroke width).
+ * A timer with a short time left: Lucide's `timer` icon (ISC licence), drawn
+ * at the size of the text beside it (`size`, its font size, so the icon is
+ * 1em) with its 24-unit box centred on (x, y), and Lucide's own stroke.
+ * Inside the dial the time left is a green wedge that shrinks from `at`, the
+ * icon's hand riding its edge.
  */
-const Timer: React.FC<{ x: number; y: number; at: number }> = ({ x, y, at }) => {
+const Timer: React.FC<{ x: number; y: number; at: number; size: number }> = ({ x, y, at, size }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
-  const s = 26 / 8; // Lucide's timer dial is r = 8 (centre 12,14); drawn 26px across the radius
+  const s = size / 24;
   const sweep = 0.18 * Math.PI * 2 * map(frame, [at, at + 40], [1, 0.55]);
-  const w = 6.2; // the wedge, inside the dial's stroke
+  const w = 6.2; // the wedge, inside the dial's stroke (the dial is r = 8 at 12,14)
   const ex = 12 + w * Math.sin(sweep);
   const ey = 14 - w * Math.cos(sweep);
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p }}>
-      <g transform={`translate(${x - 12 * s} ${y - 14 * s}) scale(${s})`} fill="none" stroke={OK} strokeWidth={3 / s} strokeLinecap="round" strokeLinejoin="round">
+      <g transform={`translate(${x - 12 * s} ${y - 12 * s}) scale(${s})`} fill="none" stroke={OK} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
         <circle cx={12} cy={14} r={8} fill={PAPER} />
         <path d={`M12,14 L12,${14 - w} A${w},${w} 0 0 1 ${ex},${ey} Z`} fill={OK} stroke="none" opacity={0.85} />
         <line x1={10} x2={14} y1={2} y2={2} />
@@ -157,8 +161,9 @@ export const EdgeScene: React.FC = () => {
         <Line x={redirX} y={redirY} at={popularAt + 4} size={26} weight={650} color={BLUE_INK}>
           a popular short link&apos;s redirect, the same for everyone
         </Line>
-        <Timer x={X0 + 26} y={y(616) + 18} at={shortAt} />
-        <Line x={X0 + 72} y={y(616)} at={shortAt + 4} size={26} weight={700} color={OK_INK}>
+        {/* The timer at the line's own size, centred on it, 10px before it. */}
+        <Timer x={X0 + 72 - 10 - TIMER_TEXT / 2} y={y(616) + (TIMER_TEXT * 1.3) / 2} size={TIMER_TEXT} at={shortAt} />
+        <Line x={X0 + 72} y={y(616)} at={shortAt + 4} size={TIMER_TEXT} weight={700} color={OK_INK}>
           so keep that time to live short
         </Line>
         <Line x={COL_B} y={noteY} at={priceAt} size={25} weight={700}>
