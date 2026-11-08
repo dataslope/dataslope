@@ -48,6 +48,18 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a small table lamp with a round cloth shade, its cord curling down to a plug with two thick round prongs, the plug held just in front of a round wall socket with two matching holes"
+    },
+    {
+      "id": "be-object-design-pillar",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one classical stone column standing upright on its own, seen straight on from the front: a wide square base block with a rounded moulding, a tall straight shaft carved with deep vertical flutes, and a plain rounded capital under a square top block, the whole column painted in very pale washes of warm cream yellow, with soft blue pooling in the flutes and down its shaded right side"
+    },
+    {
+      "id": "be-object-design-gauge",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "one chunky semicircular dial face seen straight on from the front, a wide half-disc resting on its flat bottom edge, with a thick rounded rim; just inside the rim a broad curved band split into three equal zones that sweep from green on the left, through yellow at the top, to red on the right; the inner half-disc below the band left completely empty, smooth and pale cream, with a single small round blue button at the exact middle of the flat bottom edge"
     }
   ]
 }

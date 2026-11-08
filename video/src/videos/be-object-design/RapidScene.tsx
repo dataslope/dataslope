@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { ACCOUNT, FACTORY, SINGLETON, TOTAL_AREA } from "./data";
-import { ACCENT_INK, ArtSpot, Box, Drift, Flow, Headline, Kicker, Line, Mark, Mark2, OK, OK_INK, pulse, Strike, Svg, VRule, X0 } from "./parts";
+import { ACCENT_INK, ArtSpot, artW, Box, Drift, Flow, Headline, Kicker, Line, Mark, Mark2, OK, OK_INK, pulse, Strike, Svg, VRule, X0 } from "./parts";
 
 const R_X = 820;
 const LIST_TOP = 330;
@@ -19,17 +19,33 @@ type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Lay
 
 // ── 9. The four pillars ──────────────────────────────────────────────────────
 
-const Pillar: React.FC<{ x: number; y: number; at: number; color: string }> = ({ x, y, at, color }) => {
-  const frame = useCurrentFrame();
-  const p = ease(frame, at, 12);
-  return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p }}>
-      <rect x={x - 4} y={y} width={44} height={9} rx={2} fill={color} />
-      <rect x={x + 4} y={y + 9} width={28} height={(52 - 18) * p} fill={`color-mix(in srgb, ${color} 45%, ${PAPER})`} stroke={color} strokeWidth={2} />
-      <rect x={x - 4} y={y + 43} width={44} height={9} rx={2} fill={color} />
-    </svg>
-  );
-};
+/** Every pillar is the one painted column (be-object-design-pillar),
+ *  glazed in its own hue: an SVG filter recolors the painting toward the
+ *  hue while keeping its washes' light and dark, then lays that over the
+ *  painting at GLAZE. The four filters are defined once, here. */
+const GLAZE = 0.85;
+const Glazes: React.FC<{ colors: readonly string[] }> = ({ colors }) => (
+  <svg width={0} height={0} style={{ position: "absolute" }}>
+    <defs>
+      {colors.map((color, i) => (
+        <filter key={i} id={`be-object-design-glaze-${i}`} colorInterpolationFilters="sRGB">
+          <feFlood style={{ floodColor: color }} result="hue" />
+          <feComposite in="hue" in2="SourceGraphic" operator="in" result="wash" />
+          <feBlend in="wash" in2="SourceGraphic" mode="color" result="tinted" />
+          <feComposite in="tinted" in2="SourceGraphic" operator="arithmetic" k2={GLAZE} k3={1 - GLAZE} />
+        </filter>
+      ))}
+    </defs>
+  </svg>
+);
+
+/** The rows: a word and its gloss beside a column PILLAR_H tall, centred on
+ *  the two lines, with clear air between one column and the next. */
+const PILLAR_TOP = 344;
+const PILLAR_PITCH = 128;
+const PILLAR_H = 100;
+/** The two lines' middle, under a row's top. */
+const TEXT_MID = 29;
 
 const Pillars: React.FC<{ c: Ctx }> = ({ c }) => {
   const rows = [
@@ -38,13 +54,15 @@ const Pillars: React.FC<{ c: Ctx }> = ({ c }) => {
     { at: c.w("r-pillars", "Polymorphism gives one call"), word: "Polymorphism", gloss: "one call, the right behavior for each type", color: ACCENT },
     { at: c.w("r-pillars", "Abstraction shows what an object does"), word: "Abstraction", gloss: "what an object does, not how", color: ds("yellow", 600) },
   ];
+  const pw = artW("pillar", PILLAR_H);
   return (
     <>
+      <Glazes colors={rows.map((r) => r.color)} />
       {rows.map((r, i) => {
-        const top = c.y(352 + i * 104);
+        const top = c.y(PILLAR_TOP + i * PILLAR_PITCH);
         return (
           <React.Fragment key={r.word}>
-            <Pillar x={R_X} y={top + 4} at={r.at - 4} color={r.color} />
+            <ArtSpot id="pillar" at={r.at - 4} left={R_X + 18 - pw / 2} top={top + TEXT_MID - PILLAR_H / 2} h={PILLAR_H} filter={`url(#be-object-design-glaze-${i})`} />
             <Line x={R_X + 90} y={top - 4} at={r.at} size={27} weight={700}>
               {r.word}
             </Line>
