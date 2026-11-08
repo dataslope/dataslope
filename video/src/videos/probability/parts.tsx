@@ -1,5 +1,5 @@
 import React from "react";
-import { useCurrentFrame, useVideoConfig } from "remotion";
+import { continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { arrowHead, type Pt } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
@@ -33,10 +33,6 @@ export const DATA_INK = BLUE_INK;
 export const STAT = ACCENT;
 export const STAT_INK = ACCENT_INK;
 export const SOFT = `color-mix(in srgb, ${INK_SOFT} 42%, transparent)`;
-export const FAINT = `color-mix(in srgb, ${INK_SOFT} 24%, ${PAPER})`;
-/** Part 4's doorway, the room behind a door that has swung open: dark, so an
- *  open door reads as open, with a white label on it. */
-export const ROOM = `color-mix(in srgb, ${INK} 60%, ${PAPER})`;
 /** Part 4's car, in the brand's "look here" yellow. */
 export const GOLD = ds("yellow", 500);
 export const GOLD_DEEP = ds("yellow", 700);
@@ -59,7 +55,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -78,8 +74,7 @@ export const Headline: React.FC<{
   firstAt: number;
   secondAt?: number;
   out?: number;
-  secondColor?: string;
-}> = ({ top, left = 92, size = 76, first, second, firstAt, secondAt, out, secondColor = STAT_INK }) => (
+}> = ({ top, left = 92, size = 76, first, second, firstAt, secondAt, out }) => (
   <div style={{ position: "absolute", left, top, display: "flex", gap: "0.26em", ...headline(size) }}>
     <Ink at={firstAt} dur={20} out={out} style={{ position: "relative", whiteSpace: "nowrap" }}>
       {first}
@@ -89,7 +84,7 @@ export const Headline: React.FC<{
         at={secondAt}
         dur={18}
         out={out}
-        style={{ position: "relative", ...headline(size, true), color: secondColor, whiteSpace: "nowrap" }}
+        style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
       >
         {second}
       </Ink>
@@ -342,7 +337,7 @@ export const Coin: React.FC<{
         alignItems: "center",
         justifyContent: "center",
         ...note(Math.round(r * 0.95), heads ? PAPER : INK),
-        fontWeight: 700,
+        fontWeight: 500,
         lineHeight: 1,
       }}
     >
@@ -394,11 +389,100 @@ export const Spot: React.FC<{
   );
 };
 
+/** A painting from illustrations.json, by its size and the box its drawn
+ *  content fills (x0, y0, x1, y1 in the WebP's own pixels). */
+type Art = { id: string; w: number; h: number; box: readonly [number, number, number, number] };
+
+/** Part 4's door, painted shut (probability-door) and swung open onto a dark
+ *  room (probability-door-open). Both are a yellow frame round a blue door,
+ *  and each is placed by its frame, so the one crossfades into the other. */
+const DOOR_SHUT: Art = { id: "probability-door", w: 672, h: 1008, box: [32, 21, 640, 987] };
+const DOOR_OPEN: Art = { id: "probability-door-open", w: 692, h: 1015, box: [32, 7, 660, 995] };
+/** Width over height of the door's frame, which sets a door's width. */
+export const DOOR_ASPECT = (DOOR_SHUT.box[2] - DOOR_SHUT.box[0]) / (DOOR_SHUT.box[3] - DOOR_SHUT.box[1]);
+/** The middle of the open doorway, as a fraction of the frame's width. */
+export const DOORWAY_X = 0.58;
+
+/** Places a painting so its drawn content fills the box given. */
+const fitArt = (art: Art, left: number, top: number, width: number, height: number): React.CSSProperties => {
+  const [x0, y0, x1, y1] = art.box;
+  const sx = width / (x1 - x0);
+  const sy = height / (y1 - y0);
+  return { position: "absolute", left: left - x0 * sx, top: top - y0 * sy, width: art.w * sx, height: art.h * sy, objectFit: "fill" };
+};
+
+/** Masks already loaded in this tab. Remotion waits for <Img>, never for a
+ *  CSS mask-image, so a tab whose first frame has a tint would otherwise
+ *  paint the wash before its mask arrived, as a plain rectangle. */
+const loadedMasks = new Set<string>();
+
+/** A wash cut to a painting's own shape (its alpha as a CSS mask), holding
+ *  the frame with delayRender until the mask image has loaded. */
+const MaskedTint: React.FC<{ url: string; style: React.CSSProperties; color: string; opacity: number }> = ({ url, style, color, opacity }) => {
+  const [handle] = React.useState(() => (loadedMasks.has(url) ? null : delayRender(`mask ${url}`)));
+  React.useEffect(() => {
+    if (handle === null) return;
+    const img = new Image();
+    const done = () => {
+      loadedMasks.add(url);
+      continueRender(handle);
+    };
+    img.onload = done;
+    img.onerror = done;
+    img.src = url;
+  }, [handle, url]);
+  const mask = `url(${url})`;
+  return (
+    <div
+      style={{
+        ...style,
+        background: color,
+        opacity,
+        WebkitMaskImage: mask,
+        WebkitMaskSize: "100% 100%",
+        maskImage: mask,
+        maskSize: "100% 100%",
+      }}
+    />
+  );
+};
+
+/**
+ * A painted door, its frame `height` tall and centered on `cx`. It swings
+ * open on `open` (0 to 1): the open painting fades in over the shut one,
+ * which goes once it is covered. `tint` washes the shut door in a color, cut
+ * to the painting's own shape, by `tintAmount`.
+ */
+export const PaintedDoor: React.FC<{
+  cx: number;
+  top: number;
+  height: number;
+  open?: number;
+  opacity?: number;
+  tint?: string;
+  tintAmount?: number;
+}> = ({ cx, top, height, open = 0, opacity = 1, tint, tintAmount = 0 }) => {
+  if (opacity <= 0) return null;
+  const width = height * DOOR_ASPECT;
+  const left = cx - width / 2;
+  const shut = fitArt(DOOR_SHUT, left, top, width, height);
+  const maskUrl = staticFile(`images/${VIDEO}/${DOOR_SHUT.id}.webp`);
+  return (
+    <>
+      {open < 1 ? <Illustration video={VIDEO} id={DOOR_SHUT.id} style={{ ...shut, opacity: opacity * Math.min(1, 2 * (1 - open)) }} /> : null}
+      {tint && tintAmount > 0 && open < 1 ? (
+        <MaskedTint url={maskUrl} style={shut} color={tint} opacity={opacity * tintAmount * (1 - open)} />
+      ) : null}
+      {open > 0 ? <Illustration video={VIDEO} id={DOOR_OPEN.id} style={{ ...fitArt(DOOR_OPEN, left, top, width, height), opacity: opacity * open }} /> : null}
+    </>
+  );
+};
+
 /** A label set in Inter, for a figure's annotations. */
 export const Tag: React.FC<{ size?: number; color?: string; weight?: number; children: React.ReactNode }> = ({
   size = 22,
   color = INK,
-  weight = 600,
+  weight = 500,
   children,
 }) => <span style={{ ...note(size, color), fontWeight: weight, whiteSpace: "nowrap" }}>{children}</span>;
 

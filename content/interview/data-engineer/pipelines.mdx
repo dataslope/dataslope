@@ -45,7 +45,7 @@ DO UPDATE SET
   status     = EXCLUDED.status,
   updated_at = EXCLUDED.updated_at;
 
--- DuckDB / partition-overwrite pattern: delete the partition, re-insert.
+-- Partition-overwrite pattern: delete the partition, re-insert.
 DELETE FROM events WHERE event_date = '2024-06-01';
 INSERT INTO events SELECT * FROM events_stage WHERE event_date = '2024-06-01';
 ```
@@ -60,10 +60,11 @@ partitions. Too-granular partitioning creates many tiny files (the
 
 The query below filters `events` on `event_date = '2024-06-01'` so only
 that day's rows are scanned, and the trailing comment shows how wrapping
-`event_date` in `YEAR(...)` would defeat pruning.
+`event_date` in a function such as `EXTRACT(YEAR FROM ...)` would defeat
+pruning.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE events (
   event_date  DATE,
   user_id     INTEGER,
@@ -91,7 +92,7 @@ ORDER BY user_id, event_type;
 
 -- Wrapping the column in a function defeats pruning on many engines
 -- (Postgres among them); a range on the raw column prunes on all of them.
--- WHERE YEAR(event_date) = 2024   -- avoid this pattern`}
+-- WHERE EXTRACT(YEAR FROM event_date) = 2024   -- avoid this pattern`}
 />
 
 ### What does an orchestrator (Airflow/Dagster) give you over cron?

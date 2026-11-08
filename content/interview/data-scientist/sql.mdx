@@ -1,11 +1,11 @@
 ---
 title: SQL for Data Science
-description: Data Scientist SQL interview questions, joins, aggregation, window functions, cohort retention, safe rate math, and sessionization, with runnable DuckDB queries and two graded challenges.
+description: Data Scientist SQL interview questions, joins, aggregation, window functions, cohort retention, safe rate math, and sessionization, with runnable Postgres queries and two graded challenges.
 ---
 
 Data Scientists write SQL to pull cohorts, compute rates, and reconstruct
 sessions long before any modeling happens. This page is a question bank
-with **runnable** queries that execute in your browser on DuckDB, plus two
+with **runnable** queries that execute in your browser on PostgreSQL, plus two
 graded challenges.
 
 <Figure
@@ -13,9 +13,9 @@ graded challenges.
   alt="A cohort grid of tiles on a platform, each row shorter than the one above it, forming a descending staircase of retained tiles"
 />
 
-> **Dialect:** the runnable blocks target **DuckDB**, which is close to
-> standard SQL. Most queries run unchanged on Postgres, BigQuery, or
-> Snowflake; engine-specific syntax is called out where it matters.
+> **Dialect:** the runnable blocks target **PostgreSQL**, which is close to
+> standard SQL. Most queries run unchanged on BigQuery, Snowflake, or
+> DuckDB; engine-specific syntax is called out where it matters.
 
 ## Q&A
 
@@ -37,7 +37,7 @@ aggregation. An aggregate condition like `COUNT(*) > 5` must go in `HAVING`
 because the aggregate does not exist yet when `WHERE` runs.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
   (1, 'North', 120.0), (2, 'South', 80.0), (3, 'North', 60.0),
   (4, 'East', 200.0), (5, 'South', 90.0), (6, 'North', 75.0),
@@ -65,7 +65,7 @@ preserved, which is what you want when you need per-row context like a rank
 or a running total.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE sales AS SELECT * FROM (VALUES
   ('North', 'Ava', 100), ('North', 'Ben', 140), ('North', 'Cy', 120),
   ('North', 'Dana', 175), ('North', 'Eli', 85), ('North', 'Fay', 210),
@@ -97,11 +97,11 @@ row per group."
 
 Wrap the denominator in `NULLIF(denominator, 0)`: it turns a zero into
 `NULL`, so the division yields `NULL` (a clean "undefined") instead of an
-error or `Infinity`. Multiply by `1.0` (or cast) to force floating-point
-division rather than integer truncation.
+error or `Infinity`. Multiply by `1.0` (or cast) so the division keeps its
+fraction: Postgres truncates integer division, so `7 / 2` is `3`.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE funnel AS SELECT * FROM (VALUES
   ('A', 1000, 120), ('B', 800, 96), ('C', 0, 0),
   ('D', 1240, 173), ('E', 640, 51), ('F', 0, 0),
@@ -131,13 +131,14 @@ cohort and period offset.
 
 ```sql
 WITH first_seen AS (
-  SELECT user_id, DATE_TRUNC('month', MIN(event_date)) AS cohort
+  SELECT user_id, DATE_TRUNC('month', MIN(event_date))::date AS cohort
   FROM activity
   GROUP BY user_id
 ),
 labeled AS (
   SELECT a.user_id, f.cohort,
-    DATE_DIFF('month', f.cohort, DATE_TRUNC('month', a.event_date)) AS month_offset
+    (EXTRACT(YEAR FROM a.event_date) - EXTRACT(YEAR FROM f.cohort)) * 12
+      + (EXTRACT(MONTH FROM a.event_date) - EXTRACT(MONTH FROM f.cohort)) AS month_offset
   FROM activity a
   JOIN first_seen f USING (user_id)
 )
@@ -147,8 +148,11 @@ GROUP BY cohort, month_offset
 ORDER BY cohort, month_offset;
 ```
 
-Dividing each `retained` count by the cohort's `month_offset = 0` size
-turns the counts into retention **rates**.
+Postgres has no month-difference function, so the offset is built from the
+year and month parts; warehouses have a one-call form (`DATEDIFF(month, ...)`
+in Snowflake, `DATE_DIFF(..., MONTH)` in BigQuery). Dividing each `retained`
+count by the cohort's `month_offset = 0` size turns the counts into retention
+**rates**.
 
 ### What is sessionization, and how do you do it in SQL?
 
@@ -159,7 +163,7 @@ opens a new session, then take a running `SUM` of those flags as the session
 id.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE hits AS SELECT * FROM (VALUES
   (1, TIMESTAMP '2024-01-01 09:00:00'),
   (1, TIMESTAMP '2024-01-01 09:10:00'),
@@ -246,7 +250,7 @@ PRECEDING AND CURRENT ROW`, which accumulates from the start, and rows tied on
 `day` share one total. Write `ROWS` for a sum that moves strictly row by row.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE txns AS SELECT * FROM (VALUES
   (DATE '2024-01-01', 100), (DATE '2024-01-02', 250),
   (DATE '2024-01-03', 75),  (DATE '2024-01-04', 180),
@@ -285,14 +289,15 @@ SELECT * FROM ranked WHERE rn = 1;
 
 Use ordered-set aggregates: `PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY x)`
 for a continuous (interpolated) median, or `PERCENTILE_DISC` for an actual
-data value. DuckDB also offers `MEDIAN(x)` and `QUANTILE_CONT(x, 0.9)`.
+data value. Both run as written in Postgres; DuckDB and Snowflake also offer
+a `MEDIAN(x)` shorthand.
 Averages hide skew; report a median or the p90 for latency-style metrics.
 
 ### How do you pivot rows into columns?
 
 Standard SQL uses conditional aggregation, `SUM(CASE WHEN ... THEN ... END)`
-one column per category. DuckDB, BigQuery, and SQL Server also offer a
-native `PIVOT`.
+one column per category. BigQuery, Snowflake, SQL Server, and DuckDB also
+offer a native `PIVOT`; Postgres does not.
 
 ```sql
 SELECT
@@ -353,9 +358,9 @@ WHERE b.user_id IS NULL;   -- active in Jan, gone in Feb
 ## Challenges
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Conversion rate per variant"
-  instructions={`Table \`events\` has columns \`user_id\`, \`variant\`, and \`converted\` (\`1\` if the user converted, else \`0\`). Return one row per \`variant\` with columns \`variant\` and \`rate\`, where \`rate\` is conversions divided by the number of users in that variant. Use \`NULLIF\` to guard the denominator. Order by \`variant\`.`}
+  instructions={`Table \`events\` has columns \`user_id\`, \`variant\`, and \`converted\` (\`1\` if the user converted, else \`0\`). Return one row per \`variant\` with columns \`variant\` and \`rate\`, where \`rate\` is conversions divided by the number of users in that variant, rounded to 4 decimal places. Use \`NULLIF\` to guard the denominator. Order by \`variant\`.`}
   initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
   (1, 'A', 1), (2, 'A', 0), (3, 'A', 0), (7, 'A', 0),
   (9, 'A', 1), (11, 'A', 0), (13, 'A', 0), (15, 'A', 1),
@@ -372,7 +377,7 @@ FROM events
 -- group + order;`}
   solutionSql={`SELECT
   variant,
-  SUM(converted) * 1.0 / NULLIF(COUNT(*), 0) AS rate
+  ROUND(SUM(converted) * 1.0 / NULLIF(COUNT(*), 0), 4) AS rate
 FROM events
 GROUP BY variant
 ORDER BY variant;`}
@@ -386,7 +391,7 @@ The second challenge is the same deduplication pattern pointed the
 other way: earliest per group rather than latest.
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Each customer's first order"
   instructions={`Table \`orders\` has columns \`id\`, \`customer_id\`, \`order_date\`, and \`amount\`. Return **one row per customer**, their **earliest** order, with columns \`customer_id\`, \`order_date\`, and \`amount\`. Use a window function (\`ROW_NUMBER\`) in a CTE. Order by \`customer_id\`.`}
   initSql={`CREATE TABLE orders AS SELECT * FROM (VALUES

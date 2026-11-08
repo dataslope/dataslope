@@ -36,14 +36,14 @@
               3
             ],
             [
-              "Kira",
+              "Alice",
               95,
               4,
               4,
               4
             ],
             [
-              "Alice",
+              "Kira",
               95,
               5,
               4,
@@ -99,28 +99,28 @@
               9
             ],
             [
-              "Hugo",
+              "Mona",
               80,
               13,
-              13,
-              10
-            ],
-            [
-              "Carol",
-              80,
-              14,
               13,
               10
             ],
             [
               "Bob",
               80,
+              14,
+              13,
+              10
+            ],
+            [
+              "Carol",
+              80,
               15,
               13,
               10
             ],
             [
-              "Mona",
+              "Hugo",
               80,
               16,
               13,
@@ -217,14 +217,14 @@
               3
             ],
             [
-              "Kira",
+              "Alice",
               95,
               4,
               4,
               4
             ],
             [
-              "Alice",
+              "Kira",
               95,
               5,
               4,
@@ -280,28 +280,28 @@
               9
             ],
             [
-              "Hugo",
+              "Mona",
               80,
               13,
-              13,
-              10
-            ],
-            [
-              "Carol",
-              80,
-              14,
               13,
               10
             ],
             [
               "Bob",
               80,
+              14,
+              13,
+              10
+            ],
+            [
+              "Carol",
+              80,
               15,
               13,
               10
             ],
             [
-              "Mona",
+              "Hugo",
               80,
               16,
               13,
@@ -366,7 +366,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "latest": {
       "setup": "CREATE TABLE events (user_id INTEGER, event_time TIMESTAMP, status VARCHAR);\nINSERT INTO events VALUES\n  (1, TIMESTAMP '2024-01-01 10:00', 'signup'),\n  (1, TIMESTAMP '2024-01-03 09:00', 'active'),\n  (1, TIMESTAMP '2024-01-09 14:00', 'active'),\n  (2, TIMESTAMP '2024-01-02 12:00', 'signup'),\n  (2, TIMESTAMP '2024-01-05 08:00', 'churn'),\n  (2, TIMESTAMP '2024-01-04 15:00', 'active'),\n  (3, TIMESTAMP '2024-01-01 11:00', 'signup'),\n  (3, TIMESTAMP '2024-01-06 16:00', 'active'),\n  (3, TIMESTAMP '2024-01-12 10:30', 'churn'),\n  (4, TIMESTAMP '2024-01-03 08:15', 'signup'),\n  (4, TIMESTAMP '2024-01-07 13:45', 'active'),\n  (5, TIMESTAMP '2024-01-04 09:20', 'signup'),\n  (5, TIMESTAMP '2024-01-08 11:10', 'active'),\n  (5, TIMESTAMP '2024-01-15 17:00', 'active'),\n  (6, TIMESTAMP '2024-01-05 10:05', 'signup'),\n  (6, TIMESTAMP '2024-01-11 12:30', 'churn'),\n  (7, TIMESTAMP '2024-01-06 14:40', 'signup'),\n  (7, TIMESTAMP '2024-01-13 09:50', 'active'),\n  (8, TIMESTAMP '2024-01-07 15:25', 'signup'),\n  (8, TIMESTAMP '2024-01-14 08:35', 'active'),\n  (8, TIMESTAMP '2024-01-20 16:15', 'churn'),\n  (9, TIMESTAMP '2024-01-08 11:55', 'signup'),\n  (9, TIMESTAMP '2024-01-16 13:05', 'active'),\n  (10, TIMESTAMP '2024-01-09 10:45', 'signup');",
@@ -514,67 +514,11 @@
         },
         "qualify": {
           "sql": "SELECT *\nFROM events\nQUALIFY ROW_NUMBER() OVER (\n  PARTITION BY user_id ORDER BY event_time DESC\n) = 1\nORDER BY user_id;",
-          "ok": true,
-          "columns": [
-            "user_id",
-            "event_time",
-            "status"
-          ],
-          "rows": [
-            [
-              1,
-              "2024-01-09 14:00:00",
-              "active"
-            ],
-            [
-              2,
-              "2024-01-05 08:00:00",
-              "churn"
-            ],
-            [
-              3,
-              "2024-01-12 10:30:00",
-              "churn"
-            ],
-            [
-              4,
-              "2024-01-07 13:45:00",
-              "active"
-            ],
-            [
-              5,
-              "2024-01-15 17:00:00",
-              "active"
-            ],
-            [
-              6,
-              "2024-01-11 12:30:00",
-              "churn"
-            ],
-            [
-              7,
-              "2024-01-13 09:50:00",
-              "active"
-            ],
-            [
-              8,
-              "2024-01-20 16:15:00",
-              "churn"
-            ],
-            [
-              9,
-              "2024-01-16 13:05:00",
-              "active"
-            ],
-            [
-              10,
-              "2024-01-09 10:45:00",
-              "signup"
-            ]
-          ]
+          "ok": false,
+          "error": "ERROR: syntax error at or near \"ROW_NUMBER\""
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "latestTie": {
       "setup": "CREATE TABLE events (user_id INTEGER, event_time TIMESTAMP, status VARCHAR);\nINSERT INTO events VALUES\n  (1, TIMESTAMP '2024-01-01 10:00', 'signup'),\n  (1, TIMESTAMP '2024-01-03 09:00', 'active'),\n  (1, TIMESTAMP '2024-01-09 14:00', 'active'),\n  (2, TIMESTAMP '2024-01-02 12:00', 'signup'),\n  (2, TIMESTAMP '2024-01-05 08:00', 'churn'),\n  (2, TIMESTAMP '2024-01-04 15:00', 'active'),\n  (3, TIMESTAMP '2024-01-01 11:00', 'signup'),\n  (3, TIMESTAMP '2024-01-06 16:00', 'active'),\n  (3, TIMESTAMP '2024-01-12 10:30', 'churn'),\n  (4, TIMESTAMP '2024-01-03 08:15', 'signup'),\n  (4, TIMESTAMP '2024-01-07 13:45', 'active'),\n  (5, TIMESTAMP '2024-01-04 09:20', 'signup'),\n  (5, TIMESTAMP '2024-01-08 11:10', 'active'),\n  (5, TIMESTAMP '2024-01-15 17:00', 'active'),\n  (6, TIMESTAMP '2024-01-05 10:05', 'signup'),\n  (6, TIMESTAMP '2024-01-11 12:30', 'churn'),\n  (7, TIMESTAMP '2024-01-06 14:40', 'signup'),\n  (7, TIMESTAMP '2024-01-13 09:50', 'active'),\n  (8, TIMESTAMP '2024-01-07 15:25', 'signup'),\n  (8, TIMESTAMP '2024-01-14 08:35', 'active'),\n  (8, TIMESTAMP '2024-01-20 16:15', 'churn'),\n  (9, TIMESTAMP '2024-01-08 11:55', 'signup'),\n  (9, TIMESTAMP '2024-01-16 13:05', 'active'),\n  (10, TIMESTAMP '2024-01-09 10:45', 'signup');\nINSERT INTO events VALUES (3, TIMESTAMP '2024-01-12 10:30', 'active');",
@@ -663,12 +607,12 @@
             [
               3,
               "2024-01-12 10:30:00",
-              "churn"
+              "active"
             ],
             [
               3,
               "2024-01-12 10:30:00",
-              "active"
+              "churn"
             ],
             [
               4,
@@ -729,7 +673,7 @@
             [
               3,
               "2024-01-12 10:30:00",
-              "churn"
+              "active"
             ],
             [
               4,
@@ -769,7 +713,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "where": {
       "setup": "CREATE TABLE orders (region TEXT, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  ('North', 120.00), ('South', 80.50), ('East', 200.00),\n  ('West', 50.25),   ('North', 60.00), ('South', 90.00),\n  ('East', 140.00),  ('West', 110.00), ('North', 75.50),\n  ('South', 65.00),  ('North', 145.75), ('East', 95.00),\n  ('West', 40.00),   ('South', 130.25), ('North', 88.00),\n  ('East', 175.50),  ('West', 62.75),   ('South', 105.00),\n  ('North', 210.00), ('East', 45.25),   ('West', 155.00),\n  ('South', 70.75),  ('North', 99.50),  ('East', 185.00);",
@@ -777,10 +721,10 @@
         "whereAggregate": {
           "sql": "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE SUM(amount) > 400\nGROUP BY region;",
           "ok": false,
-          "error": "Binder Error: WHERE clause cannot contain aggregates!"
+          "error": "ERROR: aggregate functions are not allowed in WHERE"
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "moving": {
       "setup": "CREATE TABLE daily_metrics (event_date DATE, daily_value INTEGER);\nINSERT INTO daily_metrics VALUES\n  (DATE '2024-01-01', 120), (DATE '2024-01-02', 135), (DATE '2024-01-03', 110),\n  (DATE '2024-01-05', 150), (DATE '2024-01-06', 140), (DATE '2024-01-10', 160),\n  (DATE '2024-01-11', 155), (DATE '2024-01-12', 170), (DATE '2024-01-13', 180);",
@@ -843,47 +787,47 @@
             [
               "2024-01-01",
               120,
-              120
+              "120.0000000000000000"
             ],
             [
               "2024-01-02",
               135,
-              127.5
+              "127.5000000000000000"
             ],
             [
               "2024-01-03",
               110,
-              121.66666666666667
+              "121.6666666666666667"
             ],
             [
               "2024-01-05",
               150,
-              128.75
+              "128.7500000000000000"
             ],
             [
               "2024-01-06",
               140,
-              131
+              "131.0000000000000000"
             ],
             [
               "2024-01-10",
               160,
-              135.83333333333334
+              "135.8333333333333333"
             ],
             [
               "2024-01-11",
               155,
-              138.57142857142858
+              "138.5714285714285714"
             ],
             [
               "2024-01-12",
               170,
-              145.71428571428572
+              "145.7142857142857143"
             ],
             [
               "2024-01-13",
               180,
-              152.14285714285714
+              "152.1428571428571429"
             ]
           ]
         },
@@ -901,70 +845,70 @@
             [
               "2024-01-01",
               120,
-              120,
+              "120.0",
               "2024-01-01",
               1
             ],
             [
               "2024-01-02",
               135,
-              127.5,
+              "127.5",
               "2024-01-01",
               2
             ],
             [
               "2024-01-03",
               110,
-              121.7,
+              "121.7",
               "2024-01-01",
               3
             ],
             [
               "2024-01-05",
               150,
-              128.8,
+              "128.8",
               "2024-01-01",
               4
             ],
             [
               "2024-01-06",
               140,
-              131,
+              "131.0",
               "2024-01-01",
               5
             ],
             [
               "2024-01-10",
               160,
-              135.8,
+              "135.8",
               "2024-01-01",
               6
             ],
             [
               "2024-01-11",
               155,
-              138.6,
+              "138.6",
               "2024-01-01",
               7
             ],
             [
               "2024-01-12",
               170,
-              145.7,
+              "145.7",
               "2024-01-02",
               7
             ],
             [
               "2024-01-13",
               180,
-              152.1,
+              "152.1",
               "2024-01-03",
               7
             ]
           ]
         },
         "range": {
-          "sql": "SELECT event_date, daily_value,\n  ROUND(AVG(daily_value) OVER w, 1) AS avg_7,\n  MIN(event_date) OVER w AS frame_start,\n  COUNT(*) OVER w AS n\nFROM daily_metrics\nWINDOW w AS (ORDER BY event_date\n  RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW)\nORDER BY event_date;",
+          "sql": "SELECT event_date, daily_value,\n  ROUND(AVG(daily_value) OVER w, 1) AS avg_7,\n  MIN(event_date) OVER w AS frame_start,\n  COUNT(*) OVER w AS n\nFROM daily_metrics\nWINDOW w AS (ORDER BY event_date\n  RANGE BETWEEN INTERVAL '6 days' PRECEDING AND CURRENT ROW)\nORDER BY event_date;",
           "ok": true,
           "columns": [
             "event_date",
@@ -977,63 +921,63 @@
             [
               "2024-01-01",
               120,
-              120,
+              "120.0",
               "2024-01-01",
               1
             ],
             [
               "2024-01-02",
               135,
-              127.5,
+              "127.5",
               "2024-01-01",
               2
             ],
             [
               "2024-01-03",
               110,
-              121.7,
+              "121.7",
               "2024-01-01",
               3
             ],
             [
               "2024-01-05",
               150,
-              128.8,
+              "128.8",
               "2024-01-01",
               4
             ],
             [
               "2024-01-06",
               140,
-              131,
+              "131.0",
               "2024-01-01",
               5
             ],
             [
               "2024-01-10",
               160,
-              150,
+              "150.0",
               "2024-01-05",
               3
             ],
             [
               "2024-01-11",
               155,
-              151.3,
+              "151.3",
               "2024-01-05",
               4
             ],
             [
               "2024-01-12",
               170,
-              156.3,
+              "156.3",
               "2024-01-06",
               4
             ],
             [
               "2024-01-13",
               180,
-              166.3,
+              "166.3",
               "2024-01-10",
               4
             ]
@@ -1081,33 +1025,162 @@
             [
               "2024-01-11",
               155,
-              138.57142857142858
+              "138.5714285714285714"
             ],
             [
               "2024-01-12",
               170,
-              145.71428571428572
+              "145.7142857142857143"
             ],
             [
               "2024-01-13",
               180,
-              152.14285714285714
+              "152.1428571428571429"
             ]
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "spine": {
       "setup": "CREATE TABLE daily_metrics (event_date DATE, daily_value INTEGER);\nINSERT INTO daily_metrics VALUES\n  (DATE '2024-01-01', 120), (DATE '2024-01-02', 135), (DATE '2024-01-03', 110),\n  (DATE '2024-01-05', 150), (DATE '2024-01-06', 140), (DATE '2024-01-10', 160),\n  (DATE '2024-01-11', 155), (DATE '2024-01-12', 170), (DATE '2024-01-13', 180);",
       "steps": {
         "pageSpine": {
           "sql": "WITH spine AS (\n  SELECT generate_series(\n    DATE '2024-01-01', DATE '2024-01-31', INTERVAL '1 day'\n  )::date AS day\n)\nSELECT\n  s.day,\n  COALESCE(m.daily_value, 0) AS daily_value\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nORDER BY s.day;",
-          "ok": false,
-          "error": "Conversion Error: Unimplemented type for cast (TIMESTAMP[] -> DATE)"
+          "ok": true,
+          "columns": [
+            "day",
+            "daily_value"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              120
+            ],
+            [
+              "2024-01-02",
+              135
+            ],
+            [
+              "2024-01-03",
+              110
+            ],
+            [
+              "2024-01-04",
+              0
+            ],
+            [
+              "2024-01-05",
+              150
+            ],
+            [
+              "2024-01-06",
+              140
+            ],
+            [
+              "2024-01-07",
+              0
+            ],
+            [
+              "2024-01-08",
+              0
+            ],
+            [
+              "2024-01-09",
+              0
+            ],
+            [
+              "2024-01-10",
+              160
+            ],
+            [
+              "2024-01-11",
+              155
+            ],
+            [
+              "2024-01-12",
+              170
+            ],
+            [
+              "2024-01-13",
+              180
+            ],
+            [
+              "2024-01-14",
+              0
+            ],
+            [
+              "2024-01-15",
+              0
+            ],
+            [
+              "2024-01-16",
+              0
+            ],
+            [
+              "2024-01-17",
+              0
+            ],
+            [
+              "2024-01-18",
+              0
+            ],
+            [
+              "2024-01-19",
+              0
+            ],
+            [
+              "2024-01-20",
+              0
+            ],
+            [
+              "2024-01-21",
+              0
+            ],
+            [
+              "2024-01-22",
+              0
+            ],
+            [
+              "2024-01-23",
+              0
+            ],
+            [
+              "2024-01-24",
+              0
+            ],
+            [
+              "2024-01-25",
+              0
+            ],
+            [
+              "2024-01-26",
+              0
+            ],
+            [
+              "2024-01-27",
+              0
+            ],
+            [
+              "2024-01-28",
+              0
+            ],
+            [
+              "2024-01-29",
+              0
+            ],
+            [
+              "2024-01-30",
+              0
+            ],
+            [
+              "2024-01-31",
+              0
+            ]
+          ]
         },
         "joined": {
-          "sql": "WITH spine AS (\n  SELECT CAST(day AS DATE) AS day\n  FROM generate_series(DATE '2024-01-01',\n    DATE '2024-01-13', INTERVAL 1 DAY) AS t(day)\n)\nSELECT s.day, m.daily_value\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nORDER BY s.day;",
+          "sql": "WITH spine AS (\n  SELECT generate_series(\n    DATE '2024-01-01', DATE '2024-01-13', INTERVAL '1 day'\n  )::date AS day\n)\nSELECT s.day, m.daily_value\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nORDER BY s.day;",
           "ok": true,
           "columns": [
             "day",
@@ -1169,7 +1242,7 @@
           ]
         },
         "gaps": {
-          "sql": "WITH spine AS (\n  SELECT CAST(day AS DATE) AS day\n  FROM generate_series(DATE '2024-01-01',\n    DATE '2024-01-13', INTERVAL 1 DAY) AS t(day)\n)\nSELECT s.day\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nWHERE m.event_date IS NULL\nORDER BY s.day;",
+          "sql": "WITH spine AS (\n  SELECT generate_series(\n    DATE '2024-01-01', DATE '2024-01-13', INTERVAL '1 day'\n  )::date AS day\n)\nSELECT s.day\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nWHERE m.event_date IS NULL\nORDER BY s.day;",
           "ok": true,
           "columns": [
             "day"
@@ -1190,7 +1263,7 @@
           ]
         },
         "filled": {
-          "sql": "WITH spine AS (\n  SELECT CAST(day AS DATE) AS day\n  FROM generate_series(DATE '2024-01-01',\n    DATE '2024-01-13', INTERVAL 1 DAY) AS t(day)\n)\nSELECT s.day, COALESCE(m.daily_value, 0) AS daily_value\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nORDER BY s.day;",
+          "sql": "WITH spine AS (\n  SELECT generate_series(\n    DATE '2024-01-01', DATE '2024-01-13', INTERVAL '1 day'\n  )::date AS day\n)\nSELECT s.day, COALESCE(m.daily_value, 0) AS daily_value\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nORDER BY s.day;",
           "ok": true,
           "columns": [
             "day",
@@ -1252,7 +1325,7 @@
           ]
         },
         "filledAvg": {
-          "sql": "WITH spine AS (\n  SELECT CAST(day AS DATE) AS day\n  FROM generate_series(DATE '2024-01-01',\n    DATE '2024-01-13', INTERVAL 1 DAY) AS t(day)\n),\nfilled AS (\n  SELECT s.day, COALESCE(m.daily_value, 0) AS daily_value\n  FROM spine s\n  LEFT JOIN daily_metrics m ON m.event_date = s.day\n)\nSELECT day, daily_value,\n  ROUND(AVG(daily_value) OVER (ORDER BY day\n    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW), 1) AS avg_7,\n  MIN(day) OVER (ORDER BY day\n    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS frame_start\nFROM filled\nORDER BY day;",
+          "sql": "WITH spine AS (\n  SELECT generate_series(\n    DATE '2024-01-01', DATE '2024-01-13', INTERVAL '1 day'\n  )::date AS day\n),\nfilled AS (\n  SELECT s.day, COALESCE(m.daily_value, 0) AS daily_value\n  FROM spine s\n  LEFT JOIN daily_metrics m ON m.event_date = s.day\n)\nSELECT day, daily_value,\n  ROUND(AVG(daily_value) OVER (ORDER BY day\n    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW), 1) AS avg_7,\n  MIN(day) OVER (ORDER BY day\n    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS frame_start\nFROM filled\nORDER BY day;",
           "ok": true,
           "columns": [
             "day",
@@ -1264,85 +1337,85 @@
             [
               "2024-01-01",
               120,
-              120,
+              "120.0",
               "2024-01-01"
             ],
             [
               "2024-01-02",
               135,
-              127.5,
+              "127.5",
               "2024-01-01"
             ],
             [
               "2024-01-03",
               110,
-              121.7,
+              "121.7",
               "2024-01-01"
             ],
             [
               "2024-01-04",
               0,
-              91.3,
+              "91.3",
               "2024-01-01"
             ],
             [
               "2024-01-05",
               150,
-              103,
+              "103.0",
               "2024-01-01"
             ],
             [
               "2024-01-06",
               140,
-              109.2,
+              "109.2",
               "2024-01-01"
             ],
             [
               "2024-01-07",
               0,
-              93.6,
+              "93.6",
               "2024-01-01"
             ],
             [
               "2024-01-08",
               0,
-              76.4,
+              "76.4",
               "2024-01-02"
             ],
             [
               "2024-01-09",
               0,
-              57.1,
+              "57.1",
               "2024-01-03"
             ],
             [
               "2024-01-10",
               160,
-              64.3,
+              "64.3",
               "2024-01-04"
             ],
             [
               "2024-01-11",
               155,
-              86.4,
+              "86.4",
               "2024-01-05"
             ],
             [
               "2024-01-12",
               170,
-              89.3,
+              "89.3",
               "2024-01-06"
             ],
             [
               "2024-01-13",
               180,
-              95,
+              "95.0",
               "2024-01-07"
             ]
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "islands": {
       "setup": "CREATE TABLE daily_logins (user_id INTEGER, login_date DATE);\nINSERT INTO daily_logins VALUES\n  (1, DATE '2024-01-01'), (1, DATE '2024-01-02'), (1, DATE '2024-01-03'),\n  (1, DATE '2024-01-05'), (1, DATE '2024-01-06'), (1, DATE '2024-01-10'),\n  (1, DATE '2024-01-11'), (1, DATE '2024-01-12'), (1, DATE '2024-01-13'),\n  (2, DATE '2024-01-01'), (2, DATE '2024-01-04'), (2, DATE '2024-01-05'),\n  (2, DATE '2024-01-06'), (2, DATE '2024-01-09'),\n  (3, DATE '2024-01-02'), (3, DATE '2024-01-03'), (3, DATE '2024-01-04'),\n  (3, DATE '2024-01-08'), (3, DATE '2024-01-09'),\n  (4, DATE '2024-01-01'), (4, DATE '2024-01-07'),\n  (5, DATE '2024-01-03'), (5, DATE '2024-01-04'), (5, DATE '2024-01-05');",
@@ -1496,7 +1569,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "islandsDup": {
       "setup": "CREATE TABLE daily_logins (user_id INTEGER, login_date DATE);\nINSERT INTO daily_logins VALUES\n  (1, DATE '2024-01-01'), (1, DATE '2024-01-02'), (1, DATE '2024-01-03'),\n  (1, DATE '2024-01-05'), (1, DATE '2024-01-06'), (1, DATE '2024-01-10'),\n  (1, DATE '2024-01-11'), (1, DATE '2024-01-12'), (1, DATE '2024-01-13'),\n  (2, DATE '2024-01-01'), (2, DATE '2024-01-04'), (2, DATE '2024-01-05'),\n  (2, DATE '2024-01-06'), (2, DATE '2024-01-09'),\n  (3, DATE '2024-01-02'), (3, DATE '2024-01-03'), (3, DATE '2024-01-04'),\n  (3, DATE '2024-01-08'), (3, DATE '2024-01-09'),\n  (4, DATE '2024-01-01'), (4, DATE '2024-01-07'),\n  (5, DATE '2024-01-03'), (5, DATE '2024-01-04'), (5, DATE '2024-01-05');\nINSERT INTO daily_logins VALUES (1, DATE '2024-01-02');",
@@ -1719,7 +1792,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "anti": {
       "setup": "CREATE TABLE customers (id INTEGER, name TEXT);\nINSERT INTO customers VALUES (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di');\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00),\n  (104, 3, 55.00),  (105, 3, 45.00), (106, 2, 30.00), (107, NULL, 25.00);",
@@ -1745,7 +1818,7 @@
           "rows": []
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "recursive": {
       "setup": "CREATE TABLE employees (id INTEGER, name TEXT, manager_id INTEGER);\nINSERT INTO employees VALUES\n  (1, 'Ana', NULL), (2, 'Ben', 1), (3, 'Cy', 1),\n  (4, 'Dee', 2), (5, 'Eli', 2), (6, 'Fay', 3), (7, 'Gus', 3);\nCREATE TABLE edges (src INTEGER, dst INTEGER);\nINSERT INTO edges VALUES (1, 2), (2, 3), (3, 1);",
@@ -1941,7 +2014,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "cte": {
       "setup": "CREATE TABLE orders (user_id INTEGER, order_date DATE, amount DECIMAL(10,2));\nINSERT INTO orders VALUES\n  (1, DATE '2024-01-01', 100.00), (1, DATE '2024-01-05', 250.00),\n  (1, DATE '2024-01-12', 75.50),  (1, DATE '2024-01-19', 310.00),\n  (1, DATE '2024-01-26', 45.25),  (2, DATE '2024-01-03', 200.00),\n  (2, DATE '2024-01-08', 150.00), (2, DATE '2024-01-15', 90.75),\n  (2, DATE '2024-01-22', 265.00), (3, DATE '2024-01-02', 120.00),\n  (3, DATE '2024-01-09', 340.50), (3, DATE '2024-01-16', 60.00),\n  (3, DATE '2024-01-23', 175.25), (4, DATE '2024-01-04', 210.00),\n  (4, DATE '2024-01-11', 85.00),  (4, DATE '2024-01-18', 295.75),\n  (5, DATE '2024-01-06', 130.00), (5, DATE '2024-01-13', 240.50),\n  (5, DATE '2024-01-20', 70.00),  (5, DATE '2024-01-27', 190.25),\n  (6, DATE '2024-01-07', 155.00), (6, DATE '2024-01-14', 280.00),\n  (6, DATE '2024-01-21', 110.50), (6, DATE '2024-01-28', 205.00);",
@@ -2229,7 +2302,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "lag": {
       "setup": "CREATE TABLE daily_revenue (order_date DATE, revenue INTEGER);\nINSERT INTO daily_revenue VALUES\n  (DATE '2024-01-01', 100), (DATE '2024-01-02', 250),\n  (DATE '2024-01-03', 75),  (DATE '2024-01-04', 180);",
@@ -2312,13 +2385,13 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "percent": {
       "setup": "CREATE TABLE scores AS SELECT * FROM (VALUES (10), (20), (20), (30)) AS t(v);",
       "steps": {
         "both": {
-          "sql": "SELECT v,\n  ROUND(PERCENT_RANK() OVER (ORDER BY v), 2) AS pct_rank,\n  ROUND(CUME_DIST()    OVER (ORDER BY v), 2) AS cume_dist\nFROM scores\nORDER BY v;",
+          "sql": "SELECT v,\n  ROUND(PERCENT_RANK() OVER (ORDER BY v)::numeric, 2) AS pct_rank,\n  ROUND(CUME_DIST()    OVER (ORDER BY v)::numeric, 2) AS cume_dist\nFROM scores\nORDER BY v;",
           "ok": true,
           "columns": [
             "v",
@@ -2328,28 +2401,28 @@
           "rows": [
             [
               10,
-              0,
-              0.25
+              "0.00",
+              "0.25"
             ],
             [
               20,
-              0.33,
-              0.75
+              "0.33",
+              "0.75"
             ],
             [
               20,
-              0.33,
-              0.75
+              "0.33",
+              "0.75"
             ],
             [
               30,
-              1,
-              1
+              "1.00",
+              "1.00"
             ]
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "coalesce": {
       "setup": "CREATE TABLE users (user_id INTEGER, phone TEXT, email TEXT);\nINSERT INTO users VALUES\n  (1, '555-0101', 'ada@example.com'), (2, NULL, 'bo@example.com'), (3, NULL, NULL);",
@@ -2411,39 +2484,18 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "pivot": {
       "setup": "CREATE TABLE traffic AS SELECT * FROM (VALUES\n  ('North', 'mobile', 120), ('North', 'desktop', 80),\n  ('South', 'mobile', 95),  ('South', 'desktop', 140),\n  ('East', 'mobile', 60),   ('East', 'desktop', 70)\n) AS t(region, device, sessions);",
       "steps": {
         "pivot": {
           "sql": "PIVOT traffic ON device USING SUM(sessions) GROUP BY region ORDER BY region;",
-          "ok": true,
-          "columns": [
-            "region",
-            "desktop",
-            "mobile"
-          ],
-          "rows": [
-            [
-              "East",
-              "70",
-              "60"
-            ],
-            [
-              "North",
-              "80",
-              "120"
-            ],
-            [
-              "South",
-              "140",
-              "95"
-            ]
-          ]
+          "ok": false,
+          "error": "ERROR: syntax error at or near \"PIVOT\""
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     }
   }
 }

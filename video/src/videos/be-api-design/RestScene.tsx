@@ -80,11 +80,11 @@ export const RestScene: React.FC = () => {
 
         {/* A resource with a URL, and the methods that act on it. */}
         <Note at={resAt} x={CARD.x} y={cardTop + 4} width={CARD.w} style={{ textAlign: "center" }}>
-          <div style={{ ...label(23, BLUE_INK), whiteSpace: "nowrap" }}>a resource</div>
-          <div style={{ fontFamily: MONO, fontSize: 36, fontWeight: 600, color: INK, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, urlAt, 10) }}>/articles/42</div>
+          <div style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap" }}>a resource</div>
+          <div style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, urlAt, 10) }}>/articles/42</div>
         </Note>
         <Note at={urlAt + 6} x={CARD.x} y={cardTop + CARD.h + h(12)} width={CARD.w} style={{ textAlign: "center" }}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>its URL names it</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>its URL names it</span>
         </Note>
         {METHODS.map((m, i) => {
           const at = methodsAt + 4 + i * 4;
@@ -108,22 +108,22 @@ export const RestScene: React.FC = () => {
 
         {/* Paths are nouns, never verbs. */}
         <Note at={nounsAt} x={X0} y={nounTop}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Paths are nouns</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Paths are nouns</span>
         </Note>
-        <div style={{ position: "absolute", left: X0, top: nounTop + h(46), display: "flex", alignItems: "center", gap: 14, fontSize: 30, opacity: ease(frame, fortyTwoAt, 10) }}>
+        <div style={{ position: "absolute", left: X0, top: nounTop + h(46), display: "flex", alignItems: "center", gap: 14, fontSize: 28, opacity: ease(frame, fortyTwoAt, 10) }}>
           <Tick at={fortyTwoAt + 4} size={28} />
-          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 600, color: OK_INK }}>/articles/42</span>
+          <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: OK_INK }}>/articles/42</span>
         </div>
-        <div style={{ position: "absolute", left: X0 + 330, top: nounTop + h(46), display: "flex", alignItems: "center", gap: 14, fontSize: 30, opacity: ease(frame, verbAt, 10) }}>
+        <div style={{ position: "absolute", left: X0 + 330, top: nounTop + h(46), display: "flex", alignItems: "center", gap: 14, fontSize: 28, opacity: ease(frame, verbAt, 10) }}>
           <Cross at={verbAt + 8} size={26} />
-          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 600, color: ACCENT_INK }}>
+          <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: ACCENT_INK }}>
             <Strike at={verbAt + 10}>/getArticle</Strike>
           </span>
         </div>
 
         {/* A request that carries everything, to a server that keeps nothing. */}
         <Note at={carriesAt} x={R_X} y={reqTop - h(44)}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Each request carries everything</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Each request carries everything</span>
         </Note>
         <Msg
           x={R_X}
@@ -138,12 +138,12 @@ export const RestScene: React.FC = () => {
         />
         <Flow points={[[R_X + REQ_W + 8, reqTop + reqH / 2], [SRV.x - 8, reqTop + reqH / 2]]} at={carriesAt + 20} color={BAR} head={13} />
         <Node x={SRV.x} y={reqTop} w={SRV.w} h={reqH + h(70)} at={carriesAt + 10} tone="plain" title="server" size={24}>
-          <span style={{ ...note(21, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap", opacity: ease(frame, sessionAt + 4, 12) }}>keeps no session</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, sessionAt + 4, 12) }}>keeps no session</span>
         </Node>
         <Note at={meanAt} x={R_X} y={reqTop + reqH + h(26)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 700, color: METHOD_INK }}>GET</span> means read;{" "}
-            <span style={{ fontFamily: MONO, fontWeight: 700 }}>404</span> means not found.
+            <span style={{ fontFamily: MONO, fontWeight: 500, color: METHOD_INK }}>GET</span> means read;{" "}
+            <span style={{ fontFamily: MONO, fontWeight: 500 }}>404</span> means not found.
           </span>
         </Note>
 
@@ -153,14 +153,14 @@ export const RestScene: React.FC = () => {
           const at = last ? guessAt + 14 : guessAt + i * 5;
           return (
             <Note key={p} at={at} x={X0} y={guessTop + i * h(50)}>
-              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: last ? INK : INK_SOFT, whiteSpace: "nowrap" }}>
+              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: last ? INK : INK_SOFT, whiteSpace: "nowrap" }}>
                 {last ? <Mark at={guessAt + 20}>{p}</Mark> : p}
               </span>
             </Note>
           );
         })}
         <Note at={guessAt + 26} x={X0 + 440} y={guessTop + 2 * h(50) + 4}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>← guessed</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>← guessed</span>
         </Note>
 
         {/* Any server can answer the next request. */}
@@ -184,13 +184,13 @@ export const RestScene: React.FC = () => {
                 head={12}
               />
               <Note at={at + 10} x={1560} y={srvTop(i) + h(18)}>
-                <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: BLUE_INK, whiteSpace: "nowrap" }}>200 OK</span>
+                <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: BLUE_INK, whiteSpace: "nowrap" }}>200 OK</span>
               </Note>
             </React.Fragment>
           );
         })}
         <Note at={nextAt + 14} x={1320} y={srvTop(1) + h(92)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>the next request, either one</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the next request, either one</span>
         </Note>
 
         {/* A hairline between the resource and the request. */}

@@ -77,7 +77,7 @@ export const InstanceofScene: React.FC = () => {
         marks={[{ ...CHECK_RUN_SPAN, at: noUserAt - 2, color: `color-mix(in srgb, ${ACCENT} 26%, transparent)` }]}
       />
       <Note at={noUserAt + 4} x={JS_X} y={top + listingHeight(CHECK_JS.length, SIZE) + 26} width={JS_W}>
-        <span style={note(21, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           The interface was erased, so nothing in <Mono>check.js</Mono> defines <Mono>User</Mono>.
         </span>
       </Note>

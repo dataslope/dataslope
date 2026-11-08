@@ -139,21 +139,21 @@ export const DotScene: React.FC = () => {
         {[0.5, 1].map((v) => (
           <g key={v}>
             <line x1={O[0] + v * U} x2={O[0] + v * U} y1={O[1]} y2={O[1] + 8} stroke={LINE} strokeWidth={1.6} />
-            <text x={O[0] + v * U} y={O[1] + 34} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+            <text x={O[0] + v * U} y={O[1] + 34} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
               {one(v)}
             </text>
             <line x1={O[0] - 8} x2={O[0]} y1={O[1] - v * U} y2={O[1] - v * U} stroke={LINE} strokeWidth={1.6} />
-            <text x={O[0] - 16} y={O[1] - v * U + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+            <text x={O[0] - 16} y={O[1] - v * U + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
               {one(v)}
             </text>
           </g>
         ))}
         <circle cx={O[0]} cy={O[1]} r={4.5} fill={INK} />
         {/* Axis names: a vector's first number runs right, its second up. */}
-        <text x={O[0] + 0.58 * U} y={O[1] + 70} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+        <text x={O[0] + 0.58 * U} y={O[1] + 70} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
           first number
         </text>
-        <text x={O[0] + 12} y={O[1] - 1.12 * U - 14} style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+        <text x={O[0] + 12} y={O[1] - 1.12 * U - 14} style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
           second number
         </text>
       </Svg>
@@ -183,7 +183,7 @@ export const DotScene: React.FC = () => {
 
       {/* Tip labels. */}
       <Fade at={queryAt + 4} style={{ left: q[0] + 18, top: q[1] - 6, ...halo }}>
-        <span style={{ ...label(22, QUERY_INK), whiteSpace: "nowrap" }}>query</span>
+        <span style={{ ...label(24, QUERY_INK), whiteSpace: "nowrap" }}>query</span>
       </Fade>
       {TOKENS.map((t, i) => {
         const [x, ty] = keyTips[i];
@@ -191,7 +191,7 @@ export const DotScene: React.FC = () => {
           i === 0 ? { left: x + 18, top: ty - 30 } : i === 1 ? { left: x + 18, top: ty - 16 } : { left: x + 4, top: ty - 72 };
         return (
           <Fade key={t} at={keyAt(i) + 8} style={{ ...pos, ...halo }}>
-            <span style={{ ...label(22, KEY_INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, KEY_INK), whiteSpace: "nowrap" }}>
               <Mono>{t}</Mono>
             </span>
           </Fade>
@@ -210,7 +210,7 @@ export const DotScene: React.FC = () => {
       {/* ── Fig. 4: multiply the matching numbers, and add ── */}
       <FigLabel n="4" title="Multiply the matching numbers, and add" at={keysAt - 2} x={L.chip} y={y(FIG_Y)} />
       <Fade at={keysAt - 2} style={{ left: L.chip, top: headY + 10 }}>
-        <span style={{ ...label(23, QUERY_INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(24, QUERY_INK), whiteSpace: "nowrap" }}>
           Query, from <Mono>it</Mono>
         </span>
       </Fade>
@@ -218,10 +218,10 @@ export const DotScene: React.FC = () => {
         <Cells values={TROPHY.query} cell={76} border={QUERY} highlight={qLit} />
       </Fade>
       <Fade at={multiplyAt - 2} style={{ left: L.expr, top: headY + 10 }}>
-        <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>Multiply, then add</span>
+        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Multiply, then add</span>
       </Fade>
       <Fade at={dotAt - 2} style={{ left: L.result, top: headY + 10 }}>
-        <span style={{ ...label(23, POINT_INK), whiteSpace: "nowrap" }}>Dot product</span>
+        <span style={{ ...label(24, POINT_INK), whiteSpace: "nowrap" }}>Dot product</span>
       </Fade>
       {/* The dot-product column, outlined when it is named. */}
       <Svg opacity={dotGlow * (1 - 0.6 * ease(frame, metAt, 14))}>
@@ -248,7 +248,7 @@ export const DotScene: React.FC = () => {
                 gap: "0.6em",
                 fontFamily: MONO,
                 fontSize: EXPR,
-                fontWeight: 600,
+                fontWeight: 500,
                 color: INK,
                 whiteSpace: "pre",
                 ...TABULAR,
@@ -262,12 +262,12 @@ export const DotScene: React.FC = () => {
               </span>
             </div>
             <div style={{ position: "absolute", left: L.result - 44, top: 6, opacity: sum, display: "flex", gap: 36, alignItems: "baseline" }}>
-              <span style={{ fontFamily: MONO, fontSize: EXPR, fontWeight: 600, color: INK_SOFT }}>=</span>
+              <span style={{ fontFamily: MONO, fontSize: EXPR, fontWeight: 500, color: INK_SOFT }}>=</span>
               <span
                 style={{
                   fontFamily: MONO,
-                  fontSize: 32,
-                  fontWeight: 700,
+                  fontSize: 34,
+                  fontWeight: 500,
                   color: INK,
                   borderRadius: 6,
                   boxShadow: i === 2 ? `0 0 0 ${6 * pulse(frame, elevenAgainAt, 30)}px color-mix(in srgb, ${POINT} 35%, transparent)` : undefined,
@@ -286,10 +286,10 @@ export const DotScene: React.FC = () => {
 
       {/* Cosine, the course's earlier measure, is this same sum. */}
       <Note at={cosineAt - 4} x={L.chip} y={y(800)} width={760}>
-        <div style={{ ...body(32), color: INK }}>
+        <div style={{ ...body(34), color: INK }}>
           Cosine similarity: the same sum, on arrows scaled to <Mark at={lengthOneAt}>length one.</Mark>
         </div>
-        <div style={{ ...body(32), color: INK, marginTop: 14, opacity: ease(frame, keepsAt - 4, 12) }}>
+        <div style={{ ...body(34), color: INK, marginTop: 14, opacity: ease(frame, keepsAt - 4, 12) }}>
           Attention <Mark at={keepsAt}>keeps the lengths.</Mark>
         </div>
       </Note>

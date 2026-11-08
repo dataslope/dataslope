@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, headline, label } from "../../editorial/style";
+import { ACCENT_INK, body, headline, label, INK } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
@@ -65,15 +65,15 @@ export const ShapesScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 2} dur={14} style={{ left: 124, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>The part most people miss</span>
+      <Ink at={start - 2} dur={14} style={{ left: 124, top: y(112), whiteSpace: "nowrap" }}>
+        <span style={label(24, ACCENT_INK)}>The part most people miss</span>
       </Ink>
       {/* One line in two inks; the second half follows the first in the flow. */}
       <div style={{ position: "absolute", left: 118, top: y(146), display: "flex", gap: "0.26em", ...headline(66) }}>
         <Ink at={start + 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           One row per group,
         </Ink>
-        <Ink at={transAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={transAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: INK, whiteSpace: "nowrap" }}>
           or one per row.
         </Ink>
       </div>
@@ -84,7 +84,7 @@ export const ShapesScene: React.FC = () => {
 
       {/* ── the frame, where the last scene left it ── */}
       <Ink at={start - 14} dur={10} style={{ left: A_X, top: y(LABEL_Y) }}>
-        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600 }}>df</span>
+        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>df</span>
       </Ink>
       <Header x={A_X} top={y(HEADER_Y)} width={CARD_W} at={start - 14} cols={FRAME_COLS} />
       {ROWS.map((r, i) => (
@@ -140,7 +140,7 @@ export const ShapesScene: React.FC = () => {
         <Count value={TOTALS.length} text="rows out" />
       </Note>
       <Note at={orderAt + 2} x={T_X + 190} y={y(ROW0 + 7 * RH + 22)}>
-        <span style={{ ...body(26, true), whiteSpace: "nowrap" }}>indexed {TOTAL_INDEX[0]} to {TOTAL_INDEX[TOTAL_INDEX.length - 1]}, like the frame</span>
+        <span style={{ ...body(28, true), whiteSpace: "nowrap" }}>indexed {TOTAL_INDEX[0]} to {TOTAL_INDEX[TOTAL_INDEX.length - 1]}, like the frame</span>
       </Note>
     </AbsoluteFill>
   );

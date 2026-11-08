@@ -23,8 +23,8 @@ const OVERLAP = 6;
  * Data Engineer interview prep videos, on the editorial page. Fifteen
  * questions from the second half of the track's data-modeling page: nine
  * worked through, a scene each (the bridge table shares its scene with the
- * many-to-many question), then six quick ones. Every table ran in DuckDB, the
- * UUID index sizes in Postgres (check.mjs, results.json, data.ts).
+ * many-to-many question), then six quick ones. Every table and index size
+ * ran in Postgres (check.mjs, results.json, data.ts).
  *
  * Every scene boundary is a narration cue, so new audio re-times the cuts
  * along with every animation inside them.

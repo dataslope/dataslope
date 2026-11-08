@@ -166,7 +166,7 @@ const daRapid = (daSql.figures as unknown as Record<string, DaFigure>).rapid.ste
 const daTable = (id: string): Table => ({ cols: daRapid[id].columns, rows: daRapid[id].rows.map((r) => r.map(String)) });
 
 export const CLUSTER = {
-  /** Data Analyst Part 1's users table and its email index (DuckDB). */
+  /** Data Analyst Part 1's users table and its email index (da-sql's results). */
   users: daTable("users"),
   emailIndex: daTable("emailIndex"),
   sql: [table("cluster", "clusterShown").rows[0][0]],

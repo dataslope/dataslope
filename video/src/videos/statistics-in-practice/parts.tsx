@@ -34,7 +34,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -64,7 +64,7 @@ export const Headline: React.FC<{
           at={turnAt ?? at + 14}
           dur={18}
           out={out}
-          style={{ position: "relative", ...headline(size, true), color: STAT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
         >
           {turn}
         </Ink>

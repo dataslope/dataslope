@@ -93,20 +93,20 @@ export const SkewScene: React.FC = () => {
             }}
           />
           <Note at={tailAt + 2} x={X.x1 - 10} y={base - h(70)} align="right">
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>and {INCOME.beyond} more, up to {fmt(INCOME.max, 0)} →</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>and {INCOME.beyond} more, up to {fmt(INCOME.max, 0)} →</span>
           </Note>
           <Note at={tailAt + 12} x={X.x1 - 10} y={base - h(40)} align="right">
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>a long tail of high earners</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a long tail of high earners</span>
           </Note>
 
           {/* Mean and median. */}
           <VRule x={sx(X, INCOME.mean)} bottom={base} top={base - h(TALL + 50)} at={meanAt - 4} />
           <Note at={meanAt} x={sx(X, INCOME.mean) + 12} y={base - h(TALL + 54)}>
-            <span style={{ ...note(23, INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>mean {fmt(INCOME.mean, 0)}</span>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>mean {fmt(INCOME.mean, 0)}</span>
           </Note>
           <VRule x={sx(X, INCOME.median)} bottom={base} top={base - h(TALL + 50)} at={medianAt - 4} color={INK_SOFT} dash="3 5" />
           <Note at={medianAt} x={sx(X, INCOME.median) - 12} y={base - h(TALL + 54)} align="right">
-            <span style={{ ...note(23, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>median {fmt(INCOME.median, 0)}</span>
+            <span style={{ ...note(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>median {fmt(INCOME.median, 0)}</span>
           </Note>
 
           {/* The normal forced onto them, and the impossible part of it. */}
@@ -132,7 +132,7 @@ export const SkewScene: React.FC = () => {
             </span>
           </Note>
           <Note at={nothingAt - 2} x={zeroX - 16} y={base - h(250) + 42} align="right">
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...halo }}>earning less than nothing</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...halo }}>earning less than nothing</span>
           </Note>
         </div>
       </Drift>

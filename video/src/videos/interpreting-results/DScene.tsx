@@ -147,14 +147,14 @@ export const DScene: React.FC = () => {
               top: base + 18,
               transform: "translateX(-50%)",
               opacity: ease(frame, sdAt + i * 1.5, 8),
-              ...note(20, INK_SOFT),
+              ...note(24, INK_SOFT),
             }}
           >
             {v === 0 ? "0" : `${v > 0 ? "+" : "−"}${Math.abs(v)}`}
           </div>
         ))}
         <Note at={sdAt + 10} x={X.x1} y={base + 52} align="right">
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>standard deviations from group A&apos;s average</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>standard deviations from group A&apos;s average</span>
         </Note>
 
         <Ring x={(sx(X, 0) + sx(X, d)) / 2} y={peakY - 18} at={apartAt - 2} r0={20} r1={80} />
@@ -181,8 +181,8 @@ export const DScene: React.FC = () => {
             top: peakY - 64,
             transform: "translateX(-50%)",
             opacity: ease(frame, oneAt - 4, 10),
-            ...note(26, STAT_INK),
-            fontWeight: 700,
+            ...note(28, STAT_INK),
+            fontWeight: 500,
             whiteSpace: "nowrap",
             ...halo,
           }}
@@ -190,7 +190,7 @@ export const DScene: React.FC = () => {
           d = {fmt(d, d === 1 ? 0 : 1)}
         </div>
         <Note at={unitsAt - 2} x={160} y={y(318)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Marker at={unitsAt}>no units</Marker>: the same for dollars, milliseconds or test scores
           </span>
         </Note>
@@ -201,7 +201,7 @@ export const DScene: React.FC = () => {
             top: peakY + h(150),
             opacity: shade,
             ...note(24, INK),
-            fontWeight: 650,
+            fontWeight: 500,
             whiteSpace: "nowrap",
             ...halo,
           }}
@@ -213,7 +213,7 @@ export const DScene: React.FC = () => {
       {/* The formula the narration just spoke, which the table's last note
           comes back to: no sample size in it. */}
       <Note at={sdAt - 2} x={TABLE_X} y={y(258)}>
-        <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           d = gap <span style={{ color: INK_SOFT }}>÷</span> standard deviation
         </span>
       </Note>
@@ -228,7 +228,7 @@ export const DScene: React.FC = () => {
             top: y(TABLE_Y),
             whiteSpace: "nowrap",
             opacity: ease(frame, i === 2 ? overlapAt - 4 : at[0] - 10, 12),
-            ...label(21, INK_SOFT),
+            ...label(24, INK_SOFT),
           }}
         >
           {t}
@@ -262,7 +262,7 @@ export const DScene: React.FC = () => {
               }}
             />
             <Ink at={at[i] - 4} dur={12} style={{ left: TABLE_X + COLS[0], top: rowY + 6, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(30, INK), fontWeight: 700 }}>{fmt(o.d, 1)}</span>
+              <span style={{ ...note(28, INK), fontWeight: 500 }}>{fmt(o.d, 1)}</span>
             </Ink>
             <Ink at={at[i] + 2} dur={12} style={{ left: TABLE_X + COLS[1], top: rowY + 2, whiteSpace: "nowrap", opacity: 1 - startDim }}>
               <span style={{ ...body(34, true), color: INK }}>{o.label}</span>
@@ -272,7 +272,7 @@ export const DScene: React.FC = () => {
               dur={12}
               style={{ left: TABLE_X + COLS[2], top: rowY + 6, whiteSpace: "nowrap" }}
             >
-              <span style={{ ...note(30, i === 2 ? STAT_INK : INK), fontWeight: 700 }}>
+              <span style={{ ...note(28, i === 2 ? STAT_INK : INK), fontWeight: 500 }}>
                 {i === 2 ? <Marker at={thirdsAt - 2}>{Math.round(o.shared * 100)}%</Marker> : `${Math.round(o.shared * 100)}%`}
               </span>
             </Ink>
@@ -293,7 +293,7 @@ export const DScene: React.FC = () => {
       <Ring x={TABLE_X + COLS[2] + 34} y={y(TABLE_Y) + 56 + 2 * ROW + 24} at={thirdsAt - 2} r1={64} />
       <Ring x={TABLE_X + COLS[1] + 50} y={y(TABLE_Y) + 56 + 2 * ROW + 24} at={evenAt - 2} r1={70} />
       <Note at={startAt - 2} x={TABLE_X} y={y(TABLE_Y) + 56 + 3 * ROW + 6}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           only a start: <Marker at={stakeAt - 2}>what&apos;s at stake</Marker> decides big
         </span>
       </Note>
@@ -301,7 +301,7 @@ export const DScene: React.FC = () => {
       <Ring x={(sx(X, 0) + sx(X, d)) / 2} y={peakY - 52} at={sizeAt - 2} r0={30} r1={90} />
       <Ring x={TABLE_X + 200} y={y(TABLE_Y) + 56 + 3 * ROW + 60} at={haveAt - 2} r0={30} r1={120} />
       <Note at={unlikeAt - 2} x={TABLE_X} y={y(TABLE_Y) + 56 + 3 * ROW + 46}>
-        <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           and no <Marker at={dataAt - 2}>sample size</Marker> in the formula
         </span>
       </Note>

@@ -94,9 +94,9 @@ export const SolidScene: React.FC = () => {
                   opacity: ease(frame, textAt + i * 3, 10) * (1 - d),
                 }}
               >
-                <span style={{ ...headline(60), color: `color-mix(in srgb, ${BLUE_INK} ${Math.round(35 + fill * 65)}%, ${PAPER})`, fontWeight: 700 }}>{r.letter}</span>
+                <span style={{ ...headline(60), color: `color-mix(in srgb, ${BLUE_INK} ${Math.round(35 + fill * 65)}%, ${PAPER})`, fontWeight: 500 }}>{r.letter}</span>
               </div>
-              <Line x={NAME_X} y={top(i) - 2} at={r.at} size={26} weight={700} dim={dim}>
+              <Line x={NAME_X} y={top(i) - 2} at={r.at} size={26} weight={500} dim={dim}>
                 {r.name}
               </Line>
               <Line x={NAME_X} y={top(i) + 36} at={r.at + 8} size={22} color={INK_SOFT} weight={500} dim={dim}>
@@ -119,7 +119,7 @@ export const SolidScene: React.FC = () => {
           <Box key={t} x={EX_X + k * 190} y={exTop(1)} w={170} h={BOX_H} at={oAt + 8 + k * 4} title={t} size={22} dim={dim} />
         ))}
         <Box x={EX_X + 380 + 30 * (1 - ease(frame, newAt + 4, 14))} y={exTop(1)} w={190} h={BOX_H} at={newAt + 4} title="+ new option" size={22} tone="ok" dashed dim={dim} />
-        <Line x={EX_X + 610} y={mid(1) - 16} at={newCodeAt} size={24} color={OK_INK} weight={650} dim={dim}>
+        <Line x={EX_X + 610} y={mid(1) - 16} at={newCodeAt} size={24} color={OK_INK} weight={500} dim={dim}>
           new code<span style={{ color: INK, fontWeight: 500, opacity: ease(frame, notEditAt, 10) }}>, not an edit</span>
         </Line>
 
@@ -128,7 +128,7 @@ export const SolidScene: React.FC = () => {
         <Flow points={[[EX_X + 156, mid(2)], [EX_X + 232, mid(2)]]} at={lAt + 12} dur={8} width={2.2} head={12} dim={dim} />
         <Box x={EX_X + 240} y={exTop(2)} w={250} h={BOX_H} at={lAt + 14} title="where a rectangle fits" size={21} dashed dim={dim} />
         <Mark2 at={couldntAt + 4} kind="cross" size={32} style={{ left: EX_X + 512, top: mid(2) - 16, opacity: 1 - ease(frame, dim, 14) * 0.6 }} />
-        <Line x={EX_X + 566} y={mid(2) - 16} at={couldntAt + 2} size={24} color={ACCENT_INK} weight={650} dim={dim}>
+        <Line x={EX_X + 566} y={mid(2) - 16} at={couldntAt + 2} size={24} color={ACCENT_INK} weight={500} dim={dim}>
           the square couldn&apos;t
         </Line>
 
@@ -137,22 +137,22 @@ export const SolidScene: React.FC = () => {
         <Flow points={[[EX_X + 196, mid(3)], [EX_X + 272, mid(3)]]} at={stockAt + 8} dur={8} width={2.2} head={12} dim={dim} />
         <Box x={EX_X + 280} y={exTop(3)} w={180} h={BOX_H} at={stockAt + 10} title="reads stock" size={22} tone="ok" dim={dim} />
         <Box x={EX_X + 520} y={exTop(3)} w={300} h={BOX_H} at={refundsAt} size={22} tone="bad" dashed dim={dim}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Strike at={refundsAt + 10}>stock and refunds</Strike>
           </span>
         </Box>
 
         {/* D: on to question 5. */}
-        <Line x={EX_X} y={mid(4) - 16} at={nextAt} size={24} weight={700} color={BLUE_INK} dim={dim}>
+        <Line x={EX_X} y={mid(4) - 16} at={nextAt} size={24} weight={500} color={BLUE_INK} dim={dim}>
           → the next question
         </Line>
 
         {/* Guidelines, not laws. */}
-        <Line x={X0} y={y(800)} at={lawsAt} size={30} weight={600}>
+        <Line x={X0} y={y(800)} at={lawsAt} size={30} weight={500}>
           Guidelines for low coupling and high cohesion, <Mark at={notLawsAt}>not laws</Mark>
         </Line>
         <Line x={X0} y={y(800) + 50} at={everywhereAt} size={24} color={INK_SOFT} weight={500}>
-          applied everywhere, they become <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, overAt, 10) }}>over-engineering</span>
+          applied everywhere, they become <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, overAt, 10) }}>over-engineering</span>
         </Line>
       </Drift>
     </AbsoluteFill>

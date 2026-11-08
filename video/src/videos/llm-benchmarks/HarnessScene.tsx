@@ -117,11 +117,11 @@ export const HarnessScene: React.FC = () => {
           <div style={{ position: "absolute", left: 8, right: 8, top: 12 + LOOP_LINE, height: LOOP_LINE * 2, background: MARK, opacity: bodyLit * 0.8, borderRadius: 4 }} />
           <div style={{ position: "absolute", left: 8, right: 8, top: 12 + LOOP_LINE * 3, height: LOOP_LINE, background: MARK, opacity: lastLit * 0.8, borderRadius: 4 }} />
           <div style={{ position: "relative" }}>
-            <span style={{ color: KW, fontWeight: 600 }}>for</span> text, expected <span style={{ color: KW, fontWeight: 600 }}>in</span> tickets:
+            <span style={{ color: KW, fontWeight: 500 }}>for</span> text, expected <span style={{ color: KW, fontWeight: 500 }}>in</span> tickets:
           </div>
           <div style={{ position: "relative" }}>
             {"    got = "}
-            <span style={{ color: A, fontWeight: 600 }}>{counting ? pass.name : "model"}</span>
+            <span style={{ color: A, fontWeight: 500 }}>{counting ? pass.name : "model"}</span>
             (text)
           </div>
           <div style={{ position: "relative" }}>
@@ -143,16 +143,16 @@ export const HarnessScene: React.FC = () => {
 
         {/* Header. */}
         <Ink at={from + 4} dur={12} style={{ left: COL.ticket, top: y(HEAD_Y) - 16, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>ticket</span>
+          <span style={label(24, INK_SOFT)}>ticket</span>
         </Ink>
         <Ink at={queueAt - 4} dur={12} style={{ left: COL.expected, top: y(HEAD_Y) - 16, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>right queue</span>
+          <span style={label(24, INK_SOFT)}>right queue</span>
         </Ink>
         <Ink at={modelsAt - 4} dur={12} style={{ left: COL.cheap, top: y(HEAD_Y) - 16, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>cheap stand-in</span>
+          <span style={label(24, INK_SOFT)}>cheap stand-in</span>
         </Ink>
         <Ink at={modelsAt} dur={12} style={{ left: COL.good, top: y(HEAD_Y) - 16, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>good stand-in</span>
+          <span style={label(24, INK_SOFT)}>good stand-in</span>
         </Ink>
         <Svg opacity={ease(frame, from + 6, 12)}>
           <line x1={X0} x2={TABLE_X1} y1={y(HEAD_Y) + 16} y2={y(HEAD_Y) + 16} stroke={INK} strokeWidth={2} />
@@ -170,18 +170,18 @@ export const HarnessScene: React.FC = () => {
                 <rect x={X0 - 10} y={rowY - h(STEP) / 2} width={TABLE_X1 - X0 + 20} height={h(STEP) - 2} fill={TRAP} />
               </Svg>
               <Ink at={at} dur={10} style={{ left: COL.ticket, top: rowY - 14, whiteSpace: "nowrap" }}>
-                <span style={note(22, INK)}>{t.text}</span>
+                <span style={note(24, INK)}>{t.text}</span>
               </Ink>
               <Ink at={Math.max(at, queueAt - 4 + i)} dur={10} style={{ left: COL.expected, top: rowY - 13, whiteSpace: "nowrap" }}>
-                <span style={{ fontFamily: MONO, fontSize: 21, color: INK }}>{t.expected}</span>
+                <span style={{ fontFamily: MONO, fontSize: 24, color: INK }}>{t.expected}</span>
               </Ink>
               <Ink at={cheapMark(i) - 4} dur={10} style={{ left: COL.cheap, top: rowY - 13, whiteSpace: "nowrap" }}>
-                <span style={{ fontFamily: MONO, fontSize: 21, color: cheapOk ? INK : TRAP_INK, fontWeight: cheapOk ? 400 : 600 }}>
+                <span style={{ fontFamily: MONO, fontSize: 24, color: cheapOk ? INK : TRAP_INK, fontWeight: cheapOk ? 400 : 500 }}>
                   {cheapOk ? t.cheap : <Marked at={toOtherAt - 2 + i}>{t.cheap}</Marked>}
                 </span>
               </Ink>
               <Ink at={goodMark(i) - 4} dur={10} style={{ left: COL.good, top: rowY - 13, whiteSpace: "nowrap" }}>
-                <span style={{ fontFamily: MONO, fontSize: 21, color: INK }}>{t.good}</span>
+                <span style={{ fontFamily: MONO, fontSize: 24, color: INK }}>{t.good}</span>
               </Ink>
               <Svg>
                 {cheapOk ? <Check x={COL.cheap + 170} y={rowY} at={cheapMark(i)} size={20} /> : <Cross x={COL.cheap + 170} y={rowY} at={cheapMark(i)} size={16} />}
@@ -194,31 +194,31 @@ export const HarnessScene: React.FC = () => {
 
         {/* The two scores. */}
         <Ink at={threeAt - 2} dur={12} style={{ left: TOTAL_X, top: y(400), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>cheap stand-in</span>
+          <span style={label(24, INK_SOFT)}>cheap stand-in</span>
         </Ink>
         <Ink at={thirtyAt - 2} dur={14} style={{ left: TOTAL_X, top: y(400) + 34, whiteSpace: "nowrap" }}>
           <span style={{ ...body(64), color: TRAP_INK, ...TABULAR }}>{HARNESS.cheap}%</span>
         </Ink>
         <Ink at={threeAt} dur={12} style={{ left: TOTAL_X, top: y(400) + 118, whiteSpace: "nowrap" }}>
-          <span style={note(22, INK_SOFT)}>
+          <span style={note(24, INK_SOFT)}>
             <span style={TABULAR}>{HARNESS.cheapRight}</span> of <span style={TABULAR}>{TICKETS.length}</span> right
           </span>
         </Ink>
         <Ink at={otherAt - 2} dur={12} style={{ left: TOTAL_X, top: y(620), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>good stand-in</span>
+          <span style={label(24, INK_SOFT)}>good stand-in</span>
         </Ink>
         <Ink at={allTenAt - 2} dur={14} style={{ left: TOTAL_X, top: y(620) + 34, whiteSpace: "nowrap" }}>
           <span style={{ ...body(64), color: OK_INK, ...TABULAR }}>{HARNESS.good}%</span>
         </Ink>
         {/* The failure list, read: every miss went to one queue. */}
         <Ink at={sevenAt - 2} dur={14} style={{ left: TOTAL_X, top: y(800), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, INK), fontWeight: 600 }}>
+          <span style={{ ...note(24, INK), fontWeight: 500 }}>
             all <span style={TABULAR}>{HARNESS.cheapMisses.length}</span> misses sent to{" "}
             <span style={{ fontFamily: MONO, color: TRAP_INK }}>{MISS_QUEUE}</span>
           </span>
         </Ink>
         <Ink at={queueEndAt - 2} dur={14} style={{ left: TOTAL_X, top: y(800) + 36, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK), fontStyle: "italic" }}>who reads that queue?</span>
+          <span style={{ ...note(24, INK) }}>who reads that queue?</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

@@ -128,10 +128,10 @@ export const CellScene: React.FC = () => {
           marks={[{ line: 1, at: fiveAt }]}
         />
         <Note at={nobodyAt - 2} x={SEARCH_X} y={y(BODY_Y) + listH + 16}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>({LIST_SEARCH.rows} rows)</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>({LIST_SEARCH.rows} rows)</span>
         </Note>
         <Note at={buriedAt} x={SEARCH_X + 130} y={y(BODY_Y) + listH + 16}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mono>{SOUGHT}</Mono> is in Ada&apos;s cell, inside one string
           </span>
         </Note>
@@ -164,10 +164,10 @@ export const CellScene: React.FC = () => {
           />
         </Svg>
         <Note at={groupAt + 4} x={edge + 40} y={gb.top + 12}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>A repeating group</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>A repeating group</span>
         </Note>
         <Note at={ceilingAt + 2} x={edge + 40} y={gb.top + 50}>
-          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>and nowhere to put a fourth</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>and nowhere to put a fourth</span>
         </Note>
         {/* The fourth number, with no column to land in. */}
         {overIn > 0 ? (
@@ -201,7 +201,7 @@ export const CellScene: React.FC = () => {
         ) : null}
         {/* Fig. 3 gave Grace one number; this row is a new attempt, with four. */}
         <Note at={fourthAt} x={gb.x} y={gb.bottom(COLUMNS.rows.length + 1) + 18}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Grace, with four numbers</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Grace, with four numbers</span>
         </Note>
         {/* Postgres refuses as the fourth number arrives, so the refusal is up
             for the rest of the beat and the hold after it. */}

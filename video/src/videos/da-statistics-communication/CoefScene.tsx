@@ -60,8 +60,8 @@ const Marker: React.FC<{
           top: y - lift - 22,
           textAlign: align === "center" ? "center" : align === "end" ? "right" : "left",
           opacity: ease(frame, from + 4, 10) * (1 - o),
-          ...note(23, color),
-          fontWeight: 650,
+          ...note(24, color),
+          fontWeight: 500,
           whiteSpace: "nowrap",
           ...TABULAR,
         }}
@@ -137,12 +137,12 @@ export const CoefScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={ideaAt - 2} x={96} y={y(300)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>correlation</b>: the idea, two things moving together
           </span>
         </Note>
         <Note at={numberAt - 2} x={960} y={y(300)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>the coefficient</b>: a number for it
           </span>
         </Note>
@@ -157,7 +157,7 @@ export const CoefScene: React.FC = () => {
                 x={at(R, t)}
                 y={sy + 34}
                 textAnchor="middle"
-                style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
+                style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
               >
                 {t === 0 ? "0" : t < 0 ? `−${Math.abs(t)}` : String(t)}
               </text>
@@ -166,13 +166,13 @@ export const CoefScene: React.FC = () => {
         </Svg>
         {/* The scale holds Pearson's r and Spearman's both, so it is named for neither. */}
         <Note at={pearsonAt} x={96} y={sy - 16}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>coefficient</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>coefficient</span>
         </Note>
         <Note at={pearsonAt + 4} x={R.b + 40} y={sy - 36}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Pearson&apos;s r:</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>Pearson&apos;s r:</span>
         </Note>
         <Note at={lineAt + 2} x={R.b + 40} y={sy - 4}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>how close to a straight line</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>how close to a straight line</span>
         </Note>
 
         {/* ── Question 2's days, for a number to put on the scale ── */}
@@ -199,24 +199,24 @@ export const CoefScene: React.FC = () => {
           Spearman: {fmt(SHAPE.eSpearman)}
         </Marker>
         <Note at={spearmanAt} x={E_X.a} y={y(PANEL.top) - 10}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Spearman ranks the values first</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Spearman ranks the values first</span>
         </Note>
 
         <Note at={useAt - 2} x={96} y={y(492)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            Spearman for <span style={{ color: OK_INK, fontWeight: 650 }}>monotonic, not straight</span>, or ordinal data
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            Spearman for <span style={{ color: OK_INK, fontWeight: 500 }}>monotonic, not straight</span>, or ordinal data
             <span style={{ color: INK_SOFT, opacity: ease(frame, ordinalAt - 2, 10) }}> (ranked categories, like a 1-to-5 rating)</span>
           </span>
         </Note>
 
         {/* Spearman misses the U as well: a reason to plot first. */}
         <Note at={neitherAt - 2} x={(U_X.a + U_X.b) / 2 - 200} width={400} y={y(586)} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             Spearman: {SHAPE.uSpearman < 0 ? `−${fmt(-SHAPE.uSpearman)}` : fmt(SHAPE.uSpearman)}
           </span>
         </Note>
         <Note at={plotAt - 2} x={(U_X.a + U_X.b) / 2 - 200} width={400} y={y(586) + 40} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>plot the data first</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>plot the data first</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -28,7 +28,7 @@ const OVERLAP = 6;
  * orchestration page, with the seven Pipelines asks here too: eleven worked
  * through, a scene each (retries take two, for the jitter), then three quick
  * ones. Airflow and Dagster are drawn as mechanism; every number is a chart
- * spec's, Pyodide's or DuckDB's (check.mjs, results.json, data.ts).
+ * spec's, Pyodide's or Postgres's (check.mjs, results.json, data.ts).
  *
  * No series intro, as in the other interview series. Every scene boundary is a
  * narration cue, so new audio re-times the cuts along with every animation

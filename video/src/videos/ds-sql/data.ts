@@ -1,9 +1,8 @@
 import results from "./results.json" with { type: "json" };
 
 // Every table, statement and message the video shows, read from
-// results.json: what DuckDB v1.4.3 (DuckDB-Wasm 1.32.0, the engine the
-// page's blocks run) returned for the statements in check.mjs, which wrote
-// it, plus the one figure run on the site's Postgres engine. Each figure ran
+// results.json: what Postgres (PGlite, the engine the page's blocks run)
+// returned for the statements in check.mjs, which wrote it. Each figure ran
 // in a fresh database built by its own setup, and the SQL printed on screen
 // is the SQL in that file, so a listing cannot drift from what ran. Pure (no
 // Remotion, no DOM).
@@ -43,8 +42,8 @@ const table = (figure: string, id: string): Table => {
 export type Query = { lines: string[] };
 const query = (figure: string, id: string): Query & Table => ({ lines: step(figure, id).sql.split("\n"), ...table(figure, id) });
 
-/** A statement the engine refused: its SQL and its error, split into the
- *  kind ("Binder Error", "ERROR") and the message. */
+/** A statement Postgres refused: its SQL and its error, split into the
+ *  kind ("ERROR") and the message. */
 const refused = (figure: string, id: string) => {
   const s = step(figure, id);
   if (s.ok || !s.error) throw new Error(`${figure}.${id} did not fail: ${s.sql}`);
@@ -78,17 +77,14 @@ export const RETAIN = {
 export const RATE = {
   /** The page's funnel: its first six of 24 variants, as data. */
   funnel: table("rate", "funnel"),
-  /** DuckDB's bare division on C and F, with no NULLIF: null already. */
-  duckBare: query("rate", "duckBare"),
   noSessions: scalar("rate", "zeros", "no_sessions"),
   variants: table("rate", "page").rows.length,
-  /** The same bare division in Postgres: the zero divisor fails it. */
-  pgBare: refused("ratePg", "bare"),
-  /** Postgres, on the two variants with sessions: integer division. */
-  pgTruncated: query("ratePg", "truncated"),
-  /** Postgres, with * 1.0 and NULLIF. */
-  pgFixed: query("ratePg", "fixed"),
-  pgVersion: (results.figures as unknown as Record<string, Figure>).ratePg.version,
+  /** The bare division: the zero divisor fails the whole query. */
+  pgBare: refused("rate", "bare"),
+  /** On the two variants with sessions: integer division, truncated. */
+  pgTruncated: query("rate", "truncated"),
+  /** With * 1.0 and NULLIF. */
+  pgFixed: query("rate", "fixed"),
 };
 
 // ── 4. Cohort retention ─────────────────────────────────────────────────────
@@ -165,4 +161,6 @@ export const RAPID = {
   counts: query("count", "counts"),
 };
 
-export const RUNTIME = `DuckDB ${FIGURES.retain.version}`;
+/** The engine that ran the figures, for the record: never put on screen
+ *  (no Postgres version is shown in the videos). */
+export const RUNTIME = FIGURES.retain.version;

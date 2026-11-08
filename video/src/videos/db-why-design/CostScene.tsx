@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT, body, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -105,7 +105,7 @@ export const CostScene: React.FC = () => {
           {/* One line at one size, the notes' own: the reply stands out by its ink, weight and highlight. */}
           <Ink at={legalFrom - 4} dur={16} style={{ left: X0, top: y(300), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14, fontSize: 24 }}>
             <span style={label(24, INK_SOFT)}>Postgres replied</span>
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 700, color: INK }}>
+            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>
               <Mark at={toldAt - 2}>UPDATE {FLAT.updated}</Mark>
             </span>
             <span style={note(24, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
@@ -166,8 +166,8 @@ export const CostScene: React.FC = () => {
                       transform: `scale(${1 + stepped * 0.025})`,
                     }}
                   >
-                    <div style={label(20, INK_SOFT)}>{one ? "Ada's email: one fact" : `copy on order ${c.order}`}</div>
-                    <div style={{ fontFamily: MONO, fontSize: 26, color: INK, fontWeight: 600 }}>
+                    <div style={label(24, INK_SOFT)}>{one ? "Ada's email: one fact" : `copy on order ${c.order}`}</div>
+                    <div style={{ fontFamily: MONO, fontSize: 28, color: INK, fontWeight: 500 }}>
                       <span style={{ opacity: swap < 0.5 ? 1 - 2 * swap : 2 * swap - 1 }}>{swap < 0.5 ? OLD_EMAIL : c.email}</span>
                     </div>
                   </div>
@@ -201,12 +201,12 @@ export const CostScene: React.FC = () => {
             </React.Fragment>
           ))}
           <Note at={foreverAt - 2} x={CHIP_X} y={chipY(3) + 84} dim={anomalyAt + 10}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>By hand, forever.</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>By hand, forever.</span>
           </Note>
 
           {/* Its name. */}
           <Ink at={anomalyAt - 2} dur={18} style={{ left: X0, top: y(ANOMALY_Y), whiteSpace: "nowrap" }}>
-            <span style={{ ...headline(54, true), color: ACCENT_INK }}>The update anomaly</span>
+            <span style={{ ...headline(54, true), color: INK }}>The update anomaly</span>
           </Ink>
           <div
             style={{
@@ -221,10 +221,10 @@ export const CostScene: React.FC = () => {
           />
           {/* Under the copies it means. */}
           <Note at={outlivesAt + 4} x={X0} y={y(COPY_Y[1]) + h(CARD_H) + 18}>
-            <span style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>The data stays.</span>
+            <span style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>The data stays.</span>
           </Note>
           <Note at={tomorrowAt} x={CHIP_X} y={chipY(0) - 52}>
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Code, tomorrow</span>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Code, tomorrow</span>
           </Note>
         </div>
       </Drift>

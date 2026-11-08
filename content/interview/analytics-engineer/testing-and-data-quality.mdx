@@ -13,7 +13,7 @@ YAML/SQL, one runnable check, and concept-check MCQs.
   alt="A row of small gates on a platform, each gate inspecting a passing block and diverting one cracked block into a side bin"
 />
 
-> **Context:** dbt tests compile to SQL that runs in your warehouse. The one runnable block below uses **DuckDB** to show what a failing uniqueness test actually surfaces.
+> **Context:** dbt tests compile to SQL that runs in your warehouse. The one runnable block below uses **PostgreSQL** to show what a failing uniqueness test actually surfaces.
 
 ## Q&A
 
@@ -75,7 +75,7 @@ The rows that break the assumption, the duplicated keys. A `unique` test on
 more than once. An empty result passes; the returned rows are what you fix:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`-- Orders 2, 11 and 19 each appear twice: the duplicates a uniqueness
 -- test is meant to catch.
 CREATE TABLE fct_orders AS SELECT * FROM (VALUES
@@ -90,7 +90,8 @@ CREATE TABLE fct_orders AS SELECT * FROM (VALUES
 SELECT order_id, COUNT(*) AS n
 FROM fct_orders
 GROUP BY order_id
-HAVING COUNT(*) > 1;`}
+HAVING COUNT(*) > 1
+ORDER BY order_id;`}
 />
 
 ### What is the difference between a source test and a model test?

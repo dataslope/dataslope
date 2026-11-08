@@ -130,24 +130,24 @@ export const ConfoundScene: React.FC = () => {
         {[0, 60, 120, 180, 240].map((v) => (
           <div
             key={v}
-            style={{ position: "absolute", left: px(v), top: bottom + 14, transform: "translateX(-50%)", opacity: ease(frame, exerciseAt, 12), ...note(20, INK_SOFT) }}
+            style={{ position: "absolute", left: px(v), top: bottom + 14, transform: "translateX(-50%)", opacity: ease(frame, exerciseAt, 12), ...note(24, INK_SOFT) }}
           >
             {v}
           </div>
         ))}
         <Note at={exerciseAt + 2} x={X.x1} y={bottom + 46} align="right">
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>exercise, minutes a week</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>exercise, minutes a week</span>
         </Note>
         {[110, 120, 130, 140, 150].map((v) => (
           <div
             key={v}
-            style={{ position: "absolute", right: 1920 - X.x0 + 12, top: py(v) - 13, opacity: ease(frame, pressureAt, 12), ...note(20, INK_SOFT), ...TABULAR }}
+            style={{ position: "absolute", right: 1920 - X.x0 + 12, top: py(v) - 13, opacity: ease(frame, pressureAt, 12), ...note(24, INK_SOFT), ...TABULAR }}
           >
             {v}
           </div>
         ))}
         <Note at={pressureAt + 2} x={X.x0 + 12} y={top - 34}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>blood pressure, mmHg</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>blood pressure, mmHg</span>
         </Note>
 
         {/* ── The people, then their age bands ── */}
@@ -211,22 +211,22 @@ export const ConfoundScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={nineAt - 2} x={px(CONFOUND.pooled.x1) - 10} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * CONFOUND.pooled.x1) - 80} align="right" dim={fallsAt}>
-          <span style={{ ...note(23, STAT_INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             everyone: +{fmt(CONFOUND.pooledPerHour, 1)} mmHg <Marker at={hourAt - 2}>per weekly hour</Marker>
           </span>
         </Note>
         <Note at={hourAt + 6} x={px(70)} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * 40) + 8} from="up" out={colorAt}>
-          <span style={{ ...note(20, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+          <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
             one hour
           </span>
         </Note>
         {CONFOUND.fits.map((f, k) => (
           <Note key={k} at={bandAt + k * 4} x={px(f.x1) + 10} y={py(f.intercept + f.slope * f.x1) - 4}>
-            <span style={{ ...note(20, BAND_INK[k]), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>{BAND_NAME[k]}</span>
+            <span style={{ ...note(24, BAND_INK[k]), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>{BAND_NAME[k]}</span>
           </Note>
         ))}
         <Note at={higherAt - 2} x={X.x1 - 10} y={bottom - 56} align="right">
-          <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>older bands: more exercise, higher pressure</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>older bands: more exercise, higher pressure</span>
         </Note>
       </Drift>
       </div>
@@ -243,7 +243,7 @@ export const ConfoundScene: React.FC = () => {
       {box("Blood pressure", PRESSURE[0], lowY, drivesAt - 4)}
       <Ring x={AGE[0]} y={ageY} at={cureAt - 2} r0={40} r1={110} />
       <Note at={confounderAt - 2} x={AGE[0]} y={ageY - 76} from="up">
-        <span style={{ ...label(22, STAT_INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...label(24, STAT_INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           <Marker at={confounderAt}>the confounder</Marker>
         </span>
       </Note>
@@ -267,12 +267,12 @@ export const ConfoundScene: React.FC = () => {
       <Spot id="interpreting-results-coin" at={coinAt - 6} left={1230} top={y(760)} width={180} height={200} />
       <Arrow from={[1390, y(790)]} to={[EXERCISE[0], lowY + 32]} at={coinAt + 4} dur={12} color={STAT} />
       <Note at={randomAt - 2} x={1440} y={y(800)}>
-        <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           randomize who <Marker at={cantAt - 4}>exercises</Marker>
         </span>
       </Note>
       <Note at={cantAt} x={1440} y={y(842)}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>and age can&apos;t decide it</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>and age can&apos;t decide it</span>
       </Note>
       </div>
     </AbsoluteFill>

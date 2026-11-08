@@ -111,7 +111,7 @@ export const RulerScene: React.FC = () => {
           is a ruler.
         </Ink>
       </div>
-      <Ink at={inferenceAt - 4} dur={18} style={{ left: 94, top: y(186), ...headline(40, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+      <Ink at={inferenceAt - 4} dur={18} style={{ left: 94, top: y(186), ...headline(40, true), color: INK, whiteSpace: "nowrap" }}>
         Intervals and tests are measured with it.
       </Ink>
       {ILLUSTRATIONS ? (
@@ -152,7 +152,7 @@ export const RulerScene: React.FC = () => {
       <Axis scale={X} base={y(BASE)} ticks={TICKS} at={dotsAt - 4} format={seconds} />
       <Rule x={mx} y0={y(BASE)} y1={y(STRIP_TOP - 22)} at={eightAt - 4} dur={12} color={ACCENT} width={2.8} />
       <Note at={eightAt} x={mx + 14} y={y(STRIP_TOP - 40)}>
-        <span style={{ ...note(23, ACCENT_INK), fontWeight: 700 }}>average {fmt(TIMES.mean)} s</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>average {fmt(TIMES.mean)} s</span>
       </Note>
 
       {/* ── Fig. 7: the ruler ── */}
@@ -207,8 +207,8 @@ export const RulerScene: React.FC = () => {
                 textAnchor="middle"
                 style={{
                   fontFamily: SANS,
-                  fontSize: 22,
-                  fontWeight: k === 0 || lit > 0 ? 700 : 500,
+                  fontSize: 24,
+                  fontWeight: k === 0 || lit > 0 ? 500 : 500,
                   fill: lit > 0 ? ACCENT_INK : k === 0 ? INK : INK_SOFT,
                   fontVariantNumeric: "tabular-nums",
                 }}
@@ -220,7 +220,7 @@ export const RulerScene: React.FC = () => {
         </g>
       </svg>
       <Note at={seAt + 16} x={R.x1} y={y(RULER_TOP + RULER_H) + 14} align="right">
-        <span style={label(19, INK_SOFT)}>standard errors from the average</span>
+        <span style={label(24, INK_SOFT)}>standard errors from the average</span>
       </Note>
 
       {/* The interval, lit on the ruler when the bridge names it: in the
@@ -240,7 +240,7 @@ export const RulerScene: React.FC = () => {
       {/* The rough interval: about two standard errors either way. */}
       <Span x0={rx(TIMES.lo)} x1={rx(TIMES.hi)} y={y(RULER_TOP - 22)} at={stepAt} dur={26} color={ACCENT} width={3.2} tick={10} />
       <div style={{ position: "absolute", left: rx(TIMES.lo), top: y(RULER_TOP - 72), display: "flex", alignItems: "baseline", gap: "0.4em", whiteSpace: "nowrap" }}>
-        <Ink at={sevenAt - 2} dur={14} style={{ position: "relative", ...note(24, ACCENT_INK), fontWeight: 700 }}>
+        <Ink at={sevenAt - 2} dur={14} style={{ position: "relative", ...note(24, ACCENT_INK), fontWeight: 500 }}>
           {fmt(TIMES.lo)} to {fmt(TIMES.hi)} s,
         </Ink>
         {/* One line, one size, one face: the range is set apart by weight
@@ -273,10 +273,10 @@ export const RulerScene: React.FC = () => {
         tick={8}
       />
       <Note at={testAt + 4} x={rx(TIMES.tested) - 16} y={y(RULER_TOP + RULER_H + 26)} align="right" from="right">
-        <span style={note(22, INK)}>tested value, {fmt(TIMES.tested, 1)} s</span>
+        <span style={note(24, INK)}>tested value, {fmt(TIMES.tested, 1)} s</span>
       </Note>
       <Note at={lessAt - 2} x={rx(TIMES.mean) + 16} y={y(RULER_TOP + RULER_H + 26)}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 700 }}>{fmt(TIMES.gapInSe)} standard errors away</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>{fmt(TIMES.gapInSe)} standard errors away</span>
       </Note>
 
       <div style={{ position: "absolute", left: R.x0, right: 1920 - R.x1, top: y(856) - 29, height: 1, background: HAIRLINE, opacity: ease(frame, nextAt - 6, 12) }} />

@@ -24,7 +24,7 @@ const OVERLAP = 6;
  * Engineer interview prep videos, on the editorial page. Fifteen questions
  * from the first half of the track's data-modeling page: ten worked through,
  * a scene each (facts and the star share one), then five quick ones. Every
- * table and number ran in DuckDB-Wasm (check.mjs, results.json, data.ts);
+ * table and number ran in Postgres (check.mjs, results.json, data.ts);
  * every schema is drawn with the ERD kit.
  *
  * Every scene boundary is a narration cue, so new audio re-times the cuts

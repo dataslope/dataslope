@@ -6,7 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, INK, INK_SOFT, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ArtSpot, Box, Drift, Flow, Gauge, Line, lerp, Mark, OK, OK_INK, pulse, toneAt, VRule, X0 } from "./parts";
+import { ArtSpot, Box, dialBox, Drift, Flow, Gauge, Line, lerp, Mark, OK, OK_INK, pulse, toneAt, VRule, X0 } from "./parts";
 
 /** The god class's five jobs, and what makes each one change. */
 const JOBS = [
@@ -23,9 +23,16 @@ const GOD = { x: 480, w: 430, top: 432, title: 62, row: 54, rowH: 44 };
 /** Where each piece sits once the class is split: further apart. */
 const SPLIT_PITCH = 70;
 const CHECKOUT = { x: 1270, w: 230, h: 72 };
+/** Each gauge is the painted dial (parts.tsx), `r` its rim's radius and `cy`
+ *  its hub. */
 const GAUGE = { r: 78, cy: 318, xs: [1440, 1700] };
 /** While the definitions are read, the gauges sit large in the open page. */
 const BIG = { r: 130, cy: 600, xs: [720, 1200] };
+/** A gauge's name sits this far under its painting, its note one line
+ *  further, and the hairline between them reaches past the note. */
+const LABEL_GAP = 26;
+const NOTE_DY = 32;
+const LABELS_H = NOTE_DY + 30;
 
 /**
  * Question 1. Cohesion and coupling as two gauges, then the anti-pattern:
@@ -84,6 +91,10 @@ export const CohScene: React.FC = () => {
   const gy = lerp(y(BIG.cy), gaugeY, move);
   const gr = lerp(BIG.r, GAUGE.r, move);
   const gx = (i: number) => lerp(BIG.xs[i], GAUGE.xs[i], move);
+  const dial = dialBox(gr);
+  const labelY = gy + dial.below + LABEL_GAP;
+  // Under the small gauges' notes, with the same air again.
+  const solidY = gaugeY + dialBox(GAUGE.r).below + LABEL_GAP + LABELS_H + 32;
 
   return (
     <AbsoluteFill>
@@ -111,7 +122,7 @@ export const CohScene: React.FC = () => {
           <b>Coupling</b>: how much modules depend on each other
           <span style={{ color: INK_SOFT, opacity: ease(frame, lowAt, 10) }}>; low, and a change rarely spreads</span>
         </Line>
-        <VRule x={(gx(0) + gx(1)) / 2} top={gy - gr} bottom={gy + 74} at={coupAt + 6} />
+        <VRule x={(gx(0) + gx(1)) / 2} top={gy - dial.above} bottom={labelY + LABELS_H} at={coupAt + 6} />
         {(["cohesion", "coupling"] as const).map((name, i) => {
           const cx = gx(i);
           const good = name === "cohesion" ? 1 : 0;
@@ -121,16 +132,17 @@ export const CohScene: React.FC = () => {
                 cx={cx}
                 cy={gy}
                 r={gr}
+                flip={good === 1}
                 at={i === 0 ? cohAt + 6 : coupAt + 6}
                 steps={[
                   { at: godAt, value: good ? 0.14 : 0.86, tone: "bad" },
                   { at: highAt, value: good ? 0.86 : 0.14, tone: "ok" },
                 ]}
               />
-              <Line x={cx} y={gy + 18} at={i === 0 ? cohAt + 8 : coupAt + 8} size={22} weight={700} align="center" width={220}>
+              <Line x={cx} y={labelY} at={i === 0 ? cohAt + 8 : coupAt + 8} size={22} weight={500} align="center" width={220}>
                 {name}
               </Line>
-              <Line x={cx} y={gy + 50} at={i === 0 ? purposeAt : lowAt} size={20} color={INK_SOFT} weight={600} align="center" width={220}>
+              <Line x={cx} y={labelY + NOTE_DY} at={i === 0 ? purposeAt : lowAt} size={20} color={INK_SOFT} weight={500} align="center" width={220}>
                 {good ? "high is good" : "low is good"}
               </Line>
             </React.Fragment>
@@ -152,9 +164,9 @@ export const CohScene: React.FC = () => {
             opacity: ease(frame, managerAt, 12) * (1 - split),
           }}
         />
-        <Line x={GOD.x + 22} y={T + 14} at={managerAt} size={25} weight={750} out={splitAt}>
+        <Line x={GOD.x + 22} y={T + 14} at={managerAt} size={25} weight={500} out={splitAt}>
           <span style={{ color: ACCENT }}>Order manager</span>
-          <span style={{ color: INK_SOFT, fontWeight: 600, opacity: ease(frame, godAt, 10) }}> · a god class</span>
+          <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, godAt, 10) }}> · a god class</span>
         </Line>
         {JOBS.map((j, i) => {
           const top = rowTop(i);
@@ -185,7 +197,7 @@ export const CohScene: React.FC = () => {
                 transform: `translateX(${(1 - p) * -10}px)`,
               }}
             >
-              <span style={{ ...note(23, split > 0.5 ? OK_INK : INK), fontWeight: 600, whiteSpace: "nowrap" }}>{j.job}</span>
+              <span style={{ ...note(24, split > 0.5 ? OK_INK : INK), fontWeight: 500, whiteSpace: "nowrap" }}>{j.job}</span>
             </div>
           );
         })}
@@ -197,7 +209,7 @@ export const CohScene: React.FC = () => {
           const mid = rowMid(i);
           return (
             <React.Fragment key={j.why}>
-              <Line x={WHY.x + WHY.w} y={mid - 15} at={at} size={22} weight={650} color={red > 0.5 ? ACCENT : INK_SOFT} align="right" width={WHY.w}>
+              <Line x={WHY.x + WHY.w} y={mid - 15} at={at} size={22} weight={500} color={red > 0.5 ? ACCENT : INK_SOFT} align="right" width={WHY.w}>
                 {j.why}
               </Line>
               <Flow points={[[WHY.x + WHY.w + 16, mid], [GOD.x + 16, mid]]} at={at + 4} dur={8} color={red > 0.5 ? ACCENT : INK} width={2.2} head={12} />
@@ -220,7 +232,7 @@ export const CohScene: React.FC = () => {
           ]}
         />
         <Flow points={[[CHECKOUT.x - 8, ckMid], [GOD.x + GOD.w + 8, ckMid]]} at={touchesAt + 4} color={redFlow > 0.5 ? ACCENT : INK} out={splitAt} />
-        <Line x={GOD.x + GOD.w + 40} y={ckMid - 46} at={touchesAt + 8} size={20} color={INK_SOFT} weight={600} out={splitAt}>
+        <Line x={GOD.x + GOD.w + 40} y={ckMid - 46} at={touchesAt + 8} size={20} color={INK_SOFT} weight={500} out={splitAt}>
           depends on all five
         </Line>
         {JOBS.map((j, i) => (
@@ -238,7 +250,7 @@ export const CohScene: React.FC = () => {
         <ArtSpot id="multitool" at={knifeAt} out={splitAt - 10} left={1590} top={ckMid - 75} h={150} />
 
         {/* How to spot one. */}
-        <Line x={CHECKOUT.x} y={y(752)} at={spotAt} size={22} weight={700}>
+        <Line x={CHECKOUT.x} y={y(752)} at={spotAt} size={22} weight={500}>
           In a review, count
         </Line>
         {[
@@ -254,7 +266,7 @@ export const CohScene: React.FC = () => {
             </Line>
           </React.Fragment>
         ))}
-        <Line x={(GAUGE.xs[0] + GAUGE.xs[1]) / 2} y={gaugeY + 92} at={solidAt} size={21} color={OK_INK} weight={650} align="center" width={420}>
+        <Line x={(GAUGE.xs[0] + GAUGE.xs[1]) / 2} y={solidY} at={solidAt} size={21} color={OK_INK} weight={500} align="center" width={420}>
           most of SOLID pushes this way
         </Line>
       </Drift>

@@ -54,7 +54,7 @@ const Item: React.FC<{ x: number; y: number; at: number; mark: React.ReactNode; 
   return (
     <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "center", gap: 14, opacity: p * (1 - o), transform: `translateX(${(1 - p) * -12}px)` }}>
       {mark}
-      <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>{children}</span>
+      <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>{children}</span>
     </div>
   );
 };
@@ -152,19 +152,19 @@ export const PrivacyScene: React.FC = () => {
         {/* From the two headings to the list's last line. */}
         <ColumnRule x={INSTEAD_RULE_X} top={top - h(54)} height={h(54) + 3 * pitch + 36} at={rowsAt0 - 2} out={out5} />
         <Note at={rowsAt0 - 2} x={INSTEAD_X} y={top - h(54)} out={out5}>
-          <span style={{ ...label(22, OK_INK), whiteSpace: "nowrap" }}>Instead: the schema, and a few made-up rows</span>
+          <span style={{ ...label(24, OK_INK), whiteSpace: "nowrap" }}>Instead: the schema, and a few made-up rows</span>
         </Note>
         <TextPanel lines={schema} x={INSTEAD_X} top={top} width={INSTEAD_W} size={20} mono at={schemaAt - 4} lineAt={[schemaAt, madeUpAt, madeUpAt + 6]} out={out5} />
         <Note at={madeUpAt + 8} x={INSTEAD_X} y={top + h(160)} out={out5}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>made up for this video: no real customer in it</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>made up for this video: no real customer in it</span>
         </Note>
         <Note at={breachAt - 2} x={X0} y={top + 4 * pitch + h(40)} out={out5}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>one careless paste can be a reportable data breach</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one careless paste can be a reportable data breach</span>
         </Note>
 
         {/* ── Question 6: what for, what not, how checked ── */}
         <Note at={Math.min(ownAt, asked6) - 6} x={X0} y={top - h(54)}>
-          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>Be specific, and own the result:</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Be specific, and own the result:</span>
         </Note>
         {/* A hairline centred in each gap, as tall as the taller of the two
             columns beside it, inking in with the column to its right. */}
@@ -175,7 +175,7 @@ export const PrivacyScene: React.FC = () => {
           <React.Fragment key={c.head}>
             {/* Every header in the same blue: keeping the definitions and the
                 conclusions is the right practice, so nothing here is red. */}
-            <div style={{ position: "absolute", left: c.x, top, ...label(22, BLUE_INK), opacity: ease(frame, c.at, 12), whiteSpace: "nowrap" }}>{c.head}</div>
+            <div style={{ position: "absolute", left: c.x, top, ...label(24, BLUE_INK), opacity: ease(frame, c.at, 12), whiteSpace: "nowrap" }}>{c.head}</div>
             {c.items.map((it, k) => (
               <Item key={it.text} x={c.x} y={top + h(46) + k * pitch} at={it.at} mark={c.ok ? <Tick at={it.at + 4} size={24} /> : <Dash at={it.at + 4} />}>
                 {it.text}
@@ -195,9 +195,9 @@ export const PrivacyScene: React.FC = () => {
             opacity: ease(frame, hidingAt - 2, 12),
           }}
         >
-          <div style={{ ...note(28, ACCENT_INK), fontWeight: 650, lineHeight: "36px", whiteSpace: "nowrap" }}>hid it, then couldn&apos;t explain a line</div>
+          <div style={{ ...note(28, ACCENT_INK), fontWeight: 500, lineHeight: "36px", whiteSpace: "nowrap" }}>hid it, then couldn&apos;t explain a line</div>
           <FlexRule at={openlyAt - 2} />
-          <div style={{ ...note(28, OK_INK), fontWeight: 650, lineHeight: "36px", whiteSpace: "nowrap", opacity: ease(frame, openlyAt - 2, 12) }}>
+          <div style={{ ...note(28, OK_INK), fontWeight: 500, lineHeight: "36px", whiteSpace: "nowrap", opacity: ease(frame, openlyAt - 2, 12) }}>
             used it openly, and checked it
           </div>
         </div>

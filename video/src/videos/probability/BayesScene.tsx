@@ -100,8 +100,8 @@ export const BayesScene: React.FC = () => {
         {/* ── Two conditionals: both are on the page as "backwards" is said,
              and each number arrives with its own words. ── */}
         <Ink at={inverseFrom + 4} dur={16} style={{ left: 160, top: y(300), whiteSpace: "nowrap" }}>
-          <div style={label(23, INK_SOFT)}>Among the sick</div>
-          <div style={{ ...note(32, INK), marginTop: 10 }}>
+          <div style={label(24, INK_SOFT)}>Among the sick</div>
+          <div style={{ ...note(34, INK), marginTop: 10 }}>
             P(positive <span style={{ color: INK_SOFT }}>| sick</span>)
           </div>
           <div>
@@ -116,8 +116,8 @@ export const BayesScene: React.FC = () => {
           <span style={{ ...body(40, true), color: INK }}>is not</span>
         </Ink>
         <Ink at={backwardsAt - 4} dur={16} style={{ left: 860, top: y(300), whiteSpace: "nowrap" }}>
-          <div style={label(23, INK_SOFT)}>Among the positives</div>
-          <div style={{ ...note(32, INK), marginTop: 10 }}>
+          <div style={label(24, INK_SOFT)}>Among the positives</div>
+          <div style={{ ...note(34, INK), marginTop: 10 }}>
             P(sick <span style={{ color: INK_SOFT }}>| positive</span>)
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 28 }}>
@@ -141,7 +141,7 @@ export const BayesScene: React.FC = () => {
         {/* ── Bayes' rule, and the base rate. "One" is the test's own rate,
              what the arrow starts from; "the other" is the one you want. ── */}
         <Ink at={bayesAt - 4} dur={18} style={{ left: 160, top: y(540), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(30, INK) }}>
+          <span style={{ ...note(28, INK) }}>
             <Sweep at={Math.max(otherAt - 2, oneAt + 10)}>P(sick | positive)</Sweep> ={" "}
             <Sweep at={oneAt - 2}>P(positive | sick)</Sweep> ×{" "}
             <span style={{ position: "relative", display: "inline-block" }}>
@@ -155,8 +155,8 @@ export const BayesScene: React.FC = () => {
                   left: 0,
                   bottom: "100%",
                   marginBottom: 6,
-                  ...note(22, DATA_INK),
-                  fontWeight: 650,
+                  ...note(24, DATA_INK),
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                   opacity: ease(frame, baseAt + 2, 12),
                 }}
@@ -195,7 +195,7 @@ export const BayesScene: React.FC = () => {
           return (
             <React.Fragment key={name}>
               <Ink at={healthyAt + i * 4} dur={12} style={{ left: 160, top: top + h(BAR.h) / 2 - 15 }}>
-                <span style={note(22, INK)}>{name}</span>
+                <span style={note(24, INK)}>{name}</span>
               </Ink>
               <div style={{ position: "absolute", left: BAR.x0, top, width: w * g, height: h(BAR.h), background: color }} />
               <Note at={outnumberAt + i * 6} x={BAR.x0 + w * g + 14} y={top + h(BAR.h) / 2 - 15}>
@@ -205,7 +205,7 @@ export const BayesScene: React.FC = () => {
           );
         })}
         <Note at={thousandAt} x={BAR.x0 + 140} y={y(BAR.y[1]) + h(BAR.h) / 2 - 15}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>{num(TEST.healthy / TEST.sick)}</b> to 1
           </span>
         </Note>
@@ -262,10 +262,10 @@ export const BayesScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={{ ...note(24, DATA_INK), fontWeight: 700 }}>
+              <span style={{ ...note(24, DATA_INK), fontWeight: 500 }}>
                 {i === 0 ? num(TEST.tp) : num(TEST.retestTp)} sick
               </span>
-              <span style={{ ...note(24, STAT_INK), fontWeight: 700, opacity: i === 0 ? 1 : ease(frame, tenAt + 4, 12) }}>
+              <span style={{ ...note(24, STAT_INK), fontWeight: 500, opacity: i === 0 ? 1 : ease(frame, tenAt + 4, 12) }}>
                 {i === 0 ? num(TEST.fp) : num(TEST.retestFp)} false alarms
               </span>
             </div>
@@ -275,8 +275,8 @@ export const BayesScene: React.FC = () => {
                 left: SHARE.x0 + 18,
                 top: top + h(SHARE.h) / 2 - 22,
                 opacity: ease(frame, i === 0 ? retestFrom + 16 : nineInTenAt, 12),
-                ...note(30, "var(--ds-white)"),
-                fontWeight: 700,
+                ...note(28, "var(--ds-white)"),
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -286,7 +286,7 @@ export const BayesScene: React.FC = () => {
         );
       })}
       <Note at={retestFrom + 16} x={SHARE.x0 + 14} y={y(SHARE.y[0]) + h(SHARE.h) / 2 - 18}>
-        <span style={{ ...note(26, "var(--ds-white)"), fontWeight: 700, whiteSpace: "nowrap" }}>{pct(TEST.treePpv)} real</span>
+        <span style={{ ...note(28, "var(--ds-white)"), fontWeight: 500, whiteSpace: "nowrap" }}>{pct(TEST.treePpv)} real</span>
       </Note>
       <Ink at={ninetyOneAt - 4} dur={16} style={{ left: SHARE.x0, top: y(770), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 22 }}>
         <Big size={96} color={DATA_INK} italic>
@@ -294,15 +294,15 @@ export const BayesScene: React.FC = () => {
         </Big>
       </Ink>
       <Ink at={trustAt - 4} dur={18} style={{ left: 900, top: y(790), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(36, true), color: INK }}>
+        <span style={{ ...body(34, true), color: INK }}>
           Before you trust a positive, ask <Sweep at={rareAt}>how rare</Sweep> the thing is.
         </span>
       </Ink>
       {/* In the face and size of the line above it: the rate stands out by
           its color and weight. */}
       <Ink at={rareAt + 2} dur={16} style={{ left: 900, top: y(842), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(36, true), color: INK_SOFT }}>
-          Here, <span style={{ color: DATA_INK, fontWeight: 600 }}>1 in {num(TEST.oneIn)}</span>.
+        <span style={{ ...body(34, true), color: INK_SOFT }}>
+          Here, <span style={{ color: DATA_INK, fontWeight: 500 }}>1 in {num(TEST.oneIn)}</span>.
         </span>
       </Ink>
       </div>

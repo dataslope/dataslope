@@ -53,6 +53,12 @@
       "category": "video-portrait",
       "style": "watercolor portrait",
       "subject": "Edgar F. \"Ted\" Codd (1923 to 2003), the British-born mathematician at IBM who invented the relational model of data, in his fifties: balding on top, with short white-grey hair at the sides, a neat grey moustache, a long friendly face with a slight smile, clean-shaven chin, no glasses, wearing a pale open-collared shirt under a blue jacket"
+    },
+    {
+      "id": "db-relational-history-papers",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a short neat stack of three loose sheets of pale cream paper, seen from the front and slightly fanned so the edge of each sheet shows, the top sheet completely empty and smooth, held together at one top corner by a single chunky red binder clip, with soft blue washes shading the sheet edges"
     }
   ]
 }

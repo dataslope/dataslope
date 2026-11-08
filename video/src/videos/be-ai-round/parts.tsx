@@ -173,7 +173,7 @@ export const Node: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      <span style={{ ...label(size, t.ink), fontWeight: 700, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span>
+      <span style={{ ...label(size, t.ink), fontWeight: 500, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span>
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: "center" }}>{sub}</span> : null}
       {children}
     </div>
@@ -277,7 +277,7 @@ export const Pill: React.FC<{
           border: `2px solid ${t.line}`,
           background: solid ? t.line : t.fill,
           ...label(size, solid ? PAPER : t.ink),
-          fontWeight: 700,
+          fontWeight: 500,
           whiteSpace: "nowrap",
         }}
       >

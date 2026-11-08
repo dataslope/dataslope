@@ -10,7 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Cross, Drift, Flow, Http, Mark, Msg, msgHeight, OK_INK, Strike, X0, VRule } from "./parts";
 
-const CODE_SIZE = 23;
+const CODE_SIZE = 24;
 
 type Column = { cls: string; name: string; x: number; w: number; codes: string[] };
 const COLUMNS: Column[] = [
@@ -116,7 +116,7 @@ export const CodesScene: React.FC = () => {
           return (
             <React.Fragment key={c.cls}>
               <Note at={classAt[ci] - 2} x={x} y={colTop} out={out}>
-                <span style={{ fontFamily: MONO, fontSize: 44, fontWeight: 700, color: INK, whiteSpace: "nowrap" }}>
+                <span style={{ fontFamily: MONO, fontSize: 44, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>
                   <span style={{ position: "relative", display: "inline-block" }}>
                     <span style={{ position: "absolute", inset: "0.08em -0.04em 0 -0.04em", background: HIGHLIGHT, borderRadius: 4, opacity: ease(frame, Math.max(digitAt, classAt[ci] - 2), 10) * (1 - ease(frame, fourAt + 30, 12)) }} />
                     <span style={{ position: "relative" }}>{c.cls[0]}</span>
@@ -146,20 +146,20 @@ export const CodesScene: React.FC = () => {
 
         {/* Why it matters: a client branches on the code. */}
         <Note at={rightAt} x={X0} y={whyTop} out={leave}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>The client's code</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>The client's code</span>
         </Note>
         <Note at={inCodeAt} x={X0} y={whyTop + h(50)} out={leave}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 22 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24 }}>
             <Tick at={inCodeAt + 6} size={24} />
-            <span style={{ fontFamily: MONO, fontSize: 22, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+            <span style={{ fontFamily: MONO, fontSize: 24, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
               if status == <b style={{ color: OK_INK }}>404</b>: show_not_found()
             </span>
           </div>
         </Note>
         <Note at={parseAt} x={X0} y={whyTop + h(100)} out={leave}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 22 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24 }}>
             <Cross at={parseAt + 8} size={22} />
-            <span style={{ fontFamily: MONO, fontSize: 22, color: ACCENT_INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+            <span style={{ fontFamily: MONO, fontSize: 24, color: ACCENT_INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
               <Strike at={parseAt + 10}>if "not found" in message: …</Strike>
             </span>
           </div>
@@ -178,7 +178,7 @@ export const CodesScene: React.FC = () => {
           lines={[{ t: "401 Unauthorized" }, { t: "WWW-Authenticate: Bearer", at: challengeAt, mark: { at: challengeAt + 6 } }]}
         />
         <Note at={authnAt} x={RESP_X} y={rowTop(0) + twoH + h(12)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             really: <b>not authenticated</b>
           </span>
         </Note>
@@ -194,10 +194,10 @@ export const CodesScene: React.FC = () => {
         <Flow points={[[REQ_X + REQ_W + 8, rowTop(1) + twoH / 2], [RESP_X - 8, rowTop(1) + twoH / 2]]} at={a403 + 8} color={INK_SOFT} width={2.2} head={11} />
         <Msg x={RESP_X} y={rowTop(1)} w={RESP_W} at={refusesAt} tone="bad" lines={[{ t: "403 Forbidden" }, { t: "understood, and refused", color: INK_SOFT }]} />
         <Note at={enoughAt} x={REQ_X} y={rowTop(1) + twoH + h(12)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>valid credentials, not enough permission</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>valid credentials, not enough permission</span>
         </Note>
         <Note at={againAt} x={RESP_X} y={rowTop(1) + twoH + h(12)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Strike at={againAt + 10}>log in again</Strike> <span style={{ color: INK_SOFT }}>won't necessarily help</span>
           </span>
         </Note>
@@ -207,10 +207,10 @@ export const CodesScene: React.FC = () => {
         <Flow points={[[REQ_X + REQ_W + 8, rowTop(2) + twoH / 2], [RESP_X - 8, rowTop(2) + twoH / 2]]} at={a404 + 8} color={INK_SOFT} width={2.2} head={11} />
         <Msg x={RESP_X} y={rowTop(2)} w={RESP_W} at={a404 + 10} tone="data" lines={[{ t: "404 Not Found" }, { t: "on purpose", at: purposeAt, color: INK_SOFT }]} />
         <Note at={strangerAt} x={1640} y={rowTop(2) + h(26)}>
-          <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT, opacity: 0.5, whiteSpace: "nowrap" }}>article 42</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT, opacity: 0.5, whiteSpace: "nowrap" }}>article 42</span>
         </Note>
         <Note at={strangerAt + 6} x={RESP_X} y={rowTop(2) + twoH + h(12)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>hides that it exists</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>hides that it exists</span>
         </Note>
 
         {/* Hairlines between the four classes, each with the column to its right. */}

@@ -117,12 +117,12 @@ export const OrderScene: React.FC = () => {
         />
       ))}
       <Note at={differAt - 2} x={X0} y={rowA + tileH(SIZE) + 14}>
-        <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          as sets of single words, the only difference: <Mono size={22} color={ACCENT_INK} weight={600}>not</Mono>
+        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          as sets of single words, the only difference: <Mono size={22} color={ACCENT_INK} weight={500}>not</Mono>
         </div>
       </Note>
       <Ink at={bigramsAt - 4} dur={12} style={{ left: GRAMS_X, top: rowB - 42, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT), fontWeight: 600 }}>as bigrams</span>
+        <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>as bigrams</span>
       </Ink>
       {bGrams.map((t, i) => (
         <Tile key={`bg${i}`} text={t.text} x={t.x} y={t.y} size={CHIP} at={bigramsAt - 2 + i * 3} />
@@ -142,17 +142,17 @@ export const OrderScene: React.FC = () => {
       {/* A lone "not" turns up in praise too: the pair is what carries the sign. */}
       <Tile text="not bad" x={aGrams[notGood].x} y={rowA + tileH(SIZE) + 12} size={CHIP} at={praiseAt - 2} marks={[{ at: notBadAt - 2 }]} />
       <Note at={notBadAt + 2} x={aGrams[notGood].x + tileW("not bad", CHIP) + 14} y={rowA + tileH(SIZE) + 12}>
-        <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
           praise has a lone not too
         </div>
       </Note>
       <Note at={pairAt - 2} x={aGrams[notGood].x} y={rowA + tileH(SIZE) + tileH(CHIP) + 28}>
-        <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           the pair is what a model can learn is <Marked at={negativeAt - 2}>negative</Marked>
         </div>
       </Note>
       <Note at={hasAt + 4} x={bGrams[bGrams.length - 1].x + bGrams[bGrams.length - 1].w + 16} y={rowB}>
-        <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
           no <Mono size={22} color={INK_SOFT}>&nbsp;not good&nbsp;</Mono> here
         </div>
       </Note>
@@ -162,7 +162,7 @@ export const OrderScene: React.FC = () => {
       {/* Fig. 14: counted pairs. */}
       <FigLabel n="14" title="The most common bigrams" at={findsAt - 4} x={T1} y={y(568)} />
       <Ink at={linesAt - 2} dur={12} style={{ left: T1, top: y(568) + 46, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT), fontWeight: 600 }}>three lines about machine learning</span>
+        <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>three lines about machine learning</span>
       </Ink>
       {/* The three lines themselves, then what counting their bigrams finds. */}
       {PHRASES.sentences.map((line, k) => (
@@ -186,7 +186,7 @@ export const OrderScene: React.FC = () => {
         );
       })}
       <Ink at={emmaAt - 2} dur={12} style={{ left: T2, top: y(568) + 46, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT), fontWeight: 600 }}>
+        <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>
           all of Emma<span style={{ opacity: ease(frame, stopwordAt - 2, 10) }}>, pairs with no stopword</span>
         </span>
       </Ink>
@@ -205,7 +205,7 @@ export const OrderScene: React.FC = () => {
       ))}
       <Spot id="nlp-counting-words-hats" at={castAt - 4} left={1530} top={y(580)} width={280} height={179} />
       <Note at={fiveAt - 4} x={T1} y={rowY(3) + 24}>
-        <div style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>
+        <div style={{ ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
           Two words in a row help. <span style={{ color: ACCENT_INK }}>Would five help more?</span>
         </div>
       </Note>

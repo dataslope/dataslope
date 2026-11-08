@@ -133,65 +133,65 @@ export const ErrorsScene: React.FC = () => {
           ))}
         </Svg>
         <Note at={t1At} x={xs(0) - 110} y={y(BASE) - h(PEAK) - h(44)} width={220} style={{ textAlign: "center" }}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>no effect</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>no effect</span>
         </Note>
         <Note at={t2At} x={xs(ERRORS.shift) - 110} y={y(BASE) - h(PEAK) - h(44)} width={220} style={{ textAlign: "center" }} out={doubleAt}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>a real effect</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a real effect</span>
         </Note>
         <Note at={fpAt + 4} x={xs(crit) + 10} y={y(BASE) + h(14)}>
-          <span style={{ ...label(20, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             threshold, z = <span style={TABULAR}>{crit}</span>
           </span>
         </Note>
         {/* The axis, named a row below the threshold so the two never read as one line. */}
         <Note at={t1At + 12} x={RIGHT} y={y(BASE) + h(48)} align="right">
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>where the test statistic lands</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>where the test statistic lands</span>
         </Note>
 
         {/* The two errors, named. */}
         <Note at={fpAt - 2} x={COL_X} y={y(390)}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Type I · a false positive</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Type I · a false positive</span>
         </Note>
         <Note at={alphaAt} x={COL_X} y={y(430)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
             α = {pct(ERRORS.alpha)}<span style={{ opacity: ease(frame, firstAt, 10) }}>: ships features that do nothing</span>
           </span>
         </Note>
         <Note at={missAt - 2} x={COL_X} y={y(490)}>
-          <span style={{ ...note(27, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Type II · a false negative</span>
+          <span style={{ ...note(28, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Type II · a false negative</span>
         </Note>
         <Note at={betaAt} x={COL_X} y={y(530)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
             β<span style={{ opacity: stale }}> = {pct(ERRORS.beta)}</span><span style={{ opacity: ease(frame, secondAt, 10) }}>: abandons features that work</span>
           </span>
         </Note>
 
         {/* Power, and what moves it. */}
         <Note at={oneMinusAt} x={COL_X} y={y(596)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             power = 1 − β<span style={{ opacity: stale }}> = {pct(POWER.base)}</span>
           </span>
         </Note>
         <Note at={codeAt} x={COL_X} y={y(644)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
             the page&apos;s code: effect 0.2 SD, <Mark at={howManyAt - 4}>{POWER.n} per arm</Mark>
             <span style={{ opacity: ease(frame, eightyAt, 10) }}> → {pct(POWER.base)}</span>
           </span>
         </Note>
         {levers.map((l, i) => (
           <Note key={l.text} at={leverAts[i] - 2} x={COL_X} y={y(696) + i * h(44)}>
-            <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
               {l.text} <b style={{ color: OK_INK }}>→ {pct(l.v)}</b>
             </span>
           </Note>
         ))}
         <Note at={ninetyEightAt} x={xs(ERRORS.shift * Math.SQRT2) - 110} y={y(BASE) - h(PEAK) - h(44)} width={220} style={{ textAlign: "center" }}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>twice the users</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>twice the users</span>
         </Note>
         {/* The shifted curve's own power, inside its green area, where the old 80% no longer applies. */}
         <Note at={ninetyEightAt + 4} x={xs(ERRORS.shift * Math.SQRT2) - 110} y={y(BASE) - h(PEAK) * 0.42} width={220} style={{ textAlign: "center" }}>
-          <span style={{ ...note(34, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{pct(POWER.levers[0].power)}</span>
-          <div style={{ ...label(20, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>power</div>
+          <span style={{ ...note(34, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{pct(POWER.levers[0].power)}</span>
+          <div style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>power</div>
         </Note>
       </Drift>
     </AbsoluteFill>

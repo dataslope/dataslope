@@ -136,7 +136,7 @@ export const OpenScene: React.FC = () => {
         {/* The constraints the table carries, ticked one by one. */}
         {checks.map((c, k) => (
           <Ink key={k} at={c.at - 2} dur={14} style={{ left: X0 + k * 360, top: y(CHECKS_Y), whiteSpace: "nowrap" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 12, ...note(22, INK) }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 12, ...note(24, INK) }}>
               <svg width={24} height={24} style={{ overflow: "visible", transform: `scale(${1 + recheck * 0.25})` }}>
                 <path d="M1,12.5 L9,20.5 L23,2" fill="none" stroke={BLUE_INK} strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -149,12 +149,12 @@ export const OpenScene: React.FC = () => {
             false (one row is new), and the price's steps back as the talk
             moves to the update. */}
         <Note at={twiceAt} out={orderOneAt + 4} x={RIGHT} y={g.rowMid(0) - 18}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Mono>{email ?? ""}</Mono>, on {copies(F.email, email)} rows
           </span>
         </Note>
         <Note at={priceAt + 4} dim={rushedAt} x={RIGHT} y={g.rowMid(0) + 22}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             {FLAT.rows[0][F.product]} at <Mono>{price ?? ""}</Mono>, on {priceRows.length} rows
           </span>
         </Note>
@@ -174,13 +174,13 @@ export const OpenScene: React.FC = () => {
           {UPDATE.tag}
         </Reply>
         <Note at={complaintsAt - 2} x={RIGHT + 150} y={listTop + listH + 24}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>No error, no warning.</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>No error, no warning.</span>
         </Note>
         <Note at={twoAt + 4} x={RIGHT} y={listTop + listH + 100}>
-          <span style={{ ...label(26, ACCENT_INK), whiteSpace: "nowrap" }}>Two emails for one Ada</span>
+          <span style={{ ...label(28, ACCENT_INK), whiteSpace: "nowrap" }}>Two emails for one Ada</span>
         </Note>
         <Note at={brokeAt + 2} x={RIGHT} y={listTop + listH + 144}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Every constraint still holds.</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Every constraint still holds.</span>
         </Note>
       </Drift>
     </AbsoluteFill>

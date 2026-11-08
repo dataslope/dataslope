@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { Fig, FIG_GAP } from "./kit";
-import { Drift, Kicker, lerp, Mark, Spot, Stack, STAT_INK, Svg, Word } from "./parts";
+import { Drift, Kicker, lerp, Mark, Spot, Stack, Svg, Word } from "./parts";
 
 const BOX_Y = 500;
 const BOX_W = 340;
@@ -100,14 +100,14 @@ export const NounsScene: React.FC = () => {
           <Ink at={thingsAt - 2} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
             <Mark at={thingsAt + 8}>things.</Mark>
           </Ink>
-          <Ink at={circleNounsAt - 4} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+          <Ink at={circleNounsAt - 4} dur={18} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
             Circle the nouns.
           </Ink>
         </div>
 
         {/* ── The sentence, word by word as it is read ── */}
         <Ink at={soAt} dur={14} style={{ left: 122, top: y(292), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>One sentence</span>
+          <span style={label(24, INK_SOFT)}>One sentence</span>
         </Ink>
         <div style={{ position: "absolute", left: 120, top: y(330), ...body(64, true), color: INK, whiteSpace: "nowrap", wordSpacing: "0.32em" }}>
           <Word at={words[0] - 2} circleAt={circleAt[0]}>
@@ -153,12 +153,12 @@ export const NounsScene: React.FC = () => {
           </Svg>
         ) : null}
         <Note at={candidateAt + 4} out={thoughAt} x={bx0} y={by + 16}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Candidate entities: kinds of things worth tracking</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Candidate entities: kinds of things worth tracking</span>
         </Note>
 
         {/* ── The test: its label on a line of its own above it, as "One sentence" is ── */}
         <Note at={testAt - 6} out={statusAt - 4} x={122} y={y(TEST_Y)}>
-          <span style={label(22, INK_SOFT)}>A test</span>
+          <span style={label(24, INK_SOFT)}>A test</span>
         </Note>
         <Ink at={canAt - 4} dur={16} out={statusAt - 4} style={{ left: 120, top: y(TEST_Y + 32), whiteSpace: "nowrap" }}>
           <span style={{ ...body(40, true), color: INK }}>Can there be many of these?</span>
@@ -184,14 +184,14 @@ export const NounsScene: React.FC = () => {
               transform: `translateY(${(1 - chipIn) * 12}px)`,
             }}
           >
-            <span style={{ fontFamily: MONO, fontSize: 21, color: INK }}>status</span>
+            <span style={{ fontFamily: MONO, fontSize: 24, color: INK }}>status</span>
           </div>
         ) : null}
         <Note at={statusAt + 4} out={describesAt} x={orders.x - 24} y={y(CHIP_Y) + 8} align="right" from="right">
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>A thing of its own?</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>A thing of its own?</span>
         </Note>
         <Note at={notAt - 6} x={orders.x} y={orders.top + orders.head + orders.row + 22} from="up">
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             A fact <span style={{ color: INK_SOFT }}>about an order, not a thing</span>
           </span>
         </Note>

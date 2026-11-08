@@ -58,7 +58,7 @@ const tokenize = (line: string): Token[] => {
     if (comment) out.push({ text, color: TOKEN_INK.punct });
     else if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -81,7 +81,7 @@ export const Code: React.FC<{ line: string; size?: number; weight?: number }> = 
  * ink, the numbers in `ink` when the value is being judged (red wrong, green
  * right), otherwise in the listing's number orange.
  */
-export const Py: React.FC<{ text: string; size?: number; ink?: string; weight?: number }> = ({ text, size = 22, ink, weight = 600 }) => (
+export const Py: React.FC<{ text: string; size?: number; ink?: string; weight?: number }> = ({ text, size = 22, ink, weight = 500 }) => (
   <span style={{ fontFamily: MONO, fontSize: size, whiteSpace: "pre", fontVariantLigatures: "none", fontWeight: weight }}>
     {[...text.matchAll(/(\d+)|([^\d]+)/g)].map(([t, num], i) => (
       <span key={i} style={{ color: num ? ink ?? TOKEN_INK.number : INK_SOFT }}>
@@ -243,7 +243,7 @@ export const DiffListing: React.FC<{
                 left: g.padX,
                 fontFamily: MONO,
                 fontSize: size,
-                fontWeight: 700,
+                fontWeight: 500,
                 color: r.sign === "+" ? OK_INK : ACCENT_INK,
                 opacity: r.sign === "+" || r.sign === "-" ? signs : 0,
               }}
@@ -277,8 +277,8 @@ export const FileTab: React.FC<{
   const d = on === undefined ? 0 : (1 - Math.max(0, ...on.map(([a, b]) => during(frame, a, b, 10)))) * 0.6;
   return (
     <Ink at={at} dur={14} out={out} style={{ left: x, top, whiteSpace: "nowrap", opacity: 1 - d, display: "flex", alignItems: "baseline", gap: 16, fontSize: size }}>
-      <span style={{ fontFamily: MONO, fontSize: size, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{name}</span>
-      {children ? <span style={{ ...note(size, INK_SOFT), fontWeight: 600 }}>{children}</span> : null}
+      <span style={{ fontFamily: MONO, fontSize: size, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{name}</span>
+      {children ? <span style={{ ...note(size, INK_SOFT), fontWeight: 500 }}>{children}</span> : null}
     </Ink>
   );
 };
@@ -388,7 +388,7 @@ export const Steps: React.FC<{
         const done = ease(frame, next - 2, 10);
         return (
           <Ink key={i} at={at + i * 3} dur={12} out={out} style={{ left: x, top: top + i * rowH, width, height: rowH }}>
-            <div style={{ position: "relative", width, height: rowH, display: "flex", alignItems: "center", gap: 14, fontSize: 23 }}>
+            <div style={{ position: "relative", width, height: rowH, display: "flex", alignItems: "center", gap: 14, fontSize: 24 }}>
               <div
                 style={{
                   position: "absolute",
@@ -404,12 +404,12 @@ export const Steps: React.FC<{
               <span style={{ position: "relative", width: 26, height: 26, flex: "none", display: "flex", alignItems: "center" }}>
                 {done > 0 && frame >= next - 2 ? <Tick at={next - 2} size={24} /> : null}
               </span>
-              <span style={{ position: "relative", ...label(23, current > 0.5 ? ACCENT_INK : INK_SOFT), width: 22, flex: "none", textAlign: "right" }}>{i + 1}</span>
+              <span style={{ position: "relative", ...label(24, current > 0.5 ? ACCENT_INK : INK_SOFT), width: 22, flex: "none", textAlign: "right" }}>{i + 1}</span>
               <span
                 style={{
                   position: "relative",
-                  ...note(23, INK),
-                  fontWeight: current > 0.5 ? 650 : 500,
+                  ...note(24, INK),
+                  fontWeight: current > 0.5 ? 500 : 500,
                   whiteSpace: "nowrap",
                   flex: "none",
                   opacity: 0.5 + 0.5 * Math.max(current, done),
@@ -453,7 +453,7 @@ export const Checklist: React.FC<{ items: readonly Check[]; x: number; top: numb
         const bad = item.badAt === undefined ? 0 : ease(frame, item.badAt, 8);
         return (
           <Ink key={i} at={item.at} dur={14} out={out} style={{ left: x, top: top + i * rowH, height: rowH, opacity: 1 - d }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 18, height: rowH, fontSize: 23 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 18, height: rowH, fontSize: 24 }}>
               <span
                 style={{
                   width: 30,
@@ -471,7 +471,7 @@ export const Checklist: React.FC<{ items: readonly Check[]; x: number; top: numb
                 {item.okAt !== undefined && frame >= item.okAt ? <Tick at={item.okAt} size={22} /> : null}
                 {item.badAt !== undefined && frame >= item.badAt ? <Cross at={item.badAt} size={20} /> : null}
               </span>
-              <span style={{ ...note(23, bad > 0.5 ? ACCENT_INK : INK), whiteSpace: "nowrap" }}>{item.label}</span>
+              <span style={{ ...note(24, bad > 0.5 ? ACCENT_INK : INK), whiteSpace: "nowrap" }}>{item.label}</span>
             </div>
           </Ink>
         );
@@ -512,7 +512,7 @@ export const TestGrid: React.FC<{
     <>
       {cols.map((c, j) => (
         <Ink key={`c${j}`} at={c.at ?? headAt} dur={12} out={out} style={{ left: c.x - 150, width: 300, top, height: rowH, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>{c.title}</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{c.title}</span>
         </Ink>
       ))}
       <div
@@ -619,7 +619,7 @@ export const NumberLine: React.FC<{
       {ticks.map((t) => (
         <g key={t} opacity={ease(frame, at + 6, 10)}>
           <line x1={sx(t)} x2={sx(t)} y1={y - 5} y2={y + 5} stroke={INK_SOFT} strokeWidth={1.6} />
-          <text x={sx(t)} y={y + 30} textAnchor="middle" style={svgText(label(20, INK_SOFT))}>
+          <text x={sx(t)} y={y + 30} textAnchor="middle" style={svgText(label(24, INK_SOFT))}>
             {t}
           </text>
         </g>

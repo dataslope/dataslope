@@ -138,11 +138,11 @@ export const NextScene: React.FC = () => {
         <Headline lead="A first design" at={firstAt} size={70} />
         <MiniDesign at={firstAt + 4} y={y} />
 
-        <Line x={textX} y={y(352)} at={sizedAt} size={26} color={INK_SOFT} weight={600}>
+        <Line x={textX} y={y(352)} at={sizedAt} size={26} color={INK_SOFT} weight={500}>
           sized for its estimate
         </Line>
         <div style={{ position: "absolute", left: textX, top: y(352) + 46, fontSize: 34, opacity: ease(frame, sizedAt + 4, 12), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(34, BLUE_INK), fontWeight: 700 }}>
+          <span style={{ ...note(34, BLUE_INK), fontWeight: 500 }}>
             <span style={{ display: "inline-grid", verticalAlign: "bottom" }}>
               <span style={{ gridArea: "1 / 1", opacity: 1 - ten }}>
                 <Num>{int(peak)}</Num>
@@ -156,9 +156,9 @@ export const NextScene: React.FC = () => {
             redirects a second
           </span>
         </div>
-        <div style={{ position: "absolute", left: textX, top: y(530), display: "flex", alignItems: "center", gap: 14, fontSize: 26, opacity: ease(frame, noneAt, 12) }}>
+        <div style={{ position: "absolute", left: textX, top: y(530), display: "flex", alignItems: "center", gap: 14, fontSize: 28, opacity: ease(frame, noneAt, 12) }}>
           {frame >= noneAt ? <Tick at={noneAt + 4} size={28} /> : <span style={{ width: 28 }} />}
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>no single point of failure</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no single point of failure</span>
         </div>
 
         <Spot id="crow" at={firstAt + 10} left={1372} top={y(330)} width={crowW} height={crowH} />

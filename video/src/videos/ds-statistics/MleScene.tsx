@@ -124,7 +124,7 @@ export const MleScene: React.FC = () => {
             first data in grey, ten times the data in the data blue, as the
             series sets a baseline against what is compared with it. */}
         <Note at={clicksAt} x={SIDE_X} y={y(400)} out={mleOut}>
-          <span style={{ ...noteText(28, INK_SOFT), fontWeight: 650, ...TABULAR, display: "flex", alignItems: "center", gap: 14 }}>
+          <span style={{ ...noteText(28, INK_SOFT), fontWeight: 500, ...TABULAR, display: "flex", alignItems: "center", gap: 14 }}>
             <span style={{ width: 34, height: 0, borderTop: `3.4px solid ${INK_SOFT}` }} />
             12 clicks in 40 views
           </span>
@@ -150,7 +150,7 @@ export const MleScene: React.FC = () => {
           </span>
         </Note>
         <Note at={tenAt} x={SIDE_X} y={y(450)} out={mleOut}>
-          <span style={{ ...noteText(28, BLUE_INK), fontWeight: 650, ...TABULAR, display: "flex", alignItems: "center", gap: 14 }}>
+          <span style={{ ...noteText(28, BLUE_INK), fontWeight: 500, ...TABULAR, display: "flex", alignItems: "center", gap: 14 }}>
             <span style={{ width: 34, height: 0, borderTop: `3.4px solid ${BAR}` }} />
             120 in 400
           </span>
@@ -212,7 +212,7 @@ export const MleScene: React.FC = () => {
         />
         <Svg opacity={ease(frame, byNAt - 2, 10)}>
           {rows.map((r, i) => (
-            <text key={r.n} x={vx(i)} y={y(V_BASE) + 32} textAnchor="middle" fill={INK_SOFT} style={{ ...label(20, INK_SOFT), ...TABULAR }}>
+            <text key={r.n} x={vx(i)} y={y(V_BASE) + 32} textAnchor="middle" fill={INK_SOFT} style={{ ...label(24, INK_SOFT), ...TABULAR }}>
               n = {r.n}
             </text>
           ))}
@@ -247,12 +247,12 @@ export const MleScene: React.FC = () => {
 
         <Note at={meanAt} x={SIDE_X} y={y(420)}>
           <span style={{ ...noteText(26, INK) }}>
-            the sample mean: <span style={{ color: OK_INK, fontWeight: 650 }}>unbiased</span>
+            the sample mean: <span style={{ color: OK_INK, fontWeight: 500 }}>unbiased</span>
           </span>
         </Note>
         <Note at={byNAt} x={SIDE_X} y={y(470)}>
           <span style={{ ...noteText(26, INK) }}>
-            variance ÷ n: <span style={{ color: ACCENT_INK, fontWeight: 650 }}>not</span>
+            variance ÷ n: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>not</span>
           </span>
         </Note>
         <Note at={ownAt} x={SIDE_X} y={y(550)} out={whyOut}>
@@ -268,7 +268,7 @@ export const MleScene: React.FC = () => {
           <span style={{ ...noteText(24, ACCENT_INK) }}>so the squares come out small</span>
         </Note>
         <Note at={fixAt + 6} x={SIDE_X} y={y(760)}>
-          <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: OK_INK, whiteSpace: "nowrap" }}>
+          <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: OK_INK, whiteSpace: "nowrap" }}>
             s² = Σ(x − <span style={{ textDecoration: "overline" }}>x</span>)² / (n − 1)
           </div>
         </Note>
@@ -276,7 +276,7 @@ export const MleScene: React.FC = () => {
         {/* ── The follow-up: is unbiased always better? ── */}
         <Note at={mlAt} x={SIDE_X} y={y(550)}>
           <span style={{ ...noteText(24, INK) }}>
-            <span style={{ color: ACCENT_INK, fontWeight: 650 }}>÷ n</span> is the MLE:
+            <span style={{ color: ACCENT_INK, fontWeight: 500 }}>÷ n</span> is the MLE:
             <span style={{ opacity: ease(frame, lessAt - 2, 10) }}> biased, but less variable</span>
           </span>
         </Note>

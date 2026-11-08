@@ -81,7 +81,7 @@ export const RuleScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 4} dur={14} style={{ left: LEFT, top: y(140) }}>
-        <span style={label(22, ACCENT_INK)}>Before you trust a correlation</span>
+        <span style={label(24, ACCENT_INK)}>Before you trust a correlation</span>
       </Ink>
       <Ink at={start - 2} dur={22} style={{ left: LEFT - 6, top: y(184), width: 1180, ...headline(84), lineHeight: 1.08 }}>
         Test each series for stationarity.
@@ -89,9 +89,9 @@ export const RuleScene: React.FC = () => {
 
       <Ink at={trustAt - 4} dur={16} style={{ left: LEFT, top: head, width: 1180 }}>
         <div style={{ position: "relative", height: 34 }}>
-          <span style={{ ...label(20, INK_SOFT), position: "absolute", left: 0 }}>Series</span>
-          <span style={{ ...label(20, INK_SOFT), position: "absolute", left: COL.p - LEFT }}>Dickey-Fuller p-value</span>
-          <span style={{ ...label(20, INK_SOFT), position: "absolute", left: COL.verdict - LEFT }}>Verdict</span>
+          <span style={{ ...label(24, INK_SOFT), position: "absolute", left: 0 }}>Series</span>
+          <span style={{ ...label(24, INK_SOFT), position: "absolute", left: COL.p - LEFT }}>Dickey-Fuller p-value</span>
+          <span style={{ ...label(24, INK_SOFT), position: "absolute", left: COL.verdict - LEFT }}>Verdict</span>
         </div>
         <div style={{ height: 2, background: INK }} />
       </Ink>
@@ -103,7 +103,7 @@ export const RuleScene: React.FC = () => {
               <div style={{ position: "absolute", left: 0, top: 6 }}>
                 <Spark kind={r.spark} />
               </div>
-              <span style={{ ...body(36), color: INK, position: "absolute", left: COL.name - LEFT, top: 12, whiteSpace: "nowrap" }}>
+              <span style={{ ...body(34), color: INK, position: "absolute", left: COL.name - LEFT, top: 12, whiteSpace: "nowrap" }}>
                 {r.name}
               </span>
               <span style={{ ...headline(48), position: "absolute", left: COL.p - LEFT, top: 10, whiteSpace: "nowrap" }}>{r.p}</span>

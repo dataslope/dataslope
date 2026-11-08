@@ -107,7 +107,7 @@ export const PqScene: React.FC = () => {
           { title: "Priority queue: most urgent first", order: [...ARRIVALS].sort((a, b) => a - b), at: urgentAt },
         ].map((lane, j) => (
           <React.Fragment key={lane.title}>
-            <div style={{ position: "absolute", left: 140, top: laneY[j] + 16, ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, lane.at - 2, 10), width: 260 }}>
+            <div style={{ position: "absolute", left: 140, top: laneY[j] + 16, ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, lane.at - 2, 10), width: 260 }}>
               {lane.title.split(":")[0]}
             </div>
             {lane.order.map((u, i) => {
@@ -130,7 +130,7 @@ export const PqScene: React.FC = () => {
                     justifyContent: "center",
                     ...label(24, u === 1 ? INK : BLUE_INK),
                     ...TABULAR,
-                    fontWeight: 700,
+                    fontWeight: 500,
                     opacity: p,
                     transform: `translateX(${(1 - p) * -20}px)`,
                   }}
@@ -144,7 +144,7 @@ export const PqScene: React.FC = () => {
             </div>
           </React.Fragment>
         ))}
-        <Line at={urgentAt + 10} x={LANE_X} y={laneY[1] + 62} size={21} color={INK_SOFT} weight={600}>
+        <Line at={urgentAt + 10} x={LANE_X} y={laneY[1] + 62} size={21} color={INK_SOFT} weight={500}>
           1 is the most urgent
           <span style={{ opacity: ease(frame, schedAt, 10) }}>: a scheduler, Dijkstra&apos;s algorithm</span>
         </Line>
@@ -155,7 +155,7 @@ export const PqScene: React.FC = () => {
             { x: T.push, t: "push" },
             { x: T.pop, t: "pop" },
           ].map((c) => (
-            <div key={c.t} style={{ position: "absolute", left: c.x, top: tTop, ...label(21, INK_SOFT) }}>
+            <div key={c.t} style={{ position: "absolute", left: c.x, top: tTop, ...label(24, INK_SOFT) }}>
               {c.t}
             </div>
           ))}
@@ -165,16 +165,16 @@ export const PqScene: React.FC = () => {
         </Svg>
         {rows.map((r, i) => (
           <React.Fragment key={r.name}>
-            <div style={{ position: "absolute", left: T.name, top: rowY(i) + 10, ...note(24, INK), fontWeight: 650, opacity: ease(frame, r.at - 2, 10), whiteSpace: "nowrap" }}>{r.name}</div>
-            <div style={{ position: "absolute", left: T.push, top: rowY(i) + 10, ...note(24, i === 2 ? OK_INK : r.pushBad ? ACCENT_INK : INK), fontWeight: 650, opacity: ease(frame, r.pushAt, 10), whiteSpace: "nowrap" }}>{r.push}</div>
-            <div style={{ position: "absolute", left: T.pop, top: rowY(i) + 10, ...note(24, i === 2 ? OK_INK : r.popBad ? ACCENT_INK : INK), fontWeight: 650, opacity: ease(frame, r.popAt, 10), whiteSpace: "nowrap" }}>{r.pop}</div>
+            <div style={{ position: "absolute", left: T.name, top: rowY(i) + 10, ...note(24, INK), fontWeight: 500, opacity: ease(frame, r.at - 2, 10), whiteSpace: "nowrap" }}>{r.name}</div>
+            <div style={{ position: "absolute", left: T.push, top: rowY(i) + 10, ...note(24, i === 2 ? OK_INK : r.pushBad ? ACCENT_INK : INK), fontWeight: 500, opacity: ease(frame, r.pushAt, 10), whiteSpace: "nowrap" }}>{r.push}</div>
+            <div style={{ position: "absolute", left: T.pop, top: rowY(i) + 10, ...note(24, i === 2 ? OK_INK : r.popBad ? ACCENT_INK : INK), fontWeight: 500, opacity: ease(frame, r.popAt, 10), whiteSpace: "nowrap" }}>{r.pop}</div>
           </React.Fragment>
         ))}
 
         <VRule x={1060} top={laneY[0]} bottom={y(814) + 56} at={levelsAt} />
 
         {/* The heap: twenty levels for a million, one push climbing. */}
-        <Line at={levelsAt} x={TREE.x0} y={apexY - 72} size={22} weight={650}>
+        <Line at={levelsAt} x={TREE.x0} y={apexY - 72} size={22} weight={500}>
           A heap of a million: <Num>{HEAP.levels}</Num> levels
         </Line>
         <Svg opacity={tri}>
@@ -221,7 +221,7 @@ export const PqScene: React.FC = () => {
         </Line>
 
         {/* Building one. */}
-        <Line at={linearAt} x={140} y={y(716)} size={22} weight={650}>
+        <Line at={linearAt} x={140} y={y(716)} size={22} weight={500}>
           Building a heap: O(n), not O(n log n). Comparisons, a million items:
         </Line>
         <HBar

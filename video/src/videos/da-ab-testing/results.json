@@ -1,6 +1,6 @@
 {
   "runtime": {
-    "sql": "DuckDB v1.4.3",
+    "sql": "PostgreSQL 18.3 (PGlite 0.5.8)",
     "py": "Pyodide / Python 3.14.2 / SciPy 1.18.0"
   },
   "sql": {
@@ -24,27 +24,27 @@
             [
               "Product view",
               27500,
-              0.6547619047619048
+              "0.65476190476190476190"
             ],
             [
               "Add to cart",
               14200,
-              0.5163636363636364
+              "0.51636363636363636364"
             ],
             [
               "Checkout started",
               8900,
-              0.6267605633802817
+              "0.62676056338028169014"
             ],
             [
               "Payment entered",
               5100,
-              0.5730337078651685
+              "0.57303370786516853933"
             ],
             [
               "Purchase",
               3900,
-              0.7647058823529411
+              "0.76470588235294117647"
             ]
           ]
         },
@@ -83,25 +83,25 @@
           ]
         },
         "overall": {
-          "sql": "SELECT MIN(users) * 1.0 / MAX(users) AS overall FROM funnel;",
+          "sql": "SELECT ROUND(MIN(users) * 1.0 / MAX(users), 4) AS overall FROM funnel;",
           "ok": true,
           "columns": [
             "overall"
           ],
           "rows": [
             [
-              0.09285714285714286
+              "0.0929"
             ]
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "conversion": {
       "setup": "CREATE TABLE events (user_id INTEGER, stage TEXT);\nINSERT INTO events VALUES\n  (1, 'visit'), (1, 'purchase'), (1, 'purchase'), (2, 'visit'),\n  (3, 'visit'), (3, 'purchase'), (4, 'visit'), (5, 'visit');",
       "steps": {
         "table": {
-          "sql": "SELECT user_id, stage FROM events ORDER BY rowid;",
+          "sql": "SELECT user_id, stage FROM events ORDER BY ctid;",
           "ok": true,
           "columns": [
             "user_id",
@@ -150,7 +150,7 @@
           ],
           "rows": [
             [
-              0.4
+              "0.40000000000000000000"
             ]
           ]
         },
@@ -162,12 +162,24 @@
           ],
           "rows": [
             [
-              0.6
+              "0.60000000000000000000"
+            ]
+          ]
+        },
+        "whole": {
+          "sql": "SELECT\n  COUNT(DISTINCT CASE WHEN stage = 'purchase' THEN user_id END)\n  / COUNT(DISTINCT user_id) AS overall_conversion\nFROM events;",
+          "ok": true,
+          "columns": [
+            "overall_conversion"
+          ],
+          "rows": [
+            [
+              0
             ]
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "stones": {
       "setup": "CREATE TABLE stones (size TEXT, treatment TEXT, success INTEGER, n INTEGER);\nINSERT INTO stones VALUES\n  ('Small', 'A', 81, 87), ('Small', 'B', 234, 270),\n  ('Large', 'A', 192, 263), ('Large', 'B', 55, 80);",
@@ -188,28 +200,28 @@
               "A",
               81,
               87,
-              93.1
+              "93.1"
             ],
             [
               "Small",
               "B",
               234,
               270,
-              86.7
+              "86.7"
             ],
             [
               "Large",
               "A",
               192,
               263,
-              73
+              "73.0"
             ],
             [
               "Large",
               "B",
               55,
               80,
-              68.8
+              "68.8"
             ]
           ]
         },
@@ -225,26 +237,26 @@
           "rows": [
             [
               "A",
-              "273",
-              "350",
-              78
+              273,
+              350,
+              "78.0"
             ],
             [
               "B",
-              "289",
-              "350",
-              82.6
+              289,
+              350,
+              "82.6"
             ]
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "ratio": {
       "setup": "CREATE TABLE regions (region TEXT, avg_order INTEGER, customers INTEGER);\nINSERT INTO regions VALUES\n  ('North', 52, 4200), ('South', 49, 3100), ('East', 61, 1850), ('West', 47, 2600), ('Islands', 131, 40);",
       "steps": {
         "table": {
-          "sql": "SELECT region, avg_order, customers FROM regions ORDER BY rowid;",
+          "sql": "SELECT region, avg_order, customers FROM regions ORDER BY ctid;",
           "ok": true,
           "columns": [
             "region",
@@ -280,26 +292,26 @@
           ]
         },
         "averaged": {
-          "sql": "SELECT AVG(avg_order) AS average_of_averages FROM regions;",
+          "sql": "SELECT ROUND(AVG(avg_order), 2) AS average_of_averages FROM regions;",
           "ok": true,
           "columns": [
             "average_of_averages"
           ],
           "rows": [
             [
-              68
+              "68.00"
             ]
           ]
         },
         "weighted": {
-          "sql": "SELECT SUM(avg_order * customers) * 1.0 / SUM(customers) AS per_customer FROM regions;",
+          "sql": "SELECT ROUND(SUM(avg_order * customers) * 1.0 / SUM(customers), 2) AS per_customer FROM regions;",
           "ok": true,
           "columns": [
             "per_customer"
           ],
           "rows": [
             [
-              51.78880407124682
+              "51.79"
             ]
           ]
         },
@@ -312,13 +324,13 @@
           ],
           "rows": [
             [
-              "610590",
-              "11790"
+              610590,
+              11790
             ]
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     }
   },
   "py": {

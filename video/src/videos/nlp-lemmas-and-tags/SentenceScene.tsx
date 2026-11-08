@@ -23,7 +23,7 @@ const ROW = { word: 0, penn: 1, pos: 2, naive: 3, aware: 4, porter: 5 } as const
 const LEGEND_X = 1490;
 const LEGEND_Y = 344;
 const LEGEND_STEP = 64;
-const legendCode: React.CSSProperties = { fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, fontVariantLigatures: "none" };
+const legendCode: React.CSSProperties = { fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, fontVariantLigatures: "none" };
 /** The fix as one call, in Fig. 1's code face. */
 const CALL_SIZE = 28;
 const callFace: React.CSSProperties = {
@@ -163,7 +163,7 @@ export const SentenceScene: React.FC = () => {
 
   const rowLabel = (r: number, at: number, text: string) => (
     <Ink at={at} dur={12} style={{ left: X0, top: labelTop(r), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{text}</span>
+      <span style={label(24, INK_SOFT)}>{text}</span>
     </Ink>
   );
 
@@ -295,7 +295,7 @@ export const SentenceScene: React.FC = () => {
         />
       ))}
       <Ink at={endingsAt} dur={12} out={closeAt + 4} style={{ left: CHIP_X, top: rowTop(ROW.porter) + chipH + 16, whiteSpace: "nowrap" }}>
-        <span style={label(22, INK)}>only cuts endings, and lowercases</span>
+        <span style={label(24, INK)}>only cuts endings, and lowercases</span>
       </Ink>
 
       {/* The fix as code, under the figure, where Fig. 1 left the bug. */}

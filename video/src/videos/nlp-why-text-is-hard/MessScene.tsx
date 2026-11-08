@@ -18,7 +18,7 @@ const Gloss: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <span style={{ ...body(42, true), color: INK_SOFT }}>{children}</span>
 );
 /** A period, a comma or an apostrophe that carries the trouble, in red. */
-const Red: React.FC<{ children: React.ReactNode }> = ({ children }) => <span style={{ color: BAD_INK, fontWeight: 700 }}>{children}</span>;
+const Red: React.FC<{ children: React.ReactNode }> = ({ children }) => <span style={{ color: BAD_INK, fontWeight: 500 }}>{children}</span>;
 
 /**
  * Part 1, the plainer mess: the lesson's five kinds, one row each, each
@@ -118,7 +118,7 @@ export const MessScene: React.FC = () => {
       ))}
       {NAMES.map((r, i) => (
         <Ink key={r.name} at={r.at} dur={14} style={{ left: X0, top: row(i) + 4, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(28, INK), fontWeight: 700 }}>
+          <span style={{ ...label(28, INK), fontWeight: 500 }}>
             {/* Each kind is highlighted again as the narration names its step. */}
             <Mark at={NAME_AGAIN[i]} out={NAME_AGAIN[i] + 40}>
               {r.name}
@@ -239,7 +239,7 @@ export const MessScene: React.FC = () => {
       {/* The step each one is the reason for. */}
       {TAGS.map((t, i) => (
         <Ink key={i} at={tagAt(i)} dur={14} style={{ right: 1920 - TAG_X, top: row(i) + 2, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(28, TOKEN_INK), fontWeight: 650 }}>
+          <span style={{ ...label(28, TOKEN_INK), fontWeight: 500 }}>
             {i < 2 ? <Mark at={splitAt + i * 3}>{t}</Mark> : t}
           </span>
         </Ink>

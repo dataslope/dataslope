@@ -44,7 +44,7 @@ export const KeepScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Outer joins in Postgres</span>
+        <span style={label(24, ACCENT_INK)}>Outer joins in Postgres</span>
       </Ink>
       <Ink at={open + 2} dur={22} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
         A left join keeps every row.
@@ -76,7 +76,7 @@ export const KeepScene: React.FC = () => {
         { x: ORD_X, name: "orders", at: ordAt - 4 },
       ].map((t) => (
         <Ink key={t.name} at={t.at} dur={14} style={{ left: t.x + 14, top: y(TABLE_TOP - 46) }}>
-          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>{t.name}</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{t.name}</span>
         </Ink>
       ))}
       <Table

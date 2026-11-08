@@ -112,7 +112,7 @@ export const AsyncScene: React.FC = () => {
           What is async/await, and how does the event loop work?
         </QuestionCard>
         <Note at={coopAt} x={X0} y={y(290)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Band at={coopAt + 6}>Cooperative</Band> concurrency, on one thread
           </span>
         </Note>
@@ -129,11 +129,11 @@ export const AsyncScene: React.FC = () => {
           })}
         </svg>
         <Note at={loopAt} x={cx - 110} y={cy - 32} width={220} style={{ textAlign: "center" }}>
-          <div style={{ ...label(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>event loop</div>
-          <div style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", marginTop: 2 }}>one thread</div>
+          <div style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>event loop</div>
+          <div style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", marginTop: 2 }}>one thread</div>
         </Note>
         <Note at={loopAt + 10} x={cx - 60} y={cy - RING.r - 92} width={120} style={{ textAlign: "center" }} out={thousandsAt - 4}>
-          <span style={{ ...label(20, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>running</span>
+          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>running</span>
         </Note>
         {NAMES.map((name, k) => {
           const d = disc(k);
@@ -161,7 +161,7 @@ export const AsyncScene: React.FC = () => {
                 transform: `scale(${0.6 + 0.4 * p})`,
               }}
             >
-              <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: run ? PAPER : BLUE_INK }}>{name}</span>
+              <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: run ? PAPER : BLUE_INK }}>{name}</span>
             </div>
           );
         })}
@@ -184,11 +184,11 @@ export const AsyncScene: React.FC = () => {
               opacity: hog,
             }}
           >
-            <span style={{ ...label(20, PAPER), fontWeight: 750 }}>CPU</span>
+            <span style={{ ...label(24, PAPER), fontWeight: 500 }}>CPU</span>
           </div>
         ) : null}
         <Note at={handsAt} x={PARK.x - 40} y={PARK.y + DISC + 10} out={anotherAt + 40}>
-          <span style={{ ...label(20, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>awaiting the network</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>awaiting the network</span>
         </Note>
         <Note at={noPreAt} x={X0} y={y(800)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -196,17 +196,17 @@ export const AsyncScene: React.FC = () => {
           </span>
         </Note>
         <Note at={neverAt + 6} x={X0} y={y(842)} out={hogEnd}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             a loop that never awaits<span style={{ opacity: ease(frame, starvesAt, 10) }} >: every other one starves</span>
           </span>
         </Note>
         <Note at={thousandsAt + 6} x={X0} y={y(842)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>Where it shines: thousands of sockets, one thread</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Where it shines: thousands of sockets, one thread</span>
         </Note>
 
         {/* The page's two fetches. */}
         <Note at={fetchesAt} x={AXIS.x} y={y(330)}>
-          <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>Two fetches, gathered: the page&apos;s block, run</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Two fetches, gathered: the page&apos;s block, run</span>
         </Note>
         {[
           { name: "a", row: ROW_A, wait: msA, at: aWaitsAt },
@@ -214,13 +214,13 @@ export const AsyncScene: React.FC = () => {
         ].map((f) => (
           <React.Fragment key={f.name}>
             <Note at={fetchesAt + 4} x={AXIS.x - 46} y={y(f.row) + h(ROW_H) / 2 - 17}>
-              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 700, color: BLUE_INK }}>{f.name}</span>
+              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: BLUE_INK }}>{f.name}</span>
             </Note>
             <WaitBar axis={AXIS} y={y(f.row)} h={h(ROW_H)} start={0} stop={f.wait} at={f.at} color={BAR}>
-              <span style={{ ...label(21, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>await, {ms(f.wait / 1000)}</span>
+              <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>await, {ms(f.wait / 1000)}</span>
             </WaitBar>
             <Note at={f.name === firstDone ? bFirstAt : twentyAt - 6} x={msX(AXIS, f.wait) + 14} y={y(f.row) + h(ROW_H) / 2 - 15}>
-              <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+              <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 ✓ {f.name} done{f.name === firstDone ? ", first" : ""}
               </span>
             </Note>
@@ -235,17 +235,17 @@ export const AsyncScene: React.FC = () => {
           <line x1={msX(AXIS, 0)} x2={msX(AXIS, 0) + (msX(AXIS, total) - msX(AXIS, 0)) * ease(frame, overlapAt, 18)} y1={y(626) + 8} y2={y(626) + 8} stroke={OK} strokeWidth={2.4} />
         </svg>
         <Note at={twentyAt - 2} x={AXIS.x} y={y(652)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             The pair takes about <Num>{total}</Num> ms, not <Num>{sum}</Num>
           </span>
         </Note>
         <Note at={gatheredAt} x={AXIS.x} y={y(712)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            gather returns <Band at={orderAt}>{<span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 600, color: INK }}>{pyList(ASYNC.awaiting.results)}</span>}</Band>
+            gather returns <Band at={orderAt}>{<span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{pyList(ASYNC.awaiting.results)}</span>}</Band>
           </span>
         </Note>
         <Note at={orderAt + 4} x={AXIS.x} y={y(756)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>in the order asked, whichever finished first</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>in the order asked, whichever finished first</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -112,7 +112,7 @@ export const FileScene: React.FC = () => {
   // ── Question 4 ──
   const C = FILE.chunks.lines;
   const cH = listingHeight(C.length, SIZE);
-  const chunkH = h(30);
+  const chunkH = h(34);
   const chunkTop = rTop + h(6);
   // Each chunk in turn is grouped and folded, one every 8 frames.
   const foldK = frame < foldAt ? -1 : Math.min(FILE.nChunks - 1, Math.floor((frame - foldAt) / 8));
@@ -185,7 +185,7 @@ export const FileScene: React.FC = () => {
 
         {/* The for loop's peak stays under it once the bars give way. */}
         <Note at={kbAt + 4} x={X0} y={sTop + listingHeight(S.length, SIZE) + h(14)} out={out3}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             peak <Num>{st.num}</Num> {st.unit}
           </span>
         </Note>
@@ -193,7 +193,7 @@ export const FileScene: React.FC = () => {
             still streams, a fixed block at a time (the page's "fixed-size
             chunks"). */}
         <Note at={kbAt + 24} x={X0} y={sTop + listingHeight(S.length, SIZE) + h(58)} out={out3}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             no line breaks? <Mono>f.read(size)</Mono>, a fixed block at a time
           </span>
         </Note>
@@ -219,10 +219,10 @@ export const FileScene: React.FC = () => {
         {/* Why read() holds about twice the file: measured, the bytes alone
             are half of it. */}
         <Note at={seventeenAt + 14} x={RIGHT_X - 100 + 220 + 520 * (FILE.read.peak / FILE.readlines.peak) + 140} y={rTop + h(10) + h(33) - h(14)} out={chainAt - 4}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>the bytes and the text</span>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>the bytes and the text</span>
         </Note>
         <Note at={lazyAt} x={RIGHT_X - 100} y={rTop + h(230)} out={chainAt - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             a file object is <Mark at={lazyAt + 6}>a lazy iterator over its lines</Mark>
           </span>
         </Note>
@@ -302,16 +302,18 @@ export const FileScene: React.FC = () => {
                 position: "absolute",
                 left: CHUNK_X,
                 top: chunkTop + i * chunkH,
-                width: 150,
-                height: chunkH - 5,
+                width: 184,
+                height: chunkH - 6,
                 borderRadius: 3,
                 background: lit ? OK : done ? `color-mix(in srgb, ${BAR} 30%, ${PAPER})` : BAR,
                 opacity: p,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...note(19, lit ? PAPER : done ? BLUE_INK : PAPER),
-                fontWeight: 650,
+                ...note(24, lit ? PAPER : done ? BLUE_INK : PAPER),
+                fontWeight: 500,
+                lineHeight: 1,
+                whiteSpace: "nowrap",
               }}
             >
               100,000 rows
@@ -329,7 +331,7 @@ export const FileScene: React.FC = () => {
           marks={T.rows.map((_, row) => ({ row, col: 1, at: matchAt + 6 + row * 2, color: MARK_OK }))}
         />
         <Note at={matchAt + 4} x={TOTALS_X} y={tg.rowTop(T.rows.length) + h(14)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same as the whole read</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same as the whole read</span>
         </Note>
 
         <Note at={peaksAt - 4} x={X0} y={pBarsY - h(42)}>
@@ -352,7 +354,7 @@ export const FileScene: React.FC = () => {
 
         {/* Why it folds: sums do, a mean does not. */}
         <Note at={sumsAt} x={CHUNK_X} y={meanTop}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             first <Num>{FILE.meanSizes.reduce((a, b) => a + b, 0).toLocaleString("en-US")}</Num> rows: chunks of{" "}
             {FILE.meanSizes.map((k, i) => (
               <React.Fragment key={i}>
@@ -369,18 +371,18 @@ export const FileScene: React.FC = () => {
           </span>
         </Note>
         <Note at={meanAt} x={CHUNK_X} y={meanTop + h(44)}>
-          <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap", display: "flex", gap: 16 }}>
+          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap", display: "flex", gap: 16 }}>
             <span>mean of the chunks&apos; means</span>
             <Strike at={offAt + 6}>
-              <span style={{ fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{FILE.meanOfMeans}</span>
+              <span style={{ fontWeight: 500, fontVariantNumeric: "tabular-nums" }}>{FILE.meanOfMeans}</span>
             </Strike>
           </span>
         </Note>
         <Note at={carryAt} x={CHUNK_X} y={meanTop + h(90)}>
-          <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap", display: "flex", gap: 16 }}>
+          <span style={{ ...note(28, OK_INK), whiteSpace: "nowrap", display: "flex", gap: 16 }}>
             <span>sum ÷ count, at the end</span>
             <Mark at={carryAt + 10} color={MARK_OK}>
-              <span style={{ fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{FILE.meanFolded}</span>
+              <span style={{ fontWeight: 500, fontVariantNumeric: "tabular-nums" }}>{FILE.meanFolded}</span>
             </Mark>
             <span style={{ color: INK_SOFT }}>the true mean</span>
           </span>

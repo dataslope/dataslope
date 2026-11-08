@@ -114,7 +114,7 @@ export const ExtentScene: React.FC = () => {
           <rect x={maxX + 6} y={y(350)} width={X.x1 - maxX - 6} height={stripY + h(JIT + 10) - y(350)} fill="url(#dist-nodata)" />
         </Svg>
         <Note at={seventeenEnd} x={X.x1 - 10} y={y(356)} align="right">
-          <span style={{ ...label(22, INK_SOFT), opacity: 0.7 + noDataGlow * 0.3 }}>no data out here</span>
+          <span style={{ ...label(24, INK_SOFT), opacity: 0.7 + noDataGlow * 0.3 }}>no data out here</span>
         </Note>
 
         {/* The two tails being asked about. */}
@@ -153,11 +153,11 @@ export const ExtentScene: React.FC = () => {
           { x: minX, v: RANGE.min, at: runAt + 4 },
           { x: maxX, v: RANGE.max, at: seventeenEnd - 8 },
         ].map((e) => (
-          <Centered key={e.v} x={e.x} y={stripY + h(JIT + 26)} opacity={ease(frame, e.at, 10)} style={{ ...note(22, INK), fontWeight: 650 }}>
+          <Centered key={e.v} x={e.x} y={stripY + h(JIT + 26)} opacity={ease(frame, e.at, 10)} style={{ ...note(24, INK), fontWeight: 500 }}>
             {fmt(e.v, 1)}
           </Centered>
         ))}
-        <Centered x={(minX + maxX) / 2} y={stripY + h(JIT + 26)} opacity={ease(frame, runAt + 10, 10)} style={note(21, INK_SOFT)}>
+        <Centered x={(minX + maxX) / 2} y={stripY + h(JIT + 26)} opacity={ease(frame, runAt + 10, 10)} style={note(24, INK_SOFT)}>
           the data
         </Centered>
 
@@ -166,7 +166,7 @@ export const ExtentScene: React.FC = () => {
           <div style={{ ...askNote(26), whiteSpace: "nowrap", ...halo }}>
             above {RANGE.near}: <Count at={fourAt - 6} dur={14} to={RANGE.sfNear * 100} digits={2} suffix="%" />
           </div>
-          <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, backAt - 2, 10), ...halo }}>
+          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, backAt - 2, 10), ...halo }}>
             {RANGE.dataAboveNear} of the {RANGE.n} values are up there
           </div>
         </Note>
@@ -200,7 +200,7 @@ export const ExtentScene: React.FC = () => {
           <span style={{ color: ASK, opacity: digitsIn ? 1 : 0 }}>{RANGE.farDigits}</span>
         </div>
         <Note at={shapeAt - 4} x={FAR_X} y={y(FAR_Y) + 66}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
             all of it from the assumed shape
           </span>
         </Note>

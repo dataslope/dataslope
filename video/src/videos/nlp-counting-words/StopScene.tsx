@@ -84,7 +84,7 @@ export const StopScene: React.FC = () => {
       {panels.map((p, k) => (
         <React.Fragment key={p.title}>
           <Ink at={p.titleAt} dur={14} style={{ left: BAR_X(k), top: y(340), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(24, INK), fontWeight: 600 }}>{p.title}</span>
+            <span style={{ ...label(24, INK), fontWeight: 500 }}>{p.title}</span>
           </Ink>
           {p.rows.map(([w, c], i) => {
             const at = p.ats[i] - 2;
@@ -133,20 +133,20 @@ export const StopScene: React.FC = () => {
       ))}
 
       <Note at={aboutAt - 2} x={PANELS[0]} y={rowY(6) + 10}>
-        <div style={{ ...body(30, true), color: INK_SOFT, whiteSpace: "nowrap" }}>Not one says what the book is about.</div>
+        <div style={{ ...body(28, true), color: INK_SOFT, whiteSpace: "nowrap" }}>Not one says what the book is about.</div>
       </Note>
       <Note at={secondAt - 4} out={throughAt} x={BAR_X(1) + 220} y={rowY(1)}>
-        <div style={{ height: rowH, display: "flex", alignItems: "center", ...body(30, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <div style={{ height: rowH, display: "flex", alignItems: "center", ...body(28, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
           the heroine, second
         </div>
       </Note>
       <Note at={filterAt - 2} x={BAR_X(1)} y={rowY(6) + 10}>
-        <div style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>
+        <div style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>
           Filter first, and the <Marked at={topicAt - 2}>topic</Marked> comes through.
         </div>
       </Note>
       <Note at={againAt} x={BAR_X(1)} y={y(340) + 38}>
-        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>same scale as the left</div>
+        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>same scale as the left</div>
       </Note>
     </AbsoluteFill>
   );

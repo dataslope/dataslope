@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, headline, label, note } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, INK, INK_SOFT, headline, label, note } from "../../editorial/style";
 import { Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -61,8 +61,8 @@ const Row: React.FC<{ i: number; at: number; name: string; part: React.ReactNode
           transform: `translateY(${(1 - p) * -10}px)`,
         }}
       >
-        <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{name}</span>
-        <span style={{ ...label(22, partColor), whiteSpace: "nowrap", opacity: ease(frame, at + 10, 12) }}>{part}</span>
+        <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</span>
+        <span style={{ ...label(24, partColor), whiteSpace: "nowrap", opacity: ease(frame, at + 10, 12) }}>{part}</span>
       </div>
       <div
         style={{
@@ -149,14 +149,14 @@ export const HookScene: React.FC = () => {
           at={breaksAt}
           dur={20}
           out={hookOut}
-          style={{ left: 92, top: y(HOOK_Y) + 108, whiteSpace: "nowrap", ...headline(92, true), color: ACCENT_INK }}
+          style={{ left: 92, top: y(HOOK_Y) + 108, whiteSpace: "nowrap", ...headline(92, true), color: INK }}
         >
           What breaks under load?
         </Ink>
-        <Ink at={backendAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 252, whiteSpace: "nowrap", ...note(30, INK) }}>
+        <Ink at={backendAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 252, whiteSpace: "nowrap", ...note(28, INK) }}>
           Backend interviews ask them <Mark at={moreAt + 2}>more than they used to.</Mark>
         </Ink>
-        <Ink at={seriesAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 316, whiteSpace: "nowrap", ...note(30, INK) }}>
+        <Ink at={seriesAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 316, whiteSpace: "nowrap", ...note(28, INK) }}>
           This series is about answering them.
         </Ink>
 
@@ -191,7 +191,6 @@ export const HookScene: React.FC = () => {
             left: STACK_X,
             top: y(CAPTION_Y),
             ...note(24, INK_SOFT),
-            fontStyle: "italic",
             whiteSpace: "nowrap",
             opacity: ease(frame, liveAt - 2, 12),
           }}
@@ -214,10 +213,10 @@ export const HookScene: React.FC = () => {
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap", marginLeft: "-0.14em" }}>
+              <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap", marginLeft: "-0.14em" }}>
                 <Mark at={addAt + 2}>Backend roles add</Mark>
               </span>
-              <span style={{ ...label(22, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, addAt + 12, 12) }}>
+              <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, addAt + 12, 12) }}>
                 Parts <Num>{partOf("be-system-design")}</Num> to <Num>{partOf("be-concurrency")}</Num>
               </span>
             </div>

@@ -100,7 +100,7 @@ range, so each order resolves to the `city` that was current when it was
 placed.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE dim_customer (
   customer_key INTEGER,
   customer_id  INTEGER,
@@ -281,7 +281,7 @@ The example below has transaction-grain `fact_sales` and daily-grain
 `fact_budget` compares like grains instead of double-counting budget rows.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE fact_sales (
   sale_date DATE,
   region    VARCHAR,
@@ -389,7 +389,7 @@ pre-computed `fiscal_quarter` while filtering out holidays with
 `is_holiday = false`, no inline date arithmetic required.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE dim_date (
   date_key        INTEGER,
   calendar_date   DATE,

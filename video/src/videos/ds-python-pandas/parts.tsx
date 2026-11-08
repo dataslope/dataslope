@@ -155,7 +155,7 @@ export const Bars: React.FC<{
                 left: x + nameW + w + 16,
                 top: mid - 17,
                 ...note(28, b.ink),
-                fontWeight: 650,
+                fontWeight: 500,
                 ...TABULAR,
                 opacity: ease(frame, b.at + 10, 10),
                 whiteSpace: "nowrap",
@@ -182,10 +182,10 @@ export const FadeIn: React.FC<{ at: number; children: React.ReactNode }> = ({ at
  *  (`Mono` sets code at 0.88em, which inside a 21px title is 18.5px, under
  *  the 19px floor.) */
 export const TitleCode: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, fontVariantLigatures: "none" }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, fontVariantLigatures: "none" }}>{children}</span>
 );
 
 /** A small caption in the soft ink, for where a number came from. */
 export const Source: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{children}</span>
+  <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{children}</span>
 );

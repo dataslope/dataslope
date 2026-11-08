@@ -55,7 +55,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -85,7 +85,7 @@ export const Headline: React.FC<{
           at={turnAt ?? at + 12}
           dur={18}
           out={out}
-          style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
         >
           {turn}
         </Ink>
@@ -289,8 +289,8 @@ export const Chip: React.FC<{
         opacity: p * (1 - o) * (1 - d),
         transform: `translate(${(1 - p) * 16 + o * 16}px, ${0}px) scale(${1 + glow * 0.04})`,
         transformOrigin: "50% 50%",
-        ...label(22, INK),
-        fontWeight: 600,
+        ...label(24, INK),
+        fontWeight: 500,
         whiteSpace: "nowrap",
       }}
     >
@@ -346,8 +346,8 @@ export const tokenize = (line: string): Token[] => {
     if (comment) out.push({ text, color: TOKEN_INK.comment });
     else if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
-    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 600 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
+    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -472,7 +472,7 @@ export const Listing: React.FC<{
 // ── The database table, after WhyNormalization's kit ─────────────────────────
 
 export type TCell = string | null;
-export const HEAD_SIZE = 21;
+export const HEAD_SIZE = 24;
 export const BODY_SIZE = 24;
 const PAD = 18;
 /** JetBrains Mono's advance, in em. */
@@ -624,7 +624,7 @@ export const DbTable: React.FC<{
           const w = hm ? ease(frame, hm.at, 10) : 0;
           const lift = hm?.out === undefined ? 0 : ease(frame, hm.out, 12);
           return (
-            <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: INK_SOFT }}>
+            <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 500, color: INK_SOFT }}>
               <span style={{ position: "relative", display: "inline-block" }}>
                 {w > 0 && lift < 1 ? (
                   <span
@@ -728,13 +728,13 @@ export const ErrorBox: React.FC<{
         }}
       >
         <div>
-          <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
+          <span style={{ color: ACCENT_INK, fontWeight: 500 }}>ERROR:</span>
           {"  "}
           {parts.length === 2 && nameAt !== undefined ? (
             <>
               {parts[0]}
               <Mark at={nameAt}>
-                <span style={{ fontWeight: 700 }}>&quot;{constraint}&quot;</span>
+                <span style={{ fontWeight: 500 }}>&quot;{constraint}&quot;</span>
               </Mark>
               {parts[1]}
             </>
@@ -744,7 +744,7 @@ export const ErrorBox: React.FC<{
         </div>
         {detail ? (
           <div style={{ color: INK_SOFT }}>
-            <span style={{ fontWeight: 600 }}>DETAIL:</span>
+            <span style={{ fontWeight: 500 }}>DETAIL:</span>
             {"  "}
             {detail}
           </div>
@@ -756,7 +756,7 @@ export const ErrorBox: React.FC<{
 
 /** Code set inside running text or a label, at the text's own size. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: weight ?? 600, color }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: weight ?? 500, color }}>{children}</span>
 );
 
 /** A square bracket on the right of some rows, opening toward them. */
@@ -790,7 +790,7 @@ export const RowBracket: React.FC<{ x: number; y0: number; y1: number; at: numbe
 /** A column badge as an entity box sets it (editorial/erd.tsx): bold, in the
  *  key blue. */
 export const Badge: React.FC<{ children: React.ReactNode; size?: number }> = ({ children, size = 20 }) => (
-  <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: size, color: BLUE_INK, whiteSpace: "nowrap" }}>{children}</span>
+  <span style={{ fontFamily: SANS, fontWeight: 500, fontSize: size, color: BLUE_INK, whiteSpace: "nowrap" }}>{children}</span>
 );
 
 /** A relationship end as the diagrams draw it (crowsfoot.ts), on a short
@@ -849,7 +849,7 @@ export const FigKey: React.FC<{ entries: readonly KeyEntry[]; right: number; top
           >
             {e.badge ? <Badge size={21}>{e.badge}</Badge> : null}
             {e.end ? <EndGlyph kind={e.end} /> : null}
-            <span style={{ ...note(21, INK_SOFT) }}>{e.text}</span>
+            <span style={{ ...note(24, INK_SOFT) }}>{e.text}</span>
           </span>
         );
       })}

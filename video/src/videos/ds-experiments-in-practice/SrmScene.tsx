@@ -103,7 +103,7 @@ export const SrmScene: React.FC = () => {
         </svg>
         {/* At the dashed line's end, apart from the bars' own counts. */}
         <Note at={askedAt + 6} x={BARS_X + 2 * BAR_W + GAP + 52} y={sy(bad.expected) - h(28)}>
-          <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             asked for:
             <br />
             {count(bad.expected)} each
@@ -118,8 +118,8 @@ export const SrmScene: React.FC = () => {
                 width: BAR_W,
                 top: sy(b.v) + (i === 0 ? h(14) : -h(40)),
                 textAlign: "center",
-                ...note(25, i === 0 ? PAPER : BLUE_INK),
-                fontWeight: 700,
+                ...note(24, i === 0 ? PAPER : BLUE_INK),
+                fontWeight: 500,
                 ...TABULAR,
                 opacity: ease(frame, b.at + 8, 10),
               }}
@@ -133,8 +133,8 @@ export const SrmScene: React.FC = () => {
                 width: BAR_W,
                 top: y(BASE) + h(12),
                 textAlign: "center",
-                ...label(22, INK_SOFT),
-                fontWeight: 700,
+                ...label(24, INK_SOFT),
+                fontWeight: 500,
                 opacity: ease(frame, askedAt, 10),
               }}
             >
@@ -145,23 +145,23 @@ export const SrmScene: React.FC = () => {
 
         {/* The test. */}
         <Note at={chiAt} x={RIGHT_X} y={y(390)} out={formulaOut}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             a chi-square test: <span style={{ opacity: ease(frame, chanceAt, 10) }}>could chance do this?</span>
           </span>
         </Note>
         <Note at={chiAt + 6} x={RIGHT_X} y={y(440)} out={formulaOut}>
-          <span style={{ fontFamily: MONO, fontSize: 27, fontWeight: 600, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+          <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
             χ² = Σ (observed − expected)² / expected
           </span>
         </Note>
         <Note at={sixteenAt - 2} x={RIGHT_X} y={y(500)} out={formulaOut}>
-          <span style={{ fontFamily: MONO, fontSize: 27, fontWeight: 600, color: INK, whiteSpace: "pre", fontVariantLigatures: "none", ...TABULAR }}>
+          <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none", ...TABULAR }}>
             {"   = 200² / 5,000 + 200² / 5,000 = "}
             <Mark at={sixteenAt + 4}>{bad.chi2.toFixed(0)}</Mark>
           </span>
         </Note>
         <Note at={pAt - 2} x={RIGHT_X} y={y(580)} out={formulaOut}>
-          <span style={{ ...note(32, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(34, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             p ≈ {bad.p.toFixed(5)}, about 1 in {count(Math.round(1 / bad.p / 1000) * 1000)}
           </span>
         </Note>
@@ -207,8 +207,8 @@ export const SrmScene: React.FC = () => {
               width: MINI_W + 20,
               top: y(MINI_BASE) + h(10),
               textAlign: "center",
-              ...label(20, INK_SOFT),
-              fontWeight: 700,
+              ...label(24, INK_SOFT),
+              fontWeight: 500,
               ...TABULAR,
               opacity: ease(frame, fineAt + 8 + i * 4, 10),
             }}
@@ -219,25 +219,25 @@ export const SrmScene: React.FC = () => {
         {/* The verdict on the split the question is about outlasts the
             formula, as the contrast split's does. */}
         <Note at={formulaOut + 4} x={BARS_X - 40} y={sy(bad.observed[1]) - h(96)}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             p ≈ <span style={TABULAR}>{bad.p.toFixed(5)}</span>: an SRM
           </span>
         </Note>
         <Note at={fineP - 2} x={MINI_X - 20} y={y(MINI_TOP) - h(62)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>p = {fine.p.toFixed(2)}: chance</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>p = {fine.p.toFixed(2)}: chance</span>
         </Note>
 
         {/* What usually causes it. */}
         <Note at={causeAt + 2} x={RIGHT_X} y={y(400)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>something treats the arms differently:</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>something treats the arms differently:</span>
         </Note>
         {causes.map((c, i) => (
           <Note key={c.text} at={c.at - 2} x={RIGHT_X} y={y(450) + i * h(56)}>
-            <span style={{ ...note(29, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>· {c.text}</span>
+            <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>· {c.text}</span>
           </Note>
         ))}
         <Note at={findAt - 2} x={RIGHT_X} y={y(640)}>
-          <span style={{ ...note(30, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Find it before you read a single result.</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Find it before you read a single result.</span>
         </Note>
       </Drift>
     </AbsoluteFill>

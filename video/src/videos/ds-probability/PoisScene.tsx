@@ -83,10 +83,10 @@ export const PoisScene: React.FC = () => {
 
         {/* ── Binomial: a fixed number of trials ── */}
         <Ink at={binAt} dur={14} out={colsOut} style={{ left: X0, top: y(330) }}>
-          <span style={{ ...label(32, INK) }}>binomial</span>
+          <span style={{ ...label(34, INK) }}>binomial</span>
         </Ink>
         <Note at={binAt + 8} x={X0} y={y(384)} out={colsOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             a fixed number of <Mark at={indepAt}>independent</Mark> trials, each with the same chance
           </span>
         </Note>
@@ -122,17 +122,17 @@ export const PoisScene: React.FC = () => {
           />
         </Svg>
         <Note at={impAt + 10} x={X0} y={y(IMPRESSIONS.top) + IMPRESSIONS.rows * (IMPRESSIONS.size + IMPRESSIONS.gap) + 20} out={colsOut}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             {IMPRESSIONS.cols * IMPRESSIONS.rows} of {LIMIT.n.toLocaleString("en-US")} impressions, each clicked or not
           </span>
         </Note>
 
         {/* ── Poisson: no natural ceiling ── */}
         <Ink at={poisAt} dur={14} out={colsOut} style={{ left: COL_R, top: y(330) }}>
-          <span style={{ ...label(32, INK) }}>Poisson</span>
+          <span style={{ ...label(34, INK) }}>Poisson</span>
         </Ink>
         <Note at={ceilingAt} x={COL_R} y={y(384)} out={colsOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>events at a steady rate, with no natural ceiling</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>events at a steady rate, with no natural ceiling</span>
         </Note>
         <Svg opacity={1 - ease(frame, colsOut, 10)}>
           <line
@@ -150,7 +150,7 @@ export const PoisScene: React.FC = () => {
           })}
         </Svg>
         <Note at={arrivalsAt + 4} x={COL_R} y={y(LINE.y) + 24} out={colsOut}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>arrivals in one minute</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>arrivals in one minute</span>
         </Note>
 
         {/* ── Where they meet ── */}
@@ -176,13 +176,13 @@ export const PoisScene: React.FC = () => {
           })}
         </Svg>
         <Note at={manyAt + 10} x={PLOT.right - 300} y={y(PLOT.top) - 6}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <span style={{ display: "inline-block", width: 18, height: 18, background: DATA_LIGHT, marginRight: 10, verticalAlign: "-2px" }} />
             binomial, 1,000 trials at 0.3%
           </span>
         </Note>
         <Note at={rateAt + 2} x={PLOT.right - 300} y={y(PLOT.top) + 36}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <span style={{ display: "inline-block", width: 18, height: 18, borderRadius: 9, background: POIS, marginRight: 10, verticalAlign: "-2px" }} />
             Poisson, rate 3
           </span>
@@ -192,9 +192,9 @@ export const PoisScene: React.FC = () => {
         </Note>
         {/* The rule, not just the one example: many trials, a small chance. */}
         <Note at={npAt} x={PLOT.right - 300} y={y(PLOT.top) + 150}>
-          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             many trials, small chance:{" "}
-            <span style={math(30)}>
+            <span style={math(28)}>
               λ = <V>n</V>
               <V>p</V>
             </span>

@@ -57,7 +57,7 @@ export const SaveScene: React.FC = () => {
   const tree = ease(frame, jobAt, 20);
   const rowLabel = (text: string, at: number, color: string, top: number) => (
     <Note at={at} x={TREE_X} y={top + h(10)}>
-      <span style={{ ...label(22, color), fontWeight: 700, whiteSpace: "nowrap" }}>{text}</span>
+      <span style={{ ...label(24, color), fontWeight: 500, whiteSpace: "nowrap" }}>{text}</span>
     </Note>
   );
 
@@ -99,7 +99,7 @@ export const SaveScene: React.FC = () => {
             <svg width={26} height={34} style={{ overflow: "visible" }}>
               <Bookmark x={0} y={0} size={32} color={PAPER} />
             </svg>
-            <span style={{ ...note(30, PAPER), fontWeight: 700, whiteSpace: "nowrap" }}>Save for later</span>
+            <span style={{ ...note(28, PAPER), fontWeight: 500, whiteSpace: "nowrap" }}>Save for later</span>
           </div>
           {RECIPES.map((r, i) => {
             const top = y(ROWS.job) + h(110) + i * h(64);
@@ -110,14 +110,14 @@ export const SaveScene: React.FC = () => {
                   <svg width={22} height={28} style={{ overflow: "visible", flex: "0 0 22px" }}>
                     <Bookmark x={0} y={0} size={26} color={DATA} />
                   </svg>
-                  <span style={{ ...note(26, INK), whiteSpace: "nowrap", flex: 1 }}>{r}</span>
+                  <span style={{ ...note(28, INK), whiteSpace: "nowrap", flex: 1 }}>{r}</span>
                   {opened ? <Tick at={weekAt + 6 + i * 4} size={28} /> : <span style={{ width: 28 }} />}
                 </div>
               </Note>
             );
           })}
           <Note at={weekAt + 14} x={X0} y={y(ROWS.job) + h(110) + 4 * h(64) + h(6)}>
-            <span style={{ ...label(21, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>cooked within a week</span>
+            <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>cooked within a week</span>
           </Note>
           <Note at={backAt + 4} x={X0} y={y(ROWS.not) + h(70)}>
             <span style={madeUp()}>recipes made up for this video</span>
@@ -131,7 +131,7 @@ export const SaveScene: React.FC = () => {
             ))}
           </Svg>
           <Note at={jobAt} x={TREE_X} y={y(ROWS.job) + h(6)}>
-            <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
               <b>the job:</b> <span style={{ opacity: ease(frame, backAt, 12) }}>bring people back to cook what they saved</span>
             </span>
           </Note>
@@ -149,7 +149,7 @@ export const SaveScene: React.FC = () => {
             saves per user
           </Tag>
           <Note at={whyAt} x={TREE_X + ROW_LABEL_W + 440} y={y(ROWS.secondary) + h(10)}>
-            <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>explain why it moved</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>explain why it moved</span>
           </Note>
 
           {rowLabel("Guardrails", guardsAt - 2, INK_SOFT, y(ROWS.guard))}
@@ -160,7 +160,7 @@ export const SaveScene: React.FC = () => {
             load time
           </Tag>
           <Note at={guardsAt + 4} x={TREE_X + ROW_LABEL_W + 470} y={y(ROWS.guard) + h(10)}>
-            <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>catch it stealing from the main flow</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>catch it stealing from the main flow</span>
           </Note>
 
           {rowLabel("Not this", dontAt, ACCENT_INK, y(ROWS.not))}
@@ -168,8 +168,8 @@ export const SaveScene: React.FC = () => {
             <Strike at={clicksAt + 6}>clicks on the button</Strike>
           </Tag>
           <Note at={interactionAt} x={TREE_X + ROW_LABEL_W + 330} y={y(ROWS.not) + h(10)}>
-            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-              <span style={{ color: ACCENT_INK, fontWeight: 650 }}>the interaction</span>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+              <span style={{ color: ACCENT_INK, fontWeight: 500 }}>the interaction</span>
               <span style={{ opacity: ease(frame, valueAt, 10) }}>, not the value</span>
             </span>
           </Note>

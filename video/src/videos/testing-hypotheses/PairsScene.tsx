@@ -91,11 +91,11 @@ export const PairsScene: React.FC = () => {
           ))}
         </Svg>
         {[120, 140, 160].map((v) => (
-          <div key={v} style={{ position: "absolute", right: 1920 - 214, top: vy(v) - 13, opacity: ease(frame, patientsAt, 12), ...note(20, INK_SOFT) }}>
+          <div key={v} style={{ position: "absolute", right: 1920 - 214, top: vy(v) - 13, opacity: ease(frame, patientsAt, 12), ...note(24, INK_SOFT) }}>
             {v}
           </div>
         ))}
-        <div style={{ position: "absolute", right: 1920 - 214, top: vy(174) - 13, opacity: ease(frame, patientsAt + 4, 12), ...label(21, INK_SOFT) }}>
+        <div style={{ position: "absolute", right: 1920 - 214, top: vy(174) - 13, opacity: ease(frame, patientsAt + 4, 12), ...label(24, INK_SOFT) }}>
           mmHg
         </div>
         {[
@@ -165,7 +165,7 @@ export const PairsScene: React.FC = () => {
           </Label>
         </Note>
         <Note at={p115At - 2} x={COL[0] - 100} y={y(BOTTOM) + 64}>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             as two separate groups: p = {fmt(PAIRED.unpairedP, 3)}
           </span>
         </Note>
@@ -217,18 +217,18 @@ export const PairsScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={tenAt - 4} x={sx(D, PAIRED.meanChange) + 14} y={y(D_STRIP) - h(60) - 40}>
-          <span style={{ ...note(24, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
             average drop {fmt(PAIRED.meanChange, 1)}
           </span>
         </Note>
         <div style={{ position: "absolute", left: D.x0, top: y(720), opacity: ease(frame, tenAt - 4, 12), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(40, STAT_INK), fontWeight: 700 }}>
+          <span style={{ ...note(40, STAT_INK), fontWeight: 500 }}>
             <span style={{ fontStyle: "italic" }}>t</span> = {fmt(PAIRED.pairedT, 1)}
           </span>
           <span
             style={{
-              ...note(36, STAT_INK),
-              fontWeight: 650,
+              ...note(34, STAT_INK),
+              fontWeight: 500,
               marginLeft: 28,
               opacity: ease(frame, billionAt - 6, 12),
             }}
@@ -242,7 +242,7 @@ export const PairsScene: React.FC = () => {
           </Label>
         </Note>
         <Note at={controlAt - 2} x={colX(1, ONE) + 20} y={vy(PAIRED.after[ONE]) - 14}>
-          <span style={{ ...label(22, STAT_INK), ...halo, whiteSpace: "nowrap", display: "inline-block", transform: `scale(${1 + 0.05 * sameGlow})` }}>
+          <span style={{ ...label(24, STAT_INK), ...halo, whiteSpace: "nowrap", display: "inline-block", transform: `scale(${1 + 0.05 * sameGlow})` }}>
             their own control
           </span>
         </Note>

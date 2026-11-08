@@ -201,7 +201,7 @@
           ],
           "rows": [
             [
-              51.8
+              "51.8"
             ]
           ]
         },
@@ -234,7 +234,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "ratios": {
       "setup": "CREATE TABLE daily (day DATE, sessions INTEGER, conversions INTEGER);\nINSERT INTO daily VALUES ('2026-01-05', 10, 5), ('2026-01-06', 1000, 20);",
@@ -253,13 +253,13 @@
               "2026-01-05",
               10,
               5,
-              50
+              "50.0"
             ],
             [
               "2026-01-06",
               1000,
               20,
-              2
+              "2.0"
             ]
           ]
         },
@@ -271,7 +271,7 @@
           ],
           "rows": [
             [
-              26
+              "26.0"
             ]
           ]
         },
@@ -283,12 +283,12 @@
           ],
           "rows": [
             [
-              2.5
+              "2.5"
             ]
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "nulls": {
       "setup": "CREATE TABLE customers (customer_id INTEGER);\nINSERT INTO customers VALUES (1), (2), (3);\nCREATE TABLE orders (customer_id INTEGER);\nINSERT INTO orders VALUES (1), (NULL);",
@@ -318,7 +318,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     }
   },
   "bank": 110

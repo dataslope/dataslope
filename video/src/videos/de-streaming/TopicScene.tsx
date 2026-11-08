@@ -141,7 +141,7 @@ export const TopicScene: React.FC = () => {
         {/* The producer, which hashes each key. */}
         <Box x={PROD.x} y={prodTop} w={PROD.w} h={h(140)} at={hashAt - 4}>
           <span>producer</span>
-          <span style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, color: BLUE_INK, marginTop: 6, fontVariantLigatures: "none" }}>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: BLUE_INK, marginTop: 6, fontVariantLigatures: "none" }}>
             hash(key) mod{" "}
             <span style={{ display: "inline-grid" }}>
               <span style={{ gridArea: "1 / 1", opacity: 1 - grown }}>{PARTITIONS.count}</span>
@@ -150,7 +150,7 @@ export const TopicScene: React.FC = () => {
           </span>
         </Box>
         <Note at={noKeyAt} x={PROD.x} y={prodTop + h(160)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>no key: round-robin</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>no key: round-robin</span>
         </Note>
 
         {/* The lanes: one log, then three partitions. */}
@@ -208,7 +208,7 @@ export const TopicScene: React.FC = () => {
           dur={10}
         />
         <Note at={endAt + 2} x={LANE_X + LANE_W + 134} y={laneTop(1) + laneH / 2 - h(16)} out={splitAt - 2}>
-          <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>new messages go on the end</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>new messages go on the end</span>
         </Note>
 
         {/* The clicks, each into its user's partition, at the next offset. */}
@@ -252,11 +252,11 @@ export const TopicScene: React.FC = () => {
           }}
         />
         <Note at={orderAt} x={LANE_X + LANE_W + 24} y={laneTop(avaLane) + laneH / 2 - h(16)} out={insideAt + 10}>
-          <span style={{ ...label(21, USER_INK.ava), fontWeight: 700, whiteSpace: "nowrap" }}>← ava's clicks, offsets 0 to 4, in arrival order</span>
+          <span style={{ ...label(24, USER_INK.ava), fontWeight: 500, whiteSpace: "nowrap" }}>← ava's clicks, offsets 0 to 4, in arrival order</span>
         </Note>
         <Legend x={LANE_X} y={laneTop(2) + laneH + h(58)} at={flyAt(0) + 4} out={addAt - 4} note="· the video's own stream" />
         <Note at={acrossAt + 6} x={LANE_X} y={laneTop(2) + laneH + h(10)} out={partsOut}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             in order of arrival: <b style={{ color: USER_INK.dee }}>dee</b>'s click from <Num>{deeClick.t}</Num> s sits after{" "}
             <b style={{ color: USER_INK[aheadOfDee.user] }}>{aheadOfDee.user}</b>'s from <Num>{aheadOfDee.t}</Num> s
           </span>
@@ -264,17 +264,17 @@ export const TopicScene: React.FC = () => {
 
         {/* Offsets named: each lane's slots count from zero. */}
         <Note at={logAt + 6} x={RIGHT_X} y={y(400)} out={partsOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>topic</b>: a named log that only grows at its end
           </span>
         </Note>
         <Note at={unitAt} x={RIGHT_X} y={y(452)} out={partsOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>partition</b>: the unit of parallelism
           </span>
         </Note>
         <Note at={offsetAt} x={RIGHT_X} y={y(504)} out={partsOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>offset</b>: a message's position in its partition
             <span style={{ opacity: ease(frame, zeroAt - 2, 10) }}>
               , from <Num>0</Num>
@@ -285,11 +285,11 @@ export const TopicScene: React.FC = () => {
         {/* Order: inside each partition, never across. */}
         {[0, 1, 2].map((p) => (
           <Note key={p} at={insideAt + p * 3} x={LANE_X + LANE_W + 18} y={laneTop(p) + laneH / 2 - h(15)} out={partsOut}>
-            <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>✓ in order</span>
+            <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>✓ in order</span>
           </Note>
         ))}
         <Note at={acrossAt} x={RIGHT_X} y={y(600)} out={partsOut}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>no order across partitions</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no order across partitions</span>
         </Note>
 
         {/* Question 2: what the count caps, and what it costs. */}
@@ -312,21 +312,21 @@ export const TopicScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={capAt + 10} x={RIGHT_X + 160} y={y(400)} out={moveOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             at most <b style={TABULAR}>3</b> consumers share the work
           </span>
         </Note>
         <Note at={whereAt} x={RIGHT_X + 160} y={y(452)} out={moveOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>order holds inside each one</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>order holds inside each one</span>
         </Note>
         <Note at={moreAt} x={RIGHT_X + 160} y={y(530)} out={moveOut}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>more partitions: more throughput</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>more partitions: more throughput</span>
         </Note>
         {costs.map((c, i) => (
           <Note key={c.text} at={c.at - 2} x={RIGHT_X + 184} y={y(580) + i * h(44)} out={moveOut}>
-            <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               + {c.text}
-              {c.text === "longer rebalances" ? <span style={{ ...label(23, INK_SOFT), fontWeight: 650 }}> (partitions reassigned)</span> : null}
+              {c.text === "longer rebalances" ? <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}> (partitions reassigned)</span> : null}
             </span>
           </Note>
         ))}
@@ -346,10 +346,10 @@ export const TopicScene: React.FC = () => {
           }
         />
         <Note at={neverAt} x={cellX(1) + 20} y={y(730) + laneH / 2 - h(15)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>added later; never removed</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>added later; never removed</span>
         </Note>
         <div style={{ position: "absolute", left: RIGHT_X - 100, top: y(330), opacity: ease(frame, movesAt, 12) }}>
-          <div style={{ display: "flex", gap: 0, ...label(20, INK_SOFT), fontWeight: 700, borderBottom: `1.5px solid ${HAIRLINE}`, paddingBottom: 6 }}>
+          <div style={{ display: "flex", gap: 0, ...label(24, INK_SOFT), fontWeight: 500, borderBottom: `1.5px solid ${HAIRLINE}`, paddingBottom: 6 }}>
             <span style={{ width: 90 }}>key</span>
             <span style={{ width: 110, textAlign: "center" }}>of 3</span>
             <span style={{ width: 110, textAlign: "center" }}>of 4</span>
@@ -364,14 +364,14 @@ export const TopicScene: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   height: h(46),
-                  ...note(25, INK),
+                  ...note(24, INK),
                   background: moved && p > 0 ? `color-mix(in srgb, ${MARK_BAD} ${p * 100}%, transparent)` : undefined,
                   borderRadius: 4,
                 }}
               >
-                <span style={{ width: 90, color: USER_INK[u], fontWeight: 700, paddingLeft: 4 }}>{u}</span>
+                <span style={{ width: 90, color: USER_INK[u], fontWeight: 500, paddingLeft: 4 }}>{u}</span>
                 <span style={{ width: 110, textAlign: "center", ...TABULAR }}>{PARTITIONS.of[u]}</span>
-                <span style={{ width: 110, textAlign: "center", ...TABULAR, fontWeight: 700, color: moved ? ACCENT_INK : INK, opacity: p }}>
+                <span style={{ width: 110, textAlign: "center", ...TABULAR, fontWeight: 500, color: moved ? ACCENT_INK : INK, opacity: p }}>
                   {PARTITIONS.four[u]}
                 </span>
               </div>
@@ -379,7 +379,7 @@ export const TopicScene: React.FC = () => {
           })}
         </div>
         <Note at={modelAt} x={WAFFLE.x} y={y(WAFFLE.top) - h(70)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             model: <Num>{count(MOVED.keys)}</Num> keys,
             <br />3 partitions, then 4
           </span>
@@ -407,7 +407,7 @@ export const TopicScene: React.FC = () => {
           })}
         </svg>
         <Note at={modelAt + 8} x={WAFFLE.x + 10 * (WAFFLE.cell + WAFFLE.gap) + 14} y={y(WAFFLE.top)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", lineHeight: 1.35 }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", lineHeight: 1.35 }}>
             1 square:
             <br />
             <Num>{count(MOVED.keys / 100)}</Num> keys
@@ -420,7 +420,7 @@ export const TopicScene: React.FC = () => {
           </span>
         </Note>
         <Note at={pctAt} x={WAFFLE.x} y={y(WAFFLE.top) + 10 * (WAFFLE.cell + WAFFLE.gap) + h(10)}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{count(MOVED.moved)}</Num> move: <Num>{Math.round(MOVED.share * 100)}</Num>%
           </span>
         </Note>
@@ -439,16 +439,16 @@ export const TopicScene: React.FC = () => {
           </Cell>
         ) : null}
         <Note at={readAt + 14} x={LANE_X} y={y(730) + laneH + h(10)}>
-          <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <b style={{ color: USER_INK.ava }}>ava</b>'s new click: partition <Num>{NEW_P}</Num>, read before her old ones in partition{" "}
             <Num>{PARTITIONS.of.ava}</Num>
           </span>
         </Note>
         <Note at={readAt} x={RIGHT_X - 100} y={y(650)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a user's new clicks can be read before the old ones</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a user's new clicks can be read before the old ones</span>
         </Note>
         <Note at={peakAt} x={RIGHT_X - 100} y={y(706)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>size for peak throughput, with headroom</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>size for peak throughput, with headroom</span>
         </Note>
       </Drift>
     </AbsoluteFill>

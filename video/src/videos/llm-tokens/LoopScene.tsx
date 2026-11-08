@@ -139,7 +139,7 @@ export const LoopScene: React.FC = () => {
                   position: "absolute",
                   left: CTX_X - 50,
                   top: rowY(i) + 10,
-                  ...label(21, INK_SOFT),
+                  ...label(24, INK_SOFT),
                   opacity: rowP,
                   transform: `scale(${1 + 0.35 * pulse(frame, eachStepAt + i * 5, 16)})`,
                 }}
@@ -186,7 +186,7 @@ export const LoopScene: React.FC = () => {
                     position: "absolute",
                     left: g.right + 14 + ARROW_W + 14,
                     top: rowY(i) + 54,
-                    ...note(22, INK_SOFT),
+                    ...note(24, INK_SOFT),
                     whiteSpace: "nowrap",
                     opacity: ease(frame, pickAt + 4, 10),
                   }}
@@ -204,7 +204,7 @@ export const LoopScene: React.FC = () => {
           at={whatAt - 6}
         />
         <Note at={whatAt} x={CTX_X} y={rowY(LOOP.length - 1) + h(62) + 10}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>tokens, but what is one?</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>tokens, but what is one?</span>
         </Note>
       </Drift>
 
@@ -244,7 +244,7 @@ export const LoopScene: React.FC = () => {
               <Svg opacity={ease(frame, at, 10)}>
                 <circle cx={px} cy={py} r={7 + 3 * glow} fill={TOKEN} />
               </Svg>
-              <div style={{ position: "absolute", ...place, opacity: ease(frame, at, 12), whiteSpace: "nowrap", ...note(24, INK), fontWeight: 600 }}>
+              <div style={{ position: "absolute", ...place, opacity: ease(frame, at, 12), whiteSpace: "nowrap", ...note(24, INK), fontWeight: 500 }}>
                 {text}
               </div>
             </React.Fragment>
@@ -266,11 +266,11 @@ export const LoopScene: React.FC = () => {
 
       {/* What the loop does not have. */}
       <Note at={aPlanAt - 2} x={LX} y={y(FIG_Y) - 4} dim={databaseAt}>
-        <div style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>Each step sees only the row it is on.</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, reasonableAt, 12) }}>
+        <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>Each step sees only the row it is on.</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, reasonableAt, 12) }}>
           The sentence comes from steps that were each reasonable,
         </div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 4, whiteSpace: "nowrap", opacity: ease(frame, advanceAt - 6, 12) }}>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 4, whiteSpace: "nowrap", opacity: ease(frame, advanceAt - 6, 12) }}>
           not from anything that decided it in advance.
         </div>
       </Note>
@@ -278,11 +278,11 @@ export const LoopScene: React.FC = () => {
       {/* What it knows: the weights, a ball of many strands with no labelled drawer. */}
       <Spot id="llm-tokens-yarn" at={knowsAt - 4} left={LX + 10} top={y(470)} width={300} height={300} />
       <Note at={weightsAt - 2} x={LX + 340} y={y(470) + 40}>
-        <div style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>Its weights</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 8, whiteSpace: "nowrap", opacity: ease(frame, tunedAt, 12) }}>
+        <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>Its weights</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 8, whiteSpace: "nowrap", opacity: ease(frame, tunedAt, 12) }}>
           numbers tuned in training
         </div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 4, whiteSpace: "nowrap", opacity: ease(frame, guessesAt, 12) }}>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 4, whiteSpace: "nowrap", opacity: ease(frame, guessesAt, 12) }}>
           until its guesses matched real text
         </div>
       </Note>
@@ -315,7 +315,7 @@ export const LoopScene: React.FC = () => {
             <span
               style={{
                 ...note(24, INK),
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 display: "inline-block",
                 transform: `scale(${1 + 0.05 * pulse(frame, sureAt - 4 + k * 4, 18)})`,
@@ -327,7 +327,7 @@ export const LoopScene: React.FC = () => {
         </React.Fragment>
       ))}
       <Note at={machineryAt - 2} x={LX + 10} y={y(470) + h(326) + 44}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the same machinery, and just as sure</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the same machinery, and just as sure</span>
       </Note>
     </AbsoluteFill>
   );

@@ -10,7 +10,7 @@ import { ILLUSTRATIONS, VIDEO } from "./data";
 /**
  * Pieces this video needs beyond the shared editorial kit and the interview
  * kit (editorial/interview.tsx), as in Part 4 (da-advanced-sql/parts.tsx):
- * the SQL listing, DuckDB's tables and the page furniture are Part 1's
+ * the SQL listing, the result tables and the page furniture are Part 1's
  * (da-sql/parts.tsx), so the series stays one family. What is local is the
  * columns and geometry helpers for a result, a plain-text panel (a prompt, a
  * report sentence), and the spot illustration bound to this video.
@@ -47,7 +47,7 @@ const NUMBER = /^-?\d[\d,_]*(\.\d+)?$/;
  *  a line's sizes may differ by (`check:frames`), where the 0.88em of the
  *  Mono this video used to take from Parts 1 and 2 is not. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 500, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );

@@ -149,7 +149,7 @@ export const StepsScene: React.FC = () => {
                   ...label(24),
                   // After label(), which sets its own color.
                   color: i < 2 && frame > beforeAt + 8 ? PAPER : BLUE_INK,
-                  fontWeight: 700,
+                  fontWeight: 500,
                   ...TABULAR,
                 }}
               >
@@ -189,10 +189,10 @@ export const StepsScene: React.FC = () => {
         {hyp.map((r, i) => (
           <React.Fragment key={i}>
             <Note at={r.at} x={X0} y={r.y}>
-              <span style={{ ...noteText(28, INK_SOFT), fontWeight: 650 }}>{r.name}</span>
+              <span style={{ ...noteText(28, INK_SOFT), fontWeight: 500 }}>{r.name}</span>
             </Note>
             <Note at={r.at + 2} x={HYP_X} y={r.y - h(4)}>
-              <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 600, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
+              <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
                 {r.formula}
               </span>
             </Note>

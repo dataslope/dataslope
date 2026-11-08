@@ -7,7 +7,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HERO } from "./data";
-import { Box, Chip, DATA, DATA_TINT, Doc, type DocRow, Drift, Headline, Kicker, LineArrow, Mark, say, Spot, X0 } from "./parts";
+import { Box, Chip, DATA, DATA_TINT, Doc, docHeight, type DocRow, docWidth, Drift, Headline, Kicker, LineArrow, Mark, say, Spot, X0 } from "./parts";
 
 const FIG_Y = 360;
 const BOX_H = 120;
@@ -17,7 +17,17 @@ const DOC_ROWS: DocRow[] = [
   { kind: "t", w: 0.8 },
   { kind: "t", w: 0.95 },
   { kind: "t", w: 0.6 },
+  { kind: "h", w: 0.45 },
+  { kind: "t", w: 0.85 },
+  { kind: "t", w: 0.5 },
 ];
+/** The three painted pages, each at the painting's own proportions, fanned
+ *  down and right, the stack centred on the arrow that leaves it. */
+const DOC_W = docWidth(DOC_ROWS.length);
+const DOC_H = docHeight(DOC_ROWS.length);
+const FAN = { dx: 34, dy: 14 } as const;
+/** The air under the stack, before its word. */
+const DOC_NOTE_GAP = 28;
 const STEPS = [
   { text: "extract", x: 0, w: 136 },
   { text: "clean", x: 154, w: 110 },
@@ -62,6 +72,7 @@ export const HookScene: React.FC = () => {
   const end = n.beat("plan").to;
 
   const midY = y(FIG_Y) + BOX_H / 2;
+  const docTop = midY - (2 * FAN.dy + DOC_H) / 2;
   const IDX = { x: X0 + 330, w: 270 };
   const ASK = { x: IDX.x + IDX.w + 120, w: 290 };
   const dash = ease(frame, dashAt, 10) * (1 - ease(frame, feedAt - 4, 10));
@@ -82,10 +93,10 @@ export const HookScene: React.FC = () => {
         <Headline lead="The newest pipelines" turn="feed an AI assistant." at={newestAt - 2} turnAt={feedAt - 2} size={68} />
 
         {/* Documents, a pipeline, the index, and what reads it. */}
-        <Doc x={X0} y={y(FIG_Y) - 6} w={120} rows={DOC_ROWS} at={newestAt + 4} />
-        <Doc x={X0 + 34} y={y(FIG_Y) + 8} w={120} rows={DOC_ROWS} at={newestAt + 8} />
-        <Doc x={X0 + 68} y={y(FIG_Y) + 22} w={120} rows={DOC_ROWS} at={newestAt + 12} />
-        <Note at={newestAt + 10} x={X0} y={y(FIG_Y) + 172}>
+        {[0, 1, 2].map((k) => (
+          <Doc key={k} x={X0 + k * FAN.dx} y={docTop + k * FAN.dy} w={DOC_W} rows={DOC_ROWS} at={newestAt + 4 + k * 4} />
+        ))}
+        <Note at={newestAt + 10} x={X0} y={docTop + 2 * FAN.dy + DOC_H + DOC_NOTE_GAP}>
           <span style={say(22, INK_SOFT)}>documents</span>
         </Note>
         <LineArrow from={[X0 + 205, midY]} to={[IDX.x - 14, midY]} at={newestAt + 14} />
@@ -130,7 +141,7 @@ export const HookScene: React.FC = () => {
           <span style={say(26, INK_SOFT)}>the fundamentals carry over</span>
         </Note>
         <Note at={storeAt - 4} x={X0} y={STEP_Y + 134}>
-          <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             what&apos;s new: <Mark at={storeAt + 2}>the vector store</Mark>
             <span style={{ opacity: ease(frame, billAt - 4, 10) }}>
               , <Mark at={billAt + 2}>the embedding bill</Mark>
@@ -138,7 +149,7 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={elevenAt - 2} x={X0} y={y(880)}>
-          <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(34, INK), whiteSpace: "nowrap" }}>
             11 questions<span style={{ opacity: ease(frame, everyAt - 2, 10) }}>, every one worked through</span>
           </span>
         </Note>

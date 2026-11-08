@@ -117,10 +117,10 @@ export const LspScene: React.FC = () => {
         </Line>
 
         {/* The hierarchy. */}
-        <Line x={X0} y={topRow - 60} at={trapAt} size={21} color={ACCENT_INK} weight={700} out={fixAt}>
+        <Line x={X0} y={topRow - 60} at={trapAt} size={21} color={ACCENT_INK} weight={500} out={fixAt}>
           The classic trap
         </Line>
-        <Line x={X0} y={topRow - 60} at={fixAt + 10} size={21} color={OK_INK} weight={700}>
+        <Line x={X0} y={topRow - 60} at={fixAt + 10} size={21} color={OK_INK} weight={500}>
           The fix
         </Line>
         <Box x={rectBox.x} y={rectBox.y} w={NODE.w} h={NODE.h} at={usableAt + 4} title={frame < rectAt ? "Parent" : "Rectangle"} lit={pulse(frame, rectAt, 20)} />
@@ -138,16 +138,16 @@ export const LspScene: React.FC = () => {
           ]}
         />
         <Flow points={[[X0 + 70, lowRow - 8], [X0 + 70, topRow + NODE.h + 8]]} at={usableAt + 14} out={dontAt} />
-        <Line x={X0 + 92} y={(topRow + NODE.h + lowRow) / 2 - 14} at={usableAt + 16} size={21} color={INK_SOFT} weight={650} out={dontAt}>
+        <Line x={X0 + 92} y={(topRow + NODE.h + lowRow) / 2 - 14} at={usableAt + 16} size={21} color={INK_SOFT} weight={500} out={dontAt}>
           is a
         </Line>
-        <Line x={X0} y={lowRow + NODE.h + 18} at={equalAt} size={21} color={INK_SOFT} weight={600} out={dontAt}>
+        <Line x={X0} y={lowRow + NODE.h + 18} at={equalAt} size={21} color={INK_SOFT} weight={500} out={dontAt}>
           keeps width and height equal
         </Line>
         <Box x={shapeBox.x} y={shapeBox.y} w={shapeBox.w} h={shapeBox.h} at={siblingsAt} title="Shape" tone="ok" sub="each works out its own area" subSize={20} />
         <Flow points={[[X0 + NODE.w / 2, lowRow - 8], [X0 + NODE.w / 2, topRow + NODE.h + 8]]} at={siblingsAt + 14} dur={10} width={2.2} head={12} />
         <Flow points={[[X0 + 250 + NODE.w / 2, lowRow - 8], [X0 + 250 + NODE.w / 2, topRow + NODE.h + 8]]} at={siblingsAt + 18} dur={10} width={2.2} head={12} />
-        <Line x={X0} y={lowRow + NODE.h + 18} at={resizedAt} size={22} weight={600} color={OK_INK}>
+        <Line x={X0} y={lowRow + NODE.h + 18} at={resizedAt} size={22} weight={500} color={OK_INK}>
           Or: shapes that can&apos;t be resized
         </Line>
 
@@ -155,7 +155,7 @@ export const LspScene: React.FC = () => {
         <VRule x={(RECT_X + LISKOV.width * UNIT + SQ_X) / 2} top={base - LISKOV.width * UNIT} bottom={base + 112} at={squareAt + 4} />
 
         {/* The caller written for rectangles. */}
-        <Line x={CALLER_X} y={topRow - 60} at={codeAt} size={21} color={INK_SOFT} weight={700}>
+        <Line x={CALLER_X} y={topRow - 60} at={codeAt} size={21} color={INK_SOFT} weight={500}>
           Code written for rectangles
         </Line>
         {[
@@ -164,26 +164,26 @@ export const LspScene: React.FC = () => {
           { at: expectsAt, text: `expects an area of ${LISKOV.width * LISKOV.height}` },
         ].map((s, i) => (
           <Line key={s.text} x={CALLER_X} y={topRow + i * 48} at={s.at} size={25} weight={i === 2 ? 700 : 500}>
-            <span style={{ color: INK_SOFT, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
+            <span style={{ color: INK_SOFT, fontWeight: 500, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
             {"  "}
             {s.text}
           </Line>
         ))}
 
         {/* The rule, in plain words. */}
-        <Line x={CALLER_X} y={y(764)} at={demandAt - 4} size={25} weight={600}>
+        <Line x={CALLER_X} y={y(764)} at={demandAt - 4} size={25} weight={500}>
           A subclass mustn&apos;t <Mark at={demandAt + 4}>demand more</Mark> of its callers,
         </Line>
-        <Line x={CALLER_X} y={y(764) + 48} at={promiseAt - 2} size={25} weight={600}>
+        <Line x={CALLER_X} y={y(764) + 48} at={promiseAt - 2} size={25} weight={500}>
           or <Mark at={promiseAt + 4}>promise them less</Mark>.
         </Line>
 
         {/* The two shapes, to scale, each named under its base. */}
         <Shape x={RECT_X} base={base} w={rw} h={rh} at={rectAt} tone={rectDone ? "ok" : "data"} />
-        <Line x={RECT_X} y={base + 14} at={rectAt} size={21} color={INK_SOFT} weight={700}>
+        <Line x={RECT_X} y={base + 14} at={rectAt} size={21} color={INK_SOFT} weight={500}>
           rectangle
         </Line>
-        <Line x={RECT_X} y={base + 46} at={widthAt + 4} size={25} weight={700} color={rectDone ? OK_INK : INK}>
+        <Line x={RECT_X} y={base + 46} at={widthAt + 4} size={25} weight={500} color={rectDone ? OK_INK : INK}>
           <span style={{ fontVariantNumeric: "tabular-nums" }}>
             {Math.round(rw)} × {Math.round(rh)}
             {rectDone ? ` = ${LISKOV.rectangle}` : ""}
@@ -192,20 +192,20 @@ export const LspScene: React.FC = () => {
         <Mark2 at={expectsAt + 8} kind="tick" size={30} style={{ left: RECT_X + 160, top: base + 48 }} />
 
         <Shape x={SQ_X} base={base} w={sq} h={sq} at={squareAt + 4} tone={sqDone ? "bad" : "data"} />
-        <Line x={SQ_X} y={base + 14} at={squareAt + 4} size={21} color={INK_SOFT} weight={700}>
+        <Line x={SQ_X} y={base + 14} at={squareAt + 4} size={21} color={INK_SOFT} weight={500}>
           square
         </Line>
-        <Line x={SQ_X} y={base + 46} at={handAt + 8} size={25} weight={700} color={sqDone ? ACCENT_INK : INK}>
+        <Line x={SQ_X} y={base + 46} at={handAt + 8} size={25} weight={500} color={sqDone ? ACCENT_INK : INK}>
           <span style={{ fontVariantNumeric: "tabular-nums" }}>
             {Math.round(sq)} × {Math.round(sq)}
             {sqDone ? ` = ${LISKOV.square}` : ""}
           </span>
         </Line>
         <Mark2 at={sixteenAt + 4} kind="cross" size={30} style={{ left: SQ_X + 160, top: base + 48 }} />
-        <Line x={SQ_X} y={base + 88} at={sixteenAt + 8} size={21} color={ACCENT_INK} weight={650}>
+        <Line x={SQ_X} y={base + 88} at={sixteenAt + 8} size={21} color={ACCENT_INK} weight={500}>
           expected {LISKOV.width * LISKOV.height}
         </Line>
-        <Line x={SQ_X} y={base + 46} at={tooAt} size={21} color={INK_SOFT} weight={600} out={handAt + 6}>
+        <Line x={SQ_X} y={base + 46} at={tooAt} size={21} color={INK_SOFT} weight={500} out={handAt + 6}>
           width sets height
         </Line>
       </Drift>

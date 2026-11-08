@@ -33,7 +33,7 @@ const MiniBars: React.FC<{ t: number; x: number; top: number; height: number; at
           top: top + height + 12,
           textAlign: "center",
           opacity: ease(frame, at + 4, 12),
-          ...note(20, INK_SOFT),
+          ...note(24, INK_SOFT),
         }}
       >
         T = {t}
@@ -58,7 +58,7 @@ export const RuleScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 2} dur={14} style={{ left: 120, top: y(150) }}>
-        <span style={label(22, ACCENT_INK)}>Choosing a temperature</span>
+        <span style={label(24, ACCENT_INK)}>Choosing a temperature</span>
       </Ink>
 
       <MiniBars t={0.2} x={128} top={y(250)} height={h(120)} at={downAt - 6} />
@@ -66,15 +66,15 @@ export const RuleScene: React.FC = () => {
         <div style={{ ...headline(64), lineHeight: 1.08 }}>Turn it down for one right answer.</div>
       </Ink>
       <Ink at={likeAt - 2} dur={18} style={{ left: 340, top: y(342), width: 960 }}>
-        <div style={{ ...body(32) }}>Extraction, analysis and code.</div>
+        <div style={{ ...body(34) }}>Extraction, analysis and code.</div>
       </Ink>
 
       <MiniBars t={1.5} x={128} top={y(500)} height={h(120)} at={upAt - 6} />
       <Ink at={upAt - 4} dur={20} style={{ left: 340, top: y(500), width: 960 }}>
-        <div style={{ ...headline(64, true), color: ACCENT_INK, lineHeight: 1.08 }}>Turn it up for variety.</div>
+        <div style={{ ...headline(64, true), color: INK, lineHeight: 1.08 }}>Turn it up for variety.</div>
       </Ink>
       <Ink at={varietyAt + 4} dur={18} style={{ left: 340, top: y(592), width: 960 }}>
-        <div style={{ ...body(32) }}>Brainstorming and drafting.</div>
+        <div style={{ ...body(34) }}>Brainstorming and drafting.</div>
       </Ink>
 
       {ILLUSTRATIONS ? (

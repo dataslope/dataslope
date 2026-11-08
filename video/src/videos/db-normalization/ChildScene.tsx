@@ -165,7 +165,7 @@ export const ChildScene: React.FC = () => {
           <KeyArrow key={i} from={[pg.x - 10, pg.rowMid(i)]} to={[sg.x + sg.width + 10, sg.rowMid(studentRow(r[1]))]} at={pointingAt + 4 + i * 5} />
         ))}
         <Note at={noneAt - 2} x={sg.x + sg.width + 24} y={sg.rowMid(linus) - 15}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{linusPhones} phones</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{linusPhones} phones</span>
         </Note>
 
         {/* A plain equality finds Ada now: the wash marks just the comparison. */}

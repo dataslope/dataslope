@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK_SOFT, label, note, INK } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { DRAWS, ROWS, SEED, TOKENS, UNIFORMS } from "./data";
@@ -55,7 +55,7 @@ export const DrawScene: React.FC = () => {
         <Ink at={start - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Twenty draws per temperature,
         </Ink>
-        <Ink at={sameAt - 2} dur={18} style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={sameAt - 2} dur={18} style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}>
           the same random numbers.
         </Ink>
       </div>
@@ -77,7 +77,7 @@ export const DrawScene: React.FC = () => {
         }}
       />
       <Ink at={start - 4} dur={12} style={{ right: 1920 - (X0 - 24), top: y(268) }}>
-        <span style={{ ...label(20), whiteSpace: "nowrap" }}>Random number</span>
+        <span style={{ ...label(24), whiteSpace: "nowrap" }}>Random number</span>
       </Ink>
       {UNIFORMS.map((u, j) => (
         <div
@@ -89,14 +89,14 @@ export const DrawScene: React.FC = () => {
             top: y(268),
             textAlign: "center",
             opacity: ease(frame, start - 2 + j * 0.8, 10),
-            ...note(20, INK_SOFT),
+            ...note(24, INK_SOFT),
           }}
         >
           {u.toFixed(2).replace(/^0/, "")}
         </div>
       ))}
       <Ink at={start - 2} dur={12} style={{ left: COUNT_X, top: y(268) }}>
-        <span style={{ ...label(20), whiteSpace: "nowrap" }}>Cat picked</span>
+        <span style={{ ...label(24), whiteSpace: "nowrap" }}>Cat picked</span>
       </Ink>
 
       {ROWS.map((r, k) => {
@@ -140,8 +140,8 @@ export const DrawScene: React.FC = () => {
                     justifyContent: "center",
                     opacity: Math.min(1, s),
                     transform: `scale(${0.6 + 0.4 * s})`,
-                    ...note(20, TEXT[tok]),
-                    fontWeight: 650,
+                    ...note(24, TEXT[tok]),
+                    fontWeight: 500,
                   }}
                 >
                   {TOKENS[tok]}
@@ -170,7 +170,7 @@ export const DrawScene: React.FC = () => {
                   )}
                 </span>
                 {/* Clear of the highlighter, which reaches below the number's line. */}
-                <span style={{ display: "block", marginTop: 10, ...note(20, INK_SOFT) }}>of {DRAWS}</span>
+                <span style={{ display: "block", marginTop: 10, ...note(24, INK_SOFT) }}>of {DRAWS}</span>
               </span>
             </Note>
           </React.Fragment>
@@ -192,7 +192,7 @@ export const DrawScene: React.FC = () => {
             />
           </svg>
           <Note at={rockAt + 2} x={tileX(ROCK_AT) + TILE_W / 2} y={y(ROW_Y(HOT)) + h(TILE_H) + 22} from="up" style={{ transform: "translateX(-50%)" }}>
-            <span style={{ ...note(21, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               Rock, at {(ROWS[HOT].probs[ROCK] * 100).toFixed(1)}%, picked{" "}
               {ROWS[HOT].counts[ROCK] === 1 ? "once" : `${ROWS[HOT].counts[ROCK]} times`}
             </span>
@@ -201,7 +201,7 @@ export const DrawScene: React.FC = () => {
       ) : null}
 
       <Note at={highAt + 10} x={120} y={y(830)}>
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Every row reuses the same twenty numbers, so as T rises a column can only stay put or move to a less
           likely token.
         </span>

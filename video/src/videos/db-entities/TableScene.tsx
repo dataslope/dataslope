@@ -102,12 +102,12 @@ export const TableScene: React.FC = () => {
             />
           </div>
           <Note at={realCustomerAt - 4} x={cRight + 28} y={adaMid - 16}>
-            <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               Ada <span style={{ color: INK_SOFT }}>is one row: one real customer</span>
             </span>
           </Note>
           <Note at={doesntAt - 2} x={CUSTOMERS_X} y={cBottom + 26} from="up">
-            <span style={{ ...note(23, STAT_INK), whiteSpace: "nowrap" }}>No {PRICE_NAME} here: a customer has other facts</span>
+            <span style={{ ...note(24, STAT_INK), whiteSpace: "nowrap" }}>No {PRICE_NAME} here: a customer has other facts</span>
           </Note>
         </div>
 

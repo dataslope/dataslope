@@ -61,7 +61,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -91,7 +91,7 @@ export const Headline: React.FC<{
           at={turnAt ?? at + 12}
           dur={18}
           out={out}
-          style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
         >
           {turn}
         </Ink>
@@ -428,7 +428,7 @@ export const Chip: React.FC<{
           style={{
             fontFamily: MONO,
             fontSize: Math.max(20, Math.round(size * 0.7)),
-            fontWeight: 600,
+            fontWeight: 500,
             color: focus > 0.5 ? FOCUS_INK : INK_SOFT,
             opacity: idP,
             transform: `translateY(${(1 - idP) * -6}px)`,
@@ -463,7 +463,7 @@ export const ChipFace: React.FC<{ text: string; size?: number; focus?: number; a
       background: chipGround(focus, alt),
       fontFamily: MONO,
       fontSize: size,
-      fontWeight: 600,
+      fontWeight: 500,
       lineHeight: 1.15,
       color: INK,
       whiteSpace: "pre",

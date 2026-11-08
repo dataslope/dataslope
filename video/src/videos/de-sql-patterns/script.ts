@@ -37,9 +37,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Reused (the user asked for it; never edited in place):
  *   - Question 4 and 5's scene is da-sql's OrderScene, copied and re-cued, on
  *     da-sql's results (the DA page's 24 orders: 11 over 100, 4 regions, 2
- *     kept by HAVING > 400; DuckDB's "WHERE clause cannot contain
- *     aggregates!"), with the SUM-in-WHERE error from da-sql's WhereScene,
- *     run here with the written query's own condition, SUM(amount) > 400.
+ *     kept by HAVING > 400), with the SUM-in-WHERE error from da-sql's
+ *     WhereScene, run here with the written query's own condition,
+ *     SUM(amount) > 400: Postgres's "ERROR: aggregate functions are not
+ *     allowed in WHERE".
  *   - Question 6's scene is da-advanced-sql's FrameScene, its first part,
  *     on its four payments (ROWS 100, 350, 425; RANGE 425 for both).
  *   - Question 10's scene is da-sql's AntiScene, on its customers and orders
@@ -58,16 +59,19 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * islands come back to. It promises eleven on real queries and eleven at
  * speed, which is what the video does.
  *
- * Facts. Every statement on screen ran in DuckDB v1.4.3 (DuckDB-Wasm 1.32.0,
- * the engine the page's blocks run): check.mjs here into results.json, or
- * the reused videos' own check.mjs into theirs; data.ts reads both.
+ * Facts. Every statement on screen ran in Postgres (PGlite, PostgreSQL 18,
+ * the engine the page's blocks run), from a fresh database per figure:
+ * check.mjs here into results.json, or the reused videos' own check.mjs into
+ * theirs; data.ts reads both. Every error is Postgres's own text.
  *   - The page's players: the four 80s are rows 13 to 16; RANK 13, 13, 13,
  *     13, then 17; DENSE_RANK 10, then 11.
  *   - The page's events: 24 events from 10 users, ten rows kept by the
- *     subquery and by the page's QUALIFY alike. The video's own tie, a
+ *     subquery, as the page's block now keeps them. The video's own tie, a
  *     second event for user 3 at 2024-01-12 10:30: RANK keeps both (11 rows),
  *     ROW_NUMBER one (10).
- *   - QUALIFY's engines are the page's own list.
+ *   - QUALIFY's engines are the page's own list. Postgres has no QUALIFY
+ *     (it refuses the listing with a syntax error), so its listing is shown
+ *     without a result, and the screen says where it runs.
  *   - The video's own daily metric on user 1's nine login days (January 1
  *     to 13, the 4th and the 7th to the 9th missing): on the 13th, ROWS 6
  *     PRECEDING reaches back to the 3rd (eleven days) and averages 152.1;
@@ -75,9 +79,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     over the spine, with the four gaps as zeros, ROWS 6 PRECEDING covers the
  *     7th to the 13th and averages 95.0. The ROWS frame's first six rows hold
  *     fewer than seven; CASE WHEN COUNT(*) OVER w = 7 nulls exactly those.
- *   - The page's spine query fails in DuckDB as the page writes it
- *     (generate_series in SELECT returns one list, and the ::date cast
- *     refuses it); the spine on screen is generate_series as a table.
+ *   - The page's spine query runs in Postgres as the page writes it
+ *     (generate_series in SELECT, one row a day, cast back to date); the
+ *     spine on screen is that query over the thirteen days, and its rows are
+ *     the first thirteen of the page's January.
  *   - The page's logins: user 1's islands run 3, 2 and 4 days. The video's
  *     own second login on January 2 merges the first two into a false
  *     January 1 to 6 island of 4 rows; SELECT DISTINCT first restores them.
@@ -90,10 +95,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     700 (none passes the page's 1000): users 1, 2 and 6 either way; the
  *     page's LAG query on the DA advanced page's first four amounts; the page's
  *     own 10, 20, 20, 30 (PERCENT_RANK 0.33 and CUME_DIST 0.75 for the 20s);
- *     the page's COALESCE on the video's own three users; DuckDB's PIVOT on
- *     ds-sql's traffic.
+ *     the page's COALESCE on the video's own three users. Snowflake, SQL
+ *     Server and DuckDB have a PIVOT clause; Postgres refuses one (check.mjs
+ *     runs DuckDB's on ds-sql's traffic), and nothing of it is shown.
  *
- * Written for Drew's ear: SQL is said "sequel" (the series rule), keywords
+ * Written for Drew's ear: SQL is said "sequel" (the series rule; MySQL is
+ * "my sequel", SQL Server "Sequel Server", as in Part 2), keywords
  * that read as words stay in capitals (WHERE, HAVING, NOT IN), the rest as
  * they are said ("row number", "N tile", "cume dist", "null if"), CTE
  * expanded once, numbers as they are said, no sentence opening "A" before
@@ -117,11 +124,9 @@ export const script: NarrationScript = {
       text: "Which days are missing? How long is each streak? Which login is the latest? Questions like these fill the sequel round of a data engineering interview.",
       pauseAfter: 0.6,
     },
-    {
-      id: "plan",
-      text: "This video answers twenty-two of them. Eleven get worked through on real queries in DuckDB. The other eleven come quickly, at the end.",
-      pauseAfter: 0.7,
-    },
+    { id: "plan", text: "This video answers twenty-two of them." },
+    { id: "plan-worked", text: "Eleven get worked through on real queries in Postgres." },
+    { id: "plan-quick", text: "The other eleven come quickly, at the end.", pauseAfter: 0.7 },
     { id: "rank-in", text: "Most of them start by numbering rows." },
 
     // ── 1, 2, 3. Ranking, the latest row, QUALIFY ─────────────────────────
@@ -160,9 +165,9 @@ export const script: NarrationScript = {
     },
     {
       id: "qualify",
-      text: "Question three. What is qualify, and which engines support it? It filters on a window function after it's computed, the way having filters an aggregate. The subquery goes, and the same ten rows come back.",
-      pauseAfter: 0.6,
+      text: "Question three. What is qualify, and which engines support it? It filters on a window function after it's computed, the way having filters an aggregate.",
     },
+    { id: "qualify-goes", text: "The subquery goes, and the filter sits in the query itself.", pauseAfter: 0.6 },
     {
       id: "qualify-where",
       text: "DuckDB, BigQuery, Snowflake and Databricks support it. Postgres and my sequel don't, so there you keep the subquery.",
@@ -194,7 +199,7 @@ export const script: NarrationScript = {
     },
     {
       id: "where-try",
-      text: "Put a sum in WHERE instead, and DuckDB refuses: the aggregate doesn't exist yet.",
+      text: "Put a sum in WHERE instead, and Postgres refuses: the aggregate doesn't exist yet.",
       pauseAfter: 0.7,
     },
     {
@@ -389,14 +394,9 @@ export const script: NarrationScript = {
       text: "A running total is a sum ordered by date, framed from the first row to this one, per user. Leave the frame out, and the default is range, so rows tied on a date share one total.",
       pauseAfter: 0.9,
     },
-    {
-      id: "r-pivot",
-      text: "To pivot, sum a case expression for each new column, grouped by the row. DuckDB also has a pivot clause.",
-    },
-    {
-      id: "r-pivot-dyn",
-      text: "If the values aren't known in advance, the case version takes dynamic sequel. DuckDB's pivot finds them itself.",
-    },
+    { id: "r-pivot", text: "To pivot, sum a case expression for each new column, grouped by the row." },
+    { id: "r-pivot-clause", text: "Snowflake, Sequel Server and DuckDB also have a pivot clause. Postgres doesn't." },
+    { id: "r-pivot-dyn", text: "If the values aren't known in advance, the case version takes dynamic sequel." },
     {
       id: "r-joins",
       text: "An inner join keeps only matches: six rows. Left keeps every customer, so Di comes back with nulls. Right keeps every order, the stray one too. Full keeps both: eight.",

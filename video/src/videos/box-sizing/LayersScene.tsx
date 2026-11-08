@@ -68,7 +68,7 @@ export const LayersScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>The CSS box model</span>
+        <span style={label(24, ACCENT_INK)}>The CSS box model</span>
       </Ink>
       <Ink at={open + 2} dur={20} style={{ left: 92, top: y(150), ...headline(88), whiteSpace: "nowrap" }}>
         Every element is a box,
@@ -76,7 +76,7 @@ export const LayersScene: React.FC = () => {
       <Ink
         at={fourAt - 6}
         dur={20}
-        style={{ left: 92, top: y(242), ...headline(88, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 92, top: y(242), ...headline(88, true), color: INK, whiteSpace: "nowrap" }}
       >
         built in four layers.
       </Ink>
@@ -177,10 +177,10 @@ const Callout: React.FC<{
         <circle cx={tx} cy={y} r={5} fill={INK} stroke={PAPER} strokeWidth={2.5} opacity={ease(frame, at + 12, 6)} />
       </svg>
       <Note at={at} x={x} y={y - 17}>
-        <div style={{ ...label(26, color), lineHeight: "34px", whiteSpace: "nowrap" }}>{title}</div>
+        <div style={{ ...label(28, color), lineHeight: "34px", whiteSpace: "nowrap" }}>{title}</div>
       </Note>
       <Note at={textAt ?? at + 6} x={x} y={y + 24}>
-        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           {emphasis ? (
             <span style={{ borderBottom: `3px solid ${ACCENT}`, paddingBottom: 2 }}>{text}</span>
           ) : (

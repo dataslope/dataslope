@@ -1,11 +1,11 @@
 import results from "./results.json" with { type: "json" };
 
 // Every table, statement and message the video shows, read from
-// results.json: what DuckDB v1.4.3 (DuckDB-Wasm 1.32.0, the engine the
-// page's blocks run) returned for the statements in check.mjs, which wrote
-// it. Each figure ran in a fresh database built by its own setup, and the SQL
-// printed on screen is the SQL in that file, so a listing cannot drift from
-// what ran. Pure (no Remotion, no DOM).
+// results.json: what Postgres (PGlite, the engine the page's blocks run)
+// returned for the statements in check.mjs, which wrote it. Each figure ran
+// in a fresh database built by its own setup, and the SQL printed on screen
+// is the SQL in that file, so a listing cannot drift from what ran. Pure (no
+// Remotion, no DOM).
 
 export const VIDEO = "da-advanced-sql";
 
@@ -42,8 +42,8 @@ const table = (figure: string, id: string): Table => {
 export type Query = { lines: string[] };
 const query = (figure: string, id: string): Query & Table => ({ lines: step(figure, id).sql.split("\n"), ...table(figure, id) });
 
-/** A statement DuckDB refused: its SQL and its error, split into the kind
- *  ("Binder Error") and the message. */
+/** A statement Postgres refused: its SQL and its error, split into the kind
+ *  ("ERROR") and the message. */
 const refused = (figure: string, id: string) => {
   const s = step(figure, id);
   if (s.ok || !s.error) throw new Error(`${figure}.${id} did not fail: ${s.sql}`);
@@ -79,7 +79,8 @@ export const RANK = {
   products: table("topN", "table"),
   rowNumber: query("topN", "rowNumber"),
   rank: query("topN", "rank"),
-  qualify: query("topN", "qualify"),
+  /** QUALIFY, which Postgres does not have: its listing alone. */
+  qualify: { lines: refused("topN", "qualify").lines },
   inWhere: refused("topN", "inWhere"),
 };
 
@@ -133,5 +134,3 @@ export const RAPID = {
   unpivot: query("pivot", "unpivot"),
   inWhere: refused("topN", "inWhere"),
 };
-
-export const RUNTIME = `DuckDB ${(results.figures as unknown as Record<string, Figure>).window.version}`;

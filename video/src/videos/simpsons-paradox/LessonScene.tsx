@@ -22,7 +22,7 @@ export const LessonScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 12} dur={14} style={{ left: 120, top: y(150) }}>
-        <span style={label(22, ACCENT_INK)}>The name for it</span>
+        <span style={label(24, ACCENT_INK)}>The name for it</span>
       </Ink>
       <Ink at={start - 10} dur={22} style={{ left: 114, top: y(194), ...headline(112), whiteSpace: "nowrap" }}>
         Simpson&apos;s paradox
@@ -34,7 +34,7 @@ export const LessonScene: React.FC = () => {
       </Ink>
       <Ink at={ruleAt - 6} dur={22} style={{ left: 120, top: y(560), width: 1040 }}>
         <div style={{ height: 2, background: INK, width: 140, marginBottom: 30 }} />
-        <div style={{ ...headline(58, true), color: ACCENT_INK, lineHeight: 1.12 }}>
+        <div style={{ ...headline(58, true), color: INK, lineHeight: 1.12 }}>
           Before you trust a total, ask what it is averaging over.
         </div>
       </Ink>

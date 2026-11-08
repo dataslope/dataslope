@@ -200,7 +200,7 @@ export const FanoutScene: React.FC = () => {
         />
         <Note at={grainAt - 2} x={LIST_X} y={y(TOP) + fixedH + 12}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 650 }}>The grain:</span> what one row stands for.
+            <span style={{ fontWeight: 500 }}>The grain:</span> what one row stands for.
           </span>
         </Note>
         <Note at={oneRowAt - 2} x={LIST_X} y={y(TOP) + fixedH + 54}>

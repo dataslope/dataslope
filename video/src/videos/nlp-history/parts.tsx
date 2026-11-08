@@ -4,7 +4,7 @@ import { arrowHead, type Pt } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { ACCENT, BAR, BLUE_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
@@ -57,7 +57,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -87,7 +87,7 @@ export const Headline: React.FC<{
           at={turnAt ?? at + 10}
           dur={18}
           out={out}
-          style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
         >
           {turn}
         </Ink>
@@ -326,7 +326,7 @@ export const Tick: React.FC<{ x: number; y: number; at: number; size?: number; c
 
 /** Code or a sample set inside running text or a label, at the text's own size. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 600, color }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 500, color }}>{children}</span>
 );
 
 /** A small label in Inter. */
@@ -401,7 +401,7 @@ export const Quote: React.FC<{
         <div style={{ ...body(size, true), color, lineHeight: 1.2 }}>{children}</div>
       </Ink>
       <Ink at={creditAt ?? at + 14} dur={14} style={{ position: "relative", marginLeft: 28, marginTop: 18, width: width - 28 }}>
-        <div style={{ ...label(21, INK_SOFT), fontWeight: 560, lineHeight: 1.35 }}>{credit}</div>
+        <div style={{ ...label(24, INK_SOFT), fontWeight: 500, lineHeight: 1.35 }}>{credit}</div>
       </Ink>
     </div>
   );
@@ -444,7 +444,7 @@ export const Chip: React.FC<{
         whiteSpace: "nowrap",
         fontFamily: mono ? MONO : SANS,
         fontSize: size,
-        fontWeight: mono ? 500 : 600,
+        fontWeight: mono ? 500 : 500,
         color,
         lineHeight: 1.2,
       }}

@@ -252,7 +252,7 @@ export const GenScene: React.FC = () => {
           ]}
         />
         <Note at={moveAt + 10} x={NOTE_X} y={y(BARS_Y) + 3 * h(54) + h(8)} out={fig1Out}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={moveAt + 16}>the same, whatever the input&apos;s size</Mark>
           </span>
         </Note>
@@ -320,15 +320,15 @@ export const GenScene: React.FC = () => {
           marks={[{ line: 0, at: zeroAt + 2, color: MARK_BAD }]}
         />
         <Note at={printAt} x={RIGHT_X} y={againTop + h(6)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>a list: print it, read it twice</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>a list: print it, read it twice</span>
         </Note>
         <Note at={smallAt} x={RIGHT_X} y={againTop + h(70)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mark at={smallAt + 4} color={MARK}>small data you rescan:</Mark> lists
           </span>
         </Note>
         <Note at={largeAt} x={RIGHT_X} y={againTop + h(122)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={largeAt + 4} color={MARK_OK}>large or endless data:</Mark> generators
           </span>
         </Note>

@@ -140,7 +140,7 @@ export const TabScene: React.FC = () => {
                 transform: `translateY(${(1 - ease(frame, at, 12)) * 8}px)`,
                 fontFamily: SANS,
                 fontSize: i === 2 ? 26 : 23,
-                fontWeight: 650,
+                fontWeight: 500,
                 color: i === 2 ? BLUE_INK : INK,
                 whiteSpace: "nowrap",
               }}
@@ -181,7 +181,7 @@ export const TabScene: React.FC = () => {
                 background: LISTING_PAPER,
                 border: `1.5px solid ${HAIRLINE}`,
                 borderBottom: "none",
-                ...label(20, INK),
+                ...label(24, INK),
                 // "in your browser" and "this course": the tab the reader has open.
                 transform: `scale(${1 + (pulse(frame, browserAt - 2, 18) + pulse(frame, courseAt - 2, 18)) * 0.08})`,
               }}
@@ -211,9 +211,9 @@ export const TabScene: React.FC = () => {
         dim={easierAt - 2}
       />
       <Ink at={tellsAt - 2} dur={16} style={{ left: FX + 30, top: FTOP + BAR_H + 22 + 96, width: FW - 70, opacity: 1 - frameDim }}>
-        <div style={{ fontFamily: MONO, fontSize: 22, lineHeight: 1.55, color: INK }}>
+        <div style={{ fontFamily: MONO, fontSize: 24, lineHeight: 1.55, color: INK }}>
           <Mark at={eighteenAt - 4}>
-            <span style={{ fontWeight: 700 }}>{VERSION_SHORT}</span>
+            <span style={{ fontWeight: 500 }}>{VERSION_SHORT}</span>
           </Mark>{" "}
           <span style={{ color: INK_SOFT }}>{VERSION_REST}, …</span>
         </div>

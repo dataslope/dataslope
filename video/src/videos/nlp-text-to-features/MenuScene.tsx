@@ -117,12 +117,12 @@ export const MenuScene: React.FC = () => {
         ))}
       </ChipRow>
       <Note at={turnsAt} x={X0} y={y(WORDS_LABEL_Y)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>a list of words</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a list of words</span>
       </Note>
       <Arrow from={[740, y(ROW_Y) + 22]} to={[880, y(ROW_Y) + 22]} at={turnsAt} dur={16} color={INK_SOFT} />
       {BOW.vocab.map((w, j) => (
         <Note key={w} at={numbersAt + j} x={CELL.x0 + j * CELL.step + CELL.w / 2} y={y(CELL.top) - 34} style={{ transform: "translateX(-50%)" }}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>{w}</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{w}</span>
         </Note>
       ))}
       {ROW.map((c, j) => (
@@ -139,7 +139,7 @@ export const MenuScene: React.FC = () => {
         />
       ))}
       <Note at={featuresAt - 2} x={CELL.x0} y={y(WORDS_LABEL_Y)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           <Mark at={rowsAt - 2}>a row of numbers</Mark>: features
         </span>
       </Note>
@@ -147,8 +147,8 @@ export const MenuScene: React.FC = () => {
       {/* ── Fig. 2: tokenize, then a question at every step ── */}
       <FigLabel n="2" title="The cleaning steps: a menu, not a recipe" at={menuAt - 4} x={X0} y={y(FIG2_Y)} />
       <Card at={tokenizeAt - 4} x={TOKENIZE.x} y={y(STATION_Y)} w={TOKENIZE.w} h={h(STATION_H)} fill={SURFACE} line={INK}>
-        <span style={label(26, INK)}>tokenize</span>
-        <span style={{ ...note(20, INK_SOFT), marginTop: 6 }}>nearly always</span>
+        <span style={label(28, INK)}>tokenize</span>
+        <span style={{ ...note(24, INK_SOFT), marginTop: 6 }}>nearly always</span>
       </Card>
       {QUESTIONS.map((q, k) => (
         <React.Fragment key={q}>
@@ -173,7 +173,7 @@ export const MenuScene: React.FC = () => {
 
       {/* ── The one question, the lesson's callout ── */}
       <Note at={testAt - 2} x={X0} y={y(TEST_Y) - 38}>
-        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>The same test, at every step</span>
+        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>The same test, at every step</span>
       </Note>
       <Ink at={doesAt - 4} dur={22} style={{ left: X0, top: y(TEST_Y), ...body(40, true), color: INK, whiteSpace: "nowrap" }}>
         Does what this step throws away <Mark at={matterAt - 2}>matter to your task?</Mark>

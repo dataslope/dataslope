@@ -113,7 +113,7 @@ export const Step: React.FC<{
       />
       <span
         style={{
-          ...note(26),
+          ...note(28),
           ...badgeStyle("gray", 26),
           position: "relative",
           width: 40,
@@ -130,7 +130,7 @@ export const Step: React.FC<{
       >
         {n}
       </span>
-      <span style={{ position: "relative", ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{children}</span>
+      <span style={{ position: "relative", ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{children}</span>
     </div>
   );
 };

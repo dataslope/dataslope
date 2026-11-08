@@ -39,7 +39,7 @@ export {
  *  a line's sizes may differ by (`check:frames`), where the 0.88em of the
  *  Mono this video used to take from Parts 1 and 2 is not. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 500, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );
@@ -271,7 +271,7 @@ export const Sheet: React.FC<{
                 ...cellStyle(g.xs[insert.c], insert.width, g.rowTop(g.firstRow + i)),
                 fontFamily: SANS,
                 fontSize: size,
-                fontWeight: i === 0 ? 650 : 450,
+                fontWeight: i === 0 ? 500 : 450,
                 color: INK,
                 // A replayed insert takes its values with it as it closes.
                 opacity: ease(frame, insert.at + 10 + i * 2, 10) * ins,
@@ -353,9 +353,9 @@ export const FormulaText: React.FC<{ formula: string; upto?: number; size?: numb
     const mp = mark === undefined ? 0 : mark.at === undefined ? 1 : ease(frame, mark.at, 10);
     const bg = mark && mp > 0 ? (mp >= 1 ? mark.color : `color-mix(in srgb, ${mark.color} ${Math.round(mp * 100)}%, transparent)`) : undefined;
     if (str) parts.push({ text, color: inkOf.green, weight: 500, bg });
-    else if (ref) parts.push({ text, color: BLUE_INK, weight: 600, bg });
-    else if (fn) parts.push({ text, color: INK, weight: 700, bg });
-    else if (name) parts.push({ text, color: inkOf.purple, weight: 600, bg });
+    else if (ref) parts.push({ text, color: BLUE_INK, weight: 500, bg });
+    else if (fn) parts.push({ text, color: INK, weight: 500, bg });
+    else if (name) parts.push({ text, color: inkOf.purple, weight: 500, bg });
     else if (number) parts.push({ text, color: inkOf.orange, weight: 500, bg });
     else parts.push({ text, color: INK_SOFT, weight: 500 });
   }
@@ -431,8 +431,8 @@ export const FormulaBar: React.FC<{
         opacity: p * (1 - d) * (1 - o),
       }}
     >
-      {cell ? <span style={{ ...label(19, INK_SOFT), minWidth: 34 }}>{cell}</span> : null}
-      <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: Math.max(19, Math.round(size * 0.9)), color: INK_SOFT, fontWeight: 600 }}>fx</span>
+      {cell ? <span style={{ ...label(24, INK_SOFT), minWidth: 34 }}>{cell}</span> : null}
+      <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: Math.max(19, Math.round(size * 0.9)), color: INK_SOFT, fontWeight: 500 }}>fx</span>
       <span style={{ flex: "0 1 auto", overflow: "hidden", display: "grid" }}>
         <span style={{ ...layer, opacity: 1 - rw }}>
           <FormulaText formula={formula} upto={typed} size={size} marks={marks} />
@@ -455,7 +455,7 @@ export const FormulaBar: React.FC<{
                   opacity: r.on,
                   fontFamily: SANS,
                   fontSize: size * 1.05,
-                  fontWeight: 700,
+                  fontWeight: 500,
                   color: ink(r.tone),
                   ...(NUMERIC.test(String(r.text)) ? TABULAR : {}),
                 }}

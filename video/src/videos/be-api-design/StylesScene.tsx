@@ -115,19 +115,19 @@ export const StylesScene: React.FC = () => {
         {heads.map((hd, i) => (
           <React.Fragment key={hd.name}>
             <Note at={hd.at} x={COLS[i]} y={headTop}>
-              <div style={{ ...label(32, INK), fontWeight: 750, whiteSpace: "nowrap" }}>{hd.name}</div>
-              <div style={{ ...note(22, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>{hd.what}</div>
+              <div style={{ ...label(34, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{hd.name}</div>
+              <div style={{ ...note(24, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>{hd.what}</div>
             </Note>
             {lines[i].plus.map(([t, at], k) => (
               <Note key={t} at={at} x={COLS[i]} y={plusTop + k * h(36)}>
-                <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+                <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
                   <b style={{ color: BLUE_INK }}>+</b> {t}
                 </span>
               </Note>
             ))}
             {lines[i].minus.map(([t, at], k) => (
               <Note key={t} at={at} x={COLS[i]} y={plusTop + (lines[i].plus.length + k) * h(36)}>
-                <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+                <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
                   <b>−</b> {t}
                 </span>
               </Note>
@@ -137,21 +137,21 @@ export const StylesScene: React.FC = () => {
 
         {/* REST: one screen, three round trips. */}
         <Note at={screenAt} x={COLS[0]} y={figTop}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>one screen: an article, its author, its comments</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>one screen: an article, its author, its comments</span>
         </Note>
         {trips.map((t, i) => {
           const at = screenAt + 8 + i * 8;
           return (
             <Note key={t} at={at} x={COLS[0]} y={figTop + h(44) + i * h(46)}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 21 }}>
-                <span style={{ ...label(23, BLUE_INK), fontWeight: 750, width: 22, textAlign: "right" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 24 }}>
+                <span style={{ ...label(24, BLUE_INK), fontWeight: 500, width: 22, textAlign: "right" }}>
                   <Num>{i + 1}</Num>
                 </span>
-                <span style={{ fontFamily: MONO, fontSize: 21, color: INK, whiteSpace: "pre" }}>
-                  <span style={{ color: METHOD_INK, fontWeight: 700 }}>GET</span>
+                <span style={{ fontFamily: MONO, fontSize: 24, color: INK, whiteSpace: "pre" }}>
+                  <span style={{ color: METHOD_INK, fontWeight: 500 }}>GET</span>
                   {t.slice(3)}
                 </span>
-                <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, tripsAt + i * 4, 8) }}>↻</span>
+                <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, tripsAt + i * 4, 8) }}>↻</span>
               </div>
             </Note>
           );
@@ -163,7 +163,7 @@ export const StylesScene: React.FC = () => {
             {QUERY.map((l, i) => {
               const field = /title|name|text/.test(l);
               return (
-                <div key={i} style={{ fontFamily: MONO, fontSize: Q_SIZE, lineHeight: "30px", whiteSpace: "pre", color: field ? INK : INK_SOFT, fontWeight: field ? 650 : 500, opacity: ease(frame, exactlyAt + i * 3, 8) }}>
+                <div key={i} style={{ fontFamily: MONO, fontSize: Q_SIZE, lineHeight: "30px", whiteSpace: "pre", color: field ? INK : INK_SOFT, fontWeight: field ? 500 : 500, opacity: ease(frame, exactlyAt + i * 3, 8) }}>
                   {field ? (
                     <>
                       {l.match(/^\s*/)![0]}
@@ -197,12 +197,12 @@ export const StylesScene: React.FC = () => {
             opacity: ease(frame, grpcAt + 12, 10),
           }}
         >
-          <div style={{ position: "absolute", left: -((bitOffset * 4) % 216), top: 2, fontFamily: MONO, fontSize: 19, lineHeight: "24px", color: BLUE_INK, whiteSpace: "pre" }}>
+          <div style={{ position: "absolute", left: -((bitOffset * 4) % 216), top: 2, fontFamily: MONO, fontSize: 24, lineHeight: "24px", color: BLUE_INK, whiteSpace: "pre" }}>
             {BITS.repeat(4)}
           </div>
         </div>
         <Note at={streamAt} x={COLS[2]} y={sTop + svc.h + h(24)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>a binary stream, both ways</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a binary stream, both ways</span>
         </Note>
 
         {/* The split: REST at the edge, gRPC inside. */}

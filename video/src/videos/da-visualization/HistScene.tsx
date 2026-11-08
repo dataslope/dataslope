@@ -124,10 +124,10 @@ export const HistScene: React.FC = () => {
                 <g key={c.key}>
                   <rect x={x} y={yy} width={bw} height={base - yy} fill={BAR} />
                   {gap > 0 ? <rect x={x + bw} y={base - h(70)} width={band - bw} height={h(70)} fill={HIGHLIGHT} opacity={gap} /> : null}
-                  <text x={x + bw / 2} y={base + 26} textAnchor="middle" style={{ ...label(19, INK), fill: INK }}>
+                  <text x={x + bw / 2} y={base + 26} textAnchor="middle" style={{ ...label(24, INK), fill: INK }}>
                     {c.key}
                   </text>
-                  <text x={x + bw / 2} y={yy - 10} textAnchor="middle" style={{ ...label(19, INK_SOFT), fill: INK_SOFT, ...TABULAR }} opacity={g}>
+                  <text x={x + bw / 2} y={yy - 10} textAnchor="middle" style={{ ...label(24, INK_SOFT), fill: INK_SOFT, ...TABULAR }} opacity={g}>
                     {c.count}
                   </text>
                 </g>
@@ -158,7 +158,7 @@ export const HistScene: React.FC = () => {
 
         {/* ── Question 5: one sample, three bin widths ── */}
         <Note at={tryAt} x={PANELS[0].x0} y={y(P_TOP) - h(118)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>the same {BINS.n.toLocaleString("en-US")} values, three bin widths</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>the same {BINS.n.toLocaleString("en-US")} values, three bin widths</span>
         </Note>
         <PanelTitle x={PANELS[0].x0} y={y(P_TOP) - h(66)} at={fiveAt - 2}>
           Bins {wide.width} wide
@@ -190,16 +190,16 @@ export const HistScene: React.FC = () => {
         </div>
 
         <Note at={rulesAt} x={PANELS[0].x0} y={y(P_BASE) + h(110)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>Sturges, Freedman–Diaconis: </span>
-          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, startAt, 10) }}>a place to start, not a verdict</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Sturges, Freedman–Diaconis: </span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, startAt, 10) }}>a place to start, not a verdict</span>
         </Note>
         <Note at={startAt + 14} x={PANELS[0].x0} y={y(P_BASE) + h(148)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             Sturges sets the bin count from the sample size; Freedman–Diaconis, the width from the IQR
           </span>
         </Note>
         <Note at={reportAt + 4} x={PANELS[2].x0} y={y(P_BASE) + h(110)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Mark at={bridgeAt + 2}>
               report the shape that holds<span style={{ opacity: ease(frame, widthsAt - 2, 10) }}> across widths</span>
             </Mark>

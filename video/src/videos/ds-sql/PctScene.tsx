@@ -17,7 +17,10 @@ const AX_X1 = 1700;
 const STRIP_Y = 440;
 const SQL_TOP = 590;
 const SIZE = 19;
-const RES_X = 1080;
+/** The listings are as wide as their longest line: PERCENTILE_CONT cast to
+ *  numeric so Postgres's ROUND(x, 1) takes it, 84 characters at 19px. */
+const SQL_W = 1000;
+const RES_X = 1230;
 
 const px = (ms: number) => AX_X0 + ((Math.log(ms) - Math.log(LO)) / (Math.log(HI) - Math.log(LO))) * (AX_X1 - AX_X0);
 
@@ -44,7 +47,7 @@ const Marker: React.FC<{ at: number; out?: number; ms: number; y: number; color:
           left: x + 10,
           top: y - 74,
           ...note(24, color),
-          fontWeight: 650,
+          fontWeight: 500,
           whiteSpace: "nowrap",
           ...TABULAR,
         }}
@@ -122,7 +125,7 @@ export const PctScene: React.FC = () => {
           {[100, 300, 1000, 3000].map((t) => (
             <g key={t}>
               <line x1={px(t)} x2={px(t)} y1={sy + 22} y2={sy + 30} stroke={INK_SOFT} strokeWidth={1.4} />
-              <text x={px(t)} y={sy + 54} textAnchor="middle" fill={INK_SOFT} style={{ ...label(19, INK_SOFT), ...TABULAR }}>
+              <text x={px(t)} y={sy + 54} textAnchor="middle" fill={INK_SOFT} style={{ ...label(24, INK_SOFT), ...TABULAR }}>
                 {t >= 1000 ? `${t / 1000} s` : `${t} ms`}
               </text>
             </g>
@@ -144,7 +147,7 @@ export const PctScene: React.FC = () => {
             );
           })}
         </svg>
-        <div style={{ position: "absolute", left: AX_X0 - 10, top: sy + h(70), ...label(19, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, twelveAt + 4, 12) }}>
+        <div style={{ position: "absolute", left: AX_X0 - 10, top: sy + h(70), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, twelveAt + 4, 12) }}>
           12 request times, made up for this video (log scale)
         </div>
         <Marker at={meanAt + 2} out={whyAt} ms={PCT.mean} y={sy} color={ACCENT_INK}>
@@ -155,7 +158,7 @@ export const PctScene: React.FC = () => {
             position: "absolute",
             left: px(sorted[faster[0]]) - 10,
             top: sy - h(70),
-            ...note(22, OK_INK),
+            ...note(24, OK_INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, slowerAt + 6, 12) * (1 - ease(frame, contAt, 10)),
           }}
@@ -173,7 +176,7 @@ export const PctScene: React.FC = () => {
             position: "absolute",
             left: px(p90) + 10,
             top: sy + h(80),
-            ...note(22, INK),
+            ...note(24, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, nineAt, 12),
           }}
@@ -190,13 +193,13 @@ export const PctScene: React.FC = () => {
             stroke={ACCENT}
             strokeWidth={2.6}
           />
-          <text x={(px(p90) + px(HI)) / 2} y={sy - 122} textAnchor="middle" style={svgText({ ...label(19, ACCENT_INK), fontWeight: 700 })}>
+          <text x={(px(p90) + px(HI)) / 2} y={sy - 122} textAnchor="middle" style={svgText({ ...label(24, ACCENT_INK), fontWeight: 500 })}>
             the slow tail
           </text>
         </svg>
 
         {/* ── The two medians, then the two p90s ── */}
-        <Listing lines={M.lines} x={X0} top={resTop} width={900} size={SIZE} at={contAt - 4} out={whyAt} marks={[{ line: 1, at: contAt + 6 }, { line: 2, at: discAt + 4, color: MARK_OK }]} />
+        <Listing lines={M.lines} x={X0} top={resTop} width={SQL_W} size={SIZE} at={contAt - 4} out={whyAt} marks={[{ line: 1, at: contAt + 6 }, { line: 2, at: discAt + 4, color: MARK_OK }]} />
         <DataTable
           g={mg}
           cols={colsOf(M, { median_cont: { ink: BLUE_INK }, median_disc: { ink: BLUE_INK, at: discAt + 2 } })}
@@ -205,14 +208,14 @@ export const PctScene: React.FC = () => {
           rows={rowsAt(M.rows, medAt)}
           marks={[{ row: 0, col: 1, at: fiftyAt, color: MARK_OK }]}
         />
-        <Listing lines={P.lines} x={X0} top={resTop} width={900} size={SIZE} at={whyAt + 4} marks={[{ line: 1, at: p90At }]} />
+        <Listing lines={P.lines} x={X0} top={resTop} width={SQL_W} size={SIZE} at={whyAt + 4} marks={[{ line: 1, at: p90At }]} />
         <DataTable g={pg} cols={colsOf(P, { p90_cont: { ink: BLUE_INK }, p90_disc: { ink: BLUE_INK } })} at={p90At - 2} rows={rowsAt(P.rows, p90At + 2)} />
         <div
           style={{
             position: "absolute",
             left: X0,
             top: resTop + listingHeight(M.lines.length, SIZE) + h(18),
-            ...note(22, INK_SOFT),
+            ...note(24, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, discAt + 6, 12) * (1 - ease(frame, whyAt, 10)),
           }}

@@ -140,12 +140,12 @@ export const BridgeScene: React.FC = () => {
         <Entity layout={factBefore} at={severalAt - 4} marks={{ promo_key: { at: roomAt + 2, tone: "warn" } }} out={swapAt} />
         <Entity layout={promo} at={severalAt + 4} />
         <Note at={twoAt + 2} x={promo.x} y={promo.bottom + h(20)} out={sitsAt}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            order <Num>1</Num>: SUMMER10 <i>and</i> FREESHIP
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            order <Num>1</Num>: SUMMER10 and FREESHIP
           </span>
         </Note>
         <Note at={roomAt + 6} x={factBefore.x} y={factBefore.bottom + h(16)} out={swapAt}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>one column, one promotion</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one column, one promotion</span>
         </Note>
 
         {/* ── The bridge between them ── */}
@@ -178,7 +178,7 @@ export const BridgeScene: React.FC = () => {
           bands={[{ row: 0, at: onceAt, out: worthAt, color: MARK }]}
         />
         <Note at={worthAt + 8} x={go.x} y={go.rowTop(O.rows.length) + h(14)}>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             total: $<Num>{BRIDGE.total}</Num>
           </span>
         </Note>
@@ -200,7 +200,7 @@ export const BridgeScene: React.FC = () => {
         </TableName>
         <DataTable g={gf} cols={colsOf(F)} at={sumAt} rows={F.rows.map((cells, i) => ({ cells, at: sumAt + 6 + i * 3 }))} />
         <Note at={fortyAt} x={gf.x} y={gf.rowTop(F.rows.length) + h(14)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             sum: $<Strike at={neverAt + 2}>
               <Num>{BRIDGE.fanoutTotal}</Num>
             </Strike>
@@ -217,12 +217,12 @@ export const BridgeScene: React.FC = () => {
           marks={W.rows.map((_, row) => ({ row, col: 1, at: shareAt + row * 3, color: MARK_OK }))}
         />
         <Note at={shareAt + 4} x={gw.x} y={gw.rowTop(W.rows.length) + h(14)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             sum: $<Num>{BRIDGE.weightedTotal}</Num>
           </span>
         </Note>
         <Note at={neverAt + 6} x={gf.x} y={gf.rowTop(F.rows.length) + h(56)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>never add these up</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>never add these up</span>
         </Note>
       </Drift>
     </AbsoluteFill>

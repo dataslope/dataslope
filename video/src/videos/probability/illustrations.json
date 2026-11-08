@@ -42,6 +42,24 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a modern smartphone lying at a slight angle on top of a folded paper warranty certificate, the certificate's corner held by a round red wax seal with two short ribbon tails, and a small sturdy blue shield standing upright beside the phone; the phone screen plain and dark, and no writing anywhere"
+    },
+    {
+      "id": "probability-door",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "one tall wooden door standing shut on its own inside a chunky rectangular wooden frame, seen straight from the front: the door washed in bright blue, built from a few long vertical planks, with a small round yellow knob near its right edge, and the thick frame around it washed in warm yellow"
+    },
+    {
+      "id": "probability-door-open",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "one tall chunky rectangular wooden door frame washed in warm yellow, standing on its own and seen straight from the front, its bright blue plank door swung open inward and away from the viewer on hinges at the left, so only a narrow strip of the blue door shows along the left side of the opening, and the empty opening filled with a deep, dark wash of blue and green like an unlit room"
+    },
+    {
+      "id": "probability-letter",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "one closed paper envelope lying flat and seen from the back, its pointed flap folded shut, the paper washed in pale blue with a small round red wax seal at the tip of the flap"
     }
   ]
 }

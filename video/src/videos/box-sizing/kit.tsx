@@ -62,14 +62,14 @@ export const tokenizeCss = (line: string, state: CssState = { inBlock: false, af
       out.push({ text, color: TOKEN_INK.punct });
     } else if (num) out.push({ text, color: inBlock ? TOKEN_INK.number : TOKEN_INK.selector });
     else if (word) {
-      if (!inBlock) out.push({ text, color: TOKEN_INK.selector, weight: 600 });
+      if (!inBlock) out.push({ text, color: TOKEN_INK.selector, weight: 500 });
       else if (!afterColon) out.push({ text, color: TOKEN_INK.property });
       else out.push({ text, color: TOKEN_INK.value });
     } else if (sel) {
       if (inBlock && sel === ":") {
         afterColon = true;
         out.push({ text, color: TOKEN_INK.punct });
-      } else out.push({ text, color: TOKEN_INK.selector, weight: 600 });
+      } else out.push({ text, color: TOKEN_INK.selector, weight: 500 });
     } else out.push({ text, color: TOKEN_INK.punct });
   }
   return { tokens: out, state: { inBlock, afterColon } };
@@ -251,8 +251,8 @@ export const Fig: React.FC<{ n: string; at: number; x: number; y: number; out?: 
   children,
 }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
-    <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 
@@ -434,7 +434,7 @@ export const DimLabel: React.FC<{ value: string; unit?: string; color?: string; 
   children,
 }) => (
   <span style={{ display: "inline-flex", alignItems: "baseline", gap: "0.35em" }}>
-    <span style={{ ...note(size, color), fontWeight: 650 }}>
+    <span style={{ ...note(size, color), fontWeight: 500 }}>
       {value}
       {unit}
     </span>

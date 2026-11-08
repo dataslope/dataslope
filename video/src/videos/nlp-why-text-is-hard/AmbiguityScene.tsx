@@ -24,15 +24,15 @@ const Readings: React.FC<{
 }> = ({ a, b, aAt, bAt, top, hlA }) => (
   <div style={{ position: "absolute", left: EX_X, top, display: "flex", alignItems: "baseline", gap: 22, whiteSpace: "nowrap" }}>
     <Ink at={aAt} dur={14} style={{ position: "relative" }}>
-      <span style={{ ...body(32, true), color: INK }}>{hlA ? <Mark at={hlA.at} out={hlA.out}>{a}</Mark> : a}</span>
+      <span style={{ ...body(34, true), color: INK }}>{hlA ? <Mark at={hlA.at} out={hlA.out}>{a}</Mark> : a}</span>
     </Ink>
     {/* "or" in the readings' own face and size, soft and upright, so the
         line stays one size. */}
     <Ink at={bAt - 6} dur={10} style={{ position: "relative" }}>
-      <span style={{ ...body(32), color: INK_SOFT }}>or</span>
+      <span style={{ ...body(34), color: INK_SOFT }}>or</span>
     </Ink>
     <Ink at={bAt} dur={14} style={{ position: "relative" }}>
-      <span style={{ ...body(32, true), color: INK }}>{b}</span>
+      <span style={{ ...body(34, true), color: INK }}>{b}</span>
     </Ink>
   </div>
 );
@@ -48,10 +48,10 @@ const RowName: React.FC<{ name: string; gist: string; nameAt: number; gistAt: nu
 }) => (
   <>
     <Ink at={nameAt - 2} dur={14} style={{ left: X0, top, whiteSpace: "nowrap" }}>
-      <span style={{ ...label(30, INK), fontWeight: 700 }}>{name}</span>
+      <span style={{ ...label(28, INK), fontWeight: 500 }}>{name}</span>
     </Ink>
     <Ink at={gistAt} dur={16} style={{ left: X0, top: top + 48, whiteSpace: "nowrap" }}>
-      <span style={{ ...note(23, INK_SOFT) }}>{gist}</span>
+      <span style={{ ...note(24, INK_SOFT) }}>{gist}</span>
     </Ink>
   </>
 );
@@ -163,7 +163,7 @@ export const AmbiguityScene: React.FC = () => {
       {/* ── Referential ── */}
       <RowName name="Referential" gist="what does it point to?" nameAt={referentialAt} gistAt={refFrom - 2} top={row(2)} />
       <Ink at={trophyAt - 6} dur={24} style={{ left: EX_X, top: row(2) - 6, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(38), color: INK }}>
+        <span style={{ ...body(34), color: INK }}>
           The trophy didn't fit in the case because <Mark at={whatAt}>it</Mark> was too big.
         </span>
       </Ink>

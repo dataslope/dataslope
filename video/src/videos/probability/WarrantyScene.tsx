@@ -129,7 +129,7 @@ export const WarrantyScene: React.FC = () => {
             {/* One line, one size: the chance stands out by color and weight. */}
             <Ink at={r.at} dur={14} style={{ left: 220, top: y(400 + i * 90), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18, ...note(28, INK) }}>
               <span style={{ width: 210, display: "inline-block" }}>{r.name}</span>
-              <span style={{ color: i === 0 ? STAT_INK : INK_SOFT, fontWeight: 700, opacity: ease(frame, r.pAt, 10), width: 90, display: "inline-block" }}>
+              <span style={{ color: i === 0 ? STAT_INK : INK_SOFT, fontWeight: 500, opacity: ease(frame, r.pAt, 10), width: 90, display: "inline-block" }}>
                 {pct(r.p)}
               </span>
               <span style={{ color: INK_SOFT }}>
@@ -154,7 +154,7 @@ export const WarrantyScene: React.FC = () => {
               the green it has on the right too, and bold. */}
           <span style={note(28, INK)}>
             Expected profit = ${WARRANTY.price} − ${fmt(WARRANTY.ePayout, 0)} ={" "}
-            <span style={{ color: OK_INK, fontWeight: 700 }}>
+            <span style={{ color: OK_INK, fontWeight: 500 }}>
               <Sweep at={keepAt + 4}>${fmt(WARRANTY.eProfit, 0)}</Sweep>
             </span>
           </span>
@@ -168,10 +168,10 @@ export const WarrantyScene: React.FC = () => {
 
         {/* ── A million in code ── */}
         <Ink at={millionAt - 4} dur={14} style={{ left: RIGHT, top: y(330), whiteSpace: "nowrap" }}>
-          <span style={note(26, INK)}>
+          <span style={note(28, INK)}>
             <Count at={millionAt - 2} dur={26} to={WARRANTY.sold} format={num} /> sold in code:
           </span>
-          <span style={{ ...note(26, INK), opacity: ease(frame, profitAt - 4, 10) }}>
+          <span style={{ ...note(28, INK), opacity: ease(frame, profitAt - 4, 10) }}>
             {" "}
             average profit <b style={{ color: STAT_INK }}>${fmt(WARRANTY.simProfit)}</b>
           </span>
@@ -180,12 +180,12 @@ export const WarrantyScene: React.FC = () => {
             color and bold. */}
         <Ink at={storeAt - 4} dur={14} style={{ left: RIGHT, top: y(392), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16, ...note(28, INK) }}>
           <span style={{ width: 140, display: "inline-block" }}>The store</span>
-          <span style={{ color: OK_INK, fontWeight: 700, width: 76, display: "inline-block" }}>+${fmt(WARRANTY.eProfit, 0)}</span>
+          <span style={{ color: OK_INK, fontWeight: 500, width: 76, display: "inline-block" }}>+${fmt(WARRANTY.eProfit, 0)}</span>
           <span style={{ color: INK_SOFT }}>a warranty, on average</span>
         </Ink>
         <Ink at={onAverageAt - 4} dur={14} style={{ left: RIGHT, top: y(448), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16, ...note(28, INK) }}>
           <span style={{ width: 140, display: "inline-block" }}>The buyer</span>
-          <span style={{ color: STAT_INK, fontWeight: 700, width: 76, display: "inline-block" }}>
+          <span style={{ color: STAT_INK, fontWeight: 500, width: 76, display: "inline-block" }}>
             <Sweep at={buyerAt - 2}>−${fmt(WARRANTY.eProfit, 0)}</Sweep>
           </span>
           <span style={{ color: INK_SOFT, opacity: ease(frame, buyerAt - 2, 10) }}>a losing bet</span>
@@ -214,7 +214,7 @@ export const WarrantyScene: React.FC = () => {
             rowGap: h(14),
             alignItems: "baseline",
             whiteSpace: "nowrap",
-            ...note(26, INK),
+            ...note(28, INK),
           }}
         >
           <Held at={oneLossAt + 2}>No warranty</Held>
@@ -243,7 +243,7 @@ export const WarrantyScene: React.FC = () => {
       </div>
 
       {/* ── The bridge: one variable's summary, and the shapes many share ── */}
-      <div style={{ position: "absolute", left: 160, top: y(770), display: "flex", alignItems: "baseline", gap: "0.3em", whiteSpace: "nowrap", ...label(26, INK) }}>
+      <div style={{ position: "absolute", left: 160, top: y(770), display: "flex", alignItems: "baseline", gap: "0.3em", whiteSpace: "nowrap", ...label(28, INK) }}>
         <Held at={evAt - 2}>E[X]</Held>
         <Held at={varAt - 2}>and Var(X)</Held>
         <Held at={sumAt - 2}>sum up one variable.</Held>
@@ -254,7 +254,7 @@ export const WarrantyScene: React.FC = () => {
       {/* Each name as its shape is drawn, while the bridge is still speaking. */}
       {(["binomial", "normal", "exponential"] as const).map((t, k) => (
         <Note key={t} at={[manyRvAt + 8, shapesAt + 8, namedAt + 4][k]} x={SHAPES.x[k]} y={y(SHAPES.base) + 10}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
         </Note>
       ))}
       <Svg>

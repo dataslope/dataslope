@@ -91,7 +91,7 @@ export const OverScene: React.FC = () => {
           return (
             <React.Fragment key={c.layer}>
               <Box x={x} y={layerTop} w={COL_W} h={LAYER.h} at={c.at} dashed tone="plain" tones={[[eachAt + 6 + i * 6, "bad"], ...(i === 1 ? ([[earnsAt, "ok"]] as const) : [])]} dim={dim}>
-                <span style={{ position: "relative", ...label(25, c2.ink), fontWeight: 700, whiteSpace: "nowrap" }}>
+                <span style={{ position: "relative", ...label(24, c2.ink), fontWeight: 500, whiteSpace: "nowrap" }}>
                   {c.layer}
                   <span
                     style={{
@@ -106,7 +106,7 @@ export const OverScene: React.FC = () => {
                     }}
                   />
                 </span>
-                <span style={{ ...note(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, c.at + 8, 10) }}>
+                <span style={{ ...note(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, c.at + 8, 10) }}>
                   {keep > 0.5 ? "earned: two rules" : "a layer to read through"}
                 </span>
               </Box>
@@ -130,18 +130,18 @@ export const OverScene: React.FC = () => {
         <Line x={X0} y={y(660)} at={eachAt} size={26} out={notesOut}>
           Abstraction you have to read through
           <span style={{ opacity: ease(frame, nobodyAt, 10) }}>
-            , for <span style={{ color: ACCENT_INK, fontWeight: 650 }}>flexibility nobody uses</span>
+            , for <span style={{ color: ACCENT_INK, fontWeight: 500 }}>flexibility nobody uses</span>
           </span>
         </Line>
         <Line x={X0} y={y(660) + 52} at={variationAt} size={26} out={notesOut}>
           Patterns solve variation you expect
           <span style={{ color: INK_SOFT, opacity: ease(frame, specAt, 10) }}>; added speculatively, they break</span>
         </Line>
-        <Line x={X0} y={y(660) + 116} at={yagniAt} size={30} weight={700} out={notesOut}>
+        <Line x={X0} y={y(660) + 116} at={yagniAt} size={30} weight={500} out={notesOut}>
           YAGNI: <Mark at={gonnaAt}>you aren&apos;t gonna need it</Mark>
         </Line>
 
-        <Line x={X0} y={y(660)} at={triggerAt} size={28} weight={650}>
+        <Line x={X0} y={y(660)} at={triggerAt} size={28} weight={500}>
           Name the trigger, not the pattern
           <span style={{ color: OK_INK, opacity: ease(frame, secondAt, 10) }}>: the second shipping rule</span>
         </Line>

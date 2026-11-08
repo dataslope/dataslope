@@ -42,6 +42,12 @@
       "category": "video-hero",
       "style": "watercolor illustration",
       "subject": "a yellow retractable tape measure with its blue tape pulled out in one long gentle curve, lying beside a small open wooden crate that holds a short neat row of blank pale index cards standing on edge"
+    },
+    {
+      "id": "llm-benchmarks-rubric",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one chunky wooden clipboard standing upright, seen straight on from the front: a warm yellow-ochre board with a thick blue metal clip across its top edge, holding a single large sheet of pale cream paper whose face is completely empty and smooth, an even, very light wash from edge to edge"
     }
   ]
 }

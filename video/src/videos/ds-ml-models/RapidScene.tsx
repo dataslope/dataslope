@@ -75,7 +75,7 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         at={c.w("r-gen", "A discriminative model")}
         top={c.y(360)}
         size={28}
-        weight={700}
+        weight={500}
       >
         Discriminative
       </Line>
@@ -97,7 +97,7 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         at={c.w("r-gen", "A generative model")}
         top={c.y(520)}
         size={28}
-        weight={700}
+        weight={500}
       >
         Generative
       </Line>
@@ -185,7 +185,7 @@ const Scale13: React.FC<{ c: Ctx }> = ({ c }) => {
                 left: R_X,
                 top: top + c.h(8),
                 opacity: p,
-                ...note(22, INK),
+                ...note(24, INK),
                 whiteSpace: "nowrap",
               }}
             >
@@ -214,8 +214,8 @@ const Scale13: React.FC<{ c: Ctx }> = ({ c }) => {
                 left: R_X + 240 + W * b.v * p,
                 top: top + c.h(6),
                 opacity: p,
-                ...note(23, b.color),
-                fontWeight: 700,
+                ...note(24, b.color),
+                fontWeight: 500,
                 ...TABULAR,
               }}
             >
@@ -235,7 +235,7 @@ const Encode: React.FC<{ c: Ctx }> = ({ c }) => {
   const colW = 160;
   return (
     <>
-      <Line at={oneHotAt} top={c.y(352)} size={25} weight={650}>
+      <Line at={oneHotAt} top={c.y(352)} size={25} weight={500}>
         one-hot: a column of 0s and 1s per category
       </Line>
       {[
@@ -260,7 +260,7 @@ const Encode: React.FC<{ c: Ctx }> = ({ c }) => {
                 width: j ? colW : 110,
                 fontFamily: MONO,
                 fontSize: i === 0 ? 19 : 20,
-                fontWeight: i === 0 || cell === "1" ? 700 : 500,
+                fontWeight: i === 0 || cell === "1" ? 500 : 500,
                 color: cell === "1" ? BLUE_INK : i === 0 ? INK : INK_SOFT,
                 fontVariantLigatures: "none",
               }}
@@ -312,13 +312,13 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {kinds.map((k, i) => (
         <Note key={k.name} at={k.at} x={R_X} y={c.y(360) + i * c.h(52)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b style={{ display: "inline-block", width: 150 }}>{k.name}</b>
             {k.text}
           </span>
         </Note>
       ))}
-      <Line at={keepsAt} top={c.y(540)} weight={650}>
+      <Line at={keepsAt} top={c.y(540)} weight={500}>
         RFE (recursive feature elimination), asked for {RFE.names.length} of{" "}
         {RFE.of}, keeps:
       </Line>
@@ -332,8 +332,8 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
           <span
             style={{
               fontFamily: MONO,
-              fontSize: 21,
-              fontWeight: 600,
+              fontSize: 24,
+              fontWeight: 500,
               color: BLUE_INK,
               whiteSpace: "nowrap",
               fontVariantLigatures: "none",
@@ -483,12 +483,12 @@ export const RapidScene: React.FC = () => {
           />
         </Svg>
         <Note at={nextFrom} x={gx} y={gy - h(70)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             every model here, built from parts you can point to
           </span>
         </Note>
         <Note at={learnsAt} x={gx + 560} y={gy - h(4)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Mark at={learnsAt + 4}>a neural network learns its own</Mark>
           </span>
         </Note>

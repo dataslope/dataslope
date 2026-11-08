@@ -31,7 +31,7 @@ const Column: React.FC<{ at: number; title: string; children: React.ReactNode }>
   const p = ease(frame, at - 2, 14);
   return (
     <div style={{ width: "fit-content", maxWidth: COL_W, opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>
-      <div style={{ ...note(29, INK), fontWeight: 650, marginBottom: 14, whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...note(28, INK), fontWeight: 500, marginBottom: 14, whiteSpace: "nowrap" }}>{title}</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>{children}</div>
     </div>
   );
@@ -122,12 +122,12 @@ export const AiScene: React.FC = () => {
         <Headline lead="AI has changed this interview" turn="in four ways." at={from + 2} turnAt={fourAt} size={62} />
 
         <div style={{ position: "absolute", left: X0, top: top - 4, width: STEP_X - X0 - 40, opacity: ease(frame, ingestAt - 2, 12) }}>
-          <div style={{ ...note(30, INK), fontWeight: 650 }}>
+          <div style={{ ...note(28, INK), fontWeight: 500 }}>
             Ingestion for <span style={{ opacity: ease(frame, ragAt - 2, 12) }}>RAG</span>
           </div>
           <div style={{ ...note(24, INK_SOFT), marginTop: 4, opacity: ease(frame, expandAt - 2, 12) }}>retrieval-augmented generation</div>
           {/* What RAG does, once, for a viewer who has not built one. */}
-          <div style={{ ...note(22, INK_SOFT), fontStyle: "italic", marginTop: 2, textWrap: "balance", opacity: ease(frame, expandAt + 10, 12) }}>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 2, textWrap: "balance", opacity: ease(frame, expandAt + 10, 12) }}>
             a model answers from documents it looks up
           </div>
           <div style={{ ...note(24, INK), marginTop: 10, opacity: ease(frame, promptAt - 2, 12) }}>
@@ -266,13 +266,13 @@ export const AiScene: React.FC = () => {
             position: "absolute",
             left: X0,
             top: y(POINTER_Y),
-            ...note(26, INK),
+            ...note(28, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, moreAt - 2, 12),
             transform: `translateY(${(1 - ease(frame, moreAt - 2, 12)) * 8}px)`,
           }}
         >
-          <span style={label(26, BLUE_INK)}>
+          <span style={label(28, BLUE_INK)}>
             Part <Num>{partOf("de-pipelines-for-ai")}</Num>
           </span>
           , {aiPart?.title}, covers all four in depth.

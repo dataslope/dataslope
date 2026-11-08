@@ -57,7 +57,7 @@ const Panel: React.FC<{ i: number; at: number; title: string; children: React.Re
           transform: `translateY(${(1 - p) * 14}px)`,
         }}
       >
-        <div style={{ ...note(32, INK), fontWeight: 650, marginBottom: 16, whiteSpace: "nowrap" }}>{title}</div>
+        <div style={{ ...note(34, INK), fontWeight: 500, marginBottom: 16, whiteSpace: "nowrap" }}>{title}</div>
         {children}
       </div>
     </>
@@ -65,7 +65,7 @@ const Panel: React.FC<{ i: number; at: number; title: string; children: React.Re
 };
 
 const line = (frame: number, at: number): React.CSSProperties => ({
-  ...note(26, INK_SOFT),
+  ...note(28, INK_SOFT),
   lineHeight: 1.35,
   whiteSpace: "nowrap",
   opacity: ease(frame, at - 2, 12),
@@ -143,7 +143,7 @@ export const AiScene: React.FC = () => {
                 { x: 110, y: 110, anchor: "middle", text: "pass rate" },
               ] as const
             ).map((t) => (
-              <text key={t.text} x={t.x} y={t.y} textAnchor={t.anchor} style={label(20, INK_SOFT)} fill={INK_SOFT} opacity={ciP}>
+              <text key={t.text} x={t.x} y={t.y} textAnchor={t.anchor} style={label(24, INK_SOFT)} fill={INK_SOFT} opacity={ciP}>
                 {t.text}
               </text>
             ))}
@@ -164,7 +164,7 @@ export const AiScene: React.FC = () => {
               <rect key={k} x={20 + k * 70} y={130 - v * runP} width={44} height={v * runP} rx={4} fill={BAR} opacity={0.35 + 0.25 * k} />
             ))}
             {runs.map((_, k) => (
-              <text key={k} x={42 + k * 70} y={156} textAnchor="middle" style={label(20, INK_SOFT)} fill={INK_SOFT} opacity={runP}>
+              <text key={k} x={42 + k * 70} y={156} textAnchor="middle" style={label(24, INK_SOFT)} fill={INK_SOFT} opacity={runP}>
                 run {k + 1}
               </text>
             ))}
@@ -183,16 +183,16 @@ export const AiScene: React.FC = () => {
               border: `1.5px solid ${HAIRLINE}`,
               borderRadius: 8,
               fontFamily: MONO,
-              fontSize: 22,
+              fontSize: 24,
               color: INK,
               whiteSpace: "pre",
               fontVariantLigatures: "none",
               opacity: ease(frame, checkAt + 6, 12),
             }}
           >
-            <span style={{ color: BLUE_INK, fontWeight: 600 }}>SELECT</span> …
+            <span style={{ color: BLUE_INK, fontWeight: 500 }}>SELECT</span> …
             <span style={{ display: "inline-block", width: 34 }} />
-            <span style={{ color: OK_INK, fontWeight: 700, opacity: checkP, display: "inline-block", transform: `scale(${0.6 + 0.4 * checkP})` }}>✓</span>
+            <span style={{ color: OK_INK, fontWeight: 500, opacity: checkP, display: "inline-block", transform: `scale(${0.6 + 0.4 * checkP})` }}>✓</span>
           </div>
         </Panel>
 

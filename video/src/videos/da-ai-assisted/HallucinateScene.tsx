@@ -79,7 +79,7 @@ export const HallucinateScene: React.FC = () => {
             return (
               <React.Fragment key={k.text}>
                 {i > 0 ? <FlexRule at={k.at - 2} /> : null}
-                <div style={{ ...note(28, ACCENT_INK), fontWeight: 600, lineHeight: "36px", whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
+                <div style={{ ...note(28, ACCENT_INK), fontWeight: 500, lineHeight: "36px", whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
                   {k.text}
                 </div>
               </React.Fragment>
@@ -87,7 +87,7 @@ export const HallucinateScene: React.FC = () => {
           })}
         </div>
         <Note at={fluentAt - 2} x={X0} y={y(KINDS_Y) + h(66)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>a language model writes fluent text either way</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a language model writes fluent text either way</span>
         </Note>
 
         {/* ── The page's example, as a line in a weekly report: its source
@@ -101,7 +101,7 @@ export const HallucinateScene: React.FC = () => {
             transform: `translateY(${(1 - reportP) * 12}px)`,
           }}
         >
-          <div style={{ ...label(20, INK_SOFT), lineHeight: "26px", whiteSpace: "nowrap" }}>Weekly summary, drafted by a model</div>
+          <div style={{ ...label(24, INK_SOFT), lineHeight: "26px", whiteSpace: "nowrap" }}>Weekly summary, drafted by a model</div>
           <div style={{ ...body(44), color: INK, lineHeight: "56px", marginTop: 12, whiteSpace: "nowrap" }}>
             Signups <Mark at={confirmsAt + 2} color={MARK_OK}>fell 12%</Mark>{" "}
             {/* Set off from the highlight, so the strike starts on "because", not on its edge. */}
@@ -114,10 +114,10 @@ export const HallucinateScene: React.FC = () => {
           </div>
         </div>
         <Note at={confirmsAt + 6} x={X0} y={verdictY}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>✓ your query confirms the 12%</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>✓ your query confirms the 12%</span>
         </Note>
         <Note at={guessAt + 6} x={X0 + 526} y={verdictY}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             the &ldquo;because&rdquo; is a guess
             <span style={{ opacity: ease(frame, checkAt - 2, 10) }}>: check the timing and the segments, or cut it</span>
           </span>
@@ -133,7 +133,7 @@ export const HallucinateScene: React.FC = () => {
             transform: `translateY(${(1 - ease(frame, ruleAt - 2, 12)) * 10}px)`,
           }}
         >
-          <span style={{ ...note(32, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(34, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={tracesAt}>Every number and every claim traces to a query or a cell.</Mark>
           </span>
           <div style={{ ...note(24, INK_SOFT), marginTop: 12, whiteSpace: "nowrap" }}>

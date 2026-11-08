@@ -14,18 +14,25 @@ import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, MARK_OK, rowsAt, Tabl
 const TOP = 350;
 const SQL_X = 640;
 const SIZE = 19;
-const SQL_W = 1000;
+/** The page's query a point smaller, so its 20 lines leave room under it.
+ *  The month offset is split over three lines (the page writes two) so the
+ *  widest line is 72 characters and the note beside it has air. */
+const PAGE_SIZE = 18;
+const SQL_W = 880;
+/** Between the listing's box and the note beside it. */
+const NOTE_GAP = 64;
 const GRID_X = 640;
 const GRID_TOP = 420;
 
 /**
  * Question 4, on the video's own activity log. A few of its rows; the page's
- * cohort query, its first CTE marked as the cohort is named and the
- * DATE_DIFF as the months since; the counts per cohort and offset, with
- * January's 8, 6, 4, 3 picked out; then those counts as shares of each
- * cohort's month zero (the query's last SELECT, FIRST_VALUE picking month 0,
- * under the grid), which is the opening's chart again, its outline drawn as
- * the narration says why the newest cohorts are the shortest rows.
+ * cohort query, its first CTE marked as the cohort is named and the month
+ * offset (built from the year and month parts: Postgres has no
+ * month-difference function) as the months since; the counts per cohort and
+ * offset, with January's 8, 6, 4, 3 picked out; then those counts as shares
+ * of each cohort's month zero (the query's last SELECT, FIRST_VALUE picking
+ * month 0, under the grid), which is the opening's chart again, its outline
+ * drawn as the narration says why the newest cohorts are the shortest rows.
  */
 export const CohortScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -90,7 +97,7 @@ export const CohortScene: React.FC = () => {
         </TableName>
         <DataTable g={sg} cols={colsOf(sample, { user_id: { ink: BLUE_INK } })} at={logAt} out={countAt} rows={rowsAt(sample.rows, logAt + 4)} />
         <Note at={logAt + 10} x={X0} y={sg.rowTop(sample.rows.length) + h(14)} out={countAt}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
             the first 6 of {COHORT.events} events
             <br />
             from {COHORT.users} users, made up for this video
@@ -103,16 +110,16 @@ export const CohortScene: React.FC = () => {
           x={SQL_X}
           top={y(TOP)}
           width={SQL_W}
-          size={SIZE}
+          size={PAGE_SIZE}
           at={earliestAt - 4}
           out={divideAt}
           marks={[
             { line: lineOf(P.lines, "MIN(event_date)"), at: earliestAt + 4 },
-            { line: lineOf(P.lines, "DATE_DIFF"), at: labelAt + 4 },
+            ...P.lines.flatMap((l, i) => (l.includes("EXTRACT(") ? [i] : [])).map((line, k) => ({ line, at: labelAt + 4 + k * 4 })),
             { line: lineOf(P.lines, "COUNT(DISTINCT user_id)"), at: countAt + 4, color: MARK_OK },
           ]}
         />
-        <Note at={cohortAt + 2} x={SQL_X + SQL_W + 24} y={y(TOP) + h(28)} out={divideAt}>
+        <Note at={cohortAt + 2} x={SQL_X + SQL_W + NOTE_GAP} y={y(TOP) + h(28)} out={divideAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             each user&rsquo;s
             <br />
@@ -137,7 +144,7 @@ export const CohortScene: React.FC = () => {
             position: "absolute",
             left: GRID_X,
             top: y(GRID_TOP) - h(100),
-            ...note(26, INK),
+            ...note(28, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, divideAt + 2, 12),
           }}

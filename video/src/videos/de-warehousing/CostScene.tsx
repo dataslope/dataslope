@@ -95,16 +95,16 @@ export const CostScene: React.FC = () => {
             <React.Fragment key={b.title}>
               {i ? <div style={{ width: 1, background: HAIRLINE, opacity: ease(frame, b.at - 2, 14) }} /> : null}
               <div style={{ opacity: ease(frame, b.at, 12) }}>
-                <div style={{ ...note(24, INK), fontWeight: 650 }}>{b.title}</div>
-                <div style={{ ...note(21, BLUE_INK), marginTop: 10, opacity: ease(frame, b.sub, 10) }}>{b.who}</div>
+                <div style={{ ...note(24, INK), fontWeight: 500 }}>{b.title}</div>
+                <div style={{ ...note(24, BLUE_INK), marginTop: 10, opacity: ease(frame, b.sub, 10) }}>{b.who}</div>
               </div>
             </React.Fragment>
           ))}
         </div>
 
         {/* ── Read less ── */}
-        <div style={{ position: "absolute", left: X0, top: y(READ_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, lessAt, 12) }}>
-          Read less <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>· the page&apos;s query on the made-up million sales, bytes DuckDB read</span>
+        <div style={{ position: "absolute", left: X0, top: y(READ_Y) - h(44), ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, lessAt, 12) }}>
+          Read less <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>· the page&apos;s query on the made-up million sales, bytes DuckDB read</span>
         </div>
         {reads.map((r, i) => (
           <React.Fragment key={r.what}>
@@ -128,12 +128,12 @@ export const CostScene: React.FC = () => {
         ))}
 
         {/* What the bytes are, on the scan-billed warehouse: its own tables bill logical bytes. */}
-        <div style={{ position: "absolute", left: X0, top: y(READ_Y) + 2 * h(STEP) + h(58), ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, kbAt + 16, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(READ_Y) + 2 * h(STEP) + h(58), ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, kbAt + 16, 12) }}>
           On BigQuery&apos;s own tables, a query is billed by the columns and partitions it reads, before compression.
         </div>
 
         {/* ── Compute less often ── */}
-        <div style={{ position: "absolute", left: X0, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, oftenAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, oftenAt, 12) }}>
           Compute less often
         </div>
         {levers.map((l, i) => (
@@ -146,7 +146,7 @@ export const CostScene: React.FC = () => {
               display: "flex",
               alignItems: "center",
               gap: 12,
-              ...note(25, INK),
+              ...note(24, INK),
               whiteSpace: "nowrap",
               opacity: ease(frame, l.at, 12),
             }}
@@ -161,7 +161,7 @@ export const CostScene: React.FC = () => {
         <VRule x={(X0 + 528 + STORE_X) / 2} top={y(COMPUTE_Y) - h(44)} height={h(44) + 3 * h(44) - h(10)} at={coldAt} />
 
         {/* ── Store cheaper ── */}
-        <div style={{ position: "absolute", left: STORE_X, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, coldAt, 12) }}>
+        <div style={{ position: "absolute", left: STORE_X, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, coldAt, 12) }}>
           Store cheaper
         </div>
         <div
@@ -172,7 +172,7 @@ export const CostScene: React.FC = () => {
             display: "flex",
             alignItems: "center",
             gap: 12,
-            ...note(25, INK),
+            ...note(24, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, coldAt, 12),
           }}

@@ -156,7 +156,7 @@ export const HookScene: React.FC = () => {
                 dim={dim}
               >
                 <span
-                  style={{ ...note(44, BLUE_INK), fontWeight: 700, ...TABULAR }}
+                  style={{ ...note(44, BLUE_INK), fontWeight: 500, ...TABULAR }}
                 >
                   {Math.round(p.model.test * 100)}%
                 </span>
@@ -170,7 +170,7 @@ export const HookScene: React.FC = () => {
           y={y(TOP) + h(PH) + h(80)}
           dim={lineAt}
         >
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             on the {MOONS.nTest} points they haven&apos;t seen
           </span>
         </Note>
@@ -188,8 +188,8 @@ export const HookScene: React.FC = () => {
         <Note at={fifteenAt - 2} x={X0} y={y(800)} dim={lineAt}>
           <span
             style={{
-              ...note(30, INK),
-              fontWeight: 650,
+              ...note(28, INK),
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,
             }}
@@ -198,12 +198,12 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={elevenAt - 2} x={X0 + 236} y={y(800)} dim={lineAt}>
-          <span style={{ ...note(30, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <b style={{ color: BLUE_INK }}>11</b> with a model fitted on screen
           </span>
         </Note>
         <Note at={fourAt - 2} x={X0 + 750} y={y(800)} dim={lineAt}>
-          <span style={{ ...note(30, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <b>4</b> in a sentence each, at the end
           </span>
         </Note>

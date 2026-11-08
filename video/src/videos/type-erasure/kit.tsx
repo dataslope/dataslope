@@ -58,8 +58,8 @@ export const tokenize = (line: string): Token[] => {
     if (comment) out.push({ text, color: TOKEN_INK.comment });
     else if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
-    else if (word && TYPES.has(word)) out.push({ text, color: TOKEN_INK.type, weight: 600 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
+    else if (word && TYPES.has(word)) out.push({ text, color: TOKEN_INK.type, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -361,7 +361,7 @@ export const Terminal: React.FC<{
             <span
               style={{
                 color: r.kind === "err" ? ACCENT_INK : INK,
-                fontWeight: r.kind === "cmd" ? 600 : r.kind === "err" ? 600 : 400,
+                fontWeight: r.kind === "cmd" ? 500 : r.kind === "err" ? 500 : 400,
               }}
             >
               {r.text}
@@ -370,8 +370,8 @@ export const Terminal: React.FC<{
           {r.tag ? (
             <span
               style={{
-                ...note(20, r.tag.color ?? INK_SOFT),
-                fontWeight: 600,
+                ...note(24, r.tag.color ?? INK_SOFT),
+                fontWeight: 500,
                 opacity: ease(frame, r.tag.at, 10),
               }}
             >
@@ -393,8 +393,8 @@ export const FileTab: React.FC<{ at: number; x: number; y: number; name: string;
   children,
 }) => (
   <Ink at={at} dur={14} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
-    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 700, color: INK }}>{name}</span>
-    {children ? <span style={note(21, INK_SOFT)}>{children}</span> : null}
+    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{name}</span>
+    {children ? <span style={note(24, INK_SOFT)}>{children}</span> : null}
   </Ink>
 );
 
@@ -408,8 +408,8 @@ export const Fig: React.FC<{ n: string; at: number; x: number; y: number; out?: 
   children,
 }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
-    <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 

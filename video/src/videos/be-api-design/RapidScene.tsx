@@ -37,26 +37,26 @@ const Naming: React.FC<{ c: Ctx }> = ({ c }) => {
       {paths.map((p, i) => (
         <React.Fragment key={p.p}>
           <Note at={p.at} x={R_X} y={top + i * c.h(50)}>
-            <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: INK, whiteSpace: "nowrap" }}>{p.p}</span>
+            <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>{p.p}</span>
           </Note>
           <Note at={p.at + 6} x={R_X + 440} y={top + i * c.h(50) + 3}>
-            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>{p.what}</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{p.what}</span>
           </Note>
         </React.Fragment>
       ))}
       <Note at={noVerbsAt} x={R_X} y={top + c.h(166)}>
         <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 28 }}>
           <Cross at={noVerbsAt + 6} size={24} />
-          <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: ACCENT_INK, whiteSpace: "nowrap" }}>
+          <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: ACCENT_INK, whiteSpace: "nowrap" }}>
             <Strike at={noVerbsAt + 8}>/publishArticle/42</Strike>
           </span>
         </div>
       </Note>
       <Note at={noVerbsAt + 12} x={R_X + 38} y={top + c.h(210)}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>no verbs in paths: the method is the verb</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>no verbs in paths: the method is the verb</span>
       </Note>
       <Note at={actionAt} x={R_X} y={top + c.h(266)}>
-        <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>An action becomes a state change</span>
+        <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>An action becomes a state change</span>
       </Note>
       <Msg x={R_X} y={top + c.h(310)} w={460} at={patchAt} tone="ok" lines={[{ t: "PATCH /articles/42" }, { t: '{"status": "published"}' }]} />
     </>
@@ -95,7 +95,7 @@ const Blog: React.FC<{ c: Ctx }> = ({ c }) => {
       {BLOG.map(([m, p, what], i) => (
         <Note key={i} at={rowAt(i)} x={R_X} y={top + 6 + i * rowH}>
           <div style={{ position: "relative", width: 900, height: rowH, fontSize: TABLE_SIZE }}>
-            <span style={{ position: "absolute", left: cols[0] - R_X, fontFamily: MONO, fontSize: TABLE_SIZE, fontWeight: 700, color: METHOD_INK }}>{m}</span>
+            <span style={{ position: "absolute", left: cols[0] - R_X, fontFamily: MONO, fontSize: TABLE_SIZE, fontWeight: 500, color: METHOD_INK }}>{m}</span>
             <span style={{ position: "absolute", left: cols[1] - R_X, fontFamily: MONO, fontSize: TABLE_SIZE, color: INK, whiteSpace: "pre" }}>{p}</span>
             <span style={{ position: "absolute", left: cols[2] - R_X, ...note(TABLE_SIZE, INK_SOFT), whiteSpace: "nowrap" }}>{what}</span>
           </div>
@@ -103,8 +103,8 @@ const Blog: React.FC<{ c: Ctx }> = ({ c }) => {
       ))}
       <div style={{ position: "absolute", left: R_X, top: top + 10 + BLOG.length * rowH, width: 900, height: 1, background: HAIRLINE, opacity: ease(frame, commentsAt, 10) }} />
       <Note at={filtersAt} x={R_X} y={top + 30 + BLOG.length * rowH}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-          filters: <span style={{ fontFamily: MONO, fontWeight: 600 }}>/articles?status=published&amp;sort=-created_at</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          filters: <span style={{ fontFamily: MONO, fontWeight: 500 }}>/articles?status=published&amp;sort=-created_at</span>
         </span>
       </Note>
       <Msg
@@ -140,15 +140,15 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={pathAt} x={R_X} y={top}>
-        <span style={{ fontFamily: MONO, fontSize: 40, fontWeight: 700, color: INK, whiteSpace: "nowrap" }}>
+        <span style={{ fontFamily: MONO, fontSize: 40, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>
           <span style={{ color: METHOD_INK }}>GET</span> /<Mark at={pathAt + 6}>v1</Mark>/orders
         </span>
       </Note>
       <Note at={defaultAt} x={R_X + 480} y={top + 12}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>the most visible, the default</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the most visible, the default</span>
       </Note>
       <Note at={protectAt} x={R_X} y={body - c.h(44)}>
-        <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>An order, as v1 clients read it</span>
+        <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>An order, as v1 clients read it</span>
       </Note>
       <Note at={protectAt} x={R_X} y={body}>
         <div style={{ borderTop: `2px solid ${INK}`, borderBottom: `1px solid ${HAIRLINE}`, background: LISTING_PAPER, padding: "6px 22px", width: 820, fontFamily: MONO, fontSize: 24, lineHeight: "38px" }}>
@@ -166,13 +166,13 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
               ) : (
                 <Http line={f.t} size={24} />
               )}
-              {f.strike !== undefined ? <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, opacity: ease(frame, f.strike + 6, 8) }}>removed: breaks clients</span> : null}
-              {f.swap !== undefined ? <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, opacity: ease(frame, f.swap + 6, 8) }}>type changed: breaks clients</span> : null}
+              {f.strike !== undefined ? <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, opacity: ease(frame, f.strike + 6, 8) }}>removed: breaks clients</span> : null}
+              {f.swap !== undefined ? <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, opacity: ease(frame, f.swap + 6, 8) }}>type changed: breaks clients</span> : null}
             </div>
           ))}
           <div style={{ paddingLeft: 28, whiteSpace: "pre", opacity: ease(frame, addingAt, 10), display: "flex", gap: 16, alignItems: "baseline" }}>
             <span style={{ color: OK_INK }}>&quot;note&quot;: null</span>
-            <span style={{ ...note(22, OK_INK), fontWeight: 650 }}>optional, added: still v1</span>
+            <span style={{ ...note(24, OK_INK), fontWeight: 500 }}>optional, added: still v1</span>
           </div>
           <div style={{ color: INK_SOFT }}>{"}"}</div>
         </div>
@@ -217,10 +217,10 @@ const Errors: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={traceAt} x={R_X} y={top + msgHeight(ERROR_BODY.length, 22) + c.h(30)}>
         <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24 }}>
           <Cross at={traceAt + 4} size={24} />
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Strike at={traceAt + 8}>a stack trace</Strike>
           </span>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>never in the body</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>never in the body</span>
         </div>
       </Note>
     </>
@@ -257,7 +257,7 @@ const Hateoas: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={skipAt} x={R_X} y={top + msgHeight(HATEOAS_BODY.length, 22) + c.h(72)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          in practice: <b>often skipped</b>; a <span style={{ fontFamily: MONO, fontWeight: 600 }}>next</span> link is common
+          in practice: <b>often skipped</b>; a <span style={{ fontFamily: MONO, fontWeight: 500 }}>next</span> link is common
         </span>
       </Note>
     </>
@@ -310,17 +310,17 @@ const Content: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={encodingAt} x={R_X} y={barTop - c.h(48)}>
-        <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>This page of 20 articles, as JSON</span>
+        <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>This page of 20 articles, as JSON</span>
       </Note>
       <div style={{ position: "absolute", left: R_X, top: barTop, width: fullW * ease(frame, encodingAt + 4, 18), height: 30, background: BAR, borderRadius: 4 }} />
       <Note at={encodingAt + 14} x={R_X} y={barTop + 40}>
-        <span style={{ ...note(23, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           <Num>{thousands(GZIP.bytes)}</Num> bytes
         </span>
       </Note>
       <div style={{ position: "absolute", left: R_X, top: barTop + c.h(100), width: zipW * ease(frame, gzipAt + 16, 14), height: 30, background: OK, borderRadius: 4 }} />
       <Note at={gzipAt + 22} x={R_X + zipW + 16} y={barTop + c.h(100) + 2}>
-        <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           <Num>{thousands(GZIP.gzipped)}</Num> bytes gzipped
           <span style={{ opacity: ease(frame, sixthAt, 10) }}>: about a sixth</span>
         </span>
@@ -374,10 +374,10 @@ export const RapidScene: React.FC = () => {
         {/* The bridge: every endpoint has data behind it. */}
         <Spot id="puffin" at={behindAt + 4} left={1430} top={y(360)} {...puffin} />
         <Note at={behindAt} x={R_X} y={y(430)}>
-          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>Behind every endpoint,</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>Behind every endpoint,</span>
         </Note>
         <Note at={liveAt} x={R_X} y={y(430) + h(46)}>
-          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             the data has to <b style={{ color: BLUE_INK }}>live somewhere</b>.
           </span>
         </Note>

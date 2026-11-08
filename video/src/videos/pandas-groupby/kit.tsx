@@ -65,7 +65,7 @@ export const tokenize = (line: string): Token[] => {
     const [text, str, num, call, name] = m;
     if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (call) out.push({ text, color: TOKEN_INK.call, weight: 600 });
+    else if (call) out.push({ text, color: TOKEN_INK.call, weight: 500 });
     else if (name) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -131,8 +131,8 @@ export const Fig: React.FC<{ n: string; at: number; x: number; y: number; out?: 
   children,
 }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
-    <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 
@@ -161,11 +161,11 @@ const cardStyle = (dept: Dept, x: number, top: number, width: number, height: nu
 const deptText = (dept: Dept): React.CSSProperties => ({
   fontFamily: SANS,
   fontSize: 24,
-  fontWeight: 620,
+  fontWeight: 500,
   color: DEPT_INK[dept],
 });
-const numText: React.CSSProperties = { ...note(26, INK), fontWeight: 520, lineHeight: 1 };
-const idxText: React.CSSProperties = { fontFamily: MONO, fontSize: 21, color: INK_SOFT };
+const numText: React.CSSProperties = { ...note(28, INK), fontWeight: 520, lineHeight: 1 };
+const idxText: React.CSSProperties = { fontFamily: MONO, fontSize: 24, color: INK_SOFT };
 
 /** Where a card is, how far it has lifted, and how it is turned. */
 export type Pose = { x: number; top: number; lift?: number; turn?: number; opacity?: number };
@@ -201,7 +201,7 @@ export const KeyCard: React.FC<{ dept: Dept; value: number; pose: Pose; height: 
       transform: pose.turn ? `rotate(${pose.turn}deg)` : undefined,
     }}
   >
-    <span style={{ ...deptText(dept), fontWeight: 720, width: KEY_W, paddingLeft: 14, boxSizing: "border-box" }}>
+    <span style={{ ...deptText(dept), fontWeight: 500, width: KEY_W, paddingLeft: 14, boxSizing: "border-box" }}>
       {dept}
     </span>
     <span style={{ ...numText, flex: 1, textAlign: "right", paddingRight: 18 }}>{value}</span>
@@ -231,7 +231,7 @@ export const ValueCell: React.FC<{
         {index}
       </span>
     )}
-    <span style={{ ...numText, flex: 1, textAlign: "right", paddingRight: 18, fontWeight: strong ? 680 : 520 }}>{text}</span>
+    <span style={{ ...numText, flex: 1, textAlign: "right", paddingRight: 18, fontWeight: strong ? 500 : 520 }}>{text}</span>
   </div>
 );
 
@@ -261,7 +261,7 @@ export const Header: React.FC<{
             top: 0,
             opacity: p,
             whiteSpace: "nowrap",
-            ...(c.code ? { fontFamily: MONO, fontSize: 21, color: INK_SOFT } : label(20, INK_SOFT)),
+            ...(c.code ? { fontFamily: MONO, fontSize: 24, color: INK_SOFT } : label(24, INK_SOFT)),
           }}
         >
           {c.text}

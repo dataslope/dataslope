@@ -148,7 +148,7 @@ export const CoddScene: React.FC = () => {
         <div style={{ ...body(28, true) }}>at IBM&apos;s lab in San Jose</div>
       </Ink>
       <Ink at={publishedAt - 2} dur={14} out={keepAt - 14} style={{ left: 730, top: y(560), whiteSpace: "nowrap" }}>
-        <div style={{ ...note(21, INK_SOFT) }}>Communications of the ACM 13(6), pp. 377–387</div>
+        <div style={{ ...note(24, INK_SOFT) }}>Communications of the ACM 13(6), pp. 377–387</div>
       </Ink>
 
       {/* ── The tables ── */}
@@ -207,7 +207,7 @@ export const CoddScene: React.FC = () => {
       />
       {/* "stored at": the row's place on disk, as Postgres names it (its ctid). */}
       <Ink at={likesAt - 2} dur={12} out={whereAt + 20} style={{ left: OX + orderW[0] + orderW[1] + orderW[2] + 8, top: TOP + HEAD_H + 6 * ROW_H + 14, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(20, INK_SOFT) }}>
+        <span style={{ ...note(24, INK_SOFT) }}>
           <Strike at={whereAt}>block, slot on disk</Strike>
         </span>
       </Ink>
@@ -233,7 +233,7 @@ export const CoddScene: React.FC = () => {
         ]}
       />
       <Ink at={answerAt - 4} dur={12} style={{ left: LX, top: ATOP - h(40), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(21, INK) }}>Ada&apos;s orders</span>
+        <span style={{ ...label(24, INK) }}>Ada&apos;s orders</span>
       </Ink>
       <MovingTable
         x={LX}
@@ -265,7 +265,7 @@ export const CoddScene: React.FC = () => {
         <>
           <Tick x={answerRight + 44} y={ATOP + HEAD_H + ROW_H} at={sameAt} />
           <Ink at={sameAt + 4} dur={12} style={{ left: answerRight + 80, top: ATOP + HEAD_H + ROW_H - 16, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(22, KEY_INK), fontWeight: 650 }}>same answer</span>
+            <span style={{ ...note(24, KEY_INK), fontWeight: 500 }}>same answer</span>
           </Ink>
         </>
       ) : null}
@@ -273,11 +273,11 @@ export const CoddScene: React.FC = () => {
       {/* ── What Codd's paper opens with: its first sentence, up to where it
           adds "(the internal representation)" ── */}
       <Ink at={independenceAt - 4} dur={22} style={{ left: LX, top: ATOP + HEAD_H + 2 * ROW_H + h(44), width: 720 }}>
-        <div style={{ ...body(27, true), color: INK, lineHeight: 1.3 }}>
+        <div style={{ ...body(28, true), color: INK, lineHeight: 1.3 }}>
           Future users of large data banks must be protected from having to know{" "}
           <Mark at={whereAt - 2}>how the data is organized</Mark> in the machine&nbsp;…
         </div>
-        <div style={{ ...note(20, INK_SOFT), marginTop: 10 }}>Codd, 1970, the paper&apos;s first sentence</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 10 }}>Codd, 1970, the paper&apos;s first sentence</div>
       </Ink>
     </AbsoluteFill>
   );

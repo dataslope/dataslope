@@ -3,7 +3,7 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, fmt, headline as headlineStyle, HIGHLIGHT, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
+import { ACCENT, BAR, fmt, headline as headlineStyle, HIGHLIGHT, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
 import { H, Ink, W } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -64,7 +64,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -99,7 +99,7 @@ export const Headline: React.FC<{
         {children}
       </Ink>
       {italic !== undefined && second !== undefined ? (
-        <Ink at={second} dur={18} out={out} style={{ position: "relative", ...headlineStyle(size, true), color: ACCENT_INK }}>
+        <Ink at={second} dur={18} out={out} style={{ position: "relative", ...headlineStyle(size, true), color: INK }}>
           {italic}
         </Ink>
       ) : null}
@@ -432,7 +432,7 @@ export const TagChip: React.FC<{
           alignItems: "center",
           justifyContent: "center",
           fontFamily: MONO,
-          fontWeight: 700,
+          fontWeight: 500,
           fontSize: size,
           color: f.ink,
           opacity: p,
@@ -447,7 +447,7 @@ export const TagChip: React.FC<{
             marginTop: 8,
             textAlign: "center",
             ...label(glossSize, f.ink),
-            fontWeight: 600,
+            fontWeight: 500,
             whiteSpace: "nowrap",
             opacity: g,
             transform: `translateY(${(1 - g) * 6}px)`,
@@ -490,7 +490,7 @@ export const HBar: React.FC<{
 /** Inter, set for a number beside a bar. */
 export const numStyle = (size = 22, color: string = INK): React.CSSProperties => ({
   ...label(size, color),
-  fontWeight: 600,
+  fontWeight: 500,
   ...TABULAR,
   whiteSpace: "nowrap",
 });

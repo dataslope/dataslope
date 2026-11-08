@@ -82,10 +82,10 @@ export const FrameScene: React.FC = () => {
           </TableName>
           <DataTable g={pg} cols={colsOf(P)} at={asked - 6} rows={rowsAt(P.rows, asked - 2)} bands={peers.map((row) => ({ row, at: sameDayAt, color: MARK }))} />
           <Note at={setAt} x={TABLE_X} y={pg.rowTop(P.rows.length) + h(24)} width={440}>
-            <span style={{ ...note(25, INK), display: "block", textWrap: "balance" }}>the frame: the rows the function sees</span>
+            <span style={{ ...note(24, INK), display: "block", textWrap: "balance" }}>the frame: the rows the function sees</span>
           </Note>
           <Note at={upToAt} x={TABLE_X} y={pg.rowTop(P.rows.length) + h(110)} width={440}>
-            <span style={{ ...note(23, INK_SOFT) }}>a running total: every row up to this one</span>
+            <span style={{ ...note(24, INK_SOFT) }}>a running total: every row up to this one</span>
           </Note>
           <RowBracket
             g={pg}
@@ -145,7 +145,7 @@ export const FrameScene: React.FC = () => {
 
           {/* ── When to reach for each ── */}
           <Note at={predictableAt - 2} x={LIST_X} y={notesY}>
-            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               <QMono>ROWS</QMono>: physical rows, predictable{" "}
               <span style={{ opacity: ease(frame, tiesAt - 2, 10) }}>
                 once <QMono>ORDER BY day, <Mark at={idAt}>id</Mark></QMono> breaks ties
@@ -153,7 +153,7 @@ export const FrameScene: React.FC = () => {
             </span>
           </Note>
           <Note at={belongAt - 6} x={LIST_X} y={notesY + h(46)}>
-            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               <QMono>RANGE</QMono>: tied values as one group,{" "}
               <span style={{ opacity: ease(frame, spanAt - 2, 10) }}>
                 <Mark at={bridgeAt}>or a span of time</Mark>

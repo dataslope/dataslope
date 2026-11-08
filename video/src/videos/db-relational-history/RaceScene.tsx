@@ -7,10 +7,17 @@ import { ACCENT, ACCENT_INK, BAR, HAIRLINE, INK, INK_SOFT, note, PAPER } from ".
 import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Headline, KEY_INK, Mark, pulse, Svg, Tag, Wire } from "./parts";
+import { Headline, KEY_INK, Mark, pulse, Spot, Svg, Tag, Wire } from "./parts";
 
 const X: XScale = { lo: 1972, hi: 1986, x0: 330, x1: 1740 };
 const TICKS = [1972, 1974, 1976, 1978, 1980, 1982, 1984, 1986];
+
+/** System R's papers, painted (db-relational-history-papers, 771x1011): a
+ *  short clipped stack standing over 1976 on IBM's lane, well clear of the
+ *  System R band under it. */
+const PAPERS_H = 96;
+const PAPERS_W = Math.round((PAPERS_H * 771) / 1011);
+const PAPERS_GAP = 34;
 
 /** A year's dot on a lane, popping in on `at`. */
 const Dot: React.FC<{ x: number; y: number; at: number; color: string; r?: number; swell?: number; dim?: number }> = ({
@@ -108,7 +115,7 @@ export const RaceScene: React.FC = () => {
             top: AXIS + 14,
             transform: "translateX(-50%)",
             opacity: ease(frame, raceFrom + 4, 14),
-            ...note(20, INK_SOFT),
+            ...note(24, INK_SOFT),
           }}
         >
           {t}
@@ -132,32 +139,34 @@ export const RaceScene: React.FC = () => {
         </g>
         <line x1={sx(X, 1973)} x2={sx(X, 1973) + lane(onlyAt - 2, 1973)} y1={LANE_UCB} y2={LANE_UCB} stroke={BAR} strokeWidth={2.4} />
       </Svg>
-      <Tag x={X.x0} y={LANE_IBM - 58} at={raceFrom + 2} dim={onlyAt - 4} size={23} color={INK} weight={650}>
+      <Tag x={X.x0} y={LANE_IBM - 58} at={raceFrom + 2} dim={onlyAt - 4} size={23} color={INK} weight={500}>
         IBM
       </Tag>
       <Tag x={sx(X, 1974)} y={LANE_IBM + 18} at={raceFrom + 10} dim={onlyAt - 4} size={20}>
         System R
       </Tag>
-      <Tag x={X.x0} y={LANE_CO - 58} at={companyAt - 4} dim={onlyAt - 4} size={23} color={INK} weight={650}>
+      <Tag x={X.x0} y={LANE_CO - 58} at={companyAt - 4} dim={onlyAt - 4} size={23} color={INK} weight={500}>
         <Mark at={closelyAt - 2} out={seventyNineAt}>
           A small California company
         </Mark>
       </Tag>
-      <Tag x={X.x0} y={LANE_UCB - 58} at={onlyAt - 2} size={23} color={KEY_INK} weight={650}>
+      <Tag x={X.x0} y={LANE_UCB - 58} at={onlyAt - 2} size={23} color={KEY_INK} weight={500}>
         Berkeley
       </Tag>
       <Dot x={sx(X, 1973)} y={LANE_UCB} at={readingAt - 2} color={BAR} swell={pulse(frame, readingAt + 8, 20)} />
 
       {/* System R's work, published, and read across the way. */}
-      <Svg opacity={1 - dimIbm}>
-        <g transform={`translate(${paperX} ${LANE_IBM - 46})`} opacity={ease(frame, publishedAt - 2, 10)}>
-          <rect x={-15} y={-20} width={30} height={40} rx={2} fill={PAPER} stroke={INK} strokeWidth={2} />
-          {[-10, -3, 4, 11].map((ly) => (
-            <line key={ly} x1={-9} x2={9} y1={ly} y2={ly} stroke={INK_SOFT} strokeWidth={1.6} />
-          ))}
-        </g>
-      </Svg>
-      <Tag x={paperX + 26} y={LANE_IBM - 74} at={publishedAt} dim={onlyAt - 4} size={21}>
+      <Spot
+        id="db-relational-history-papers"
+        at={publishedAt - 2}
+        dim={onlyAt - 4}
+        from={[0, 14]}
+        left={paperX - PAPERS_W / 2}
+        top={LANE_IBM - PAPERS_GAP - PAPERS_H}
+        width={PAPERS_W}
+        height={PAPERS_H}
+      />
+      <Tag x={paperX + PAPERS_W / 2 + 28} y={LANE_IBM - PAPERS_GAP - PAPERS_H / 2 - 13} at={publishedAt} dim={onlyAt - 4} size={21}>
         its papers, published
       </Tag>
       <Wire
@@ -176,7 +185,7 @@ export const RaceScene: React.FC = () => {
 
       {/* ── The launches ── */}
       <Dot x={sx(X, 1979)} y={LANE_CO} at={seventyNineAt - 2} color={ACCENT} r={13} swell={pulse(frame, buyAt - 2, 20)} dim={onlyAt - 4} />
-      <Tag x={sx(X, 1979) + 24} y={LANE_CO - 52} at={oracleAt - 2} dim={onlyAt - 4} size={26} color={ACCENT_INK} weight={700}>
+      <Tag x={sx(X, 1979) + 24} y={LANE_CO - 52} at={oracleAt - 2} dim={onlyAt - 4} size={26} color={ACCENT_INK} weight={500}>
         Oracle, 1979
       </Tag>
       <Tag x={sx(X, 1979) + 24} y={LANE_CO + 20} at={firstAt - 2} dim={onlyAt - 4} size={21} color={INK}>
@@ -204,11 +213,11 @@ export const RaceScene: React.FC = () => {
         color={INK_SOFT}
         dim={onlyAt - 4}
       />
-      <Tag x={sx(X, 1981) + 16} y={y(330)} at={turingAt - 4} dim={onlyAt - 4} size={22} color={INK} weight={650}>
+      <Tag x={sx(X, 1981) + 16} y={y(330)} at={turingAt - 4} dim={onlyAt - 4} size={22} color={INK} weight={500}>
         Codd wins the Turing Award
       </Tag>
       <Tag x={sx(X, 1973) + 26} y={LANE_UCB + 20} at={readingAt} size={21} color={KEY_INK}>
-        Ingres, 1973: <span style={{ color: INK, fontWeight: 650 }}>spoke QUEL, not SQL</span>
+        Ingres, 1973: <span style={{ color: INK, fontWeight: 500 }}>spoke QUEL, not SQL</span>
       </Tag>
     </AbsoluteFill>
   );

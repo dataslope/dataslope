@@ -152,7 +152,7 @@ export const Bars: React.FC<{
                 top: mid - 16,
                 width: nameW - 20,
                 textAlign: "right",
-                ...label(23, INK),
+                ...label(24, INK),
                 opacity: ease(frame, b.at - 4, 10),
                 whiteSpace: "nowrap",
               }}
@@ -176,7 +176,7 @@ export const Bars: React.FC<{
                 left: x + nameW + w + 16,
                 top: mid - 18,
                 ...note(28, b.ink),
-                fontWeight: 650,
+                fontWeight: 500,
                 opacity: ease(frame, b.at + 10, 10),
                 whiteSpace: "nowrap",
               }}
@@ -203,11 +203,11 @@ export const Title: React.FC<{ children: React.ReactNode; color?: string; size?:
   children,
   color = INK,
   size = 23,
-}) => <span style={{ ...note(size, color), fontWeight: 650, whiteSpace: "nowrap" }}>{children}</span>;
+}) => <span style={{ ...note(size, color), fontWeight: 500, whiteSpace: "nowrap" }}>{children}</span>;
 
 /** Code set as a figure's title: the title's own size, in the mono face. */
 export const TitleCode: React.FC<{ children: React.ReactNode; size?: number }> = ({ children, size = 22 }) => (
-  <span style={{ fontFamily: MONO, fontSize: size, fontWeight: 600, fontVariantLigatures: "none" }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: size, fontWeight: 500, fontVariantLigatures: "none" }}>{children}</span>
 );
 
 /** Bytes as the screen prints them: "62.6" and "MB", "149" and "KB". */

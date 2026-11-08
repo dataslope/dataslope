@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SURVEY } from "./data";
-import { DOT, Kicker, lerp, Mark, pulse, RAW, Spot, STAT_INK, Svg } from "./parts";
+import { DOT, Kicker, lerp, Mark, pulse, RAW, Spot, Svg } from "./parts";
 
 /** The field: one dot per 50 customers, 120 across (and 50 down). */
 const COLS = 120;
@@ -119,7 +119,7 @@ export const SurveyScene: React.FC = () => {
       <Ink
         at={questionAt - 4}
         dur={20}
-        style={{ left: 92, top: y(244), ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 92, top: y(244), ...headline(80, true), color: INK, whiteSpace: "nowrap" }}
       >
         Your question is about {fmtInt(SURVEY.customers)}.
       </Ink>
@@ -192,7 +192,7 @@ export const SurveyScene: React.FC = () => {
         </div>
       </Ink>
       <Note at={listAt - 2} x={1310} y={y(762)} width={470}>
-        <div style={{ ...body(30, true), color: INK, lineHeight: 1.3 }}>
+        <div style={{ ...body(28, true), color: INK, lineHeight: 1.3 }}>
           Often not a list at all
           <span style={{ opacity: ease(frame, checkoutAt - 2, 10) }}>
             : every checkout a design will ever see.
@@ -242,12 +242,12 @@ export const SurveyScene: React.FC = () => {
         />
       </Svg>
       <Note at={happenedAt + 2} x={nowX} y={runY + 38} from="up">
-        <span style={{ ...label(22, INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+        <span style={{ ...label(24, INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
           now
         </span>
       </Note>
       <Note at={happenedAt + 8} x={nowX + RUN_PITCH * 1.5} y={runY + 38}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...halo }}>still to happen</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...halo }}>still to happen</span>
       </Note>
     </AbsoluteFill>
   );

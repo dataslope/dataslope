@@ -77,7 +77,7 @@ The date-boundary bug is easy to see once both versions run side by side.
 The assistant's filter and the half-open one, over the same January orders:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE orders AS SELECT * FROM (VALUES
   (1, TIMESTAMP '2025-12-31 23:59:00', 75.00, 'completed'),
   (2, TIMESTAMP '2026-01-01 00:00:00', 120.00, 'completed'),
@@ -122,7 +122,7 @@ values from the query results rather than generating them.
 Give it what a colleague would need:
 
 ```text
-Dialect: DuckDB.
+Dialect: PostgreSQL.
 Tables: orders(order_id, customer_id, order_ts TIMESTAMP, amount, status)
         customers(customer_id, signup_date, is_test BOOLEAN)
 Grain: one row per order in orders.

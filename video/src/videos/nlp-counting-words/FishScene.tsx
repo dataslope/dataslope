@@ -91,7 +91,7 @@ export const FishScene: React.FC = () => {
         return (
           <React.Fragment key={k}>
             <Note at={(k === 0 ? nounAt : verbAt) - 2} out={(k === 0 ? nnAt : vbpAt) - 6} x={cx - 60} y={top + 4} width={120} from="up">
-              <div style={{ ...label(24, INK), fontWeight: 600, textAlign: "center" }}>{k === 0 ? "a noun" : "a verb"}</div>
+              <div style={{ ...label(24, INK), fontWeight: 500, textAlign: "center" }}>{k === 0 ? "a noun" : "a verb"}</div>
             </Note>
             <TagChip tag={r.tag} family={fam} cx={cx} y={top} at={(k === 0 ? nnAt : vbpAt) - 2} size={24} gloss={FAMILY[fam].name} glossAt={(k === 0 ? nnAt : vbpAt) + 6} glossSize={22} />
           </React.Fragment>
@@ -99,16 +99,16 @@ export const FishScene: React.FC = () => {
       })}
 
       <Note at={counterAt - 2} x={X0} y={y(ROWS[1]) + 170}>
-        <div style={{ ...body(30, true), color: INK_SOFT, whiteSpace: "nowrap" }}>To a counter, both are just “fish”.</div>
+        <div style={{ ...body(28, true), color: INK_SOFT, whiteSpace: "nowrap" }}>To a counter, both are just “fish”.</div>
       </Note>
       <Note at={taggingAt - 2} x={X0} y={y(ROWS[1]) + 230}>
-        <div style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>
-          <span style={{ fontWeight: 600 }}>Part-of-speech tagging:</span> each word&apos;s <Marked at={jobAt - 2}>job</Marked>, judged
+        <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>
+          <span style={{ fontWeight: 500 }}>Part-of-speech tagging:</span> each word&apos;s <Marked at={jobAt - 2}>job</Marked>, judged
           from the words around it.
         </div>
       </Note>
       <Note at={learnedAt - 2} x={X0} y={y(ROWS[1]) + 288}>
-        <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
           NLTK&apos;s tagger learned from text people <Marked at={handAt - 2}>tagged by hand</Marked>
         </div>
       </Note>

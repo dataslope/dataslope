@@ -155,11 +155,11 @@ export const CacheScene: React.FC = () => {
           the system prompt is in it. */}
       <VBracket x={right + 10} y0={geo.ty(LAST.resent)} y1={geo.base - 1} at={lastAt - 2} out={twentiethAt + 4} right={false} />
       <Note at={lastAt} out={twentiethAt + 4} x={right + 28} y={(geo.ty(LAST.resent) + geo.base) / 2 - 50} width={320}>
-        <span style={{ display: "block", ...note(24, INK), fontWeight: 600 }}>sent last turn</span>
-        <span style={{ display: "block", ...note(22, INK_SOFT), ...TABULAR }}>{int(LAST.resent)} tokens</span>
+        <span style={{ display: "block", ...note(24, INK), fontWeight: 500 }}>sent last turn</span>
+        <span style={{ display: "block", ...note(24, INK_SOFT), ...TABULAR }}>{int(LAST.resent)} tokens</span>
       </Note>
       <Note at={sysAt} out={twentiethAt + 4} x={right + 28} y={(geo.ty(LAST.resent) + geo.base) / 2 + 10} width={320}>
-        <span style={{ display: "block", ...note(22, INK_SOFT) }}>system prompt included</span>
+        <span style={{ display: "block", ...note(24, INK_SOFT) }}>system prompt included</span>
       </Note>
 
       {/* The staircase it was. */}
@@ -168,16 +168,16 @@ export const CacheScene: React.FC = () => {
       </Svg>
       {/* Under the dashed edge and right of where it crosses, clear of Fig. 7. */}
       <Note at={flatAt - 4} x={geo.x(33) + 10} y={lastTop + 140}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>without the cache</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>without the cache</span>
       </Note>
       <Note at={twentiethAt} x={RX} y={geo.base - 112} width={360}>
-        <span style={{ display: "block", ...note(24, CACHED_INK), fontWeight: 650 }}>a twentieth of the price</span>
-        <span style={{ display: "block", ...note(21, INK_SOFT), ...TABULAR }}>
+        <span style={{ display: "block", ...note(24, CACHED_INK), fontWeight: 500 }}>a twentieth of the price</span>
+        <span style={{ display: "block", ...note(24, INK_SOFT), ...TABULAR }}>
           {usd(PRICE.cached, 2)} a million, not {usd(PRICE.in, 2)}
         </span>
       </Note>
       <Note at={newAt + 2} x={RX} y={geo.base - 206} width={360}>
-        <span style={{ ...note(24, NEW_INK), fontWeight: 650, whiteSpace: "nowrap" }}>only the new slice pays in full</span>
+        <span style={{ ...note(24, NEW_INK), fontWeight: 500, whiteSpace: "nowrap" }}>only the new slice pays in full</span>
       </Note>
 
       {/* Forty turns, with and without: the whole bill, replies and all, which
@@ -193,7 +193,7 @@ export const CacheScene: React.FC = () => {
       <Arrow from={[CHART.x0 + 280, billY + 28]} to={[CHART.x0 + 340, billY + 28]} at={centsAt - 6} dur={10} color={INK_SOFT} />
       <Note at={centsAt - 2} x={CHART.x0 + 360} y={billY}>
         <span style={{ display: "block", ...headline(52), color: CACHED_INK, ...TABULAR, ...halo }}>{usd(CACHE.cached)}</span>
-        <span style={{ display: "block", marginTop: 14, ...note(26, INK), fontWeight: 650, ...halo }}>
+        <span style={{ display: "block", marginTop: 14, ...note(28, INK), fontWeight: 500, ...halo }}>
           <span style={TABULAR}>{pct(CACHE.saved)}</span> less
         </span>
       </Note>
@@ -227,8 +227,8 @@ export const CacheScene: React.FC = () => {
               alignItems: "center",
               paddingLeft: 12,
               opacity: p,
-              ...note(20, row.cached ? INK : mix(INK, PAPER, fill)),
-              fontWeight: 600,
+              ...note(24, row.cached ? INK : mix(INK, PAPER, fill)),
+              fontWeight: 500,
               whiteSpace: "nowrap",
             }}
           >
@@ -237,10 +237,10 @@ export const CacheScene: React.FC = () => {
         );
       })}
       <Note at={firstAt - 4} x={RX + REQ_W + 12} y={y(REQ_Y) + 6}>
-        <span style={{ ...note(22, INK), fontWeight: 650 }}>first</span>
+        <span style={{ ...note(24, INK), fontWeight: 500 }}>first</span>
       </Note>
       <Note at={matchAt + 2} x={RX} y={y(REQ_Y + 3 * REQ_STEP) + 2} width={360}>
-        <span style={{ ...note(21, CACHED_INK), fontWeight: 600 }}>so the cache can match it</span>
+        <span style={{ ...note(24, CACHED_INK), fontWeight: 500 }}>so the cache can match it</span>
       </Note>
     </AbsoluteFill>
   );

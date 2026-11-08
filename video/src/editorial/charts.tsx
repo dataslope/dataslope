@@ -103,8 +103,8 @@ export const Axis: React.FC<{
             textAnchor="end"
             style={{
               fontFamily: SANS,
-              fontSize: 19,
-              fontWeight: 650,
+              fontSize: 24,
+              fontWeight: 500,
               fill: INK_SOFT,
             }}
           >

@@ -88,7 +88,7 @@ export const CompressScene: React.FC = () => {
           position: "absolute",
           left: BAR_X + w(bytes) + 16,
           top: top + (h(BAR_H) - 30) / 2,
-          ...note(23, opts.ink ?? INK),
+          ...note(24, opts.ink ?? INK),
           whiteSpace: "nowrap",
           opacity: ease(frame, at + 6, 10),
         }}
@@ -105,8 +105,8 @@ export const CompressScene: React.FC = () => {
 
   const name = (top: number, at: number, col: string, sub: React.ReactNode) => (
     <div style={{ position: "absolute", left: X0, top: top - 4, width: BAR_X - X0 - 20, opacity: ease(frame, at, 12) }}>
-      <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>{col}</div>
-      <div style={{ ...note(20, INK_SOFT), marginTop: 2 }}>{sub}</div>
+      <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{col}</div>
+      <div style={{ ...note(24, INK_SOFT), marginTop: 2 }}>{sub}</div>
     </div>
   );
 
@@ -133,7 +133,7 @@ export const CompressScene: React.FC = () => {
           Why is compression more effective in columnar formats?
         </QuestionCard>
         <Note at={typeAt} x={X0} y={y(262)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             One column: one type
             <span style={{ opacity: ease(frame, fewAt, 10) }}>, often few distinct values</span>
             <span style={{ opacity: ease(frame, regionAt + 10, 10) }}>. Each column, as CSV text against its bytes in Parquet:</span>
@@ -155,29 +155,29 @@ export const CompressScene: React.FC = () => {
 
         {/* The dictionary: each value once, then a short code per row. */}
         <div style={{ position: "absolute", left: 1400, top: R - 6, opacity: ease(frame, dictAt, 12) }}>
-          <div style={{ ...label(20, INK_SOFT), marginBottom: 8 }}>dictionary</div>
+          <div style={{ ...label(24, INK_SOFT), marginBottom: 8 }}>dictionary</div>
           {firstSeen.map((v, i) => (
-            <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", height: 30, fontFamily: MONO, fontSize: 21, color: INK }}>
+            <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", height: 30, fontFamily: MONO, fontSize: 24, color: INK }}>
               <span style={{ width: 26, textAlign: "right", color: INK_SOFT }}>{i}</span>
               <span>{v}</span>
             </div>
           ))}
         </div>
         <div style={{ position: "absolute", left: 1600, top: R - 6, opacity: ease(frame, bitsAt - 4, 12) }}>
-          <div style={{ ...label(20, INK_SOFT), marginBottom: 8, whiteSpace: "nowrap" }}>first rows</div>
+          <div style={{ ...label(24, INK_SOFT), marginBottom: 8, whiteSpace: "nowrap" }}>first rows</div>
           {sample.rows.map((r, i) => (
-            <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", height: 30, fontFamily: MONO, fontSize: 21, color: INK, whiteSpace: "nowrap" }}>
+            <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", height: 30, fontFamily: MONO, fontSize: 24, color: INK, whiteSpace: "nowrap" }}>
               <span style={{ display: "inline-block", minWidth: 28, padding: "0 6px", borderRadius: 4, background: COLUMN_TINT.region, textAlign: "center" }}>
                 {firstSeen.indexOf(r[regionCol])}
               </span>
-              <span style={{ color: INK_SOFT, fontSize: 19 }}>{r[regionCol]}</span>
+              <span style={{ color: INK_SOFT, fontSize: 24 }}>{r[regionCol]}</span>
             </div>
           ))}
         </div>
 
         {/* ── amount: random to the cent ── */}
         {name(A, amountAt, "amount", <><Num>{count(amount.distinct)}</Num> distinct values</>)}
-        <div style={{ position: "absolute", left: X0, top: A + h(50), ...note(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, centAt + 6, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: A + h(50), ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, centAt + 6, 12) }}>
           too many for a dictionary
         </div>
         {bar(A, amount.csv, amountAt + 4, "as CSV text", { csv: true, tint: TINTS[5], sizeAt: fromAt })}
@@ -189,18 +189,18 @@ export const CompressScene: React.FC = () => {
         {bar(D + h(STEP), date.parquet, threeKbAt - 4, "in Parquet, in long runs of one date", { tint: COLUMN_TINT.sale_date, sizeAt: threeKbAt, ink: OK_INK })}
 
         {/* ── Why a row file loses, and what fewer bytes buy ── */}
-        <div style={{ position: "absolute", left: X0, top: ROW_Y, ...note(23, INK), whiteSpace: "nowrap", opacity: ease(frame, rleAt + 20, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: ROW_Y, ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, rleAt + 20, 12) }}>
           Parquet&apos;s encodings: dictionary, run-length, delta, bit-packing.
           <span style={{ opacity: ease(frame, rowAt, 10) }}> A row file interleaves every field, which defeats them.</span>
         </div>
-        <div style={{ position: "absolute", left: X0, top: ROW_Y + h(34), ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, fasterAt - 4, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: ROW_Y + h(34), ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, fasterAt - 4, 12) }}>
           Fewer bytes to read: faster scans, not just cheaper storage.
         </div>
 
         {/* ── The whole file, by codec ── */}
         <div style={{ position: "absolute", left: X0, top: C - 6, width: BAR_X - X0 - 20, opacity: ease(frame, codecAt, 12) }}>
-          <div style={{ ...label(23, INK) }}>the whole file</div>
-          <div style={{ ...note(20, INK_SOFT), marginTop: 2 }}>by codec</div>
+          <div style={{ ...label(24, INK) }}>the whole file</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 2 }}>by codec</div>
         </div>
         {/* The section's hairline, where it was, with 30px of room under it
             to the first bar's words. */}
@@ -208,13 +208,13 @@ export const CompressScene: React.FC = () => {
         {bar(C, FILES.zstd, zstdAt - 4, <><QCode>zstd</QCode> (Zstandard)</>, { tint: COLUMN_TINT.units, sizeAt: zstdAt })}
         {bar(C + h(STEP), FILES.parquet, snappyAt - 4, <><QCode>snappy</QCode>, the default</>, { tint: COLUMN_TINT.category, sizeAt: snappyAt })}
         <Note at={slowerAt} x={BAR_X + w(FILES.zstd) + 380} y={C + (h(BAR_H) - 30) / 2}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>but slower to decompress</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>but slower to decompress</span>
         </Note>
         <Note at={slowLinkAt} x={X0} y={C + h(STEP) * 2 + h(14)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Over a slow link, the smaller file wins
             <span style={{ opacity: ease(frame, fastAt, 10) }}>; on a fast disk, the faster codec.</span>
-            <span style={{ ...note(21, INK_SOFT), opacity: ease(frame, fastAt + 12, 10) }}> The trade-off is the page&apos;s chart of codec speeds.</span>
+            <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, fastAt + 12, 10) }}> The trade-off is the page&apos;s chart of codec speeds.</span>
           </span>
         </Note>
       </Drift>

@@ -77,8 +77,8 @@ export const CostScene: React.FC = () => {
                 justifyContent: "center",
                 opacity: Math.min(1, s),
                 transform: `translateY(${(1 - Math.min(1, s)) * -20}px)`,
-                ...note(26, BLUE_INK),
-                fontWeight: 650,
+                ...note(28, BLUE_INK),
+                fontWeight: 500,
               }}
             >
               {kTokens(MONEY.document)}
@@ -87,22 +87,22 @@ export const CostScene: React.FC = () => {
         })}
         {Array.from({ length: MONEY.turns }, (_, j) => (
           <Note key={j} at={blockAt(j)} x={X0 + j * BLOCK_PITCH + BLOCK_W / 2} y={y(BLOCK_Y) + bh + 12} from="up" style={{ transform: "translateX(-50%)" }}>
-            <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>turn {j + 1}</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>turn {j + 1}</span>
           </Note>
         ))}
 
         {/* The running bill: true at every moment, the blocks on screen times 500,000. */}
         {landed > 0 ? (
           <div style={{ position: "absolute", left: X0, top: y(BILL_Y), whiteSpace: "nowrap" }}>
-            <div style={{ ...label(22, INK_SOFT), marginBottom: 8 }}>Input tokens billed</div>
+            <div style={{ ...label(24, INK_SOFT), marginBottom: 8 }}>Input tokens billed</div>
             <span style={{ ...headline(120), color: frame >= fiveMAt - 2 ? ACCENT_INK : INK, ...TABULAR }}>
               {count(landed * MONEY.document)}
             </span>
           </div>
         ) : null}
         <Note at={cacheAt - 2} x={X0} y={y(BILL_Y) + 190}>
-          <span style={{ ...note(26, INK) }}>unless a cache steps in</span>
-          <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>
+          <span style={{ ...note(28, INK) }}>unless a cache steps in</span>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>
             A cache bills a repeated prefix at a tenth of the input price or less (Unit 4).
           </div>
         </Note>

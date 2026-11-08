@@ -99,7 +99,7 @@ export const QuantileScene: React.FC = () => {
             <line x1={sx(X, scale)} x2={sx(X, scale)} y1={base} y2={base - h(70)} stroke={INK} strokeWidth={2} strokeDasharray="6 6" />
           </Svg>
           <Note at={avgAt + 4} x={sx(X, scale) + 12} y={base - h(60)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...halo }}>average {scale} ms</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...halo }}>average {scale} ms</span>
           </Note>
 
           {/* What's asked: the time ninety-five percent beat. */}
@@ -110,7 +110,7 @@ export const QuantileScene: React.FC = () => {
             <span style={{ ...askNote(22), whiteSpace: "nowrap" }}>95% of requests done by... when?</span>
           </Note>
           <Note at={timeAt} x={X.x0 + 16} y={qy + 14} out={plotAt}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>a time, not a chance</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a time, not a chance</span>
           </Note>
 
           {draw > 0 ? (
@@ -142,8 +142,8 @@ export const QuantileScene: React.FC = () => {
                   left: sx(X, cursor) + 14,
                   top: py(f(cursor)) + 12,
                   opacity: readout,
-                  ...note(22, INK),
-                  fontWeight: 600,
+                  ...note(24, INK),
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                   ...halo,
                 }}
@@ -171,7 +171,7 @@ export const QuantileScene: React.FC = () => {
           {/* The density the curve sums up: its area left of the tracer is the
               curve's height there, and 95% of it is what 599 ms reads back. */}
           <Ink at={responseAt - 2} dur={14} style={{ left: PANEL_X, top: y(IN_BASE - IN_TALL - 56), whiteSpace: "nowrap" }}>
-            <span style={label(21, INK_SOFT)}>The density of response times</span>
+            <span style={label(24, INK_SOFT)}>The density of response times</span>
           </Ink>
           <Svg opacity={inset}>
             {draw > 0 ? (
@@ -192,7 +192,7 @@ export const QuantileScene: React.FC = () => {
             ) : null}
           </Svg>
           <Note at={areaAt - 2} x={PANEL_X} y={inBase + 14} out={acrossAt - 4}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>shaded: the share finished</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>shaded: the share finished</span>
           </Note>
           <Note at={msAt - 2} x={PANEL_X} y={inBase + 14}>
             <span style={{ ...askNote(21), whiteSpace: "nowrap" }}>95% of the area lies left of {fmt(QUANTILE.ppf, 0)} ms</span>
@@ -200,15 +200,15 @@ export const QuantileScene: React.FC = () => {
 
           {/* The two directions. */}
           <Ink at={quantileAt - 2} dur={14} style={{ left: PANEL_X, top: y(620), whiteSpace: "nowrap" }}>
-            <span style={label(22, INK_SOFT)}>Two directions</span>
+            <span style={label(24, INK_SOFT)}>Two directions</span>
           </Ink>
           <Ink at={quantileAt + 4} dur={14} style={{ left: PANEL_X, top: y(658), whiteSpace: "nowrap" }}>
             <span style={code(24, INK)}>cdf</span>
-            <span style={{ ...note(23, INK_SOFT), marginLeft: 12 }}>a time → a share</span>
+            <span style={{ ...note(24, INK_SOFT), marginLeft: 12 }}>a time → a share</span>
           </Ink>
           <Ink at={backwardsAt - 6} dur={14} style={{ left: PANEL_X, top: y(700), whiteSpace: "nowrap" }}>
             <span style={code(24, ASK)}>ppf</span>
-            <span style={{ ...note(23, INK), marginLeft: 12, fontWeight: 600 }}>a share → a time</span>
+            <span style={{ ...note(24, INK), marginLeft: 12, fontWeight: 500 }}>a share → a time</span>
           </Ink>
           <Ink at={backwardsAt + 6} dur={14} style={{ left: PANEL_X, top: y(744), whiteSpace: "nowrap" }}>
             <span style={code(22, INK_SOFT)}>
@@ -216,7 +216,7 @@ export const QuantileScene: React.FC = () => {
             </span>
           </Ink>
           <Ink at={cutoffAt - 4} dur={14} style={{ left: PANEL_X, top: y(800), whiteSpace: "nowrap" }}>
-            <span style={{ ...body(30, true), color: INK }}>a cutoff, or a promise:</span>
+            <span style={{ ...body(28, true), color: INK }}>a cutoff, or a promise:</span>
           </Ink>
           <Ink at={promiseAt + 6} dur={14} style={{ left: PANEL_X, top: y(846), whiteSpace: "nowrap" }}>
             <span style={{ ...askNote(23) }}>95% within {fmt(QUANTILE.ppf, 0)} ms</span>

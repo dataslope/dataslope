@@ -95,15 +95,15 @@ type Tok = { text: string; color: string; weight?: number };
  *  line's code, a header's name, a JSON body's strings and numbers. */
 const tokens = (line: string, statusInk: string): Tok[] => {
   const method = line.match(METHODS);
-  if (method) return [{ text: method[1], color: METHOD_INK, weight: 700 }, { text: line.slice(method[1].length), color: INK, weight: 500 }];
+  if (method) return [{ text: method[1], color: METHOD_INK, weight: 500 }, { text: line.slice(method[1].length), color: INK, weight: 500 }];
   const status = line.match(/^(\d{3})(\b.*)$/);
-  if (status) return [{ text: status[1], color: statusInk, weight: 700 }, { text: status[2], color: statusInk, weight: 600 }];
+  if (status) return [{ text: status[1], color: statusInk, weight: 500 }, { text: status[2], color: statusInk, weight: 500 }];
   const header = line.match(/^([A-Z][A-Za-z-]*):( .*)$/);
-  if (header) return [{ text: `${header[1]}:`, color: INK_SOFT, weight: 600 }, { text: header[2], color: INK, weight: 500 }];
+  if (header) return [{ text: `${header[1]}:`, color: INK_SOFT, weight: 500 }, { text: header[2], color: INK, weight: 500 }];
   const out: Tok[] = [];
   for (const m of line.matchAll(/("(?:[^"\\]|\\.)*")(\s*:)?|(-?\d+(?:\.\d+)?)|([A-Za-z_][\w.-]*)|(\s+)|(.)/g)) {
     const [text, str, colon, num, word] = m;
-    if (str && colon) out.push({ text: str, color: INK, weight: 600 }, { text: colon, color: INK_SOFT });
+    if (str && colon) out.push({ text: str, color: INK, weight: 500 }, { text: colon, color: INK_SOFT });
     else if (str) out.push({ text, color: inkOf.green });
     else if (num) out.push({ text, color: inkOf.orange });
     else if (word) out.push({ text, color: INK });
@@ -304,7 +304,7 @@ export const Node: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      <span style={{ ...label(size, titleInk ?? t.ink), fontWeight: 700, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO, fontWeight: 600 } : {}) }}>{title}</span>
+      <span style={{ ...label(size, titleInk ?? t.ink), fontWeight: 500, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO, fontWeight: 500 } : {}) }}>{title}</span>
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap" }}>{sub}</span> : null}
       {children}
     </div>
@@ -386,7 +386,7 @@ export const Pill: React.FC<{
   const frame = useCurrentFrame();
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
   const text = (
-    <span style={{ ...label(size, TONE[tone].ink), fontWeight: 700, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO, fontWeight: 700 } : {}) }}>{children}</span>
+    <span style={{ ...label(size, TONE[tone].ink), fontWeight: 500, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO, fontWeight: 500 } : {}) }}>{children}</span>
   );
   return (
     <Ink at={at} dur={12} out={out} style={{ left: x, top: y, opacity: 1 - d, fontSize: size }}>

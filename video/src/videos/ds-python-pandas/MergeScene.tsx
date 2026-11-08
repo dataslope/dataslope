@@ -91,7 +91,7 @@ export const MergeScene: React.FC = () => {
 
   const header = (word: string, rest: React.ReactNode, at: number, out?: number) => (
     <Note at={at} x={X0} y={y(HEAD_Y)} out={out}>
-      <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+      <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
         <Mark at={at + 4}>
           <Mono>{word}</Mono>
         </Mark>{" "}
@@ -181,7 +181,7 @@ export const MergeScene: React.FC = () => {
           ]}
         />
         <Note at={sameAt} x={RESULT_X} y={mg.rowTop(M.rows.length) + h(22)} out={outMatch}>
-          <span style={{ ...label(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same four rows</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same four rows</span>
         </Note>
 
         {/* ── the calls: merge's with how's join types, then join's ── */}
@@ -192,7 +192,7 @@ export const MergeScene: React.FC = () => {
             <FadeIn at={typesAt - 2}>
               : inner,{" "}
               <Mark at={leftAt}>
-                <span style={{ color: INK, fontWeight: 650 }}>left</span>
+                <span style={{ color: INK, fontWeight: 500 }}>left</span>
               </Mark>
               , right or outer
             </FadeIn>

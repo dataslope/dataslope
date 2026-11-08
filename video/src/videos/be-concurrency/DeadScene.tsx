@@ -1,15 +1,15 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { Illustration } from "../../components/Illustration";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { DEADLOCK } from "./data";
-import { Drift, Flow, LockGlyph, OK, OK_INK, pulse, THREAD, ThreadName, tint, VRule, X0 } from "./parts";
+import { DEADLOCK, ILLUSTRATIONS, VIDEO } from "./data";
+import { Drift, Flow, LockGlyph, OK_INK, pulse, THREAD, ThreadName, tint, VRule, X0 } from "./parts";
 
 /** The wait-for picture, in layout units: two locks between two threads. */
 const A = { x: 410, y: 350, w: 140, h: 64 };
@@ -24,7 +24,8 @@ const CONDITIONS = [
   { name: "Circular wait", gloss: "a cycle, each waiting on the next", fix: "one global order: A before B" },
 ];
 const ROW_X = 1060;
-const LINK_X = 1000;
+/** The chain's column: each link centred here, 40px clear of the rows. */
+const LINK_CX = 985;
 const ROW0 = 392;
 const ROW_H = 110;
 const FIX_X = 1470;
@@ -34,23 +35,26 @@ const named = (s: string) => s.replace(/^T(\d)/, "thread $1");
 const STUCK = DEADLOCK.opposite.examples[0];
 if (!STUCK || STUCK.waitsFor.T1 !== "B" || STUCK.waitsFor.T2 !== "A") throw new Error("deadlock: results.json's schedule is not the one drawn");
 
-/** A chain link, an upright oval; `open` cuts a gap in its right side, so the chain comes apart there. */
-const Link: React.FC<{ cx: number; cy: number; at: number; open: number; color: string }> = ({ cx, cy, at, open, color }) => {
+/** A chain link, painted (be-concurrency-link, 810x1518): an upright oval
+ *  loop washed in blue. Broken, it is be-concurrency-link-open (772x1473),
+ *  the same loop in green with a gap cut through its right side, so the chain
+ *  comes apart there. Both are drawn in one box, and `open` cross-fades the
+ *  first into the second: the closed link holds until the open one is half
+ *  in, so the link never thins out on the way. */
+const LINK = { w: 810, h: 1518 } as const;
+const linkW = (height: number) => (height * LINK.w) / LINK.h;
+
+const Link: React.FC<{ cx: number; cy: number; height: number; at: number; open: number }> = ({ cx, cy, height, at, open }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
-  if (p <= 0) return null;
-  const rx = 18;
-  const ry = 60;
-  const gap = (open * 80 * Math.PI) / 180;
-  const pt = (a: number) => `${(cx + rx * Math.cos(a)).toFixed(2)},${(cy + ry * Math.sin(a)).toFixed(2)}`;
+  if (p <= 0 || !ILLUSTRATIONS) return null;
+  const w = linkW(height);
+  const fill: React.CSSProperties = { position: "absolute", left: 0, top: 0, width: w, height };
   return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p }}>
-      {gap > 0.01 ? (
-        <path d={`M${pt(gap / 2)} A${rx},${ry} 0 1 1 ${pt(-gap / 2)}`} fill="none" stroke={color} strokeWidth={7} strokeLinecap="round" />
-      ) : (
-        <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="none" stroke={color} strokeWidth={7} />
-      )}
-    </svg>
+    <div style={{ position: "absolute", left: cx - w / 2, top: cy - height / 2, width: w, height, opacity: p, transform: `translateY(${(p - 1) * 10}px)` }}>
+      {open < 1 ? <Illustration video={VIDEO} id={`${VIDEO}-link`} style={{ ...fill, opacity: Math.min(1, 2 - 2 * open) }} /> : null}
+      {open > 0 ? <Illustration video={VIDEO} id={`${VIDEO}-link-open`} style={{ ...fill, opacity: open }} /> : null}
+    </div>
   );
 };
 
@@ -132,6 +136,9 @@ export const DeadScene: React.FC = () => {
   const waitColor = stuck > 0.5 ? ACCENT : INK_SOFT;
 
   const rowY = (i: number) => y(ROW0) + i * h(ROW_H);
+  // One link per row, a little taller than the row so the four meet end to
+  // end as a chain; each is centred on its condition's two lines of text.
+  const linkH = h(ROW_H + 6);
   const broken = CONDITIONS.map((_, i) => (i === 3 ? Math.max(ease(frame, breakAt + 4, 14), ease(frame, fixAt[3], 14)) : ease(frame, fixAt[i] + 4, 14)));
   const shrink = ease(frame, shortAt + 8, 30);
   // Livelock: two threads step toward each other, both back off, again, in step.
@@ -184,14 +191,14 @@ export const DeadScene: React.FC = () => {
             <span style={{ transform: `scale(${1 + 0.2 * pulse(frame, twoAt + 10, 18)})` }}>
               <LockGlyph size={30} color={l.holder < 0 ? INK : THREAD[l.holder].fill} />
             </span>
-            <span style={{ ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>{l.name}</span>
+            <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{l.name}</span>
           </Note>
         ))}
         {[t1, t2].map((t, i) => (
           <ThreadName key={i} t={i} x={t.x + t.w / 2} y={t.y + t.h / 2 - 15} at={setAt + 6 + i * 4} size={23} center />
         ))}
         <Note at={wantsBAt} x={X0} y={y(686)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.5em", fontSize: 20 }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.5em", fontSize: 24 }}>
             <svg width={36} height={10}>
               <line x1={0} y1={5} x2={36} y2={5} stroke={INK_SOFT} strokeWidth={4} />
             </svg>
@@ -208,10 +215,10 @@ export const DeadScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{STUCK.trace.map(named).join(", then ")}:</span>
         </Note>
         <Note at={eachAt} x={X0} y={y(766)} out={getsAt - 2}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>each waits on the other, for good</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>each waits on the other, for good</span>
         </Note>
         <Note at={eachAt + 16} x={X0} y={y(806)} out={getsAt - 2}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Num>{DEADLOCK.opposite.deadlock}</Num> of the <Num>{DEADLOCK.opposite.schedules}</Num> possible schedules end this way
           </span>
         </Note>
@@ -219,7 +226,7 @@ export const DeadScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Both take A first: the loser waits holding nothing</span>
         </Note>
         <Note at={noSchedAt} x={X0} y={y(766)} out={shortAt - 4}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{DEADLOCK.sameOrder.deadlock}</Num> of <Num>{DEADLOCK.sameOrder.schedules}</Num> schedules deadlock
           </span>
         </Note>
@@ -254,7 +261,7 @@ export const DeadScene: React.FC = () => {
         <div style={{ position: "absolute", left: 758 + 26 * sway, top: y(828) + 4, width: 24, height: 24, borderRadius: 12, background: THREAD[1].fill, opacity: ease(frame, lockstepAt, 10) }} />
 
         {/* Coffman's four, as a chain. */}
-        <Note at={coffAt} x={LINK_X - 20} y={y(290)}>
+        <Note at={coffAt} x={LINK_CX - linkW(linkH) / 2} y={y(290)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Coffman&apos;s four conditions<span style={{ opacity: ease(frame, coffAt + 20, 10) }}>: all have to hold</span>
           </span>
@@ -263,29 +270,29 @@ export const DeadScene: React.FC = () => {
           const cy = rowY(i) + h(30);
           return (
             <React.Fragment key={c.name}>
-              <Link cx={LINK_X + 18} cy={cy} at={condAt[i] - 2} open={broken[i]} color={broken[i] > 0.5 ? OK : ds("gray", 500)} />
+              <Link cx={LINK_CX} cy={cy} height={linkH} at={condAt[i] - 2} open={broken[i]} />
               <Note at={condAt[i]} x={ROW_X} y={rowY(i)}>
-                <div style={{ ...note(25, broken[i] > 0.5 ? OK_INK : INK), fontWeight: 700, whiteSpace: "nowrap" }}>{c.name}</div>
-                <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{c.gloss}</div>
+                <div style={{ ...note(24, broken[i] > 0.5 ? OK_INK : INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.name}</div>
+                <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{c.gloss}</div>
               </Note>
               <Note at={fixAt[i]} x={FIX_X} y={rowY(i) + h(14)}>
-                <span style={{ ...note(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{c.fix}</span>
+                <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.fix}</span>
               </Note>
             </React.Fragment>
           );
         })}
         <VRule x={FIX_X - 32} top={rowY(0)} height={rowY(3) + h(70) - rowY(0)} at={globalAt} />
         <Note at={breakAt} x={ROW_X} y={rowY(4) + h(6)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Break any one, and it can&apos;t happen</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Break any one, and it can&apos;t happen</span>
         </Note>
         <Note at={queueAt} x={FIX_X} y={rowY(0) + h(48)}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>no other thread needs the lock</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>no other thread needs the lock</span>
         </Note>
         <Note at={orderAt + 4} x={FIX_X} y={rowY(3) + h(48)}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the usual target</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the usual target</span>
         </Note>
         <Note at={releasesAt} x={FIX_X} y={rowY(2) + h(48)}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>gives up, lets go of the first</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>gives up, lets go of the first</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -23,8 +23,8 @@ const OVERLAP = 6;
  * "SQL" (16:9), Part 1 of the Data Analyst interview prep videos, on the
  * editorial page. Twenty-four questions from the track's SQL page: ten that
  * hide a trap, one scene (or two) each, then a rapid-fire round of fourteen.
- * Every table, statement and error ran in DuckDB (check.mjs, results.json,
- * data.ts).
+ * Every table, statement and error ran in Postgres (check.mjs,
+ * results.json, data.ts).
  *
  * No series intro yet: the first scene opens at frame 0. When it is added,
  * it goes before the hook as the course videos' SeriesIntro scene (course

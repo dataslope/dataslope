@@ -53,7 +53,7 @@ const Asked: React.FC<{ at: number; question: string; children: React.ReactNode 
         }}
       >
         <span style={{ position: "absolute", left: "calc(50% - 1px)", top: 4, width: 2, height: 22 * p, background: INK_SOFT }} />
-        <span style={{ position: "absolute", left: 2, top: 32, ...note(24, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>{question}</span>
+        <span style={{ position: "absolute", left: 2, top: 32, ...note(24, INK), whiteSpace: "nowrap" }}>{question}</span>
       </span>
     </span>
   );
@@ -195,7 +195,7 @@ export const HookScene: React.FC = () => {
             out={structureAt - 10}
             style={{ left: STRIP_X + ci * CELL - 7, top: stripTop + cellH + 2, width: 40, textAlign: "center" }}
           >
-            <span style={{ ...note(28, BAD_INK), fontWeight: 700 }}>?</span>
+            <span style={{ ...note(28, BAD_INK), fontWeight: 500 }}>?</span>
           </Ink>
         ))}
 

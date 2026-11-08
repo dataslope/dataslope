@@ -127,7 +127,7 @@ export const Reply: React.FC<{
   // The house badge (editorial/ui): blue for the key blue, gray for the
   // plain ink, red otherwise.
   <Ink at={at} dur={12} out={out} style={{ left: x, top: y, whiteSpace: "nowrap" }}>
-    <span style={{ ...badgeStyle(color === BLUE_INK ? "blue" : color === INK ? "gray" : "red", size), fontFamily: MONO, fontWeight: 600 }}>
+    <span style={{ ...badgeStyle(color === BLUE_INK ? "blue" : color === INK ? "gray" : "red", size), fontFamily: MONO, fontWeight: 500 }}>
       {children}
     </span>
   </Ink>
@@ -277,7 +277,7 @@ export const Notation: React.FC<{
         whiteSpace: "nowrap",
         fontFamily: MONO,
         fontSize: size,
-        fontWeight: 600,
+        fontWeight: 500,
         color: INK,
         opacity: 1 - o,
       }}

@@ -143,7 +143,7 @@ export const PaletteScene: React.FC = () => {
     </>
   );
   const legend = (p: (typeof PANELS)[number], at: number) => (
-    <div style={{ position: "absolute", left: p.x0, top: pBase + h(34), ...label(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, at, 10) }}>
+    <div style={{ position: "absolute", left: p.x0, top: pBase + h(34), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, at, 10) }}>
       <Swatch color={OK} /> {mobile.key}
       <span style={{ display: "inline-block", width: 28 }} />
       <Swatch color={ACCENT} /> {retail.key}
@@ -187,7 +187,7 @@ export const PaletteScene: React.FC = () => {
 
         {/* ── Question 15: three families, then one accent ── */}
         <Note at={matchAt - 2} x={FAMILIES_X[0]} y={y(290)} out={out15}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>match the palette to the data</span>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>match the palette to the data</span>
         </Note>
         {FAMILIES.map((f, k) => {
           const x = FAMILIES_X[k];
@@ -228,7 +228,7 @@ export const PaletteScene: React.FC = () => {
                         x={x + (i + 0.5) * cellW}
                         y={stripTop + stripH + 30}
                         textAnchor="middle"
-                        style={{ ...label(19, INK_SOFT) }}
+                        style={{ ...label(24, INK_SOFT) }}
                         fill={INK_SOFT}
                         opacity={ease(frame, at + 6 + i * 2, 10)}
                       >
@@ -244,7 +244,7 @@ export const PaletteScene: React.FC = () => {
                           x={x + [cellW / 2, STRIP_W / 2, STRIP_W - cellW / 2][i]}
                           y={stripTop + stripH + 30}
                           textAnchor="middle"
-                          style={{ ...label(19, INK_SOFT) }}
+                          style={{ ...label(24, INK_SOFT) }}
                           fill={INK_SOFT}
                           opacity={ease(frame, (k === 1 ? darkAt : at) + 6, 10)}
                         >
@@ -255,7 +255,7 @@ export const PaletteScene: React.FC = () => {
                   : null}
               </Svg>
               <Note at={(k === 2 ? centerAt : k === 1 ? darkAt : at) + 4} x={x} y={stripTop + stripH + h(52)} out={out15}>
-                <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>{f.caption}</span>
+                <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{f.caption}</span>
               </Note>
             </React.Fragment>
           );
@@ -285,7 +285,7 @@ export const PaletteScene: React.FC = () => {
           );
         })}
         <Note at={seeAt + 6} x={ACC.x1 + 14} y={accY(mobile.values.at(-1)!) - 15} out={out15}>
-          <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>{mobile.key}</span>
+          <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap" }}>{mobile.key}</span>
         </Note>
         <Note at={accentAt} x={ACC.x1 + 160} y={y(650)} out={out15}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
@@ -293,10 +293,10 @@ export const PaletteScene: React.FC = () => {
           </span>
         </Note>
         <Note at={seeAt} x={ACC.x1 + 160} y={y(700)} out={out15}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>for the series they should see,</span>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>for the series they should see,</span>
         </Note>
         <Note at={seeAt + 10} x={ACC.x1 + 160} y={y(744)} out={out15}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>and the rest in gray</span>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>and the rest in gray</span>
         </Note>
 
         {/* ── Question 16: the palette comes round again ── */}
@@ -314,7 +314,7 @@ export const PaletteScene: React.FC = () => {
                 {wrapped ? (
                   <circle cx={discX(i)} cy={discY} r={DISC_R + 7} fill="none" stroke={INK} strokeWidth={1.6} strokeDasharray="4 4" />
                 ) : null}
-                <text x={discX(i)} y={discY + DISC_R + 32} textAnchor="middle" style={{ ...label(19, INK_SOFT) }} fill={INK_SOFT}>
+                <text x={discX(i)} y={discY + DISC_R + 32} textAnchor="middle" style={{ ...label(24, INK_SOFT) }} fill={INK_SOFT}>
                   {i + 1}
                 </text>
               </g>
@@ -351,7 +351,7 @@ export const PaletteScene: React.FC = () => {
             return (
               <g key={i} opacity={p}>
                 <circle cx={discX(i)} cy={foldY} r={DISC_R * p} fill={other ? GRAY : CATS[i]} />
-                <text x={discX(i)} y={foldY + DISC_R + 32} textAnchor="middle" style={{ ...label(19, INK_SOFT) }} fill={INK_SOFT}>
+                <text x={discX(i)} y={foldY + DISC_R + 32} textAnchor="middle" style={{ ...label(24, INK_SOFT) }} fill={INK_SOFT}>
                   {other ? "other" : i + 1}
                 </text>
               </g>
@@ -375,7 +375,7 @@ export const PaletteScene: React.FC = () => {
           return (
             <React.Fragment key={c.key}>
               <LineSet values={c.values} x0={x0} x1={x0 + SMALL.w} base={base} top={top + h(26)} lo={0} hi={100} at={at} dots={false} width={2.4} out={out16} edges />
-              <div style={{ position: "absolute", left: x0, top, ...label(19, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, at + 2, 10) * (1 - ease(frame, out16, 10)) }}>
+              <div style={{ position: "absolute", left: x0, top, ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, at + 2, 10) * (1 - ease(frame, out16, 10)) }}>
                 {c.key}
               </div>
             </React.Fragment>
@@ -387,7 +387,7 @@ export const PaletteScene: React.FC = () => {
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>about 8% of men have red-green color blindness</span>
         </Note>
         <Note at={aloneAt - 2} x={PANELS[0].x0} y={y(350)}>
-          <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>so color can&apos;t be the only cue</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>so color can&apos;t be the only cue</span>
         </Note>
 
         <PanelTitle x={PANELS[0].x0} y={pTop - h(56)} at={mostAt - 4}>
@@ -420,7 +420,7 @@ export const PaletteScene: React.FC = () => {
             { key: retail.key, v: retail.values.at(-1)!, color: SAFE[1] },
           ].map((s) => (
             <Note key={s.key} at={labelAt + (s.key === retail.key ? 4 : 0)} x={PANELS[2].x1 + 12} y={pY(s.v) - h(16)}>
-              <span style={{ ...label(21, INK), whiteSpace: "nowrap", borderBottom: `3px solid ${s.color}` }}>{s.key}</span>
+              <span style={{ ...label(24, INK), whiteSpace: "nowrap", borderBottom: `3px solid ${s.color}` }}>{s.key}</span>
             </Note>
           ))}
         </div>

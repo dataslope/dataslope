@@ -44,7 +44,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -75,7 +75,7 @@ export const Head: React.FC<{ parts: readonly HeadPart[]; out?: number; size?: n
           style={{
             position: "relative",
             whiteSpace: "nowrap",
-            ...(p.italic ? { ...headline(size, true), color: p.color ?? ASK_INK } : null),
+            ...(p.italic ? { ...headline(size, true), color: INK } : null),
           }}
         >
           {p.text}
@@ -89,7 +89,7 @@ export const Head: React.FC<{ parts: readonly HeadPart[]; out?: number; size?: n
 export const code = (size = 24, color: string = INK): React.CSSProperties => ({
   fontFamily: MONO,
   fontSize: size,
-  fontWeight: 600,
+  fontWeight: 500,
   color,
   whiteSpace: "nowrap",
 });
@@ -327,7 +327,7 @@ export const YTicks: React.FC<{
       {ticks.map((v) => (
         <div
           key={v}
-          style={{ position: "absolute", right: 1920 - (x0 - 14), top: py(v) - 13, opacity: p, ...note(20, INK_SOFT) }}
+          style={{ position: "absolute", right: 1920 - (x0 - 14), top: py(v) - 13, opacity: p, ...note(24, INK_SOFT) }}
         >
           {format(v)}
         </div>
@@ -485,4 +485,4 @@ export const Spot: React.FC<{
 };
 
 /** Shorthand for the house annotation in the ask color, bold. */
-export const askNote = (size = 23): React.CSSProperties => ({ ...note(size, ASK_INK), fontWeight: 700 });
+export const askNote = (size = 23): React.CSSProperties => ({ ...note(size, ASK_INK), fontWeight: 500 });

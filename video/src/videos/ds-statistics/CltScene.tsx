@@ -146,7 +146,7 @@ export const CltScene: React.FC = () => {
                 <NormalCurve scale={s} base={base} unit={unit} mu={0} sd={1} count={10000} bin={0.25} at={t + 10} color={INK} width={2.2} />
               </div>
               <Note at={t} x={x0} y={base + h(18)} out={panelOut}>
-                <span style={{ ...noteText(26, INK), fontWeight: 650 }}>{LABELS[i]}</span>
+                <span style={{ ...noteText(26, INK), fontWeight: 500 }}>{LABELS[i]}</span>
               </Note>
             </React.Fragment>
           );

@@ -65,7 +65,7 @@ const ArrayList: React.FC<{ c: Ctx }> = ({ c }) => {
   const walk = ease(frame, walkAt, 24);
   return (
     <>
-      <Line at={indexAt} x={R_X} y={c.T} size={24} weight={650}>
+      <Line at={indexAt} x={R_X} y={c.T} size={24} weight={500}>
         Array: index in O(1), cache-friendly
         <span style={{ opacity: ease(frame, shiftsAt, 10), color: ACCENT_INK }}>; a middle insert shifts the rest</span>
       </Line>
@@ -73,7 +73,7 @@ const ArrayList: React.FC<{ c: Ctx }> = ({ c }) => {
         <Cell key={i} x={R_X + i * cw} y={c.T + c.h(50)} at={indexAt + i * 2} value="" w={cw - 8} h={50} dx={i >= 3 ? cw * shift : 0} tone={i >= 3 && shift > 0 ? "bad" : lit(i) ? "look" : "data"} />
       ))}
       <Cell x={R_X + 3 * cw} y={c.T + c.h(50)} at={shiftsAt + 16} value="" w={cw - 8} h={50} tone="look" opacity={ins} />
-      <Line at={listAt} x={R_X} y={lTop - c.h(52)} size={24} weight={650}>
+      <Line at={listAt} x={R_X} y={lTop - c.h(52)} size={24} weight={500}>
         Linked list: splice in O(1), given the node
         <span style={{ opacity: ease(frame, walkAt, 10), color: ACCENT_INK }}>; finding it is a walk</span>
       </Line>
@@ -107,7 +107,7 @@ const Bst: React.FC<{ c: Ctx }> = ({ c }) => {
   const short = RAPID.bstShuffledHeight * scale * ease(frame, shuffledAt, 10);
   return (
     <>
-      <Line at={c.w("r-bst", "A binary search tree")} x={R_X} y={c.T} size={24} weight={650}>
+      <Line at={c.w("r-bst", "A binary search tree")} x={R_X} y={c.T} size={24} weight={500}>
         A BST
         <span style={{ opacity: ease(frame, heightAt, 10) }}> costs its height per operation.</span>
         <span style={{ opacity: ease(frame, orderAt, 10) }}>
@@ -120,16 +120,16 @@ const Bst: React.FC<{ c: Ctx }> = ({ c }) => {
       <Svg opacity={ease(frame, orderAt, 10)}>
         <line x1={R_X} x2={R_X + 400} y1={base + 1} y2={base + 1} stroke={INK} strokeWidth={1.6} />
       </Svg>
-      <Line at={orderAt + 10} x={R_X + 130} y={base - tall - 4} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={orderAt + 10} x={R_X + 130} y={base - tall - 4} size={24} weight={500} color={ACCENT_INK}>
         <span style={TABULAR}>{int(Math.round((tall / scale) || 0))}</span> levels, in order
       </Line>
-      <Line at={shuffledAt} x={R_X + 350} y={base - 40} size={24} weight={700} color={OK_INK}>
+      <Line at={shuffledAt} x={R_X + 350} y={base - 40} size={24} weight={500} color={OK_INK}>
         <Num>{RAPID.bstShuffledHeight}</Num>, shuffled
       </Line>
-      <Line at={avlAt} x={R_X + 620} y={c.T + c.h(160)} size={24} weight={650}>
+      <Line at={avlAt} x={R_X + 620} y={c.T + c.h(160)} size={24} weight={500}>
         AVL, red-black:
       </Line>
-      <Line at={avlAt + 6} x={R_X + 620} y={c.T + c.h(204)} size={24} weight={700} color={OK_INK}>
+      <Line at={avlAt + 6} x={R_X + 620} y={c.T + c.h(204)} size={24} weight={500} color={OK_INK}>
         stay at O(log n)
       </Line>
     </>
@@ -187,12 +187,12 @@ const Traverse: React.FC<{ c: Ctx }> = ({ c }) => {
       ))}
       {rows.map((r, i) => (
         <React.Fragment key={r.name}>
-          <Line at={r.at} x={rx} y={c.T + c.h(30) + i * c.h(120)} size={23} weight={650}>
+          <Line at={r.at} x={rx} y={c.T + c.h(30) + i * c.h(120)} size={23} weight={500}>
             {r.name}
           </Line>
-          <div style={{ position: "absolute", left: rx, top: c.T + c.h(72) + i * c.h(120), display: "flex", gap: 18, fontSize: 26 }}>
+          <div style={{ position: "absolute", left: rx, top: c.T + c.h(72) + i * c.h(120), display: "flex", gap: 18, fontSize: 28 }}>
             {r.order.map((v, k) => (
-              <span key={k} style={{ ...label(26, BLUE_INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, r.at + 4 + k * 3, 8) }}>
+              <span key={k} style={{ ...label(28, BLUE_INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, r.at + 4 + k * 3, 8) }}>
                 {v}
               </span>
             ))}
@@ -226,7 +226,7 @@ const BstHeap: React.FC<{ c: Ctx }> = ({ c }) => {
   const sTop = c.T + c.h(350);
   return (
     <>
-      <Line at={topAt} x={R_X} y={c.T} size={24} weight={650}>
+      <Line at={topAt} x={R_X} y={c.T} size={24} weight={500}>
         A heap: only its top is in order
       </Line>
       <Svg opacity={ease(frame, topAt + 4, 10)}>
@@ -235,7 +235,7 @@ const BstHeap: React.FC<{ c: Ctx }> = ({ c }) => {
       {heap.map((v, i) => (
         <GraphNode key={i} x={hx(i)} y={hy(i)} at={topAt + 4 + i * 2} name={String(v)} r={24} tone={i === 0 ? "look" : "plain"} />
       ))}
-      <Line at={orderAt} x={R_X} y={sTop - c.h(54)} size={24} weight={650}>
+      <Line at={orderAt} x={R_X} y={sTop - c.h(54)} size={24} weight={500}>
         A balanced BST: the whole order
       </Line>
       {keys.map((v, i) => {
@@ -247,7 +247,7 @@ const BstHeap: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={nextAt} x={R_X} y={sTop + c.h(76)} size={23}>
         Next key after <Num>{keys[3]}</Num>: O(log n)
       </Line>
-      <Line at={rangeAt} x={R_X} y={sTop + c.h(118)} size={23} color={OK_INK} weight={650}>
+      <Line at={rangeAt} x={R_X} y={sTop + c.h(118)} size={23} color={OK_INK} weight={500}>
         A range: O(log n) to find its start, then one step per key
       </Line>
     </>
@@ -294,16 +294,16 @@ const Trie: React.FC<{ c: Ctx }> = ({ c }) => {
       {TRIE.map((t, i) => (
         <GraphNode key={i} x={pos(i)[0]} y={pos(i)[1]} at={storesAt + t.d * 4} name={t.ch} r={24} tone={lit(i) ? "look" : t.word ? "ok" : "data"} />
       ))}
-      <Line at={storesAt} x={rx} y={c.T + c.h(40)} size={24} weight={650}>
+      <Line at={storesAt} x={rx} y={c.T + c.h(40)} size={24} weight={500}>
         One character per level
       </Line>
       <Line at={lookupAt} x={rx} y={c.T + c.h(86)} size={24}>
-        Look up <span style={{ fontFamily: MONO, fontWeight: 600 }}>cart</span>: <Num>4</Num> steps, its length
+        Look up <span style={{ fontFamily: MONO, fontWeight: 500 }}>cart</span>: <Num>4</Num> steps, its length
       </Line>
-      <Line at={manyAt} x={rx} y={c.T + c.h(128)} size={24} color={OK_INK} weight={650}>
+      <Line at={manyAt} x={rx} y={c.T + c.h(128)} size={24} color={OK_INK} weight={500}>
         however many keys are stored
       </Line>
-      <Line at={usesAt} x={rx} y={c.T + c.h(200)} size={24} weight={650} color={BLUE_INK}>
+      <Line at={usesAt} x={rx} y={c.T + c.h(200)} size={24} weight={500} color={BLUE_INK}>
         Autocomplete, IP routing
       </Line>
       <Line at={memAt} x={rx} y={c.T + c.h(242)} size={24} color={ACCENT_INK}>
@@ -339,23 +339,23 @@ const Binary: React.FC<{ c: Ctx }> = ({ c }) => {
   }
   return (
     <>
-      <Line at={needsAt} x={R_X} y={c.T} size={24} weight={650}>
+      <Line at={needsAt} x={R_X} y={c.T} size={24} weight={500}>
         Sorted, indexable data: <Num>{int(1_000_000)}</Num> items
       </Line>
       <div style={{ position: "absolute", left: R_X, top: barY, width: W, height: 34, background: BLUE_FILL, border: `2px solid ${BAR}`, borderRadius: 4, boxSizing: "border-box", opacity: ease(frame, needsAt, 10) }} />
       {steps.slice(0, shown).map(([a, b], k) => (
         <div key={k} style={{ position: "absolute", left: R_X + a * W, top: barY + 44 + k * 7, width: Math.max(2, (b - a) * W), height: 4, background: k === shown - 1 ? INK : BAR, borderRadius: 2 }} />
       ))}
-      <Line at={probesAt} x={R_X} y={barY + c.h(190)} size={26} weight={700}>
+      <Line at={probesAt} x={R_X} y={barY + c.h(190)} size={26} weight={500}>
         Probes: <span style={{ ...TABULAR, color: OK_INK }}>{shown}</span> at most
       </Line>
-      <Line at={offAt} x={R_X} y={barY + c.h(250)} size={24} color={ACCENT_INK} weight={600}>
+      <Line at={offAt} x={R_X} y={barY + c.h(250)} size={24} color={ACCENT_INK} weight={500}>
         Bugs: off-by-one bounds
       </Line>
-      <Line at={overflowAt} x={R_X} y={barY + c.h(294)} size={24} color={ACCENT_INK} weight={600}>
+      <Line at={overflowAt} x={R_X} y={barY + c.h(294)} size={24} color={ACCENT_INK} weight={500}>
         <span style={{ fontFamily: MONO }}>(lo + hi) / 2</span> overflows a fixed-width integer
       </Line>
-      <Line at={overflowAt + 16} x={R_X} y={barY + c.h(338)} size={24} color={OK_INK} weight={600}>
+      <Line at={overflowAt + 16} x={R_X} y={barY + c.h(338)} size={24} color={OK_INK} weight={500}>
         the page writes <span style={{ fontFamily: MONO }}>lo + (hi - lo) // 2</span>
       </Line>
     </>
@@ -391,7 +391,7 @@ const Pointers: React.FC<{ c: Ctx }> = ({ c }) => {
   const found = s.sum === target;
   return (
     <>
-      <Line at={walkAt} x={R_X} y={c.T} size={24} weight={650}>
+      <Line at={walkAt} x={R_X} y={c.T} size={24} weight={500}>
         Sorted array, target <Num>{target}</Num>: walk in from both ends
       </Line>
       {nums.map((v, i) => (
@@ -401,7 +401,7 @@ const Pointers: React.FC<{ c: Ctx }> = ({ c }) => {
         { i: s.lo, t: "left" },
         { i: s.hi, t: "right" },
       ].map((ptr) => (
-        <div key={ptr.t} style={{ position: "absolute", left: R_X + ptr.i * cw - 5, width: cw, top: rowY + 70, textAlign: "center", ...label(21, INK), opacity: ease(frame, walkAt + 10, 8) }}>
+        <div key={ptr.t} style={{ position: "absolute", left: R_X + ptr.i * cw - 5, width: cw, top: rowY + 70, textAlign: "center", ...label(24, INK), opacity: ease(frame, walkAt + 10, 8) }}>
           ↑ {ptr.t}
         </div>
       ))}
@@ -415,7 +415,7 @@ const Pointers: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={bigAt} x={R_X} y={rowY + c.h(172)} size={24}>
         Too big: move the right
       </Line>
-      <Line at={linearAt} x={R_X} y={rowY + c.h(230)} size={25} weight={700} color={OK_INK}>
+      <Line at={linearAt} x={R_X} y={rowY + c.h(230)} size={25} weight={500} color={OK_INK}>
         Returns <span style={{ fontFamily: MONO }}>{PAGE.twoPointers[0]}</span>: O(n), not O(n²)
       </Line>
     </>
@@ -448,7 +448,7 @@ const Window: React.FC<{ c: Ctx }> = ({ c }) => {
   const rowY = c.T + c.h(90);
   return (
     <>
-      <Line at={growsAt} x={R_X} y={c.T} size={24} weight={650}>
+      <Line at={growsAt} x={R_X} y={c.T} size={24} weight={500}>
         One range that grows and shrinks, never recomputed
       </Line>
       {[...s].map((ch, i) => (
@@ -469,7 +469,7 @@ const Window: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={longestAt} x={R_X} y={rowY + c.h(110)} size={24}>
         Longest without a repeat, so far: <b style={{ ...TABULAR, color: OK_INK }}>{st.best}</b>
       </Line>
-      <Line at={passAt} x={R_X} y={rowY + c.h(156)} size={24} weight={650} color={OK_INK}>
+      <Line at={passAt} x={R_X} y={rowY + c.h(156)} size={24} weight={500} color={OK_INK}>
         One pass. The page prints <Num>{PAGE.window[0]}</Num>
       </Line>
     </>
@@ -494,7 +494,7 @@ const Adjacency: React.FC<{ c: Ctx }> = ({ c }) => {
   const m = ease(frame, matrixAt, 18);
   return (
     <>
-      <Line at={assumeAt} x={R_X} y={c.T} size={24} weight={650}>
+      <Line at={assumeAt} x={R_X} y={c.T} size={24} weight={500}>
         Assume <Num>{int(A.users)}</Num> users, <Num>{A.friends}</Num> friends each
       </Line>
       <div style={{ position: "absolute", left: R_X, top, width: side * m, height: side * m, background: `color-mix(in srgb, ${ACCENT} 12%, ${PAPER})`, border: `2px solid ${ACCENT}`, boxSizing: "border-box", opacity: m > 0 ? 1 : 0 }} />
@@ -503,22 +503,22 @@ const Adjacency: React.FC<{ c: Ctx }> = ({ c }) => {
         <circle cx={R_X + 4} cy={top + 4} r={14} fill="none" stroke={HIGHLIGHT} strokeWidth={5} />
       </Svg>
       <VRule x={R_X + side + 35} top={top} bottom={top + side} at={listAt} />
-      <Line at={listAt} x={R_X + side + 70} y={top} size={24} weight={700} color={BLUE_INK}>
+      <Line at={listAt} x={R_X + side + 70} y={top} size={24} weight={500} color={BLUE_INK}>
         List: <Num>{int(A.listEntries)}</Num> entries
       </Line>
       <Line at={listAt + 8} x={R_X + side + 70} y={top + c.h(40)} size={22} color={INK_SOFT}>
         the dot in the corner, to scale
       </Line>
-      <Line at={matrixAt} x={R_X + side + 70} y={top + c.h(110)} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={matrixAt} x={R_X + side + 70} y={top + c.h(110)} size={24} weight={500} color={ACCENT_INK}>
         Matrix: <Num>{int(A.matrixCells)}</Num> cells
       </Line>
       <Line at={emptyAt} x={R_X + side + 70} y={top + c.h(150)} size={22} color={INK_SOFT}>
         nearly all of them empty
       </Line>
-      <Line at={denseAt} x={R_X + side + 70} y={top + c.h(230)} size={24} weight={650}>
+      <Line at={denseAt} x={R_X + side + 70} y={top + c.h(230)} size={24} weight={500}>
         A matrix suits dense graphs
       </Line>
-      <Line at={denseAt + 12} x={R_X + side + 70} y={top + c.h(270)} size={24} weight={650}>
+      <Line at={denseAt + 12} x={R_X + side + 70} y={top + c.h(270)} size={24} weight={500}>
         and O(1) edge checks
       </Line>
     </>
@@ -548,7 +548,7 @@ const Cycle: React.FC<{ c: Ctx }> = ({ c }) => {
         <GraphNode key={k} x={pos[k][0]} y={pos[k][1]} at={runAt} name={k} r={32} tone={frame >= visitAt[k] ? "look" : "plain"} />
       ))}
       <VRule x={1276} top={c.T + c.h(40)} bottom={c.T + c.h(292) + 30} at={runAt} />
-      <Line at={runAt} x={rx} y={c.T + c.h(40)} size={24} weight={650}>
+      <Line at={runAt} x={rx} y={c.T + c.h(40)} size={24} weight={500}>
         DFS, each node marked:
       </Line>
       {[
@@ -556,15 +556,15 @@ const Cycle: React.FC<{ c: Ctx }> = ({ c }) => {
         { t: "on the path", tone: HIGHLIGHT, at: pathAt },
         { t: "done", tone: BLUE_FILL, at: doneAt },
       ].map((m, i) => (
-        <div key={m.t} style={{ position: "absolute", left: rx, top: c.T + c.h(90) + i * c.h(44), display: "flex", alignItems: "center", gap: 12, fontSize: 23, opacity: ease(frame, m.at, 10) }}>
+        <div key={m.t} style={{ position: "absolute", left: rx, top: c.T + c.h(90) + i * c.h(44), display: "flex", alignItems: "center", gap: 12, fontSize: 24, opacity: ease(frame, m.at, 10) }}>
           <span style={{ width: 22, height: 22, borderRadius: 11, background: m.tone, border: `2px solid ${INK}` }} />
-          <span style={{ ...label(23, INK), fontWeight: 500 }}>{m.t}</span>
+          <span style={{ ...label(24, INK), fontWeight: 500 }}>{m.t}</span>
         </div>
       ))}
-      <Line at={backAt} x={rx} y={c.T + c.h(250)} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={backAt} x={rx} y={c.T + c.h(250)} size={24} weight={500} color={ACCENT_INK}>
         C → A reaches a node on the path:
       </Line>
-      <Line at={backAt + 8} x={rx} y={c.T + c.h(292)} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={backAt + 8} x={rx} y={c.T + c.h(292)} size={24} weight={500} color={ACCENT_INK}>
         a cycle. The page prints {PAGE.cycle[1]}
       </Line>
     </>
@@ -584,7 +584,7 @@ const Topo: React.FC<{ c: Ctx }> = ({ c }) => {
   const rowY = c.T + c.h(200);
   return (
     <>
-      <Line at={ordersAt} x={R_X} y={c.T} size={24} weight={650}>
+      <Line at={ordersAt} x={R_X} y={c.T} size={24} weight={500}>
         An order for a graph with no cycles
       </Line>
       {Object.entries(G).flatMap(([a, nbs]) =>
@@ -612,13 +612,13 @@ const Topo: React.FC<{ c: Ctx }> = ({ c }) => {
       {order.map((k, i) => (
         <GraphNode key={k} x={x(k)} y={rowY} at={ordersAt + 6 + i * 4} name={k} r={32} />
       ))}
-      <Line at={forwardAt} x={R_X} y={rowY + c.h(70)} size={24} weight={650} color={OK_INK}>
+      <Line at={forwardAt} x={R_X} y={rowY + c.h(70)} size={24} weight={500} color={OK_INK}>
         Every edge points forward
       </Line>
       <Line at={buildAt} x={R_X} y={rowY + c.h(112)} size={24}>
-        Build steps, task dependencies: the page prints <span style={{ fontFamily: MONO, fontWeight: 600 }}>{PAGE.topo[0]}</span>
+        Build steps, task dependencies: the page prints <span style={{ fontFamily: MONO, fontWeight: 500 }}>{PAGE.topo[0]}</span>
       </Line>
-      <Line at={linearAt} x={R_X} y={rowY + c.h(154)} size={24} weight={650}>
+      <Line at={linearAt} x={R_X} y={rowY + c.h(154)} size={24} weight={500}>
         O(V + E)
       </Line>
     </>
@@ -639,7 +639,7 @@ const Kahn: React.FC<{ c: Ctx }> = ({ c }) => {
   const removed = (i: number) => out.includes(i) && frame >= removesAt + 16;
   return (
     <>
-      <Line at={removesAt} x={R_X} y={c.T} size={24} weight={650}>
+      <Line at={removesAt} x={R_X} y={c.T} size={24} weight={500}>
         Remove nodes with nothing pointing in, one by one
       </Line>
       {edges.map(([a, b]) => (
@@ -649,9 +649,9 @@ const Kahn: React.FC<{ c: Ctx }> = ({ c }) => {
         <GraphNode key={i} x={pos(i)[0]} y={pos(i)[1]} at={removesAt + 2} name={String(i)} tone={removed(i) ? "ok" : frame >= leftAt ? "bad" : "data"} />
       ))}
       <Line at={removesAt + 16} x={R_X} y={c.T + c.h(380)} size={24}>
-        Removed: <span style={{ fontFamily: MONO, fontWeight: 600, color: OK_INK }}>[{out.join(", ")}]</span>, then nothing has in-degree 0
+        Removed: <span style={{ fontFamily: MONO, fontWeight: 500, color: OK_INK }}>[{out.join(", ")}]</span>, then nothing has in-degree 0
       </Line>
-      <Line at={leftAt} x={R_X} y={c.T + c.h(424)} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={leftAt} x={R_X} y={c.T + c.h(424)} size={24} weight={500} color={ACCENT_INK}>
         <Num>{nodes.length - out.length}</Num> of <Num>{nodes.length}</Num> left<span style={{ opacity: ease(frame, cycleAt, 10) }}>: the graph has a cycle</span>
       </Line>
     </>
@@ -675,30 +675,30 @@ const Bits: React.FC<{ c: Ctx }> = ({ c }) => {
   const rowH = c.h(46);
   return (
     <>
-      <Line at={singleAt} x={R_X} y={c.T} size={24} weight={650}>
+      <Line at={singleAt} x={R_X} y={c.T} size={24} weight={500}>
         Single instructions: take the XOR of every number
       </Line>
       {nums.map((v, i) => {
         const fade = paired(v) ? ease(frame, cancelAt + 4, 12) : 0;
         return (
-          <div key={i} style={{ position: "absolute", left: R_X + 40, top: c.T + c.h(64) + i * rowH, display: "flex", gap: 30, fontSize: 26, opacity: ease(frame, xorAt + i * 3, 8) * (1 - 0.7 * fade) }}>
-            <span style={{ fontFamily: MONO, fontWeight: 600, color: paired(v) && fade > 0 ? INK_SOFT : INK, width: 40, textAlign: "right" }}>{v}</span>
-            <span style={{ fontFamily: MONO, fontWeight: 600, letterSpacing: "0.2em", color: paired(v) ? BLUE_INK : OK_INK }}>{bin(v)}</span>
+          <div key={i} style={{ position: "absolute", left: R_X + 40, top: c.T + c.h(64) + i * rowH, display: "flex", gap: 30, fontSize: 28, opacity: ease(frame, xorAt + i * 3, 8) * (1 - 0.7 * fade) }}>
+            <span style={{ fontFamily: MONO, fontWeight: 500, color: paired(v) && fade > 0 ? INK_SOFT : INK, width: 40, textAlign: "right" }}>{v}</span>
+            <span style={{ fontFamily: MONO, fontWeight: 500, letterSpacing: "0.2em", color: paired(v) ? BLUE_INK : OK_INK }}>{bin(v)}</span>
           </div>
         );
       })}
       <Svg opacity={ease(frame, leftAt - 4, 10)}>
         <line x1={R_X + 30} x2={R_X + 230} y1={c.T + c.h(64) + nums.length * rowH + 6} y2={c.T + c.h(64) + nums.length * rowH + 6} stroke={INK} strokeWidth={1.8} />
       </Svg>
-      <div style={{ position: "absolute", left: R_X + 40, top: c.T + c.h(64) + nums.length * rowH + 16, display: "flex", gap: 30, fontSize: 26, opacity: ease(frame, leftAt, 10) }}>
-        <span style={{ fontFamily: MONO, fontWeight: 700, color: OK_INK, width: 40, textAlign: "right" }}>{result}</span>
-        <span style={{ fontFamily: MONO, fontWeight: 700, letterSpacing: "0.2em", color: OK_INK }}>{bin(result)}</span>
+      <div style={{ position: "absolute", left: R_X + 40, top: c.T + c.h(64) + nums.length * rowH + 16, display: "flex", gap: 30, fontSize: 28, opacity: ease(frame, leftAt, 10) }}>
+        <span style={{ fontFamily: MONO, fontWeight: 500, color: OK_INK, width: 40, textAlign: "right" }}>{result}</span>
+        <span style={{ fontFamily: MONO, fontWeight: 500, letterSpacing: "0.2em", color: OK_INK }}>{bin(result)}</span>
       </div>
       <VRule x={1095} top={c.T + c.h(64)} bottom={c.T + c.h(64) + (nums.length + 1) * rowH + 30} at={cancelAt} />
       <Line at={cancelAt} x={R_X + 400} y={c.T + c.h(110)} size={24}>
         Each pair cancels: <span style={{ fontFamily: MONO }}>x ^ x = 0</span>
       </Line>
-      <Line at={leftAt} x={R_X + 400} y={c.T + c.h(160)} size={24} weight={700} color={OK_INK}>
+      <Line at={leftAt} x={R_X + 400} y={c.T + c.h(160)} size={24} weight={500} color={OK_INK}>
         The unpaired one is left: <Num>{result}</Num>
       </Line>
       <Line at={spaceAt} x={R_X + 400} y={c.T + c.h(210)} size={24}>
@@ -765,10 +765,10 @@ export const RapidTwoScene: React.FC = () => {
 
         {/* The close. */}
         <Art name="pangolin" at={closeAt} left={1380} top={y(290)} h={330} />
-        <Line at={closeAt} x={R_X} y={y(660)} size={30} weight={600}>
+        <Line at={closeAt} x={R_X} y={y(660)} size={30} weight={500}>
           None of these answers needed a line of code.
         </Line>
-        <Line at={argumentAt} x={R_X} y={y(708)} size={30} weight={700} color={BLUE_INK}>
+        <Line at={argumentAt} x={R_X} y={y(708)} size={30} weight={500} color={BLUE_INK}>
           The structure and the count were the argument.
         </Line>
         <Line at={assistantAt} x={R_X} y={y(766)} size={26} color={INK_SOFT}>

@@ -29,11 +29,18 @@ import { getInputProps, useCurrentFrame } from "remotion";
  *   pair of neighbours on a line is compared, and one that differs in size
  *   by more than MIXED or in family (code in the mono face excepted, and
  *   super- and subscripts) is reported as `[mixed]`.
+ * - Text drawn over other text, or off the page. Two settled runs of text
+ *   from unrelated elements whose glyph boxes cross by more than OVERLAP of
+ *   the smaller are reported as `[overlap]`; a run that reaches past the
+ *   1920x1080 page as `[offpage]`. Input props `audit: "overlap"` runs this
+ *   check alone, for a fast sweep after a change of type sizes.
  */
 export const PageAudit: React.FC = () => {
   const frame = useCurrentFrame();
-  const on = (getInputProps() as { audit?: boolean }).audit === true;
+  const mode = (getInputProps() as { audit?: boolean | "overlap" }).audit;
+  const on = mode === true;
   useLayoutEffect(() => {
+    if (mode === "overlap" || mode === true) for (const c of overlaps()) console.warn(`${c} at frame ${frame}`);
     if (!on) return;
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
@@ -48,7 +55,7 @@ export const PageAudit: React.FC = () => {
     }
     for (const c of crowded()) console.warn(`[crowded] ${c} at frame ${frame}`);
     for (const c of mixed()) console.warn(`[mixed] ${c} at frame ${frame}`);
-  }, [frame, on]);
+  }, [frame, on, mode]);
   return null;
 };
 
@@ -214,6 +221,64 @@ function mixed(): string[] {
     out.push(
       `"${a.text.slice(-24)}" (${Math.round(a.size)}px ${a.face}) and "${b.text.slice(0, 24)}" (${Math.round(b.size)}px ${b.face}) share a line`,
     );
+  }
+  return out;
+}
+
+/** How much of the smaller of two runs of text another may cover before it
+ *  reads as drawn on top of it. */
+export const OVERLAP = 0.12;
+
+function overlaps(): string[] {
+  const seen = new Map<Element, number>();
+  const alpha = (el: Element): number => {
+    const known = seen.get(el);
+    if (known !== undefined) return known;
+    const st = getComputedStyle(el);
+    const parent = el.parentElement;
+    const a = st.display === "none" || st.visibility === "hidden" ? 0 : Number(st.opacity) * (parent ? alpha(parent) : 1);
+    seen.set(el, a);
+    return a;
+  };
+  type Run = { r: { left: number; right: number; top: number; bottom: number }; owner: Element; text: string };
+  const runs: Run[] = [];
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const text = node.textContent ?? "";
+    const first = text.search(/\S/);
+    const el = node.parentElement;
+    if (first < 0 || !el || el.closest("style, script") || alpha(el) <= 0.9) continue;
+    const range = document.createRange();
+    range.setStart(node, first);
+    range.setEnd(node, text.trimEnd().length);
+    for (const r of range.getClientRects()) {
+      if (r.width < 1 || r.height < 1) continue;
+      // The glyphs, not the line box: a line box is about 1.2em tall and
+      // neighbouring lines' boxes may touch.
+      const inset = r.height * 0.18;
+      runs.push({ r: { left: r.left, right: r.right, top: r.top + inset, bottom: r.bottom - inset }, owner: el, text: text.trim() });
+    }
+  }
+  const out: string[] = [];
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  for (const a of runs) {
+    // Partly on the page and partly off: text parked far off the page (a
+    // measuring copy) is meant to be out of sight.
+    const onPage = a.r.right > 0 && a.r.left < W && a.r.bottom > 0 && a.r.top < H;
+    if (onPage && (a.r.left < -1 || a.r.right > W + 1 || a.r.top < -1 || a.r.bottom > H + 1)) out.push(`[offpage] "${a.text.slice(0, 50)}"`);
+  }
+  const area = (r: Run["r"]) => Math.max(0, r.right - r.left) * Math.max(0, r.bottom - r.top);
+  for (let i = 0; i < runs.length; i++) {
+    for (let j = i + 1; j < runs.length; j++) {
+      const a = runs[i];
+      const b = runs[j];
+      if (a.owner === b.owner || a.owner.contains(b.owner) || b.owner.contains(a.owner)) continue;
+      const x = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left);
+      const y = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
+      if (x <= 0 || y <= 0) continue;
+      if (x * y > OVERLAP * Math.min(area(a.r), area(b.r))) out.push(`[overlap] "${a.text.slice(0, 40)}" and "${b.text.slice(0, 40)}"`);
+    }
   }
   return out;
 }

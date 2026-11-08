@@ -43,7 +43,7 @@ tables? Which join path, and does it fan out? Each guess produces a valid
 query and a plausible number:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
   (1, FALSE), (2, FALSE), (3, FALSE), (4, TRUE), (5, FALSE)
 ) AS t(customer_id, is_test);

@@ -21,6 +21,7 @@ import {
   listingHeight,
   MARK,
   MARK_BAD,
+  MARK_EDGE,
   MARK_OK,
   QMono,
   stripGeometry,
@@ -108,7 +109,7 @@ export const MovingScene: React.FC = () => {
     cols: ["frame", "covers", "rows", "avg_7"],
     rows: [
       ["ROWS 6 PRECEDING", covers(rowsStart), L.rows.n, L.rows.avg_7],
-      ["RANGE 6 DAY", covers(rangeStart), L.range.n, L.range.avg_7],
+      ["RANGE 6 days", covers(rangeStart), L.range.n, L.range.avg_7],
       ["spine, then ROWS", covers(spineStart), String(daysAcross(spineStart, lastDay)), L.spine.avg_7],
     ],
   };
@@ -120,11 +121,12 @@ export const MovingScene: React.FC = () => {
   const P = MOVING.page;
   const F = SPINE.filled;
   const out7 = q8At - 4;
-  const underList = (lines: number) => y(LIST_Y) + listingHeight(lines, SIZE) + h(22);
+  // A note under a listing keeps 40px of air below its box.
+  const underList = (lines: number) => y(LIST_Y) + listingHeight(lines, SIZE) + h(40);
   // The spine's average: the same ROWS frame, as it ran over the filled days.
   const spineAvg = SPINE.filledAvg.lines.flatMap((l, i, all) => (l.includes("AVG(daily_value) OVER") ? [l.trim(), all[i + 1].trim().replace(/,$/, "")] : []));
   if (spineAvg.length !== 2 || !spineAvg[1].startsWith("ROWS BETWEEN 6 PRECEDING")) throw new Error("the spine's average is not the ROWS frame");
-  const code: React.CSSProperties = { fontFamily: MONO, fontSize: 20, fontWeight: 600, color: BLUE_INK, whiteSpace: "pre", fontVariantLigatures: "none" };
+  const code: React.CSSProperties = { fontFamily: MONO, fontSize: 24, fontWeight: 500, color: BLUE_INK, whiteSpace: "pre", fontVariantLigatures: "none" };
 
   return (
     <AbsoluteFill>
@@ -148,8 +150,8 @@ export const MovingScene: React.FC = () => {
 
           {/* ── The metric, on the opening's thirteen days ── */}
           <Ink at={metricAt - 2} dur={12} style={{ left: X0, top: g.top - h(40), whiteSpace: "nowrap" }}>
-            <span style={label(21, INK_SOFT)}>
-              <span style={{ fontFamily: MONO, fontWeight: 600 }}>daily_metrics</span>: the video&rsquo;s own values, on user 1&rsquo;s login days
+            <span style={label(24, INK_SOFT)}>
+              <span style={{ fontFamily: MONO, fontWeight: 500 }}>daily_metrics</span>: the video&rsquo;s own values, on user 1&rsquo;s login days
             </span>
           </Ink>
           <DayStrip
@@ -163,10 +165,10 @@ export const MovingScene: React.FC = () => {
               { index, at: zerosAt + 4 + k * 3, text: "0", color: OK_INK },
             ])}
             marks={[
-              ...missing.map((index, k) => ({ index, at: missingAt + 2 + k * 2, out: thirteenthAt, color: MARK })),
-              { index: last, at: thirteenthAt + 2, out: q8At, color: MARK },
-              ...missing.map((index, k) => ({ index, at: gapsAt + k * 2, out: zerosAt + 4, color: MARK })),
-              ...missing.map((index, k) => ({ index, at: zerosAt + 4 + k * 3, out: bridgeAt, color: MARK_OK })),
+              ...missing.map((index, k) => ({ index, at: missingAt + 2 + k * 2, out: thirteenthAt, color: MARK, edge: MARK_EDGE })),
+              { index: last, at: thirteenthAt + 2, out: q8At, color: MARK, edge: MARK_EDGE },
+              ...missing.map((index, k) => ({ index, at: gapsAt + k * 2, out: zerosAt + 4, color: MARK, edge: MARK_EDGE })),
+              ...missing.map((index, k) => ({ index, at: zerosAt + 4 + k * 3, out: bridgeAt, color: MARK_OK, edge: OK })),
             ]}
             spans={[
               {
@@ -215,7 +217,7 @@ export const MovingScene: React.FC = () => {
 
           {/* The ROWS frame's short windows, and the CASE that nulls them. */}
           <Note at={shortAt} x={X0} y={underList(P.lines.length)} out={generateAt - 2}>
-            <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               the first <Num>{MOVING.full.nulled}</Num> rows have short frames:{" "}
               <span style={{ opacity: ease(frame, nullFirstAt - 2, 10) }}>null them</span>
             </div>
@@ -248,8 +250,8 @@ export const MovingScene: React.FC = () => {
             ]}
           />
           <Note at={calendarAt} x={SUM_X} y={sg.rowTop(3) + h(26)}>
-            <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>by the calendar:</div>
-            <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+            <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>by the calendar:</div>
+            <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
               {MOVING.rangeClause.replace(/\)$/, "")}
             </div>
           </Note>
@@ -259,7 +261,9 @@ export const MovingScene: React.FC = () => {
             </span>
           </Note>
 
-          {/* ── Question 8: a spine of every date, the data left-joined on ── */}
+          {/* ── Question 8: a spine of every date, the data left-joined on.
+              The spine is the page's own, generate_series in SELECT cast back
+              to date, over the thirteen days. ── */}
           <Listing
             lines={F.lines}
             x={X0}
@@ -268,14 +272,15 @@ export const MovingScene: React.FC = () => {
             size={SIZE}
             at={generateAt - 2}
             marks={[
-              { line: lineOf(F.lines, "FROM generate_series"), at: generateAt + 6 },
+              { line: lineOf(F.lines, "generate_series("), at: generateAt + 6 },
+              { line: lineOf(F.lines, "INTERVAL '1 day'"), at: generateAt + 10 },
               { line: lineOf(F.lines, "LEFT JOIN"), at: joinAt + 2 },
               { line: lineOf(F.lines, "COALESCE"), at: zerosAt + 2, color: MARK_OK },
             ]}
           />
           {/* The step the 95.0 comes from: the same frame, over the filled days. */}
           <Note at={againAt + 4} x={X0} y={underList(F.lines.length)}>
-            <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>then the same frame, over these rows:</div>
+            <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>then the same frame, over these rows:</div>
             <div style={{ ...code, marginTop: 6 }}>{`${spineAvg[0]}\n  ${spineAvg[1]}`}</div>
           </Note>
           <Note at={calendarTableAt - 2} x={SUM_X} y={sg.rowTop(3) + h(110)}>

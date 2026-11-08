@@ -130,18 +130,18 @@ export const HookScene: React.FC = () => {
         {chips.map((c, i) => (
           <React.Fragment key={i}>
             <Note at={c.at} x={chipX} y={c.y - 18} out={hookOut}>
-              <span style={{ ...note(27, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{c.text}</span>
+              <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.text}</span>
             </Note>
             <Arrow from={[arrowFromX, c.y]} to={[HOOK_X - 22, top + fnH * (0.34 + i * 0.16)]} at={c.at + 4} out={hookOut} />
           </React.Fragment>
         ))}
         <Note at={secondsAt} x={chipX} y={chips[2].y + 26} out={hookOut}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>in a few seconds</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>in a few seconds</span>
         </Note>
 
         {/* ── What reading it means ── */}
         <Note at={doesAt - 4} x={HOOK_X} y={wordsY} out={hookOut}>
-          <span style={{ display: "flex", gap: 44, fontSize: 30, ...note(30, INK), whiteSpace: "nowrap" }}>
+          <span style={{ display: "flex", gap: 44, fontSize: 28, ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mark at={doesAt}>what it does</Mark>
             <span style={{ opacity: ease(frame, assumesAt - 4, 10) }}>
               <Mark at={assumesAt}>what it assumes</Mark>

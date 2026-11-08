@@ -105,7 +105,7 @@ export const SquareScene: React.FC = () => {
               })}
             </Svg>
             <Note at={fillAt + (k === 0 ? 30 : 24)} x={g.x} y={top + side + 18}>
-              <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+              <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
                 {g.n} tokens, {g.n * g.n} pairs
               </span>
             </Note>
@@ -124,32 +124,32 @@ export const SquareScene: React.FC = () => {
         <path d={curve("quadratic")} fill="none" stroke={ACCENT} strokeWidth={3.4} pathLength={1} strokeDasharray={`${quadP} 1`} />
       </Svg>
       {Y_TICKS.map((w) => (
-        <div key={w} style={{ position: "absolute", right: 1920 - LX0 + 12, top: ly(w) - 13, opacity: ease(frame, eightAt, 12), ...note(20, INK_SOFT) }}>
+        <div key={w} style={{ position: "absolute", right: 1920 - LX0 + 12, top: ly(w) - 13, opacity: ease(frame, eightAt, 12), ...note(24, INK_SOFT) }}>
           {count(w)}×
         </div>
       ))}
       {X_TICKS.map((v) => (
         <div
           key={v}
-          style={{ position: "absolute", left: lx(v) - 40, width: 80, top: ly(1) + 12, textAlign: "center", opacity: ease(frame, eightAt, 12), ...note(20, INK_SOFT) }}
+          style={{ position: "absolute", left: lx(v) - 40, width: 80, top: ly(1) + 12, textAlign: "center", opacity: ease(frame, eightAt, 12), ...note(24, INK_SOFT) }}
         >
           {kTokens(v)}
         </div>
       ))}
       <Ink at={eightAt + 4} dur={12} style={{ left: LX0, top: ly(1) + 44, width: LX1 - LX0, textAlign: "center" }}>
-        <span style={label(20)}>Context length, in tokens (log scale)</span>
+        <span style={label(24)}>Context length, in tokens (log scale)</span>
       </Ink>
       <Note at={textAt - 2} x={LX1 + 14} y={ly(ATTENTION.lengthRatio) - 16}>
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 700, ...TABULAR, ...halo }}>{count(ATTENTION.lengthRatio)}×</span>
-        <div style={note(20, INK_SOFT)}>the text</div>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, ...TABULAR, ...halo }}>{count(ATTENTION.lengthRatio)}×</span>
+        <div style={note(24, INK_SOFT)}>the text</div>
       </Note>
       <Note at={fifteenAt - 2} x={LX1 + 14} y={ly(ATTENTION.workRatio) - 16}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, ...TABULAR, ...halo }}>{count(ATTENTION.workRatio)}×</span>
-        <div style={note(20, INK_SOFT)}>the work</div>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, ...TABULAR, ...halo }}>{count(ATTENTION.workRatio)}×</span>
+        <div style={note(24, INK_SOFT)}>the work</div>
       </Note>
       {/* Why the square is a straight line here. */}
       <Note at={fifteenAt + 10} x={LX0 + 14} y={ly(9000)}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>On log axes, a square is a line twice as steep.</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>On log axes, a square is a line twice as steep.</span>
       </Note>
       </div>
       </Drift>

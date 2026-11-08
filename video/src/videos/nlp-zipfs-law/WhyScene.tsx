@@ -88,8 +88,8 @@ export const WhyScene: React.FC = () => {
               alignItems: "center",
               justifyContent: "center",
               fontFamily: SANS,
-              fontSize: 20,
-              fontWeight: 600,
+              fontSize: 24,
+              fontWeight: 500,
               color: kept > 0 ? DATA_INK : INK,
             }}
           >
@@ -97,7 +97,7 @@ export const WhyScene: React.FC = () => {
           </div>
         );
       })}
-      <Tag x={GX} y={gridBottom + 18} at={fillAt} size={21} color={INK} weight={650}>
+      <Tag x={GX} y={gridBottom + 18} at={fillAt} size={21} color={INK} weight={500}>
         these 100 are <span style={TABULAR}>{pct(EMMA.top100Share)}</span> of the book
         <span style={{ opacity: ease(frame, seventyAt, 12), color: POINT_INK }}>
           {" "}
@@ -107,11 +107,11 @@ export const WhyScene: React.FC = () => {
 
       {/* ── Stopwords and IDF ── */}
       <Spot id="nlp-zipfs-law-sieve" at={stopwordsAt - 2} left={SPOT_X} top={y(340)} width={SPOT} height={SPOT} />
-      <Tag x={SPOT_X + SPOT / 2} y={y(340) + SPOT + 8} at={stopwordsAt + 2} align="center" size={22} color={INK} weight={650}>
+      <Tag x={SPOT_X + SPOT / 2} y={y(340) + SPOT + 8} at={stopwordsAt + 2} align="center" size={22} color={INK} weight={500}>
         drop the <Mark at={leastAt}>stopwords</Mark>
       </Tag>
       <Spot id="nlp-zipfs-law-balance" at={idfAt - 2} left={SPOT_X} top={y(640)} width={SPOT} height={SPOT} />
-      <Tag x={SPOT_X + SPOT / 2} y={y(640) + SPOT + 8} at={idfAt + 2} align="center" size={22} color={INK} weight={650} style={{ textAlign: "center" }}>
+      <Tag x={SPOT_X + SPOT / 2} y={y(640) + SPOT + 8} at={idfAt + 2} align="center" size={22} color={INK} weight={500} style={{ textAlign: "center" }}>
         IDF: <Mark at={weightAt}>more weight</Mark>
         <br />
         the <Mark at={fewerAt}>fewer documents</Mark>

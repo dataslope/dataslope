@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT } from "../../editorial/style";
+import { body, INK, INK_SOFT, SERIF_ITALIC } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -28,7 +28,7 @@ const find = (list: readonly string[], t: string) => {
 /** The call above a row, in the code face. */
 const Sub: React.FC<{ at: number; y: number; children: React.ReactNode }> = ({ at, y, children }) => (
   <Ink at={at} dur={14} style={{ left: X0, top: y, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none" }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>{children}</span>
   </Ink>
 );
 
@@ -158,11 +158,11 @@ export const TweetScene: React.FC = () => {
       </div>
 
       {/* The lesson's moral, as it is said. */}
-      <div style={{ position: "absolute", left: X0, top: y(NOTE_Y), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...body(38), color: INK, opacity: noteDim }}>
+      <div style={{ position: "absolute", left: X0, top: y(NOTE_Y), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...body(34), color: INK, opacity: noteDim }}>
         <Ink at={keepAt - 2} dur={16} style={{ position: "relative" }}>
           Keep the{" "}
           <Mark at={unitsAt}>
-            <span style={{ fontStyle: "italic" }}>units</span>
+            <span style={{ fontStyle: SERIF_ITALIC }}>units</span>
           </Mark>
         </Ink>
         <Ink at={caresAt - 4} dur={16} style={{ position: "relative" }}>

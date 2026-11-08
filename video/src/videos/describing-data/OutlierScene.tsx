@@ -103,7 +103,7 @@ export const OutlierScene: React.FC = () => {
         <Ink at={outlierFrom - 4} dur={20} out={verdictFrom - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
           An outlier is far away.
         </Ink>
-        <Ink at={allAt - 4} dur={18} out={verdictFrom - 6} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={allAt - 4} dur={18} out={verdictFrom - 6} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           Nothing more.
         </Ink>
       </div>
@@ -111,7 +111,7 @@ export const OutlierScene: React.FC = () => {
         <Ink at={verdictFrom - 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           A flag is a <Mark at={questionAt - 2}>question</Mark>,
         </Ink>
-        <Ink at={notVerdictAt - 4} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={notVerdictAt - 4} dur={18} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           not a verdict.
         </Ink>
       </div>
@@ -236,7 +236,7 @@ export const OutlierScene: React.FC = () => {
               paddingTop: RULE_GAP,
             }}
           >
-            <div style={{ ...label(26, INK), fontWeight: 700 }}>{k.title}</div>
+            <div style={{ ...label(28, INK), fontWeight: 500 }}>{k.title}</div>
             <div style={{ ...body(28), color: INK_SOFT, marginTop: 8, whiteSpace: "nowrap", opacity: Math.max(ease(frame, egAt[i] - 4, 12), acts) }}>
               {i === 2 ? (
                 <>
@@ -246,7 +246,7 @@ export const OutlierScene: React.FC = () => {
                 k.eg
               )}
             </div>
-            <div style={{ ...note(24, STAT_INK), fontWeight: 650, marginTop: 14, opacity: ease(frame, actAt[i] - 4, 12), whiteSpace: "nowrap", ...halo }}>
+            <div style={{ ...note(24, STAT_INK), fontWeight: 500, marginTop: 14, opacity: ease(frame, actAt[i] - 4, 12), whiteSpace: "nowrap", ...halo }}>
               {k.act}
             </div>
           </div>
@@ -256,7 +256,7 @@ export const OutlierScene: React.FC = () => {
       <Pulse x={160 + 1120 + 8} y={y(CARDS) + RULE_GAP + 18} at={fraudAt - 2} color={STAT} r={6} />
       <Pulse x={sx(X, 200)} y={ySpread(at(200))} at={egAt[2] - 2} color={DATA} r={7} />
       <Ink at={whyAt - 4} dur={16} style={{ left: 160, top: y(CARDS) - 56, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT) }}>First find out which it is</span>
+        <span style={{ ...label(24, INK_SOFT) }}>First find out which it is</span>
       </Ink>
     </AbsoluteFill>
   );

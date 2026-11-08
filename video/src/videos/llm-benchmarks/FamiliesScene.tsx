@@ -110,7 +110,7 @@ export const FamiliesScene: React.FC = () => {
           })}
         </Svg>
         <Ink at={fiftyAt - 2} dur={12} style={{ left: COL_X[0], top: gy(210) - 12, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(26, A_INK), fontWeight: 700 }}>
+          <span style={{ ...label(28, A_INK), fontWeight: 500 }}>
             <Count at={fiftyAt - 2} to={QUOTED.mmluSubjects} dur={18} />
           </span>
           <span style={{ ...label(24, INK), marginLeft: 10 }}>subjects</span>
@@ -121,10 +121,10 @@ export const FamiliesScene: React.FC = () => {
         <CardTitle x={COL_X[1]} top={top} at={cardAt[1]} name="GPQA Diamond" />
         <GpqaBar x={COL_X[1]} y={gy(150)} w={COL_W} at={phdAt} fill={thirtyAt} value={QUOTED.gpqaNonExpertPhd} />
         <Ink at={phdAt - 2} dur={12} style={{ left: COL_X[1], top: gy(40) - 14, width: COL_W }}>
-          <span style={{ ...note(22, INK), lineHeight: 1.25 }}>PhDs from other fields,</span>
+          <span style={{ ...note(24, INK), lineHeight: 1.25 }}>PhDs from other fields,</span>
         </Ink>
         <Ink at={webAt - 4} dur={12} style={{ left: COL_X[1], top: gy(70) - 14, width: COL_W }}>
-          <span style={{ ...note(22, INK), lineHeight: 1.25 }}>with web access</span>
+          <span style={{ ...note(24, INK), lineHeight: 1.25 }}>with web access</span>
         </Ink>
         <CardText x={COL_X[1]} top={top + h(TEXT_TOP)} lines={[[scienceAt, "Graduate-level biology,"], [scienceAt + 6, "chemistry and physics"]]} />
 
@@ -158,7 +158,7 @@ const CardTitle: React.FC<{ x: number; top: number; at: number; name: string }> 
   const { h } = useLayout();
   return (
     <Ink at={at} dur={14} style={{ left: x, top: top + h(22), whiteSpace: "nowrap" }}>
-      <span style={{ ...label(28, INK), fontWeight: 700, transform: `scale(${1 + pulse(frame, at + 10, 18) * 0.04})`, display: "inline-block" }}>
+      <span style={{ ...label(28, INK), fontWeight: 500, transform: `scale(${1 + pulse(frame, at + 10, 18) * 0.04})`, display: "inline-block" }}>
         {name}
       </span>
     </Ink>
@@ -170,7 +170,7 @@ const CardText: React.FC<{ x: number; top: number; lines: [number, string][] }> 
   <>
     {lines.map(([at, text], i) => (
       <Ink key={i} at={at - 2} dur={12} style={{ left: x, top: top + i * 31, whiteSpace: "nowrap" }}>
-        <span style={note(23, INK)}>{text}</span>
+        <span style={note(24, INK)}>{text}</span>
       </Ink>
     ))}
   </>
@@ -187,15 +187,15 @@ const GpqaBar: React.FC<{ x: number; y: number; w: number; at: number; fill: num
       <Svg opacity={t}>
         <rect x={x} y={y} width={w} height={28} rx={4} fill={PAPER} stroke={HAIRLINE} strokeWidth={1.4} />
         <rect x={x} y={y} width={(w * value * p) / 100} height={28} rx={4} fill={B} />
-        <text x={x} y={y + 58} style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
+        <text x={x} y={y + 58} style={svgText({ ...label(24, INK_SOFT), fontWeight: 500, ...TABULAR })}>
           0
         </text>
-        <text x={x + w} y={y + 58} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
+        <text x={x + w} y={y + 58} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500, ...TABULAR })}>
           100
         </text>
       </Svg>
       <Ink at={fill - 2} dur={12} style={{ left: x + (w * value) / 100 - 30, top: y - 46, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(28, INK), fontWeight: 700 }}>
+        <span style={{ ...label(28, INK), fontWeight: 500 }}>
           <Count at={fill - 6} to={value} dur={18} suffix="%" />
         </span>
       </Ink>
@@ -218,7 +218,7 @@ const SweFlow: React.FC<{ x: number; y: number; issueAt: number; patchAt: number
           borderRadius: 8,
           border: `2px solid ${i === 2 && frame >= testsAt + 6 ? OK : INK}`,
           background: PAPER,
-          ...(mono ? { fontFamily: MONO, fontSize: 21, color: INK } : { ...label(22, INK), fontWeight: 600 }),
+          ...(mono ? { fontFamily: MONO, fontSize: 24, color: INK } : { ...label(24, INK), fontWeight: 500 }),
         }}
       >
         {text}

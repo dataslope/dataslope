@@ -75,11 +75,11 @@ export const BerksonScene: React.FC = () => {
         </span>
       </Ink>
       <Note at={p === ALL ? abilityAt : at + 4} x={(p.x0 + p.x1) / 2} y={bottom + 14} from="up">
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>ability</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>ability</span>
       </Note>
       {p === ALL ? (
         <Note at={abilityAt + 6} x={p.x0 - 14} y={(top + bottom) / 2 - 14} align="right">
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>interview</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>interview</span>
         </Note>
       ) : null}
     </>
@@ -130,7 +130,7 @@ export const BerksonScene: React.FC = () => {
         <Dashed x0={c0[0]} y0={c0[1]} x1={c1[0]} y1={c1[1]} at={barAt - 6} dur={16} color={INK} width={2.4} />
         <Dashed x0={d0[0]} y0={d0[1]} x1={d1[0]} y1={d1[1]} at={getInAt - 6} dur={12} color={INK_SOFT} width={1.6} />
         <Note at={addAt - 2} x={c1[0] - 10} y={c1[1] + 18} align="right">
-          <span style={{ ...note(20, INK), fontWeight: 600, whiteSpace: "nowrap", background: PAPER, padding: "0 4px" }}>sum ≥ {BERKSON.bar}</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER, padding: "0 4px" }}>sum ≥ {BERKSON.bar}</span>
         </Note>
 
         {/* Weak interview, strong ability: the corner that remains. */}
@@ -179,19 +179,19 @@ export const BerksonScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={getInAt} x={IN.x1 + 20} y={top + 6}>
-          <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             {BERKSON.admitted.length} of {BERKSON.n} get in
           </span>
         </Note>
         <Note at={abilityInAt - 4} x={IN.x1 + 20} y={py(42) - 16}>
-          <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>weak interview,</span>
-          <div style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>so strong ability</div>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>weak interview,</span>
+          <div style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>so strong ability</div>
         </Note>
         <Note at={barAt + 8} x={ALL.x0 + 14} y={py(20) - 6}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>turned away</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>turned away</span>
         </Note>
         <Note at={customersAt - 2} x={160} y={bottom + 64}>
-          <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>
+          <span style={{ ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
             among our customers, among patients, among people who replied:{" "}
             <Marker at={dataAt - 4}>who got in?</Marker>
           </span>

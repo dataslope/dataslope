@@ -96,7 +96,7 @@ export const MiddleScene: React.FC = () => {
           })}
         </Svg>
         {R_TICKS.map((r) => (
-          <div key={r} style={{ position: "absolute", right: 1920 - CX0 + 14, top: yAt(r) - 13, opacity: ease(frame, start, 12), ...note(20, INK_SOFT) }}>
+          <div key={r} style={{ position: "absolute", right: 1920 - CX0 + 14, top: yAt(r) - 13, opacity: ease(frame, start, 12), ...note(24, INK_SOFT) }}>
             {Math.round(r * 100)}%
           </div>
         ))}
@@ -110,28 +110,28 @@ export const MiddleScene: React.FC = () => {
               top: y(C_BASE) + 12,
               textAlign: "center",
               opacity: ease(frame, start + 2, 12),
-              ...note(20, INK_SOFT),
+              ...note(24, INK_SOFT),
             }}
           >
             {p.position}
           </div>
         ))}
         <Ink at={start + 6} dur={12} style={{ left: CX0, top: y(C_BASE) + 46, width: CX1 - CX0, textAlign: "center" }}>
-          <span style={label(20)}>Where the fact sits in the context</span>
+          <span style={label(24)}>Where the fact sits in the context</span>
         </Ink>
         <Note at={startAt - 2} x={pts[0][0] + 16} y={pts[0][1] - 46}>
-          <span style={{ ...note(26, BLUE_INK), fontWeight: 650, ...halo }}>{Math.round(first.recall * 100)}%</span>
+          <span style={{ ...note(28, BLUE_INK), fontWeight: 500, ...halo }}>{Math.round(first.recall * 100)}%</span>
         </Note>
         <Note at={endAt - 2} x={pts[pts.length - 1][0] - 16} y={pts[pts.length - 1][1] - 46} align="right">
-          <span style={{ ...note(26, BLUE_INK), fontWeight: 650, ...halo }}>{Math.round(last.recall * 100)}%</span>
+          <span style={{ ...note(28, BLUE_INK), fontWeight: 500, ...halo }}>{Math.round(last.recall * 100)}%</span>
         </Note>
         <Note at={sagsAt - 2} x={xAt(worst.at)} y={yAt(worst.recall) + 22} from="up" style={{ transform: "translateX(-50%)" }}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             {Math.round(worst.recall * 100)}% halfway through
           </span>
         </Note>
         <Ink at={lostAt - 2} dur={18} style={{ left: xAt(worst.at) - 220, width: 440, top: yAt(0.87), textAlign: "center" }}>
-          <span style={{ ...headline(46, true), color: ACCENT_INK }}>Lost in the middle</span>
+          <span style={{ ...headline(46, true), color: INK }}>Lost in the middle</span>
         </Ink>
         {/* The lesson's rule: what matters goes where recall is strong. */}
         <Note at={firstLastAt - 2} x={CX0 - 40} y={y(C_BASE) + 40}>
@@ -145,7 +145,7 @@ export const MiddleScene: React.FC = () => {
           </Tag>
         </Note>
         <Note at={chaptersAt - 2} x={1490} y={y(640)} width={340}>
-          <div style={{ ...note(23, INK), fontWeight: 600 }}>The three chapters that matter, not the whole manual.</div>
+          <div style={{ ...note(24, INK), fontWeight: 500 }}>The three chapters that matter, not the whole manual.</div>
         </Note>
         <Note at={start + 30} x={1490} y={y(470)} width={340}>
           <Illustrative>Stylized heights, from the lesson. The U shape is the finding that replicates.</Illustrative>

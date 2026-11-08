@@ -250,7 +250,7 @@ export const KmeansScene: React.FC = () => {
           >
             <span
               style={{
-                ...label(21, INK),
+                ...label(24, INK),
                 whiteSpace: "nowrap",
                 background: PAPER,
                 padding: "0 6px",
@@ -288,14 +288,14 @@ export const KmeansScene: React.FC = () => {
           <Note at={placeAt + 2} x={box.left} y={box.top - h(40)}>
             <span
               style={{
-                ...label(21, INK_SOFT),
+                ...label(24, INK_SOFT),
                 ...TABULAR,
                 whiteSpace: "nowrap",
               }}
             >
               {KMEANS.x.length} points · pass {pass}
               <span
-                style={{ color: OK_INK, fontWeight: 650, opacity: settled }}
+                style={{ color: OK_INK, fontWeight: 500, opacity: settled }}
               >
                 {" "}
                 · settled
@@ -303,7 +303,7 @@ export const KmeansScene: React.FC = () => {
             </span>
           </Note>
           <Note at={roundAt} x={box.left} y={box.top + box.height + h(14)}>
-            <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               assumes round clusters of similar size
               <span
                 style={{ color: INK_SOFT, opacity: ease(frame, outlierAt, 10) }}
@@ -313,7 +313,7 @@ export const KmeansScene: React.FC = () => {
             </span>
           </Note>
           <Note at={startsAt} x={box.left} y={box.top + box.height + h(54)}>
-            <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               <Mark at={troubleAt}>run several starts, or k-means++</Mark>
               <span
                 style={{ color: INK_SOFT, opacity: ease(frame, wrongAt, 10) }}
@@ -327,8 +327,8 @@ export const KmeansScene: React.FC = () => {
           <Note at={ssAt} x={CH_X} y={y(ELBOW_TOP) - h(52)}>
             <span
               style={{
-                ...label(22, INK),
-                fontWeight: 650,
+                ...label(24, INK),
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -387,8 +387,8 @@ export const KmeansScene: React.FC = () => {
           >
             <span
               style={{
-                ...note(22, BLUE_INK),
-                fontWeight: 650,
+                ...note(24, BLUE_INK),
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -399,8 +399,8 @@ export const KmeansScene: React.FC = () => {
           <Note at={threeAt} x={at(ex, 3) + 6} y={at(ey, best.inertia) - h(58)}>
             <span
               style={{
-                ...note(22, OK_INK),
-                fontWeight: 700,
+                ...note(24, OK_INK),
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -413,7 +413,7 @@ export const KmeansScene: React.FC = () => {
             x={at(ex, 5.6)}
             y={at(ey, KMEANS.elbow[5].inertia) - h(76)}
           >
-            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
               then barely moves
             </span>
           </Note>
@@ -424,7 +424,7 @@ export const KmeansScene: React.FC = () => {
             align="right"
             from="right"
           >
-            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
               always falls: look for the bend
             </span>
           </Note>
@@ -433,8 +433,8 @@ export const KmeansScene: React.FC = () => {
           <Note at={silAt} x={CH_X} y={y(SIL_TOP) - h(54)}>
             <span
               style={{
-                ...label(22, INK),
-                fontWeight: 650,
+                ...label(24, INK),
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
@@ -442,7 +442,7 @@ export const KmeansScene: React.FC = () => {
             </span>
           </Note>
           <Note at={nearerAt} x={CH_X + 190} y={y(SIL_TOP) - h(52)}>
-            <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
               how much nearer a point sits to its own cluster
             </span>
           </Note>
@@ -478,7 +478,7 @@ export const KmeansScene: React.FC = () => {
                       textAlign: "center",
                       top: at(silY, 0) + 6,
                       opacity: p,
-                      ...label(19, INK_SOFT),
+                      ...label(24, INK_SOFT),
                       ...TABULAR,
                     }}
                   >
@@ -494,8 +494,8 @@ export const KmeansScene: React.FC = () => {
           >
             <span
               style={{
-                ...note(22, OK_INK),
-                fontWeight: 700,
+                ...note(24, OK_INK),
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}

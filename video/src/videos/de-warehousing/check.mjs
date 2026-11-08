@@ -1,7 +1,9 @@
 // Measures every number the de-warehousing video shows, in DuckDB-Wasm 1.32.0
-// (DuckDB v1.4.3), the engine the Data warehousing page's
-// <SqlCodeBlock dialect="duckdb"> blocks run in the reader's browser, and
-// writes what came back to results.json, which data.ts reads. From the repo
+// (DuckDB v1.4.3), and writes what came back to results.json, which data.ts
+// reads. The Data Engineer warehousing page's own blocks run on Postgres; this
+// video stays on DuckDB because what it measures is files (CSV against
+// Parquet, partition folders, row groups), which a columnar engine reads and
+// Postgres cannot. From the repo
 // root, where @duckdb/duckdb-wasm is installed:
 //
 //   node video/src/videos/de-warehousing/check.mjs

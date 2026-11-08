@@ -114,7 +114,7 @@ export const SnapScene: React.FC = () => {
         />
         {/* Beside the table's name, clear of the arrows that leave its rows. */}
         <Note at={sixAt} x={gl.x + 300} y={gl.top - 42}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b><Num>{SNAP.logRows}</Num> rows</b> for <Num>{SR.rows.length}</Num> orders
             <span style={{ color: INK_SOFT, opacity: ease(frame, wholeAt, 10) }}>: the whole history</span>
           </span>
@@ -132,10 +132,10 @@ export const SnapScene: React.FC = () => {
           marks={[{ row: s502, col: 1, at: cancelledAt + 2, out: thenAt }]}
         />
         <Note at={easyAt} x={gs.right + 28} y={gs.rowTop(0) + h(2)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>one row per order: easy</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>one row per order: easy</span>
         </Note>
         <Note at={paidAt} x={gs.right + 28} y={gs.rowTop(s502) + h(6)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>paid first? not here</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>paid first? not here</span>
         </Note>
 
         {/* The periodic kind: a row per order per day, still no "paid" for 502. */}
@@ -151,7 +151,7 @@ export const SnapScene: React.FC = () => {
           marks={ds502.map((row, i) => ({ row, col: dsStatus, at: cancelledAt + 6 + i * 4 }))}
         />
         <Note at={paidAt + 4} x={gds.x} y={gds.rowTop(DS.rows.length) + h(14)} out={dsOut}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             periodic: still no &ldquo;paid&rdquo; for <Num>502</Num>
           </span>
         </Note>
@@ -171,7 +171,7 @@ export const SnapScene: React.FC = () => {
           ]}
         />
         <Note at={thenAt} x={X0 + qW + 24} y={qTop + h(8)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             → <Num>502</Num>
           </span>
         </Note>
@@ -184,22 +184,25 @@ export const SnapScene: React.FC = () => {
           width={660}
           size={SIZE}
           at={rebuildAt}
-          title="rebuilt from the log (QUALIFY filters on a window)"
-          marks={[{ line: lineOf(S.lines, "QUALIFY"), at: latestAt + 2 }]}
+          title="rebuilt from the log (row 1 per order, newest first)"
+          marks={[
+            { line: lineOf(S.lines, "ORDER BY changed_at DESC"), at: latestAt + 2 },
+            { line: lineOf(S.lines, "WHERE rn = 1"), at: latestAt + 8 },
+          ]}
         />
         {latest.map((r, i) => (
           <KeyArrow key={i} from={[gl.right + 8, gl.rowMid(r)]} to={[gs.x - 10, gs.rowMid(i)]} at={latestAt + 4 + i * 6} color={OK_INK} />
         ))}
         <Note at={cantAt} x={SNAP_X + 20} y={sTop + listingHeight(S.lines.length, SIZE) + h(24)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the snapshot can&rsquo;t rebuild the log</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the snapshot can&rsquo;t rebuild the log</span>
         </Note>
 
         {/* The advice. */}
         <Note at={auditAt} x={SNAP_X + 20} y={sTop + listingHeight(S.lines.length, SIZE) + h(80)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             history must be auditable?
             <br />
-            <span style={{ color: OK_INK, fontWeight: 700, opacity: ease(frame, keepAt, 10) }}>keep the log</span>
+            <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, keepAt, 10) }}>keep the log</span>
             <span style={{ opacity: ease(frame, serveAt, 10) }}>, serve the snapshot from it</span>
           </span>
         </Note>

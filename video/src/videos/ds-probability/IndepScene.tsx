@@ -101,7 +101,7 @@ export const IndepScene: React.FC = () => {
 
         {/* ── Question 4 ── */}
         <Note at={knowAt} x={X0} y={y(320)} out={out4}>
-          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>Knowing one tells you nothing about the other.</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>Knowing one tells you nothing about the other.</span>
         </Note>
         <Ink at={ruleAt} dur={18} out={out4} style={{ left: X0, top: y(390) }}>
           <span style={math(58)}>
@@ -129,7 +129,7 @@ export const IndepScene: React.FC = () => {
             whiteSpace: "nowrap",
           }}
         >
-          <span style={{ ...note(26, INK_SOFT), display: "inline-block", width: PROD4.lead, opacity: 1 - move }}>equivalently</span>
+          <span style={{ ...note(28, INK_SOFT), display: "inline-block", width: PROD4.lead, opacity: 1 - move }}>equivalently</span>
           <span style={{ ...math(46), display: "inline-block", width: COL.w }}>
             <P>
               <V>A</V> and <V>B</V>
@@ -145,7 +145,7 @@ export const IndepScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, q5At + 14, 12) }}>independent</span>
         </Ink>
         <Note at={claimAt} x={X0} y={y(540)} out={out4}>
-          <span style={{ ...note(30, INK), fontWeight: 600, whiteSpace: "nowrap" }}>A claim to justify. These break it:</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A claim to justify. These break it:</span>
         </Note>
         <Note at={visitsAt} x={X0 + 24} y={y(600)} out={out4}>
           <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>repeat visits by the same user</span>
@@ -192,7 +192,7 @@ export const IndepScene: React.FC = () => {
           </Note>
         ))}
         <Note at={splitAt + 12} x={BARS.xs[1] + BARS.w + 20} y={barTop + 4} out={out4}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <span style={{ color: DATA }}>■</span> churned
           </span>
         </Note>
@@ -211,7 +211,7 @@ export const IndepScene: React.FC = () => {
             y={splitY(s) - 16}
             out={out4}
           >
-            <span style={{ ...label(26, INK), ...TABULAR, whiteSpace: "nowrap" }}>{pct(s)}</span>
+            <span style={{ ...label(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>{pct(s)}</span>
           </Note>
         ))}
 
@@ -280,10 +280,10 @@ export const IndepScene: React.FC = () => {
             <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, toZeroAt + 8, 12) }}>out of the one face left</span>
           </Note>
           <Note at={farAt} x={COL.x} y={y(COL.far)}>
-            <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>as far from independent as it gets</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>as far from independent as it gets</span>
           </Note>
           <Note at={neverAt - 8} x={COL.x} y={y(COL.never)}>
-            <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={neverAt}>exclusive, and each possible: never independent</Mark>
             </span>
           </Note>

@@ -77,7 +77,7 @@ export const BoxScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 5} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Comparing Integers</span>
+        <span style={label(24, ACCENT_INK)}>Comparing Integers</span>
       </Ink>
       <Ink
         at={trapAt - 6}
@@ -124,7 +124,7 @@ export const BoxScene: React.FC = () => {
         Two boxings of 127, then two of 128
       </Fig>
       <Ink at={trueAt - 8} dur={12} style={{ left: OUT_X, top: y(330) }}>
-        <span style={label(21, INK_SOFT)}>Prints</span>
+        <span style={label(24, INK_SOFT)}>Prints</span>
       </Ink>
       <Listing
         lines={L}
@@ -175,7 +175,7 @@ export const BoxScene: React.FC = () => {
         ),
       )}
       <Ink at={stillTrueAt + 8} dur={14} style={{ left: LEFT, top: top + listingHeight(L.length, SIZE) + 28 }}>
-        <span style={note(20, INK_SOFT)}>OpenJDK {JAVA_MAJOR}, default settings.</span>
+        <span style={note(24, INK_SOFT)}>OpenJDK {JAVA_MAJOR}, default settings.</span>
       </Ink>
 
       {ILLUSTRATIONS ? (

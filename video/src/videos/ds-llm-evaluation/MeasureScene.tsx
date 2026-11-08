@@ -22,7 +22,7 @@ const Verdict: React.FC<{ at: number; ok: boolean }> = ({ at: from, ok }) => {
   return (
     <span
       style={{
-        ...note(26),
+        ...note(28),
         ...badgeStyle(ok ? "green" : "red", 26),
         opacity: p,
         transform: `scale(${0.8 + 0.2 * p})`,
@@ -97,18 +97,18 @@ export const MeasureScene: React.FC = () => {
         {/* The rubric: a good reply, line by line, pass or fail, as a ruled
             list of plain text under its label. */}
         <Note at={goodAt - 2} x={CARD.x} y={y(CARD.top + 40)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700 }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>
             <span style={{ opacity: 1 - ease(frame, rubricAt, 12) }}>a good reply is</span>
           </span>
         </Note>
         <Note at={rubricAt} x={CARD.x} y={y(CARD.top + 40)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 700 }}>the rubric</span>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>the rubric</span>
         </Note>
         {lines.map((l, i) => (
           <React.Fragment key={l.text}>
             <Note at={l.at - 2} x={CARD.x} y={y(CARD.top + 80) + i * h(CARD.row)}>
               <div style={{ display: "flex", alignItems: "center", gap: 22, width: CARD.w - 60 }}>
-                <span style={{ ...note(28, INK), fontWeight: 600, flex: 1 }}>{l.text}</span>
+                <span style={{ ...note(28, INK), fontWeight: 500, flex: 1 }}>{l.text}</span>
                 <Verdict at={passAt + i * 3} ok />
                 <Verdict at={passAt + 2 + i * 3} ok={false} />
               </div>
@@ -144,13 +144,13 @@ export const MeasureScene: React.FC = () => {
           </Step>
         ))}
         <Note at={rareAt} x={STEPS_X + 58} y={y(STEPS_TOP) + h(44)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>so the rare cases are in it</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>so the rare cases are in it</span>
         </Note>
         <Note at={humansAt} x={STEPS_X + 58} y={y(STEPS_TOP) + h(STEP_ROW + 44)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>to see how much humans agree</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>to see how much humans agree</span>
         </Note>
         <Note at={noiseAt - 4} x={STEPS_X + 58} y={y(STEPS_TOP) + h(3 * STEP_ROW + 44)}>
-          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>a pass rate with no interval invites people to ship noise</span>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>a pass rate with no interval invites people to ship noise</span>
         </Note>
       </Drift>
     </AbsoluteFill>

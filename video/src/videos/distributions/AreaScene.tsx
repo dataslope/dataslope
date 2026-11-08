@@ -120,7 +120,7 @@ export const AreaScene: React.FC = () => {
           </Note>
           <YTicks ticks={[0.1, 0.2]} py={py} x0={X.x0} x1={X.x1} at={waitingAt} format={(v) => fmt(v, 1)} />
           <Ink at={waitingAt + 4} dur={12} style={{ left: X.x0 - 60, top: py(EXPONENTIAL.pdf0) - h(56), whiteSpace: "nowrap" }}>
-            <span style={label(20, INK_SOFT)}>height</span>
+            <span style={label(24, INK_SOFT)}>height</span>
           </Ink>
           <Axis scale={X} base={base} ticks={[0, 5, 10, 15, 20]} at={waitingAt - 4} />
 
@@ -131,10 +131,10 @@ export const AreaScene: React.FC = () => {
           </Svg>
           {/* Clear of the curve, to its right, over the short waits it names. */}
           <Note at={commonAt - 2} x={sx(X, 1.5)} y={py(f(0.8)) - 40} out={rangesAt}>
-            <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>short waits, common</span>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>short waits, common</span>
           </Note>
           <Note at={rareAt - 2} x={sx(X, 12.5)} y={py(f(12.5)) - 54} out={rangesAt}>
-            <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>long ones, rare</span>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>long ones, rare</span>
           </Note>
 
           {/* The area left of eight, then the part left of two lifting off. */}
@@ -167,7 +167,7 @@ export const AreaScene: React.FC = () => {
             <span style={{ ...askNote(30), whiteSpace: "nowrap" }}>P(wait = 5) = 0</span>
           </Note>
           <Note at={widthAt - 2} x={px5 + 16} y={py(f(5)) - h(150) + 80} out={rangesAt - 4}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>no width, so no area</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>no width, so no area</span>
           </Note>
 
           {/* The range's ends and its share. */}
@@ -198,7 +198,7 @@ export const AreaScene: React.FC = () => {
         {/* The height, which is not a probability. */}
         <Arrow from={[sx(X, 0.45), base - 4]} to={[sx(X, 0.45), py(f(0.45)) + 4]} at={heightAt - 6} dur={14} color={INK} width={2.4} />
         <Note at={heightAt} x={sx(X, 2.6)} y={py(0.19)}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
             the height <span style={{ opacity: ease(frame, cantAt - 2, 10) }}>is not a probability</span>
           </span>
         </Note>

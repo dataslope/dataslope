@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, body, halo, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { BLUE_INK, body, halo, INK, INK_SOFT, label, note, PAPER, SERIF_ITALIC, TABULAR } from "../../editorial/style";
 import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -72,7 +72,7 @@ const Pin: React.FC<{ x: number; base: number; text: string; id: number; at: num
         }}
       >
         <TokenChip text={text} size={28} border={glow > 0.05 ? POINT : INK} />
-        <span style={{ ...note(24, tone), fontWeight: 650, ...TABULAR }}>{id}</span>
+        <span style={{ ...note(24, tone), fontWeight: 500, ...TABULAR }}>{id}</span>
       </div>
       <Svg opacity={p}>
         <line x1={x} x2={x} y1={base - 34} y2={base - 6} stroke={INK_SOFT} strokeWidth={1.6} />
@@ -115,7 +115,7 @@ const Span: React.FC<{ x0: number; x1: number; y: number; at: number; up?: boole
           transform: "translateX(-50%)",
           opacity: ease(frame, at + 8, 12),
           ...note(24, POINT_INK),
-          fontWeight: 650,
+          fontWeight: 500,
           whiteSpace: "nowrap",
           ...TABULAR,
         }}
@@ -148,7 +148,7 @@ const TableRow: React.FC<{ top: number; id: number; text: string; at: number; fi
   if (p <= 0) return null;
   return (
     <div style={{ position: "absolute", left: X0, top, opacity: p * (1 - d), display: "flex", alignItems: "center" }}>
-      <span style={{ ...note(26, INK), fontWeight: 650, width: 130, ...TABULAR }}>{id}</span>
+      <span style={{ ...note(28, INK), fontWeight: 500, width: 130, ...TABULAR }}>{id}</span>
       <span style={{ width: CELLS_X - X0 - 130 }}>
         <TokenChip text={text} size={26} border={strong ? DATA : INK} />
       </span>
@@ -176,7 +176,7 @@ const TableRow: React.FC<{ top: number; id: number; text: string; at: number; fi
 };
 
 const VDots: React.FC<{ top: number; at: number }> = ({ top, at }) => (
-  <Fade at={at} style={{ left: X0 + 40, top, ...note(30, FAINT), lineHeight: 1 }}>
+  <Fade at={at} style={{ left: X0 + 40, top, ...note(28, FAINT), lineHeight: 1 }}>
     ⋮
   </Fade>
 );
@@ -243,7 +243,7 @@ export const IdsScene: React.FC = () => {
           {TICKS.map((t, i) => (
             <g key={t} opacity={ease(frame, hookFrom + 6 + i * 3, 10)}>
               <line x1={idX(t)} x2={idX(t)} y1={LY} y2={LY + 8} stroke={INK} strokeWidth={1.4} />
-              <text x={idX(t)} y={LY + 34} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT }}>
+              <text x={idX(t)} y={LY + 34} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
                 {thousands(t)}
               </text>
             </g>
@@ -288,7 +288,7 @@ export const IdsScene: React.FC = () => {
       <Drift from={swapAt} to={end} amount={0.014} origin="30% 60%">
         <FigLabel n="2" title="An embedding table, one row per token id" at={swapAt} x={X0} y={y(FIG_Y)} />
         <Fade at={tableAt} style={{ left: X0, top: y(360) }}>
-          <div style={{ display: "flex", ...label(21, INK_SOFT) }}>
+          <div style={{ display: "flex", ...label(24, INK_SOFT) }}>
             <span style={{ width: 130 }}>Id</span>
             <span style={{ width: CELLS_X - X0 - 130 }}>Token</span>
             <span>Embedding</span>
@@ -310,7 +310,7 @@ export const IdsScene: React.FC = () => {
           </span>
         </Note>
         <Note at={embeddingAt - 2} x={CELLS_X} y={rowB - 62}>
-          <span style={{ ...label(22, BLUE_INK) }}>Berry&apos;s embedding</span>
+          <span style={{ ...label(24, BLUE_INK) }}>Berry&apos;s embedding</span>
         </Note>
         <Note at={learnedAt - 2} x={CELLS_X} y={rowC + 70}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Every row learned in training</span>
@@ -408,7 +408,7 @@ export const SpaceScene: React.FC = () => {
       {/* ── Fig. 3: the lesson's table ── */}
       <FigLabel n="4" title="The lesson's tiny embedding space" at={tinyAt - 6} x={X0} y={y(FIG_Y)} />
       <Fade at={tinyAt - 2} style={{ left: 0, top: y(366), width: 1000 }}>
-        <div style={{ position: "relative", height: 30, ...label(21, INK_SOFT) }}>
+        <div style={{ position: "relative", height: 30, ...label(24, INK_SOFT) }}>
           {SPACE.axes.map((ax, i) => (
             <span key={ax} style={{ position: "absolute", left: VEC_X[i] - 12, opacity: 1 - unnamed * 0.75 }}>
               <Mark at={namedAt + i * 4} out={noNamesAt}>
@@ -435,7 +435,7 @@ export const SpaceScene: React.FC = () => {
               <TokenChip text={w.word} size={24} border={glow > 0.05 ? POINT : w.word === "cat" ? DATA : INK} />
             </div>
             {w.vec.map((v, j) => (
-              <span key={j} style={{ position: "absolute", left: VEC_X[j], top: 14, fontFamily: MONO, fontWeight: 600, fontSize: 26, color: INK }}>
+              <span key={j} style={{ position: "absolute", left: VEC_X[j], top: 14, fontFamily: MONO, fontWeight: 500, fontSize: 28, color: INK }}>
                 {v.toFixed(1)}
               </span>
             ))}
@@ -446,8 +446,8 @@ export const SpaceScene: React.FC = () => {
                 top: 14,
                 opacity: ease(frame, dAt - 2, 10),
                 fontFamily: MONO,
-                fontWeight: 700,
-                fontSize: 26,
+                fontWeight: 500,
+                fontSize: 28,
                 color: w.word === "cat" ? INK_SOFT : near === 0 ? POINT_INK : INK,
                 ...TABULAR,
               }}
@@ -468,23 +468,23 @@ export const SpaceScene: React.FC = () => {
 
       {/* Under the table: the sentence that generalizes, then dimension 1,847. */}
       <Fade at={catSatAt - 6} out={notesOut} style={{ left: X0, top: y(800) }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 22, ...body(32), color: INK, whiteSpace: "nowrap" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 22, ...body(34), color: INK, whiteSpace: "nowrap" }}>
           <span>
             the <Mark at={catSatAt}>cat</Mark> sat on the mat
           </span>
-          <span style={{ fontStyle: "italic", color: INK_SOFT }}>seen in training</span>
+          <span style={{ fontStyle: SERIF_ITALIC, color: INK_SOFT }}>seen in training</span>
         </div>
       </Fade>
       <Fade at={dogSatAt - 4} out={notesOut} style={{ left: X0, top: y(860) }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 22, ...body(32), color: INK, whiteSpace: "nowrap" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 22, ...body(34), color: INK, whiteSpace: "nowrap" }}>
           <span>
             the <Mark at={dogSatAt}>dog</Mark> sat on the mat
           </span>
-          <span style={{ fontStyle: "italic", color: POINT_INK, opacity: ease(frame, halfAt - 2, 10) }}>half handled already</span>
+          <span style={{ fontStyle: SERIF_ITALIC, color: POINT_INK, opacity: ease(frame, halfAt - 2, 10) }}>half handled already</span>
         </div>
       </Fade>
       <Fade at={dimensionAt - 4} style={{ left: X0, top: y(800) }}>
-        <div style={{ ...label(21, INK_SOFT), marginBottom: 12 }}>A real model&apos;s vector</div>
+        <div style={{ ...label(24, INK_SOFT), marginBottom: 12 }}>A real model&apos;s vector</div>
         <div style={{ display: "flex", alignItems: "flex-end" }}>
           {Array.from({ length: 22 }, (_, i) => {
             const hot = i === 13;
@@ -502,11 +502,11 @@ export const SpaceScene: React.FC = () => {
               />
             );
           })}
-          <span style={{ ...note(26, INK_SOFT), marginLeft: 8 }}>…</span>
+          <span style={{ ...note(28, INK_SOFT), marginLeft: 8 }}>…</span>
         </div>
       </Fade>
       <Note at={dimensionAt + 6} x={X0 + 13 * 36 - 30} y={y(800) + 112} from="up">
-        <span style={{ ...note(22, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>dimension 1,847: no name</span>
+        <span style={{ ...note(24, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>dimension 1,847: no name</span>
       </Note>
 
       {/* ── Fig. 4: the same five words as points in the cube ── */}
@@ -533,10 +533,10 @@ export const SpaceScene: React.FC = () => {
           const [tx, ty] = P(end3);
           return (
             <g key={ax}>
-              <text x={tx} y={ty + 7} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 650, fill: INK_SOFT, opacity: 1 - unnamed }}>
+              <text x={tx} y={ty + 7} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT, opacity: 1 - unnamed }}>
                 {ax}
               </text>
-              <text x={tx} y={ty + 8} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 26, fontWeight: 700, fill: POINT_INK, opacity: unnamed }}>
+              <text x={tx} y={ty + 8} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 28, fontWeight: 500, fill: POINT_INK, opacity: unnamed }}>
                 ?
               </text>
             </g>
@@ -594,8 +594,8 @@ export const SpaceScene: React.FC = () => {
               top: yy - 16,
               opacity: p,
               fontFamily: MONO,
-              fontWeight: 600,
-              fontSize: 22,
+              fontWeight: 500,
+              fontSize: 24,
               lineHeight: 1.2,
               color: INK,
               whiteSpace: "nowrap",
@@ -733,7 +733,7 @@ export const OrderScene: React.FC = () => {
       <FigLabel n="5" title="Dog bites man, and man bites dog" at={orderAt - 4} x={X0} y={y(FIG_Y)} />
       <Fade at={sitsAt - 4} style={{ left: 0, top: y(366), width: 1920 }}>
         {SLOT_X.map((x, i) => (
-          <span key={i} style={{ position: "absolute", left: x, transform: "translateX(-50%)", ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span key={i} style={{ position: "absolute", left: x, transform: "translateX(-50%)", ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             Slot {i + 1}
           </span>
         ))}
@@ -790,12 +790,12 @@ export const OrderScene: React.FC = () => {
         </svg>
       </Fade>
       <Note at={identicalAt - 2} out={sumOut} x={SLOT_X[2] + 180} y={row1 + 50 + (row2 - row1) / 2 - 16}>
-        <span style={{ ...note(26, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>identical, as bags</span>
+        <span style={{ ...note(28, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>identical, as bags</span>
       </Note>
 
       {/* Where each token sits: the lesson's position signal, added slot by slot. */}
       <Fade at={mixesAt + 2} dim={nowAt} style={{ left: 0, top: posRow, width: 1920 }}>
-        <span style={{ position: "absolute", left: X0, top: -36, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ position: "absolute", left: X0, top: -36, ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
           + position, added to both rows
         </span>
         {ORDER.position.map((v, i) => (
@@ -805,13 +805,13 @@ export const OrderScene: React.FC = () => {
         ))}
       </Fade>
       <Note at={differentAt - 2} x={SUM_X - 40} y={row1 + 56}>
-        <div style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          <span style={{ color: POINT_INK, fontWeight: 650 }}>Dog</span>, first: {p1[0].vec.map((v) => v.toFixed(1)).join(", ")}
+        <div style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ color: POINT_INK, fontWeight: 500 }}>Dog</span>, first: {p1[0].vec.map((v) => v.toFixed(1)).join(", ")}
         </div>
       </Note>
       <Note at={lastAt - 2} x={SUM_X - 40} y={row2 + 56}>
-        <div style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          <span style={{ color: POINT_INK, fontWeight: 650 }}>Dog</span>, last: {p2[2].vec.map((v) => v.toFixed(1)).join(", ")}
+        <div style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ color: POINT_INK, fontWeight: 500 }}>Dog</span>, last: {p2[2].vec.map((v) => v.toFixed(1)).join(", ")}
         </div>
       </Note>
       <Svg opacity={ease(frame, measureAt - 2, 12) * 0.9}>
@@ -835,7 +835,7 @@ export const OrderScene: React.FC = () => {
         })()}
       </Svg>
       <Note at={closeAt} x={SLOT_X[0] + 30} y={row1 + 150}>
-        <span style={{ ...note(24, POINT_INK), fontWeight: 650, ...halo }}>how close?</span>
+        <span style={{ ...note(24, POINT_INK), fontWeight: 500, ...halo }}>how close?</span>
       </Note>
     </AbsoluteFill>
   );

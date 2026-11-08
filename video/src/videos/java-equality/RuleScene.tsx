@@ -38,7 +38,7 @@ export const RuleScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 5} dur={14} style={{ left: LEFT + 4, top: y(262) }}>
-        <span style={label(22, ACCENT_INK)}>The rule</span>
+        <span style={label(24, ACCENT_INK)}>The rule</span>
       </Ink>
 
       <Ink at={eqAt - 4} dur={16} style={{ ...codeCell, top: y(330) }}>
@@ -66,7 +66,7 @@ export const RuleScene: React.FC = () => {
         <Code line="a.equals(b)" size={CODE} />
       </Ink>
       <Ink at={contentsAt} dur={22} style={{ left: TEXT_X, top: y(584), width: TEXT_W }}>
-        <div style={{ ...headline(64, true), color: ACCENT_INK, lineHeight: 1.1 }}>
+        <div style={{ ...headline(64, true), color: INK, lineHeight: 1.1 }}>
           to compare <Marked p={markP(frame, dotAt)}>contents</Marked>
           <After>.</After>
         </div>

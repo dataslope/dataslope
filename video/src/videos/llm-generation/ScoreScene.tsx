@@ -70,7 +70,7 @@ export const ScoreScene: React.FC = () => {
   // "A gap of one point one": between the ends of dog's and cat's score bars.
   const gapX = [ZERO + LOGITS[1] * UNIT, ZERO + LOGITS[0] * UNIT] as const;
   const gapY = rowMid(0) - h(BAR_H) / 2 - 12;
-  const drawY = y(806);
+  const drawY = y(824);
 
   return (
     <AbsoluteFill>
@@ -110,10 +110,10 @@ export const ScoreScene: React.FC = () => {
 
       {/* Column heads. */}
       <Ink at={logitAt - 2} dur={14} style={{ left: ZERO - 80, top: y(380) }}>
-        <span style={label(21)}>Score, or logit</span>
+        <span style={label(24)}>Score, or logit</span>
       </Ink>
       <Ink at={softAt + 6} dur={14} style={{ left: P0, top: y(380) }}>
-        <span style={label(21)}>Probability</span>
+        <span style={label(24)}>Probability</span>
       </Ink>
 
       {/* The band behind the row being read out. */}
@@ -134,10 +134,11 @@ export const ScoreScene: React.FC = () => {
         <line x1={ZERO} x2={ZERO} y1={top} y2={top + (bottom - top) * ease(frame, scoreAt, 18)} stroke={INK} strokeWidth={1.6} />
       </Svg>
       <Note at={scoreAt + 6} x={ZERO} y={bottom + 8} from="up" style={{ transform: "translateX(-50%)" }}>
-        <span style={note(20, INK_SOFT)}>0</span>
+        <span style={note(24, INK_SOFT)}>0</span>
       </Note>
-      <Note at={scoreAt + 18} x={160} y={bottom + 24}>
-        <span style={note(20, INK_SOFT)}>…and every other token in the vocabulary</span>
+      {/* Below the zero line's own label, not beside it. */}
+      <Note at={scoreAt + 18} x={160} y={bottom + 46}>
+        <span style={note(24, INK_SOFT)}>…and every other token in the vocabulary</span>
       </Note>
 
       {TOKENS.map((_, i) => {
@@ -166,12 +167,12 @@ export const ScoreScene: React.FC = () => {
               align={v >= 0 ? "left" : "right"}
               y={rowMid(i) - 15}
             >
-              <span style={{ ...note(23, TEXT[i]), fontWeight: 650 }}>
+              <span style={{ ...note(24, TEXT[i]), fontWeight: 500 }}>
                 {scoreMark === undefined ? signed(v) : <Marked at={scoreMark + 2}>{signed(v)}</Marked>}
               </span>
             </Note>
             <Note at={dividesAt + i * 4 + 14} x={P0 + (P1 - P0) * p + 14} y={rowMid(i) - 15}>
-              <span style={{ ...note(23, TEXT[i]), fontWeight: 650 }}>
+              <span style={{ ...note(24, TEXT[i]), fontWeight: 500 }}>
                 {markAt === undefined ? pct(p) : <Marked at={markAt - 2}>{pct(p)}</Marked>}
               </span>
             </Note>
@@ -189,7 +190,7 @@ export const ScoreScene: React.FC = () => {
         />
       </Svg>
       <Note at={gapAt - 2} x={(gapX[0] + gapX[1]) / 2} y={gapY - 32} from="up" style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...note(21, INK), fontWeight: 650 }}>gap {signed(LOGITS[0] - LOGITS[1])}</span>
+        <span style={{ ...note(24, INK), fontWeight: 500 }}>gap {signed(LOGITS[0] - LOGITS[1])}</span>
       </Note>
 
       {/* "Three times dog's share": a bracket beside the cat and dog bars. */}
@@ -202,18 +203,18 @@ export const ScoreScene: React.FC = () => {
         />
       </Svg>
       <Note at={threeAt - 2} x={ratioX + 14} y={(rowMid(0) + rowMid(1)) / 2 - 16}>
-        <span style={{ ...note(23, INK), fontWeight: 700 }}>{CAT_OVER_DOG.toFixed(1)}×</span>
+        <span style={{ ...note(24, INK), fontWeight: 500 }}>{CAT_OVER_DOG.toFixed(1)}×</span>
       </Note>
 
       {/* Softmax: from the scores to the probabilities. */}
       <Ink at={softAt - 4} dur={14} style={{ left: ARROW_X[0], width: ARROW_X[1] - ARROW_X[0], top: mid - 56, textAlign: "center" }}>
-        <span style={{ ...note(28, INK), fontWeight: 600 }}>
+        <span style={{ ...note(28, INK), fontWeight: 500 }}>
           <Mono>softmax</Mono>
         </span>
       </Ink>
       <Arrow from={[ARROW_X[0], mid]} to={[ARROW_X[1], mid]} at={softAt} />
       <Ink at={raisesAt - 2} dur={16} style={{ left: ARROW_X[0] - 30, width: ARROW_X[1] - ARROW_X[0] + 60, top: mid + 18, textAlign: "center" }}>
-        <span style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>
+        <span style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>
           e<sup style={{ fontSize: "0.68em" }}>score</sup> ÷ total
         </span>
       </Ink>
@@ -228,7 +229,7 @@ export const ScoreScene: React.FC = () => {
             padding: "10px 20px",
             background: `color-mix(in srgb, ${INK} 5%, ${PAPER})`,
             borderTop: `2px solid ${INK}`,
-            ...note(26, INK),
+            ...note(28, INK),
             whiteSpace: "nowrap",
           }}
         >
@@ -236,7 +237,7 @@ export const ScoreScene: React.FC = () => {
         </div>
       </Ink>
       <Ink at={pickingAt - 4} dur={12} style={{ left: X0, top: drawY - 42 }}>
-        <span style={label(20)}>The sampler, three runs</span>
+        <span style={label(24)}>The sampler, three runs</span>
       </Ink>
       {DRAWS_T1.slice(0, 3).map((tok, k) => (
         <Note key={k} at={drawAt(k)} x={X0 + 590 + k * 150} y={drawY - 2} from="up">
@@ -248,8 +249,8 @@ export const ScoreScene: React.FC = () => {
               padding: "6px 14px",
               background: TINT[tok],
               borderBottom: `4px solid ${FILL[tok]}`,
-              ...note(26, TEXT[tok]),
-              fontWeight: 650,
+              ...note(28, TEXT[tok]),
+              fontWeight: 500,
             }}
           >
             {TOKENS[tok]}
@@ -259,13 +260,13 @@ export const ScoreScene: React.FC = () => {
       <Arrow from={[X0 + 506, drawY + 26]} to={[X0 + 572, drawY + 26]} at={drawAt(0) - 6} dur={10} />
       {/* The first draw is the 21.6% token: drawn, not picked. */}
       <Note at={diffAt - 2} x={X0 + 590} y={drawY + 62}>
-        <span style={{ ...note(21, TEXT[DRAWS_T1[0]]), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, TEXT[DRAWS_T1[0]]), fontWeight: 500, whiteSpace: "nowrap" }}>
           {pct(AT_T1.probs[DRAWS_T1[0]])}, drawn anyway
         </span>
       </Note>
 
       <Note at={softAt + 8} x={1240} y={drawY - 4} width={560}>
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Illustrative scores: the lesson&apos;s own four-token example, not a real model&apos;s output.
         </span>
       </Note>

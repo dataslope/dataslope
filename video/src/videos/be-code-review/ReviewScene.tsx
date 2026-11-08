@@ -50,7 +50,7 @@ const Pair: React.FC<{ name: string; value: string; ink?: string; size?: number 
 
 /** A word set beside a line it classifies, as plain text. */
 const Kind: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{children}</span>
+  <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{children}</span>
 );
 
 /**
@@ -198,7 +198,7 @@ export const ReviewScene: React.FC = () => {
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} size={60} width={1300}>
           How do you review code an assistant wrote?
         </QuestionCard>
-        <Ink at={strangerAt} dur={18} style={{ left: 96, top: y(232), ...body(36, true), color: INK, whiteSpace: "nowrap" }}>
+        <Ink at={strangerAt} dur={18} style={{ left: 96, top: y(232), ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
           Like a pull request from a capable stranger.
         </Ink>
         <Spot id="be-code-review-clipboard" at={c1At} out={lastAt - 10} left={1690} top={122} width={116} height={165} />
@@ -235,7 +235,7 @@ export const ReviewScene: React.FC = () => {
           +{tests.length}
         </FileTab>
         <Note at={backAt} x={LIST_X + 620} y={top - 44} out={testsIn}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>as it arrived, before it shipped</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>as it arrived, before it shipped</span>
         </Note>
         <DiffListing
           lines={fn}
@@ -300,7 +300,7 @@ export const ReviewScene: React.FC = () => {
           <Pair name="returns" value={REVIEW.contained.repr ?? ""} ink={ACCENT_INK} />
         </Note>
         <Note at={shrankAt} x={R_X} y={cTop + 244} out={rOut}>
-          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             <Mark at={shrankAt + 4} color={MARK_BAD}>
               the merge shrank it
             </Mark>
@@ -321,7 +321,7 @@ export const ReviewScene: React.FC = () => {
         />
         {["this code", "correct"].map((t, j) => (
           <Note key={t} at={firstAt - 4} x={verdictX[j] - 60} y={top - 44} out={fixIn}>
-            <span style={{ ...label(21, INK_SOFT), display: "inline-block", width: 120, textAlign: "center", whiteSpace: "nowrap" }}>{t}</span>
+            <span style={{ ...label(24, INK_SOFT), display: "inline-block", width: 120, textAlign: "center", whiteSpace: "nowrap" }}>{t}</span>
           </Note>
         ))}
         {ARRIVED.tests.map((t, i) => {
@@ -411,12 +411,12 @@ export const ReviewScene: React.FC = () => {
           })}
         />
         <Note at={obviousAt + 10} x={LIST_X + 920} y={gridTop + 34 + 4} out={followAt - 6}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>touched none of them</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>touched none of them</span>
         </Note>
 
         {/* ── The follow-up: is the end inclusive? ── */}
         <Note at={pastIn} x={120} y={top - 6}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             closed: <Py text={REVIEW.touching.arg} size={22} />
           </span>
         </Note>
@@ -432,10 +432,10 @@ export const ReviewScene: React.FC = () => {
           points={[{ v: touchIn[1][0], dy: 37, at: pastIn + 16, r: 26 }]}
         />
         <Note at={pastIn + 10} x={120} y={top + 158}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>both hold 2: they touch</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>both hold 2: they touch</span>
         </Note>
         <Note at={slotsAt} x={120} y={top + 230}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>half-open: booking slots</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>half-open: booking slots</span>
         </Note>
         <NumberLine
           x={150}
@@ -451,10 +451,10 @@ export const ReviewScene: React.FC = () => {
           ]}
         />
         <Note at={overlapAt} x={120} y={top + 388}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>10 is in the second slot only: no overlap</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>10 is in the second slot only: no overlap</span>
         </Note>
         <Note at={askAt} x={LIST_X} y={gridTop + 6} out={addedAt - 6}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             ask: <Mark at={askAt + 8}>is the end inclusive?</Mark>
             <FadeIn at={writeDownAt}> Then write the answer down as a test.</FadeIn>
           </span>
@@ -462,7 +462,7 @@ export const ReviewScene: React.FC = () => {
 
         {/* ── What the sort costs ── */}
         <Note at={onePassAt} x={LIST_X + fnW + 40} y={top + lineTop(sortedRow, SIZE) - 2}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <span style={{ color: INK_SOFT }}>one pass</span>
             <FadeIn at={nlognAt - 2}>
               {" "}→{" "}
@@ -473,7 +473,7 @@ export const ReviewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={costAt} x={LIST_X + fnW + 40} y={top + lineTop(sortedRow, SIZE) + 46}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>what the fix costs</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>what the fix costs</span>
         </Note>
         <NextLine at={nextAt} x={LIST_X} y={gridTop + 40} width={1140}>
           algorithms as reasoning

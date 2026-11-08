@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
 import { Ink, Num, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -91,10 +91,10 @@ export const SeriesScene: React.FC = () => {
           <Ink at={elevenAt - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
             Eleven videos,
           </Ink>
-          <Ink at={totalAt} dur={18} style={{ position: "relative", ...headline(62, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+          <Ink at={totalAt} dur={18} style={{ position: "relative", ...headline(62, true), color: INK, whiteSpace: "nowrap" }}>
             {QUESTIONS} questions,
           </Ink>
-          <Ink at={onceAt} dur={18} style={{ position: "relative", ...headline(62, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+          <Ink at={onceAt} dur={18} style={{ position: "relative", ...headline(62, true), color: INK, whiteSpace: "nowrap" }}>
             each answered once.
           </Ink>
         </div>
@@ -188,7 +188,7 @@ export const SeriesScene: React.FC = () => {
                     top: 8,
                     textAlign: "center",
                     ...label(24, PAPER),
-                    fontWeight: 700,
+                    fontWeight: 500,
                     opacity: ease(frame, growAt(i) + 14, 10),
                   }}
                 >
@@ -206,10 +206,10 @@ export const SeriesScene: React.FC = () => {
                   transform: `translateY(${(1 - pIn) * 10}px)`,
                 }}
               >
-                <div style={label(19, BLUE_INK)}>
+                <div style={label(24, BLUE_INK)}>
                   Part <Num>{p.n}</Num>
                 </div>
-                <div style={{ ...note(21, INK), fontWeight: 650, marginTop: 2, lineHeight: 1.15, textWrap: "balance" }}>{p.title}</div>
+                <div style={{ ...note(24, INK), fontWeight: 500, marginTop: 2, lineHeight: 1.15, textWrap: "balance" }}>{p.title}</div>
               </div>
               <Spot
                 video={p.video}
@@ -266,7 +266,7 @@ export const SeriesScene: React.FC = () => {
             opacity: ease(frame, bankAt - 2, 10) * (1 - ease(frame, nextAt - 16, 10)),
           }}
         >
-          A bank of <span style={{ fontWeight: 650 }}>{BANK} multiple-choice questions</span>, for the whole track
+          A bank of <span style={{ fontWeight: 500 }}>{BANK} multiple-choice questions</span>, for the whole track
         </div>
 
         <NextLine at={nextAt} x={LEFT} y={y(LINE_Y) + h(6)} width={1000}>

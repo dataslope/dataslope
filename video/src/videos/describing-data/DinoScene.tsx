@@ -130,7 +130,7 @@ export const DinoScene: React.FC = () => {
         <Ink at={dinoFrom - 4} dur={20} out={lossyFrom - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Same numbers.
         </Ink>
-        <Ink at={plotAt - 2} dur={18} out={lossyFrom - 6} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={plotAt - 2} dur={18} out={lossyFrom - 6} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           Different pictures.
         </Ink>
       </div>
@@ -221,8 +221,8 @@ export const DinoScene: React.FC = () => {
           return (
             <div key={r.key} style={{ position: "absolute", left: 1000, top, width: 470, opacity: p, transform: `translateX(${(1 - p) * 18}px)`, display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: `1px solid ${HAIRLINE}`, paddingBottom: 10 }}>
               {/* A row reads as one line: name and value at one size, the value in weight. */}
-              <span style={{ ...label(27, INK), fontWeight: 560 }}>{r.name}</span>
-              <span style={{ ...note(27, INK), ...TABULAR, fontWeight: 700 }}>
+              <span style={{ ...label(28, INK), fontWeight: 500 }}>{r.name}</span>
+              <span style={{ ...note(28, INK), ...TABULAR, fontWeight: 500 }}>
                 <Mark at={hundredthAt - 2 + i * 2} out={plotAt + 10}>
                   {stat(stats[r.key])}
                 </Mark>
@@ -259,20 +259,20 @@ export const DinoScene: React.FC = () => {
 
       {/* The credit. */}
       <Ink at={cairoAt - 2} dur={16} style={{ left: 1000, top: y(860), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(21, INK_SOFT), ...halo }}>The dinosaur: Alberto Cairo.</span>
+        <span style={{ ...note(24, INK_SOFT), ...halo }}>The dinosaur: Alberto Cairo.</span>
       </Ink>
       <Ink at={yearAt - 2} dur={16} style={{ left: 1000, top: y(860) + 32, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(21, INK_SOFT), ...halo }}>
+        <span style={{ ...note(24, INK_SOFT), ...halo }}>
           The other twelve, 2017: <span style={{ opacity: ease(frame, justinAt - 4, 12) }}>Justin Matejka and George Fitzmaurice.</span>
         </span>
       </Ink>
       <Ink at={meansAt - 8} dur={16} style={{ left: 1000, top: y(410) - 50, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT) }}>
+        <span style={{ ...label(24, INK_SOFT) }}>
           Five numbers, <Mark at={numbersAt - 2} out={numbersAt + 50}>the same for all thirteen</Mark>
         </span>
       </Ink>
       <Ink at={choicesAt - 4} dur={16} style={{ left: 200, top: y(920), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK) }}>But drawing one means choosing how.</span>
+        <span style={{ ...label(24, INK) }}>But drawing one means choosing how.</span>
       </Ink>
     </AbsoluteFill>
   );

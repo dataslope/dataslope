@@ -14,7 +14,7 @@ tells you exactly which idea to revisit.
 />
 
 Work through a section, then read the matching topic page for the long-form
-reasoning. The SQL targets DuckDB, as the runnable challenges elsewhere on
+reasoning. The SQL targets PostgreSQL, as the runnable challenges elsewhere on
 this track do, and is standard except where a question says otherwise.
 
 ## Advanced SQL
@@ -176,16 +176,16 @@ this track do, and is standard except where a question says otherwise.
 />
 
 <MultipleChoice
-  markdown={`Which DuckDB expression produces one row per day for January 2026?
+  markdown={`Which Postgres expression produces one row per day for January 2026?
 
 - \`SELECT DATE '2026-01-01' + 31\`
   > This computes a single date, not a series.
-- \`SELECT RANGE(31)\`
-  > \`range\` yields integers, which still need converting into dates.
+- \`SELECT generate_series(1, 31)\`
+  > This yields the integers 1 to 31, which still need converting into dates.
 - \`SELECT * FROM dates WHERE month = 1\`, against an existing dates table.
   > This assumes a dates table already exists, which is the thing being built.
-- [o] \`SELECT unnest(generate_series(DATE '2026-01-01', DATE '2026-01-31', INTERVAL 1 DAY))\`
-  > \`generate_series\` returns the list and \`unnest\` expands it into rows. Postgres offers \`generate_series\` returning rows directly; BigQuery uses \`GENERATE_DATE_ARRAY\`.`}
+- [o] \`SELECT generate_series(DATE '2026-01-01', DATE '2026-01-31', INTERVAL '1 day')::date\`
+  > \`generate_series\` returns one row per step. Given dates and an interval it returns timestamps, so the cast brings each row back to a date. DuckDB's scalar form returns a list that needs \`unnest\`; BigQuery uses \`GENERATE_DATE_ARRAY\`.`}
 />
 
 <MultipleChoice

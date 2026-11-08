@@ -50,7 +50,7 @@ const Rdd: React.FC<{ c: Ctx }> = ({ c }) => {
   ];
   return (
     <>
-      <Line at={objAt - 2} top={c.y(350)} size={27} weight={700}>
+      <Line at={objAt - 2} top={c.y(350)} size={27} weight={500}>
         RDD
       </Line>
       {[0, 1, 2, 3].map((k) => (
@@ -68,8 +68,8 @@ const Rdd: React.FC<{ c: Ctx }> = ({ c }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            ...label(22, PAPER),
-            fontWeight: 800,
+            ...label(24, PAPER),
+            fontWeight: 500,
           }}
         >
           ?
@@ -78,7 +78,7 @@ const Rdd: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={seeAt - 2} x={R_X + 410} top={c.y(352)} color={INK_SOFT} size={23}>
         objects Spark can&apos;t see inside
       </Line>
-      <Line at={dfAt - 2} top={c.y(436)} size={27} weight={700}>
+      <Line at={dfAt - 2} top={c.y(436)} size={27} weight={500}>
         DataFrame
       </Line>
       <Note at={dfAt + 4} x={R_X + 180} y={c.y(434)}>
@@ -96,7 +96,7 @@ const Rdd: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ opacity: ease(frame, pruneAt, 10) }}> prune columns,</span>
         <span style={{ opacity: ease(frame, codeAt, 10) }}> generate code</span>
       </Line>
-      <Line at={preferAt - 2} top={c.y(580)} size={26} color={OK_INK} weight={700}>
+      <Line at={preferAt - 2} top={c.y(580)} size={26} color={OK_INK} weight={500}>
         Prefer DataFrames
         <span style={{ opacity: ease(frame, onlyAt, 10), color: INK, fontWeight: 500 }}>; RDDs only for what they can&apos;t express</span>
       </Line>
@@ -122,7 +122,7 @@ const Collect: React.FC<{ c: Ctx }> = ({ c }) => {
       {[0, 1, 2, 3].map((k) => (
         <React.Fragment key={k}>
           <Machine x={R_X} top={exTop(k)} width={200} height={c.h(52)} at={pullAt - 6 + k * 2} />
-          <div style={{ position: "absolute", left: R_X + 14, top: exTop(k) + c.h(26) - 13, ...label(20, INK_SOFT), opacity: ease(frame, pullAt - 4 + k * 2, 10) }}>executor {k + 1}</div>
+          <div style={{ position: "absolute", left: R_X + 14, top: exTop(k) + c.h(26) - 13, ...label(24, INK_SOFT), opacity: ease(frame, pullAt - 4 + k * 2, 10) }}>executor {k + 1}</div>
           <Arrow from={[R_X + 208, exTop(k) + c.h(26)]} to={[DRIVER_X - 10, drvTop + c.h(70)]} at={pullAt + 4 + k * 3} dur={12} color={ACCENT} width={1.8} head={10} />
         </React.Fragment>
       ))}
@@ -130,17 +130,17 @@ const Collect: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={oneAt - 2} x={DRIVER_X + 16} top={drvTop + c.h(44)} size={22} color={INK_SOFT}>
         one machine
       </Line>
-      <Line at={oomAt} x={DRIVER_X + 16} top={drvTop + c.h(84)} size={23} color={ACCENT_INK} weight={700}>
+      <Line at={oomAt} x={DRIVER_X + 16} top={drvTop + c.h(84)} size={23} color={ACCENT_INK} weight={500}>
         <span style={{ opacity: oom }}>out of memory</span>
       </Line>
       <Line at={undoAt - 2} top={c.y(630)} size={23} color={ACCENT_INK}>
         and the work is no longer distributed
       </Line>
-      <Line at={lookAt - 2} top={c.y(700)} size={24} color={OK_INK} weight={650}>
-        to look: <span style={{ fontFamily: MONO, fontSize: 22 }}>show(n)</span>, <span style={{ fontFamily: MONO, fontSize: 22 }}>take(n)</span>
+      <Line at={lookAt - 2} top={c.y(700)} size={24} color={OK_INK} weight={500}>
+        to look: <span style={{ fontFamily: MONO, fontSize: 24 }}>show(n)</span>, <span style={{ fontFamily: MONO, fontSize: 24 }}>take(n)</span>
       </Line>
-      <Line at={saveAt - 2} top={c.y(746)} size={24} color={OK_INK} weight={650}>
-        to save: <span style={{ fontFamily: MONO, fontSize: 22 }}>write</span>, from the executors in parallel
+      <Line at={saveAt - 2} top={c.y(746)} size={24} color={OK_INK} weight={500}>
+        to save: <span style={{ fontFamily: MONO, fontSize: 24 }}>write</span>, from the executors in parallel
       </Line>
     </>
   );
@@ -168,9 +168,9 @@ const Push: React.FC<{ c: Ctx }> = ({ c }) => {
   const prune = ease(frame, projAt + 8, 12);
   return (
     <>
-      <Line at={predAt - 2} top={c.y(342)} size={25} weight={700}>
+      <Line at={predAt - 2} top={c.y(342)} size={25} weight={500}>
         Predicate pushdown:{" "}
-        <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 600 }}>
+        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>
           SELECT region, amount … WHERE amount &gt; {CUT}
         </span>
       </Line>
@@ -198,18 +198,18 @@ const Push: React.FC<{ c: Ctx }> = ({ c }) => {
               alignItems: "center",
               padding: "0 14px",
               gap: 10,
-              ...note(21, INK),
+              ...note(24, INK),
               whiteSpace: "nowrap",
             }}
           >
             <span style={{ opacity: ease(frame, minAt, 10) }}>
               min {g.min} · max {g.max}
             </span>
-            <span style={{ marginLeft: "auto", ...label(20, can ? OK_INK : INK_SOFT), opacity: skip }}>{can ? "read" : "skipped"}</span>
+            <span style={{ marginLeft: "auto", ...label(24, can ? OK_INK : INK_SOFT), opacity: skip }}>{can ? "read" : "skipped"}</span>
           </div>
         );
       })}
-      <Line at={projAt - 2} top={c.y(536)} size={25} weight={700}>
+      <Line at={projAt - 2} top={c.y(536)} size={25} weight={500}>
         Projection pushdown: <span style={{ fontWeight: 500 }}>only the columns named</span>
       </Line>
       <Note at={projAt + 4} x={R_X} y={c.y(586)}>
@@ -223,7 +223,7 @@ const Push: React.FC<{ c: Ctx }> = ({ c }) => {
           ))}
         </span>
       </Note>
-      <Line at={freeAt - 2} top={c.y(668)} size={26} color={OK_INK} weight={700}>
+      <Line at={freeAt - 2} top={c.y(668)} size={26} color={OK_INK} weight={500}>
         DataFrames get both for free
       </Line>
     </>
@@ -283,14 +283,14 @@ export const RapidScene: React.FC = () => {
 
         {/* The bridge: data that never stops arriving. */}
         <Note at={assumedAt} x={R_X} y={y(430)}>
-          <span style={{ ...note(30, INK), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             Every answer here assumed
             <br />
             the data had <b>finished arriving</b>.
           </span>
         </Note>
         <Note at={neverAt - 2} x={R_X} y={y(540)}>
-          <span style={{ ...note(30, INK), fontWeight: 700, whiteSpace: "nowrap" }}>In streaming, it never does.</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>In streaming, it never does.</span>
         </Note>
         <Spot id="de-distributed-honeybee" at={assumedAt + 4} left={1420} top={y(560)} width={360} height={282} />
         <NextLine at={nextAt} x={R_X} y={y(760)} width={560}>

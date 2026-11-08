@@ -152,7 +152,7 @@ export const PowerScene: React.FC = () => {
         <span
           style={{
             ...note(40, DATA_INK),
-            fontWeight: 700,
+            fontWeight: 500,
             display: "inline-block",
             transform: `scale(${1 + 0.1 * pulse(frame, reallyAt - 2, 24)})`,
             transformOrigin: "0 60%",
@@ -161,7 +161,7 @@ export const PowerScene: React.FC = () => {
           <Count at={fortySevenAt - 4} to={POWER.power} dur={20} format={(v) => pct(v, 1)} />
         </span>
         {/* In the number's own face and near its size, so the two read as one line. */}
-        <span style={{ ...note(38, INK), fontWeight: 500, marginLeft: 18, display: "inline-block", transform: `scale(${1 + 0.06 * flipGlow})` }}>
+        <span style={{ ...note(34, INK), fontWeight: 500, marginLeft: 18, display: "inline-block", transform: `scale(${1 + 0.06 * flipGlow})` }}>
           <span style={{ opacity: ease(frame, findingAt - 2, 10) }}>
             caught it<span style={{ opacity: ease(frame, flipAt - 4, 12) }}>: a coin flip</span>
           </span>
@@ -291,7 +291,7 @@ export const PowerScene: React.FC = () => {
       {[0.25, 0.5, 0.75, 1].map((v) => (
         <div
           key={v}
-          style={{ position: "absolute", right: 1920 - L.x0 + 14, top: py(v) - 13, opacity: (1 - schematic) * ease(frame, onlyAt + 4, 12), ...note(20, INK_SOFT) }}
+          style={{ position: "absolute", right: 1920 - L.x0 + 14, top: py(v) - 13, opacity: (1 - schematic) * ease(frame, onlyAt + 4, 12), ...note(24, INK_SOFT) }}
         >
           {pct(v, 0)}
         </div>
@@ -307,7 +307,7 @@ export const PowerScene: React.FC = () => {
             <span
               style={{
                 ...note(24, DATA_INK),
-                fontWeight: 700,
+                fontWeight: 500,
                 ...halo,
                 whiteSpace: "nowrap",
                 display: "inline-block",
@@ -331,7 +331,7 @@ export const PowerScene: React.FC = () => {
         </Label>
       </Note>
       <Note at={pushingAt - 2} x={1150} y={y(840)} out={onlyAt - 6}>
-        <span style={{ ...body(30, true), color: STAT_INK }}>Push one down, the other goes up.</span>
+        <span style={{ ...body(28, true), color: STAT_INK }}>Push one down, the other goes up.</span>
       </Note>
     </AbsoluteFill>
   );

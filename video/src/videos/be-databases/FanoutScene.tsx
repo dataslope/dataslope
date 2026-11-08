@@ -43,8 +43,8 @@ const Chip: React.FC<{ x: number; y: number; amount: number; tone: "data" | "bad
         alignItems: "center",
         justifyContent: "center",
         fontFamily: MONO,
-        fontSize: 19,
-        fontWeight: 600,
+        fontSize: 24,
+        fontWeight: 500,
         color: INK,
         fontVariantLigatures: "none",
         opacity,
@@ -123,7 +123,7 @@ export const FanoutScene: React.FC = () => {
 
         {/* ── The orders ── */}
         <Note at={oneManyAt} x={X0} y={top - h(48)}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             <SmallCode>orders</SmallCode>: <span style={{ color: BLUE_INK }}><Num>{FANOUT.orders}</Num> rows</span>
           </span>
         </Note>
@@ -133,7 +133,7 @@ export const FanoutScene: React.FC = () => {
           return <Chip key={o.id} x={X0 + p.x} y={top + p.y} amount={o.amount} tone={lit > 0.5 ? "sara" : "data"} opacity={ease(frame, oneManyAt + i * 0.8, 8)} />;
         })}
         <Note at={ordersAt + 4} x={X0} y={sumY}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <SmallCode>SUM(amount)</SmallCode> = <b style={{ color: BLUE_INK }}>{money(Number(FANOUT.total))}</b>
           </span>
         </Note>
@@ -141,15 +141,15 @@ export const FanoutScene: React.FC = () => {
         {/* ── Joined to its items ── */}
         <Flow points={[[X0 + leftW + 22, top + gridH / 2], [R_X - 22, top + gridH / 2]]} at={itemsAt} color={INK} width={2.6} />
         <Note at={itemsAt + 4} x={X0 + leftW + 6} y={top + gridH / 2 - h(46)}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>join items</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>join items</span>
         </Note>
         <Note at={rowsAt - 4} x={R_X} y={top - h(48)}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             joined:{" "}
             <span style={{ color: fold > 0.5 ? OK_INK : ACCENT_INK }}>
               <Num>{fold > 0.5 ? FANOUT.orders : FANOUT.joinedRows}</Num> rows
             </span>
-            <span style={{ ...label(22, INK_SOFT), opacity: ease(frame, oneRowAt, 10) }}>, one per order</span>
+            <span style={{ ...label(24, INK_SOFT), opacity: ease(frame, oneRowAt, 10) }}>, one per order</span>
           </span>
         </Note>
         {FANOUT.list.map((o, i) => {
@@ -169,12 +169,12 @@ export const FanoutScene: React.FC = () => {
           );
         })}
         <Note at={doublesAt} x={R_X} y={sumY} out={rightAt - 2}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <SmallCode>SUM(amount)</SmallCode> = <b style={{ color: ACCENT_INK }}>{money(Number(FANOUT.inflatedTotal))}</b>
           </span>
         </Note>
         <Note at={rightAt} x={R_X} y={sumY}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <SmallCode>SUM(amount)</SmallCode> = <b style={{ color: OK_INK }}>{money(Number(FANOUT.fixedTotal))}</b>
           </span>
         </Note>
@@ -204,22 +204,22 @@ export const FanoutScene: React.FC = () => {
 
         {/* ── Row counts, step by step ── */}
         <Note at={multAt} x={R_X} y={listTop + h(56)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             the error multiplies<span style={{ opacity: ease(frame, sampleAt, 10) }}>: a small sample can hide it</span>
           </span>
         </Note>
         <Note at={checkAt} x={R_X} y={listTop + h(112)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "baseline", gap: "0.4em", fontSize: 24 }}>
             <b>Row counts:</b>
-            <span style={{ color: BLUE_INK, fontWeight: 650 }}>
+            <span style={{ color: BLUE_INK, fontWeight: 500 }}>
               <Num>{FANOUT.orders}</Num>
             </span>
             <span style={{ color: INK_SOFT }}>→</span>
-            <span style={{ color: ACCENT_INK, fontWeight: 650 }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 500 }}>
               <Num>{FANOUT.joinedRows}</Num>
             </span>
             <span style={{ color: INK_SOFT }}>→</span>
-            <span style={{ color: OK_INK, fontWeight: 650 }}>
+            <span style={{ color: OK_INK, fontWeight: 500 }}>
               <Num>{FANOUT.orders}</Num>
             </span>
             <span style={{ color: INK_SOFT, fontWeight: 500 }}>before and after every join</span>
@@ -232,5 +232,5 @@ export const FanoutScene: React.FC = () => {
 
 /** A table or column name inside a label. */
 const SmallCode: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 600, fontVariantLigatures: "none" }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 500, fontVariantLigatures: "none" }}>{children}</span>
 );

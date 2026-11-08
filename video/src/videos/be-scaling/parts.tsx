@@ -86,7 +86,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -109,7 +109,7 @@ export const Headline: React.FC<{
         {lead}
       </Ink>
       {turn ? (
-        <Ink at={turnAt ?? at + 10} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={turnAt ?? at + 10} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}>
           {turn}
         </Ink>
       ) : null}
@@ -221,7 +221,7 @@ export const Node: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      {title ? <span style={{ ...label(size, t.ink), fontWeight: 700, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span> : null}
+      {title ? <span style={{ ...label(size, t.ink), fontWeight: 500, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span> : null}
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: "center" }}>{sub}</span> : null}
       {children}
     </div>
@@ -311,7 +311,7 @@ export const Pill: React.FC<{
           border: `2px solid ${t.line}`,
           background: solid ? t.line : t.fill,
           ...label(size, solid ? PAPER : t.ink),
-          fontWeight: 700,
+          fontWeight: 500,
           whiteSpace: "nowrap",
         }}
       >
@@ -537,8 +537,8 @@ export const MiniMap: React.FC<{
           left: Math.min(MAP.w - 180, Math.max(0, labelX - 90)),
           width: 180,
           textAlign: "center",
-          ...label(19, INK),
-          fontWeight: 650,
+          ...label(24, INK),
+          fontWeight: 500,
           whiteSpace: "nowrap",
         }}
       >
@@ -586,7 +586,7 @@ export const StepRow: React.FC<{ x: number; y: number; steps: readonly Step[]; s
         return (
           <React.Fragment key={i}>
             {i > 0 ? <span style={{ ...note(size, INK_SOFT), opacity: p }}>→</span> : null}
-            <span style={{ ...note(size, s.color ?? INK), fontWeight: s.weight ?? 650, opacity: p, position: "relative", display: "inline-block", margin: "0 0.14em" }}>
+            <span style={{ ...note(size, s.color ?? INK), fontWeight: s.weight ?? 500, opacity: p, position: "relative", display: "inline-block", margin: "0 0.14em" }}>
               <span
                 style={{
                   position: "absolute",

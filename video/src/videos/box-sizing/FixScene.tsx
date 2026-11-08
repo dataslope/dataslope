@@ -3,7 +3,7 @@ import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remo
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { inkOf } from "../../theme/brand";
@@ -72,7 +72,7 @@ export const FixScene: React.FC = () => {
         <Ink
           at={includesAt - 2}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           width includes padding and border.
         </Ink>
@@ -92,7 +92,7 @@ export const FixScene: React.FC = () => {
 
       {/* The fix, set once at the top of the stylesheet. */}
       <Note at={topAt - 2} x={RULE_X} y={y(LIST_TOP) - 46}>
-        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>At the top of the stylesheet</span>
+        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>At the top of the stylesheet</span>
       </Note>
       <Listing
         lines={RULE}
@@ -108,7 +108,7 @@ export const FixScene: React.FC = () => {
         ]}
       />
       <Note at={everyAt + 4} x={RULE_X} y={ruleBottom + 20}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Every element gets it, and <Mono>::before</Mono> and <Mono>::after</Mono> too
         </span>
       </Note>
@@ -167,8 +167,8 @@ export const FixScene: React.FC = () => {
       </Dim>
 
       <Note at={exactlyAt - 2} x={RULE_X} y={g.top + 20}>
-        <div style={{ ...label(22, INK) }}>Each column</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(24, INK) }}>Each column</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>
           {m1.content} + {2 * BOX.padding} + {2 * BOX.border} = <b style={{ color: INK }}>{m1.width}px</b>
         </div>
       </Note>

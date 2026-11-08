@@ -30,17 +30,21 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
  *
- * Facts. Every statement on screen ran in DuckDB v1.4.3 (DuckDB-Wasm 1.32.0,
- * the engine the page's blocks run), by check.mjs into results.json, which
- * data.ts reads:
+ * Facts. Every statement on screen ran in Postgres (PGlite, PostgreSQL 18,
+ * the engine the page's blocks run), from a fresh database per figure, by
+ * check.mjs into results.json, which data.ts reads; every error is Postgres's
+ * own text:
  *   - "window", the video's own six sales (the page's first six transaction
  *     amounts, three days in each of two regions): GROUP BY gives North 425
  *     and South 640; SUM OVER (PARTITION BY region) keeps all six rows; RANK
  *     restarts per region, North's 250 and South's 320 both first.
  *   - "rank", the page's 24 scores: 88 three times and 85 four times; RANK
  *     goes 8, 8, 8, 11 and DENSE_RANK 8, 8, 8, 9. The video's own eight
- *     products, Emma and Ulysses tied at 310: ROW_NUMBER keeps four rows (Emma
- *     of the pair), RANK five; QUALIFY gives ROW_NUMBER's four.
+ *     products, Emma and Ulysses tied at 310: ROW_NUMBER keeps four rows (one
+ *     of the pair), RANK five. Postgres has no QUALIFY (it refuses the
+ *     listing with a syntax error), so its listing is shown without a result
+ *     and the screen says where it runs: DuckDB, Snowflake and BigQuery, as
+ *     the page says (with Databricks), and not Postgres or SQL Server.
  *   - "frame", the video's own four payments (the page's first four amounts,
  *     the middle two on one day): ROWS, ordered by day and then id so the
  *     tie has one order, gives 100, 350, 425, 605; RANGE and the default
@@ -50,16 +54,19 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     row, NTH_VALUE(amount, 3) null, null, then 75.
  *   - "running", the page's 24 days: the running total reaches 4,255; the
  *     trailing three-day average starts 100.00, 175.00, 141.67. A RANGE frame
- *     of INTERVAL 2 DAY runs on the spine's sales, which have gaps.
+ *     of INTERVAL '2 days' runs on the spine's sales, which have gaps.
  *   - "latest", the video's own plan changes: user 1 has three rows, and
  *     only team is kept. The page's spine: sales on March 1, 3 and 4, so the
- *     2nd and the 5th come back as zeros.
+ *     2nd and the 5th come back as zeros. Postgres's generate_series returns
+ *     one row per step, as timestamps, cast back to date as the page does.
  *   - at speed: LAG gives 150 for January 2; NTILE(4) makes four groups of
- *     six from the page's 24 customers, NTILE(5) 5, 5, 5, 5, 4; DuckDB's own
- *     error for a window in WHERE; the page's org chart has five levels;
- *     January's 24 days fall in four weeks, each from a Monday, the last of
- *     three days; the page's pivot and its unpivot;
- *     PERCENT_RANK 0 to 1 and CUME_DIST 0.2 to 1 on five customers.
+ *     six from the page's 24 customers, NTILE(5) 5, 5, 5, 5, 4; Postgres's
+ *     own error for a window in WHERE ("window functions are not allowed in
+ *     WHERE"); the page's org chart has five levels; January's 24 days fall
+ *     in four weeks, each from a Monday (DATE_TRUNC on a date prints as a
+ *     timestamptz, "+00" included), the last of three days; the page's
+ *     pivot and its unpivot; PERCENT_RANK 0 to 1 and CUME_DIST 0.2 to 1 on
+ *     five customers.
  *
  * Written for Drew's ear, as in Parts 1 to 3: SQL keywords are written as
  * words, "N tile" for NTILE, "cume dist" for CUME_DIST, "date trunc" for
@@ -285,9 +292,10 @@ export const script: NarrationScript = {
       id: "r-ntile",
       text: "N tile splits ordered rows into equal buckets. Twenty-four customers make four quartiles of six. Split them five ways, and the first buckets each take an extra row.",
     },
+    { id: "r-where", text: "Can a window function go in where? No." },
     {
-      id: "r-where",
-      text: "Can a window function go in where? No. Windows are computed after where, group by and having, so DuckDB refuses. Filter in an outer query, or with qualify.",
+      id: "r-where-why",
+      text: "Windows are computed after where, group by and having, so Postgres refuses. Filter in an outer query, or with qualify where it's supported.",
     },
     {
       id: "r-recursive",

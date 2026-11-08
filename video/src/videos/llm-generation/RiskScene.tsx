@@ -67,11 +67,11 @@ export const RiskScene: React.FC = () => {
         {/* Column heads, each as the narration names it. */}
         {FACTORS.map((f, k) => (
           <Ink key={f} at={factorAt[k] - 4} dur={12} style={{ left: CX(k) - 85, width: 170, top: y(HEAD_Y), textAlign: "center" }}>
-            <span style={{ ...label(22, INK), fontWeight: 650, display: "inline-block", lineHeight: 1.2 }}>{f}</span>
+            <span style={{ ...label(24, INK), fontWeight: 500, display: "inline-block", lineHeight: 1.2 }}>{f}</span>
           </Ink>
         ))}
         <Ink at={zeroAt - 6} dur={12} style={{ left: SCORE_X - 70, width: 140, top: y(HEAD_Y), textAlign: "center" }}>
-          <span style={{ ...label(22, INK), fontWeight: 650, display: "inline-block", lineHeight: 1.2 }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, display: "inline-block", lineHeight: 1.2 }}>
             Score
             <br />
             out of 5
@@ -95,7 +95,7 @@ export const RiskScene: React.FC = () => {
                 }}
               />
               <Ink at={start + 4 + i * 5} dur={14} style={{ left: X0, top: top + rh / 2 - 22, width: 560 }}>
-                <span style={{ ...body(31), color: INK }}>{r.case}</span>
+                <span style={{ ...body(28), color: INK }}>{r.case}</span>
               </Ink>
               <Svg opacity={ease(frame, start + 8, 12)}>
                 <line x1={X0} x2={1800} y1={top + rh + 20} y2={top + rh + 20} stroke={HAIRLINE} strokeWidth={0.8} />

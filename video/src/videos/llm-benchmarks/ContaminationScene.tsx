@@ -88,8 +88,8 @@ export const ContaminationScene: React.FC = () => {
         {/* benchmark-pitfalls' table, its first two rows. */}
         <Ink at={memorizedAt - 8} dur={12} style={{ left: X0, top: y(TABLE_Y) - 4, width: 900 }}>
           <div style={{ position: "relative", height: 30 }}>
-            <span style={{ ...label(22, INK_SOFT), position: "absolute", left: 0 }}>situation</span>
-            <span style={{ ...label(22, INK_SOFT), position: "absolute", left: RESULT_X - X0 }}>reported result</span>
+            <span style={{ ...label(24, INK_SOFT), position: "absolute", left: 0 }}>situation</span>
+            <span style={{ ...label(24, INK_SOFT), position: "absolute", left: RESULT_X - X0 }}>reported result</span>
           </div>
         </Ink>
         <Svg opacity={ease(frame, memorizedAt - 6, 12)}>
@@ -98,13 +98,13 @@ export const ContaminationScene: React.FC = () => {
         {rows.map((r, i) => (
           <React.Fragment key={r.situation}>
             <Ink at={rowAt[i]} dur={12} style={{ left: X0, top: rowY(i) - 16, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(26, INK), fontWeight: 600 }}>{r.situation}</span>
+              <span style={{ ...note(28, INK), fontWeight: 500 }}>{r.situation}</span>
             </Ink>
             <Ink at={rowAt[i] + 8} dur={12} style={{ left: RESULT_X, top: rowY(i) - 16, whiteSpace: "nowrap" }}>
               <span
                 style={{
-                  ...note(26, A_INK),
-                  fontWeight: 700,
+                  ...note(28, A_INK),
+                  fontWeight: 500,
                   display: "inline-block",
                   transform: `scale(${1 + pulse(frame, sameAt + i * 4, 18) * 0.06})`,
                   transformOrigin: "0 50%",
@@ -127,25 +127,25 @@ export const ContaminationScene: React.FC = () => {
           />
         </Svg>
         <Ink at={sameAt + 4} dur={14} style={{ left: RULE_X1 + 44, top: (rowY(0) + rowY(1)) / 2 - 14, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, INK), fontWeight: 600 }}>the same number</span>
+          <span style={{ ...note(24, INK), fontWeight: 500 }}>the same number</span>
         </Ink>
 
         {/* The case that proved it. */}
         <Ink at={sweAt - 4} dur={12} style={{ left: X0, top: y(690), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(26, INK), fontWeight: 700 }}>
+          <span style={{ ...label(28, INK), fontWeight: 500 }}>
             <Strike at={sweAt + 10}>SWE-bench Verified</Strike>
           </span>
         </Ink>
         <Ink at={februaryAt - 2} dur={12} style={{ left: X0 + 300, top: y(690) + 3, whiteSpace: "nowrap" }}>
-          <span style={note(23, INK_SOFT)}>OpenAI stopped reporting it, February 2026</span>
+          <span style={note(24, INK_SOFT)}>OpenAI stopped reporting it, February 2026</span>
         </Ink>
         <Ink at={reciteAt - 2} dur={12} style={{ left: X0, top: y(690) + 40, whiteSpace: "nowrap" }}>
-          <span style={note(23, INK)}>models could recite some of its fixes from memory</span>
+          <span style={note(24, INK)}>models could recite some of its fixes from memory</span>
         </Ink>
 
         {/* The defense. */}
         <Ink at={defenseAt - 4} dur={14} style={{ left: X0, top: y(808), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(26, INK), fontWeight: 600 }}>
+          <span style={{ ...note(28, INK), fontWeight: 500 }}>
             The defense: a test it <Marked at={seenAt - 2}>can&apos;t have seen</Marked>
           </span>
         </Ink>

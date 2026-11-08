@@ -115,9 +115,9 @@ export const RepeatScene: React.FC = () => {
       {/* Counter, top right. The line under the number says what each sample
           is, not what it is out of: "of 500" read as 47 of 500 customers. */}
       <div style={{ position: "absolute", left: 1400, top: y(120), opacity: ease(frame, drawAt, 12) }}>
-        <div style={label(20, INK_SOFT)}>Samples drawn, each way</div>
+        <div style={label(24, INK_SOFT)}>Samples drawn, each way</div>
         <div style={{ ...headline(108), ...TABULAR, marginTop: 6 }}>{k}</div>
-        <div style={{ ...body(26, true), marginTop: 4 }}>each of {SAMPLE_N} customers</div>
+        <div style={{ ...body(28, true), marginTop: 4 }}>each of {SAMPLE_N} customers</div>
       </div>
 
       <FigLabel n={fig(2)} title={`The average of each sample of ${SAMPLE_N}`} at={againFrom} x={160} y={y(384)} />
@@ -133,8 +133,8 @@ export const RepeatScene: React.FC = () => {
           ...halo,
         }}
       >
-        <span style={note(21, INK_SOFT)}>true average </span>
-        <span style={{ ...note(22, INK), fontWeight: 700 }}>{fmt(TRUE_MEAN)}</span>
+        <span style={note(24, INK_SOFT)}>true average </span>
+        <span style={{ ...note(24, INK), fontWeight: 500 }}>{fmt(TRUE_MEAN)}</span>
       </div>
 
       <Pile means={REPEAT_RANDOM} bins={RANDOM_BINS} land={land} color={RANDOM} first={againFrom} />
@@ -142,27 +142,27 @@ export const RepeatScene: React.FC = () => {
 
       {/* "Both sides of seventy, about half above and half below." */}
       <Note at={sidesAt} x={truthX - 14} y={y(RANDOM_TOP - 50)} align="right" from="right" out={nameFrom}>
-        <span style={{ ...note(24, RANDOM_INK), fontWeight: 700, ...halo }}>{RANDOM_BELOW} below</span>
+        <span style={{ ...note(24, RANDOM_INK), fontWeight: 500, ...halo }}>{RANDOM_BELOW} below</span>
       </Note>
       <Note at={halfAt} x={truthX + 14} y={y(RANDOM_TOP - 50)} out={nameFrom}>
-        <span style={{ ...note(24, RANDOM_INK), fontWeight: 700, ...halo }}>{RANDOM_ABOVE} above</span>
+        <span style={{ ...note(24, RANDOM_INK), fontWeight: 500, ...halo }}>{RANDOM_ABOVE} above</span>
       </Note>
       <Note at={bothFrom} x={160} y={y(700)}>
-        <div style={{ ...label(21, RANDOM_INK) }}>At random</div>
-        <div style={{ ...body(30, true), color: INK, marginTop: 4 }}>a miss either way</div>
+        <div style={{ ...label(24, RANDOM_INK) }}>At random</div>
+        <div style={{ ...body(28, true), color: INK, marginTop: 4 }}>a miss either way</div>
       </Note>
 
       {/* "Near eighty, every single time." */}
       <Bracket x0={sx(X, EASY_MIN)} x1={sx(X, EASY_MAX)} y={y(EASY_TOP - 30)} at={timeAt - 4} color={EASY} />
       <Note at={timeAt} x={sx(X, EASY_MAX) + 22} y={y(EASY_TOP - 52)}>
-        <div style={{ ...note(24, EASY_INK), fontWeight: 700, ...halo }}>
+        <div style={{ ...note(24, EASY_INK), fontWeight: 500, ...halo }}>
           all {REPEAT_COUNT} from {fmt(EASY_MIN)}
         </div>
-        <div style={{ ...note(24, EASY_INK), fontWeight: 700, ...halo }}>to {fmt(EASY_MAX)}</div>
+        <div style={{ ...note(24, EASY_INK), fontWeight: 500, ...halo }}>to {fmt(EASY_MAX)}</div>
       </Note>
       <Note at={everyFrom} x={860} y={y(700)}>
-        <div style={{ ...label(21, EASY_INK) }}>The easy way</div>
-        <div style={{ ...body(30, true), color: INK, marginTop: 4 }}>a miss one way, every time</div>
+        <div style={{ ...label(24, EASY_INK) }}>The easy way</div>
+        <div style={{ ...body(28, true), color: INK, marginTop: 4 }}>a miss one way, every time</div>
       </Note>
 
       {/* The name for it. */}
@@ -182,7 +182,7 @@ export const RepeatScene: React.FC = () => {
           and 10.03 here against 9.94 in the closing figure read as if it
           shrank with more data. */}
       <Ink at={biasAt - 6} dur={16} style={{ left: (truthX + easyX) / 2 - 200, top: y(500) + 12, width: 400, textAlign: "center" }}>
-        <span style={{ ...note(24, EASY_INK), fontWeight: 700, ...halo }}>+{fmt(EASY_CENTER - TRUE_MEAN, 0)} points</span>
+        <span style={{ ...note(24, EASY_INK), fontWeight: 500, ...halo }}>+{fmt(EASY_CENTER - TRUE_MEAN, 0)} points</span>
       </Ink>
     </AbsoluteFill>
   );

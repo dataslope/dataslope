@@ -60,7 +60,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -85,7 +85,7 @@ export const Head: React.FC<{
         {children}
       </Ink>
       {italic !== undefined && second !== undefined ? (
-        <Ink at={second} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={second} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}>
           {italic}
         </Ink>
       ) : null}
@@ -383,7 +383,7 @@ export const GhostRow: React.FC<{ e: EntityLayout; index: number; name: string; 
         opacity: p * (1 - o),
         transform: `translateX(${(1 - p) * -12}px)`,
         fontFamily: MONO,
-        fontSize: 21,
+        fontSize: 24,
         color: ACCENT_INK,
       }}
     >
@@ -526,9 +526,9 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: SANS,
-                fontWeight: 700,
+                fontWeight: 500,
                 // 20px, within 12% of the 22px step beside it.
-                fontSize: 20,
+                fontSize: 24,
                 color: fill > 0.5 ? PAPER : INK,
                 transform: `scale(${1 + sw * 0.25})`,
                 opacity: lerp(1, lerp(0.55, 1, Math.max(lit, done)), rail),
@@ -538,8 +538,8 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
             </div>
             <span
               style={{
-                ...label(22, INK),
-                fontWeight: lit * rail > 0.5 ? 700 : 560,
+                ...label(24, INK),
+                fontWeight: lit * rail > 0.5 ? 500 : 500,
                 opacity: labelOp,
                 position: "relative",
               }}
@@ -567,7 +567,7 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
 
 // ── A database table, drawn as rows and cells (after WhyNormalization's kit) ─
 
-export const HEAD_SIZE = 22;
+export const HEAD_SIZE = 24;
 export const BODY_SIZE = 26;
 const PAD = 20;
 /** JetBrains Mono's advance, in em. */
@@ -745,7 +745,7 @@ export const DbTable: React.FC<{
             style={{ ...cellBox(j), top: g.top, height: g.headH, opacity: o }}
           >
             <div style={inner}>
-            <span style={{ fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: isGhost(j) ? ACCENT_INK : INK_SOFT }}>{c}</span>
+            <span style={{ fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 500, color: isGhost(j) ? ACCENT_INK : INK_SOFT }}>{c}</span>
             {badge && bIn > 0 ? (
               // The key badge, a blue house badge at 20px: within 12% of the
               // 22px name.
@@ -841,7 +841,7 @@ export const ErrorBox: React.FC<{
         background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
         padding: "14px 22px 16px",
         fontFamily: MONO,
-        fontSize: 21,
+        fontSize: 24,
         lineHeight: 1.45,
         whiteSpace: "pre-wrap",
         color: INK,
@@ -851,13 +851,13 @@ export const ErrorBox: React.FC<{
       }}
     >
       <div>
-        <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
+        <span style={{ color: ACCENT_INK, fontWeight: 500 }}>ERROR:</span>
         {"  "}
         {message}
       </div>
       {detail ? (
         <div style={{ color: INK_SOFT }}>
-          <span style={{ fontWeight: 600 }}>DETAIL:</span>
+          <span style={{ fontWeight: 500 }}>DETAIL:</span>
           {"  "}
           {detail}
         </div>
@@ -892,7 +892,7 @@ export const Chip: React.FC<{ tone?: "ink" | "key" | "warn" | "soft"; size?: num
       justifyContent: "center",
       width,
       boxSizing: "border-box",
-      fontWeight: 600,
+      fontWeight: 500,
     }}
   >
     {children}
@@ -901,5 +901,5 @@ export const Chip: React.FC<{ tone?: "ink" | "key" | "warn" | "soft"; size?: num
 
 /** Code inside running text, at the text's own size. */
 export const Mono: React.FC<{ children: string; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: weight ?? 600, color }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: weight ?? 500, color }}>{children}</span>
 );

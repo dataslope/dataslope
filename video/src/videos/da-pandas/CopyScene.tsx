@@ -146,7 +146,7 @@ export const CopyScene: React.FC = () => {
                   clipPath: `inset(0 ${(1 - p) * 100}% 0 0)`,
                 }}
               />
-              <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 8 }}>{s.text}</div>
+              <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: 8 }}>{s.text}</div>
             </div>
           );
         })}
@@ -167,7 +167,7 @@ export const CopyScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a warning: the line runs, and df stays as it was</span>
         </Note>
         <Note at={unchangedAt - 2} x={X0} y={g.rowTop(COPY.frame.rows.length) + h(24)} out={fixAt - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>df doesn&apos;t change</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>df doesn&apos;t change</span>
         </Note>
         <Note at={olderAt} x={MID_X} y={warnBottom + h(64)} out={fixAt - 4}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -199,13 +199,13 @@ export const CopyScene: React.FC = () => {
           marks={pNorth.map((row, k) => ({ row, col: 2, at: parentAt + 4 + k * 4, color: MARK_OK }))}
         />
         <Note at={sharesAt - 4} x={NOTES_X} y={y(TOP)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>a view shares memory with its parent</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>a view shares memory with its parent</span>
         </Note>
         <Note at={copyNotAt - 2} x={NOTES_X} y={y(TOP) + h(48)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>a copy doesn&apos;t</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>a copy doesn&apos;t</span>
         </Note>
         <Note at={actsAt - 4} x={NOTES_X} y={y(TOP) + h(96)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>in pandas 3, it acts as a copy</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>in pandas 3, it acts as a copy</span>
         </Note>
         {/* The page's subset: separate on purpose, so it says .copy(). */}
         <Listing
@@ -227,7 +227,7 @@ export const CopyScene: React.FC = () => {
           rows={COPY.subset.rows.map((cells, i) => ({ cells, at: subsetAt + 10 + i * 3 }))}
         />
         <Note at={sayAt - 2} x={MID_X} y={sg.rowTop(COPY.subset.rows.length) + h(30)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             a separate subset? say so: <Mono>.copy()</Mono>
           </span>
         </Note>

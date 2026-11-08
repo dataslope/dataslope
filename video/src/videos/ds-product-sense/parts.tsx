@@ -46,7 +46,7 @@ export const DATA_LIGHT = ds("blue", 200);
 export const BAD = ds("red", 500);
 
 /** The small print every made-up number carries. */
-export const madeUp = (size = 19): React.CSSProperties => ({ ...label(size, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" });
+export const madeUp = (size = 19): React.CSSProperties => ({ ...label(size, INK_SOFT), whiteSpace: "nowrap" });
 
 /**
  * A metric written as a chip: its name in a rounded box that inks in on `at`.
@@ -64,7 +64,7 @@ export const Chip: React.FC<{
   out?: number;
   weight?: number;
   children: React.ReactNode;
-}> = ({ x, y, at: from, ink = INK, size = 26, lit, dim, out, weight = 600, children }) => {
+}> = ({ x, y, at: from, ink = INK, size = 26, lit, dim, out, weight = 500, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 12);
   const l = lit === undefined ? 0 : ease(frame, lit, 12);
@@ -184,13 +184,13 @@ export const Step: React.FC<{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...label(21, INK),
-          fontWeight: 700,
+          ...label(24, INK),
+          fontWeight: 500,
         }}
       >
         {n}
       </span>
-      <span style={{ position: "relative", ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{children}</span>
+      <span style={{ position: "relative", ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{children}</span>
     </div>
   );
 };

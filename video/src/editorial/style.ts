@@ -1,7 +1,7 @@
 import type React from "react";
 import { colors, ds, inkOf } from "../theme/brand";
 import { SANS } from "../theme/fonts";
-import { SERIF } from "./fonts";
+import { INTER_OPTICAL, SERIF } from "./fonts";
 
 /**
  * The palette of a magazine's science pages, built only from brand ramps:
@@ -22,17 +22,32 @@ export const ACCENT_INK = inkOf.red;
 export const BLUE_INK = inkOf.blue;
 export const HIGHLIGHT = `color-mix(in srgb, ${ds("yellow", 400)} 80%, transparent)`;
 
-/** Display headlines, in the variant's face (typefaces.ts). Sizes are
- *  written for Fraunces; the face's own scale brings it to the same x-height. */
+/**
+ * Italic in the variant's face, for a stressed word, a term or a quotation:
+ * a serif's italic, and upright in Inter, which the house never slants
+ * (typefaces.ts). body() takes its italic from it, so an italic deck
+ * stands upright in the Inter variant with no edit to the scene. Titles are
+ * never italic (headline()). Text that is Inter in every variant (label(), note()) is never
+ * italic, except where the slant is notation: a math variable, a null.
+ */
+export const SERIF_ITALIC = "var(--ed-italic, italic)";
+
+/** The title face: Inter (its Display optical size), weight 500, upright and
+ *  black in every video and every variant. A title is set in one color and
+ *  never slanted; `italic` is kept so a headline's second half can still be
+ *  told apart by the scenes that pass it, and draws upright. Sizes were
+ *  written for Fraunces, so Inter is scaled to the same x-height. */
+export const TITLE_FAMILY = `"${INTER_OPTICAL}", "Inter Variable", system-ui, sans-serif`;
+export const TITLE_WEIGHT = 500;
+const TITLE_SCALE = 0.9;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept so callers can mark a headline's second half
 export const headline = (size: number, italic = false): React.CSSProperties => ({
-  fontFamily: SERIF,
-  fontSize: `calc(${size}px * var(--ed-head-scale))`,
-  fontWeight: italic ? "var(--ed-head-italic-wght)" : "var(--ed-head-wght)",
-  fontStyle: italic ? "italic" : "normal",
-  fontVariationSettings: "var(--ed-head-axes)",
+  fontFamily: TITLE_FAMILY,
+  fontSize: size * TITLE_SCALE,
+  fontWeight: TITLE_WEIGHT,
+  fontStyle: "normal",
   lineHeight: 1.02,
-  letterSpacing: "var(--ed-head-tracking)",
-  // Playfair defaults to old-style figures; numbers in a chart stand level.
+  letterSpacing: "-0.02em",
   fontVariantNumeric: "lining-nums",
   color: INK,
 });
@@ -42,7 +57,7 @@ export const body = (size: number, italic = false): React.CSSProperties => ({
   fontFamily: SERIF,
   fontSize: `calc(${size}px * var(--ed-body-scale))`,
   fontWeight: 400,
-  fontStyle: italic ? "italic" : "normal",
+  fontStyle: italic ? SERIF_ITALIC : "normal",
   fontVariationSettings: "var(--ed-body-axes)",
   fontVariantNumeric: "lining-nums",
   lineHeight: 1.25,
@@ -51,10 +66,10 @@ export const body = (size: number, italic = false): React.CSSProperties => ({
 
 /** Inter semibold in sentence case: kickers, figure numbers and axis
  *  titles. Never tracked capitals, which shout and blur at small sizes. */
-export const label = (size = 21, color: string = INK_SOFT): React.CSSProperties => ({
+export const label = (size = 24, color: string = INK_SOFT): React.CSSProperties => ({
   fontFamily: SANS,
   fontSize: size,
-  fontWeight: 650,
+  fontWeight: 500,
   color,
 });
 
@@ -62,7 +77,7 @@ export const label = (size = 21, color: string = INK_SOFT): React.CSSProperties 
  *  Inter's tabular feature also sets the hyphen in a digit-wide slot, so
  *  "p-value" read "p - value" in every note while it was on. Give a number
  *  that must not shift as it changes (a counter, a column) TABULAR. */
-export const note = (size = 21, color: string = INK): React.CSSProperties => ({
+export const note = (size = 24, color: string = INK): React.CSSProperties => ({
   fontFamily: SANS,
   fontSize: size,
   fontWeight: 500,

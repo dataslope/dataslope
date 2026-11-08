@@ -52,22 +52,22 @@ export const ChenScene: React.FC = () => {
           <span style={{ ...headline(132), color: STAT_INK }}>1976</span>
         </Ink>
         <Ink at={chenAt - 4} dur={16} style={{ left: 122, top: y(436), whiteSpace: "nowrap" }}>
-          <span style={label(32, INK)}>Peter Chen</span>
+          <span style={label(34, INK)}>Peter Chen</span>
         </Ink>
         <Ink at={modelAt - 2} dur={18} style={{ left: 122, top: y(490), whiteSpace: "nowrap" }}>
           <div style={{ ...body(28, true), color: INK }}>{PAPER_TITLE}</div>
-          <div style={{ ...note(21, INK_SOFT), marginTop: 10 }}>{JOURNAL}</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 10 }}>{JOURNAL}</div>
         </Ink>
 
         {/* ── The argument, in order: each step's number in its own words' face and
             size, set apart by its ink and weight ── */}
         <Ink at={meansAt - 8} dur={16} style={{ left: 122, top: stepY, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(40), color: STAT_INK, fontWeight: 600, marginRight: 14 }}>1</span>
+          <span style={{ ...body(40), color: STAT_INK, fontWeight: 500, marginRight: 14 }}>1</span>
           <span style={{ ...body(40), color: INK }}>What the data means</span>
         </Ink>
         <Arrow from={[548, stepY + 30]} to={[618, stepY + 30]} at={beforeAt} dur={12} />
         <Ink at={storeAt - 6} dur={16} style={{ left: 650, top: stepY, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(40), color: INK_SOFT, fontWeight: 600, marginRight: 14 }}>2</span>
+          <span style={{ ...body(40), color: INK_SOFT, fontWeight: 500, marginRight: 14 }}>2</span>
           <span style={{ ...body(40), color: INK_SOFT }}>How to store it</span>
         </Ink>
 

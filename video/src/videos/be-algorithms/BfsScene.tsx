@@ -118,7 +118,7 @@ export const BfsScene: React.FC = () => {
           { g: right, title: "Depth-first", order: dfsOrder, at: dfsAt, titleAt: dfsAt.A - 4, side: "right" as const },
         ].map((v) => (
           <React.Fragment key={v.title}>
-            <Line at={v.titleAt} x={v.g.A[0] - 130} y={gTop - 76} size={22} weight={650}>
+            <Line at={v.titleAt} x={v.g.A[0] - 130} y={gTop - 76} size={22} weight={500}>
               {v.title}: {v.order.join(", ")}
             </Line>
             {edges.map(([a, b]) => (
@@ -151,7 +151,7 @@ export const BfsScene: React.FC = () => {
         <VRule x={985} top={apexY - 72} bottom={baseY + 96} at={memoryAt} />
 
         {/* Memory: a million-node tree. */}
-        <Line at={memoryAt} x={TREE.x0} y={apexY - 72} size={22} weight={650}>
+        <Line at={memoryAt} x={TREE.x0} y={apexY - 72} size={22} weight={500}>
           Full binary tree: <Num>{int(TRAVERSAL.nodes)}</Num> nodes, <Num>{TRAVERSAL.levels}</Num> levels
         </Line>
         <Svg opacity={tri}>
@@ -181,7 +181,7 @@ export const BfsScene: React.FC = () => {
         </Line>
 
         {/* The queue itself: list or deque. */}
-        <Line at={poppingAt - 2} x={140} y={rowY1 + 14} size={23} weight={650}>
+        <Line at={poppingAt - 2} x={140} y={rowY1 + 14} size={23} weight={500}>
           Python list
         </Line>
         {Array.from({ length: CELLS }, (_, i) => {
@@ -202,13 +202,13 @@ export const BfsScene: React.FC = () => {
             />
           );
         })}
-        <Line at={poppingAt + 18} x={cx0 + CELLS * 76 + 20} y={rowY1 + 12} size={23} color={ACCENT_INK} weight={600}>
+        <Line at={poppingAt + 18} x={cx0 + CELLS * 76 + 20} y={rowY1 + 12} size={23} color={ACCENT_INK} weight={500}>
           every item behind it shifts
           <span style={{ opacity: ease(frame, billionAt, 10) }}>
             : <b style={TABULAR}>{int(TRAVERSAL.listShifts)}</b> moves for this tree
           </span>
         </Line>
-        <Line at={dequeAt} x={140} y={rowY2 + 14} size={23} weight={650}>
+        <Line at={dequeAt} x={140} y={rowY2 + 14} size={23} weight={500}>
           Deque
         </Line>
         {Array.from({ length: CELLS }, (_, i) => {
@@ -228,7 +228,7 @@ export const BfsScene: React.FC = () => {
             />
           );
         })}
-        <Line at={eitherAt + 6} x={cx0 + CELLS * 76 + 20} y={rowY2 + 12} size={23} color={OK_INK} weight={700}>
+        <Line at={eitherAt + 6} x={cx0 + CELLS * 76 + 20} y={rowY2 + 12} size={23} color={OK_INK} weight={500}>
           pops either end in O(1)
         </Line>
       </Drift>

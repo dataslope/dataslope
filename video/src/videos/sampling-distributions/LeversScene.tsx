@@ -112,7 +112,7 @@ export const LeversScene: React.FC = () => {
       <Ink
         at={waysAt + 6}
         dur={18}
-        style={{ left: 112, top: y(188), ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 112, top: y(188), ...headline(64, true), color: INK, whiteSpace: "nowrap" }}
       >
         Only one narrows the spread.
       </Ink>
@@ -127,10 +127,10 @@ export const LeversScene: React.FC = () => {
 
       {/* In real life there is one sample: the left lever is not there. */}
       <Note at={realAt} x={LEFT.x0 + 470} y={y(372)} width={260}>
-        <span style={{ ...body(30, true), color: INK }}>In real life, you get one sample.</span>
+        <span style={{ ...body(28, true), color: INK }}>In real life, you get one sample.</span>
       </Note>
       <Note at={leverAt - 2} x={RIGHT.x0} y={y(372)} width={290}>
-        <span style={{ ...body(30, true), color: INK }}>Its size is the lever you control.</span>
+        <span style={{ ...body(28, true), color: INK }}>Its size is the lever you control.</span>
       </Note>
     </AbsoluteFill>
   );
@@ -177,14 +177,14 @@ const Panel: React.FC<{ spec: PanelSpec; hold: number; axisAt: number }> = ({ sp
         width={2.6}
       />
       <Note at={times[0] + 8} x={sx(scale, center + sd) + 14} y={bracketY - 15}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>± ${fmt(rows[i].sd)}</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>± ${fmt(rows[i].sd)}</span>
       </Note>
 
       {/* The printout, a row per state. */}
       <Ink at={times[0]} dur={12} style={{ left: scale.x0, top: y(TABLE_TOP), width: tableW }}>
         <div style={{ position: "relative", height: 30, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(20, INK_SOFT), position: "absolute", left: 0 }}>{spec.head}</span>
-          <span style={{ ...label(20, INK_SOFT), position: "absolute", left: colB - scale.x0 }}>Spread of the averages</span>
+          <span style={{ ...label(24, INK_SOFT), position: "absolute", left: 0 }}>{spec.head}</span>
+          <span style={{ ...label(24, INK_SOFT), position: "absolute", left: colB - scale.x0 }}>Spread of the averages</span>
         </div>
         <div style={{ height: 1.5, background: INK }} />
       </Ink>
@@ -217,7 +217,7 @@ const Panel: React.FC<{ spec: PanelSpec; hold: number; axisAt: number }> = ({ sp
                 opacity: rowIn,
               }}
             />
-            <div style={{ position: "absolute", left: scale.x0, top: y(top) + 2, opacity: rowIn, ...headline(36) }}>
+            <div style={{ position: "absolute", left: scale.x0, top: y(top) + 2, opacity: rowIn, ...headline(34) }}>
               {spec.value(r)}
             </div>
             <div
@@ -226,7 +226,7 @@ const Panel: React.FC<{ spec: PanelSpec; hold: number; axisAt: number }> = ({ sp
                 left: colB,
                 top: y(top) + 2,
                 opacity: rowIn,
-                ...headline(36),
+                ...headline(34),
                 color: ACCENT_INK,
                 ...TABULAR,
               }}

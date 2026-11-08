@@ -129,7 +129,7 @@ export const DashScene: React.FC = () => {
                 alignItems: "center",
               }}
             >
-              {lead ? <span style={{ ...headline(22 + 12 * big), color: INK, whiteSpace: "nowrap" }}>key metric</span> : null}
+              {lead ? <span style={{ ...headline(24 + 12 * big), color: INK, whiteSpace: "nowrap" }}>key metric</span> : null}
             </div>
           );
         })}
@@ -137,7 +137,7 @@ export const DashScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>darker: more attention, in a simple model, not a measurement</span>
         </Note>
         <Note at={fasterAt - 2} x={GRID.x} y={cellY(3) + h(42)} out={out11}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             attention falls faster <b>down</b> the page than across it
           </span>
         </Note>
@@ -154,10 +154,10 @@ export const DashScene: React.FC = () => {
         <LineSet values={D.added} x0={CREEP.x0} x1={CREEP.x1} base={cBase} top={cTop} lo={0} hi={CREEP.hi} at={addedAt - 2} color={ACCENT} dots={false} labels={months} out={out11} edges />
         <LineSet values={D.used} x0={CREEP.x0} x1={CREEP.x1} base={cBase} top={cTop} lo={0} hi={CREEP.hi} at={fortyAt} color={BAR} dots={false} axis={false} out={out11} edges />
         <Note at={fortyAt + 4} x={CREEP.x1 + 14} y={lastY(D.added.at(-1)!) - 14} out={out11}>
-          <span style={{ ...label(21, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>{D.added.at(-1)} added</span>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>{D.added.at(-1)} added</span>
         </Note>
         <Note at={sixAt} x={CREEP.x1 + 14} y={lastY(D.used.at(-1)!) - 14} out={out11}>
-          <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap", ...TABULAR }}>{D.used.at(-1)} opened</span>
+          <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap", ...TABULAR }}>{D.used.at(-1)} opened</span>
         </Note>
         <Verdict ok x={CREEP.x0} y={cBase + h(50)} at={cutAt} out={out11}>
           cut what doesn&apos;t earn its place
@@ -167,7 +167,7 @@ export const DashScene: React.FC = () => {
           design for the audience
         </Verdict>
         <Note at={execAt - 2} x={CREEP.x0 + 38} y={cBase + h(130)} out={out11}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>an executive summary differs from an ops monitoring view</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>an executive summary differs from an ops monitoring view</span>
         </Note>
 
         {/* ── Question 12: what each is for, side by side ── */}
@@ -212,7 +212,7 @@ export const DashScene: React.FC = () => {
                   style={{
                     ...note(28, INK),
                     lineHeight: `${COLS.lineH}px`,
-                    fontWeight: "strong" in l ? 650 : undefined,
+                    fontWeight: "strong" in l ? 500 : undefined,
                     marginTop: COLS.lineGap,
                     opacity: ease(frame, l.at - 2, 12),
                     whiteSpace: "nowrap",

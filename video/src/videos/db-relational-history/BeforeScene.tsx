@@ -210,16 +210,16 @@ export const BeforeScene: React.FC = () => {
       {/* ── The rocket IMS was built for, then the program that walks the tree ── */}
       <Spot id="db-relational-history-rocket" at={saturnAt - 6} out={startsAt - 4} left={172} top={y(340)} width={176} height={410} />
       <Ink at={saturnAt - 4} dur={14} out={startsAt - 4} style={{ left: 96, top: y(724), whiteSpace: "nowrap" }}>
-        <div style={{ ...label(22, INK) }}>IBM&apos;s IMS, first shipped 1967</div>
-        <div style={{ ...body(23, true), marginTop: 6 }}>built to track Saturn V parts</div>
+        <div style={{ ...label(24, INK) }}>IBM&apos;s IMS, first shipped 1967</div>
+        <div style={{ ...body(24, true), marginTop: 6 }}>built to track Saturn V parts</div>
       </Ink>
 
       <Ink at={startsAt - 2} dur={14} style={{ left: 96, top: y(390), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, ACCENT_INK) }}>The program</span>
+        <span style={{ ...label(24, ACCENT_INK) }}>The program</span>
       </Ink>
       {steps.map((s, i) => (
         <Ink key={i} at={stepAt[i]} dur={12} style={{ left: 96, top: y(444 + i * 58), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK), fontFamily: MONO }}>
+          <span style={{ ...note(24, INK), fontFamily: MONO }}>
             <span style={{ color: INK_SOFT }}>{i + 1}&nbsp;&nbsp;</span>
             {i === 1 ? (
               <Strike at={walkedAt}>
@@ -236,7 +236,7 @@ export const BeforeScene: React.FC = () => {
         </Ink>
       ))}
       <Ink at={everyAt} dur={12} style={{ left: 126, top: y(444 + 4 * 58), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 650 }}>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>
           child 1 is now {last.name}
         </span>
       </Ink>
@@ -335,11 +335,11 @@ export const BeforeScene: React.FC = () => {
       <Cross x={nx - CHILD_W / 2 + 16} y={CHILD_Y} at={breaksAt - 2} size={22} />
 
       {/* The web of extra pointers, and the rule that held. */}
-      <div style={{ position: "absolute", left: 96, top: y(842), display: "flex", gap: "0.3em", ...note(22, INK_SOFT) }}>
+      <div style={{ position: "absolute", left: 96, top: y(842), display: "flex", gap: "0.3em", ...note(24, INK_SOFT) }}>
         <Ink at={networkAt - 2} dur={14} out={reorgAt - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Network databases: more pointers,
         </Ink>
-        <Ink at={ruleAt - 2} dur={14} out={reorgAt - 6} style={{ position: "relative", whiteSpace: "nowrap", color: INK, fontWeight: 600 }}>
+        <Ink at={ruleAt - 2} dur={14} out={reorgAt - 6} style={{ position: "relative", whiteSpace: "nowrap", color: INK, fontWeight: 500 }}>
           and still a route.
         </Ink>
       </div>

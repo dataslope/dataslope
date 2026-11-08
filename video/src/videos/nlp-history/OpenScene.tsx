@@ -49,8 +49,8 @@ const IdeaLabel: React.FC<{
           whiteSpace: "nowrap",
         }}
       >
-        <div style={{ ...label(21, DATA_INK), fontWeight: 700, ...TABULAR }}>{year}</div>
-        <div style={{ ...label(25, INK), fontWeight: 600, marginTop: 2 }}>{text}</div>
+        <div style={{ ...label(24, DATA_INK), fontWeight: 500, ...TABULAR }}>{year}</div>
+        <div style={{ ...label(24, INK), fontWeight: 500, marginTop: 2 }}>{text}</div>
       </div>
     </>
   );
@@ -79,8 +79,8 @@ const Span: React.FC<{ from: number; to: number; y: number; at: number; numAt: n
           top: y + 12,
           transform: `translate(-50%, ${(1 - t) * 6}px)`,
           opacity: t * (1 - d),
-          ...note(25, INK),
-          fontWeight: 600,
+          ...note(24, INK),
+          fontWeight: 500,
           background: PAPER,
           padding: "0 10px",
         }}

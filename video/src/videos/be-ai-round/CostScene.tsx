@@ -56,7 +56,7 @@ const Bill: React.FC<{
         overflow: "hidden",
       }}
     >
-      <span style={{ ...label(22, ink), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, at + 16, 10) }}>{text}</span>
+      <span style={{ ...label(24, ink), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, at + 16, 10) }}>{text}</span>
     </div>
   );
   return (
@@ -218,7 +218,7 @@ export const CostScene: React.FC = () => {
               on its word, the arithmetic and the prints with the example. */}
           <Listing lines={code} x={X0} top={y(LIST_Y)} width={930} size={LIST_SIZE} at={dailyAt - 4} lineAt={lineAt} marks={marks} />
           <Note at={inputAt - 4} x={RIGHT_X} y={y(LIST_Y)}>
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>What it prints</span>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>What it prints</span>
           </Note>
           <Console
             lines={COST.printed}
@@ -234,7 +234,7 @@ export const CostScene: React.FC = () => {
         {/* The day's bill: beside the listing, then across the page. */}
         <Bill x={bx} top={btop} px={bpx} input={COST.input} output={COST.output} at={inputAt + 4} height={barH} litInput={largerAt} />
         <Note at={leverAt + 20} x={X0} y={y(BAR_B.v) - 44}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             As written: <Num>{thousands(COST.daily)}</Num> USD a day
           </span>
         </Note>
@@ -243,43 +243,43 @@ export const CostScene: React.FC = () => {
         {[levers.slice(0, 2), levers.slice(2)].map((row, r) => (
           <div
             key={r}
-            style={{ position: "absolute", left: X0, top: y(BAR_B.v) + barH + h(12 + r * 36), display: "flex", alignItems: "baseline", gap: 14, fontSize: 23 }}
+            style={{ position: "absolute", left: X0, top: y(BAR_B.v) + barH + h(12 + r * 36), display: "flex", alignItems: "baseline", gap: 14, fontSize: 24 }}
           >
             {row.map((l, i) => {
               const p = ease(frame, l.at - 2, 12);
               return (
                 <React.Fragment key={l.text}>
-                  {i > 0 ? <span style={{ ...note(23, INK_SOFT), opacity: p }}>·</span> : null}
-                  <span style={{ ...note(23, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: p }}>{l.text}</span>
+                  {i > 0 ? <span style={{ ...note(24, INK_SOFT), opacity: p }}>·</span> : null}
+                  <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p }}>{l.text}</span>
                 </React.Fragment>
               );
             })}
           </div>
         ))}
         <Note at={afterAt} x={NEXT_X} y={y(BAR_B.v) - 40}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>after that</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>after that</span>
         </Note>
         {nexts.map((l, i) => (
           <Ink key={l.text} at={l.at} dur={12} style={{ left: NEXT_X, top: y(BAR_B.v) + h(-2 + i * 40) }}>
-            <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{l.text}</span>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{l.text}</span>
           </Ink>
         ))}
 
         {/* Per token, and per request. */}
         <Note at={fiveAt - 2} x={X0 + COST.input * BAR_B.px + 3} y={y(BAR_B.v) + barH + h(12)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             per token, output costs <b>{COST.outputPerTokenRatio}×</b> input
           </span>
         </Note>
         <Note at={fewerAt - 2} x={X0 + COST.input * BAR_B.px + 3} y={y(BAR_B.v) + barH + h(48)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             but a request has <Num>{thousands(COST.inputTokens)}</Num> in, <Mark at={fewerAt + 6}><Num>{COST.outputTokens}</Num> out</Mark>
           </span>
         </Note>
 
         {/* Halve each side, against the original bill. */}
         <Note at={halvePAt - 2} x={X0} y={y(HALF_P) - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Halve the prompt</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Halve the prompt</span>
         </Note>
         <Bill
           x={X0}
@@ -292,12 +292,12 @@ export const CostScene: React.FC = () => {
           saved={{ from: X0 + (halfPInput + COST.output) * BAR_B.px + 3, width: fullW - (halfPInput + COST.output) * BAR_B.px - 3 }}
         />
         <Note at={savedPAt - 2} x={X0 + fullW + 24} y={y(HALF_P) + barH / 2 - 17}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             saves <Num>{thousands(COST.halvePromptSaves)}</Num> a day
           </span>
         </Note>
         <Note at={halveAAt - 2} x={X0} y={y(HALF_A) - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Halve the answer</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Halve the answer</span>
         </Note>
         <Bill
           x={X0}
@@ -310,13 +310,13 @@ export const CostScene: React.FC = () => {
           saved={{ from: X0 + (COST.input + halfAOutput) * BAR_B.px + 3, width: fullW - (COST.input + halfAOutput) * BAR_B.px - 3 }}
         />
         <Note at={savedAAt - 2} x={X0 + fullW + 24} y={y(HALF_A) + barH / 2 - 17}>
-          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             saves <Num>{COST.halveAnswerSaves}</Num> a day
           </span>
         </Note>
 
         <Ink at={checkAt} dur={14} style={{ left: X0, top: y(862) }}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             The page&apos;s illustrative prices: <Num>{COST.priceIn.toFixed(2)}</Num> and <Num>{COST.priceOut.toFixed(2)}</Num> USD per million input and output tokens. Check your
             provider&apos;s.
           </span>

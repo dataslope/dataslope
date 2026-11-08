@@ -14,7 +14,7 @@ const RIGHT_X = 1000;
 const OPTS = { headH: 46, rowH: 50, bodySize: 24, headSize: 21 } as const;
 
 /**
- * Question 5, on why-normalization's shop (re-run in DuckDB). Normalized,
+ * Question 5, on why-normalization's shop (re-run here). Normalized,
  * Ada's email is one customers row that her orders reach through a join;
  * denormalized, it is copied onto each order, so reads need no join and a
  * rushed update leaves her two emails. Then where each one belongs, and why
@@ -116,7 +116,7 @@ export const NormScene: React.FC = () => {
           <ElbowArrow key={r} points={loop(r)} at={joinAt + 4 + k * 4} />
         ))}
         <Note at={joinAt + 10} x={loopX + 18} y={(og.rowMid(0) + cg.rowMid(0)) / 2 - 16}>
-          <span style={{ ...note(23, KEY_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a join</span>
+          <span style={{ ...note(24, KEY_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a join</span>
         </Note>
 
         {/* ── Denormalized: copied onto each order ── */}
@@ -138,16 +138,16 @@ export const NormScene: React.FC = () => {
           swaps={[{ row: 0, col: fEmail, at: rushedAt + 8, value: newEmail }]}
         />
         <Note at={fasterAt} x={RIGHT_X} y={below + h(20)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>no join: faster reads</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no join: faster reads</span>
         </Note>
         <Note at={priceAt} x={RIGHT_X} y={below + h(62)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             costs: storage
             <span style={{ opacity: ease(frame, disagreeAt, 10) }}>, and copies that can disagree</span>
           </span>
         </Note>
         <Note at={rushedAt} x={RIGHT_X} y={below + h(118)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mono>{update}</Mono>
             <span style={{ opacity: ease(frame, rushedAt + 10, 10) }}>
               {" "}
@@ -156,22 +156,22 @@ export const NormScene: React.FC = () => {
           </span>
         </Note>
         <Note at={twoAt + 6} x={RIGHT_X} y={below + h(160)}>
-          <span style={{ ...note(30, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>Ada now has two emails.</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Ada now has two emails.</span>
         </Note>
 
         {/* ── Where each belongs, one line each, so the warehouse's reason fits under them ── */}
         <Note at={writesAt} x={X0} y={og.rowTop(NORM_ORDERS.rows.length) + h(36)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Normalize: frequent writes that must stay consistent</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Normalize: frequent writes that must stay consistent</span>
         </Note>
         <Note at={readsAt} x={RIGHT_X} y={og.rowTop(NORM_ORDERS.rows.length) + h(36)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Denormalize: reads dominate,
             <span style={{ color: INK, opacity: ease(frame, warehouseAt - 2, 10) }}> like a warehouse</span>
           </span>
         </Note>
         {/* Why the warehouse's copies do not drift apart the way orders_flat's did. */}
         <Note at={affordAt} x={RIGHT_X} y={og.rowTop(NORM_ORDERS.rows.length) + h(84)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             its copies: <span style={{ opacity: ease(frame, rebuildsAt, 10) }}>rebuilt by one pipeline,</span>
             <span style={{ opacity: ease(frame, handAt, 10) }}> never edited by hand</span>
           </span>

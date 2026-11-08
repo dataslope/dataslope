@@ -26,7 +26,7 @@ import {
   type TableGeometry,
   X0,
 } from "./parts";
-import { QMono } from "./mono";
+import { Mono, QMono } from "./mono";
 
 /** Where the answers go: right of the list. */
 const R_X = 720;
@@ -46,7 +46,7 @@ const geo = (c: Ctx, x: number, top: number, cols: readonly string[], rows: read
 /** A query's name over a result table, set as code. */
 const CodeName: React.FC<{ g: TableGeometry; at: number; children: React.ReactNode }> = ({ g, at, children }) => (
   <Ink at={at} dur={12} style={{ left: g.x, top: g.top - 38, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 700, color: INK, fontVariantLigatures: "none" }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{children}</span>
   </Ink>
 );
 
@@ -108,10 +108,10 @@ const Union: React.FC<{ c: Ctx }> = ({ c }) => {
       </CodeName>
       <DataTable g={ag2} cols={numeric(RAPID.unionAll.cols)} at={allAt} rows={RAPID.unionAll.rows.map((cells, i) => ({ cells, at: allAt + 4 + i * 3 }))} bands={dup(RAPID.unionAll.rows).map((row, k) => ({ row, at: allAt + 18 + k * 4 }))} />
       <Note at={fasterAt - 4} x={ag2.right + 40} y={ag2.top + c.h(60)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>keeps every row, and it&apos;s faster:</span>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>keeps every row, and it&apos;s faster:</span>
       </Note>
       <Note at={checkAt - 2} x={ag2.right + 40} y={ag2.top + c.h(100)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>it skips the duplicate check</span>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>it skips the duplicate check</span>
       </Note>
     </>
   );
@@ -230,8 +230,6 @@ const Coalesce: React.FC<{ c: Ctx }> = ({ c }) => {
   const coalesceLine = lines.findIndex((l) => l.includes("COALESCE"));
   const nullifLine = lines.findIndex((l) => l.includes("NULLIF"));
   const day1 = 0;
-  // DuckDB without NULLIF: the zero-session day comes back null, not an error.
-  const duckNull = RAPID.divideByZero.rows[day1][0] === "null";
   return (
     <>
       <Listing
@@ -257,20 +255,23 @@ const Coalesce: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={errorAt - 2} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(30)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          Dividing by 0: <span style={{ color: ACCENT_INK, fontWeight: 650 }}>an error</span> in most databases.
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          Dividing by 0: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>an error</span> in most databases.
         </span>
       </Note>
       <Note at={byNullAt - 2} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(76)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Dividing by null: just null.</span>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>Dividing by null: just null.</span>
       </Note>
-      {/* The engine these ran in is one of the lenient ones: said, so a viewer
-          who tries it on the page is not surprised. */}
-      {duckNull ? (
-        <Note at={byNullAt + 12} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(122)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>DuckDB, which ran these, gives null for both.</span>
-        </Note>
-      ) : null}
+      {/* The engine these ran in is one of the strict ones: its own words for
+          the same division without NULLIF. */}
+      <Note at={byNullAt + 12} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(122)}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          Postgres, which ran these:{" "}
+          <Mono color={ACCENT_INK}>
+            {RAPID.divideByZero.kind}: {RAPID.divideByZero.message}
+          </Mono>
+        </span>
+      </Note>
     </>
   );
 };
@@ -362,7 +363,7 @@ const IndexFigure: React.FC<{ c: Ctx; tableAt: number; storedAt: number; indexAt
       />
       <Note at={storedAt} x={R_X} y={ug.rowTop(n + (insertAt === undefined ? 0 : 1)) + 16}>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <span style={{ fontWeight: 650 }}>clustered:</span> the rows themselves,
+          <span style={{ fontWeight: 500 }}>clustered:</span> the rows themselves,
         </div>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>in id order (one per table)</div>
       </Note>
@@ -388,7 +389,7 @@ const IndexFigure: React.FC<{ c: Ctx; tableAt: number; storedAt: number; indexAt
       )}
       <Note at={lookupAt + 6} x={ig.x} y={ig.rowTop(n + (insertAt === undefined ? 0 : 1)) + 16}>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <span style={{ fontWeight: 650 }}>non-clustered:</span> a separate lookup
+          <span style={{ fontWeight: 500 }}>non-clustered:</span> a separate lookup
         </div>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>(many per table)</div>
       </Note>
@@ -462,7 +463,6 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
   });
   const sub = firstRegion.length - 1;
   const allH = listingHeight(RAPID.groupByAll.lines.length, 22);
-  const ag = geo(c, R_X, c.T + allH + c.h(70), RAPID.groupByAll.cols, RAPID.groupByAll.rows);
   const allLine = RAPID.groupByAll.lines.findIndex((l) => l.startsWith("GROUP BY ALL"));
   return (
     <>
@@ -480,7 +480,7 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
         out={allAt - 4}
       />
       <Note at={twelveAt - 2} x={rg.right + 40} y={rg.top + c.h(10)} out={allAt - 4}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
           <Term at={twelveAt - 2}>
             <span style={TABULAR}>{pairs}</span>
           </Term>
@@ -494,17 +494,23 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
           </Term>
           <Term at={seventeenAt - 2}>
             {" = "}
-            <span style={{ ...TABULAR, fontWeight: 650 }}>{rows.length}</span> rows
+            <span style={{ ...TABULAR, fontWeight: 500 }}>{rows.length}</span> rows
           </Term>
         </span>
       </Note>
+      {/* Postgres, which runs the page's blocks, refuses GROUP BY ALL, so
+          there is no result to show: the listing, what it means, and where
+          it runs. */}
       <Listing lines={RAPID.groupByAll.lines} x={R_X} top={c.T} width={760} size={22} at={allAt - 2} marks={[{ line: allLine, at: allAt + 8 }]} />
-      <DataTable g={ag} cols={numeric(RAPID.groupByAll.cols, ["revenue"])} at={allAt} rows={RAPID.groupByAll.rows.map((cells, i) => ({ cells, at: allAt + 4 + i * 2 }))} />
-      <Note at={everyAt - 2} x={ag.right + 40} y={ag.top + c.h(10)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>every selected column you didn&apos;t aggregate</span>
+      <Note at={everyAt - 2} x={R_X} y={c.T + allH + c.h(50)}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          = <Mono>GROUP BY region</Mono>: every selected column you didn&apos;t aggregate
+        </span>
       </Note>
-      <Note at={everyAt + 16} x={ag.right + 40} y={ag.top + c.h(52)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Not standard SQL: where it&apos;s supported.</span>
+      <Note at={everyAt + 16} x={R_X} y={c.T + allH + c.h(100)}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          Not standard SQL: Snowflake, Databricks and DuckDB have it. Postgres doesn&apos;t.
+        </span>
       </Note>
     </>
   );
@@ -587,8 +593,8 @@ const Dedupe: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Ink at={rowNumberAt} dur={12} style={{ left: listX, top: c.T - 38, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK_SOFT) }}>
-          <span style={{ fontFamily: MONO, fontWeight: 600, fontVariantLigatures: "none" }}>ROW_NUMBER()</span>: a window function, Part 4
+        <span style={{ ...note(24, INK_SOFT) }}>
+          <span style={{ fontFamily: MONO, fontWeight: 500, fontVariantLigatures: "none" }}>ROW_NUMBER()</span>: a window function, Part 4
         </span>
       </Ink>
       <Listing
@@ -627,12 +633,12 @@ const Cross: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {regions.map((r, j) => (
         <Ink key={r} at={at + j * 2} dur={10} style={{ left: gx + j * cw, top: c.T, width: cw, textAlign: "center" }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK }}>{r}</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{r}</span>
         </Ink>
       ))}
       {products.map((p, i) => (
         <Ink key={p} at={at + 4 + i * 2} dur={10} style={{ left: R_X, top: gy + i * ch + ch / 2 - 16 }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK }}>{p}</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{p}</span>
         </Ink>
       ))}
       {products.flatMap((_, i) =>
@@ -675,7 +681,7 @@ const Cross: React.FC<{ c: Ctx }> = ({ c }) => {
 /**
  * The rapid-fire round, questions 11 to 24: the numbered list on the left,
  * ticked as the round goes, and each answer on the right, every table and
- * listing as DuckDB ran it. The cross join stays up through the bridge to the
+ * listing as Postgres ran it. The cross join stays up through the bridge to the
  * next video.
  */
 export const RapidScene: React.FC = () => {

@@ -151,13 +151,13 @@ export const PoissonScene: React.FC = () => {
               x={STRIP_X0 + i * STRIP_STEP}
               y={y(STRIP_BASE) + 8}
               opacity={ease(frame, countAt - 4 + i * 0.6, 8)}
-              style={note(19, INK_SOFT)}
+              style={note(24, INK_SOFT)}
             >
               {count}
             </Centered>
           ))}
           <Note at={countAt + 10} x={STRIP_X0 - 22} y={y(STRIP_BASE) + 40}>
-            <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
               tickets in each hour
               <span style={{ opacity: ease(frame, hoursEnd, 12) }}>: 24 of the {fmt(POISSON.hours, 0)} simulated</span>
             </span>
@@ -202,12 +202,12 @@ export const PoissonScene: React.FC = () => {
           </Note>
           <VRule x={mx} bottom={base} top={base - h(TALL + 54)} at={meanAt - 4} />
           <Note at={meanAt} x={mx + 34} y={base - h(TALL + 52)}>
-            <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>mean {POISSON.mean}</span>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>mean {POISSON.mean}</span>
           </Note>
 
           {/* ── The numbers ── */}
           <Ink at={oneHourAt - 6} dur={14} style={{ left: PANEL_X, top: y(420), whiteSpace: "nowrap" }}>
-            <span style={label(22, INK_SOFT)}>Eight or more tickets</span>
+            <span style={label(24, INK_SOFT)}>Eight or more tickets</span>
           </Ink>
           <Ink at={eightyAt - 8} dur={16} style={{ left: PANEL_X, top: y(458), whiteSpace: "nowrap" }}>
             <span style={{ ...body(46, true), color: INK }}>
@@ -215,24 +215,24 @@ export const PoissonScene: React.FC = () => {
             </span>
           </Ink>
           <Ink at={formulaAt - 6} dur={14} style={{ left: PANEL_X, top: y(540), whiteSpace: "nowrap" }}>
-            <span style={{ ...note(24, INK), fontWeight: 600 }}>
+            <span style={{ ...note(24, INK), fontWeight: 500 }}>
               <Sweep at={formulaAt - 2}>
                 formula <span style={askNote(24)}>{fmt(POISSON.sfAtLeast * 100, 2)}%</span>
               </Sweep>
             </span>
           </Ink>
           <Ink at={simulateAt - 4} dur={14} style={{ left: PANEL_X, top: y(584), whiteSpace: "nowrap" }}>
-            <span style={{ ...note(24, INK), fontWeight: 600 }}>
+            <span style={{ ...note(24, INK), fontWeight: 500 }}>
               simulated <span style={askNote(24)}>{sims >= 1 || frame >= sevenAt - 4 ? `${fmt(POISSON.simulatedAtLeast * 100, 2)}%` : "…"}</span>
             </span>
           </Ink>
           <Note at={simulateAt} x={PANEL_X} y={y(624)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
               <span style={TABULAR}>{fmt(Math.round(POISSON.hours * sims), 0)}</span> hours, a tick for each count
             </span>
           </Note>
           <Ink at={varianceAt - 4} dur={14} style={{ left: PANEL_X, top: y(690), whiteSpace: "nowrap" }}>
-            <span style={{ ...note(24, INK), fontWeight: 600 }}>
+            <span style={{ ...note(24, INK), fontWeight: 500 }}>
               mean {POISSON.mean} = variance {POISSON.variance}
             </span>
           </Ink>
@@ -240,7 +240,7 @@ export const PoissonScene: React.FC = () => {
             <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>real variance far above the mean?</span>
           </Note>
           <Note at={clumpingAt - 2} x={PANEL_X} y={y(770)}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 10 }}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 10 }}>
               <svg width={40} height={8} style={{ overflow: "visible" }}>
                 <line x1={0} x2={40} y1={4} y2={4} stroke={ASK} strokeWidth={2.6} strokeDasharray="8 6" />
               </svg>
@@ -248,7 +248,7 @@ export const PoissonScene: React.FC = () => {
             </span>
           </Note>
           <Note at={understateAt - 2} x={PANEL_X} y={y(800)}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>come more often than this says</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>come more often than this says</span>
           </Note>
           {/* A count with the same mean that clumps: three times the variance,
               and far more hours of eight or more. */}

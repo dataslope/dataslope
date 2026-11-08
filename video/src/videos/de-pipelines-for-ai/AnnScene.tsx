@@ -143,13 +143,13 @@ export const AnnScene: React.FC = () => {
 
         {/* What exact search is, and when it is enough. */}
         <Note at={exactAt} x={X0} y={y(244)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>exact</b>: the query against every vector
             <span style={{ opacity: ease(frame, accurateAt - 2, 10), color: OK_INK }}>, perfectly accurate</span>
           </span>
         </Note>
         <Note at={fineAt - 2} x={X0} y={y(244) + 40} dim={tradeAt}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             fine into the hundreds of thousands
             <span style={{ opacity: ease(frame, filterAt - 2, 10) }}>, more so after a filter</span>
           </span>
@@ -237,13 +237,13 @@ export const AnnScene: React.FC = () => {
           ))}
         </svg>
         <Note at={seventyAt + 4} x={px(missBox.x) + 18} y={py(missBox.y) - 16}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
             missed: across the border
           </span>
         </Note>
         <QueryMark x={qx} y={qy} at={everyAt - 4} />
         <Note at={everyAt + 2} x={qx + 26} y={qy - 15} dim={hnswAt}>
-          <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap", background: PAPER, padding: "0 4px" }}>query</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER, padding: "0 4px" }}>query</span>
         </Note>
 
         {/* Approximate, under exact; the two indexes under the space. */}
@@ -253,25 +253,25 @@ export const AnnScene: React.FC = () => {
           </span>
         </Note>
         <Note at={hnswAt} x={X0} y={top + SC.h + 20} dim={clusterAt}>
-          <span style={{ ...note(23, ds("purple", 600)), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ds("purple", 600)), fontWeight: 500, whiteSpace: "nowrap" }}>
             HNSW, a graph index
             <span style={{ opacity: ease(frame, fastAt - 2, 10), color: INK, fontWeight: 500 }}>: fast and accurate</span>
             <span style={{ opacity: ease(frame, memAt - 2, 10), color: INK_SOFT, fontWeight: 500 }}>, memory-hungry, slow to build</span>
           </span>
         </Note>
         <Note at={clusterAt} x={X0} y={top + SC.h + 60}>
-          <span style={{ ...note(23, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <span style={{ opacity: ease(frame, ivfAt - 2, 10) }}>IVF, </span>a cluster index
             <span style={{ opacity: ease(frame, nearestAt - 2, 10), color: INK, fontWeight: 500 }}>: search only the nearest clusters</span>
           </span>
         </Note>
         <Note at={lessAt - 2} x={X0} y={top + SC.h + 100}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>less memory and faster builds than HNSW; often with product quantization</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>less memory and faster builds than HNSW; often with product quantization</span>
         </Note>
 
         {/* The simulation. */}
         <Note at={modelAt - 2} x={CH.x0 - 70} y={y(CH.top) - 136}>
-          <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             modelled in NumPy
             <span style={{ opacity: ease(frame, sizeAt - 2, 10), fontWeight: 500 }}>
               : {num(ANN.n)} vectors, {ANN.lists} clusters
@@ -283,7 +283,7 @@ export const AnnScene: React.FC = () => {
         </Note>
         {/* The chart's frame, up from "Beyond that", so the right half is never bare. */}
         <Note at={tradeAt + 4} x={CH.x0 - 70} y={y(CH.top) - 62}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             recall<span style={{ fontWeight: 500, color: INK_SOFT }}>: the share of the true top ten found</span>
           </span>
         </Note>
@@ -292,7 +292,7 @@ export const AnnScene: React.FC = () => {
             {[0.6, 0.7, 0.8, 0.9, 1.0].map((v) => (
               <g key={v}>
                 <line x1={CH.x0 - 20} x2={CH.x1 + 20} y1={at(ys, v)} y2={at(ys, v)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
-                <text x={CH.x0 - 34} y={at(ys, v) + 7} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), ...TABULAR })}>
+                <text x={CH.x0 - 34} y={at(ys, v) + 7} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), ...TABULAR })}>
                   {pct(v)}
                 </text>
               </g>
@@ -301,7 +301,7 @@ export const AnnScene: React.FC = () => {
           </g>
           <g opacity={ease(frame, nearestAt, 14)}>
             {probes.map((p) => (
-              <text key={p.probe} x={xOf(p.probe)} y={y(CH.bottom) + 56} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), ...TABULAR })}>
+              <text key={p.probe} x={xOf(p.probe)} y={y(CH.bottom) + 56} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), ...TABULAR })}>
                 {p.probe}
               </text>
             ))}
@@ -330,27 +330,27 @@ export const AnnScene: React.FC = () => {
           })}
         </svg>
         <Note at={nearestAt + 4} x={CH.x1 - 520} y={y(CH.bottom) + 84}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={knobAt + 2}>clusters probed: the knob</Mark>
             <span style={{ opacity: ease(frame, breadthAt - 2, 10), fontWeight: 500 }}> (in HNSW, search breadth)</span>
           </span>
         </Note>
         <Note at={onePctAt - 2} x={xOf(1) + 18} y={at(ys, one.recall) + 14}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             compares {pct(one.work)} of the vectors
             <br />
-            <span style={{ opacity: ease(frame, seventyAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>finds {pct(one.recall)}</span>
+            <span style={{ opacity: ease(frame, seventyAt - 2, 10), color: BLUE_INK, fontWeight: 500 }}>finds {pct(one.recall)}</span>
           </span>
         </Note>
         <Note at={sixteenAt + 2} x={xOf(16) + 18} y={at(ys, sixteen.recall) + 18}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             compares {pct(sixteen.work)}
             <br />
-            <span style={{ opacity: ease(frame, ninetySixAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>finds {pct(sixteen.recall)}</span>
+            <span style={{ opacity: ease(frame, ninetySixAt - 2, 10), color: BLUE_INK, fontWeight: 500 }}>finds {pct(sixteen.recall)}</span>
           </span>
         </Note>
         <Note at={measureAt - 2} x={CH.x0 - 70} y={y(CH.bottom) + 132}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={measureAt + 6} color={MARK_OK}>
               measure recall against exact search
             </Mark>

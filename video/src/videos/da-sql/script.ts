@@ -34,20 +34,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
  *
- * Facts. Every statement on screen ran in DuckDB v1.4.3 (DuckDB-Wasm 1.32.0,
- * the engine and version the page's blocks run), from a fresh database per
- * figure, by check.mjs into results.json, which data.ts reads; every error is
- * DuckDB's own text:
+ * Facts. Every statement on screen ran in Postgres (PGlite, PostgreSQL 18,
+ * the engine the page's blocks run), from a fresh database per figure, by
+ * check.mjs into results.json, which data.ts reads; every error is Postgres's
+ * own text:
  *   - "where", on the page's 24 orders: region revenue East 840.75, North
- *     798.75, South 541.50, West 418.00; SUM in WHERE fails with "Binder
- *     Error: WHERE clause cannot contain aggregates!"; HAVING SUM(amount) >
+ *     798.75, South 541.50, West 418.00; SUM in WHERE fails with "ERROR:
+ *     aggregate functions are not allowed in WHERE"; HAVING SUM(amount) >
  *     600 keeps East and North ("two regions come back"). The pipeline: 24
  *     rows, 11 with amount > 100 ("the eleven over a hundred dollars"; no
  *     amount is exactly 100.00),
  *     four regions, and HAVING > 400 keeps East 700.50 and North 475.75
  *     ("the two over four hundred"). The thresholds are the video's own.
- *     DuckDB lets WHERE use a plain SELECT alias (plainAlias), which
- *     standard SQL and Postgres refuse, hence "in most databases".
+ *     Postgres refuses a plain SELECT alias in WHERE as well (plainAlias),
+ *     as standard SQL does.
  *   - "joins", the page's second challenge's first four customers and all
  *     six of their orders (Di never ordered), plus order 125 for a customer
  *     25 who isn't in the table, the video's own row: INNER 6 rows, LEFT 7
@@ -83,8 +83,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     Large, 120.00 Medium, 50.25 Small (the page's thresholds); WHEN score
  *     = NULL sends Ben's null to "Below A", IS NULL to "Unknown"; COALESCE
  *     gives 0 for a null discount and NULLIF a null rate for zero
- *     sessions (DuckDB also gives null without NULLIF, where most engines
- *     raise an error, which the screen says); ROLLUP over the page's challenge table gives 17 rows (12
+ *     sessions (without NULLIF, Postgres stops with "ERROR: division by
+ *     zero", which the screen shows); ROLLUP over the page's challenge table gives 17 rows (12
  *     region and category pairs, 4 subtotals, 1 total); the duplicate
  *     search finds two emails twice, and the ROW_NUMBER delete removes 2
  *     rows; 3 products by 4 regions give 12 rows, and 1,000 by 1,000 give
@@ -129,9 +129,10 @@ export const script: NarrationScript = {
       text: "WHERE filters rows, before anything is grouped. HAVING filters groups, after.",
       pauseAfter: 0.8,
     },
+    { id: "where-try", text: "So ask for the regions with revenue over six hundred, and put the sum in WHERE." },
     {
-      id: "where-try",
-      text: "So ask for the regions with revenue over six hundred, and put the sum in WHERE. DuckDB refuses. WHERE clause cannot contain aggregates.",
+      id: "where-refused",
+      text: "Postgres refuses. Aggregate functions are not allowed in WHERE.",
       pauseAfter: 0.6,
     },
     { id: "where-why", text: "The sum doesn't exist yet when WHERE runs.", pauseAfter: 0.8 },

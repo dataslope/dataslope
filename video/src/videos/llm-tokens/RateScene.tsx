@@ -21,7 +21,7 @@ const Cell: React.FC<{ at: number; value: string; unit: string; glow?: number }>
   return (
     <div style={{ display: "flex", alignItems: "baseline", gap: 12, opacity: p, transform: `translateY(${(1 - p) * 8}px)` }}>
       <span style={{ ...headline(60), color: glow > 0.3 ? FOCUS_INK : INK, ...TABULAR }}>{value}</span>
-      <span style={{ ...body(30), color: INK_SOFT, whiteSpace: "nowrap" }}>{unit}</span>
+      <span style={{ ...body(28), color: INK_SOFT, whiteSpace: "nowrap" }}>{unit}</span>
     </div>
   );
 };
@@ -108,14 +108,14 @@ export const RateScene: React.FC = () => {
             display: "flex",
             alignItems: "baseline",
             gap: 40,
-            ...note(26, INK),
+            ...note(28, INK),
           }}
         >
           <span style={{ opacity: ease(frame, charsAt - 2, 10), whiteSpace: "nowrap" }}>
-            <b style={{ ...TABULAR, fontWeight: 650 }}>{OPENING.chars}</b> characters
+            <b style={{ ...TABULAR, fontWeight: 600 }}>{OPENING.chars}</b> characters
           </span>
           <span style={{ opacity: inked > 0 ? 1 : 0, whiteSpace: "nowrap" }}>
-            <b style={{ ...TABULAR, fontWeight: 650, color: inked === pieces.length ? FOCUS_INK : INK }}>{inked}</b> tokens
+            <b style={{ ...TABULAR, fontWeight: 600, color: inked === pieces.length ? FOCUS_INK : INK }}>{inked}</b> tokens
           </span>
           <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, tokensAt + 6, 12), whiteSpace: "nowrap" }}>
             {OPENING.charsPerToken} characters a token:{" "}
@@ -153,10 +153,10 @@ export const RateScene: React.FC = () => {
               <ChipFace text={p.text} size={28} />
             </React.Fragment>
           ))}
-          <span style={{ ...body(30), color: INK, marginLeft: 34, whiteSpace: "nowrap", opacity: ease(frame, nobodyAt - 2, 12) }}>
+          <span style={{ ...body(28), color: INK, marginLeft: 34, whiteSpace: "nowrap", opacity: ease(frame, nobodyAt - 2, 12) }}>
             Nobody chose these cuts.
           </span>
-          <span style={{ ...label(22, FOCUS_INK), marginLeft: 18, whiteSpace: "nowrap", opacity: ease(frame, learnedAt - 2, 12) }}>
+          <span style={{ ...label(24, FOCUS_INK), marginLeft: 18, whiteSpace: "nowrap", opacity: ease(frame, learnedAt - 2, 12) }}>
             They were learned.
           </span>
         </div>

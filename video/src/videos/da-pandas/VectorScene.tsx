@@ -125,7 +125,7 @@ export const VectorScene: React.FC = () => {
         />
         <Note at={oneCallAt - 2} x={vg.right + 26} y={vg.rowTop(2)} out={out13}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 650 }}>1 call</span>, in compiled C
+            <span style={{ fontWeight: 500 }}>1 call</span>, in compiled C
           </span>
         </Note>
         <Listing lines={VECTOR.applied.lines} x={APPLY_X} top={y(TOP)} width={600} size={SIZE} at={applyAt - 4} out={out13} />
@@ -140,12 +140,12 @@ export const VectorScene: React.FC = () => {
         {/* One call per value, counted as the values arrive. */}
         {Array.from({ length: rows }, (_, i) => (
           <Ink key={i} at={everyAt + 4 + i * 5} dur={8} out={out13} style={{ left: pg.right + 20, top: pg.rowMid(i) - 14 }}>
-            <span style={{ ...label(20, BLUE_INK), whiteSpace: "nowrap" }}>call {i + 1}</span>
+            <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap" }}>call {i + 1}</span>
           </Ink>
         ))}
         <Note at={millionAt - 2} x={APPLY_X} y={pg.rowTop(rows) + h(30)} out={out13}>
-          <span style={{ ...note(30, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            {fmt(VECTOR.calls, 0)} rows, <span style={{ fontWeight: 650 }}>{fmt(VECTOR.calls, 0)} calls</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
+            {fmt(VECTOR.calls, 0)} rows, <span style={{ fontWeight: 500 }}>{fmt(VECTOR.calls, 0)} calls</span>
           </span>
         </Note>
 
@@ -168,12 +168,12 @@ export const VectorScene: React.FC = () => {
               width={3}
             />
             <Ink at={colAt + 2 + k * 4} dur={12} style={{ left: fg.xs[j], top: under, width: fg.widths[j] - fg.pad, textAlign: "right" }}>
-              <span style={{ fontFamily: MONO, fontSize: 26, color: BLUE_INK, fontVariantLigatures: "none" }}>{VECTOR.byColumn.rows[k][1]}</span>
+              <span style={{ fontFamily: MONO, fontSize: 28, color: BLUE_INK, fontVariantLigatures: "none" }}>{VECTOR.byColumn.rows[k][1]}</span>
             </Ink>
           </React.Fragment>
         ))}
         <Ink at={colAt} dur={12} style={{ left: fg.x + fg.pad, top: under }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK }}>axis=0</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: BLUE_INK }}>axis=0</span>
         </Ink>
         {/* axis=1: across each row, its answer beside it. */}
         {F.rows.map((_, i) => (

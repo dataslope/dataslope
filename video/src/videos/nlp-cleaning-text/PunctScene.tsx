@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, note, SERIF_ITALIC } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -44,15 +44,15 @@ const Recipe: React.FC<{ at: number; onAt: number; doesAt: number; y: number; ca
 }) => (
   <>
     <Ink at={at} dur={14} style={{ left: X0, top: y - 8, whiteSpace: "nowrap" }}>
-      <div style={{ fontFamily: MONO, fontSize: 23, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{call}</div>
+      <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>{call}</div>
     </Ink>
     <Ink at={onAt} dur={14} style={{ left: X0, top: y + 24, whiteSpace: "nowrap" }}>
-      <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>
+      <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>
         on {on}
       </div>
     </Ink>
     <Ink at={doesAt} dur={14} style={{ left: X0, top: y + 56, whiteSpace: "nowrap" }}>
-      <div style={note(20, INK_SOFT)}>{does}</div>
+      <div style={note(24, INK_SOFT)}>{does}</div>
     </Ink>
   </>
 );
@@ -230,11 +230,11 @@ export const PunctScene: React.FC = () => {
       {/* The lesson's order tip, as it is said, and what it means on this line:
           Punkt finds two sentences in the text as written, one once its
           punctuation is gone. */}
-      <div style={{ position: "absolute", left: X0, top: y(NOTE_Y), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...body(36), color: INK }}>
+      <div style={{ position: "absolute", left: X0, top: y(NOTE_Y), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...body(34), color: INK }}>
         <Ink at={afterAt - 6} dur={16} style={{ position: "relative" }}>
           Strip punctuation after you tokenize,
         </Ink>
-        <Ink at={neverAt - 4} dur={16} style={{ position: "relative", fontStyle: "italic" }}>
+        <Ink at={neverAt - 4} dur={16} style={{ position: "relative", fontStyle: SERIF_ITALIC }}>
           never before.
         </Ink>
       </div>
@@ -248,8 +248,8 @@ export const PunctScene: React.FC = () => {
           dur={14}
           style={{ left: INSET_X, top: y(NOTE_Y) - 6 + i * 38, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}
         >
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none", width: 330 }}>{r.call}</span>
-          <span style={{ ...note(24, r.color), fontWeight: 650 }}>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none", width: 330 }}>{r.call}</span>
+          <span style={{ ...note(24, r.color), fontWeight: 500 }}>
             {r.n} {r.n === 1 ? "sentence" : "sentences"}
           </span>
         </Ink>

@@ -1,99 +1,22 @@
-// Runs every statement the ds-sql video shows in DuckDB, the engine the Data
-// Scientist SQL page's blocks run in the reader's browser, and writes what
-// came back to results.json, which data.ts reads. From the repo root, where
-// @duckdb/duckdb-wasm (pinned to the version runtime/duckdb.ts loads) is
-// installed:
+// Runs every statement the ds-sql video shows on the site's Postgres engine
+// (PGlite, PostgreSQL 18), the engine the Data Scientist SQL page's blocks
+// run in the reader's browser, and writes what came back to results.json,
+// which data.ts reads. From the repo root:
 //
 //   node video/src/videos/ds-sql/check.mjs
 //
 // Each figure runs in a fresh database built by its own setup, as the page
-// gives every block its own engine. Values are printed the way a SQL client
-// prints them: a DECIMAL at its scale, a DATE as "2024-01-01", a NULL as
-// null. Tables are the page's own (content/interview/data-scientist/sql.mdx)
+// gives every block its own engine (video/scripts/lib/pg-figure.mjs). Values
+// are printed the way psql prints them: a numeric at its scale, a DATE as
+// "2024-01-01", a NULL as null, and an error as Postgres's own "ERROR: ..."
+// line. Tables are the page's own (content/interview/data-scientist/sql.mdx)
 // wherever the page has one; the rest are marked "the video's own" below and
-// in script.ts. The one Postgres figure (a rate's integer division and its
-// divide-by-zero error) runs on the site's Postgres engine through
-// scripts/lib/sql-engines.mjs, the same one the Postgres lessons grade with.
+// in script.ts.
 /* global console, URL */
 import { writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
-const require = createRequire(join(dirname(fileURLToPath(import.meta.url)), "../../../../package.json"));
-const duckdb = require("@duckdb/duckdb-wasm");
-const { default: Worker } = await import(pathToFileURL(require.resolve("web-worker")).href);
-const dist = join(dirname(require.resolve("@duckdb/duckdb-wasm")), "..", "dist");
-const bundle = await duckdb.selectBundle({
-  mvp: { mainModule: join(dist, "duckdb-mvp.wasm"), mainWorker: join(dist, "duckdb-node-mvp.worker.cjs") },
-  eh: { mainModule: join(dist, "duckdb-eh.wasm"), mainWorker: join(dist, "duckdb-node-eh.worker.cjs") },
-});
-
-/** One value as a SQL client prints it, from its Arrow column type. */
-function shown(value, type) {
-  if (value === null || value === undefined) return null;
-  const t = String(type);
-  if (t.startsWith("Decimal")) {
-    const scale = type.scale ?? 0;
-    const digits = String(value).replace("-", "").padStart(scale + 1, "0");
-    const sign = String(value).startsWith("-") ? "-" : "";
-    return scale ? `${sign}${digits.slice(0, -scale)}.${digits.slice(-scale)}` : `${sign}${digits}`;
-  }
-  if (t.startsWith("Date")) return new Date(Number(value)).toISOString().slice(0, 10);
-  if (t.startsWith("Timestamp")) return new Date(Number(value)).toISOString().slice(0, 19).replace("T", " ");
-  if (typeof value === "bigint") return Number(value);
-  return value?.valueOf?.() ?? value;
-}
-
-async function figure(setup, steps) {
-  const worker = new Worker(pathToFileURL(bundle.mainWorker).href, { type: "module" });
-  const db = new duckdb.AsyncDuckDB({ log: () => {} }, worker);
-  await db.instantiate(bundle.mainModule);
-  const conn = await db.connect();
-  for (const stmt of setup.split(/;\s*\n/).map((s) => s.trim()).filter(Boolean)) await conn.query(stmt);
-  const out = {};
-  for (const [id, sql] of Object.entries(steps)) {
-    try {
-      const table = await conn.query(sql);
-      const fields = table.schema.fields;
-      const rows = table.toArray().map((r) => {
-        const obj = r.toJSON();
-        return fields.map((f) => shown(obj[f.name], f.type));
-      });
-      out[id] = { sql, ok: true, columns: fields.map((f) => f.name), rows };
-    } catch (e) {
-      // DuckDB's message is "<Kind> Error: <text>", then a LINE excerpt.
-      const message = String(e.message).split("\n")[0];
-      out[id] = { sql, ok: false, error: message };
-    }
-  }
-  const version = (await conn.query("SELECT version() AS v")).toArray()[0].toJSON().v;
-  await conn.close();
-  await db.terminate();
-  await worker.terminate();
-  return { setup, steps: out, version };
-}
-
-/** The same, on the site's Postgres engine (PGlite), for the one figure that
- *  shows what Postgres does differently. Values come back as Postgres prints
- *  them. */
-async function pgFigure(setup, steps) {
-  const { createEngine } = await import(new URL("../../../../scripts/lib/sql-engines.mjs", import.meta.url).href);
-  const engine = await createEngine("postgres");
-  await engine.exec(setup);
-  const out = {};
-  for (const [id, sql] of Object.entries(steps)) {
-    try {
-      const [r] = await engine.exec(sql);
-      out[id] = { sql, ok: true, columns: r.columns, rows: r.values.map((row) => row.map((v) => (v === null ? null : String(v)))) };
-    } catch (e) {
-      out[id] = { sql, ok: false, error: `ERROR: ${String(e.message).split("\n")[0]}` };
-    }
-  }
-  const version = engine.version;
-  await engine.destroy();
-  return { setup, steps: out, version };
-}
+import { figure } from "../../../scripts/lib/pg-figure.mjs";
 
 // ── The page's tables ───────────────────────────────────────────────────────
 
@@ -239,7 +162,9 @@ const VIEWS = `CREATE TABLE views AS SELECT * FROM (VALUES
 const results = { figures: {} };
 
 // 1, 2. Retention needs a LEFT JOIN, and churn is its NULL rows.
-const RETAIN = "COUNT(b.user_id) * 1.0 / COUNT(*)";
+// Rounded: Postgres prints this numeric ratio with twenty decimal places.
+// The scenes show it as a percentage, not as SQL.
+const RETAIN = "ROUND(COUNT(b.user_id) * 1.0 / COUNT(*), 2)";
 results.figures.retain = await figure(ACTIVE, {
   jan: "SELECT user_id FROM active_jan ORDER BY user_id;",
   feb: "SELECT user_id FROM active_feb ORDER BY user_id;",
@@ -254,30 +179,30 @@ results.figures.retain = await figure(ACTIVE, {
     "SELECT a.user_id\nFROM active_jan a\nWHERE NOT EXISTS (\n  SELECT 1 FROM active_feb b WHERE b.user_id = a.user_id\n)\nORDER BY a.user_id;",
 });
 
-// 3. A safe rate: the page's block in DuckDB, and the same funnel in
-//    Postgres, where integer division truncates and a zero divisor errors.
+// 3. A safe rate: the page's block, the bare division the zero divisor
+//    fails, and integer division, which Postgres truncates.
 const FIRST_SIX = "WHERE variant IN ('A', 'B', 'C', 'D', 'E', 'F')";
 results.figures.rate = await figure(PAGE_FUNNEL, {
   page: "SELECT\n  variant,\n  sessions,\n  conversions,\n  ROUND(conversions * 1.0 / NULLIF(sessions, 0), 4) AS conversion_rate\nFROM funnel\nORDER BY variant;",
   firstSix: `SELECT variant, sessions, conversions,\n  ROUND(conversions * 1.0 / NULLIF(sessions, 0), 4) AS conversion_rate\nFROM funnel\n${FIRST_SIX}\nORDER BY variant;`,
   bare: `SELECT variant, conversions / sessions AS rate\nFROM funnel\n${FIRST_SIX}\nORDER BY variant;`,
   zeros: "SELECT COUNT(*) AS no_sessions FROM funnel WHERE sessions = 0;",
-  coalesced: `SELECT variant,\n  COALESCE(conversions * 1.0 / NULLIF(sessions, 0), 0) AS rate\nFROM funnel\n${FIRST_SIX}\nORDER BY variant;`,
-  // The funnel's first six rows as data, and DuckDB's bare division on the
-  // two with no sessions: null without any NULLIF.
+  // Not shown (the screen strikes a COALESCE through): rounded, since
+  // Postgres prints the unrounded ratio with twenty decimal places.
+  coalesced: `SELECT variant,\n  ROUND(COALESCE(conversions * 1.0 / NULLIF(sessions, 0), 0), 4) AS rate\nFROM funnel\n${FIRST_SIX}\nORDER BY variant;`,
+  // The funnel's first six rows as data.
   funnel: `SELECT variant, sessions, conversions\nFROM funnel\n${FIRST_SIX}\nORDER BY variant;`,
-  duckBare: "SELECT variant, conversions / sessions AS rate\nFROM funnel WHERE variant IN ('C', 'F')\nORDER BY variant;",
-});
-results.figures.ratePg = await pgFigure(PAGE_FUNNEL, {
-  bare: `SELECT variant, conversions / sessions AS rate\nFROM funnel\n${FIRST_SIX}\nORDER BY variant;`,
+  // Integer division on the two variants with sessions, then the fix.
   truncated: "SELECT variant, conversions / sessions AS rate\nFROM funnel\nWHERE variant IN ('A', 'B')\nORDER BY variant;",
   fixed: `SELECT variant,\n  ROUND(conversions * 1.0 / NULLIF(sessions, 0), 4) AS rate\nFROM funnel\n${FIRST_SIX}\nORDER BY variant;`,
 });
 
 // 4. Cohort retention: the page's query on the video's own activity log,
-//    then its counts as rates of each cohort's month zero.
+//    then its counts as rates of each cohort's month zero. Postgres has no
+//    month-difference function, so the page builds the offset from the year
+//    and month parts, and casts the truncated month back to a date.
 const COHORT_CTES =
-  "WITH first_seen AS (\n  SELECT user_id, DATE_TRUNC('month', MIN(event_date)) AS cohort\n  FROM activity\n  GROUP BY user_id\n),\nlabeled AS (\n  SELECT a.user_id, f.cohort,\n    DATE_DIFF('month', f.cohort, DATE_TRUNC('month', a.event_date)) AS month_offset\n  FROM activity a\n  JOIN first_seen f USING (user_id)\n)";
+  "WITH first_seen AS (\n  SELECT user_id, DATE_TRUNC('month', MIN(event_date))::date AS cohort\n  FROM activity\n  GROUP BY user_id\n),\nlabeled AS (\n  SELECT a.user_id, f.cohort,\n    (EXTRACT(YEAR FROM a.event_date) - EXTRACT(YEAR FROM f.cohort)) * 12\n      + EXTRACT(MONTH FROM a.event_date)\n      - EXTRACT(MONTH FROM f.cohort) AS month_offset\n  FROM activity a\n  JOIN first_seen f USING (user_id)\n)";
 results.figures.cohort = await figure(ACTIVITY, {
   rows: "SELECT COUNT(*) AS events, COUNT(DISTINCT user_id) AS users FROM activity;",
   sample: "SELECT user_id, event_date FROM activity ORDER BY user_id, event_date LIMIT 6;",
@@ -286,26 +211,28 @@ results.figures.cohort = await figure(ACTIVITY, {
 });
 
 // 5. Sessionization: the page's block, and the same steps for user 1 with
-//    the gap in minutes, for the timeline.
+//    the gap in whole minutes, for the timeline (not shown as SQL).
 results.figures.sessions = await figure(PAGE_HITS, {
   page: "WITH gaps AS (\n  SELECT user_id, ts,\n    CASE\n      WHEN ts - LAG(ts) OVER (PARTITION BY user_id ORDER BY ts) > INTERVAL '30 minutes'\n        OR LAG(ts) OVER (PARTITION BY user_id ORDER BY ts) IS NULL\n      THEN 1 ELSE 0\n    END AS is_new_session\n  FROM hits\n)\nSELECT user_id, ts,\n  SUM(is_new_session) OVER (PARTITION BY user_id ORDER BY ts) AS session_id\nFROM gaps\nORDER BY user_id, ts;",
   userOne:
-    "SELECT strftime(ts, '%H:%M') AS time,\n  DATE_DIFF('minute', LAG(ts) OVER (ORDER BY ts), ts) AS gap_min\nFROM hits\nWHERE user_id = 1\nORDER BY ts;",
+    "SELECT to_char(ts, 'HH24:MI') AS time,\n  (EXTRACT(EPOCH FROM ts - LAG(ts) OVER (ORDER BY ts)) / 60)::int AS gap_min\nFROM hits\nWHERE user_id = 1\nORDER BY ts;",
   userOneSteps:
-    "WITH g AS (\n  SELECT ts, DATE_DIFF('minute', LAG(ts) OVER (ORDER BY ts), ts) AS gap_min\n  FROM hits WHERE user_id = 1\n),\nf AS (\n  SELECT *, CASE WHEN gap_min IS NULL OR gap_min > 30 THEN 1 ELSE 0 END AS is_new\n  FROM g\n)\nSELECT strftime(ts, '%H:%M') AS time, gap_min, is_new,\n  SUM(is_new) OVER (ORDER BY ts) AS session_id\nFROM f\nORDER BY ts;",
+    "WITH g AS (\n  SELECT ts, (EXTRACT(EPOCH FROM ts - LAG(ts) OVER (ORDER BY ts)) / 60)::int AS gap_min\n  FROM hits WHERE user_id = 1\n),\nf AS (\n  SELECT *, CASE WHEN gap_min IS NULL OR gap_min > 30 THEN 1 ELSE 0 END AS is_new\n  FROM g\n)\nSELECT to_char(ts, 'HH24:MI') AS time, gap_min, is_new,\n  SUM(is_new) OVER (ORDER BY ts) AS session_id\nFROM f\nORDER BY ts;",
   perUser:
     "WITH gaps AS (\n  SELECT user_id, ts,\n    CASE WHEN ts - LAG(ts) OVER (PARTITION BY user_id ORDER BY ts) > INTERVAL '30 minutes'\n      OR LAG(ts) OVER (PARTITION BY user_id ORDER BY ts) IS NULL THEN 1 ELSE 0 END AS is_new_session\n  FROM hits\n)\nSELECT user_id, SUM(is_new_session) AS sessions, COUNT(*) AS hits\nFROM gaps\nGROUP BY user_id\nORDER BY user_id;",
 });
 
-// 6. Median and percentiles on the video's own latencies.
+// 6. Median and percentiles on the video's own latencies. PERCENTILE_CONT
+//    returns a double precision, which Postgres's two-argument ROUND does not
+//    take, so it is cast to numeric first.
 results.figures.pct = await figure(REQUESTS, {
   values: "SELECT ms FROM requests ORDER BY ms;",
   mean: "SELECT ROUND(AVG(ms), 1) AS mean FROM requests;",
   slower: "SELECT COUNT(*) AS faster_than_mean FROM requests WHERE ms < (SELECT AVG(ms) FROM requests);",
   median:
-    "SELECT\n  ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ms), 1) AS median_cont,\n  PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ms) AS median_disc\nFROM requests;",
+    "SELECT\n  ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ms)::numeric, 1) AS median_cont,\n  PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ms) AS median_disc\nFROM requests;",
   p90:
-    "SELECT\n  ROUND(PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY ms), 1) AS p90_cont,\n  PERCENTILE_DISC(0.9) WITHIN GROUP (ORDER BY ms) AS p90_disc\nFROM requests;",
+    "SELECT\n  ROUND(PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY ms)::numeric, 1) AS p90_cont,\n  PERCENTILE_DISC(0.9) WITHIN GROUP (ORDER BY ms) AS p90_disc\nFROM requests;",
 });
 
 // At speed.
@@ -355,5 +282,5 @@ const failed = Object.entries(results.figures).flatMap(([f, fig]) =>
     .filter(([, s]) => !s.ok)
     .map(([id, s]) => `${f}.${id}: ${s.error}`),
 );
-console.log(`wrote ${fileURLToPath(out)} (${results.figures.retain.version}; ${results.figures.ratePg.version})`);
+console.log(`wrote ${fileURLToPath(out)} (${results.figures.retain.version})`);
 console.log(failed.length ? `errors, as expected where a figure shows one:\n  ${failed.join("\n  ")}` : "no errors");

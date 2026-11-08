@@ -105,8 +105,8 @@ export const DefaultScene: React.FC = () => {
       <FigLabel n="13" title="One corpus, two tf-idf recipes" at={start - 2} x={X0} y={y(FIG_Y)} />
 
       {/* Column heads and formulas. */}
-      <div style={{ position: "absolute", left: COL_A, top: y(HEAD_Y), opacity: a, ...label(21, INK_SOFT) }}>Textbook, as in the lesson</div>
-      <div style={{ position: "absolute", left: COL_B, top: y(HEAD_Y), opacity: b, ...label(21, INK_SOFT) }}>
+      <div style={{ position: "absolute", left: COL_A, top: y(HEAD_Y), opacity: a, ...label(24, INK_SOFT) }}>Textbook, as in the lesson</div>
+      <div style={{ position: "absolute", left: COL_B, top: y(HEAD_Y), opacity: b, ...label(24, INK_SOFT) }}>
         <Code>TfidfVectorizer()</Code> default
       </div>
       <Ink at={textbookAt - 2} dur={18} style={{ left: COL_A, top: y(FORMULA_Y), ...headline(42), whiteSpace: "nowrap" }}>
@@ -161,14 +161,14 @@ export const DefaultScene: React.FC = () => {
         </React.Fragment>
       ))}
       <Note at={textbookAt + 8} x={WORD_X} y={y(ROW_Y[1] + ROW_H + 22)}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           <V>N</V> is {N}. <i>{VOCAB[THE]}</i> is in {DF[THE]} documents, <i>{VOCAB[CAT]}</i> in {DF[CAT]}.
         </span>
       </Note>
 
       {/* Doc 1 under the default. */}
       <Note at={barsAt - 6} x={CHART_X - 20} y={y(HEAD_Y)}>
-        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Doc 1’s tf-idf scores through <Code>TfidfVectorizer()</Code>
         </span>
       </Note>
@@ -202,22 +202,22 @@ export const DefaultScene: React.FC = () => {
             y={y(BASE_Y) - h(MAX_H) * (d.v / TOP_V) - 40}
             style={{ transform: "translateX(-50%)" }}
           >
-            <span style={{ ...note(22, d.j === THE && top > 0.5 ? ACCENT_INK : INK), fontWeight: 600 }}>{d.v.toFixed(2)}</span>
+            <span style={{ ...note(24, d.j === THE && top > 0.5 ? ACCENT_INK : INK), fontWeight: 500 }}>{d.v.toFixed(2)}</span>
           </Note>
           <Note at={barsAt - 4 + k * 3} x={CHART_X + k * STEP + BAR_W / 2} y={y(BASE_Y) + 12} style={{ transform: "translateX(-50%)" }}>
-            <span style={{ ...body(30, true), color: INK }}>{d.w}</span>
+            <span style={{ ...body(28, true), color: INK }}>{d.w}</span>
           </Note>
         </React.Fragment>
       ))}
       {DEFAULT_THE_TOPS ? (
         <Note at={topAt} x={CHART_X - 20} y={y(BASE_Y + 76)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <i>{VOCAB[THE]}</i> still scores highest, in every row
           </span>
         </Note>
       ) : null}
       <Note at={chartAt - 2} x={CHART_X - 20} y={y(BASE_Y + 118)}>
-        <span style={{ ...note(22, INK), display: "block", width: 680 }}>
+        <span style={{ ...note(24, INK), display: "block", width: 680 }}>
           Its other defaults: <Mark at={rawAt}>raw counts</Mark> for tf, then each row <Mark at={lengthAt - 2}>scaled to length one</Mark>.
         </span>
       </Note>

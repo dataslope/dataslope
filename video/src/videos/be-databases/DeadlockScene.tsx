@@ -31,7 +31,7 @@ const Hold: React.FC<{ x0: number; x1: number; y: number; account: 1 | 2; at: nu
   return (
     <g opacity={1 - o}>
       <rect x={x0} y={y - 7} width={(x1 - x0) * p} height={14} rx={7} fill={fail > 0 ? `color-mix(in srgb, ${ACCENT} ${fail * 100}%, ${ACC[account]})` : ACC[account]} opacity={0.85} />
-      <text x={x0} y={labelAbove ? y - 20 : y + 38} style={svgText({ ...label(20, ACC_INK[account]), fontWeight: 700 })} opacity={ease(frame, at + 4, 10)}>
+      <text x={x0} y={labelAbove ? y - 20 : y + 38} style={svgText({ ...label(24, ACC_INK[account]), fontWeight: 500 })} opacity={ease(frame, at + 4, 10)}>
         locks account {account}
       </text>
     </g>
@@ -62,7 +62,7 @@ const Mark: React.FC<{ x: number; y: number; at: number; out: number; text: stri
   return (
     <g opacity={p}>
       <circle cx={x} cy={y} r={8} fill={color} />
-      <text x={x} y={below ? y + 36 : y - 20} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 20, fontWeight: 700, color })}>
+      <text x={x} y={below ? y + 36 : y - 20} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 24, fontWeight: 500, color })}>
         {text}
       </text>
     </g>
@@ -170,13 +170,13 @@ export const DeadlockScene: React.FC = () => {
           What is a deadlock, and how do you avoid it?
         </QuestionCard>
         <Note at={cycleAt} x={X0} y={y(250) + h(4)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>
             A cycle of transactions, each holding a lock another one needs.
           </span>
         </Note>
 
         <Note at={twoAt} x={1800} y={y(250) + h(8)} align="right">
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>drawn: it needs two sessions at once</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>drawn: it needs two sessions at once</span>
         </Note>
 
         {/* ── The lanes ── */}
@@ -186,7 +186,7 @@ export const DeadlockScene: React.FC = () => {
             { yy: l2, name: "transfer 2" },
           ].map(({ yy, name }) => (
             <g key={name}>
-              <text x={X0} y={yy + 8} style={svgText(label(23, INK))}>
+              <text x={X0} y={yy + 8} style={svgText(label(24, INK))}>
                 {name}
               </text>
               <line x1={T0 - 30} y1={yy} x2={T0 - 30 + (T1 - T0 + 30) * lanesIn} y2={yy} stroke={HAIRLINE} strokeWidth={2} />
@@ -216,20 +216,20 @@ export const DeadlockScene: React.FC = () => {
           <Mark x={tx(0.86)} y={l2} at={noCycleAt + 14} out={end + 60} text="COMMIT" color={OK_INK} below />
         </Svg>
         <Note at={wants2At + 8} x={cx + 150} y={(l1 + l2) / 2 - h(30)} out={finishesAt}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             1 waits for <b style={{ color: ACC_INK[2] }}>account 2</b>
           </span>
         </Note>
         <Note at={wants1At + 8} x={cx - 150} y={(l1 + l2) / 2 - h(30)} out={abortsAt + 6} align="right">
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             2 waits for <b style={{ color: ACC_INK[1] }}>account 1</b>
           </span>
         </Note>
         <Note at={neitherAt} x={cx + 150} y={(l1 + l2) / 2 + h(8)} out={findsAt}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>neither can go on</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>neither can go on</span>
         </Note>
         <Note at={simplyAt + 2} x={tx(0.26)} y={(l1 + l2) / 2 - h(16)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             2 waits for <b style={{ color: ACC_INK[1] }}>account 1</b>, holding nothing
           </span>
         </Note>
@@ -269,16 +269,16 @@ export const DeadlockScene: React.FC = () => {
         <ColumnRule x={770} top={below} bottom={below + h(176)} at={errorAt} out={cycOut} />
         <PgError x={980} top={below + h(4)} width={420} at={errorAt} message="ERROR: deadlock detected" size={21} out={cycOut} />
         <Note at={abortsAt + 4} x={980} y={below + h(80)} out={cycOut}>
-          <div style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             transfer 2 is the <b style={{ color: ACCENT_INK }}>victim</b>, rolled back
           </div>
-          <div style={{ ...note(23, OK_INK), whiteSpace: "nowrap", marginTop: h(10), opacity: ease(frame, finishesAt, 10) }}>transfer 1 finishes</div>
-          <div style={{ ...note(23, OK_INK), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, retriesAt, 10) }}>the application retries transfer 2</div>
+          <div style={{ ...note(24, OK_INK), whiteSpace: "nowrap", marginTop: h(10), opacity: ease(frame, finishesAt, 10) }}>transfer 1 finishes</div>
+          <div style={{ ...note(24, OK_INK), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, retriesAt, 10) }}>the application retries transfer 2</div>
         </Note>
 
         {/* ── How to avoid it ── */}
         <Note at={avoidAt} x={X0} y={below + h(10)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>Lock in one global order</b>
             <span style={{ opacity: ease(frame, lowestAt, 10) }}>: the lowest account ID first</span>
           </span>
@@ -299,5 +299,5 @@ export const DeadlockScene: React.FC = () => {
 
 /** A setting's name inside a line of type. */
 const SmallCode: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 600, fontVariantLigatures: "none" }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 500, fontVariantLigatures: "none" }}>{children}</span>
 );

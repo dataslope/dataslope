@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, fmt, halo, headline, HIGHLIGHT, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { fmt, halo, headline, HIGHLIGHT, INK_SOFT, label, note, PAPER, INK } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import {
@@ -92,7 +92,7 @@ export const ErrorScene: React.FC = () => {
         <Ink
           at={climbsAt - 2}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           Error on new points turns back up.
         </Ink>
@@ -108,18 +108,18 @@ export const ErrorScene: React.FC = () => {
           display: "flex",
           alignItems: "center",
           gap: 12,
-          ...note(21, INK_SOFT),
+          ...note(24, INK_SOFT),
           whiteSpace: "nowrap",
         }}
       >
         <span style={{ display: "inline-flex", alignItems: "center", gap: 10, opacity: ease(frame, trainAt - 4, 12) }}>
           <Swatch color={TRAIN_COLOR} />
-          <span style={{ color: TRAIN_INK, fontWeight: 650 }}>{N_TRAIN} training points</span>
+          <span style={{ color: TRAIN_INK, fontWeight: 500 }}>{N_TRAIN} training points</span>
         </span>
         <span style={{ width: 18 }} />
         <span style={{ display: "inline-flex", alignItems: "center", gap: 10, opacity: ease(frame, newAt - 4, 12) }}>
           <Swatch color={NEW_COLOR} />
-          <span style={{ color: NEW_INK, fontWeight: 650 }}>{N_TEST.toLocaleString("en-US")} new points</span>
+          <span style={{ color: NEW_INK, fontWeight: 500 }}>{N_TEST.toLocaleString("en-US")} new points</span>
         </span>
       </div>
 
@@ -131,7 +131,7 @@ export const ErrorScene: React.FC = () => {
         at={start - 4}
       />
       <Ink at={start + 4} dur={14} style={{ left: X.x0, top: box.base + 52, width: X.x1 - X.x0, textAlign: "center" }}>
-        <span style={label(20, INK_SOFT)}>Polynomial degree</span>
+        <span style={label(24, INK_SOFT)}>Polynomial degree</span>
       </Ink>
 
       <Curve id="of-err-test" pts={testPts} box={box} reveal={testReveal} color={NEW_COLOR} width={4} />
@@ -164,20 +164,20 @@ export const ErrorScene: React.FC = () => {
       </svg>
 
       <Note at={threeAt + 2} x={px(best.degree) + 24} y={py(0.072) - 14}>
-        <span style={{ ...note(22, NEW_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(24, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           lowest, {fmt(best.test, 3)} at degree {best.degree}
         </span>
       </Note>
       <Note at={zeroAt} x={X.x1 + 6} y={py(0) - 50} align="right" from="right">
-        <span style={{ ...note(22, TRAIN_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(24, TRAIN_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           {fmt(last.train, 3)} at degree {last.degree}
         </span>
       </Note>
       <Note at={worseAt - 4} x={px(EXIT_DEGREE) + 24} y={box.top + 4}>
-        <div style={{ ...note(24, NEW_INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>
+        <div style={{ ...note(24, NEW_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           {fmt(last.test, 1)} at degree {last.degree}, off the chart
         </div>
-        <div style={{ ...note(21, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", ...halo }}>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", ...halo }}>
           {Math.round(RATIO)} times its lowest
         </div>
       </Note>

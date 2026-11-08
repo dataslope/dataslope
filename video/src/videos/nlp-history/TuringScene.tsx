@@ -50,25 +50,29 @@ const Slip: React.FC<{ pts: readonly (readonly [number, number])[]; at: number; 
   );
 };
 
-/** The judge: a desk terminal drawn in ink, in a card. */
-const Judge: React.FC<{ x: number; top: number; at: number }> = ({ x, top, at }) => {
+/** The judge's terminal, painted (nlp-history-judge, 1164x984), in the
+ *  column the judge stands in, and where its two wires leave it: the
+ *  monitor's right edge and the keyboard's right corner, as fractions of the
+ *  painting. */
+const JUDGE_COL = 280;
+const JUDGE_W = 250;
+const JUDGE_H = Math.round((JUDGE_W * 984) / 1164);
+const JUDGE_LIFT = 10;
+const JUDGE_SCREEN = { x: 0.97, y: 0.33 } as const;
+const JUDGE_KEYS = { x: 0.94, y: 0.83 } as const;
+/** Where the painting sits inside the judge's column. */
+const judgeBox = (x: number, top: number) => ({ left: x + (JUDGE_COL - JUDGE_W) / 2, top: top - JUDGE_LIFT });
+
+/** "the judge", well clear of the painting above it. */
+const JudgeLabel: React.FC<{ x: number; top: number; at: number }> = ({ x, top, at }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = Math.min(1, pop(frame, at, fps, 15));
   if (p <= 0.001) return null;
+  const box = judgeBox(x, top);
   return (
-    <div style={{ position: "absolute", left: x, top, width: 280, height: 230, opacity: p, transform: `translateY(${(1 - p) * 16}px)` }}>
-      <svg width={280} height={180} style={{ position: "absolute", left: 0, top: 0, overflow: "visible" }}>
-        {/* screen */}
-        <rect x={60} y={14} width={160} height={104} rx={10} fill={PAPER} stroke={INK} strokeWidth={3} />
-        <line x1={84} x2={176} y1={46} y2={46} stroke={INK_SOFT} strokeWidth={3} strokeLinecap="round" />
-        <line x1={84} x2={150} y1={66} y2={66} stroke={INK_SOFT} strokeWidth={3} strokeLinecap="round" />
-        <line x1={84} x2={164} y1={86} y2={86} stroke={INK_SOFT} strokeWidth={3} strokeLinecap="round" />
-        <line x1={140} x2={140} y1={118} y2={136} stroke={INK} strokeWidth={3} />
-        {/* keyboard */}
-        <path d="M44,148 L236,148 L254,172 L26,172 Z" fill={PAPER} stroke={INK} strokeWidth={3} strokeLinejoin="round" />
-      </svg>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 190, textAlign: "center", ...label(26, INK) }}>the judge</div>
+    <div style={{ position: "absolute", left: x, width: JUDGE_COL, top: box.top + JUDGE_H + 30, textAlign: "center", opacity: p, ...label(28, INK) }}>
+      the judge
     </div>
   );
 };
@@ -112,13 +116,16 @@ export const TuringScene: React.FC = () => {
   const doorB: [number, number] = [BX + 0.8 * BW, BTOP + BH * 0.97];
   const JX = 300;
   const JTOP = y(470);
-  const jOut: [number, number] = [JX + 270, JTOP + 70];
+  const jb = judgeBox(JX, JTOP);
+  // The wires leave the painting a few pixels clear of its edges.
+  const jOut: [number, number] = [jb.left + JUDGE_SCREEN.x * JUDGE_W + 12, jb.top + JUDGE_SCREEN.y * JUDGE_H];
+  const jKeys: [number, number] = [jb.left + JUDGE_KEYS.x * JUDGE_W + 10, jb.top + JUDGE_KEYS.y * JUDGE_H];
   const floor = BTOP + BH + 34;
   // A runs straight to the person's booth; B runs under it to the machine's.
   const wireA = [jOut, [BX + 0.03 * BW, jOut[1]]] as const;
   const wireB = [
-    [JX + 258, JTOP + 160],
-    [JX + 330, JTOP + 160],
+    jKeys,
+    [JX + 330, jKeys[1]],
     [JX + 330, floor],
     [doorB[0], floor],
     doorB,
@@ -155,7 +162,8 @@ export const TuringScene: React.FC = () => {
       <FigLabel n="6" title="Turing's imitation game" at={testAt - 4} x={96} y={y(290)} />
       <div style={{ opacity: 1 - settle * 0.3 }}>
         <Spot id="booths" at={from + 2} left={BX} top={BTOP} width={BW} height={BH} />
-        <Judge x={JX} top={JTOP} at={judgeAt - 4} />
+        <Spot id="judge" at={judgeAt - 4} left={jb.left} top={jb.top} width={JUDGE_W} height={JUDGE_H} />
+        <JudgeLabel x={JX} top={JTOP} at={judgeAt - 4} />
         <Svg opacity={wires}>
           {[wireA, wireB].map((w, i) => (
             <path key={i} d={pathOf(w)} fill="none" stroke={INK_SOFT} strokeWidth={2} strokeDasharray="7 7" strokeLinejoin="round" />
@@ -163,20 +171,20 @@ export const TuringScene: React.FC = () => {
         </Svg>
         <Slip pts={wireA} at={typedAt + 6} period={46} />
         <Slip pts={wireB} at={typedAt + 14} period={52} offset={0.6} />
-        <Tag x={doorA[0]} y={floor + 18} at={personAt} align="center" size={25} color={INK} weight={650}>
+        <Tag x={doorA[0]} y={floor + 18} at={personAt} align="center" size={25} color={INK} weight={500}>
           a hidden person
         </Tag>
-        <Tag x={doorB[0]} y={floor + 18} at={machineAt} align="center" size={25} color={INK} weight={650}>
+        <Tag x={doorB[0]} y={floor + 18} at={machineAt} align="center" size={25} color={INK} weight={500}>
           a hidden machine
         </Tag>
         {[doorA, doorB].map(([x], i) => (
-          <Ink key={i} at={whichAt + i * 4} style={{ left: x - 24, top: BTOP - 72, width: 48, textAlign: "center" }}>
+          <Ink key={i} at={whichAt + i * 4} style={{ left: x - 24, top: BTOP - 96, width: 48, textAlign: "center" }}>
             <span style={{ ...headline(76), color: ACCENT_INK }}>?</span>
           </Ink>
         ))}
         <Tick x={doorB[0] + 150} y={floor + 34} at={passesAt} />
       </div>
-      <div style={{ position: "absolute", left: 96, top: y(820), display: "flex", gap: "0.3em", ...headline(38, true), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: 96, top: y(820), display: "flex", gap: "0.3em", ...headline(34, true), whiteSpace: "nowrap" }}>
         <Ink at={chatbotAt - 2} style={{ position: "relative" }}>
           Every chatbot since has been
         </Ink>

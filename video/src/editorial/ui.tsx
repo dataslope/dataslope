@@ -1,7 +1,7 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
 import { ease } from "../components/motion";
-import { ACCENT_INK, body, HAIRLINE, INK, label, TABULAR } from "./style";
+import { ACCENT_INK, HAIRLINE, INK, label, TABULAR, TITLE_FAMILY, TITLE_WEIGHT } from "./style";
 
 export const W = 1920;
 export const H = 1080;
@@ -173,8 +173,8 @@ export const FigLabel: React.FC<{
   out?: number;
 }> = ({ n, title, at, x, y, out }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(FIG_SIZE, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
-    <span style={{ ...label(FIG_SIZE, INK), fontWeight: 560 }}>{title}</span>
+    <span style={{ ...label(FIG_SIZE, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(FIG_SIZE, INK), fontWeight: 500 }}>{title}</span>
   </Ink>
 );
 
@@ -198,7 +198,7 @@ export const NextLine: React.FC<{
       <div
         style={{ position: "absolute", left: x, top: y, width, height: 1, background: HAIRLINE, opacity: ease(frame, at - 4, 12) }}
       />
-      <Ink at={at} dur={18} style={{ left: x, top: y + 28, ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
+      <Ink at={at} dur={18} style={{ left: x, top: y + 28, fontFamily: TITLE_FAMILY, fontSize: 28, fontWeight: TITLE_WEIGHT, letterSpacing: "-0.01em", color: INK, whiteSpace: "nowrap" }}>
         Next: {children}
       </Ink>
     </>
@@ -251,7 +251,7 @@ export const badgeStyle = (tone: BadgeTone, size = 24): React.CSSProperties => {
     color: ink,
     fontSize: size,
     // Semibold: the owner found bold too heavy for a tinted chip.
-    fontWeight: 600,
+    fontWeight: 500,
     lineHeight: 1.15,
     whiteSpace: "nowrap",
   };

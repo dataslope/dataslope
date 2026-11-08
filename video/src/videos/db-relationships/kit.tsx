@@ -42,8 +42,8 @@ const tokenize = (line: string): Token[] => {
     const [text, str, num, word] = m;
     if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
-    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 600 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
+    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -172,7 +172,7 @@ export const Listing: React.FC<{
 
 /** Code set inside running text or a label, at the text's own size. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 600, color }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 500, color }}>{children}</span>
 );
 
 /** "Fig. 2" and a title that may hold code: the shared FigLabel, widened. */
@@ -185,8 +185,8 @@ export const Fig: React.FC<{ n: string; at: number; x: number; y: number; out?: 
   children,
 }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
-    <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 
@@ -326,7 +326,7 @@ export const DbTable: React.FC<{
       <div style={{ position: "absolute", left: g.x, top: bottom - 1, width: g.width * p, height: 1.5, background: INK }} />
       <Ink at={at + 2} dur={14} style={{ left: g.x, top: g.top, width: g.width, height: g.headH, display: "flex", alignItems: "center" }}>
         {cols.map((c, j) => (
-          <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: g.size.head, fontWeight: 600, color: INK_SOFT }}>
+          <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: g.size.head, fontWeight: 500, color: INK_SOFT }}>
             {c}
           </div>
         ))}
@@ -453,7 +453,7 @@ export const ErrorBox: React.FC<{
         background: `color-mix(in srgb, ${ACCENT} ${9 + Math.round(pulse * 8)}%, ${PAPER})`,
         padding: "16px 22px 18px",
         fontFamily: MONO,
-        fontSize: 21,
+        fontSize: 24,
         lineHeight: 1.5,
         whiteSpace: "pre-wrap",
         color: INK,
@@ -463,12 +463,12 @@ export const ErrorBox: React.FC<{
       }}
     >
       <div>
-        <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
+        <span style={{ color: ACCENT_INK, fontWeight: 500 }}>ERROR:</span>
         {"  "}
         {message}
       </div>
       <div style={{ color: INK_SOFT }}>
-        <span style={{ fontWeight: 600 }}>DETAIL:</span>
+        <span style={{ fontWeight: 500 }}>DETAIL:</span>
         {"  "}
         {detail}
       </div>

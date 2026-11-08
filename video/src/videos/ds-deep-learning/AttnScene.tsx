@@ -79,17 +79,17 @@ export const AttnScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={makesAt - 2} x={X0} y={y(300)}>
-          <span style={{ fontFamily: MONO, fontSize: 32, fontWeight: 600, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+          <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
             <Mark at={softAt}>softmax(</Mark>
             <Mark at={scoreAt + 2}>QKᵀ</Mark> <Mark at={rootAt}>/ √d</Mark>
             <Mark at={softAt}>)</Mark> V
           </span>
         </Note>
         <Note at={makesAt} x={X0 + 560} y={y(290)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Q, K, V: each token&apos;s vector × three learned matrices</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Q, K, V: each token&apos;s vector × three learned matrices</span>
         </Note>
         <Note at={entriesAt - 2} x={X0 + 560} y={y(326)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
             d = {A.d}, the entries in each q and k;{" "}
             <span style={{ opacity: ease(frame, oneKeyAt - 2, 10) }}>√d keeps the softmax from putting all its weight on one key</span>
           </span>
@@ -98,14 +98,14 @@ export const AttnScene: React.FC = () => {
         {/* ── Four tokens, each with a query, a key and a value ── */}
         {A.tokens.map((t, i) => (
           <React.Fragment key={t}>
-            <Tagline x={TOK_X} y={rowY(i) + h(16)} at={makesAt - 4 + i * 2} size={26} color={INK} weight={650}>
+            <Tagline x={TOK_X} y={rowY(i) + h(16)} at={makesAt - 4 + i * 2} size={26} color={INK} weight={500}>
               {t}
             </Tagline>
             <Svg opacity={ease(frame, makesAt + 4 + i * 2, 10)}>
               {QKV.map((c, k) => (
                 <g key={c.name}>
                   <rect x={TOK_X + 110 + k * 46} y={rowY(i) + h(14)} width={38} height={h(38)} rx={5} fill={`color-mix(in srgb, ${c.color} 30%, ${PAPER})`} stroke={c.color} strokeWidth={2} />
-                  <text x={TOK_X + 110 + k * 46 + 19} y={rowY(i) + h(14) + h(38) / 2 + 7} textAnchor="middle" style={{ fontFamily: MONO, fontSize: 20, fontWeight: 700, fill: INK }}>
+                  <text x={TOK_X + 110 + k * 46 + 19} y={rowY(i) + h(14) + h(38) / 2 + 7} textAnchor="middle" style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, fill: INK }}>
                     {c.name}
                   </text>
                 </g>
@@ -145,7 +145,7 @@ export const AttnScene: React.FC = () => {
           weights: how much each token takes from each
         </Tagline>
         {A.roundedSums.map((s, i) => (
-          <Tagline key={i} x={SUM_X} y={rowY(i) + h(20)} at={rowAt + i * 3} size={24} color={OK_INK} weight={700}>
+          <Tagline key={i} x={SUM_X} y={rowY(i) + h(20)} at={rowAt + i * 3} size={24} color={OK_INK} weight={500}>
             = {s.toFixed(2)}
           </Tagline>
         ))}
@@ -173,26 +173,26 @@ export const AttnScene: React.FC = () => {
           })}
         </Svg>
         <Note at={hereAt - 2} x={GX} y={rowY(4) + h(52)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>four tokens, random vectors of length {A.d}</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>four tokens, random vectors of length {A.d}</span>
         </Note>
 
         {/* ── One row's output, spelled out ── */}
         <Note at={blendAt - 2} x={BLEND_X} y={rowY(0)}>
-          <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             output for &ldquo;{A.tokens[PICK]}&rdquo; =
           </span>
         </Note>
         {A.tokens.map((t, j) => (
           <Note key={t} at={blendAt + 2 + j * 3} x={BLEND_X + 30} y={rowY(0) + h(52) + j * h(46)}>
-            <span style={{ ...note(25, INK), whiteSpace: "nowrap", ...TABULAR }}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
               <span style={{ display: "inline-block", width: 28 }}>{j > 0 ? "+" : ""}</span>
-              <b style={{ color: OK_INK }}>{A.weights[PICK][j].toFixed(2)}</b> × <span style={{ fontFamily: MONO, fontSize: 23, color: BLUE_INK }}>v</span>
-              <span style={{ ...label(23, INK_SOFT) }}>({t})</span>
+              <b style={{ color: OK_INK }}>{A.weights[PICK][j].toFixed(2)}</b> × <span style={{ fontFamily: MONO, fontSize: 24, color: BLUE_INK }}>v</span>
+              <span style={{ ...label(24, INK_SOFT) }}>({t})</span>
             </span>
           </Note>
         ))}
         <Note at={onceAt + 2} x={BLEND_X} y={rowY(0) + h(52) + 4 * h(46) + h(20)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={onceAt + 6}>all four rows at once</Mark>
           </span>
         </Note>

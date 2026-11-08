@@ -65,7 +65,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -95,7 +95,7 @@ export const Headline: React.FC<{
           at={turnAt ?? at + 10}
           dur={18}
           out={out}
-          style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
         >
           {turn}
         </Ink>
@@ -483,22 +483,22 @@ export const PaperPage: React.FC<{
           top: 22,
           display: "flex",
           justifyContent: "space-between",
-          ...note(19, INK_SOFT),
+          ...note(24, INK_SOFT),
           whiteSpace: "nowrap",
         }}
       >
         <span>Communications of the ACM</span>
-        <span style={{ opacity: ease(frame, dateAt - 2, 10), color: ACCENT_INK, fontWeight: 650 }}>June 1970</span>
+        <span style={{ opacity: ease(frame, dateAt - 2, 10), color: ACCENT_INK, fontWeight: 500 }}>June 1970</span>
       </div>
       <div style={{ position: "absolute", left: pad, right: pad, top: 54, height: 1.5, background: INK }} />
       <Ink at={titleAt} dur={20} style={{ left: pad, top: 70, width: width - 2 * pad }}>
-        <div style={{ ...headline(30), lineHeight: 1.12 }}>A Relational Model of Data for Large Shared Data Banks</div>
+        <div style={{ ...headline(28), lineHeight: 1.12 }}>A Relational Model of Data for Large Shared Data Banks</div>
       </Ink>
       <Ink at={authorAt} dur={14} style={{ left: pad, top: 156, whiteSpace: "nowrap" }}>
-        <div style={{ ...label(21, INK) }}>
+        <div style={{ ...label(24, INK) }}>
           {authorMark !== undefined ? <Mark at={authorMark}>E. F. Codd</Mark> : "E. F. Codd"}
         </div>
-        <div style={{ ...body(20, true), marginTop: 4 }}>IBM Research Laboratory, San Jose, California</div>
+        <div style={{ ...body(24, true), marginTop: 4 }}>IBM Research Laboratory, San Jose, California</div>
       </Ink>
       {Array.from({ length: lines }, (_, i) => {
         const w = ease(frame, textAt + i * 7, 12);
@@ -524,10 +524,10 @@ export const PaperPage: React.FC<{
 
 // ── A table of rows that can move on disk ────────────────────────────────────
 
-export const CELL_SIZE = 25;
+export const CELL_SIZE = 24;
 /** How far a row in flight steps right, at most (see MovingTable). */
 export const ASIDE = 100;
-export const HEAD_SIZE = 21;
+export const HEAD_SIZE = 24;
 /** JetBrains Mono's advance, in em. */
 const ADVANCE = 0.6;
 const PAD = 18;
@@ -613,7 +613,7 @@ export const MovingTable: React.FC<{
               lineHeight: `${headH}px`,
               fontFamily: MONO,
               fontSize: HEAD_SIZE,
-              fontWeight: 600,
+              fontWeight: 500,
               color: INK_SOFT,
               opacity: colOp(j),
             }}
@@ -738,8 +738,8 @@ export const tokenize = (line: string): Token[] => {
     const [text, str, num, word] = m;
     if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
-    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 600 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
+    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -850,7 +850,7 @@ export const ErrorBox: React.FC<{
           background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
           padding: "14px 22px 16px",
           fontFamily: MONO,
-          fontSize: 20,
+          fontSize: 24,
           lineHeight: 1.5,
           whiteSpace: "pre-wrap",
           color: INK,
@@ -860,10 +860,10 @@ export const ErrorBox: React.FC<{
         }}
       >
         <div>
-          <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span> {message}
+          <span style={{ color: ACCENT_INK, fontWeight: 500 }}>ERROR:</span> {message}
         </div>
         <div style={{ color: INK_SOFT, opacity: detailAt === undefined ? 1 : ease(frame, detailAt, 12) }}>
-          <span style={{ fontWeight: 600 }}>DETAIL:</span> {detail}
+          <span style={{ fontWeight: 500 }}>DETAIL:</span> {detail}
         </div>
       </div>
     </Ink>
@@ -923,7 +923,7 @@ export const Card: React.FC<{
       </Ink>
       {lines.map((l, i) => (
         <Ink key={i} at={l.at} dur={14} style={{ left: 2, top: 30 + titleSize * 1.15 + i * 36, whiteSpace: "nowrap" }}>
-          <div style={{ ...note(21, INK_SOFT) }}>{l.children}</div>
+          <div style={{ ...note(24, INK_SOFT) }}>{l.children}</div>
         </Ink>
       ))}
     </div>
@@ -932,7 +932,7 @@ export const Card: React.FC<{
 
 /** Code set inside running text or a label, at the text's own size. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 600, color }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 500, color }}>{children}</span>
 );
 
 /** A small label in Inter, for the tree and the charts. */

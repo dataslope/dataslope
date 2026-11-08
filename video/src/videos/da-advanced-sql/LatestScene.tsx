@@ -32,7 +32,8 @@ const RESULT_X = 900;
 const SPINE_X = 720;
 const SPINE_W = 630;
 const SPINE_SIZE = 19;
-const SPINE_RESULT_X = 1380;
+/** 80px clear of the spine listing (SPINE_X + SPINE_W). */
+const SPINE_RESULT_X = SPINE_X + SPINE_W + 80;
 const CHART = { x0: 790, x1: 1290, base: 800, top: 660 };
 
 /**
@@ -149,7 +150,7 @@ export const LatestScene: React.FC = () => {
           marks={R.rows.map((_, row) => ({ row, col: rn, at: numberAt + 6 + row * 2, out: keepAt + 4 }))}
         />
         <Note at={keepAt + 16} x={X0} y={kNote + h(30)} out={out11}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             keep <QMono>rn = 1</QMono> in an outer query, or with <QMono>QUALIFY</QMono>
           </span>
         </Note>
@@ -164,7 +165,7 @@ export const LatestScene: React.FC = () => {
           </span>
         </Note>
         <Note at={teamAt + 4} x={rg.right + 24} y={rg.rowTop(0) + 8} out={out11}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the newest</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the newest</span>
         </Note>
 
         {/* ── Question 12: the days that aren't there ── */}
@@ -183,7 +184,7 @@ export const LatestScene: React.FC = () => {
               x={cx(i)}
               y={y(CHART.base) + 28}
               textAnchor="middle"
-              style={svgText({ ...label(19, zeros.includes(i) ? ACCENT_INK : INK_SOFT), fontVariantNumeric: "tabular-nums" })}
+              style={svgText({ ...label(24, zeros.includes(i) ? ACCENT_INK : INK_SOFT), fontVariantNumeric: "tabular-nums" })}
             >
               Mar {Number(r[0].slice(8))}
             </text>
@@ -223,7 +224,7 @@ export const LatestScene: React.FC = () => {
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>back, as 0</span>
         </Note>
         <Note at={calendarAt - 2} x={SPINE_RESULT_X} y={sg.rowTop(S.rows.length) + h(60)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>other engines: a calendar table</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>other engines: a calendar table</span>
         </Note>
       </Drift>
     </AbsoluteFill>

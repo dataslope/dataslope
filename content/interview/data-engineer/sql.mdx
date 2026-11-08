@@ -12,7 +12,7 @@ the challenges.
   alt="A rail of ordered rows on a platform with a transparent window frame sliding across it, a ranked podium of three heights standing beside it"
 />
 
-> **SQL dialect:** the runnable challenges on Dataslope execute in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted, most of it runs unchanged on Postgres, MySQL, BigQuery, or Snowflake.
+> **SQL dialect:** the runnable challenges on Dataslope execute in your browser on **PostgreSQL**, so the SQL below targets Postgres. It is standard SQL except where noted; most of it runs unchanged on MySQL, BigQuery, Snowflake, or DuckDB.
 
 ## Q&A
 
@@ -29,7 +29,7 @@ The query below runs all three over the same `players` table ordered by
 tied 80-point scores.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE players (name VARCHAR, score INTEGER);
 INSERT INTO players VALUES
   ('Alice', 95), ('Bob', 80), ('Carol', 80), ('Dave', 70),
@@ -47,10 +47,11 @@ FROM players;`}
 
 ### How do you keep only the latest row per key (deduplication)?
 
-Number rows within each key by recency, then keep number 1:
+Number rows within each key by recency in a subquery, then keep number 1
+outside it:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE events (user_id INTEGER, event_time TIMESTAMP, status VARCHAR);
 INSERT INTO events VALUES
   (1, TIMESTAMP '2024-01-01 10:00', 'signup'),
@@ -77,16 +78,23 @@ INSERT INTO events VALUES
   (9, TIMESTAMP '2024-01-08 11:55', 'signup'),
   (9, TIMESTAMP '2024-01-16 13:05', 'active'),
   (10, TIMESTAMP '2024-01-09 10:45', 'signup');`}
-  starterCode={`SELECT *
-FROM events
-QUALIFY ROW_NUMBER() OVER (
-  PARTITION BY user_id ORDER BY event_time DESC
-) = 1;`}
+  starterCode={`SELECT user_id, event_time, status
+FROM (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (
+      PARTITION BY user_id ORDER BY event_time DESC
+    ) AS rn
+  FROM events
+) ranked
+WHERE rn = 1
+ORDER BY user_id;`}
 />
 
 Use `ROW_NUMBER` (not `RANK`) so exact-tie timestamps still collapse to
-one row. Without `QUALIFY` (e.g. Postgres), wrap it in a subquery and
-filter `WHERE rn = 1`.
+one row. A window function can't appear in `WHERE`, which is why it sits in
+the subquery. Engines with `QUALIFY` (Snowflake, BigQuery, Databricks) drop
+the subquery and filter in place, as the next answer shows.
 
 ### What's the difference between a CTE and a subquery? When is a CTE worth it?
 
@@ -175,7 +183,7 @@ FROM daily_revenue;
 Use `SUM` with a window frame that starts at the beginning of the partition and ends at the current row:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE orders (user_id INTEGER, order_date DATE, amount DECIMAL(10,2));
 INSERT INTO orders VALUES
   (1, DATE '2024-01-01', 100.00), (1, DATE '2024-01-05', 250.00),
@@ -241,10 +249,23 @@ The query below uses `QUALIFY` to keep only the top two `products` per
 wrapping subquery.
 
 ```sql
--- Keep top-2 products per category
+-- Keep top-2 products per category (BigQuery, Snowflake, Databricks)
 SELECT product_id, category, revenue
 FROM products
 QUALIFY RANK() OVER (PARTITION BY category ORDER BY revenue DESC) <= 2;
+```
+
+In Postgres the same filter moves one level out:
+
+```sql
+SELECT product_id, category, revenue
+FROM (
+  SELECT
+    product_id, category, revenue,
+    RANK() OVER (PARTITION BY category ORDER BY revenue DESC) AS rnk
+  FROM products
+) ranked
+WHERE rnk <= 2;
 ```
 
 ### How do you write a recursive CTE?
@@ -314,7 +335,7 @@ ORDER BY s.day;
 It describes finding **consecutive runs** (islands) of rows separated by missing values or breaks (gaps). The classic approach subtracts a sequential row number from the ordered value so that rows in the same island share an identical "group key":
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE daily_logins (user_id INTEGER, login_date DATE);
 INSERT INTO daily_logins VALUES
   (1, DATE '2024-01-01'), (1, DATE '2024-01-02'), (1, DATE '2024-01-03'),
@@ -563,7 +584,7 @@ A `CROSS JOIN` produces the **Cartesian product** of two tables (every row from 
 ## Challenges
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Rank orders by amount within region"
   instructions={`The table \`orders\` has columns \`id\`, \`region\`, and \`amount\`. For every row, add a column \`rnk\` giving its rank **within its region** by \`amount\` descending (largest = rank 1). Return \`id\`, \`region\`, \`amount\`, \`rnk\`. Sort by \`region\`, then \`rnk\`.`}
   initSql={`CREATE TABLE orders AS
@@ -602,9 +623,9 @@ The second challenge is deduplication, the single most common window
 function task in a data engineering interview.
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Most recent event per user"
-  instructions={`The table \`events\` has columns \`user_id\`, \`event_time\`, and \`status\`, with several rows per user. Return exactly **one row per user**, the row with the most recent \`event_time\`. Columns: \`user_id\`, \`event_time\`, \`status\`.`}
+  instructions={`The table \`events\` has columns \`user_id\`, \`event_time\`, and \`status\`, with several rows per user. Return exactly **one row per user**, the row with the most recent \`event_time\`. Columns: \`user_id\`, \`event_time\`, \`status\`. Postgres has no \`QUALIFY\`, so rank in a subquery and filter outside it.`}
   initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
   (1, TIMESTAMP '2024-01-01 10:00', 'signup'),
   (1, TIMESTAMP '2024-01-03 09:00', 'active'),
@@ -642,11 +663,16 @@ FROM events
   user_id,
   event_time,
   status
-FROM events
-QUALIFY ROW_NUMBER() OVER (
-  PARTITION BY user_id
-  ORDER BY event_time DESC
-) = 1
+FROM (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (
+      PARTITION BY user_id
+      ORDER BY event_time DESC
+    ) AS rn
+  FROM events
+) ranked
+WHERE rn = 1
 ORDER BY user_id;`}
   tests={[
     { id: "row_count", name: "One row per user", description: "Ten users → ten rows", expectedRowCount: 10 },
@@ -656,5 +682,6 @@ ORDER BY user_id;`}
 
 ## Go deeper
 
-- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
+- [Intro to SQL with Postgres](/courses/intro-sql-postgres)
 - [Database Design with PostgreSQL](/courses/database-design-postgresql)
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)

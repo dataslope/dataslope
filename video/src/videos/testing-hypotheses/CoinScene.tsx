@@ -95,7 +95,7 @@ export const CoinScene: React.FC = () => {
                 at={simulateAt - 2}
                 to={COIN.runs}
                 dur={64}
-                style={{ ...note(24, INK), fontWeight: 700, display: "inline-block", transform: `scale(${1 + 0.12 * runsGlow})` }}
+                style={{ ...note(24, INK), fontWeight: 500, display: "inline-block", transform: `scale(${1 + 0.12 * runsGlow})` }}
               />
             </Label>
           </Ink>
@@ -183,7 +183,7 @@ export const CoinScene: React.FC = () => {
           {/* The count of runs at least that far out, and the share they make. */}
           {/* Right-aligned past the axis end, so the count clears the 62 line. */}
           <Note at={farOutAt} x={COUNT_X} y={y(BASE) - h(TALL * 0.4)} align="right">
-            <span style={{ ...note(24, STAT_INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
               <Count at={farOutAt} to={COIN.upper + COIN.lower} dur={26} /> runs at least 12 out
             </span>
           </Note>
@@ -191,7 +191,7 @@ export const CoinScene: React.FC = () => {
             <span
               style={{
                 ...note(40, STAT_INK),
-                fontWeight: 700,
+                fontWeight: 500,
                 ...halo,
                 whiteSpace: "nowrap",
                 display: "inline-block",

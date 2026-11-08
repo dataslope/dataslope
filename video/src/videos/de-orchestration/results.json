@@ -660,7 +660,7 @@
   "runtime": {
     "python": "3.14.2",
     "pyodide": "314.0.7",
-    "duckdb": "v1.4.3"
+    "postgres": "PostgreSQL 18.3 (PGlite 0.5.8)"
   },
   "retry": {
     "retries": 3,
@@ -709,7 +709,7 @@
     ]
   },
   "gate": {
-    "sql": "SELECT count(*) AS row_count,\n       avg((customer_id IS NULL)::INT) AS null_rate,\n       count(*) - count(DISTINCT order_id) AS duplicate_ids,\n       count(*) FILTER (WHERE amount <= 0) AS bad_amounts\nFROM orders_batch",
+    "sql": "SELECT count(*) AS row_count,\n       round(avg((customer_id IS NULL)::INT), 4) AS null_rate,\n       count(*) - count(DISTINCT order_id) AS duplicate_ids,\n       count(*) FILTER (WHERE amount <= 0) AS bad_amounts\nFROM orders_batch",
     "rows": 1000,
     "nullRate": 0.04,
     "duplicates": 0,

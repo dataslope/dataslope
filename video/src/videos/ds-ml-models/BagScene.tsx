@@ -148,7 +148,7 @@ export const BagScene: React.FC = () => {
           align="right"
           from="right"
         >
-          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             gray: trees on bootstrap samples
           </span>
         </Note>
@@ -176,8 +176,8 @@ export const BagScene: React.FC = () => {
         <Note at={fromAt} x={LEFTS[0]} y={under}>
           <span
             style={{
-              ...note(25, ACCENT_INK),
-              fontWeight: 650,
+              ...note(24, ACCENT_INK),
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,
             }}
@@ -188,8 +188,8 @@ export const BagScene: React.FC = () => {
         <Note at={toAt} x={LEFTS[0]} y={under + h(40)}>
           <span
             style={{
-              ...note(25, OK_INK),
-              fontWeight: 650,
+              ...note(24, OK_INK),
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...TABULAR,
             }}
@@ -200,7 +200,7 @@ export const BagScene: React.FC = () => {
         </Note>
         <Note at={varAt} x={LEFTS[0]} y={under + h(96)}>
           <span
-            style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}
+            style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
             <Mark at={varAt + 2}>cuts variance</Mark>
           </span>
@@ -275,7 +275,7 @@ export const BagScene: React.FC = () => {
           from="right"
           out={tenAt}
         >
-          <span style={{ ...label(19, ACCENT_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             red: what the next tree is fitted to
           </span>
         </Note>
@@ -297,8 +297,8 @@ export const BagScene: React.FC = () => {
           <Note key={s.k} at={s.at} x={LEFTS[1] + i * 250} y={under}>
             <span
               style={{
-                ...note(25, s.color),
-                fontWeight: 650,
+                ...note(24, s.color),
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -313,20 +313,20 @@ export const BagScene: React.FC = () => {
           </Note>
         ))}
         <Note at={hundredAt} x={LEFTS[1]} y={under + h(40)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             test error (mean squared), on 2,000 new points; the noise
             alone costs {fmt(ENS.mse.noise, 3)}
           </span>
         </Note>
         <Note at={biasAt} x={LEFTS[1]} y={under + h(96)}>
           <span
-            style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}
+            style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
             <Mark at={biasAt + 2}>cuts bias</Mark>
           </span>
         </Note>
         <Note at={accurateAt} x={LEFTS[1] + 220} y={under + h(100)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             often more accurate,{" "}
             <span
               style={{ opacity: ease(frame, noisyAt, 10), color: ACCENT_INK }}
@@ -336,7 +336,7 @@ export const BagScene: React.FC = () => {
           </span>
         </Note>
         <Note at={holdsAt} x={LEFTS[0] + 240} y={under + h(100)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             holds up on noisy data
           </span>
         </Note>

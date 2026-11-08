@@ -89,9 +89,9 @@ export const tokenize = (line: string): Token[] => {
   for (const m of line.matchAll(/(\d+)|([A-Za-z_]\w*)|(\s+)|(.)/g)) {
     const [text, num, word] = m;
     if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
-    else if (word && FUNCTIONS.has(word)) out.push({ text, color: TOKEN_INK.fn, weight: 600 });
-    else if (word && ALIASES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 650 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
+    else if (word && FUNCTIONS.has(word)) out.push({ text, color: TOKEN_INK.fn, weight: 500 });
+    else if (word && ALIASES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -263,8 +263,8 @@ export const Fig: React.FC<{ n: string; at: number; y: number; x?: number; out?:
   children,
 }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
-    <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 
@@ -326,7 +326,7 @@ export const Headline: React.FC<{
   return (
     <>
       <Ink at={at - 2} dur={14} style={{ left: X0 + 4, top: y(KICKER_Y) }}>
-        <span style={label(21, ACCENT_INK)}>{kicker}</span>
+        <span style={label(24, ACCENT_INK)}>{kicker}</span>
       </Ink>
       <Ink at={at} dur={20} style={{ left: X0, top: y(HEAD1_Y), ...headline(HEAD_SIZE), whiteSpace: "nowrap" }}>
         {line1}
@@ -334,7 +334,7 @@ export const Headline: React.FC<{
       <Ink
         at={line2At}
         dur={20}
-        style={{ left: X0, top: y(HEAD2_Y), ...headline(HEAD_SIZE, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: X0, top: y(HEAD2_Y), ...headline(HEAD_SIZE, true), color: INK, whiteSpace: "nowrap" }}
       >
         {mark ? (
           <Stroke kind={mark.kind} at={mark.at}>
@@ -451,7 +451,7 @@ export const CellText: React.FC<{ col: string; value: string; weight?: number; c
       whiteSpace: "nowrap",
       fontVariantLigatures: "none",
       fontVariantNumeric: "tabular-nums",
-      fontWeight: weight ?? (col === "region" ? 600 : 400),
+      fontWeight: weight ?? (col === "region" ? 500 : 400),
       color: color ?? (col === "region" ? REGION_INK[value as Region] : INK),
     }}
   >
@@ -461,7 +461,7 @@ export const CellText: React.FC<{ col: string; value: string; weight?: number; c
 
 /** "(6 rows)", the way psql closes a result. */
 export const RowCount: React.FC<{ n: number }> = ({ n }) => (
-  <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT, whiteSpace: "nowrap" }}>
+  <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT, whiteSpace: "nowrap" }}>
     ({n} rows)
   </span>
 );

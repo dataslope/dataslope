@@ -108,7 +108,7 @@ export const LogicScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 14} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Three-valued logic</span>
+        <span style={label(24, ACCENT_INK)}>Three-valued logic</span>
       </Ink>
       <div
         style={{
@@ -170,14 +170,14 @@ export const LogicScene: React.FC = () => {
 
       {/* Row titles. */}
       <Ink at={comparisonAt - 8} dur={14} style={{ left: LEFT, ...cellRow(ROW1) }}>
-        <span style={label(22, INK_SOFT)}>Comparison</span>
+        <span style={label(24, INK_SOFT)}>Comparison</span>
       </Ink>
       <Ink at={wordAt[0] - 8} dur={14} style={{ left: LEFT, ...cellRow(ROW2) }}>
-        <span style={label(22, INK_SOFT)}>What it returns</span>
+        <span style={label(24, INK_SOFT)}>What it returns</span>
       </Ink>
       <Ink at={whereAt - 6} dur={14} style={{ left: LEFT, ...cellRow(ROW3) }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          <span style={label(22, INK_SOFT)}>
+          <span style={label(24, INK_SOFT)}>
             Under <Mono color={INK}>WHERE</Mono>
           </span>
         </div>
@@ -211,7 +211,7 @@ export const LogicScene: React.FC = () => {
               <Code line={c.expr} size={EXPR} />
             </Ink>
             <Ink at={wordAt[i] - 2} dur={14} style={{ left: colLeft(i), ...cellRow(ROW2) }}>
-              <TruthWord value={c.value} size={50} weight={680} />
+              <TruthWord value={c.value} size={50} weight={500} />
             </Ink>
             <Ink at={whereAt + i * 4} dur={14} style={{ left: colLeft(i), ...cellRow(ROW3), gap: 18 }}>
               <RowToken
@@ -220,7 +220,7 @@ export const LogicScene: React.FC = () => {
               />
               <span
                 style={{
-                  ...label(26, kept ? TRUTH.true.ink : INK_SOFT),
+                  ...label(28, kept ? TRUTH.true.ink : INK_SOFT),
                   opacity: ease(frame, decided, 10),
                 }}
               >
@@ -231,9 +231,9 @@ export const LogicScene: React.FC = () => {
         );
       })}
       <Note at={isUnknownAt} x={colLeft(2)} y={y(NOTE_Y)} from="up" width={COL_W}>
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Postgres returns{" "}
-          <Mono color={UNKNOWN_INK} weight={700}>
+          <Mono color={UNKNOWN_INK} weight={500}>
             NULL
           </Mono>
         </span>

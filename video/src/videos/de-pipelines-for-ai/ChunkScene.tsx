@@ -8,13 +8,16 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CHUNK, num, pct } from "./data";
-import { ChunkBracket, Doc, type DocRow, Drift, head, Mark, MARK_OK, OK_INK, X0 } from "./parts";
+import { ChunkBracket, Doc, docFace, docHeight, type DocRow, Drift, head, Mark, MARK_OK, OK_INK, X0 } from "./parts";
 import { ds } from "../../theme/brand";
 
 const COL = 340;
 const DOC_W = 196;
 const DOC_Y = 330;
-const BR = DOC_W + 16;
+/** Where a page's chunk brackets stand, well clear of the painted sheet. */
+const BR = DOC_W + 22;
+/** The air between a page and the caption under it. */
+const CAPTION_GAP = 28;
 
 /** Three sections, each a heading and its lines, each about its own topic. */
 const ROWS: DocRow[] = [
@@ -82,12 +85,18 @@ export const ChunkScene: React.FC = () => {
 
   const docY = y(DOC_Y);
   const cx = (i: number) => X0 + i * COL;
-  const labelY = docY + ROWS.length * 22 + 40;
+  const N = ROWS.length;
+  const labelY = docY + docHeight(N) + CAPTION_GAP;
   const OVERLAP = `color-mix(in srgb, ${ds("yellow", 400)} 70%, transparent)`;
+  /** A band across a page's rows: the face they are set in, and a little more. */
+  const band = (i: number, color: string) => {
+    const f = docFace(cx(i), DOC_W);
+    return { x: f.x - 5, w: f.w + 10, color };
+  };
 
   const Caption: React.FC<{ i: number; at: number; dim?: number; children: React.ReactNode }> = ({ i, at, dim, children }) => (
     <Note at={at} x={cx(i)} y={labelY} width={COL - 24} dim={dim}>
-      <div style={{ ...note(22, INK), lineHeight: 1.35 }}>{children}</div>
+      <div style={{ ...note(24, INK), lineHeight: 1.35 }}>{children}</div>
     </Note>
   );
 
@@ -107,7 +116,7 @@ export const ChunkScene: React.FC = () => {
           How do you choose a chunking strategy?
         </QuestionCard>
         <Note at={tradeAt} x={X0} y={y(240)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mark at={tradeAt + 4}>precision against context</Mark>
           </span>
         </Note>
@@ -122,7 +131,7 @@ export const ChunkScene: React.FC = () => {
               <span style={head(22, INK)}>{c.title}</span>
             </Note>
             <Doc x={cx(c.i)} y={docY} w={DOC_W} rows={ROWS} at={c.at - 2} tint={c.i === 1 ? topicsAt : undefined} dim={choicesAt} />
-            <ChunkBracket x={cx(c.i) + BR} docY={docY} r0={c.r0} r1={c.r1} at={c.at + 4} dim={choicesAt} />
+            <ChunkBracket x={cx(c.i) + BR} docY={docY} n={N} r0={c.r0} r1={c.r1} at={c.at + 4} dim={choicesAt} />
           </React.Fragment>
         ))}
         <Caption i={0} at={smallAt + 2} dim={choicesAt}>
@@ -149,32 +158,32 @@ export const ChunkScene: React.FC = () => {
           { r0: 6, r1: 12, dx: 16 },
           { r0: 12, r1: 15, dx: 0 },
         ].map((c, k) => (
-          <ChunkBracket key={k} x={cx(2) + BR + c.dx} docY={docY} r0={c.r0} r1={c.r1} at={fixedAt + 4 + k * 5} />
+          <ChunkBracket key={k} x={cx(2) + BR + c.dx} docY={docY} n={N} r0={c.r0} r1={c.r1} at={fixedAt + 4 + k * 5} />
         ))}
         {[6, 12].map((r) => (
           <ChunkBracket
             key={r}
             x={cx(2) + BR + 34}
             docY={docY}
+            n={N}
             r0={r}
             r1={r}
             at={overlapAt + 4}
             color={ds("yellow", 600)}
-            band={{ x: cx(2) + 8, w: DOC_W - 16, color: OVERLAP }}
+            band={band(2, OVERLAP)}
           />
         ))}
         <Caption i={2} at={sizeAt - 2}>
           {CHUNK.low} to {CHUNK.high} tokens
-          <span style={{ opacity: ease(frame, overlapAt - 2, 10) }}>
-            , {pct(CHUNK.overlapLow)} to {pct(CHUNK.overlapHigh)} shared
-          </span>
           <br />
-          <span style={{ color: INK_SOFT, fontSize: 20 }}>
-            400 tokens ≈ {num(Math.round(CHUNK.chars400 / 100) * 100)} characters of prose
+          <span style={{ color: INK_SOFT }}>(400 ≈ {num(Math.round(CHUNK.chars400 / 100) * 100)} characters)</span>
+          <br />
+          <span style={{ opacity: ease(frame, overlapAt - 2, 10) }}>
+            {pct(CHUNK.overlapLow)} to {pct(CHUNK.overlapHigh)} shared
           </span>
           <br />
           <span style={{ opacity: ease(frame, wholeAt - 2, 10) }}>
-            <Mark at={wholeAt + 4}>a cut sentence stays whole</Mark>
+            <Mark at={wholeAt + 4}>cut sentences stay whole</Mark>
           </span>
         </Caption>
 
@@ -188,7 +197,7 @@ export const ChunkScene: React.FC = () => {
           { r0: 5, r1: 9 },
           { r0: 10, r1: 15 },
         ].map((c, k) => (
-          <ChunkBracket key={k} x={cx(3) + BR} docY={docY} r0={c.r0} r1={c.r1} at={headingsAt + 2 + k * 5} />
+          <ChunkBracket key={k} x={cx(3) + BR} docY={docY} n={N} r0={c.r0} r1={c.r1} at={headingsAt + 2 + k * 5} />
         ))}
         <Caption i={3} at={headingsAt}>
           split at headings and paragraphs
@@ -204,12 +213,13 @@ export const ChunkScene: React.FC = () => {
         <ChunkBracket
           x={cx(4) + BR}
           docY={docY}
+          n={N}
           r0={7}
           r1={8}
           at={retrieveAt + 2}
-          band={{ x: cx(4) + 8, w: DOC_W - 16, color: `color-mix(in srgb, ${ds("blue", 300)} 45%, transparent)` }}
+          band={band(4, `color-mix(in srgb, ${ds("blue", 300)} 45%, transparent)`)}
         />
-        <ChunkBracket x={cx(4) + BR + 20} docY={docY} r0={5} r1={9} at={sendAt + 2} color={OK_INK} />
+        <ChunkBracket x={cx(4) + BR + 20} docY={docY} n={N} r0={5} r1={9} at={sendAt + 2} color={OK_INK} />
         <Caption i={4} at={retrieveAt - 2}>
           <span style={{ color: BLUE_INK }}>retrieve the small chunk</span>
           <br />
@@ -217,21 +227,21 @@ export const ChunkScene: React.FC = () => {
         </Caption>
 
         {/* No universal best. */}
-        <Note at={bestAt} x={X0} y={y(820)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+        <Note at={bestAt} x={X0} y={y(845)}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             no universal best:{" "}
-            <span style={{ opacity: ease(frame, recallAt - 2, 10), color: OK_INK, fontWeight: 650 }}>
+            <span style={{ opacity: ease(frame, recallAt - 2, 10), color: OK_INK, fontWeight: 500 }}>
               <Mark at={recallAt + 6} color={MARK_OK}>
                 measure retrieval recall on labeled questions
               </Mark>
             </span>
           </span>
         </Note>
-        <Note at={recallAt + 14} x={X0 + 880} y={y(820) + 5}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>recall: the share of the right passages it finds</span>
+        <Note at={recallAt + 14} x={X0 + 900} y={y(845) + 5}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>recall: the share of the right passages it finds</span>
         </Note>
-        <Note at={storeAt - 2} x={X0} y={y(820) + 46}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+        <Note at={storeAt - 2} x={X0} y={y(845) + 50}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             and store the chunk settings with the index version
             <span style={{ opacity: ease(frame, rebuildAt - 2, 10), color: INK_SOFT }}>: a change means a rebuild</span>
           </span>

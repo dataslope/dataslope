@@ -117,7 +117,7 @@ export const PointerScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Pointers in C</span>
+        <span style={label(24, ACCENT_INK)}>Pointers in C</span>
       </Ink>
       <Ink
         at={open + 2}
@@ -205,9 +205,9 @@ export const PointerScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={label(20, INK_SOFT)}>prints</span>
-              <span style={{ fontSize: 26, color: VALUE_INK }}>
-                <Mono weight={600}>{out}</Mono>
+              <span style={label(24, INK_SOFT)}>prints</span>
+              <span style={{ fontSize: 28, color: VALUE_INK }}>
+                <Mono weight={500}>{out}</Mono>
               </span>
             </Ink>
           );
@@ -350,19 +350,19 @@ export const PointerScene: React.FC = () => {
           dur={12}
           style={{ left: s.x, top: y(SIZE_Y), width: s.w, textAlign: "center", whiteSpace: "nowrap" }}
         >
-          <span style={note(21, INK_SOFT)}>
+          <span style={note(24, INK_SOFT)}>
             <Mono>{s.type}</Mono>, {s.bytes} bytes
           </span>
         </Ink>
       ))}
 
       <Note at={machineAt - 2} x={STRIP_L} y={y(NOTE_Y)} from="up">
-        <span style={note(21, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Sizes from <Mono>sizeof</Mono> on x86-64 Linux, gcc 13.
         </span>
       </Note>
       <Note at={changeAt - 2} x={STRIP_L} y={y(NOTE_Y) + 34} from="up">
-        <span style={note(21, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Addresses from one run, printed with <Mono>%p</Mono>. They change on every run.
         </span>
       </Note>

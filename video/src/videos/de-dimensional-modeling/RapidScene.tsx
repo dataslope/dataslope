@@ -72,17 +72,17 @@ const Conformed: React.FC<{ c: Ctx }> = ({ c }) => {
       <Entity layout={sales} at={salesAt} />
       <Entity layout={inventory} at={salesAt + 8} />
       <Note at={dateAt} x={date.right + 26} y={date.top + 2}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           shared by
           <br />
           both facts
         </span>
       </Note>
       <Note at={sameAt} x={R_X} y={c.y(780)}>
-        <span style={{ ...note(25, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>same keys, same values</span>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>same keys, same values</span>
       </Note>
       <Note at={drillAt} x={R_X} y={c.y(830)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           drill across:
           <span style={{ opacity: ease(frame, lineAt, 10) }}> the days line up</span>
         </span>
@@ -132,10 +132,10 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
       </PanelHead>
       <DataTable g={wg} cols={wideCols} rows={[]} at={wideAt + 4} marks={[]} />
       <Note at={newAt + 8} x={wg.xs[6] - 6} y={wg.top + wg.headH + 10}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>↑ a new column</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>↑ a new column</span>
       </Note>
       <Note at={fastAt} x={R_X} y={wg.top + wg.headH + 10}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>fast, and easy in a dashboard</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>fast, and easy in a dashboard</span>
       </Note>
       <PanelHead at={narrowAt - 2} x={R_X} y={c.y(564)} width={960} sub="flexible, at the cost of joins" subAt={flexAt}>
         Narrow
@@ -147,7 +147,7 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
       <Relation name="narrow-city" points={[customers.anchor("right", "customer_id"), cityT.anchor("left", "customer_id")]} from="exactly-one" to="zero-or-one" at={joinsAt + 2} />
       <Relation name="narrow-plan" points={toPlan} from="exactly-one" to="zero-or-one" at={joinsAt + 8} />
       <Note at={colAt} x={R_X} y={c.y(896)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Columnar warehouses handle wide tables well.</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Columnar warehouses handle wide tables well.</span>
       </Note>
     </>
   );
@@ -188,7 +188,7 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={planAt} x={R_X} y={c.y(352)}>
-        <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           Bus matrix <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>· the plan</span>
         </span>
       </Note>
@@ -206,8 +206,8 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            ...label(22, BLUE_INK),
-            fontWeight: 700,
+            ...label(24, BLUE_INK),
+            fontWeight: 500,
             opacity: ease(frame, acrossAt + j * 3, 10),
           }}
         >
@@ -245,8 +245,8 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
               height: CELL_H,
               display: "flex",
               alignItems: "center",
-              ...label(23, INK),
-              fontWeight: 700,
+              ...label(24, INK),
+              fontWeight: 500,
               opacity: ease(frame, downAt + i * 3, 10),
             }}
           >
@@ -278,15 +278,15 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
         }}
       />
       <Note at={martAt} x={R_X} y={rowTop(PROCESSES.length) + c.h(28)}>
-        <span style={{ ...label(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           Data mart <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>· what gets built</span>
         </span>
       </Note>
       <Note at={salesAt} x={R_X} y={rowTop(PROCESSES.length) + c.h(78)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>the slice of the warehouse for one domain: sales</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the slice of the warehouse for one domain: sales</span>
       </Note>
       <Note at={combinedAt} x={R_X} y={rowTop(PROCESSES.length) + c.h(130)}>
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>shared dimensions let two marts be combined</span>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>shared dimensions let two marts be combined</span>
       </Note>
     </>
   );
@@ -311,7 +311,7 @@ const DateDim: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={whyAt} x={R_X} y={c.y(330) - 4}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           the page&apos;s <Mono>dim_date</Mono>: <span style={{ opacity: ease(frame, rulesAt, 10) }}>fiscal quarters and {HOLIDAYS} holidays, stored once</span>
         </span>
       </Note>
@@ -336,7 +336,7 @@ const DateDim: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={[]}
       />
       <Note at={oneJoinAt + 4} x={g.right + 40} y={g.top + c.h(30)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           one join,
           <br />
           no date math
@@ -345,12 +345,12 @@ const DateDim: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* The page's fiscal quarters are its calendar's (check.mjs), so it is the
           holidays that only the table can supply. */}
       <Note at={holidaysAt} x={g.right + 40} y={g.top + c.h(124)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           No date function knows
           <br />
           the {HOLIDAYS} holidays.
         </span>
-        <div style={{ ...note(21, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>(Here, the fiscal quarters match the calendar.)</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>(Here, the fiscal quarters match the calendar.)</div>
       </Note>
     </>
   );
@@ -380,7 +380,7 @@ const Metric: React.FC<{ c: Ctx }> = ({ c }) => {
         Measure
       </PanelHead>
       <Note at={revenueAt} x={R_X} y={c.y(438)}>
-        <span style={{ fontFamily: "inherit", ...note(26, INK), whiteSpace: "nowrap" }}>
+        <span style={{ fontFamily: "inherit", ...note(28, INK), whiteSpace: "nowrap" }}>
           <Mono>fact_orders.amount</Mono> <span style={{ color: INK_SOFT }}>· revenue</span>
         </span>
       </Note>
@@ -388,7 +388,7 @@ const Metric: React.FC<{ c: Ctx }> = ({ c }) => {
         Metric
       </PanelHead>
       <Note at={aovAt} x={R_X} y={c.y(602)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
           average order value
           <span style={{ opacity: ease(frame, overAt, 10) }}>
             {" "}
@@ -398,14 +398,14 @@ const Metric: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       {teams.map((tm, i) => (
         <Note key={tm.who} at={tm.at} x={R_X + i * 420} y={c.y(680)}>
-          <div style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <div style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             team {i === 0 ? "A" : "B"}: {tm.who}
           </div>
           {/* One size across the sum: the answer stands out by weight and
               color. */}
           <div style={{ ...note(24, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>
             <Num>{money(col(tm.t, "revenue"))}</Num> / <Num>{col(tm.t, "orders")}</Num> ={" "}
-            <b style={{ fontWeight: 800, color: ACCENT_INK }}>
+            <b style={{ fontWeight: 600, color: ACCENT_INK }}>
               <Num>{money(col(tm.t, "aov"))}</Num>
             </b>
           </div>
@@ -414,10 +414,10 @@ const Metric: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* The two teams side by side, a hairline between them. */}
       <ColumnRule x={R_X + TEAM_RULE} top={c.y(680)} height={TEAM_H} at={teams[1].at} />
       <Note at={teamsAt} x={R_X} y={c.y(800)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>one name, two numbers</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one name, two numbers</span>
       </Note>
       <Note at={onceAt} x={R_X} y={c.y(850)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap", background: PAPER }}>Define each metric once, in the semantic layer.</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER }}>Define each metric once, in the semantic layer.</span>
       </Note>
     </>
   );
@@ -471,19 +471,19 @@ export const RapidScene: React.FC = () => {
         {/* ── The bridge ── */}
         {/* Question 8 already kept two rows for customer 42; every other answer did not. */}
         <Note at={apartAt} x={X0} y={listBottom + h(36)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             Apart from Question 8,
             <span style={{ opacity: ease(frame, everyAt - 2, 10) }}> every answer treated a dimension as fixed.</span>
           </span>
         </Note>
         <Note at={moveAt} x={X0} y={listBottom + h(82)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             Customers move <QMono>Boston → Austin</QMono>
             <span style={{ opacity: ease(frame, renamedAt, 10) }}>, products get renamed.</span>
           </span>
         </Note>
         <Note at={historyAt} x={X0} y={listBottom + h(128)}>
-          <span style={{ ...note(26, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>The model has to keep history.</span>
+          <span style={{ ...note(28, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The model has to keep history.</span>
         </Note>
         <NextLine at={nextAt} x={X0} y={listBottom + h(184)} width={900}>
           modeling history

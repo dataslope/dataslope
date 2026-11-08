@@ -25,7 +25,7 @@ export const TINT = FILL.map((c) => `color-mix(in srgb, ${c} 26%, ${PAPER})`);
 export const Tok: React.FC<{ i: number; size?: number; weight?: number; style?: React.CSSProperties }> = ({
   i,
   size = 34,
-  weight = 600,
+  weight = 500,
   style,
 }) => (
   <span style={{ fontFamily: MONO, fontSize: size, fontWeight: weight, color: TEXT[i], whiteSpace: "nowrap", ...style }}>
@@ -47,12 +47,12 @@ export const Swatch: React.FC<{ i: number; size?: number }> = ({ i, size = 16 })
 
 /** "■ cat  ■ dog  ■ bird  ■ rock", for the right end of a figure label. */
 export const Legend: React.FC = () => (
-  <span style={{ ...note(21), display: "inline-flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
+  <span style={{ ...note(24), display: "inline-flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
     {TOKENS.map((t, i) => (
       <React.Fragment key={t}>
         {i > 0 ? <span style={{ width: 12 }} /> : null}
         <Swatch i={i} />
-        <span style={{ color: TEXT[i], fontWeight: 600 }}>{t}</span>
+        <span style={{ color: TEXT[i], fontWeight: 500 }}>{t}</span>
       </React.Fragment>
     ))}
   </span>

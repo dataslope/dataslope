@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, headline, HIGHLIGHT, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, body, headline, HIGHLIGHT, INK_SOFT, label, note, INK } from "../../editorial/style";
 import { Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
@@ -58,14 +58,14 @@ export const ShareScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 2} dur={14} style={{ left: 124, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Transform, then divide</span>
+      <Ink at={start - 2} dur={14} style={{ left: 124, top: y(112), whiteSpace: "nowrap" }}>
+        <span style={label(24, ACCENT_INK)}>Transform, then divide</span>
       </Ink>
       <div style={{ position: "absolute", left: 118, top: y(146), display: "flex", gap: "0.26em", ...headline(66) }}>
         <Ink at={start + 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Salary over group total
         </Ink>
-        <Ink at={shareAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={shareAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: INK, whiteSpace: "nowrap" }}>
           is each row&apos;s share.
         </Ink>
       </div>
@@ -82,7 +82,7 @@ export const ShareScene: React.FC = () => {
 
       {/* ── the frame and its group totals, where the last scene left them ── */}
       <Ink at={start - 14} dur={10} style={{ left: A_X, top: y(LABEL_Y) }}>
-        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600 }}>df</span>
+        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>df</span>
       </Ink>
       <Header x={A_X} top={y(HEADER_Y)} width={CARD_W} at={start - 14} cols={FRAME_COLS} />
       <Header x={T_X} top={y(HEADER_Y)} width={T_W} at={start - 14} cols={[{ text: "group total", right: 18 }]} />
@@ -134,14 +134,14 @@ export const ShareScene: React.FC = () => {
       <Note at={pctAt - 4} x={NOTE_X} y={exMid - 44}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 16, whiteSpace: "nowrap" }}>
           <span style={{ ...headline(64), color: DEPT_INK[EXAMPLE.dept] }}>{pct(SHARES[ex])}</span>
-          <span style={{ ...body(30), opacity: ease(frame, engAt - 4, 12) }}>
+          <span style={{ ...body(28), opacity: ease(frame, engAt - 4, 12) }}>
             {EXAMPLE.salary} of engineering&apos;s {TOTALS[ex]}
           </span>
         </div>
       </Note>
 
       <Note at={engAt + 14} x={A_X} y={y(ROW0 + 7 * RH + 18)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Within each department, the shares add up to {pct(Math.min(...SHARE_SUMS))}.
         </span>
       </Note>

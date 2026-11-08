@@ -127,7 +127,7 @@ export const KeysScene: React.FC = () => {
           {problems.map((p, i) => (
             <Note key={p.what} at={p.at - 2} x={X0} y={y(412) + i * h(50)}>
               <span style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-                <span style={{ ...label(25, ACCENT_INK), fontWeight: 700, width: 170 }}>{p.what}</span>
+                <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, width: 170 }}>{p.what}</span>
                 <span style={{ ...note(24, INK) }}>
                   {p.code ? <Mono>{p.code}</Mono> : null}
                   {p.text}
@@ -141,13 +141,13 @@ export const KeysScene: React.FC = () => {
             Surrogate key
           </PanelHead>
           <Note at={nothingAt} x={R_X} y={y(372)}>
-            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
               means nothing,
               <span style={{ opacity: ease(frame, upstreamAt, 10) }}> so nothing upstream can change it</span>
             </span>
           </Note>
           <Note at={smallAt} x={R_X} y={y(424)}>
-            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
               small: an integer, <Mono>1001</Mono>
             </span>
           </Note>
@@ -172,7 +172,7 @@ export const KeysScene: React.FC = () => {
           ]}
         />
         <Note at={fortyTwoAt + 10} x={X0} y={dg.rowTop(dim.rows.length) + h(22)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>42 twice: the natural key can&apos;t be the key</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>42 twice: the natural key can&apos;t be the key</span>
         </Note>
 
         <TableName g={fg} at={pointsAt - 4}>
@@ -192,10 +192,10 @@ export const KeysScene: React.FC = () => {
           <KeyArrow key={i} from={[fg.x - 10, fg.rowMid(i)]} to={[dg.right + 12, dg.rowMid(target(i))]} at={pointsAt + 8 + i * 6} />
         ))}
         <Note at={trueAt + 8} x={fg.x} y={fg.rowTop(fact.rows.length) + h(22)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>each order: the version true when it was placed</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>each order: the version true when it was placed</span>
         </Note>
         <Note at={lookAt} x={fg.x} y={fg.rowTop(fact.rows.length) + h(62)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             each load: <Mono>customer_id</Mono> + date
             <span style={{ opacity: ease(frame, newOrderAt, 10) }}> → a new order&apos;s key</span>
           </span>
@@ -203,9 +203,9 @@ export const KeysScene: React.FC = () => {
 
         {/* ── Where it leads ── */}
         <Note at={scdAt} x={X0} y={dg.rowTop(dim.rows.length) + h(106)}>
-          <span style={{ ...note(27, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Versions like these: a slowly changing dimension
-            <span style={{ color: INK, fontWeight: 560, opacity: ease(frame, historyAt, 10) }}> · where modeling history begins</span>
+            <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, historyAt, 10) }}> · where modeling history begins</span>
           </span>
         </Note>
       </Drift>

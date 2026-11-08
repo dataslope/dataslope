@@ -47,8 +47,8 @@ const Phrase: React.FC<{ at: number; underlineAt: number; color: string; childre
  *  gloss reads as a note in the margin rather than as words of the line. */
 const Gloss: React.FC<{ at: number; form: string; gist: string; color: string }> = ({ at, form, gist, color }) => (
   <Ink at={at} dur={14} style={{ position: "relative", alignSelf: "center", marginLeft: 116, whiteSpace: "nowrap" }}>
-    <div style={{ ...label(24, color), fontWeight: 700 }}>{form}</div>
-    <div style={{ ...note(21, INK_SOFT), marginTop: 4 }}>{gist}</div>
+    <div style={{ ...label(24, color), fontWeight: 500 }}>{form}</div>
+    <div style={{ ...note(24, INK_SOFT), marginTop: 4 }}>{gist}</div>
   </Ink>
 );
 
@@ -103,7 +103,7 @@ export const OathScene: React.FC = () => {
       <Sfx name="el-tap" at={almostAt - 2} level={-29} />
 
       <Ink at={from - 10} dur={14} style={{ left: X0 + 2, top: y(KICKER_Y) }}>
-        <span style={label(22, INK_SOFT)}>Third normal form</span>
+        <span style={label(24, INK_SOFT)}>Third normal form</span>
       </Ink>
       <Spot id="db-normalization-keys" at={oathAt - 6} out={soAt} left={1520} top={y(300)} width={280} height={392} />
 
@@ -136,7 +136,7 @@ export const OathScene: React.FC = () => {
             <span style={{ ...label(24, INK) }}>William Kent, 1983</span>
           </Ink>
           <Ink at={yearAt} dur={16} style={{ left: X0 + 260, top: y(664) + 1, whiteSpace: "nowrap" }}>
-            <span style={{ ...body(25, true), color: INK_SOFT }}>A Simple Guide to Five Normal Forms in Relational Database Theory</span>
+            <span style={{ ...body(24, true), color: INK_SOFT }}>A Simple Guide to Five Normal Forms in Relational Database Theory</span>
           </Ink>
           <Ink at={coddAt - 2} dur={20} style={{ left: X0, top: y(714), whiteSpace: "nowrap" }}>
             <span style={{ ...body(40, true), color: ACCENT_INK }}>…so help me Codd.</span>

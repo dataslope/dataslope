@@ -95,11 +95,11 @@ export const ObsScene: React.FC = () => {
           at={oneAt + 4}
           tone="data"
           title="Order"
-          sub={<span style={{ color: BLUE_INK, fontWeight: 650 }}>{frame < placedAt ? "the subject" : `${frame >= second ? "1043" : "1042"} placed`}</span>}
+          sub={<span style={{ color: BLUE_INK, fontWeight: 500 }}>{frame < placedAt ? "the subject" : `${frame >= second ? "1043" : "1042"} placed`}</span>}
           lit={pulse(frame, placedAt + 4, 20) + pulse(frame, second, 20)}
           dim={costDim}
         />
-        <Line x={ORDER.x} y={orderTop + ORDER.h + 22} at={typesAt} size={21} color={INK_SOFT} weight={600} dim={costDim}>
+        <Line x={ORDER.x} y={orderTop + ORDER.h + 22} at={typesAt} size={21} color={INK_SOFT} weight={500} dim={costDim}>
           knows only: notify each one
         </Line>
         <Pill x={ORDER.x} y={orderTop + ORDER.h + 70} at={withoutAt} tone="ok" size={21} dim={costDim}>
@@ -143,7 +143,7 @@ export const ObsScene: React.FC = () => {
                 {dot(t2)}
               </Svg>
               {result ? (
-                <Line x={RES_X} y={lisMid(i) - 16} at={i < 3 ? resultAt(i) : second + 16 + 4 * i} size={24} weight={600} color={BLUE_INK} dim={costDim}>
+                <Line x={RES_X} y={lisMid(i) - 16} at={i < 3 ? resultAt(i) : second + 16 + 4 * i} size={24} weight={500} color={BLUE_INK} dim={costDim}>
                   {result}
                 </Line>
               ) : null}
@@ -165,7 +165,7 @@ export const ObsScene: React.FC = () => {
         />
 
         {/* Where it is used. */}
-        <Line x={X0} y={pathTop + 14} at={useAt} size={24} weight={600} out={costAt}>
+        <Line x={X0} y={pathTop + 14} at={useAt} size={24} weight={500} out={costAt}>
           event systems
           <span style={{ opacity: ease(frame, uiAt, 10) }}> · UI data binding</span>
           <span style={{ opacity: ease(frame, pubAt, 10) }}> · publish-subscribe</span>
@@ -178,7 +178,7 @@ export const ObsScene: React.FC = () => {
             {i > 0 ? <Flow points={[[X0 + i * 200 - 44, pathTop + 30], [X0 + i * 200 - 8, pathTop + 30]]} at={readingAt + i * 5 - 2} dur={6} width={2.2} head={11} /> : null}
           </React.Fragment>
         ))}
-        <Line x={X0 + 600} y={pathTop + 14} at={afterAt} size={25} weight={650} color={ACCENT_INK}>
+        <Line x={X0 + 600} y={pathTop + 14} at={afterAt} size={25} weight={500} color={ACCENT_INK}>
           and then? Go and find who subscribed.
         </Line>
       </Drift>

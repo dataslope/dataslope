@@ -95,7 +95,7 @@ export const SumScene: React.FC = () => {
         <Ink
           at={totalAt - 2}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           get {BOX.rendered}.
         </Ink>
@@ -124,7 +124,7 @@ export const SumScene: React.FC = () => {
         padding={ease(frame, padAt - 4, 14)}
         border={ease(frame, borderAt - 4, 14)}
       >
-        <span style={{ ...note(22, CONTENT_INK), fontWeight: 600 }}>content</span>
+        <span style={{ ...note(24, CONTENT_INK), fontWeight: 500 }}>content</span>
       </BoxDrawing>
 
       {/* Padding and border on both sides, then each strip as it is read. */}
@@ -189,7 +189,7 @@ export const SumScene: React.FC = () => {
       </div>
 
       <Note at={totalAt + 8} x={LIST_X} y={listBottom + 34} from="up">
-        <div style={{ ...note(21, INK_SOFT), width: LIST_W }}>
+        <div style={{ ...note(24, INK_SOFT), width: LIST_W }}>
           Read back in {BROWSER}: <Mono>getBoundingClientRect()</Mono> gives {BOX.rendered}, a child filling the content
           box gives {BOX.content}.
         </div>
@@ -206,7 +206,7 @@ const Term: React.FC<{ at: number; value: number; color: string; sub: string }> 
     style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}
   >
     <span style={{ ...headline(56), color, fontVariantNumeric: "tabular-nums lining-nums" }}>{value}</span>
-    <span style={{ ...note(20, INK_SOFT), marginTop: 10 }}>{sub}</span>
+    <span style={{ ...note(24, INK_SOFT), marginTop: 10 }}>{sub}</span>
   </Ink>
 );
 

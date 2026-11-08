@@ -100,18 +100,18 @@ export const BlindScene: React.FC = () => {
           dur={14}
           style={{ left: px[0], top: y(SENT_Y + i * 50), display: "flex", alignItems: "baseline", gap: SENT_GAP, whiteSpace: "nowrap" }}
         >
-          <span style={{ ...label(21, INK_SOFT), width: 22 }}>{"AB"[i]}</span>
+          <span style={{ ...label(24, INK_SOFT), width: 22 }}>{"AB"[i]}</span>
           <span style={{ ...body(34), color: INK }}>{s}</span>
         </Ink>
       ))}
       {ORDER.vocab.map((w, j) => (
-        <Ink key={w} at={manAt + 6 + j * 2} dur={10} style={{ left: MINI.x0 + j * MINI.w, width: MINI.w, top: y(MINI.headY), textAlign: "center", ...label(22, INK) }}>
+        <Ink key={w} at={manAt + 6 + j * 2} dur={10} style={{ left: MINI.x0 + j * MINI.w, width: MINI.w, top: y(MINI.headY), textAlign: "center", ...label(24, INK) }}>
           {w}
         </Ink>
       ))}
       {ORDER.rows.map((row, i) => (
         <React.Fragment key={i}>
-          <Ink at={manAt + 8 + i * 4} dur={10} style={{ left: px[0], top: y(MINI.rowY + i * MINI.step) + h(MINI.h) / 2 - 15, ...label(21, INK_SOFT) }}>
+          <Ink at={manAt + 8 + i * 4} dur={10} style={{ left: px[0], top: y(MINI.rowY + i * MINI.step) + h(MINI.h) / 2 - 15, ...label(24, INK_SOFT) }}>
             {"AB"[i]}
           </Ink>
           {row.map((c, j) => (
@@ -130,7 +130,7 @@ export const BlindScene: React.FC = () => {
         </React.Fragment>
       ))}
       <Note at={sameAt - 2} x={px[0]} y={y(MINI.rowY + 2 * MINI.step) + 14}>
-        <span style={{ ...note(26, LOST_INK), fontWeight: 600, whiteSpace: "nowrap" }}>The same bag</span>
+        <span style={{ ...note(28, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The same bag</span>
       </Note>
 
       {/* ── The panels side by side: a hairline in each gap, inking with the
@@ -143,7 +143,7 @@ export const BlindScene: React.FC = () => {
         Mostly zeros
       </Ink>
       <Note at={realAt - 2} x={px[1]} y={y(SENT_Y)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>doc1’s row, from Fig. 7</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>doc1’s row, from Fig. 7</span>
       </Note>
       {DOC1.map((c, j) => (
         <NumCell
@@ -160,7 +160,7 @@ export const BlindScene: React.FC = () => {
         />
       ))}
       <Note at={tensAt - 2} x={px[1]} y={y(STRIP_Y + 56)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           the same row, against <Mark at={tensAt}>tens of thousands</Mark> of words
         </span>
       </Note>
@@ -199,7 +199,7 @@ export const BlindScene: React.FC = () => {
           dur={14}
           style={{ left: px[2], top: y(SENT_Y + i * 50), display: "flex", alignItems: "baseline", gap: SENT_GAP, whiteSpace: "nowrap" }}
         >
-          <span style={{ ...label(21, INK_SOFT), width: 22 }}>{"CD"[i]}</span>
+          <span style={{ ...label(24, INK_SOFT), width: 22 }}>{"CD"[i]}</span>
           <span style={{ ...body(34), color: INK }}>{t}</span>
         </Ink>
       ))}
@@ -208,14 +208,14 @@ export const BlindScene: React.FC = () => {
           key={w}
           at={excellentAt + 6 + j * 2}
           dur={10}
-          style={{ left: MEANING_X0 + j * MEANING_W, width: MEANING_W, top: y(MINI.headY), textAlign: "center", ...label(22, INK) }}
+          style={{ left: MEANING_X0 + j * MEANING_W, width: MEANING_W, top: y(MINI.headY), textAlign: "center", ...label(24, INK) }}
         >
           {w}
         </Ink>
       ))}
       {MEANING.rows.map((row, i) => (
         <React.Fragment key={i}>
-          <Ink at={excellentAt + 8 + i * 4} dur={10} style={{ left: px[2], top: y(MINI.rowY + i * MINI.step) + h(MINI.h) / 2 - 15, ...label(21, INK_SOFT) }}>
+          <Ink at={excellentAt + 8 + i * 4} dur={10} style={{ left: px[2], top: y(MINI.rowY + i * MINI.step) + h(MINI.h) / 2 - 15, ...label(24, INK_SOFT) }}>
             {"CD"[i]}
           </Ink>
           {row.map((c, j) => {
@@ -244,7 +244,7 @@ export const BlindScene: React.FC = () => {
         </span>
       </Note>
       <Note at={meaningAt - 2} x={px[2]} y={y(MINI.rowY + 2 * MINI.step) + 58}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           The two reviews share only <i>{MEANING.shared.join(", ")}</i>.
         </span>
       </Note>
@@ -254,9 +254,9 @@ export const BlindScene: React.FC = () => {
       {/* ── The turn: the commonest word wins every row ── */}
       <div style={{ position: "absolute", left: X0, top: y(COMMON_Y), display: "flex", alignItems: "center", gap: 18, whiteSpace: "nowrap" }}>
         <Chip text="the" size={30} at={commonAt - 2} mark={biggestAt - 2} />
-        <span style={{ ...note(26, INK) }}>
+        <span style={{ ...note(28, INK) }}>
           <Reveal at={biggestAt - 4}>{`${THE_COUNTS.join(" or ")} in every row, the biggest count,`}</Reveal>{" "}
-          <Reveal at={leastAt - 2} style={{ color: LOST_INK, fontStyle: "italic" }}>
+          <Reveal at={leastAt - 2} style={{ color: LOST_INK }}>
             and the least telling.
           </Reveal>
         </span>

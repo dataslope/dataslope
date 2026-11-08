@@ -75,15 +75,15 @@ export const RulesScene: React.FC = () => {
           }}
         />
         <Ink at={countsAt} dur={14} style={{ left: COL_X[0], top: y(ROW_Y[2] + 92), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK), fontWeight: 700 }}>This course: rules and counts</span>
+          <span style={{ ...label(24, INK), fontWeight: 500 }}>This course: rules and counts</span>
         </Ink>
 
         {/* Column heads */}
         <Ink at={rulesAt - 4} dur={14} style={{ left: COL_X[0], top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(44), color: INK, fontWeight: 600 }}>Rules</span>
+          <span style={{ ...body(44), color: INK, fontWeight: 500 }}>Rules</span>
         </Ink>
         <Ink at={learnedAt - 4} dur={14} style={{ left: COL_X[1], top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(44), color: INK, fontWeight: 600 }}>Learning</span>
+          <span style={{ ...body(44), color: INK, fontWeight: 500 }}>Learning</span>
         </Ink>
         <div
           style={{
@@ -124,10 +124,10 @@ export const RulesScene: React.FC = () => {
 
         {/* A real rule: NLTK's stopword list. */}
         <Ink at={stopAt - 2} dur={16} style={{ left: COL_X[0], top: y(ROW_Y[0]) + 52, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK_SOFT) }}>like NLTK's stopword list, {STOPWORDS.count} words:</span>
+          <span style={{ ...note(24, INK_SOFT) }}>like NLTK's stopword list, {STOPWORDS.count} words:</span>
         </Ink>
         <Ink at={stopAt + 4} dur={16} style={{ left: COL_X[0], top: y(ROW_Y[0]) + 84, whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: MONO, fontSize: 21, color: INK }}>{STOPWORDS.first.slice(0, 4).join(", ")}, …</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, color: INK }}>{STOPWORDS.first.slice(0, 4).join(", ")}, …</span>
         </Ink>
         {/* As the narration turns to the pipeline, learning steps back. */}
         <div

@@ -98,7 +98,7 @@ export const SplitScene: React.FC = () => {
   const ng = geoOf(N, namedX, y(TOP) + listingHeight(N.lines.length, SIZE) + h(54), h, { rowH: 52 });
   const header = (text: string, x: number, at: number) => (
     <Note at={at} x={x} y={y(HEAD_Y)} out={out1}>
-      <span style={{ ...label(22, INK_SOFT), fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>{text}</span>
+      <span style={{ ...label(24, INK_SOFT), fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" }}>{text}</span>
     </Note>
   );
 
@@ -146,8 +146,8 @@ export const SplitScene: React.FC = () => {
               out={out1}
             />
             <Note at={sumAt + k * 5} x={APPLY_X} y={g.rowMid(Math.floor((t.rows.length - 1) / 2)) - h(18)} out={out1}>
-              <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
-                sum = <span style={{ color: BLUE_INK, fontWeight: 650 }}>{S.rows[k][1]}</span>
+              <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
+                sum = <span style={{ color: BLUE_INK, fontWeight: 500 }}>{S.rows[k][1]}</span>
               </span>
             </Note>
             <KeyArrow
@@ -189,7 +189,7 @@ export const SplitScene: React.FC = () => {
           marks={S.rows.map((_, row) => ({ row, col: 0, at: indexAt + row * 3 }))}
         />
         <Note at={seriesAt + 4} x={oneX} y={og.rowTop(S.rows.length) + h(22)}>
-          <span style={label(22)}>
+          <span style={label(24)}>
             <Badge tone="blue" size={22}>
               Series
             </Badge>
@@ -205,14 +205,14 @@ export const SplitScene: React.FC = () => {
           marks={N.rows.map((_, row) => ({ row, col: 0, at: indexAt + 4 + row * 3 }))}
         />
         <Note at={frameAt + 4} x={namedX} y={ng.rowTop(N.rows.length) + h(22)}>
-          <span style={label(22)}>
+          <span style={label(24)}>
             <Badge tone="blue" size={22}>
               DataFrame
             </Badge>
           </span>
         </Note>
         <Note at={resetAt} x={X0} y={y(744)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             the regions are the index, until <Mono color={BLUE_INK}>.reset_index()</Mono>
           </span>
         </Note>

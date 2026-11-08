@@ -82,7 +82,7 @@ const Sentence: React.FC<{ marks: { word: string; at: number; color?: string }[]
       {S.slice(i)}
     </span>,
   );
-  return <span style={{ fontFamily: MONO, fontSize: SIZE, fontWeight: 600, color: INK, whiteSpace: "pre" }}>{parts}</span>;
+  return <span style={{ fontFamily: MONO, fontSize: SIZE, fontWeight: 500, color: INK, whiteSpace: "pre" }}>{parts}</span>;
 };
 
 const it = TOKENS.indexOf("it");
@@ -158,7 +158,7 @@ export const QuestionScene: React.FC = () => {
       <Headline
         lead={
           <>
-            What does <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: "0.86em" }}>it</span> mean?
+            What does <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: "0.86em" }}>it</span> mean?
           </>
         }
         at={from}
@@ -235,7 +235,7 @@ export const QuestionScene: React.FC = () => {
         <Tag size={21}>itself</Tag>
       </Fade>
       <Fade at={winAt} style={{ left: (trX + itX) / 2 - 110, top: R - 134 }}>
-        <span style={{ ...label(22, POINT_INK), whiteSpace: "nowrap" }}>the biggest weight?</span>
+        <span style={{ ...label(24, POINT_INK), whiteSpace: "nowrap" }}>the biggest weight?</span>
       </Fade>
       <Spot id="llm-meaning-trophy" at={trophyAt - 4} left={1440} top={y(390)} width={340} height={334} />
 

@@ -64,7 +64,7 @@ export const ClaimScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 6} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Data from outside the program</span>
+        <span style={label(24, ACCENT_INK)}>Data from outside the program</span>
       </Ink>
       <Ink
         at={start - 4}
@@ -72,7 +72,7 @@ export const ClaimScene: React.FC = () => {
         style={{ left: LEFT - 2, top: y(150), ...headline(88), whiteSpace: "nowrap", display: "flex", gap: "0.24em" }}
       >
         <span>A type is</span>
-        <span style={{ ...headline(88, true), color: ACCENT_INK, opacity: ease(frame, onlyAt - 6, 12) }}>only a claim.</span>
+        <span style={{ ...headline(88, true), color: INK, opacity: ease(frame, onlyAt - 6, 12) }}>only a claim.</span>
       </Ink>
       {ILLUSTRATIONS ? (
         <Illustration
@@ -114,11 +114,11 @@ export const ClaimScene: React.FC = () => {
       <Note at={anyAt} x={NOTE_X} y={parseMid - 17} width={700}>
         <div style={note(24, INK)}>
           <Mono>JSON.parse</Mono> returns{" "}
-          <Mono color={ACCENT_INK} weight={700}>
+          <Mono color={ACCENT_INK} weight={500}>
             {JSON_PARSE_RETURNS}
           </Mono>
         </div>
-        <div style={{ ...note(20, INK_SOFT), marginTop: 8 }}>as declared in TypeScript&apos;s lib.es5.d.ts</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 8 }}>as declared in TypeScript&apos;s lib.es5.d.ts</div>
       </Note>
       <Note at={whateverAt + 2} x={NOTE_X} y={parseMid + 74} width={700}>
         <div style={note(24, INK)}>
@@ -144,9 +144,9 @@ export const ClaimScene: React.FC = () => {
         ]}
       />
       <Note at={crashesAt + 10} x={NOTE_X} y={termTop + 18} width={700}>
-        <div style={{ ...note(22, INK_SOFT) }}>
+        <div style={{ ...note(24, INK_SOFT) }}>
           The type said <Mono color={INK}>name</Mono> is a string. At runtime it was{" "}
-          <Mono color={ACCENT_INK} weight={700}>
+          <Mono color={ACCENT_INK} weight={500}>
             null
           </Mono>
           .

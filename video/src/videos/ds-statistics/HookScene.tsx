@@ -85,7 +85,7 @@ export const HookScene: React.FC = () => {
 
         {/* ── The two sentences that give a candidate away ── */}
         <Note at={sentenceAt} x={X0} y={y(MISREAD_Y - 6)} out={misreadOut}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 650 }}>One sentence gives it away</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>One sentence gives it away</span>
         </Note>
         {[
           { at: pAt, term: "a p-value", read: "the chance the null is true", strike: hookEnd - 18 },
@@ -93,8 +93,8 @@ export const HookScene: React.FC = () => {
         ].map((m, i) => (
           <Note key={m.term} at={m.at} x={X0} y={y(MISREAD_Y + 56 + i * 110)} out={misreadOut}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-              <span style={{ ...noteText(36, INK), fontWeight: 650 }}>{m.term}</span>
-              <span style={{ ...label(22, INK_SOFT) }}>read as</span>
+              <span style={{ ...noteText(36, INK), fontWeight: 500 }}>{m.term}</span>
+              <span style={{ ...label(24, INK_SOFT) }}>read as</span>
               <span style={{ ...body(42, true), color: ACCENT_INK }}>
                 <Strike at={m.strike}>“{m.read}”</Strike>
               </span>
@@ -105,7 +105,7 @@ export const HookScene: React.FC = () => {
         {/* ── Nineteen questions in three stages, then the short three ── */}
         <Note at={nineteenAt} x={X0} y={roadY - h(92)} dim={bridgeAt}>
           <span style={{ ...noteText(30, INK), ...TABULAR }}>
-            <span style={{ fontWeight: 650 }}>19</span> questions
+            <span style={{ fontWeight: 500 }}>19</span> questions
           </span>
         </Note>
         {dots.map((d, i) => {
@@ -139,7 +139,7 @@ export const HookScene: React.FC = () => {
           const { x0, x1 } = stageX(k);
           return (
             <Note key={s.name} at={stageAt[k] + 2} x={x0} y={roadY + h(48)} dim={k === 0 ? undefined : bridgeAt + 2} out={clearAt}>
-              <span style={{ ...noteText(26, INK), fontWeight: k === 0 ? 650 : 500, minWidth: x1 - x0, display: "inline-block" }}>
+              <span style={{ ...noteText(26, INK), fontWeight: k === 0 ? 500 : 500, minWidth: x1 - x0, display: "inline-block" }}>
                 {k === 0 ? <Mark at={bridgeAt + 2}>{s.name}</Mark> : s.name}
               </span>
             </Note>
@@ -150,7 +150,7 @@ export const HookScene: React.FC = () => {
         </Note>
         <Note at={figureAt + 6} x={X0} y={roadY + h(110)} dim={bridgeAt + 2} out={clearAt}>
           <span style={{ ...noteText(24, INK_SOFT) }}>
-            <span style={{ color: BAR, fontWeight: 650 }}>16</span> come with a figure
+            <span style={{ color: BAR, fontWeight: 500 }}>16</span> come with a figure
           </span>
         </Note>
       </Drift>

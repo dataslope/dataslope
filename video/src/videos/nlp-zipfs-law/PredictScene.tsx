@@ -89,11 +89,11 @@ export const PredictScene: React.FC = () => {
       <FigLabel n="3" title="The novel's top ten, against one over the rank from the top word" at={from} x={96} y={y(286)} />
       <Ink at={predictionAt} style={{ left: 1824 - 520, top: y(286) + 2, width: 520, display: "flex", justifyContent: "flex-end", gap: 12, alignItems: "center", whiteSpace: "nowrap" }}>
         <Swatch color={LAW} dashed />
-        <span style={{ ...note(21, INK_SOFT), fontWeight: 600 }}>predicted from “to”</span>
+        <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>predicted from “to”</span>
         <span style={{ width: 14 }} />
         <span style={{ opacity: ease(frame, inEmmaAt - 2, 10), display: "inline-flex", gap: 12, alignItems: "center" }}>
           <Swatch color={DATA} />
-          <span style={{ ...note(21, DATA_INK), fontWeight: 600 }}>Emma</span>
+          <span style={{ ...note(24, DATA_INK), fontWeight: 500 }}>Emma</span>
         </span>
       </Ink>
 
@@ -104,7 +104,7 @@ export const PredictScene: React.FC = () => {
         { x: LAW_R, align: "right" as const, text: "predicted", at: predictionAt - 4 },
         { x: EMMA_R, align: "right" as const, text: "Emma", at: inEmmaAt - 4 },
       ].map((c) => (
-        <Tag key={c.text} x={c.x} y={HEAD_Y} at={c.at} align={c.align} size={21} weight={650}>
+        <Tag key={c.text} x={c.x} y={HEAD_Y} at={c.at} align={c.align} size={21} weight={500}>
           {c.text}
         </Tag>
       ))}
@@ -135,7 +135,7 @@ export const PredictScene: React.FC = () => {
           return (
             <div key={r.rank} style={{ position: "absolute", inset: 0, opacity: o }}>
               {cell(RANK_R, "right", rowsIn(i), <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>{r.rank}</span>)}
-              {cell(WORD_L, "left", rowsIn(i), <span style={{ ...note(24, INK), fontWeight: 600 }}>{i === 1 ? <Mark at={secondAt}>{r.word}</Mark> : r.word}</span>)}
+              {cell(WORD_L, "left", rowsIn(i), <span style={{ ...note(24, INK), fontWeight: 500 }}>{i === 1 ? <Mark at={secondAt}>{r.word}</Mark> : r.word}</span>)}
               {cell(
                 LAW_R,
                 "right",
@@ -156,7 +156,7 @@ export const PredictScene: React.FC = () => {
                 EMMA_R,
                 "right",
                 emmaIn(i),
-                <span style={{ ...note(24, DATA_INK), fontWeight: 600, ...TABULAR }}>
+                <span style={{ ...note(24, DATA_INK), fontWeight: 500, ...TABULAR }}>
                   {i === 1 ? <Mark at={fiveAt}>{emmaText}</Mark> : emmaText}
                 </span>,
               )}
@@ -195,7 +195,7 @@ export const PredictScene: React.FC = () => {
             strokeDasharray={`${ease(frame, tiesAt - 2, 16)} 1`}
           />
         </Svg>
-        <Tag x={tieX1 + 14} y={rowY(0) + ROW * 0.5 + 4} at={tiesAt} size={21} color={POINT_INK} weight={650}>
+        <Tag x={tieX1 + 14} y={rowY(0) + ROW * 0.5 + 4} at={tiesAt} size={21} color={POINT_INK} weight={500}>
           nearly tied
         </Tag>
 
@@ -217,8 +217,8 @@ export const PredictScene: React.FC = () => {
                   top: emmaBarY(9) + BAR_H + 7,
                   transform: "translateX(-50%)",
                   opacity: p,
-                  ...note(20, POINT_INK),
-                  fontWeight: 650,
+                  ...note(24, POINT_INK),
+                  fontWeight: 500,
                 }}
               >
                 {k}×
@@ -226,7 +226,7 @@ export const PredictScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Tag x={tenthEmmaX + 18} y={rowY(9) + 8} at={itsPredictionAt} size={22} color={POINT_INK} weight={700}>
+        <Tag x={tenthEmmaX + 18} y={rowY(9) + 8} at={itsPredictionAt} size={22} color={POINT_INK} weight={500}>
           {(Math.round(EMMA.tenthOverLaw * 10) / 10).toFixed(1)}× the prediction
         </Tag>
       </div>

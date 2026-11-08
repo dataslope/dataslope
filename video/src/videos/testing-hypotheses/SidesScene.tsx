@@ -146,7 +146,7 @@ export const SidesScene: React.FC = () => {
               y={py(phi(2.4)) - 70}
               out={s < 0 ? oneSidedAt : allAt - 4}
             >
-              <span style={{ ...note(30, STAT_INK), fontWeight: 700, ...halo, display: "inline-block", transform: "translateX(-50%)" }}>2.5%</span>
+              <span style={{ ...note(28, STAT_INK), fontWeight: 500, ...halo, display: "inline-block", transform: "translateX(-50%)" }}>2.5%</span>
             </Note>
           ))}
           {[-1, 1].map((s) => (
@@ -159,7 +159,7 @@ export const SidesScene: React.FC = () => {
                 transform: "translateX(-50%)",
                 opacity: ease(frame, Math.max(beyondAt + 2, nineAt - 4), 12) * (s < 0 ? 1 - lowerGone : 1 - slide),
                 ...note(24, STAT_INK),
-                fontWeight: 700,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...halo,
               }}
@@ -177,8 +177,8 @@ export const SidesScene: React.FC = () => {
               top: y(BASE) + 32,
               transform: "translateX(-50%)",
               opacity: ourT * (1 - lowerGone),
-              ...note(21, STAT_INK),
-              fontWeight: 700,
+              ...note(24, STAT_INK),
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...halo,
             }}
@@ -188,7 +188,7 @@ export const SidesScene: React.FC = () => {
 
           {/* The one-sided reading. */}
           <Note at={oneTailAt - 2} x={sx(X, 3.05)} y={py(phi(2.4)) - 70}>
-            <span style={{ ...note(30, STAT_INK), fontWeight: 700, ...halo, display: "inline-block", transform: "translateX(-50%)" }}>5%</span>
+            <span style={{ ...note(28, STAT_INK), fontWeight: 500, ...halo, display: "inline-block", transform: "translateX(-50%)" }}>5%</span>
           </Note>
           <div
             style={{
@@ -198,7 +198,7 @@ export const SidesScene: React.FC = () => {
               transform: `translateX(-50%) scale(${1 + 0.2 * glowUp})`,
               opacity: ease(frame, sixAt - 4, 12),
               ...note(24, STAT_INK),
-              fontWeight: 700,
+              fontWeight: 500,
               whiteSpace: "nowrap",
               ...halo,
             }}
@@ -215,18 +215,18 @@ export const SidesScene: React.FC = () => {
           />
         </Drift>
         <Ink at={easierAt - 4} dur={16} style={{ left: 160, top: y(820), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(36, true), color: INK }}>
+          <span style={{ ...body(34, true), color: INK }}>
             A nearer cutoff is <Mark at={easierAt + 4}>an easier bar to clear</Mark>,
           </span>
         </Ink>
         <Ink at={chosenAt - 4} dur={18} style={{ left: 160, top: y(820) + 50, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(36, true), color: INK }}>
+          <span style={{ ...body(34, true), color: INK }}>
             so the side is <Mark at={dataAt - 2}>chosen before you see the data.</Mark>
           </span>
         </Ink>
       </div>
       <Ink at={exactlyAt - 8} dur={16} style={{ left: 1180, top: y(300), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(36, true), color: STAT_INK }}>And what is that 3%, exactly?</span>
+        <span style={{ ...body(34, true), color: STAT_INK }}>And what is that 3%, exactly?</span>
       </Ink>
     </AbsoluteFill>
   );

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, fmt, headline, INK, INK_SOFT, note } from "../../editorial/style";
+import { fmt, headline, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { FIT_INK, ILLUSTRATIONS, MAX_DEGREE, N_TEST, NEW_INK, row, VIDEO } from "./data";
@@ -30,15 +30,15 @@ export const RuleScene: React.FC = () => {
       <Ink
         at={seenAt - 8}
         dur={20}
-        style={{ left: 114, top: y(448), ...headline(92, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 114, top: y(448), ...headline(92, true), color: INK, whiteSpace: "nowrap" }}
       >
         it has never seen.
       </Ink>
       <Ink at={seenAt + 8} dur={20} style={{ left: 120, top: y(600), width: 1100 }}>
         <div style={{ ...note(24, INK_SOFT), lineHeight: 1.45 }}>
           Degree {last.degree}: an error of{" "}
-          <span style={{ color: FIT_INK[11], fontWeight: 700 }}>{fmt(last.train, 3)}</span> on its training points,
-          and of <span style={{ color: NEW_INK, fontWeight: 700 }}>{fmt(last.test, 1)}</span> on{" "}
+          <span style={{ color: FIT_INK[11], fontWeight: 500 }}>{fmt(last.train, 3)}</span> on its training points,
+          and of <span style={{ color: NEW_INK, fontWeight: 500 }}>{fmt(last.test, 1)}</span> on{" "}
           {N_TEST.toLocaleString("en-US")} new ones.
         </div>
       </Ink>

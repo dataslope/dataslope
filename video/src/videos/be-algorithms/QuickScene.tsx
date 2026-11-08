@@ -103,7 +103,7 @@ export const QuickScene: React.FC = () => {
         <Art name="cards" at={sortAt} out={randomAt - 24} left={1290} top={y(470)} h={150} />
 
         {/* Last-element pivot on sorted input. */}
-        <Line at={worstAt} x={LX} y={rampTop - 50} size={22} weight={650}>
+        <Line at={worstAt} x={LX} y={rampTop - 50} size={22} weight={500}>
           Worst case: <Num>{int(N)}</Num> sorted numbers, pivot on the last
         </Line>
         <Svg opacity={ease(frame, pivotAt - 6, 12)}>
@@ -115,16 +115,16 @@ export const QuickScene: React.FC = () => {
           {/* The pivots, one per level, along the staircase's edge. */}
           {depthShown > 0 ? <line x1={ix(LX, N)} y1={stairTop} x2={ix(LX, N - depthShown)} y2={stairBottom} stroke={HIGHLIGHT} strokeWidth={4} /> : null}
         </Svg>
-        <Line at={levelsAt} x={600} y={y(590)} size={24} weight={700}>
+        <Line at={levelsAt} x={600} y={y(590)} size={24} weight={500}>
           <Num>{QUICKSORT.lastPivotSorted.depth}</Num> levels
         </Line>
-        <Line at={halfAt} x={600} y={y(628)} size={24} weight={700} color={ACCENT_INK}>
+        <Line at={halfAt} x={600} y={y(628)} size={24} weight={500} color={ACCENT_INK}>
           <Num>{int(QUICKSORT.lastPivotSorted.compares)}</Num> comparisons
         </Line>
         <Line at={halfAt + 10} x={600} y={y(666)} size={22} color={INK_SOFT}>
           n(n − 1)/2, about n²/2
         </Line>
-        <Line at={limitAt} x={520} y={y(712)} size={22} weight={600}>
+        <Line at={limitAt} x={520} y={y(712)} size={22} weight={500}>
           Recursive: past Python&apos;s limit of <Num>{int(QUICKSORT.recursionLimit)}</Num>
         </Line>
         <div
@@ -133,8 +133,8 @@ export const QuickScene: React.FC = () => {
             left: 520,
             top: y(752),
             fontFamily: MONO,
-            fontSize: 20,
-            fontWeight: 600,
+            fontSize: 24,
+            fontWeight: 500,
             lineHeight: 1.4,
             color: ACCENT_INK,
             opacity: ease(frame, pastAt, 10),
@@ -147,7 +147,7 @@ export const QuickScene: React.FC = () => {
         <VRule x={1004} top={rampTop - 50} bottom={insetBottom + 262} at={randomAt} />
 
         {/* Random pivots, the same input, the same scale. */}
-        <Line at={randomAt} x={RXP} y={rampTop - 50} size={22} weight={650}>
+        <Line at={randomAt} x={RXP} y={rampTop - 50} size={22} weight={500}>
           Random pivots, the same input
         </Line>
         <Svg opacity={ease(frame, randomAt, 12)}>
@@ -178,13 +178,13 @@ export const QuickScene: React.FC = () => {
             />
           ))}
         </Svg>
-        <Line at={randomAt + 10} x={RXP + W - 300} y={insetTop - 40} size={21} color={INK_SOFT} weight={600} width={300} align="right">
+        <Line at={randomAt + 10} x={RXP + W - 300} y={insetTop - 40} size={21} color={INK_SOFT} weight={500} width={300} align="right">
           the band, <Num>{ZOOM}</Num> times taller
         </Line>
-        <Line at={twentyAt} x={RXP} y={insetBottom + 20} size={24} weight={700}>
+        <Line at={twentyAt} x={RXP} y={insetBottom + 20} size={24} weight={500}>
           <Num>{QUICKSORT.randomPivotSorted.depth}</Num> levels
         </Line>
-        <Line at={elevenAt} x={RXP + 180} y={insetBottom + 20} size={24} weight={700} color={OK_INK}>
+        <Line at={elevenAt} x={RXP + 180} y={insetBottom + 20} size={24} weight={500} color={OK_INK}>
           <Num>{int(QUICKSORT.randomPivotSorted.compares)}</Num> comparisons
         </Line>
 
@@ -192,7 +192,7 @@ export const QuickScene: React.FC = () => {
         <Line at={commonAt} x={RXP} y={insetBottom + 86} size={24}>
           Sorted input is common: rows by ID, events by time.
         </Line>
-        <Line at={randomizeAt} x={RXP} y={insetBottom + 128} size={24} weight={700} color={OK_INK}>
+        <Line at={randomizeAt} x={RXP} y={insetBottom + 128} size={24} weight={500} color={OK_INK}>
           Randomize the pivot.
         </Line>
         <Line at={edgeAt} x={RXP} y={insetBottom + 190} size={24}>

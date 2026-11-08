@@ -67,7 +67,7 @@ export const CompareScene: React.FC = () => {
   });
   const num = (size: number, color: string): React.CSSProperties => ({
     ...note(size, color),
-    fontWeight: 600,
+    fontWeight: 500,
   });
   /** A highlighter swipe behind the n = 50 value of a column. */
   const swipe = (at: number) => ({
@@ -94,7 +94,7 @@ export const CompareScene: React.FC = () => {
         ] as const
       ).map(([key, title, color, ink, at]) => (
         <Ink key={key} at={at} dur={14} style={{ left: GROUP[key][0], top: y(GROUP_Y), width: GROUP[key][1] - GROUP[key][0] }}>
-          <div style={{ ...label(24, ink), fontWeight: 700, paddingBottom: 8, borderBottom: `2px solid ${color}` }}>{title}</div>
+          <div style={{ ...label(24, ink), fontWeight: 500, paddingBottom: 8, borderBottom: `2px solid ${color}` }}>{title}</div>
         </Ink>
       ))}
       {(
@@ -109,7 +109,7 @@ export const CompareScene: React.FC = () => {
         ] as const
       ).map(([key, title, at]) => (
         <Ink key={key} at={at} dur={12} style={{ left: COL[key] - 200, width: 200, top: y(HEAD_Y), textAlign: "right" }}>
-          <span style={label(21, INK_SOFT)}>{title}</span>
+          <span style={label(24, INK_SOFT)}>{title}</span>
         </Ink>
       ))}
       <div
@@ -167,15 +167,15 @@ export const CompareScene: React.FC = () => {
 
       {/* What the columns say, one note under each group. */}
       <Note at={twoAt} x={GROUP.memo[0]} y={y(NOTE_Y)} from="up" width={GROUP.memo[1] - GROUP.memo[0]}>
-        <span style={note(21, INK_SOFT)}>
-          Calls: <span style={{ color: MEMO_INK, fontWeight: 650 }}>2n − 1</span> at every n, two more per step.
+        <span style={note(24, INK_SOFT)}>
+          Calls: <span style={{ color: MEMO_INK, fontWeight: 500 }}>2n − 1</span> at every n, two more per step.
         </span>
       </Note>
       <Note at={removesAt} x={GROUP.naive[0]} y={y(NOTE_Y)} from="up" width={GROUP.naive[1] - GROUP.naive[0]}>
-        <span style={note(21, INK_SOFT)}>Stack depth: the most calls open at once, the same n in both.</span>
+        <span style={note(24, INK_SOFT)}>Stack depth: the most calls open at once, the same n in both.</span>
       </Note>
       <Note at={microAt + 10} x={LEFT} y={y(FOOT_Y)} from="up">
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Same machine and method as Fig. 3: {MACHINE.compiler}, -O2, best of {MACHINE.rounds} timing rounds. Memo times include
           making the table.
         </span>
@@ -184,7 +184,7 @@ export const CompareScene: React.FC = () => {
       {/* The rule. */}
       <Ink at={ruleAt - 6} dur={20} style={{ left: LEFT, top: y(RULE_Y), width: 1240 }}>
         <div style={{ height: 2, background: INK, width: 140, marginBottom: 24 }} />
-        <div style={{ ...label(22, ACCENT_INK), marginBottom: 14 }}>The seed of dynamic programming</div>
+        <div style={{ ...label(24, ACCENT_INK), marginBottom: 14 }}>The seed of dynamic programming</div>
         <div style={{ ...headline(52, true), color: INK, lineHeight: 1.14 }}>
           <div>When a recursion asks the same question twice,</div>
           <div>keep the first answer.</div>

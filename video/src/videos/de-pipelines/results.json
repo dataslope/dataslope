@@ -1,4 +1,7 @@
 {
+  "postgres": [
+    "PostgreSQL 18.3 (PGlite 0.5.8)"
+  ],
   "duckdb": [
     "v1.4.3"
   ],
@@ -39,7 +42,7 @@
         "sql": "INSERT INTO events\nSELECT * FROM events_stage\nWHERE event_date = '2024-06-01';",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -63,7 +66,7 @@
         "sql": "INSERT INTO events\nSELECT * FROM events_stage\nWHERE event_date = '2024-06-01';",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -87,7 +90,7 @@
         "sql": "DELETE FROM events",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -99,7 +102,7 @@
         "sql": "DELETE FROM events\nWHERE event_date = '2024-06-01';",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -111,7 +114,7 @@
         "sql": "INSERT INTO events\nSELECT * FROM events_stage\nWHERE event_date = '2024-06-01';",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -135,7 +138,7 @@
         "sql": "DELETE FROM events\nWHERE event_date = '2024-06-01';",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -147,7 +150,7 @@
         "sql": "INSERT INTO events\nSELECT * FROM events_stage\nWHERE event_date = '2024-06-01';",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -171,15 +174,19 @@
         "sql": "BEGIN TRANSACTION",
         "ok": true,
         "columns": [
-          "Success"
+          "rows affected"
         ],
-        "rows": []
+        "rows": [
+          [
+            0
+          ]
+        ]
       },
       "txDelete": {
         "sql": "DELETE FROM events\nWHERE event_date = '2024-06-01';",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -190,15 +197,19 @@
       "txInsertFails": {
         "sql": "INSERT INTO events SELECT * FROM events_stage_missing WHERE event_date = '2024-06-01'",
         "ok": false,
-        "error": "Catalog Error: Table with name events_stage_missing does not exist!"
+        "error": "ERROR: relation \"events_stage_missing\" does not exist"
       },
       "txRollback": {
         "sql": "ROLLBACK",
         "ok": true,
         "columns": [
-          "Success"
+          "rows affected"
         ],
-        "rows": []
+        "rows": [
+          [
+            0
+          ]
+        ]
       },
       "txCount": {
         "sql": "SELECT COUNT(*) AS events FROM events WHERE event_date = '2024-06-01'",
@@ -213,7 +224,7 @@
         ]
       }
     },
-    "version": "v1.4.3"
+    "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
   },
   "upsert": {
     "setup": "CREATE TABLE orders (order_id INTEGER PRIMARY KEY, status VARCHAR, updated_at TIMESTAMP);\nCREATE TABLE orders_stage (order_id INTEGER, status VARCHAR, updated_at TIMESTAMP);\nINSERT INTO orders_stage VALUES\n  (101, 'paid', TIMESTAMP '2024-06-01 09:10:00'),\n  (102, 'shipped', TIMESTAMP '2024-06-01 11:45:00'),\n  (103, 'paid', TIMESTAMP '2024-06-01 16:20:00');",
@@ -222,7 +233,7 @@
         "sql": "INSERT INTO orders (order_id, status, updated_at)\nSELECT order_id, status, updated_at\nFROM orders_stage\nON CONFLICT (order_id)\nDO UPDATE SET\n  status     = EXCLUDED.status,\n  updated_at = EXCLUDED.updated_at",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -246,7 +257,7 @@
         "sql": "INSERT INTO orders (order_id, status, updated_at)\nSELECT order_id, status, updated_at\nFROM orders_stage\nON CONFLICT (order_id)\nDO UPDATE SET\n  status     = EXCLUDED.status,\n  updated_at = EXCLUDED.updated_at",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -270,7 +281,7 @@
         "sql": "MERGE INTO orders USING orders_stage AS s ON orders.order_id = s.order_id\nWHEN MATCHED THEN UPDATE SET status = s.status, updated_at = s.updated_at\nWHEN NOT MATCHED THEN INSERT VALUES (s.order_id, s.status, s.updated_at)",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -291,7 +302,7 @@
         ]
       }
     },
-    "version": "v1.4.3"
+    "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
   },
   "cdc": {
     "setup": "CREATE TABLE orders (order_id INTEGER, status VARCHAR, updated_at TIMESTAMP);\nINSERT INTO orders VALUES\n  (1, 'paid', TIMESTAMP '2024-05-31 14:02:00'),\n  (2, 'paid', TIMESTAMP '2024-05-31 16:40:00'),\n  (3, 'paid', TIMESTAMP '2024-05-31 18:15:00');",
@@ -326,7 +337,7 @@
         "sql": "UPDATE orders SET status = 'shipped', updated_at = TIMESTAMP '2024-06-01 08:15:00' WHERE order_id = 2",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -338,7 +349,7 @@
         "sql": "INSERT INTO orders VALUES (4, 'paid', TIMESTAMP '2024-06-01 09:30:00')",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -350,7 +361,7 @@
         "sql": "DELETE FROM orders WHERE order_id = 3",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -406,7 +417,7 @@
         ]
       }
     },
-    "version": "v1.4.3"
+    "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
   },
   "parquet": {
     "setup": "COPY (SELECT * FROM (VALUES (1, 'paid', 20.00::DECIMAL(8,2)), (2, 'paid', 35.50::DECIMAL(8,2))) t(order_id, status, amount)) TO 'day1.parquet' (FORMAT parquet);\nCOPY (SELECT * FROM (VALUES (3, 'paid', 12.00::DECIMAL(8,2), 'SAVE10')) t(order_id, status, amount, coupon)) TO 'day2.parquet' (FORMAT parquet);\nCOPY (SELECT * FROM (VALUES (4, 'paid', 48.00::DECIMAL(8,2), 'WELCOME')) t(order_id, status, total, coupon)) TO 'day3.parquet' (FORMAT parquet);",
@@ -653,7 +664,7 @@
         "sql": "INSERT INTO orders_clean SELECT * FROM orders_raw",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -665,7 +676,7 @@
         "sql": "DELETE FROM orders_clean",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -677,15 +688,19 @@
         "sql": "ALTER TABLE orders_raw ADD COLUMN coupon VARCHAR",
         "ok": true,
         "columns": [
-          "Success"
+          "rows affected"
         ],
-        "rows": []
+        "rows": [
+          [
+            0
+          ]
+        ]
       },
       "newRow": {
         "sql": "INSERT INTO orders_raw VALUES (3, 'paid', 12.00, 'SAVE10')",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -726,13 +741,13 @@
       "star": {
         "sql": "INSERT INTO orders_clean\nSELECT * FROM orders_raw;",
         "ok": false,
-        "error": "Binder Error: table orders_clean has 3 columns but 4 values were supplied"
+        "error": "ERROR: INSERT has more expressions than target columns"
       },
       "named": {
         "sql": "INSERT INTO orders_clean\nSELECT order_id, status, amount\nFROM orders_raw;",
         "ok": true,
         "columns": [
-          "Count"
+          "rows affected"
         ],
         "rows": [
           [
@@ -767,6 +782,6 @@
         ]
       }
     },
-    "version": "v1.4.3"
+    "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
   }
 }

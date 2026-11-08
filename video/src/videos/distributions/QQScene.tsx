@@ -100,11 +100,11 @@ export const QQScene: React.FC = () => {
                 {p.ticks.map((t) => (
                   <g key={t}>
                     <line x1={sx(X, t)} x2={sx(X, t)} y1={bottom} y2={bottom + 6} stroke={INK} strokeWidth={1.2} />
-                    <text x={sx(X, t)} y={bottom + 28} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fill: INK_SOFT }}>
+                    <text x={sx(X, t)} y={bottom + 28} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fill: INK_SOFT }}>
                       {t}
                     </text>
                     <line x1={p.x0 - 6} x2={p.x0} y1={py(t)} y2={py(t)} stroke={INK} strokeWidth={1.2} />
-                    <text x={p.x0 - 12} y={py(t) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fill: INK_SOFT }}>
+                    <text x={p.x0 - 12} y={py(t) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fill: INK_SOFT }}>
                       {t}
                     </text>
                   </g>
@@ -187,13 +187,13 @@ export const QQScene: React.FC = () => {
 
         {/* Axis titles, shared by both panels. */}
         <Ink at={modelsAt - 2} dur={14} style={{ left: 220, top: bottom + h(52), whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>across: where the fitted model puts each quantile</span>
+          <span style={label(24, INK_SOFT)}>across: where the fitted model puts each quantile</span>
         </Ink>
         <Ink at={quantilesAt} dur={14} style={{ left: 220 + 18, top: y(TOP) + 6, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>up: the data's own, sorted</span>
+          <span style={label(24, INK_SOFT)}>up: the data's own, sorted</span>
         </Ink>
         <Note at={lineEnd - 6} x={sx(scaleFor(PANELS[0]), 52)} y={yFor(PANELS[0])(36)}>
-          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>on the line: the fit holds</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>on the line: the fit holds</span>
         </Note>
 
         {/* The skewed panel's ends. */}
@@ -206,7 +206,7 @@ export const QQScene: React.FC = () => {
           <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>the lower tail, too</span>
         </Note>
         <Note at={costlyAt - 2} x={sx(scaleFor(PANELS[1]), 62)} y={yFor(PANELS[1])(112) + 36} align="right">
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>where the costly mistakes live</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>where the costly mistakes live</span>
         </Note>
       </Drift>
     </AbsoluteFill>

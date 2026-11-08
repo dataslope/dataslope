@@ -188,6 +188,6 @@ export const Counter: React.FC<{
         {value}
       </span>
     </div>
-    <div style={{ ...label(22, INK_SOFT), marginTop: 10 }}>{caption}</div>
+    <div style={{ ...label(24, INK_SOFT), marginTop: 10 }}>{caption}</div>
   </Ink>
 );

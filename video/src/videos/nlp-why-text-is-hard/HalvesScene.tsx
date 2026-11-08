@@ -130,7 +130,7 @@ export const HalvesScene: React.FC = () => {
 
       {/* ── Preprocessing ── */}
       <Ink at={cleaningAt - 4} dur={14} style={{ left: LEFT_X, top: y(TITLE_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(44), color: INK, fontWeight: 600 }}>Preprocessing</span>
+        <span style={{ ...body(44), color: INK, fontWeight: 500 }}>Preprocessing</span>
       </Ink>
       <Spot id={ART.conveyor} at={cleaningAt} left={LEFT_X + 20} top={y(TITLE_Y) + 66} width={700} height={300} />
       {STEPS.map((s, i) => (
@@ -142,7 +142,7 @@ export const HalvesScene: React.FC = () => {
         <span style={{ ...body(28, true), color: INK_SOFT }}>the same toolbox in every project</span>
       </Ink>
       <Ink at={optionalAt} dur={14} style={{ right: 1920 - PILLS_RIGHT, top: pillY + 66, whiteSpace: "nowrap", opacity: clear }}>
-        <span style={{ ...label(22, INK_SOFT) }}>lighter: optional</span>
+        <span style={{ ...label(24, INK_SOFT) }}>lighter: optional</span>
       </Ink>
       {/* The optional steps, bracketed: what the goal decides. */}
       {bracket > 0 ? (
@@ -159,13 +159,13 @@ export const HalvesScene: React.FC = () => {
 
       {/* ── Analysis ── */}
       <Ink at={analysisAt - 4} dur={14} style={{ left: RIGHT_X, top: y(TITLE_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(44), color: INK, fontWeight: 600 }}>Analysis</span>
+        <span style={{ ...body(44), color: INK, fontWeight: 500 }}>Analysis</span>
       </Ink>
       {["counting", "tagging", "building features"].map((u, i) => (
         <Pill key={u} text={u} x={RIGHT_X} y={y(TITLE_Y + 96 + i * 82)} at={uses[i] - 4} size={26} width={360} />
       ))}
       <Ink at={goalAt - 4} dur={16} style={{ left: RIGHT_X, top: y(TITLE_Y + 96 + 3 * 82) + 6, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(32, true), color: INK }}>depends on your goal</span>
+        <span style={{ ...body(34, true), color: INK }}>depends on your goal</span>
       </Ink>
       {/* The goal chooses the preprocessing too. */}
       <CurvedArrow

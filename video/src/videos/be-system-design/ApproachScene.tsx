@@ -11,7 +11,7 @@ import { ESTIMATE } from "./data";
 import { Arrow, Drift, InlineArrow, int, Line, Mark, reach, VRule, X0 } from "./parts";
 
 const NF_X = 900;
-const ROW_SIZE = 27;
+const ROW_SIZE = 28;
 const STEPS = [
   { text: "Requirements", cue: null },
   { text: "Estimate the load", cue: "estimate the load" },
@@ -153,7 +153,7 @@ export const ApproachScene: React.FC = () => {
         </div>
 
         {/* The two lists. */}
-        <Line x={X0} y={headY} at={listsAt} size={30} weight={700} color={BLUE_INK}>
+        <Line x={X0} y={headY} at={listsAt} size={30} weight={500} color={BLUE_INK}>
           Functional
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, mustAt, 10) }}>: what the system must do</span>
         </Line>
@@ -162,21 +162,21 @@ export const ApproachScene: React.FC = () => {
             {it.text}
           </Line>
         ))}
-        <Line x={NF_X} y={headY} at={listsAt + 6} size={30} weight={700} color={BLUE_INK}>
+        <Line x={NF_X} y={headY} at={listsAt + 6} size={30} weight={500} color={BLUE_INK}>
           <Mark at={shapesAt} color={HIGHLIGHT}>
             Non-functional
           </Mark>
         </Line>
         <VRule x={785} top={headY} bottom={reach(frame, headY + 40, items.map((it, i) => [it.at, row(i) + 36] as const))} at={listsAt + 6} />
         {qualities.map((q, i) => (
-          <Line key={q.name} x={NF_X} y={row(i)} at={nfWords[i]} size={ROW_SIZE} weight={600}>
+          <Line key={q.name} x={NF_X} y={row(i)} at={nfWords[i]} size={ROW_SIZE} weight={500}>
             {q.name}
             {q.gloss ? <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, q.glossAt, 10) }}>: {q.gloss}</span> : null}
           </Line>
         ))}
 
         {/* The order: requirements first, bottlenecks last. */}
-        <div style={{ position: "absolute", left: X0, top: stepsY, height: 54, display: "flex", alignItems: "center", gap: 18, fontSize: 26 }}>
+        <div style={{ position: "absolute", left: X0, top: stepsY, height: 54, display: "flex", alignItems: "center", gap: 18, fontSize: 28 }}>
           {STEPS.map((s, i) => {
             const at = stepAt[i];
             const p = ease(frame, at, 12);
@@ -199,7 +199,7 @@ export const ApproachScene: React.FC = () => {
                       opacity: lit,
                     }}
                   />
-                  <span style={{ position: "relative", ...note(26, open ? INK_SOFT : INK), fontWeight: 650, fontStyle: open ? "italic" : "normal" }}>
+                  <span style={{ position: "relative", ...note(28, open ? INK_SOFT : INK), fontWeight: 500, fontStyle: open ? "italic" : "normal" }}>
                     {s.text}
                   </span>
                 </span>
@@ -214,10 +214,10 @@ export const ApproachScene: React.FC = () => {
           { x: X0 + 620, at: billionAt, n: ESTIMATE.readsPerDay, unit: "redirects a day", servers: 12 },
         ].map((f) => (
           <React.Fragment key={f.unit}>
-            <Line x={f.x} y={figY} at={f.at} size={27} weight={700} color={BLUE_INK}>
+            <Line x={f.x} y={figY} at={f.at} size={27} weight={500} color={BLUE_INK}>
               <Num>{int(f.n)}</Num> {f.unit}
             </Line>
-            <Line x={f.x} y={figY + 48} at={Math.max(f.at, sameAt)} size={22} weight={600} color={INK}>
+            <Line x={f.x} y={figY + 48} at={Math.max(f.at, sameAt)} size={22} weight={500} color={INK}>
               shorten · redirect
             </Line>
             <Arrow
@@ -255,7 +255,7 @@ export const ApproachScene: React.FC = () => {
         ))}
         <VRule x={583} top={figY} bottom={figY + 92} at={billionAt} />
         <VRule x={1308} top={figY} bottom={figY + 92} at={sayAt} />
-        <Line x={1400} y={figY} at={sayAt} size={27} weight={700} width={420}>
+        <Line x={1400} y={figY} at={sayAt} size={27} weight={500} width={420}>
           Say each assumption out loud
         </Line>
         <Line x={1400} y={figY + 50} at={correctAt} size={25} color={INK_SOFT} width={420}>

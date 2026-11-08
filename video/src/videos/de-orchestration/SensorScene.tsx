@@ -134,7 +134,7 @@ export const SensorScene: React.FC = () => {
           </span>
         </Note>
         <Note at={blocksAt} x={X0 + 266} y={y(378) + h(24)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             blocks until true<span style={{ opacity: ease(frame, timesAt, 10) }}>, or times out</span>
           </span>
         </Note>
@@ -156,15 +156,15 @@ export const SensorScene: React.FC = () => {
           ].map((m) => ({ color: MARK, ...m }))}
         />
         <Note at={fiveAt + 4} x={1100} y={y(286) + listingHeight(SENSOR.length, 20) + h(18)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             300 s: a check every 5 minutes<span style={{ opacity: ease(frame, twoAt + 4, 10) }}> · 7,200 s: gives up after 2 hours</span>
           </span>
         </Note>
 
         {/* Poke mode: four slots, four sensors waiting in them. */}
         <Note at={pokeAt} x={X0} y={pokeTop - h(46)}>
-          <span style={{ ...note(25, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            poke mode <span style={{ ...label(23, INK_SOFT) }}>(the default) · a pool of 4 worker slots</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            poke mode <span style={{ ...label(24, INK_SOFT) }}>(the default) · a pool of 4 worker slots</span>
           </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, pokeAt, 10) }}>
@@ -201,8 +201,8 @@ export const SensorScene: React.FC = () => {
               position: "absolute",
               left: LANE_X0 + 14,
               top: laneY(pokeTop, i) + laneH / 2 - 13,
-              ...label(19, INK),
-              fontWeight: 600,
+              ...label(24, INK),
+              fontWeight: 500,
               whiteSpace: "nowrap",
               opacity: ease(frame, (i === 0 ? holdsAt : fillAt + (i - 1) * 4) + 10, 10),
             }}
@@ -210,20 +210,20 @@ export const SensorScene: React.FC = () => {
             sensor, waiting
           </div>
         ))}
-        <div style={{ position: "absolute", left: X0, top: laneY(pokeTop, 0) + 3, ...label(19, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, fillAt + 10, 10) }}>queued</div>
+        <div style={{ position: "absolute", left: X0, top: laneY(pokeTop, 0) + 3, ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, fillAt + 10, 10) }}>queued</div>
         {frame >= nothingAt + 2 ? (
           <div style={{ position: "absolute", left: X0 + 100, top: laneY(pokeTop, 1) + laneH * 0.8 - 9 }}>
             <Cross at={nothingAt + 2} size={24} />
           </div>
         ) : null}
         <Note at={nothingAt} x={LANE_X1 + 20} y={laneY(pokeTop, 3) - 2}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>nothing else can run</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>nothing else can run</span>
         </Note>
 
         {/* Reschedule mode: a check takes a slot for a moment and gives it back. */}
         <Note at={resAt} x={X0} y={resTop - h(46)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            reschedule mode <span style={{ ...label(23, INK_SOFT) }}>· the slot is free between checks</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            reschedule mode <span style={{ ...label(24, INK_SOFT) }}>· the slot is free between checks</span>
           </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, resAt, 10) }}>
@@ -251,21 +251,21 @@ export const SensorScene: React.FC = () => {
           ))}
         </svg>
         <Note at={resAt + 30} x={LANE_X1 + 20} y={laneY(resTop, 0) - 2}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>grey: a check, then the slot is given back</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>grey: a check, then the slot is given back</span>
         </Note>
         <Note at={resAt + 40} x={LANE_X1 + 20} y={laneY(resTop, 1) + 4}>
-          <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>blue: real work, running between</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>blue: real work, running between</span>
         </Note>
         <Note at={useAt} x={LANE_X1 + 20} y={laneY(resTop, 2) + 2}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             reschedule, or a deferrable sensor
           </span>
         </Note>
         <Note at={deferAt + 10} x={LANE_X1 + 20} y={laneY(resTop, 3) + 4}>
-          <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>deferrable: Airflow&apos;s triggerer waits, no worker slot at all</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>deferrable: Airflow&apos;s triggerer waits, no worker slot at all</span>
         </Note>
         <Note at={brieflyAt} x={LANE_X1 + 20} y={laneY(resTop, 3) + h(40)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>for anything that waits more than briefly</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>for anything that waits more than briefly</span>
         </Note>
       </Drift>
     </AbsoluteFill>

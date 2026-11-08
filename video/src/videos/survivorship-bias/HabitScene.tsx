@@ -76,7 +76,7 @@ export const HabitScene: React.FC = () => {
         <Ink at={start - 2} dur={14} style={{ left: HERE_X, top: y(222) }}>
           <span
             style={{
-              ...label(22, INK),
+              ...label(24, INK),
               padding: "2px 8px",
               marginLeft: -8,
               background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(ease(frame, hereAt - 2, 10) * 100)}%, transparent)`,
@@ -86,7 +86,7 @@ export const HabitScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={missingAt - 4} dur={14} style={{ left: GONE_X, top: y(222) }}>
-          <span style={label(22, ACCENT_INK)}>Missing from it</span>
+          <span style={label(24, ACCENT_INK)}>Missing from it</span>
         </Ink>
 
         {ROWS.map((r, i) => {
@@ -127,7 +127,7 @@ export const HabitScene: React.FC = () => {
         <Ink at={askAt - 2} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Ask what's missing,
         </Ink>
-        <Ink at={whyAt - 4} dur={16} style={{ position: "relative", ...headline(84, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={whyAt - 4} dur={16} style={{ position: "relative", ...headline(84, true), color: INK, whiteSpace: "nowrap" }}>
           and why.
         </Ink>
       </div>

@@ -134,7 +134,7 @@ export const SkewScene: React.FC = () => {
           at={dragsAt - 4}
           dur={18}
           out={rightFrom - 6}
-          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}
         >
           The tail drags the mean.
         </Ink>
@@ -264,7 +264,7 @@ export const SkewScene: React.FC = () => {
                 opacity: ease(frame, answerAt[i] - 6, 12),
                 whiteSpace: "nowrap",
                 ...label(28, r.red ? STAT_INK : INK),
-                fontWeight: 700,
+                fontWeight: 500,
                 lineHeight: 1.2,
                 ...halo,
               }}
@@ -279,7 +279,7 @@ export const SkewScene: React.FC = () => {
                   top: top + 46,
                   opacity: ease(frame, subAt[i] - 4, 12),
                   whiteSpace: "nowrap",
-                  ...label(20, INK_SOFT),
+                  ...label(24, INK_SOFT),
                   fontWeight: 500,
                 }}
               >
@@ -298,7 +298,7 @@ export const SkewScene: React.FC = () => {
       })}
       </div>
       <Ink at={dependsAt - 4} dur={16} style={{ left: 960, top: y(330), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK), fontWeight: 560 }}>If the data is…</span>
+        <span style={{ ...label(24, INK), fontWeight: 500 }}>If the data is…</span>
       </Ink>
     </AbsoluteFill>
   );

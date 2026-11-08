@@ -138,7 +138,7 @@ export const CteScene: React.FC = () => {
           dim={onceAt}
         />
         <Note at={everyoneAt - 2} x={AVGS_X} y={ag.rowTop(SUBQUERIES.averages.rows.length) + 18} out={sameAt - 2}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             everyone: <span style={TABULAR}>{SUBQUERIES.overall.toFixed(2)}</span>
           </span>
         </Note>
@@ -157,20 +157,20 @@ export const CteScene: React.FC = () => {
 
         {/* ── Which to use ── */}
         <Note at={oneOffAt - 2} x={LIST_X} y={ruleTop} out={q10At - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 650 }}>Subquery:</span> a one-off filter.
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ fontWeight: 500 }}>Subquery:</span> a one-off filter.
           </span>
         </Note>
         <Note at={twiceAt - 2} x={LIST_X} y={ruleTop + h(48)} out={q10At - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 650 }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ fontWeight: 500 }}>
               <Mono>CTE</Mono>:
             </span>{" "}
             a step used twice<Fade at={chainAt}>, a chain of steps,</Fade>
           </span>
         </Note>
         <Note at={hierarchyAt - 2} x={LIST_X} y={ruleTop + h(90)} out={q10At - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             or a hierarchy, which needs <Mark at={recursiveAt}><Mono>WITH RECURSIVE</Mono></Mark>.
           </span>
         </Note>
@@ -187,7 +187,7 @@ export const CteScene: React.FC = () => {
           out={onceAt - 4}
         />
         <Note at={slowAt - 4} x={LIST_X} y={correlatedEnd + h(26)} out={onceAt - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             Re-run for every order: <Mark at={slowAt}>slow on a big table</Mark>.
           </span>
         </Note>

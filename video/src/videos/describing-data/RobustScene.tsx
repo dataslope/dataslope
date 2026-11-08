@@ -108,7 +108,7 @@ export const RobustScene: React.FC = () => {
         <Ink at={incomesFrom - 4} dur={20} out={iqrFrom - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
           One wild value,
         </Ink>
-        <Ink at={leapsAt - 6} dur={18} out={iqrFrom - 6} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={leapsAt - 6} dur={18} out={iqrFrom - 6} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           and the SD follows it.
         </Ink>
       </div>
@@ -121,10 +121,10 @@ export const RobustScene: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, opacity: 1 - dimAll }}>
         {/* ── The two readouts, and the center each one goes with ── */}
         <Ink at={nineAt - 2} dur={14} style={{ left: SD_X, top: statsY, whiteSpace: "nowrap" }}>
-          <div style={{ ...note(32, STAT_INK), fontWeight: 700 }}>
+          <div style={{ ...note(34, STAT_INK), fontWeight: 500 }}>
             SD <span style={TABULAR}>{fmt(sd, 1)}</span>
           </div>
-          <div style={{ ...label(22, STAT_INK), opacity: ease(frame, meanGoesAt - 4, 12), marginTop: 12 }}>
+          <div style={{ ...label(24, STAT_INK), opacity: ease(frame, meanGoesAt - 4, 12), marginTop: 12 }}>
             <Mark at={meanGoesAt - 2}>goes with a mean</Mark>
           </div>
         </Ink>
@@ -143,13 +143,13 @@ export const RobustScene: React.FC = () => {
           }}
         />
         <Ink at={fourteenAt - 2} dur={14} style={{ left: IQR_X, top: statsY, whiteSpace: "nowrap" }}>
-          <div style={{ ...note(32, INK), fontWeight: 700, display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ ...note(34, INK), fontWeight: 500, display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ display: "inline-block", width: 22, height: 22, background: HIGHLIGHT, opacity: 0.8, border: `2px solid ${INK}` }} />
             <span>
               IQR <span style={TABULAR}>{fmt(ROBUST.iqr, 1)}</span>
             </span>
           </div>
-          <div style={{ ...label(22, INK), opacity: ease(frame, medianGoesAt - 4, 12), marginTop: 12 }}>
+          <div style={{ ...label(24, INK), opacity: ease(frame, medianGoesAt - 4, 12), marginTop: 12 }}>
             <Mark at={medianGoesAt - 2}>goes with a median</Mark>
           </div>
         </Ink>
@@ -268,7 +268,7 @@ export const RobustScene: React.FC = () => {
 
         {/* The median absolute deviation: the middle of the sorted distances. */}
         <Ink at={madAt - 2} dur={14} style={{ left: 160, top: y(DIST_Y) - 46, whiteSpace: "nowrap" }}>
-          <span style={label(22, INK)}>Each income's distance from the median, sorted</span>
+          <span style={label(24, INK)}>Each income's distance from the median, sorted</span>
         </Ink>
         {ROBUST.distances.map((d, i) => {
           const a = ease(frame, typicalAt + i * 2.5, 10);
@@ -286,7 +286,7 @@ export const RobustScene: React.FC = () => {
                 transform: `translateY(${(1 - a) * 10 - hot * 6}px)`,
                 whiteSpace: "nowrap",
                 ...note(28, hot > 0.5 ? STAT_INK : INK),
-                fontWeight: hot > 0.5 ? 700 : 500,
+                fontWeight: hot > 0.5 ? 500 : 500,
               }}
             >
               {fmt(d, 1)}
@@ -301,7 +301,7 @@ export const RobustScene: React.FC = () => {
       <Pulse x={medX} y={strip - BOX_H / 2 - 20} at={stillAt - 2} color={INK} r={6} />
       <Pulse x={medX} y={strip - BOX_H / 2 - 20} at={fromMedianAt - 2} color={INK} r={6} />
       <Ink at={looksAt - 2} dur={18} style={{ left: 160, top: y(915), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, INK), ...halo }}>Neither one shows a shape.</span>
+        <span style={{ ...note(28, INK), ...halo }}>Neither one shows a shape.</span>
       </Ink>
     </AbsoluteFill>
   );

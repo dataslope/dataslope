@@ -50,7 +50,7 @@ export const CodeScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: 124, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Recursion in C++</span>
+        <span style={label(24, ACCENT_INK)}>Recursion in C++</span>
       </Ink>
       <Ink at={open + 2} dur={22} style={{ left: 118, top: y(152), ...headline(88), whiteSpace: "nowrap", display: "flex", gap: "0.24em" }}>
         <span>Correct, but</span>
@@ -104,7 +104,7 @@ export const CodeScene: React.FC = () => {
         marks={[{ line: 3, at: definitionAt - 2, from: 9, chars: 23 }]}
       />
       <Note at={definitionAt + 6} x={LIST_X} y={listingBottom + 22} from="up">
-        <span style={note(21, INK_SOFT)}>Every call with n above 1 makes two more calls.</span>
+        <span style={note(24, INK_SOFT)}>Every call with n above 1 makes two more calls.</span>
       </Note>
 
       {/* fib(40): the answer, then the bill. */}
@@ -137,7 +137,7 @@ export const CodeScene: React.FC = () => {
         </Ink>
       </div>
       <Note at={callsAt + 8} x={SIDE_X} y={listingBottom + 22} from="up" width={660}>
-        <span style={note(21, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Counted by a copy of <Mono>fib</Mono> that adds one to a counter on every call.
         </span>
       </Note>

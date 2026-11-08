@@ -84,8 +84,8 @@ export const CountsScene: React.FC = () => {
                 </>
               ) : null}
               <Ink at={docAt[i] - 4} dur={16} style={{ position: "relative", display: "flex", alignItems: "baseline", gap: 40 }}>
-                <span style={{ ...label(21, INK_SOFT) }}>Doc {i + 1}</span>
-                <span style={{ ...body(31), color: INK }}>{d}</span>
+                <span style={{ ...label(24, INK_SOFT) }}>Doc {i + 1}</span>
+                <span style={{ ...body(28), color: INK }}>{d}</span>
               </Ink>
             </React.Fragment>
           );
@@ -110,17 +110,17 @@ export const CountsScene: React.FC = () => {
         width={2}
       />
       <Note at={twoAt + 2} x={colX(THE) + 4} y={y(NOTE_Y)}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>{THE_COUNT} in every row</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{THE_COUNT} in every row</span>
       </Note>
       <Note at={twoAt + 10} x={colX(2) + 4} y={y(NOTE_Y)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Every other word: {OTHER_COUNTS.join(" or ")} where it appears, 0 elsewhere
         </span>
       </Note>
 
       {SAME ? (
         <Ink at={sameAt - 2} dur={20} style={{ left: X0, top: y(VERDICT_Y), width: 1400 }}>
-          <div style={{ ...body(36, true), color: INK, lineHeight: 1.25 }}>
+          <div style={{ ...body(34, true), color: INK, lineHeight: 1.25 }}>
             The same in all three rows, so this column can’t tell the documents <Mark at={apartAt - 2}>apart.</Mark>
           </div>
         </Ink>

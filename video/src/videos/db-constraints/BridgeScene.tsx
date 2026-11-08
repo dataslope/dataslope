@@ -152,7 +152,7 @@ export const BridgeScene: React.FC = () => {
         </Svg>
       ) : null}
       <Note at={emailsAt + 4} x={bx + 30} y={(by0 + by1) / 2 - 16}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           {FLAT.before[0][2]}: {FLAT.emails} emails
         </span>
       </Note>

@@ -15,10 +15,12 @@
 //   - Pyodide 314.0.7 (plain Python, the runtime the Python pages run), for
 //     the page's retry settings as a doubling schedule and a backfill's
 //     partition list, the date-range loop the page's backfill answer asks for;
-//   - DuckDB-Wasm (the SQL pages' engine), for the video's own quality gate on
-//     a 1,000-row batch and the freshness check the page describes
-//     (`MAX(updated_at)` against now) on the video's own `daily_orders`. Its
-//     `now()` is pinned to a fixed instant, so a rerun writes the same file.
+//   - Postgres (PGlite, PostgreSQL 18, the engine the interview pages' SQL
+//     runs on), for the video's own quality gate on a 1,000-row batch and the
+//     freshness check the page describes (`MAX(updated_at)` against now) on
+//     the video's own `daily_orders`, through video/scripts/lib/pg-figure.mjs.
+//     Its `now()` is pinned to a fixed instant, so a rerun writes the same
+//     file.
 // One more value is quoted rather than measured: Airflow's default parse
 // interval ("parse" at the end), the one thing the parse-time answer needs.
 /* global console */
@@ -26,6 +28,8 @@ import { writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+
+import { figure } from "../../../scripts/lib/pg-figure.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../../../..");
@@ -235,90 +239,94 @@ json.dumps({
   R.runtime.pyodide = py.version;
 }
 
-// ── DuckDB: a quality gate, and a freshness check ──────────────────────────
+// ── Postgres: a quality gate, and a freshness check ─────────────────────────
+// On PGlite, through the shared video/scripts/lib/pg-figure.mjs: one fresh
+// database, the two tables built in its setup, each query a step. Values come
+// back as psql prints them (a count as a number, a numeric as a string), and
+// are read back with Number() below.
 {
-  const duckdb = require("@duckdb/duckdb-wasm");
-  const { default: Worker } = await import(pathToFileURL(require.resolve("web-worker")).href);
-  const dist = join(dirname(require.resolve("@duckdb/duckdb-wasm")), "..", "dist");
-  const bundle = await duckdb.selectBundle({
-    mvp: { mainModule: join(dist, "duckdb-mvp.wasm"), mainWorker: join(dist, "duckdb-node-mvp.worker.cjs") },
-    eh: { mainModule: join(dist, "duckdb-eh.wasm"), mainWorker: join(dist, "duckdb-node-eh.worker.cjs") },
-  });
-  const worker = new Worker(pathToFileURL(bundle.mainWorker).href, { type: "module" });
-  const db = new duckdb.AsyncDuckDB({ log: () => {} }, worker);
-  await db.instantiate(bundle.mainModule);
-  const conn = await db.connect();
-  const one = async (sql) => (await conn.query(sql)).toArray().map((r) => r.toJSON());
-  const version = (await one("SELECT version() AS v"))[0].v;
-
   // The video's own batch: 1,000 orders, every 25th with no customer.
-  await conn.query(`CREATE TABLE orders_batch AS
+  const BATCH = `CREATE TABLE orders_batch AS
     SELECT i AS order_id,
            CASE WHEN i % 25 = 0 THEN NULL ELSE 1000 + i % 300 END AS customer_id,
            round(5 + (i * 37) % 200 + 0.99, 2) AS amount
-    FROM range(1, 1001) t(i)`);
+    FROM generate_series(1, 1000) t(i);`;
+  // The video's own daily_orders: an order every three minutes from 00:01 to
+  // 23:58, for June 1 and June 2. June 3's source sent nothing.
+  const DAILY = `CREATE TABLE daily_orders AS
+    SELECT d.day + INTERVAL '1 minute' + i * INTERVAL '3 minutes' AS updated_at
+    FROM (VALUES (TIMESTAMP '2025-06-01'), (TIMESTAMP '2025-06-02')) d(day), generate_series(0, 479) t(i);`;
+
+  // The null rate is rounded: Postgres prints an unrounded AVG of integers
+  // with twenty decimal places. Not on screen; the scene shows it as "4.0%".
   const GATE = `SELECT count(*) AS row_count,
-       avg((customer_id IS NULL)::INT) AS null_rate,
+       round(avg((customer_id IS NULL)::INT), 4) AS null_rate,
        count(*) - count(DISTINCT order_id) AS duplicate_ids,
        count(*) FILTER (WHERE amount <= 0) AS bad_amounts
 FROM orders_batch`;
-  const g = (await one(GATE))[0];
-  const limits = { minRows: 500, maxNullRate: 0.01 };
-  R.gate = {
-    sql: GATE,
-    rows: Number(g.row_count),
-    nullRate: Number(g.null_rate),
-    duplicates: Number(g.duplicate_ids),
-    badAmounts: Number(g.bad_amounts),
-    limits,
-    checks: [
-      { name: "row count", value: Number(g.row_count), pass: Number(g.row_count) >= limits.minRows },
-      { name: "null customer IDs", value: Number(g.null_rate), pass: Number(g.null_rate) <= limits.maxNullRate },
-      { name: "duplicate order IDs", value: Number(g.duplicate_ids), pass: Number(g.duplicate_ids) === 0 },
-      { name: "amounts above zero", value: Number(g.bad_amounts), pass: Number(g.bad_amounts) === 0 },
-    ],
-  };
-
-  // The video's own daily_orders: an order every three minutes from 00:01 to
-  // 23:58, for June 1 and June 2. June 3's source sent nothing.
-  await conn.query(`CREATE TABLE daily_orders AS
-    SELECT d.day + INTERVAL 1 MINUTE + i * INTERVAL 3 MINUTE AS updated_at
-    FROM (VALUES (TIMESTAMP '2025-06-01'), (TIMESTAMP '2025-06-02')) d(day), range(0, 480) t(i)`);
-  // The check as the page describes it, now() against MAX(updated_at). now()
-  // is pinned to 06:00 on each morning, the SLA's hour.
+  // The check as the page describes it, now() against MAX(updated_at): the
+  // query FreshScene prints.
   const FRESH = `SELECT max(updated_at) AS newest,
        now() - max(updated_at) AS age
 FROM daily_orders`;
-  // The query on screen is the one that runs, with only now() replaced; the
-  // outer select reads its two columns back as text.
-  const at = async (now) => {
-    const pinned = FRESH.replace("now()", `TIMESTAMP '${now}'`);
-    const row = (await one(`SELECT strftime(newest, '%Y-%m-%d %H:%M') AS newest,
-       date_diff('minute', newest, newest + age) AS minutes,
-       age::VARCHAR AS age
-FROM (${pinned})`))[0];
-    return { now: now.slice(0, 16), newest: row.newest, minutes: Number(row.minutes), age: row.age };
+  // now() is pinned to 06:00 on each morning, the SLA's hour, so a rerun
+  // writes the same file. The query on screen is the one that runs, with only
+  // now() replaced; the outer select reads its two columns back as text.
+  const pinned = (now) => `SELECT to_char(newest, 'YYYY-MM-DD HH24:MI') AS newest,
+       (EXTRACT(EPOCH FROM age) / 60)::int AS minutes,
+       age::text AS age
+FROM (${FRESH.replace("now()", `TIMESTAMP '${now}'`)}) AS checked`;
+  const FINE = "2025-06-03 06:00:00";
+  const STALE = "2025-06-04 06:00:00";
+
+  const fig = await figure(`${BATCH}\n${DAILY}\n`, {
+    gate: GATE,
+    // The printed query, unpinned: run once to show it runs as written in
+    // Postgres. Its answer depends on today's date, so it is not kept.
+    asWritten: FRESH,
+    fine: pinned(FINE),
+    stale: pinned(STALE),
+    rowsPerDay: "SELECT count(*) AS n FROM daily_orders WHERE updated_at < TIMESTAMP '2025-06-02'",
+    // What June 3's load added: the row count a volume check on that load sees.
+    missedDayRows:
+      "SELECT count(*) AS n FROM daily_orders WHERE updated_at >= TIMESTAMP '2025-06-03' AND updated_at < TIMESTAMP '2025-06-04'",
+  });
+  for (const [id, s] of Object.entries(fig.steps)) check(s.ok, `${id} did not run in Postgres: ${s.error}`);
+  const row = (id) => fig.steps[id].rows[0];
+
+  const [rowCount, nullRate, duplicates, badAmounts] = row("gate").map(Number);
+  const limits = { minRows: 500, maxNullRate: 0.01 };
+  R.gate = {
+    sql: GATE,
+    rows: rowCount,
+    nullRate,
+    duplicates,
+    badAmounts,
+    limits,
+    checks: [
+      { name: "row count", value: rowCount, pass: rowCount >= limits.minRows },
+      { name: "null customer IDs", value: nullRate, pass: nullRate <= limits.maxNullRate },
+      { name: "duplicate order IDs", value: duplicates, pass: duplicates === 0 },
+      { name: "amounts above zero", value: badAmounts, pass: badAmounts === 0 },
+    ],
   };
-  const rowsPerDay = (await one("SELECT count(*) AS n FROM daily_orders WHERE updated_at < TIMESTAMP '2025-06-02'"))[0].n;
-  // What June 3's load added: the row count a volume check on that load sees.
-  const missedDayRows = (
-    await one("SELECT count(*) AS n FROM daily_orders WHERE updated_at >= TIMESTAMP '2025-06-03' AND updated_at < TIMESTAMP '2025-06-04'")
-  )[0].n;
+
+  const at = (id, now) => {
+    const [newest, minutes, age] = row(id);
+    return { now: now.slice(0, 16), newest, minutes: Number(minutes), age };
+  };
   const thresholdHours = 12;
-  const fine = await at("2025-06-03 06:00:00");
-  const stale = await at("2025-06-04 06:00:00");
+  const fine = at("fine", FINE);
+  const stale = at("stale", STALE);
   R.fresh = {
     sql: FRESH,
-    rowsPerDay: Number(rowsPerDay),
+    rowsPerDay: Number(row("rowsPerDay")[0]),
     thresholdHours,
     fine: { ...fine, alert: fine.minutes > thresholdHours * 60 },
     stale: { ...stale, alert: stale.minutes > thresholdHours * 60 },
-    missedDayRows: Number(missedDayRows),
+    missedDayRows: Number(row("missedDayRows")[0]),
   };
-  R.runtime.duckdb = version;
-  await conn.close();
-  await db.terminate();
-  await worker.terminate();
+  R.runtime.postgres = fig.version;
 }
 
 // ── Airflow's parse loop: a documented default, quoted, not measured ──────────

@@ -52,8 +52,8 @@ const Folder: React.FC<{ x: number; y: number; h: number; name: string; at: numb
           alignItems: "center",
           justifyContent: "center",
           fontFamily: MONO,
-          fontSize: 21,
-          fontWeight: 600,
+          fontSize: 24,
+          fontWeight: 500,
           color: INK,
         }}
       >
@@ -129,7 +129,7 @@ export const PartitionScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={splitsAt} x={X0} y={y(268)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             One folder per value of the key
             <span style={{ opacity: ease(frame, dateAt, 10) }}>, usually a date</span>
             <span style={{ opacity: ease(frame, monthAt, 10) }}>
@@ -152,7 +152,7 @@ export const PartitionScene: React.FC = () => {
           />
         ))}
         <Note at={twelveAt + 2} x={X0} y={y(FOLDER_Y) + h(FOLDER_H) + h(14)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Num>{PARTITION.files}</Num> files, <Num>{count(fewest)}</Num> to <Num>{count(most)}</Num> rows each
           </span>
         </Note>
@@ -186,16 +186,16 @@ export const PartitionScene: React.FC = () => {
           ]}
         />
         <Note at={keyAt} x={PLAN_X} y={y(LIST_Y) + h(110)} out={fnAt - 2}>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <QCode>region</QCode> is not the key: nothing to prune
           </span>
         </Note>
         <Note at={keyAt + 8} x={PLAN_X} y={y(LIST_Y) + h(146)} out={fnAt - 2}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>pruning: skipping the folders that can&apos;t match</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>pruning: skipping the folders that can&apos;t match</span>
         </Note>
 
         {/* ── A good key ── */}
-        <div style={{ position: "absolute", left: X0, top: y(752), display: "flex", alignItems: "center", gap: 14, ...note(26, INK), whiteSpace: "nowrap", opacity: ease(frame, goodAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(752), display: "flex", alignItems: "center", gap: 14, ...note(28, INK), whiteSpace: "nowrap", opacity: ease(frame, goodAt, 12) }}>
           <Tick at={goodAt + 6} size={26} color={OK} />
           <span>
             <b style={{ color: OK_INK }}>A good key</b>: the column queries filter on most
@@ -203,7 +203,7 @@ export const PartitionScene: React.FC = () => {
           </span>
         </div>
         <Note at={badAt} x={X0 + 40} y={y(788)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             not a customer ID
             <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, tinyAt, 10) }}>: millions of tiny folders</span>
           </span>
@@ -223,14 +223,14 @@ export const PartitionScene: React.FC = () => {
           ]}
         />
         <Note at={fnAt + 6} x={X0} y={y(830)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             A function on the key defeats pruning on many engines
             <span style={{ opacity: ease(frame, appliedAt, 10) }}>; DuckDB applies it to each folder&apos;s name</span>
-            <span style={{ color: INK, fontWeight: 650, opacity: ease(frame, checkAt, 10) }}>. Check your engine&apos;s plan.</span>
+            <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, checkAt, 10) }}>. Check your engine&apos;s plan.</span>
           </span>
         </Note>
         {/* The habit that prunes everywhere: the raw key, or a range on it (measured: 3 of 12). */}
-        <div style={{ position: "absolute", left: X0, top: y(866), display: "flex", alignItems: "center", gap: 12, ...note(23, INK), whiteSpace: "nowrap", opacity: ease(frame, rawAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(866), display: "flex", alignItems: "center", gap: 12, ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, rawAt, 12) }}>
           <Tick at={everyAt} size={23} color={OK} />
           <span>
             Filter on the key itself

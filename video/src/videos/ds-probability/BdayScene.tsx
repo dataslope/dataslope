@@ -10,7 +10,10 @@ import { Sfx } from "../../sound/Sfx";
 import { BDAY, pct } from "./data";
 import { at, Axes, DATA, DATA_LIGHT, Drift, math, OK, OK_INK, Person, pulse, type Scale, Svg } from "./parts";
 
-const RING = { cx: 470, cy: 590, r: 230 };
+/** The ring the room's people stand on, and how tall each painted person
+ *  is: a paper disc (`disc` radius) keeps the chords off each one, and the
+ *  discs stay 18px apart round the ring. */
+const RING = { cx: 470, cy: 590, r: 245, person: 40, disc: 24 };
 const PLOT = { left: 1000, right: 1780, top: 400, base: 800 };
 
 /** Every pair of the room's people, in the order they are drawn. */
@@ -101,16 +104,16 @@ export const BdayScene: React.FC = () => {
           {Array.from({ length: BDAY.people }, (_, i) => {
             const p = ease(frame, textAt + i * 0.8, 10);
             const [x, py] = spot(i);
-            return p > 0 ? (
-              <g key={i}>
-                <circle cx={x} cy={py} r={22 * p} fill={PAPER} />
-                <Person x={x} y={py + 4} size={34 * p} color={DATA} />
-              </g>
-            ) : null;
+            return p > 0 ? <circle key={i} cx={x} cy={py} r={RING.disc * p} fill={PAPER} /> : null;
           })}
         </Svg>
+        {Array.from({ length: BDAY.people }, (_, i) => {
+          const p = ease(frame, textAt + i * 0.8, 10);
+          const [x, py] = spot(i);
+          return p > 0 ? <Person key={i} x={x} y={py} height={RING.person * p} /> : null;
+        })}
         <Note at={yesAt} x={90} y={y(320)}>
-          <span style={{ ...note(40, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Yes, just.</span>
+          <span style={{ ...note(40, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Yes, just.</span>
         </Note>
         <Note at={pairsAt + 4} x={RING.cx - 170} width={340} y={cy - 26} from="up" style={{ textAlign: "center" }}>
           <span
@@ -134,7 +137,7 @@ export const BdayScene: React.FC = () => {
 
         {/* ── The complement: each new person misses everyone before them ── */}
         <Note at={complementAt} x={WORK.x} y={y(WORK.noMatch)}>
-          <span style={math(32, INK)}>
+          <span style={math(34, INK)}>
             P(no match) ={" "}
             <Late at={firstAt}>
               {365 - 1}/365
@@ -151,7 +154,7 @@ export const BdayScene: React.FC = () => {
           </span>
         </Note>
         <Note at={fiftyAt} x={WORK.x} y={y(WORK.match)}>
-          <span style={math(32, OK_INK)}>
+          <span style={math(34, OK_INK)}>
             P(match) = 1 − {pct(BDAY.noMatch, 1)} = {pct(BDAY.exact, 1)}
           </span>
         </Note>
@@ -188,7 +191,7 @@ export const BdayScene: React.FC = () => {
           <span style={{ ...label(28, OK_INK), ...TABULAR, whiteSpace: "nowrap" }}>23 people: {pct(BDAY.exact, 1)}</span>
         </Note>
         <Note at={roomsAt + 4} x={at23[0] + 22} y={at23[1] + 52}>
-          <span style={{ ...label(22, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
             {BDAY.rooms.toLocaleString("en-US")} simulated rooms: {pct(BDAY.simulated, 1)}
           </span>
         </Note>

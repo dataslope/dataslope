@@ -35,8 +35,8 @@ const Count: React.FC<{ x: number; y: number; at: number; name: string; rows: st
         transform: `translateY(${(1 - p) * 10}px)`,
       }}
     >
-      <div style={{ ...label(20, INK_SOFT) }}>{name}</div>
-      <div style={{ ...note(34, bad ? ACCENT_INK : INK), fontWeight: 700, ...TABULAR }}>{rows}</div>
+      <div style={{ ...label(24, INK_SOFT) }}>{name}</div>
+      <div style={{ ...note(34, bad ? ACCENT_INK : INK), fontWeight: 500, ...TABULAR }}>{rows}</div>
     </div>
   );
 };
@@ -118,7 +118,7 @@ export const CheckScene: React.FC = () => {
                 transform: `translateX(${(1 - p) * -14}px)`,
               }}
             >
-              <span style={{ ...label(22, INK_SOFT), width: 26, textAlign: "right", ...TABULAR }}>{i + 1}</span>
+              <span style={{ ...label(24, INK_SOFT), width: 26, textAlign: "right", ...TABULAR }}>{i + 1}</span>
               <Tick at={s.at + 6} size={26} />
               <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>{s.text}</span>
             </div>
@@ -139,7 +139,7 @@ export const CheckScene: React.FC = () => {
         <Count x={FIG_X + 396} y={figTop} at={fourteenAt - 2} name="after the join" rows="14,000 rows" bad />
         {/* Above its box, so the row under it is free for step 3's example. */}
         <Note at={fanAt - 2} x={FIG_X + 396} y={figTop - h(38)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>something is fanning out</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>something is fanning out</span>
         </Note>
 
         {/* ── Examples for the filter, NULL and reconcile checks ── */}
@@ -149,7 +149,7 @@ export const CheckScene: React.FC = () => {
         <Note at={notInAt - 2} x={FIG_X} y={besideY(3)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mono color={INK}>NOT IN</Mono> against a column with nulls:{" "}
-            <span style={{ color: ACCENT_INK, fontWeight: 650 }}>{NULLS.notIn} rows</span>
+            <span style={{ color: ACCENT_INK, fontWeight: 500 }}>{NULLS.notIn} rows</span>
           </span>
         </Note>
         <Note at={financeAt - 2} x={FIG_X} y={besideY(4)}>
@@ -158,8 +158,8 @@ export const CheckScene: React.FC = () => {
 
         {/* ── The range check's example ── */}
         <Note at={hundredAt - 2} x={FIG_X} y={top + 6 * pitch - h(4)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            a conversion rate <span style={{ color: ACCENT_INK, fontWeight: 650 }}>over 100%</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            a conversion rate <span style={{ color: ACCENT_INK, fontWeight: 500 }}>over 100%</span>
           </span>
         </Note>
         <Note at={bugAt - 2} x={FIG_X} y={top + 6 * pitch + h(40)}>

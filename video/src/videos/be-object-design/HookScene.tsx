@@ -110,16 +110,16 @@ export const HookScene: React.FC = () => {
           const bandW = NEW.w + (EDIT.w - NEW.w) * k + 12;
           return (
             <React.Fragment key={r.id}>
-              <Line x={X0} y={rowMid - 18} at={at} size={27} weight={600} dim={dim}>
+              <Line x={X0} y={rowMid - 18} at={at} size={27} weight={500} dim={dim}>
                 {r.text}
               </Line>
               <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: hover * (1 - ease(frame, dim, 12)) }}>
                 <rect x={bandX} y={rowMid - OPT_H / 2 - 6} width={bandW} height={OPT_H + 12} rx={10} fill={HIGHLIGHT} />
               </svg>
-              <Line x={NEW.x + NEW.w / 2} y={rowMid - 15} at={landsAt + i * 3} size={23} weight={700} color={OK_INK} align="center" width={NEW.w} dim={dim}>
+              <Line x={NEW.x + NEW.w / 2} y={rowMid - 15} at={landsAt + i * 3} size={23} weight={500} color={OK_INK} align="center" width={NEW.w} dim={dim}>
                 a new piece
               </Line>
-              <Line x={EDIT.x + EDIT.w / 2} y={rowMid - 15} at={editAt + i * 3} size={23} weight={700} color={ACCENT_INK} align="center" width={EDIT.w} dim={dim}>
+              <Line x={EDIT.x + EDIT.w / 2} y={rowMid - 15} at={editAt + i * 3} size={23} weight={500} color={ACCENT_INK} align="center" width={EDIT.w} dim={dim}>
                 an edit to working code
               </Line>
             </React.Fragment>
@@ -133,7 +133,7 @@ export const HookScene: React.FC = () => {
         <ArtSpot id="armadillo" at={shopAt + 14} left={1494} top={y(468)} h={210} />
 
         {/* The round. */}
-        <Line x={X0} y={chipsTop + 8} at={fifteenAt - 2} size={30} weight={700}>
+        <Line x={X0} y={chipsTop + 8} at={fifteenAt - 2} size={30} weight={500}>
           Fifteen questions<span style={{ opacity: ease(frame, shopOneAt, 10) }}>, on one shop</span>
         </Line>
         {Array.from({ length: 15 }, (_, i) => {
@@ -162,7 +162,7 @@ export const HookScene: React.FC = () => {
                 transform: `scale(${0.6 + 0.4 * p})`,
               }}
             >
-              <span style={{ ...label(isBig ? 21 : 19, isBig && fill > 0.5 ? PAPER : isBig ? BLUE_INK : INK), fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
+              <span style={{ ...label(isBig ? 21 : 19, isBig && fill > 0.5 ? PAPER : isBig ? BLUE_INK : INK), fontWeight: 500, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
             </div>
           );
         })}

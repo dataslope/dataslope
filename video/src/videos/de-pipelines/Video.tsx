@@ -22,8 +22,9 @@ const OVERLAP = 6;
  * "Pipelines & systems" (16:9), Part 6 of the Data Engineer interview prep
  * videos, on the editorial page. Eleven questions from the track's pipelines
  * page: eight worked through, a scene each, then three quick ones. Every
- * table, count and error ran in DuckDB-Wasm (check.mjs, results.json,
- * data.ts); the rest are mechanisms, drawn.
+ * table, count and error ran in Postgres, but for Question 5's Parquet
+ * reads, which ran in DuckDB (check.mjs, results.json, data.ts); the rest
+ * are mechanisms, drawn.
  *
  * Every scene boundary is a narration cue, so new audio re-times the cuts
  * along with every animation inside them.

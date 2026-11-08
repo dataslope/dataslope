@@ -131,7 +131,7 @@ export const PennScene: React.FC = () => {
           <Tile text="fish" x={X0} y={y(322) + k * 70} at={from - 4 + k * 4} size={26} out={tallAt - 14} />
           <TagChip tag={tag} family={familyOf(tag)} cx={X0 + 160} y={y(322) + k * 70 + 4} at={from + k * 4} size={22} out={tallAt - 14} />
           <Note at={from + 4 + k * 4} out={tallAt - 14} x={X0 + 220} y={y(322) + k * 70 + 8}>
-            <div style={{ ...label(22, FAMILY[familyOf(tag)].ink), fontWeight: 600, whiteSpace: "nowrap" }}>{FAMILY[familyOf(tag)].name}</div>
+            <div style={{ ...label(24, FAMILY[familyOf(tag)].ink), fontWeight: 500, whiteSpace: "nowrap" }}>{FAMILY[familyOf(tag)].name}</div>
           </Note>
         </React.Fragment>
       ))}
@@ -169,12 +169,12 @@ export const PennScene: React.FC = () => {
 
       {/* The first-letter shortcut. */}
       <Note at={thirtySixAt - 2} x={LX} y={y(266)}>
-        <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
           about <span style={numStyle(22, INK)}>36</span> tags in all
         </div>
       </Note>
       <Ink at={firstLetterAt - 2} dur={14} style={{ left: LX, top: y(266) + 40, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(30, true), color: INK }}>The first letter does the work:</span>
+        <span style={{ ...body(28, true), color: INK }}>The first letter does the work:</span>
       </Ink>
       {(["noun", "verb", "adj", "adv"] as const).map((fam, k) => (
         <Note key={fam} at={letterAts[fam] - 2} x={LX} y={y(266) + 96 + k * 46}>
@@ -190,14 +190,14 @@ export const PennScene: React.FC = () => {
                 border: `2px solid ${FAMILY[fam].fill}`,
                 background: FAMILY[fam].tint,
                 fontFamily: MONO,
-                fontWeight: 700,
-                fontSize: 22,
+                fontWeight: 500,
+                fontSize: 24,
                 color: FAMILY[fam].ink,
               }}
             >
               {fam === "noun" ? "N…" : fam === "verb" ? "V…" : fam === "adj" ? "J…" : "R…"}
             </span>
-            <span style={{ ...label(24, FAMILY[fam].ink), fontWeight: 600 }}>{FAMILY[fam].name}s</span>
+            <span style={{ ...label(24, FAMILY[fam].ink), fontWeight: 500 }}>{FAMILY[fam].name}s</span>
           </div>
         </Note>
       ))}
@@ -241,8 +241,8 @@ export const PennScene: React.FC = () => {
       {ROW_ORDER.map((r, k) => (
         <Note key={r.fam} at={rowLabelAt[k]} x={X0} y={sortedY(k)}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, height: tileH(ESIZE), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 22, color: FAMILY[r.fam].ink }}>{r.prefix}</span>
-            <span style={{ ...label(24, INK), fontWeight: 600 }}>
+            <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 24, color: FAMILY[r.fam].ink }}>{r.prefix}</span>
+            <span style={{ ...label(24, INK), fontWeight: 500 }}>
               {k === 0 ? <Marked at={nounsAt - 2}>{r.name}</Marked> : r.name}
             </span>
           </div>

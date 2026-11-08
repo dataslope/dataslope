@@ -9,7 +9,8 @@
     },
     "sizes": {
       "video-hero": "1536x1024",
-      "video-icon": "1024x1024"
+      "video-icon": "1024x1024",
+      "video-page": "1024x1536"
     },
     "styles": {
       "watercolor illustration": {
@@ -24,6 +25,12 @@
       "category": "video-hero",
       "style": "watercolor illustration",
       "subject": "a llama standing beside a small wooden filing cabinet with one drawer pulled open, full of thick paper index cards"
+    },
+    {
+      "id": "de-pipelines-for-ai-page",
+      "category": "video-page",
+      "style": "watercolor illustration",
+      "subject": "one single tall loose sheet of pale cream paper standing upright, seen straight on from the front, nearly twice as tall as it is wide, its whole face completely empty and smooth, an even, very light warm cream wash from edge to edge, its four edges shaded softly by a thin band of pale blue wash that stays narrow, and its lower right corner gently curled forward"
     }
   ]
 }

@@ -19,8 +19,8 @@ const OVERLAP = 6;
  * "SQL" (16:9), Part 10 of the Data Scientist interview prep videos, on the
  * editorial page. The page's fifteen questions: six worked through on real
  * queries, a scene each (the first two share one), then nine at speed. Every
- * statement, result and error ran in DuckDB (and one in Postgres): check.mjs,
- * results.json, data.ts.
+ * statement, result and error ran in Postgres, the engine the page's blocks
+ * run: check.mjs, results.json, data.ts.
  *
  * No series intro yet, as in the other parts.
  *

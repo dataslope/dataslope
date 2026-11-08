@@ -56,7 +56,7 @@ export const PromptScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={2} dur={14} style={{ left: 120, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Picking the next token</span>
+        <span style={label(24, ACCENT_INK)}>Picking the next token</span>
       </Ink>
       <Ink at={4} dur={20} style={{ left: 114, top: y(150), ...headline(88), whiteSpace: "nowrap" }}>
         Her new pet is a
@@ -93,10 +93,10 @@ export const PromptScene: React.FC = () => {
 
       {/* Column heads. */}
       <Ink at={figAt} dur={14} style={{ left: ZERO - 80, top: y(398) }}>
-        <span style={label(21)}>Score, or logit</span>
+        <span style={label(24)}>Score, or logit</span>
       </Ink>
       <Ink at={softAt + 6} dur={14} style={{ left: P0, top: y(398) }}>
-        <span style={label(21)}>Probability</span>
+        <span style={label(24)}>Probability</span>
       </Ink>
 
       {/* The band behind the row being read out. */}
@@ -124,7 +124,7 @@ export const PromptScene: React.FC = () => {
         />
       </svg>
       <Note at={figAt + 6} x={ZERO} y={bottom + 8} from="up" style={{ transform: "translateX(-50%)" }}>
-        <span style={note(20, INK_SOFT)}>0</span>
+        <span style={note(24, INK_SOFT)}>0</span>
       </Note>
 
       {TOKENS.map((_, i) => {
@@ -153,10 +153,10 @@ export const PromptScene: React.FC = () => {
               align={v >= 0 ? "left" : "right"}
               y={cy + h(BAR_H) / 2 - 15}
             >
-              <span style={{ ...note(23, TEXT[i]), fontWeight: 650 }}>{signed(v)}</span>
+              <span style={{ ...note(24, TEXT[i]), fontWeight: 500 }}>{signed(v)}</span>
             </Note>
             <Note at={dividesAt + i * 4 + 14} x={P0 + (P1 - P0) * p + 14} y={cy + h(BAR_H) / 2 - 15}>
-              <span style={{ ...note(23, TEXT[i]), fontWeight: 650 }}>
+              <span style={{ ...note(24, TEXT[i]), fontWeight: 500 }}>
                 {markAt === undefined ? pct(p) : <Marked at={markAt - 2}>{pct(p)}</Marked>}
               </span>
             </Note>
@@ -166,19 +166,19 @@ export const PromptScene: React.FC = () => {
 
       {/* Softmax: from the scores to the probabilities. */}
       <Ink at={softAt - 4} dur={14} style={{ left: ARROW_X[0], width: ARROW_X[1] - ARROW_X[0], top: mid - 56, textAlign: "center" }}>
-        <span style={{ ...note(28, INK), fontWeight: 600 }}>
+        <span style={{ ...note(28, INK), fontWeight: 500 }}>
           <Mono>softmax</Mono>
         </span>
       </Ink>
       <Arrow from={[ARROW_X[0], mid]} to={[ARROW_X[1], mid]} at={softAt} />
       <Ink at={raisesAt - 2} dur={16} style={{ left: ARROW_X[0] - 30, width: ARROW_X[1] - ARROW_X[0] + 60, top: mid + 18, textAlign: "center" }}>
-        <span style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>
+        <span style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>
           e<sup style={{ fontSize: "0.68em" }}>score</sup> ÷ total
         </span>
       </Ink>
 
       <Note at={softAt + 8} x={120} y={y(800)}>
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Illustrative scores: the lesson&apos;s own four-token example, not a real model&apos;s output.
         </span>
       </Note>

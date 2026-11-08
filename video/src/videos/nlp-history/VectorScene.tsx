@@ -40,7 +40,7 @@ const WordDot: React.FC<{ x: number; y: number; word: string; at: number; dx: nu
           transform: `translate(${dx < 0 ? "-100%" : "0"}, -50%)`,
           opacity: p,
           fontFamily: MONO,
-          fontSize: 30,
+          fontSize: 28,
           fontWeight: 500,
           color: INK,
           whiteSpace: "nowrap",
@@ -87,22 +87,22 @@ const PaperCard: React.FC<{
         boxSizing: "border-box",
       }}
     >
-      <div style={{ position: "absolute", left: pad, right: pad, top: 20, display: "flex", justifyContent: "space-between", ...note(19, INK_SOFT), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: pad, right: pad, top: 20, display: "flex", justifyContent: "space-between", ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
         <span>arXiv</span>
-        <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, dateAt, 10) }}>{W2V_PAPER.date}</span>
+        <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, dateAt, 10) }}>{W2V_PAPER.date}</span>
       </div>
       {/* The masthead rule; the title starts 28px below it. */}
       <div style={{ position: "absolute", left: pad, right: pad, top: 52, height: 1.5, background: INK }} />
       <Ink at={at + 6} dur={20} style={{ left: pad, top: 82, width: width - 2 * pad }}>
-        <div style={{ ...headline(30), lineHeight: 1.12 }}>
+        <div style={{ ...headline(28), lineHeight: 1.12 }}>
           <Mark at={titleMark}>{W2V_PAPER.title}</Mark>
         </div>
       </Ink>
       <Ink at={authorAt} dur={14} style={{ left: pad, top: 170, width: width - 2 * pad }}>
-        <div style={{ ...label(21, INK), lineHeight: 1.35 }}>{W2V_PAPER.authors}</div>
+        <div style={{ ...label(24, INK), lineHeight: 1.35 }}>{W2V_PAPER.authors}</div>
       </Ink>
       <Ink at={placeAt} dur={14} style={{ left: pad, top: 238, whiteSpace: "nowrap" }}>
-        <div style={{ ...label(21, INK_SOFT), fontWeight: 560 }}>{W2V_PAPER.place}</div>
+        <div style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>{W2V_PAPER.place}</div>
       </Ink>
       {Array.from({ length: 5 }, (_, i) => {
         const w = ease(frame, at + 14 + i * 6, 12);
@@ -207,13 +207,13 @@ export const VectorScene: React.FC = () => {
         <line x1={query[0] - 8} y1={query[1] + 8} x2={queen[0] + 14} y2={queen[1] - 12} stroke={INK_SOFT} strokeWidth={1.8} strokeDasharray="5 5" opacity={ring} />
         <circle cx={queen[0]} cy={queen[1]} r={30} fill="none" stroke={ACCENT} strokeWidth={2.8} pathLength={1} strokeDasharray={`${ring} 1`} />
       </Svg>
-      <Tag x={query[0] + 22} y={query[1] - 62} at={womanAt + 12} size={24} color={ACCENT_INK} weight={650}>
+      <Tag x={query[0] + 22} y={query[1] - 62} at={womanAt + 12} size={24} color={ACCENT_INK} weight={500}>
         king − man + woman
       </Tag>
-      <Tag x={queen[0] + 46} y={queen[1] + 4} at={nearestAt} size={23} color={INK} weight={650}>
+      <Tag x={queen[0] + 46} y={queen[1] + 4} at={nearestAt} size={23} color={INK} weight={500}>
         nearest other word: <span style={{ fontFamily: MONO, fontWeight: 500 }}>{W2V.analogy[0].word}</span>
       </Tag>
-      <Tag x={(man[0] + woman[0]) / 2} y={man[1] + 54} at={manAt + 8} align="center" size={20} color={INK_SOFT} weight={560}>
+      <Tag x={(man[0] + woman[0]) / 2} y={man[1] + 54} at={manAt + 8} align="center" size={20} color={INK_SOFT} weight={500}>
         one step, man to woman
       </Tag>
 
@@ -223,7 +223,7 @@ export const VectorScene: React.FC = () => {
       {/* ── Fig. 12 ── */}
       <FigLabel n="12" title="The six words nearest to excellent" at={rememberAt - 2} x={LX} y={y(290)} />
       <Ink at={rememberAt} style={{ left: LX, top: LTOP - 4, whiteSpace: "nowrap" }}>
-        <div style={{ ...label(22, INK_SOFT) }}>
+        <div style={{ ...label(24, INK_SOFT) }}>
           in a bag of words, <span style={{ fontFamily: MONO, color: INK }}>great</span> and{" "}
           <span style={{ fontFamily: MONO, color: INK }}>excellent</span> share <Mark at={columnsAt}>nothing</Mark>
         </div>
@@ -237,7 +237,7 @@ export const VectorScene: React.FC = () => {
         return (
           <React.Fragment key={w.word}>
             <Ink at={t} style={{ left: LX, top: top + 2, width: 210, textAlign: "right" }}>
-              <span style={{ fontFamily: MONO, fontSize: 30, color: isGreat ? DATA_INK : INK, fontWeight: isGreat ? 600 : 400 }}>
+              <span style={{ fontFamily: MONO, fontSize: 28, color: isGreat ? DATA_INK : INK, fontWeight: isGreat ? 500 : 400 }}>
                 {isGreat ? <Mark at={neighborsAt}>{w.word}</Mark> : w.word}
               </span>
             </Ink>

@@ -74,7 +74,7 @@ export const MemoryScene: React.FC = () => {
           </span>
         </Ink>
         <Note at={answerAt + 12} x={X0 + 720} y={y(312)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>time already waited changes nothing</span>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>time already waited changes nothing</span>
         </Note>
         <Note at={answerAt + 22} x={X0 + 720} y={y(350)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -142,24 +142,24 @@ export const MemoryScene: React.FC = () => {
               from="up"
               style={{ textAlign: "center" }}
             >
-              <span style={{ ...label(24, INK), ...TABULAR, fontWeight: 700 }}>{pct(MEMORY.exact)}</span>
-              {i === 0 ? <div style={{ ...label(21, INK), marginTop: 2 }}>of the bar</div> : null}
+              <span style={{ ...label(24, INK), ...TABULAR, fontWeight: 500 }}>{pct(MEMORY.exact)}</span>
+              {i === 0 ? <div style={{ ...label(24, INK), marginTop: 2 }}>of the bar</div> : null}
             </Note>
           );
         })}
         <Note at={averageAt + 10} x={at(xs, 22)} y={at(ys, 0.62)}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>waits average 12 minutes</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>waits average 12 minutes</span>
         </Note>
 
         {/* The same answer, three times. */}
         <Note at={pctAt} x={TABLE.x} y={y(TABLE.top) - 56}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>already waited · chance of 10 more</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>already waited · chance of 10 more</span>
         </Note>
         {windows.map((w, i) => (
           <Note key={w.s} at={i === 0 ? pctAt : w.at} x={TABLE.x} y={y(TABLE.top) + i * TABLE.row}>
             <span
               style={{
-                ...note(32, INK),
+                ...note(34, INK),
                 ...TABULAR,
                 whiteSpace: "nowrap",
                 display: "inline-block",
@@ -170,11 +170,11 @@ export const MemoryScene: React.FC = () => {
             >
               {w.s} min
             </span>
-            <span style={{ ...note(34, OK_INK), ...TABULAR, fontWeight: 700, whiteSpace: "nowrap" }}>{pct(MEMORY.exact)}</span>
+            <span style={{ ...note(34, OK_INK), ...TABULAR, fontWeight: 500, whiteSpace: "nowrap" }}>{pct(MEMORY.exact)}</span>
           </Note>
         ))}
         <Note at={otherAt} x={TABLE.x} y={y(TABLE.top) + 3 * TABLE.row + 30} width={500}>
-          <span style={{ ...note(26, INK), fontWeight: 600 }}>No other continuous distribution does that.</span>
+          <span style={{ ...note(28, INK), fontWeight: 500 }}>No other continuous distribution does that.</span>
         </Note>
       </Drift>
     </AbsoluteFill>

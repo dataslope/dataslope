@@ -16,7 +16,7 @@
           ]
         },
         "table": {
-          "sql": "SELECT region, amount FROM orders ORDER BY rowid;",
+          "sql": "SELECT region, amount FROM orders ORDER BY ctid;",
           "ok": true,
           "columns": [
             "region",
@@ -150,7 +150,7 @@
         "whereAggregate": {
           "sql": "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE SUM(amount) > 600\nGROUP BY region;",
           "ok": false,
-          "error": "Binder Error: WHERE clause cannot contain aggregates!"
+          "error": "ERROR: aggregate functions are not allowed in WHERE"
         },
         "having": {
           "sql": "SELECT region, SUM(amount) AS revenue\nFROM orders\nGROUP BY region\nHAVING SUM(amount) > 600\nORDER BY revenue DESC;",
@@ -233,20 +233,11 @@
         },
         "plainAlias": {
           "sql": "SELECT region, amount * 2 AS doubled FROM orders WHERE doubled > 400 ORDER BY doubled DESC;",
-          "ok": true,
-          "columns": [
-            "region",
-            "doubled"
-          ],
-          "rows": [
-            [
-              "North",
-              "420.00"
-            ]
-          ]
+          "ok": false,
+          "error": "ERROR: column \"doubled\" does not exist"
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "joins": {
       "setup": "CREATE TABLE customers (id INTEGER, name TEXT);\nINSERT INTO customers VALUES (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di');\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00),\n  (104, 3, 55.00),  (105, 3, 45.00), (106, 2, 30.00), (125, 25, 64.00);",
@@ -508,7 +499,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "leftTrap": {
       "setup": "CREATE TABLE customers (id INTEGER, name TEXT);\nINSERT INTO customers VALUES (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di');\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00),\n  (104, 3, 55.00),  (105, 3, 45.00), (106, 2, 30.00);",
@@ -600,7 +591,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "fanout": {
       "setup": "CREATE TABLE orders (order_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES (1, 100.00), (2, 50.00);\nCREATE TABLE order_items (order_id INTEGER, item TEXT);\nINSERT INTO order_items VALUES (1, 'A'), (1, 'B'), (1, 'C'), (2, 'D');",
@@ -719,7 +710,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "nulls": {
       "setup": "CREATE TABLE orders (id INTEGER, discount INTEGER);\nINSERT INTO orders VALUES (1, 10), (2, NULL), (3, 5), (4, NULL), (5, 0), (6, 15);",
@@ -762,7 +753,7 @@
           "sql": "SELECT COUNT(*) FROM orders\nWHERE discount = NULL;",
           "ok": true,
           "columns": [
-            "count_star()"
+            "count"
           ],
           "rows": [
             [
@@ -774,7 +765,7 @@
           "sql": "SELECT COUNT(*) FROM orders\nWHERE discount IS NULL;",
           "ok": true,
           "columns": [
-            "count_star()"
+            "count"
           ],
           "rows": [
             [
@@ -795,22 +786,22 @@
           ]
         },
         "counts": {
-          "sql": "SELECT COUNT(*), COUNT(1), COUNT(discount),\n       AVG(discount),\n       AVG(COALESCE(discount, 0))\nFROM orders;",
+          "sql": "SELECT COUNT(*), COUNT(1), COUNT(discount),\n       ROUND(AVG(discount), 1),\n       ROUND(AVG(COALESCE(discount, 0)), 1)\nFROM orders;",
           "ok": true,
           "columns": [
-            "count_star()",
-            "count(1)",
-            "count(discount)",
-            "avg(discount)",
-            "avg(COALESCE(discount, 0))"
+            "count",
+            "count",
+            "count",
+            "round",
+            "round"
           ],
           "rows": [
             [
               6,
               6,
               4,
-              7.5,
-              5
+              "7.5",
+              "5.0"
             ]
           ]
         },
@@ -838,16 +829,16 @@
           ]
         },
         "averages": {
-          "sql": "SELECT AVG(discount),\n       AVG(COALESCE(discount, 0))\nFROM orders;",
+          "sql": "SELECT ROUND(AVG(discount), 1),\n       ROUND(AVG(COALESCE(discount, 0)), 1)\nFROM orders;",
           "ok": true,
           "columns": [
-            "avg(discount)",
-            "avg(COALESCE(discount, 0))"
+            "round",
+            "round"
           ],
           "rows": [
             [
-              7.5,
-              5
+              "7.5",
+              "5.0"
             ]
           ]
         },
@@ -855,9 +846,9 @@
           "sql": "SELECT COUNT(*), COUNT(1), COUNT(discount)\nFROM orders;",
           "ok": true,
           "columns": [
-            "count_star()",
-            "count(1)",
-            "count(discount)"
+            "count",
+            "count",
+            "count"
           ],
           "rows": [
             [
@@ -880,7 +871,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "anti": {
       "setup": "CREATE TABLE customers (id INTEGER, name TEXT);\nINSERT INTO customers VALUES (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di');\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00),\n  (104, 3, 55.00),  (105, 3, 45.00), (106, 2, 30.00), (107, NULL, 25.00);",
@@ -994,7 +985,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "distinct": {
       "setup": "CREATE TABLE orders (order_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES (1, 100.00), (2, 50.00), (3, 50.00);\nCREATE TABLE order_items (order_id INTEGER, item TEXT);\nINSERT INTO order_items VALUES (1, 'A'), (1, 'B'), (1, 'C'), (2, 'D'), (3, 'E');",
@@ -1116,7 +1107,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "subqueries": {
       "setup": "CREATE TABLE customers (id INTEGER, name TEXT);\nINSERT INTO customers VALUES (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di');\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00),\n  (104, 3, 55.00),  (105, 3, 45.00), (106, 2, 30.00);",
@@ -1163,7 +1154,7 @@
           ]
         },
         "averagesNamed": {
-          "sql": "SELECT c.name, AVG(o.amount) AS avg_amount FROM orders o JOIN customers c ON c.id = o.customer_id GROUP BY c.id, c.name ORDER BY c.id;",
+          "sql": "SELECT c.name, ROUND(AVG(o.amount), 2) AS avg_amount FROM orders o JOIN customers c ON c.id = o.customer_id GROUP BY c.id, c.name ORDER BY c.id;",
           "ok": true,
           "columns": [
             "name",
@@ -1172,20 +1163,20 @@
           "rows": [
             [
               "Ava",
-              80
+              "80.00"
             ],
             [
               "Ben",
-              55
+              "55.00"
             ],
             [
               "Cy",
-              50
+              "50.00"
             ]
           ]
         },
         "averages": {
-          "sql": "SELECT customer_id, AVG(amount) AS avg_amount FROM orders GROUP BY customer_id ORDER BY customer_id;",
+          "sql": "SELECT customer_id, ROUND(AVG(amount), 2) AS avg_amount FROM orders GROUP BY customer_id ORDER BY customer_id;",
           "ok": true,
           "columns": [
             "customer_id",
@@ -1194,27 +1185,27 @@
           "rows": [
             [
               1,
-              80
+              "80.00"
             ],
             [
               2,
-              55
+              "55.00"
             ],
             [
               3,
-              50
+              "50.00"
             ]
           ]
         },
         "overall": {
-          "sql": "SELECT AVG(amount) AS avg_amount FROM orders;",
+          "sql": "SELECT ROUND(AVG(amount), 2) AS avg_amount FROM orders;",
           "ok": true,
           "columns": [
             "avg_amount"
           ],
           "rows": [
             [
-              61.666666666666664
+              "61.67"
             ]
           ]
         },
@@ -1289,7 +1280,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "rapid": {
       "setup": "CREATE TABLE employees (id INTEGER, name TEXT, manager_id INTEGER);\nINSERT INTO employees VALUES (1, 'Mona', NULL), (2, 'Gina', 1), (3, 'Bob', 1), (4, 'Sara', 2);\nCREATE TABLE store_a (city TEXT);\nINSERT INTO store_a VALUES ('Austin'), ('Boston');\nCREATE TABLE store_b (city TEXT);\nINSERT INTO store_b VALUES ('Boston'), ('Chicago');\nCREATE TABLE expected_products (product_id INTEGER);\nINSERT INTO expected_products VALUES (1), (2), (3), (4);\nCREATE TABLE received_products (product_id INTEGER);\nINSERT INTO received_products VALUES (1), (2), (4);\nCREATE TABLE tests (student TEXT, score INTEGER);\nINSERT INTO tests VALUES ('Ava', 95), ('Ben', NULL), ('Cy', 72);\nCREATE TABLE traffic (day INTEGER, discount INTEGER, revenue INTEGER, sessions INTEGER);\nINSERT INTO traffic VALUES (1, NULL, 500, 0), (2, 5, 300, 60);\nCREATE TABLE users (id INTEGER, email TEXT);\nINSERT INTO users VALUES (1, 'ada@example.com'), (2, 'bo@example.com'), (3, 'ada@example.com'), (4, 'cy@example.com'), (5, 'bo@example.com');\nCREATE TABLE regions (region TEXT);\nINSERT INTO regions VALUES ('North'), ('South'), ('East'), ('West');\nCREATE TABLE products (product_name TEXT);\nINSERT INTO products VALUES ('Mug'), ('Tee'), ('Cap');",
@@ -1659,18 +1650,8 @@
         },
         "divideByZero": {
           "sql": "SELECT revenue / sessions AS revenue_per_session FROM traffic ORDER BY day;",
-          "ok": true,
-          "columns": [
-            "revenue_per_session"
-          ],
-          "rows": [
-            [
-              null
-            ],
-            [
-              5
-            ]
-          ]
+          "ok": false,
+          "error": "ERROR: division by zero"
         },
         "dates": {
           "sql": "SELECT EXTRACT(YEAR FROM DATE '2024-01-17') AS order_year,\n  DATE_TRUNC('month', DATE '2024-01-17') AS order_month,\n  DATE '2024-01-17' + INTERVAL '7 days' AS due_date;",
@@ -1682,8 +1663,8 @@
           ],
           "rows": [
             [
-              2024,
-              "2024-01-01",
+              "2024",
+              "2024-01-01 00:00:00+00",
               "2024-01-24 00:00:00"
             ]
           ]
@@ -1764,7 +1745,7 @@
           "sql": "WITH dupes AS (\n  SELECT id, ROW_NUMBER() OVER (\n    PARTITION BY email ORDER BY id) AS rn\n  FROM users)\nDELETE FROM users\nWHERE id IN (SELECT id FROM dupes WHERE rn > 1);",
           "ok": true,
           "columns": [
-            "Count"
+            "rows affected"
           ],
           "rows": [
             [
@@ -1798,7 +1779,7 @@
           "sql": "SELECT COUNT(*) FROM products CROSS JOIN regions;",
           "ok": true,
           "columns": [
-            "count_star()"
+            "count"
           ],
           "rows": [
             [
@@ -1807,10 +1788,10 @@
           ]
         },
         "crossJoinThousand": {
-          "sql": "SELECT COUNT(*) FROM range(1000) a CROSS JOIN range(1000) b;",
+          "sql": "SELECT COUNT(*) FROM generate_series(1, 1000) a CROSS JOIN generate_series(1, 1000) b;",
           "ok": true,
           "columns": [
-            "count_star()"
+            "count"
           ],
           "rows": [
             [
@@ -1819,7 +1800,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "rollup": {
       "setup": "CREATE TABLE orders AS SELECT * FROM (VALUES\n  (1,  'North', 'A', 120.00), (2,  'South', 'B',  80.50),\n  (3,  'East',  'A', 200.00), (4,  'West',  'C',  50.25),\n  (5,  'North', 'B',  60.00), (6,  'South', 'A',  90.00),\n  (7,  'East',  'C', 140.00), (8,  'West',  'B', 110.00),\n  (9,  'North', 'C',  75.50), (10, 'South', 'B',  65.00),\n  (11, 'North', 'A', 145.75), (12, 'East',  'B',  95.00),\n  (13, 'West',  'A',  40.00), (14, 'South', 'C', 130.25),\n  (15, 'North', 'B',  88.00), (16, 'East',  'A', 175.50),\n  (17, 'West',  'C',  62.75), (18, 'South', 'A', 105.00),\n  (19, 'North', 'C', 210.00), (20, 'East',  'B',  45.25),\n  (21, 'West',  'A', 155.00), (22, 'South', 'B',  70.75),\n  (23, 'North', 'A',  99.50), (24, 'East',  'C', 185.00)\n) AS t(id, region, category, amount);",
@@ -1922,32 +1903,11 @@
         },
         "groupByAll": {
           "sql": "SELECT region, SUM(amount) AS revenue\nFROM orders\nGROUP BY ALL\nORDER BY revenue DESC;",
-          "ok": true,
-          "columns": [
-            "region",
-            "revenue"
-          ],
-          "rows": [
-            [
-              "East",
-              "840.75"
-            ],
-            [
-              "North",
-              "798.75"
-            ],
-            [
-              "South",
-              "541.50"
-            ],
-            [
-              "West",
-              "418.00"
-            ]
-          ]
+          "ok": false,
+          "error": "ERROR: syntax error at or near \"ORDER\""
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     }
   }
 }

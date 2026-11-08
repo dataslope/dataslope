@@ -149,7 +149,7 @@ export const BlendScene: React.FC = () => {
         const pos = i === 0 ? { left: x + 16, top: ty - 30 } : i === 1 ? { left: x + 16, top: ty - 26 } : { left: x + 2, top: ty - 46 };
         return (
           <Fade key={t} at={from + 4} style={{ ...pos, ...halo }}>
-            <span style={{ ...label(21, KEY_INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, KEY_INK), whiteSpace: "nowrap" }}>
               <Mono>{t}</Mono>
             </span>
           </Fade>
@@ -162,7 +162,7 @@ export const BlendScene: React.FC = () => {
           top: qTip[1] + lerp(-6, -8, turn),
           transform: `translateX(${lerp(0, -100, turn)}%)`,
           opacity: ease(frame, from + 4, 10),
-          ...label(21, QUERY_INK),
+          ...label(24, QUERY_INK),
           whiteSpace: "nowrap",
           ...halo,
         }}
@@ -173,7 +173,7 @@ export const BlendScene: React.FC = () => {
       {/* ── Fig. 9: the scores and weights, for this query ── */}
       <FigLabel n="9" title="Dot products, scores, weights" at={from} x={M.chip} y={y(FIG_Y)} />
       <Fade at={from} style={{ left: M.chip, top: qY, display: "flex", alignItems: "center", gap: 18 }}>
-        <span style={{ ...label(22, QUERY_INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(24, QUERY_INK), whiteSpace: "nowrap" }}>
           Query, from <Mono>it</Mono>
         </span>
         <span style={{ borderRadius: 8, boxShadow: `0 0 0 ${5 * pulse(frame, towardAt, 26)}px color-mix(in srgb, ${POINT} 40%, transparent)` }}>
@@ -181,15 +181,15 @@ export const BlendScene: React.FC = () => {
         </span>
       </Fade>
       <Fade at={from + 2} style={{ left: 0, top: headY, width: 1300 }}>
-        <span style={{ position: "absolute", left: M.key, ...label(21, KEY_INK) }}>Key</span>
-        <span style={{ position: "absolute", left: M.dot, ...label(21, INK_SOFT) }}>Dot</span>
-        <span style={{ position: "absolute", left: M.score, ...label(21, INK_SOFT) }}>Scaled</span>
-        <span style={{ position: "absolute", left: M.weight, ...label(21, INK_SOFT) }}>Weight</span>
+        <span style={{ position: "absolute", left: M.key, ...label(24, KEY_INK) }}>Key</span>
+        <span style={{ position: "absolute", left: M.dot, ...label(24, INK_SOFT) }}>Dot</span>
+        <span style={{ position: "absolute", left: M.score, ...label(24, INK_SOFT) }}>Scaled</span>
+        <span style={{ position: "absolute", left: M.weight, ...label(24, INK_SOFT) }}>Weight</span>
       </Fade>
       {TOKENS.map((t, i) => {
         const hotA = i === 0 ? 1 - ease(frame, runAt, 10) : 0;
         const hotB = i === 1 ? ease(frame, fourSevenAt - 2, 10) : 0;
-        const numStyle: React.CSSProperties = { fontFamily: MONO, fontWeight: 700, fontSize: NUM, color: INK, ...TABULAR };
+        const numStyle: React.CSSProperties = { fontFamily: MONO, fontWeight: 500, fontSize: NUM, color: INK, ...TABULAR };
         return (
           <Fade key={t} at={from + 4 + i * 3} style={{ left: 0, top: rowY(i), width: 1300, height: 60 }}>
             <div style={{ position: "absolute", left: M.chip, top: 4 }}>
@@ -233,7 +233,7 @@ export const BlendScene: React.FC = () => {
             top: exprY + line * 46,
             fontFamily: MONO,
             fontSize: 24,
-            fontWeight: 600,
+            fontWeight: 500,
             color: INK,
             whiteSpace: "pre",
             opacity: ease(frame, line ? weightAt : scaledAt - 2, 12) * dimUntil(line ? swingsAt + 20 : swingsAt - 4),
@@ -243,7 +243,7 @@ export const BlendScene: React.FC = () => {
           {line ? (
             <>
               <Swap a={blendLines(A)[1].split("=")[0]} b={blendLines(B)[1].split("=")[0]} swapAt={swingsAt - 4} />
-              <span style={{ opacity: ease(frame, addedAt - 2, 10), color: POINT_INK, fontWeight: 700 }}>
+              <span style={{ opacity: ease(frame, addedAt - 2, 10), color: POINT_INK, fontWeight: 500 }}>
                 = <Swap a={pair(A.output2, (x) => x.toFixed(2))} b={pair(B.output2, (x) => x.toFixed(2))} swapAt={swingsAt + 20} />
               </span>
             </>
@@ -260,11 +260,11 @@ export const BlendScene: React.FC = () => {
         <line x1={VO[0]} x2={VO[0]} y1={VO[1]} y2={VO[1] - 10.6 * VU} stroke={LINE} strokeWidth={1.6} />
         {[0, 5, 10].map((v) => (
           <g key={v}>
-            <text x={VO[0] + v * VU} y={VO[1] + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+            <text x={VO[0] + v * VU} y={VO[1] + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
               {v}
             </text>
             {v ? (
-              <text x={VO[0] - 14} y={VO[1] - v * VU + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+              <text x={VO[0] - 14} y={VO[1] - v * VU + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
                 {v}
               </text>
             ) : null}
@@ -307,14 +307,14 @@ export const BlendScene: React.FC = () => {
         const pos = i === 0 ? { left: vx + 22, top: vy - 54 } : i === 1 ? { left: vx + 20, top: vy - 16 } : { left: vx + 16, top: vy + 8 };
         const at = pair(VALUES[i]);
         return (
-          <div key={t} style={{ position: "absolute", ...pos, opacity: ease(frame, valuesAt + i * 3, 10), ...label(21, VALUE_INK), whiteSpace: "nowrap", ...halo }}>
+          <div key={t} style={{ position: "absolute", ...pos, opacity: ease(frame, valuesAt + i * 3, 10), ...label(24, VALUE_INK), whiteSpace: "nowrap", ...halo }}>
             value of <Mono>{t}</Mono>
             {i === 0 ? <br /> : " "}
             {at}
           </div>
         );
       })}
-      <div style={{ position: "absolute", left: ox + 26, top: oy - 58, opacity: point, ...label(22, POINT_INK), whiteSpace: "nowrap", ...halo }}>
+      <div style={{ position: "absolute", left: ox + 26, top: oy - 58, opacity: point, ...label(24, POINT_INK), whiteSpace: "nowrap", ...halo }}>
         new vector for <Mono>it</Mono>
       </div>
     </AbsoluteFill>

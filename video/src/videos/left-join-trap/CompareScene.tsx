@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
+import { body, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -72,7 +72,7 @@ export const CompareScene: React.FC = () => {
     {
       title: (
         <>
-          Plus <Mono weight={600}>{filterOf(SQL_LINES.where)}</Mono>
+          Plus <Mono weight={500}>{filterOf(SQL_LINES.where)}</Mono>
         </>
       ),
       rows: WHERE.rows,
@@ -83,7 +83,7 @@ export const CompareScene: React.FC = () => {
     {
       title: (
         <>
-          Plus <Mono weight={600}>{filterOf(SQL_LINES.on)}</Mono> in <Mono weight={600}>ON</Mono>
+          Plus <Mono weight={500}>{filterOf(SQL_LINES.on)}</Mono> in <Mono weight={500}>ON</Mono>
         </>
       ),
       rows: ON.rows,
@@ -105,7 +105,7 @@ export const CompareScene: React.FC = () => {
         <Ink
           at={answersAt - 2}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           three answers.
         </Ink>
@@ -120,7 +120,7 @@ export const CompareScene: React.FC = () => {
         return (
           <React.Fragment key={i}>
             <Ink at={t.at - 2} dur={14} style={{ left: x + 14, top: y(TITLE_TOP), whiteSpace: "nowrap" }}>
-              <span style={{ ...label(22, INK), fontWeight: 560 }}>{t.title}</span>
+              <span style={{ ...label(24, INK), fontWeight: 500 }}>{t.title}</span>
             </Ink>
             <Table
               x={x}
@@ -138,7 +138,7 @@ export const CompareScene: React.FC = () => {
               <span
                 style={{
                   fontFamily: MONO,
-                  fontSize: 21,
+                  fontSize: 24,
                   color: count > 0.5 ? INK : INK_SOFT,
                   whiteSpace: "nowrap",
                   padding: "2px 0.4em",
@@ -197,7 +197,7 @@ export const CompareScene: React.FC = () => {
                 }}
               />
             </span>
-            <span style={{ ...body(26, true), color: LOST_INK, whiteSpace: "nowrap" }}>vanished</span>
+            <span style={{ ...body(28, true), color: LOST_INK, whiteSpace: "nowrap" }}>vanished</span>
           </div>
         );
       })}
@@ -210,9 +210,9 @@ export const CompareScene: React.FC = () => {
           <div>
             filter the right table{" "}
             <Underline at={inOnAt - 2} color={KEPT_INK}>
-              in <Mono weight={600}>ON</Mono>
+              in <Mono weight={500}>ON</Mono>
             </Underline>
-            , not in <Mono weight={600}>WHERE</Mono>.
+            , not in <Mono weight={500}>WHERE</Mono>.
           </div>
         </div>
       </Ink>

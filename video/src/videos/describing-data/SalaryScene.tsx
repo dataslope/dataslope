@@ -136,7 +136,7 @@ export const SalaryScene: React.FC = () => {
           at={leapsAt - 2}
           dur={18}
           out={middleFrom - 6}
-          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}
         >
           and the mean leaps.
         </Ink>

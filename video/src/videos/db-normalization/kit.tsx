@@ -109,8 +109,8 @@ export const tokenize = (line: string): Token[] => {
     if (comment) out.push({ text, color: TOKEN_INK.comment });
     else if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
-    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 600 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
+    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -278,14 +278,14 @@ export const Fig: React.FC<{ n: string; at: number; out?: number; x?: number; y:
   children,
 }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
-    <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>Fig. {n}</span>
+    <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 
 /** Code set inside running text or a label, at the text's own size. */
 export const Mono: React.FC<{ children: string; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 600, color }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 500, color }}>{children}</span>
 );
 
 // ── The headline ─────────────────────────────────────────────────────────────
@@ -311,7 +311,7 @@ export const Headline: React.FC<{
   return (
     <>
       <Ink at={at - 4} dur={14} out={out} style={{ left: X0 + 2, top: y(KICKER_Y) }}>
-        <span style={label(22, INK_SOFT)}>{kicker}</span>
+        <span style={label(24, INK_SOFT)}>{kicker}</span>
       </Ink>
       <div
         style={{
@@ -327,7 +327,7 @@ export const Headline: React.FC<{
         <Ink at={at} dur={22} out={out} style={{ position: "relative" }}>
           {lead}
         </Ink>
-        <Ink at={turnAt ?? at + 4} dur={20} out={out} style={{ position: "relative", ...headline(size, true), color: ACCENT_INK }}>
+        <Ink at={turnAt ?? at + 4} dur={20} out={out} style={{ position: "relative", ...headline(size, true), color: INK }}>
           <span style={{ position: "relative" }}>
             {turn}
             <svg
@@ -362,7 +362,7 @@ export const Headline: React.FC<{
 // ── The database table ───────────────────────────────────────────────────────
 
 /** Column titles and values: JetBrains Mono, as a SQL client sets them. */
-export const HEAD_SIZE = 22;
+export const HEAD_SIZE = 24;
 export const BODY_SIZE = 26;
 /** Room on each side of a cell's text, in px. */
 const PAD = 20;
@@ -582,7 +582,7 @@ export const DbTable: React.FC<{
         {cols.map((c, j) => (
           <div
             key={c}
-            style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: INK_SOFT }}
+            style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 500, color: INK_SOFT }}
           >
             {c}
           </div>
@@ -713,7 +713,7 @@ export const ErrorBox: React.FC<{
         background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
         padding: "16px 22px 18px",
         fontFamily: MONO,
-        fontSize: 21,
+        fontSize: 24,
         lineHeight: 1.5,
         whiteSpace: "pre-wrap",
         color: INK,
@@ -723,13 +723,13 @@ export const ErrorBox: React.FC<{
       }}
     >
       <div>
-        <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
+        <span style={{ color: ACCENT_INK, fontWeight: 500 }}>ERROR:</span>
         {"  "}
         <Unbroken text={message} />
       </div>
       {detail ? (
         <div style={{ color: INK_SOFT }}>
-          <span style={{ fontWeight: 600 }}>DETAIL:</span>
+          <span style={{ fontWeight: 500 }}>DETAIL:</span>
           {"  "}
           <Unbroken text={detail} />
         </div>

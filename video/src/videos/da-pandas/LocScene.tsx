@@ -142,7 +142,7 @@ export const LocScene: React.FC = () => {
         {/* ── A slice: loc keeps its end label, iloc stops before its end ── */}
         <Listing lines={LOC.locSlice.lines} x={LIST_X} top={y(TOP)} width={SLICE_W} size={SIZE} at={locSliceAt - 4} out={northAt - 2} />
         <Note at={threeRowsAt - 2} x={LIST_X + SLICE_W + 24} y={y(TOP) + h(14)} out={northAt - 2}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap", fontWeight: 650 }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", fontWeight: 500 }}>
             <Num>{LOC.locSlice.rows.length}</Num> rows
           </span>
         </Note>
@@ -151,7 +151,7 @@ export const LocScene: React.FC = () => {
         </Note>
         <Listing lines={LOC.ilocSlice.lines} x={LIST_X} top={secondY} width={SLICE_W} size={SIZE} at={ilocSliceAt - 4} out={northAt - 2} />
         <Note at={twoRowsAt - 2} x={LIST_X + SLICE_W + 24} y={secondY + h(14)} out={northAt - 2}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap", fontWeight: 650 }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", fontWeight: 500 }}>
             <Num>{LOC.ilocSlice.rows.length}</Num> rows
           </span>
         </Note>

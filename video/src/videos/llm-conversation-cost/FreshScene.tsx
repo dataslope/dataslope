@@ -151,7 +151,7 @@ export const FreshScene: React.FC = () => {
         width={400}
         style={{ textAlign: "center" }}
       >
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the middle, recalled less well</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the middle, recalled less well</span>
       </Note>
 
       {/* Eight chats of five turns, each starting over. */}
@@ -191,10 +191,10 @@ export const FreshScene: React.FC = () => {
 
       {/* The bills: a column without a cache, then one with it. */}
       <Note at={withoutAt - 2} x={COLS[0]} y={long.base - 112}>
-        <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>no cache</span>
+        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>no cache</span>
       </Note>
       <Note at={withAt - 2} x={COLS[1]} y={long.base - 112}>
-        <span style={{ ...label(22, CACHED_INK), whiteSpace: "nowrap" }}>with the cache</span>
+        <span style={{ ...label(24, CACHED_INK), whiteSpace: "nowrap" }}>with the cache</span>
       </Note>
       {bill(FRESH.one, dollarAt - 4, false, long.base, 0)}
       {bill(FRESH.eight, fortyTwoAt - 4, false, short.base, 0)}
@@ -203,8 +203,8 @@ export const FreshScene: React.FC = () => {
       {/* With the gap nearly closed, what is left is the other half of the
           lesson's "a cost decision as well as an accuracy one". */}
       <Note at={accuracyAt - 2} x={COLS[0]} y={long.base + 40} width={360}>
-        <span style={{ display: "block", ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the bigger reason left:</span>
-        <span style={{ display: "block", ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>accuracy</span>
+        <span style={{ display: "block", ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the bigger reason left:</span>
+        <span style={{ display: "block", ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>accuracy</span>
       </Note>
 
       {/* The takeaway. */}

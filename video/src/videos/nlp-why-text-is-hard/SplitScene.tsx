@@ -138,7 +138,7 @@ export const SplitScene: React.FC = () => {
 
         {/* ── Row A: split() ── */}
         <Ink at={splitAt - 4} dur={14} style={{ left: X0, top: aTop + 8, whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: MONO, fontSize: 24, color: INK, fontWeight: 600 }}>.split()</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, color: INK, fontWeight: 500 }}>.split()</span>
         </Ink>
         <Count value={SPLIT.pieces.length} unit="pieces" at={eightAt - 2} x={1800} y={aTop + 6} align="right" />
         {COLS.map((c, i) => (
@@ -163,7 +163,7 @@ export const SplitScene: React.FC = () => {
         ))}
         {/* "hiding its not" */}
         <Ink at={hidingAt} dur={12} out={tokFrom} style={{ left: pieceX(P("can't")), top: aTop + ch + 12, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(26, true), color: BAD_INK }}>the not is hidden</span>
+          <span style={{ ...body(28, true), color: BAD_INK }}>the not is hidden</span>
         </Ink>
         {/* "a different word from plain butter" */}
         {aside > 0 ? (
@@ -183,17 +183,17 @@ export const SplitScene: React.FC = () => {
             }}
           >
             <span>
-              butter<span style={{ color: BAD_INK, fontWeight: 700 }}>,</span>
+              butter<span style={{ color: BAD_INK, fontWeight: 500 }}>,</span>
             </span>
-            <span style={{ ...label(22, INK_SOFT) }}>and</span>
+            <span style={{ ...label(24, INK_SOFT) }}>and</span>
             <span>butter</span>
-            <span style={{ ...body(26, true), color: BAD_INK }}>two different words</span>
+            <span style={{ ...body(28, true), color: BAD_INK }}>two different words</span>
           </div>
         ) : null}
 
         {/* ── Row B: word_tokenize() ── */}
         <Ink at={tokenizerAt - 4} dur={14} style={{ left: X0, top: bTop + 8, whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: MONO, fontSize: 24, color: INK, fontWeight: 600 }}>word_tokenize()</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, color: INK, fontWeight: 500 }}>word_tokenize()</span>
         </Ink>
         <Count value={SPLIT.tokens.length} unit="tokens" at={twelveAt - 2} x={1800} y={bTop + 6} align="right" />
         <Svg>

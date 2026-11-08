@@ -248,7 +248,7 @@ export const HomeScene: React.FC = () => {
 
         {/* The wide view, computed when it is asked for. */}
         <Ink at={joinAt - 6} dur={14} style={{ left: jg.x, top: jg.top - 44, whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>orders joined to customers and products</span>
+          <span style={label(24, INK_SOFT)}>orders joined to customers and products</span>
         </Ink>
         <DbTable
           g={jg}
@@ -258,14 +258,14 @@ export const HomeScene: React.FC = () => {
           numeric={[0, 4]}
         />
         <Note at={anyAt} x={jg.x + jg.width + 40} y={jg.rowMid(0) - 16}>
-          <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Rebuilt by a join,</div>
-          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>stored nowhere.</div>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Rebuilt by a join,</div>
+          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>stored nowhere.</div>
         </Note>
 
         {/* The path the normal forms take, starting with one cell: the
             names only, since only the first is explained here. */}
         <Ink at={formsAt - 2} dur={14} style={{ left: X0, top: y(LADDER_Y) - 40, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>The normal forms</span>
+          <span style={label(24, INK_SOFT)}>The normal forms</span>
         </Ink>
         <div style={{ position: "absolute", left: X0 - 12, top: y(LADDER_Y), display: "flex", alignItems: "center", gap: 16 }}>
           {LADDER.map((name, k) => (
@@ -296,7 +296,7 @@ const Step: React.FC<{ name: string; litAt?: number }> = ({ name, litAt }) => {
     // Plain until it is lit, then a blue house badge: the tint fades in.
     <span
       style={{
-        ...label(26),
+        ...label(28),
         ...STEP_BADGE,
         position: "relative",
         background: `color-mix(in srgb, ${STEP_BADGE.background} ${Math.round(lit * 100)}%, transparent)`,
@@ -305,7 +305,7 @@ const Step: React.FC<{ name: string; litAt?: number }> = ({ name, litAt }) => {
     >
       {name}
       {litAt !== undefined ? (
-        <span style={{ position: "absolute", left: 14, top: "100%", marginTop: 10, fontWeight: 400, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: lit }}>
+        <span style={{ position: "absolute", left: 14, top: "100%", marginTop: 10, fontWeight: 400, ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: lit }}>
           one value per cell
         </span>
       ) : null}
@@ -333,7 +333,7 @@ const HomeBracket: React.FC<{ name: string; x0: number; x1: number; y: number; a
         />
       </Svg>
       <Ink at={at + 4} dur={12} style={{ left: x0, top: y - 40, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, BLUE_INK) }}>
+        <span style={{ ...label(24, BLUE_INK) }}>
           <Mono>{name}</Mono>
         </span>
       </Ink>

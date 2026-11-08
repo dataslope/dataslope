@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { SERIF } from "../../editorial/fonts";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note, SERIF_ITALIC, TABULAR } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -64,10 +64,10 @@ const Bar: React.FC<{ x: number; base: number; height: number; at: number; color
   return (
     <>
       <div style={{ position: "absolute", left: x, top: base - height * p, width: BARS.w, height: height * p, background: color, borderRadius: "4px 4px 0 0", opacity: 0.88 }} />
-      <div style={{ position: "absolute", left: x - 40, width: BARS.w + 80, top: base - height * p - 40, textAlign: "center", ...note(28, ink), fontWeight: 700, ...TABULAR, opacity: ease(frame, from + 8, 10) }}>
+      <div style={{ position: "absolute", left: x - 40, width: BARS.w + 80, top: base - height * p - 40, textAlign: "center", ...note(28, ink), fontWeight: 500, ...TABULAR, opacity: ease(frame, from + 8, 10) }}>
         {value}
       </div>
-      <div style={{ position: "absolute", left: x - 40, width: BARS.w + 80, top: base + 10, textAlign: "center", ...label(21, INK_SOFT), opacity: p }}>{name}</div>
+      <div style={{ position: "absolute", left: x - 40, width: BARS.w + 80, top: base + 10, textAlign: "center", ...label(24, INK_SOFT), opacity: p }}>{name}</div>
     </>
   );
 };
@@ -160,10 +160,10 @@ export const LeadScene: React.FC = () => {
           <Line xs={xs} ys={ys} values={LEAD.lagging} upTo={lagUp} color={WARM} />
         </Svg>
         <Note at={leadDefAt + 10} x={at(xs, 8)} y={at(ys, 0.36) - h(50)} out={out3}>
-          <span style={{ ...label(22, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>week-one cooking</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>week-one cooking</span>
         </Note>
         <Note at={lagDefAt + 10} x={at(xs, 6)} y={at(ys, 0.255)} out={out3}>
-          <span style={{ ...label(22, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>month-three retention</span>
+          <span style={{ ...label(24, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>month-three retention</span>
         </Note>
         <VLine
           x={at(xs, change)}
@@ -174,11 +174,11 @@ export const LeadScene: React.FC = () => {
           color={INK}
           dash="7 6"
           width={2}
-          label={<span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>onboarding change</span>}
+          label={<span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>onboarding change</span>}
           labelY={y(CHART.top) - h(44)}
         />
         <Bracket x0={at(xs, dropLead)} x1={at(xs, dropLag)} y={at(ys, 0.334)} at={lagDropAt + 10} out={out3} color={INK}>
-          <span style={{ ...label(22, INK), fontWeight: 700 }}>
+          <span style={{ ...label(24, INK), fontWeight: 500 }}>
             <span style={TABULAR}>{LEAD.lagWeeks}</span> weeks later
             <span style={{ color: ACCENT_INK, opacity: ease(frame, lateAt, 10) }}>, too late to act</span>
           </span>
@@ -204,17 +204,17 @@ export const LeadScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>retention at month three</span>
         </Note>
         <Note at={steerAt} x={SIDE_X} y={y(590)} out={out3}>
-          <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={steerAt + 6} out={causesAt}>
               steer by the leading line
             </Mark>
           </span>
         </Note>
         <Note at={causesAt} x={SIDE_X} y={y(642)} out={out3}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>if it causes the outcome,</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>if it causes the outcome,</span>
         </Note>
         <Note at={corrAt} x={SIDE_X} y={y(684)} out={out3}>
-          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>not just correlates with it</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>not just correlates with it</span>
         </Note>
 
         {/* ── Question 4: Goodhart's law, cleared on the bridge ── */}
@@ -223,24 +223,24 @@ export const LeadScene: React.FC = () => {
             What is Goodhart&apos;s law?
           </QuestionCard>
           <Note at={lawAt - 2} x={X0} y={y(300)}>
-            <span style={{ fontFamily: SERIF, fontSize: 40, fontStyle: "italic", color: INK, whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: SERIF, fontSize: 40, fontStyle: SERIF_ITALIC, color: INK, whiteSpace: "nowrap" }}>
               When a measure becomes a target,{" "}
               <span style={{ opacity: ease(frame, stopsAt - 2, 12) }}>it stops being a good measure.</span>
             </span>
           </Note>
           <Note at={rewardAt} x={X0} y={y(380)}>
-            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>
               reward closing tickets fast
               <span style={{ opacity: ease(frame, earlyAt, 10) }}>, and some close before it&apos;s solved</span>
             </span>
           </Note>
           <Note at={closeAt - 2} x={X0} y={y(BARS.top) - h(96)}>
-            <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>median time to close</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>median time to close</span>
           </Note>
           <Bar x={X0 + 30} base={base} height={GOODHART.closeHoursWas * hourScale} at={closeAt} color={DATA} value={`${GOODHART.closeHoursWas} h`} name="before" ink={BLUE_INK} />
           <Bar x={X0 + 210} base={base} height={GOODHART.closeHoursNow * hourScale} at={threeAt - 2} color={DATA} value={`${GOODHART.closeHoursNow} h`} name="after" ink={BLUE_INK} />
           <Note at={reopenAt - 2} x={760} y={y(BARS.top) - h(96)}>
-            <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={handsAt} color={`color-mix(in srgb, ${ACCENT} 22%, transparent)`}>
                 tickets reopened
               </Mark>
@@ -249,10 +249,10 @@ export const LeadScene: React.FC = () => {
           <Bar x={790} base={base} height={GOODHART.reopenWas * pctScale} at={reopenAt} color={ACCENT} value={`${GOODHART.reopenWas}%`} name="before" ink={ACCENT_INK} />
           <Bar x={970} base={base} height={GOODHART.reopenNow * pctScale} at={fifteenAt - 2} color={ACCENT} value={`${GOODHART.reopenNow}%`} name="after" ink={ACCENT_INK} />
           <Note at={counterAt} x={1210} y={y(BARS.top) + h(40)}>
-            <span style={{ ...note(30, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>← the counter-metric</span>
+            <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>← the counter-metric</span>
           </Note>
           <Note at={counterAt + 6} x={1210} y={y(BARS.top) + h(90)}>
-            <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>that catches it</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>that catches it</span>
           </Note>
           <Note at={closeAt} x={X0} y={base + h(56)}>
             <span style={madeUp()}>made up for this video</span>

@@ -113,7 +113,7 @@ export const PipelineScene: React.FC = () => {
 
         {/* The raw string. */}
         <Ink at={outputAt - 6} dur={14} style={{ left: X0, top: y(RAW_Y) + 4, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, INK_SOFT) }}>raw text</span>
+          <span style={{ ...label(24, INK_SOFT) }}>raw text</span>
         </Ink>
         <Ink at={outputAt - 2} dur={20} style={{ left: COL_X0, top: y(RAW_Y), whiteSpace: "pre" }}>
           <span style={{ fontFamily: MONO, fontSize: 24, color: INK }}>"{PIPE.text}"</span>
@@ -149,7 +149,7 @@ export const PipelineScene: React.FC = () => {
         {PIPE.stages.map((s, k) => (
           <React.Fragment key={s.name}>
             <Ink at={labelAt[k]} dur={14} style={{ left: X0, top: rowY(k) + 6, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(22, INK), fontWeight: 600 }}>
+              <span style={{ ...label(24, INK), fontWeight: 500 }}>
                 <Mark at={choosingAt + k * 3} out={hardAt + 30}>
                   {STAGE_LABELS[k]}
                 </Mark>
@@ -197,7 +197,7 @@ export const PipelineScene: React.FC = () => {
         {/* Step 2 as the lesson writes it. */}
         <CodeStrip line="tokens = [t.lower() for t in tokens]" x={X0} y={y(CODE_Y)} at={comprehensionAt - 6} size={26} />
         <Ink at={easyAt - 4} dur={14} style={{ left: X0 + 640, top: y(CODE_Y) + 12, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(30, true), color: INK_SOFT }}>step 2, as one line of Python</span>
+          <span style={{ ...body(28, true), color: INK_SOFT }}>step 2, as one line of Python</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

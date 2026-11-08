@@ -5,11 +5,12 @@ import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { BAR, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
+import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
- * The SQL listing, DuckDB's error box and the result tables are the Data
+ * The SQL listing, the engine's error box and the result tables are the Data
  * Analyst SQL videos' (da-sql/parts.tsx, and the column, geometry and frame
  * helpers from da-advanced-sql/parts.tsx), re-exported the way
  * ds-sql/parts.tsx does, so the three series' SQL videos look like one
@@ -44,6 +45,9 @@ export {
 } from "../da-sql/parts";
 export { colsOf, geoOf, RowBracket, rowsAt, type FrameStep } from "../da-advanced-sql/parts";
 
+/** The border a yellow-marked (MARK) day cell takes while its tint is on. */
+export const MARK_EDGE = ds("yellow", 600);
+
 /**
  * Code inside a line of type, at 0.92em of the line (never under 19px), so it
  * stays within the 12% a line's sizes may differ by (README, "One line, one
@@ -57,7 +61,7 @@ export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?
       fontFamily: MONO,
       fontSize: "max(19px, 0.92em)",
       fontStyle: "normal",
-      fontWeight: weight ?? 600,
+      fontWeight: weight ?? 500,
       color,
       fontVariantLigatures: "none",
       wordSpacing: "-0.3em",
@@ -131,7 +135,9 @@ export type StripDay = {
 /** Text that replaces a cell's own on a cue: a missing day's null, then 0. */
 export type StripFill = { index: number; at: number; text: string; color: string; italic?: boolean };
 /** A tint over a cell, on a cue (MARK, MARK_BAD, MARK_OK). */
-export type StripMark = { index: number; at: number; out?: number; color: string };
+/** A tint on one cell. `edge` turns the cell's border to that color while
+ *  the tint is on (a green fill takes a green border, not the strip's blue). */
+export type StripMark = { index: number; at: number; out?: number; color: string; edge?: string };
 /** A span of days, drawn as a bracket under the strip with its label below. */
 export type StripSpan = { from: number; to: number; at: number; out?: number; color: string; ink?: string; label: React.ReactNode };
 
@@ -188,7 +194,12 @@ export const DayStrip: React.FC<{
         const fill = [...fills].filter((f) => f.index === i && frame >= f.at).pop();
         const fillP = fill ? ease(frame, fill.at, 10) : 0;
         const filled = d.present ? 1 : solid;
-        const tints = marks.filter((m) => m.index === i);
+        const tints = marks
+          .filter((m) => m.index === i)
+          .map((m) => ({ m, w: ease(frame, m.at, 12) * (m.out === undefined ? 1 : 1 - ease(frame, m.out, 10)) }));
+        const baseEdge = d.present || solid > 0.5 ? BAR : INK_SOFT;
+        const edged = tints.filter((t) => t.m.edge && t.w > 0).pop();
+        const edge = edged ? `color-mix(in srgb, ${edged.m.edge} ${Math.round(edged.w * 100)}%, ${baseEdge})` : baseEdge;
         return (
           <React.Fragment key={d.date}>
             <div
@@ -200,17 +211,16 @@ export const DayStrip: React.FC<{
                 height: g.cellH,
                 boxSizing: "border-box",
                 borderRadius: 8,
-                border: `2.5px ${d.present || solid > 0.5 ? "solid" : "dashed"} ${d.present || solid > 0.5 ? BAR : INK_SOFT}`,
+                border: `2.5px ${d.present || solid > 0.5 ? "solid" : "dashed"} ${edge}`,
                 background: `color-mix(in srgb, ${BAR} ${18 * filled}%, ${PAPER})`,
                 opacity: p,
                 transform: `scale(${0.85 + 0.15 * p})`,
                 overflow: "hidden",
               }}
             >
-              {tints.map((m, k) => {
-                const w = ease(frame, m.at, 12) * (m.out === undefined ? 1 : 1 - ease(frame, m.out, 10));
-                return w > 0 ? <div key={k} style={{ position: "absolute", inset: 0, background: m.color, opacity: w }} /> : null;
-              })}
+              {tints.map(({ m, w }, k) =>
+                w > 0 ? <div key={k} style={{ position: "absolute", inset: 0, background: m.color, opacity: w }} /> : null,
+              )}
               {d.value !== undefined && !fill ? <CellText text={d.value} size={valueSize} color={INK} /> : null}
               {fill ? (
                 <div style={{ position: "absolute", inset: 0, opacity: fillP }}>
@@ -225,7 +235,7 @@ export const DayStrip: React.FC<{
                 top: g.top + g.cellH + h(8),
                 width: g.cell,
                 textAlign: "center",
-                ...label(20, INK_SOFT),
+                ...label(24, INK_SOFT),
                 fontVariantNumeric: "tabular-nums",
                 opacity: p,
               }}
@@ -253,7 +263,7 @@ const CellText: React.FC<{ text: string; size: number; color: string; italic?: b
       justifyContent: "center",
       fontFamily: MONO,
       fontSize: size,
-      fontWeight: 600,
+      fontWeight: 500,
       fontStyle: italic ? "italic" : undefined,
       color,
       fontVariantLigatures: "none",
@@ -289,7 +299,7 @@ const Span: React.FC<{ g: StripGeometry; span: StripSpan }> = ({ g, span }) => {
         />
       </svg>
       <Ink at={span.at + 6} dur={12} style={{ left: x0, top: y + h(10), width: x1 - x0, textAlign: "center", whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, span.ink ?? INK), fontWeight: 650 }}>{span.label}</span>
+        <span style={{ ...note(24, span.ink ?? INK), fontWeight: 500 }}>{span.label}</span>
       </Ink>
     </div>
   );

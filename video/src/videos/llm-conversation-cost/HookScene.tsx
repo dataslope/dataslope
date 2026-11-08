@@ -62,10 +62,10 @@ export const HookScene: React.FC = () => {
 
       {/* Column heads. */}
       <Note at={chatAt - 6} x={TILE_X} y={y(400)}>
-        <span style={label(22, INK_SOFT)}>The chat, one block a turn</span>
+        <span style={label(24, INK_SOFT)}>The chat, one block a turn</span>
       </Note>
       <Note at={billAt - 6} x={BILL_X} y={y(400)}>
-        <span style={label(22, INK_SOFT)}>Its bill</span>
+        <span style={label(24, INK_SOFT)}>Its bill</span>
       </Note>
 
       {ROWS.map((turns, k) => {
@@ -73,7 +73,7 @@ export const HookScene: React.FC = () => {
         return (
           <React.Fragment key={turns}>
             <Note at={tilesAt[k] - 2} x={X0} y={top + h(ROW_H) / 2 - 18}>
-              <span style={{ ...note(28, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{turns} turns</span>
+              <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{turns} turns</span>
             </Note>
             {/* One block a turn, laid down left to right. */}
             {Array.from({ length: turns }, (_, i) => {
@@ -99,7 +99,7 @@ export const HookScene: React.FC = () => {
             })}
             <HBar x={BILL_X} y={top} w={billFor(turns).plain * PX} h={h(ROW_H)} at={barAt[k]} dur={k ? 22 : 14} fill={COST} />
             <Note at={barAt[k] + (k ? 16 : 10)} x={BILL_X + billFor(turns).plain * PX + 16} y={top + h(ROW_H) / 2 - 18}>
-              <span style={{ ...note(28, INK), fontWeight: 650, ...TABULAR }}>{usd(billFor(turns).plain)}</span>
+              <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR }}>{usd(billFor(turns).plain)}</span>
             </Note>
           </React.Fragment>
         );
@@ -122,11 +122,11 @@ export const HookScene: React.FC = () => {
       {/* Where a doubled bill would stop, and the part past it. */}
       <HBar x={BILL_X} y={rowY(1)} w={ghostW} h={h(ROW_H)} at={doubleAt - 6} dur={12} fill="transparent" outline={PAPER} dashed />
       <Note at={doubleAt - 2} x={BILL_X + ghostW} y={rowY(1) + h(ROW_H) + 10} align="right">
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>if it just doubled</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>if it just doubled</span>
       </Note>
       <Bracket x0={BILL_X + ghostW + 2} x1={BILL_X + realW} y={rowY(1) - 20} at={doubleAt + 6} color={POINT} tick={10} />
       <Note at={doubleAt + 10} x={(BILL_X + ghostW + BILL_X + realW) / 2 - 8} y={rowY(1) - 62} from="up">
-        <span style={{ ...note(30, POINT_INK), fontWeight: 700 }}>?</span>
+        <span style={{ ...note(28, POINT_INK), fontWeight: 500 }}>?</span>
       </Note>
     </AbsoluteFill>
   );

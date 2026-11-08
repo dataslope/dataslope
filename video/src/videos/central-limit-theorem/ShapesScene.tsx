@@ -165,7 +165,7 @@ export const ShapesScene: React.FC = () => {
       <FigLabel n={fig(3)} title="Three populations, each averaged thirty at a time" at={open} x={120} y={y(LABEL_Y)} />
       {/* The legend for the curves, at the right end of the label row. */}
       <Note at={sameAt + 12} x={1780} y={y(LABEL_Y) + 2} align="right" from="right">
-        <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 12 }}>
+        <span style={{ ...note(24, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 12 }}>
           <svg width={36} height={10} style={{ overflow: "visible" }}>
             <line x1={2} x2={34} y1={5} y2={5} stroke={INK} strokeWidth={2.4} strokeLinecap="round" />
           </svg>
@@ -188,7 +188,7 @@ export const ShapesScene: React.FC = () => {
                 <span style={{ ...headline(46), color: ACCENT_INK }}>{c.letter}</span>
                 <span style={headline(46)}>{c.title}</span>
               </div>
-              <div style={{ ...body(26, true), marginTop: 6 }}>{c.sub}</div>
+              <div style={{ ...body(28, true), marginTop: 6 }}>{c.sub}</div>
             </Ink>
             <Bars
               counts={c.popCounts}
@@ -207,14 +207,14 @@ export const ShapesScene: React.FC = () => {
             <Ink at={mAt - 6} dur={14} style={{ left: colX(i), top: y(STEP_Y) - 8, width: COL_W }}>
               <div style={{ height: 1, background: HAIRLINE, marginBottom: 28 }} />
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={label(19, INK_SOFT)}>↓ Averages of 30</span>
-                <span style={note(20, INK_SOFT)}>
+                <span style={label(24, INK_SOFT)}>↓ Averages of 30</span>
+                <span style={note(24, INK_SOFT)}>
                   spread <b style={{ color: ACCENT_INK }}>{fmt(c.simSpread)}</b>
                 </span>
               </div>
               {/* Each pile fills its panel: say how far it is magnified, so
                   its width is not read against the population's. */}
-              <div style={{ ...note(19, INK_SOFT), marginTop: 2 }}>axis zoomed in {fmt(c.zoom, 1)}×</div>
+              <div style={{ ...note(24, INK_SOFT), marginTop: 2 }}>axis zoomed in {fmt(c.zoom, 1)}×</div>
             </Ink>
             <Bars
               counts={c.mCounts}

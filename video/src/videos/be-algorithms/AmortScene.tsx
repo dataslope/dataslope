@@ -81,7 +81,7 @@ export const AmortScene: React.FC = () => {
   const count = ease(frame, addAt + 4, 24);
   const perAppend = AMORTIZED.copiesPerAppend * count;
   const at = AMORTIZED.copiesPerAppendAt;
-  const tick = svgText({ fontFamily: SANS, fontSize: 20, fontWeight: 500, color: INK_SOFT, ...TABULAR });
+  const tick = svgText({ fontFamily: SANS, fontSize: 24, fontWeight: 500, color: INK_SOFT, ...TABULAR });
 
   return (
     <AbsoluteFill>
@@ -102,7 +102,7 @@ export const AmortScene: React.FC = () => {
         </Line>
 
         {/* The chart. */}
-        <Line at={appendAt} x={CX0} y={top - 64} size={22} weight={650}>
+        <Line at={appendAt} x={CX0} y={top - 64} size={22} weight={500}>
           A Python list, a million appends: slots allocated
         </Line>
         <Svg opacity={ease(frame, appendAt, 12)}>
@@ -126,7 +126,7 @@ export const AmortScene: React.FC = () => {
             </g>
           ))}
         </Svg>
-        <Line at={appendAt + 10} x={CX1} y={base + 56} size={20} color={INK_SOFT} weight={650} align="right" width={400}>
+        <Line at={appendAt + 10} x={CX1} y={base + 56} size={20} color={INK_SOFT} weight={500} align="right" width={400}>
           items appended
         </Line>
         <Svg>
@@ -146,29 +146,29 @@ export const AmortScene: React.FC = () => {
           {sweep > 0 && sweep < 1 ? <line x1={px(k)} x2={px(k)} y1={top - 20} y2={base} stroke={INK_SOFT} strokeWidth={1.6} strokeDasharray="4 4" /> : null}
         </Svg>
         {/* Legend, at the right end of the chart's own line. */}
-        <div style={{ position: "absolute", left: 830, top: top - 64, display: "flex", alignItems: "center", gap: 14, fontSize: 21, opacity: ease(frame, doublesAt, 12), whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: 830, top: top - 64, display: "flex", alignItems: "center", gap: 14, fontSize: 24, opacity: ease(frame, doublesAt, 12), whiteSpace: "nowrap" }}>
           <span style={{ width: 30, borderTop: `3px solid ${BAR}` }} />
-          <span style={label(21, BLUE_INK)}>list</span>
+          <span style={label(24, BLUE_INK)}>list</span>
           <span style={{ width: 30, marginLeft: 12, borderTop: `3px dashed ${INK_SOFT}` }} />
-          <span style={label(21, INK_SOFT)}>doubling</span>
+          <span style={label(24, INK_SOFT)}>doubling</span>
         </div>
 
         <VRule x={1130} top={top - 64} bottom={base + 80} at={roomAt} />
 
         {/* The counts, on the right. */}
-        <Line at={roomAt} x={RX} y={y(372)} size={28} weight={700}>
+        <Line at={roomAt} x={RX} y={y(372)} size={28} weight={500}>
           Resizes: <span style={{ ...TABULAR, color: BLUE_INK }}>{resizes}</span>
         </Line>
         <Line at={copyAt} x={RX} y={y(418)} size={24} color={INK_SOFT}>
           each one can copy every item so far
         </Line>
-        <Line at={addAt} x={RX} y={y(488)} size={28} weight={700}>
+        <Line at={addAt} x={RX} y={y(488)} size={28} weight={500}>
           Copies per append: <span style={{ ...TABULAR, color: BLUE_INK }}>{perAppend.toFixed(1)}</span>
           <span style={{ color: OK_INK, opacity: ease(frame, constAt, 10) }}> constant</span>
         </Line>
-        <div style={{ position: "absolute", left: RX, top: y(536), display: "flex", gap: 28, fontSize: 22, whiteSpace: "nowrap", opacity: ease(frame, anyAt, 10) }}>
+        <div style={{ position: "absolute", left: RX, top: y(536), display: "flex", gap: 28, fontSize: 24, whiteSpace: "nowrap", opacity: ease(frame, anyAt, 10) }}>
           {(["1000", "1000000", "2000000"] as const).map((len) => (
-            <span key={len} style={note(22, INK_SOFT)}>
+            <span key={len} style={note(24, INK_SOFT)}>
               at <Num>{int(Number(len))}</Num>: <b style={{ color: INK }}><Num>{at[len].toFixed(1)}</Num></b>
             </span>
           ))}
@@ -188,15 +188,15 @@ export const AmortScene: React.FC = () => {
         <Line at={fixedAt} x={RX} y={y(692)} size={24} color={INK_SOFT}>
           Any fixed factor stays O(1); so does a rehash
         </Line>
-        <Line at={promiseAt} x={RX} y={y(762)} size={24} weight={600}>
+        <Line at={promiseAt} x={RX} y={y(762)} size={24} weight={500}>
           An average, not a promise per call:
         </Line>
-        <Line at={lastAt} x={RX} y={y(806)} size={24} weight={600}>
+        <Line at={lastAt} x={RX} y={y(806)} size={24} weight={500}>
           <Mark at={copiesAt}>
             one append copies <Num>{int(lastItems)}</Num>
           </Mark>
         </Line>
-        <Line at={budgetAt} x={RX} y={y(850)} size={24} weight={700} color={OK_INK}>
+        <Line at={budgetAt} x={RX} y={y(850)} size={24} weight={500} color={OK_INK}>
           On a latency budget, allocate up front
         </Line>
         <Line at={appendAt + 30} x={CX0} y={base + 56} size={20} color={INK_SOFT} weight={500}>

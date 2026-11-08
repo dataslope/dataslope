@@ -96,7 +96,7 @@ export const SizeScene: React.FC = () => {
 
         {/* The four inputs, and where each comes from. */}
         <Note at={inputsAt - 2} x={X0} y={y(282)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>four inputs</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>four inputs</span>
         </Note>
         {inputs.map((c, i) => {
           const p = ease(frame, inputAts[i] - 2, 10);
@@ -108,7 +108,7 @@ export const SizeScene: React.FC = () => {
                   data, gray when it is a choice. */}
               <div
                 style={{
-                  ...note(23),
+                  ...note(24),
                   ...badgeStyle(c.data ? "blue" : "gray", 23),
                   position: "absolute",
                   left: lefts[i],
@@ -123,10 +123,10 @@ export const SizeScene: React.FC = () => {
                 {c.name}
               </div>
               <Note at={c.valueAt} x={lefts[i]} y={y(372)} width={widths[i]} style={{ textAlign: "center" }}>
-                <span style={{ ...note(30, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{c.value}</span>
+                <span style={{ ...note(28, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{c.value}</span>
               </Note>
               <Note at={tagAt} x={lefts[i]} y={y(418)} width={widths[i]} style={{ textAlign: "center" }}>
-                <span style={{ ...label(20, c.data ? BLUE_INK : INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
+                <span style={{ ...label(24, c.data ? BLUE_INK : INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
                   {c.data ? "from data" : "a choice"}
                 </span>
               </Note>
@@ -162,11 +162,11 @@ export const SizeScene: React.FC = () => {
 
         {/* The formula, its terms as the narration names them, and its two answers. */}
         <Note at={formulaAt} x={COL_X} y={y(486)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>the page&apos;s formula</span>
-          <div style={{ ...note(27, INK), fontWeight: 600, marginTop: 6, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>the page&apos;s formula</span>
+          <div style={{ ...note(28, INK), fontWeight: 500, marginTop: 6, whiteSpace: "nowrap" }}>
             n = (z<sub style={SUB}>α/2</sub> + z<sub style={SUB}>β</sub>)² · <Mark at={varianceAt - 2}>2p(1 − p)</Mark> / MDE²
           </div>
-          <div style={{ ...label(24, INK_SOFT), fontWeight: 600, marginTop: 14, whiteSpace: "nowrap" }}>
+          <div style={{ ...label(24, INK_SOFT), fontWeight: 500, marginTop: 14, whiteSpace: "nowrap" }}>
             <span style={{ opacity: ease(frame, zAlphaAt - 2, 10) }}>
               z<sub style={SUB}>α/2</sub> = {SIZE.zAlpha.toFixed(2)}
             </span>
@@ -179,22 +179,22 @@ export const SizeScene: React.FC = () => {
           </div>
         </Note>
         <Note at={twoAt} x={COL_X} y={y(624)}>
-          <span style={{ ...note(27, BLUE_INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, BLUE_INK), whiteSpace: "nowrap", ...TABULAR }}>
             10% → 12%: <b>{SIZE.two.toLocaleString("en-US")}</b> per arm
           </span>
         </Note>
         <Note at={oneAt} x={COL_X} y={y(672)}>
-          <span style={{ ...note(27, WARM_INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, WARM_INK), whiteSpace: "nowrap", ...TABULAR }}>
             <span style={{ opacity: ease(frame, halveAt, 8) }}>10% → 11%:</span> <b>{SIZE.one.toLocaleString("en-US")}</b> per arm
           </span>
         </Note>
         <Note at={fourAt} x={COL_X} y={y(720)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
             half the lift, <b>×{SIZE.ratio}</b> the users
           </span>
         </Note>
         <Note at={squaredAt - 2} x={COL_X} y={y(784)}>
-          <span style={{ ...note(36, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(34, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={directionAt - 6}>n ∝ 1 / MDE²</Mark>
           </span>
         </Note>

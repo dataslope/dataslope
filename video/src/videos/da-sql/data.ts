@@ -1,9 +1,8 @@
 import results from "./results.json" with { type: "json" };
 
 // Every table, statement and message the video shows, read from
-// results.json: what DuckDB v1.4.3 (DuckDB-Wasm 1.32.0, the engine the
-// page's blocks run) returned for the statements in check.mjs, which wrote
-// it. Each figure ran in a fresh database built by its own setup, and the SQL
+// results.json: what Postgres (PGlite, the engine the page's blocks run)
+// returned for the statements in check.mjs, which wrote it. Each figure ran in a fresh database built by its own setup, and the SQL
 // printed on screen is the SQL in that file, so a listing cannot drift from
 // what ran. Pure (no Remotion, no DOM).
 
@@ -42,8 +41,8 @@ const table = (figure: string, id: string): Table => {
 export type Query = { lines: string[] };
 const query = (figure: string, id: string): Query & Table => ({ lines: step(figure, id).sql.split("\n"), ...table(figure, id) });
 
-/** A statement DuckDB refused: its SQL and its error, split into the kind
- *  ("Binder Error") and the message. */
+/** A statement Postgres refused: its SQL and its error, split into the kind
+ *  ("ERROR") and the message. */
 const refused = (figure: string, id: string) => {
   const s = step(figure, id);
   if (s.ok || !s.error) throw new Error(`${figure}.${id} did not fail: ${s.sql}`);
@@ -52,8 +51,8 @@ const refused = (figure: string, id: string) => {
 };
 
 /**
- * A result whose columns DuckDB named for itself ("count_star()",
- * "avg(discount)"), headed instead with each expression as the listing above
+ * A result whose columns Postgres named for itself (three columns all
+ * "count", "round"), headed instead with each expression as the listing above
  * it writes it ("COUNT(*)"): the SELECT list, split at its top-level commas.
  */
 const asWritten = <T extends { lines: string[]; cols: string[] }>(q: T): T => {
@@ -188,7 +187,7 @@ export const RAPID = {
   emailIndex: table("rapid", "emailIndex"),
   duplicates: query("rapid", "duplicates"),
   rowNumbers: table("rapid", "rowNumbers"),
-  /** DuckDB heads a DELETE's result "Count"; it is the rows deleted. */
+  /** A DELETE returns no columns; check.mjs reports its row count. */
   dedupe: { ...query("rapid", "dedupe"), cols: ["rows deleted"] },
   afterDedupe: table("rapid", "afterDedupe"),
   products: table("rapid", "products"),
@@ -196,9 +195,10 @@ export const RAPID = {
   cross: Number(scalar("rapid", "crossJoin")),
   crossThousand: Number(scalar("rapid", "crossJoinThousand")),
   rollup: query("rollup", "rollup"),
-  /** DuckDB without NULLIF: a zero divisor gives null, not an error. */
-  divideByZero: table("rapid", "divideByZero"),
-  groupByAll: query("rollup", "groupByAll"),
+  /** Without NULLIF: Postgres stops on the zero divisor. */
+  divideByZero: refused("rapid", "divideByZero"),
+  /** GROUP BY ALL, which Postgres does not have: its listing alone. */
+  groupByAll: { lines: refused("rollup", "groupByAll").lines },
 };
 
 export const VERSION = FIGURES.where.version;

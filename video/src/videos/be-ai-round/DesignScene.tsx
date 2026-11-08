@@ -150,16 +150,16 @@ export const DesignScene: React.FC = () => {
 
         {/* The model as a dependency: six risks, then the concerns that
             answer them take their place along the top. */}
-        <Ink at={modelAt} dur={14} out={risksOut} style={{ left: X0, top: y(STRIP_Y), display: "flex", alignItems: "baseline", gap: 14, fontSize: 25 }}>
-          <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>The model is</span>
+        <Ink at={modelAt} dur={14} out={risksOut} style={{ left: X0, top: y(STRIP_Y), display: "flex", alignItems: "baseline", gap: 14, fontSize: 24 }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>The model is</span>
           {risks.map((r, i) => (
-            <span key={r.text} style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, r.at - 2, 8) }}>
+            <span key={r.text} style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, r.at - 2, 8) }}>
               {r.text}
               {i < risks.length - 1 ? "," : ""}
             </span>
           ))}
         </Ink>
-        <div style={{ position: "absolute", left: X0, top: y(STRIP_Y), display: "flex", alignItems: "baseline", gap: 26, fontSize: 25 }}>
+        <div style={{ position: "absolute", left: X0, top: y(STRIP_Y), display: "flex", alignItems: "baseline", gap: 26, fontSize: 24 }}>
           {concerns.map((c, i) => {
             const next = concerns[i + 1]?.at ?? end + 60;
             const p = ease(frame, c.at - 2, 10);
@@ -169,8 +169,8 @@ export const DesignScene: React.FC = () => {
                 key={c.name}
                 style={{
                   position: "relative",
-                  ...note(25, now > 0.5 ? INK : INK_SOFT),
-                  fontWeight: now > 0.5 ? 750 : 600,
+                  ...note(24, now > 0.5 ? INK : INK_SOFT),
+                  fontWeight: now > 0.5 ? 500 : 500,
                   whiteSpace: "nowrap",
                   opacity: p,
                   // The highlight reaches 0.2em past the word: given back as margin.
@@ -220,13 +220,13 @@ export const DesignScene: React.FC = () => {
         <Flow points={[[right("C") + 6, mid("C") - 18], [BOX.API.x - 8, mid("API") - 18]]} at={edgeAt} color={INK} head={13} />
         <Flow points={[[BOX.API.x - 6, mid("C") + 18], [right("C") + 8, mid("C") + 18]]} at={edgeAt + 4} color={BAR} head={13} lit={streamAt} litOut={failAt - 4} />
         <Note at={edgeAt + 10} x={right("C") + 8} y={mid("C") + 28}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>{streamLabel}</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{streamLabel}</span>
         </Note>
         <Flow points={[[right("API") + 6, mid("API")], [BOX.Q.x - 8, mid("Q")]]} at={edgeAt + 6} head={13} />
         <Flow points={[[right("Q") + 6, mid("Q")], [BOX.Cache.x - 8, mid("Cache")]]} at={edgeAt + 10} head={13} lit={cacheAt} litOut={qualityAt - 4} />
         <Flow points={[[cacheX, bottom("Cache") + 6], [cacheX, top("LLM") - 8]]} at={edgeAt + 14} head={13} lit={failAt} litOut={shapeAt - 4} />
         <Note at={edgeAt + 18} x={cacheX - 14} y={y(510)} align="right">
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>{missLabel}</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{missLabel}</span>
         </Note>
         <Flow points={[[BOX.LLM.x - 6, mid("LLM")], [right("V") + 8, mid("V")]]} at={edgeAt + 18} head={13} />
         <Flow
@@ -243,7 +243,7 @@ export const DesignScene: React.FC = () => {
           litOut={costAt - 4}
         />
         <Note at={edgeAt + 26} x={1000} y={loopY + 8}>
-          <span style={{ ...note(20, ACCENT_INK), whiteSpace: "nowrap" }}>{invalidLabel}</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>{invalidLabel}</span>
         </Note>
         <Flow
           points={[
@@ -260,7 +260,7 @@ export const DesignScene: React.FC = () => {
         <Node x={QUEUE.x} y={queueTop} w={QUEUE.w} h={bh} at={queueAt} title="Queue" sub="long jobs" tone="plain" lit={queueAt} litOut={failAt - 4} />
         <Flow points={[[475, bottom("API") + 6], [475, queueTop - 8]]} at={queueAt + 4} head={13} />
         <Ink at={statusAt} dur={12} style={{ left: QUEUE.x, top: y(732) + 6 }}>
-          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>status endpoint</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>status endpoint</span>
         </Ink>
         <Flow
           points={[
@@ -274,7 +274,7 @@ export const DesignScene: React.FC = () => {
           color={INK_SOFT}
         />
         <Note at={statusAt + 10} x={BOX.C.x + 78} y={y(640)}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>polls</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>polls</span>
         </Note>
 
         {/* Failure: on the provider edge. */}
@@ -286,29 +286,29 @@ export const DesignScene: React.FC = () => {
             <React.Fragment key={f.text}>
               <div style={{ position: "absolute", left: cacheX + 10, top: fy + 13, width: (LABEL_X - 14 - cacheX - 10) * p, height: 1.6, background: INK_SOFT }} />
               <Ink at={f.at} dur={12} style={{ left: LABEL_X, top: fy }}>
-                <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{f.text}</span>
+                <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{f.text}</span>
               </Ink>
             </React.Fragment>
           );
         })}
         <Note at={codesAt} x={LABEL_X} y={y(514)}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>on 429s and server errors</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>on 429s and server errors</span>
         </Note>
         <Note at={fallbackAt + 8} x={LABEL_X} y={y(612)}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>smaller model, cached answer,</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>smaller model, cached answer,</span>
         </Note>
         <Note at={fallbackAt + 20} x={LABEL_X} y={y(638)}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>or a graceful &ldquo;try again&rdquo;</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>or a graceful &ldquo;try again&rdquo;</span>
         </Note>
 
         {/* Structured output: validate, retry or repair. */}
         <Ink at={trustAt} dur={12} style={{ left: BOX.V.x, top: y(800) }}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>never trust the shape</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>never trust the shape</span>
         </Ink>
 
         {/* Cost: a spend alert on the quota. */}
         <Ink at={alertAt} dur={12} style={{ left: BOX.Q.x, top: y(470) }}>
-          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>+ an alert on spend</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>+ an alert on spend</span>
         </Ink>
 
         {/* Quality: an eval set, and logs, under the provider. */}
@@ -338,7 +338,7 @@ export const DesignScene: React.FC = () => {
           color={INK_SOFT}
         />
         <Note at={evalAt + 30} x={X0} y={y(860)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>The page&apos;s flowchart, with what each concern adds</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>The page&apos;s flowchart, with what each concern adds</span>
         </Note>
       </Drift>
     </AbsoluteFill>

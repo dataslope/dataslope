@@ -103,7 +103,7 @@ export const ChooseScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={startAt - 2} x={X0} y={y(ROW0 - 52)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>the question → the chart</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>the question → the chart</span>
         </Note>
         {rows.map((r, i) => {
           const p = ease(frame, r.at - 2, 12);
@@ -116,7 +116,7 @@ export const ChooseScene: React.FC = () => {
               <Svg>
                 <Glyph kind={r.glyph} x={GLYPH_X} y={top} p={ease(frame, r.at + 4, 12)} />
               </Svg>
-              <div style={{ position: "absolute", left: GLYPH_X + 96, top: top + 10, ...label(25, INK), whiteSpace: "nowrap", opacity: ease(frame, r.at + 6, 12) }}>
+              <div style={{ position: "absolute", left: GLYPH_X + 96, top: top + 10, ...label(24, INK), whiteSpace: "nowrap", opacity: ease(frame, r.at + 6, 12) }}>
                 {r.chart}
               </div>
             </React.Fragment>
@@ -125,7 +125,7 @@ export const ChooseScene: React.FC = () => {
 
         {/* ── How accurately each encoding is read ── */}
         <Note at={underAt - 2} x={1020} y={y(ROW0 - 52)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>judgement error, relative to position</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>judgement error, relative to position</span>
         </Note>
         {ENCODINGS.rows.map((e, i) => {
           const at0 = rankAts[i];
@@ -134,18 +134,18 @@ export const ChooseScene: React.FC = () => {
           const last = i === ENCODINGS.rows.length - 1;
           return (
             <React.Fragment key={e.key}>
-              <div style={{ position: "absolute", left: 1020, top: top + 8, width: 250, ...note(27, INK), opacity: ease(frame, at0 - 4, 10), whiteSpace: "nowrap" }}>
+              <div style={{ position: "absolute", left: 1020, top: top + 8, width: 250, ...note(28, INK), opacity: ease(frame, at0 - 4, 10), whiteSpace: "nowrap" }}>
                 {e.key}
               </div>
               <div style={{ position: "absolute", left: BAR_X, top: top + h(8), width: e.error * UNIT * p, height: h(34), background: last ? ds("blue", 300) : BAR, borderRadius: 2 }} />
-              <div style={{ position: "absolute", left: BAR_X + e.error * UNIT * p + 12, top: top + 8, ...label(22, last ? ACCENT_INK : INK), opacity: ease(frame, at0 + 6, 10), ...TABULAR }}>
+              <div style={{ position: "absolute", left: BAR_X + e.error * UNIT * p + 12, top: top + 8, ...label(24, last ? ACCENT_INK : INK), opacity: ease(frame, at0 + 6, 10), ...TABULAR }}>
                 {fmt(e.error, 1)}
               </div>
             </React.Fragment>
           );
         })}
         <Note at={threeAt - 2} x={1020} y={y(ROW0) + 5 * h(PITCH) + h(6)}>
-          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
             color saturation: about {fmt(ENCODINGS.colorVsPosition, 0)}× the error of position
           </span>
         </Note>

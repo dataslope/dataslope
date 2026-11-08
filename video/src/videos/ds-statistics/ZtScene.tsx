@@ -64,7 +64,7 @@ export const ZtScene: React.FC = () => {
           y={base - h(150 + row * 40) + 6}
           fill={color}
           textAnchor={side === "left" ? "end" : "start"}
-          style={{ ...noteText(24, color), fontWeight: 650, fontVariantNumeric: "tabular-nums" }}
+          style={{ ...noteText(24, color), fontWeight: 500, fontVariantNumeric: "tabular-nums" }}
         >
           {label}
         </text>

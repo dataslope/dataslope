@@ -97,7 +97,7 @@ export const Headline: React.FC<{
         {children}
       </Ink>
       {italic && second !== undefined ? (
-        <Ink at={second} dur={18} out={out} style={{ position: "relative", ...headlineStyle(size, true), color: ACCENT_INK }}>
+        <Ink at={second} dur={18} out={out} style={{ position: "relative", ...headlineStyle(size, true), color: INK }}>
           {italic}
         </Ink>
       ) : null}
@@ -308,7 +308,7 @@ export const Key: React.FC<{ at: number; out?: number; swatch: string; edge?: st
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 10, opacity: p * (1 - o), transform: `translateY(${(1 - p) * 8}px)` }}>
       <span style={{ width: 26, height: 18, borderRadius: 3, background: swatch, boxShadow: edge ? `inset 0 0 0 2px ${edge}` : undefined }} />
-      <span style={{ ...label(21, INK_SOFT), fontWeight: 560, whiteSpace: "nowrap" }}>{children}</span>
+      <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{children}</span>
     </span>
   );
 };

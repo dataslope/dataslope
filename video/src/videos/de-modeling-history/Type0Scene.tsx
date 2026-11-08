@@ -112,7 +112,7 @@ export const Type0Scene: React.FC = () => {
           marks={[{ line: lineOf(F.lines, "ON CONFLICT"), at: ignoreAt, out: secondAt }]}
         />
         <Note at={onceAt + 12} x={X0 + listW + 24} y={firstTop + h(44)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{TYPE0.firstCount}</Num> row written
           </span>
         </Note>
@@ -130,7 +130,7 @@ export const Type0Scene: React.FC = () => {
           ]}
         />
         <Note at={nothingAt + 4} x={X0 + listW + 24} y={laterTop + h(44)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{TYPE0.laterCount}</Num> rows written
           </span>
         </Note>
@@ -150,10 +150,10 @@ export const Type0Scene: React.FC = () => {
           marks={[{ row: 0, col: T.cols.indexOf("signup_date"), at: standsAt + 2, color: MARK_OK }]}
         />
         <Note at={nothingAt + 8} x={g.right + 24} y={g.rowTop(1) + h(8)} out={standsAt + 18}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>ignored</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>ignored</span>
         </Note>
         <Note at={standsAt + 26} x={TABLE_X} y={g.rowTop(1) + h(20)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the first value stands</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the first value stands</span>
         </Note>
 
         {/* In a Type 2 dimension: each new version copies the date. */}
@@ -174,14 +174,14 @@ export const Type0Scene: React.FC = () => {
           ]}
         />
         <Note at={sourceAt} x={TABLE_X} y={gm.rowTop(M.rows.length) + h(16)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             the source sent {sent}: ignored
           </span>
         </Note>
 
         {/* Types are per column: one row, each column with its own. */}
         <Note at={perAt} x={X0} y={stripY - h(42)}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>one customer row, a type per column</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>one customer row, a type per column</span>
         </Note>
         {/* Three columns of plain text, a column's name over its type,
             with a hairline in each gap that inks in with the column to its
@@ -194,12 +194,12 @@ export const Type0Scene: React.FC = () => {
               <React.Fragment key={c.name}>
                 {i ? <div style={{ width: 1, margin: `0 ${COL_GAP / 2}px`, background: HAIRLINE, opacity: p }} /> : null}
                 <div style={{ opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
-                  <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK, lineHeight: 1.25, whiteSpace: "nowrap" }}>{c.name}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, lineHeight: 1.25, whiteSpace: "nowrap" }}>{c.name}</div>
                   <div style={{ marginTop: 12 }}>
                     <span
                       style={{
-                        ...label(21, INK),
-                        fontWeight: 700,
+                        ...label(24, INK),
+                        fontWeight: 500,
                         whiteSpace: "nowrap",
                         padding: "1px 6px",
                         margin: "0 -6px",

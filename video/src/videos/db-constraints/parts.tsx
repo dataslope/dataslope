@@ -84,7 +84,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -113,7 +113,7 @@ export const Head: React.FC<{
           at={turnAt}
           dur={18}
           out={out}
-          style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
         >
           {turn}
         </Ink>
@@ -289,7 +289,7 @@ const tokenize = (line: string): Token[] => {
     const [text, str, num, word] = m;
     if (str) out.push({ text, color: STRING_INK });
     else if (num) out.push({ text, color: NUMBER_INK });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: KEYWORD_INK, weight: 700 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: KEYWORD_INK, weight: 500 });
     else if (word) out.push({ text, color: INK });
     else out.push({ text, color: INK_SOFT });
   }
@@ -323,7 +323,7 @@ export const Code: React.FC<{ children: string; size?: number }> = ({ children, 
 
 /** Code set inside running text or a label. */
 export const Mono: React.FC<{ children: string; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 600, color }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 500, color }}>{children}</span>
 );
 
 /**
@@ -517,7 +517,7 @@ export const TypeMark: React.FC<{ layout: EntityLayout; row: string; at: number;
 
 // ── The data table (after WhyNormalization's kit) ────────────────────────────
 
-export const HEAD_SIZE = 22;
+export const HEAD_SIZE = 24;
 export const BODY_SIZE = 28;
 const PAD = 20;
 const ADVANCE = 0.6;
@@ -689,7 +689,7 @@ export const DbTable: React.FC<{
         style={{ left: g.x, top: g.top, width: g.width, height: g.headH, display: "flex", alignItems: "center" }}
       >
         {cols.map((c, j) => (
-          <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: INK_SOFT }}>
+          <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 500, color: INK_SOFT }}>
             {c}
           </div>
         ))}
@@ -858,7 +858,7 @@ export const ErrorBox: React.FC<{
           background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
           padding: "14px 22px 16px",
           fontFamily: MONO,
-          fontSize: 22,
+          fontSize: 24,
           lineHeight: 1.45,
           whiteSpace: "pre-wrap",
           color: INK,
@@ -868,13 +868,13 @@ export const ErrorBox: React.FC<{
         }}
       >
         <div>
-          <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
+          <span style={{ color: ACCENT_INK, fontWeight: 500 }}>ERROR:</span>
           {"  "}
           {msg}
         </div>
         {detail ? (
           <div style={{ color: INK_SOFT, opacity: detailAt === undefined ? 1 : ease(frame, detailAt, 12) }}>
-            <span style={{ fontWeight: 600 }}>DETAIL:</span>
+            <span style={{ fontWeight: 500 }}>DETAIL:</span>
             {"  "}
             {unbroken(detail)}
           </div>
@@ -894,7 +894,7 @@ export const Tag: React.FC<{ x: number; top: number; at: number; children: strin
   out,
 }) => (
   <Ink at={at} dur={12} out={out} style={{ left: x, top, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color }}>{children}</span>
   </Ink>
 );
 

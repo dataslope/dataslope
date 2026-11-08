@@ -132,13 +132,13 @@ export const BatchScene: React.FC = () => {
           </span>
         </Note>
         <Note at={neverAt} x={X0} y={builtinTop + h(44)} out={sinceAt - 4}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same first three, forever</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same first three, forever</span>
         </Note>
 
         {/* The stream, opening into batches of three. */}
         <Note at={sevenAt - 4} x={RIGHT_X} y={blocksTop - h(46)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 600 }}>range(7)</span>, in threes
+            <span style={{ fontFamily: MONO, fontWeight: 500 }}>range(7)</span>, in threes
           </span>
         </Note>
         {Array.from({ length: 7 }, (_, i) => {
@@ -164,8 +164,8 @@ export const BatchScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: MONO,
-                fontSize: 26,
-                fontWeight: 600,
+                fontSize: 28,
+                fontWeight: 500,
                 color: BLUE_INK,
               }}
             >
@@ -231,7 +231,7 @@ export const BatchScene: React.FC = () => {
         <Listing lines={BATCH.builtin.lines} x={X0} top={builtinTop} width={760} size={SIZE} at={sinceAt} marks={[{ line: lineOf(BATCH.builtin.lines, "itertools.batched"), at: exactlyAt, color: MARK }]} />
         <Console lines={BATCH.builtin.out} x={RIGHT_X + 340} top={outTop} width={300} at={exactlyAt - 2} />
         <Note at={exactlyAt + 4} x={RIGHT_X + 340} y={outTop + consoleHeight(BATCH.builtin.out.length) + h(14)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>batched gives tuples</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>batched gives tuples</span>
         </Note>
       </Drift>
     </AbsoluteFill>

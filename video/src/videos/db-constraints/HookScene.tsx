@@ -172,7 +172,7 @@ export const HookScene: React.FC = () => {
       {/* ── A product saved at -3.00 ── */}
       <Ink at={minusAt - 2} dur={12} out={chipOut} style={{ left: 120, top: products.rows[2].mid - 26, whiteSpace: "nowrap" }}>
         {/* The bad value as a red house badge. */}
-        <span style={{ ...badgeStyle("red", 30), fontFamily: MONO, fontWeight: 600 }}>
+        <span style={{ ...badgeStyle("red", 30), fontFamily: MONO, fontWeight: 500 }}>
           price {BAD}
         </span>
       </Ink>
@@ -180,7 +180,7 @@ export const HookScene: React.FC = () => {
       <Note at={saleAt - 4} x={122} y={products.rows[2].mid + 40} out={chipOut}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Not a sale,{" "}
-          <span style={{ color: ACCENT_INK, fontWeight: 600 }}>
+          <span style={{ color: ACCENT_INK, fontWeight: 500 }}>
             <Mark at={mistakeAt} color="color-mix(in srgb, var(--ds-red-500) 22%, transparent)">
               a mistake
             </Mark>
@@ -197,7 +197,7 @@ export const HookScene: React.FC = () => {
             <Ink at={writerAt(i)} dur={12} style={{ left: WRITER_X, top: rowY(i) - 17, whiteSpace: "nowrap" }}>
               <span
                 style={{
-                  ...label(26, forgot && frame >= oneAt ? ACCENT_INK : INK),
+                  ...label(28, forgot && frame >= oneAt ? ACCENT_INK : INK),
                   display: "inline-block",
                   transform: `scale(${1 + named2 * 0.08})`,
                   transformOrigin: "0 50%",
@@ -240,7 +240,7 @@ export const HookScene: React.FC = () => {
         </Svg>
       ) : null}
       <Note at={landed} x={products.left} y={products.bottom + 22} from="up">
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           price <span style={{ fontFamily: MONO }}>{BAD}</span> is in
         </span>
       </Note>

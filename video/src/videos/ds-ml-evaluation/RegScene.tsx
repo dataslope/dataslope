@@ -52,15 +52,15 @@ const PathFrame: React.FC<{ b: Box; at: number }> = ({ b, at: from }) => {
       {Y_TICKS.map((v) => (
         <React.Fragment key={v}>
           <line x1={b.left - 6} x2={b.left} y1={at(ys, sy(v))} y2={at(ys, sy(v))} stroke={INK_SOFT} strokeWidth={1.4} />
-          <text x={b.left - 12} y={at(ys, sy(v)) + 7} textAnchor="end" fill={INK_SOFT} style={{ ...label(19, INK_SOFT), fontVariantNumeric: "tabular-nums" }}>
+          <text x={b.left - 12} y={at(ys, sy(v)) + 7} textAnchor="end" fill={INK_SOFT} style={{ ...label(24, INK_SOFT), fontVariantNumeric: "tabular-nums" }}>
             {v < 0 ? `\u2212${-v}` : v}
           </text>
         </React.Fragment>
       ))}
-      <text x={b.left} y={y(b.top) - 14} textAnchor="start" fill={INK_SOFT} style={{ ...label(19, INK_SOFT), fontWeight: 650 }}>
+      <text x={b.left} y={y(b.top) - 14} textAnchor="start" fill={INK_SOFT} style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>
         coefficient, scale stretched near 0
       </text>
-      <text x={b.right} y={y(b.bottom) + 34} textAnchor="end" fill={INK_SOFT} style={{ ...label(19, INK_SOFT), fontWeight: 650 }}>
+      <text x={b.right} y={y(b.bottom) + 34} textAnchor="end" fill={INK_SOFT} style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>
         stronger penalty →
       </text>
     </Svg>
@@ -167,14 +167,14 @@ export const RegScene: React.FC = () => {
           </span>
         </Note>
         <Note at={mixAt + 10} x={RIDGE.left} y={y(326)} out={end - 8}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
             here {Math.round(REG.enetL1Ratio * 100)}% L1 and {Math.round((1 - REG.enetL1Ratio) * 100)}% L2
           </span>
         </Note>
         {/* Up as the first paths draw, so the lines are never unexplained;
             the narration names them a few seconds later. */}
         <Note at={ridgeNameAt - 2} x={RIDGE.left} y={y(326)} out={q4At - 4}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mark at={tenAt}>ten measurements</Mark> from a diabetes study, one line each
           </span>
         </Note>
@@ -197,12 +197,12 @@ export const RegScene: React.FC = () => {
             ))}
           </Svg>
           <Note at={sevenAt + 4} x={pickX(RIDGE) + 16} y={y(RIDGE.top) - h(4)}>
-            <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               keeps <span style={TABULAR}>{REG.ridgeKept}</span> of <span style={TABULAR}>10</span>
             </span>
           </Note>
           <Note at={keepAllAt} x={RIDGE.left} y={y(RIDGE.bottom) + h(52)}>
-            <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>all ten shrink, and none stays at 0</span>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>all ten shrink, and none stays at 0</span>
           </Note>
         </Fade>
 
@@ -266,7 +266,7 @@ export const RegScene: React.FC = () => {
             ))}
           </Svg>
           <Note at={sevenAt - 2} x={pickX(LASSO) + 16} y={y(LASSO.top) - h(4)}>
-            <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               keeps{" "}
               <Mark at={sevenAt}>
                 <span style={TABULAR}>{REG.lassoKept}</span> of <span style={TABULAR}>10</span>
@@ -274,10 +274,10 @@ export const RegScene: React.FC = () => {
             </span>
           </Note>
           <Note at={selectAt - 2} x={LASSO.left} y={y(LASSO.bottom) + h(52)} out={cholAt}>
-            <span style={{ ...note(27, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>feature selection</span>
+            <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>feature selection</span>
           </Note>
           <Note at={cholAt + 2} x={LASSO.left} y={y(LASSO.bottom) + h(52)}>
-            <span style={{ ...note(24, WARM_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               s1 and s2, two cholesterol measures
               <span style={{ opacity: ease(frame, corrAt - 2, 10) }}>
                 : correlation <span style={TABULAR}>{fmt(REG.s1s2, 1)}</span>
@@ -288,21 +288,23 @@ export const RegScene: React.FC = () => {
 
         {/* ── Elastic net keeps both, still selects, and keeps them steadily ── */}
         <Fade from={keepsOneAt + 2} out={end - 8}>
-          <Table at={keepsOneAt + 4} enetAt={enetAt} ageAt={ageAt} swell={swell} left={RIDGE.left} top={tableTop} rowH={h(60)} />
-          <Note at={ageAt + 6} x={RIDGE.left} y={tableTop + h(162)}>
+          <Table at={keepsOneAt + 4} enetAt={enetAt} ageAt={ageAt} swell={swell} left={RIDGE.left} top={tableTop} rowH={h(72)} />
+          <Note at={ageAt + 6} x={RIDGE.left} y={tableTop + h(186)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              <b>age</b> at exactly 0 under both: <span style={{ color: OK_INK, fontWeight: 650 }}>elastic net still selects</span>
+              <b>age</b> at exactly 0 under both: <span style={{ color: OK_INK, fontWeight: 500 }}>elastic net still selects</span>
             </span>
           </Note>
-          <Note at={refitAt - 2} x={RIDGE.left} y={tableTop + h(216)}>
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-              refitted on {REG.boot.n} resamples of the patients: how often each keeps both s1 and s2
+          <Note at={refitAt - 2} x={RIDGE.left} y={tableTop + h(240)}>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+              refitted on {REG.boot.n} resamples of the patients:
+              <br />
+              how often each keeps both s1 and s2
             </span>
           </Note>
-          <Resamples name="lasso" counts={REG.boot.lasso} n={REG.boot.n} at={refitAt + 4} litAt={fiveAt} color={WARM} ink={WARM_INK} left={RIDGE.left} top={tableTop + h(254)} />
-          <Resamples name="elastic net" counts={REG.boot.enet} n={REG.boot.n} at={refitAt + 8} litAt={pairAt} color={OK} ink={OK_INK} left={RIDGE.left} top={tableTop + h(292)} />
-          <Note at={selectsAt - 2} x={RIDGE.left} y={tableTop + h(348)}>
-            <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>selects like lasso, steadier when features are correlated</span>
+          <Resamples name="lasso" counts={REG.boot.lasso} n={REG.boot.n} at={refitAt + 4} litAt={fiveAt} color={WARM} ink={WARM_INK} left={RIDGE.left} top={tableTop + h(316)} />
+          <Resamples name="elastic net" counts={REG.boot.enet} n={REG.boot.n} at={refitAt + 8} litAt={pairAt} color={OK} ink={OK_INK} left={RIDGE.left} top={tableTop + h(356)} />
+          <Note at={selectsAt - 2} x={RIDGE.left} y={tableTop + h(416)}>
+            <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>selects like lasso, steadier when features are correlated</span>
           </Note>
         </Fade>
       </Drift>
@@ -329,7 +331,7 @@ const Table: React.FC<{ at: number; enetAt: number; ageAt: number; swell: number
     { name: "elastic net", vals: [...REG.enetS1S2, ageOf(REG.enetDropped)], at: enetAt },
   ];
   const head = (text: string, x: number, at: number) => (
-    <div style={{ position: "absolute", left: x, top, ...label(21, INK_SOFT), fontWeight: 650, opacity: ease(frame, at, 10) }}>{text}</div>
+    <div style={{ position: "absolute", left: x, top, ...label(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, at, 10) }}>{text}</div>
   );
   return (
     <>
@@ -338,11 +340,11 @@ const Table: React.FC<{ at: number; enetAt: number; ageAt: number; swell: number
       {head("age", COL[3], ageAt - 2)}
       {rows.map((r, i) => {
         const p = ease(frame, r.at, 12);
-        const rowTop = top + rowH * (i + 0.6);
+        const rowTop = top + rowH * (i + 0.7);
         const enet = r.name === "elastic net";
         return (
           <div key={r.name} style={{ position: "absolute", left: 0, top: rowTop, opacity: p, transform: `translateY(${(1 - p) * 8}px)` }}>
-            <div style={{ position: "absolute", left: COL[0], top: 0, ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{r.name}</div>
+            <div style={{ position: "absolute", left: COL[0], top: 0, ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.name}</div>
             {r.vals.map((v, k) => (
               <div
                 key={k}
@@ -350,8 +352,8 @@ const Table: React.FC<{ at: number; enetAt: number; ageAt: number; swell: number
                   position: "absolute",
                   left: COL[k + 1],
                   top: 0,
-                  ...note(30, v === 0 ? (k === 2 ? INK : ACCENT_INK) : enet ? OK_INK : WARM_INK),
-                  fontWeight: 700,
+                  ...note(28, v === 0 ? (k === 2 ? INK : ACCENT_INK) : enet ? OK_INK : WARM_INK),
+                  fontWeight: 500,
                   ...TABULAR,
                   whiteSpace: "nowrap",
                   opacity: k === 2 ? ease(frame, ageAt, 10) : 1,
@@ -391,7 +393,7 @@ const Resamples: React.FC<{
   const lit = ease(frame, litAt, 14);
   return (
     <>
-      <div style={{ position: "absolute", left, top, ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, from, 10) }}>{name}</div>
+      <div style={{ position: "absolute", left, top, ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, from, 10) }}>{name}</div>
       {Array.from({ length: n }, (_, i) => {
         const p = ease(frame, from + i * 0.5, 6);
         const both = i < counts.both;
@@ -419,7 +421,7 @@ const Resamples: React.FC<{
           left: cellsLeft + n * (CELL + GAP) + 14,
           top,
           ...note(24, ink),
-          fontWeight: 700,
+          fontWeight: 500,
           whiteSpace: "nowrap",
           opacity: lit,
         }}

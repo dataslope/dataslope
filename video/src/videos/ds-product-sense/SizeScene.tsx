@@ -41,10 +41,10 @@ const Factor: React.FC<{ x: number; top: number; w: number; at: number; out: num
         transform: `translateY(${(1 - p) * 16}px)`,
       }}
     >
-      <div style={{ ...note(40, result ? OK_INK : INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+      <div style={{ ...note(40, result ? OK_INK : INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
         {result ? <Mark at={from + 6} color={MARK_OK}>{value}</Mark> : value}
       </div>
-      <div style={{ ...label(21, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>{text}</div>
+      <div style={{ ...label(24, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>{text}</div>
     </div>
   );
 };
@@ -135,7 +135,7 @@ export const SizeScene: React.FC = () => {
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             break it into factors
             <span style={{ opacity: ease(frame, loudAt, 10) }}>, every assumption out loud</span>
-            <span style={{ ...note(26, BLUE_INK), fontWeight: 650, opacity: ease(frame, searchesAt, 10) }}>: daily searches by ingredient</span>
+            <span style={{ ...note(28, BLUE_INK), fontWeight: 500, opacity: ease(frame, searchesAt, 10) }}>: daily searches by ingredient</span>
           </span>
         </Note>
         {factors.map((f, i) => (
@@ -149,7 +149,7 @@ export const SizeScene: React.FC = () => {
         <Factor x={xOf(4)} top={y(CHAIN.top)} w={1824 - xOf(4)} at={resultAt - 2} out={out10} value={`≈ ${num(MARKET.daily)}`} text="searches a day" result />
         {running.map((r, i) => (
           <Note key={r.text} at={r.at} x={xOf(i + 1)} y={y(CHAIN.top) + h(132)} out={out10}>
-            <span style={{ ...label(21, BLUE_INK), ...TABULAR, whiteSpace: "nowrap" }}>= {r.text}</span>
+            <span style={{ ...label(24, BLUE_INK), ...TABULAR, whiteSpace: "nowrap" }}>= {r.text}</span>
           </Note>
         ))}
         <Note at={mauAt} x={X0} y={y(CHAIN.top) + h(132)} out={out10}>
@@ -158,29 +158,29 @@ export const SizeScene: React.FC = () => {
 
         {/* The sanity check: what the answer says each feature user does. */}
         <Note at={sanityCheckAt} x={1824} align="right" y={y(604)} out={out10}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>sanity check:</b>{" "}
-            <span style={{ color: BLUE_INK, fontWeight: 600, opacity: ease(frame, sanityCheckAt + 10, 10) }}>
+            <span style={{ color: BLUE_INK, fontWeight: 500, opacity: ease(frame, sanityCheckAt + 10, 10) }}>
               {num(MARKET.daily)} searches ÷ {num(MARKET.users)} users
             </span>
-            <span style={{ color: BLUE_INK, fontWeight: 600, opacity: ease(frame, eachAt, 10) }}> = {MARKET.perUserDaily} search a day each</span>
-            <span style={{ color: OK_INK, fontWeight: 650, opacity: ease(frame, plausibleAt, 10) }}>, plausible</span>
+            <span style={{ color: BLUE_INK, fontWeight: 500, opacity: ease(frame, eachAt, 10) }}> = {MARKET.perUserDaily} search a day each</span>
+            <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, plausibleAt, 10) }}>, plausible</span>
           </span>
         </Note>
 
         {/* What's graded. */}
         <Note at={structureAt - 4} x={X0} y={y(680)} out={out10}>
           <div style={{ display: "flex", alignItems: "center", gap: 36 }}>
-            <span style={{ ...note(29, INK), fontWeight: 650, whiteSpace: "nowrap" }}>graded:</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>graded:</span>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <Tick at={structureAt + 4} size={30} />
-              <span style={{ ...note(29, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the structure</span>
+              <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the structure</span>
             </span>
             <span style={{ display: "flex", alignItems: "center", gap: 10, opacity: ease(frame, sanityAt - 2, 10) }}>
               <Tick at={sanityAt + 4} size={30} />
-              <span style={{ ...note(29, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the sanity check</span>
+              <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the sanity check</span>
             </span>
-            <span style={{ ...note(29, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, notAt - 2, 10) }}>
+            <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, notAt - 2, 10) }}>
               <Strike at={notAt + 6}>the number</Strike>
             </span>
           </div>
@@ -193,10 +193,10 @@ export const SizeScene: React.FC = () => {
           How do you size a feature&apos;s impact before building it?
         </QuestionCard>
         <Note at={boundAt} x={X0} y={y(330)}>
-          <span style={{ ...note(32, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Bound it.</span>
+          <span style={{ ...note(34, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Bound it.</span>
         </Note>
         <Note at={reachAt} x={X0} y={y(400)}>
-          <span style={{ ...note(30, INK), ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>
             <b>{num(IMPACT.reach)}</b> weekly users reach its screen
             <span style={{ opacity: ease(frame, similarAt, 10) }}>
               {" "}
@@ -208,7 +208,7 @@ export const SizeScene: React.FC = () => {
           </span>
         </Note>
         <Note at={rangeAt} x={X0} y={y(460)}>
-          <span style={{ ...note(30, BLUE_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, BLUE_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
             = {num(IMPACT.extraLo)} to {num(IMPACT.extraHi)} extra weekly cooks
           </span>
         </Note>
@@ -217,7 +217,7 @@ export const SizeScene: React.FC = () => {
           {[0, 5_000, 10_000, 15_000, 20_000].map((v) => (
             <g key={v}>
               <line x1={at(xs, v)} x2={at(xs, v)} y1={y(AXIS.y)} y2={y(AXIS.y) + 8} stroke={INK} strokeWidth={1.4} />
-              <text x={at(xs, v)} y={y(AXIS.y) + 34} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), ...TABULAR })}>
+              <text x={at(xs, v)} y={y(AXIS.y) + 34} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), ...TABULAR })}>
                 {num(v)}
               </text>
             </g>
@@ -235,16 +235,16 @@ export const SizeScene: React.FC = () => {
           />
         </Svg>
         <Note at={goalAt + 4} x={at(xs, IMPACT.goal)} align="right" y={y(AXIS.y) - h(100)}>
-          <span style={{ ...label(22, INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>goal: {num(IMPACT.goal)} ▾</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>goal: {num(IMPACT.goal)} ▾</span>
         </Note>
         <Bracket x0={at(xs, 0)} x1={at(xs, IMPACT.extraHi)} y={y(AXIS.y) + h(70)} at={fifthAt} color={ACCENT_INK}>
-          <span style={{ ...label(23, ACCENT_INK), fontWeight: 700, ...TABULAR }}>best case: {pct(IMPACT.shareOfGoal)} of the goal</span>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, ...TABULAR }}>best case: {pct(IMPACT.shareOfGoal)} of the goal</span>
         </Bracket>
         <Note at={deprioritizeAt} x={980} y={y(AXIS.y) + h(84)}>
-          <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>→ deprioritize it before anyone builds it</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>→ deprioritize it before anyone builds it</span>
         </Note>
         <Note at={cheapestAt} x={980} y={y(AXIS.y) + h(140)}>
-          <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={cheapestAt + 8}>the cheapest experiment is the arithmetic</Mark>
           </span>
         </Note>

@@ -117,7 +117,7 @@ export const HookScene: React.FC = () => {
             top: y(MID_Y) - 52,
             width: 120,
             textAlign: "center",
-            ...label(20, INK_SOFT),
+            ...label(24, INK_SOFT),
             opacity: ease(frame, splitAt + 4, 10),
           }}
         >
@@ -132,7 +132,7 @@ export const HookScene: React.FC = () => {
                 top: laneY(l.side) + (l.side < 0 ? -50 : 18),
                 whiteSpace: "nowrap",
                 opacity: ease(frame, l.at - 2, 12),
-                ...note(26, l.ink),
+                ...note(28, l.ink),
               }}
             >
               <b>{l.name}</b>, {l.what}
@@ -145,7 +145,7 @@ export const HookScene: React.FC = () => {
                 whiteSpace: "nowrap",
                 opacity: ease(frame, measureAt + (l.side < 0 ? 0 : 6), 12),
                 ...note(34, l.ink),
-                fontWeight: 650,
+                fontWeight: 500,
                 ...TABULAR,
               }}
             >
@@ -160,7 +160,7 @@ export const HookScene: React.FC = () => {
             top: y(MID_Y) - 16,
             whiteSpace: "nowrap",
             opacity: ease(frame, measureAt + 10, 12),
-            ...label(19, INK_SOFT),
+            ...label(24, INK_SOFT),
           }}
         >
           converted
@@ -203,7 +203,7 @@ export const HookScene: React.FC = () => {
                   transform: `translateY(${(1 - p) * 10}px)`,
                 }}
               >
-                <div style={{ ...note(64, r.ink), fontWeight: 700, lineHeight: "64px", ...TABULAR }}>{r.count}</div>
+                <div style={{ ...note(64, r.ink), fontWeight: 500, lineHeight: "64px", ...TABULAR }}>{r.count}</div>
                 <div style={{ ...note(28, r.ink), lineHeight: "36px", marginTop: 8, whiteSpace: "nowrap" }}>{r.text}</div>
               </div>
             </React.Fragment>
@@ -214,7 +214,7 @@ export const HookScene: React.FC = () => {
             position: "absolute",
             left: X0,
             top: y(MID_Y) + LANE + 122,
-            ...label(21, INK_SOFT),
+            ...label(24, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, nineteenAt - 2, 12) * (1 - ease(frame, startsAt + 2, 14) * 0.45),
           }}

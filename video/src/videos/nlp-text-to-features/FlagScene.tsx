@@ -85,7 +85,7 @@ export const FlagScene: React.FC = () => {
 
       {/* ── Fig. 16: the rule ── */}
       <FigLabel n="16" title="The lesson’s negation rule" at={negationAt - 4} x={X0} y={y(FIG_Y)} />
-      <Ink at={negationAt - 2} dur={14} style={{ left: X0, top: y(RULE_ON_Y) + 8, ...label(23, INK), whiteSpace: "nowrap" }}>
+      <Ink at={negationAt - 2} dur={14} style={{ left: X0, top: y(RULE_ON_Y) + 8, ...label(24, INK), whiteSpace: "nowrap" }}>
         <Mark at={onAt - 2}>Flag on</Mark>
       </Ink>
       <ChipRow x={RULE_CHIPS_X} y={y(RULE_ON_Y)}>
@@ -94,7 +94,7 @@ export const FlagScene: React.FC = () => {
           return <Chip key={w} text={w} size={28} at={k >= 0 ? spokenAt[k] - 2 : spokenAt[2] + 8} bump={[onAt + 2 * NEG_ORDER.indexOf(w), reachAt + 8]} />;
         })}
       </ChipRow>
-      <Ink at={resetAt.comma - 4} dur={14} style={{ left: X0, top: y(RULE_OFF_Y) + 8, ...label(23, INK), whiteSpace: "nowrap" }}>
+      <Ink at={resetAt.comma - 4} dur={14} style={{ left: X0, top: y(RULE_OFF_Y) + 8, ...label(24, INK), whiteSpace: "nowrap" }}>
         <Mark at={offAt - 2}>Flag off</Mark>
       </Ink>
       <ChipRow x={RULE_CHIPS_X} y={y(RULE_OFF_Y)}>
@@ -113,7 +113,7 @@ export const FlagScene: React.FC = () => {
         })}
       </ChipRow>
       {/* The reset, run on a sentence: the lamp under each token is the flag after it. */}
-      <Ink at={exAt - 4} dur={12} style={{ left: X0, top: y(EX_Y) + 49, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+      <Ink at={exAt - 4} dur={12} style={{ left: X0, top: y(EX_Y) + 49, ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
         flag
       </Ink>
       <TraceRow
@@ -129,7 +129,7 @@ export const FlagScene: React.FC = () => {
         bumpComma={commaAt}
       />
       <Note at={plusOneAt + 14} x={VERDICT_X} y={y(EX_Y) + 48}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           with no reset: {signed(RESET_EXAMPLE.scoreWithoutReset)}, {RESET_EXAMPLE.labelWithoutReset}
         </span>
       </Note>
@@ -184,7 +184,7 @@ const TraceRow: React.FC<{
           const badge = polar ? (badgeAt ? badgeAt[scored++] - 2 : tokenAt + 10) : 0;
           const flipped = s.role === "flipped";
           const sign = polar ? (
-            <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, badge, 10) }}>
+            <span style={{ ...note(24, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, badge, 10) }}>
               {flipped ? (
                 <>
                   <span style={{ color: s.polarity > 0 ? NEG_INK : POS_INK }}>
@@ -230,10 +230,10 @@ const TraceRow: React.FC<{
           );
         })}
       </TokenRow>
-      <div style={{ position: "absolute", left: SUM_X, top: top + 2, ...note(30, INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, verdictAt - 6, 10) }}>
+      <div style={{ position: "absolute", left: SUM_X, top: top + 2, ...note(28, INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, verdictAt - 6, 10) }}>
         {signed(trace.score)}
       </div>
-      <div style={{ position: "absolute", left: VERDICT_X, top: top + 2, ...note(30, inkFor(trace.label)), fontWeight: 650, opacity: ease(frame, verdictAt - 2, 10) }}>
+      <div style={{ position: "absolute", left: VERDICT_X, top: top + 2, ...note(28, inkFor(trace.label)), fontWeight: 500, opacity: ease(frame, verdictAt - 2, 10) }}>
         {trace.label}
       </div>
     </>

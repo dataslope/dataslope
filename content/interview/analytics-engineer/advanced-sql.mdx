@@ -12,7 +12,7 @@ Q&A, then solve the challenges.
   alt="A stepped platform where a ranked column of numbered blocks feeds into a spiral rail that loops back on itself, a transparent window frame hovering over three of the blocks"
 />
 
-> **SQL dialect:** the runnable blocks on this page execute in your browser on **DuckDB**, so the SQL targets DuckDB. It is standard SQL except where noted (`QUALIFY`, `generate_series`, native `PIVOT`).
+> **SQL dialect:** the runnable blocks on this page execute in your browser on **PostgreSQL**, so the SQL targets Postgres. It is standard SQL except where noted (`DISTINCT ON`, `FILTER`, `generate_series`). `QUALIFY` and native `PIVOT`, which Postgres lacks, are shown as illustrative snippets.
 
 ## Q&A
 
@@ -55,12 +55,13 @@ use `RANK`/`DENSE_RANK` for leaderboards.
 
 ### How do you deduplicate to the latest record per key?
 
-Number rows within each key by a recency `ORDER BY`, then keep row 1. The
-cleanest form uses `QUALIFY`, which filters on a window function without a
-subquery. The block below keeps only the most recent row per `customer_id`:
+Number rows within each key by a recency `ORDER BY`, then keep row 1. A
+window function can't appear in `WHERE`, so compute it in a subquery and
+filter outside it. The block below keeps only the most recent row per
+`customer_id`:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE customer_updates AS SELECT * FROM (VALUES
   (1, TIMESTAMP '2024-01-01 10:00:00', 'a@x.com'),
   (1, TIMESTAMP '2024-03-01 09:00:00', 'a2@x.com'),
@@ -89,20 +90,32 @@ subquery. The block below keeps only the most recent row per `customer_id`:
 ) AS t(customer_id, updated_at, email);`}
   starterCode={`-- One row per customer: the latest update wins
 SELECT customer_id, updated_at, email
-FROM customer_updates
-QUALIFY ROW_NUMBER() OVER (
-  PARTITION BY customer_id
-  ORDER BY updated_at DESC
-) = 1
+FROM (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (
+      PARTITION BY customer_id
+      ORDER BY updated_at DESC
+    ) AS rn
+  FROM customer_updates
+) ranked
+WHERE rn = 1
 ORDER BY customer_id;`}
 />
+
+Postgres also has a shortcut for exactly this shape: `SELECT DISTINCT ON
+(customer_id) * FROM customer_updates ORDER BY customer_id, updated_at DESC`
+keeps the first row of each `customer_id` in the sort order. It is
+Postgres-only, so the `ROW_NUMBER` form is the one to know for a warehouse.
 
 ### What does `QUALIFY` do, and how does it relate to `WHERE` and `HAVING`?
 
 `QUALIFY` filters on the result of a **window function**, the way `WHERE`
 filters raw rows and `HAVING` filters aggregated groups. Logical order is
-`WHERE` → `GROUP BY`/`HAVING` → window functions → `QUALIFY`. Without it you must
-wrap the window function in a subquery or CTE and filter in an outer query.
+`WHERE` → `GROUP BY`/`HAVING` → window functions → `QUALIFY`. Snowflake,
+BigQuery, Databricks and DuckDB support it, so it comes up often in analytics
+engineering. Postgres and MySQL do not: there you wrap the window function in
+a subquery or CTE and filter in an outer query, as in the block above.
 
 <SyntaxBreakdown
   parts={[
@@ -111,6 +124,18 @@ wrap the window function in a subquery or CTE and filter in an outer query.
     { text: "QUALIFY rn = 1", label: "filters on the window result" },
   ]}
 />
+
+On a warehouse that has it, the deduplication above loses its subquery:
+
+```sql
+-- Snowflake, BigQuery, Databricks (not Postgres)
+SELECT customer_id, updated_at, email
+FROM customer_updates
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY customer_id
+  ORDER BY updated_at DESC
+) = 1;
+```
 
 ### What is a CTE, and when do you prefer it over a subquery?
 
@@ -156,7 +181,7 @@ partition through this one." Change the frame to get a moving window, e.g.
 `ROWS BETWEEN 6 PRECEDING AND CURRENT ROW` for a 7-row trailing average.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE daily AS SELECT * FROM (VALUES
   (DATE '2024-01-01', 10), (DATE '2024-01-02', 20), (DATE '2024-01-03', 5),
   (DATE '2024-01-04', 15), (DATE '2024-01-05', 32), (DATE '2024-01-06', 14),
@@ -182,7 +207,7 @@ ORDER BY day;`}
 
 `ROWS` counts **physical rows** (2 preceding means the two rows above).
 `RANGE` counts **logical values** of the `ORDER BY` expression, so ties are
-grouped together and `RANGE BETWEEN INTERVAL '7' DAY PRECEDING ...` bounds by
+grouped together and `RANGE BETWEEN INTERVAL '7 days' PRECEDING ...` bounds by
 value, not row count. `ROWS` is what you usually want; `RANGE` matters when ties
 or value-based windows are involved.
 
@@ -210,7 +235,7 @@ the current row, then subtract. Below, month-over-month change is
 because there is no prior row:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE monthly AS SELECT * FROM (VALUES
   (DATE '2022-07-01', 180), (DATE '2022-08-01', 155), (DATE '2022-09-01', 210),
   (DATE '2022-10-01', 195), (DATE '2022-11-01', 240), (DATE '2022-12-01', 330),
@@ -245,7 +270,7 @@ activity still appear (as zero) instead of vanishing. Without a spine, a chart
 of daily signups silently skips days that had none, distorting trends and
 moving averages.
 
-### How do you generate a series of dates in DuckDB?
+### How do you generate a series of dates in Postgres?
 
 Three arguments: where to start, where to stop, and the step, given as an interval:
 
@@ -254,35 +279,38 @@ Three arguments: where to start, where to stop, and the step, given as an interv
     { text: "generate_series(" },
     { text: "DATE '2024-01-01',", label: "start, inclusive" },
     { text: "DATE '2024-12-31',", label: "end, inclusive" },
-    { text: "INTERVAL 1 DAY", label: "the step" },
+    { text: "INTERVAL '1 day'", label: "the step" },
     { text: ")" },
   ]}
 />
 
-`generate_series(start, stop, INTERVAL 1 DAY)` produces every date in the range;
-cast to `DATE` if you seeded from `DATE` bounds. Below it fills the spine from
-the data's own min and max:
+`generate_series(start, stop, INTERVAL '1 day')` produces every date in the
+range. Postgres returns timestamps even from `DATE` bounds, so cast back to
+`DATE`. Below it fills the spine from the data's own min and max:
 
 ```sql
 WITH bounds AS (SELECT MIN(login_date) AS lo, MAX(login_date) AS hi FROM logins)
 SELECT CAST(g AS DATE) AS day
-FROM bounds, generate_series(bounds.lo, bounds.hi, INTERVAL 1 DAY) AS gs(g);
+FROM bounds, generate_series(bounds.lo, bounds.hi, INTERVAL '1 day') AS gs(g);
 ```
 
 ### How do you pivot rows into columns?
 
 Portably, aggregate with `CASE WHEN` per target column: `SUM(CASE WHEN
-quarter = 'Q1' THEN amt END) AS q1`. DuckDB also has a native `PIVOT`
-statement (`PIVOT sales ON quarter USING SUM(amt) GROUP BY region`). The
+quarter = 'Q1' THEN amt END) AS q1`. Postgres also accepts the shorter
+`SUM(amt) FILTER (WHERE quarter = 'Q1') AS q1`. Snowflake, BigQuery, SQL
+Server and DuckDB add a native `PIVOT` clause; Postgres has none. The
 `CASE WHEN` form works everywhere and makes the output columns explicit, which
 matters when downstream consumers expect a fixed schema.
 
 ### How do you unpivot columns into rows?
 
 Reverse the pivot: turn wide columns into `(key, value)` pairs. Portably that is
-a `UNION ALL` per column; DuckDB has a native `UNPIVOT wide ON q1, q2 INTO NAME
-quarter VALUE amt`. Unpivoting is common when a source arrives wide (one column
-per month) but your model wants a long, tidy grain.
+a `UNION ALL` per column. Postgres does it in one pass with a lateral `VALUES`
+list, `FROM wide CROSS JOIN LATERAL (VALUES ('Q1', q1), ('Q2', q2)) AS
+u(quarter, amt)`, and Snowflake, BigQuery and SQL Server have a native
+`UNPIVOT`. Unpivoting is common when a source arrives wide (one column per
+month) but your model wants a long, tidy grain.
 
 ### How do you avoid a divide-by-zero error?
 
@@ -317,9 +345,11 @@ functions run **after** `GROUP BY`, so you can window over aggregated results.
 
 ### How do you find the top-N rows per group?
 
-Rank within each group and filter: `QUALIFY ROW_NUMBER() OVER (PARTITION BY
-group_col ORDER BY metric DESC) <= 3`. Swap `ROW_NUMBER` for `RANK` if you want
-ties to share a slot and possibly return more than N rows. This "top-N per
+Rank within each group in a subquery, then filter outside it: compute
+`ROW_NUMBER() OVER (PARTITION BY group_col ORDER BY metric DESC) AS rn` and
+keep `WHERE rn <= 3` (or put the window in `QUALIFY` where the engine has it).
+Swap `ROW_NUMBER` for `RANK` if you want ties to share a slot and possibly
+return more than N rows. This "top-N per
 group" pattern is one of the most common window-function interview asks.
 
 ### When is `COUNT(DISTINCT ...)` a problem, and what do you do about it?
@@ -339,8 +369,8 @@ recompute from the base grain rather than rolling up.
   > \`DISTINCT\` dedupes identical rows; it can't pick the latest record when other columns differ.
 - \`WHERE updated_at = MAX(updated_at)\`.
   > You can't use a bare aggregate in \`WHERE\`, and a global max wouldn't be per-user anyway.
-- [o] \`QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY updated_at DESC) = 1\`.
-  > Numbering per user by recency and keeping row 1 returns exactly one complete row per key in a single pass.
+- [o] \`ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY updated_at DESC)\`, keeping row 1.
+  > Numbering per user by recency and keeping row 1 (in an outer query, or with \`QUALIFY\` where the engine has it) returns exactly one complete row per key.
 - \`GROUP BY user_id\` and \`MAX(updated_at)\`, then select the other columns.
   > \`MAX(updated_at)\` gives the latest timestamp but drops the rest of that row; you'd need another join to recover \`email\` etc.`}
 />
@@ -374,9 +404,9 @@ recompute from the base grain rather than rolling up.
 ## Challenges
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Deduplicate to the latest record per key"
-  instructions={`Table \`customer_updates\` (\`customer_id\`, \`updated_at\`, \`email\`) has **multiple rows per customer**. Return exactly **one row per** \`customer_id\`: the row with the most recent \`updated_at\`. Keep columns \`customer_id\`, \`updated_at\`, \`email\`. Sort by \`customer_id\`. Hint: number rows per customer by \`updated_at\` descending and keep the first with \`QUALIFY\`.`}
+  instructions={`Table \`customer_updates\` (\`customer_id\`, \`updated_at\`, \`email\`) has **multiple rows per customer**. Return exactly **one row per** \`customer_id\`: the row with the most recent \`updated_at\`. Keep columns \`customer_id\`, \`updated_at\`, \`email\`. Sort by \`customer_id\`. Hint: number rows per customer by \`updated_at\` descending in a subquery, then keep row 1 outside it (Postgres has no \`QUALIFY\`).`}
   initSql={`CREATE TABLE customer_updates AS SELECT * FROM (VALUES
   (1, TIMESTAMP '2024-01-01 10:00:00', 'a@x.com'),
   (1, TIMESTAMP '2024-03-01 09:00:00', 'a2@x.com'),
@@ -405,15 +435,25 @@ recompute from the base grain rather than rolling up.
 ) AS t(customer_id, updated_at, email);`}
   starterCode={`-- Keep only the newest row per customer_id
 SELECT customer_id, updated_at, email
-FROM customer_updates
--- QUALIFY ROW_NUMBER() OVER (...) = 1
+FROM (
+  SELECT
+    *
+    -- , ROW_NUMBER() OVER (...) AS rn
+  FROM customer_updates
+) ranked
+-- WHERE rn = 1
 ORDER BY customer_id;`}
   solutionSql={`SELECT customer_id, updated_at, email
-FROM customer_updates
-QUALIFY ROW_NUMBER() OVER (
-  PARTITION BY customer_id
-  ORDER BY updated_at DESC
-) = 1
+FROM (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (
+      PARTITION BY customer_id
+      ORDER BY updated_at DESC
+    ) AS rn
+  FROM customer_updates
+) ranked
+WHERE rn = 1
 ORDER BY customer_id;`}
   tests={[
     { id: "rows", name: "One row per customer", description: "Twelve customers collapse to twelve rows", expectedRowCount: 12 },
@@ -425,9 +465,9 @@ The second challenge is the one interviewers reach for when they want
 to see whether you think about the days that *are not* in the data.
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Daily active users with a date spine"
-  instructions={`Table \`logins\` (\`user_id\`, \`login_date\`) records logins over several days, but some days have **no logins at all**. Produce a **complete daily series**: one row for every calendar day from the earliest to the latest \`login_date\`, with the count of **distinct** active users that day (0 for empty days). Columns: \`day\`, \`active_users\`. Sort by \`day\`. Hint: build a spine with \`generate_series(..., INTERVAL 1 DAY)\` and \`LEFT JOIN\`.`}
+  instructions={`Table \`logins\` (\`user_id\`, \`login_date\`) records logins over several days, but some days have **no logins at all**. Produce a **complete daily series**: one row for every calendar day from the earliest to the latest \`login_date\`, with the count of **distinct** active users that day (0 for empty days). Columns: \`day\`, \`active_users\`. Sort by \`day\`. Hint: build a spine with \`generate_series(..., INTERVAL '1 day')\` and \`LEFT JOIN\`.`}
   initSql={`-- 2024-05-02, 05-06, 05-09, 05-12 and 05-13 have no logins at all: those
 -- are the days a date spine has to invent.
 CREATE TABLE logins AS SELECT * FROM (VALUES
@@ -454,7 +494,7 @@ ORDER BY day;`}
 ),
 spine AS (
   SELECT CAST(g AS DATE) AS day
-  FROM bounds, generate_series(bounds.lo, bounds.hi, INTERVAL 1 DAY) AS gs(g)
+  FROM bounds, generate_series(bounds.lo, bounds.hi, INTERVAL '1 day') AS gs(g)
 )
 SELECT
   s.day,
@@ -471,6 +511,6 @@ ORDER BY s.day;`}
 
 ## Go deeper
 
-- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
 - [Intro to SQL with Postgres](/courses/intro-sql-postgres)
 - [Database Design with PostgreSQL](/courses/database-design-postgresql)
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)

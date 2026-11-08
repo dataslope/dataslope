@@ -99,7 +99,7 @@ export const MonthScene: React.FC = () => {
           ["Per month", BAR_X, "left", isntAt - 4],
         ].map(([t, x, a, at]) => (
           <Note key={t as string} at={at as number} x={x as number} y={y(HEAD_Y)} align={a as "left" | "right"} from="up">
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
           </Note>
         ))}
         <Hairline x={X0} y={y(HEAD_Y) + 36} w={RIGHT - X0} at={monthAt} color={INK_SOFT} />
@@ -124,13 +124,13 @@ export const MonthScene: React.FC = () => {
                 }}
               />
               <Note at={fourAt - 2 + i * 5} x={X0} y={ry}>
-                <span style={{ ...note(25, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{r.name}</span>
+                <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.name}</span>
               </Note>
               <Note at={modelAt - 2 + i * 3} x={MODEL_X} y={ry}>
-                <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>{NAME[r.model]}</span>
+                <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{NAME[r.model]}</span>
               </Note>
               <Note at={volumeWordAt - 2 + i * 3} x={TOK_R} y={ry} align="right">
-                <span style={{ ...note(25, INK), ...TABULAR, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>
                   {i === dom ? (
                     <Marked at={tokensAt - 2}>{`${int(r.in)} in, ${int(r.out)} out`}</Marked>
                   ) : (
@@ -139,7 +139,7 @@ export const MonthScene: React.FC = () => {
                 </span>
               </Note>
               <Note at={volumeWordAt + i * 3} x={DAY_R} y={ry} align="right">
-                <span style={{ ...note(25, INK), ...TABULAR, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>
                   {i === dom || i === dear ? <Marked at={volumeAt - 2 + (i === dear ? 6 : 0)}>{int(r.perDay)}</Marked> : int(r.perDay)}
                 </span>
               </Note>
@@ -147,8 +147,8 @@ export const MonthScene: React.FC = () => {
                 {/* The decoy is red only until the real answer is named; then red belongs to that row alone. */}
                 <span
                   style={{
-                    ...note(25, i === dear && frame < summariesAt - 4 ? POINT_INK : INK),
-                    fontWeight: i === dear && frame < summariesAt - 4 ? 700 : 500,
+                    ...note(24, i === dear && frame < summariesAt - 4 ? POINT_INK : INK),
+                    fontWeight: i === dear && frame < summariesAt - 4 ? 500 : 500,
                     ...TABULAR,
                     whiteSpace: "nowrap",
                   }}
@@ -167,7 +167,7 @@ export const MonthScene: React.FC = () => {
                 style={{ transform: `scaleY(${1 + barLit * 0.35})` }}
               />
               <Note at={growAt(i) + 12} x={BAR_X + (r.month / maxMonth) * BAR_MAX + 14} y={ry}>
-                <span style={{ ...note(25, i === dom ? POINT_INK : INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(24, i === dom ? POINT_INK : INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
                   {i === dom ? <Marked at={eightAt - 2}>{usd(r.month)}</Marked> : usd(r.month)}
                 </span>
               </Note>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, headline, INK_SOFT, note } from "../../editorial/style";
+import { headline, INK_SOFT, note, INK } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import {
@@ -181,7 +181,7 @@ export const GroupScene: React.FC = () => {
             </Ink>
             {lead && merge > 0 ? (
               <div style={{ position: "absolute", ...cellBox(g, AMOUNT, rt, g.rowH, amountX), opacity: merge }}>
-                <CellText col="total" value={TOTAL[region]} weight={650} />
+                <CellText col="total" value={TOTAL[region]} weight={500} />
               </div>
             ) : null}
           </React.Fragment>
@@ -208,7 +208,7 @@ export const GroupScene: React.FC = () => {
           x={g.colX[AMOUNT] - COL_W.day + COL_W.amount + 28}
           y={g.rowTop(i) + g.rowH / 2 - 15}
         >
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>{PARTS[regionOf(row)].join(" + ")}</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{PARTS[regionOf(row)].join(" + ")}</span>
         </Note>
       ))}
 
@@ -229,7 +229,7 @@ export const GroupScene: React.FC = () => {
         <Ink
           at={outAt - 2}
           dur={16}
-          style={{ position: "relative", ...headline(62, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(62, true), color: INK, whiteSpace: "nowrap" }}
         >
           {GROUPED.rows.length} rows out.
         </Ink>

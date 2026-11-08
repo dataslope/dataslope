@@ -41,7 +41,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Reused, per the series rule:
  *   - Question 5 is why-normalization's shop (WhyNormalization, and Unit 7's
  *     opening): orders 1 and 2 are Ada's, order 3 is Grace's, the rushed
- *     update fixes only order 1. Its statements are re-run in DuckDB here.
+ *     update fixes only order 1. Its statements are re-run here.
  *   - Question 6 shows db-normalization's three tables (Unit 7: a phones cell
  *     holding a list, order_items_bad, orders_bad), read from its
  *     results.json, and its "the key, the whole key, and nothing but the key"
@@ -52,8 +52,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - Every schema is drawn with the ERD kit (editorial/erd.tsx); every table
  *     and listing is da-sql's kit, as ds-sql takes it.
  *
- * Facts. Every number below ran in DuckDB 1.4.3 (DuckDB-Wasm, the engine the
- * page's blocks run in), by check.mjs into results.json, which data.ts reads:
+ * Facts. Every number below ran in Postgres (PGlite, PostgreSQL 18, the
+ * engine the page's blocks run in), by check.mjs into results.json, which
+ * data.ts reads:
  *   - "versions": the page's Type 2 block: customer 42 is customer_key 1001
  *     in Boston and 1087 in Austin; by the page's point-in-time join, order
  *     101 (2023-05-10) resolves to 1001 and order 102 (2024-06-01) to 1087.
@@ -65,8 +66,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     page's own block holds one sale per day and region, so its naive join
  *     sums the budget correctly, 5,748.00 both ways, and cannot show the
  *     double count its prose describes.)
- *   - "denorm": why-normalization's update in DuckDB: one row changed, and
- *     Ada then has two distinct emails.
+ *   - "denorm": why-normalization's update: one row changed, and Ada then
+ *     has two distinct emails.
  *   - "accum": the video's own loan application 7: applied 2024-03-04,
  *     approved 2024-03-11 (seven days), funded 2024-03-20 (nine days later).
  *   - "semi": the video's own month-end balances, built from Ada's and Ben's

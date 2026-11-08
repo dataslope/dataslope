@@ -50,11 +50,11 @@ export const CollapseScene: React.FC = () => {
         Every call <Mono>{`fibMemo(${TREE_N})`}</Mono> makes
       </Fig>
       <Note at={tableAt} x={1800} y={y(104) + 1} align="right" from="right">
-        <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
+        <span style={{ ...note(24, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
           <Key stroke={INK_SOFT} fill={PAPER} /> <span>computed</span>
           <span style={{ width: 16 }} />
           <Key stroke={MEMO} dashed fill={`color-mix(in srgb, ${MEMO} 14%, ${PAPER})`} />
-          <span style={{ color: MEMO_INK, fontWeight: 650 }}>read from the table</span>
+          <span style={{ color: MEMO_INK, fontWeight: 500 }}>read from the table</span>
         </span>
       </Note>
 
@@ -105,8 +105,8 @@ export const CollapseScene: React.FC = () => {
         hot={ease(frame, nineAt - 2, 10)}
       />
       <Note at={nineAt + 6} x={SIDE_X} y={y(COUNTER_TOP) + 200} from="up" width={340}>
-        <div style={note(22, INK_SOFT)}>{NAIVE_CALLS} without the table.</div>
-        <div style={{ ...note(22, INK), marginTop: 6 }}>
+        <div style={note(24, INK_SOFT)}>{NAIVE_CALLS} without the table.</div>
+        <div style={{ ...note(24, INK), marginTop: 6 }}>
           {MEMO_HITS} of the {MEMO_CALLS} just read it.
         </div>
       </Note>

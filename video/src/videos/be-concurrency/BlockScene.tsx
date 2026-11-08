@@ -92,7 +92,7 @@ export const BlockScene: React.FC = () => {
           Why can&apos;t you just call a blocking function inside a coroutine?
         </QuestionCard>
         <Note at={oneThreadAt} x={X0} y={y(290)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             The loop is one thread<span style={{ opacity: ease(frame, neverAt, 10) }}>, and a blocking call <b style={{ color: ACCENT_INK }}>never yields</b></span>
           </span>
         </Note>
@@ -104,13 +104,13 @@ export const BlockScene: React.FC = () => {
         ].map((f, i) => (
           <React.Fragment key={f.name}>
             <Note at={oneThreadAt + 4} x={AXIS.x - 40} y={y(GHOST[i]) + h(GHOST_H) / 2 - 13}>
-              <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 700, color: INK_SOFT }}>{f.name}</span>
+              <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT }}>{f.name}</span>
             </Note>
             <WaitBar axis={AXIS} y={y(GHOST[i])} h={h(GHOST_H)} start={0} stop={f.wait} at={oneThreadAt + 6 + i * 4} color={ds("gray", 400)} dur={16} />
           </React.Fragment>
         ))}
         <Note at={oneThreadAt + 12} x={msX(AXIS, msA) + 20} y={y(GHOST[0]) + h(6)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             awaiting: about <Num>{overlapped}</Num> ms
           </span>
         </Note>
@@ -118,37 +118,37 @@ export const BlockScene: React.FC = () => {
         {/* The blocking run. */}
         {["a", "b"].map((name) => (
           <Note key={name} at={swapAt + 2} x={AXIS.x - 44} y={rowY(name) + rowH / 2 - 17}>
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 700, color: BLUE_INK }}>{name}</span>
+            <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: BLUE_INK }}>{name}</span>
           </Note>
         ))}
         <WaitBar axis={AXIS} y={rowY("a")} h={rowH} start={0} stop={msA} at={holdsAt} color={ACCENT} solid>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>blocking sleep: holds the thread</span>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>blocking sleep: holds the thread</span>
         </WaitBar>
         <WaitBar axis={AXIS} y={rowY("b")} h={rowH} start={msA} stop={msA + msB} at={bCantAt + 8} color={BAR}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>await, {ms(msB / 1000)}</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>await, {ms(msB / 1000)}</span>
         </WaitBar>
         <Note at={bCantAt + 2} x={AXIS.x + 12} y={rowY("b") + rowH / 2 - 14} out={bCantAt + 8}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>can&apos;t start yet</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>can&apos;t start yet</span>
         </Note>
         <Note at={aFirstAt} x={msX(AXIS, msA) + 14} y={rowY(first) + rowH / 2 - 15}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>✓ {first} done, first</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>✓ {first} done, first</span>
         </Note>
         <Note at={thirtyAt - 4} x={msX(AXIS, msA + msB) + 14} y={rowY(second) + rowH / 2 - 15}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>✓ {second} done</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>✓ {second} done</span>
         </Note>
         <MsAxis axis={AXIS} y={rowY("b") + rowH + h(26)} to={serial} at={swapAt + 4} />
         <Note at={thirtyAt} x={RIGHT_X} y={rowY("a") + h(4)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             blocking: <Num>{serial}</Num> ms
           </span>
         </Note>
         <Note at={addUpAt} x={RIGHT_X} y={rowY("a") + h(44)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>the waits add up instead of overlapping</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the waits add up instead of overlapping</span>
         </Note>
 
         {/* In a server: one call, and every request on the loop behind it. */}
         <Note at={serverAt} x={X0} y={laneY + laneH / 2 - 15}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>the loop</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the loop</span>
         </Note>
         {/* The loop's lane: a hairline under it. */}
         <div style={{ position: "absolute", left: AXIS.x - 10, top: laneY + laneH + 8, width: 920, height: 1, background: HAIRLINE, opacity: ease(frame, serverAt, 12) }} />
@@ -178,19 +178,19 @@ export const BlockScene: React.FC = () => {
                 opacity: p * (1 - done * 0.9),
               }}
             >
-              <span style={{ ...label(20, done > 0.5 ? OK_INK : stalled > 0.5 ? INK_SOFT : BLUE_INK), fontWeight: 700 }}>req {k + 1}</span>
+              <span style={{ ...label(24, done > 0.5 ? OK_INK : stalled > 0.5 ? INK_SOFT : BLUE_INK), fontWeight: 500 }}>req {k + 1}</span>
             </div>
           );
         })}
         <Note at={stallsAt} x={AXIS.x} y={laneY + laneH + h(26)} out={awaitAt - 2}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             One call, and <Band at={stallsAt + 6}>every request</Band> on the loop stalls until it returns
           </span>
         </Note>
 
         {/* The fix. */}
         <Node x={POOL.x} y={y(POOL.y)} w={POOL.w} h={h(POOL.h)} at={poolAt} tone="plain" fill="transparent" line={HAIRLINE} stroke={1.5} align="left" justify="flex-start">
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", marginTop: 8 }}>a thread or process pool</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", marginTop: 8 }}>a thread or process pool</span>
         </Node>
         <div
           style={{
@@ -209,17 +209,17 @@ export const BlockScene: React.FC = () => {
             opacity: ease(frame, serverAt + 2, 10),
           }}
         >
-          <span style={{ ...label(21, moved > 0.5 ? INK : ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{callText}</span>
+          <span style={{ ...label(24, moved > 0.5 ? INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{callText}</span>
         </div>
         <Flow points={[[POOL.x - 8, laneY + laneH / 2], [AXIS.x + 916, laneY + laneH / 2]]} at={awaitAt} color={OK} width={2.8} dash="8 6" />
         <Note at={awaitAt + 6} x={AXIS.x} y={laneY + laneH + h(26)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>await its result: the loop runs on</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>await its result: the loop runs on</span>
         </Note>
         <Note at={poolAt + 6} x={POOL.x} y={y(POOL.y + POOL.h) + h(14)}>
-          <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, whiteSpace: "nowrap" }}>loop.run_in_executor(…)</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, whiteSpace: "nowrap" }}>loop.run_in_executor(…)</span>
         </Note>
         <Note at={libsAt} x={POOL.x} y={y(612)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>The fix: async-native libraries, or</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The fix: async-native libraries, or</span>
         </Note>
       </Drift>
     </AbsoluteFill>

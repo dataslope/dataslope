@@ -140,8 +140,8 @@ export const PathScene: React.FC = () => {
         ] as const
       ).map(([x, t, at, sub]) => (
         <Fade key={t} at={at - 2} style={{ left: x, top: top0 - 84 }}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
-          {sub ? <div style={{ ...note(19, INK_SOFT), marginTop: 2, whiteSpace: "nowrap" }}>{sub}</div> : null}
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
+          {sub ? <div style={{ ...note(24, INK_SOFT), marginTop: 2, whiteSpace: "nowrap" }}>{sub}</div> : null}
         </Fade>
       ))}
       {toks.map((t, i) => (
@@ -150,13 +150,13 @@ export const PathScene: React.FC = () => {
             <TokenChip text={t.piece} size={23} />
           </Fade>
           <Fade at={idsAt + i * 3} style={{ left: X.ids, top: rowY(i) + 8 }}>
-            <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 24, color: INK, ...TABULAR }}>{t.id}</span>
+            <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 24, color: INK, ...TABULAR }}>{t.id}</span>
           </Fade>
           <Fade at={embeddingAt - 2 + i * 2} style={{ left: X.emb, top: rowY(i) + 6, display: "flex", alignItems: "center", gap: 10 }}>
             <Strip cells={8} at={embeddingAt + i * 2} frame={frame} />
             {/* + its slot's position vector, drawn as a vector rather than a count. */}
             <span style={{ display: "inline-flex", alignItems: "center", gap: 6, opacity: ease(frame, positionAt + i * 2, 8) }}>
-              <span style={{ ...note(22, POINT_INK), fontWeight: 700 }}>+</span>
+              <span style={{ ...note(24, POINT_INK), fontWeight: 500 }}>+</span>
               {[0, 1, 2].map((c) => (
                 <span key={c} style={{ width: 14, height: 30, borderRadius: 3, border: `1.5px solid ${POINT}`, background: PAPER }} />
               ))}
@@ -266,12 +266,12 @@ export const PathScene: React.FC = () => {
       {/* On top of the stack, the output layer the parameter count will name. */}
       <Fade at={modelAt - 2} style={{ left: X.stack, top: blockBot - SLABS * 40 - 66, width: 220 }}>
         <div style={{ border: `2px solid ${INK}`, borderRadius: 8, padding: "6px 12px 8px", background: PAPER }}>
-          <div style={{ ...label(21, INK) }}>Output layer</div>
-          <div style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>a score per token</div>
+          <div style={{ ...label(24, INK) }}>Output layer</div>
+          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a score per token</div>
         </div>
       </Fade>
       <Fade at={thirtyAt - 2} style={{ left: X.stack, top: blockBot + 14, display: "flex", alignItems: "baseline", gap: 12 }}>
-        <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 24, color: INK, ...TABULAR }}>×{PARAMS.layers}</div>
+        <div style={{ fontFamily: MONO, fontWeight: 500, fontSize: 24, color: INK, ...TABULAR }}>×{PARAMS.layers}</div>
         <div style={{ opacity: ease(frame, modelAt - 4, 10) }}>
           <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>in the lesson&apos;s</div>
           <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>mid-sized model</div>
@@ -348,7 +348,7 @@ export const ParamsScene: React.FC = () => {
       {/* ── Fig. 19: the lesson's sums, as one bar ── */}
       <FigLabel n="18" title="Where the lesson's mid-sized model keeps its parameters" at={from} x={X0} y={y(FIG_Y)} />
       <Fade at={sevenAt - 2} style={{ left: BAR_X1, top: y(FIG_Y) + 2, transform: "translateX(-100%)" }}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
           <Mark at={wholeAt}>Total: {PARAMS.total.toFixed(2)} billion</Mark>
         </span>
       </Fade>
@@ -405,13 +405,13 @@ export const ParamsScene: React.FC = () => {
               whiteSpace: "nowrap",
             }}
           >
-            <span style={{ ...label(22, INK) }}>{i === 3 ? "Output layer" : s.name}</span>{" "}
-            <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, s.valueAt - 2, 10), ...TABULAR }}>{s.b.toFixed(2)} billion</span>
+            <span style={{ ...label(24, INK) }}>{i === 3 ? "Output layer" : s.name}</span>{" "}
+            <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, s.valueAt - 2, 10), ...TABULAR }}>{s.b.toFixed(2)} billion</span>
           </Fade>
         );
       })}
       <Fade at={fiftyAt - 2} style={{ left: segs[2].x0 + 28, top: BY + BH / 2 - 26 }}>
-        <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 36, color: PAPER, ...TABULAR }}>{PARAMS.ffShare}%</span>
+        <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 34, color: PAPER, ...TABULAR }}>{PARAMS.ffShare}%</span>
       </Fade>
       <Note at={knowsAt - 4} x={X0} y={y(615)}>
         <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>
@@ -431,7 +431,7 @@ export const ParamsScene: React.FC = () => {
       <Arrow from={[X0 + 380, WY + 72]} to={[X0 + 4, WY + 72]} at={widthAt} color={INK_SOFT} />
       <Fade at={holdAt - 4} style={{ left: X0, top: WY + 92 }}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <b style={{ fontWeight: 650 }}>Width:</b> what one token&apos;s vector can hold <span style={{ color: INK_SOFT, ...TABULAR }}>({thousands(PARAMS.dModel)} numbers)</span>
+          <b style={{ fontWeight: 600 }}>Width:</b> what one token&apos;s vector can hold <span style={{ color: INK_SOFT, ...TABULAR }}>({thousands(PARAMS.dModel)} numbers)</span>
         </span>
       </Fade>
       <Svg>
@@ -446,13 +446,13 @@ export const ParamsScene: React.FC = () => {
       <Arrow from={[DX + 290, DY - 4]} to={[DX + 290, DY - 8 * 30 + 6]} at={depthAt} color={INK_SOFT} />
       <Fade at={refinedAt - 4} style={{ left: DX + 320, top: DY - 150 }}>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <b style={{ fontWeight: 650 }}>Depth:</b> how many times
+          <b style={{ fontWeight: 600 }}>Depth:</b> how many times
         </div>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>it gets refined</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", ...TABULAR }}>({PARAMS.layers} blocks)</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", ...TABULAR }}>({PARAMS.layers} blocks)</div>
       </Fade>
       <Note at={bothAt - 2} x={X0 + 30 * 26 + 60} y={WY - 6}>
-        <span style={{ ...note(26, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>You need both.</span>
+        <span style={{ ...note(28, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>You need both.</span>
       </Note>
     </AbsoluteFill>
   );
@@ -561,13 +561,13 @@ export const ExpertsScene: React.FC = () => {
         return (
           <React.Fragment key={name}>
             <Fade at={i ? usesAt - 4 : storesAt - 2} style={{ left: BX, top }}>
-              <span style={{ ...label(22, INK) }}>{name}</span>
+              <span style={{ ...label(24, INK) }}>{name}</span>
             </Fade>
             <Svg opacity={p > 0 ? 1 : 0}>
               <rect x={BX} y={top + 44} width={Math.max(4, (v / ds3.total) * BW * p)} height={46} rx={3} fill={i ? POINT : DATA} />
             </Svg>
             <Fade at={at} style={{ left: BX + (v / ds3.total) * BW + 16, top: top + 50 }}>
-              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 28, color: i ? POINT_INK : INK, whiteSpace: "nowrap", ...TABULAR }}>
+              <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 28, color: i ? POINT_INK : INK, whiteSpace: "nowrap", ...TABULAR }}>
                 {v} billion
               </span>
             </Fade>
@@ -575,7 +575,7 @@ export const ExpertsScene: React.FC = () => {
         );
       })}
       <Fade at={thirtyAt + 10} style={{ left: BX, top: y(440 + 2 * 170) - 10 }}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>{ds3.share}% of it runs per token</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>{ds3.share}% of it runs per token</span>
       </Fade>
     </AbsoluteFill>
   );
@@ -618,15 +618,15 @@ export const TopScene: React.FC = () => {
 
       <FigLabel n="22" title="At the top: a score for every token in the vocabulary" at={from} x={X0} y={y(FIG_Y)} />
       <Fade at={lastAt - 4} style={{ left: X0, top: VY - 64 }}>
-        <span style={{ ...label(22, INK_SOFT) }}>The last position&apos;s vector, after every block</span>
+        <span style={{ ...label(24, INK_SOFT) }}>The last position&apos;s vector, after every block</span>
       </Fade>
       <Fade at={lastAt - 2} style={{ left: X0, top: VY, display: "flex", alignItems: "center", gap: 16 }}>
         <Strip cells={14} w={26} h={34} at={lastAt} frame={frame} strong />
       </Fade>
       <Arrow from={[X0 + 14 * 26 + 30, VY + 17]} to={[LX - 30, VY + 17]} at={scoreAt - 4} />
       <Fade at={scoreAt - 2} style={{ left: LX, top: y(350) }}>
-        <span style={{ ...label(21, INK_SOFT) }}>Token</span>
-        <span style={{ ...label(21, INK_SOFT), position: "absolute", left: ZERO - LX + 60 }}>Score</span>
+        <span style={{ ...label(24, INK_SOFT) }}>Token</span>
+        <span style={{ ...label(24, INK_SOFT), position: "absolute", left: ZERO - LX + 60 }}>Score</span>
       </Fade>
       <Svg opacity={ease(frame, scoreAt, 12)}>
         <line x1={ZERO} x2={ZERO} y1={rowTop(0) - 6} y2={rowTop(LOGITS.tokens.length) - 18} stroke={LINE} strokeWidth={1.6} />
@@ -653,7 +653,7 @@ export const TopScene: React.FC = () => {
                 top: top + 10,
                 opacity: p,
                 fontFamily: MONO,
-                fontWeight: 700,
+                fontWeight: 500,
                 fontSize: 24,
                 color: INK,
                 ...TABULAR,
@@ -665,16 +665,16 @@ export const TopScene: React.FC = () => {
         );
       })}
       <Fade at={vocabAt} style={{ left: LX + 30, top: rowTop(LOGITS.tokens.length) - 8 }}>
-        <div style={{ ...note(30, FAINT), lineHeight: 1 }}>⋮</div>
+        <div style={{ ...note(28, FAINT), lineHeight: 1 }}>⋮</div>
       </Fade>
       <Fade at={allAt - 2} style={{ left: LX + 80, top: rowTop(LOGITS.tokens.length) }}>
-        <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+        <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
           <Mark at={allAt}>{thousands(PARAMS.vocab)} scores</Mark>
         </span>
       </Fade>
       <Fade at={allAt + 8} style={{ left: LX, top: rowTop(LOGITS.tokens.length) + 56 }}>
-        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Four example scores, from the sampling lesson.</div>
-        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Four example scores, from the sampling lesson.</div>
+        <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           {thousands(PARAMS.vocab)}: the vocabulary of the lesson&apos;s mid-sized model.
         </div>
       </Fade>

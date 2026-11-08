@@ -157,7 +157,7 @@ export const GroupScene: React.FC = () => {
           {null}
         </Box>
         <Note at={setAt + 2} x={GA.x + 4} y={y(GA_TOP) - h(36)}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>consumer group A</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>consumer group A</span>
         </Note>
         {[0, 1, 2, 3].map((c) => {
           const at = c < 2 ? setAt + 6 + c * 4 : c === 2 ? thirdAt : fourthAt;
@@ -206,7 +206,7 @@ export const GroupScene: React.FC = () => {
           }}
         />
         <Note at={rebalanceAt} x={GA.x + 210} y={y(GA_TOP) - h(36)} out={q4At - 4}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", background: HIGHLIGHT, borderRadius: 4, padding: "0 6px" }}>rebalance</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap", background: HIGHLIGHT, borderRadius: 4, padding: "0 6px" }}>rebalance</span>
         </Note>
         <Crash x={GA.cx + GA.cw - 6} y={cTop(1) + 4} at={crashAt + 2} />
 
@@ -215,7 +215,7 @@ export const GroupScene: React.FC = () => {
           {null}
         </Box>
         <Note at={secondAt + 2} x={GB.x + 4} y={mid(1) - h(70) - h(36)} out={fanOut}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>consumer group B</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>consumer group B</span>
         </Note>
         <Box x={GB.cx} y={mid(1) - cH / 2} w={GB.cw} h={cH} at={secondAt + 4} out={fanOut} size={21}>
           consumer
@@ -237,15 +237,15 @@ export const GroupScene: React.FC = () => {
 
         {/* What a group does, along the bottom. */}
         <Note at={splitAt} x={X0} y={y(770)} out={fanOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>each partition goes to exactly one consumer in the group: the work is split, not copied</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>each partition goes to exactly one consumer in the group: the work is split, not copied</span>
         </Note>
         <Note at={stopsAt} x={X0} y={y(818)} out={fanOut}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             parallelism stops at the partition count: a fourth consumer has nothing to read
           </span>
         </Note>
         <Note at={feedsAt} x={X0} y={y(866)} out={fanOut}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>each group reads every message: one stream feeds several pipelines</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>each group reads every message: one stream feeds several pipelines</span>
         </Note>
         {[
           { at: twoAt, text: "2 consumers: one has two partitions" },
@@ -265,26 +265,26 @@ export const GroupScene: React.FC = () => {
           <Marker key={p} x={cellX(COMMITTED[p] + 1) - 5} top={laneTop(p) - 6} bottom={laneTop(p) + laneH + 6} at={recordsAt + 4 + p * 4} color={INK} />
         ))}
         <Note at={recordsAt + 10} x={X0} y={mid(0) - h(16)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Bar color={INK} />
             <b>commit</b>: how far group A got
           </span>
         </Note>
         <Note at={storesAt} x={X0} y={mid(0) + h(26)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>one per partition, stored in Kafka</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>one per partition, stored in Kafka</span>
         </Note>
         {/* Under partition 1, its arrow on the first offset after the commit, clear of the commit bars: where the new owner picks up. */}
         <Note at={ownerAt + 4} x={cellX(COMMITTED[1] + 1) + 8} y={laneTop(1) + laneH + h(10)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>↑ consumer 1 resumes here</span>
+          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>↑ consumer 1 resumes here</span>
         </Note>
         {/* The wrong alternative, struck: the start of the partition. */}
         <Note at={startAt - 2} x={LANE_X - 24} y={mid(1) - h(16)} align="right">
-          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Strike at={startAt + 4}>from offset 0</Strike>
           </span>
         </Note>
         <Note at={costAt} x={LANE_X - 280} y={y(770)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <span style={{ background: HIGHLIGHT, borderRadius: 4, padding: "0 6px" }}>offsets 3 and 4</span>: processed, never committed. Read again?
           </span>
         </Note>

@@ -58,15 +58,15 @@ const Order: React.FC<{ threads: string; result: number; x: number; y: number; a
   const right = result === RACE.one.right;
   const ink = judged > 0.5 ? (right ? OK_INK : ACCENT_INK) : INK;
   return (
-    <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "center", gap: 4, fontSize: 22, opacity: Math.min(1, p) * (1 - dim), transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`, transformOrigin: "0 50%" }}>
+    <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "center", gap: 4, fontSize: 24, opacity: Math.min(1, p) * (1 - dim), transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`, transformOrigin: "0 50%" }}>
       {[...threads].map((c, i) => (
         <span key={i} style={{ width: SQ, height: SQ, borderRadius: 4, background: THREAD[who(c)].fill }} />
       ))}
       <span
         style={{
           marginLeft: 10,
-          ...label(22, ink),
-          fontWeight: 750,
+          ...label(24, ink),
+          fontWeight: 500,
           padding: "0 6px",
           borderRadius: 5,
           background: judged > 0 ? tint(right ? OK : ACCENT, 18 * judged) : "transparent",
@@ -153,14 +153,14 @@ export const RaceScene: React.FC = () => {
           What is a race condition?
         </QuestionCard>
         <Note at={timingAt - 4} x={X0} y={y(290)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             The result depends on the <Band at={timingAt + 2}>timing</Band> of operations on shared state
           </span>
         </Note>
 
         {/* The shared counter. */}
         <Note at={classicAt} x={X0} y={y(356)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650 }}>the counter</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>the counter</span>
         </Note>
         <div
           style={{
@@ -172,7 +172,7 @@ export const RaceScene: React.FC = () => {
             transformOrigin: "0 50%",
           }}
         >
-          <span style={{ ...label(64, counterInk), fontWeight: 750, lineHeight: 1 }}>
+          <span style={{ ...label(64, counterInk), fontWeight: 500, lineHeight: 1 }}>
             <Num>{counter}</Num>
           </span>
         </div>
@@ -181,7 +181,7 @@ export const RaceScene: React.FC = () => {
         {/* Two threads, three steps each. */}
         {[0, 1].map((t) => (
           <Note key={t} at={twoAt + t * 4} x={X0} y={rowY[t] + chipH / 2 - 14}>
-            <span style={{ ...label(21, THREAD[t].ink), fontWeight: 700, whiteSpace: "nowrap" }}>thread {t + 1}</span>
+            <span style={{ ...label(24, THREAD[t].ink), fontWeight: 500, whiteSpace: "nowrap" }}>thread {t + 1}</span>
           </Note>
         ))}
         {[0, 1].map((t) =>
@@ -215,13 +215,13 @@ export const RaceScene: React.FC = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   gap: "0.3em",
-                  fontSize: 21,
+                  fontSize: 24,
                   opacity: p * (1 - fused),
                 }}
               >
-                <span style={{ ...label(21, th.ink), fontWeight: 700 }}>{step}</span>
+                <span style={{ ...label(24, th.ink), fontWeight: 500 }}>{step}</span>
                 {valued > 0 ? (
-                  <span style={{ ...label(21, lost > 0 ? ACCENT_INK : BLUE_INK), fontWeight: 750, opacity: valued }}>
+                  <span style={{ ...label(24, lost > 0 ? ACCENT_INK : BLUE_INK), fontWeight: 500, opacity: valued }}>
                     <Num>{seen.value}</Num>
                   </span>
                 ) : null}
@@ -251,25 +251,25 @@ export const RaceScene: React.FC = () => {
             }}
           >
             <LockGlyph size={24} color={INK} />
-            <span style={{ ...label(21, THREAD[t].ink), fontWeight: 700, whiteSpace: "nowrap" }}>read, add, write</span>
+            <span style={{ ...label(24, THREAD[t].ink), fontWeight: 500, whiteSpace: "nowrap" }}>read, add, write</span>
           </div>
         ))}
         <Flow points={[[STEP_X, y(736)], [STEP_X + 6 * SLOT - 10, y(736)]]} at={bothReadAt} color={INK_SOFT} width={2} head={13} out={fixAt} />
         <Note at={bothReadAt + 4} x={STEP_X + 6 * SLOT + 6} y={y(736) - 15} out={fixAt}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650 }}>time</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>time</span>
         </Note>
         <Note at={lostAt} x={STEP_X} y={y(762)} out={fixAt}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Two increments, and the counter reads <Num>{LOST.result}</Num>: one is lost
           </span>
         </Note>
         <Note at={sectionAt + 4} x={STEP_X} y={y(736)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>One critical section: a lock around all three</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>One critical section: a lock around all three</span>
         </Note>
 
         {/* Every order the six steps can run in. */}
         <Note at={countAt} x={G_X} y={y(326)} out={fixAt + 2}>
-          <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Every order of the six steps<span style={{ opacity: ease(frame, twentyAt, 10) }}>
               : <Num>{RACE.one.orders}</Num>
             </span>
@@ -301,7 +301,7 @@ export const RaceScene: React.FC = () => {
         </Note>
         {/* With the lock: two orders, both right. */}
         <Note at={ordersAt - 2} x={G_X} y={y(326)}>
-          <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             With the lock: <Num>{RACE.locked.orders}</Num> orders
           </span>
         </Note>
@@ -311,7 +311,7 @@ export const RaceScene: React.FC = () => {
           if (p <= 0) return null;
           const judged = ease(frame, bothSevenAt, 10);
           return (
-            <div key={o.threads} style={{ position: "absolute", left: G_X, top: y(G_TOP) + k * h(76), display: "flex", alignItems: "center", gap: 8, fontSize: 22, opacity: p }}>
+            <div key={o.threads} style={{ position: "absolute", left: G_X, top: y(G_TOP) + k * h(76), display: "flex", alignItems: "center", gap: 8, fontSize: 24, opacity: p }}>
               {[...o.threads].map((c, i) => (
                 <span
                   key={i}
@@ -324,14 +324,14 @@ export const RaceScene: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    ...label(21, THREAD[who(c)].ink),
-                    fontWeight: 700,
+                    ...label(24, THREAD[who(c)].ink),
+                    fontWeight: 500,
                   }}
                 >
                   thread {who(c) + 1}
                 </span>
               ))}
-              <span style={{ marginLeft: 12, ...label(24, judged > 0.5 ? OK_INK : INK), fontWeight: 750, padding: "0 6px", borderRadius: 5, background: tint(OK, 18 * judged) }}>
+              <span style={{ marginLeft: 12, ...label(24, judged > 0.5 ? OK_INK : INK), fontWeight: 500, padding: "0 6px", borderRadius: 5, background: tint(OK, 18 * judged) }}>
                 <Num>{o.result}</Num>
               </span>
             </div>

@@ -44,7 +44,7 @@ const Cell: React.FC<{ x: number; y: number; at: number; lit?: number; dim?: num
       <span
         style={{
           ...note(42, INK),
-          fontWeight: bold ? 700 : 500,
+          fontWeight: bold ? 500 : 500,
           padding: "0 10px",
           borderRadius: 6,
           background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, transparent)`,
@@ -145,7 +145,7 @@ export const TableScene: React.FC = () => {
         ] as const
       ).map(([t, x, at]) => (
         <Ink key={t} at={at} dur={12} style={{ left: x - CELL_W / 2, top: y(HEAD_Y) - 14, width: CELL_W, textAlign: "center" }}>
-          <span style={label(23, t === "Churned" ? STAT_INK : INK_SOFT)}>{t}</span>
+          <span style={label(24, t === "Churned" ? STAT_INK : INK_SOFT)}>{t}</span>
         </Ink>
       ))}
       <div
@@ -239,7 +239,7 @@ export const TableScene: React.FC = () => {
         <Ink key={c.key} at={c.at - 8} dur={16} style={{ left: CHIP_X, top: y(c.rowY) - 24, opacity: c.key === "all" ? 1 - ease(frame, comparingAt - 4, 12) * 0.6 : 1, whiteSpace: "nowrap" }}>
           {/* One line, one size: the rate is the line's own Inter, in the
               accent and bold. */}
-          <span style={{ ...note(30, INK) }}>
+          <span style={{ ...note(28, INK) }}>
             P(churn{c.given ? <span style={{ color: INK_SOFT }}> | {c.given}</span> : null}) = {num(c.top)} /{" "}
             {c.key === "free" ? (
               <Sweep at={fractionAt} dur={14}>
@@ -249,18 +249,18 @@ export const TableScene: React.FC = () => {
               num(c.bottom)
             )}{" "}
             ={" "}
-            <span style={{ color: STAT_INK, fontWeight: 700 }}>{c.key === "all" ? pct(c.p) : <Sweep at={c.mark}>{pct(c.p)}</Sweep>}</span>
+            <span style={{ color: STAT_INK, fontWeight: 500 }}>{c.key === "all" ? pct(c.p) : <Sweep at={c.mark}>{pct(c.p)}</Sweep>}</span>
           </span>
         </Ink>
       ))}
       {/* After the first "|" it explains is on screen. */}
       <Note at={sixAt + 4} x={CHIP_X} y={y(ROW_Y.paid) - 96}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           The bar reads &ldquo;given&rdquo;: churn, given a paid plan.
         </span>
       </Note>
       <Note at={fractionAt + 4} x={CHIP_X} y={y(ROW_Y.all) + 64}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           Divide by the free users only,
           <span style={{ color: INK_SOFT }}> not by all {num(TABLE.total)}.</span>
         </span>

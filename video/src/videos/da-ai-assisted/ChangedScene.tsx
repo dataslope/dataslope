@@ -31,8 +31,8 @@ const Kind: React.FC<{ x: number; y: number; at: number; title: React.ReactNode;
   if (p <= 0) return null;
   return (
     <div style={{ position: "absolute", left: x, top: y, width: COL_W, textAlign: "center", opacity: p, transform: `translateY(${(1 - p) * 12}px)` }}>
-      <div style={{ ...note(26, INK), fontWeight: 650, lineHeight: "34px", whiteSpace: "nowrap" }}>{title}</div>
-      <div style={{ ...note(22, INK_SOFT), lineHeight: "29px", marginTop: 6, textWrap: "balance" }}>{sub}</div>
+      <div style={{ ...note(28, INK), fontWeight: 500, lineHeight: "34px", whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...note(24, INK_SOFT), lineHeight: "29px", marginTop: 6, textWrap: "balance" }}>{sub}</div>
       {extra}
     </div>
   );
@@ -102,8 +102,8 @@ export const ChangedScene: React.FC = () => {
             transform: `translateY(${(1 - coreP) * 12}px)`,
           }}
         >
-          <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: "42px", whiteSpace: "nowrap" }}>The live SQL screen</div>
-          <div style={{ ...note(22, INK_SOFT), lineHeight: "29px", marginTop: 6, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(34, INK), fontWeight: 500, lineHeight: "42px", whiteSpace: "nowrap" }}>The live SQL screen</div>
+          <div style={{ ...note(24, INK_SOFT), lineHeight: "29px", marginTop: 6, whiteSpace: "nowrap" }}>
             usually <Mark at={offAt + 2}>AI off</Mark>
             <span style={{ opacity: ease(frame, fluencyAt - 2, 10) }}>, so fluency still matters</span>
           </div>
@@ -136,7 +136,7 @@ export const ChangedScene: React.FC = () => {
             sub={r.sub}
             extra={
               i === 2 ? (
-                <div style={{ ...label(19, BLUE_INK), lineHeight: "25px", marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, biAt + 2, 14) }}>BI: business intelligence</div>
+                <div style={{ ...label(24, BLUE_INK), lineHeight: "25px", marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, biAt + 2, 14) }}>BI: business intelligence</div>
               ) : undefined
             }
           />
@@ -154,10 +154,10 @@ export const ChangedScene: React.FC = () => {
             transform: `translateY(${(1 - ease(frame, askAt - 2, 12)) * 10}px)`,
           }}
         >
-          <span style={{ ...note(30, INK), fontWeight: 600, background: `linear-gradient(${HIGHLIGHT}, ${HIGHLIGHT})`, padding: "4px 12px", borderRadius: 6 }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, background: `linear-gradient(${HIGHLIGHT}, ${HIGHLIGHT})`, padding: "4px 12px", borderRadius: 6 }}>
             Ask the recruiter: is AI allowed in this round?
           </span>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 10, opacity: ease(frame, differAt - 2, 10) }}>policies differ, and change often</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 10, opacity: ease(frame, differAt - 2, 10) }}>policies differ, and change often</div>
         </div>
       </Drift>
     </AbsoluteFill>

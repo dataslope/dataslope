@@ -31,9 +31,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
  *
- * Facts. Every query and result on screen ran in DuckDB v1.4.3 (DuckDB-Wasm
- * 1.32.0, the engine the page's blocks run), by check.mjs into results.json,
- * which data.ts reads:
+ * Facts. Every query and result on screen ran in Postgres (PGlite,
+ * PostgreSQL 18, the engine the page's blocks run), by check.mjs into
+ * results.json, which data.ts reads:
  *   - "mistakes", the page's nine orders and its query (each WHERE broken
  *     after its column, to fit the panel): the assistant's BETWEEN total is
  *     405.50, the half-open total 840.50, so the assistant misses 51.8% of
@@ -42,8 +42,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     orders 7 and 8 hold that share. An order at 23:59:59.5 is dropped by an
  *     end at 23:59:59 and kept by the half-open range ("any timestamp
  *     precision", the page's concept check). The video's own two days (5 of
- *     10 sessions, then 20 of 1,000): the average of the two rates is 26%, the
- *     pooled rate 2.5%.
+ *     10 sessions, then 20 of 1,000): the average of the two rates is 26%
+ *     (Postgres prints the rounded numeric as 26.0), the pooled rate 2.5%.
  *   - "check": 10,000 orders becoming 14,000 rows is the page's own
  *     illustration, not a query result. The NULL trap (the video's own three
  *     customers and an order with no customer id): NOT IN keeps 0 rows, and

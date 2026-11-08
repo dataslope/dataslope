@@ -93,7 +93,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -122,7 +122,7 @@ export const Headline: React.FC<{
           at={turnAt ?? at + 10}
           dur={18}
           out={out}
-          style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
         >
           {turn}
         </Ink>
@@ -135,7 +135,7 @@ export const Headline: React.FC<{
  *  matches JetBrains Mono's x-height to the line's and stays inside the one
  *  size a line may hold (PageAudit's 12%). */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none" }}>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 500, color, fontVariantLigatures: "none" }}>
     {children}
   </span>
 );
@@ -261,8 +261,8 @@ const tokenize = (line: string): Token[] => {
     const [text, str, num, word] = m;
     if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
-    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 600 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
+    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -412,13 +412,13 @@ export const ErrorBox: React.FC<{
         }}
       >
         <div>
-          <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
+          <span style={{ color: ACCENT_INK, fontWeight: 500 }}>ERROR:</span>
           {"  "}
           <span style={{ opacity: quiet ? 0.32 : 1 }}>{message}</span>
         </div>
         {detail ? (
           <div style={{ color: INK_SOFT, opacity: detailIn }}>
-            <span style={{ fontWeight: 600 }}>DETAIL:</span>
+            <span style={{ fontWeight: 500 }}>DETAIL:</span>
             {"  "}
             {parts && parts.length === 2 ? (
               <>
@@ -469,14 +469,14 @@ export const Reply: React.FC<{
           padding: "8px 18px 9px",
           fontFamily: MONO,
           fontSize: size,
-          fontWeight: 600,
+          fontWeight: 500,
           color: OK_INK,
         }}
       >
         {tag}
       </div>
       {gloss ? (
-        <span style={{ ...note(20, INK_SOFT), opacity: ease(frame, glossAt ?? at + 8, 10) }}>{gloss}</span>
+        <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, glossAt ?? at + 8, 10) }}>{gloss}</span>
       ) : null}
     </Ink>
   );
@@ -701,7 +701,7 @@ export const DataTable: React.FC<{
               gap: 8,
               fontFamily: MONO,
               fontSize: g.headSize,
-              fontWeight: 600,
+              fontWeight: 500,
               color: INK_SOFT,
             }}
           >
@@ -847,7 +847,7 @@ export const TableName: React.FC<{ g: TableGeometry; at: number; children: React
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   return (
     <Ink at={at} dur={12} out={out} style={{ left: g.x, top: g.top - 38, whiteSpace: "nowrap", opacity: 1 - d }}>
-      <span style={{ ...label(21, INK), fontWeight: 650 }}>{children}</span>
+      <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
     </Ink>
   );
 };

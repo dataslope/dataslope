@@ -104,16 +104,16 @@ export const MapReduceScene: React.FC = () => {
 
         {/* The phases, as column heads. */}
         <Note at={machinesAt - 2} x={ROW_X} y={y(LABEL_Y)}>
-          <span style={{ ...label(25, INK_SOFT), whiteSpace: "nowrap" }}>Input splits</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Input splits</span>
         </Note>
         <Note at={phasesAt} x={PAIR_X} y={y(LABEL_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>1 Map</span>
+          <span style={{ ...label(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>1 Map</span>
         </Note>
         <Note at={shuffleWordAt} x={760} y={y(LABEL_Y)}>
-          <span style={{ ...label(26, red > 0.5 ? ACCENT_INK : INK), fontWeight: 700, whiteSpace: "nowrap" }}>Shuffle</span>
+          <span style={{ ...label(28, red > 0.5 ? ACCENT_INK : INK), fontWeight: 500, whiteSpace: "nowrap" }}>Shuffle</span>
         </Note>
         <Note at={phasesAt + 6} x={RED_X} y={y(LABEL_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>2 Reduce</span>
+          <span style={{ ...label(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>2 Reduce</span>
         </Note>
 
         {/* Three machines, each with its split of the frame. */}
@@ -212,7 +212,7 @@ export const MapReduceScene: React.FC = () => {
         })}
         {/* What the pair is made of, under the first one. */}
         <Note at={deptAt} x={PAIR_X} y={y(slotTop(0, 0)) - h(30)} out={sendAt}>
-          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>key · value</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>key · value</span>
         </Note>
 
         {/* Reduce: a bracket on each group, and its sum. */}
@@ -254,22 +254,22 @@ export const MapReduceScene: React.FC = () => {
           );
         })}
         <Note at={reduceAt} x={SUM_X} y={y(LABEL_Y)}>
-          <span style={{ ...label(25, INK_SOFT), whiteSpace: "nowrap" }}>sum per key</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>sum per key</span>
         </Note>
         <Note at={groupbyAt - 2} x={SUM_X} y={y(842)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            a <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>groupby</span>, across machines
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            a <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>groupby</span>, across machines
           </span>
         </Note>
 
         {/* Why it scales, and what it costs. */}
         <Note at={scalesAt} x={ROW_X} y={y(842)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             independent map tasks<span style={{ opacity: ease(frame, failAt, 10) }}> · the framework handles failures</span>
           </span>
         </Note>
         <Note at={costAt + 4} x={770} y={y(842)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             the cost<span style={{ opacity: ease(frame, networkAt, 10) }}>: data across the network</span>
           </span>
         </Note>

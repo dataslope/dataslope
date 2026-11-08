@@ -97,7 +97,7 @@ export const FlatScene: React.FC = () => {
         {/* The table and its columns from the first mention of a database; its rows with "a few orders". */}
         <FigLabel n="1" title="One table for everything" at={databaseAt - 4} x={X0} y={y(FIG_Y)} />
         <Note at={databaseAt + 4} x={g.x + g.width} y={y(FIG_Y) + 3} align="right">
-          <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, whiteSpace: "nowrap" }}>{FLAT.table}</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, whiteSpace: "nowrap" }}>{FLAT.table}</span>
         </Note>
         <DbTable
           g={g}
@@ -119,7 +119,7 @@ export const FlatScene: React.FC = () => {
 
         {/* The right column: day one, the copies, then the rushed update. */}
         <Note at={worksAt} out={adaAt} x={RIGHT_X} y={g.rowTop(0)}>
-          <div style={label(21, INK_SOFT)}>Day one</div>
+          <div style={label(24, INK_SOFT)}>Day one</div>
           <div style={{ ...body(34), color: INK, marginTop: 10, whiteSpace: "nowrap" }}>The first screen works.</div>
         </Note>
         <Note at={twiceAt - 2} out={changesAt - 6} x={RIGHT_X} y={g.rowTop(0) + 4}>
@@ -136,13 +136,13 @@ export const FlatScene: React.FC = () => {
           marks={[{ line: 2, at: oneOhOneAt - 2 }]}
         />
         {/* One line at one size: the reply stands out by its ink and weight. */}
-        <Ink at={swapAt + 4} dur={14} style={{ left: RIGHT_X, top: replyTop, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14, fontSize: 22 }}>
-          <span style={label(22, INK_SOFT)}>Postgres replied</span>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: INK }}>UPDATE {FLAT.updated}</span>
-          <span style={note(22, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
+        <Ink at={swapAt + 4} dur={14} style={{ left: RIGHT_X, top: replyTop, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14, fontSize: 24 }}>
+          <span style={label(24, INK_SOFT)}>Postgres replied</span>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>UPDATE {FLAT.updated}</span>
+          <span style={note(24, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
         </Ink>
         <Note at={missesAt + 2} x={RIGHT_X} y={replyTop + 52}>
-          <div style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>Order {FLAT.rows[MISSED_ROW][F.id]} still has the old one.</div>
+          <div style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>Order {FLAT.rows[MISSED_ROW][F.id]} still has the old one.</div>
         </Note>
 
         {/* Fig. 2: the lesson's GROUP BY, after the update. */}
@@ -165,10 +165,10 @@ export const FlatScene: React.FC = () => {
           at={twoAt + 4}
         />
         <Note at={twoAt + 8} x={gg.x + gg.width + 54} y={gg.rowTop(GROUPED_ADA[0]) + 10}>
-          <div style={{ ...body(36), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+          <div style={{ ...body(34), color: ACCENT_INK, whiteSpace: "nowrap" }}>
             {WORDS[FLAT.adaEmails]} emails for {ADA.split(" ")[0]}.
           </div>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>Which is right? The table can&apos;t say.</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>Which is right? The table can&apos;t say.</div>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, INK, INK_SOFT, note } from "../../editorial/style";
+import { ACCENT_INK, body, INK, INK_SOFT, note, SERIF_ITALIC } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -130,7 +130,7 @@ export const CaseScene: React.FC = () => {
         <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.75 * (ease(frame, foldingAt, 8) - ease(frame, foldDone, 12)) }}>
           <Arrow from={[X0 + leftW + 22, midY]} to={[TX - 26, midY]} at={lowerAt} />
           <Ink at={lowerAt + 4} dur={12} style={{ left: X0 + leftW + 30, top: midY - 34, whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT }}>lower()</span>
+            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT }}>lower()</span>
           </Ink>
         </div>
         <Tag at={distinctAt} x={X0} y={colBottom + 16} color={INK}>
@@ -152,10 +152,10 @@ export const CaseScene: React.FC = () => {
               <Arrow from={[arrowX0, mid]} to={[arrowX0 + 64, mid]} at={becomes[i]} />
               <Chip text={r.lower} x={lowX} y={top} at={becomes[i] + 4} size={SIZE} tones={[{ at: results[i], tone: "bad" }]} />
               <Ink at={names[i] + 6} dur={14} style={{ left: glossX, top: top - 2, whiteSpace: "nowrap" }}>
-                <span style={note(22, INK_SOFT)}>{r.before}</span>
+                <span style={note(24, INK_SOFT)}>{r.before}</span>
               </Ink>
               <Ink at={results[i] - 2} dur={14} style={{ left: glossX, top: top + 28, whiteSpace: "nowrap" }}>
-                <span style={{ ...note(22, ACCENT_INK), fontWeight: 600 }}>becomes {r.after}</span>
+                <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>becomes {r.after}</span>
               </Ink>
             </React.Fragment>
           );
@@ -165,12 +165,12 @@ export const CaseScene: React.FC = () => {
       {/* The lesson's verdict, one under each figure. */}
       <Ink at={noiseAt - 6} dur={16} style={{ left: X0, top: y(NOTE_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...body(34), color: INK }}>
-          For counting, case is <span style={{ fontStyle: "italic" }}>noise.</span>
+          For counting, case is <span style={{ fontStyle: SERIF_ITALIC }}>noise.</span>
         </span>
       </Ink>
       <Ink at={signalAt - 6} dur={16} style={{ left: FIG7_X, top: y(NOTE_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...body(34), color: INK }}>
-          For a name, it&apos;s the <span style={{ fontStyle: "italic", color: ACCENT_INK }}>signal.</span>
+          For a name, it&apos;s the <span style={{ fontStyle: SERIF_ITALIC, color: ACCENT_INK }}>signal.</span>
         </span>
       </Ink>
     </AbsoluteFill>

@@ -69,7 +69,7 @@ export const SummaryScene: React.FC = () => {
 
   const name = (x: number, text: string, at: number) => (
     <Ink at={at} dur={12} style={{ left: x, top: y(NAMES_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK)}>
+      <span style={label(24, INK)}>
         <Mono>{text}</Mono>
       </span>
     </Ink>
@@ -127,7 +127,7 @@ export const SummaryScene: React.FC = () => {
         {/* The derived copy. */}
         <SmallArrow from={[ig.x + ig.width + 24, arrowY]} to={[sg.x - 24, arrowY]} at={storeAt - 2} color={INK} width={2.4} />
         <Ink at={storeAt + 4} dur={12} style={{ left: ig.x + ig.width + 34, top: arrowY - 42, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>summed per day</span>
+          <span style={{ ...note(24, INK_SOFT) }}>summed per day</span>
         </Ink>
         {name(sg.x, "daily_sales_summary", storeAt + 2)}
         <DbTable
@@ -151,24 +151,24 @@ export const SummaryScene: React.FC = () => {
         </Reply>
 
         <Note at={purposeAt - 6} x={sg.x} y={sg.bottom(SUMMARY.rows.length) + 22}>
-          <span style={{ ...label(23, ACCENT_INK), whiteSpace: "nowrap" }}>A derived copy, stored on purpose</span>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>A derived copy, stored on purpose</span>
         </Note>
         <Note at={simplerAt - 4} x={sg.x} y={sg.bottom(SUMMARY.rows.length) + 62}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>One row per day, ready to read</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>One row per day, ready to read</span>
         </Note>
         <Note at={staleAt - 4} x={sg.x} y={sg.bottom(SUMMARY.rows.length) + 118}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             {stale[0]}: stored <Mono color={ACCENT_INK}>{stale[1] ?? ""}</Mono>, live <Mono>{stale[2] ?? ""}</Mono>
           </span>
         </Note>
         <Note at={planAt - 2} x={sg.x} y={sg.bottom(SUMMARY.rows.length) + 162}>
-          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>A copy needs a sync plan.</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>A copy needs a sync plan.</span>
         </Note>
 
         {/* What it answers to. */}
         <SourceBracket x0={og.x} x1={ig.x + ig.width} y={sourcesBottom + 18} at={truthAt - 4} />
         <Ink at={truthAt} dur={14} style={{ left: og.x, top: sourcesBottom + 34, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(23, BLUE_INK) }}>The source of truth</span>
+          <span style={{ ...label(24, BLUE_INK) }}>The source of truth</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

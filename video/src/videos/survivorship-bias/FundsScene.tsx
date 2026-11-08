@@ -87,7 +87,7 @@ export const FundsScene: React.FC = () => {
         <Ink
           at={sevenAt - 4}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           and the average goes up.
         </Ink>
@@ -100,7 +100,7 @@ export const FundsScene: React.FC = () => {
         y={y(196)}
       />
       <Note at={closeAt} x={1800} y={y(196) + 2} align="right" from="right">
-        <span style={{ ...note(21, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
+        <span style={{ ...note(24, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
           <Swatch kind="open" /> still open
           <span style={{ width: 14 }} />
           <Swatch kind="closed" /> closed and deleted
@@ -153,12 +153,12 @@ export const FundsScene: React.FC = () => {
         />
       </svg>
       <Note at={closeAt + 4} x={cutX - 14} y={y(404)} align="right">
-        <span style={{ ...note(21, ACCENT_INK), fontWeight: 650 }}>Closed below −4%</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>Closed below −4%</span>
       </Note>
 
       {/* Counter: funds closed so far. */}
       <Note at={sweepFrom - 4} x={190} y={y(430)}>
-        <div style={label(20, INK_SOFT)}>Closed and deleted</div>
+        <div style={label(24, INK_SOFT)}>Closed and deleted</div>
         <div
           style={{
             ...headline(96),
@@ -192,8 +192,8 @@ export const FundsScene: React.FC = () => {
         />
       </svg>
       <Note at={averagingAt + 2} x={allX - 16} y={y(LINE_TOP + 4)} align="right">
-        <div style={label(20, INK_SOFT)}>All {FUNDS.n.toLocaleString("en-US")} funds</div>
-        <div style={{ ...note(30, INK), fontWeight: 700 }}>{fmt(FUNDS.trueAvg)}%</div>
+        <div style={label(24, INK_SOFT)}>All {FUNDS.n.toLocaleString("en-US")} funds</div>
+        <div style={{ ...note(28, INK), fontWeight: 500 }}>{fmt(FUNDS.trueAvg)}%</div>
       </Note>
       {/* Named from the moment it appears, and riding along with it as the
           sweep moves it: red is the biased number, never "still open". */}
@@ -208,7 +208,7 @@ export const FundsScene: React.FC = () => {
       >
         <div
           style={{
-            ...label(20, ACCENT_INK),
+            ...label(24, ACCENT_INK),
             transformOrigin: "left center",
             transform: `scale(${swell(frame, averageAt - 2, 0.12, 22)})`,
           }}
@@ -217,8 +217,8 @@ export const FundsScene: React.FC = () => {
         </div>
         <div
           style={{
-            ...note(30, ACCENT_INK),
-            fontWeight: 700,
+            ...note(28, ACCENT_INK),
+            fontWeight: 500,
             opacity: ease(frame, sevenAt - 2, 10),
           }}
         >
@@ -226,7 +226,7 @@ export const FundsScene: React.FC = () => {
         </div>
       </div>
       <Note at={notOneAt - 2} x={sx(X, FUNDS.survivorAvg) + 16} y={y(LINE_TOP + 86)}>
-        <span style={note(21, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           <b style={{ color: ACCENT_INK }}>+{fmt(FUNDS.inflation)} points</b>
           <span style={{ opacity: ease(frame, betterAt - 2, 12) }}>, and not one fund did better</span>
         </span>

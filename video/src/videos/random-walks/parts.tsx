@@ -4,7 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HAIRLINE, headline, INK, INK_SOFT, note } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, headline, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -120,14 +120,14 @@ export const ValueGrid: React.FC<{
             right: 1920 - scale.x0 + 16,
             top: yOf(v) - 14,
             opacity: t,
-            ...note(20, INK_SOFT),
+            ...note(24, INK_SOFT),
           }}
         >
           {v < 0 ? `−${-v}` : v}
         </div>
       ))}
       {title ? (
-        <div style={{ position: "absolute", left: scale.x0, top: yOf(spec.hi) - 44, opacity: t, ...note(20, INK_SOFT) }}>
+        <div style={{ position: "absolute", left: scale.x0, top: yOf(spec.hi) - 44, opacity: t, ...note(24, INK_SOFT) }}>
           {title}
         </div>
       ) : null}
@@ -154,7 +154,7 @@ export const Headline: React.FC<{ first: string; second: string; at: number; sec
         at={secondAt}
         dur={18}
         out={out}
-        style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
       >
         {second}
       </Ink>

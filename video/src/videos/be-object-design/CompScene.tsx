@@ -169,16 +169,16 @@ export const CompScene: React.FC = () => {
         </Line>
 
         {/* Part A, left: the loyalty cart extends the cart. */}
-        <Line x={X0} y={cartTop - 44} at={extendsAt} size={21} color={INK_SOFT} weight={650} out={aOut}>
+        <Line x={X0} y={cartTop - 44} at={extendsAt} size={21} color={INK_SOFT} weight={500} out={aOut}>
           Inheritance: the loyalty cart extends the cart
         </Line>
         <Box x={CART.x} y={cartTop} w={CART.w} h={CART.h} at={tiesAt} out={aOut} align="left" lit={pulse(frame, breakUpAt, 24)}>
           <span />
         </Box>
-        <Line x={CART.x + 22} y={cartTop + 16} at={tiesAt + 4} size={24} weight={750} color={INK_SOFT} out={extendsAt}>
+        <Line x={CART.x + 22} y={cartTop + 16} at={tiesAt + 4} size={24} weight={500} color={INK_SOFT} out={extendsAt}>
           Parent class
         </Line>
-        <Line x={CART.x + 22} y={cartTop + 16} at={extendsAt + 6} size={24} weight={750} out={aOut}>
+        <Line x={CART.x + 22} y={cartTop + 16} at={extendsAt + 6} size={24} weight={500} out={aOut}>
           Shopping cart
         </Line>
         <Box x={ADD_ALL.x} y={chipTop} w={ADD_ALL.w} h={CHIP_H} at={oneAtATimeAt - 8} title="add-all" size={22} out={aOut} lit={pulse(frame, speedsAt, 20)} />
@@ -186,11 +186,11 @@ export const CompScene: React.FC = () => {
         <Flow points={[[ADD_ALL.x + ADD_ALL.w + 6, chipMid], [ADD.x - 8, chipMid]]} at={oneAtATimeAt - 4} dur={8} width={2.2} head={12} out={speedsAt + 4} />
         <Flow points={[[ADD.x + ADD.w + 6, chipMid], [ITEMS.x - 8, chipMid]]} at={oneAtATimeAt - 2} dur={8} width={2.2} head={12} out={aOut} />
         <Box x={ITEMS.x} y={chipTop} w={ITEMS.w} h={CHIP_H} at={countsAt + 4} tone="data" out={aOut} align="left">
-          <span style={{ ...note(21, BAR), display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, BAR), display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
             {[0, 1, 2].map((i) => (
               <span key={i} style={{ width: 22, height: 22, borderRadius: 5, background: i < inCart ? ITEM_FILL[i] : "transparent", border: `2px solid ${i < inCart ? ITEM_FILL[i] : ds("blue", 200)}` }} />
             ))}
-            <span style={{ marginLeft: 8, fontWeight: 650, color: BAR, fontVariantNumeric: "tabular-nums" }}>{inCart} in the cart</span>
+            <span style={{ marginLeft: 8, fontWeight: 500, color: BAR, fontVariantNumeric: "tabular-nums" }}>{inCart} in the cart</span>
           </span>
         </Box>
         {/* After the speed-up: add-all fills the list itself, skipping add. */}
@@ -224,7 +224,7 @@ export const CompScene: React.FC = () => {
             opacity: 1 - ease(frame, aOut, 8),
           }}
         />
-        <Line x={CHILD.x + 146} y={(cartTop + CART.h + childTop) / 2 - 16} at={tiesAt + 8} size={21} color={INK_SOFT} weight={650} out={aOut}>
+        <Line x={CHILD.x + 146} y={(cartTop + CART.h + childTop) / 2 - 16} at={tiesAt + 8} size={21} color={INK_SOFT} weight={500} out={aOut}>
           extends
         </Line>
         <Box
@@ -239,7 +239,7 @@ export const CompScene: React.FC = () => {
           out={aOut}
           tones={[[zeroAt, "bad"]]}
         />
-        <Line x={COUNTER_X} y={childTop - 2} at={countsAt + 2} size={20} color={INK_SOFT} weight={650} out={aOut}>
+        <Line x={COUNTER_X} y={childTop - 2} at={countsAt + 2} size={20} color={INK_SOFT} weight={500} out={aOut}>
           counted
         </Line>
         <Value x={COUNTER_X} y={childTop + 30} at={countsAt + 2} tone={counterTone} out={aOut} lit={pulse(frame, zeroAt + 4, 22) + pulse(frame, threeAt, 22)}>
@@ -254,7 +254,7 @@ export const CompScene: React.FC = () => {
         <VRule x={(CART.x + CART.w + RIGHT_X) / 2} top={cartTop - 44} bottom={y(CHILD.top + CHILD.h)} at={holdsAt} out={aOut} />
 
         {/* Part A, right: a counter that holds a cart. */}
-        <Line x={RIGHT_X} y={cartTop - 44} at={holdsAt} size={21} color={OK_INK} weight={650} out={aOut}>
+        <Line x={RIGHT_X} y={cartTop - 44} at={holdsAt} size={21} color={OK_INK} weight={500} out={aOut}>
           Composition: the counter has a cart
         </Line>
         <Box x={RIGHT_X} y={cartTop} w={COUNTER_BOX.w} h={COUNTER_BOX.h} at={holdsAt + 2} tone="ok" title="Loyalty counter" sub={<span style={{ opacity: ease(frame, ownAt, 10) }}>counts in its own methods</span>} out={aOut} />
@@ -265,7 +265,7 @@ export const CompScene: React.FC = () => {
             fill={OK}
           />
         </Svg>
-        <Line x={RIGHT_X + 146} y={(cartTop + COUNTER_BOX.h + y(HELD.top)) / 2 - 14} at={holdsAt + 10} size={21} color={OK_INK} weight={650} out={aOut}>
+        <Line x={RIGHT_X + 146} y={(cartTop + COUNTER_BOX.h + y(HELD.top)) / 2 - 14} at={holdsAt + 10} size={21} color={OK_INK} weight={500} out={aOut}>
           has a
         </Line>
         <Box x={RIGHT_X} y={y(HELD.top)} w={COUNTER_BOX.w} h={HELD.h} at={holdsAt + 12} title="Shopping cart" sub={<span style={{ opacity: ease(frame, promisesAt, 10) }}>only what it promises</span>} out={aOut} />
@@ -274,7 +274,7 @@ export const CompScene: React.FC = () => {
           { at: afterAt, x: RIGHT_X + COUNTER_BOX.w + 200, label: "after", v: LOYALTY.composesAfter[1] },
         ].map((c) => (
           <React.Fragment key={c.label}>
-            <Line x={c.x} y={cartTop - 2} at={c.at} size={20} color={INK_SOFT} weight={650} out={aOut}>
+            <Line x={c.x} y={cartTop - 2} at={c.at} size={20} color={INK_SOFT} weight={500} out={aOut}>
               {c.label}
             </Line>
             <Value x={c.x} y={cartTop + 30} at={c.at} tone={c.label === "after" ? "ok" : "data"} out={aOut}>
@@ -284,17 +284,17 @@ export const CompScene: React.FC = () => {
         ))}
 
         {/* Part B: a subclass per pair, or one part per choice. */}
-        <Line x={X0} y={y(GRID_TOP - 96)} at={channelsAt} size={22} weight={700}>
+        <Line x={X0} y={y(GRID_TOP - 96)} at={channelsAt} size={22} weight={500}>
           A subclass per pair
         </Line>
         {timings.map((t, j) => (
-          <Line key={t} x={cellX(j) + CELL.w / 2} y={y(GRID_TOP - 48)} at={timingsAt + j * 4} size={20} color={INK_SOFT} weight={650} align="center" width={CELL.w}>
+          <Line key={t} x={cellX(j) + CELL.w / 2} y={y(GRID_TOP - 48)} at={timingsAt + j * 4} size={20} color={INK_SOFT} weight={500} align="center" width={CELL.w}>
             {t}
           </Line>
         ))}
         {channels.map((c, i) => (
           <React.Fragment key={c}>
-            <Line x={X0} y={rowY(i) + 12} at={i < 3 ? channelsAt + i * 5 : fourthAt} size={21} weight={700}>
+            <Line x={X0} y={rowY(i) + 12} at={i < 3 ? channelsAt + i * 5 : fourthAt} size={21} weight={500}>
               {c}
             </Line>
             {timings.map((t, j) => (
@@ -312,11 +312,11 @@ export const CompScene: React.FC = () => {
             ))}
           </React.Fragment>
         ))}
-        <Line x={X0} y={rowY(4) + 10} at={nineAt + 10} size={26} weight={700}>
+        <Line x={X0} y={rowY(4) + 10} at={nineAt + 10} size={26} weight={500}>
           <span style={{ color: subclasses > NOTIFIERS.inheritance[0] ? ACCENT : INK, fontVariantNumeric: "tabular-nums" }}>{subclasses}</span> subclasses
         </Line>
 
-        <Line x={PARTS_X[0]} y={y(GRID_TOP - 96)} at={partsAt} size={22} weight={700}>
+        <Line x={PARTS_X[0]} y={y(GRID_TOP - 96)} at={partsAt} size={22} weight={500}>
           <span style={{ color: OK_INK }}>Composition:</span> one part per choice
         </Line>
         {channels.map((c, i) => (
@@ -325,7 +325,7 @@ export const CompScene: React.FC = () => {
         {timings.map((t, j) => (
           <Box key={t} x={PARTS_X[1]} y={rowY(j)} w={PART_W[1]} h={CELL.h} at={partsAt + 14 + j * 3} title={t} size={21} lit={j === digest ? pulse(frame, digestAt, 24) : 0} />
         ))}
-        <Line x={PARTS_X[0]} y={rowY(4) + 10} at={sixAt} size={26} weight={700}>
+        <Line x={PARTS_X[0]} y={rowY(4) + 10} at={sixAt} size={26} weight={500}>
           <span style={{ color: parts > NOTIFIERS.composition[0] ? OK_INK : INK, fontVariantNumeric: "tabular-nums" }}>{parts}</span> parts
         </Line>
 
@@ -333,7 +333,7 @@ export const CompScene: React.FC = () => {
         <VRule x={(PARTS_X[1] + PART_W[1] + 1520) / 2} top={rowY(0) - 4} bottom={rowY(2) + 66} at={customerAt} />
 
         {/* One customer's notifier swaps its timing part. */}
-        <Line x={1520} y={rowY(0) - 4} at={customerAt} size={20} color={INK_SOFT} weight={650}>
+        <Line x={1520} y={rowY(0) - 4} at={customerAt} size={20} color={INK_SOFT} weight={500}>
           one customer
         </Line>
         <Box x={1520} y={rowY(0) + 28} w={110} h={CELL.h} at={customerAt + 2} title="text" size={21} />
@@ -349,8 +349,8 @@ export const CompScene: React.FC = () => {
                   position: "absolute",
                   inset: 0,
                   textAlign: "center",
-                  ...label(21, OK_INK),
-                  fontWeight: 700,
+                  ...label(24, OK_INK),
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                   opacity: s.k,
                   transform: `translateY(${(s.text === "now" ? -1 : 1) * (1 - s.k) * 18}px)`,
@@ -361,7 +361,7 @@ export const CompScene: React.FC = () => {
             ))}
           </span>
         </Box>
-        <Line x={1520} y={rowY(2) + 34} at={runtimeAt} size={21} color={OK_INK} weight={650}>
+        <Line x={1520} y={rowY(2) + 34} at={runtimeAt} size={21} color={OK_INK} weight={500}>
           swapped at runtime
         </Line>
         <Line x={X0} y={rowY(5) + 10} at={keepAt} size={26}>

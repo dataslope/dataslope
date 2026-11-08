@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, headline, INK, INK_SOFT, label, note, SERIF_ITALIC } from "../../editorial/style";
 import { badgeStyle, ColumnRule, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -25,7 +25,7 @@ const Chip: React.FC<{ at: number; added?: boolean; children: React.ReactNode }>
   return (
     <div
       style={{
-        ...note(22),
+        ...note(24),
         ...badgeStyle(added ? "blue" : "gray", 22),
         display: "block",
         opacity: p,
@@ -148,7 +148,7 @@ export const PostgresScene: React.FC = () => {
                 overflow: "hidden",
                 opacity: open,
                 color: ACCENT_INK,
-                fontStyle: "italic",
+                fontStyle: SERIF_ITALIC,
               }}
             >
               IN
@@ -171,13 +171,13 @@ export const PostgresScene: React.FC = () => {
             at: speakAt - 4,
             children: (
               <>
-                speaks POSTQUEL, <span style={{ color: ACCENT_INK, fontWeight: 650 }}>not SQL</span>
+                speaks POSTQUEL, <span style={{ color: ACCENT_INK, fontWeight: 500 }}>not SQL</span>
               </>
             ),
           },
         ]}
       />
-      <Tag x={XS[0] + 2} y={TOP + H + 18} at={afterAt} out={catchAt} size={23} color={ACCENT_INK} weight={650}>
+      <Tag x={XS[0] + 2} y={TOP + H + 18} at={afterAt} out={catchAt} size={23} color={ACCENT_INK} weight={500}>
         post Ingres: after Ingres
       </Tag>
       <Tag x={XS[0] + 2} y={TOP + H + 18} at={wonAt - 4} size={23} color={INK}>
@@ -192,7 +192,7 @@ export const PostgresScene: React.FC = () => {
         <ColumnRule x={(XS[0] + COL_RIGHT[0] + AX) / 2} top={TOP + 8} height={h(176)} at={extendAt - 4} />
       </div>
       <Ink at={extendAt - 4} dur={14} out={catchAt - 6} style={{ left: AX, top: TOP + 2, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT) }}>Commercial systems: a fixed menu of types</span>
+        <span style={{ ...label(24, INK_SOFT) }}>Commercial systems: a fixed menu of types</span>
       </Ink>
       <div style={{ position: "absolute", left: AX, top: TOP + 44, display: "flex", gap: 14, opacity: 1 - ease(frame, catchAt - 6, 10) }}>
         {BUILT_IN.map((t, i) => (
@@ -202,7 +202,7 @@ export const PostgresScene: React.FC = () => {
         ))}
       </div>
       <Ink at={typesAt - 4} dur={14} out={catchAt - 6} style={{ left: AX, top: TOP + 128, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, KEY_INK) }}>POSTGRES: add your own, such as</span>
+        <span style={{ ...label(24, KEY_INK) }}>POSTGRES: add your own, such as</span>
       </Ink>
       <div style={{ position: "absolute", left: AX, top: TOP + 170, display: "flex", gap: 14, opacity: 1 - ease(frame, catchAt - 6, 10) }}>
         {YOUR_OWN.map((t, i) => (
@@ -213,11 +213,11 @@ export const PostgresScene: React.FC = () => {
       </div>
 
       <Ink at={speakAt - 8} dur={14} out={asideOut} style={{ left: AX, top: TOP + 2, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK) }}>Ada&apos;s orders, in POSTQUEL</span>
+        <span style={{ ...label(24, INK) }}>Ada&apos;s orders, in POSTQUEL</span>
       </Ink>
       <Listing lines={[TWIN_POSTQUEL]} x={AX} top={TOP + 40} width={740} at={speakAt - 6} lineAt={[speakAt - 4]} dim={wonAt} out={asideOut} />
       <Ink at={sqlAt - 4} dur={14} out={asideOut} style={{ left: AX, top: TOP + 134, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, KEY_INK) }}>and in SQL</span>
+        <span style={{ ...label(24, KEY_INK) }}>and in SQL</span>
       </Ink>
       <Listing
         lines={[TWIN_SQL]}
@@ -257,7 +257,7 @@ export const PostgresScene: React.FC = () => {
             at: gaveAt - 2,
             children: (
               <>
-                POSTQUEL swapped for <span style={{ color: KEY_INK, fontWeight: 650 }}>SQL</span>
+                POSTQUEL swapped for <span style={{ color: KEY_INK, fontWeight: 500 }}>SQL</span>
               </>
             ),
           },

@@ -218,7 +218,7 @@ export const PlanBox: React.FC<{
   const lineH = Math.round(size * 1.7);
   return (
     <div style={{ position: "absolute", left: x, top, width, opacity: p * (1 - o) * (1 - d) }}>
-      <div style={{ ...label(19, INK_SOFT), marginBottom: 10, whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...label(24, INK_SOFT), marginBottom: 10, whiteSpace: "nowrap" }}>{title}</div>
       <div
         style={{
           background: ds("gray", 50),
@@ -250,7 +250,7 @@ export const PlanBox: React.FC<{
                   fontSize: size,
                   whiteSpace: "pre",
                   color: INK,
-                  fontWeight: l.strong ? 700 : 400,
+                  fontWeight: l.strong ? 500 : 400,
                   fontVariantLigatures: "none",
                 }}
               >
@@ -283,7 +283,7 @@ export const VRule: React.FC<{ x: number; top: number; height: number; at: numbe
  * mono space brought back to about a sans space.
  */
 export const QCode: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 500, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { COUNTS, DOCS, ILLUSTRATIONS, THE, VIDEO } from "./data";
@@ -49,7 +49,7 @@ export const HookScene: React.FC = () => {
       <Ink
         at={10}
         dur={20}
-        style={{ left: 92, top: y(204), ...headline(88, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 92, top: y(204), ...headline(88, true), color: INK, whiteSpace: "nowrap" }}
       >
         says the least.
       </Ink>
@@ -73,7 +73,7 @@ export const HookScene: React.FC = () => {
               dur={16}
               style={{ left: SLIP_X, top: y(SLIP_Y(i)), height: ROW_H, display: "flex", alignItems: "center", gap: NAME_GAP }}
             >
-              <span style={{ ...label(21, INK_SOFT), width: NAME_W, whiteSpace: "nowrap" }}>Doc {i + 1}</span>
+              <span style={{ ...label(24, INK_SOFT), width: NAME_W, whiteSpace: "nowrap" }}>Doc {i + 1}</span>
               <span style={{ ...body(46), color: INK, whiteSpace: "nowrap" }}>
                 {words.map((w, k) => {
                   const isThe = w === "the";
@@ -102,7 +102,7 @@ export const HookScene: React.FC = () => {
       })}
 
       <Note at={commonAt + 6} x={SLIP_X} y={y(SLIP_Y(2) + 126)}>
-        <span style={note(22, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           In every document, <i>the</i> appears {THE_COUNTS.map(times).join(" or ")}. No other word appears more
           than {times(OTHER_MAX)}.
         </span>

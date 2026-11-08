@@ -115,12 +115,12 @@ export const WhyScene: React.FC = () => {
           justifyContent: "center",
         }}
       >
-        <span style={label(30, INK)}>model</span>
+        <span style={label(28, INK)}>model</span>
       </div>
 
       {/* Reading: every prompt token goes in together. */}
       <Ink at={promptAt - 6} dur={12} style={{ left: X0, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(25, INPUT_INK), fontWeight: 700 }}>Reading the prompt</span>
+        <span style={{ ...label(24, INPUT_INK), fontWeight: 500 }}>Reading the prompt</span>
       </Ink>
       {rows.map((row, r) => (
         <div key={r} style={{ position: "absolute", left: X0, top: y(LEFT_ROWS[r]), display: "flex", gap: 6 }}>
@@ -138,14 +138,14 @@ export const WhyScene: React.FC = () => {
       ))}
       <Arrow from={[BOX.x - 110, midY]} to={[BOX.x - 12, midY]} at={onceAt - 2} dur={10} color={INPUT} width={3} />
       <Note at={passAt - 4} x={X0} y={y(COUNT_Y)}>
-        <span style={{ ...note(27, INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
           {prompt.length} tokens, 1 pass
         </span>
       </Note>
 
       {/* Writing: one token out per pass. */}
       <Ink at={answerAt - 4} dur={12} style={{ left: RIGHT_X, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(25, OUTPUT_INK), fontWeight: 700 }}>Writing the answer</span>
+        <span style={{ ...label(24, OUTPUT_INK), fontWeight: 500 }}>Writing the answer</span>
       </Ink>
       <Arrow from={[BOX.x + BOX.w + 12, midY]} to={[RIGHT_X - 12, midY]} at={oneAt - 10} dur={10} color={OUTPUT} width={3} />
       <div style={{ position: "absolute", left: RIGHT_X, top: y(RIGHT_ROW), display: "flex", gap: 6 }}>
@@ -160,13 +160,13 @@ export const WhyScene: React.FC = () => {
       </div>
       {passesDone > 0 ? (
         <div style={{ position: "absolute", left: RIGHT_X, top: y(COUNT_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(27, INK), fontWeight: 600, ...TABULAR }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR }}>
             {passesDone} {passesDone === 1 ? "token" : "tokens"}, {passesDone} {passesDone === 1 ? "pass" : "passes"}
           </span>
         </div>
       ) : null}
       <Note at={ownAt} x={RIGHT_X} y={y(COUNT_Y) + 44} out={weightAt - 6}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>each through the whole model</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>each through the whole model</span>
       </Note>
 
       {/* What a pass costs: every weight moved, for eleven tokens of work or one. */}
@@ -182,7 +182,7 @@ export const WhyScene: React.FC = () => {
       ].map((m) => (
         <React.Fragment key={m.x}>
           <Note at={m.at - 4} x={m.x} y={y(COUNT_Y) + 88}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>work per pass</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>work per pass</span>
           </Note>
           <div
             style={{
@@ -200,18 +200,18 @@ export const WhyScene: React.FC = () => {
           />
           <HBar x={m.x + 160} y={y(COUNT_Y) + 92} w={METER_W * m.share} h={22} at={m.at} dur={14} fill={m.color} radius={4} />
           <Note at={m.at + 6} x={m.x + 160 + METER_W + 14} y={y(COUNT_Y) + 88}>
-            <span style={{ ...note(22, INK), ...TABULAR, whiteSpace: "nowrap" }}>{m.value}</span>
+            <span style={{ ...note(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>{m.value}</span>
           </Note>
         </React.Fragment>
       ))}
       <Note at={waitsAt - 4} x={RIGHT_X + 160 + METER_W + 110} y={y(COUNT_Y) + 88}>
-        <span style={{ ...note(22, OUTPUT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the rest waits</span>
+        <span style={{ ...note(24, OUTPUT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the rest waits</span>
       </Note>
 
       {/* The gap the price reflects. */}
       <Bracket x0={X0} x1={1760} y={y(COUNT_Y) + 148} at={fiveAt - 2} color={INK_SOFT} up />
       <Ink at={gapAt - 6} dur={16} style={{ left: 640, top: y(COUNT_Y) + 166, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(36, true), color: INK }}>Five times the price: a real gap in the work.</span>
+        <span style={{ ...body(34, true), color: INK }}>Five times the price: a real gap in the work.</span>
       </Ink>
     </AbsoluteFill>
   );

@@ -77,7 +77,7 @@ export const NoveltyScene: React.FC = () => {
           What are novelty and primacy effects, and how do you handle them?
         </QuestionCard>
         <Note at={newAt} x={X0} y={y(330)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             New gets clicked because it's new.{" "}
             <span style={{ opacity: ease(frame, realAt, 10) }}>The lift is real</span>
             <span style={{ opacity: ease(frame, lastAt, 10), color: ACCENT_INK }}>, and it doesn't last.</span>
@@ -102,32 +102,32 @@ export const NoveltyScene: React.FC = () => {
         <Curve points={pts(NOVELTY.novelty)} x={x} y={yS} at={upAt} dur={Math.max(20, underAt - upAt + 6)} color={wrong > 0.5 ? ACCENT : WARM} dots={5} />
         <Curve points={pts(NOVELTY.durable)} x={x} y={yS} at={plainAt} dur={26} color={BAR} dots={5} />
         <Note at={upAt + 4} x={at(x, 1) + 18} y={at(yS, NOVELTY.novelty[0]) - 16}>
-          <span style={{ ...label(23, novInk), fontWeight: 750, ...TABULAR }}>+{NOVELTY.novelty[0].toFixed(1)}%</span>
+          <span style={{ ...label(24, novInk), fontWeight: 500, ...TABULAR }}>+{NOVELTY.novelty[0].toFixed(1)}%</span>
         </Note>
         <Note at={underAt} x={at(x, 8) + 14} y={at(yS, NOVELTY.novelty[7]) - 6}>
-          <span style={{ ...label(22, novInk), fontWeight: 750, whiteSpace: "nowrap", ...TABULAR }}>+{NOVELTY.novelty[7].toFixed(1)}%</span>
+          <span style={{ ...label(24, novInk), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>+{NOVELTY.novelty[7].toFixed(1)}%</span>
         </Note>
         <Note at={plainAt + 18} x={at(x, 8) + 14} y={at(yS, NOVELTY.durable[7]) - 24}>
-          <span style={{ ...label(22, BLUE_INK), fontWeight: 750, whiteSpace: "nowrap", ...TABULAR }}>+{NOVELTY.durable[7].toFixed(1)}%</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>+{NOVELTY.durable[7].toFixed(1)}%</span>
         </Note>
         <Note at={plainAt + 8} x={at(x, 3.2)} y={at(yS, NOVELTY.durable[2]) - h(48)}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a plainer change</span>
+          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a plainer change</span>
         </Note>
         {/* Each band carries its own label: week one while it is the one
             read, then the first weeks once they are what to run past. */}
         <Note at={readAt + 2} x={at(x, 1.5)} y={y(PLOT.top) - h(6)} out={pastAt}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>read in week one</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>read in week one</span>
         </Note>
         <Note at={pastAt + 4} x={at(x, 0.6) + 10} y={y(PLOT.top) - h(6)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>run past these weeks</span>
+          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>run past these weeks</span>
         </Note>
         <Note at={wrongAt} x={at(x, 2.2)} y={at(yS, 11)}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>→ you'd ship the wrong one</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>→ you'd ship the wrong one</span>
         </Note>
 
         {/* Primacy: the mirror, as a sketch. */}
         <Note at={primacyAt} x={SKETCH.x0} y={y(SKETCH.mid) - h(190)}>
-          <span style={{ ...note(27, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Primacy, the other way</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Primacy, the other way</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, primacyAt + 2, 10) }}>
           <line x1={SKETCH.x0} x2={SKETCH.x1} y1={y(SKETCH.mid)} y2={y(SKETCH.mid)} stroke={INK} strokeWidth={1.4} />
@@ -142,28 +142,28 @@ export const NoveltyScene: React.FC = () => {
           />
         </svg>
         <Note at={primacyAt + 6} x={SKETCH.x1 - 140} y={y(SKETCH.mid) + h(12)}>
-          <span style={{ ...label(19, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>a sketch, no data</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a sketch, no data</span>
         </Note>
         <Note at={resistAt + 4} x={SKETCH.x0 + 20} y={y(SKETCH.mid) + h(118)}>
-          <span style={{ ...label(21, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>resist at first</span>
+          <span style={{ ...label(24, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>resist at first</span>
         </Note>
         <Note at={learnAt} x={SKETCH.x1 - 200} y={y(SKETCH.mid) - h(150)}>
-          <span style={{ ...label(21, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>until they learn it</span>
+          <span style={{ ...label(24, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>until they learn it</span>
         </Note>
 
         {/* The defences, for both. */}
         <Note at={pastAt} x={SKETCH.x0} y={y(752)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>run past the first weeks</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>run past the first weeks</span>
         </Note>
         <Note at={compareAt} x={SKETCH.x0} y={y(794)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             compare new users
             <br />
             <span style={{ opacity: ease(frame, returningAt - 2, 10) }}>with returning ones</span>
           </span>
         </Note>
         <Note at={neverAt} x={SKETCH.x0} y={y(864)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>(new users never saw the old version)</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>(new users never saw the old version)</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -120,7 +120,7 @@ export const AbScene: React.FC = () => {
         {bars.map((b, i) => (
           <React.Fragment key={i}>
             <Ink at={b.at - 6} dur={14} style={{ left: 160, top: y(ROW_Y[i]) - 22, whiteSpace: "nowrap" }}>
-              <span style={{ ...body(38, true), color: INK }}>{b.label}</span>
+              <span style={{ ...body(34, true), color: INK }}>{b.label}</span>
             </Ink>
             {b.grow > 0 ? (
               <div
@@ -129,7 +129,7 @@ export const AbScene: React.FC = () => {
                   left: X.x0 + (sx(X, b.value) - X.x0) * b.grow + 16,
                   top: y(ROW_Y[i]) - 22,
                   ...note(34, DATA_INK),
-                  fontWeight: 700,
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                   ...halo,
                 }}
@@ -155,8 +155,8 @@ export const AbScene: React.FC = () => {
                 top: y(ROW_Y[1]) - 14,
                 transform: "translateX(-50%)",
                 opacity: ease(frame, nearlyAt + k * 6, 8),
-                ...note(22, PAPER),
-                fontWeight: 700,
+                ...note(24, PAPER),
+                fontWeight: 500,
               }}
             >
               {k + 1}
@@ -166,8 +166,8 @@ export const AbScene: React.FC = () => {
         <Note at={manyAt - 4} x={end2} y={y(ROW_Y[1]) - h(BAR_H) / 2 - 46} align="right">
           <span
             style={{
-              ...note(26, STAT_INK),
-              fontWeight: 700,
+              ...note(28, STAT_INK),
+              fontWeight: 500,
               display: "inline-block",
               transform: `scale(${1 + 0.1 * manyGlow})`,
               transformOrigin: "100% 50%",

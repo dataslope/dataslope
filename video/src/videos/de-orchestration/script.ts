@@ -74,13 +74,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "bf-cost": charts/incremental-vs-full-refresh.mjs: 8,000 rows a day on
  *     200,000; a full rebuild at day 730 reprocesses 6,040,000 rows, 755 times
  *     one day's partition.
- *   - "gate": the video's own 1,000-order batch in DuckDB-Wasm 1.4.3: 4.0%
+ *   - "gate": the video's own 1,000-order batch in Postgres (PGlite): 4.0%
  *     null customer IDs against a limit of 1%; no duplicates, no bad amounts.
  *   - "cb-model": charts/circuit-breaker-states.mjs, copied with its seed and
  *     checked against its caption: trips at 50% errors, open 12 seconds, one
  *     failed probe, closed after the second; retries alone peak at 300
  *     requests a second against 100 and never recover.
- *   - "fresh-run": the video's own daily_orders in DuckDB, an order every
+ *   - "fresh-run": the video's own daily_orders in Postgres, an order every
  *     three minutes on June 1 and 2, nothing on June 3; the page's check
  *     (now against max(updated_at)) with now() pinned to 06:00: 6 h 2 min on
  *     June 3, 30 h 2 min (1 day 06:02) on June 4, against the video's own

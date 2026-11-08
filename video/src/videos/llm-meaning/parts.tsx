@@ -68,7 +68,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -98,7 +98,7 @@ export const Headline: React.FC<{
           at={turnAt ?? at + 12}
           dur={18}
           out={out}
-          style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
         >
           {turn}
         </Ink>
@@ -300,7 +300,7 @@ export const TokenChip: React.FC<{
         alignItems: "baseline",
         fontFamily: MONO,
         fontSize: size,
-        fontWeight: 600,
+        fontWeight: 500,
         color,
         background: fill,
         border: `2px solid ${border}`,
@@ -352,7 +352,7 @@ export const VectorCells: React.FC<{
               padding: "6px 0 7px",
               fontFamily: MONO,
               fontSize: size,
-              fontWeight: 600,
+              fontWeight: 500,
               color,
               borderLeft: i ? `1px solid color-mix(in srgb, ${border} 45%, transparent)` : undefined,
               background: h > 0 ? `color-mix(in srgb, ${highlightColor} ${Math.round(h * 100)}%, transparent)` : undefined,
@@ -384,7 +384,7 @@ export const Say: React.FC<{ children: React.ReactNode; size?: number; color?: s
 }) => <span style={{ ...note(size, color), whiteSpace: "nowrap", ...style }}>{children}</span>;
 
 /** Text in the mono face, inside running text, at the text's own size. */
-export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight = 600 }) => (
+export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight = 500 }) => (
   <span style={{ fontFamily: MONO, fontWeight: weight, color, fontVariantLigatures: "none" }}>{children}</span>
 );
 

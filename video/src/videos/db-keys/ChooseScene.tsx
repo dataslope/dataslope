@@ -86,8 +86,8 @@ export const ChooseScene: React.FC = () => {
                 paddingLeft: 22,
               }}
             >
-              <span style={{ ...label(25, INK) }}>A parent row goes.</span>
-              <span style={{ ...note(20, INK_SOFT) }}>What about its children?</span>
+              <span style={{ ...label(24, INK) }}>A parent row goes.</span>
+              <span style={{ ...note(24, INK_SOFT) }}>What about its children?</span>
             </div>
           </Ink>
 
@@ -105,7 +105,7 @@ export const ChooseScene: React.FC = () => {
               <React.Fragment key={a.action}>
                 <ElbowArrow points={i === 1 ? [pts[0], [ANSWER_X - 14, by]] : pts} at={a.at - 2} color={INK} width={2.2} dur={14} />
                 <Ink at={a.at} dur={14} style={{ left: ANSWER_X, top: by - 28, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
-                  <span style={{ ...body(38, true), color: INK }}>{a.q}</span>
+                  <span style={{ ...body(34, true), color: INK }}>{a.q}</span>
                   <span style={{ opacity: ease(frame, a.actAt - 4, 10), transform: `translateY(${(1 - ease(frame, a.actAt - 4, 10)) * 8}px)`, display: "inline-block" }}>
                     <span
                       style={{
@@ -133,7 +133,7 @@ export const ChooseScene: React.FC = () => {
             <Tag color={INK} size={29} mono>
               ON UPDATE
             </Tag>
-            <span style={{ ...body(32, true), color: INK }}>
+            <span style={{ ...body(34, true), color: INK }}>
               <span style={{ opacity: ease(frame, sameAt - 4, 10) }}>asks the same question.</span>
               <span style={{ opacity: ease(frame, neverAt - 10, 10) }}>
                 {" "}

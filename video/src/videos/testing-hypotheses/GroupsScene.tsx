@@ -156,8 +156,8 @@ export const GroupsScene: React.FC = () => {
         <Note at={thirtyAt - 4} x={160} y={ry(RING.y + RING.r + 110) + 40}>
           <span
             style={{
-              ...note(26, STAT_INK),
-              fontWeight: 700,
+              ...note(28, STAT_INK),
+              fontWeight: 500,
               whiteSpace: "nowrap",
               display: "inline-block",
               transform: `scale(${1 + 0.06 * pulse(frame, trialsAt, 24)})`,
@@ -185,11 +185,11 @@ export const GroupsScene: React.FC = () => {
         {/* "F =" at the size of the terms it equals, as the t-test scene sets "t =". */}
         <span style={{ ...body(34, true), color: INK }}>F =</span>
         <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-          <span style={{ ...body(32, true), color: STAT_INK, opacity: ease(frame, betweenAt - 4, 12) }}>
+          <span style={{ ...body(34, true), color: STAT_INK, opacity: ease(frame, betweenAt - 4, 12) }}>
             <Mark at={groupMeansAt}>spread between the group means</Mark>
           </span>
           <span style={{ width: 470, height: 3, background: INK }} />
-          <span style={{ ...body(32, true), color: INK, opacity: ease(frame, withinAt - 4, 12) }}>spread within the groups</span>
+          <span style={{ ...body(34, true), color: INK, opacity: ease(frame, withinAt - 4, 12) }}>spread within the groups</span>
         </span>
       </Ink>
       {/* The baseline that makes twelve mean something. */}
@@ -274,11 +274,11 @@ export const GroupsScene: React.FC = () => {
         </Label>
       </Note>
       <Note at={twelveAt - 4} x={W.x1} y={y(ROW_Y[0]) - h(52) - 52} align="right">
-        <span style={{ ...note(34, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>F = {fmt(ANOVA.F, 1)}</span>
+        <span style={{ ...note(34, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>F = {fmt(ANOVA.F, 1)}</span>
       </Note>
       <Spot id="testing-hypotheses-alarm" at={whichAt - 6} left={240} top={y(470)} width={260} height={260} />
       <Note at={whichAt - 2} x={170} y={y(470) + 290}>
-        <span style={{ ...body(32, true), color: INK }}>Something differs. Not which.</span>
+        <span style={{ ...body(34, true), color: INK }}>Something differs. Not which.</span>
       </Note>
     </AbsoluteFill>
   );

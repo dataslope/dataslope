@@ -55,7 +55,7 @@ export { colsOf, geoOf, rowsAt } from "../da-advanced-sql/parts";
  * one size, one family"); never under 19px.
  */
 export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 500, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );
@@ -96,7 +96,7 @@ const KEYWORDS = new Set(
     "UPDATE SET INSERT INTO CREATE TABLE ALTER ADD COLUMN CONFLICT DO NOTHING DELETE COUNT SUM ROW_NUMBER EXISTS EXCEPT"
   ).split(" "),
 );
-/** Literals DuckDB prints in lower case. */
+/** Boolean literals, which the listings write in lower case. */
 const LITERALS = new Set(["true", "false"]);
 const TABLES = new Set([
   "dim_customer",
@@ -125,9 +125,9 @@ const tokenize = (line: string): Token[] => {
     if (comment) out.push({ text, color: INK_SOFT });
     else if (str) out.push({ text, color: TOKEN_INK.string });
     else if (num) out.push({ text, color: TOKEN_INK.number });
-    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 700 });
+    else if (word && KEYWORDS.has(word)) out.push({ text, color: TOKEN_INK.keyword, weight: 500 });
     else if (word && LITERALS.has(word)) out.push({ text, color: TOKEN_INK.number });
-    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 600 });
+    else if (word && TABLES.has(word)) out.push({ text, color: TOKEN_INK.name, weight: 500 });
     else if (word) out.push({ text, color: TOKEN_INK.name });
     else out.push({ text, color: TOKEN_INK.punct });
   }
@@ -197,7 +197,7 @@ export const Listing: React.FC<{
   return (
     <div style={{ position: "absolute", left: x, top, width, height: listingHeight(lines.length, size), opacity: (1 - d) * (1 - o) }}>
       {title ? (
-        <div style={{ position: "absolute", left: 0, bottom: "100%", paddingBottom: 8, whiteSpace: "nowrap", ...label(21, INK_SOFT), opacity: p }}>{title}</div>
+        <div style={{ position: "absolute", left: 0, bottom: "100%", paddingBottom: 8, whiteSpace: "nowrap", ...label(24, INK_SOFT), opacity: p }}>{title}</div>
       ) : null}
       <div
         style={{

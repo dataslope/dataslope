@@ -22,7 +22,7 @@ const OVERLAP = 6;
  * interview prep videos, on the editorial page. Nineteen questions of the
  * track's page: fifteen worked through on its own data and charts, a scene
  * or a part of one each, then four at speed. Every count, test and interval
- * ran in DuckDB or in Pyodide with SciPy, and every curve is recomputed from
+ * ran in Postgres or in Pyodide with SciPy, and every curve is recomputed from
  * the page's chart (check.mjs, results.json, data.ts).
  *
  * Every scene boundary is a narration cue, so new audio re-times the cuts

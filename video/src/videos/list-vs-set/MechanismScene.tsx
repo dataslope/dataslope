@@ -186,10 +186,10 @@ export const MechanismScene: React.FC = () => {
         />
       ) : null}
       <Note at={ideaAt} x={LEFT} y={ya(A_CELLS) + CELL_H + 20} out={notThereAt - 6}>
-        <span style={note(22, INK_SOFT)}>Nothing records where a value is, so each item is checked in turn.</span>
+        <span style={note(24, INK_SOFT)}>Nothing records where a value is, so each item is checked in turn.</span>
       </Note>
       <Note at={landAt + 2} x={lastX + CELL_W} y={ya(A_CELLS) + CELL_H + 20} align="right" out={notThereAt - 6}>
-        <span style={{ ...note(22, LIST_INK), fontWeight: 650 }}>found at the very end</span>
+        <span style={{ ...note(24, LIST_INK), fontWeight: 500 }}>found at the very end</span>
       </Note>
       <Ink at={notThereAt - 2} dur={16} style={{ left: LEFT, top: ya(A_NOTE), display: "flex", alignItems: "baseline", gap: "0.6em", whiteSpace: "nowrap" }}>
         <Code line="-1 in big_list" size={CODE} />
@@ -227,8 +227,8 @@ export const MechanismScene: React.FC = () => {
         dur={16}
         style={{ left: resultX + 6 * CODE * 0.6 + 40, top: pipeY, height: 52, display: "flex", alignItems: "center", gap: "0.45em", whiteSpace: "nowrap" }}
       >
-        <span style={{ ...body(30, true), color: INK }}>bucket 999,999</span>
-        <span style={{ ...body(30, true), color: INK_SOFT }}>of</span>
+        <span style={{ ...body(28, true), color: INK }}>bucket 999,999</span>
+        <span style={{ ...body(28, true), color: INK_SOFT }}>of</span>
         <span style={{ position: "relative", ...headline(34), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums", marginLeft: "0.15em" }}>
           {/* The highlight reaches 0.1em past the number, so the number keeps
               0.15em of margin: a full space between the highlight and "of". */}
@@ -254,7 +254,7 @@ export const MechanismScene: React.FC = () => {
         return (
           <React.Fragment key={i}>
             <Ink at={at} dur={12} style={{ left: s.x, top: y(B_CELLS) - 34, width: CELL_W, textAlign: "center" }}>
-              <span style={{ ...note(19, isTarget && landed > 0 ? SET_INK : INK_SOFT), fontWeight: isTarget ? 650 : 500 }}>
+              <span style={{ ...note(24, isTarget && landed > 0 ? SET_INK : INK_SOFT), fontWeight: isTarget ? 500 : 500 }}>
                 {commas(s.index)}
               </span>
             </Ink>
@@ -293,7 +293,7 @@ export const MechanismScene: React.FC = () => {
         </svg>
       ) : null}
       <Note at={thatBucketAt + 10} x={LEFT} y={y(FOOT)}>
-        <span style={note(21, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           A whole number hashes to itself, so here every value sits in the bucket of the same number.
         </span>
       </Note>
@@ -326,7 +326,7 @@ const RowTitle: React.FC<{ at: number; y: number; letter: string; color: string;
   title,
 }) => (
   <Ink at={at} dur={16} style={{ left: LEFT, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
-    <span style={label(22, color)}>{letter}</span>
+    <span style={label(24, color)}>{letter}</span>
     <span style={{ ...body(34, true), color: INK }}>{title}</span>
   </Ink>
 );
@@ -341,7 +341,7 @@ const Counter: React.FC<{ at: number; y: number; value: number; color: string; h
 }) => (
   <Note at={at} x={RIGHT} y={y - 10} align="right" from="right">
     <div style={{ display: "flex", alignItems: "baseline", gap: 16, justifyContent: "flex-end" }}>
-      <span style={label(21, INK_SOFT)}>comparisons</span>
+      <span style={label(24, INK_SOFT)}>comparisons</span>
       <span
         style={{
           ...headline(52),
@@ -395,7 +395,7 @@ const Cell: React.FC<{
         alignItems: "center",
         justifyContent: "center",
         fontFamily: MONO,
-        fontSize: 26,
+        fontSize: 28,
         color: inkOf.orange,
       }}
     >

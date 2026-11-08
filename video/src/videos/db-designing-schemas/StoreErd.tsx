@@ -149,7 +149,7 @@ export const StoreErd: React.FC = () => {
       <FigLabel n="1" title="The store's schema, one step at a time" at={n.beat("entities").from - 2} x={STORE_X[0]} y={y(262)} out={leaveAt} />
       {/* The two boxes that stay beside Fig. 2 are still Fig. 1's. */}
       <Ink at={leaveAt + 12} dur={16} style={{ left: STORE_X[2], top: y(262), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT), fontWeight: 560 }}>Their schema, from Fig. 1</span>
+        <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>Their schema, from Fig. 1</span>
       </Ink>
 
       {/* ── The boxes ── */}
@@ -266,7 +266,7 @@ export const StoreErd: React.FC = () => {
             gap: 18,
           }}
         >
-          <span style={{ ...label(22, INK_SOFT) }}>facts of the link</span>
+          <span style={{ ...label(24, INK_SOFT) }}>facts of the link</span>
           <span style={{ opacity: ease(frame, howManyAt - 2, 10), transform: `translateY(${(1 - ease(frame, howManyAt - 2, 10)) * 8}px)` }}>
             <Chip>how many</Chip>
           </span>
@@ -355,8 +355,8 @@ const QuantityMark: React.FC<{ e: ReturnType<typeof useStoreLayout>["orderItems"
           position: "absolute",
           left: e.right - 74,
           top: r.mid - 15,
-          ...note(22, ACCENT_INK),
-          fontWeight: 700,
+          ...note(24, ACCENT_INK),
+          fontWeight: 500,
           opacity: p * (1 - o),
           whiteSpace: "nowrap",
         }}

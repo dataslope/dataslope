@@ -30,7 +30,7 @@ const TABLE_Y = 470;
 /**
  * Question 1, WHERE against HAVING, on the page's 24 orders: the two
  * definitions, the region totals as the groups HAVING filters, the sum put
- * in WHERE and DuckDB's refusal, then the same filter in HAVING and the two
+ * in WHERE and Postgres's refusal, then the same filter in HAVING and the two
  * regions it keeps, and why row filters still belong in WHERE.
  */
 export const WhereScene: React.FC = () => {
@@ -44,8 +44,8 @@ export const WhereScene: React.FC = () => {
   const havingAt = n.word("where-rows", "HAVING filters");
   const askAt = n.word("where-try", "regions");
   const sumAt = n.word("where-try", "put the sum");
-  const refusesAt = n.word("where-try", "refuses");
-  const errAt = n.word("where-try", "WHERE clause");
+  const refusesAt = n.word("where-refused", "refuses");
+  const errAt = n.word("where-refused", "Aggregate functions");
   const whyAt = n.word("where-why", "doesn't exist");
   const moveAt = n.word("where-fix", "Move");
   const twoAt = n.word("where-fix", "two regions");
@@ -76,12 +76,12 @@ export const WhereScene: React.FC = () => {
 
         {/* ── The two definitions ── */}
         <Note at={rowsAt - 4} x={X0} y={y(300)}>
-          <span style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
+          <span style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>
             <Mono>WHERE</Mono> filters rows, before anything is grouped.
           </span>
         </Note>
         <Note at={havingAt - 4} x={X0} y={y(356)}>
-          <span style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
+          <span style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>
             <Mono>HAVING</Mono> filters groups, after.
           </span>
         </Note>
@@ -102,10 +102,10 @@ export const WhereScene: React.FC = () => {
           bands={WHERE.totals.rows.flatMap((cells, i) => (kept.has(cells[0]) ? [{ row: i, at: twoAt + 2 + i * 4 }] : []))}
         />
         <Note at={askAt} x={g.right + 24} y={g.top + g.headH + 2 * g.rowH - 16}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap", fontWeight: 650 }}>&gt; 600?</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", fontWeight: 500 }}>&gt; 600?</span>
         </Note>
 
-        {/* ── The sum in WHERE, and DuckDB's refusal ── */}
+        {/* ── The sum in WHERE, and Postgres's refusal ── */}
         <Listing
           lines={WHERE.aggregate.lines}
           x={X0}
@@ -127,7 +127,7 @@ export const WhereScene: React.FC = () => {
           out={moveAt - 2}
         />
         <Note at={whyAt - 6} x={X0} y={y(LIST_Y) + listH + 112} out={moveAt - 2}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             The sum doesn&apos;t exist yet when <Mono>WHERE</Mono> runs.
           </span>
         </Note>
@@ -143,7 +143,7 @@ export const WhereScene: React.FC = () => {
           marks={[{ line: havingLine, at: moveAt + 12 }]}
         />
         <Note at={keepAt - 2} x={X0} y={y(LIST_Y) + havingH + 30}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             Row filters still go in <Mono>WHERE</Mono>: <Mark at={shrinkAt}>fewer rows to group</Mark>.
           </span>
         </Note>

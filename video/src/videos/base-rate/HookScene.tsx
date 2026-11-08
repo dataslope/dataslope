@@ -28,7 +28,7 @@ export const HookScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={2} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>One positive result</span>
+        <span style={label(24, ACCENT_INK)}>One positive result</span>
       </Ink>
       <Ink at={4} dur={20} style={{ left: 92, top: y(152), ...headline(88), whiteSpace: "nowrap" }}>
         A {pct(SENSITIVITY)} accurate test
@@ -36,7 +36,7 @@ export const HookScene: React.FC = () => {
       <Ink at={10} dur={20} style={{ left: 92, top: y(246), ...headline(88, true), whiteSpace: "nowrap" }}>
         says you have it.
       </Ink>
-      <Ink at={rareAt - 8} dur={18} style={{ left: 96, top: y(386), width: 1180, ...body(32) }}>
+      <Ink at={rareAt - 8} dur={18} style={{ left: 96, top: y(386), width: 1180, ...body(34) }}>
         {/* The rarity is the whole story, so it is the phrase that gets marked. */}
         <span
           style={{
@@ -99,7 +99,7 @@ export const HookScene: React.FC = () => {
       <Ink
         at={answerAt}
         dur={18}
-        style={{ left: 752, top: y(552), ...headline(200, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 752, top: y(552), ...headline(200, true), color: INK, whiteSpace: "nowrap" }}
       >
         <span style={{ fontSize: "0.36em", marginRight: "0.3em" }}>about</span>
         {pct(PPV)}

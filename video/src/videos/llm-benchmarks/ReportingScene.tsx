@@ -137,7 +137,7 @@ export const ReportingScene: React.FC = () => {
                     stroke={i === 1 ? TRAP : INK_SOFT}
                     strokeWidth={1.6}
                   />
-                  <text x={ICON_X + ICON_W / 2} y={ry + 28} textAnchor="middle" style={{ ...label(19, i === 1 ? TRAP_INK : INK_SOFT), fill: i === 1 ? TRAP_INK : INK_SOFT }}>
+                  <text x={ICON_X + ICON_W / 2} y={ry + 28} textAnchor="middle" style={{ ...label(24, i === 1 ? TRAP_INK : INK_SOFT), fill: i === 1 ? TRAP_INK : INK_SOFT }}>
                     {i === 0 ? "notes" : "all its reasoning"}
                   </text>
                 </g>
@@ -145,42 +145,42 @@ export const ReportingScene: React.FC = () => {
                   x={ICON_X + ICON_W / 2}
                   y={ry - 21}
                   textAnchor="middle"
-                  style={{ ...label(21, PAPER), fontWeight: 700, fill: PAPER }}
+                  style={{ ...label(24, PAPER), fontWeight: 500, fill: PAPER }}
                   opacity={ease(frame, modelAt + 2 + i * 3, 10)}
                 >
                   model
                 </text>
               </Svg>
               <Ink at={harnessesAt + i * 5} dur={12} style={{ left: ICON_X, top: ry + ICON_H / 2 + 4, whiteSpace: "nowrap", opacity: 1 - dim }}>
-                <span style={note(21, INK_SOFT)}>harness</span>
+                <span style={note(24, INK_SOFT)}>harness</span>
               </Ink>
 
               {/* The run's score. */}
               <Ink at={r.nameAt} dur={12} style={{ left: BX0, top: ry - 58, whiteSpace: "nowrap", opacity: 1 - dim }}>
-                <span style={{ ...label(24, INK), fontWeight: 650 }}>{r.name}</span>
+                <span style={{ ...label(24, INK), fontWeight: 500 }}>{r.name}</span>
               </Ink>
               <Svg opacity={(1 - dim)}>
                 <rect x={BX0} y={ry - 16} width={(BX1 - BX0) * ease(frame, arcAt - 4 + i * 6, 18)} height={32} rx={3} fill={FAINT} opacity={0.6} />
                 <rect x={BX0} y={ry - 16} width={(X(r.v) - BX0) * grow} height={32} rx={3} fill={i === 1 ? TRAP : A} />
               </Svg>
               <Ink at={r.at + 6} dur={10} style={{ left: X(100) + 16, top: ry - 18, whiteSpace: "nowrap", opacity: 1 - dim }}>
-                <span style={{ ...note(30, i === 1 ? TRAP_INK : A_INK), fontWeight: 700, ...TABULAR }}>
+                <span style={{ ...note(28, i === 1 ? TRAP_INK : A_INK), fontWeight: 500, ...TABULAR }}>
                   {i === 0 ? <Marked at={firstAt - 2}>{fmt(r.v, 1)}%</Marked> : `${fmt(r.v, 1)}%`}
                 </span>
               </Ink>
               <Ink at={lessAt - 4 + i * 6} dur={12} style={{ left: BX0, top: ry + 26, whiteSpace: "nowrap", opacity: 1 - dim }}>
-                <span style={note(22, INK_SOFT)}>
-                  run cost <span style={{ ...TABULAR, color: INK, fontWeight: 600 }}>{usd(r.usd)}</span>
+                <span style={note(24, INK_SOFT)}>
+                  run cost <span style={{ ...TABULAR, color: INK, fontWeight: 500 }}>{usd(r.usd)}</span>
                 </span>
               </Ink>
             </React.Fragment>
           );
         })}
         <Ink at={hiddenAt - 2} dur={12} style={{ left: BX0 + 330, top: y(ROW_Y[1]) - 56, whiteSpace: "nowrap", opacity: 1 - vendorDim }}>
-          <span style={note(22, TRAP_INK)}>keeps its hidden reasoning between moves</span>
+          <span style={note(24, TRAP_INK)}>keeps its hidden reasoning between moves</span>
         </Ink>
         <Ink at={hiddenAt + 4} dur={12} style={{ left: BX0 + 330, top: y(ROW_Y[0]) - 56, whiteSpace: "nowrap" }}>
-          <span style={note(22, INK_SOFT)}>keeps only the notes the model chooses</span>
+          <span style={note(24, INK_SOFT)}>keeps only the notes the model chooses</span>
         </Ink>
 
         {/* Same model, same test, same week. */}
@@ -194,7 +194,7 @@ export const ReportingScene: React.FC = () => {
               <svg width={30} height={30} style={{ overflow: "visible" }}>
                 <Check x={14} y={15} at={s.at} size={24} color={OK} />
               </svg>
-              <span style={{ ...note(24, INK), fontWeight: 600 }}>{s.text}</span>
+              <span style={{ ...note(24, INK), fontWeight: 500 }}>{s.text}</span>
             </span>
           ))}
         </div>

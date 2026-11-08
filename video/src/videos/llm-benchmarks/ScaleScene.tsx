@@ -76,17 +76,17 @@ export const ScaleScene: React.FC = () => {
         <svg width={18} height={18}>
           <circle cx={9} cy={9} r={8} fill={A} />
         </svg>
-        <span style={{ ...label(22, A_INK), marginRight: 22 }}>Model A</span>
+        <span style={{ ...label(24, A_INK), marginRight: 22 }}>Model A</span>
         <svg width={18} height={18}>
           <circle cx={9} cy={9} r={8} fill={B} />
         </svg>
-        <span style={label(22, B_INK)}>Model B</span>
+        <span style={label(24, B_INK)}>Model B</span>
       </Ink>
 
       <Drift from={from} to={end} amount={0.01} origin="55% 55%">
         {/* ── MMLU ── */}
         <Ink at={mmluAt - 6} dur={12} style={{ left: X0, top: my - 17, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(26, INK), fontWeight: 700 }}>MMLU</span>
+          <span style={{ ...label(28, INK), fontWeight: 500 }}>MMLU</span>
         </Ink>
         <Track x0={TX0} x1={TX1} y={my} at={from + 2} />
         <Svg opacity={ease(frame, labelAt - 2, 12)}>
@@ -97,7 +97,7 @@ export const ScaleScene: React.FC = () => {
           <Dot x={X(MMLU.a)} y={my} at={aAt} r={9} color={A} />
         </Svg>
         <Ink at={capAt - 2} dur={14} style={{ left: X(MMLU.ceiling) - 6, top: my - 78, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, TRAP_INK), fontWeight: 600, display: "inline-block", transform: "translateX(-100%)" }}>
+          <span style={{ ...note(24, TRAP_INK), fontWeight: 500, display: "inline-block", transform: "translateX(-100%)" }}>
             wrong answer keys cap it near {MMLU.ceiling}
           </span>
         </Ink>
@@ -116,7 +116,7 @@ export const ScaleScene: React.FC = () => {
           {[90, 92, 94, 96].map((v) => (
             <g key={v}>
               <line x1={zx(v)} x2={zx(v)} y1={zy + 2} y2={zy + 9} stroke={INK_SOFT} strokeWidth={1.4} />
-              <text x={zx(v)} y={zy + 32} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
+              <text x={zx(v)} y={zy + 32} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500, ...TABULAR })}>
                 {v}
               </text>
             </g>
@@ -128,31 +128,31 @@ export const ScaleScene: React.FC = () => {
           <line x1={zx(MMLU.ceiling)} x2={zx(MMLU.ceiling)} y1={zy - 110} y2={zy + 16} stroke={TRAP} strokeWidth={2.6} strokeDasharray="6 5" />
         </Svg>
         <Ink at={ninetyFiveAt - 2} dur={12} style={{ left: zx(MMLU.ceiling) + 12, top: zy - 116, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, TRAP_INK), fontWeight: 600 }}>ceiling</span>
+          <span style={{ ...note(24, TRAP_INK), fontWeight: 500 }}>ceiling</span>
         </Ink>
         <Svg>
           <Dot x={zx(MMLU.b)} y={zy} at={bAt} r={12} color={B} />
           <Dot x={zx(MMLU.a)} y={zy} at={aAt} r={12} color={A} />
         </Svg>
         <Ink at={aAt} dur={10} style={{ left: zx(MMLU.a), top: zy - 54, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, A_INK), fontWeight: 700, ...TABULAR, display: "inline-block", transform: "translateX(-30%)" }}>
+          <span style={{ ...note(24, A_INK), fontWeight: 500, ...TABULAR, display: "inline-block", transform: "translateX(-30%)" }}>
             {fmt(MMLU.a, 1)}
           </span>
         </Ink>
         <Ink at={bAt} dur={10} style={{ left: zx(MMLU.b), top: zy - 54, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, B_INK), fontWeight: 600, ...TABULAR, display: "inline-block", transform: "translateX(-70%)" }}>
+          <span style={{ ...note(24, B_INK), fontWeight: 500, ...TABULAR, display: "inline-block", transform: "translateX(-70%)" }}>
             {fmt(MMLU.b, 1)}
           </span>
         </Ink>
         <Bracket x0={zx(MMLU.b)} x1={zx(MMLU.a)} y={zy - 76} at={sixAt - 4} color={INK} />
         <Ink at={sixAt - 2} dur={12} style={{ left: (zx(MMLU.b) + zx(MMLU.a)) / 2, top: zy - 116, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK), fontWeight: 700, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(24, INK), fontWeight: 500, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
             {fmt(MMLU.gap, 1)}
           </span>
         </Ink>
         <Bracket x0={zx(MMLU.a) + 16} x1={zx(MMLU.ceiling) - 4} y={zy - 76} at={ceilingAt - 4} color={TRAP} />
         <Ink at={ceilingAt - 2} dur={12} style={{ left: (zx(MMLU.a) + zx(MMLU.ceiling)) / 2, top: zy - 116, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, TRAP_INK), fontWeight: 600, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(24, TRAP_INK), fontWeight: 500, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
             {fmt(MMLU.ceiling - MMLU.a, 1)} to the ceiling
           </span>
         </Ink>
@@ -171,7 +171,7 @@ export const ScaleScene: React.FC = () => {
             return (
               <g key={k} opacity={p}>
                 <circle cx={cx} cy={cy} r={17} fill={lit > 0 ? TRAP : "none"} fillOpacity={lit} stroke={TRAP} strokeWidth={2.2} />
-                <text x={cx} y={cy + 7} textAnchor="middle" style={{ ...label(20, TRAP_INK), fill: lit > 0.5 ? PAPER : TRAP_INK, fontWeight: 700 }}>
+                <text x={cx} y={cy + 7} textAnchor="middle" style={{ ...label(24, TRAP_INK), fill: lit > 0.5 ? PAPER : TRAP_INK, fontWeight: 500 }}>
                   {k + 1}
                 </text>
               </g>
@@ -181,7 +181,7 @@ export const ScaleScene: React.FC = () => {
 
         {/* ── ARC-AGI-3 ── */}
         <Ink at={arcAt - 6} dur={12} style={{ left: X0, top: ay - 17, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(26, INK), fontWeight: 700 }}>ARC-AGI-3</span>
+          <span style={{ ...label(28, INK), fontWeight: 500 }}>ARC-AGI-3</span>
         </Ink>
         <Track x0={TX0} x1={TX1} y={ay} at={arcAt - 8} />
         <Svg>
@@ -189,22 +189,22 @@ export const ScaleScene: React.FC = () => {
           <Dot x={X(ARC3.a)} y={ay} at={arcA} r={12} color={A} />
         </Svg>
         <Ink at={arcA} dur={10} style={{ left: X(ARC3.a), top: ay - 54, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, A_INK), fontWeight: 700, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(24, A_INK), fontWeight: 500, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
             {fmt(ARC3.a, 1)}
           </span>
         </Ink>
         <Ink at={arcB} dur={10} style={{ left: X(ARC3.b), top: ay - 54, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, B_INK), fontWeight: 600, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(24, B_INK), fontWeight: 500, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
             {fmt(ARC3.b, 1)}
           </span>
         </Ink>
         <Bracket x0={X(ARC3.a) + 16} x1={X(100)} y={ay - 76} at={roomAt - 4} color={INK_SOFT} />
         <Ink at={roomAt - 2} dur={12} style={{ left: (X(ARC3.a) + X(100)) / 2, top: ay - 116, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK_SOFT), fontWeight: 600, display: "inline-block", transform: "translateX(-50%)" }}>room above</span>
+          <span style={{ ...note(24, INK_SOFT), fontWeight: 500, display: "inline-block", transform: "translateX(-50%)" }}>room above</span>
         </Ink>
         <Bracket x0={X(ARC3.b)} x1={X(ARC3.a)} y={ay - 76} at={realAt - 4} color={A} width={2.6} />
         <Ink at={realAt - 2} dur={14} style={{ left: (X(ARC3.b) + X(ARC3.a)) / 2, top: ay - 118, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, A_INK), fontWeight: 700, display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+          <span style={{ ...note(24, A_INK), fontWeight: 500, display: "inline-block", transform: "translateX(-50%)", ...halo }}>
             <span style={TABULAR}>{fmt(ARC3.gap, 1)}</span> points: a real difference
           </span>
         </Ink>

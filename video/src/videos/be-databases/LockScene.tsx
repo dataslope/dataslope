@@ -65,12 +65,12 @@ const AccountRow: React.FC<{ x: number; y: number; h: number; id: number; balanc
         alignItems: "center",
         gap: 18,
         padding: "0 18px",
-        fontSize: 22,
+        fontSize: 24,
         opacity: p,
       }}
     >
-      <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>account {id}</span>
-      <span style={{ fontFamily: MONO, fontSize: 22, color: BLUE_INK, fontWeight: 600 }}>{balance}</span>
+      <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>account {id}</span>
+      <span style={{ fontFamily: MONO, fontSize: 24, color: BLUE_INK, fontWeight: 500 }}>{balance}</span>
     </div>
   );
 };
@@ -179,7 +179,7 @@ export const LockScene: React.FC = () => {
         {/* ── Left: pessimistic, centred until the optimistic side arrives ── */}
         <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - ease(frame, optAt - 12, 24)) * 460}px)` }}>
         <Note at={pessAt} x={X0} y={y(HEAD_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Pessimistic: lock first</span>
+          <span style={{ ...label(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Pessimistic: lock first</span>
         </Note>
         <AccountRow x={X0} y={rowsTop} h={rowH} id={1} balance={100} at={forUpdateAt} tone={ease(frame, untilAt, 8) > 0.5 ? "held" : "data"} />
         <AccountRow x={X0} y={row2} h={rowH} id={2} balance={LOCK.otherRow?.balance ?? 0} at={forUpdateAt + 4} tone={ease(frame, freeAt + 4, 8) > 0.5 ? "ok" : "data"} />
@@ -188,18 +188,18 @@ export const LockScene: React.FC = () => {
         <Node x={waiter.x} y={waiter.y} w={waiter.w} h={waiter.h} at={otherAt} tone="plain" bare title="another transaction" size={22} out={holdsAt - 2} />
         <Flow points={[[waiter.x - 10, waiter.y + waiter.h / 2], [X0 + ROW_W + 14, waiter.y + waiter.h / 2]]} at={otherAt + 4} color={INK_SOFT} width={2.4} dash="7 6" out={holdsAt - 2} />
         <Note at={waitsAt} x={waiter.x} y={waiter.y + waiter.h + h(10)} out={holdsAt - 2}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>waits</b> until commit
           </span>
         </Note>
         {/* The run: account 1 held by a parked transaction, NOWAIT refused. */}
         <Note at={holdsAt} x={X0 + ROW_W + 40} y={rowsTop + h(8)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>held by another transaction</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>held by another transaction</span>
         </Note>
         <Listing lines={LOCK.nowait} x={X0} top={lockTop} width={740} size={20} at={notWaitAt - 2} marks={[{ line: "NOWAIT", text: "NOWAIT", at: notWaitAt + 6 }]} />
         <PgError x={X0} top={lockTop + listingHeight(LOCK.nowait.length, 20) + h(10)} width={704} at={refusesAt} message={LOCK.refused} size={19} />
         <Note at={freeAt + 4} x={X0 + ROW_W + 40} y={row2 + h(8)}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>granted at once</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>granted at once</span>
         </Note>
 
         </div>
@@ -208,10 +208,10 @@ export const LockScene: React.FC = () => {
 
         {/* ── Right: optimistic ── */}
         <Note at={optAt} x={R_X} y={y(HEAD_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Optimistic: no lock, a version</span>
+          <span style={{ ...label(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Optimistic: no lock, a version</span>
         </Note>
         <Note at={versionAt} x={R_X} y={y(HEAD_Y) + h(52)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap", fontSize: 23 }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", fontSize: 24 }}>
             the row: stock <b>{LOCK.readA?.stock}</b>,{" "}
             <Mark at={versionAt + 6}>
               <b>version {LOCK.readA?.version}</b>
@@ -237,25 +237,25 @@ export const LockScene: React.FC = () => {
           <circle cx={knob} cy={sy} r={13} fill={inkOf.yellow} stroke={PAPER} strokeWidth={3} />
         </svg>
         <Note at={winsAt - 4} x={sx0 - 20} y={sy - h(60)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>conflicts rare</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>conflicts rare</span>
         </Note>
         <Note at={pessWinsAt - 4} x={sx1 + 20} y={sy - h(60)} align="right">
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>frequent</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>frequent</span>
         </Note>
         <Note at={winsAt + 4} x={sx0 - 20} y={sy + h(26)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>optimistic</b>
             <span style={{ opacity: ease(frame, retryAt, 10) }}>: a conflict costs one retry</span>
           </span>
         </Note>
         <Note at={pessWinsAt + 8} x={sx1 + 20} y={sy + h(66)} align="right">
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <span style={{ opacity: ease(frame, pileAt, 10) }}>retries would pile up: </span>
             <b style={{ color: OK_INK }}>pessimistic</b>
           </span>
         </Note>
         <Note at={nothingAt + 4} x={sg.right + 24} y={sg.rowTop(3) + h(8)}>
-          <span style={{ ...note(21, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>stale</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>stale</span>
         </Note>
       </Drift>
     </AbsoluteFill>

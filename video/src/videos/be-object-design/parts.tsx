@@ -66,7 +66,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(22, INK_SOFT)}>{children}</span>
+      <span style={label(26, INK_SOFT)}>{children}</span>
     </Ink>
   );
 };
@@ -88,7 +88,7 @@ export const Headline: React.FC<{ lead: string; turn?: string; at: number; turnA
         {lead}
       </Ink>
       {turn ? (
-        <Ink at={turnAt ?? at + 10} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={turnAt ?? at + 10} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}>
           {turn}
         </Ink>
       ) : null}
@@ -254,7 +254,7 @@ export const Box: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      {title ? <span style={{ ...label(size, c.ink), fontWeight: 700, whiteSpace: "nowrap", textAlign: align }}>{title}</span> : null}
+      {title ? <span style={{ ...label(size, c.ink), fontWeight: 500, whiteSpace: "nowrap", textAlign: align }}>{title}</span> : null}
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: align }}>{sub}</span> : null}
       {children}
     </div>
@@ -332,7 +332,7 @@ export const Pill: React.FC<{
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.62;
   return (
     <Ink at={at} dur={12} out={out} style={{ left: x, top: y + 6, opacity: 1 - d }}>
-      <span style={{ ...label(size, tone === "plain" ? INK_SOFT : TONE[tone].ink), fontWeight: 700, whiteSpace: "nowrap" }}>{children}</span>
+      <span style={{ ...label(size, tone === "plain" ? INK_SOFT : TONE[tone].ink), fontWeight: 500, whiteSpace: "nowrap" }}>{children}</span>
     </Ink>
   );
 };
@@ -411,15 +411,38 @@ export const Value: React.FC<{
         transformOrigin: "0% 50%",
       }}
     >
-      <span style={{ ...label(size, toneInk(tone)), fontWeight: 750, fontVariantNumeric: "tabular-nums lining-nums", whiteSpace: "nowrap" }}>{children}</span>
+      <span style={{ ...label(size, toneInk(tone)), fontWeight: 500, fontVariantNumeric: "tabular-nums lining-nums", whiteSpace: "nowrap" }}>{children}</span>
     </div>
   );
 };
 
 /**
- * A semicircular gauge: a track from "low" to "high", and a needle at
- * `value` (0 to 1) that swings between the values `steps` name, each from
- * its frame. The needle takes the tone of the step it settles on.
+ * The painted dial (be-object-design-gauge, 1516x855): a half-disc whose
+ * band runs green on the left, through yellow, to red on the right, with a
+ * blue hub at the middle of its flat edge and no needle. Measured as
+ * fractions of the painting: the hub's centre (x of the width, y of the
+ * height), and, as fractions of the width, the hub's radius, the band's
+ * outer rim (the dial's radius) and where in the band the needle's tip
+ * stops (the band runs 0.35 to 0.485).
+ */
+const DIAL_SIZE = [1516, 855] as const;
+const DIAL = { hubX: 0.4989, hubY: 0.8993, hub: 0.0435, rim: 0.485, tip: 0.425 } as const;
+
+/** The painting for a dial of radius `r`: its size, and how far it reaches
+ *  above and below the hub. */
+export const dialBox = (r: number) => {
+  const w = r / DIAL.rim;
+  const h = (w * DIAL_SIZE[1]) / DIAL_SIZE[0];
+  return { w, h, above: DIAL.hubY * h, below: (1 - DIAL.hubY) * h };
+};
+
+/**
+ * A gauge: the painted dial with its hub at (cx, cy) and its rim at radius
+ * `r`, and a needle drawn over it at `value` (0 at the left, 1 at the right)
+ * that swings between the values `steps` name, each from its frame. The
+ * needle takes the tone of the step it settles on, and starts at the
+ * painted hub's rim. `flip` mirrors the painting, red on the left and green on
+ * the right, for a gauge where high is good; the needle is never mirrored.
  */
 export const Gauge: React.FC<{
   cx: number;
@@ -427,12 +450,10 @@ export const Gauge: React.FC<{
   r: number;
   at: number;
   steps: readonly { at: number; value: number; tone: Tone }[];
+  flip?: boolean;
   dim?: number;
-}> = ({ cx, cy, r, at, steps, dim }) => {
+}> = ({ cx, cy, r, at, steps, flip, dim }) => {
   const frame = useCurrentFrame();
-  const p = ease(frame, at, 16);
-  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.62;
-  if (p <= 0) return null;
   let value = 0.5;
   let color = INK;
   for (const s of steps) {
@@ -441,16 +462,24 @@ export const Gauge: React.FC<{
     value = lerp(value, s.value, k);
     color = k >= 1 ? toneLine(s.tone) : `color-mix(in srgb, ${toneLine(s.tone)} ${Math.round(k * 100)}%, ${color})`;
   }
+  const { w, h } = dialBox(r);
+  const hx = (flip ? 1 - DIAL.hubX : DIAL.hubX) * w;
+  const hy = DIAL.hubY * h;
   const ang = Math.PI * (1 - value);
-  const tip: Pt = [cx + Math.cos(ang) * (r - 14), cy - Math.sin(ang) * (r - 14)];
-  const arc = `M${cx - r},${cy} A${r},${r} 0 0 1 ${cx + r},${cy}`;
+  const [ux, uy] = [Math.cos(ang), -Math.sin(ang)];
+  const at2 = (along: number, across: number): string => `${hx + ux * along - uy * across},${hy + uy * along + ux * across}`;
+  // A tapered needle, from the hub's rim to partway into the band.
+  const base = DIAL.hub * w * 0.9;
+  const tip = DIAL.tip * w;
+  const bw = w * 0.019;
+  const tw = w * 0.005;
+  const needle = `M${at2(base, bw)} L${at2(tip, tw)} L${at2(tip, -tw)} L${at2(base, -bw)} Z`;
   return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p * (1 - d) }}>
-      <path d={arc} fill="none" stroke={ds("gray", 200)} strokeWidth={14} strokeLinecap="round" />
-      <path d={arc} fill="none" stroke={ds("gray", 400)} strokeWidth={2} strokeDasharray="2 22" />
-      <line x1={cx} y1={cy} x2={tip[0]} y2={tip[1]} stroke={color} strokeWidth={5} strokeLinecap="round" />
-      <circle cx={cx} cy={cy} r={8} fill={color} />
-    </svg>
+    <Spot id="gauge" at={at} dim={dim} left={cx - hx} top={cy - hy} width={w} height={h} flip={flip}>
+      <svg width={w} height={h} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+        <path d={needle} fill={color} stroke={color} strokeWidth={w * 0.008} strokeLinejoin="round" />
+      </svg>
+    </Spot>
   );
 };
 
@@ -476,9 +505,8 @@ export const Mark2: React.FC<{ at: number; kind: "tick" | "cross"; size?: number
 
 // ── Spot illustrations ───────────────────────────────────────────────────────
 
-/** A watercolor from illustrations.json: it pops in on `at`, bobs gently,
- *  and fades on `out`. */
-export const Spot: React.FC<{
+/** What a Spot takes. */
+type SpotProps = {
   id: string;
   at: number;
   out?: number;
@@ -487,27 +515,41 @@ export const Spot: React.FC<{
   top: number;
   width: number;
   height: number;
-}> = ({ id, at, out, dim, left, top, width, height }) => {
+  /** Mirror the painting left to right (not its children). */
+  flip?: boolean;
+  /** A CSS filter on the painting alone: a glaze (RapidScene's pillars). */
+  filter?: string;
+  children?: React.ReactNode;
+};
+
+/**
+ * A watercolor from illustrations.json: it pops in on `at`, bobs gently,
+ * and fades on `out`. Any children are drawn over the painting in a box of
+ * the same size that moves with it, so marks laid on the art (a gauge's
+ * needle) stay on it as it bobs.
+ */
+export const Spot: React.FC<SpotProps> = ({ id, at, out, dim, left, top, width, height, flip, filter, children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
   const o = out === undefined ? 0 : ease(frame, out, 12);
   const d = dim === undefined ? 0 : ease(frame, dim, 20) * 0.6;
   if (!ILLUSTRATIONS || p <= 0.001 || o >= 1) return null;
+  const lift = `translateY(${bob(frame, 4, 110) + (1 - p) * 24}px)`;
+  const box: React.CSSProperties = {
+    position: "absolute",
+    left,
+    top,
+    width,
+    height,
+    opacity: Math.min(1, p) * (1 - o) * (1 - d),
+    transform: lift,
+  };
   return (
-    <Illustration
-      video={VIDEO}
-      id={`${VIDEO}-${id}`}
-      style={{
-        position: "absolute",
-        left,
-        top,
-        width,
-        height,
-        opacity: Math.min(1, p) * (1 - o) * (1 - d),
-        transform: `translateY(${bob(frame, 4, 110) + (1 - p) * 24}px)`,
-      }}
-    />
+    <>
+      <Illustration video={VIDEO} id={`${VIDEO}-${id}`} style={{ ...box, transform: flip ? `${lift} scaleX(-1)` : lift, filter }} />
+      {children ? <div style={box}>{children}</div> : null}
+    </>
   );
 };
 
@@ -520,15 +562,17 @@ export { ACCENT, ACCENT_INK, BLUE_INK, INK };
  *  spot is drawn at its own aspect and never past half its pixels at 4K. */
 export const ART = {
   armadillo: [1492, 1003],
+  gauge: DIAL_SIZE,
   multitool: [1014, 871],
   parcel: [1024, 850],
+  pillar: [417, 1024],
   plug: [1011, 943],
   "shopping-cart": [969, 1024],
 } as const;
 export type ArtId = keyof typeof ART;
 
 /** A spot `h` px tall at its own aspect, with its top-left at (left, top). */
-export const ArtSpot: React.FC<{ id: ArtId; at: number; out?: number; dim?: number; left: number; top: number; h: number }> = ({ id, h, ...rest }) => {
+export const ArtSpot: React.FC<Omit<SpotProps, "id" | "width" | "height"> & { id: ArtId; h: number }> = ({ id, h, ...rest }) => {
   const [nw, nh] = ART[id];
   return <Spot id={id} width={Math.round((h * nw) / nh)} height={h} {...rest} />;
 };

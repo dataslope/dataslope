@@ -135,7 +135,7 @@ export const CheckScene: React.FC = () => {
         <Ink at={checkItAt - 6} dur={20} style={{ position: "relative" }}>
           Check it the long way:
         </Ink>
-        <Ink at={thousandAt - 4} dur={18} style={{ position: "relative", ...headline(56, true), color: ACCENT_INK }}>
+        <Ink at={thousandAt - 4} dur={18} style={{ position: "relative", ...headline(56, true), color: INK }}>
           ten thousand samples.
         </Ink>
       </div>
@@ -161,14 +161,14 @@ export const CheckScene: React.FC = () => {
         color={INK}
       />
       <Note at={twentyFiveAt} x={sx(X, CHECK.mu + CHECK.sigma) + 16} y={y(POP_BASE - 0.69 * POP_H) - 15}>
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 700, ...halo }}>± {CHECK.sigma}</span>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, ...halo }}>± {CHECK.sigma}</span>
       </Note>
 
       {/* ── The samples ── */}
       {active >= 0 ? <SampleDots step={steps[active]} index={active} /> : null}
       {frame >= fastFrom && frame < fastTo + 4 ? <FastDots /> : null}
       <Note at={drawAt + 6} x={sx(X, 200) + 20} y={y(STRIP_Y - 14)} out={steps[0].c + 8}>
-        <span style={label(20, INK_SOFT)}>{CHECK.n} values, drawn at random</span>
+        <span style={label(24, INK_SOFT)}>{CHECK.n} values, drawn at random</span>
       </Note>
 
       {/* ── Fig. 4: the averages ── */}
@@ -199,12 +199,12 @@ export const CheckScene: React.FC = () => {
         width={2.2}
       />
       <Note at={spreadAt + 4} x={sx(X, center + CHECK.measured) + 14} y={y(pileSpanY) - 15}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, ...halo }}>± {fmt(CHECK.measured)}</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, ...halo }}>± {fmt(CHECK.measured)}</span>
       </Note>
 
       {/* ── Right column: the count, then the two spreads side by side ── */}
       <div style={{ position: "absolute", left: COL, top: y(214), opacity: counter * notNeeded }}>
-        <div style={label(20, INK_SOFT)}>Samples drawn</div>
+        <div style={label(24, INK_SOFT)}>Samples drawn</div>
         <div
           style={{
             ...headline(104),
@@ -224,7 +224,7 @@ export const CheckScene: React.FC = () => {
           the count, so the extra line costs the page's foot nothing. */}
       <Ink at={spreadAt - 4} dur={14} style={{ left: COL, top: y(500), width: 384 }}>
         <div style={{ height: 1, background: INK, marginBottom: 28 }} />
-        <div style={label(20, INK_SOFT)}>Spread of the {CHECK.samples.toLocaleString("en-US")} averages</div>
+        <div style={label(24, INK_SOFT)}>Spread of the {CHECK.samples.toLocaleString("en-US")} averages</div>
       </Ink>
       <Ink at={fiveAt - 2} dur={14} style={{ left: COL, top: y(564) }}>
         <div style={{ ...headline(64), color: ACCENT_INK, ...TABULAR }}>
@@ -237,7 +237,7 @@ export const CheckScene: React.FC = () => {
       <Ink at={oneAt - 4} dur={14} style={{ left: COL, top: y(690), width: 384 }}>
         <div style={{ height: 1, background: HAIRLINE, marginBottom: 28 }} />
         {/* The sample's own s, which stands in for σ: where 3.67 comes from. */}
-        <div style={label(20, INK_SOFT)}>
+        <div style={label(24, INK_SOFT)}>
           One sample: s = {fmt(CHECK.oneSampleSd)}, ÷ √{CHECK.n}
         </div>
       </Ink>
@@ -248,7 +248,7 @@ export const CheckScene: React.FC = () => {
         <div style={{ ...body(28, true), marginTop: 2 }}>estimated</div>
       </Ink>
       <Note at={closeAt + 2} x={COL} y={y(884)}>
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Theory, {CHECK.sigma} ÷ √{CHECK.n}: {fmt(CHECK.theory)}
         </span>
       </Note>

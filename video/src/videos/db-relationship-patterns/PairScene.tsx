@@ -32,9 +32,14 @@ import {
 } from "./parts";
 
 const TABLE_Y = 410;
-const LIST_X = 860;
-const LIST_W = 900;
+/** Wide enough that the error's DETAIL line (60 characters of 24px mono)
+ *  stays on one line, so the box is three lines tall; the left edge keeps
+ *  about 100px of air after the table. */
+const LIST_X = 880;
+const LIST_W = 920;
 const LIST_SIZE = 24;
+/** The error box at that width: two lines of message, one of detail. */
+const ERROR_H = 144;
 /** Seven rows (four shown, the rows left out, Linus's twice) fit under the
  *  headline at this height (before `h()`). */
 const TABLE_ROW_H = 52;
@@ -121,7 +126,7 @@ export const PairScene: React.FC = () => {
           </Svg>
         ) : null}
         <Ink at={pkAt} dur={14} style={{ left: mid, top: by - 44, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, KEY_INK), fontWeight: 700, display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...label(24, KEY_INK), fontWeight: 500, display: "inline-block", transform: "translateX(-50%)" }}>
             primary key
           </span>
         </Ink>
@@ -156,7 +161,7 @@ export const PairScene: React.FC = () => {
           bands={[{ row: linus, at: rowAt + 4, color: MARK_OK }]}
         />
         <Ink at={identityAt} dur={14} style={{ left: g.x, top: g.rowTop(linus + 2) + 22, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, frame >= rowAt ? OK_INK : INK), fontWeight: 600 }}>
+          <span style={{ ...label(24, frame >= rowAt ? OK_INK : INK), fontWeight: 500 }}>
             <span style={TABULAR}>{count}</span> rows in all
           </span>
         </Ink>
@@ -191,8 +196,8 @@ export const PairScene: React.FC = () => {
           detail={JT.again.detail ?? ""}
           detailMark={existsAt}
         />
-        <Ink at={noAt + 10} dur={12} style={{ left: LIST_X, top: listTop + listH + 220, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 600 }}>the second time: still {JT.againCount} rows</span>
+        <Ink at={noAt + 10} dur={12} style={{ left: LIST_X, top: listTop + listH + 84 + ERROR_H + 32, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>the second time: still {JT.againCount} rows</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

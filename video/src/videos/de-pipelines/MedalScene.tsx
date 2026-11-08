@@ -91,7 +91,7 @@ export const MedalScene: React.FC = () => {
           }}
         />
         <Note at={lakeAt} x={TIER_X + TIER_W + 40} y={tierTop(1) + th / 2 - 16}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>a lake or lakehouse</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a lake or lakehouse</span>
         </Note>
 
         {TIERS.map((t, i) => (
@@ -149,18 +149,18 @@ export const MedalScene: React.FC = () => {
         <Flow points={[[railX, tierTop(2) + th / 2], [railX, tierTop(1) + th / 2 + 4]]} at={silverFromAt} color={OK} width={3.2} />
         <Flow points={[[railX, tierTop(1) + th / 2], [railX, tierTop(0) + th / 2 + 4]]} at={goldFromAt} color={OK} width={3.2} />
         <Note at={rebuiltAt} x={120} y={tierTop(0) - h(20)}>
-          <span style={{ ...label(22, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>rebuilt from</span>
+          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>rebuilt from</span>
           <br />
-          <span style={{ ...label(22, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>the layer below</span>
+          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the layer below</span>
         </Note>
         <Note at={wrongAt + 4} x={120} y={tierTop(1) + h(26)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>a wrong rule</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a wrong rule</span>
         </Note>
         <Note at={fixAt + 4} x={120} y={tierTop(1) + h(62)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: fixP }}>fixed, rebuilt</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: fixP }}>fixed, rebuilt</span>
         </Note>
         <Note at={holdsAt} x={120} y={tierTop(2) + h(26)}>
-          <span style={{ ...note(23, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             still the
             <br />
             original

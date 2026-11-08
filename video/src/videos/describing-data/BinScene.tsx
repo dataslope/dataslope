@@ -187,7 +187,7 @@ export const BinScene: React.FC = () => {
         </Drift>
       ) : null}
       <Ink at={nothingAt - 2} dur={16} style={{ left: 160, top: y(910), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT) }}>The data doesn't say which one is right</span>
+        <span style={{ ...label(24, INK_SOFT) }}>The data doesn't say which one is right</span>
       </Ink>
     </AbsoluteFill>
   );

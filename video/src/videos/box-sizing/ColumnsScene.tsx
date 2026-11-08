@@ -81,7 +81,7 @@ export const ColumnsScene: React.FC = () => {
         <Ink
           at={wrapsAt - 2}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           don&apos;t fit in one row.
         </Ink>
@@ -181,19 +181,19 @@ export const ColumnsScene: React.FC = () => {
         </svg>
       ) : null}
       <Note at={lineAt + 4} x={(p3[0] + p0[0]) / 2} y={p3[1] + 14} style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>onto line 2</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>onto line 2</span>
       </Note>
 
       {/* The arithmetic, beside the figure. */}
       <Note at={eachAt - 2} x={NOTES_X} y={g.top}>
-        <div style={{ ...label(22, INK) }}>Each column</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(24, INK) }}>Each column</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>
           {first.content} + {2 * BOX.padding} + {2 * BOX.border} = <b style={{ color: INK }}>{first.width}px</b>
         </div>
       </Note>
       <Note at={sevenAt} x={NOTES_X} y={g.top + 98}>
-        <div style={{ ...label(22, INK) }}>Side by side</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(24, INK) }}>Side by side</div>
+        <div style={{ ...note(24, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>
           {first.width} + {second.width} = <b style={{ color: ACCENT_INK }}>{NEED}px</b>, in a {ROW.width}px row
         </div>
       </Note>

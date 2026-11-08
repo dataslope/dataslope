@@ -116,7 +116,7 @@ export const SchemaScene: React.FC = () => {
       {WRITERS.map((w, i) => (
         <React.Fragment key={w}>
           <Ink at={everyAt + i * 4} dur={12} out={errorAt} style={{ left: wx(i), top: wy, width: 120, textAlign: "center" }}>
-            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>{w}</span>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{w}</span>
           </Ink>
           <Arrow
             from={[wx(i) + 60, wy - 8]}
@@ -159,7 +159,7 @@ export const SchemaScene: React.FC = () => {
       />
       <Tick x={g.x + g.width + 18} y={g.rowMid(0)} at={productAt - 2} />
       <Note at={mistakeAt - 2} x={TABLE_X} y={g.rowTop(2) + h(36) + 150}>
-        <span style={{ ...note(24, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>caught on the write, not found months later</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>caught on the write, not found months later</span>
       </Note>
       <Spot id="db-constraints-door" at={doorAt - 4} left={770} top={y(600)} width={200} height={320} />
     </AbsoluteFill>

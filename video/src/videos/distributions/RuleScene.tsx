@@ -133,7 +133,7 @@ export const RuleScene: React.FC = () => {
               <Svg>
                 <path d={`M${x0},${yy + 10} L${x0},${yy} L${x1},${yy} L${x1},${yy + 10}`} fill="none" stroke={INK} strokeWidth={1.8} />
               </Svg>
-              <div style={{ position: "absolute", left: x1 + 14, top: yy - 16, opacity: ease(frame, b.at + 8, 6), ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+              <div style={{ position: "absolute", left: x1 + 14, top: yy - 16, opacity: ease(frame, b.at + 8, 6), ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 <span style={TABULAR}>{fmt(share, 2)}</span>%
               </div>
             </React.Fragment>
@@ -150,8 +150,8 @@ export const RuleScene: React.FC = () => {
               textAnchor="middle"
               style={{
                 fontFamily: SANS,
-                fontSize: 22 + sigmaGlow * 3,
-                fontWeight: 600,
+                fontSize: 24 + sigmaGlow * 3,
+                fontWeight: 500,
                 fill: sigmaGlow > 0.1 ? ASK_INK : INK_SOFT,
               }}
             >
@@ -167,13 +167,13 @@ export const RuleScene: React.FC = () => {
             <line key={k} x1={sx(X, k)} x2={sx(X, k)} y1={y(SCORE_Y)} y2={y(SCORE_Y) + 7} stroke={INK} strokeWidth={1.2} />
           ))}
         </Svg>
-        <div style={{ position: "absolute", left: 96, top: y(SCORE_Y) - 14, opacity: scoreAxis, ...label(21, INK_SOFT) }}>Test scores</div>
+        <div style={{ position: "absolute", left: 96, top: y(SCORE_Y) - 14, opacity: scoreAxis, ...label(24, INK_SOFT) }}>Test scores</div>
         {[-3, -2, -1, 0, 1, 2, 3].map((k) => {
           const v = RULE.mu + k * RULE.sigma;
           const at = k === 0 ? hundredAt : fifteenAt + Math.abs(k) * 3;
           const red = (k === -2 && frame >= seventyAt - 2) || (k === 2 && frame >= thirtyAt - 2) || (k === 3 && frame >= fortyFiveAt - 2);
           return (
-            <Centered key={k} x={sx(X, k)} y={y(SCORE_Y) + 12} opacity={ease(frame, at - 2, 10)} style={red ? askNote(26) : { ...note(24, INK), fontWeight: 600 }}>
+            <Centered key={k} x={sx(X, k)} y={y(SCORE_Y) + 12} opacity={ease(frame, at - 2, 10)} style={red ? askNote(26) : { ...note(24, INK), fontWeight: 500 }}>
               {v}
             </Centered>
           );

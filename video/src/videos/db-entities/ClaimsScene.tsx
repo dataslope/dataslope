@@ -101,8 +101,8 @@ export const ClaimsScene: React.FC = () => {
         <Listing lines={[NAME.sql]} x={X} top={y(LISTING_Y)} width={660} size={28} at={capAt - 6} lineAt={[capAt - 2]} />
         <Note at={claimingAt - 2} x={X + 700} y={y(LISTING_Y + 6)}>
           {/* Within a step of the listing's 28px code, which it reads along. */}
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            claims <span style={{ color: STAT_INK, fontWeight: 650 }}>no name is longer than {NAME.limit} characters</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            claims <span style={{ color: STAT_INK, fontWeight: 500 }}>no name is longer than {NAME.limit} characters</span>
           </span>
         </Note>
 
@@ -143,7 +143,7 @@ export const ClaimsScene: React.FC = () => {
               top: slotsY + slotH + 10,
               opacity: slotsIn,
               transform: "translateX(-50%)",
-              ...note(20, INK_SOFT),
+              ...note(24, INK_SOFT),
             }}
           >
             {k}
@@ -166,8 +166,8 @@ export const ClaimsScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: MONO,
-                fontSize: 30,
-                fontWeight: out ? 700 : 500,
+                fontSize: 28,
+                fontWeight: out ? 500 : 500,
                 color: out ? STAT_INK : INK,
                 opacity: p,
                 transform: `translateY(${(1 - p) * -14}px) scale(${1 + (out ? over * 0.25 : 0)})`,
@@ -185,7 +185,7 @@ export const ClaimsScene: React.FC = () => {
             opacity: ease(frame, nameAt[0] - 2, 8),
             whiteSpace: "nowrap",
             ...note(COUNT_SIZE, landed > NAME.limit ? STAT_INK : INK),
-            fontWeight: 700,
+            fontWeight: 500,
           }}
         >
           {/* One line at one size: the count stands out by its ink and weight. */}
@@ -205,7 +205,7 @@ export const ClaimsScene: React.FC = () => {
                 <span style={label(24, INK)}>{s.head}</span>
               </Ink>
               <Ink at={itemsAt} dur={16} style={{ left: s.x, top: y(770), whiteSpace: "nowrap" }}>
-                <span style={{ ...body(36, true), color: INK }}>{s.items}</span>
+                <span style={{ ...body(34, true), color: INK }}>{s.items}</span>
               </Ink>
               <Ink at={verdictAt + 8} dur={14} style={{ left: s.x, top: y(830), whiteSpace: "nowrap" }}>
                 <span style={{ ...label(24, i === 0 ? STAT_INK : INK_SOFT) }}>{s.verdict}</span>

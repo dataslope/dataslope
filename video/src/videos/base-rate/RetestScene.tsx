@@ -49,7 +49,6 @@ export const RetestScene: React.FC = () => {
         firstAt={start - 6}
         secondAt={elevenAt - 2}
         out={ruleAt - 10}
-        secondColor={COLOR_INK.hasIt}
       />
       <Headline
         top={y(104)}
@@ -93,7 +92,7 @@ export const RetestScene: React.FC = () => {
         <span style={{ ...label(24, COLOR_INK.hasIt), whiteSpace: "nowrap" }}>
           {num(COUNT.retestTp)} positive again
         </span>
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", marginLeft: 14 }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginLeft: 14 }}>
           {pct(SENSITIVITY)} of {num(COUNT.tp)}, rounded
         </span>
       </Note>
@@ -102,7 +101,7 @@ export const RetestScene: React.FC = () => {
         <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{num(cleared)} cleared</div>
         <div style={{ ...label(24, COLOR_INK.falseAlarm), whiteSpace: "nowrap", marginTop: 6 }}>
           {num(COUNT.retestFp)} still positive
-          <span style={{ ...note(20, INK_SOFT), marginLeft: 14 }}>
+          <span style={{ ...note(24, INK_SOFT), marginLeft: 14 }}>
             {pct(1 - SPECIFICITY)} of {num(COUNT.fp)}
           </span>
         </div>
@@ -146,7 +145,7 @@ export const RetestScene: React.FC = () => {
         })}
       </svg>
       <Note at={stripAt + 10} x={SCALE.x1 + 14} y={line - 14}>
-        <span style={note(20, INK_SOFT)}>100%</span>
+        <span style={note(24, INK_SOFT)}>100%</span>
       </Note>
       {marks.map((m) => (
         <Note
@@ -158,7 +157,7 @@ export const RetestScene: React.FC = () => {
           from="up"
           style={{ textAlign: m.below ? "left" : "center" }}
         >
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             {m.text}: <b style={{ color: m.ink }}>{pct(m.p, m.p < 0.01 ? 1 : 0)}</b>
           </span>
         </Note>

@@ -147,18 +147,18 @@ export const LawScene: React.FC = () => {
           {TICKS.map((k, ti) => (
             <g key={k} opacity={ease(frame, everyAt - 4 + ti * 5, 8)}>
               <line x1={fx(k)} x2={fx(k)} y1={y(CH.base) + 1} y2={y(CH.base) + 7} stroke={INK} strokeWidth={1.2} />
-              <text x={fx(k)} y={y(CH.base) + 32} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT }}>
+              <text x={fx(k)} y={y(CH.base) + 32} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
                 {k.toLocaleString("en-US")}
               </text>
             </g>
           ))}
-          <text x={CH.x1} y={y(CH.base) + 64} textAnchor="end" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 650, fill: INK_SOFT }}>
+          <text x={CH.x1} y={y(CH.base) + 64} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
             flips so far (log scale)
           </text>
           {[0, 0.25, 0.5, 0.75, 1].map((p) => (
             <g key={p}>
               <line x1={CH.x0 - 6} x2={CH.x0} y1={fy(p)} y2={fy(p)} stroke={INK} strokeWidth={1.2} />
-              <text x={CH.x0 - 14} y={fy(p) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT }}>
+              <text x={CH.x0 - 14} y={fy(p) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
                 {pct(p)}
               </text>
             </g>
@@ -210,7 +210,7 @@ export const LawScene: React.FC = () => {
       </Svg>
       <Pulse x={fx(4)} y={fy(FOUR)} at={quartersAt - 4} />
       <Note at={quartersAt} x={fx(4) + 16} y={fy(FOUR) - 46}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>4 flips: {pct(FOUR)}</span>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>4 flips: {pct(FOUR)}</span>
       </Note>
       {/* What the line has reached, read out as it is drawn. */}
       {drawn ? (
@@ -221,28 +221,28 @@ export const LawScene: React.FC = () => {
             top: y(CH.top) - 4,
             opacity: (1 - ease(frame, lawAt - 8, 12)) * ease(frame, afterAt - 2, 8),
             whiteSpace: "nowrap",
-            ...note(30, INK_SOFT),
+            ...note(28, INK_SOFT),
           }}
         >
           {/* One line, one size: the numbers stand out by weight and color. */}
-          after <span style={{ color: INK, fontWeight: 700, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span> flips:{" "}
-          <span style={{ color: DATA_INK, fontWeight: 700, ...TABULAR }}>{head ? pct(head[1]) : ""}</span>
+          after <span style={{ color: INK, fontWeight: 500, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span> flips:{" "}
+          <span style={{ color: DATA_INK, fontWeight: 500, ...TABULAR }}>{head ? pct(head[1]) : ""}</span>
         </div>
       ) : null}
       <Note at={fiveAt} x={CH.x1 + 12} y={fy(0.5) - 15}>
-        <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>true {pct(0.5)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>true {pct(0.5)}</span>
       </Note>
 
       {/* The early band's ends, said aloud. */}
       <VBracket x={fx(100) + 12} y0={fy(EARLY.hi)} y1={fy(EARLY.lo)} at={fortyAt} color={STAT} right />
       <Note at={fortyAt + 2} x={fx(100) + 34} y={fy(EARLY.lo) - 14}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>{Math.round(EARLY.lo * 100)}%</span>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{Math.round(EARLY.lo * 100)}%</span>
       </Note>
       <Note at={fiftySixAt - 2} x={fx(100) + 34} y={fy(EARLY.hi) - 14}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>{Math.round(EARLY.hi * 100)}%</span>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{Math.round(EARLY.hi * 100)}%</span>
       </Note>
       <Note at={pointAt} x={fx(1000)} y={fy(LATE.hi) - 74} from="up">
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           within {fmt(LATE_BOUND, 1)} points of {pct(0.5)}
         </span>
       </Note>
@@ -261,7 +261,7 @@ export const LawScene: React.FC = () => {
 
       {/* ── The gambler's fallacy, beside the chart ── */}
       <Ink at={balanceAt - 4} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y - 92), whiteSpace: "nowrap" }}>
-        <span style={label(22, INK)}>Five heads in a row</span>
+        <span style={label(24, INK)}>Five heads in a row</span>
       </Ink>
       {Array.from({ length: 5 }, (_, i) => {
         const x0 = MEM.x0 + i * MEM.pitch;
@@ -292,23 +292,23 @@ export const LawScene: React.FC = () => {
       })}
       <Leader points={[[landX, landY + LANDED.r + 8], [landX, fy(llnAt(STREAK[2])) - 12]]} at={paidAt + 14} dur={10} color={STAT} />
       <Note at={paidAt + 16} x={landX + 2 * LANDED.pitch + LANDED.r + 14} y={landY - 15}>
-        <span style={{ ...note(21, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           flips {STREAK[0]} to {STREAK_END}
         </span>
       </Note>
       {/* High enough that "still ½" clears the chart's "true 50%" row. */}
       <Ink at={fiftyAt - 6} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y + 38), whiteSpace: "nowrap" }}>
-        <span style={note(22, INK_SOFT)}>The next flip</span>
-        <div style={{ ...headline(64, true), color: STAT_INK, marginTop: 6 }}>still ½</div>
+        <span style={note(24, INK_SOFT)}>The next flip</span>
+        <div style={{ ...headline(64, true), color: INK, marginTop: 6 }}>still ½</div>
       </Ink>
       <Ink at={memoryAt - 2} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y + 190), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(32, true), color: INK }}>No memory.</span>
+        <span style={{ ...body(34, true), color: INK }}>No memory.</span>
       </Ink>
       <Note at={swampedAt} x={MEM.x0 - MEM.r} y={y(MEM.y + 262)} width={320}>
-        <span style={{ ...note(22, INK), lineHeight: 1.35 }}>A streak is never paid back, only swamped.</span>
+        <span style={{ ...note(24, INK), lineHeight: 1.35 }}>A streak is never paid back, only swamped.</span>
       </Note>
       <Note at={afterEnd - 6} x={fx(30)} y={y(CH.base) - h(60)}>
-        <span style={{ ...note(21, DATA), fontWeight: 650, whiteSpace: "nowrap" }}>everything after the streak</span>
+        <span style={{ ...note(24, DATA), fontWeight: 500, whiteSpace: "nowrap" }}>everything after the streak</span>
       </Note>
     </AbsoluteFill>
   );

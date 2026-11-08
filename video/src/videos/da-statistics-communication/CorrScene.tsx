@@ -51,8 +51,8 @@ const Node: React.FC<{ x: number; y: number; at: number; color?: string; childre
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        ...note(26, color),
-        fontWeight: 600,
+        ...note(28, color),
+        fontWeight: 500,
       }}
     >
       {children}
@@ -138,12 +138,12 @@ export const CorrScene: React.FC = () => {
         />
         <Dots dots={dots} r={7} />
         <Note at={rAt - 2} x={PLOT.left + 30} y={y(PLOT.top) + h(10)}>
-          <span style={{ ...note(34, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(34, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             r = {fmt(CORR.r)}
           </span>
         </Note>
         <Note at={hotAt + 6} x={PLOT.left + 30} y={y(PLOT.top) + h(62)}>
-          <span style={{ ...note(24, WARM_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, WARM_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             ● the {hotDays} days at 30 °C or hotter
           </span>
         </Note>
@@ -179,10 +179,10 @@ export const CorrScene: React.FC = () => {
           </span>
         </Note>
         <Note at={vanishAt - 2} x={(linkFrom + linkTo) / 2 - 200} width={400} y={linkY + h(16)} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>{fmt(CORR.partial)}</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{fmt(CORR.partial)}</span>
         </Note>
         <Note at={vanishAt + 4} x={(linkFrom + linkTo) / 2 - 200} width={400} y={linkY + h(54)} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>with temperature held fixed</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>with temperature held fixed</span>
         </Note>
 
         <Node x={heat.x} y={heat.y} at={bothAt - 2} color={WARM_INK}>
@@ -197,13 +197,13 @@ export const CorrScene: React.FC = () => {
             <React.Fragment key={a.side}>
               <ElbowArrow points={[[x0, y0], [x1, y1]]} at={a.at} color={WARM} width={2.6} />
               <Note at={a.at + 8} x={(x0 + x1) / 2 + a.side * 28} y={(y0 + y1) / 2 - 18} align={a.side < 0 ? "right" : "left"}>
-                <span style={{ ...note(22, WARM_INK), whiteSpace: "nowrap", ...TABULAR }}>r = {fmt(a.r)}</span>
+                <span style={{ ...note(24, WARM_INK), whiteSpace: "nowrap", ...TABULAR }}>r = {fmt(a.r)}</span>
               </Note>
             </React.Fragment>
           );
         })}
         <Note at={confounderAt - 2} x={heat.x - 200} width={400} y={heat.y - NODE_H / 2 - h(48)} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>the confounder</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the confounder</span>
         </Note>
 
         {/* The other two ways two things move together. */}
@@ -214,9 +214,9 @@ export const CorrScene: React.FC = () => {
           </span>
         </Note>
         <Note at={experimentAt - 2} x={1060} y={y(812)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>To argue a cause: an experiment,</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>To argue a cause: an experiment,</span>
           <br />
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>like an A/B test, or a careful causal design.</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>like an A/B test, or a careful causal design.</span>
         </Note>
       </Drift>
     </AbsoluteFill>

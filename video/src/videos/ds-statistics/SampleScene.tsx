@@ -161,7 +161,7 @@ export const SampleScene: React.FC = () => {
           width={2.4}
           label={
             <span style={{ ...noteText(24, INK), opacity: ease(frame, muAt - 2, 10) }}>
-              <span style={{ ...label(20, INK_SOFT), marginRight: 10 }}>parameter</span>μ = <span style={TABULAR}>{fmt(S.mu, 2)}</span>
+              <span style={{ ...label(24, INK_SOFT), marginRight: 10 }}>parameter</span>μ = <span style={TABULAR}>{fmt(S.mu, 2)}</span>
             </span>
           }
           labelY={popBase - h(POP_H) - h(30)}
@@ -191,7 +191,7 @@ export const SampleScene: React.FC = () => {
         </Note>
         <Note at={xbarAt} x={x(S.firstMean) + 12} y={stripY + h(24)} dim={drawAt}>
           <span style={{ ...noteText(24, BLUE_INK) }}>
-            <span style={{ ...label(20, INK_SOFT), marginRight: 10 }}>statistic</span>x̄ = <span style={TABULAR}>{fmt(S.firstMean, 2)}</span>
+            <span style={{ ...label(24, INK_SOFT), marginRight: 10 }}>statistic</span>x̄ = <span style={TABULAR}>{fmt(S.firstMean, 2)}</span>
           </span>
         </Note>
         <Leader
@@ -229,17 +229,17 @@ export const SampleScene: React.FC = () => {
           </div>
         </Note>
         <Note at={rootAt} x={RIGHT_X} y={y(530)} out={panelOut}>
-          <div style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
+          <div style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
             SE = SD / √n
           </div>
         </Note>
         <Note at={sevenAt - 2} x={RIGHT_X} y={y(588)} out={panelOut}>
-          <div style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
+          <div style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
             n = 50: {fmt(S.sigma, 2)} / √50 = <Mark at={sevenAt + 2}>{fmt(S.seFormula, 2)}</Mark>
           </div>
         </Note>
         <Note at={fourAt} x={RIGHT_X} y={y(642)} out={panelOut}>
-          <div style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
+          <div style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
             n = 200: {fmt(S.sigma, 2)} / √200 = <Mark at={halfAt + 2}>{fmt(S.se200, 2)}</Mark>
           </div>
         </Note>
@@ -303,11 +303,11 @@ export const SampleScene: React.FC = () => {
           <div style={{ ...noteText(26, INK), ...TABULAR, lineHeight: 1.45 }}>
             its spread is the SE:
             <br />
-            <Mark at={simAt}>{fmt(S.seSimulated, 2)}</Mark> <span style={{ ...label(20, INK_SOFT) }}>simulated</span>
+            <Mark at={simAt}>{fmt(S.seSimulated, 2)}</Mark> <span style={{ ...label(24, INK_SOFT) }}>simulated</span>
             <span style={{ opacity: ease(frame, formulaAt - 2, 10) }}>
               {" "}
               · <Mark at={formulaAt}>{fmt(S.seFormula, 2)}</Mark>{" "}
-              <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, byFormulaAt - 2, 12) }}>by the formula</span>
+              <span style={{ ...label(24, INK_SOFT), opacity: ease(frame, byFormulaAt - 2, 12) }}>by the formula</span>
             </span>
           </div>
         </Note>

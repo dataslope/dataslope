@@ -86,7 +86,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={{ ...label(22, ACCENT_INK), fontWeight: 700 }}>{children}</span>
+      <span style={{ ...label(26, ACCENT_INK), fontWeight: 500 }}>{children}</span>
     </Ink>
   );
 };
@@ -108,7 +108,7 @@ export const Headline: React.FC<{ lead: string; turn?: string; at: number; turnA
         {lead}
       </Ink>
       {turn ? (
-        <Ink at={turnAt ?? at + 10} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={turnAt ?? at + 10} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}>
           {turn}
         </Ink>
       ) : null}
@@ -118,7 +118,7 @@ export const Headline: React.FC<{ lead: string; turn?: string; at: number; turnA
 
 /** Code inside running text, at the text's own size (QMono's spacing). */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: weight ?? 500, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );
@@ -306,7 +306,7 @@ export const Node: React.FC<{
         transform: `scale(${0.9 + 0.1 * Math.min(1, p)})`,
       }}
     >
-      <span style={{ ...label(size, t.ink), fontWeight: 700, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO } : {}) }}>{title}</span>
+      <span style={{ ...label(size, t.ink), fontWeight: 500, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO } : {}) }}>{title}</span>
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap" }}>{sub}</span> : null}
     </div>
   );
@@ -380,7 +380,7 @@ export const HBar: React.FC<{
   const bw = full * p;
   return (
     <div style={{ position: "absolute", left: x, top: y, opacity: Math.min(1, p * 2) * (1 - o) * (1 - d) }}>
-      <div style={{ ...note(size, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{name}</div>
+      <div style={{ ...note(size, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</div>
       <div style={{ position: "relative", height: barH, marginTop: 12 }}>
         <div style={{ position: "absolute", left: 0, top: 0, width: bw, height: barH, background: color, borderRadius: 3 }} />
         <div
@@ -390,7 +390,7 @@ export const HBar: React.FC<{
             top: barH / 2,
             transform: "translateY(-50%)",
             ...note(size, ink),
-            fontWeight: 700,
+            fontWeight: 500,
             whiteSpace: "nowrap",
             opacity: ease(frame, at + dur * 0.6, 8),
           }}
@@ -442,7 +442,7 @@ export const Cell: React.FC<{
         justifyContent: "center",
         fontFamily: MONO,
         fontSize: size,
-        fontWeight: 600,
+        fontWeight: 500,
         color: t.ink,
         opacity: p * (1 - o) * opacity,
         transform: `scale(${0.85 + 0.15 * p})`,
@@ -503,8 +503,8 @@ export const GraphNode: React.FC<{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...label(26, t.ink),
-          fontWeight: 700,
+          ...label(28, t.ink),
+          fontWeight: 500,
           opacity: Math.min(1, p),
           transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`,
         }}
@@ -520,7 +520,7 @@ export const GraphNode: React.FC<{
             // at gets a highlighter band, never a box.
             ...label(24, badgeTone === "look" || badgeTone === "plain" ? INK : bt.ink),
             ...TABULAR,
-            fontWeight: 750,
+            fontWeight: 500,
             whiteSpace: "nowrap",
             opacity: b,
           }}
@@ -575,9 +575,9 @@ export const Edge: React.FC<{
             left: mx,
             top: my,
             transform: "translate(-50%, -50%)",
-            ...label(23, weightInk),
+            ...label(24, weightInk),
             ...TABULAR,
-            fontWeight: 700,
+            fontWeight: 500,
             opacity: w * (1 - d) * opacity,
             whiteSpace: "nowrap",
           }}

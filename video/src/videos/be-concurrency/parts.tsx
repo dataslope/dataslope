@@ -98,7 +98,7 @@ export const ThreadName: React.FC<{
       }}
     >
       <span style={{ width: size * 0.55, height: size * 0.55, borderRadius: size, background: th.fill, flexShrink: 0 }} />
-      <span style={{ ...label(size, ink ?? th.ink), fontWeight: 700, whiteSpace: "nowrap" }}>{children ?? `thread ${t + 1}`}</span>
+      <span style={{ ...label(size, ink ?? th.ink), fontWeight: 500, whiteSpace: "nowrap" }}>{children ?? `thread ${t + 1}`}</span>
     </div>
   );
 };
@@ -177,7 +177,7 @@ export const Node: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      {title !== undefined ? <span style={{ ...label(size, titleInk ?? t.ink), fontWeight: 700, whiteSpace: "nowrap", textAlign: align }}>{title}</span> : null}
+      {title !== undefined ? <span style={{ ...label(size, titleInk ?? t.ink), fontWeight: 500, whiteSpace: "nowrap", textAlign: align }}>{title}</span> : null}
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: align }}>{sub}</span> : null}
       {children}
     </div>
@@ -265,7 +265,7 @@ export const Pill: React.FC<{
           border: `2px solid ${t.line}`,
           background: solid ? t.line : t.fill,
           ...label(size, solid ? PAPER : t.ink),
-          fontWeight: 700,
+          fontWeight: 500,
           whiteSpace: "nowrap",
         }}
       >

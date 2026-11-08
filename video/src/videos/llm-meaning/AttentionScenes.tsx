@@ -69,7 +69,7 @@ const Sentence: React.FC<{ s: string; marks: { word: string; at: number; color?:
     i = m.i + m.word.length;
   }
   parts.push(s.slice(i));
-  return <span style={{ fontFamily: MONO, fontSize: SIZE, fontWeight: 600, color: INK, whiteSpace: "pre" }}>{parts}</span>;
+  return <span style={{ fontFamily: MONO, fontSize: SIZE, fontWeight: 500, color: INK, whiteSpace: "pre" }}>{parts}</span>;
 };
 
 export const TrophyScene: React.FC = () => {
@@ -144,16 +144,16 @@ export const TrophyScene: React.FC = () => {
         color={POINT}
       />
       <Note at={theTrophyAt + 2} x={X0} y={R1 + 56}>
-        <span style={{ ...note(24, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>it: the trophy</span>
+        <span style={{ ...note(24, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>it: the trophy</span>
       </Note>
       <Note at={suitcaseAt + 2} x={X0} y={R2 + 56}>
-        <span style={{ ...note(24, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>it: the suitcase</span>
+        <span style={{ ...note(24, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>it: the suitcase</span>
       </Note>
       <Note at={aroundAt - 2} x={X0 + 300} y={R2 + 56}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Same token; the words around it decide.</span>
       </Note>
       <Note at={attentionAt} x={X0} y={y(870)} width={1240}>
-        <div style={{ ...body(32), color: INK }}>
+        <div style={{ ...body(34), color: INK }}>
           Each token <Mark at={pullsAt}>pulls in information</Mark> from the others, weighted by{" "}
           <Mark at={relevantAt}>how relevant</Mark> each one is.
         </div>
@@ -264,7 +264,7 @@ export const QkvScene: React.FC = () => {
               </span>
             </Fade>
             <Fade at={nameAt[i] - 4} style={{ left: TX, top: top - 10 }}>
-              <div style={{ ...label(26, r.ink) }}>{r.name}</div>
+              <div style={{ ...label(28, r.ink) }}>{r.name}</div>
               <div style={{ ...body(34, true), color: INK, marginTop: 6, whiteSpace: "nowrap" }}>
                 {i === 2 ? (
                   <>
@@ -284,7 +284,7 @@ export const QkvScene: React.FC = () => {
 
 // ═══ Scene 9: one score worked through, and the blend it makes ═════════════
 
-const T_X = { tok: X0, key: 310, value: 500, score: 700, weight: 890 };
+const T_X = { tok: X0, key: 310, value: 500, score: 700, weight: 500 };
 const T_ROW = 78;
 
 /** A number that changes in place through `steps`, each inked on its frame
@@ -303,7 +303,7 @@ const Steps: React.FC<{ steps: readonly { at: number; value: number; digits: num
     <span
       style={{
         fontFamily: MONO,
-        fontWeight: 700,
+        fontWeight: 500,
         fontSize: size,
         color,
         opacity: p,
@@ -335,8 +335,8 @@ const WorkedScore: React.FC<{
   const step = (at: number) => ({ opacity: ease(frame, at, 10) });
   const named = ease(frame, nameAt, 12);
   return (
-    <div style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap", fontFamily: MONO, fontWeight: 600, fontSize: 26, color: INK, ...TABULAR }}>
-      <span style={{ ...label(26, INK_SOFT), fontFamily: undefined }}>{token}:</span>
+    <div style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap", fontFamily: MONO, fontWeight: 500, fontSize: 28, color: INK, ...TABULAR }}>
+      <span style={{ ...label(28, INK_SOFT), fontFamily: undefined }}>{token}:</span>
       <span style={{ position: "relative", display: "inline-flex", gap: 14 }}>
         <span style={step(multiplyAt)}>
           <span style={{ color: QUERY_INK }}>{fix(q[0])}</span> × <span style={{ color: KEY_INK }}>{fix(k[0])}</span>
@@ -357,7 +357,7 @@ const WorkedScore: React.FC<{
             textAlign: "center",
           }}
         >
-          <span style={{ ...label(20, POINT_INK) }}>a dot product</span>
+          <span style={{ ...label(24, POINT_INK) }}>a dot product</span>
         </span>
       </span>
       <span style={step(rootAt)}>
@@ -454,7 +454,7 @@ export const BlendScene: React.FC = () => {
       <FigLabel n="13" title="The lesson's real vectors, three tokens of two numbers" at={from} x={X0} y={y(FIG_Y)} />
       <Fade at={from + 2} style={{ left: X0, top: QY, display: "flex", alignItems: "center", gap: 20 }}>
         <span style={{ ...label(24, QUERY_INK) }}>
-          Query, from <span style={{ fontFamily: MONO, fontWeight: 600 }}>it</span>
+          Query, from <span style={{ fontFamily: MONO, fontWeight: 500 }}>it</span>
         </span>
         <span
           style={{
@@ -464,17 +464,17 @@ export const BlendScene: React.FC = () => {
         >
           <VectorCells values={frame < swapQ + 5 ? A.query : B.query} size={26} border={QUERY} fill={PAPER} />
         </span>
-        <span style={{ opacity: ease(frame, swapQ + 4, 10), ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>pointed at suitcase</span>
+        <span style={{ opacity: ease(frame, swapQ + 4, 10), ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>pointed at suitcase</span>
       </Fade>
       <Fade at={from + 6} style={{ left: 0, top: HY, width: 1100 }}>
-        <span style={{ position: "absolute", left: T_X.tok, ...label(21, INK_SOFT) }}>Token</span>
-        <span style={{ position: "absolute", left: T_X.key, ...label(21, KEY_INK) }}>Key</span>
-        <span style={{ position: "absolute", left: T_X.value, ...label(21, VALUE_INK) }}>Value</span>
-        <span style={{ position: "absolute", left: T_X.score, ...label(21, INK_SOFT), opacity: ease(frame, scoreWordAt - 2, 10) }}>
+        <span style={{ position: "absolute", left: T_X.tok, ...label(24, INK_SOFT) }}>Token</span>
+        <span style={{ position: "absolute", left: T_X.key, ...label(24, KEY_INK) }}>Key</span>
+        <span style={{ position: "absolute", left: T_X.value, ...label(24, VALUE_INK) }}>Value</span>
+        <span style={{ position: "absolute", left: T_X.score, ...label(24, INK_SOFT), opacity: ease(frame, scoreWordAt - 2, 10) }}>
           Score
           <span style={{ marginLeft: 10, color: POINT_INK, opacity: ease(frame, dividedAt, 10) }}>÷ √{QKV.dim}</span>
         </span>
-        <span style={{ position: "absolute", left: T_X.weight, ...label(21, INK_SOFT), opacity: ease(frame, weightsWordAt - 2, 10) }}>Weight</span>
+        <span style={{ position: "absolute", left: T_X.weight, ...label(24, INK_SOFT), opacity: ease(frame, weightsWordAt - 2, 10) }}>Weight</span>
       </Fade>
       <Svg opacity={ease(frame, from + 6, 12)}>
         <line x1={X0} x2={1010} y1={HY + 36} y2={HY + 36} stroke={INK} strokeWidth={1.6} />
@@ -561,8 +561,8 @@ export const BlendScene: React.FC = () => {
         <line x1={T_X.weight - 10} x2={T_X.weight + 110} y1={rowTop(3) - 6} y2={rowTop(3) - 6} stroke={INK} strokeWidth={1.4} />
       </Svg>
       <Fade at={oneAt - 2} style={{ left: T_X.weight - 134, top: rowTop(3) + 2, display: "flex", gap: 14, alignItems: "baseline" }}>
-        <span style={{ ...label(26, INK_SOFT), width: 120, textAlign: "right" }}>Total</span>
-        <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 26, color: INK, ...TABULAR }}>
+        <span style={{ ...label(28, INK_SOFT), width: 120, textAlign: "right" }}>Total</span>
+        <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 28, color: INK, ...TABULAR }}>
           {A.weightSum.toFixed(3)}
         </span>
       </Fade>
@@ -599,9 +599,9 @@ export const BlendScene: React.FC = () => {
       <Note at={newAt - 2} x={X0} y={workY + 150}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <span style={{ ...label(24, POINT_INK) }}>
-            New vector for <span style={{ fontFamily: MONO, fontWeight: 600 }}>it</span>
+            New vector for <span style={{ fontFamily: MONO, fontWeight: 500 }}>it</span>
           </span>
-          <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 24, color: POINT_INK, ...TABULAR }}>
+          <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 24, color: POINT_INK, ...TABULAR }}>
             {(move < 0.5 ? A.output : B.output).map((v) => v.toFixed(3)).join(", ")}
           </span>
         </div>
@@ -615,7 +615,7 @@ export const BlendScene: React.FC = () => {
         </div>
       </Note>
       <Note at={thatAt - 2} out={blendPronounsAt - 8} x={1100} y={y(560)} width={640}>
-        <div style={{ ...note(26, INK_SOFT) }}>
+        <div style={{ ...note(28, INK_SOFT) }}>
           Dividing by √{QKV.dim}, the square root of the vector size, <Mark at={smallAt - 2}>keeps the scores small</Mark> as vectors grow.
         </div>
       </Note>
@@ -627,11 +627,11 @@ export const BlendScene: React.FC = () => {
         <line x1={PX0} x2={PX0} y1={PY0} y2={PY0 - 10.6 * PU} stroke={LINE} strokeWidth={1.6} />
         {[0, 5, 10].map((v) => (
           <g key={v}>
-            <text x={PX0 + v * PU} y={PY0 + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+            <text x={PX0 + v * PU} y={PY0 + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
               {v}
             </text>
             {v ? (
-              <text x={PX0 - 14} y={PY0 - v * PU + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+              <text x={PX0 - 14} y={PY0 - v * PU + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
                 {v}
               </text>
             ) : null}
@@ -676,16 +676,16 @@ export const BlendScene: React.FC = () => {
               left: i === 0 ? vx + 18 : right ? vx + 16 : vx + 22,
               top: i === 0 ? vy - 46 : right ? vy + 14 : vy - 16,
               opacity: ease(frame, valuesAt - 2 + i * 3, 10),
-              ...label(21, VALUE_INK),
+              ...label(24, VALUE_INK),
               whiteSpace: "nowrap",
               ...halo,
             }}
           >
-            value of <span style={{ fontFamily: MONO, fontWeight: 600 }}>{t}</span>
+            value of <span style={{ fontFamily: MONO, fontWeight: 500 }}>{t}</span>
           </div>
         );
       })}
-      <div style={{ position: "absolute", left: ox + 44, top: oy - 64, opacity: blendP, ...label(22, POINT_INK), whiteSpace: "nowrap", ...halo }}>
+      <div style={{ position: "absolute", left: ox + 44, top: oy - 64, opacity: blendP, ...label(24, POINT_INK), whiteSpace: "nowrap", ...halo }}>
         new vector
       </div>
     </AbsoluteFill>
@@ -823,13 +823,13 @@ export const HeadsScene: React.FC = () => {
         <Tag size={22}>Heads, side by side</Tag>
       </Fade>
       <Fade at={dozensAt - 2} style={{ left: HX + 4 * (HW + GAP) + 6, top: baseY - 4 * (HH + GAP) + 10 }}>
-        <div style={{ ...note(30, FAINT), lineHeight: 1 }}>⋮</div>
+        <div style={{ ...note(28, FAINT), lineHeight: 1 }}>⋮</div>
       </Fade>
       <Fade at={dozensAt - 2} style={{ left: HX + 4 * (HW + GAP) + 6, top: baseY - 2 * (HH + GAP) }}>
         <Tag size={22}>Dozens of layers</Tag>
       </Fade>
       <Note at={ownAt - 2} x={HX} y={baseY - 4 * (HH + GAP) - 40}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Each head, its own idea of relevant</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Each head, its own idea of relevant</span>
       </Note>
 
       {/* ── Fig. 16: each token against itself and every token before it ── */}
@@ -884,20 +884,20 @@ export const HeadsScene: React.FC = () => {
         at={laterAt - 2}
         style={{ left: GX + small.n * CELL - 14, top: GY + 12, transform: "translateX(-100%)", textAlign: "right" }}
       >
-        <div style={{ ...label(21, INK_SOFT), lineHeight: 1.25, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(24, INK_SOFT), lineHeight: 1.25, whiteSpace: "nowrap" }}>
           Later tokens:
           <br />
           never scored
         </div>
       </Fade>
       <div style={{ position: "absolute", left: GX, top: GY - 52, opacity: ease(frame, tenAt - 2, 10) }}>
-        <span style={{ ...note(28, INK), fontWeight: 650, ...TABULAR }}>
+        <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR }}>
           {small.n} tokens: <Mark at={fiftyAt}>{small.scores} scores</Mark>
         </span>
       </div>
       <div style={{ position: "absolute", left: GX + big.n * CELL + 24, top: GY + big.n * CELL - 70, opacity: ease(frame, twentyAt - 2, 10) }}>
-        <div style={{ ...note(28, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{big.n} tokens:</div>
-        <div style={{ ...note(28, POINT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap", opacity: ease(frame, hundredAt - 2, 10) }}>
+        <div style={{ ...note(28, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{big.n} tokens:</div>
+        <div style={{ ...note(28, POINT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap", opacity: ease(frame, hundredAt - 2, 10) }}>
           <Mark at={hundredAt + 4}>{big.scores} scores</Mark>
         </div>
       </div>

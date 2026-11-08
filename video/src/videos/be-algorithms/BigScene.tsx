@@ -92,7 +92,7 @@ export const BigScene: React.FC = () => {
         </Line>
 
         {/* Every pair, and one pass. */}
-        <Line at={loopAt - 2} x={GX} y={gTop - 46} size={22} weight={650}>
+        <Line at={loopAt - 2} x={GX} y={gTop - 46} size={22} weight={500}>
           Double loop: every pair
         </Line>
         <Svg>
@@ -118,7 +118,7 @@ export const BigScene: React.FC = () => {
             );
           })}
         </Svg>
-        <Line at={loopAt + 30} x={GX} y={passTop - 46} size={22} weight={650}>
+        <Line at={loopAt + 30} x={GX} y={passTop - 46} size={22} weight={500}>
           One pass: each item once
         </Line>
         <Svg>
@@ -132,7 +132,7 @@ export const BigScene: React.FC = () => {
         {/* The table: n, pairs, one pass. */}
         <div style={{ position: "absolute", left: 0, top: tTop, opacity: ease(frame, loopAt, 12) }}>
           {COLS.map((c) => (
-            <div key={c.name} style={{ position: "absolute", left: c.right - 360, width: 360, textAlign: "right", ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            <div key={c.name} style={{ position: "absolute", left: c.right - 360, width: 360, textAlign: "right", ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
               {c.name}
             </div>
           ))}
@@ -169,9 +169,9 @@ export const BigScene: React.FC = () => {
                     width: 360,
                     top: rowTop(i) + 12,
                     textAlign: "right",
-                    ...note(26, k === 1 && big ? ACCENT_INK : k === 2 ? OK_INK : INK),
+                    ...note(28, k === 1 && big ? ACCENT_INK : k === 2 ? OK_INK : INK),
                     ...TABULAR,
-                    fontWeight: k === 0 ? 600 : 700,
+                    fontWeight: k === 0 ? 500 : 500,
                     opacity: p,
                     transform: `translateY(${(1 - p) * 8}px)`,
                   }}
@@ -180,7 +180,7 @@ export const BigScene: React.FC = () => {
                 </div>
               ))}
               {r.counted ? (
-                <div style={{ position: "absolute", left: COLS[2].right + 44, top: rowTop(i) + 14, ...note(22, INK_SOFT), fontStyle: "italic", opacity: p, whiteSpace: "nowrap" }}>
+                <div style={{ position: "absolute", left: COLS[2].right + 44, top: rowTop(i) + 14, ...note(24, INK_SOFT), opacity: p, whiteSpace: "nowrap" }}>
                   counted as it ran
                 </div>
               ) : null}
@@ -189,7 +189,7 @@ export const BigScene: React.FC = () => {
         })}
 
         {/* The million, modeled at an assumed rate: both on one scale. */}
-        <Line at={modelAt} x={BAR_X} y={y(566)} size={22} color={INK_SOFT} weight={600}>
+        <Line at={modelAt} x={BAR_X} y={y(566)} size={22} color={INK_SOFT} weight={500}>
           Model: <Num>100</Num> million checks a second, an assumption
         </Line>
         <HBar
@@ -220,14 +220,14 @@ export const BigScene: React.FC = () => {
         <Art name="hourglass" at={minutesAt} left={1590} top={y(320)} h={200} />
 
         {/* Why they care, and where the brute force is fine. */}
-        <Line at={whyAt} x={GX} y={y(786)} size={26} weight={600}>
+        <Line at={whyAt} x={GX} y={y(786)} size={26} weight={500}>
           It predicts whether a solution survives its real input.
           <span style={{ opacity: ease(frame, gameAt, 10) }}>
             {" "}
-            The usual game: <span style={{ color: ACCENT_INK, fontWeight: 700 }}>O(n²)</span> → <span style={{ color: OK_INK, fontWeight: 700 }}>O(n)</span>
+            The usual game: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>O(n²)</span> → <span style={{ color: OK_INK, fontWeight: 500 }}>O(n)</span>
           </span>
         </Line>
-        <Line at={dropAt} x={GX} y={y(836)} size={26} weight={600}>
+        <Line at={dropAt} x={GX} y={y(836)} size={26} weight={500}>
           Constants dropped: at <Num>100</Num> the brute force is often fine, and simpler.
           <span style={{ opacity: ease(frame, sayAt, 10), color: INK_SOFT }}> Say where it stops being fine.</span>
         </Line>

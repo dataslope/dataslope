@@ -122,7 +122,7 @@ export const DedupScene: React.FC = () => {
 
         {/* ── 7. The first per user, with a set ── */}
         <TableName g={rg} at={asked - 6} out={out7}>
-          <span style={{ fontFamily: MONO, fontWeight: 600 }}>records</span>
+          <span style={{ fontFamily: MONO, fontWeight: 500 }}>records</span>
         </TableName>
         <DataTable
           g={rg}
@@ -152,7 +152,7 @@ export const DedupScene: React.FC = () => {
           ]}
         />
         <Note at={seenAt + 2} x={RIGHT_X} y={y(TOP) + h(4)} out={out7}>
-          <span style={{ ...note(30, INK), whiteSpace: "nowrap", fontFamily: MONO }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", fontFamily: MONO }}>
             seen = {"{"}
             {seenIds.map((id, i) => (
               <span key={id} style={{ color: BLUE_INK }}>
@@ -248,7 +248,7 @@ export const DedupScene: React.FC = () => {
           marks={[{ row: 0, col: LT.cols.indexOf("value"), at: keepsAt + 4, color: MARK_OK }]}
         />
         <Note at={sqlAt} x={MID_X} y={y(TOP) + llH + h(22)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             the pandas <Mono>ROW_NUMBER() = 1</Mono> <span style={{ color: INK_SOFT }}>of SQL</span>
           </span>
         </Note>
@@ -256,7 +256,7 @@ export const DedupScene: React.FC = () => {
           <Title>a tie on ts?</Title>
         </Note>
         <Note at={breakAt} x={MID_X} y={y(TOP) + llH + h(134)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <Mark at={breakAt + 6} color={MARK_OK}>add a tiebreaker column to the sort</Mark>
             <span style={{ color: INK_SOFT, opacity: ease(frame, arbitraryAt - 4, 10) }}>, or the row kept is arbitrary</span>
           </span>

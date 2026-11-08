@@ -94,10 +94,10 @@ export const HookScene: React.FC = () => {
         return (
           <React.Fragment key={r.verb}>
             <Ink at={grow[i] - 6} dur={12} style={{ left: X0, top: ry - 6, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(32, r.ink), fontWeight: 700 }}>{r.verb}</span>
+              <span style={{ ...label(34, r.ink), fontWeight: 500 }}>{r.verb}</span>
             </Ink>
             <Ink at={named[i] - 4} dur={14} style={{ left: X0, top: ry + 38, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(23, INK_SOFT) }}>{r.what}</span>
+              <span style={{ ...note(24, INK_SOFT) }}>{r.what}</span>
             </Ink>
             <HBar
               x={BAR_X}
@@ -110,7 +110,7 @@ export const HookScene: React.FC = () => {
               style={{ transform: `scaleY(${1 + lit * 0.12})` }}
             />
             <Note at={grow[i] + 6} x={BAR_X + w(r.tokens) + 18} y={ry + 6 + h(BAR_H) / 2 - 16}>
-              <span style={{ ...note(25, INK), ...TABULAR, whiteSpace: "nowrap" }}>{int(r.tokens)} tokens</span>
+              <span style={{ ...note(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>{int(r.tokens)} tokens</span>
             </Note>
             {/* What each one costs: the question the part answers. */}
             <Note at={costAt - 4 + i * 4} x={ASK_X} y={ry + 6 + h(BAR_H) / 2 - 22}>
@@ -132,7 +132,7 @@ export const HookScene: React.FC = () => {
         right={false}
       />
       <Note at={writtenAt + 2} x={BAR_X + w(ROWS[2].tokens) + 206} y={(y(ROW_Y[1]) + y(ROW_Y[2])) / 2 + h(BAR_H) / 2 - 12}>
-        <span style={{ ...note(24, OUTPUT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>both written</span>
+        <span style={{ ...note(24, OUTPUT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>both written</span>
       </Note>
       {/* …though only one of them reaches you. */}
       <div
@@ -148,7 +148,7 @@ export const HookScene: React.FC = () => {
         }}
       />
       <Note at={neverAt + 2} x={BAR_X} y={y(ROW_Y[2]) + h(BAR_H) + 30}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>never shown to you</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>never shown to you</span>
       </Note>
     </AbsoluteFill>
   );

@@ -106,21 +106,21 @@ export const BackfillScene: React.FC = () => {
 
         {/* Count tokens. */}
         <Note at={countAt - 2} x={X0} y={eqY - 46}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>count tokens</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>count tokens</span>
         </Note>
         <Note at={tenAt - 2} x={X0} y={eqY}>
-          <span style={{ ...note(36, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(34, INK), whiteSpace: "nowrap" }}>
             <Num>{num(BACKFILL.chunks)}</Num> chunks
             <span style={{ opacity: ease(frame, fourHAt - 2, 10) }}>
               {" "}× <Num>{BACKFILL.tokensPerChunk}</Num> tokens
             </span>
-            <span style={{ opacity: ease(frame, billionAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>
+            <span style={{ opacity: ease(frame, billionAt - 2, 10), color: BLUE_INK, fontWeight: 500 }}>
               {" "}= <Mark at={billionAt + 4}><Num>{num(BACKFILL.tokens)}</Num> tokens</Mark>
             </span>
           </span>
         </Note>
         <Note at={costAt - 2} x={X0} y={eqY + 70}>
-          <span style={{ ...note(29, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>cost</b> ={" "}
             <span style={{ opacity: ease(frame, thousandAt - 2, 10) }}>
               <Num>{num(BACKFILL.millions)}</Num> × the price per million tokens
@@ -128,13 +128,13 @@ export const BackfillScene: React.FC = () => {
             <span style={{ opacity: ease(frame, pricesAt - 2, 10), color: INK_SOFT }}>
               ; at <Num>{cents(BACKFILL.priceLow)}</Num> to <Num>{cents(BACKFILL.priceHigh)}</Num> cents,
             </span>
-            <span style={{ opacity: ease(frame, billAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>
+            <span style={{ opacity: ease(frame, billAt - 2, 10), color: BLUE_INK, fontWeight: 500 }}>
               {" "}$<Num>{num(BACKFILL.costLow)}</Num> to $<Num>{num(BACKFILL.costHigh)}</Num>
             </span>
           </span>
         </Note>
         <Note at={timeAt - 2} x={X0} y={eqY + 122}>
-          <span style={{ ...note(29, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b>time</b> = 4 billion ÷ your rate limit
             <span style={{ opacity: ease(frame, rateAt - 2, 10), color: INK_SOFT }}>
               ; at <Num>{num(BACKFILL.rate)}</Num> tokens a minute,
@@ -142,7 +142,7 @@ export const BackfillScene: React.FC = () => {
             <span style={{ opacity: ease(frame, minutesAt - 2, 10) }}>
               {" "}<Num>{num(BACKFILL.minutes)}</Num> minutes
             </span>
-            <span style={{ opacity: ease(frame, daysAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>
+            <span style={{ opacity: ease(frame, daysAt - 2, 10), color: BLUE_INK, fontWeight: 500 }}>
               {" "}
               <Mark at={realAt + 4}>
                 ≈ <Num>{BACKFILL.days.toFixed(1)}</Num> days
@@ -156,12 +156,12 @@ export const BackfillScene: React.FC = () => {
 
         {/* The run, designed to fail partway. */}
         <Note at={failAt} x={X0} y={barTop - 104}>
-          <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={failAt + 4}>design for failure partway</Mark>
           </span>
         </Note>
         {/* The key, on a line of its own just over the squares it names. */}
-        <div style={{ position: "absolute", left: X0, top: barTop - 44, ...label(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, failAt, 14) * ease(frame, batchAt - 2, 10) }}>
+        <div style={{ position: "absolute", left: X0, top: barTop - 44, ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, failAt, 14) * ease(frame, batchAt - 2, 10) }}>
           each square, one batch of requests
         </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
@@ -217,13 +217,13 @@ export const BackfillScene: React.FC = () => {
           })}
         </svg>
         <Note at={retryAt} x={cellX(FAIL) - 60} y={barTop - 52} dim={checkAt}>
-          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>rate-limited: retry, wait longer</span>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>rate-limited: retry, wait longer</span>
         </Note>
         <Note at={crashAt} x={cellX(CRASH) + 4} y={barTop - 52}>
-          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: crash }}>the run dies</span>
+          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: crash }}>the run dies</span>
         </Note>
         <Note at={checkAt + 2} x={cellX(CHECKPOINTS[0]) - 4} y={barTop + CELL + 14}>
-          <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap" }}>checkpoints</span>
+          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>checkpoints</span>
         </Note>
         {/* The restart: a second row, from the last checkpoint, not from zero. */}
         <div style={{ opacity: restart }}>
@@ -236,10 +236,10 @@ export const BackfillScene: React.FC = () => {
           />
         </div>
         <Note at={resumeAt + 2} x={cellX(RESUME) - 76} y={row2Top + 2} align="right" width={360}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a restart resumes here</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a restart resumes here</span>
         </Note>
         <Note at={overAt - 2} x={cellX(RESUME) - 76} y={row2Top + 36} align="right" width={360}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>not from batch one</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>not from batch one</span>
         </Note>
         <Note at={upsertAt - 2} x={X0} y={row2Top + 28}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -249,7 +249,7 @@ export const BackfillScene: React.FC = () => {
           </span>
         </Note>
         <Note at={hashAt - 2} x={X0} y={row2Top + CELL + 64}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <span style={{ display: "inline-block", width: 18, height: 18, borderRadius: 4, background: QUIET, marginRight: 10, verticalAlign: "-2px" }} />
             already embedded, hash unchanged:{" "}
             <Mark at={neverAt + 4} color={MARK_OK}>

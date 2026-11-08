@@ -18,7 +18,7 @@ const R_X = 1200;
 const DIAG_Y = 780;
 const PANEL_W = 520;
 
-const keyText = (size: number, color: string = INK) => svgText({ fontFamily: MONO, fontSize: size, fontWeight: 600, color });
+const keyText = (size: number, color: string = INK) => svgText({ fontFamily: MONO, fontSize: size, fontWeight: 500, color });
 
 /** A small box with a centred label, in SVG. */
 const Box: React.FC<{ x: number; y: number; w: number; h: number; text: string; fill?: string; stroke?: string; ink?: string; p: number }> = ({
@@ -34,7 +34,7 @@ const Box: React.FC<{ x: number; y: number; w: number; h: number; text: string; 
 }) => (
   <g opacity={p}>
     <rect x={x} y={y} width={w} height={h} rx={5} fill={fill} stroke={stroke} strokeWidth={1.5} />
-    <text x={x + w / 2} y={y + h / 2 + 7} textAnchor="middle" style={svgText({ ...label(20, ink) })}>
+    <text x={x + w / 2} y={y + h / 2 + 7} textAnchor="middle" style={svgText({ ...label(24, ink) })}>
       {text}
     </text>
   </g>
@@ -109,7 +109,7 @@ export const JoinScene: React.FC = () => {
 
         {/* ── Shrink first: the December filter, and the plan ── */}
         <Note at={smallerAt} x={R_X} y={y(TOP) - h(46)}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Shrink the big side before the join</span>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>Shrink the big side before the join</span>
         </Note>
         <Listing lines={JOIN.december} x={R_X} top={y(TOP)} width={600} size={20} at={smallerAt + 2} marks={[{ line: "WHERE", at: decAt + 4 }]} />
         <PlanBox
@@ -129,10 +129,10 @@ export const JoinScene: React.FC = () => {
           ]}
         />
         <Note at={reachAt + 4} x={R_X} y={y(TOP) + listingHeight(JOIN.december.length, 20) + h(24)}>
-          <div style={{ ...label(21, INK_SOFT) }}>orders into the join</div>
+          <div style={{ ...label(24, INK_SOFT) }}>orders into the join</div>
           {/* The count on a line of its own, so it may stay large; what it
               is not, under it at the label's size. */}
-          <div style={{ ...note(40, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(40, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{thousands(JOIN.probe)}</Num>
           </div>
           <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, millionAt, 10) }}>
@@ -144,9 +144,9 @@ export const JoinScene: React.FC = () => {
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           {/* 1. Hash join */}
           <g opacity={ease(frame, strategyAt, 12)}>
-            <text x={p1} y={diagY - 16} style={svgText(label(21, INK))}>
+            <text x={p1} y={diagY - 16} style={svgText(label(24, INK))}>
               Hash join
-              <tspan style={svgText(note(20, INK_SOFT))} opacity={ease(frame, defaultAt, 10)}>
+              <tspan style={svgText(note(24, INK_SOFT))} opacity={ease(frame, defaultAt, 10)}>
                 {"  the usual default"}
               </tspan>
             </text>
@@ -165,7 +165,7 @@ export const JoinScene: React.FC = () => {
                 opacity={ease(frame, buildAt + i * 2, 8)}
               />
             ))}
-            <text x={p1} y={diagY + 86} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, buildAt + 8, 10)}>
+            <text x={p1} y={diagY + 86} style={svgText(note(24, INK_SOFT))} opacity={ease(frame, buildAt + 8, 10)}>
               builds the hash table
             </text>
             <Box x={p1} y={diagY + 104} w={170} h={50} text={`orders ${thousands(JOIN.probe)}`} p={ease(frame, streamAt - 4, 10)} stroke={inkOf.yellow} ink={INK} />
@@ -183,14 +183,14 @@ export const JoinScene: React.FC = () => {
                   return <rect key={k} x={x - 7} y={yy - 7} width={14} height={14} rx={3} fill={inkOf.yellow} opacity={Math.min(1, t * 5) * (1 - Math.max(0, (t - 0.85) / 0.15))} />;
                 })
               : null}
-            <text x={bucketX(0)} y={diagY + 176} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, streamAt, 10)}>
+            <text x={bucketX(0)} y={diagY + 176} style={svgText(note(24, INK_SOFT))} opacity={ease(frame, streamAt, 10)}>
               the big side streams past, probing
             </text>
           </g>
 
           {/* 2. Sort-merge join */}
           <g opacity={ease(frame, mergeAt - 4, 12)}>
-            <text x={p2} y={diagY - 16} style={svgText(label(21, INK))}>
+            <text x={p2} y={diagY - 16} style={svgText(label(24, INK))}>
               Sort-merge join
             </text>
             {[left, right].map((run, side) =>
@@ -215,23 +215,23 @@ export const JoinScene: React.FC = () => {
                 <line key={i} x1={p2 + 100} y1={diagY + 24 + i * 34} x2={p2 + 210} y2={diagY + 24 + j * 34} stroke={BAR} strokeWidth={2} />
               ) : null;
             })}
-            <text x={p2 + 300} y={diagY + 40} style={svgText(note(20, INK))} opacity={ease(frame, mergeAt + 6, 10)}>
+            <text x={p2 + 300} y={diagY + 40} style={svgText(note(24, INK))} opacity={ease(frame, mergeAt + 6, 10)}>
               both sorted on the key,
             </text>
-            <text x={p2 + 300} y={diagY + 68} style={svgText(note(20, INK))} opacity={ease(frame, walksAt, 10)}>
+            <text x={p2 + 300} y={diagY + 68} style={svgText(note(24, INK))} opacity={ease(frame, walksAt, 10)}>
               walked once, together
             </text>
-            <text x={p2 + 300} y={diagY + 124} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, sortedAt, 10)}>
+            <text x={p2 + 300} y={diagY + 124} style={svgText(note(24, INK_SOFT))} opacity={ease(frame, sortedAt, 10)}>
               wins if already sorted,
             </text>
-            <text x={p2 + 300} y={diagY + 152} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, memoryAt, 10)}>
+            <text x={p2 + 300} y={diagY + 152} style={svgText(note(24, INK_SOFT))} opacity={ease(frame, memoryAt, 10)}>
               or too big to hash
             </text>
           </g>
 
           {/* 3. Across machines */}
           <g opacity={ease(frame, machinesAt - 4, 12)}>
-            <text x={p3} y={diagY - 16} style={svgText(label(21, INK))}>
+            <text x={p3} y={diagY - 16} style={svgText(label(24, INK))}>
               Across machines
             </text>
             {[0, 1, 2].map((m) => {
@@ -239,34 +239,34 @@ export const JoinScene: React.FC = () => {
               return (
                 <g key={m}>
                   <rect x={mx} y={diagY + 10} width={156} height={130} rx={6} fill={PAPER} stroke={HAIRLINE} strokeWidth={1.5} />
-                  <text x={mx + 12} y={diagY + 38} style={svgText(label(19, INK_SOFT))}>
+                  <text x={mx + 12} y={diagY + 38} style={svgText(label(24, INK_SOFT))}>
                     machine {m + 1}
                   </text>
                   {/* Each machine's own slice of orders, which stays where it is
                       under both strategies. */}
-                  <text x={mx + 12} y={diagY + 70} style={svgText(note(19, INK))} opacity={ease(frame, broadcastAt, 10)}>
+                  <text x={mx + 12} y={diagY + 70} style={svgText(note(24, INK))} opacity={ease(frame, broadcastAt, 10)}>
                     orders {m + 1}
                   </text>
                   {/* Broadcast: a whole copy of the small table beside it. */}
                   <g opacity={ease(frame, broadcastAt + 6 + m * 4, 10) * (1 - ease(frame, bucketAt, 10))}>
                     <rect x={mx + 12} y={diagY + 84} width={132} height={30} rx={4} fill={`color-mix(in srgb, ${BAR} 18%, ${PAPER})`} stroke={BAR} />
-                    <text x={mx + 78} y={diagY + 105} textAnchor="middle" style={svgText(note(19, BLUE_INK))}>
+                    <text x={mx + 78} y={diagY + 105} textAnchor="middle" style={svgText(note(24, BLUE_INK))}>
                       customers
                     </text>
                   </g>
                   {/* Bucketing: customers split on the key too, bucket by bucket. */}
                   <g opacity={ease(frame, bucketAt + m * 4, 10)}>
-                    <text x={mx + 12} y={diagY + 105} style={svgText(note(19, INK))}>
+                    <text x={mx + 12} y={diagY + 105} style={svgText(note(24, INK))}>
                       customers {m + 1}
                     </text>
                   </g>
                 </g>
               );
             })}
-            <text x={p3} y={diagY + 176} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, movingAt, 10) * (1 - ease(frame, togetherAt, 10))}>
+            <text x={p3} y={diagY + 176} style={svgText(note(24, INK_SOFT))} opacity={ease(frame, movingAt, 10) * (1 - ease(frame, togetherAt, 10))}>
               the cost is moving rows between machines
             </text>
-            <text x={p3} y={diagY + 176} style={svgText(note(20, INK))} opacity={ease(frame, togetherAt, 10)}>
+            <text x={p3} y={diagY + 176} style={svgText(note(24, INK))} opacity={ease(frame, togetherAt, 10)}>
               bucketed by customer_id: matches sit together
             </text>
           </g>

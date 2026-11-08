@@ -117,16 +117,16 @@ export const CurseScene: React.FC = () => {
             </Label>
           </Note>
           <Note at={eightyAt} x={sigX + 14} y={y(BASE) - h(TALL + 40) - 6}>
-            <span style={{ ...note(24, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>the winners average {fmt(CURSE.meanSig, 2)}</span>
+            <span style={{ ...note(24, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>the winners average {fmt(CURSE.meanSig, 2)}</span>
           </Note>
           <Bracket x0={truthX} x1={sigX} y={y(BASE) - h(TALL + 40) - 30} at={threeAt - 4} color={STAT} up />
           <Note at={threeAt} x={(truthX + sigX) / 2} y={y(BASE) - h(TALL + 40) - 76} from="up">
-            <span style={{ display: "inline-block", transform: "translateX(-50%)", ...note(24, STAT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <span style={{ display: "inline-block", transform: "translateX(-50%)", ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               {fmt(CURSE.meanSig / CURSE.effect, 1)} times the truth
             </span>
           </Note>
           <Note at={twelveAt - 2} x={X.x1} y={y(BASE) - h(240)} align="right">
-            <span style={{ ...note(30, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
               significant: <Count at={twelveAt - 2} to={CURSE.power} dur={20} format={(v) => pct(v, 0)} />
             </span>
           </Note>

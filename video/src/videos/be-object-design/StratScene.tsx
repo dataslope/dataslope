@@ -93,17 +93,17 @@ export const StratScene: React.FC = () => {
 
         {/* The shipment, which asks whichever card it holds. */}
         <Box x={SHIP.x} y={shipTop} w={SHIP.w} h={SHIP.h} at={shipAt} tone="plain" title="Shipment" lit={pulse(frame, notEditedAt, 24)}>
-          <span style={{ ...note(22, INK_SOFT), fontWeight: 600, opacity: ease(frame, parcelAt, 10), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, parcelAt, 10), whiteSpace: "nowrap" }}>
             a parcel weighing <b style={{ color: BLUE_INK }}>{SHIPPING.weight}</b>
           </span>
-          <span style={{ ...note(22, INK_SOFT), fontWeight: 600, opacity: ease(frame, asksAt, 10), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, asksAt, 10), whiteSpace: "nowrap" }}>
             asks its card for the cost
           </span>
         </Box>
         <Pill x={SHIP.x} y={shipTop + SHIP.h + 36} at={notEditedAt} tone="ok" size={21}>
           ✓ not edited
         </Pill>
-        <Line x={SHIP.x + 190} y={shipTop + SHIP.h + 42} at={ocAt} size={23} color={OK_INK} weight={650}>
+        <Line x={SHIP.x + 190} y={shipTop + SHIP.h + 42} at={ocAt} size={23} color={OK_INK} weight={500}>
           open-closed
         </Line>
 
@@ -121,7 +121,7 @@ export const StratScene: React.FC = () => {
             opacity: ease(frame, behindAt + 6, 12) * (1 - ease(frame, plainAt + 10, 14) * 0.7),
           }}
         />
-        <Line x={CARD.x - 22} y={brTop - 40} at={behindAt + 6} size={21} weight={700} color={frame >= indirectionAt ? ACCENT_INK : INK_SOFT}>
+        <Line x={CARD.x - 22} y={brTop - 40} at={behindAt + 6} size={21} weight={500} color={frame >= indirectionAt ? ACCENT_INK : INK_SOFT}>
           <Strike at={indirectionAt + 6}>one interface: a cost for a weight</Strike>
         </Line>
         {cards.map((c, i) => (
@@ -155,13 +155,13 @@ export const StratScene: React.FC = () => {
             />
           </React.Fragment>
         ))}
-        <Line x={COST_X} y={cardMid(0) - 16} at={flatAt + 6} size={26} weight={600}>
+        <Line x={COST_X} y={cardMid(0) - 16} at={flatAt + 6} size={26} weight={500}>
           costs <b style={{ color: BLUE_INK }}>{price(SHIPPING.flat)}</b>
         </Line>
-        <Line x={COST_X} y={cardMid(1) - 16} at={sixAt} size={26} weight={600} out={fold + 4}>
+        <Line x={COST_X} y={cardMid(1) - 16} at={sixAt} size={26} weight={500} out={fold + 4}>
           {SHIPPING.weight} × 2 = <b style={{ color: BLUE_INK }}>{price(SHIPPING.byWeight)}</b>
         </Line>
-        <Line x={COST_X} y={cardMid(2) - 16} at={freeAt + 8} size={26} weight={600} out={fold + 8}>
+        <Line x={COST_X} y={cardMid(2) - 16} at={freeAt + 8} size={26} weight={500} out={fold + 8}>
           weight {SHIPPING.third.light.weight}: <b style={{ color: BLUE_INK }}>{price(SHIPPING.third.light.cost)}</b>
           <span style={{ opacity: ease(frame, classAt, 10) }}>
             , weight {SHIPPING.third.heavy.weight}: <b style={{ color: OK_INK }}>{price(SHIPPING.third.heavy.cost)}</b>
@@ -169,7 +169,7 @@ export const StratScene: React.FC = () => {
         </Line>
 
         {/* One rule: the interface is extra. */}
-        <Line x={CARD.x - 22} y={y(740)} at={indirectionAt} size={26} weight={600}>
+        <Line x={CARD.x - 22} y={y(740)} at={indirectionAt} size={26} weight={500}>
           One rule: the interface is just <span style={{ color: ACCENT_INK }}>indirection</span>
         </Line>
         <Line x={CARD.x - 22} y={y(740) + 48} at={plainAt} size={26}>

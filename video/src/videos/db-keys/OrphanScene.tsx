@@ -182,7 +182,7 @@ export const OrphanScene: React.FC = () => {
           <Tag color={ACCENT_INK} size={21}>
             orphan
           </Tag>
-          <span style={{ ...note(21, INK_SOFT), marginLeft: 10, opacity: ease(frame, parentAt - 2, 10) }}>no parent</span>
+          <span style={{ ...note(24, INK_SOFT), marginLeft: 10, opacity: ease(frame, parentAt - 2, 10) }}>no parent</span>
         </Note>
 
         <ErrorBox
@@ -196,7 +196,7 @@ export const OrphanScene: React.FC = () => {
           dim={leavesAt - 10}
         />
         <Note at={leavesAt - 2} x={CUSTOMERS_X + customers.width + 20} y={customers.rowMid(owner) - 16}>
-          <span style={{ ...note(30, ACCENT_INK), fontWeight: 700 }}>?</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500 }}>?</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -38,7 +38,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Facts. Every plan, count and size ran on the site's Postgres (PGlite 0.5.8,
  * PostgreSQL 18.3) through scripts/lib/sql-engines.mjs, by check.mjs into
  * results.json, which data.ts reads; the one DuckDB plan ran in DuckDB-Wasm
- * 1.32.0, the page's engine. The tables are the video's own, seeded with
+ * 1.32.0, shown as another engine's optimizer. The tables are the video's own, seeded with
  * generate_series and fixed expressions (no random draws): orders, 1,000,000
  * rows, 20 for each of 50,000 customers, dates spread over 2024;
  * customers, 50,000; employees, 10,000 in ten departments. Plans are shown as

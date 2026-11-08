@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, headline, HIGHLIGHT, INK } from "../../editorial/style";
+import { headline, HIGHLIGHT, INK } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { LEFT, NO_ORDER_IDS, NO_ORDERS, nullRows, SQL_LINES } from "./data";
@@ -35,7 +35,7 @@ export const JoinScene: React.FC = () => {
         <Ink
           at={fourAt + 4}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           orders or not.
         </Ink>
@@ -73,7 +73,7 @@ export const JoinScene: React.FC = () => {
             No order has <Mono>customer_id</Mono> {NO_ORDER_IDS.join(" or ")}, so {NO_ORDERS.join(" and ")} match nothing.
           </span>
           <span style={noteText(24)}>
-            They stay, with <Mono color={NULL_INK} weight={700}>NULL</Mono> in every order column.
+            They stay, with <Mono color={NULL_INK} weight={500}>NULL</Mono> in every order column.
           </span>
         </div>
       </Note>

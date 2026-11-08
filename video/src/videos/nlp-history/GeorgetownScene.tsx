@@ -60,7 +60,7 @@ export const GeorgetownScene: React.FC = () => {
   const stat = (x: number, at: number, value: React.ReactNode, caption: React.ReactNode, swell = 0) => (
     <Ink at={at} dur={16} style={{ left: x, top: y(370), whiteSpace: "nowrap" }}>
       <div style={{ ...headline(92), ...TABULAR, transform: `scale(${1 + swell * 0.05})`, transformOrigin: "0 100%" }}>{value}</div>
-      <div style={{ ...label(25, INK_SOFT), marginTop: 10 }}>{caption}</div>
+      <div style={{ ...label(24, INK_SOFT), marginTop: 10 }}>{caption}</div>
     </Ink>
   );
 
@@ -153,29 +153,30 @@ export const GeorgetownScene: React.FC = () => {
           <circle cx={sx(X, ALPAC_YEAR)} cy={AXIS} r={12 * ease(frame, reportAt - 2, 10)} fill={ACCENT} stroke={PAPER} strokeWidth={2.5} />
         </Svg>
         {TICKS.map((t) => (
-          <div key={t} style={{ position: "absolute", left: sx(X, t), top: AXIS + 16, transform: "translateX(-50%)", opacity: lane, ...note(20, INK_SOFT), ...TABULAR }}>
+          <div key={t} style={{ position: "absolute", left: sx(X, t), top: AXIS + 16, transform: "translateX(-50%)", opacity: lane, ...note(24, INK_SOFT), ...TABULAR }}>
             {t}
           </div>
         ))}
-        <Tag x={sx(X, demoYear)} y={AXIS - 62} at={papersAt} align="center" size={23} color={INK} weight={650}>
+        {/* Set well clear of the dot under them, which pulses on "twelve". */}
+        <Tag x={sx(X, demoYear)} y={AXIS - 92} at={papersAt} align="center" size={23} color={INK} weight={500}>
           the demo
         </Tag>
-        <Tag x={sx(X, demoYear)} y={AXIS - 36} at={papersAt + 6} align="center" size={20} color={INK_SOFT}>
+        <Tag x={sx(X, demoYear)} y={AXIS - 66} at={papersAt + 6} align="center" size={20} color={INK_SOFT}>
           front-page news
         </Tag>
         {/* Dostert's forecast, over the years it named. */}
         <Ink at={predictedAt} style={{ left: sx(X, demoYear + 3), top: AXIS - 128, whiteSpace: "nowrap" }}>
-          <div style={{ ...headline(38, true), color: ACCENT_INK }}>
+          <div style={{ ...headline(34, true), color: INK }}>
             &ldquo;{"\u2009"}<Mark at={fiveAt - 2}>five</Mark>, perhaps <Mark at={threeAt}>three</Mark>, years hence&rdquo;
           </div>
-          <div style={{ ...label(20, INK_SOFT), marginTop: 6 }}>Leon Dostert, one of its leaders</div>
+          <div style={{ ...label(24, INK_SOFT), marginTop: 6 }}>Leon Dostert, one of its leaders</div>
         </Ink>
         {/* The report, under its year. */}
         <Ink at={noAt - 4} style={{ left: sx(X, ALPAC_YEAR) + 120 - 1100, top: AXIS + 54, width: 1100, textAlign: "right" }}>
-          <div style={{ ...label(21, INK_SOFT) }}>ALPAC report, {ALPAC_YEAR}</div>
-          <div style={{ ...headline(30, true), color: INK, marginTop: 4, lineHeight: 1.15 }}>&ldquo;{ALPAC}&rdquo;</div>
+          <div style={{ ...label(24, INK_SOFT) }}>ALPAC report, {ALPAC_YEAR}</div>
+          <div style={{ ...headline(28, true), color: INK, marginTop: 4, lineHeight: 1.15 }}>&ldquo;{ALPAC}&rdquo;</div>
         </Ink>
-        <Tag x={sx(X, ALPAC_YEAR)} y={AXIS - 62} at={fundingAt - 2} align="center" size={23} color={ACCENT_INK} weight={700}>
+        <Tag x={sx(X, ALPAC_YEAR)} y={AXIS - 72} at={fundingAt - 2} align="center" size={23} color={ACCENT_INK} weight={500}>
           funding dried up
         </Tag>
       </div>

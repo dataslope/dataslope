@@ -9,7 +9,7 @@ import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LOGINS } from "./data";
-import { daysBetween, DayStrip, Drift, Headline, Kicker, MARK, pulse, Spot, stripGeometry, X0 } from "./parts";
+import { daysBetween, DayStrip, Drift, Headline, Kicker, MARK, MARK_EDGE, pulse, Spot, stripGeometry, X0 } from "./parts";
 
 const STRIP_Y = 330;
 const CELL = 84;
@@ -59,8 +59,8 @@ export const HookScene: React.FC = () => {
   const latestAt = n.word("hook-ask", "Which login is the latest");
   const roundAt = n.word("hook-ask", "Questions like these");
   const twentyTwoAt = n.word("plan", "twenty-two of them");
-  const elevenAt = n.word("plan", "Eleven get worked through");
-  const quickAt = n.word("plan", "The other eleven");
+  const elevenAt = n.word("plan-worked", "Eleven get worked through");
+  const quickAt = n.word("plan-quick", "The other eleven");
   const firstAt = n.word("rank-in", "numbering rows");
   const end = n.beat("rank-in").to;
 
@@ -100,8 +100,8 @@ export const HookScene: React.FC = () => {
         <Spot id="de-sql-patterns-koala" at={from + 10} left={1390} top={y(290)} width={440} height={441} />
 
         <Ink at={loginsAt - 2} dur={12} style={{ left: X0, top: g.top - h(44), whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>
-            User 1&rsquo;s logins, from the page&rsquo;s <span style={{ fontFamily: MONO, fontWeight: 600 }}>daily_logins</span>
+          <span style={label(24, INK_SOFT)}>
+            User 1&rsquo;s logins, from the page&rsquo;s <span style={{ fontFamily: MONO, fontWeight: 500 }}>daily_logins</span>
           </span>
         </Ink>
         <DayStrip
@@ -109,9 +109,9 @@ export const HookScene: React.FC = () => {
           days={days}
           at={loginsAt}
           marks={[
-            ...missing.map((index, k) => ({ index, at: fourAt + 2 + k * 3, out: streaksAt, color: MARK })),
-            ...missing.map((index, k) => ({ index, at: missingAt + 2 + k * 2, out: longAt, color: MARK })),
-            { index: last, at: latestAt + 2, out: askOut + 20, color: MARK },
+            ...missing.map((index, k) => ({ index, at: fourAt + 2 + k * 3, out: streaksAt, color: MARK, edge: MARK_EDGE })),
+            ...missing.map((index, k) => ({ index, at: missingAt + 2 + k * 2, out: longAt, color: MARK, edge: MARK_EDGE })),
+            { index: last, at: latestAt + 2, out: askOut + 20, color: MARK, edge: MARK_EDGE },
           ]}
           spans={spans}
         />
@@ -138,12 +138,12 @@ export const HookScene: React.FC = () => {
           { at: latestAt, text: "Which login is the latest?" },
         ].map((q, i) => (
           <Ink key={q.text} at={q.at - 2} dur={14} out={askOut} style={{ left: X0, top: y(ASK_Y) + i * h(54), whiteSpace: "nowrap" }}>
-            <span style={{ ...body(36), color: INK }}>{q.text}</span>
+            <span style={{ ...body(34), color: INK }}>{q.text}</span>
           </Ink>
         ))}
         {/* What the three have in common, as a line under them. */}
         <Ink at={roundAt - 2} dur={14} out={askOut} style={{ left: X0, top: y(ASK_Y) + 3 * h(54) + h(22), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(26, INK_SOFT) }}>Questions like these fill the SQL round of a data engineering interview.</span>
+          <span style={{ ...note(28, INK_SOFT) }}>Questions like these fill the SQL round of a data engineering interview.</span>
         </Ink>
 
         {/* ── Twenty-two questions: eleven on real queries, eleven quickly ── */}
@@ -152,7 +152,7 @@ export const HookScene: React.FC = () => {
             position: "absolute",
             left: X0,
             top: y(CHIPS_Y) - h(48),
-            ...label(22, INK_SOFT),
+            ...label(24, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, twentyTwoAt - 2, 12),
           }}
@@ -188,8 +188,8 @@ export const HookScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: SANS,
-                fontSize: 19,
-                fontWeight: 700,
+                fontSize: 24,
+                fontWeight: 500,
                 ...TABULAR,
                 opacity: p * (1 - fade) * (worked ? 1 : 0.55 + 0.45 * tone),
                 transform: `scale(${p * (1 + 0.15 * pulse(frame, firstAt, 16) * (i === 0 ? 1 : 0))})`,
@@ -204,19 +204,19 @@ export const HookScene: React.FC = () => {
             position: "absolute",
             left: chipX(0),
             top: y(CHIPS_Y) + h(62),
-            ...note(26, INK),
+            ...note(28, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, elevenAt - 2, 12) * (1 - ease(frame, firstAt + 4, 14) * 0.5),
           }}
         >
-          <b style={TABULAR}>{WORKED}</b> on real queries, in DuckDB
+          <b style={TABULAR}>{WORKED}</b> on real queries, in Postgres
         </div>
         <div
           style={{
             position: "absolute",
             left: chipX(WORKED),
             top: y(CHIPS_Y) + h(62),
-            ...note(26, INK_SOFT),
+            ...note(28, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, quickAt - 2, 12) * (1 - ease(frame, firstAt + 4, 14) * 0.5),
           }}

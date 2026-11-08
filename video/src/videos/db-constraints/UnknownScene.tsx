@@ -127,32 +127,32 @@ export const UnknownScene: React.FC = () => {
         bands={[{ row: pen, at: slipsAt, out: requiredAt }]}
       />
       <Note at={throughAt - 2} x={g.x + g.width + 18} y={g.rowMid(pen) - 15} out={requiredAt - 4}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>stored</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>stored</span>
       </Note>
       {/* Where Pen was: the same insert, against a price that is NOT NULL too. */}
       <Note at={notNullAt + 2} x={g.x + g.width + 18} y={g.rowMid(1) - 15}>
-        <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           same insert, with <Mono>NOT NULL</Mono>
         </span>
       </Note>
 
       {/* The test, as Postgres evaluates it on the row with no price. */}
       <Ink at={testAt - 2} dur={14} out={testOut} style={{ left: TABLE_X, top: below, display: "flex", alignItems: "center", gap: 18 }}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>The test on that row:</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The test on that row:</span>
         {/* 25px, within 12% of the 23px words it shares a line with. */}
         <Code size={25}>{"null >= 0"}</Code>
       </Ink>
       <Arrow from={[TABLE_X + 420, below + 22]} to={[TABLE_X + 490, below + 22]} at={unknownAt - 6} dur={10} color={INK_SOFT} out={testOut} />
       <Ink at={unknownAt - 2} dur={14} out={testOut} style={{ left: TABLE_X + 510, top: below, whiteSpace: "nowrap" }}>
-        <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 700, color: ACCENT_INK }}>{String(CHECK_ONLY.test)}</span>
-        <span style={{ ...note(23, INK), marginLeft: 16 }}>unknown, not false</span>
+        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: ACCENT_INK }}>{String(CHECK_ONLY.test)}</span>
+        <span style={{ ...note(24, INK), marginLeft: 16 }}>unknown, not false</span>
       </Ink>
 
       {/* ── The three rules, narrowing ── */}
       {LAYERS.map((l, i) => (
         <React.Fragment key={l.code}>
           <Ink at={l.at - 2} dur={14} style={{ left: X0, top: layerY(i) - 20, display: "flex", alignItems: "center", gap: 18 }}>
-            <span style={{ ...note(23, INK_SOFT), width: 26, textAlign: "right" }}>{i + 1}</span>
+            <span style={{ ...note(24, INK_SOFT), width: 26, textAlign: "right" }}>{i + 1}</span>
             <Code size={24}>{l.code}</Code>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{l.what}</span>
           </Ink>

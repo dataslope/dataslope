@@ -81,7 +81,7 @@ export const HookScene: React.FC = () => {
         <Spot id="crow" at={designAt + 6} left={1316} top={y(250)} width={crowW} height={crowH} />
 
         <Ink at={grownAt} dur={14} style={{ left: X0, top: y(330) }}>
-          <span style={{ ...note(25, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", opacity: 1 - dimCards }}>
+          <span style={{ ...note(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: 1 - dimCards }}>
             Where interviews have grown
           </span>
         </Ink>
@@ -119,10 +119,10 @@ export const HookScene: React.FC = () => {
                   transform: `translateY(${(1 - p) * 14}px)`,
                 }}
               >
-                <span style={{ ...note(31, c.ink), fontWeight: 650, whiteSpace: "nowrap" }}>{c.text}</span>
+                <span style={{ ...note(28, c.ink), fontWeight: 500, whiteSpace: "nowrap" }}>{c.text}</span>
               </div>
               <Ink at={c.at + 2} dur={12} style={{ left: c.x + 64, top: cardsTop + CARD_H / 2 + 12 }}>
-                <span style={{ ...label(22, c.trendInk), whiteSpace: "nowrap", opacity: 1 - dimCards }}>{c.trend}</span>
+                <span style={{ ...label(24, c.trendInk), whiteSpace: "nowrap", opacity: 1 - dimCards }}>{c.trend}</span>
               </Ink>
               <div style={{ position: "absolute", inset: 0, opacity: 1 - dimCards }}>
                 <Trend x={c.x + 22} y={cardsTop + CARD_H / 2} up={c.up} at={c.at} color={c.color} />
@@ -135,7 +135,7 @@ export const HookScene: React.FC = () => {
 
         {/* The plan: five questions on one design. */}
         <Ink at={fiveAt} dur={14} style={{ left: X0, top: chipY - 76 }}>
-          <span style={{ ...note(28, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Five questions,{" "}
             <span style={{ color: BLUE_INK, opacity: ease(frame, oneAt, 10) }}>one design</span>
           </span>
@@ -159,7 +159,7 @@ export const HookScene: React.FC = () => {
                 height: chipH,
                 display: "flex",
                 alignItems: "center",
-                fontSize: 30,
+                fontSize: 28,
                 opacity: p,
                 transform: `translateY(${(1 - p) * 10}px)`,
               }}
@@ -177,8 +177,8 @@ export const HookScene: React.FC = () => {
                     opacity: lit,
                   }}
                 />
-                <span style={{ position: "relative", ...note(30, ACCENT_INK), fontWeight: 700 }}>{c.n}</span>
-                <span style={{ position: "relative", ...note(30, INK), fontWeight: 650 }}> {c.word}</span>
+                <span style={{ position: "relative", ...note(28, ACCENT_INK), fontWeight: 500 }}>{c.n}</span>
+                <span style={{ position: "relative", ...note(28, INK), fontWeight: 500 }}> {c.word}</span>
               </span>
             </div>
           );

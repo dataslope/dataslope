@@ -107,10 +107,10 @@ export const SeriesScene: React.FC = () => {
                 }}
               >
                 <div style={{ position: "absolute", left: 0, top: TEXT_TOP, width: TEXT_W }}>
-                  <div style={{ ...label(20, BLUE_INK), ...TABULAR }}>Part {p.n}</div>
+                  <div style={{ ...label(24, BLUE_INK), ...TABULAR }}>Part {p.n}</div>
                   {/* Part 1's highlight reaches 0.14em left of its title,
                       and takes it back, so the title stays under its label. */}
-                  <div style={{ ...note(27, INK), fontWeight: 650, marginTop: 6, lineHeight: 1.15, marginLeft: i === 0 ? "-0.14em" : 0 }}>
+                  <div style={{ ...note(28, INK), fontWeight: 500, marginTop: 6, lineHeight: 1.15, marginLeft: i === 0 ? "-0.14em" : 0 }}>
                     {i === 0 ? (
                       <Mark at={screenAt - 2} dur={14}>
                         {p.title}
@@ -122,7 +122,7 @@ export const SeriesScene: React.FC = () => {
                 </div>
                 {/* Its own line, where a two-line title leaves it, so every
                     count in a row shares a baseline. */}
-                <div style={{ position: "absolute", left: 0, top: COUNT_TOP, ...note(22, INK_SOFT), ...TABULAR }}>
+                <div style={{ position: "absolute", left: 0, top: COUNT_TOP, ...note(24, INK_SOFT), ...TABULAR }}>
                   {p.questions} questions
                 </div>
               </div>
@@ -157,7 +157,7 @@ export const SeriesScene: React.FC = () => {
             position: "absolute",
             right: 1920 - (itemX(COLS - 1) + ITEM_W),
             top: y(GRID_Y) - h(62),
-            ...note(22, INK_SOFT),
+            ...note(24, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, onceAt - 2, 12) * (1 - ease(frame, screenAt, 16) * 0.5),
           }}
@@ -185,7 +185,7 @@ export const SeriesScene: React.FC = () => {
           </span>
         </div>
         <div style={{ position: "absolute", left: X0, top: practiceY + h(44), ...note(28, INK), whiteSpace: "nowrap", opacity: ease(frame, bankAt - 2, 10) }}>
-          A bank of <span style={{ fontWeight: 650 }}>{BANK} multiple-choice questions</span>, across the track
+          A bank of <span style={{ fontWeight: 500 }}>{BANK} multiple-choice questions</span>, across the track
         </div>
 
         <NextLine at={nextAt} x={X0} y={practiceY + h(114)} width={1000}>

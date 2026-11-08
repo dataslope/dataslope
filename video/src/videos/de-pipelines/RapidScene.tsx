@@ -47,8 +47,8 @@ const Dbt: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={toolAt} x={R_X} y={top - 42}>
-        <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: MONO, fontWeight: 600 }}>models/marts/fct_orders.sql</span>
+        <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ fontFamily: MONO, fontWeight: 500 }}>models/marts/fct_orders.sql</span>
           <span style={{ color: INK_SOFT, opacity: ease(frame, savesAt, 10) }}> → saved as a table or a view</span>
         </span>
       </Note>
@@ -63,11 +63,11 @@ const Dbt: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       {refs.map((r, i) => (
         <React.Fragment key={r}>
-          <Node x={nodeX(i)} y={gTop} w={250} h={c.h(58)} at={dependsAt + i * 4} title={<span style={{ fontFamily: MONO, fontSize: 21 }}>{r}</span>} />
+          <Node x={nodeX(i)} y={gTop} w={250} h={c.h(58)} at={dependsAt + i * 4} title={<span style={{ fontFamily: MONO, fontSize: 24 }}>{r}</span>} />
           <Flow points={[[nodeX(i) + 125, gTop + c.h(58) + 6], [nodeX(i) + 125, fTop - c.h(30)], [fct.x + fct.w / 2 + (i - 1) * 60, fTop - c.h(30)], [fct.x + fct.w / 2 + (i - 1) * 60, fTop - 8]]} at={orderAt + i * 4} color={BAR} width={2.2} head={12} />
         </React.Fragment>
       ))}
-      <Node x={fct.x} y={fTop} w={fct.w} h={c.h(62)} at={orderAt + 14} tone="ok" title={<span style={{ fontFamily: MONO, fontSize: 22 }}>fct_orders</span>} />
+      <Node x={fct.x} y={fTop} w={fct.w} h={c.h(62)} at={orderAt + 14} tone="ok" title={<span style={{ fontFamily: MONO, fontSize: 24 }}>fct_orders</span>} />
       <Pill x={fct.x + fct.w + 30} y={fTop + 4} at={testsAt} tone="plain" size={20}>
         tests
       </Pill>
@@ -75,7 +75,7 @@ const Dbt: React.FC<{ c: Ctx }> = ({ c }) => {
         docs
       </Pill>
       <Note at={tAt} x={fct.x + fct.w + 260} y={fTop + 2}>
-        <span style={{ ...note(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           the T in EL<span style={{ color: OK_INK, background: HIGHLIGHT, padding: "0 4px", borderRadius: 4 }}>T</span>
         </span>
       </Note>
@@ -114,7 +114,7 @@ const FanOut: React.FC<{ c: Ctx }> = ({ c }) => {
   const from = [dim.x + dim.w + 6, dim.y + dim.h / 2] as const;
   return (
     <>
-      <Node x={dim.x} y={dim.y} w={dim.w} h={dim.h} at={oneAt} title={<span style={{ fontFamily: MONO, fontSize: 22 }}>dim_customer</span>} sub={<span style={{ opacity: ease(frame, correctAt, 10) }}>one row corrected</span>} />
+      <Node x={dim.x} y={dim.y} w={dim.w} h={dim.h} at={oneAt} title={<span style={{ fontFamily: MONO, fontSize: 24 }}>dim_customer</span>} sub={<span style={{ opacity: ease(frame, correctAt, 10) }}>one row corrected</span>} />
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
         {/* A fan into every row of aggregates built on it... */}
         {Array.from({ length: GRID.rows }, (_, r) => {
@@ -169,13 +169,13 @@ const FanOut: React.FC<{ c: Ctx }> = ({ c }) => {
         ) : null}
       </svg>
       <Note at={manyAt + 6} x={gx} y={gy - c.h(46)}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>thousands of aggregates built on it</span>
+        <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>thousands of aggregates built on it</span>
       </Note>
       <Note at={staleAt} x={gx} y={gy + GRID.rows * (GRID.size + GRID.gap) + c.h(10)} out={onlyAt}>
-        <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>all of them stale</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>all of them stale</span>
       </Note>
       <Note at={onlyAt + 6} x={gx} y={gy + GRID.rows * (GRID.size + GRID.gap) + c.h(10)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>recompute only the affected ones</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>recompute only the affected ones</span>
       </Note>
       <Note at={graphAt + 4} x={R_X} y={c.y(720)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the dependency graph finds the smallest scope</span>
@@ -187,7 +187,7 @@ const FanOut: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       {/* The other meaning, from data modeling. */}
       <Note at={joinAt} x={R_X} y={c.y(838)}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           not a <b style={{ color: INK }}>join fan-out</b>
           <span style={{ opacity: ease(frame, repeatsAt, 10) }}>: a one-to-many join that repeats rows and inflates sums</span>
         </span>
@@ -275,7 +275,7 @@ const Lineage: React.FC<{ c: Ctx }> = ({ c }) => {
         const red = fwd.has(k) && k !== "rawCust" ? fwdP : 0;
         return (
           <React.Fragment key={k}>
-            <Node x={node.x} y={node.y} w={W} h={H} at={at(k)} tone={red > 0.5 ? "bad" : k === "ordersDb" || k === "crm" || k === "dash" ? "plain" : "data"} title={<span style={{ fontFamily: k === "ordersDb" || k === "crm" || k === "dash" ? undefined : MONO, fontSize: 20 }}>{node.t}</span>} lit={back.has(k) ? backP * 0.6 : 0} />
+            <Node x={node.x} y={node.y} w={W} h={H} at={at(k)} tone={red > 0.5 ? "bad" : k === "ordersDb" || k === "crm" || k === "dash" ? "plain" : "data"} title={<span style={{ fontFamily: k === "ordersDb" || k === "crm" || k === "dash" ? undefined : MONO, fontSize: 24 }}>{node.t}</span>} lit={back.has(k) ? backP * 0.6 : 0} />
             {pers.has(k) && persP > 0 ? (
               <div style={{ position: "absolute", left: node.x + W - 34, top: node.y - 14, width: 26, height: 26, borderRadius: 13, background: PERSONAL, border: `3px solid ${PAPER}`, opacity: persP }} />
             ) : null}
@@ -349,12 +349,12 @@ export const RapidScene: React.FC = () => {
         {/* The bridge. */}
         <Spot id={HERO.id} at={assumedAt + 4} left={1150} top={y(420)} width={660} height={358} />
         <Note at={oneAt} x={X0} y={listBottom + h(50)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             Every example here ran on <b style={{ color: BLUE_INK }}>one machine</b>.
           </span>
         </Note>
         <Note at={outgrowsAt} x={X0} y={listBottom + h(104)}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             A day of events outgrows it
             <span style={{ opacity: ease(frame, splitAt, 10) }}>
               : the work splits across <b style={{ color: BLUE_INK }}>many</b>.

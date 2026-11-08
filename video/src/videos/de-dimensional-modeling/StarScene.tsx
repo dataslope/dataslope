@@ -61,8 +61,8 @@ const JoinBadge: React.FC<{ at: number; out?: number; x: number; y: number; n: n
         background: KEY,
         color: PAPER,
         fontFamily: SANS,
-        fontSize: 20,
-        fontWeight: 750,
+        fontSize: 24,
+        fontWeight: 500,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -229,7 +229,7 @@ export const StarScene: React.FC = () => {
 
         {/* ── The fact table, its grain, measures and keys ── */}
         <Note at={grainAt} x={fact.left} y={fact.top - 44}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             grain: <span style={{ color: INK }}>one row per order line</span>
           </span>
         </Note>
@@ -263,19 +263,19 @@ export const StarScene: React.FC = () => {
 
         {/* Question 1's two definitions, written while they are said, where the star's notes go later. */}
         <Note at={numbersAt} x={NOTE_X} y={y(310)} width={NOTE_W} out={q2At - 6}>
-          <span style={{ ...note(26, INK) }}>
+          <span style={{ ...note(28, INK) }}>
             <b>Fact table:</b> events, and the numbers you add up
           </span>
         </Note>
         <Note at={contextAt} x={NOTE_X} y={y(420)} width={NOTE_W} out={q2At - 6}>
-          <span style={{ ...note(26, INK) }}>
+          <span style={{ ...note(28, INK) }}>
             <b>Dimensions:</b> the context you filter and group by
           </span>
         </Note>
 
         {/* "This is a star", named where the snowflake will grow. */}
         <Note at={starAt} x={NOTE_X} y={y(310)} width={NOTE_W} out={snowAt - 4}>
-          <span style={{ ...note(26, INK) }}>
+          <span style={{ ...note(28, INK) }}>
             A star: <span style={{ color: BLUE_INK, opacity: ease(frame, oneJoinAt, 10) }}>every dimension one join from the fact</span>
           </span>
         </Note>
@@ -313,7 +313,7 @@ export const StarScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             revenue by department: <b style={{ color: BLUE_INK }}>3 joins</b>
           </span>
-          <div style={{ ...note(22, INK_SOFT), opacity: ease(frame, insteadAt, 10), whiteSpace: "nowrap" }}>in the star, 1</div>
+          <div style={{ ...note(24, INK_SOFT), opacity: ease(frame, insteadAt, 10), whiteSpace: "nowrap" }}>in the star, 1</div>
         </Note>
 
         {/* ── Why the star: what each part is good at ── */}
@@ -330,7 +330,7 @@ export const StarScene: React.FC = () => {
           <span style={{ ...note(24, INK) }}>Dashboard tools map straight onto it.</span>
         </Note>
         <Note at={defaultAt} x={NOTE_X} y={y(600)} width={NOTE_W}>
-          <span style={{ ...note(30, OK_INK), fontWeight: 750 }}>The default: a star.</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500 }}>The default: a star.</span>
         </Note>
         <Note at={largeAt} x={NOTE_X} y={y(660)} width={NOTE_W}>
           <span style={{ ...note(24, INK_SOFT) }}>

@@ -78,12 +78,12 @@ export const DagsterScene: React.FC = () => {
 
         {/* Airflow: tasks, wired by hand. */}
         <Note at={airAt} x={LEFT} y={y(286)}>
-          <span style={{ ...note(30, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Airflow <span style={{ color: INK_SOFT, fontWeight: 500 }}>· task-centric</span>
           </span>
         </Note>
         <Note at={airAt + 8} x={LEFT} y={y(334)}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>what to run, and when</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>what to run, and when</span>
         </Note>
         {TASKS.map((t, i) => (
           <TaskBox key={t.name} cx={t.cx} cy={cy} w={200} h={taskH} at={stepsAt + i * 4} size={25}>
@@ -102,12 +102,12 @@ export const DagsterScene: React.FC = () => {
           />
         ))}
         <Note at={wireAt + 8} x={LEFT} y={cy + h(62)}>
-          <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 600, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
             load(transform(extract()))
           </span>
         </Note>
         <Note at={wireAt + 16} x={LEFT} y={cy + h(112)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>the order, written by hand</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>the order, written by hand</span>
         </Note>
 
         {/* The two models side by side: a hairline in the gap, from the heads
@@ -116,12 +116,12 @@ export const DagsterScene: React.FC = () => {
 
         {/* Dagster: assets, the graph worked out from what each reads. */}
         <Note at={dagAt} x={RIGHT_X} y={y(286)}>
-          <span style={{ ...note(30, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Dagster <span style={{ color: INK_SOFT, fontWeight: 500 }}>· asset-centric</span>
           </span>
         </Note>
         <Note at={dagAt + 8} x={RIGHT_X} y={y(334)}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <b style={{ color: INK }}>software-defined assets</b>: what data exists, and how it was made
           </span>
         </Note>
@@ -146,7 +146,7 @@ export const DagsterScene: React.FC = () => {
           </TaskBox>
         ))}
         <Note at={fileAt} x={RIGHT_X} y={cy - assetH / 2 - h(46)}>
-          <span style={{ ...label(20, BLUE_INK), whiteSpace: "nowrap" }}>each one a table or a file</span>
+          <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap" }}>each one a table or a file</span>
         </Note>
         {ASSETS.map((a) =>
           a.reads ? (
@@ -158,7 +158,7 @@ export const DagsterScene: React.FC = () => {
                 width: assetW,
                 top: cy + assetH / 2 + h(12),
                 textAlign: "center",
-                ...label(20, INK_SOFT),
+                ...label(24, INK_SOFT),
                 whiteSpace: "nowrap",
                 opacity: ease(frame, readsAt, 10),
               }}
@@ -192,7 +192,7 @@ export const DagsterScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={readsAt + 16} x={RIGHT_X} y={cy + h(96)}>
-          <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>the order, worked out from the data</span>
+          <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap" }}>the order, worked out from the data</span>
         </Note>
 
         {/* What the asset model gives you for free: each asset fresh, and when. */}
@@ -222,7 +222,7 @@ export const DagsterScene: React.FC = () => {
           freshness, built in
         </Pill>
         <Note at={knowsAt} x={RIGHT_X} y={y(728)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             every asset knows what produced it<span style={{ opacity: ease(frame, whenAt, 10) }}>, and when</span>
           </span>
         </Note>
@@ -233,7 +233,7 @@ export const DagsterScene: React.FC = () => {
           testing primitives
         </Pill>
         <Note at={typingAt + 8} x={RIGHT_X} y={y(846)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             outputs type-checked at run time
             <span style={{ opacity: ease(frame, testingAt + 6, 10) }}> · assets unit-tested with mock resources</span>
           </span>
@@ -241,10 +241,10 @@ export const DagsterScene: React.FC = () => {
 
         {/* The usual pushback. */}
         <Note at={whenAt + 6} x={LEFT} y={y(700)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Airflow can also run a DAG when a dataset updates</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Airflow can also run a DAG when a dataset updates</span>
         </Note>
         <Note at={whenAt + 12} x={LEFT} y={y(736)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>(Airflow 3 calls them assets), but its unit is still the task</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>(Airflow 3 calls them assets), but its unit is still the task</span>
         </Note>
       </Drift>
     </AbsoluteFill>

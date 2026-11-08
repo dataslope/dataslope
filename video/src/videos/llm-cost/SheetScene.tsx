@@ -103,7 +103,7 @@ export const SheetScene: React.FC = () => {
           ["Against input", BAR_X],
         ].map(([t, x], k) => (
           <Ink key={t} at={fiveAt - 4 + k * 3} dur={12} style={{ left: x as number, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-            <span style={label(21, INK_SOFT)}>{t}</span>
+            <span style={label(24, INK_SOFT)}>{t}</span>
           </Ink>
         ))}
         <Hairline x={X0} y={y(HEAD_Y) + 40} w={RIGHT - X0} at={fiveAt} color={INK_SOFT} />
@@ -119,8 +119,8 @@ export const SheetScene: React.FC = () => {
               <Ink at={fiveAt + i * 4} dur={12} style={{ left: NAME_X, top: rowY(i) - 2, whiteSpace: "nowrap" }}>
                 <span
                   style={{
-                    ...label(30, colors[i]),
-                    fontWeight: 700,
+                    ...label(28, colors[i]),
+                    fontWeight: 500,
                     display: "inline-block",
                     transformOrigin: "0 60%",
                     transform: `scale(${1 + pulse(frame, at - 4, 20) * 0.08})`,
@@ -133,7 +133,7 @@ export const SheetScene: React.FC = () => {
                 <span style={note(24, INK_SOFT)}>{row.what}</span>
               </Ink>
               <Ink at={at} dur={14} style={{ left: REL_X, top: rowY(i), whiteSpace: "nowrap" }}>
-                <span style={{ ...note(27, INK), fontWeight: 600 }}>
+                <span style={{ ...note(28, INK), fontWeight: 500 }}>
                   <Marked at={ratiosAt + i * 4}>{row.relation}</Marked>
                 </span>
               </Ink>
@@ -163,7 +163,7 @@ export const SheetScene: React.FC = () => {
         {/* Cache write: input's length, and a little more. */}
         <HBar x={BAR_X} y={barY(3)} w={unit} h={bh} at={rowAt[3] + 2} fill={CACHED_SOFT} outline={CACHED} />
         <Note at={rowAt[3] + 10} x={BAR_X + unit + 8} y={barY(3) + bh / 2 - 19}>
-          <span style={{ ...label(28, CACHED_INK), fontWeight: 700 }}>+</span>
+          <span style={{ ...label(28, CACHED_INK), fontWeight: 500 }}>+</span>
         </Note>
         {/* Batch: about half of the rate it is applied to. */}
         <Outline x={BAR_X} y={barY(4)} w={unit} h={bh} at={rowAt[4]} />
@@ -172,7 +172,7 @@ export const SheetScene: React.FC = () => {
         <Note at={fallingAt + 4} x={BAR_X} y={barY(4) + h(ROW_DY) - 6}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             Lower prices,{" "}
-            <span style={{ opacity: ease(frame, moveAt - 6, 12), color: INK, fontWeight: 600 }}>same ratios.</span>
+            <span style={{ opacity: ease(frame, moveAt - 6, 12), color: INK, fontWeight: 500 }}>same ratios.</span>
           </span>
         </Note>
       </Drift>

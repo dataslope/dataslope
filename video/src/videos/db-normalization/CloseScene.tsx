@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { BLUE_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { ColumnRule, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -52,7 +52,7 @@ export const CloseScene: React.FC = () => {
       <Sfx name="el-chime" at={end + 8} level={-32} />
 
       <Ink at={from - 10} dur={14} style={{ left: X0 + 2, top: y(KICKER_Y) }}>
-        <span style={label(22, INK_SOFT)}>Normalization</span>
+        <span style={label(24, INK_SOFT)}>Normalization</span>
       </Ink>
       <Spot id="db-normalization-drawer" at={from - 4} left={1470} top={y(250)} width={320} height={318} />
 
@@ -74,7 +74,7 @@ export const CloseScene: React.FC = () => {
               <Ink at={l.at - 4} dur={18} style={{ position: "relative" }}>
                 {l.lead}
               </Ink>
-              <Ink at={l.at + 4} dur={18} style={{ position: "relative", ...headline(84, true), color: ACCENT_INK }}>
+              <Ink at={l.at + 4} dur={18} style={{ position: "relative", ...headline(84, true), color: INK }}>
                 {l.turn}
               </Ink>
             </div>
@@ -87,8 +87,8 @@ export const CloseScene: React.FC = () => {
             <Ink key={f.name} at={rulesAt + k * 6} dur={14} style={{ left: X0 + k * 420, top: y(560), whiteSpace: "nowrap" }}>
               <span style={{ display: "inline-flex", alignItems: "baseline", gap: 12 }}>
                 {/* 24px, within 12% of the 22px gist on its line. */}
-                <span style={{ ...label(24, BLUE_INK), fontWeight: 700 }}>{f.name}</span>
-                <span style={{ ...note(22, INK) }}>{f.gist}</span>
+                <span style={{ ...label(24, BLUE_INK), fontWeight: 500 }}>{f.name}</span>
+                <span style={{ ...note(24, INK) }}>{f.gist}</span>
               </span>
             </Ink>
           ))}
@@ -103,7 +103,7 @@ export const CloseScene: React.FC = () => {
           designing a schema, start to finish,
         </NextLine>
         <Ink at={liveAt - 4} dur={16} style={{ left: X0, top: y(700) + 84, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK_SOFT) }}>and changing it once it&apos;s live</span>
+          <span style={{ ...note(24, INK_SOFT) }}>and changing it once it&apos;s live</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

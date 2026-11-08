@@ -114,14 +114,14 @@ export const DivisorScene: React.FC = () => {
         <Ink at={measuredFrom - 2} dur={20} out={swampAt + 4} outDur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Divide by n,
         </Ink>
-        <Ink at={lowAt - 6} dur={18} out={swampAt + 4} outDur={14} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={lowAt - 6} dur={18} out={swampAt + 4} outDur={14} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           and you come up short.
         </Ink>
       </div>
 
       {/* The two divisors the headline asks about: one size, the right one in weight and color. */}
       <div style={{ position: "absolute", left: 1330, top: y(330), opacity: (1 - phaseB) * (1 - ease(frame, fiveAt - 4, 12)), whiteSpace: "nowrap", display: "flex", gap: 22, alignItems: "baseline" }}>
-        <span style={{ ...note(28, STAT_INK), fontWeight: 700, opacity: ease(frame, nineAt - 4, 12) }}>12 ÷ 9</span>
+        <span style={{ ...note(28, STAT_INK), fontWeight: 500, opacity: ease(frame, nineAt - 4, 12) }}>12 ÷ 9</span>
         <span style={{ ...note(28, INK_SOFT), opacity: ease(frame, tenAt - 4, 12) }}>not 12 ÷ 10</span>
       </div>
 
@@ -225,22 +225,22 @@ export const DivisorScene: React.FC = () => {
 
         {/* The total of the squares, live, against what the sample's mean gives. */}
         <Ink at={closerAt - 2} dur={16} style={{ left: 1330, top: y(500), whiteSpace: "nowrap" }}>
-          <div style={{ ...label(23, INK), fontWeight: 560 }}>Sum of the squares</div>
+          <div style={{ ...label(24, INK), fontWeight: 500 }}>Sum of the squares</div>
           <div
             style={{
               ...note(64, `color-mix(in srgb, ${INK} ${(away * 100).toFixed(1)}%, ${STAT_INK})`),
               ...TABULAR,
-              fontWeight: 700,
+              fontWeight: 500,
               marginTop: 6,
             }}
           >
             {fmt(ss, 1)}
           </div>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 2 }}>measured from {centerName}</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 2 }}>measured from {centerName}</div>
           <div
             style={{
-              ...note(22, STAT_INK),
-              fontWeight: 600,
+              ...note(24, STAT_INK),
+              fontWeight: 500,
               marginTop: 8,
               opacity: ease(frame, otherAt - 4, 12) * (1 - ease(frame, aroundAt + 22, 12)),
             }}
@@ -249,11 +249,11 @@ export const DivisorScene: React.FC = () => {
           </div>
         </Ink>
         <Ink at={smallAt - 2} dur={16} style={{ left: 1330, top: y(700), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, INK), ...halo }}>
+          <span style={{ ...note(24, INK), ...halo }}>
             Around its own mean, the <Mark at={smallAt + 2}>smallest</Mark> it can be.
           </span>
         </Ink>
-        <div style={{ position: "absolute", left: 1330, top: y(750), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...note(23, STAT_INK), fontWeight: 600 }}>
+        <div style={{ position: "absolute", left: 1330, top: y(750), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...note(24, STAT_INK), fontWeight: 500 }}>
           <Ink at={divideByAt - 4} dur={14} style={{ position: "relative" }}>
             <span style={halo}>Divided by n,</span>
           </Ink>
@@ -262,7 +262,7 @@ export const DivisorScene: React.FC = () => {
           </Ink>
         </div>
         <Ink at={numberAt - 4} dur={16} style={{ left: 1330, top: y(750) + 38, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK_SOFT), ...halo }}>
+          <span style={{ ...note(24, INK_SOFT), ...halo }}>
             n, the number of values: here, {DIVISOR.five.length}
           </span>
         </Ink>
@@ -354,9 +354,9 @@ export const DivisorScene: React.FC = () => {
                 }}
               >
                 {/* One size across the line: the code in mono, the value in weight and color. */}
-                <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK }}>{c.code}</span>
-                <span style={{ ...note(26, STAT_INK), fontWeight: 700 }}>{fmt(c.value, 2)}</span>
-                <span style={{ ...note(26, INK_SOFT), opacity: ease(frame, c.noteAt - 4, 12) }}>
+                <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK }}>{c.code}</span>
+                <span style={{ ...note(28, STAT_INK), fontWeight: 500 }}>{fmt(c.value, 2)}</span>
+                <span style={{ ...note(28, INK_SOFT), opacity: ease(frame, c.noteAt - 4, 12) }}>
                   {i === 1 ? <Mark at={minusOneAt - 2}>{c.note}</Mark> : c.note}
                 </span>
               </div>
@@ -376,7 +376,7 @@ export const DivisorScene: React.FC = () => {
             }}
           />
           <Ink at={disagreeAt - 4} dur={16} style={{ left: 260, top: y(800), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(22, INK_SOFT) }}>x: the ten salaries of Fig. 1, two answers</span>
+            <span style={{ ...label(24, INK_SOFT) }}>x: the ten salaries of Fig. 1, two answers</span>
           </Ink>
           <Ink at={weaknessAt - 4} dur={16} style={{ left: 260, top: y(915), whiteSpace: "nowrap" }}>
             <span style={{ ...note(24, INK), ...halo }}>

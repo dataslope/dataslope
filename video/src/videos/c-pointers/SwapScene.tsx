@@ -217,7 +217,7 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
   return (
     <AbsoluteFill>
       <Ink at={c.open} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Passing to a function</span>
+        <span style={label(24, ACCENT_INK)}>Passing to a function</span>
       </Ink>
       <Ink
         at={c.open + 2}
@@ -425,7 +425,7 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
                   alignItems: "center",
                 }}
               >
-                <span style={{ ...note(20, INK_SOFT), fontStyle: "italic" }}>copy</span>
+                <span style={{ ...note(24, INK_SOFT) }}>copy</span>
               </Ink>
             </React.Fragment>
           ))}
@@ -436,14 +436,14 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
         dur={14}
         style={{ left: FRAME_L, top: y(OUT_Y), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}
       >
-        <span style={label(21, INK_SOFT)}>It prints</span>
-        <span style={{ fontFamily: MONO, fontSize: 32, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>
+        <span style={label(24, INK_SOFT)}>It prints</span>
+        <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>
           {fig.stdout}
         </span>
         <span
           style={{
-            ...note(22, isPtr ? ADDR_INK : ACCENT_INK),
-            fontWeight: 650,
+            ...note(24, isPtr ? ADDR_INK : ACCENT_INK),
+            fontWeight: 500,
             opacity: ease(frame, c.doneAt - 2, 10),
           }}
         >
@@ -451,7 +451,7 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
         </span>
       </Ink>
       <Note at={c.namesAt + 14} x={FRAME_L} y={y(NOTE_Y)} from="up">
-        <span style={note(21, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           Addresses from one run, printed with <Mono>%p</Mono>. They change on every run.
         </span>
       </Note>
@@ -492,7 +492,7 @@ const FramePanel: React.FC<{ name: string; at: number; top: number; bottom: numb
         dur={12}
         style={{ left: FRAME_LABEL_X, top: boxTop, height: boxH, display: "flex", alignItems: "center" }}
       >
-        <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK_SOFT }}>{name}</span>
+        <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK_SOFT }}>{name}</span>
       </Ink>
     </>
   );

@@ -112,23 +112,23 @@ export const LimitsScene: React.FC = () => {
       </Svg>
       <Axis scale={XL} base={y(L_AXIS)} ticks={[0, 2, 4, 6, 8, 10, 12, 14]} at={informationAt + 2} />
       <Note at={biasedAt + 8} x={sx(XL, BIASED.cutoff) + 12} y={y(L_STRIP - 30)}>
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>never recorded</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>never recorded</span>
       </Note>
       <Bars counts={lCounts} lo={XL.lo} bin={BIN} scale={XL} base={y(L_HIST)} unit={h(Math.min(8, L_HIST_H / Math.max(1, ...lCounts)))} color={EST} gap={0.5} />
       <Note at={carriesAt + 4} x={sx(XL, BIASED.mean)} y={y(L_HIST) - h(L_HIST_H) - 34} from="up">
-        <span style={{ ...note(20, INK_SOFT), ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(24, INK_SOFT), ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           {BIASED.means.length.toLocaleString("en-US")} resampled averages
         </span>
       </Note>
       <IntervalBar x0={sx(XL, BIASED.lo)} x1={sx(XL, BIASED.hi)} y={y(L_BAR)} at={confidentAt - 2} dur={14} color={INK} width={4} tick={10} />
       <Note at={confidentAt + 4} x={sx(XL, BIASED.lo) - 12} y={y(L_BAR) + 18} align="right">
-        <span style={{ ...note(21, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           {fmt(BIASED.lo)} to {fmt(BIASED.hi)}
         </span>
       </Note>
       <Rule x={sx(XL, BIASED.trueMean)} y0={y(L_BAR) + 20} y1={y(L_STRIP - 40)} at={wrongAt - 4} dur={16} color={INK} width={2.4} dash="7 6" />
       <Note at={wrongAt} x={sx(XL, BIASED.trueMean) + 12} y={y(L_BAR) - 12}>
-        <span style={{ ...note(21, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>true mean, {fmt(BIASED.trueMean, 0)}: outside it</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>true mean, {fmt(BIASED.trueMean, 0)}: outside it</span>
       </Note>
       <Svg opacity={ease(frame, wrongAt + 4, 10)}>
         <circle cx={sx(XL, BIASED.trueMean)} cy={y(L_BAR)} r={9 + 3 * pulse(frame, wrongAt + 4, 16)} fill="none" stroke={EST} strokeWidth={2.6} />
@@ -159,7 +159,7 @@ export const LimitsScene: React.FC = () => {
         })}
       </Svg>
       <Note at={edgesAt + 4} x={XR.x0} y={y(R_STRIP) + 18}>
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the sample’s largest values</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the sample’s largest values</span>
       </Note>
       <Rule
         x={sx(XR, MAXIMUM.sampleMax)}
@@ -172,7 +172,7 @@ export const LimitsScene: React.FC = () => {
         dash="7 6"
       />
       <Note at={neverAt + 2} x={sx(XR, MAXIMUM.sampleMax) + 14} y={y(R_STRIP + 60)}>
-        <span style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap", lineHeight: 1.35 }}>
+        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", lineHeight: 1.35 }}>
           a resample
           <br />
           never gets
@@ -181,7 +181,7 @@ export const LimitsScene: React.FC = () => {
         </span>
       </Note>
       <Note at={maximumAt - 4} x={sx(XR, top.v) - 14} y={y(R_BASE) - h(R_H) - 4} align="right" from="right">
-        <span style={{ ...note(21, EST_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           {Math.round(MAXIMUM.atTop * 100)}% of resamples: exactly {fmt(MAXIMUM.sampleMax)}
         </span>
       </Note>
@@ -189,7 +189,7 @@ export const LimitsScene: React.FC = () => {
       </div>
 
       {/* ── Precision, not accuracy ── */}
-      <div style={{ position: "absolute", left: 160, top: y(744), display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...body(36, true) }}>
+      <div style={{ position: "absolute", left: 160, top: y(744), display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...body(34, true) }}>
         <Slot at={precisionFrom - 2} style={{ color: INK }}>
           It measures how much an estimate{" "}
           <Marked at={wobblesAt - 2} color={HIGHLIGHT}>
@@ -205,7 +205,7 @@ export const LimitsScene: React.FC = () => {
 
       {/* ── The bridge ── */}
       <Ink at={nextFrom - 2} dur={18} style={{ left: 160, top: y(818), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, INK_SOFT) }}>
+        <span style={{ ...note(28, INK_SOFT) }}>
           An interval:{" "}
           <span style={{ opacity: ease(frame, whichAt - 2, 12) }}>
             which values are{" "}
@@ -217,10 +217,10 @@ export const LimitsScene: React.FC = () => {
         </span>
       </Ink>
       <Ink at={oneValueAt - 4} dur={18} style={{ left: 160, top: y(862), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, INK_SOFT) }}>
+        <span style={{ ...note(28, INK_SOFT) }}>
           A test: one value
           <span style={{ opacity: ease(frame, particularAt - 2, 12) }}> in particular.</span>
-          <span style={{ position: "relative", color: EST_INK, fontWeight: 650, opacity: ease(frame, zeroAt - 6, 12) }}>
+          <span style={{ position: "relative", color: EST_INK, fontWeight: 500, opacity: ease(frame, zeroAt - 6, 12) }}>
             {" "}
             Could it be zero?
             <span

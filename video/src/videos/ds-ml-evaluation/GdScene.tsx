@@ -148,13 +148,13 @@ export const GdScene: React.FC = () => {
         <Note at={againstAt - 2} x={LEFTS[0]} y={y(310)} out={end - 8}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             each step:{" "}
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600 }}>
+            <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500 }}>
               x ← x − <Mark at={sizeAt - 2}>rate</Mark> × gradient
             </span>
           </span>
         </Note>
         <Note at={startAt - 2} x={LEFTS[0] + 760} y={y(316)} out={clearAt}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>loss = x², starting at x = {GD.start}</span>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>loss = x², starting at x = {GD.start}</span>
         </Note>
 
         {runs.map((run, i) => (
@@ -164,7 +164,7 @@ export const GdScene: React.FC = () => {
               <span style={TABULAR}>{titles[i].text}</span>
             </PanelTitle>
             <Note at={labels[i].at} x={run.left} y={y(BOTTOM) + h(18)} out={clearAt}>
-              <span style={{ ...note(24, labels[i].ink), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>{labels[i].text}</span>
+              <span style={{ ...note(24, labels[i].ink), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{labels[i].text}</span>
             </Note>
           </React.Fragment>
         ))}
@@ -172,7 +172,7 @@ export const GdScene: React.FC = () => {
         {/* ── Three ways to take the step: a list of its own, once the bowls
             have cleared, so none sits under a learning rate's outcome ── */}
         <Note at={clearAt + 6} x={LEFTS[0]} y={y(420)} out={end - 8}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>three ways to take each step</span>
+          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>three ways to take each step</span>
         </Note>
         {[
           { at: Math.max(clearAt + 12, oneAt), head: "SGD, stochastic gradient descent", body: "one example a step" },
@@ -181,8 +181,8 @@ export const GdScene: React.FC = () => {
         ].map((s, i) => (
           <Note key={s.head} at={s.at - 2} x={LEFTS[0]} y={y(480) + i * h(84)} out={end - 8}>
             <div style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
-              <span style={{ ...note(32, INK), fontWeight: 650, width: 640 }}>{s.head}</span>
-              <span style={{ ...note(30, INK_SOFT) }}>{s.body}</span>
+              <span style={{ ...note(34, INK), fontWeight: 500, width: 640 }}>{s.head}</span>
+              <span style={{ ...note(28, INK_SOFT) }}>{s.body}</span>
             </div>
           </Note>
         ))}

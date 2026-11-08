@@ -107,7 +107,7 @@ export const CountScene: React.FC = () => {
         return <Tile key={i} text={t.text} x={t.x} y={t.y} at={tileAt(i)} size={TILE_SIZE} marks={marks} />;
       })}
       <Note at={thirtyAt - 2} x={LEFT_X} y={tilesBottom + 18}>
-        <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
           <span style={numStyle(22, INK)}>{FOX.total}</span> words, once the punctuation is gone
         </span>
       </Note>
@@ -135,7 +135,7 @@ export const CountScene: React.FC = () => {
         <Mono size={21} color={INK_SOFT}>
           FreqDist
         </Mono>
-        <span style={{ ...label(20, INK_SOFT), marginLeft: 12 }}>each word and its count</span>
+        <span style={{ ...label(24, INK_SOFT), marginLeft: 12 }}>each word and its count</span>
       </Ink>
       {/* The five most common rows, banded as most_common(5) is asked for. */}
       <HBar x={WORD_RIGHT - 120} y={rowY(0) + 2} w={BAR_X + 8 * UNIT + 70 - (WORD_RIGHT - 120)} h={top5 * rowH - 4} at={fiveAt - 2} color={`color-mix(in srgb, ${HIGHLIGHT} 45%, transparent)`} dur={14} />
@@ -185,7 +185,7 @@ export const CountScene: React.FC = () => {
                 alignItems: "center",
                 opacity: showing,
                 ...numStyle(22, isThe && frame >= eightAt - 2 ? ACCENT_INK : INK),
-                fontWeight: isThe && frame >= eightAt - 2 ? 700 : 600,
+                fontWeight: isThe && frame >= eightAt - 2 ? 500 : 500,
               }}
             >
               {frame >= sweepEnd + 6 ? total : Math.max(1, Math.round(t))}
@@ -194,14 +194,14 @@ export const CountScene: React.FC = () => {
         );
       })}
       <Note at={Math.max(thirteenAt - 2, sweepEnd + 2)} x={NOTE_X} y={rowY(7) + 6}>
-        <div style={{ ...body(30), color: INK, whiteSpace: "nowrap" }}>
+        <div style={{ ...body(28), color: INK, whiteSpace: "nowrap" }}>
           <span style={numStyle(30, INK)}>{FOX.distinct}</span> different words
         </div>
       </Note>
 
       {/* Thirteen out of thirty: the ratio the next scene names. */}
       <Ink at={ratioThirteen - 4} dur={16} style={{ left: NOTE_X, top: rowY(7) + 58, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(30), color: INK }}>
+        <span style={{ ...body(28), color: INK }}>
           out of <Slot30 at={ratioThirty - 2} />
         </span>
       </Ink>

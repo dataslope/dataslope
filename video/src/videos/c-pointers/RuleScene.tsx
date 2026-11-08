@@ -38,7 +38,7 @@ export const RuleScene: React.FC = () => {
       backAt: livesAt + 4,
       back: (
         <>
-          In Fig. 1, <span style={{ color: ADDR_INK, fontWeight: 600 }}>{FIG1.n}</span>
+          In Fig. 1, <span style={{ color: ADDR_INK, fontWeight: 500 }}>{FIG1.n}</span>
         </>
       ),
     },
@@ -49,8 +49,8 @@ export const RuleScene: React.FC = () => {
       backAt: thereAt + 4,
       back: (
         <>
-          In Fig. 1, n&apos;s box: read <span style={{ color: VALUE_INK, fontWeight: 600 }}>42</span>, then wrote{" "}
-          <span style={{ color: VALUE_INK, fontWeight: 600 }}>100</span>
+          In Fig. 1, n&apos;s box: read <span style={{ color: VALUE_INK, fontWeight: 500 }}>42</span>, then wrote{" "}
+          <span style={{ color: VALUE_INK, fontWeight: 500 }}>100</span>
         </>
       ),
     },
@@ -59,7 +59,7 @@ export const RuleScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 8} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Pointers in C</span>
+        <span style={label(24, ACCENT_INK)}>Pointers in C</span>
       </Ink>
       <Ink
         at={start - 6}
@@ -98,7 +98,7 @@ export const RuleScene: React.FC = () => {
               style={{
                 fontFamily: MONO,
                 fontSize: 104,
-                fontWeight: 700,
+                fontWeight: 500,
                 color: ADDR_INK,
                 fontVariantLigatures: "none",
                 lineHeight: 1.1,
@@ -110,7 +110,7 @@ export const RuleScene: React.FC = () => {
             <span style={{ ...body(58, true), color: INK }}>{r.text}</span>
           </Ink>
           <Note at={r.backAt} x={RIGHT} y={y(ROWS[i]) + 50} align="right" from="right">
-            <span style={note(21, INK_SOFT)}>{r.back}</span>
+            <span style={note(24, INK_SOFT)}>{r.back}</span>
           </Note>
         </React.Fragment>
       ))}
@@ -127,7 +127,7 @@ export const RuleScene: React.FC = () => {
         }}
       />
       <Note at={thereAt + 12} x={LEFT} y={y(FOOT)} from="up" width={1500}>
-        <span style={note(21, INK_SOFT)}>
+        <span style={note(24, INK_SOFT)}>
           In a declaration the star only names the type: <Mono color={INK}>int *p</Mono> says <Mono color={INK}>p</Mono>{" "}
           is a pointer to an int. In an expression, <Mono color={INK}>*p</Mono> follows it.
         </span>

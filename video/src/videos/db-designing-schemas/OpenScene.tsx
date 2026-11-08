@@ -58,7 +58,7 @@ export const OpenScene: React.FC = () => {
       <Ink at={openFrom - 8} dur={20} style={{ left: 92, top: y(150), ...headline(72), whiteSpace: "nowrap" }}>
         The rules get you <Mark at={halfwayAt - 2} dur={14}>halfway.</Mark>
       </Ink>
-      <Ink at={otherAt - 4} dur={20} style={{ left: 92, top: y(236), ...headline(72, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+      <Ink at={otherAt - 4} dur={20} style={{ left: 92, top: y(236), ...headline(72, true), color: INK, whiteSpace: "nowrap" }}>
         The other half is a process,
       </Ink>
       {halves.map((h, i) => (
@@ -92,14 +92,14 @@ export const OpenScene: React.FC = () => {
               opacity: ease(frame, couldAt - 6, 12),
               clipPath: `inset(0 ${(1 - ease(frame, couldAt - 6, 16)) * 100}% 0 0)`,
               fontFamily: MONO,
-              fontSize: 30,
+              fontSize: 28,
               whiteSpace: "pre",
               minWidth: 470,
             }}
           >
             <Strike at={guessAt} top="0.5em">
               <span>
-                <span style={{ color: inkOf.purple, fontWeight: 700 }}>{shown.slice(0, 12)}</span>
+                <span style={{ color: inkOf.purple, fontWeight: 500 }}>{shown.slice(0, 12)}</span>
                 <span style={{ color: INK }}>{shown.slice(12)}</span>
               </span>
             </Strike>
@@ -107,10 +107,10 @@ export const OpenScene: React.FC = () => {
           </div>
         ) : null}
         <Ink at={guessAt - 2} dur={16} style={{ left: 484, top: y(690), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(32, true), color: ACCENT_INK }}>a first guess</span>
+          <span style={{ ...body(34, true), color: ACCENT_INK }}>a first guess</span>
         </Ink>
         <Ink at={storeAt - 2} dur={14} style={{ left: 150, top: y(786), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(26, true), color: INK_SOFT }}>an online store</span>
+          <span style={{ ...body(28, true), color: INK_SOFT }}>an online store</span>
         </Ink>
       </div>
     </AbsoluteFill>

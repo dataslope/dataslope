@@ -12,7 +12,8 @@ import { Bar, Cylinder, Drift, Flow, Headline, Kicker, Node, pulse, Spot, X0 } f
 
 const FIG_TOP = 290;
 const API = { x: X0, w: 170 };
-const DB = { x: 660, w: 250 };
+/** The database, painted, centred where the drawn one stood. */
+const DB = { x: 680, w: 210 };
 const BARS_TOP = 562;
 const CHIPS_Y = 733;
 const SQUARES_Y = 794;
@@ -60,8 +61,8 @@ export const HookScene: React.FC = () => {
 
   const top = y(FIG_TOP);
   const apiH = h(150);
-  const dbTop = top - h(6);
-  const dbH = h(170);
+  // Raised so its foot stands well clear of the note under it.
+  const dbTop = top - h(32);
   const readY = top + h(44);
   const writeY = top + h(104);
   const otherTop = top + h(178);
@@ -100,16 +101,16 @@ export const HookScene: React.FC = () => {
 
         {/* ── An API, a database, and the requests between them ── */}
         <Node x={API.x} y={top} w={API.w} h={apiH} at={apiAt - 2} tone="plain" title="API" sub="requests" size={30} bare />
-        <Cylinder x={DB.x} y={dbTop} w={DB.w} h={dbH + h(30)} at={dbAt - 2} title="database" swapTo="PostgreSQL" swapAt={postgresAt + 2} size={24} />
+        <Cylinder x={DB.x} y={dbTop} w={DB.w} at={dbAt - 2} title="database" swapTo="PostgreSQL" swapAt={postgresAt + 2} size={24} />
         <Flow points={[[API.x + API.w + 8, readY], [DB.x - 12, readY]]} at={readsAt} color={BAR} width={3} />
         <Note at={fastAt - 4} x={API.x + API.w + 40} y={readY - h(44)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             read: <b style={{ color: BLUE_INK }}>fast</b>
           </span>
         </Note>
         <Flow points={[[API.x + API.w + 8, writeY], [DB.x - 12, writeY]]} at={writesAt} color={INK} width={3} />
         <Note at={rightAt - 4} x={API.x + API.w + 40} y={writeY - h(44)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             write: <b>right</b>
           </span>
         </Note>
@@ -126,9 +127,9 @@ export const HookScene: React.FC = () => {
           color={inkOf.yellow}
           width={3}
         />
-        {/* Clear of the cylinder's foot (top + 194): it ran under the curve. */}
+        {/* Well clear of the painted cylinder's foot, which stands above it. */}
         <Note at={momentAt - 2} x={API.x + API.w + 176} y={top + h(218)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>another write, at the same moment</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>another write, at the same moment</span>
         </Note>
 
         {/* ── The tables every number ran on ── */}
@@ -171,12 +172,12 @@ export const HookScene: React.FC = () => {
           }
           segments={[{ value: OPENING.orders, color: BAR }]}
         />
-        <div style={{ position: "absolute", left: X0, top: y(CHIPS_Y), display: "flex", alignItems: "baseline", gap: "0.5em", fontSize: 22, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, smallAt - 2, 10) }}>and small ones:</span>
+        <div style={{ position: "absolute", left: X0, top: y(CHIPS_Y), display: "flex", alignItems: "baseline", gap: "0.5em", fontSize: 24, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, smallAt - 2, 10) }}>and small ones:</span>
           {chips.map((c, i) => (
-            <span key={c.name} style={{ ...note(22, INK), opacity: ease(frame, c.at, 10) }}>
+            <span key={c.name} style={{ ...note(24, INK), opacity: ease(frame, c.at, 10) }}>
               {i > 0 ? <span style={{ color: INK_SOFT, marginRight: "0.5em" }}>·</span> : null}
-              <b>{c.name}</b> <span style={{ ...TABULAR, color: BLUE_INK, fontWeight: 650 }}>{c.rows}</span>
+              <b>{c.name}</b> <span style={{ ...TABULAR, color: BLUE_INK, fontWeight: 500 }}>{c.rows}</span>
             </span>
           ))}
         </div>
@@ -207,7 +208,7 @@ export const HookScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 ...label(deep ? 21 : 19, tone > 0.5 ? PAPER : BLUE_INK),
-                fontWeight: 700,
+                fontWeight: 500,
                 ...TABULAR,
                 opacity: p,
                 transform: `scale(${(0.7 + 0.3 * p) * (1 + 0.12 * glow)})`,
@@ -223,8 +224,8 @@ export const HookScene: React.FC = () => {
             position: "absolute",
             left: sqX(0) + SQ - 14,
             top: sqTop - 16,
-            ...label(19, INK),
-            fontWeight: 700,
+            ...label(24, INK),
+            fontWeight: 500,
             background: HIGHLIGHT,
             borderRadius: 999,
             padding: "0 7px",
@@ -236,17 +237,17 @@ export const HookScene: React.FC = () => {
           +1
         </div>
         <Note at={elevenAt} x={squaresEnd + 34} y={sqTop - h(30)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>11</b> worked through
           </span>
         </Note>
         <Note at={fiveAt} x={squaresEnd + 34} y={sqTop + h(4)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b>5</b> quickly, at the end
           </span>
         </Note>
         <Note at={plusAt + 4} x={squaresEnd + 34} y={sqTop + h(38)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <b style={{ color: INK }}>+1</b> from system design, with question 1
           </span>
         </Note>

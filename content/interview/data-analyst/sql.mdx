@@ -12,7 +12,7 @@ question bank: short **Q&A** to review the ideas, **concept checks**, and
   alt="Two stacks of colored row tiles on a platform bridged into one combined table, with a small funnel above filtering rows down into three grouped bars"
 />
 
-> **SQL dialect:** the runnable challenges on Dataslope execute in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted, most of it runs unchanged on Postgres, MySQL, BigQuery, or Snowflake.
+> **SQL dialect:** the runnable challenges on Dataslope execute in your browser on **PostgreSQL**, so the SQL below targets Postgres. It is standard SQL except where noted; most of it runs unchanged on MySQL, BigQuery, Snowflake, or DuckDB.
 
 ## Q&A
 
@@ -24,7 +24,7 @@ must go in `HAVING`, because the aggregate doesn't exist yet when `WHERE`
 runs.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE orders (region TEXT, amount DECIMAL(8,2));
 INSERT INTO orders VALUES
   ('North', 120.00), ('South', 80.50), ('East', 200.00),
@@ -192,7 +192,7 @@ rows (the "window"), so the original row count is preserved. They use the
 `OVER(...)` clause.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE employees (name TEXT, department TEXT, salary INTEGER);
 INSERT INTO employees VALUES
   ('Alice', 'Engineering', 95000),  ('Bob',   'Engineering', 105000),
@@ -211,8 +211,9 @@ INSERT INTO employees VALUES
   name,
   department,
   salary,
-  AVG(salary) OVER (PARTITION BY department) AS dept_avg
-FROM employees;
+  ROUND(AVG(salary) OVER (PARTITION BY department), 2) AS dept_avg
+FROM employees
+ORDER BY department, name;
 -- Every employee row is kept; dept_avg is the average for their dept.`}
 />
 
@@ -253,7 +254,7 @@ they handle ties differently:
 - `DENSE_RANK`, ties share the same rank; the next rank does **not** skip (1, 2, 2, 3).
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE results (name TEXT, score INTEGER);
 INSERT INTO results VALUES
   ('Alice', 90), ('Bob', 85), ('Carol', 85), ('Dave', 80),
@@ -454,7 +455,9 @@ FROM orders
 GROUP BY region;
 ```
 
-Some engines (SQL Server, BigQuery, DuckDB) offer a native `PIVOT` syntax.
+Some engines (SQL Server, BigQuery, Snowflake, DuckDB) offer a native `PIVOT`
+syntax. Postgres has none, but its `FILTER` clause shortens each column to
+`SUM(amount) FILTER (WHERE category = 'A') AS cat_a`.
 
 ### What does GROUP BY ALL or GROUP BY with ROLLUP do?
 
@@ -557,10 +560,12 @@ CROSS JOIN regions r;
 ### How do you calculate a running total in SQL?
 
 Use `SUM` as a window function with `ORDER BY` inside `OVER`. By default
-the frame is `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`.
+the frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`, so rows tied
+on the `ORDER BY` value share one total. Write `ROWS BETWEEN UNBOUNDED
+PRECEDING AND CURRENT ROW` when the total must move strictly row by row.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE transactions (date DATE, amount DECIMAL(8,2));
 INSERT INTO transactions VALUES
   ('2024-01-01', 100.00),
@@ -625,7 +630,7 @@ FROM transactions;`}
 ## Challenges
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Total revenue per region"
   instructions={`The table \`orders\` has columns \`id\`, \`region\`, \`category\`, and \`amount\`. Return the **total revenue per region**: two columns, \`region\` and \`revenue\` (the summed \`amount\`), sorted by \`revenue\` descending.`}
   initSql={`CREATE TABLE orders AS
@@ -666,7 +671,7 @@ JOIN`. Six of the 24 customers have never ordered, and they still have
 to appear in your answer.
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Total spend per customer, including zero"
   instructions={`Two tables are loaded: \`customers\` (\`id\`, \`name\`, \`region\`) and \`orders\` (\`id\`, \`customer_id\`, \`amount\`). Return **every** customer with their total order \`amount\`, including customers who placed **no** orders, which should show \`0\`. Columns: \`name\`, \`total\`. Sort by \`total\` descending.`}
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES

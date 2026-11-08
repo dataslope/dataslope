@@ -98,7 +98,7 @@ export const HookScene: React.FC = () => {
               }}
             />
             <Note at={b.valueAt - 2} x={xOf(HOOK.train) + 18} y={y(b.top) + h(8)}>
-              <span style={{ ...note(38, BLUE_INK), fontWeight: 700, ...TABULAR }}>{Math.round(b.v * 100)}%</span>
+              <span style={{ ...note(34, BLUE_INK), fontWeight: 500, ...TABULAR }}>{Math.round(b.v * 100)}%</span>
             </Note>
           </React.Fragment>
         ))}
@@ -118,7 +118,7 @@ export const HookScene: React.FC = () => {
           <line x1={xOf(HOOK.train)} x2={xOf(HOOK.train)} y1={y(TRAIN_Y) + h(BAR_H)} y2={y(TEST_Y)} stroke={ACCENT} strokeWidth={1.6} strokeDasharray="3 5" />
         </Svg>
         <Note at={gapAt + 4} x={xOf(HOOK.train) - 210} y={y(TEST_Y) + h(BAR_H) + h(14)} width={200} align="right" from="up">
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: `scale(${1 + 0.08 * swell})` }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: `scale(${1 + 0.08 * swell})` }}>
             the gap
           </span>
         </Note>
@@ -171,7 +171,7 @@ export const HookScene: React.FC = () => {
         })}
         {Array.from({ length: TOTAL }, (_, i) => (
           <Note key={i} at={fifteenAt + i * 1.4} x={X0 + i * (TILE + TILE_GAP)} y={y(TILES_Y) + h(TILE) + h(8)} width={TILE} style={{ textAlign: "center" }} dim={firstAt + 4}>
-            <span style={{ ...label(20, i === 0 && frame >= firstAt ? INK : INK_SOFT), ...TABULAR, fontWeight: 650 }}>{i + 1}</span>
+            <span style={{ ...label(24, i === 0 && frame >= firstAt ? INK : INK_SOFT), ...TABULAR, fontWeight: 500 }}>{i + 1}</span>
           </Note>
         ))}
         <Note at={realAt - 2} x={X0} y={y(TILES_Y) + h(96)} dim={firstAt + 4}>

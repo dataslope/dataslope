@@ -105,7 +105,7 @@ export const HookScene: React.FC = () => {
 
         {/* ── The log and the memory, one scale ── */}
         <Note at={logAt - 2} x={X0} y={logTop - h(42)}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             the log <span style={{ color: BLUE_INK }}>50 GB</span>
           </span>
         </Note>
@@ -136,7 +136,7 @@ export const HookScene: React.FC = () => {
 
         {/* Under its box, so the lines the for loop drops in never cross it. */}
         <Note at={memAt - 2} x={X0} y={memTop + barH + h(10)}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
             memory <span style={{ color: INK_SOFT }}>8 GB</span>
           </span>
         </Note>
@@ -185,7 +185,7 @@ export const HookScene: React.FC = () => {
           }}
         />
         <Note at={fitAt} x={X0 + logW + 24} y={memTop + barH / 2 - h(16)} out={lineAt - 6}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>can&apos;t fit</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>can&apos;t fit</span>
         </Note>
 
         {/* The for loop: one line at a time */}
@@ -218,13 +218,13 @@ export const HookScene: React.FC = () => {
           </>
         ) : null}
         <Note at={holdsAt} x={X0 + memW + 24} y={memTop + barH / 2 - h(16)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>memory holds one line</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>memory holds one line</span>
         </Note>
 
         {/* ── The two reads, in code ── */}
         <Note at={wholeAt} x={X0} y={y(CODE_Y)} out={eighteenAt - 6}>
           <span style={{ display: "flex", alignItems: "baseline", gap: 40, whiteSpace: "nowrap" }}>
-            <span style={{ fontSize: 30 }}>
+            <span style={{ fontSize: 28 }}>
               <Strike at={fitAt + 2}>
                 <Code line={wholeLine} size={30} />
               </Strike>
@@ -243,7 +243,7 @@ export const HookScene: React.FC = () => {
 
         {/* ── The count, then the choice the first question opens on ── */}
         <Note at={eighteenAt} x={X0} y={y(COUNT_Y)} out={choiceAt - 6}>
-          <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(34, INK), whiteSpace: "nowrap" }}>
             18 questions: <Mark at={workedAt}>14 worked through</Mark>, <Mark at={quickAt}>4 quickly</Mark>
           </span>
         </Note>

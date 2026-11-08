@@ -119,15 +119,15 @@ export const HeightScene: React.FC = () => {
           </Svg>
           {[...FINE, ...COARSE].map((v) =>
             tickAlpha(v) > 0 ? (
-              <div key={v} style={{ position: "absolute", right: 1920 - (X.x0 - 14), top: py(v) - 13, opacity: tickAlpha(v), ...note(20, INK_SOFT) }}>
+              <div key={v} style={{ position: "absolute", right: 1920 - (X.x0 - 14), top: py(v) - 13, opacity: tickAlpha(v), ...note(24, INK_SOFT) }}>
                 {fmt(v, 1)}
               </div>
             ) : null,
           )}
           {/* The axis is a height until the narration names it a density. */}
           <Ink at={uniformFrom + 8} dur={14} style={{ left: X.x0 - 60, top: base - h(TOP_PX + 64), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(20, INK_SOFT), opacity: 1 - named }}>height</span>
-            <span style={{ ...label(20, INK_SOFT), opacity: named, position: "absolute", left: 40, top: 40 }}>density</span>
+            <span style={{ ...label(24, INK_SOFT), opacity: 1 - named }}>height</span>
+            <span style={{ ...label(24, INK_SOFT), opacity: named, position: "absolute", left: 40, top: 40 }}>density</span>
           </Ink>
           <Axis scale={X} base={base} ticks={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} at={uniformFrom + 2} />
 
@@ -136,7 +136,7 @@ export const HeightScene: React.FC = () => {
             <line x1={X.x0} x2={X.x1} y1={py(1)} y2={py(1)} stroke={INK} strokeWidth={1.6} strokeDasharray="6 6" opacity={0.6} />
           </Svg>
           <Note at={climbAt} x={X.x1} y={py(1) - 36} align="right">
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>1, the most a probability can be</span>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>1, the most a probability can be</span>
           </Note>
 
           {/* The block. */}
@@ -166,7 +166,7 @@ export const HeightScene: React.FC = () => {
 
           {/* Labels on the flat block. */}
           <Note at={pointOneAt - 4} x={sx(X, 8.2)} y={py(UNIFORM.pdf) - 44} out={squeezeAt - 6}>
-            <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>height {fmt(UNIFORM.pdf, 1)}</span>
+            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>height {fmt(UNIFORM.pdf, 1)}</span>
           </Note>
           <Bracket
             x0={sx(X, UNIFORM.a)}
@@ -189,10 +189,10 @@ export const HeightScene: React.FC = () => {
 
           {/* The squeeze, read live. */}
           <Ink at={squeezeAt + 4} dur={14} style={{ left: PANEL_X - 40, top: y(430), whiteSpace: "nowrap" }}>
-            <span style={label(22, INK_SOFT)}>width × height</span>
+            <span style={label(24, INK_SOFT)}>width × height</span>
           </Ink>
           <Ink at={squeezeAt + 8} dur={14} style={{ left: PANEL_X - 40, top: y(470), whiteSpace: "nowrap" }}>
-            <span style={{ ...note(32, INK), fontWeight: 650 }}>
+            <span style={{ ...note(34, INK), fontWeight: 500 }}>
               <span style={TABULAR}>{fmt(width, 2)}</span> × <span style={TABULAR}>{fmt(height, 2)}</span>
             </span>
           </Ink>
@@ -200,7 +200,7 @@ export const HeightScene: React.FC = () => {
             <span style={{ ...askNote(32), opacity: 1 - areaFlash * 0.3 }}>= area 1</span>
           </Ink>
           <Note at={twoAt - 2} x={sx(X, UNIFORM.narrowScale) + 22} y={py(UNIFORM.narrowPdf) - 16}>
-            <span style={{ ...note(26, INK), fontWeight: 700, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
               height {fmt(UNIFORM.narrowPdf, 0)}
             </span>
           </Note>
@@ -210,7 +210,7 @@ export const HeightScene: React.FC = () => {
             </span>
           </Note>
           <Note at={densityAt} x={sx(X, UNIFORM.narrowScale) + 22} y={py(UNIFORM.narrowPdf) + 74}>
-            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
               a density: probability <span style={{ opacity: ease(frame, n.word("density", "per unit") - 4, 10) }}>per unit of width</span>
             </span>
           </Note>
