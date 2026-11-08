@@ -9,10 +9,11 @@ import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { MONTY } from "./data";
-import { DATA, DATA_INK, FAINT, GOLD, GOLD_INK, Headline, lerp, ROOM, STAT, STAT_INK, Svg } from "./parts";
+import { DATA, DATA_INK, DOOR_ASPECT, GOLD, GOLD_INK, Headline, lerp, PaintedDoor, STAT, STAT_INK, Svg } from "./parts";
 
 /** The three cases, one row each: where the car is, given you picked door 1. */
 const ROWS = [350, 530, 710];
+/** Each case's three doors, painted (PaintedDoor), in slots `w` wide. */
 const MINI = { x: [430, 545, 660], w: 88, h: 104 } as const;
 const RESULT_X = 810;
 /** Which door the host opens in each case, and where the car is. */
@@ -124,25 +125,40 @@ export const CasesScene: React.FC = () => {
               <span style={{ ...note(24, INK) }}>Car behind {c.car + 1}</span>
               <div style={{ ...note(21, INK_SOFT), opacity: ease(frame, stayWins ? oneInAt - 2 : otherAt + 4, 10) }}>1 in 3</div>
             </Ink>
+            {/* The painted doors: the host's swings open onto its dark room;
+                the car's flashes gold; the one he leaves shut glows gold. */}
+            {MINI.x.map((x, d) => (
+              <PaintedDoor
+                key={d}
+                cx={x + MINI.w / 2}
+                top={ry}
+                height={h(MINI.h)}
+                open={d === c.opens ? open : 0}
+                opacity={ease(frame, at, 12)}
+                tint={GOLD}
+                tintAmount={d === c.car ? carFlash * 0.85 : 0}
+              />
+            ))}
             <Svg opacity={ease(frame, at, 12)}>
               {MINI.x.map((x, d) => {
-                const isOpen = d === c.opens ? open : 0;
-                const leaf = lerp(MINI.w, MINI.w * 0.18, isOpen);
+                const dw = h(MINI.h) * DOOR_ASPECT;
+                const ring = (stroke: string, width: number, opacity = 1) => (
+                  <rect
+                    x={x + MINI.w / 2 - dw / 2 - 7}
+                    y={ry - 7}
+                    width={dw + 14}
+                    height={h(MINI.h) + 14}
+                    rx={8}
+                    fill="none"
+                    stroke={stroke}
+                    strokeWidth={width}
+                    opacity={opacity}
+                  />
+                );
                 return (
                   <g key={d}>
-                    <rect x={x} y={ry} width={MINI.w} height={h(MINI.h)} fill={d === c.car ? GOLD : ROOM} />
-                    <rect
-                      x={x}
-                      y={ry}
-                      width={leaf}
-                      height={h(MINI.h)}
-                      rx={3}
-                      fill={FAINT}
-                      stroke={d === shutDoor ? `color-mix(in srgb, ${GOLD} ${Math.round(glow * 100)}%, ${INK})` : INK}
-                      strokeWidth={d === shutDoor ? lerp(1.6, 4, glow) : 1.6}
-                    />
-                    {d === c.car && carFlash > 0 ? <rect x={x} y={ry} width={leaf} height={h(MINI.h)} rx={3} fill={GOLD} opacity={carFlash * 0.75} /> : null}
-                    {d === 0 ? <rect x={x - 7} y={ry - 7} width={MINI.w + 14} height={h(MINI.h) + 14} rx={8} fill="none" stroke={STAT} strokeWidth={2.6} /> : null}
+                    {d === shutDoor && glow > 0 ? ring(GOLD, lerp(1.6, 4, glow), glow) : null}
+                    {d === 0 ? ring(STAT, 2.6) : null}
                   </g>
                 );
               })}
@@ -154,7 +170,7 @@ export const CasesScene: React.FC = () => {
                 style={{
                   position: "absolute",
                   left: x + MINI.w / 2,
-                  top: ry + h(MINI.h) + 8,
+                  top: ry + h(MINI.h) + 12,
                   transform: "translateX(-50%)",
                   opacity: ease(frame, d === 0 && !stayWins ? goatAt - 2 : at + 6, 10),
                   ...note(19, d === c.car ? GOLD_INK : INK_SOFT),

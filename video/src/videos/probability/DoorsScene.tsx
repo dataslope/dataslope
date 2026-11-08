@@ -1,17 +1,22 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { arrowHead, cubicPath, sampleCubic, type Cubic } from "../../components/arrow";
+import { Illustration } from "../../components/Illustration";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { mulberry32 } from "./data";
-import { DATA, DATA_INK, FAINT, GOLD_INK, Headline, Kicker, lerp, ROOM, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { mulberry32, VIDEO } from "./data";
+import { DATA, DATA_INK, DOOR_ASPECT, DOORWAY_X, GOLD_INK, Headline, Kicker, PaintedDoor, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 const DOOR = { x: [200, 520, 840], w: 240, top: 410, h: 360 } as const;
-/** The letters that poured in, as a small heap of envelopes. */
+/** How far your pick's ring stands off the painted frame. */
+const RING = 14;
+/** The letters that poured in, as a small heap of painted envelopes
+ *  (probability-letter, 1320x862). */
+const LETTER = { w: 58, h: Math.round((58 * 862) / 1320) } as const;
 const LETTERS = (() => {
   const r = mulberry32(1990);
   return Array.from({ length: 14 }, (_, i) => ({
@@ -22,7 +27,8 @@ const LETTERS = (() => {
   }));
 })();
 
-/** A door, drawn as a panel with a knob, that can swing open on `open`. */
+/** A painted door (PaintedDoor) in its slot, its number over it, that can
+ *  swing open on `open`; the ring round it marks your pick. */
 const Door: React.FC<{ x: number; top: number; w: number; h: number; at: number; open?: number; pick?: number; n: number }> = ({
   x,
   top,
@@ -36,22 +42,27 @@ const Door: React.FC<{ x: number; top: number; w: number; h: number; at: number;
   const frame = useCurrentFrame();
   const p = ease(frame, at, 16);
   if (p <= 0) return null;
-  const leaf = lerp(w, w * 0.16, open);
+  const cx = x + w / 2;
+  const dw = h * DOOR_ASPECT;
   return (
     <>
-      <Svg opacity={p}>
-        {/* The frame, and the dark room behind the leaf: dark enough that an
-            open door never reads as a closed one. */}
-        <rect x={x - 8} y={top - 8} width={w + 16} height={h + 8} rx={10} fill="none" stroke={INK} strokeWidth={2.4} />
-        <rect x={x} y={top} width={w} height={h} fill={ROOM} />
-        <rect x={x} y={top} width={leaf} height={h} rx={4} fill={FAINT} stroke={INK} strokeWidth={2} />
-        {/* The knob goes with the swing, before the leaf is edge on. */}
-        {open < 0.5 ? <circle cx={x + leaf - 26 * (leaf / w)} cy={top + h * 0.54} r={8 * (leaf / w)} fill={INK} opacity={1 - open * 2} /> : null}
-        {pick > 0 ? (
-          <rect x={x - 18} y={top - 18} width={w + 36} height={h + 28} rx={16} fill="none" stroke={STAT} strokeWidth={4} opacity={pick} />
-        ) : null}
-      </Svg>
-      <div style={{ position: "absolute", left: x + w / 2, top: top - 74, transform: "translateX(-50%)", opacity: p, ...headline(48), color: INK }}>{n}</div>
+      <PaintedDoor cx={cx} top={top} height={h} open={open} opacity={p} />
+      {pick > 0 ? (
+        <Svg>
+          <rect
+            x={cx - dw / 2 - RING}
+            y={top - RING}
+            width={dw + 2 * RING}
+            height={h + 2 * RING}
+            rx={16}
+            fill="none"
+            stroke={STAT}
+            strokeWidth={4}
+            opacity={pick}
+          />
+        </Svg>
+      ) : null}
+      <div style={{ position: "absolute", left: cx, top: top - 74, transform: "translateX(-50%)", opacity: p, ...headline(48), color: INK }}>{n}</div>
     </>
   );
 };
@@ -118,22 +129,23 @@ export const DoorsScene: React.FC = () => {
       {DOOR.x.map((x, i) => (
         <Door key={i} n={i + 1} x={x} top={top} w={DOOR.w} h={dh} at={threeAt - 4 + i * 5} open={i === 2 ? open3 : 0} pick={i === 0 ? pick : 0} />
       ))}
-      <Ink at={carAt - 2} dur={16} style={{ left: DOOR.x[0], top: top + dh + 30, whiteSpace: "nowrap" }}>
+      <Ink at={carAt - 2} dur={16} style={{ left: DOOR.x[0], top: top + dh + 42, whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK) }}>
           Behind them: <b style={{ color: GOLD_INK }}>a car</b>
           <span style={{ opacity: ease(frame, goatsAt - 4, 10) }}>, and two goats</span>
         </span>
       </Ink>
-      <Note at={pickAt + 4} x={DOOR.x[0] + DOOR.w / 2} y={top + dh / 2 - 18} from="up">
+      {/* High on the door, well clear of its knob. */}
+      <Note at={pickAt + 4} x={DOOR.x[0] + DOOR.w / 2} y={top + dh * 0.28} from="up">
         <span style={{ ...label(24, STAT_INK), display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap", background: PAPER, padding: "2px 10px", borderRadius: 6 }}>
           your pick
         </span>
       </Note>
-      {/* What the open door shows. */}
-      <Note at={goatAt} x={DOOR.x[2] + DOOR.w * 0.58} y={top + dh * 0.44} from="up">
+      {/* What the open door shows, in the middle of its dark doorway. */}
+      <Note at={goatAt} x={DOOR.x[2] + DOOR.w / 2 + (DOORWAY_X - 0.5) * dh * DOOR_ASPECT} y={top + dh * 0.44} from="up">
         <span style={{ ...label(28, PAPER), display: "inline-block", transform: "translateX(-50%)" }}>goat</span>
       </Note>
-      <Ink at={hostAt - 2} dur={14} style={{ left: DOOR.x[0], top: top + dh + 80, whiteSpace: "nowrap" }}>
+      <Ink at={hostAt - 2} dur={14} style={{ left: DOOR.x[0], top: top + dh + 94, whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK_SOFT) }}>The host knows where the car is, and opens a door with a goat.</span>
       </Ink>
       <Svg>
@@ -164,21 +176,29 @@ export const DoorsScene: React.FC = () => {
           Switch:<span style={{ opacity: ease(frame, twoAt - 4, 12) }}> it wins two times in three.</span>
         </span>
       </Ink>
-      <Svg>
-        {LETTERS.map((l, i) => {
-          const p = pop(frame, thousandsAt - 2 + i * 1.4 + l.jit, fps, 14);
-          if (p <= 0.001) return null;
-          const ex = 1270 + l.dx;
-          const ey = y(820) + l.dy;
-          return (
-            <g key={i} transform={`translate(${ex},${ey - (1 - Math.min(1, p)) * 30}) rotate(${l.rot})`} opacity={Math.min(1, p)}>
-              <rect x={-26} y={-17} width={52} height={34} rx={3} fill={PAPER} stroke={INK} strokeWidth={1.8} />
-              <path d="M-26,-17 L0,4 L26,-17" fill="none" stroke={INK} strokeWidth={1.6} strokeLinejoin="round" />
-            </g>
-          );
-        })}
-      </Svg>
-      <Note at={wrongAt - 4} x={1250} y={y(860)}>
+      {LETTERS.map((l, i) => {
+        const p = pop(frame, thousandsAt - 2 + i * 1.4 + l.jit, fps, 14);
+        if (p <= 0.001) return null;
+        const ex = 1270 + l.dx;
+        const ey = y(820) + l.dy;
+        return (
+          <Illustration
+            key={i}
+            video={VIDEO}
+            id="probability-letter"
+            style={{
+              position: "absolute",
+              left: ex - LETTER.w / 2,
+              top: ey - LETTER.h / 2,
+              width: LETTER.w,
+              height: LETTER.h,
+              opacity: Math.min(1, p),
+              transform: `translateY(${-(1 - Math.min(1, p)) * 30}px) rotate(${l.rot}deg)`,
+            }}
+          />
+        );
+      })}
+      <Note at={wrongAt - 4} x={1250} y={y(860) + 18}>
         <span style={{ ...note(23, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>Thousands of letters: she&apos;s wrong.</span>
       </Note>
     </AbsoluteFill>
