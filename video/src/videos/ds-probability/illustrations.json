@@ -9,7 +9,8 @@
     },
     "sizes": {
       "video-hero": "1536x1024",
-      "video-icon": "1024x1024"
+      "video-icon": "1024x1024",
+      "video-page": "1024x1536"
     },
     "styles": {
       "watercolor illustration": {
@@ -42,6 +43,12 @@
       "category": "video-hero",
       "style": "watercolor illustration",
       "subject": "one classic tall top hat seen from the front at a slight angle, its tall straight crown washed in deep red with a broad yellow band around its base, sitting on a wide brim that curls up a little at both sides"
+    },
+    {
+      "id": "ds-probability-person",
+      "category": "video-page",
+      "style": "watercolor illustration",
+      "subject": "one simple, bold stylized person standing upright on their own, seen straight from the front, shaped like a chunky peg doll: a large smooth round head washed in brand blue, set just above a broad rounded body with soft sloping shoulders that widens gently down to a flat rounded hem, the arms only suggested as soft folds resting at its sides, the body washed in a deeper brand blue with a few soft blooms of green pooling inside the wash, the whole figure a compact, chunky silhouette about twice as tall as it is wide"
     }
   ]
 }

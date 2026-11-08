@@ -9,7 +9,10 @@ import { Sfx } from "../../sound/Sfx";
 import { BDAY } from "./data";
 import { Card, DATA, DATA_LIGHT, Drift, Headline, Kicker, mulberry32, Person, pulse, Spot, Svg, X0 } from "./parts";
 
-const ROOM = { x: X0, y: 300, w: 560, h: 380 };
+/** The room, wide enough that its painted people (PEOPLE_H tall) stand
+ *  with a clear gap round each one. */
+const ROOM = { x: X0, y: 300, w: 620, h: 400 };
+const PEOPLE_H = 54;
 const BAR_Y = 742;
 const BAR_PX = 4;
 const CARD = { w: 100, h: 140, pitch: 118, y: 380 };
@@ -18,17 +21,19 @@ const WORKED = 12;
 const TOTAL = 14;
 const SET_ASIDE = 70;
 
-/** Where each of the room's twenty-three people stands, the same on every
- *  frame: a loose grid, nudged, and kept a shoulder's width (32px) inside the
- *  room's right wall, which the odd rows' last column could otherwise touch. */
+/** Where each of the room's twenty-three people stands (the middle of the
+ *  painting), the same on every frame: a loose grid, nudged, and kept 36px
+ *  inside the room's right wall, which the odd rows' last column could
+ *  otherwise touch. Any two people are at least 20px apart, and every one
+ *  at least 21px inside the walls. */
 const SPOTS = (() => {
   const r = mulberry32(23);
   const out: [number, number][] = [];
   for (let i = 0; i < BDAY.people; i++) {
     const col = i % 6;
     const row = Math.floor(i / 6);
-    const x = ROOM.x + 60 + col * 88 + (r() - 0.5) * 34 + (row % 2) * 30;
-    out.push([Math.min(x, ROOM.x + ROOM.w - 32), ROOM.y + 70 + row * 82 + (r() - 0.5) * 22]);
+    const x = ROOM.x + 64 + col * 96 + (r() - 0.5) * 30 + (row % 2) * 34;
+    out.push([Math.min(x, ROOM.x + ROOM.w - 36), ROOM.y + 74 + row * 86 + (r() - 0.5) * 18]);
   }
   return out;
 })();
@@ -66,6 +71,7 @@ export const HookScene: React.FC = () => {
   const roomOut = definitionsAt;
   const hold = pulse(frame, holdAt, 30) + pulse(frame, settleAt, 24) * 0.6;
   const roomLine = ease(frame, peopleAt - 4, 16);
+  const roomIn = 1 - ease(frame, roomOut, 12);
   const bar23 = ease(frame, tinyAt, 14);
   const bar365 = ease(frame, daysAt, 24);
   const barsOut = ease(frame, roomOut, 12);
@@ -86,7 +92,7 @@ export const HookScene: React.FC = () => {
         <Spot id="ds-probability-rabbit" at={from + 4} out={fourteenAt - 8} left={1200} top={y(270)} width={600} height={440} />
 
         {/* ── The room ── */}
-        <Svg opacity={1 - ease(frame, roomOut, 12)}>
+        <Svg opacity={roomIn}>
           <rect
             x={ROOM.x}
             y={y(ROOM.y)}
@@ -99,11 +105,11 @@ export const HookScene: React.FC = () => {
             pathLength={1}
             strokeDasharray={`${roomLine} 1`}
           />
-          {SPOTS.map(([px, py], i) => {
-            const p = ease(frame, peopleAt + i * 1.2, 10);
-            return p > 0 ? <Person key={i} x={px} y={y(py)} size={44 * p} color={DATA} opacity={p} /> : null;
-          })}
         </Svg>
+        {SPOTS.map(([px, py], i) => {
+          const p = ease(frame, peopleAt + i * 1.2, 10);
+          return p > 0 ? <Person key={i} x={px} y={y(py)} height={PEOPLE_H * p} opacity={p * roomIn} /> : null;
+        })}
         <Note at={peopleAt + 30} x={ROOM.x + ROOM.w + 30} y={y(ROOM.y + 20)} out={roomOut}>
           <span style={{ ...label(26, INK), ...TABULAR, whiteSpace: "nowrap" }}>{BDAY.people} people</span>
         </Note>

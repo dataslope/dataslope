@@ -10,7 +10,10 @@ import { Sfx } from "../../sound/Sfx";
 import { BDAY, pct } from "./data";
 import { at, Axes, DATA, DATA_LIGHT, Drift, math, OK, OK_INK, Person, pulse, type Scale, Svg } from "./parts";
 
-const RING = { cx: 470, cy: 590, r: 230 };
+/** The ring the room's people stand on, and how tall each painted person
+ *  is: a paper disc (`disc` radius) keeps the chords off each one, and the
+ *  discs stay 18px apart round the ring. */
+const RING = { cx: 470, cy: 590, r: 245, person: 40, disc: 24 };
 const PLOT = { left: 1000, right: 1780, top: 400, base: 800 };
 
 /** Every pair of the room's people, in the order they are drawn. */
@@ -101,14 +104,14 @@ export const BdayScene: React.FC = () => {
           {Array.from({ length: BDAY.people }, (_, i) => {
             const p = ease(frame, textAt + i * 0.8, 10);
             const [x, py] = spot(i);
-            return p > 0 ? (
-              <g key={i}>
-                <circle cx={x} cy={py} r={22 * p} fill={PAPER} />
-                <Person x={x} y={py + 4} size={34 * p} color={DATA} />
-              </g>
-            ) : null;
+            return p > 0 ? <circle key={i} cx={x} cy={py} r={RING.disc * p} fill={PAPER} /> : null;
           })}
         </Svg>
+        {Array.from({ length: BDAY.people }, (_, i) => {
+          const p = ease(frame, textAt + i * 0.8, 10);
+          const [x, py] = spot(i);
+          return p > 0 ? <Person key={i} x={x} y={py} height={RING.person * p} /> : null;
+        })}
         <Note at={yesAt} x={90} y={y(320)}>
           <span style={{ ...note(40, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Yes, just.</span>
         </Note>

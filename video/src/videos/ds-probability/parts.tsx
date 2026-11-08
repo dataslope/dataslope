@@ -12,7 +12,7 @@ import { ILLUSTRATIONS, VIDEO } from "./data";
  * (editorial/interview.tsx). The page furniture and the plotting pieces come
  * from the Data Analyst statistics part (Axes, Dots, VLine, Bracket), so the
  * two series stay one family; what is new is probability's own vocabulary:
- * notation set as math, a die face, a dealt card, and a door.
+ * notation set as math, a die face, a dealt card, and a painted person.
  */
 export {
   at,
@@ -232,21 +232,32 @@ export const Card: React.FC<{
   );
 };
 
-// ── A person, drawn as a token ───────────────────────────────────────────────
+// ── A person, painted ────────────────────────────────────────────────────────
 
-/** A head and shoulders in one ink, `size` tall, for a crowd or a room. */
-export const Person: React.FC<{ x: number; y: number; size: number; color: string; opacity?: number }> = ({
-  x,
-  y,
-  size,
-  color,
-  opacity = 1,
-}) => (
-  <g transform={`translate(${x},${y}) scale(${size / 40})`} opacity={opacity}>
-    <circle cx={0} cy={-12} r={8.5} fill={color} />
-    <path d="M -14 16 Q -14 -1 0 -1 Q 14 -1 14 16 Z" fill={color} />
-  </g>
-);
+/**
+ * The painted person (ds-probability-person, 831x1535): one figure, in data
+ * blue, for every person in the video, so a crowd is one painting repeated.
+ * Its head, as fractions of the painting: the top of the head, the neck
+ * under it, its center and its width.
+ */
+export const PERSON = { w: 831, h: 1535, head: { top: 0.02, neck: 0.378, cx: 0.498, w: 0.708 } } as const;
+
+/** How wide the painted person is when it is `height` tall. */
+export const personWidth = (height: number) => (height * PERSON.w) / PERSON.h;
+
+/** The painted person, `height` tall, centered on (x, y). It is HTML, not
+ *  SVG, so it sits after (over) any Svg it stands on. */
+export const Person: React.FC<{ x: number; y: number; height: number; opacity?: number }> = ({ x, y, height, opacity = 1 }) => {
+  if (height <= 0 || opacity <= 0) return null;
+  const width = personWidth(height);
+  return (
+    <Illustration
+      video={VIDEO}
+      id="ds-probability-person"
+      style={{ position: "absolute", left: x - PERSON.head.cx * width, top: y - height / 2, width, height, opacity }}
+    />
+  );
+};
 
 // ── Spot illustrations ───────────────────────────────────────────────────────
 
