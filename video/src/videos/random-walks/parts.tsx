@@ -4,7 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HAIRLINE, headline, INK, INK_SOFT, note } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, headline, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -154,7 +154,7 @@ export const Headline: React.FC<{ first: string; second: string; at: number; sec
         at={secondAt}
         dur={18}
         out={out}
-        style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
       >
         {second}
       </Ink>

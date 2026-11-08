@@ -115,7 +115,7 @@ export const MorphScene: React.FC = () => {
         <Ink
           at={dropsAt - 4}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           the leader drops to zero.
         </Ink>

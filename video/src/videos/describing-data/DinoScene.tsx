@@ -130,7 +130,7 @@ export const DinoScene: React.FC = () => {
         <Ink at={dinoFrom - 4} dur={20} out={lossyFrom - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Same numbers.
         </Ink>
-        <Ink at={plotAt - 2} dur={18} out={lossyFrom - 6} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={plotAt - 2} dur={18} out={lossyFrom - 6} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           Different pictures.
         </Ink>
       </div>

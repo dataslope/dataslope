@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, fmt, headline, INK, INK_SOFT, note } from "../../editorial/style";
+import { fmt, headline, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { FIT_INK, ILLUSTRATIONS, MAX_DEGREE, N_TEST, NEW_INK, row, VIDEO } from "./data";
@@ -30,7 +30,7 @@ export const RuleScene: React.FC = () => {
       <Ink
         at={seenAt - 8}
         dur={20}
-        style={{ left: 114, top: y(448), ...headline(92, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 114, top: y(448), ...headline(92, true), color: INK, whiteSpace: "nowrap" }}
       >
         it has never seen.
       </Ink>

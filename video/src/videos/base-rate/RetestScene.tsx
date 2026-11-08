@@ -49,7 +49,6 @@ export const RetestScene: React.FC = () => {
         firstAt={start - 6}
         secondAt={elevenAt - 2}
         out={ruleAt - 10}
-        secondColor={COLOR_INK.hasIt}
       />
       <Headline
         top={y(104)}

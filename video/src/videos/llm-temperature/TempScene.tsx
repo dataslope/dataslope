@@ -67,7 +67,7 @@ export const TempScene: React.FC = () => {
         <Ink at={start - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Temperature divides the scores
         </Ink>
-        <Ink at={beforeAt - 2} dur={18} style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={beforeAt - 2} dur={18} style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}>
           before the softmax.
         </Ink>
       </div>

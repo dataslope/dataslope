@@ -3,7 +3,7 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, fmt, headline as headlineStyle, HIGHLIGHT, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
+import { ACCENT, BAR, fmt, headline as headlineStyle, HIGHLIGHT, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
 import { H, Ink, W } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -99,7 +99,7 @@ export const Headline: React.FC<{
         {children}
       </Ink>
       {italic !== undefined && second !== undefined ? (
-        <Ink at={second} dur={18} out={out} style={{ position: "relative", ...headlineStyle(size, true), color: ACCENT_INK }}>
+        <Ink at={second} dur={18} out={out} style={{ position: "relative", ...headlineStyle(size, true), color: INK }}>
           {italic}
         </Ink>
       ) : null}

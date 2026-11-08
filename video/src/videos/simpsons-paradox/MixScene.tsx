@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { ds, type Step } from "../../theme/brand";
@@ -95,7 +95,7 @@ export const MixScene: React.FC = () => {
         <Ink
           at={worseAt - 2}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           worse overall?
         </Ink>

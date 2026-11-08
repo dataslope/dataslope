@@ -119,7 +119,7 @@ export const RuleScene: React.FC = () => {
           A window function, <Mono weight={600}>OVER (…)</Mono>
         </div>
         {/* Broken by hand, so no face leaves "it." alone on a line. */}
-        <div style={{ ...headline(74, true), color: ACCENT_INK, marginTop: 22, lineHeight: 1.1 }}>
+        <div style={{ ...headline(74, true), color: INK, marginTop: 22, lineHeight: 1.1 }}>
           <div>Every row,</div>
           <div>with its group beside it.</div>
         </div>

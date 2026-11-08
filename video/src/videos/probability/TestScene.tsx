@@ -124,7 +124,7 @@ export const TestScene: React.FC = () => {
 
       <Kicker at={testFrom - 10}>Bayes and the 99% test</Kicker>
       <Headline top={y(150)} first="A 99% accurate test" second="says positive." firstAt={testFrom - 6} secondAt={positiveAt - 4} out={lineupAt - 8} />
-      <Headline top={y(150)} first={`Of ${num(TEST.positives)} positives,`} second={`${TEST.tp} are sick.`} firstAt={lineupAt - 2} secondAt={sickAt - 4} secondColor={DATA_INK} />
+      <Headline top={y(150)} first={`Of ${num(TEST.positives)} positives,`} second={`${TEST.tp} are sick.`} firstAt={lineupAt - 2} secondAt={sickAt - 4} />
 
       {/* ── The facts, and the two answers ── */}
       <div style={{ opacity: 1 - factsOut }}>

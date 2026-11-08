@@ -83,7 +83,6 @@ export const CrowdScene: React.FC = () => {
         firstAt={start - 6}
         secondAt={tenAt - 2}
         out={pullAt - 10}
-        secondColor={COLOR_INK.hasIt}
       />
       <Headline
         top={y(104)}
@@ -91,7 +90,6 @@ export const CrowdScene: React.FC = () => {
         second={`only 1 in ${ONE_IN} has it.`}
         firstAt={pullAt}
         secondAt={elevenAt - 2}
-        secondColor={COLOR_INK.hasIt}
       />
 
       <FigLabel n="1" title="Ten thousand people, one mark each" at={start} x={120} y={y(196)} out={pullAt - 6} />

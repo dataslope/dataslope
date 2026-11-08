@@ -166,7 +166,7 @@ export const GeorgetownScene: React.FC = () => {
         </Tag>
         {/* Dostert's forecast, over the years it named. */}
         <Ink at={predictedAt} style={{ left: sx(X, demoYear + 3), top: AXIS - 128, whiteSpace: "nowrap" }}>
-          <div style={{ ...headline(38, true), color: ACCENT_INK }}>
+          <div style={{ ...headline(38, true), color: INK }}>
             &ldquo;{"\u2009"}<Mark at={fiveAt - 2}>five</Mark>, perhaps <Mark at={threeAt}>three</Mark>, years hence&rdquo;
           </div>
           <div style={{ ...label(20, INK_SOFT), marginTop: 6 }}>Leon Dostert, one of its leaders</div>

@@ -144,7 +144,7 @@ export const SqlScene: React.FC = () => {
             opacity: question * (1 - ease(frame, lanesOut, 10)),
             transform: `scale(${0.6 + 0.4 * Math.min(1, pop(frame, fastAt - 2, fps, 12))})`,
             ...headline(54, true),
-            color: ACCENT_INK,
+            color: INK,
           }}
         >
           ?

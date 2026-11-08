@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
 import { Ink, Num, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -91,10 +91,10 @@ export const SeriesScene: React.FC = () => {
           <Ink at={elevenAt - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
             Eleven videos,
           </Ink>
-          <Ink at={totalAt} dur={18} style={{ position: "relative", ...headline(62, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+          <Ink at={totalAt} dur={18} style={{ position: "relative", ...headline(62, true), color: INK, whiteSpace: "nowrap" }}>
             {QUESTIONS} questions,
           </Ink>
-          <Ink at={onceAt} dur={18} style={{ position: "relative", ...headline(62, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+          <Ink at={onceAt} dur={18} style={{ position: "relative", ...headline(62, true), color: INK, whiteSpace: "nowrap" }}>
             each answered once.
           </Ink>
         </div>

@@ -112,7 +112,7 @@ export const LeversScene: React.FC = () => {
       <Ink
         at={waysAt + 6}
         dur={18}
-        style={{ left: 112, top: y(188), ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 112, top: y(188), ...headline(64, true), color: INK, whiteSpace: "nowrap" }}
       >
         Only one narrows the spread.
       </Ink>

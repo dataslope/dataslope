@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SURVEY } from "./data";
-import { DOT, Kicker, lerp, Mark, pulse, RAW, Spot, STAT_INK, Svg } from "./parts";
+import { DOT, Kicker, lerp, Mark, pulse, RAW, Spot, Svg } from "./parts";
 
 /** The field: one dot per 50 customers, 120 across (and 50 down). */
 const COLS = 120;
@@ -119,7 +119,7 @@ export const SurveyScene: React.FC = () => {
       <Ink
         at={questionAt - 4}
         dur={20}
-        style={{ left: 92, top: y(244), ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 92, top: y(244), ...headline(80, true), color: INK, whiteSpace: "nowrap" }}
       >
         Your question is about {fmtInt(SURVEY.customers)}.
       </Ink>

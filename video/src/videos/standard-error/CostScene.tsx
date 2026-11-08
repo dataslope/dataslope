@@ -16,8 +16,7 @@ import {
   label,
   note,
   PAPER,
-  TABULAR,
-} from "../../editorial/style";
+  TABULAR, INK } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -103,7 +102,7 @@ export const CostScene: React.FC = () => {
       <Ink at={costFrom - 6} dur={20} style={{ left: 92, top: y(112), ...headline(56), whiteSpace: "nowrap" }}>
         What the square root costs.
       </Ink>
-      <Ink at={expensiveAt - 4} dur={18} style={{ left: 94, top: y(186), ...headline(44, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+      <Ink at={expensiveAt - 4} dur={18} style={{ left: 94, top: y(186), ...headline(44, true), color: INK, whiteSpace: "nowrap" }}>
         Precision gets expensive, fast.
       </Ink>
       {ILLUSTRATIONS ? (

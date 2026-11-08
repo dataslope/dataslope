@@ -72,7 +72,7 @@ export const ClaimScene: React.FC = () => {
         style={{ left: LEFT - 2, top: y(150), ...headline(88), whiteSpace: "nowrap", display: "flex", gap: "0.24em" }}
       >
         <span>A type is</span>
-        <span style={{ ...headline(88, true), color: ACCENT_INK, opacity: ease(frame, onlyAt - 6, 12) }}>only a claim.</span>
+        <span style={{ ...headline(88, true), color: INK, opacity: ease(frame, onlyAt - 6, 12) }}>only a claim.</span>
       </Ink>
       {ILLUSTRATIONS ? (
         <Illustration

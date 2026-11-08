@@ -299,7 +299,7 @@ export const LawScene: React.FC = () => {
       {/* High enough that "still ½" clears the chart's "true 50%" row. */}
       <Ink at={fiftyAt - 6} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y + 38), whiteSpace: "nowrap" }}>
         <span style={note(22, INK_SOFT)}>The next flip</span>
-        <div style={{ ...headline(64, true), color: STAT_INK, marginTop: 6 }}>still ½</div>
+        <div style={{ ...headline(64, true), color: INK, marginTop: 6 }}>still ½</div>
       </Ink>
       <Ink at={memoryAt - 2} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y + 190), whiteSpace: "nowrap" }}>
         <span style={{ ...body(32, true), color: INK }}>No memory.</span>

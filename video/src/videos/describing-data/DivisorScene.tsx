@@ -114,7 +114,7 @@ export const DivisorScene: React.FC = () => {
         <Ink at={measuredFrom - 2} dur={20} out={swampAt + 4} outDur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Divide by n,
         </Ink>
-        <Ink at={lowAt - 6} dur={18} out={swampAt + 4} outDur={14} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={lowAt - 6} dur={18} out={swampAt + 4} outDur={14} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           and you come up short.
         </Ink>
       </div>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, headline, HIGHLIGHT, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, body, headline, HIGHLIGHT, INK_SOFT, label, note, INK } from "../../editorial/style";
 import { Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
@@ -65,7 +65,7 @@ export const ShareScene: React.FC = () => {
         <Ink at={start + 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Salary over group total
         </Ink>
-        <Ink at={shareAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={shareAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: INK, whiteSpace: "nowrap" }}>
           is each row&apos;s share.
         </Ink>
       </div>

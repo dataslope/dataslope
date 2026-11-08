@@ -484,7 +484,7 @@ export const ThreeScene: React.FC = () => {
         <Ink
           at={widthsAt - 4}
           dur={18}
-          style={{ position: "relative", ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(64, true), color: INK, whiteSpace: "nowrap" }}
         >
           three widths.
         </Ink>

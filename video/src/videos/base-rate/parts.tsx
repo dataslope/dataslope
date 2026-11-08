@@ -2,7 +2,7 @@ import React from "react";
 import { useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, headline } from "../../editorial/style";
+import { headline, INK } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { BLOCK_COLS, BLOCK_ROWS } from "./data";
 
@@ -35,8 +35,7 @@ export const Headline: React.FC<{
   firstAt: number;
   secondAt?: number;
   out?: number;
-  secondColor?: string;
-}> = ({ top, left = 116, size = 60, first, second, firstAt, secondAt, out, secondColor = ACCENT_INK }) => (
+}> = ({ top, left = 116, size = 60, first, second, firstAt, secondAt, out }) => (
   <div style={{ position: "absolute", left, top, display: "flex", gap: "0.26em", ...headline(size) }}>
     <Ink at={firstAt} dur={20} out={out} style={{ position: "relative", whiteSpace: "nowrap" }}>
       {first}
@@ -46,7 +45,7 @@ export const Headline: React.FC<{
         at={secondAt}
         dur={18}
         out={out}
-        style={{ position: "relative", ...headline(size, true), color: secondColor, whiteSpace: "nowrap" }}
+        style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
       >
         {second}
       </Ink>

@@ -135,7 +135,7 @@ export const CheckScene: React.FC = () => {
         <Ink at={checkItAt - 6} dur={20} style={{ position: "relative" }}>
           Check it the long way:
         </Ink>
-        <Ink at={thousandAt - 4} dur={18} style={{ position: "relative", ...headline(56, true), color: ACCENT_INK }}>
+        <Ink at={thousandAt - 4} dur={18} style={{ position: "relative", ...headline(56, true), color: INK }}>
           ten thousand samples.
         </Ink>
       </div>

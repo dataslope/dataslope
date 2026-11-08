@@ -71,7 +71,7 @@ export const RuleScene: React.FC = () => {
 
       <MiniBars t={1.5} x={128} top={y(500)} height={h(120)} at={upAt - 6} />
       <Ink at={upAt - 4} dur={20} style={{ left: 340, top: y(500), width: 960 }}>
-        <div style={{ ...headline(64, true), color: ACCENT_INK, lineHeight: 1.08 }}>Turn it up for variety.</div>
+        <div style={{ ...headline(64, true), color: INK, lineHeight: 1.08 }}>Turn it up for variety.</div>
       </Ink>
       <Ink at={varietyAt + 4} dur={18} style={{ left: 340, top: y(592), width: 960 }}>
         <div style={{ ...body(32) }}>Brainstorming and drafting.</div>

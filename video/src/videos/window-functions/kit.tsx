@@ -334,7 +334,7 @@ export const Headline: React.FC<{
       <Ink
         at={line2At}
         dur={20}
-        style={{ left: X0, top: y(HEAD2_Y), ...headline(HEAD_SIZE, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: X0, top: y(HEAD2_Y), ...headline(HEAD_SIZE, true), color: INK, whiteSpace: "nowrap" }}
       >
         {mark ? (
           <Stroke kind={mark.kind} at={mark.at}>

@@ -134,7 +134,7 @@ export const SkewScene: React.FC = () => {
           at={dragsAt - 4}
           dur={18}
           out={rightFrom - 6}
-          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}
         >
           The tail drags the mean.
         </Ink>

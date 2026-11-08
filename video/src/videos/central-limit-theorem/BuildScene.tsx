@@ -290,7 +290,7 @@ export const BuildScene: React.FC = () => {
       <Ink at={morphAt + 4} dur={20} out={cltFrom} style={{ left: 1180, top: y(130), ...headline(54), lineHeight: 1.08 }}>
         Average thirty waits.
       </Ink>
-      <Ink at={pick2 - 4} dur={18} out={cltFrom} style={{ left: 1180, top: y(188), ...headline(54, true), color: ACCENT_INK }}>
+      <Ink at={pick2 - 4} dur={18} out={cltFrom} style={{ left: 1180, top: y(188), ...headline(54, true), color: INK }}>
         Then do it again.
       </Ink>
       <Ink at={theoremAt - 4} dur={22} style={{ left: 1180, top: y(120), ...headline(60), lineHeight: 1.04 }}>

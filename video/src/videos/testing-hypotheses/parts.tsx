@@ -82,7 +82,7 @@ export const Head: React.FC<{
         {a}
       </Ink>
       {b !== undefined && bAt !== undefined ? (
-        <Ink at={bAt} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={bAt} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}>
           {b}
         </Ink>
       ) : null}

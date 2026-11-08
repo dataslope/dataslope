@@ -127,7 +127,7 @@ export const ErdScene: React.FC = () => {
               ["lines.", linesAt],
             ] as const
           ).map(([w, at]) => (
-            <Ink key={w} at={at - 4} dur={14} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+            <Ink key={w} at={at - 4} dur={14} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
               {w}
             </Ink>
           ))}

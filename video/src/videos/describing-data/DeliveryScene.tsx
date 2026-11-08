@@ -136,7 +136,7 @@ export const DeliveryScene: React.FC = () => {
           at={spreadAt - 6}
           dur={18}
           out={devFrom - 6}
-          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}
         >
           Different spread.
         </Ink>

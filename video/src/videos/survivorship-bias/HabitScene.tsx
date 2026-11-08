@@ -127,7 +127,7 @@ export const HabitScene: React.FC = () => {
         <Ink at={askAt - 2} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Ask what's missing,
         </Ink>
-        <Ink at={whyAt - 4} dur={16} style={{ position: "relative", ...headline(84, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={whyAt - 4} dur={16} style={{ position: "relative", ...headline(84, true), color: INK, whiteSpace: "nowrap" }}>
           and why.
         </Ink>
       </div>

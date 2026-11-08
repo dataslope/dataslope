@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, headline } from "../../editorial/style";
+import { ACCENT_INK, headline, INK } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { OVER_SQL, PARTITIONS, WINDOWED } from "./data";
@@ -146,7 +146,7 @@ export const OverScene: React.FC = () => {
         dur={18}
         style={{ left: X0, top: listBottom + h(44), ...headline(62), whiteSpace: "nowrap" }}
       >
-        {rows} rows in, <span style={{ ...headline(62, true), color: ACCENT_INK }}>{rows} rows out.</span>
+        {rows} rows in, <span style={{ ...headline(62, true), color: INK }}>{rows} rows out.</span>
       </Ink>
     </AbsoluteFill>
   );

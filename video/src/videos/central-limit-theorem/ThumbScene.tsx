@@ -148,7 +148,7 @@ export const ThumbScene: React.FC = () => {
       <Ink at={thumbAt - 2} dur={18} style={{ left: 196, top: y(432), ...headline(50) }}>
         A rule of thumb,
       </Ink>
-      <Ink at={lawAt - 4} dur={14} style={{ left: 196, top: y(490), ...headline(50, true), color: ACCENT_INK }}>
+      <Ink at={lawAt - 4} dur={14} style={{ left: 196, top: y(490), ...headline(50, true), color: INK }}>
         not a law.
       </Ink>
       <Ink at={lawAt + 8} dur={18} style={{ left: 198, top: y(588), width: 620 }}>

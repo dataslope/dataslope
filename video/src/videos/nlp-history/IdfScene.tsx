@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, fmt, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { fmt, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { Badge, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -268,7 +268,7 @@ export const IdfScene: React.FC = () => {
           threeAt - 2,
         )}
         <Ink at={muchAt} out={fewerAt - 6} style={{ left: RX, top: CLOSE_Y, whiteSpace: "nowrap" }}>
-          <div style={{ ...headline(36, true), color: ACCENT_INK }}>one match, one point, either way</div>
+          <div style={{ ...headline(36, true), color: INK }}>one match, one point, either way</div>
         </Ink>
       </div>
       <div style={{ position: "absolute", left: RX, top: CLOSE_Y, display: "flex", gap: "0.3em", ...headline(36, true), whiteSpace: "nowrap" }}>

@@ -145,7 +145,7 @@ export const GapScene: React.FC = () => {
           at={betterAt - 6}
           dur={18}
           out={sameAt - 14}
-          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}
         >
           Is B better?
         </Ink>
@@ -154,7 +154,7 @@ export const GapScene: React.FC = () => {
         <Ink at={sameAt - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Made the same way.
         </Ink>
-        <Ink at={neverAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={neverAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           The gap is never zero.
         </Ink>
       </div>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, headline, INK_SOFT, note } from "../../editorial/style";
+import { headline, INK_SOFT, note, INK } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import {
@@ -229,7 +229,7 @@ export const GroupScene: React.FC = () => {
         <Ink
           at={outAt - 2}
           dur={16}
-          style={{ position: "relative", ...headline(62, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(62, true), color: INK, whiteSpace: "nowrap" }}
         >
           {GROUPED.rows.length} rows out.
         </Ink>

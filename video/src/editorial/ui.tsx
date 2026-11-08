@@ -1,7 +1,7 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
 import { ease } from "../components/motion";
-import { ACCENT_INK, body, HAIRLINE, INK, label, TABULAR } from "./style";
+import { ACCENT_INK, HAIRLINE, INK, label, TABULAR, TITLE_FAMILY, TITLE_WEIGHT } from "./style";
 
 export const W = 1920;
 export const H = 1080;
@@ -198,7 +198,7 @@ export const NextLine: React.FC<{
       <div
         style={{ position: "absolute", left: x, top: y, width, height: 1, background: HAIRLINE, opacity: ease(frame, at - 4, 12) }}
       />
-      <Ink at={at} dur={18} style={{ left: x, top: y + 28, ...body(34), color: INK, whiteSpace: "nowrap" }}>
+      <Ink at={at} dur={18} style={{ left: x, top: y + 28, fontFamily: TITLE_FAMILY, fontSize: 31, fontWeight: TITLE_WEIGHT, letterSpacing: "-0.01em", color: INK, whiteSpace: "nowrap" }}>
         Next: {children}
       </Ink>
     </>

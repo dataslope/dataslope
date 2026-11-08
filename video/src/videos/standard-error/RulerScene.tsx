@@ -111,7 +111,7 @@ export const RulerScene: React.FC = () => {
           is a ruler.
         </Ink>
       </div>
-      <Ink at={inferenceAt - 4} dur={18} style={{ left: 94, top: y(186), ...headline(40, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+      <Ink at={inferenceAt - 4} dur={18} style={{ left: 94, top: y(186), ...headline(40, true), color: INK, whiteSpace: "nowrap" }}>
         Intervals and tests are measured with it.
       </Ink>
       {ILLUSTRATIONS ? (

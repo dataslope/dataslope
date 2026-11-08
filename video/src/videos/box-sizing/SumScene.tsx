@@ -95,7 +95,7 @@ export const SumScene: React.FC = () => {
         <Ink
           at={totalAt - 2}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           get {BOX.rendered}.
         </Ink>

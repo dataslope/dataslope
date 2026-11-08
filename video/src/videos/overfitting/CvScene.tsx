@@ -4,7 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { sx } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, fmt, halo, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, halo, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import {
@@ -78,7 +78,7 @@ export const CvScene: React.FC = () => {
         <Ink
           at={scoreAt - 4}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           and score the model on that.
         </Ink>

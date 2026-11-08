@@ -108,7 +108,7 @@ export const IdfScene: React.FC = () => {
         <Ink
           at={zeroAt - 4}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           weighs nothing.
         </Ink>

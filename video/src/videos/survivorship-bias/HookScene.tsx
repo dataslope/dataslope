@@ -172,7 +172,7 @@ export const HookScene: React.FC = () => {
         <Ink
           at={holesAt - 6}
           dur={18}
-          style={{ position: "relative", whiteSpace: "nowrap", ...headline(52, true), color: ACCENT_INK }}
+          style={{ position: "relative", whiteSpace: "nowrap", ...headline(52, true), color: INK }}
         >
           armor the parts with the most holes.
         </Ink>

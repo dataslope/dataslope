@@ -123,7 +123,7 @@ export const KindsScene: React.FC = () => {
         <Ink at={whichGroupAt - 6} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Which group,
         </Ink>
-        <Ink at={muchAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={muchAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           or how much?
         </Ink>
       </div>

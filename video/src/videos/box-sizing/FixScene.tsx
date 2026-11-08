@@ -3,7 +3,7 @@ import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remo
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { inkOf } from "../../theme/brand";
@@ -72,7 +72,7 @@ export const FixScene: React.FC = () => {
         <Ink
           at={includesAt - 2}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           width includes padding and border.
         </Ink>

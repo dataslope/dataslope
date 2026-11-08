@@ -109,7 +109,7 @@ export const Headline: React.FC<{
         {lead}
       </Ink>
       {turn ? (
-        <Ink at={turnAt ?? at + 10} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={turnAt ?? at + 10} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}>
           {turn}
         </Ink>
       ) : null}

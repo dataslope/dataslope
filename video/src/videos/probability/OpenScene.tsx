@@ -152,7 +152,7 @@ export const OpenScene: React.FC = () => {
                   opacity: ease(frame, needAt - 2, 14) * (1 - panelsOut),
                   // Small enough to sit inside its bar's dashed outline.
                   ...headline(96, true),
-                  color: STAT_INK,
+                  color: INK,
                 }}
               >
                 ?

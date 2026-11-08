@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT, body, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -206,7 +206,7 @@ export const CostScene: React.FC = () => {
 
           {/* Its name. */}
           <Ink at={anomalyAt - 2} dur={18} style={{ left: X0, top: y(ANOMALY_Y), whiteSpace: "nowrap" }}>
-            <span style={{ ...headline(54, true), color: ACCENT_INK }}>The update anomaly</span>
+            <span style={{ ...headline(54, true), color: INK }}>The update anomaly</span>
           </Ink>
           <div
             style={{

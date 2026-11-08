@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { BLUE_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { ColumnRule, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -74,7 +74,7 @@ export const CloseScene: React.FC = () => {
               <Ink at={l.at - 4} dur={18} style={{ position: "relative" }}>
                 {l.lead}
               </Ink>
-              <Ink at={l.at + 4} dur={18} style={{ position: "relative", ...headline(84, true), color: ACCENT_INK }}>
+              <Ink at={l.at + 4} dur={18} style={{ position: "relative", ...headline(84, true), color: INK }}>
                 {l.turn}
               </Ink>
             </div>

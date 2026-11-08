@@ -135,7 +135,7 @@ export const TrendScene: React.FC = () => {
         <Ink
           at={plusAt - 6}
           dur={18}
-          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}
         >
           signal plus noise.
         </Ink>

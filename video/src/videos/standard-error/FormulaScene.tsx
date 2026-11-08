@@ -85,7 +85,7 @@ export const FormulaScene: React.FC = () => {
         <Ink at={oneFrom - 8} dur={20} style={{ position: "relative" }}>
           You only ever see one average.
         </Ink>
-        <Ink at={divideAt - 4} dur={16} style={{ position: "relative", ...headline(56, true), color: ACCENT_INK }}>
+        <Ink at={divideAt - 4} dur={16} style={{ position: "relative", ...headline(56, true), color: INK }}>
           So divide.
         </Ink>
       </div>

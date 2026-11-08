@@ -85,7 +85,7 @@ export const Head: React.FC<{
         {children}
       </Ink>
       {italic !== undefined && second !== undefined ? (
-        <Ink at={second} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={second} dur={18} out={out} style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}>
           {italic}
         </Ink>
       ) : null}

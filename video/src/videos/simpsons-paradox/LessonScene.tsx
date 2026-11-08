@@ -34,7 +34,7 @@ export const LessonScene: React.FC = () => {
       </Ink>
       <Ink at={ruleAt - 6} dur={22} style={{ left: 120, top: y(560), width: 1040 }}>
         <div style={{ height: 2, background: INK, width: 140, marginBottom: 30 }} />
-        <div style={{ ...headline(58, true), color: ACCENT_INK, lineHeight: 1.12 }}>
+        <div style={{ ...headline(58, true), color: INK, lineHeight: 1.12 }}>
           Before you trust a total, ask what it is averaging over.
         </div>
       </Ink>

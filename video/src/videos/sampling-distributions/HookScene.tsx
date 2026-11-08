@@ -5,7 +5,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Axis, Bars, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, note } from "../../editorial/style";
+import { ACCENT, body, headline, INK, INK_SOFT, note } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { histogram, peak, PILE, POPULATION, SAMPLE } from "./data";
 import { money, POP_FILL, SAMPLE_FILL } from "./parts";
@@ -107,7 +107,7 @@ export const HookScene: React.FC = () => {
         <Ink
           at={alikeAt - 4}
           dur={18}
-          style={{ position: "relative", ...headline(72, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(72, true), color: INK, whiteSpace: "nowrap" }}
         >
           that look alike.
         </Ink>

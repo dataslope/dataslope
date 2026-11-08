@@ -108,7 +108,7 @@ export const RobustScene: React.FC = () => {
         <Ink at={incomesFrom - 4} dur={20} out={iqrFrom - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
           One wild value,
         </Ink>
-        <Ink at={leapsAt - 6} dur={18} out={iqrFrom - 6} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={leapsAt - 6} dur={18} out={iqrFrom - 6} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           and the SD follows it.
         </Ink>
       </div>

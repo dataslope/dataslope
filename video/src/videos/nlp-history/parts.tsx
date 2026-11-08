@@ -4,7 +4,7 @@ import { arrowHead, type Pt } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { ACCENT, BAR, BLUE_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
@@ -87,7 +87,7 @@ export const Headline: React.FC<{
           at={turnAt ?? at + 10}
           dur={18}
           out={out}
-          style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
         >
           {turn}
         </Ink>

@@ -112,7 +112,7 @@ export const TrapScene: React.FC = () => {
         <Ink at={numericalAt - 6} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Numbers
         </Ink>
-        <Ink at={arentAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={arentAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           that aren&apos;t quantities.
         </Ink>
       </div>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, fmt, halo, headline, HIGHLIGHT, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { fmt, halo, headline, HIGHLIGHT, INK_SOFT, label, note, PAPER, INK } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import {
@@ -92,7 +92,7 @@ export const ErrorScene: React.FC = () => {
         <Ink
           at={climbsAt - 2}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           Error on new points turns back up.
         </Ink>

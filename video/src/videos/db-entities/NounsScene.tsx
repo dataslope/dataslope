@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { Fig, FIG_GAP } from "./kit";
-import { Drift, Kicker, lerp, Mark, Spot, Stack, STAT_INK, Svg, Word } from "./parts";
+import { Drift, Kicker, lerp, Mark, Spot, Stack, Svg, Word } from "./parts";
 
 const BOX_Y = 500;
 const BOX_W = 340;
@@ -100,7 +100,7 @@ export const NounsScene: React.FC = () => {
           <Ink at={thingsAt - 2} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
             <Mark at={thingsAt + 8}>things.</Mark>
           </Ink>
-          <Ink at={circleNounsAt - 4} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+          <Ink at={circleNounsAt - 4} dur={18} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
             Circle the nouns.
           </Ink>
         </div>

@@ -103,7 +103,7 @@ export const OutlierScene: React.FC = () => {
         <Ink at={outlierFrom - 4} dur={20} out={verdictFrom - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
           An outlier is far away.
         </Ink>
-        <Ink at={allAt - 4} dur={18} out={verdictFrom - 6} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={allAt - 4} dur={18} out={verdictFrom - 6} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           Nothing more.
         </Ink>
       </div>
@@ -111,7 +111,7 @@ export const OutlierScene: React.FC = () => {
         <Ink at={verdictFrom - 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           A flag is a <Mark at={questionAt - 2}>question</Mark>,
         </Ink>
-        <Ink at={notVerdictAt - 4} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={notVerdictAt - 4} dur={18} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           not a verdict.
         </Ink>
       </div>

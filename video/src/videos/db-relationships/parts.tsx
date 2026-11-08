@@ -5,7 +5,7 @@ import { type Cardinality, endSegment, endSymbols as kitEndSymbols, MARKER, mark
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, halo, headline, label, note } from "../../editorial/style";
+import { HIGHLIGHT, INK, INK_SOFT, PAPER, halo, headline, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -67,7 +67,7 @@ export const Headline: React.FC<{
           at={turnAt ?? at + 12}
           dur={18}
           out={out}
-          style={{ position: "relative", ...headline(size, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
         >
           {turn}
         </Ink>
@@ -321,7 +321,7 @@ export const Query: React.FC<{ x: number; y: number; at: number; out?: number }>
         transform: `translate(-50%, -50%) scale(${0.6 + 0.4 * Math.min(1.2, p)})`,
         opacity: Math.min(1, p) * (1 - o),
         ...headline(46, true),
-        color: ACCENT_INK,
+        color: INK,
         ...halo,
       }}
     >

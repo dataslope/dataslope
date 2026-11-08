@@ -133,7 +133,7 @@ export const WhichScene: React.FC = () => {
         Which plot, when?
       </Ink>
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
-        <Ink at={firstAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={firstAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           Plot first.
         </Ink>
         <Ink at={summarizeAt - 4} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>

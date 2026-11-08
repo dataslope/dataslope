@@ -14,8 +14,7 @@ import {
   INK_SOFT,
   label,
   note,
-  PAPER,
-} from "../../editorial/style";
+  PAPER, INK } from "../../editorial/style";
 import { ColumnRule, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -122,7 +121,7 @@ export const AgesScene: React.FC = () => {
           </Ink>
         </span>
       </div>
-      <div style={{ position: "absolute", left: 92, top: y(236), display: "flex", alignItems: "baseline", ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: 92, top: y(236), display: "flex", alignItems: "baseline", ...headline(64, true), color: INK, whiteSpace: "nowrap" }}>
         <Ink at={errorAt - 6} dur={18} style={{ position: "relative", width: NAME_W, flexShrink: 0 }}>
           <span style={{ display: "inline-block", transformOrigin: "right 80%", transform: `scale(${swell(frame, mixedAt + 4, 0.06, 20)})` }}>
             <Marker at={mixedAt + 4} out={spreadAt - 4}>Standard</Marker>

@@ -75,7 +75,7 @@ export const Head: React.FC<{ parts: readonly HeadPart[]; out?: number; size?: n
           style={{
             position: "relative",
             whiteSpace: "nowrap",
-            ...(p.italic ? { ...headline(size, true), color: p.color ?? ASK_INK } : null),
+            ...(p.italic ? { ...headline(size, true), color: INK } : null),
           }}
         >
           {p.text}

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { COUNTS, DOCS, ILLUSTRATIONS, THE, VIDEO } from "./data";
@@ -49,7 +49,7 @@ export const HookScene: React.FC = () => {
       <Ink
         at={10}
         dur={20}
-        style={{ left: 92, top: y(204), ...headline(88, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 92, top: y(204), ...headline(88, true), color: INK, whiteSpace: "nowrap" }}
       >
         says the least.
       </Ink>

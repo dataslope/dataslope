@@ -106,10 +106,10 @@ export const CloseScene: React.FC = () => {
           <Ink at={tellingAt - 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
             Telling a good answer
           </Ink>
-          <Ink at={plausibleAt - 2} dur={18} style={{ position: "relative", ...headline(58, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+          <Ink at={plausibleAt - 2} dur={18} style={{ position: "relative", ...headline(58, true), color: INK, whiteSpace: "nowrap" }}>
             from a plausible one,
           </Ink>
-          <Ink at={whyAt - 2} dur={18} style={{ position: "relative", ...headline(58, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+          <Ink at={whyAt - 2} dur={18} style={{ position: "relative", ...headline(58, true), color: INK, whiteSpace: "nowrap" }}>
             and saying why.
           </Ink>
         </div>

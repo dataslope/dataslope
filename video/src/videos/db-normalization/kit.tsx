@@ -327,7 +327,7 @@ export const Headline: React.FC<{
         <Ink at={at} dur={22} out={out} style={{ position: "relative" }}>
           {lead}
         </Ink>
-        <Ink at={turnAt ?? at + 4} dur={20} out={out} style={{ position: "relative", ...headline(size, true), color: ACCENT_INK }}>
+        <Ink at={turnAt ?? at + 4} dur={20} out={out} style={{ position: "relative", ...headline(size, true), color: INK }}>
           <span style={{ position: "relative" }}>
             {turn}
             <svg

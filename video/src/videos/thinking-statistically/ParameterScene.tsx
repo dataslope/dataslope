@@ -183,7 +183,7 @@ export const ParameterScene: React.FC = () => {
         <Ink at={parameterFrom - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Parameters stay put.
         </Ink>
-        <Ink at={movesAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={movesAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           Statistics move.
         </Ink>
       </div>

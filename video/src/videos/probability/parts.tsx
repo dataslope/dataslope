@@ -74,8 +74,7 @@ export const Headline: React.FC<{
   firstAt: number;
   secondAt?: number;
   out?: number;
-  secondColor?: string;
-}> = ({ top, left = 92, size = 76, first, second, firstAt, secondAt, out, secondColor = STAT_INK }) => (
+}> = ({ top, left = 92, size = 76, first, second, firstAt, secondAt, out }) => (
   <div style={{ position: "absolute", left, top, display: "flex", gap: "0.26em", ...headline(size) }}>
     <Ink at={firstAt} dur={20} out={out} style={{ position: "relative", whiteSpace: "nowrap" }}>
       {first}
@@ -85,7 +84,7 @@ export const Headline: React.FC<{
         at={secondAt}
         dur={18}
         out={out}
-        style={{ position: "relative", ...headline(size, true), color: secondColor, whiteSpace: "nowrap" }}
+        style={{ position: "relative", ...headline(size, true), color: INK, whiteSpace: "nowrap" }}
       >
         {second}
       </Ink>

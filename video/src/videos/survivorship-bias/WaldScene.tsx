@@ -111,7 +111,7 @@ export const WaldScene: React.FC = () => {
         <Ink
           at={backAt - 2}
           dur={18}
-          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
         >
           {WALD.returned} come back.
         </Ink>
@@ -285,7 +285,7 @@ export const WaldScene: React.FC = () => {
           <span style={{ ...body(30, true), color: INK }}>The holes mark hits a plane can survive.</span>
         </Ink>
         <Ink at={protectAt - 4} dur={16} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <span style={{ ...headline(42, true), color: ACCENT_INK }}>Protect where they aren't.</span>
+          <span style={{ ...headline(42, true), color: INK }}>Protect where they aren't.</span>
         </Ink>
       </div>
     </AbsoluteFill>

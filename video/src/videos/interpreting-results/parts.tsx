@@ -67,7 +67,7 @@ export const Headline: React.FC<{
         style={{
           position: "relative",
           whiteSpace: "nowrap",
-          ...(p.italic ? { ...headline(size, true), color: p.color ?? STAT_INK } : p.color ? { color: p.color } : {}),
+          ...(p.italic ? { ...headline(size, true), color: INK } : p.color ? { color: p.color } : {}),
         }}
       >
         {p.text}

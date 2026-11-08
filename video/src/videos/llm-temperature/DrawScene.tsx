@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK_SOFT, label, note, INK } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { DRAWS, ROWS, SEED, TOKENS, UNIFORMS } from "./data";
@@ -55,7 +55,7 @@ export const DrawScene: React.FC = () => {
         <Ink at={start - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Twenty draws per temperature,
         </Ink>
-        <Ink at={sameAt - 2} dur={18} style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={sameAt - 2} dur={18} style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}>
           the same random numbers.
         </Ink>
       </div>

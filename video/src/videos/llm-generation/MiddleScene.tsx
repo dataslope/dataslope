@@ -131,7 +131,7 @@ export const MiddleScene: React.FC = () => {
           </span>
         </Note>
         <Ink at={lostAt - 2} dur={18} style={{ left: xAt(worst.at) - 220, width: 440, top: yAt(0.87), textAlign: "center" }}>
-          <span style={{ ...headline(46, true), color: ACCENT_INK }}>Lost in the middle</span>
+          <span style={{ ...headline(46, true), color: INK }}>Lost in the middle</span>
         </Ink>
         {/* The lesson's rule: what matters goes where recall is strong. */}
         <Note at={firstLastAt - 2} x={CX0 - 40} y={y(C_BASE) + 40}>

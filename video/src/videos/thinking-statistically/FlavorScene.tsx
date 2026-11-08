@@ -97,7 +97,7 @@ export const FlavorScene: React.FC = () => {
         <Ink at={noAt - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           There is no flavor
         </Ink>
-        <Ink at={noAt + 8} dur={16} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={noAt + 8} dur={16} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           {mean}.
         </Ink>
       </div>

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, headline, label } from "../../editorial/style";
+import { ACCENT_INK, body, headline, label, INK } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
@@ -73,7 +73,7 @@ export const ShapesScene: React.FC = () => {
         <Ink at={start + 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           One row per group,
         </Ink>
-        <Ink at={transAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={transAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: INK, whiteSpace: "nowrap" }}>
           or one per row.
         </Ink>
       </div>

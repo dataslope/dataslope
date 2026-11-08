@@ -104,7 +104,7 @@ export const FitScene: React.FC = () => {
       <Ink
         at={failAt - 4}
         dur={20}
-        style={{ left: 114, top: y(232), ...headline(76, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 114, top: y(232), ...headline(76, true), color: INK, whiteSpace: "nowrap" }}
       >
         wrong on data it hasn’t seen.
       </Ink>

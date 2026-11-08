@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, headline, INK, INK_SOFT, label } from "../../editorial/style";
+import { headline, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -26,7 +26,7 @@ export const RuleScene: React.FC = () => {
       </Ink>
       <Ink at={tfidfAt - 6} dur={22} style={{ left: 120, top: y(330), width: 1060 }}>
         <div style={{ height: 2, background: INK, width: 140, marginBottom: 30 }} />
-        <div style={{ ...headline(58, true), color: ACCENT_INK, lineHeight: 1.12 }}>
+        <div style={{ ...headline(58, true), color: INK, lineHeight: 1.12 }}>
           TF-IDF rewards the words that are frequent here and rare elsewhere.
         </div>
       </Ink>

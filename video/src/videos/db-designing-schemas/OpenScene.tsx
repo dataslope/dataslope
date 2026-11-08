@@ -58,7 +58,7 @@ export const OpenScene: React.FC = () => {
       <Ink at={openFrom - 8} dur={20} style={{ left: 92, top: y(150), ...headline(72), whiteSpace: "nowrap" }}>
         The rules get you <Mark at={halfwayAt - 2} dur={14}>halfway.</Mark>
       </Ink>
-      <Ink at={otherAt - 4} dur={20} style={{ left: 92, top: y(236), ...headline(72, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+      <Ink at={otherAt - 4} dur={20} style={{ left: 92, top: y(236), ...headline(72, true), color: INK, whiteSpace: "nowrap" }}>
         The other half is a process,
       </Ink>
       {halves.map((h, i) => (

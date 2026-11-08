@@ -105,7 +105,7 @@ export const AnyScene: React.FC = () => {
       <Ink
         at={everyAt + 4}
         dur={18}
-        style={{ left: 112, top: y(188), ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 112, top: y(188), ...headline(64, true), color: INK, whiteSpace: "nowrap" }}
       >
         a sampling distribution.
       </Ink>
@@ -114,7 +114,7 @@ export const AnyScene: React.FC = () => {
       <Note at={nameAt - 2} x={1180} y={y(118)} width={640}>
         <span style={label(22, INK_SOFT)}>That width has a name</span>
       </Note>
-      <Ink at={seAt - 4} dur={20} style={{ left: 1176, top: y(156), ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+      <Ink at={seAt - 4} dur={20} style={{ left: 1176, top: y(156), ...headline(64, true), color: INK, whiteSpace: "nowrap" }}>
         the standard error.
       </Ink>
       {merged ? null : (

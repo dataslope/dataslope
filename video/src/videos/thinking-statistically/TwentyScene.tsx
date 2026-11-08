@@ -131,7 +131,7 @@ export const TwentyScene: React.FC = () => {
           at={twentyFrom - 40}
           dur={1}
           out={samplesAt - 16}
-          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}
         >
           Statistics move.
         </Ink>
@@ -145,7 +145,7 @@ export const TwentyScene: React.FC = () => {
           at={answersAt - 6}
           dur={18}
           out={thinkAt - 8}
-          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}
         >
           twenty answers.
         </Ink>
@@ -158,7 +158,7 @@ export const TwentyScene: React.FC = () => {
           at={thinkAt + 14}
           dur={18}
           out={kindAt - 10}
-          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+          style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}
         >
           not points.
         </Ink>

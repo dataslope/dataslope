@@ -51,7 +51,7 @@ export const TopPScene: React.FC = () => {
         <Ink at={start - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Top-p cuts the tail
         </Ink>
-        <Ink at={dropAt - 2} dur={18} style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={dropAt - 2} dur={18} style={{ position: "relative", ...headline(56, true), color: INK, whiteSpace: "nowrap" }}>
           before the draw.
         </Ink>
       </div>

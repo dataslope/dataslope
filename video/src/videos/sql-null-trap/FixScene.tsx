@@ -92,7 +92,7 @@ export const FixScene: React.FC = () => {
           left: LEFT - 2,
           top: y(240),
           ...headline(54, true),
-          color: ACCENT_INK,
+          color: INK,
           whiteSpace: "nowrap",
         }}
       >

@@ -99,7 +99,7 @@ export const HookScene: React.FC = () => {
       <Ink
         at={answerAt}
         dur={18}
-        style={{ left: 752, top: y(552), ...headline(200, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 752, top: y(552), ...headline(200, true), color: INK, whiteSpace: "nowrap" }}
       >
         <span style={{ fontSize: "0.36em", marginRight: "0.3em" }}>about</span>
         {pct(PPV)}

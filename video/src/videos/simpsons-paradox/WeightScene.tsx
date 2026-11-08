@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { ds, type Step } from "../../theme/brand";
@@ -64,7 +64,7 @@ export const WeightScene: React.FC = () => {
       <Ink
         at={mixAt - 4}
         dur={18}
-        style={{ left: 116, top: y(170), ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        style={{ left: 116, top: y(170), ...headline(56, true), color: INK, whiteSpace: "nowrap" }}
       >
         Move the weights, move the total.
       </Ink>

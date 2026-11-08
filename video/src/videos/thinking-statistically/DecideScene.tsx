@@ -107,7 +107,7 @@ export const DecideScene: React.FC = () => {
         <Ink at={decidesFrom - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           The type decides
         </Ink>
-        <Ink at={allowedAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={allowedAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           what&apos;s allowed.
         </Ink>
       </div>

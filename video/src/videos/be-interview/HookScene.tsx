@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, headline, label, note } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, INK, INK_SOFT, headline, label, note } from "../../editorial/style";
 import { Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -149,7 +149,7 @@ export const HookScene: React.FC = () => {
           at={breaksAt}
           dur={20}
           out={hookOut}
-          style={{ left: 92, top: y(HOOK_Y) + 108, whiteSpace: "nowrap", ...headline(92, true), color: ACCENT_INK }}
+          style={{ left: 92, top: y(HOOK_Y) + 108, whiteSpace: "nowrap", ...headline(92, true), color: INK }}
         >
           What breaks under load?
         </Ink>
