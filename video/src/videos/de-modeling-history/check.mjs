@@ -1,17 +1,17 @@
-// Runs every statement the de-modeling-history video shows in DuckDB, the
-// engine the Data Engineer data-modeling page's blocks run in the reader's
-// browser (<SqlCodeBlock dialect="duckdb">), and writes what came back to
-// results.json, which data.ts reads. From the repo root, where
-// @duckdb/duckdb-wasm (pinned to the version runtime/duckdb.ts loads) is
-// installed:
+// Runs every statement the de-modeling-history video shows on the site's
+// Postgres engine (PGlite, PostgreSQL 18), the engine the Data Engineer
+// data-modeling page's blocks run in the reader's browser
+// (<SqlCodeBlock dialect="postgres">), and writes what came back to
+// results.json, which data.ts reads. From the repo root:
 //
 //   node video/src/videos/de-modeling-history/check.mjs
 //
 // Each figure runs in a fresh database built by its own setup, as the page
-// gives every block its own engine; its steps run in order on one
-// connection, so an UPDATE in one step is seen by the next. Values are
-// printed the way a SQL client prints them: a DECIMAL at its scale, a DATE
-// as "2024-01-01", a NULL as null.
+// gives every block its own engine (video/scripts/lib/pg-figure.mjs); its
+// steps run in order in that database, so an UPDATE in one step is seen by
+// the next. Values are printed the way psql prints them: a numeric at its
+// scale, a DATE as "2024-01-01", a timestamp to the second, a NULL as null,
+// and a statement that returns no rows as its "rows affected".
 //
 // The SCD tables are the page's own (content/interview/data-engineer/
 // data-modeling.mdx, "How do you preserve history when a dimension attribute
@@ -21,88 +21,10 @@
 // runs them with the dates the page's table already holds, so the result is
 // the page's rows. Everything else is the video's own small table, marked
 // so below and in script.ts.
-//
-// The one Postgres figure (the UUID index sizes) runs on the site's Postgres
-// engine through scripts/lib/sql-engines.mjs: index size is a B-tree
-// question, and DuckDB keeps no B-tree it reports a size for.
 /* global console, URL */
 import { writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
 
-const require = createRequire(join(dirname(fileURLToPath(import.meta.url)), "../../../../package.json"));
-const duckdb = require("@duckdb/duckdb-wasm");
-const { default: Worker } = await import(pathToFileURL(require.resolve("web-worker")).href);
-const dist = join(dirname(require.resolve("@duckdb/duckdb-wasm")), "..", "dist");
-const bundle = await duckdb.selectBundle({
-  mvp: { mainModule: join(dist, "duckdb-mvp.wasm"), mainWorker: join(dist, "duckdb-node-mvp.worker.cjs") },
-  eh: { mainModule: join(dist, "duckdb-eh.wasm"), mainWorker: join(dist, "duckdb-node-eh.worker.cjs") },
-});
-
-/** One value as a SQL client prints it, from its Arrow column type. */
-function shown(value, type) {
-  if (value === null || value === undefined) return null;
-  const t = String(type);
-  if (t.startsWith("Decimal")) {
-    const scale = type.scale ?? 0;
-    const digits = String(value).replace("-", "").padStart(scale + 1, "0");
-    const sign = String(value).startsWith("-") ? "-" : "";
-    return scale ? `${sign}${digits.slice(0, -scale)}.${digits.slice(-scale)}` : `${sign}${digits}`;
-  }
-  if (t.startsWith("Date")) return new Date(Number(value)).toISOString().slice(0, 10);
-  if (t.startsWith("Timestamp")) return new Date(Number(value)).toISOString().slice(0, 16).replace("T", " ");
-  if (typeof value === "bigint") return Number(value);
-  return value?.valueOf?.() ?? value;
-}
-
-async function figure(setup, steps) {
-  const worker = new Worker(pathToFileURL(bundle.mainWorker).href, { type: "module" });
-  const db = new duckdb.AsyncDuckDB({ log: () => {} }, worker);
-  await db.instantiate(bundle.mainModule);
-  const conn = await db.connect();
-  for (const stmt of setup.split(/;\s*\n/).map((s) => s.trim()).filter(Boolean)) await conn.query(stmt);
-  const out = {};
-  for (const [id, sql] of Object.entries(steps)) {
-    try {
-      const table = await conn.query(sql);
-      const fields = table.schema.fields;
-      const rows = table.toArray().map((r) => {
-        const obj = r.toJSON();
-        return fields.map((f) => shown(obj[f.name], f.type));
-      });
-      out[id] = { sql, ok: true, columns: fields.map((f) => f.name), rows };
-    } catch (e) {
-      const message = String(e.message).split("\n")[0];
-      out[id] = { sql, ok: false, error: message };
-    }
-  }
-  const version = (await conn.query("SELECT version() AS v")).toArray()[0].toJSON().v;
-  await conn.close();
-  await db.terminate();
-  await worker.terminate();
-  return { setup, steps: out, version };
-}
-
-/** The same, on the site's Postgres engine (PGlite). */
-async function pgFigure(setup, steps) {
-  const { createEngine } = await import(new URL("../../../../scripts/lib/sql-engines.mjs", import.meta.url).href);
-  const engine = await createEngine("postgres");
-  await engine.exec(setup);
-  const out = {};
-  for (const [id, sql] of Object.entries(steps)) {
-    try {
-      const res = await engine.exec(sql);
-      const r = res[res.length - 1];
-      out[id] = { sql, ok: true, columns: r.columns, rows: r.values.map((row) => row.map((v) => (v === null ? null : String(v)))) };
-    } catch (e) {
-      out[id] = { sql, ok: false, error: `ERROR: ${String(e.message).split("\n")[0]}` };
-    }
-  }
-  const version = (await engine.exec("SHOW server_version"))[0].values[0][0];
-  await engine.destroy();
-  return { setup, steps: out, version: `PostgreSQL ${version}` };
-}
+import { figure } from "../../../scripts/lib/pg-figure.mjs";
 
 // ── The page's tables ───────────────────────────────────────────────────────
 
@@ -345,17 +267,20 @@ INSERT INTO order_events VALUES
   (501, 'shipped',   TIMESTAMP '2024-06-02 14:00');`,
   {
     log: "SELECT order_id, status, changed_at\nFROM order_events\nORDER BY order_id, changed_at;",
+    // The latest row per order, in the subquery form the page uses for
+    // a dedup: Postgres has no QUALIFY.
     snapshot:
-      "CREATE TABLE order_snapshot AS\nSELECT order_id, status\nFROM order_events\nQUALIFY ROW_NUMBER() OVER (\n  PARTITION BY order_id ORDER BY changed_at DESC) = 1;",
+      "CREATE TABLE order_snapshot AS\nSELECT order_id, status FROM (\n  SELECT *, ROW_NUMBER() OVER (PARTITION BY order_id\n    ORDER BY changed_at DESC) AS rn\n  FROM order_events) e\nWHERE rn = 1;",
     snapshotRows: "SELECT order_id, status FROM order_snapshot ORDER BY order_id;",
     // Paid, then cancelled: the timestamps, not just both statuses, decide.
     paidThenCancelled:
       "SELECT order_id\nFROM order_events p JOIN order_events c USING (order_id)\nWHERE p.status = 'paid' AND c.status = 'cancelled'\n  AND p.changed_at < c.changed_at;",
     counts: "SELECT (SELECT COUNT(*) FROM order_events) AS log_rows,\n  (SELECT COUNT(*) FROM order_snapshot) AS snapshot_rows;",
     // The periodic snapshot (Part 3's kind): each order's state at the end of
-    // each day. It keeps a row per day, and still no "paid" for 502.
+    // each day. It keeps a row per day, and still no "paid" for 502. Not on
+    // screen as SQL, only its rows.
     daily:
-      "CREATE TABLE order_daily_snapshot AS\nSELECT e.order_id, d.snapshot_date,\n       arg_max(e.status, e.changed_at) AS status\nFROM (VALUES (DATE '2024-06-01'), (DATE '2024-06-02')) d(snapshot_date)\nJOIN order_events e ON e.changed_at < d.snapshot_date + INTERVAL 1 DAY\nGROUP BY e.order_id, d.snapshot_date;",
+      "CREATE TABLE order_daily_snapshot AS\nSELECT DISTINCT ON (e.order_id, d.snapshot_date)\n       e.order_id, d.snapshot_date, e.status\nFROM (VALUES (DATE '2024-06-01'), (DATE '2024-06-02')) d(snapshot_date)\nJOIN order_events e ON e.changed_at < d.snapshot_date + INTERVAL '1 day'\nORDER BY e.order_id, d.snapshot_date, e.changed_at DESC;",
     dailyRows: "SELECT order_id, snapshot_date, status\nFROM order_daily_snapshot\nORDER BY order_id, snapshot_date;",
   },
 );
@@ -431,12 +356,11 @@ INSERT INTO enrollment VALUES
   },
 );
 
-// The surrogate key: a sequence against a UUID, on the site's Postgres. Key
-// sizes as Postgres stores them, and the primary-key index each builds over
-// 100,000 rows. The random UUIDs are md5 of the row number cast to uuid, so
+// The surrogate key: a sequence against a UUID. Key sizes as Postgres stores
+// them, and the primary-key index each builds over 100,000 rows. The random UUIDs are md5 of the row number cast to uuid, so
 // the run is repeatable and their order is as scattered as random ones';
 // version 7 is Postgres 18's own time-ordered uuidv7().
-results.figures.uuid = await pgFigure(
+results.figures.uuid = await figure(
   `CREATE TABLE seq_keys (id bigint PRIMARY KEY);
 INSERT INTO seq_keys SELECT g FROM generate_series(1, 100000) g;
 CREATE TABLE uuid_keys (id uuid PRIMARY KEY);
@@ -455,8 +379,10 @@ INSERT INTO uuid7_keys SELECT uuidv7() FROM generate_series(1, 100000) g;`,
     seqSample: "SELECT id FROM seq_keys ORDER BY id DESC LIMIT 1;",
     // The same random keys, indexed in one sorted build instead of one at a
     // time: what is left of their extra size is the key's width alone.
-    rebuilt:
-      "CREATE TABLE uuid_rebuilt (id uuid);\nINSERT INTO uuid_rebuilt SELECT id FROM uuid_keys;\nALTER TABLE uuid_rebuilt ADD PRIMARY KEY (id);\nSELECT pg_relation_size('uuid_rebuilt_pkey') AS random_uuid_rebuilt;",
+    rebuiltTable: "CREATE TABLE uuid_rebuilt (id uuid);",
+    rebuiltCopy: "INSERT INTO uuid_rebuilt SELECT id FROM uuid_keys;",
+    rebuiltIndex: "ALTER TABLE uuid_rebuilt ADD PRIMARY KEY (id);",
+    rebuilt: "SELECT pg_relation_size('uuid_rebuilt_pkey') AS random_uuid_rebuilt;",
   },
 );
 
@@ -465,6 +391,5 @@ for (const [name, fig] of Object.entries(results.figures)) {
     if (!step.ok && !(name === "pageInsert")) console.log(`FAILED ${name}.${id}: ${step.error}`);
   }
 }
-results.engines = { duckdb: results.figures.history.version, postgres: results.figures.uuid.version };
 writeFileSync(new URL("./results.json", import.meta.url), JSON.stringify(results, null, 2) + "\n");
 console.log("wrote results.json:", Object.keys(results.figures).join(", "));

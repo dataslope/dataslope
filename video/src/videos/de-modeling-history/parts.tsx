@@ -96,7 +96,7 @@ const KEYWORDS = new Set(
     "UPDATE SET INSERT INTO CREATE TABLE ALTER ADD COLUMN CONFLICT DO NOTHING DELETE COUNT SUM ROW_NUMBER EXISTS EXCEPT"
   ).split(" "),
 );
-/** Literals DuckDB prints in lower case. */
+/** Boolean literals, which the listings write in lower case. */
 const LITERALS = new Set(["true", "false"]);
 const TABLES = new Set([
   "dim_customer",

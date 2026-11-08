@@ -1,12 +1,11 @@
 import results from "./results.json" with { type: "json" };
 
 // Every table, statement and number the video shows, read from
-// results.json: what DuckDB v1.4.3 (DuckDB-Wasm 1.32.0, the engine the
-// page's blocks run) returned for the statements in check.mjs, which wrote
-// it, plus the one figure run on the site's Postgres 18 (the UUID index
-// sizes). Each figure ran in a fresh database built by its own setup, and the
-// SQL printed on screen is the SQL in that file, so a listing cannot drift
-// from what ran. Pure (no Remotion, no DOM).
+// results.json: what Postgres (PGlite, the engine the page's blocks run)
+// returned for the statements in check.mjs, which wrote it. Each figure ran
+// in a fresh database built by its own setup, and the SQL printed on screen
+// is the SQL in that file, so a listing cannot drift from what ran. Pure (no
+// Remotion, no DOM).
 
 export const VIDEO = "de-modeling-history";
 
@@ -52,14 +51,13 @@ const cell = (t: Table, row: number, col: string) => {
   return t.rows[row][j];
 };
 
-/** How many rows a statement wrote (DuckDB's Count). */
+/** How many rows a statement wrote: an INSERT returns no columns, so
+ *  check.mjs reports its rows affected. */
 const written = (figure: string, id: string) => Number(table(figure, id).rows[0][0]);
 
 /** A DECIMAL product prints at the sum of its factors' scales ("110.0000");
  *  on screen it is money, at two places. */
 const money = (v: string) => Number(v).toFixed(2);
-
-export const ENGINE = { duckdb: results.engines.duckdb, postgres: results.engines.postgres };
 
 // ── The hook and 1: customer 42's move, three ways ─────────────────────────
 

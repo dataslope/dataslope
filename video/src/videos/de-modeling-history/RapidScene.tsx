@@ -375,7 +375,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={costAt} x={R_X} y={barTop - c.h(48)}>
         <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          primary key index, <Num>100,000</Num> rows, Postgres <Num>18</Num>
+          primary key index, <Num>100,000</Num> rows, Postgres
         </span>
       </Note>
       {bars.map((b) => {
@@ -447,8 +447,8 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
 
 /**
  * The quick round: six special cases down the left, each answer on the right
- * while it is read, every table from a DuckDB run (the index sizes from
- * Postgres); then the bridge into Part 5, with the chameleon back.
+ * while it is read, every table and index size from a Postgres run; then the
+ * bridge into Part 5, with the chameleon back.
  */
 export const RapidScene: React.FC = () => {
   const n = useNarration();

@@ -47,10 +47,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
  *
- * Facts. Every statement and table on screen ran in DuckDB v1.4.3
- * (DuckDB-Wasm 1.32.0, the engine the page's blocks run), by check.mjs into
- * results.json, which data.ts reads; the UUID index sizes ran on the site's
- * Postgres 18.3 (PGlite, scripts/lib/sql-engines.mjs):
+ * Facts. Every statement and table on screen ran in Postgres (PGlite,
+ * PostgreSQL 18, the engine the page's blocks run), by check.mjs into
+ * results.json, which data.ts reads:
  *   - "scd", "type2", "type46": the page's own dim_customer and 24 orders.
  *     Customer 42 lives in Boston (key 1001, 2022-01-01 to 2024-03-14), then
  *     Austin (key 1087, from 2024-03-15). Order 101 (2023-05-10, 350.00) was
@@ -78,6 +77,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     row per order is 501 shipped and 502 cancelled; the periodic (daily)
  *     snapshot has four rows and 502 is cancelled on both days; only the
  *     log answers "paid, then cancelled" (502, by comparing timestamps).
+ *     The rebuild keeps ROW_NUMBER() = 1 in a subquery, as the page's
+ *     dedup does: Postgres has no QUALIFY.
  *   - "bridge"/"mtm", the video's own three orders (100, 60 and 40, 200 in
  *     all) and three promotions, with the page's bridge and weight: summed
  *     through the bridge they report 340; weighted, 110, 70 and 20, which is
@@ -86,7 +87,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     invoice number; 3 x 2 x 2 = 12 junk rows; order 301 ordered on a
  *     Friday and shipped on a Monday from one date table; 5 x 4 = 20
  *     mini-dimension rows; three attendance rows, and enrollment minus
- *     attendance is Ben's Statistics class. The UUID item, in Postgres: an
+ *     attendance is Ben's Statistics class. The UUID item: an
  *     integer is 4 bytes, a bigint 8, a UUID 16; primary-key indexes over
  *     100,000 rows are 2.26 MB for a sequence, 4.42 MB for random UUIDs
  *     ("almost twice": 1.96) and 3.18 MB for Postgres 18's time-ordered

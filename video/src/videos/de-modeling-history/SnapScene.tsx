@@ -184,8 +184,11 @@ export const SnapScene: React.FC = () => {
           width={660}
           size={SIZE}
           at={rebuildAt}
-          title="rebuilt from the log (QUALIFY filters on a window)"
-          marks={[{ line: lineOf(S.lines, "QUALIFY"), at: latestAt + 2 }]}
+          title="rebuilt from the log (row 1 per order, newest first)"
+          marks={[
+            { line: lineOf(S.lines, "ORDER BY changed_at DESC"), at: latestAt + 2 },
+            { line: lineOf(S.lines, "WHERE rn = 1"), at: latestAt + 8 },
+          ]}
         />
         {latest.map((r, i) => (
           <KeyArrow key={i} from={[gl.right + 8, gl.rowMid(r)]} to={[gs.x - 10, gs.rowMid(i)]} at={latestAt + 4 + i * 6} color={OK_INK} />
