@@ -212,12 +212,38 @@ export type DocRow = { kind: "h" | "t"; w: number; topic?: number };
  *  things (the accents, which carry no meaning elsewhere here). */
 export const TOPIC = [ds("blue", 300), ds("teal", 300), ds("purple", 300)] as const;
 
-export const DOC_ROW = 22;
+/** The pitch of a Doc's rows. */
+export const DOC_ROW = 19;
 
 /**
- * A page of a document: a light sheet with its rows drawn as bars, headings
- * darker and shorter. `tint` colors each text row by its topic, for a
- * figure about what one chunk covers.
+ * The painted sheet (de-pipelines-for-ai-page, its own pixels), and the part
+ * of its pale face the rows are set on, as fractions of the painting: inside
+ * its blue edges, and above the curled corner at its foot (only the short
+ * last row of a section reaches that low, on the left).
+ */
+const PAGE = { id: "de-pipelines-for-ai-page", w: 891, h: 1529 } as const;
+const FACE = { side: 0.13, top: 0.08, bottom: 0.9 } as const;
+
+/** The height of a Doc of `n` rows: its rows fill the painted face. */
+export const docHeight = (n: number) => Math.round(((n - 1) * DOC_ROW + 8) / (FACE.bottom - FACE.top));
+
+/** The width at which a Doc of `n` rows shows the painting at its own proportions. */
+export const docWidth = (n: number) => Math.round((docHeight(n) * PAGE.w) / PAGE.h);
+
+/** Where row `i` of a Doc of `n` rows at `y` sits: the top of its bar. */
+export const docRowY = (y: number, i: number, n: number) => y + Math.round(FACE.top * docHeight(n)) + i * DOC_ROW;
+
+/** The span of a Doc `w` wide at `x` that its rows are set in, for a band laid across them. */
+export const docFace = (x: number, w: number) => ({ x: x + FACE.side * w, w: (1 - 2 * FACE.side) * w });
+
+/**
+ * A page of a document: the painted sheet, with its rows drawn over its face
+ * as bars, headings darker and shorter. It is `w` wide and as tall as its
+ * rows need (docHeight); a figure narrower than docWidth squeezes the
+ * blank sheet a little, which a plain page carries without showing it. It
+ * stays still (no bob), because brackets and bands are drawn against its
+ * rows. `tint` colors each text row by its topic, for a figure about what
+ * one chunk covers.
  */
 export const Doc: React.FC<{
   x: number;
@@ -233,35 +259,44 @@ export const Doc: React.FC<{
   const t = tint === undefined ? 0 : ease(frame, tint, 14);
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
   if (p <= 0) return null;
-  const pad = 16;
-  const height = rows.length * DOC_ROW + 2 * pad - 8;
+  const n = rows.length;
+  const height = docHeight(n);
+  const face = docFace(0, w);
   return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p * (1 - d) }}>
-      <rect x={x} y={y} width={w} height={height} rx={8} fill={PAPER} stroke={INK_SOFT} strokeWidth={1.6} />
-      {rows.map((r, i) => {
-        const ry = y + pad + i * DOC_ROW;
-        const inner = w - 2 * pad;
-        const color =
-          r.kind === "h" ? INK : t > 0 && r.topic !== undefined ? `color-mix(in srgb, ${TOPIC[r.topic]} ${100 * t}%, ${QUIET})` : QUIET;
-        return (
-          <rect key={i} x={x + pad} y={ry} width={inner * r.w * Math.min(1, p * 1.4)} height={r.kind === "h" ? 11 : 8} rx={3} fill={color} />
-        );
-      })}
-    </svg>
+    <div style={{ position: "absolute", left: x, top: y, width: w, height, opacity: p * (1 - d) }}>
+      {ILLUSTRATIONS ? (
+        <Illustration video={VIDEO} id={PAGE.id} style={{ position: "absolute", left: 0, top: 0, width: w, height, objectFit: "fill" }} />
+      ) : null}
+      <svg width={w} height={height} style={{ position: "absolute", left: 0, top: 0, overflow: "visible" }}>
+        {rows.map((r, i) => {
+          const color =
+            r.kind === "h" ? INK : t > 0 && r.topic !== undefined ? `color-mix(in srgb, ${TOPIC[r.topic]} ${100 * t}%, ${QUIET})` : QUIET;
+          return (
+            <rect
+              key={i}
+              x={face.x}
+              y={docRowY(0, i, n)}
+              width={face.w * r.w * Math.min(1, p * 1.4)}
+              height={r.kind === "h" ? 11 : 8}
+              rx={3}
+              fill={color}
+            />
+          );
+        })}
+      </svg>
+    </div>
   );
 };
 
-/** Where row `i` of a Doc at `y` sits, top and bottom of its bar. */
-export const docRowY = (y: number, i: number) => y + 16 + i * DOC_ROW;
-
 /**
- * A chunk's span beside a document: a square bracket from row `r0` to row
- * `r1` (inclusive), drawn down on `at`, in `color`, `dx` px right of the
- * sheet's edge. `band` also lays a wash across the rows it covers.
+ * A chunk's span beside a document of `n` rows: a square bracket from row
+ * `r0` to row `r1` (inclusive), drawn down on `at`, in `color`, at `x`, right
+ * of the sheet's edge. `band` also lays a wash across the rows it covers.
  */
 export const ChunkBracket: React.FC<{
   x: number;
   docY: number;
+  n: number;
   r0: number;
   r1: number;
   at: number;
@@ -269,14 +304,14 @@ export const ChunkBracket: React.FC<{
   dim?: number;
   out?: number;
   band?: { x: number; w: number; color: string };
-}> = ({ x, docY, r0, r1, at: from, color = BLUE_INK, dim, out, band }) => {
+}> = ({ x, docY, n, r0, r1, at: from, color = BLUE_INK, dim, out, band }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 12);
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.65;
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || o >= 1) return null;
-  const top = docRowY(docY, r0) - 5;
-  const bottom = docRowY(docY, r1) + 13;
+  const top = docRowY(docY, r0, n) - 5;
+  const bottom = docRowY(docY, r1, n) + 13;
   const yb = top + (bottom - top) * p;
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: (1 - d) * (1 - o) }}>
