@@ -8,11 +8,11 @@ import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
  * Pieces this video needs beyond the shared editorial kit and the interview
- * kit (editorial/interview.tsx). The SQL listing, DuckDB's error box and the
- * result tables are Part 1's (da-sql/parts.tsx), and the page furniture is
- * shared with the other parts, so the series stays one family; what is local
- * is the columns and geometry helpers for a result, and the spot illustration
- * bound to this video.
+ * kit (editorial/interview.tsx). The SQL listing, the engine's error box and
+ * the result tables are Part 1's (da-sql/parts.tsx), and the page furniture
+ * is shared with the other parts, so the series stays one family; what is
+ * local is the columns and geometry helpers for a result, and the spot
+ * illustration bound to this video.
  */
 export {
   DataTable,

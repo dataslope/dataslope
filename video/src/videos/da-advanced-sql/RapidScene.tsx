@@ -124,8 +124,9 @@ const Ntile: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const Where: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-where", "Can a window function go in where");
-  const noAt = c.w("r-where", "DuckDB refuses");
-  const outerAt = c.w("r-where", "Filter in an outer query");
+  const noAt = c.w("r-where-why", "Postgres refuses");
+  const outerAt = c.w("r-where-why", "Filter in an outer query");
+  const qualifyAt = c.w("r-where-why", "or with qualify");
   const e = RAPID.inWhere;
   const errTop = under(c, e.lines.length);
   return (
@@ -134,7 +135,13 @@ const Where: React.FC<{ c: Ctx }> = ({ c }) => {
       <ErrorBox x={R_X} top={errTop} width={700} at={noAt - 4} kind={e.kind} message={e.message} size={21} />
       <Note at={outerAt - 2} x={R_X} y={errTop + c.h(100)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          windows run after <QMono>WHERE</QMono> and <QMono>HAVING</QMono>: filter outside, or with <QMono>QUALIFY</QMono>
+          windows run after <QMono>WHERE</QMono> and <QMono>HAVING</QMono>: filter outside
+        </span>
+      </Note>
+      {/* Question 5 said Postgres has no QUALIFY. */}
+      <Note at={qualifyAt - 2} x={R_X} y={errTop + c.h(146)}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          or with <QMono>QUALIFY</QMono>, where the engine has it
         </span>
       </Note>
     </>
@@ -175,18 +182,25 @@ const Recursive: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 17. Bucketing timestamps ────────────────────────────────────────────────
 
+/** The weeks. DATE_TRUNC on a date gives Postgres's timestamptz, so the
+ *  listing casts it back to a date ("2024-01-01"), the usual Postgres idiom.
+ *  The listing fits its longest line (45 characters) and the table sits 80px
+ *  clear of it. */
+const WEEKS_LIST_W = 560;
+const WEEKS_X = R_X + WEEKS_LIST_W + 80;
+
 const Bucket: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-bucket", "Date trunc snaps");
   const weeksAt = c.w("r-bucket", "January's twenty-four days");
   const mondayAt = c.w("r-bucket-last", "Weeks start on Monday");
   const shortAt = c.w("r-bucket-last", "only three days");
   const W = RAPID.weeks;
-  const g = geo(c, W, R_X + 620, c.T);
+  const g = geo(c, W, WEEKS_X, c.T);
   const last = W.rows.length - 1;
   const days = W.cols.indexOf("days");
   return (
     <>
-      <Listing lines={W.lines} x={R_X} top={c.T} width={580} size={SIZE} at={at - 4} marks={[{ line: 0, at: at + 10 }]} />
+      <Listing lines={W.lines} x={R_X} top={c.T} width={WEEKS_LIST_W} size={SIZE} at={at - 4} marks={[{ line: 0, at: at + 10 }]} />
       <DataTable
         g={g}
         cols={colsOf(W)}
@@ -197,10 +211,10 @@ const Bucket: React.FC<{ c: Ctx }> = ({ c }) => {
           { row: last, col: days, at: shortAt + 2 },
         ]}
       />
-      <Note at={mondayAt + 6} x={R_X + 620} y={g.rowTop(W.rows.length) + c.h(16)}>
+      <Note at={mondayAt + 6} x={WEEKS_X} y={g.rowTop(W.rows.length) + c.h(16)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>each a Monday</span>
       </Note>
-      <Note at={shortAt + 4} x={R_X + 620} y={g.rowTop(W.rows.length) + c.h(50)}>
+      <Note at={shortAt + 4} x={WEEKS_X} y={g.rowTop(W.rows.length) + c.h(50)}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>the last week is partial</span>
       </Note>
     </>
@@ -299,7 +313,7 @@ const Percent: React.FC<{ c: Ctx }> = ({ c }) => {
 /**
  * The quick round, questions 13 to 20: the same numbered list as the other
  * parts, in this part's own words ("Eight more, at speed"), each answer ran
- * in DuckDB on the page's tables.
+ * in Postgres on the page's tables.
  */
 export const RapidScene: React.FC = () => {
   const n = useNarration();

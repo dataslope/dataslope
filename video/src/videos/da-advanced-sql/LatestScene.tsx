@@ -32,7 +32,8 @@ const RESULT_X = 900;
 const SPINE_X = 720;
 const SPINE_W = 630;
 const SPINE_SIZE = 19;
-const SPINE_RESULT_X = 1380;
+/** 80px clear of the spine listing (SPINE_X + SPINE_W). */
+const SPINE_RESULT_X = SPINE_X + SPINE_W + 80;
 const CHART = { x0: 790, x1: 1290, base: 800, top: 660 };
 
 /**

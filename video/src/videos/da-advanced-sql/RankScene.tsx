@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -31,13 +31,16 @@ const RESULT_X = 1000;
 const TOPN_LIST_X = 590;
 const TOPN_RESULT_X = 1270;
 const TOPN_LIST_W = 650;
+/** QUALIFY's "runs in / not in" notes, 70px clear of its listing. */
+const QUALIFY_NOTE_X = TOPN_LIST_X + TOPN_LIST_W + 70;
 
 /**
  * Questions 3, 4 and 5. The page's 24 scores, ranks 7 to 14, where three
  * 88s and four 85s tie: RANK skips to 11, DENSE_RANK goes on to 9. Then the
- * video's own eight products: ROW_NUMBER keeps exactly two per category (Emma
+ * video's own eight products: ROW_NUMBER keeps exactly two per category (one
  * of the tied pair), RANK keeps both, and QUALIFY does ROW_NUMBER's filter
- * without the wrapping query.
+ * without the wrapping query. Postgres, which ran the rest, has no QUALIFY,
+ * so it is a listing with no result: what it does and where it runs.
  */
 export const RankScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -73,6 +76,7 @@ export const RankScene: React.FC = () => {
   const noWrapAt = n.word("qualify", "no wrapping query");
   const supportAt = n.word("qualify", "DuckDB, Snowflake and BigQuery");
   const wrapAt = n.word("qualify-where", "Postgres and SQL Server");
+  const wrapQueryAt = n.word("qualify-where", "wrap the query");
   const bridgeAt = n.beat("frame-in").from;
   // The finished page holds through the bridge and fades into the cut.
   const clearAt = n.beat("frame").from - 8 - 30;
@@ -214,7 +218,9 @@ export const RankScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* QUALIFY: the same filter, no wrapping query. */}
+        {/* QUALIFY: the same filter, no wrapping query. Postgres refuses it
+            (data.ts checks that it did), so there is no result to show: the
+            listing, what it means, and where it runs. */}
         <Listing
           lines={q.lines}
           x={TOPN_LIST_X}
@@ -224,7 +230,6 @@ export const RankScene: React.FC = () => {
           at={filtersAt - 4}
           marks={[{ line: 4, at: noWrapAt - 4, color: MARK_OK }]}
         />
-        <DataTable g={rng} cols={colsOf(q)} at={filtersAt + 4} rows={rowsAt(q.rows, filtersAt + 8)} />
         <Note at={noWrapAt} x={TOPN_LIST_X} y={y(TOP) + listingHeight(q.lines.length, 19) + h(24)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <Mark at={bridgeAt}>
@@ -232,11 +237,22 @@ export const RankScene: React.FC = () => {
             </Mark>
           </span>
         </Note>
-        <Note at={supportAt - 2} x={TOPN_LIST_X} y={y(TOP) + listingHeight(q.lines.length, 19) + h(68)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>DuckDB, Snowflake, BigQuery</span>
+        {/* Where it runs, in the column the results had: Postgres, which ran
+            every other listing here, is one of the engines without it. */}
+        <Note at={supportAt - 2} x={QUALIFY_NOTE_X} y={y(TOP) + h(4)}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>runs in</span>
         </Note>
-        <Note at={wrapAt} x={TOPN_LIST_X} y={y(TOP) + listingHeight(q.lines.length, 19) + h(106)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>not Postgres or SQL Server: wrap the query there</span>
+        <Note at={supportAt} x={QUALIFY_NOTE_X} y={y(TOP) + h(38)}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>DuckDB, Snowflake, BigQuery</span>
+        </Note>
+        <Note at={wrapAt - 2} x={QUALIFY_NOTE_X} y={y(TOP) + h(104)}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>not in</span>
+        </Note>
+        <Note at={wrapAt} x={QUALIFY_NOTE_X} y={y(TOP) + h(138)}>
+          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>Postgres or SQL Server</span>
+        </Note>
+        <Note at={wrapQueryAt} x={QUALIFY_NOTE_X} y={y(TOP) + h(182)}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>there, wrap the query as in question 4</span>
         </Note>
         <Note at={tieAt + 4} x={X0} y={pg.rowTop(P.rows.length) + h(20)} out={useRankAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>Emma and Ulysses: 310 each</span>

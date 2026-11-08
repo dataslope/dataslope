@@ -108,7 +108,7 @@ export const RunningScene: React.FC = () => {
           width={820}
           size={SIZE}
           at={asked - 6}
-          lineAt={[asked - 4, asked, avgAt - 4, avgAt, avgAt + 4, asked + 2, asked + 4]}
+          lineAt={[asked - 4, asked, avgAt - 4, avgAt, asked + 2, asked + 4]}
           marks={[
             { line: 1, at: sumAt + 4, out: q10At },
             { line: 3, at: beforeAt - 2 },

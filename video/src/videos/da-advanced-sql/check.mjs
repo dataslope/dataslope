@@ -1,76 +1,22 @@
-// Runs every statement the da-advanced-sql video shows in DuckDB, the engine
-// the Data Analyst advanced SQL page's blocks run in the reader's browser, and
-// writes what came back to results.json, which data.ts reads. From the repo
-// root, where @duckdb/duckdb-wasm (pinned to the version runtime/duckdb.ts
-// loads) is installed:
+// Runs every statement the da-advanced-sql video shows on the site's Postgres
+// engine (PGlite, PostgreSQL 18), the engine the Data Analyst advanced SQL
+// page's blocks run in the reader's browser, and writes what came back to
+// results.json, which data.ts reads. From the repo root:
 //
 //   node video/src/videos/da-advanced-sql/check.mjs
 //
 // Each figure runs in a fresh database built by its own setup, as the page
-// gives every block its own engine. Values are printed the way a SQL client
-// prints them: a DECIMAL at its scale ("798.75"), a DATE as "2024-01-01", a
-// NULL as null. Tables are the page's own (content/interview/data-analyst/
-// advanced-sql.mdx) wherever the page has one; the rest are marked "the
-// video's own" below and in script.ts.
+// gives every block its own engine (video/scripts/lib/pg-figure.mjs). Values
+// are printed the way psql prints them: a numeric at its scale ("798.75"), a
+// DATE as "2024-01-01", a NULL as null, and an error as Postgres's own
+// "ERROR: ..." line. Tables are the page's own (content/interview/
+// data-analyst/advanced-sql.mdx) wherever the page has one; the rest are
+// marked "the video's own" below and in script.ts.
 /* global console, URL */
 import { writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
-const require = createRequire(join(dirname(fileURLToPath(import.meta.url)), "../../../../package.json"));
-const duckdb = require("@duckdb/duckdb-wasm");
-const { default: Worker } = await import(pathToFileURL(require.resolve("web-worker")).href);
-const dist = join(dirname(require.resolve("@duckdb/duckdb-wasm")), "..", "dist");
-const bundle = await duckdb.selectBundle({
-  mvp: { mainModule: join(dist, "duckdb-mvp.wasm"), mainWorker: join(dist, "duckdb-node-mvp.worker.cjs") },
-  eh: { mainModule: join(dist, "duckdb-eh.wasm"), mainWorker: join(dist, "duckdb-node-eh.worker.cjs") },
-});
-
-/** One value as a SQL client prints it, from its Arrow column type. */
-function shown(value, type) {
-  if (value === null || value === undefined) return null;
-  const t = String(type);
-  if (t.startsWith("Decimal")) {
-    const scale = type.scale ?? 0;
-    const digits = String(value).replace("-", "").padStart(scale + 1, "0");
-    const sign = String(value).startsWith("-") ? "-" : "";
-    return scale ? `${sign}${digits.slice(0, -scale)}.${digits.slice(-scale)}` : `${sign}${digits}`;
-  }
-  if (t.startsWith("Date")) return new Date(Number(value)).toISOString().slice(0, 10);
-  if (t.startsWith("Timestamp")) return new Date(Number(value)).toISOString().slice(0, 19).replace("T", " ");
-  if (typeof value === "bigint") return Number(value);
-  return value?.valueOf?.() ?? value;
-}
-
-async function figure(setup, steps) {
-  const worker = new Worker(pathToFileURL(bundle.mainWorker).href, { type: "module" });
-  const db = new duckdb.AsyncDuckDB({ log: () => {} }, worker);
-  await db.instantiate(bundle.mainModule);
-  const conn = await db.connect();
-  for (const stmt of setup.split(/;\s*\n/).map((s) => s.trim()).filter(Boolean)) await conn.query(stmt);
-  const out = {};
-  for (const [id, sql] of Object.entries(steps)) {
-    try {
-      const table = await conn.query(sql);
-      const fields = table.schema.fields;
-      const rows = table.toArray().map((r) => {
-        const obj = r.toJSON();
-        return fields.map((f) => shown(obj[f.name], f.type));
-      });
-      out[id] = { sql, ok: true, columns: fields.map((f) => f.name), rows };
-    } catch (e) {
-      // DuckDB's message is "<Kind> Error: <text>", then a LINE excerpt.
-      const message = String(e.message).split("\n")[0];
-      out[id] = { sql, ok: false, error: message };
-    }
-  }
-  const version = (await conn.query("SELECT version() AS v")).toArray()[0].toJSON().v;
-  await conn.close();
-  await db.terminate();
-  await worker.terminate();
-  return { setup, steps: out, version };
-}
+import { figure } from "../../../scripts/lib/pg-figure.mjs";
 
 // ── The page's tables ───────────────────────────────────────────────────────
 
@@ -180,6 +126,8 @@ results.figures.topN = await figure(PRODUCTS, {
     "WITH ranked AS (\n  SELECT *,\n    ROW_NUMBER() OVER (PARTITION BY category\n                       ORDER BY revenue DESC) AS rn\n  FROM products\n)\nSELECT * FROM ranked WHERE rn <= 2\nORDER BY category, rn;",
   rank:
     "WITH ranked AS (\n  SELECT *,\n    RANK() OVER (PARTITION BY category\n                 ORDER BY revenue DESC) AS rn\n  FROM products\n)\nSELECT * FROM ranked WHERE rn <= 2\nORDER BY category, rn, product;",
+  // Postgres has no QUALIFY: the video shows the listing and says which
+  // engines have it, and data.ts checks that this one refused it.
   qualify:
     "SELECT *,\n  ROW_NUMBER() OVER (PARTITION BY category\n                     ORDER BY revenue DESC) AS rn\nFROM products\nQUALIFY rn <= 2\nORDER BY category, rn;",
   // Rapid fire: a window function in WHERE.
@@ -214,19 +162,19 @@ results.figures.last = await figure(PAGE_TXNS, {
     "SELECT day, amount,\n  FIRST_VALUE(amount) OVER (ORDER BY day) AS first,\n  NTH_VALUE(amount, 3) OVER (ORDER BY day) AS third\nFROM txns\nWHERE day <= DATE '2024-01-04'\nORDER BY day;",
 });
 
-// 9, 10. Running total and moving average: the page's block, with the moving
-//    average rounded to cents and kept a DECIMAL, so it prints at its scale
-//    ("175.00") like every other amount on screen.
+// 9, 10. Running total and moving average: the page's block, the moving
+//    average rounded to cents as the page rounds it, so it prints at its
+//    scale ("175.00") like every other amount on screen.
 results.figures.running = await figure(PAGE_TXNS, {
   both:
-    "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day) AS running_total,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2)::DECIMAL(8,2)\n    AS moving_avg_3\nFROM txns\nORDER BY day;",
+    "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day) AS running_total,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS moving_avg_3\nFROM txns\nORDER BY day;",
   centered:
     "SELECT day, amount,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING), 2) AS centered_3\nFROM txns\nORDER BY day;",
   // Rapid fire: LAG and day-over-day change, on the same days.
   lag: "SELECT day, amount,\n  LAG(amount) OVER (ORDER BY day) AS prev_day,\n  amount - LAG(amount) OVER (ORDER BY day) AS change\nFROM txns\nORDER BY day;",
   // Rapid fire: bucketing by week (2024-01-01 is a Monday).
   weeks:
-    "SELECT DATE_TRUNC('week', day) AS week,\n  COUNT(*) AS days,\n  SUM(amount) AS revenue\nFROM txns\nGROUP BY 1\nORDER BY 1;",
+    "SELECT DATE_TRUNC('week', day)::date AS week,\n  COUNT(*) AS days,\n  SUM(amount) AS revenue\nFROM txns\nGROUP BY 1\nORDER BY 1;",
 });
 
 // 11. Latest row per key: the video's own profile updates.
@@ -241,17 +189,18 @@ results.figures.latest = await figure(EVENTS, {
   kept: "WITH ranked AS (\n  SELECT *,\n    ROW_NUMBER() OVER (PARTITION BY user_id\n                       ORDER BY updated_at DESC) AS rn\n  FROM events\n)\nSELECT * FROM ranked WHERE rn = 1\nORDER BY user_id;",
 });
 
-// 12. A date spine: the page's block, and the same days without it. The
-//    generated days are cast to DATE, so they print as dates rather than as
-//    midnight timestamps; the join and the result are otherwise the page's.
+// 12. A date spine: the page's block, and the same days without it.
+//    generate_series returns one row per step, as timestamps, so the days are
+//    cast back to date, as the page does.
 results.figures.spine = await figure(PAGE_SPINE_SALES, {
   without: "SELECT day, amount\nFROM sales\nWHERE day <= DATE '2024-03-05'\nORDER BY day;",
   spine:
-    "WITH spine AS (\n  SELECT unnest(generate_series(DATE '2024-03-01',\n    DATE '2024-03-05', INTERVAL 1 DAY))::DATE AS day\n)\nSELECT s.day, COALESCE(x.amount, 0) AS amount\nFROM spine s\nLEFT JOIN sales x ON x.day = s.day\nORDER BY s.day;",
+    "WITH spine AS (\n  SELECT generate_series(DATE '2024-03-01',\n    DATE '2024-03-05', INTERVAL '1 day')::date AS day\n)\nSELECT s.day, COALESCE(x.amount, 0) AS amount\nFROM spine s\nLEFT JOIN sales x ON x.day = s.day\nORDER BY s.day;",
   // Question 10's follow-up: a three-day average over days with gaps is a
-  // RANGE frame with an interval, not ROWS. Only its frame clause is shown.
+  // RANGE frame with an interval, not ROWS. Only its frame clause is shown;
+  // rounded, since Postgres prints an unrounded AVG with sixteen places.
   rangeDays:
-    "SELECT day, amount,\n  AVG(amount) OVER (ORDER BY day\n    RANGE BETWEEN INTERVAL 2 DAY PRECEDING AND CURRENT ROW) AS avg_3_days\nFROM sales\nWHERE day <= DATE '2024-03-07'\nORDER BY day;",
+    "SELECT day, amount,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    RANGE BETWEEN INTERVAL '2 days' PRECEDING AND CURRENT ROW), 2) AS avg_3_days\nFROM sales\nWHERE day <= DATE '2024-03-07'\nORDER BY day;",
 });
 
 // Rapid fire.

@@ -54,11 +54,11 @@
           "rows": [
             [
               "North",
-              "425"
+              425
             ],
             [
               "South",
-              "640"
+              640
             ]
           ]
         },
@@ -76,37 +76,37 @@
               "2024-01-01",
               "North",
               100,
-              "425"
+              425
             ],
             [
               "2024-01-02",
               "North",
               250,
-              "425"
+              425
             ],
             [
               "2024-01-03",
               "North",
               75,
-              "425"
+              425
             ],
             [
               "2024-01-01",
               "South",
               180,
-              "640"
+              640
             ],
             [
               "2024-01-02",
               "South",
               320,
-              "640"
+              640
             ],
             [
               "2024-01-03",
               "South",
               140,
-              "640"
+              640
             ]
           ]
         },
@@ -159,7 +159,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "rank": {
       "setup": "CREATE TABLE results (name TEXT, score INTEGER);\nINSERT INTO results VALUES\n  ('Alice', 90), ('Bob', 85), ('Carol', 85), ('Dave', 80),\n  ('Erin', 97), ('Frank', 78), ('Grace', 91), ('Hugo', 85),\n  ('Iris', 72), ('Jonas', 88), ('Kira', 95), ('Leo', 64),\n  ('Mona', 80), ('Nils', 99), ('Otto', 76), ('Pia', 88),\n  ('Quinn', 69), ('Rui', 93), ('Sara', 85), ('Theo', 71),\n  ('Ulla', 82), ('Vik', 96), ('Wanda', 74), ('Yara', 88);",
@@ -246,28 +246,28 @@
               8
             ],
             [
-              "Hugo",
+              "Bob",
               85,
               11,
               11,
               9
             ],
             [
-              "Carol",
+              "Hugo",
               85,
               12,
               11,
               9
             ],
             [
-              "Sara",
+              "Carol",
               85,
               13,
               11,
               9
             ],
             [
-              "Bob",
+              "Sara",
               85,
               14,
               11,
@@ -427,28 +427,28 @@
               8
             ],
             [
-              "Hugo",
+              "Bob",
               85,
               11,
               11,
               9
             ],
             [
-              "Carol",
+              "Hugo",
               85,
               12,
               11,
               9
             ],
             [
-              "Sara",
+              "Carol",
               85,
               13,
               11,
               9
             ],
             [
-              "Bob",
+              "Sara",
               85,
               14,
               11,
@@ -527,7 +527,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "topN": {
       "setup": "CREATE TABLE products (category TEXT, product TEXT, revenue INTEGER);\nINSERT INTO products VALUES\n  ('Books', 'Dune', 420), ('Books', 'Emma', 310), ('Books', 'Ulysses', 310), ('Books', 'Beloved', 150),\n  ('Games', 'Chess', 500), ('Games', 'Go', 260), ('Games', 'Risk', 180), ('Games', 'Uno', 90);",
@@ -663,47 +663,16 @@
         },
         "qualify": {
           "sql": "SELECT *,\n  ROW_NUMBER() OVER (PARTITION BY category\n                     ORDER BY revenue DESC) AS rn\nFROM products\nQUALIFY rn <= 2\nORDER BY category, rn;",
-          "ok": true,
-          "columns": [
-            "category",
-            "product",
-            "revenue",
-            "rn"
-          ],
-          "rows": [
-            [
-              "Books",
-              "Dune",
-              420,
-              1
-            ],
-            [
-              "Books",
-              "Emma",
-              310,
-              2
-            ],
-            [
-              "Games",
-              "Chess",
-              500,
-              1
-            ],
-            [
-              "Games",
-              "Go",
-              260,
-              2
-            ]
-          ]
+          "ok": false,
+          "error": "ERROR: syntax error at or near \"rn\""
         },
         "inWhere": {
           "sql": "SELECT *\nFROM products\nWHERE ROW_NUMBER() OVER (PARTITION BY category\n                         ORDER BY revenue DESC) <= 2;",
           "ok": false,
-          "error": "Binder Error: WHERE clause cannot contain window functions!"
+          "error": "ERROR: window functions are not allowed in WHERE"
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "frame": {
       "setup": "CREATE TABLE payments (id INTEGER, day DATE, amount INTEGER);\nINSERT INTO payments VALUES\n  (1, '2024-01-01', 100), (2, '2024-01-02', 250), (3, '2024-01-02', 75), (4, '2024-01-03', 180);",
@@ -753,25 +722,25 @@
               1,
               "2024-01-01",
               100,
-              "100"
+              100
             ],
             [
               2,
               "2024-01-02",
               250,
-              "350"
+              350
             ],
             [
               3,
               "2024-01-02",
               75,
-              "425"
+              425
             ],
             [
               4,
               "2024-01-03",
               180,
-              "605"
+              605
             ]
           ]
         },
@@ -789,25 +758,25 @@
               1,
               "2024-01-01",
               100,
-              "100"
+              100
             ],
             [
               2,
               "2024-01-02",
               250,
-              "425"
+              425
             ],
             [
               3,
               "2024-01-02",
               75,
-              "425"
+              425
             ],
             [
               4,
               "2024-01-03",
               180,
-              "605"
+              605
             ]
           ]
         },
@@ -825,25 +794,25 @@
               1,
               "2024-01-01",
               100,
-              "100"
+              100
             ],
             [
               2,
               "2024-01-02",
               250,
-              "425"
+              425
             ],
             [
               3,
               "2024-01-02",
               75,
-              "425"
+              425
             ],
             [
               4,
               "2024-01-03",
               180,
-              "605"
+              605
             ]
           ]
         },
@@ -861,30 +830,30 @@
               1,
               "2024-01-01",
               100,
-              "605"
+              605
             ],
             [
               2,
               "2024-01-02",
               250,
-              "605"
+              605
             ],
             [
               3,
               "2024-01-02",
               75,
-              "605"
+              605
             ],
             [
               4,
               "2024-01-03",
               180,
-              "605"
+              605
             ]
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "last": {
       "setup": "CREATE TABLE txns (day DATE, amount DECIMAL(8,2));\nINSERT INTO txns VALUES\n  ('2024-01-01', 100.00), ('2024-01-02', 250.00), ('2024-01-03', 75.00),\n  ('2024-01-04', 180.00), ('2024-01-05', 320.00), ('2024-01-06', 140.00),\n  ('2024-01-07', 95.00),  ('2024-01-08', 210.00), ('2024-01-09', 60.00),\n  ('2024-01-10', 275.00), ('2024-01-11', 130.00), ('2024-01-12', 185.00),\n  ('2024-01-13', 340.00), ('2024-01-14', 55.00),  ('2024-01-15', 220.00),\n  ('2024-01-16', 165.00), ('2024-01-17', 90.00),  ('2024-01-18', 300.00),\n  ('2024-01-19', 125.00), ('2024-01-20', 240.00), ('2024-01-21', 70.00),\n  ('2024-01-22', 195.00), ('2024-01-23', 155.00), ('2024-01-24', 280.00);",
@@ -988,13 +957,13 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "running": {
       "setup": "CREATE TABLE txns (day DATE, amount DECIMAL(8,2));\nINSERT INTO txns VALUES\n  ('2024-01-01', 100.00), ('2024-01-02', 250.00), ('2024-01-03', 75.00),\n  ('2024-01-04', 180.00), ('2024-01-05', 320.00), ('2024-01-06', 140.00),\n  ('2024-01-07', 95.00),  ('2024-01-08', 210.00), ('2024-01-09', 60.00),\n  ('2024-01-10', 275.00), ('2024-01-11', 130.00), ('2024-01-12', 185.00),\n  ('2024-01-13', 340.00), ('2024-01-14', 55.00),  ('2024-01-15', 220.00),\n  ('2024-01-16', 165.00), ('2024-01-17', 90.00),  ('2024-01-18', 300.00),\n  ('2024-01-19', 125.00), ('2024-01-20', 240.00), ('2024-01-21', 70.00),\n  ('2024-01-22', 195.00), ('2024-01-23', 155.00), ('2024-01-24', 280.00);",
       "steps": {
         "both": {
-          "sql": "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day) AS running_total,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2)::DECIMAL(8,2)\n    AS moving_avg_3\nFROM txns\nORDER BY day;",
+          "sql": "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day) AS running_total,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS moving_avg_3\nFROM txns\nORDER BY day;",
           "ok": true,
           "columns": [
             "day",
@@ -1161,122 +1130,122 @@
             [
               "2024-01-01",
               "100.00",
-              175
+              "175.00"
             ],
             [
               "2024-01-02",
               "250.00",
-              141.67
+              "141.67"
             ],
             [
               "2024-01-03",
               "75.00",
-              168.33
+              "168.33"
             ],
             [
               "2024-01-04",
               "180.00",
-              191.67
+              "191.67"
             ],
             [
               "2024-01-05",
               "320.00",
-              213.33
+              "213.33"
             ],
             [
               "2024-01-06",
               "140.00",
-              185
+              "185.00"
             ],
             [
               "2024-01-07",
               "95.00",
-              148.33
+              "148.33"
             ],
             [
               "2024-01-08",
               "210.00",
-              121.67
+              "121.67"
             ],
             [
               "2024-01-09",
               "60.00",
-              181.67
+              "181.67"
             ],
             [
               "2024-01-10",
               "275.00",
-              155
+              "155.00"
             ],
             [
               "2024-01-11",
               "130.00",
-              196.67
+              "196.67"
             ],
             [
               "2024-01-12",
               "185.00",
-              218.33
+              "218.33"
             ],
             [
               "2024-01-13",
               "340.00",
-              193.33
+              "193.33"
             ],
             [
               "2024-01-14",
               "55.00",
-              205
+              "205.00"
             ],
             [
               "2024-01-15",
               "220.00",
-              146.67
+              "146.67"
             ],
             [
               "2024-01-16",
               "165.00",
-              158.33
+              "158.33"
             ],
             [
               "2024-01-17",
               "90.00",
-              185
+              "185.00"
             ],
             [
               "2024-01-18",
               "300.00",
-              171.67
+              "171.67"
             ],
             [
               "2024-01-19",
               "125.00",
-              221.67
+              "221.67"
             ],
             [
               "2024-01-20",
               "240.00",
-              145
+              "145.00"
             ],
             [
               "2024-01-21",
               "70.00",
-              168.33
+              "168.33"
             ],
             [
               "2024-01-22",
               "195.00",
-              140
+              "140.00"
             ],
             [
               "2024-01-23",
               "155.00",
-              210
+              "210.00"
             ],
             [
               "2024-01-24",
               "280.00",
-              217.5
+              "217.50"
             ]
           ]
         },
@@ -1437,7 +1406,7 @@
           ]
         },
         "weeks": {
-          "sql": "SELECT DATE_TRUNC('week', day) AS week,\n  COUNT(*) AS days,\n  SUM(amount) AS revenue\nFROM txns\nGROUP BY 1\nORDER BY 1;",
+          "sql": "SELECT DATE_TRUNC('week', day)::date AS week,\n  COUNT(*) AS days,\n  SUM(amount) AS revenue\nFROM txns\nGROUP BY 1\nORDER BY 1;",
           "ok": true,
           "columns": [
             "week",
@@ -1468,7 +1437,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "latest": {
       "setup": "CREATE TABLE events (user_id INTEGER, plan TEXT, updated_at DATE);\nINSERT INTO events VALUES\n  (1, 'free', '2024-01-03'), (1, 'pro', '2024-02-10'), (1, 'team', '2024-03-05'),\n  (2, 'free', '2024-01-20'), (2, 'pro', '2024-02-28'),\n  (3, 'free', '2024-02-14');",
@@ -1552,7 +1521,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "spine": {
       "setup": "CREATE TABLE sales (day DATE, amount INTEGER);\nINSERT INTO sales VALUES\n  ('2024-03-01', 100), ('2024-03-03', 250), ('2024-03-04', 75),\n  ('2024-03-06', 190), ('2024-03-07', 145), ('2024-03-10', 220),\n  ('2024-03-11', 80),  ('2024-03-12', 310), ('2024-03-15', 125),\n  ('2024-03-17', 265), ('2024-03-18', 95),  ('2024-03-20', 175),\n  ('2024-03-21', 240), ('2024-03-24', 60),  ('2024-03-25', 205),\n  ('2024-03-26', 130), ('2024-03-28', 285), ('2024-03-29', 110),\n  ('2024-03-31', 160), ('2024-04-02', 195), ('2024-04-03', 70),\n  ('2024-04-05', 250), ('2024-04-06', 140), ('2024-04-08', 300);",
@@ -1580,7 +1549,7 @@
           ]
         },
         "spine": {
-          "sql": "WITH spine AS (\n  SELECT unnest(generate_series(DATE '2024-03-01',\n    DATE '2024-03-05', INTERVAL 1 DAY))::DATE AS day\n)\nSELECT s.day, COALESCE(x.amount, 0) AS amount\nFROM spine s\nLEFT JOIN sales x ON x.day = s.day\nORDER BY s.day;",
+          "sql": "WITH spine AS (\n  SELECT generate_series(DATE '2024-03-01',\n    DATE '2024-03-05', INTERVAL '1 day')::date AS day\n)\nSELECT s.day, COALESCE(x.amount, 0) AS amount\nFROM spine s\nLEFT JOIN sales x ON x.day = s.day\nORDER BY s.day;",
           "ok": true,
           "columns": [
             "day",
@@ -1610,7 +1579,7 @@
           ]
         },
         "rangeDays": {
-          "sql": "SELECT day, amount,\n  AVG(amount) OVER (ORDER BY day\n    RANGE BETWEEN INTERVAL 2 DAY PRECEDING AND CURRENT ROW) AS avg_3_days\nFROM sales\nWHERE day <= DATE '2024-03-07'\nORDER BY day;",
+          "sql": "SELECT day, amount,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    RANGE BETWEEN INTERVAL '2 days' PRECEDING AND CURRENT ROW), 2) AS avg_3_days\nFROM sales\nWHERE day <= DATE '2024-03-07'\nORDER BY day;",
           "ok": true,
           "columns": [
             "day",
@@ -1621,32 +1590,32 @@
             [
               "2024-03-01",
               100,
-              100
+              "100.00"
             ],
             [
               "2024-03-03",
               250,
-              175
+              "175.00"
             ],
             [
               "2024-03-04",
               75,
-              162.5
+              "162.50"
             ],
             [
               "2024-03-06",
               190,
-              132.5
+              "132.50"
             ],
             [
               "2024-03-07",
               145,
-              167.5
+              "167.50"
             ]
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "ntile": {
       "setup": "CREATE TABLE customers (name TEXT, spend DECIMAL(8,2));\nINSERT INTO customers VALUES\n  ('Ava', 900), ('Ben', 720), ('Cy', 540), ('Di', 480),\n  ('Eve', 300), ('Finn', 260), ('Gus', 150), ('Hana', 90),\n  ('Iris', 1450), ('Jonas', 1120), ('Kira', 880), ('Leo', 815),\n  ('Mona', 640), ('Nils', 605), ('Otto', 570), ('Pia', 505),\n  ('Quinn', 430), ('Rui', 375), ('Sara', 340), ('Theo', 285),\n  ('Ulla', 230), ('Vik', 195), ('Wanda', 130), ('Yara', 45);",
@@ -1881,7 +1850,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "recursive": {
       "setup": "CREATE TABLE emp (id INT, name TEXT, manager_id INT);\nINSERT INTO emp VALUES\n  (1,'CEO',NULL),\n  (2,'VP Eng',1), (3,'VP Sales',1), (4,'VP Finance',1),\n  (5,'Eng Mgr Platform',2), (6,'Eng Mgr Product',2), (7,'Eng Mgr Data',2),\n  (8,'Sales Dir East',3), (9,'Sales Dir West',3),\n  (10,'Controller',4),\n  (11,'Engineer A',5), (12,'Engineer B',5), (13,'Engineer C',6),\n  (14,'Engineer D',6), (15,'Engineer E',7), (16,'Engineer F',7),\n  (17,'AE East 1',8), (18,'AE East 2',8), (19,'AE West 1',9),\n  (20,'AE West 2',9), (21,'Accountant',10),\n  (22,'Intern Platform',11), (23,'Intern Data',15), (24,'Intern Product',13);",
@@ -2073,7 +2042,7 @@
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     },
     "pivot": {
       "setup": "CREATE TABLE sales (region TEXT, quarter TEXT, amount INTEGER);\nINSERT INTO sales VALUES\n  ('North','Q1',100), ('North','Q2',140), ('South','Q1',80),\n  ('South','Q2',120), ('North','Q1',60),  ('South','Q2',30),\n  ('East','Q1',95),   ('East','Q2',175),  ('West','Q1',110),\n  ('West','Q2',65),   ('North','Q2',85),  ('South','Q1',145),\n  ('East','Q1',40),   ('West','Q2',200),  ('North','Q1',75),\n  ('South','Q2',55),  ('East','Q2',130),  ('West','Q1',90),\n  ('North','Q2',115), ('South','Q1',35),  ('East','Q1',160),\n  ('West','Q2',105),  ('North','Q1',50),  ('South','Q2',185);",
@@ -2089,23 +2058,23 @@
           "rows": [
             [
               "East",
-              "295",
-              "305"
+              295,
+              305
             ],
             [
               "North",
-              "285",
-              "340"
+              285,
+              340
             ],
             [
               "South",
-              "260",
-              "390"
+              260,
+              390
             ],
             [
               "West",
-              "200",
-              "370"
+              200,
+              370
             ]
           ]
         },
@@ -2121,47 +2090,47 @@
             [
               "East",
               "q1",
-              "295"
+              295
             ],
             [
               "East",
               "q2",
-              "305"
+              305
             ],
             [
               "North",
               "q1",
-              "285"
+              285
             ],
             [
               "North",
               "q2",
-              "340"
+              340
             ],
             [
               "South",
               "q1",
-              "260"
+              260
             ],
             [
               "South",
               "q2",
-              "390"
+              390
             ],
             [
               "West",
               "q1",
-              "200"
+              200
             ],
             [
               "West",
               "q2",
-              "370"
+              370
             ]
           ]
         }
       },
-      "version": "v1.4.3"
+      "version": "PostgreSQL 18.3 (PGlite 0.5.8)"
     }
   }
 }

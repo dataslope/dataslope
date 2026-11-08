@@ -19,7 +19,7 @@ const OVERLAP = 6;
  * "Advanced SQL" (16:9), Part 4 of the Data Analyst interview prep videos, on
  * the editorial page. Twenty questions of the track's advanced SQL page:
  * twelve worked through on real queries, a scene or a part of one each, then
- * eight at speed. Every statement, result and error ran in DuckDB
+ * eight at speed. Every statement, result and error ran in Postgres
  * (check.mjs, results.json, data.ts).
  *
  * No series intro yet, as in Parts 1 to 3 (see da-sql/Video.tsx for how it
