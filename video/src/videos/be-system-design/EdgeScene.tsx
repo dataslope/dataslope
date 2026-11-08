@@ -9,20 +9,29 @@ import { Drift, Headline, Kicker, Line, Mark, OK, OK_INK, reach, VRule, X0 } fro
 
 const COL_B = 980;
 
-/** A timer with a short time left: a dial whose sweep is nearly gone. */
+/**
+ * A timer with a short time left: Lucide's `timer` icon (ISC licence) on its
+ * 24-unit grid, its dial centred on (x, y), and inside it the time that is
+ * left as a green wedge that shrinks from `at`, the icon's hand riding the
+ * wedge's edge. The stroke is held at 3px (Lucide's absolute stroke width).
+ */
 const Timer: React.FC<{ x: number; y: number; at: number }> = ({ x, y, at }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
-  const r = 22;
+  const s = 26 / 8; // Lucide's timer dial is r = 8 (centre 12,14); drawn 26px across the radius
   const sweep = 0.18 * Math.PI * 2 * map(frame, [at, at + 40], [1, 0.55]);
-  const ex = x + r * Math.sin(sweep);
-  const ey = y - r * Math.cos(sweep);
+  const w = 6.2; // the wedge, inside the dial's stroke
+  const ex = 12 + w * Math.sin(sweep);
+  const ey = 14 - w * Math.cos(sweep);
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p }}>
-      <circle cx={x} cy={y} r={r + 4} fill={PAPER} stroke={OK} strokeWidth={3} />
-      <path d={`M${x},${y} L${x},${y - r} A${r},${r} 0 0 1 ${ex},${ey} Z`} fill={OK} opacity={0.85} />
-      <line x1={x} x2={x} y1={y - r - 4} y2={y - r - 11} stroke={OK} strokeWidth={4} strokeLinecap="round" />
+      <g transform={`translate(${x - 12 * s} ${y - 14 * s}) scale(${s})`} fill="none" stroke={OK} strokeWidth={3 / s} strokeLinecap="round" strokeLinejoin="round">
+        <circle cx={12} cy={14} r={8} fill={PAPER} />
+        <path d={`M12,14 L12,${14 - w} A${w},${w} 0 0 1 ${ex},${ey} Z`} fill={OK} stroke="none" opacity={0.85} />
+        <line x1={10} x2={14} y1={2} y2={2} />
+        <line x1={12} x2={ex} y1={14} y2={ey} />
+      </g>
     </svg>
   );
 };
