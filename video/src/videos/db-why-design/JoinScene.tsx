@@ -15,12 +15,14 @@ const TOP = 340;
 const LOW_FIG = 640;
 const LOW_Y = 690;
 const CARD_X = 800;
-/** The four boxes, narrow enough to leave each line room for its verb. */
+/** The four boxes: orders and order_items wide enough for their longest key
+ *  name beside its type at 24px, the short-named boxes narrower, so each line
+ *  still has room for its verb with air on both sides. */
 const BOX = {
-  customers: { x: X0, width: 290 },
-  orders: { x: 543, width: 330 },
-  items: { x: 1006, width: 380 },
-  products: { x: 1520, width: 280 },
+  customers: { x: X0, width: 260 },
+  orders: { x: 480, width: 380 },
+  items: { x: 960, width: 410 },
+  products: { x: 1530, width: 270 },
 };
 const RIGHT = BOX.products.x + BOX.products.width;
 /** A relationship's verb, centred over the gap its line crosses, above the line. */

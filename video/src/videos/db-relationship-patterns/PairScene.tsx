@@ -32,9 +32,14 @@ import {
 } from "./parts";
 
 const TABLE_Y = 410;
-const LIST_X = 860;
-const LIST_W = 900;
+/** Wide enough that the error's DETAIL line (60 characters of 24px mono)
+ *  stays on one line, so the box is three lines tall; the left edge keeps
+ *  about 100px of air after the table. */
+const LIST_X = 880;
+const LIST_W = 920;
 const LIST_SIZE = 24;
+/** The error box at that width: two lines of message, one of detail. */
+const ERROR_H = 144;
 /** Seven rows (four shown, the rows left out, Linus's twice) fit under the
  *  headline at this height (before `h()`). */
 const TABLE_ROW_H = 52;
@@ -191,7 +196,7 @@ export const PairScene: React.FC = () => {
           detail={JT.again.detail ?? ""}
           detailMark={existsAt}
         />
-        <Ink at={noAt + 10} dur={12} style={{ left: LIST_X, top: listTop + listH + 220, whiteSpace: "nowrap" }}>
+        <Ink at={noAt + 10} dur={12} style={{ left: LIST_X, top: listTop + listH + 84 + ERROR_H + 32, whiteSpace: "nowrap" }}>
           <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>the second time: still {JT.againCount} rows</span>
         </Ink>
       </Drift>
