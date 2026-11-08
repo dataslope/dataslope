@@ -14,7 +14,7 @@ const RIGHT_X = 1000;
 const OPTS = { headH: 46, rowH: 50, bodySize: 24, headSize: 21 } as const;
 
 /**
- * Question 5, on why-normalization's shop (re-run in DuckDB). Normalized,
+ * Question 5, on why-normalization's shop (re-run here). Normalized,
  * Ada's email is one customers row that her orders reach through a join;
  * denormalized, it is copied onto each order, so reads need no join and a
  * rushed update leaves her two emails. Then where each one belongs, and why

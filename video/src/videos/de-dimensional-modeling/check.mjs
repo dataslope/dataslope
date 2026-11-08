@@ -1,17 +1,17 @@
-// Runs every statement the de-dimensional-modeling video shows in DuckDB, the
-// engine the Data Engineer data-modeling page's blocks run in the reader's
-// browser, and writes what came back to results.json, which data.ts reads.
-// From the repo root, where @duckdb/duckdb-wasm (pinned to the version
-// runtime/duckdb.ts loads) is installed:
+// Runs every statement the de-dimensional-modeling video shows on the site's
+// Postgres engine (PGlite, PostgreSQL 18), the engine the Data Engineer
+// data-modeling page's blocks run in the reader's browser, and writes what
+// came back to results.json, which data.ts reads. From the repo root:
 //
 //   node video/src/videos/de-dimensional-modeling/check.mjs
 //
 // Each figure runs in a fresh database built by its own setup, as the page
-// gives every block its own engine. Values are printed the way a SQL client
-// prints them: a DECIMAL at its scale ("350.00"), a DATE as "2024-01-01", a
-// NULL as null. The harness is da-sql's (video/src/videos/da-sql/check.mjs).
+// gives every block its own engine (video/scripts/lib/pg-figure.mjs). Values
+// are printed the way psql prints them: a numeric at its scale ("350.00"), a
+// DATE as "2024-01-01", a NULL as null, and a statement that returns no rows
+// (an UPDATE) as its "rows affected".
 //
-// The page's three <SqlCodeBlock dialect="duckdb"> blocks run as the page
+// The page's three <SqlCodeBlock dialect="postgres"> blocks run as the page
 // gives them (content/interview/data-engineer/data-modeling.mdx): the Type 2
 // point-in-time join (its customer 42 is Question 8's figure), the grain
 // mismatch fix, and the date dimension (Question 14). Every other table is
@@ -27,64 +27,12 @@
 //   - two days of visits, for the distinct count (Question 10).
 /* global console */
 import { writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
+
+import { figure } from "../../../scripts/lib/pg-figure.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const require = createRequire(join(here, "../../../../package.json"));
-const duckdb = require("@duckdb/duckdb-wasm");
-const { default: Worker } = await import(pathToFileURL(require.resolve("web-worker")).href);
-const dist = join(dirname(require.resolve("@duckdb/duckdb-wasm")), "..", "dist");
-const bundle = await duckdb.selectBundle({
-  mvp: { mainModule: join(dist, "duckdb-mvp.wasm"), mainWorker: join(dist, "duckdb-node-mvp.worker.cjs") },
-  eh: { mainModule: join(dist, "duckdb-eh.wasm"), mainWorker: join(dist, "duckdb-node-eh.worker.cjs") },
-});
-
-/** One value as a SQL client prints it, from its Arrow column type. */
-function shown(value, type) {
-  if (value === null || value === undefined) return null;
-  const t = String(type);
-  if (t.startsWith("Decimal")) {
-    const scale = type.scale ?? 0;
-    const digits = String(value).replace("-", "").padStart(scale + 1, "0");
-    const sign = String(value).startsWith("-") ? "-" : "";
-    return scale ? `${sign}${digits.slice(0, -scale)}.${digits.slice(-scale)}` : `${sign}${digits}`;
-  }
-  if (t.startsWith("Date")) return new Date(Number(value)).toISOString().slice(0, 10);
-  if (t.startsWith("Timestamp")) return new Date(Number(value)).toISOString().slice(0, 19).replace("T", " ");
-  if (typeof value === "bigint") return String(value);
-  if (typeof value === "boolean") return String(value);
-  return String(value?.valueOf?.() ?? value);
-}
-
-async function figure(setup, steps) {
-  const worker = new Worker(pathToFileURL(bundle.mainWorker).href, { type: "module" });
-  const db = new duckdb.AsyncDuckDB({ log: () => {} }, worker);
-  await db.instantiate(bundle.mainModule);
-  const conn = await db.connect();
-  for (const stmt of setup.split(/;\s*\n/).map((s) => s.trim()).filter(Boolean)) await conn.query(stmt);
-  const out = {};
-  for (const [id, sql] of Object.entries(steps)) {
-    try {
-      const table = await conn.query(sql);
-      const fields = table.schema.fields;
-      const rows = table.toArray().map((r) => {
-        const obj = r.toJSON();
-        return fields.map((f) => shown(obj[f.name], f.type));
-      });
-      out[id] = { sql, ok: true, cols: fields.map((f) => f.name), rows };
-    } catch (e) {
-      // DuckDB's message is "<Kind> Error: <text>", then a LINE excerpt.
-      out[id] = { sql, ok: false, error: String(e.message).split("\n")[0] };
-    }
-  }
-  const version = (await conn.query("SELECT version() AS v")).toArray()[0].toJSON().v;
-  await conn.close();
-  await db.terminate();
-  await worker.terminate();
-  return { steps: out, version };
-}
 
 const results = { figures: {} };
 const F = results.figures;
@@ -315,7 +263,7 @@ ORDER BY d.fiscal_quarter;`,
   holidays: "SELECT COUNT(*) AS holidays FROM dim_date WHERE is_holiday;",
   // The page's fiscal quarters are its calendar quarters, so only the
   // holiday flag is something no date function could compute here.
-  fiscalDiffers: "SELECT COUNT(*) AS differ FROM dim_date WHERE fiscal_quarter <> 'Q' || quarter(calendar_date);",
+  fiscalDiffers: "SELECT COUNT(*) AS differ FROM dim_date WHERE fiscal_quarter <> 'Q' || EXTRACT(QUARTER FROM calendar_date);",
   aovAll: "SELECT SUM(amount) AS revenue, COUNT(*) AS orders, ROUND(SUM(amount) / COUNT(*), 2) AS aov FROM fact_orders;",
   aovWorking: `SELECT SUM(f.amount) AS revenue, COUNT(*) AS orders, ROUND(SUM(f.amount) / COUNT(*), 2) AS aov
 FROM fact_orders f JOIN dim_date d ON d.date_key = f.order_date_key
@@ -405,8 +353,8 @@ JOIN daily_sales d
 });
 
 // Question 5. why-normalization's shop (its data.ts: orders 1 and 2 are
-// Ada's, order 3 is Grace's), the same statements run here in DuckDB: one
-// wide table, the rushed update, and the two-table design with its join.
+// Ada's, order 3 is Grace's), the same statements run here: one wide table,
+// the rushed update, and the two-table design with its join.
 F.norm = await figure(
   `CREATE TABLE orders_flat (
   order_id       INTEGER PRIMARY KEY,
@@ -492,14 +440,14 @@ F.account = await figure(ACCOUNT_SETUP, {
   overTime: "SELECT SUM(balance) AS balance FROM fact_balance;",
   // ...and what that sum is made of: each month-end's total across accounts.
   monthEnds: "SELECT month_end, SUM(balance) AS balance FROM fact_balance GROUP BY month_end ORDER BY month_end;",
-  // ...and the last value in the period is.
-  closing: `SELECT account, arg_max(balance, month_end) AS closing
+  // ...and the last value in the period is: each account's latest
+  // month-end (values on screen, not the SQL).
+  closing: `SELECT DISTINCT ON (account) account, balance AS closing
 FROM fact_balance
-GROUP BY account
-ORDER BY account;`,
+ORDER BY account, month_end DESC;`,
   closingTotal: `SELECT SUM(closing) AS balance FROM (
-  SELECT arg_max(balance, month_end) AS closing
-  FROM fact_balance GROUP BY account);`,
+  SELECT DISTINCT ON (account) balance AS closing
+  FROM fact_balance ORDER BY account, month_end DESC);`,
   average: "SELECT account, ROUND(AVG(balance), 2) AS average FROM fact_balance GROUP BY account ORDER BY account;",
   // The accumulating snapshot, as each stage lands: one row, updated in place.
   applied: "SELECT * FROM fact_loan_application;",
@@ -507,8 +455,9 @@ ORDER BY account;`,
   approved: "SELECT * FROM fact_loan_application;",
   fund: "UPDATE fact_loan_application SET funded = DATE '2024-03-20' WHERE application_id = 7;",
   funded: "SELECT * FROM fact_loan_application;",
-  stages: `SELECT date_diff('day', applied, approved) AS days_to_approve,
-       date_diff('day', approved, funded) AS days_to_fund
+  // A date minus a date is a number of days.
+  stages: `SELECT approved - applied AS days_to_approve,
+       funded - approved AS days_to_fund
 FROM fact_loan_application;`,
 });
 
@@ -526,10 +475,11 @@ INSERT INTO visits VALUES
 
 // ── Checks: what the narration says has to be what came back ───────────────
 
+/** A step's rows, each value as text (null stays null), as data.ts reads them. */
 const one = (fig, step) => {
   const s = F[fig].steps[step];
   if (!s.ok) throw new Error(`${fig}.${step} failed: ${s.error}`);
-  return s.rows;
+  return s.rows.map((r) => r.map((v) => (v === null ? null : String(v))));
 };
 const expect = (what, got, want) => {
   if (JSON.stringify(got) !== JSON.stringify(want)) throw new Error(`${what}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`);
@@ -556,12 +506,11 @@ expect("stages", one("account", "stages"), [["7", "9"]]);
 expect("distinct", one("visits", "both"), [["4"]]);
 expect("fiscal quarters are calendar quarters", one("datePage", "fiscalDiffers"), [["0"]]);
 
-results.version = F.scd.version;
 const path = join(here, "results.json");
 writeFileSync(path, JSON.stringify(results, null, 2) + "\n");
-console.log(`wrote ${path} (DuckDB ${results.version})`);
+console.log(`wrote ${path} (${F.scd.version})`);
 for (const [fig, f] of Object.entries(F)) {
   for (const [id, s] of Object.entries(f.steps)) {
-    console.log(`${fig}.${id}: ${s.cols.join(", ")} -> ${JSON.stringify(s.rows).slice(0, 220)}`);
+    console.log(`${fig}.${id}: ${s.columns.join(", ")} -> ${JSON.stringify(s.rows).slice(0, 220)}`);
   }
 }

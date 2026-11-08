@@ -15,7 +15,7 @@ const R_X = 680;
 /** The remedies' column, right of the visitors. */
 const FIX_X = 1360;
 const OPTS = { headH: 46, rowH: 50, bodySize: 24, headSize: 21 } as const;
-/** Who visited on each day: the video's own rows, counted in DuckDB. */
+/** Who visited on each day: the video's own rows, counted in Postgres. */
 const WHO: Record<string, readonly string[]> = { Mon: ["Ada", "Ben", "Cy"], Tue: ["Ben", "Cy", "Di"] };
 
 /** The three kinds side by side, a hairline centred in each gap. */

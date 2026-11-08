@@ -2,12 +2,12 @@ import results from "./results.json" with { type: "json" };
 import dbNorm from "../db-normalization/results.json" with { type: "json" };
 
 // Every table, listing and number the video shows, read from results.json:
-// what DuckDB 1.4.3 (DuckDB-Wasm, the engine the page's blocks run in)
-// returned when check.mjs ran each statement from a fresh database. The SQL
-// printed on screen is the SQL in that file, split into lines, so a listing
-// cannot drift from what ran. Question 6's three small tables are Unit 7's
-// (db-normalization's results.json, from PGlite), so the course video and
-// this one show the same rows. Pure (no Remotion, no DOM).
+// what Postgres (PGlite, the engine the page's blocks run in) returned when
+// check.mjs ran each statement from a fresh database. The SQL printed on
+// screen is the SQL in that file, split into lines, so a listing cannot
+// drift from what ran. Question 6's three small tables are Unit 7's
+// (db-normalization's results.json, also from PGlite), so the course video
+// and this one show the same rows. Pure (no Remotion, no DOM).
 
 export const VIDEO = "de-dimensional-modeling";
 
@@ -20,7 +20,8 @@ export const ILLUSTRATIONS = true;
 /** The hero's pixels (1373x1022): at 4K it may be drawn at most half that. */
 export const HERO = { id: "de-dimensional-modeling-starfish", w: 1373, h: 1022 } as const;
 
-type Step = { sql: string; ok: boolean; cols: string[]; rows: (string | null)[][] };
+type Value = string | number | boolean | null;
+type Step = { sql: string; ok: boolean; columns: string[]; rows: Value[][] };
 const FIGS = results.figures as unknown as Record<string, { steps: Record<string, Step> }>;
 
 /** A query's columns and its rows, a SQL NULL printed "null" as a client prints it. */
@@ -33,14 +34,12 @@ const step = (fig: string, id: string): Step => {
 };
 const table = (fig: string, id: string): Result => {
   const s = step(fig, id);
-  return { cols: s.cols, rows: s.rows.map((r) => r.map((v) => v ?? "null")), sql: s.sql };
+  return { cols: s.columns, rows: s.rows.map((r) => r.map((v) => (v === null ? "null" : String(v)))), sql: s.sql };
 };
 /** One value: the first row's column `col`. */
 const value = (fig: string, id: string, col = 0) => String(step(fig, id).rows[0][col]);
 /** A statement as it ran, one string per printed line. */
 export const linesOf = (r: Result) => r.sql.split("\n") as readonly string[];
-
-export const DUCKDB_VERSION = results.version;
 
 // ── Question 3. A column at the wrong grain ─────────────────────────────────
 
@@ -57,7 +56,7 @@ export const NAIVE_TOTALS = table("mismatch", "naiveTotals");
 export const FIXED = table("mismatch", "fixed");
 export const FIXED_TOTALS = table("mismatch", "fixedTotals");
 
-// ── Question 5. why-normalization's shop, in DuckDB ─────────────────────────
+// ── Question 5. why-normalization's shop, re-run here ───────────────────────
 
 export const FLAT = table("norm", "flat");
 export const FLAT_AFTER = table("norm", "flatAfter");
@@ -65,6 +64,7 @@ export const NORM_CUSTOMERS = table("norm", "customers");
 export const NORM_ORDERS = table("norm", "orders");
 export const NORM_JOIN = table("norm", "join");
 export const UPDATE_SQL = step("norm", "update").sql;
+/** The UPDATE's rows affected. */
 export const UPDATE_ROWS = value("norm", "update");
 export const ADA_EMAILS = value("norm", "emails");
 
