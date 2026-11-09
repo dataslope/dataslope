@@ -44,7 +44,7 @@ export const KeepScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Outer joins in Postgres</span>
+        <span style={label(26, ACCENT_INK)}>Outer joins in Postgres</span>
       </Ink>
       <Ink at={open + 2} dur={22} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
         A left join keeps every row.

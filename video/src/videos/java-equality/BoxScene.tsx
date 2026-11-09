@@ -77,7 +77,7 @@ export const BoxScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 5} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Comparing Integers</span>
+        <span style={label(26, ACCENT_INK)}>Comparing Integers</span>
       </Ink>
       <Ink
         at={trapAt - 6}

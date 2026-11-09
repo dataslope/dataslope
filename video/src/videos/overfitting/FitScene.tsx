@@ -4,19 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { sx } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT_INK,
-  fmt,
-  halo,
-  headline,
-  HIGHLIGHT,
-  INK,
-  INK_SOFT,
-  body,
-  label,
-  note,
-  PAPER,
-} from "../../editorial/style";
+import { ACCENT_INK, body, fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import {
@@ -96,7 +84,7 @@ export const FitScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={nameAt - 4} dur={14} style={{ left: 120, top: y(104) }}>
-        <span style={label(22, ACCENT_INK)}>Overfitting</span>
+        <span style={label(26, ACCENT_INK)}>Overfitting</span>
       </Ink>
       <Ink at={hookAt - 6} dur={20} style={{ left: 114, top: y(148), ...headline(76), whiteSpace: "nowrap" }}>
         Perfect on the data it learned,

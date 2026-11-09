@@ -28,7 +28,7 @@ export const HookScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={2} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>One positive result</span>
+        <span style={label(26, ACCENT_INK)}>One positive result</span>
       </Ink>
       <Ink at={4} dur={20} style={{ left: 92, top: y(152), ...headline(88), whiteSpace: "nowrap" }}>
         A {pct(SENSITIVITY)} accurate test

@@ -6,7 +6,7 @@ import { Sfx } from "../../sound/Sfx";
 import { Axis, Bars, NormalCurve, sx, type XScale } from "../../editorial/charts";
 import { histogram, INCOME_MEANS, MEANS_30, mean, SAMPLE_COUNT, sd, skew } from "./data";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, fmt, halo, headline, INK, INK_SOFT, note, label } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useFigNumber } from "../sampling/merged";
 import { Marker, swell } from "../sampling/emphasis";
@@ -106,7 +106,7 @@ export const ThumbScene: React.FC = () => {
 
       {/* The pull quote, and its correction. */}
       <Ink at={start - 14} dur={14} style={{ left: 196, top: y(112) }}>
-        <span style={label(20, ACCENT_INK)}>What you will hear</span>
+        <span style={label(26, ACCENT_INK)}>What you will hear</span>
       </Ink>
       <Ink at={start - 12} dur={14} style={{ left: 84, top: y(150), ...headline(240), color: ACCENT, opacity: 0.85 }}>
         “

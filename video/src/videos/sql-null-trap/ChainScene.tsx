@@ -69,7 +69,7 @@ export const ChainScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 14} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Inside NOT IN</span>
+        <span style={label(26, ACCENT_INK)}>Inside NOT IN</span>
       </Ink>
       <div
         style={{

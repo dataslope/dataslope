@@ -3,18 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { Axis, normalPdf, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  BAR,
-  BLUE_INK,
-  body,
-  fmt,
-  headline,
-  INK_SOFT,
-  label,
-  note,
-  PAPER, INK } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, fmt, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { ColumnRule, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -95,7 +84,7 @@ export const AgesScene: React.FC = () => {
 
       {/* ── The two names, each with what it is the spread of ── */}
       <Ink at={2} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(20, ACCENT_INK)}>
+        <span style={label(26, ACCENT_INK)}>
           <PartName />Two spreads, easily confused
         </span>
       </Ink>

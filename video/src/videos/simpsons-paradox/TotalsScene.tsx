@@ -32,7 +32,7 @@ export const TotalsScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={2} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(20, ACCENT_INK)}>Berkeley, 1973</span>
+        <span style={label(26, ACCENT_INK)}>Berkeley, 1973</span>
       </Ink>
       <Ink at={4} dur={20} style={{ left: 92, top: y(150), ...headline(88), whiteSpace: "nowrap" }}>
         Women were admitted

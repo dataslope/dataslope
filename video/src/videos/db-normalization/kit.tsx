@@ -3,19 +3,7 @@ import { useCurrentFrame } from "remotion";
 import { arrowHead, type Cubic, cubicPath, lineLength, sampleCubic } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  BAR,
-  BLUE_INK,
-  HAIRLINE,
-  HIGHLIGHT,
-  INK,
-  INK_SOFT,
-  PAPER,
-  headline,
-  label,
-} from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
 import { Ink, type Pt } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -311,7 +299,7 @@ export const Headline: React.FC<{
   return (
     <>
       <Ink at={at - 4} dur={14} out={out} style={{ left: X0 + 2, top: y(KICKER_Y) }}>
-        <span style={label(22, INK_SOFT)}>{kicker}</span>
+        <span style={label(26, ACCENT_INK)}>{kicker}</span>
       </Ink>
       <div
         style={{

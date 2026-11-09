@@ -217,7 +217,7 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
   return (
     <AbsoluteFill>
       <Ink at={c.open} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Passing to a function</span>
+        <span style={label(26, ACCENT_INK)}>Passing to a function</span>
       </Ink>
       <Ink
         at={c.open + 2}

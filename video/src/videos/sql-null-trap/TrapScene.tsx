@@ -69,7 +69,7 @@ export const TrapScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Working with NULL in Postgres</span>
+        <span style={label(26, ACCENT_INK)}>Working with NULL in Postgres</span>
       </Ink>
       <Ink
         at={open + 2}

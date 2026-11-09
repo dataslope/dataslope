@@ -56,7 +56,7 @@ export const PromptScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={2} dur={14} style={{ left: 120, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Picking the next token</span>
+        <span style={label(26, ACCENT_INK)}>Picking the next token</span>
       </Ink>
       <Ink at={4} dur={20} style={{ left: 114, top: y(150), ...headline(88), whiteSpace: "nowrap" }}>
         Her new pet is a

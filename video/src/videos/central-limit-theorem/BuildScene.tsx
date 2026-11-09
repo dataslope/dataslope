@@ -20,7 +20,7 @@ import {
   WAITS,
 } from "./data";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, body, fmt, headline, INK, INK_SOFT, label, note, PAPER, SERIF_ITALIC, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, body, fmt, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useFigNumber } from "../sampling/merged";
@@ -155,7 +155,7 @@ export const BuildScene: React.FC = () => {
 
       {/* ── P1: headline, deck and the population at full size ── */}
       <Ink at={2} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
-        <span style={label(20, ACCENT_INK)}>
+        <span style={label(26, ACCENT_INK)}>
           <PartName />Waiting in line
         </span>
       </Ink>
@@ -164,7 +164,7 @@ export const BuildScene: React.FC = () => {
       </Ink>
       <Ink at={10} dur={20} out={p1Out} style={{ left: 92, top: y(246), ...headline(92), whiteSpace: "nowrap" }}>
         is{" "}
-        <span style={{ position: "relative", fontStyle: SERIF_ITALIC, fontWeight: "var(--clt-head-italic-wght)" }}>
+        <span style={{ position: "relative" }}>
           lopsided.
           {/* Sized in em and to the word, so it underlines it in any face. */}
           <svg

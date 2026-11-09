@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { ACCENT_INK, body, fmt, halo, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx, type SoundName } from "../../sound/Sfx";
@@ -115,7 +115,7 @@ export const RepeatScene: React.FC = () => {
       {/* Counter, top right. The line under the number says what each sample
           is, not what it is out of: "of 500" read as 47 of 500 customers. */}
       <div style={{ position: "absolute", left: 1400, top: y(120), opacity: ease(frame, drawAt, 12) }}>
-        <div style={label(20, INK_SOFT)}>Samples drawn, each way</div>
+        <div style={label(26, ACCENT_INK)}>Samples drawn, each way</div>
         <div style={{ ...headline(108), ...TABULAR, marginTop: 6 }}>{k}</div>
         <div style={{ ...body(26, true), marginTop: 4 }}>each of {SAMPLE_N} customers</div>
       </div>

@@ -55,7 +55,7 @@ export const MemoScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 12} dur={14} style={{ left: 124, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>The fix</span>
+        <span style={label(26, ACCENT_INK)}>The fix</span>
       </Ink>
       <Ink at={start - 10} dur={22} style={{ left: 118, top: y(150), ...headline(84), whiteSpace: "nowrap" }}>
         Write each answer <span style={headline(84, true)}>down.</span>
