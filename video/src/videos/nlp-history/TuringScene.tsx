@@ -188,7 +188,7 @@ export const TuringScene: React.FC = () => {
         <Ink at={chatbotAt - 2} style={{ position: "relative" }}>
           Every chatbot since has been
         </Ink>
-        <Ink at={chatbotAt + 10} style={{ position: "relative", color: ACCENT_INK }}>
+        <Ink at={chatbotAt + 10} style={{ position: "relative" }}>
           chasing it.
         </Ink>
       </div>
