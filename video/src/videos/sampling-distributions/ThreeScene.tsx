@@ -7,22 +7,7 @@ import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  body,
-  fmt,
-  HAIRLINE,
-  halo,
-  headline,
-  HIGHLIGHT,
-  INK,
-  INK_SOFT,
-  label,
-  note,
-  PAPER,
-  TABULAR,
-} from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, fmt, HAIRLINE, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import {
   histogram,
@@ -249,7 +234,7 @@ export const ThreeScene: React.FC = () => {
 
       {/* ══ Phase 1: the population, at full size ══ */}
       <Ink at={popFrom - 12} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
-        <span style={label(22, INK_SOFT)}>The first distribution</span>
+        <span style={label(26, ACCENT_INK)}>The first distribution</span>
       </Ink>
       <Ink at={popFrom - 8} dur={20} out={p1Out} style={{ left: 92, top: y(150), ...headline(92), whiteSpace: "nowrap" }}>
         The population
@@ -320,7 +305,7 @@ export const ThreeScene: React.FC = () => {
 
       {/* ══ Phase 2: one sample ══ */}
       <Ink at={sampleFrom - 4} dur={14} out={p2Out} style={{ left: RX, top: y(112) }}>
-        <span style={label(22, INK_SOFT)}>The second distribution</span>
+        <span style={label(26, ACCENT_INK)}>The second distribution</span>
       </Ink>
       <Ink at={sampleFrom} dur={18} out={p2Out} style={{ left: RX - 4, top: y(146), ...headline(64), whiteSpace: "nowrap" }}>
         One sample
@@ -371,7 +356,7 @@ export const ThreeScene: React.FC = () => {
 
       {/* ══ Phase 3: the sampling distribution ══ */}
       <Ink at={thirdFrom - 4} dur={14} out={p3Out} style={{ left: RX, top: y(112) }}>
-        <span style={label(22, INK_SOFT)}>The third distribution</span>
+        <span style={label(26, ACCENT_INK)}>The third distribution</span>
       </Ink>
       <Ink at={thirdFrom} dur={20} out={p3Out} style={{ left: RX - 4, top: y(146), ...headline(64), lineHeight: 1.04 }}>
         The sampling

@@ -108,7 +108,7 @@ export const LogicScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 14} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Three-valued logic</span>
+        <span style={label(26, ACCENT_INK)}>Three-valued logic</span>
       </Ink>
       <div
         style={{

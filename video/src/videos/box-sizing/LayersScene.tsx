@@ -68,7 +68,7 @@ export const LayersScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>The CSS box model</span>
+        <span style={label(26, ACCENT_INK)}>The CSS box model</span>
       </Ink>
       <Ink at={open + 2} dur={20} style={{ left: 92, top: y(150), ...headline(88), whiteSpace: "nowrap" }}>
         Every element is a box,

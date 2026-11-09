@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, body, fmt, HAIRLINE, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -71,7 +71,7 @@ export const DigestScene: React.FC = () => {
 
       {/* The race, as its year is said. */}
       <Ink at={yearAt - 4} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(20, INK_SOFT)}>
+        <span style={label(26, ACCENT_INK)}>
           The <Marker at={yearAt + 4}>1936</Marker> presidential race
         </span>
       </Ink>

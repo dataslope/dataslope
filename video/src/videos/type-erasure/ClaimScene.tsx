@@ -64,7 +64,7 @@ export const ClaimScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 6} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Data from outside the program</span>
+        <span style={label(26, ACCENT_INK)}>Data from outside the program</span>
       </Ink>
       <Ink
         at={start - 4}

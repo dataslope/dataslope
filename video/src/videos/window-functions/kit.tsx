@@ -2,17 +2,7 @@ import React from "react";
 import { useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  BLUE_INK,
-  HAIRLINE,
-  HIGHLIGHT,
-  INK,
-  INK_SOFT,
-  headline,
-  label,
-} from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -326,7 +316,7 @@ export const Headline: React.FC<{
   return (
     <>
       <Ink at={at - 2} dur={14} style={{ left: X0 + 4, top: y(KICKER_Y) }}>
-        <span style={label(21, ACCENT_INK)}>{kicker}</span>
+        <span style={label(26, ACCENT_INK)}>{kicker}</span>
       </Ink>
       <Ink at={at} dur={20} style={{ left: X0, top: y(HEAD1_Y), ...headline(HEAD_SIZE), whiteSpace: "nowrap" }}>
         {line1}

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT_INK, body, fmt, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { BUILD_MS, BUILD_SCANS, LIST_BYTES, MILLION, SET_BYTES } from "./data";
 import { Code, Fig, LIST, LIST_INK, Listing, SET, SET_INK } from "./kit";
@@ -51,7 +51,7 @@ export const RuleScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 14} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, INK_SOFT)}>Testing membership</span>
+        <span style={label(26, ACCENT_INK)}>Testing membership</span>
       </Ink>
       <Ink at={start - 12} dur={20} style={{ left: LEFT - 2, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
         Again and again?

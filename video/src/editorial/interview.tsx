@@ -4,7 +4,7 @@ import { during, ease } from "../components/motion";
 import { ds, inkOf } from "../theme/brand";
 import { MONO } from "../theme/fonts";
 import { useLayout, LayoutContext, layoutFor } from "./layout";
-import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "./style";
+import { ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "./style";
 import { Ink } from "./ui";
 
 /**
@@ -82,7 +82,7 @@ export const QuestionCard: React.FC<{
   return (
     <>
       <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, ACCENT_INK), fontWeight: 500 }}>{kicker ?? `Question ${n}`}</span>
+        <span style={{ ...label(26, ACCENT_INK), fontWeight: 500 }}>{kicker ?? `Question ${n}`}</span>
       </Ink>
       {/* Balanced, so a question that wraps breaks into even lines rather than
           leaving one word on the last; the line count is the same either way. */}

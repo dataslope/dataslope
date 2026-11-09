@@ -50,7 +50,7 @@ export const CodeScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: 124, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Recursion in C++</span>
+        <span style={label(26, ACCENT_INK)}>Recursion in C++</span>
       </Ink>
       <Ink at={open + 2} dur={22} style={{ left: 118, top: y(152), ...headline(88), whiteSpace: "nowrap", display: "flex", gap: "0.24em" }}>
         <span>Correct, but</span>

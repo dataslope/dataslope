@@ -68,7 +68,7 @@ export const ErasureScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>What TypeScript ships</span>
+        <span style={label(26, ACCENT_INK)}>What TypeScript ships</span>
       </Ink>
       <Ink
         at={open + 2}

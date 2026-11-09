@@ -59,7 +59,7 @@ export const RuleScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 8} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Pointers in C</span>
+        <span style={label(26, ACCENT_INK)}>Pointers in C</span>
       </Ink>
       <Ink
         at={start - 6}

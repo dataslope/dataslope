@@ -81,7 +81,7 @@ export const RuleScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 4} dur={14} style={{ left: LEFT, top: y(140) }}>
-        <span style={label(22, ACCENT_INK)}>Before you trust a correlation</span>
+        <span style={label(26, ACCENT_INK)}>Before you trust a correlation</span>
       </Ink>
       <Ink at={start - 2} dur={22} style={{ left: LEFT - 6, top: y(184), width: 1180, ...headline(84), lineHeight: 1.08 }}>
         Test each series for stationarity.

@@ -53,7 +53,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pencil" at={homeAt + 6} level={-35} />
 
       <Ink at={yearAt - 6} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>
+        <span style={label(26, ACCENT_INK)}>
           <PartName />Statistical Research Group, Columbia, 1943
           {/* The statistician, as he is named. */}
           <span style={{ display: "inline-block", opacity: ease(frame, waldAt - 2, 14), translate: `${(1 - ease(frame, waldAt - 2, 14)) * -10}px 0` }}>

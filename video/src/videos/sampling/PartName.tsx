@@ -1,5 +1,5 @@
 import React from "react";
-import { HAIRLINE, INK, label } from "../../editorial/style";
+import { ACCENT_INK, HAIRLINE, label } from "../../editorial/style";
 import { useMergedPart } from "./merged";
 
 /**
@@ -17,7 +17,7 @@ export const PartName: React.FC<{ alone?: boolean }> = ({ alone = false }) => {
   if (!part) return null;
   return (
     <>
-      <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>{part.name}</span>
+      <span style={{ ...label(26, ACCENT_INK), whiteSpace: "nowrap" }}>{part.name}</span>
       {alone ? null : <KickerRule />}
     </>
   );
