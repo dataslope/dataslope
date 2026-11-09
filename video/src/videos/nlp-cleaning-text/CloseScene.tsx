@@ -2,16 +2,14 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, INK, INK_SOFT, label, SERIF_ITALIC } from "../../editorial/style";
-import { ColumnRule, FigLabel, Ink, NextLine } from "../../editorial/ui";
+import { FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Headline, Kicker, Spot, X0 } from "./parts";
 
 const FIG_Y = 300;
-/** Four columns across the page, each centred under its spot, with a
- *  hairline centred in each 40px gap: the widest line ("the capitals and
- *  punctuation", about 380px in 28px Inter) keeps about 25px from it. The
- *  rules that capped each column are gone. */
+/** Four columns across the page, each centred under its spot, 40px apart,
+ *  with no rule between them: the space alone separates the columns. */
 const COL_Y = 346;
 const COL_W = 390;
 const COL_GAP = 40;
@@ -23,10 +21,8 @@ const ART_GAP = 44;
  *  Inter at one line height, set on one even pitch. */
 const LINE_H = 28 * 1.2;
 const LINE_PITCH = 46;
-/** A column's text, from its name's top to the bottom of what it lost, in
- *  px under COL_Y: the hairlines span this. */
+/** Where a column's text starts, in px under COL_Y. */
 const TEXT_TOP = 22 + ART_H + ART_GAP;
-const TEXT_H = 2 * LINE_PITCH + LINE_H;
 /** "threw away" and what was lost, under the name. */
 const LOST_TOP = TEXT_TOP + LINE_PITCH;
 const NOTE_Y = 746;
@@ -87,7 +83,6 @@ export const CloseScene: React.FC = () => {
         const line: React.CSSProperties = { width: COL_W, textAlign: "center", whiteSpace: "nowrap" };
         return (
           <React.Fragment key={s.name}>
-            {i > 0 ? <ColumnRule x={x - COL_GAP / 2} top={top + TEXT_TOP} height={TEXT_H} at={colAt[i] + 4} /> : null}
             <Spot id={s.art} at={colAt[i] + 2} left={x + (COL_W - w) / 2} top={top + 22 + (h - hh) / 2} width={w} height={hh} />
             <Ink at={colAt[i] + 4} dur={14} style={{ left: x, top: top + TEXT_TOP, ...line }}>
               <div style={{ ...label(28, INK), fontWeight: 500, lineHeight: 1.2 }}>{s.name}</div>
