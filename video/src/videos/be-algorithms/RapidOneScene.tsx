@@ -380,7 +380,7 @@ const DivideDp: React.FC<{ c: Ctx }> = ({ c }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            ...label(24, INK),
+            ...label(20, INK),
             ...TABULAR,
             opacity: ease(frame, dpAt + 4 + f.depth * 3, 8),
           }}
@@ -478,7 +478,7 @@ const Coin: React.FC<{ v: number; x: number; y: number; at: number; tone: "bad" 
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        ...label(28, tone === "ok" ? OK_INK : ACCENT_INK),
+        ...label(26, tone === "ok" ? OK_INK : ACCENT_INK),
         ...TABULAR,
         opacity: p,
         transform: `scale(${0.7 + 0.3 * p})`,
@@ -564,7 +564,7 @@ const Backtrack: React.FC<{ c: Ctx }> = ({ c }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        ...label(24, d === 3 ? OK_INK : BLUE_INK),
+        ...label(22, d === 3 ? OK_INK : BLUE_INK),
         ...TABULAR,
         opacity: ease(frame, at(d), 8),
       }}
@@ -593,7 +593,7 @@ const Backtrack: React.FC<{ c: Ctx }> = ({ c }) => {
       {level2.map((p, i) => node(p, 2, i, 6))}
       {perms.map((p, i) => node(p, 3, i, 6))}
       {perms.map((p, i) => (
-        <div key={`t${i}`} style={{ position: "absolute", left: lx(6, i) - 60, width: 120, top: ly(3) + 32, textAlign: "center", fontFamily: MONO, fontSize: 24, fontWeight: 500, color: OK_INK, opacity: ease(frame, at(3) + 6, 8) }}>
+        <div key={`t${i}`} style={{ position: "absolute", left: lx(6, i) - 60, width: 120, top: ly(3) + 32, textAlign: "center", fontFamily: MONO, fontSize: 20, fontWeight: 500, color: OK_INK, opacity: ease(frame, at(3) + 6, 8) }}>
           {p.join("")}
         </div>
       ))}

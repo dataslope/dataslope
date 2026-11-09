@@ -248,7 +248,7 @@ export const ShapeScene: React.FC = () => {
             </Tag>
           </Drift>
           <Ink at={tailsAt - 2} dur={16} style={{ left: 160, top: y(910), whiteSpace: "nowrap" }}>
-            <span style={label(24, INK_SOFT)}>The tails: how often values land far out</span>
+            <span style={label(22, INK_SOFT)}>The tails: how often values land far out</span>
           </Ink>
         </div>
       ) : null}

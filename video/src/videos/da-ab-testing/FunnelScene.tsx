@@ -84,7 +84,7 @@ export const FunnelScene: React.FC = () => {
         width: COL_W,
         top: y(HEAD_Y),
         textAlign: "center",
-        ...label(24, INK_SOFT),
+        ...label(20, INK_SOFT),
         whiteSpace: "nowrap",
         opacity: ease(frame, at, 10) * (out === undefined ? 1 : 1 - ease(frame, out, 10)),
       }}
@@ -136,7 +136,7 @@ export const FunnelScene: React.FC = () => {
           const yy = rowY(i);
           return (
             <React.Fragment key={s.stage}>
-              <div style={{ position: "absolute", left: X0, top: yy, height: rowH, display: "flex", alignItems: "center", opacity: named, ...note(24, INK), whiteSpace: "nowrap" }}>
+              <div style={{ position: "absolute", left: X0, top: yy, height: rowH, display: "flex", alignItems: "center", opacity: named, ...note(25, INK), whiteSpace: "nowrap" }}>
                 {s.stage}
               </div>
               <div
@@ -159,7 +159,7 @@ export const FunnelScene: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   opacity: ease(frame, at + 8, 10),
-                  ...note(24, BLUE_INK),
+                  ...note(23, BLUE_INK),
                   ...TABULAR,
                   whiteSpace: "nowrap",
                 }}
@@ -193,7 +193,7 @@ export const FunnelScene: React.FC = () => {
                 justifyContent: "center",
                 opacity: p,
                 transform: `scale(${1 + 0.08 * swell})`,
-                ...note(24, INK),
+                ...note(25, INK),
                 fontWeight: hot > 0.5 ? 500 : 500,
                 ...TABULAR,
               }}
@@ -227,7 +227,7 @@ export const FunnelScene: React.FC = () => {
             >
               <span
                 style={{
-                  ...note(24, ACCENT_INK),
+                  ...note(25, ACCENT_INK),
                   ...TABULAR,
                   padding: "2px 10px",
                   borderRadius: 4,
@@ -242,7 +242,7 @@ export const FunnelScene: React.FC = () => {
         })}
 
         {/* ── LAG: the stage before, on this row ── */}
-        {head(STEP_X, <span style={{ fontFamily: MONO, fontSize: 24 }}>LAG(users)</span>, lagAt)}
+        {head(STEP_X, <span style={{ fontFamily: MONO, fontSize: 20 }}>LAG(users)</span>, lagAt)}
         {stages.map((s, i) => {
           const at = rowAt + i * 3;
           const p = ease(frame, at, 14);
@@ -262,7 +262,7 @@ export const FunnelScene: React.FC = () => {
                 justifyContent: "center",
                 opacity: p,
                 transform: `translateY(${(1 - p) * -rowH}px)`,
-                ...(prev === null ? { fontFamily: MONO, fontSize: 24, color: INK_SOFT } : { ...note(24, BLUE_INK), ...TABULAR }),
+                ...(prev === null ? { fontFamily: MONO, fontSize: 22, color: INK_SOFT } : { ...note(25, BLUE_INK), ...TABULAR }),
               }}
             >
               {prev === null ? "null" : count(prev)}
@@ -278,7 +278,7 @@ export const FunnelScene: React.FC = () => {
           </span>
         </Note>
         <Note at={topAt} x={STEP_X - COL_W / 2} y={y(LIST_Y)} out={lowerOut}>
-          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>the top loses most because it has the most people</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>the top loses most because it has the most people</span>
         </Note>
         <Listing
           lines={FUNNEL.step.lines}

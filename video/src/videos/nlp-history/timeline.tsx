@@ -48,7 +48,7 @@ export const TimelineAxis: React.FC<{ y: number; at: number; todayAt?: number; d
             top: y + 16,
             transform: "translateX(-50%)",
             opacity: t * (1 - d),
-            ...note(24, INK_SOFT),
+            ...note(20, INK_SOFT),
           }}
         >
           {v}
@@ -62,7 +62,7 @@ export const TimelineAxis: React.FC<{ y: number; at: number; todayAt?: number; d
             top: y - 56,
             transform: `translate(-50%, ${(1 - today) * 6}px)`,
             opacity: today * (1 - d),
-            ...note(24, INK),
+            ...note(21, INK),
             fontWeight: 500,
           }}
         >

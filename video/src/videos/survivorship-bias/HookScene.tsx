@@ -53,7 +53,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pencil" at={homeAt + 6} level={-35} />
 
       <Ink at={yearAt - 6} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(24, ACCENT_INK)}>
+        <span style={label(21, ACCENT_INK)}>
           <PartName />Statistical Research Group, Columbia, 1943
           {/* The statistician, as he is named. */}
           <span style={{ display: "inline-block", opacity: ease(frame, waldAt - 2, 14), translate: `${(1 - ease(frame, waldAt - 2, 14)) * -10}px 0` }}>
@@ -146,10 +146,10 @@ export const HookScene: React.FC = () => {
         />
       </svg>
       <Note at={homeAt + 8} x={STRIP_X0 - 40} y={y(STRIP_Y + 84)}>
-        <span style={label(24, INK)}>Came home: counted, hole by hole</span>
+        <span style={label(21, INK)}>Came home: counted, hole by hole</span>
       </Note>
       <Note at={homeAt + 12} x={STRIP_X0 + LOST * STRIP_DX} y={y(STRIP_Y - 92)} from="up">
-        <span style={{ ...note(24, INK_SOFT), display: "block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, INK_SOFT), display: "block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>
           Went down: never counted
         </span>
       </Note>

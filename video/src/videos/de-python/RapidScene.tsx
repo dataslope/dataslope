@@ -201,10 +201,10 @@ const PitfallsBody: React.FC<{ c: Ctx }> = ({ c }) => {
           <span style={{ display: "flex", alignItems: "baseline", gap: 26, whiteSpace: "nowrap" }}>
             {/* Red at once, so it reads as the wrong way; struck only once it
                 has been read, with its fix right after. */}
-            <span style={{ display: "inline-block", width: 420, ...note(28, ACCENT_INK) }}>
+            <span style={{ display: "inline-block", width: 420, ...note(26, ACCENT_INK) }}>
               <Strike at={it.at + 36}>{it.bad}</Strike>
             </span>
-            <span style={{ ...note(28, OK_INK), fontWeight: 500 }}>
+            <span style={{ ...note(26, OK_INK), fontWeight: 500 }}>
               <FadeIn at={it.at + 40}>{it.fix}</FadeIn>
             </span>
           </span>

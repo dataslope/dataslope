@@ -226,7 +226,7 @@ export const LogitScene: React.FC = () => {
             align="right"
             from="right"
           >
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
               {LOGIT.malignant} malignant, at 1
             </span>
           </Note>
@@ -237,7 +237,7 @@ export const LogitScene: React.FC = () => {
             align="right"
             from="right"
           >
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
               {LOGIT.n - LOGIT.malignant} benign, at 0
             </span>
           </Note>
@@ -320,7 +320,7 @@ export const LogitScene: React.FC = () => {
           >
             <span
               style={{
-                ...note(28, ACCENT_INK),
+                ...note(26, ACCENT_INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
                 ...TABULAR,
@@ -344,7 +344,7 @@ export const LogitScene: React.FC = () => {
             </Formula>
           </Note>
           <Note at={oddsAt} x={COL} y={y(TOP) + h(54)} out={fitAt - 4}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
               the score: the log odds
             </span>
           </Note>
@@ -354,7 +354,7 @@ export const LogitScene: React.FC = () => {
             </Formula>
           </Note>
           <Note at={fitAt + 6} x={COL} y={y(TOP) + h(54)} out={out1}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
               fitted on {LOGIT.n} tumors
             </span>
           </Note>
@@ -366,7 +366,7 @@ export const LogitScene: React.FC = () => {
             </Formula>
           </Note>
           <Note at={sigAt + 6} x={COL} y={y(TOP) + h(184)} out={out1}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
               the sigmoid:{" "}
               <Mark at={squeezeAt + 2}>any score, into 0 to 1</Mark>
             </span>
@@ -395,7 +395,7 @@ export const LogitScene: React.FC = () => {
             </span>
           </Note>
           <Note at={assumesAt} x={COL} y={y(TOP) + h(40)}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
               which least squares assumes
             </span>
           </Note>
@@ -411,7 +411,7 @@ export const LogitScene: React.FC = () => {
             </span>
           </Note>
           <Note at={mlAt} x={COL} y={y(TOP) + h(186)}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               fitted by maximum likelihood
             </span>
           </Note>

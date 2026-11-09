@@ -249,15 +249,15 @@ export const FrameScene: React.FC = () => {
           marks={whole.rows.map((_, row) => ({ row, col: tc, at: sixOhFiveAt + 2 + row * 2, color: MARK_OK }))}
         />
         <Note at={noFrameAt + 4} x={LIST_X} y={rg.rowTop(R.rows.length) + h(22)} out={leaveOutAt - 2}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             no frame: <QMono>RANGE</QMono> from the start to this row
           </span>
         </Note>
         <Note at={runningAt + 4} x={LIST_X} y={rg.rowTop(R.rows.length) + h(62)} out={leaveOutAt - 2}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>a running total, not the total</span>
+          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>a running total, not the total</span>
         </Note>
         <Note at={sixOhFiveAt + 6} x={LIST_X} y={rg.rowTop(R.rows.length) + h(22)} out={out78}>
-          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>no ORDER BY: the whole partition</span>
+          <span style={{ ...note(25, OK_INK), whiteSpace: "nowrap" }}>no ORDER BY: the whole partition</span>
         </Note>
 
         {/* ── Question 8: LAST_VALUE, with the default frame and widened ── */}

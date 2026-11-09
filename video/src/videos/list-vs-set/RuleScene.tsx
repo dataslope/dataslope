@@ -51,7 +51,7 @@ export const RuleScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 14} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(24, INK_SOFT)}>Testing membership</span>
+        <span style={label(21, INK_SOFT)}>Testing membership</span>
       </Ink>
       <Ink at={start - 12} dur={20} style={{ left: LEFT - 2, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
         Again and again?
@@ -110,7 +110,7 @@ export const RuleScene: React.FC = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            ...note(24, LIST_INK),
+            ...note(19, LIST_INK),
             fontWeight: 500,
             opacity: ease(frame, sevenAt + i * 3, 8),
           }}
@@ -119,8 +119,8 @@ export const RuleScene: React.FC = () => {
         </div>
       ))}
       <Ink at={sevenAt + 14} dur={14} style={{ left: BAR_X + BAR_W + 18, top: y(BUILD_Y), whiteSpace: "nowrap" }}>
-        <div style={{ ...note(24, SET_INK), fontWeight: 500 }}>{fmt(BUILD_MS, 1)} ms</div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 4 }}>{fmt(BUILD_SCANS, 1)} scans</div>
+        <div style={{ ...note(22, SET_INK), fontWeight: 500 }}>{fmt(BUILD_MS, 1)} ms</div>
+        <div style={{ ...note(20, INK_SOFT), marginTop: 4 }}>{fmt(BUILD_SCANS, 1)} scans</div>
       </Ink>
 
       {/* ── Memory ── */}
@@ -130,11 +130,11 @@ export const RuleScene: React.FC = () => {
         <rect x={BAR_X} y={y(MEM_Y) + 44} width={SET_BYTES * bytePx * memSet} height={34} fill={SET} />
       </svg>
       <Ink at={memoryAt} dur={12} style={{ left: BAR_X + LIST_BYTES * bytePx + 16, top: y(MEM_Y) + 4, height: 26, display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
-        <span style={{ ...note(24, LIST_INK), fontWeight: 500 }}>list {fmt(MB(LIST_BYTES), 1)} MB</span>
+        <span style={{ ...note(21, LIST_INK), fontWeight: 500 }}>list {fmt(MB(LIST_BYTES), 1)} MB</span>
       </Ink>
       <Ink at={memoryAt + 16} dur={14} style={{ left: BAR_X + BAR_W + 18, top: y(MEM_Y) + 30, whiteSpace: "nowrap" }}>
-        <div style={{ ...note(24, SET_INK), fontWeight: 500 }}>{fmt(MB(SET_BYTES), 1)} MB</div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 4 }}>{fmt(SET_BYTES / LIST_BYTES, 1)}× the list</div>
+        <div style={{ ...note(22, SET_INK), fontWeight: 500 }}>{fmt(MB(SET_BYTES), 1)} MB</div>
+        <div style={{ ...note(20, INK_SOFT), marginTop: 4 }}>{fmt(SET_BYTES / LIST_BYTES, 1)}× the list</div>
       </Ink>
 
       {/* ── Every lookup after ── */}
@@ -144,7 +144,7 @@ export const RuleScene: React.FC = () => {
         <span style={{ ...headline(58), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums" }}>
           {fmt(MILLION.setNs, 1)} ns
         </span>
-        <span style={{ ...body(28, true), color: INK_SOFT }}>
+        <span style={{ ...body(30, true), color: INK_SOFT }}>
           where a scan of the list takes {fmt(MILLION.listMs)} ms
         </span>
       </Ink>

@@ -193,7 +193,7 @@ export const IdentityScene: React.FC = () => {
           <span style={{ ...note(40, ACCENT_INK), fontWeight: 500 }}>?</span>
         </Note>
         <Note at={tellAt - 2} x={CUSTOMERS_X} y={customers.rowTop(2) + 22} out={clearAt}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             Matching on the name finds <b style={{ color: ACCENT_INK }}>{NOKEY.matches}</b> customers.
             <span style={{ opacity: ease(frame, noKeyAt, 10) }}> No key to tell them apart.</span>
           </span>
@@ -202,7 +202,7 @@ export const IdentityScene: React.FC = () => {
         {/* The key: one line, to one row. */}
         <KeyArrow from={fromKeyed} to={toRow(owner)} at={oneOhOneAt + 2} />
         <Note at={oneOhTwoAt + 8} x={CUSTOMERS_X} y={customers.rowTop(2) + 22}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             Matching on <Mono color={KEY_INK}>customer_id</Mono> finds{" "}
             <b style={{ color: KEY_INK }}>{TAYLORS.matches}</b>. Same name, two people.
           </span>

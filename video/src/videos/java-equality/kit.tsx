@@ -482,7 +482,7 @@ export const VarCell: React.FC<{
           borderRight: `1.5px solid ${HAIRLINE}`,
           opacity: ease(frame, at + 4, 10),
           fontFamily: MONO,
-          fontSize: 34,
+          fontSize: 32,
           fontWeight: 500,
           color: INK,
         }}
@@ -557,7 +557,7 @@ export const HeapObj: React.FC<{
         <span
           style={{
             fontFamily: SANS,
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: 500,
             color: INK_SOFT,
             lineHeight: 1.1,
@@ -568,7 +568,7 @@ export const HeapObj: React.FC<{
         <span
           style={{
             fontFamily: MONO,
-            fontSize: 34,
+            fontSize: 32,
             fontWeight: 500,
             color: valueInk,
             lineHeight: 1.2,

@@ -43,7 +43,7 @@ const Degenerate: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={L.rows.map((_, row) => ({ row, col: 0, at: invoiceAt + 4 + row * 2 }))}
       />
       <Note at={invoiceAt + 8} x={gl.x} y={gl.rowTop(L.rows.length) + c.h(16)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           <QMono>invoice_number</QMono> lives on the fact: no table behind it
         </span>
       </Note>
@@ -96,7 +96,7 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={flagsAt} x={R_X} y={top - c.h(56)}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>small flags, each a column on the fact</span>
+        <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>small flags, each a column on the fact</span>
       </Note>
       {/* Three columns of value chips, a "×" between them, then "=" and
           the count on a line of its own with its label under it. Every gap
@@ -107,7 +107,7 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
           <React.Fragment key={g.name}>
             {i ? <div style={{ ...note(34, INK_SOFT), margin: "50px 44px 0", opacity: ease(frame, g.at, 10) }}>×</div> : null}
             <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "stretch" }}>
-              <div style={{ ...label(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, g.at - 2, 10), whiteSpace: "nowrap" }}>{g.name}</div>
+              <div style={{ ...label(21, INK_SOFT), fontWeight: 500, opacity: ease(frame, g.at - 2, 10), whiteSpace: "nowrap" }}>{g.name}</div>
               {g.values.map((v, j) => (
                 <Chip key={v} at={g.at + 2 + j * 3}>
                   {v}
@@ -121,11 +121,11 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
           <div style={{ ...note(46, BLUE_INK), fontWeight: 500 }}>
             <Num>{RAPID.junk}</Num>
           </div>
-          <div style={{ ...note(28, INK), marginTop: 2 }}>rows in dim_junk</div>
+          <div style={{ ...note(26, INK), marginTop: 2 }}>rows in dim_junk</div>
         </div>
       </div>
       <Note at={oneAt} x={R_X} y={c.y(660)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           the fact carries one <QMono>junk_key</QMono> instead of three columns
         </span>
       </Note>
@@ -238,12 +238,12 @@ const Mini: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>age band, income tier: change often</span>
       </Note>
       <Note at={twentyAt} x={dimD.x} y={dimD.bottom + c.h(14)}>
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           <Num>5</Num> bands × <Num>4</Num> tiers = <Num>{RAPID.mini}</Num> rows
         </span>
       </Note>
       <Note at={t4At} x={dimD.x} y={dimD.bottom + c.h(56)}>
-        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Kimball&rsquo;s SCD Type 4</span>
+        <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Kimball&rsquo;s SCD Type 4</span>
       </Note>
       <Note at={stopsAt} x={R_X} y={fact.bottom + c.h(30)}>
         <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
@@ -279,11 +279,11 @@ const Factless: React.FC<{ c: Ctx }> = ({ c }) => {
       </TableName>
       <DataTable g={ga} cols={colsOf(A)} at={noneAt - 2} rows={A.rows.map((cells, i) => ({ cells, at: eventAt + i * 4 }))} />
       <Note at={noneAt + 6} x={ga.x} y={ga.rowTop(A.rows.length) + c.h(16)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>names stand in for keys; no measure column</span>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>names stand in for keys; no measure column</span>
       </Note>
       {/* The code at 23px, so QMono's 0.92em stays well above 19px. */}
       <TableName g={gx} at={coverAt}>
-        <span style={{ fontSize: 24 }}>
+        <span style={{ fontSize: 23 }}>
           <QMono>enrollment</QMono>
           <span style={{ opacity: ease(frame, minusAt, 10) }}>
             {" "}
@@ -294,7 +294,7 @@ const Factless: React.FC<{ c: Ctx }> = ({ c }) => {
       </TableName>
       <DataTable g={gx} cols={colsOf(X)} at={minusAt} rows={X.rows.map((cells, i) => ({ cells, at: cameAt + i * 3 }))} marks={X.rows.map((_, row) => ({ row, col: 0, at: cameAt + 6 }))} />
       <TableName g={gc} at={countAt - 2}>
-        <span style={{ fontSize: 24 }}>
+        <span style={{ fontSize: 23 }}>
           <QMono>COUNT(*)</QMono>
         </span>{" "}
         per class
@@ -327,7 +327,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
   const keyBox = (top: number, at: number, value: string, name: string, bytes: number, bytesAt: number, kind: string) => (
     <Note at={at} x={R_X} y={top}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK_SOFT), width: 120 }}>{name}</span>
+        <span style={{ ...label(22, INK_SOFT), width: 120 }}>{name}</span>
         {/* The key's value as the house's badge, at 24px: within 12% of
             the 22px name and the 24px bytes on its line. */}
         <span style={{ ...badgeStyle("gray", 24), fontFamily: MONO }}>{value}</span>
@@ -364,17 +364,17 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {keyBox(c.y(370), seqAt, U.seqSample, "sequence", U.bigint, compactAt, "a bigint")}
       <Note at={orderAt} x={R_X + 140} y={c.y(370) + c.h(52)}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>1, 2, 3, … in order</span>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>1, 2, 3, … in order</span>
       </Note>
       {keyBox(c.y(470), uuidAt, U.sample, "UUID", U.uuid, bytesAt, "")}
       <Note at={counterAt} x={R_X + 140} y={c.y(470) + c.h(52)}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
           made anywhere, no shared counter
           <span style={{ opacity: ease(frame, manyAt, 10) }}>: many sources at once</span>
         </span>
       </Note>
       <Note at={costAt} x={R_X} y={barTop - c.h(48)}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
           primary key index, <Num>100,000</Num> rows, Postgres
         </span>
       </Note>
@@ -383,7 +383,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
         const top = b.top;
         return (
           <React.Fragment key={b.name}>
-            <div style={{ position: "absolute", left: R_X, top, height: barH, display: "flex", alignItems: "center", ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, b.at - 4, 10) }}>
+            <div style={{ position: "absolute", left: R_X, top, height: barH, display: "flex", alignItems: "center", ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, b.at - 4, 10) }}>
               {b.name}
             </div>
             <div style={{ position: "absolute", left: BAR_X, top, width: b.v * unit * p, height: barH, background: b.fill, borderRadius: 3 }} />
@@ -395,7 +395,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
                 height: barH,
                 display: "flex",
                 alignItems: "center",
-                ...note(24, b.ink),
+                ...note(23, b.ink),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
                 opacity: ease(frame, b.at + 10, 10),
@@ -421,8 +421,8 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
             {/* A bracket under the stretch of bar it explains. */}
             <div style={{ height: 8, borderLeft: `2px solid ${sp.ink}`, borderRight: `2px solid ${sp.ink}`, borderBottom: `2px solid ${sp.ink}` }} />
             <div style={{ position: "absolute", left: "50%", top: 14, transform: "translateX(-50%)", textAlign: "center", whiteSpace: "nowrap" }}>
-              <div style={{ ...label(24, sp.ink), fontWeight: 500 }}>{sp.head}</div>
-              <div style={{ ...label(24, sp.ink), fontWeight: 500, opacity: ease(frame, sp.lit, 10) }}>
+              <div style={{ ...label(20, sp.ink), fontWeight: 500 }}>{sp.head}</div>
+              <div style={{ ...label(20, sp.ink), fontWeight: 500, opacity: ease(frame, sp.lit, 10) }}>
                 <Num>{sp.ratio.toFixed(2)}</Num>×
               </div>
             </div>
@@ -501,11 +501,11 @@ export const RapidScene: React.FC = () => {
         {/* The bridge. */}
         <Spot id={HERO.id} at={jobAt - 4} left={1360} top={y(330)} width={460} height={Math.round((460 * HERO.h) / HERO.w)} />
         <Note at={jobAt} x={R_X} y={y(380)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>Every table here is filled by a load job:</span>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>Every table here is filled by a load job:</span>
         </Note>
         {steps.map((s, i) => (
           <Note key={s.text} at={s.at - 2} x={R_X + 24} y={y(440) + i * h(46)}>
-            <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>· {s.text}</span>
+            <span style={{ ...note(25, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>· {s.text}</span>
           </Note>
         ))}
         <Note at={codeAt} x={R_X} y={y(600)}>

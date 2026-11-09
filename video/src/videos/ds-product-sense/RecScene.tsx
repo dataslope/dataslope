@@ -160,7 +160,7 @@ export const RecScene: React.FC = () => {
                 border: `2.2px solid ${arm ? WARM_INK : BLUE_INK}`,
                 borderRadius: 12,
                 padding: "14px 18px",
-                ...note(28, arm ? WARM_INK : BLUE_INK),
+                ...note(26, arm ? WARM_INK : BLUE_INK),
                 fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
@@ -172,29 +172,29 @@ export const RecScene: React.FC = () => {
 
         {/* The design: one primary metric, guardrails, the unit. */}
         <Note at={primaryAt} x={RIGHT_X} y={y(330)} out={out8}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>primary</b>
             <span style={{ opacity: ease(frame, shareAt, 12) }}>: share of users who cook a recommended recipe</span>
           </span>
         </Note>
         <Note at={guardsAt} x={RIGHT_X} y={y(384)} out={out8}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             <b>guardrails</b>: latency, variety
           </span>
         </Note>
         <Note at={unitAt} x={RIGHT_X} y={y(438)} out={out8}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             <b>unit</b>: the user, not the <Strike at={unitAt + 8}>session</Strike>
           </span>
         </Note>
         <Note at={indepAt} x={RIGHT_X + 24} y={y(482)} out={out8}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>one person&apos;s sessions aren&apos;t independent</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>one person&apos;s sessions aren&apos;t independent</span>
         </Note>
 
         {/* The size, before launch: DA Part 7's formula. */}
         <Note at={sizeAt} x={RIGHT_X} y={y(SIZE.top) - h(56)} out={out8}>
-          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            users per group <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>(80% power, 5% two-sided)</span>
+          <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            users per group <span style={{ ...note(25, INK_SOFT), fontWeight: 500 }}>(80% power, 5% two-sided)</span>
           </span>
         </Note>
         {[
@@ -206,13 +206,13 @@ export const RecScene: React.FC = () => {
           return (
             <React.Fragment key={i}>
               <Note at={i === 0 ? baseAt : halfAt} x={RIGHT_X} y={top + h(4)} out={out8}>
-                <span style={{ ...label(24, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{b.text}</span>
+                <span style={{ ...label(22, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>{b.text}</span>
               </Note>
               <Svg opacity={1 - ease(frame, out8, 10)}>
                 <rect x={RIGHT_X + 170} y={top} width={(SIZE.w * b.n * p) / longest} height={h(SIZE.h)} fill={b.fill} opacity={0.85} rx={3} />
               </Svg>
               <Note at={(i === 0 ? fifteenAt : fourAt) + 8} x={RIGHT_X + 170 + (SIZE.w * b.n) / longest + 14} y={top + h(4)} out={out8}>
-                <span style={{ ...label(24, b.ink), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
+                <span style={{ ...label(22, b.ink), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
                   {num(b.n)}
                   {i === 1 ? (
                     <>
@@ -258,14 +258,14 @@ export const RecScene: React.FC = () => {
         <Clear at={spotAt}>
           {reasons.map((r, i) => (
             <Note key={r.text} at={r.at - 2} x={X0} y={y(340) + i * h(70)}>
-              <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+              <span style={{ ...note(29, INK), whiteSpace: "nowrap" }}>
                 <span style={{ color: ACCENT_INK, fontWeight: 500 }}>✕</span> {r.text}
                 {r.eg ? <span style={{ color: INK_SOFT, opacity: ease(frame, r.egAt, 10) }}> ({r.eg})</span> : null}
               </span>
             </Note>
           ))}
           <Note at={switchAt - 2} x={ALT_X} y={y(340)}>
-            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>instead:</span>
+            <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>instead:</span>
           </Note>
           <Tag x={ALT_X} y={y(396)} at={switchAt} size={25} tone="blue">
             randomize whole regions
@@ -274,7 +274,7 @@ export const RecScene: React.FC = () => {
             or switch by time slot
           </Tag>
           <Note at={baselineAt} x={ALT_X} y={y(478)}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>or compare against a baseline:</span>
+            <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>or compare against a baseline:</span>
           </Note>
           {methods.map((m, i) => (
             <React.Fragment key={m.text}>
@@ -282,12 +282,12 @@ export const RecScene: React.FC = () => {
                 {m.text}
               </Tag>
               <Note at={m.glossAt} x={ALT_X + 386} y={y(526) + i * h(62) + h(9)}>
-                <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{m.gloss}</span>
+                <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>{m.gloss}</span>
               </Note>
             </React.Fragment>
           ))}
           <Note at={tradesAt} x={ALT_X} y={y(730)}>
-            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
               less rigor,{" "}
               <span style={{ opacity: ease(frame, runAt, 10) }}>
                 <Mark at={numbersAt} color={`color-mix(in srgb, ${OK} 24%, transparent)`}>

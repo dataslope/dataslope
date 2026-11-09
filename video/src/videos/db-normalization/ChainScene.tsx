@@ -183,12 +183,12 @@ export const ChainScene: React.FC = () => {
             />
           </Svg>
           <Ink at={orderIdAt - 2} dur={12} style={{ left: g.x + 4, top: g.top - 104, whiteSpace: "nowrap" }}>
-            <span style={label(24, BLUE_INK)}>the key</span>
+            <span style={label(21, BLUE_INK)}>the key</span>
           </Ink>
           {/* What the narration says about the city, in the right column
               until the update's listing takes its place. */}
           <Note at={customerAt + 6} out={adaAt - 10} x={RIGHT} y={g.top}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
               <Mono>customer_city</Mono> is a fact about the customer
             </span>
           </Note>
@@ -221,7 +221,7 @@ export const ChainScene: React.FC = () => {
             ]}
           />
           <Ink at={transitiveAt - 2} dur={14} style={{ left: RIGHT, top: g.top - 98, whiteSpace: "nowrap" }}>
-            <span style={{ ...label(24, ACCENT_INK) }}>a transitive dependency</span>
+            <span style={{ ...label(22, ACCENT_INK) }}>a transitive dependency</span>
           </Ink>
 
           {/* Ada's move, made on one row. */}
@@ -239,7 +239,7 @@ export const ChainScene: React.FC = () => {
             {CITY_UPDATE.tag}
           </Reply>
           <Ink at={livesAt - 6} dur={12} style={{ left: RIGHT, top: tg.top - 40, whiteSpace: "nowrap" }}>
-            <span style={label(24, INK_SOFT)}>Grouped by customer and city</span>
+            <span style={label(21, INK_SOFT)}>Grouped by customer and city</span>
           </Ink>
           <DbTable
             g={tg}
@@ -279,14 +279,14 @@ export const ChainScene: React.FC = () => {
             {CITY_GOOD.tag}
           </Reply>
           <Note at={onceAt + 18} x={X0 + 470} y={customers.bottom + 106}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
               and {oxford.length === 2 ? "both" : `all ${oxford.length}`} of her orders now show {NEW_CITY}
             </span>
           </Note>
 
           {/* The orders, joined to their customer: Ada's two say Oxford. */}
           <Ink at={onceAt + 2} dur={12} style={{ left: jg.x, top: jg.top - 44, whiteSpace: "nowrap" }}>
-            <span style={label(24, INK_SOFT)}>orders joined to customers</span>
+            <span style={label(22, INK_SOFT)}>orders joined to customers</span>
           </Ink>
           <DbTable
             g={jg}

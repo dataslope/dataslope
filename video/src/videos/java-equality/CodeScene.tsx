@@ -68,7 +68,7 @@ export const CodeScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(24, ACCENT_INK)}>Comparing strings in Java</span>
+        <span style={label(21, ACCENT_INK)}>Comparing strings in Java</span>
       </Ink>
       <Ink
         at={open + 2}
@@ -169,10 +169,10 @@ export const CodeScene: React.FC = () => {
 
       {/* What each println printed, and the question behind it. */}
       <Ink at={falseAt - 8} dur={12} style={{ ...row(HEAD_LINE), left: OUT_X }}>
-        <span style={label(24, INK_SOFT)}>Prints</span>
+        <span style={label(21, INK_SOFT)}>Prints</span>
       </Ink>
       <Ink at={questionsAt - 2} dur={14} style={{ ...row(HEAD_LINE), left: ASK_X }}>
-        <span style={label(24, INK_SOFT)}>The question it asks</span>
+        <span style={label(21, INK_SOFT)}>The question it asks</span>
       </Ink>
       {FIG1.prints.map((v, i) =>
         v === null ? null : (
@@ -182,20 +182,20 @@ export const CodeScene: React.FC = () => {
         ),
       )}
       <Ink at={sameObjectAt - 2} dur={18} style={{ ...row(SAME_LINE), left: ASK_X }}>
-        <span style={{ ...body(34, true), color: INK }}>
+        <span style={{ ...body(36, true), color: INK }}>
           is this the <Marked p={markP(frame, objectAt)}>same object</Marked>
           <After>?</After>
         </span>
       </Ink>
       <Ink at={contentsAskAt - 2} dur={18} style={{ ...row(EQUALS_LINE), left: ASK_X }}>
-        <span style={{ ...body(34, true), color: INK }}>
+        <span style={{ ...body(36, true), color: INK }}>
           do they hold the <Marked p={markP(frame, contentsAt)}>same contents</Marked>
           <After>?</After>
         </span>
       </Ink>
 
       <Ink at={trueAt + 8} dur={14} style={{ left: LEFT, top: top + listingHeight(L.length, SIZE) + 28 }}>
-        <span style={note(24, INK_SOFT)}>Printed by this code, run on OpenJDK {JAVA_MAJOR}.</span>
+        <span style={note(20, INK_SOFT)}>Printed by this code, run on OpenJDK {JAVA_MAJOR}.</span>
       </Ink>
     </AbsoluteFill>
   );

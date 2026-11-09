@@ -164,8 +164,8 @@ const deptText = (dept: Dept): React.CSSProperties => ({
   fontWeight: 500,
   color: DEPT_INK[dept],
 });
-const numText: React.CSSProperties = { ...note(28, INK), fontWeight: 520, lineHeight: 1 };
-const idxText: React.CSSProperties = { fontFamily: MONO, fontSize: 24, color: INK_SOFT };
+const numText: React.CSSProperties = { ...note(26, INK), fontWeight: 520, lineHeight: 1 };
+const idxText: React.CSSProperties = { fontFamily: MONO, fontSize: 21, color: INK_SOFT };
 
 /** Where a card is, how far it has lifted, and how it is turned. */
 export type Pose = { x: number; top: number; lift?: number; turn?: number; opacity?: number };
@@ -261,7 +261,7 @@ export const Header: React.FC<{
             top: 0,
             opacity: p,
             whiteSpace: "nowrap",
-            ...(c.code ? { fontFamily: MONO, fontSize: 24, color: INK_SOFT } : label(24, INK_SOFT)),
+            ...(c.code ? { fontFamily: MONO, fontSize: 21, color: INK_SOFT } : label(20, INK_SOFT)),
           }}
         >
           {c.text}

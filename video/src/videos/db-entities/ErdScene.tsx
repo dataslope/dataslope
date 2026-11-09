@@ -174,26 +174,26 @@ export const ErdScene: React.FC = () => {
 
         {/* The three pieces, tagged as they are named. */}
         <Note at={boxesAt + 2} out={tagsOut} x={CUSTOMERS_X} y={customers.top - 52}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>an entity</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>an entity</span>
         </Note>
         <Leader points={[[CUSTOMERS_X - 20, customers.rows[1].mid], [CUSTOMERS_X - 4, customers.rows[1].mid]]} at={factsAt + 6} out={tagsOut} dot={false} />
         <Note at={factsAt + 6} out={tagsOut} x={CUSTOMERS_X - 30} y={customers.rows[1].mid - 15} align="right">
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>an attribute</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>an attribute</span>
         </Note>
         <Note at={relAt} out={tagsOut} x={midX} y={lineY + 26} from="up">
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
             a relationship
           </span>
         </Note>
 
         {/* The key markers, read. */}
         <Note at={primaryAt - 2} x={CUSTOMERS_X} y={customers.bottom + 22} from="up">
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             PK <span style={{ color: INK_SOFT }}>primary key,</span> UK <span style={{ color: INK_SOFT }}>unique</span>
           </span>
         </Note>
         <Note at={foreignAt - 2} x={ORDERS_X} y={orders.bottom + 22} from="up">
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             FK <span style={{ color: INK_SOFT }}>foreign key, to {ERD.fk.table}</span>
           </span>
         </Note>
@@ -212,12 +212,12 @@ export const ErdScene: React.FC = () => {
         <BoxPulse x={orders.x} y={orders.y} width={orders.width} height={orders.head} at={eachAt} />
         <Pulse x={barsX} y={lineY} at={exactlyAt} r={8} grow={18} color={INK} />
         <Note at={exactlyAt - 2} x={a[0] + 28} y={lineY + 30} from="up">
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             <Mark at={oneKeyAt}>exactly one</Mark>
           </span>
         </Note>
         <Note at={zeroAt + 2} x={b[0] - 28} y={lineY + 30} from="up" align="right">
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             <Mark at={manyKeyAt}>zero or many</Mark>
           </span>
         </Note>
@@ -230,7 +230,7 @@ export const ErdScene: React.FC = () => {
         <Pulse x={manyEnd.near[0]} y={lineY} at={footAt} r={8} grow={18} color={STAT_INK} />
 
         <Note at={aloneAt - 4} x={midX} y={lineY - 96} from="up">
-          <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(23, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
             The line says as much as the boxes
           </span>
         </Note>

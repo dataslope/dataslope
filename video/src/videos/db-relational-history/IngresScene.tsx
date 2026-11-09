@@ -121,8 +121,8 @@ export const IngresScene: React.FC = () => {
       {/* ── The tape ── */}
       <Spot id="db-relational-history-tape" at={tapeAt - 6} left={560} top={y(640)} width={210} height={210} />
       <Ink at={costAt - 2} dur={14} style={{ left: 800, top: y(690), whiteSpace: "nowrap" }}>
-        <div style={{ ...note(24, INK) }}>its source code, on tape</div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>
+        <div style={{ ...note(23, INK) }}>its source code, on tape</div>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>
           <Mark at={tapeAt}>for a nominal fee</Mark>
         </div>
       </Ink>

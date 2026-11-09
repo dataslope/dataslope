@@ -90,7 +90,7 @@ export const PeekScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={identicalAt - 4} x={X0} y={y(CHART.top) - h(84)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             A and B identical: <b>nothing to find</b>
           </span>
         </Note>
@@ -116,24 +116,24 @@ export const PeekScene: React.FC = () => {
               strokeWidth={1.6}
               strokeDasharray="6 6"
             />
-            <text x={CHART.x1 + 14} y={alphaY + 7} style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: ACCENT_INK }}>
+            <text x={CHART.x1 + 14} y={alphaY + 7} style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: ACCENT_INK }}>
               0.05
             </text>
           </g>
           {[0, 0.2, 0.4].map((t) => (
-            <text key={t} x={CHART.x0 - 14} y={at(ys, t) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
+            <text key={t} x={CHART.x0 - 14} y={at(ys, t) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
               {t === 0 ? "0" : t.toFixed(1)}
             </text>
           ))}
           {[0, 2000, 4000, 6000, 8000].map((t) => (
-            <text key={t} x={at(xs, t)} y={y(CHART.base) + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
+            <text key={t} x={at(xs, t)} y={y(CHART.base) + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
               {t.toLocaleString("en-US")}
             </text>
           ))}
-          <text x={CHART.x1} y={y(CHART.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
+          <text x={CHART.x1} y={y(CHART.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
             users per arm, checked every hundred
           </text>
-          <text x={CHART.x0 - 14} y={y(CHART.top) - 18} style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
+          <text x={CHART.x0 - 14} y={y(CHART.top) - 18} style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
             p-value
           </text>
           {path ? <path d={path} fill="none" stroke={A_COLOR} strokeWidth={3} strokeLinejoin="round" /> : null}
@@ -150,10 +150,10 @@ export const PeekScene: React.FC = () => {
           <circle cx={at(xs, PEEK.planned)} cy={at(ys, PEEK.final)} r={9 * finalP} fill={OK} />
         </Svg>
         <Note at={eightHundredAt + 2} x={at(xs, firstCross) - 40} width={80} y={y(CHART.base) + h(9)} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>{firstCross.toLocaleString("en-US")}</span>
+          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>{firstCross.toLocaleString("en-US")}</span>
         </Note>
         <Note at={againAt + 10} x={at(xs, secondCross)} y={y(CHART.top) - h(36)}>
-          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
             under 0.05 from {secondCross.toLocaleString("en-US")} to {runEnd.toLocaleString("en-US")}
           </span>
         </Note>
@@ -165,14 +165,14 @@ export const PeekScene: React.FC = () => {
         </Note>
         {/* Why, then the fix, in the empty upper right. */}
         <Note at={lookAt - 2} x={X0 + 980} y={y(CHART.top) - h(84)}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>every look: one more chance to cross by luck</span>
-          <div style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, farAt - 2, 10) }}>
+          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>every look: one more chance to cross by luck</span>
+          <div style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, farAt - 2, 10) }}>
             false winners: far more than <Num>{Math.round(ALPHA * 100)}%</Num> of the time
           </div>
         </Note>
         <Note at={fixAt - 2} x={X0 + 980} y={y(CHART.top) + h(14)}>
-          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>fix the sample size first and look once,</span>
-          <div style={{ ...note(24, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, seqAt - 2, 10) }}>
+          <span style={{ ...note(25, OK_INK), whiteSpace: "nowrap" }}>fix the sample size first and look once,</span>
+          <div style={{ ...note(25, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, seqAt - 2, 10) }}>
             or use a sequential test
             <span style={{ opacity: ease(frame, stricterAt - 2, 10) }}>: a stricter line per look</span>
           </div>

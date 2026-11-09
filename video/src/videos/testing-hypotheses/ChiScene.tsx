@@ -115,7 +115,7 @@ export const ChiScene: React.FC = () => {
             <Ink at={deviceAt + i * 4} dur={12} style={{ left: LABEL_X, top: rowY(i) + 14, whiteSpace: "nowrap" }}>
               <span
                 style={{
-                  ...body(34, true),
+                  ...body(38, true),
                   color: row === "mobile" && mobileGlowRow > 0.1 ? STAT_INK : INK,
                   display: "inline-block",
                   transform: row === "mobile" ? `scale(${1 + 0.08 * mobileGlowRow})` : undefined,
@@ -201,7 +201,7 @@ export const ChiScene: React.FC = () => {
                 >
                   <Count at={at} to={obs} dur={16} />
                   {showGap > 0 ? (
-                    <span style={{ position: "relative", display: "inline-block", marginLeft: 12, ...note(28, STAT_INK), fontWeight: 500 }}>
+                    <span style={{ position: "relative", display: "inline-block", marginLeft: 12, ...note(26, STAT_INK), fontWeight: 500 }}>
                       <span style={{ opacity: showGap * (1 - toShare) }}>
                         {gap > 0 ? "+" : "−"}
                         {fmt(Math.abs(gap), 1)}
@@ -225,10 +225,10 @@ export const ChiScene: React.FC = () => {
 
         {/* The statistic: every cell's share, added up. */}
         <div style={{ position: "absolute", left: LABEL_X, top: y(830), opacity: total, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(34, STAT_INK), fontWeight: 500 }}>
+          <span style={{ ...note(38, STAT_INK), fontWeight: 500 }}>
             <Greek>χ</Greek>² = <Count at={twelveAt - 8} to={CHI.chi2} dur={20} format={(v) => fmt(v, 1)} />
           </span>
-          <span style={{ ...note(34, STAT_INK), fontWeight: 500, marginLeft: 30, opacity: ease(frame, pAt - 4, 12) }}>p = {fmt(CHI.p, 3)}</span>
+          <span style={{ ...note(36, STAT_INK), fontWeight: 500, marginLeft: 30, opacity: ease(frame, pAt - 4, 12) }}>p = {fmt(CHI.p, 3)}</span>
         </div>
         <Note at={pAt + 6} x={LABEL_X + 520} y={y(830) + 8}>
           <Label size={22} color={INK_SOFT} weight={520}>
@@ -237,7 +237,7 @@ export const ChiScene: React.FC = () => {
         </Note>
       </div>
       <Ink at={bothAt - 4} dur={18} style={{ left: 160, top: y(892), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(34, true), color: INK }}>
+        <span style={{ ...body(36, true), color: INK }}>
           Two columns of <Mark at={bothNumbersAt - 2}>numbers</Mark>: do they <Mark at={togetherAt - 2}>move together?</Mark>
         </span>
       </Ink>

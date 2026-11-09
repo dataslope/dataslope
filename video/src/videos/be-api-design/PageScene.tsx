@@ -154,7 +154,7 @@ export const PageScene: React.FC = () => {
                   <path d={`M${p.x + 2},${bTop} v8 H${p.x + p.w - 2} v-8`} fill="none" stroke={BAR} strokeWidth={2} />
                 </svg>
                 <Note at={at + 2} x={p.x} y={bTop + 14} width={p.w} style={{ textAlign: "center" }}>
-                  <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap" }}>{p.says}</span>
+                  <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>{p.says}</span>
                 </Note>
               </React.Fragment>
             );
@@ -168,7 +168,7 @@ export const PageScene: React.FC = () => {
 
         {/* What it costs: rows the index scan read, for twenty returned. */}
         <Note at={runAt} x={X0} y={chartTop}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
             Rows read for one page of <Num>{PAGE_SIZE}</Num>
             <span style={{ color: INK_SOFT, opacity: ease(frame, articlesAt, 10) }}>
               {" "}· PostgreSQL, <Num>{thousands(PAGE.articles)}</Num> articles, newest first
@@ -176,7 +176,7 @@ export const PageScene: React.FC = () => {
           </span>
         </Note>
         <Note at={p1At} x={X0} y={chartTop + h(32)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
             <span style={{ color: BLUE_INK }}>■ by offset</span>
             <span style={{ color: OK_INK, opacity: ease(frame, depthAt, 10) }}>{"   "}■ by cursor</span>
           </span>
@@ -189,19 +189,19 @@ export const PageScene: React.FC = () => {
           return (
             <React.Fragment key={o.page}>
               <Note at={offsetAt[i] - 4} x={X0} y={top + 6}>
-                <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+                <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
                   page <Num>{thousands(o.page)}</Num>
                 </span>
               </Note>
               <div style={{ position: "absolute", left: BAR_X0, top: top + 4, width: barW(o.read) * grow, height: BAR_H, background: BAR, borderRadius: 3, opacity: grow > 0 ? 1 : 0 }} />
               <Note at={offsetAt[i] + 14} x={BAR_X0 + barW(o.read) + 12} y={top}>
-                <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(23, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                   <Num>{thousands(o.read)}</Num>
                 </span>
               </Note>
               <div style={{ position: "absolute", left: BAR_X0, top: top + 4 + BAR_H + 10, width: barW(cur.read) * curGrow, height: BAR_H, background: OK, borderRadius: 3, opacity: curGrow > 0 ? 1 : 0 }} />
               <Note at={depthAt + 10 + i * 4} x={BAR_X0 + barW(cur.read) + 12} y={top + BAR_H + 10}>
-                <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                   <Num>{thousands(cur.read)}</Num>
                 </span>
               </Note>
@@ -212,28 +212,28 @@ export const PageScene: React.FC = () => {
         <div style={{ position: "absolute", left: BAR_X0, top: axisY, width: BAR_X1 - BAR_X0, height: 1, background: HAIRLINE, opacity: ease(frame, p1At, 12) }} />
         {Array.from({ length: DECADES + 1 }, (_, d) => (
           <Note key={d} at={p1At + d} x={BAR_X0 + (d / DECADES) * (BAR_X1 - BAR_X0) - 40} y={axisY + 8} width={80} style={{ textAlign: "center" }}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(19, INK_SOFT), whiteSpace: "nowrap" }}>
               <Num>{thousands(10 ** d)}</Num>
             </span>
           </Note>
         ))}
         <Note at={p1At + 8} x={BAR_X1 + 50} y={axisY + 8}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>log scale</span>
+          <span style={{ ...note(19, INK_SOFT), whiteSpace: "nowrap" }}>log scale</span>
         </Note>
 
         {/* Page 500 as Postgres ran it: the scan reads what OFFSET skips. */}
         <Note at={p500At} x={LIST_X[0]} y={listTop} out={repeatAt - 6}>
-          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Page 500, as Postgres ran it</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Page 500, as Postgres ran it</span>
         </Note>
         {page500.query.map((l, i) => (
           <Note key={l} at={p500At + 4 + i * 4} x={LIST_X[0]} y={listTop + h(46) + i * h(38)} out={repeatAt - 6}>
-            <span style={{ fontFamily: MONO, fontSize: 24, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+            <span style={{ fontFamily: MONO, fontSize: 23, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
               {l.includes("OFFSET") ? <Mark at={p500At + 20}>{l}</Mark> : l}
             </span>
           </Note>
         ))}
         <Note at={p500At + 24} x={LIST_X[0]} y={listTop + h(56) + page500.query.length * h(38)} out={repeatAt - 6}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             the index scan reads <b style={{ color: BLUE_INK }}><Num>{thousands(page500.read)}</Num> rows</b>, and LIMIT keeps <Num>{PAGE_SIZE}</Num>
           </span>
         </Note>
@@ -242,7 +242,7 @@ export const PageScene: React.FC = () => {
         {lists.map((l, li) => (
           <React.Fragment key={l.title}>
             <Note at={li === 0 ? repeatAt : l.at} x={LIST_X[li]} y={listTop}>
-              <span style={{ ...label(24, li === 0 ? INK : l.tone === "bad" ? ACCENT_INK : OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{l.title}</span>
+              <span style={{ ...label(21, li === 0 ? INK : l.tone === "bad" ? ACCENT_INK : OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{l.title}</span>
             </Note>
             {l.ids.map((id, i) => {
               const first = i === 0 && li > 0;
@@ -265,15 +265,15 @@ export const PageScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={publishedAt} x={LIST_X[1]} y={listTop - h(46)}>
-          <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             + article {thousands(PAGE.published)} published
           </span>
         </Note>
         <Note at={startsAt + 14} x={LIST_X[1]} y={rowTop(4)}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>shown twice</span>
+          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>shown twice</span>
         </Note>
         <Note at={shiftAt} x={LIST_X[2]} y={rowTop(4)}>
-          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>nothing shifts</span>
+          <span style={{ ...note(22, OK_INK), whiteSpace: "nowrap" }}>nothing shifts</span>
         </Note>
 
         {/* The cursor, and what it decodes to. */}
@@ -284,31 +284,31 @@ export const PageScene: React.FC = () => {
           </span>
         </Note>
         <Note at={idAt} x={LIST_X[0]} y={cursorTop + h(46)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             decodes to{" "}
             <span style={{ fontFamily: MONO, fontSize: 24, color: INK, fontWeight: 500 }}>{JSON.stringify(PAGE.cursorDecoded).replace(":", ": ")}</span>
             , page 1's last ID
           </span>
         </Note>
         <Note at={afterAt} x={LIST_X[0]} y={cursorTop + h(92)}>
-          <span style={{ fontFamily: MONO, fontSize: 24, color: INK, whiteSpace: "nowrap" }}>
+          <span style={{ fontFamily: MONO, fontSize: 22, color: INK, whiteSpace: "nowrap" }}>
             <span style={{ color: METHOD_INK, fontWeight: 500 }}>GET</span> /articles?limit={PAGE_SIZE}&after={PAGE.cursorToken}
           </span>
         </Note>
 
         {/* What a cursor costs. */}
         <Note at={costsAt} x={LIST_X[0]} y={y(770)}>
-          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>What a cursor costs</span>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>What a cursor costs</span>
         </Note>
         <Note at={noJumpAt} x={LIST_X[0]} y={y(770) + h(44)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             no jump to <Strike at={noJumpAt + 10}>page 500</Strike>
           </span>
         </Note>
         <Note at={orderAt} x={LIST_X[0]} y={y(770) + h(88)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             a unique, unchanging order:{" "}
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>
+            <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 500 }}>
               (created_at, <Mark at={tieAt + 4}>id</Mark>)
             </span>
           </span>

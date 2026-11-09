@@ -326,7 +326,7 @@ export const Headline: React.FC<{
   return (
     <>
       <Ink at={at - 2} dur={14} style={{ left: X0 + 4, top: y(KICKER_Y) }}>
-        <span style={label(24, ACCENT_INK)}>{kicker}</span>
+        <span style={label(21, ACCENT_INK)}>{kicker}</span>
       </Ink>
       <Ink at={at} dur={20} style={{ left: X0, top: y(HEAD1_Y), ...headline(HEAD_SIZE), whiteSpace: "nowrap" }}>
         {line1}
@@ -461,7 +461,7 @@ export const CellText: React.FC<{ col: string; value: string; weight?: number; c
 
 /** "(6 rows)", the way psql closes a result. */
 export const RowCount: React.FC<{ n: number }> = ({ n }) => (
-  <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT, whiteSpace: "nowrap" }}>
+  <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT, whiteSpace: "nowrap" }}>
     ({n} rows)
   </span>
 );

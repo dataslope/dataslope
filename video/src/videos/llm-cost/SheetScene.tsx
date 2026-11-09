@@ -103,7 +103,7 @@ export const SheetScene: React.FC = () => {
           ["Against input", BAR_X],
         ].map(([t, x], k) => (
           <Ink key={t} at={fiveAt - 4 + k * 3} dur={12} style={{ left: x as number, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-            <span style={label(24, INK_SOFT)}>{t}</span>
+            <span style={label(21, INK_SOFT)}>{t}</span>
           </Ink>
         ))}
         <Hairline x={X0} y={y(HEAD_Y) + 40} w={RIGHT - X0} at={fiveAt} color={INK_SOFT} />
@@ -119,7 +119,7 @@ export const SheetScene: React.FC = () => {
               <Ink at={fiveAt + i * 4} dur={12} style={{ left: NAME_X, top: rowY(i) - 2, whiteSpace: "nowrap" }}>
                 <span
                   style={{
-                    ...label(28, colors[i]),
+                    ...label(30, colors[i]),
                     fontWeight: 500,
                     display: "inline-block",
                     transformOrigin: "0 60%",
@@ -133,7 +133,7 @@ export const SheetScene: React.FC = () => {
                 <span style={note(24, INK_SOFT)}>{row.what}</span>
               </Ink>
               <Ink at={at} dur={14} style={{ left: REL_X, top: rowY(i), whiteSpace: "nowrap" }}>
-                <span style={{ ...note(28, INK), fontWeight: 500 }}>
+                <span style={{ ...note(27, INK), fontWeight: 500 }}>
                   <Marked at={ratiosAt + i * 4}>{row.relation}</Marked>
                 </span>
               </Ink>

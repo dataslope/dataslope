@@ -259,7 +259,7 @@ export const Mono: React.FC<{ children: string; color?: string; weight?: number 
 // ── The database table ───────────────────────────────────────────────────────
 
 /** Column titles and values: JetBrains Mono, as a SQL client sets them. */
-export const HEAD_SIZE = 24;
+export const HEAD_SIZE = 22;
 export const BODY_SIZE = 26;
 /** Room on each side of a cell's text, in px. */
 const PAD = 20;
@@ -615,7 +615,7 @@ export const ErrorBox: React.FC<{
           background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
           padding: "16px 22px 18px",
           fontFamily: MONO,
-          fontSize: 24,
+          fontSize: 21,
           lineHeight: 1.5,
           whiteSpace: "pre-wrap",
           color: INK,

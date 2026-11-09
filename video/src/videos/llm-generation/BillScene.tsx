@@ -78,7 +78,7 @@ export const BillScene: React.FC = () => {
 
       {/* What you read: the answer. */}
       <Ink at={readAt - 4} dur={12} style={{ left: X0, top: readY + bh / 2 - 16, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK), fontWeight: 500 }}>You read</span>
+        <span style={{ ...label(22, INK), fontWeight: 500 }}>You read</span>
       </Ink>
       <Ink at={readAt - 2} dur={12} style={{ left: B0, top: readY, width: answerW, height: bh }}>
         <div style={{ width: "100%", height: "100%", boxSizing: "border-box", background: tint(BAR, 30), borderBottom: `5px solid ${BAR}` }} />
@@ -89,7 +89,7 @@ export const BillScene: React.FC = () => {
 
       {/* What you pay output prices for: the working too. */}
       <Ink at={outputAt - 4} dur={12} style={{ left: X0, top: payY + bh / 2 - 30, width: 320 }}>
-        <div style={{ ...label(24, INK), fontWeight: 500, lineHeight: 1.25 }}>
+        <div style={{ ...label(22, INK), fontWeight: 500, lineHeight: 1.25 }}>
           You <Marked at={payAt - 2}>pay output prices</Marked> for
         </div>
       </Ink>
@@ -101,10 +101,10 @@ export const BillScene: React.FC = () => {
         <line x1={B0 + thinkW} x2={B0 + thinkW} y1={payY} y2={payY + bh} stroke={PAPER} strokeWidth={2} />
       </Svg>
       <Note at={seeAt - 2} x={B0 + 18} y={payY + bh / 2 - 15}>
-        <span style={{ ...note(24, THINK_INK), fontWeight: 500, ...TABULAR }}>{THINKING_TOKENS} thinking tokens, hidden</span>
+        <span style={{ ...note(23, THINK_INK), fontWeight: 500, ...TABULAR }}>{THINKING_TOKENS} thinking tokens, hidden</span>
       </Note>
       <Ink at={total119At - 2} dur={14} style={{ left: B0, top: payY + bh + 18, width: B1 - B0 + 2, textAlign: "right" }}>
-        <span style={{ ...note(34, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
           <span style={{ color: ACCENT_INK, fontWeight: 500, ...TABULAR }}>{TOTAL}</span> tokens at the output rate
         </span>
       </Ink>
@@ -129,7 +129,7 @@ export const BillScene: React.FC = () => {
             top: y(DIAL_Y) + 22,
             textAlign: "center",
             opacity: ease(frame, settingAt + 2, 12),
-            ...note(24, INK_SOFT),
+            ...note(22, INK_SOFT),
           }}
         >
           {l}
@@ -139,7 +139,7 @@ export const BillScene: React.FC = () => {
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the lowest that passes your tests</span>
       </Note>
       <Note at={purposeAt - 2} x={DIAL[0]} y={y(DIAL_Y) + 54} from="up" style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>set on purpose</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>set on purpose</span>
       </Note>
 
       {/* Every token read, written or thought ends up here. */}
@@ -155,7 +155,7 @@ export const BillScene: React.FC = () => {
         </Note>
       ))}
       <Ink at={readsAt - 6} dur={12} style={{ left: X0, top: y(CHIPS_Y) + 6, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK), fontWeight: 500 }}>Every token it</span>
+        <span style={{ ...label(22, INK), fontWeight: 500 }}>Every token it</span>
       </Ink>
       <Note at={billAt - 2} x={X0 + 260 + 450} y={y(CHIPS_Y) + 4}>
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>all on the bill</span>

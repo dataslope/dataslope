@@ -25,7 +25,7 @@ const Chip: React.FC<{ at: number; added?: boolean; children: React.ReactNode }>
   return (
     <div
       style={{
-        ...note(24),
+        ...note(22),
         ...badgeStyle(added ? "blue" : "gray", 22),
         display: "block",
         opacity: p,
@@ -192,7 +192,7 @@ export const PostgresScene: React.FC = () => {
         <ColumnRule x={(XS[0] + COL_RIGHT[0] + AX) / 2} top={TOP + 8} height={h(176)} at={extendAt - 4} />
       </div>
       <Ink at={extendAt - 4} dur={14} out={catchAt - 6} style={{ left: AX, top: TOP + 2, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK_SOFT) }}>Commercial systems: a fixed menu of types</span>
+        <span style={{ ...label(22, INK_SOFT) }}>Commercial systems: a fixed menu of types</span>
       </Ink>
       <div style={{ position: "absolute", left: AX, top: TOP + 44, display: "flex", gap: 14, opacity: 1 - ease(frame, catchAt - 6, 10) }}>
         {BUILT_IN.map((t, i) => (
@@ -202,7 +202,7 @@ export const PostgresScene: React.FC = () => {
         ))}
       </div>
       <Ink at={typesAt - 4} dur={14} out={catchAt - 6} style={{ left: AX, top: TOP + 128, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, KEY_INK) }}>POSTGRES: add your own, such as</span>
+        <span style={{ ...label(22, KEY_INK) }}>POSTGRES: add your own, such as</span>
       </Ink>
       <div style={{ position: "absolute", left: AX, top: TOP + 170, display: "flex", gap: 14, opacity: 1 - ease(frame, catchAt - 6, 10) }}>
         {YOUR_OWN.map((t, i) => (
@@ -213,11 +213,11 @@ export const PostgresScene: React.FC = () => {
       </div>
 
       <Ink at={speakAt - 8} dur={14} out={asideOut} style={{ left: AX, top: TOP + 2, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK) }}>Ada&apos;s orders, in POSTQUEL</span>
+        <span style={{ ...label(22, INK) }}>Ada&apos;s orders, in POSTQUEL</span>
       </Ink>
       <Listing lines={[TWIN_POSTQUEL]} x={AX} top={TOP + 40} width={740} at={speakAt - 6} lineAt={[speakAt - 4]} dim={wonAt} out={asideOut} />
       <Ink at={sqlAt - 4} dur={14} out={asideOut} style={{ left: AX, top: TOP + 134, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, KEY_INK) }}>and in SQL</span>
+        <span style={{ ...label(22, KEY_INK) }}>and in SQL</span>
       </Ink>
       <Listing
         lines={[TWIN_SQL]}

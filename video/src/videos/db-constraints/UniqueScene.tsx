@@ -107,7 +107,7 @@ export const UniqueScene: React.FC = () => {
       />
 
       <Note at={distinctAt - 2} x={card.right + 14} y={card.rows[0].mid - 15} dim={evenAt}>
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>never repeats</span>
+        <span style={{ ...note(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>never repeats</span>
       </Note>
       <DbTable
         g={g}

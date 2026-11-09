@@ -554,7 +554,7 @@ export const Bar: React.FC<{
   const end = segments.reduce((s, seg) => s + (seg.value / max) * width * ease(frame, seg.at ?? at, 20), 0);
   return (
     <div style={{ position: "absolute", left: x, top: y, opacity: Math.min(1, p * 2) * (1 - o) * (1 - d) }}>
-      <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{text}</div>
+      <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>{text}</div>
       <div style={{ position: "relative", marginTop: 10, height: 30, display: "flex", alignItems: "center" }}>
         {segments.map((seg, i) => (
           <div

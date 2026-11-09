@@ -149,7 +149,7 @@ export const DualScene: React.FC = () => {
             <circle cx={crossX} cy={crossY} r={22} fill="none" stroke={ACCENT} strokeWidth={2.6} strokeDasharray="5 5" opacity={ring} />
           </Svg>
         ) : null}
-        <div style={{ position: "absolute", left: LEFT.x0, top: base + h(28), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, nothingAt, 10) * (1 - ease(frame, out9, 10)) }}>
+        <div style={{ position: "absolute", left: LEFT.x0, top: base + h(28), ...label(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, nothingAt, 10) * (1 - ease(frame, out9, 10)) }}>
           <Swatch color={CATS[0]} /> revenue
           <span style={{ display: "inline-block", width: 28 }} />
           <Swatch color={CATS[3]} /> the metric

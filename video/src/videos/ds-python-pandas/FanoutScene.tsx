@@ -125,7 +125,7 @@ export const FanoutScene: React.FC = () => {
           rows={O.rows.map((cells, i) => ({ cells, at: asked - 2 + i * 2 }))}
         />
         <Note at={backAt} x={X0} y={og.rowTop(O.rows.length) + h(20)} out={outInputs}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
             {nBefore} rows, revenue {sumBefore}
           </span>
         </Note>
@@ -171,7 +171,7 @@ export const FanoutScene: React.FC = () => {
           ])}
         />
         <Note at={sixAt + 12} x={MERGED_X} y={mg.rowTop(M.rows.length) + h(20)}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             {nAfter} rows, revenue {sumAfter}
           </span>
         </Note>
@@ -179,14 +179,14 @@ export const FanoutScene: React.FC = () => {
         {/* ── The guards ── */}
         <Listing lines={U.lines} x={X0} top={uTop} width={620} size={SIZE} at={uniqueAt} />
         <Note at={uniqueAt + 10} x={X0 + 640} y={uTop + h(12)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             → <Mark at={uniqueAt + 16} color={MARK_BAD}><Mono>{U.value}</Mono></Mark>
           </span>
         </Note>
         <Listing lines={V.lines} x={X0} top={vTop} width={880} size={SIZE} at={validateAt - 4} marks={[{ line: 1, at: validateAt + 6, color: MARK_OK }]} />
         <ErrorBox x={X0} top={eTop} width={960} at={raisesAt} kind={V.kind} message={V.message} size={19} />
         <Note at={afterAt} x={X0} y={eTop + h(96)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
             after a merge: <Mark at={afterAt + 8} out={fixAt}>{nAfter} rows, where you expected {nBefore}</Mark>
           </span>
         </Note>
@@ -194,7 +194,7 @@ export const FanoutScene: React.FC = () => {
         {/* ── The fix: one row per customer, then merge ── */}
         <Listing lines={D.lines} x={X0} top={dTop} width={dW} size={SIZE} at={fixAt - 2} marks={[{ line: 0, at: keepAt + 4, out: gapsAt + 4, color: MARK_OK }]} />
         <Note at={thenAt} x={X0 + dW + 24} y={dTop + h(12)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             → then merge: {nFixed} rows, revenue {sumFixed}
           </span>
         </Note>

@@ -98,15 +98,15 @@ export const MedianScene: React.FC = () => {
       </Svg>
       <Axis scale={X} base={y(AXIS1)} ticks={[0, 20, 40, 60, 80, 100, 120, 140]} at={incomesAt - 6} />
       <Note at={skewedAt - 2} x={sx(X, 70)} y={y(STRIP) - 46}>
-        <span style={{ ...note(24, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>a few large incomes, far out</span>
+        <span style={{ ...note(22, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>a few large incomes, far out</span>
       </Note>
       <Rule x={sx(X, K(MEDIAN.median))} y0={y(STRIP) + h(26)} y1={y(STRIP) - h(30)} at={medianAt - 2} color={EST} width={4} />
       <Note at={honestAt - 4} x={sx(X, K(MEDIAN.median)) - 12} y={y(STRIP) - 52} align="right" from="right">
-        <span style={{ ...note(24, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>median {dollars(MEDIAN.median)}</span>
+        <span style={{ ...note(22, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>median {dollars(MEDIAN.median)}</span>
       </Note>
 
       {/* ── The one word ── */}
-      <div style={{ position: "absolute", left: 160, top: y(440), display: "flex", alignItems: "baseline", gap: "0.3em", whiteSpace: "nowrap", ...note(28, INK) }}>
+      <div style={{ position: "absolute", left: 160, top: y(440), display: "flex", alignItems: "baseline", gap: "0.3em", whiteSpace: "nowrap", ...note(30, INK) }}>
         <Slot at={loopAt - 4}>For each of {MEDIAN.B.toLocaleString("en-US")} resamples, record its</Slot>
         <Slot at={loopAt + 2}>
           <Strike at={oneWordAt - 2}>
@@ -147,7 +147,7 @@ export const MedianScene: React.FC = () => {
         ))}
       </Svg>
       <Note at={onlyAt - 2} x={sx(XZ, 37.6)} y={y(HIST_BASE) - h(HIST_H * 0.62)}>
-        <span style={{ ...note(24, INK), ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), ...halo, whiteSpace: "nowrap" }}>
           only {MEDIAN.distinct} different values
           <br />
           <span style={{ color: DATA }}>blue ticks: the incomes</span>
@@ -168,25 +168,25 @@ export const MedianScene: React.FC = () => {
 
       {/* ── Right column: the count, then the interval ── */}
       <div style={{ position: "absolute", left: COL, top: y(560), opacity: ease(frame, pileAt - 6, 12) }}>
-        <div style={label(24, INK_SOFT)}>Resamples</div>
+        <div style={label(21, INK_SOFT)}>Resamples</div>
         <div style={{ ...headline(72), ...TABULAR, marginTop: 4, color: k >= MEDIAN.B ? INK : EST_INK }}>
           {k.toLocaleString("en-US")}
         </div>
       </div>
       <Ink at={middleAt - 4} dur={14} style={{ left: COL, top: y(700), width: 420 }}>
         <div style={{ height: 1, background: HAIRLINE, marginBottom: 12 }} />
-        <div style={label(24, INK_SOFT)}>95% interval for the median</div>
+        <div style={label(21, INK_SOFT)}>95% interval for the median</div>
       </Ink>
       <div style={{ position: "absolute", left: COL, top: y(748), display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...headline(44) }}>
         <Slot at={eightHundredAt - 4}>{dollars(MEDIAN.lo)}</Slot>
         <Slot at={oneHundredAt - 4}>to {dollars(MEDIAN.hi)}</Slot>
       </div>
       <Ink at={formulaAt - 4} dur={16} style={{ left: COL, top: y(818), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(28, true), color: EST_INK }}>No formula needed.</span>
+        <span style={{ ...body(30, true), color: EST_INK }}>No formula needed.</span>
         <div style={{ height: 3, marginTop: 4, background: EST, width: `${100 * ease(frame, neededEndAt - 2, 18)}%`, borderRadius: 2 }} />
       </Ink>
       <Note at={rangeFiveAt - 2} x={(sx(XZ, K(MEDIAN.lo)) + sx(XZ, K(MEDIAN.hi))) / 2} y={y(HIST_BASE) - h(HIST_H) - 76} from="up">
-        <span style={{ ...note(24, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           the middle 95%
         </span>
       </Note>

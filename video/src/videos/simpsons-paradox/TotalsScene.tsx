@@ -32,7 +32,7 @@ export const TotalsScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={2} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(24, ACCENT_INK)}>Berkeley, 1973</span>
+        <span style={label(20, ACCENT_INK)}>Berkeley, 1973</span>
       </Ink>
       <Ink at={4} dur={20} style={{ left: 92, top: y(150), ...headline(88), whiteSpace: "nowrap" }}>
         Women were admitted
@@ -91,7 +91,7 @@ export const TotalsScene: React.FC = () => {
           <React.Fragment key={g}>
             <Ink at={figAt + (g === "men" ? 2 : 6)} dur={14} style={{ left: 160, top: top + 4 }}>
               <div style={{ ...body(34), color: INK }}>{NAME[g]}</div>
-              <div style={{ ...note(24, INK_SOFT), marginTop: 2 }}>{t.applied.toLocaleString("en-US")} applied</div>
+              <div style={{ ...note(20, INK_SOFT), marginTop: 2 }}>{t.applied.toLocaleString("en-US")} applied</div>
             </Ink>
             <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
               <rect x={SCALE.x0} y={top} width={w} height={h(BAR_H)} fill={COLOR[g]} />
@@ -99,7 +99,7 @@ export const TotalsScene: React.FC = () => {
             <Note at={growAt[g] + 10} x={SCALE.x0 + w + 22} y={top + h(BAR_H) / 2 - 32}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
                 <span style={{ ...headline(56), color: COLOR_INK[g] }}>{pct(t.rate)}</span>
-                <span style={note(24, INK_SOFT)}>{t.admitted.toLocaleString("en-US")} admitted</span>
+                <span style={note(21, INK_SOFT)}>{t.admitted.toLocaleString("en-US")} admitted</span>
               </div>
             </Note>
           </React.Fragment>
@@ -107,7 +107,7 @@ export const TotalsScene: React.FC = () => {
       })}
 
       <Note at={growAt.women + 20} x={160} y={y(792)}>
-        <span style={note(24, INK_SOFT)}>
+        <span style={note(20, INK_SOFT)}>
           Source: Bickel, Hammel and O&apos;Connell, <i>Science</i>, 1975. The six departments took 4,526
           applications.
         </span>

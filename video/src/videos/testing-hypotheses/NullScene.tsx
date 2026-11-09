@@ -142,7 +142,7 @@ export const NullScene: React.FC = () => {
           opacity: ease(frame, ifAt - 4, 14) * (1 - 0.45 * ease(frame, soundsAt - 4, 14)),
         }}
       >
-        <span style={{ ...body(34, true), color: INK }}>
+        <span style={{ ...body(36, true), color: INK }}>
           If <H0 /> were true,
           <br />
           would data like mine be <Mark at={surprisingAt}>surprising?</Mark>
@@ -156,7 +156,7 @@ export const NullScene: React.FC = () => {
         </Label>
       </Ink>
       <Ink at={rejectAt - 4} dur={14} style={{ left: leftX - 30, top: outTop + 40 }}>
-        <span style={{ ...body(34, true), ...badgeStyle("red", 38) }}>
+        <span style={{ ...body(38, true), ...badgeStyle("red", 38) }}>
           Reject <H0 />
         </span>
       </Ink>
@@ -166,7 +166,7 @@ export const NullScene: React.FC = () => {
         </Label>
       </Ink>
       <Ink at={failAt - 4} dur={14} style={{ left: rightX + 60, top: outTop + 40 }}>
-        <span style={{ ...body(34, true), ...badgeStyle("gray", 38) }}>
+        <span style={{ ...body(38, true), ...badgeStyle("gray", 38) }}>
           Fail to reject <H0 />
         </span>
       </Ink>
@@ -174,7 +174,7 @@ export const NullScene: React.FC = () => {
       {/* The turn to the courtroom: the gavel arrives where the next scene keeps it. */}
       <Spot id="testing-hypotheses-gavel" at={trialAt - 4} left={GAVEL.left} top={y(GAVEL.top)} width={GAVEL.width} height={GAVEL.height} />
       <Ink at={trialAt + 6} dur={16} style={{ left: GAVEL.left + GAVEL.width + 30, top: y(GAVEL.top) + 110, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(34, true), color: INK_SOFT }}>a trial, in other words</span>
+        <span style={{ ...body(36, true), color: INK_SOFT }}>a trial, in other words</span>
       </Ink>
     </AbsoluteFill>
   );

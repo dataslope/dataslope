@@ -136,7 +136,7 @@ export const WhyScene: React.FC = () => {
             right: 1920 - X.x0 + 16,
             top: mid - v * half - 14,
             opacity: ease(frame, flipsAt - 2, 10),
-            ...note(24, INK_SOFT),
+            ...note(20, INK_SOFT),
           }}
         >
           {v > 0 ? "+1" : "−1"}
@@ -145,15 +145,15 @@ export const WhyScene: React.FC = () => {
 
       {/* Right column: neighbours in the walk, the worked example, neighbours in the flips. */}
       <Note at={eachAt} x={RIGHT} y={y(300) - 8}>
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Each point against the next</div>
+        <div style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Each point against the next</div>
         {/* The figure, then what it is on a line of its own: one size per line. */}
         <div style={{ ...headline(72), color: COLOR_INK.a, marginTop: 10 }}>{dec(LAG1_WALK)}</div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>correlation</div>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>correlation</div>
       </Note>
 
       <Ink at={subtractAt - 4} dur={14} style={{ left: RIGHT, top: tableTop, width: 540 }}>
         <div style={{ position: "relative", height: 40 }}>
-          <span style={{ ...label(24, INK), position: "absolute", left: 0, top: 4 }}>Walk</span>
+          <span style={{ ...label(21, INK), position: "absolute", left: 0, top: 4 }}>Walk</span>
           {WALK_A.slice(0, SHOWN).map((v, i) => (
             <span
               key={i}
@@ -173,7 +173,7 @@ export const WhyScene: React.FC = () => {
         <div style={{ height: 1.5, background: HAIRLINE, marginTop: 8 }} />
       </Ink>
       <div style={{ position: "absolute", left: RIGHT, top: tableTop + 60, width: 540, height: 40 }}>
-        <span style={{ ...label(24, INK), position: "absolute", left: 0, top: 4, opacity: ease(frame, afterAt - 6, 10) }}>
+        <span style={{ ...label(21, INK), position: "absolute", left: 0, top: 4, opacity: ease(frame, afterAt - 6, 10) }}>
           Difference
         </span>
         {DIFF_A.slice(0, SHOWN - 1).map((d, i) => (
@@ -196,9 +196,9 @@ export const WhyScene: React.FC = () => {
       </div>
 
       <Note at={backAt} x={RIGHT} y={mid - 56}>
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Each flip against the next</div>
+        <div style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Each flip against the next</div>
         <div style={{ ...headline(72), color: COLOR_INK.a, marginTop: 10 }}>{dec(LAG1_FLIPS)}</div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>correlation</div>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>correlation</div>
       </Note>
       <Note at={backAt + 10} x={RIGHT} y={mid + 122} width={540}>
         <span style={prose(20)}>{STEPS} differences, each one exactly a flip.</span>

@@ -58,13 +58,13 @@ export const GrowthScene: React.FC = () => {
 
       {/* Column heads and the rule under them. */}
       <Ink at={start - 10} dur={14} style={{ left: LEFT, top: y(HEAD), width: N_R - LEFT, textAlign: "right" }}>
-        <span style={label(24, INK_SOFT)}>n</span>
+        <span style={label(22, INK_SOFT)}>n</span>
       </Ink>
       <Ink at={start - 8} dur={14} style={{ left: CALLS_R - 300, top: y(HEAD), width: 300, textAlign: "right" }}>
-        <span style={label(24, INK_SOFT)}>Calls</span>
+        <span style={label(22, INK_SOFT)}>Calls</span>
       </Ink>
       <Ink at={ranAt - 8} dur={14} style={{ left: TIME_R - 400, top: y(HEAD), width: 400, textAlign: "right" }}>
-        <span style={label(24, INK_SOFT)}>Time for one call</span>
+        <span style={label(22, INK_SOFT)}>Time for one call</span>
       </Ink>
       <div
         style={{
@@ -125,7 +125,7 @@ export const GrowthScene: React.FC = () => {
             >
               <span
                 style={{
-                  ...(isLast ? headline(56) : note(28, INK_SOFT)),
+                  ...(isLast ? headline(56) : note(30, INK_SOFT)),
                   color: isLast ? NAIVE_INK : INK_SOFT,
                   fontVariantNumeric: "tabular-nums lining-nums",
                 }}
@@ -161,7 +161,7 @@ export const GrowthScene: React.FC = () => {
                 left: BRACKET_X + 26,
                 top: (y0 + y1) / 2 - 16,
                 opacity: p,
-                ...note(28, NAIVE_INK),
+                ...note(26, NAIVE_INK),
                 fontWeight: 500,
               }}
             >
@@ -172,10 +172,10 @@ export const GrowthScene: React.FC = () => {
       })}
 
       <Note at={billionAt} x={LEFT} y={rowTop(ROWS.length) + h(26)} from="up" width={RIGHT - LEFT}>
-        <div style={note(24, INK_SOFT)}>
+        <div style={note(21, INK_SOFT)}>
           Calls counted by a copy of <Mono>fib</Mono> that adds one to a counter on every call.
         </div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>
           Times: {MACHINE.compiler} with -O2 on one core of a shared cloud machine ({MACHINE.cpu}), the best of{" "}
           {MACHINE.rounds} timing rounds, or {MACHINE.roundsSlow} for n&nbsp;=&nbsp;{ROWS[last].n}.
         </div>

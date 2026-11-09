@@ -166,7 +166,7 @@ export const GroupbyScene: React.FC = () => {
         {/* ── Split, apply, combine: each stage named on its word ── */}
         {stages.map((s) => (
           <Ink key={s.text} at={s.at} dur={12} out={returnsAt - 4} style={{ left: s.x, top: y(STAGE_Y) }}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{s.text}</span>
+            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>{s.text}</span>
           </Ink>
         ))}
 
@@ -209,7 +209,7 @@ export const GroupbyScene: React.FC = () => {
                   height: h(PIECE_LABEL),
                   display: "flex",
                   alignItems: "center",
-                  ...label(24, INK),
+                  ...label(21, INK),
                   opacity: ease(frame, splitAt + 14 + p * 4, 12),
                 }}
               >
@@ -221,7 +221,7 @@ export const GroupbyScene: React.FC = () => {
                   position: "absolute",
                   left: PIECES_X + 340,
                   top: pieceTops[p] + h(PIECE_LABEL) + (pieceRows[p].length * h(PIECE_ROW)) / 2 - 18,
-                  ...note(28, INK),
+                  ...note(26, INK),
                   ...TABULAR,
                   whiteSpace: "nowrap",
                   opacity: ease(frame, sumAt + 2 + p * 5, 10),
@@ -289,7 +289,7 @@ export const GroupbyScene: React.FC = () => {
           out={q4At - 4}
         />
         <Note at={seriesAt} x={sg.right + 28} y={sg.rowTop(1)} out={q4At - 4}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>a Series</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>a Series</span>
         </Note>
         <Listing lines={GROUPBY.agg.lines} x={PIECES_X} top={y(TOP)} width={500} size={SIZE} at={aggAt - 2} out={q4At - 4} />
         <DataTable
@@ -300,7 +300,7 @@ export const GroupbyScene: React.FC = () => {
           out={q4At - 4}
         />
         <Note at={frameAt + 2} x={ag.right + 28} y={ag.rowTop(1)} out={q4At - 4}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>a DataFrame</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>a DataFrame</span>
         </Note>
 
         {/* ── agg: one row per group; transform: one per row ── */}
@@ -313,11 +313,11 @@ export const GroupbyScene: React.FC = () => {
           out={q5At - 4}
         />
         <Note at={onePerGroupAt + 10} x={mg.right + 28} y={mg.rowTop(1)} out={q5At - 4}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>{GROUPBY.aggMean.rows.length} rows</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>{GROUPBY.aggMean.rows.length} rows</span>
         </Note>
         <Listing lines={GROUPBY.transform.lines} x={X0} top={below} width={760} size={SIZE} at={transformAt - 2} out={q5At - 4} />
         <Note at={fiveAt} x={X0 + 780} y={below + h(8)} out={q5At - 4}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>{table.rows.length} rows</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>{table.rows.length} rows</span>
         </Note>
 
         {/* ── A share of the group's total ── */}

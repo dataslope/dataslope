@@ -110,7 +110,7 @@ export const MetricScene: React.FC = () => {
                   the step's 28, so the line keeps one size. */}
               <span
                 style={{
-                  ...label(28, trap ? ACCENT_INK : INK),
+                  ...label(26, trap ? ACCENT_INK : INK),
                   ...badgeStyle(trap ? "red" : "gray", 26),
                   width: 46,
                   height: 46,
@@ -162,7 +162,7 @@ export const MetricScene: React.FC = () => {
         />
         {/* A rate's change in points, beside its change in percent. */}
         <Note at={upAt + 10} x={g.xs[ci] + g.widths[ci] - g.pad} align="right" y={g.rowTop(3) + 8} from="up">
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             (<Num>+{fmt(METRIC.points, 1)}</Num> points)
           </span>
         </Note>
@@ -174,7 +174,7 @@ export const MetricScene: React.FC = () => {
 
         {/* ── This example's driver, and what to check next ── */}
         <Note at={lostAt - 2} x={TABLE_X} y={g.rowTop(3) + h(92)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             lost: <Num>{count(String(lost[0]))}</Num> sessions
             <span style={{ opacity: ease(frame, twelveAt - 2, 10) }}>
               , only <Num>{lost[1]}</Num> orders (<Num>{fmt(lost[2], 1)}%</Num>)
@@ -182,13 +182,13 @@ export const MetricScene: React.FC = () => {
           </span>
         </Note>
         <Note at={driverAt - 2} x={TABLE_X} y={g.rowTop(3) + h(132)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>likeliest: low-intent traffic dropped away</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>likeliest: low-intent traffic dropped away</span>
         </Note>
         <Note at={campaignAt - 2} x={TABLE_X} y={g.rowTop(3) + h(162)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a paused campaign, or bots now filtered out</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>a paused campaign, or bots now filtered out</span>
         </Note>
         <Note at={checkAt - 2} x={TABLE_X} y={g.rowTop(3) + h(200)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             check next: sessions by channel
             <span style={{ opacity: ease(frame, ordersFellAt - 2, 10) }}>; say orders fell</span>
           </span>

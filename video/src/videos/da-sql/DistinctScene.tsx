@@ -161,7 +161,7 @@ export const DistinctScene: React.FC = () => {
         />
         {/* The real total, beside the wrong one. */}
         <Note at={truthAt - 2} x={sg.right + 48} y={sg.top + h(HEAD_H) + h(6)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
             the real total:{" "}
             <Mark at={truthAt + 8} color={MARK_OK}>
               {DISTINCT.truth}
@@ -186,6 +186,6 @@ export const DistinctScene: React.FC = () => {
 /** A listing's small title, over its top rule. */
 const Caption: React.FC<{ at: number; out?: number; x: number; top: number; children: React.ReactNode }> = ({ at, out, x, top, children }) => (
   <Ink at={at} dur={12} out={out} style={{ left: x, top, whiteSpace: "nowrap" }}>
-    <span style={label(24, INK_SOFT)}>{children}</span>
+    <span style={label(22, INK_SOFT)}>{children}</span>
   </Ink>
 );

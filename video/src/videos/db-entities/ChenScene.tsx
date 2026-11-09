@@ -52,11 +52,11 @@ export const ChenScene: React.FC = () => {
           <span style={{ ...headline(132), color: STAT_INK }}>1976</span>
         </Ink>
         <Ink at={chenAt - 4} dur={16} style={{ left: 122, top: y(436), whiteSpace: "nowrap" }}>
-          <span style={label(34, INK)}>Peter Chen</span>
+          <span style={label(32, INK)}>Peter Chen</span>
         </Ink>
         <Ink at={modelAt - 2} dur={18} style={{ left: 122, top: y(490), whiteSpace: "nowrap" }}>
           <div style={{ ...body(28, true), color: INK }}>{PAPER_TITLE}</div>
-          <div style={{ ...note(24, INK_SOFT), marginTop: 10 }}>{JOURNAL}</div>
+          <div style={{ ...note(21, INK_SOFT), marginTop: 10 }}>{JOURNAL}</div>
         </Ink>
 
         {/* ── The argument, in order: each step's number in its own words' face and

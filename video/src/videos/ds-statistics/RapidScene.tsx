@@ -119,7 +119,7 @@ const Ranks: React.FC<{ c: Ctx }> = ({ c }) => {
           <g key={k}>
             <line x1={s.a} x2={s.b} y1={r.y} y2={r.y} stroke={INK} strokeWidth={1.2} opacity={0.5} />
             <line x1={far.a} x2={far.b} y1={r.y} y2={r.y} stroke={INK} strokeWidth={1.2} opacity={0.5} />
-            <text x={(s.b + far.a) / 2} y={r.y + 7} textAnchor="middle" fill={INK_SOFT} style={{ ...label(24, INK_SOFT) }}>
+            <text x={(s.b + far.a) / 2} y={r.y + 7} textAnchor="middle" fill={INK_SOFT} style={{ ...label(22, INK_SOFT) }}>
               //
             </text>
             {r.values.map((v, i) => {
@@ -144,11 +144,11 @@ const Ranks: React.FC<{ c: Ctx }> = ({ c }) => {
         </Note>
       ))}
       <Note at={queuesAt + 8} x={s.b} y={c.y(690)} align="right">
-        <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>minutes to resolve a ticket</span>
+        <span style={{ ...label(19, INK_SOFT), fontWeight: 500 }}>minutes to resolve a ticket</span>
       </Note>
       {rows.map((r) => (
         <Note key={r.name} at={queuesAt} x={R_X + 30} y={r.y - c.h(52)}>
-          <span style={{ ...label(24, INK_SOFT) }}>{r.name}</span>
+          <span style={{ ...label(20, INK_SOFT) }}>{r.name}</span>
         </Note>
       ))}
       <Note at={monsterAt + 4} x={R_END} y={c.y(470)} align="right">

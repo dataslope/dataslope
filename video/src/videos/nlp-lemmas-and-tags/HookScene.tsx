@@ -179,7 +179,7 @@ export const HookScene: React.FC = () => {
         a noun
       </Tag>
       <Ink at={oneWordAt} dur={14} out={raceAt - 10} style={{ left: RIGHT_X, top: phraseTop + 6, whiteSpace: "nowrap" }}>
-        <span style={label(28, INK_SOFT)}>
+        <span style={label(26, INK_SOFT)}>
           one word at a time, <Fade at={sentenceAt - 2}>never the sentence</Fade>
         </span>
       </Ink>

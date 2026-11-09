@@ -147,10 +147,10 @@ export const TailScene: React.FC = () => {
         })}
       </Svg>
       <Note at={differentAt} x={WX} y={cellTop + waffleSide + 14}>
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>each square: a hundredth of them</div>
+        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>each square: a hundredth of them</div>
       </Note>
       <Note at={onceAt} x={WX} y={cellTop + waffleSide + 50}>
-        <div style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ display: "inline-block", width: 18, height: 18, borderRadius: 3, background: ACCENT }} />
           <span style={numStyle(22, ACCENT_INK)}>{fmt(EMMA.hapaxes, 0)}</span>
           <span>used just once</span>
@@ -184,20 +184,20 @@ export const TailScene: React.FC = () => {
       </Svg>
       {RANK_TICKS.map((r) => (
         <Ink key={r} at={rankAt + 10} dur={12} style={{ left: rx(r) - 40, width: 80, top: base + 30, textAlign: "center" }}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, ...{ fontVariantNumeric: "lining-nums" } }}>{fmt(r, 0)}</span>
+          <span style={{ ...label(19, INK_SOFT), fontWeight: 500, ...{ fontVariantNumeric: "lining-nums" } }}>{fmt(r, 0)}</span>
         </Ink>
       ))}
       <Note at={rankAt + 16} x={X1} y={base + 60} align="right">
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>rank, most common first</div>
+        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>rank, most common first</div>
       </Note>
       <Note at={rankAt + 4} x={X0 + 12} y={top - 12}>
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
           <span style={numStyle(20, INK)}>{fmt(EMMA.ranked[0], 0)}</span> uses of the top word
         </div>
       </Note>
       {/* The top ten, too narrow to see apart: named beside the spike. */}
       <Note at={topTenAt - 2} x={X0 + 60} y={top + 40}>
-        <div style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           the top ten
           <span style={{ opacity: ease(frame, fifthAt - 2, 10) }}>
             : <span style={numStyle(22, ACCENT_INK)}>{Math.round(EMMA.top10Share * 100)}%</span> of all the words
@@ -213,17 +213,17 @@ export const TailScene: React.FC = () => {
       </Note>
       <Leader points={[[X0 + 54, top + 56], [X0 + 4, top + 40]]} at={topTenAt} color={INK_SOFT} width={1.4} />
       <Note at={twoThousandAt - 2} x={onceFrom} y={base - 40}>
-        <div style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           <span style={numStyle(22, ACCENT_INK)}>{fmt(EMMA.hapaxes, 0)}</span> used just once
         </div>
       </Note>
       <Note at={giantsAt - 6} x={1260} y={top + 70}>
-        <div style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>
+        <div style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>
           <Marked at={giantsAt}>A few giants</Marked>
           <span style={{ opacity: ease(frame, longAt - 2, 12) }}>, a long tail:</span>
         </div>
-        <div style={{ ...body(28), color: ACCENT_INK, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, zipfAt - 2, 12) }}>Zipf&apos;s law</div>
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 8, opacity: ease(frame, almostAt - 2, 12) }}>
+        <div style={{ ...body(30), color: ACCENT_INK, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, zipfAt - 2, 12) }}>Zipf&apos;s law</div>
+        <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 8, opacity: ease(frame, almostAt - 2, 12) }}>
           and almost every text has it
         </div>
       </Note>
@@ -248,21 +248,21 @@ export const TailScene: React.FC = () => {
         ) : null}
       </Svg>
       <Note at={closesAt + 10} x={GX0} y={gBase + 10}>
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>words read, from the first page</div>
+        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>words read, from the first page</div>
       </Note>
       <Note at={closesAt + 30} x={GX1} y={gBase + 10} align="right">
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>to the last</div>
+        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>to the last</div>
       </Note>
       <Note at={closesAt + 20} x={GX0 + 10} y={gBase - gTall - 6}>
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>different words so far</div>
+        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>different words so far</div>
       </Note>
       <Note at={newAt - 2} x={GX1 + 18} y={gy(EMMA.distinct) - 4}>
-        <div style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           <span style={numStyle(24, ACCENT_INK)}>+{EMMA.newAtEnd}</span> new
         </div>
       </Note>
       <Note at={lastAt} x={GX1 + 18} y={gy(EMMA.distinct) + 28}>
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>in the last {fmt(EMMA.last, 0)}</div>
+        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>in the last {fmt(EMMA.last, 0)}</div>
       </Note>
       <div
         style={{

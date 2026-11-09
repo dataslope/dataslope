@@ -124,7 +124,7 @@ export const DistScene: React.FC = () => {
 
         {names.map(([name, at], i) => (
           <Ink key={name} at={at} dur={14} style={{ left: panelX(i), top: y(PANEL.top) - 62 }}>
-            <span style={{ ...label(28, INK), whiteSpace: "nowrap" }}>{name}</span>
+            <span style={{ ...label(30, INK), whiteSpace: "nowrap" }}>{name}</span>
           </Ink>
         ))}
 
@@ -148,13 +148,13 @@ export const DistScene: React.FC = () => {
             the binomial and the Poisson (alike in shape) read apart. */}
         {params.map(([text, at], i) => (
           <Note key={i} at={at} x={panelX(i) + PANEL.w} y={y(PANEL.top) - 4} align="right">
-            <span style={{ ...math(28, INK_SOFT) }}>{text}</span>
+            <span style={{ ...math(26, INK_SOFT) }}>{text}</span>
           </Note>
         ))}
 
         {/* What each one is, as it is said. */}
         <Note at={trialAt} x={panelX(0)} y={capY} width={PANEL.w}>
-          <span style={{ ...note(24, INK) }}>one yes or no trial</span>
+          <span style={{ ...note(23, INK) }}>one yes or no trial</span>
         </Note>
         <Note at={trialAt + 12} x={panelX(0)} y={capY + 40} width={PANEL.w}>
           <span style={math(28)}>
@@ -162,7 +162,7 @@ export const DistScene: React.FC = () => {
           </span>
         </Note>
         <Note at={binAt + 8} x={panelX(1)} y={capY} width={PANEL.w}>
-          <span style={{ ...note(24, INK) }}>successes in <span style={math(28)}><V>n</V></span> trials</span>
+          <span style={{ ...note(23, INK) }}>successes in <span style={math(26)}><V>n</V></span> trials</span>
         </Note>
         <Note at={npAt} x={panelX(1)} y={capY + 40} width={PANEL.w}>
           <span style={math(28)}>
@@ -177,25 +177,25 @@ export const DistScene: React.FC = () => {
           </span>
         </Note>
         <Note at={poisAt + 8} x={panelX(2)} y={capY} width={PANEL.w}>
-          <span style={{ ...note(24, INK) }}>events in an interval</span>
+          <span style={{ ...note(23, INK) }}>events in an interval</span>
         </Note>
         <Note at={lambdaAt} x={panelX(2)} y={capY + 40} width={PANEL.w}>
           <span style={math(28)}>mean = variance = λ</span>
         </Note>
         <Note at={normAt + 8} x={panelX(3)} y={capY} width={PANEL.w}>
-          <span style={{ ...note(24, INK) }}>the symmetric bell</span>
+          <span style={{ ...note(23, INK) }}>the symmetric bell</span>
         </Note>
         <Note at={s68At} x={panelX(3)} y={capY + 40} width={PANEL.w}>
-          <span style={{ ...label(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(23, INK), ...TABULAR, whiteSpace: "nowrap" }}>
             {pct(within[0])} <Late at={s95At}>· {pct(within[1])}</Late> <Late at={s997At}>· {pct(within[2], 1)}</Late>
           </span>
-          <div style={{ ...note(24, INK_SOFT), marginTop: 4 }}>within one, two and three standard deviations</div>
+          <div style={{ ...note(20, INK_SOFT), marginTop: 4 }}>within one, two and three standard deviations</div>
         </Note>
         <Note at={waitAt} x={panelX(4)} y={capY} width={PANEL.w}>
-          <span style={{ ...note(24, INK) }}>the wait between Poisson events</span>
+          <span style={{ ...note(23, INK) }}>the wait between Poisson events</span>
         </Note>
         <Note at={bernAt + 10} x={panelX(0)} y={y(PANEL.top) + h(PANEL.height) + 4} width={PANEL.w}>
-          <span style={{ ...label(24, INK_SOFT), display: "flex", justifyContent: "space-around" }}>
+          <span style={{ ...label(21, INK_SOFT), display: "flex", justifyContent: "space-around" }}>
             <span>no</span>
             <span>yes</span>
           </span>

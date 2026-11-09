@@ -131,7 +131,7 @@ export const TwoPipelinesScene: React.FC = () => {
       {/* ── The topic pipeline ── */}
       <Ink at={topicAt - 4} dur={14} style={{ left: X0, top: y(TOPIC_Y), whiteSpace: "nowrap" }}>
         <div style={label(24, INK)}>Topic pipeline</div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>drops every stopword</div>
+        <div style={{ ...note(20, INK_SOFT), marginTop: 6 }}>drops every stopword</div>
       </Ink>
       <ChipRow x={ROW_X} y={y(TOPIC_Y)}>
         {PIPE.alpha.map((w, k) => {
@@ -153,13 +153,13 @@ export const TwoPipelinesScene: React.FC = () => {
         })}
       </ChipRow>
       <Note at={listAt - 2} x={X0} y={y(REVIEW_Y) + 68}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
           <i>not</i> and <i>but</i> are both on NLTK’s English stopword list
         </span>
       </Note>
       {/* What the topic pipeline threw away, as it closes up. */}
       <Note at={leftAt - 2} x={X0} y={y(DROPPED_Y) + 8}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>dropped</span>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>dropped</span>
       </Note>
       <ChipRow x={ROW_X} y={y(DROPPED_Y)}>
         {topicStops.map((k, i) => (
@@ -174,7 +174,7 @@ export const TwoPipelinesScene: React.FC = () => {
         skipAt={fineAt - 2}
       />
       <Note at={topicRecipeAt + 6} x={RECIPE_X} y={y(TOPIC_Y) + 50}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Fig. 2’s menu, as this pipeline takes it</span>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>Fig. 2’s menu, as this pipeline takes it</span>
       </Note>
       <Note at={fineAt - 2} x={ROW_X} y={y(READ_Y)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -194,7 +194,7 @@ export const TwoPipelinesScene: React.FC = () => {
       {/* ── The sentiment pipeline ── */}
       <Ink at={sentAt - 4} dur={14} style={{ left: X0, top: y(SENT_Y), whiteSpace: "nowrap" }}>
         <div style={label(24, INK)}>Sentiment pipeline</div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>keeps the negations</div>
+        <div style={{ ...note(20, INK_SOFT), marginTop: 6 }}>keeps the negations</div>
       </Ink>
       <ChipRow x={ROW_X} y={y(SENT_Y)}>
         {PIPE.alpha.map((w, k) => {
@@ -220,7 +220,7 @@ export const TwoPipelinesScene: React.FC = () => {
         skipAt={unitAt - 2}
       />
       <Note at={sentRecipeAt + 12} x={RECIPE_X} y={y(SENT_Y) + 50}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
           drops every stopword except {[...PIPE.keep].sort((a, b) => SPOKEN_KEEP.indexOf(a) - SPOKEN_KEEP.indexOf(b)).map((w, k, all) => (
             <React.Fragment key={w}>
               {k > 0 ? (k === all.length - 1 ? " and " : ", ") : null}
@@ -230,7 +230,7 @@ export const TwoPipelinesScene: React.FC = () => {
         </span>
       </Note>
       <Note at={pairsAt - 4} x={X0} y={y(PAIRS_Y) + 8}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>word pairs</span>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>word pairs</span>
       </Note>
       <ChipRow x={ROW_X} y={y(PAIRS_Y)}>
         {PIPE.bigrams.map(([a, b], k) => (
@@ -238,7 +238,7 @@ export const TwoPipelinesScene: React.FC = () => {
         ))}
       </ChipRow>
       <Note at={unitAt - 2} x={ROW_X} y={y(PAIRS_Y) + 64}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           <i>not good</i> survives as one feature.
         </span>
       </Note>
@@ -269,7 +269,7 @@ const Recipe: React.FC<{ top: number; at: number; lit: Partial<Record<Step, numb
           <div
             key={s}
             style={{
-              ...label(24, on > 0.5 ? INK : INK_SOFT),
+              ...label(20, on > 0.5 ? INK : INK_SOFT),
               ...TAKEN,
               position: "relative",
               background: "none",

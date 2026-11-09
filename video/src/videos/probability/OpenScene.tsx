@@ -140,7 +140,7 @@ export const OpenScene: React.FC = () => {
             </Svg>
             {seen ? (
               <Note at={summaryAt} x={x0 + PANEL.w * 0.44 + 14} y={y(PANEL.base - PANEL.tall - 40)} out={halfFrom - 8}>
-                <span style={{ ...note(24, STAT_INK), fontWeight: 500 }}>a summary</span>
+                <span style={{ ...note(21, STAT_INK), fontWeight: 500 }}>a summary</span>
               </Note>
             ) : (
               <div
@@ -164,7 +164,7 @@ export const OpenScene: React.FC = () => {
       {/* From what you have to what you haven't seen. */}
       <Arrow from={[PANEL.x[0] + PANEL.w + 30, y(PANEL.base - PANEL.tall * 0.5)]} to={[PANEL.x[1] - 40, y(PANEL.base - PANEL.tall * 0.5)]} at={reasonAt - 4} dur={14} out={halfFrom - 8} color={INK_SOFT} width={3} />
       <Note at={needAt - 2} x={PANEL.x[1]} y={y(PANEL.base + 24)} out={halfFrom - 8}>
-        <span style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>Reasoning about it takes probability.</span>
+        <span style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>Reasoning about it takes probability.</span>
       </Note>
 
       {/* ── One half, for one flip ── */}
@@ -182,7 +182,7 @@ export const OpenScene: React.FC = () => {
       <div style={{ opacity: 1 - defDim * 0.4 }}>
         <Coin x={680} y={y(420)} heads at={singleAt} r={38} />
         <Ink at={tailsAt - 8} dur={12} style={{ left: 742, top: y(420) - 20, whiteSpace: "nowrap" }}>
-          <span style={note(28, INK_SOFT)}>or</span>
+          <span style={note(26, INK_SOFT)}>or</span>
         </Ink>
         <Coin x={826} y={y(420)} heads={false} at={tailsAt - 2} r={38} />
         {/* Half a coin: the thing a single flip can't give you. */}
@@ -191,7 +191,7 @@ export const OpenScene: React.FC = () => {
           <line x1={1000} x2={1000} y1={y(420) - 38} y2={y(420) + 38} stroke={INK} strokeWidth={1.5} strokeDasharray="4 4" />
         </Svg>
         <Note at={noHalfAt + 2} x={1060} y={y(420) - 18}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <Strike at={noHalfAt + 6}>half a head</Strike>
           </span>
         </Note>
@@ -232,7 +232,7 @@ export const OpenScene: React.FC = () => {
         color={STAT}
       />
       <Note at={headsAt - 2} x={STRIP.x0 - STRIP.r} y={y(STRIP.y) - STRIP.r - 56}>
-        <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the first {COIN.streak}: all heads</span>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the first {COIN.streak}: all heads</span>
       </Note>
       <Note at={overAt + 4} x={STRIP.x0 + STRIP.count * STRIP.pitch} y={y(STRIP.y) - 16}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>…</span>

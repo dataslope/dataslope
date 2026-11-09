@@ -61,7 +61,7 @@ export const LimitsScene: React.FC = () => {
   const nextEnd = n.beat("next").to;
 
   const rowLabel = (text: string, at: number, top: number) => (
-    <Ink at={at} dur={12} style={{ left: X0, top: y(top) + 8, ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+    <Ink at={at} dur={12} style={{ left: X0, top: y(top) + 8, ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
       {text}
     </Ink>
   );
@@ -93,7 +93,7 @@ export const LimitsScene: React.FC = () => {
       {rowLabel("Sarcasm", sarcasmAt - 2, ROW_Y.sarcasm)}
       <TraceRow trace={SARCASM} top={y(ROW_Y.sarcasm)} at={ohAt - 2} verdictAt={scoresAt} struck={winkAt} />
       <Note at={winkAt + 4} x={VERDICT_X} y={y(ROW_Y.sarcasm) + 48}>
-        <span style={{ ...note(24, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>it can’t see the wink</span>
+        <span style={{ ...note(21, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>it can’t see the wink</span>
       </Note>
 
       {/* Context: one word, two senses. Put "unpredictable" in the negative
@@ -108,26 +108,26 @@ export const LimitsScene: React.FC = () => {
         struck={thrillerAt + 10}
       />
       <Note at={brakesAt + 2} x={CHIPS_X} y={y(ROW_Y.context) + 86}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
           with <i>{CONTEXT.added}</i> added to the negative list, as brakes would want
         </span>
       </Note>
       <Note at={thrillerAt + 14} x={VERDICT_X} y={y(ROW_Y.context) + 48}>
-        <span style={{ ...note(24, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a good thriller</span>
+        <span style={{ ...note(21, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a good thriller</span>
       </Note>
 
       {/* Missing words: in neither list, so worth nothing. */}
       {rowLabel("Missing words", missingAt - 4, ROW_Y.missing)}
       <TraceRow trace={UNKNOWN} top={y(ROW_Y.missing)} at={missingAt - 2} verdictAt={nothingAt} />
       <Note at={nothingAt + 4} x={CHIPS_X} y={y(ROW_Y.missing) + 46}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
           in the lesson’s lists, <i>unpredictable</i> is in neither
         </span>
       </Note>
 
       {/* Why build one anyway, and what learned models keep. */}
       <Note at={baselineAt - 2} x={X0} y={y(BASELINE_Y)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           <span style={{ ...label(LEAD_SIZE, INK_SOFT), marginRight: 16 }}>A baseline first</span>
           <Reveal at={fastAt - 2}>fast</Reveal>
           <Reveal at={dataAt - 2}>{", no training data"}</Reveal>
@@ -135,7 +135,7 @@ export const LimitsScene: React.FC = () => {
         </span>
       </Note>
       <Note at={labeledAt - 4} x={X0} y={y(LEARN_Y)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           <span style={{ ...label(LEAD_SIZE, INK_SOFT), marginRight: 16 }}>Learned models</span>
           <Reveal at={stillAt - 2}>still </Reveal>
           <Mark at={stillAt + 2}>tokenize</Mark>
@@ -148,7 +148,7 @@ export const LimitsScene: React.FC = () => {
 
       {/* The bridge: two dates, then the next video. */}
       <Note at={olderAt} x={X0} y={y(DATES_Y)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           <span style={{ ...label(LEAD_SIZE, INK_SOFT), marginRight: 16 }}>Older than they look</span>
           <Reveal at={idfAt - 2}>IDF, 1972</Reveal>
           <Reveal at={pairsAt - 2}>{"  ·  counting word pairs, 1948"}</Reveal>
@@ -194,7 +194,7 @@ const TraceRow: React.FC<{ trace: Trace; top: number; at: number; verdictAt: num
               }
               below={
                 polar ? (
-                  <span style={{ ...note(24, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, toneAt + 2, 10) }}>
+                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, toneAt + 2, 10) }}>
                     {signed(s.polarity)}
                   </span>
                 ) : null
@@ -203,10 +203,10 @@ const TraceRow: React.FC<{ trace: Trace; top: number; at: number; verdictAt: num
           );
         })}
       </TokenRow>
-      <div style={{ position: "absolute", left: SUM_X, top: top + 2, ...note(28, INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, verdictAt - 6, 10) }}>
+      <div style={{ position: "absolute", left: SUM_X, top: top + 2, ...note(30, INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, verdictAt - 6, 10) }}>
         {signed(trace.score)}
       </div>
-      <div style={{ position: "absolute", left: VERDICT_X, top: top + 2, ...note(28, inkFor(trace.label)), fontWeight: 500, opacity: ease(frame, verdictAt - 2, 10) }}>
+      <div style={{ position: "absolute", left: VERDICT_X, top: top + 2, ...note(30, inkFor(trace.label)), fontWeight: 500, opacity: ease(frame, verdictAt - 2, 10) }}>
         {struck !== undefined ? <Strike at={struck}>{trace.label}</Strike> : trace.label}
       </div>
     </>

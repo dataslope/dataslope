@@ -72,7 +72,7 @@ export const LemmaScene: React.FC = () => {
   const row = (key: keyof typeof ROW_Y) => y(ROW_Y[key]);
   const rowLabel = (text: string, at: number, key: keyof typeof ROW_Y, color: string = INK_SOFT) => (
     <Ink at={at} dur={12} style={{ left: LABEL_X, top: row(key), height: tileH(SIZE), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
-      <span style={{ ...label(24, color), fontWeight: 500 }}>{text}</span>
+      <span style={{ ...label(22, color), fontWeight: 500 }}>{text}</span>
     </Ink>
   );
 
@@ -108,7 +108,7 @@ export const LemmaScene: React.FC = () => {
         />
       ))}
       <Note at={wordnetAt - 2} x={COL_X} y={row("words") - 54}>
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
           <Mono size={21} color={INK_SOFT}>
             WordNetLemmatizer
           </Mono>{" "}
@@ -162,10 +162,10 @@ export const LemmaScene: React.FC = () => {
         );
       })}
       <Note at={untouchedAt - 2} x={cols.right + 24} y={row("naive")}>
-        <div style={{ height: tileH(SIZE), display: "flex", alignItems: "center", ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>untouched</div>
+        <div style={{ height: tileH(SIZE), display: "flex", alignItems: "center", ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>untouched</div>
       </Note>
       <Note at={runAt} x={cols.right + 24} y={row("aware")}>
-        <div style={{ height: tileH(SIZE), display: "flex", alignItems: "center", ...label(24, FAMILY.verb.ink), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <div style={{ height: tileH(SIZE), display: "flex", alignItems: "center", ...label(22, FAMILY.verb.ink), fontWeight: 500, whiteSpace: "nowrap" }}>
           the verbs, fixed
         </div>
       </Note>
@@ -177,7 +177,7 @@ export const LemmaScene: React.FC = () => {
         </span>
       </Ink>
       <Note at={accurateAt - 2} x={COL_X} y={y(744) + 70}>
-        <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
           the accurate <Marked at={recipeWordAt - 2}>recipe</Marked>
         </div>
       </Note>

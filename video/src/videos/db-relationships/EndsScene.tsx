@@ -34,7 +34,7 @@ const RIGHT_W = 270;
 const TEXT_X = 950;
 /** The key, kept beside the table: the four definitions Fig. 3 gave. */
 const KEY_X = 1530;
-const KEY_SIZE = 28;
+const KEY_SIZE = 26;
 const KEY_EDGE = 64;
 /** The key and the readings beside it are two columns of text: a hairline
  *  in the gap, centred between the longest example (which ends near 1446)
@@ -133,12 +133,12 @@ const Callout: React.FC<{
   const top = above ? lineY - 168 : lineY + 92;
   const titleEl = (
     <Ink at={titleAt} dur={12} style={{ position: "relative" }}>
-      <span style={label(24, INK_SOFT)}>{title}</span>
+      <span style={label(22, INK_SOFT)}>{title}</span>
     </Ink>
   );
   const valueEl = (
     <Ink at={valueAt} dur={12} style={{ position: "relative" }}>
-      <span style={{ ...body(34, true), color: ACCENT_INK }}>{value}</span>
+      <span style={{ ...body(36, true), color: ACCENT_INK }}>{value}</span>
     </Ink>
   );
   return (
@@ -223,7 +223,7 @@ const EndKey: React.FC<{ top: number; at: number; hits: readonly { glyph: Glyph;
         return <Glow key={k} c={r.c} r={22} at={hit.at - 2} out={hit.at + 30} />;
       })}
       <Ink at={at} dur={14} style={{ left: KEY_X, top, whiteSpace: "nowrap" }}>
-        <span style={label(24, INK_SOFT)}>Reading an end</span>
+        <span style={label(22, INK_SOFT)}>Reading an end</span>
       </Ink>
       {rules.map((r, i) => (
         <Ink
@@ -233,8 +233,8 @@ const EndKey: React.FC<{ top: number; at: number; hits: readonly { glyph: Glyph;
           style={{ left: KEY_X, top: top + 46 + i * 48, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 8 }}
         >
           {/* One line, one size: the rule's value is set in its lead's Inter, in the accent. */}
-          <span style={note(24, INK)}>{r.lead}</span>
-          <span style={label(24, ACCENT_INK)}>{r.value}</span>
+          <span style={note(22, INK)}>{r.lead}</span>
+          <span style={label(22, ACCENT_INK)}>{r.value}</span>
         </Ink>
       ))}
       <Svg>
@@ -257,7 +257,7 @@ const EndKey: React.FC<{ top: number; at: number; hits: readonly { glyph: Glyph;
       </Svg>
       {rows.map((r) => (
         <Ink key={r.glyph} at={r.at + 2} dur={12} style={{ left: KEY_X + KEY_EDGE + 28, top: r.rowTop, height: 44, display: "flex", alignItems: "center" }}>
-          <span style={{ ...body(28, true), color: ACCENT_INK }}>{r.value}</span>
+          <span style={{ ...body(30, true), color: ACCENT_INK }}>{r.value}</span>
         </Ink>
       ))}
     </>
@@ -449,10 +449,10 @@ export const EndsScene: React.FC = () => {
                 to={{ kind: r.to, at: r.marksAt }}
               />
               <Ink at={r.readingAt - 2} dur={14} style={{ left: TEXT_X, top: r.top - 6, whiteSpace: "nowrap" }}>
-                <span style={{ ...body(34, true), color: INK }}>{r.reading}</span>
+                <span style={{ ...body(36, true), color: INK }}>{r.reading}</span>
               </Ink>
               <Ink at={r.exAt - 2} dur={14} style={{ left: TEXT_X, top: r.top + 40, whiteSpace: "nowrap" }}>
-                <span style={{ ...note(24, INK_SOFT) }}>{r.example}</span>
+                <span style={{ ...note(23, INK_SOFT) }}>{r.example}</span>
               </Ink>
             </React.Fragment>
           );

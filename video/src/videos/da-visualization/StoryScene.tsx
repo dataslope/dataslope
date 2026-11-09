@@ -111,12 +111,12 @@ export const StoryScene: React.FC = () => {
           );
         })}
         <div style={{ position: "absolute", left: CHART.x0, top: top - h(110), opacity: ease(frame, perPointAt - 4, 12) * (1 - ease(frame, out13, 10)) }}>
-          <div style={{ ...headline(34), color: INK_SOFT, whiteSpace: "nowrap" }}>
+          <div style={{ ...headline(36), color: INK_SOFT, whiteSpace: "nowrap" }}>
             <Strike at={fellAt - 6}>Revenue by month</Strike>
           </div>
         </div>
         <div style={{ position: "absolute", left: CHART.x0, top: top - h(64), opacity: ease(frame, fellAt, 14) * (1 - ease(frame, out13, 10)) }}>
-          <div style={{ ...headline(34), color: OK_INK, whiteSpace: "nowrap" }}>
+          <div style={{ ...headline(38), color: OK_INK, whiteSpace: "nowrap" }}>
             Revenue fell {S.dropPct}% the month after the price rise
           </div>
         </div>
@@ -143,10 +143,10 @@ export const StoryScene: React.FC = () => {
           <line x1={riseX} x2={riseX} y1={top - 10} y2={base} stroke={INK} strokeWidth={1.6} strokeDasharray="5 5" />
         </svg>
         <Note at={fellAt + 6} x={riseX + 10} y={top - h(14)} out={out13}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>price rise</span>
+          <span style={{ ...label(19, INK), whiteSpace: "nowrap" }}>price rise</span>
         </Note>
         <Note at={fellAt + 10} x={fellX - 24} y={yRev(S.revenue[S.rise]) - h(36)} out={out13}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(21, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <Mark at={fellAt + 12}>−{S.dropPct}%</Mark>
           </span>
         </Note>
@@ -187,18 +187,18 @@ export const StoryScene: React.FC = () => {
           />
         </svg>
         <Note at={markAt + 6} x={shipX + 12} y={top - h(6)}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>June pricing change</span>
+          <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>June pricing change</span>
         </Note>
         <Note at={fourAt - 4} x={ax(1)} y={ay(A.values[1]) - h(70)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>+{fmt(A.beforeSlope, 1)} a month</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>+{fmt(A.beforeSlope, 1)} a month</span>
         </Note>
         <Note at={fourAt} x={ax(9) - 40} y={ay(A.values[9]) - h(80)}>
-          <span style={{ ...label(24, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(23, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>
             +{fmt(A.afterSlope, 1)} a month: about {A.multiple}×
           </span>
         </Note>
         <Note at={pastedAt - 2} x={STEPS_X} y={y(520)}>
-          <span style={{ ...note(28, INK) }}>
+          <span style={{ ...note(26, INK) }}>
             a chart that says its own point
             <br />
             travels without you

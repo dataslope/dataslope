@@ -85,17 +85,17 @@ const Card: React.FC<{
         </span>
       </Ink>
       <Ink at={whatAt} dur={14} style={{ left: x, top: y(CARD_Y + 96), whiteSpace: "nowrap" }}>
-        <span style={note(24, INK_SOFT)}>{what}</span>
+        <span style={note(25, INK_SOFT)}>{what}</span>
       </Ink>
       <Ink at={howAt} dur={14} style={{ left: x, top: y(CARD_Y + 140), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(24, INK), fontWeight: 500 }}>
+        <span style={{ ...note(25, INK), fontWeight: 500 }}>
           {how}
           <span style={{ opacity: ease(frame, how2At, 10) }}>{how2}</span>
         </span>
       </Ink>
       <Ink at={symbolAt} dur={16} style={{ left: x + 540, top: y(CARD_Y + 14), width: 180, textAlign: "center" }}>
         <div style={{ ...headline(112), color, lineHeight: 1 }}>{symbol}</div>
-        <div style={{ ...label(24, INK_SOFT), marginTop: 18, opacity: ease(frame, symbolNoteAt, 10) }}>{symbolNote}</div>
+        <div style={{ ...label(20, INK_SOFT), marginTop: 18, opacity: ease(frame, symbolNoteAt, 10) }}>{symbolNote}</div>
       </Ink>
     </>
   );
@@ -262,7 +262,7 @@ export const ParameterScene: React.FC = () => {
         dur={30}
       />
       <Note at={partAt + 14} x={sx(X, 70) - 18} y={y(BASE - 64)} align="right" out={usuallyAt - 2}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...halo }}>the whole population</span>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...halo }}>the whole population</span>
       </Note>
       <TruthLine x={muX} bottom={base} top={lerp(y(LABEL_Y + 34), y(ROW_ONE.ROW0 - 16), m)} at={hundredAt - 4} />
       {/* mu rides with its line into Fig. 5, to where that figure labels it. */}
@@ -320,7 +320,7 @@ export const ParameterScene: React.FC = () => {
         {/* "how big is that miss": the average it is measured from swells. */}
         <span
           style={{
-            ...note(24, STAT_INK),
+            ...note(25, STAT_INK),
             fontWeight: 500,
             whiteSpace: "nowrap",
             display: "inline-block",
@@ -349,7 +349,7 @@ export const ParameterScene: React.FC = () => {
         />
         {/* It makes way for the population on "the price of seeing only part". */}
         <Note at={closeAt + 2} x={barX + 16} y={stripY + h(44)} out={priceAt - 6}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             off by{" "}
             <b style={{ color: STAT_INK }}>
               <Mark at={missAt - 2}>{fmt(KNOWN.error)}</Mark>

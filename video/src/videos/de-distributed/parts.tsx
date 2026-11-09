@@ -124,16 +124,16 @@ const cardBox = (dept: Dept, pose: Pose, width: number, height: number): React.C
 
 const deptText = (dept: Dept, weight = 500): React.CSSProperties => ({
   fontFamily: SANS,
-  fontSize: 24,
+  fontSize: 23,
   fontWeight: weight,
   color: DEPT_INK[dept],
 });
-const numText: React.CSSProperties = { ...note(24, INK), fontWeight: 540, lineHeight: 1 };
+const numText: React.CSSProperties = { ...note(25, INK), fontWeight: 540, lineHeight: 1 };
 
 /** One row of the frame: its index, its department and its salary. */
 export const RowCard: React.FC<{ row: Row; pose: Pose; width: number; height: number }> = ({ row, pose, width, height }) => (
   <div style={cardBox(row.dept, pose, width, height)}>
-    <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT, width: 40, textAlign: "right", paddingRight: 4, boxSizing: "border-box" }}>
+    <span style={{ fontFamily: MONO, fontSize: 21, color: INK_SOFT, width: 40, textAlign: "right", paddingRight: 4, boxSizing: "border-box" }}>
       {row.index}
     </span>
     <span style={{ ...deptText(row.dept), width: 100, paddingLeft: 14, boxSizing: "border-box" }}>{row.dept}</span>

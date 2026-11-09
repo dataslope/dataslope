@@ -31,7 +31,7 @@ export const RuleScene: React.FC = () => {
         </div>
       </Ink>
       <Ink at={tfidfAt + 10} dur={20} style={{ left: 120, top: y(590) }}>
-        <div style={{ ...label(24, INK_SOFT), marginBottom: 14 }}>The lesson&apos;s formula</div>
+        <div style={{ ...label(21, INK_SOFT), marginBottom: 14 }}>The lesson&apos;s formula</div>
         <div style={{ display: "flex", alignItems: "center", ...headline(44), whiteSpace: "nowrap" }}>
           <span>
             <V>tf-idf</V>(<V>w</V>, <V>d</V>)

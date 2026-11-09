@@ -228,10 +228,10 @@ export const CastScene: React.FC = () => {
           ) : null}
         </Svg>
         <Centered x={soloMeanX} y={soloBox.top - h(30) - 34} opacity={soloMarks}>
-          <span style={{ ...note(24, INK), fontWeight: 500 }}>a mean</span>
+          <span style={{ ...note(23, INK), fontWeight: 500 }}>a mean</span>
         </Centered>
         <Centered x={soloMeanX} y={soloBox.top + soloBox.h + h(52)} opacity={soloMarks * ease(frame, varianceAt - 4, 12)}>
-          <span style={{ ...note(24, INK), fontWeight: 500 }}>a variance: how widely it spreads</span>
+          <span style={{ ...note(23, INK), fontWeight: 500 }}>a variance: how widely it spreads</span>
         </Centered>
 
         {/* The row: counts, then measurements. */}
@@ -241,7 +241,7 @@ export const CastScene: React.FC = () => {
         ].map((g) => (
           <React.Fragment key={g.text}>
             <Ink at={g.at} dur={14} style={{ left: slotX(g.from), top: y(SLOT_TOP - 66), whiteSpace: "nowrap" }}>
-              <span style={label(24, INK_SOFT)}>{g.text}</span>
+              <span style={label(22, INK_SOFT)}>{g.text}</span>
             </Ink>
             <div
               style={{
@@ -272,7 +272,7 @@ export const CastScene: React.FC = () => {
         </Svg>
         {CAST.map((c, i) => (
           <Ink key={c.name} at={namesAt - 4 + i * 3} dur={12} style={{ left: slotX(i), top: y(SLOT_TOP + SLOT_H + 22), whiteSpace: "nowrap" }}>
-            <span style={{ ...body(34, true), color: INK }}>{c.name}</span>
+            <span style={{ ...body(32, true), color: INK }}>{c.name}</span>
           </Ink>
         ))}
       </div>
@@ -300,7 +300,7 @@ export const CastScene: React.FC = () => {
             })}
           </Svg>
           <Note at={signsAt + 6} x={160} y={y(DOTS_Y + 24)} out={rarerAt - 2}>
-            <span style={note(24, INK_SOFT)}>ten simulated visitors: the red ones signed up</span>
+            <span style={note(20, INK_SOFT)}>ten simulated visitors: the red ones signed up</span>
           </Note>
           <Svg opacity={1 - ease(frame, bernoulliOut, 12)}>
             {[NO_X, YES_X].map((x, i) => {
@@ -332,7 +332,7 @@ export const CastScene: React.FC = () => {
             return (
               <React.Fragment key={b.word}>
                 <Centered x={b.x} y={bBase + 12} opacity={ease(frame, startAt + 6, 12) * shown}>
-                  <span style={label(24, INK)}>{b.word}</span>
+                  <span style={label(22, INK)}>{b.word}</span>
                 </Centered>
                 {/* The lesson's 0.3, then the binomial's 0.03, never a number in between. */}
                 <Centered x={b.x} y={top} opacity={ease(frame, b.at, 10) * (1 - ease(frame, inHundredAt - 6, 8)) * shown}>
@@ -348,7 +348,7 @@ export const CastScene: React.FC = () => {
 
         {/* ── The binomial's rules, once the Bernoulli has made way ── */}
         <Ink at={holdsAt - 4} dur={14} style={{ left: 160, top: y(330), whiteSpace: "nowrap" }}>
-          <span style={label(24, INK_SOFT)}>The binomial assumes</span>
+          <span style={label(22, INK_SOFT)}>The binomial assumes</span>
         </Ink>
         {[
           { text: "a fixed number of visitors", at: holdsAt + 2 },
@@ -357,7 +357,7 @@ export const CastScene: React.FC = () => {
           { text: "just yes or no", at: sameAt + 10 },
         ].map((r, i) => (
           <Ink key={r.text} at={r.at} dur={14} style={{ left: 160, top: y(390 + i * 66), whiteSpace: "nowrap" }}>
-            <span style={{ ...body(34), color: INK }}>
+            <span style={{ ...body(32), color: INK }}>
               {i === 0 ? (
                 <Sweep at={fixedAt - 4}>{r.text}</Sweep>
               ) : r.strike !== undefined ? (
@@ -372,7 +372,7 @@ export const CastScene: React.FC = () => {
           <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>A crowd from one TV ad</span>
         </Note>
         <Note at={alikeAt} x={160} y={y(390 + 4 * 66 + 46)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>all behaving alike</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>all behaving alike</span>
         </Note>
 
         {/* ── Fig. 2: two hundred visitors ── */}
@@ -403,7 +403,7 @@ export const CastScene: React.FC = () => {
         />
         <VRule x={sixX} bottom={base} top={base - h(TALL + 34)} at={sixAt - 4} opacity={1 - dimBinomial * 0.5} />
         <Note at={sixAt} x={sixX + 14} y={base - h(TALL + 40)} dim={tenAt}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{BINOMIAL.mode}, the likeliest</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{BINOMIAL.mode}, the likeliest</span>
         </Note>
         <Bracket x0={tailX0} x1={tailX1} y={tailTop} at={tenAt + 2} color={ASK} />
         <Note at={tenAt + 4} x={(tailX0 + tailX1) / 2 - 120} y={tailTop - h(56)}>

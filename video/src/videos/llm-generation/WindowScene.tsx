@@ -123,10 +123,10 @@ export const WindowScene: React.FC = () => {
           <React.Fragment key={p.name}>
             <Ink at={at - 2} dur={12} style={{ left: X0, top: y(LEG_Y(k)), display: "flex", alignItems: "center", gap: 14, whiteSpace: "nowrap" }}>
               <span style={{ width: 18, height: 18, background: p.color, flex: "none" }} />
-              <span style={{ ...note(24, p.ink), fontWeight: 500 }}>{p.name}</span>
+              <span style={{ ...note(23, p.ink), fontWeight: 500 }}>{p.name}</span>
             </Ink>
             <Note at={(k === 1 ? docAt : k === PARTS.length ? sixAt : twoAt + 4) + k * 2} x={LEG_NUM_X} y={y(LEG_Y(k))} align="right">
-              <span style={{ ...note(24, k === PARTS.length ? ACCENT_INK : INK), fontWeight: 500, ...TABULAR }}>{count(tokens)}</span>
+              <span style={{ ...note(23, k === PARTS.length ? ACCENT_INK : INK), fontWeight: 500, ...TABULAR }}>{count(tokens)}</span>
             </Note>
           </React.Fragment>
         );
@@ -134,12 +134,12 @@ export const WindowScene: React.FC = () => {
 
       {/* The verdict: how much is used, and how little is left. */}
       <Ink at={twoAt} dur={14} style={{ left: 900, top: y(442), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR }}>
+        <span style={{ ...note(26, INK), fontWeight: 500, ...TABULAR }}>
           {count(USED)} of {count(WINDOW)} used
         </span>
       </Ink>
       <Ink at={sixAt - 2} dur={16} style={{ left: 900, top: y(512), whiteSpace: "nowrap" }}>
-        <div style={{ ...note(28, INK) }}>Tokens left to answer in</div>
+        <div style={{ ...note(26, INK) }}>Tokens left to answer in</div>
         <div style={{ ...headline(84), color: ACCENT_INK, marginTop: 4, marginLeft: -4, ...TABULAR }}>{count(ROOM)}</div>
       </Ink>
 
@@ -157,7 +157,7 @@ export const WindowScene: React.FC = () => {
         />
       </Svg>
       <Note at={edgeAt + 6} x={tx(SHOWN - 1) + TILE_W + 10} y={tilesY + th + 18} align="right">
-        <span style={{ ...label(24, INK) }}>the window</span>
+        <span style={{ ...label(21, INK) }}>the window</span>
       </Note>
       {Array.from({ length: TURNS }, (_, j) => {
         const pos = j - shift;
@@ -186,7 +186,7 @@ export const WindowScene: React.FC = () => {
               justifyContent: "center",
               opacity: p * (1 - vanish),
               transform: `scale(${1 - vanish * 0.4})`,
-              ...note(24, inkOf.teal),
+              ...note(21, inkOf.teal),
               fontWeight: 500,
             }}
           >
@@ -201,13 +201,13 @@ export const WindowScene: React.FC = () => {
         </Svg>
       ))}
       <Note at={notThereAt + 6} out={beginningAt - 6} x={X0} y={tilesY + th + 18}>
-        <span style={{ ...note(24, INK_SOFT) }}>trimmed turns</span>
+        <span style={{ ...note(22, INK_SOFT) }}>trimmed turns</span>
       </Note>
       <Note at={beginningAt - 2} x={X0} y={tilesY + th + 18}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>its own beginning</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500 }}>its own beginning</span>
       </Note>
       <Note at={fadesAt} out={notThereAt - 4} x={X0} y={tilesY + th + 18}>
-        <span style={{ ...note(24, INK_SOFT) }}>past the edge: nothing fades</span>
+        <span style={{ ...note(22, INK_SOFT) }}>past the edge: nothing fades</span>
       </Note>
     </AbsoluteFill>
   );

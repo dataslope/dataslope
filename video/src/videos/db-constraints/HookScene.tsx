@@ -197,7 +197,7 @@ export const HookScene: React.FC = () => {
             <Ink at={writerAt(i)} dur={12} style={{ left: WRITER_X, top: rowY(i) - 17, whiteSpace: "nowrap" }}>
               <span
                 style={{
-                  ...label(28, forgot && frame >= oneAt ? ACCENT_INK : INK),
+                  ...label(26, forgot && frame >= oneAt ? ACCENT_INK : INK),
                   display: "inline-block",
                   transform: `scale(${1 + named2 * 0.08})`,
                   transformOrigin: "0 50%",

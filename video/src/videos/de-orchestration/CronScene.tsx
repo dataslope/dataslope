@@ -100,7 +100,7 @@ export const CronScene: React.FC = () => {
 
         {/* Cron: two lines, two times, nothing between them. */}
         <Note at={cronAt} x={X0} y={y(266)}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             cron: <span style={{ opacity: ease(frame, setAt, 10) }}>a command at a set time</span>
           </span>
         </Note>
@@ -124,7 +124,7 @@ export const CronScene: React.FC = () => {
           {[0, 1, 2, 3, 4].map((hr) => (
             <g key={hr}>
               <line x1={tx(hr)} x2={tx(hr)} y1={axisY} y2={axisY + 7} stroke={INK} strokeWidth={1.4} />
-              <text x={tx(hr)} y={axisY + 31} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
+              <text x={tx(hr)} y={axisY + 31} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
                 {`0${hr}:00`}
               </text>
             </g>
@@ -171,21 +171,21 @@ export const CronScene: React.FC = () => {
           </div>
         ))}
         <Note at={trAt + 8} x={tx(2) + 10} y={rowY.extract - h(64)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>02:00: cron fires</span>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>02:00: cron fires</span>
         </Note>
         <Note at={longAt + 16} x={tx(2.58) + 14} y={rowY.extract - 14}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>runs long</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>runs long</span>
         </Note>
         <Note at={halfAt - 2} x={tx(2.55) + 14} y={rowY.transform - 14}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>on half the data</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>on half the data</span>
         </Note>
         <Note at={neitherAt} x={X0} y={y(680)}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>cron: no graph, no run history</span>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>cron: no graph, no run history</span>
         </Note>
 
         {/* The orchestrator: the page's DAG. */}
         <Note at={dagAt} x={DAG_X - NODE_W / 2} y={y(236)}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             an orchestrator runs a DAG<span style={{ opacity: ease(frame, expandAt, 10) }}>: directed acyclic graph</span>
           </span>
         </Note>
@@ -243,10 +243,10 @@ export const CronScene: React.FC = () => {
           alert + halt
         </TaskBox>
         <Note at={depsAt + 12} dim={run(GATE)} x={DAG_X + NODE_W / 2 + 56} y={NODES[GATE].cy - h(40)}>
-          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>fail</span>
+          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>fail</span>
         </Note>
         <Note at={depsAt + 8} x={DAG_X + 14} y={(NODES[GATE].cy + NODES[GATE + 1].cy) / 2 - 14}>
-          <span style={{ ...label(24, OK_INK), whiteSpace: "nowrap" }}>pass</span>
+          <span style={{ ...label(20, OK_INK), whiteSpace: "nowrap" }}>pass</span>
         </Note>
 
         {/* What comes with it. */}
@@ -256,10 +256,10 @@ export const CronScene: React.FC = () => {
           </Pill>
         ))}
         <Note at={threeAt} x={DAG_X - NODE_W / 2} y={y(712)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Airflow · Dagster · Prefect</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Airflow · Dagster · Prefect</span>
         </Note>
         <Note at={historyAt - 2} x={DAG_X - NODE_W / 2} y={y(760)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>run history</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>run history</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           {Array.from({ length: 8 }, (_, i) => {

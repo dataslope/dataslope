@@ -154,12 +154,12 @@ export const LookScene: React.FC = () => {
           ))}
         </Svg>
         <Note at={tipAt} x={X.x1} y={y(AXIS) + 40} align="right">
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>tip, as a share of the bill</span>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>tip, as a share of the bill</span>
         </Note>
 
         {/* Before the split: one strip of every bill. */}
         <Note at={countAt + 6} out={splitAt - 2} x={160} y={y(ALL_Y) - 14}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>All {TIPS.rows}</span>
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>All {TIPS.rows}</span>
         </Note>
 
         {/* ── The bills ── */}
@@ -188,7 +188,7 @@ export const LookScene: React.FC = () => {
           })}
         </Svg>
         <Note at={countAt + 4 + PINNED * 0.12} x={OFF_END} y={pinnedY - 44} from="up">
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
             {Math.round(TIPS.max)}%
           </span>
         </Note>
@@ -197,12 +197,12 @@ export const LookScene: React.FC = () => {
         {DAYS.map((d, k) => (
           <React.Fragment key={d}>
             <Ink at={splitAt + k * 4} dur={12} style={{ left: 160, top: y(ROW_Y[k]) - 26, whiteSpace: "nowrap" }}>
-              <span style={label(24, INK)}>{DAY_NAMES[d]}</span>
+              <span style={label(22, INK)}>{DAY_NAMES[d]}</span>
             </Ink>
             <Note at={nineteenAt - 2 + (k === FRI ? 0 : 6 + k * 2)} x={160} y={y(ROW_Y[k]) + 6}>
               <span
                 style={{
-                  ...note(24, k === FRI ? STAT_INK : INK_SOFT),
+                  ...note(20, k === FRI ? STAT_INK : INK_SOFT),
                   fontWeight: k === FRI ? 500 : 500,
                   whiteSpace: "nowrap",
                 }}
@@ -277,7 +277,7 @@ export const LookScene: React.FC = () => {
         <Ring x={sx(X2, fri.mean - fri.half)} y={y(ROW_Y[FRI])} at={fromAt - 2} r0={8} r1={34} />
         <Ring x={sx(X2, fri.mean + fri.half)} y={y(ROW_Y[FRI])} at={toAt - 2} r0={8} r1={34} />
         <Note at={wobblesAt + 4} out={medianAt - 6} x={X2.x0} y={y(AXIS) + 44}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>how far each average could wobble</span>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>how far each average could wobble</span>
         </Note>
         <Svg>
           {DAYS.map((d, k) => {
@@ -312,7 +312,7 @@ export const LookScene: React.FC = () => {
                 transform: "translateX(-50%)",
                 opacity: a,
                 whiteSpace: "nowrap",
-                ...note(24, lead ? STAT_INK : INK_SOFT),
+                ...note(21, lead ? STAT_INK : INK_SOFT),
                 ...TABULAR,
                 fontWeight: lead ? 500 : 500,
                 ...halo,

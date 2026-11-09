@@ -537,7 +537,7 @@ export const MiniMap: React.FC<{
           left: Math.min(MAP.w - 180, Math.max(0, labelX - 90)),
           width: 180,
           textAlign: "center",
-          ...label(24, INK),
+          ...label(19, INK),
           fontWeight: 500,
           whiteSpace: "nowrap",
         }}

@@ -161,7 +161,7 @@ export const JoinScene: React.FC = () => {
         {/* ── The cost: it stays, under the joined rows, once the follow-up
             takes the lower half. ── */}
         <Note at={hashAt} x={OUT_X} y={costTop}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             hash join{" "}
             <Mark at={plusAt} color={MARK_OK}>
               <i>O</i>(<i>n</i> + <i>m</i>)
@@ -169,7 +169,7 @@ export const JoinScene: React.FC = () => {
           </span>
         </Note>
         <Note at={everyAt} x={OUT_X} y={costTop + h(50)}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             every pair{" "}
             <Mark at={timesAt} color={MARK_BAD}>
               <i>O</i>(<i>n</i> × <i>m</i>)
@@ -177,7 +177,7 @@ export const JoinScene: React.FC = () => {
           </span>
         </Note>
         <Note at={timesAt + 12} x={OUT_X} y={costTop + h(100)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <i>n</i> orders, <i>m</i> users; only the smaller side is held in memory
           </span>
         </Note>

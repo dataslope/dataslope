@@ -110,7 +110,7 @@ export const ThinkScene: React.FC = () => {
                 transform: `scale(${1 + (i === 1 ? pulse(frame, answerAt, 20) * 0.3 : 0)})`,
               }}
             />
-            <span style={label(24, i === 2 ? OUTPUT_INK : INK_SOFT)}>{k.name}</span>
+            <span style={label(21, i === 2 ? OUTPUT_INK : INK_SOFT)}>{k.name}</span>
           </Ink>
         ))}
 
@@ -121,7 +121,7 @@ export const ThinkScene: React.FC = () => {
           return (
             <React.Fragment key={r.thinking}>
               <Note at={at} x={LABEL_R} y={ry + bh / 2 - 17} align="right">
-                <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(26, INK), ...TABULAR, whiteSpace: "nowrap" }}>
                   {int(r.thinking)}
                   {i === 0 ? <span style={{ color: INK_SOFT }}> thinking</span> : null}
                 </span>
@@ -145,7 +145,7 @@ export const ThinkScene: React.FC = () => {
               <Note at={timesAt[i]} x={ansX1 + px(thinkCost(r.thinking)) * g + 18} y={ry + bh / 2 - 18}>
                 <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
                   <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>{usd(r.cost, 5)}</span>
-                  <span style={{ ...note(28, markAt[i] > 0 ? POINT_INK : INK), fontWeight: 500, ...TABULAR }}>
+                  <span style={{ ...note(26, markAt[i] > 0 ? POINT_INK : INK), fontWeight: 500, ...TABULAR }}>
                     {markAt[i] > 0 ? <Marked at={markAt[i]}>{`${r.times.toFixed(1)}x`}</Marked> : `${r.times.toFixed(1)}x`}
                   </span>
                 </span>
@@ -163,12 +163,12 @@ export const ThinkScene: React.FC = () => {
           {AXIS_TICKS.map((v) => (
             <g key={v}>
               <line x1={BAR_X + px(v)} x2={BAR_X + px(v)} y1={axisY} y2={axisY + 7} stroke={INK} strokeWidth={1.2} />
-              <text x={BAR_X + px(v)} y={axisY + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
+              <text x={BAR_X + px(v)} y={axisY + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
                 {usd(v)}
               </text>
             </g>
           ))}
-          <text x={BAR_X + BAR_MAX + 18} y={axisY + 30} style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
+          <text x={BAR_X + BAR_MAX + 18} y={axisY + 30} style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
             cost per request
           </text>
         </Svg>

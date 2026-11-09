@@ -85,7 +85,7 @@ export const HookScene: React.FC = () => {
 
         {/* ── The two sentences that give a candidate away ── */}
         <Note at={sentenceAt} x={X0} y={y(MISREAD_Y - 6)} out={misreadOut}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>One sentence gives it away</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>One sentence gives it away</span>
         </Note>
         {[
           { at: pAt, term: "a p-value", read: "the chance the null is true", strike: hookEnd - 18 },
@@ -94,7 +94,7 @@ export const HookScene: React.FC = () => {
           <Note key={m.term} at={m.at} x={X0} y={y(MISREAD_Y + 56 + i * 110)} out={misreadOut}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
               <span style={{ ...noteText(36, INK), fontWeight: 500 }}>{m.term}</span>
-              <span style={{ ...label(24, INK_SOFT) }}>read as</span>
+              <span style={{ ...label(22, INK_SOFT) }}>read as</span>
               <span style={{ ...body(42, true), color: ACCENT_INK }}>
                 <Strike at={m.strike}>“{m.read}”</Strike>
               </span>

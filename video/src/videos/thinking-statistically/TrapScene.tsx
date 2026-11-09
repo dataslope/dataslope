@@ -38,7 +38,7 @@ const LIT_BADGE = badgeStyle("yellow", 21);
 const Dtype: React.FC<{ children: React.ReactNode; lit?: number }> = ({ children, lit = 0 }) => (
   <span
     style={{
-      ...mono(24, INK_SOFT),
+      ...mono(21, INK_SOFT),
       ...GRAY_BADGE,
       background: `color-mix(in srgb, ${LIT_BADGE.background} ${Math.round(lit * 100)}%, ${GRAY_BADGE.background})`,
       color: `color-mix(in srgb, ${LIT_BADGE.color} ${Math.round(lit * 100)}%, ${GRAY_BADGE.color})`,
@@ -125,7 +125,7 @@ export const TrapScene: React.FC = () => {
         if (a <= 0) return null;
         return (
           <div key={c.name} style={{ position: "absolute", left: COL[ci] + (ci === 0 ? shift : 0), top: 0, width: COL_W, opacity: a }}>
-            <div style={{ position: "absolute", top: y(HEAD_Y), ...mono(28, INK, 700) }}>{c.name}</div>
+            <div style={{ position: "absolute", top: y(HEAD_Y), ...mono(26, INK, 700) }}>{c.name}</div>
             <div style={{ position: "absolute", top: y(DTYPE_Y), opacity: ci === 0 ? ease(frame, integersAt - 4, 12) : 1 }}>
               <Dtype lit={ci === 0 ? lit : storedLit}>{c.dtype}</Dtype>
             </div>
@@ -148,7 +148,7 @@ export const TrapScene: React.FC = () => {
                       borderRadius: 4,
                       background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(hot * 100)}%, transparent)`,
                       opacity: ease(frame, c.at + 2 + i * c.step, 10),
-                      ...mono(28),
+                      ...mono(30),
                     }}
                   >
                     {/* "averages them": each zip code read into the mean, in turn. */}
@@ -179,7 +179,7 @@ export const TrapScene: React.FC = () => {
 
       {/* The zip codes' mean. */}
       <Ink at={averagesAt - 4} dur={14} style={{ left: COL[0] + shift, top: y(MEAN_Y), whiteSpace: "nowrap" }}>
-        <span style={mono(24, INK_SOFT)}>.mean()</span>
+        <span style={mono(22, INK_SOFT)}>.mean()</span>
       </Ink>
       <Ink at={fortyAt - 4} dur={16} style={{ left: COL[0] + shift, top: y(MEAN_Y + 40), whiteSpace: "nowrap" }}>
         <span style={mono(40, STAT_INK, 700)}>
@@ -194,7 +194,7 @@ export const TrapScene: React.FC = () => {
         </span>
       </Ink>
       <Note at={placeAt} x={COL[0] + shift} y={y(MEAN_Y + 108)}>
-        <span style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>
+        <span style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>
           Not a place
           <span style={{ opacity: ease(frame, labelsAt - 2, 10) }}>: the average of four labels.</span>
         </span>
@@ -202,34 +202,34 @@ export const TrapScene: React.FC = () => {
 
       {/* ── The doubling test ── */}
       <Ink at={testAt - 4} dur={14} style={{ left: TEST_X, top: y(HEAD_Y - 58), whiteSpace: "nowrap" }}>
-        <span style={label(24, INK_SOFT)}>The doubling test</span>
+        <span style={label(22, INK_SOFT)}>The doubling test</span>
       </Ink>
       <Ink at={doublingAt - 6} dur={16} style={{ left: TEST_X, top: y(HEAD_Y - 8), whiteSpace: "nowrap" }}>
         <span style={{ ...body(40, true), color: INK }}>Would doubling it mean anything?</span>
       </Ink>
       <div style={{ position: "absolute", left: TEST_X, top: y(DTYPE_Y + 60), opacity: priceIn }}>
-        <div style={mono(34)}>
+        <div style={mono(32)}>
           ${fmt(ZIPS.price)} × 2<span style={{ opacity: ease(frame, costsAt - 4, 10) }}> = ${fmt(ZIPS.priceDoubled)}</span>
         </div>
-        <div style={{ ...note(24, INK), marginTop: 12, opacity: ease(frame, twiceAt - 4, 10) }}>
+        <div style={{ ...note(25, INK), marginTop: 12, opacity: ease(frame, twiceAt - 4, 10) }}>
           <b>Yes.</b> Twice the price.
         </div>
       </div>
       <div style={{ position: "absolute", left: TEST_X, top: y(DTYPE_Y + 220), opacity: ease(frame, zipCodeAt - 6, 14) }}>
-        <div style={mono(34)}>
+        <div style={mono(32)}>
           {ZIPS.zip} × 2<span style={{ opacity: ease(frame, getAt - 4, 10) }}> = {ZIPS.zipDoubled}</span>
         </div>
-        <div style={{ ...note(24, STAT_INK), marginTop: 12, opacity: ease(frame, nonsenseAt - 4, 10) }}>
+        <div style={{ ...note(25, STAT_INK), marginTop: 12, opacity: ease(frame, nonsenseAt - 4, 10) }}>
           <b>No.</b> That&apos;s nonsense, so it&apos;s a label.
         </div>
       </div>
 
       {/* Storage, not meaning. */}
       <Note at={typeAt - 2} x={TEST_X} y={y(MEAN_Y + 40)} width={680}>
-        <div style={{ ...label(24, INK_SOFT) }}>
+        <div style={{ ...label(21, INK_SOFT) }}>
           <Dtype lit={lit}>{ZIPS.dtypes.zip_code}</Dtype>
         </div>
-        <div style={{ ...body(34, true), color: INK, marginTop: 14, lineHeight: 1.3 }}>
+        <div style={{ ...body(32, true), color: INK, marginTop: 14, lineHeight: 1.3 }}>
           <span style={{ opacity: ease(frame, saysAt - 4, 10) }}>says how it&apos;s stored.</span>
           <span style={{ opacity: ease(frame, meansAt - 4, 10) }}> What it means</span>
           <span style={{ opacity: ease(frame, callAt - 6, 10) }}> is your call.</span>

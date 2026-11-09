@@ -167,45 +167,45 @@ export const RowsScene: React.FC = () => {
 
         {/* ── What each kind of system does ── */}
         <Note at={oltpAt} x={RIGHT_X} y={y(TOP) + h(4)} out={q2At - 2}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <b>OLTP</b>
             <span style={{ color: INK_SOFT, opacity: ease(frame, oltpXAt, 10) }}>, online transaction processing</span>
           </span>
         </Note>
         <Note at={appAt} x={RIGHT_X} y={y(TOP) + h(38)} out={q2At - 2}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             runs the application
             <span style={{ opacity: ease(frame, smallAt, 10) }}>: many small reads and writes</span>
           </span>
         </Note>
         <Note at={olapAt} x={RIGHT_X} y={y(TOP) + h(100)} out={q2At - 2}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <b>OLAP</b>
             <span style={{ color: INK_SOFT, opacity: ease(frame, olapXAt, 10) }}>, online analytical processing</span>
           </span>
         </Note>
         <Note at={reportsAt} x={RIGHT_X} y={y(TOP) + h(134)} out={q2At - 2}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             runs the reports
             <span style={{ opacity: ease(frame, fewAt, 10) }}>: a few columns, millions of rows</span>
           </span>
         </Note>
 
         {/* ── The row store ── */}
-        <div style={{ position: "absolute", left: X0, top: rowY - 40, ...label(24, INK), whiteSpace: "nowrap", opacity: ease(frame, rowStoreAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: rowY - 40, ...label(22, INK), whiteSpace: "nowrap", opacity: ease(frame, rowStoreAt, 12) }}>
           Row store <span style={{ color: INK_SOFT, fontWeight: 500 }}>· OLTP · each sale&apos;s fields together</span>
         </div>
         {sample.rows.map((_, r) => cols.map((__, c) => cell(rowX(r, c), rowY, c, rowStoreAt + 4 + r * 3 + c * 0.6, `r${r}${c}`)))}
         <ReadMark x={rowX(ORDER, 0)} y={rowY} width={cols.length * CW - 4} height={sh} at={onePlaceAt} out={fewAt} />
         <Note at={onePlaceAt + 4} x={rowX(ORDER, 0)} y={rowY + sh + h(10)} out={fewAt}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>one order, one place</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>one order, one place</span>
         </Note>
         {/* A report's column, scattered through the rows. */}
         {sample.rows.map((_, r) => (
           <ReadMark key={r} x={rowX(r, AMOUNT)} y={rowY} width={CELL} height={sh} at={fewAt + 6 + r * 3} out={threeAt} />
         ))}
         <Note at={fewAt + 16} x={X0 + sample.rows.length * (cols.length * CW + SEP) + 4} y={rowY + h(4)} out={threeAt}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <QCode>amount</QCode>: every sixth value
           </span>
         </Note>
@@ -213,7 +213,7 @@ export const RowsScene: React.FC = () => {
         <ReadMark x={X0} y={rowY} width={sample.rows.length * (cols.length * CW + SEP) - SEP - 4} height={sh} at={mixesAt + 6} />
 
         {/* ── The column store ── */}
-        <div style={{ position: "absolute", left: X0, top: colY - 40, ...label(24, INK), whiteSpace: "nowrap", opacity: ease(frame, colStoreAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: colY - 40, ...label(22, INK), whiteSpace: "nowrap", opacity: ease(frame, colStoreAt, 12) }}>
           Column store <span style={{ color: INK_SOFT, fontWeight: 500 }}>· OLAP · each column together</span>
         </div>
         {cols.map((_, c) => sample.rows.map((__, r) => cell(colX(r, c), colY, c, groupAt(c) + r * 1.5, `c${r}${c}`)))}
@@ -227,7 +227,7 @@ export const RowsScene: React.FC = () => {
               top: colY + sh + h(8),
               textAlign: "center",
               fontFamily: MONO,
-              fontSize: 24,
+              fontSize: 19,
               color: INK_SOFT,
               whiteSpace: "nowrap",
               opacity: ease(frame, groupAt(c) + 4, 10),
@@ -244,7 +244,7 @@ export const RowsScene: React.FC = () => {
           return <ReadMark key={name} x={colX(0, c)} y={colY} width={sample.rows.length * CW - 4} height={sh} at={at} />;
         })}
         <Note at={typeAt} x={colX(0, 0)} y={colY + sh + h(46)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             one type, side by side: it compresses well
             <span style={{ opacity: ease(frame, batchAt, 10) }}>
               {" "}
@@ -267,7 +267,7 @@ export const RowsScene: React.FC = () => {
             { line: lineOf(QUERY.lines, "SUM(amount)"), at: amountAt + 2 },
           ]}
         />
-        <div style={{ position: "absolute", left: BAR_X, top: y(TOP) - 4, ...label(24, INK), whiteSpace: "nowrap", opacity: ease(frame, fiveAt - 6, 12) }}>
+        <div style={{ position: "absolute", left: BAR_X, top: y(TOP) - 4, ...label(21, INK), whiteSpace: "nowrap", opacity: ease(frame, fiveAt - 6, 12) }}>
           <span style={{ fontFamily: MONO, fontWeight: 500 }}>sales.parquet</span>
           <span style={{ color: INK_SOFT, fontWeight: 500 }}>
             {" "}
@@ -280,7 +280,7 @@ export const RowsScene: React.FC = () => {
         </div>
         <FileBar x={BAR_X} y={y(TOP) + h(34)} width={pqW} height={h(40)} at={fiveAt - 6} segments={PARQUET_SEGMENTS} />
         <ReadMark x={BAR_X + pqW * read.before} y={y(TOP) + h(34)} width={pqW * read.share} height={h(40)} at={fiveAt + 4} />
-        <div style={{ position: "absolute", left: BAR_X, top: y(TOP) + h(100), ...label(24, INK), whiteSpace: "nowrap", opacity: ease(frame, mixesAt, 12) }}>
+        <div style={{ position: "absolute", left: BAR_X, top: y(TOP) + h(100), ...label(21, INK), whiteSpace: "nowrap", opacity: ease(frame, mixesAt, 12) }}>
           <span style={{ fontFamily: MONO, fontWeight: 500 }}>sales.csv</span>
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, wholeAt - 4, 10) }}>
             {" "}
@@ -290,7 +290,7 @@ export const RowsScene: React.FC = () => {
         <FileBar x={BAR_X} y={y(TOP) + h(134)} width={BAR_W} height={h(40)} at={mixesAt} pattern={cols.map((c) => COLUMN_TINT[c])} />
         <ReadMark x={BAR_X} y={y(TOP) + h(134)} width={BAR_W} height={h(40)} at={wholeAt - 4} />
         {/* The two gaps, apart: the file's size is its encoding, the read is its columns. */}
-        <div style={{ position: "absolute", left: BAR_X, top: y(TOP) + h(196), ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, wholeAt + 12, 12) }}>
+        <div style={{ position: "absolute", left: BAR_X, top: y(TOP) + h(196), ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, wholeAt + 12, 12) }}>
           <Num>{MB(FILES.csv)}</Num> to <Num>{MB(FILES.parquet)}</Num>: binary types and compression · <Num>{MB(FILES.parquet)}</Num> to{" "}
           <Num>{MB(QUERY.parquet.read)}</Num>: three columns of six
         </div>

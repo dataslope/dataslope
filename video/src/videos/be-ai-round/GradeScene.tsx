@@ -34,13 +34,13 @@ const Row: React.FC<{ x: number; y: number; at: number; ok: boolean; dim?: numbe
         display: "flex",
         alignItems: "center",
         gap: 16,
-        fontSize: 24,
+        fontSize: 25,
         opacity: p * (1 - d),
         transform: `translateX(${(1 - p) * -12}px)`,
       }}
     >
       {ok ? <Tick at={at + 4} size={26} /> : <Cross at={at + 4} size={24} />}
-      <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{children}</span>
+      <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>{children}</span>
     </div>
   );
 };
@@ -166,13 +166,13 @@ export const GradeScene: React.FC = () => {
 
           {/* Canva's write-up, as a pull quote with its source. */}
           <Ink at={canvaAt} dur={18} style={{ left: X0, top: y(398), width: 1330 }}>
-            <div style={{ ...body(34, true), color: INK, lineHeight: 1.22 }}>
+            <div style={{ ...body(38, true), color: INK, lineHeight: 1.22 }}>
               The strong candidates{" "}
               <span style={{ opacity: ease(frame, quoteAt - 2, 12) }}>&ldquo;didn&rsquo;t just prompt AI and accept whatever it generated.&rdquo;</span>
             </div>
           </Ink>
           <Note at={canvaAt + 10} x={X0} y={y(452)}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Canva&apos;s write-up of its first AI-assisted interviews, June 2025</span>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Canva&apos;s write-up of its first AI-assisted interviews, June 2025</span>
           </Note>
           <Note at={struggledAt} x={X0} y={y(548)}>
             <span style={line(28, INK)}>
@@ -181,7 +181,7 @@ export const GradeScene: React.FC = () => {
             </span>
           </Note>
           <Note at={googleAt} x={X0} y={y(636)}>
-            <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               Google pilot rubric, 2026: <span style={{ fontWeight: 500 }}>the same three skills</span>
             </span>
           </Note>
@@ -222,13 +222,13 @@ export const GradeScene: React.FC = () => {
         {/* One prep guide's advice: part of it by hand, explained, beats a
             whole solution you can't explain. */}
         <Note at={guideAt} x={X0} y={pastY - h(56)}>
-          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             One prep guide&apos;s advice <span style={{ color: INK_SOFT, fontWeight: 500 }}>(interviewing.io)</span>
           </span>
         </Note>
         <Blocks x={X0} y={pastY} at={partAt} built={3} fill={`color-mix(in srgb, ${OK} 22%, ${PAPER})`} line={OK} />
         <Note at={partAt + 12} x={X0} y={pastY + BLOCK * 0.78 + h(18)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             part of it, by hand: <b style={{ color: OK_INK }}>explained</b>
           </span>
         </Note>
@@ -248,7 +248,7 @@ export const GradeScene: React.FC = () => {
           }}
         />
         <Note at={cantAt} x={RED_X} y={pastY + BLOCK * 0.78 + h(18)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             a whole solution: <b style={{ color: ACCENT_INK }}>can&apos;t explain</b>
           </span>
         </Note>

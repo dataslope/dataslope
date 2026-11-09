@@ -163,7 +163,7 @@ export const SplitScene: React.FC = () => {
         ))}
         {/* "hiding its not" */}
         <Ink at={hidingAt} dur={12} out={tokFrom} style={{ left: pieceX(P("can't")), top: aTop + ch + 12, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(28, true), color: BAD_INK }}>the not is hidden</span>
+          <span style={{ ...body(26, true), color: BAD_INK }}>the not is hidden</span>
         </Ink>
         {/* "a different word from plain butter" */}
         {aside > 0 ? (
@@ -185,9 +185,9 @@ export const SplitScene: React.FC = () => {
             <span>
               butter<span style={{ color: BAD_INK, fontWeight: 500 }}>,</span>
             </span>
-            <span style={{ ...label(24, INK_SOFT) }}>and</span>
+            <span style={{ ...label(22, INK_SOFT) }}>and</span>
             <span>butter</span>
-            <span style={{ ...body(28, true), color: BAD_INK }}>two different words</span>
+            <span style={{ ...body(26, true), color: BAD_INK }}>two different words</span>
           </div>
         ) : null}
 

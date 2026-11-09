@@ -126,7 +126,7 @@ export const VerbsScene: React.FC = () => {
                 transform: "translateX(-50%)",
                 opacity: ease(frame, l.at + 8, 12),
                 whiteSpace: "nowrap",
-                ...note(24, INK_SOFT),
+                ...note(23, INK_SOFT),
                 ...halo,
               }}
             >
@@ -144,7 +144,7 @@ export const VerbsScene: React.FC = () => {
               top: b.bottom + 18,
               transform: "translateX(-50%)",
               opacity: ease(frame, nounsAt + i * 5, 12),
-              ...note(24, INK_SOFT),
+              ...note(21, INK_SOFT),
             }}
           >
             a noun
@@ -159,7 +159,7 @@ export const VerbsScene: React.FC = () => {
               top: l.a[1] + 22,
               transform: "translateX(-50%)",
               opacity: ease(frame, verbsAt + i * 6, 12),
-              ...note(24, INK_SOFT),
+              ...note(21, INK_SOFT),
             }}
           >
             a verb
@@ -173,13 +173,13 @@ export const VerbsScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={moreAt - 2} dur={12} style={{ left: XS[0], top: y(SENT_Y) + VERDICT_DY, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK_SOFT) }}>specific</span>
+          <span style={{ ...note(23, INK_SOFT) }}>specific</span>
         </Ink>
         <Ink at={hasAt - 4} dur={16} style={{ left: XS[0], top: y(SENT_Y) + SENT_STEP, whiteSpace: "nowrap" }}>
           <span style={{ ...body(46), color: INK_SOFT, opacity: 0.8 }}>Customer has order.</span>
         </Ink>
         <Ink at={hasAt + 10} dur={12} style={{ left: XS[0], top: y(SENT_Y) + SENT_STEP + VERDICT_DY, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK_SOFT) }}>less precise</span>
+          <span style={{ ...note(23, INK_SOFT) }}>less precise</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

@@ -155,7 +155,7 @@ export const BuildScene: React.FC = () => {
 
       {/* ── P1: headline, deck and the population at full size ── */}
       <Ink at={2} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
-        <span style={label(24, ACCENT_INK)}>
+        <span style={label(20, ACCENT_INK)}>
           <PartName />Waiting in line
         </span>
       </Ink>
@@ -225,15 +225,15 @@ export const BuildScene: React.FC = () => {
         grow={(i) => ease(frame, 6 + i * 1.1, 16)}
       />
       <Axis scale={X} base={y(popBase)} ticks={TICKS} at={4} format={minutes} />
-      <Note at={20} x={1762} y={y(popBase - 46)} align="right" out={p1Out} style={note(24, INK_SOFT)}>
+      <Note at={20} x={1762} y={y(popBase - 46)} align="right" out={p1Out} style={note(20, INK_SOFT)}>
         {OVER_50} waits ran past 50 min
       </Note>
 
       {/* "Most wait a few minutes." */}
       <Leader points={pts([[560, 526], [390, 526], [292, 580]])} at={fewAt} out={avgAt} />
       <Note at={fewAt} x={568} y={y(500)} out={avgAt}>
-        <div style={{ ...body(28, true), color: INK }}>Most wait a few minutes.</div>
-        <div style={note(24, INK_SOFT)}>Half of all waits are under {fmt(MEDIAN, 1)} min.</div>
+        <div style={{ ...body(30, true), color: INK }}>Most wait a few minutes.</div>
+        <div style={note(23, INK_SOFT)}>Half of all waits are under {fmt(MEDIAN, 1)} min.</div>
       </Note>
 
       {/* "About one in twenty waits half an hour or more." */}
@@ -252,8 +252,8 @@ export const BuildScene: React.FC = () => {
         out={p1Out}
       />
       <Note at={twentyAt} x={sx(X, 30)} y={y(704)} out={p1Out}>
-        <div style={{ ...body(28, true), color: INK }}>About one in twenty waits 30 min or more.</div>
-        <div style={note(24, INK_SOFT)}>
+        <div style={{ ...body(30, true), color: INK }}>About one in twenty waits 30 min or more.</div>
+        <div style={note(23, INK_SOFT)}>
           {fmt(SHARE_30 * 100, 1)}% of the {POP_SIZE.toLocaleString("en-US")} customers
         </div>
       </Note>
@@ -279,11 +279,11 @@ export const BuildScene: React.FC = () => {
       </Note>
       <SpreadArrow from={sx(X, WAIT_MU)} to={sx(X, WAIT_MU + WAIT_SD)} y={y(546)} at={spreadAt - 2} out={p1Out} />
       <Note at={spreadAt + 2} x={sx(X, WAIT_MU) + 14} y={y(560)} out={p1Out}>
-        <div style={{ ...note(24, INK) }}>
+        <div style={{ ...note(25, INK) }}>
           Spread <span style={{ fontWeight: 500, color: ACCENT_INK }}>{fmt(WAIT_SD)} min</span>
         </div>
         {/* What the spread is, under it: one size to a line. */}
-        <div style={{ ...note(24, INK_SOFT), marginTop: 2 }}>one standard deviation</div>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 2 }}>one standard deviation</div>
       </Note>
 
       {/* ── P2: the sample strip, the averages, the second figure ── */}
@@ -322,7 +322,7 @@ export const BuildScene: React.FC = () => {
           from "Their averages: normal" that the big count never shares its
           line, and 80px clear of the bell. */}
       <div style={{ position: "absolute", left: 1180, top: y(612), opacity: counter }}>
-        <div style={label(24, INK_SOFT)}>Samples drawn</div>
+        <div style={label(20, INK_SOFT)}>Samples drawn</div>
         <div
           style={{
             ...headline(124),
@@ -336,7 +336,7 @@ export const BuildScene: React.FC = () => {
         <div style={{ ...body(28, true), marginTop: 6 }}>of 30 customers each</div>
       </div>
       <Note at={thousandAt} x={1012} y={y(822)} from="up" out={centeredAt}>
-        <span style={note(24, INK_SOFT)}>each one a different 30 of the 10,000</span>
+        <span style={note(22, INK_SOFT)}>each one a different 30 of the 10,000</span>
       </Note>
 
       {/* The bell. */}
@@ -375,7 +375,7 @@ export const BuildScene: React.FC = () => {
         />
       ))}
       <Note at={centeredAt + 4} x={sx(X, N30.center) + 14} y={y(512)}>
-        <span style={note(24, ACCENT_INK)}>
+        <span style={note(23, ACCENT_INK)}>
           <b>Centered on {fmt(N30.center)} min.</b>{" "}
           <span style={{ color: INK_SOFT }}>The population average is {fmt(WAIT_MU)}.</span>
         </span>
@@ -384,11 +384,11 @@ export const BuildScene: React.FC = () => {
       {/* The theorem, in two tags. */}
       <Leader points={pts([[742, 318], [700, 318], [652, 372]])} at={stayAt - 2} />
       <Note at={stayAt} x={752} y={y(304)}>
-        <span style={label(24, INK)}>The waits: still lopsided</span>
+        <span style={label(20, INK)}>The waits: still lopsided</span>
       </Note>
       <Leader points={pts([[690, 708], [640, 708], [578, 772]])} at={normalAt - 2} color={ACCENT} />
       <Note at={normalAt} x={700} y={y(694)}>
-        <span style={label(24, ACCENT_INK)}>Their averages: normal</span>
+        <span style={label(20, ACCENT_INK)}>Their averages: normal</span>
       </Note>
     </AbsoluteFill>
   );
@@ -452,7 +452,7 @@ const SampleDots: React.FC<{ step: Step; index: number }> = ({ step, index }) =>
       {index === 0 ? (
         <>
           <Note at={step.s + 4} x={1180} y={y(STRIP_Y + 62)} out={step.c}>
-            <span style={label(24, BLUE_INK)}>30 customers, picked at random</span>
+            <span style={label(20, BLUE_INK)}>30 customers, picked at random</span>
           </Note>
           <div
             style={{

@@ -146,7 +146,7 @@ export const RecapScene: React.FC = () => {
                   <span style={{ color: INK_SOFT, marginRight: 10 }}>{i + 1}</span>
                   {s.name}
                 </div>
-                <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, marginTop: 12, whiteSpace: "nowrap" }}>{s.how}</div>
+                <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: INK_SOFT, marginTop: 12, whiteSpace: "nowrap" }}>{s.how}</div>
                 <div
                   style={{
                     fontFamily: MONO,
@@ -229,7 +229,7 @@ export const RecapScene: React.FC = () => {
               top: GY + i * CELL + 12,
               transform: "translateX(-100%)",
               opacity: ease(frame, pairAt, 10),
-              ...label(24, QUERY_INK),
+              ...label(20, QUERY_INK),
               whiteSpace: "nowrap",
             }}
           >
@@ -243,7 +243,7 @@ export const RecapScene: React.FC = () => {
               transform: "translateX(-100%) rotate(-50deg)",
               transformOrigin: "100% 0",
               opacity: ease(frame, pairAt + 2, 10),
-              ...label(24, KEY_INK),
+              ...label(20, KEY_INK),
               whiteSpace: "nowrap",
             }}
           >
@@ -256,7 +256,7 @@ export const RecapScene: React.FC = () => {
       </Fade>
       {/* The computed cell is the only red one, in the row and column it names. */}
       <Fade at={pairAt + 8} style={{ left: LX, top: GY + 2 * CELL + 10 }}>
-        <span style={{ ...label(24, POINT_INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(22, POINT_INK), whiteSpace: "nowrap" }}>
           <Mono>it</Mono> to <Mono>trophy</Mono>, the one we computed: {three(r0.weight)}
         </span>
       </Fade>
@@ -264,7 +264,7 @@ export const RecapScene: React.FC = () => {
         <Tag size={20}>empty: later tokens, not scored</Tag>
       </Fade>
       <Fade at={onceAt - 2} style={{ left: LX, top: GY - 64 }}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>many heads, at once</span>
+        <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>many heads, at once</span>
       </Fade>
       <Spot id="llm-attention-score-mix" at={realAt - 6} left={1440} top={y(600)} width={260} height={330} />
     </AbsoluteFill>

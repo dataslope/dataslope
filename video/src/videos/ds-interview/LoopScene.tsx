@@ -64,7 +64,7 @@ const Stop: React.FC<{ i: number; at: number; title: string; children?: React.Re
           alignItems: "flex-end",
           justifyContent: "center",
           textAlign: "center",
-          ...note(34, INK),
+          ...note(32, INK),
           fontWeight: 500,
           lineHeight: 1.15,
           opacity: p,
@@ -159,7 +159,7 @@ export const LoopScene: React.FC = () => {
               top: below,
               textAlign: "center",
               whiteSpace: "nowrap",
-              ...headline(34, true),
+              ...headline(32, true),
               color: INK,
               opacity: ease(frame, predictAt - 2, 14),
             }}

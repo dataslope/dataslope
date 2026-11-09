@@ -151,7 +151,7 @@ export const NullScene: React.FC = () => {
             >
               {k.show}
             </div>
-            <span style={{ ...note(28, isNull ? ACCENT_INK : INK_SOFT), fontWeight: isNull ? 500 : 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, isNull ? ACCENT_INK : INK_SOFT), fontWeight: isNull ? 500 : 500, whiteSpace: "nowrap" }}>
               {k.says}
             </span>
           </div>
@@ -222,10 +222,10 @@ export const NullScene: React.FC = () => {
         >
           {stored[1]}
         </span>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>twice?</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>twice?</span>
       </Ink>
       <Note at={leaveAt + 10} x={TABLE_X} y={g.top - h(40)} out={senseAt}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>status left out</span>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>status left out</span>
       </Note>
     </AbsoluteFill>
   );

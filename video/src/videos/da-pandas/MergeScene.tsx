@@ -150,7 +150,7 @@ export const MergeScene: React.FC = () => {
           swaps={relabelled.map((row) => ({ row, col: 0, at: runAt, value: MERGE.clean.rows[row][0] }))}
         />
         <Note at={sideAt - 2} x={MID_X} y={stg.rowTop(MERGE.stacked.rows.length) + h(26)} out={q7At - 4}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <Mono>axis=1</Mono>: side by side
           </span>
         </Note>
@@ -184,7 +184,7 @@ export const MergeScene: React.FC = () => {
           rows={MERGE.merged.rows.map((cells, i) => ({ cells, at: customerAt + i * 3 }))}
         />
         <Note at={joinAt - 2} x={RIGHT_X} y={mg.rowTop(MERGE.merged.rows.length) + h(26)} out={q7At - 4}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <Mono>join</Mono> is a merge on the index
           </span>
         </Note>
@@ -230,7 +230,7 @@ export const MergeScene: React.FC = () => {
           rows={MERGE.twoKeys.rows.map((cells, i) => ({ cells, at: bothAt + 6 + i * 3 }))}
         />
         <Note at={differAt - 2} x={tg.right + 40} y={tg.rowTop(0) + h(4)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             names differ? <Mono>left_on=</Mono> and <Mono>right_on=</Mono>
           </span>
         </Note>

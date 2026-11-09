@@ -132,7 +132,7 @@ export const IdfScene: React.FC = () => {
 
       {/* Why the log: the lesson's 1 in 10,000. */}
       <Note at={logNoteAt - 2} x={720} y={y(FORMULA_Y + 6) + 150}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           so a word in 1 of {LOG_EXAMPLE.N.toLocaleString("en-US")} documents weighs{" "}
           <Mark at={rareAt - 2}>{LOG_EXAMPLE.ln.toFixed(1)}</Mark>, not {LOG_EXAMPLE.ratio.toLocaleString("en-US")}
         </span>
@@ -172,8 +172,8 @@ export const IdfScene: React.FC = () => {
       ].map((d, k) => (
         <Note key={k} at={d.at} x={720} y={y(FORMULA_Y + 6) + k * 50}>
           <span style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-            <span style={{ ...body(34), color: INK, width: 96 }}>{d.sym}</span>
-            <span style={note(24, INK_SOFT)}>{d.text}</span>
+            <span style={{ ...body(32), color: INK, width: 96 }}>{d.sym}</span>
+            <span style={note(22, INK_SOFT)}>{d.text}</span>
           </span>
         </Note>
       ))}
@@ -191,7 +191,7 @@ export const IdfScene: React.FC = () => {
         />
       </svg>
       <Note at={theFrom} x={BAR_X0} y={axisHead} style={{ transform: "translateX(-50%)" }}>
-        <span style={label(24, INK_SOFT)}>idf</span>
+        <span style={label(20, INK_SOFT)}>idf</span>
       </Note>
 
       {rows.map((r) => {
@@ -205,7 +205,7 @@ export const IdfScene: React.FC = () => {
             <Note at={r.at + 2} x={290} y={mid - 42}>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <DocPips word={r.j} p={r.pips} />
-                <span style={{ ...note(24, INK_SOFT), opacity: Math.min(1, r.pips * 2), whiteSpace: "nowrap" }}>{dfText(r.j)}</span>
+                <span style={{ ...note(20, INK_SOFT), opacity: Math.min(1, r.pips * 2), whiteSpace: "nowrap" }}>{dfText(r.j)}</span>
               </div>
             </Note>
             <div

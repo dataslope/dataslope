@@ -125,7 +125,7 @@ export const PanelTitle: React.FC<{ x: number; y: number; at: number; out?: numb
   const o = ease(frame, from, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
   if (o <= 0) return null;
   return (
-    <div style={{ position: "absolute", left: x, top: y, whiteSpace: "nowrap", opacity: o, ...label(24, color), fontWeight: 500 }}>
+    <div style={{ position: "absolute", left: x, top: y, whiteSpace: "nowrap", opacity: o, ...label(22, color), fontWeight: 500 }}>
       {children}
     </div>
   );

@@ -132,22 +132,22 @@ export const RunningScene: React.FC = () => {
         />
         <RowBracket g={g} steps={steps} />
         <Note at={safeAt} x={X0} y={y(TOP) + listH + h(30)} out={q10At - 4}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>each day appears once, so the default frame is safe</span>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>each day appears once, so the default frame is safe</span>
         </Note>
         <Note at={lessAt} x={X0} y={y(TOP) + listH + h(30)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the first days average fewer rows: the frame is clipped</span>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>the first days average fewer rows: the frame is clipped</span>
         </Note>
         <Note at={centeredAt} x={X0} y={y(TOP) + listH + h(90)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>centered, about each day:</span>
-          <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: BLUE_INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>centered, about each day:</span>
+          <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: BLUE_INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none" }}>
             ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
           </div>
         </Note>
         <Note at={notDaysAt + 4} x={X0} y={y(TOP) + listH + h(170)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             rows, not days. <span style={{ color: INK_SOFT }}>If a day can be missing:</span>
           </span>
-          <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: BLUE_INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none", opacity: ease(frame, intervalAt - 2, 12) }}>
+          <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: BLUE_INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none", opacity: ease(frame, intervalAt - 2, 12) }}>
             {rangeClause}
           </div>
         </Note>

@@ -107,10 +107,10 @@ export const LexiconScene: React.FC = () => {
       {/* ── Fig. 15: the naive counter ── */}
       <FigLabel n="15" title="The naive counter, on the lesson’s three reviews" at={rowAt[0] - 8} x={FIG15_X} y={y(FIG_Y)} />
       <Note at={rowAt[0] - 4} x={SUM_X} y={y(LEX_HEAD_Y)}>
-        <span style={label(24, INK_SOFT)}>sum</span>
+        <span style={label(21, INK_SOFT)}>sum</span>
       </Note>
       <Note at={rowAt[0] - 4} x={VERDICT_X} y={y(LEX_HEAD_Y)}>
-        <span style={label(24, INK_SOFT)}>verdict</span>
+        <span style={label(21, INK_SOFT)}>verdict</span>
       </Note>
       {NAIVE.map((r, i) => (
         <ReviewRow
@@ -125,11 +125,11 @@ export const LexiconScene: React.FC = () => {
         />
       ))}
       <Note at={neverAt + 8} x={VERDICT_X} y={y(REVIEW_Y[wrongIdx]) + 52}>
-        <span style={{ ...note(24, LOST_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: wrongMark }}>wrong</span>
+        <span style={{ ...note(22, LOST_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: wrongMark }}>wrong</span>
       </Note>
 
       <Note at={countingAt - 2} x={FIG15_X} y={y(BLIND_Y)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
           One word at a time is a bag of words: <span style={{ opacity: ease(frame, orderAt - 2, 10) }}>blind to order.</span>
         </span>
       </Note>
@@ -142,7 +142,7 @@ const SignBadge: React.FC<{ at: number; color: string; children: React.ReactNode
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
   return (
-    <span style={{ ...note(24, color), ...TABULAR, fontWeight: 500, opacity: p, transform: `translateY(${(1 - p) * 6}px)`, display: "inline-block" }}>
+    <span style={{ ...note(22, color), ...TABULAR, fontWeight: 500, opacity: p, transform: `translateY(${(1 - p) * 6}px)`, display: "inline-block" }}>
       {children}
     </span>
   );
@@ -185,21 +185,21 @@ const ReviewRow: React.FC<{
               }
               below={
                 scored ? (
-                  <span style={{ ...note(24, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, at + k * 2 + 8, 10) }}>
+                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, at + k * 2 + 8, 10) }}>
                     {signed(s.polarity)}
                   </span>
                 ) : isNot ? (
-                  <span style={{ ...note(24, LOST_INK), fontWeight: 500, opacity: ease(frame, notAt + 2, 10) }}>never read</span>
+                  <span style={{ ...note(21, LOST_INK), fontWeight: 500, opacity: ease(frame, notAt + 2, 10) }}>never read</span>
                 ) : null
               }
             />
           );
         })}
       </TokenRow>
-      <div style={{ position: "absolute", left: SUM_X, top: top + 4, ...note(28, INK), ...TABULAR, fontWeight: 500, opacity: sum }}>
+      <div style={{ position: "absolute", left: SUM_X, top: top + 4, ...note(30, INK), ...TABULAR, fontWeight: 500, opacity: sum }}>
         {signed(trace.score)}
       </div>
-      <div style={{ position: "absolute", left: VERDICT_X, top: top + 4, ...note(28, inkFor(trace.label)), fontWeight: 500, opacity: v }}>
+      <div style={{ position: "absolute", left: VERDICT_X, top: top + 4, ...note(30, inkFor(trace.label)), fontWeight: 500, opacity: v }}>
         {struck !== undefined ? <Strike at={struck}>{trace.label}</Strike> : trace.label}
       </div>
     </>

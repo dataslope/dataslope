@@ -106,7 +106,7 @@ export const BiasScene: React.FC = () => {
 
         {/* ── Who the survey can reach ── */}
         <Note at={distortAt - 4} x={120} y={y(BAR_Y) + h(6)}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap", ...TABULAR }}>{BIAS.users.toLocaleString("en-US")} users</span>
+          <span style={{ ...label(23, INK), whiteSpace: "nowrap", ...TABULAR }}>{BIAS.users.toLocaleString("en-US")} users</span>
         </Note>
         <div
           style={{
@@ -131,17 +131,17 @@ export const BiasScene: React.FC = () => {
           }}
         />
         <Note at={usersAt + 8} x={BAR_X} y={y(BAR_Y + BAR_H) + h(10)}>
-          <span style={{ ...note(24, BLUE_INK), whiteSpace: "nowrap" }}>stayed: the users a survey reaches</span>
+          <span style={{ ...note(23, BLUE_INK), whiteSpace: "nowrap" }}>stayed: the users a survey reaches</span>
         </Note>
         <Note at={quarterAt - 2} x={churnX} y={y(BAR_Y + BAR_H) + h(10)}>
-          <div style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>churned: {pct}</div>
-          <div style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>mostly the unhappiest</div>
+          <div style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>churned: {pct}</div>
+          <div style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>mostly the unhappiest</div>
         </Note>
         <Note at={survivorAt - 2} x={NOTE_X} y={y(BAR_Y) - h(4)}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>survivorship bias</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>survivorship bias</span>
         </Note>
         <Note at={selfAt - 2} x={NOTE_X} y={y(BAR_Y) + h(34)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             <span style={{ opacity: ease(frame, pollAt, 10) }}>a web poll: </span>
             <b>self-selection</b>
           </span>
@@ -159,7 +159,7 @@ export const BiasScene: React.FC = () => {
         {STRIP_ROWS.map((row, r) => (
           <React.Fragment key={row.key}>
             <Note at={unhappiestAt + r * 6 - 4} out={stripsOut} x={120} y={y(row.y) - 16}>
-              <span style={{ ...label(24, r === 0 ? ACCENT_INK : BLUE_INK), whiteSpace: "nowrap" }}>{row.key}</span>
+              <span style={{ ...label(23, r === 0 ? ACCENT_INK : BLUE_INK), whiteSpace: "nowrap" }}>{row.key}</span>
             </Note>
             <Dots
               dots={BIAS.strips[row.key].map((v, i) => ({
@@ -186,7 +186,7 @@ export const BiasScene: React.FC = () => {
         />
         {ROWS.map((row, r) => (
           <Note key={row.n} at={rowAt[r] - 4} x={120} y={y(row.y) - 16}>
-            <span style={{ ...label(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
+            <span style={{ ...label(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
               {Number(row.n).toLocaleString("en-US")} users
             </span>
           </Note>
@@ -216,13 +216,13 @@ export const BiasScene: React.FC = () => {
         />
         <Dots dots={dots} r={8} opacity={0.55} />
         <Note at={scatterAt} x={NOTE_X} y={y(ROWS[0].y) - 16}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>they scatter</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>they scatter</span>
         </Note>
         <Note at={settleAt} x={NOTE_X} y={y(ROWS[2].y) - 16}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>they settle, on {fmt(BIAS.stayed)}</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>they settle, on {fmt(BIAS.stayed)}</span>
         </Note>
         <Note at={noiseAt} x={NOTE_X} y={y(ROWS[1].y) - 16}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>less noise…</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>less noise…</span>
         </Note>
         <Bracket x0={tx} x1={sx} y={y(478)} up at={nothingAt} color={ACCENT}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same bias</span>
@@ -234,7 +234,7 @@ export const BiasScene: React.FC = () => {
           { at: exitAt, text: "for those who left: an exit survey" },
         ].map((line, i) => (
           <Note key={line.text} at={line.at - 2} x={1060} y={y(ROWS[1].y) + h(50) + i * 32}>
-            <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{line.text}</span>
+            <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{line.text}</span>
           </Note>
         ))}
       </Drift>

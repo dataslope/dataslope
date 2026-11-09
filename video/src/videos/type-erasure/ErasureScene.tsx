@@ -68,7 +68,7 @@ export const ErasureScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(24, ACCENT_INK)}>What TypeScript ships</span>
+        <span style={label(21, ACCENT_INK)}>What TypeScript ships</span>
       </Ink>
       <Ink
         at={open + 2}
@@ -137,7 +137,7 @@ export const ErasureScene: React.FC = () => {
 
       <Arrow points={[[LEFT + TS_W + 22, arrowY], [JS_X - 22, arrowY]]} at={compilerAt - 2} dur={12} />
       <Ink at={compilerAt} dur={12} style={{ left: LEFT + TS_W + 22, width: JS_X - LEFT - TS_W - 44, top: arrowY - 48, textAlign: "center" }}>
-        <span style={{ fontSize: 28, color: INK_SOFT }}>
+        <span style={{ fontSize: 26, color: INK_SOFT }}>
           <Mono weight={500}>tsc</Mono>
         </span>
       </Ink>

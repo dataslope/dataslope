@@ -152,7 +152,7 @@ export const RulerScene: React.FC = () => {
       <Axis scale={X} base={y(BASE)} ticks={TICKS} at={dotsAt - 4} format={seconds} />
       <Rule x={mx} y0={y(BASE)} y1={y(STRIP_TOP - 22)} at={eightAt - 4} dur={12} color={ACCENT} width={2.8} />
       <Note at={eightAt} x={mx + 14} y={y(STRIP_TOP - 40)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>average {fmt(TIMES.mean)} s</span>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500 }}>average {fmt(TIMES.mean)} s</span>
       </Note>
 
       {/* ── Fig. 7: the ruler ── */}
@@ -207,7 +207,7 @@ export const RulerScene: React.FC = () => {
                 textAnchor="middle"
                 style={{
                   fontFamily: SANS,
-                  fontSize: 24,
+                  fontSize: 22,
                   fontWeight: k === 0 || lit > 0 ? 500 : 500,
                   fill: lit > 0 ? ACCENT_INK : k === 0 ? INK : INK_SOFT,
                   fontVariantNumeric: "tabular-nums",
@@ -220,7 +220,7 @@ export const RulerScene: React.FC = () => {
         </g>
       </svg>
       <Note at={seAt + 16} x={R.x1} y={y(RULER_TOP + RULER_H) + 14} align="right">
-        <span style={label(24, INK_SOFT)}>standard errors from the average</span>
+        <span style={label(19, INK_SOFT)}>standard errors from the average</span>
       </Note>
 
       {/* The interval, lit on the ruler when the bridge names it: in the
@@ -273,10 +273,10 @@ export const RulerScene: React.FC = () => {
         tick={8}
       />
       <Note at={testAt + 4} x={rx(TIMES.tested) - 16} y={y(RULER_TOP + RULER_H + 26)} align="right" from="right">
-        <span style={note(24, INK)}>tested value, {fmt(TIMES.tested, 1)} s</span>
+        <span style={note(22, INK)}>tested value, {fmt(TIMES.tested, 1)} s</span>
       </Note>
       <Note at={lessAt - 2} x={rx(TIMES.mean) + 16} y={y(RULER_TOP + RULER_H + 26)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>{fmt(TIMES.gapInSe)} standard errors away</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500 }}>{fmt(TIMES.gapInSe)} standard errors away</span>
       </Note>
 
       <div style={{ position: "absolute", left: R.x0, right: 1920 - R.x1, top: y(856) - 29, height: 1, background: HAIRLINE, opacity: ease(frame, nextAt - 6, 12) }} />

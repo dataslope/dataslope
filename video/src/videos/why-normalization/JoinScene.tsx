@@ -93,7 +93,7 @@ export const JoinScene: React.FC = () => {
         marks={[{ row: 0, col: C.email, at: storedAt }]}
       />
       <Note at={storedAt + 6} x={sg.x} y={sg.bottom(CUSTOMERS_AFTER.length) + h(30)} from="up">
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           Two rows of the result, one row of <Mono>customers</Mono>
         </span>
       </Note>

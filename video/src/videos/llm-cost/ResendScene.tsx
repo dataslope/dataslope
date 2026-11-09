@@ -95,7 +95,7 @@ export const ResendScene: React.FC = () => {
         {[0, 10000, 20000].map((t) => (
           <g key={t}>
             <line x1={CHART_X0 - 12} x2={slotX(turns.length) + SLOT} y1={tokY(t)} y2={tokY(t)} stroke={INK} strokeOpacity={t ? 0.12 : 0} />
-            <text x={CHART_X0 - 22} y={tokY(t) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
+            <text x={CHART_X0 - 22} y={tokY(t) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT }}>
               {t ? `${t / 1000}k` : "0"}
             </text>
           </g>
@@ -106,15 +106,15 @@ export const ResendScene: React.FC = () => {
             x={slotX(t) + BAR_W / 2}
             y={y(BASE) + 30}
             textAnchor="middle"
-            style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}
+            style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT }}
           >
             {t}
           </text>
         ))}
-        <text x={slotX(turns.length) + SLOT} y={y(BASE) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
+        <text x={slotX(turns.length) + SLOT} y={y(BASE) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
           turn
         </text>
-        <text x={CHART_X0 - 12} y={tokY(Y_MAX) - 4} style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
+        <text x={CHART_X0 - 12} y={tokY(Y_MAX) - 4} style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
           tokens sent
         </text>
       </Svg>
@@ -156,18 +156,18 @@ export const ResendScene: React.FC = () => {
         color={INPUT_INK}
       />
       <Note at={sliceAt - 2} x={slotX(last.turn) - 66} y={tokY(last.input) - 78} align="right">
-        <span style={{ ...note(24, INPUT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INPUT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
           new message, {int(CONVERSATION.user)} tokens
         </span>
       </Note>
       <VBracket x={slotX(last.turn) + BAR_W + 12} y0={tokY(last.resent)} y1={y(BASE) - 2} at={paidAt - 4} color={INK} right={false} />
       <Note at={paidAt} x={slotX(last.turn) + BAR_W + 26} y={(tokY(last.resent) + y(BASE)) / 2 - 30} width={180}>
-        <span style={{ ...note(24, INK) }}>everything already paid for</span>
+        <span style={{ ...note(23, INK) }}>everything already paid for</span>
       </Note>
 
       {/* The bill so far. */}
       <Note at={sumBillAt - 4} x={BILL_R} y={y(BILL_Y[0] - 56)} align="right">
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
           The bill: every bar
           <span style={{ opacity: ease(frame, replyAt - 6, 12) }}>, plus each reply</span>
         </span>

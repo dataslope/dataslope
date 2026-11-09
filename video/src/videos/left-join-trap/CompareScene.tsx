@@ -120,7 +120,7 @@ export const CompareScene: React.FC = () => {
         return (
           <React.Fragment key={i}>
             <Ink at={t.at - 2} dur={14} style={{ left: x + 14, top: y(TITLE_TOP), whiteSpace: "nowrap" }}>
-              <span style={{ ...label(24, INK), fontWeight: 500 }}>{t.title}</span>
+              <span style={{ ...label(22, INK), fontWeight: 500 }}>{t.title}</span>
             </Ink>
             <Table
               x={x}
@@ -138,7 +138,7 @@ export const CompareScene: React.FC = () => {
               <span
                 style={{
                   fontFamily: MONO,
-                  fontSize: 24,
+                  fontSize: 21,
                   color: count > 0.5 ? INK : INK_SOFT,
                   whiteSpace: "nowrap",
                   padding: "2px 0.4em",
@@ -197,7 +197,7 @@ export const CompareScene: React.FC = () => {
                 }}
               />
             </span>
-            <span style={{ ...body(28, true), color: LOST_INK, whiteSpace: "nowrap" }}>vanished</span>
+            <span style={{ ...body(26, true), color: LOST_INK, whiteSpace: "nowrap" }}>vanished</span>
           </div>
         );
       })}

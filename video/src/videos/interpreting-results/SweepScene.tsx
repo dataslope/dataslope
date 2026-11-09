@@ -150,7 +150,7 @@ export const SweepScene: React.FC = () => {
                 top: bottom + 14,
                 transform: "translateX(-50%)",
                 opacity: ease(frame, from, 12),
-                ...note(24, INK_SOFT),
+                ...note(20, INK_SOFT),
               }}
             >
               {t.toLocaleString("en-US")}
@@ -159,7 +159,7 @@ export const SweepScene: React.FC = () => {
         )}
         {PANELS.map((p, k) => (
           <Note key={k} at={growAt + 4} x={(p.x0 + p.x1) / 2} y={bottom + 48} from="up">
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+            <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
               observations per group
             </span>
           </Note>
@@ -172,7 +172,7 @@ export const SweepScene: React.FC = () => {
               right: 1920 - P.x0 + 12,
               top: decadeY(e) - 13,
               opacity: ease(frame, from, 12),
-              ...note(24, INK_SOFT),
+              ...note(20, INK_SOFT),
               whiteSpace: "nowrap",
             }}
           >
@@ -187,7 +187,7 @@ export const SweepScene: React.FC = () => {
               right: 1920 - D.x0 + 12,
               top: dY(v) - 13,
               opacity: ease(frame, from, 12),
-              ...note(24, INK_SOFT),
+              ...note(20, INK_SOFT),
               ...TABULAR,
             }}
           >
@@ -198,12 +198,12 @@ export const SweepScene: React.FC = () => {
         {/* The true effect, on the d panel. */}
         <Dashed x0={D.x0} y0={dY(SWEEP.trueD)} x1={D.x1} y1={dY(SWEEP.trueD)} at={fixedAt - 4} dur={18} width={2.4} />
         <Note at={fixedAt} x={D.x1} y={dY(SWEEP.trueD) - 40} align="right">
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>the true effect, {fmt(SWEEP.trueD, 1)}</span>
+          <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>the true effect, {fmt(SWEEP.trueD, 1)}</span>
         </Note>
         {/* p = 0.05, on the p panel, in the stretched top band. */}
         <Dashed x0={P.x0} y0={pY(0.05)} x1={P.x1} y1={pY(0.05)} at={growAt} dur={14} color={INK_SOFT} width={1.4} dash="4 4" />
         <Note at={growAt + 6} x={P.x1} y={pY(0.05) - 30} align="right">
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...halo }}>p = 0.05</span>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", ...halo }}>p = 0.05</span>
         </Note>
 
         {/* Each sample size arrives as a guide down both panels. */}
@@ -229,7 +229,7 @@ export const SweepScene: React.FC = () => {
         {/* Each guide keeps its sample size at its top. */}
         {SWEEP.rows.map((r, i) => (
           <Note key={r.n} at={rowAt(i)} x={nx(D, r.n)} y={top + 6} from="up">
-            <span style={{ ...note(24, INK), ...TABULAR, fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+            <span style={{ ...note(22, INK), ...TABULAR, fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
               {r.n.toLocaleString("en-US")}
             </span>
           </Note>
@@ -264,10 +264,10 @@ export const SweepScene: React.FC = () => {
                 y={last ? bottom - 78 : i === 3 ? pPts[i][1] - 12 : pPts[i][1] - 34}
                 align={i === 3 ? "right" : "left"}
               >
-                <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>{pLabel(r.p)}</span>
+                <span style={{ ...note(21, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>{pLabel(r.p)}</span>
               </Note>
               <Note at={dAt + 4 + i * 3} x={dPts[i][0]} y={dPts[i][1] + (r.d > SWEEP.trueD ? -44 : 16)} from="up">
-                <span style={{ ...note(24, DATA_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+                <span style={{ ...note(21, DATA_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
                   {fmt(r.d, 2)}
                 </span>
               </Note>
@@ -280,10 +280,10 @@ export const SweepScene: React.FC = () => {
         <Ring x={finalP[0]} y={bottom - 6} at={zeroAt + 4} r1={44} />
         <Dashed x0={D.x0} y0={dY(SWEEP.trueD)} x1={D.x1} y1={dY(SWEEP.trueD)} at={threeAt - 4} dur={16} width={4.4} color={DATA} />
         <Note at={pWorldAt - 2} x={P.x0 + 24} y={bottom - 50}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>moves with sample size</span>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>moves with sample size</span>
         </Note>
         <Note at={sizeAt - 2} x={D.x0 + 24} y={dY(0.08)}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>stays put</span>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>stays put</span>
         </Note>
         {/* The panel the narration is not about steps back: d on "the world", p on "the p-value". */}
         {[

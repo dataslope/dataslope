@@ -100,7 +100,7 @@ export const ChiScene: React.FC = () => {
         <div style={{ position: "absolute", left: X0, top, width, opacity: tableP, transform: `translateY(${(1 - tableP) * 10}px)` }}>
           <div style={{ position: "absolute", left: 0, top: h(HEAD_H) - 1, width, height: 1.5, background: INK }} />
           {["device", "stayed", "churned"].map((c, j) => (
-            <div key={c} style={{ position: "absolute", left: colX[j] - X0 + 14, top: h(12), ...label(24, INK_SOFT), fontWeight: 500 }}>
+            <div key={c} style={{ position: "absolute", left: colX[j] - X0 + 14, top: h(12), ...label(22, INK_SOFT), fontWeight: 500 }}>
               {c}
             </div>
           ))}
@@ -121,12 +121,12 @@ export const ChiScene: React.FC = () => {
                 <Note at={tableAt + 4 + (i * 2 + j) * 2} x={x} y={rowY(i) + h(10)}>
                   {/* The observed count the narration reads: data blue, under
                       the yellow mark, not the red kept for a wrong answer. */}
-                  <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: BLUE_INK, ...TABULAR }}>
+                  <span style={{ fontFamily: MONO, fontSize: 32, fontWeight: 500, color: BLUE_INK, ...TABULAR }}>
                     {hot ? <Mark at={mobileAt + 6}>{obs}</Mark> : obs}
                   </span>
                 </Note>
                 <Note at={expectAt + 2 + (i * 2 + j) * 2} x={x} y={rowY(i) + h(54)}>
-                  <span style={{ ...label(24, hot ? INK : INK_SOFT), ...TABULAR }}>
+                  <span style={{ ...label(20, hot ? INK : INK_SOFT), ...TABULAR }}>
                     expected{" "}
                     {hot ? (
                       <Mark at={expectAt + 8}>{fmt(CHI.expected[i][j], 1)}</Mark>
@@ -145,12 +145,12 @@ export const ChiScene: React.FC = () => {
         )}
 
         <Note at={sumAt} x={SIDE_X} y={y(500)}>
-          <div style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
+          <div style={{ fontFamily: MONO, fontSize: 32, fontWeight: 500, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
             χ² = Σ (O − E)² / E
           </div>
         </Note>
         <Note at={chiAt - 2} x={SIDE_X} y={y(566)}>
-          <div style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
+          <div style={{ fontFamily: MONO, fontSize: 32, fontWeight: 500, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
             &nbsp;&nbsp;= <Mark at={chiAt + 2}>{fmt(CHI.chi2, 1)}</Mark>
           </div>
         </Note>

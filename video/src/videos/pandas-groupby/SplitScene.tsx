@@ -92,8 +92,8 @@ export const SplitScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={open} dur={14} style={{ left: 124, top: y(112), whiteSpace: "nowrap" }}>
-        <span style={label(24, ACCENT_INK)}>pandas groupby</span>
+      <Ink at={open} dur={14} style={{ left: 124, top: y(112) }}>
+        <span style={label(21, ACCENT_INK)}>pandas groupby</span>
       </Ink>
       <Ink at={open + 2} dur={22} style={{ left: 118, top: y(146), ...headline(66), whiteSpace: "nowrap" }}>
         What does each department{" "}
@@ -183,7 +183,7 @@ export const SplitScene: React.FC = () => {
           from="right"
           dim={stackedAt - 4}
         >
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{pc.rows.length} rows</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>{pc.rows.length} rows</span>
         </Note>
       ))}
 
@@ -217,7 +217,7 @@ export const SplitScene: React.FC = () => {
               />
             </svg>
             <Note at={sumAt - 2 + k * 6} x={(ARROW_X0 + ARROW_X1) / 2} y={mid - 40} from="up" style={{ transform: "translateX(-50%)" }}>
-              <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, opacity: spent }}>sum</span>
+              <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK, opacity: spent }}>sum</span>
             </Note>
             <Arrow from={[ARROW_X0, mid]} to={[ARROW_X1, mid]} at={sumAt + k * 6} opacity={spent} />
             {/* Engineering's answer, while the narration reads it out. */}

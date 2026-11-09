@@ -110,12 +110,12 @@ export const Reply: React.FC<{
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 10, height: 26, marginBottom: 10 }}>
-        <span style={{ ...label(24, `color-mix(in srgb, ${tone} ${100 * v}%, ${INK_SOFT})`), fontWeight: 500 }}>{title}</span>
+        <span style={{ ...label(21, `color-mix(in srgb, ${tone} ${100 * v}%, ${INK_SOFT})`), fontWeight: 500 }}>{title}</span>
         {verdict && v > 0 ? (
           verdict.ok ? (
             <Tick at={verdict.at} size={24} />
           ) : (
-            <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, opacity: v }}>✕</span>
+            <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, opacity: v }}>✕</span>
           )
         ) : null}
       </div>

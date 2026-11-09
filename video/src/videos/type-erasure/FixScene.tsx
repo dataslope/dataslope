@@ -83,23 +83,23 @@ export const FixScene: React.FC = () => {
         />
       </svg>
       <Note at={fieldAt + 4} x={NOTE_X} y={(testsTop + testsBottom) / 2 - 30} width={NOTE_W}>
-        <div style={note(24, INK)}>Each test runs at runtime, on the real value.</div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>
+        <div style={note(22, INK)}>Each test runs at runtime, on the real value.</div>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>
           When <Mono>isUser</Mono> returns true, TypeScript treats <Mono>x</Mono> as a <Mono>User</Mono>.
         </div>
       </Note>
 
       <Note at={notLetAt} x={NOTE_X} y={rowMid(GUARD_UNKNOWN.line) - 34} width={NOTE_W}>
-        <div style={note(24, INK)}>
+        <div style={note(22, INK)}>
           Use <Mono>data</Mono> before the check, and tsc says:
         </div>
-        <div style={{ fontFamily: MONO, fontSize: 24, color: ACCENT_INK, fontWeight: 500, marginTop: 8, whiteSpace: "nowrap" }}>
+        <div style={{ fontFamily: MONO, fontSize: 20, color: ACCENT_INK, fontWeight: 500, marginTop: 8, whiteSpace: "nowrap" }}>
           error {UNGUARDED_ERROR.code}: {UNGUARDED_ERROR.message}
         </div>
       </Note>
 
       <Note at={insideAt + 4} x={NOTE_X} y={rowMid(GUARD_INSIDE) - 15} width={NOTE_W}>
-        <div style={note(24, INK)}>
+        <div style={note(22, INK)}>
           Here <Mono>data</Mono> is a{" "}
           <span style={{ color: OK_INK, fontWeight: 500, opacity: 0.4 + 0.6 * ease(frame, userAt, 10) }}>
             <Mono>User</Mono>

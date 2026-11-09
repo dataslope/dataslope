@@ -67,7 +67,7 @@ const Categorical: React.FC<{ c: Ctx }> = ({ c }) => {
         const top = barTop + i * c.h(70);
         return (
           <React.Fragment key={b.text}>
-            <div style={{ position: "absolute", left: R_X, top, width: 200, ...label(24, INK), opacity: ease(frame, b.at - 4, 8) }}>{b.text}</div>
+            <div style={{ position: "absolute", left: R_X, top, width: 200, ...label(21, INK), opacity: ease(frame, b.at - 4, 8) }}>{b.text}</div>
             <div
               style={{
                 position: "absolute",
@@ -254,7 +254,7 @@ const Duplicates: React.FC<{ c: Ctx }> = ({ c }) => {
       <Listing lines={D.countLines} x={listX} top={c.T} width={620} size={SIZE} at={at} />
       <Console lines={[String(D.count)]} x={listX} top={c.T + lineH + c.h(12)} width={100} at={twoAt - 2} />
       <Note at={twoAt + 8} x={listX + 124} y={c.T + lineH + c.h(12) + c.h(8)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           on every column instead: <Num>{D.countAll}</Num>
         </span>
       </Note>

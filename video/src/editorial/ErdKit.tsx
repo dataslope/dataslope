@@ -81,7 +81,7 @@ export const ErdKit: React.FC = () => (
           <React.Fragment key={kind}>
             <Relation name={kind} points={[[160, yy], [540, yy]]} from="many" to={kind} at={4 + i * 6} dur={14} />
             <div style={{ position: "absolute", left: 540, top: yy - 30, width: 26, height: 60, background: INK_SOFT, opacity: 0.25, borderRadius: 3 }} />
-            <div style={{ position: "absolute", left: 160, top: yy - 52, ...label(24) }}>{kind.replace(/-/g, " ")}</div>
+            <div style={{ position: "absolute", left: 160, top: yy - 52, ...label(21) }}>{kind.replace(/-/g, " ")}</div>
           </React.Fragment>
         );
       })}

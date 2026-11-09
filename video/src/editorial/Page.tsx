@@ -19,11 +19,11 @@ export type EditorialProps = NarratedProps & {
   sfx?: boolean;
 };
 
-/** The house setting: Inter throughout (titles 500, text 400), and the figures get the whole page. */
+/** The house setting: Source Serif 4 for titles and text, Inter for labels and figures, and the figures get the whole page. */
 export const EDITORIAL_DEFAULTS = {
   timeline: null,
   captions: false,
-  typeface: "inter",
+  typeface: "source-serif",
 } as const satisfies EditorialProps;
 
 /** How far every scene sits above where it was laid out, in px. The pages

@@ -132,7 +132,7 @@ export const BigScene: React.FC = () => {
         {/* The table: n, pairs, one pass. */}
         <div style={{ position: "absolute", left: 0, top: tTop, opacity: ease(frame, loopAt, 12) }}>
           {COLS.map((c) => (
-            <div key={c.name} style={{ position: "absolute", left: c.right - 360, width: 360, textAlign: "right", ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <div key={c.name} style={{ position: "absolute", left: c.right - 360, width: 360, textAlign: "right", ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
               {c.name}
             </div>
           ))}
@@ -169,7 +169,7 @@ export const BigScene: React.FC = () => {
                     width: 360,
                     top: rowTop(i) + 12,
                     textAlign: "right",
-                    ...note(28, k === 1 && big ? ACCENT_INK : k === 2 ? OK_INK : INK),
+                    ...note(26, k === 1 && big ? ACCENT_INK : k === 2 ? OK_INK : INK),
                     ...TABULAR,
                     fontWeight: k === 0 ? 500 : 500,
                     opacity: p,
@@ -180,7 +180,7 @@ export const BigScene: React.FC = () => {
                 </div>
               ))}
               {r.counted ? (
-                <div style={{ position: "absolute", left: COLS[2].right + 44, top: rowTop(i) + 14, ...note(24, INK_SOFT), opacity: p, whiteSpace: "nowrap" }}>
+                <div style={{ position: "absolute", left: COLS[2].right + 44, top: rowTop(i) + 14, ...note(22, INK_SOFT), opacity: p, whiteSpace: "nowrap" }}>
                   counted as it ran
                 </div>
               ) : null}

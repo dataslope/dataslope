@@ -35,7 +35,7 @@ const NUM = 34;
 /** A column head in two lines, in the lesson's terms: "raw scores" are the
  *  dot products, "scaled scores" the same over the square root of d. */
 const Head: React.FC<{ x: number; lines: [React.ReactNode, React.ReactNode]; opacity?: number }> = ({ x, lines, opacity = 1 }) => (
-  <div style={{ position: "absolute", left: x, top: -30, ...label(24, INK_SOFT), lineHeight: 1.25, whiteSpace: "nowrap", opacity }}>
+  <div style={{ position: "absolute", left: x, top: -30, ...label(23, INK_SOFT), lineHeight: 1.25, whiteSpace: "nowrap", opacity }}>
     <div>{lines[0]}</div>
     <div>{lines[1]}</div>
   </div>
@@ -217,18 +217,18 @@ export const WeightsScene: React.FC = () => {
       </Svg>
       <Fade at={addUpAt - 2} style={{ left: C.weight, top: rowY(3) - 6, display: "flex", gap: 14, alignItems: "baseline" }}>
         <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: NUM, color: INK, ...TABULAR }}>1.000</span>
-        <span style={{ ...label(24, INK_SOFT) }}>in all</span>
+        <span style={{ ...label(22, INK_SOFT) }}>in all</span>
       </Fade>
 
       {/* The two rules, on the right, as the narration states them. */}
       <Note at={dividedAt - 2} x={1390} y={headY - 4} width={450}>
-        <div style={{ ...body(34), color: INK }}>
+        <div style={{ ...body(32), color: INK }}>
           scaled = raw score{" "}
           <Mark at={squareAt}>
             ÷ <span style={{ fontFamily: MONO, fontWeight: 500 }}>√d</span>
           </Mark>
         </div>
-        <div style={{ ...body(28), color: INK_SOFT, marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, howManyAt - 2, 10) }}>
+        <div style={{ ...body(27), color: INK_SOFT, marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, howManyAt - 2, 10) }}>
           <span style={{ fontFamily: MONO, fontWeight: 500, color: INK }}>d</span>: <Mark at={howManyAt}>how many numbers</Mark> a vector holds
         </div>
         <div style={{ ...body(28), color: INK_SOFT, marginTop: 10, opacity: ease(frame, rootTwoAt - 2, 10) }}>
@@ -236,12 +236,12 @@ export const WeightsScene: React.FC = () => {
         </div>
       </Note>
       <Note at={stepsAt - 2} x={1390} y={y(640)} width={430}>
-        <div style={{ ...body(34), color: INK }}>
+        <div style={{ ...body(32), color: INK }}>
           softmax: <Mark at={raiseAt}>raise e</Mark> to each scaled score, then <Mark at={divideAt}>divide</Mark> by the total
         </div>
       </Note>
       <Fade at={realAt - 2} out={dividedAt - 6} style={{ left: 1390, top: headY + 4 }}>
-        <div style={{ ...body(28, true), color: INK_SOFT, width: 430 }}>
+        <div style={{ ...body(30, true), color: INK_SOFT, width: 430 }}>
           Real queries and keys: many more numbers, so <Mark at={bigAt}>bigger sums</Mark>.
         </div>
       </Fade>
@@ -249,10 +249,10 @@ export const WeightsScene: React.FC = () => {
       {/* ── Fig. 6: why divide; the sums of long vectors, before and after ── */}
       <FigLabel n="6" title="How big the sum gets, for random vectors" at={manyAt - 4} out={spreadOut} x={X0} y={SY} />
       <Fade at={manyAt - 2} out={spreadOut} style={{ left: SA, top: SY + 50 }}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>The sum</span>
+        <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>The sum</span>
       </Fade>
       <Fade at={squareAt - 2} out={spreadOut} style={{ left: SB, top: SY + 50 }}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>
           ÷ <span style={{ fontFamily: MONO, fontWeight: 500 }}>√d</span>
         </span>
       </Fade>
@@ -284,7 +284,7 @@ export const WeightsScene: React.FC = () => {
                 left: x + v * SU + 14,
                 top: sRow(i) + 1,
                 fontFamily: MONO,
-                fontSize: 28,
+                fontSize: 26,
                 fontWeight: 500,
                 color: INK,
                 opacity: Math.max(0, (p - 0.7) / 0.3),
@@ -297,7 +297,7 @@ export const WeightsScene: React.FC = () => {
         );
         return (
           <div key={sp.d} style={{ position: "absolute", inset: 0, opacity: ease(frame, rowAt, 10) * (1 - gone) }}>
-            <span style={{ position: "absolute", left: X0, top: sRow(i) + 2, ...label(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ position: "absolute", left: X0, top: sRow(i) + 2, ...label(23, INK), whiteSpace: "nowrap" }}>
               {sp.d} numbers
             </span>
             {cell(SA, sp.std, grow)}
@@ -331,7 +331,7 @@ export const WeightsScene: React.FC = () => {
             />
             <div style={{ position: "absolute", left: s.x + 16, top: BY + 13, opacity: ease(frame, addThemAt + 4 + i * 5, 10), display: "flex", gap: 14, alignItems: "baseline", whiteSpace: "nowrap" }}>
               <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{TOKENS[i]}</span>
-              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: hot > 0.5 ? POINT_INK : INK, ...TABULAR }}>
+              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: hot > 0.5 ? POINT_INK : INK, ...TABULAR }}>
                 <Swap a={three(rows[i].power)} b={three(rows[i].weight)} swapAt={swapAt + i * 4} />
               </span>
             </div>
@@ -348,7 +348,7 @@ export const WeightsScene: React.FC = () => {
         <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT }}>0</span>
       </Fade>
       <Fade at={totalSaidAt - 2} style={{ left: end - 6, top: BY + BH + 22, transform: "translateX(-60%)" }}>
-        <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
+        <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
           <Swap a={`total ${three(TROPHY.total)}`} b="1" swapAt={swapAt} />
         </span>
       </Fade>
@@ -381,7 +381,7 @@ export const WeightsScene: React.FC = () => {
                 left: g.x + 16,
                 top: GY + 4,
                 fontFamily: MONO,
-                fontSize: 24,
+                fontSize: 23,
                 fontWeight: 500,
                 color: hot > 0.5 ? POINT_INK : INK_SOFT,
                 opacity: ease(frame, withoutAt + 6 + i * 5, 10),

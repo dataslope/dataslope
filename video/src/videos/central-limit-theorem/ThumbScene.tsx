@@ -106,7 +106,7 @@ export const ThumbScene: React.FC = () => {
 
       {/* The pull quote, and its correction. */}
       <Ink at={start - 14} dur={14} style={{ left: 196, top: y(112) }}>
-        <span style={label(24, ACCENT_INK)}>What you will hear</span>
+        <span style={label(20, ACCENT_INK)}>What you will hear</span>
       </Ink>
       <Ink at={start - 12} dur={14} style={{ left: 84, top: y(150), ...headline(240), color: ACCENT, opacity: 0.85 }}>
         “
@@ -143,7 +143,7 @@ export const ThumbScene: React.FC = () => {
         enough.”
       </Ink>
       <Note at={alwaysAt + 2} x={200} y={y(358)}>
-        <span style={note(24, INK_SOFT)}>the 30-or-more rule</span>
+        <span style={note(22, INK_SOFT)}>the 30-or-more rule</span>
       </Note>
       <Ink at={thumbAt - 2} dur={18} style={{ left: 196, top: y(432), ...headline(50) }}>
         A rule of thumb,
@@ -152,7 +152,7 @@ export const ThumbScene: React.FC = () => {
         not a law.
       </Ink>
       <Ink at={lawAt + 8} dur={18} style={{ left: 198, top: y(588), width: 620 }}>
-        <div style={{ ...body(28), color: INK }}>
+        <div style={{ ...body(27), color: INK }}>
           How much averaging the bell needs depends on the population. A mild skew settles near thirty. A
           heavy tail can need hundreds.
         </div>
@@ -173,7 +173,7 @@ export const ThumbScene: React.FC = () => {
             </Ink>
             {r.off > 0 ? (
               <Note at={c.tag + 8} x={X1} y={y(r.top + 6)} align="right">
-                <span style={note(24, INK_SOFT)}>
+                <span style={note(20, INK_SOFT)}>
                   {r.off} {r.off === 1 ? "average runs" : "averages run"} past the right edge
                 </span>
               </Note>
@@ -211,10 +211,10 @@ export const ThumbScene: React.FC = () => {
               />
             ) : null}
             <Note at={c.tag} x={tagX} y={y(r.base - 150)}>
-              <div style={{ ...label(24, t.tone), ...halo }}>
+              <div style={{ ...label(19, t.tone), ...halo }}>
                 {i === 2 ? <Marker at={muchAt - 2}>{t.head}</Marker> : t.head}
               </div>
-              <div style={{ ...note(24, INK_SOFT), ...halo }}>{t.sub(r)}</div>
+              <div style={{ ...note(20, INK_SOFT), ...halo }}>{t.sub(r)}</div>
             </Note>
           </React.Fragment>
         );

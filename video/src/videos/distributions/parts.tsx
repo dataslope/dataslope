@@ -327,7 +327,7 @@ export const YTicks: React.FC<{
       {ticks.map((v) => (
         <div
           key={v}
-          style={{ position: "absolute", right: 1920 - (x0 - 14), top: py(v) - 13, opacity: p, ...note(24, INK_SOFT) }}
+          style={{ position: "absolute", right: 1920 - (x0 - 14), top: py(v) - 13, opacity: p, ...note(20, INK_SOFT) }}
         >
           {format(v)}
         </div>

@@ -208,7 +208,7 @@ export const GroupScene: React.FC = () => {
           x={g.colX[AMOUNT] - COL_W.day + COL_W.amount + 28}
           y={g.rowTop(i) + g.rowH / 2 - 15}
         >
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{PARTS[regionOf(row)].join(" + ")}</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>{PARTS[regionOf(row)].join(" + ")}</span>
         </Note>
       ))}
 

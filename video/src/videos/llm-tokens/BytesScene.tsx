@@ -101,7 +101,7 @@ export const BytesScene: React.FC = () => {
                 <div style={{ ...label(24, INK), whiteSpace: "nowrap" }}>{g.language}</div>
                 <div style={{ ...body(24, true), color: INK_SOFT, whiteSpace: "nowrap", marginTop: 2 }}>{g.romanized}</div>
                 {/* What the gaps between the squares mean: one character each. */}
-                <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, perCharAt[i], 12), ...TABULAR }}>
+                <div style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, perCharAt[i], 12), ...TABULAR }}>
                   {g.chars} {i === 0 ? "letters" : "characters"} × {perChar} {perChar === 1 ? "byte" : "bytes"}
                 </div>
               </div>
@@ -152,7 +152,7 @@ export const BytesScene: React.FC = () => {
               })}
               <div style={{ position: "absolute", left: COUNT_X, top: top - 2, display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
                 <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, bytesCountAt[i] - 2, 10), ...TABULAR }}>{g.bytes} bytes</span>
-                <span style={{ ...note(28, rare ? FOCUS_INK : INK), fontWeight: 500, opacity: tok, ...TABULAR }}>
+                <span style={{ ...note(26, rare ? FOCUS_INK : INK), fontWeight: 500, opacity: tok, ...TABULAR }}>
                   {g.tokens} {g.tokens === 1 ? "token" : "tokens"}
                 </span>
               </div>
@@ -163,7 +163,7 @@ export const BytesScene: React.FC = () => {
         {/* The key, and UTF-8's rule. */}
         <div style={{ position: "absolute", left: X0, top: y(KEY_Y), display: "flex", alignItems: "center", gap: 14, opacity: ease(frame, bytesAt, 12) }}>
           <span style={{ width: 22, height: 22, borderRadius: 3, background: BYTE }} />
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>one byte</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>one byte</span>
           <span
             style={{
               width: 40,
@@ -175,8 +175,8 @@ export const BytesScene: React.FC = () => {
               opacity: ease(frame, startsAt, 12),
             }}
           />
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, startsAt, 12) }}>one token</span>
-          <span style={{ ...note(24, INK_SOFT), marginLeft: 40, whiteSpace: "nowrap", opacity: ease(frame, threeAt - 2, 12) }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, startsAt, 12) }}>one token</span>
+          <span style={{ ...note(22, INK_SOFT), marginLeft: 40, whiteSpace: "nowrap", opacity: ease(frame, threeAt - 2, 12) }}>
             UTF-8: 1 byte for an English letter, 3 for a Japanese or Hindi character
           </span>
         </div>
@@ -185,7 +185,7 @@ export const BytesScene: React.FC = () => {
             position: "absolute",
             left: COUNT_X,
             top: rowY(last) + h(56),
-            ...note(24, INK_SOFT),
+            ...note(22, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, twelveTokensAt + 16, 12),
           }}

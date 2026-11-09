@@ -401,7 +401,7 @@ export const Quote: React.FC<{
         <div style={{ ...body(size, true), color, lineHeight: 1.2 }}>{children}</div>
       </Ink>
       <Ink at={creditAt ?? at + 14} dur={14} style={{ position: "relative", marginLeft: 28, marginTop: 18, width: width - 28 }}>
-        <div style={{ ...label(24, INK_SOFT), fontWeight: 500, lineHeight: 1.35 }}>{credit}</div>
+        <div style={{ ...label(21, INK_SOFT), fontWeight: 500, lineHeight: 1.35 }}>{credit}</div>
       </Ink>
     </div>
   );

@@ -94,11 +94,11 @@ export const QuestionsScene: React.FC = () => {
 
       <Drift from={whatFrom} to={end} amount={0.018} origin="40% 60%">
         {/* Column heads, and a rule under them. */}
-        <div style={{ position: "absolute", left: Q_X, top: rowY(0) - 64, opacity: heads, ...label(24, INK_SOFT) }}>The question</div>
-        <div style={{ position: "absolute", left: R_X, top: rowY(0) - 64, opacity: heads, ...label(24, INK_SOFT) }}>
+        <div style={{ position: "absolute", left: Q_X, top: rowY(0) - 64, opacity: heads, ...label(21, INK_SOFT) }}>The question</div>
+        <div style={{ position: "absolute", left: R_X, top: rowY(0) - 64, opacity: heads, ...label(21, INK_SOFT) }}>
           What it decides
         </div>
-        <div style={{ position: "absolute", left: S_X, top: rowY(0) - 64, opacity: sqlHead, ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: S_X, top: rowY(0) - 64, opacity: sqlHead, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
           How SQL writes it down
         </div>
         <div style={{ position: "absolute", left: X0, top: rowY(0) - 26, width: 1680 * heads, height: 2, background: INK }} />
@@ -109,10 +109,10 @@ export const QuestionsScene: React.FC = () => {
             <React.Fragment key={r.q}>
               {/* The number is set as its question is: same face, same size, told apart by ink and weight. */}
               <Ink at={r.at - 6} dur={14} style={{ left: X0, top: rowY(i) - 4, whiteSpace: "nowrap" }}>
-                <span style={{ ...body(34), color: ACCENT_INK, fontWeight: 500 }}>{i + 1}</span>
+                <span style={{ ...body(38), color: ACCENT_INK, fontWeight: 500 }}>{i + 1}</span>
               </Ink>
               <Ink at={r.at - 4} dur={16} style={{ left: Q_X, top: rowY(i) - 4, whiteSpace: "nowrap" }}>
-                <span style={{ ...body(34), color: INK }}>
+                <span style={{ ...body(38), color: INK }}>
                   <Mark at={designAt - 4 + i * 4}>{r.q}</Mark>
                 </span>
               </Ink>
@@ -149,10 +149,10 @@ export const QuestionsScene: React.FC = () => {
           );
         })}
         <Ink at={downAt} dur={16} style={{ left: S_X, top: rowY(5) - 2, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(28, true), color: INK_SOFT }}>The answers, written down.</span>
+          <span style={{ ...body(30, true), color: INK_SOFT }}>The answers, written down.</span>
         </Ink>
         <Ink at={designAt} dur={16} style={{ left: Q_X, top: rowY(5) - 2, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(28, true), color: ACCENT_INK }}>The design.</span>
+          <span style={{ ...body(30, true), color: ACCENT_INK }}>The design.</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

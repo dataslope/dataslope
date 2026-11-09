@@ -102,8 +102,8 @@ export const DesignScene: React.FC = () => {
         return (
           <React.Fragment key={s}>
             <Ink at={at} dur={12} style={{ left: STEP_X[i], top: y(STEP_Y), whiteSpace: "nowrap", display: "flex", gap: 10 }}>
-              <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>{i + 1}</span>
-              <span style={{ ...label(24, INK), fontWeight: 500 }}>
+              <span style={{ ...label(22, ACCENT_INK), fontWeight: 500 }}>{i + 1}</span>
+              <span style={{ ...label(22, INK), fontWeight: 500 }}>
                 {i === 1 ? (
                   <Marker at={experimentInAt - 6} color={HIGHLIGHT}>
                     {s}
@@ -122,13 +122,13 @@ export const DesignScene: React.FC = () => {
       <Ring x={STEP_X[1] + 6} y={y(STEP_Y) + 46} at={experimentInAt - 4} />
       <Bracket x0={STEP_X[0] - 4} x1={STEP_X[3] - 40} y={y(STEP_Y) + 74} at={firstAt - 6} up />
       <Ink at={firstAt - 2} dur={14} style={{ left: STEP_X[0], top: y(STEP_Y) + 84, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(24, INK_SOFT) }}>decided before the first user arrives</span>
+        <span style={{ ...note(21, INK_SOFT) }}>decided before the first user arrives</span>
       </Ink>
 
       <div style={{ position: "absolute", inset: 0, opacity: lowerDim }}>
         {/* ── One hypothesis ── */}
         <Ink at={oneAt - 4} dur={14} style={{ left: 160, top: y(490), whiteSpace: "nowrap" }}>
-          <span style={label(24, INK_SOFT)}>One hypothesis</span>
+          <span style={label(22, INK_SOFT)}>One hypothesis</span>
         </Ink>
         <Ink at={buttonAt - 8} dur={22} style={{ left: 160, top: y(526), width: 720 }}>
           <span style={{ ...body(42), color: INK }}>
@@ -153,10 +153,10 @@ export const DesignScene: React.FC = () => {
                 gap: 12,
               }}
             >
-              <span style={label(24, INK_SOFT)}>{g === "A" ? "A: the old button" : "B: the new one"}</span>
+              <span style={label(21, INK_SOFT)}>{g === "A" ? "A: the old button" : "B: the new one"}</span>
               <span
                 style={{
-                  ...label(28, g === "A" ? INK : PAPER),
+                  ...label(26, g === "A" ? INK : PAPER),
                   display: "inline-block",
                   width: 240,
                   textAlign: "center",
@@ -174,19 +174,19 @@ export const DesignScene: React.FC = () => {
 
         {/* ── One metric, chosen now ── */}
         <Ink at={metricAt - 4} dur={14} style={{ left: 160, top: y(690), whiteSpace: "nowrap" }}>
-          <span style={label(24, INK_SOFT)}>One primary metric</span>
+          <span style={label(22, INK_SOFT)}>One primary metric</span>
         </Ink>
         <Ink at={metricAt + 2} dur={18} style={{ left: 160, top: y(METRIC_Y) + PRIMARY_DY, whiteSpace: "nowrap" }}>
           <span style={{ ...body(42), color: INK }}>Conversion rate</span>
         </Ink>
         {/* Under the metric it qualifies, 10px down, not on its line. */}
         <Ink at={nowAt - 4} dur={14} style={{ left: 160, top: y(METRIC_Y) + CHOSEN_DY, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, STAT_INK), fontWeight: 500 }}>chosen now, before any data</span>
+          <span style={{ ...note(22, STAT_INK), fontWeight: 500 }}>chosen now, before any data</span>
         </Ink>
 
         {/* Ten metrics, and the one that happened to move. */}
         <Ink at={tenAt - 6} dur={14} style={{ left: 1010, top: y(690), whiteSpace: "nowrap" }}>
-          <span style={label(24, INK_SOFT)}>Or track ten</span>
+          <span style={label(22, INK_SOFT)}>Or track ten</span>
         </Ink>
         <div style={{ position: "absolute", left: 1010, top: y(METRIC_Y), display: "flex", flexDirection: "column", gap: METRIC_ROW_GAP }}>
           {METRIC_ROWS.map((row, r) => (
@@ -206,7 +206,7 @@ export const DesignScene: React.FC = () => {
                   >
                     <span
                       style={{
-                        ...note(24),
+                        ...note(21),
                         ...GRAY_BADGE,
                         // The one that moved turns from gray to red as it is cheered.
                         ...(mover
@@ -226,7 +226,7 @@ export const DesignScene: React.FC = () => {
           ))}
         </div>
         <Ink at={movesAt - 2} dur={14} style={{ left: 1010, top: y(CHEER_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, STAT_INK), fontWeight: 500 }}>and cheer the one that moved</span>
+          <span style={{ ...note(22, STAT_INK), fontWeight: 500 }}>and cheer the one that moved</span>
         </Ink>
       </div>
     </AbsoluteFill>

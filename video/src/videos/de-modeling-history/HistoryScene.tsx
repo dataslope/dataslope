@@ -112,7 +112,7 @@ export const HistoryScene: React.FC = () => {
           How do you preserve history when a dimension attribute changes?
         </QuestionCard>
         <Note at={scdAt} x={X0} y={y(268)}>
-          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
             A slowly changing dimension, an <b style={{ color: INK }}>SCD</b>
             <span style={{ opacity: ease(frame, threeAt, 10) }}>: three classic types, on customer <Num>42</Num></span>
           </span>
@@ -124,7 +124,7 @@ export const HistoryScene: React.FC = () => {
         {bands.map((b, i) => (
           <Note key={b.name} at={threeAt + i * 5} x={X0} y={top(i) + h(40)}>
             <div style={{ opacity: 0.4 + 0.6 * ease(frame, b.at - 2, 12) }}>
-              <div style={{ ...note(34, i === 1 && lit > 0.5 ? OK_INK : INK), fontWeight: 500, whiteSpace: "nowrap", marginLeft: i === 1 ? "-0.14em" : undefined }}>
+              <div style={{ ...note(32, i === 1 && lit > 0.5 ? OK_INK : INK), fontWeight: 500, whiteSpace: "nowrap", marginLeft: i === 1 ? "-0.14em" : undefined }}>
                 {i === 1 ? (
                   <Mark at={standardAt} color={MARK_OK}>
                     {b.name}
@@ -133,17 +133,17 @@ export const HistoryScene: React.FC = () => {
                   b.name
                 )}
               </div>
-              <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{b.what}</div>
+              <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{b.what}</div>
             </div>
           </Note>
         ))}
         {/* The verdict: Type 2 marked in the right answer's green as the
             standard, Type 1 kept for typos. */}
         <Note at={standardAt + 6} x={X0} y={top(1) + h(VERDICT)}>
-          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the standard</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the standard</span>
         </Note>
         <Note at={typoAt - 2} x={X0} y={top(0) + h(VERDICT)}>
-          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>right for a typo</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>right for a typo</span>
         </Note>
 
         {/* ── Type 1 ── */}
@@ -172,7 +172,7 @@ export const HistoryScene: React.FC = () => {
           ]}
         />
         <Note at={movedAt + 4} x={go1.right + 30} y={go1.rowTop(0) + h(4)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             placed in Boston,
             <br />
             now counted for Austin
@@ -244,7 +244,7 @@ export const HistoryScene: React.FC = () => {
           </span>
         </Note>
         <Note at={againAt + 2} x={g3.right + 40} y={g3.rowTop(0) - h(44)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>then a second move, to Denver</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>then a second move, to Denver</span>
         </Note>
       </Drift>
     </AbsoluteFill>

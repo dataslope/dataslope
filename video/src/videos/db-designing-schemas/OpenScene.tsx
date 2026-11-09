@@ -92,7 +92,7 @@ export const OpenScene: React.FC = () => {
               opacity: ease(frame, couldAt - 6, 12),
               clipPath: `inset(0 ${(1 - ease(frame, couldAt - 6, 16)) * 100}% 0 0)`,
               fontFamily: MONO,
-              fontSize: 28,
+              fontSize: 30,
               whiteSpace: "pre",
               minWidth: 470,
             }}
@@ -107,10 +107,10 @@ export const OpenScene: React.FC = () => {
           </div>
         ) : null}
         <Ink at={guessAt - 2} dur={16} style={{ left: 484, top: y(690), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(34, true), color: ACCENT_INK }}>a first guess</span>
+          <span style={{ ...body(32, true), color: ACCENT_INK }}>a first guess</span>
         </Ink>
         <Ink at={storeAt - 2} dur={14} style={{ left: 150, top: y(786), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(28, true), color: INK_SOFT }}>an online store</span>
+          <span style={{ ...body(26, true), color: INK_SOFT }}>an online store</span>
         </Ink>
       </div>
     </AbsoluteFill>

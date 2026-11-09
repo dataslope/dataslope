@@ -93,13 +93,13 @@ const Window: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={at} x={R_X} y={c.T}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           <QMono>GROUP BY</QMono>: {RAPID.sales} rows in, {G.rows.length} out
         </span>
       </Note>
       <DataTable g={gg} cols={colsOf(G)} at={fourAt - 4} rows={rowsAt(G.rows, fourAt, 3)} dim={keepsAt} />
       <Note at={keepsAt} x={R_X + 360} y={c.T}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           <QMono>OVER (PARTITION BY region)</QMono>: all {RAPID.sales} kept
         </span>
       </Note>
@@ -111,7 +111,7 @@ const Window: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={W.rows.map((_, row) => ({ row, col: total, at: besideAt + 2 + row * 2, color: MARK_OK }))}
       />
       <Note at={keepsAt + 18} x={R_X + 360} y={wg.rowTop(W.rows.length) + c.h(10)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>…and {RAPID.sales - W.rows.length} more rows</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>…and {RAPID.sales - W.rows.length} more rows</span>
       </Note>
     </>
   );
@@ -147,7 +147,7 @@ const Rank: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={arbitraryAt + 6} x={R_X} y={g.rowTop(R.rows.length) + c.h(18)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           <QMono>ROW_NUMBER</QMono> on a tie: {ties.map((row) => R.rows[row][name]).join(" or ")} could be {R.rows[ties[0]][col("row_number")]}
         </span>
       </Note>
@@ -237,7 +237,7 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={nums.map((t, row) => ({ row, col: rt, at: t, color: MARK_OK }))}
       />
       <Note at={frameAt} x={R_X} y={g.rowTop(R.rows.length) + c.h(18)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           the frame by default: <QMono>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</QMono>
         </span>
       </Note>
@@ -283,7 +283,7 @@ const Latest: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <DataTable g={g} cols={colsOf(L)} at={oneAt - 2} rows={rowsAt(L.rows, oneAt + 2)} />
       <Note at={twelveAt} x={g.right + 24} y={g.rowTop(0)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
           {RAPID.orders} orders in,
           <br />
           {RAPID.latest.rows.length} rows out:
@@ -321,7 +321,7 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <DataTable g={g} cols={colsOf(P, { mobile: { ink: BLUE_INK }, desktop: { ink: BLUE_INK } })} at={desktopAt + 4} rows={rowsAt(P.rows, regionAt)} />
       <Note at={desktopAt + 6} x={g.right + 24} y={g.rowTop(0)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           the video&rsquo;s own
           <br />
           traffic table
@@ -363,7 +363,7 @@ const Count: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={eightAt} x={g.right + 24} y={g.rowTop(0)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           the video&rsquo;s own
           <br />8 page views
         </span>

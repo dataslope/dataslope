@@ -89,7 +89,7 @@ export const CollapseScene: React.FC = () => {
       />
       <Axis scale={HIST_X} base={base} ticks={TICKS} format={(v) => (v === 0 ? "0" : dec(v, v % 1 ? 1 : 0))} at={start - 2} size={20} />
       <Note at={start - 2} x={(HIST_X.x0 + HIST_X.x1) / 2} y={base + 48} style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Correlation of the two series in a pair, r</span>
+        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Correlation of the two series in a pair, r</span>
       </Note>
 
       <Layer opacity={cut}>
@@ -109,10 +109,10 @@ export const CollapseScene: React.FC = () => {
 
       {/* Before and after, as a small table. */}
       <Note at={start} x={COL[1]} y={row(0) - 58}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Walks</span>
+        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Walks</span>
       </Note>
       <Note at={sameAt} x={COL[2]} y={row(0) - 58}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Differences</span>
+        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Differences</span>
       </Note>
       <Layer opacity={ease(frame, start, 12)}>
         <line x1={TABLE_X} x2={TABLE_X + TABLE_W} y1={row(0) - 18} y2={row(0) - 18} stroke={INK} strokeWidth={1.6} />
@@ -140,7 +140,7 @@ export const CollapseScene: React.FC = () => {
       </Note>
 
       <Note at={sevenAt} x={COL[0]} y={row(1)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Past ±{CUT}</span>
+        <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>Past ±{CUT}</span>
       </Note>
       <Note at={sevenAt + 2} x={COL[1]} y={row(1) - 6}>
         <span style={{ ...headline(44), color: ACCENT_INK }}>{pct(SHARE.walks25)}</span>
@@ -148,7 +148,7 @@ export const CollapseScene: React.FC = () => {
       {/* The count, and what it is out of on a line under it: one size per line. */}
       <Note at={twoAt} x={COL[2]} y={row(1) - 6}>
         <div style={{ ...headline(44), color: COLOR_INK.a }}>{DIFFS_PAST_25}</div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>of {PAIRS.toLocaleString("en-US")}</div>
+        <div style={{ ...note(20, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>of {PAIRS.toLocaleString("en-US")}</div>
       </Note>
 
       <Note at={sameAt + 20} x={TABLE_X} y={row(2) + LEGEND_DROP} width={TABLE_W}>

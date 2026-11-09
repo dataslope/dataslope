@@ -159,10 +159,10 @@ export const CompositeScene: React.FC = () => {
           <Svg>
             <g opacity={ease(frame, sortsAt, 12)}>
               <line x1={lastX} x2={lastX + bookW} y1={bookTop} y2={bookTop} stroke={INK} strokeWidth={2} />
-              <text x={lastX + 16} y={bookTop + 30} style={svgText(label(24, ease(frame, lastAt, 8) > 0.5 ? INK : INK_SOFT))}>
+              <text x={lastX + 16} y={bookTop + 30} style={svgText(label(21, ease(frame, lastAt, 8) > 0.5 ? INK : INK_SOFT))}>
                 last name
               </text>
-              <text x={firstX + 16} y={bookTop + 30} style={svgText(label(24, ease(frame, firstAt, 8) > 0.5 ? INK : INK_SOFT))}>
+              <text x={firstX + 16} y={bookTop + 30} style={svgText(label(21, ease(frame, firstAt, 8) > 0.5 ? INK : INK_SOFT))}>
                 first name
               </text>
               <line x1={lastX} x2={lastX + bookW} y1={bookTop + 44} y2={bookTop + 44} stroke={HAIRLINE} strokeWidth={1} />
@@ -181,10 +181,10 @@ export const CompositeScene: React.FC = () => {
                 <g key={i} opacity={p}>
                   <rect x={lastX + 4} y={rowTop(i) + 3} width={bookW - 8} height={h(BOOK_ROW) - 6} rx={3} fill={band} />
                   {i > 0 ? <line x1={lastX} x2={lastX + bookW} y1={rowTop(i)} y2={rowTop(i)} stroke={`color-mix(in srgb, ${INK} 14%, transparent)`} /> : null}
-                  <text x={lastX + 16} y={rowMid(i) + 8} style={svgText({ ...note(24, groupStart ? INK : INK_SOFT), fontWeight: groupStart ? 500 : 500 })}>
+                  <text x={lastX + 16} y={rowMid(i) + 8} style={svgText({ ...note(23, groupStart ? INK : INK_SOFT), fontWeight: groupStart ? 500 : 500 })}>
                     {last}
                   </text>
-                  <text x={firstX + 16} y={rowMid(i) + 8} style={svgText(note(24, INK))}>
+                  <text x={firstX + 16} y={rowMid(i) + 8} style={svgText(note(23, INK))}>
                     {first}
                   </text>
                   {groupStart ? (
@@ -205,7 +205,7 @@ export const CompositeScene: React.FC = () => {
             <line x1={lastX} x2={lastX + bookW} y1={rowTop(BOOK.length)} y2={rowTop(BOOK.length)} stroke={INK} strokeWidth={1.5} opacity={ease(frame, sortsAt + 20, 10)} />
           </Svg>
           <Note at={secondAt + 6} x={lastX + bookW + 40} y={rowTop(0) - h(2)}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>sorted by last name; within each, by first</span>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>sorted by last name; within each, by first</span>
           </Note>
           <Note at={everyLoveAt + 2} x={720} y={rowMid(loves[0]) - h(64)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -236,17 +236,17 @@ export const CompositeScene: React.FC = () => {
 
         {/* ── The strip: the index's entries, in index order ── */}
         <Note at={runAt + 4} x={STRIP_X} y={stripY - h(80)} out={swapAt - 2}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             index entries in order: <span style={{ color: INK }}>by customer, then time</span>
           </span>
         </Note>
         <Note at={swapAt + 4} x={STRIP_X} y={stripY - h(80)} out={skipAt - 2}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             index entries in order: <span style={{ color: INK }}>by time, then customer</span>
           </span>
         </Note>
         <Note at={statusAt} x={STRIP_X} y={stripY - h(80)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             index entries in order: <span style={{ color: INK }}>by status, then time</span>
           </span>
         </Note>
@@ -275,7 +275,7 @@ export const CompositeScene: React.FC = () => {
                   const fill = read > 0 ? inkOf.yellow : day > 0 ? ACCENT : lit42 > 0 ? BAR : `color-mix(in srgb, ${BAR} 45%, ${PAPER})`;
                   return <rect key={k} x={tick(g, k) - 2.5} y={stripY + 10} width={5} height={stripH - 20} rx={2} fill={fill} />;
                 })}
-                <text x={STRIP_X + g * groupW + groupW / 2} y={stripY + stripH + 30} textAnchor="middle" style={svgText({ ...label(24, g === g42 ? INK : INK_SOFT), fontWeight: g === g42 ? 500 : 500 })}>
+                <text x={STRIP_X + g * groupW + groupW / 2} y={stripY + stripH + 30} textAnchor="middle" style={svgText({ ...label(20, g === g42 ? INK : INK_SOFT), fontWeight: g === g42 ? 500 : 500 })}>
                   {c}
                 </text>
               </g>
@@ -308,10 +308,10 @@ export const CompositeScene: React.FC = () => {
               fill={`color-mix(in srgb, ${ACCENT} 18%, transparent)`}
               style={{ transform: `translateX(${(1 - ease(frame, sameAt + 6, 26)) * (STRIP_X + STRIP_W - timeX(latestFrom) + 6)}px)` }}
             />
-            <text x={STRIP_X} y={stripY + stripH + 30} style={svgText(label(24, INK_SOFT))}>
+            <text x={STRIP_X} y={stripY + stripH + 30} style={svgText(label(20, INK_SOFT))}>
               January 2024
             </text>
-            <text x={STRIP_X + STRIP_W} y={stripY + stripH + 30} textAnchor="end" style={svgText(label(24, INK_SOFT))}>
+            <text x={STRIP_X + STRIP_W} y={stripY + stripH + 30} textAnchor="end" style={svgText(label(20, INK_SOFT))}>
               December
             </text>
           </g>
@@ -323,7 +323,7 @@ export const CompositeScene: React.FC = () => {
                 {r > 0 ? <line x1={STRIP_X + r * runW} x2={STRIP_X + r * runW} y1={stripY - 6} y2={stripY + stripH + 6} stroke={INK_SOFT} strokeWidth={1.5} /> : null}
                 <rect x={STRIP_X + r * runW + 10} y={stripY + 12} width={runW - 46} height={stripH - 24} rx={3} fill={`color-mix(in srgb, ${BAR} 30%, ${PAPER})`} />
                 <rect x={STRIP_X + (r + 1) * runW - 30} y={stripY + 8} width={18} height={stripH - 16} rx={3} fill={ease(frame, fiveAt + 4 + r * 4, 8) > 0.5 ? OK : `color-mix(in srgb, ${BAR} 60%, ${PAPER})`} />
-                <text x={STRIP_X + r * runW + runW / 2} y={stripY + stripH + 30} textAnchor="middle" style={svgText(label(24, INK_SOFT))}>
+                <text x={STRIP_X + r * runW + runW / 2} y={stripY + stripH + 30} textAnchor="middle" style={svgText(label(20, INK_SOFT))}>
                   {s}
                 </text>
               </g>
@@ -378,7 +378,7 @@ export const CompositeScene: React.FC = () => {
         ]} />
         <Note at={skipAt + 2} x={NOTE_X} y={planTop + h(4)}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Postgres: skip scan</div>
-          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, fewAt, 10) }}>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, fewAt, 10) }}>
             when <SmallMono>status</SmallMono> has few values
           </div>
           <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, neverAt, 10) }}>never touched the table</div>

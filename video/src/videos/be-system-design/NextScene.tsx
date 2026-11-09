@@ -156,9 +156,9 @@ export const NextScene: React.FC = () => {
             redirects a second
           </span>
         </div>
-        <div style={{ position: "absolute", left: textX, top: y(530), display: "flex", alignItems: "center", gap: 14, fontSize: 28, opacity: ease(frame, noneAt, 12) }}>
+        <div style={{ position: "absolute", left: textX, top: y(530), display: "flex", alignItems: "center", gap: 14, fontSize: 26, opacity: ease(frame, noneAt, 12) }}>
           {frame >= noneAt ? <Tick at={noneAt + 4} size={28} /> : <span style={{ width: 28 }} />}
-          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no single point of failure</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no single point of failure</span>
         </div>
 
         <Spot id="crow" at={firstAt + 10} left={1372} top={y(330)} width={crowW} height={crowH} />

@@ -152,7 +152,7 @@ export const Bars: React.FC<{
                 top: mid - 16,
                 width: nameW - 20,
                 textAlign: "right",
-                ...label(24, INK),
+                ...label(23, INK),
                 opacity: ease(frame, b.at - 4, 10),
                 whiteSpace: "nowrap",
               }}

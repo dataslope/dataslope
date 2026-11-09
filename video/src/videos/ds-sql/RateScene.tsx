@@ -81,7 +81,7 @@ export const RateScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── Right: the data ── */}
-        <div style={{ position: "absolute", left: DATA_X, top: y(TOP), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, fourAt - 4, 12) }}>
+        <div style={{ position: "absolute", left: DATA_X, top: y(TOP), ...label(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, fourAt - 4, 12) }}>
           The page&rsquo;s funnel: {RATE.noSessions} of {RATE.variants} variants have no sessions
         </div>
         <DataTable
@@ -97,7 +97,7 @@ export const RateScene: React.FC = () => {
         />
 
         {/* ── Left: Postgres ── */}
-        <div style={{ position: "absolute", left: X0, top: y(TOP), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, pgAt - 4, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(TOP), ...label(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, pgAt - 4, 12) }}>
           The same table, in Postgres
         </div>
         <Listing lines={RATE.pgBare.lines} x={X0} top={pgTop} width={640} size={PG_SIZE} at={pgAt - 2} out={wrapAt - 2} marks={[{ line: 0, at: pgAt + 8 }]} />
@@ -153,7 +153,7 @@ export const RateScene: React.FC = () => {
           swaps={T.rows.map((_, row) => ({ row, col: 1, at: twelveAt + row * 3, value: fixedA[row], color: OK_INK }))}
         />
         <Note at={multAt} x={tg.right + 28} y={tg.rowTop(0)}>
-          <span style={{ ...note(28, OK_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap" }}>
             <QMono>conversions * 1.0 / …</QMono>
           </span>
         </Note>

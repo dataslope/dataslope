@@ -134,7 +134,7 @@ export const MistakesScene: React.FC = () => {
 
   const running = (at: number, out: number | undefined, k: number, text: string) => (
     <Note at={at} x={X0} y={y(TOP) - h(92)} out={out}>
-      <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+      <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
         <span style={{ ...label(24, INK_SOFT) }}>
           <Num>{k}</Num> ·
         </span>{" "}
@@ -188,13 +188,13 @@ export const MistakesScene: React.FC = () => {
           </span>
         </Note>
         <Note at={totalAt + 2} x={X0} y={notesTop + h(60)} out={outA}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>order 5 is cancelled: out of both totals</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>order 5 is cancelled: out of both totals</span>
         </Note>
         {/* Why half-open, not an end one second before midnight (check.mjs's lastSecond). */}
         <Note at={precisionAt - 2} x={X0} y={notesTop + h(100)} out={outA}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             half-open is right at any precision
-            <span style={{ ...note(24, INK), fontWeight: 400, opacity: ease(frame, secondAt - 2, 10) }}>
+            <span style={{ ...note(23, INK), fontWeight: 400, opacity: ease(frame, secondAt - 2, 10) }}>
               : an end at <Mono>{last[0].slice(11, 19)}</Mono> still drops <Mono color={ACCENT_INK}>{lastTime}</Mono>
             </span>
           </span>
@@ -228,7 +228,7 @@ export const MistakesScene: React.FC = () => {
           ]}
         />
         <Note at={halfAt - 2} x={LIST_X} y={pg.rowTop(1) + h(18)} out={outA}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             the assistant misses <Num>{BOUNDARY.missed}%</Num> of January&apos;s revenue
           </span>
         </Note>
@@ -249,7 +249,7 @@ export const MistakesScene: React.FC = () => {
         />
         <DataTable g={ag} cols={colsOf(RATIOS.averaged)} at={averageAt + 4} rows={rowsAt(RATIOS.averaged.rows, twentySixAt - 2)} marks={[{ row: 0, col: 0, at: twentySixAt + 4, color: MARK_BAD }]} />
         <Note at={countsAt - 2} x={X0} y={avgTop + avgH + h(12)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             a {small}-session day counts as much as a {large}-session one
           </span>
         </Note>
@@ -267,7 +267,7 @@ export const MistakesScene: React.FC = () => {
         {/* ── The page's whole list: four silent, one loud ── */}
         {rest.map((r, i) => (
           <Note key={r.text} at={r.at} x={REST_X} y={restTop + i * pitch}>
-            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
               <span style={{ ...label(24, INK_SOFT), marginRight: 12 }}>
                 <Num>{i + 1}</Num>
               </span>
@@ -294,7 +294,7 @@ export const MistakesScene: React.FC = () => {
           <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the silent ones are the danger</span>
         </Note>
         <Note at={inventedAt - 2} x={REST_X} y={loudY}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <span style={{ ...label(24, INK_SOFT), marginRight: 12 }}>
               <Num>5</Num>
             </span>
@@ -302,7 +302,7 @@ export const MistakesScene: React.FC = () => {
           </span>
         </Note>
         <Note at={loudAt - 2} x={REST_X + 26} y={loudY + h(40)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>they fail loudly: the harmless kind</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>they fail loudly: the harmless kind</span>
         </Note>
       </Drift>
     </AbsoluteFill>

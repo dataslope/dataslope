@@ -120,14 +120,14 @@ export const ValueGrid: React.FC<{
             right: 1920 - scale.x0 + 16,
             top: yOf(v) - 14,
             opacity: t,
-            ...note(24, INK_SOFT),
+            ...note(20, INK_SOFT),
           }}
         >
           {v < 0 ? `−${-v}` : v}
         </div>
       ))}
       {title ? (
-        <div style={{ position: "absolute", left: scale.x0, top: yOf(spec.hi) - 44, opacity: t, ...note(24, INK_SOFT) }}>
+        <div style={{ position: "absolute", left: scale.x0, top: yOf(spec.hi) - 44, opacity: t, ...note(20, INK_SOFT) }}>
           {title}
         </div>
       ) : null}

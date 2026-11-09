@@ -86,7 +86,7 @@ export const CorrScene: React.FC = () => {
 
         {/* ── The page's correlated subquery, and its plan in Postgres ── */}
         <Note at={avgAt - 4} x={X0} y={y(TOP) - h(46)} out={fixOut}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
             A classic example, on <Num>{thousands(CORR.employees)}</Num> employees in {CORR.departments} departments
           </span>
         </Note>
@@ -117,8 +117,8 @@ export const CorrScene: React.FC = () => {
           ]}
         />
         <Note at={perRowAt} x={R_X} y={y(TOP)} out={countOut}>
-          <div style={{ ...label(24, INK_SOFT) }}>rows read</div>
-          <div style={{ ...note(28, INK), whiteSpace: "nowrap", marginTop: h(10) }}>
+          <div style={{ ...label(21, INK_SOFT) }}>rows read</div>
+          <div style={{ ...note(30, INK), whiteSpace: "nowrap", marginTop: h(10) }}>
             <Num>{thousands(CORR.loops)}</Num> runs
             <span style={{ opacity: ease(frame, scanAt, 10) }}>
               {" "}
@@ -149,16 +149,16 @@ export const CorrScene: React.FC = () => {
         />
         {/* What each form reads: the count from before, and the rewrite's. */}
         <Note at={twiceAt} x={X0} y={y(TOP) + planHeight(CORR.rewritePlan.length, PLAN) + h(36)}>
-          <div style={{ ...label(24, INK_SOFT) }}>rows read</div>
-          <div style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, twentyAt, 10) }}>
+          <div style={{ ...label(21, INK_SOFT) }}>rows read</div>
+          <div style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, twentyAt, 10) }}>
             rewrite: {CORR.rewriteScans} scans × <Num>{thousands(scanRows)}</Num> = <Num>{thousands(rewriteRead)}</Num>
           </div>
-          <div style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap", marginTop: h(6), opacity: ease(frame, notAt, 10) }}>
+          <div style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap", marginTop: h(6), opacity: ease(frame, notAt, 10) }}>
             correlated: <Num>{thousands(CORR.loops)}</Num> × <Num>{thousands(CORR.perLoop)}</Num> = <Num>{thousands(total)}</Num>
           </div>
         </Note>
         <Note at={onceAt} x={R_X} y={rewriteTop - h(46)}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>The usual rewrite</span>
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>The usual rewrite</span>
         </Note>
         <Listing lines={CORR.rewrite} x={R_X} top={rewriteTop} width={640} size={20} at={onceAt} marks={[{ line: "WITH dept_avgs", at: cteAt + 4, color: MARK_OK }]} />
         <Note at={sameAt + 4} x={R_X} y={rewriteTop + listingHeight(CORR.rewrite.length, 20) + h(18)}>
@@ -168,7 +168,7 @@ export const CorrScene: React.FC = () => {
           </span>
         </Note>
         <Note at={windowAt} x={R_X} y={rewriteTop + listingHeight(CORR.rewrite.length, 20) + h(62)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             or <SmallMono>AVG(salary) OVER (PARTITION BY department)</SmallMono>
           </span>
         </Note>
@@ -176,17 +176,17 @@ export const CorrScene: React.FC = () => {
         {/* ── DuckDB decorrelates it on its own ── */}
         <Note at={someAt} x={R_X} y={duckTop}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Some optimizers rewrite it themselves.</div>
-          <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, duckAt, 10) }}>
+          <div style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, duckAt, 10) }}>
             DuckDB {CORR.duckVersion}, the original query&rsquo;s plan:
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: h(12) }}>
             {ops.map((op, i) => (
               <React.Fragment key={op}>
-                {i > 0 ? <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, asHashAt - 4 + i * 4, 10) }}>{i === 1 ? "of" : "and"}</span> : null}
+                {i > 0 ? <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, asHashAt - 4 + i * 4, 10) }}>{i === 1 ? "of" : "and"}</span> : null}
                 <span
                   style={{
                     fontFamily: MONO,
-                    fontSize: 24,
+                    fontSize: 21,
                     fontWeight: op === "HASH_JOIN" ? 500 : 500,
                     color: op === "HASH_JOIN" ? OK_INK : INK,
                     opacity: ease(frame, asHashAt - 4 + i * 4, 10),

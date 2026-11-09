@@ -206,10 +206,10 @@ export const SeriesScene: React.FC = () => {
                   transform: `translateY(${(1 - pIn) * 10}px)`,
                 }}
               >
-                <div style={label(24, BLUE_INK)}>
+                <div style={label(19, BLUE_INK)}>
                   Part <Num>{p.n}</Num>
                 </div>
-                <div style={{ ...note(24, INK), fontWeight: 500, marginTop: 2, lineHeight: 1.15, textWrap: "balance" }}>{p.title}</div>
+                <div style={{ ...note(21, INK), fontWeight: 500, marginTop: 2, lineHeight: 1.15, textWrap: "balance" }}>{p.title}</div>
               </div>
               <Spot
                 video={p.video}

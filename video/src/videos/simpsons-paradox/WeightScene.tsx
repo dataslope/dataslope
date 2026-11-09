@@ -82,7 +82,7 @@ export const WeightScene: React.FC = () => {
           <React.Fragment key={r.mix}>
             <Ink at={at} dur={14} style={{ left: 120, top: top + 2, whiteSpace: "nowrap" }}>
               <div style={{ ...body(28), color: INK, lineHeight: 1.15 }}>{r.head}</div>
-              <div style={{ ...note(24, INK_SOFT), marginTop: 4 }}>{r.sub}</div>
+              <div style={{ ...note(20, INK_SOFT), marginTop: 4 }}>{r.sub}</div>
             </Ink>
             <Note at={at + 6} x={120} y={top + 82}>
               <MixStrip group={r.mix} x={0} top={0} width={240} />
@@ -114,7 +114,7 @@ export const WeightScene: React.FC = () => {
 
       {/* The leaning: almost all of the women's weight sat on C to F. */}
       <Note at={leanedAt - 2} x={SCALE.x0 + 14} y={y(ROWS[0].top) + h(BAR_H) + 12}>
-        <span style={note(24, COLOR_INK.women)}>
+        <span style={note(22, COLOR_INK.women)}>
           <b>{pct(1 - EASY_SHARE.women, 0)}</b> of the weight on C to F, the four hardest
         </span>
       </Note>
@@ -132,10 +132,10 @@ export const WeightScene: React.FC = () => {
         />
       </svg>
       <Note at={weightedAt + 6} x={menX} y={y(328)} align="left" style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...label(24, COLOR_INK.men), whiteSpace: "nowrap" }}>Men, {pct(TOTAL.men.rate)}</span>
+        <span style={{ ...label(21, COLOR_INK.men), whiteSpace: "nowrap" }}>Men, {pct(TOTAL.men.rate)}</span>
       </Note>
       <Note at={aheadAt} x={px(WOMEN_AT_MEN_MIX) + 190} y={y(ROWS[1].top) + h(BAR_H) / 2 - 14}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           {((WOMEN_AT_MEN_MIX - TOTAL.men.rate) * 100).toFixed(1)} points ahead of the men
         </span>
       </Note>

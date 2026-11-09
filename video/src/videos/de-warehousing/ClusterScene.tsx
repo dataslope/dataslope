@@ -104,7 +104,7 @@ export const ClusterScene: React.FC = () => {
               strokeOpacity={0.25}
             />
             {labels && hit ? (
-              <text x={x1 + 10} y={yy + h(BAR_H) - 2} style={svgText(label(24, INK))} opacity={ease(frame, readAt + 6, 10)}>
+              <text x={x1 + 10} y={yy + h(BAR_H) - 2} style={svgText(label(19, INK))} opacity={ease(frame, readAt + 6, 10)}>
                 {short(g.lo)} to {short(g.hi)}
               </text>
             ) : null}
@@ -127,13 +127,13 @@ export const ClusterScene: React.FC = () => {
           What is clustering (or sorting) within a partition?
         </QuestionCard>
         <Note at={ordersAt} x={X0} y={y(244)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             Rows ordered inside the files
             <span style={{ opacity: ease(frame, likeAt, 10) }}>, so like values sit together.</span>
           </span>
         </Note>
         <Note at={minmaxAt} x={X0} y={y(278)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             Every column&apos;s minimum and maximum
             <span style={{ opacity: ease(frame, groupAt, 10) }}>, kept for each row group</span>
             <span style={{ opacity: ease(frame, rowsCueAt, 10) }}>
@@ -158,7 +158,7 @@ export const ClusterScene: React.FC = () => {
             {MONTH_NAMES.map((m, i) => (
               <g key={m} opacity={ease(frame, ordersAt + 4 + i * 2, 10)}>
                 <line x1={xOf(monthStart(i))} x2={xOf(monthStart(i))} y1={y(MONTHS_Y) + 4} y2={y(MONTHS_Y) + 28} stroke={INK} strokeOpacity={0.35} />
-                <text x={xOf(monthStart(i)) + 6} y={y(MONTHS_Y) + 22} style={svgText(label(24, INK_SOFT))}>
+                <text x={xOf(monthStart(i)) + 6} y={y(MONTHS_Y) + 22} style={svgText(label(19, INK_SOFT))}>
                   {m}
                 </text>
               </g>
@@ -166,15 +166,15 @@ export const ClusterScene: React.FC = () => {
           </g>
         </svg>
         <Note at={marchAt + 4} x={bandX0} y={y(SHUFFLED_Y) + 9 * h(STEP) + h(12)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>
             <QCode>WHERE sale_date BETWEEN</QCode> March 1 <QCode>AND</QCode> March 31
           </span>
         </Note>
 
         {/* ── In date order ── */}
         <div style={{ position: "absolute", left: X0, top: y(SORTED_Y) - 4, width: AX0 - X0 - 20, opacity: ease(frame, likeAt - 2, 12) }}>
-          <div style={{ ...label(24, INK) }}>in date order</div>
-          <div style={{ ...note(24, INK_SOFT), marginTop: 4, opacity: ease(frame, weeksAt, 10) }}>
+          <div style={{ ...label(23, INK) }}>in date order</div>
+          <div style={{ ...note(20, INK_SOFT), marginTop: 4, opacity: ease(frame, weeksAt, 10) }}>
             <Num>{CLUSTER.sorted.groups.length}</Num> row groups, about six weeks each
           </div>
         </div>
@@ -183,25 +183,25 @@ export const ClusterScene: React.FC = () => {
           <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{CLUSTER.sorted.overlapping}</Num> of <Num>{CLUSTER.sorted.groups.length}</Num> groups read
           </div>
-          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <Num>{MB(CLUSTER.sorted.read, 2)}</Num> read
           </div>
         </div>
 
         {/* ── Shuffled ── */}
         <div style={{ position: "absolute", left: X0, top: y(SHUFFLED_Y) - 4, width: AX0 - X0 - 20, opacity: ease(frame, shuffleAt, 12) }}>
-          <div style={{ ...label(24, INK) }}>shuffled</div>
-          <div style={{ ...note(24, INK_SOFT), marginTop: 4, opacity: ease(frame, yearAt, 10) }}>every group spans the year</div>
+          <div style={{ ...label(23, INK) }}>shuffled</div>
+          <div style={{ ...note(20, INK_SOFT), marginTop: 4, opacity: ease(frame, yearAt, 10) }}>every group spans the year</div>
         </div>
         {panel(SHUFFLED_Y, CLUSTER.shuffled.groups, shuffleAt + 4, nothingAt, ACCENT, false, STEP)}
         <div style={{ position: "absolute", left: RIGHT, top: y(SHUFFLED_Y) + h(STEP) * 2, opacity: ease(frame, nothingAt + 4, 12) }}>
           <div style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{CLUSTER.shuffled.overlapping}</Num> of <Num>{CLUSTER.shuffled.groups.length}</Num> groups read
           </div>
-          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <Num>{MB(CLUSTER.shuffled.read, 2)}</Num> read
           </div>
-          <div style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, fiveAt, 10) }}>
+          <div style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, fiveAt, 10) }}>
             <Num>{Math.round(ratio)}</Num> times as much
           </div>
         </div>

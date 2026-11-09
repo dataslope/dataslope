@@ -116,7 +116,7 @@ export const SchemaScene: React.FC = () => {
       {WRITERS.map((w, i) => (
         <React.Fragment key={w}>
           <Ink at={everyAt + i * 4} dur={12} out={errorAt} style={{ left: wx(i), top: wy, width: 120, textAlign: "center" }}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{w}</span>
+            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>{w}</span>
           </Ink>
           <Arrow
             from={[wx(i) + 60, wy - 8]}

@@ -89,7 +89,7 @@ const Pass: React.FC<{ x: number; top: number; at: number; label: string; spent?
           position: "absolute",
           left: x + ROWS * PITCH + 6,
           top: top + BLOCK / 2 - 15,
-          ...note(24, INK_SOFT),
+          ...note(22, INK_SOFT),
           whiteSpace: "nowrap",
           opacity: ease(frame, at - 10, 10),
         }}
@@ -201,7 +201,7 @@ export const IterScene: React.FC = () => {
         <Note at={iterableAt - 2} x={X0} y={defTop} out={outDefs}>
           <span style={{ display: "flex", gap: 36, alignItems: "baseline", whiteSpace: "nowrap" }}>
             <Title size={26}>iterable</Title>
-            <span style={{ ...note(24, INK_SOFT) }}>
+            <span style={{ ...note(22, INK_SOFT) }}>
               <Mono>list</Mono>, <Mono>dict</Mono>
             </span>
           </span>
@@ -221,7 +221,7 @@ export const IterScene: React.FC = () => {
         <Note at={iteratorAt - 2} x={RIGHT_X} y={defTop} out={outDefs}>
           <span style={{ display: "flex", gap: 36, alignItems: "baseline", whiteSpace: "nowrap" }}>
             <Title size={26}>iterator</Title>
-            <span style={{ ...note(24, INK_SOFT) }}>
+            <span style={{ ...note(22, INK_SOFT) }}>
               a generator<span style={{ opacity: ease(useCurrentFrame(), fileAt, 10) }}>, an open file</span>
             </span>
           </span>
@@ -242,7 +242,7 @@ export const IterScene: React.FC = () => {
         <Pass x={RIGHT_X} top={row1} at={placeAt + 2} label="loop 1" spent out={outPasses} />
         {/* The second loop gets nothing: next() on a spent iterator raises. */}
         <Note at={stopAt - 6} x={RIGHT_X + ROWS * PITCH + 6} y={row2 + BLOCK / 2 - h(15)} out={outPasses}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>loop 2</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>loop 2</span>
         </Note>
         <Raised
           x={RIGHT_X}
@@ -267,7 +267,7 @@ export const IterScene: React.FC = () => {
           marks={[{ line: 0, at: fourAgainAt, color: MARK_OK }]}
         />
         <Note at={isAt} x={X0 + 330} y={twiceTop + liH + h(22)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mark at={newOneAt}>
               <Mono>iter(rows) is rows</Mono>: {ITER.list.isIter}
             </Mark>
@@ -287,7 +287,7 @@ export const IterScene: React.FC = () => {
           marks={[{ line: 0, at: zeroAt + 4, color: MARK_BAD }]}
         />
         <Note at={isAt} x={RIGHT_X + 330} y={twiceTop + liH + h(22)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mark at={itselfAt}>
               <Mono>iter(rows) is rows</Mono>: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>{ITER.gen.isIter}</span>
             </Mark>

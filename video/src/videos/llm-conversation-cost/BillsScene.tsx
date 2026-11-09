@@ -139,7 +139,7 @@ export const BillsScene: React.FC = () => {
               </>
             ) : null}
             <Note at={valueAt[k] - 4} x={BX + lineW + triW + 18} y={rowTop(k) + rowH / 2 - 19}>
-              <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR }}>{usd(b.plain)}</span>
+              <span style={{ ...note(30, INK), fontWeight: 500, ...TABULAR }}>{usd(b.plain)}</span>
             </Note>
           </React.Fragment>
         );
@@ -167,14 +167,14 @@ export const BillsScene: React.FC = () => {
       </Svg>
       {[2, 3, 4].map((r) => (
         <Note key={r} at={ratiosFrom + 2} x={nx(r) - 30} y={y(NY) + 16} width={60} style={{ textAlign: "center" }}>
-          <span style={{ ...label(24, INK_SOFT), ...TABULAR }}>{`×${r}`}</span>
+          <span style={{ ...label(22, INK_SOFT), ...TABULAR }}>{`×${r}`}</span>
         </Note>
       ))}
       <Note at={allLineAt - 2} x={nx(2) - 150} y={y(NY) + 52} width={300} style={{ textAlign: "center" }}>
-        <span style={{ ...note(24, LINE_EDGE), fontWeight: 500, whiteSpace: "nowrap" }}>all rectangle and replies</span>
+        <span style={{ ...note(22, LINE_EDGE), fontWeight: 500, whiteSpace: "nowrap" }}>all rectangle and replies</span>
       </Note>
       <Note at={allTriAt - 2} x={nx(4) - 100} y={y(NY) + 52} width={200} style={{ textAlign: "center" }}>
-        <span style={{ ...note(24, TRI_INK), fontWeight: 500, whiteSpace: "nowrap" }}>all triangle</span>
+        <span style={{ ...note(22, TRI_INK), fontWeight: 500, whiteSpace: "nowrap" }}>all triangle</span>
       </Note>
       {DOUBLINGS.map((d, k) => {
         const p = ease(frame, ratioAt[k] - 2, 10);
@@ -186,7 +186,7 @@ export const BillsScene: React.FC = () => {
               <circle cx={nx(d.times)} cy={y(NY)} r={10 * p + 6 * pulse(frame, longerAt - 2 + k * 9, 18)} fill={POINT} />
             </Svg>
             <Note at={ratioAt[k]} x={nx(d.times) - 90} y={y(NY) - 92} width={180} from="up" style={{ textAlign: "center" }}>
-              <span style={{ display: "block", ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+              <span style={{ display: "block", ...note(21, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
                 {d.from} to {d.to} turns
               </span>
               <span style={{ display: "block", ...note(28, POINT_INK), fontWeight: 500, ...TABULAR }}>{times(d.times)}</span>

@@ -54,7 +54,7 @@ export const RateScale: React.FC<{ x0: number; x1: number; top: number; at: numb
             top,
             transform: "translateX(-50%)",
             opacity: p,
-            ...note(24, INK_SOFT),
+            ...note(20, INK_SOFT),
           }}
         >
           {Math.round(s * 100)}%

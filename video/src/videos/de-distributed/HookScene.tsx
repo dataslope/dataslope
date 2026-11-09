@@ -96,7 +96,7 @@ export const HookScene: React.FC = () => {
           dim={giveAt + 20}
         />
         <Note at={fitsAt + 6} x={BOX_X + BOX_W + 14} y={y(BOX_BOTTOM) + h(20)} out={cutAt + 10}>
-          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>doesn&apos;t fit</span>
+          <span style={{ ...label(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>doesn&apos;t fit</span>
         </Note>
 
         {/* Six machines, a piece each. */}
@@ -112,7 +112,7 @@ export const HookScene: React.FC = () => {
               toneAt={k === SLOW ? slowAt : undefined}
             />
             <Note at={giveAt - 2 + k * 2} x={W_X + 16} y={workerMid(k) - 14}>
-              <span style={{ ...label(24, k === SLOW && slow > 0.5 ? ACCENT_INK : INK_SOFT), whiteSpace: "nowrap" }}>machine {k + 1}</span>
+              <span style={{ ...label(21, k === SLOW && slow > 0.5 ? ACCENT_INK : INK_SOFT), whiteSpace: "nowrap" }}>machine {k + 1}</span>
             </Note>
             <Curve from={[BOX_X + BOX_W + 6, y(485)]} to={[W_X - 8, workerMid(k)]} at={giveAt + k * 2} dur={16} color={INK_SOFT} width={1.6} head={11} />
             <Curve
@@ -161,22 +161,22 @@ export const HookScene: React.FC = () => {
         {/* One result. */}
         <Machine x={RES_X} top={y(RES_TOP)} width={RES_W} height={h(RES_H)} at={bringAt + 10} tone="ok" fill={`color-mix(in srgb, ${ds("green", 100)} 60%, ${PAPER})`} />
         <Note at={bringAt + 14} x={RES_X} y={resMid - 16} width={RES_W} align="left" style={{ textAlign: "center" }}>
-          <span style={{ ...label(24, OK_INK), fontWeight: 500 }}>one result</span>
+          <span style={{ ...label(23, OK_INK), fontWeight: 500 }}>one result</span>
         </Note>
 
         {/* What every answer turns on, where it happens. */}
         <Note at={splitAt - 2} x={BOX_X + BOX_W + 14} y={y(278)}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: INK }}>1</b> how the work is split
           </span>
         </Note>
         <Note at={netAt - 2} x={W_X + W_W + 20} y={y(278)}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: INK }}>2</b> what crosses the network
           </span>
         </Note>
         <Note at={slowAt - 2} x={W_X} y={y(W_TOP + 6 * W_PITCH) + h(4)}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: INK }}>3</b> a machine slow, or dead
           </span>
         </Note>

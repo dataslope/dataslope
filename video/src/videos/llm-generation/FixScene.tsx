@@ -42,7 +42,7 @@ const Badge: React.FC<{ kind: "yes" | "no" | number; at: number; x: number; y: n
         ) : kind === "no" ? (
           <path d="M-7,-7 L7,7 M7,-7 L-7,7" fill="none" stroke={PAPER} strokeWidth={4} strokeLinecap="round" />
         ) : (
-          <text y={11} textAnchor="middle" style={svgText({ ...body(28), color: String(NUMBER_BADGE.color), fontWeight: 500 })}>
+          <text y={11} textAnchor="middle" style={svgText({ ...body(31), color: String(NUMBER_BADGE.color), fontWeight: 500 })}>
             {kind}
           </text>
         )}
@@ -124,7 +124,7 @@ export const FixScene: React.FC = () => {
           <div style={{ ...body(28, true), color: INK }}>They land on right and wrong answers alike.</div>
         </Note>
         <Note at={insideAt - 2} x={X0 + 64} y={y(ROW_Y(2)) + 4} width={LEFT_W - 64}>
-          <div style={{ ...body(28, true), color: INK_SOFT }}>Nothing inside knows which answers are wrong.</div>
+          <div style={{ ...body(30, true), color: INK_SOFT }}>Nothing inside knows which answers are wrong.</div>
         </Note>
       </div>
 
@@ -164,17 +164,17 @@ export const FixScene: React.FC = () => {
             {/* The lesson's reason for each fix, held until the cut. */}
             {k < GLOSS.length ? (
               <Note at={itemAt[k] + 8} x={RIGHT_X + 64} y={y(ITEM_Y(k)) + 48}>
-                <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{GLOSS[k]}</span>
+                <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>{GLOSS[k]}</span>
               </Note>
             ) : null}
           </React.Fragment>
         );
       })}
       <Note at={easyAt - 2} x={RIGHT_X + 64} y={y(ITEM_Y(4)) + 6} width={760}>
-        <div style={{ ...body(28, true), color: GOOD_INK }}>An easy, honest continuation to pick instead.</div>
+        <div style={{ ...body(30, true), color: GOOD_INK }}>An easy, honest continuation to pick instead.</div>
       </Note>
       <Note at={limitsAt - 2} x={RIGHT_X + 64} y={y(ITEM_Y(5)) + 6} width={760}>
-        <div style={{ ...body(28, true), color: ACCENT_INK }}>And the window has limits of its own.</div>
+        <div style={{ ...body(30, true), color: ACCENT_INK }}>And the window has limits of its own.</div>
       </Note>
       </Drift>
     </AbsoluteFill>

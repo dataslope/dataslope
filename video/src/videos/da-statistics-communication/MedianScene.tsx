@@ -101,10 +101,10 @@ export const MedianScene: React.FC = () => {
           out={medianAt}
         />
         <Note at={tailAt + 4} x={tailFrom} y={y(BASE) - h(200)} out={medianAt}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>a long tail, past $100</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>a long tail, past $100</span>
         </Note>
         <Note at={smallAt} x={at(xs, 34)} y={y(TOP) + h(40)} out={medianAt}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>most are small</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>most are small</span>
         </Note>
 
         {/* ── Median, then mean ── */}
@@ -144,7 +144,7 @@ export const MedianScene: React.FC = () => {
           width={2.6}
         />
         <Note at={draggedAt + 6} x={ax + 190} y={y(TOP) + h(40)}>
-          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>dragged right by the tail</span>
+          <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>dragged right by the tail</span>
         </Note>
         <Note at={aboveAt - 2} x={ax + 30} y={y(TOP) + h(110)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
@@ -154,14 +154,14 @@ export const MedianScene: React.FC = () => {
 
         {/* When the mean is still the number: anything that has to add up. */}
         <Note at={totalAt - 2} x={ax + 30} y={y(TOP) + h(160)}>
-          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
             the mean for a total: revenue = mean order × orders
           </span>
         </Note>
         <Note at={incomeAt - 2} x={1180} y={y(TOP) + h(220)}>
-          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>also skewed: income, house prices,</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>also skewed: income, house prices,</span>
           <br />
-          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>session lengths</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>session lengths</span>
         </Note>
         <Bracket x0={mx} x1={ax} y={labelY - h(16)} up at={gapAt} color={INK}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the gap</span>

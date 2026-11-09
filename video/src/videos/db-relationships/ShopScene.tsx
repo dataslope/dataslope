@@ -217,7 +217,7 @@ export const ShopScene: React.FC = () => {
         />
         {/* The first key on two columns: said in a line, left to Unit 4. */}
         <Ink at={itemsAt + 24} dur={14} style={{ left: items.x, top: items.bottom + 14, whiteSpace: "nowrap" }}>
-          <span style={note(24, INK_SOFT)}>
+          <span style={note(21, INK_SOFT)}>
             Two PKs: <Mark at={nameAt + 15}>together, they name each row</Mark>.
           </span>
         </Ink>
@@ -238,7 +238,7 @@ export const ShopScene: React.FC = () => {
                 transform: i === 1 ? undefined : "translateX(-50%)",
                 opacity: ease(frame, readAt + i * 6 + 10, 12),
                 whiteSpace: "nowrap",
-                ...note(24, INK_SOFT),
+                ...note(21, INK_SOFT),
                 ...halo,
               }}
             >
@@ -263,8 +263,8 @@ export const ShopScene: React.FC = () => {
               style={{ left: TEXT_X, top: y(SENT_Y + i * SENT_STEP), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}
             >
               {/* The number in its sentence's own face and size, set apart by color and weight. */}
-              <span style={{ ...body(34), color: ACCENT_INK, fontWeight: 500 }}>{i + 1}</span>
-              <span style={{ ...body(34), color: INK }}>
+              <span style={{ ...body(33), color: ACCENT_INK, fontWeight: 500 }}>{i + 1}</span>
+              <span style={{ ...body(33), color: INK }}>
                 {t.lead} <Mark at={t.countAt}>{t.count}</Mark> {t.tail}
               </span>
             </Ink>
@@ -278,7 +278,7 @@ export const ShopScene: React.FC = () => {
 
         {/* ── The lesson's query: one join for each line, then its result ── */}
         <Ink at={queryAt - 2} dur={14} style={{ left: TEXT_X, top: y(QUERY_Y) - 44, whiteSpace: "nowrap" }}>
-          <span style={label(24, INK_SOFT)}>The lesson&apos;s query: one join for each key</span>
+          <span style={label(22, INK_SOFT)}>The lesson&apos;s query: one join for each key</span>
         </Ink>
         <Listing
           lines={PATH_JOINS}
@@ -290,7 +290,7 @@ export const ShopScene: React.FC = () => {
           lineAt={joinLineAt}
         />
         <Ink at={rowsAt - 6} dur={14} style={{ left: TEXT_X, top: y(RESULT_Y) - 44, whiteSpace: "nowrap" }}>
-          <span style={label(24, INK_SOFT)}>What it returns</span>
+          <span style={label(22, INK_SOFT)}>What it returns</span>
         </Ink>
         <DbTable
           g={rg}

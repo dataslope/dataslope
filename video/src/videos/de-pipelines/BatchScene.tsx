@@ -90,10 +90,10 @@ export const BatchScene: React.FC = () => {
 
         {/* Lane titles. */}
         <Note at={batchAt - 2} x={X0} y={by - h(14)}>
-          <span style={{ ...label(28, INK), fontWeight: 500 }}>Batch</span>
+          <span style={{ ...label(30, INK), fontWeight: 500 }}>Batch</span>
         </Note>
         <Note at={streamAt - 2} x={X0} y={sy - h(14)}>
-          <span style={{ ...label(28, INK), fontWeight: 500 }}>Streaming</span>
+          <span style={{ ...label(30, INK), fontWeight: 500 }}>Streaming</span>
         </Note>
 
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
@@ -109,7 +109,7 @@ export const BatchScene: React.FC = () => {
                 {[0, 1].map((f) => (
                   <g key={f}>
                     <line x1={ax(f)} x2={ax(f)} y1={l.ly - 7} y2={l.ly + 7} stroke={INK} strokeWidth={1.6} />
-                    <text x={ax(f)} y={l.ly + 34} textAnchor="middle" style={svgText({ fontFamily: SANS, fontSize: 24, fontWeight: 500, color: INK_SOFT })}>
+                    <text x={ax(f)} y={l.ly + 34} textAnchor="middle" style={svgText({ fontFamily: SANS, fontSize: 20, fontWeight: 500, color: INK_SOFT })}>
                       {f === 0 ? "10:00" : "11:00"}
                     </text>
                   </g>
@@ -160,7 +160,7 @@ export const BatchScene: React.FC = () => {
         {/* Batch's one result, at the end of the hour: an output, not a verdict. */}
         <Node x={ax(1) - 120} y={by + h(56)} w={240} h={h(62)} at={resultAt} tone="plain" title="one result" size={23} />
         <Note at={hourAt + 4} x={ax(0)} y={by - h(108)}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a bounded chunk: one hour of events</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a bounded chunk: one hour of events</span>
         </Note>
         <Note at={simpleAt} x={ax(0)} y={by + h(60)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>simple, cheap, easy to rerun</span>
@@ -171,13 +171,13 @@ export const BatchScene: React.FC = () => {
 
         {/* Streaming's results, each seconds after its event. */}
         <Note at={arrivesAt + 6} x={AX1 + 30} y={sy + h(50)}>
-          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>a result per event</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>a result per event</span>
         </Note>
         <Note at={secondsAt - 2} x={AX1 + 30} y={sy - h(44)}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>results seconds old</span>
         </Note>
         <Note at={priceAt} x={AX0} y={sy + h(104)}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>The price, all yours to run:</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>The price, all yours to run:</span>
         </Note>
         {costs.map((c, i) => (
           <Pill key={c.text} x={AX0 + [0, 196, 340, 488][i]} y={sy + h(146)} at={c.at} tone="plain" size={21}>
@@ -187,15 +187,15 @@ export const BatchScene: React.FC = () => {
 
         {/* The choice, by latency. */}
         <Note at={chooseAt} x={RIGHT_X + 160} y={y(300)}>
-          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Choose by the latency needed</span>
+          <span style={{ ...label(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Choose by the latency needed</span>
         </Note>
         <ChoiceCard at={dashAt} x={RIGHT_X + 160} y={by - h(40)} need="An hourly dashboard" pick="batch" lit={pulse(frame, dashAt + 10, 22)} />
         <ChoiceCard at={fraudAt} x={RIGHT_X + 160} y={sy - h(40)} need="Fraud detection" pick="streaming" lit={pulse(frame, fraudAt + 10, 22)} />
         {/* Between the two: micro-batch, and systems that run both. */}
         <Note at={microAt} x={RIGHT_X + 160} y={(by + sy) / 2 - h(36)}>
           <div style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>In between: micro-batch</div>
-          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, fewAt, 10) }}>a batch every few seconds</div>
-          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, bothAt, 10) }}>and many systems run both</div>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, fewAt, 10) }}>a batch every few seconds</div>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, bothAt, 10) }}>and many systems run both</div>
         </Note>
         <Note at={dontAt} x={X0} y={y(885)}>
           <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
@@ -215,7 +215,7 @@ const ChoiceCard: React.FC<{ at: number; x: number; y: number; need: string; pic
   if (p <= 0) return null;
   return (
     <div style={{ position: "absolute", left: x, top: y, opacity: p, transform: `translateX(${(1 - p) * 16}px)` }}>
-      <div style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{need}</div>
+      <div style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{need}</div>
       <div style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: k, transform: `scale(${1 + 0.06 * lit})`, transformOrigin: "0 50%" }}>
         → {pick}
       </div>

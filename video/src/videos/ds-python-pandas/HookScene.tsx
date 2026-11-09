@@ -116,12 +116,12 @@ export const HookScene: React.FC = () => {
           marks={extra.map((row) => ({ row, col: amount, at: nowAt + 8, color: MARK_BAD }))}
         />
         <Note at={revAt} x={X0} y={og.rowTop(FANOUT.orders.rows.length) + h(18)} out={out}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
             {nBefore} rows, revenue {sumBefore}
           </span>
         </Note>
         <Note at={nowAt} x={MERGED_X} y={mg.rowTop(M.rows.length) + h(18)} out={out}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             {nAfter} rows, revenue <Mark at={whyAt}>{sumAfter}</Mark>
           </span>
         </Note>
@@ -139,7 +139,7 @@ export const HookScene: React.FC = () => {
           ]}
         />
         <Note at={backAt} x={X0} y={pg.rowTop(PLAN.rows.length) + h(36)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             the merge: <Mark at={backAt + 8}>question 6</Mark>
           </span>
         </Note>

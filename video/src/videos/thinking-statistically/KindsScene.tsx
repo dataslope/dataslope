@@ -143,7 +143,7 @@ export const KindsScene: React.FC = () => {
               {p.name}
             </div>
             {/* What it says arrives on "which group" and "how much", "or how many". */}
-            <div style={{ ...note(24, INK_SOFT), marginTop: 12, opacity: ease(frame, (i ? muchAt : whichGroupAt) - 4, 12) }}>
+            <div style={{ ...note(25, INK_SOFT), marginTop: 12, opacity: ease(frame, (i ? muchAt : whichGroupAt) - 4, 12) }}>
               {p.what}
               <span style={{ opacity: ease(frame, manyAt - 2, 10) }}>{p.more}</span>
             </div>
@@ -190,8 +190,8 @@ export const KindsScene: React.FC = () => {
           >
             {l.name}
           </div>
-          <div style={{ ...note(24, INK), fontWeight: 500, marginTop: 12 }}>{l.what}</div>
-          <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>
+          <div style={{ ...note(23, INK), fontWeight: 500, marginTop: 12 }}>{l.what}</div>
+          <div style={{ ...note(23, INK_SOFT), marginTop: 6 }}>
             <Mark at={likeAt[i] - 2} out={likeAt[i] + 40}>
               like {l.like}
             </Mark>
@@ -208,7 +208,7 @@ export const KindsScene: React.FC = () => {
             left: LEAVES[0].x + lerp(COUNTRIES[k][1], COUNTRIES[SHUFFLED[k]][1], shuffle),
             top: y(PICTURE_Y) + lerp(COUNTRIES[k][2], COUNTRIES[SHUFFLED[k]][2], shuffle) + Math.sin(shuffle * Math.PI) * ARC[k],
             opacity: ease(frame, leafAt[0] + 4 + k * 4, 10),
-            ...note(28, INK),
+            ...note(26, INK),
             ...badgeStyle("gray", 26),
           }}
         >
@@ -315,7 +315,7 @@ export const KindsScene: React.FC = () => {
             {ZIPS.zip}
           </span>
           {/* The size of the code beside it: emphasis is the color and the weight. */}
-          <span style={{ ...label(28, STAT_INK), fontWeight: 500, opacity: ease(frame, dontAt - 2, 10) }}>?</span>
+          <span style={{ ...label(30, STAT_INK), fontWeight: 500, opacity: ease(frame, dontAt - 2, 10) }}>?</span>
         </div>
       ) : null}
     </AbsoluteFill>

@@ -44,10 +44,10 @@ export const RvScene: React.FC = () => {
       <Headline top={y(150)} first="A random variable" second="puts a number on each outcome." firstAt={rvFrom - 6} secondAt={numberAt - 2} />
 
       <Ink at={flipAt - 6} dur={12} style={{ left: COIN_X[0] - 30, top: y(296), whiteSpace: "nowrap" }}>
-        <span style={label(24, INK_SOFT)}>Two flips</span>
+        <span style={label(23, INK_SOFT)}>Two flips</span>
       </Ink>
       <Ink at={countAt - 4} dur={12} style={{ left: 900, top: y(296), whiteSpace: "nowrap" }}>
-        <span style={label(24, INK_SOFT)}>X, the number of heads</span>
+        <span style={label(23, INK_SOFT)}>X, the number of heads</span>
       </Ink>
       {outcomes.map((o, i) => (
         <React.Fragment key={o}>
@@ -61,10 +61,10 @@ export const RvScene: React.FC = () => {
         </React.Fragment>
       ))}
       <Note at={one2At + 4} x={1080} y={y((ROW_Y[1] + ROW_Y[2]) / 2) - 22} width={620}>
-        <span style={{ ...body(34, true), color: INK }}>Two outcomes, one number: that&apos;s allowed.</span>
+        <span style={{ ...body(32, true), color: INK }}>Two outcomes, one number: that&apos;s allowed.</span>
       </Note>
       <Note at={zeroAt + 8} x={1080} y={y(ROW_Y[3]) - 22} width={620}>
-        <span style={{ ...body(34, true), color: INK }}>Now there&apos;s something to average.</span>
+        <span style={{ ...body(32, true), color: INK }}>Now there&apos;s something to average.</span>
       </Note>
     </AbsoluteFill>
   );

@@ -140,12 +140,12 @@ export const BridgeScene: React.FC = () => {
         <Entity layout={factBefore} at={severalAt - 4} marks={{ promo_key: { at: roomAt + 2, tone: "warn" } }} out={swapAt} />
         <Entity layout={promo} at={severalAt + 4} />
         <Note at={twoAt + 2} x={promo.x} y={promo.bottom + h(20)} out={sitsAt}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             order <Num>1</Num>: SUMMER10 and FREESHIP
           </span>
         </Note>
         <Note at={roomAt + 6} x={factBefore.x} y={factBefore.bottom + h(16)} out={swapAt}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one column, one promotion</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one column, one promotion</span>
         </Note>
 
         {/* ── The bridge between them ── */}
@@ -222,7 +222,7 @@ export const BridgeScene: React.FC = () => {
           </span>
         </Note>
         <Note at={neverAt + 6} x={gf.x} y={gf.rowTop(F.rows.length) + h(56)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>never add these up</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>never add these up</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -91,7 +91,7 @@ export const OverScene: React.FC = () => {
           return (
             <React.Fragment key={c.layer}>
               <Box x={x} y={layerTop} w={COL_W} h={LAYER.h} at={c.at} dashed tone="plain" tones={[[eachAt + 6 + i * 6, "bad"], ...(i === 1 ? ([[earnsAt, "ok"]] as const) : [])]} dim={dim}>
-                <span style={{ position: "relative", ...label(24, c2.ink), fontWeight: 500, whiteSpace: "nowrap" }}>
+                <span style={{ position: "relative", ...label(25, c2.ink), fontWeight: 500, whiteSpace: "nowrap" }}>
                   {c.layer}
                   <span
                     style={{
@@ -106,7 +106,7 @@ export const OverScene: React.FC = () => {
                     }}
                   />
                 </span>
-                <span style={{ ...note(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, c.at + 8, 10) }}>
+                <span style={{ ...note(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, c.at + 8, 10) }}>
                   {keep > 0.5 ? "earned: two rules" : "a layer to read through"}
                 </span>
               </Box>

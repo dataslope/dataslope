@@ -99,7 +99,7 @@ export const AttrScene: React.FC = () => {
           const holds = TYPE_HOLDS[c.type] ?? c.type;
           return (
             <Note key={c.name} at={at} x={TABLE_X} y={holdsTop + i * 42}>
-              <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "flex", gap: 14 }}>
+              <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", display: "flex", gap: 14 }}>
                 <span style={{ width: 170, color: INK }}>
                   <Mono weight={500}>{c.name}</Mono>
                 </span>

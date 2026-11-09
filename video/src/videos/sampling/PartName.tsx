@@ -17,7 +17,7 @@ export const PartName: React.FC<{ alone?: boolean }> = ({ alone = false }) => {
   if (!part) return null;
   return (
     <>
-      <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>{part.name}</span>
+      <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>{part.name}</span>
       {alone ? null : <KickerRule />}
     </>
   );

@@ -190,9 +190,9 @@ const Traverse: React.FC<{ c: Ctx }> = ({ c }) => {
           <Line at={r.at} x={rx} y={c.T + c.h(30) + i * c.h(120)} size={23} weight={500}>
             {r.name}
           </Line>
-          <div style={{ position: "absolute", left: rx, top: c.T + c.h(72) + i * c.h(120), display: "flex", gap: 18, fontSize: 28 }}>
+          <div style={{ position: "absolute", left: rx, top: c.T + c.h(72) + i * c.h(120), display: "flex", gap: 18, fontSize: 26 }}>
             {r.order.map((v, k) => (
-              <span key={k} style={{ ...label(28, BLUE_INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, r.at + 4 + k * 3, 8) }}>
+              <span key={k} style={{ ...label(26, BLUE_INK), ...TABULAR, fontWeight: 500, opacity: ease(frame, r.at + 4 + k * 3, 8) }}>
                 {v}
               </span>
             ))}
@@ -401,7 +401,7 @@ const Pointers: React.FC<{ c: Ctx }> = ({ c }) => {
         { i: s.lo, t: "left" },
         { i: s.hi, t: "right" },
       ].map((ptr) => (
-        <div key={ptr.t} style={{ position: "absolute", left: R_X + ptr.i * cw - 5, width: cw, top: rowY + 70, textAlign: "center", ...label(24, INK), opacity: ease(frame, walkAt + 10, 8) }}>
+        <div key={ptr.t} style={{ position: "absolute", left: R_X + ptr.i * cw - 5, width: cw, top: rowY + 70, textAlign: "center", ...label(21, INK), opacity: ease(frame, walkAt + 10, 8) }}>
           ↑ {ptr.t}
         </div>
       ))}
@@ -556,9 +556,9 @@ const Cycle: React.FC<{ c: Ctx }> = ({ c }) => {
         { t: "on the path", tone: HIGHLIGHT, at: pathAt },
         { t: "done", tone: BLUE_FILL, at: doneAt },
       ].map((m, i) => (
-        <div key={m.t} style={{ position: "absolute", left: rx, top: c.T + c.h(90) + i * c.h(44), display: "flex", alignItems: "center", gap: 12, fontSize: 24, opacity: ease(frame, m.at, 10) }}>
+        <div key={m.t} style={{ position: "absolute", left: rx, top: c.T + c.h(90) + i * c.h(44), display: "flex", alignItems: "center", gap: 12, fontSize: 23, opacity: ease(frame, m.at, 10) }}>
           <span style={{ width: 22, height: 22, borderRadius: 11, background: m.tone, border: `2px solid ${INK}` }} />
-          <span style={{ ...label(24, INK), fontWeight: 500 }}>{m.t}</span>
+          <span style={{ ...label(23, INK), fontWeight: 500 }}>{m.t}</span>
         </div>
       ))}
       <Line at={backAt} x={rx} y={c.T + c.h(250)} size={24} weight={500} color={ACCENT_INK}>
@@ -681,7 +681,7 @@ const Bits: React.FC<{ c: Ctx }> = ({ c }) => {
       {nums.map((v, i) => {
         const fade = paired(v) ? ease(frame, cancelAt + 4, 12) : 0;
         return (
-          <div key={i} style={{ position: "absolute", left: R_X + 40, top: c.T + c.h(64) + i * rowH, display: "flex", gap: 30, fontSize: 28, opacity: ease(frame, xorAt + i * 3, 8) * (1 - 0.7 * fade) }}>
+          <div key={i} style={{ position: "absolute", left: R_X + 40, top: c.T + c.h(64) + i * rowH, display: "flex", gap: 30, fontSize: 26, opacity: ease(frame, xorAt + i * 3, 8) * (1 - 0.7 * fade) }}>
             <span style={{ fontFamily: MONO, fontWeight: 500, color: paired(v) && fade > 0 ? INK_SOFT : INK, width: 40, textAlign: "right" }}>{v}</span>
             <span style={{ fontFamily: MONO, fontWeight: 500, letterSpacing: "0.2em", color: paired(v) ? BLUE_INK : OK_INK }}>{bin(v)}</span>
           </div>
@@ -690,7 +690,7 @@ const Bits: React.FC<{ c: Ctx }> = ({ c }) => {
       <Svg opacity={ease(frame, leftAt - 4, 10)}>
         <line x1={R_X + 30} x2={R_X + 230} y1={c.T + c.h(64) + nums.length * rowH + 6} y2={c.T + c.h(64) + nums.length * rowH + 6} stroke={INK} strokeWidth={1.8} />
       </Svg>
-      <div style={{ position: "absolute", left: R_X + 40, top: c.T + c.h(64) + nums.length * rowH + 16, display: "flex", gap: 30, fontSize: 28, opacity: ease(frame, leftAt, 10) }}>
+      <div style={{ position: "absolute", left: R_X + 40, top: c.T + c.h(64) + nums.length * rowH + 16, display: "flex", gap: 30, fontSize: 26, opacity: ease(frame, leftAt, 10) }}>
         <span style={{ fontFamily: MONO, fontWeight: 500, color: OK_INK, width: 40, textAlign: "right" }}>{result}</span>
         <span style={{ fontFamily: MONO, fontWeight: 500, letterSpacing: "0.2em", color: OK_INK }}>{bin(result)}</span>
       </div>

@@ -148,19 +148,19 @@ export const PlanScene: React.FC = () => {
         />
         {/* Read as a tree: the indented step first, feeding the one above. */}
         <Note at={firstAt + 4} x={arrowX} y={seqY - h(16)} out={threeAt}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: inkOf.yellow }}>1</b>&nbsp;&nbsp;the indented step runs first
           </span>
         </Note>
         <Note at={feedsAt + 2} x={arrowX} y={aggY - h(16)} out={threeAt}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: inkOf.yellow }}>2</b>&nbsp;&nbsp;and feeds the one above it
           </span>
         </Note>
 
         {/* ── The three things to read ── */}
         <Note at={threeAt} x={R_X} y={rows(0)} out={countAt}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Read three things</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Read three things</span>
         </Note>
         {[
           { at: kindAt, text: "the kind of scan", row: 1 },
@@ -168,7 +168,7 @@ export const PlanScene: React.FC = () => {
           { at: awayAt, text: "rows a filter threw away", row: 3 },
         ].map((t, i) => (
           <Note key={t.text} at={t.at} x={R_X} y={rows(t.row)} out={countAt}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
               <b>{i + 1}</b>&nbsp;&nbsp;{t.text}
             </span>
           </Note>
@@ -176,7 +176,7 @@ export const PlanScene: React.FC = () => {
 
         {/* ── What this plan says ── */}
         <Note at={hasAt} x={R_X} y={rows(0)} out={fixOut}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             an index on <SmallMono color={INK}>created_at</SmallMono> exists
           </span>
         </Note>
@@ -240,7 +240,7 @@ export const PlanScene: React.FC = () => {
           </div>
         </Note>
         <Note at={sargAt} x={X0} y={rangePlanTop + h(200)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>Sargable</b>
             <span style={{ opacity: ease(frame, searchAt, 10) }}>: a filter the index can search.</span>
           </span>
