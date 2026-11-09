@@ -8,7 +8,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ILLUSTRATIONS, VIDEO } from "./data";
-import { Plane, SKIN } from "./parts";
+import { Plane } from "./parts";
 import { KickerRule, PartName } from "../sampling/PartName";
 
 /** One mission as a strip of planes; the one at LOST never comes home. */
@@ -16,6 +16,8 @@ const STRIP = 10;
 const LOST = 6;
 const STRIP_X0 = 150;
 const STRIP_DX = 150;
+/** Each plane's wingspan, upright in the strip (the planes fly nose right). */
+const STRIP_W = 90;
 const STRIP_Y = 610;
 
 /**
@@ -110,32 +112,25 @@ export const HookScene: React.FC = () => {
       <Ink at={evidenceAt - 4} dur={16} style={{ left: 96, top: y(456) }}>
         <span style={{ ...body(34, true), color: INK }}>The evidence: the damage on the planes that came home.</span>
       </Ink>
+      {Array.from({ length: STRIP }, (_, i) => {
+        const at = evidenceAt + i * 2;
+        const show = ease(frame, at, 12);
+        if (show <= 0) return null;
+        const isLost = i === LOST;
+        const gone = isLost ? lost : 0;
+        return (
+          <Plane
+            key={i}
+            x={STRIP_X0 + i * STRIP_DX - (1 - show) * 30}
+            y={y(STRIP_Y) + gone * 14}
+            width={STRIP_W}
+            rotate={90}
+            // The one that did not come home fades to a ghost as it drops.
+            opacity={show * (1 - 0.85 * gone)}
+          />
+        );
+      })}
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-        {Array.from({ length: STRIP }, (_, i) => {
-          const at = evidenceAt + i * 2;
-          const show = ease(frame, at, 12);
-          if (show <= 0) return null;
-          const isLost = i === LOST;
-          const gone = isLost ? lost : 0;
-          return (
-            <Plane
-              key={i}
-              x={STRIP_X0 + i * STRIP_DX - (1 - show) * 30}
-              y={y(STRIP_Y) + gone * 14}
-              scale={0.34}
-              rotate={90}
-              opacity={show}
-              detail="none"
-              style={(part) => ({
-                fill: isLost ? `color-mix(in srgb, ${SKIN} ${100 - gone * 100}%, transparent)` : SKIN,
-                // Too small to show the tanks: they fill in with the wing.
-                stroke: part === "fuel" ? "none" : isLost && gone > 0 ? INK_SOFT : INK,
-                width: 1.3,
-                dash: isLost && gone > 0.4 ? "4 3" : undefined,
-              })}
-            />
-          );
-        })}
         {/* A bracket under the nine that came home. */}
         <path
           d={`M${STRIP_X0 - 40},${y(STRIP_Y + 54)} v10 H${STRIP_X0 + (STRIP - 1) * STRIP_DX + 40} v-10`}
