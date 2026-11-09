@@ -87,7 +87,7 @@ export const ChunkScene: React.FC = () => {
   const cx = (i: number) => X0 + i * COL;
   const N = ROWS.length;
   const labelY = docY + docHeight(N) + CAPTION_GAP;
-  const OVERLAP = `color-mix(in srgb, ${ds("yellow", 400)} 70%, transparent)`;
+  const OVERLAP = `color-mix(in srgb, ${ds("yellow", 300)} 55%, transparent)`;
   /** A band across a page's rows: the face they are set in, and a little more. */
   const band = (i: number, color: string) => {
     const f = docFace(cx(i), DOC_W);

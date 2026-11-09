@@ -20,7 +20,9 @@ export const BAR = ds("blue", 500);
 export const ACCENT = ds("red", 500);
 export const ACCENT_INK = inkOf.red;
 export const BLUE_INK = inkOf.blue;
-export const HIGHLIGHT = `color-mix(in srgb, ${ds("yellow", 400)} 80%, transparent)`;
+/** The yellow behind a highlighted word, cell or row: a light wash, so the
+ *  text on it stays the strongest thing there. */
+export const HIGHLIGHT = `color-mix(in srgb, ${ds("yellow", 300)} 55%, transparent)`;
 
 /**
  * Italic in the variant's face, for a stressed word, a term or a quotation:

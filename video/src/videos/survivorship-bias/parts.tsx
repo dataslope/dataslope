@@ -7,7 +7,7 @@ import type { PartKey } from "./data";
 export const SKIN = `color-mix(in srgb, ${INK} 9%, ${PAPER})`;
 /** The part the narration is on: an opaque yellow, so the wing under a
  *  nacelle does not show through. */
-export const PART_HI = `color-mix(in srgb, ${ds("yellow", 400)} 62%, ${PAPER})`;
+export const PART_HI = `color-mix(in srgb, ${ds("yellow", 300)} 55%, ${PAPER})`;
 
 /**
  * A twin-engine plane seen from above, nose up, in units centred on the wing

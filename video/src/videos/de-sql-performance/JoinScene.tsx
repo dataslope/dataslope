@@ -200,7 +200,7 @@ export const JoinScene: React.FC = () => {
                 const here = frame >= walksAt && i === walk;
                 return (
                   <g key={`${side}-${i}`}>
-                    <rect x={x} y={yy} width={60} height={28} rx={4} fill={here ? `color-mix(in srgb, ${ds("yellow", 400)} 70%, ${PAPER})` : PAPER} stroke={INK_SOFT} strokeWidth={1.2} />
+                    <rect x={x} y={yy} width={60} height={28} rx={4} fill={here ? `color-mix(in srgb, ${ds("yellow", 300)} 55%, ${PAPER})` : PAPER} stroke={INK_SOFT} strokeWidth={1.2} />
                     <text x={x + 30} y={yy + 21} textAnchor="middle" style={keyText(19)}>
                       {k}
                     </text>

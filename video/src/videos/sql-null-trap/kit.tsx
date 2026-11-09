@@ -27,7 +27,7 @@ export const TRUTH = {
 export const truthKey = (v: Truth) => (v === null ? "unknown" : v ? "true" : "false");
 export const UNKNOWN_INK = TRUTH.unknown.ink;
 /** A wash behind whatever is unknown: the amber lamp, thinned. */
-export const UNKNOWN_WASH = `color-mix(in srgb, ${ds("yellow", 400)} 55%, transparent)`;
+export const UNKNOWN_WASH = `color-mix(in srgb, ${ds("yellow", 300)} 55%, transparent)`;
 
 /** The listing's grey card, and the token inks from `inkOf` (theme/brand.ts). */
 export const LISTING_PAPER = ds("gray", 50);

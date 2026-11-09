@@ -5,21 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, drift, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  BAR,
-  BLUE_INK,
-  HAIRLINE,
-  HIGHLIGHT,
-  INK,
-  INK_SOFT,
-  PAPER,
-  TABULAR,
-  headline,
-  label,
-  note,
-} from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";

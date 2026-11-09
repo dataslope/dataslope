@@ -17,7 +17,7 @@ const BAR_X = 790;
 const BAR_W = 1030;
 
 const money = (c: Cell) => (typeof c.value === "number" ? c.value.toFixed(2) : printed(c.value));
-const LOCK = `color-mix(in srgb, ${ds("yellow", 400)} 70%, transparent)`;
+const LOCK = `color-mix(in srgb, ${ds("yellow", 300)} 55%, transparent)`;
 
 /**
  * Questions 7 and 8. The page's $F$1 tax rate filled down three amounts: with

@@ -179,7 +179,7 @@ export const LineageScene: React.FC = () => {
                   boxSizing: "border-box",
                   borderRadius: 4,
                   background: isReplay
-                    ? `color-mix(in srgb, ${ds("yellow", 400)} 55%, ${PAPER})`
+                    ? `color-mix(in srgb, ${ds("yellow", 300)} 55%, ${PAPER})`
                     : wideParent > 0
                       ? `color-mix(in srgb, ${ds("yellow", 400)} ${55 * wideParent}%, color-mix(in srgb, ${BAR} ${36 * fill}%, ${PAPER}))`
                       : `color-mix(in srgb, ${BAR} ${36 * fill}%, ${PAPER})`,

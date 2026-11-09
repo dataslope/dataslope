@@ -4,7 +4,7 @@ import { arrowHead } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, PAPER, headline as headlineStyle, label, note, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, headline as headlineStyle, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { badgeStyle, type BadgeTone, H, Ink, W } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -66,7 +66,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(26, INK_SOFT)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };

@@ -89,7 +89,7 @@ export const LookupScene: React.FC = () => {
   const slot = (k: number) => y(SHEET_Y) - h(10) + k * h(66);
   const out3 = q4At - 4;
   const out4 = q5At - 4;
-  const RANGE = `color-mix(in srgb, ${ds("yellow", 400)} 60%, transparent)`;
+  const RANGE = `color-mix(in srgb, ${ds("yellow", 300)} 55%, transparent)`;
   // Where the mug sits in the name column B2:B5: MATCH's answer.
   const position = Number(A.matchMug.value);
   if (L.products[position][1] !== "Mug") throw new Error(`MATCH says ${position}, but the mug is elsewhere`);
