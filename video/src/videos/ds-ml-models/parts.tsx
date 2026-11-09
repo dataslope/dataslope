@@ -364,7 +364,7 @@ export const PanelTitle: React.FC<{
         top: y,
         whiteSpace: "nowrap",
         opacity: o * (1 - d),
-        ...label(24, color),
+        ...label(22, color),
         fontWeight: 500,
       }}
     >

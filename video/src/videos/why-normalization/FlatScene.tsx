@@ -99,7 +99,7 @@ export const FlatScene: React.FC = () => {
       />
       <Bracket x={right + 18} y0={g.rowTop(0) + 10} y1={g.rowTop(2) - 10} at={twiceAt} />
       <Note at={twiceAt + 6} x={RIGHT_X} y={g.rowTop(1) - 16}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Ada&apos;s email, on orders 1 and 2</span>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Ada&apos;s email, on orders 1 and 2</span>
       </Note>
 
       {/* The three anomalies, side by side on an even step. Each column's
@@ -114,10 +114,10 @@ export const FlatScene: React.FC = () => {
         >
           <div style={{ height: 2, width: 56, background: INK, marginBottom: RULE_GAP }} />
           <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-            <span style={{ ...body(34), color: ACCENT_INK }}>{k + 1}</span>
-            <span style={{ ...body(34), color: INK }}>{a.name}</span>
+            <span style={{ ...body(38), color: ACCENT_INK }}>{k + 1}</span>
+            <span style={{ ...body(38), color: INK }}>{a.name}</span>
           </div>
-          <div style={{ ...note(24, INK_SOFT), marginTop: 12 }}>{a.gist}</div>
+          <div style={{ ...note(22, INK_SOFT), marginTop: 12 }}>{a.gist}</div>
         </Ink>
       ))}
     </AbsoluteFill>

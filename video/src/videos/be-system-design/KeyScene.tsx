@@ -95,8 +95,8 @@ export const KeyScene: React.FC = () => {
                 transform: `translateY(${(1 - p) * 12}px)`,
               }}
             >
-              <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>{c.name}</span>
-              <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, c.sub - 4, 10) }}>{c.body}</span>
+              <span style={{ ...label(23, INK_SOFT), fontWeight: 500 }}>{c.name}</span>
+              <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, c.sub - 4, 10) }}>{c.body}</span>
             </div>
           );
         })}
@@ -109,14 +109,14 @@ export const KeyScene: React.FC = () => {
         <Line x={X0} y={secY} at={keyAt} size={28} weight={500}>
           Base <Num>{KEY.alphabet.length}</Num> of a counted ID
         </Line>
-        <div style={{ position: "absolute", left: X0, top: secY + 64, display: "flex", alignItems: "center", gap: "0.6em", fontSize: 28 }}>
-          <span style={{ ...note(28, INK_SOFT), opacity: ease(frame, keyAt + 6, 10) }}>
+        <div style={{ position: "absolute", left: X0, top: secY + 64, display: "flex", alignItems: "center", gap: "0.6em", fontSize: 26 }}>
+          <span style={{ ...note(26, INK_SOFT), opacity: ease(frame, keyAt + 6, 10) }}>
             <Num>{KEY.alphabet.length}</Num> characters:
           </span>
           {groups.map((g, i) => (
             <React.Fragment key={g}>
-              {i ? <span style={{ ...note(28, INK_SOFT), opacity: ease(frame, groupAt[i], 10) }}>·</span> : null}
-              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: BLUE_INK, opacity: ease(frame, groupAt[i], 10) }}>{g}</span>
+              {i ? <span style={{ ...note(26, INK_SOFT), opacity: ease(frame, groupAt[i], 10) }}>·</span> : null}
+              <span style={{ fontFamily: MONO, fontSize: 27, fontWeight: 500, color: BLUE_INK, opacity: ease(frame, groupAt[i], 10) }}>{g}</span>
             </React.Fragment>
           ))}
         </div>
@@ -165,18 +165,18 @@ export const KeyScene: React.FC = () => {
         <Line x={RX} y={secY} at={hashAt} size={28} weight={500}>
           Or a hash of the long URL
         </Line>
-        <div style={{ position: "absolute", left: RX, top: secY + 60, display: "flex", alignItems: "center", gap: 16, fontSize: 28 }}>
-          <span style={{ ...note(28, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, hashAt + 4, 10) }}>long URL</span>
+        <div style={{ position: "absolute", left: RX, top: secY + 60, display: "flex", alignItems: "center", gap: 16, fontSize: 27 }}>
+          <span style={{ ...note(27, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, hashAt + 4, 10) }}>long URL</span>
           <InlineArrow at={hashAt + 10} w={40} />
-          <span style={{ ...note(28, INK), fontWeight: 500, opacity: ease(frame, hashAt + 14, 10) }}>hash</span>
+          <span style={{ ...note(27, INK), fontWeight: 500, opacity: ease(frame, hashAt + 14, 10) }}>hash</span>
           <InlineArrow at={checkAt - 4} w={40} />
-          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, checkAt, 10) }}>
+          <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, checkAt, 10) }}>
             <Mark at={checkAt + 2} color={HIGHLIGHT}>
               already taken?
             </Mark>
           </span>
           <InlineArrow at={storeAt - 4} w={40} />
-          <span style={{ ...note(28, BLUE_INK), fontWeight: 500, opacity: ease(frame, storeAt, 10) }}>store</span>
+          <span style={{ ...note(27, BLUE_INK), fontWeight: 500, opacity: ease(frame, storeAt, 10) }}>store</span>
         </div>
       </Drift>
     </AbsoluteFill>

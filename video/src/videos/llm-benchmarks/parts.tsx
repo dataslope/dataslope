@@ -4,22 +4,7 @@ import { arrowHead, type Pt } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  BAR,
-  BLUE_INK,
-  fmt,
-  HAIRLINE,
-  HIGHLIGHT,
-  headline as headlineStyle,
-  INK,
-  INK_SOFT,
-  label,
-  PAPER,
-  TABULAR,
-  svgText,
-} from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, fmt, HAIRLINE, headline as headlineStyle, HIGHLIGHT, INK, INK_SOFT, label, PAPER, svgText, TABULAR } from "../../editorial/style";
 import { type BadgeTone, badgeStyle, H, Ink, W } from "../../editorial/ui";
 import { colors, ds } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -72,7 +57,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(26, INK_SOFT)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };
@@ -406,7 +391,7 @@ export const Track: React.FC<{
         {ticks.map((v) => (
           <g key={v}>
             <line x1={X(v)} x2={X(v)} y1={y + 2} y2={y + 9} stroke={INK_SOFT} strokeWidth={1.4} />
-            <text x={X(v)} y={y + 32} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500, ...TABULAR })}>
+            <text x={X(v)} y={y + 32} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
               {v}
             </text>
           </g>
@@ -463,7 +448,7 @@ export const Tag: React.FC<{
   return (
     <div
       style={{
-        ...label(24),
+        ...label(22),
         ...badge,
         position: "absolute",
         left: x,

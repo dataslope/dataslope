@@ -89,7 +89,7 @@ const ThreeD: React.FC<{ c: Ctx }> = ({ c }) => {
       </Svg>
       {leaders.map((l) => (
         <Note key={l.text} at={l.at + 4} x={axisX - 86} y={l.y - 15}>
-          <span style={{ ...label(24, ACCENT), whiteSpace: "nowrap" }}>{l.text}</span>
+          <span style={{ ...label(20, ACCENT), whiteSpace: "nowrap" }}>{l.text}</span>
         </Note>
       ))}
       <Verdict ok={false} x={axisX} y={base + c.h(40)} at={whichAt}>
@@ -101,7 +101,7 @@ const ThreeD: React.FC<{ c: Ctx }> = ({ c }) => {
         return (
           <React.Fragment key={row.key}>
             <Note at={row.at - 2} x={rowX0} y={row.cy - row.r(5) - c.h(48)}>
-              <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>{row.title}</span>
+              <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>{row.title}</span>
             </Note>
             <Svg>
               {BUBBLES.values.map((v, i) => {
@@ -110,7 +110,7 @@ const ThreeD: React.FC<{ c: Ctx }> = ({ c }) => {
                 return (
                   <g key={v} opacity={p}>
                     <circle cx={cx[i]} cy={row.cy} r={row.r(v) * p} fill={lit ? BAR : ds("blue", 200)} />
-                    <text x={cx[i]} y={row.cy + row.r(5) + 28} textAnchor="middle" style={{ ...label(24, INK_SOFT), ...TABULAR }} fill={INK_SOFT}>
+                    <text x={cx[i]} y={row.cy + row.r(5) + 28} textAnchor="middle" style={{ ...label(19, INK_SOFT), ...TABULAR }} fill={INK_SOFT}>
                       {v}
                     </text>
                   </g>
@@ -174,7 +174,7 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
         <g opacity={legend}>
           <rect x={x1 - 118} y={top - 28} width={110} height={36} fill={PAPER} stroke={INK_SOFT} strokeWidth={1.4} />
           <rect x={x1 - 106} y={top - 18} width={16} height={16} fill={BAR} />
-          <text x={x1 - 82} y={top - 4} style={{ ...label(24, INK) }} fill={INK}>
+          <text x={x1 - 82} y={top - 4} style={{ ...label(19, INK) }} fill={INK}>
             Visits
           </text>
         </g>
@@ -182,14 +182,14 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
       <BarSet values={values} labels={days} x0={x0} x1={x1} base={base} top={top} lo={0} hi={hi} at={at0} step={1} />
       <Svg opacity={ease(frame, losesAt, 12)}>
         {values.map((v, i) => (
-          <text key={i} x={bandMid(i, values.length, x0, x1)} y={yOf(v) - 10} textAnchor="middle" style={{ ...label(24, BLUE_INK), ...TABULAR }} fill={BLUE_INK}>
+          <text key={i} x={bandMid(i, values.length, x0, x1)} y={yOf(v) - 10} textAnchor="middle" style={{ ...label(19, BLUE_INK), ...TABULAR }} fill={BLUE_INK}>
             {v}
           </text>
         ))}
       </Svg>
 
       <Note at={at0} x={R_X + 680} y={c.y(420)} width={R_END - R_X - 680}>
-        <span style={{ ...note(28, INK) }}>
+        <span style={{ ...note(26, INK) }}>
           <b>data-ink ratio</b>: the share of the ink that shows data
         </span>
       </Note>
@@ -206,7 +206,7 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
       </Verdict>
       {/* The legend's one job, naming what the bars count, done as a title. */}
       <Note at={losesAt} x={x0 - 30} y={top - c.h(62)}>
-        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>Visits per day</span>
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>Visits per day</span>
       </Note>
     </>
   );
@@ -250,7 +250,7 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
             <React.Fragment key={card.name}>
               {k > 0 ? <FlexRule at={at0 + k * 6} /> : null}
               <div style={{ opacity: p, transform: `translateY(${(1 - p) * 12}px)` }}>
-                <div style={{ ...headline(34), color: INK, lineHeight: "44px", whiteSpace: "nowrap" }}>{card.name}</div>
+                <div style={{ ...headline(38), color: INK, lineHeight: "44px", whiteSpace: "nowrap" }}>{card.name}</div>
                 <div style={{ ...note(24, INK_SOFT), lineHeight: "31px", marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, card.at - 2, 12) }}>{card.text}</div>
               </div>
             </React.Fragment>
@@ -258,12 +258,12 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
         })}
       </div>
       <Note at={biAt - 2} x={R_X + 40} y={c.y(600)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           all three are <b>BI</b> tools<span style={{ opacity: ease(frame, busAt - 2, 10) }}>: business intelligence</span>
         </span>
       </Note>
       <Note at={transfersAt - 2} x={R_X + 40} y={c.y(670)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>what transfers between them:</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>what transfers between them:</span>
       </Note>
       <Verdict ok x={R_X + 60} y={c.y(720)} at={framingAt}>
         framing the question
@@ -312,13 +312,13 @@ const Scatter: React.FC<{ c: Ctx }> = ({ c }) => {
         ))}
       </Svg>
       <Note at={pileAt - 2} x={R_X + 580} y={c.y(400)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>two continuous variables, one dot each</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>two continuous variables, one dot each</span>
       </Note>
       <Note at={lowerAt - 2} x={R_X + 580} y={c.y(450)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>piled up? lower the opacity</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>piled up? lower the opacity</span>
       </Note>
       <Note at={fourAt - 2} x={R_X + 580} y={c.y(500)}>
-        <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
           <Num>{SCATTER.n.toLocaleString("en-US")}</Num> points
         </span>
       </Note>
@@ -383,7 +383,7 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
           })}
         </g>
         {["Jan", "Dec"].map((m, i) => (
-          <text key={m} x={i ? x1 : x0} y={base + 26} textAnchor={i ? "end" : "start"} style={{ ...label(24, INK_SOFT) }} fill={INK_SOFT} opacity={reveal}>
+          <text key={m} x={i ? x1 : x0} y={base + 26} textAnchor={i ? "end" : "start"} style={{ ...label(19, INK_SOFT) }} fill={INK_SOFT} opacity={reveal}>
             {m}
           </text>
         ))}
@@ -392,12 +392,12 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
         const mid = ((k ? cum[k - 1][n - 1] : 0) + cum[k][n - 1]) / 2;
         return (
           <Note key={ch.key} at={stackAt + 10 + k * 2} x={x1 + 12} y={yOf(mid, n - 1) - 13}>
-            <span style={{ ...label(24, k === web ? INK : INK_SOFT), whiteSpace: "nowrap", fontWeight: k === web ? 500 : 500 }}>{ch.key}</span>
+            <span style={{ ...label(19, k === web ? INK : INK_SOFT), whiteSpace: "nowrap", fontWeight: k === web ? 500 : 500 }}>{ch.key}</span>
           </Note>
         );
       })}
       <Note at={hundredAt - 2} x={x0} y={top - c.h(56)}>
-        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
           {share > 0.5 ? "As shares: a 100% stack" : "Orders, stacked by channel"}
         </span>
       </Note>
@@ -418,10 +418,10 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
         edges
       />
       <Note at={ownAt + 4} x={L.x0} y={top - c.h(56)}>
-        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>Web, on its own line</span>
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>Web, on its own line</span>
       </Note>
       <Note at={webAt} x={L.x0} y={base - ((channels[web].values[0] / hi) * (base - top)) - c.h(52)}>
-        <span style={{ ...label(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
+        <span style={{ ...label(20, INK), whiteSpace: "nowrap", ...TABULAR }}>
           {channels[web].values[0]} in January, {channels[web].values[n - 1]} in December
         </span>
       </Note>

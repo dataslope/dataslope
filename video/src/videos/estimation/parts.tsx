@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { SERIF } from "../../editorial/fonts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, fmt, headline as headlineStyle, INK, INK_SOFT, PAPER, label, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, fmt, headline as headlineStyle, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
 import { H, Ink, W } from "../../editorial/ui";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -43,7 +43,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(26, INK_SOFT)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };

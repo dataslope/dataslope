@@ -125,16 +125,16 @@ export const HookScene: React.FC = () => {
 
         {/* The plan: ten questions on this workbook, eight one formula each. */}
         <Note at={eighteenAt - 2} x={X0} y={y(SHEET_Y) - h(64)}>
-          <span style={{ ...label(28, INK), whiteSpace: "nowrap", ...TABULAR }}>18 questions</span>
+          <span style={{ ...label(26, INK), whiteSpace: "nowrap", ...TABULAR }}>18 questions</span>
         </Note>
         <Sheet g={pg} values={products} at={productAt - 6} cellAt={(r) => productAt - 4 + (r - 1) * 2} bold={(r) => r === 1} size={20} />
         <Note at={tenAt} x={PRODUCTS_X} y={pg.bottom + h(30)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <b>1 to 10</b>: worked on these two sheets
           </span>
         </Note>
         <Note at={eightAt - 2} x={PRODUCTS_X} y={pg.bottom + h(74)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>
             <b style={{ color: INK }}>11 to 18</b>: one formula each
           </span>
         </Note>

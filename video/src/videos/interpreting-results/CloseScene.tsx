@@ -80,7 +80,7 @@ export const CloseScene: React.FC = () => {
       ))}
       <Bracket x0={TAG_X[0]} x1={TAG_X[2] + 420} y={y(TAG_Y) + 96} at={flawAt - 4} up tick={14} color={STAT} width={2.6} />
       <Ink at={dataAt - 6} dur={14} style={{ left: TAG_X[0], top: y(TAG_Y) + 118, whiteSpace: "nowrap" }}>
-        <span style={label(28, STAT_INK)}>
+        <span style={label(26, STAT_INK)}>
           one flaw: the data chose the analysis, <Marker at={advanceAt - 4}>not the plan</Marker>
         </span>
       </Ink>
@@ -94,7 +94,7 @@ export const CloseScene: React.FC = () => {
               borderRadius: 8,
               background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(100 * (i === 0 ? 1 - toConfirm : i === 2 ? toConfirm : 0))}%, ${PAPER})`,
               border: `2px solid ${INK}`,
-              ...label(28, INK),
+              ...label(30, INK),
             }}
           >
             {i + 1}. {s}

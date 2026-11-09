@@ -97,9 +97,9 @@ export const HookScene: React.FC = () => {
           ) : null}
         </Svg>
         {/* Fast, while the hundred fills the box. */}
-        <div style={{ position: "absolute", left: SQ_X + DOTS * PITCH + 24, top: top + 90, display: "flex", alignItems: "center", gap: 10, fontSize: 28, opacity: ease(frame, fastAt, 10) * (1 - ease(frame, millionAt, 10)) }}>
+        <div style={{ position: "absolute", left: SQ_X + DOTS * PITCH + 24, top: top + 90, display: "flex", alignItems: "center", gap: 10, fontSize: 26, opacity: ease(frame, fastAt, 10) * (1 - ease(frame, millionAt, 10)) }}>
           <Tick at={fastAt} size={28} />
-          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>fast</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>fast</span>
         </div>
         <Line at={millionAt + 28} x={SQ_X + 26} y={top + 10} size={22} weight={500}>
           <span style={halo}>← the hundred</span>
@@ -111,9 +111,9 @@ export const HookScene: React.FC = () => {
         <Line at={structureAt - 2} x={CHIP_X} y={top + 20} size={26} weight={500}>
           Which structure keeps it cheap?
         </Line>
-        <div style={{ position: "absolute", left: CHIP_X, top: top + 76, display: "flex", gap: 14, fontSize: 28, whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: CHIP_X, top: top + 76, display: "flex", gap: 14, fontSize: 26, whiteSpace: "nowrap" }}>
           {STRUCTS.map((st, i) => (
-            <span key={st} style={{ ...note(28, BLUE_INK), fontWeight: 500, opacity: ease(frame, structureAt + 6 + i * 5, 10) }}>
+            <span key={st} style={{ ...note(26, BLUE_INK), fontWeight: 500, opacity: ease(frame, structureAt + 6 + i * 5, 10) }}>
               {i ? <span style={{ color: INK_SOFT, fontWeight: 500, marginRight: 14 }}>·</span> : null}
               {st}
             </span>
@@ -127,13 +127,13 @@ export const HookScene: React.FC = () => {
           </span>
           <span style={{ opacity: ease(frame, countsAt, 10) }}>, argued with counts, not code</span>
         </Line>
-        <div style={{ position: "absolute", left: CHIP_X, top: top + 300, display: "flex", gap: 34, fontSize: 28, whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: CHIP_X, top: top + 300, display: "flex", gap: 34, fontSize: 26, whiteSpace: "nowrap" }}>
           {[
             { at: eightAt, n: 8, text: "with a figure each" },
             { at: threeAt, n: 3, text: "inside those" },
             { at: quickAt, n: 24, text: "quickly" },
           ].map((it) => (
-            <span key={it.n} style={{ ...note(28, INK), opacity: ease(frame, it.at - 2, 10) }}>
+            <span key={it.n} style={{ ...note(26, INK), opacity: ease(frame, it.at - 2, 10) }}>
               <b style={{ color: BLUE_INK }}>
                 <Num>{it.n}</Num>
               </b>{" "}

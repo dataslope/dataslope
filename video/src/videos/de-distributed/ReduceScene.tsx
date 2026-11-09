@@ -105,7 +105,7 @@ export const ReduceScene: React.FC = () => {
             <Chip mono size={21} tone="red">
               groupByKey
             </Chip>
-            <span style={{ ...label(24, INK_SOFT) }}>sends</span>
+            <span style={{ ...label(20, INK_SOFT) }}>sends</span>
           </span>
         </Note>
         {MR.splits.map((sp, s) =>
@@ -129,7 +129,7 @@ export const ReduceScene: React.FC = () => {
             <Chip mono size={21} tone="green">
               reduceByKey
             </Chip>
-            <span style={{ ...label(24, INK_SOFT) }}>sends</span>
+            <span style={{ ...label(20, INK_SOFT) }}>sends</span>
           </span>
         </Note>
         {MR.combined.map((parts, s) =>
@@ -141,7 +141,7 @@ export const ReduceScene: React.FC = () => {
               <React.Fragment key={`${s}-${slot}`}>
                 <PairCard dept={pt.dept} value={pt.salary} strong={summed} width={CARD_W} height={cardH} pose={{ x: B_X - (1 - p) * 16, top: y(slotTop(s, slot)), opacity: p }} />
                 {summed ? (
-                  <div style={{ position: "absolute", left: B_X + CARD_W + 16, top: y(slotTop(s, slot)) + cardH / 2 - 13, ...label(24, OK_INK), whiteSpace: "nowrap", opacity: p }}>
+                  <div style={{ position: "absolute", left: B_X + CARD_W + 16, top: y(slotTop(s, slot)) + cardH / 2 - 13, ...label(20, OK_INK), whiteSpace: "nowrap", opacity: p }}>
                     120 + 140
                   </div>
                 ) : null}
@@ -158,21 +158,21 @@ export const ReduceScene: React.FC = () => {
         {/* At scale. */}
         <div style={{ position: "absolute", left: 1030, top: y(330), width: 1.5, height: y(860) - y(330), background: `color-mix(in srgb, ${INK_SOFT} 30%, transparent)`, opacity: ease(frame, modelAt - 6, 12) }} />
         <Note at={modelAt - 2} x={R_X} y={y(316)}>
-          <span style={{ ...label(24, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(23, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap" }}>
             A model: <Num>{count(REDUCE.events)}</Num> clicks,
             <br />
             <Num>{count(REDUCE.keys)}</Num> products, <Num>{REDUCE.partitions}</Num> partitions
           </span>
         </Note>
         <Note at={millionAt - 2} x={BAR_X} y={y(420)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>groupByKey</span> shuffles <b style={{ color: ACCENT_INK }}><Num>{count(REDUCE.groupByKey)}</Num> values</b>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>groupByKey</span> shuffles <b style={{ color: ACCENT_INK }}><Num>{count(REDUCE.groupByKey)}</Num> values</b>
           </span>
         </Note>
         <div style={{ position: "absolute", left: BAR_X, top: y(462), width: BAR_W * big, height: h(34), background: `color-mix(in srgb, ${ACCENT} 55%, ${PAPER})`, borderRadius: 3 }} />
         <Note at={fourAt - 2} x={BAR_X} y={y(530)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>reduceByKey</span> shuffles <b style={{ color: OK_INK }}><Num>{count(REDUCE.reduceByKey)}</Num> partial counts</b>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>reduceByKey</span> shuffles <b style={{ color: OK_INK }}><Num>{count(REDUCE.reduceByKey)}</Num> partial counts</b>
           </span>
         </Note>
         <div
@@ -187,28 +187,28 @@ export const ReduceScene: React.FC = () => {
           }}
         />
         <Note at={fewerAt - 2} x={BAR_X + 30} y={y(574)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{REDUCE.ratio}</Num> × fewer
           </span>
         </Note>
         {/* Why else, and what to use. */}
         <Note at={hotAt - 2} x={R_X} y={y(660)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             groupByKey: a hot key&apos;s every value
             <br />
             in one task&apos;s memory
           </span>
         </Note>
         <Note at={preferAt - 2} x={R_X} y={y(752)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            prefer <span style={{ fontFamily: MONO, fontSize: 24 }}>reduceByKey</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            prefer <span style={{ fontFamily: MONO, fontSize: 21 }}>reduceByKey</span>
             <span style={{ opacity: ease(frame, dfAt, 10) }}>
-              , or <span style={{ fontFamily: MONO, fontSize: 24 }}>groupBy().agg()</span>
+              , or <span style={{ fontFamily: MONO, fontSize: 21 }}>groupBy().agg()</span>
             </span>
           </span>
         </Note>
         <Note at={assocAt - 2} x={R_X} y={y(796)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>when the aggregation is associative</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>when the aggregation is associative</span>
         </Note>
       </Drift>
     </AbsoluteFill>

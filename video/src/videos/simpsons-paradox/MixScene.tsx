@@ -109,7 +109,7 @@ export const MixScene: React.FC = () => {
           <React.Fragment key={g}>
             <Ink at={whereAt - 4 + gi * 4} dur={14} style={{ left: 120, top: top + 6 }}>
               <div style={{ ...body(34), color: INK }}>{NAME[g]}</div>
-              <div style={{ ...note(24, INK_SOFT), marginTop: 2 }}>
+              <div style={{ ...note(20, INK_SOFT), marginTop: 2 }}>
                 {TOTAL[g].applied.toLocaleString("en-US")} applicants
               </div>
             </Ink>
@@ -154,8 +154,8 @@ export const MixScene: React.FC = () => {
       {/* Half of the men: A and B. */}
       {bracket("men", BX0, easyEnd - 3, menAt - 4)}
       <Note at={menAt} x={BX0} y={y(BAR_TOP.men) - 82}>
-        <span style={{ ...label(24, COLOR_INK.men) }}>{pct(EASY_SHARE.men, 0)} applied to A or B</span>
-        <span style={{ ...note(24, INK_SOFT), marginLeft: 12, opacity: ease(frame, twoInThreeAt - 2, 12) }}>
+        <span style={{ ...label(22, COLOR_INK.men) }}>{pct(EASY_SHARE.men, 0)} applied to A or B</span>
+        <span style={{ ...note(22, INK_SOFT), marginLeft: 12, opacity: ease(frame, twoInThreeAt - 2, 12) }}>
           which admitted {pct(EASY_RATE, 0)} of applicants
         </span>
       </Note>
@@ -163,10 +163,10 @@ export const MixScene: React.FC = () => {
       {/* Ninety-three percent of the women: C to F. */}
       {bracket("women", hardStart, BX1 - 3, womenAt - 4)}
       <Note at={womenAt} x={hardStart} y={y(BAR_TOP.women) + h(BAR_H) + 32}>
-        <span style={{ ...label(24, COLOR_INK.women) }}>
+        <span style={{ ...label(22, COLOR_INK.women) }}>
           {pct(1 - EASY_SHARE.women, 0)} applied to C, D, E or F
         </span>
-        <span style={{ ...note(24, INK_SOFT), marginLeft: 12, opacity: ease(frame, awayAt - 2, 12) }}>
+        <span style={{ ...note(22, INK_SOFT), marginLeft: 12, opacity: ease(frame, awayAt - 2, 12) }}>
           which admitted {pct(HARD_RATE, 0)}
         </span>
       </Note>
@@ -174,12 +174,12 @@ export const MixScene: React.FC = () => {
       {/* The key: what the shades mean. */}
       <Note at={whereAt + 20} x={BX0} y={y(790)}>
         <div style={{ display: "flex", alignItems: "center", gap: 22, whiteSpace: "nowrap" }}>
-          <span style={label(24, INK_SOFT)}>Darker is harder to get into. Admitted, both groups:</span>
+          <span style={label(20, INK_SOFT)}>Darker is harder to get into. Admitted, both groups:</span>
           {DEPTS.map((d) => (
             <span key={d.dept} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
               <span style={{ width: 18, height: 18, background: ds("gray", step(d)), display: "inline-block" }} />
-              <span style={{ ...note(24, INK), fontWeight: 500 }}>{d.dept}</span>
-              <span style={note(24, INK_SOFT)}>{pct(d.rate, 0)}</span>
+              <span style={{ ...note(21, INK), fontWeight: 500 }}>{d.dept}</span>
+              <span style={note(21, INK_SOFT)}>{pct(d.rate, 0)}</span>
             </span>
           ))}
         </div>

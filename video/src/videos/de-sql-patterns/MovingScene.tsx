@@ -126,7 +126,7 @@ export const MovingScene: React.FC = () => {
   // The spine's average: the same ROWS frame, as it ran over the filled days.
   const spineAvg = SPINE.filledAvg.lines.flatMap((l, i, all) => (l.includes("AVG(daily_value) OVER") ? [l.trim(), all[i + 1].trim().replace(/,$/, "")] : []));
   if (spineAvg.length !== 2 || !spineAvg[1].startsWith("ROWS BETWEEN 6 PRECEDING")) throw new Error("the spine's average is not the ROWS frame");
-  const code: React.CSSProperties = { fontFamily: MONO, fontSize: 24, fontWeight: 500, color: BLUE_INK, whiteSpace: "pre", fontVariantLigatures: "none" };
+  const code: React.CSSProperties = { fontFamily: MONO, fontSize: 20, fontWeight: 500, color: BLUE_INK, whiteSpace: "pre", fontVariantLigatures: "none" };
 
   return (
     <AbsoluteFill>
@@ -150,7 +150,7 @@ export const MovingScene: React.FC = () => {
 
           {/* ── The metric, on the opening's thirteen days ── */}
           <Ink at={metricAt - 2} dur={12} style={{ left: X0, top: g.top - h(40), whiteSpace: "nowrap" }}>
-            <span style={label(24, INK_SOFT)}>
+            <span style={label(21, INK_SOFT)}>
               <span style={{ fontFamily: MONO, fontWeight: 500 }}>daily_metrics</span>: the video&rsquo;s own values, on user 1&rsquo;s login days
             </span>
           </Ink>
@@ -217,7 +217,7 @@ export const MovingScene: React.FC = () => {
 
           {/* The ROWS frame's short windows, and the CASE that nulls them. */}
           <Note at={shortAt} x={X0} y={underList(P.lines.length)} out={generateAt - 2}>
-            <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
               the first <Num>{MOVING.full.nulled}</Num> rows have short frames:{" "}
               <span style={{ opacity: ease(frame, nullFirstAt - 2, 10) }}>null them</span>
             </div>
@@ -250,8 +250,8 @@ export const MovingScene: React.FC = () => {
             ]}
           />
           <Note at={calendarAt} x={SUM_X} y={sg.rowTop(3) + h(26)}>
-            <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>by the calendar:</div>
-            <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+            <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>by the calendar:</div>
+            <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
               {MOVING.rangeClause.replace(/\)$/, "")}
             </div>
           </Note>
@@ -280,7 +280,7 @@ export const MovingScene: React.FC = () => {
           />
           {/* The step the 95.0 comes from: the same frame, over the filled days. */}
           <Note at={againAt + 4} x={X0} y={underList(F.lines.length)}>
-            <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>then the same frame, over these rows:</div>
+            <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>then the same frame, over these rows:</div>
             <div style={{ ...code, marginTop: 6 }}>{`${spineAvg[0]}\n  ${spineAvg[1]}`}</div>
           </Note>
           <Note at={calendarTableAt - 2} x={SUM_X} y={sg.rowTop(3) + h(110)}>

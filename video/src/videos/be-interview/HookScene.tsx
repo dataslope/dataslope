@@ -61,8 +61,8 @@ const Row: React.FC<{ i: number; at: number; name: string; part: React.ReactNode
           transform: `translateY(${(1 - p) * -10}px)`,
         }}
       >
-        <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</span>
-        <span style={{ ...label(24, partColor), whiteSpace: "nowrap", opacity: ease(frame, at + 10, 12) }}>{part}</span>
+        <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</span>
+        <span style={{ ...label(22, partColor), whiteSpace: "nowrap", opacity: ease(frame, at + 10, 12) }}>{part}</span>
       </div>
       <div
         style={{
@@ -153,10 +153,10 @@ export const HookScene: React.FC = () => {
         >
           What breaks under load?
         </Ink>
-        <Ink at={backendAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 252, whiteSpace: "nowrap", ...note(28, INK) }}>
+        <Ink at={backendAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 252, whiteSpace: "nowrap", ...note(30, INK) }}>
           Backend interviews ask them <Mark at={moreAt + 2}>more than they used to.</Mark>
         </Ink>
-        <Ink at={seriesAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 316, whiteSpace: "nowrap", ...note(28, INK) }}>
+        <Ink at={seriesAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 316, whiteSpace: "nowrap", ...note(30, INK) }}>
           This series is about answering them.
         </Ink>
 
@@ -213,10 +213,10 @@ export const HookScene: React.FC = () => {
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap", marginLeft: "-0.14em" }}>
+              <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap", marginLeft: "-0.14em" }}>
                 <Mark at={addAt + 2}>Backend roles add</Mark>
               </span>
-              <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, addAt + 12, 12) }}>
+              <span style={{ ...label(22, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, addAt + 12, 12) }}>
                 Parts <Num>{partOf("be-system-design")}</Num> to <Num>{partOf("be-concurrency")}</Num>
               </span>
             </div>

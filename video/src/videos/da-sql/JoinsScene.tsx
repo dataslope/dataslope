@@ -165,8 +165,8 @@ export const JoinsScene: React.FC = () => {
             out={k.kind === "FULL" ? leftJoinAt - 4 : k.until === undefined ? undefined : k.until - 4}
             style={{ left: rg.x, top: rg.top - 40, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}
           >
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>{k.kind} JOIN</span>
-            <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>{k.rows} rows</span>
+            <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK }}>{k.kind} JOIN</span>
+            <span style={{ ...note(22, INK_SOFT), ...TABULAR }}>{k.rows} rows</span>
           </Ink>
         ))}
         <DataTable
@@ -201,8 +201,8 @@ export const JoinsScene: React.FC = () => {
                 />
                 <Venn kind={k.kind} />
                 <div style={{ position: "relative" }}>
-                  <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>{k.kind}</div>
-                  <div style={{ ...note(24, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>{k.rows} rows</div>
+                  <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>{k.kind}</div>
+                  <div style={{ ...note(21, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>{k.rows} rows</div>
                 </div>
               </div>
             </Ink>

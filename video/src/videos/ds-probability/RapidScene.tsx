@@ -47,16 +47,16 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
       <Axes x={xs} y={ys} xTicks={[140, 160, 180, 200]} yTicks={[50, 75, 100]} xTitle="height, cm" yTitle="weight, kg" at={startAt} size={21} />
       <Dots dots={dots} r={4.5} opacity={0.6} />
       <Note at={startAt + 6} x={SIDE} y={y(390)}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>covariance</span>
+        <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>covariance</span>
       </Note>
       <Note at={cmAt} x={SIDE} y={y(424)}>
-        <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>{fmt(COV.covCm, 1)} in centimeters</span>
+        <span style={{ ...note(30, INK), ...TABULAR, whiteSpace: "nowrap" }}>{fmt(COV.covCm, 1)} in centimeters</span>
       </Note>
       <Note at={mAt} x={SIDE} y={y(466)}>
-        <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>{fmt(COV.covM, 2)} in meters</span>
+        <span style={{ ...note(30, INK), ...TABULAR, whiteSpace: "nowrap" }}>{fmt(COV.covM, 2)} in meters</span>
       </Note>
       <Note at={corrAt} x={SIDE} y={y(512)}>
-        <span style={{ ...label(24, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(23, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
           correlation <span style={{ color: OK_INK }}>{fmt(COV.rCm)}</span> either way
         </span>
       </Note>
@@ -67,7 +67,7 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
           return (
             <g key={v}>
               <line x1={x} x2={x} y1={scale.y + 14} y2={scale.y + 30} stroke={INK} strokeWidth={2} />
-              <text x={x} y={scale.y + 56} textAnchor="middle" style={{ ...label(24, INK_SOFT), ...TABULAR, fill: INK_SOFT }}>
+              <text x={x} y={scale.y + 56} textAnchor="middle" style={{ ...label(21, INK_SOFT), ...TABULAR, fill: INK_SOFT }}>
                 {v === -1 ? "−1" : v}
               </text>
             </g>
@@ -82,12 +82,12 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
         ))}
       </Svg>
       <Note at={zeroAt + 4} x={PARA.right + 30} y={y(PARA.top) + 10}>
-        <span style={{ ...label(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>r = {fmt(COV.parabolaR)}</span>
+        <span style={{ ...label(26, INK), ...TABULAR, whiteSpace: "nowrap" }}>r = {fmt(COV.parabolaR)}</span>
       </Note>
       <Note at={lineAt} x={PARA.right + 30} y={y(PARA.top) + 52}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>no straight line,</span>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>no straight line,</span>
         <br />
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
           <Mark at={lineAt + 10}>still a relationship</Mark>
         </span>
       </Note>
@@ -205,15 +205,15 @@ export const RapidScene: React.FC = () => {
         {/* ── Into machine learning ── */}
         <Spot id="ds-probability-rabbit" at={modelAt} left={X0 - 10} top={y(560)} width={420} height={300} />
         <Note at={modelAt + 4} x={R_X} y={y(440)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>A model&rsquo;s output is a probability too.</span>
+          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>A model&rsquo;s output is a probability too.</span>
         </Note>
         <Note at={holdsAt} x={R_X} y={y(520)}>
-          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>
             Does it hold up on data the model hasn&rsquo;t seen?
           </span>
         </Note>
         <Note at={scoreAt} x={R_X} y={y(580)}>
-          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>How would you score it?</span>
+          <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>How would you score it?</span>
         </Note>
         <NextLine at={nextAt} x={R_X} y={y(760)} width={1000}>
           Machine learning, training and evaluating

@@ -99,7 +99,7 @@ export const GeometricScene: React.FC = () => {
           </Svg>
         ) : null}
         <Note at={fiveAt + 4} x={PIE_X} y={y(PIE_Y) + PIE_R + 16} style={{ transform: "translateX(-50%)" }}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>each call: a 1-in-5 chance</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>each call: a 1-in-5 chance</span>
         </Note>
 
         <Axis scale={X} base={base} ticks={[1, 5, 10, 15, 20]} at={triesAt - 10} />
@@ -131,14 +131,14 @@ export const GeometricScene: React.FC = () => {
           />
         </Svg>
         <Note at={oneAt} x={firstX + 50} y={base - GEOMETRIC.pmf[0] * unit - 18}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>1 call, the likeliest</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>1 call, the likeliest</span>
         </Note>
         <VRule x={meanX} bottom={base} top={base - h(TALL - 120)} at={averageAt - 2} />
         <Note at={callsAt - 2} x={meanX + 12} y={base - h(TALL - 110)}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>average {GEOMETRIC.mean}</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>average {GEOMETRIC.mean}</span>
         </Note>
         <Note at={likeliestAt} x={meanX + 12} y={base - h(TALL - 146)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>but not the likeliest</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>but not the likeliest</span>
         </Note>
         <Bracket x0={tailX0} x1={tailX1} y={tailY} at={tenAt - 4} color={ASK} />
         <Note at={elevenAt} x={(tailX0 + tailX1) / 2 - 130} y={tailY - h(50)}>

@@ -156,7 +156,7 @@ export const CloseScene: React.FC = () => {
                 }}
               >
                 <span style={{ ...label(24, counting ? DATA_INK : INK), fontWeight: 500 }}>{s.name}</span>
-                <span style={{ ...label(24, INK_SOFT), fontWeight: 500, ...TABULAR }}> {s.year}</span>
+                <span style={{ ...label(22, INK_SOFT), fontWeight: 500, ...TABULAR }}> {s.year}</span>
               </Ink>
             </React.Fragment>
           );
@@ -164,7 +164,7 @@ export const CloseScene: React.FC = () => {
 
         {/* ── What still sits underneath ── */}
         <Ink at={vectorsAt - 4} dur={14} style={{ left: 96, top: LIST - 4, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK_SOFT) }}>still underneath, and the year it came from</span>
+          <span style={{ ...label(22, INK_SOFT) }}>still underneath, and the year it came from</span>
         </Ink>
         {still.map((l, i) => (
           <Ink key={l.story} at={l.at - 2} dur={16} style={{ left: 96, top: LIST + 40 + i * ROW, whiteSpace: "nowrap" }}>
@@ -179,7 +179,7 @@ export const CloseScene: React.FC = () => {
         ))}
         {/* ── And the two warnings ── */}
         <Ink at={warningsAt - 2} dur={14} style={{ left: WARN_X, top: LIST - 4, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK_SOFT) }}>two warnings</span>
+          <span style={{ ...label(22, INK_SOFT) }}>two warnings</span>
         </Ink>
         {warn.map((l, i) => (
           <Ink key={l.story} at={l.at - 2} dur={16} style={{ left: WARN_X, top: LIST + 40 + i * ROW, whiteSpace: "nowrap" }}>

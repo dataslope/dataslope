@@ -17,7 +17,7 @@ const WORKER = { x: 1110, w: 170, h: 58, mids: [400, 500] };
 const STORE = { x: 1380, w: 320 };
 const TOKEN = { w: 40, h: 34, step: 46 };
 /** A click's ID, as a small solid chip. */
-const chip = (fill: string): React.CSSProperties => ({ ...label(24, PAPER), fontWeight: 500, padding: "4px 8px", borderRadius: 7, background: fill });
+const chip = (fill: string): React.CSSProperties => ({ ...label(20, PAPER), fontWeight: 500, padding: "4px 8px", borderRadius: 7, background: fill });
 
 /**
  * Question 8: a click counted in the database inside the redirect, and a
@@ -115,7 +115,7 @@ export const QueueScene: React.FC = () => {
         {/* Before: the count is written inside the request. */}
         <Flow points={[[REDIRECT.x + REDIRECT.w + 6, mid], [STORE.x - 8, mid]]} at={countingAt + 6} color={ACCENT} dur={20} out={oldOut} />
         <Ink at={waitAt} dur={12} out={oldOut} style={{ left: REDIRECT.x + REDIRECT.w + 60, top: mid - 46, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>count +1, and the redirect waits for it</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>count +1, and the redirect waits for it</span>
         </Ink>
         <Node
           x={STORE.x}
@@ -127,13 +127,13 @@ export const QueueScene: React.FC = () => {
           dashed={ease(frame, txAt, 10) > 0.5}
           fill={PAPER}
         >
-          <div style={{ position: "absolute", top: 14, left: 0, right: 0, textAlign: "center", ...label(24, ease(frame, txAt, 10) > 0.5 ? OK_INK : BLUE_INK), fontWeight: 500 }}>
+          <div style={{ position: "absolute", top: 14, left: 0, right: 0, textAlign: "center", ...label(22, ease(frame, txAt, 10) > 0.5 ? OK_INK : BLUE_INK), fontWeight: 500 }}>
             {ease(frame, txAt, 10) > 0.5 ? "one transaction" : "database"}
           </div>
-          <div style={{ position: "absolute", top: 58, left: 22, ...note(24, INK), whiteSpace: "nowrap" }}>
+          <div style={{ position: "absolute", top: 58, left: 22, ...note(22, INK), whiteSpace: "nowrap" }}>
             clicks: <b><Num>{1203 + (recorded > 0.5 ? 1 : 0)}</Num></b>
           </div>
-          <div style={{ position: "absolute", top: 104, left: 22, ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, idAt, 10) }}>
+          <div style={{ position: "absolute", top: 104, left: 22, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, idAt, 10) }}>
             seen IDs: <Num>45 46</Num>
             <span style={{ color: OK_INK, fontWeight: 500, opacity: recorded }}> 47</span>
           </div>
@@ -159,7 +159,7 @@ export const QueueScene: React.FC = () => {
           <rect x={QUEUE.x} y={mid - QUEUE.h / 2} width={QUEUE.w} height={QUEUE.h} rx={12} fill={`color-mix(in srgb, ${BAR} 6%, ${PAPER})`} stroke={BAR} strokeWidth={2.5} />
         </Svg>
         <Ink at={queueAt + 4} dur={12} style={{ left: QUEUE.x, top: mid - QUEUE.h / 2 - 40, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, BLUE_INK), fontWeight: 500 }}>queue</span>
+          <span style={{ ...label(22, BLUE_INK), fontWeight: 500 }}>queue</span>
         </Ink>
         <Flow points={[[REDIRECT.x + REDIRECT.w + 6, mid], [QUEUE.x - 8, mid]]} at={queueAt + 4} color={BAR} />
         {tokens.map((t) =>
@@ -203,10 +203,10 @@ export const QueueScene: React.FC = () => {
         </Line>
         <Flow points={[[REDIRECT.x + REDIRECT.w / 2, mid + REDIRECT.h / 2 + 6], [REDIRECT.x + REDIRECT.w / 2, mid + 110], [CLIENT.x + CLIENT.w / 2, mid + 110], [CLIENT.x + CLIENT.w / 2, mid + CLIENT.h / 2 + 8]]} at={returnsAt} color={OK} width={2.6} />
         <Ink at={returnsAt + 8} dur={12} style={{ left: CLIENT.x + CLIENT.w / 2 + 16, top: mid + 122, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, OK_INK), fontWeight: 500 }}>returns at once</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500 }}>returns at once</span>
         </Ink>
         <Ink at={burstAt} dur={12} style={{ left: QUEUE.x, top: mid + QUEUE.h / 2 + 18, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK), fontWeight: 500 }}>
+          <span style={{ ...note(21, INK), fontWeight: 500 }}>
             <Mark at={burstAt + 2}>a burst only makes it longer</Mark>
           </span>
         </Ink>
@@ -258,7 +258,7 @@ export const QueueScene: React.FC = () => {
               position: "absolute",
               left: STORE.x + 30,
               top: storeTop + storeH - 52,
-              ...label(24, OK_INK),
+              ...label(20, OK_INK),
               fontWeight: 500,
               whiteSpace: "nowrap",
               opacity: repeat,

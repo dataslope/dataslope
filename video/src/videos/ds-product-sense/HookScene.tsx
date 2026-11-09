@@ -62,7 +62,7 @@ const Tile: React.FC<{
         transform: `translateY(${(1 - p) * 20}px)`,
       }}
     >
-      <div style={{ position: "absolute", left: 0, top: COL.name, ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</div>
+      <div style={{ position: "absolute", left: 0, top: COL.name, ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</div>
       <div style={{ position: "absolute", left: 0, top: COL.value, ...note(64, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
         <span style={lift}>{value}</span>
       </div>
@@ -142,7 +142,7 @@ export const HookScene: React.FC = () => {
             at={signupsAt - 4}
             name="Total signups"
             value={num(HOOK.signups)}
-            delta={<span style={{ ...note(28, INK_SOFT), fontWeight: 500 }}>▲ {num(HOOK.signupsToday)} today</span>}
+            delta={<span style={{ ...note(26, INK_SOFT), fontWeight: 500 }}>▲ {num(HOOK.signupsToday)} today</span>}
             deltaAt={upAt}
             line={signups}
             lineAt={everyAt - 4}
@@ -168,7 +168,7 @@ export const HookScene: React.FC = () => {
             name="Still cooking 4 weeks after joining"
             value={`${HOOK.retentionNow}%`}
             delta={
-              <span style={{ ...note(28, ACCENT_INK), fontWeight: 500 }}>
+              <span style={{ ...note(26, ACCENT_INK), fontWeight: 500 }}>
                 ▼ 2 points, from {HOOK.retentionWas}%
               </span>
             }
@@ -186,7 +186,7 @@ export const HookScene: React.FC = () => {
             <span style={{ ...madeUp(21), opacity: 1 }}>one made-up recipe app: all its numbers are invented</span>
           </Note>
           <Note at={codeAt} x={col2 + COL.lineW} align="right" y={y(TILE.top) - h(44) - 5}>
-            <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>no code in this round</span>
+            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>no code in this round</span>
           </Note>
 
           {/* Fourteen questions: eleven with a figure, three in a sentence. */}
@@ -216,13 +216,13 @@ export const HookScene: React.FC = () => {
             })}
           </svg>
           <Note at={elevenAt + 8} x={X0} y={y(SQUARES.top) + SQUARES.size + h(14)}>
-            <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>11 with a figure</span>
+            <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>11 with a figure</span>
           </Note>
           <Note at={threeAt + 6} x={X0 + 11 * (SQUARES.size + SQUARES.gap) + 30} y={y(SQUARES.top) + SQUARES.size + h(14)}>
-            <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>3 in a sentence</span>
+            <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>3 in a sentence</span>
           </Note>
           <Note at={beginAt + 4} x={X0} y={y(SQUARES.top) - 62}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
               <b style={{ color: INK }}>first:</b> the number a whole team steers by
             </span>
           </Note>

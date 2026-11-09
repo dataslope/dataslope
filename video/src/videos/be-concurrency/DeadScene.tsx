@@ -191,14 +191,14 @@ export const DeadScene: React.FC = () => {
             <span style={{ transform: `scale(${1 + 0.2 * pulse(frame, twoAt + 10, 18)})` }}>
               <LockGlyph size={30} color={l.holder < 0 ? INK : THREAD[l.holder].fill} />
             </span>
-            <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{l.name}</span>
+            <span style={{ ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{l.name}</span>
           </Note>
         ))}
         {[t1, t2].map((t, i) => (
           <ThreadName key={i} t={i} x={t.x + t.w / 2} y={t.y + t.h / 2 - 15} at={setAt + 6 + i * 4} size={23} center />
         ))}
         <Note at={wantsBAt} x={X0} y={y(686)}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.5em", fontSize: 24 }}>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.5em", fontSize: 20 }}>
             <svg width={36} height={10}>
               <line x1={0} y1={5} x2={36} y2={5} stroke={INK_SOFT} strokeWidth={4} />
             </svg>
@@ -218,7 +218,7 @@ export const DeadScene: React.FC = () => {
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>each waits on the other, for good</span>
         </Note>
         <Note at={eachAt + 16} x={X0} y={y(806)} out={getsAt - 2}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <Num>{DEADLOCK.opposite.deadlock}</Num> of the <Num>{DEADLOCK.opposite.schedules}</Num> possible schedules end this way
           </span>
         </Note>
@@ -272,11 +272,11 @@ export const DeadScene: React.FC = () => {
             <React.Fragment key={c.name}>
               <Link cx={LINK_CX} cy={cy} height={linkH} at={condAt[i] - 2} open={broken[i]} />
               <Note at={condAt[i]} x={ROW_X} y={rowY(i)}>
-                <div style={{ ...note(24, broken[i] > 0.5 ? OK_INK : INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.name}</div>
-                <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{c.gloss}</div>
+                <div style={{ ...note(25, broken[i] > 0.5 ? OK_INK : INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.name}</div>
+                <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{c.gloss}</div>
               </Note>
               <Note at={fixAt[i]} x={FIX_X} y={rowY(i) + h(14)}>
-                <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.fix}</span>
+                <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.fix}</span>
               </Note>
             </React.Fragment>
           );
@@ -286,13 +286,13 @@ export const DeadScene: React.FC = () => {
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Break any one, and it can&apos;t happen</span>
         </Note>
         <Note at={queueAt} x={FIX_X} y={rowY(0) + h(48)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>no other thread needs the lock</span>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>no other thread needs the lock</span>
         </Note>
         <Note at={orderAt + 4} x={FIX_X} y={rowY(3) + h(48)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the usual target</span>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the usual target</span>
         </Note>
         <Note at={releasesAt} x={FIX_X} y={rowY(2) + h(48)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>gives up, lets go of the first</span>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>gives up, lets go of the first</span>
         </Note>
       </Drift>
     </AbsoluteFill>

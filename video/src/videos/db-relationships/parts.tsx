@@ -5,7 +5,7 @@ import { type Cardinality, endSegment, endSymbols as kitEndSymbols, MARKER, mark
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { HIGHLIGHT, INK, INK_SOFT, PAPER, halo, headline, label, note } from "../../editorial/style";
+import { ACCENT_INK, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -39,7 +39,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: X0, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(26, INK_SOFT)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };
@@ -271,7 +271,7 @@ export const Link: React.FC<{
             top: at2[1],
             opacity: labelIn * (1 - gone) * (1 - dimmed),
             whiteSpace: "nowrap",
-            ...note(24, INK_SOFT),
+            ...note(21, INK_SOFT),
             ...halo,
           }}
         >

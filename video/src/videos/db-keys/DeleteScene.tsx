@@ -178,7 +178,7 @@ export const DeleteScene: React.FC = () => {
         {/* ── The three columns' headings: ON DELETE, then which ── */}
         {kinds.map((kind, i) => (
           <Ink key={kind.name} at={deletingAt - 4 + i * 4} dur={14} style={{ left: COL_X[i], top: y(TAG_Y), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT }}>
+            <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 500, color: INK_SOFT }}>
               ON DELETE{" "}
               {/* "?" until the narration names this one, then its name in the same place. */}
               <span style={{ position: "relative", display: "inline-block" }}>
@@ -330,7 +330,7 @@ export const DeleteScene: React.FC = () => {
         </Ink>
         <Reply x={COL_X[2]} top={s.below + 40} at={ticketStaysAt} tag={SETNULL.del.tag} size={20} />
         <Ink at={noOneAt + 6} dur={14} style={{ left: COL_X[2] + 150, top: s.below + 46, whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: MONO, fontSize: 24, color: INK }}>ticket {SETNULL.ticketsAfter.rows[0][0]} stays</span>
+          <span style={{ fontFamily: MONO, fontSize: 20, color: INK }}>ticket {SETNULL.ticketsAfter.rows[0][0]} stays</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

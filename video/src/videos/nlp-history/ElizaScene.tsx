@@ -116,13 +116,13 @@ export const ElizaScene: React.FC = () => {
           return (
             <React.Fragment key={i}>
               <Ink at={t} dur={12} style={{ left: PAD, top, whiteSpace: "pre" }}>
-                <div style={{ fontFamily: MONO, fontSize: 28, color: INK_SOFT }}>
+                <div style={{ fontFamily: MONO, fontSize: 30, color: INK_SOFT }}>
                   You:{"   "}
                   <span style={{ color: INK }}>{youLine}</span>
                 </div>
               </Ink>
               <Ink at={isFirst ? handAt - 2 : t + 6} dur={14} style={{ left: PAD, top: top + LINE, whiteSpace: "pre" }}>
-                <div style={{ fontFamily: MONO, fontSize: 28, color: INK, fontWeight: 500 }}>
+                <div style={{ fontFamily: MONO, fontSize: 30, color: INK, fontWeight: 500 }}>
                   ELIZA: <span style={{ fontWeight: 400 }}>{elizaLine}</span>
                 </div>
               </Ink>
@@ -164,7 +164,7 @@ export const ElizaScene: React.FC = () => {
       >
         &ldquo;{SECRETARY}&rdquo;
       </Quote>
-      <div style={{ position: "absolute", left: PX, top: y(856), display: "flex", gap: "0.3em", ...headline(34, true), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: PX, top: y(856), display: "flex", gap: "0.3em", ...headline(36, true), whiteSpace: "nowrap" }}>
         <Ink at={seeingAt - 2} style={{ position: "relative", color: INK }}>
           Reading real understanding
         </Ink>

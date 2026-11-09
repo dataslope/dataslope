@@ -29,7 +29,7 @@ const Block: React.FC<{ at: number; children: React.ReactNode }> = ({ at: from, 
   const frame = useCurrentFrame();
   const p = ease(frame, from, 14);
   return (
-    <div style={{ ...note(28, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 16}px)` }}>
+    <div style={{ ...note(29, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 16}px)` }}>
       {children}
     </div>
   );
@@ -165,7 +165,7 @@ export const ChangedScene: React.FC = () => {
           ))}
         </div>
         <Note at={coreAt} x={X0} y={y(BASE_Y) + 24 + 36 + 12}>
-          <span style={{ ...label(24, BLUE_INK), fontWeight: 500 }}>the core loop, the same as ever</span>
+          <span style={{ ...label(22, BLUE_INK), fontWeight: 500 }}>the core loop, the same as ever</span>
         </Note>
 
         {layers.map((l, i) => (
@@ -174,7 +174,7 @@ export const ChangedScene: React.FC = () => {
           </Layer>
         ))}
         <Note at={layers[0].at - 2} x={X0} y={layerTop(3) + LAYER_TEXT - 64}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>what&apos;s been added on top</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>what&apos;s been added on top</span>
         </Note>
 
         {/* Beside "AI in your own workflow": what a round with an assistant grades. */}
@@ -191,7 +191,7 @@ export const ChangedScene: React.FC = () => {
           </Note>
         ))}
         <Note at={pipeAt} x={SIDE} y={layerTop(0) + LAYER_TEXT} from="right">
-          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>now: the pipeline itself</span>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>now: the pipeline itself</span>
         </Note>
       </Drift>
     </AbsoluteFill>

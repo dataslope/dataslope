@@ -103,7 +103,7 @@ export const CoverScene: React.FC = () => {
           marks={[{ line: "Heap Blocks", at: heapAt }]}
         />
         <Note at={aloneAt} x={X0 + 1150 - 12} y={planTop + h(4)} align="right" out={includeAt - 8}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
             with an index on <SmallMono>customer_id</SmallMono> alone
           </span>
         </Note>
@@ -145,7 +145,7 @@ export const CoverScene: React.FC = () => {
           bands={rows.slice(0, SHOWN).map((_, row) => ({ row, at: zeroAt + row * 2, color: MARK_OK }))}
         />
         <Note at={holdsAt + 10} x={R_X} y={ig.rowTop(rows.length) + h(14)} out={includeAt}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>amount lives only in the table</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>amount lives only in the table</span>
         </Note>
         <PageStrip
           x={R_X}
@@ -156,7 +156,7 @@ export const CoverScene: React.FC = () => {
           ticks={[{ pages: INDEX.pages42, at: heapAt - 4, out: includeAt - 4, color: inkOf.red }]}
           out={sizeAt}
         />
-        <div style={{ position: "absolute", left: R_X, top: stripY + h(64), ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, holdsAt + 6, 12) * (1 - ease(frame, sizeAt, 10)) }}>
+        <div style={{ position: "absolute", left: R_X, top: stripY + h(64), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, holdsAt + 6, 12) * (1 - ease(frame, sizeAt, 10)) }}>
           the table&rsquo;s pages
         </div>
         <Note at={heapAt + 4} x={R_X} y={stripY + h(100)} out={includeAt - 4}>
@@ -172,7 +172,7 @@ export const CoverScene: React.FC = () => {
 
         {/* ── The price: size ── */}
         <Note at={sizeAt + 2} x={R_X} y={stripY - h(16)}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>Index size on disk</span>
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Index size on disk</span>
         </Note>
         <Bar
           x={R_X}
@@ -207,7 +207,7 @@ export const CoverScene: React.FC = () => {
           ink={ACCENT_INK}
         />
         <Note at={zeroAt + 14} x={X0} y={afterTop + planHeight(COVER.after.length, PLAN) + h(14)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
             <Num>0</Num> heap fetches because the table was just vacuumed: pages changed since then are still fetched
           </span>
         </Note>

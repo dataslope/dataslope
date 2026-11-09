@@ -100,14 +100,14 @@ export const CherryScene: React.FC = () => {
           ))}
         </Svg>
         {[80, 100, 120].map((v) => (
-          <div key={v} style={{ position: "absolute", right: 1920 - X0 + 12, top: py(v) - 13, opacity: ease(frame, from + 2, 12), ...note(24, INK_SOFT), ...TABULAR }}>
+          <div key={v} style={{ position: "absolute", right: 1920 - X0 + 12, top: py(v) - 13, opacity: ease(frame, from + 2, 12), ...note(20, INK_SOFT), ...TABULAR }}>
             {v}
           </div>
         ))}
         {[0, 2, 4, 6, 8, 10].map((yr) => (
           <div
             key={yr}
-            style={{ position: "absolute", left: px(Math.min(yr * 12, S.length - 1)), top: y(BOTTOM) + 14, transform: "translateX(-50%)", opacity: ease(frame, from + 4, 12), ...note(24, INK_SOFT) }}
+            style={{ position: "absolute", left: px(Math.min(yr * 12, S.length - 1)), top: y(BOTTOM) + 14, transform: "translateX(-50%)", opacity: ease(frame, from + 4, 12), ...note(20, INK_SOFT) }}
           >
             {yr === 0 ? "Year 0" : yr}
           </div>
@@ -131,7 +131,7 @@ export const CherryScene: React.FC = () => {
         <Dashed x0={X0} y0={py(S[0])} x1={X1} y1={py(S[0])} at={startedAt - 6} dur={22} color={INK_SOFT} width={2} />
         <Bracket x0={X0} x1={X1} y={py(HI) - 16} at={tenYearsAt - 4} up={false} tick={12} />
         <Note at={tenYearsAt} x={(X0 + X1) / 2} y={py(HI) - 52} from="up">
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", background: PAPER, padding: "0 10px" }}>
+          <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", background: PAPER, padding: "0 10px" }}>
             ten years
           </span>
         </Note>
@@ -140,7 +140,7 @@ export const CherryScene: React.FC = () => {
           {lit > 0 ? <path d={partial(winPts, lit)} fill="none" stroke={STAT} strokeWidth={6} strokeLinejoin="round" strokeLinecap="round" /> : null}
         </Svg>
         <Note at={startedAt - 2} x={X1} y={py(S[0]) + 14} align="right">
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
             started at {fmt(S[0], 0)}, ended at {fmt(S[S.length - 1], 0)}
           </span>
         </Note>
@@ -178,12 +178,12 @@ export const CherryScene: React.FC = () => {
         {winPts.map((_, i) => (
           <React.Fragment key={i}>
             <div
-              style={{ position: "absolute", left: ZX[i] + ZW / 2, top: zbase + 12, transform: "translateX(-50%)", opacity: ease(frame, showAt + 6 + i * 4, 10), ...note(24, INK_SOFT) }}
+              style={{ position: "absolute", left: ZX[i] + ZW / 2, top: zbase + 12, transform: "translateX(-50%)", opacity: ease(frame, showAt + 6 + i * 4, 10), ...note(20, INK_SOFT) }}
             >
               {MONTH[(WANDER.start + i) % 12]}
             </div>
             <Note at={everyAt - 4 + i * 4} x={ZX[i] + ZW / 2} y={zbase - h(S[WANDER.start + i] * ZUNIT) - 36} from="up">
-              <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+              <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
                 {fmt(S[WANDER.start + i], 0)}
               </span>
             </Note>
@@ -191,8 +191,8 @@ export const CherryScene: React.FC = () => {
         ))}
         {/* What the bars alone say, as they land; what they leave out, on "real". */}
         <Note at={thoseAt + 8} x={ZX[3] + ZW + 70} y={y(700)}>
-          <span style={{ ...body(34, true), color: STAT_INK, whiteSpace: "nowrap" }}>a breakout?</span>
-          <div style={{ ...note(24, INK_SOFT), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, realAt - 4, 12) }}>
+          <span style={{ ...body(36, true), color: STAT_INK, whiteSpace: "nowrap" }}>a breakout?</span>
+          <div style={{ ...note(22, INK_SOFT), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, realAt - 4, 12) }}>
             missing: the other {S.length - WANDER.length} months
           </div>
         </Note>

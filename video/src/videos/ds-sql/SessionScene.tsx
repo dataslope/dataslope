@@ -96,7 +96,7 @@ export const SessionScene: React.FC = () => {
           {Array.from({ length: 7 }, (_, k) => 9 + k).map((hr) => (
             <g key={hr} opacity={ease(frame, groupsAt + 6 + (hr - 9) * 2, 10)}>
               <line x1={tx(hr * 60)} x2={tx(hr * 60)} y1={ay} y2={ay + 8} stroke={INK_SOFT} strokeWidth={1.4} />
-              <text x={tx(hr * 60)} y={ay + 32} textAnchor="middle" fill={INK_SOFT} style={{ ...label(24, INK_SOFT), ...TABULAR }}>
+              <text x={tx(hr * 60)} y={ay + 32} textAnchor="middle" fill={INK_SOFT} style={{ ...label(19, INK_SOFT), ...TABULAR }}>
                 {hr}:00
               </text>
             </g>
@@ -104,7 +104,7 @@ export const SessionScene: React.FC = () => {
           {/* The rule: thirty minutes, to scale. */}
           <g opacity={ease(frame, thirtyAt - 2, 12)}>
             <rect x={tx(T1 - 30)} y={ay - 100} width={tx(T0 + 30) - tx(T0)} height={10} rx={3} fill={POINT_FILL} />
-            <text x={tx(T1)} y={ay - 110} textAnchor="end" fill={INK} style={{ ...label(24, INK) }}>
+            <text x={tx(T1)} y={ay - 110} textAnchor="end" fill={INK} style={{ ...label(19, INK) }}>
               a common threshold: 30 min
             </text>
           </g>
@@ -117,7 +117,7 @@ export const SessionScene: React.FC = () => {
             return (
               <g key={s} opacity={p}>
                 <path d={`M${a},${ay + 48} L${a},${ay + 56} L${b},${ay + 56} L${b},${ay + 48}`} fill="none" stroke={OK} strokeWidth={3} />
-                <text x={(a + b) / 2} y={ay + 82} textAnchor="middle" fill={OK_INK} style={{ ...label(24, OK_INK), fontWeight: 500 }}>
+                <text x={(a + b) / 2} y={ay + 82} textAnchor="middle" fill={OK_INK} style={{ ...label(19, OK_INK), fontWeight: 500 }}>
                   session {s}
                 </text>
               </g>
@@ -138,7 +138,7 @@ export const SessionScene: React.FC = () => {
                   stroke={hot > 0.5 ? POINT : INK_SOFT}
                   strokeWidth={long ? 2.6 : 1.8}
                 />
-                <text x={mid} y={ay - 54} textAnchor="middle" fill={hot > 0.5 ? INK : INK_SOFT} style={{ ...label(24, hot > 0.5 ? INK : INK_SOFT), fontWeight: long ? 500 : 500, ...TABULAR }}>
+                <text x={mid} y={ay - 54} textAnchor="middle" fill={hot > 0.5 ? INK : INK_SOFT} style={{ ...label(19, hot > 0.5 ? INK : INK_SOFT), fontWeight: long ? 500 : 500, ...TABULAR }}>
                   {long ? `${r[gap]} min` : r[gap]}
                 </text>
               </g>
@@ -156,7 +156,7 @@ export const SessionScene: React.FC = () => {
             );
           })}
         </svg>
-        <div style={{ position: "absolute", left: AX_X0 - 10, top: ay - h(116), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, hitsAt, 12) }}>
+        <div style={{ position: "absolute", left: AX_X0 - 10, top: ay - h(116), ...label(19, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, hitsAt, 12) }}>
           user 1, January 1
         </div>
 
@@ -192,7 +192,7 @@ export const SessionScene: React.FC = () => {
           ]}
         />
         <Note at={gapsAt} x={X0} y={g.rowTop(S.rows.length) + h(14)} out={allAt}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>gaps over 30 minutes open a session</span>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>gaps over 30 minutes open a session</span>
         </Note>
         <Note at={allAt} x={X0} y={g.rowTop(S.rows.length) + h(14)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>

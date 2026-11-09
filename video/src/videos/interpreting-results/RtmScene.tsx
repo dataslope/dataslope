@@ -130,7 +130,7 @@ export const RtmScene: React.FC = () => {
             </Ink>
           ))}
           <Ink at={from - 2} dur={12} style={{ left: 160, top: top - 42, whiteSpace: "nowrap" }}>
-            <span style={note(24, INK_SOFT)}>sales that month</span>
+            <span style={note(20, INK_SOFT)}>sales that month</span>
           </Ink>
           {/* The value axis. */}
           <Svg opacity={ease(frame, from - 2, 14)}>
@@ -139,7 +139,7 @@ export const RtmScene: React.FC = () => {
             ))}
           </Svg>
           {[50, 75, 100, 125, 150].map((v) => (
-            <div key={v} style={{ position: "absolute", right: 1920 - 228, top: py(v) - 13, opacity: ease(frame, from, 12), ...note(24, INK_SOFT), ...TABULAR }}>
+            <div key={v} style={{ position: "absolute", right: 1920 - 228, top: py(v) - 13, opacity: ease(frame, from, 12), ...note(20, INK_SOFT), ...TABULAR }}>
               {v}
             </div>
           ))}
@@ -184,10 +184,10 @@ export const RtmScene: React.FC = () => {
                   {b > 0 ? <line x1={COLS[1] - HALF - 18} x2={lerp(COLS[1] - HALF - 18, COLS[1] + HALF + 18, b)} y1={py(g.after)} y2={py(g.after)} stroke={g.color} strokeWidth={5} strokeLinecap="round" /> : null}
                 </Svg>
                 <Note at={g.beforeAt + 2} x={COLS[0] - HALF - 30} y={py(g.before) - 17} align="right">
-                  <span style={{ ...note(28, g.ink), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>{fmt(g.before, 1)}</span>
+                  <span style={{ ...note(26, g.ink), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>{fmt(g.before, 1)}</span>
                 </Note>
                 <Note at={g.afterAt + 2} x={COLS[1] + HALF + 30} y={py(g.after) - 17}>
-                  <span style={{ ...note(28, g.ink), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+                  <span style={{ ...note(26, g.ink), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
                     {fmt(g.after, 1)}
                     <span style={{ ...note(24, INK_SOFT), marginLeft: 12 }}>
                       {g.after > g.before ? "+" : "−"}
@@ -207,10 +207,10 @@ export const RtmScene: React.FC = () => {
             );
           })}
           <Note at={topAt} x={COLS[0] - HALF - 30} y={py(RTM.topBefore) - 54} align="right">
-            <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>top tenth</span>
+            <span style={{ ...note(21, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>top tenth</span>
           </Note>
           <Note at={bottomAt} x={COLS[0] - HALF - 30} y={py(RTM.bottomBefore) + 18} align="right">
-            <span style={{ ...note(24, DATA_INK), fontWeight: 500, whiteSpace: "nowrap" }}>bottom tenth</span>
+            <span style={{ ...note(21, DATA_INK), fontWeight: 500, whiteSpace: "nowrap" }}>bottom tenth</span>
           </Note>
 
           {/* The averages, ringed as the narration explains them. */}
@@ -229,7 +229,7 @@ export const RtmScene: React.FC = () => {
           {/* Where everyone's average sits, both months. */}
           <Dashed x0={240} y0={py(RTM.mean1)} x1={1130} y1={py(RTM.mean1)} at={averageAt - 6} dur={20} width={2.4} />
           <Note at={averageAt + 4} x={COLS[1] + HALF + 30} y={py(RTM.mean1) - 12}>
-            <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>everyone, about {Math.round(RTM.mean1)}</span>
+            <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>everyone, about {Math.round(RTM.mean1)}</span>
           </Note>
         </Drift>
 
@@ -238,7 +238,7 @@ export const RtmScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             sales = <Marker at={skillAt}>skill</Marker> + <Marker at={luckAt - 2}>luck</Marker>
           </span>
-          <div style={{ ...note(24, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>new luck every month</div>
+          <div style={{ ...note(21, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>new luck every month</div>
         </Note>
         <Note at={coachAt - 4} x={NOTE_X + 60} y={y(640)}>
           <span style={{ ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
@@ -246,13 +246,13 @@ export const RtmScene: React.FC = () => {
           </span>
         </Note>
         <Note at={anywayAt - 2} x={NOTE_X + 60} y={y(640) + 54}>
-          <span style={{ ...note(24, DATA_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, DATA_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             +{fmt(RTM.bottomAfter - RTM.bottomBefore, 1)} with no program at all
           </span>
         </Note>
         <Ring x={NOTE_X + 230} y={y(640) + 50} at={creditItAt - 2} color={DATA} r0={40} r1={150} />
         <Note at={controlAt - 2} x={NOTE_X + 60} y={y(780)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>The fair comparison</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>The fair comparison</span>
         </Note>
         <Note at={controlAt + 6} x={NOTE_X + 60} y={y(780) + 36}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>

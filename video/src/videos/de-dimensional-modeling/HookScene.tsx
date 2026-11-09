@@ -67,7 +67,7 @@ export const HookScene: React.FC = () => {
         <Note at={longAt} x={X0} y={y(LIST_Y + 80)}>
           <span style={{ display: "flex", alignItems: "center", gap: 18, whiteSpace: "nowrap" }}>
             <span style={{ width: 30, height: 30, borderRadius: 4, background: BAR, transform: `scale(${pop(frame, longAt, fps, 12)})` }} />
-            <span style={{ ...note(28, INK) }}>
+            <span style={{ ...note(30, INK) }}>
               one long table of events
               <span style={{ opacity: ease(frame, middleAt, 10), color: BLUE_INK }}>, in the middle</span>
             </span>
@@ -78,7 +78,7 @@ export const HookScene: React.FC = () => {
             <span style={{ width: 30, display: "flex", justifyContent: "center" }}>
               <span style={{ width: 18, height: 18, borderRadius: 3, border: `3px solid ${BAR}`, background: PAPER }} />
             </span>
-            <span style={{ ...note(28, INK) }}>small tables around it, that say</span>
+            <span style={{ ...note(30, INK) }}>small tables around it, that say</span>
           </span>
         </Note>
         {/* The four words as the house's badges, each popping in as it is
@@ -96,7 +96,7 @@ export const HookScene: React.FC = () => {
 
         {/* The round. */}
         <Note at={fifteenAt - 2} x={X0} y={y(LIST_Y + 330)}>
-          <span style={{ ...note(34, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(32, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <span style={{ color: BLUE_INK }}>
               <Num>15</Num> questions
             </span>
@@ -104,7 +104,7 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={tenAt - 2} x={X0} y={y(LIST_Y + 392)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: BLUE_INK }}>
               <Num>10</Num>
             </b>{" "}
@@ -113,7 +113,7 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={fiveAt - 2} x={X0 + 470} y={y(LIST_Y + 392)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>
               <Num>5</Num>
             </b>{" "}

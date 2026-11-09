@@ -67,7 +67,7 @@ export const BinaryScene: React.FC = () => {
       </Headline>
       <FigLabel n="8" title="Counts against presence, from the lesson" at={start - 2} x={X0} y={y(FIG_Y)} />
 
-      <Ink at={spamAt - 4} dur={14} style={{ left: X0, top: y(SPAM_Y) + 12, ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+      <Ink at={spamAt - 4} dur={14} style={{ left: X0, top: y(SPAM_Y) + 12, ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
         The spam
       </Ink>
       <ChipRow x={COL_X0} y={y(SPAM_Y)}>
@@ -79,20 +79,20 @@ export const BinaryScene: React.FC = () => {
 
       {/* When presence is enough, in the lesson's words. */}
       <Note at={shortAt - 2} x={1140} y={y(SPAM_Y) + 12}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           for <Mark at={shortAt}>short texts</Mark>, presence is enough: less swayed by length
         </span>
       </Note>
 
       <Note at={whetherAt + 4} x={X0} y={y(HEAD_ROW_Y) + 4}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the lesson’s vocabulary</span>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the lesson’s vocabulary</span>
       </Note>
       {SPAM.vocab.map((w, j) => (
         <Ink
           key={w}
           at={whetherAt + j * 2}
           dur={12}
-          style={{ left: COL_X0 + j * COL_W, width: COL_W, top: y(HEAD_ROW_Y), textAlign: "center", ...label(28, INK), whiteSpace: "nowrap" }}
+          style={{ left: COL_X0 + j * COL_W, width: COL_W, top: y(HEAD_ROW_Y), textAlign: "center", ...label(26, INK), whiteSpace: "nowrap" }}
         >
           {w}
         </Ink>
@@ -102,7 +102,7 @@ export const BinaryScene: React.FC = () => {
         const mark = ease(frame, r.markAt - 2, 12);
         return (
           <React.Fragment key={r.name}>
-            <Ink at={r.at - 4} dur={14} style={{ left: X0, top: y(r.top) + h(ROW_H) / 2 - 18, ...label(28, INK), whiteSpace: "nowrap" }}>
+            <Ink at={r.at - 4} dur={14} style={{ left: X0, top: y(r.top) + h(ROW_H) / 2 - 18, ...label(26, INK), whiteSpace: "nowrap" }}>
               {r.name}
             </Ink>
             {r.values.map((v, j) => (
@@ -124,7 +124,7 @@ export const BinaryScene: React.FC = () => {
         );
       })}
       <Note at={oneAt + 4} x={COL_X0} y={y(NOTE_Y)}>
-        <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
           1 for <Mark at={presentAt - 2}>present</Mark>, 0 for absent
         </span>
       </Note>

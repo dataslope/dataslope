@@ -88,7 +88,7 @@ export const WhyScene: React.FC = () => {
               alignItems: "center",
               justifyContent: "center",
               fontFamily: SANS,
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: 500,
               color: kept > 0 ? DATA_INK : INK,
             }}

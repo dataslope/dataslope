@@ -218,12 +218,12 @@ export const KnnScene: React.FC = () => {
         </Svg>
 
         <Note at={keepAt} x={COL} y={y(350)} out={out1}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             keeps all {MOONS.nTrain} training points
           </span>
         </Note>
         <Note at={newAt} x={COL} y={y(410)} out={out1}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             a new point{" "}
             <span style={{ opacity: ease(frame, closestAt, 10) }}>
               → its k closest
@@ -246,17 +246,17 @@ export const KnnScene: React.FC = () => {
           </span>
         </Note>
         <Note at={tenAt + 10} x={COL} y={y(560)} out={out1}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             so the new point is <Dot color={CLASS[VOTE.predicted]} />
           </span>
         </Note>
         <Note at={noTrainAt} x={COL} y={y(660)} out={out1}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>
             no training step,
           </span>
         </Note>
         <Note at={slowAt} x={COL} y={y(700)} out={out1}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>
             but slow to predict on large data
           </span>
         </Note>
@@ -312,7 +312,7 @@ export const KnnScene: React.FC = () => {
               >
                 <span
                   style={{
-                    ...note(24, BLUE_INK),
+                    ...note(25, BLUE_INK),
                     fontWeight: 500,
                     whiteSpace: "nowrap",
                     ...TABULAR,
@@ -332,7 +332,7 @@ export const KnnScene: React.FC = () => {
                 >
                   <span
                     style={{
-                      ...note(24, p.tagInk),
+                      ...note(25, p.tagInk),
                       fontWeight: 500,
                       whiteSpace: "nowrap",
                     }}
@@ -347,7 +347,7 @@ export const KnnScene: React.FC = () => {
         <Note at={patchAt} x={LEFTS[0] + 14} y={y(TOP) + h(10)} out={fifteenAt}>
           <span
             style={{
-              ...label(24, INK),
+              ...label(19, INK),
               whiteSpace: "nowrap",
               background: PAPER,
               padding: "0 6px",
@@ -357,7 +357,7 @@ export const KnnScene: React.FC = () => {
           </span>
         </Note>
         <Note at={cvAt} x={LEFTS[0]} y={y(TOP) + h(PH) + h(104)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <Mark at={labelsAt}>choose k by cross-validation</Mark>
           </span>
         </Note>

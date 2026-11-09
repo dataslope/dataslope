@@ -58,8 +58,8 @@ const Acid: React.FC<{ c: Ctx }> = ({ c }) => {
           {i > 0 ? <ColumnRule x={x - 27} top={top + c.h(14)} bottom={top + c.h(256)} at={p.at - 4} /> : null}
           <div style={{ position: "absolute", left: x, top, width: 196, opacity: Math.max(0.25, a) }}>
             <div style={{ ...headline(110), color: a > 0.5 ? BLUE_INK : INK_SOFT, lineHeight: 1 }}>{p.letter}</div>
-            <div style={{ ...label(28, INK), fontWeight: 500, marginTop: c.h(20), opacity: a }}>{p.word}</div>
-            <div style={{ ...note(24, INK_SOFT), marginTop: c.h(10), opacity: ease(frame, p.at + 8, 10), width: 196 }}>{p.gist}</div>
+            <div style={{ ...label(26, INK), fontWeight: 500, marginTop: c.h(20), opacity: a }}>{p.word}</div>
+            <div style={{ ...note(23, INK_SOFT), marginTop: c.h(10), opacity: ease(frame, p.at + 8, 10), width: 196 }}>{p.gist}</div>
           </div>
           </React.Fragment>
         );
@@ -113,16 +113,16 @@ const Norm: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={harderAt + 14} x={dg.x} y={dg.rowTop(3) + c.h(14)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one copy changed, two stale</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one copy changed, two stale</span>
       </Note>
       <Note at={disagreeAt} x={R_X} y={notesTop}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           <b>Normalized:</b> each fact once, nothing to disagree
           <span style={{ color: INK_SOFT, opacity: ease(frame, writeAt, 10) }}>; suits write-heavy systems</span>
         </span>
       </Note>
       <Note at={skipAt} x={R_X} y={notesTop + c.h(44)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           <b>Denormalized:</b> no join
           <span style={{ color: INK_SOFT, opacity: ease(frame, buyingAt, 10) }}>; faster reads, more storage, harder updates</span>
         </span>
@@ -170,13 +170,13 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
         <circle cx={lx} cy={cy} r={r} fill={`color-mix(in srgb, ${BAR} ${30 * fillL}%, ${PAPER})`} stroke={BAR} strokeWidth={2.5} />
         <circle cx={rx} cy={cy} r={r} fill={`color-mix(in srgb, ${BAR} ${30 * fillR}%, transparent)`} stroke={BAR} strokeWidth={2.5} />
         <circle cx={rx} cy={cy} r={r} clipPath="url(#be-joins-left)" fill={`color-mix(in srgb, ${OK} ${45 * inner}%, transparent)`} />
-        <text x={lx - r * 0.5} y={cy - r - 18} textAnchor="middle" style={svgText(label(24, INK))}>
+        <text x={lx - r * 0.5} y={cy - r - 18} textAnchor="middle" style={svgText(label(22, INK))}>
           customers
         </text>
-        <text x={rx + r * 0.5} y={cy - r - 18} textAnchor="middle" style={svgText(label(24, INK))}>
+        <text x={rx + r * 0.5} y={cy - r - 18} textAnchor="middle" style={svgText(label(22, INK))}>
           orders
         </text>
-        <text x={(lx + rx) / 2} y={cy + 8} textAnchor="middle" style={svgText({ ...label(24, OK_INK), fontWeight: 500 })} opacity={ease(frame, innerRowsAt, 10)}>
+        <text x={(lx + rx) / 2} y={cy + 8} textAnchor="middle" style={svgText({ ...label(22, OK_INK), fontWeight: 500 })} opacity={ease(frame, innerRowsAt, 10)}>
           matches
         </text>
       </Svg>
@@ -191,17 +191,17 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={nullsAt} x={R_X + 700} y={c.y(400) + c.h(96)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
           order columns <i>null</i> for:
         </span>
       </Note>
       {RAPID.joins.none.map((name, i) => (
         <Note key={name} at={sixAt + i * 2} x={R_X + 700 + (i % 3) * 100} y={c.y(400) + c.h(136) + Math.floor(i / 3) * c.h(40)}>
-          <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</span>
+          <span style={{ ...note(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{name}</span>
         </Note>
       ))}
       <Note at={rightAt} x={R_X + 700} y={c.y(400) + c.h(250)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           <b>right</b>: the mirror
           <span style={{ opacity: ease(frame, fullAt, 10) }}>
             ; <b>full</b>: both sides
@@ -252,7 +252,7 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
       </TableName>
       <DataTable g={cg} cols={[{ name: "id", ink: BLUE_INK }, { name: "name" }]} rows={[["1", "Ava"], ["2", "Ben"]].map((cells, i) => ({ cells, at: pkAt + 4 + i * 3 }))} at={pkAt} />
       <Note at={uniqueAt} x={cg.x} y={cg.rowTop(2) + c.h(14)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           unique, never null<span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, autoAt, 10) }}>, indexed for you</span>
         </span>
       </Note>
@@ -273,16 +273,16 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
         <KeyArrow key={i} from={[og.right + 8, og.rowMid(i)]} to={[cg.x - 8, cg.rowMid(i)]} at={fkAt + 8 + i * 4} />
       ))}
       <Note at={missingAt + 10} x={og.x} y={og.rowTop(3) + c.h(14)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no customer 9: refused</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no customer 9: refused</span>
       </Note>
       <Note at={doesntAt - 4} x={R_X} y={idxTop - c.h(48)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           Indexes on the transfer example&rsquo;s tables, from <SmallMono color={INK}>pg_indexes</SmallMono>:
         </span>
       </Note>
       <DataTable g={ig} cols={RAPID.keys.cols.map((n) => ({ name: n }))} rows={RAPID.keys.rows.map((cells, i) => ({ cells, at: doesntAt + i * 3 }))} at={doesntAt - 2} />
       <Note at={doesntAt + 12} x={ig.right + 40} y={idxTop + c.h(30)}>
-        <div style={{ ...note(24, INK), width: 400 }}>
+        <div style={{ ...note(22, INK), width: 400 }}>
           primary keys only: <b style={{ color: ACCENT_INK }}>nothing on</b> <SmallMono>from_id</SmallMono> or <SmallMono>to_id</SmallMono>, the foreign keys
         </div>
       </Note>
@@ -304,7 +304,7 @@ const Cover: React.FC<{ c: Ctx }> = ({ c }) => {
       <Listing lines={cv.query.slice(1)} x={R_X} top={top} width={760} size={20} at={holdsAt - 6} />
       <Listing lines={cv.include} x={R_X} top={top + c.h(118)} width={760} size={20} at={holdsAt} marks={[{ line: "INCLUDE", text: "INCLUDE (amount)", at: holdsAt + 8 }]} />
       <Note at={aloneAt - 6} x={R_X} y={top + c.h(250)}>
-        <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <div style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           index on <SmallMono>customer_id</SmallMono> alone: <SmallMono>Bitmap Heap Scan</SmallMono>,{" "}
           <b style={{ color: ACCENT_INK }}>
             <Num>{cv.heapBlocks}</Num> table pages
@@ -312,7 +312,7 @@ const Cover: React.FC<{ c: Ctx }> = ({ c }) => {
         </div>
       </Note>
       <Note at={aloneAt} x={R_X} y={top + c.h(300)}>
-        <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <div style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           with <SmallMono>amount</SmallMono> inside: <SmallMono>Index Only Scan</SmallMono>,{" "}
           <b style={{ color: OK_INK }}>
             <SmallMono>Heap Fetches: {cv.heapFetches}</SmallMono>
@@ -320,12 +320,12 @@ const Cover: React.FC<{ c: Ctx }> = ({ c }) => {
         </div>
       </Note>
       <Note at={zeroAt + 4} x={R_X} y={top + c.h(360)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
           the same <SmallMono>SUM</SmallMono>, {cv.spend}, <b style={{ color: OK_INK }}>zero trips to the table</b>
         </span>
       </Note>
       <Note at={priceAt - 4} x={R_X} y={top + c.h(420)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           the price: <b>a wider index</b>
         </span>
       </Note>
@@ -381,13 +381,13 @@ export const RapidScene: React.FC = () => {
         {/* ── The bridge ── */}
         <Spot art="chipmunk" at={isoAt + 4} left={1260} top={y(330)} width={480} />
         <Note at={isoAt} x={X0} y={listBottom + h(46)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             Isolation, locks, deadlocks:
             <span style={{ opacity: ease(frame, sideAt, 10) }}> the database&rsquo;s side</span>
           </span>
         </Note>
         <Note at={manyAt} x={X0} y={listBottom + h(94)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             of <b style={{ color: BLUE_INK }}>many requests arriving at once</b>
           </span>
         </Note>

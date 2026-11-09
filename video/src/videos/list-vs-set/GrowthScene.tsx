@@ -72,7 +72,7 @@ export const GrowthScene: React.FC = () => {
       </Fig>
       {/* The legend, at the right end of the label's line. */}
       <Note at={start - 6} x={1790} y={y(104) + 1} align="right" from="right">
-        <span style={{ ...note(24, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 12 }}>
+        <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 12 }}>
           <Swatch color={LIST} /> <span style={{ color: LIST_INK, fontWeight: 500 }}>list</span>
           <span style={{ width: 14 }} />
           <Swatch color={SET} /> <span style={{ color: SET_INK, fontWeight: 500 }}>set</span>
@@ -81,8 +81,8 @@ export const GrowthScene: React.FC = () => {
 
       {/* ── a: both, in milliseconds ── */}
       <Ink at={start - 10} dur={14} style={{ left: A.x0 - 94, top: y(TITLE_Y), display: "flex", alignItems: "baseline", gap: 14 }}>
-        <span style={label(24, INK_SOFT)}>a</span>
-        <span style={{ ...body(28, true), color: INK }}>Both, in milliseconds</span>
+        <span style={label(22, INK_SOFT)}>a</span>
+        <span style={{ ...body(30, true), color: INK }}>Both, in milliseconds</span>
       </Ink>
       <Grid
         scale={A}
@@ -127,25 +127,25 @@ export const GrowthScene: React.FC = () => {
         </svg>
       ) : null}
       <Note at={doublesAt} x={hx - 18} y={hy - 66} align="right">
-        <div style={{ ...note(24, LIST_INK), fontWeight: 500, ...halo }}>{fmt(HALF_MILLION.listMs)} ms</div>
-        <div style={{ ...note(24, INK_SOFT), ...halo }}>at 500,000 items</div>
+        <div style={{ ...note(22, LIST_INK), fontWeight: 500, ...halo }}>{fmt(HALF_MILLION.listMs)} ms</div>
+        <div style={{ ...note(20, INK_SOFT), ...halo }}>at 500,000 items</div>
       </Note>
       <Note at={tooAt} x={mx - 18} y={my - 66} align="right">
-        <div style={{ ...note(24, LIST_INK), fontWeight: 500, ...halo }}>{fmt(MILLION.listMs)} ms</div>
-        <div style={{ ...note(24, INK_SOFT), ...halo }}>at 1,000,000</div>
+        <div style={{ ...note(22, LIST_INK), fontWeight: 500, ...halo }}>{fmt(MILLION.listMs)} ms</div>
+        <div style={{ ...note(20, INK_SOFT), ...halo }}>at 1,000,000</div>
       </Note>
       <Note at={tooAt + 6} x={mx + 52} y={(hy + my) / 2 - 30}>
         <div style={{ ...note(24, INK), fontWeight: 500 }}>×{fmt(MILLION.listMs / HALF_MILLION.listMs, 1)} the time</div>
-        <div style={{ ...note(24, INK_SOFT) }}>for ×2 the items</div>
+        <div style={{ ...note(20, INK_SOFT) }}>for ×2 the items</div>
       </Note>
       <Note at={flatAt} x={sx(A, 560_000)} y={y(A_BASE) - 48} from="up">
-        <span style={{ ...note(24, SET_INK), fontWeight: 500, ...halo }}>the set, on the floor at every size</span>
+        <span style={{ ...note(22, SET_INK), fontWeight: 500, ...halo }}>the set, on the floor at every size</span>
       </Note>
 
       {/* ── b: the set alone, in nanoseconds ── */}
       <Ink at={flatAt - 6} dur={14} style={{ left: B.x0 - 84, top: y(TITLE_Y), display: "flex", alignItems: "baseline", gap: 14 }}>
-        <span style={label(24, INK_SOFT)}>b</span>
-        <span style={{ ...body(28, true), color: INK }}>The set, in nanoseconds</span>
+        <span style={label(22, INK_SOFT)}>b</span>
+        <span style={{ ...body(30, true), color: INK }}>The set, in nanoseconds</span>
       </Ink>
       <Grid
         scale={B}
@@ -168,14 +168,14 @@ export const GrowthScene: React.FC = () => {
         <div style={{ ...note(24, SET_INK), fontWeight: 500 }}>
           {fmt(SET_NS_RANGE[0], 1)} to {fmt(SET_NS_RANGE[1], 1)} ns
         </div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 4 }}>at every size, 100k to 1M</div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 14, opacity: ease(frame, everyAt - 2, 10) }}>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 4 }}>at every size, 100k to 1M</div>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 14, opacity: ease(frame, everyAt - 2, 10) }}>
           The blue line in a, drawn {zoomRounded.toLocaleString("en-US")} times taller.
         </div>
       </Ink>
 
       <Note at={start + 10} x={A.x0 - 94} y={y(866)}>
-        <span style={note(24, INK_SOFT)}>
+        <span style={note(20, INK_SOFT)}>
           Measured with timeit: best of 30 runs per size, CPython 3.13 on one 2.1 GHz Xeon core.
         </span>
       </Note>
@@ -207,7 +207,7 @@ const Grid: React.FC<{
   if (p <= 0) return null;
   const text: React.CSSProperties = {
     fontFamily: SANS,
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 500,
     fill: INK_SOFT,
     fontVariantNumeric: "tabular-nums",

@@ -93,10 +93,10 @@ export const GridScene: React.FC = () => {
       {/* ── The axes: what's true, what you decide ── */}
       {/* On the column headers' baseline: 22px set 6px lower than their 28px. */}
       <Ink at={trueAt - 4} dur={14} style={{ left: ROW_LABEL_X, top: y(340) + 6, whiteSpace: "nowrap" }}>
-        <span style={label(24, INK_SOFT)}>What&apos;s true</span>
+        <span style={label(22, INK_SOFT)}>What&apos;s true</span>
       </Ink>
       <Ink at={decideAt - 4} dur={14} style={{ left: COL_X[0] + 8, top: y(290), whiteSpace: "nowrap" }}>
-        <span style={label(24, INK_SOFT)}>What you decide</span>
+        <span style={label(22, INK_SOFT)}>What you decide</span>
       </Ink>
       {[
         <>
@@ -117,7 +117,7 @@ export const GridScene: React.FC = () => {
         <>There is a real effect</>,
       ].map((t, r) => (
         <Ink key={r} at={trueAt + r * 6} dur={14} style={{ left: ROW_LABEL_X, top: cellY(r) + cellH / 2 - 22, width: 420 }}>
-          <span style={{ ...body(34, true), color: INK }}>{t}</span>
+          <span style={{ ...body(36, true), color: INK }}>{t}</span>
         </Ink>
       ))}
 

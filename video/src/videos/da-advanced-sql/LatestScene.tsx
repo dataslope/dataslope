@@ -150,7 +150,7 @@ export const LatestScene: React.FC = () => {
           marks={R.rows.map((_, row) => ({ row, col: rn, at: numberAt + 6 + row * 2, out: keepAt + 4 }))}
         />
         <Note at={keepAt + 16} x={X0} y={kNote + h(30)} out={out11}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             keep <QMono>rn = 1</QMono> in an outer query, or with <QMono>QUALIFY</QMono>
           </span>
         </Note>
@@ -184,7 +184,7 @@ export const LatestScene: React.FC = () => {
               x={cx(i)}
               y={y(CHART.base) + 28}
               textAnchor="middle"
-              style={svgText({ ...label(24, zeros.includes(i) ? ACCENT_INK : INK_SOFT), fontVariantNumeric: "tabular-nums" })}
+              style={svgText({ ...label(19, zeros.includes(i) ? ACCENT_INK : INK_SOFT), fontVariantNumeric: "tabular-nums" })}
             >
               Mar {Number(r[0].slice(8))}
             </text>
@@ -224,7 +224,7 @@ export const LatestScene: React.FC = () => {
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>back, as 0</span>
         </Note>
         <Note at={calendarAt - 2} x={SPINE_RESULT_X} y={sg.rowTop(S.rows.length) + h(60)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>other engines: a calendar table</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>other engines: a calendar table</span>
         </Note>
       </Drift>
     </AbsoluteFill>

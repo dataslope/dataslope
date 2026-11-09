@@ -155,7 +155,7 @@ export const CoverageScene: React.FC = () => {
       {/* ── Fig. 4: a hundred intervals ── */}
       <FigLabel n="4" title={`A 95% interval from each sample of ${COVERAGE.n}`} at={buildAt - 6} x={160} y={y(500)} />
       <Note at={buildAt} x={XI.x1} y={y(500) + 2} align="right" from="right">
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
           zoomed in: {XI.lo} to {XI.hi}
         </span>
       </Note>
@@ -218,23 +218,23 @@ export const CoverageScene: React.FC = () => {
         />
       </Svg>
       <Note at={hundredAt} x={truthX + 12} y={y(POP_BASE - POP_H * 0.45)} out={seeAt - 4}>
-        <span style={{ ...note(24, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>true mean</span>
+        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>true mean</span>
       </Note>
       <Note at={yourAt} x={sx(XI, COVERAGE.intervals[YOURS].hi) + 16} y={rowY(YOURS) - 15}>
-        <span style={{ ...note(24, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           yours
           <span style={{ fontWeight: 500, color: INK_SOFT, opacity: ease(frame, seeAt, 12) }}>: in, or out?</span>
         </span>
       </Note>
       <Note at={seeAt + 6} x={truthX} y={y(POP_BASE + 14)} from="up">
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           in real life, the true mean is hidden
         </span>
       </Note>
 
       {/* ── Right column: the tally ── */}
       <div style={{ position: "absolute", left: COL, top: y(250), opacity: ease(frame, buildAt - 4, 12) }}>
-        <div style={label(24, INK_SOFT)}>Intervals drawn</div>
+        <div style={label(21, INK_SOFT)}>Intervals drawn</div>
         <div style={{ ...headline(88), ...TABULAR, marginTop: 4 }}>{drawn}</div>
       </div>
       <Ink at={ninetyFourAt - 4} dur={14} style={{ left: COL, top: y(400), width: 420 }}>
@@ -251,14 +251,14 @@ export const CoverageScene: React.FC = () => {
         </div>
       </Ink>
       <Note at={unluckyAt - 2} x={COL} y={y(580)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Same recipe, unlucky samples.</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Same recipe, unlucky samples.</span>
       </Note>
       <Note at={ninetyFiveAt - 2} x={COL} y={y(620)}>
-        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Again and again: about 95 in 100.</span>
+        <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Again and again: about 95 in 100.</span>
       </Note>
       <Spot id="estimation-ring-toss" at={againAndAt - 4} out={sentenceAt - 12} left={COL + 40} top={y(668)} width={200} height={206} />
       <Ink at={sentenceAt - 4} dur={18} style={{ left: COL, top: y(700), width: 430 }}>
-        <span style={{ ...body(34, true), color: INK }}>
+        <span style={{ ...body(32, true), color: INK }}>
           “A 95% chance it’s in{" "}
           <span style={{ color: EST_INK, opacity: ease(frame, everyoneAt - 2, 10) }}>this</span> one”?
         </span>

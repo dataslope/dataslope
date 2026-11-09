@@ -22,7 +22,7 @@ export const LessonScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 12} dur={14} style={{ left: 120, top: y(150) }}>
-        <span style={label(24, ACCENT_INK)}>The name for it</span>
+        <span style={label(22, ACCENT_INK)}>The name for it</span>
       </Ink>
       <Ink at={start - 10} dur={22} style={{ left: 114, top: y(194), ...headline(112), whiteSpace: "nowrap" }}>
         Simpson&apos;s paradox

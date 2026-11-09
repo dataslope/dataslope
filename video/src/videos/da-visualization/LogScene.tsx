@@ -23,7 +23,7 @@ const LOG_HI = 4;
 /** A series' label at the end of its line: where it starts, and its growth. */
 const EndLabel: React.FC<{ at: number; x: number; y: number; start: number; growth: number }> = ({ at, x, y, start, growth }) => (
   <Note at={at} x={x} y={y - 14}>
-    <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
+    <span style={{ ...label(20, INK), whiteSpace: "nowrap" }}>
       from <Num>{start.toLocaleString("en-US")}</Num>, <Num>+{growth}%</Num>
     </span>
   </Note>
@@ -75,7 +75,7 @@ export const LogScene: React.FC = () => {
           When does a log scale earn its place?
         </QuestionCard>
         <Note at={answerAt} x={LEFT.x0} y={y(300)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             rates of change, or values that span <span style={{ opacity: ease(frame, magnitudeAt - 2, 10) }}>orders of magnitude</span>
           </span>
         </Note>

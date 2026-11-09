@@ -43,7 +43,7 @@ const Event: React.FC<{ x: number; y: number; at: number; text: string; color?: 
   return (
     <g opacity={p}>
       <circle cx={x} cy={y} r={7} fill={color} />
-      <text x={x} y={y - 18} textAnchor="middle" style={mono(24, color)}>
+      <text x={x} y={y - 18} textAnchor="middle" style={mono(19, color)}>
         {text}
       </text>
     </g>
@@ -60,7 +60,7 @@ const Value: React.FC<{ x: number; y: number; at: number; value: string; tone: B
   return (
     <g opacity={p}>
       <rect x={x - 32} y={y + 17} width={64} height={32} rx={b.borderRadius as number} style={{ fill: String(b.background) }} />
-      <text x={x} y={y + 40} textAnchor="middle" style={{ ...mono(24, String(b.color)), fontWeight: 500 }}>
+      <text x={x} y={y + 40} textAnchor="middle" style={{ ...mono(20, String(b.color)), fontWeight: 500 }}>
         {value}
       </text>
     </g>
@@ -144,14 +144,14 @@ export const IsoScene: React.FC = () => {
             const p = lane(at);
             return (
               <g key={name} opacity={Math.min(1, p * 2)}>
-                <text x={X0} y={yy + 7} style={svgText(label(24, INK))}>
+                <text x={X0} y={yy + 7} style={svgText(label(22, INK))}>
                   Transaction {name}
                 </text>
                 <line x1={T0} y1={yy} x2={T0 + (T1 - T0) * p} y2={yy} stroke={HAIRLINE} strokeWidth={2} />
               </g>
             );
           })}
-          <text x={T1} y={laneB + 54} textAnchor="end" style={svgText(note(24, INK_SOFT))} opacity={ease(frame, seeAt + 10, 10)}>
+          <text x={T1} y={laneB + 54} textAnchor="end" style={svgText(note(20, INK_SOFT))} opacity={ease(frame, seeAt + 10, 10)}>
             time →
           </text>
           {/* B's change, uncommitted until its commit (dashed in between). */}
@@ -160,7 +160,7 @@ export const IsoScene: React.FC = () => {
           <Event x={commit} y={laneB} at={changesAt + 8} text="COMMIT" color={INK} out={rollAt} />
           <g opacity={rollback}>
             <circle cx={commit} cy={laneB} r={7} fill={ACCENT} />
-            <text x={commit} y={laneB - 18} textAnchor="middle" style={mono(24, ACCENT_INK)}>
+            <text x={commit} y={laneB - 18} textAnchor="middle" style={mono(19, ACCENT_INK)}>
               ROLLBACK?
             </text>
           </g>
@@ -191,7 +191,7 @@ export const IsoScene: React.FC = () => {
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           <g opacity={ease(frame, ruAt - 4, 12)}>
             {ANOMALIES.map((a, j) => (
-              <text key={a} x={colX(j)} y={gridTop} style={svgText(label(24, INK_SOFT))}>
+              <text key={a} x={colX(j)} y={gridTop} style={svgText(label(21, INK_SOFT))}>
                 {a}
               </text>
             ))}
@@ -206,11 +206,11 @@ export const IsoScene: React.FC = () => {
             return (
               <g key={lv.name} opacity={p}>
                 {i > 0 ? <line x1={GRID_X} y1={yy - ROW_H + 18} x2={colX(2) + COL_W} y2={yy - ROW_H + 18} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} /> : null}
-                <text x={GRID_X} y={yy} style={svgText({ ...note(24, INK), fontWeight: 500 })}>
+                <text x={GRID_X} y={yy} style={svgText({ ...note(23, INK), fontWeight: 500 })}>
                   {lv.name}
                 </text>
                 {lv.allows.map((allowed, j) => (
-                  <text key={j} x={colX(j)} y={yy} style={svgText(note(24, allowed ? ACCENT_INK : OK_INK))} opacity={ease(frame, at + 6 + j * 3, 10)}>
+                  <text key={j} x={colX(j)} y={yy} style={svgText(note(22, allowed ? ACCENT_INK : OK_INK))} opacity={ease(frame, at + 6 + j * 3, 10)}>
                     {allowed ? "allowed" : "prevented"}
                   </text>
                 ))}
@@ -218,7 +218,7 @@ export const IsoScene: React.FC = () => {
                   <g opacity={ease(frame, defaultAt, 10)}>
                     {/* The house's badge, in the highlighter's yellow. */}
                     <rect x={colX(2) + COL_W} y={yy - 25} width={184} height={32} rx={DEFAULT_BADGE.borderRadius as number} style={{ fill: String(DEFAULT_BADGE.background) }} />
-                    <text x={colX(2) + COL_W + 92} y={yy - 2} textAnchor="middle" style={svgText({ ...label(24, String(DEFAULT_BADGE.color)), fontWeight: 500 })}>
+                    <text x={colX(2) + COL_W + 92} y={yy - 2} textAnchor="middle" style={svgText({ ...label(20, String(DEFAULT_BADGE.color)), fontWeight: 500 })}>
                       Postgres default
                     </text>
                   </g>
@@ -259,7 +259,7 @@ export const IsoScene: React.FC = () => {
           <div style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, retriedAt, 10) }}>can fail; retry it</div>
         </Note>
         <Note at={onlyAt} x={GRID_X} y={gridTop + 14 + 4 * ROW_H + h(18)}>
-          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
             The SQL standard&rsquo;s table. Postgres goes further: its read uncommitted acts as read committed, and its repeatable read stops phantoms too.
           </div>
         </Note>

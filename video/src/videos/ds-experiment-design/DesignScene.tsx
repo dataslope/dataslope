@@ -108,7 +108,7 @@ export const DesignScene: React.FC = () => {
         {/* The plan, written before anything runs. */}
         <div style={{ position: "absolute", inset: 0, transform: `translateX(${centered}px)` }}>
         <Note at={writeAt} x={X0} y={y(PLAN_TOP) + h(14)}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", letterSpacing: "0.04em" }}>TEST PLAN · written before launch</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", letterSpacing: "0.04em" }}>TEST PLAN · written before launch</span>
         </Note>
         {rows.map((r, i) => {
           const p = ease(frame, r.at - 2, 12);
@@ -134,7 +134,7 @@ export const DesignScene: React.FC = () => {
                 transform: `translateX(${(1 - p) * 12}px)`,
               }}
             >
-              <span style={{ width: KEY_W, ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{r.key}</span>
+              <span style={{ width: KEY_W, ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{r.key}</span>
               <span style={{ ...note(isMetric ? 26 : 23, INK), fontWeight: isMetric ? 500 : 500, whiteSpace: "nowrap" }}>
                 {isGuard ? (
                   <Mark at={guardCheckAt} out={q2At}>
@@ -153,7 +153,7 @@ export const DesignScene: React.FC = () => {
               {isMetric ? (
                 <span style={{ marginLeft: 16, display: "inline-flex", alignItems: "center", gap: 6, opacity: ease(frame, agreeAt + 4, 10) }}>
                   <Tick at={agreeAt + 4} size={24} />
-                  <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>agreed</span>
+                  <span style={{ ...label(20, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>agreed</span>
                 </span>
               ) : null}
             </div>
@@ -186,7 +186,7 @@ export const DesignScene: React.FC = () => {
             <div
               key={c.text}
               style={{
-                ...note(24),
+                ...note(22),
                 ...badgeStyle("gray", 22),
                 opacity: p * q2,
                 transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.05 * Math.max(pulse(frame, c.at, 14), ...c.again.map((t) => pulse(frame, t, 14)))})`,
@@ -211,14 +211,14 @@ export const DesignScene: React.FC = () => {
               <Note at={c.verdictAt} x={RIGHT_X + 40} y={top + h(50)}>
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
                   {c.ok ? <Tick at={c.verdictAt + 2} size={24} /> : null}
-                  <span style={{ ...note(24, c.ok ? OK_INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.verdict}</span>
+                  <span style={{ ...note(25, c.ok ? OK_INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{c.verdict}</span>
                 </span>
               </Note>
             </React.Fragment>
           );
         })}
         <Note at={switchAt - 2} x={RIGHT_X} y={y(800)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>agreed before launch: no switching after the results</span>
+          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>agreed before launch: no switching after the results</span>
         </Note>
       </Drift>
     </AbsoluteFill>

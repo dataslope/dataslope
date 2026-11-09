@@ -141,14 +141,14 @@ export const LazyScene: React.FC = () => {
         </Note>
         <Note at={showAt + 6} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(24)} out={q4At}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>show()</span> is an action
+            <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500 }}>show()</span> is an action
             <span style={{ opacity: ease(frame, scheduleAt, 10) }}>: compile, schedule</span>
             <span style={{ opacity: ease(frame, runAt, 10), color: BLUE_INK, fontWeight: 500 }}>, run</span>
           </span>
         </Note>
         <Note at={tooAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(80)} out={q4At}>
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap" }}>
-            <span style={{ ...note(24, INK_SOFT) }}>actions too:</span>
+            <span style={{ ...note(23, INK_SOFT) }}>actions too:</span>
             {[
               { t: "collect()", at: tooAt },
               { t: "write", at: tooAt + 6 },
@@ -163,14 +163,14 @@ export const LazyScene: React.FC = () => {
           </span>
         </Note>
         <Note at={groupedAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(136)} out={q4At}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>groupBy().count()</span> is still a transformation
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>groupBy().count()</span> is still a transformation
           </span>
         </Note>
 
         {/* The plan beside it. */}
         <Note at={planAt - 2} x={N_X} y={y(N_TOP) - h(46)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
             the plan<span style={{ opacity: ease(frame, nothingAt, 10) * (1 - ease(frame, runAt, 10)) }}>, not yet run</span>
           </span>
         </Note>
@@ -232,9 +232,9 @@ export const LazyScene: React.FC = () => {
                 ) : null}
               </span>
               {isShow ? (
-                <span style={{ marginLeft: "auto", ...label(24, BLUE_INK), fontWeight: 500 }}>action</span>
+                <span style={{ marginLeft: "auto", ...label(20, BLUE_INK), fontWeight: 500 }}>action</span>
               ) : run > 0 ? (
-                <span style={{ marginLeft: "auto", ...label(24, BLUE_INK), opacity: run }}>ran</span>
+                <span style={{ marginLeft: "auto", ...label(20, BLUE_INK), opacity: run }}>ran</span>
               ) : null}
             </div>
           );
@@ -251,7 +251,7 @@ export const LazyScene: React.FC = () => {
           </Svg>
         ) : null}
         <Note at={wholeAt + 4} x={N_X + N_W + 44} y={(slotY(0) + slotY(3) + nodeH) / 2 - h(40)} out={pushAt}>
-          <span style={{ ...label(24, INK), display: "block", lineHeight: 1.3 }}>
+          <span style={{ ...label(22, INK), display: "block", lineHeight: 1.3 }}>
             the whole
             <br />
             plan<span style={{ opacity: ease(frame, rewriteAt, 10) }}>, rewritten</span>
@@ -260,7 +260,7 @@ export const LazyScene: React.FC = () => {
 
         {/* The columns the scan reads, beside it. */}
         <Note at={pruneAt - 2} x={N_X + N_W + 34} y={slotY(0) - h(46)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>columns</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>columns</span>
         </Note>
         {COLUMNS.map((c, i) => (
           <Note key={c} at={pruneAt + i} x={N_X + N_W + 34} y={slotY(0) + i * h(40)}>
@@ -275,7 +275,7 @@ export const LazyScene: React.FC = () => {
         {/* What the optimizer does with it, and what eager execution can't. */}
         {rewrites.map((r, i) => (
           <Note key={r.text} at={r.at - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(40 + i * 46)}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               <b style={{ color: OK_INK }}>{i + 1}</b>
               {"  "}
               {r.text}
@@ -285,7 +285,7 @@ export const LazyScene: React.FC = () => {
           </Note>
         ))}
         <Note at={eagerAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(40 + 4 * 46 + 14)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             run step by step, eagerly<span style={{ opacity: ease(frame, noneAt, 10) }}>: none of this is possible</span>
           </span>
         </Note>

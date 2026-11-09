@@ -45,19 +45,19 @@ const PaperPage: React.FC<{ x: number; top: number; width: number; height: numbe
         boxSizing: "border-box",
       }}
     >
-      <div style={{ position: "absolute", left: pad, right: pad, top: 20, display: "flex", justifyContent: "space-between", ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: pad, right: pad, top: 20, display: "flex", justifyContent: "space-between", ...note(19, INK_SOFT), whiteSpace: "nowrap" }}>
         <span>{SHANNON_PAPER.journal}</span>
         <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, at + 10, 10) }}>{SHANNON_PAPER.date}</span>
       </div>
       {/* The masthead rule; what follows it starts 28px below. */}
       <div style={{ position: "absolute", left: pad, right: pad, top: 52, height: 1.5, background: INK }} />
       <Ink at={at + 4} dur={20} style={{ left: pad, top: 82, width: width - 2 * pad }}>
-        <div style={{ ...headline(34), lineHeight: 1.12 }}>
+        <div style={{ ...headline(32), lineHeight: 1.12 }}>
           <Mark at={markAt}>{SHANNON_PAPER.title}</Mark>
         </div>
       </Ink>
       <Ink at={at + 14} dur={14} style={{ left: pad, top: 180, whiteSpace: "nowrap" }}>
-        <div style={label(24, INK)}>{SHANNON_PAPER.author}</div>
+        <div style={label(21, INK)}>{SHANNON_PAPER.author}</div>
       </Ink>
       {Array.from({ length: lines }, (_, i) => {
         const w = ease(frame, at + 20 + i * 6, 12);
@@ -125,7 +125,7 @@ const ContentsPage: React.FC<{ x: number; top: number; width: number; height: nu
         boxSizing: "border-box",
       }}
     >
-      <div style={{ position: "absolute", left: pad, right: pad, top: 20, display: "flex", justifyContent: "space-between", ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: pad, right: pad, top: 20, display: "flex", justifyContent: "space-between", ...note(19, INK_SOFT), whiteSpace: "nowrap" }}>
         <span>Contents</span>
         <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, at + 8, 10) }}>Part I: Discrete Noiseless Systems</span>
       </div>
@@ -140,7 +140,7 @@ const ContentsPage: React.FC<{ x: number; top: number; width: number; height: nu
               <div style={{ position: "absolute", left: pad - 10, top: lineTop - 6, width: (width - 2 * pad + 20) * tuck, height: 46, borderRadius: 6, background: HIGHLIGHT }} />
             ) : null}
             <Ink at={at + 8 + i * 5} dur={12} style={{ left: pad, top: lineTop, right: pad, whiteSpace: "nowrap", opacity: isTucked ? 1 : 1 - tuck * 0.55 }}>
-              <div style={{ display: "flex", gap: 18, alignItems: "baseline", ...note(28, INK), fontWeight: isTucked && tuck > 0.5 ? 500 : 400 }}>
+              <div style={{ display: "flex", gap: 18, alignItems: "baseline", ...note(26, INK), fontWeight: isTucked && tuck > 0.5 ? 500 : 400 }}>
                 <span style={{ ...TABULAR, color: INK_SOFT, width: 22, textAlign: "right" }}>{i + 1}.</span>
                 <span>{i === 5 ? <>Choice, Uncertainty and <Mark at={markAt}>Entropy</Mark></> : t}</span>
               </div>
@@ -185,7 +185,7 @@ const WordChip: React.FC<{ x: number; y: number; w: number; text: string; at: nu
         alignItems: "center",
         justifyContent: "center",
         fontFamily: MONO,
-        fontSize: 28,
+        fontSize: 26,
         color: INK,
       }}
     >
@@ -369,7 +369,7 @@ export const ShannonScene: React.FC = () => {
         </div>
       </Ink>
       <Ink at={writerAt + 6} out={sampleOut} style={{ left: SX, top: y(640), whiteSpace: "nowrap" }}>
-        <div style={{ ...note(24, INK_SOFT) }}>Second-order word approximation, &ldquo;A Mathematical Theory of Communication&rdquo;, Part I</div>
+        <div style={{ ...note(21, INK_SOFT) }}>Second-order word approximation, &ldquo;A Mathematical Theory of Communication&rdquo;, Part I</div>
       </Ink>
 
       {/* ── Fig. 5, the course's next-word counts, settling back on the turn ── */}
@@ -408,7 +408,7 @@ export const ShannonScene: React.FC = () => {
 
       {/* The tally after "the", and the guess. */}
       <Ink at={afterAt - 2} style={{ left: 96, top: TALLY_Y + 8, whiteSpace: "nowrap" }}>
-        <div style={{ ...label(28, INK), display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ ...label(26, INK), display: "flex", alignItems: "center", gap: 14 }}>
           after <span style={{ fontFamily: MONO, fontWeight: 500, background: `color-mix(in srgb, ${ds("yellow", 500)} 30%, transparent)`, padding: "2px 10px", borderRadius: 6 }}>the</span>
         </div>
       </Ink>
@@ -443,12 +443,12 @@ export const ShannonScene: React.FC = () => {
         <div style={{ display: "flex", alignItems: "center", gap: 16, ...label(28, INK) }}>
           <InlineArrow at={guessesAt - 2} length={70} />
           guess:
-          <span style={{ fontFamily: MONO, fontWeight: 500, color: DATA_INK, fontSize: 28 }}>{BIGRAM.guess.the}</span>
+          <span style={{ fontFamily: MONO, fontWeight: 500, color: DATA_INK, fontSize: 30 }}>{BIGRAM.guess.the}</span>
         </div>
       </Ink>
       <Tick x={1240} y={TALLY_Y + 52} at={guessesAt + 8} />
       </AbsoluteFill>
-      <div style={{ position: "absolute", left: 96, top: y(800), display: "flex", gap: "0.3em", ...headline(34, true), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: 96, top: y(800), display: "flex", gap: "0.3em", ...headline(38, true), whiteSpace: "nowrap" }}>
         <Ink at={todayAt - 2} style={{ position: "relative" }}>
           Today&rsquo;s language models make the same guess,
         </Ink>

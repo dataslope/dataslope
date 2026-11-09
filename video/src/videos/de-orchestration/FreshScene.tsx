@@ -127,7 +127,7 @@ export const FreshScene: React.FC = () => {
         {/* Its answers, one each morning at six. */}
         <div style={{ position: "absolute", left: RES_X, top: resTop, display: "flex", opacity: ease(frame, sixHAt - 6, 10) }}>
           {COLS.map((c) => (
-            <div key={c.key} style={{ width: c.w, ...label(24, INK_SOFT), fontWeight: 500, fontFamily: c.key === "newest" ? MONO : SANS }}>
+            <div key={c.key} style={{ width: c.w, ...label(20, INK_SOFT), fontWeight: 500, fontFamily: c.key === "newest" ? MONO : SANS }}>
               {c.label}
             </div>
           ))}
@@ -137,9 +137,9 @@ export const FreshScene: React.FC = () => {
           const p = ease(frame, row.at - 2, 10);
           return (
             <div key={i} style={{ position: "absolute", left: RES_X, top: resTop + (i + 1) * RH, display: "flex", alignItems: "center", opacity: p }}>
-              <div style={{ width: COLS[0].w, ...note(24, INK), fontWeight: 500 }}>06:00 Jun {Number(row.r.now.slice(8, 10))}</div>
-              <div style={{ width: COLS[1].w, fontFamily: MONO, fontSize: 24, color: INK, fontVariantLigatures: "none" }}>{row.r.newest}</div>
-              <div style={{ width: COLS[2].w, ...note(24, row.ok ? OK_INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+              <div style={{ width: COLS[0].w, ...note(22, INK), fontWeight: 500 }}>06:00 Jun {Number(row.r.now.slice(8, 10))}</div>
+              <div style={{ width: COLS[1].w, fontFamily: MONO, fontSize: 21, color: INK, fontVariantLigatures: "none" }}>{row.r.newest}</div>
+              <div style={{ width: COLS[2].w, ...note(22, row.ok ? OK_INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 <Num>{hm(row.r.minutes)}</Num>
               </div>
               <div style={{ width: 40 }}>{frame >= row.at + 6 ? row.ok ? <Tick at={row.at + 6} size={24} /> : <Cross at={row.at + 6} size={24} /> : null}</div>
@@ -152,7 +152,7 @@ export const FreshScene: React.FC = () => {
           {[0, 24, 48, 72].map((hr) => (
             <g key={hr}>
               <line x1={hx(hr)} x2={hx(hr)} y1={bandY - bandH / 2 - h(26)} y2={bandY + bandH / 2 + 6} stroke={INK_SOFT} strokeWidth={1.2} opacity={0.6} />
-              <text x={hx(hr) + 8} y={bandY - bandH / 2 - h(12)} style={svgText({ ...label(24, INK), fontWeight: 500 })}>
+              <text x={hx(hr) + 8} y={bandY - bandH / 2 - h(12)} style={svgText({ ...label(20, INK), fontWeight: 500 })}>
                 {`June ${hr / 24 + 1}`}
               </text>
             </g>
@@ -181,7 +181,7 @@ export const FreshScene: React.FC = () => {
           ].map((m) => (
             <g key={m.t} opacity={ease(frame, m.at, 10)}>
               <line x1={hx(m.t)} x2={hx(m.t)} y1={bandY - bandH / 2 - h(10)} y2={m.to + h(12)} stroke={INK} strokeWidth={2.2} />
-              <text x={hx(m.t)} y={bandY - bandH / 2 - h(16)} textAnchor="middle" style={svgText({ ...label(24, INK), fontWeight: 500 })}>
+              <text x={hx(m.t)} y={bandY - bandH / 2 - h(16)} textAnchor="middle" style={svgText({ ...label(19, INK), fontWeight: 500 })}>
                 06:00
               </text>
             </g>
@@ -205,19 +205,19 @@ export const FreshScene: React.FC = () => {
           })}
         </svg>
         <Note at={sixAt + 10} x={hx(0)} y={bandY + bandH / 2 + h(6)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>an order every 3 minutes</span>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>an order every 3 minutes</span>
         </Note>
         <Note at={newestAt + 6} x={hx(newest) - 12} y={bandY - bandH / 2 - h(58)} align="right">
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>newest: 23:58</span>
+          <span style={{ ...label(20, INK), whiteSpace: "nowrap" }}>newest: 23:58</span>
         </Note>
         <Note at={nightAt + 6} x={hx(58)} y={bandY - 14}>
-          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>the source sent nothing</span>
+          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>the source sent nothing</span>
         </Note>
         <Note at={sixHAt + 6} x={hx(now1) + 12} y={b1Y - 16}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{hm(FRESH.fine.minutes)}: fresh</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{hm(FRESH.fine.minutes)}: fresh</span>
         </Note>
         <Note at={thirtyAt + 6} x={hx(now2) - 12} y={b2Y + h(4)} align="right">
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{hm(FRESH.stale.minutes)}: stale, alert</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{hm(FRESH.stale.minutes)}: stale, alert</span>
         </Note>
 
         {/* The run that night, all green, and the two checks that are not:
@@ -233,7 +233,7 @@ export const FreshScene: React.FC = () => {
           </Pill>
         ))}
         <Note at={noRowsAt} x={X0 + 460} y={y(826)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
             <Num>{FRESH.missedDayRows}</Num> new rows
           </span>
         </Note>
@@ -251,12 +251,12 @@ export const FreshScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>catches data that never arrived</span>
         </Note>
         <Note at={cantAt} x={X0 + NOTES_DX} y={y(802)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             row-level checks only read the rows <span style={{ opacity: ease(frame, thereAt, 10) }}>that are there</span>
           </span>
         </Note>
         <Note at={countAt + 6} x={X0 + NOTES_DX} y={y(840)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>a row count on the day&apos;s load catches it too</span>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>a row count on the day&apos;s load catches it too</span>
         </Note>
       </Drift>
     </AbsoluteFill>

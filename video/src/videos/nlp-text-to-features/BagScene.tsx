@@ -127,7 +127,7 @@ export const BagScene: React.FC = () => {
         })}
       </ChipRow>
       <Note at={whichAt - 4} x={BAG_X} y={y(TALLY_Y) - 40}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>What the bag keeps</span>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>What the bag keeps</span>
       </Note>
       <div style={{ position: "absolute", left: BAG_X, top: y(TALLY_Y), display: "flex", gap: 14 }}>
         {TALLY.map((t, k) => (
@@ -135,7 +135,7 @@ export const BagScene: React.FC = () => {
         ))}
       </div>
       <Note at={orderAt} x={BAG_X} y={y(TALLY_Y) + 58}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>which words and how many times; their order is gone</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>which words and how many times; their order is gone</span>
       </Note>
       </div>
 
@@ -145,12 +145,12 @@ export const BagScene: React.FC = () => {
         <Ink key={i} at={docsAt - 2 + i * 5} dur={16} style={{ left: FIG7_X, top: y(DOC_Y0 + i * DOC_STEP), display: "flex", alignItems: "baseline", gap: 40, whiteSpace: "nowrap" }}>
           {/* The name stands more than 1.2em clear of its sentence, so it
               reads as a column of names, not as part of the line. */}
-          <span style={{ ...label(24, INK_SOFT), width: 60 }}>doc{i + 1}</span>
-          <span style={{ ...body(34), color: INK }}>{d}</span>
+          <span style={{ ...label(21, INK_SOFT), width: 60 }}>doc{i + 1}</span>
+          <span style={{ ...body(32), color: INK }}>{d}</span>
         </Ink>
       ))}
       <Note at={vocabAt - 2} x={COL_X0} y={y(VOCAB_NOTE_Y)}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
           Vocabulary, sorted<span style={{ opacity: ease(frame, nineAt - 2, 10) }}>: {BOW.vocab.length} words</span>
         </span>
       </Note>
@@ -159,7 +159,7 @@ export const BagScene: React.FC = () => {
           key={w}
           at={distinctAt + j * 2}
           dur={10}
-          style={{ left: COL_X0 + j * COL_W, width: COL_W, top: y(HEAD_ROW_Y), textAlign: "center", ...label(24, INK), whiteSpace: "nowrap" }}
+          style={{ left: COL_X0 + j * COL_W, width: COL_W, top: y(HEAD_ROW_Y), textAlign: "center", ...label(22, INK), whiteSpace: "nowrap" }}
         >
           {w}
         </Ink>
@@ -169,7 +169,7 @@ export const BagScene: React.FC = () => {
         const sweep = pulse(frame, sameAt + i * 6, 22);
         return (
           <React.Fragment key={i}>
-            <Ink at={at} dur={12} style={{ left: FIG7_X, top: y(ROW_Y0 + i * ROW_STEP) + h(ROW_H) / 2 - 14, ...label(24, INK) }}>
+            <Ink at={at} dur={12} style={{ left: FIG7_X, top: y(ROW_Y0 + i * ROW_STEP) + h(ROW_H) / 2 - 14, ...label(22, INK) }}>
               doc{i + 1}
             </Ink>
             {row.map((c, j) => {
@@ -201,7 +201,7 @@ export const BagScene: React.FC = () => {
         </span>
       </Note>
       <Note at={sameAt - 2} x={FIG7_X} y={y(DTM_NOTE_Y) + 44}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Every row the same {BOW.vocab.length} columns, in the same order</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Every row the same {BOW.vocab.length} columns, in the same order</span>
       </Note>
     </AbsoluteFill>
   );
@@ -214,7 +214,7 @@ const TallyChip: React.FC<{ word: string; count: number; at: number; countAt: nu
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
       <Chip text={word} size={24} at={at} style={{ marginRight: 0 }} />
-      <span style={{ ...note(28, BLUE_INK), ...TABULAR, fontWeight: 500, opacity: c, transform: `translateY(${(1 - c) * 6}px)` }}>
+      <span style={{ ...note(26, BLUE_INK), ...TABULAR, fontWeight: 500, opacity: c, transform: `translateY(${(1 - c) * 6}px)` }}>
         ×{count}
       </span>
     </span>

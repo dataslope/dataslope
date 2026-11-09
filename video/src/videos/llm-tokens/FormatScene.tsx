@@ -51,7 +51,7 @@ const BarRow: React.FC<{
           position: "absolute",
           left: LBAR.barX + width + 14,
           top: top + 4,
-          ...note(28, focus > 0.5 ? FOCUS_INK : INK),
+          ...note(30, focus > 0.5 ? FOCUS_INK : INK),
           fontWeight: 500,
           opacity: ease(frame, at + 8, 8),
           ...TABULAR,
@@ -149,7 +149,7 @@ export const FormatScene: React.FC = () => {
             <React.Fragment key={r.name}>
               <BarRow top={sampleY(i)} at={r.at - 2} width={r.s.charsPerToken * perChar} value={r.s.charsPerToken.toFixed(1)}>
                 <div style={{ ...label(24, INK), whiteSpace: "nowrap" }}>{r.name}</div>
-                <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, r.said, 12), ...TABULAR }}>
+                <div style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, r.said, 12), ...TABULAR }}>
                   {num(r.s.chars)} characters, {num(r.s.tokens)} tokens
                 </div>
               </BarRow>
@@ -209,10 +209,10 @@ export const FormatScene: React.FC = () => {
               />
             </div>
             <Note at={keyAt} x={X0 + CSV_DX} y={y(TEXT_Y) + 46 + h(140)}>
-              <div style={{ ...note(24, FOCUS_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+              <div style={{ ...note(22, FOCUS_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 JSON: the {FORMATS.keys.length} keys on all {FORMATS.jsonKeyNames / FORMATS.keys.length} records
               </div>
-              <div style={{ ...note(24, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>CSV: once, in a header</div>
+              <div style={{ ...note(22, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>CSV: once, in a header</div>
             </Note>
           </div>
         </Out>
@@ -231,10 +231,10 @@ export const FormatScene: React.FC = () => {
                 value={String(f.json)}
                 focus={rare ? ease(frame, hundredAt - 2, 10) : 0}
               >
-                <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>{f.encoding}</div>
+                <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>{f.encoding}</div>
                 <div
                   style={{
-                    ...note(24, rare && frame > gptAt ? FOCUS_INK : INK_SOFT),
+                    ...note(20, rare && frame > gptAt ? FOCUS_INK : INK_SOFT),
                     whiteSpace: "nowrap",
                     marginTop: 2,
                   }}
@@ -249,7 +249,7 @@ export const FormatScene: React.FC = () => {
             <div style={{ ...body(28), color: INK, whiteSpace: "nowrap", opacity: ease(frame, percentAt - 2, 12) }}>
               about <span style={{ color: FOCUS_INK }}>30% more tokens</span> for the same text
             </div>
-            <div style={{ ...note(24, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>Anthropic, Pricing, October 2026, as the lesson cites it</div>
+            <div style={{ ...note(20, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>Anthropic, Pricing, October 2026, as the lesson cites it</div>
           </Note>
         </div>
 

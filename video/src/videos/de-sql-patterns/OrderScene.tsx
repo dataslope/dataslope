@@ -168,7 +168,7 @@ export const OrderScene: React.FC = () => {
               style={{ left: STEP_X, top: rowY(i), height: h(44), display: "flex", alignItems: "center", gap: 16 }}
             >
               <StepBadge n={i + 1} />
-              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
+              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
                 {s.clause}
               </span>
             </Ink>
@@ -293,12 +293,12 @@ export const OrderScene: React.FC = () => {
 
           {/* ── Row filters still go in WHERE ── */}
           <Note at={earlyAt - 2} x={X0} y={notesY}>
-            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
               Filter rows in <Mono>WHERE</Mono>: <Mark at={fewerAt}>fewer rows to group</Mark>.
             </span>
           </Note>
           <Note at={keepAt - 2} x={X0} y={notesY + h(50)}>
-            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
               <Mark at={bridgeAt} color={MARK_OK}>
                 <Mono>HAVING</Mono> is for conditions on an aggregate.
               </Mark>
@@ -337,7 +337,7 @@ const StepBadge: React.FC<{ n: number }> = ({ n }) => (
 /** A figure's small title, over its top. */
 const Caption: React.FC<{ at: number; out?: number; x: number; top: number; children: React.ReactNode }> = ({ at, out, x, top, children }) => (
   <Ink at={at} out={out} dur={12} style={{ left: x, top, whiteSpace: "nowrap" }}>
-    <span style={label(24, INK_SOFT)}>{children}</span>
+    <span style={label(21, INK_SOFT)}>{children}</span>
   </Ink>
 );
 
@@ -363,7 +363,7 @@ const Group: React.FC<{ region: string; at: number; x: number; top: number; kept
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...label(24, INK),
+          ...label(20, INK),
         }}
       >
         {region}

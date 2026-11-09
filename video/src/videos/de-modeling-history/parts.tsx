@@ -197,7 +197,7 @@ export const Listing: React.FC<{
   return (
     <div style={{ position: "absolute", left: x, top, width, height: listingHeight(lines.length, size), opacity: (1 - d) * (1 - o) }}>
       {title ? (
-        <div style={{ position: "absolute", left: 0, bottom: "100%", paddingBottom: 8, whiteSpace: "nowrap", ...label(24, INK_SOFT), opacity: p }}>{title}</div>
+        <div style={{ position: "absolute", left: 0, bottom: "100%", paddingBottom: 8, whiteSpace: "nowrap", ...label(21, INK_SOFT), opacity: p }}>{title}</div>
       ) : null}
       <div
         style={{

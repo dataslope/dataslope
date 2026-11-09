@@ -72,7 +72,7 @@ export const MsAxis: React.FC<{ axis: Axis; y: number; to: number; at: number; o
       </svg>
       {ticks.map((t) => (
         <Note key={t} at={at + 4} x={msX(axis, t) - 40} y={y + 12} width={80} style={{ textAlign: "center" }} dim={opacity < 1 ? at : undefined}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{t === to ? `${t} ms` : t}</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{t === to ? `${t} ms` : t}</span>
         </Note>
       ))}
     </>

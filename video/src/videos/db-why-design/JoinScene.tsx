@@ -15,14 +15,12 @@ const TOP = 340;
 const LOW_FIG = 640;
 const LOW_Y = 690;
 const CARD_X = 800;
-/** The four boxes: orders and order_items wide enough for their longest key
- *  name beside its type at 24px, the short-named boxes narrower, so each line
- *  still has room for its verb with air on both sides. */
+/** The four boxes, narrow enough to leave each line room for its verb. */
 const BOX = {
-  customers: { x: X0, width: 260 },
-  orders: { x: 480, width: 380 },
-  items: { x: 960, width: 410 },
-  products: { x: 1530, width: 270 },
+  customers: { x: X0, width: 290 },
+  orders: { x: 543, width: 330 },
+  items: { x: 1006, width: 380 },
+  products: { x: 1520, width: 280 },
 };
 const RIGHT = BOX.products.x + BOX.products.width;
 /** A relationship's verb, centred over the gap its line crosses, above the line. */
@@ -126,7 +124,7 @@ export const JoinScene: React.FC = () => {
           />
           {/* Part 1's anomaly, cured: the email lives in one row. */}
           <Note at={ownTablesAt + 4} x={customers.left} y={customers.bottom + 16}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Each email, stored once</span>
+            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Each email, stored once</span>
           </Note>
           <Entity
             layout={orders}
@@ -144,7 +142,7 @@ export const JoinScene: React.FC = () => {
             marks={{ name: { at: notebookAt + 4, tone: "note" }, id: { at: link(2), tone: "key" } }}
           />
           <Note at={notebookAt + 6} x={products.left} y={products.bottom + 16}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
               name = <span style={{ fontFamily: MONO, color: INK }}>&apos;{NOTEBOOK_NAME}&apos;</span>
             </span>
           </Note>
@@ -179,7 +177,7 @@ export const JoinScene: React.FC = () => {
             labelPos={verbAt("appears in", jog3, p[1])}
           />
           <Note at={linksAt} x={orders.left} y={orders.bottom + 16}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Three joins, along keys that were already there</span>
+            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Three joins, along keys that were already there</span>
           </Note>
         </div>
 
@@ -188,11 +186,11 @@ export const JoinScene: React.FC = () => {
         <DbTable g={g} cols={NOTEBOOK.cols} rows={NOTEBOOK.rows.map((cells) => ({ cells, at: adaAt - 4 }))} at={nameAt - 2} marks={[{ row: 0, col: 0, at: adaAt + 4 }]} />
         {/* Why one name: Ada's notebook orders fold into one row, and in this shop no one else bought one. */}
         <Note at={adaAt + 10} x={X0} y={g.rowTop(1) + 18}>
-          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             One row: {firstName(NOTEBOOK.rows[0][0] as string)} bought notebooks {times(NOTEBOOK.lines.length)}.
           </div>
           {OTHERS.map((o) => (
-            <div key={o.who} style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>
+            <div key={o.who} style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>
               In this shop, {firstName(o.who)} bought a {o.bought.join(" and a ")}.
             </div>
           ))}
@@ -236,7 +234,7 @@ export const JoinScene: React.FC = () => {
             dur={14}
             style={{ left: CARD_X + (i % 2) * CHORE_COL, top: y(LOW_Y) + 104 + Math.floor(i / 2) * 48, whiteSpace: "nowrap" }}
           >
-            <span style={{ ...label(24, INK), fontWeight: 500 }}>
+            <span style={{ ...label(22, INK), fontWeight: 500 }}>
               <span style={{ color: ACCENT_INK, fontWeight: 500, marginRight: 10 }}>{i + 1}</span>
               {t}
             </span>
@@ -256,7 +254,7 @@ export const JoinScene: React.FC = () => {
           }}
         />
         <Ink at={projectAt + 2} dur={18} style={{ left: CARD_X, top: y(LOW_Y) + 214, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(34, true), color: ACCENT_INK, background: PAPER }}>A query became a project.</span>
+          <span style={{ ...body(32, true), color: ACCENT_INK, background: PAPER }}>A query became a project.</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

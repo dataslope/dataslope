@@ -40,7 +40,7 @@ const RunCount: React.FC<{ at: number; x: number; y: number; run: string; value:
   const badge = tone === "bad" ? "red" : tone === "ok" ? "green" : "blue";
   return (
     <div style={{ position: "absolute", left: x, top: y, width: 170, opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
-      <div style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{run}</div>
+      <div style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{run}</div>
       {/* The number as a house badge, at the box's old size; a second look
           swells it a little (`lit`). */}
       <div
@@ -140,20 +140,20 @@ export const IdemScene: React.FC = () => {
           What does it mean for a pipeline to be idempotent, and why does it matter?
         </QuestionCard>
         <Note at={defAt} x={X0} y={y(296)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             Idempotent: run it twice, and it leaves <Mark at={sameAt}>the same final state</Mark> as running it once.
           </span>
         </Note>
 
         {/* A: the blind insert, run twice. */}
         <Note at={blindAt - 2} x={X0} y={aTop - 40}>
-          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             A blind insert, from <Mono>events_stage</Mono> <span style={{ color: INK_SOFT, fontWeight: 500 }}>(the page's 24 events)</span>
           </span>
         </Note>
         <Listing lines={blind} x={X0} top={aTop} width={LIST_W} size={SIZE} at={blindAt} dim={overAt} />
         <Note at={tableAt} x={COUNT_X} y={aTop - 40} dim={overAt}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>June 1's events, after each run</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>June 1's events, after each run</span>
         </Note>
         <RunCount at={eightAt - 2} x={COUNT_X} y={countY(aTop)} run="after run 1" value={IDEM.blind[0]} tone="data" />
         <RunCount at={sixteenAt - 2} x={COUNT_X + COUNT_GAP} y={countY(aTop)} run="after the retry" value={IDEM.blind[1]} tone="bad" lit={pulse(frame, sixteenAt + 8, 20)} />
@@ -162,14 +162,14 @@ export const IdemScene: React.FC = () => {
           ✕ failed after the write
         </Pill>
         <Note at={retryAt} x={COUNT_X + 140} y={aTop + h(170)}>
-          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             ↻ retried<span style={{ opacity: ease(frame, againAt, 10) }}>: the same insert, again</span>
           </span>
         </Note>
 
         {/* B: overwrite the partition, run twice; BEGIN and COMMIT come later. */}
         <Note at={overAt - 2} x={X0} y={bTop - 40}>
-          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Overwrite the partition: delete, then insert</span>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Overwrite the partition: delete, then insert</span>
         </Note>
         <Listing
           lines={B_LINES}
@@ -189,39 +189,39 @@ export const IdemScene: React.FC = () => {
         <RunCount at={twiceAt + 6} x={COUNT_X + COUNT_GAP} y={countY(bTop) + h(40)} run="after run 2" value={IDEM.over[1]} tone="ok" lit={pulse(frame, twiceAt + 18, 20)} />
         <ColumnRule x={COUNT_X + COUNT_RULE} top={countY(bTop) + h(40)} height={COUNT_H} at={twiceAt + 8} />
         <Note at={emptyAt} x={COUNT_X} y={bTop + bH - h(56)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             insert fails inside it: rolled back, June 1 still has {IDEM.rolledBack}
           </span>
         </Note>
 
         {/* Rows with a key. */}
         <Note at={keyAt} x={NOTE_X} y={bTop + h(30)}>
-          <div style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Rows with a key: upsert</div>
-          <div style={{ marginTop: 12, ...note(28, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, mergeAt, 10) }}>
+          <div style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Rows with a key: upsert</div>
+          <div style={{ marginTop: 12, ...note(26, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, mergeAt, 10) }}>
             <Mono>MERGE INTO …</Mono>
           </div>
-          <div style={{ marginTop: 8, ...note(28, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, mergeAt + 14, 10) }}>
+          <div style={{ marginTop: 8, ...note(26, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, mergeAt + 14, 10) }}>
             <Mono>INSERT … ON CONFLICT DO UPDATE</Mono>
           </div>
           {/* The page's ON CONFLICT upsert, run twice on three staged orders. */}
-          <div style={{ marginTop: 12, ...note(24, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, conflictAt + 12, 10) }}>
+          <div style={{ marginTop: 12, ...note(22, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, conflictAt + 12, 10) }}>
             run twice: <Num>{IDEM.upsert[0]}</Num> orders, then <Num>{IDEM.upsert[1]}</Num>
           </div>
         </Note>
 
         {/* Why it matters. */}
         <Note at={whyAt} x={NOTE_X} y={aTop - 40}>
-          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Why it's the foundation</span>
+          <span style={{ ...label(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Why it's the foundation</span>
         </Note>
         <Note at={repairAt} x={NOTE_X} y={aTop + h(4)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             a retry or a backfill <b style={{ color: OK_INK }}>repairs</b> a day,
             <br />
             never duplicates it
           </span>
         </Note>
         <Note at={autoAt} x={NOTE_X} y={aTop + h(100)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>so recovery can be automated</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>so recovery can be automated</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -105,12 +105,12 @@ export const DomainScene: React.FC = () => {
             />
           </div>
           <Note at={anythingAt - 2} out={spellAt[0] - 2} x={looseRight + 30} y={rowsTop + 10}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Anything goes in</span>
+            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Anything goes in</span>
           </Note>
           {/* The question holds through the pause, and leaves as the table moves aside. */}
           <Bracket x={looseRight + 14} y0={rowsTop + 6} y1={rowsBottom - 6} at={sameAt - 2} out={narrowAt + 6} />
           <Note at={sameAt + 4} out={narrowAt + 6} x={looseRight + 42} y={(rowsTop + rowsBottom) / 2 - 30}>
-            <span style={{ ...note(24, STAT_INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(23, STAT_INK), whiteSpace: "nowrap" }}>
               {LOOSE.distinct} values.
               <br />
               The same state?
@@ -118,7 +118,7 @@ export const DomainScene: React.FC = () => {
           </Note>
           {LOOSE_IN.map((row) => (
             <Note key={row} at={onlyAt + 6} x={looseRight + 30} y={top + g.rowMid(row) * S - 15}>
-              <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>gets in</span>
+              <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>gets in</span>
             </Note>
           ))}
         </div>
@@ -168,7 +168,7 @@ export const DomainScene: React.FC = () => {
         />
         {/* Where that name came from: the CHECK above has none of its own. */}
         <Note at={ruleAt + 12} x={RIGHT_X + RIGHT_W - 22} y={errorBottom + 18} align="right" from="up">
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Named by Postgres: table, column, check</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Named by Postgres: table, column, check</span>
         </Note>
       </Drift>
     </AbsoluteFill>

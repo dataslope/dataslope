@@ -4,7 +4,7 @@ import { arrowHead } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { colors, ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -46,7 +46,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(26, INK_SOFT)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };
@@ -235,7 +235,7 @@ export const Call: React.FC<{ at: number; x: number; y: number; children: React.
         top: y + 2,
         opacity: p * (1 - o),
         fontFamily: MONO,
-        fontSize: 24,
+        fontSize: 21,
         fontWeight: 500,
         color: INK_SOFT,
         whiteSpace: "nowrap",
@@ -280,12 +280,12 @@ export const LabelEnd: React.FC<{
         whiteSpace: "nowrap",
       }}
     >
-      <span style={{ opacity: p, fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>
+      <span style={{ opacity: p, fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>
         {call}
       </span>
       {/* The count at 22px beside the 21px call: one line, one size. */}
       {count ? (
-        <span style={{ ...note(24, countColor), fontWeight: 500, opacity: c, transform: `translateY(${(1 - c) * 6}px)`, display: "inline-block" }}>
+        <span style={{ ...note(22, countColor), fontWeight: 500, opacity: c, transform: `translateY(${(1 - c) * 6}px)`, display: "inline-block" }}>
           {count}
         </span>
       ) : null}

@@ -16,8 +16,8 @@ const PANEL_W = 800;
 /** A panel's numbered title. */
 const Title: React.FC<{ n: number; x: number; y: number; at: number; children: React.ReactNode }> = ({ n, x, y, at, children }) => (
   <Note at={at} x={x} y={y}>
-    <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-      <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, marginRight: 14 }}>{n}</span>
+    <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+      <span style={{ ...note(29, ACCENT_INK), fontWeight: 500, marginRight: 14 }}>{n}</span>
       {children}
     </span>
   </Note>
@@ -40,7 +40,7 @@ const Tag: React.FC<{ x: number; y: number; w: number; at: number; tone: BadgeTo
   return (
     <div
       style={{
-        ...label(24),
+        ...label(19),
         ...badgeStyle(tone, 19),
         position: "absolute",
         left: x,
@@ -124,7 +124,7 @@ export const AbScene: React.FC = () => {
           How do you A/B test an LLM feature?
         </QuestionCard>
         <Note at={fourAt - 4} x={X0} y={y(250)}>
-          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
             the usual machinery, with <Mark at={fourAt + 4}>four adjustments</Mark>
           </span>
         </Note>
@@ -167,7 +167,7 @@ export const AbScene: React.FC = () => {
           </span>
         </Note>
         <Note at={sizeAt} x={COL[1]} y={y(ROW[0]) + 236}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             size it from an A/A test
             <span style={{ opacity: ease(frame, aaAt - 2, 10) }}> (both arms identical)</span>
             <span style={{ opacity: ease(frame, pilotAt - 2, 10) }}>, or a pilot</span>
@@ -196,16 +196,16 @@ export const AbScene: React.FC = () => {
           })}
         </svg>
         <Note at={pinAt + 4} x={TL.x0} y={TL.y - 82}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>the test, start to finish, one model name</span>
+          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>the test, start to finish, one model name</span>
         </Note>
         <Note at={updateAt + 6} x={mid + 12} y={TL.y - 54} from="right">
-          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>updated under the same name</span>
+          <span style={{ ...label(19, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>updated under the same name</span>
         </Note>
         <Note at={halfAt} x={TL.x0} y={TL.y + 50}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>the treatment changes halfway through</span>
+          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>the treatment changes halfway through</span>
         </Note>
         <Note at={logAt + 6} x={TL.x0} y={TL.y + 86}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={logAt + 10}>log the version on every request</Mark>
           </span>
         </Note>
@@ -217,7 +217,7 @@ export const AbScene: React.FC = () => {
         {/* The guardrails as blue house badges, two to a row. */}
         {guards.map((g) => (
           <Note key={g.text} at={g.at - 2} x={COL[1] + (g.w % 2) * 330} y={y(ROW[1]) + 77 + Math.floor(g.w / 2) * 64} from="up">
-            <span style={note(24)}>
+            <span style={note(23)}>
               <Badge tone="blue" size={23}>
                 {g.text}
               </Badge>
@@ -236,7 +236,7 @@ export const AbScene: React.FC = () => {
         </Note>
 
         <Note at={nextAt - 4} x={COL[1]} y={y(ROW[1]) + 266}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", maxWidth: PANEL_W }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", maxWidth: PANEL_W }}>
             next: the model as the measuring tool
           </span>
         </Note>

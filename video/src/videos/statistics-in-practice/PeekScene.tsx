@@ -100,7 +100,7 @@ export const PeekScene: React.FC = () => {
       {/* ── The sample size, from the smallest lift worth catching ── */}
       <div style={{ position: "absolute", inset: 0, opacity: sizeDim, transform: `translateY(${(1 - rise) * h(190)}px)` }}>
         <Ink at={sizeFrom + 4} dur={14} style={{ left: 160, top: y(292), whiteSpace: "nowrap" }}>
-          <span style={label(24, INK_SOFT)}>To catch</span>
+          <span style={label(21, INK_SOFT)}>To catch</span>
         </Ink>
         <Ink at={catchAt - 2} dur={18} style={{ left: 160, top: y(322), whiteSpace: "nowrap" }}>
           <span style={{ ...body(44), color: INK }}>
@@ -108,7 +108,7 @@ export const PeekScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={powerAt - 4} dur={14} style={{ left: 160, top: y(388), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK_SOFT) }}>
+          <span style={{ ...note(22, INK_SOFT) }}>
             with {Math.round(DESIGN.power * 100)}% power, testing at {DESIGN.alpha}
           </span>
         </Ink>
@@ -118,12 +118,12 @@ export const PeekScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={perArmAt - 4} dur={14} style={{ left: 684, top: y(388), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK) }}>users in each arm</span>
+          <span style={{ ...note(22, INK) }}>users in each arm</span>
         </Ink>
         {(["A", "B"] as const).map((g, i) => (
           <React.Fragment key={g}>
             <div
-              style={{ position: "absolute", left: BAR_X0 - 36, top: y(316 + i * 46) - 2, opacity: ease(frame, sizeFrom + 8 + i * 4, 12), ...label(24, INK) }}
+              style={{ position: "absolute", left: BAR_X0 - 36, top: y(316 + i * 46) - 2, opacity: ease(frame, sizeFrom + 8 + i * 4, 12), ...label(22, INK) }}
             >
               {g}
             </div>
@@ -149,7 +149,7 @@ export const PeekScene: React.FC = () => {
       {/* In where the size panel was, once it has gone. */}
       <FigLabel n="3" title="Two identical arms: the p-value, after every hundred visitors" at={hereAt + 4} x={160} y={y(FIG_Y)} />
       <Ink at={recomputeAt} dur={10} style={{ left: X.x1, top: y(FIG_Y), whiteSpace: "nowrap", transform: "translateX(-100%)" }}>
-        <span style={{ ...note(24, INK_SOFT) }}>
+        <span style={{ ...note(22, INK_SOFT) }}>
           visitors per arm so far: <span style={{ ...TABULAR, color: INK, fontWeight: 500 }}>{num(reach > 0 ? shownN : 0)}</span>
         </span>
       </Ink>
@@ -169,13 +169,13 @@ export const PeekScene: React.FC = () => {
       {[0.25, 0.5].map((p) => (
         <div
           key={p}
-          style={{ position: "absolute", right: 1920 - X.x0 + 16, top: py(p) - 14, opacity: ease(frame, hereAt + 6, 14), ...note(24, INK_SOFT) }}
+          style={{ position: "absolute", right: 1920 - X.x0 + 16, top: py(p) - 14, opacity: ease(frame, hereAt + 6, 14), ...note(20, INK_SOFT) }}
         >
           {fmt(p, 2)}
         </div>
       ))}
       <div
-        style={{ position: "absolute", right: 1920 - X.x0 + 16, top: py(0.375) - 14, opacity: ease(frame, hereAt + 6, 14), ...label(24, INK_SOFT) }}
+        style={{ position: "absolute", right: 1920 - X.x0 + 16, top: py(0.375) - 14, opacity: ease(frame, hereAt + 6, 14), ...label(20, INK_SOFT) }}
       >
         p
       </div>
@@ -194,10 +194,10 @@ export const PeekScene: React.FC = () => {
         </Svg>
       ) : null}
       <Note at={identicalAt} x={X.x1 - 12} y={py(PEEKING.alpha) + 4} align="right">
-        <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>under {PEEKING.alpha}: &ldquo;significant&rdquo;</span>
+        <span style={{ ...note(20, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>under {PEEKING.alpha}: &ldquo;significant&rdquo;</span>
       </Note>
       <Note at={nothingAt - 2} x={X.x1 - 44} y={py(P_MAX) + 8} align="right">
-        <span style={{ ...note(24, INK_SOFT), fontWeight: 500, ...halo }}>no effect anywhere in this data</span>
+        <span style={{ ...note(21, INK_SOFT), fontWeight: 500, ...halo }}>no effect anywhere in this data</span>
       </Note>
 
       {/* The planned size: the one look that counts, lit when it is named. */}
@@ -207,7 +207,7 @@ export const PeekScene: React.FC = () => {
         </Svg>
       ) : null}
       <Note at={theEndAt} x={PLAN_X} y={py(P_MAX) + 66}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the one look</span>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>the one look</span>
       </Note>
       {planned > 0 ? (
         <Svg>
@@ -222,10 +222,10 @@ export const PeekScene: React.FC = () => {
         </Svg>
       ) : null}
       <Note at={plannedAt} x={PLAN_X} y={py(P_MAX) - 8}>
-        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>planned</span>
+        <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>planned</span>
       </Note>
       <Note at={plannedAt + 4} x={PLAN_X} y={py(P_MAX) + 26}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{num(PEEKING.planned)} per arm</span>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{num(PEEKING.planned)} per arm</span>
       </Note>
 
       {/* ── The wandering p-value ── */}
@@ -256,12 +256,12 @@ export const PeekScene: React.FC = () => {
         color={STAT}
       />
       <Note at={firstDipAt + 2} x={pts[FIRST][0] + 12} y={py(0.47) - 30}>
-        <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           stop here at {num(rows[FIRST].n)}
         </span>
       </Note>
       <Note at={noiseAt - 4} x={pts[FIRST][0] + 12} y={py(0.47)}>
-        <span style={{ ...note(24, STAT_INK), whiteSpace: "nowrap", ...halo }}>and you ship noise</span>
+        <span style={{ ...note(22, STAT_INK), whiteSpace: "nowrap", ...halo }}>and you ship noise</span>
       </Note>
       <Note at={nineteenAt - 4} x={pts[last][0] - 16} y={pts[last][1] + 14} align="right">
         <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>p = {fmt(PEEKING.final)}</span>

@@ -122,13 +122,13 @@ export const WalletScene: React.FC = () => {
         </Svg>
         {/* What a dot is, at the cloud's thin end. */}
         <Ink at={adoptedAt} dur={14} style={{ left: T0 + 30, top: y(LINE_Y) - h(26) - h(70) - 46, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK_SOFT) }}>people using the number</span>
+          <span style={{ ...note(20, INK_SOFT) }}>people using the number</span>
         </Ink>
         <Ink at={yearAt - 4} dur={14} style={{ left: T0 - 4, top: y(LINE_Y) + 22, whiteSpace: "nowrap" }}>
           <span style={{ ...headline(44) }}>1938</span>
         </Ink>
         <Note at={lockportAt - 2} x={T0} y={y(LINE_Y) + 84}>
-          <div style={{ ...note(24, INK_SOFT), lineHeight: 1.45, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(22, INK_SOFT), lineHeight: 1.45, whiteSpace: "nowrap" }}>
             <div>{WALLET.town}</div>
             <div style={{ opacity: ease(frame, sampleAt, 10) }}>
               a sample card in <Mark at={everyAt}>every wallet</Mark>
@@ -146,19 +146,19 @@ export const WalletScene: React.FC = () => {
             <div style={{ ...headline(68), color: ACCENT_INK, ...TABULAR }}>
               {count.toLocaleString("en-US")}
             </div>
-            <div style={{ ...note(24, INK), opacity: ease(frame, usingAt - 4, 10) }}>people using it, that year</div>
+            <div style={{ ...note(22, INK), opacity: ease(frame, usingAt - 4, 10) }}>people using it, that year</div>
           </div>
         </Note>
 
         {/* ── What broke ── */}
         <Note at={uniqueAt - 4} x={T0} y={y(UNIQUE_Y)}>
-          <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>
+          <div style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
             <Strike at={uniqueAt + 2}>Unique</Strike>
             <span style={{ opacity: ease(frame, sharedAt - 2, 10), color: ACCENT_INK, fontStyle: SERIF_ITALIC }}> shared by thousands</span>
           </div>
         </Note>
         <Note at={permanentAt - 4} x={T0} y={y(PERMANENT_Y)}>
-          <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>
+          <div style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
             <Strike at={permanentAt + 2}>Permanent</Strike>
             <span style={{ opacity: ease(frame, cancelledAt - 2, 10), color: ACCENT_INK, fontStyle: SERIF_ITALIC }}> cancelled</span>
           </div>
@@ -169,7 +169,7 @@ export const WalletScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={fiveAt + 10} dur={14} style={{ right: 1920 - 1824, top: y(SOURCE_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>Figures: {WALLET.source}</span>
+          <span style={{ ...label(19, INK_SOFT), fontWeight: 500 }}>Figures: {WALLET.source}</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

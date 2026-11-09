@@ -145,7 +145,7 @@ export const SampleScene: React.FC = () => {
 
       {/* ── P1: the question, over the population at full size ── */}
       <Ink at={2} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
-        <span style={label(24, INK_SOFT)}>
+        <span style={label(20, INK_SOFT)}>
           <PartName />A satisfaction survey
         </span>
       </Ink>
@@ -242,13 +242,13 @@ export const SampleScene: React.FC = () => {
           ...halo,
         }}
       >
-        <span style={note(24, INK_SOFT)}>True average </span>
+        <span style={note(22, INK_SOFT)}>True average </span>
         <span style={{ ...note(24, INK), fontWeight: 500 }}>{SHOWN.truth}</span>
       </div>
 
       {/* "anyone above seventy-five", then "eleven times as likely". */}
       <Note at={aboveAt - 2} x={sx(X1, THRESHOLD) + 14} y={y(popTop - 76)}>
-        <span style={{ ...label(24, INK), ...halo }}>
+        <span style={{ ...label(21, INK), ...halo }}>
           Above {THRESHOLD}:{" "}
           <span style={{ opacity: ease(frame, elevenAt - 4, 12) }}>picked {LIKELIER} times as often</span>
         </span>
@@ -277,7 +277,7 @@ export const SampleScene: React.FC = () => {
       />
       <TruthLine x={truth2X} bottom={y(FIG2_BASE)} top={y(FIG2_TOP)} at={fig2At + 6} />
       <Note at={fig2At + 12} x={truth2X + 12} y={y(FIG2_TOP - 10)}>
-        <span style={{ ...note(24, INK_SOFT), ...halo }}>true {SHOWN.truth}</span>
+        <span style={{ ...note(20, INK_SOFT), ...halo }}>true {SHOWN.truth}</span>
       </Note>
 
       <FallingBlock step={steps.random} slot={randomSlot} color={RANDOM} />
@@ -294,15 +294,15 @@ export const SampleScene: React.FC = () => {
           opacity: ease(frame, sixtyAt - 2, 10) * landed(steps.random.d),
         }}
       >
-        <div style={{ ...note(28, RANDOM_INK), fontWeight: 500 }}>{SHOWN.random}</div>
-        <div style={note(24, INK_SOFT)}>at random</div>
+        <div style={{ ...note(30, RANDOM_INK), fontWeight: 500 }}>{SHOWN.random}</div>
+        <div style={note(20, INK_SOFT)}>at random</div>
       </div>
       <Note at={littleAt - 2} x={160} y={y(690)} out={takeAt}>
-        <div style={{ ...body(34, true), color: INK }}>
+        <div style={{ ...body(32, true), color: INK }}>
           A little low,{" "}
           <span style={{ opacity: ease(frame, closeAt - 2, 12) }}>but close.</span>
         </div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 6, opacity: ease(frame, closeAt + 6, 12) }}>
+        <div style={{ ...note(22, INK_SOFT), marginTop: 6, opacity: ease(frame, closeAt + 6, 12) }}>
           {SHOWN.under} under the true average
         </div>
       </Note>
@@ -317,14 +317,14 @@ export const SampleScene: React.FC = () => {
           opacity: ease(frame, eightyAt - 2, 10) * landed(steps.easy.d),
         }}
       >
-        <div style={{ ...note(28, EASY_INK), fontWeight: 500 }}>{SHOWN.easy}</div>
-        <div style={note(24, INK_SOFT)}>the easy way</div>
+        <div style={{ ...note(30, EASY_INK), fontWeight: 500 }}>{SHOWN.easy}</div>
+        <div style={note(20, INK_SOFT)}>the easy way</div>
       </div>
       <Note at={pickedAt} x={160} y={y(690)}>
-        <div style={{ ...body(34, true), color: INK }}>
+        <div style={{ ...body(32, true), color: INK }}>
           {Math.round(FIRST_EASY.shareAbove * 100)}% of these 500 score over {THRESHOLD}.
         </div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 6 }}>
+        <div style={{ ...note(22, INK_SOFT), marginTop: 6 }}>
           Of all {POP_SIZE.toLocaleString("en-US")} customers, {Math.round(SHARE_ABOVE * 100)}% do.
         </div>
       </Note>

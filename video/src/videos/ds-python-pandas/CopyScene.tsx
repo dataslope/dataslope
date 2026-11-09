@@ -129,10 +129,10 @@ export const CopyScene: React.FC = () => {
           />
         </svg>
         <Note at={selectAt + 4} x={bx(0)} y={brY + h(18)} out={outChain}>
-          <span style={{ ...label(24, BLUE_INK), fontWeight: 500 }}>1 select</span>
+          <span style={{ ...label(22, BLUE_INK), fontWeight: 500 }}>1 select</span>
         </Note>
         <Note at={setAt + 4} x={bx(split) + 8} y={brY + h(18)} out={outChain}>
-          <span style={{ ...label(24, ACCENT), fontWeight: 500 }}>2 set</span>
+          <span style={{ ...label(22, ACCENT), fontWeight: 500 }}>2 set</span>
         </Note>
 
         {/* ── df, and the selection the set lands on ── */}

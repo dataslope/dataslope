@@ -110,7 +110,7 @@ export const RateScene: React.FC = () => {
         })}
       </Svg>
       <Note at={convertAt} x={GRID_X} y={y(GRID_Y) + h(ROWS * PITCH) + 14}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           <span style={{ display: "inline-block", width: 14, height: 14, background: DATA, marginRight: 10 }} />
           converted: {RATE.successes}
         </span>
@@ -118,7 +118,7 @@ export const RateScene: React.FC = () => {
 
       {/* ── Right column: the rate, its standard error, its interval ── */}
       <Ink at={fiveFortyAt - 6} dur={14} style={{ left: COL, top: y(240), whiteSpace: "nowrap" }}>
-        <span style={label(24, INK_SOFT)}>
+        <span style={label(22, INK_SOFT)}>
           The observed rate, <PHat />
         </span>
       </Ink>
@@ -131,7 +131,7 @@ export const RateScene: React.FC = () => {
         </Ink>
       </div>
       <Ink at={seAt - 4} dur={14} style={{ left: COL, top: y(392), whiteSpace: "nowrap" }}>
-        <span style={label(24, INK_SOFT)}>A rate’s standard error</span>
+        <span style={label(22, INK_SOFT)}>A rate’s standard error</span>
       </Ink>
       <div style={{ position: "absolute", left: COL, top: y(432), display: "flex", alignItems: "baseline", gap: 16, whiteSpace: "nowrap" }}>
         <Ink at={itselfAt - 6} dur={18} style={{ position: "relative", fontFamily: SERIF, fontSize: 42, color: INK }}>
@@ -143,7 +143,7 @@ export const RateScene: React.FC = () => {
       </div>
       {/* Why 1.96 here and not a t: nothing separate was estimated. */}
       <Note at={noSpreadAt - 4} x={COL} y={y(500)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           No separate spread to estimate
           <span style={{ opacity: ease(frame, noTAt - 4, 10) }}>, so no t</span>
           <span style={{ opacity: ease(frame, usualAt - 4, 10) }}>
@@ -158,13 +158,13 @@ export const RateScene: React.FC = () => {
       <Axis scale={X} base={y(AXIS)} ticks={[15, 16, 17, 18, 19, 20, 21]} format={(v) => `${v}%`} at={eighteenAt - 8} />
       <Rule x={px(RATE.pHat)} y0={y(AXIS)} y1={y(BAR_Y) - 30} at={eighteenAt - 2} color={EST} width={3.4} />
       <Note at={eighteenAt} x={px(RATE.pHat) + 12} y={y(BAR_Y) - 70}>
-        <span style={{ ...note(24, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, EST_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
           <PHat /> = {pct(RATE.pHat)}
         </span>
       </Note>
       {/* One standard error at a time, out to 1.96 of them. */}
       <Note at={stepAt} x={px(RATE.pHat + RATE.se)} y={y(AXIS) - 46} from="up">
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>1 SE</span>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>1 SE</span>
       </Note>
       <Svg opacity={ease(frame, stepAt - 2, 12)}>
         {[-1, 1].map((s) => (
@@ -180,7 +180,7 @@ export const RateScene: React.FC = () => {
         ))}
       </Svg>
       <Note at={nineSixAt} x={(COL + 1760) / 2} y={y(AXIS) + 46} from="up">
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           {fmt(RATE.z)} standard errors either way
         </span>
       </Note>
@@ -189,15 +189,15 @@ export const RateScene: React.FC = () => {
         <circle cx={px(RATE.pHat)} cy={y(BAR_Y)} r={6.5 * ease(frame, eitherAt - 4, 10)} fill={EST} stroke={PAPER} strokeWidth={1.4} />
       </Svg>
       <Note at={sixteenAt - 2} x={px(RATE.lo) - 14} y={y(BAR_Y) - 16} align="right" from="right">
-        <span style={{ ...note(28, INK), fontWeight: 500, ...halo }}>{pct(RATE.lo)}</span>
+        <span style={{ ...note(26, INK), fontWeight: 500, ...halo }}>{pct(RATE.lo)}</span>
       </Note>
       <Note at={percentAt - 2} x={(COL + 1760) / 2} y={y(AXIS) + 84} from="up">
-        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           a 95% interval for the true rate
         </span>
       </Note>
       <Note at={nineteenAt - 2} x={px(RATE.hi) + 14} y={y(BAR_Y) - 16}>
-        <span style={{ ...note(28, INK), fontWeight: 500, ...halo }}>{pct(RATE.hi)}</span>
+        <span style={{ ...note(26, INK), fontWeight: 500, ...halo }}>{pct(RATE.hi)}</span>
       </Note>
     </AbsoluteFill>
   );

@@ -87,10 +87,10 @@ export const CloseScene: React.FC = () => {
                 />
               )}
               <Ink at={at + 4} dur={12} style={{ left: x, top: y(ROW_V) + h(ART_H) + h(14), width: COL_W, textAlign: "center" }}>
-                <div style={{ ...label(24, i === ours ? ACCENT_INK : INK_SOFT), fontWeight: 500 }}>
+                <div style={{ ...label(20, i === ours ? ACCENT_INK : INK_SOFT), fontWeight: 500 }}>
                   <Num>{s.n}</Num>
                 </div>
-                <div style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 2 }}>
+                <div style={{ ...note(20, INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 2 }}>
                   {i === ours ? <Mark at={jobAt}>{s.title}</Mark> : s.title}
                 </div>
               </Ink>
@@ -100,7 +100,7 @@ export const CloseScene: React.FC = () => {
 
         {/* The same test, every round. */}
         <Note at={testAt} x={X0} y={y(410)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>The same test, every round</span>
+          <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>The same test, every round</span>
         </Note>
         <div style={{ position: "absolute", left: 92, top: y(452), display: "flex", gap: "0.26em", ...headline(58) }}>
           <Ink at={tellingAt - 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
@@ -124,7 +124,7 @@ export const CloseScene: React.FC = () => {
 
         {/* The track's practice, counted. */}
         <Note at={practice[0].at - 6} x={X0} y={y(CARD_V) - 44}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Practice on the track</span>
+          <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>Practice on the track</span>
         </Note>
         {practice.slice(1).map((p, i) => (
           <ColumnRule key={p.text} x={X0 + (i + 1) * (CARD_W + CARD_GAP) - CARD_GAP / 2} top={y(CARD_V)} height={96} at={p.at} />

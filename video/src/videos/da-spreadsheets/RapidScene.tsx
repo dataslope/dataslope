@@ -113,7 +113,7 @@ const Clean: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Slot c={c} k={0} cell={TEXT.clean} at={at} resultAt={backAt - 2} />
       <Note at={at + 6} x={R_X} y={c.y(TOP) + c.h(110)}>
-        <span style={{ fontFamily: MONO, fontSize: 28, color: ACCENT_INK, whiteSpace: "pre" }}>
+        <span style={{ fontFamily: MONO, fontSize: 30, color: ACCENT_INK, whiteSpace: "pre" }}>
           &ldquo;{raw.replaceAll(" ", "·")}&rdquo;
         </span>
       </Note>
@@ -121,7 +121,7 @@ const Clean: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>· marks a space: TRIM drops the extras, PROPER fixes the case</span>
       </Note>
       <Note at={lookAt - 2} x={R_X} y={c.y(TOP) + c.h(230)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>tidy the keys first, or lookups miss</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>tidy the keys first, or lookups miss</span>
       </Note>
     </>
   );
@@ -268,7 +268,7 @@ const Dupes: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={firstAt + 14} x={R_X} y={g.bottom + c.h(62)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
           <Mono color={INK}>$A$2:A2</Mono> stops at its own row, so only the later copy flags
         </span>
       </Note>

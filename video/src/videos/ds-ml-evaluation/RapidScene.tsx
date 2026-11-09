@@ -44,7 +44,7 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={rmseAt - 4} x={R_X + 40} y={c.y(330)}>
-        <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>the page&apos;s five predictions: each miss&apos;s share of the total</span>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>the page&apos;s five predictions: each miss&apos;s share of the total</span>
       </Note>
       {rows.map((r, i) => {
         const total = r.vals.reduce((a, b) => a + b, 0);
@@ -53,7 +53,7 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
         let acc = 0;
         return (
           <React.Fragment key={r.name}>
-            <div style={{ position: "absolute", left: R_X + 40, top, ...note(24, INK), fontWeight: 500, opacity: p, whiteSpace: "nowrap" }}>
+            <div style={{ position: "absolute", left: R_X + 40, top, ...note(25, INK), fontWeight: 500, opacity: p, whiteSpace: "nowrap" }}>
               {i === 0 ? <Mark at={maeAt}>{r.name}</Mark> : r.name}
             </div>
             {r.vals.map((v, k) => {
@@ -75,7 +75,7 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    ...label(24, PAPER),
+                    ...label(20, PAPER),
                     fontWeight: 500,
                     ...TABULAR,
                   }}
@@ -88,12 +88,12 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <Note at={dominateAt} x={R_X + 40} y={c.y(600)}>
-        <span style={{ ...note(24, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>squared, the two big misses dominate</span>
+        <span style={{ ...note(25, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>squared, the two big misses dominate</span>
       </Note>
       {/* RMSE's root brings it back to the target's units too: the choice is
           about what a big miss costs, not about units. */}
       <Note at={unitsAt - 2} x={R_X + 40} y={c.y(652)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
           both in the target&apos;s units
           <span style={{ opacity: ease(frame, useAt - 2, 10) }}>
             : <b>RMSE</b> when big misses cost more
@@ -101,11 +101,11 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={r2At - 2} x={R_X + 40} y={c.y(704)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
           <b>R²</b>: the share of variance explained; 1 is perfect, 0 is no better than the mean
         </span>
         <br />
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, noUnitsAt - 2, 10) }}>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, noUnitsAt - 2, 10) }}>
           no units, so it compares across datasets
         </span>
       </Note>
@@ -161,12 +161,12 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>predict {LOSS.at} for a true positive:</span>
       </Note>
       <Note at={sqAt + 2} x={box.right + 30} y={c.y(box.top) + c.h(56)}>
-        <span style={{ ...note(28, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           squared error <span style={TABULAR}>{fmt(LOSS.sqAt)}</span>
         </span>
       </Note>
       <Note at={xentAt + 2} x={box.right + 30} y={c.y(box.top) + c.h(100)}>
-        <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           cross-entropy <span style={TABULAR}>{fmt(LOSS.xentAt)}</span>
         </span>
       </Note>
@@ -184,7 +184,7 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={gradAt - 2} x={box.right + 30} y={c.y(box.top) + c.h(302)}>
         <div style={{ whiteSpace: "nowrap" }}>
-          <div style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>
+          <div style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>
             gradient at <span style={TABULAR}>{LOSS.at}</span>, behind a sigmoid:
           </div>
           <div style={{ ...note(24, OK_INK), fontWeight: 500 }}>
@@ -218,16 +218,16 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
         <Note key={s.text} at={s.at - 2} x={R_X + 40} y={c.y(380) + i * c.h(72)}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <Tick at={s.at + 2} size={26} />
-            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>{s.text}</span>
+            <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>{s.text}</span>
           </div>
         </Note>
       ))}
       <Note at={noiseAt - 2} x={R_X + 40} y={c.y(380) + 3 * c.h(72) + c.h(20)}>
-        <span style={{ ...note(34, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(32, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           gap within its noise? <span style={{ opacity: ease(frame, simplerAt - 4, 10) }}><Mark at={simplerAt}>take the simpler one</Mark></span>
         </span>
         <br />
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a paired bootstrap on held-out predictions measures that noise</span>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>a paired bootstrap on held-out predictions measures that noise</span>
       </Note>
       <Note at={testAt - 2} x={R_X + 40} y={c.y(380) + 3 * c.h(72) + c.h(130)}>
         <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>

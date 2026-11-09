@@ -12,8 +12,8 @@ import { WIDE_COLUMNS, WIDE_ROWS } from "./data";
 import { Chip, clamp01, Drift, Head, Kicker, Mark, MARK_BAD, RowWash, Spot } from "./parts";
 import { useStoreLayout } from "./StoreErd";
 
-const HEAD_SIZE = 24;
-const CELL_SIZE = 24;
+const HEAD_SIZE = 21;
+const CELL_SIZE = 20;
 const PAD = 14;
 /** JetBrains Mono's advance, in em. */
 const ADVANCE = 0.6;
@@ -160,7 +160,7 @@ export const ScaleScene: React.FC = () => {
                 <React.Fragment key={i}>
                   {/* Each table's columns under its name, a firmer rule between tables. */}
                   {first ? (
-                    <div style={{ position: "absolute", left: XS[i] + 6, top: -36, ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>from {c.table}</div>
+                    <div style={{ position: "absolute", left: XS[i] + 6, top: -36, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>from {c.table}</div>
                   ) : null}
                   {i > 0 ? (
                     <div

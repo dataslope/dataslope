@@ -97,7 +97,7 @@ export const CohortScene: React.FC = () => {
         </TableName>
         <DataTable g={sg} cols={colsOf(sample, { user_id: { ink: BLUE_INK } })} at={logAt} out={countAt} rows={rowsAt(sample.rows, logAt + 4)} />
         <Note at={logAt + 10} x={X0} y={sg.rowTop(sample.rows.length) + h(14)} out={countAt}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
             the first 6 of {COHORT.events} events
             <br />
             from {COHORT.users} users, made up for this video
@@ -144,7 +144,7 @@ export const CohortScene: React.FC = () => {
             position: "absolute",
             left: GRID_X,
             top: y(GRID_TOP) - h(100),
-            ...note(28, INK),
+            ...note(26, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, divideAt + 2, 12),
           }}

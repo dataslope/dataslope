@@ -27,12 +27,12 @@ const Requests: React.FC<{ top: number; at: number; mixed: boolean; label: strin
   if (p <= 0) return null;
   return (
     <div style={{ position: "absolute", left: X0, top, display: "flex", alignItems: "center", gap: 14, opacity: p }}>
-      <span style={{ width: 150, ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{text}</span>
+      <span style={{ width: 150, ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{text}</span>
       <svg width={52} height={52} style={{ overflow: "visible" }}>
         <circle cx={26} cy={16} r={11} fill={INK} />
         <path d="M6,50 Q26,20 46,50 Z" fill={INK} />
       </svg>
-      <span style={{ ...label(24, INK_SOFT), margin: "0 4px" }}>→</span>
+      <span style={{ ...label(20, INK_SOFT), margin: "0 4px" }}>→</span>
       {Array.from({ length: 5 }, (_, i) => {
         const b = mixed ? i % 2 === 1 : true;
         const q = ease(frame, at + 4 + i * 3, 8);
@@ -47,7 +47,7 @@ const Requests: React.FC<{ top: number; at: number; mixed: boolean; label: strin
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              ...label(24, PAPER),
+              ...label(21, PAPER),
               fontWeight: 500,
               opacity: q,
               transform: `scale(${0.6 + 0.4 * q})`,
@@ -138,13 +138,13 @@ export const UnitScene: React.FC = () => {
             apart by their gap, the usual one green. Each badge holds its
             place before it inks, so the line never reflows. */}
         <div style={{ position: "absolute", left: X0, top: y(300), display: "flex", alignItems: "baseline", gap: 12, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, assignedAt, 14) }}>assigned to a group:</span>
+          <span style={{ ...note(25, INK_SOFT), opacity: ease(frame, assignedAt, 14) }}>assigned to a group:</span>
           {[
             { text: "usually a user", at: userAt, main: true },
             { text: "session", at: sessionAt, main: false },
             { text: "device", at: sessionAt + 6, main: false },
           ].map((c) => (
-            <span key={c.text} style={{ ...note(24), ...badgeStyle(c.main ? "green" : "gray", 25), opacity: ease(frame, c.at - 2, 10) }}>
+            <span key={c.text} style={{ ...note(25), ...badgeStyle(c.main ? "green" : "gray", 25), opacity: ease(frame, c.at - 2, 10) }}>
               {c.text}
             </span>
           ))}
@@ -159,12 +159,12 @@ export const UnitScene: React.FC = () => {
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>both versions</span>
         </Note>
         <Note at={diluteAt} x={X0} y={y(620)}>
-          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>the measured difference is diluted</span>
+          <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>the measured difference is diluted</span>
         </Note>
 
         {/* The analysis: orders nested in users. */}
         <Note at={respectAt} x={RIGHT_X} y={y(300)}>
-          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the analysis respects the unit, too</span>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the analysis respects the unit, too</span>
         </Note>
         <Svg opacity={ease(frame, thousandAt - 2, 12)}>
           {ORDERS.map((k, u) => {
@@ -191,7 +191,7 @@ export const UnitScene: React.FC = () => {
           })}
         </Svg>
         <Note at={thousandAt + 6} x={RIGHT_X} y={y(468)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
             1,000 users · about 5 orders each · <span style={{ opacity: ease(frame, aaAt - 2, 10) }}>A/A: both groups get the same version</span>
           </span>
         </Note>
@@ -202,7 +202,7 @@ export const UnitScene: React.FC = () => {
           const grow = ease(frame, b.valAt - 6, 16);
           return (
             <React.Fragment key={b.text}>
-              <div style={{ position: "absolute", left: RIGHT_X, top: y(b.top), ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p }}>
+              <div style={{ position: "absolute", left: RIGHT_X, top: y(b.top), ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p }}>
                 {b.v === UNIT.user ? (
                   <Mark at={wrongAt - 6} color={MARK_OK}>
                     {b.text}
@@ -210,7 +210,7 @@ export const UnitScene: React.FC = () => {
                 ) : (
                   b.text
                 )}
-                <span style={{ ...label(24, b.ink), fontWeight: 500, opacity: ease(frame, b.seAt, 10) }}>
+                <span style={{ ...label(23, b.ink), fontWeight: 500, opacity: ease(frame, b.seAt, 10) }}>
                   {" · standard error "}
                   {b.se.toFixed(2)}
                   {b.v === UNIT.naive ? <span style={{ opacity: ease(frame, smallAt, 10) }}>, too small</span> : null}
@@ -233,16 +233,16 @@ export const UnitScene: React.FC = () => {
                 <line x1={xOf(0.05)} x2={xOf(0.05)} y1={y(b.top) + h(32)} y2={y(b.top) + h(88)} stroke={INK} strokeWidth={2} strokeDasharray="4 5" />
               </Svg>
               <Note at={b.valAt} x={Math.max(xOf(b.v), xOf(0.05) + 6) + 14} y={y(b.top) + h(42)}>
-                <span style={{ ...note(28, b.ink), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{pct(b.v, 1)} significant</span>
+                <span style={{ ...note(30, b.ink), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{pct(b.v, 1)} significant</span>
               </Note>
             </React.Fragment>
           );
         })}
         <Note at={promiseAt + 2} x={xOf(0.05) - 100} y={y(774)} width={200} style={{ textAlign: "center" }}>
-          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>5% promised</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>5% promised</span>
         </Note>
         <Note at={orderAt} x={RIGHT_X} y={y(830)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>{UNIT.sims.toLocaleString("en-US")} simulated A/A tests</span>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>{UNIT.sims.toLocaleString("en-US")} simulated A/A tests</span>
         </Note>
         <Note at={clusterAt} x={RIGHT_X} y={y(872)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>or keep every order, with clustered standard errors</span>

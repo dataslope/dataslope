@@ -73,7 +73,7 @@ export const HookScene: React.FC = () => {
               dur={16}
               style={{ left: SLIP_X, top: y(SLIP_Y(i)), height: ROW_H, display: "flex", alignItems: "center", gap: NAME_GAP }}
             >
-              <span style={{ ...label(24, INK_SOFT), width: NAME_W, whiteSpace: "nowrap" }}>Doc {i + 1}</span>
+              <span style={{ ...label(21, INK_SOFT), width: NAME_W, whiteSpace: "nowrap" }}>Doc {i + 1}</span>
               <span style={{ ...body(46), color: INK, whiteSpace: "nowrap" }}>
                 {words.map((w, k) => {
                   const isThe = w === "the";
@@ -102,7 +102,7 @@ export const HookScene: React.FC = () => {
       })}
 
       <Note at={commonAt + 6} x={SLIP_X} y={y(SLIP_Y(2) + 126)}>
-        <span style={note(24, INK_SOFT)}>
+        <span style={note(22, INK_SOFT)}>
           In every document, <i>the</i> appears {THE_COUNTS.map(times).join(" or ")}. No other word appears more
           than {times(OTHER_MAX)}.
         </span>

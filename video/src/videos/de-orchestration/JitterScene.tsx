@@ -100,7 +100,7 @@ export const JitterScene: React.FC = () => {
           ))}
         </svg>
         <Note at={onceAt + 6} x={dotX(TASK_DOTS - 1) + 22} y={dotY - 14} align="left">
-          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap", opacity: failed }}>fail at once</span>
+          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap", opacity: failed }}>fail at once</span>
         </Note>
 
         {/* The two panels. */}
@@ -113,18 +113,18 @@ export const JitterScene: React.FC = () => {
                 {[0, 100, 200, 300].map((v) => (
                   <g key={v}>
                     <line x1={pnl.x} x2={pnl.x + PANEL_W} y1={vy(v)} y2={vy(v)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={v ? 0.5 : 0} />
-                    <text x={pnl.x - 12} y={vy(v) + 7} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
+                    <text x={pnl.x - 12} y={vy(v) + 7} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
                       {v}
                     </text>
                   </g>
                 ))}
                 <line x1={pnl.x} x2={pnl.x + PANEL_W} y1={base} y2={base} stroke={INK} strokeWidth={1.6} />
                 {[0, 1000, 2000, 3000, 4000].map((ms) => (
-                  <text key={ms} x={msX(pnl.x, ms)} y={base + 30} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
+                  <text key={ms} x={msX(pnl.x, ms)} y={base + 30} textAnchor="middle" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
                     {count(ms)}
                   </text>
                 ))}
-                <text x={pnl.x + PANEL_W} y={base + 58} textAnchor="end" style={svgText({ ...label(24, INK_SOFT) })}>
+                <text x={pnl.x + PANEL_W} y={base + 58} textAnchor="end" style={svgText({ ...label(19, INK_SOFT) })}>
                   ms after the failure
                 </text>
               </svg>
@@ -132,7 +132,7 @@ export const JitterScene: React.FC = () => {
           );
         })}
         <Note at={modelAt + 4} x={PANELS[0].x} y={y(372)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
             a model: <Num>{count(STORM.clients)}</Num> tasks, a <Num>{STORM.base}</Num> ms base, retries per <Num>{STORM.bucket}</Num> ms
           </span>
         </Note>
@@ -198,7 +198,7 @@ export const JitterScene: React.FC = () => {
             return (
               <g key={i} opacity={p}>
                 <path d={`M${x0},${top + 10} L${x0},${top} L${x1},${top} L${x1},${top + 10}`} fill="none" stroke={color} strokeWidth={2 + third} />
-                <text x={(x0 + x1) / 2} y={top - 10} textAnchor="middle" style={svgText({ ...label(24, i === 2 && third > 0.5 ? OK_INK : INK_SOFT), fontWeight: 500 })}>
+                <text x={(x0 + x1) / 2} y={top - 10} textAnchor="middle" style={svgText({ ...label(19, i === 2 && third > 0.5 ? OK_INK : INK_SOFT), fontWeight: 500 })}>
                   {`wait ${i + 1}`}
                 </text>
               </g>
@@ -208,26 +208,26 @@ export const JitterScene: React.FC = () => {
 
         {/* The numbers. */}
         <Note at={sameAt} x={msX(PANELS[0].x, plainSpikes[0]) - 6} y={vy(Y_MAX) - h(46)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{count(STORM.peakPlain)}</Num> in one 100 ms
           </span>
         </Note>
         <Note at={capAt + 8} x={PANELS[0].x + PANEL_W} y={vy(STORM.capacity) + h(10)} align="right">
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK), whiteSpace: "nowrap" }}>
             service takes <Num>{STORM.capacity}</Num>
           </span>
         </Note>
         <Note at={peakAt + 6} x={bx(PANELS[1].x, peakIdx) - 8} y={vy(STORM.peakJitter) - h(34)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             peak <Num>{STORM.peakJitter}</Num>
           </span>
         </Note>
         <Note at={thirdAt + 4} x={msX(PANELS[1].x, round3.to) + 12} y={vy(STORM.capacity) + h(14)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{round3.jitterPeak}</Num>: under <Num>{STORM.capacity}</Num>
           </span>
         </Note>
-        <div style={{ position: "absolute", left: PANELS[1].x, top: y(372), ...label(24, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, landsAt, 10) }}>
+        <div style={{ position: "absolute", left: PANELS[1].x, top: y(372), ...label(21, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, landsAt, 10) }}>
           each retry at a random point in its wait
         </div>
       </Drift>

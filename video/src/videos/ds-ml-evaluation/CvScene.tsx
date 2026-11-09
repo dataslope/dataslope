@@ -148,7 +148,7 @@ export const CvScene: React.FC = () => {
             {ticks.map((t) => (
               <g key={t} opacity={ease(frame, asked + 4, 12)}>
                 <line x1={at(xs, t)} x2={at(xs, t)} y1={base} y2={base + 7} stroke={INK} strokeWidth={1.2} />
-                <text x={at(xs, t)} y={base + 32} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
+                <text x={at(xs, t)} y={base + 32} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
                   {Math.round(t * 100)}%
                 </text>
               </g>
@@ -177,12 +177,12 @@ export const CvScene: React.FC = () => {
             })}
           </Svg>
           <Bracket x0={lo} x1={hi} y={base + h(62)} at={rangeAt} color={ACCENT}>
-            <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, ...TABULAR }}>
+            <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, ...TABULAR }}>
               {pct(CV.min, 1)} to {pct(CV.max)}
             </span>
           </Bracket>
           <Note at={oneAt + 2} x={STRIP.left} y={base + h(128)} out={meanAt}>
-            <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>one split: one draw from that range</span>
+            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>one split: one draw from that range</span>
           </Note>
 
           {/* The folds' mean, back on the same axis; then the same average over
@@ -191,12 +191,12 @@ export const CvScene: React.FC = () => {
             <line x1={meanX} x2={meanX} y1={top - h(14)} y2={base} stroke={OK} strokeWidth={3.4} />
           </Svg>
           <Note at={meanAt + 2} x={STRIP.left} y={base + h(128)}>
-            <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               five folds, averaged: <span style={TABULAR}>{fmt(CV.mean * 100, 1)}%</span>
             </span>
           </Note>
           <Note at={pileAt - 2} x={STRIP.left} y={base + h(170)}>
-            <span style={{ ...note(28, OK_INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap" }}>
               that average on {CV.means.length} reshuffles:{" "}
               <b style={TABULAR}>
                 {pct(CV.meansMin, 1)} to {pct(CV.meansMax, 1)}
@@ -238,7 +238,7 @@ export const CvScene: React.FC = () => {
                     position: "absolute",
                     left: FOLDS.left + FOLDS.width + 22,
                     top: rowTop + h(4),
-                    ...note(28, BLUE_INK),
+                    ...note(26, BLUE_INK),
                     fontWeight: 500,
                     ...TABULAR,
                     opacity: ease(frame, (k === 0 ? fifthAt : rowAt) + 4, 10),
@@ -250,7 +250,7 @@ export const CvScene: React.FC = () => {
             );
           })}
           <Note at={fourAt} x={FOLDS.left} y={y(FOLDS.top) + 5 * h(FOLDS.rowH) + h(2)}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
               <span style={{ display: "inline-block", width: 16, height: 12, background: `color-mix(in srgb, ${BAR} 28%, ${PAPER})`, border: `1.5px solid ${BAR}`, marginRight: 8 }} />
               train on four
               <span style={{ display: "inline-block", width: 16, height: 12, background: HIGHLIGHT, border: `1.5px solid ${INK}`, margin: "0 8px 0 22px", opacity: ease(frame, fifthAt, 10) }} />
@@ -297,7 +297,7 @@ export const CvScene: React.FC = () => {
                         <>
                           tune and choose
                           <br />
-                          <span style={{ ...note(24, INK_SOFT) }}>or cross-validate</span>
+                          <span style={{ ...note(22, INK_SOFT) }}>or cross-validate</span>
                         </>
                       ) : (
                         s.role
@@ -320,7 +320,7 @@ export const CvScene: React.FC = () => {
               width={2.8}
             />
             <Note at={peekAt + 8} x={valSeg.left + 40} y={barTop - h(130)}>
-              <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>
+              <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>
                 <Strike at={flatterAt - 4} color={ACCENT} top="0.78em">
                   choosing by the test score
                 </Strike>
@@ -345,7 +345,7 @@ const TimeSeries: React.FC<{ at: number; afterAt: number; left: number; top: num
   const rows = 3;
   return (
     <>
-      <div style={{ position: "absolute", left, top, ...label(24, INK), fontWeight: 500, opacity: ease(frame, from, 10), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left, top, ...label(21, INK), fontWeight: 500, opacity: ease(frame, from, 10), whiteSpace: "nowrap" }}>
         time series: validate only on what comes after
       </div>
       {Array.from({ length: rows }, (_, r) =>
@@ -373,7 +373,7 @@ const TimeSeries: React.FC<{ at: number; afterAt: number; left: number; top: num
           );
         }),
       )}
-      <div style={{ position: "absolute", left: left + 6 * (cell + 4) + 8, top: top + h(58), ...label(24, INK_SOFT), opacity: ease(frame, Math.min(afterAt, from + 30), 10), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: left + 6 * (cell + 4) + 8, top: top + h(58), ...label(19, INK_SOFT), opacity: ease(frame, Math.min(afterAt, from + 30), 10), whiteSpace: "nowrap" }}>
         time →
       </div>
     </>

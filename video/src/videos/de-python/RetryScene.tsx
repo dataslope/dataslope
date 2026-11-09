@@ -172,11 +172,11 @@ export const RetryScene: React.FC = () => {
         {/* The axis: seconds after the outage. */}
         {[0, 1, 3, 7, 15].map((t) => (
           <Note key={t} at={modelAt + 4} x={sx(t) - 12} y={axisY}>
-            <span style={{ ...label(24, INK_SOFT), display: "inline-block", width: 24, textAlign: "center" }}>{t}</span>
+            <span style={{ ...label(20, INK_SOFT), display: "inline-block", width: 24, textAlign: "center" }}>{t}</span>
           </Note>
         ))}
         <Note at={modelAt + 8} x={sx(SECONDS) + 4} y={axisY}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>s</span>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>s</span>
         </Note>
         <Note at={togetherAt} x={RIGHT_X} y={axisY + h(40)} out={randomAt - 4}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>

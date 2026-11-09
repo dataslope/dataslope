@@ -4,20 +4,7 @@ import { arrowHead, type Cubic, cubicPath, lineLength, sampleCubic } from "../..
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  BAR,
-  BLUE_INK,
-  HAIRLINE,
-  HIGHLIGHT,
-  INK,
-  INK_SOFT,
-  PAPER,
-  headline,
-  label,
-  note,
-} from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, type Pt } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
@@ -79,7 +66,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(26, INK_SOFT)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };
@@ -127,7 +114,7 @@ export const Caption: React.FC<{ at: number; x: number; y: number; out?: number;
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
   return (
     <Ink at={at} dur={14} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", opacity: 1 - d }}>
-      <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
+      <span style={{ ...label(23, INK), fontWeight: 500 }}>{children}</span>
     </Ink>
   );
 };
@@ -349,7 +336,7 @@ export const Chip: React.FC<{
       }}
     >
       <span style={{ fontFamily: SANS, fontWeight: 500, fontSize: 24, color: INK, whiteSpace: "nowrap" }}>{name}</span>
-      {sub ? <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT, whiteSpace: "nowrap" }}>{sub}</span> : null}
+      {sub ? <span style={{ fontFamily: MONO, fontSize: 19, color: INK_SOFT, whiteSpace: "nowrap" }}>{sub}</span> : null}
     </div>
   );
 };
@@ -562,7 +549,7 @@ export const ErrorBox: React.FC<{
         background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
         padding: "14px 22px 16px",
         fontFamily: MONO,
-        fontSize: 24,
+        fontSize: 20,
         lineHeight: 1.5,
         whiteSpace: "pre-wrap",
         color: INK,
@@ -598,13 +585,13 @@ export const Reply: React.FC<{ x: number; y: number; at: number; text: string; c
 }) => (
   <Ink at={at} dur={14} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
     <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color }}>{text}</span>
-    {children ? <span style={{ ...note(24, INK_SOFT) }}>{children}</span> : null}
+    {children ? <span style={{ ...note(22, INK_SOFT) }}>{children}</span> : null}
   </Ink>
 );
 
 // ── The database table ───────────────────────────────────────────────────────
 
-export const HEAD_SIZE = 24;
+export const HEAD_SIZE = 22;
 export const BODY_SIZE = 26;
 const PAD = 20;
 /** JetBrains Mono's advance, in em: every glyph is this wide. */
@@ -882,7 +869,7 @@ export const DbTable: React.FC<{
               }}
             >
               {r.note !== undefined ? (
-                <div style={{ padding: `0 ${PAD}px`, ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{r.note}</div>
+                <div style={{ padding: `0 ${PAD}px`, ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{r.note}</div>
               ) : (
                 r.cells.map((v, j) => (
                   <div key={j} style={cellBox(j)}>
@@ -927,7 +914,7 @@ export const ColTag: React.FC<{ g: TableGeometry; col: number; at: number; color
   children,
 }) => (
   <Ink at={at} dur={12} out={out} style={{ left: g.xs[col] + PAD, top: g.top - 36, whiteSpace: "nowrap" }}>
-    <span style={{ ...label(24, color), fontWeight: 500 }}>{children}</span>
+    <span style={{ ...label(20, color), fontWeight: 500 }}>{children}</span>
   </Ink>
 );
 

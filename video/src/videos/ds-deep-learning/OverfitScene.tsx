@@ -111,12 +111,12 @@ export const OverfitScene: React.FC = () => {
           <line x1={ex(O.bestEpoch) + 6} y1={at(ys, O.bestVal) - 10} x2={ex(220)} y2={at(ys, 0.163)} stroke={OK} strokeWidth={1.6} />
         </Svg>
         <Note at={lowAt + 2} x={ex(220) + 6} y={at(ys, 0.163) - h(30)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             lowest: {O.bestVal.toFixed(3)}, epoch {O.bestEpoch}
           </span>
         </Note>
         <Note at={climbAt + 4} x={ex(4000) - 330} y={at(ys, O.endVal) - h(52)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             {O.endVal.toFixed(3)} by the end: over twice the low
           </span>
         </Note>
@@ -131,7 +131,7 @@ export const OverfitScene: React.FC = () => {
           color={OK}
           dash="6 6"
           width={2.4}
-          label={<span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>stop here</span>}
+          label={<span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>stop here</span>}
           labelY={at(ys, 0.285)}
         />
         <div
@@ -167,7 +167,7 @@ export const OverfitScene: React.FC = () => {
         <Dots dots={O.points.map(([a, b], i) => ({ x: at(fx, a), y: at(fy, b), at: toyAt + 2 + i * 0.8 }))} r={6} opacity={0.85} />
         <Curve points={fit} x={fx} y={fy} at={noiseAt - 8} dur={22} color={ACCENT} width={3} clip={fitClip} />
         <Note at={noiseAt + 2} x={FIT.left + 10} y={y(FIT.bottom) + h(10)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             at the end: it <Mark at={noiseAt + 8}>bends to fit the noise</Mark>
           </span>
         </Note>
@@ -181,7 +181,7 @@ export const OverfitScene: React.FC = () => {
               <div
                 key={f.text}
                 style={{
-                  ...label(24),
+                  ...label(23),
                   ...badgeStyle(isStop ? "green" : "gray", 23),
                   display: "flex",
                   alignItems: "center",

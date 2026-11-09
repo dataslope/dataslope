@@ -44,7 +44,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(26, INK_SOFT)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };
@@ -327,7 +327,7 @@ export const YTicks: React.FC<{
       {ticks.map((v) => (
         <div
           key={v}
-          style={{ position: "absolute", right: 1920 - (x0 - 14), top: py(v) - 13, opacity: p, ...note(24, INK_SOFT) }}
+          style={{ position: "absolute", right: 1920 - (x0 - 14), top: py(v) - 13, opacity: p, ...note(20, INK_SOFT) }}
         >
           {format(v)}
         </div>

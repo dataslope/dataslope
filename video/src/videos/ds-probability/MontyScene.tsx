@@ -160,13 +160,13 @@ export const MontyScene: React.FC = () => {
         })}
         {/* Under the open door, not over the goat it shows. */}
         <Note at={goatAt + 8} x={DOOR.xs[2]} width={DOOR.w} y={doorTop + doorH + 16} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(28, INK), fontWeight: 500 }}>goat</span>
+          <span style={{ ...note(30, INK), fontWeight: 500 }}>goat</span>
         </Note>
         <Note at={pickAt + 4} x={DOOR.xs[0]} width={DOOR.w} y={doorTop + 40} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(28, INK), fontWeight: 500, background: PAPER, padding: "2px 10px", borderRadius: 6 }}>your pick</span>
+          <span style={{ ...note(26, INK), fontWeight: 500, background: PAPER, padding: "2px 10px", borderRadius: 6 }}>your pick</span>
         </Note>
         <Note at={hostAt + 2} x={DOOR.xs[2]} width={DOOR.w} y={doorTop - 46} from="up" out={thirdAt} style={{ textAlign: "center" }}>
-          <span style={{ ...label(24, INK_SOFT) }}>the host opens</span>
+          <span style={{ ...label(22, INK_SOFT) }}>the host opens</span>
         </Note>
         {/* Under the doors, clear of the mats round them. */}
         <ElbowArrow
@@ -182,7 +182,7 @@ export const MontyScene: React.FC = () => {
           width={3}
         />
         <Note at={takeAt} x={DOOR.xs[0] + DOOR.w / 2 + 20} y={doorTop + doorH + 88}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>switch</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>switch</span>
         </Note>
 
         {/* ── One third on yours, two thirds on the rest ── */}
@@ -203,13 +203,13 @@ export const MontyScene: React.FC = () => {
           />
         </Svg>
         <Note at={thirdAt} x={DOOR.xs[0]} width={DOOR.w} y={bracketY - 46} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...label(28, INK), ...TABULAR }}>1/3</span>
+          <span style={{ ...label(30, INK), ...TABULAR }}>1/3</span>
         </Note>
         <Note at={twoThirdsAt} x={(twoX0 + twoX1) / 2 - 100} width={200} y={bracketY - 46} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...label(28 + 4 * pulse(frame, landAt + 10, 20), closeOn > 0.5 ? OK_INK : INK), ...TABULAR }}>2/3</span>
+          <span style={{ ...label(30 + 4 * pulse(frame, landAt + 10, 20), closeOn > 0.5 ? OK_INK : INK), ...TABULAR }}>2/3</span>
         </Note>
         <Note at={neverAt} x={DOOR.xs[2]} width={DOOR.w} y={doorTop + doorH + 70} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...label(24, INK_SOFT) }}>never the car</span>
+          <span style={{ ...label(21, INK_SOFT) }}>never the car</span>
         </Note>
 
         {/* ── The page's 100,000 games ── */}
@@ -231,7 +231,7 @@ export const MontyScene: React.FC = () => {
                 <rect x={SIM.x} y={top + 44} width={SIM.w * r.share * p} height={SIM.bar} rx={4} fill={r.color} opacity={0.85} />
               </Svg>
               <Note at={r.at + 10} x={SIM.x + SIM.w * r.share + 16} y={top + 52}>
-                <span style={{ ...label(28, r.ink), ...TABULAR }}>{pct(r.share)}</span>
+                <span style={{ ...label(30, r.ink), ...TABULAR }}>{pct(r.share)}</span>
               </Note>
             </React.Fragment>
           );

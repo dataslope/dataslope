@@ -89,9 +89,9 @@ const Assumed: React.FC<{ at: number; first?: boolean; children: React.ReactNode
 const DiffRow: React.FC<{ at: number; add: boolean; children: React.ReactNode }> = ({ at, add, children }) => {
   const frame = useCurrentFrame();
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, opacity: ease(frame, at, 10), whiteSpace: "nowrap", fontSize: 24 }}>
-      <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: add ? OK_INK : ACCENT_INK }}>+</span>
-      <span style={note(24, add ? INK : ACCENT_INK)}>{children}</span>
+    <div style={{ display: "flex", alignItems: "center", gap: 12, opacity: ease(frame, at, 10), whiteSpace: "nowrap", fontSize: 22 }}>
+      <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: add ? OK_INK : ACCENT_INK }}>+</span>
+      <span style={note(22, add ? INK : ACCENT_INK)}>{children}</span>
     </div>
   );
 };
@@ -197,7 +197,7 @@ export const BugsScene: React.FC = () => {
         <Spot id="be-code-review-beetle" at={textAt + 6} left={1590} top={120} width={140} height={150} />
 
         {/* ── Code that is almost right: the survey ── */}
-        <Ink at={almostAt - 2} dur={18} out={surveyOut} style={{ left: 96, top: y(318), ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
+        <Ink at={almostAt - 2} dur={18} out={surveyOut} style={{ left: 96, top: y(318), ...body(38, true), color: INK, whiteSpace: "nowrap" }}>
           Code that is almost right.
         </Ink>
         {SURVEY.map((s, i) => {
@@ -207,7 +207,7 @@ export const BugsScene: React.FC = () => {
           return (
             <React.Fragment key={i}>
               <Note at={at - 4} x={X0} y={top} out={surveyOut}>
-                <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>{s.text}</span>
+                <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>{s.text}</span>
               </Note>
               <div
                 style={{
@@ -222,7 +222,7 @@ export const BugsScene: React.FC = () => {
                 }}
               />
               <Note at={at + 14} x={X0 + w + 22} y={top + 44} out={surveyOut}>
-                <span style={{ ...note(34, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(38, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                   <span style={TABULAR}>{s.pct}</span>%
                 </span>
               </Note>
@@ -262,7 +262,7 @@ export const BugsScene: React.FC = () => {
         <Card x={cx(2)} y={R1} w={COL + CARD_W} h={CARD_H} at={apiAt - 4} title="Invented APIs" dim={quietAt} undim={failsAt} alarm={failsAt + 2} out={gone}>
           <div style={{ display: "flex", flexDirection: "column", gap: 4, opacity: ease(frame, paramAt - 4, 10) }}>
             {LOUD.code.map((l, i) => (
-              <div key={i} style={{ fontSize: 24, whiteSpace: "pre" }}>
+              <div key={i} style={{ fontSize: 21, whiteSpace: "pre" }}>
                 {l.includes("inplace") ? (
                   <>
                     <Code line={l.slice(0, l.indexOf("inplace"))} size={21} />
@@ -283,7 +283,7 @@ export const BugsScene: React.FC = () => {
               background: `color-mix(in srgb, ${ACCENT} ${9 + 14 * glow}%, ${PAPER})`,
               padding: "6px 14px 8px",
               fontFamily: MONO,
-              fontSize: 24,
+              fontSize: 19,
               color: INK,
               whiteSpace: "nowrap",
               fontVariantLigatures: "none",
@@ -313,7 +313,7 @@ export const BugsScene: React.FC = () => {
         </Card>
 
         <Card x={cx(1)} y={R2} w={CARD_W} h={CARD_H} at={secAt - 4} title="Security" dim={quietAt} out={gone}>
-          <div style={{ opacity: ease(frame, sqlAt - 2, 10), fontSize: 24 }}>
+          <div style={{ opacity: ease(frame, sqlAt - 2, 10), fontSize: 20 }}>
             <Code line={'f"... WHERE id = {user_id}"'} size={20} />
           </div>
           <Line at={secretsAt}>a secret pasted into the code</Line>

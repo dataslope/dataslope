@@ -64,7 +64,7 @@ const Form: React.FC<{
   const frame = useCurrentFrame();
   return (
     <div style={{ position: "absolute", left: X0, top, width: 450 }}>
-      <div style={{ ...label(24, color), fontWeight: 500, opacity: ease(frame, at - 4, 10), whiteSpace: "nowrap" }}>{name}</div>
+      <div style={{ ...label(23, color), fontWeight: 500, opacity: ease(frame, at - 4, 10), whiteSpace: "nowrap" }}>{name}</div>
       {/* flow-root, or the Ink's negative bleed margin collapses through this box and lifts it 34px. */}
       <div style={{ position: "relative", display: "flow-root", height: 62, marginTop: 6 }}>
         <Phrase at={at} underlineAt={underlineAt} color={color}>
@@ -72,9 +72,9 @@ const Form: React.FC<{
         </Phrase>
       </div>
       {builds ? (
-        <div style={{ ...note(24, INK), marginTop: 12, opacity: ease(frame, buildsAt ?? at, 10), whiteSpace: "nowrap" }}>{builds}</div>
+        <div style={{ ...note(20, INK), marginTop: 12, opacity: ease(frame, buildsAt ?? at, 10), whiteSpace: "nowrap" }}>{builds}</div>
       ) : null}
-      <div style={{ ...note(24, INK_SOFT), marginTop: builds ? 6 : 12, opacity: ease(frame, at + 8, 10), whiteSpace: "nowrap" }}>
+      <div style={{ ...note(21, INK_SOFT), marginTop: builds ? 6 : 12, opacity: ease(frame, at + 8, 10), whiteSpace: "nowrap" }}>
         breaks it: <Mono>{table}</Mono>
       </div>
     </div>
@@ -165,7 +165,7 @@ export const NfScene: React.FC = () => {
             marks={[{ row: 0, col: col(NF1, "phones"), at: twoAt + 4, color: MARK_BAD }]}
           />
           <Note at={twoAt + 10} x={g1.right + 24} y={g1.rowTop(0) + 6} out={appAt}>
-            <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>← two values, one cell</span>
+            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>← two values, one cell</span>
           </Note>
 
           {/* ── Second normal form ── */}
@@ -192,7 +192,7 @@ export const NfScene: React.FC = () => {
             marks={[...all(NF2, "product_id", halfAt, MARK_KEY), ...all(NF2, "product_name", halfAt + 4, MARK)]}
           />
           <Note at={halfAt + 8} x={g2.right + 24} y={g2.rowTop(0) + 4} out={appAt}>
-            <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               ← half the key
             </span>
           </Note>
@@ -221,9 +221,9 @@ export const NfScene: React.FC = () => {
             marks={[...all(NF3, "customer_id", notOrderAt, MARK_KEY), ...all(NF3, "customer_city", cityAt + 4, MARK)]}
           />
           <Note at={transAt - 2} x={TABLE_X} y={g3.rowTop(NF3.rows.length) + h(14)}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
               <Mono>order_id</Mono> → <Mono>customer_id</Mono> → <Mono>customer_city</Mono>
-              <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, marginLeft: 16 }}>a transitive dependency</span>
+              <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, marginLeft: 16 }}>a transitive dependency</span>
             </span>
           </Note>
         </div>
@@ -246,10 +246,10 @@ export const NfScene: React.FC = () => {
           }}
         />
         <Note at={purposeAt + 4} x={STAR_X} y={star.top - 40}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a star&apos;s dimension</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a star&apos;s dimension</span>
         </Note>
         <Note at={deptAt} x={STAR_X} y={star.bottom + h(18)} width={360}>
-          <span style={{ ...note(24, INK) }}>
+          <span style={{ ...note(23, INK) }}>
             <Mono>department</Mono> depends on <Mono>category</Mono>, not on the key:
             <span style={{ fontWeight: 500 }}> not 3NF, on purpose</span>
           </span>

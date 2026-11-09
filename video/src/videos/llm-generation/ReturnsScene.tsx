@@ -85,32 +85,32 @@ export const ReturnsScene: React.FC = () => {
         ))}
       </Svg>
       {A_TICKS.map((a) => (
-        <div key={a} style={{ position: "absolute", right: 1920 - (px(0) - 20) + 12, top: ay(a) - 13, opacity: ease(frame, start, 12), ...note(24, INK_SOFT) }}>
+        <div key={a} style={{ position: "absolute", right: 1920 - (px(0) - 20) + 12, top: ay(a) - 13, opacity: ease(frame, start, 12), ...note(20, INK_SOFT) }}>
           {Math.round(a * 100)}%
         </div>
       ))}
       {BUDGETS.map((b, k) => (
         <div
           key={b}
-          style={{ position: "absolute", left: px(k) - 50, width: 100, top: y(C_BASE) + 12, textAlign: "center", opacity: ease(frame, start + k * 3, 10), ...note(24, INK_SOFT) }}
+          style={{ position: "absolute", left: px(k) - 50, width: 100, top: y(C_BASE) + 12, textAlign: "center", opacity: ease(frame, start + k * 3, 10), ...note(20, INK_SOFT) }}
         >
           {b === 0 ? "0" : b < 1000 ? b : kTokens(b)}
         </div>
       ))}
       <Ink at={start + 10} dur={12} style={{ left: px(0), top: y(C_BASE) + 46, width: px(last) - px(0), textAlign: "center" }}>
-        <span style={label(24)}>Thinking tokens (each step past 250 doubles)</span>
+        <span style={label(20)}>Thinking tokens (each step past 250 doubles)</span>
       </Ink>
       {/* The accuracy at each end, in the curve's own figures. */}
       <Note at={start + 40} x={px(last)} y={pts[last][1] - 50} align="right">
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, ...halo }}>{Math.round(ACCURACY[last] * 100)}%</span>
+        <span style={{ ...note(22, BLUE_INK), fontWeight: 500, ...halo }}>{Math.round(ACCURACY[last] * 100)}%</span>
       </Note>
       <Note at={thirdsAt - 2} x={px(k500) + 16} y={ay((ACCURACY[0] + ACCURACY[k500]) / 2) + 4}>
-        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
           {Math.round(FIRST_500_SHARE * 100)}% of the whole gain
         </span>
       </Note>
       <Note at={nothingAt - 2} x={(px(k8k) + px(last)) / 2} y={ay(ACCURACY[last]) + 34} from="up" style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>+0 points</span>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>+0 points</span>
       </Note>
       <Note at={start + 50} x={X0} y={y(888)}>
         <Illustrative>Stylized numbers, from the lesson. The saturating shape is what is consistently reported.</Illustrative>
@@ -118,24 +118,24 @@ export const ReturnsScene: React.FC = () => {
 
       {/* Where it helps, where it can't, and where it hurts. */}
       <Ink at={paysAt - 2} dur={14} style={{ left: RIGHT_X, top: y(330) }}>
-        <span style={label(24, GOOD_INK)}>Helps where steps can be checked</span>
+        <span style={label(22, GOOD_INK)}>Helps where steps can be checked</span>
       </Ink>
       {["math", "code", "planning"].map((t, k) => (
         <Ink key={t} at={itemAt[k] - 2} dur={12} style={{ left: RIGHT_X, top: y(370 + k * 46) }}>
-          <span style={{ ...body(34), color: INK }}>{t}</span>
+          <span style={{ ...body(32), color: INK }}>{t}</span>
         </Ink>
       ))}
       <Ink at={butAt - 2} dur={14} style={{ left: RIGHT_X, top: y(540) }}>
-        <span style={label(24, ACCENT_INK)}>Can&apos;t help</span>
+        <span style={label(22, ACCENT_INK)}>Can&apos;t help</span>
       </Ink>
       <Ink at={neverAt - 8} dur={14} style={{ left: RIGHT_X, top: y(580), width: 420 }}>
-        <div style={{ ...body(34), color: INK }}>recalling a fact it never had</div>
+        <div style={{ ...body(32), color: INK }}>recalling a fact it never had</div>
       </Ink>
       <Ink at={easyAt - 2} dur={14} style={{ left: RIGHT_X, top: y(690) }}>
-        <span style={label(24, ACCENT_INK)}>Can hurt</span>
+        <span style={label(22, ACCENT_INK)}>Can hurt</span>
       </Ink>
       <Ink at={talkAt - 4} dur={14} style={{ left: RIGHT_X, top: y(730), width: 420 }}>
-        <div style={{ ...body(34), color: INK }}>an easy problem, talked out of a right answer</div>
+        <div style={{ ...body(32), color: INK }}>an easy problem, talked out of a right answer</div>
       </Ink>
       </Drift>
     </AbsoluteFill>

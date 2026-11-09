@@ -105,10 +105,10 @@ export const HeapScene: React.FC = () => {
 
       {/* Column heads and the line between stack and heap. */}
       <Ink at={Math.max(start - 5, variableAt - 6)} dur={14} style={{ left: CELL_X - 18, top: y(HEADS) }}>
-        <span style={label(24, INK_SOFT)}>Stack frame</span>
+        <span style={label(21, INK_SOFT)}>Stack frame</span>
       </Ink>
       <Ink at={heapAt - 4} dur={14} style={{ left: HEAP_X, top: y(HEADS) }}>
-        <span style={label(24, INK_SOFT)}>Heap</span>
+        <span style={label(21, INK_SOFT)}>Heap</span>
       </Ink>
       <div
         style={{
@@ -153,7 +153,7 @@ export const HeapScene: React.FC = () => {
         >
           <span
             style={{
-              ...label(24, INK_SOFT),
+              ...label(20, INK_SOFT),
               position: "absolute",
               left: 16,
               top: 8,
@@ -237,10 +237,10 @@ export const HeapScene: React.FC = () => {
 
       {/* What makes each object. */}
       <Note at={freshAt} x={NEAR_X + OBJ_W + 24} y={mid(1) - 14}>
-        <span style={note(24, INK_SOFT)}>a new object</span>
+        <span style={note(20, INK_SOFT)}>a new object</span>
       </Note>
       <Note at={runsAt + 2} x={NEAR_X + OBJ_W + 24} y={mid(3) - 14}>
-        <span style={note(24, INK_SOFT)}>another new one</span>
+        <span style={note(20, INK_SOFT)}>another new one</span>
       </Note>
 
       {/* What == prints for them. */}

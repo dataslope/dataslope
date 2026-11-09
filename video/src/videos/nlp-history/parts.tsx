@@ -4,7 +4,7 @@ import { arrowHead, type Pt } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, BAR, BLUE_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
@@ -57,7 +57,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(26, INK_SOFT)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };
@@ -401,7 +401,7 @@ export const Quote: React.FC<{
         <div style={{ ...body(size, true), color, lineHeight: 1.2 }}>{children}</div>
       </Ink>
       <Ink at={creditAt ?? at + 14} dur={14} style={{ position: "relative", marginLeft: 28, marginTop: 18, width: width - 28 }}>
-        <div style={{ ...label(24, INK_SOFT), fontWeight: 500, lineHeight: 1.35 }}>{credit}</div>
+        <div style={{ ...label(21, INK_SOFT), fontWeight: 500, lineHeight: 1.35 }}>{credit}</div>
       </Ink>
     </div>
   );

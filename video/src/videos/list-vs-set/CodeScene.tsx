@@ -66,7 +66,7 @@ export const CodeScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={open} dur={14} style={{ left: 124, top: y(112) }}>
-        <span style={label(24, ACCENT_INK)}>Membership tests in Python</span>
+        <span style={label(21, ACCENT_INK)}>Membership tests in Python</span>
       </Ink>
       <Ink at={open + 2} dur={22} style={{ left: 118, top: y(152), ...headline(88), whiteSpace: "nowrap", display: "flex", gap: "0.24em" }}>
         <span>Same question,</span>
@@ -153,8 +153,8 @@ export const CodeScene: React.FC = () => {
 
       {/* The side table: what each line answered, and how long it took. */}
       <Ink at={bothAt - 4} dur={14} style={{ ...row(2), left: ANSWER_X, width: RIGHT - ANSWER_X, gap: 0 }}>
-        <span style={{ ...label(24, INK_SOFT), width: TIME_X - ANSWER_X }}>Answer</span>
-        <span style={{ ...label(24, INK_SOFT), opacity: ease(frame, listAt - 6, 10) }}>Time per lookup</span>
+        <span style={{ ...label(21, INK_SOFT), width: TIME_X - ANSWER_X }}>Answer</span>
+        <span style={{ ...label(21, INK_SOFT), opacity: ease(frame, listAt - 6, 10) }}>Time per lookup</span>
       </Ink>
       <div
         style={{
@@ -182,7 +182,7 @@ export const CodeScene: React.FC = () => {
         </span>
       </Ink>
       <Note at={twentyAt + 10} x={TIME_X} y={listingBottom + 8} from="up">
-        <span style={note(24, INK_SOFT)}>timeit, best of 30 runs, CPython 3.13</span>
+        <span style={note(20, INK_SOFT)}>timeit, best of 30 runs, CPython 3.13</span>
       </Note>
 
       {/* The ratio, on one line: the number, then what it means. */}
@@ -201,7 +201,7 @@ export const CodeScene: React.FC = () => {
           </Ink>
         </div>
         <Ink at={timesAt + 8} dur={14} style={{ position: "relative" }}>
-          <span style={note(24, INK_SOFT)}>
+          <span style={note(21, INK_SOFT)}>
             {fmt(MILLION.listMs)} ms ÷ {fmt(MILLION.setNs, 1)} ns, rounded to the nearest thousand
           </span>
         </Ink>

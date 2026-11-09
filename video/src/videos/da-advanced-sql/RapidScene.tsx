@@ -68,13 +68,13 @@ const Lag: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={at + 20} x={R_X} y={g.rowTop(t.rows.length) + c.h(20)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the row before, not the day before</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the row before, not the day before</span>
       </Note>
       <Note at={nullAt + 4} x={g.right + 24} y={g.rowTop(0)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>nothing before day 1</span>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>nothing before day 1</span>
       </Note>
       <Note at={defaultAt} x={g.right + 24} y={g.rowTop(0) + c.h(36)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           null, unless <QMono>LAG</QMono> gets a default
         </span>
       </Note>
@@ -99,13 +99,13 @@ const Ntile: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Listing lines={RAPID.quartiles.lines} x={R_X} top={c.T} width={720} size={SIZE} at={at - 4} marks={[{ line: 1, at: at + 8 }]} />
       <Note at={fourAt - 4} x={R_X} y={top - c.h(36)}>
-        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
           <QMono>NTILE(4)</QMono>: customers per bucket
         </span>
       </Note>
       <DataTable g={qg} cols={colsOf(q)} at={fourAt - 2} rows={rowsAt(q.rows, fourAt + 2)} />
       <Note at={fiveAt - 4} x={R_X + 420} y={top - c.h(36)}>
-        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
           <QMono>NTILE(5)</QMono>: customers per bucket
         </span>
       </Note>
@@ -134,7 +134,7 @@ const Where: React.FC<{ c: Ctx }> = ({ c }) => {
       <Listing lines={e.lines} x={R_X} top={c.T} width={700} size={SIZE} at={at - 4} marks={[{ line: 2, at: at + 12 }]} />
       <ErrorBox x={R_X} top={errTop} width={700} at={noAt - 4} kind={e.kind} message={e.message} size={21} />
       <Note at={outerAt - 2} x={R_X} y={errTop + c.h(100)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           windows run after <QMono>WHERE</QMono> and <QMono>HAVING</QMono>: filter outside
         </span>
       </Note>
@@ -174,7 +174,7 @@ const Recursive: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <DataTable g={g} cols={colsOf(L)} at={levelsAt - 4} rows={rowsAt(L.rows, levelsAt, 3)} />
       <Note at={levelsAt + 6} x={R_X + 660} y={g.rowTop(L.rows.length) + c.h(16)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>CEO down, {L.rows.length} levels</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>CEO down, {L.rows.length} levels</span>
       </Note>
     </>
   );
@@ -212,10 +212,10 @@ const Bucket: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={mondayAt + 6} x={WEEKS_X} y={g.rowTop(W.rows.length) + c.h(16)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>each a Monday</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>each a Monday</span>
       </Note>
       <Note at={shortAt + 4} x={WEEKS_X} y={g.rowTop(W.rows.length) + c.h(50)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the last week is partial</span>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>the last week is partial</span>
       </Note>
     </>
   );
@@ -260,7 +260,7 @@ const Unpivot: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Listing lines={lines} x={R_X} top={c.T} width={760} size={SIZE} at={at - 4} marks={[{ line: 1, at: at + 10 }]} />
       <Note at={at + 4} x={R_X + 780} y={c.T + 8}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           <QMono>wide</QMono>: the pivot
         </span>
       </Note>
@@ -297,12 +297,12 @@ const Percent: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={at + 6} x={g.right + 24} y={g.rowTop(0)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           <QMono>pct_rank</QMono> = (rank − 1) / (rows − 1)
         </span>
       </Note>
       <Note at={cumeAt} x={g.right + 24} y={g.rowTop(1) + c.h(10)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           <QMono>cume_dist</QMono>: the share at or below
         </span>
       </Note>

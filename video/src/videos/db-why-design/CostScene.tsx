@@ -166,8 +166,8 @@ export const CostScene: React.FC = () => {
                       transform: `scale(${1 + stepped * 0.025})`,
                     }}
                   >
-                    <div style={label(24, INK_SOFT)}>{one ? "Ada's email: one fact" : `copy on order ${c.order}`}</div>
-                    <div style={{ fontFamily: MONO, fontSize: 28, color: INK, fontWeight: 500 }}>
+                    <div style={label(20, INK_SOFT)}>{one ? "Ada's email: one fact" : `copy on order ${c.order}`}</div>
+                    <div style={{ fontFamily: MONO, fontSize: 26, color: INK, fontWeight: 500 }}>
                       <span style={{ opacity: swap < 0.5 ? 1 - 2 * swap : 2 * swap - 1 }}>{swap < 0.5 ? OLD_EMAIL : c.email}</span>
                     </div>
                   </div>
@@ -201,7 +201,7 @@ export const CostScene: React.FC = () => {
             </React.Fragment>
           ))}
           <Note at={foreverAt - 2} x={CHIP_X} y={chipY(3) + 84} dim={anomalyAt + 10}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>By hand, forever.</span>
+            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>By hand, forever.</span>
           </Note>
 
           {/* Its name. */}
@@ -221,10 +221,10 @@ export const CostScene: React.FC = () => {
           />
           {/* Under the copies it means. */}
           <Note at={outlivesAt + 4} x={X0} y={y(COPY_Y[1]) + h(CARD_H) + 18}>
-            <span style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>The data stays.</span>
+            <span style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>The data stays.</span>
           </Note>
           <Note at={tomorrowAt} x={CHIP_X} y={chipY(0) - 52}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Code, tomorrow</span>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Code, tomorrow</span>
           </Note>
         </div>
       </Drift>

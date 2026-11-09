@@ -404,7 +404,7 @@ export const AddrLabel: React.FC<{
       </span>
       <Ink at={at} dur={14} style={{ position: "relative" }}>
         <span style={{ position: "relative", display: "inline-block" }}>
-          <span style={{ ...note(24, ADDR_INK), fontWeight: 500 }}>
+          <span style={{ ...note(20, ADDR_INK), fontWeight: 500 }}>
             <Marked p={mark}>{addr}</Marked>
           </span>
           {tagP > 0 ? (

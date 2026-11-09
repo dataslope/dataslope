@@ -148,7 +148,7 @@ export const TrendScene: React.FC = () => {
       {/* The examples of a process, beside the machine, until "never see". */}
       {["customers deciding,", "machines running,", "demand rising and falling"].map((t, i) => (
         <Ink key={t} at={exampleAt[i] - 4} dur={14} out={neverSeeAt} style={{ right: 1920 - 1452, top: y(176 + i * 38), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(28, true), color: INK_SOFT }}>{t}</span>
+          <span style={{ ...body(27, true), color: INK_SOFT }}>{t}</span>
         </Ink>
       ))}
 
@@ -169,7 +169,7 @@ export const TrendScene: React.FC = () => {
             right: 1920 - (X.x0 - 22),
             top: py(v) - 13,
             opacity: ease(frame, trendFrom + 4, 14),
-            ...note(24, INK_SOFT),
+            ...note(20, INK_SOFT),
             ...TABULAR,
           }}
         >
@@ -284,7 +284,7 @@ export const TrendScene: React.FC = () => {
 
       {/* "Something must have happened... right?": the question the story asks, at the top of the fall. */}
       <Note at={somethingAt - 2} x={bandX0 - 12} y={pts[first][1] - 108} align="right" dim={nothingAt + 6} out={neverAt + 4}>
-        <span style={{ ...body(28, true), color: STAT_INK, whiteSpace: "nowrap", ...halo }}>
+        <span style={{ ...body(30, true), color: STAT_INK, whiteSpace: "nowrap", ...halo }}>
           <Strike at={nothingAt} color={INK}>What happened here?</Strike>
         </span>
       </Note>
@@ -303,13 +303,13 @@ export const TrendScene: React.FC = () => {
       {/* "Only ever a slice": the two years, bracketed under the axis. */}
       <Bracket x0={X.x0} x1={X.x1} y={y(BASE) + 50} at={sliceAt - 4} up color={INK_SOFT} tick={10} width={2} />
       <Note at={sliceAt + 4} x={(X.x0 + X.x1) / 2} y={y(BASE) + 58} from="up">
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           the {TREND.months.length} months you saw
         </span>
       </Note>
       {/* "Of something much bigger": the level runs on, and says so. */}
       <Note at={biggerAt + 10} x={X.x1 + 18} y={py(TREND.level) - 70}>
-        <div style={{ ...note(24, INK), whiteSpace: "nowrap", ...halo }}>
+        <div style={{ ...note(22, INK), whiteSpace: "nowrap", ...halo }}>
           the process
           <br />
           keeps going
@@ -317,24 +317,24 @@ export const TrendScene: React.FC = () => {
       </Note>
 
       <Note at={twelveAt - 4} x={bandX1 - 18} y={py(TOP_VALUE) + 22} align="right" dim={dimStory} out={neverAt + 2}>
-        <span style={{ ...note(24, STAT_INK), fontWeight: 500, ...halo }}>
+        <span style={{ ...note(23, STAT_INK), fontWeight: 500, ...halo }}>
           The last six months: down {fmt(Math.abs(TREND.change), 1)}
         </span>
       </Note>
 
       {/* Labels on the level line, where no month comes near it. */}
       <Note at={signalAt - 2} x={440} y={py(TREND.level) - 70}>
-        <span style={{ ...label(24, INK), ...halo }}>Signal</span>
+        <span style={{ ...label(22, INK), ...halo }}>Signal</span>
       </Note>
       <Note at={hundredAt} x={440} y={py(TREND.level) - 40}>
-        <span style={{ ...note(24, INK), ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), ...halo, whiteSpace: "nowrap" }}>
           <Mark at={flatHundredAt - 2} out={wobblesAt}>
             the process: a flat {TREND.level}
           </Mark>
         </span>
       </Note>
       <Note at={noiseAt} x={pts[TREND.months.indexOf(10)][0] + 18} y={pts[TREND.months.indexOf(10)][1] - 12}>
-        <span style={{ ...label(24, INK), ...halo, whiteSpace: "nowrap" }}>Noise</span>
+        <span style={{ ...label(22, INK), ...halo, whiteSpace: "nowrap" }}>Noise</span>
       </Note>
       </AbsoluteFill>
     </AbsoluteFill>

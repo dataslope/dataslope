@@ -4,21 +4,7 @@ import { arrowHead, type Pt } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  BAR,
-  BLUE_INK,
-  body,
-  HAIRLINE,
-  headline,
-  HIGHLIGHT,
-  INK,
-  INK_SOFT,
-  label,
-  note,
-  PAPER,
-} from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
@@ -65,7 +51,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(26, INK_SOFT)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };
@@ -483,7 +469,7 @@ export const PaperPage: React.FC<{
           top: 22,
           display: "flex",
           justifyContent: "space-between",
-          ...note(24, INK_SOFT),
+          ...note(19, INK_SOFT),
           whiteSpace: "nowrap",
         }}
       >
@@ -492,13 +478,13 @@ export const PaperPage: React.FC<{
       </div>
       <div style={{ position: "absolute", left: pad, right: pad, top: 54, height: 1.5, background: INK }} />
       <Ink at={titleAt} dur={20} style={{ left: pad, top: 70, width: width - 2 * pad }}>
-        <div style={{ ...headline(28), lineHeight: 1.12 }}>A Relational Model of Data for Large Shared Data Banks</div>
+        <div style={{ ...headline(30), lineHeight: 1.12 }}>A Relational Model of Data for Large Shared Data Banks</div>
       </Ink>
       <Ink at={authorAt} dur={14} style={{ left: pad, top: 156, whiteSpace: "nowrap" }}>
-        <div style={{ ...label(24, INK) }}>
+        <div style={{ ...label(21, INK) }}>
           {authorMark !== undefined ? <Mark at={authorMark}>E. F. Codd</Mark> : "E. F. Codd"}
         </div>
-        <div style={{ ...body(24, true), marginTop: 4 }}>IBM Research Laboratory, San Jose, California</div>
+        <div style={{ ...body(20, true), marginTop: 4 }}>IBM Research Laboratory, San Jose, California</div>
       </Ink>
       {Array.from({ length: lines }, (_, i) => {
         const w = ease(frame, textAt + i * 7, 12);
@@ -524,10 +510,10 @@ export const PaperPage: React.FC<{
 
 // ── A table of rows that can move on disk ────────────────────────────────────
 
-export const CELL_SIZE = 24;
+export const CELL_SIZE = 25;
 /** How far a row in flight steps right, at most (see MovingTable). */
 export const ASIDE = 100;
-export const HEAD_SIZE = 24;
+export const HEAD_SIZE = 21;
 /** JetBrains Mono's advance, in em. */
 const ADVANCE = 0.6;
 const PAD = 18;
@@ -850,7 +836,7 @@ export const ErrorBox: React.FC<{
           background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
           padding: "14px 22px 16px",
           fontFamily: MONO,
-          fontSize: 24,
+          fontSize: 20,
           lineHeight: 1.5,
           whiteSpace: "pre-wrap",
           color: INK,
@@ -923,7 +909,7 @@ export const Card: React.FC<{
       </Ink>
       {lines.map((l, i) => (
         <Ink key={i} at={l.at} dur={14} style={{ left: 2, top: 30 + titleSize * 1.15 + i * 36, whiteSpace: "nowrap" }}>
-          <div style={{ ...note(24, INK_SOFT) }}>{l.children}</div>
+          <div style={{ ...note(21, INK_SOFT) }}>{l.children}</div>
         </Ink>
       ))}
     </div>

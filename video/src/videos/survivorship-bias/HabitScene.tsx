@@ -76,7 +76,7 @@ export const HabitScene: React.FC = () => {
         <Ink at={start - 2} dur={14} style={{ left: HERE_X, top: y(222) }}>
           <span
             style={{
-              ...label(24, INK),
+              ...label(22, INK),
               padding: "2px 8px",
               marginLeft: -8,
               background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(ease(frame, hereAt - 2, 10) * 100)}%, transparent)`,
@@ -86,7 +86,7 @@ export const HabitScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={missingAt - 4} dur={14} style={{ left: GONE_X, top: y(222) }}>
-          <span style={label(24, ACCENT_INK)}>Missing from it</span>
+          <span style={label(22, ACCENT_INK)}>Missing from it</span>
         </Ink>
 
         {ROWS.map((r, i) => {

@@ -149,7 +149,7 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={elevenAt - 2} x={X0} y={y(880)}>
-          <span style={{ ...note(34, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
             11 questions<span style={{ opacity: ease(frame, everyAt - 2, 10) }}>, every one worked through</span>
           </span>
         </Note>

@@ -86,11 +86,11 @@ export const RunsScene: React.FC = () => {
       <Note at={closeAt - 4} x={X0} y={y(296)}>
         <span style={{ display: "inline-flex", gap: 26, alignItems: "baseline", whiteSpace: "nowrap" }}>
           {RUN_TOKENS.map((t, i) => (
-            <span key={t} style={{ ...note(24, HUE_INK[i]), fontWeight: 500 }}>
+            <span key={t} style={{ ...note(22, HUE_INK[i]), fontWeight: 500 }}>
               <span style={{ fontFamily: MONO }}>{t}</span> {pct(RUN_PROBS[i])}
             </span>
           ))}
-          <span style={note(24, INK_SOFT)}>from scores 1.0, 0.9 and 0.8, on every pick</span>
+          <span style={note(21, INK_SOFT)}>from scores 1.0, 0.9 and 0.8, on every pick</span>
         </span>
       </Note>
       {RUNS.map((run, k) => {
@@ -98,7 +98,7 @@ export const RunsScene: React.FC = () => {
         return (
           <React.Fragment key={k}>
             <Ink at={tileAt(k, 0) - 6} dur={12} style={{ left: X0, top: top + h(TILE) / 2 - 15 }}>
-              <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Run {k + 1}</span>
+              <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Run {k + 1}</span>
             </Ink>
             {[...run].map((ch, j) => {
               const tok = RUN_TOKENS.indexOf(ch);
@@ -123,7 +123,7 @@ export const RunsScene: React.FC = () => {
                     opacity: Math.min(1, s),
                     transform: `scale(${(0.6 + 0.4 * s) * (1 + swell * 0.06)})`,
                     fontFamily: MONO,
-                    fontSize: 28,
+                    fontSize: 26,
                     fontWeight: 500,
                     color: HUE_INK[tok],
                   }}
@@ -154,7 +154,7 @@ export const RunsScene: React.FC = () => {
         />
       </Svg>
       <Note at={agreeAt - 2} x={fxAt(0) - 10} y={trunkY + h(FTILE) + 22}>
-        <span style={note(24, INK_SOFT)}>the same so far</span>
+        <span style={note(21, INK_SOFT)}>the same so far</span>
       </Note>
       {[0, 1].map((branch) => (
         <Svg key={branch} opacity={ease(frame, splitAt - 4, 10)}>
@@ -201,10 +201,10 @@ export const RunsScene: React.FC = () => {
         />
       ))}
       <Note at={splitAt + 10} x={fxAt(TRUNK + BRANCH - 1) + FTILE} y={trunkY - h(SPLIT) - 40} align="right">
-        <span style={{ ...note(24, INK), fontWeight: 500 }}>one answer</span>
+        <span style={{ ...note(21, INK), fontWeight: 500 }}>one answer</span>
       </Note>
       <Note at={splitAt + 14} x={fxAt(TRUNK + BRANCH - 1) + FTILE} y={trunkY + h(SPLIT) + h(FTILE) + 14} align="right">
-        <span style={{ ...note(24, INK), fontWeight: 500 }}>another</span>
+        <span style={{ ...note(21, INK), fontWeight: 500 }}>another</span>
       </Note>
       </Drift>
     </AbsoluteFill>

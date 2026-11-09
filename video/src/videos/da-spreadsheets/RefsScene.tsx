@@ -17,7 +17,7 @@ const BAR_X = 790;
 const BAR_W = 1030;
 
 const money = (c: Cell) => (typeof c.value === "number" ? c.value.toFixed(2) : printed(c.value));
-const LOCK = `color-mix(in srgb, ${ds("yellow", 400)} 70%, transparent)`;
+const LOCK = `color-mix(in srgb, ${ds("yellow", 300)} 55%, transparent)`;
 
 /**
  * Questions 7 and 8. The page's $F$1 tax rate filled down three amounts: with
@@ -216,12 +216,12 @@ export const RefsScene: React.FC = () => {
           out={out7}
         />
         <Note at={lockAt} x={X0 + 1090} y={g.bottom + h(46)} out={out7}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             <b>$F</b>: the column stays on the regions
           </span>
         </Note>
         <Note at={rowAt} x={X0 + 1090} y={g.bottom + h(84)} out={out7}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             <b>$1</b>: the row stays on the months
           </span>
         </Note>

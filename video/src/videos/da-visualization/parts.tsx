@@ -334,7 +334,7 @@ export const Verdict: React.FC<{ ok: boolean; x: number; y: number; at: number; 
           <path d="M5 5 L19 19 M19 5 L5 19" fill="none" stroke={color} strokeWidth={3.4} strokeLinecap="round" pathLength={1} strokeDasharray={`${p} 1`} />
         )}
       </svg>
-      {children ? <span style={{ ...label(24, ok ? OK_INK : ACCENT_INK) }}>{children}</span> : null}
+      {children ? <span style={{ ...label(22, ok ? OK_INK : ACCENT_INK) }}>{children}</span> : null}
     </div>
   );
 };
@@ -363,7 +363,7 @@ export const PanelTitle: React.FC<{ x: number; y: number; at: number; out?: numb
   const p = ease(frame, from, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || o >= 1) return null;
-  return <div style={{ position: "absolute", left: x, top: y, ...label(24, INK), whiteSpace: "nowrap", opacity: p * (1 - o) }}>{children}</div>;
+  return <div style={{ position: "absolute", left: x, top: y, ...label(22, INK), whiteSpace: "nowrap", opacity: p * (1 - o) }}>{children}</div>;
 };
 
 // ── Spot illustrations ───────────────────────────────────────────────────────

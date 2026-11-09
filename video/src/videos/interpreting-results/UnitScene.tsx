@@ -85,10 +85,10 @@ export const UnitScene: React.FC = () => {
         <span style={label(24, color)}>{title}</span>
       </Ink>
       <Note at={at + 6} x={(p.x0 + p.x1) / 2} y={bottom + 14} from="up">
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>{xTitle}</span>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>{xTitle}</span>
       </Note>
       {[40, 60, 80].map((v) => (
-        <div key={v} style={{ position: "absolute", right: 1920 - p.x0 + 10, top: py(v) - 13, opacity: ease(frame, at + 4, 12), ...note(24, INK_SOFT), ...TABULAR }}>
+        <div key={v} style={{ position: "absolute", right: 1920 - p.x0 + 10, top: py(v) - 13, opacity: ease(frame, at + 4, 12), ...note(20, INK_SOFT), ...TABULAR }}>
           {v}%
         </div>
       ))}
@@ -140,14 +140,14 @@ export const UnitScene: React.FC = () => {
             <Marker at={peopleAt - 2}>People</Marker>, within a district
             <span style={{ opacity: ease(frame, sevenAt - 6, 8) }}>
               : r = <span style={TABULAR}>{signed(DISTRICTS.rWithin)}</span>
-              <span style={{ ...note(24, INK_SOFT), marginLeft: 10, opacity: ease(frame, averagesAt - 4, 10) }}>averaged over the six</span>
+              <span style={{ ...note(22, INK_SOFT), marginLeft: 10, opacity: ease(frame, averagesAt - 4, 10) }}>averaged over the six</span>
             </span>
           </>,
           STAT_INK,
           "income, one dot per person",
         )}
         <Note at={countingAt - 2} x={AGG.x0 + 12} y={top + 6}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>average turnout</span>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>average turnout</span>
         </Note>
 
         <Svg>
@@ -217,8 +217,8 @@ export const UnitScene: React.FC = () => {
         <Ring x={AGG.x0 + 230} y={top - 30} at={quoteAt - 2} color={DATA} r0={20} r1={90} />
         <Ring x={IND.x0 + 330} y={top - 30} at={quoteAt + 4} r0={20} r1={90} />
         <Note at={bothAt - 2} x={IND.x1 + 24} y={bottom - 80}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>same data,</span>
-          <div style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>different unit</div>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>same data,</span>
+          <div style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>different unit</div>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -97,18 +97,18 @@ export const TxnScene: React.FC = () => {
         {/* ── A transaction, as a bracket ── */}
         <div style={{ opacity: 1 - ease(frame, schemOut, 10) }}>
           {[
-            { at: beginAt - 2, i: 0, body: <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK }}>BEGIN</span> },
-            { at: runAt, i: 1, body: <span style={{ ...note(28, BLUE_INK) }}>a statement</span> },
-            { at: runAt + 4, i: 2, body: <span style={{ ...note(28, BLUE_INK) }}>another statement</span> },
+            { at: beginAt - 2, i: 0, body: <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK }}>BEGIN</span> },
+            { at: runAt, i: 1, body: <span style={{ ...note(26, BLUE_INK) }}>a statement</span> },
+            { at: runAt + 4, i: 2, body: <span style={{ ...note(26, BLUE_INK) }}>another statement</span> },
           ].map((r) => (
             <Note key={r.i} at={r.at} x={X0 + 50} y={sTop + r.i * step + h(8)}>
               <span style={{ whiteSpace: "nowrap" }}>{r.body}</span>
             </Note>
           ))}
           <Note at={commitAt} x={X0 + 50} y={sTop + 3 * step + h(8)}>
-            <span style={{ whiteSpace: "nowrap", fontFamily: MONO, fontSize: 28, fontWeight: 500, color: OK_INK }}>
+            <span style={{ whiteSpace: "nowrap", fontFamily: MONO, fontSize: 26, fontWeight: 500, color: OK_INK }}>
               COMMIT
-              <span style={{ ...note(28, INK_SOFT), fontWeight: 500, opacity: ease(frame, rollAt - 2, 10) }}> or </span>
+              <span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, rollAt - 2, 10) }}> or </span>
               <span style={{ color: ACCENT_INK, opacity: ease(frame, rollAt, 10) }}>ROLLBACK</span>
             </span>
           </Note>
@@ -116,7 +116,7 @@ export const TxnScene: React.FC = () => {
             <path d={`M${X0 + 24},${sTop + h(10)} h-14 V${sTop + 3 * step + h(46)} h14`} fill="none" stroke={INK} strokeWidth={2.5} />
           </svg>
           <Note at={oneAt + 4} x={X0 + 560} y={sTop + step + h(40)}>
-            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
               succeed or fail <b>as one</b>
             </span>
           </Note>
@@ -154,15 +154,15 @@ export const TxnScene: React.FC = () => {
           marks={[{ row: 0, col: 1, at: hundredAt, color: MARK_OK }]}
         />
         <Note at={transferAt + 6} x={R_X} y={g.rowTop(2) + h(24)} out={rollbackAt}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>moving 30 from account 1</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>moving 30 from account 1</span>
         </Note>
         <Note at={hundredAt + 4} x={R_X} y={g.rowTop(2) + h(24)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the debit is undone</span>
+          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the debit is undone</span>
         </Note>
 
         {/* ── What the application does ── */}
         <Note at={jobAt} x={R_X} y={y(640)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>The application, on an error:</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>The application, on an error:</span>
         </Note>
         {[
           { at: catchAt, text: "catch it" },

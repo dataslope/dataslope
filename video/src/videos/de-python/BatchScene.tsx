@@ -164,7 +164,7 @@ export const BatchScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: MONO,
-                fontSize: 28,
+                fontSize: 26,
                 fontWeight: 500,
                 color: BLUE_INK,
               }}
@@ -231,7 +231,7 @@ export const BatchScene: React.FC = () => {
         <Listing lines={BATCH.builtin.lines} x={X0} top={builtinTop} width={760} size={SIZE} at={sinceAt} marks={[{ line: lineOf(BATCH.builtin.lines, "itertools.batched"), at: exactlyAt, color: MARK }]} />
         <Console lines={BATCH.builtin.out} x={RIGHT_X + 340} top={outTop} width={300} at={exactlyAt - 2} />
         <Note at={exactlyAt + 4} x={RIGHT_X + 340} y={outTop + consoleHeight(BATCH.builtin.out.length) + h(14)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>batched gives tuples</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>batched gives tuples</span>
         </Note>
       </Drift>
     </AbsoluteFill>

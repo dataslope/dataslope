@@ -131,7 +131,7 @@ export const CostScene: React.FC = () => {
               x={X.x0 - 16}
               y={y(sy(g)) + 7}
               textAnchor="end"
-              style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}
+              style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT }}
             >
               {g}
             </text>
@@ -182,19 +182,19 @@ export const CostScene: React.FC = () => {
             </Note>
             {mk.n % 400 !== 0 ? (
               <Note at={mk.at} x={px - 60} width={120} y={y(BASE) + 34} from="up" style={{ textAlign: "center" }}>
-                <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>{thousands(mk.n)}</span>
+                <span style={{ ...note(21, ACCENT_INK), fontWeight: 500 }}>{thousands(mk.n)}</span>
               </Note>
             ) : null}
           </React.Fragment>
         );
       })}
       <Note at={curveFrom + 10} x={X.x1} y={y(BASE) + 62} align="right">
-        <span style={label(24, INK_SOFT)}>people in the sample</span>
+        <span style={label(19, INK_SOFT)}>people in the sample</span>
       </Note>
 
       {/* ── The squares ── */}
       <Ink at={hundredAt - 4} dur={14} style={{ left: groups[0].x, top: y(484) }}>
-        <span style={label(24, INK_SOFT)}>Each square is {PEOPLE} people</span>
+        <span style={label(20, INK_SOFT)}>Each square is {PEOPLE} people</span>
       </Ink>
       {groups.map((g) => (
         <Squares key={g.side} side={g.side} at={g.at} x={g.x} />
@@ -205,8 +205,8 @@ export const CostScene: React.FC = () => {
         const at = g.side === 10 ? timesAt : g.at + 4;
         return (
           <Note key={g.side} at={at} x={g.x} y={y(SQ_BASE) + 14}>
-            <div style={{ ...headline(28), ...TABULAR }}>{thousands(people)}</div>
-            <div style={{ ...note(24, ACCENT_INK), fontWeight: 500, marginTop: 2 }}>error {fmt(se, 1)}</div>
+            <div style={{ ...headline(30), ...TABULAR }}>{thousands(people)}</div>
+            <div style={{ ...note(20, ACCENT_INK), fontWeight: 500, marginTop: 2 }}>error {fmt(se, 1)}</div>
           </Note>
         );
       })}

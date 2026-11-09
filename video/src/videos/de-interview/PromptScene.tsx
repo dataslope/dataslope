@@ -191,7 +191,7 @@ export const PromptScene: React.FC = () => {
             width: 80,
             top: bandY(0) - 40,
             textAlign: "center",
-            ...label(24, INK_SOFT),
+            ...label(20, INK_SOFT),
             opacity: ease(frame, downAt - 2, 12),
           }}
         >
@@ -214,7 +214,7 @@ export const PromptScene: React.FC = () => {
             width: 80,
             top: bandY(3) + h(BAND_H) + 14,
             textAlign: "center",
-            ...label(24, INK_SOFT),
+            ...label(20, INK_SOFT),
             opacity: ease(frame, filesAt, 12),
           }}
         >
@@ -261,7 +261,7 @@ export const PromptScene: React.FC = () => {
                 <div style={{ width: NAME_W, flex: "none" }}>
                   {/* The layer being read carries the highlighter behind its
                       name, its width given back as margin. */}
-                  <div style={{ ...note(34, INK), fontWeight: 500, lineHeight: 1.12 }}>
+                  <div style={{ ...note(32, INK), fontWeight: 500, lineHeight: 1.12 }}>
                     <span
                       style={{
                         padding: "1px 10px 3px",
@@ -280,7 +280,7 @@ export const PromptScene: React.FC = () => {
                       the row together. */}
                   <div
                     style={{
-                      ...label(24, BLUE_INK),
+                      ...label(21, BLUE_INK),
                       lineHeight: "26px",
                       height: 26 * partsIn(i),
                       marginTop: 6 * partsIn(i),
@@ -312,7 +312,7 @@ export const PromptScene: React.FC = () => {
                   {/* Inter at the layer name's size, not the serif: the two
                       share the row's one line, so they share one face. */}
                   {deeper > 0 ? (
-                    <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", ...note(28, INK_SOFT), opacity: deeper, whiteSpace: "nowrap" }}>
+                    <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", ...note(30, INK_SOFT), opacity: deeper, whiteSpace: "nowrap" }}>
                       a level deeper than an analyst screen
                     </div>
                   ) : null}
@@ -339,8 +339,8 @@ export const PromptScene: React.FC = () => {
           </svg>
         ) : null}
         <div style={{ position: "absolute", left: DESIGN_X + 6, top: designTop, width: 1900 - DESIGN_X }}>
-          <div style={{ ...body(34, true), color: INK, whiteSpace: "nowrap", opacity: ease(frame, designAt - 2, 12) }}>design a pipeline for X</div>
-          <div style={{ ...label(24, BLUE_INK), marginTop: 8, opacity: ease(frame, elevenAt - 2, 12) }}>
+          <div style={{ ...body(32, true), color: INK, whiteSpace: "nowrap", opacity: ease(frame, designAt - 2, 12) }}>design a pipeline for X</div>
+          <div style={{ ...label(21, BLUE_INK), marginTop: 8, opacity: ease(frame, elevenAt - 2, 12) }}>
             <PartsLabel parts={[partOf("de-pipelines-for-ai")]} /> walks one through
           </div>
         </div>

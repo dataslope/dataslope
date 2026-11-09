@@ -134,7 +134,7 @@ export const CacheScene: React.FC = () => {
           const loss = i > 0 ? ease(frame, lossAt[i], 10) : 0;
           return (
             <div key={i} style={{ position: "absolute", left: X0, top: rowY(i), height: 40, display: "flex", alignItems: "center", opacity: o }}>
-              <span style={{ ...note(24, INK), width: BAR_X - X0 - 20, whiteSpace: "nowrap" }}>
+              <span style={{ ...note(22, INK), width: BAR_X - X0 - 20, whiteSpace: "nowrap" }}>
                 cache holds <b>{SIZE_NAME[i]}</b>
               </span>
               <span style={{ width: w, height: 34, background: BAR, borderRadius: 4, marginLeft: 0 }} />
@@ -172,10 +172,10 @@ export const CacheScene: React.FC = () => {
           head={12 + 4 * dead * (1 - replica)}
         />
         <Ink at={deadAt + 6} dur={12} out={replicaAt} style={{ left: D.app.x, top: storeMid + 44, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>every read reaches the database</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>every read reaches the database</span>
         </Ink>
         <Ink at={replicaAt + 8} dur={12} style={{ left: D.app.x, top: storeMid + 44, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, OK_INK), fontWeight: 500 }}>so the cache needs replicas too</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500 }}>so the cache needs replicas too</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

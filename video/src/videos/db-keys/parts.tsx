@@ -4,20 +4,7 @@ import { arrowHead, type Cubic, cubicPath, lineLength, roundedPolyline, sampleCu
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  BAR,
-  BLUE_INK,
-  HAIRLINE,
-  HIGHLIGHT,
-  INK,
-  INK_SOFT,
-  PAPER,
-  headline,
-  label,
-  note,
-} from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { badgeStyle, Ink, type Pt } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -93,7 +80,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={label(26, INK_SOFT)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };
@@ -476,7 +463,7 @@ export const Reply: React.FC<{
         {tag}
       </div>
       {gloss ? (
-        <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, glossAt ?? at + 8, 10) }}>{gloss}</span>
+        <span style={{ ...note(20, INK_SOFT), opacity: ease(frame, glossAt ?? at + 8, 10) }}>{gloss}</span>
       ) : null}
     </Ink>
   );
@@ -847,7 +834,7 @@ export const TableName: React.FC<{ g: TableGeometry; at: number; children: React
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   return (
     <Ink at={at} dur={12} out={out} style={{ left: g.x, top: g.top - 38, whiteSpace: "nowrap", opacity: 1 - d }}>
-      <span style={{ ...label(24, INK), fontWeight: 500 }}>{children}</span>
+      <span style={{ ...label(21, INK), fontWeight: 500 }}>{children}</span>
     </Ink>
   );
 };

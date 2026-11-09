@@ -43,7 +43,7 @@ const Cell: React.FC<{ x: number; y: number; w: number; h: number; at: number; f
         justifyContent: "center",
         textAlign: "center",
         opacity: p,
-        ...note(24, INK),
+        ...note(23, INK),
         fontWeight: 500,
       }}
     >
@@ -129,13 +129,13 @@ export const CapScene: React.FC = () => {
           ["stay available", "every working node answers", availableAt],
         ].map(([t, sub, at], i) => (
           <Ink key={i} at={(at as number) - 6} dur={14} style={{ left: G.col[i], top: y(G.top) - h(84), width: G.colW, textAlign: "center" }}>
-            <div style={{ ...label(24, INK), fontWeight: 500 }}>{t as string}</div>
-            <div style={{ ...note(24, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>{sub as string}</div>
+            <div style={{ ...label(23, INK), fontWeight: 500 }}>{t as string}</div>
+            <div style={{ ...note(20, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>{sub as string}</div>
           </Ink>
         ))}
         {["network healthy", "during a partition"].map((t, r) => (
           <Ink key={t} at={partitionAt + r * 6} dur={14} style={{ left: G.head, top: row(r), height: rowH, display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
-            <span style={{ ...label(24, r ? ACCENT_INK : INK), fontWeight: 500 }}>{t}</span>
+            <span style={{ ...label(22, r ? ACCENT_INK : INK), fontWeight: 500 }}>{t}</span>
           </Ink>
         ))}
         <Cell x={G.col[0]} y={row(0)} w={G.col[1] + G.colW - G.col[0]} h={rowH} at={availableAt + 6} fill={healthyFill} lit={topLit}>
@@ -227,7 +227,7 @@ export const CapScene: React.FC = () => {
 
         {/* ── PACELC ── */}
         <Ink at={healthyAt} dur={14} style={{ left: P.pacelc, top: y(700), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>and on a healthy network</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>and on a healthy network</span>
         </Ink>
         <Ink at={pacelcAt} dur={16} style={{ left: P.pacelc, top: y(744), whiteSpace: "nowrap" }}>
           <span style={{ ...label(40, INK), fontWeight: 500, letterSpacing: "0.02em" }}>

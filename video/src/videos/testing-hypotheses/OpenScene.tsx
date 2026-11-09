@@ -207,7 +207,7 @@ export const OpenScene: React.FC = () => {
               position: "absolute",
               left: sx(C, b.rate * g) + 14,
               top: y(b.yy) - 19,
-              ...note(28, b.color),
+              ...note(30, b.color),
               fontWeight: 500,
               whiteSpace: "nowrap",
             }}
@@ -253,13 +253,13 @@ export const OpenScene: React.FC = () => {
 
       {/* The question, as the lesson puts it. */}
       <Ink at={soAt - 2} dur={16} style={{ left: 160, top: y(756), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(34, true), color: INK_SOFT }}>The real question:</span>
+        <span style={{ ...body(36, true), color: INK_SOFT }}>The real question:</span>
       </Ink>
       <Ink at={ifAt - 2} dur={18} style={{ left: 160, top: y(756) + 54, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(34, true), color: INK }}>if there were no difference at all,</span>
+        <span style={{ ...body(38, true), color: INK }}>if there were no difference at all,</span>
       </Ink>
       <Ink at={howAt - 4} dur={22} style={{ left: 160, top: y(756) + 108, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(34, true), color: INK }}>
+        <span style={{ ...body(38, true), color: INK }}>
           how often would <Mark at={chanceAt}>chance alone</Mark> hand you <Mark at={bigAt}>a gap this big?</Mark>
         </span>
       </Ink>

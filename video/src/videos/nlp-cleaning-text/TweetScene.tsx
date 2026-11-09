@@ -28,7 +28,7 @@ const find = (list: readonly string[], t: string) => {
 /** The call above a row, in the code face. */
 const Sub: React.FC<{ at: number; y: number; children: React.ReactNode }> = ({ at, y, children }) => (
   <Ink at={at} dur={14} style={{ left: X0, top: y, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>{children}</span>
   </Ink>
 );
 
@@ -158,7 +158,7 @@ export const TweetScene: React.FC = () => {
       </div>
 
       {/* The lesson's moral, as it is said. */}
-      <div style={{ position: "absolute", left: X0, top: y(NOTE_Y), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...body(34), color: INK, opacity: noteDim }}>
+      <div style={{ position: "absolute", left: X0, top: y(NOTE_Y), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...body(38), color: INK, opacity: noteDim }}>
         <Ink at={keepAt - 2} dur={16} style={{ position: "relative" }}>
           Keep the{" "}
           <Mark at={unitsAt}>

@@ -5,21 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, drift, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  BAR,
-  BLUE_INK,
-  HAIRLINE,
-  HIGHLIGHT,
-  INK,
-  INK_SOFT,
-  PAPER,
-  TABULAR,
-  headline,
-  label,
-  note,
-} from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -503,7 +489,7 @@ export const GraphNode: React.FC<{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...label(28, t.ink),
+          ...label(26, t.ink),
           fontWeight: 500,
           opacity: Math.min(1, p),
           transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`,
@@ -575,7 +561,7 @@ export const Edge: React.FC<{
             left: mx,
             top: my,
             transform: "translate(-50%, -50%)",
-            ...label(24, weightInk),
+            ...label(23, weightInk),
             ...TABULAR,
             fontWeight: 500,
             opacity: w * (1 - d) * opacity,

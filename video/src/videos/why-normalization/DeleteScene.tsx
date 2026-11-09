@@ -102,7 +102,7 @@ export const DeleteScene: React.FC = () => {
       />
 
       <Ink at={nameAt - 10} dur={14} style={{ left: RIGHT_X, top: y(FIG_Y) + 2 }}>
-        <span style={label(24, INK_SOFT)}>Then, looking for Grace</span>
+        <span style={label(21, INK_SOFT)}>Then, looking for Grace</span>
       </Ink>
       <Listing
         lines={LOOKUP_SQL}
@@ -117,7 +117,7 @@ export const DeleteScene: React.FC = () => {
       <Note at={forgotAt} x={RIGHT_X + 20} y={rg.bottom(0) + h(14)} from="up">
         <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
           <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT }}>(0 rows)</span>
-          <span style={note(24, ACCENT_INK)}>Her name and email are gone.</span>
+          <span style={note(22, ACCENT_INK)}>Her name and email are gone.</span>
         </div>
       </Note>
     </AbsoluteFill>

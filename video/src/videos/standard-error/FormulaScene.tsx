@@ -92,7 +92,7 @@ export const FormulaScene: React.FC = () => {
 
       {/* ── The shortcut ── */}
       <Ink at={divideAt - 6} dur={14} style={{ left: 120, top: y(214) }}>
-        <span style={label(24, INK_SOFT)}>The standard error of an average</span>
+        <span style={label(21, INK_SOFT)}>The standard error of an average</span>
       </Ink>
       <Ink at={divideAt} dur={18} style={{ left: 116, top: y(248), ...headline(124, true), whiteSpace: "nowrap" }}>
         <span style={{ color: BLUE_INK }}>s</span> ÷{" "}
@@ -110,7 +110,7 @@ export const FormulaScene: React.FC = () => {
 
       {/* ── The lesson's numbers through it ── */}
       <Ink at={tenAt - 8} dur={14} style={{ left: 120, top: y(420) }}>
-        <span style={label(24, INK_SOFT)}>For the {AGES.n} ages</span>
+        <span style={label(21, INK_SOFT)}>For the {AGES.n} ages</span>
       </Ink>
       <div
         style={{
@@ -131,7 +131,7 @@ export const FormulaScene: React.FC = () => {
         <Ink at={rootAt - 2} dur={14} style={{ position: "relative" }}>
           <span style={{ display: "inline-flex", flexDirection: "column" }}>
             <span>÷ √{AGES.n}</span>
-            <span style={{ ...note(24, INK_SOFT), letterSpacing: "normal", marginTop: 4, marginLeft: "1.6em" }}>
+            <span style={{ ...note(21, INK_SOFT), letterSpacing: "normal", marginTop: 4, marginLeft: "1.6em" }}>
               √{AGES.n} is about {fmt(AGES.sqrtN)}
             </span>
           </span>
@@ -143,7 +143,7 @@ export const FormulaScene: React.FC = () => {
             <span>
               = <Marked at={zeroAt + 8} color={HIGHLIGHT}><span style={{ color: ACCENT_INK }}>{fmt(AGES.se)}</span></Marked>
             </span>
-            <span style={{ ...note(24, INK_SOFT), letterSpacing: "normal", marginTop: 4, marginLeft: 60, opacity: ease(frame, zeroAt + 4, 14) }}>
+            <span style={{ ...note(21, INK_SOFT), letterSpacing: "normal", marginTop: 4, marginLeft: 60, opacity: ease(frame, zeroAt + 4, 14) }}>
               years
             </span>
           </span>
@@ -172,12 +172,12 @@ export const FormulaScene: React.FC = () => {
       <Span x0={sx(X, AGES.min)} x1={sx(X, AGES.max)} y={y(STRIP_TOP - 18)} at={decadesAt - 6} dur={20} color={BLUE_INK} />
       <AverageBand at={averageAt - 2} mx={mx} />
       <Note at={decadesAt} x={160} y={y(806)}>
-        <span style={{ ...body(34, true), color: BLUE_INK }}>
+        <span style={{ ...body(32, true), color: BLUE_INK }}>
           The ages: {Math.round(AGES.min)} to {Math.round(AGES.max)} years.
         </span>
       </Note>
       <Note at={yearAt - 2} x={mx - 16} y={y(806)}>
-        <span style={{ ...body(34, true), color: ACCENT_INK }}>
+        <span style={{ ...body(32, true), color: ACCENT_INK }}>
           Their average: {fmt(AGES.mean)}, give or take {fmt(AGES.se)}.
         </span>
       </Note>
@@ -199,7 +199,7 @@ const OneAverage: React.FC<{ from: number; at: number; out: number }> = ({ from,
   return (
     <>
       <div style={{ position: "absolute", left: 160, top: y(592), opacity: appear }}>
-        <span style={label(24, INK_SOFT)}>One sample of {AGES.n} ages</span>
+        <span style={label(22, INK_SOFT)}>One sample of {AGES.n} ages</span>
       </div>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: appear }}>
         {AGES.values.map((v, i) => (
@@ -235,8 +235,8 @@ const Definition: React.FC<{ at: number; top: number; symbol: string; color: str
   <Ink at={at} dur={16} style={{ left: 640, top, display: "flex", alignItems: "baseline", gap: 22, whiteSpace: "nowrap" }}>
     {/* The symbol at the definition's own size, set apart by the head
         face's italic and its color: one size to a line. */}
-    <span style={{ ...headline(34, true), color, width: 34 }}>{symbol}</span>
-    <span style={{ ...body(34), color: INK }}>{children}</span>
+    <span style={{ ...headline(32, true), color, width: 34 }}>{symbol}</span>
+    <span style={{ ...body(32), color: INK }}>{children}</span>
   </Ink>
 );
 

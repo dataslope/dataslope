@@ -69,7 +69,7 @@ export const ChainScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Ink at={start - 14} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
-        <span style={label(24, ACCENT_INK)}>Inside NOT IN</span>
+        <span style={label(21, ACCENT_INK)}>Inside NOT IN</span>
       </Ink>
       <div
         style={{
@@ -111,7 +111,7 @@ export const ChainScene: React.FC = () => {
         <Code line={`${GRACE.id} NOT IN (${LIST})`} size={CODE} />
         <span
           style={{
-            ...body(34, true),
+            ...body(32, true),
             color: INK_SOFT,
             opacity: ease(frame, termAt[0] - 10, 12),
           }}
@@ -169,7 +169,7 @@ export const ChainScene: React.FC = () => {
               alignItems: "center",
             }}
           >
-            <span style={label(24, INK_SOFT)}>The whole chain</span>
+            <span style={label(22, INK_SOFT)}>The whole chain</span>
           </Ink>
           <Ink at={resultAt} dur={14} style={{ position: "relative" }}>
             <TruthWord value={GRACE.result} size={28} weight={500} />
@@ -179,7 +179,7 @@ export const ChainScene: React.FC = () => {
 
       {/* Why: an AND that holds an unknown is false or unknown, never true. */}
       <Ink at={oneUnknownAt - 4} dur={14} style={{ left: RULES_X, top: y(SHORT_Y) + 6 }}>
-        <span style={label(24, INK_SOFT)}>
+        <span style={label(22, INK_SOFT)}>
           An <Mono color={INK}>AND</Mono> that holds an unknown
         </span>
       </Ink>
@@ -202,14 +202,14 @@ export const ChainScene: React.FC = () => {
             whiteSpace: "nowrap",
           }}
         >
-          <span style={{ width: `${15 * 0.6}em`, fontSize: 28, flex: "none" }}>
+          <span style={{ width: `${15 * 0.6}em`, fontSize: 30, flex: "none" }}>
             <Code line={r.line} size={30} />
           </span>
           <TruthWord value={r.value} size={26} />
         </Ink>
       ))}
       <Note at={neverAt} x={RULES_X} y={y(TERMS_Y) + 118} from="up">
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500 }}>Either way, never true.</span>
+        <span style={{ ...note(21, ACCENT_INK), fontWeight: 500 }}>Either way, never true.</span>
       </Note>
 
       {/* Fig. 4: every customer through the same chain. */}
@@ -262,8 +262,8 @@ export const ChainScene: React.FC = () => {
         }}
       />
       <Ink at={notOneAt} dur={18} style={{ left: LEFT + TABLE_W + 48, top: tableTop + 40, width: 440 }}>
-        <div style={{ ...body(34, true), color: INK }}>Not one row is true,</div>
-        <div style={{ ...note(24, INK_SOFT), marginTop: 12 }}>
+        <div style={{ ...body(32, true), color: INK }}>Not one row is true,</div>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 12 }}>
           so <Mono color={INK}>WHERE</Mono> keeps none of them:
         </div>
         <div

@@ -110,7 +110,7 @@ export const RecursiveScene: React.FC = () => {
           ]}
         />
         <Note at={halvesAt} x={X0} y={y(TOP) + listingHeight(L.lines.length, SIZE) + h(24)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             anchor <QMono>UNION ALL</QMono> recursive half, run until a pass adds no rows
           </span>
         </Note>
@@ -147,7 +147,7 @@ export const RecursiveScene: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...label(24, INK),
+                ...label(23, INK),
                 opacity: p,
                 transform: `scale(${0.85 + 0.15 * p})`,
               }}
@@ -158,12 +158,12 @@ export const RecursiveScene: React.FC = () => {
         })}
         {depths.map((d, level) => (
           <Ink key={d} at={levelAt[level] + 4} dur={12} style={{ left: LEVEL_LABEL_X, top: y(LEVEL_Y[level]) + h(4), whiteSpace: "nowrap" }}>
-            <div style={{ ...label(24, BLUE_INK) }}>depth {d}</div>
-            <div style={{ ...note(24, INK_SOFT) }}>{passLabels[level]}</div>
+            <div style={{ ...label(20, BLUE_INK) }}>depth {d}</div>
+            <div style={{ ...note(20, INK_SOFT) }}>{passLabels[level]}</div>
           </Ink>
         ))}
         <Note at={noManagerAt + 8} x={place.get(L.rows[0][id])!.x + NODE_W / 2 + 20} y={y(LEVEL_Y[0]) + h(12)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             <QMono>manager_id</QMono> is null
           </span>
         </Note>
@@ -178,7 +178,7 @@ export const RecursiveScene: React.FC = () => {
           </span>
         </Note>
         <Note at={loopAt} x={TREE_X0} y={bottom + h(128)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             a loop in the data never runs dry:{" "}
             {/* The cap arrives before it is named, so it and its run can
                 both be read before the cut. */}
@@ -188,7 +188,7 @@ export const RecursiveScene: React.FC = () => {
           </span>
         </Note>
         <Note at={capAt - 2} x={TREE_X0} y={bottom + h(170)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
             on a three-node loop, it stops at depth <Num>{RECURSIVE.capped}</Num>
           </span>
         </Note>

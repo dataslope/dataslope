@@ -117,7 +117,7 @@ export const ExamplesScene: React.FC = () => {
         {STEPS.map((s, i) => (
           <React.Fragment key={s.text}>
             <Tag at={stepAt[i]} x={stepX[i]} y={y(340)} width={s.w}>
-              <span style={{ ...label(24, A_INK), fontWeight: 500, marginRight: 10 }}>{i + 1}</span>
+              <span style={{ ...label(22, A_INK), fontWeight: 500, marginRight: 10 }}>{i + 1}</span>
               {i === 0 ? <Marked at={howAt - 2}>{s.text}</Marked> : s.text}
             </Tag>
             {i > 0 ? (
@@ -152,21 +152,21 @@ export const ExamplesScene: React.FC = () => {
           ))}
         </Svg>
         <Ink at={eightyAt - 2} dur={12} style={{ left: HX0 - 80, top: y(BASE_A) - h(MAX_H) - 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, A_INK), fontWeight: 500 }}>right {SIZES.trueA}% of the time</span>
+          <span style={{ ...note(22, A_INK), fontWeight: 500 }}>right {SIZES.trueA}% of the time</span>
         </Ink>
         <Ink at={sixtyFiveAt - 2} dur={12} style={{ left: HX0 - 80, top: y(BASE_B) - h(MAX_H) - 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, B_INK), fontWeight: 500 }}>right {SIZES.trueB}%</span>
+          <span style={{ ...note(22, B_INK), fontWeight: 500 }}>right {SIZES.trueB}%</span>
         </Ink>
         {/* The axis: correct answers out of 20. */}
         <Svg opacity={ease(frame, sixtyFiveAt, 12)}>
           {[5, 10, 15, 20].map((k) => (
-            <text key={k} x={sx(k) + SLOT / 2} y={y(BASE_B) + 30} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500, ...TABULAR })}>
+            <text key={k} x={sx(k) + SLOT / 2} y={y(BASE_B) + 30} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
               {k}
             </text>
           ))}
         </Svg>
         <Ink at={sixtyFiveAt + 4} dur={12} style={{ left: sx(20) + SLOT + 20, top: y(BASE_B) + 10, whiteSpace: "nowrap" }}>
-          <span style={note(24, INK_SOFT)}>right, of {SIZES.n}</span>
+          <span style={note(21, INK_SOFT)}>right, of {SIZES.n}</span>
         </Ink>
         {/* The runs counter: on screen only while it is counting, and after. */}
         <Ink at={twentyAt - 4} dur={10} style={{ left: sx(20) + SLOT + 20, top: y(BASE_A) - 40, whiteSpace: "nowrap" }}>
@@ -189,7 +189,7 @@ export const ExamplesScene: React.FC = () => {
           <span style={{ ...body(44, true), color: A_INK }}>about four in five</span>
         </Ink>
         <Ink at={fourAt + 10} dur={14} style={{ left: RX0 - 30, top: y(358) + 64, whiteSpace: "nowrap" }}>
-          <span style={note(24, INK_SOFT)}>
+          <span style={note(21, INK_SOFT)}>
             tied in <span style={TABULAR}>{SIZES.ties}</span>, behind in <span style={TABULAR}>{SIZES.bWins}</span>
           </span>
         </Ink>
@@ -201,14 +201,14 @@ export const ExamplesScene: React.FC = () => {
           <svg width={16} height={16}>
             <rect width={16} height={16} rx={2} fill={A} />
           </svg>
-          <span style={note(24, A_INK)}>
+          <span style={note(20, A_INK)}>
             {SIZES.trueA}% against {SIZES.trueB}%
           </span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 10, marginLeft: 14, opacity: ease(frame, closeAt - 4, 12) }}>
             <svg width={16} height={16}>
               <rect width={16} height={16} rx={2} fill={B} />
             </svg>
-            <span style={note(24, INK_SOFT)}>
+            <span style={note(20, INK_SOFT)}>
               {SIZES.trueA}% against {CLOSE_RATES.trueB}%
             </span>
           </span>
@@ -227,7 +227,7 @@ export const ExamplesScene: React.FC = () => {
               <Svg opacity={ease(frame, at, 10)}>
                 <rect x={x} y={y(RBASE) - bh} width={44} height={bh} rx={2} fill={lit > 0 ? A : FAINT} opacity={0.6 + 0.4 * lit} />
                 <rect x={x + 48} y={y(RBASE) - ch} width={22} height={ch} rx={2} fill={B} />
-                <text x={x + 35} y={y(RBASE) + 28} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500, ...TABULAR })}>
+                <text x={x + 35} y={y(RBASE) + 28} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
                   {r.n}
                 </text>
               </Svg>
@@ -253,12 +253,12 @@ export const ExamplesScene: React.FC = () => {
           dur={12}
           style={{ left: RX0 + 4 * RSTEP + 59, top: y(RBASE) - h(RMAX) * (CLOSE_RATES.rates[4].pct / 100) - 30, whiteSpace: "nowrap" }}
         >
-          <span style={{ ...note(24, INK_SOFT), fontWeight: 500, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(20, INK_SOFT), fontWeight: 500, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
             {fmt(CLOSE_RATES.rates[4].pct, 1)}%
           </span>
         </Ink>
         <Ink at={fig12At + 12} dur={12} style={{ left: RX0 + 4 * RSTEP + 84, top: y(RBASE) + 8, whiteSpace: "nowrap" }}>
-          <span style={note(24, INK_SOFT)}>examples</span>
+          <span style={note(21, INK_SOFT)}>examples</span>
         </Ink>
 
         {/* Close after thirty: they probably are. */}

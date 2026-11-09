@@ -89,7 +89,7 @@ export const StageScene: React.FC = () => {
         const slow = k === 0 && i === SLOW;
         return (
           <React.Fragment key={i}>
-            <div style={{ position: "absolute", left: x + 20, top: laneY(i) + laneH / 2 - 13, opacity: p, ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <div style={{ position: "absolute", left: x + 20, top: laneY(i) + laneH / 2 - 13, opacity: p, ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
               task {i + 1}
             </div>
             <div
@@ -141,7 +141,7 @@ export const StageScene: React.FC = () => {
         {/* One action, one job. */}
         <Note at={actionAt - 2} x={S1_X} y={y(296)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>write()</span>, one action: <b>one job</b>
+            <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500 }}>write()</span>, one action: <b>one job</b>
           </span>
         </Note>
         <Svg opacity={ease(frame, actionAt + 4, 12)}>
@@ -159,7 +159,7 @@ export const StageScene: React.FC = () => {
           )}
         </Svg>
         <Note at={wideAt + 2} x={S1_X + S_W} y={y(S_TOP) + h(S_H) + h(8)} width={S2_X - S1_X - S_W} style={{ textAlign: "center" }}>
-          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500 }}>shuffle</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>shuffle</span>
         </Note>
         <Note at={countAt - 2} x={S2_X} y={y(296)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -182,17 +182,17 @@ export const StageScene: React.FC = () => {
           </Svg>
         ) : null}
         <Note at={perAt - 2} x={S1_X + TRACK_X} y={y(S_TOP) + h(S_H) + h(8)}>
-          <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, BLUE_INK), whiteSpace: "nowrap" }}>
             one task per partition<span style={{ opacity: ease(frame, parallelAt, 10) }}>, side by side</span>
           </span>
         </Note>
         <Note at={lastAt + 6} x={S1_X + TRACK_X + TRACK_W - 300} y={y(S_TOP) + h(8)}>
-          <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>waits for its last task</span>
+          <span style={{ ...label(20, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>waits for its last task</span>
         </Note>
 
         {/* The page's fan-out chart. */}
         <Note at={chartAt} x={S1_X} y={y(620)}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
             From the page&apos;s fan-out chart
             <span style={{ opacity: ease(frame, pAt, 10), color: INK_SOFT, fontWeight: 500 }}>: each task slow with a 1% chance</span>
           </span>
@@ -207,10 +207,10 @@ export const StageScene: React.FC = () => {
           size={19}
         />
         <Note at={chartAt + 6} x={sx.a - 14} y={sy.b - h(40)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>chance the stage is slow</span>
+          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>chance the stage is slow</span>
         </Note>
         <Note at={chartAt + 6} x={sx.b + 18} y={sy.a - 14}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>tasks in the stage</span>
+          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>tasks in the stage</span>
         </Note>
         <Svg>
           {draw > 0 ? (
@@ -222,25 +222,25 @@ export const StageScene: React.FC = () => {
           <circle cx={twoX} cy={twoY} r={7 * ease(frame, twoAt + 2, 10)} fill={ACCENT} />
         </Svg>
         <Note at={halfAt + 4} x={halfX + 22} y={halfY + h(8)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{TAIL.half}</Num> tasks: slow half the time
           </span>
         </Note>
         <Note at={pctAt - 2} x={twoX - 20} y={twoY - h(46)} align="right">
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{TAIL.tasks}</Num> tasks: <Num>{Math.round(TAIL.at200 * 100)}</Num>%
           </span>
         </Note>
 
         {/* The fix for a straggler. */}
         <Note at={specAt - 2} x={SPEC_X} y={y(712)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, display: "block", whiteSpace: "nowrap" }}>speculative execution</span>
-          <span style={{ ...note(24, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, copyAt, 10) }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, display: "block", whiteSpace: "nowrap" }}>speculative execution</span>
+          <span style={{ ...note(22, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, copyAt, 10) }}>
             a copy of a slow task
             <br />
             <span style={{ opacity: ease(frame, elseAt, 10) }}>on another executor</span>
           </span>
-          <span style={{ display: "block", fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none", whiteSpace: "nowrap", marginTop: 8, opacity: ease(frame, elseAt + 6, 10) }}>
+          <span style={{ display: "block", fontFamily: MONO, fontSize: 20, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none", whiteSpace: "nowrap", marginTop: 8, opacity: ease(frame, elseAt + 6, 10) }}>
             spark.speculation
           </span>
         </Note>

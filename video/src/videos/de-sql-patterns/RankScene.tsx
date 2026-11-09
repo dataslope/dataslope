@@ -152,7 +152,7 @@ export const RankScene: React.FC = () => {
           {/* ── Question 1: the page's ranking, where the 80s tie ── */}
           <Listing lines={RANK.lines} x={X0} top={y(TOP)} width={700} size={SIZE} at={asked - 6} out={out1} />
           <Note at={playersAt} x={RESULT_X} y={y(TOP)} out={out1}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
               <QMono>players</QMono>, rows <Num>11</Num> to <Num>17</Num> of the page&apos;s <Num>{RANK.rows}</Num>
             </span>
           </Note>
@@ -170,17 +170,17 @@ export const RankScene: React.FC = () => {
             ]}
           />
           <Note at={arbitraryAt} x={X0} y={notesY} out={out1}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               <QMono>ROW_NUMBER</QMono>: unique, ties broken arbitrarily
             </span>
           </Note>
           <Note at={seventeenAt - 4} x={X0} y={notesY + h(46)} out={out1}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               <QMono>RANK</QMono>: ties share, then it <b>skips</b> (<Num>{rankTie}</Num>, then <Num>{rankNext}</Num>)
             </span>
           </Note>
           <Note at={elevenAt - 4} x={X0} y={notesY + h(92)} out={out1}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               <QMono>DENSE_RANK</QMono>: ties share, <b>no gap</b> (<Num>{denseTie}</Num>, then <Num>{denseNext}</Num>)
             </span>
           </Note>
@@ -232,7 +232,7 @@ export const RankScene: React.FC = () => {
             ]}
           />
           <Note at={countAt} x={SUB_X} y={y(TOP) + subH + h(24)} out={notRankAt}>
-            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
               <Num>{LATEST.events}</Num> events in, <Mark at={tenAt}><Num>{S.rows.length}</Num> rows out: one per user</Mark>
             </span>
           </Note>
@@ -251,17 +251,17 @@ export const RankScene: React.FC = () => {
             marks={ones.map((row, k) => ({ row, col: urnk, at: bothAt + 4 + k * 4, color: MARK_BAD }))}
           />
           <Note at={twiceAt} x={X0} y={tieNotesY} out={tieOut}>
-            <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>
               <QMono>RANK</QMono> keeps both: <Num>{LATEST.rankKept}</Num> rows, user 3 twice
             </span>
           </Note>
           <Note at={exactlyAt} x={X0} y={tieNotesY + h(44)} out={tieOut}>
-            <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(25, OK_INK), whiteSpace: "nowrap" }}>
               <QMono>ROW_NUMBER</QMono> keeps one: <Num>{LATEST.rowNumberKept}</Num> rows
             </span>
           </Note>
           <Note at={tiebreakAt - 4} x={X0} y={tieNotesY + h(88)} out={tieOut}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
               which one is arbitrary, unless <QMono>ORDER BY</QMono> breaks the tie
             </span>
           </Note>
@@ -281,32 +281,32 @@ export const RankScene: React.FC = () => {
             marks={[{ line: lineOf(Q.lines, "QUALIFY"), at: havingAt, color: MARK_OK }]}
           />
           <Note at={havingAt + 4} x={X0} y={qNotesY}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               <Mark at={bridgeAt}>
                 like <QMono>HAVING</QMono>, for a window function
               </Mark>
             </span>
           </Note>
           <Note at={inQueryAt - 2} x={X0} y={qNotesY + h(56)}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>no subquery: the filter sits in the query itself</span>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>no subquery: the filter sits in the query itself</span>
           </Note>
           {/* Where it runs, in the column question 2's subquery leaves:
               Postgres, which ran every other listing here, is one of the
               engines without it. */}
           <Note at={enginesAt - 4} x={Q3_SIDE_X} y={y(TOP) + h(4)}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>runs in</span>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>runs in</span>
           </Note>
           <Note at={enginesAt - 2} x={Q3_SIDE_X} y={y(TOP) + h(42)}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>DuckDB, BigQuery, Snowflake, Databricks</span>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>DuckDB, BigQuery, Snowflake, Databricks</span>
           </Note>
           <Note at={notAt - 4} x={Q3_SIDE_X} y={y(TOP) + h(126)}>
-            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>not in</span>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>not in</span>
           </Note>
           <Note at={notAt - 2} x={Q3_SIDE_X} y={y(TOP) + h(164)}>
-            <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>Postgres or MySQL</span>
+            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>Postgres or MySQL</span>
           </Note>
           <Note at={keepSubAt - 2} x={Q3_SIDE_X} y={y(TOP) + h(234)}>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>there, keep the subquery from question 2</span>
+            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>there, keep the subquery from question 2</span>
           </Note>
         </>
       </Drift>

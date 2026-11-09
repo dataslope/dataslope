@@ -114,7 +114,7 @@ export const SimpsonScene: React.FC = () => {
           ]}
         />
         <Note at={reverseAt - 2} x={X0} y={sg.rowTop(S.rows.length) + h(26)} out={out14}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             A wins inside each group
             <span style={{ opacity: ease(frame, betterAt - 2, 10), color: OK_INK, fontWeight: 500 }}>: the better treatment</span>
           </span>
@@ -134,20 +134,20 @@ export const SimpsonScene: React.FC = () => {
           ]}
         />
         <Note at={losesAt + 6} x={POOLED_X} y={pg.rowTop(Pd.rows.length) + h(26)} out={out14}>
-          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>and loses overall</span>
+          <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>and loses overall</span>
         </Note>
         <Note at={givenAt + 4} x={POOLED_X} y={pg.rowTop(Pd.rows.length) + h(80)} out={out14} width={720}>
-          <span style={{ ...note(24, INK), ...TABULAR }}>
+          <span style={{ ...note(25, INK), ...TABULAR }}>
             {largeA} of A&apos;s {totalA} patients had large stones, the hard cases
           </span>
         </Note>
         <Note at={segmentAt - 2} x={POOLED_X} y={pg.rowTop(Pd.rows.length) + h(160)} out={out14}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>segment before you conclude</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>segment before you conclude</span>
         </Note>
 
         {/* ── Question 15: two ratios that mislead ── */}
         <Note at={bothAt - 4} x={X0} y={y(TOP - 20)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             revenue per session: watch the top and the bottom
             <span style={{ opacity: ease(frame, fellAt - 2, 10) }}>; it rises when sessions fall</span>
           </span>
@@ -164,11 +164,11 @@ export const SimpsonScene: React.FC = () => {
           marks={R.rows.map((_, r) => ({ row: r, col: 1, at: sixtyEightAt - 8 + r * 2, out: perAt }))}
         />
         <Note at={sixtyEightAt - 2} x={resultX} y={rg.rowTop(0)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>average of the five averages</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>average of the five averages</span>
           <div style={{ ...note(44, ACCENT_INK), fontWeight: 500, ...TABULAR }}>{fmt(RATIO.averaged, 0)}</div>
         </Note>
         <Note at={perAt - 2} x={resultX} y={rg.rowTop(2) + h(10)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>per customer, weighted by customers</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>per customer, weighted by customers</span>
           <div style={{ ...note(44, OK_INK), fontWeight: 500, ...TABULAR }}>{fmt(RATIO.weighted, 1)}</div>
         </Note>
         <Note at={fortyAt + 4} x={resultX} y={rg.rowTop(4) + h(20)}>

@@ -178,7 +178,7 @@ export const SplitScene: React.FC = () => {
           <Ink at={barAt - 2 + i * 6} dur={12} style={{ left: x, top: base + 16, whiteSpace: "nowrap" }}>
             {/* The plan's name, and its users on a line of their own. */}
             <div style={{ ...headline(40), color: INK }}>{i === 0 ? "Paid" : "Free"}</div>
-            <div style={{ ...note(24, INK_SOFT), marginTop: 2 }}>{num(TABLE.rowTotals[i])} users</div>
+            <div style={{ ...note(21, INK_SOFT), marginTop: 2 }}>{num(TABLE.rowTotals[i])} users</div>
           </Ink>
           {/* The split's label rides above the split, outside its bar. */}
           <div
@@ -203,7 +203,7 @@ export const SplitScene: React.FC = () => {
           left: BARS.x[1] + 16,
           top: top + 12,
           opacity: ease(frame, splitAt + 8, 10),
-          ...note(24, "var(--ds-white)"),
+          ...note(21, "var(--ds-white)"),
           fontWeight: 500,
           whiteSpace: "nowrap",
         }}
@@ -211,7 +211,7 @@ export const SplitScene: React.FC = () => {
         churned
       </div>
       <Note at={fifteenAt} x={(BARS.x[0] + BARS.w + BARS.x[1]) / 2} y={top + H * TABLE.pAll + 10} from="up">
-        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", textAlign: "center" }}>
+        <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", textAlign: "center" }}>
           everyone
           <br />
           {pct(TABLE.pAll)}
@@ -227,7 +227,7 @@ export const SplitScene: React.FC = () => {
       <Pulse x={BARS.x[1] + BARS.w + 48} y={splitY(1) - 22} at={twentyFourAt - 2} r={34} />
       <VBracket x={STEP_X} y0={splitY(0)} y1={splitY(1)} at={gapAt - 4} color={INK} right />
       <Note at={gapAt} x={STEP_X + 24} y={(splitY(0) + splitY(1)) / 2 - 15}>
-        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           {Math.round((TABLE.pFree - TABLE.pPaid) * 100)} points
         </span>
       </Note>
@@ -236,7 +236,7 @@ export const SplitScene: React.FC = () => {
       {/* ── Independence, in symbols ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - multiDim * 0.7 }}>
       <Ink at={indepAt - 4} dur={14} style={{ left: RIGHT, top: y(344), whiteSpace: "nowrap" }}>
-        <span style={label(24, INK_SOFT)}>Independent means</span>
+        <span style={label(23, INK_SOFT)}>Independent means</span>
       </Ink>
       <Ink at={givenAt - 4} dur={16} style={{ left: RIGHT, top: y(386), whiteSpace: "nowrap" }}>
         <Sweep at={indepWordAt - 2} dur={16} out={testInFrom - 6}>
@@ -247,16 +247,16 @@ export const SplitScene: React.FC = () => {
         </Sweep>
       </Ink>
       <Note at={actAt} x={RIGHT} y={y(450)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Here it isn&apos;t: the gap is information.</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Here it isn&apos;t: the gap is information.</span>
       </Note>
       </div>
 
       {/* ── The licence to multiply: ten independent flips, each a half ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - multBack * 0.6 }}>
       <Ink at={tenAt - 2} dur={12} style={{ left: RIGHT, top: y(518), whiteSpace: "nowrap" }}>
-        <span style={label(24, INK_SOFT)}>Ten heads in a row</span>
+        <span style={label(23, INK_SOFT)}>Ten heads in a row</span>
       </Ink>
-      <div style={{ position: "absolute", left: RIGHT, top: y(556), display: "flex", alignItems: "flex-end", gap: 2, ...note(28, INK), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: RIGHT, top: y(556), display: "flex", alignItems: "flex-end", gap: 2, ...note(30, INK), whiteSpace: "nowrap" }}>
         {Array.from({ length: 10 }, (_, i) => {
           const at = lerp(halfAt - 2, timesAt + 6, i / 9);
           const p = ease(frame, at, 8);
@@ -276,7 +276,7 @@ export const SplitScene: React.FC = () => {
       <Ink at={oneInAt - 4} dur={16} style={{ left: RIGHT, top: y(668), whiteSpace: "nowrap" }}>
         {/* 0.5 to the tenth is 0.000977, so "about". One line, one size:
             the answer is the line's own Inter, in the accent and bold. */}
-        <span style={{ ...note(28, INK) }}>
+        <span style={{ ...note(30, INK) }}>
           ≈ {STREAK.ten.toFixed(4).replace(/0+$/, "")}, about{" "}
           <span style={{ color: STAT_INK, fontWeight: 500 }}>
             <Sweep at={oneInAt}>1 in 1,000</Sweep>
@@ -299,7 +299,7 @@ export const SplitScene: React.FC = () => {
           rowGap: 14,
           alignItems: "baseline",
           whiteSpace: "nowrap",
-          ...note(28, INK),
+          ...note(26, INK),
         }}
       >
         {(

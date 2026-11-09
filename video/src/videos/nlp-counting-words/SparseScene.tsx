@@ -143,7 +143,7 @@ export const SparseScene: React.FC = () => {
           })}
         </Svg>
         <Note at={elseAt} x={X0 - 40} y={base - tall - 34}>
-          <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>every one appears again</div>
+          <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>every one appears again</div>
         </Note>
         {EMMA.sparsity.map((s, i) => (
           <React.Fragment key={s.n}>
@@ -151,18 +151,18 @@ export const SparseScene: React.FC = () => {
               <div style={{ ...numStyle(28, inside(i) ? PAPER : INK), textAlign: "center" }}>{pct(s.recur)}</div>
             </Note>
             <Ink at={ngramAt - 2 + i * 3} dur={12} style={{ left: barX(i) - 30, width: BAR_W + 60, top: base + 12, textAlign: "center" }}>
-              <div style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+              <div style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                 {i === 1 ? <Marked at={biSaid - 2}>{NAMES[i]}</Marked> : i === 2 ? <Marked at={triSaid - 2}>{NAMES[i]}</Marked> : NAMES[i]}
               </div>
             </Ink>
           </React.Fragment>
         ))}
         <Note at={orderAt + 6} x={barX(4) + BAR_W + 20} y={base + 44}>
-          <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>a square for each word of order</div>
+          <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>a square for each word of order</div>
         </Note>
         <Bracket x0={barX(1) - 6} x1={barX(2) + BAR_W + 6} y={base + 84} at={sweetAt - 4} color={INK} up />
         <Note at={sweetAt} x={barX(1) - 6} y={base + 94} width={barX(2) + BAR_W + 12 - barX(1)}>
-          <div style={{ ...body(28, true), color: INK, whiteSpace: "nowrap", textAlign: "center" }}>
+          <div style={{ ...body(30, true), color: INK, whiteSpace: "nowrap", textAlign: "center" }}>
             <Marked at={sweetAt + 2}>the sweet spot</Marked>
           </div>
         </Note>
@@ -170,12 +170,12 @@ export const SparseScene: React.FC = () => {
         {/* What a one-off is worth; set back as the bridge begins. */}
         <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.5 * ease(frame, butAt - 2, 14) }}>
           <Note at={oneAt - 2} x={NOTE_X} y={y(300)} from="right">
-            <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>Seen only once,</div>
-            <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>it tells you almost nothing:</div>
+            <div style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>Seen only once,</div>
+            <div style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>it tells you almost nothing:</div>
           </Note>
           <Note at={sightingAt - 2} x={NOTE_X} y={y(300) + 92} from="right">
-            <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>one sighting can&apos;t tell a pattern</div>
-            <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 2 }}>from an accident</div>
+            <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>one sighting can&apos;t tell a pattern</div>
+            <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 2 }}>from an accident</div>
           </Note>
           <Note at={sparsityAt - 2} x={NOTE_X} y={y(300) + 160} from="right">
             <div style={{ ...body(34, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>That&apos;s sparsity.</div>
@@ -184,15 +184,15 @@ export const SparseScene: React.FC = () => {
             <div style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               bigrams<span style={{ opacity: ease(frame, plentyAt - 2, 10) }}>, and trigrams with plenty of text:</span>
             </div>
-            <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, orderAt - 2, 10) }}>enough order to help,</div>
-            <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, commonAt - 2, 10) }}>
+            <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, orderAt - 2, 10) }}>enough order to help,</div>
+            <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, commonAt - 2, 10) }}>
               still common enough to count
             </div>
           </Note>
         </div>
         <Note at={numbersAt - 2} x={NOTE_X} y={y(300) + 370} from="right">
-          <div style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>A model wants numbers,</div>
-          <div style={{ ...body(28, true), color: INK, whiteSpace: "nowrap", opacity: ease(frame, listsAt - 2, 12) }}>not lists of words.</div>
+          <div style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>A model wants numbers,</div>
+          <div style={{ ...body(30, true), color: INK, whiteSpace: "nowrap", opacity: ease(frame, listsAt - 2, 12) }}>not lists of words.</div>
         </Note>
       </div>
 

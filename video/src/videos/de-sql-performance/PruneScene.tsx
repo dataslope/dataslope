@@ -80,7 +80,7 @@ export const PruneScene: React.FC = () => {
 
         {/* ── The twelve partitions ── */}
         <Note at={splitAt} x={X0} y={y(BOX_TOP) - h(40)}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
             orders, <SmallMono>PARTITION BY RANGE (order_date)</SmallMono>: one table per month, rows in each
           </span>
         </Note>
@@ -117,8 +117,8 @@ export const PruneScene: React.FC = () => {
                 transform: `translateY(${(1 - shown) * 10}px)`,
               }}
             >
-              <span style={{ ...label(24, INK) }}>{MONTHS[i]}</span>
-              <span style={{ ...note(24, BLUE_INK), ...TABULAR }}>{thousands(p.orders)}</span>
+              <span style={{ ...label(21, INK) }}>{MONTHS[i]}</span>
+              <span style={{ ...note(20, BLUE_INK), ...TABULAR }}>{thousands(p.orders)}</span>
             </div>
           );
         })}
@@ -142,7 +142,7 @@ export const PruneScene: React.FC = () => {
           <div style={{ ...note(28, OK_INK), whiteSpace: "nowrap" }}>
             <b>1</b> of 12 partitions read
           </div>
-          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8) }}>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8) }}>
             SUM = <Num>{thousands(Number(PRUNE.marchSum))}</Num>
           </div>
         </Note>
@@ -172,7 +172,7 @@ export const PruneScene: React.FC = () => {
           ]}
         />
         <Note at={allAt} x={X0 + 30} y={fnPlanTop + planHeight(FN_SHOWN, PLAN) + h(14)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             … then the same Seq Scan on the other ten: <b>{PRUNE.fnScans}</b> in all
           </span>
         </Note>
@@ -180,12 +180,12 @@ export const PruneScene: React.FC = () => {
           <div style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, allAt, 10) }}>
             <b>{PRUNE.fnScans}</b> of 12 partitions read, in Postgres
           </div>
-          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8) }}>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8) }}>
             SUM = <Num>{thousands(Number(PRUNE.fnSum))}</Num>, the same
           </div>
         </Note>
         <Note at={enginesAt} x={R_X} y={y(LIST_TOP) + h(104)}>
-          <div style={{ ...note(24, INK_SOFT), width: 600 }}>Some engines still prune through a function.</div>
+          <div style={{ ...note(22, INK_SOFT), width: 600 }}>Some engines still prune through a function.</div>
         </Note>
         <Note at={keyAt} x={R_X} y={y(LIST_TOP) + h(164)}>
           <div style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>Filter on the partition key itself, as a range:</div>

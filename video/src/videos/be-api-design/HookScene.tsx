@@ -99,10 +99,10 @@ export const HookScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={asksAt} x={GAPS[0].from + 26} y={top + BOX_H + h(16)}>
-          <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>asks →</span>
+          <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>asks →</span>
         </Note>
         <Note at={answersAt} x={GAPS[0].from + 26} y={top + BOX_H + h(52)}>
-          <span style={{ ...label(24, BLUE_INK), whiteSpace: "nowrap" }}>← answers</span>
+          <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>← answers</span>
         </Note>
         {/* Both sides agree on how: a bracket under the whole row. */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, agreeAt, 12) }}>
@@ -114,12 +114,12 @@ export const HookScene: React.FC = () => {
           />
         </svg>
         <Note at={agreeAt + 4} x={GAPS[1].from + 40} y={top + BOX_H + h(52)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>both sides agree on how</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>both sides agree on how</span>
         </Note>
 
         {/* What the interview tests the design for. */}
         <Note at={predAt - 4} x={X0} y={y(510)}>
-          <span style={{ ...note(34, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(36, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={predAt}>Predictable,</Mark> <Mark at={consAt}>consistent,</Mark> <Mark at={misuseAt}>hard to misuse.</Mark>
           </span>
         </Note>
@@ -128,21 +128,21 @@ export const HookScene: React.FC = () => {
 
         {/* The page's example: a blog's two resources. */}
         <Note at={blogAt} x={X0} y={blogTop}>
-          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>The example: a blog</span>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>The example: a blog</span>
         </Note>
         {[
           { name: "articles", sub: "the blog's posts", at: articlesAt, x: X0 },
           { name: "comments", sub: "on each article", at: commentsAt, x: X0 + 330 },
         ].map((r) => (
           <Note key={r.name} at={r.at} x={r.x} y={blogTop + h(50)}>
-            <div style={{ ...label(34, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.name}</div>
-            <div style={{ ...note(24, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>{r.sub}</div>
+            <div style={{ ...label(32, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.name}</div>
+            <div style={{ ...note(22, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>{r.sub}</div>
           </Note>
         ))}
         <Flow points={[[X0 + 190, blogTop + h(50) + 22], [X0 + 300, blogTop + h(50) + 22]]} at={commentsAt - 2} color={BAR} />
 
         {/* The round: sixteen questions, ten big and six small. */}
-        <div style={{ position: "absolute", left: X0, top: planTop, display: "flex", alignItems: "center", gap: 10, fontSize: 24 }}>
+        <div style={{ position: "absolute", left: X0, top: planTop, display: "flex", alignItems: "center", gap: 10, fontSize: 21 }}>
           {Array.from({ length: 16 }, (_, i) => {
             const big = i < 10;
             const at = big ? tenAt + i * 2 : sixAt + (i - 10) * 2;

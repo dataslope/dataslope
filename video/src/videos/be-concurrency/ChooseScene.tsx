@@ -79,7 +79,7 @@ export const ChooseScene: React.FC = () => {
 
         {/* The deciding question. */}
         <Note at={decidingAt} x={ROOT.cx - ROOT.w / 2} y={rootTop + rootH / 2 - 20} width={ROOT.w} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Band at={decidingAt + 6}>Waiting on I/O, or burning CPU?</Band>
           </span>
         </Note>
@@ -120,7 +120,7 @@ export const ChooseScene: React.FC = () => {
                 head={13}
               />
               <Note at={whenAt[i] + 6} x={l.x} y={leafY + h(6)} width={LEAF_W} from="up" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                <span style={{ ...label(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: named }}>
+                <span style={{ ...label(30, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: named }}>
                   {i === 1 ? (
                     <>
                       threads, <Band at={capAt}>in a pool</Band>
@@ -129,8 +129,8 @@ export const ChooseScene: React.FC = () => {
                     l.title
                   )}
                 </span>
-                <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{l.when}</span>
-                <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, whyAt[i], 10) }}>{l.why}</span>
+                <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>{l.when}</span>
+                <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, whyAt[i], 10) }}>{l.why}</span>
               </Note>
             </React.Fragment>
           );
@@ -138,17 +138,17 @@ export const ChooseScene: React.FC = () => {
 
         {/* What real services run. */}
         <Note at={mixAt} x={X0} y={mixY + h(14)}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Real services mix them:</span>
+          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Real services mix them:</span>
         </Note>
         <Note at={serverAt} x={480} y={mixY + h(32) - 16} width={300} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>async server</span>
+          <span style={{ ...label(25, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>async server</span>
         </Note>
         <Flow points={[[792, mixY + h(32)], [1092, mixY + h(32)]]} at={heavyAt} color={BAR} width={2.8} />
         <Note at={heavyAt + 4} x={820} y={mixY - h(30)}>
-          <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>heavy computation</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>heavy computation</span>
         </Note>
         <Note at={poolAt} x={1104} y={mixY + h(32) - 16} width={300} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>process pool</span>
+          <span style={{ ...label(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>process pool</span>
         </Note>
       </Drift>
     </AbsoluteFill>

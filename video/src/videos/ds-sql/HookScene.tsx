@@ -101,7 +101,7 @@ export const HookScene: React.FC = () => {
 
         {/* ── Fifteen questions: six on real queries, nine quickly ── */}
         <div
-          style={{ position: "absolute", left: X0, top: y(CHIPS_Y) - h(46), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, fifteenAt - 2, 12) }}
+          style={{ position: "absolute", left: X0, top: y(CHIPS_Y) - h(46), ...label(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, fifteenAt - 2, 12) }}
         >
           15 questions
         </div>
@@ -129,7 +129,7 @@ export const HookScene: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...label(24, worked && tone > 0.5 && first === 0 ? PAPER : INK),
+                ...label(21, worked && tone > 0.5 && first === 0 ? PAPER : INK),
                 fontWeight: 500,
                 ...TABULAR,
                 opacity: p * (1 - fade),
@@ -145,7 +145,7 @@ export const HookScene: React.FC = () => {
             position: "absolute",
             left: chipX(0),
             top: y(CHIPS_Y) + h(66),
-            ...note(28, INK),
+            ...note(26, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, sixAt - 2, 12) * (1 - ease(frame, firstAt + 4, 14) * 0.5),
           }}
@@ -157,7 +157,7 @@ export const HookScene: React.FC = () => {
             position: "absolute",
             left: chipX(WORKED),
             top: y(CHIPS_Y) + h(66),
-            ...note(28, INK_SOFT),
+            ...note(26, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, nineAt - 2, 12) * (1 - ease(frame, firstAt + 4, 14) * 0.5),
           }}

@@ -87,7 +87,7 @@ export const ChunkScene: React.FC = () => {
   const cx = (i: number) => X0 + i * COL;
   const N = ROWS.length;
   const labelY = docY + docHeight(N) + CAPTION_GAP;
-  const OVERLAP = `color-mix(in srgb, ${ds("yellow", 400)} 70%, transparent)`;
+  const OVERLAP = `color-mix(in srgb, ${ds("yellow", 300)} 55%, transparent)`;
   /** A band across a page's rows: the face they are set in, and a little more. */
   const band = (i: number, color: string) => {
     const f = docFace(cx(i), DOC_W);
@@ -96,7 +96,7 @@ export const ChunkScene: React.FC = () => {
 
   const Caption: React.FC<{ i: number; at: number; dim?: number; children: React.ReactNode }> = ({ i, at, dim, children }) => (
     <Note at={at} x={cx(i)} y={labelY} width={COL - 24} dim={dim}>
-      <div style={{ ...note(24, INK), lineHeight: 1.35 }}>{children}</div>
+      <div style={{ ...note(22, INK), lineHeight: 1.35 }}>{children}</div>
     </Note>
   );
 
@@ -116,7 +116,7 @@ export const ChunkScene: React.FC = () => {
           How do you choose a chunking strategy?
         </QuestionCard>
         <Note at={tradeAt} x={X0} y={y(240)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <Mark at={tradeAt + 4}>precision against context</Mark>
           </span>
         </Note>
@@ -175,15 +175,16 @@ export const ChunkScene: React.FC = () => {
         ))}
         <Caption i={2} at={sizeAt - 2}>
           {CHUNK.low} to {CHUNK.high} tokens
-          <br />
-          <span style={{ color: INK_SOFT }}>(400 ≈ {num(Math.round(CHUNK.chars400 / 100) * 100)} characters)</span>
-          <br />
           <span style={{ opacity: ease(frame, overlapAt - 2, 10) }}>
-            {pct(CHUNK.overlapLow)} to {pct(CHUNK.overlapHigh)} shared
+            , {pct(CHUNK.overlapLow)} to {pct(CHUNK.overlapHigh)} shared
+          </span>
+          <br />
+          <span style={{ color: INK_SOFT, fontSize: 20 }}>
+            400 tokens ≈ {num(Math.round(CHUNK.chars400 / 100) * 100)} characters of prose
           </span>
           <br />
           <span style={{ opacity: ease(frame, wholeAt - 2, 10) }}>
-            <Mark at={wholeAt + 4}>cut sentences stay whole</Mark>
+            <Mark at={wholeAt + 4}>a cut sentence stays whole</Mark>
           </span>
         </Caption>
 
@@ -227,8 +228,8 @@ export const ChunkScene: React.FC = () => {
         </Caption>
 
         {/* No universal best. */}
-        <Note at={bestAt} x={X0} y={y(845)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+        <Note at={bestAt} x={X0} y={y(820)}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             no universal best:{" "}
             <span style={{ opacity: ease(frame, recallAt - 2, 10), color: OK_INK, fontWeight: 500 }}>
               <Mark at={recallAt + 6} color={MARK_OK}>
@@ -237,11 +238,11 @@ export const ChunkScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={recallAt + 14} x={X0 + 900} y={y(845) + 5}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>recall: the share of the right passages it finds</span>
+        <Note at={recallAt + 14} x={X0 + 880} y={y(820) + 5}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>recall: the share of the right passages it finds</span>
         </Note>
-        <Note at={storeAt - 2} x={X0} y={y(845) + 50}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+        <Note at={storeAt - 2} x={X0} y={y(820) + 46}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             and store the chunk settings with the index version
             <span style={{ opacity: ease(frame, rebuildAt - 2, 10), color: INK_SOFT }}>: a change means a rebuild</span>
           </span>

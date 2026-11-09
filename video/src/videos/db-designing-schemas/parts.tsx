@@ -5,20 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { ENTITY, type EntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  BAR,
-  BLUE_INK,
-  body,
-  HAIRLINE,
-  headline,
-  HIGHLIGHT,
-  INK,
-  INK_SOFT,
-  label,
-  PAPER,
-} from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
 import { badgeStyle, Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
@@ -60,7 +47,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-      <span style={label(26, INK_SOFT)}>{children}</span>
+      <span style={label(26, ACCENT_INK)}>{children}</span>
     </Ink>
   );
 };
@@ -383,7 +370,7 @@ export const GhostRow: React.FC<{ e: EntityLayout; index: number; name: string; 
         opacity: p * (1 - o),
         transform: `translateX(${(1 - p) * -12}px)`,
         fontFamily: MONO,
-        fontSize: 24,
+        fontSize: 21,
         color: ACCENT_INK,
       }}
     >
@@ -402,7 +389,7 @@ export const RowWash: React.FC<{ e: EntityLayout; rows: readonly number[]; at: n
   rows,
   at,
   out,
-  color = `color-mix(in srgb, ${ds("yellow", 400)} 70%, ${PAPER})`,
+  color = `color-mix(in srgb, ${ds("yellow", 300)} 55%, ${PAPER})`,
 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
@@ -528,7 +515,7 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
                 fontFamily: SANS,
                 fontWeight: 500,
                 // 20px, within 12% of the 22px step beside it.
-                fontSize: 24,
+                fontSize: 20,
                 color: fill > 0.5 ? PAPER : INK,
                 transform: `scale(${1 + sw * 0.25})`,
                 opacity: lerp(1, lerp(0.55, 1, Math.max(lit, done)), rail),
@@ -538,7 +525,7 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
             </div>
             <span
               style={{
-                ...label(24, INK),
+                ...label(22, INK),
                 fontWeight: lit * rail > 0.5 ? 500 : 500,
                 opacity: labelOp,
                 position: "relative",
@@ -567,7 +554,7 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
 
 // ── A database table, drawn as rows and cells (after WhyNormalization's kit) ─
 
-export const HEAD_SIZE = 24;
+export const HEAD_SIZE = 22;
 export const BODY_SIZE = 26;
 const PAD = 20;
 /** JetBrains Mono's advance, in em. */
@@ -841,7 +828,7 @@ export const ErrorBox: React.FC<{
         background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
         padding: "14px 22px 16px",
         fontFamily: MONO,
-        fontSize: 24,
+        fontSize: 21,
         lineHeight: 1.45,
         whiteSpace: "pre-wrap",
         color: INK,

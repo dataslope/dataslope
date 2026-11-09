@@ -137,7 +137,7 @@ export const AxisScene: React.FC = () => {
         </Verdict>
         {/* The rule is for both panels, so it sits under both. */}
         <Note at={labelAt - 2} x={LEFT.x0} y={base + h(104)} width={RIGHT.x1 - LEFT.x0} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <Mark at={bridgeAt + 2}>either way, label the axis</Mark>
           </span>
         </Note>

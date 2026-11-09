@@ -194,14 +194,14 @@ export const BalancerScene: React.FC = () => {
         ].map(([name, at, sub], i) => (
           <React.Fragment key={i}>
             <Ink at={(at as number) - 2} dur={14} out={phaseOut} style={{ left: PANEL_X[i], top: panelTop, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(24, INK), fontWeight: 500 }}>
+              <span style={{ ...label(23, INK), fontWeight: 500 }}>
                 <Mark at={at as number} out={i < 2 ? ([lcAt, chAt][i] as number) : phaseOut - 10}>
                   {name as string}
                 </Mark>
               </span>
             </Ink>
             <Ink at={(at as number) + 4} dur={14} out={phaseOut} style={{ left: PANEL_X[i], top: panelTop + 40, whiteSpace: "nowrap" }}>
-              <span style={note(24, INK_SOFT)}>{sub as string}</span>
+              <span style={note(20, INK_SOFT)}>{sub as string}</span>
             </Ink>
           </React.Fragment>
         ))}
@@ -237,7 +237,7 @@ export const BalancerScene: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...label(24, BLUE_INK),
+                ...label(20, BLUE_INK),
                 fontWeight: 500,
                 opacity: p * (1 - o),
               }}
@@ -254,8 +254,8 @@ export const BalancerScene: React.FC = () => {
           if (p <= 0 || o >= 1) return null;
           const pick = i === lcPick ? lcNew : 0;
           return (
-            <div key={i} style={{ position: "absolute", left: PANEL_X[1], top: lcRow(i), display: "flex", alignItems: "center", gap: 12, opacity: p * (1 - o), fontSize: 24 }}>
-              <span style={{ ...label(24, INK_SOFT), width: 18, textAlign: "right" }}>
+            <div key={i} style={{ position: "absolute", left: PANEL_X[1], top: lcRow(i), display: "flex", alignItems: "center", gap: 12, opacity: p * (1 - o), fontSize: 20 }}>
+              <span style={{ ...label(20, INK_SOFT), width: 18, textAlign: "right" }}>
                 <Num>{i + 1}</Num>
               </span>
               <div style={{ display: "flex", gap: 4 }}>
@@ -280,7 +280,7 @@ export const BalancerScene: React.FC = () => {
         {[chAt + 6, everyAt].map((at, r) => (
           <React.Fragment key={r}>
             <Ink at={at} dur={12} out={phaseOut} style={{ left: PANEL_X[2], top: y(476) + r * h(84), whiteSpace: "nowrap" }}>
-              <span style={{ ...note(24, INK), display: "inline-flex", alignItems: "center", gap: 14 }}>
+              <span style={{ ...note(22, INK), display: "inline-flex", alignItems: "center", gap: 14 }}>
                 <span style={{ fontFamily: MONO, color: BLUE_INK, fontWeight: 500 }}>
                   {key.key}
                 </span>
@@ -343,7 +343,7 @@ export const BalancerScene: React.FC = () => {
           })}
         </Svg>
         <Ink at={ringAt + 6} dur={14} style={{ left: RING.cx - 110, top: ringCy - 34, width: 220, textAlign: "center" }}>
-          <span style={{ ...note(24, INK_SOFT) }}>
+          <span style={{ ...note(20, INK_SOFT) }}>
             a key goes to the next
             <br />
             point clockwise
@@ -354,7 +354,7 @@ export const BalancerScene: React.FC = () => {
           const at = s < 3 ? simAt + 8 + s * 3 : fourthAt;
           return (
             <Ink key={s} at={at} dur={12} style={{ left: 1580, top: y(GRID_TOP) + 40 + s * 40, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(24, s === 3 ? INK : INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, fontWeight: s === 3 ? 500 : 500 }}>
+              <span style={{ ...note(21, s === 3 ? INK : INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, fontWeight: s === 3 ? 500 : 500 }}>
                 <span style={{ width: 20, height: 20, borderRadius: 4, background: SERVER[s] }} />
                 server {s + 1}
                 {s === 3 ? ", added" : ""}

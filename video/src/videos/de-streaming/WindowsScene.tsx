@@ -92,7 +92,7 @@ export const WindowsScene: React.FC = () => {
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           <line x1={ex(0) - 10} x2={ex(0) - 10 + (ex(SPAN) - ex(0) + 20) * ease(frame, figAt, 16)} y1={axisY} y2={axisY} stroke={INK} strokeWidth={2} />
           {[0, 5, 10, 15, 20, 25, 30].map((t) => (
-            <text key={t} x={ex(t)} y={axisY + 32} textAnchor="middle" style={svgText({ fontFamily: SANS, fontSize: 24, fontWeight: 500, color: INK_SOFT, fontVariantNumeric: "tabular-nums" })} opacity={ease(frame, figAt + 6, 10)}>
+            <text key={t} x={ex(t)} y={axisY + 32} textAnchor="middle" style={svgText({ fontFamily: SANS, fontSize: 20, fontWeight: 500, color: INK_SOFT, fontVariantNumeric: "tabular-nums" })} opacity={ease(frame, figAt + 6, 10)}>
               {t} s
             </text>
           ))}
@@ -112,10 +112,10 @@ export const WindowsScene: React.FC = () => {
           ))}
         </svg>
         <Note at={figAt + 6} x={X0} y={axisY - h(16)}>
-          <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>event time</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>event time</span>
         </Note>
         <Note at={endlessAt + 6} x={ex(37.5)} y={axisY - h(16)}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>… and on</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>… and on</span>
         </Note>
         <Note at={bucketsAt} x={ex(0)} y={axisY - h(64)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -125,8 +125,8 @@ export const WindowsScene: React.FC = () => {
 
         {/* Tumbling. */}
         <Note at={tumbleAt} x={X0} y={y(TUMBLE_Y) + h(8)}>
-          <div style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>tumbling</div>
-          <div style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, overlapAt, 10) }}>fixed, no overlap</div>
+          <div style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>tumbling</div>
+          <div style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, overlapAt, 10) }}>fixed, no overlap</div>
         </Note>
         {[0, 1, 2].map((w) => {
           const p = ease(frame, tenAt + w * 4, 12);
@@ -148,7 +148,7 @@ export const WindowsScene: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...note(24, BLUE_INK),
+                ...note(25, BLUE_INK),
                 fontWeight: 500,
                 overflow: "hidden",
                 whiteSpace: "nowrap",
@@ -161,13 +161,13 @@ export const WindowsScene: React.FC = () => {
           );
         })}
         <Note at={oneAt} x={NOTE_X} y={y(TUMBLE_Y) + h(10)}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>each click in one</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>each click in one</span>
         </Note>
 
         {/* Hopping (Flink's sliding): ten seconds long, a new one every five. */}
         <Note at={slideAt} x={X0} y={y(SLIDE_Y) + h(8)}>
-          <div style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>hopping</div>
-          <div style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, hopAt, 10) }}>"sliding" in Flink</div>
+          <div style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>hopping</div>
+          <div style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, hopAt, 10) }}>"sliding" in Flink</div>
         </Note>
         {sliding.map((w, k) => {
           const row = k % 2;
@@ -191,7 +191,7 @@ export const WindowsScene: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...note(24, BLUE_INK),
+                ...note(23, BLUE_INK),
                 fontWeight: 500,
                 overflow: "hidden",
                 whiteSpace: "nowrap",
@@ -203,7 +203,7 @@ export const WindowsScene: React.FC = () => {
           );
         })}
         <Note at={twoAt} x={NOTE_X} y={y(SLIDE_Y) + h(20)}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             each click in two:
             <br />
             ava's at <span style={TABULAR}>{PICK_T}</span> s, in both
@@ -214,8 +214,8 @@ export const WindowsScene: React.FC = () => {
 
         {/* Sessions: a lane per user, closed by a gap of five seconds. */}
         <Note at={sessionAt} x={X0} y={y(SESSION_Y) - h(46)}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>session</span>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, gapAt, 10) }}>
+          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>session</span>
+          <span style={{ ...label(23, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, gapAt, 10) }}>
             {" "}
             · no fixed size; closed by a gap of inactivity
           </span>
@@ -255,11 +255,11 @@ export const WindowsScene: React.FC = () => {
         </svg>
         {USERS.map((u, r) => (
           <Note key={u} at={sessionAt + r * 3} x={X0 + 170} y={y(SESSION_Y) + h(20) + r * h(48) - h(15)}>
-            <span style={{ ...label(24, USER_INK[u]), fontWeight: 500, whiteSpace: "nowrap" }}>{u}</span>
+            <span style={{ ...label(21, USER_INK[u]), fontWeight: 500, whiteSpace: "nowrap" }}>{u}</span>
           </Note>
         ))}
         <Note at={fiveGapAt + 6} x={NOTE_X} y={y(SESSION_Y) + h(6)}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Dash color={INK_SOFT} />
             five quiet seconds
             <br />
@@ -267,7 +267,7 @@ export const WindowsScene: React.FC = () => {
           </span>
         </Note>
         <Note at={twoSessAt} x={NOTE_X} y={y(SESSION_Y) + h(100)}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             ava: <span style={TABULAR}>5</span> clicks,{" "}
             <span style={{ background: HIGHLIGHT, borderRadius: 4, padding: "0 4px" }}>
               <span style={TABULAR}>{WINDOWS.sessions.ava.length}</span> sessions
@@ -275,7 +275,7 @@ export const WindowsScene: React.FC = () => {
           </span>
         </Note>
         <Note at={sessionizeAt} x={NOTE_X} y={y(SESSION_Y) + h(150)}>
-          <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>how to sessionize users</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>how to sessionize users</span>
         </Note>
       </Drift>
     </AbsoluteFill>

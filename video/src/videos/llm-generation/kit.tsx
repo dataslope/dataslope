@@ -4,7 +4,7 @@ import { arrowHead } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { type BadgeTone, badgeStyle, Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -274,5 +274,5 @@ export const Tag: React.FC<{ tone: BadgeTone; children: React.ReactNode; size?: 
 /** Soft ink for the notes that say a figure's numbers are the lesson's
  *  illustration rather than a measurement. */
 export const Illustrative: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={note(24, INK_SOFT)}>{children}</span>
+  <span style={note(20, INK_SOFT)}>{children}</span>
 );

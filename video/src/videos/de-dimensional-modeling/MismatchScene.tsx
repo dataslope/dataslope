@@ -98,7 +98,7 @@ export const MismatchScene: React.FC = () => {
           What does grain mismatch mean, and how do you fix it?
         </QuestionCard>
         <Note at={sameAt} x={X0} y={y(258)}>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Two fact tables at two grains</span>
+          <span style={{ ...label(23, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Two fact tables at two grains</span>
         </Note>
 
         {/* ── The two facts ── */}
@@ -161,7 +161,7 @@ export const MismatchScene: React.FC = () => {
           );
         })}
         <Note at={repeatsAt + 10} x={ng.right + 36} y={ng.rowTop(1) + 8} out={naiveOut}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             one budget,
             <br />
             three rows
@@ -204,7 +204,7 @@ export const MismatchScene: React.FC = () => {
           marks={FIXED.rows.map((_, i) => ({ row: i, col: fBudget, at: againAt + i * 4, color: MARK_OK }))}
         />
         <Note at={thenAt + 4} x={RES_X} y={fg.rowTop(FIXED.rows.length) + h(22)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mono>WITH daily_sales AS (… GROUP BY sale_date, region)</Mono>
           </span>
         </Note>

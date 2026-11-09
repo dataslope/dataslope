@@ -197,7 +197,7 @@ export const CohScene: React.FC = () => {
                 transform: `translateX(${(1 - p) * -10}px)`,
               }}
             >
-              <span style={{ ...note(24, split > 0.5 ? OK_INK : INK), fontWeight: 500, whiteSpace: "nowrap" }}>{j.job}</span>
+              <span style={{ ...note(23, split > 0.5 ? OK_INK : INK), fontWeight: 500, whiteSpace: "nowrap" }}>{j.job}</span>
             </div>
           );
         })}

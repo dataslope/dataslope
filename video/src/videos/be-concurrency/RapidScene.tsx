@@ -22,7 +22,7 @@ type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Lay
 /** A body's first line: the term, then what it means. */
 const Lead: React.FC<{ at: number; c: Ctx; term: string; children: React.ReactNode }> = ({ at, c, term, children }) => (
   <Note at={at} x={R_X} y={c.y(336)}>
-    <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+    <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
       <b style={{ color: BLUE_INK }}>{term}</b>: {children}
     </span>
   </Note>
@@ -50,21 +50,21 @@ const Locks: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={mutexAt} x={R_X} y={c.y(336)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
           <b style={{ color: BLUE_INK }}>Mutex</b>: exactly one holder
         </span>
       </Note>
       <Note at={mutexAt + 4} x={R_X} y={c.y(392)}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 14, fontSize: 24 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 14, fontSize: 21 }}>
           <LockGlyph size={30} color={INK} />
-          <span style={{ ...label(24, THREAD[0].ink), fontWeight: 500 }}>thread 1 holds it</span>
-          <span style={{ ...label(24, INK_SOFT), fontWeight: 500, marginLeft: 18 }}>·</span>
-          <span style={{ ...label(24, THREAD[1].ink), fontWeight: 500, marginLeft: 18 }}>thread 2 waits</span>
+          <span style={{ ...label(22, THREAD[0].ink), fontWeight: 500 }}>thread 1 holds it</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, marginLeft: 18 }}>·</span>
+          <span style={{ ...label(22, THREAD[1].ink), fontWeight: 500, marginLeft: 18 }}>thread 2 waits</span>
         </span>
       </Note>
 
       <Note at={semAt} x={R_X} y={c.y(480)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
           <b style={{ color: BLUE_INK }}>Semaphore</b>: up to some number<span style={{ opacity: ease(frame, fiveAt, 10) }}>, say five downloads at once</span>
         </span>
       </Note>
@@ -76,18 +76,18 @@ const Locks: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <Note at={fiveAt + 10} x={R_X + limit * 84 + 20} y={slotY + slotH / 2 - 15}>
-        <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
           waiting: <Num>{Math.max(0, downloads - Math.min(downloads, (Math.min(wave, waves - 1) + 1) * limit))}</Num>, done: <Num>{Math.min(downloads, Math.min(wave, waves) * limit)}</Num>
         </span>
       </Note>
       <Note at={fiveAt + 24} x={R_X} y={slotY + slotH + c.h(14)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           run on asyncio: never more than <Num>{peak}</Num> of the <Num>{downloads}</Num> in flight
         </span>
       </Note>
 
       <Note at={reAt} x={R_X} y={c.y(668)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
           <b style={{ color: BLUE_INK }}>Reentrant lock</b>: its holder can take it again
         </span>
       </Note>
@@ -98,7 +98,7 @@ const Locks: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Flow points={[[R_X + 300, c.y(758)], [R_X + 340, c.y(758)], [R_X + 340, c.y(720)], [R_X + 296, c.y(720)]]} at={reAt + 16} color={THREAD[0].fill} width={2.6} head={12} />
       <Note at={recAt} x={R_X + 380} y={c.y(734)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>again, from a recursive call: no self-deadlock</span>
+        <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>again, from a recursive call: no self-deadlock</span>
       </Note>
     </>
   );
@@ -123,7 +123,7 @@ const Atomic: React.FC<{ c: Ctx }> = ({ c }) => {
         <Band at={indivAt}>one indivisible step</Band>
       </Lead>
       <Note at={halfAt} x={R_X} y={c.y(392)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>no other thread can see it half done</span>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>no other thread can see it half done</span>
       </Note>
       <Note at={notAt} x={R_X} y={rowY + chipH / 2 - 16}>
         <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>counter += 1</span>
@@ -153,18 +153,18 @@ const Atomic: React.FC<{ c: Ctx }> = ({ c }) => {
               opacity: p,
             }}
           >
-            <span style={{ ...label(24, fuse > 0.5 ? OK_INK : ACCENT_INK), fontWeight: 500 }}>{step}</span>
+            <span style={{ ...label(22, fuse > 0.5 ? OK_INK : ACCENT_INK), fontWeight: 500 }}>{step}</span>
           </div>
         );
       })}
       <Note at={notAt + 14} x={R_X + 250} y={rowY + chipH + c.h(14)} out={casAt + 4}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>three steps, so another thread can land between them</span>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>three steps, so another thread can land between them</span>
       </Note>
       <Note at={casAt + 10} x={R_X + 250} y={rowY + chipH + c.h(14)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>compare-and-swap: one instruction</span>
+        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>compare-and-swap: one instruction</span>
       </Note>
       <Note at={lockAt} x={R_X + 250} y={rowY + chipH + c.h(60)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.4em" }}>
+        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.4em" }}>
           <LockGlyph size={24} color={OK} />
           <span>or a lock held around the whole thing</span>
         </span>
@@ -220,18 +220,18 @@ const Safe: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Node>
       <Note at={queueAt + 4} x={qX} y={dY + c.h(44)}>
-        <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a thread-safe queue</span>
+        <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a thread-safe queue</span>
       </Note>
       <Flow points={[[qX + 232, dY], [ownerX - 14, dY]]} at={queueAt + 10} color={BAR} width={2.6} head={13} />
       <Note at={oneAt + 4} x={ownerX} y={dY - 15} width={226} from="up" style={{ textAlign: "center" }}>
-        <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one owner thread</span>
+        <span style={{ ...label(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one owner thread</span>
       </Note>
       <Flow points={[[ownerX + 240, dY], [stateX - 14, dY]]} at={oneAt + 10} color={OK} width={2.6} head={13} />
       <Note at={oneAt + 10} x={stateX} y={dY - 15} width={120} from="up" style={{ textAlign: "center" }}>
-        <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the state</span>
+        <span style={{ ...label(23, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the state</span>
       </Note>
       <Note at={shareAt} x={R_X} y={c.y(780)}>
-        <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           Share by communicating, <span style={{ color: INK_SOFT }}>not by sharing memory.</span>
         </span>
       </Note>
@@ -295,20 +295,20 @@ const Live: React.FC<{ c: Ctx }> = ({ c }) => {
             opacity: ease(frame, runningAt + 2 + f.t * 4, 10),
           }}
         >
-          <span style={{ ...label(24, PAPER), fontWeight: 500 }}>T{f.t + 1}</span>
+          <span style={{ ...label(20, PAPER), fontWeight: 500 }}>T{f.t + 1}</span>
         </div>
       ))}
       {/* The CPU, looking busy. */}
       <Note at={busyAt} x={1600} y={top - c.h(36)}>
-        <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>CPU</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>CPU</span>
       </Note>
       <div style={{ position: "absolute", left: 1600, top, width: 64, height: bottom - top, borderRadius: 8, border: `2px solid ${HAIRLINE}`, boxSizing: "border-box", opacity: ease(frame, busyAt, 10) }} />
       <div style={{ position: "absolute", left: 1604, top: bottom - 4 - (bottom - top - 8) * busy * (0.9 + 0.1 * Math.sin(frame / 3)), width: 56, height: (bottom - top - 8) * busy * (0.9 + 0.1 * Math.sin(frame / 3)), borderRadius: 5, background: ACCENT, opacity: busy }} />
       <Note at={harderAt} x={R_X} y={c.y(660)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the CPU looks busy, so it&apos;s harder to spot than a deadlock</span>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the CPU looks busy, so it&apos;s harder to spot than a deadlock</span>
       </Note>
       <Note at={backoffAt} x={R_X} y={c.y(708)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>randomized backoff: one waits, the other gets past</span>
+        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>randomized backoff: one waits, the other gets past</span>
       </Note>
     </>
   );
@@ -353,7 +353,7 @@ const Starve: React.FC<{ c: Ctx }> = ({ c }) => {
         opacity,
       }}
     >
-      <span style={{ ...label(24, green > 0.5 ? OK_INK : high ? THREAD[2].ink : INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{text}</span>
+      <span style={{ ...label(21, green > 0.5 ? OK_INK : high ? THREAD[2].ink : INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{text}</span>
     </div>
   );
   return (
@@ -389,15 +389,15 @@ const Starve: React.FC<{ c: Ctx }> = ({ c }) => {
         return <Token key={k} x={lerp(R_X, LOCK_X - 150, p)} y={rowY} text="high" high opacity={(1 - gone) * (1 - fair)} />;
       })}
       <Note at={lowAt} x={R_X} y={rowY + c.h(82)} out={fairAt}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           the low-priority thread, passed over <Num>{passes}</Num> times
         </span>
       </Note>
       <Note at={fairAt + 6} x={R_X} y={c.y(640)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a fair lock serves in arrival order</span>
+        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a fair lock serves in arrival order</span>
       </Note>
       <Note at={notByAt} x={R_X} y={c.y(688)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>and don&apos;t hand shared resources out by priority</span>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>and don&apos;t hand shared resources out by priority</span>
       </Note>
     </>
   );
@@ -427,7 +427,7 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
         a fixed set of reusable workers
       </Lead>
       <Note at={queueAt} x={R_X} y={qY - c.h(40)}>
-        <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a queue of tasks</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a queue of tasks</span>
       </Note>
       {inputs.map((v, k) => {
         const p = ease(frame, queueAt + 2 + k * 2, 10);
@@ -454,7 +454,7 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
               opacity: p * (1 - done),
             }}
           >
-            <span style={{ ...label(24, BLUE_INK), fontWeight: 500 }}>
+            <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>
               <Num>{v}</Num>
             </span>
           </div>
@@ -464,16 +464,16 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
         <Node key={i} x={wX + i * 112} y={qY - c.h(8)} w={104} h={chip + c.h(16)} at={fixedAt + 4 + i * 3} tone="plain" fill="transparent" line={HAIRLINE} stroke={1.5} dashed />
       ))}
       <Note at={fixedAt + 8} x={wX} y={qY + chip + c.h(18)}>
-        <span style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
           <Num>{workers}</Num> workers, reused
           <span style={{ opacity: ease(frame, boundAt, 10) }}>: at most <Num>{workers}</Num> run at once</span>
         </span>
       </Note>
       <Note at={skipAt} x={R_X} y={qY + chip + c.h(18)}>
-        <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no new thread per task</span>
+        <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no new thread per task</span>
       </Note>
       <Note at={mapAt} x={R_X} y={c.y(582)}>
-        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>pool.map(square, range(6))</span>
+        <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>pool.map(square, range(6))</span>
       </Note>
       <div style={{ position: "absolute", left: R_X, top: resY, fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, whiteSpace: "pre", opacity: ease(frame, mapAt + 6, 10) }}>
         [
@@ -486,7 +486,7 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
         ]
       </div>
       <Note at={orderAt} x={R_X} y={resY + c.h(50)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>in input order, the page&apos;s example</span>
+        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>in input order, the page&apos;s example</span>
       </Note>
     </>
   );
@@ -535,7 +535,7 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
   // The ticket, centred in the band between the running work and the axis.
   const tW = 320;
   const tTop = (c.y(456) + c.h(40) + axisY) / 2 - ticketH(tW) / 2;
-  const state: React.CSSProperties = { ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", position: "absolute" };
+  const state: React.CSSProperties = { ...label(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", position: "absolute" };
   return (
     <>
       <Lead at={ticketAt} c={c} term="Future">
@@ -543,10 +543,10 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
       </Lead>
       <Flow points={[[t0, axisY], [tEnd, axisY]]} at={startAt} color={INK_SOFT} width={2} head={13} />
       <Note at={startAt + 6} x={tEnd + 8} y={axisY - 15}>
-        <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>time</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>time</span>
       </Note>
       <Note at={startAt} x={t0} y={c.y(456) + c.h(20) - 15}>
-        <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>start the work</span>
+        <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>start the work</span>
       </Note>
       {/* The work runs on, somewhere else. */}
       <div
@@ -567,7 +567,7 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
           opacity: work > 0 ? 1 : 0,
         }}
       >
-        <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the work, running</span>
+        <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the work, running</span>
       </div>
       {/* The ticket: handed over at once, redeemed later. */}
       <Ticket x={tX} y={tTop} w={tW} at={onceAt}>
@@ -576,14 +576,14 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...state, color: OK_INK, opacity: Math.max(0, 2 * ready - 1) }}>future: the value</span>
       </Ticket>
       <Note at={onceAt + 4} x={t0} y={axisY + c.h(18)}>
-        <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the ticket, at once</span>
+        <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the ticket, at once</span>
       </Note>
       <Note at={laterAt + 6} x={1380} y={axisY + c.h(18)}>
-        <span style={{ ...label(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the value, later</span>
+        <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the value, later</span>
       </Note>
       <Note at={blockAt} x={R_X} y={c.y(808)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          collect it by blocking (<span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>.result()</span>) or by awaiting it
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          collect it by blocking (<span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500 }}>.result()</span>) or by awaiting it
         </span>
       </Note>
     </>
@@ -640,12 +640,12 @@ export const RapidScene: React.FC = () => {
         {/* The bridge. */}
         <Spot id="hummingbird" at={allAt + 4} left={1120} top={y(350)} width={640} height={h(420)} />
         <Note at={allAt} x={X0} y={listBottom + h(40)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             All of this was code running <b style={{ color: BLUE_INK, opacity: ease(frame, sameAt, 10) }}>at the same time</b>.
           </span>
         </Note>
         <Note at={hardAt} x={X0} y={listBottom + h(88)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             Just as hard: code that has to <b style={{ color: BLUE_INK, opacity: ease(frame, changeAt, 10) }}>keep changing without breaking</b>.
           </span>
         </Note>

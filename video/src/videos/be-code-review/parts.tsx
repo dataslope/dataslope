@@ -388,7 +388,7 @@ export const Steps: React.FC<{
         const done = ease(frame, next - 2, 10);
         return (
           <Ink key={i} at={at + i * 3} dur={12} out={out} style={{ left: x, top: top + i * rowH, width, height: rowH }}>
-            <div style={{ position: "relative", width, height: rowH, display: "flex", alignItems: "center", gap: 14, fontSize: 24 }}>
+            <div style={{ position: "relative", width, height: rowH, display: "flex", alignItems: "center", gap: 14, fontSize: 23 }}>
               <div
                 style={{
                   position: "absolute",
@@ -404,11 +404,11 @@ export const Steps: React.FC<{
               <span style={{ position: "relative", width: 26, height: 26, flex: "none", display: "flex", alignItems: "center" }}>
                 {done > 0 && frame >= next - 2 ? <Tick at={next - 2} size={24} /> : null}
               </span>
-              <span style={{ position: "relative", ...label(24, current > 0.5 ? ACCENT_INK : INK_SOFT), width: 22, flex: "none", textAlign: "right" }}>{i + 1}</span>
+              <span style={{ position: "relative", ...label(23, current > 0.5 ? ACCENT_INK : INK_SOFT), width: 22, flex: "none", textAlign: "right" }}>{i + 1}</span>
               <span
                 style={{
                   position: "relative",
-                  ...note(24, INK),
+                  ...note(23, INK),
                   fontWeight: current > 0.5 ? 500 : 500,
                   whiteSpace: "nowrap",
                   flex: "none",
@@ -453,7 +453,7 @@ export const Checklist: React.FC<{ items: readonly Check[]; x: number; top: numb
         const bad = item.badAt === undefined ? 0 : ease(frame, item.badAt, 8);
         return (
           <Ink key={i} at={item.at} dur={14} out={out} style={{ left: x, top: top + i * rowH, height: rowH, opacity: 1 - d }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 18, height: rowH, fontSize: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 18, height: rowH, fontSize: 23 }}>
               <span
                 style={{
                   width: 30,
@@ -471,7 +471,7 @@ export const Checklist: React.FC<{ items: readonly Check[]; x: number; top: numb
                 {item.okAt !== undefined && frame >= item.okAt ? <Tick at={item.okAt} size={22} /> : null}
                 {item.badAt !== undefined && frame >= item.badAt ? <Cross at={item.badAt} size={20} /> : null}
               </span>
-              <span style={{ ...note(24, bad > 0.5 ? ACCENT_INK : INK), whiteSpace: "nowrap" }}>{item.label}</span>
+              <span style={{ ...note(23, bad > 0.5 ? ACCENT_INK : INK), whiteSpace: "nowrap" }}>{item.label}</span>
             </div>
           </Ink>
         );
@@ -512,7 +512,7 @@ export const TestGrid: React.FC<{
     <>
       {cols.map((c, j) => (
         <Ink key={`c${j}`} at={c.at ?? headAt} dur={12} out={out} style={{ left: c.x - 150, width: 300, top, height: rowH, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{c.title}</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>{c.title}</span>
         </Ink>
       ))}
       <div
@@ -619,7 +619,7 @@ export const NumberLine: React.FC<{
       {ticks.map((t) => (
         <g key={t} opacity={ease(frame, at + 6, 10)}>
           <line x1={sx(t)} x2={sx(t)} y1={y - 5} y2={y + 5} stroke={INK_SOFT} strokeWidth={1.6} />
-          <text x={sx(t)} y={y + 30} textAnchor="middle" style={svgText(label(24, INK_SOFT))}>
+          <text x={sx(t)} y={y + 30} textAnchor="middle" style={svgText(label(20, INK_SOFT))}>
             {t}
           </text>
         </g>

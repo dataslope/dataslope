@@ -100,7 +100,7 @@ export const HookScene: React.FC = () => {
         <Spot id="de-sql-patterns-koala" at={from + 10} left={1390} top={y(290)} width={440} height={441} />
 
         <Ink at={loginsAt - 2} dur={12} style={{ left: X0, top: g.top - h(44), whiteSpace: "nowrap" }}>
-          <span style={label(24, INK_SOFT)}>
+          <span style={label(21, INK_SOFT)}>
             User 1&rsquo;s logins, from the page&rsquo;s <span style={{ fontFamily: MONO, fontWeight: 500 }}>daily_logins</span>
           </span>
         </Ink>
@@ -138,12 +138,12 @@ export const HookScene: React.FC = () => {
           { at: latestAt, text: "Which login is the latest?" },
         ].map((q, i) => (
           <Ink key={q.text} at={q.at - 2} dur={14} out={askOut} style={{ left: X0, top: y(ASK_Y) + i * h(54), whiteSpace: "nowrap" }}>
-            <span style={{ ...body(34), color: INK }}>{q.text}</span>
+            <span style={{ ...body(36), color: INK }}>{q.text}</span>
           </Ink>
         ))}
         {/* What the three have in common, as a line under them. */}
         <Ink at={roundAt - 2} dur={14} out={askOut} style={{ left: X0, top: y(ASK_Y) + 3 * h(54) + h(22), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(28, INK_SOFT) }}>Questions like these fill the SQL round of a data engineering interview.</span>
+          <span style={{ ...note(26, INK_SOFT) }}>Questions like these fill the SQL round of a data engineering interview.</span>
         </Ink>
 
         {/* ── Twenty-two questions: eleven on real queries, eleven quickly ── */}
@@ -152,7 +152,7 @@ export const HookScene: React.FC = () => {
             position: "absolute",
             left: X0,
             top: y(CHIPS_Y) - h(48),
-            ...label(24, INK_SOFT),
+            ...label(22, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, twentyTwoAt - 2, 12),
           }}
@@ -188,7 +188,7 @@ export const HookScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: SANS,
-                fontSize: 24,
+                fontSize: 19,
                 fontWeight: 500,
                 ...TABULAR,
                 opacity: p * (1 - fade) * (worked ? 1 : 0.55 + 0.45 * tone),
@@ -204,7 +204,7 @@ export const HookScene: React.FC = () => {
             position: "absolute",
             left: chipX(0),
             top: y(CHIPS_Y) + h(62),
-            ...note(28, INK),
+            ...note(26, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, elevenAt - 2, 12) * (1 - ease(frame, firstAt + 4, 14) * 0.5),
           }}
@@ -216,7 +216,7 @@ export const HookScene: React.FC = () => {
             position: "absolute",
             left: chipX(WORKED),
             top: y(CHIPS_Y) + h(62),
-            ...note(28, INK_SOFT),
+            ...note(26, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, quickAt - 2, 12) * (1 - ease(frame, firstAt + 4, 14) * 0.5),
           }}

@@ -50,7 +50,7 @@ const Line: React.FC<{ at: number; top: number; x?: number; children: React.Reac
   color = INK,
 }) => (
   <Note at={at} x={x} y={top}>
-    <span style={{ ...note(28, color), whiteSpace: "nowrap", ...TABULAR }}>{children}</span>
+    <span style={{ ...note(26, color), whiteSpace: "nowrap", ...TABULAR }}>{children}</span>
   </Note>
 );
 
@@ -170,10 +170,10 @@ const CaseBody: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={S.rows.map((_, row) => ({ row, col: size, at: c.w("r-case", "a list of conditions") + row * 2, color: MARK_KEY }))}
       />
       <Note at={startAt + 4} x={R_X} y={g.top - c.h(40)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>started from the default</span>
+        <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>started from the default</span>
       </Note>
       <Note at={matchAt} x={bx} y={bg.top - c.h(40)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           started from <Mono>amount</Mono>
         </span>
       </Note>

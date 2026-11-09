@@ -66,7 +66,7 @@ export const WalkScene: React.FC = () => {
 
       {/* The first flips, spelled out as the narration describes a step. */}
       <Ink at={stepAt - 6} dur={14} style={{ left: 200, top: y(258) + 9, whiteSpace: "nowrap" }}>
-        <span style={label(24, INK_SOFT)}>First {FIRST_FLIPS.length} flips</span>
+        <span style={label(20, INK_SOFT)}>First {FIRST_FLIPS.length} flips</span>
       </Ink>
       {FIRST_FLIPS.map((f, i) => {
         const p = ease(frame, stepAt + i * 3, 10);
@@ -75,7 +75,7 @@ export const WalkScene: React.FC = () => {
           <div
             key={i}
             style={{
-              ...note(24),
+              ...note(21),
               ...badgeStyle(up ? "blue" : "red", 21),
               position: "absolute",
               left: 380 + i * (CHIP_W + CHIP_GAP),

@@ -133,7 +133,7 @@ export const QuickScene: React.FC = () => {
             left: 520,
             top: y(752),
             fontFamily: MONO,
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: 500,
             lineHeight: 1.4,
             color: ACCENT_INK,

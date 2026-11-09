@@ -95,7 +95,7 @@ export const RuleScene: React.FC = () => {
                 />
               );
             })}
-            <Ink at={captionAt} dur={18} style={{ left: panel.x, top: y(CAPTION_Y), ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
+            <Ink at={captionAt} dur={18} style={{ left: panel.x, top: y(CAPTION_Y), ...body(36, true), color: INK, whiteSpace: "nowrap" }}>
               {panel.caption}
             </Ink>
           </React.Fragment>

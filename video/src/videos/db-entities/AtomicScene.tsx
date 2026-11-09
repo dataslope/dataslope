@@ -103,7 +103,7 @@ export const AtomicScene: React.FC = () => {
             />
           </div>
           <Note at={packAt + 2} x={X + g.xs[PHONES_COL] * S} y={tableBottom + 14} from="up">
-            <span style={{ ...note(24, STAT_INK), whiteSpace: "nowrap" }}>Two facts in one cell</span>
+            <span style={{ ...note(23, STAT_INK), whiteSpace: "nowrap" }}>Two facts in one cell</span>
           </Note>
           <Listing lines={[PACKED.search]} x={X} top={y(560)} width={960} size={22} at={searchAt - 6} lineAt={[searchAt - 2]} />
           {/* One line at one size: Postgres's answer stands out by its ink and weight. */}
@@ -154,7 +154,7 @@ export const AtomicScene: React.FC = () => {
           <BoxPulse x={customers.x} y={customers.y} width={BOX_W} height={customers.height} at={boxesAt} />
           <BoxPulse x={addresses.x} y={addresses.y} width={BOX_W} height={addresses.head} at={boxesAt + 4} />
           <Note at={tooAt + 2} x={BOX_X} y={addresses.bottom + 46} from="up">
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
               An entity of its own, <span style={{ color: INK_SOFT }}>many per customer</span>
             </span>
           </Note>

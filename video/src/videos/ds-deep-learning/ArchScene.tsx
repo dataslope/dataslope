@@ -121,7 +121,7 @@ export const ArchScene: React.FC = () => {
             {/* One line, one size: the name in weight, what it stands for in
                 the softer ink. */}
             <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{t.head}</span>
-            {t.what ? <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>{`  ${t.what}`}</span> : null}
+            {t.what ? <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>{`  ${t.what}`}</span> : null}
           </Note>
         ))}
 
@@ -180,7 +180,7 @@ export const ArchScene: React.FC = () => {
           what it found
         </Tagline>
         <Note at={sameAt - 2} x={PANELS[0]} y={y(GY) + GRID * CELL + h(24)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one filter, the same weights everywhere</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one filter, the same weights everywhere</span>
         </Note>
         <Note at={imagesAt - 2} x={PANELS[0]} y={y(GY) + GRID * CELL + h(64)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -218,12 +218,12 @@ export const ArchScene: React.FC = () => {
           the hidden state, carried forward
         </Tagline>
         <Note at={slowAt - 2} x={PANELS[1]} y={y(TOK_Y) + h(76)}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
             slow, step by step; <span style={{ opacity: ease(frame, forgetsAt - 2, 10) }}>forgets over long spans</span>
           </span>
         </Note>
         <Note at={lstmAt - 2} x={PANELS[1]} y={y(TOK_Y) + h(114)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>LSTM, long short-term memory: forgets less</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>LSTM, long short-term memory: forgets less</span>
         </Note>
 
         {/* ── Transformer ── */}
@@ -258,10 +258,10 @@ export const ArchScene: React.FC = () => {
           </Tagline>
         ))}
         <Note at={onceAt + 4} x={PANELS[2]} y={y(TOK_Y) + h(76)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every pair at once, in parallel</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every pair at once, in parallel</span>
         </Note>
         <Note at={backboneAt - 2} x={PANELS[2]} y={y(TOK_Y) + h(114)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the backbone of modern language models</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>the backbone of modern language models</span>
         </Note>
         <Svg opacity={pulse(frame, longAt, 24)}>
           <rect x={PANELS[2] + 10} y={y(TOK_Y) - h(230)} width={PANEL_W - 20} height={h(300)} rx={10} fill="none" stroke={OK} strokeWidth={2} strokeDasharray="6 6" />

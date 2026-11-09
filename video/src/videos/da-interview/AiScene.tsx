@@ -35,8 +35,8 @@ const Switch: React.FC<{ at: number; x: number; y: number }> = ({ at, x, y }) =>
           background: INK_SOFT,
         }}
       />
-      <div style={{ position: "absolute", left: 0, width: W / 2, top: 14, textAlign: "center", ...label(24, off < 0.5 ? PAPER : INK_SOFT) }}>AI on</div>
-      <div style={{ position: "absolute", left: W / 2, width: W / 2, top: 14, textAlign: "center", ...label(24, off >= 0.5 ? PAPER : INK_SOFT) }}>AI off</div>
+      <div style={{ position: "absolute", left: 0, width: W / 2, top: 14, textAlign: "center", ...label(22, off < 0.5 ? PAPER : INK_SOFT) }}>AI on</div>
+      <div style={{ position: "absolute", left: W / 2, width: W / 2, top: 14, textAlign: "center", ...label(22, off >= 0.5 ? PAPER : INK_SOFT) }}>AI off</div>
     </div>
   );
 };

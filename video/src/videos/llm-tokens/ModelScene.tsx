@@ -69,12 +69,12 @@ export const ModelScene: React.FC = () => {
       <Drift from={hookFrom} to={end} amount={0.014} origin="40% 55%">
         <FigLabel n="1" title="One step of a language model" at={hookFrom} x={X0} y={y(FIG_Y)} />
         <Note at={hookFrom + 10} x={X0} y={y(FIG_Y) + 44}>
-          <span style={note(24, INK_SOFT)}>Scores as the lesson illustrates them</span>
+          <span style={note(21, INK_SOFT)}>Scores as the lesson illustrates them</span>
         </Note>
 
         {/* What it reads: the lesson's toy loop starts from one word. */}
         <Note at={hookFrom + 4} x={CTX.x} y={y(CTX.y) - 50}>
-          <span style={label(24, INK_SOFT)}>It reads</span>
+          <span style={label(21, INK_SOFT)}>It reads</span>
         </Note>
         <div style={{ position: "absolute", left: CTX.x, top: y(CTX.y), opacity: ease(frame, hookFrom + 4, 12) }}>
           <ChipFace text="the" size={32} />
@@ -106,7 +106,7 @@ export const ModelScene: React.FC = () => {
 
         {/* What it returns: a probability for every token. */}
         <Note at={probAt - 2} x={BARS.x} y={rowY(0) - 50}>
-          <span style={label(24, INK_SOFT)}>It returns a probability for each next token</span>
+          <span style={label(21, INK_SOFT)}>It returns a probability for each next token</span>
         </Note>
         {DIST.map((d, i) => {
           const p = ease(frame, barAt(i), 14);
@@ -146,11 +146,11 @@ export const ModelScene: React.FC = () => {
         })}
         {/* The rest of the vocabulary: two hundred thousand in all. */}
         <Note at={thousandAt - 2} x={BARS.x} y={rowY(DIST.length) + 6}>
-          <div style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <div style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             and <span style={{ ...TABULAR, fontWeight: 500, color: FOCUS_INK }}>{num(VOCAB - DIST.length)}</span> more
             tokens, sharing the other {rest.toFixed(2)}
           </div>
-          <div style={{ ...note(24, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(21, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>
             o200k_base, GPT-4o&apos;s tokenizer, has {num(VOCAB)} tokens in all
           </div>
         </Note>
@@ -159,11 +159,11 @@ export const ModelScene: React.FC = () => {
       {/* Picking one is a step of its own, and a setting. */}
       <Spot id="llm-tokens-die" at={pickingAt - 4} left={1500} top={y(470)} width={300} height={300} />
       <Note at={separateAt - 2} x={1490} y={y(470) + 330}>
-        <div style={{ ...body(28), color: INK, whiteSpace: "nowrap" }}>Picking one:</div>
-        <div style={{ ...body(28), color: INK, whiteSpace: "nowrap" }}>a separate step</div>
+        <div style={{ ...body(30), color: INK, whiteSpace: "nowrap" }}>Picking one:</div>
+        <div style={{ ...body(30), color: INK, whiteSpace: "nowrap" }}>a separate step</div>
       </Note>
       <Note at={knobAt - 2} x={1490} y={y(470) + 420}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>and a setting you choose</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>and a setting you choose</span>
       </Note>
     </AbsoluteFill>
   );

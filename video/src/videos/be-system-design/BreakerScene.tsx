@@ -112,10 +112,10 @@ export const BreakerScene: React.FC = () => {
         <Spot id="breaker" at={breakerAt} left={1600} top={118} width={160} height={artH("breaker", 160)} />
 
         {/* Panel titles. */}
-        <div style={{ position: "absolute", left: TX0, top: errTop - h(48), ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
+        <div style={{ position: "absolute", left: TX0, top: errTop - h(48), ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
           error rate at the dependency
         </div>
-        <div style={{ position: "absolute", left: TX0, top: reqTop - h(48), ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
+        <div style={{ position: "absolute", left: TX0, top: reqTop - h(48), ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
           requests per second reaching it
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, simAt, 10) }}> · the page&apos;s simulation</span>
         </div>
@@ -145,7 +145,7 @@ export const BreakerScene: React.FC = () => {
                 strokeDasharray={r === BREAKER.trip ? "6 5" : r ? "2 6" : undefined}
                 opacity={r === BREAKER.trip ? ease(frame, tripAt, 10) : r ? 0.5 : 1}
               />
-              <text x={TX0 - 14} y={ey(r) + 7} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
+              <text x={TX0 - 14} y={ey(r) + 7} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
                 {`${r * 100}%`}
               </text>
             </g>
@@ -155,17 +155,17 @@ export const BreakerScene: React.FC = () => {
             .map((v) => (
               <g key={v}>
                 <line x1={TX0} x2={TX1} y1={ry(v)} y2={ry(v)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray={v ? "2 6" : undefined} opacity={v ? 0.5 : 1} />
-                <text x={TX0 - 14} y={ry(v) + 7} textAnchor="end" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
+                <text x={TX0 - 14} y={ry(v) + 7} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
                   {v}
                 </text>
               </g>
             ))}
           {[0, 30, 60, 90, 120].map((t) => (
-            <text key={t} x={tx(t)} y={reqBot + 30} textAnchor="middle" style={svgText({ ...label(24, INK_SOFT), fontWeight: 500 })}>
+            <text key={t} x={tx(t)} y={reqBot + 30} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500 })}>
               {t}
             </text>
           ))}
-          <text x={TX1} y={reqBot + 60} textAnchor="end" style={svgText({ ...label(24, INK_SOFT) })}>
+          <text x={TX1} y={reqBot + 60} textAnchor="end" style={svgText({ ...label(20, INK_SOFT) })}>
             seconds
           </text>
           {/* Retries alone. */}

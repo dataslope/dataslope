@@ -77,7 +77,7 @@ export const ConcurrentScene: React.FC = () => {
         {/* The grid: two experiments on one set of users. */}
         <div style={{ opacity: gridIn }}>
           {["old", "new"].map((t, c) => (
-            <div key={`c${t}`} style={{ position: "absolute", left: GRID.x + c * GRID.cw, width: GRID.cw, top: y(GRID.top) - h(44), textAlign: "center", ...label(24, INK_SOFT), fontWeight: 500 }}>
+            <div key={`c${t}`} style={{ position: "absolute", left: GRID.x + c * GRID.cw, width: GRID.cw, top: y(GRID.top) - h(44), textAlign: "center", ...label(21, INK_SOFT), fontWeight: 500 }}>
               {t}
             </div>
           ))}
@@ -85,7 +85,7 @@ export const ConcurrentScene: React.FC = () => {
             recommendations
           </div>
           {["old", "new"].map((t, r) => (
-            <div key={`r${t}`} style={{ position: "absolute", left: GRID.x - 110, width: 90, top: y(GRID.top) + r * h(GRID.ch) + h(GRID.ch) / 2 - 14, textAlign: "right", ...label(24, INK_SOFT), fontWeight: 500 }}>
+            <div key={`r${t}`} style={{ position: "absolute", left: GRID.x - 110, width: 90, top: y(GRID.top) + r * h(GRID.ch) + h(GRID.ch) / 2 - 14, textAlign: "right", ...label(21, INK_SOFT), fontWeight: 500 }}>
               {t}
             </div>
           ))}
@@ -137,10 +137,10 @@ export const ConcurrentScene: React.FC = () => {
           })}
         </svg>
         <Note at={pricingAt + 6} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) - h(64)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>pricing's lift, without and with</span>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>pricing's lift, without and with</span>
         </Note>
         <Note at={recsAt} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) - h(28)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the new recommendations</span>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>the new recommendations</span>
         </Note>
         <Note at={interactAt} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) + h(24)}>
           <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>if they differ, the two interact</span>

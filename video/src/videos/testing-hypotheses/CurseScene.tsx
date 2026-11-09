@@ -126,7 +126,7 @@ export const CurseScene: React.FC = () => {
             </span>
           </Note>
           <Note at={twelveAt - 2} x={X.x1} y={y(BASE) - h(240)} align="right">
-            <span style={{ ...note(28, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(30, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
               significant: <Count at={twelveAt - 2} to={CURSE.power} dur={20} format={(v) => pct(v, 0)} />
             </span>
           </Note>
