@@ -20,7 +20,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PARTS, pct, type PartKey, WALD } from "./data";
-import { PART_HI, Plane, SKIN, Swatch } from "./parts";
+import { Plane, Swatch } from "./parts";
 import { swell } from "../sampling/emphasis";
 import { useFigNumber } from "../sampling/merged";
 
@@ -40,7 +40,8 @@ const THICK = 24;
 
 const PLANE_X = 470;
 const PLANE_Y = 565;
-const PLANE_SCALE = 2.5;
+/** Wingtip to wingtip, in px. */
+const PLANE_W = 600;
 
 /**
  * Wald's worked example: the plane's four parts, each part's share of the
@@ -125,21 +126,16 @@ export const WaldScene: React.FC = () => {
         </span>
       </Note>
 
-      {/* ── The plane ── */}
-      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-        <Plane
-          x={PLANE_X}
-          y={y(PLANE_Y)}
-          scale={PLANE_SCALE * (0.94 + 0.06 * pop(frame, start, fps, 16))}
-          opacity={ease(frame, start, 14)}
-          style={(key) => ({
-            fill: focus(key) > 0 ? `color-mix(in srgb, ${PART_HI} ${Math.round(focus(key) * 100)}%, ${SKIN})` : SKIN,
-            stroke: key === "engines" && guard > 0 ? ACCENT : INK,
-            // The part the narration is on is drawn heavier, as well as lit.
-            width: (key === "engines" ? 1.6 + guard * 3 : 1.6) + 1.8 * focus(key),
-          })}
-        />
-      </svg>
+      {/* ── The plane: the part the narration is on is washed in yellow, and
+          the engines take a red outline once the holes "aren't" there ── */}
+      <Plane
+        x={PLANE_X}
+        y={y(PLANE_Y)}
+        width={PLANE_W * (0.94 + 0.06 * pop(frame, start, fps, 16))}
+        opacity={ease(frame, start, 14)}
+        lit={focus}
+        outline={(key) => (key === "engines" && guard > 0 ? { color: ACCENT, width: 2.2 + guard * 2.8 } : null)}
+      />
       {/* Kept under the plane, clear of the column the conclusion inks into. */}
       <Note at={exampleAt} x={150} y={y(852)}>
         <div style={note(20, INK_SOFT)}>Wald's illustrative data: each part's area,</div>
