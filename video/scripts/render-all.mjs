@@ -49,6 +49,11 @@
  * its inputs. Such an output's record is written on the next run that is not
  * a dry run, and from then on the hashes decide.
  *
+ * Openers are the exception to out/<id>-4k.mp4: they render into
+ * out/openers/ (`out/openers/Series-Statistics-3-4k.mp4`), as thumbnails have
+ * out/thumbnails/, so the folder of videos is only videos. Their records in
+ * the manifest are keyed by that path.
+ *
  * The two review kits under "Assets" in Root.tsx (ErdKit, InterviewKit) are
  * not videos and are not rendered. Compositions in EXTRAS are rendered with
  * the videos though they are not narrated: the unit opener sample, and the
@@ -59,7 +64,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { openerId, SERIES, unitLabel } from "../src/series.ts";
+import { OPENERS_OUT, openerId, SERIES, unitLabel } from "../src/series.ts";
 import { registry, videoNames } from "./lib/audio.mjs";
 
 const VIDEO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -107,7 +112,9 @@ if (!X264_PRESETS.includes(x264Preset)) {
 const SCALE = hd ? 2 / 3 : fhd ? 1 : 2;
 const SUFFIX = hd ? "-hd" : fhd ? "-fhd" : "-4k";
 const SETTINGS = { scale: SCALE, codec: "h264", imageFormat: "jpeg", jpegQuality: 92 };
-const outputOf = (id) => path.join(OUT, `${id}${SUFFIX}.mp4`);
+/** Ids of the compositions rendered into out/openers/ (EXTRAS, below). */
+const openerIds = new Set();
+const outputOf = (id) => path.join(OUT, openerIds.has(id) ? OPENERS_OUT : "", `${id}${SUFFIX}.mp4`);
 
 // --- Fingerprinting --------------------------------------------------------
 
@@ -200,6 +207,8 @@ const EXTRAS = [
     })),
   ),
 ];
+
+for (const e of EXTRAS) openerIds.add(e.id);
 
 const ASSET_DIRS = ["narration", "images", "patterns"].map((d) => path.join(PUBLIC, d));
 const assetNames = new Set(ASSET_DIRS.flatMap((d) => (existsSync(d) ? readdirSync(d) : [])));
@@ -313,6 +322,7 @@ for (const [i, v] of todo.entries()) {
   const started = Date.now();
   try {
     const composition = await selectComposition({ serveUrl, id: v.id, inputProps: {}, browserExecutable });
+    mkdirSync(path.dirname(v.output), { recursive: true });
     let shown = -1;
     await renderMedia({
       serveUrl,

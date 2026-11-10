@@ -12,7 +12,8 @@
  *
  * It first runs render-all on exactly the pieces it needs, so a piece is
  * rendered only when it is missing or its inputs changed since its last
- * render (out/.render-manifest.json), then joins them with ffmpeg:
+ * render (out/.render-manifest.json), then joins them with ffmpeg. The
+ * openers are read from out/openers/, the videos from out/:
  *
  * - The picture is copied packet for packet (`-c:v copy`): every frame in the
  *   series is the frame its piece rendered, bit for bit, at no quality cost
@@ -37,7 +38,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { openerId, SERIES, unitLabel } from "../src/series.ts";
+import { OPENERS_OUT, openerId, SERIES, unitLabel } from "../src/series.ts";
 
 const VIDEO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(VIDEO_ROOT, "out");
@@ -82,8 +83,9 @@ const unitRange = (() => {
   return (n) => n >= lo && n <= hi;
 })();
 
-// render-all's names: <id>-fhd.mp4 at 1080p, <id>-4k.mp4 at 4K.
-const outputOf = (id) => path.join(OUT, `${id}${fhd ? "-fhd" : "-4k"}.mp4`);
+// render-all's names: <id>-fhd.mp4 at 1080p, <id>-4k.mp4 at 4K, with the
+// openers in out/openers/.
+const outputOf = (id, isOpener) => path.join(OUT, isOpener ? OPENERS_OUT : "", `${id}${fhd ? "-fhd" : "-4k"}.mp4`);
 
 // Remotion's own ffmpeg and ffprobe, through its CLI. On Windows npx is a
 // .cmd, which only runs through a shell, and cmd splits an argument at its
@@ -129,8 +131,8 @@ for (const name of names) {
     process.exit(1);
   }
   const pieces = units.flatMap((u) => [
-    { id: openerId(name, u), unit: u },
-    ...u.videos.map((id) => ({ id, unit: u })),
+    { id: openerId(name, u), unit: u, opener: true },
+    ...u.videos.map((id) => ({ id, unit: u, opener: false })),
   ]);
   const stem = `${name}${unitsArg ? `-units-${unitsArg}` : ""}${fhd ? "-fhd" : "-4k"}`;
   const output = path.join(SERIES_OUT, `${stem}.mp4`);
@@ -150,14 +152,14 @@ for (const name of names) {
       process.exit(1);
     }
   }
-  const missing = pieces.filter((p) => !existsSync(outputOf(p.id)));
+  const missing = pieces.filter((p) => !existsSync(outputOf(p.id, p.opener)));
   if (missing.length) {
     console.error(`${name}: not rendered yet: ${missing.map((p) => p.id).join(", ")}`);
     process.exit(1);
   }
 
   // Copying the picture needs every piece encoded alike.
-  const probed = pieces.map((p) => ({ ...p, ...probe(outputOf(p.id)) }));
+  const probed = pieces.map((p) => ({ ...p, ...probe(outputOf(p.id, p.opener)) }));
   const ref = probed[0];
   const odd = probed.filter((p) => p.video !== ref.video || p.audio !== ref.audio);
   if (odd.length) {
@@ -170,7 +172,7 @@ for (const name of names) {
   const chapters = [];
   let t = 0;
   for (const p of probed) {
-    if (p.id === openerId(name, p.unit)) chapters.push({ start: t, unit: p.unit });
+    if (p.opener) chapters.push({ start: t, unit: p.unit });
     t += p.duration;
   }
   const total = t;
@@ -180,7 +182,7 @@ for (const name of names) {
   const list = path.join(SERIES_OUT, `${stem}.concat.txt`);
   // Forward slashes on Windows too, which ffmpeg reads there as well.
   const listPath = (f) => f.replaceAll("\\", "/").replaceAll("'", "'\\''");
-  writeFileSync(list, probed.map((p) => `file '${listPath(outputOf(p.id))}'`).join("\n") + "\n");
+  writeFileSync(list, probed.map((p) => `file '${listPath(outputOf(p.id, p.opener))}'`).join("\n") + "\n");
   console.log(`\nStitching ${probed.length} pieces (${clock(total)})…`);
   const started = Date.now();
   tool("ffmpeg", [
