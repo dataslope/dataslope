@@ -161,3 +161,11 @@ export const unitLabel = (s: SeriesDef, u: SeriesUnit) => `${s.kind === "course"
 
 /** The opener composition before a unit: `Series-Statistics-3`. */
 export const openerId = (key: string, u: SeriesUnit) => `Series-${key}-${u.n}`;
+
+/**
+ * The folder under out/ the rendered openers go in, apart from the videos
+ * (`out/openers/Series-Statistics-3-4k.mp4`), as thumbnails have
+ * `out/thumbnails/`. render-all writes them there and render-series reads
+ * them from there.
+ */
+export const OPENERS_OUT = "openers";

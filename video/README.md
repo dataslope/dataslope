@@ -122,7 +122,8 @@ to a 1080p viewer, which keeps small type sharp. `render:all` also takes `--hd` 
 720p (`out/<id>-hd.mp4`, 1280x720), for a quick local copy to watch.
 
 **`npm run render:all`** (`scripts/render-all.mjs`) renders every video,
-plus the series openers and the unit opener sample. It skips a video whose
+plus the series openers and the unit opener sample, which go in their own
+folder, `out/openers/<id>-4k.mp4`, as thumbnails have `out/thumbnails/`. It skips a video whose
 output is in `out/` and whose content has not changed since it was
 rendered, and re-renders one whose content has, even though the old file is
 there. Its content is everything its render reads: the source files
@@ -214,7 +215,9 @@ opener shows. The openers are Columns-7's three lines (the series' name,
 "Unit n" or "Part n", the title), generated from that list into the Studio's
 `Series-Openers` folder: a course's in blue, an interview track's in green,
 mark and title both, like their thumbnails. Renaming a unit there
-re-renders that unit's opener alone. A unit with a deep dive plays it after
+re-renders that unit's opener alone. The rendered openers are in
+`out/openers/` (`OPENERS_OUT` in `src/series.ts`), not beside the videos;
+`render:series` reads them from there. A unit with a deep dive plays it after
 the unit video, under the one opener, and Statistics Unit 5 is the merged
 `Stats-5-Sampling`.
 
