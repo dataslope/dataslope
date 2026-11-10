@@ -56,6 +56,8 @@ import type {
 
 /** How many result rows the Output tab renders before truncating. */
 const MAX_OUTPUT_ROWS = 200;
+/** How many rows of a table the Tables tab shows. */
+const MAX_PREVIEW_ROWS = 100;
 
 export type RunMode = "run" | "submit";
 
@@ -377,6 +379,41 @@ export function useChallengeRunner(challenge: Challenge) {
     [executeCode, executeSql, isSql],
   );
 
+  /**
+   * The first rows of one of the challenge's tables, for the Tables tab.
+   *
+   * Read from the same live database the learner's queries run against, so
+   * the preview cannot disagree with what a `SELECT *` would return. That
+   * boots the engine if nothing has run yet; a warm engine answers at once.
+   */
+  const previewTable = useCallback(
+    async (name: string): Promise<OutputPanel> => {
+      try {
+        const engine = await ensureEngine();
+        // The name comes from the authored schema, never from the learner.
+        const quoted = `"${name.replace(/"/g, '""')}"`;
+        const [rows] = await engine.exec(
+          `SELECT * FROM ${quoted} LIMIT ${MAX_PREVIEW_ROWS}`,
+        );
+        const [count] = await engine.exec(`SELECT COUNT(*) FROM ${quoted}`);
+        const total = Number(count?.values[0]?.[0] ?? rows?.values.length ?? 0);
+        const panel = sqlOutputPanel(rows ?? null);
+        if (panel.kind !== "table") return panel;
+        const shown = panel.rows.length;
+        return {
+          ...panel,
+          footer:
+            total > shown
+              ? `First ${shown} of ${total.toLocaleString("en-US")} rows`
+              : `${shown} row${shown === 1 ? "" : "s"}`,
+        };
+      } catch (err) {
+        return { kind: "error", message: err instanceof Error ? err.message : String(err) };
+      }
+    },
+    [ensureEngine],
+  );
+
   /** Throw away the engine so the next run re-seeds a clean database. */
   const reset = useCallback(() => {
     if (isSql) resetEngine();
@@ -392,6 +429,7 @@ export function useChallengeRunner(challenge: Challenge) {
     execute,
     reset,
     dispose,
+    previewTable,
     busy,
     /** Boot progress: the SQL hook's own state, or the code runtime's. */
     boot: isSql

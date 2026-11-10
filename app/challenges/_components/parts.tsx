@@ -7,7 +7,7 @@
  * (always open vs. collapsible) and a handful of type scales.
  */
 
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Check,
@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Copy,
   Eye,
+  Loader2,
   Table2,
   XCircle,
 } from "lucide-react";
@@ -172,7 +173,7 @@ function InstructionBlockView({
 
     case "columns":
       return (
-        <div className={s.card}>
+        <div className={s.columns}>
           <div className={s.columnsHead}>
             <span>Column</span>
             <span>Type</span>
@@ -188,7 +189,7 @@ function InstructionBlockView({
 
     case "table":
       return (
-        <div className={s.cardScroll}>
+        <div className={s.tableScroll}>
           <table className={s.previewTable}>
             <thead>
               <tr>
@@ -238,8 +239,8 @@ function InstructionBlockView({
       return (
         <div className={s.exampleList}>
           {block.items.map((item) => (
-            <div key={item.label} className={s.schemaCard}>
-              <div className={s.cardHead}>{item.label}</div>
+            <div key={item.label} className={s.example}>
+              <div className={s.exampleLabel}>{item.label}</div>
               <div className={s.exampleGrid}>
                 {item.fields.map((field) => (
                   <Fragment key={field.name}>
@@ -279,31 +280,62 @@ function InstructionBlockView({
 
 // ─── Schema browser ──────────────────────────────────────────────────
 
+/**
+ * "Preview" on a table: opens its rows in the Tables tab. The accessible name
+ * carries the table, since a page with four tables has four of these.
+ */
+function PreviewButton({ table, onPreview }: { table: string; onPreview: (name: string) => void }) {
+  return (
+    <button
+      type="button"
+      className={s.textBtn}
+      aria-label={`Preview rows of ${table}`}
+      onClick={() => onPreview(table)}
+    >
+      Preview
+    </button>
+  );
+}
+
 /** Desktop schema: every table expanded, since the pane has the room. */
-export function SchemaList({ tables }: { tables: SchemaTable[] }) {
+export function SchemaList({
+  tables,
+  onPreview,
+}: {
+  tables: SchemaTable[];
+  /** Show a table's rows. */
+  onPreview: (name: string) => void;
+}) {
   return (
     <div className={s.schemaList}>
       {tables.map((table) => (
-        <div key={table.name} className={s.schemaCard}>
+        <div key={table.name} className={s.schemaTable}>
           <div className={s.schemaHead}>
             <span className={s.schemaName}>
               <Table2 size={13} strokeWidth={2} aria-hidden="true" />
               {table.name}
             </span>
             <span className={s.schemaRows}>{table.rows} rows</span>
+            <PreviewButton table={table.name} onPreview={onPreview} />
           </div>
-          <div className={s.schemaCols}>
-            {table.columns.map((col) => (
-              <span key={col.name} className={s.schemaCol}>
-                <span>
-                  {col.name}
-                  {col.key ? <span className={s.schemaKey}> {col.key}</span> : null}
-                </span>
-                <span className={s.schemaType}>{col.type}</span>
-              </span>
-            ))}
-          </div>
+          <SchemaColumns table={table} />
         </div>
+      ))}
+    </div>
+  );
+}
+
+function SchemaColumns({ table }: { table: SchemaTable }) {
+  return (
+    <div className={s.schemaCols}>
+      {table.columns.map((col) => (
+        <span key={col.name} className={s.schemaCol}>
+          <span>
+            {col.name}
+            {col.key ? <span className={s.schemaKey}> {col.key}</span> : null}
+          </span>
+          <span className={s.schemaType}>{col.type}</span>
+        </span>
       ))}
     </div>
   );
@@ -314,17 +346,19 @@ export function SchemaAccordion({
   tables,
   openTable,
   onToggle,
+  onPreview,
 }: {
   tables: SchemaTable[];
   openTable: string | null;
   onToggle: (name: string) => void;
+  onPreview: (name: string) => void;
 }) {
   return (
-    <div className={s.schemaList}>
+    <div className={`${s.schemaList} ${s.schemaListCompact}`}>
       {tables.map((table) => {
         const open = openTable === table.name;
         return (
-          <div key={table.name} className={s.schemaCard}>
+          <div key={table.name} className={s.schemaTable}>
             <button
               type="button"
               className={`${s.schemaHead} ${s.schemaToggle}`}
@@ -336,7 +370,7 @@ export function SchemaAccordion({
                 {table.name}
               </span>
               <span className={s.schemaRows}>
-                {table.rows}
+                {table.rows} rows
                 <ChevronDown
                   size={14}
                   strokeWidth={2}
@@ -348,18 +382,76 @@ export function SchemaAccordion({
               </span>
             </button>
             {open ? (
-              <div className={`${s.schemaCols} ${s.schemaColsOpen}`}>
-                {table.columns.map((col) => (
-                  <span key={col.name} className={s.schemaCol}>
-                    <span>{col.name}</span>
-                    <span className={s.schemaType}>{col.type}</span>
-                  </span>
-                ))}
-              </div>
+              <>
+                <SchemaColumns table={table} />
+                <div className={s.schemaPreviewRow}>
+                  <PreviewButton table={table.name} onPreview={onPreview} />
+                </div>
+              </>
             ) : null}
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ─── Tables ──────────────────────────────────────────────────────────
+
+/**
+ * The Tables tab of a database challenge: pick a table, see its rows.
+ *
+ * The rows come from the live in-browser database (see `previewTable` in
+ * `useChallengeRunner`), so the first visit boots the engine; `preview` is
+ * null until they arrive.
+ */
+export function TablesPanel({
+  tables,
+  selected,
+  onSelect,
+  preview,
+  loading,
+  mobile,
+}: {
+  tables: SchemaTable[];
+  selected: string;
+  onSelect: (name: string) => void;
+  /** The selected table's rows, once loaded. */
+  preview: OutputPanel | null;
+  loading: boolean;
+  mobile?: boolean;
+}) {
+  return (
+    <div className={s.stack}>
+      <div
+        className={`${s.tablePicker} ${s.noScrollbar}`}
+        role="group"
+        aria-label="Table to preview"
+      >
+        {tables.map((table) => {
+          const on = table.name === selected;
+          return (
+            <button
+              key={table.name}
+              type="button"
+              aria-pressed={on}
+              className={[s.tablePick, on ? s.tablePickOn : ""].filter(Boolean).join(" ")}
+              onClick={() => onSelect(table.name)}
+            >
+              {table.name}
+              <span className={s.tablePickRows}>{table.rows}</span>
+            </button>
+          );
+        })}
+        {loading ? (
+          <Loader2 size={13} className={`${s.spin} ${s.tablePickSpin}`} aria-label="Loading rows" />
+        ) : null}
+      </div>
+      {preview ? (
+        <OutputPanelView output={preview} mobile={mobile} />
+      ) : (
+        <p className={s.emptyResults}>Loading the first rows of {selected}…</p>
+      )}
     </div>
   );
 }
@@ -601,6 +693,8 @@ export function SubmitErrorPanel({
 function TestRow({ test, mobile }: { test: TestOutcome; mobile?: boolean }) {
   return (
     <div className={mobile ? `${s.testRow} ${s.mTestRow}` : s.testRow}>
+      {/* The icon is the verdict; its text equivalent is for screen readers. */}
+      <span className={s.srOnly}>{test.pass ? "Passed:" : "Failed:"}</span>
       {test.pass ? (
         <CheckCircle2
           size={15}
@@ -623,18 +717,6 @@ function TestRow({ test, mobile }: { test: TestOutcome; mobile?: boolean }) {
           <span className={s.testGot}>{test.got}</span>
         ) : null}
       </div>
-      {/* The phone drops the redundant badge: the icon already says it, and
-          the row needs the width for the detail line. */}
-      {mobile ? null : (
-        <span
-          className={[
-            s.testBadge,
-            test.pass ? s.testBadgePass : s.testBadgeFail,
-          ].join(" ")}
-        >
-          {test.pass ? "Passed" : "Failed"}
-        </span>
-      )}
     </div>
   );
 }
@@ -692,28 +774,40 @@ export function SolutionPanelView({
           <Spans spans={note} />
         </p>
       ) : null}
-      <div className={s.solutionCard}>
-        <div className={s.solutionHead}>
-          <span className={s.solutionLabel}>{label}</span>
-          <CopyButton source={source} />
-        </div>
-        <CodeBlock source={source} language={language} className={s.solutionPre} />
+      <div className={s.solutionHead}>
+        <h3 className={s.solutionLabel}>{label}</h3>
+        <CopyButton source={source} />
       </div>
+      <CodeBlock source={source} language={language} className={s.solutionPre} />
     </div>
   );
 }
 
 function CopyButton({ source }: { source: string }) {
+  // Says so when it worked: a button that changes nothing reads as broken.
+  const [copied, setCopied] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
   return (
     <button
       type="button"
       className={s.copyBtn}
       onClick={() => {
-        void navigator.clipboard?.writeText(source);
+        void navigator.clipboard?.writeText(source).then(() => {
+          setCopied(true);
+          if (timer.current) clearTimeout(timer.current);
+          timer.current = setTimeout(() => setCopied(false), 1600);
+        });
       }}
     >
-      <Copy size={12} strokeWidth={2} aria-hidden="true" />
-      Copy
+      {copied ? (
+        <Check size={12} strokeWidth={2.5} aria-hidden="true" />
+      ) : (
+        <Copy size={12} strokeWidth={2} aria-hidden="true" />
+      )}
+      <span aria-live="polite">{copied ? "Copied" : "Copy"}</span>
     </button>
   );
 }
