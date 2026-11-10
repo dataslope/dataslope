@@ -268,42 +268,46 @@
 .undoBtn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  border: 1px solid var(--cw-pass-ink);
+  border: 0;
   border-radius: 2px;
-  background: var(--cw-pass-tint);
-  padding: 6px 8px;
+  background: transparent;
+  padding: 7px 10px;
   font-family: inherit;
   font-size: 13px;
-  font-weight: 600;
   letter-spacing: -0.015em;
+  font-weight: 600;
   color: var(--cw-pass-ink);
 }
 .undoBtn:hover {
-  background: var(--cw-pass-ink);
-  color: #fff;
+  background: var(--cw-pass-tint);
 }
 .mIconBtnUndo {
   color: var(--cw-pass-ink);
 }
 
+/* The actions carry no box: no outline and no fill. Rank is in the type
+   instead. The secondary action is medium weight, the primary one is
+   semibold in the accent, and both tint on hover like every other control
+   in the bar. */
 .secondaryBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  border: 1px solid var(--cw-border-strong);
+  border: 0;
   border-radius: 2px;
-  background: var(--cw-bg);
-  padding: 7px 12px;
+  background: transparent;
+  padding: 7px 10px;
   font-family: inherit;
   font-size: 13px;
-  font-weight: 500;
   letter-spacing: -0.015em;
+  font-weight: 500;
   color: var(--cw-ink);
 }
-.secondaryBtn:hover {
-  border-color: var(--cw-ink);
+.secondaryBtn:hover:not(:disabled) {
+  background: var(--cw-bg-hover);
 }
 
 .primaryBtn {
@@ -313,16 +317,17 @@
   gap: 6px;
   border: 0;
   border-radius: 2px;
-  background: var(--cw-ink);
-  padding: 8px 14px;
+  background: transparent;
+  padding: 7px 10px;
   font-family: inherit;
   font-size: 13px;
-  font-weight: 500;
   letter-spacing: -0.015em;
-  color: var(--cw-bg);
+  font-weight: 600;
+  color: var(--cw-accent-link);
 }
-.primaryBtn:hover {
-  background: var(--cw-ink-hover);
+.primaryBtn:hover:not(:disabled) {
+  background: var(--cw-accent-tint);
+  color: var(--cw-accent-link-hover);
 }
 
 .iconBtn {
@@ -1112,10 +1117,17 @@ a.primaryBtn {
 
 /* ─── Result tabs ───────────────────────────────────────────────────── */
 
+/* The tabs sit flush: edge to edge in the strip and against each other, each
+   the full height of the row, so the selected one is a block of tint rather
+   than a pill floating in padding. */
+.paneHeadTabs {
+  padding: 0;
+}
+
 .tabStrip {
   display: flex;
-  align-items: center;
-  gap: 2px;
+  align-items: stretch;
+  align-self: stretch;
   flex: 1;
   min-width: 0;
   overflow-x: auto;
@@ -1125,16 +1137,23 @@ a.primaryBtn {
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  flex-shrink: 0;
   border: 0;
-  border-radius: 2px;
+  border-radius: 0;
   background: transparent;
-  padding: 6px 10px;
+  padding: 0 14px;
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 500;
   letter-spacing: -0.015em;
   color: var(--cw-text-muted);
   white-space: nowrap;
+}
+.tab:hover {
+  color: var(--cw-ink);
+}
+.tab svg {
+  flex-shrink: 0;
 }
 .tabOn {
   background: var(--cw-bg-hover);
@@ -1292,87 +1311,62 @@ a.primaryBtn {
 
 /* ─── Test cases ────────────────────────────────────────────────────── */
 
+/* The verdict is a line of type, not a colored bar: the icon and the ink
+   say pass or fail, and the row below it is the first check. */
 .testBanner {
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 1px solid var(--cw-border-light);
-  background: var(--cw-fail-tint);
-  padding: 10px 14px;
+  min-height: 44px;
+  padding: 6px 14px 0;
 }
 .testBanner svg {
   flex-shrink: 0;
   color: var(--cw-fail-ink);
 }
 .testBannerText {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   color: var(--cw-fail-ink);
 }
 .testBannerSub {
   font-size: 12.5px;
   white-space: nowrap;
-  color: var(--cw-fail-ink-strong);
+  color: var(--cw-text-muted);
 }
-.testBannerPass {
-  background: var(--cw-pass-tint);
-}
-.testBannerPass svg,
-.testBannerPass .testBannerText,
-.testBannerPass .testBannerSub {
+.testBannerPass > svg,
+.testBannerPass .testBannerText {
   color: var(--cw-pass-ink);
 }
 
-/* The next step, offered at the moment of highest momentum. Pushed right so
-   it reads as the banner's action rather than part of the verdict text. */
-.continueBtn {
+/* The way on, offered at the moment of highest momentum, and the way to the
+   full output when a submission never reached its checks. Text actions,
+   pushed right so they read as the row's action rather than its verdict. */
+.continueBtn,
+.errorBtn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   margin-left: auto;
   border: 0;
-  border-radius: 3px;
-  background: var(--cw-pass-ink);
-  padding: 5px 9px;
+  border-radius: 2px;
+  background: transparent;
+  padding: 6px 8px;
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.015em;
   white-space: nowrap;
-  color: #fff;
-}
-.continueBtn svg {
-  color: #fff;
-}
-/* The last step's "Next challenge" is a link to another page. */
-a.continueBtn {
   text-decoration: none;
+  color: var(--cw-accent-link);
 }
-.continueBtn:hover {
-  filter: brightness(1.12);
+.testBanner .continueBtn svg {
+  color: currentColor;
 }
-
-/* The banner's action when the submission never reached its checks: the
-   way to the full output, in the banner's own red rather than the pass
-   green, since nothing here passed. */
-.errorBtn {
-  display: inline-flex;
-  align-items: center;
-  margin-left: auto;
-  border: 1px solid var(--cw-fail-ink);
-  border-radius: 3px;
-  background: var(--cw-bg);
-  padding: 4px 9px;
-  font-family: inherit;
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  white-space: nowrap;
-  color: var(--cw-fail-ink);
-}
+.continueBtn:hover,
 .errorBtn:hover {
-  background: var(--cw-fail-ink);
-  color: #fff;
+  background: var(--cw-accent-tint);
+  color: var(--cw-accent-link-hover);
 }
 
 .submitErrorLead {
@@ -1872,18 +1866,16 @@ a.continueBtn {
 
 .mResultTabs {
   display: flex;
-  align-items: center;
-  gap: 4px;
+  align-items: stretch;
   flex-shrink: 0;
   border-bottom: 1px solid var(--cw-border-light);
-  padding: 8px 10px;
   overflow-x: auto;
 }
 .mTab {
   min-height: 44px;
   min-width: 44px;
   justify-content: center;
-  padding: 7px 10px;
+  padding: 0 12px;
 }
 
 .mResultPanel {

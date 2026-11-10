@@ -40,12 +40,16 @@ import {
   Database,
   Eye,
   History,
+  Lightbulb,
+  ListChecks,
   Loader2,
   Lock,
   Play,
   RotateCcw,
+  SquareTerminal,
   Table2,
   Undo2,
+  type LucideIcon,
 } from "lucide-react";
 // Not "@/lib/challenges": that module imports every challenge, and this is
 // client code. See lib/challenges/steps.ts.
@@ -94,13 +98,18 @@ import s from "./ChallengeWorkspace.module.css";
 type ResultTab = "output" | "tests" | "tables" | "solution" | "subs";
 type MobileView = "problem" | "code" | "results";
 
-const RESULT_TABS: { id: ResultTab; label: string; shortLabel?: string }[] = [
-  { id: "output", label: "Output" },
-  { id: "tests", label: "Test cases", shortLabel: "Tests" },
+const RESULT_TABS: {
+  id: ResultTab;
+  label: string;
+  shortLabel?: string;
+  Icon: LucideIcon;
+}[] = [
+  { id: "output", label: "Output", Icon: SquareTerminal },
+  { id: "tests", label: "Test cases", shortLabel: "Tests", Icon: ListChecks },
   // Database challenges only: see `resultTabList`.
-  { id: "tables", label: "Tables" },
-  { id: "solution", label: "Solution" },
-  { id: "subs", label: "Submissions" },
+  { id: "tables", label: "Tables", Icon: Table2 },
+  { id: "solution", label: "Solution", Icon: Lightbulb },
+  { id: "subs", label: "Submissions", Icon: History },
 ];
 
 /** Minimum instructions width, and the workspace width it must leave behind. */
@@ -828,6 +837,7 @@ export function ChallengeWorkspace({
               .join(" ")}
             onClick={() => chooseTab(tab.id)}
           >
+            <tab.Icon size={14} strokeWidth={2} aria-hidden="true" />
             <span>{mobile ? (tab.shortLabel ?? tab.label) : tab.label}</span>
             {showBadge ? (
               <span
@@ -1264,7 +1274,7 @@ export function ChallengeWorkspace({
             />
 
             <div className={s.paneColumn}>
-              <div className={s.paneHead}>{resultTabs(false)}</div>
+              <div className={`${s.paneHead} ${s.paneHeadTabs}`}>{resultTabs(false)}</div>
               <div
                 ref={panelRef}
                 role="tabpanel"
