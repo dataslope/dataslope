@@ -37,6 +37,18 @@ The splits were cut free from the kept takes with `--recut`: `debug-ai`, `review
 
 `check.mjs` was run again: 21 runs pass. **Every existing value in `results.json` came back identical.** The only new key is `cost` (`n` 1,000, `inOrder` 999, `shuffled` 8,658). New narration checks are in `claims`: `review-empty` and `next-cost`.
 
-## Checks
+## Checks (on the final code, through `out/entries/BackendEngineer-7-CodeReview.tsx` and the queue)
 
-(filled in below)
+- tsc and eslint report no errors in `src/videos/be-code-review/`.
+- `check:cues`: nothing names this folder. `npm test`: 79 pass, 0 fail. An earlier run failed only on `be-concurrency` cues, which belong to another fixer.
+- `check:motion`: pass (7:45.8; no still stretch of 2 s or more).
+- `check:frames`: pass.
+- `check:sync`: pass (37 beats, worst +0.03 s at `review-empty`).
+- `check:mix`: pass (speech at least 13.1 dB above the effects).
+- Stills looked at, at 4, 56.5, 101, 156, 195, 230, 239, 250, 263, 270, 282, 293, 331, 357, 369, 375.5, 436, 459 and 463 s. They cover the headline, the Boundaries card arriving on "The usual suspects", the red SQL band, the quotes inside the highlight, the shortened stat, the aside with only step 2 lit, the rerun ticks with the payoff held, step 5 one row lower, the grid with the third question marked, the `debug-more` red marks and note, the split checklist, contained "should be", empty/single, the blue slots, and the closing cost table. After the first set I made two touch-ups: the `test_intervals.py +9` tab now also leaves at the closing, and 999 is right-aligned under its highlight. Both were checked on a new still.
+
+## Notes
+
+- The coordinator's WIP checkpoint (8523f59d) already holds most of this work. Only the later edits show as uncommitted.
+- `Steps.relight` gained an optional `until` in this folder's own `parts.tsx`. No shared file was touched.
+- Prettier flags formatting in this folder, including files I did not touch (`Video.tsx`). I left it alone, since `lint` passes.
