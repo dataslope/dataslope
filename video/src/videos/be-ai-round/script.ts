@@ -145,7 +145,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * words (for the lexicon), and OWASP is glossed as a security project; HTTP
  * status codes are said as numbers ("four twenty-nines"), server errors in
  * words; numbers as they are said; no sentence opens on "A" before an
- * initialism. Canva, Google, Copilot and METR are the page's sources and
+ * initialism. Canva, Google and METR are the page's sources and
  * examples, named as such; nothing of theirs runs here.
  */
 export const script: NarrationScript = {
@@ -359,7 +359,13 @@ export const script: NarrationScript = {
     {
       id: "daily",
       scene: true,
-      text: "Question seven, the behavioral one. How do you use AI tools in your day-to-day work? A vague answer, like I use Copilot a lot, scores poorly.",
+      text: "Question seven, the behavioral one. How do you use AI tools in your day-to-day work?",
+    },
+    {
+      // Split from "daily" so the rewording (Claude Code for Copilot, the
+      // owner, 2026-11-11) voices only this sentence.
+      id: "daily-vague",
+      text: "A vague answer, like I use Claude Code a lot, scores poorly.",
       pauseAfter: 0.6,
     },
     {

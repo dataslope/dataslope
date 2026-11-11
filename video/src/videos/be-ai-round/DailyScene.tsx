@@ -47,9 +47,9 @@ export const DailyScene: React.FC = () => {
   const from = n.beat("daily").from;
   const qAt = n.word("daily", "Question seven");
   const textAt = n.word("daily", "How do you use AI tools");
-  const vagueAt = n.word("daily", "A vague answer");
-  const copilotAt = n.word("daily", "like I use Copilot a lot");
-  const poorlyAt = n.word("daily", "scores poorly");
+  const vagueAt = n.word("daily-vague", "A vague answer");
+  const quoteAt = n.word("daily-vague", "like I use Claude Code a lot");
+  const poorlyAt = n.word("daily-vague", "scores poorly");
   const concreteAt = n.word("daily-concrete", "Give a concrete workflow");
   const bins = [
     {
@@ -130,7 +130,7 @@ export const DailyScene: React.FC = () => {
           {/* A vague answer, struck. */}
           <Note at={vagueAt} x={X0} y={y(262)}>
             <span style={line(28, INK)}>
-              <span style={{ opacity: ease(frame, copilotAt - 2, 10) }}>
+              <span style={{ opacity: ease(frame, quoteAt - 2, 10) }}>
                 <Strike at={poorlyAt}>&ldquo;I use Claude Code a lot.&rdquo;</Strike>
               </span>
               <span style={{ color: ACCENT_INK, fontWeight: 500, marginLeft: "0.45em", opacity: ease(frame, poorlyAt, 10) }}> A vague answer scores poorly.</span>
