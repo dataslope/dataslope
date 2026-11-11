@@ -284,7 +284,7 @@ export const SkewScene: React.FC = () => {
                 }}
               >
                 {i === 1
-                  ? ["incomes,", "prices,", "wait times"].map((w, k) => (
+                  ? ["Incomes,", "prices,", "wait times"].map((w, k) => (
                       <span key={w} style={{ opacity: ease(frame, examplesAt[k] - 4, 10) }}>
                         {k ? " " : ""}
                         {w}
