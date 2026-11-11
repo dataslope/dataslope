@@ -6,7 +6,7 @@ import { body, HAIRLINE, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { DATA_INK, DATA_WASH, Greek, H0, Head, Kicker, Label, Mark, pulse, STAT_INK, STAT_WASH, Tick } from "./parts";
+import { DATA_INK, Greek, H0, Head, Kicker, Label, Mark, STAT_INK, Tick } from "./parts";
 
 const COL_X = [620, 1200];
 const COL_W = 560;
@@ -41,36 +41,23 @@ export const GridScene: React.FC = () => {
   const catchingAt = n.word("power", "catching");
   const thereAt = n.word("power", "really there");
   const oneMinusAt = n.word("minus-beta", "one minus");
-  const minusBetaAt = n.word("minus-beta", "beta");
 
   const cellY = (r: number) => y(ROW_Y[r]);
   const cellH = h(ROW_H);
   const frameIn = (k: number) => ease(frame, fourAt - 4 + k * 4, 12);
 
-  /** One cell of the grid, its wash coming in on `at`. */
-  const cell = (r: number, c: number, k: number, wash: string | null, at: number, glowAt: number, glowAt2?: number) => {
-    const f = frameIn(k);
-    if (f <= 0) return null;
-    const w = wash ? ease(frame, at, 14) : 0;
-    const g = pulse(frame, glowAt, 26) + (glowAt2 === undefined ? 0 : pulse(frame, glowAt2, 26));
-    return (
-      <div
-        style={{
-          position: "absolute",
-          left: COL_X[c] + 8,
-          top: cellY(r) + 8,
-          width: COL_W - 16,
-          height: cellH - 16,
-          border: `2px solid ${HAIRLINE}`,
-          borderRadius: 10,
-          opacity: f,
-          transform: `scale(${(0.96 + 0.04 * f) * (1 + 0.012 * g)})`,
-        }}
-      >
-        {wash ? <div style={{ position: "absolute", inset: 0, background: wash, opacity: w, borderRadius: 8 }} /> : null}
-      </div>
-    );
-  };
+  // The quadrants are kept apart by one cross of hairlines, not by cards
+  // (the owner, 2026-11-11): a vertical between the two decisions, from
+  // their headers down, and a horizontal between the two truths, from their
+  // labels across. Each outcome keeps its color in its own words.
+  const crossX = (COL_X[0] + COL_W + COL_X[1]) / 2 - 10;
+  const crossY = (cellY(0) + cellH + cellY(1)) / 2;
+  const tableTop = y(330);
+  const tableBottom = cellY(1) + cellH;
+  const tableLeft = ROW_LABEL_X;
+  const tableRight = COL_X[1] + COL_W;
+  const vDraw = frameIn(0);
+  const hDraw = frameIn(1);
 
   const text = (r: number, c: number, line: number, at: number, node: React.ReactNode) => (
     <Ink at={at} dur={14} style={{ left: COL_X[c] + 40, top: cellY(r) + 36 + line * 52, whiteSpace: "nowrap" }}>
@@ -121,11 +108,27 @@ export const GridScene: React.FC = () => {
         </Ink>
       ))}
 
-      {/* ── The four cells ── */}
-      {cell(0, 0, 0, null, 0, thereAt + 4)}
-      {cell(0, 1, 1, STAT_WASH, alarmAt - 4, alphaAt)}
-      {cell(1, 0, 2, STAT_WASH, missAt - 4, betaAt, minusBetaAt)}
-      {cell(1, 1, 3, DATA_WASH, powerAt - 4, catchingAt + 6, oneMinusAt)}
+      {/* ── The cross between the four outcomes ── */}
+      <div
+        style={{
+          position: "absolute",
+          left: crossX - 1,
+          top: tableTop,
+          width: 2,
+          height: (tableBottom - tableTop) * vDraw,
+          background: HAIRLINE,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: tableLeft,
+          top: crossY - 1,
+          width: (tableRight - tableLeft) * hDraw,
+          height: 2,
+          background: HAIRLINE,
+        }}
+      />
 
       {text(0, 1, 0, alarmAt - 4, <span style={{ ...body(40, true), color: STAT_INK }}>A false alarm</span>)}
       {text(0, 1, 1, typeOneAt - 4, <Label size={26}>Type I error</Label>)}

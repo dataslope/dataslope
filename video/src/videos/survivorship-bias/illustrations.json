@@ -9,7 +9,8 @@
     },
     "sizes": {
       "video-hero": "1536x1024",
-      "video-icon": "1024x1024"
+      "video-icon": "1024x1024",
+      "video-portrait": "1024x1024"
     },
     "styles": {
       "watercolor illustration": {
@@ -19,16 +20,14 @@
       "detailed watercolor": {
         "constraints": "Paint it as a refined, detailed watercolor in the manner of a museum's aviation illustration: accurate proportions and careful drawing, with the structure of the subject described precisely, then laid in soft transparent washes that feather at their edges, darker pigment pooling where a wash has dried, and the tooth of cold-press paper visible only inside the paint. Paint bare metal in cool pale blue washes with warm yellow light on the upper surfaces, and keep any red to small accents. Never outline in black and never shade with grey or black. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no sky, no clouds, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
         "softAlphaWarn": 0.3
+      },
+      "watercolor portrait": {
+        "constraints": "Paint it as a refined, loose watercolor portrait in the manner of an editorial magazine illustration: head and shoulders in three-quarter view, the face drawn carefully enough that the likeness reads, everything else left loose. Use soft transparent washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, and the tooth of cold-press paper visible only inside the paint. Paint the skin and hair in their natural colors with warm washes, and the clothes in the brand colors below: a jacket in blue washes, a shirt or collar in a pale warm wash. Never outline in black and never shade with grey. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no frame or border, no soft glow and no vignette, so the bust lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
       }
     }
   },
   "prompts": [
-    {
-      "id": "survivorship-bias-homeward",
-      "category": "video-hero",
-      "style": "detailed watercolor",
-      "subject": "one four-engine heavy bomber of the Second World War, in the shape of a B-17, flying home toward the left in three-quarter view from slightly above: a long rounded fuselage with a glazed nose and gun turrets, four engines on long straight wings, a tall tail fin, every propeller blurred as it spins; the wings and the rear of the fuselage peppered with small scattered bullet holes and torn patches of skin, while the engines and the cockpit are untouched"
-    },
     {
       "id": "survivorship-bias-drawer",
       "category": "video-icon",
@@ -40,6 +39,12 @@
       "category": "video-icon",
       "style": "detailed watercolor",
       "subject": "one twin-engine bomber of the Second World War seen from directly above, in exact plan view with the nose pointing straight up the page and the plane perfectly symmetric left to right: a long narrow rounded fuselage with a small glazed nose and a cockpit canopy, two straight wings set at right angles to the fuselage a third of the way back from the nose, one engine nacelle on each wing about two fifths of the way out, reaching forward of the wing to a propeller seen edge-on as a thin bar, and at the tail a straight tailplane with a small fin; the whole plane fills the frame from wingtip to wingtip, with no damage, no bullet holes, no markings and no insignia"
+    },
+    {
+      "id": "survivorship-bias-wald",
+      "category": "video-portrait",
+      "style": "watercolor portrait",
+      "subject": "Abraham Wald (1902 to 1950), the Hungarian-born statistician of Columbia's Statistical Research Group, as his best-known photograph shows him: a slim man in his thirties with short dark-brown wavy hair combed up and back from a high forehead, a narrow oval face, heavy-lidded dark eyes under straight dark brows, a long straight nose, thin lips with a faint closed smile, clean-shaven, no glasses; wearing a white shirt with a diagonally striped tie under a dark jacket painted in blue washes"
     }
   ]
 }

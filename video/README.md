@@ -1081,20 +1081,22 @@ for the moments where the subject is a real one:
 - **`watercolor portrait`**: head and shoulders of a named person, the face
   drawn carefully enough that the likeness reads, the clothes in brand washes.
   Used for Ted Codd (DbDesign-9-RelationalHistory), Claude Shannon and Alan
-  Turing (Nlp-5-History), each in the scene that names them and gone before
-  the scene moves on.
+  Turing (Nlp-5-History), and Abraham Wald (Stats-5-2-SurvivorshipBias),
+  each in the scene that names them.
 - **`detailed watercolor`**: accurate proportions and fine structure, for a
-  subject a viewer knows the real shape of. SurvivorshipBias's bomber is a
-  four-engine heavy bomber of 1943 with bullet holes across its wings and
-  fuselage, and none in its engines or cockpit, which is the point of the
-  story.
+  subject a viewer knows the real shape of. SurvivorshipBias's row of
+  bombers is a twin-engine bomber in exact plan view. (Its hook once carried
+  a four-engine heavy bomber in this style; the owner swapped it for Wald's
+  portrait, 2026-11-11.)
 
 **A portrait is checked against a photograph before it is used.** The model
 knows some faces and invents others. Turing came back recognisable from his
 name alone. Codd came back with a full head of brown hair until his subject
 described what his photo shows (balding, white at the sides, a grey
 moustache). Abraham Wald came back as someone else in round glasses, and was
-dropped rather than shown. So a portrait's subject names the person and
+dropped, until a second try described his Wikipedia photograph (no glasses,
+dark wavy hair combed up from a high forehead, heavy-lidded eyes, a narrow
+face, a striped tie). So a portrait's subject names the person and
 describes the photograph, and it is compared with that photograph before it
 goes in. Only people who have died are painted; Chamberlin and Stonebraker,
 in the same history, are not.

@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
-import { bob, ease, pop } from "../../components/motion";
+import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
@@ -21,7 +21,7 @@ const STRIP_W = 90;
 const STRIP_Y = 610;
 
 /**
- * Hook to "the most holes": Wald's question, the watercolor bomber, and the
+ * Hook to "the most holes": Wald's question, his watercolor portrait, and the
  * only evidence there was, the planes that came home.
  */
 export const HookScene: React.FC = () => {
@@ -33,9 +33,9 @@ export const HookScene: React.FC = () => {
   const yearAt = n.word("hook", "1943");
   const waldAt = n.word("hook", "Abraham Wald");
   const whichAt = n.word("hook", "Which parts");
-  // The bomber comes in with the year, so the page has its picture while the
-  // question is set up; the headline inks as the question is asked.
-  const planeAt = yearAt;
+  // His portrait comes in as he is named (the owner, 2026-11-11: it was a
+  // watercolor bomber), and the headline inks as the question is asked.
+  const portraitAt = waldAt;
   const bomberAt = n.word("hook", "bomber");
   const vulnerableAt = n.word("hook", "vulnerable");
   const evidenceAt = n.word("evidence", "evidence");
@@ -48,7 +48,7 @@ export const HookScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound (merged video only; the standalone has sfx off) ── */}
-      <Sfx name="el-pop" at={planeAt - 4} level={-30} />
+      <Sfx name="el-pop" at={portraitAt - 4} level={-30} />
       <Sfx name="el-pencil" at={vulnerableAt} level={-33} />
       <Sfx name="el-sprinkle" at={evidenceAt} level={-34} />
       <Sfx name="el-whoosh" at={homeAt} level={-34} />
@@ -95,15 +95,16 @@ export const HookScene: React.FC = () => {
       {ILLUSTRATIONS ? (
         <Illustration
           video={VIDEO}
-          id="survivorship-bias-homeward"
+          id="survivorship-bias-wald"
           style={{
             position: "absolute",
-            left: 1150,
-            top: y(118),
-            width: 660,
-            height: 350,
-            opacity: pop(frame, planeAt - 4, fps, 16),
-            transform: `translate(${(1 - pop(frame, planeAt - 4, fps, 16)) * 60}px, ${bob(frame, 6, 120)}px)`,
+            // Head and shoulders, 821 by 1024, beside the headline.
+            left: 1360,
+            top: y(84),
+            width: 321,
+            height: 400,
+            opacity: pop(frame, portraitAt - 4, fps, 16),
+            transform: `translateX(${(1 - pop(frame, portraitAt - 4, fps, 16)) * 40}px)`,
           }}
         />
       ) : null}

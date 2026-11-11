@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem, Tick } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
 import { badgeStyle, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -124,7 +124,9 @@ const Strata: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={sixAt} x={R_X + 40} y={c.y(390)}>
-        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        {/* At the size of the notes below it (the owner, 2026-11-11: it was
+            a 21px label beside 23-26px lines). */}
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
           Twenty users, <b style={{ color: WARM }}>six heavy users</b> ringed · <b style={{ color: BLUE_INK }}>A</b> or <b style={{ color: OK_INK }}>B</b>
         </span>
       </Note>
