@@ -97,6 +97,7 @@ const ArrayList: React.FC<{ c: Ctx }> = ({ c }) => {
 const Bst: React.FC<{ c: Ctx }> = ({ c }) => {
   const bstAt = c.w("r-bst", "A binary search tree");
   const ruleAt = c.w("r-bst", "keeps smaller keys to the left of each node");
+  const largerAt = c.w("r-bst", "larger ones to the right");
   const heightAt = c.w("r-bst", "so an operation costs its height");
   const orderAt = c.w("bst-heights", "A thousand keys inserted in order");
   const shuffledAt = c.w("bst-heights", "shuffled, twenty-one");
@@ -111,8 +112,13 @@ const Bst: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {/* The rule first: it is what a BST is, and why in-order comes out sorted. */}
       <Line at={bstAt} x={R_X} y={c.T} size={24} weight={500}>
-        A BST: at every node, smaller keys left
-        <span style={{ opacity: ease(frame, ruleAt + 8, 10) }}>, larger keys right</span>
+        A BST: at every node,{" "}
+        <span style={{ opacity: ease(frame, ruleAt + 4, 10) }}>
+          <Mark at={ruleAt + 8}>smaller keys left</Mark>
+        </span>
+        <span style={{ opacity: ease(frame, largerAt, 10) }}>
+          , <Mark at={largerAt + 4}>larger keys right</Mark>
+        </span>
       </Line>
       <Line at={heightAt} x={R_X} y={c.T + c.h(46)} size={24} weight={500}>
         An operation costs the tree&apos;s height.

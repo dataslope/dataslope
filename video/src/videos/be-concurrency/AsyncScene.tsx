@@ -91,7 +91,7 @@ export const AsyncScene: React.FC = () => {
   const ringDim = 1 - 0.6 * ease(frame, fetchesAt, 12) * (1 - ease(frame, noPreAt - 4, 12));
   // a steps off to wait on the network, and comes back when the OS says its
   // socket is ready.
-  const park = ease(frame, awaitsAt + 6, 16) * (1 - ease(frame, wakeAt, 16));
+  const park = ease(frame, awaitsAt + 6, 16) * (1 - ease(frame, wakeAt + 12, 18));
   const PARK = { x: 650, y: y(RING.y - 120) };
 
   const disc = (k: number) => {
@@ -108,11 +108,13 @@ export const AsyncScene: React.FC = () => {
   };
   const sockets = ease(frame, thousandsAt, 20);
   // The woken arrow: from the parked disc to the ring's edge nearest it,
-  // "back onto the loop" (a then rides back to its own slot).
+  // "back onto the loop", drawn while a is still parked at its tail and gone
+  // by the time a has ridden back to its own slot.
   const awayX = PARK.x - cx;
   const awayY = PARK.y - cy;
   const away = Math.hypot(awayX, awayY);
-  const homeTip = { x: cx + (awayX / away) * (RING.r + 14), y: cy + (awayY / away) * (RING.r + 14) };
+  // It stops short of the discs riding the ring, so it never points at one.
+  const homeTip = { x: cx + (awayX / away) * (RING.r + DISC + 14), y: cy + (awayY / away) * (RING.r + DISC + 14) };
   const homeTail = { x: PARK.x - (awayX / away) * (DISC + 8), y: PARK.y - (awayY / away) * (DISC + 8) };
 
   return (
@@ -206,7 +208,7 @@ export const AsyncScene: React.FC = () => {
             <span style={{ ...label(20, PAPER), fontWeight: 500 }}>CPU</span>
           </div>
         ) : null}
-        <Note at={handsAt} x={PARK.x - 40} y={PARK.y + DISC + 10} out={wakeAt + 10}>
+        <Note at={handsAt} x={PARK.x - 40} y={PARK.y + DISC + 10} out={wakeAt + 6}>
           <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>awaiting the network</span>
         </Note>
         {/* Under the loop: the OS says which sockets are ready, and a goes back on. */}
@@ -215,8 +217,8 @@ export const AsyncScene: React.FC = () => {
             the loop asks the OS<span style={{ opacity: ease(frame, readyAt, 10) }}>: which sockets are ready?</span>
           </span>
         </Note>
-        <Flow points={[[homeTail.x, homeTail.y], [homeTip.x, homeTip.y]]} at={wakeAt} color={OK} width={2.8} head={13} out={wakeAt + 50} />
-        <Note at={wakeAt + 4} x={PARK.x + DISC + 12} y={PARK.y - 14} out={wakeAt + 50}>
+        <Flow points={[[homeTail.x, homeTail.y], [homeTip.x, homeTip.y]]} at={wakeAt - 4} color={OK} width={2.8} head={13} out={wakeAt + 16} />
+        <Note at={wakeAt} x={PARK.x + DISC + 12} y={PARK.y - 14} out={wakeAt + 30}>
           <span style={{ ...label(20, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>ready: woken</span>
         </Note>
         </div>
