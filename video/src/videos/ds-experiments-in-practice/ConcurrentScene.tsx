@@ -3,11 +3,11 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CONTROL, Drift, OK, OK_INK, pulse, TREAT, X0 } from "./parts";
+import { Drift, OK_INK, pulse, TREAT, X0 } from "./parts";
 
 const GRID = { x: 560, top: 420, cw: 300, ch: 170 };
 
@@ -46,7 +46,6 @@ export const ConcurrentScene: React.FC = () => {
   const only = ease(frame, onlyAt, 12);
   const lifts = ease(frame, pricingAt + 4, 14);
   const differ = ease(frame, interactAt, 12);
-  const fact = ease(frame, factorialAt, 14);
   const bump = pulse(frame, factorialAt + 4, 20);
   const fill = ease(frame, fillAt, 12);
 
@@ -90,28 +89,27 @@ export const ConcurrentScene: React.FC = () => {
             </div>
           ))}
           <div style={{ position: "absolute", left: GRID.x - 270, top: y(GRID.top) + h(GRID.ch) - 16, ...note(24, INK), fontWeight: 500 }}>pricing</div>
+          {/* The four cells kept apart by one cross of hairlines, not by
+              bordered cards (the owner, 2026-11-11). A cell lights by its
+              words coming up to full strength in their color. */}
+          <div style={{ position: "absolute", left: GRID.x + GRID.cw - 1, top: y(GRID.top), width: 2, height: 2 * h(GRID.ch), background: HAIRLINE }} />
+          <div style={{ position: "absolute", left: GRID.x, top: y(GRID.top) + h(GRID.ch) - 1, width: 2 * GRID.cw, height: 2, background: HAIRLINE }} />
           {cells.map((cl) => {
             const { left, top } = cell(cl.r, cl.c);
-            const bg = cl.r === 1 && cl.c === 1 ? HIGHLIGHT : `color-mix(in srgb, ${CONTROL} 35%, ${PAPER})`;
             return (
               <div
                 key={cl.text}
                 style={{
                   position: "absolute",
-                  left: left + 4,
-                  top: top + 4,
-                  width: GRID.cw - 8,
-                  height: h(GRID.ch) - 8,
-                  boxSizing: "border-box",
-                  border: `2px solid ${fact > 0 ? `color-mix(in srgb, ${OK} ${fact * 100}%, ${INK})` : INK}`,
-                  borderRadius: 8,
-                  background: cl.lit > 0 ? `color-mix(in srgb, ${bg} ${cl.lit * 100}%, ${PAPER})` : PAPER,
+                  left,
+                  top,
+                  width: GRID.cw,
+                  height: h(GRID.ch),
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   ...note(24, cl.ink),
-                  fontWeight: cl.r === 1 && cl.c === 1 ? 500 : 500,
-                  opacity: cl.lit > 0 || cl.text === "neither" ? 1 : 0.6,
+                  fontWeight: 500,
                   transform: `scale(${1 + 0.03 * bump})`,
                 }}
               >

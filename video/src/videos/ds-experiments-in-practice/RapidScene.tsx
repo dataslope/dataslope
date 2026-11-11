@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { arrowHead, cubicPath, sampleCubic, type Cubic } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
@@ -39,28 +40,36 @@ const Ate: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-        <circle cx={cx} cy={cy} r={c.h(190) * all} fill={`color-mix(in srgb, ${CONTROL} ${30 + 25 * lit}%, ${PAPER})`} stroke={INK} strokeWidth={2 + 2 * lit} />
+        <circle cx={cx} cy={cy} r={c.h(190) * all} fill={`color-mix(in srgb, ${CONTROL} ${30 + 25 * lit}%, ${PAPER})`} />
         <circle cx={cx + 50} cy={cy + c.h(40)} r={c.h(96) * got} fill={TREAT} opacity={0.85} />
       </svg>
-      <Note at={ateNameAt - 2} x={R_X + 520} y={c.y(400)}>
+      {/* Each term spelled out as it is said, then its short form and what
+          it averages over (the owner, 2026-11-11). */}
+      <Note at={ateAt - 2} x={R_X + 520} y={c.y(372)}>
+        <span style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Average treatment effect</span>
+      </Note>
+      <Note at={ateNameAt - 2} x={R_X + 520} y={c.y(410)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          <b>ATE</b>
+          ATE
           <span style={{ opacity: ease(frame, everyoneAt, 10) }}>: averaged over everyone</span>
         </span>
       </Note>
-      <Note at={attNameAt - 2} x={R_X + 520} y={c.y(460)}>
+      <Note at={attAt - 2} x={R_X + 520} y={c.y(472)}>
+        <span style={{ ...note(26, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Average treatment effect on the treated</span>
+      </Note>
+      <Note at={attNameAt - 2} x={R_X + 520} y={c.y(510)}>
         <span style={{ ...note(26, BLUE_INK), whiteSpace: "nowrap" }}>
-          <b>ATT</b>
+          ATT
           <span style={{ opacity: ease(frame, gotAt - 2, 10) }}>: only over those who got it</span>
         </span>
       </Note>
-      <Note at={matchAt} x={R_X + 520} y={c.y(560)}>
+      <Note at={matchAt} x={R_X + 520} y={c.y(590)}>
         <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Randomized, all treated: they match</span>
       </Note>
-      <Note at={apartAt} x={R_X + 520} y={c.y(610)}>
+      <Note at={apartAt} x={R_X + 520} y={c.y(636)}>
         <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Opt-in or observational: they can differ</span>
       </Note>
-      <Note at={reportAt} x={R_X + 520} y={c.y(690)}>
+      <Note at={reportAt} x={R_X + 520} y={c.y(712)}>
         <span style={{ ...note(25, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           Report <b>ATT</b> for the people who use it
         </span>
@@ -82,16 +91,27 @@ const Long: React.FC<{ c: Ctx }> = ({ c }) => {
   const x0 = R_X;
   const wk = 112;
   const top = c.y(470);
-  // Eight weeks. What drifts is marked above the strip; each defence labels
-  // its own mark: the cycle under its outline, the end date at its flag,
-  // which stands where the run stops.
-  const flagX = x0 + 8 * wk - 3;
+  // Eight weeks, in gray. What drifts is marked above the strip; each
+  // defence labels its own mark: the cycle under its outline, the end date
+  // by an arrow to the line where the run stops, set a little clear of the
+  // last week (the owner, 2026-11-11: a line, not a flag; gray, not blue).
+  const endX = x0 + 8 * wk + 8;
+  const lineTop = top - c.h(22);
+  const lineBottom = top + c.h(60) + 8;
+  const endLabelY = top + c.h(104);
+  const endMid = endLabelY + 15;
+  const endArrow: Cubic = [
+    [endX - 66, endMid],
+    [endX - 18, endMid],
+    [endX, endMid - 14],
+    [endX, lineBottom + 7],
+  ];
   return (
     <>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
         {Array.from({ length: 8 }, (_, i) => (
           <g key={i} opacity={ease(frame, driftAt + i * 1.5, 8)}>
-            <rect x={x0 + i * wk} y={top} width={wk - 6} height={c.h(60)} rx={5} fill={`color-mix(in srgb, ${CONTROL} 40%, ${PAPER})`} stroke={INK} strokeWidth={1.2} />
+            <rect x={x0 + i * wk} y={top} width={wk - 6} height={c.h(60)} rx={5} fill={`color-mix(in srgb, ${INK_SOFT} 16%, ${PAPER})`} />
             <text x={x0 + i * wk + (wk - 6) / 2} y={top + c.h(30) + 7} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
               {i === 0 ? "week 1" : i + 1}
             </text>
@@ -99,10 +119,14 @@ const Long: React.FC<{ c: Ctx }> = ({ c }) => {
         ))}
         {/* A full business cycle: two weeks here. */}
         <rect x={x0 - 4} y={top - 6} width={(2 * wk + 2) * ease(frame, cycleAt, 12)} height={c.h(60) + 12} rx={8} fill="none" stroke={OK} strokeWidth={3.5} />
-        {/* The end date, set before the start, where the run ends. */}
+        {/* The end date, set before the start: a line where the run ends,
+            and an arrow up to it from its label. */}
         <g opacity={ease(frame, endAt, 10)}>
-          <line x1={flagX} x2={flagX} y1={top - c.h(70)} y2={top + c.h(76)} stroke={OK} strokeWidth={3} />
-          <path d={`M${flagX},${top - c.h(70)} l40,12 l-40,12 z`} fill={OK} />
+          <line x1={endX} x2={endX} y1={lineTop} y2={lineBottom} stroke={OK} strokeWidth={3} strokeLinecap="round" />
+        </g>
+        <g opacity={ease(frame, endAt + 6, 10)}>
+          <path d={cubicPath(endArrow)} fill="none" stroke={OK} strokeWidth={2.4} strokeLinecap="round" />
+          <path d={arrowHead(sampleCubic(endArrow), 12, 7.4)} fill="none" stroke={OK} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
         </g>
       </svg>
       <Note at={seasonsAt} x={x0 + 2 * wk} y={top - c.h(44)}>
@@ -114,14 +138,14 @@ const Long: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={freezeAt} x={x0} y={top - c.h(118)}>
         <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Freeze the scope for the whole run</span>
       </Note>
-      <Note at={cycleAt + 4} x={x0} y={top + c.h(84)}>
+      <Note at={cycleAt + 4} x={x0} y={endLabelY}>
         <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
           At least one full business cycle
           <br />
           <span style={{ ...label(20, INK_SOFT), fontWeight: 500 }}>(often a week or two)</span>
         </span>
       </Note>
-      <Note at={endAt + 4} x={flagX - 12} y={top + c.h(84)} align="right">
+      <Note at={endAt + 4} x={endX - 76} y={endLabelY} align="right">
         <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>End date, set in advance</span>
       </Note>
     </>
