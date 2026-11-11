@@ -296,7 +296,7 @@ export const RateScene: React.FC = () => {
         <Line at={fourTimesAt} x={X0} y={y(390) + 196} size={23} weight={500} color={ACCENT_INK}>
           all <Num>{RATE.localOk}</Num> pass: 4× the limit
         </Line>
-        <VRule x={930} top={y(330)} bottom={sharedBox.top + sharedBox.h + 30 + 2 * (CELL + CELL_GAP) + 50} at={shareAt} />
+        <VRule x={930} top={y(330)} bottom={sharedBox.top + sharedBox.h + 30 + 2 * (CELL + CELL_GAP) + 94} at={shareAt} />
         <Line at={shareAt} x={1010} y={y(330)} size={23} weight={500} color={OK_INK}>
           The count in a store they all share
         </Line>

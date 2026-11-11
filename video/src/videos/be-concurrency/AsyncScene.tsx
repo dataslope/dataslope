@@ -86,7 +86,8 @@ export const AsyncScene: React.FC = () => {
   const hog = ease(frame, hogStart, 14) * (1 - ease(frame, hogEnd, 14));
   // It also holds still while the timeline beside it is read.
   const held = (f: number, s0: number, s1: number) => Math.max(0, Math.min(f, s1) - s0);
-  const turn = (Math.max(0, frame - loopAt) - held(frame, fetchesAt, noPreAt) - held(frame, hogStart, hogEnd + 14)) / (fps * 9);
+  const turnOf = (f: number) => (Math.max(0, f - loopAt) - held(f, fetchesAt, noPreAt) - held(f, hogStart, hogEnd + 14)) / (fps * 9);
+  const turn = turnOf(frame);
   const ringDim = 1 - 0.6 * ease(frame, fetchesAt, 12) * (1 - ease(frame, noPreAt - 4, 12));
   // a steps off to wait on the network, and comes back when the OS says its
   // socket is ready.
@@ -106,6 +107,12 @@ export const AsyncScene: React.FC = () => {
     return { x, y: yy, top: k === 0 ? top * (1 - park) : top };
   };
   const sockets = ease(frame, thousandsAt, 20);
+  // Where a lands back on the ring when it is woken: the arrow aims there.
+  const homeAng = -Math.PI / 2 - turnOf(wakeAt + 16) * 2 * Math.PI;
+  const home = { x: cx + RING.r * Math.cos(homeAng), y: cy + RING.r * Math.sin(homeAng) };
+  const toHome = { x: home.x - (PARK.x - DISC - 8), y: home.y - (PARK.y + 12) };
+  const toHomeLen = Math.hypot(toHome.x, toHome.y);
+  const homeTip = { x: home.x - (toHome.x / toHomeLen) * (DISC + 8), y: home.y - (toHome.y / toHomeLen) * (DISC + 8) };
 
   return (
     <AbsoluteFill>
@@ -207,7 +214,7 @@ export const AsyncScene: React.FC = () => {
             the loop asks the OS<span style={{ opacity: ease(frame, readyAt, 10) }}>: which sockets are ready?</span>
           </span>
         </Note>
-        <Flow points={[[PARK.x - DISC - 8, PARK.y + 12], [cx + RING.r * 0.87 + DISC + 6, cy - RING.r * 0.5 - 4]]} at={wakeAt} color={OK} width={2.8} head={13} out={wakeAt + 50} />
+        <Flow points={[[PARK.x - DISC - 8, PARK.y + 12], [homeTip.x, homeTip.y]]} at={wakeAt} color={OK} width={2.8} head={13} out={wakeAt + 50} />
         <Note at={wakeAt + 4} x={PARK.x + DISC + 12} y={PARK.y - 14} out={wakeAt + 50}>
           <span style={{ ...label(20, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>ready: woken</span>
         </Note>

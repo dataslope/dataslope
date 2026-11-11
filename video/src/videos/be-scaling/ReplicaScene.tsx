@@ -198,7 +198,7 @@ export const ReplicaScene: React.FC = () => {
           for a short while after a write
         </Line>
 
-        <VRule x={1257} top={y(340)} bottom={y(760)} at={asyncAt} />
+        <VRule x={1257} top={y(340)} bottom={y(780)} at={asyncAt} />
 
         {/* ── A lagging follower, promoted. ── */}
         <Line at={asyncAt} x={LOG.x} y={y(352)} size={22} weight={500} color={INK}>
@@ -245,13 +245,13 @@ export const ReplicaScene: React.FC = () => {
         <Line at={semiAt} x={LOG.x} y={y(402) + h(214)} size={22} weight={500} color={INK}>
           <Mark at={semiAt + 2}>Semi-synchronous</Mark>
         </Line>
-        <Line at={waitsAt} x={LOG.x} y={y(402) + h(258)} size={21} color={OK_INK} weight={500}>
+        <Line at={waitsAt} x={LOG.x} y={y(402) + h(262)} size={21} color={OK_INK} weight={500}>
           a write waits for one follower
         </Line>
-        <Line at={nothingAt} x={LOG.x} y={y(402) + h(292)} size={21} color={OK_INK} weight={500}>
+        <Line at={nothingAt} x={LOG.x} y={y(402) + h(302)} size={21} color={OK_INK} weight={500}>
           promote that one: nothing lost
         </Line>
-        <Line at={slowerAt} x={LOG.x} y={y(402) + h(326)} size={21} color={INK_SOFT}>
+        <Line at={slowerAt} x={LOG.x} y={y(402) + h(342)} size={21} color={INK_SOFT}>
           the price: every write is slower
         </Line>
       </Drift>

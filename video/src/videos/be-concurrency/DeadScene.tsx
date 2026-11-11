@@ -381,12 +381,12 @@ export const DeadScene: React.FC = () => {
         </Note>
         {(["T1", "T2"] as const).map((t, i) => (
           <Note key={t} at={whomAt + 4 + i * 6} x={X0} y={y(712 + i * 36)}>
-            <span style={{ ...note(22, THREAD[i].ink), fontWeight: 500, whiteSpace: "nowrap" }}>{dumpLine(t)}</span>
+            <span style={{ ...note(22, THREAD[i].ink), fontWeight: 500, whiteSpace: "nowrap" }}>
+              {dumpLine(t)}
+              {i === 1 ? <span style={{ color: ACCENT_INK, opacity: ease(frame, whomAt + 20, 10) }}>: a cycle</span> : null}
+            </span>
           </Note>
         ))}
-        <Note at={whomAt + 20} x={X0 + 470} y={y(730)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a cycle</span>
-        </Note>
         <Note at={whomAt + 30} x={X0} y={y(786)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>(databases find their own and abort one transaction)</span>
         </Note>

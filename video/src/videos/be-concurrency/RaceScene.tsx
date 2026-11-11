@@ -59,12 +59,12 @@ const Order: React.FC<{ threads: string; result: number; x: number; y: number; a
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
   if (p <= 0.001) return null;
-  // The order the pass/fail line points at swells once, on its word.
+  // The order the pass/fail line points at is ringed once, on its word.
   const lit = flash === undefined ? 0 : pulse(frame, flash, 22);
   const right = result === RACE.one.right;
   const ink = judged > 0.5 ? (right ? OK_INK : ACCENT_INK) : INK;
   return (
-    <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "center", gap: 4, fontSize: 22, opacity: Math.min(1, p) * (1 - dim), transform: `scale(${(0.85 + 0.15 * Math.min(1, p)) * (1 + 0.22 * lit)})`, transformOrigin: "0 50%" }}>
+    <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "center", gap: 4, fontSize: 22, opacity: Math.min(1, p) * (1 - dim), transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`, transformOrigin: "0 50%" }}>
       {[...threads].map((c, i) => (
         <span key={i} style={{ width: SQ, height: SQ, borderRadius: 4, background: THREAD[who(c)].fill }} />
       ))}
@@ -75,7 +75,8 @@ const Order: React.FC<{ threads: string; result: number; x: number; y: number; a
           fontWeight: 500,
           padding: "0 6px",
           borderRadius: 5,
-          background: judged > 0 ? tint(right ? OK : ACCENT, 18 * judged) : "transparent",
+          background: judged > 0 ? tint(right ? OK : ACCENT, 18 * judged + 30 * lit) : "transparent",
+          boxShadow: lit > 0 ? `0 0 0 ${2.5 * lit}px ${right ? OK : ACCENT}` : undefined,
         }}
       >
         <Num>{result}</Num>

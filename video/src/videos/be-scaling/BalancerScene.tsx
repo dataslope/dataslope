@@ -344,7 +344,7 @@ export const BalancerScene: React.FC = () => {
             );
           })}
         </Svg>
-        <Ink at={clockAt} dur={14} style={{ left: RING.cx - 110, top: ringCy - 34, width: 220, textAlign: "center" }}>
+        <Ink at={clockAt} dur={14} style={{ left: RING.cx - 130, top: ringCy - 34, width: 260, textAlign: "center", whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK), fontWeight: 500 }}>
             <Mark at={clockAt + 2}>a key goes to the next</Mark>
             <br />

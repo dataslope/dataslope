@@ -132,9 +132,9 @@ const Atomic: React.FC<{ c: Ctx }> = ({ c }) => {
   const casY = c.y(606);
   const casH = c.h(50);
   const CAS = [
-    { x: R_X + 250, w: 126, text: "read: 5", at: cmpAt + 4 },
-    { x: R_X + 390, w: 126, text: "add: 6", at: cmpAt + 8 },
-    { x: R_X + 530, w: 300, text: "write 6, only if still 5", at: onlyAt },
+    { x: R_X + 284, w: 126, text: "read: 5", at: cmpAt + 4 },
+    { x: R_X + 424, w: 126, text: "add: 6", at: cmpAt + 8 },
+    { x: R_X + 564, w: 270, text: "write 6, only if still 5", at: onlyAt },
   ];
   const loopY = casY + casH + c.h(30);
   return (

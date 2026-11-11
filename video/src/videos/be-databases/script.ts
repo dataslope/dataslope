@@ -202,8 +202,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     block comments "Cy has no orders"; run, Cy has two, 104 and 124, so
  *     the video names no one and says "the six who never ordered".
  *     Reported.) "r-keys": pg_indexes on
- *     accounts and transfers lists only the two primary keys
- *     (accounts_pkey, transfers_pkey), none on from_id or to_id. "r-cover":
+ *     the quick round's own customers and orders, orders.customer_id
+ *     declared a foreign key, lists only the two primary keys
+ *     (customers_pkey, orders_pkey), none on customer_id. "r-cover":
  *     SUM(amount) for customer 42 on an index on customer_id is a Bitmap Heap
  *     Scan of 20 table pages; with INCLUDE (amount), after VACUUM, an Index
  *     Only Scan with "Heap Fetches: 0".

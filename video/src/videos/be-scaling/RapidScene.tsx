@@ -156,7 +156,7 @@ const Consist: React.FC<{ c: Ctx }> = ({ c }) => {
         <>
           <div style={{ position: "absolute", left: mid - 0.75, top: lineY + 14, width: 1.5, height: 68, background: INK_SOFT, opacity: 0.5 * midP }} />
           <div style={{ position: "absolute", left: mid - 11, top: lineY - 11, width: 22, height: 22, borderRadius: 11, background: BAR, opacity: midP, border: `3px solid ${PAPER}`, boxSizing: "border-box" }} />
-          <div style={{ position: "absolute", left: mid - 150, top: lineY - 60, width: 300, textAlign: "center", opacity: midP, ...label(23, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          <div style={{ position: "absolute", left: mid - 150, top: lineY - 64, width: 300, textAlign: "center", opacity: midP, ...label(23, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             session guarantees
           </div>
         </>

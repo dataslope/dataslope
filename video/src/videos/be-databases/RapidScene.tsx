@@ -226,6 +226,8 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
   const fkAt = c.w("r-keys", "A foreign key points at");
   const missingAt = c.w("r-keys", "no order can name a missing customer");
   const doesntAt = c.w("r-keys", "Postgres doesn't index the foreign key's column");
+  const yourselfAt = c.w("r-keys-fix", "Index it yourself");
+  const scansAt = c.w("r-keys-fix", "scans the whole orders table");
   const top = c.y(372);
   const cg = tableGeometry({
     x: 1330,
@@ -281,14 +283,16 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={doesntAt - 4} x={R_X} y={idxTop - c.h(48)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          Indexes on the transfer example&rsquo;s tables, from <SmallMono color={INK}>pg_indexes</SmallMono>:
+          Indexes on these two tables, from <SmallMono color={INK}>pg_indexes</SmallMono>:
         </span>
       </Note>
       <DataTable g={ig} cols={RAPID.keys.cols.map((n) => ({ name: n }))} rows={RAPID.keys.rows.map((cells, i) => ({ cells, at: doesntAt + i * 3 }))} at={doesntAt - 2} />
       <Note at={doesntAt + 12} x={ig.right + 40} y={idxTop + c.h(30)}>
-        <div style={{ ...note(22, INK), width: 400 }}>
-          primary keys only: <b style={{ color: ACCENT_INK }}>nothing on</b> <SmallMono>from_id</SmallMono> or <SmallMono>to_id</SmallMono>, the foreign keys
+        <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <b style={{ color: ACCENT_INK }}>no index on</b> <SmallMono>customer_id</SmallMono>
         </div>
+        <div style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: c.h(14), opacity: ease(frame, yourselfAt, 10) }}>index it yourself</div>
+        <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: c.h(8), opacity: ease(frame, scansAt, 10) }}>or lookups and deletes scan all orders</div>
       </Note>
     </>
   );

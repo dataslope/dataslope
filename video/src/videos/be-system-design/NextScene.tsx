@@ -150,7 +150,6 @@ export const NextScene: React.FC = () => {
   const end = n.beat("next-10x").to;
 
   const peak = sig(ESTIMATE.peakReadQps);
-  const ten = ease(frame, tenAt, 12);
   const textX = 800;
   const crowW = 420;
   const crowH = Math.round((crowW * ART.crow[1]) / ART.crow[0]);
