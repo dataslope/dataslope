@@ -59,10 +59,10 @@ export const MeasureScene: React.FC = () => {
   const rubricAt = n.word("measure", "turn that into a rubric");
   const passAt = n.word("measure", "pass or fail on each");
   const steps = [
-    { text: "sample real traffic, by intent and difficulty", at: n.word("measure-steps", "Sample real traffic") },
-    { text: "expert labels, two raters on some items", at: n.word("measure-steps", "Have experts label a subset") },
-    { text: "every version on the same items", at: n.word("measure-steps", "Score every version") },
-    { text: "report the uncertainty", at: n.word("measure-steps", "report the uncertainty") },
+    { text: "Sample real traffic, by intent and difficulty", at: n.word("measure-steps", "Sample real traffic") },
+    { text: "Expert labels, two raters on some items", at: n.word("measure-steps", "Have experts label a subset") },
+    { text: "Every version on the same items", at: n.word("measure-steps", "Score every version") },
+    { text: "Report the uncertainty", at: n.word("measure-steps", "report the uncertainty") },
   ];
   const rareAt = n.word("measure-steps", "so the rare cases are in it");
   const humansAt = n.word("measure-steps", "how much humans agree");
@@ -143,14 +143,14 @@ export const MeasureScene: React.FC = () => {
             {s.text}
           </Step>
         ))}
-        <Note at={rareAt} x={STEPS_X + 58} y={y(STEPS_TOP) + h(44)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>so the rare cases are in it</span>
+        <Note at={rareAt} x={STEPS_X + 58} y={y(STEPS_TOP) + h(48)}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>so the rare cases are in it</span>
         </Note>
-        <Note at={humansAt} x={STEPS_X + 58} y={y(STEPS_TOP) + h(STEP_ROW + 44)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>to see how much humans agree</span>
+        <Note at={humansAt} x={STEPS_X + 58} y={y(STEPS_TOP) + h(STEP_ROW + 48)}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>to see how much humans agree</span>
         </Note>
-        <Note at={noiseAt - 4} x={STEPS_X + 58} y={y(STEPS_TOP) + h(3 * STEP_ROW + 44)}>
-          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>a pass rate with no interval invites people to ship noise</span>
+        <Note at={noiseAt - 4} x={STEPS_X + 58} y={y(STEPS_TOP) + h(3 * STEP_ROW + 48)}>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>a pass rate with no interval invites people to ship noise</span>
         </Note>
       </Drift>
     </AbsoluteFill>
