@@ -25,7 +25,7 @@
 - When: 262-287.5 s, from `q5` "a follower is promoted" through `q5-fix` (frames element-275.jpeg, element-286.jpeg)
 - What: on "a follower is promoted" the top follower turns green and is renamed "new leader", but its sub-label stays "read-only". The blue "writes" arrow still points into the red "leader x" box, and the "reads" arrow still points at the new leader as if nothing changed. The figure stays on screen, dimmed, for the rest of the scene.
 - Why it matters: the point of promotion is that the follower starts taking writes, and the figure says it doesn't.
-- Cause: `video/src/videos/be-scaling/ReplicaScene.tsx:125` (`sub="read-only"` for every follower, promoted or not); `:91` (the writes `Flow` always ends at `LEADER.x`).
+- Cause: `video/src/videos/be-scaling/ReplicaScene.tsx:125` (`sub="read-only"` for every follower, promoted or not); `:92` (the writes `Flow` always ends at `LEADER.x`).
 - Fix: `sub={i === 0 && promoted > 0.5 ? "takes writes" : "read-only"}`. On `promotedAt`, fade out the writes arrow into the dead leader and draw a second writes `Flow` into the new leader (e.g. `[[X0, lMid], [FOLLOW.x - 60, lMid], [FOLLOW.x - 60, fMid[0]], [FOLLOW.x - 8, fMid[0]]]`).
 
 ### 3. [P2] confusion: the even hash spread is repainted red to stand for one user's links, and four servers stand in for eight shards
@@ -132,7 +132,7 @@
 ### 18. [P3] confusion: elbow connectors in the shared-bucket panel meet at one point
 - When: 507-513.7 s, beat `q9-shared` (frame element-512.jpeg)
 - What: server 1's horizontal run passes through the point where server 2's connector turns, and the same happens with servers 3 and 4. Server 2 appears to branch into two arrows.
-- Cause: `video/src/videos/be-scaling/RateScene.tsx`, the shared-bucket `Flow` points (horizontal runs at one y for every server).
+- Cause: `video/src/videos/be-scaling/RateScene.tsx:286` (every connector runs horizontally at the same `y(390) + 84`).
 - Fix: give each connector its own horizontal y (stagger by 14 px), or run them straight down into the bucket's top edge at four x positions.
 
 ### 19. [P3] confusion: red question marks on every box in the hook
