@@ -49,8 +49,13 @@ const Folder: React.FC<{ x: number; y: number; h: number; name: string; at: numb
     ) : null;
   return (
     <div style={{ position: "absolute", left: x, top: y + (1 - p) * 12, width: FOLDER_W, height: h, opacity: p * (1 - 0.62 * pruned) }}>
-      {art(FOLDER_ART.blue, 1)}
-      {art(FOLDER_ART.read, read * (1 - trap))}
+      {/* Each color is its own painting, and the three are not quite the
+          same shape, so a layer underneath peeks round the edges of the one
+          over it (the owner, 2026-11-11: a hint of blue round the red). A
+          layer stays whole while the one over it fades in, so the folder is
+          never see-through, and drops out once that one has arrived. */}
+      {art(FOLDER_ART.blue, read >= 1 || trap >= 1 ? 0 : 1)}
+      {art(FOLDER_ART.read, trap >= 1 ? 0 : read)}
       {art(FOLDER_ART.trap, trap)}
       {/* The month on the front, below the tab. */}
       <div
