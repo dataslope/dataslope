@@ -82,7 +82,7 @@ export const AxisScene: React.FC = () => {
         <YTicks ticks={[0, 25, 50, 75, 100]} x={LEFT.x0} base={base} top={top} lo={0} hi={T.top} at={asked - 4} out={out6} />
         <BarSet values={scores} labels={teams} x0={LEFT.x0} x1={LEFT.x1} base={base} top={top} lo={0} hi={T.top} at={fiveAt - 2} out={out6} />
         <Verdict ok x={LEFT.x0} y={base + h(50)} at={honestAt} out={out6}>
-          about {fmt(T.realPct, 1)}% apart, and it looks it
+          About {fmt(T.realPct, 1)}% apart, and it looks it
         </Verdict>
         <Note at={equalAt} x={LEFT.x1 - 140} y={top - h(70)} out={out6}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Nearly equal</span>

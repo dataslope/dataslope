@@ -228,7 +228,7 @@ export const DualScene: React.FC = () => {
           labels={INVERTED.years.map((yr, i) => (i % 2 ? "" : String(yr)))}
         />
         <Verdict ok={false} x={LEFT.x1 + 10} y={miniTop + h(10)} at={fallAt}>
-          a {INVERTED.risePct}% rise
+          A {INVERTED.risePct}% rise
         </Verdict>
 
         <PanelTitle x={RIGHT.x0} y={miniTop - h(48)} at={zerosAt - 4}>

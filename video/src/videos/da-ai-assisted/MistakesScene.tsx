@@ -250,7 +250,7 @@ export const MistakesScene: React.FC = () => {
         <DataTable g={ag} cols={colsOf(RATIOS.averaged)} at={averageAt + 4} rows={rowsAt(RATIOS.averaged.rows, twentySixAt - 2)} marks={[{ row: 0, col: 0, at: twentySixAt + 4, color: MARK_BAD }]} />
         <Note at={countsAt - 2} x={X0} y={avgTop + avgH + h(12)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            a {small}-session day counts as much as a {large}-session one
+            A {small}-session day counts as much as a {large}-session one
           </span>
         </Note>
         <Listing
