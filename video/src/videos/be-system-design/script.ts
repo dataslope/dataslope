@@ -55,7 +55,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     four filled in, the last ("bottlenecks") left open.
  *   q1-why: the "Non-functional" column takes the yellow highlight on "shapes
  *     the design"; two small figures side by side, "1,000 users" and "1
- *     billion redirects a day", over the same two feature chips.
+ *     billion redirects a day", over the same two feature chips, each with
+ *     what it takes in words ("one small server", "many servers, caches").
  *   q2: question card; three empty slots, "Requests per second (QPS)",
  *     "Storage", "Bandwidth", each filled by the beats below, "QPS" inked on
  *     its word. The envelope-and-pencil
@@ -70,6 +71,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     years; 500 B × 35,000/s ≈ 17 MB/s. Both small beside the 35,000.
  *   q2-verdict: storage and bandwidth dim; "35,000 reads/s" and a "cache"
  *     chip stay lit.
+ *   q2-cache: under the cache, "a whole day of new links: 5 GB, fits in one
+ *     machine's memory" (results.json dayInMemoryBytes).
  *   q2-ladder: the page's latency ladder (memory-latency-ladder), redrawn as
  *     horizontal bars on a log axis from results.json; main memory, the SSD
  *     read and the in-data-center round trip lit in turn, with "×1,000" and
@@ -77,15 +80,22 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q2-tail, q2-fanout: the page's latency histogram (latency-percentiles),
  *     redrawn from results.json's bins, with the median, mean and p99 rules
  *     placed as said (labelled 24 ms, 31 ms, 286 ms; a "simulated sample"
- *     note). Then a row of 100 small squares, one call each, and "1 − 0.99¹⁰⁰
+ *     note). On "one request in a hundred" the bins from 100 ms on grow a
+ *     hundred times taller, so the tail is seen, and the band is counted:
+ *     401 requests, 294 of them past the chart's 320 ms edge (tailCount,
+ *     offChart). Then a row of 100 small squares, one call each, and "1 − 0.99¹⁰⁰
  *     ≈ 63% of page loads hit at least one" on "sixty-three percent".
  *   q3: question card; the API as two plain cards, "create: long URL → key"
  *     and "redirect: key → long URL". No code, no HTTP syntax.
  *   q3-key: the 62 characters in three groups (a–z, A–Z, 0–9), then an ID
  *     encoded to its six-character key; "62⁶ ≈ 57 billion keys, over 15
  *     years at 10 million a day" (results.json keyLengths).
- *   q3-hash: the alternative beside it: a long URL through a hash to a key,
- *     with a small "already taken?" check before the store.
+ *   q3-temp: a third column beside the API, "which kind": "temporary (302)"
+ *     in green, "permanent (301): browsers keep it" in red.
+ *   q3-hash: the alternative beside it: a long URL through a hash to a few
+ *     characters; "taken?" (yellow) then "add a salt, hash again"; "store
+ *     only if absent: no two servers claim one key" in green; and, in gray,
+ *     the same long URL always gets the same key.
  *   q3-diagram: the page's diagram, drawn box by box as named: client, load
  *     balancer, two app servers, cache, key-value store (system-design.mdx's
  *     mermaid); "100 : 1" on the cache's arrow.
@@ -93,12 +103,17 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     app server, app server to the cache and back (two round trips, each
  *     "0.5 ms" from the ladder), "≈ 1 ms" in green; then a miss, the dot
  *     going on to the store, "+0.5 ms +0.1 ms (SSD) ≈ 1.6 ms".
- *   q3-counter: a single "counter" box that both app servers call, ringed in
- *     red; it splits into two ID blocks, one per server ("1 to 1,000,000",
- *     "1,000,001 to 2,000,000"), drawn green.
+ *   q3-counter, q3-blocks, q3-coord: a single "counter" box that both app
+ *     servers call, ringed in red; each server takes its own block, "from
+ *     9,876,000,001" and "from 9,877,000,001" (results.json blocks, so the
+ *     first holds the counted IDs below), drawn green; the counter stays,
+ *     plain, with dashed arrows out to each server: it hands out the blocks,
+ *     asked once per 1,000,000 IDs, and a dead server leaves a gap.
  *   q3-guess: three consecutive IDs and their keys from results.json
  *     (counted), stacked so the keys visibly differ in one last character;
  *     red on "walk through".
+ *   q3-edges: Question one's edges, under them: "Custom aliases: the same
+ *     keys, stored only if free"; "Expiry: a column the redirect checks".
  *   q4: question card; the q3 diagram returns, and the load balancer, the
  *     cache and the store are ringed in red on their words. On "Lose the
  *     cache", the cache fades and every arrow it carried reroutes to the store.
@@ -114,23 +129,30 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     as said; the retry line (dashed) climbing to 300 against the 100 that
  *     callers offer, in red; the breaker's error rate falling to zero, in
  *     green, on "recovers". The breaker-switch spot.
+ *   q4-how: four green lines beside the time axis: retry with backoff and
+ *     jitter, under a small retry budget; while it's open, fail fast, or
+ *     serve a cached answer.
  *   q5: question card; a world outline with an origin dot in Virginia and a
  *     user in Sydney. The globe spot.
  *   q5-light: the arc between them with "15,700 km ÷ 200 km/ms × 2 ≈ 157 ms",
  *     a floor, and beside it q3-path's "≈ 1 ms" inside the data center, drawn
  *     to the same scale (a sliver); then an edge dot beside the user, "under
  *     1 ms".
- *   q5-use: three benefits as chips (latency, origin offload, spikes), then
- *     two columns: "at the edge" (images, JavaScript, CSS, video) and "to the
- *     origin" (user-specific responses, or a short time to live).
- *   q5-redirect: a short-link redirect moves into the edge column; two red
- *     notes under it, "not counted by you" and "a taken-down link still
- *     works", and a short timer that answers both, on "keep that time short".
+ *   q5-use, q5-dyn: three benefits as chips (latency, origin offload,
+ *     spikes), then two columns: "at the edge" (images, JavaScript, CSS,
+ *     video) and "to the origin" (user-specific responses, or a short time
+ *     to live, glossed; even those save handshake round trips, in green).
+ *   q5-redirect: a short-link redirect moves into the edge column; "The
+ *     price" and its two red notes under it there, "not counted by you" and
+ *     "a taken-down link still works", and a short timer that answers both,
+ *     on "keep that time short".
  *   q5-win: the line "the cheapest large win for a read-heavy, global
  *     product", the page's words.
- *   next, next-10x: the whole design small and green; "35,000/s" beside it
- *     becomes "350,000/s" in yellow on "ten times"; <NextLine> "Next: scaling
- *     a design".
+ *   next, next-10x: the whole design small and green, behind a green "edge";
+ *     "sized for its estimate: 35,000 redirects a second" beside it stays,
+ *     and a row of its own, "now ten times the traffic: 350,000 redirects a
+ *     second", is marked yellow on "ten times"; <NextLine> "Next: scaling a
+ *     design".
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
@@ -175,8 +197,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     app server to cache), 2 × 0.5 = 1 ms; a miss adds a third and an SSD
  *     read, 1.5 + 0.1 = 1.6 ms. Network time only, as the ladder gives it;
  *     no server's processing time is claimed. ID blocks ("a million at a
- *     time") and consecutive keys are the follow-up, shown on the video's own
- *     IDs (9,876,543,210 and the next two: aMoY42, aMoY43, aMoY44).
+ *     time", handed out by the counter "once per million IDs") and
+ *     consecutive keys are the follow-up, shown on the video's own IDs
+ *     (9,876,543,210 and the next two: aMoY42, aMoY43, aMoY44), which the
+ *     first server's block (9,876,000,001 to 9,877,000,000) holds. A day of
+ *     new links in memory: the 5 GB a day the estimate stores ("Even a whole
+ *     day of new links is five gigabytes"). Temporary or permanent redirect,
+ *     a salted rehash with a conditional write, custom aliases and expiry:
+ *     the standard follow-ups, said as design choices, no vendor named.
  *   - single points of failure (q4): the page's answer (one database, one
  *     load balancer, one cache; active-passive pairs, replicated databases
  *     with failover, multiple app servers, several availability zones). The
@@ -185,7 +213,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     open 12 s, probes with 10% of traffic, the first probe fails and the
  *     second closes it; the retry loop's offered load peaks at 300 against
  *     the 100 callers send, and its error rate ends at 0.98 ("never"), the
- *     breaker's at 0.025.
+ *     breaker's at 0.025. "Retry with backoff and jitter, under a small
+ *     budget, ... fail fast or serve a cached answer" is the standard advice
+ *     for the retries that chart blames, said without a number.
  *   - distance (q5): light in fiber about 200 km a millisecond (c over a
  *     refractive index near 1.5); Sydney to Ashburn, Virginia, 15,674 km
  *     great-circle, so at least 157 ms round trip ("over a hundred times" the
