@@ -5,6 +5,7 @@ import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, TABULAR, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { VANISH } from "./data";
@@ -151,7 +152,10 @@ export const VanishScene: React.FC = () => {
             </Svg>
             <Note at={millionAt} x={px(0.3)} y={py(1e-5)}>
               <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-                0.25<sup>10</sup> = {VANISH.ten.toFixed(8)}: under one in a million
+                <MathRun>
+                  0.25<sup>10</sup> = {VANISH.ten.toFixed(8)}
+                </MathRun>
+                : under one in a million
               </span>
             </Note>
             <Note at={earlyAt + 2} x={px(0.3)} y={py(1e-5) + h(40)}>
@@ -159,7 +163,10 @@ export const VanishScene: React.FC = () => {
             </Note>
             <Note at={explodesAt - 2} x={px(10) - 330} y={py(VANISH.tenBig) - h(50)}>
               <span style={{ ...note(25, WARM_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-                1.5<sup>10</sup> = {VANISH.tenBig}: it explodes
+                <MathRun>
+                  1.5<sup>10</sup> = {VANISH.tenBig}
+                </MathRun>
+                : it explodes
               </span>
             </Note>
             {/* Under the gridline at 1, clear of both lines (it sat on the gridline). */}

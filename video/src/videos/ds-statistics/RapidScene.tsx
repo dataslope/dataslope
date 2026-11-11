@@ -5,6 +5,7 @@ import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, fmt, label } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CORR } from "../da-statistics-communication/data";
@@ -156,7 +157,10 @@ const Ranks: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={tAt - 4} x={R_X} y={c.y(740)}>
         <span style={{ ...noteText(26, ACCENT_INK) }}>
-          t-test: <span style={{ ...TABULAR }}>p = {fmt(RANKS.t, 2)}</span>
+          t-test:{" "}
+          <MathRun style={{ ...TABULAR }}>
+            <I>p</I> = {fmt(RANKS.t, 2)}
+          </MathRun>
           <span style={{ ...noteText(22, INK_SOFT), marginLeft: 14 }}>sees nothing</span>
         </span>
       </Note>
@@ -170,7 +174,9 @@ const Ranks: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...noteText(26, OK_INK) }}>
           Mann-Whitney:{" "}
           <Mark at={uAt + 4} color={MARK_OK}>
-            <span style={{ ...TABULAR }}>p = {fmt(RANKS.u, 3)}</span>
+            <MathRun style={{ ...TABULAR }}>
+              <I>p</I> = {fmt(RANKS.u, 3)}
+            </MathRun>
           </Mark>
           <span style={{ ...noteText(22, INK_SOFT), marginLeft: 14 }}>finds the shift</span>
         </span>

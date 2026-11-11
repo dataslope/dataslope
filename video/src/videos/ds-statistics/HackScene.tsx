@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, fmt, label } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
+import { M } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HACK } from "./data";
@@ -130,7 +131,7 @@ export const HackScene: React.FC = () => {
         <Note at={chanceAt} x={X0} y={y(540)}>
           <span style={{ ...noteText(26, INK), ...TABULAR }}>
             the chance of at least one in 20:{" "}
-            <span style={{ fontFamily: MONO, fontWeight: 500 }}>1 − 0.95²⁰</span>{" "}
+            <M>{"1 − 0.95^{20}"}</M>{" "}
             <span style={{ opacity: ease(frame, pctAt - 2, 10) }}>
               = <Mark at={pctAt + 2} color={MARK_BAD}>{Math.round(HACK.atLeastOne * 100)}%</Mark>
             </span>

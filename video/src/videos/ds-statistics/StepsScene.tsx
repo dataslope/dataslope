@@ -6,7 +6,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Mark, MARK_OK, noteText, OK_INK, Svg, X0 } from "./parts";
@@ -90,11 +90,19 @@ export const StepsScene: React.FC = () => {
   const STEPS = [
     <>State the null and the alternative</>,
     <>
-      Choose the significance level, <i>α</i>, and size the sample
+      Choose the significance level,{" "}
+      <MathRun>
+        <I>α</I>
+      </MathRun>
+      , and size the sample
     </>,
     <>Collect the data; compute the test statistic and its p-value</>,
     <>
-      Reject the null if <i>p</i> &lt; <i>α</i>, and say what that means
+      Reject the null if{" "}
+      <MathRun>
+        <I>p</I> &lt; <I>α</I>
+      </MathRun>
+      , and say what that means
     </>,
   ];
   const stepY = (i: number) => y(STEP_TOP + i * STEP_PITCH);
@@ -192,9 +200,7 @@ export const StepsScene: React.FC = () => {
               <span style={{ ...noteText(28, INK_SOFT), fontWeight: 500 }}>{r.name}</span>
             </Note>
             <Note at={r.at + 2} x={HYP_X} y={r.y - h(4)}>
-              <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
-                {r.formula}
-              </span>
+              <MathRun style={{ fontSize: 36, color: INK }}>{r.formula}</MathRun>
             </Note>
             {r.tag ? (
               <>

@@ -4,8 +4,8 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, body } from "../../editorial/style";
-import { MONO } from "../../theme/fonts";
 import { Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CI } from "./data";
@@ -95,9 +95,9 @@ export const CiScene: React.FC = () => {
         <Note at={buildAt + 4} x={SIDE_X} y={y(300)} out={clearAt}>
           <span style={{ ...noteText(22, INK_SOFT) }}>
             each one:{" "}
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK }}>
-              <span style={{ textDecoration: "overline" }}>x</span> ± t*·s/√n
-            </span>
+            <MathRun style={{ color: INK }}>
+              <I>x̄</I> ± <I>t</I>*·<I>s</I>/√<I>n</I>
+            </MathRun>
           </span>
         </Note>
         <Note at={takeAt + 8} x={RIGHT + 30} y={vy(TRUTH) - 16} out={clearAt}>

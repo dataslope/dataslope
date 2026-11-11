@@ -6,6 +6,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, fmt } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CLT } from "./data";
@@ -193,7 +194,11 @@ export const CltScene: React.FC = () => {
         />
         <Curve points={[[RUN_X.a, ry(CLT.mu)], [RUN_X.b, ry(CLT.mu)]]} at={runAt - 2} dur={16} out={clearAt} color={INK} width={2.2} dash="7 6" />
         <Note at={runAt + 4} x={RUN_X.b + 14} y={ry(CLT.mu) - 16} out={clearAt}>
-          <span style={{ ...noteText(22, INK), ...TABULAR }}>μ = {fmt(CLT.mu, 2)}</span>
+          <span style={{ ...noteText(22, INK), ...TABULAR }}>
+            <MathRun>
+              <I>μ</I> = {fmt(CLT.mu, 2)}
+            </MathRun>
+          </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: 1 - ease(frame, clearAt, 10) }}>
           <defs>
@@ -246,7 +251,12 @@ export const CltScene: React.FC = () => {
           <line x1={(bell.x0 + bell.x1) / 2} x2={(bell.x0 + bell.x1) / 2} y1={bell.base} y2={bell.base + 8} stroke={INK} strokeWidth={1.4} />
         </Svg>
         <Note at={shapeAt + 12} x={bell.x0 + 40} y={bell.base + h(14)} out={clearAt}>
-          <span style={{ ...noteText(22, INK_SOFT) }}>the spread of the mean around μ</span>
+          <span style={{ ...noteText(22, INK_SOFT) }}>
+            the spread of the mean around{" "}
+            <MathRun>
+              <I>μ</I>
+            </MathRun>
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -6,6 +6,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, TABULAR, fmt } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EFFECT } from "./data";
@@ -115,15 +116,20 @@ export const EffectScene: React.FC = () => {
 
         <Note at={pAt + 4} x={SIDE_X} y={y(580)}>
           <span style={{ ...noteText(30, INK), ...TABULAR }}>
-            p = <b>{EFFECT.p.toFixed(5)}</b>
+            <MathRun>
+              <I>p</I> = <b>{EFFECT.p.toFixed(5)}</b>
+            </MathRun>
           </span>
         </Note>
         <Note at={dAt} x={SIDE_X} y={y(636)}>
           <span style={{ ...noteText(30, WARM_INK), ...TABULAR }}>
-            Cohen&apos;s d ={" "}
-            <span style={{ opacity: ease(frame, lessAt - 2, 10) }}>
-              <b>{fmt(EFFECT.d, 4)}</b>
-            </span>
+            Cohen&apos;s{" "}
+            <MathRun>
+              <I>d</I> ={" "}
+              <span style={{ opacity: ease(frame, lessAt - 2, 10) }}>
+                <b>{fmt(EFFECT.d, 4)}</b>
+              </span>
+            </MathRun>
           </span>
         </Note>
         <Note at={dAt + 8} x={SIDE_X} y={y(686)}>

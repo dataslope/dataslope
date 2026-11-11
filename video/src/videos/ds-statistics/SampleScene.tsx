@@ -6,7 +6,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, fmt, label } from "../../editorial/style";
 import { Leader, Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SAMPLE } from "./data";
@@ -161,7 +161,10 @@ export const SampleScene: React.FC = () => {
           width={2.4}
           label={
             <span style={{ ...noteText(24, INK), opacity: ease(frame, muAt - 2, 10) }}>
-              <span style={{ ...label(20, INK_SOFT), marginRight: 10 }}>parameter</span>μ = <span style={TABULAR}>{fmt(S.mu, 2)}</span>
+              <span style={{ ...label(20, INK_SOFT), marginRight: 10 }}>parameter</span>
+              <MathRun>
+                <I>μ</I> = <span style={TABULAR}>{fmt(S.mu, 2)}</span>
+              </MathRun>
             </span>
           }
           labelY={popBase - h(POP_H) - h(30)}
@@ -191,7 +194,10 @@ export const SampleScene: React.FC = () => {
         </Note>
         <Note at={xbarAt} x={x(S.firstMean) + 12} y={stripY + h(24)} dim={drawAt}>
           <span style={{ ...noteText(24, BLUE_INK) }}>
-            <span style={{ ...label(20, INK_SOFT), marginRight: 10 }}>statistic</span>x̄ = <span style={TABULAR}>{fmt(S.firstMean, 2)}</span>
+            <span style={{ ...label(20, INK_SOFT), marginRight: 10 }}>statistic</span>
+            <MathRun>
+              <I>x̄</I> = <span style={TABULAR}>{fmt(S.firstMean, 2)}</span>
+            </MathRun>
           </span>
         </Note>
         <Leader
@@ -207,7 +213,12 @@ export const SampleScene: React.FC = () => {
           out={drawAt}
         />
         <Note at={estAt + 6} x={x(13) + 12} y={stripY + h(54)} out={drawAt}>
-          <span style={{ ...noteText(24, INK) }}>estimates μ</span>
+          <span style={{ ...noteText(24, INK) }}>
+            estimates{" "}
+            <MathRun>
+              <I>μ</I>
+            </MathRun>
+          </span>
         </Note>
 
         {/* ── Question 2: the spread of single values, and of the mean ── */}
@@ -229,19 +240,19 @@ export const SampleScene: React.FC = () => {
           </div>
         </Note>
         <Note at={rootAt} x={RIGHT_X} y={y(530)} out={panelOut}>
-          <div style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
-            SE = SD / √n
-          </div>
+          <MathRun style={{ fontSize: 30, color: INK, ...TABULAR }}>
+            SE = SD / √<I>n</I>
+          </MathRun>
         </Note>
         <Note at={sevenAt - 2} x={RIGHT_X} y={y(588)} out={panelOut}>
-          <div style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
-            n = 50: {fmt(S.sigma, 2)} / √50 = <Mark at={sevenAt + 2}>{fmt(S.seFormula, 2)}</Mark>
-          </div>
+          <MathRun style={{ fontSize: 28, color: BLUE_INK, ...TABULAR }}>
+            <I>n</I> = 50: {fmt(S.sigma, 2)} / √50 = <Mark at={sevenAt + 2}>{fmt(S.seFormula, 2)}</Mark>
+          </MathRun>
         </Note>
         <Note at={fourAt} x={RIGHT_X} y={y(642)} out={panelOut}>
-          <div style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
-            n = 200: {fmt(S.sigma, 2)} / √200 = <Mark at={halfAt + 2}>{fmt(S.se200, 2)}</Mark>
-          </div>
+          <MathRun style={{ fontSize: 28, color: BLUE_INK, ...TABULAR }}>
+            <I>n</I> = 200: {fmt(S.sigma, 2)} / √200 = <Mark at={halfAt + 2}>{fmt(S.se200, 2)}</Mark>
+          </MathRun>
         </Note>
         <Note at={halfAt + 4} x={RIGHT_X} y={y(700)} out={panelOut}>
           <span style={{ ...noteText(24, OK_INK) }}>four times the data, half the error</span>
