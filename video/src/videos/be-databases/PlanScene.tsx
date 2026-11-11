@@ -33,8 +33,9 @@ const R_X = 1320;
  * first (the indented Seq Scan runs first and feeds the Aggregate above it),
  * then the three things to read, each a band on its span with its label on
  * the right: the kind of scan, estimated rows against actual rows, the rows
- * a filter threw away. Then the numbers themselves, and the cause: the cast,
- * circled in the statement and marked in the filter. Last, the range on the
+ * a filter threw away. Then the numbers themselves, why the gap matters
+ * (the plan is chosen from the estimate), and the cause: the cast, banded
+ * red in the statement and in the filter. Last, the range on the
  * column itself and its plan, an Index Only Scan whose estimate and actual
  * rows agree, and the word for it, with the other two usual fixes.
  */

@@ -76,10 +76,12 @@ const Value: React.FC<{ x: number; y: number; at: number; out: number; value: st
  * table. Above it, two transactions as lanes: the run of the dirty read
  * (another transaction's 50 parked uncommitted; a read at each of the four
  * levels, 100 every time, so the standard's "possible" under read
- * uncommitted is struck for Postgres), then the non-repeatable read and the
- * phantom drawn from the page's definitions (Postgres's repeatable read
- * stops phantoms, from its docs), then serializable's price: a transaction
- * aborted with a serialization failure, and the retry.
+ * uncommitted gets a "Postgres: no" badge beside it, never a strike: the
+ * standard's cell is right), then the non-repeatable read and the phantom
+ * drawn from the page's definitions (Postgres's repeatable read stops
+ * phantoms, from its docs, badged the same way), then serializable: write
+ * skew, which repeatable read lets through (two on-call doctors), and its
+ * price, a transaction aborted with a serialization failure, and the retry.
  */
 export const IsoScene: React.FC = () => {
   const frame = useCurrentFrame();
