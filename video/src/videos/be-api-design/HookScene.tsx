@@ -155,7 +155,7 @@ export const HookScene: React.FC = () => {
                   style={{
                     width: s,
                     height: s,
-                    borderRadius: 7,
+                    borderRadius: 5,
                     boxSizing: "border-box",
                     border: `2px solid ${BAR}`,
                     background: big ? `color-mix(in srgb, ${BAR} 16%, ${PAPER})` : PAPER,

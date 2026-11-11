@@ -64,7 +64,7 @@ const Evict: React.FC<{ c: Ctx }> = ({ c }) => {
                       width: 90,
                       height: 52,
                       boxSizing: "border-box",
-                      borderRadius: 8,
+                      borderRadius: 5,
                       border: `2px solid ${out > 0.5 ? ACCENT : BAR}`,
                       background: out > 0.5 ? `color-mix(in srgb, ${ACCENT} 10%, ${PAPER})` : `color-mix(in srgb, ${BAR} 10%, ${PAPER})`,
                       display: "flex",

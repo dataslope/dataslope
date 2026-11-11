@@ -11,7 +11,7 @@ import { MONO } from "../../theme/fonts";
 import { Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, Q_SIZE, Q_W, Svg, VRule, X0 } from "./parts";
 
 const LEADER = { x: 330, w: 230, h: 80, mid: 490 };
-const FOLLOW = { x: 760, w: 240, h: 68, mids: [400, 580] };
+const FOLLOW = { x: 760, w: 240, h: 84, mids: [400, 580] };
 const READS_X = 1170;
 /** The timeline: a leader row and a follower row, time running right. */
 const T = { x0: 330, x1: 1240, leader: 744, follower: 828, create: 400, copy: 820, open: 560, window: 940 };
@@ -205,7 +205,7 @@ export const ReplicaScene: React.FC = () => {
                     width: LOG.cell,
                     height: 34,
                     boxSizing: "border-box",
-                    borderRadius: 6,
+                    borderRadius: 4,
                     border: missing ? `2.5px dashed ${ACCENT}` : `2px solid ${BAR}`,
                     background: missing ? PAPER : `color-mix(in srgb, ${BAR} 18%, ${PAPER})`,
                     display: "flex",

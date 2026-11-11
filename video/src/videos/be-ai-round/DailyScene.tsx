@@ -8,9 +8,15 @@ import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { METR } from "./data";
-import { Clear, ColumnRule, Drift, line, Mark, Spot, Strike, X0 } from "./parts";
+import { Clear, Drift, line, Mark, Spot, Strike, X0 } from "./parts";
 
 const BIN_Y = 372;
+/** The bins' spots, in bin order: hand it, keep it, verify, the time it was
+ *  wrong. A clear 100px under the longest list, and as much again left free
+ *  under them. */
+const BIN_ART = ["be-ai-round-robot-papers", "be-ai-round-padlock", "be-ai-round-magnifier", "be-ai-round-glass"];
+const BIN_ART_Y = 690;
+const BIN_ART_SIZE = 170;
 const BIN_W = 362;
 const BIN_GAP = 60;
 /** METR's two results, on one axis of time taken: zero, and a percent in px. */
@@ -125,9 +131,9 @@ export const DailyScene: React.FC = () => {
           <Note at={vagueAt} x={X0} y={y(262)}>
             <span style={line(28, INK)}>
               <span style={{ opacity: ease(frame, copilotAt - 2, 10) }}>
-                <Strike at={poorlyAt}>&ldquo;I use Copilot a lot.&rdquo;</Strike>
+                <Strike at={poorlyAt}>&ldquo;I use Claude Code a lot.&rdquo;</Strike>
               </span>
-              <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, poorlyAt, 10) }}> A vague answer scores poorly.</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 500, marginLeft: "0.45em", opacity: ease(frame, poorlyAt, 10) }}> A vague answer scores poorly.</span>
             </span>
           </Note>
 
@@ -135,9 +141,6 @@ export const DailyScene: React.FC = () => {
           <Note at={concreteAt} x={X0} y={binTop - 46}>
             <span style={{ ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A concrete workflow</span>
           </Note>
-          {bins.slice(1).map((b, i) => (
-            <ColumnRule key={b.title} x={X0 + (i + 1) * (BIN_W + BIN_GAP) - BIN_GAP / 2} top={binTop} height={h(212)} at={b.at} />
-          ))}
           {bins.map((b, i) => {
             const p = ease(frame, b.at - 2, 12);
             if (p <= 0) return null;
@@ -163,6 +166,21 @@ export const DailyScene: React.FC = () => {
               </div>
             );
           })}
+          {/* One spot per bin, well under the longest list, so the four
+              read as a row of their own. */}
+          {bins.map((b, i) => (
+            <Spot
+              key={b.title}
+              id={BIN_ART[i]}
+              at={b.at + 8}
+              left={X0 + i * (BIN_W + BIN_GAP)}
+              top={y(BIN_ART_Y)}
+              width={BIN_ART_SIZE}
+              height={BIN_ART_SIZE}
+              phase={i * 29}
+              amp={3}
+            />
+          ))}
         </Clear>
 
         {/* Measure rather than assume: METR's trial. */}

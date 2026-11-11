@@ -27,28 +27,36 @@ const MiniTable: React.FC<{
   rowH: number;
   name: string;
   at: number;
-  lit?: { rows: readonly number[]; at: number; color: string };
+  lit?: { rows: readonly number[]; at: number; color: string; ink: string };
 }> = ({ x, y, w, rows, rowH, name, at, lit }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 14);
   if (p <= 0) return null;
   const headH = 34;
   const litP = lit ? ease(frame, lit.at, 12) : 0;
+  /** A skeleton bar's fill: `base` on a plain row; on a lit row, the row's
+   *  ink at `strength`% over paper, faded in with the tint. */
+  const skeleton = (i: number, base: string, strength: number) =>
+    lit && lit.rows.includes(i) && litP > 0
+      ? `color-mix(in srgb, color-mix(in srgb, ${lit.ink} ${strength}%, ${PAPER}) ${Math.round(litP * 100)}%, ${base})`
+      : base;
   return (
     <g opacity={p}>
-      <rect x={x} y={y} width={w} height={headH + rows * rowH} rx={6} fill={PAPER} stroke={BAR} strokeWidth={2} />
-      <rect x={x} y={y} width={w} height={headH} rx={6} fill={`color-mix(in srgb, ${BAR} 18%, ${PAPER})`} />
+      <rect x={x} y={y} width={w} height={headH + rows * rowH} rx={4} fill={PAPER} stroke={BAR} strokeWidth={2} />
+      <rect x={x} y={y} width={w} height={headH} rx={4} fill={`color-mix(in srgb, ${BAR} 18%, ${PAPER})`} />
       <text x={x + 14} y={y + 24} style={svgText({ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: INK })}>
         {name}
       </text>
       {Array.from({ length: rows }, (_, i) => (
         <g key={i} opacity={ease(frame, at + 4 + i * 2, 10)}>
+          {/* On a lit row the skeleton darkens into the row's own hue, so it
+              reads on the tint instead of greying it out. */}
           {lit && lit.rows.includes(i) ? (
             <rect x={x + 3} y={y + headH + i * rowH + 3} width={w - 6} height={rowH - 6} rx={3} fill={lit.color} opacity={0.35 * litP} />
           ) : null}
           <line x1={x} x2={x + w} y1={y + headH + i * rowH} y2={y + headH + i * rowH} stroke={`color-mix(in srgb, ${INK} 18%, transparent)`} strokeWidth={1} />
-          <rect x={x + 16} y={y + headH + i * rowH + rowH / 2 - 4} width={w * 0.22} height={8} rx={4} fill={`color-mix(in srgb, ${BAR} 55%, ${PAPER})`} />
-          <rect x={x + 26 + w * 0.22} y={y + headH + i * rowH + rowH / 2 - 4} width={w * (0.25 + ((i * 37) % 30) / 100)} height={8} rx={4} fill={`color-mix(in srgb, ${INK} 22%, ${PAPER})`} />
+          <rect x={x + 16} y={y + headH + i * rowH + rowH / 2 - 4} width={w * 0.22} height={8} rx={4} fill={skeleton(i, `color-mix(in srgb, ${BAR} 55%, ${PAPER})`, 85)} />
+          <rect x={x + 26 + w * 0.22} y={y + headH + i * rowH + rowH / 2 - 4} width={w * (0.25 + ((i * 37) % 30) / 100)} height={8} rx={4} fill={skeleton(i, `color-mix(in srgb, ${INK} 22%, ${PAPER})`, 50)} />
         </g>
       ))}
     </g>
@@ -190,8 +198,8 @@ export const NosqlScene: React.FC = () => {
             <span style={{ ...label(26, INK), fontWeight: 500 }}>Relational</span>
           </Ink>
           <Svg>
-            <MiniTable x={cust.x} y={tTop} w={cust.w} rows={4} rowH={rowH} name="customers" at={relAt} lit={{ rows: [1], at: joinsAt, color: BAR }} />
-            <MiniTable x={ord.x} y={tTop} w={ord.w} rows={5} rowH={rowH} name="orders" at={relAt + 4} lit={{ rows: txnRows, at: txnAt + 2, color: OK }} />
+            <MiniTable x={cust.x} y={tTop} w={cust.w} rows={4} rowH={rowH} name="customers" at={relAt} lit={{ rows: [1], at: joinsAt, color: BAR, ink: BLUE_INK }} />
+            <MiniTable x={ord.x} y={tTop} w={ord.w} rows={5} rowH={rowH} name="orders" at={relAt + 4} lit={{ rows: txnRows, at: txnAt + 2, color: OK, ink: OK_INK }} />
             {/* customer 2's orders, joined */}
             {[0, 2].map((r, k) => (
               <path

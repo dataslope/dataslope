@@ -462,7 +462,7 @@ const Window: React.FC<{ c: Ctx }> = ({ c }) => {
           width: (st.right - st.left + 1) * cw - 2,
           height: 74,
           border: `3px solid ${INK}`,
-          borderRadius: 10,
+          borderRadius: 8,
           opacity: ease(frame, growsAt + 6, 8),
         }}
       />

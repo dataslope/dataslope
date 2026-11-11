@@ -163,7 +163,7 @@ export const FeedScene: React.FC = () => {
                   left: PUSH.feed.x + PUSH.feed.w + 14,
                   top: m - 16 - (1 - drop(i)) * 20,
                   padding: "3px 9px",
-                  borderRadius: 7,
+                  borderRadius: 5,
                   background: BAR,
                   ...label(19, PAPER),
                   fontWeight: 500,

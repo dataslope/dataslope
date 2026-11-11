@@ -26,7 +26,10 @@ export const SpofScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
   const { y } = useLayout();
-  const B = diagramBoxes(y);
+  // The app servers carry no ID range here, so they keep the narrower box
+  // the two zones were laid out around (Question three widens them).
+  const D = diagramBoxes(y);
+  const B = { ...D, app1: { ...D.app1, w: 250 }, app2: { ...D.app2, w: 250 } };
 
   const from = n.beat("q4").from;
   const qAt = n.word("q4", "Question four");

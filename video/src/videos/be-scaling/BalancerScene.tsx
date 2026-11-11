@@ -230,7 +230,7 @@ export const BalancerScene: React.FC = () => {
                 top,
                 width: 48,
                 height: 32,
-                borderRadius: 7,
+                borderRadius: 5,
                 background: `color-mix(in srgb, ${BAR} 14%, ${PAPER})`,
                 border: `2px solid ${BAR}`,
                 boxSizing: "border-box",

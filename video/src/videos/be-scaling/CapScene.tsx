@@ -7,12 +7,15 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, lab
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Line, Mark, MiniMap, Node, Q_SIZE, Q_W, Svg, VRule, X0 } from "./parts";
+import { Illustration } from "../../components/Illustration";
+import { Drift, Line, Mark, MiniMap, Node, Q_SIZE, Q_W, spotH, VRule, X0 } from "./parts";
 
 /** The page's grid: two rows (the network's state), two columns (the choice). */
 const G = { head: X0, col: [420, 800], colW: 360, top: 400, rowH: 104, gap: 12 };
 /** The shortener, split by a partition, at the right. */
 const P = { left: 1290, cut: 1560, right: 1640, top: 420, pacelc: 1420 };
+/** The crack's drawn width: 250px tall, spanning both rows of nodes. */
+const CRACK_W = 77;
 
 /** A cell of the grid: a tinted box that inks its text in. */
 const Cell: React.FC<{ x: number; y: number; w: number; h: number; at: number; fill: string; lit?: number; children: React.ReactNode }> = ({
@@ -36,7 +39,7 @@ const Cell: React.FC<{ x: number; y: number; w: number; h: number; at: number; f
         top: y,
         width: w,
         height: h,
-        borderRadius: 10,
+        borderRadius: 8,
         background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${lit * 100}%, ${fill})` : fill,
         display: "flex",
         alignItems: "center",
@@ -205,16 +208,21 @@ export const CapScene: React.FC = () => {
         ].map(([x, r, t], i) => (
           <Node key={i} x={x as number} y={pTop + (r as number) * h(96)} w={170} h={68} at={choiceAt + 4 + i * 3} tone="data" title={t as string} size={21} />
         ))}
-        <Svg opacity={cutP}>
-          <path
-            d={`M${P.cut},${pTop - 14} l-14,${h(44)} l28,${h(44)} l-28,${h(44)} l28,${h(44)} l-14,${h(30)}`}
-            fill="none"
-            stroke={ACCENT}
-            strokeWidth={3.2}
-            strokeDasharray="10 7"
-            pathLength={1}
-          />
-        </Svg>
+        {/* The partition: a watercolor crack between the two sides, wiped
+            in from the top as the dashed line it replaces drew on. */}
+        <Illustration
+          video="be-scaling"
+          id="be-scaling-crack"
+          style={{
+            position: "absolute",
+            left: P.cut - CRACK_W / 2,
+            top: pTop - 20,
+            width: CRACK_W,
+            height: spotH("crack", CRACK_W),
+            opacity: Math.min(1, cutP * 3),
+            clipPath: `inset(0 0 ${(1 - cutP) * 100}% 0)`,
+          }}
+        />
         <Line at={choiceAt + 10} x={P.left} y={pTop + h(190)} size={20} color={INK_SOFT}>
           majority side
         </Line>

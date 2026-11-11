@@ -156,7 +156,7 @@ export const QueueScene: React.FC = () => {
 
         {/* ── After: the click is queued; workers drain it. ── */}
         <Svg opacity={queueIn}>
-          <rect x={QUEUE.x} y={mid - QUEUE.h / 2} width={QUEUE.w} height={QUEUE.h} rx={12} fill={`color-mix(in srgb, ${BAR} 6%, ${PAPER})`} stroke={BAR} strokeWidth={2.5} />
+          <rect x={QUEUE.x} y={mid - QUEUE.h / 2} width={QUEUE.w} height={QUEUE.h} rx={8} fill={`color-mix(in srgb, ${BAR} 6%, ${PAPER})`} stroke={BAR} strokeWidth={2.5} />
         </Svg>
         <Ink at={queueAt + 4} dur={12} style={{ left: QUEUE.x, top: mid - QUEUE.h / 2 - 40, whiteSpace: "nowrap" }}>
           <span style={{ ...label(22, BLUE_INK), fontWeight: 500 }}>queue</span>
@@ -172,7 +172,7 @@ export const QueueScene: React.FC = () => {
                 top: mid - TOKEN.h / 2,
                 width: TOKEN.w,
                 height: TOKEN.h,
-                borderRadius: 7,
+                borderRadius: 5,
                 background: BAR,
                 opacity: t.o,
               }}

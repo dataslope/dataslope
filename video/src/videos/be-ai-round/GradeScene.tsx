@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK, OK_INK, QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, PAPER, body, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, body, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -46,7 +46,7 @@ const Row: React.FC<{ x: number; y: number; at: number; ok: boolean; dim?: numbe
 };
 
 /** A solution as a row of six blocks, `built` of them filled. */
-const Blocks: React.FC<{ x: number; y: number; at: number; built: number; fill: string; line: string }> = ({ x, y, at, built, fill, line: stroke }) => {
+const Blocks: React.FC<{ x: number; y: number; at: number; built: number; fill: string }> = ({ x, y, at, built, fill }) => {
   const frame = useCurrentFrame();
   return (
     <>
@@ -64,9 +64,10 @@ const Blocks: React.FC<{ x: number; y: number; at: number; built: number; fill: 
               width: BLOCK,
               height: BLOCK * 0.78,
               boxSizing: "border-box",
-              borderRadius: 8,
-              border: `2.2px ${solid ? "solid" : "dashed"} ${solid ? stroke : HAIRLINE}`,
-              background: solid ? fill : PAPER,
+              borderRadius: 5,
+              // No outline: a built block is a solid tint, a slot not yet
+              // built a faint grey one.
+              background: solid ? fill : "color-mix(in srgb, var(--ds-gray-400) 16%, transparent)",
               opacity: p,
               transform: `scale(${0.85 + 0.15 * p})`,
             }}
@@ -226,13 +227,13 @@ export const GradeScene: React.FC = () => {
             One prep guide&apos;s advice <span style={{ color: INK_SOFT, fontWeight: 500 }}>(interviewing.io)</span>
           </span>
         </Note>
-        <Blocks x={X0} y={pastY} at={partAt} built={3} fill={`color-mix(in srgb, ${OK} 22%, ${PAPER})`} line={OK} />
+        <Blocks x={X0} y={pastY} at={partAt} built={3} fill={`color-mix(in srgb, ${OK} 34%, ${PAPER})`} />
         <Note at={partAt + 12} x={X0} y={pastY + BLOCK * 0.78 + h(18)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             part of it, by hand: <b style={{ color: OK_INK }}>explained</b>
           </span>
         </Note>
-        <Blocks x={RED_X} y={pastY} at={presentAt} built={6} fill={`color-mix(in srgb, ${INK_SOFT} 18%, ${PAPER})`} line={INK_SOFT} />
+        <Blocks x={RED_X} y={pastY} at={presentAt} built={6} fill={`color-mix(in srgb, ${INK_SOFT} 26%, ${PAPER})`} />
         <div
           style={{
             position: "absolute",

@@ -348,7 +348,7 @@ const Slots: React.FC<{ x: number; top: number; w: number; at: number; filled: r
               width: w - 48,
               height: 34,
               boxSizing: "border-box",
-              borderRadius: 6,
+              borderRadius: 4,
               border: `2px ${f ? "solid" : "dashed"} ${f ? BAR : ds("gray", 400)}`,
               background: f ? `color-mix(in srgb, ${BAR} ${tone === "data" ? 22 : 0}%, ${PAPER})` : "transparent",
               opacity: p,

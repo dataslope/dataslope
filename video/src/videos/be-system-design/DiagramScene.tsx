@@ -10,7 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE, KEY, LADDER } from "./data";
 import { diagramBoxes, SIDE_A, SIDE_B, sideRoute } from "./diagram";
-import { Arrow, between, Box, Cross, Drift, Headline, int, Kicker, Line, OK_INK, Ring, Traveller, X0 } from "./parts";
+import { along, Arrow, between, Box, Cross, Drift, Headline, int, Kicker, Line, OK_INK, Ring, Traveller, X0 } from "./parts";
 
 const RX = 1460;
 const HOP_MS = LADDER.levels.find((l) => l.name === "Network round trip")!.ns / 1e6;
@@ -80,7 +80,7 @@ export const DiagramScene: React.FC = () => {
   };
   const ghost = { ...B.cache, cy: B.app1.cy, w: 200, h: 82 };
   const ghostOut = followAt - 10;
-  const counter = { cx: 960, cy: B.app1.cy, w: 150, h: 62 };
+  const counter = { cx: 960, cy: B.app1.cy, w: 130, h: 62 };
   const counterOut = blockAt + 20;
 
   // One redirect: a hit, then a miss.
@@ -175,7 +175,8 @@ export const DiagramScene: React.FC = () => {
         <RoundTrip pts={e.app1Cache} from={miss[1]} dur={18} />
         <RoundTrip pts={e.app1Store} from={miss[2]} dur={40} />
         {missMark > 0 ? (
-          <div style={{ position: "absolute", left: B.cache.cx + B.cache.w / 2 - 16, top: B.cache.cy - B.cache.h / 2 - 16, opacity: missMark }}>
+          // Centred on the arrow the missed lookup took, app server to cache.
+          <div style={{ position: "absolute", left: along(e.app1Cache, 0.5)[0] - 14, top: along(e.app1Cache, 0.5)[1] - 14, opacity: missMark }}>
             <Cross at={miss[1] + 9} size={28} />
           </div>
         ) : null}

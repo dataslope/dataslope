@@ -239,7 +239,7 @@ export const ScaleScene: React.FC = () => {
                 width: 54,
                 height: 44,
                 boxSizing: "border-box",
-                borderRadius: 8,
+                borderRadius: 5,
                 border: `2.5px solid ${OK}`,
                 background: `color-mix(in srgb, ${OK} 12%, ${PAPER})`,
                 opacity: Math.min(1, p),

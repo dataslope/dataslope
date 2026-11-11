@@ -328,7 +328,7 @@ export const IndexScene: React.FC = () => {
                 y={bucketY}
                 width={bucketW}
                 height={h(46)}
-                rx={6}
+                rx={4}
                 fill={eq > 0 ? `color-mix(in srgb, ${OK} ${30 * eq}%, ${PAPER})` : PAPER}
                 stroke={eq > 0.5 ? OK : bad > 0.5 ? ACCENT : INK_SOFT}
                 strokeWidth={eq > 0.5 || bad > 0.5 ? 2.5 : 1.5}

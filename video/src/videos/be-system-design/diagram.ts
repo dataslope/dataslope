@@ -10,11 +10,11 @@ import type { Rect } from "./parts";
  */
 export const diagramBoxes = (y: (v: number) => number) => ({
   client: { cx: 960, cy: y(312), w: 170, h: 62 },
-  lb: { cx: 960, cy: y(424), w: 230, h: 64 },
-  app1: { cx: 700, cy: y(546), w: 250, h: 82 },
-  app2: { cx: 1220, cy: y(546), w: 250, h: 82 },
-  cache: { cx: 960, cy: y(668), w: 170, h: 64 },
-  store: { cx: 960, cy: y(792), w: 250, h: 64 },
+  lb: { cx: 960, cy: y(424), w: 230, h: 76 },
+  app1: { cx: 700, cy: y(546), w: 280, h: 82 },
+  app2: { cx: 1220, cy: y(546), w: 280, h: 82 },
+  cache: { cx: 960, cy: y(668), w: 170, h: 76 },
+  store: { cx: 960, cy: y(792), w: 250, h: 76 },
 });
 
 /** The two columns Question four sorts everything into: one per zone. */

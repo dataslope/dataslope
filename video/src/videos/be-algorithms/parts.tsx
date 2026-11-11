@@ -281,7 +281,7 @@ export const Node: React.FC<{
         height: h,
         boxSizing: "border-box",
         border: `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${t.line}`,
-        borderRadius: 12,
+        borderRadius: 8,
         background: t.fill,
         display: "flex",
         flexDirection: "column",
@@ -443,6 +443,16 @@ export const Cell: React.FC<{
 
 export const NODE_R = 30;
 
+/** A graph node's disc, by tone: borderless, so tinted deeper than TONE's box
+ *  fills, with the label in the tone's ink still clearing AA on it. */
+const NODE_FILL: Record<Tone, string> = {
+  data: `color-mix(in srgb, ${BAR} 24%, ${PAPER})`,
+  ok: `color-mix(in srgb, ${OK} 26%, ${PAPER})`,
+  bad: `color-mix(in srgb, ${ACCENT} 22%, ${PAPER})`,
+  plain: "color-mix(in srgb, var(--ds-gray-400) 34%, transparent)",
+  look: `color-mix(in srgb, ${HIGHLIGHT} 75%, ${PAPER})`,
+};
+
 /** A graph's node: a circle with its name, and an optional badge (a visiting
  *  order or a distance) on its upper right. */
 export const GraphNode: React.FC<{
@@ -484,8 +494,10 @@ export const GraphNode: React.FC<{
           height: 2 * r,
           boxSizing: "border-box",
           borderRadius: "50%",
-          border: `${2.5 + 2 * lit}px solid ${t.line}`,
-          background: t.fill,
+          // No outline: a node is a solid disc of its tone, a step deeper
+          // than a box's fill so it holds its shape on its own.
+          background: NODE_FILL[tone],
+          boxShadow: lit > 0 ? `0 0 0 ${2 * lit}px ${t.line}` : undefined,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

@@ -17,7 +17,7 @@ import { Drift, Flow, Headline, Kicker, Mark, Spot } from "./parts";
 const ROOT_Y = 262;
 /** The heading's line, in px: the fork starts under it. */
 const ROOT_LINE = 42;
-const FORK_Y = 350;
+const FORK_Y = 342;
 const HEAD_Y = 392;
 const CAPTION_Y = 434;
 const COL_L = 120;
@@ -213,7 +213,8 @@ export const AiScene: React.FC = () => {
     [960, rootBottom + 8],
     [960, forkY],
     [colCx(c), forkY],
-    [colCx(c), headTop - 4],
+    // The arrowheads stop a clear 14px above the two heads.
+    [colCx(c), headTop - 14],
   ];
   const headIn = (at: number) => ease(frame, at - 2, 12);
   const moved = ease(frame, movedAt - 2, 12);

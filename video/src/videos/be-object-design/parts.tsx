@@ -223,7 +223,7 @@ export const Box: React.FC<{
   align?: "center" | "left";
   radius?: number;
   children?: React.ReactNode;
-}> = ({ x, y, w, h, at, title, sub, tone = "plain", tones = [], size = 25, subSize = 21, dim, undim, out, lit = 0, dashed, align = "center", radius = 12, children }) => {
+}> = ({ x, y, w, h, at, title, sub, tone = "plain", tones = [], size = 25, subSize = 21, dim, undim, out, lit = 0, dashed, align = "center", radius = 8, children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);

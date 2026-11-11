@@ -200,7 +200,7 @@ export const HookScene: React.FC = () => {
                 top: sqTop + (SQ - size) / 2,
                 width: size,
                 height: size,
-                borderRadius: 6,
+                borderRadius: 4,
                 boxSizing: "border-box",
                 border: `2px solid ${BAR}`,
                 background: `color-mix(in srgb, ${BAR} ${12 + 78 * tone}%, ${PAPER})`,

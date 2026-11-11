@@ -50,7 +50,7 @@ const Glyph: React.FC<{ ch: string; x: number; y: number; at: number; mark?: str
         top: y,
         width: CH - 10,
         height: 92,
-        borderRadius: 8,
+        borderRadius: 5,
         background: m > 0 && mark ? mark : undefined,
         opacity: p,
         display: "flex",

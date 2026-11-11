@@ -208,7 +208,7 @@ export const Node: React.FC<{
         height: h,
         boxSizing: "border-box",
         border: `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${t.line}`,
-        borderRadius: 12,
+        borderRadius: 8,
         background: fill ?? t.fill,
         display: "flex",
         flexDirection: "column",
@@ -352,6 +352,7 @@ export const Line: React.FC<{
 export const SPOTS = {
   bison: [1268, 1021],
   conveyor: [1024, 653],
+  crack: [314, 1024],
   newspaper: [1024, 830],
   timer: [867, 1003],
 } as const satisfies Record<string, readonly [number, number]>;
@@ -500,9 +501,9 @@ export const MiniMap: React.FC<{
         {limit > 0 ? (
           <rect x={28} y={58} width={8} height={34} rx={2} fill={glow("limit") > 0.5 ? HIGHLIGHT : INK_SOFT} stroke={stroke("limit")} strokeWidth={1.4} opacity={limit} />
         ) : null}
-        <rect x={lb.x} y={lb.y} width={lb.w} height={lb.h} rx={7} {...box("lb")} />
+        <rect x={lb.x} y={lb.y} width={lb.w} height={lb.h} rx={5} {...box("lb")} />
         {appBoxes.map((b, i) => (
-          <rect key={i} x={app.x} y={b.y} width={app.w} height={b.h} rx={6} {...box("app")} opacity={b.o} />
+          <rect key={i} x={app.x} y={b.y} width={app.w} height={b.h} rx={4} {...box("app")} opacity={b.o} />
         ))}
         {queue > 0 ? (
           <g opacity={queue}>
@@ -513,13 +514,13 @@ export const MiniMap: React.FC<{
           </g>
         ) : null}
         {/* The cache, with its replica behind it. */}
-        {replica > 0 ? <rect x={cache.x + 10} y={cache.y + 9} width={cache.w} height={cache.h} rx={7} {...box("cache")} opacity={replica} /> : null}
-        <rect x={cache.x} y={cache.y} width={cache.w} height={cache.h} rx={7} {...box("cache")} />
+        {replica > 0 ? <rect x={cache.x + 10} y={cache.y + 9} width={cache.w} height={cache.h} rx={5} {...box("cache")} opacity={replica} /> : null}
+        <rect x={cache.x} y={cache.y} width={cache.w} height={cache.h} rx={5} {...box("cache")} />
         {/* The store: one box, then four shards, with two followers beside it. */}
         {[0, 1, 2, 3].map((k) => {
           const w = lerp(store.w, (store.w - 9) / 4, shards);
           const x = lerp(store.x, store.x + k * ((store.w - 9) / 4 + 3), shards);
-          return <rect key={k} x={x} y={store.y} width={w} height={store.h} rx={6} {...box("store")} opacity={k === 0 ? 1 : shards} />;
+          return <rect key={k} x={x} y={store.y} width={w} height={store.h} rx={4} {...box("store")} opacity={k === 0 ? 1 : shards} />;
         })}
         {followers > 0
           ? [0, 1].map((k) => (

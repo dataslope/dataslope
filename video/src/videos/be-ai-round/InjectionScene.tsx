@@ -222,7 +222,7 @@ export const InjectionScene: React.FC = () => {
                   key={i}
                   style={{
                     padding: "6px 12px 7px",
-                    borderRadius: 6,
+                    borderRadius: 4,
                     border: `2px solid ${edge}`,
                     background: tint,
                     fontFamily: MONO,

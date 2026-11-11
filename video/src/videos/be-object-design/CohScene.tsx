@@ -159,7 +159,7 @@ export const CohScene: React.FC = () => {
             height: godH,
             boxSizing: "border-box",
             border: `${2.5 + 2 * pulse(frame, godAt + 4, 24)}px solid ${ACCENT}`,
-            borderRadius: 14,
+            borderRadius: 8,
             background: `color-mix(in srgb, ${ACCENT} 6%, transparent)`,
             opacity: ease(frame, managerAt, 12) * (1 - split),
           }}
@@ -186,7 +186,7 @@ export const CohScene: React.FC = () => {
                 width: GOD.w - 48,
                 height: GOD.rowH,
                 boxSizing: "border-box",
-                borderRadius: 10,
+                borderRadius: 6,
                 border: `2.5px solid color-mix(in srgb, ${c.line} ${Math.round(Math.max(split, i === EMAIL ? emailRed : 0) * 100)}%, transparent)`,
                 background: `color-mix(in srgb, ${c.fill} ${Math.round(Math.max(split, i === EMAIL ? emailRed : 0) * 100)}%, transparent)`,
                 borderBottom: split < 0.5 && i < 4 && !(i === EMAIL && emailRed > 0.5) ? `1px solid color-mix(in srgb, ${INK} 25%, transparent)` : undefined,

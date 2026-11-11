@@ -1,12 +1,13 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { OK, OK_INK, RapidFire, type RapidItem } from "../../editorial/interview";
+import { OK_INK, RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, headline, label, note, svgText } from "../../editorial/style";
 import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { ds } from "../../theme/brand";
 import { RAPID } from "./data";
 import {
   ColumnRule,
@@ -28,6 +29,9 @@ import {
   tableGeometry,
   X0,
 } from "./parts";
+
+/** The Venn lens, inner join's matches: a deep green that white type reads on. */
+const MATCH = ds("green", 700);
 
 const R_X = 800;
 const LIST_TOP = 380;
@@ -169,14 +173,14 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
         </defs>
         <circle cx={lx} cy={cy} r={r} fill={`color-mix(in srgb, ${BAR} ${30 * fillL}%, ${PAPER})`} stroke={BAR} strokeWidth={2.5} />
         <circle cx={rx} cy={cy} r={r} fill={`color-mix(in srgb, ${BAR} ${30 * fillR}%, transparent)`} stroke={BAR} strokeWidth={2.5} />
-        <circle cx={rx} cy={cy} r={r} clipPath="url(#be-joins-left)" fill={`color-mix(in srgb, ${OK} ${45 * inner}%, transparent)`} />
+        <circle cx={rx} cy={cy} r={r} clipPath="url(#be-joins-left)" fill={`color-mix(in srgb, ${MATCH} ${85 * inner}%, transparent)`} />
         <text x={lx - r * 0.5} y={cy - r - 18} textAnchor="middle" style={svgText(label(22, INK))}>
           customers
         </text>
         <text x={rx + r * 0.5} y={cy - r - 18} textAnchor="middle" style={svgText(label(22, INK))}>
           orders
         </text>
-        <text x={(lx + rx) / 2} y={cy + 8} textAnchor="middle" style={svgText({ ...label(22, OK_INK), fontWeight: 500 })} opacity={ease(frame, innerRowsAt, 10)}>
+        <text x={(lx + rx) / 2} y={cy + 8} textAnchor="middle" style={svgText({ ...label(22, PAPER), fontWeight: 600 })} opacity={ease(frame, innerRowsAt, 10)}>
           matches
         </text>
       </Svg>

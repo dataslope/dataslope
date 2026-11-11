@@ -146,7 +146,7 @@ export const Node: React.FC<{
   align?: "center" | "left";
   justify?: "center" | "flex-start";
   children?: React.ReactNode;
-}> = ({ x, y, w, h, at, title, sub, tone = "data", fill, line, titleInk, size = 25, subSize = 21, dim, out, lit = 0, dashed, radius = 12, stroke = 2.5, align = "center", justify = "center", children }) => {
+}> = ({ x, y, w, h, at, title, sub, tone = "data", fill, line, titleInk, size = 25, subSize = 21, dim, out, lit = 0, dashed, radius = 8, stroke = 2.5, align = "center", justify = "center", children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
@@ -295,7 +295,7 @@ export const Block: React.FC<{
   dim?: number;
   children?: React.ReactNode;
   style?: React.CSSProperties;
-}> = ({ at, from, to, moveAt = Infinity, moveDur = 22, h, fill, line, radius = 6, grow = 10, out, dim, children, style }) => {
+}> = ({ at, from, to, moveAt = Infinity, moveDur = 22, h, fill, line, radius = 4, grow = 10, out, dim, children, style }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, grow);
   const m = to ? ease(frame, moveAt, moveDur) : 0;

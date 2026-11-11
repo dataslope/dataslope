@@ -461,7 +461,7 @@ export const Checklist: React.FC<{ items: readonly Check[]; x: number; top: numb
                   flex: "none",
                   boxSizing: "border-box",
                   border: `2px solid ${bad > 0.5 ? ACCENT : INK_SOFT}`,
-                  borderRadius: 6,
+                  borderRadius: 4,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",

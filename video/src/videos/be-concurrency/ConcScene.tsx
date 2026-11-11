@@ -152,7 +152,7 @@ export const ConcScene: React.FC = () => {
                   width: SLICE * p,
                   height: laneH,
                   boxSizing: "border-box",
-                  borderRadius: 7,
+                  borderRadius: 5,
                   border: `2.5px solid ${th.fill}`,
                   background: tint(th.fill, 32),
                   display: "flex",

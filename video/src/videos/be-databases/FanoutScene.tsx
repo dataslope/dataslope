@@ -22,7 +22,12 @@ const R_X = 890;
 /** How far each repeated copy of an order sits behind the one in front. */
 const STACK = 7;
 
-const money = (v: number) => thousands(Math.floor(v)) + (v % 1).toFixed(2).slice(1);
+/** An amount to one decimal place ("40.0", "95.3", "2,661.5"): two places
+ *  overfilled the chips, and the cents are never the point here. */
+const money = (v: number) => {
+  const [whole, tenth] = v.toFixed(1).split(".");
+  return `${thousands(Number(whole))}.${tenth}`;
+};
 
 /** One order as a chip: its amount, in mono. */
 const Chip: React.FC<{ x: number; y: number; amount: number; tone: "data" | "bad" | "ok" | "sara"; opacity: number; behind?: boolean }> = ({ x, y, amount, tone, opacity, behind }) => {
@@ -184,13 +189,13 @@ export const FanoutScene: React.FC = () => {
         <Note at={saraAt + 2} x={X0} y={listTop} out={fixAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b style={{ background: `color-mix(in srgb, ${inkOf.yellow} 30%, transparent)`, padding: "0 6px", borderRadius: 4, margin: "0 0.1em" }}>Sara</b>, two orders:{" "}
-            {saras.map((i) => money(FANOUT.list[i].amount)).join(" + ")} = <b style={{ color: BLUE_INK }}>{FANOUT.sara.right}</b>
+            {saras.map((i) => money(FANOUT.list[i].amount)).join(" + ")} = <b style={{ color: BLUE_INK }}>{money(Number(FANOUT.sara.right))}</b>
           </span>
         </Note>
         <Note at={nineAt} x={R_X} y={listTop} out={fixAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <span style={{ opacity: ease(frame, bothAt, 10) }}>three items each, so three copies each: </span>
-            <b style={{ color: ACCENT_INK }}>{FANOUT.sara.wrong}</b>
+            <b style={{ color: ACCENT_INK }}>{money(Number(FANOUT.sara.wrong))}</b>
           </span>
         </Note>
 

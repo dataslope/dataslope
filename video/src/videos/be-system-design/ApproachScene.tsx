@@ -119,7 +119,7 @@ export const ApproachScene: React.FC = () => {
                   height: 76,
                   boxSizing: "border-box",
                   border: `2.4px solid ${INK_SOFT}`,
-                  borderRadius: 10,
+                  borderRadius: 8,
                   opacity: p,
                 }}
               />

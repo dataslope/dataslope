@@ -256,10 +256,8 @@ export const CompositeScene: React.FC = () => {
             y={stripY}
             width={STRIP_W * ease(frame, runAt, 18)}
             height={stripH}
-            rx={6}
+            rx={4}
             fill={`color-mix(in srgb, ${BAR} 8%, ${PAPER})`}
-            stroke={`color-mix(in srgb, ${BAR} 45%, ${PAPER})`}
-            strokeWidth={1.5}
             opacity={ease(frame, runAt, 6)}
           />
 

@@ -244,7 +244,7 @@ export const DeadScene: React.FC = () => {
             top: y(772),
             width: 600 - 420 * shrink,
             height: h(26),
-            borderRadius: 6,
+            borderRadius: 4,
             background: tint(BAR, 30),
             border: `2px solid ${BAR}`,
             boxSizing: "border-box",

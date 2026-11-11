@@ -141,7 +141,7 @@ export const HourScene: React.FC = () => {
                   width: (p.x1 - p.x0 - 6) * slot,
                   height: barH - 12,
                   boxSizing: "border-box",
-                  borderRadius: 8,
+                  borderRadius: 5,
                   border: `2px solid ${ds("blue", 400)}`,
                   opacity: slot > 0 ? 1 : 0,
                 }}

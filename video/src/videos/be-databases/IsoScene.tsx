@@ -45,7 +45,7 @@ const Event: React.FC<{ x: number; y: number; at: number; out: number; text: str
   return (
     <g opacity={p}>
       <circle cx={x} cy={y} r={7} fill={color} />
-      <text x={x} y={y - 18} textAnchor="middle" style={mono(19, color)}>
+      <text x={x} y={y - 26} textAnchor="middle" style={mono(19, color)}>
         {text}
       </text>
     </g>

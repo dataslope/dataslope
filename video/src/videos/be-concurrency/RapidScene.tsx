@@ -145,7 +145,7 @@ const Atomic: React.FC<{ c: Ctx }> = ({ c }) => {
               border: `2.5px solid ${fuse > 0.5 ? OK : ACCENT}`,
               borderLeftWidth: fuse > 0.9 && s > 0 ? 0 : 2.5,
               borderRightWidth: fuse > 0.9 && s < 2 ? 0 : 2.5,
-              borderRadius: fuse > 0.9 ? (s === 0 ? "8px 0 0 8px" : s === 2 ? "0 8px 8px 0" : 0) : 8,
+              borderRadius: fuse > 0.9 ? (s === 0 ? "5px 0 0 5px" : s === 2 ? "0 5px 5px 0" : 0) : 5,
               background: tint(fuse > 0.5 ? OK : ACCENT, 14),
               display: "flex",
               alignItems: "center",
@@ -302,7 +302,7 @@ const Live: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={busyAt} x={1600} y={top - c.h(36)}>
         <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>CPU</span>
       </Note>
-      <div style={{ position: "absolute", left: 1600, top, width: 64, height: bottom - top, borderRadius: 8, border: `2px solid ${HAIRLINE}`, boxSizing: "border-box", opacity: ease(frame, busyAt, 10) }} />
+      <div style={{ position: "absolute", left: 1600, top, width: 64, height: bottom - top, borderRadius: 5, border: `2px solid ${HAIRLINE}`, boxSizing: "border-box", opacity: ease(frame, busyAt, 10) }} />
       <div style={{ position: "absolute", left: 1604, top: bottom - 4 - (bottom - top - 8) * busy * (0.9 + 0.1 * Math.sin(frame / 3)), width: 56, height: (bottom - top - 8) * busy * (0.9 + 0.1 * Math.sin(frame / 3)), borderRadius: 5, background: ACCENT, opacity: busy }} />
       <Note at={harderAt} x={R_X} y={c.y(660)}>
         <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the CPU looks busy, so it&apos;s harder to spot than a deadlock</span>
@@ -343,7 +343,7 @@ const Starve: React.FC<{ c: Ctx }> = ({ c }) => {
         top: ty,
         width: 130,
         height: rowH,
-        borderRadius: 8,
+        borderRadius: 5,
         boxSizing: "border-box",
         border: `2.5px solid ${green > 0.5 ? OK : high ? THREAD[2].fill : ds("gray", 400)}`,
         background: green > 0.5 ? tint(OK, 16) : high ? tint(THREAD[2].fill, 20) : ds("gray", 100),
@@ -444,7 +444,7 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
               top: qY + c.h(6) * taken,
               width: 58,
               height: chip - c.h(12) * taken,
-              borderRadius: 7,
+              borderRadius: 5,
               boxSizing: "border-box",
               border: `2.5px solid ${BAR}`,
               background: tint(BAR, 14),
@@ -556,7 +556,7 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
           top: c.y(456),
           width: (1300 - t0 - 200) * work,
           height: c.h(40),
-          borderRadius: 7,
+          borderRadius: 5,
           background: tint(BAR, 30),
           border: `2px solid ${BAR}`,
           boxSizing: "border-box",

@@ -52,7 +52,7 @@ const Slice: React.FC<{ t: number; x: number; y: number; w: number; h: number; a
         width: (w - 4) * p,
         height: h,
         boxSizing: "border-box",
-        borderRadius: 6,
+        borderRadius: 4,
         border: kind === "run" ? `2.5px solid ${th.fill}` : `1.5px dashed ${kind === "wait" ? th.fill : HAIRLINE}`,
         background: kind === "run" ? tint(th.fill, 34) : kind === "wait" ? tint(th.fill, 8) : "transparent",
         display: "flex",
@@ -200,7 +200,7 @@ export const GilScene: React.FC = () => {
           return (
             <React.Fragment key={o.name}>
               <Note at={countsAt + k * 4} x={x} y={y(BOX.top + 84)} width={140} from="up" out={page1Out} style={{ textAlign: "center" }}>
-                <div style={{ ...label(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{o.name}</div>
+                <div style={{ ...label(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{o.name}</div>
                 <div style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", marginTop: 6 }}>
                   refs: <Num>{o.refs}</Num>
                 </div>

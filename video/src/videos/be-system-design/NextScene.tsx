@@ -73,7 +73,7 @@ const MiniDesign: React.FC<{ at: number; y: (v: number) => number }> = ({ at, y 
                 height: h,
                 boxSizing: "border-box",
                 border: `2.2px ${standby ? "dashed" : "solid"} ${OK}`,
-                borderRadius: 9,
+                borderRadius: 8,
                 background: fill,
                 opacity: p,
                 transform: `scale(${0.9 + 0.1 * p})`,
@@ -91,7 +91,7 @@ const MiniDesign: React.FC<{ at: number; y: (v: number) => number }> = ({ at, y 
           height: 36,
           boxSizing: "border-box",
           border: `2.2px solid ${INK_SOFT}`,
-          borderRadius: 9,
+          borderRadius: 5,
           opacity: ease(frame, at, 12),
         }}
       />
