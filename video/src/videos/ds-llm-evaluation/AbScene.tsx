@@ -23,6 +23,10 @@ const Title: React.FC<{ n: number; x: number; y: number; at: number; children: R
   </Note>
 );
 
+/** This scene's badges' top and bottom padding: 0.32em, against the house
+ *  badge's 0.21em. */
+const PAD_Y = (size: number) => Math.round(size * 0.32);
+
 /** A rounded tag on the page: a session, an arm, an output. The house
  *  badge (a light tint of its hue, in that hue's ink, no border, its own
  *  padding) at a width of its own, which grows in as it inks. */
@@ -42,10 +46,13 @@ const Tag: React.FC<{ x: number; y: number; w: number; at: number; tone: BadgeTo
       style={{
         ...label(19),
         ...badgeStyle(tone, 19),
+        // A little more air top and bottom than the house badge (the owner,
+        // 2026-11-11).
+        padding: `${PAD_Y(19)}px ${Math.round(19 * 0.55)}px`,
         position: "absolute",
         left: x,
         // Its own padding, centred where the 46px box's middle was.
-        top: y + Math.round((46 - (19 * 1.15 + 2 * Math.round(19 * 0.21))) / 2),
+        top: y + Math.round((46 - (19 * 1.15 + 2 * PAD_Y(19))) / 2),
         width: w * (0.5 + 0.5 * p),
         boxSizing: "border-box",
         textAlign: "center",
@@ -218,7 +225,7 @@ export const AbScene: React.FC = () => {
         {guards.map((g) => (
           <Note key={g.text} at={g.at - 2} x={COL[1] + (g.w % 2) * 330} y={y(ROW[1]) + 77 + Math.floor(g.w / 2) * 64} from="up">
             <span style={note(23)}>
-              <Badge tone="blue" size={23}>
+              <Badge tone="blue" size={23} style={{ padding: `${PAD_Y(23)}px ${Math.round(23 * 0.55)}px` }}>
                 {g.text}
               </Badge>
             </span>
