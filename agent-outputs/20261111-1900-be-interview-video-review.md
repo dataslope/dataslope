@@ -213,12 +213,61 @@ change back:
 Also from today: the miss X now sits on the left app server's arrow (System
 design), and that reviewer separately asks for the miss not to be red at all.
 
-## Next
+## The fixes
 
-No fixes have been made. The reports are written to be fixed from, one fixer
-per video, the way the Data Engineer series was
-(`20261105-de-interview-video-review/tools/FIX-BRIEF.md`): P1s first, then
-answers, then the other P2s, then P3s, with beats split at sentence breaks so
-only the changed words are voiced. At the Data Engineer series' rate (about
-935 characters a video, at about 0.22 credits a character), that is roughly
-2,000 ElevenLabs credits.
+**Done**, the same day. One fixer per video worked to
+[`tools/FIX-BRIEF.md`](20261111-be-interview-video-review/tools/FIX-BRIEF.md),
+in order: P1s, then answers, then the other P2s, then P3s. Each fixer's report,
+with every finding by number and what changed, is in
+[`20261111-be-interview-video-review/fixes/`](20261111-be-interview-video-review/fixes/).
+
+| Video | Findings | Characters voiced | Length before → after |
+| --- | --- | --- | --- |
+| 0 The interview, now | 8 fixed | 511 | 2:50 → 3:00 |
+| 1 System design | 16 fixed, 1 in part, 1 moot | 928 | 7:49 → 8:47 |
+| 2 Scaling | 19 fixed | 931 | 10:43 → 11:47 |
+| 3 API design | 16 fixed | 405 | 10:50 → 11:17 |
+| 4 Databases | 19 fixed | 922 | 11:06 → 12:09 |
+| 5 Concurrency | 16 fixed, 2 in part | 891 | 10:13 → 10:58 |
+| 6 Object design | 11 fixed, 1 in part | 654 (1,549 billed) | 9:32 → 10:17 |
+| 7 Code review | 15 fixed | 564 | 7:11 → 7:46 |
+| 8 Algorithms | 19 fixed | 668 | 11:47 → 12:42 |
+| 9 AI round | 14 fixed | 713 | 9:57 → 10:50 |
+| **Total** | **153 fixed, 4 in part, 1 moot** | **7,187 (8,082 billed)** | **1:31:57 → 1:39:31** |
+
+- **Voice.** Each video stayed under its cap (1,000 characters, 600 for Part
+  0). Beats were split at sentence breaks so only new sentences were voiced;
+  every beat a fixer did not mean to change is byte-identical, and no take was
+  re-recorded. Part 6 voiced nine split beats by mistake (895 characters),
+  noticed, and cut them back from the kept takes for free, so the audio is
+  right but those credits are spent. At about 0.22 credits a character the
+  pass cost roughly 1,800 credits, inside the 2,000 the owner approved.
+- **Values.** Every existing value in every `results.json` came back
+  identical, except Part 4's one-day query, rewritten on purpose as a
+  half-open range (the same 2,656 rows). New claims are measured, among them a
+  cursor's index (100,001 rows scanned against 20), a ninth shard (89% of keys
+  move by modulo, 13% on a ring), Python's sort on sorted input (999
+  comparisons against 8,658), and the p99 tail's 401 requests.
+- **Checks.** Each fixer passed typecheck, lint, `npm test`, `check:cues`,
+  `check:motion`, `check:sync` (worst +0.05 s), `check:mix` and
+  `check:frames` on its final code. With all ten in, the package passes
+  typecheck, lint, `npm test` (79/79) and `check:cues`.
+- **One owner decision kept over a finding.** Part 1's reviewer asked for the
+  cache miss not to be marked in red, and its fixer replaced the red X with a
+  label. The owner had placed that X at the centre of the miss arrow earlier
+  the same day, so the X is back there, beside the fixer's "miss" label and
+  grey cache. `check:frames` passes with it.
+- **The owner's polish round is intact** in every video it touched.
+
+**Left in part:**
+- Part 1 #14: "1,000 users" against "redirects a day" still differ in unit.
+  The server boxes are words now, but the narration needed 143 more P3
+  characters.
+- Part 5 #15: the hook's empty lower half needs a new figure.
+- Part 5 #18: one fast clause in the race is left; cutting it is a paid
+  re-voice.
+- Part 6 #11(c): left on evidence. The cited frame caught a highlight
+  mid-sweep, and the finished spacing is right.
+
+**Shared changes:** none needed; no fixer touched a shared file.
+
