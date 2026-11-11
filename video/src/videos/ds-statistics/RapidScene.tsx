@@ -161,7 +161,7 @@ const Ranks: React.FC<{ c: Ctx }> = ({ c }) => {
           <MathRun style={{ ...TABULAR }}>
             <I>p</I> = {fmt(RANKS.t, 2)}
           </MathRun>
-          <span style={{ ...noteText(22, INK_SOFT), marginLeft: 14 }}>sees nothing</span>
+          <span style={{ color: INK_SOFT, marginLeft: 14 }}>sees nothing</span>
         </span>
       </Note>
       <Note at={swampAt} x={R_X + 24} y={c.y(792)}>
@@ -178,7 +178,7 @@ const Ranks: React.FC<{ c: Ctx }> = ({ c }) => {
               <I>p</I> = {fmt(RANKS.u, 3)}
             </MathRun>
           </Mark>
-          <span style={{ ...noteText(22, INK_SOFT), marginLeft: 14 }}>finds the shift</span>
+          <span style={{ color: INK_SOFT, marginLeft: 14 }}>finds the shift</span>
         </span>
       </Note>
     </>
@@ -246,8 +246,10 @@ const Corr: React.FC<{ c: Ctx }> = ({ c }) => {
         <div style={{ ...noteText(22, INK_SOFT), lineHeight: 1.35 }}>
           <span style={{ color: WARM_INK }}>Temperature, the confounder,</span>
           <br />
-          <span style={{ opacity: ease(frame, holdAt - 2, 10) }}>held fixed: </span>
-          <span style={{ ...noteText(28, OK_INK), fontWeight: 500, opacity: ease(frame, partialAt - 2, 10), ...TABULAR }}>{fmt(CORR.partial, 2)}</span>
+          {/* The answer line in one size: the partial r is told apart by its
+              color and weight. */}
+          <span style={{ fontSize: 26, opacity: ease(frame, holdAt - 2, 10) }}>held fixed: </span>
+          <span style={{ ...noteText(26, OK_INK), fontWeight: 600, opacity: ease(frame, partialAt - 2, 10), ...TABULAR }}>{fmt(CORR.partial, 2)}</span>
         </div>
       </Note>
       <Note at={expAt} x={R_X} y={c.y(860)}>

@@ -315,7 +315,8 @@ export const AucScene: React.FC = () => {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {pct(b.v)} <span style={{ ...label(19, INK_SOFT), fontWeight: 500 }}>{b.tag}</span>
+                      {/* The tag within 12% of its value: one line, one size. */}
+                      {pct(b.v)} <span style={{ ...label(24, INK_SOFT), fontWeight: 500 }}>{b.tag}</span>
                     </div>
                   </React.Fragment>
                 ))}

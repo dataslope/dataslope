@@ -104,7 +104,7 @@ export const IndepScene: React.FC = () => {
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>Knowing one tells you nothing about the other.</span>
         </Note>
         <Ink at={ruleAt} dur={18} out={out4} style={{ left: X0, top: y(390) }}>
-          <span style={math(58)}>
+          <MathRun style={math(58)}>
             <P>
               <V>A</V>
               <Given />
@@ -114,7 +114,7 @@ export const IndepScene: React.FC = () => {
             <P>
               <V>A</V>
             </P>
-          </span>
+          </MathRun>
         </Ink>
         {/* Equivalently, the product rule: it stays on into Question 5. */}
         <Ink
@@ -130,7 +130,7 @@ export const IndepScene: React.FC = () => {
           }}
         >
           <span style={{ ...note(26, INK_SOFT), display: "inline-block", width: PROD4.lead, opacity: 1 - move }}>Equivalently</span>
-          <span style={{ ...math(46), display: "inline-block", width: COL.w }}>
+          <MathRun style={{ ...math(46), display: "inline-block", width: COL.w }}>
             <P>
               <V>A</V> and <V>B</V>
             </P>{" "}
@@ -141,7 +141,7 @@ export const IndepScene: React.FC = () => {
             <P>
               <V>B</V>
             </P>
-          </span>
+          </MathRun>
           <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, q5At + 14, 12) }}>independent</span>
         </Ink>
         <Note at={claimAt} x={X0} y={y(540)} out={out4}>
@@ -253,30 +253,30 @@ export const IndepScene: React.FC = () => {
           ))}
           {/* Mutually exclusive, directly under the product it never equals. */}
           <Note at={zeroAt} x={COL.x} y={y(COL.zero)} style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <span style={{ ...math(46), display: "inline-block", width: COL.w }}>
+            <MathRun style={{ ...math(46), display: "inline-block", width: COL.w }}>
               <P>
                 <V>A</V> and <V>B</V>
               </P>{" "}
               = 0
-            </span>
+            </MathRun>
             <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, zeroAt + 10, 12) }}>mutually exclusive</span>
           </Note>
           {/* The die: P(two) stays 1/6; given a one, it is 0. Both are true. */}
           <Note at={dropsAt} x={COL.x} y={y(COL.two)} style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <span style={{ ...math(42, `color-mix(in srgb, ${INK_SOFT} ${quiet * 100}%, ${INK})`), display: "inline-block", width: COL.w }}>
+            <MathRun style={{ ...math(42, `color-mix(in srgb, ${INK_SOFT} ${quiet * 100}%, ${INK})`), display: "inline-block", width: COL.w }}>
               <P>two</P> = {EXCL.pTwo}
-            </span>
+            </MathRun>
             <span style={{ ...note(24, INK_SOFT), opacity: quiet }}>out of all six faces</span>
           </Note>
           <Note at={toZeroAt - 2} x={COL.x} y={y(COL.twoGiven)} style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <span style={{ ...math(42, INK), display: "inline-block", width: COL.w }}>
+            <MathRun style={{ ...math(42, INK), display: "inline-block", width: COL.w }}>
               <P>
                 two
                 <Given />
                 one
               </P>{" "}
               = {EXCL.pTwoGivenOne}
-            </span>
+            </MathRun>
             <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, toZeroAt + 8, 12) }}>out of the one face left</span>
           </Note>
           <Note at={farAt} x={COL.x} y={y(COL.far)}>

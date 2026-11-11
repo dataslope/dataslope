@@ -67,24 +67,24 @@ export const MemoryScene: React.FC = () => {
         </QuestionCard>
 
         <Ink at={answerAt} dur={18} style={{ left: X0, top: y(300) }}>
-          <span style={math(44)}>
+          <MathRun style={math(44)}>
             P(<V>X</V> &gt; <V>s</V> + <V>t</V>
             <Given />
             <V>X</V> &gt; <V>s</V>) = P(<V>X</V> &gt; <V>t</V>)
-          </span>
+          </MathRun>
         </Ink>
         <Note at={answerAt + 12} x={X0 + 720} y={y(312)}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Time already waited changes nothing</span>
         </Note>
         <Note at={answerAt + 22} x={X0 + 720} y={y(350)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            <span style={math(28, INK)}>
+            <MathRun style={math(28, INK)}>
               <V>s</V>
-            </span>{" "}
+            </MathRun>{" "}
             already waited,{" "}
-            <span style={math(28, INK)}>
+            <MathRun style={math(28, INK)}>
               <V>t</V>
-            </span>{" "}
+            </MathRun>{" "}
             more
           </span>
         </Note>

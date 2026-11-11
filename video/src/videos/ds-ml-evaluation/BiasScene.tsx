@@ -193,7 +193,8 @@ export const BiasScene: React.FC = () => {
                 <Tick at={f.at + 2} size={26} color={OK} />
                 <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
                   {isReg ? <Mark at={oneAt}>{f.text}</Mark> : f.text}
-                  {f.gloss ? <span style={{ ...note(24, INK_SOFT) }}>{f.gloss}</span> : null}
+                  {/* Within 12% of the fix it glosses, so the line reads as one line. */}
+                  {f.gloss ? <span style={{ ...note(29, INK_SOFT) }}>{f.gloss}</span> : null}
                 </span>
               </div>
             </Note>

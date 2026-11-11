@@ -81,7 +81,10 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
                     ...TABULAR,
                   }}
                 >
-                  {v / total > 0.08 ? `${Math.round((100 * v) / total)}%` : ""}
+                  {/* The share inks in once the bars are near their width:
+                      while they grow from nothing, every label sits on its
+                      neighbours. */}
+                  <span style={{ opacity: ease(frame, r.at + 10, 8) }}>{v / total > 0.08 ? `${Math.round((100 * v) / total)}%` : ""}</span>
                 </div>
               );
             })}

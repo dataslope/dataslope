@@ -130,14 +130,14 @@ export const BdayScene: React.FC = () => {
           </span>
         </Note>
         <Note at={countAt + 12} x={RING.cx - 170} width={340} y={cy + 30} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...math(28, INK), background: PAPER, padding: "2px 10px", borderRadius: 6 }}>
+          <MathRun style={{ ...math(28, INK), background: PAPER, padding: "2px 10px", borderRadius: 6 }}>
             {BDAY.people} × {BDAY.people - 1} ÷ 2
-          </span>
+          </MathRun>
         </Note>
 
         {/* ── The complement: each new person misses everyone before them ── */}
         <Note at={complementAt} x={WORK.x} y={y(WORK.noMatch)}>
-          <span style={math(32, INK)}>
+          <MathRun style={math(32, INK)}>
             P(no match) ={" "}
             <Late at={firstAt}>
               {365 - 1}/365
@@ -151,12 +151,12 @@ export const BdayScene: React.FC = () => {
             <Late at={noneAt}>
               {" "}= {pct(BDAY.noMatch, 1)}
             </Late>
-          </span>
+          </MathRun>
         </Note>
         <Note at={fiftyAt} x={WORK.x} y={y(WORK.match)}>
-          <span style={math(32, OK_INK)}>
+          <MathRun style={math(32, OK_INK)}>
             P(match) = 1 − {pct(BDAY.noMatch, 1)} = {pct(BDAY.exact, 1)}
-          </span>
+          </MathRun>
         </Note>
 
         {/* ── The chance, against the size of the room ── */}

@@ -146,15 +146,16 @@ export const StepsScene: React.FC = () => {
             <div style={{ display: "flex", alignItems: "center", gap: 22, whiteSpace: "nowrap" }}>
               <span
                 style={{
-                  width: 46,
-                  height: 46,
+                  width: 50,
+                  height: 50,
                   borderRadius: "50%",
                   border: `2.5px solid ${BAR}`,
                   background: i < 2 ? `color-mix(in srgb, ${BAR} ${ease(frame, beforeAt + 4 + i * 3, 12) * 100}%, ${PAPER})` : PAPER,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  ...label(24),
+                  // Within 12% of the step's 32px text beside it: one line.
+                  ...label(29),
                   // After label(), which sets its own color.
                   color: i < 2 && frame > beforeAt + 8 ? PAPER : BLUE_INK,
                   fontWeight: 500,

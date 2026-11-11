@@ -2,6 +2,7 @@ import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
+import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -47,6 +48,22 @@ export const lineOf = (lines: readonly string[], text: string): number => {
   if (i < 0) throw new Error(`no listing line holds ${JSON.stringify(text)}`);
   return i;
 };
+
+/**
+ * Code inside a question, a list label or a line of prose, in the mono face
+ * at 0.92em of the words around it: within the 12% a line's sizes may differ
+ * by (`check:frames`, `[mixed]`), where the interview kit's shared `QMono`
+ * sets it at 0.84em (a 62px question's `LEFT JOIN` at 52px, a 23px list
+ * label's `HAVING` at 19px). That one is shared with every interview video,
+ * so this video takes its own, as da-sql's mono.tsx does. Never under the
+ * house floor of 19px. A mono space is 0.6em, so the word spacing brings it
+ * back to about a sans space.
+ */
+export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 500, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);
 
 /** A watercolor spot from illustrations.json: it pops in on `at`, bobs
  *  gently, and fades on `out`. */

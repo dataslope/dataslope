@@ -194,16 +194,16 @@ export const PoisScene: React.FC = () => {
         <Note at={npAt} x={PLOT.right - 300} y={y(PLOT.top) + 150}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Many trials, small chance:{" "}
-            <span style={math(30)}>
+            <MathRun style={math(30)}>
               λ = <V>n</V>
               <V>p</V>
-            </span>
+            </MathRun>
           </span>
         </Note>
         <Note at={thousandAt + 4} x={PLOT.right - 300} y={y(PLOT.top) + 194}>
-          <span style={{ ...math(28, INK_SOFT), ...TABULAR }}>
+          <MathRun style={{ ...math(28, INK_SOFT), ...TABULAR }}>
             {LIMIT.n.toLocaleString("en-US")} × {LIMIT.p} = {LIMIT.lam}
-          </span>
+          </MathRun>
         </Note>
       </Drift>
     </AbsoluteFill>

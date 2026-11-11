@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, RapidFire, type RapidItem } from "../../editorial/interview";
+import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
-import { colsOf, DataTable, Drift, ErrorBox, geoOf, Headline, Kicker, lineOf, Listing, listingHeight, MARK_BAD, MARK_OK, rowsAt, Spot, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, ErrorBox, geoOf, Headline, Kicker, lineOf, Listing, listingHeight, MARK_BAD, MARK_OK, QMono, rowsAt, Spot, TableName, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 740;

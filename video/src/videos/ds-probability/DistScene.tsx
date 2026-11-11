@@ -148,7 +148,7 @@ export const DistScene: React.FC = () => {
             the binomial and the Poisson (alike in shape) read apart. */}
         {params.map(([text, at], i) => (
           <Note key={i} at={at} x={panelX(i) + PANEL.w} y={y(PANEL.top) - 4} align="right">
-            <span style={{ ...math(26, INK_SOFT) }}>{text}</span>
+            <MathRun style={{ ...math(26, INK_SOFT) }}>{text}</MathRun>
           </Note>
         ))}
 
@@ -157,30 +157,30 @@ export const DistScene: React.FC = () => {
           <span style={{ ...note(23, INK) }}>One yes or no trial</span>
         </Note>
         <Note at={trialAt + 12} x={panelX(0)} y={capY + 40} width={PANEL.w}>
-          <span style={math(28)}>
+          <MathRun style={math(28)}>
             mean <V>p</V>
-          </span>
+          </MathRun>
         </Note>
         <Note at={binAt + 8} x={panelX(1)} y={capY} width={PANEL.w}>
-          <span style={{ ...note(23, INK) }}>Successes in <span style={math(26)}><V>n</V></span> trials</span>
+          <span style={{ ...note(23, INK) }}>Successes in <MathRun style={math(26)}><V>n</V></MathRun> trials</span>
         </Note>
         <Note at={npAt} x={panelX(1)} y={capY + 40} width={PANEL.w}>
-          <span style={math(28)}>
+          <MathRun style={math(28)}>
             mean <V>n</V>
             <V>p</V>
-          </span>
+          </MathRun>
         </Note>
         <Note at={npAt + 12} x={panelX(1)} y={capY + 76} width={PANEL.w}>
-          <span style={math(28)}>
+          <MathRun style={math(28)}>
             variance <V>n</V>
             <V>p</V>(1 − <V>p</V>)
-          </span>
+          </MathRun>
         </Note>
         <Note at={poisAt + 8} x={panelX(2)} y={capY} width={PANEL.w}>
           <span style={{ ...note(23, INK) }}>Events in an interval</span>
         </Note>
         <Note at={lambdaAt} x={panelX(2)} y={capY + 40} width={PANEL.w}>
-          <span style={math(28)}>mean = variance = λ</span>
+          <MathRun style={math(28)}>mean = variance = λ</MathRun>
         </Note>
         <Note at={normAt + 8} x={panelX(3)} y={capY} width={PANEL.w}>
           <span style={{ ...note(23, INK) }}>The symmetric bell</span>

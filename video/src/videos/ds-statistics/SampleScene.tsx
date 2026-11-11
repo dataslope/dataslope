@@ -161,7 +161,7 @@ export const SampleScene: React.FC = () => {
           width={2.4}
           label={
             <span style={{ ...noteText(24, INK), opacity: ease(frame, muAt - 2, 10) }}>
-              <span style={{ ...label(20, INK_SOFT), marginRight: 10 }}>parameter</span>
+              <span style={{ ...label(24, INK_SOFT), marginRight: 10 }}>parameter</span>
               <MathRun>
                 <I>μ</I> = <span style={TABULAR}>{fmt(S.mu, 2)}</span>
               </MathRun>
@@ -194,7 +194,7 @@ export const SampleScene: React.FC = () => {
         </Note>
         <Note at={xbarAt} x={x(S.firstMean) + 12} y={stripY + h(24)} dim={drawAt}>
           <span style={{ ...noteText(24, BLUE_INK) }}>
-            <span style={{ ...label(20, INK_SOFT), marginRight: 10 }}>statistic</span>
+            <span style={{ ...label(24, INK_SOFT), marginRight: 10 }}>statistic</span>
             <MathRun>
               <I>x̄</I> = <span style={TABULAR}>{fmt(S.firstMean, 2)}</span>
             </MathRun>
@@ -314,11 +314,11 @@ export const SampleScene: React.FC = () => {
           <div style={{ ...noteText(26, INK), ...TABULAR, lineHeight: 1.45 }}>
             Its spread is the SE:
             <br />
-            <Mark at={simAt}>{fmt(S.seSimulated, 2)}</Mark> <span style={{ ...label(20, INK_SOFT) }}>simulated</span>
+            <Mark at={simAt}>{fmt(S.seSimulated, 2)}</Mark> <span style={{ color: INK_SOFT }}>simulated</span>
             <span style={{ opacity: ease(frame, formulaAt - 2, 10) }}>
               {" "}
               · <Mark at={formulaAt}>{fmt(S.seFormula, 2)}</Mark>{" "}
-              <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, byFormulaAt - 2, 12) }}>by the formula</span>
+              <span style={{ color: INK_SOFT, opacity: ease(frame, byFormulaAt - 2, 12) }}>by the formula</span>
             </span>
           </div>
         </Note>
