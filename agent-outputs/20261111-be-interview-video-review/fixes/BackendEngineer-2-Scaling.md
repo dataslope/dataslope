@@ -63,7 +63,28 @@ other MP3 is unchanged, and `takes/be-scaling/` is untouched.
 
 ## Length and checks
 
-CHECKS_PLACEHOLDER
+**New length 11:47** (`npm run cues -- be-scaling`: 58 beats, 1,704 words,
+706.6 s plus the 2.6 s tail; `check:motion` measured 11:46.8). It was
+10:43: the nine new beats add about 66 s, all of it answers the review asked
+for.
+
+All on the final code, bundled from `out/entries/BackendEngineer-2-Scaling.tsx`
+through `out/render-slot.sh`:
+
+- `tsc --noEmit`: no errors in `src/videos/be-scaling/`. `eslint
+  src/videos/be-scaling`: clean.
+- `npm run check:cues`: pass. `npm test`: 79 of 79 pass.
+- `check:motion`: pass, 0 stretches still for 2 s or more.
+- `check:sync`: pass, every beat within ±0.12 s (worst +0.04 s, `q4-write`).
+- `check:mix`: pass (closest, speech 10.3 dB above the effects at 4:09.2).
+- `check:frames`: pass (65 arrows within 3.1°, spacing, one size per line,
+  no hyphen in tabular figures).
+- Stills looked at, at every change: 22, 75, 83.5, 132, 147, 157, 163, 172,
+  190, 232, 242, 259, 290, 322/323, 341, 364, 377, 549, 571/572, 626/627,
+  679, 703 s. Four small follow-ups came from them (ring label wrapping to
+  three lines, the semi-synchronous lines too tight, the shared-bucket rule
+  stopping short of the new line, the "session guarantees" label off the end
+  labels' baseline), each fixed and re-stilled.
 
 ## Noticed
 
