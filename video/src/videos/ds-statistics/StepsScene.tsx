@@ -13,7 +13,7 @@ import { Drift, Mark, MARK_OK, noteText, OK_INK, Svg, X0 } from "./parts";
 
 const STEP_TOP = 390;
 const STEP_PITCH = 92;
-const HYP_X = 360;
+const HYP_X = 400;
 const SKETCH_X = 1300;
 const SKETCH_W = 300;
 const SKETCH_H = 70;
