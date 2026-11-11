@@ -96,7 +96,7 @@ export const HookScene: React.FC = () => {
           dim={giveAt + 20}
         />
         <Note at={fitsAt + 6} x={BOX_X + BOX_W + 14} y={y(BOX_BOTTOM) + h(20)} out={cutAt + 10}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>doesn&apos;t fit</span>
+          <span style={{ ...label(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Doesn&apos;t fit</span>
         </Note>
 
         {/* Six machines, a piece each. */}
@@ -167,17 +167,17 @@ export const HookScene: React.FC = () => {
         {/* What every answer turns on, where it happens. */}
         <Note at={splitAt - 2} x={BOX_X + BOX_W + 14} y={y(278)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: INK }}>1</b> how the work is split
+            <b style={{ color: INK }}>1</b> How the work is split
           </span>
         </Note>
         <Note at={netAt - 2} x={W_X + W_W + 20} y={y(278)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: INK }}>2</b> what crosses the network
+            <b style={{ color: INK }}>2</b> What crosses the network
           </span>
         </Note>
         <Note at={slowAt - 2} x={W_X} y={y(W_TOP + 6 * W_PITCH) + h(4)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: INK }}>3</b> a machine slow, or dead
+            <b style={{ color: INK }}>3</b> A machine slow, or dead
           </span>
         </Note>
 

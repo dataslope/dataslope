@@ -119,7 +119,7 @@ export const HookScene: React.FC = () => {
         </Box>
         <Note at={onlyAt} x={IDX.x} y={y(FIG_Y) + BOX_H + 22}>
           <span style={say(24, INK)}>
-            <Mark at={indexAt + 4}>it knows your documents only from what&apos;s in here</Mark>
+            <Mark at={indexAt + 4}>It knows your documents only from what&apos;s in here</Mark>
           </span>
         </Note>
 
@@ -138,11 +138,11 @@ export const HookScene: React.FC = () => {
           </Chip>
         ))}
         <Note at={carryAt} x={X0} y={STEP_Y + 84}>
-          <span style={say(26, INK_SOFT)}>the fundamentals carry over</span>
+          <span style={say(26, INK_SOFT)}>The fundamentals carry over</span>
         </Note>
         <Note at={storeAt - 4} x={X0} y={STEP_Y + 134}>
           <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            what&apos;s new: <Mark at={storeAt + 2}>the vector store</Mark>
+            What&apos;s new: <Mark at={storeAt + 2}>the vector store</Mark>
             <span style={{ opacity: ease(frame, billAt - 4, 10) }}>
               , <Mark at={billAt + 2}>the embedding bill</Mark>
             </span>

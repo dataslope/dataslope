@@ -170,7 +170,7 @@ export const SkewScene: React.FC = () => {
         {/* ── What causes it, and the fix ── */}
         <Note at={keyAt - 2} x={R_X} y={y(334)}>
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap" }}>
-            <span style={{ ...note(23, INK_SOFT) }}>one common key:</span>
+            <span style={{ ...note(23, INK_SOFT) }}>One common key:</span>
             {causes.map((c) => (
               <span key={c.text} style={{ opacity: ease(frame, c.at - 2, 10) }}>
                 <Chip tone="orange" size={23}>
@@ -181,7 +181,7 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={fewAt} x={R_X} y={y(398)} out={thirtyAt - 4}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>a few partitions hold far more than the rest</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>A few partitions hold far more than the rest</span>
         </Note>
         <Note at={thirtyAt + 2} x={R_X} y={y(410)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -192,11 +192,11 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={waitAt - 2} x={R_X} y={y(470)} out={saltAt}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every core waits for it</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Every core waits for it</span>
         </Note>
         <Note at={suffixAt} x={R_X} y={y(470)}>
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap", ...note(24, INK) }}>
-            <b>salt it:</b>
+            <b>Salt it:</b>
             <Chip tone="orange" size={26} mono>
               guest
             </Chip>
@@ -213,11 +213,11 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={stageAt - 2} x={R_X} y={y(536)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the stage waits for the largest</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The stage waits for the largest</span>
         </Note>
         <Note at={twoAt - 2} x={R_X} y={y(604)}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            aggregate in two steps
+            Aggregate in two steps
             <span style={{ ...note(22, INK_SOFT), fontWeight: 500 }}>, if it can&apos;t combine locally</span>
           </span>
         </Note>
@@ -232,7 +232,7 @@ export const SkewScene: React.FC = () => {
         </Note>
         <Note at={joinAt - 2} x={R_X} y={y(692)}>
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap", ...note(24, INK) }}>
-            <b>in a join:</b>
+            <b>In a join:</b>
             <span style={{ opacity: ease(frame, copyAt, 10), display: "flex", gap: 10, alignItems: "center" }}>
               <span style={{ ...note(22, INK_SOFT) }}>the other side&apos;s</span>
               <Chip size={26} mono>
@@ -252,16 +252,16 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={matchAt - 2} x={R_X} y={y(740)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every salted row still finds its match</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Every salted row still finds its match</span>
         </Note>
         <Note at={nullsAt - 2} x={R_X} y={y(792)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            or: handle nulls and stand-in keys separately
+            Or: handle nulls and stand-in keys separately
           </span>
         </Note>
         <Note at={aqeAt - 2} x={R_X} y={y(832)}>
           <span style={{ ...note(23, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap" }}>
-            or: adaptive query execution<span style={{ opacity: ease(frame, splitAt, 10) }}> splits skewed join partitions</span>
+            Or: adaptive query execution<span style={{ opacity: ease(frame, splitAt, 10) }}> splits skewed join partitions</span>
             <br />
             <span style={{ ...note(21, INK_SOFT), opacity: ease(frame, splitAt + 8, 10) }}>re-planning while the job runs</span>
           </span>

@@ -93,7 +93,7 @@ export const GateScene: React.FC = () => {
 
         {/* What gets checked. */}
         <Note at={testAt} x={X0} y={y(284)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>tested before the data moves on</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Tested before the data moves on</span>
         </Note>
         <div style={{ position: "absolute", left: X0, top: y(326), display: "flex", gap: 14, opacity: 1 - 0.35 * ease(frame, gateAt, 14) }}>
           {CHECKS.map((c) => {
@@ -106,7 +106,7 @@ export const GateScene: React.FC = () => {
           })}
         </div>
         <Note at={toolsAt} x={X0} y={y(386)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>run by dbt tests · Great Expectations · Soda</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Run by dbt tests · Great Expectations · Soda</span>
         </Note>
 
         {/* Where they belong: a gate between load and publish. */}
@@ -165,12 +165,12 @@ export const GateScene: React.FC = () => {
         </Note>
         <Note at={stagingAt} x={X0} y={dagY + nodeH / 2 + h(40)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            load writes where no one reads<span style={{ opacity: ease(frame, swapAt, 10) }}>; publish swaps it in</span>
+            Load writes where no one reads<span style={{ opacity: ease(frame, swapAt, 10) }}>; publish swaps it in</span>
             <span style={{ opacity: ease(frame, passesAt, 10) }}> on a pass</span>
           </span>
         </Note>
         <Note at={wapAt} x={X0} y={dagY + nodeH / 2 + h(80)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>write, audit, publish</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Write, audit, publish</span>
         </Note>
         <Note at={neverAt + 2} x={cx(4) - NODE_W / 2} y={dagY + nodeH / 2 + h(16)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>never runs</span>
@@ -193,7 +193,7 @@ export const GateScene: React.FC = () => {
         >
           <div style={{ height: HEAD, display: "flex", alignItems: "center", borderBottom: `1px solid ${HAIRLINE}` }}>
             <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-              this batch: <Num>{count(GATE.rows)}</Num> orders
+              This batch: <Num>{count(GATE.rows)}</Num> orders
             </span>
           </div>
           {rows.map((r, i) => {
@@ -220,7 +220,7 @@ export const GateScene: React.FC = () => {
                 {bad > 0 ? (
                   <div style={{ position: "absolute", left: -10, right: -10, top: 0, bottom: 0, background: `color-mix(in srgb, ${MARK_BAD} ${bad * 100}%, transparent)` }} />
                 ) : null}
-                <span style={{ position: "relative", ...note(23, INK), flex: 1, whiteSpace: "nowrap" }}>{r.name}</span>
+                <span style={{ position: "relative", ...note(23, INK), flex: 1, whiteSpace: "nowrap" }}>{r.name.charAt(0).toUpperCase() + r.name.slice(1)}</span>
                 <span style={{ position: "relative", ...note(23, r.pass ? INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
                   <Num>{r.value}</Num>
                   {!r.pass ? (
@@ -243,7 +243,7 @@ export const GateScene: React.FC = () => {
           </Badge>
         </Note>
         <Note at={failsAt + 10} x={cardX + cardW + 30} y={cardTop + h(74)}>
-          <span style={{ ...label(21, OK_INK), whiteSpace: "nowrap" }}>bad data stops before anyone sees it</span>
+          <span style={{ ...label(21, OK_INK), whiteSpace: "nowrap" }}>Bad data stops before anyone sees it</span>
         </Note>
       </Drift>
     </AbsoluteFill>

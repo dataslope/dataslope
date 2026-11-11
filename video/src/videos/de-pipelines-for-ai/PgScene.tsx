@@ -51,17 +51,17 @@ export const PgScene: React.FC = () => {
   const millionsAt = n.word("pg", "millions of vectors");
   const billionsAt = n.word("pg", "not billions");
   const reasons = [
-    { text: "one system", at: n.word("pg-why", "One system") },
-    { text: "real transactions", at: n.word("pg-why", "real transactions") },
-    { text: "joins against your relational data", at: n.word("pg-why", "joins against your relational data") },
-    { text: "access filters in plain SQL", at: n.word("pg-why", "access filters in plain sequel") },
+    { text: "One system", at: n.word("pg-why", "One system") },
+    { text: "Real transactions", at: n.word("pg-why", "real transactions") },
+    { text: "Joins against your relational data", at: n.word("pg-why", "joins against your relational data") },
+    { text: "Access filters in plain SQL", at: n.word("pg-why", "access filters in plain sequel") },
   ];
   const dedAt = n.word("pg-dedicated", "A dedicated vector database");
   const costAt = n.word("pg-dedicated", "earns its operational cost");
   const earns = [
-    { text: "very large scale", at: n.word("pg-dedicated", "very large scale") },
-    { text: "very high query rates", at: n.word("pg-dedicated", "very high query rates") },
-    { text: "hybrid search and multi-tenancy built in", at: n.word("pg-dedicated", "hybrid search and multi-tenancy built in") },
+    { text: "Very large scale", at: n.word("pg-dedicated", "very large scale") },
+    { text: "Very high query rates", at: n.word("pg-dedicated", "very high query rates") },
+    { text: "Hybrid search and multi-tenancy built in", at: n.word("pg-dedicated", "hybrid search and multi-tenancy built in") },
   ];
   const caveatAt = n.word("pg-caveat", "With an approximate index");
   const afterAt = n.word("pg-caveat", "that filter runs after the search");
@@ -70,9 +70,9 @@ export const PgScene: React.FC = () => {
   const herePgAt = n.word("pg-lean", "here pgvector");
   const evidenceAt = n.word("pg-lean", "what evidence would change your mind");
   const evidence = [
-    { text: "the index outgrows memory", at: n.word("pg-lean", "the index outgrowing memory") },
-    { text: "latency misses its target at peak", at: n.word("pg-lean", "latency missing its target at peak load") },
-    { text: "filtered searches lose recall", at: n.word("pg-lean", "filtered searches losing recall") },
+    { text: "The index outgrows memory", at: n.word("pg-lean", "the index outgrowing memory") },
+    { text: "Latency misses its target at peak", at: n.word("pg-lean", "latency missing its target at peak load") },
+    { text: "Filtered searches lose recall", at: n.word("pg-lean", "filtered searches losing recall") },
   ];
   const end = n.beat("pg-lean").to;
 
@@ -134,6 +134,9 @@ export const PgScene: React.FC = () => {
             borderRadius: "0 10px 10px 0",
             background: PAPER,
             border: `2px solid ${INK_SOFT}`,
+            // One line in the middle, the blue half's own edge, not two
+            // borders side by side (the owner, 2026-11-11).
+            borderLeft: "none",
             boxSizing: "border-box",
             display: "flex",
             alignItems: "center",
@@ -156,7 +159,7 @@ export const PgScene: React.FC = () => {
           </span>
         </Note>
         <Note at={inPgAt - 2} x={X0} y={listTop - 30}>
-          <span style={madeUp(19)}>its search is one more SQL statement (pgvector&apos;s syntax, shown, not run)</span>
+          <span style={madeUp(19)}>Its search is one more SQL statement (pgvector&apos;s syntax, shown, not run)</span>
         </Note>
         <SqlListing
           lines={QUERY}
@@ -190,7 +193,7 @@ export const PgScene: React.FC = () => {
         {/* The caveat: Question 8's trap. */}
         <Note at={caveatAt - 2} x={X0} y={listTop + sqlListingHeight(QUERY.length, 24) + 26 + reasons.length * 44 + 8}>
           <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            with an approximate index,{" "}
+            With an approximate index,{" "}
             <span style={{ opacity: ease(frame, afterAt - 2, 10) }}>
               <span style={{ fontFamily: MONO, fontVariantLigatures: "none" }}>WHERE</span> runs after the search
             </span>
@@ -200,7 +203,7 @@ export const PgScene: React.FC = () => {
 
         {/* A dedicated vector database. */}
         <Note at={dedAt - 2} x={RIGHT_X} y={listTop - 64}>
-          <span style={head(23, INK)}>a dedicated vector database</span>
+          <span style={head(23, INK)}>A dedicated vector database</span>
         </Note>
         <Note at={costAt - 2} x={RIGHT_X} y={listTop - 18}>
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>earns its operational cost with</span>
@@ -216,12 +219,12 @@ export const PgScene: React.FC = () => {
 
         {/* What an interviewer wants. */}
         <Note at={leanAt - 2} x={RIGHT_X} y={y(630) + 18}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>the answer they want</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>The answer they want</span>
         </Note>
         <Note at={leanAt} x={RIGHT_X} y={y(630) + 58}>
           <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap", lineHeight: 1.5 }}>
             <Mark at={leanAt + 4} color={MARK_OK}>
-              which way you&apos;d lean
+              Which way you&apos;d lean
             </Mark>
             <span style={{ opacity: ease(frame, herePgAt - 2, 10) }}>: pgvector,</span>
             <br />

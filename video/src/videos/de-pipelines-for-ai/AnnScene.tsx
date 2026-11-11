@@ -144,7 +144,7 @@ export const AnnScene: React.FC = () => {
         {/* What exact search is, and when it is enough. */}
         <Note at={exactAt} x={X0} y={y(244)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <b>exact</b>: the query against every vector
+            <b>Exact</b>: the query against every vector
             <span style={{ opacity: ease(frame, accurateAt - 2, 10), color: OK_INK }}>, perfectly accurate</span>
           </span>
         </Note>
@@ -249,7 +249,7 @@ export const AnnScene: React.FC = () => {
         {/* Approximate, under exact; the two indexes under the space. */}
         <Note at={tradeAt - 2} x={X0} y={y(244) + 80}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b>approximate</b>: a little recall for big speedups
+            <b>Approximate</b>: a little recall for big speedups
           </span>
         </Note>
         <Note at={hnswAt} x={X0} y={top + SC.h + 20} dim={clusterAt}>
@@ -272,19 +272,19 @@ export const AnnScene: React.FC = () => {
         {/* The simulation. */}
         <Note at={modelAt - 2} x={CH.x0 - 70} y={y(CH.top) - 136}>
           <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            modelled in NumPy
+            Modelled in NumPy
             <span style={{ opacity: ease(frame, sizeAt - 2, 10), fontWeight: 500 }}>
               : {num(ANN.n)} vectors, {ANN.lists} clusters
             </span>
           </span>
         </Note>
         <Note at={sizeAt + 4} x={CH.x0 - 70} y={y(CH.top) - 100}>
-          <span style={madeUp(19)}>a seeded simulation, not a vector database</span>
+          <span style={madeUp(19)}>A seeded simulation, not a vector database</span>
         </Note>
         {/* The chart's frame, up from "Beyond that", so the right half is never bare. */}
         <Note at={tradeAt + 4} x={CH.x0 - 70} y={y(CH.top) - 62}>
           <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            recall<span style={{ fontWeight: 500, color: INK_SOFT }}>: the share of the true top ten found</span>
+            Recall<span style={{ fontWeight: 500, color: INK_SOFT }}>: the share of the true top ten found</span>
           </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
@@ -352,7 +352,7 @@ export const AnnScene: React.FC = () => {
         <Note at={measureAt - 2} x={CH.x0 - 70} y={y(CH.bottom) + 132}>
           <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={measureAt + 6} color={MARK_OK}>
-              measure recall against exact search
+              Measure recall against exact search
             </Mark>
             <span style={{ opacity: ease(frame, defaultsAt - 2, 10), color: INK_SOFT, fontWeight: 500 }}>, not the defaults</span>
           </span>

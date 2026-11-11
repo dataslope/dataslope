@@ -150,7 +150,7 @@ export const TopicScene: React.FC = () => {
           </span>
         </Box>
         <Note at={noKeyAt} x={PROD.x} y={prodTop + h(160)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>no key: round-robin</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>No key: round-robin</span>
         </Note>
 
         {/* The lanes: one log, then three partitions. */}
@@ -257,7 +257,7 @@ export const TopicScene: React.FC = () => {
         <Legend x={LANE_X} y={laneTop(2) + laneH + h(58)} at={flyAt(0) + 4} out={addAt - 4} note="· the video's own stream" />
         <Note at={acrossAt + 6} x={LANE_X} y={laneTop(2) + laneH + h(10)} out={partsOut}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            in order of arrival: <b style={{ color: USER_INK.dee }}>dee</b>'s click from <Num>{deeClick.t}</Num> s sits after{" "}
+            In order of arrival: <b style={{ color: USER_INK.dee }}>dee</b>'s click from <Num>{deeClick.t}</Num> s sits after{" "}
             <b style={{ color: USER_INK[aheadOfDee.user] }}>{aheadOfDee.user}</b>'s from <Num>{aheadOfDee.t}</Num> s
           </span>
         </Note>
@@ -265,17 +265,17 @@ export const TopicScene: React.FC = () => {
         {/* Offsets named: each lane's slots count from zero. */}
         <Note at={logAt + 6} x={RIGHT_X} y={y(400)} out={partsOut}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <b>topic</b>: a named log that only grows at its end
+            <b>Topic</b>: a named log that only grows at its end
           </span>
         </Note>
         <Note at={unitAt} x={RIGHT_X} y={y(452)} out={partsOut}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <b>partition</b>: the unit of parallelism
+            <b>Partition</b>: the unit of parallelism
           </span>
         </Note>
         <Note at={offsetAt} x={RIGHT_X} y={y(504)} out={partsOut}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <b>offset</b>: a message's position in its partition
+            <b>Offset</b>: a message's position in its partition
             <span style={{ opacity: ease(frame, zeroAt - 2, 10) }}>
               , from <Num>0</Num>
             </span>
@@ -289,7 +289,7 @@ export const TopicScene: React.FC = () => {
           </Note>
         ))}
         <Note at={acrossAt} x={RIGHT_X} y={y(600)} out={partsOut}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no order across partitions</span>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>No order across partitions</span>
         </Note>
 
         {/* Question 2: what the count caps, and what it costs. */}
@@ -313,14 +313,14 @@ export const TopicScene: React.FC = () => {
         ))}
         <Note at={capAt + 10} x={RIGHT_X + 160} y={y(400)} out={moveOut}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            at most <b style={TABULAR}>3</b> consumers share the work
+            At most <b style={TABULAR}>3</b> consumers share the work
           </span>
         </Note>
         <Note at={whereAt} x={RIGHT_X + 160} y={y(452)} out={moveOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>order holds inside each one</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Order holds inside each one</span>
         </Note>
         <Note at={moreAt} x={RIGHT_X + 160} y={y(530)} out={moveOut}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>more partitions: more throughput</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>More partitions: more throughput</span>
         </Note>
         {costs.map((c, i) => (
           <Note key={c.text} at={c.at - 2} x={RIGHT_X + 184} y={y(580) + i * h(44)} out={moveOut}>
@@ -350,9 +350,9 @@ export const TopicScene: React.FC = () => {
         </Note>
         <div style={{ position: "absolute", left: RIGHT_X - 100, top: y(330), opacity: ease(frame, movesAt, 12) }}>
           <div style={{ display: "flex", gap: 0, ...label(20, INK_SOFT), fontWeight: 500, borderBottom: `1.5px solid ${HAIRLINE}`, paddingBottom: 6 }}>
-            <span style={{ width: 90 }}>key</span>
-            <span style={{ width: 110, textAlign: "center" }}>of 3</span>
-            <span style={{ width: 110, textAlign: "center" }}>of 4</span>
+            <span style={{ width: 90 }}>Key</span>
+            <span style={{ width: 110, textAlign: "center" }}>Of 3</span>
+            <span style={{ width: 110, textAlign: "center" }}>Of 4</span>
           </div>
           {USERS.map((u, i) => {
             const moved = PARTITIONS.of[u] !== PARTITIONS.four[u];
@@ -380,7 +380,7 @@ export const TopicScene: React.FC = () => {
         </div>
         <Note at={modelAt} x={WAFFLE.x} y={y(WAFFLE.top) - h(70)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            model: <Num>{count(MOVED.keys)}</Num> keys,
+            Model: <Num>{count(MOVED.keys)}</Num> keys,
             <br />3 partitions, then 4
           </span>
         </Note>
@@ -445,10 +445,10 @@ export const TopicScene: React.FC = () => {
           </span>
         </Note>
         <Note at={readAt} x={RIGHT_X - 100} y={y(650)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a user's new clicks can be read before the old ones</span>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A user's new clicks can be read before the old ones</span>
         </Note>
         <Note at={peakAt} x={RIGHT_X - 100} y={y(706)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>size for peak throughput, with headroom</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Size for peak throughput, with headroom</span>
         </Note>
       </Drift>
     </AbsoluteFill>

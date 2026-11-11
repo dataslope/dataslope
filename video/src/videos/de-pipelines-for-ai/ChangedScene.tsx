@@ -116,22 +116,22 @@ export const ChangedScene: React.FC = () => {
   const coreAt = n.word("changed", "The core hasn't");
   const blocks = [
     { text: "SQL", at: n.word("changed", "sequel") },
-    { text: "modeling", at: n.word("changed", "modeling") },
-    { text: "batch and streaming design", at: n.word("changed", "batch and streaming design") },
+    { text: "Modeling", at: n.word("changed", "modeling") },
+    { text: "Batch and streaming design", at: n.word("changed", "batch and streaming design") },
   ];
   const layers = [
-    { text: "system design for AI data", at: n.word("changed-layer", "system design for AI data") },
-    { text: "unstructured data: PDFs and tickets into clean text", at: n.word("changed-layer", "Unstructured data") },
-    { text: "vector search trade-offs", at: n.word("changed-layer", "Vector search trade-offs") },
+    { text: "System design for AI data", at: n.word("changed-layer", "system design for AI data") },
+    { text: "Unstructured data: PDFs and tickets into clean text", at: n.word("changed-layer", "Unstructured data") },
+    { text: "Vector search trade-offs", at: n.word("changed-layer", "Vector search trade-offs") },
     { text: "AI in your own workflow", at: n.word("changed-layer", "AI in your own workflow") },
   ];
   const roundsAt = n.word("changed-verify", "Some coding rounds allow an assistant");
   const gradeAt = n.word("changed-verify", "grade how you check its code");
   const checks = [
-    { text: "idempotency", at: n.word("changed-verify", "idempotency") },
-    { text: "partition overwrites", at: n.word("changed-verify", "partition overwrites") },
-    { text: "time zones", at: n.word("changed-verify", "time zones") },
-    { text: "schema drift", at: n.word("changed-verify", "schema drift") },
+    { text: "Idempotency", at: n.word("changed-verify", "idempotency") },
+    { text: "Partition overwrites", at: n.word("changed-verify", "partition overwrites") },
+    { text: "Time zones", at: n.word("changed-verify", "time zones") },
+    { text: "Schema drift", at: n.word("changed-verify", "schema drift") },
   ];
   const pipeAt = n.word("rag-in", "the pipeline itself");
   const end = n.beat("rag-in").to;
@@ -165,7 +165,7 @@ export const ChangedScene: React.FC = () => {
           ))}
         </div>
         <Note at={coreAt} x={X0} y={y(BASE_Y) + 24 + 36 + 12}>
-          <span style={{ ...label(22, BLUE_INK), fontWeight: 500 }}>the core loop, the same as ever</span>
+          <span style={{ ...label(22, BLUE_INK), fontWeight: 500 }}>The core loop, the same as ever</span>
         </Note>
 
         {layers.map((l, i) => (
@@ -174,13 +174,13 @@ export const ChangedScene: React.FC = () => {
           </Layer>
         ))}
         <Note at={layers[0].at - 2} x={X0} y={layerTop(3) + LAYER_TEXT - 64}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>what&apos;s been added on top</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>What&apos;s been added on top</span>
         </Note>
 
         {/* Beside "AI in your own workflow": what a round with an assistant grades. */}
         <Note at={roundsAt} x={SIDE} y={layerTop(3) + LAYER_TEXT - 68} from="right" dim={pipeAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            rounds that allow an assistant
+            Rounds that allow an assistant
             <br />
             <Mark at={gradeAt + 4}>grade how you check its code:</Mark>
           </span>
@@ -191,7 +191,7 @@ export const ChangedScene: React.FC = () => {
           </Note>
         ))}
         <Note at={pipeAt} x={SIDE} y={layerTop(0) + LAYER_TEXT} from="right">
-          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>now: the pipeline itself</span>
+          <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Now: the pipeline itself</span>
         </Note>
       </Drift>
     </AbsoluteFill>

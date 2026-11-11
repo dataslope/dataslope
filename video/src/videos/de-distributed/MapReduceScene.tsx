@@ -254,23 +254,23 @@ export const MapReduceScene: React.FC = () => {
           );
         })}
         <Note at={reduceAt} x={SUM_X} y={y(LABEL_Y)}>
-          <span style={{ ...label(25, INK_SOFT), whiteSpace: "nowrap" }}>sum per key</span>
+          <span style={{ ...label(25, INK_SOFT), whiteSpace: "nowrap" }}>Sum per key</span>
         </Note>
         <Note at={groupbyAt - 2} x={SUM_X} y={y(842)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            a <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>groupby</span>, across machines
+            A <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500 }}>groupby</span>, across machines
           </span>
         </Note>
 
         {/* Why it scales, and what it costs. */}
         <Note at={scalesAt} x={ROW_X} y={y(842)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            independent map tasks<span style={{ opacity: ease(frame, failAt, 10) }}> · the framework handles failures</span>
+            Independent map tasks<span style={{ opacity: ease(frame, failAt, 10) }}> · the framework handles failures</span>
           </span>
         </Note>
         <Note at={costAt + 4} x={770} y={y(842)}>
           <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            the cost<span style={{ opacity: ease(frame, networkAt, 10) }}>: data across the network</span>
+            The cost<span style={{ opacity: ease(frame, networkAt, 10) }}>: data across the network</span>
           </span>
         </Note>
       </Drift>

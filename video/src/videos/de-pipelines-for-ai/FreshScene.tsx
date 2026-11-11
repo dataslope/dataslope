@@ -13,7 +13,7 @@ import { Console, Drift, lineOf, Listing, listingHeight, Mark, MARK_BAD, X0 } fr
 
 const LIST_SIZE = 20;
 const TABLE_X = 1230;
-const COLS = [{ w: 130, t: "chunk id" }, { w: 104, t: "indexed" }, { w: 84, t: "now" }, { w: 230, t: "" }];
+const COLS = [{ w: 130, t: "Chunk id" }, { w: 104, t: "Indexed" }, { w: 84, t: "Now" }, { w: 230, t: "" }];
 const ROW_H = 64;
 
 /**
@@ -84,7 +84,7 @@ export const FreshScene: React.FC = () => {
         {/* The page's block and what it printed. */}
         <Note at={loadAt - 2} x={X0} y={listTop - 40}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            an incremental load, keyed by content: the page&apos;s block, run in Pyodide
+            An incremental load, keyed by content: the page&apos;s block, run in Pyodide
           </span>
         </Note>
         <Listing
@@ -178,13 +178,13 @@ export const FreshScene: React.FC = () => {
           );
         })}
         <Note at={exampleAt} x={TABLE_X} y={tableTop + 40 + ids.length * ROW_H + 18}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>chunk id → hash, in the index and in the sources now</span>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Chunk id → hash, in the index and in the sources now</span>
         </Note>
 
         {/* The trap. */}
         <Note at={skipAt} x={X0} y={y(870)}>
           <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={skipAt + 4} color={MARK_BAD}>skip the deletes</Mark>
+            <Mark at={skipAt + 4} color={MARK_BAD}>Skip the deletes</Mark>
             <span style={{ opacity: ease(frame, keepsAt - 2, 10) }}>, and a removed document keeps answering</span>
             <span style={{ opacity: ease(frame, leakAt - 2, 10), color: INK }}>: wrong at best, a data leak at worst</span>
           </span>

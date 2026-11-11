@@ -212,7 +212,7 @@ export const LineageScene: React.FC = () => {
         </Note>
         <Note at={stepsAt} x={RDD_X} y={y(500)} out={diesAt}>
           <span style={{ ...note(24, BLUE_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
-            keeps the steps
+            Keeps the steps
             <br />
             <span style={{ opacity: ease(frame, notDataAt, 10), color: INK_SOFT, fontWeight: 500 }}>not the data</span>
           </span>
@@ -221,7 +221,7 @@ export const LineageScene: React.FC = () => {
         {/* An executor dies. */}
         <Note at={diesAt} x={RDD_X} y={y(500)} out={q14At - 6}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
-            an executor dies
+            An executor dies
             <br />
             <span style={{ opacity: ease(frame, aloneAt, 10), color: INK }}>replay that partition alone</span>
           </span>
@@ -231,7 +231,7 @@ export const LineageScene: React.FC = () => {
         </Note>
         <Note at={pastAt - 2} x={RDD_X} y={y(622)} out={q14At - 6}>
           <span style={{ ...note(22, INK), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
-            past a shuffle:
+            Past a shuffle:
             <br />
             <span style={{ opacity: ease(frame, parentAt, 10) }}>needs every parent&apos;s output</span>
           </span>
@@ -241,7 +241,7 @@ export const LineageScene: React.FC = () => {
         <Disk x={COLS[1].x + BW / 2 - 28} top={y(ROWS[2]) + bh + h(30)} at={ckptAt + 2} out={q14At - 6} />
         <Arrow from={[COLS[1].x + BW / 2, y(ROWS[2]) + bh + 4]} to={[COLS[1].x + BW / 2, y(ROWS[2]) + bh + h(28)]} at={savingAt} dur={8} width={1.8} head={9} out={q14At - 6} />
         <Note at={savingAt - 2} x={COLS[1].x + BW / 2 + 56} y={y(ROWS[2]) + bh + h(30) + diskHeight() / 2 - 15} out={q14At - 6}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>checkpoint: a copy in reliable storage</span>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Checkpoint: a copy in reliable storage</span>
         </Note>
 
         {/* ── Caching ── */}
@@ -266,7 +266,7 @@ export const LineageScene: React.FC = () => {
           </span>
         </Note>
         <CacheRow
-          label="without a cache"
+          label="Without a cache"
           top={y(ACT_Y[0])}
           at={twoAt}
           countAt={twiceAt}
@@ -275,16 +275,16 @@ export const LineageScene: React.FC = () => {
           color={ACCENT_INK}
           h={h}
         />
-        <CacheRow label="with one" top={y(ACT_Y[1])} at={onceAt - 6} countAt={onceAt} reads={1} cached color={OK_INK} h={h} />
+        <CacheRow label="With one" top={y(ACT_Y[1])} at={onceAt - 6} countAt={onceAt} reads={1} cached color={OK_INK} h={h} />
         <Note at={paysAt - 2} x={RDD_X} y={y(680)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
-            pays: several actions
+            Pays: several actions
             <br />
             <span style={{ opacity: ease(frame, iterAt, 10) }}>an iterative algorithm</span>
           </span>
         </Note>
         <Note at={onceUsedAt - 2} x={RDD_X} y={y(756)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>used once: wasted memory</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Used once: wasted memory</span>
         </Note>
         <Note at={onceUsedAt + 10} x={RDD_X} y={y(792)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
@@ -293,7 +293,7 @@ export const LineageScene: React.FC = () => {
         </Note>
         <Note at={lazyAt - 2} x={RDD_X} y={y(834)}>
           <span style={{ ...note(23, INK), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
-            lazy too:
+            Lazy too:
             <span style={{ opacity: ease(frame, firstAt, 10) }}> fills on the</span>
             <br />
             <span style={{ opacity: ease(frame, firstAt, 10) }}>first action</span>
@@ -388,7 +388,7 @@ const CacheRow: React.FC<{
         </>
       )}
       <div style={{ position: "absolute", left: 960, top: top + h(4), ...note(24, color), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, countAt, 10) }}>
-        source read {reads === 2 ? "twice" : "once"}
+        Source read {reads === 2 ? "twice" : "once"}
       </div>
     </div>
   );

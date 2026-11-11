@@ -166,7 +166,7 @@ export const KindsScene: React.FC = () => {
           </svg>
           <Note at={retryAt} x={zoomX + 274} y={zoomY - h(96)} align="right">
             <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              retry: <span style={{ fontWeight: 500 }}>one failed task, the same run</span>
+              Retry: <span style={{ fontWeight: 500 }}>one failed task, the same run</span>
             </span>
           </Note>
           {frame >= failedAt + 4 ? (
@@ -192,7 +192,7 @@ export const KindsScene: React.FC = () => {
           />
           <Note at={rerunAt} x={cx(RERUN) - 180} y={stripY - h(118) - boxH / 2 - h(46)}>
             <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              rerun: <span style={{ fontWeight: 500, opacity: ease(frame, fixAt, 10) }}>a finished date, after a fix</span>
+              Rerun: <span style={{ fontWeight: 500, opacity: ease(frame, fixAt, 10) }}>a finished date, after a fix</span>
             </span>
           </Note>
         </div>
@@ -200,7 +200,7 @@ export const KindsScene: React.FC = () => {
         {/* A backfill: the dates that never ran, or a range again. */}
         <Note at={backAt} x={X_START} y={stripY - boxH / 2 - h(96)}>
           <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            backfill: <span style={{ fontWeight: 500, opacity: ease(frame, neverAt, 10) }}>dates that never ran</span>
+            Backfill: <span style={{ fontWeight: 500, opacity: ease(frame, neverAt, 10) }}>dates that never ran</span>
           </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, rangeAt, 12) }}>

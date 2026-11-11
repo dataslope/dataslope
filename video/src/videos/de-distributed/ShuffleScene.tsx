@@ -131,7 +131,7 @@ export const ShuffleScene: React.FC = () => {
         ))}
         <Note at={movesAt} x={RED_X} y={y(ROW_TOPS[0]) - h(40)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            one partition per key<span style={{ opacity: ease(frame, fetchAt, 10) }}>: reduce tasks</span>
+            One partition per key<span style={{ opacity: ease(frame, fetchAt, 10) }}>: reduce tasks</span>
           </span>
         </Note>
         {[0, 1, 2].map((m) => (
@@ -178,7 +178,7 @@ export const ShuffleScene: React.FC = () => {
         </Note>
         <Note at={secondAt - 2} x={SCALED_X} y={y(LAD_TOP) - h(64)}>
           <span style={{ ...label(21, INK_SOFT), display: "block", lineHeight: 1.25, whiteSpace: "nowrap" }}>
-            if the fastest cache
+            If the fastest cache
             <br />
             took one second
           </span>

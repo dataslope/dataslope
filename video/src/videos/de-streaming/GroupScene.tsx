@@ -237,15 +237,15 @@ export const GroupScene: React.FC = () => {
 
         {/* What a group does, along the bottom. */}
         <Note at={splitAt} x={X0} y={y(770)} out={fanOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>each partition goes to exactly one consumer in the group: the work is split, not copied</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Each partition goes to exactly one consumer in the group: the work is split, not copied</span>
         </Note>
         <Note at={stopsAt} x={X0} y={y(818)} out={fanOut}>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            parallelism stops at the partition count: a fourth consumer has nothing to read
+            Parallelism stops at the partition count: a fourth consumer has nothing to read
           </span>
         </Note>
         <Note at={feedsAt} x={X0} y={y(866)} out={fanOut}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>each group reads every message: one stream feeds several pipelines</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Each group reads every message: one stream feeds several pipelines</span>
         </Note>
         {[
           { at: twoAt, text: "2 consumers: one has two partitions" },
@@ -285,7 +285,7 @@ export const GroupScene: React.FC = () => {
         </Note>
         <Note at={costAt} x={LANE_X - 280} y={y(770)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <span style={{ background: HIGHLIGHT, borderRadius: 4, padding: "0 6px" }}>offsets 3 and 4</span>: processed, never committed. Read again?
+            <span style={{ background: HIGHLIGHT, borderRadius: 4, padding: "0 6px" }}>Offsets 3 and 4</span>: processed, never committed. Read again?
           </span>
         </Note>
       </Drift>

@@ -107,7 +107,7 @@ export const DagsterScene: React.FC = () => {
           </span>
         </Note>
         <Note at={wireAt + 16} x={LEFT} y={cy + h(112)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>the order, written by hand</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>The order, written by hand</span>
         </Note>
 
         {/* The two models side by side: a hairline in the gap, from the heads
@@ -146,7 +146,7 @@ export const DagsterScene: React.FC = () => {
           </TaskBox>
         ))}
         <Note at={fileAt} x={RIGHT_X} y={cy - assetH / 2 - h(46)}>
-          <span style={{ ...label(20, BLUE_INK), whiteSpace: "nowrap" }}>each one a table or a file</span>
+          <span style={{ ...label(20, BLUE_INK), whiteSpace: "nowrap" }}>Each one a table or a file</span>
         </Note>
         {ASSETS.map((a) =>
           a.reads ? (
@@ -192,7 +192,7 @@ export const DagsterScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={readsAt + 16} x={RIGHT_X} y={cy + h(96)}>
-          <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>the order, worked out from the data</span>
+          <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>The order, worked out from the data</span>
         </Note>
 
         {/* What the asset model gives you for free: each asset fresh, and when. */}
@@ -223,7 +223,7 @@ export const DagsterScene: React.FC = () => {
         </Pill>
         <Note at={knowsAt} x={RIGHT_X} y={y(728)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            every asset knows what produced it<span style={{ opacity: ease(frame, whenAt, 10) }}>, and when</span>
+            Every asset knows what produced it<span style={{ opacity: ease(frame, whenAt, 10) }}>, and when</span>
           </span>
         </Note>
         <Pill x={RIGHT_X} y={y(790)} at={typingAt} tone="blue" size={22}>
@@ -234,7 +234,7 @@ export const DagsterScene: React.FC = () => {
         </Pill>
         <Note at={typingAt + 8} x={RIGHT_X} y={y(846)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            outputs type-checked at run time
+            Outputs type-checked at run time
             <span style={{ opacity: ease(frame, testingAt + 6, 10) }}> · assets unit-tested with mock resources</span>
           </span>
         </Note>

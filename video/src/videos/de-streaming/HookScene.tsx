@@ -22,9 +22,9 @@ const KINDS = ["click", "payment", "reading", "click", "click", "payment", "read
 
 /** The three things a streaming round tests, each with its cue. */
 const TESTS = [
-  { cue: "how Kafka", text: "how Kafka, a distributed log, spreads it across machines" },
-  { cue: "what a delivery guarantee", text: "what a delivery guarantee really promises" },
-  { cue: "how to count over time", text: "how to count over time when events arrive late and out of order" },
+  { cue: "how Kafka", text: "How Kafka, a distributed log, spreads it across machines" },
+  { cue: "what a delivery guarantee", text: "What a delivery guarantee really promises" },
+  { cue: "how to count over time", text: "How to count over time when events arrive late and out of order" },
 ];
 
 /**
@@ -110,7 +110,7 @@ export const HookScene: React.FC = () => {
           </div>
         ))}
         <Note at={lastAt} x={BELT_RIGHT - 40} y={y(BELT_Y) + CHIP_H + h(16)} align="right">
-          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>no last row to wait for</span>
+          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>No last row to wait for</span>
         </Note>
 
         {/* What the round tests. */}
@@ -143,7 +143,7 @@ export const HookScene: React.FC = () => {
               <span style={{ ...note(29, INK), fontWeight: 500 }}>
                 {i === 2 ? (
                   <>
-                    how to count over time when events arrive{" "}
+                    How to count over time when events arrive{" "}
                     <span style={{ color: ease(frame, lateAt, 10) > 0.5 ? ACCENT_INK : INK, fontWeight: ease(frame, lateAt, 10) > 0.5 ? 700 : 560 }}>
                       late and out of order
                     </span>

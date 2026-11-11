@@ -111,11 +111,11 @@ export const PartitionScene: React.FC = () => {
         {/* One partition, one task, one core. */}
         <Note at={unitAt - 2} x={G_X} y={y(300)}>
           <span style={{ display: "block", whiteSpace: "nowrap", ...note(25, INK) }}>
-            a <b style={{ color: BLUE_INK }}>partition</b>: the unit of parallelism
+            A <b style={{ color: BLUE_INK }}>partition</b>: the unit of parallelism
           </span>
           <span style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", ...note(25, INK), marginTop: 6 }}>
             <span style={{ opacity: ease(frame, taskAt, 10) }}>
-              one task, on one partition,
+              One task, on one partition,
             </span>
             <span style={{ opacity: ease(frame, coreAt, 10) }}>on one core</span>
           </span>
@@ -284,12 +284,12 @@ export const PartitionScene: React.FC = () => {
             <Num>{count(MANY.partitions)}</Num> of <Num>{mb(MANY.mb)}</Num>
           </span>
           <span style={{ display: "block", ...note(23, ACCENT_INK), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, schedAt, 10) }}>
-            scheduling costs more than the work
+            Scheduling costs more than the work
           </span>
         </Note>
         <Note at={fewHundredAt - 2} x={R_X} y={caseRow(2)}>
           <span style={{ ...note(23, OK_INK), whiteSpace: "nowrap", fontWeight: 500 }}>
-            target: a few hundred MB a partition
+            Target: a few hundred MB a partition
             <span style={{ opacity: ease(frame, twoFourAt, 10) }}>, 2 to 4 × the cores</span>
           </span>
           <span style={{ display: "block", ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, sixtyAt - 2, 10) }}>
@@ -392,7 +392,7 @@ const Coalesce: React.FC<{ x: number; top: number; at: number; labelAt: number; 
       </Svg>
       <Note at={writeAt - 2} x={x2 + MINI_W + 24} y={oldY(1)}>
         <span style={{ ...note(22, INK_SOFT), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
-          cheap: use it
+          Cheap: use it
           <br />
           before writing
         </span>

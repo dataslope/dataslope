@@ -94,10 +94,10 @@ export const LazyScene: React.FC = () => {
   const bracket = ease(frame, wholeAt, 14) * (1 - ease(frame, pushAt, 10));
 
   const rewrites: { at: number; text: string; more?: { at: number; text: string }; soft?: string }[] = [
-    { at: pushAt, text: "push the filter into the scan", more: { at: lessAt, text: ": read less" } },
-    { at: pruneAt, text: "prune unused columns" },
-    { at: fuseAt, text: "fuse chained steps" },
-    { at: joinAt, text: "pick the join strategy", soft: " (when the plan has a join)" },
+    { at: pushAt, text: "Push the filter into the scan", more: { at: lessAt, text: ": read less" } },
+    { at: pruneAt, text: "Prune unused columns" },
+    { at: fuseAt, text: "Fuse chained steps" },
+    { at: joinAt, text: "Pick the join strategy", soft: " (when the plan has a join)" },
   ];
 
   return (
@@ -136,7 +136,7 @@ export const LazyScene: React.FC = () => {
         />
         <Note at={nothingAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(24)} out={showAt}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            transformations: a plan, and <b style={{ color: INK }}>nothing runs</b>
+            Transformations: a plan, and <b style={{ color: INK }}>nothing runs</b>
           </span>
         </Note>
         <Note at={showAt + 6} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(24)} out={q4At}>
@@ -148,7 +148,7 @@ export const LazyScene: React.FC = () => {
         </Note>
         <Note at={tooAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(80)} out={q4At}>
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap" }}>
-            <span style={{ ...note(23, INK_SOFT) }}>actions too:</span>
+            <span style={{ ...note(23, INK_SOFT) }}>Actions too:</span>
             {[
               { t: "collect()", at: tooAt },
               { t: "write", at: tooAt + 6 },
@@ -171,7 +171,7 @@ export const LazyScene: React.FC = () => {
         {/* The plan beside it. */}
         <Note at={planAt - 2} x={N_X} y={y(N_TOP) - h(46)}>
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            the plan<span style={{ opacity: ease(frame, nothingAt, 10) * (1 - ease(frame, runAt, 10)) }}>, not yet run</span>
+            The plan<span style={{ opacity: ease(frame, nothingAt, 10) * (1 - ease(frame, runAt, 10)) }}>, not yet run</span>
           </span>
         </Note>
         <Svg>
@@ -260,7 +260,7 @@ export const LazyScene: React.FC = () => {
 
         {/* The columns the scan reads, beside it. */}
         <Note at={pruneAt - 2} x={N_X + N_W + 34} y={slotY(0) - h(46)}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>columns</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Columns</span>
         </Note>
         {COLUMNS.map((c, i) => (
           <Note key={c} at={pruneAt + i} x={N_X + N_W + 34} y={slotY(0) + i * h(40)}>
@@ -286,7 +286,7 @@ export const LazyScene: React.FC = () => {
         ))}
         <Note at={eagerAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(40 + 4 * 46 + 14)}>
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            run step by step, eagerly<span style={{ opacity: ease(frame, noneAt, 10) }}>: none of this is possible</span>
+            Run step by step, eagerly<span style={{ opacity: ease(frame, noneAt, 10) }}>: none of this is possible</span>
           </span>
         </Note>
       </Drift>

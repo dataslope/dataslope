@@ -117,14 +117,14 @@ export const ChunkScene: React.FC = () => {
         </QuestionCard>
         <Note at={tradeAt} x={X0} y={y(240)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <Mark at={tradeAt + 4}>precision against context</Mark>
+            <Mark at={tradeAt + 4}>Precision against context</Mark>
           </span>
         </Note>
 
         {/* The trade: one small chunk, one large. */}
         {[
-          { i: 0, title: "small chunk", at: smallAt, r0: 2, r1: 3 },
-          { i: 1, title: "large chunk", at: largeAt, r0: 0, r1: ROWS.length - 1 },
+          { i: 0, title: "Small chunk", at: smallAt, r0: 2, r1: 3 },
+          { i: 1, title: "Large chunk", at: largeAt, r0: 0, r1: ROWS.length - 1 },
         ].map((c) => (
           <React.Fragment key={c.title}>
             <Note at={c.at - 2} x={cx(c.i)} y={docY - 44} dim={choicesAt}>
@@ -135,12 +135,12 @@ export const ChunkScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Caption i={0} at={smallAt + 2} dim={choicesAt}>
-          matches precisely
+          Matches precisely
           <br />
           <span style={{ color: ACCENT_INK, opacity: ease(frame, loseAt - 2, 10) }}>can lose the context the answer needs</span>
         </Caption>
         <Caption i={1} at={largeAt + 2} dim={choicesAt}>
-          keeps context
+          Keeps context
           <br />
           <span style={{ color: ACCENT_INK, opacity: ease(frame, topicsAt - 2, 10) }}>one vector, three topics</span>
           <span style={{ color: ACCENT_INK, opacity: ease(frame, fuzzAt - 2, 10) }}>: fuzzier</span>
@@ -150,7 +150,7 @@ export const ChunkScene: React.FC = () => {
 
         {/* Fixed size, with the overlap lit. */}
         <Note at={fixedAt - 2} x={cx(2)} y={docY - 44}>
-          <span style={head(22, INK)}>fixed size, overlapping</span>
+          <span style={head(22, INK)}>Fixed size, overlapping</span>
         </Note>
         <Doc x={cx(2)} y={docY} w={DOC_W} rows={ROWS} at={fixedAt - 2} />
         {[
@@ -190,7 +190,7 @@ export const ChunkScene: React.FC = () => {
 
         {/* Structure-aware. */}
         <Note at={structAt - 2} x={cx(3)} y={docY - 44}>
-          <span style={head(22, INK)}>structure-aware</span>
+          <span style={head(22, INK)}>Structure-aware</span>
         </Note>
         <Doc x={cx(3)} y={docY} w={DOC_W} rows={ROWS} at={structAt - 2} />
         {[
@@ -201,14 +201,14 @@ export const ChunkScene: React.FC = () => {
           <ChunkBracket key={k} x={cx(3) + BR} docY={docY} n={N} r0={c.r0} r1={c.r1} at={headingsAt + 2 + k * 5} />
         ))}
         <Caption i={3} at={headingsAt}>
-          split at headings and paragraphs
+          Split at headings and paragraphs
           <br />
           <span style={{ opacity: ease(frame, mergeAt - 2, 10) }}>then merge toward the target</span>
         </Caption>
 
         {/* Small-to-big. */}
         <Note at={s2bAt - 2} x={cx(4)} y={docY - 44}>
-          <span style={head(22, INK)}>small-to-big</span>
+          <span style={head(22, INK)}>Small-to-big</span>
         </Note>
         <Doc x={cx(4)} y={docY} w={DOC_W} rows={ROWS} at={s2bAt - 2} />
         <ChunkBracket
@@ -222,15 +222,15 @@ export const ChunkScene: React.FC = () => {
         />
         <ChunkBracket x={cx(4) + BR + 20} docY={docY} n={N} r0={5} r1={9} at={sendAt + 2} color={OK_INK} />
         <Caption i={4} at={retrieveAt - 2}>
-          <span style={{ color: BLUE_INK }}>retrieve the small chunk</span>
+          <span style={{ color: BLUE_INK }}>Retrieve the small chunk</span>
           <br />
-          <span style={{ color: OK_INK, opacity: ease(frame, sendAt - 2, 10) }}>send its parent section</span>
+          <span style={{ color: OK_INK, opacity: ease(frame, sendAt - 2, 10) }}>Send its parent section</span>
         </Caption>
 
         {/* No universal best. */}
         <Note at={bestAt} x={X0} y={y(820)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            no universal best:{" "}
+            No universal best:{" "}
             <span style={{ opacity: ease(frame, recallAt - 2, 10), color: OK_INK, fontWeight: 500 }}>
               <Mark at={recallAt + 6} color={MARK_OK}>
                 measure retrieval recall on labeled questions
@@ -239,7 +239,7 @@ export const ChunkScene: React.FC = () => {
           </span>
         </Note>
         <Note at={recallAt + 14} x={X0 + 880} y={y(820) + 5}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>recall: the share of the right passages it finds</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Recall: the share of the right passages it finds</span>
         </Note>
         <Note at={storeAt - 2} x={X0} y={y(820) + 46}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>

@@ -45,9 +45,9 @@ export const SlaScene: React.FC = () => {
   const ordersAt = n.word("sla", "daily orders, fresh by six");
   const threeAt = n.word("sla-enforce", "Enforce it three ways");
   const ways = [
-    { at: n.word("sla-enforce", "a deadline callback"), lead: "deadline callback:", text: "alert when a task misses its target" },
-    { at: n.word("sla-enforce", "freshness checks in the warehouse"), lead: "freshness check", text: "in the warehouse" },
-    { at: n.word("sla-enforce", "and priority"), lead: "priority:", text: "critical pipelines get compute first" },
+    { at: n.word("sla-enforce", "a deadline callback"), lead: "Deadline callback:", text: "alert when a task misses its target" },
+    { at: n.word("sla-enforce", "freshness checks in the warehouse"), lead: "Freshness check", text: "in the warehouse" },
+    { at: n.word("sla-enforce", "and priority"), lead: "Priority:", text: "critical pipelines get compute first" },
   ];
   const missAt = n.word("sla-enforce", "misses its target");
   const trackAt = n.word("sla-slo", "track it over time");
@@ -187,7 +187,7 @@ export const SlaScene: React.FC = () => {
 
         {/* Three ways to enforce it. */}
         <Note at={threeAt} x={X0} y={y(608)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>enforce it three ways</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Enforce it three ways</span>
         </Note>
         {ways.map((w, i) => (
           <Note key={i} at={w.at - 2} x={X0} y={y(650) + i * h(48)}>
@@ -224,7 +224,7 @@ export const SlaScene: React.FC = () => {
         </svg>
         <Note at={objAt} x={X0 + STRIP * 42 + 20} y={y(822)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            an objective
+            An objective
             <span style={{ opacity: ease(frame, sloAt, 10) }}>
               , an <b>SLO</b>: <Num>{ON_TIME}</Num> of <Num>{STRIP}</Num> nights on time
             </span>

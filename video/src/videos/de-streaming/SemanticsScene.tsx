@@ -91,9 +91,9 @@ export const SemanticsScene: React.FC = () => {
   };
 
   const ROWS = [
-    { name: "at-most-once", rule: "commit, then process", at: commitFirstAt - 2 },
-    { name: "at-least-once", rule: "process, then commit", at: procFirstAt - 2 },
-    { name: "exactly-once", rule: "one effect per message", at: exactAt - 2 },
+    { name: "At-most-once", rule: "commit, then process", at: commitFirstAt - 2 },
+    { name: "At-least-once", rule: "process, then commit", at: procFirstAt - 2 },
+    { name: "Exactly-once", rule: "one effect per message", at: exactAt - 2 },
   ];
 
   const strips = [
@@ -222,29 +222,29 @@ export const SemanticsScene: React.FC = () => {
         {/* Verdicts. */}
         <Note at={mostAt} x={VERDICT_X} y={cellsTop(0) - h(4)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            no duplicates, but <b style={{ color: ACCENT_INK, opacity: ease(frame, lostAt - 2, 8) }}>8 and 9 lost</b>
+            No duplicates, but <b style={{ color: ACCENT_INK, opacity: ease(frame, lostAt - 2, 8) }}>8 and 9 lost</b>
           </span>
         </Note>
         <Note at={leastAt} x={VERDICT_X} y={cellsTop(1) - h(4)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            nothing lost, but <b style={{ color: ACCENT_INK, opacity: ease(frame, dupAt - 2, 8) }}>5 to 7 twice</b>
+            Nothing lost, but <b style={{ color: ACCENT_INK, opacity: ease(frame, dupAt - 2, 8) }}>5 to 7 twice</b>
             <span style={{ ...label(23, INK_SOFT), opacity: ease(frame, defaultAt, 10) }}> · the usual default</span>
           </span>
         </Note>
         <Note at={deletedAt} x={VERDICT_X} y={cellsTop(1) + h(36)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>can't save a message retention deleted before it was read</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Can't save a message retention deleted before it was read</span>
         </Note>
         <Note at={effectAt} x={VERDICT_X} y={cellsTop(2) - h(4)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one effect each on the result</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>One effect each on the result</span>
         </Note>
         <Note at={nothingAt} x={VERDICT_X} y={cellsTop(2) + h(36)}>
-          <span style={{ ...label(20, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>may run twice; the second run changes nothing</span>
+          <span style={{ ...label(20, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>May run twice; the second run changes nothing</span>
         </Note>
 
         {/* The model: a thousand messages, twenty batches, three crashes. */}
         <Note at={modelAt} x={X0} y={y(752)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            model: <Num>{count(DELIVERY.messages)}</Num> messages
+            Model: <Num>{count(DELIVERY.messages)}</Num> messages
             <span style={{ opacity: ease(frame, commitEveryAt, 10) }}>
               , a commit every <Num>{DELIVERY.batch}</Num>
             </span>

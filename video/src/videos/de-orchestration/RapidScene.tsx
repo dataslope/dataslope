@@ -74,10 +74,10 @@ const Deps: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>reads A half-done</span>
       </Note>
       <Note at={breaksAt} x={R_X} y={c.y(580)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>breaks the first night A runs late</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Breaks the first night A runs late</span>
       </Note>
       <Note at={opts[0].at - 4} x={R_X} y={c.y(640)}>
-        <span style={{ ...label(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>instead, wait on the data:</span>
+        <span style={{ ...label(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Instead, wait on the data:</span>
       </Note>
       {opts.map((o, i) => (
         <Pill key={o.text} x={R_X} y={c.y(684) + i * c.h(54)} at={o.at - 2} tone="green" size={23}>
@@ -104,9 +104,9 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
   const alertAt = c.w("r-alerts", "Alert once");
   const teamAt = c.w("r-alerts", "to the owning team");
   const fields = [
-    { k: "table", v: "daily_orders", at: c.w("r-alerts", "naming the table") },
-    { k: "partition", v: FRESH.stale.now.slice(0, 10), at: c.w("r-alerts", "partition and check") },
-    { k: "check", v: "freshness", at: c.w("r-alerts", "and check") + 4 },
+    { k: "Table", v: "daily_orders", at: c.w("r-alerts", "naming the table") },
+    { k: "Partition", v: FRESH.stale.now.slice(0, 10), at: c.w("r-alerts", "partition and check") },
+    { k: "Check", v: "freshness", at: c.w("r-alerts", "and check") + 4 },
   ];
   const pageAt = c.w("r-alerts", "don't page on retries");
   const healAt = c.w("r-alerts", "heal themselves");
@@ -146,7 +146,7 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
           then its fields. No frame. */}
       <div style={{ position: "absolute", left: cardX, top: cardTop, opacity: ease(frame, alertAt, 12) }}>
         <div style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", borderBottom: `1px solid ${HAIRLINE}`, paddingBottom: 10 }}>
-          one alert<span style={{ color: INK, opacity: ease(frame, teamAt, 10) }}> → orders team</span>
+          One alert<span style={{ color: INK, opacity: ease(frame, teamAt, 10) }}> → orders team</span>
         </div>
         {fields.map((f, i) => {
           const p = ease(frame, f.at - 2, 10);
@@ -173,8 +173,8 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       {/* A retry that healed: no page. */}
       <div style={{ position: "absolute", left: cardX + HEALED_DX, top: cardTop, opacity: ease(frame, pageAt, 12) }}>
-        <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>try 1 failed, try 2 ran</div>
-        <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 10, opacity: ease(frame, healAt, 10) }}>healed itself: no page</div>
+        <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Try 1 failed, try 2 ran</div>
+        <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 10, opacity: ease(frame, healAt, 10) }}>Healed itself: no page</div>
       </div>
     </>
   );
@@ -238,7 +238,7 @@ const Observe: React.FC<{ c: Ctx }> = ({ c }) => {
         ))}
       </div>
       <Note at={logsAt} x={R_X} y={c.y(306)}>
-        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>structured logs</span>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Structured logs</span>
       </Note>
       {lin.map((name, i) => (
         <TaskBox key={name} cx={linX(i)} cy={linY} w={210} h={c.h(48)} at={linAt + i * 4} mono={i === 1 || i === 2} size={21}>
@@ -258,10 +258,10 @@ const Observe: React.FC<{ c: Ctx }> = ({ c }) => {
         />
       ))}
       <Note at={linAt} x={R_X} y={linY - c.h(66)}>
-        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>lineage</span>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Lineage</span>
       </Note>
       <Note at={metaAt} x={R_X} y={c.y(616)}>
-        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>run metadata</span>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Run metadata</span>
       </Note>
       <div style={{ position: "absolute", left: R_X + 160, top: c.y(606), display: "flex", alignItems: "center", gap: 14 }}>
         {metas.map((m) => {
@@ -289,7 +289,7 @@ const Observe: React.FC<{ c: Ctx }> = ({ c }) => {
       ) : null}
       <Note at={failAt + 4} x={R_X + 7 * 66 + 20} y={sliceY + 6}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          a 2 a.m. failure:{" "}
+          A 2 a.m. failure:{" "}
           <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, sliceAt, 10) }}>rerun one slice</span>
         </span>
       </Note>

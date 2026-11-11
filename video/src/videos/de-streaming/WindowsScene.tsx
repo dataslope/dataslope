@@ -119,13 +119,13 @@ export const WindowsScene: React.FC = () => {
         </Note>
         <Note at={bucketsAt} x={ex(0)} y={axisY - h(64)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            finite buckets<span style={{ opacity: ease(frame, aggAt, 10) }}> to count, sum or average</span>
+            Finite buckets<span style={{ opacity: ease(frame, aggAt, 10) }}> to count, sum or average</span>
           </span>
         </Note>
 
         {/* Tumbling. */}
         <Note at={tumbleAt} x={X0} y={y(TUMBLE_Y) + h(8)}>
-          <div style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>tumbling</div>
+          <div style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Tumbling</div>
           <div style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, overlapAt, 10) }}>fixed, no overlap</div>
         </Note>
         {[0, 1, 2].map((w) => {
@@ -161,12 +161,12 @@ export const WindowsScene: React.FC = () => {
           );
         })}
         <Note at={oneAt} x={NOTE_X} y={y(TUMBLE_Y) + h(10)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>each click in one</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Each click in one</span>
         </Note>
 
         {/* Hopping (Flink's sliding): ten seconds long, a new one every five. */}
         <Note at={slideAt} x={X0} y={y(SLIDE_Y) + h(8)}>
-          <div style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>hopping</div>
+          <div style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Hopping</div>
           <div style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, hopAt, 10) }}>"sliding" in Flink</div>
         </Note>
         {sliding.map((w, k) => {
@@ -204,7 +204,7 @@ export const WindowsScene: React.FC = () => {
         })}
         <Note at={twoAt} x={NOTE_X} y={y(SLIDE_Y) + h(20)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            each click in two:
+            Each click in two:
             <br />
             ava's at <span style={TABULAR}>{PICK_T}</span> s, in both
             <br />
@@ -214,7 +214,7 @@ export const WindowsScene: React.FC = () => {
 
         {/* Sessions: a lane per user, closed by a gap of five seconds. */}
         <Note at={sessionAt} x={X0} y={y(SESSION_Y) - h(46)}>
-          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>session</span>
+          <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Session</span>
           <span style={{ ...label(23, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, gapAt, 10) }}>
             {" "}
             · no fixed size; closed by a gap of inactivity
@@ -261,7 +261,7 @@ export const WindowsScene: React.FC = () => {
         <Note at={fiveGapAt + 6} x={NOTE_X} y={y(SESSION_Y) + h(6)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Dash color={INK_SOFT} />
-            five quiet seconds
+            Five quiet seconds
             <br />
             close a session
           </span>
@@ -275,7 +275,7 @@ export const WindowsScene: React.FC = () => {
           </span>
         </Note>
         <Note at={sessionizeAt} x={NOTE_X} y={y(SESSION_Y) + h(150)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>how to sessionize users</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>How to sessionize users</span>
         </Note>
       </Drift>
     </AbsoluteFill>
