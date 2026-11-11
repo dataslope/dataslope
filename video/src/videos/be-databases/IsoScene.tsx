@@ -8,7 +8,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, 
 import { Badge, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { ISOLATION } from "./data";
 import { DataTable, Drift, Listing, Spot, Svg, tableGeometry, X0 } from "./parts";
 
@@ -280,7 +280,7 @@ export const IsoScene: React.FC = () => {
               key={`${b.i}-${b.j}`}
               style={{ position: "absolute", left: colX(b.j) + POSSIBLE_W + 12, top: rowY(b.i), height: rowH, display: "flex", alignItems: "center", opacity: b.p }}
             >
-              <Badge tone="yellow" size={20}>
+              <Badge tone="yellow" size={20} style={{ fontFamily: SANS }}>
                 Postgres: no
               </Badge>
             </div>

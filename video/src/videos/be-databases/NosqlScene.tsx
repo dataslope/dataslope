@@ -327,7 +327,7 @@ export const NosqlScene: React.FC = () => {
           </span>
         </Note>
         {/* Relational scales out too: what decides is the access pattern. */}
-        <Note at={scaleAt} x={sqlX + store.w / 2} y={underY + h(36)} style={{ transform: "translateX(-50%)" }}>
+        <Note at={scaleAt} x={sqlX + store.w / 2} y={underY + h(36)} style={{ transform: "translateX(-50%)" }} out={relNewAt - 6}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             scales too: <span style={{ color: INK, opacity: ease(frame, shardAt, 10) }}>replicas, sharding</span>
           </span>

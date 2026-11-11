@@ -191,11 +191,16 @@ export const DiagramScene: React.FC = () => {
         <RoundTrip pts={e.app1Cache} from={miss[1]} dur={18} />
         <RoundTrip pts={e.app1Store} from={miss[2]} dur={40} />
         {missMark > 0 ? (
-          // Beside the arrow the missed lookup took, app server to cache: a
-          // miss is the normal path, so it is named, not crossed out.
-          <div style={{ position: "absolute", left: along(e.app1Cache, 0.5)[0] + 16, top: along(e.app1Cache, 0.5)[1] - 34, opacity: missMark, ...note(22, INK), fontWeight: 600 }}>
-            miss
-          </div>
+          // The X sits at the centre of the arrow the missed lookup took (the
+          // owner's placement, 2026-11-11), named "miss" beside it.
+          <>
+            <div style={{ position: "absolute", left: along(e.app1Cache, 0.5)[0] - 14, top: along(e.app1Cache, 0.5)[1] - 14, opacity: missMark }}>
+              <Cross at={miss[1] + 9} size={28} />
+            </div>
+            <div style={{ position: "absolute", left: along(e.app1Cache, 0.5)[0] + 24, top: along(e.app1Cache, 0.5)[1] - 40, opacity: missMark, ...note(22, INK), fontWeight: 600 }}>
+              miss
+            </div>
+          </>
         ) : null}
         <Line x={SIDE_A - 18} y={(B.app1.cy + B.store.cy) / 2 - 16} at={miss[2] + 18} out={pathOut} size={22} weight={500} color={BLUE_INK} align="right">
           + <Num>{HOP_MS}</Num> ms

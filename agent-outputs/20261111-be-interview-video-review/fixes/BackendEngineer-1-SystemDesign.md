@@ -73,7 +73,20 @@ check.mjs was re-run from the repo root. **Every existing value in
 - Typecheck and eslint for the folder: clean.
 - `npm run check:cues`: passes.
 - `npm test`: passes (0 failures).
-CHECKS_PLACEHOLDER
+- `check:motion`: passes. It checked 8:47.3, and nothing holds still for 2 s
+  or more.
+- `check:sync`: passes. All 44 checked beats are within ±0.12 s, and the
+  worst is +0.04 s (`q5`). Every re-voiced and recut beat is within 0.02 s.
+  `q2-band` has no pause before it, so it is unchecked, as before.
+- `check:mix`: passes. The narration is at -19.7 LUFS and the effects 30.5 LU
+  under it. Where both sound, speech is a median 30.3 dB above the effects,
+  and 12.5 dB at the closest.
+- `check:frames`: passes:
+  - 4 illustrations, none stretched;
+  - 42 arrows straight under their heads;
+  - no hyphen in tabular figures;
+  - spacing, size and family pass;
+  - every word cue names its occurrence.
 - Stills, each looked at: 83, 163, 201, 233.5, 260, 286.5, 291.5, 298.5,
   313.5, 333, 426, 459.5, 486, 504.5, 511, 517.5 and 526 s. Two defects found
   in them are fixed:

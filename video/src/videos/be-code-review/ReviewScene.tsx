@@ -240,7 +240,7 @@ export const ReviewScene: React.FC = () => {
         <FileTab x={LIST_X} top={top - 44} at={diffIn} out={fixIn} on={[[diffIn, testsIn]]} name="intervals.py">
           +{LINES}
         </FileTab>
-        <FileTab x={LIST_X + 270} top={top - 44} at={diffIn + 4} on={[[testsIn, fixIn]]} name="test_intervals.py">
+        <FileTab x={LIST_X + 270} top={top - 44} at={diffIn + 4} out={closeIn} on={[[testsIn, fixIn]]} name="test_intervals.py">
           +{tests.length}
         </FileTab>
         <Note at={caughtAt} x={LIST_X + 620} y={top - 44} out={testsIn}>
@@ -515,7 +515,14 @@ export const ReviewScene: React.FC = () => {
             <span style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap", ...note(22, INK) }}>
               <span style={{ width: 200 }}>{r.name}</span>
               <span style={{ width: 70, textAlign: "right" }}>
-                {r.mark === undefined ? <Num>{r.value.toLocaleString("en-US")}</Num> : <Mark at={r.mark}><Num>{r.value.toLocaleString("en-US")}</Num></Mark>}
+                {r.mark === undefined ? <Num>{r.value.toLocaleString("en-US")}</Num> : (
+                  // The highlight's margin is given back, so 999 stays right-aligned with the row below.
+                  <span style={{ marginRight: "-0.14em" }}>
+                    <Mark at={r.mark}>
+                      <Num>{r.value.toLocaleString("en-US")}</Num>
+                    </Mark>
+                  </span>
+                )}
               </span>
             </span>
           </Note>
