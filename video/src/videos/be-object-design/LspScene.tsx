@@ -17,7 +17,7 @@ const SQ_X = 1460;
 const BASE = 640;
 /** Where the pointer from "The square promises less" starts: past the end
  *  of that line (25px Inter), clear of its last word. */
-const WHICH_END = 1270;
+const WHICH_END = 1312;
 
 /** A shape drawn to scale, `w` by `h` units, its bottom-left corner at
  *  (x, base), a faint grid inside so its area can be counted. */

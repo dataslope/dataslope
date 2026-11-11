@@ -11,19 +11,25 @@ import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE } from "./data";
 import { ART, Arrow, Drift, Headline, int, Kicker, Line, Mark, OK, OK_INK, sig, Spot, X0 } from "./parts";
 
-/** The finished design in miniature: two zones of four boxes, the client
- *  above them, every box green. No labels: it is Question four's picture. */
+/** The finished design in miniature: two zones of four boxes, every box
+ *  green, and above them the client reaching them through Question five's
+ *  edge. Only the edge is labelled: the rest is Question four's picture. */
 const MiniDesign: React.FC<{ at: number; y: (v: number) => number }> = ({ at, y }) => {
   const frame = useCurrentFrame();
   const cols = [260, 560];
   const rows = [y(380), y(450), y(520), y(590)];
   const w = 150;
   const h = 44;
-  const client = { x: 410, y: y(300) };
+  const client = { x: 300, y: y(300) };
+  const edge = { x: 470, y: y(300) };
   const fill = `color-mix(in srgb, ${OK} 12%, ${PAPER})`;
   const edges: Pt[][] = [
     [
-      [client.x - 30, client.y + 18],
+      [client.x + 50 + 6, client.y],
+      [edge.x - 50 - 6, edge.y],
+    ],
+    [
+      [edge.x - 30, edge.y + 18 + 4],
       [cols[0] + 20, rows[0] - h / 2 - 8],
     ],
     [
@@ -95,6 +101,27 @@ const MiniDesign: React.FC<{ at: number; y: (v: number) => number }> = ({ at, y 
           opacity: ease(frame, at, 12),
         }}
       />
+      <div
+        style={{
+          position: "absolute",
+          left: edge.x - 50,
+          top: edge.y - 18,
+          width: 100,
+          height: 36,
+          boxSizing: "border-box",
+          border: `2.2px solid ${OK}`,
+          borderRadius: 5,
+          background: fill,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          ...note(20, OK_INK),
+          fontWeight: 500,
+          opacity: ease(frame, at + 3, 12),
+        }}
+      >
+        edge
+      </div>
       {edges.map((pts, i) => (
         <Arrow key={i} points={pts} at={at + 8 + i * 2} dur={10} head={9} width={2} color={INK} />
       ))}
@@ -103,9 +130,10 @@ const MiniDesign: React.FC<{ at: number; y: (v: number) => number }> = ({ at, y 
 };
 
 /**
- * The close: the first design, sized for its estimate and with no single
- * point of failure, drawn small and green; then the bridge into Part 2, the
- * same design at ten times the traffic. The crow looks along its signpost to
+ * The close: the first design, sized for its estimate (35,000 redirects a
+ * second, which Part 2 opens on) and with no single point of failure, drawn
+ * small and green behind its edge; then the bridge into Part 2, ten times
+ * that traffic on a row of its own, so the design's own size stays as it was. The crow looks along its signpost to
  * what comes next.
  */
 export const NextScene: React.FC = () => {
@@ -141,25 +169,23 @@ export const NextScene: React.FC = () => {
         <Line x={textX} y={y(352)} at={sizedAt} size={26} color={INK_SOFT} weight={500}>
           sized for its estimate
         </Line>
-        <div style={{ position: "absolute", left: textX, top: y(352) + 46, fontSize: 34, opacity: ease(frame, sizedAt + 4, 12), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(34, BLUE_INK), fontWeight: 500 }}>
-            <span style={{ display: "inline-grid", verticalAlign: "bottom" }}>
-              <span style={{ gridArea: "1 / 1", opacity: 1 - ten }}>
-                <Num>{int(peak)}</Num>
-              </span>
-              <span style={{ gridArea: "1 / 1", opacity: ten, color: INK }}>
-                <Mark at={tenAt + 4} color={HIGHLIGHT}>
-                  <Num>{int(peak * 10)}</Num>
-                </Mark>
-              </span>
-            </span>{" "}
-            redirects a second
-          </span>
-        </div>
-        <div style={{ position: "absolute", left: textX, top: y(530), display: "flex", alignItems: "center", gap: 14, fontSize: 26, opacity: ease(frame, noneAt, 12) }}>
+        <Line x={textX} y={y(352) + 46} at={sizedAt + 4} size={34} color={BLUE_INK} weight={500}>
+          <Num>{int(peak)}</Num> redirects a second
+        </Line>
+        <div style={{ position: "absolute", left: textX, top: y(452), display: "flex", alignItems: "center", gap: 14, fontSize: 26, opacity: ease(frame, noneAt, 12) }}>
           {frame >= noneAt ? <Tick at={noneAt + 4} size={28} /> : <span style={{ width: 28 }} />}
           <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no single point of failure</span>
         </div>
+
+        {/* The bridge: the same design, asked for ten times its estimate. */}
+        <Line x={textX} y={y(548)} at={tenAt} size={26} color={INK_SOFT} weight={500}>
+          now ten times the traffic
+        </Line>
+        <Line x={textX} y={y(548) + 46} at={tenAt + 4} size={34} color={INK} weight={500}>
+          <Mark at={tenAt + 8} color={HIGHLIGHT}>
+            <Num>{int(peak * 10)}</Num> redirects a second
+          </Mark>
+        </Line>
 
         <Spot id="crow" at={firstAt + 10} left={1372} top={y(330)} width={crowW} height={crowH} />
         <NextLine at={nextAt} x={X0} y={y(790)} width={1100}>

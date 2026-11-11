@@ -203,7 +203,7 @@ export const StylesScene: React.FC = () => {
             opacity: ease(frame, grpcAt + 12, 10),
           }}
         >
-          <div style={{ position: "absolute", left: -((bitOffset * 4) % 216), top: 2, fontFamily: MONO, fontSize: 19, lineHeight: "24px", color: BLUE_INK, whiteSpace: "pre" }}>
+          <div style={{ position: "absolute", left: -((bitOffset * 4) % 239), top: 1, fontFamily: MONO, fontSize: 21, lineHeight: "26px", color: BLUE_INK, whiteSpace: "pre" }}>
             {BITS.repeat(4)}
           </div>
         </div>

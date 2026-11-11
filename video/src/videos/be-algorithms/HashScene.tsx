@@ -212,10 +212,10 @@ export const HashScene: React.FC = () => {
         <Line at={evenAt + 10} x={BX + COLS * BP + 26} y={bTop + Math.floor(SHARED / COLS) * BP - 12} size={21} weight={500}>
           first shared bucket
         </Line>
-        <Line at={whyAt} x={BX + COLS * BP + 26} y={bTop + Math.floor(SHARED / COLS) * BP + 26} size={21} color={INK_SOFT}>
+        <Line at={whyAt} x={BX + COLS * BP + 26} y={bTop + Math.floor(SHARED / COLS) * BP + 34} size={21} color={INK_SOFT}>
           each new key can hit
         </Line>
-        <Line at={whyAt + 6} x={BX + COLS * BP + 26} y={bTop + Math.floor(SHARED / COLS) * BP + 54} size={21} color={INK_SOFT}>
+        <Line at={whyAt + 6} x={BX + COLS * BP + 26} y={bTop + Math.floor(SHARED / COLS) * BP + 62} size={21} color={INK_SOFT}>
           any key already in
         </Line>
         <div style={{ position: "absolute", left: BX, top: bTop + 20 * BP + 24, ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, bucketsAt, 10) }}>

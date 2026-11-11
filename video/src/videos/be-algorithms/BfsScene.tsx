@@ -59,7 +59,6 @@ export const BfsScene: React.FC = () => {
   const pathAt = n.word("bfs-memory", "DFS holds one path");
   const flipsAt = n.word("bfs-chain", "On a long chain it flips");
   const wholeAt = n.word("bfs-chain", "DFS the whole chain");
-  const overflowsAt = n.word("bfs-chain", "recursion overflows");
   const dequeAt = n.word("bfs-deque", "And make the queue a deque");
   const poppingAt = n.word("bfs-deque", "Popping a Python list's front");
   const billionAt = n.word("bfs-deque", "two hundred seventy-five billion moves here");
@@ -194,7 +193,6 @@ export const BfsScene: React.FC = () => {
           <span style={{ opacity: ease(frame, wholeAt, 10) }}>
             , DFS <b style={{ ...TABULAR, color: ACCENT_INK }}>{int(CHAIN.dfsPath)}</b>
           </span>
-          <span style={{ opacity: ease(frame, overflowsAt, 10), color: ACCENT_INK }}>; recursion overflows</span>
         </Line>
         <Line at={dequeAt - 4} x={140} y={rowY1 - 48} size={22} weight={500} color={ACCENT_INK}>
           Also asked: What is a deque, and when should you prefer it over a list?

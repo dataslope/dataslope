@@ -563,8 +563,8 @@ const Backtrack: React.FC<{ c: Ctx }> = ({ c }) => {
   const nums = [1, 2, 3];
   const W = 840;
   const lx = (k: number, i: number) => R_X + ((i + 0.5) / k) * W;
-  const ly = (d: number) => c.T + c.h(116) + (d - 1) * c.h(88);
-  const rootY = c.T + c.h(116) - c.h(88);
+  const ly = (d: number) => c.T + c.h(104) + d * c.h(88);
+  const rootY = ly(0);
   // Where each candidate sits in the full tree of orderings: a first digit
   // over its two continuations, each over its one completion.
   const slot = (p: number[]) => {
@@ -652,10 +652,10 @@ const Backtrack: React.FC<{ c: Ctx }> = ({ c }) => {
           </React.Fragment>
         );
       })}
-      <Line at={dropsAt} x={R_X} y={ly(3) + c.h(74)} size={24}>
+      <Line at={dropsAt} x={R_X} y={ly(3) + c.h(70)} size={24}>
         A branch that can&apos;t succeed is dropped at once: <span style={{ color: ACCENT_INK }}>nothing under it is tried</span>
       </Line>
-      <Line at={usesAt} x={R_X} y={ly(3) + c.h(116)} size={24} weight={500} color={BLUE_INK}>
+      <Line at={usesAt} x={R_X} y={ly(3) + c.h(112)} size={24} weight={500} color={BLUE_INK}>
         N-Queens, Sudoku, permutations
       </Line>
     </>
