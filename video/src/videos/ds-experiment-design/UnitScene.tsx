@@ -7,7 +7,8 @@ import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } f
 import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { pct, UNIT, UNIT_SE } from "./data";
+import { Illustration } from "../../components/Illustration";
+import { pct, UNIT, UNIT_SE, VIDEO } from "./data";
 import { Drift, Mark, MARK_OK, OK, OK_INK, Svg, X0 } from "./parts";
 import { mulberry32 } from "../da-statistics-communication/parts";
 
@@ -28,10 +29,13 @@ const Requests: React.FC<{ top: number; at: number; mixed: boolean; label: strin
   return (
     <div style={{ position: "absolute", left: X0, top, display: "flex", alignItems: "center", gap: 14, opacity: p }}>
       <span style={{ width: 150, ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{text}</span>
-      <svg width={52} height={52} style={{ overflow: "visible" }}>
-        <circle cx={26} cy={16} r={11} fill={INK} />
-        <path d="M6,50 Q26,20 46,50 Z" fill={INK} />
-      </svg>
+      {/* The painted person, the Probability video's blue figure made dark
+          and near-gray for this page (the owner, 2026-11-11): sharp's
+          modulate({ saturation: 0.06, brightness: 0.42 }) over
+          ds-probability-person.webp. */}
+      <div style={{ width: 52, display: "flex", justifyContent: "center" }}>
+        <Illustration video={VIDEO} id="ds-experiment-design-person" style={{ width: 32, height: 59 }} />
+      </div>
       <span style={{ ...label(20, INK_SOFT), margin: "0 4px" }}>→</span>
       {Array.from({ length: 5 }, (_, i) => {
         const b = mixed ? i % 2 === 1 : true;
