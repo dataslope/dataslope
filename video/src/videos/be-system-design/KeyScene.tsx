@@ -114,14 +114,14 @@ export const KeyScene: React.FC = () => {
         <VRule x={645} top={cardY} bottom={cardY + 80} at={otherAt - 2} />
 
         {/* Which redirect: temporary, since browsers keep a permanent one. */}
-        <VRule x={1190} top={cardY} bottom={cardY + 112} at={tempAt} />
+        <VRule x={1190} top={cardY} bottom={cardY + 116} at={tempAt} />
         <Line x={TX} y={cardY} at={tempAt} size={23} color={INK_SOFT}>
           which kind
         </Line>
-        <Line x={TX} y={cardY + 36} at={tempAt + 6} size={30} color={OK_INK}>
+        <Line x={TX} y={cardY + 40} at={tempAt + 6} size={30} color={OK_INK}>
           temporary (<Num>302</Num>)
         </Line>
-        <Line x={TX} y={cardY + 86} at={permAt} size={23} color={ACCENT_INK}>
+        <Line x={TX} y={cardY + 90} at={permAt} size={23} color={ACCENT_INK}>
           permanent (<Num>301</Num>): browsers keep it
         </Line>
         <Line x={X0} y={cardY - 52} at={apiAt} size={22} weight={500} color={INK_SOFT}>

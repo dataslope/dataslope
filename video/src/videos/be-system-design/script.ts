@@ -56,7 +56,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q1-why: the "Non-functional" column takes the yellow highlight on "shapes
  *     the design"; two small figures side by side, "1,000 users" and "1
  *     billion redirects a day", over the same two feature chips, each with
- *     what it takes in words ("one small server", "many servers, caches").
+ *     what it takes in words ("one server", "many servers, caches").
  *   q2: question card; three empty slots, "Requests per second (QPS)",
  *     "Storage", "Bandwidth", each filled by the beats below, "QPS" inked on
  *     its word. The envelope-and-pencil
