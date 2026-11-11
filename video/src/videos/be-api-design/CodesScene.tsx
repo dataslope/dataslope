@@ -14,16 +14,16 @@ const CODE_SIZE = 23;
 
 type Column = { cls: string; name: string; x: number; w: number; codes: string[] };
 const COLUMNS: Column[] = [
-  { cls: "2xx", name: "success", x: X0, w: 340, codes: ["200 OK", "201 Created", "204 No Content"] },
-  { cls: "3xx", name: "redirection", x: 470, w: 340, codes: ["301 Moved Permanently", "304 Not Modified"] },
+  { cls: "2xx", name: "Success", x: X0, w: 340, codes: ["200 OK", "201 Created", "204 No Content"] },
+  { cls: "3xx", name: "Redirection", x: 470, w: 340, codes: ["301 Moved Permanently", "304 Not Modified"] },
   {
     cls: "4xx",
-    name: "client error",
+    name: "Client error",
     x: 880,
     w: 420,
     codes: ["400 Bad Request", "401 Unauthorized", "403 Forbidden", "404 Not Found", "409 Conflict", "422 Unprocessable Entity", "429 Too Many Requests"],
   },
-  { cls: "5xx", name: "server error", x: 1360, w: 420, codes: ["500 Internal Server Error", "503 Service Unavailable"] },
+  { cls: "5xx", name: "Server error", x: 1360, w: 420, codes: ["500 Internal Server Error", "503 Service Unavailable"] },
 ];
 
 /** The three answers to one request, on the right once Question 4 is up. */
@@ -178,7 +178,7 @@ export const CodesScene: React.FC = () => {
         />
         <Note at={authnAt} x={RESP_X} y={rowTop(0) + twoH + h(12)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            really: <b>not authenticated</b>
+            Really: <b>not authenticated</b>
           </span>
         </Note>
 
@@ -193,11 +193,11 @@ export const CodesScene: React.FC = () => {
         <Flow points={[[REQ_X + REQ_W + 8, rowTop(1) + twoH / 2], [RESP_X - 8, rowTop(1) + twoH / 2]]} at={a403 + 8} color={INK_SOFT} width={2.2} head={11} />
         <Msg x={RESP_X} y={rowTop(1)} w={RESP_W} at={refusesAt} tone="bad" lines={[{ t: "403 Forbidden" }, { t: "understood, and refused", color: INK_SOFT }]} />
         <Note at={enoughAt} x={REQ_X} y={rowTop(1) + twoH + h(12)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>valid credentials, not enough permission</span>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Valid credentials, not enough permission</span>
         </Note>
         <Note at={againAt} x={RESP_X} y={rowTop(1) + twoH + h(12)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            logging in again won't necessarily help
+            Logging in again won't necessarily help
           </span>
         </Note>
 
@@ -206,7 +206,7 @@ export const CodesScene: React.FC = () => {
         <Flow points={[[REQ_X + REQ_W + 8, rowTop(2) + twoH / 2], [RESP_X - 8, rowTop(2) + twoH / 2]]} at={a404 + 8} color={INK_SOFT} width={2.2} head={11} />
         <Msg x={RESP_X} y={rowTop(2)} w={RESP_W} at={a404 + 10} tone="data" lines={[{ t: "404 Not Found" }, { t: "on purpose", at: purposeAt, color: INK_SOFT }]} />
         <Note at={strangerAt + 6} x={RESP_X} y={rowTop(2) + twoH + h(12)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>hides that it exists</span>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Hides that it exists</span>
         </Note>
 
         {/* Hairlines between the four classes, each with the column to its right. */}

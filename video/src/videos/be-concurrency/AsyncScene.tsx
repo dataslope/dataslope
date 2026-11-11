@@ -229,7 +229,7 @@ export const AsyncScene: React.FC = () => {
         </Note>
         <Note at={neverAt + 6} x={X0} y={y(842)} out={hogEnd}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            a loop that never awaits<span style={{ opacity: ease(frame, starvesAt, 10) }} >: every other one starves</span>
+            A loop that never awaits<span style={{ opacity: ease(frame, starvesAt, 10) }} >: every other one starves</span>
           </span>
         </Note>
         <Note at={thousandsAt + 6} x={X0} y={y(842)}>

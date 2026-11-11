@@ -162,7 +162,7 @@ export const ProcScene: React.FC = () => {
           </span>
         </Note>
         <Note at={parallelAt} x={L.x} y={y(L.top + L.h + 116)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>processes are how Python runs in parallel</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Processes are how Python runs in parallel</span>
         </Note>
 
         {/* Processes: each its own memory. */}

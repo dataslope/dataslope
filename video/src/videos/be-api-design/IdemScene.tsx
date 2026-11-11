@@ -143,7 +143,7 @@ export const IdemScene: React.FC = () => {
         <Msg x={X0} y={msgTop} w={540} at={postAt} lines={[{ t: "POST /payments" }, { t: BODY }]} />
         {plainRows.map((r, i) => (
           <Note key={i} at={r.at - 2} x={X0} y={plainG.rowTop(i) + h(8)}>
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>{i === 0 ? "attempt" : "retry"}</span>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>{i === 0 ? "Attempt" : "Retry"}</span>
           </Note>
         ))}
         <DataTable g={plainG} cols={plainCols} rows={plainRows} at={chargedAt} />
@@ -174,7 +174,7 @@ export const IdemScene: React.FC = () => {
         {keyedBack.map((back, i) => (
           <Note key={i} at={i === 0 ? storesAt + 8 : findsAt + (i - 1) * 8} x={R_X} y={attemptsTop + i * h(40)}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-              <span style={{ color: INK_SOFT }}>{i === 0 ? "attempt" : "retry"} →</span>{" "}
+              <span style={{ color: INK_SOFT }}>{i === 0 ? "Attempt" : "Retry"} →</span>{" "}
               {i === 0 ? back : <Mark at={originalAt + (i - 1) * 6}><span style={{ color: OK_INK, fontWeight: 500 }}>{back}</span></Mark>}
             </span>
           </Note>
@@ -222,12 +222,12 @@ export const IdemScene: React.FC = () => {
         {/* What the losing request gets back, and a key reused with another body. */}
         <Note at={catchesAt} x={1290} y={raceTop + h(44)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            caught: <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, storedAt, 10) }}>→ payment {storedId}, as stored</span>
+            Caught: <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, storedAt, 10) }}>→ payment {storedId}, as stored</span>
           </span>
         </Note>
         <Note at={reusedAt} x={1290} y={raceTop + h(92) + 4}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            same key, new body: <b style={{ color: ACCENT_INK, opacity: ease(frame, rejectedAt, 10) }}>rejected</b>
+            Same key, new body: <b style={{ color: ACCENT_INK, opacity: ease(frame, rejectedAt, 10) }}>rejected</b>
           </span>
         </Note>
 

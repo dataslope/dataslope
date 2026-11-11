@@ -149,7 +149,7 @@ export const Type2Scene: React.FC = () => {
         ) : null}
         <Note at={txAt + 8} x={X0} y={txBottom + h(14)} out={stmtOut}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            one transaction
+            One transaction
             <span style={{ fontWeight: 500, color: INK, opacity: ease(frame, changedAt, 10) }}>, only for a customer whose tracked columns changed</span>
           </span>
         </Note>
@@ -202,8 +202,8 @@ export const Type2Scene: React.FC = () => {
           at={findsAt}
           title={
             <span style={{ position: "relative", display: "inline-block" }}>
-              <span style={{ opacity: 1 - ease(frame, storesAt, 10) }}>the point-in-time join</span>
-              <span style={{ position: "absolute", left: 0, top: 0, opacity: ease(frame, storesAt + 6, 10) }}>the same join at load: it keeps the key</span>
+              <span style={{ opacity: 1 - ease(frame, storesAt, 10) }}>The point-in-time join</span>
+              <span style={{ position: "absolute", left: 0, top: 0, opacity: ease(frame, storesAt + 6, 10) }}>The same join at load: it keeps the key</span>
             </span>
           }
           marks={[
@@ -215,7 +215,7 @@ export const Type2Scene: React.FC = () => {
           swaps={[{ line: 0, at: storesAt, text: L.lines[0] }]}
         />
         <TableName g={gp} at={findsAt + 6} out={storesAt}>
-          her two orders
+          Her two orders
         </TableName>
         <DataTable
           g={gp}
@@ -242,7 +242,7 @@ export const Type2Scene: React.FC = () => {
 
         {/* ── Right, last: the key stored at load ── */}
         <TableName g={gl} at={storesAt + 6}>
-          stored on the fact at load time
+          Stored on the fact at load time
         </TableName>
         <DataTable
           g={gl}
@@ -259,12 +259,12 @@ export const Type2Scene: React.FC = () => {
         />
         <Note at={storesAt + 8} x={X0} y={joinTop + listingHeight(P.lines.length, SIZE) + h(28)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            runs once, at load: the fact keeps <b>customer_key</b>
+            Runs once, at load: the fact keeps <b>customer_key</b>
           </span>
         </Note>
         <Note at={todayAt} x={X0} y={joinTop + listingHeight(P.lines.length, SIZE) + h(86)}>
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>
-            today&rsquo;s view:{" "}
+            Today&rsquo;s view:{" "}
             <span style={{ color: OK_INK, opacity: ease(frame, isCurrentAt, 10) }}>
               <QMono>WHERE is_current</QMono>
             </span>

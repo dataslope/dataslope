@@ -63,12 +63,12 @@ export const HookScene: React.FC = () => {
         {/* ── Six weeks as a pie, then as a line ── */}
         <Pie values={V} cx={CX} cy={y(CY)} r={h(R)} at={pieAt - 4} out={lineAt - 2} labels={LINE_BAR.weeks} />
         <Verdict ok={false} x={CX + h(R) + 70} y={y(CY) - 16} at={nothingAt} out={lineAt - 2}>
-          weeks as slices
+          Weeks as slices
         </Verdict>
         <YTicks ticks={[150, 200, 250, 300]} x={PLOT.x0} base={base} top={top} lo={PLOT.lo} hi={PLOT.hi} at={lineAt} />
         <LineSet values={V} x0={PLOT.x0} x1={PLOT.x1} base={base} top={top} lo={PLOT.lo} hi={PLOT.hi} at={lineAt - 2} dur={24} labels={LINE_BAR.weeks} />
         <Verdict ok x={PLOT.x1 - 220} y={top - h(50)} at={storyAt}>
-          the same six, as a line
+          The same six, as a line
         </Verdict>
 
         {/* ── How the video splits ── */}

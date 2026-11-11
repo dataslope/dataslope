@@ -172,7 +172,7 @@ export const PivotScene: React.FC = () => {
           lightAt={summedAt}
         />
         <Note at={exploreAt - 2} x={PANEL_X} y={boxY(2) - h(14)} out={q2At}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>to explore, or to cross-tab in seconds</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>To explore, or to cross-tab in seconds</span>
         </Note>
 
         {/* ── The cross-tab it builds ── */}
@@ -188,7 +188,7 @@ export const PivotScene: React.FC = () => {
         />
         <Note at={sqlAt - 2} x={PANEL_X} y={pg.bottom + h(20)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            in SQL: <Mono color={INK}>SUM(CASE WHEN …)</Mono>
+            In SQL: <Mono color={INK}>SUM(CASE WHEN …)</Mono>
           </span>
         </Note>
         <Note at={twoAt - 2} x={pg.colMid(3) + 70} y={pg.rowTop(2) + 4}>

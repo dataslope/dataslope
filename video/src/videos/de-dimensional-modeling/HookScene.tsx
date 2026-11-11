@@ -68,7 +68,7 @@ export const HookScene: React.FC = () => {
           <span style={{ display: "flex", alignItems: "center", gap: 18, whiteSpace: "nowrap" }}>
             <span style={{ width: 30, height: 30, borderRadius: 4, background: BAR, transform: `scale(${pop(frame, longAt, fps, 12)})` }} />
             <span style={{ ...note(30, INK) }}>
-              one long table of events
+              One long table of events
               <span style={{ opacity: ease(frame, middleAt, 10), color: BLUE_INK }}>, in the middle</span>
             </span>
           </span>
@@ -78,7 +78,7 @@ export const HookScene: React.FC = () => {
             <span style={{ width: 30, display: "flex", justifyContent: "center" }}>
               <span style={{ width: 18, height: 18, borderRadius: 3, border: `3px solid ${BAR}`, background: PAPER }} />
             </span>
-            <span style={{ ...note(30, INK) }}>small tables around it, that say</span>
+            <span style={{ ...note(30, INK) }}>Small tables around it, that say</span>
           </span>
         </Note>
         {/* The four words as the house's badges, each popping in as it is

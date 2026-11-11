@@ -28,9 +28,9 @@ const Naming: React.FC<{ c: Ctx }> = ({ c }) => {
   const patchAt = c.w("r-naming", "patch the status to published");
   const top = c.y(340);
   const paths = [
-    { p: "/articles", what: "a collection", at: pluralAt },
-    { p: "/articles/42", what: "a member", at: membersAt },
-    { p: "/articles/42/comments", what: "its comments", at: beneathAt },
+    { p: "/articles", what: "A collection", at: pluralAt },
+    { p: "/articles/42", what: "A member", at: membersAt },
+    { p: "/articles/42/comments", what: "Its comments", at: beneathAt },
   ];
   return (
     <>
@@ -53,7 +53,7 @@ const Naming: React.FC<{ c: Ctx }> = ({ c }) => {
         </div>
       </Note>
       <Note at={noVerbsAt + 12} x={R_X + 38} y={top + c.h(210)}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>no verbs in paths: the method is the verb</span>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>No verbs in paths: the method is the verb</span>
       </Note>
       <Note at={actionAt} x={R_X} y={top + c.h(266)}>
         <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>An action becomes a state change</span>
@@ -66,13 +66,13 @@ const Naming: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 12. A blog's resource API ───────────────────────────────────────────────
 
 const BLOG: [string, string, string][] = [
-  ["GET", "/articles", "list (paginated, filterable)"],
-  ["POST", "/articles", "create"],
-  ["GET", "/articles/42", "read one"],
-  ["PATCH", "/articles/42", "partial update"],
-  ["DELETE", "/articles/42", "delete"],
-  ["GET", "/articles/42/comments", "sub-collection"],
-  ["POST", "/articles/42/comments", "add a comment"],
+  ["GET", "/articles", "List (paginated, filterable)"],
+  ["POST", "/articles", "Create"],
+  ["GET", "/articles/42", "Read one"],
+  ["PATCH", "/articles/42", "Partial update"],
+  ["DELETE", "/articles/42", "Delete"],
+  ["GET", "/articles/42/comments", "Sub-collection"],
+  ["POST", "/articles/42/comments", "Add a comment"],
 ];
 const TABLE_SIZE = 22;
 
@@ -104,7 +104,7 @@ const Blog: React.FC<{ c: Ctx }> = ({ c }) => {
       <div style={{ position: "absolute", left: R_X, top: top + 10 + BLOG.length * rowH, width: 900, height: 1, background: HAIRLINE, opacity: ease(frame, commentsAt, 10) }} />
       <Note at={filtersAt} x={R_X} y={top + 30 + BLOG.length * rowH}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-          filters: <span style={{ fontFamily: MONO, fontWeight: 500 }}>/articles?status=published&amp;sort=-created_at</span>
+          Filters: <span style={{ fontFamily: MONO, fontWeight: 500 }}>/articles?status=published&amp;sort=-created_at</span>
         </span>
       </Note>
       <Msg
@@ -148,7 +148,7 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={defaultAt} x={R_X} y={top + c.h(72)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          <b style={{ color: OK_INK }}>the default</b>
+          <b style={{ color: OK_INK }}>The default</b>
           <span style={{ opacity: ease(frame, visibleAt, 10) }}>: more visible and cache-friendly than</span>
         </span>
       </Note>
@@ -177,13 +177,13 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
               ) : (
                 <Http line={f.t} size={24} />
               )}
-              {f.strike !== undefined ? <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, opacity: ease(frame, f.strike + 6, 8) }}>removed: breaks clients</span> : null}
-              {f.swap !== undefined ? <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, opacity: ease(frame, f.swap + 6, 8) }}>type changed: breaks clients</span> : null}
+              {f.strike !== undefined ? <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, opacity: ease(frame, f.strike + 6, 8) }}>Removed: breaks clients</span> : null}
+              {f.swap !== undefined ? <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, opacity: ease(frame, f.swap + 6, 8) }}>Type changed: breaks clients</span> : null}
             </div>
           ))}
           <div style={{ paddingLeft: 28, whiteSpace: "pre", opacity: ease(frame, addingAt, 10), display: "flex", gap: 16, alignItems: "baseline" }}>
             <span style={{ color: OK_INK }}>&quot;summary&quot;: null</span>
-            <span style={{ ...note(22, OK_INK), fontWeight: 500 }}>optional, added: still v1</span>
+            <span style={{ ...note(22, OK_INK), fontWeight: 500 }}>Optional, added: still v1</span>
           </div>
           <div style={{ color: INK_SOFT }}>{"}"}</div>
         </div>
@@ -229,7 +229,7 @@ const Errors: React.FC<{ c: Ctx }> = ({ c }) => {
         <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24 }}>
           <Cross at={traceAt + 4} size={24} />
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Strike at={traceAt + 8}>a stack trace</Strike>
+            <Strike at={traceAt + 8}>A stack trace</Strike>
           </span>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>never in the body</span>
         </div>
@@ -268,7 +268,7 @@ const Hateoas: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={skipAt} x={R_X} y={top + msgHeight(HATEOAS_BODY.length, 22) + c.h(72)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          in practice: <b>often skipped</b>; a <span style={{ fontFamily: MONO, fontWeight: 500 }}>next</span> link is common
+          In practice: <b>often skipped</b>; a <span style={{ fontFamily: MONO, fontWeight: 500 }}>next</span> link is common
         </span>
       </Note>
     </>

@@ -108,7 +108,7 @@ export const SignifScene: React.FC = () => {
         {/* ── Question 8: the same effect, more and more users ── */}
         <Note at={statAt - 2} x={X0} y={y(TOP - 20)} out={out8}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <b>statistical</b>: unlikely to be noise
+            <b>Statistical</b>: unlikely to be noise
           </span>
         </Note>
         {/* Between the two definitions, centred in their gap: the first runs
@@ -116,7 +116,7 @@ export const SignifScene: React.FC = () => {
         <ColumnRule x={X0 + 465} top={y(TOP - 20)} height={34} at={pracAt - 2} out={out8} />
         <Note at={pracAt - 2} x={X0 + 560} y={y(TOP - 20)} out={out8}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <b>practical</b>: big enough to matter
+            <b>Practical</b>: big enough to matter
           </span>
         </Note>
         <Svg opacity={ease(frame, holdAt - 4, 12) * (1 - ease(frame, out8, 10))}>
@@ -165,21 +165,21 @@ export const SignifScene: React.FC = () => {
         })}
         <Note at={holdAt + 4} x={P.x0 + 520} y={y(P.top) - h(10)} out={out8}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            the same small effect at every size
+            The same small effect at every size
             <span style={{ opacity: ease(frame, fifthAt - 2, 10), color: INK }}>
               : <i>d</i> = <Num>{PRACTICAL.d}</Num>
             </span>
           </span>
         </Note>
         <Note at={neverAt - 2} x={P.x0 + 520} y={y(P.top) + h(36)} out={out8}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>only the sample grew</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Only the sample grew</span>
         </Note>
         <Note at={reportAt - 2} x={P.x0 + 520} y={y(P.top) + h(82)} out={out8}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>report the effect and its range, not just p</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Report the effect and its range, not just p</span>
         </Note>
         <Note at={callAt - 2} x={P.x0 + 520} y={y(P.top) + h(128)} out={out8}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b>practical</b> is a business call:
+            <b>Practical</b> is a business call:
           </span>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, shipAt - 4, 10) }}>
             the effect and its range against the smallest lift worth shipping
@@ -231,14 +231,14 @@ export const SignifScene: React.FC = () => {
         </Note>
         <Note at={plusAt - 4} x={X0} y={liftY + h(130)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            estimate ± 1.96 standard errors: {fmt(EXPERIMENT.lift[0])} ± {fmt(EXPERIMENT.zc)} × {fmt(EXPERIMENT.se)}
+            Estimate ± 1.96 standard errors: {fmt(EXPERIMENT.lift[0])} ± {fmt(EXPERIMENT.zc)} × {fmt(EXPERIMENT.se)}
           </span>
         </Note>
         <Note at={seAt - 2} x={X0} y={liftY + h(180)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>standard error: how much the estimate wobbles from run to run</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Standard error: how much the estimate wobbles from run to run</span>
         </Note>
         <Note at={wideAt - 2} x={X0} y={liftY + h(232)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>if it were wide, from a loss to a big win: we&apos;d need more data</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>If it were wide, from a loss to a big win: we&apos;d need more data</span>
         </Note>
 
         {/* A hundred 95% intervals around a known truth. */}

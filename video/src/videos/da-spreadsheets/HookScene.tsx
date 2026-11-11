@@ -120,7 +120,7 @@ export const HookScene: React.FC = () => {
         {/* The third failure stays up into the plan, so its note can be read. */}
         <RangeBox g={g} r0={2} r1={11} c0={2} c1={2} at={wrongAt + 2} out={tenAt - 8} color={ACCENT} dash />
         <Note at={wrongAt + 6} x={g.right + 20} y={g.rowTop(6)} out={tenAt - 8}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the sum, pointed at the months</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>The sum, pointed at the months</span>
         </Note>
 
         {/* The plan: ten questions on this workbook, eight one formula each. */}

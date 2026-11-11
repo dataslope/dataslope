@@ -141,11 +141,11 @@ export const BridgeScene: React.FC = () => {
         <Entity layout={promo} at={severalAt + 4} />
         <Note at={twoAt + 2} x={promo.x} y={promo.bottom + h(20)} out={sitsAt}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            order <Num>1</Num>: SUMMER10 and FREESHIP
+            Order <Num>1</Num>: SUMMER10 and FREESHIP
           </span>
         </Note>
         <Note at={roomAt + 6} x={factBefore.x} y={factBefore.bottom + h(16)} out={swapAt}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one column, one promotion</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>One column, one promotion</span>
         </Note>
 
         {/* ── The bridge between them ── */}
@@ -179,11 +179,11 @@ export const BridgeScene: React.FC = () => {
         />
         <Note at={worthAt + 8} x={go.x} y={go.rowTop(O.rows.length) + h(14)}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            total: $<Num>{BRIDGE.total}</Num>
+            Total: $<Num>{BRIDGE.total}</Num>
           </span>
         </Note>
         <TableName g={gb} at={pairAt - 2}>
-          its rows: one per pair
+          Its rows: one per pair
         </TableName>
         <DataTable
           g={gb}
@@ -196,18 +196,18 @@ export const BridgeScene: React.FC = () => {
 
         {/* ── Summed through the bridge, then weighted ── */}
         <TableName g={gf} at={sumAt}>
-          {ease(frame, touchedAt, 10) > 0.5 ? "revenue each touched" : "summed through it"}
+          {ease(frame, touchedAt, 10) > 0.5 ? "Revenue each touched" : "Summed through it"}
         </TableName>
         <DataTable g={gf} cols={colsOf(F)} at={sumAt} rows={F.rows.map((cells, i) => ({ cells, at: sumAt + 6 + i * 3 }))} />
         <Note at={fortyAt} x={gf.x} y={gf.rowTop(F.rows.length) + h(14)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            sum: $<Strike at={neverAt + 2}>
+            Sum: $<Strike at={neverAt + 2}>
               <Num>{BRIDGE.fanoutTotal}</Num>
             </Strike>
           </span>
         </Note>
         <TableName g={gw} at={multAt}>
-          weighted
+          Weighted
         </TableName>
         <DataTable
           g={gw}
@@ -218,11 +218,11 @@ export const BridgeScene: React.FC = () => {
         />
         <Note at={shareAt + 4} x={gw.x} y={gw.rowTop(W.rows.length) + h(14)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            sum: $<Num>{BRIDGE.weightedTotal}</Num>
+            Sum: $<Num>{BRIDGE.weightedTotal}</Num>
           </span>
         </Note>
         <Note at={neverAt + 6} x={gf.x} y={gf.rowTop(F.rows.length) + h(56)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>never add these up</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Never add these up</span>
         </Note>
       </Drift>
     </AbsoluteFill>

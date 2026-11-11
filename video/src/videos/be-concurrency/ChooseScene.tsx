@@ -14,9 +14,9 @@ const SPLIT = 470;
 const LEAF_Y = 586;
 const LEAF_W = 420;
 const LEAVES = [
-  { x: X0, title: "async", when: "waiting, on many connections", why: "one thread, the lowest overhead", branch: 0 },
-  { x: 580, title: "threads, in a pool", when: "waiting, through blocking libraries", why: "they release the GIL while they wait", branch: 0 },
-  { x: 1240, title: "multiprocessing", when: "burning CPU", why: "sidesteps the GIL: true parallelism", branch: 1 },
+  { x: X0, title: "async", when: "Waiting, on many connections", why: "One thread, the lowest overhead", branch: 0 },
+  { x: 580, title: "Threads, in a pool", when: "Waiting, through blocking libraries", why: "They release the GIL while they wait", branch: 0 },
+  { x: 1240, title: "multiprocessing", when: "Burning CPU", why: "Sidesteps the GIL: true parallelism", branch: 1 },
 ];
 const BRANCHES = [
   { cx: (X0 + LEAF_W / 2 + 580 + LEAF_W / 2) / 2, text: "waiting on I/O" },
@@ -127,7 +127,7 @@ export const ChooseScene: React.FC = () => {
                 <span style={{ ...label(30, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: named }}>
                   {i === 1 ? (
                     <>
-                      threads, <Band at={capAt}>in a pool</Band>
+                      Threads, <Band at={capAt}>in a pool</Band>
                     </>
                   ) : (
                     l.title

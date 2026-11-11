@@ -281,12 +281,12 @@ export const HashScene: React.FC = () => {
           {/* The average case, and the condition (the page's "hashable"). */}
           <Note at={avgAt} x={AVG_X} y={pipeY + 4}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              <Mark at={avgAt + 4}>on average</Mark>: a collision adds a probe or two
+              <Mark at={avgAt + 4}>On average</Mark>: a collision adds a probe or two
             </span>
           </Note>
           <Note at={worstAt - 4} x={AVG_X} y={pipeY + 46}>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-              worst case <i>O</i>(<i>n</i>); keys must be hashable
+              Worst case <i>O</i>(<i>n</i>); keys must be hashable
             </span>
           </Note>
 
@@ -299,7 +299,7 @@ export const HashScene: React.FC = () => {
               <span style={{ ...note(30, SET_INK), fontWeight: 500, opacity: ease(frame, nsAt - 2, 10) }}>
                 set <span style={{ fontVariantNumeric: "tabular-nums" }}>{HASH.setNs.toFixed(1)}</span> ns
               </span>
-              <Source>a million numbers, timed in CPython 3.13 for the course video “List or set?”</Source>
+              <Source>A million numbers, timed in CPython 3.13 for the course video “List or set?”</Source>
             </span>
           </Note>
         </div>
@@ -330,7 +330,7 @@ export const HashScene: React.FC = () => {
           marks={[{ line: lineOf(DS, "not in seen"), at: setAt + 6, color: MARK_OK }]}
         />
         <Note at={fiftyAt - 8} x={X0} y={barsY - h(44)}>
-          <Title>equality comparisons, deduplicating distinct keys</Title>
+          <Title>Equality comparisons, deduplicating distinct keys</Title>
         </Note>
         <Bars
           x={X0}
@@ -346,7 +346,7 @@ export const HashScene: React.FC = () => {
         />
         <Note at={fourAt} x={X0 + 330 + 860 * (HASH.list5k / HASH.list10k) + 260} y={barsY + h(58) + h(10)}>
           <span style={{ ...note(28, LIST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            twice the keys, four times the work:{" "}
+            Twice the keys, four times the work:{" "}
             <Mark at={squaredAt}>
               <span style={{ fontStyle: "italic" }}>O</span>(<span style={{ fontStyle: "italic" }}>n</span>²)
             </Mark>
@@ -354,7 +354,7 @@ export const HashScene: React.FC = () => {
         </Note>
         <Note at={setAt + 10} x={X0 + 330 + 160} y={barsY + 2 * h(58) + h(10)}>
           <span style={{ ...note(26, SET_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            one hash lookup each; every key is new, so nothing to compare
+            One hash lookup each; every key is new, so nothing to compare
           </span>
         </Note>
       </Drift>
@@ -374,7 +374,7 @@ const RowTitle: React.FC<{ at: number; y: number; letter: string; color: string;
 const Counter: React.FC<{ at: number; y: number; value: number; color: string }> = ({ at, y, value, color }) => (
   <Note at={at} x={RIGHT} y={y - 8} align="right" from="right">
     <div style={{ display: "flex", alignItems: "baseline", gap: 58, justifyContent: "flex-end" }}>
-      <span style={label(21, INK_SOFT)}>comparisons</span>
+      <span style={label(21, INK_SOFT)}>Comparisons</span>
       <span style={{ ...headline(46), color, fontVariantNumeric: "tabular-nums lining-nums", minWidth: "4.6em", textAlign: "right" }}>
         {commas(value)}
       </span>

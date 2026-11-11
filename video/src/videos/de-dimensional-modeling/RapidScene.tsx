@@ -79,11 +79,11 @@ const Conformed: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={sameAt} x={R_X} y={c.y(780)}>
-        <span style={{ ...note(25, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>same keys, same values</span>
+        <span style={{ ...note(25, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Same keys, same values</span>
       </Note>
       <Note at={drillAt} x={R_X} y={c.y(830)}>
         <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          drill across:
+          Drill across:
           <span style={{ opacity: ease(frame, lineAt, 10) }}> the days line up</span>
         </span>
       </Note>
@@ -135,7 +135,7 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>↑ a new column</span>
       </Note>
       <Note at={fastAt} x={R_X} y={wg.top + wg.headH + 10}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>fast, and easy in a dashboard</span>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Fast, and easy in a dashboard</span>
       </Note>
       <PanelHead at={narrowAt - 2} x={R_X} y={c.y(564)} width={960} sub="flexible, at the cost of joins" subAt={flexAt}>
         Narrow
@@ -283,10 +283,10 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={salesAt} x={R_X} y={rowTop(PROCESSES.length) + c.h(78)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>the slice of the warehouse for one domain: sales</span>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>The slice of the warehouse for one domain: sales</span>
       </Note>
       <Note at={combinedAt} x={R_X} y={rowTop(PROCESSES.length) + c.h(130)}>
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>shared dimensions let two marts be combined</span>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Shared dimensions let two marts be combined</span>
       </Note>
     </>
   );
@@ -312,7 +312,7 @@ const DateDim: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={whyAt} x={R_X} y={c.y(330) - 4}>
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-          the page&apos;s <Mono>dim_date</Mono>: <span style={{ opacity: ease(frame, rulesAt, 10) }}>fiscal quarters and {HOLIDAYS} holidays, stored once</span>
+          The page&apos;s <Mono>dim_date</Mono>: <span style={{ opacity: ease(frame, rulesAt, 10) }}>fiscal quarters and {HOLIDAYS} holidays, stored once</span>
         </span>
       </Note>
       <Listing
@@ -337,7 +337,7 @@ const DateDim: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <Note at={oneJoinAt + 4} x={g.right + 40} y={g.top + c.h(30)}>
         <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          one join,
+          One join,
           <br />
           no date math
         </span>
@@ -389,7 +389,7 @@ const Metric: React.FC<{ c: Ctx }> = ({ c }) => {
       </PanelHead>
       <Note at={aovAt} x={R_X} y={c.y(602)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          average order value
+          Average order value
           <span style={{ opacity: ease(frame, overAt, 10) }}>
             {" "}
             = <Mono>revenue / orders</Mono>
@@ -399,7 +399,7 @@ const Metric: React.FC<{ c: Ctx }> = ({ c }) => {
       {teams.map((tm, i) => (
         <Note key={tm.who} at={tm.at} x={R_X + i * 420} y={c.y(680)}>
           <div style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            team {i === 0 ? "A" : "B"}: {tm.who}
+            Team {i === 0 ? "A" : "B"}: {tm.who}
           </div>
           {/* One size across the sum: the answer stands out by weight and
               color. */}
@@ -414,7 +414,7 @@ const Metric: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* The two teams side by side, a hairline between them. */}
       <ColumnRule x={R_X + TEAM_RULE} top={c.y(680)} height={TEAM_H} at={teams[1].at} />
       <Note at={teamsAt} x={R_X} y={c.y(800)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one name, two numbers</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>One name, two numbers</span>
       </Note>
       <Note at={onceAt} x={R_X} y={c.y(850)}>
         <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap", background: PAPER }}>Define each metric once, in the semantic layer.</span>

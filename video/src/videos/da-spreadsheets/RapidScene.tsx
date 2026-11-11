@@ -121,7 +121,7 @@ const Clean: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>· marks a space: TRIM drops the extras, PROPER fixes the case</span>
       </Note>
       <Note at={lookAt - 2} x={R_X} y={c.y(TOP) + c.h(230)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>tidy the keys first, or lookups miss</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Tidy the keys first, or lookups miss</span>
       </Note>
     </>
   );
@@ -162,7 +162,7 @@ const Dates: React.FC<{ c: Ctx }> = ({ c }) => {
       <Slot c={c} k={1} cell={TEXT.days} at={minusAt - 2} resultAt={thirtyAt} />
       <Slot c={c} k={2} cell={TEXT.datevalue} at={textAt} resultAt={convertsAt + 4} />
       <Note at={at} x={R_X} y={c.y(TOP) + 3 * c.h(62) + c.h(14)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a date is a count of days, so dates subtract</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>A date is a count of days, so dates subtract</span>
       </Note>
     </>
   );
@@ -188,7 +188,7 @@ const Format: React.FC<{ c: Ctx }> = ({ c }) => {
           opacity: ease(frame, at, 12),
         }}
       >
-        rule on <b>revenue</b>: cell value <Mono>&gt; 150</Mono>
+        Rule on <b>revenue</b>: cell value <Mono>&gt; 150</Mono>
       </div>
       <Sheet
         g={g}
@@ -264,7 +264,7 @@ const Dupes: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <Note at={bothAt + 6} x={R_X} y={g.bottom + c.h(20)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <b style={{ color: ACCENT_INK }}>both copies flag</b>; Remove Duplicates keeps the first
+          <b style={{ color: ACCENT_INK }}>Both copies flag</b>; Remove Duplicates keeps the first
         </span>
       </Note>
       <Note at={firstAt + 14} x={R_X} y={g.bottom + c.h(62)}>

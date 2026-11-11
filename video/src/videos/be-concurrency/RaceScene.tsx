@@ -169,7 +169,7 @@ export const RaceScene: React.FC = () => {
 
         {/* The shared counter. */}
         <Note at={classicAt} x={X0} y={y(356)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>the counter</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>The counter</span>
         </Note>
         <div
           style={{

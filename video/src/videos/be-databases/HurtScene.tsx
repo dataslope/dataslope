@@ -179,7 +179,7 @@ export const HurtScene: React.FC = () => {
           ink={ACCENT_INK}
         />
         <Note at={eachAt} x={R_X} y={lTop + h(196)}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>one record per change written to disk; an insert changes every index</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>One record per change written to disk; an insert changes every index</span>
         </Note>
 
         <Note at={spaceAt} x={R_X} y={lTop + h(250)}>

@@ -94,12 +94,12 @@ export const ClusterScene: React.FC = () => {
         />
         <Note at={storedAt} x={X0} y={ug.rowTop(users.length) + h(18)} dim={leftDim}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 500 }}>clustered:</span> the rows themselves,
+            <span style={{ fontWeight: 500 }}>Clustered:</span> the rows themselves,
           </div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, oneAt, 10) }}>in id order (one per table)</div>
         </Note>
         <TableName g={ig} at={indexAt} dim={leftDim}>
-          an index on email
+          An index on email
         </TableName>
         <DataTable
           g={ig}
@@ -113,7 +113,7 @@ export const ClusterScene: React.FC = () => {
         ))}
         <Note at={lookupAt + 6} x={ig.x} y={ig.rowTop(index.length) + h(18)} dim={leftDim}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 500 }}>non-clustered:</span> a separate lookup
+            <span style={{ fontWeight: 500 }}>Non-clustered:</span> a separate lookup
           </div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, manyAt, 10) }}>(many per table)</div>
         </Note>
@@ -149,17 +149,17 @@ export const ClusterScene: React.FC = () => {
         </div>
         <Note at={twentyAt + 6} x={R_X} y={stripY + h(104)} out={afterAt + 2}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            before: on <b>{CLUSTER.pagesBefore.length}</b> pages
+            Before: on <b>{CLUSTER.pagesBefore.length}</b> pages
           </span>
         </Note>
         <Note at={shareAt} x={R_X} y={stripY + h(104)}>
           <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap" }}>
-            after: all <Num>20</Num> on page <Num>{page}</Num>
+            After: all <Num>20</Num> on page <Num>{page}</Num>
           </span>
         </Note>
         <Note at={keptAt} x={R_X} y={stripY + h(150)}>
           <div style={{ ...note(24, ACCENT_INK), width: R_W, opacity: ease(frame, lastAt, 10) }}>
-            a new order for 42 lands on page <Num>{thousands(CLUSTER.newPage)}</Num>, the last
+            A new order for 42 lands on page <Num>{thousands(CLUSTER.newPage)}</Num>, the last
           </div>
           <div style={{ ...note(22, INK_SOFT), width: R_W, marginTop: h(10) }}>
             CLUSTER runs once; Postgres doesn&rsquo;t keep the order

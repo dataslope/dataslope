@@ -80,10 +80,10 @@ export const PrivacyScene: React.FC = () => {
   const asked5 = n.beat("privacy").to;
   const asked6 = n.beat("takehome").to;
   const never = [
-    { at: n.word("privacy-never", "customer personal data"), text: "customer personal data" },
-    { at: n.word("privacy-never", "credentials"), text: "credentials" },
-    { at: n.word("privacy-never", "confidential financials"), text: "confidential financials" },
-    { at: n.word("privacy-never", "under a contract or a regulation"), text: "anything under a contract or a regulation" },
+    { at: n.word("privacy-never", "customer personal data"), text: "Customer personal data" },
+    { at: n.word("privacy-never", "credentials"), text: "Credentials" },
+    { at: n.word("privacy-never", "confidential financials"), text: "Confidential financials" },
+    { at: n.word("privacy-never", "under a contract or a regulation"), text: "Anything under a contract or a regulation" },
   ];
   const healthAt = n.word("privacy-never", "health or payments");
   const rowsAt0 = n.word("privacy-instead", "don't need real rows");
@@ -117,9 +117,9 @@ export const PrivacyScene: React.FC = () => {
     "(2, 'Sample Two', 'two@example.com', '2 Example St')",
   ];
   const cols = [
-    { x: X0, at: used[0] - 6, head: "used it for", items: [{ at: used[0], text: "boilerplate SQL" }, { at: used[1], text: "a regular expression" }, { at: used[2], text: "chart code" }], ok: true },
-    { x: X0 + COL_W + 50, at: didntAt - 2, head: "didn't use it for", items: [{ at: defsAt, text: "the metric definitions" }, { at: conclusionsAt, text: "the conclusions" }], ok: false },
-    { x: X0 + 2 * (COL_W + 50), at: checkedAt - 2, head: "how you checked it", items: [{ at: reconciledAt, text: "reconciled the total" }, { at: tracedAt, text: "traced three rows by hand" }], ok: true },
+    { x: X0, at: used[0] - 6, head: "Used it for", items: [{ at: used[0], text: "Boilerplate SQL" }, { at: used[1], text: "A regular expression" }, { at: used[2], text: "Chart code" }], ok: true },
+    { x: X0 + COL_W + 50, at: didntAt - 2, head: "Didn't use it for", items: [{ at: defsAt, text: "The metric definitions" }, { at: conclusionsAt, text: "The conclusions" }], ok: false },
+    { x: X0 + 2 * (COL_W + 50), at: checkedAt - 2, head: "How you checked it", items: [{ at: reconciledAt, text: "Reconciled the total" }, { at: tracedAt, text: "Traced three rows by hand" }], ok: true },
   ];
 
   return (
@@ -141,7 +141,7 @@ export const PrivacyScene: React.FC = () => {
 
         {/* ── Question 5: never, and instead ── */}
         <Note at={Math.min(approvedAt, asked5) - 6} x={X0} y={top - h(54)} out={out5}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>anything your company hasn&apos;t approved for that tool:</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Anything your company hasn&apos;t approved for that tool:</span>
         </Note>
         {never.map((v, i) => (
           <Item key={v.text} x={X0} y={top + i * pitch} at={v.at} out={out5} mark={<Cross at={v.at + 4} />}>
@@ -156,10 +156,10 @@ export const PrivacyScene: React.FC = () => {
         </Note>
         <TextPanel lines={schema} x={INSTEAD_X} top={top} width={INSTEAD_W} size={20} mono at={schemaAt - 4} lineAt={[schemaAt, madeUpAt, madeUpAt + 6]} out={out5} />
         <Note at={madeUpAt + 8} x={INSTEAD_X} y={top + h(160)} out={out5}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>made up for this video: no real customer in it</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Made up for this video: no real customer in it</span>
         </Note>
         <Note at={breachAt - 2} x={X0} y={top + 4 * pitch + h(40)} out={out5}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one careless paste can be a reportable data breach</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>One careless paste can be a reportable data breach</span>
         </Note>
 
         {/* ── Question 6: what for, what not, how checked ── */}
@@ -195,10 +195,10 @@ export const PrivacyScene: React.FC = () => {
             opacity: ease(frame, hidingAt - 2, 12),
           }}
         >
-          <div style={{ ...note(28, ACCENT_INK), fontWeight: 500, lineHeight: "36px", whiteSpace: "nowrap" }}>hid it, then couldn&apos;t explain a line</div>
+          <div style={{ ...note(28, ACCENT_INK), fontWeight: 500, lineHeight: "36px", whiteSpace: "nowrap" }}>Hid it, then couldn&apos;t explain a line</div>
           <FlexRule at={openlyAt - 2} />
           <div style={{ ...note(28, OK_INK), fontWeight: 500, lineHeight: "36px", whiteSpace: "nowrap", opacity: ease(frame, openlyAt - 2, 12) }}>
-            used it openly, and checked it
+            Used it openly, and checked it
           </div>
         </div>
       </Drift>

@@ -121,7 +121,7 @@ export const RetryScene: React.FC = () => {
         {/* ── The model: six clients, one outage ── */}
         <Note at={jitterAt} x={RIGHT_X} y={axisTop - h(10)}>
           <span style={{ display: "flex", gap: 16, alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <Title>a model: six clients fail at once</Title>
+            <Title>A model: six clients fail at once</Title>
             <Source>random.Random(42)</Source>
           </span>
         </Note>
@@ -180,7 +180,7 @@ export const RetryScene: React.FC = () => {
         </Note>
         <Note at={togetherAt} x={RIGHT_X} y={axisY + h(40)} out={randomAt - 4}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            plain backoff, all six at once
+            Plain backoff, all six at once
             <FadeIn at={herdAt - 4}>
               : <Mark at={herdAt + 2}>a thundering herd</Mark>
             </FadeIn>
@@ -206,7 +206,7 @@ export const RetryScene: React.FC = () => {
             is not, and what makes it safe. */}
         <Note at={safeAt} x={X0} y={badTop + h(146)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            retry only what&apos;s safe to repeat:{" "}
+            Retry only what&apos;s safe to repeat:{" "}
             <FadeIn at={chargeAt - 2}>
               <span style={{ color: ACCENT_INK }}>a retried payment can charge twice</span>
             </FadeIn>
@@ -214,12 +214,12 @@ export const RetryScene: React.FC = () => {
         </Note>
         <Note at={keyAt} x={X0} y={badTop + h(184)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={keyAt + 6} color={MARK_OK}>send an idempotency key</Mark>
+            <Mark at={keyAt + 6} color={MARK_OK}>Send an idempotency key</Mark>
             <FadeIn at={chargesOnceAt - 2}>, and the server charges once</FadeIn>
           </span>
         </Note>
         <Note at={notAt} x={X0} y={badTop}>
-          <Title color={ACCENT_INK}>what not to retry</Title>
+          <Title color={ACCENT_INK}>What not to retry</Title>
         </Note>
       </Drift>
     </AbsoluteFill>

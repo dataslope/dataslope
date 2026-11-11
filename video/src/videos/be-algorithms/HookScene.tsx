@@ -16,7 +16,7 @@ const SQ_X = 140;
  *  corner of the million it really is (ten thousandths of a side). */
 const DOTS = 10;
 const PITCH = 22;
-const STRUCTS = ["hash map", "heap", "stack", "deque"];
+const STRUCTS = ["Hash map", "Heap", "Stack", "Deque"];
 const CHIP_X = 700;
 
 /**
@@ -110,7 +110,7 @@ export const HookScene: React.FC = () => {
         {/* Fast, while the hundred fills the box. */}
         <div style={{ position: "absolute", left: SQ_X + DOTS * PITCH + 24, top: top + 90, display: "flex", alignItems: "center", gap: 10, fontSize: 26, opacity: ease(frame, fastAt, 10) * (1 - ease(frame, millionAt, 10)) }}>
           <Tick at={fastAt} size={28} />
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>fast</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Fast</span>
         </div>
 
 

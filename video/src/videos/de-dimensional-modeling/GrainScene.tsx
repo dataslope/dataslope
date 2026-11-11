@@ -129,7 +129,7 @@ export const GrainScene: React.FC = () => {
         />
         {/* Each column tested against the grain, over its title. */}
         <Note at={everyAt} x={g.x} y={g.top - 84}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>does it make sense per line?</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Does it make sense per line?</span>
         </Note>
         {testRow(qty, qtyAt + 2, true)}
         {testRow(amt, qtyAt + 6, true)}
@@ -138,7 +138,7 @@ export const GrainScene: React.FC = () => {
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>← per order, not per line</span>
         </Note>
         <Note at={threeAt} x={g.right + 30} y={g.rowTop(1) + 10} out={orderGrainAt - 6}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>order 1001: three lines</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Order 1001: three lines</span>
         </Note>
 
         {/* What a sum makes of it. */}
@@ -155,7 +155,7 @@ export const GrainScene: React.FC = () => {
         {/* Where it belongs: a fact at order grain. */}
         <Note at={orderGrainAt - 2} x={ORDERS_X} y={y(GRAIN_Y) + 6}>
           <span style={{ ...label(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            grain: <span style={{ opacity: ease(frame, perOrderAt, 10) }}>one row per order</span>
+            Grain: <span style={{ opacity: ease(frame, perOrderAt, 10) }}>one row per order</span>
           </span>
         </Note>
         <TableName g={og} at={orderGrainAt}>

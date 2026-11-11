@@ -127,13 +127,13 @@ export const MismatchScene: React.FC = () => {
         />
         <Note at={twoDaysAt + 6} x={bg.right + 26} y={bg.rowTop(0) + 14} out={fixAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            two days: <b>{money(fixedBudget)}</b>
+            Two days: <b>{money(fixedBudget)}</b>
           </span>
         </Note>
 
         {/* ── Joined at the sale's grain: the budget repeats ── */}
         <TableName g={ng} at={joinAt} out={naiveOut}>
-          joined on day and region
+          Joined on day and region
         </TableName>
         <DataTable
           g={ng}
@@ -162,7 +162,7 @@ export const MismatchScene: React.FC = () => {
         })}
         <Note at={repeatsAt + 10} x={ng.right + 36} y={ng.rowTop(1) + 8} out={naiveOut}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            one budget,
+            One budget,
             <br />
             three rows
           </span>
@@ -194,7 +194,7 @@ export const MismatchScene: React.FC = () => {
           );
         })}
         <TableName g={fg} at={thenAt}>
-          rolled up to days, then joined
+          Rolled up to days, then joined
         </TableName>
         <DataTable
           g={fg}

@@ -180,9 +180,9 @@ const Traverse: React.FC<{ c: Ctx }> = ({ c }) => {
   const inorder = PAGE.inorder.map(Number);
   const pos = (t: TNode): P => [R_X + 40 + inorder.indexOf(t.v) * 80, c.T + c.h(70) + t.depth * c.h(100)];
   const rows = [
-    { name: "In-order", order: inorder, at: inAt, note: "sorted", noteAt: inAt + 20 },
-    { name: "Pre-order", order: walkOrder(root, "pre"), at: preAt, note: "root first: serialize", noteAt: serialAt },
-    { name: "Post-order", order: walkOrder(root, "post"), at: postAt, note: "children first: delete", noteAt: deleteAt },
+    { name: "In-order", order: inorder, at: inAt, note: "Sorted", noteAt: inAt + 20 },
+    { name: "Pre-order", order: walkOrder(root, "pre"), at: preAt, note: "Root first: serialize", noteAt: serialAt },
+    { name: "Post-order", order: walkOrder(root, "post"), at: postAt, note: "Children first: delete", noteAt: deleteAt },
   ];
   const rx = R_X + 480;
   return (
@@ -369,7 +369,7 @@ const Binary: React.FC<{ c: Ctx }> = ({ c }) => {
         In C or Java, <span style={{ fontFamily: MONO }}>(lo + hi) / 2</span> can overflow an <span style={{ fontFamily: MONO }}>int</span>
       </Line>
       <Line at={overflowAt + 16} x={R_X} y={barY + c.h(338)} size={24} color={OK_INK} weight={500}>
-        the safe midpoint: <span style={{ fontFamily: MONO }}>lo + (hi - lo) / 2</span>
+        The safe midpoint: <span style={{ fontFamily: MONO }}>lo + (hi - lo) / 2</span>
       </Line>
     </>
   );

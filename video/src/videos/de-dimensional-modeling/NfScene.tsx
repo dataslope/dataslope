@@ -75,7 +75,7 @@ const Form: React.FC<{
         <div style={{ ...note(20, INK), marginTop: 12, opacity: ease(frame, buildsAt ?? at, 10), whiteSpace: "nowrap" }}>{builds}</div>
       ) : null}
       <div style={{ ...note(21, INK_SOFT), marginTop: builds ? 6 : 12, opacity: ease(frame, at + 8, 10), whiteSpace: "nowrap" }}>
-        breaks it: <Mono>{table}</Mono>
+        Breaks it: <Mono>{table}</Mono>
       </div>
     </div>
   );
@@ -246,7 +246,7 @@ export const NfScene: React.FC = () => {
           }}
         />
         <Note at={purposeAt + 4} x={STAR_X} y={star.top - 40}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a star&apos;s dimension</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>A star&apos;s dimension</span>
         </Note>
         <Note at={deptAt} x={STAR_X} y={star.bottom + h(18)} width={360}>
           <span style={{ ...note(23, INK) }}>

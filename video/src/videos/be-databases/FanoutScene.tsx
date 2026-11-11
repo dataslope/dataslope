@@ -150,7 +150,7 @@ export const FanoutScene: React.FC = () => {
         </Note>
         <Note at={rowsAt - 4} x={R_X} y={top - h(48)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            joined:{" "}
+            Joined:{" "}
             <span style={{ color: fold > 0.5 ? OK_INK : ACCENT_INK }}>
               <Num>{fold > 0.5 ? FANOUT.orders : FANOUT.joinedRows}</Num> rows
             </span>
@@ -200,7 +200,7 @@ export const FanoutScene: React.FC = () => {
         </Note>
         <Note at={nineAt} x={R_X} y={listTop} out={fixAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ opacity: ease(frame, bothAt, 10) }}>three items each, so three copies each: </span>
+            <span style={{ opacity: ease(frame, bothAt, 10) }}>Three items each, so three copies each: </span>
             <b style={{ color: ACCENT_INK }}>{money(Number(FANOUT.sara.wrong))}</b>
           </span>
         </Note>
@@ -216,7 +216,7 @@ export const FanoutScene: React.FC = () => {
         {/* ── Row counts, step by step ── */}
         <Note at={multAt} x={R_X} y={listTop + h(56)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            the error grows with items per order<span style={{ opacity: ease(frame, sampleAt, 10) }}>: single-item test data hides it</span>
+            The error grows with items per order<span style={{ opacity: ease(frame, sampleAt, 10) }}>: single-item test data hides it</span>
           </span>
         </Note>
         <Note at={checkAt} x={R_X} y={listTop + h(112)}>

@@ -139,11 +139,11 @@ export const BlockScene: React.FC = () => {
         <MsAxis axis={AXIS} y={rowY("b") + rowH + h(26)} to={serial} at={swapAt + 4} />
         <Note at={thirtyAt} x={RIGHT_X} y={rowY("a") + h(4)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            blocking: <Num>{serial}</Num> ms
+            Blocking: <Num>{serial}</Num> ms
           </span>
         </Note>
         <Note at={addUpAt} x={RIGHT_X} y={rowY("a") + h(44)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>the waits add up instead of overlapping</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>The waits add up instead of overlapping</span>
         </Note>
 
         {/* In a server: one call, and every request on the loop behind it. */}
@@ -213,7 +213,7 @@ export const BlockScene: React.FC = () => {
         </div>
         <Flow points={[[POOL.x - 8, laneY + laneH / 2], [AXIS.x + 916, laneY + laneH / 2]]} at={awaitAt} color={OK} width={2.8} dash="8 6" />
         <Note at={awaitAt + 6} x={AXIS.x} y={laneY + laneH + h(26)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>await its result: the loop runs on</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Await its result: the loop runs on</span>
         </Note>
         <Note at={poolAt + 6} x={POOL.x} y={y(POOL.y + POOL.h) + h(14)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>runs off the loop&apos;s thread; the loop doesn&apos;t wait</span>

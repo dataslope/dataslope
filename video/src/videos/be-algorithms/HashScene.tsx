@@ -153,14 +153,14 @@ export const HashScene: React.FC = () => {
         ))}
         {/* The map, filling as the pass moves. */}
         <Line at={twoSumAt + 6} x={MAP_X} y={aTop - 50} size={22} weight={500} color={INK_SOFT}>
-          map: number → index
+          Map: number → index
         </Line>
         <div style={{ position: "absolute", left: MAP_X, top: aTop, width: 190, height: 64, boxSizing: "border-box", borderRadius: 8, background: BLUE_FILL, opacity: ease(frame, twoSumAt + 6, 10) }} />
         <div style={{ position: "absolute", left: MAP_X, width: 190, top: aTop + 14, textAlign: "center", fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, opacity: ease(frame, storeAt + 2, 10) }}>
           {nums[0]} → 0
         </div>
         <div style={{ position: "absolute", left: MAP_X, top: aTop + 92, opacity: ease(frame, linearAt - 6, 10), display: "flex", alignItems: "center", gap: 12, fontSize: 26 }}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>returns</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Returns</span>
           <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: OK_INK }}>{HASH.twoSum.answer}</span>
         </div>
         <Line at={linearAt} x={AX} y={aTop + 214} size={24} weight={500}>

@@ -89,7 +89,7 @@ const Locks: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={fiveAt + 24} x={R_X} y={slotY + slotH + c.h(14)}>
         <span style={{ ...note(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          run for real: never more than <Num>{peak}</Num> of the <Num>{downloads}</Num> in flight
+          Run for real: never more than <Num>{peak}</Num> of the <Num>{downloads}</Num> in flight
         </span>
       </Note>
 
@@ -178,10 +178,10 @@ const Atomic: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <Note at={notAt + 14} x={R_X + 250} y={rowY + chipH + c.h(14)} out={casAt + 4}>
-        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>three steps, so another thread can land between them</span>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Three steps, so another thread can land between them</span>
       </Note>
       <Note at={casAt + 10} x={R_X + 250} y={rowY + chipH + c.h(14)}>
-        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>an atomic add: one instruction</span>
+        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>An atomic add: one instruction</span>
       </Note>
       <Note at={cmpAt} x={R_X} y={casY + casH / 2 - 15}>
         <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>or compare-and-swap:</span>
@@ -231,9 +231,9 @@ const Safe: React.FC<{ c: Ctx }> = ({ c }) => {
   const queueAt = c.w("r-safe", "a thread-safe queue");
   const shareAt = c.w("r-safe", "Share by communicating");
   const ways = [
-    { at: avoidAt, text: "avoid shared mutable state" },
-    { at: guardAt, text: "guard it with a lock" },
-    { at: oneAt, text: "keep it in one thread, fed by a queue" },
+    { at: avoidAt, text: "Avoid shared mutable state" },
+    { at: guardAt, text: "Guard it with a lock" },
+    { at: oneAt, text: "Keep it in one thread, fed by a queue" },
   ];
   const qX = R_X + 230;
   const ownerX = qX + 310;
@@ -352,10 +352,10 @@ const Live: React.FC<{ c: Ctx }> = ({ c }) => {
       <div style={{ position: "absolute", left: 1600, top, width: 64, height: bottom - top, borderRadius: 5, border: `2px solid ${HAIRLINE}`, boxSizing: "border-box", opacity: ease(frame, busyAt, 10) }} />
       <div style={{ position: "absolute", left: 1604, top: bottom - 4 - (bottom - top - 8) * busy * (0.9 + 0.1 * Math.sin(frame / 3)), width: 56, height: (bottom - top - 8) * busy * (0.9 + 0.1 * Math.sin(frame / 3)), borderRadius: 5, background: ACCENT, opacity: busy }} />
       <Note at={harderAt} x={R_X} y={c.y(660)}>
-        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the CPU looks busy, so it&apos;s harder to spot than a deadlock</span>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The CPU looks busy, so it&apos;s harder to spot than a deadlock</span>
       </Note>
       <Note at={backoffAt} x={R_X} y={c.y(708)}>
-        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>randomized backoff: one waits, the other gets past</span>
+        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Randomized backoff: one waits, the other gets past</span>
       </Note>
     </>
   );
@@ -438,12 +438,12 @@ const Starve: React.FC<{ c: Ctx }> = ({ c }) => {
       })}
       <Note at={lowAt} x={R_X} y={rowY + c.h(82)} out={fairAt}>
         <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          the low-priority thread, passed over <Num>{passes}</Num> times
+          The low-priority thread, passed over <Num>{passes}</Num> times
         </span>
       </Note>
       <Note at={fairAt + 6} x={R_X} y={c.y(640)}>
         <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          a fair lock serves in arrival order <span style={{ color: INK_SOFT, fontWeight: 400 }}>(the numbers)</span>
+          A fair lock serves in arrival order <span style={{ color: INK_SOFT, fontWeight: 400 }}>(the numbers)</span>
         </span>
       </Note>
       <Note at={notByAt} x={R_X} y={c.y(688)}>
@@ -529,7 +529,7 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={skipAt} x={R_X} y={qY + chip + c.h(18)}>
-        <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no new thread per task</span>
+        <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>No new thread per task</span>
       </Note>
     </>
   );
@@ -627,7 +627,7 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the value, later</span>
       </Note>
       <Note at={blockAt} x={R_X} y={c.y(808)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>collect it by blocking or by awaiting it</span>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Collect it by blocking or by awaiting it</span>
       </Note>
       {/* The promise: the work's end, which fills the value in. */}
       <Note at={promiseAt} x={R_X} y={c.y(404)}>

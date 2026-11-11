@@ -186,12 +186,12 @@ export const IndexScene: React.FC = () => {
         </div>
         <Note at={outOfAt} x={R_X} y={stripY + h(100)} out={lowAt}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            reads <b>{INDEX.heapBlocks}</b> of them
+            Reads <b>{INDEX.heapBlocks}</b> of them
           </span>
         </Note>
         <Note at={passAt} x={R_X} y={stripY + h(100)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            reads them all, in order: one pass
+            Reads them all, in order: one pass
           </span>
         </Note>
 
@@ -223,7 +223,7 @@ export const IndexScene: React.FC = () => {
             Inserting <Num>10,000</Num> rows: write-ahead log records
           </span>
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8) }}>
-            every change is written to this log first, so its records count the writes
+            Every change is written to this log first, so its records count the writes
           </div>
         </Note>
         <Bar

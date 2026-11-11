@@ -132,10 +132,10 @@ export const SnapScene: React.FC = () => {
           marks={[{ row: s502, col: 1, at: cancelledAt + 2, out: thenAt }]}
         />
         <Note at={easyAt} x={gs.right + 28} y={gs.rowTop(0) + h(2)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>one row per order: easy</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>One row per order: easy</span>
         </Note>
         <Note at={paidAt} x={gs.right + 28} y={gs.rowTop(s502) + h(6)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>paid first? not here</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Paid first? Not here</span>
         </Note>
 
         {/* The periodic kind: a row per order per day, still no "paid" for 502. */}
@@ -152,7 +152,7 @@ export const SnapScene: React.FC = () => {
         />
         <Note at={paidAt + 4} x={gds.x} y={gds.rowTop(DS.rows.length) + h(14)} out={dsOut}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            periodic: still no &ldquo;paid&rdquo; for <Num>502</Num>
+            Periodic: still no &ldquo;paid&rdquo; for <Num>502</Num>
           </span>
         </Note>
 
@@ -164,7 +164,7 @@ export const SnapScene: React.FC = () => {
           width={qW}
           size={SIZE}
           at={answerAt}
-          title="only the log can answer"
+          title="Only the log can answer"
           marks={[
             { line: lineOf(Q.lines, "WHERE"), at: answerAt + 12 },
             { line: lineOf(Q.lines, "changed_at <"), at: thenAt + 6 },
@@ -184,7 +184,7 @@ export const SnapScene: React.FC = () => {
           width={660}
           size={SIZE}
           at={rebuildAt}
-          title="rebuilt from the log (row 1 per order, newest first)"
+          title="Rebuilt from the log (row 1 per order, newest first)"
           marks={[
             { line: lineOf(S.lines, "ORDER BY changed_at DESC"), at: latestAt + 2 },
             { line: lineOf(S.lines, "WHERE rn = 1"), at: latestAt + 8 },
@@ -194,15 +194,15 @@ export const SnapScene: React.FC = () => {
           <KeyArrow key={i} from={[gl.right + 8, gl.rowMid(r)]} to={[gs.x - 10, gs.rowMid(i)]} at={latestAt + 4 + i * 6} color={OK_INK} />
         ))}
         <Note at={cantAt} x={SNAP_X + 20} y={sTop + listingHeight(S.lines.length, SIZE) + h(24)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the snapshot can&rsquo;t rebuild the log</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The snapshot can&rsquo;t rebuild the log</span>
         </Note>
 
         {/* The advice. */}
         <Note at={auditAt} x={SNAP_X + 20} y={sTop + listingHeight(S.lines.length, SIZE) + h(80)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            history must be auditable?
+            History must be auditable?
             <br />
-            <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, keepAt, 10) }}>keep the log</span>
+            <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, keepAt, 10) }}>Keep the log</span>
             <span style={{ opacity: ease(frame, serveAt, 10) }}>, serve the snapshot from it</span>
           </span>
         </Note>

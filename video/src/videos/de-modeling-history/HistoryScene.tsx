@@ -140,10 +140,10 @@ export const HistoryScene: React.FC = () => {
         {/* The verdict: Type 2 marked in the right answer's green as the
             standard, Type 1 kept for typos. */}
         <Note at={standardAt + 6} x={X0} y={top(1) + h(VERDICT)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the standard</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The standard</span>
         </Note>
         <Note at={typoAt - 2} x={X0} y={top(0) + h(VERDICT)}>
-          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>right for a typo</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Right for a typo</span>
         </Note>
 
         {/* ── Type 1 ── */}
@@ -159,7 +159,7 @@ export const HistoryScene: React.FC = () => {
           marks={[{ row: 0, col: t1City, at: setAt + 2, out: bothAt + 10 }]}
         />
         <TableName g={go1} at={bothAt - 4}>
-          her orders, joined to it
+          Her orders, joined to it
         </TableName>
         <DataTable
           g={go1}
@@ -173,7 +173,7 @@ export const HistoryScene: React.FC = () => {
         />
         <Note at={movedAt + 4} x={go1.right + 30} y={go1.rowTop(0) + h(4)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            placed in Boston,
+            Placed in Boston,
             <br />
             now counted for Austin
           </span>
@@ -201,7 +201,7 @@ export const HistoryScene: React.FC = () => {
           ]}
         />
         <TableName g={go2} at={joinsAt - 2}>
-          her orders, by date
+          Her orders, by date
         </TableName>
         <DataTable
           g={go2}
@@ -236,7 +236,7 @@ export const HistoryScene: React.FC = () => {
         />
         <Note at={stepAt} x={g3.right + 40} y={g3.rowTop(0) - h(2)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            one step back
+            One step back
             <span style={{ opacity: ease(frame, goneAt, 10) }}>
               :{" "}
               <span style={{ color: ACCENT_INK, fontWeight: 500 }}>Boston is gone</span>
@@ -244,7 +244,7 @@ export const HistoryScene: React.FC = () => {
           </span>
         </Note>
         <Note at={againAt + 2} x={g3.right + 40} y={g3.rowTop(0) - h(44)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>then a second move, to Denver</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Then a second move, to Denver</span>
         </Note>
       </Drift>
     </AbsoluteFill>

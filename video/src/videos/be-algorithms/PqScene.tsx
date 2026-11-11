@@ -153,8 +153,8 @@ export const PqScene: React.FC = () => {
         {/* Three ways to keep one. */}
         <div style={{ opacity: ease(frame, sortedAt - 4, 12) }}>
           {[
-            { x: T.push, t: "push" },
-            { x: T.pop, t: "pop" },
+            { x: T.push, t: "Push" },
+            { x: T.pop, t: "Pop" },
           ].map((c) => (
             <div key={c.t} style={{ position: "absolute", left: c.x, top: tTop, ...label(21, INK_SOFT) }}>
               {c.t}

@@ -59,10 +59,10 @@ export const ChangedScene: React.FC = () => {
   const fluencyAt = n.word("changed-core", "fluency still matters");
   const aroundAt = n.word("changed-around", "Around it");
   const ring = [
-    { at: n.word("changed-around", "verifying a query"), title: "Verifying a query", sub: "an assistant wrote this; is it right?" },
-    { at: n.word("changed-around", "what you would and wouldn't share"), title: "Responsible use", sub: "what you'd share with a tool, and saying so" },
+    { at: n.word("changed-around", "verifying a query"), title: "Verifying a query", sub: "An assistant wrote this; is it right?" },
+    { at: n.word("changed-around", "what you would and wouldn't share"), title: "Responsible use", sub: "What you'd share with a tool, and saying so" },
     { at: n.word("changed-around", "the AI features in BI tools"), title: "AI in BI tools", sub: "Power BI, Tableau, Looker" },
-    { at: n.word("changed-around", "deeper follow-ups on take-homes"), title: "Take-home follow-ups", sub: "why this filter, why this grain" },
+    { at: n.word("changed-around", "deeper follow-ups on take-homes"), title: "Take-home follow-ups", sub: "Why this filter, why this grain" },
   ];
   const biAt = n.word("changed-around", "business intelligence tools");
   const askAt = n.word("changed-ask", "Ask the recruiter");
@@ -104,7 +104,7 @@ export const ChangedScene: React.FC = () => {
         >
           <div style={{ ...note(32, INK), fontWeight: 500, lineHeight: "42px", whiteSpace: "nowrap" }}>The live SQL screen</div>
           <div style={{ ...note(22, INK_SOFT), lineHeight: "29px", marginTop: 6, whiteSpace: "nowrap" }}>
-            usually <Mark at={offAt + 2}>AI off</Mark>
+            Usually <Mark at={offAt + 2}>AI off</Mark>
             <span style={{ opacity: ease(frame, fluencyAt - 2, 10) }}>, so fluency still matters</span>
           </div>
         </div>
@@ -157,7 +157,7 @@ export const ChangedScene: React.FC = () => {
           <span style={{ ...note(30, INK), fontWeight: 500, background: `linear-gradient(${HIGHLIGHT}, ${HIGHLIGHT})`, padding: "4px 12px", borderRadius: 6 }}>
             Ask the recruiter: is AI allowed in this round?
           </span>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 10, opacity: ease(frame, differAt - 2, 10) }}>policies differ, and change often</div>
+          <div style={{ ...note(22, INK_SOFT), marginTop: 10, opacity: ease(frame, differAt - 2, 10) }}>Policies differ, and change often</div>
         </div>
       </Drift>
     </AbsoluteFill>

@@ -180,7 +180,7 @@ export const DeadlockScene: React.FC = () => {
         </Note>
 
         <Note at={twoAt} x={1800} y={y(250) + h(8)} align="right">
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>drawn: it needs two sessions at once</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Drawn: it needs two sessions at once</span>
         </Note>
 
         {/* ── The lanes ── */}
@@ -230,7 +230,7 @@ export const DeadlockScene: React.FC = () => {
           </span>
         </Note>
         <Note at={neitherAt} x={cx + 150} y={(l1 + l2) / 2 + h(8)} out={findsAt}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>neither can go on</span>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Neither can go on</span>
         </Note>
         <Note at={simplyAt + 2} x={tx(0.26)} y={(l1 + l2) / 2 - h(16)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
@@ -264,7 +264,7 @@ export const DeadlockScene: React.FC = () => {
         </Svg>
         <Note at={waitsAt} x={X0 + 110} y={below + h(10)} out={cycOut}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            waits <SmallCode>deadlock_timeout</SmallCode> = <b>{DEADLOCK.timeout}</b>
+            Waits <SmallCode>deadlock_timeout</SmallCode> = <b>{DEADLOCK.timeout}</b>
           </div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(10), opacity: ease(frame, looksAt, 10) }}>
             then looks for a cycle<span style={{ opacity: ease(frame, findsAt, 10) }}>: <b>found</b></span>
@@ -274,10 +274,10 @@ export const DeadlockScene: React.FC = () => {
         <PgError x={980} top={below + h(4)} width={420} at={errorAt} message="ERROR: deadlock detected" size={21} out={cycOut} />
         <Note at={abortsAt + 4} x={980} y={below + h(80)} out={cycOut}>
           <div style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            transfer 2 is the <b style={{ color: ACCENT_INK }}>victim</b>, rolled back
+            Transfer 2 is the <b style={{ color: ACCENT_INK }}>victim</b>, rolled back
           </div>
-          <div style={{ ...note(23, OK_INK), whiteSpace: "nowrap", marginTop: h(10), opacity: ease(frame, finishesAt, 10) }}>transfer 1 finishes</div>
-          <div style={{ ...note(23, OK_INK), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, retriesAt, 10) }}>the application retries transfer 2</div>
+          <div style={{ ...note(23, OK_INK), whiteSpace: "nowrap", marginTop: h(10), opacity: ease(frame, finishesAt, 10) }}>Transfer 1 finishes</div>
+          <div style={{ ...note(23, OK_INK), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, retriesAt, 10) }}>The application retries transfer 2</div>
         </Note>
 
         {/* ── How to avoid it ── */}
@@ -288,7 +288,7 @@ export const DeadlockScene: React.FC = () => {
           </span>
         </Note>
         <Note at={noCycleAt} x={X0} y={below + h(62)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>one wait, no cycle: both transfers finish</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>One wait, no cycle: both transfers finish</span>
         </Note>
         <Note at={shortAt} x={X0} y={below + h(130)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Keep transactions short.</span>

@@ -18,10 +18,10 @@ const T1 = { x: 140, y: 470, w: 170, h: 64 };
 const T2 = { x: 650, y: 470, w: 170, h: 64 };
 /** The four conditions, in the page's order, and the fix that breaks each. */
 const CONDITIONS = [
-  { name: "Mutual exclusion", gloss: "one holder at a time", fix: "one owner, fed by a queue" },
-  { name: "Hold and wait", gloss: "holds one, waits for another", fix: "one coarse lock", more: ", or all at once" },
-  { name: "No preemption", gloss: "nothing takes a lock away", fix: "a timeout: release, retry" },
-  { name: "Circular wait", gloss: "a cycle, each waiting on the next", fix: "one global order: A before B" },
+  { name: "Mutual exclusion", gloss: "One holder at a time", fix: "One owner, fed by a queue" },
+  { name: "Hold and wait", gloss: "Holds one, waits for another", fix: "One coarse lock", more: ", or all at once" },
+  { name: "No preemption", gloss: "Nothing takes a lock away", fix: "A timeout: release, retry" },
+  { name: "Circular wait", gloss: "A cycle, each waiting on the next", fix: "One global order: A before B" },
 ];
 const ROW_X = 1060;
 /** The chain's column: each link centred here, 40px clear of the rows. */
@@ -32,10 +32,12 @@ const FIX_X = 1470;
 
 /** The page's trace of a deadlock, in the screen's names ("thread 1 takes A"). */
 const named = (s: string) => s.replace(/^T(\d)/, "thread $1");
+/** A line that stands on its own starts with a capital. */
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const STUCK = DEADLOCK.opposite.examples[0];
 /** A thread's holds and wait in the stuck schedule, for the thread dump. */
 const dumpLine = (t: "T1" | "T2") =>
-  `${named(t)} holds ${(STUCK.holds[t] ?? []).join(", ")}, waits for ${STUCK.waitsFor[t]}`;
+  `${cap(named(t))} holds ${(STUCK.holds[t] ?? []).join(", ")}, waits for ${STUCK.waitsFor[t]}`;
 if (!STUCK || STUCK.waitsFor.T1 !== "B" || STUCK.waitsFor.T2 !== "A") throw new Error("deadlock: results.json's schedule is not the one drawn");
 
 /** A chain link, painted (be-concurrency-link, 810x1518): an upright oval
@@ -318,7 +320,7 @@ export const DeadScene: React.FC = () => {
 
         {/* The schedule, from results.json, then the one-order version. */}
         <Note at={ifBothAt} x={X0} y={y(726)} out={getsAt - 2}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{STUCK.trace.map(named).join(", then ")}:</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{cap(STUCK.trace.map(named).join(", then "))}:</span>
         </Note>
         <Note at={eachAt} x={X0} y={y(766)} out={getsAt - 2}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>each waits on the other, for good</span>

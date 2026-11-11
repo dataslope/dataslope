@@ -126,7 +126,7 @@ export const FunnelScene: React.FC = () => {
         />
 
         {/* ── The funnel: one bar per stage ── */}
-        {head(BAR_X + 60, "users", stepsAt)}
+        {head(BAR_X + 60, "Users", stepsAt)}
         {stages.map((s, i) => {
           const at = stepsAt + i * 5;
           const p = ease(frame, at, 14);
@@ -172,7 +172,7 @@ export const FunnelScene: React.FC = () => {
 
         {/* ── The step conversion ── */}
         <div style={{ position: "absolute", left: 0, top: 0, transform: `translateX(${stepX - STEP_X}px)` }}>
-          {head(STEP_X, "step conversion", perStepAt)}
+          {head(STEP_X, "Step conversion", perStepAt)}
         </div>
         {stages.map((s, i) => {
           if (s.step === null) return null;
@@ -204,7 +204,7 @@ export const FunnelScene: React.FC = () => {
         })}
 
         {/* ── The people lost: the top looks worst ── */}
-        {head(SIDE_X, "lost", lostAt, lostOut)}
+        {head(SIDE_X, "Lost", lostAt, lostOut)}
         {stages.map((s, i) => {
           if (s.lost === null) return null;
           const p = ease(frame, lostAt + 4 + i * 3, 10);
@@ -273,12 +273,12 @@ export const FunnelScene: React.FC = () => {
         {/* ── Under the bars: the overall rate, then the query ── */}
         <Note at={overallAt - 2} x={X0} y={y(LIST_Y)} out={lowerOut}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            overall: {count(stages[stages.length - 1].users)} of {count(top)} ={" "}
+            Overall: {count(stages[stages.length - 1].users)} of {count(top)} ={" "}
             <b style={{ color: OK_INK, opacity: ease(frame, nineAt - 2, 10) }}>{pct(FUNNEL.overall, 1)}</b>
           </span>
         </Note>
         <Note at={topAt} x={STEP_X - COL_W / 2} y={y(LIST_Y)} out={lowerOut}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>the top loses most because it has the most people</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>The top loses most because it has the most people</span>
         </Note>
         <Listing
           lines={FUNNEL.step.lines}

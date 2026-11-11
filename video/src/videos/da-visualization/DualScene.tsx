@@ -156,17 +156,17 @@ export const DualScene: React.FC = () => {
         </div>
         <Note at={corrAt - 2} x={LEFT.x1 - 220} y={top - h(60)} out={out9}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            correlation <Num>{fmt(DUAL.corr)}</Num>
+            Correlation <Num>{fmt(DUAL.corr)}</Num>
           </span>
         </Note>
         <Verdict ok={false} x={LEFT.x0} y={base + h(64)} at={noiseAt + 4} out={out9}>
-          its noise looks as big as revenue&apos;s climb
+          Its noise looks as big as revenue&apos;s climb
         </Verdict>
         <Verdict ok={false} x={RIGHT.x0} y={base + h(64)} at={overtakeAt + 4} out={outZero}>
-          flat, and a crossover the axes invented
+          Flat, and a crossover the axes invented
         </Verdict>
         <Note at={arbitraryAt} x={LEFT.x0} y={base + h(110)} out={out9}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>either right axis is a choice, and so is the story</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Either right axis is a choice, and so is the story</span>
         </Note>
 
         {/* The page's fix, in the right panel's place: both indexed to 100, one axis. */}
@@ -177,7 +177,7 @@ export const DualScene: React.FC = () => {
         <LineSet values={DUAL.indexed.a} x0={RIGHT.x0} x1={RIGHT.x1} base={base} top={top} lo={INDEX.lo} hi={INDEX.hi} at={indexAt + 4} color={CATS[0]} dots={false} out={out9} edges />
         <LineSet values={DUAL.indexed.b} x0={RIGHT.x0} x1={RIGHT.x1} base={base} top={top} lo={INDEX.lo} hi={INDEX.hi} at={indexAt + 10} color={CATS[3]} dots={false} axis={false} out={out9} edges />
         <Verdict ok x={RIGHT.x0} y={base + h(64)} at={shareAt} out={out9}>
-          one axis, nothing to tune
+          One axis, nothing to tune
         </Verdict>
         <Note at={panelsAt - 2} x={RIGHT.x0} y={base + h(110)} out={out9}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>or two aligned panels, one axis each</span>
@@ -200,13 +200,13 @@ export const DualScene: React.FC = () => {
         <Note at={decadeAt - 2} x={DECADE.x1 - 320} y={y(DECADE.top) - h(56)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Mark at={rangeAt}>
-              the decade: <Num>{C.decadePct}%</Num> net change
+              The decade: <Num>{C.decadePct}%</Num> net change
             </Mark>
           </span>
         </Note>
         <Note at={upAt - 2} x={cx(C.window.end) + 16} y={y(DECADE.top) - h(4)}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            the window: up <Num>{C.windowPct}%</Num>
+            The window: up <Num>{C.windowPct}%</Num>
           </span>
         </Note>
 
@@ -237,10 +237,10 @@ export const DualScene: React.FC = () => {
         <LineSet values={zeros} x0={RIGHT.x0} x1={RIGHT.x1} base={miniBase} top={miniTop} lo={0} hi={80} at={zerosAt - 2} color={ACCENT} dots={false} width={2.4} edges dim={bridgeAt + 4} />
         <LineSet values={gapped} x0={RIGHT.x0} x1={RIGHT.x1} base={miniBase} top={miniTop} lo={0} hi={80} at={gapAt - 2} color={OK} dots={false} axis={false} width={2.8} edges />
         <Verdict ok={false} x={RIGHT.x0} y={miniBase + h(14)} at={collapseAt - 6}>
-          a collapse that never happened
+          A collapse that never happened
         </Verdict>
         <Verdict ok x={RIGHT.x0} y={miniBase + h(54)} at={gapAt + 6}>
-          a gap, not a zero
+          A gap, not a zero
         </Verdict>
       </Drift>
     </AbsoluteFill>

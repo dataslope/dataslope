@@ -184,7 +184,7 @@ export const QuickScene: React.FC = () => {
           <Num>{int(QUICKSORT.randomPivotSorted.compares)}</Num> comparisons
         </Line>
         <Line at={twentyAt + 10} x={RXP} y={insetTop - 38} size={21} color={INK_SOFT} weight={500}>
-          detail, zoomed <Num>{ZOOM}</Num>× to show the splits
+          Detail, zoomed <Num>{ZOOM}</Num>× to show the splits
         </Line>
 
         {/* Why it matters. */}

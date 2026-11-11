@@ -134,7 +134,7 @@ export const TypesScene: React.FC = () => {
           marks={TRANSACTIONS.rows.map((_, i) => ({ row: i, col: amount, at: happenedAt + i * 2, color: MARK_OK }))}
         />
         <Note at={happenedAt} x={tg.right + 34} y={tg.rowTop(TRANSACTIONS.rows.length - 1) + h(8)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>what happened</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>What happened</span>
         </Note>
 
         {/* ── Periodic snapshot ── */}
@@ -163,7 +163,7 @@ export const TypesScene: React.FC = () => {
           ]}
         />
         <Note at={stoodAt} x={R_X} y={sg.rowTop(SNAPSHOT_ADA.rows.length) + h(16)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>where things stood</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Where things stood</span>
         </Note>
 
         {/* ── Accumulating snapshot ── */}
@@ -198,12 +198,12 @@ export const TypesScene: React.FC = () => {
           bands={[{ row: 0, at: updatedAt, out: updatedAt + 26 }]}
         />
         <Note at={updatedAt} x={ag.right + 40} y={ag.rowTop(0) + 8}>
-          <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>updated in place, stage by stage</span>
+          <span style={{ ...note(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Updated in place, stage by stage</span>
         </Note>
         <Lag x0={ag.colMid(cApplied)} x1={ag.colMid(cApproved)} y={lagY} at={swapApprove + 6} days={STAGES.approve} />
         <Lag x0={ag.colMid(cApproved)} x1={ag.colMid(cFunded)} y={lagY} at={swapFund + 6} days={STAGES.fund} />
         <Note at={longAt} x={ag.right + 40} y={ag.rowTop(1) + h(6)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>how long each step took</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>How long each step took</span>
         </Note>
       </Drift>
     </AbsoluteFill>

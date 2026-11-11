@@ -99,7 +99,7 @@ export const CheckScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={Math.min(readAt, asked) - 6} x={X0} y={top - h(56)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>read it as if a new colleague wrote it:</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Read it as if a new colleague wrote it:</span>
         </Note>
         {steps.map((s, i) => {
           const p = ease(frame, s.at - 2, 12);
@@ -139,12 +139,12 @@ export const CheckScene: React.FC = () => {
         <Count x={FIG_X + 396} y={figTop} at={fourteenAt - 2} name="after the join" rows="14,000 rows" bad />
         {/* Above its box, so the row under it is free for step 3's example. */}
         <Note at={fanAt - 2} x={FIG_X + 396} y={figTop - h(38)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>something is fanning out</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Something is fanning out</span>
         </Note>
 
         {/* ── Examples for the filter, NULL and reconcile checks ── */}
         <Note at={revenueAt - 2} x={FIG_X} y={besideY(2)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>does revenue drop refunds and test accounts?</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Does revenue drop refunds and test accounts?</span>
         </Note>
         <Note at={notInAt - 2} x={FIG_X} y={besideY(3)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -159,7 +159,7 @@ export const CheckScene: React.FC = () => {
         {/* ── The range check's example ── */}
         <Note at={hundredAt - 2} x={FIG_X} y={top + 6 * pitch - h(4)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            a conversion rate <span style={{ color: ACCENT_INK, fontWeight: 500 }}>over 100%</span>
+            A conversion rate <span style={{ color: ACCENT_INK, fontWeight: 500 }}>over 100%</span>
           </span>
         </Note>
         <Note at={bugAt - 2} x={FIG_X} y={top + 6 * pitch + h(40)}>

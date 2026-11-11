@@ -212,7 +212,7 @@ export const IndexScene: React.FC = () => {
         {/* log n against n, under the plan */}
         <Note at={logAt} x={X0} y={planTop + h(196)} out={kindAt - 4}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
-            index: <M>O(log n)</M>
+            Index: <M>O(log n)</M>
             <span style={{ color: INK_SOFT }}> against </span>
             scan: <M>O(n)</M>
           </span>
@@ -356,7 +356,7 @@ export const IndexScene: React.FC = () => {
         <Flow points={[[hashBox.x + hashBox.w - 30, hashBox.y + hashBox.h + 6], [bucketX(eqBucket) + bucketW / 2, bucketY - 10]]} at={straightAt} color={OK} width={3} out={rangeAt} />
         <Note at={straightAt + 6} x={hashBox.x + hashBox.w + 36} y={hashTop + h(10)} out={rangeAt}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>equality:</b> one bucket
+            <b style={{ color: OK_INK }}>Equality:</b> one bucket
           </span>
         </Note>
         {rangeBuckets.map((b, k) => (
@@ -372,7 +372,7 @@ export const IndexScene: React.FC = () => {
         ))}
         <Note at={rangeAt + 10} x={hashBox.x + hashBox.w + 36} y={hashTop + h(10)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: ACCENT_INK }}>a range:</b>
+            <b style={{ color: ACCENT_INK }}>A range:</b>
           </span>
           <div style={{ ...note(22, INK), whiteSpace: "nowrap", marginTop: h(6) }}>scattered buckets, nothing to walk</div>
         </Note>

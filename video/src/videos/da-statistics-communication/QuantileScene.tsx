@@ -180,7 +180,7 @@ export const QuantileScene: React.FC = () => {
         </Note>
         <Note at={quartilesAt - 2} x={X0} y={y(328)} out={out6}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <b>quartiles</b>: the cuts at 25, 50 and 75
+            <b>Quartiles</b>: the cuts at 25, 50 and 75
           </span>
         </Note>
         <Note at={fenceAt - 2} x={X0} y={y(286)} out={lookAt - 4}>
@@ -199,7 +199,7 @@ export const QuantileScene: React.FC = () => {
           </span>
         </Note>
         <Note at={typoAt - 2} x={X0} y={y(328)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>an outlier can be a typo, or the most important row you have</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>An outlier can be a typo, or the most important row you have</span>
         </Note>
 
         {/* ── Thirteen amounts, in order ── */}
@@ -255,7 +255,7 @@ export const QuantileScene: React.FC = () => {
           </span>
         </Note>
         <Note at={nobodyAt} x={p90X + 30} y={bottom + h(24)} out={out6}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>not in the data:</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Not in the data:</span>
         </Note>
         <Note at={interpAt - 2} x={p90X + 30} y={bottom + h(24) + 30} out={out6}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
@@ -267,7 +267,7 @@ export const QuantileScene: React.FC = () => {
           </span>
         </Note>
         <Note at={rulesAt - 2} x={p90X + 30} y={bottom + h(24) + 108} out={out6}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>other tools,</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Other tools,</span>
           <br />
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>other rules</span>
         </Note>
@@ -312,7 +312,7 @@ export const QuantileScene: React.FC = () => {
         />
         <Note at={meanAt - 2} x={STRIP_X} y={zTop + cellH + h(14)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            the two drag the mean to <b>{fmt(AMOUNTS.mean, 1)}</b>
+            The two drag the mean to <b>{fmt(AMOUNTS.mean, 1)}</b>
             <span style={{ opacity: ease(frame, stdAt - 2, 10) }}>
               {" "}
               and the standard deviation to <b>{fmt(AMOUNTS.std, 1)}</b>
@@ -331,7 +331,7 @@ export const QuantileScene: React.FC = () => {
         </Note>
         <Note at={hideAt - 2} x={STRIP_X + 840} y={zTop + cellH + h(62)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            the outliers hide themselves<span style={{ opacity: ease(frame, maskingAt - 2, 10) }}>: <b>masking</b></span>
+            The outliers hide themselves<span style={{ opacity: ease(frame, maskingAt - 2, 10) }}>: <b>masking</b></span>
           </span>
         </Note>
         {/* Which rule, then: one built on quartiles, which the outliers can't move. */}

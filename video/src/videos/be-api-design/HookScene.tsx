@@ -115,7 +115,7 @@ export const HookScene: React.FC = () => {
           />
         </svg>
         <Note at={agreeAt + 4} x={BOXES[0].x} y={top + BOX_H + h(108)} width={BOXES[2].x + BOXES[2].w - BOXES[0].x} style={{ textAlign: "center" }}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>both sides agree on how</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Both sides agree on how</span>
         </Note>
 
         {/* What the interview tests the design for. */}

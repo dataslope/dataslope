@@ -250,7 +250,7 @@ export const LimitScene: React.FC = () => {
           </span>
         </Note>
         <Note at={onlyAt} x={X0} y={safeTop + h(50)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>safe to repeat:</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Safe to repeat:</span>
         </Note>
         {chips.map((c, i) => {
           const x = [X0 + 200, X0 + 360, X0 + 520, X0 + 950][i];

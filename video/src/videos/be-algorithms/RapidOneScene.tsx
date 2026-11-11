@@ -87,10 +87,10 @@ const Merge: React.FC<{ c: Ctx }> = ({ c }) => {
       <Row values={sorted(right)} x={R_X + 3 * 68 + 40} y={c.T + 2 * step} at={sortsAt + 4} />
       <Row values={out} x={R_X} y={c.T + 3 * step} at={mergesAt} tone="ok" />
       {[
-        { t: "the input", at: halvesAt - 8, k: 0 },
-        { t: "halves", at: halvesAt, k: 1 },
-        { t: "each sorted", at: sortsAt, k: 2 },
-        { t: <>merged in <M>O(n)</M></>, at: mergesAt, k: 3 },
+        { t: "The input", at: halvesAt - 8, k: 0 },
+        { t: "Halves", at: halvesAt, k: 1 },
+        { t: "Each sorted", at: sortsAt, k: 2 },
+        { t: <>Merged in <M>O(n)</M></>, at: mergesAt, k: 3 },
       ].map((r) => (
         <Line key={r.k} at={r.at} x={R_X + 7 * 68 + 100} y={c.T + r.k * step + 12} size={23} color={INK_SOFT}>
           {r.t}
@@ -216,7 +216,7 @@ const InPlace: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
       <Row values={values} x={R_X} y={c.T + c.h(52)} at={inAt + 4} />
       <Line at={quickAt} x={R_X} y={c.T + c.h(122)} size={24} color={BLUE_INK} weight={500}>
-        quicksort, with random pivots
+        Quicksort, with random pivots
       </Line>
       <Line at={outAt} x={R_X} y={b2} size={25} weight={500}>
         Out of place: extra memory grows with the input
@@ -227,7 +227,7 @@ const InPlace: React.FC<{ c: Ctx }> = ({ c }) => {
         a buffer as big as the input
       </Line>
       <Line at={mergeAt} x={R_X} y={b2 + c.h(52) + 140} size={24} color={BLUE_INK} weight={500}>
-        merge sort
+        Merge sort
       </Line>
     </>
   );
@@ -365,7 +365,7 @@ const DivideDp: React.FC<{ c: Ctx }> = ({ c }) => {
         )),
       )}
       <Line at={mergeAt} x={R_X} y={ly(3) + c.h(4)} size={23} color={INK_SOFT}>
-        merge sort: no piece is solved twice
+        Merge sort: no piece is solved twice
       </Line>
       <VRule x={1237} top={c.T} bottom={ly(5) + c.h(4) + 30} at={dpAt} />
       <Line at={dpAt} x={fx} y={c.T} size={24} weight={500}>
@@ -444,11 +444,11 @@ const Classic: React.FC<{ c: Ctx }> = ({ c }) => {
   const knowAt = c.w("r-classic", "Know coin change");
   const stateAt = c.w("r-classic", "each teaches a way to define the state");
   const problems = [
-    { name: "coin change", state: "fewest coins for each amount", at: knowAt },
-    { name: "longest common subsequence", state: "a prefix of each string", at: c.w("r-classic", "longest common subsequence") },
-    { name: "knapsack", state: "items so far, capacity left", at: c.w("r-classic", "knapsack") },
-    { name: "edit distance", state: "a prefix of each string", at: c.w("r-classic", "edit distance") },
-    { name: "word break", state: "can this prefix be split?", at: c.w("r-classic", "word break") },
+    { name: "Coin change", state: "fewest coins for each amount", at: knowAt },
+    { name: "Longest common subsequence", state: "a prefix of each string", at: c.w("r-classic", "longest common subsequence") },
+    { name: "Knapsack", state: "items so far, capacity left", at: c.w("r-classic", "knapsack") },
+    { name: "Edit distance", state: "a prefix of each string", at: c.w("r-classic", "edit distance") },
+    { name: "Word break", state: "can this prefix be split?", at: c.w("r-classic", "word break") },
   ];
   return (
     <>
@@ -458,7 +458,7 @@ const Classic: React.FC<{ c: Ctx }> = ({ c }) => {
             {p.name}
           </Line>
           <Line at={p.at + 8} x={R_X + 470} y={c.T + i * c.h(76) + 8} size={23} color={INK_SOFT}>
-            state: {p.state}
+            State: {p.state}
           </Line>
         </React.Fragment>
       ))}

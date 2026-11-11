@@ -209,7 +209,7 @@ export const CorrScene: React.FC = () => {
         {/* The other two ways two things move together. */}
         <Note at={chanceAt - 2} x={1060} y={y(766)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            other links: pure chance
+            Other links: pure chance
             <span style={{ opacity: ease(frame, backwardsAt - 2, 10) }}>, or a cause that runs backwards</span>
           </span>
         </Note>

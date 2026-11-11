@@ -138,11 +138,11 @@ export const NormScene: React.FC = () => {
           swaps={[{ row: 0, col: fEmail, at: rushedAt + 8, value: newEmail }]}
         />
         <Note at={fasterAt} x={RIGHT_X} y={below + h(20)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no join: faster reads</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>No join: faster reads</span>
         </Note>
         <Note at={priceAt} x={RIGHT_X} y={below + h(62)}>
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            costs: storage
+            Costs: storage
             <span style={{ opacity: ease(frame, disagreeAt, 10) }}>, and copies that can disagree</span>
           </span>
         </Note>

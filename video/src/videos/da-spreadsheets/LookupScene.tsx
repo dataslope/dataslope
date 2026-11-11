@@ -208,7 +208,7 @@ export const LookupScene: React.FC = () => {
           </span>
         </Note>
         <Note at={typedAt - 2} x={BAR_X} y={slot(2) + h(40)} out={out3}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>the 3 is typed in</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>The 3 is typed in</span>
         </Note>
 
         {/* ── Question 4: INDEX/MATCH ── */}
@@ -300,23 +300,23 @@ export const LookupScene: React.FC = () => {
         <RangeBox g={g} r0={2} r1={5} c0={2} c1={2} at={rangesAt + 18} out={out4} color={ds("purple", 500)} shiftAt={shift} />
         <Note at={rangesAt + 16} x={BAR_X} y={slot(2) - h(6)} out={movesAt}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            written before the insert: <b style={{ color: INK }}>C2:C5</b>, the prices
+            Written before the insert: <b style={{ color: INK }}>C2:C5</b>, the prices
           </span>
         </Note>
         <Note at={movesAt + 4} x={BAR_X} y={slot(2) - h(6)} out={out4}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            after it, Excel rewrites the range: <b style={{ color: INK }}>D2:D5</b>, still the prices
+            After it, Excel rewrites the range: <b style={{ color: INK }}>D2:D5</b>, still the prices
           </span>
         </Note>
 
         {/* ── Question 5: XLOOKUP ── */}
         <Note at={newerAt - 2} x={BAR_X} y={slot(0) - h(4)} out={arraysAt}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            the newer lookup: <b style={{ color: INK }}>Excel 365 and 2021 or later</b>
+            The newer lookup: <b style={{ color: INK }}>Excel 365 and 2021 or later</b>
           </span>
         </Note>
         <Note at={olderAt - 2} x={BAR_X} y={slot(0) + h(40)} out={arraysAt}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>older versions don&apos;t have it</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Older versions don&apos;t have it</span>
         </Note>
         <FormulaBar
           x={BAR_X}
@@ -349,10 +349,10 @@ export const LookupScene: React.FC = () => {
           </span>
         </Note>
         <Note at={notFoundAt + 6} x={BAR_X} y={slot(2) - h(6)} out={bridgeAt}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>no IFERROR around it</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>No IFERROR around it</span>
         </Note>
         <Note at={exactAt} x={BAR_X} y={slot(2) + h(40)} out={bridgeAt}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>exact match unless you ask otherwise</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Exact match unless you ask otherwise</span>
         </Note>
         <RangeBox g={g} r0={2} r1={5} c0={1} c1={1} at={arraysAt + 6} out={exactAt + 4} color={ds("teal", 500)} />
         <RangeBox g={g} r0={2} r1={5} c0={0} c1={0} at={arraysAt + 10} out={exactAt + 4} color={ds("purple", 500)} />

@@ -151,12 +151,12 @@ export const LatestScene: React.FC = () => {
         />
         <Note at={keepAt + 16} x={X0} y={kNote + h(30)} out={out11}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            keep <QMono>rn = 1</QMono> in an outer query, or with <QMono>QUALIFY</QMono>
+            Keep <QMono>rn = 1</QMono> in an outer query, or with <QMono>QUALIFY</QMono>
           </span>
         </Note>
         <Note at={tieAt} x={X0} y={kNote + h(76)} out={out11}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            a tie on <QMono>updated_at</QMono> needs a tiebreaker too
+            A tie on <QMono>updated_at</QMono> needs a tiebreaker too
           </span>
         </Note>
         <Note at={maxAt} x={X0} y={kNote + h(116)} out={out11}>
@@ -172,7 +172,7 @@ export const LatestScene: React.FC = () => {
         <Listing lines={W.lines} x={X0} top={y(TOP)} width={520} size={21} at={q12At + 6} />
         <DataTable g={wg} cols={colsOf(W)} at={q12At + 10} rows={rowsAt(W.rows, q12At + 14, 3)} />
         <Note at={skipAt + 2} x={X0} y={wg.rowTop(W.rows.length) + h(18)}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>no row for the 2nd or the 5th</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>No row for the 2nd or the 5th</span>
         </Note>
 
         {/* A small line chart: drawn over the gaps, then through the zeros. */}
@@ -221,10 +221,10 @@ export const LatestScene: React.FC = () => {
           bands={zeros.map((row, k) => ({ row, at: zerosAt + k * 4, color: MARK_OK }))}
         />
         <Note at={zerosAt + 8} x={SPINE_RESULT_X} y={sg.rowTop(S.rows.length) + h(16)}>
-          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>back, as 0</span>
+          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>Back, as 0</span>
         </Note>
         <Note at={calendarAt - 2} x={SPINE_RESULT_X} y={sg.rowTop(S.rows.length) + h(60)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>other engines: a calendar table</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Other engines: a calendar table</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -228,7 +228,7 @@ export const AuthScene: React.FC = () => {
         {/* Session: an opaque ID in a cookie, and the server's store. */}
         <Note at={cookieAt} x={S.x} y={bodyTop} out={leave}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            in a cookie:{" "}
+            In a cookie:{" "}
             <span style={{ color: INK }}>
               <Mark at={charsAt}>
                 <Num>{AUTH.sessionChars}</Num> random characters
@@ -275,7 +275,7 @@ export const AuthScene: React.FC = () => {
           </Note>
         ))}
         <Note at={decodeAt + 4} x={J.x} y={claimsTop - h(40)} out={leave}>
-          <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>the payload, decoded without the key</span>
+          <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>The payload, decoded without the key</span>
         </Note>
         <Note at={decodeAt + 8} x={J.x} y={claimsTop} out={leave}>
           <div style={{ borderTop: `2px solid ${BAR}`, borderBottom: `1px solid ${HAIRLINE}`, padding: "8px 16px", background: LISTING_PAPER, width: 440 }}>
@@ -302,13 +302,13 @@ export const AuthScene: React.FC = () => {
         </Note>
         <Note at={sigAt} x={J.x} y={claimsTop + h(184)} out={leave}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            the <span style={{ color: PART_INK.signature, fontWeight: 500 }}>signature</span> proves who issued it
+            The <span style={{ color: PART_INK.signature, fontWeight: 500 }}>signature</span> proves who issued it
           </span>
         </Note>
         <Note at={verifiesAt} x={J.x} y={claimsTop + h(228)} out={leave}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 23 }}>
             <Cross at={verifiesAt + 2} size={22} />
-            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>role changed: it no longer verifies</span>
+            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Role changed: it no longer verifies</span>
           </div>
         </Note>
 
@@ -331,15 +331,15 @@ export const AuthScene: React.FC = () => {
         </Note>
         <Note at={delegAt} x={O.x} y={svcTop + h(80) + h(28)} out={leave}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <b>delegated</b> authorization, not a token format
+            <b>Delegated</b> authorization, not a token format
           </span>
         </Note>
         <Note at={tokensAt} x={O.x} y={svcTop + h(80) + h(68)} out={leave}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>its tokens: JWTs or opaque strings</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Its tokens: JWTs or opaque strings</span>
         </Note>
         <Note at={oidcAt} x={O.x} y={svcTop + h(80) + h(108)} out={leave}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            logging in: <span style={{ color: INK }}>OpenID Connect</span>
+            Logging in: <span style={{ color: INK }}>OpenID Connect</span>
             <span style={{ opacity: ease(frame, idTokenAt, 10) }}>, an ID token</span>
           </span>
         </Note>
@@ -374,7 +374,7 @@ export const AuthScene: React.FC = () => {
         <Clock x={jx + 74 - 10 - CLOCK_TEXT / 2} y={srvTop + twoH + h(40) + (CLOCK_TEXT * 1.3) / 2} size={CLOCK_TEXT} at={validAt + 8} color={ACCENT} />
         <Note at={validAt + 10} x={jx + 74} y={srvTop + twoH + h(40)}>
           <span style={{ ...note(CLOCK_TEXT, INK), whiteSpace: "nowrap" }}>
-            valid until <span style={{ fontFamily: MONO, fontWeight: 500 }}>exp</span>, deleted session or not
+            Valid until <span style={{ fontFamily: MONO, fontWeight: 500 }}>exp</span>, deleted session or not
           </span>
         </Note>
         <Note at={lookupAt} x={jx + 74} y={srvTop + twoH + h(80)}>
@@ -390,7 +390,7 @@ export const AuthScene: React.FC = () => {
         ))}
         <Note at={withoutAt} x={jx} y={svcRow + h(96)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            each verifies the signature itself, <b style={{ color: OK_INK }}>no session store</b>
+            Each verifies the signature itself, <b style={{ color: OK_INK }}>no session store</b>
           </span>
         </Note>
 

@@ -145,16 +145,16 @@ export const DashScene: React.FC = () => {
           );
         })}
         <Note at={modelAt} x={GRID.x} y={cellY(3) + h(4)} out={out11}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>darker: more attention, in a simple model, not a measurement</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Darker: more attention, in a simple model, not a measurement</span>
         </Note>
         <Note at={fasterAt - 2} x={GRID.x} y={cellY(3) + h(42)} out={out11}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            attention falls faster <b>down</b> the page than across it
+            Attention falls faster <b>down</b> the page than across it
           </span>
         </Note>
         <Note at={consistentAt} x={GRID.x} y={cellY(3) + h(82)} out={out11}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            consistent scales and colors<span style={{ opacity: ease(frame, freshAt - 2, 10) }}>, and how fresh the data is</span>
+            Consistent scales and colors<span style={{ opacity: ease(frame, freshAt - 2, 10) }}>, and how fresh the data is</span>
           </span>
         </Note>
 
@@ -178,7 +178,7 @@ export const DashScene: React.FC = () => {
           Design for the audience
         </Verdict>
         <Note at={execAt - 2} x={CREEP.x0 + 31} y={vBase + h(130)} out={out11}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>an executive summary differs from an ops monitoring view</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>An executive summary differs from an ops monitoring view</span>
         </Note>
 
         {/* ── Question 12: what each is for, side by side ── */}
@@ -187,19 +187,19 @@ export const DashScene: React.FC = () => {
             title: "Dashboard",
             at: dashAt,
             lines: [
-              { at: dashAt + 6, text: "a living view, for monitoring" },
+              { at: dashAt + 6, text: "A living view, for monitoring" },
               { at: nowAt, text: "“What's happening now?”" },
-              { at: decisionsAt + 4, text: "drives day-to-day decisions", strong: true },
+              { at: decisionsAt + 4, text: "Drives day-to-day decisions", strong: true },
             ],
           },
           {
             title: "Report",
             at: reportAt,
             lines: [
-              { at: reportAt + 6, text: "answers one question" },
-              { at: narrativeAt, text: "narrative and context" },
-              { at: topAt, text: "read from top to bottom" },
-              { at: deeperAt, text: "drives deeper analysis", strong: true },
+              { at: reportAt + 6, text: "Answers one question" },
+              { at: narrativeAt, text: "Narrative and context" },
+              { at: topAt, text: "Read from top to bottom" },
+              { at: deeperAt, text: "Drives deeper analysis", strong: true },
             ],
           },
         ].map((col, k) => {

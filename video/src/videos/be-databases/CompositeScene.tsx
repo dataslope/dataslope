@@ -163,10 +163,10 @@ export const CompositeScene: React.FC = () => {
             <g opacity={ease(frame, sortsAt, 12)}>
               <line x1={lastX} x2={lastX + bookW} y1={bookTop} y2={bookTop} stroke={INK} strokeWidth={2} />
               <text x={lastX + 16} y={bookTop + 30} style={svgText(label(21, ease(frame, lastAt, 8) > 0.5 ? INK : INK_SOFT))}>
-                last name
+                Last name
               </text>
               <text x={firstX + 16} y={bookTop + 30} style={svgText(label(21, ease(frame, firstAt, 8) > 0.5 ? INK : INK_SOFT))}>
-                first name
+                First name
               </text>
               <line x1={lastX} x2={lastX + bookW} y1={bookTop + 44} y2={bookTop + 44} stroke={HAIRLINE} strokeWidth={1} />
             </g>
@@ -210,11 +210,11 @@ export const CompositeScene: React.FC = () => {
             <line x1={lastX} x2={lastX + bookW} y1={rowTop(BOOK.length)} y2={rowTop(BOOK.length)} stroke={INK} strokeWidth={1.5} opacity={ease(frame, sortsAt + 20, 10)} />
           </Svg>
           <Note at={secondAt + 6} x={lastX + bookW + 40} y={rowTop(0) - h(2)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>sorted by last name; within each, by first</span>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Sorted by last name; within each, by first</span>
           </Note>
           <Note at={everyLoveAt + 2} x={720} y={rowMid(loves[0]) - h(64)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              <b style={{ color: OK_INK }}>every Lovelace:</b> one run
+              <b style={{ color: OK_INK }}>Every Lovelace:</b> one run
             </span>
           </Note>
           <Note at={adaLoveAt + 2} x={720} y={rowMid(adaLove) - h(14)}>
@@ -224,7 +224,7 @@ export const CompositeScene: React.FC = () => {
           </Note>
           <Note at={everyAdaAt + 4} x={720} y={rowMid(loves[2]) + h(44)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              <b style={{ color: ACCENT_INK }}>every Ada:</b> scattered through the book
+              <b style={{ color: ACCENT_INK }}>Every Ada:</b> scattered through the book
             </span>
           </Note>
         </div>
@@ -242,17 +242,17 @@ export const CompositeScene: React.FC = () => {
         {/* ── The strip: the index's entries, in index order ── */}
         <Note at={stripAt + 4} x={STRIP_X} y={stripY - h(80)} out={swapAt - 2}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            index entries in order: <span style={{ color: INK }}>by customer, then time</span>
+            Index entries in order: <span style={{ color: INK }}>by customer, then time</span>
           </span>
         </Note>
         <Note at={swapAt + 4} x={STRIP_X} y={stripY - h(80)} out={skipAt - 2}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            index entries in order: <span style={{ color: INK }}>by time, then customer</span>
+            Index entries in order: <span style={{ color: INK }}>by time, then customer</span>
           </span>
         </Note>
         <Note at={statusAt} x={STRIP_X} y={stripY - h(80)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            index entries in order: <span style={{ color: INK }}>by status, then time</span>
+            Index entries in order: <span style={{ color: INK }}>by status, then time</span>
           </span>
         </Note>
         <Svg>
@@ -362,11 +362,11 @@ export const CompositeScene: React.FC = () => {
         ]} />
         <Note at={thirteenAt} x={NOTE_X} y={planTop + h(4)} out={dayAt - 4}>
           <div style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{COMPOSITE.latestPages} pages</div>
-          <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(10), opacity: ease(frame, noSortAt, 10) }}>newest first, no Sort node</div>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(10), opacity: ease(frame, noSortAt, 10) }}>Newest first, no Sort node</div>
         </Note>
         <PlanBox lines={dayShown} x={X0} top={planTop} width={1260} size={19} at={dayAt + 4} out={swapAt - 4} marks={[{ line: "Seq Scan", text: "Seq Scan", at: tableAt, color: MARK_RED }]} />
         <Note at={tableAt + 4} x={NOTE_X} y={planTop + h(4)} out={swapAt - 4}>
-          <div style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one day, scattered across runs:</div>
+          <div style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>One day, scattered across runs:</div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(6) }}>
             <Num>{thousands(COMPOSITE.dayCount)}</Num> orders, read from the table
           </div>
@@ -378,7 +378,7 @@ export const CompositeScene: React.FC = () => {
         </Note>
         <Note at={ruleAt} x={NOTE_X} y={planTop + h(4)} out={skipAt - 4}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Order the columns:</div>
-          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, equalityAt, 10) }}>equality first,</div>
+          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, equalityAt, 10) }}>Equality first,</div>
           <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(4), opacity: ease(frame, rangeAt, 10) }}>then range or sort</div>
         </Note>
         <PlanBox lines={skipShown} x={X0} top={planTop} width={1260} size={19} at={statusAt + 4} marks={[
@@ -394,7 +394,7 @@ export const CompositeScene: React.FC = () => {
           <div style={{ ...note(22, INK), whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, fiveAt + 4, 10) }}>
             <Num>{COMPOSITE.skipSearches}</Num> searches: <Num>{STATUSES.length}</Num> statuses + the end
           </div>
-          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, neverAt, 10) }}>never touched the table</div>
+          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, neverAt, 10) }}>Never touched the table</div>
         </Note>
       </Drift>
     </AbsoluteFill>

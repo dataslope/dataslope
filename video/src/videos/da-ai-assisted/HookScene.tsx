@@ -83,7 +83,7 @@ export const HookScene: React.FC = () => {
           marks={[{ line: BUG_LINE, at: rightAt, color: `color-mix(in srgb, ${ds("red", 500)} 22%, transparent)` }]}
         />
         <Note at={rightAt + 4} x={X0 + WIDTH + 20} y={bugY - 4} dim={firstAt}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>right?</span>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Right?</span>
         </Note>
 
         {/* ── Nine questions: six in full, three short, as two badges ── */}

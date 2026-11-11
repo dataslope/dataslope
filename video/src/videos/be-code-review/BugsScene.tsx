@@ -239,21 +239,21 @@ export const BugsScene: React.FC = () => {
             <Op color={ACCENT_INK}>&lt;</Op> where <Op color={OK_INK}>&lt;=</Op> belongs
           </Line>
           <Line at={offAt}>
-            an off-by-one<span style={{ opacity: ease(frame, emptyAt, 10) }}>, the empty input</span>
+            An off-by-one<span style={{ opacity: ease(frame, emptyAt, 10) }}>, the empty input</span>
           </Line>
-          <Line at={windowAt}>the exact edge of a window</Line>
+          <Line at={windowAt}>The exact edge of a window</Line>
         </Card>
 
         <Card x={cx(1)} y={R1} w={CARD_W} h={CARD_H} at={assumeAt - 4} title="Unstated assumptions" dim={quietAt} undim={lift - 4}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Assumed at={sortedAt} first>
-              sorted?
+              Sorted?
             </Assumed>
-            <Assumed at={uniqueAt}>unique?</Assumed>
+            <Assumed at={uniqueAt}>Unique?</Assumed>
           </div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Assumed at={nullAt} first>
-              not null?
+              Not null?
             </Assumed>
             <Assumed at={asciiAt}>ASCII?</Assumed>
           </div>
@@ -293,7 +293,7 @@ export const BugsScene: React.FC = () => {
             <span style={{ color: ACCENT_INK, fontWeight: 500 }}>{kind}:</span> {message}
           </div>
           <Line at={packageAt} color={ACCENT_INK}>
-            an invented package name:{" "}
+            An invented package name:{" "}
             <span style={{ opacity: ease(frame, registerAt - 2, 10), marginLeft: "-0.14em" }}>
               <Mark at={registeredAt} color={MARK_BAD}>
                 an attacker can register it
@@ -308,7 +308,7 @@ export const BugsScene: React.FC = () => {
             <Code line="    pass" size={21} />
           </div>
           <Line at={hidesAt} color={ACCENT_INK}>
-            hides the failure from the caller
+            Hides the failure from the caller
           </Line>
         </Card>
 
@@ -318,8 +318,8 @@ export const BugsScene: React.FC = () => {
               <Code line={'f"... WHERE id = {user_id}"'} size={20} />
             </Mark>
           </div>
-          <Line at={secretsAt}>a secret pasted into the code</Line>
-          <Line at={authAt}>a missing authorization check</Line>
+          <Line at={secretsAt}>A secret pasted into the code</Line>
+          <Line at={authAt}>A missing authorization check</Line>
         </Card>
 
         <Card
@@ -334,26 +334,26 @@ export const BugsScene: React.FC = () => {
           to={{ x: cx(2), y: R1, at: lift }}
         >
           <Line at={assertAt} color={ACCENT_INK} icon={<Cross at={assertAt + 4} size={20} />}>
-            asserts what the code does
+            Asserts what the code does
           </Line>
           <Line at={proveAt - 10} color={OK_INK} icon={<Tick at={proveAt - 6} size={22} />}>
-            passes, <Mark at={proveAt}>and proves nothing</Mark>
+            Passes, <Mark at={proveAt}>and proves nothing</Mark>
           </Line>
         </Card>
 
         <Card x={cx(3)} y={R2} w={CARD_W} h={CARD_H} at={creepAt - 4} title="Scope creep" dim={quietAt} out={gone}>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <DiffRow at={creepAt + 4} add>
-              the change asked for
+              The change asked for
             </DiffRow>
             <DiffRow at={renamedAt} add={false}>
-              renamed variables
+              Renamed variables
             </DiffRow>
             <DiffRow at={reformatAt} add={false}>
-              reformatted files
+              Reformatted files
             </DiffRow>
             <DiffRow at={unrelatedAt} add={false}>
-              unrelated edits
+              Unrelated edits
             </DiffRow>
           </div>
         </Card>

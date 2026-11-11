@@ -150,7 +150,7 @@ export const FrameScene: React.FC = () => {
           bands={peers.map((row) => ({ row, at: sameDayAt, color: MARK }))}
         />
         <Note at={sliceAt} x={TABLE_X} y={pg.rowTop(P.rows.length) + h(24)} out={out78} width={420}>
-          <span style={{ ...note(24, INK_SOFT) }}>the frame: the rows the function sees for this one</span>
+          <span style={{ ...note(24, INK_SOFT) }}>The frame: the rows the function sees for this one</span>
         </Note>
         <RowBracket
           g={pg}
@@ -232,11 +232,11 @@ export const FrameScene: React.FC = () => {
           </span>
         </Note>
         <Note at={tiedAt + 4} x={rg.right + 30} y={rg.rowTop(1) + h(8)} out={leaveOutAt - 2}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>tied days share one total</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Tied days share one total</span>
         </Note>
         <Note at={writeAt} x={rg.right + 30} y={rg.rowTop(1) + h(50)} out={leaveOutAt - 2}>
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
-            row by row: <QMono>ROWS</QMono> and a unique <QMono>ORDER BY</QMono>
+            Row by row: <QMono>ROWS</QMono> and a unique <QMono>ORDER BY</QMono>
           </span>
         </Note>
         {/* No ORDER BY: a second result, every total the partition's. */}
@@ -250,14 +250,14 @@ export const FrameScene: React.FC = () => {
         />
         <Note at={noFrameAt + 4} x={LIST_X} y={rg.rowTop(R.rows.length) + h(22)} out={leaveOutAt - 2}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            no frame: <QMono>RANGE</QMono> from the start to this row
+            No frame: <QMono>RANGE</QMono> from the start to this row
           </span>
         </Note>
         <Note at={runningAt + 4} x={LIST_X} y={rg.rowTop(R.rows.length) + h(62)} out={leaveOutAt - 2}>
-          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>a running total, not the total</span>
+          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>A running total, not the total</span>
         </Note>
         <Note at={sixOhFiveAt + 6} x={LIST_X} y={rg.rowTop(R.rows.length) + h(22)} out={out78}>
-          <span style={{ ...note(25, OK_INK), whiteSpace: "nowrap" }}>no ORDER BY: the whole partition</span>
+          <span style={{ ...note(25, OK_INK), whiteSpace: "nowrap" }}>No ORDER BY: the whole partition</span>
         </Note>
 
         {/* ── Question 8: LAST_VALUE, with the default frame and widened ── */}
@@ -271,7 +271,7 @@ export const FrameScene: React.FC = () => {
           marks={LD.rows.map((_, row) => ({ row, col: lc, at: ownAt + row * 3, color: MARK_BAD }))}
         />
         <Note at={ownAt + 8} x={ldg.right + 24} y={ldg.rowTop(1)} out={firstAt - 2}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>each row&apos;s own amount</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>Each row&apos;s own amount</span>
         </Note>
         <Listing lines={LW.lines} x={1000} top={y(TOP)} width={800} size={SIZE} at={widenAt - 4} marks={[{ line: 2, at: widenAt + 6, color: MARK_OK }, { line: 3, at: widenAt + 10, color: MARK_OK }]} />
         <DataTable
@@ -307,7 +307,7 @@ export const FrameScene: React.FC = () => {
         />
         <Note at={realAt + 8} x={1000} y={lwg.rowTop(LW.rows.length) + h(20)}>
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>
-            <Mark at={bridgeAt}>the real last day: {LW.rows[0][lc]}</Mark>
+            <Mark at={bridgeAt}>The real last day: {LW.rows[0][lc]}</Mark>
           </span>
         </Note>
         </AbsoluteFill>

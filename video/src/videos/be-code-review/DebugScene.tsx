@@ -214,7 +214,7 @@ export const DebugScene: React.FC = () => {
           </span>
         </Note>
         <Note at={allowedAt} x={120} y={y(480)} out={introOut}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>where an assistant is allowed, the brief:</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Where an assistant is allowed, the brief:</span>
         </Note>
         <Ink at={plainAt} dur={20} out={introOut} style={{ left: 120, top: y(525), ...body(44, true), color: INK, whiteSpace: "nowrap" }}>
           <Mark at={readAt}>&ldquo;read, debug and optimize&rdquo;</Mark> an existing codebase
@@ -298,14 +298,14 @@ export const DebugScene: React.FC = () => {
 
         {/* ── What it returns: the report and the reproduction ── */}
         <Note at={reportAt} x={R_X} y={top - 6}>
-          <span style={{ ...R_LABEL, whiteSpace: "nowrap" }}>the bug report</span>
+          <span style={{ ...R_LABEL, whiteSpace: "nowrap" }}>The bug report</span>
         </Note>
         <Note at={mergingAt} x={R_X} y={top + 30}>
           <Py text={DEBUG.report.arg} size={22} />
         </Note>
         <Note at={eightSixAt - 6} x={R_X} y={top + 70}>
           <span style={{ display: "flex", gap: 14, alignItems: "center", fontSize: 22, whiteSpace: "nowrap" }}>
-            <span style={note(22, INK_SOFT)}>returns</span>
+            <span style={note(22, INK_SOFT)}>Returns</span>
             <Swap
               versions={[
                 { at: eightSixAt - 6, text: DEBUG.report.repr ?? "", ink: ACCENT_INK },
@@ -316,14 +316,14 @@ export const DebugScene: React.FC = () => {
           </span>
         </Note>
         <Note at={threeFourAt - 6} x={R_X} y={top + 144}>
-          <span style={{ ...R_LABEL, whiteSpace: "nowrap" }}>the reproduction</span>
+          <span style={{ ...R_LABEL, whiteSpace: "nowrap" }}>The reproduction</span>
         </Note>
         <Note at={threeFourAt} x={R_X} y={top + 180}>
           <Py text={DEBUG.repro.arg} size={22} />
         </Note>
         <Note at={threeTwoAt - 4} x={R_X} y={top + 220}>
           <span style={{ display: "flex", gap: 14, alignItems: "center", fontSize: 22, whiteSpace: "nowrap" }}>
-            <span style={note(22, INK_SOFT)}>returns</span>
+            <span style={note(22, INK_SOFT)}>Returns</span>
             <Swap
               versions={[
                 { at: threeTwoAt - 4, text: DEBUG.repro.repr ?? "", ink: ACCENT_INK },
@@ -336,11 +336,11 @@ export const DebugScene: React.FC = () => {
 
         {/* ── Step 1: what the loop relies on ── */}
         <Note at={lastAt} x={LIST_X} y={B} out={step2 - 6}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>each interval is compared only with the last one merged</span>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>Each interval is compared only with the last one merged</span>
         </Note>
         <Note at={orderAt} x={LIST_X} y={B + 58} out={step2 - 6}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            safe only if <Mark at={orderAt + 6}>the order</Mark> holds
+            Safe only if <Mark at={orderAt + 6}>the order</Mark> holds
           </span>
         </Note>
 
@@ -348,7 +348,7 @@ export const DebugScene: React.FC = () => {
         <DiffListing lines={LISTINGS.reproTest} diff={false} x={LIST_X} top={B} width={diffWidth(LISTINGS.reproTest, 20, false)} size={20} at={asTestAt} out={step3 - 6} />
         <Note at={enoughAt} x={LIST_X} y={B + diffHeight(2, 20) + 22} out={step3 - 6}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            with ends 0 to 4, no single interval fails; {DEBUG.search.twoIntervals} of {DEBUG.search.inputsOfTwo} pairs do
+            With ends 0 to 4, no single interval fails; {DEBUG.search.twoIntervals} of {DEBUG.search.inputsOfTwo} pairs do
           </span>
         </Note>
 
@@ -376,7 +376,7 @@ export const DebugScene: React.FC = () => {
         {/* ── The hypothesis, tested from outside ── */}
         <Note at={hypoAt} x={LIST_X} y={B} out={aiAt - 6}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            hypothesis: the loop assumes its input is <Mark at={sortedAt + 10}>sorted</Mark>
+            Hypothesis: the loop assumes its input is <Mark at={sortedAt + 10}>sorted</Mark>
           </span>
         </Note>
         <Note at={beforeAt} x={LIST_X} y={B + 60} out={aiAt - 6}>
@@ -391,7 +391,7 @@ export const DebugScene: React.FC = () => {
         {/* ── Step 4: the symptom patched, then the cause ── */}
         <Note at={emptyAt + 6} x={LIST_X} y={B} out={causeAt - 4}>
           <span style={{ whiteSpace: "nowrap", ...note(26, ACCENT_INK) }}>
-            three intervals in, <Py text={DEBUG.symptomReport.repr ?? ""} size={26} ink={ACCENT_INK} /> out,{" "}
+            Three intervals in, <Py text={DEBUG.symptomReport.repr ?? ""} size={26} ink={ACCENT_INK} /> out,{" "}
             <FadeIn at={noErrorAt}>
               <Mark at={noErrorAt + 4} color={MARK_BAD}>
                 and no error at all
@@ -401,7 +401,7 @@ export const DebugScene: React.FC = () => {
         </Note>
         <Note at={rerunAt} x={LIST_X} y={B} out={hereAt}>
           <span style={{ display: "flex", gap: 16, alignItems: "center", whiteSpace: "nowrap", fontSize: 22 }}>
-            <span style={note(22, INK_SOFT)}>rerun</span>
+            <span style={note(22, INK_SOFT)}>Rerun</span>
             {DEBUG.causeTests.tests.map((t, i) => (
               <span key={t.name} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 21 }}>
                 <Verdict ok={t.ok} at={allAt + 2 + i * 4} size={24} />
@@ -432,7 +432,7 @@ export const DebugScene: React.FC = () => {
 
         {/* ── With an assistant ── */}
         <Note at={aiAt} x={LIST_X} y={B - 4} out={step4 - 6}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>ask an assistant</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Ask an assistant</span>
         </Note>
         {[
           { at: doesAt, text: "What does this function do?" },
@@ -444,7 +444,7 @@ export const DebugScene: React.FC = () => {
         ))}
         <Note at={noSubAt + 4} x={LIST_X} y={B + 162} out={step4 - 6}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            no substitute for <Mark at={noSubAt + 10}>step 2, reproducing it</Mark>
+            No substitute for <Mark at={noSubAt + 10}>step 2, reproducing it</Mark>
             <FadeIn at={guessAt}>: its answer is a hypothesis,</FadeIn>
             <FadeIn at={provesAt}> a failing test proves it</FadeIn>
           </span>
@@ -458,8 +458,8 @@ export const DebugScene: React.FC = () => {
           width={830}
           headAt={testsAt}
           cols={[
-            { title: "before the fix", x: LIST_X + 600 },
-            { title: "after", x: LIST_X + 760 },
+            { title: "Before the fix", x: LIST_X + 600 },
+            { title: "After", x: LIST_X + 760 },
           ]}
           rows={DEBUG.keptBefore.tests.map((t, i) => {
             const isRepro = t.name === "test_reproduction";
@@ -476,7 +476,7 @@ export const DebugScene: React.FC = () => {
           })}
         />
         <Note at={neitherAt + 4} x={LIST_X + 860} y={B + 54}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>neither tested the order</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Neither tested the order</span>
         </Note>
         <Note at={keepAt + 14} x={LIST_X + 860} y={B + 114}>
           <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
@@ -487,7 +487,7 @@ export const DebugScene: React.FC = () => {
         {/* ── And the lines beside the sort ── */}
         <Note at={oneBugAt} x={LIST_X} y={B + 176}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            the report found one bug;{" "}
+            The report found one bug;{" "}
             <FadeIn at={twoMoreAt}>
               <span style={{ color: ACCENT_INK }}>two more sit beside the sort</span>
             </FadeIn>

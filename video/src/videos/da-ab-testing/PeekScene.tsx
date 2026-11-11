@@ -165,13 +165,13 @@ export const PeekScene: React.FC = () => {
         </Note>
         {/* Why, then the fix, in the empty upper right. */}
         <Note at={lookAt - 2} x={X0 + 980} y={y(CHART.top) - h(84)}>
-          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>every look: one more chance to cross by luck</span>
+          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>Every look: one more chance to cross by luck</span>
           <div style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, farAt - 2, 10) }}>
-            false winners: far more than <Num>{Math.round(ALPHA * 100)}%</Num> of the time
+            False winners: far more than <Num>{Math.round(ALPHA * 100)}%</Num> of the time
           </div>
         </Note>
         <Note at={fixAt - 2} x={X0 + 980} y={y(CHART.top) + h(14)}>
-          <span style={{ ...note(25, OK_INK), whiteSpace: "nowrap" }}>fix the sample size first and look once,</span>
+          <span style={{ ...note(25, OK_INK), whiteSpace: "nowrap" }}>Fix the sample size first and look once,</span>
           <div style={{ ...note(25, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, seqAt - 2, 10) }}>
             or use a sequential test
             <span style={{ opacity: ease(frame, stricterAt - 2, 10) }}>: a stricter line per look</span>

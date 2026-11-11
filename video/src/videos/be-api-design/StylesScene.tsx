@@ -57,34 +57,34 @@ export const StylesScene: React.FC = () => {
   const figTop = y(400);
   const plusTop = y(625);
   const heads = [
-    { name: "REST", what: "resources over HTTP and JSON", at: restAt },
-    { name: "GraphQL", what: "the client names its fields", at: gqlAt },
+    { name: "REST", what: "Resources over HTTP and JSON", at: restAt },
+    { name: "GraphQL", what: "The client names its fields", at: gqlAt },
     { name: "gRPC", what: "Protocol Buffers over HTTP/2", at: grpcAt },
   ];
   const lines: { plus: [string, number][]; minus: [string, number][] }[] = [
     {
       plus: [
-        ["understood everywhere, easy to cache", understoodAt],
-        ["the safe default for a public API", defaultAt],
+        ["Understood everywhere, easy to cache", understoodAt],
+        ["The safe default for a public API", defaultAt],
       ],
-      minus: [["round trips, fields it never shows", fieldsAt]],
+      minus: [["Round trips, fields it never shows", fieldsAt]],
     },
     {
       plus: [
-        ["exactly the fields, in one query", oneAt + 6],
-        ["suits rich, varied front ends", richAt],
+        ["Exactly the fields, in one query", oneAt + 6],
+        ["Suits rich, varied front ends", richAt],
       ],
       minus: [
-        ["caching and rate limits get harder", harderAt],
-        ["a limit weighs each query's cost", weighAt],
+        ["Caching and rate limits get harder", harderAt],
+        ["A limit weighs each query's cost", weighAt],
       ],
     },
     {
       plus: [
-        ["fast, strongly typed, streams", fastAt],
-        ["ideal between internal services", internalAt],
+        ["Fast, strongly typed, streams", fastAt],
+        ["Ideal between internal services", internalAt],
       ],
-      minus: [["weak browser support, not human-readable", browserAt]],
+      minus: [["Weak browser support, not human-readable", browserAt]],
     },
   ];
   const trips = ["GET /articles/42", "GET /users/7", "GET /articles/42/comments"];
@@ -143,7 +143,7 @@ export const StylesScene: React.FC = () => {
 
         {/* REST: one screen, three round trips. */}
         <Note at={screenAt} x={COLS[0]} y={figTop}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>one screen: an article, its author, its comments</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>One screen: an article, its author, its comments</span>
         </Note>
         {trips.map((t, i) => {
           const at = screenAt + 8 + i * 8;

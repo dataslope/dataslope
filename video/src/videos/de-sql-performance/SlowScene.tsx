@@ -139,19 +139,19 @@ export const SlowScene: React.FC = () => {
         <RowGrid x={GRID_X} top={gridTop} cell={CELL} gap={PITCH - CELL} at={seqAt - 4} sweep={{ from: everyAt, to: everyAt + 50 }} hits={hits} hitAt={keptAt} hitDot out={q2At - 4} />
         <div style={{ position: "absolute", left: GRID_X, top: gridTop + 20 * PITCH + h(20), display: "flex", gap: 44, opacity: 1 - ease(frame, q2At - 4, 10) }}>
           <div style={{ opacity: ease(frame, everyAt, 10) }}>
-            <div style={{ ...label(21, INK_SOFT) }}>read</div>
+            <div style={{ ...label(21, INK_SOFT) }}>Read</div>
             <div style={{ ...headline(48), color: BLUE_INK }}>
               <Counter from={everyAt} to={everyAt + 50} value={SLOW.orders} />
             </div>
           </div>
           <div style={{ opacity: ease(frame, keptAt, 10) }}>
-            <div style={{ ...label(21, INK_SOFT) }}>kept</div>
+            <div style={{ ...label(21, INK_SOFT) }}>Kept</div>
             <div style={{ ...headline(48), color: INK }}>
               <Num>{SLOW.kept}</Num>
             </div>
           </div>
           <div style={{ opacity: ease(frame, awayAt, 10) }}>
-            <div style={{ ...label(21, INK_SOFT) }}>thrown away</div>
+            <div style={{ ...label(21, INK_SOFT) }}>Thrown away</div>
             <div style={{ ...headline(48), color: ACCENT_INK }}>
               <Num>{thousands(SLOW.removed)}</Num>
             </div>
@@ -167,9 +167,9 @@ export const SlowScene: React.FC = () => {
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Also:</span>
             <div>
               {[
-                { at: earlyAt, text: "filter early" },
-                { at: colsAt, text: "select only the columns you need" },
-                { at: pruneAt, text: "prune partitions" },
+                { at: earlyAt, text: "Filter early" },
+                { at: colsAt, text: "Select only the columns you need" },
+                { at: pruneAt, text: "Prune partitions" },
               ].map((fix) => (
                 <div key={fix.text} style={{ ...note(24, INK), whiteSpace: "nowrap", height: h(40), opacity: ease(frame, fix.at - 2, 12) }}>
                   {fix.text}
@@ -241,9 +241,9 @@ export const SlowScene: React.FC = () => {
           </div>
         </Note>
         <Note at={compareAt} x={RIGHT_X} y={q2ListTop + h(4)} out={analyzeAt}>
-          <div style={{ ...label(21, INK_SOFT) }}>orders it expected</div>
+          <div style={{ ...label(21, INK_SOFT) }}>Orders it expected</div>
           <div style={{ ...headline(64), color: ACCENT_INK, ...TABULAR }}>{EXPLAIN.staleEstimate}</div>
-          <div style={{ ...label(21, INK_SOFT), marginTop: h(14), opacity: ease(frame, expectedAt + 10, 10) }}>orders it got</div>
+          <div style={{ ...label(21, INK_SOFT), marginTop: h(14), opacity: ease(frame, expectedAt + 10, 10) }}>Orders it got</div>
           <div style={{ ...headline(64), color: BLUE_INK, opacity: ease(frame, expectedAt + 10, 10) }}>
             <Num>{thousands(EXPLAIN.staleActual)}</Num>
           </div>
@@ -256,7 +256,7 @@ export const SlowScene: React.FC = () => {
         <Note at={analyzeAt} x={RIGHT_X} y={q2ListTop + h(4)}>
           <Listing lines={["ANALYZE orders;"]} x={0} top={0} width={300} size={22} at={analyzeAt} />
           <div style={{ position: "absolute", top: listingHeight(1, 22) + h(24), ...label(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, closeAt, 10) }}>
-            new estimate
+            New estimate
           </div>
           <div style={{ position: "absolute", top: listingHeight(1, 22) + h(54), ...headline(64), color: OK_INK, whiteSpace: "nowrap", opacity: ease(frame, closeAt, 10) }}>
             <Num>{thousands(EXPLAIN.freshEstimate)}</Num>

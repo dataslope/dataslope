@@ -176,7 +176,7 @@ export const HookScene: React.FC = () => {
             ...note(28, INK),
           }}
         >
-          an <b>A/B test</b>: random groups, one change, one comparison
+          An <b>A/B test</b>: random groups, one change, one comparison
         </div>
 
         {/* ── Nineteen questions: each count on a line of its own over its

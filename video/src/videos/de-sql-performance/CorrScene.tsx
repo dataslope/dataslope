@@ -117,7 +117,7 @@ export const CorrScene: React.FC = () => {
           ]}
         />
         <Note at={perRowAt} x={R_X} y={y(TOP)} out={countOut}>
-          <div style={{ ...label(21, INK_SOFT) }}>rows read</div>
+          <div style={{ ...label(21, INK_SOFT) }}>Rows read</div>
           <div style={{ ...note(30, INK), whiteSpace: "nowrap", marginTop: h(10) }}>
             <Num>{thousands(CORR.loops)}</Num> runs
             <span style={{ opacity: ease(frame, scanAt, 10) }}>
@@ -149,12 +149,12 @@ export const CorrScene: React.FC = () => {
         />
         {/* What each form reads: the count from before, and the rewrite's. */}
         <Note at={twiceAt} x={X0} y={y(TOP) + planHeight(CORR.rewritePlan.length, PLAN) + h(36)}>
-          <div style={{ ...label(21, INK_SOFT) }}>rows read</div>
+          <div style={{ ...label(21, INK_SOFT) }}>Rows read</div>
           <div style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, twentyAt, 10) }}>
-            rewrite: {CORR.rewriteScans} scans × <Num>{thousands(scanRows)}</Num> = <Num>{thousands(rewriteRead)}</Num>
+            Rewrite: {CORR.rewriteScans} scans × <Num>{thousands(scanRows)}</Num> = <Num>{thousands(rewriteRead)}</Num>
           </div>
           <div style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap", marginTop: h(6), opacity: ease(frame, notAt, 10) }}>
-            correlated: <Num>{thousands(CORR.loops)}</Num> × <Num>{thousands(CORR.perLoop)}</Num> = <Num>{thousands(total)}</Num>
+            Correlated: <Num>{thousands(CORR.loops)}</Num> × <Num>{thousands(CORR.perLoop)}</Num> = <Num>{thousands(total)}</Num>
           </div>
         </Note>
         <Note at={onceAt} x={R_X} y={rewriteTop - h(46)}>
@@ -163,7 +163,7 @@ export const CorrScene: React.FC = () => {
         <Listing lines={CORR.rewrite} x={R_X} top={rewriteTop} width={640} size={20} at={onceAt} marks={[{ line: "WITH dept_avgs", at: cteAt + 4, color: MARK_OK }]} />
         <Note at={sameAt + 4} x={R_X} y={rewriteTop + listingHeight(CORR.rewrite.length, 20) + h(18)}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 10, ...note(24, INK), whiteSpace: "nowrap" }}>
-            the same rows: <Num>{CORR.differ}</Num> differ
+            The same rows: <Num>{CORR.differ}</Num> differ
             <Tick at={sameAt + 12} size={24} color={OK} />
           </span>
         </Note>

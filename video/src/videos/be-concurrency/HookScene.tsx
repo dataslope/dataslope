@@ -135,9 +135,9 @@ export const HookScene: React.FC = () => {
   const lineBottom = y(690);
 
   const shared = [
-    { id: "counter", name: "a counter", at: counterAt, x: 1000 },
-    { id: "lock", name: "a lock", at: lockAt, x: 1270 },
-    { id: "connection", name: "a connection", at: connAt, x: 1540 },
+    { id: "counter", name: "A counter", at: counterAt, x: 1000 },
+    { id: "lock", name: "A lock", at: lockAt, x: 1270 },
+    { id: "connection", name: "A connection", at: connAt, x: 1540 },
   ];
 
   return (
@@ -225,7 +225,7 @@ export const HookScene: React.FC = () => {
           </Note>
           <Note at={queueAt - 2} x={X0} y={y(470)} out={onceAt - 2}>
             <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", fontSize: 24, gap: "0.5em" }}>
-              <span>the queue grows</span>
+              <span>The queue grows</span>
               <span style={{ display: "inline-flex", gap: 8 }}>
                 {Array.from({ length: queued }, (_, k) => (
                   <span key={k} style={{ width: 16, height: 16, borderRadius: 8, background: ACCENT, opacity: ease(frame, queueAt + (k - 1) * 5, 6) }} />

@@ -125,19 +125,19 @@ const Variance: React.FC<{ c: Ctx }> = ({ c }) => {
       })}
       <Note at={squaredAt - 2} x={R_X + 40} y={row(0)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          <b>variance</b>: the average squared distance from the mean
+          <b>Variance</b>: the average squared distance from the mean
         </span>
       </Note>
       <Note at={rootAt - 2} x={R_X + 40} y={row(1)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          <b>standard deviation</b>: its square root
+          <b>Standard deviation</b>: its square root
           <span style={{ opacity: ease(frame, unitsAt - 2, 10) }}>, in the data&apos;s own units</span>
         </span>
       </Note>
       {/* The page's 10 to 50, worked: the squares, then both divisors. */}
       <Note at={Math.min(takeAt + 8, squaresAt) - 2} x={R_X + 40} y={row(2)}>
         <span style={{ ...note(26, BLUE_INK), whiteSpace: "nowrap" }}>
-          squared: <Num>{V.squares.map(count).join(" + ")}</Num>
+          Squared: <Num>{V.squares.map(count).join(" + ")}</Num>
           <span style={{ opacity: ease(frame, sumAt - 2, 10) }}>
             {" "}= <b><Num>{count(V.sumSquares)}</Num></b>
           </span>
@@ -162,12 +162,12 @@ const Variance: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={closerAt - 2} x={R_X + 40} y={row(5)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          a sample&apos;s own mean sits closer to its points, so ÷ n comes out small
+          A sample&apos;s own mean sits closer to its points, so ÷ n comes out small
         </span>
       </Note>
       <Note at={sdAt - 4} x={R_X + 40} y={row(6)}>
         <span style={{ ...note(28, BLUE_INK), whiteSpace: "nowrap" }}>
-          standard deviation: <Num>√{fmt(V.var, 0)} =</Num> <b><Num>{fmt(V.std)}</Num></b>
+          Standard deviation: <Num>√{fmt(V.var, 0)} =</Num> <b><Num>{fmt(V.std)}</Num></b>
         </span>
       </Note>
     </>
@@ -188,7 +188,7 @@ const Mode: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={at0 - 4} x={R_X + 40} y={top - c.h(10)}>
-        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>support tickets, by type</span>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Support tickets, by type</span>
       </Note>
       {rows.map(([name, count], i) => {
         const p = ease(frame, at0 + 4 + i * 3, 14);
@@ -219,10 +219,10 @@ const Mode: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* Well clear of the billing bar's count, so the two read as a count
           and a note about it rather than as one line in two sizes. */}
       <Note at={billingAt + 4} x={barX + 3 * unit + 110} y={top + c.h(50)}>
-        <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>mode: {RAPID.mode.mode}</span>
+        <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Mode: {RAPID.mode.mode}</span>
       </Note>
       <Note at={twoAt - 2} x={R_X + 40} y={top + c.h(330)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>two peaks in a distribution? check for two groups</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Two peaks in a distribution? check for two groups</span>
       </Note>
     </>
   );
@@ -287,7 +287,7 @@ const Normal: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* Why an analyst cares: the averages are near-normal, whatever the data. */}
       <Note at={whyAt - 2} x={R_X + 40} y={c.y(306)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          <b>why it matters</b>: a big sample&apos;s average comes out close to normal,
+          <b>Why it matters</b>: a big sample&apos;s average comes out close to normal,
         </span>
       </Note>
       <Note at={evenAt - 2} x={R_X + 40} y={c.y(306) + c.h(38)}>
@@ -334,12 +334,12 @@ const Population: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={at0 - 2} x={R_X + 40} y={c.y(340)}>
         <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-          <b>population</b>: everyone you care about (<Num>{P.count.toLocaleString("en-US")}</Num>)
+          <b>Population</b>: everyone you care about (<Num>{P.count.toLocaleString("en-US")}</Num>)
         </span>
       </Note>
       <Note at={sampleAt - 2} x={R_X + 40} y={c.y(390)}>
         <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-          <b>sample</b>: the part you measured (<Num>{P.size}</Num>)
+          <b>Sample</b>: the part you measured (<Num>{P.size}</Num>)
           <span style={{ opacity: ease(frame, estimateAt - 2, 10), color: INK_SOFT }}>; its mean is an estimate</span>
         </span>
       </Note>
@@ -378,7 +378,7 @@ const Population: React.FC<{ c: Ctx }> = ({ c }) => {
       )}
       <Note at={errorAt - 2} x={at(s, 52.4)} y={c.y(560)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          that scatter: <b>sampling error</b>
+          That scatter: <b>sampling error</b>
         </span>
       </Note>
     </>

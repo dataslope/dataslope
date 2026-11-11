@@ -228,7 +228,7 @@ export const CopyScene: React.FC = () => {
         />
         <Note at={sayAt - 2} x={MID_X} y={sg.rowTop(COPY.subset.rows.length) + h(30)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            A separate subset? Say so: <Mono>.copy()</Mono>
+            A separate subset? say so: <Mono>.copy()</Mono>
           </span>
         </Note>
         <Note at={versionAt - 2} x={MID_X} y={sg.rowTop(COPY.subset.rows.length) + h(76)}>

@@ -138,11 +138,11 @@ export const BiasScene: React.FC = () => {
           <div style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>mostly the unhappiest</div>
         </Note>
         <Note at={survivorAt - 2} x={NOTE_X} y={y(BAR_Y) - h(4)}>
-          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>survivorship bias</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Survivorship bias</span>
         </Note>
         <Note at={selfAt - 2} x={NOTE_X} y={y(BAR_Y) + h(34)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            <span style={{ opacity: ease(frame, pollAt, 10) }}>a web poll: </span>
+            <span style={{ opacity: ease(frame, pollAt, 10) }}>A web poll: </span>
             <b>self-selection</b>
           </span>
         </Note>
@@ -216,22 +216,22 @@ export const BiasScene: React.FC = () => {
         />
         <Dots dots={dots} r={8} opacity={0.55} />
         <Note at={scatterAt} x={NOTE_X} y={y(ROWS[0].y) - 16}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>they scatter</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>They scatter</span>
         </Note>
         <Note at={settleAt} x={NOTE_X} y={y(ROWS[2].y) - 16}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>they settle, on {fmt(BIAS.stayed)}</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>They settle, on {fmt(BIAS.stayed)}</span>
         </Note>
         <Note at={noiseAt} x={NOTE_X} y={y(ROWS[1].y) - 16}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>less noise…</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Less noise…</span>
         </Note>
         <Bracket x0={tx} x1={sx} y={y(478)} up at={nothingAt} color={ACCENT}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same bias</span>
         </Bracket>
         {/* In the plot's empty lower right, clear of the axis row and the notes column. */}
         {[
-          { at: Math.min(fixAt + 10, randomAt), text: "the fix: a random sample of everyone" },
+          { at: Math.min(fixAt + 10, randomAt), text: "The fix: a random sample of everyone" },
           { at: strataAt, text: "or stratified: a set share per group" },
-          { at: exitAt, text: "for those who left: an exit survey" },
+          { at: exitAt, text: "For those who left: an exit survey" },
         ].map((line, i) => (
           <Note key={line.text} at={line.at - 2} x={1060} y={y(ROWS[1].y) + h(50) + i * 32}>
             <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{line.text}</span>

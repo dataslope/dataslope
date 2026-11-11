@@ -95,9 +95,9 @@ export const WindowScene: React.FC = () => {
   const out1 = q2At - 4;
 
   const chips = [
-    { at: shareAt, clause: "PARTITION BY", text: "which rows share a window", hot: [splitsAt, startsAt] },
-    { at: orderAt, clause: "ORDER BY", text: "their order inside it", hot: [setsAt, setsAt + 40] },
-    { at: frameAt, clause: "ROWS …", text: "the frame around this row", hot: [] },
+    { at: shareAt, clause: "PARTITION BY", text: "Which rows share a window", hot: [splitsAt, startsAt] },
+    { at: orderAt, clause: "ORDER BY", text: "Their order inside it", hot: [setsAt, setsAt + 40] },
+    { at: frameAt, clause: "ROWS …", text: "The frame around this row", hot: [] },
   ];
 
   return (
@@ -242,7 +242,7 @@ export const WindowScene: React.FC = () => {
         />
         <Note at={againAt + 6} x={rg.right + 30} y={rg.rowTop(southFirst)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <Mark at={bridgeAt}>starts over at 1</Mark>
+            <Mark at={bridgeAt}>Starts over at 1</Mark>
           </span>
         </Note>
         </AbsoluteFill>

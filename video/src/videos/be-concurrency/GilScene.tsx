@@ -234,7 +234,7 @@ export const GilScene: React.FC = () => {
         </Ink>
         <Note at={oneLockAt} x={BOX.x} y={y(BOX.top + BOX.h + 26)} out={boxOut}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>one lock around the interpreter</b>
+            <b style={{ color: OK_INK }}>One lock around the interpreter</b>
             <span style={{ opacity: ease(frame, withoutAt, 10) }}>, not one on every object</span>
           </span>
         </Note>
@@ -271,7 +271,7 @@ export const GilScene: React.FC = () => {
         </Note>
         <Note at={nothingAt} x={brX + 36} y={opsTop + h(52)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            nothing promises
+            Nothing promises
             <br />
             the four run together
           </span>
@@ -279,7 +279,7 @@ export const GilScene: React.FC = () => {
         <Note at={stillAt} x={brX + 36} y={opsTop + h(150)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.4em" }}>
             <LockGlyph size={24} color={OK} />
-            <span style={{ background: MARK_OK, padding: "0 4px", borderRadius: 4 }}>the lock is still needed</span>
+            <span style={{ background: MARK_OK, padding: "0 4px", borderRadius: 4 }}>The lock is still needed</span>
           </span>
         </Note>
 
@@ -334,7 +334,7 @@ export const GilScene: React.FC = () => {
         </Note>
         <Note at={noGilAt + 20} x={X0} y={FREE_Y + h(90)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            free-threaded, opt-in (experimental in 3.13); this video&apos;s Python {PYTHON} is the default build, GIL {GIL_BUILD.enabled ? "on" : "off"}
+            Free-threaded, opt-in (experimental in 3.13); this video&apos;s Python {PYTHON} is the default build, GIL {GIL_BUILD.enabled ? "on" : "off"}
           </span>
         </Note>
       </Drift>
