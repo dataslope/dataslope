@@ -113,6 +113,8 @@ export const ScoringScene: React.FC = () => {
               {/* The approach's number on a tinted disc, 26px beside the 28px title. */}
               <span
                 style={{
+                  // The title's own face (Inter), so the line is one family.
+                  ...label(26, INK),
                   ...badgeStyle("blue", 26),
                   display: "inline-flex",
                   alignItems: "center",

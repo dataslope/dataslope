@@ -157,6 +157,8 @@ export const RecapScene: React.FC = () => {
                   {/* The step's number on a tinted disc: 22px beside the 24px name. */}
                   <span
                     style={{
+                      // The name's own face (Inter), so the line is one family.
+                      ...label(22, INK),
                       ...badgeStyle(i === 4 ? "red" : "gray", 22),
                       width: 34,
                       height: 34,

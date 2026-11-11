@@ -180,7 +180,7 @@ export const TwentyScene: React.FC = () => {
           <MathRun>
             <I>μ</I> = {KNOWN.mu}
           </MathRun>
-          <span style={{ ...note(21, INK_SOFT), marginLeft: 12, opacity: ease(frame, parameterAt + 4, 10) }}>never moves</span>
+          <span style={{ ...note(23, INK_SOFT), marginLeft: 12, opacity: ease(frame, parameterAt + 4, 10) }}>never moves</span>
         </span>
       </Note>
 
