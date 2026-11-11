@@ -182,7 +182,7 @@ export const RouteScene: React.FC = () => {
           );
         })}
         <Ink at={scoresAt + 10} dur={14} style={{ left: TABLE_X, top: y(LINE_Y[2]) + 56, whiteSpace: "nowrap" }}>
-          <span style={note(21, INK_SOFT)}>percent of questions right</span>
+          <span style={note(21, INK_SOFT)}>Percent of questions right</span>
         </Ink>
         {/* "...that looks like one": the table offered as the test. */}
         <Arrow from={[TABLE_X - 24, y(548)]} to={[GATE_X + GATE_W + 34, y(548)]} at={looksAt - 4} dur={14} color={TRAP} />

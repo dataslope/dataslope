@@ -125,7 +125,7 @@ export const IdfScene: React.FC = () => {
       <>
         <Ink at={at - 4} style={{ left: RX, top, whiteSpace: "nowrap" }}>
           <div style={{ ...label(27, INK) }}>
-            a match on <span style={{ color: inkColor }}>{name}</span>
+            A match on <span style={{ color: inkColor }}>{name}</span>
           </div>
         </Ink>
         <Ink at={docsAt} style={{ left: RX, top: top + R.docs, whiteSpace: "nowrap" }}>
@@ -234,7 +234,7 @@ export const IdfScene: React.FC = () => {
           {/* The two words as house badges, in the gray and the blue the
               rows and the grid below give them. */}
           <div style={{ display: "flex", alignItems: "baseline", gap: 14, ...label(23, INK_SOFT) }}>
-            a search for
+            A search for
             <Badge tone="gray" size={23}>
               a common word
             </Badge>
@@ -247,7 +247,7 @@ export const IdfScene: React.FC = () => {
         {row(
           ROW_A,
           commonAt,
-          "A common word",
+          "a common word",
           COMMON_INK,
           COMMON_INK,
           commonW,
@@ -261,7 +261,7 @@ export const IdfScene: React.FC = () => {
         {row(
           ROW_B,
           rareAt,
-          "A rare word",
+          "a rare word",
           DATA,
           DATA_INK,
           rareW,

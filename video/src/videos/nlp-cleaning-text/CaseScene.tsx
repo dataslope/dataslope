@@ -112,9 +112,13 @@ export const CaseScene: React.FC = () => {
           const m = ease(frame, foldingAt + i * 2, 20);
           if (m <= 0) return null;
           const g = group[i];
+          // Chips that fold onto one already there hand over to it as they
+          // land, so two copies of a word never sit one on the other.
+          const first = group.indexOf(g) === i;
           return (
             <Chip
               key={`m${i}`}
+              opacity={first ? 1 : 1 - ease(frame, foldingAt + i * 2 + 12, 8)}
               text={w}
               display={m > 0.5 ? CASE.folded[i] : w}
               x={lerp(X0, TX, m)}

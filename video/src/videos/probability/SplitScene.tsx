@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { body, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -241,9 +242,15 @@ export const SplitScene: React.FC = () => {
       <Ink at={givenAt - 4} dur={16} style={{ left: RIGHT, top: y(386), whiteSpace: "nowrap" }}>
         <Sweep at={indepWordAt - 2} dur={16} out={testInFrom - 6}>
           <span style={{ ...note(42, INK), fontWeight: 500 }}>
-            P(churn <span style={{ color: INK_SOFT }}>| plan</span>)
+            <MathRun>
+              <I>P</I>(churn <span style={{ color: INK_SOFT }}>| plan</span>)
+            </MathRun>
           </span>
-          <span style={{ ...note(42, INK), fontWeight: 500, opacity: ease(frame, withoutAt - 4, 12) }}> = P(churn)</span>
+          <span style={{ ...note(42, INK), fontWeight: 500, opacity: ease(frame, withoutAt - 4, 12) }}>
+            <MathRun>
+              {" "}= <I>P</I>(churn)
+            </MathRun>
+          </span>
         </Sweep>
       </Ink>
       <Note at={actAt} x={RIGHT} y={y(450)}>
@@ -310,13 +317,19 @@ export const SplitScene: React.FC = () => {
         ).map(([a, b, exprAt, fracAt, pAt, top, bottom, p, color]) => (
           <React.Fragment key={a}>
             <Held at={exprAt}>
-              P({a} <span style={{ color: INK_SOFT }}>| {b}</span>)
+              <MathRun>
+                <I>P</I>({a} <span style={{ color: INK_SOFT }}>| {b}</span>)
+              </MathRun>
             </Held>
             <Held at={fracAt}>
-              = {num(top)} / {num(bottom)}
+              <MathRun>
+                = {num(top)} / {num(bottom)}
+              </MathRun>
             </Held>
             <Held at={pAt}>
-              = <b style={{ color }}>{pct(p)}</b>
+              <MathRun>
+                = <b style={{ color }}>{pct(p)}</b>
+              </MathRun>
             </Held>
           </React.Fragment>
         ))}

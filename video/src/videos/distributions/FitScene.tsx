@@ -108,8 +108,8 @@ export const FitScene: React.FC = () => {
           <span style={label(22, INK_SOFT)}>The parameters</span>
         </Ink>
         {[
-          { name: "mean", value: FIT.loc, truth: FIT.trueLoc, digits: 2, at: knowAt, p: mean, yy: 474 },
-          { name: "spread", value: FIT.scale, truth: FIT.trueScale, digits: 2, at: knowAt + 6, p: spread, yy: 524 },
+          { name: "Mean", value: FIT.loc, truth: FIT.trueLoc, digits: 2, at: knowAt, p: mean, yy: 474 },
+          { name: "Spread", value: FIT.scale, truth: FIT.trueScale, digits: 2, at: knowAt + 6, p: spread, yy: 524 },
         ].map((r) => (
           <Ink key={r.name} at={r.at} dur={14} style={{ left: PANEL_X, top: y(r.yy), whiteSpace: "nowrap" }}>
             {/* One line, one size: the estimate stands out by color and

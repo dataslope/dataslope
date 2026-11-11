@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { body, headline, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -47,7 +48,9 @@ export const RvScene: React.FC = () => {
         <span style={label(23, INK_SOFT)}>Two flips</span>
       </Ink>
       <Ink at={countAt - 4} dur={12} style={{ left: 900, top: y(296), whiteSpace: "nowrap" }}>
-        <span style={label(23, INK_SOFT)}>X, the number of heads</span>
+        <span style={label(23, INK_SOFT)}>
+          <MathRun><I>X</I></MathRun>, the number of heads
+        </span>
       </Ink>
       {outcomes.map((o, i) => (
         <React.Fragment key={o}>

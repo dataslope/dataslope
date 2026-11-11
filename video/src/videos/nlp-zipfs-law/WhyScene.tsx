@@ -2,16 +2,18 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { HAIRLINE, INK, PAPER, TABULAR } from "../../editorial/style";
+import { HAIRLINE, INK, TABULAR } from "../../editorial/style";
 import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA, pct } from "./data";
-import { DATA_INK, EMPTY, Headline, Mark, POINT, POINT_INK, Spot, Strike, Tag } from "./kit";
+import { DATA_INK, DATA_WASH, Headline, Mark, POINT, POINT_INK, Spot, Strike, Tag } from "./kit";
 
 /** The top hundred as a 10 by 10 grid of word chips, in rank order. */
 const GX = 96;
+/** A plain chip: the gray badge's tint. */
+const CHIP_GRAY = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
 const CHIP_W = 126;
 const CHIP_H = 38;
 const COL = CHIP_W + 6;
@@ -80,8 +82,9 @@ export const WhyScene: React.FC = () => {
               height: CHIP_H,
               boxSizing: "border-box",
               borderRadius: 4,
-              background: kept > 0 ? `color-mix(in srgb, ${EMPTY} ${100 - 60 * kept}%, ${PAPER})` : EMPTY,
-              boxShadow: kept > 0 ? `inset 0 0 0 ${2 * kept}px color-mix(in srgb, ${DATA_INK} 70%, transparent)` : undefined,
+              // Fill only: gray for every word, a blue tint for the book's
+              // own words once the stopwords are struck (no ring).
+              background: kept > 0 ? `color-mix(in srgb, ${DATA_WASH} ${(100 * kept).toFixed(0)}%, ${CHIP_GRAY})` : CHIP_GRAY,
               opacity: p * (1 - 0.55 * struck),
               display: "flex",
               alignItems: "center",

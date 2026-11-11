@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { badgeStyle, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { A, A_INK, Arrow, B, Check, Cross, Drift, Headline, Marked, OK, Spot, Svg, Tag, TRAP, TRAP_INK, X0 } from "./parts";
@@ -113,7 +113,7 @@ export const MismatchScene: React.FC = () => {
 
         {/* Third on every leaderboard. */}
         <Ink at={thirdAt - 8} dur={12} out={out8} style={{ left: X0, top: y(BOARD_Y) - 46, whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>every public leaderboard</span>
+          <span style={label(22, INK_SOFT)}>Every public leaderboard</span>
         </Ink>
         {[0, 1, 2].map((k) => {
           const ry = y(BOARD_Y) + k * BOARD_STEP;
@@ -143,9 +143,27 @@ export const MismatchScene: React.FC = () => {
         return (
           <React.Fragment key={q.q}>
             <Ink at={at} dur={12} style={{ left: X0, top: ry - 20, whiteSpace: "nowrap" }}>
-              {/* The numeral in the question's own face, so the line is one
-                  size and one family. */}
-              <span style={{ ...body(40), color: A_INK, fontWeight: 500, display: "inline-block", width: 48 }}>{i + 1}</span>
+              {/* The numeral on a tinted disc, no ring, in the question's own
+                  face at 36px: within 12% of the 40px line. */}
+              <span
+                style={{
+                  ...badgeStyle("blue", 36),
+                  ...body(36),
+                  color: A_INK,
+                  fontWeight: 500,
+                  width: 52,
+                  height: 52,
+                  padding: 0,
+                  borderRadius: 26,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  verticalAlign: "middle",
+                  marginRight: 16,
+                }}
+              >
+                {i + 1}
+              </span>
               <span style={{ ...body(40), color: INK }}>{last ? <Marked at={lastAt - 2}>{q.q}</Marked> : q.q}</span>
             </Ink>
             <Ink at={at + 8} dur={12} style={{ left: 780, top: ry - 10, whiteSpace: "nowrap" }}>

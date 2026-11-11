@@ -323,10 +323,12 @@ export const SentenceScene: React.FC = () => {
             <Ink at={at} dur={10} style={{ left: LEGEND_X, ...middle }}>
               <span style={legendCode}>{m.letter}</span>
             </Ink>
-            <Arrow from={[LEGEND_X + 30, mid]} to={[LEGEND_X + 96, mid]} at={at + 4} dur={8} />
+            {/* From just past the key ("else" is four characters wide) to the
+                chip's edge. */}
+            <Arrow from={[LEGEND_X + m.letter.length * 0.6 * 26 + 12, mid]} to={[LEGEND_X + 128, mid]} at={at + 4} dur={8} />
             {/* The code as the WordNet pos row draws it, so "a" reads as a code. */}
-            <Chip text={m.pos} x={LEGEND_X + 98} y={top} at={at + 8} size={SIZE} />
-            <Ink at={at + 10} dur={10} style={{ left: LEGEND_X + 98 + chipWidth(m.pos, SIZE) + 14, ...middle }}>
+            <Chip text={m.pos} x={LEGEND_X + 130} y={top} at={at + 8} size={SIZE} />
+            <Ink at={at + 10} dur={10} style={{ left: LEGEND_X + 130 + chipWidth(m.pos, SIZE) + 14, ...middle }}>
               <span style={label(26, INK)}>
                 <Mark at={at + 8} out={at + 32}>
                   {m.name}

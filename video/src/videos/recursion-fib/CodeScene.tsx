@@ -104,7 +104,9 @@ export const CodeScene: React.FC = () => {
         marks={[{ line: 3, at: definitionAt - 2, from: 9, chars: 23 }]}
       />
       <Note at={definitionAt + 6} x={LIST_X} y={listingBottom + 22} from="up">
-        <span style={note(21, INK_SOFT)}>Every call with n above 1 makes two more calls.</span>
+        <span style={note(21, INK_SOFT)}>
+          Every call with <Mono>n</Mono> above 1 makes two more calls.
+        </span>
       </Note>
 
       {/* fib(40): the answer, then the bill. */}

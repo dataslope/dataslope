@@ -217,7 +217,7 @@ export const CloseScene: React.FC = () => {
           <div style={note(20, INK_SOFT)}>one standard deviation</div>
         </div>
         <Note at={varianceAt} x={640} y={y(600)} out={biasAt}>
-          <div style={{ ...body(30, true), color: INK }}>how far one sample&rsquo;s</div>
+          <div style={{ ...body(30, true), color: INK }}>How far one sample&rsquo;s</div>
           <div style={{ ...body(30, true), color: INK }}>
             average <Marker at={theNextAt - 2}>strays from the next</Marker>
           </div>
@@ -272,7 +272,7 @@ export const CloseScene: React.FC = () => {
         {/* Up as "centered" is said, and kept until the pile starts to move,
             which would cross it. */}
         <Note at={centeredAt} x={640} y={y(600)} out={betterAt - 4}>
-          <div style={{ ...body(30, true), color: INK }}>where the averages</div>
+          <div style={{ ...body(30, true), color: INK }}>Where the averages</div>
           <div style={{ ...body(30, true), color: EASY_INK }}>center, right or wrong</div>
         </Note>
       </div>

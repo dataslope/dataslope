@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { body, fmt, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -102,7 +103,9 @@ export const BayesScene: React.FC = () => {
         <Ink at={inverseFrom + 4} dur={16} style={{ left: 160, top: y(300), whiteSpace: "nowrap" }}>
           <div style={label(23, INK_SOFT)}>Among the sick</div>
           <div style={{ ...note(32, INK), marginTop: 10 }}>
-            P(positive <span style={{ color: INK_SOFT }}>| sick</span>)
+            <MathRun>
+              <I>P</I>(positive <span style={{ color: INK_SOFT }}>| sick</span>)
+            </MathRun>
           </div>
           <div>
             <Held at={sickPeopleAt - 6}>
@@ -118,7 +121,9 @@ export const BayesScene: React.FC = () => {
         <Ink at={backwardsAt - 4} dur={16} style={{ left: 860, top: y(300), whiteSpace: "nowrap" }}>
           <div style={label(23, INK_SOFT)}>Among the positives</div>
           <div style={{ ...note(32, INK), marginTop: 10 }}>
-            P(sick <span style={{ color: INK_SOFT }}>| positive</span>)
+            <MathRun>
+              <I>P</I>(sick <span style={{ color: INK_SOFT }}>| positive</span>)
+            </MathRun>
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 28 }}>
             <Held at={positivesAt - 6}>
@@ -141,12 +146,19 @@ export const BayesScene: React.FC = () => {
         {/* ── Bayes' rule, and the base rate. "One" is the test's own rate,
              what the arrow starts from; "the other" is the one you want. ── */}
         <Ink at={bayesAt - 4} dur={18} style={{ left: 160, top: y(540), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(30, INK) }}>
-            <Sweep at={Math.max(otherAt - 2, oneAt + 10)}>P(sick | positive)</Sweep> ={" "}
-            <Sweep at={oneAt - 2}>P(positive | sick)</Sweep> ×{" "}
+          {/* Bayes' rule in the math face, as the site's KaTeX sets it. */}
+          <MathRun style={{ fontSize: 32, color: INK }}>
+            <Sweep at={Math.max(otherAt - 2, oneAt + 10)}>
+              <I>P</I>(sick | positive)
+            </Sweep>{" "}
+            ={" "}
+            <Sweep at={oneAt - 2}>
+              <I>P</I>(positive | sick)
+            </Sweep>{" "}
+            ×{" "}
             <span style={{ position: "relative", display: "inline-block" }}>
               <Sweep at={baseAt - 2} color={`color-mix(in srgb, ${DATA} 35%, transparent)`}>
-                P(sick)
+                <I>P</I>(sick)
               </Sweep>
               {/* The base rate, named right above the term it is. */}
               <span
@@ -164,21 +176,26 @@ export const BayesScene: React.FC = () => {
                 the base rate, 1 in {num(TEST.oneIn)}
               </span>
             </span>{" "}
-            ÷ P(positive)
-          </span>
+            ÷ <I>P</I>(positive)
+          </MathRun>
         </Ink>
         <Note at={beforeAt} x={160} y={y(600)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            = {TEST.sensitivity} × {TEST.baseRate} ÷ {fmt(TEST.pPos, 5)} ={" "}
-            <b style={{ color: STAT_INK }}>
-              <Sweep at={testedAt - 2}>{fmt(TEST.ppv, 3)}</Sweep>
-            </b>
+            <MathRun>
+              = {TEST.sensitivity} × {TEST.baseRate} ÷ {fmt(TEST.pPos, 5)} ={" "}
+              <b style={{ color: STAT_INK }}>
+                <Sweep at={testedAt - 2}>{fmt(TEST.ppv, 3)}</Sweep>
+              </b>
+            </MathRun>
           </span>
         </Note>
         {/* Where the 0.01098 comes from: the tree's positives, sick or not. */}
         <Note at={beforeAt + 12} x={160} y={y(654)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            P(positive) = {num(TEST.positives)} / {num(TEST.population)}: everyone who tests positive
+            <MathRun>
+              <I>P</I>(positive) = {num(TEST.positives)} / {num(TEST.population)}
+            </MathRun>
+            : everyone who tests positive
           </span>
         </Note>
 

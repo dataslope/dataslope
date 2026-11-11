@@ -40,7 +40,7 @@ export const DATA = BAR;
 export const MARK_BAD = `color-mix(in srgb, ${ACCENT} 24%, transparent)`;
 /** A neutral wash for words that come back (repeats), so red stays for what
  *  the narration points at. */
-export const REPEAT_WASH = `color-mix(in srgb, ${INK_SOFT} 18%, transparent)`;
+export const REPEAT_WASH = `color-mix(in srgb, ${INK_SOFT} 26%, transparent)`;
 /** Ink set back from the figure being talked about. */
 export const FADED = `color-mix(in srgb, ${INK_SOFT} 34%, ${PAPER})`;
 export const RULE = `color-mix(in srgb, ${INK} 22%, transparent)`;
@@ -305,7 +305,7 @@ export type TileMark = { at: number; out?: number; color?: string };
  * then on to `to` over `to.dur`, with no arc.
  */
 /** A plain tile's fill: the gray badge's tint. */
-const TILE_FILL = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
+const TILE_FILL = "color-mix(in srgb, var(--ds-gray-400) 13%, transparent)";
 
 export const Tile: React.FC<{
   text: string;

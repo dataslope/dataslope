@@ -178,7 +178,7 @@ export const ExamplesScene: React.FC = () => {
         {/* The verdict at 20: how often the better one is ahead. */}
         <Ink at={aheadAt - 4} dur={14} style={{ left: RX0 - 30, top: y(318), whiteSpace: "nowrap" }}>
           <span style={{ ...note(24, INK), fontWeight: 500 }}>
-            better one ahead in{" "}
+            Better one ahead in{" "}
             <span style={{ color: A_INK, ...TABULAR }}>
               <Count at={aheadAt - 4} to={SIZES.aWins} dur={16} />
             </span>{" "}

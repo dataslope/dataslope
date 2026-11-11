@@ -240,7 +240,7 @@ export const TabScene: React.FC = () => {
         width={2.4 + refuse * 2}
       />
       <Tag x={1070} y={y(700)} at={labAt - 2} out={refusesAt + 4} size={23} color={INK}>
-        raised in a Berkeley <Mark at={labAt}>lab</Mark>, then by <Mark at={volunteersAt}>volunteers</Mark>
+        Raised in a Berkeley <Mark at={labAt}>lab</Mark>, then by <Mark at={volunteersAt}>volunteers</Mark>
       </Tag>
       <Tag x={1070} y={y(742)} at={salesAt - 2} out={refusesAt + 4} size={23} color={INK_SOFT}>
         not by a sales team

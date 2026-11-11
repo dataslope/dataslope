@@ -98,7 +98,7 @@ export const ContaminationScene: React.FC = () => {
         {rows.map((r, i) => (
           <React.Fragment key={r.situation}>
             <Ink at={rowAt[i]} dur={12} style={{ left: X0, top: rowY(i) - 16, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(26, INK), fontWeight: 500 }}>{r.situation}</span>
+              <span style={{ ...note(26, INK), fontWeight: 500 }}>{r.situation[0].toUpperCase() + r.situation.slice(1)}</span>
             </Ink>
             <Ink at={rowAt[i] + 8} dur={12} style={{ left: RESULT_X, top: rowY(i) - 16, whiteSpace: "nowrap" }}>
               <span
@@ -110,7 +110,7 @@ export const ContaminationScene: React.FC = () => {
                   transformOrigin: "0 50%",
                 }}
               >
-                <Marked at={sameAt - 2 + i * 4}>{r.reported}</Marked>
+                <Marked at={sameAt - 2 + i * 4}>{r.reported[0].toUpperCase() + r.reported.slice(1)}</Marked>
               </span>
             </Ink>
             <Svg opacity={ease(frame, rowAt[i] + 4, 12)}>

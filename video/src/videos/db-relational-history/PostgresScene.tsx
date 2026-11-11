@@ -162,7 +162,7 @@ export const PostgresScene: React.FC = () => {
             at: databaseAt - 2,
             children: (
               <>
-                built to be <Mark at={extendAt - 2} out={catchAt}>extended</Mark>,
+                Built to be <Mark at={extendAt - 2} out={catchAt}>extended,</Mark>
               </>
             ),
           },
@@ -171,7 +171,7 @@ export const PostgresScene: React.FC = () => {
             at: speakAt - 4,
             children: (
               <>
-                speaks POSTQUEL, <span style={{ color: ACCENT_INK, fontWeight: 500 }}>not SQL</span>
+                Speaks POSTQUEL, <span style={{ color: ACCENT_INK, fontWeight: 500 }}>not SQL</span>
               </>
             ),
           },
@@ -277,9 +277,9 @@ export const PostgresScene: React.FC = () => {
         accent
         title="PostgreSQL"
         lines={[
-          { at: goingAt - 2, children: "kept going by volunteers" },
-          { at: ninetySixAt - 2, children: "renamed in 1996" },
-          { at: officiallyAt - 2, children: "officially said:" },
+          { at: goingAt - 2, children: "Kept going by volunteers" },
+          { at: ninetySixAt - 2, children: "Renamed in 1996" },
+          { at: officiallyAt - 2, children: "Officially said:" },
         ]}
       />
       {/* The official name, said a syllable at a time under the card whose

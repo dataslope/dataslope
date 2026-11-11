@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { fmt, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { ds } from "../../theme/brand";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
@@ -91,10 +92,14 @@ export const DieScene: React.FC = () => {
       <Headline top={y(150)} first="Now, a decision" second="worth weighing." firstAt={decideFrom - 2} secondAt={weighAt - 2} />
       <FigLabel n="8" title="A loaded die: the chance of each face" at={expectedAt - 4} x={PMF.x0} y={y(268)} />
       <Ink at={loadedAt - 2} dur={14} style={{ left: PMF.x0, top: y(318), whiteSpace: "nowrap" }}>
-        <span style={note(22, INK_SOFT)}>X is the face rolled</span>
+        <span style={note(22, INK_SOFT)}>
+          <MathRun><I>X</I></MathRun> is the face rolled
+        </span>
       </Ink>
       <Ink at={expectedAt - 2} dur={14} style={{ left: RIGHT, top: y(318), whiteSpace: "nowrap" }}>
-        <span style={label(23, INK_SOFT)}>E[X], the expected value of X</span>
+        <span style={label(23, INK_SOFT)}>
+          <MathRun>E[<I>X</I>]</MathRun>, the expected value of <MathRun><I>X</I></MathRun>
+        </span>
       </Ink>
 
       {/* ── The pmf ── */}
@@ -260,7 +265,7 @@ export const DieScene: React.FC = () => {
       {/* ── The spread ── */}
       <Ink at={varianceAt - 4} dur={14} style={{ left: RIGHT, top: y(592), whiteSpace: "nowrap" }}>
         <span style={note(28, INK)}>
-          Variance, Var(X){" "}
+          Variance, <MathRun>Var(<I>X</I>)</MathRun>{" "}
           <span style={{ opacity: ease(frame, threeAt - 4, 10) }}>
             = <b style={{ color: STAT_INK }}>{fmt(DIE.variance, 2)}</b>
             <span style={{ color: INK_SOFT }}>, in squared units</span>

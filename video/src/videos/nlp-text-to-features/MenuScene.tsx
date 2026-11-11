@@ -118,7 +118,8 @@ export const MenuScene: React.FC = () => {
       <Note at={turnsAt} x={X0} y={y(WORDS_LABEL_Y)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>a list of words</span>
       </Note>
-      <Arrow from={[740, y(ROW_Y) + 22]} to={[880, y(ROW_Y) + 22]} at={turnsAt} dur={16} color={INK_SOFT} />
+      {/* From just past the last chip (it ends near x 592) to the first cell. */}
+      <Arrow from={[604, y(ROW_Y) + 22]} to={[CELL.x0 - 2, y(ROW_Y) + 22]} at={turnsAt} dur={16} color={INK_SOFT} />
       {BOW.vocab.map((w, j) => (
         <Note key={w} at={numbersAt + j} x={CELL.x0 + j * CELL.step + CELL.w / 2} y={y(CELL.top) - 34} style={{ transform: "translateX(-50%)" }}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>{w}</span>

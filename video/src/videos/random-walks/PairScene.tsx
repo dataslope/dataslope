@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
+import { M } from "../../editorial/math";
 import { ACCENT_INK, halo, headline, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -94,7 +95,9 @@ export const PairScene: React.FC = () => {
       </Note>
 
       <Ink at={corrAt - 4} dur={14} style={{ left: R_X, top: y(380) }}>
-        <span style={label(21, INK_SOFT)}>Their correlation, r</span>
+        <span style={label(21, INK_SOFT)}>
+          Their correlation, <M>r</M>
+        </span>
       </Ink>
       <Ink at={numberAt - 2} dur={18} style={{ left: R_X - 6, top: y(380) + 44 }}>
         <span style={{ ...headline(120), color: ACCENT_INK }}>{dec(R_WALKS)}</span>

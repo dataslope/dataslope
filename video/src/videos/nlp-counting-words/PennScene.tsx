@@ -170,7 +170,7 @@ export const PennScene: React.FC = () => {
       {/* The first-letter shortcut. */}
       <Note at={thirtySixAt - 2} x={LX} y={y(266)}>
         <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          about <span style={numStyle(22, INK)}>36</span> tags in all
+          About <span style={numStyle(22, INK)}>36</span> tags in all
         </div>
       </Note>
       <Ink at={firstLetterAt - 2} dur={14} style={{ left: LX, top: y(266) + 40, whiteSpace: "nowrap" }}>

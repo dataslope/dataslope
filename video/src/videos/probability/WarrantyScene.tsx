@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { normalPdf } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { body, fmt, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -133,7 +134,7 @@ export const WarrantyScene: React.FC = () => {
                 {pct(r.p)}
               </span>
               <span style={{ color: INK_SOFT }}>
-                store pays <b style={{ color: INK }}>${num(r.pays)}</b>
+                Store pays <b style={{ color: INK }}>${num(r.pays)}</b>
               </span>
             </Ink>
           </React.Fragment>
@@ -244,8 +245,8 @@ export const WarrantyScene: React.FC = () => {
 
       {/* ── The bridge: one variable's summary, and the shapes many share ── */}
       <div style={{ position: "absolute", left: 160, top: y(770), display: "flex", alignItems: "baseline", gap: "0.3em", whiteSpace: "nowrap", ...label(26, INK) }}>
-        <Held at={evAt - 2}>E[X]</Held>
-        <Held at={varAt - 2}>and Var(X)</Held>
+        <Held at={evAt - 2}><MathRun>E[<I>X</I>]</MathRun></Held>
+        <Held at={varAt - 2}>and <MathRun>Var(<I>X</I>)</MathRun></Held>
         <Held at={sumAt - 2}>sum up one variable.</Held>
         <Held at={manyRvAt - 2} style={{ color: INK_SOFT }}>
           Many share a shape:

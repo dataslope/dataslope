@@ -296,7 +296,7 @@ export const LookupScene: React.FC = () => {
       {/* What WordNet is, under its column, as the narration says it. */}
       <Ink at={dictionaryAt - 2} dur={12} style={{ left: COL[2] + 26, top: headY + 34, whiteSpace: "nowrap" }}>
         <span style={faint}>
-          The dictionary
+          the dictionary
           <Fade at={lemmatizerAt - 2}>
             <span>&nbsp;behind the lemmatizer</span>
           </Fade>

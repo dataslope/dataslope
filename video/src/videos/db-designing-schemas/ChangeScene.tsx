@@ -198,7 +198,7 @@ export const ChangeScene: React.FC = () => {
             <Chip tone="soft">{d}</Chip>
           </Ink>
           {/* "Leaning on its shape": each dependent's end of its line, the last once it has arrived. */}
-          <Ping x={depX - 12} y={depY(i) + 22} at={i < 4 ? shapeAt + i * 3 : leanAt[4] + 8} color={INK} r={22} dur={20} />
+          <Ping x={depX - 4} y={depY(i) + 22} at={i < 4 ? shapeAt + i * 3 : leanAt[4] + 8} color={INK} r={22} dur={20} />
         </React.Fragment>
       ))}
       <div

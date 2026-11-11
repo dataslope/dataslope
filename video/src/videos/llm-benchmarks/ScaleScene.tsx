@@ -170,7 +170,8 @@ export const ScaleScene: React.FC = () => {
             const cy = zy - 6;
             return (
               <g key={k} opacity={p}>
-                <circle cx={cx} cy={cy} r={17} fill={lit > 0 ? TRAP : "none"} fillOpacity={lit} stroke={TRAP} strokeWidth={2.2} />
+                {/* A tinted disc, no ring (the house badge); the current one fills. */}
+                <circle cx={cx} cy={cy} r={17} fill={`color-mix(in srgb, ${TRAP} ${Math.round(22 + 78 * lit)}%, ${PAPER})`} />
                 <text x={cx} y={cy + 7} textAnchor="middle" style={{ ...label(20, TRAP_INK), fill: lit > 0.5 ? PAPER : TRAP_INK, fontWeight: 500 }}>
                   {k + 1}
                 </text>

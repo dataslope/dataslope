@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { I, MathRun } from "../../editorial/math";
+import { I, M, MathRun } from "../../editorial/math";
 import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK_SOFT, label, note, INK } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -204,7 +204,7 @@ export const DrawScene: React.FC = () => {
 
       <Note at={highAt + 10} x={120} y={y(830)}>
         <span style={note(20, INK_SOFT)}>
-          Every row reuses the same twenty numbers, so as T rises a column can only stay put or move to a less
+          Every row reuses the same twenty numbers, so as <M>T</M> rises a column can only stay put or move to a less
           likely token.
         </span>
       </Note>

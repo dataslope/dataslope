@@ -469,7 +469,7 @@ export const SpaceScene: React.FC = () => {
       <Fade at={catSatAt - 6} out={notesOut} style={{ left: X0, top: y(800) }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 22, ...body(32), color: INK, whiteSpace: "nowrap" }}>
           <span>
-            the <Mark at={catSatAt}>cat</Mark> sat on the mat
+            The <Mark at={catSatAt}>cat</Mark> sat on the mat
           </span>
           <span style={{ fontStyle: SERIF_ITALIC, color: INK_SOFT }}>seen in training</span>
         </div>
@@ -477,7 +477,7 @@ export const SpaceScene: React.FC = () => {
       <Fade at={dogSatAt - 4} out={notesOut} style={{ left: X0, top: y(860) }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 22, ...body(32), color: INK, whiteSpace: "nowrap" }}>
           <span>
-            the <Mark at={dogSatAt}>dog</Mark> sat on the mat
+            The <Mark at={dogSatAt}>dog</Mark> sat on the mat
           </span>
           <span style={{ fontStyle: SERIF_ITALIC, color: POINT_INK, opacity: ease(frame, halfAt - 2, 10) }}>half handled already</span>
         </div>

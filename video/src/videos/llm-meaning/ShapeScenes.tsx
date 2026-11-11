@@ -254,8 +254,9 @@ export const PathScene: React.FC = () => {
       </Svg>
       <Arrow from={[X.text + 118, mid]} to={[X.ids - 22, mid]} at={idsAt - 4} color={INK_SOFT} />
       <Arrow from={[X.ids + 96, mid]} to={[X.emb - 22, mid]} at={embeddingAt - 4} color={INK_SOFT} />
-      <Arrow from={[X.emb + 230, mid]} to={[blockL - 14, mid]} at={blockAt - 2} color={INK_SOFT} />
-      <Arrow from={[blockR + 70, mid]} to={[X.stack - 20, mid]} at={repeatsAt - 4} color={INK_SOFT} />
+      {/* Into the block's outline, and from it to the stack: edge to edge. */}
+      <Arrow from={[X.emb + 230, mid]} to={[blockL - 2, mid]} at={blockAt - 2} color={INK_SOFT} />
+      <Arrow from={[blockR + 2, mid]} to={[X.stack - 2, mid]} at={repeatsAt - 4} color={INK_SOFT} />
       <Fade at={aroundAt + 4} style={{ left: X.att - 10, top: blockBot + 52 }}>
         <Tag size={21} color={POINT_INK}>
           The input, added back in
@@ -370,6 +371,8 @@ export const ParamsScene: React.FC = () => {
           strokeWidth={2}
           strokeDasharray="8 6"
           rx={4}
+          // The empty bar's dashes go once the last part has filled it.
+          opacity={1 - ease(frame, segAt[3] + 12, 14)}
         />
         {segs.map((s, i) => {
           const p = ease(frame, s.at - 2, 16);

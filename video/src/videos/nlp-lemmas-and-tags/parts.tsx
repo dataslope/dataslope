@@ -6,7 +6,6 @@ import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -150,7 +149,8 @@ export function rowLayout(tokens: readonly string[], x: number, size = CHIP_SIZE
 
 export type Tone = "plain" | "good";
 const TONE = {
-  plain: { bg: ds("gray", 50), line: `color-mix(in srgb, ${INK} 38%, transparent)` },
+  // The gray badge's tint: with no outline, gray 50 alone did not read.
+  plain: { bg: "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)", line: `color-mix(in srgb, ${INK} 38%, transparent)` },
   good: { bg: `color-mix(in srgb, ${BAR} 20%, ${PAPER})`, line: BAR },
 } as const;
 

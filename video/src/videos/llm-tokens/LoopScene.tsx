@@ -39,7 +39,8 @@ const RING_LEFT = 470;
 const LX = X0;
 /** The three stations round the ring, clockwise from the top, in degrees. */
 const STATIONS = [-90, 30, 150];
-const ARC_GAP = 16;
+/** Degrees each arc stops short of a station: its head ends just off the dot. */
+const ARC_GAP = 5;
 const arc = (from: number, to: number): Pt[] =>
   Array.from({ length: 81 }, (_, i) => {
     const a = ((from + ((to - from) * i) / 80) * Math.PI) / 180;

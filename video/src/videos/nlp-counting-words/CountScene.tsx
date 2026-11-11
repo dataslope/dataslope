@@ -195,7 +195,7 @@ export const CountScene: React.FC = () => {
       })}
       <Note at={Math.max(thirteenAt - 2, sweepEnd + 2)} x={NOTE_X} y={rowY(7) + 6}>
         <div style={{ ...body(30), color: INK, whiteSpace: "nowrap" }}>
-          <span style={numStyle(30, INK)}>{FOX.distinct}</span> different words
+          <span style={{ fontWeight: 500, fontVariantNumeric: "tabular-nums lining-nums" }}>{FOX.distinct}</span> different words
         </div>
       </Note>
 
@@ -218,7 +218,8 @@ const Slot30: React.FC<{ at: number }> = ({ at }) => {
   const p = ease(frame, at, 12);
   return (
     <span style={{ opacity: p }}>
-      <span style={numStyle(30, INK)}>{FOX.total}</span> in all
+      {/* The number in the line's own face, so the line is one family. */}
+      <span style={{ fontWeight: 500, fontVariantNumeric: "tabular-nums lining-nums" }}>{FOX.total}</span> in all
     </span>
   );
 };

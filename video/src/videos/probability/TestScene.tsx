@@ -149,7 +149,7 @@ export const TestScene: React.FC = () => {
             style={{
               width: 56,
               height: 56,
-              borderRadius: 12,
+              borderRadius: 8,
               background: STAT,
               color: "var(--ds-white)",
               display: "inline-flex",
@@ -256,7 +256,7 @@ export const TestScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <div style={{ padding: "6px 20px 8px", borderRadius: 16, background: PILL[i] }}>
+              <div style={{ padding: "6px 20px 8px", borderRadius: 8, background: PILL[i] }}>
                 <div style={{ ...note(i === 0 ? 40 : 34, color), fontWeight: 500, lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}>
                   {big === "count:tp" ? (
                     <Count at={catchesAt} dur={Math.max(12, caughtAt - catchesAt + 6)} to={TEST.tp} format={num} steady />

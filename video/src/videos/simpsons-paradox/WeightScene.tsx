@@ -12,8 +12,8 @@ import { Gridlines, RateScale } from "./parts";
 const SCALE = { x0: 420, x1: 1620 };
 const BAR_H = 92;
 const ROWS = [
-  { mix: "women" as Group, top: 404, rate: TOTAL.women.rate, head: "Where women applied", sub: "the mix they actually sent" },
-  { mix: "men" as Group, top: 596, rate: WOMEN_AT_MEN_MIX, head: "Where men applied", sub: "the men's mix instead" },
+  { mix: "women" as Group, top: 404, rate: TOTAL.women.rate, head: "Where women applied", sub: "The mix they actually sent" },
+  { mix: "men" as Group, top: 596, rate: WOMEN_AT_MEN_MIX, head: "Where men applied", sub: "The men's mix instead" },
 ];
 const px = (rate: number) => SCALE.x0 + (SCALE.x1 - SCALE.x0) * rate;
 const shade = (d: Dept): Step => (d.rate >= 0.5 ? 300 : d.rate >= 0.3 ? 500 : d.rate >= 0.2 ? 700 : 900);
