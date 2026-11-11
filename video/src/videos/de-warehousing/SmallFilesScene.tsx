@@ -147,7 +147,7 @@ export const SmallFilesScene: React.FC = () => {
             const footer = ease(frame, footerAt + (d % 30) * 0.4, 8);
             return (
               <g key={d} opacity={p * (1 - ease(frame, rewriteAt + 18, 12))}>
-                <rect x={x} y={yy} width={CELL} height={cellH} rx={2} fill={COLUMN_TINT.sale_id} stroke={INK} strokeOpacity={0.3} strokeWidth={1} />
+                <rect x={x} y={yy} width={CELL} height={cellH} rx={2} fill={COLUMN_TINT.sale_date} />
                 <rect x={x + CELL - 5} y={yy} width={5} height={cellH} rx={1} fill={ds("blue", 700)} opacity={footer} />
               </g>
             );
@@ -158,7 +158,7 @@ export const SmallFilesScene: React.FC = () => {
             if (p <= 0) return null;
             return (
               <g key={m} opacity={p}>
-                <rect x={blockX(m)} y={blockY(m)} width={BLOCK_W} height={BLOCK_H} rx={4} fill={COLUMN_TINT.sale_id} stroke={INK} strokeOpacity={0.35} />
+                <rect x={blockX(m)} y={blockY(m)} width={BLOCK_W} height={BLOCK_H} rx={4} fill={COLUMN_TINT.sale_date} />
                 <rect x={blockX(m) + BLOCK_W - 7} y={blockY(m)} width={7} height={BLOCK_H} rx={2} fill={ds("blue", 700)} />
               </g>
             );

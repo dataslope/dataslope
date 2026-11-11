@@ -100,8 +100,6 @@ export const ClusterScene: React.FC = () => {
               height={h(BAR_H)}
               rx={3}
               fill={hit && r > 0 ? `color-mix(in srgb, ${readColor} ${100 * r}%, ${COLUMN_TINT.sale_date})` : COLUMN_TINT.sale_date}
-              stroke={INK}
-              strokeOpacity={0.25}
             />
             {labels && hit ? (
               <text x={x1 + 10} y={yy + h(BAR_H) - 2} style={svgText(label(19, INK))} opacity={ease(frame, readAt + 6, 10)}>
