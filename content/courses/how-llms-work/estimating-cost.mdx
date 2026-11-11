@@ -14,17 +14,23 @@ easy to model.
 
 ## A single request
 
+The exercises in this chapter use example prices for four tiers, from a
+flagship model down to a small one, in the shape a typical price sheet
+has: output at 5x the input rate, cached input at a small fraction of
+it. For a real estimate, take the numbers from the provider's current
+price page.
+
 <CodeBlock
   adapter="python"
   files={[
     {
       filename: "main.py",
-      initCode: `# USD per million tokens, October 2026 snapshot.
+      initCode: `# Example rates, USD per million tokens (not any provider's prices).
 PRICES = {
-    "fable":  {"in": 10.00, "out": 50.00, "cached": 0.25},
-    "opus":   {"in":  4.00, "out": 20.00, "cached": 0.20},
-    "sonnet": {"in":  2.00, "out": 10.00, "cached": 0.10},
-    "haiku":  {"in":  0.10, "out":  0.50, "cached": 0.01},
+    "flagship": {"in": 10.00, "out": 50.00, "cached": 0.25},
+    "large":    {"in":  4.00, "out": 20.00, "cached": 0.20},
+    "mid":      {"in":  2.00, "out": 10.00, "cached": 0.10},
+    "small":    {"in":  0.10, "out":  0.50, "cached": 0.01},
 }
 
 def cost(model, input_tokens=0, output_tokens=0, cached_tokens=0):
@@ -39,7 +45,7 @@ def cost(model, input_tokens=0, output_tokens=0, cached_tokens=0):
 # One support-bot request: 1,200-token prompt, 300-token answer.
 for model in PRICES:
     c = cost(model, input_tokens=1200, output_tokens=300)
-    print(f"{model:>7}: \${c:.6f} per request  "
+    print(f"{model:>8}: \${c:.6f} per request  "
           f"= \${c * 100_000:,.2f} per 100k requests")
 
 print()
@@ -76,12 +82,12 @@ This is where estimates go wrong. Every turn resends everything.
   files={[
     {
       filename: "main.py",
-      initCode: `# USD per million tokens, October 2026 snapshot.
+      initCode: `# Example rates, USD per million tokens (not any provider's prices).
 PRICES = {
-    "fable":  {"in": 10.00, "out": 50.00, "cached": 0.25},
-    "opus":   {"in":  4.00, "out": 20.00, "cached": 0.20},
-    "sonnet": {"in":  2.00, "out": 10.00, "cached": 0.10},
-    "haiku":  {"in":  0.10, "out":  0.50, "cached": 0.01},
+    "flagship": {"in": 10.00, "out": 50.00, "cached": 0.25},
+    "large":    {"in":  4.00, "out": 20.00, "cached": 0.20},
+    "mid":      {"in":  2.00, "out": 10.00, "cached": 0.10},
+    "small":    {"in":  0.10, "out":  0.50, "cached": 0.01},
 }
 
 def conversation_cost(model, turns, system=2000, user=150, reply=400, cached=False):
@@ -103,8 +109,8 @@ def conversation_cost(model, turns, system=2000, user=150, reply=400, cached=Fal
       starterCode: `# 'conversation_cost' is defined above.
 print(f"{'turns':>6} {'no cache':>10} {'cached':>10} {'saved':>8}")
 for turns in [1, 5, 10, 20, 40]:
-    plain = conversation_cost("sonnet", turns)
-    cached = conversation_cost("sonnet", turns, cached=True)
+    plain = conversation_cost("mid", turns)
+    cached = conversation_cost("mid", turns, cached=True)
     print(f"{turns:>6} \${plain:>9.4f} \${cached:>9.4f} {1 - cached/plain:>7.0%}")
 
 print()
@@ -120,7 +126,7 @@ term, and it is why a 40-turn conversation can cost more than eight
 separate 5-turn ones covering the same ground.
 
 The cached column assumes the whole conversation so far is cached,
-which is what the automatic caching modes providers now offer do:
+which is what the automatic caching modes some providers offer do:
 everything sent on the previous turn is read back at the cache rate,
 and only the newest reply and message pay full price. The first turn
 has nothing to reuse, and every turn after it has more.
@@ -141,7 +147,7 @@ usually several times longer than the visible answer.
   files={[
     {
       filename: "main.py",
-      initCode: `PRICES = {"opus": {"in": 4.00, "out": 20.00}, "sonnet": {"in": 2.00, "out": 10.00}}
+      initCode: `PRICES = {"large": {"in": 4.00, "out": 20.00}, "mid": {"in": 2.00, "out": 10.00}}
 
 def request_cost(model, in_tok, visible_out, thinking_out=0):
     p = PRICES[model]
@@ -149,9 +155,9 @@ def request_cost(model, in_tok, visible_out, thinking_out=0):
       starterCode: `IN, VISIBLE = 2000, 400
 
 print(f"{'thinking':>9} {'cost':>10} {'vs none':>9}")
-base = request_cost("sonnet", IN, VISIBLE, 0)
+base = request_cost("mid", IN, VISIBLE, 0)
 for thinking in [0, 500, 2000, 8000, 20000]:
-    c = request_cost("sonnet", IN, VISIBLE, thinking)
+    c = request_cost("mid", IN, VISIBLE, thinking)
     print(f"{thinking:>9} \${c:>9.5f} {c / base:>8.1f}x")
 
 print()
@@ -169,12 +175,12 @@ print("Reasoning effort is the whole difference.")
   files={[
     {
       filename: "main.py",
-      initCode: `# USD per million tokens, October 2026 snapshot.
+      initCode: `# Example rates, USD per million tokens (not any provider's prices).
 PRICES = {
-    "fable":  {"in": 10.00, "out": 50.00, "cached": 0.25},
-    "opus":   {"in":  4.00, "out": 20.00, "cached": 0.20},
-    "sonnet": {"in":  2.00, "out": 10.00, "cached": 0.10},
-    "haiku":  {"in":  0.10, "out":  0.50, "cached": 0.01},
+    "flagship": {"in": 10.00, "out": 50.00, "cached": 0.25},
+    "large":    {"in":  4.00, "out": 20.00, "cached": 0.20},
+    "mid":      {"in":  2.00, "out": 10.00, "cached": 0.10},
+    "small":    {"in":  0.10, "out":  0.50, "cached": 0.01},
 }
 
 def monthly(workloads):
@@ -188,10 +194,10 @@ def monthly(workloads):
         total += month
     return rows, total`,
       starterCode: `workloads = {
-    "ticket classification": {"model": "haiku",  "in": 800,   "out": 20,   "per_day": 40_000},
-    "support replies":       {"model": "haiku",  "in": 2_000, "out": 350,  "per_day": 6_000},
-    "document summaries":    {"model": "sonnet", "in": 12_000,"out": 800,  "per_day": 900},
-    "code review":           {"model": "opus",   "in": 20_000,"out": 2_000,"per_day": 200},
+    "ticket classification": {"model": "small", "in": 800,   "out": 20,   "per_day": 40_000},
+    "support replies":       {"model": "small", "in": 2_000, "out": 350,  "per_day": 6_000},
+    "document summaries":    {"model": "mid",   "in": 12_000,"out": 800,  "per_day": 900},
+    "code review":           {"model": "large", "in": 20_000,"out": 2_000,"per_day": 200},
 }
 
 rows, total = monthly(workloads)
@@ -202,7 +208,7 @@ print(f"{'-' * 56}")
 print(f"{'TOTAL':<33}\${total:>12,.2f} / month")
 
 print()
-print("Try moving 'document summaries' to haiku, or 'code review' to sonnet,")
+print("Try moving 'document summaries' to small, or 'code review' to mid,")
 print("and watch which line actually moves the total.")
 `,
     },

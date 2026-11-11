@@ -14,8 +14,8 @@ try them in.
 
 ## 1. Route to the cheapest model that passes
 
-The spread between tiers is roughly 100x as of October 2026. No amount
-of prompt trimming competes with that.
+The spread between the cheapest and most expensive tiers is roughly
+100x. No amount of prompt trimming competes with that.
 
 The mistake is choosing one model for everything, usually the best one,
 because it is the one that passed the hardest test case. Most
@@ -24,16 +24,17 @@ production traffic is not the hardest test case.
 **Route by task.** Classification, extraction, formatting, and
 routing itself go to a small model. Reserve the expensive tier for
 work that genuinely needs it, and measure which is which rather than
-guessing.
+guessing. The exercise below uses example prices for four tiers, not any
+provider's; check the provider's current price page for real ones.
 
 <CodeBlock
   adapter="python"
   files={[
     {
       filename: "main.py",
-      starterCode: `# USD per million tokens (input, output), October 2026 snapshot.
-PRICE = {"haiku": (0.10, 0.50), "sonnet": (2.00, 10.00),
-         "opus": (4.00, 20.00), "fable": (10.00, 50.00)}
+      starterCode: `# Example rates, USD per million tokens (input, output).
+PRICE = {"small": (0.10, 0.50), "mid": (2.00, 10.00),
+         "large": (4.00, 20.00), "flagship": (10.00, 50.00)}
 
 def month(model, in_tok, out_tok, per_day):
     pin, pout = PRICE[model]
@@ -42,12 +43,12 @@ def month(model, in_tok, out_tok, per_day):
 # 50,000 classifications a day, 600 tokens in, 15 out.
 print("Same classification workload on each tier:")
 for m in PRICE:
-    print(f"  {m:>7}: \${month(m, 600, 15, 50_000):>9,.2f} / month")
+    print(f"  {m:>8}: \${month(m, 600, 15, 50_000):>9,.2f} / month")
 
-everything_on_opus = month("opus", 600, 15, 50_000)
-routed = month("haiku", 600, 15, 50_000)
+everything_on_large = month("large", 600, 15, 50_000)
+routed = month("small", 600, 15, 50_000)
 print()
-print(f"Saving from routing this one workload: \${everything_on_opus - routed:,.2f}/month")
+print(f"Saving from routing this one workload: \${everything_on_large - routed:,.2f}/month")
 `,
     },
   ]}
@@ -63,7 +64,7 @@ cost is not linear in the saving.
 
 If a long system prompt, schema, or document repeats across requests,
 caching cuts it to a tenth of the input price, or to a twentieth or a
-fortieth on some of the newest models.
+fortieth on some models.
 
 <Figure
   slug="llm-controlling-cost-2-cache-stable-inline-cutout"
