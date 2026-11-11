@@ -134,7 +134,7 @@ export const BackpropScene: React.FC = () => {
 
         <Note at={chainAt - 2} x={X0} y={y(300)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            the chain rule, run backward:{" "}
+            The chain rule, run backward:{" "}
             <span style={{ opacity: ease(frame, sweepAt - 2, 10) }}>
               one sweep gives every weight its gradient,{" "}
               <span style={{ opacity: ease(frame, costAt - 2, 10) }}>at about the cost of the forward pass</span>
@@ -196,7 +196,7 @@ export const BackpropScene: React.FC = () => {
         <Note at={handAt - 2} x={1000} y={y(PRODUCT_Y)}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Tick at={handAt + 4} size={26} />
-            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>nudging{" "}
+            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>Nudging{" "}
               <MathRun>
                 <I>w</I>
               </MathRun>{" "}
@@ -206,7 +206,7 @@ export const BackpropScene: React.FC = () => {
 
         {/* ── The page's own check of the middle slope ── */}
         <Tagline x={X0} y={y(PAGE_Y)} at={pageAt - 4} size={22} color={INK}>
-          the page&apos;s check:{" "}
+          The page&apos;s check:{" "}
           <MathRun>
             <I>σ</I>′(<I>z</I>) = <I>σ</I>(<I>z</I>)(1 − <I>σ</I>(<I>z</I>))
           </MathRun>

@@ -349,7 +349,7 @@ export const TreeScene: React.FC = () => {
           y={y(GINI_TOP) + h(GINI_H) + h(12)}
         >
           <span style={{ ...note(22, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            entropy (information gain) also picks{" "}
+            Entropy (information gain) also picks{" "}
             {fmt(TREE.entropy.best[0], 2)}
             <span
               style={{ color: INK_SOFT, opacity: ease(frame, regressionAt, 10) }}
@@ -368,7 +368,7 @@ export const TreeScene: React.FC = () => {
           out={irisAt}
         >
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            purest: each side as close to one species as it gets
+            Purest: each side as close to one species as it gets
           </span>
         </Note>
 
@@ -503,7 +503,7 @@ export const TreeScene: React.FC = () => {
         )}
         <Note at={depthAt} x={COL} y={y(820)} width={COL_W}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <Mark at={readAt}>until a stopping rule: a maximum depth</Mark>
+            <Mark at={readAt}>Until a stopping rule: a maximum depth</Mark>
           </span>
         </Note>
         <Svg opacity={pulse(frame, overAt, 26)}>

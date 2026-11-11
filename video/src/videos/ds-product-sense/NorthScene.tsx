@@ -33,9 +33,9 @@ export const NorthScene: React.FC = () => {
   const pushAt = n.word("north", "every team pushes toward");
   const goodAt = n.word("north-good", "A good one");
   const checks = [
-    { text: "moves before revenue does", at: n.word("north-good", "moves before revenue does") },
-    { text: "reflects real value", at: n.word("north-good", "reflects real value") },
-    { text: "the team's work can move it", at: n.word("north-good", "the team's work can move") },
+    { text: "Moves before revenue does", at: n.word("north-good", "moves before revenue does") },
+    { text: "Reflects real value", at: n.word("north-good", "reflects real value") },
+    { text: "The team's work can move it", at: n.word("north-good", "the team's work can move") },
   ];
   const cooksAt = n.word("north-good", "weekly cooks");
   const modeAt = n.word("north-good", "open a recipe in cooking mode");
@@ -110,15 +110,15 @@ export const NorthScene: React.FC = () => {
                   background: glow > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${glow * 100}%, transparent)` : undefined,
                 }}
               >
-                weekly cooks
+                Weekly cooks
               </span>
             </div>
             <div style={{ position: "absolute", left: 0, top: 128, ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, modeAt, 12) }}>
-              people who open a recipe in cooking mode
+              People who open a recipe in cooking mode
             </div>
           </div>
           <Note at={pushAt} x={X0} y={y(STAR.top) + h(STAR.h) + h(18)} out={out1}>
-            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>the number every team pushes toward</span>
+            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>The number every team pushes toward</span>
           </Note>
 
           {/* What a good one does. */}
@@ -138,7 +138,7 @@ export const NorthScene: React.FC = () => {
           <Note at={signupsAt - 2} x={X0} y={y(STAR.top) + h(STAR.h) + h(80)} out={out1}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 22 }}>
               <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-                <Strike at={nothingAt + 2}>total signups</Strike>
+                <Strike at={nothingAt + 2}>Total signups</Strike>
               </span>
               <span style={{ ...note(27, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, nothingAt, 12) }}>
                 bigger, and says nothing about whether anyone cooks
@@ -151,7 +151,7 @@ export const NorthScene: React.FC = () => {
             What are guardrail metrics, and why do you need them?
           </QuestionCard>
           <Note at={healthAt - 2} x={CHECKS_X} y={y(STAR.top) + h(20)}>
-            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>guardrails:</span>
+            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Guardrails:</span>
           </Note>
           <Note at={healthAt + 4} x={CHECKS_X} y={y(STAR.top) + h(70)}>
             <span style={{ ...note(27, INK_SOFT), whiteSpace: "nowrap" }}>health checks you refuse to harm on the way</span>
@@ -195,7 +195,7 @@ export const NorthScene: React.FC = () => {
             </Tag>
           ))}
           <Note at={gamedAt - 2} x={X0} y={y(RAIL.top) + h(150)}>
-            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>almost any single number can be gamed:</span>
+            <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Almost any single number can be gamed:</span>
           </Note>
           <Note at={sendAt} x={X0 + 600} y={y(RAIL.top) + h(150)}>
             <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>

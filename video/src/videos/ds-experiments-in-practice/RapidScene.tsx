@@ -55,14 +55,14 @@ const Ate: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={matchAt} x={R_X + 520} y={c.y(560)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>randomized, all treated: they match</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Randomized, all treated: they match</span>
       </Note>
       <Note at={apartAt} x={R_X + 520} y={c.y(610)}>
-        <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>opt-in or observational: they can differ</span>
+        <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Opt-in or observational: they can differ</span>
       </Note>
       <Note at={reportAt} x={R_X + 520} y={c.y(690)}>
         <span style={{ ...note(25, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          report <b>ATT</b> for the people who use it
+          Report <b>ATT</b> for the people who use it
         </span>
       </Note>
     </>
@@ -112,17 +112,17 @@ const Long: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...label(22, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>other launches land</span>
       </Note>
       <Note at={freezeAt} x={x0} y={top - c.h(118)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>freeze the scope for the whole run</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Freeze the scope for the whole run</span>
       </Note>
       <Note at={cycleAt + 4} x={x0} y={top + c.h(84)}>
         <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
-          at least one full business cycle
+          At least one full business cycle
           <br />
           <span style={{ ...label(20, INK_SOFT), fontWeight: 500 }}>(often a week or two)</span>
         </span>
       </Note>
       <Note at={endAt + 4} x={flagX - 12} y={top + c.h(84)} align="right">
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>end date, set in advance</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>End date, set in advance</span>
       </Note>
     </>
   );
@@ -150,7 +150,7 @@ const Holdback: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>a few percent on the old ↑</span>
       </Note>
       <Note at={monthsAt} x={R_X} y={top + c.h(150)}>
-        <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>months later: did the win last?</span>
+        <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Months later: did the win last?</span>
       </Note>
     </>
   );
@@ -220,7 +220,7 @@ const Meta: React.FC<{ c: Ctx }> = ({ c }) => {
         </g>
       </svg>
       <Note at={weightAt + 2} x={R_X} y={c.y(372)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>weighted by precision</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Weighted by precision</span>
       </Note>
       {META.studies.map((st, i) => (
         <div
@@ -248,10 +248,10 @@ const Meta: React.FC<{ c: Ctx }> = ({ c }) => {
         pooled: {fixed(META.pooled, 1)}
       </div>
       <Note at={allAt} x={R_X} y={c.y(822)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>so pool every experiment you ran, not just the winners</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>So pool every experiment you ran, not just the winners</span>
       </Note>
       <Note at={curseAt + 2} x={BAR.x - 20} y={c.y(380)}>
-        <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the winner's curse, at 20% power</span>
+        <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The winner's curse, at 20% power</span>
       </Note>
       {[
         { text: "true effect", at: twentyAt + 6, x: BAR.x, ink: OK_INK, v: "1×", ratio: 1 },

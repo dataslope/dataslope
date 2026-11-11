@@ -163,16 +163,16 @@ export const ShapesScene: React.FC = () => {
           bands={AP.rows.map((_, row) => ({ row, at: rowAt + row * 2, color: MARK }))}
         />
         <Note at={rowAt} x={APPLY_X} y={under(AP.rows.length)} out={out3}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>each region&apos;s largest order</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Each region&apos;s largest order</span>
         </Note>
         <Note at={slowAt} x={APPLY_X} y={under(AP.rows.length) + h(40)} out={out3}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>most flexible, and slowest</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Most flexible, and slowest</span>
         </Note>
 
         {/* ── Question 4: the share, no sum-then-merge ── */}
         <Listing lines={P.lines} x={X0} top={y(LISTING_Y)} width={1110} size={SIZE} at={divideAt - 4} marks={[{ line: 1, at: divideAt + 8 }]} />
         <Note at={noMergeAt} x={X0 + 1140} y={y(LISTING_Y) + h(14)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>no need to sum by region and merge back</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>No need to sum by region and merge back</span>
         </Note>
         <Note at={pctAt + 4} x={g.right + 30} y={g.rowMid(0) - h(18)}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>100 / 160 = 62.5%</span>

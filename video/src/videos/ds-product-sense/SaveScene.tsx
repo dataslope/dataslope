@@ -13,7 +13,7 @@ import { Tag } from "./badges";
 const TREE_X = 640;
 const ROW_LABEL_W = 210;
 const ROWS = { job: 330, primary: 430, secondary: 530, guard: 630, not: 740 };
-const RECIPES = ["lemon pasta", "chickpea curry", "banana bread", "miso soup"];
+const RECIPES = ["Lemon pasta", "Chickpea curry", "Banana bread", "Miso soup"];
 
 /** A bookmark, the "saved" mark: Lucide's `bookmark` icon (ISC licence),
  *  filled, in a `size` px square (the owner, 2026-11-11: smaller, and a
@@ -122,7 +122,7 @@ export const SaveScene: React.FC = () => {
             <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>cooked within a week</span>
           </Note>
           <Note at={backAt + 4} x={X0} y={y(ROWS.not) + h(70)}>
-            <span style={madeUp()}>recipes made up for this video</span>
+            <span style={madeUp()}>Recipes made up for this video</span>
           </Note>
 
           {/* The tree, from the button's job. */}
@@ -134,7 +134,7 @@ export const SaveScene: React.FC = () => {
           </Svg>
           <Note at={jobAt} x={TREE_X} y={y(ROWS.job) + h(6)}>
             <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
-              <b>the job:</b> <span style={{ opacity: ease(frame, backAt, 12) }}>bring people back to cook what they saved</span>
+              <b>The job:</b> <span style={{ opacity: ease(frame, backAt, 12) }}>bring people back to cook what they saved</span>
             </span>
           </Note>
 
@@ -151,7 +151,7 @@ export const SaveScene: React.FC = () => {
             saves per user
           </Tag>
           <Note at={whyAt} x={TREE_X + ROW_LABEL_W + 440} y={y(ROWS.secondary) + h(10)}>
-            <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>explain why it moved</span>
+            <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>Explain why it moved</span>
           </Note>
 
           {rowLabel("Guardrails", guardsAt - 2, INK_SOFT, y(ROWS.guard))}
@@ -162,7 +162,7 @@ export const SaveScene: React.FC = () => {
             load time
           </Tag>
           <Note at={guardsAt + 4} x={TREE_X + ROW_LABEL_W + 470} y={y(ROWS.guard) + h(10)}>
-            <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>catch it stealing from the main flow</span>
+            <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>Catch it stealing from the main flow</span>
           </Note>
 
           {rowLabel("Not this", dontAt, ACCENT_INK, y(ROWS.not))}
@@ -171,7 +171,7 @@ export const SaveScene: React.FC = () => {
           </Tag>
           <Note at={interactionAt} x={TREE_X + ROW_LABEL_W + 330} y={y(ROWS.not) + h(10)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-              <span style={{ color: ACCENT_INK, fontWeight: 500 }}>the interaction</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 500 }}>The interaction</span>
               <span style={{ opacity: ease(frame, valueAt, 10) }}>, not the value</span>
             </span>
           </Note>

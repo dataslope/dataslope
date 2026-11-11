@@ -133,7 +133,7 @@ export const SizeScene: React.FC = () => {
         {/* ── Question 10: a chain of assumptions ── */}
         <Note at={factorsAt} x={X0} y={y(CHAIN.top) - h(76)} out={out10}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            break it into factors
+            Break it into factors
             <span style={{ opacity: ease(frame, loudAt, 10) }}>, every assumption out loud</span>
             <span style={{ ...note(26, BLUE_INK), fontWeight: 500, opacity: ease(frame, searchesAt, 10) }}>: daily searches by ingredient</span>
           </span>
@@ -153,13 +153,13 @@ export const SizeScene: React.FC = () => {
           </Note>
         ))}
         <Note at={mauAt} x={X0} y={y(CHAIN.top) + h(132)} out={out10}>
-          <span style={madeUp()}>assumptions for the made-up app</span>
+          <span style={madeUp()}>Assumptions for the made-up app</span>
         </Note>
 
         {/* The sanity check: what the answer says each feature user does. */}
         <Note at={sanityCheckAt} x={1824} align="right" y={y(604)} out={out10}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <b>sanity check:</b>{" "}
+            <b>Sanity check:</b>{" "}
             <span style={{ color: BLUE_INK, fontWeight: 500, opacity: ease(frame, sanityCheckAt + 10, 10) }}>
               {num(MARKET.daily)} searches ÷ {num(MARKET.users)} users
             </span>
@@ -171,17 +171,17 @@ export const SizeScene: React.FC = () => {
         {/* What's graded. */}
         <Note at={structureAt - 4} x={X0} y={y(680)} out={out10}>
           <div style={{ display: "flex", alignItems: "center", gap: 36 }}>
-            <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>graded:</span>
+            <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Graded:</span>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <Tick at={structureAt + 4} size={30} />
-              <span style={{ ...note(29, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the structure</span>
+              <span style={{ ...note(29, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The structure</span>
             </span>
             <span style={{ display: "flex", alignItems: "center", gap: 10, opacity: ease(frame, sanityAt - 2, 10) }}>
               <Tick at={sanityAt + 4} size={30} />
-              <span style={{ ...note(29, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the sanity check</span>
+              <span style={{ ...note(29, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The sanity check</span>
             </span>
             <span style={{ ...note(29, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, notAt - 2, 10) }}>
-              <Strike at={notAt + 6}>the number</Strike>
+              <Strike at={notAt + 6}>The number</Strike>
             </span>
           </div>
         </Note>
@@ -245,11 +245,11 @@ export const SizeScene: React.FC = () => {
         </Note>
         <Note at={cheapestAt} x={980} y={y(AXIS.y) + h(140)}>
           <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={cheapestAt + 8}>the cheapest experiment is the arithmetic</Mark>
+            <Mark at={cheapestAt + 8}>The cheapest experiment is the arithmetic</Mark>
           </span>
         </Note>
         <Note at={reachAt} x={X0} y={y(AXIS.y) + h(150)}>
-          <span style={madeUp()}>made up for this video</span>
+          <span style={madeUp()}>Made up for this video</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -107,10 +107,10 @@ export const StepsScene: React.FC = () => {
   ];
   const stepY = (i: number) => y(STEP_TOP + i * STEP_PITCH);
   const hyp = [
-    { y: y(420), name: "the null", formula: <>
+    { y: y(420), name: "The null", formula: <>
         <Ctr of="new" /> = <Ctr of="old" />
       </>, at: nullAt, tag: null },
-    { y: y(530), name: "the alternative", formula: <>
+    { y: y(530), name: "The alternative", formula: <>
         <Ctr of="new" /> ≠ <Ctr of="old" />
       </>, at: differAt, tag: { text: "two-sided", at: twoAt, sides: 2 as const, area: "2.5% each side" } },
     { y: y(640), name: "", formula: <>
@@ -139,7 +139,7 @@ export const StepsScene: React.FC = () => {
 
         {/* ── Question 9: the four steps ── */}
         <Note at={defAt} x={X0} y={y(300)} out={stepsOut}>
-          <span style={{ ...noteText(26, INK_SOFT) }}>deciding whether the data give enough evidence against a null hypothesis</span>
+          <span style={{ ...noteText(26, INK_SOFT) }}>Deciding whether the data give enough evidence against a null hypothesis</span>
         </Note>
         {STEPS.map((text, i) => (
           <Note key={i} at={stepAt[i]} x={X0} y={stepY(i)} out={stepsOut}>
@@ -188,7 +188,7 @@ export const StepsScene: React.FC = () => {
         <Note at={beforeAt + 6} x={1204} y={stepY(0) + h(28)} out={stepsOut}>
           <span style={{ ...noteText(26, OK_INK) }}>
             <Mark at={beforeAt + 10} color={MARK_OK}>
-              before you see any data
+              Before you see any data
             </Mark>
           </span>
         </Note>
@@ -225,11 +225,11 @@ export const StepsScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={pickAt} x={X0} y={y(750)}>
-          <span style={{ ...noteText(26, INK) }}>chosen before you look</span>
+          <span style={{ ...noteText(26, INK) }}>Chosen before you look</span>
         </Note>
         <Note at={saferAt + 6} x={X0} y={y(810)}>
           <span style={{ ...noteText(26, OK_INK) }}>
-            two-sided: the safer default, it catches a change{" "}
+            Two-sided: the safer default, it catches a change{" "}
             <span style={{ opacity: ease(frame, eitherAt - 2, 10) }}>in either direction</span>
           </span>
         </Note>

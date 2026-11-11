@@ -136,11 +136,11 @@ export const ZtScene: React.FC = () => {
           </div>
         </Note>
         <Note at={fiveAt + 6} x={SIDE_X} y={y(640)}>
-          <span style={{ ...noteText(24, INK) }}>the 95% cutoffs, two-sided</span>
+          <span style={{ ...noteText(24, INK) }}>The 95% cutoffs, two-sided</span>
         </Note>
         <Note at={softwareAt} x={SIDE_X} y={y(770)}>
           <span style={{ ...noteText(26, OK_INK) }}>
-            software uses t, <Mark at={becomesAt + 2}>t becomes z</Mark> as n grows
+            Software uses t, <Mark at={becomesAt + 2}>t becomes z</Mark> as n grows
           </span>
         </Note>
       </Drift>

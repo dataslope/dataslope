@@ -69,7 +69,7 @@ export const NullScene: React.FC = () => {
         </Note>
         <Note at={simAt} x={X0} y={y(400)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-            simulated: a change that does nothing, on a {NOSIG.base}% conversion rate
+            Simulated: a change that does nothing, on a {NOSIG.base}% conversion rate
           </span>
         </Note>
 
@@ -156,7 +156,7 @@ export const NullScene: React.FC = () => {
               ))}
               <Note at={verdictAt - 2} x={ok ? at(x, t.hi) + 96 : at(x, t.hi) + 40} y={y(row) - 20}>
                 <span style={{ ...note(28, ok ? OK_INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-                  {ok ? "no meaningful effect" : "can't tell"}
+                  {ok ? "No meaningful effect" : "Can't tell"}
                 </span>
               </Note>
             </React.Fragment>

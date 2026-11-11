@@ -345,7 +345,7 @@ export const LogitScene: React.FC = () => {
           </Note>
           <Note at={oddsAt} x={COL} y={y(TOP) + h(54)} out={fitAt - 4}>
             <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
-              the score: the log odds
+              The score: the log odds
             </span>
           </Note>
           <Note at={fitAt} x={COL} y={y(TOP)} out={out1}>
@@ -355,7 +355,7 @@ export const LogitScene: React.FC = () => {
           </Note>
           <Note at={fitAt + 6} x={COL} y={y(TOP) + h(54)} out={out1}>
             <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
-              fitted on {LOGIT.n} tumors
+              Fitted on {LOGIT.n} tumors
             </span>
           </Note>
 
@@ -367,7 +367,7 @@ export const LogitScene: React.FC = () => {
           </Note>
           <Note at={sigAt + 6} x={COL} y={y(TOP) + h(184)} out={out1}>
             <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
-              the sigmoid:{" "}
+              The sigmoid:{" "}
               <Mark at={squeezeAt + 2}>any score, into 0 to 1</Mark>
             </span>
           </Note>
@@ -391,7 +391,7 @@ export const LogitScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              a straight line&apos;s errors can&apos;t have constant variance
+              A straight line&apos;s errors can&apos;t have constant variance
             </span>
           </Note>
           <Note at={assumesAt} x={COL} y={y(TOP) + h(40)}>
@@ -407,12 +407,12 @@ export const LogitScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <Mark at={nextAt}>logistic: always between 0 and 1</Mark>
+              <Mark at={nextAt}>Logistic: always between 0 and 1</Mark>
             </span>
           </Note>
           <Note at={mlAt} x={COL} y={y(TOP) + h(186)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-              fitted by maximum likelihood
+              Fitted by maximum likelihood
             </span>
           </Note>
         </Drift>

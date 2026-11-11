@@ -60,13 +60,13 @@ export const DesignScene: React.FC = () => {
   const clearAt = nextAt - 14;
 
   const rows = [
-    { key: "hypothesis", value: "the new onboarding raises 7-day activation", at: n.word("design-plan", "A hypothesis") },
-    { key: "primary metric", value: "7-day activation", at: n.word("design-plan", "One primary metric") },
-    { key: "guardrail", value: "page latency: must not get worse", at: n.word("design-plan", "a guardrail or two") },
-    { key: "unit", value: "user", at: n.word("design-plan", "Randomize by user") },
-    { key: "sample size", value: "smallest lift worth finding · 80% power · α 5%", at: n.word("design-plan", "Size the test") },
-    { key: "duration", value: "whole weeks", at: n.word("design-plan", "Run it for whole weeks") },
-    { key: "analysis", value: "test the difference, check the guardrails", at: n.word("design-plan", "Then test the difference") },
+    { key: "Hypothesis", value: "The new onboarding raises 7-day activation", at: n.word("design-plan", "A hypothesis") },
+    { key: "Primary metric", value: "7-day activation", at: n.word("design-plan", "One primary metric") },
+    { key: "Guardrail", value: "Page latency: must not get worse", at: n.word("design-plan", "a guardrail or two") },
+    { key: "Unit", value: "User", at: n.word("design-plan", "Randomize by user") },
+    { key: "Sample size", value: "Smallest lift worth finding · 80% power · α 5%", at: n.word("design-plan", "Size the test") },
+    { key: "Duration", value: "Whole weeks", at: n.word("design-plan", "Run it for whole weeks") },
+    { key: "Analysis", value: "Test the difference, check the guardrails", at: n.word("design-plan", "Then test the difference") },
   ];
 
   // Centered while it is the only thing on the page; Question 2 moves it left.
@@ -82,9 +82,9 @@ export const DesignScene: React.FC = () => {
     { text: "measurable in the window", at: measurableAt, again: [arriveAt, passesAt] },
   ];
   const candidates = [
-    { text: "raw clicks", at: clicksAt, verdict: "fails 1: easy to inflate", verdictAt: inflateAt, ok: false },
-    { text: "90-day retention", at: retentionAt, verdict: "fails 3: arrives after the test ends", verdictAt: arriveAt, ok: false },
-    { text: "7-day activation", at: activationAt, verdict: "passes all three", verdictAt: passesAt, ok: true },
+    { text: "Raw clicks", at: clicksAt, verdict: "Fails 1: easy to inflate", verdictAt: inflateAt, ok: false },
+    { text: "90-day retention", at: retentionAt, verdict: "Fails 3: arrives after the test ends", verdictAt: arriveAt, ok: false },
+    { text: "7-day activation", at: activationAt, verdict: "Passes all three", verdictAt: passesAt, ok: true },
   ];
 
   return (
@@ -153,7 +153,7 @@ export const DesignScene: React.FC = () => {
               {isMetric ? (
                 <span style={{ marginLeft: 16, display: "inline-flex", alignItems: "center", gap: 6, opacity: ease(frame, agreeAt + 4, 10) }}>
                   <Tick at={agreeAt + 4} size={24} />
-                  <span style={{ ...label(20, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>agreed</span>
+                  <span style={{ ...label(20, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Agreed</span>
                 </span>
               ) : null}
             </div>
@@ -218,7 +218,7 @@ export const DesignScene: React.FC = () => {
           );
         })}
         <Note at={switchAt - 2} x={RIGHT_X} y={y(800)}>
-          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>agreed before launch: no switching after the results</span>
+          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>Agreed before launch: no switching after the results</span>
         </Note>
       </Drift>
     </AbsoluteFill>

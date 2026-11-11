@@ -146,8 +146,8 @@ export const AucScene: React.FC = () => {
   // did at 0.5: the weights mostly moved the threshold.
   const [lowT, lowPrecision, lowRecall] = CLS.curve.find(([t]) => t === 0.02)!;
   const pairs = [
-    { name: "recall", at: recallAt, lowAt: recall2At, before: plain.recall, after: weighted.recall, low: lowRecall, good: true },
-    { name: "precision", at: precAt, lowAt: prec2At, before: plain.precision, after: weighted.precision, low: lowPrecision, good: false },
+    { name: "Recall", at: recallAt, lowAt: recall2At, before: plain.recall, after: weighted.recall, low: lowRecall, good: true },
+    { name: "Precision", at: precAt, lowAt: prec2At, before: plain.precision, after: weighted.precision, low: lowPrecision, good: false },
   ];
 
   return (
@@ -232,7 +232,7 @@ export const AucScene: React.FC = () => {
             </div>
           </Note>
           <Note at={floodAt - 4} x={READ_X} y={y(ROC.top) + h(250)}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>false positive rate:</span>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>False positive rate:</span>
             <br />
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>false alarms ÷ every negative</span>
           </Note>
@@ -240,7 +240,7 @@ export const AucScene: React.FC = () => {
           <Note at={easyAt} x={READ_X} y={y(ROC.top) + h(330)}>
             <div style={{ ...note(22, INK), whiteSpace: "nowrap", lineHeight: 1.35 }}>
               <div>
-                at <span style={TABULAR}>{pct(CLS.alarms.recall)}</span> recall it is only <span style={TABULAR}>{pct(CLS.alarms.fpr, 1)}</span>,
+                At <span style={TABULAR}>{pct(CLS.alarms.recall)}</span> recall it is only <span style={TABULAR}>{pct(CLS.alarms.fpr, 1)}</span>,
               </div>
               <div style={{ opacity: ease(frame, flattersAt - 2, 10) }}>
                 but that is <b style={{ color: ACCENT_INK, ...TABULAR }}>{count(CLS.alarms.fp)}</b> false alarms
@@ -252,7 +252,7 @@ export const AucScene: React.FC = () => {
           </Note>
           <Note at={honestAt - 2} x={READ_X} y={y(ROC.top) + h(445)}>
             <span style={{ ...note(27, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              rare positives: <Mark at={honestAt + 4}>trust PR-AUC</Mark>
+              Rare positives: <Mark at={honestAt + 4}>trust PR-AUC</Mark>
             </span>
           </Note>
         </Fade>
@@ -262,7 +262,7 @@ export const AucScene: React.FC = () => {
           <Note at={ignoreAt - 2} x={ROC.left} y={y(300)}>
             <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
               <Strike at={ignoreAt + 6} color={ACCENT} top="0.78em">
-                accuracy
+                Accuracy
               </Strike>
               <span style={{ opacity: ease(frame, negAt - 2, 10) }}>
                 : calling every case negative scores <b style={{ color: ACCENT_INK }}>{fmt(CLS.allNegative * 100, 0)}%</b>
@@ -271,7 +271,7 @@ export const AucScene: React.FC = () => {
           </Note>
           <Note at={weightAt - 2} x={ROC.left} y={y(400)}>
             <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-              weight the rare class in the loss, at a threshold of 0.5:
+              Weight the rare class in the loss, at a threshold of 0.5:
             </span>
           </Note>
           {pairs.map((p, i) => {

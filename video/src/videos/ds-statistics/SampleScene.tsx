@@ -255,11 +255,11 @@ export const SampleScene: React.FC = () => {
           </MathRun>
         </Note>
         <Note at={halfAt + 4} x={RIGHT_X} y={y(700)} out={panelOut}>
-          <span style={{ ...noteText(24, OK_INK) }}>four times the data, half the error</span>
+          <span style={{ ...noteText(24, OK_INK) }}>Four times the data, half the error</span>
         </Note>
         <Note at={shrinkAt} x={RIGHT_X} y={y(750)} out={panelOut}>
           <span style={{ ...noteText(24, INK_SOFT) }}>
-            the SD stays ≈ <span style={TABULAR}>5</span>
+            The SD stays ≈ <span style={TABULAR}>5</span>
           </span>
         </Note>
 
@@ -307,12 +307,12 @@ export const SampleScene: React.FC = () => {
           <span style={{ ...noteText(24, INK_SOFT) }}>lopsided</span>
         </Note>
         <Note at={bellAt + 2} x={RIGHT_X} y={y(762)}>
-          <span style={{ ...noteText(24, OK_INK) }}>a narrow bell around 5</span>
+          <span style={{ ...noteText(24, OK_INK) }}>A narrow bell around 5</span>
         </Note>
         <Bracket x0={seX0} x1={seX1} y={pileBase - h(PILE_H) - h(14)} at={spreadAt} up />
         <Note at={spreadAt + 4} x={RIGHT_X} y={y(818)}>
           <div style={{ ...noteText(26, INK), ...TABULAR, lineHeight: 1.45 }}>
-            its spread is the SE:
+            Its spread is the SE:
             <br />
             <Mark at={simAt}>{fmt(S.seSimulated, 2)}</Mark> <span style={{ ...label(20, INK_SOFT) }}>simulated</span>
             <span style={{ opacity: ease(frame, formulaAt - 2, 10) }}>

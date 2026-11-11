@@ -141,7 +141,7 @@ export const CvScene: React.FC = () => {
           {/* High enough to clear the five-fold averages, whose tallest column
               (66 of the 200) stands 22 dots high. */}
           <PanelTitle x={STRIP.left} y={top - h(84)} at={asked - 2}>
-            the same model, two hundred random splits of the tumor data
+            The same model, two hundred random splits of the tumor data
           </PanelTitle>
           <Svg>
             <line x1={STRIP.left} x2={STRIP.right} y1={base + 1} y2={base + 1} stroke={INK} strokeWidth={1.6} opacity={ease(frame, asked, 12)} />
@@ -182,7 +182,7 @@ export const CvScene: React.FC = () => {
             </span>
           </Bracket>
           <Note at={oneAt + 2} x={STRIP.left} y={base + h(128)} out={meanAt}>
-            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>one split: one draw from that range</span>
+            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>One split: one draw from that range</span>
           </Note>
 
           {/* The folds' mean, back on the same axis; then the same average over
@@ -192,12 +192,12 @@ export const CvScene: React.FC = () => {
           </Svg>
           <Note at={meanAt + 2} x={STRIP.left} y={base + h(128)}>
             <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              five folds, averaged: <span style={TABULAR}>{fmt(CV.mean * 100, 1)}%</span>
+              Five folds, averaged: <span style={TABULAR}>{fmt(CV.mean * 100, 1)}%</span>
             </span>
           </Note>
           <Note at={pileAt - 2} x={STRIP.left} y={base + h(170)}>
             <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap" }}>
-              that average on {CV.means.length} reshuffles:{" "}
+              That average on {CV.means.length} reshuffles:{" "}
               <b style={TABULAR}>
                 {pct(CV.meansMin, 1)} to {pct(CV.meansMax, 1)}
               </b>
@@ -206,7 +206,7 @@ export const CvScene: React.FC = () => {
 
           {/* ── Five folds, each scored by the other four ── */}
           <PanelTitle x={FOLDS.left} y={y(FOLDS.top) - h(52)} at={kfoldAt - 2}>
-            five folds of the same rows
+            Five folds of the same rows
           </PanelTitle>
           {CV.folds.map((score, k) => {
             const rowAt = k === 0 ? fourAt - 4 : overAt + k * 5;
@@ -346,7 +346,7 @@ const TimeSeries: React.FC<{ at: number; afterAt: number; left: number; top: num
   return (
     <>
       <div style={{ position: "absolute", left, top, ...label(21, INK), fontWeight: 500, opacity: ease(frame, from, 10), whiteSpace: "nowrap" }}>
-        time series: validate only on what comes after
+        Time series: validate only on what comes after
       </div>
       {Array.from({ length: rows }, (_, r) =>
         Array.from({ length: 6 }, (_, c) => {

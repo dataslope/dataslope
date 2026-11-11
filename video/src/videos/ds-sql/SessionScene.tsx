@@ -192,11 +192,11 @@ export const SessionScene: React.FC = () => {
           ]}
         />
         <Note at={gapsAt} x={X0} y={g.rowTop(S.rows.length) + h(14)} out={allAt}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>gaps over 30 minutes open a session</span>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Gaps over 30 minutes open a session</span>
         </Note>
         <Note at={allAt} x={X0} y={g.rowTop(S.rows.length) + h(14)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            all 5 users: <b>{totalHits}</b> hits, <b>{totalSessions}</b> sessions
+            All 5 users: <b>{totalHits}</b> hits, <b>{totalSessions}</b> sessions
           </span>
         </Note>
       </Drift>

@@ -23,8 +23,8 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const whyAt = c.w("r-thumbs", "Why is a thumbs-up rate");
   const reasons = [
-    { text: "few people click", at: c.w("r-thumbs", "Few people click") },
-    { text: "the ones who do aren't typical", at: c.w("r-thumbs", "the ones who do aren't typical") },
+    { text: "Few people click", at: c.w("r-thumbs", "Few people click") },
+    { text: "The ones who do aren't typical", at: c.w("r-thumbs", "the ones who do aren't typical") },
   ];
   const rewardsAt = c.w("r-thumbs", "it rewards a confident tone");
   const correctAt = c.w("r-thumbs", "over a correct answer");
@@ -39,7 +39,7 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={whyAt - 2} x={R_X} y={c.y(330)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>a weak primary metric, because:</span>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>A weak primary metric, because:</span>
       </Note>
       {reasons.map((r, i) => (
         <Note key={r.text} at={r.at - 2} x={R_X + 30} y={c.y(390) + i * c.h(50)}>
@@ -48,14 +48,14 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
       ))}
       <Note at={rewardsAt - 2} x={R_X + 30} y={c.y(490)}>
         <span style={{ ...note(27, ACCENT_INK), whiteSpace: "nowrap" }}>
-          it rewards <Mark at={rewardsAt + 8} color={MARK_BAD}>a confident tone</Mark>
+          It rewards <Mark at={rewardsAt + 8} color={MARK_BAD}>a confident tone</Mark>
           <span style={{ opacity: ease(frame, correctAt - 2, 10) }}>
             {" "}over <Strike at={correctAt + 8}>a correct answer</Strike>
           </span>
         </span>
       </Note>
       <Note at={nextAt - 2} x={R_X} y={c.y(570)}>
-        <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>track what people do next:</span>
+        <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Track what people do next:</span>
       </Note>
       {signs.map((s, i) => (
         <Tag key={s.text} x={R_X + 30} y={c.y(626) + i * c.h(62)} at={s.at - 2} size={24} tone="green">
@@ -64,7 +64,7 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
       ))}
       <Note at={diagAt - 2} x={R_X} y={c.y(830)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-          keep the thumbs-up rate as{" "}
+          Keep the thumbs-up rate as{" "}
           <span style={{ opacity: ease(frame, targetAt - 2, 10) }}>
             <Mark at={targetAt + 6}>a diagnostic, not the target</Mark>
           </span>
@@ -83,10 +83,10 @@ const Contamination: React.FC<{ c: Ctx }> = ({ c }) => {
   const memoryAt = c.w("r-contam", "measures memory");
   const skillAt = c.w("r-contam", "not skill");
   const actions = [
-    { text: "don't pick a model on leaderboards alone", at: c.w("r-contam", "Don't pick a model") },
-    { text: "keep your own eval set private", at: c.w("r-contam-keep", "Keep your own eval set private") },
-    { text: "refresh it with recent cases", at: c.w("r-contam-keep", "refresh it with recent cases") },
-    { text: "never train on it", at: c.w("r-contam-keep", "never train on it") },
+    { text: "Don't pick a model on leaderboards alone", at: c.w("r-contam", "Don't pick a model") },
+    { text: "Keep your own eval set private", at: c.w("r-contam-keep", "Keep your own eval set private") },
+    { text: "Refresh it with recent cases", at: c.w("r-contam-keep", "refresh it with recent cases") },
+    { text: "Never train on it", at: c.w("r-contam-keep", "never train on it") },
   ];
   const promptsAt = c.w("r-contam-keep", "put it in few-shot prompts");
   const train = ease(frame, contamAt, 14);
@@ -187,10 +187,10 @@ export const RapidScene: React.FC = () => {
 
         {/* The close: what every round came back to, and the practice. */}
         <Note at={roundAt} x={X0} y={y(330)}>
-          <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>every round on this track came back to one question</span>
+          <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>Every round on this track came back to one question</span>
         </Note>
         <Note at={practice[0].at - 6} x={X0} y={y(450)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>to practice</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>To practice</span>
         </Note>
         {practice.map((p, i) => (
           <Tag key={p.text} x={X0} y={y(500) + i * h(74)} at={p.at - 2} size={28} tone="blue" lit={i === 2 ? workAt : undefined}>

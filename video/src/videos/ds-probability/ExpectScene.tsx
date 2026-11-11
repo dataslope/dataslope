@@ -125,7 +125,7 @@ export const ExpectScene: React.FC = () => {
           />
         ))}
         <Note at={weightedAt} x={X0} y={y(320)} out={out6}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>the probability-weighted average:</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>The probability-weighted average:</span>
           <span style={{ ...math(40), marginLeft: 14 }}>
             <E>
               <V>X</V>
@@ -245,7 +245,7 @@ export const ExpectScene: React.FC = () => {
           {/* Each person is an indicator: the count of matches is their sum. */}
           <Note at={indicatorAt} x={X0} y={y(418)}>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-              each person is an indicator: <span style={TABULAR}>1</span> if they get their own hat, <span style={TABULAR}>0</span> if not
+              Each person is an indicator: <span style={TABULAR}>1</span> if they get their own hat, <span style={TABULAR}>0</span> if not
             </span>
           </Note>
 

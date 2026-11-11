@@ -140,14 +140,14 @@ export const SidesScene: React.FC = () => {
           <Note at={twoAt} x={PANELS[0].left} y={y(320)}>
             <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={usuallyAt} color={MARK_OK}>
-                two-sided
+                Two-sided
               </Mark>
               <span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, eachAt, 10) }}>: 2.5% in each tail</span>
             </span>
           </Note>
           <Note at={oneAt} x={PANELS[1].left} y={y(320)}>
             <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              one-sided<span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, allAt, 10) }}>: all 5% on the predicted side</span>
+              One-sided<span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, allAt, 10) }}>: all 5% on the predicted side</span>
             </span>
           </Note>
           {[
@@ -156,24 +156,24 @@ export const SidesScene: React.FC = () => {
           ].map((r) => (
             <React.Fragment key={r.left}>
               <Note at={r.powerAt} x={r.left} y={y(686)}>
-                <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>power {pct(r.power)}</span>
+                <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>Power {pct(r.power)}</span>
               </Note>
               <Note at={r.ok ? regressionAt : neverAt - 2} x={r.left} y={y(734)}>
                 <span style={{ ...note(26, r.ok ? INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-                  a regression the same size: caught {pct(r.caught)}
+                  A regression the same size: caught {pct(r.caught)}
                 </span>
               </Note>
             </React.Fragment>
           ))}
           <Note at={usuallyAt - 2} x={PANELS[0].left} y={y(800)}>
-            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>features can hurt: product tests are usually two-sided</span>
+            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Features can hurt: product tests are usually two-sided</span>
           </Note>
         </Fade>
 
         {/* ── Question 8: an interval against a margin ── */}
         <Note at={checkoutAt} x={330} y={y(300)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            a cheaper checkout may cost{" "}
+            A cheaper checkout may cost{" "}
             <b>
               <Mark at={halfAt - 2}>at most half a point</Mark>
             </b>{" "}
@@ -241,7 +241,7 @@ export const SidesScene: React.FC = () => {
         })}
         <Note at={notWorseAt - 2} x={330} y={y(820)}>
           <span style={{ ...note(32, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={liveAt - 6}>not significant ≠ not worse</Mark>
+            <Mark at={liveAt - 6}>Not significant ≠ not worse</Mark>
           </span>
         </Note>
       </Drift>

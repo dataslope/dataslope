@@ -47,7 +47,7 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
       <Axes x={xs} y={ys} xTicks={[140, 160, 180, 200]} yTicks={[50, 75, 100]} xTitle="height, cm" yTitle="weight, kg" at={startAt} size={21} />
       <Dots dots={dots} r={4.5} opacity={0.6} />
       <Note at={startAt + 6} x={SIDE} y={y(390)}>
-        <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>covariance</span>
+        <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>Covariance</span>
       </Note>
       <Note at={cmAt} x={SIDE} y={y(424)}>
         <span style={{ ...note(30, INK), ...TABULAR, whiteSpace: "nowrap" }}>{fmt(COV.covCm, 1)} in centimeters</span>
@@ -57,7 +57,7 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
       </Note>
       <Note at={corrAt} x={SIDE} y={y(512)}>
         <span style={{ ...label(23, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
-          correlation <span style={{ color: OK_INK }}>{fmt(COV.rCm)}</span> either way
+          Correlation <span style={{ color: OK_INK }}>{fmt(COV.rCm)}</span> either way
         </span>
       </Note>
       <Svg opacity={ease(frame, rangeAt, 12)}>
@@ -85,7 +85,7 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
         <span style={{ ...label(26, INK), ...TABULAR, whiteSpace: "nowrap" }}>r = {fmt(COV.parabolaR)}</span>
       </Note>
       <Note at={lineAt} x={PARA.right + 30} y={y(PARA.top) + 52}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>no straight line,</span>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>No straight line,</span>
         <br />
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
           <Mark at={lineAt + 10}>still a relationship</Mark>
@@ -111,8 +111,8 @@ const Bet: React.FC<{ w: Words; out?: number }> = ({ w, out: dim }) => {
   const likelyAt = w("r-bet-ev", "its likeliest outcome");
   const d = dim === undefined ? 0 : ease(frame, dim, 14);
   const rows = [
-    { text: "win $10, one time in five", weight: BET.pWinFrac, pay: BET.win, part: BET.winPart, at: startAt, prodAt: fifthAt, partAt: twoAt, color: OK, ink: OK_INK },
-    { text: "lose $3, four times in five", weight: BET.pLoseFrac, pay: BET.lose, part: BET.losePart, at: loseAt, prodAt: fourFifthsAt, partAt: minusAt, color: ACCENT, ink: ACCENT_INK },
+    { text: "Win $10, one time in five", weight: BET.pWinFrac, pay: BET.win, part: BET.winPart, at: startAt, prodAt: fifthAt, partAt: twoAt, color: OK, ink: OK_INK },
+    { text: "Lose $3, four times in five", weight: BET.pLoseFrac, pay: BET.lose, part: BET.losePart, at: loseAt, prodAt: fourFifthsAt, partAt: minusAt, color: ACCENT, ink: ACCENT_INK },
   ];
   const money = (v: number) => `${v < 0 ? "−" : "+"}$${fmt(Math.abs(v))}`;
   const dollars = (v: number) => `${v < 0 ? "−" : ""}$${Math.abs(v)}`;
@@ -151,7 +151,7 @@ const Bet: React.FC<{ w: Words; out?: number }> = ({ w, out: dim }) => {
       </Svg>
       <Note at={fortyAt} x={R_X} y={y(BET_ROW.top) + 2 * BET_ROW.row + 24}>
         <span style={{ ...note(34, ACCENT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
-          expected value: −$0.40 a play
+          Expected value: −$0.40 a play
         </span>
       </Note>
     </div>

@@ -145,13 +145,13 @@ export const ReshapeScene: React.FC = () => {
         />
         <Note at={uniqueAt} x={BACK_X} y={bg.rowTop(B.rows.length) + h(20)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            each <Mark at={uniqueAt + 8}>(user, quarter)</Mark> pair
+            Each <Mark at={uniqueAt + 8}>(user, quarter)</Mark> pair
           </span>
           <br />
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>must be unique</span>
         </Note>
         <Note at={repeatAt} x={BACK_X} y={bg.rowTop(B.rows.length) + h(110)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>pairs repeat?</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Pairs repeat?</span>
           <br />
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Mark at={tableAt + 4}>

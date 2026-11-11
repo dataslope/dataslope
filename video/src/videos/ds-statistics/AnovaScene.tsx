@@ -73,7 +73,7 @@ export const AnovaScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={testAt} x={X0} y={y(300)}>
-          <span style={{ ...noteText(26, INK) }}>are three or more group means equal?</span>
+          <span style={{ ...noteText(26, INK) }}>Are three or more group means equal?</span>
         </Note>
         <Axes
           x={{ lo: 0, hi: 1, a: GROUP_X[0] - 130, b: GROUP_X[2] + 130 }}
@@ -117,7 +117,7 @@ export const AnovaScene: React.FC = () => {
         </Svg>
         <Note at={betweenAt + 6} x={SIDE_X} y={y(420)}>
           <span style={{ ...noteText(26, WARM_INK) }}>
-            spread <b>between</b> the groups
+            Spread <b>between</b> the groups
           </span>
         </Note>
         <Note at={withinAt + 6} x={SIDE_X} y={y(470)}>
@@ -135,12 +135,12 @@ export const AnovaScene: React.FC = () => {
         </Note>
         <Note at={someAt} x={SIDE_X} y={y(596)}>
           <span style={{ ...noteText(24, INK) }}>
-            a big F: some mean differs,{" "}
+            A big F: some mean differs,{" "}
             <span style={{ color: ACCENT_INK, opacity: ease(frame, whichAt - 2, 10) }}>not which</span>
           </span>
         </Note>
         <Note at={tukeyAt} x={SIDE_X} y={y(640)} dim={pairsAt}>
-          <span style={{ ...noteText(24, OK_INK) }}>a post-hoc test, like Tukey&apos;s, finds the pairs</span>
+          <span style={{ ...noteText(24, OK_INK) }}>A post-hoc test, like Tukey&apos;s, finds the pairs</span>
         </Note>
 
         {/* ── Testing every pair instead ── */}

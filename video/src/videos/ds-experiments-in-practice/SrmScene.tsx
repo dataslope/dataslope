@@ -49,9 +49,9 @@ export const SrmScene: React.FC = () => {
   const fineP = n.word("srm-test", "would be chance");
   const causeAt = n.word("srm-cause", "A mismatch means");
   const causes = [
-    { text: "bots filtered from one arm", at: n.word("srm-cause", "bots filtered") },
-    { text: "a redirect that loses slow page loads", at: n.word("srm-cause", "a redirect") },
-    { text: "a logging bug", at: n.word("srm-cause", "a logging bug") },
+    { text: "Bots filtered from one arm", at: n.word("srm-cause", "bots filtered") },
+    { text: "A redirect that loses slow page loads", at: n.word("srm-cause", "a redirect") },
+    { text: "A logging bug", at: n.word("srm-cause", "a logging bug") },
   ];
   const findAt = n.word("srm-cause", "Find it before");
   const end = n.beat("srm-cause").to;
@@ -146,7 +146,7 @@ export const SrmScene: React.FC = () => {
         {/* The test. */}
         <Note at={chiAt} x={RIGHT_X} y={y(390)} out={formulaOut}>
           <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            a chi-square test: <span style={{ opacity: ease(frame, chanceAt, 10) }}>could chance do this?</span>
+            A chi-square test: <span style={{ opacity: ease(frame, chanceAt, 10) }}>could chance do this?</span>
           </span>
         </Note>
         <Note at={chiAt + 6} x={RIGHT_X} y={y(440)} out={formulaOut}>
@@ -243,7 +243,7 @@ export const SrmScene: React.FC = () => {
 
         {/* What usually causes it. */}
         <Note at={causeAt + 2} x={RIGHT_X} y={y(400)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>something treats the arms differently:</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Something treats the arms differently:</span>
         </Note>
         {causes.map((c, i) => (
           <Note key={c.text} at={c.at - 2} x={RIGHT_X} y={y(450) + i * h(56)}>

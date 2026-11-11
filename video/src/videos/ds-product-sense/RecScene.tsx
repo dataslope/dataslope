@@ -59,10 +59,10 @@ export const RecScene: React.FC = () => {
   const q9At = n.word("cant", "Question nine");
   const q9TextAt = n.word("cant", "When can't you run");
   const reasons = [
-    { text: "the change is global", eg: "a redesign", at: n.word("cant", "When the change is global"), egAt: n.word("cant", "like a redesign") },
-    { text: "users affect each other", eg: "a marketplace", at: n.word("cant", "When users affect each other"), egAt: n.word("cant", "as in a marketplace") },
-    { text: "too few users", eg: "", at: n.word("cant", "too few of them"), egAt: 0 },
-    { text: "it would be unethical", eg: "", at: n.word("cant", "when it would be unethical"), egAt: 0 },
+    { text: "The change is global", eg: "a redesign", at: n.word("cant", "When the change is global"), egAt: n.word("cant", "like a redesign") },
+    { text: "Users affect each other", eg: "a marketplace", at: n.word("cant", "When users affect each other"), egAt: n.word("cant", "as in a marketplace") },
+    { text: "Too few users", eg: "", at: n.word("cant", "too few of them"), egAt: 0 },
+    { text: "It would be unethical", eg: "", at: n.word("cant", "when it would be unethical"), egAt: 0 },
   ];
   const switchAt = n.word("cant-instead", "randomize whole regions");
   const slotsAt = n.word("cant-instead", "switch the change on and off");
@@ -72,19 +72,19 @@ export const RecScene: React.FC = () => {
     {
       text: "difference-in-differences",
       at: n.word("cant-instead", "Difference-in-differences"),
-      gloss: "treated regions' change − untreated regions'",
+      gloss: "Treated regions' change − untreated regions'",
       glossAt: n.word("cant-instead", "how much the treated regions moved"),
     },
     {
       text: "a synthetic control",
       at: n.word("cant-instead", "A synthetic control"),
-      gloss: "untreated regions weighted into a stand-in",
+      gloss: "Untreated regions weighted into a stand-in",
       glossAt: n.word("cant-instead", "weights untreated regions"),
     },
     {
       text: "an interrupted time series",
       at: n.word("cant-instead", "An interrupted time series"),
-      gloss: "a break in the trend at the change",
+      gloss: "A break in the trend at the change",
       glossAt: n.word("cant-instead", "looks for a break in the trend"),
     },
   ];
@@ -133,7 +133,7 @@ export const RecScene: React.FC = () => {
 
         {/* ── Question 8: the split ── */}
         <Note at={abAt} x={X0} y={y(330)} out={out8}>
-          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>an A/B test: users split at random</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>An A/B test: users split at random</span>
         </Note>
         <Svg opacity={usersIn * (1 - ease(frame, out8, 10))}>
           {users.map((u, i) => {
@@ -173,28 +173,28 @@ export const RecScene: React.FC = () => {
         {/* The design: one primary metric, guardrails, the unit. */}
         <Note at={primaryAt} x={RIGHT_X} y={y(330)} out={out8}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>primary</b>
+            <b style={{ color: OK_INK }}>Primary</b>
             <span style={{ opacity: ease(frame, shareAt, 12) }}>: share of users who cook a recommended recipe</span>
           </span>
         </Note>
         <Note at={guardsAt} x={RIGHT_X} y={y(384)} out={out8}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            <b>guardrails</b>: latency, variety
+            <b>Guardrails</b>: latency, variety
           </span>
         </Note>
         <Note at={unitAt} x={RIGHT_X} y={y(438)} out={out8}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            <b>unit</b>: the user, not the <Strike at={unitAt + 8}>session</Strike>
+            <b>Unit</b>: the user, not the <Strike at={unitAt + 8}>session</Strike>
           </span>
         </Note>
         <Note at={indepAt} x={RIGHT_X + 24} y={y(482)} out={out8}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>one person&apos;s sessions aren&apos;t independent</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>One person&apos;s sessions aren&apos;t independent</span>
         </Note>
 
         {/* The size, before launch: DA Part 7's formula. */}
         <Note at={sizeAt} x={RIGHT_X} y={y(SIZE.top) - h(56)} out={out8}>
           <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            users per group <span style={{ ...note(25, INK_SOFT), fontWeight: 500 }}>(80% power, 5% two-sided)</span>
+            Users per group <span style={{ ...note(25, INK_SOFT), fontWeight: 500 }}>(80% power, 5% two-sided)</span>
           </span>
         </Note>
         {[
@@ -228,7 +228,7 @@ export const RecScene: React.FC = () => {
 
         {/* Whole weeks, weekends included. */}
         <Note at={weeksAt} x={X0} y={y(WEEKS.top) - h(44)} out={out8}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>run whole weeks</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Run whole weeks</span>
         </Note>
         <Svg opacity={1 - ease(frame, out8, 10)}>
           {Array.from({ length: 14 }, (_, i) => {
@@ -265,7 +265,7 @@ export const RecScene: React.FC = () => {
             </Note>
           ))}
           <Note at={switchAt - 2} x={ALT_X} y={y(340)}>
-            <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>instead:</span>
+            <span style={{ ...note(29, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Instead:</span>
           </Note>
           <Tag x={ALT_X} y={y(396)} at={switchAt} size={25} tone="blue">
             randomize whole regions
@@ -288,7 +288,7 @@ export const RecScene: React.FC = () => {
           ))}
           <Note at={tradesAt} x={ALT_X} y={y(730)}>
             <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-              less rigor,{" "}
+              Less rigor,{" "}
               <span style={{ opacity: ease(frame, runAt, 10) }}>
                 <Mark at={numbersAt} color={`color-mix(in srgb, ${OK} 24%, transparent)`}>
                   but you can actually run it

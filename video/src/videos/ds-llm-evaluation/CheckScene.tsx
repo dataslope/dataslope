@@ -78,11 +78,11 @@ export const CheckScene: React.FC = () => {
   const dropsAt = n.word("check", "quietly drops a third of the rows");
   const countAt = n.word("check", "Count rows at every step");
   const items = [
-    { text: "silent data loss: count rows at every step", at: lossAt },
-    { text: "leakage: a scaler fit before the split", at: n.word("check-list", "Then leakage") },
-    { text: "the wrong test", at: n.word("check-test", "The wrong test") },
-    { text: "columns or functions that don't exist", at: n.word("check-rest", "Columns or functions") },
-    { text: "causal claims it can't support", at: n.word("check-rest", "causal claims") },
+    { text: "Silent data loss: count rows at every step", at: lossAt },
+    { text: "Leakage: a scaler fit before the split", at: n.word("check-list", "Then leakage") },
+    { text: "The wrong test", at: n.word("check-test", "The wrong test") },
+    { text: "Columns or functions that don't exist", at: n.word("check-rest", "Columns or functions") },
+    { text: "Causal claims it can't support", at: n.word("check-rest", "causal claims") },
   ];
   const skewAt = n.word("check-test", "a t-test on skewed revenue");
   const twentyAt = n.word("check-test", "twenty segments tested at five percent each");
@@ -110,7 +110,7 @@ export const CheckScene: React.FC = () => {
         {/* The notebook. */}
         <Note at={juniorAt} x={NB.x} y={y(NB.top - 46)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            read it like a junior colleague&apos;s notebook
+            Read it like a junior colleague&apos;s notebook
             <span style={{ opacity: ease(frame, slipAt - 2, 10), color: ACCENT_INK }}>, with extra suspicion</span>
           </span>
         </Note>
@@ -126,11 +126,11 @@ export const CheckScene: React.FC = () => {
         <Cell y={cellY(2)} at={juniorAt + 12} code={'df.groupby("segment")["revenue"].mean()'} />
         <Note at={dropsAt + 8} x={NB.x} y={cellY(3) + h(4)}>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
-            a third of the rows, gone without a word (−{pct(NOTEBOOK.lost)})
+            A third of the rows, gone without a word (−{pct(NOTEBOOK.lost)})
           </span>
         </Note>
         <Note at={dropsAt + 12} x={NB.x} y={cellY(3) + h(52)}>
-          <span style={madeUp()}>made up for this video</span>
+          <span style={madeUp()}>Made up for this video</span>
         </Note>
 
         {/* The checks. */}
@@ -157,7 +157,7 @@ export const CheckScene: React.FC = () => {
             <Tick at={reproAt + 6} size={30} />
             <span style={{ ...note(30, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={reproAt + 8} color={MARK_OK}>
-                reproduce the headline number another way
+                Reproduce the headline number another way
               </Mark>
             </span>
           </div>

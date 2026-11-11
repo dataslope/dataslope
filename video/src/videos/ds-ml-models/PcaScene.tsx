@@ -296,7 +296,7 @@ export const PcaScene: React.FC = () => {
             out={out9}
           >
             <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
-              <span style={{ color: INK, fontWeight: 500 }}>component 1</span>{" "}
+              <span style={{ color: INK, fontWeight: 500 }}>Component 1</span>{" "}
               ={" "}
               {loadings.map((l, i) => (
                 <React.Fragment key={l.name}>
@@ -429,7 +429,7 @@ export const PcaScene: React.FC = () => {
             out={out9}
           >
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-              needs centered data
+              Needs centered data
               <span style={{ opacity: ease(frame, straightAt, 10) }}>
                 , finds only straight-line structure
               </span>
@@ -467,7 +467,7 @@ export const PcaScene: React.FC = () => {
             out={shellOut}
           >
             <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>
-              by 20 dimensions, <span style={TABULAR}>{pct(shell20, 0)}</span> of
+              By 20 dimensions, <span style={TABULAR}>{pct(shell20, 0)}</span> of
               it: the middle is empty
             </span>
           </Note>
@@ -579,7 +579,7 @@ export const PcaScene: React.FC = () => {
 
           <Note at={apartAt} x={COL} y={y(380)}>
             <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-              distances stop telling points apart
+              Distances stop telling points apart
             </span>
           </Note>
           <Note at={sufferAt} x={COL} y={y(430)}>
@@ -595,17 +595,17 @@ export const PcaScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              the fixes:
+              The fixes:
             </span>
           </Note>
           <Note at={fixesAt + 6} x={COL} y={y(576)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              fewer dimensions: PCA, <Mark at={whichAt}>feature selection</Mark>
+              Fewer dimensions: PCA, <Mark at={whichAt}>feature selection</Mark>
             </span>
           </Note>
           <Note at={regAt} x={COL} y={y(616)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              <Mark at={lastAt}>regularization</Mark>
+              <Mark at={lastAt}>Regularization</Mark>
             </span>
           </Note>
         </Drift>

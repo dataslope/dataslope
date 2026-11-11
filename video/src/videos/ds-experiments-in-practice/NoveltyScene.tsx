@@ -153,11 +153,11 @@ export const NoveltyScene: React.FC = () => {
 
         {/* The defences, for both. */}
         <Note at={pastAt} x={SKETCH.x0} y={y(752)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>run past the first weeks</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Run past the first weeks</span>
         </Note>
         <Note at={compareAt} x={SKETCH.x0} y={y(794)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            compare new users
+            Compare new users
             <br />
             <span style={{ opacity: ease(frame, returningAt - 2, 10) }}>with returning ones</span>
           </span>

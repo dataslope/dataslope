@@ -48,8 +48,8 @@ export const LearnScene: React.FC = () => {
   const clipOf = (b: Box): Box => ({ left: b.left - 12, right: b.right + 12, top: y(b.top) - 8, bottom: y(b.bottom) + 12 });
   const pts = (vals: number[]) => LEARN.sizes.map((s, i) => [s, vals[i]] as const);
   const panels = [
-    { b: LEFT, d: "1" as const, title: "a straight line", at: lineAt },
-    { b: RIGHT, d: "9" as const, title: "degree 9", at: nineAt },
+    { b: LEFT, d: "1" as const, title: "A straight line", at: lineAt },
+    { b: RIGHT, d: "9" as const, title: "Degree 9", at: nineAt },
   ];
 
   // The gap at the second size on the right, then where it ends up.
@@ -133,12 +133,12 @@ export const LearnScene: React.FC = () => {
             {/* From 45 points on, training sits a hair above validation (0.313
                 against 0.306): shuffle noise, not a finding. */}
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              both stay near <span style={TABULAR}>{fmt(lineLevel, 1)}</span>, equal within sampling error
+              Both stay near <span style={TABULAR}>{fmt(lineLevel, 1)}</span>, equal within sampling error
             </span>
           </Note>
           <Note at={biasAt - 2} x={LEFT.left} y={y(LEFT.bottom) + h(76)} out={end - 8}>
             <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              bias: more data won&apos;t help
+              Bias: more data won&apos;t help
               {/* What will, in the right answer's green. */}
               <span style={{ color: OK_INK, opacity: ease(frame, flexAt - 2, 10) }}>; a more flexible model will</span>
             </span>
@@ -153,7 +153,7 @@ export const LearnScene: React.FC = () => {
           </Note>
           <Note at={varianceAt - 2} x={RIGHT.left} y={y(RIGHT.bottom) + h(76)} out={end - 8}>
             <span style={{ ...note(27, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              variance: <Mark at={cureAt}>more data helps</Mark>
+              Variance: <Mark at={cureAt}>more data helps</Mark>
             </span>
           </Note>
         </div>

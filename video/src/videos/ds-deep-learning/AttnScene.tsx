@@ -166,10 +166,10 @@ export const AttnScene: React.FC = () => {
           fill={{ color: OK, at: softAt + 6, max: 0.8 }}
         />
         <Tagline x={GX + 2 * GW} y={rowY(4) + h(10)} width={4 * GW} align="center" at={scoreAt + 6} out={softAt} size={19}>
-          each query against each key<span style={{ opacity: ease(frame, dotAt - 2, 10) }}>, by dot product</span>
+          Each query against each key<span style={{ opacity: ease(frame, dotAt - 2, 10) }}>, by dot product</span>
         </Tagline>
         <Tagline x={GX + 2 * GW} y={rowY(4) + h(10)} width={4 * GW} align="center" at={softAt + 6} size={19}>
-          weights: how much each token takes from each
+          Weights: how much each token takes from each
         </Tagline>
         {A.roundedSums.map((s, i) => (
           <Tagline key={i} x={SUM_X} y={rowY(i) + h(20)} at={rowAt + i * 3} size={24} color={OK_INK} weight={500}>
@@ -200,13 +200,13 @@ export const AttnScene: React.FC = () => {
           })}
         </Svg>
         <Note at={hereAt - 2} x={GX} y={rowY(4) + h(52)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>four tokens, random vectors of length {A.d}</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Four tokens, random vectors of length {A.d}</span>
         </Note>
 
         {/* ── One row's output, spelled out ── */}
         <Note at={blendAt - 2} x={BLEND_X} y={rowY(0)}>
           <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            output for &ldquo;{A.tokens[PICK]}&rdquo; =
+            Output for &ldquo;{A.tokens[PICK]}&rdquo; =
           </span>
         </Note>
         {A.tokens.map((t, j) => (
@@ -220,7 +220,7 @@ export const AttnScene: React.FC = () => {
         ))}
         <Note at={onceAt + 2} x={BLEND_X} y={rowY(0) + h(52) + 4 * h(46) + h(20)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={onceAt + 6}>all four rows at once</Mark>
+            <Mark at={onceAt + 6}>All four rows at once</Mark>
           </span>
         </Note>
       </Drift>

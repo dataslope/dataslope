@@ -107,7 +107,7 @@ export const MleScene: React.FC = () => {
 
         {/* ── Question 6: the likelihood over every click rate ── */}
         <Note at={chooseAt} x={X0} y={y(300)} out={mleOut}>
-          <span style={{ ...noteText(26, INK) }}>the parameter that makes the data you saw most probable</span>
+          <span style={{ ...noteText(26, INK) }}>The parameter that makes the data you saw most probable</span>
         </Note>
         <Axes
           x={LX}
@@ -157,7 +157,7 @@ export const MleScene: React.FC = () => {
         </Note>
         <Curve points={curvePts(narrow.values)} at={tenAt + 2} dur={26} out={mleOut} color={BAR} width={3.4} />
         <Note at={narrowAt} x={SIDE_X} y={y(500)} out={mleOut}>
-          <span style={{ ...noteText(24, INK_SOFT) }}>same peak, narrower curve</span>
+          <span style={{ ...noteText(24, INK_SOFT) }}>Same peak, narrower curve</span>
         </Note>
         <Svg opacity={1 - ease(frame, mleOut, 10)}>
           {[wide, narrow].map((c, k) => {
@@ -178,17 +178,17 @@ export const MleScene: React.FC = () => {
         </Svg>
         <Note at={widthAt + 4} x={at(LX, wide.high) + 18} y={level(0) - h(16)} out={mleOut}>
           <span style={{ ...noteText(24, INK) }}>
-            the <Mark at={widthAt + 8}>width</Mark> is the precision
+            The <Mark at={widthAt + 8}>width</Mark> is the precision
           </span>
         </Note>
         <Note at={normalAt} x={SIDE_X} y={y(600)} out={mleOut}>
           <span style={{ ...noteText(24, INK) }}>
-            normal mean → <b>the sample mean</b>
+            Normal mean → <b>the sample mean</b>
           </span>
         </Note>
         <Note at={logisticAt} x={SIDE_X} y={y(650)} out={mleOut}>
           <div style={{ ...noteText(24, INK), lineHeight: 1.35 }}>
-            logistic regression → the same way,
+            Logistic regression → the same way,
             <br />
             maximizing the likelihood of the labels
           </div>
@@ -197,7 +197,7 @@ export const MleScene: React.FC = () => {
         {/* ── Question 7: dividing by n, and by n − 1 ── */}
         <Note at={avgAt} x={X0} y={y(300)}>
           <span style={{ ...noteText(26, INK) }}>
-            unbiased: its <Mark at={avgAt + 6}>average over many samples</Mark> equals the true value
+            Unbiased: its <Mark at={avgAt + 6}>average over many samples</Mark> equals the true value
           </span>
         </Note>
         <Axes
@@ -257,12 +257,12 @@ export const MleScene: React.FC = () => {
 
         <Note at={meanAt} x={SIDE_X} y={y(420)}>
           <span style={{ ...noteText(26, INK) }}>
-            the sample mean: <span style={{ color: OK_INK, fontWeight: 500 }}>unbiased</span>
+            The sample mean: <span style={{ color: OK_INK, fontWeight: 500 }}>unbiased</span>
           </span>
         </Note>
         <Note at={byNAt} x={SIDE_X} y={y(470)}>
           <span style={{ ...noteText(26, INK) }}>
-            variance{" "}
+            Variance{" "}
             <MathRun>
               ÷ <I>n</I>
             </MathRun>
@@ -271,7 +271,7 @@ export const MleScene: React.FC = () => {
         </Note>
         <Note at={ownAt} x={SIDE_X} y={y(550)} out={whyOut}>
           <div style={{ ...noteText(24, INK_SOFT), lineHeight: 1.4 }}>
-            each spread is measured from its own
+            Each spread is measured from its own
             <br />
             mean, which sits closer to the data
             <br />
@@ -298,11 +298,11 @@ export const MleScene: React.FC = () => {
           </span>
         </Note>
         <Note at={mseAt - 4} x={SIDE_X} y={y(600)}>
-          <span style={{ ...noteText(24, INK) }}>mean squared error = bias² + variance</span>
+          <span style={{ ...noteText(24, INK) }}>Mean squared error = bias² + variance</span>
         </Note>
         <Note at={mseAt + 4} x={SIDE_X} y={y(648)}>
           <span style={{ ...noteText(24, INK), ...TABULAR }}>
-            at{" "}
+            At{" "}
             <MathRun>
               <I>n</I> = {rows[five].n}
             </MathRun>
@@ -317,7 +317,7 @@ export const MleScene: React.FC = () => {
           </span>
         </Note>
         <Note at={notBetterAt} x={SIDE_X} y={y(696)}>
-          <span style={{ ...noteText(24, INK_SOFT) }}>unbiased isn&apos;t automatically better</span>
+          <span style={{ ...noteText(24, INK_SOFT) }}>Unbiased isn&apos;t automatically better</span>
         </Note>
       </Drift>
     </AbsoluteFill>

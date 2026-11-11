@@ -83,10 +83,10 @@ export const ErrorsScene: React.FC = () => {
   const stale = 1 - 0.72 * ease(frame, doubleAt + 2, 12);
 
   const levers = [
-    { text: `double the users, ${POWER.n} → ${POWER.levers[0].to}`, v: POWER.levers[0].power },
-    { text: "a bigger effect, 0.2 → 0.3 SD", v: POWER.levers[1].power },
-    { text: "less variance, SD × 0.8", v: POWER.levers[2].power },
-    { text: "a looser alpha, 0.05 → 0.10", v: POWER.levers[3].power },
+    { text: `Double the users, ${POWER.n} → ${POWER.levers[0].to}`, v: POWER.levers[0].power },
+    { text: "A bigger effect, 0.2 → 0.3 SD", v: POWER.levers[1].power },
+    { text: "Less variance, SD × 0.8", v: POWER.levers[2].power },
+    { text: "A looser alpha, 0.05 → 0.10", v: POWER.levers[3].power },
   ];
 
   return (
@@ -180,7 +180,7 @@ export const ErrorsScene: React.FC = () => {
         {/* Power, and what moves it. */}
         <Note at={oneMinusAt} x={COL_X} y={y(596)}>
           <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-            power{" "}
+            Power{" "}
             <MathRun>
               = 1 − <I>β</I>
               <span style={{ opacity: stale }}> = {pct(POWER.base)}</span>
@@ -189,7 +189,7 @@ export const ErrorsScene: React.FC = () => {
         </Note>
         <Note at={codeAt} x={COL_X} y={y(644)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-            the page&apos;s code: effect 0.2 SD, <Mark at={howManyAt - 4}>{POWER.n} per arm</Mark>
+            The page&apos;s code: effect 0.2 SD, <Mark at={howManyAt - 4}>{POWER.n} per arm</Mark>
             <span style={{ opacity: ease(frame, eightyAt, 10) }}> → {pct(POWER.base)}</span>
           </span>
         </Note>

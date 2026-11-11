@@ -145,18 +145,18 @@ export const DropScene: React.FC = () => {
           </Tagline>
           <Note at={expectedAt - 2} x={SUM_X} y={y(R3) + h(64)}>
             <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-              averaged over 100,000 draws: {D.meanSum.toFixed(2)}
+              Averaged over 100,000 draws: {D.meanSum.toFixed(2)}
             </span>
           </Note>
           <Note at={leanAt - 2} x={X0} y={y(700)}>
             <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-              no unit can lean on any one neighbor:{" "}
+              No unit can lean on any one neighbor:{" "}
               <span style={{ opacity: ease(frame, thinnedAt - 4, 10) }}>like training many thinned networks at once</span>
             </span>
           </Note>
           <Note at={inferenceAt - 2} x={X0} y={y(770)}>
             <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-              <Mark at={inferenceAt + 4}>at inference: off</Mark>, all eight pass through
+              <Mark at={inferenceAt + 4}>At inference: off</Mark>, all eight pass through
             </span>
           </Note>
         </Fade>
@@ -165,11 +165,11 @@ export const DropScene: React.FC = () => {
         <Fade from={q9At}>
           <Note at={shrinksAt - 2} x={X0} y={y(330)}>
             <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
-              each step, every weight <Mark at={shrinksAt + 4}>shrinks a little toward zero</Mark>
+              Each step, every weight <Mark at={shrinksAt + 4}>shrinks a little toward zero</Mark>
             </span>
           </Note>
           <Tagline x={X0} y={y(390)} at={sgdAt - 2} size={21}>
-            plain SGD, from{" "}
+            Plain SGD, from{" "}
             <MathRun>
               <I>w</I> = ({DECAY.w.map((v) => num(v, 1)).join(", ")})
             </MathRun>
@@ -187,7 +187,7 @@ export const DropScene: React.FC = () => {
             </MathRun>
           </Tagline>
           <Tagline x={X0} y={y(ROW_A) - h(36)} at={penaltyAt - 2} size={22} color={INK}>
-            an L2 penalty in the loss<span style={{ opacity: ease(frame, lambdaAt - 2, 10) }}>
+            An L2 penalty in the loss<span style={{ opacity: ease(frame, lambdaAt - 2, 10) }}>
               ,{" "}
               <MathRun>
                 <I>λ</I>/2 · ‖<I>w</I>‖²
@@ -218,7 +218,7 @@ export const DropScene: React.FC = () => {
             look={() => ({ tint: { color: CELL_OK, at: sameAt + 4 } })}
           />
           <Tagline x={X0} y={y(ROW_B) - h(36)} at={shrinksAt} size={22} color={INK}>
-            weight decay: shrink by {DECAY.shrink}, then the usual step
+            Weight decay: shrink by {DECAY.shrink}, then the usual step
           </Tagline>
           <Note at={shrinksAt + 2} x={X0} y={y(ROW_B) + h(8)}>
             <MathRun style={{ fontSize: 28, color: INK }}>
@@ -238,12 +238,12 @@ export const DropScene: React.FC = () => {
           <Note at={sameAt + 4} x={790} y={(y(ROW_A) + y(ROW_B)) / 2 + h(10)}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <Tick at={sameAt + 8} size={26} />
-              <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>identical</span>
+              <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Identical</span>
             </div>
           </Note>
           {/* Why Adam breaks the equivalence, then the fix. */}
           <Note at={butAt - 2} x={X0} y={y(690)}>
-            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>with Adam, the two differ: it divides{" "}
+            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>With Adam, the two differ: it divides{" "}
               <MathRun>
                 <I>λw</I>
               </MathRun>{" "}

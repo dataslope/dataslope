@@ -182,7 +182,7 @@ export const BagScene: React.FC = () => {
               ...TABULAR,
             }}
           >
-            one deep tree: test error {fmt(ENS.mse.one, 3)}
+            One deep tree: test error {fmt(ENS.mse.one, 3)}
           </span>
         </Note>
         <Note at={toAt} x={LEFTS[0]} y={under + h(40)}>
@@ -202,7 +202,7 @@ export const BagScene: React.FC = () => {
           <span
             style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
-            <Mark at={varAt + 2}>cuts variance</Mark>
+            <Mark at={varAt + 2}>Cuts variance</Mark>
           </span>
         </Note>
 
@@ -283,14 +283,14 @@ export const BagScene: React.FC = () => {
           {
             at: crudeAt,
             k: "1" as const,
-            name: "after 1 tree",
+            name: "After 1 tree",
             color: BLUE_INK,
           },
-          { at: tenAt, k: "10" as const, name: "after 10", color: BLUE_INK },
+          { at: tenAt, k: "10" as const, name: "After 10", color: BLUE_INK },
           {
             at: mseAt - 4,
             k: "100" as const,
-            name: "after 100",
+            name: "After 100",
             color: OK_INK,
           },
         ].map((s, i) => (
@@ -314,7 +314,7 @@ export const BagScene: React.FC = () => {
         ))}
         <Note at={hundredAt} x={LEFTS[1]} y={under + h(40)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
-            test error (mean squared), on 2,000 new points; the noise
+            Test error (mean squared), on 2,000 new points; the noise
             alone costs {fmt(ENS.mse.noise, 3)}
           </span>
         </Note>
@@ -322,7 +322,7 @@ export const BagScene: React.FC = () => {
           <span
             style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
-            <Mark at={biasAt + 2}>cuts bias</Mark>
+            <Mark at={biasAt + 2}>Cuts bias</Mark>
           </span>
         </Note>
         <Note at={accurateAt} x={LEFTS[1] + 220} y={under + h(100)}>

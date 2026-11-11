@@ -138,7 +138,7 @@ export const UnitScene: React.FC = () => {
             apart by their gap, the usual one green. Each badge holds its
             place before it inks, so the line never reflows. */}
         <div style={{ position: "absolute", left: X0, top: y(300), display: "flex", alignItems: "baseline", gap: 12, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(25, INK_SOFT), opacity: ease(frame, assignedAt, 14) }}>assigned to a group:</span>
+          <span style={{ ...note(25, INK_SOFT), opacity: ease(frame, assignedAt, 14) }}>Assigned to a group:</span>
           {[
             { text: "usually a user", at: userAt, main: true },
             { text: "session", at: sessionAt, main: false },
@@ -159,12 +159,12 @@ export const UnitScene: React.FC = () => {
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>both versions</span>
         </Note>
         <Note at={diluteAt} x={X0} y={y(620)}>
-          <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>the measured difference is diluted</span>
+          <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>The measured difference is diluted</span>
         </Note>
 
         {/* The analysis: orders nested in users. */}
         <Note at={respectAt} x={RIGHT_X} y={y(300)}>
-          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>the analysis respects the unit, too</span>
+          <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>The analysis respects the unit, too</span>
         </Note>
         <Svg opacity={ease(frame, thousandAt - 2, 12)}>
           {ORDERS.map((k, u) => {

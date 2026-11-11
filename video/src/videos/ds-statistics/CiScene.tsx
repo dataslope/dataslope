@@ -79,7 +79,7 @@ export const CiScene: React.FC = () => {
 
         <Note at={procAt} x={X0} y={y(300)} out={clearAt}>
           <span style={{ ...noteText(26, INK) }}>
-            a property of the <Mark at={procAt + 8}>procedure</Mark>, not of one interval
+            A property of the <Mark at={procAt + 8}>procedure</Mark>, not of one interval
           </span>
         </Note>
         <Axes
@@ -94,7 +94,7 @@ export const CiScene: React.FC = () => {
         <Curve points={[[LEFT - 20, vy(TRUTH)], [RIGHT + 20, vy(TRUTH)]]} at={takeAt + 4} dur={16} out={clearAt} color={INK} width={2.4} dash="8 6" />
         <Note at={buildAt + 4} x={SIDE_X} y={y(300)} out={clearAt}>
           <span style={{ ...noteText(22, INK_SOFT) }}>
-            each one:{" "}
+            Each one:{" "}
             <MathRun style={{ color: INK }}>
               <I>x̄</I> ± <I>t</I>*·<I>s</I>/√<I>n</I>
             </MathRun>
@@ -142,23 +142,23 @@ export const CiScene: React.FC = () => {
 
         <Note at={notAt} x={SIDE_X} y={y(540)} out={clearAt}>
           <div style={{ ...body(28, true), color: ACCENT_INK, whiteSpace: "nowrap", lineHeight: 1.3 }}>
-            <Strike at={notAt + 10}>“a 95% chance the mean</Strike>
+            <Strike at={notAt + 10}>“A 95% chance the mean</Strike>
             <br />
             <Strike at={notAt + 16}>is in this interval”</Strike>
           </div>
         </Note>
         <Note at={fixedAt} x={SIDE_X} y={y(650)} out={clearAt}>
           <span style={{ ...noteText(26, INK) }}>
-            the mean is <b>fixed</b>
+            The mean is <b>fixed</b>
           </span>
         </Note>
         <Note at={randomAt} x={SIDE_X} y={y(700)} out={clearAt}>
           <span style={{ ...noteText(26, OK_INK) }}>
-            the <Mark at={testAt}>interval is random</Mark>
+            The <Mark at={testAt}>interval is random</Mark>
           </span>
         </Note>
         <Note at={eitherAt} x={SIDE_X} y={y(770)} out={clearAt}>
-          <span style={{ ...noteText(24, INK_SOFT) }}>each one covers it, or doesn&apos;t</span>
+          <span style={{ ...noteText(24, INK_SOFT) }}>Each one covers it, or doesn&apos;t</span>
         </Note>
       </Drift>
     </AbsoluteFill>

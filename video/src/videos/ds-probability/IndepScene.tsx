@@ -129,7 +129,7 @@ export const IndepScene: React.FC = () => {
             whiteSpace: "nowrap",
           }}
         >
-          <span style={{ ...note(26, INK_SOFT), display: "inline-block", width: PROD4.lead, opacity: 1 - move }}>equivalently</span>
+          <span style={{ ...note(26, INK_SOFT), display: "inline-block", width: PROD4.lead, opacity: 1 - move }}>Equivalently</span>
           <span style={{ ...math(46), display: "inline-block", width: COL.w }}>
             <P>
               <V>A</V> and <V>B</V>
@@ -148,10 +148,10 @@ export const IndepScene: React.FC = () => {
           <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A claim to justify. These break it:</span>
         </Note>
         <Note at={visitsAt} x={X0 + 24} y={y(600)} out={out4}>
-          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>repeat visits by the same user</span>
+          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>Repeat visits by the same user</span>
         </Note>
         <Note at={networkAt} x={X0 + 24} y={y(650)} out={out4}>
-          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>network effects</span>
+          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>Network effects</span>
         </Note>
 
         {/* A thousand users, split by plan, as area. */}
@@ -280,11 +280,11 @@ export const IndepScene: React.FC = () => {
             <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, toZeroAt + 8, 12) }}>out of the one face left</span>
           </Note>
           <Note at={farAt} x={COL.x} y={y(COL.far)}>
-            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>as far from independent as it gets</span>
+            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>As far from independent as it gets</span>
           </Note>
           <Note at={neverAt - 8} x={COL.x} y={y(COL.never)}>
             <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              <Mark at={neverAt}>exclusive, and each possible: never independent</Mark>
+              <Mark at={neverAt}>Exclusive, and each possible: never independent</Mark>
             </span>
           </Note>
           <Svg opacity={ease(frame, twoAt + 6, 10)}>

@@ -88,8 +88,8 @@ export const HookScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>One sentence gives it away</span>
         </Note>
         {[
-          { at: pAt, term: "a p-value", read: "the chance the null is true", strike: hookEnd - 18 },
-          { at: ciAt, term: "a 95% interval", read: "a 95% chance", strike: hookEnd - 8 },
+          { at: pAt, term: "A p-value", read: "the chance the null is true", strike: hookEnd - 18 },
+          { at: ciAt, term: "A 95% interval", read: "a 95% chance", strike: hookEnd - 8 },
         ].map((m, i) => (
           <Note key={m.term} at={m.at} x={X0} y={y(MISREAD_Y + 56 + i * 110)} out={misreadOut}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
@@ -146,7 +146,7 @@ export const HookScene: React.FC = () => {
           );
         })}
         <Note at={shortAt + 4} x={shortX} y={roadY + h(48)} dim={bridgeAt + 2} out={clearAt}>
-          <span style={{ ...noteText(26, INK_SOFT) }}>short</span>
+          <span style={{ ...noteText(26, INK_SOFT) }}>Short</span>
         </Note>
         <Note at={figureAt + 6} x={X0} y={roadY + h(110)} dim={bridgeAt + 2} out={clearAt}>
           <span style={{ ...noteText(24, INK_SOFT) }}>

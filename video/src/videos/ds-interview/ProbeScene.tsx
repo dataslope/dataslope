@@ -35,27 +35,27 @@ export const ProbeScene: React.FC = () => {
       at: n.word("probe-list", "Statistics and probability"),
       name: "Statistics & probability",
       items: [
-        { at: n.word("probe-list", "distributions"), text: "distributions" },
-        { at: n.word("probe-list", "tests and intervals"), text: "tests and intervals" },
+        { at: n.word("probe-list", "distributions"), text: "Distributions" },
+        { at: n.word("probe-list", "tests and intervals"), text: "Tests and intervals" },
       ],
     },
     {
       at: n.word("probe-list", "Modeling"),
       name: "Modeling",
       items: [
-        { at: n.word("probe-list", "the bias and variance trade-off"), text: "the bias–variance trade-off" },
-        { at: n.word("probe-list", "regularization"), text: "regularization" },
-        { at: n.word("probe-list", "validation"), text: "validation" },
-        { at: n.word("probe-list", "the metric you pick"), text: "the metric you pick" },
+        { at: n.word("probe-list", "the bias and variance trade-off"), text: "The bias–variance trade-off" },
+        { at: n.word("probe-list", "regularization"), text: "Regularization" },
+        { at: n.word("probe-list", "validation"), text: "Validation" },
+        { at: n.word("probe-list", "the metric you pick"), text: "The metric you pick" },
       ],
     },
     {
       at: n.word("probe-list", "Experimentation"),
       name: "Experimentation",
       items: [
-        { at: n.word("probe-list", "the design"), text: "the design" },
-        { at: n.word("probe-list", "its power"), text: "its power" },
-        { at: n.word("probe-list", "the pitfalls"), text: "the pitfalls" },
+        { at: n.word("probe-list", "the design"), text: "The design" },
+        { at: n.word("probe-list", "its power"), text: "Its power" },
+        { at: n.word("probe-list", "the pitfalls"), text: "The pitfalls" },
       ],
     },
     {
@@ -71,7 +71,7 @@ export const ProbeScene: React.FC = () => {
       at: n.word("probe-list", "And communication"),
       name: "Communication",
       items: [
-        { at: n.word("probe-list", "explaining a model and its caveats"), text: "explaining a model and its caveats" },
+        { at: n.word("probe-list", "explaining a model and its caveats"), text: "Explaining a model and its caveats" },
         { at: n.word("probe-list", "to someone who doesn't build them"), text: "to someone who doesn't build them" },
       ],
     },

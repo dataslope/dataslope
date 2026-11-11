@@ -187,7 +187,7 @@ export const FanoutScene: React.FC = () => {
         <ErrorBox x={X0} top={eTop} width={960} at={raisesAt} kind={V.kind} message={V.message} size={19} />
         <Note at={afterAt} x={X0} y={eTop + h(96)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            after a merge: <Mark at={afterAt + 8} out={fixAt}>{nAfter} rows, where you expected {nBefore}</Mark>
+            After a merge: <Mark at={afterAt + 8} out={fixAt}>{nAfter} rows, where you expected {nBefore}</Mark>
           </span>
         </Note>
 

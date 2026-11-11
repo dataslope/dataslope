@@ -179,14 +179,14 @@ export const HookScene: React.FC = () => {
           />
           <Note at={wrongAt} x={col2} y={y(TILE.top) + h(TILE.h) + h(22)}>
             <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              <Mark at={wrongAt + 4}>the one that can say something is wrong</Mark>
+              <Mark at={wrongAt + 4}>The one that can say something is wrong</Mark>
             </span>
           </Note>
           <Note at={madeUpAt} x={X0} y={y(TILE.top) - h(44)}>
-            <span style={{ ...madeUp(21), opacity: 1 }}>one made-up recipe app: all its numbers are invented</span>
+            <span style={{ ...madeUp(21), opacity: 1 }}>One made-up recipe app: all its numbers are invented</span>
           </Note>
           <Note at={codeAt} x={col2 + COL.lineW} align="right" y={y(TILE.top) - h(44) - 5}>
-            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>no code in this round</span>
+            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>No code in this round</span>
           </Note>
 
           {/* Fourteen questions: eleven with a figure, three in a sentence. */}
@@ -223,7 +223,7 @@ export const HookScene: React.FC = () => {
           </Note>
           <Note at={beginAt + 4} x={X0} y={y(SQUARES.top) - 62}>
             <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
-              <b style={{ color: INK }}>first:</b> the number a whole team steers by
+              <b style={{ color: INK }}>First:</b> the number a whole team steers by
             </span>
           </Note>
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, beginAt + 8, 8) }}>

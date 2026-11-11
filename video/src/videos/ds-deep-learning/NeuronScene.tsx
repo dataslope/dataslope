@@ -182,13 +182,13 @@ export const NeuronScene: React.FC = () => {
         <Cells values={[[NEURON.a.toFixed(3)]]} x={OUT_X} y={y(NY) - h(CELL_H) / 2} w={120} h={h(CELL_H)} at={aAt - 2} out={leaveAt + 4} size={30} color={OK_INK} />
         <Cells values={[[String(NEURON.z)]]} x={OUT_X} y={y(NY) - h(CELL_H) / 2} w={120} h={h(CELL_H)} at={leaveAt + 14} out={q1Out} size={30} color={INK} />
         <Note at={regAt - 2} x={ACT_X - 20} y={y(NY) + h(70)} out={q1Out}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>without it: just linear regression</span>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Without it: just linear regression</span>
         </Note>
 
         {/* ── Question 2: two layers, then one matrix, then a non-linearity ── */}
         {/* Row A: through both layers. */}
         <Tagline x={X0} y={y(ROWS.a) - h(42)} at={onlyAt} size={22} color={INK}>
-          two linear layers
+          Two linear layers
         </Tagline>
         <Cells values={col(C.x)} x={330} y={y(ROWS.a)} w={W} h={H} at={goesAt - 2} color={BLUE_INK} format={sn} />
         <ElbowArrow points={[[420, midOf(ROWS.a)], [474, midOf(ROWS.a)]]} at={goesAt + 2} color={INK_SOFT} width={2} head={11} />
@@ -217,7 +217,7 @@ export const NeuronScene: React.FC = () => {
 
         {/* Row B: one matrix, the product of the two. */}
         <Tagline x={X0} y={y(ROWS.b) - h(42)} at={multAt - 4} size={22} color={INK}>
-          one matrix: layer 2 × layer 1
+          One matrix: layer 2 × layer 1
         </Tagline>
         <Cells values={col(C.x)} x={330} y={y(ROWS.b)} w={W} h={H} at={multAt - 2} color={BLUE_INK} format={sn} />
         <ElbowArrow points={[[420, midOf(ROWS.b)], [474, midOf(ROWS.b)]]} at={multAt + 2} color={INK_SOFT} width={2} head={11} />
@@ -234,10 +234,10 @@ export const NeuronScene: React.FC = () => {
           look={() => ({ tint: { color: CELL_OK, at: sameAt + 2 } })}
         />
         <Note at={everyAt - 2} x={1240} y={midOf(ROWS.b) - h(36)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same, for every input</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The same, for every input</span>
         </Note>
         <Note at={tenAt} x={1240} y={midOf(ROWS.b) + h(4)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>ten layers: still one matrix</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Ten layers: still one matrix</span>
         </Note>
         <Svg opacity={ease(frame, sameAt, 10)}>
           <line x1={1118 + W} x2={1118 + W} y1={y(ROWS.a) + cellsH + 8} y2={y(ROWS.b) - 8} stroke={OK} strokeWidth={2.4} strokeDasharray="4 6" />
@@ -248,7 +248,7 @@ export const NeuronScene: React.FC = () => {
 
         {/* Row C: zero the negatives in between. */}
         <Tagline x={X0} y={y(ROWS.c) - h(42)} at={zeroAt - 6} size={22} color={INK}>
-          an activation in between
+          An activation in between
         </Tagline>
         <Cells values={col(C.x)} x={330} y={y(ROWS.c)} w={W} h={H} at={zeroAt - 4} color={BLUE_INK} format={sn} />
         <ElbowArrow points={[[420, midOf(ROWS.c)], [474, midOf(ROWS.c)]]} at={zeroAt - 2} color={INK_SOFT} width={2} head={11} />
@@ -285,7 +285,7 @@ export const NeuronScene: React.FC = () => {
         />
         <Note at={depthAt - 2} x={1400} y={midOf(ROWS.c) - h(18)}>
           <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={whichAt}>now depth adds something</Mark>
+            <Mark at={whichAt}>Now depth adds something</Mark>
           </span>
         </Note>
         <Note at={curvedAt - 2} x={1400} y={midOf(ROWS.c) + h(22)}>

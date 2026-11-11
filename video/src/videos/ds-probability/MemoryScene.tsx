@@ -74,7 +74,7 @@ export const MemoryScene: React.FC = () => {
           </span>
         </Ink>
         <Note at={answerAt + 12} x={X0 + 720} y={y(312)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>time already waited changes nothing</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Time already waited changes nothing</span>
         </Note>
         <Note at={answerAt + 22} x={X0 + 720} y={y(350)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -153,7 +153,7 @@ export const MemoryScene: React.FC = () => {
 
         {/* The same answer, three times. */}
         <Note at={pctAt} x={TABLE.x} y={y(TABLE.top) - 56}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>already waited · chance of 10 more</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Already waited · chance of 10 more</span>
         </Note>
         {windows.map((w, i) => (
           <Note key={w.s} at={i === 0 ? pctAt : w.at} x={TABLE.x} y={y(TABLE.top) + i * TABLE.row}>

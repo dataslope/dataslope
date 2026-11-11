@@ -16,7 +16,7 @@ const PANEL_W = 470;
 const PANEL_GAP = 100;
 const PANEL_BASE = 610;
 const PANEL_H = 230;
-const LABELS = ["one draw", "the average of 5", "the average of 30"] as const;
+const LABELS = ["One draw", "The average of 5", "The average of 30"] as const;
 
 /** The running average: log-scaled draws across, the value up. */
 const RUN_X: Scale = { lo: 0, hi: Math.log10(2000), a: X0, b: 1200 };
@@ -131,7 +131,7 @@ export const CltScene: React.FC = () => {
         {/* ── Question 4: the mean of more draws, closer to a bell ── */}
         <Note at={saysAt} x={X0} y={y(300)} out={panelOut}>
           <span style={{ ...noteText(26, INK) }}>
-            the mean of many independent draws is close to normal,{" "}
+            The mean of many independent draws is close to normal,{" "}
             <span style={{ opacity: ease(frame, finiteAt - 2, 10) }}>if the variance is finite</span>
           </span>
         </Note>
@@ -153,7 +153,7 @@ export const CltScene: React.FC = () => {
           );
         })}
         <Note at={halfAt} x={X0 + PANEL_W + PANEL_GAP} y={base + h(58)} out={panelOut}>
-          <span style={{ ...noteText(24, BLUE_INK) }}>the skew falls by half</span>
+          <span style={{ ...noteText(24, BLUE_INK) }}>The skew falls by half</span>
         </Note>
         <Note at={againAt} x={X0 + 2 * (PANEL_W + PANEL_GAP)} y={base + h(58)} out={panelOut}>
           <span style={{ ...noteText(24, OK_INK) }}>and halves again</span>
@@ -179,7 +179,7 @@ export const CltScene: React.FC = () => {
 
         {/* ── Question 5: one running average, settling ── */}
         <Note at={settleAt} x={X0} y={y(300)} out={clearAt}>
-          <span style={{ ...noteText(26, INK) }}>as a sample grows, its mean settles on the population&apos;s</span>
+          <span style={{ ...noteText(26, INK) }}>As a sample grows, its mean settles on the population&apos;s</span>
         </Note>
         <Axes
           x={RUN_X}

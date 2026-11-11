@@ -83,11 +83,11 @@ export const PoisScene: React.FC = () => {
 
         {/* ── Binomial: a fixed number of trials ── */}
         <Ink at={binAt} dur={14} out={colsOut} style={{ left: X0, top: y(330) }}>
-          <span style={{ ...label(32, INK) }}>binomial</span>
+          <span style={{ ...label(32, INK) }}>Binomial</span>
         </Ink>
         <Note at={binAt + 8} x={X0} y={y(384)} out={colsOut}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            a fixed number of <Mark at={indepAt}>independent</Mark> trials, each with the same chance
+            A fixed number of <Mark at={indepAt}>independent</Mark> trials, each with the same chance
           </span>
         </Note>
         <Svg opacity={1 - ease(frame, colsOut, 10)}>
@@ -132,7 +132,7 @@ export const PoisScene: React.FC = () => {
           <span style={{ ...label(32, INK) }}>Poisson</span>
         </Ink>
         <Note at={ceilingAt} x={COL_R} y={y(384)} out={colsOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>events at a steady rate, with no natural ceiling</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Events at a steady rate, with no natural ceiling</span>
         </Note>
         <Svg opacity={1 - ease(frame, colsOut, 10)}>
           <line
@@ -188,12 +188,12 @@ export const PoisScene: React.FC = () => {
           </span>
         </Note>
         <Note at={rateAt + 16} x={PLOT.right - 300} y={y(PLOT.top) + 90}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>almost exactly the same</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Almost exactly the same</span>
         </Note>
         {/* The rule, not just the one example: many trials, a small chance. */}
         <Note at={npAt} x={PLOT.right - 300} y={y(PLOT.top) + 150}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            many trials, small chance:{" "}
+            Many trials, small chance:{" "}
             <span style={math(30)}>
               λ = <V>n</V>
               <V>p</V>

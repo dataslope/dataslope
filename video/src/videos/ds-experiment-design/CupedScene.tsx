@@ -179,7 +179,7 @@ export const CupedScene: React.FC = () => {
 
         {/* The adjustment, then what it buys. */}
         <Note at={subtractAt} x={COL_X} y={y(380)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>subtract what the pre-period predicts</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Subtract what the pre-period predicts</span>
           <div style={{ fontSize: 26, color: INK, marginTop: 10, whiteSpace: "nowrap" }}>
             <MathRun>
               <I>Y</I>
@@ -191,7 +191,7 @@ export const CupedScene: React.FC = () => {
           </div>
         </Note>
         <Note at={pageAt} x={COL_X} y={y(500)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>the page&apos;s {CUPED.n} users</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>The page&apos;s {CUPED.n} users</span>
         </Note>
         {bars.map((b, i) => {
           const p = ease(frame, b.at - 4, 14);
@@ -211,18 +211,18 @@ export const CupedScene: React.FC = () => {
         })}
         <Note at={averageAt} x={COL_X} y={y(740)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            average {CUPED.meanY.toFixed(2)} → {CUPED.meanAdj.toFixed(2)}, <b style={{ color: OK_INK }}>unchanged</b>
+            Average {CUPED.meanY.toFixed(2)} → {CUPED.meanAdj.toFixed(2)}, <b style={{ color: OK_INK }}>unchanged</b>
           </span>
         </Note>
         <Note at={noiseAt} x={COL_X} y={y(786)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>only the noise shrinks:</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Only the noise shrinks:</span>
         </Note>
         <Note at={halfAt - 2} x={COL_X} y={y(826)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>same power, under half the users</span>
         </Note>
         <Note at={shareAt - 2} x={COL_X} y={y(880)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            share removed{" "}
+            Share removed{" "}
             <MathRun>
               = <I>r</I>²
             </MathRun>

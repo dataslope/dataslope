@@ -241,7 +241,7 @@ export const ShapScene: React.FC = () => {
           <span
             style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}
           >
-            <Mark at={madeAt}>made up for this video</Mark>:{" "}
+            <Mark at={madeAt}>Made up for this video</Mark>:{" "}
             {SHAP.n.toLocaleString("en-US")} customers
           </span>
         </Note>
@@ -267,7 +267,7 @@ export const ShapScene: React.FC = () => {
           <span
             style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
-            share of importance:{" "}
+            Share of importance:{" "}
             <span style={{ color: BLUE_INK }}>the forest&apos;s impurity</span>
             <span style={{ color: OK_INK, opacity: ease(frame, rankAt, 10) }}>
               {" "}
@@ -377,7 +377,7 @@ export const ShapScene: React.FC = () => {
           <span
             style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}
           >
-            one customer: the chance of churning, feature by feature
+            One customer: the chance of churning, feature by feature
           </span>
         </Note>
         <Svg opacity={ease(frame, splitsAt, 12)}>
@@ -495,7 +495,7 @@ export const ShapScene: React.FC = () => {
               background: PAPER,
             }}
           >
-            exact Shapley values: every subset of the 4 features, computed in
+            Exact Shapley values: every subset of the 4 features, computed in
             NumPy
           </span>
         </Note>
@@ -508,7 +508,7 @@ export const ShapScene: React.FC = () => {
         >
           <span style={{ ...label(20, INK), whiteSpace: "nowrap" }}>
             <span style={{ fontWeight: 500 }}>
-              permutation importance, on held-out rows:
+              Permutation importance, on held-out rows:
             </span>{" "}
             {SHAP.names.map((name, i) => {
               const v = `${i === 3 ? "ID" : name} ${Math.round(perm[i] * 100)}%`;

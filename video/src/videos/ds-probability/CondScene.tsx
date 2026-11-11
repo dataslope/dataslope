@@ -110,7 +110,7 @@ export const CondScene: React.FC = () => {
           </span>
         </Ink>
         <Note at={answerAt + 10} x={X0 + 250} y={y(318)} out={out1}>
-          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>the probability of A, given that B has happened</span>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>The probability of A, given that B has happened</span>
         </Note>
 
         {[1, 2, 3, 4, 5, 6].map((v, i) => {
@@ -253,7 +253,7 @@ export const CondScene: React.FC = () => {
           </span>
         </Note>
         <Note at={knowAt + 2} x={X0} y={y(650)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>you know </span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>You know </span>
           <span style={math(36, INK)}>
             <Mark at={knowAt + 10}>
               <P>
@@ -267,7 +267,7 @@ export const CondScene: React.FC = () => {
         {/* The bridge points at what the next question computes: washed green
             on "that test", and swelling on "with numbers". */}
         <Note at={wantAt + 2} x={X0} y={y(720)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>you want </span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>You want </span>
           <span
             style={{
               ...math(36, OK_INK),
@@ -327,7 +327,7 @@ export const CondScene: React.FC = () => {
           </span>
         </Ink>
         <Note at={breaksAt} x={900} y={y(762)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>where intuition breaks</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Where intuition breaks</span>
         </Note>
       </Drift>
     </AbsoluteFill>

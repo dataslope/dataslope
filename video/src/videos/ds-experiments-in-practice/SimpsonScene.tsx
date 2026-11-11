@@ -98,7 +98,7 @@ export const SimpsonScene: React.FC = () => {
           What is Simpson's paradox in an experiment?
         </QuestionCard>
         <Note at={unevenAt} x={X0} y={y(MIX_TOP) - h(66)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a rollout that went out unevenly (the video's own numbers)</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>A rollout that went out unevenly (the video's own numbers)</span>
         </Note>
 
         {/* Each arm's users, by device. */}
@@ -222,7 +222,7 @@ export const SimpsonScene: React.FC = () => {
                     margin: "0 -6px",
                   }}
                 >
-                  {r.wins ? "new checkout wins" : "new checkout loses"}
+                  {r.wins ? "New checkout wins" : "New checkout loses"}
                 </span>
               </Note>
             </React.Fragment>
@@ -230,7 +230,7 @@ export const SimpsonScene: React.FC = () => {
         })}
         <Note at={becauseAt + 4} x={X0} y={y(700)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            desktop converts less,
+            Desktop converts less,
             <br />
             and the new checkout got mostly desktop
           </span>
