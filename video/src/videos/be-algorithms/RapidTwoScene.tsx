@@ -35,6 +35,7 @@ import {
   X0,
   int,
 } from "./parts";
+import { M } from "../../editorial/math";
 
 const R_X = 780;
 const LIST_TOP = 292;
@@ -66,7 +67,7 @@ const ArrayList: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Line at={indexAt} x={R_X} y={c.T} size={24} weight={500}>
-        Array: index in O(1), cache-friendly
+        Array: index in <M>O(1)</M>, cache-friendly
         <span style={{ opacity: ease(frame, shiftsAt, 10), color: ACCENT_INK }}>; a middle insert shifts the rest</span>
       </Line>
       {Array.from({ length: 7 }, (_, i) => (
@@ -74,7 +75,7 @@ const ArrayList: React.FC<{ c: Ctx }> = ({ c }) => {
       ))}
       <Cell x={R_X + 3 * cw} y={c.T + c.h(50)} at={shiftsAt + 16} value="" w={cw - 8} h={50} tone="look" opacity={ins} />
       <Line at={listAt} x={R_X} y={lTop - c.h(52)} size={24} weight={500}>
-        Linked list: splice in O(1), given the node
+        Linked list: splice in <M>O(1)</M>, given the node
         <span style={{ opacity: ease(frame, walkAt, 10), color: ACCENT_INK }}>; finding it is a walk</span>
       </Line>
       {[0, 1, 2, 3].map((i) => (
@@ -142,7 +143,7 @@ const Bst: React.FC<{ c: Ctx }> = ({ c }) => {
         AVL, red-black:
       </Line>
       <Line at={avlAt + 6} x={R_X + 620} y={c.T + c.h(234)} size={24} weight={500} color={OK_INK}>
-        stay at O(log n)
+        stay at <M>O(log n)</M>
       </Line>
     </>
   );
@@ -257,10 +258,10 @@ const BstHeap: React.FC<{ c: Ctx }> = ({ c }) => {
         return <Cell key={v} x={R_X + i * 70} y={sTop} at={orderAt + 4 + i * 2} value={v} w={62} h={50} size={20} tone={tone} />;
       })}
       <Line at={nextAt} x={R_X} y={sTop + c.h(76)} size={23}>
-        Next key after <Num>{keys[3]}</Num>: O(log n)
+        Next key after <Num>{keys[3]}</Num>: <M>O(log n)</M>
       </Line>
       <Line at={rangeAt} x={R_X} y={sTop + c.h(118)} size={23} color={OK_INK} weight={500}>
-        A range: O(log n) to find its start, then one step per key
+        A range: <M>O(log n)</M> to find its start, then one step per key
       </Line>
     </>
   );
@@ -445,7 +446,7 @@ const Pointers: React.FC<{ c: Ctx }> = ({ c }) => {
         Returns indices <span style={{ fontFamily: MONO }}>{PAGE.twoPointers[0]}</span>: <Num>{va}</Num> + <Num>{vb}</Num> = <Num>{target}</Num>
       </Line>
       <Line at={linearAt + 8} x={R_X} y={rowY + c.h(274)} size={25} weight={500}>
-        One pass: O(n), not O(n²)
+        One pass: <M>O(n)</M>, not <M>O(n²)</M>
       </Line>
     </>
   );
@@ -548,7 +549,7 @@ const Adjacency: React.FC<{ c: Ctx }> = ({ c }) => {
         A matrix suits dense graphs
       </Line>
       <Line at={denseAt + 12} x={R_X + side + 70} y={top + c.h(270)} size={24} weight={500}>
-        and O(1) edge checks
+        and <M>O(1)</M> edge checks
       </Line>
     </>
   );
@@ -648,7 +649,7 @@ const Topo: React.FC<{ c: Ctx }> = ({ c }) => {
         Build steps, task dependencies: the page prints <span style={{ fontFamily: MONO, fontWeight: 500 }}>{PAGE.topo[0]}</span>
       </Line>
       <Line at={linearAt} x={R_X} y={rowY + c.h(154)} size={24} weight={500}>
-        O(V + E)
+        <M>O(V + E)</M>
       </Line>
     </>
   );
@@ -734,7 +735,7 @@ const Bits: React.FC<{ c: Ctx }> = ({ c }) => {
         The unpaired one is left: <Num>{result}</Num>
       </Line>
       <Line at={spaceAt} x={R_X + 400} y={c.T + c.h(208)} size={24}>
-        O(n) time, <Mark at={spaceAt + 4}>O(1) space</Mark>
+        <M>O(n)</M> time, <Mark at={spaceAt + 4}><M>O(1)</M> space</Mark>
       </Line>
     </>
   );

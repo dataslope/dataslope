@@ -27,8 +27,8 @@ import { getInputProps, useCurrentFrame } from "remotion";
  *   profit = $80 − $45 =" in Inter with "$35" in a serif twice the size
  *   reads as two things. Emphasis is color, weight or a highlight. Every
  *   pair of neighbours on a line is compared, and one that differs in size
- *   by more than MIXED or in family (code in the mono face excepted, and
- *   super- and subscripts) is reported as `[mixed]`.
+ *   by more than MIXED or in family (code in the mono face and math marked
+ *   data-math excepted, and super- and subscripts) is reported as `[mixed]`.
  * - Text drawn over other text, or off the page. Two settled runs of text
  *   from unrelated elements whose glyph boxes cross by more than OVERLAP of
  *   the smaller are reported as `[overlap]`; a run that reaches past the
@@ -196,7 +196,10 @@ function mixed(): string[] {
     range.setEnd(node, text.trimEnd().length);
     for (const r of range.getClientRects()) {
       if (r.width < 1 || r.height < 1) continue;
-      words.push({ r, owner: el, text: text.trim(), size: parseFloat(st.fontSize), face: family(st.fontFamily), script });
+      // Math (math.tsx, marked data-math) is set in the serif inside Inter
+      // sentences, as KaTeX is on the site: allowed, like code in mono.
+      const face = el.closest("[data-math]") ? "math" : family(st.fontFamily);
+      words.push({ r, owner: el, text: text.trim(), size: parseFloat(st.fontSize), face, script });
     }
   }
   const out: string[] = [];
@@ -216,7 +219,7 @@ function mixed(): string[] {
     // Neighbours on one line: no further apart than a word or two.
     if (gap > 1.2 * Math.max(a.size, b.size) || a.script || b.script) continue;
     const ratio = Math.max(a.size, b.size) / Math.min(a.size, b.size);
-    const faces = a.face !== b.face && a.face !== "mono" && b.face !== "mono";
+    const faces = a.face !== b.face && !["mono", "math"].includes(a.face) && !["mono", "math"].includes(b.face);
     if (ratio <= MIXED && !faces) continue;
     out.push(
       `"${a.text.slice(-24)}" (${Math.round(a.size)}px ${a.face}) and "${b.text.slice(0, 24)}" (${Math.round(b.size)}px ${b.face}) share a line`,

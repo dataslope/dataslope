@@ -28,6 +28,7 @@ import {
   TestGrid,
   Verdict,
 } from "./parts";
+import { M } from "../../editorial/math";
 
 const LIST_X = 660;
 const SIZE = 20;
@@ -225,7 +226,7 @@ export const ReviewScene: React.FC = () => {
             {
               label: (
                 <>
-                  no accidental O(<i>n</i>²) loop or N+1 query
+                  no accidental <M>O(n²)</M> loop or N+1 query
                 </>
               ),
               at: c4At,
@@ -497,7 +498,7 @@ export const ReviewScene: React.FC = () => {
             <FadeIn at={nlognAt - 2}>
               {" "}→{" "}
               <Mark at={nlognAt + 6}>
-                <i>n</i> log <i>n</i>
+                <M>n log n</M>
               </Mark>
             </FadeIn>
           </span>

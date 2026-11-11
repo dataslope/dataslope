@@ -10,6 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HASH, sharedChance } from "./data";
 import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Cell, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, Mark, Mono, OK_INK, Svg, int, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 const AX = 140;
 const PITCH_X = 84;
@@ -122,7 +123,7 @@ export const HashScene: React.FC = () => {
           When do you reach for a hash map?
         </QuestionCard>
         <Line at={lookupsAt} x={96} y={y(262)} size={24} color={INK_SOFT}>
-          Lookups and inserts by key, in O(1) on average:
+          Lookups and inserts by key, in <M>O(1)</M> on average:
         </Line>
         <div style={{ position: "absolute", left: 670, top: y(262), display: "flex", gap: 14, fontSize: 24, whiteSpace: "nowrap" }}>
           {uses.map((u, i) => (
@@ -163,7 +164,7 @@ export const HashScene: React.FC = () => {
           <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: OK_INK }}>{HASH.twoSum.answer}</span>
         </div>
         <Line at={linearAt} x={AX} y={aTop + 214} size={24} weight={500}>
-          O(n) time, at the cost of O(n) memory
+          <M>O(n)</M> time, at the cost of <M>O(n)</M> memory
         </Line>
 
         <VRule x={945} top={aTop - 50} bottom={y(800) + 60} at={averageAt} />
@@ -251,9 +252,9 @@ export const HashScene: React.FC = () => {
         <div style={{ position: "absolute", left: BX, top: y(704), opacity: ease(frame, worstAt, 12) }}>
           <div style={{ ...label(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Also asked: What is the time and space complexity of a hash set?</div>
           {[
-            { at: avgAt, k: "time, on average", v: "O(1)", c: OK_INK },
-            { at: spaceAt, k: "space", v: "O(n)", c: INK },
-            { at: atWorstAt, k: "time per operation, at worst", v: "O(n)", c: ACCENT_INK },
+            { at: avgAt, k: "time, on average", v: <M>O(1)</M>, c: OK_INK },
+            { at: spaceAt, k: "space", v: <M>O(n)</M>, c: INK },
+            { at: atWorstAt, k: "time per operation, at worst", v: <M>O(n)</M>, c: ACCENT_INK },
           ].map((r, i) => (
             <div key={r.k} style={{ display: "flex", alignItems: "baseline", gap: 16, marginTop: 10, fontSize: 24, opacity: ease(frame, Math.max(r.at, setAt) - 2, 10), whiteSpace: "nowrap" }}>
               <span style={{ ...note(24, r.c), fontWeight: 500, width: 70 }}>{r.v}</span>

@@ -360,7 +360,8 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
   const reveal = ease(frame, stackAt - 2, 22);
   const web = channels.findIndex((ch) => ch.key === "Web");
   const webLift = pulse(frame, hidesAt, 40);
-  const L = { x0: R_X + 600, x1: R_X + 920 };
+  // The web line, a clear 120px past the stack's channel labels (the owner, 2026-11-11).
+  const L = { x0: R_X + 700, x1: R_X + 1000 };
 
   return (
     <>

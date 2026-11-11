@@ -84,7 +84,8 @@ export const HookScene: React.FC = () => {
         <Kicker at={from}>Data analyst interview questions</Kicker>
         <Headline lead="Two versions," turn="one honest reading." at={teamsAt - 4} turnAt={readingAt - 4} size={70} />
 
-        <Spot id="da-ab-testing-fox" at={from + 4} left={1150} top={y(290)} width={600} height={450} />
+        {/* Smaller and right-aligned where it was, for more room to its left (the owner, 2026-11-11). */}
+        <Spot id="da-ab-testing-fox" at={from + 4} left={1230} top={y(320)} width={520} height={390} />
 
         {/* ── One stream of users, split by a coin ── */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
@@ -169,7 +170,7 @@ export const HookScene: React.FC = () => {
           style={{
             position: "absolute",
             left: X0,
-            top: y(MID_Y) + LANE + 70,
+            top: y(MID_Y) + LANE + 92,
             whiteSpace: "nowrap",
             opacity: ease(frame, abAt - 2, 12),
             ...note(28, INK),
@@ -186,7 +187,7 @@ export const HookScene: React.FC = () => {
         ].map((r, i) => {
           const p = ease(frame, r.at - 2, 12);
           const dim = ease(frame, startsAt + 2, 14) * 0.45;
-          const top = y(MID_Y) + LANE + 150;
+          const top = y(MID_Y) + LANE + 212;
           return (
             <React.Fragment key={r.count}>
               {i > 0 ? (
@@ -213,7 +214,7 @@ export const HookScene: React.FC = () => {
           style={{
             position: "absolute",
             left: X0,
-            top: y(MID_Y) + LANE + 122,
+            top: y(MID_Y) + LANE + 170,
             ...label(21, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, nineteenAt - 2, 12) * (1 - ease(frame, startsAt + 2, 14) * 0.45),

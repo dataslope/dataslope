@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HEAP } from "./data";
 import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, OK_INK, PAPER, Svg, int, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 /** Five jobs, by urgency (1 the most urgent), in the order they arrive.
  *  A drawing of the two disciplines, not data. */
@@ -59,9 +60,9 @@ export const PqScene: React.FC = () => {
   const tTop = y(508);
   const rowY = (i: number) => tTop + 44 + i * 54;
   const rows = [
-    { name: "Sorted list", push: <>O(n): shifts <Num>{int(HEAP.sortedInsertMeanShift)}</Num> on average</>, pop: "O(1)", at: sortedAt, pushAt: shiftsAt, popAt: instantAt, pushBad: true, popBad: false },
-    { name: "Unsorted list", push: "O(1)", pop: "O(n): a scan", at: unsortedAt, pushAt: unsortedAt + 6, popAt: scansAt, pushBad: false, popBad: true },
-    { name: "Heap", push: "O(log n)", pop: "O(log n)", at: heapAt, pushAt: heapAt + 4, popAt: heapAt + 8, pushBad: false, popBad: false },
+    { name: "Sorted list", push: <><M>O(n)</M>: shifts <Num>{int(HEAP.sortedInsertMeanShift)}</Num> on average</>, pop: <M>O(1)</M>, at: sortedAt, pushAt: shiftsAt, popAt: instantAt, pushBad: true, popBad: false },
+    { name: "Unsorted list", push: <M>O(1)</M>, pop: <><M>O(n)</M>: a scan</>, at: unsortedAt, pushAt: unsortedAt + 6, popAt: scansAt, pushBad: false, popBad: true },
+    { name: "Heap", push: <M>O(log n)</M>, pop: <M>O(log n)</M>, at: heapAt, pushAt: heapAt + 4, popAt: heapAt + 8, pushBad: false, popBad: false },
   ];
 
   // The heap.
@@ -231,12 +232,12 @@ export const PqScene: React.FC = () => {
           A push or pop moves at most <b style={{ ...TABULAR, color: OK_INK }}>{HEAP.maxMoves}</b> levels
         </Line>
         <Line at={peekAt} x={TREE.x0} y={baseY + 102} size={23} color={INK_SOFT}>
-          Peek: O(1). Counted: push <Num>{HEAP.pushNewMinCompares}</Num>, pop <Num>{HEAP.popCompares}</Num> compares
+          Peek: <M>O(1)</M>. Counted: push <Num>{HEAP.pushNewMinCompares}</Num>, pop <Num>{HEAP.popCompares}</Num> compares
         </Line>
 
         {/* Building one. */}
         <Line at={linearAt} x={140} y={y(708)} size={22} weight={500}>
-          Building a heap: O(n), not O(n log n). Comparisons, a million items:
+          Building a heap: <M>O(n)</M>, not <M>O(n log n)</M>. Comparisons, a million items:
         </Line>
         <HBar
           x={140}
@@ -270,7 +271,7 @@ export const PqScene: React.FC = () => {
           Most nodes sit near the bottom:
         </Line>
         <Line at={bottomAt + 10} x={TREE.x0} y={y(838)} size={23}>
-          heapify makes at most <b style={{ ...TABULAR, color: OK_INK }}>{int(HEAP.heightsSum)}</b> swaps, under <i>n</i>
+          heapify makes at most <b style={{ ...TABULAR, color: OK_INK }}>{int(HEAP.heightsSum)}</b> swaps, under <M>n</M>
         </Line>
       </Drift>
     </AbsoluteFill>

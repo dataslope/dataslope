@@ -34,6 +34,7 @@ import {
   X0,
   int,
 } from "./parts";
+import { M } from "../../editorial/math";
 
 const R_X = 780;
 const LIST_TOP = 300;
@@ -89,14 +90,14 @@ const Merge: React.FC<{ c: Ctx }> = ({ c }) => {
         { t: "the input", at: halvesAt - 8, k: 0 },
         { t: "halves", at: halvesAt, k: 1 },
         { t: "each sorted", at: sortsAt, k: 2 },
-        { t: "merged in O(n)", at: mergesAt, k: 3 },
+        { t: <>merged in <M>O(n)</M></>, at: mergesAt, k: 3 },
       ].map((r) => (
-        <Line key={r.t} at={r.at} x={R_X + 7 * 68 + 100} y={c.T + r.k * step + 12} size={23} color={INK_SOFT}>
+        <Line key={r.k} at={r.at} x={R_X + 7 * 68 + 100} y={c.T + r.k * step + 12} size={23} color={INK_SOFT}>
           {r.t}
         </Line>
       ))}
       <Line at={alwaysAt} x={R_X} y={c.T + 4 * step + c.h(10)} size={25} weight={500}>
-        O(n log n) always, stable, O(n) extra memory
+        <M>O(n log n)</M> always, stable, <M>O(n)</M> extra memory
       </Line>
       <Line at={pythonAt} x={R_X} y={c.T + 4 * step + c.h(54)} size={24} color={INK_SOFT}>
         Python&apos;s own sort builds on it
@@ -123,8 +124,8 @@ const Heapsort: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Line at={guaranteesAt} x={R_X} y={c.T} size={26} weight={500}>
-        Heapsort: O(n log n) guaranteed
-        <span style={{ opacity: ease(frame, spaceAt, 10) }}>, O(1) extra space</span>
+        Heapsort: <M>O(n log n)</M> guaranteed
+        <span style={{ opacity: ease(frame, spaceAt, 10) }}>, <M>O(1)</M> extra space</span>
       </Line>
       {Array.from({ length: cells }, (_, i) => (
         <Cell key={i} x={R_X + i * cw} y={rowY} at={guaranteesAt + 6 + i} value="" w={cw - 6} h={44} />
@@ -211,7 +212,7 @@ const InPlace: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Line at={inAt} x={R_X} y={c.T} size={25} weight={500}>
-        In place: O(1) extra<span style={{ opacity: ease(frame, stackAt, 10) }}>, or O(log n) of stack</span>
+        In place: <M>O(1)</M> extra<span style={{ opacity: ease(frame, stackAt, 10) }}>, or <M>O(log n)</M> of stack</span>
       </Line>
       <Row values={values} x={R_X} y={c.T + c.h(52)} at={inAt + 4} />
       <Line at={quickAt} x={R_X} y={c.T + c.h(122)} size={24} color={BLUE_INK} weight={500}>
@@ -249,10 +250,10 @@ const Master: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Line at={solvesAt} x={R_X} y={c.T} size={25} weight={500}>
-        Merge sort: <span style={{ fontFamily: MONO, fontWeight: 500 }}>T(n) = 2 T(n/2) + n</span>
+        Merge sort: <M>T(n) = 2 T(n/2) + n</M>
       </Line>
       <Line at={solvesAt + 10} x={R_X} y={c.T + c.h(42)} size={22} color={INK_SOFT}>
-        two halves, each sorted, plus n to merge them
+        two halves, each sorted, plus <M>n</M> to merge them
       </Line>
       {Array.from({ length: levels }, (_, k) => {
         const parts = 2 ** k;
@@ -263,16 +264,16 @@ const Master: React.FC<{ c: Ctx }> = ({ c }) => {
               <Cell key={i} x={R_X + i * pw} y={rowY(k)} at={solvesAt + 6 + k * 4} value="" w={Math.max(4, pw - 6)} h={c.h(38)} tone={k === levels - 1 ? "look" : "data"} />
             ))}
             <Line at={combiningAt + k * 2} x={R_X + W + 30} y={rowY(k) + 6} size={22} color={INK_SOFT}>
-              {k === levels - 1 ? "smallest pieces: n" : <>combine: <b style={{ color: INK }}>n</b></>}
+              {k === levels - 1 ? <>smallest pieces: <M>n</M></> : <>combine: <M style={{ color: INK }}>n</M></>}
             </Line>
           </React.Fragment>
         );
       })}
       <Line at={piecesAt} x={R_X} y={rowY(levels) + c.h(4)} size={24}>
-        Combining costs n a level; the smallest pieces number n
+        Combining costs <M>n</M> a level; the smallest pieces number <M>n</M>
       </Line>
       <Line at={tieAt} x={R_X} y={rowY(levels) + c.h(46)} size={25} weight={500} color={OK_INK}>
-        They tie: n a level, log n levels<span style={{ opacity: ease(frame, nlognAt, 10) }}>, so O(n log n)</span>
+        They tie: <M>n</M> a level, <M>log n</M> levels<span style={{ opacity: ease(frame, nlognAt, 10) }}>, so <M>O(n log n)</M></span>
       </Line>
       <Line at={combDomAt} x={R_X} y={rowY(levels) + c.h(96)} size={24}>
         Combining dominates: the top level sets the cost

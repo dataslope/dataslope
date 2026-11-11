@@ -3,19 +3,27 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DASHBOARD } from "./data";
-import { ColumnRule, Drift, LineSet, PanelTitle, Verdict, YTicks } from "./parts";
+import { ColumnRule, Drift, LineSet, PanelTitle, Spot, Verdict, YTicks } from "./parts";
 
 const GRID = { x: 200, y: 340, w: 168, hgt: 128, gap: 14 };
-const CREEP = { x0: 1100, x1: 1660, base: 760, top: 440, hi: 45 };
+/** The panel-creep chart. `lift` raises it so its block centres on the
+ *  dashboard grid beside it (the owner, 2026-11-11). */
+const CREEP = { x0: 1100, x1: 1660, base: 760, top: 440, hi: 45, lift: 36 };
 /** Question 12: a dashboard and a report as two columns of plain text, each
  *  a serif name over its lines, with a hairline centred in the gap between
  *  the left column's longest line (about 640px) and the right column. */
-const COLS = { y: 388, titleH: 46, lineH: 36, lineGap: 22 };
+const COLS = { y: 388, titleH: 46, lineH: 36, lineGap: 22, titleGap: 16 };
+/** Each column's watercolor, under its list with a clear 60px above it. */
+const COL_ART = [
+  { id: "da-visualization-dashboard", w: 232, h: 200 },
+  { id: "da-visualization-report", w: 186, h: 200 },
+] as const;
+const COL_ART_Y = 740;
 const COLS_X = [220, 1080];
 const COLS_RULE_X = 860;
 
@@ -75,8 +83,11 @@ export const DashScene: React.FC = () => {
   // "That's where eyes land": the key metric, ringed while the narration is on it.
   const ring = ease(frame, eyesAt - 2, 12) * (1 - ease(frame, consistentAt - 4, 12));
   const months = D.added.map((_, i) => (i % 6 === 5 ? String(i + 1) : ""));
-  const cBase = y(CREEP.base);
-  const cTop = y(CREEP.top);
+  const cBase = y(CREEP.base - CREEP.lift);
+  const cTop = y(CREEP.top - CREEP.lift);
+  /** Where the chart sat before it was lifted: the verdicts under it stay
+   *  level with the left column's notes. */
+  const vBase = y(CREEP.base);
   const lastY = (v: number) => cBase - (v / CREEP.hi) * (cBase - cTop);
 
   return (
@@ -118,7 +129,6 @@ export const DashScene: React.FC = () => {
                 width: lead ? GRID.w + big * (GRID.w + GRID.gap) : GRID.w,
                 height: h(GRID.hgt),
                 boxSizing: "border-box",
-                border: `1.5px solid ${HAIRLINE}`,
                 borderRadius: 8,
                 background: `color-mix(in srgb, ${BAR} ${8 + 70 * share * shade}%, ${PAPER})`,
                 boxShadow: lead && ring > 0 ? `0 0 0 ${5 * ring}px ${HIGHLIGHT}` : undefined,
@@ -159,14 +169,14 @@ export const DashScene: React.FC = () => {
         <Note at={sixAt} x={CREEP.x1 + 14} y={lastY(D.used.at(-1)!) - 14} out={out11}>
           <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap", ...TABULAR }}>{D.used.at(-1)} opened</span>
         </Note>
-        <Verdict ok x={CREEP.x0} y={cBase + h(50)} at={cutAt} out={out11}>
-          cut what doesn&apos;t earn its place
+        <Verdict ok x={CREEP.x0} y={vBase + h(50)} at={cutAt} out={out11} mark={21}>
+          Cut what doesn&apos;t earn its place
         </Verdict>
         {/* The page's last point for Question 11, level with the left column's last note. */}
-        <Verdict ok x={CREEP.x0} y={cBase + h(90)} at={audienceAt} out={out11}>
-          design for the audience
+        <Verdict ok x={CREEP.x0} y={vBase + h(90)} at={audienceAt} out={out11} mark={21}>
+          Design for the audience
         </Verdict>
-        <Note at={execAt - 2} x={CREEP.x0 + 38} y={cBase + h(130)} out={out11}>
+        <Note at={execAt - 2} x={CREEP.x0 + 31} y={vBase + h(130)} out={out11}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>an executive summary differs from an ops monitoring view</span>
         </Note>
 
@@ -205,7 +215,7 @@ export const DashScene: React.FC = () => {
                 transform: `translateY(${(1 - p) * 14}px)`,
               }}
             >
-              <div style={{ ...headline(44), color: INK, lineHeight: `${COLS.titleH}px`, whiteSpace: "nowrap" }}>{col.title}</div>
+              <div style={{ ...headline(44), color: INK, lineHeight: `${COLS.titleH}px`, whiteSpace: "nowrap", marginBottom: COLS.titleGap }}>{col.title}</div>
               {col.lines.map((l) => (
                 <div
                   key={l.text}
@@ -225,7 +235,10 @@ export const DashScene: React.FC = () => {
           );
         })}
         {/* As tall as the report's column, the longer of the two. */}
-        <ColumnRule x={COLS_RULE_X} top={y(COLS.y)} height={COLS.titleH + 4 * (COLS.lineGap + COLS.lineH)} at={reportAt - 4} />
+        <ColumnRule x={COLS_RULE_X} top={y(COLS.y)} height={COLS.titleH + COLS.titleGap + 4 * (COLS.lineGap + COLS.lineH)} at={reportAt - 4} />
+        {COL_ART.map((a, k) => (
+          <Spot key={a.id} id={a.id} at={(k ? reportAt : dashAt) + 10} left={COLS_X[k]} top={y(COL_ART_Y)} width={a.w} height={a.h} />
+        ))}
       </Drift>
     </AbsoluteFill>
   );

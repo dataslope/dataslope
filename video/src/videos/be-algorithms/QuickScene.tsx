@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { QUICKSORT } from "./data";
 import { ACCENT, ACCENT_INK, Art, BAR, Drift, OK, HIGHLIGHT, INK, INK_SOFT, Line, Mark, OK_INK, PAPER, Svg, int, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 /** Two panels on one horizontal scale: a thousand items across 720px. */
 const W = 720;
@@ -103,7 +104,7 @@ export const QuickScene: React.FC = () => {
         <Line at={pickAt} x={96} y={y(262)} size={24} color={INK_SOFT}>
           Pick a pivot, split the rest into smaller and larger, sort each side
           <span style={{ opacity: ease(frame, avgAt, 10) }}>
-            : <b style={{ color: INK }}>O(n log n)</b> on average
+            : <b style={{ color: INK }}><M>O(n log n)</M></b> on average
           </span>
         </Line>
         <Art name="cards" at={sortAt} out={randomAt - 24} left={1290} top={y(470)} h={150} />
@@ -128,7 +129,7 @@ export const QuickScene: React.FC = () => {
           <Num>{int(QUICKSORT.lastPivotSorted.compares)}</Num> comparisons
         </Line>
         <Line at={halfAt + 10} x={600} y={y(666)} size={22} color={INK_SOFT}>
-          n(n − 1)/2, about n²/2
+          <M>n(n − 1)/2</M>, about <M>n²/2</M>
         </Line>
         <Line at={limitAt} x={520} y={y(712)} size={22} weight={500}>
           Recursive: past Python&apos;s limit of <Num>{int(QUICKSORT.recursionLimit)}</Num>

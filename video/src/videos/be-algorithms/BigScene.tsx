@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BIG_O } from "./data";
 import { ACCENT, ACCENT_INK, Art, BAR, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, OK_INK, PAPER, Svg, int, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 /** The schematic grid: n items down and across; a cell above the diagonal
  *  is one pair the double loop checks. Drawn, not counted (the table is). */
@@ -88,7 +89,7 @@ export const BigScene: React.FC = () => {
           What is Big-O notation, and why do interviewers care?
         </QuestionCard>
         <Line at={saysAt} x={96} y={y(262)} size={26} color={INK_SOFT}>
-          How time or memory grows with the input size <i>n</i>, constants ignored
+          How time or memory grows with the input size <M>n</M>, constants ignored
         </Line>
 
         {/* Every pair, and one pass. */}
@@ -224,7 +225,7 @@ export const BigScene: React.FC = () => {
           It predicts whether a solution survives its real input.
           <span style={{ opacity: ease(frame, gameAt, 10) }}>
             {" "}
-            The usual game: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>O(n²)</span> → <span style={{ color: OK_INK, fontWeight: 500 }}>O(n)</span>
+            The usual game: <span style={{ color: ACCENT_INK, fontWeight: 500 }}><M>O(n²)</M></span> → <span style={{ color: OK_INK, fontWeight: 500 }}><M>O(n)</M></span>
           </span>
         </Line>
         <Line at={dropAt} x={GX} y={y(836)} size={26} weight={500}>

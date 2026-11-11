@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CHAIN, TRAVERSAL } from "./data";
 import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Cell, Drift, Edge, Flow, GraphNode, HIGHLIGHT, INK_SOFT, Line, OK_INK, Svg, int, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 type P = readonly [number, number];
 /** The page's graph, a diamond: A over B and C, both over D. */
@@ -253,7 +254,7 @@ export const BfsScene: React.FC = () => {
           );
         })}
         <Line at={eitherAt + 6} x={cx0 + CELLS * 76 + 20} y={rowY2 + 12} size={23} color={OK_INK} weight={500}>
-          pops either end in O(1)
+          pops either end in <M>O(1)</M>
         </Line>
       </Drift>
     </AbsoluteFill>

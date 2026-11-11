@@ -11,6 +11,7 @@ import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { INDEX, thousands } from "./data";
 import { Drift, Flow, Listing, listingHeight, MARK_GREEN, MARK_RED, PageGrid, PlanBox, Svg, X0 } from "./parts";
+import { M } from "../../editorial/math";
 
 const TOP = 304;
 const SIZE = 21;
@@ -211,9 +212,9 @@ export const IndexScene: React.FC = () => {
         {/* log n against n, under the plan */}
         <Note at={logAt} x={X0} y={planTop + h(196)} out={kindAt - 4}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
-            index: <i>O</i>(log <i>n</i>)
+            index: <M>O(log n)</M>
             <span style={{ color: INK_SOFT }}> against </span>
-            scan: <i>O</i>(<i>n</i>)
+            scan: <M>O(n)</M>
           </span>
         </Note>
 

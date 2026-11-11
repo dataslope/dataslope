@@ -10,6 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { AMORTIZED, DOUBLING_CAPS } from "./data";
 import { BAR, BLUE_INK, Drift, HIGHLIGHT, INK, INK_SOFT, Line, Mark, OK_INK, Svg, int, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 /** The chart: items appended across, slots allocated up. */
 const CX0 = 210;
@@ -95,7 +96,7 @@ export const AmortScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} size={62}>
-          What is amortized O(1) and when does it apply?
+          What is amortized <M>O(1)</M> and when does it apply?
         </QuestionCard>
         <Line at={spreadsAt} x={96} y={y(262)} size={26} color={INK_SOFT}>
           A rare expensive step&apos;s cost, spread over the cheap ones around it
@@ -188,7 +189,7 @@ export const AmortScene: React.FC = () => {
           Python: <b>×<Num>{AMORTIZED.meanGrowthAbove1000.toFixed(3)}</Num></b> a step, about an eighth
         </Line>
         <Line at={fixedAt} x={RX} y={y(692)} size={24} color={INK_SOFT}>
-          Any fixed factor stays O(1); so does a rehash
+          Any fixed factor stays <M>O(1)</M>; so does a rehash
         </Line>
         <Line at={promiseAt} x={RX} y={y(762)} size={24} weight={500}>
           An average, not a promise per call:

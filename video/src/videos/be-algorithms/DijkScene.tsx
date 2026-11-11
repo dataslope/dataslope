@@ -10,6 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DIJKSTRA } from "./data";
 import { ACCENT, ACCENT_INK, Art, Cross, Drift, Edge, GraphNode, HIGHLIGHT, INK, INK_SOFT, Line, NODE_R, OK_INK, Strike, Svg, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 type P = readonly [number, number];
 
@@ -169,10 +170,10 @@ export const DijkScene: React.FC = () => {
           <Num>V</Num> nodes<span style={{ opacity: ease(frame, onceAt, 10) }}>, each finished once</span>
         </Line>
         <Line at={edgeAt} x={140} y={y(790)} size={24}>
-          <Num>E</Num> edges, each a heap push of log V
+          <Num>E</Num> edges, each a heap push of <M>log V</M>
         </Line>
         <Line at={timesAt} x={140} y={y(838)} size={30} weight={500} color={OK_INK}>
-          O((V + E) log V)
+          <M>O((V + E) log V)</M>
         </Line>
 
         <VRule x={915} top={y(320)} bottom={y(838) + 36} at={whyAt - 6} />
@@ -236,7 +237,7 @@ export const DijkScene: React.FC = () => {
           every edge, V − 1 times: <Num>{DIJKSTRA.bfRounds}</Num> rounds over <Num>{DIJKSTRA.bfEdges}</Num> edges
         </Line>
         <Line at={vtimesAt} x={1094} y={y(838)} size={23} weight={500}>
-          O(V · E)<span style={{ opacity: ease(frame, rightAt, 10), color: INK_SOFT, fontWeight: 500 }}>: slower, and right</span>
+          <M>O(V · E)</M><span style={{ opacity: ease(frame, rightAt, 10), color: INK_SOFT, fontWeight: 500 }}>: slower, and right</span>
         </Line>
       </Drift>
     </AbsoluteFill>
