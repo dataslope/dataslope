@@ -118,7 +118,7 @@ export const CaseScene: React.FC = () => {
           return (
             <Chip
               key={`m${i}`}
-              opacity={first ? 1 : 1 - ease(frame, foldingAt + i * 2 + 12, 8)}
+              opacity={first ? 1 : 1 - ease(frame, foldingAt + i * 2 + 6, 10)}
               text={w}
               display={m > 0.5 ? CASE.folded[i] : w}
               x={lerp(X0, TX, m)}
