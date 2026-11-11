@@ -2,7 +2,7 @@
 
 Folder `video/src/videos/be-object-design/`. Review report:
 `agent-outputs/20261111-be-interview-video-review/BackendEngineer-6-ObjectDesign.md`
-(0 P1, 5 P2, 7 P3). Nothing committed.
+(0 P1, 5 P2, 7 P3). I committed nothing; the coordinator's WIP checkpoints have picked up the changes.
 
 ## Findings
 
@@ -42,7 +42,7 @@ spent: about 340 against the 220 allowed. At 0.22 a character, 895 is about
 plain `--recut` for the splits. Never name a split beat in `--only` without
 `--recut`.
 
-Against HEAD, `alignment.json`'s `meta` and every beat not listed above are
+Against the pre-fix commit `f7144056`, `alignment.json`'s `meta` and every beat not listed above are
 identical, and `takes/be-object-design/` is untouched (`git diff --stat`
 empty). The five beats that changed text (`comp-break`, `lsp-break`, `dip-ex`,
 `r-encap`, `r-abstract`) are now take cuts of their first sentences.
@@ -64,7 +64,14 @@ positive-amount checks to the page, so "verbatim" was no longer true.
 - Typecheck (filtered to the folder) and `eslint src/videos/be-object-design`:
   clean.
 - `npm run check:cues`: pass. `npm test`: 79 of 79 pass.
-- CHECKS_PLACEHOLDER
+- `check:motion`: pass. 10:16.8 checked, 0 stretches still for 2 s or more.
+- `check:sync`: pass. 60 beats, every one within ±0.02 s; the five new
+  beats are +0.02 or closer.
+- `check:mix`: pass. Effects 27.6 LU under the narration. Where both sound,
+  the speech is a median 26.7 dB above the effects (5th percentile 12.9 dB),
+  and the closest point is 11.8 dB at 3:14.6.
+- `check:frames`: pass. 60 arrows within 1.0° under their heads, no hyphen in
+  tabular figures, spacing and one-size-per-line both clean.
 - Stills looked at: 136.5, 139.5, 206.8, 206.9, 219.5, 268.8, 334.5, 334.6,
   367.5, 401.5, 403.5, 428, 430.5, 431.5, 478, 510.5, 514.5, 519.4, 528.5,
   586.5. Two fixes came from them: the LSP pointer started over the end of its
