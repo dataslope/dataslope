@@ -59,8 +59,8 @@ All 19 findings fixed (9 P2, 10 P3). New length **12:09.3** (729.3 s, was 11:06)
 - `npm test`: 79 pass, 0 fail.
 - `check:sync`: pass. 68 beats, worst +0.03 s.
 - `check:motion`: pass. 0 stretches still for 2 s or more.
-- `check:mix`: MIX_RESULT
-- `check:frames`: FRAMES_RESULT
+- `check:mix`: pass (closest: speech 8.9 dB above the effects at 8:56.5)
+- `check:frames`: pass (8 images, 28 arrows up to 8.8°, spacing, one size per line, no tabular hyphens)
 - Stills taken at 30 moments, covering every change, and looked at. The badge font was caught in the first pass (it inherited the serif) and fixed.
 
 ## Noticed
