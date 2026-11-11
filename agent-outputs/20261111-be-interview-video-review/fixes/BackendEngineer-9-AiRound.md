@@ -19,7 +19,7 @@ The review had 14 findings: 0 P1, 5 P2 (2 of them answer findings) and 9 P3
 | 6 | P3 | The two-line jitter footnote is unread before the cut | fixed | Its first line now comes in with the simulation (`simAt + 20`, about 18 s up). The second ("the next two waves… 60 and 35 with jitter, 1,000 without") comes in on "a hundred and fifteen" and holds through `design-herd`, about 13 s, where it was 3. Not voiced, to keep P3 voice under 300 characters. |
 | 7 | P3 | The commentary on the better prompt sits under "Weak" | fixed | "The edge comes with its answer. Name the answer, not just the edge." is now one line under the Better listing, below "A smaller diff, easier to review." (`BETTER_X`, `y(790)`), each half on its old cue. Only the red "Left out, the assistant decides…" stays in the weak column, moved up to `y(600)` under "a wish". |
 | 8 | P3 | The "LLM provider" box sits alone at lower right for 10 s, title off-centre | fixed | The provider box is now drawn centred on the page (x 830, `y(430)`) under the risk words, and glides to its place in the flowchart as `design-path` starts. Every box's sub-line ("+ prompt caching", "exact match", "counted in tokens", "against a schema") is passed to `Node` only once its cue arrives, so the title sits centred until then. |
-| 9 | P3 | "circuit breaker" never said to do anything | fixed | New beat `design-breaker` after `design-fail`, voiced alone: "The breaker stops calling a provider that keeps failing, so retries don't pile onto an outage." A sub-line "stops calling a failing provider" (20px, INK_SOFT) sits under "circuit breaker" on "stops calling a provider". "fallback" and its two notes moved down 28 layout px to make room. |
+| 9 | P3 | "circuit breaker" never said to do anything | fixed | New beat `design-breaker` after `design-fail`, voiced alone: "The breaker stops calling a provider that keeps failing, so retries don't pile onto an outage." A sub-line "stops calling a failing provider" (20px, INK_SOFT) sits under "circuit breaker" on "stops calling a provider". "fallback" and its two notes moved down 28 layout px to make room; at that height its leader line would have crossed the provider box's top edge, so a leader level with the box now starts from the box's right edge instead. |
 | 10 | P3 answer | Q5 never gives the per-request figure | fixed | New beat `cost-cent` after `cost-result`, voiced alone: "Per request, that's about a third of a cent." `check.mjs` computes `cost.perRequest` (0.0035) and `cost.perRequestCents` (0.35), and fails unless the cents are between 0.3 and 0.4 and the beat says "about a third of a cent". On screen: the fourth arithmetic row (finding 3), and the moved bar's label now reads "As written: 3,500 USD a day, about a third of a cent a request". |
 | 11 | P3 answer | The scoping defense doesn't say what it stops | fixed | `inj-defend` was split in three: `inj-defend` and `inj-confirm` were recut free from the take, and the new middle beat `inj-scope`, voiced alone, says "So an email can't refund anyone else's order." (Human confirmation, already the next sentence, catches the rest.) Under the dashed ring, "only this user's orders" gains a second line, "never anyone else's", on "anyone else's order". The page's wording ("the current user's own orders") is kept. |
 | 12 | P3 | The METR chart has no axis meaning | fixed | Beside "no change": "← less time on a task" on the left and "more time →" on the right, 20px INK_SOFT, on the axis row. |
@@ -57,4 +57,35 @@ added for them.
 
 ## Length and checks
 
-PENDING
+New length **10:49.8** (was 9:57): about 52 s added, all of it the seven new
+beats. All run on the final code, through my entry and the render queue:
+
+| Check | Result |
+| --- | --- |
+| `tsc --noEmit` (my folder) | clean |
+| `eslint src/videos/be-ai-round` | clean |
+| `npm run check:cues` | pass |
+| `npm test` | 79 / 79 pass |
+| `check:motion` | pass; longest still 2.3 s (9:08.8, in `daily`) |
+| `check:sync` | pass; 53 beats, worst +0.03 s (`hour-narrate`) |
+| `check:mix` | pass; effects 29.5 LU under the narration, median 28.9 dB below speech |
+| `check:frames` | pass; 18 images, 18 arrows, no hyphen in tabular figures |
+
+Stills looked at, each at the changed place: 40 (struck claim), 158 (the
+spare-time label), 228 (prompt notes), 240 (provider centred, no sub-line),
+252 and 257 (path built on its words), 288 (breaker sub-line, fallback
+leader), 327 (finished flowchart), 357 (jitter, herd notes, footnote),
+404.5 (inputs and arithmetic rows, per request), 438 (bar label), 475
+(sources bracket), 513 (scope note), 591 (worked example), 620 (METR axis).
+No text under 19px in anything I added (smallest is 20px), and no line
+through a label.
+
+## Also noticed
+
+- The code listing's data (`COST.code`, `COST.printed`) is still read by
+  `check.mjs` and kept in `results.json`, so the page's block is still run
+  as written and checked; only the screen no longer shows it.
+- `check:mix` lists one moment at 10:07.0 where speech is 5.0 dB over the
+  effects for 50 ms. It is an existing effect in Question 7's METR chart,
+  not one I added, and the check passes.
+- No shared change needed.
