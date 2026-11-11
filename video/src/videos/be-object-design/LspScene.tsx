@@ -167,9 +167,9 @@ export const LspScene: React.FC = () => {
           Code written for rectangles
         </Line>
         {[
-          { at: widthAt, text: `sets the width to ${LISKOV.width}` },
-          { at: heightAt, text: `sets the height to ${LISKOV.height}` },
-          { at: expectsAt, text: `expects an area of ${LISKOV.width * LISKOV.height}` },
+          { at: widthAt, text: `Sets the width to ${LISKOV.width}` },
+          { at: heightAt, text: `Sets the height to ${LISKOV.height}` },
+          { at: expectsAt, text: `Expects an area of ${LISKOV.width * LISKOV.height}` },
         ].map((s, i) => (
           <Line key={s.text} x={CALLER_X} y={topRow + i * 48} at={s.at} size={25} weight={i === 2 ? 700 : 500} dim={old}>
             <span style={{ color: INK_SOFT, fontWeight: 500, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>

@@ -177,10 +177,10 @@ export const FeedScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Line at={lookupAt} x={X0} y={y(640)} size={22} color={OK_INK} weight={500} out={feedOut}>
-          reading a feed: one cheap lookup
+          Reading a feed: one cheap lookup
         </Line>
         <Line at={perAt} x={X0} y={y(690)} size={22} out={hybridIn}>
-          cost per post: one write per follower
+          Cost per post: one write per follower
         </Line>
         <Line at={twoHAt} x={X0} y={y(736)} size={22} out={hybridIn}>
           <Num>{FEED.ordinaryFollowers}</Num> followers: <b><Num>{FEED.pushWritesOrdinary}</Num> writes</b>
@@ -227,10 +227,10 @@ export const FeedScene: React.FC = () => {
         <Flow points={[[PULL.x + g.cols * (g.cell + g.gap) + 10, y(PULL.feed.mid)], [PULL.feed.x - 8, y(PULL.feed.mid)]]} at={buildsAt + 10} color={gather > 0.5 ? ACCENT : BAR} width={2.4 + gather * 2} out={feedOut} />
         <Node x={PULL.feed.x} y={y(PULL.feed.mid) - PULL.feed.h / 2} w={PULL.feed.w} h={PULL.feed.h} at={buildsAt + 12} tone="data" title="your feed" sub="built on request" size={22} out={feedOut} />
         <Line at={cheapAt} x={PULL.feed.x} y={y(PULL.feed.mid) + PULL.feed.h / 2 + h(20)} size={20} color={INK_SOFT} out={feedOut}>
-          posting is cheap
+          Posting is cheap
         </Line>
         <Line at={loadAt + 6} x={PULL.x} y={y(690)} size={22} weight={500} color={ACCENT_INK} out={hybridIn}>
-          every load: <Num>{FEED.pullReads}</Num> reads
+          Every load: <Num>{FEED.pullReads}</Num> reads
         </Line>
 
         {/* ── Why push usually wins. ── */}
@@ -326,7 +326,7 @@ export const FeedScene: React.FC = () => {
         />
         <Ink at={apiAt + 4} dur={14} style={{ left: G.cache.x + G.cache.w + 50, top: y(G.cache.mid) - 18, whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, INK), fontWeight: 500 }}>
-            every arrow: <Mark at={apiAt + 6}>an API</Mark>
+            Every arrow: <Mark at={apiAt + 6}>an API</Mark>
           </span>
         </Ink>
         <NextLine at={nextAt} x={X0} y={y(820)} width={900}>

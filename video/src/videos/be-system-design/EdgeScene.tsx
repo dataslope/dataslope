@@ -76,16 +76,16 @@ export const EdgeScene: React.FC = () => {
 
   const from = n.beat("q5-use").from;
   const benefits = [
-    { text: "cuts latency", at: n.word("q5-use", "it cuts latency") },
-    { text: "takes traffic off your origin", at: n.word("q5-use", "takes traffic off your origin") },
-    { text: "absorbs spikes", at: n.word("q5-use", "absorbs spikes") },
+    { text: "Cuts latency", at: n.word("q5-use", "it cuts latency") },
+    { text: "Takes traffic off your origin", at: n.word("q5-use", "takes traffic off your origin") },
+    { text: "Absorbs spikes", at: n.word("q5-use", "absorbs spikes") },
   ];
   const useAt = n.word("q5-use", "Use it for anything static or cacheable");
   const kinds = [
-    { text: "images", at: n.word("q5-use", "images") },
+    { text: "Images", at: n.word("q5-use", "images") },
     { text: "JavaScript", at: n.word("q5-use", "JavaScript") },
     { text: "CSS", at: n.word("q5-use", "CSS") },
-    { text: "video", at: n.word("q5-use", "and video") },
+    { text: "Video", at: n.word("q5-use", "and video") },
   ];
   const dynAt = n.word("q5-dyn", "Dynamic, user-specific responses");
   const bypassAt = n.word("q5-dyn", "usually bypass it");
@@ -156,7 +156,7 @@ export const EdgeScene: React.FC = () => {
           To the origin
         </Line>
         <Line x={COL_B} y={itemY + 4} at={dynAt + 4} size={26} weight={500}>
-          dynamic, user-specific responses
+          Dynamic, user-specific responses
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, bypassAt, 10) }}> usually bypass it</span>
         </Line>
         <Line x={COL_B} y={itemY + 64} at={ttlAt} size={24} color={INK_SOFT}>
@@ -169,17 +169,17 @@ export const EdgeScene: React.FC = () => {
 
         {/* The short link's redirect: from the origin's side to the edge. */}
         <Line x={redirX} y={redirY} at={popularAt + 4} size={26} weight={500} color={BLUE_INK}>
-          a popular short link&apos;s redirect, the same for everyone
+          A popular short link&apos;s redirect, the same for everyone
         </Line>
         {/* Its price, under it in the edge's column, then the fix. */}
         <Line x={X0} y={noteY} at={priceAt} size={25} weight={500}>
           The price
         </Line>
         <Line x={X0} y={noteY + 44} at={countAt - 6} size={24} weight={500} color={ACCENT_INK} width={720}>
-          a click the edge answers never reaches your servers, so they can&apos;t count it
+          A click the edge answers never reaches your servers, so they can&apos;t count it
         </Line>
         <Line x={X0} y={noteY + 128} at={downAt} size={24} weight={500} color={ACCENT_INK} width={720}>
-          a link you take down keeps working there until its time to live runs out
+          A link you take down keeps working there until its time to live runs out
         </Line>
         {/* The timer at the line's own size, centred on it, 10px before it. */}
         <Timer x={X0 + 36 - 10 - TIMER_TEXT / 2} y={noteY + 226 + (TIMER_TEXT * 1.3) / 2} size={TIMER_TEXT} at={shortAt} />

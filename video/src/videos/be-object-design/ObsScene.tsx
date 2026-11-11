@@ -240,7 +240,7 @@ export const ObsScene: React.FC = () => {
 
         {/* Where it is used. */}
         <Line x={X0} y={pathTop + 14} at={useAt} size={24} weight={500} out={costAt}>
-          event systems
+          Event systems
           <span style={{ opacity: ease(frame, uiAt, 10) }}> · UI data binding</span>
           <span style={{ opacity: ease(frame, pubAt, 10) }}> · publish-subscribe</span>
         </Line>

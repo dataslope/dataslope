@@ -20,10 +20,10 @@ type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Lay
 /** Five cached entries under each policy: what the policy reads off each,
  *  and the one it drops. */
 const POLICIES = [
-  { name: "LRU, least recently used", rule: "drops the entry untouched longest", tags: ["2 s ago", "9 s", "1 s", "40 s", "4 s"], drop: 3 },
-  { name: "LFU, least frequently used", rule: "keeps popular keys through a quiet spell", tags: ["12 hits", "3", "40", "1", "7"], drop: 3 },
-  { name: "First in, first out", rule: "drops in insertion order, used or not", tags: ["1st in", "2nd", "3rd", "4th", "5th"], drop: 0 },
-  { name: "TTL", rule: "expires on a timer, whatever the memory", tags: ["5 s left", "0 s", "12 s", "30 s", "8 s"], drop: 1 },
+  { name: "LRU, least recently used", rule: "Drops the entry untouched longest", tags: ["2 s ago", "9 s", "1 s", "40 s", "4 s"], drop: 3 },
+  { name: "LFU, least frequently used", rule: "Keeps popular keys through a quiet spell", tags: ["12 hits", "3", "40", "1", "7"], drop: 3 },
+  { name: "First in, first out", rule: "Drops in insertion order, used or not", tags: ["1st in", "2nd", "3rd", "4th", "5th"], drop: 0 },
+  { name: "TTL", rule: "Expires on a timer, whatever the memory", tags: ["5 s left", "0 s", "12 s", "30 s", "8 s"], drop: 1 },
 ];
 const PANEL = { w: 482, h: 210, gapX: 78, gapY: 30 };
 
@@ -87,7 +87,7 @@ const Evict: React.FC<{ c: Ctx }> = ({ c }) => {
       })}
       <VRule x={R_X + 482 + 39} top={c.y(360)} bottom={c.y(360) + 2 * c.h(PANEL.h) + PANEL.gapY - 20} at={at[1] - 4} />
       <Ink at={defaultAt} dur={12} style={{ left: px(0), top: py(0) + 150, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(20, OK_INK), fontWeight: 500 }}>a good default</span>
+        <span style={{ ...note(20, OK_INK), fontWeight: 500 }}>A good default</span>
       </Ink>
       <Ink at={pairAt} dur={14} style={{ left: R_X, top: c.y(360) + 2 * (c.h(PANEL.h) + PANEL.gapY) + 4, whiteSpace: "nowrap" }}>
         <span style={{ ...note(24, INK), fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 12 }}>
@@ -173,10 +173,10 @@ const Consist: React.FC<{ c: Ctx }> = ({ c }) => {
       ))}
       {/* What each end suits. */}
       <Ink at={feedAt} dur={12} style={{ left: x0 - 10, top: lineY + c.h(250), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(23, INK), fontWeight: 500 }}>a feed can be eventual</span>
+        <span style={{ ...note(23, INK), fontWeight: 500 }}>A feed can be eventual</span>
       </Ink>
       <Ink at={bankAt} dur={12} style={{ left: x1 - 380, top: lineY + c.h(250), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(23, INK), fontWeight: 500 }}>a bank balance usually needs strong</span>
+        <span style={{ ...note(23, INK), fontWeight: 500 }}>A bank balance usually needs strong</span>
       </Ink>
     </>
   );

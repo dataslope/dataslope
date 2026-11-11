@@ -210,15 +210,15 @@ export const ApproachScene: React.FC = () => {
 
         {/* Same features, different systems. */}
         {[
-          { x: X0, at: thousandAt, n: 1000, unit: "users", system: "one server" },
-          { x: X0 + 620, at: billionAt, n: ESTIMATE.readsPerDay, unit: "redirects a day", system: "many servers, caches" },
+          { x: X0, at: thousandAt, n: 1000, unit: "users", system: "One server" },
+          { x: X0 + 620, at: billionAt, n: ESTIMATE.readsPerDay, unit: "redirects a day", system: "Many servers, caches" },
         ].map((f) => (
           <React.Fragment key={f.unit}>
             <Line x={f.x} y={figY} at={f.at} size={27} weight={500} color={BLUE_INK}>
               <Num>{int(f.n)}</Num> {f.unit}
             </Line>
             <Line x={f.x} y={figY + 48} at={Math.max(f.at, sameAt)} size={22} weight={500} color={INK}>
-              shorten · redirect
+              Shorten · Redirect
             </Line>
             <Arrow
               points={[

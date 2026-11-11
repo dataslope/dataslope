@@ -166,19 +166,19 @@ export const NextScene: React.FC = () => {
         <MiniDesign at={firstAt + 4} y={y} />
 
         <Line x={textX} y={y(352)} at={sizedAt} size={26} color={INK_SOFT} weight={500}>
-          sized for its estimate
+          Sized for its estimate
         </Line>
         <Line x={textX} y={y(352) + 46} at={sizedAt + 4} size={34} color={BLUE_INK} weight={500}>
           <Num>{int(peak)}</Num> redirects a second
         </Line>
         <div style={{ position: "absolute", left: textX, top: y(452), display: "flex", alignItems: "center", gap: 14, fontSize: 26, opacity: ease(frame, noneAt, 12) }}>
           {frame >= noneAt ? <Tick at={noneAt + 4} size={28} /> : <span style={{ width: 28 }} />}
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no single point of failure</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>No single point of failure</span>
         </div>
 
         {/* The bridge: the same design, asked for ten times its estimate. */}
         <Line x={textX} y={y(548)} at={tenAt} size={26} color={INK_SOFT} weight={500}>
-          now ten times the traffic
+          Now ten times the traffic
         </Line>
         <Line x={textX} y={y(548) + 46} at={tenAt + 4} size={34} color={INK} weight={500}>
           <Mark at={tenAt + 8} color={HIGHLIGHT}>

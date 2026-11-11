@@ -97,14 +97,14 @@ export const CacheScene: React.FC = () => {
           size={26}
           dim={dimA}
           steps={[
-            { text: "check the cache", at: checksAt - 2, lit: [checksAt, missAt] },
-            { text: "miss", at: missAt - 2, lit: [missAt, readsAt] },
-            { text: "read the database, write the cache", at: readsAt - 2, lit: [readsAt, returnsAt] },
-            { text: "return it", at: returnsAt - 2, lit: [returnsAt, writeAt] },
+            { text: "Check the cache", at: checksAt - 2, lit: [checksAt, missAt] },
+            { text: "Miss", at: missAt - 2, lit: [missAt, readsAt] },
+            { text: "Read the database, write the cache", at: readsAt - 2, lit: [readsAt, returnsAt] },
+            { text: "Return it", at: returnsAt - 2, lit: [returnsAt, writeAt] },
           ]}
         />
         <Line at={firstAt} x={X0} y={y(422)} size={22} color={INK_SOFT} dim={dimA}>
-          every key&apos;s first request pays <Mark at={firstAt + 2}>the miss</Mark>
+          Every key&apos;s first request pays <Mark at={firstAt + 2}>the miss</Mark>
         </Line>
         <Line at={writeAt - 4} x={X0} y={y(482)} size={22} weight={500} color={INK_SOFT} dim={dimA}>
           On a write
@@ -115,17 +115,17 @@ export const CacheScene: React.FC = () => {
           size={26}
           dim={dimA}
           steps={[
-            { text: "update the database", at: writeAt, lit: [writeAt, invalAt] },
-            { text: "invalidate the cached copy", at: invalAt - 2, lit: [invalAt, onlyAt] },
+            { text: "Update the database", at: writeAt, lit: [writeAt, invalAt] },
+            { text: "Invalidate the cached copy", at: invalAt - 2, lit: [invalAt, onlyAt] },
           ]}
         />
 
         {/* ── What follows ── */}
         <Line at={onlyAt} x={1400} y={y(338)} size={22} dim={dimA}>
-          only what&apos;s asked for is cached
+          Only what&apos;s asked for is cached
         </Line>
         <Line at={failAt} x={1400} y={y(388)} size={22} dim={dimA}>
-          a failure falls through to the database
+          A failure falls through to the database
         </Line>
 
         {/* ── The simulation ── */}
@@ -201,7 +201,7 @@ export const CacheScene: React.FC = () => {
           head={12 + 4 * dead * (1 - replica)}
         />
         <Ink at={deadAt + 6} dur={12} out={replicaAt} style={{ left: D.app.x, top: storeMid + 44, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>every read reaches the database</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>Every read reaches the database</span>
         </Ink>
         <Ink at={replicaAt + 8} dur={12} style={{ left: D.app.x, top: storeMid + 44, whiteSpace: "nowrap" }}>
           <span style={{ ...label(21, OK_INK), fontWeight: 500 }}>so the cache needs replicas too</span>

@@ -124,7 +124,7 @@ export const StratScene: React.FC = () => {
           }}
         />
         <Line x={CARD.x - 22} y={brTop - 40} at={behindAt + 6} size={21} weight={500} color={frame >= indirectionAt ? ACCENT_INK : INK_SOFT}>
-          <Strike at={indirectionAt + 6}>one interface: a cost for a weight</Strike>
+          <Strike at={indirectionAt + 6}>One interface: a cost for a weight</Strike>
         </Line>
         {cards.map((c, i) => (
           <React.Fragment key={c.title}>
@@ -175,7 +175,7 @@ export const StratScene: React.FC = () => {
           One rule: the interface is just <span style={{ color: ACCENT_INK }}>indirection</span>
         </Line>
         <Line x={CARD.x - 22} y={y(740) + 48} at={plainAt} size={26}>
-          <Mark at={plainAt + 6}>a plain function</Mark> does the job
+          <Mark at={plainAt + 6}>A plain function</Mark> does the job
           <span style={{ color: INK_SOFT, opacity: ease(frame, secondAt, 10) }}>, until a second rule</span>
         </Line>
       </Drift>

@@ -117,10 +117,10 @@ export const HookScene: React.FC = () => {
                 <rect x={bandX} y={rowMid - OPT_H / 2 - 6} width={bandW} height={OPT_H + 12} rx={10} fill={HIGHLIGHT} />
               </svg>
               <Line x={NEW.x + NEW.w / 2} y={rowMid - 15} at={landsAt + i * 3} size={23} weight={500} color={OK_INK} align="center" width={NEW.w} dim={dim}>
-                a new piece
+                A new piece
               </Line>
               <Line x={EDIT.x + EDIT.w / 2} y={rowMid - 15} at={editAt + i * 3} size={23} weight={500} color={ACCENT_INK} align="center" width={EDIT.w} dim={dim}>
-                an edit to working code
+                An edit to working code
               </Line>
             </React.Fragment>
           );

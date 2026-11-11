@@ -136,7 +136,7 @@ export const DipScene: React.FC = () => {
 
         {/* What the fake recorded. */}
         <Line x={CONF.x} y={top + CONF.h + 44} at={recordsAt + 4} size={21} color={INK_SOFT} weight={500}>
-          the fake recorded one message
+          The fake recorded one message
         </Line>
         <Line x={CONF.x} y={top + CONF.h + 78} at={recordsAt + 10} size={26} color={BLUE_INK} weight={500}>
           “{sent}”
@@ -145,14 +145,14 @@ export const DipScene: React.FC = () => {
           <Mark2 at={checksAt} kind="tick" size={32} />
         </div>
         <Line x={CONF.x + 636} y={top + CONF.h + 82} at={checksAt + 2} size={23} color={OK_INK} weight={500}>
-          checked, no mail server
+          Checked, no mail server
         </Line>
 
         <ArtSpot id="plug" at={lampAt} left={1360} top={y(380)} h={190} />
 
         {/* The arrows, before and after. */}
         <Line x={B.conf.x} y={rowTop - 48} at={inversionAt} size={21} color={INK_SOFT} weight={500}>
-          before
+          Before
         </Line>
         <Box x={B.conf.x} y={rowTop} w={B.conf.w} h={rowH} at={inversionAt} title="Confirmation" size={23} tones={[[noLongerAt + 10, "bad"]]} />
         <Box x={B.email.x} y={rowTop} w={B.email.w} h={rowH} at={inversionAt + 4} title="Email sender" size={23} />
@@ -161,7 +161,7 @@ export const DipScene: React.FC = () => {
 
         <VRule x={(B.email.x + B.email.w + A.conf.x - 14) / 2} top={rowTop - 48} bottom={rowTop + rowH + 50} at={noLongerAt} />
         <Line x={A.conf.x} y={rowTop - 48} at={noLongerAt} size={21} color={OK_INK} weight={500}>
-          after
+          After
         </Line>
         <Box x={A.conf.x} y={rowTop} w={A.conf.w} h={rowH} at={noLongerAt + 4} title="Confirmation" size={23} tone="ok" />
         <Box x={A.shape.x} y={rowTop} w={A.shape.w} h={rowH} at={askedAt - 4} title="sends a message" size={22} tone="ok" dashed lit={pulse(frame, askedAt + 4, 20)} />

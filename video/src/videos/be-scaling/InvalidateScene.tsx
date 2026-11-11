@@ -129,16 +129,16 @@ export const InvalidateScene: React.FC = () => {
           out={phaseOut}
         />
         <Line at={driftAt + 6} x={X0} y={y(352) + 72 + h(24)} size={22} color={INK_SOFT} out={phaseOut}>
-          the database changed; the cache still says the old value
+          The database changed; the cache still says the old value
         </Line>
         <Line at={ttlAt} x={X0} y={y(600)} size={23} weight={500} out={phaseOut}>
           The TTL, the time to live:
         </Line>
         <Line at={longAt} x={X0} y={y(650)} size={23} out={phaseOut}>
-          <b style={{ color: ACCENT_INK }}>too long</b>, and users see stale data
+          <b style={{ color: ACCENT_INK }}>Too long</b>, and users see stale data
         </Line>
         <Line at={shortAt} x={X0} y={y(700)} size={23} out={phaseOut}>
-          <b style={{ color: ACCENT_INK }}>too short</b>, and you lose the cache&apos;s benefit
+          <b style={{ color: ACCENT_INK }}>Too short</b>, and you lose the cache&apos;s benefit
         </Line>
 
         <VRule x={800} top={y(352)} bottom={y(730)} at={modelsAt} out={chartOut} />
@@ -203,31 +203,31 @@ export const InvalidateScene: React.FC = () => {
           <span style={{ color: ACCENT_INK, opacity: ease(frame, takenAt, 10) }}> until one is taken down for abuse</span>
         </Line>
         <Line at={deleteAt} x={X0} y={y(420)} size={21} weight={500} color={OK_INK}>
-          delete the cached entry after the database commits
+          Delete the cached entry after the database commits
         </Line>
         <StepRow
           x={X0}
           y={y(454)}
           steps={[
-            { text: "mark it taken down", at: takenAt + 4 },
-            { text: "commit", at: commitsAt, color: OK_INK },
-            { text: "delete the cached entry", at: commitsAt + 10, color: OK_INK, lit: [commitsAt + 10, firstAt] },
+            { text: "Mark it taken down", at: takenAt + 4 },
+            { text: "Commit", at: commitsAt, color: OK_INK },
+            { text: "Delete the cached entry", at: commitsAt + 10, color: OK_INK, lit: [commitsAt + 10, firstAt] },
           ]}
         />
         <Line at={raceAt} x={X0} y={y(506)} size={20} color={INK_SOFT}>
           even so, a slow read can still race the delete
         </Line>
         <Line at={firstAt} x={X0} y={y(560)} size={21} weight={500} color={ACCENT_INK}>
-          delete it first, and a read in between puts the old value back
+          Delete it first, and a read in between puts the old value back
         </Line>
         <StepRow
           x={X0}
           y={y(594)}
           steps={[
-            { text: "delete the cached entry", at: firstAt },
-            { text: "a read reloads the old value", at: betweenAt, lit: [betweenAt, backAt] },
-            { text: "commit", at: betweenAt + 18 },
-            { text: "the cache holds the old value", at: backAt, color: ACCENT_INK },
+            { text: "Delete the cached entry", at: firstAt },
+            { text: "A read reloads the old value", at: betweenAt, lit: [betweenAt, backAt] },
+            { text: "Commit", at: betweenAt + 18 },
+            { text: "The cache holds the old value", at: backAt, color: ACCENT_INK },
           ]}
         />
         <Spot id="timer" at={backstopAt} x={1560} y={y(366)} w={150} />
@@ -241,7 +241,7 @@ export const InvalidateScene: React.FC = () => {
           <span style={{ ...note(23, INK), display: "inline-flex", alignItems: "center", gap: 16 }}>
             <b style={{ width: 190 }}>Write-through</b>
             <span>
-              <b style={{ color: BLUE_INK }}>cache</b> and <b style={{ color: BLUE_INK }}>database</b> written together
+              <b style={{ color: BLUE_INK }}>Cache</b> and <b style={{ color: BLUE_INK }}>database</b> written together
               <span style={{ color: INK_SOFT, opacity: ease(frame, costAt, 10) }}>: consistent, at a cost on every write</span>
             </span>
           </span>
@@ -259,7 +259,7 @@ export const InvalidateScene: React.FC = () => {
               </svg>
             </span>
             <span>
-              batched, for speed
+              Batched, for speed
               <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, crashAt, 10) }}>: a crash loses what it hadn&apos;t written</span>
             </span>
           </span>

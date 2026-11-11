@@ -122,10 +122,10 @@ export const BreakerScene: React.FC = () => {
 
         {/* Panel titles. */}
         <div style={{ position: "absolute", left: TX0, top: errTop - h(48), ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
-          error rate at the dependency
+          Error rate at the dependency
         </div>
         <div style={{ position: "absolute", left: TX0, top: reqTop - h(48), ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
-          requests per second reaching it
+          Requests per second reaching it
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, simAt, 10) }}> · the page&apos;s simulation</span>
         </div>
 

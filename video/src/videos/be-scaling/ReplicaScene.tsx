@@ -88,7 +88,7 @@ export const ReplicaScene: React.FC = () => {
 
         {/* ── Leader and followers ── */}
         <Line at={copiesAt} x={X0} y={y(340)} size={22} weight={500} color={INK_SOFT} dim={dimTop}>
-          copies of the data on several nodes
+          Copies of the data on several nodes
         </Line>
         <Ink at={writesAt - 2} dur={12} style={{ left: X0, top: lMid - 44, whiteSpace: "nowrap", opacity: 1 - ease(frame, dimTop, 12) * 0.65 }}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>writes</span>
@@ -240,19 +240,19 @@ export const ReplicaScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Line at={losesAt} x={LOG.x} y={y(402) + h(148)} size={21} color={ACCENT_INK} weight={500}>
-          promoted: w5 and w6 are lost
+          Promoted: w5 and w6 are lost
         </Line>
         <Line at={semiAt} x={LOG.x} y={y(402) + h(214)} size={22} weight={500} color={INK}>
           <Mark at={semiAt + 2}>Semi-synchronous</Mark>
         </Line>
         <Line at={waitsAt} x={LOG.x} y={y(402) + h(262)} size={21} color={OK_INK} weight={500}>
-          a write waits for one follower
+          A write waits for one follower
         </Line>
         <Line at={nothingAt} x={LOG.x} y={y(402) + h(302)} size={21} color={OK_INK} weight={500}>
-          promote that one: nothing lost
+          Promote that one: nothing lost
         </Line>
         <Line at={slowerAt} x={LOG.x} y={y(402) + h(342)} size={21} color={INK_SOFT}>
-          the price: every write is slower
+          The price: every write is slower
         </Line>
       </Drift>
     </AbsoluteFill>

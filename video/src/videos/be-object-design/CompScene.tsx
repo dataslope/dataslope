@@ -131,6 +131,9 @@ export const CompScene: React.FC = () => {
   // ── Part B: the combinations ──
   const channels = [...NOTIFIERS.channels, NOTIFIERS.added];
   const timings = NOTIFIERS.timings;
+  /** A grid heading stands on its own, so it starts with a capital; the same
+   *  names on the parts' boxes stay as the run spells them. */
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   const cellX = (j: number) => GRID_X + j * (CELL.w + 14);
   const rowY = (i: number) => y(GRID_TOP + i * GRID_PITCH);
   const subclasses = frame >= twelveAt ? NOTIFIERS.inheritance[1] : NOTIFIERS.inheritance[0];
@@ -290,13 +293,13 @@ export const CompScene: React.FC = () => {
         </Line>
         {timings.map((t, j) => (
           <Line key={t} x={cellX(j) + CELL.w / 2} y={y(GRID_TOP - 48)} at={timingsAt + j * 4} size={20} color={INK_SOFT} weight={500} align="center" width={CELL.w}>
-            {t}
+            {cap(t)}
           </Line>
         ))}
         {channels.map((c, i) => (
           <React.Fragment key={c}>
             <Line x={X0} y={rowY(i) + 12} at={i < 3 ? channelsAt + i * 5 : fourthAt} size={21} weight={500}>
-              {c}
+              {cap(c)}
             </Line>
             {timings.map((t, j) => (
               <Box
@@ -335,7 +338,7 @@ export const CompScene: React.FC = () => {
 
         {/* One customer's notifier swaps its timing part. */}
         <Line x={1520} y={rowY(0) - 4} at={customerAt} size={20} color={INK_SOFT} weight={500}>
-          one customer
+          One customer
         </Line>
         <Box x={1520} y={rowY(0) + 28} w={110} h={CELL.h} at={customerAt + 2} title="text" size={21} />
         <Box x={1520} y={rowY(1) + 28} w={220} h={CELL.h} at={customerAt + 6} tone="ok" size={21}>

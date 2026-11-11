@@ -169,7 +169,7 @@ export const RateScene: React.FC = () => {
         </QuestionCard>
         <MiniMap at={qAt} stage={8} lit="limit" grow={{ limit: capsAt }} />
         <Line at={capsAt} x={X0} y={y(250)} size={22} color={INK_SOFT} out={rowsOut}>
-          caps a client&apos;s requests per window
+          Caps a client&apos;s requests per window
           <span style={{ opacity: ease(frame, protectAt, 10) }}>, to protect the system and keep it fair</span>
         </Line>
 
@@ -207,10 +207,10 @@ export const RateScene: React.FC = () => {
 
         {/* ── Four limiters, a row each. ── */}
         {[
-          ["Fixed-window counter", "resets on the minute", fixedAt, resetsAt],
-          ["Sliding-window counter", "weighs in the minute before", slidingAt, weighsAt],
+          ["Fixed-window counter", "Resets on the minute", fixedAt, resetsAt],
+          ["Sliding-window counter", "Weighs in the minute before", slidingAt, weighsAt],
           ["Token bucket", "10 tokens, one back every 6 s", tokenAt, refillAt],
-          ["Leaky bucket", "a queue of 10, one out every 6 s", leakyAt, constantAt],
+          ["Leaky bucket", "A queue of 10, one out every 6 s", leakyAt, constantAt],
         ].map(([name, sub, at, subAt], i) => (
           <React.Fragment key={i}>
             <Ink at={(at as number) - 2} dur={12} out={rowsOut} style={{ left: X0, top: rowY(i) - 4, whiteSpace: "nowrap" }}>
@@ -252,27 +252,27 @@ export const RateScene: React.FC = () => {
           for one cheap counter
         </Line>
         <Line at={refusesAt} x={NOTE_X} y={rowY(1) - 4} size={21} weight={500} color={OK_INK} out={rowsOut}>
-          the second ten refused
+          The second ten refused
         </Line>
         <Line at={estimateAt} x={NOTE_X} y={rowY(1) + 28} size={20} color={INK_SOFT} out={rowsOut}>
-          an estimate: assumes an even spread
+          An estimate: assumes an even spread
         </Line>
         <Line at={burstAt} x={NOTE_X} y={rowY(2) - 4} size={21} weight={500} color={OK_INK} out={rowsOut}>
-          a burst of <Num>10</Num>
+          A burst of <Num>10</Num>
           <span style={{ opacity: ease(frame, secondAt, 10) }}>, then refused</span>
         </Line>
         <Line at={emptyAt} x={NOTE_X} y={rowY(2) + 28} size={20} color={ACCENT_INK} out={rowsOut}>
-          empty: HTTP 429
+          Empty: HTTP 429
           <span style={{ opacity: ease(frame, tooManyAt, 10) }}>, too many requests</span>
         </Line>
         <Line at={smoothAt} x={NOTE_X} y={rowY(3) - 4} size={21} weight={500} color={OK_INK} out={rowsOut}>
-          a smooth stream out
+          A smooth stream out
         </Line>
         <Line at={waitsAt} x={NOTE_X} y={rowY(3) + 28} size={20} color={INK_SOFT} out={rowsOut}>
           <Num>{RATE.leaky.accepted}</Num> queued: one had drained by 61 s
         </Line>
         <Line at={restAt} x={NOTE_X} y={rowY(3) + 58} size={20} weight={500} color={ACCENT_INK} out={rowsOut}>
-          queue full: the other <Num>{RATE.trace.length - RATE.leaky.accepted}</Num> refused
+          Queue full: the other <Num>{RATE.trace.length - RATE.leaky.accepted}</Num> refused
         </Line>
 
         {/* ── The follow-up: each server its own bucket, or one shared. ── */}
@@ -291,10 +291,10 @@ export const RateScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Line at={handsAt} x={X0} y={y(390) + 160} size={21} color={INK_SOFT}>
-          a burst of <Num>{RATE.burst}</Num>, dealt round-robin: ten to each
+          A burst of <Num>{RATE.burst}</Num>, dealt round-robin: ten to each
         </Line>
         <Line at={fourTimesAt} x={X0} y={y(390) + 196} size={23} weight={500} color={ACCENT_INK}>
-          all <Num>{RATE.localOk}</Num> pass: 4× the limit
+          All <Num>{RATE.localOk}</Num> pass: 4× the limit
         </Line>
         <VRule x={930} top={y(330)} bottom={sharedBox.top + sharedBox.h + 30 + 2 * (CELL + CELL_GAP) + 94} at={shareAt} />
         <Line at={shareAt} x={1010} y={y(330)} size={23} weight={500} color={OK_INK}>
@@ -319,7 +319,7 @@ export const RateScene: React.FC = () => {
           <Num>{RATE.sharedOk}</Num> pass
         </Line>
         <Line at={atomicAt} x={1010} y={sharedBox.top + sharedBox.h + 30 + 2 * (CELL + CELL_GAP) + 66} size={21} weight={500} color={INK}>
-          check and spend in <Mark at={atomicAt + 2}>one atomic step</Mark>
+          Check and spend in <Mark at={atomicAt + 2}>one atomic step</Mark>
           <span style={{ color: INK_SOFT, opacity: ease(frame, lastAt, 10) }}>, or two servers take the last token</span>
         </Line>
       </Drift>

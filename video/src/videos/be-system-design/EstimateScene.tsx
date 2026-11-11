@@ -15,10 +15,11 @@ const BW_X = 1520;
 const E = ESTIMATE;
 const A = E.assumptions;
 
-/** An assumption, as said: in gray, "assume" first. */
-const assume = (text: React.ReactNode) => (
+/** An assumption, as said: in gray, "assume" first, with a capital when it
+ *  starts the line. */
+const assume = (text: React.ReactNode, lead = false) => (
   <span style={{ color: INK_SOFT }}>
-    assume {text}
+    {lead ? "Assume" : "assume"} {text}
   </span>
 );
 
@@ -137,13 +138,14 @@ export const EstimateScene: React.FC = () => {
             <>
               <Num>{int(A.newLinksPerDay)}</Num> new links a day
             </>,
+            true,
           )}
         </Line>
         <Line x={X0} y={pair(0) + 48} at={writesAt} size={28} weight={500} color={BLUE_INK}>
           ≈ <Num>{int(sig(E.writeQps))}</Num> writes a second
         </Line>
         <Line x={X0} y={pair(1)} at={ratioAt} size={25}>
-          <span style={{ color: INK_SOFT }}>read-heavy, 100 : 1 or more, so</span>
+          <span style={{ color: INK_SOFT }}>Read-heavy, 100 : 1 or more, so</span>
           <span style={{ opacity: ease(frame, perLinkAt, 10) }}>
             {" "}
             {assume(
@@ -161,7 +163,7 @@ export const EstimateScene: React.FC = () => {
           </span>
         </Line>
         <Line x={X0} y={pair(2)} at={peakAt} size={25}>
-          <span style={{ color: INK_SOFT }}>peaks run 2 to 3 times the average, so</span>
+          <span style={{ color: INK_SOFT }}>Peaks run 2 to 3 times the average, so</span>
           <span style={{ opacity: ease(frame, threeAt, 10) }}>
             {" "}
             {assume(
@@ -181,7 +183,7 @@ export const EstimateScene: React.FC = () => {
         </Line>
         {/* How big that cache is: a whole day of new links. */}
         <Line x={X0 + 450} y={pair(2) + 100} at={dayAt} size={25} color={INK_SOFT}>
-          a whole day of new links: <Num>{Math.round(E.dayInMemoryBytes / 1e9)}</Num> GB
+          A whole day of new links: <Num>{Math.round(E.dayInMemoryBytes / 1e9)}</Num> GB
           <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, memAt, 10) }}>, fits in one machine&apos;s memory</span>
         </Line>
 
@@ -191,6 +193,7 @@ export const EstimateScene: React.FC = () => {
             <>
               <Num>{A.bytesPerLink}</Num> bytes a link
             </>,
+            true,
           )}
         </Line>
         <Line x={ST_X} y={ruleY + 60} at={gbAt - 4} size={27} dim={neitherAt}>
@@ -209,6 +212,7 @@ export const EstimateScene: React.FC = () => {
             <>
               <Num>{A.bytesPerRedirect}</Num> B a redirect
             </>,
+            true,
           )}
         </Line>
         <Line x={BW_X} y={ruleY + 60} at={mbAt - 6} size={27} dim={neitherAt}>

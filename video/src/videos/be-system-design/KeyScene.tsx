@@ -88,8 +88,8 @@ export const KeyScene: React.FC = () => {
 
         {/* The API, in words. */}
         {[
-          { x: X0, at: createAt, name: "create", body: <>long URL in, short key out</>, sub: keyOutAt },
-          { x: X0 + CARD_W + 60, at: otherAt, name: "redirect", body: <>short key in, redirect out</>, sub: redirAt },
+          { x: X0, at: createAt, name: "create", body: <>Long URL in, short key out</>, sub: keyOutAt },
+          { x: X0 + CARD_W + 60, at: otherAt, name: "redirect", body: <>Short key in, redirect out</>, sub: redirAt },
         ].map((c) => {
           const p = ease(frame, c.at - 2, 14);
           return (
@@ -116,13 +116,13 @@ export const KeyScene: React.FC = () => {
         {/* Which redirect: temporary, since browsers keep a permanent one. */}
         <VRule x={1190} top={cardY} bottom={cardY + 116} at={tempAt} />
         <Line x={TX} y={cardY} at={tempAt} size={23} color={INK_SOFT}>
-          which kind
+          Which kind
         </Line>
         <Line x={TX} y={cardY + 40} at={tempAt + 6} size={30} color={OK_INK}>
-          temporary (<Num>302</Num>)
+          Temporary (<Num>302</Num>)
         </Line>
         <Line x={TX} y={cardY + 90} at={permAt} size={23} color={ACCENT_INK}>
-          permanent (<Num>301</Num>): browsers keep it
+          Permanent (<Num>301</Num>): browsers keep it
         </Line>
         <Line x={X0} y={cardY - 52} at={apiAt} size={22} weight={500} color={INK_SOFT}>
           The API, in two calls
@@ -189,24 +189,24 @@ export const KeyScene: React.FC = () => {
           Or a hash of the long URL
         </Line>
         <div style={{ position: "absolute", left: RX, top: secY + 60, display: "flex", alignItems: "center", gap: 16, fontSize: 27 }}>
-          <span style={{ ...note(27, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, hashAt + 4, 10) }}>long URL</span>
+          <span style={{ ...note(27, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, hashAt + 4, 10) }}>Long URL</span>
           <InlineArrow at={hashAt + 10} w={40} />
-          <span style={{ ...note(27, INK), fontWeight: 500, opacity: ease(frame, hashAt + 14, 10) }}>hash</span>
+          <span style={{ ...note(27, INK), fontWeight: 500, opacity: ease(frame, hashAt + 14, 10) }}>Hash</span>
           <InlineArrow at={fewAt - 4} w={40} />
-          <span style={{ ...note(27, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, fewAt, 10) }}>a few characters</span>
+          <span style={{ ...note(27, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, fewAt, 10) }}>A few characters</span>
         </div>
         {/* The follow-up: a key that is taken, and two servers racing for one. */}
         <div style={{ position: "absolute", left: RX, top: secY + 124, display: "flex", alignItems: "center", gap: 16, fontSize: 27 }}>
           <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, takenAt, 10) }}>
             <Mark at={takenAt + 2} color={HIGHLIGHT}>
-              taken?
+              Taken?
             </Mark>
           </span>
           <InlineArrow at={saltAt - 4} w={40} />
-          <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, saltAt, 10) }}>add a salt, hash again</span>
+          <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, saltAt, 10) }}>Add a salt, hash again</span>
         </div>
         <Line x={RX} y={secY + 188} at={condAt} size={26} color={OK_INK}>
-          store only if absent
+          Store only if absent
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, claimAt, 10) }}>: no two servers claim one key</span>
         </Line>
         <Line x={RX} y={secY + 240} at={claimAt + 24} size={23} weight={400} color={INK_SOFT}>

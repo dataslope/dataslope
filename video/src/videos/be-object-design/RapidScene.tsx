@@ -49,10 +49,10 @@ const TEXT_MID = 29;
 
 const Pillars: React.FC<{ c: Ctx }> = ({ c }) => {
   const rows = [
-    { at: c.w("r-pillars", "Encapsulation bundles data"), word: "Encapsulation", gloss: "bundles data with its methods, hides the state", color: BAR },
-    { at: c.w("r-pillars", "Inheritance reuses"), word: "Inheritance", gloss: "reuses and specializes a class", color: ds("green", 500) },
-    { at: c.w("r-pillars", "Polymorphism gives one call"), word: "Polymorphism", gloss: "one call, the right behavior for each type", color: ACCENT },
-    { at: c.w("r-pillars", "Abstraction shows what an object does"), word: "Abstraction", gloss: "what an object does, not how", color: ds("yellow", 600) },
+    { at: c.w("r-pillars", "Encapsulation bundles data"), word: "Encapsulation", gloss: "Bundles data with its methods, hides the state", color: BAR },
+    { at: c.w("r-pillars", "Inheritance reuses"), word: "Inheritance", gloss: "Reuses and specializes a class", color: ds("green", 500) },
+    { at: c.w("r-pillars", "Polymorphism gives one call"), word: "Polymorphism", gloss: "One call, the right behavior for each type", color: ACCENT },
+    { at: c.w("r-pillars", "Abstraction shows what an object does"), word: "Abstraction", gloss: "What an object does, not how", color: ds("yellow", 600) },
   ];
   const pw = artW("pillar", PILLAR_H);
   return (
@@ -208,7 +208,7 @@ const Poly: React.FC<{ c: Ctx }> = ({ c }) => {
         = {TOTAL_AREA.toFixed(2)}
       </Line>
       <Line x={R_X} y={c.y(800)} at={noAt} size={24} color={INK_SOFT}>
-        no ladder of <Strike at={noAt + 8}>type checks</Strike>
+        No ladder of <Strike at={noAt + 8}>type checks</Strike>
       </Line>
     </>
   );
@@ -313,7 +313,7 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
 
       {/* Two tests, in order, then the second alone. */}
       <Line x={R_X} y={testTop} at={passesAt - 4} size={21} color={INK_SOFT} weight={500}>
-        in order
+        In order
       </Line>
       {inOrder.map(([name, result], i) => {
         const ok = result === "pass";
@@ -329,7 +329,7 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
       })}
       <VRule x={1395} top={testTop} bottom={testTop + 114} at={passesAt} />
       <Line x={1430} y={testTop} at={passesAt} size={21} color={INK_SOFT} weight={500}>
-        alone
+        Alone
       </Line>
       {alone.map(([name, result]) => (
         <React.Fragment key={name}>
@@ -340,7 +340,7 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
         </React.Fragment>
       ))}
       <Line x={R_X} y={c.y(810)} at={cleanerAt} size={24} weight={500} color={OK_INK}>
-        often cleaner: a module-level value, or plain injection
+        Often cleaner: a module-level value, or plain injection
       </Line>
     </>
   );
@@ -398,7 +398,7 @@ const Abstract: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
       <Slots x={A} top={top} w={w} at={declaresAt + 6} filled={[false, false, false]} tone="plain" />
       <Line x={A} y={top + h + 22} at={noImplAt} size={22} color={INK_SOFT} weight={500}>
-        methods named, none written
+        Methods named, none written
       </Line>
       <VRule x={(A + w + B) / 2} top={top} bottom={top + h + 156} at={abstractAt} />
       <Box x={B} y={top} w={w} h={h} at={abstractAt} tone="plain" />
@@ -407,19 +407,19 @@ const Abstract: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
       <Slots x={B} top={top} w={w} at={abstractAt + 6} filled={[true, true, false]} tone="data" />
       <Line x={B} y={top + h + 22} at={abstractAt + 10} size={22} color={INK_SOFT} weight={500}>
-        some code and state shared
+        Some code and state shared
       </Line>
       <Line x={A} y={top + h + 74} at={manyAt} size={24} weight={500}>
-        a class implements many
+        A class implements many
       </Line>
       <Line x={B} y={top + h + 74} at={oneAt} size={24} weight={500}>
-        a class extends only one
+        A class extends only one
       </Line>
       <Line x={A} y={top + h + 126} at={contractAt} size={24} weight={500} color={OK_INK}>
-        a pure contract
+        A pure contract
       </Line>
       <Line x={B} y={top + h + 126} at={sharedAt} size={24} weight={500} color={OK_INK}>
-        subclasses share code
+        Subclasses share code
       </Line>
       <Line x={A} y={top + h + 196} at={defaultsAt} size={21} color={INK_SOFT} weight={500}>
         Java and C# interfaces may carry default methods, but never instance fields.
@@ -445,9 +445,9 @@ const IsA: React.FC<{ c: Ctx }> = ({ c }) => {
   const H = 58;
   const cols = [R_X, 1160, 1500];
   const kinds = [
-    { at: isAt, upper: "Vehicle", lower: "Car", link: "is a", ok: true, note: "inheritance", noteAt: inhAt },
-    { at: hasAt, upper: "Car", lower: "Engine", link: "has a", ok: true, note: "composition", noteAt: compAt },
-    { at: extendAt, upper: "Engine", lower: "Car", link: "is a?", ok: false, note: "inherits it all", noteAt: wholeAt },
+    { at: isAt, upper: "Vehicle", lower: "Car", link: "is a", ok: true, note: "Inheritance", noteAt: inhAt },
+    { at: hasAt, upper: "Car", lower: "Engine", link: "has a", ok: true, note: "Composition", noteAt: compAt },
+    { at: extendAt, upper: "Engine", lower: "Car", link: "is a?", ok: false, note: "Inherits it all", noteAt: wholeAt },
   ];
   return (
     <>

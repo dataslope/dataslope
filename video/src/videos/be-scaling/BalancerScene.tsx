@@ -182,17 +182,17 @@ export const BalancerScene: React.FC = () => {
           so no one server is overwhelmed
         </Line>
         <Line at={healthAt} x={X0} y={y(820)} size={22} out={phaseOut}>
-          <Mark at={healthAt}>health checks</Mark> pull a dead server out
+          <Mark at={healthAt}>Health checks</Mark> pull a dead server out
         </Line>
         <Line at={availAt} x={X0} y={y(870)} size={22} color={OK_INK} weight={500} out={phaseOut}>
-          a stateless pool stays highly available
+          A stateless pool stays highly available
         </Line>
 
         {/* ── The three ways to pick a server, each lit as named. ── */}
         {[
-          ["Round-robin", rrAt, "deals them in turn"],
-          ["Least-connections", lcAt, "fewest open connections"],
-          ["Consistent hashing", chAt, "the same key, the same server"],
+          ["Round-robin", rrAt, "Deals them in turn"],
+          ["Least-connections", lcAt, "Fewest open connections"],
+          ["Consistent hashing", chAt, "The same key, the same server"],
         ].map(([name, at, sub], i) => (
           <React.Fragment key={i}>
             <Ink at={(at as number) - 2} dur={14} out={phaseOut} style={{ left: PANEL_X[i], top: panelTop, whiteSpace: "nowrap" }}>
@@ -272,10 +272,10 @@ export const BalancerScene: React.FC = () => {
           );
         })}
         <Line at={fewestAt + 10} x={PANEL_X[1]} y={lcRow(3) + h(60)} size={20} color={OK_INK} weight={500} out={phaseOut}>
-          new request: server {lcPick + 1}
+          New request: server {lcPick + 1}
         </Line>
         <Line at={slowAt} x={PANEL_X[1]} y={lcRow(3) + h(104)} size={20} color={INK_SOFT} out={phaseOut}>
-          copes with slow requests
+          Copes with slow requests
         </Line>
 
         {/* Consistent hashing: the same key reaches the same server, every time. */}
@@ -293,7 +293,7 @@ export const BalancerScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Line at={hotAt} x={PANEL_X[2]} y={y(660)} size={20} color={INK_SOFT} out={phaseOut}>
-          for servers that cache
+          For servers that cache
         </Line>
         <Line at={hotAt + 4} x={PANEL_X[2]} y={y(660) + 30} size={20} color={INK_SOFT} out={phaseOut}>
           their own hot links
@@ -346,13 +346,13 @@ export const BalancerScene: React.FC = () => {
         </Svg>
         <Ink at={clockAt} dur={14} style={{ left: RING.cx - 130, top: ringCy - 34, width: 260, textAlign: "center", whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK), fontWeight: 500 }}>
-            <Mark at={clockAt + 2}>a key goes to the next</Mark>
+            <Mark at={clockAt + 2}>A key goes to the next</Mark>
             <br />
             <Mark at={clockAt + 6}>point clockwise</Mark>
           </span>
         </Ink>
         <Line at={justAt} x={RING.cx - RING.r - 24} y={y(GRID_TOP) + 416} size={21} weight={500} color={INK_SOFT}>
-          a new point takes only the keys just before it
+          A new point takes only the keys just before it
         </Line>
         {/* Which color is which server, and what a faded square means. */}
         <Ink at={sevAt} dur={12} style={{ left: 1580, top: y(GRID_TOP) + 40 + 4 * 40 + 14, whiteSpace: "nowrap" }}>

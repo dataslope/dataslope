@@ -158,7 +158,7 @@ export const ShardScene: React.FC = () => {
           </span>
         </Line>
         <Line at={scaleAt} x={SERVER.x0} y={srvTop + SERVER.h + h(22)} size={22} color={OK_INK} weight={500}>
-          scales writes and storage past one machine
+          Scales writes and storage past one machine
         </Line>
 
         {/* ── By creation date: today's shard takes every new link. ── */}
@@ -166,7 +166,7 @@ export const ShardScene: React.FC = () => {
           Shard by creation date
         </Line>
         <Line at={todayAt + 6} x={DATE_X} y={y(640) + h(34)} size={20} color={INK_SOFT}>
-          today&apos;s new links, by shard
+          Today&apos;s new links, by shard
         </Line>
         <Svg opacity={ease(frame, dateAt, 12)}>
           {Array.from({ length: 8 }, (_, i) => {
@@ -191,7 +191,7 @@ export const ShardScene: React.FC = () => {
           Shard by a hash of the short key
         </Line>
         <Line at={simAt} x={HASH_X} y={y(640) + h(34)} size={20} color={INK_SOFT}>
-          simulation: <Num>{commas(SHARDS.keys)}</Num> keys on {SHARDS.shards} shards
+          Simulation: <Num>{commas(SHARDS.keys)}</Num> keys on {SHARDS.shards} shards
           <b style={{ color: OK_INK, opacity: ease(frame, withinAt, 10) }}>, each within 1% of an eighth</b>
         </Line>
         <Svg opacity={ease(frame, hashAt, 12)}>
@@ -225,13 +225,13 @@ export const ShardScene: React.FC = () => {
         </Svg>
         {/* A ninth shard: what moves, by modulo and on a hash ring. */}
         <Line at={ninthAt} x={1490} y={y(744)} size={21} weight={500} color={INK}>
-          add a ninth shard:
+          Add a ninth shard:
         </Line>
         <Line at={modAt} x={1490} y={y(744) + h(36)} size={21} weight={500} color={ACCENT_INK}>
-          modulo moves <Num>{pct(RESHARD.shareMod)}</Num>
+          Modulo moves <Num>{pct(RESHARD.shareMod)}</Num>
         </Line>
         <Line at={ringAt} x={1490} y={y(744) + h(72)} size={21} weight={500} color={OK_INK}>
-          a hash ring moves <Num>{pct(RESHARD.shareRing)}</Num>
+          A hash ring moves <Num>{pct(RESHARD.shareRing)}</Num>
         </Line>
 
         {/* One redirect lights one shard; one user's links light all eight. */}
@@ -240,7 +240,7 @@ export const ShardScene: React.FC = () => {
         </Ink>
         <Ink at={allAt} dur={12} style={{ left: HASH_X, top: base + 10, whiteSpace: "nowrap" }}>
           <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>
-            one user&apos;s <Num>{SHARDS.userLinks}</Num> links, a dot each: all <Num>{SHARDS.userShards}</Num> shards
+            One user&apos;s <Num>{SHARDS.userLinks}</Num> links, a dot each: all <Num>{SHARDS.userShards}</Num> shards
             <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, priceAt, 10) }}>, the price of a cross-shard query</span>
           </span>
         </Ink>

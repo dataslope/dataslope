@@ -78,10 +78,10 @@ export const SpofScene: React.FC = () => {
   const zoneP = ease(frame, zonesAt, 18);
 
   const fixes = [
-    { at: pairAt, text: "an active-passive pair" },
-    { at: failoverAt, text: "a replica, with failover" },
-    { at: cacheReplAt, text: "cache replicas" },
-    { at: zonesAt, text: "two availability zones" },
+    { at: pairAt, text: "An active-passive pair" },
+    { at: failoverAt, text: "A replica, with failover" },
+    { at: cacheReplAt, text: "Cache replicas" },
+    { at: zonesAt, text: "Two availability zones" },
   ];
 
   return (
@@ -171,13 +171,13 @@ export const SpofScene: React.FC = () => {
           Single point of failure
         </Line>
         <Line x={X0} y={y(300) + 56} at={anyAt + 6} size={24} color={INK_SOFT} width={LEFT_W}>
-          any component whose failure takes the system down
+          Any component whose failure takes the system down
         </Line>
         <Line x={X0} y={y(300) + 160} at={threeAt} size={26} weight={500} color={ACCENT_INK}>
           <Num>3</Num> in this diagram
         </Line>
         <Line x={X0} y={y(716)} at={everyAt} size={24} weight={500} color={ACCENT_INK} width={340} out={redundAt}>
-          every read lands on the store at once
+          Every read lands on the store at once
         </Line>
 
         {/* The fixes, ticked as they are said. */}
@@ -191,7 +191,7 @@ export const SpofScene: React.FC = () => {
           </div>
         ))}
         <Line x={RX} y={y(300) + 112 + 4 * 54 + 4} at={dcAt} size={21} color={INK_SOFT} width={330}>
-          separate data centers in one region
+          Separate data centers in one region
         </Line>
         <Line x={RX} y={y(700)} at={noneAt} size={28} weight={500} color={OK_INK} width={330}>
           No single machine&apos;s death causes an outage.

@@ -103,8 +103,8 @@ export const CdnScene: React.FC = () => {
   const pxPerMs = (BAR_END - BAR_X) / DISTANCE.roundTripMs;
   const rows = [
     { at: msAt, text: "Sydney to Virginia, round trip", ms: DISTANCE.roundTripMs, value: <>at least <Num>{Math.round(DISTANCE.roundTripMs)}</Num> ms</>, color: BAR },
-    { at: hundredAt, text: "inside the data center", ms: LADDER.path.hitMs, value: <>≈ <Num>{LADDER.path.hitMs}</Num> ms</>, color: BAR },
-    { at: edgeAt, text: "an edge server across town", ms: DISTANCE.edgeRoundTripMs, value: <>under <Num>1</Num> ms</>, color: OK },
+    { at: hundredAt, text: "Inside the data center", ms: LADDER.path.hitMs, value: <>≈ <Num>{LADDER.path.hitMs}</Num> ms</>, color: BAR },
+    { at: edgeAt, text: "An edge server across town", ms: DISTANCE.edgeRoundTripMs, value: <>under <Num>1</Num> ms</>, color: OK },
   ];
   const rowY = (i: number) => y(712) + i * 54;
 
@@ -163,18 +163,18 @@ export const CdnScene: React.FC = () => {
           Content delivery network
         </Line>
         <Line x={RX} y={top + 58} at={edgesAt} size={23} color={INK_SOFT} width={440}>
-          <span style={{ color: OK_INK, fontWeight: 500 }}>edge servers</span> close to your users, caching what your{" "}
+          <span style={{ color: OK_INK, fontWeight: 500 }}>Edge servers</span> close to your users, caching what your{" "}
           <span style={{ color: BLUE_INK, fontWeight: 500, opacity: ease(frame, originAt, 10) }}>origin</span>
           <span style={{ opacity: ease(frame, originAt, 10) }}> serves</span>
         </Line>
         <Line x={RX} y={top + 190} at={lightAt} size={24} weight={500}>
-          light in fiber: about <Num>{DISTANCE.kmPerMs}</Num> km per ms
+          Light in fiber: about <Num>{DISTANCE.kmPerMs}</Num> km per ms
         </Line>
         <Line x={RX} y={top + 236} at={msAt} size={24} weight={500} color={BLUE_INK}>
           <Num>{int(kmShown)}</Num> km ÷ <Num>{DISTANCE.kmPerMs}</Num> km/ms × <Num>2</Num> ≈ <Num>{Math.round(DISTANCE.roundTripMs)}</Num> ms
         </Line>
         <Line x={RX} y={top + 282} at={floorAt} size={21} color={INK_SOFT}>
-          <span style={{ opacity: ease(frame, msAt + 10, 10) }}>a floor set by physics, not a measurement</span>
+          <span style={{ opacity: ease(frame, msAt + 10, 10) }}>A floor set by physics, not a measurement</span>
         </Line>
 
         {/* One scale: the trip, the data center, the edge. */}
@@ -194,7 +194,7 @@ export const CdnScene: React.FC = () => {
           );
         })}
         <Line x={BAR_END} y={rowY(2) + 34} at={hundredAt + 10} size={21} color={INK_SOFT} align="right">
-          all three drawn to one scale
+          All three drawn to one scale
         </Line>
       </Drift>
     </AbsoluteFill>

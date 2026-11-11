@@ -132,7 +132,7 @@ export const ScaleScene: React.FC = () => {
           Vertical: a bigger machine
         </Line>
         <Line at={simpleAt} x={X0} y={y(388)} size={22} color={INK_SOFT}>
-          simple<span style={{ opacity: ease(frame, ceilAt, 10), color: ACCENT_INK }}>, but a ceiling</span>
+          Simple<span style={{ opacity: ease(frame, ceilAt, 10), color: ACCENT_INK }}>, but a ceiling</span>
           <span style={{ opacity: ease(frame, oneAt, 10), color: ACCENT_INK }}>, and one machine</span>
         </Line>
         <Svg opacity={ease(frame, vertAt, 12)}>
@@ -160,7 +160,7 @@ export const ScaleScene: React.FC = () => {
         </Svg>
         </div>
         <Line at={upAt} x={X0} y={y(904)} size={21} weight={500} color={OK_INK}>
-          still the first move for a database
+          Still the first move for a database
         </Line>
 
         {/* ── Horizontal ── */}
@@ -168,7 +168,7 @@ export const ScaleScene: React.FC = () => {
           Horizontal: more machines behind the load balancer
         </Line>
         <Line at={unlimitedAt} x={H_X} y={y(388)} size={22} color={INK_SOFT}>
-          nearly unlimited<span style={{ opacity: ease(frame, redundantAt, 10) }}>, and redundant</span>
+          Nearly unlimited<span style={{ opacity: ease(frame, redundantAt, 10) }}>, and redundant</span>
         </Line>
         <Node x={LBX.x} y={lbY} w={LBX.w} h={LBX.h} at={behindAt} tone="plain" title="load balancer" size={22} />
         {[0, 1, 2, 3].map((i) => (

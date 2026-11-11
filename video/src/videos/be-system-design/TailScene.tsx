@@ -150,7 +150,7 @@ export const TailScene: React.FC = () => {
           <Num>{P.tailCount}</Num> requests, <Num>{P.offChart}</Num> of them past <Num>{hi}</Num> ms, off the chart
         </Line>
         <Line x={X0} y={y(262)} at={sampleAt} size={22} color={INK_SOFT}>
-          a simulated sample of <Num>{int(P.n)}</Num> requests
+          A simulated sample of <Num>{int(P.n)}</Num> requests
         </Line>
 
         {/* A hundred calls, one page load. */}

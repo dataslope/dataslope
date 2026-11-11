@@ -227,7 +227,7 @@ export const DiagramScene: React.FC = () => {
           <Num>3</Num> trips + SSD ≈ <Num>{LADDER.path.missMs}</Num> ms
         </Line>
         <Line x={RX} y={y(296) + 228} at={sixAt + 8} out={sumsOut} size={21} color={INK_SOFT}>
-          network time only, from the ladder
+          Network time only, from the ladder
         </Line>
 
         {/* The counter, and the blocks that replace it. */}
@@ -247,7 +247,7 @@ export const DiagramScene: React.FC = () => {
           One shared counter
         </Line>
         <Line x={RX} y={y(296) + 48} at={bottleAt} size={26} weight={500} color={ACCENT_INK} dim={blockAt}>
-          a bottleneck
+          A bottleneck
         </Line>
         <Line x={RX} y={y(296) + 96} at={failAt} size={26} weight={500} color={ACCENT_INK} dim={blockAt}>
           and one more thing to fail
@@ -265,7 +265,7 @@ export const DiagramScene: React.FC = () => {
           asked once per <Num>{int(KEY.idBlock)}</Num> IDs
         </Line>
         <Line x={RX} y={y(296) + 380} at={gapAt} size={24} weight={500} color={INK_SOFT}>
-          a dead server leaves a gap
+          A dead server leaves a gap
         </Line>
 
         {/* Counted IDs, consecutive keys. */}
@@ -283,7 +283,7 @@ export const DiagramScene: React.FC = () => {
           </Line>
         ))}
         <Line x={X0} y={keysY + 228} at={walkAt + 6} size={23} weight={500} color={ACCENT_INK} width={360}>
-          anyone can walk through them
+          Anyone can walk through them
         </Line>
         <Line x={X0} y={keysY + 290} at={scrambleAt} size={23} weight={500} color={OK_INK}>
           Scramble the ID first,
