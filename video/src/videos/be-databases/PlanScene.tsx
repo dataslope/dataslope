@@ -152,7 +152,7 @@ export const PlanScene: React.FC = () => {
         {/* Read as a tree: the indented step first, feeding the one above. */}
         <Note at={firstAt + 4} x={arrowX} y={seqY - h(16)} out={threeAt}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: inkOf.yellow }}>1</b>&nbsp;&nbsp;the indented step runs first
+            <b style={{ color: inkOf.yellow }}>1</b>&nbsp;&nbsp;The indented step runs first
           </span>
         </Note>
         <Note at={feedsAt + 2} x={arrowX} y={aggY - h(16)} out={threeAt}>
@@ -166,9 +166,9 @@ export const PlanScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Read three things</span>
         </Note>
         {[
-          { at: kindAt, text: "the kind of scan", row: 1 },
-          { at: estAt, text: "estimated rows against actual", row: 2 },
-          { at: awayAt, text: "rows a filter threw away", row: 3 },
+          { at: kindAt, text: "The kind of scan", row: 1 },
+          { at: estAt, text: "Estimated rows against actual", row: 2 },
+          { at: awayAt, text: "Rows a filter threw away", row: 3 },
         ].map((t, i) => (
           <Note key={t.text} at={t.at} x={R_X} y={rows(t.row)} out={countAt}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
@@ -180,22 +180,22 @@ export const PlanScene: React.FC = () => {
         {/* ── What this plan says ── */}
         <Note at={hasAt} x={R_X} y={rows(0)} out={fixOut}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            an index on <SmallMono color={INK}>created_at</SmallMono> exists
+            An index on <SmallMono color={INK}>created_at</SmallMono> exists
           </span>
         </Note>
         <Note at={expectedAt} x={R_X} y={rows(1)} out={fixOut}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            expected <b><Num>{thousands(PLAN.fnEstimate)}</Num></b> rows
+            Expected <b><Num>{thousands(PLAN.fnEstimate)}</Num></b> rows
           </span>
         </Note>
         <Note at={foundAt} x={R_X} y={rows(2)} out={fixOut}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            found <b><Num>{thousands(PLAN.fnActual)}</Num></b>
+            Found <b><Num>{thousands(PLAN.fnActual)}</Num></b>
           </span>
         </Note>
         <Note at={millionAt} x={R_X} y={rows(3)} out={fixOut}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
-            threw away <b><Num>{thousands(PLAN.fnRemoved)}</Num></b>
+            Threw away <b><Num>{thousands(PLAN.fnRemoved)}</Num></b>
           </span>
         </Note>
         {/* Why the gap matters: the plan is chosen from the estimate. */}
@@ -242,10 +242,10 @@ export const PlanScene: React.FC = () => {
         />
         <Note at={rightAt} x={R_X + 30} y={rangePlanTop + h(20)}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            estimated <b><Num>{thousands(PLAN.rangeEstimate)}</Num></b>
+            Estimated <b><Num>{thousands(PLAN.rangeEstimate)}</Num></b>
           </div>
           <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(8) }}>
-            actual <Num>{thousands(PLAN.rangeActual)}</Num>
+            Actual <Num>{thousands(PLAN.rangeActual)}</Num>
           </div>
         </Note>
         <Note at={sargAt} x={X0} y={rangePlanTop + h(200)}>

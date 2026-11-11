@@ -254,8 +254,8 @@ export const CohScene: React.FC = () => {
           In a review, count
         </Line>
         {[
-          { at: reasonsAt, text: "its reasons to change" },
-          { at: withAt, text: "what has to change with it" },
+          { at: reasonsAt, text: "Its reasons to change" },
+          { at: withAt, text: "What has to change with it" },
         ].map((r, i) => (
           <React.Fragment key={r.text}>
             <div style={{ position: "absolute", left: CHECKOUT.x, top: y(800) + i * h(46), opacity: ease(frame, r.at, 10) }}>
@@ -267,7 +267,7 @@ export const CohScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Line x={(GAUGE.xs[0] + GAUGE.xs[1]) / 2} y={solidY} at={solidAt} size={21} color={OK_INK} weight={500} align="center" width={420}>
-          most of SOLID pushes this way
+          Most of SOLID pushes this way
         </Line>
       </Drift>
     </AbsoluteFill>

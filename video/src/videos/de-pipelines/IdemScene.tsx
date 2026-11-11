@@ -155,8 +155,8 @@ export const IdemScene: React.FC = () => {
         <Note at={tableAt} x={COUNT_X} y={aTop - 40} dim={overAt}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>June 1's events, after each run</span>
         </Note>
-        <RunCount at={eightAt - 2} x={COUNT_X} y={countY(aTop)} run="after run 1" value={IDEM.blind[0]} tone="data" />
-        <RunCount at={sixteenAt - 2} x={COUNT_X + COUNT_GAP} y={countY(aTop)} run="after the retry" value={IDEM.blind[1]} tone="bad" lit={pulse(frame, sixteenAt + 8, 20)} />
+        <RunCount at={eightAt - 2} x={COUNT_X} y={countY(aTop)} run="After run 1" value={IDEM.blind[0]} tone="data" />
+        <RunCount at={sixteenAt - 2} x={COUNT_X + COUNT_GAP} y={countY(aTop)} run="After the retry" value={IDEM.blind[1]} tone="bad" lit={pulse(frame, sixteenAt + 8, 20)} />
         <ColumnRule x={COUNT_X + COUNT_RULE} top={countY(aTop)} height={COUNT_H} at={sixteenAt} />
         <Pill x={COUNT_X + 140} y={aTop + h(120)} at={failAt} tone="bad" size={20}>
           ✕ failed after the write
@@ -185,12 +185,12 @@ export const IdemScene: React.FC = () => {
             { line: commitLine, at: wrapAt + 14, color: MARK_OK },
           ]}
         />
-        <RunCount at={onceAt + 4} x={COUNT_X} y={countY(bTop) + h(40)} run="after run 1" value={IDEM.over[0]} tone="data" />
-        <RunCount at={twiceAt + 6} x={COUNT_X + COUNT_GAP} y={countY(bTop) + h(40)} run="after run 2" value={IDEM.over[1]} tone="ok" lit={pulse(frame, twiceAt + 18, 20)} />
+        <RunCount at={onceAt + 4} x={COUNT_X} y={countY(bTop) + h(40)} run="After run 1" value={IDEM.over[0]} tone="data" />
+        <RunCount at={twiceAt + 6} x={COUNT_X + COUNT_GAP} y={countY(bTop) + h(40)} run="After run 2" value={IDEM.over[1]} tone="ok" lit={pulse(frame, twiceAt + 18, 20)} />
         <ColumnRule x={COUNT_X + COUNT_RULE} top={countY(bTop) + h(40)} height={COUNT_H} at={twiceAt + 8} />
         <Note at={emptyAt} x={COUNT_X} y={bTop + bH - h(56)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            insert fails inside it: rolled back, June 1 still has {IDEM.rolledBack}
+            Insert fails inside it: rolled back, June 1 still has {IDEM.rolledBack}
           </span>
         </Note>
 
@@ -205,7 +205,7 @@ export const IdemScene: React.FC = () => {
           </div>
           {/* The page's ON CONFLICT upsert, run twice on three staged orders. */}
           <div style={{ marginTop: 12, ...note(22, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, conflictAt + 12, 10) }}>
-            run twice: <Num>{IDEM.upsert[0]}</Num> orders, then <Num>{IDEM.upsert[1]}</Num>
+            Run twice: <Num>{IDEM.upsert[0]}</Num> orders, then <Num>{IDEM.upsert[1]}</Num>
           </div>
         </Note>
 
@@ -215,7 +215,7 @@ export const IdemScene: React.FC = () => {
         </Note>
         <Note at={repairAt} x={NOTE_X} y={aTop + h(4)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            a retry or a backfill <b style={{ color: OK_INK }}>repairs</b> a day,
+            A retry or a backfill <b style={{ color: OK_INK }}>repairs</b> a day,
             <br />
             never duplicates it
           </span>

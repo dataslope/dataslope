@@ -146,7 +146,7 @@ export const LockScene: React.FC = () => {
   const sg = tableGeometry({
     x: R_X,
     top: seqTop,
-    cols: [{ name: "client" }, { name: "statement" }, { name: "returned" }],
+    cols: [{ name: "Client" }, { name: "Statement" }, { name: "Returned" }],
     rows: seqRows.map((r) => r.cells),
     headH: h(40),
     rowH: h(42),
@@ -218,7 +218,7 @@ export const LockScene: React.FC = () => {
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Across two requests: <b style={{ color: OK_INK }}>only optimistic</b>
           </div>
-          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, sendAt, 10) }}>no transaction stays open; the version goes back with the write</div>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, sendAt, 10) }}>No transaction stays open; the version goes back with the write</div>
         </Note>
         <Note at={freeAt + 4} x={X0 + ROW_W + 40} y={row2 + h(8)}>
           <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>granted at once</span>
@@ -234,7 +234,7 @@ export const LockScene: React.FC = () => {
         </Note>
         <Note at={versionAt} x={R_X} y={y(HEAD_Y) + h(52)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", fontSize: 23 }}>
-            the row: stock <b>{LOCK.readA?.stock}</b>,{" "}
+            The row: stock <b>{LOCK.readA?.stock}</b>,{" "}
             <Mark at={versionAt + 6}>
               <b>version {LOCK.readA?.version}</b>
             </Mark>
@@ -243,7 +243,7 @@ export const LockScene: React.FC = () => {
         <Listing lines={LOCK.write} x={R_X} top={writeTop} width={800} size={20} at={onlyIfAt - 4} marks={[{ line: "AND version", text: "version = 3", at: onlyIfAt + 6 }]} />
         <DataTable
           g={sg}
-          cols={[{ name: "client", ink: BLUE_INK }, { name: "statement" }, { name: "returned" }]}
+          cols={[{ name: "Client", ink: BLUE_INK }, { name: "Statement" }, { name: "Returned" }]}
           rows={seqRows}
           at={twoAt - 2}
           marks={[
@@ -266,13 +266,13 @@ export const LockScene: React.FC = () => {
         </Note>
         <Note at={winsAt + 4} x={sx0 - 20} y={sy + h(26)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>optimistic</b>
+            <b style={{ color: OK_INK }}>Optimistic</b>
             <span style={{ opacity: ease(frame, retryAt, 10) }}>: a conflict costs one retry</span>
           </span>
         </Note>
         <Note at={pessWinsAt + 8} x={sx1 + 20} y={sy + h(66)} align="right">
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            <span style={{ opacity: ease(frame, pileAt, 10) }}>retries would pile up: </span>
+            <span style={{ opacity: ease(frame, pileAt, 10) }}>Retries would pile up: </span>
             <b style={{ color: OK_INK }}>pessimistic</b>
           </span>
         </Note>

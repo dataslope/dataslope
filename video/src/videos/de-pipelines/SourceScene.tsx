@@ -135,7 +135,7 @@ export const SourceScene: React.FC = () => {
         <Listing lines={named} x={LIST_X} top={listTop} width={600} size={23} at={nameAt} marks={[{ line: 1, at: nameAt + 6, color: MARK_OK }]} />
         <Note at={ignoredAt} x={LIST_X + 640} y={listTop + h(40)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            loads; <span style={{ fontFamily: MONO }}>coupon</span> is ignored
+            Loads; <span style={{ fontFamily: MONO }}>coupon</span> is ignored
           </span>
         </Note>
 

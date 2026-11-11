@@ -147,9 +147,9 @@ export const EvoScene: React.FC = () => {
   const RULE_X = 1130;
   const ruleY = (i: number) => AY + h(150 + i * 85);
   const rules = [
-    { name: "backward", at: backAt, text: "new readers read old data", reader: "v2", data: "v1" },
-    { name: "forward", at: fwdAt, text: "old readers read new data", reader: "v1", data: "v2" },
-    { name: "full", at: fullAt, text: "both", reader: "", data: "" },
+    { name: "Backward", at: backAt, text: "new readers read old data", reader: "v2", data: "v1" },
+    { name: "Forward", at: fwdAt, text: "old readers read new data", reader: "v1", data: "v2" },
+    { name: "Full", at: fullAt, text: "both", reader: "", data: "" },
   ];
 
   return (
@@ -201,10 +201,10 @@ export const EvoScene: React.FC = () => {
         {/* Before any read: what a schema per file buys, and what it leaves open. */}
         <Note at={noRewriteAt} x={TABLE_X} y={tTop + h(10)} out={readAt}>
           <div style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            add a column: <b>old files need no rewrite</b>
+            Add a column: <b>old files need no rewrite</b>
           </div>
           <div style={{ ...note(25, INK), whiteSpace: "nowrap", marginTop: 14, opacity: ease(frame, decidesAt, 10) }}>
-            <Mark at={decidesAt + 4}>the reader decides</Mark> whether it survives
+            <Mark at={decidesAt + 4}>The reader decides</Mark> whether it survives
           </div>
         </Note>
 
@@ -232,18 +232,18 @@ export const EvoScene: React.FC = () => {
           ]}
         />
         <Note at={goneAt} x={TABLE_X} y={tableBottom + h(24)} out={nameAt + 4}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>by default: coupon dropped, and no error</span>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>By default: coupon dropped, and no error</span>
         </Note>
         <Note at={failsAt} x={TABLE_X} y={tableBottom + h(70)} out={nameAt + 4}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
-            day 2 first: <b>{reversed.kind}</b>, {mismatch}
+            Day 2 first: <b>{reversed.kind}</b>, {mismatch}
           </span>
         </Note>
         <Note at={appearsAt + 4} x={TABLE_X} y={tableBottom + h(24)} out={breakAt}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>by name: coupon kept, null for day 1</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>By name: coupon kept, null for day 1</span>
         </Note>
         <Note at={breakAt} x={TABLE_X} y={tableBottom + h(76)} out={gone}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>renames and type changes break readers</span>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Renames and type changes break readers</span>
         </Note>
         <Note at={endAt + 4} x={TABLE_X} y={tableBottom + h(120)} out={gone}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
@@ -255,7 +255,7 @@ export const EvoScene: React.FC = () => {
         </Note>
         <Note at={icebergAt} x={TABLE_X} y={tableBottom + h(176)} out={gone}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>safe rename:</b> a table format like Iceberg, which tracks columns by ID
+            <b style={{ color: OK_INK }}>Safe rename:</b> a table format like Iceberg, which tracks columns by ID
           </span>
         </Note>
 
@@ -300,7 +300,7 @@ export const EvoScene: React.FC = () => {
         <Node x={reg.x} y={reg.y} w={reg.w} h={h(reg.h)} at={registryAt + 4} tone="plain" title="schema registry" sub="checks v2 against v1" />
         <Flow points={[[reg.x + reg.w + 6, regMid], [RULE_X - 30, regMid]]} at={backAt - 6} color={INK} width={2.2} head={12} />
         <Note at={backAt - 6} x={RULE_X - 14} y={AY + h(108)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>one rule, set in the registry:</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>One rule, set in the registry:</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, backAt - 6, 10) }}>
           {/* A bracket that gathers the three rules, for the arrow to land on. */}
@@ -330,7 +330,7 @@ export const EvoScene: React.FC = () => {
           coupon with a default: passes all three
         </Pill>
         <Note at={failsBackAt} x={X0} y={AY + h(382)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no default: fails backward, so fails full</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>No default: fails backward, so fails full</span>
         </Note>
         <Pill x={X0} y={AY + h(438)} at={suitsAt} tone="ok" size={23} solid>
           many services that must agree on one schema

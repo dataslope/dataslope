@@ -76,7 +76,7 @@ const Dbt: React.FC<{ c: Ctx }> = ({ c }) => {
       </Pill>
       <Note at={tAt} x={fct.x + fct.w + 260} y={fTop + 2}>
         <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          the T in EL<span style={{ color: OK_INK, background: HIGHLIGHT, padding: "0 4px", borderRadius: 4 }}>T</span>
+          The T in EL<span style={{ color: OK_INK, background: HIGHLIGHT, padding: "0 4px", borderRadius: 4 }}>T</span>
         </span>
       </Note>
     </>
@@ -169,16 +169,16 @@ const FanOut: React.FC<{ c: Ctx }> = ({ c }) => {
         ) : null}
       </svg>
       <Note at={manyAt + 6} x={gx} y={gy - c.h(46)}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>thousands of aggregates built on it</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Thousands of aggregates built on it</span>
       </Note>
       <Note at={staleAt} x={gx} y={gy + GRID.rows * (GRID.size + GRID.gap) + c.h(10)} out={onlyAt}>
-        <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>all of them stale</span>
+        <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>All of them stale</span>
       </Note>
       <Note at={onlyAt + 6} x={gx} y={gy + GRID.rows * (GRID.size + GRID.gap) + c.h(10)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>recompute only the affected ones</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Recompute only the affected ones</span>
       </Note>
       <Note at={graphAt + 4} x={R_X} y={c.y(720)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the dependency graph finds the smallest scope</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>The dependency graph finds the smallest scope</span>
       </Note>
       <Note at={cdcAt} x={R_X} y={c.y(770)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -188,7 +188,7 @@ const FanOut: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* The other meaning, from data modeling. */}
       <Note at={joinAt} x={R_X} y={c.y(838)}>
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-          not a <b style={{ color: INK }}>join fan-out</b>
+          Not a <b style={{ color: INK }}>join fan-out</b>
           <span style={{ opacity: ease(frame, repeatsAt, 10) }}>: a one-to-many join that repeats rows and inflates sums</span>
         </span>
       </Note>
@@ -284,19 +284,19 @@ const Lineage: React.FC<{ c: Ctx }> = ({ c }) => {
       })}
       <Note at={whyAt} x={R_X} y={c.y(700)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <b style={{ background: HIGHLIGHT, padding: "0 4px" }}>why did this metric change?</b> trace it back
+          <b style={{ background: HIGHLIGHT, padding: "0 4px" }}>Why did this metric change?</b> Trace it back
         </span>
       </Note>
       <Note at={breaksAt} x={R_X} y={c.y(750)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <b style={{ color: ACCENT_INK }}>drop a column:</b> what breaks downstream
+          <b style={{ color: ACCENT_INK }}>Drop a column:</b> what breaks downstream
         </span>
       </Note>
       <Note at={personalAt} x={R_X} y={c.y(800)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 10 }}>
           <span style={{ width: 20, height: 20, borderRadius: 10, background: PERSONAL, display: "inline-block" }} />
           <span>
-            <b>where personal data went</b>, for compliance
+            <b>Where personal data went</b>, for compliance
           </span>
         </span>
       </Note>

@@ -232,7 +232,7 @@ export const NosqlScene: React.FC = () => {
           </Note>
           <div style={{ position: "absolute", left: X0, top: tTop + 34 + 5 * rowH + h(40), display: "flex", gap: "0.7em", fontSize: 24, whiteSpace: "nowrap" }}>
             {[
-              { at: joinsAt, text: "joins" },
+              { at: joinsAt, text: "Joins" },
               { at: txnAt, text: "transactions across rows" },
               { at: strongAt, text: "strong consistency" },
             ].map((r, i) => (
@@ -243,7 +243,7 @@ export const NosqlScene: React.FC = () => {
             ))}
           </div>
           <Note at={safeAt} x={X0} y={tTop + 34 + 5 * rowH + h(96)}>
-            <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the safe default for most applications</span>
+            <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The safe default for most applications</span>
           </Note>
         </div>
 
@@ -275,7 +275,7 @@ export const NosqlScene: React.FC = () => {
               ))}
             </span>
           </Note>
-          <Shape x={R_X} y={y(SHAPES_TOP)} at={schemaAt} name="document" pattern="any shape, changing">
+          <Shape x={R_X} y={y(SHAPES_TOP)} at={schemaAt} name="Document" pattern="Any shape, changing">
             <div style={{ position: "absolute", left: 0, top: 26 }}>
               {['{', '  "name": "Ava",', '  "tags": ["vip"],', '  "address": {…}', '}'].map((l, i) => (
                 <div key={i} style={mono(i === 0 || i === 4 ? INK_SOFT : INK)}>
@@ -284,7 +284,7 @@ export const NosqlScene: React.FC = () => {
               ))}
             </div>
           </Shape>
-          <Shape x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP)} at={kvAt} name="key-value" pattern="one value per key">
+          <Shape x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP)} at={kvAt} name="Key-value" pattern="One value per key">
             <div style={{ position: "absolute", left: 0, top: 22, display: "flex", flexDirection: "column", gap: 14 }}>
               {["user:41", "user:42", "user:43", "user:44"].map((k, i) => (
                 <div key={k} style={{ display: "flex", gap: 10, alignItems: "center", opacity: ease(frame, kvAt + 2 + i * 2, 8) }}>
@@ -295,7 +295,7 @@ export const NosqlScene: React.FC = () => {
               ))}
             </div>
           </Shape>
-          <Shape x={R_X + 2 * (SHAPE_W + SHAPE_GAP)} y={y(SHAPES_TOP)} at={wideAt} name="wide-column" pattern="rows by key, at volume">
+          <Shape x={R_X + 2 * (SHAPE_W + SHAPE_GAP)} y={y(SHAPES_TOP)} at={wideAt} name="Wide-column" pattern="Rows by key, at volume">
             <div style={{ position: "absolute", left: 0, top: 26, display: "flex", flexDirection: "column", gap: 18 }}>
               {[5, 2, 4, 3].map((cells, i) => (
                 <div key={i} style={{ display: "flex", gap: 6, alignItems: "center", opacity: ease(frame, wideAt + 2 + i * 2, 8) }}>
@@ -308,7 +308,7 @@ export const NosqlScene: React.FC = () => {
             </div>
           </Shape>
           <Note at={patternAt} x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP) - h(40)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>one access pattern, known in advance, at huge volume</span>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>One access pattern, known in advance, at huge volume</span>
           </Note>
           <Note at={priceAt} x={R_X} y={y(SHAPES_TOP) + SHAPE_H + h(122)}>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The price: weaker consistency, limited joins</span>
@@ -333,7 +333,7 @@ export const NosqlScene: React.FC = () => {
           </span>
         </Note>
         <Note at={sizeAt - 4} x={app.x + app.w / 2} y={store.y + storeH * 0.42} style={{ transform: "translateX(-50%)" }} out={askAt - 4}>
-          <div style={{ ...note(23, INK), whiteSpace: "nowrap", textAlign: "center" }}>decide by access pattern</div>
+          <div style={{ ...note(23, INK), whiteSpace: "nowrap", textAlign: "center" }}>Decide by access pattern</div>
           <div style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", textAlign: "center", marginTop: h(6) }}>and consistency, not size</div>
         </Note>
         <Note at={logsAt + 6} x={noX + store.w / 2} y={underY} style={{ transform: "translateX(-50%)" }}>

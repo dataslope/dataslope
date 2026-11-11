@@ -185,7 +185,7 @@ export const LambdaScene: React.FC = () => {
         </Note>
         <Note at={meansAt} x={NOTE_X} y={kY + h(84)}>
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            <b style={{ color: INK }}>batch semantics:</b> a batch job's answers,
+            <b style={{ color: INK }}>Batch semantics:</b> a batch job's answers,
           </div>
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, windowsAt, 10) }}>event-time windows, exactly-once results</div>
         </Note>

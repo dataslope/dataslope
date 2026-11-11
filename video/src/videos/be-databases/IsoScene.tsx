@@ -23,12 +23,12 @@ const T0 = 470;
 const T1 = 1760;
 
 const LEVELS = ["read uncommitted", "read committed", "repeatable read", "serializable"];
-/** The highlight behind "read committed" (23px, weight 650, about 177px
+/** The highlight behind "Read committed" (23px, weight 650, about 184px
  *  wide): 8px of yellow on either side of the words, not cut off at the d. */
-const DEFAULT_MARK_W = 194;
-const ANOMALIES = ["dirty read", "non-repeatable", "phantom"];
-/** "possible" at 22px (Inter, weight 400): about 91px. */
-const POSSIBLE_W = 92;
+const DEFAULT_MARK_W = 201;
+const ANOMALIES = ["Dirty read", "Non-repeatable", "Phantom"];
+/** "Possible" at 22px (Inter, weight 400): about 92px. */
+const POSSIBLE_W = 93;
 /** The SQL standard's table: which anomaly each level allows. */
 const ALLOWS = [
   [true, true, true],
@@ -247,7 +247,7 @@ export const IsoScene: React.FC = () => {
                 {isDefault > 0 ? <rect x={X0 - 8} y={yy + 8} width={DEFAULT_MARK_W} height={rowH - 16} rx={4} fill={HIGHLIGHT} opacity={isDefault} /> : null}
                 <line x1={X0} y1={yy + rowH} x2={X0 + ruleW} y2={yy + rowH} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} />
                 <text x={X0} y={yy + rowH / 2 + 8} style={svgText({ ...note(23, INK), fontWeight: 500 })}>
-                  {lv}
+                  {lv.charAt(0).toUpperCase() + lv.slice(1)}
                 </text>
                 {i === 1 ? (
                   <text x={X0 + DEFAULT_MARK_W + 6} y={yy + rowH / 2 + 8} style={svgText(note(22, INK_SOFT))} opacity={isDefault}>
@@ -257,7 +257,7 @@ export const IsoScene: React.FC = () => {
                 {ALLOWS[i].map((allowed, j) => {
                   const cp = ease(frame, colAt[j] + 6 + i * 3, 10);
                   if (cp <= 0) return null;
-                  const word = allowed ? "possible" : "prevented";
+                  const word = allowed ? "Possible" : "Prevented";
                   return (
                     <g key={j} opacity={cp}>
                       <text x={colX(j)} y={yy + rowH / 2 + 8} style={svgText(note(22, allowed ? ACCENT_INK : OK_INK))}>
@@ -354,7 +354,7 @@ export const IsoScene: React.FC = () => {
           {/* Serializable: write skew. Both check the rule, each takes a
               different doctor off call; Postgres aborts one, which retries. */}
           <text x={X0} y={laneA - 74} style={svgText(note(21, INK_SOFT))} opacity={ease(frame, checkAt - 4, 10) * (1 - ease(frame, phase.serial.out, 8))}>
-            rule: one doctor stays on call
+            Rule: one doctor stays on call
           </text>
           <Event x={beginX} y={laneA} at={serialAt + 4} out={phase.serial.out} text="BEGIN" color={INK} />
           <Event x={beginX} y={laneB} at={orderAt} out={phase.serial.out} text="BEGIN" color={INK} />
@@ -363,7 +363,7 @@ export const IsoScene: React.FC = () => {
           <Event x={tx(0.44)} y={laneA} at={changeAt} out={phase.serial.out} text="UPDATE doctor A" color={BLUE_INK} />
           <Event x={tx(0.49)} y={laneB} at={changeAt + 4} out={phase.serial.out} text="UPDATE doctor B" color={BLUE_INK} />
           <text x={T1} y={laneB + 44} textAnchor="end" style={svgText({ ...note(21, ACCENT_INK), fontWeight: 500 })} opacity={ease(frame, breakAt, 10) * (1 - ease(frame, exchangeAt, 10))}>
-            under repeatable read, both commit: nobody on call
+            Under repeatable read, both commit: nobody on call
           </text>
           <Event x={tx(0.62)} y={laneB} at={exchangeAt} out={phase.serial.out} text="COMMIT" color={OK_INK} />
           <Event x={failX} y={laneA} at={failureAt - 2} out={phase.serial.out} text="serialization failure" color={ACCENT_INK} />
@@ -378,10 +378,10 @@ export const IsoScene: React.FC = () => {
 
         {/* ── Each anomaly, defined, right of the grid ── */}
         {[
-          { at: dirtyAt, out: phase.dirty.out, head: "Dirty read", body: "sees another transaction's change before it commits", foot: { at: neverAt, text: "Postgres never shows one: its read uncommitted acts as read committed" } },
-          { at: nonrepAt, out: phase.nonrep.out, head: "Non-repeatable read", body: "the same row, read twice, differs: a commit landed in between" },
-          { at: phantomAt, out: phase.phantom.out, head: "Phantom", body: "a rerun query matches new rows another transaction inserted", foot: { at: pgRrAt, text: "Postgres's repeatable read already stops phantoms" } },
-          { at: serialAt, out: phase.serial.out, head: "Serializable", body: "the outcome of some one-at-a-time order", mid: { at: skewAt, text: "also stops write skew, which repeatable read allows" }, foot: { at: exchangeAt, text: "may abort: catch it and retry" } },
+          { at: dirtyAt, out: phase.dirty.out, head: "Dirty read", body: "Sees another transaction's change before it commits", foot: { at: neverAt, text: "Postgres never shows one: its read uncommitted acts as read committed" } },
+          { at: nonrepAt, out: phase.nonrep.out, head: "Non-repeatable read", body: "The same row, read twice, differs: a commit landed in between" },
+          { at: phantomAt, out: phase.phantom.out, head: "Phantom", body: "A rerun query matches new rows another transaction inserted", foot: { at: pgRrAt, text: "Postgres's repeatable read already stops phantoms" } },
+          { at: serialAt, out: phase.serial.out, head: "Serializable", body: "The outcome of some one-at-a-time order", mid: { at: skewAt, text: "also stops write skew, which repeatable read allows" }, foot: { at: exchangeAt, text: "May abort: catch it and retry" } },
         ].map((d) => (
           <Note key={d.head} at={d.at} x={R_X} y={y(GRID_LOW) + h(14)} out={d.out}>
             <div style={{ width: 520 }}>
@@ -393,10 +393,10 @@ export const IsoScene: React.FC = () => {
           </Note>
         ))}
         <Note at={beforeAt} x={R_X} y={y(GRID_LOW) - h(40)} out={phase.dirty.out}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>this read ran in Postgres</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>This read ran in Postgres</span>
         </Note>
         <Note at={nonrepAt + 4} x={R_X} y={y(GRID_LOW) - h(40)} out={phase.phantom.out}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>drawn: it needs two sessions at once</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Drawn: it needs two sessions at once</span>
         </Note>
       </Drift>
     </AbsoluteFill>
