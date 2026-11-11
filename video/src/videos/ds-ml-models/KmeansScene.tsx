@@ -441,8 +441,17 @@ export const KmeansScene: React.FC = () => {
               Silhouette score
             </span>
           </Note>
-          <Note at={nearerAt} x={CH_X + 190} y={y(SIL_TOP) - h(52)}>
-            <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>
+          {/* Its gloss at the right end of the title line, as the elbow
+              chart's is, and at the gloss size used there: 20px beside the
+              22px title is one line in one size, give or take 12%. */}
+          <Note
+            at={nearerAt}
+            x={CH_X + CH_W}
+            y={y(SIL_TOP) - h(52)}
+            align="right"
+            from="right"
+          >
+            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
               how much nearer a point sits to its own cluster
             </span>
           </Note>

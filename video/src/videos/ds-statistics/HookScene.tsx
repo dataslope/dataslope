@@ -92,7 +92,7 @@ export const HookScene: React.FC = () => {
           { at: ciAt, term: "A 95% interval", read: "a 95% chance", strike: hookEnd - 8 },
         ].map((m, i) => (
           <Note key={m.term} at={m.at} x={X0} y={y(MISREAD_Y + 56 + i * 110)} out={misreadOut}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, whiteSpace: "nowrap" }}>
               {/* One line, one size and one face: the misreading is told
                   apart by its color and the strike, not by a bigger serif. */}
               <span style={{ ...noteText(36, INK), fontWeight: 500 }}>{m.term}</span>
