@@ -17,7 +17,7 @@ voiced).
 | 5 | P2 | Rapid-round lines vanish in 1 to 3 s | fixed | The five DP states now ink in with their own problem's name (`p.at + 8`), so they build while the list is read; `r-classic` pauseAfter 1.5. `r-trie`, `r-cycle`, `r-topo` pauseAfter 1.5, `r-binary` 2.0 (its fix line is also shorter now, see 15). Timing only. |
 | 6 | P2 | The two heap-build bars crowd | fixed | Header to `y(708)`, first bar `y(746)`, second `y(832)`: 36 px between the first bar and the second label (was about 12). `PqScene.tsx`. |
 | 7 | P2 | Master Theorem gives only the tie case | fixed | New beat `master-cases`: "If combining dominates, the top level sets the cost; if the pieces dominate, the bottom does." (pauseAfter 1.0). On screen the recurrence is glossed ("two halves, each sorted, plus n to merge them") and the two other cases follow the tie line, each cued to its words. The rows were tightened (58 to 50 a level) to make room. `RapidOneScene.tsx`, `Master`. |
-| 8 | P2 | A BST is never defined | fixed | `r-bst` split at its first sentence; the first is re-voiced as "A binary search tree, or BST, keeps smaller keys to the left of each node and larger ones to the right, so an operation costs its height." The rest became `bst-heights`, cut from the take for free. The screen leads with "A BST: at every node, smaller keys left, larger keys right", then "An operation costs the tree's height". `RapidTwoScene.tsx`, `Bst`. |
+| 8 | P2 | A BST is never defined | fixed | `r-bst` split at its first sentence; the first is re-voiced as "A binary search tree, or BST, keeps smaller keys to the left of each node and larger ones to the right, so an operation costs its height." The rest became `bst-heights`, cut from the take for free. The screen leads with "A BST: at every node, smaller keys left, larger keys right", each half inked and highlighted on its own words, then "An operation costs the tree's height". `RapidTwoScene.tsx`, `Bst`. |
 | 9 | P2 | Hash map worst case stops before "when, and what then" | fixed | New beat `hash-when`: "That worst case comes from a weak hash, or keys picked to collide, which is why Python randomizes string hashes. Need the keys in order? Use a balanced tree." On screen, "(a weak hash, or keys picked to collide)" follows the worst-case row, and one grey line under the rows says the rest. `check.mjs` records `sys.flags.hash_randomization` (1) and a claim ties the words to it. |
 | 10 | P2 | BFS vs DFS memory shows only DFS winning | fixed | New beat `bfs-chain`: "On a long chain it flips: BFS holds one node, DFS the whole chain, and recursion overflows." `check.mjs` runs a chain of a million: BFS queue peak 1, DFS path 1,000,000, recursive DFS raises RecursionError (`counts.chain`, three claims). On screen, under the DFS line: "A chain of 1,000,000: BFS 1, DFS 1,000,000". The triangle was shortened (base `y(640)` to `y(604)`) to make room. |
 | 11 | P3 | Yellow markers too pale | fixed | Hook: an ink ring (r 14) over the yellow one, and "the hundred" moved out of the square to lead the line above it ("the hundred in 1,000,000 items, a thousand a side", highlighted), with a leader down to the ring. Heap: a 2 px ink path over the yellow climb. Amortized: a 2 px ink outline round the lit step. |
@@ -64,7 +64,20 @@ exports `CHAIN`; the backtracking run is read through `RAPID`.
 
 New length: **761.7 s (12:42)**, from 706.6 s, 78 beats.
 
-CHECKS
+All on the final code, through the entry and the render queue:
+
+| Check | Result |
+| --- | --- |
+| `tsc` (folder) | clean |
+| `eslint src/videos/be-algorithms` | clean |
+| `npm run check:cues` | pass |
+| `npm test` | 79 of 79 pass |
+| `check.mjs` | 64 claims ok, 8 headings read as the page words them |
+| `check:sync` | pass, 78 beats, worst +0.05 s (`rapid-in`) |
+| `check:mix` | effects 28.8 LU under the narration, median 28.3 dB below the speech; the closest moment, 8.6 dB at 3:31.8, is an unchanged Stack scene effect |
+| `check:motion` | pass, nothing still for 3 s (the first run failed one 3.5 s stretch over `r-bst`; fixed by inking the BST rule's two halves on their own words with a highlight sweep, then re-run) |
+| `check:frames` | pass (47 arrows, spacing, one size per line, no hyphen in tabular figures) |
+| Stills | 29 looked at: every changed scene (hook, hash x2, amortized x2, BFS x3, heap x2, Dijkstra x2, quicksort, Master, classic DP, greedy, backtracking x2, BST x2, binary search, two pointers, cycle, Kahn, bits, Big-O) |
 
 ## Noticed, not changed
 
