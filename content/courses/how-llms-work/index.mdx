@@ -54,8 +54,8 @@ other side:
   files={[
     {
       filename: "main.py",
-      starterCode: `# How a real tokenizer cuts up the word: OpenAI's o200k_base, the one
-# GPT-4o uses. The pieces and their ids are copied from a run of it.
+      starterCode: `# How a real tokenizer cuts up the word: o200k_base, a widely used
+# tokenizer. The pieces and their ids are copied from a run of it.
 text = "strawberry"
 pieces = ["st", "raw", "berry"]
 ids = [302, 1618, 19772]
@@ -111,11 +111,12 @@ is the natural next step.
 
 ## A note on numbers
 
-Prices, model names, context sizes, and benchmark scores in this
-course are marked with **October 2026** where they appear. They will
-age: in the two months between the previous update and this one,
-Anthropic's cheapest model got ten times cheaper and OpenAI released
-one at twice its previous top price. The *structure* around them
+Prices, context sizes, and benchmark scores in this course are
+examples, and models are described by tier (a small, mid-size, large
+or flagship model) rather than by product name. Real numbers move
+fast: a vendor's cheapest model can get ten times cheaper within
+months, and a new top tier can launch at twice the previous top
+price. The *structure* around them
 (output costing several times input, cached input costing a tenth or
 less, benchmarks saturating and being replaced) has held for years and
 is what the exercises actually teach.

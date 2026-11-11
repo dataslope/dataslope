@@ -156,12 +156,12 @@ approaches, in order of preference:
     {
       filename: "main.py",
       starterCode: `# Accuracy alone does not choose a model. Cost per correct answer does.
-# Prices: USD per million tokens, October 2026. Accuracies: illustrative.
+# Prices: example USD per million tokens. Accuracies: illustrative.
 options = {
-    "haiku":  {"accuracy": 0.91, "in": 0.10, "out": 0.50},
-    "sonnet": {"accuracy": 0.94, "in": 2.00, "out": 10.00},
-    "opus":   {"accuracy": 0.95, "in": 4.00, "out": 20.00},
-    "fable":  {"accuracy": 0.95, "in": 10.00, "out": 50.00},
+    "small":    {"accuracy": 0.91, "in": 0.10, "out": 0.50},
+    "mid":      {"accuracy": 0.94, "in": 2.00, "out": 10.00},
+    "large":    {"accuracy": 0.95, "in": 4.00, "out": 20.00},
+    "flagship": {"accuracy": 0.95, "in": 10.00, "out": 50.00},
 }
 IN_TOK, OUT_TOK, VOLUME = 700, 25, 1_000_000
 
@@ -174,8 +174,8 @@ for name, o in options.items():
     print(f"{name:<8}{o['accuracy']:>6.0%}{cost:>12}{each:>14}")
 
 print()
-print("Opus buys 1 extra point over sonnet for twice the money,")
-print("and fable buys nothing over opus on this task at 2.5x the price.")
+print("The large model buys 1 extra point over mid for twice the money,")
+print("and the flagship buys nothing over large on this task at 2.5x the price.")
 print("Whether a point is worth it depends on what an error costs you.")
 `,
     },
@@ -183,14 +183,14 @@ print("Whether a point is worth it depends on what an error costs you.")
 />
 
 That last question is the one to answer before choosing, and the table
-already answers it once you price the errors. Sonnet's three extra
-points mean 30,000 fewer misclassified tickets a month for \$1,567.50
-more: about five cents an error. Opus's one more point avoids another
-10,000 for \$1,650, about sixteen cents each, and Fable avoids none. So
-the cheap model wins only if an error costs you almost nothing. If a
-misclassified ticket costs a minute of a support agent's time, that is
-worth more than sixteen cents at any ordinary wage, and Opus becomes the
-cheapest choice overall; a lost customer settles it the same way.
+already answers it once you price the errors. The mid-size model's
+three extra points mean 30,000 fewer misclassified tickets a month for
+\$1,567.50 more: about five cents an error. The large model's one more
+point avoids another 10,000 for \$1,650, about sixteen cents each, and
+the flagship avoids none. So the small model wins only if an error
+costs you almost nothing. If a misclassified ticket costs a minute of a
+support agent's time, that is worth more than sixteen cents at any
+ordinary wage, and the large model becomes the cheapest choice overall; a lost customer settles it the same way.
 
 <Callout type="info" title="Build it once, use it forever">
 The harness outlives every model in it. When a new model launches, you

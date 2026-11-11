@@ -32,7 +32,7 @@ Not a character, not a word, something in between:
 * Rare words shatter: a surname might become four or five pieces.
 * **Leading spaces belong to the token.** `" the"` and `"the"` are
   different tokens with different ids.
-* Numbers split unpredictably. `2026` might be one token or two.
+* Numbers split unpredictably. `1984` might be one token or two.
 
 <Figure
   slug="llm-tokens-token-inline-cutout"
@@ -76,8 +76,8 @@ whether they end with a space.
 
 Ask a model how many `r`s are in "strawberry" and it may get it wrong.
 Not because it cannot count to three, but because it never received
-the letters. It received opaque ids. In OpenAI's `o200k_base` tokenizer
-(GPT-4o's), `" strawberry"` with the leading space it has inside a
+the letters. It received opaque ids. In `o200k_base`, a widely used
+tokenizer, `" strawberry"` with the leading space it has inside a
 sentence is a single id, and the bare word is three: `st`, `raw`,
 `berry`. The older `cl100k_base`, `p50k_base` and `r50k_base` give the
 same counts. Answering requires it to recall facts *about* the
@@ -96,10 +96,11 @@ patterns rather than performed.
 Tokenizers are trained on corpora that are mostly English, so English
 compresses well. Other languages, particularly those not using Latin
 script, can fragment into many more tokens for the same meaning, and
-you pay per token. How much depends heavily on the tokenizer: GPT-4's
-spends more than twice as many tokens on a short sentence in Thai, and
-three times as many in Hindi, as on the same sentence in English, while
-GPT-4o's newer, larger vocabulary spends about the same on all three.
+you pay per token. How much depends heavily on the tokenizer: an older
+one, `cl100k_base`, spends more than twice as many tokens on a short
+sentence in Thai, and three times as many in Hindi, as on the same
+sentence in English, while `o200k_base`, with its larger vocabulary,
+spends about the same on all three.
 Scripts a tokenizer saw little of still break into many pieces, so
 measure your own languages on the model you will pay for.
 
