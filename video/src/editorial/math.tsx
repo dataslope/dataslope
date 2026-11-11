@@ -52,23 +52,39 @@ const tokens = (expr: string): React.ReactNode[] => {
   return out;
 };
 
+/** The math face: the house serif at Inter's x-height, upright. */
+export const MATH_STYLE: React.CSSProperties = {
+  fontFamily: SERIF,
+  fontSize: "1.08em",
+  fontWeight: 400,
+  fontStyle: "normal",
+  fontVariantNumeric: "lining-nums",
+  letterSpacing: 0,
+  whiteSpace: "nowrap",
+};
+
 export const M: React.FC<{ children: string; style?: React.CSSProperties }> = ({ children, style }) => (
-  <span
-    data-math=""
-    style={{
-      fontFamily: SERIF,
-      fontSize: "1.08em",
-      fontWeight: 400,
-      fontStyle: "normal",
-      fontVariantNumeric: "lining-nums",
-      letterSpacing: 0,
-      whiteSpace: "nowrap",
-      ...style,
-    }}
-  >
+  <span data-math="" style={{ ...MATH_STYLE, ...style }}>
     {tokens(children)}
   </span>
 );
+
+/**
+ * A formula whose pieces are not all one string: live numbers, a highlight
+ * on one term, a subscript. The run is set in the math face and marked for
+ * the audit; inside it, write each variable as `<I>x</I>` and the rest as it
+ * reads (digits, operators and named functions stay upright).
+ *
+ *   <MathRun><I>s</I>² = Σ(<I>x</I> − <I>x̄</I>)² / (<I>n</I> − 1)</MathRun>
+ */
+export const MathRun: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
+  <span data-math="" style={{ ...MATH_STYLE, ...style }}>
+    {children}
+  </span>
+);
+
+/** An italic math variable inside a MathRun (or beside M). */
+export const I: React.FC<{ children: React.ReactNode }> = ({ children }) => <i style={{ fontStyle: "italic" }}>{children}</i>;
 
 /** Big-O and its cousins, with one level of nested parentheses, and the bare
  *  growth terms the videos write in prose. */

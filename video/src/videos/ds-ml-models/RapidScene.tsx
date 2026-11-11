@@ -30,6 +30,7 @@ import {
   Svg,
   X0,
 } from "./parts";
+import { M } from "../../editorial/math";
 
 /** Where the answers go: right of the list. */
 const R_X = 800;
@@ -83,7 +84,7 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         at={c.w("r-gen", "the probability of the label given the input")}
         top={c.y(404)}
       >
-        learns P(label | input)
+        learns <M>P(label | input)</M>
       </Line>
       <Line
         at={c.w("r-gen", "like logistic regression")}
@@ -105,7 +106,7 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         at={c.w("r-gen", "how the inputs are spread within each class")}
         top={c.y(564)}
       >
-        learns P(input | class)
+        learns <M>P(input | class)</M>
         <span style={{ opacity: ease(frame, bayesAt, 10) }}>
           , then Bayes&apos; theorem
         </span>

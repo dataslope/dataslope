@@ -282,7 +282,10 @@ export const KnnScene: React.FC = () => {
                 k = {p.k}
               </PanelTitle>
               <Regions grid={m.grid} box={box} at={p.at} dur={18} />
-              <Frame box={box} at={tradeAt} />
+              {/* The outline holds the empty plot; once the regions fill it,
+                  their edge is the box, so the outline goes (the owner,
+                  2026-11-11). */}
+              <Frame box={box} at={tradeAt} out={p.at + 12} />
               <Points
                 xs={MOONS.x}
                 ys={MOONS.y}

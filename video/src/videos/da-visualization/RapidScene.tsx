@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { BUBBLES, INK_WEEK, PARTS, SCATTER } from "./data";
-import { bandMid, BarSet, CATS, Drift, FlexRule, Headline, Kicker, LineSet, pulse, Spot, Svg, Verdict, X0 } from "./parts";
+import { bandMid, BarSet, CATS, Drift, Headline, Kicker, LineSet, pulse, Spot, Svg, Verdict, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 760;
@@ -214,6 +214,10 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 20. Tableau, Power BI and Looker ────────────────────────────────────────
 
+/** Each tool's logo over its name: its height, and the space under it. */
+const LOGO_H = 56;
+const LOGO_GAP = 20;
+
 const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const at0 = c.w("r-tools", "Tableau, Power BI and Looker");
@@ -223,9 +227,9 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
   const framingAt = c.w("r-tools", "framing the question");
   const checkAt = c.w("r-tools", "checking the numbers");
   const cards = [
-    { name: "Tableau", at: c.w("r-tools", "Tableau is built for exploring"), text: "built for exploring" },
-    { name: "Power BI", at: c.w("r-tools", "Power BI fits the Microsoft stack"), text: "fits the Microsoft stack" },
-    { name: "Looker", at: c.w("r-tools", "Looker defines metrics as code"), text: "metrics defined as code" },
+    { name: "Tableau", logo: "logo-tableau", at: c.w("r-tools", "Tableau is built for exploring"), text: "built for exploring" },
+    { name: "Power BI", logo: "logo-power-bi", at: c.w("r-tools", "Power BI fits the Microsoft stack"), text: "fits the Microsoft stack" },
+    { name: "Looker", logo: "logo-looker", at: c.w("r-tools", "Looker defines metrics as code"), text: "metrics defined as code" },
   ];
   // Three columns of plain text spread across the answer area, a hairline
   // centred in each gap: each name, and under it what it is for.
@@ -236,7 +240,8 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
         style={{
           position: "absolute",
           left: R_X + 40,
-          top: c.y(416),
+          // Raised by the logo row, so the names and what follows stay put.
+          top: c.y(416) - LOGO_H - LOGO_GAP,
           width: R_END - (R_X + 40),
           display: "flex",
           justifyContent: "space-between",
@@ -248,8 +253,11 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
           const p = ease(frame, at0 + k * 6, 14);
           return (
             <React.Fragment key={card.name}>
-              {k > 0 ? <FlexRule at={at0 + k * 6} /> : null}
               <div style={{ opacity: p, transform: `translateY(${(1 - p) * 12}px)` }}>
+                {/* The product's own logo over its name (the owner, 2026-11-11):
+                    Tableau's mark and Power BI's icon from their brand art,
+                    Looker's from Simple Icons. */}
+                <Img src={staticFile(`images/da-visualization/${card.logo}.svg`)} style={{ display: "block", height: LOGO_H, width: "auto", marginBottom: LOGO_GAP }} />
                 <div style={{ ...headline(38), color: INK, lineHeight: "44px", whiteSpace: "nowrap" }}>{card.name}</div>
                 <div style={{ ...note(24, INK_SOFT), lineHeight: "31px", marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, card.at - 2, 12) }}>{card.text}</div>
               </div>

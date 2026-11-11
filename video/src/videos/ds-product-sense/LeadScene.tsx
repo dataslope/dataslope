@@ -64,7 +64,8 @@ const Bar: React.FC<{ x: number; base: number; height: number; at: number; color
   return (
     <>
       <div style={{ position: "absolute", left: x, top: base - height * p, width: BARS.w, height: height * p, background: color, borderRadius: "4px 4px 0 0", opacity: 0.88 }} />
-      <div style={{ position: "absolute", left: x - 40, width: BARS.w + 80, top: base - height * p - 40, textAlign: "center", ...note(28, ink), fontWeight: 500, ...TABULAR, opacity: ease(frame, from + 8, 10) }}>
+      {/* The value at the size of the bar's own name under it (the owner, 2026-11-11). */}
+      <div style={{ position: "absolute", left: x - 40, width: BARS.w + 80, top: base - height * p - 36, textAlign: "center", ...label(21, ink), fontWeight: 500, ...TABULAR, opacity: ease(frame, from + 8, 10) }}>
         {value}
       </div>
       <div style={{ position: "absolute", left: x - 40, width: BARS.w + 80, top: base + 10, textAlign: "center", ...label(21, INK_SOFT), opacity: p }}>{name}</div>

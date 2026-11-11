@@ -17,13 +17,14 @@ const CREEP = { x0: 1100, x1: 1660, base: 760, top: 440, hi: 45, lift: 36 };
 /** Question 12: a dashboard and a report as two columns of plain text, each
  *  a serif name over its lines, with a hairline centred in the gap between
  *  the left column's longest line (about 640px) and the right column. */
-const COLS = { y: 388, titleH: 46, lineH: 36, lineGap: 22, titleGap: 16 };
-/** Each column's watercolor, under its list with a clear 60px above it. */
+const COLS = { y: 492, titleH: 46, lineH: 36, lineGap: 22, titleGap: 16 };
+/** Each column's watercolor, above its title: about 60px clear of the
+ *  question above and 56px clear of the title below (the owner, 2026-11-11). */
 const COL_ART = [
-  { id: "da-visualization-dashboard", w: 232, h: 200 },
-  { id: "da-visualization-report", w: 186, h: 200 },
+  { id: "da-visualization-dashboard", w: 197, h: 170 },
+  { id: "da-visualization-report", w: 158, h: 170 },
 ] as const;
-const COL_ART_Y = 740;
+const COL_ART_Y = 266;
 const COLS_X = [220, 1080];
 const COLS_RULE_X = 860;
 
@@ -139,7 +140,7 @@ export const DashScene: React.FC = () => {
                 alignItems: "center",
               }}
             >
-              {lead ? <span style={{ ...headline(22 + 12 * big), color: INK, whiteSpace: "nowrap" }}>key metric</span> : null}
+              {lead ? <span style={{ ...headline(22 + 12 * big), color: PAPER, whiteSpace: "nowrap" }}>key metric</span> : null}
             </div>
           );
         })}

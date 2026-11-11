@@ -15,9 +15,15 @@ const ROW_LABEL_W = 210;
 const ROWS = { job: 330, primary: 430, secondary: 530, guard: 630, not: 740 };
 const RECIPES = ["lemon pasta", "chickpea curry", "banana bread", "miso soup"];
 
-/** A bookmark, the "saved" mark, drawn at (x, y). */
-const Bookmark: React.FC<{ x: number; y: number; size: number; color: string }> = ({ x, y, size, color }) => (
-  <path d={`M ${x} ${y} h ${size * 0.7} v ${size} l ${-size * 0.35} ${-size * 0.28} l ${-size * 0.35} ${size * 0.28} Z`} fill={color} />
+/** A bookmark, the "saved" mark: Lucide's `bookmark` icon (ISC licence),
+ *  filled, in a `size` px square (the owner, 2026-11-11: smaller, and a
+ *  well-established icon). */
+const LUCIDE_BOOKMARK =
+  "M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z";
+const Bookmark: React.FC<{ size: number; color: string }> = ({ size, color }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: "block", overflow: "visible", flex: `0 0 ${size}px` }}>
+    <path d={LUCIDE_BOOKMARK} fill={color} stroke={color} strokeWidth={2} strokeLinejoin="round" />
+  </svg>
 );
 
 /**
@@ -96,9 +102,7 @@ export const SaveScene: React.FC = () => {
               transformOrigin: "50% 50%",
             }}
           >
-            <svg width={26} height={34} style={{ overflow: "visible" }}>
-              <Bookmark x={0} y={0} size={32} color={PAPER} />
-            </svg>
+            <Bookmark size={30} color={PAPER} />
             <span style={{ ...note(30, PAPER), fontWeight: 500, whiteSpace: "nowrap" }}>Save for later</span>
           </div>
           {RECIPES.map((r, i) => {
@@ -107,9 +111,7 @@ export const SaveScene: React.FC = () => {
             return (
               <Note key={r} at={backAt + 4 + i * 3} x={X0} y={top}>
                 <div style={{ display: "flex", alignItems: "center", gap: 16, width: 360 }}>
-                  <svg width={22} height={28} style={{ overflow: "visible", flex: "0 0 22px" }}>
-                    <Bookmark x={0} y={0} size={26} color={DATA} />
-                  </svg>
+                  <Bookmark size={24} color={DATA} />
                   <span style={{ ...note(26, INK), whiteSpace: "nowrap", flex: 1 }}>{r}</span>
                   {opened ? <Tick at={weekAt + 6 + i * 4} size={28} /> : <span style={{ width: 28 }} />}
                 </div>
