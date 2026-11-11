@@ -140,8 +140,9 @@ export const CdnScene: React.FC = () => {
           })}
           <circle cx={ox} cy={oy} r={10 * ease(frame, originAt, 10)} fill={BLUE_INK} stroke={PAPER} strokeWidth={2.5} />
           <circle cx={ux} cy={uy} r={10 * ease(frame, sydneyAt, 10)} fill={INK} stroke={PAPER} strokeWidth={2.5} />
-          {/* The edge server across town. */}
-          <circle cx={ux + 16} cy={uy - 14} r={8 * ease(frame, edgeAt + 4, 10)} fill={OK} stroke={PAPER} strokeWidth={2} />
+          {/* The edge server across town: west of the user, clear of the arc,
+              which leaves Sydney to the north-east. */}
+          <circle cx={ux - 18} cy={uy - 12} r={8 * ease(frame, edgeAt + 4, 10)} fill={OK} stroke={PAPER} strokeWidth={2} />
         </svg>
         <Line x={MAP_X + ox + 18} y={top + oy - 14} at={originAt + 2} size={21} weight={500} color={BLUE_INK} style={halo}>
           origin
@@ -153,7 +154,7 @@ export const CdnScene: React.FC = () => {
         <Line x={MAP_X + mid[0]} y={top + mid[1] + 18} at={msAt + 4} size={24} weight={500} color={BLUE_INK} style={halo}>
           ≥ <Num>{Math.round(DISTANCE.roundTripMs)}</Num> ms round trip
         </Line>
-        <Line x={MAP_X + ux + 30} y={top + uy - 54} at={underAt} size={21} weight={500} color={OK_INK} style={halo}>
+        <Line x={MAP_X + ux - 34} y={top + uy - 56} at={underAt} size={21} weight={500} color={OK_INK} style={halo} align="right">
           edge
         </Line>
 

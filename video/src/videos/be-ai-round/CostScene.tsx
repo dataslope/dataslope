@@ -106,9 +106,10 @@ const Bill: React.FC<{
 
 /**
  * Question 5: what an LLM feature costs. The formula in words, then the
- * page's block as a listing, each of its numbers marked as the narration
- * reads it, and what it printed when check.mjs ran it; the day's bill as a
- * bar, input and output. The bar then takes the page: the levers that act on
+ * page's block as its three inputs, each marked as the narration reads it,
+ * and the arithmetic it does, to what it printed when check.mjs ran it, and
+ * one step on, the cost of one request; the day's bill as a bar, input and
+ * output. The bar then takes the page: the levers that act on
  * the input go on its input segment, the next two beside it. Then the step
  * the page now takes too: per token, output costs five times input, but
  * halving the prompt saves 1,000 a day and halving the answer 750, both

@@ -50,7 +50,11 @@ export const ReplicaScene: React.FC = () => {
   const asyncAt = n.word("q5-fix", "with asynchronous replication");
   const laggingAt = n.word("q5-fix", "promoting a lagging follower");
   const losesAt = n.word("q5-fix", "loses the writes it never received");
-  const end = n.beat("q5-fix").to;
+  const semiAt = n.word("q5-sync", "Semi-synchronous replication fixes that");
+  const waitsAt = n.word("q5-sync", "each write waits until one follower has it");
+  const nothingAt = n.word("q5-sync", "loses nothing");
+  const slowerAt = n.word("q5-sync", "every write is slower");
+  const end = n.beat("q5-sync").to;
 
   const lMid = y(LEADER.mid);
   const fMid = FOLLOW.mids.map((m) => y(m));
@@ -89,7 +93,20 @@ export const ReplicaScene: React.FC = () => {
         <Ink at={writesAt - 2} dur={12} style={{ left: X0, top: lMid - 44, whiteSpace: "nowrap", opacity: 1 - ease(frame, dimTop, 12) * 0.65 }}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>writes</span>
         </Ink>
-        <Flow points={[[X0, lMid], [LEADER.x - 8, lMid]]} at={writesAt} color={BAR} dim={dimTop} />
+        <Flow points={[[X0, lMid], [LEADER.x - 8, lMid]]} at={writesAt} color={BAR} dim={dimTop} out={promotedAt} />
+        {/* Once promoted, the new leader takes the writes. */}
+        <Flow
+          points={[
+            [X0, lMid],
+            [LEADER.x - 70, lMid],
+            [LEADER.x - 70, fMid[0]],
+            [FOLLOW.x - 8, fMid[0]],
+          ]}
+          at={promotedAt + 4}
+          dur={18}
+          color={BAR}
+          dim={dimTop}
+        />
         <Node
           x={LEADER.x}
           y={lMid - LEADER.h / 2}
@@ -122,7 +139,7 @@ export const ReplicaScene: React.FC = () => {
               at={streamAt + 4 + i * 4}
               tone={i === 0 && promoted > 0.5 ? "ok" : "data"}
               title={i === 0 && promoted > 0.5 ? "new leader" : "follower"}
-              sub="read-only"
+              sub={i === 0 && promoted > 0.5 ? "takes writes" : "read-only"}
               lit={i === 0 ? promoted * 0.6 : 0}
               dim={dimTop}
             />
@@ -181,7 +198,7 @@ export const ReplicaScene: React.FC = () => {
           for a short while after a write
         </Line>
 
-        <VRule x={1257} top={y(340)} bottom={y(640)} at={asyncAt} />
+        <VRule x={1257} top={y(340)} bottom={y(760)} at={asyncAt} />
 
         {/* ── A lagging follower, promoted. ── */}
         <Line at={asyncAt} x={LOG.x} y={y(352)} size={22} weight={500} color={INK}>
@@ -224,6 +241,18 @@ export const ReplicaScene: React.FC = () => {
         ))}
         <Line at={losesAt} x={LOG.x} y={y(402) + h(148)} size={21} color={ACCENT_INK} weight={500}>
           promoted: w5 and w6 are lost
+        </Line>
+        <Line at={semiAt} x={LOG.x} y={y(402) + h(214)} size={22} weight={500} color={INK}>
+          <Mark at={semiAt + 2}>Semi-synchronous</Mark>
+        </Line>
+        <Line at={waitsAt} x={LOG.x} y={y(402) + h(258)} size={21} color={OK_INK} weight={500}>
+          a write waits for one follower
+        </Line>
+        <Line at={nothingAt} x={LOG.x} y={y(402) + h(292)} size={21} color={OK_INK} weight={500}>
+          promote that one: nothing lost
+        </Line>
+        <Line at={slowerAt} x={LOG.x} y={y(402) + h(326)} size={21} color={INK_SOFT}>
+          the price: every write is slower
         </Line>
       </Drift>
     </AbsoluteFill>

@@ -260,10 +260,13 @@ export const FANOUT = {
   fixedQuery: lines("joins", "fixed"),
   fixed: { cols: fixed.cols, rows: fixed.rows.map(([n, r, i]) => [n, dollars(r), i]) },
   fixedTotal: dollars(cell("joins", "fixedTotal")),
+  /** The items counted per order and summed back up: every line item, once. */
+  fixedItems: fixed.rows.reduce((n, r) => n + Number(r[2]), 0),
   /** Sara: two orders, three items each. */
   sara: { right: dollars(byName(fixed, "Sara", "revenue")), wrong: dollars(byName(inflated, "Sara", "revenue")), items: Number(byName(fixed, "Sara", "items")) },
 };
 if (FANOUT.fixedTotal !== FANOUT.total) throw new Error("the fixed query must give back the orders' own total");
+if (FANOUT.fixedItems !== FANOUT.joinedRows) throw new Error("the fixed query must keep every item, counted once");
 if (pageOrders.length !== FANOUT.orders || pageOrders.reduce((n, o) => n + o.items, 0) !== FANOUT.joinedRows) throw new Error("the parsed orders must give the joins' row counts");
 if ((pageOrders.reduce((t, o) => t + o.amount * o.items, 0)).toFixed(2) !== FANOUT.inflatedTotal) throw new Error("the parsed orders must give the inflated total");
 

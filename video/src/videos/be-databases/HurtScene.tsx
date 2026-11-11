@@ -179,7 +179,7 @@ export const HurtScene: React.FC = () => {
           ink={ACCENT_INK}
         />
         <Note at={eachAt} x={R_X} y={lTop + h(196)}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>each insert also writes into every index</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>one record per change written to disk; an insert changes every index</span>
         </Note>
 
         <Note at={spaceAt} x={R_X} y={lTop + h(250)}>
@@ -210,13 +210,16 @@ export const HurtScene: React.FC = () => {
               </span>
             </>
           }
-          shown={`${mb(indexTotal)} MB`}
+          shown={
+            <>
+              {mb(indexTotal)} MB
+              {/* On the value's own line and baseline, a word apart. */}
+              <span style={{ marginLeft: "0.7em", fontWeight: 500, opacity: ease(frame, biggerAt, 10) }}>bigger</span>
+            </>
+          }
           segments={HURT.indexes.map((ix, i) => ({ value: ix.bytes, color: reds[i], at: spaceAt + 10 + i * 6 }))}
           ink={ACCENT_INK}
         />
-        <Note at={biggerAt} x={R_X + BAR_W + 120} y={lTop + h(392)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>bigger</span>
-        </Note>
 
         {/* ── The rule ── */}
         <Note at={ruleAt - 2} x={X0} y={y(866)}>

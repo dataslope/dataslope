@@ -156,20 +156,16 @@ export const PromptScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* The sixty-second case: the edge, and its answer. */}
-        <Note at={noticeAt} x={X0} y={y(566)} width={LEFT_W}>
-          <div style={{ ...note(25, INK), lineHeight: 1.35 }}>
+        {/* The sixty-second case: the edge, and its answer, said of the
+            better prompt and under it. Only what a weak prompt leaves out
+            stays in the weak column. */}
+        <Note at={noticeAt} x={BETTER_X} y={y(790)}>
+          <span style={line(26, INK)}>
             <Mark at={noticeAt + 6}>The edge</Mark> comes with <b style={{ color: OK_INK }}>its answer.</b>
-          </div>
+            <span style={{ opacity: ease(frame, nameAt - 2, 10), fontWeight: 500 }}> Name the answer, not just the edge.</span>
+          </span>
         </Note>
-        <Note at={nameAt - 2} x={X0} y={y(650)} width={LEFT_W}>
-          <div style={{ ...note(25, INK), fontWeight: 500, lineHeight: 1.35 }}>
-            Name the answer,
-            <br />
-            not just the edge.
-          </div>
-        </Note>
-        <Note at={otherwiseAt - 2} x={X0} y={y(744)} width={LEFT_W}>
+        <Note at={otherwiseAt - 2} x={X0} y={y(600)} width={LEFT_W}>
           <div style={{ ...note(25, ACCENT_INK), lineHeight: 1.35 }}>
             Left out, the assistant decides: inside the window, or out?
             <span style={{ opacity: ease(frame, agreesAt - 2, 10) }}> And its test agrees with itself.</span>

@@ -74,14 +74,14 @@ export const CompScene: React.FC = () => {
   const threeAt = n.word("comp-cart", "three items count three");
   const speedsAt = n.word("comp-break", "Then the cart team speeds add-all up");
   const stopsAt = n.word("comp-break", "it stops adding them one at a time");
-  const zeroAt = n.word("comp-break", "drops to zero");
-  const nobodyAt = n.word("comp-break", "nobody touched the loyalty code");
+  const zeroAt = n.word("comp-zero", "drops to zero");
+  const nobodyAt = n.word("comp-zero", "nobody touched the loyalty code");
   const holdsAt = n.word("comp-hold", "Composition holds a cart");
   const ownAt = n.word("comp-hold", "counting in its own methods");
   const promisesAt = n.word("comp-hold", "what the cart promises");
   const beforeAt = n.word("comp-hold", "three before the change");
   const afterAt = n.word("comp-hold", "three after");
-  const mixAt = n.word("comp-mix", "It also combines freely");
+  const notificationsAt = n.word("comp-mix", "Notifications go by");
   const channelsAt = n.word("comp-mix", "email, text or push");
   const timingsAt = n.word("comp-mix", "at one of three timings");
   const nineAt = n.word("comp-mix", "A subclass per pair is nine");
@@ -103,7 +103,8 @@ export const CompScene: React.FC = () => {
   const chipTop = cartTop + 72;
   const chipMid = chipTop + CHIP_H / 2;
   const childTop = y(CHILD.top);
-  const aOut = mixAt - 6;
+  // The cart stays up, "after: 3" at rest, through "It also combines freely".
+  const aOut = notificationsAt;
   const run1 = [0, 1, 2].map((i) => oneAtATimeAt + 4 + i * 12);
   const path1: P[] = [
     [ADD_ALL.x + ADD_ALL.w / 2, chipMid],
@@ -162,7 +163,7 @@ export const CompScene: React.FC = () => {
         </QuestionCard>
         <Line x={X0} y={y(270)} at={tiesAt} size={26}>
           Inheritance ties a subclass to its parent&apos;s implementation
-          <span style={{ opacity: ease(frame, breakUpAt, 10) }}>, so a change upstream can break it</span>
+          <span style={{ opacity: ease(frame, breakUpAt, 10) }}>, so a change upstream can break it.</span>
         </Line>
         <Line x={X0} y={y(316)} at={fragileAt - 2} size={26} out={aOut}>
           That&apos;s the <Mark at={fragileAt + 4} color={MARK_BAD}>fragile base class</Mark> problem.

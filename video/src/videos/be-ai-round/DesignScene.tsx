@@ -50,7 +50,9 @@ const RISKS = [
 
 /**
  * Question 4: a feature that calls an LLM API. The model is a dependency with
- * six risks, named in red; the page's flowchart is drawn around it, and then
+ * six risks, named in red, the provider drawn alone in the middle of the page;
+ * the page's flowchart is built around it box by box as the request path is
+ * walked (quota, cache, provider on a miss, validation, streamed back), and then
  * each concern the page lists lights the part of the drawing it changes or
  * adds to it: latency the streamed edge back to the client and a queue with a
  * status endpoint; failure the provider edge's timeout, retries, breaker and

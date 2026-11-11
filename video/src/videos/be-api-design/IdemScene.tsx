@@ -220,12 +220,12 @@ export const IdemScene: React.FC = () => {
         </Note>
 
         {/* What the losing request gets back, and a key reused with another body. */}
-        <Note at={catchesAt} x={1290} y={raceTop + h(92) + 4}>
+        <Note at={catchesAt} x={1290} y={raceTop + h(44)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             caught: <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, storedAt, 10) }}>→ payment {storedId}, as stored</span>
           </span>
         </Note>
-        <Note at={reusedAt} x={1290} y={raceTop + h(44)}>
+        <Note at={reusedAt} x={1290} y={raceTop + h(92) + 4}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             same key, new body: <b style={{ color: ACCENT_INK, opacity: ease(frame, rejectedAt, 10) }}>rejected</b>
           </span>

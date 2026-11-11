@@ -68,7 +68,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     three POSTs, each carrying "Idempotency-Key: 9c1f2a7e-…", one row,
  *     the second and third answered with payment 1: "3 requests, 1 charge"
  *     (green). idem-race: the duplicate insert refused, Postgres's error
- *     ("violates unique constraint …") in the soft ink.
+ *     ("violates unique constraint …") in the soft ink. idem-reply: the
+ *     caught refusal answered with payment 1, as stored (green); the same
+ *     key with a new body "rejected" (red).
  *   page: QuestionCard 6; "?limit=20&offset=40" as the page's
  *     SyntaxBreakdown. page-cost: "PostgreSQL 18, 100,000 articles" as the
  *     figure's source line; three bars on a log scale, rows read for
@@ -79,6 +81,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     what it decodes to, {"id": 99981}; page two by cursor starting at
  *     99,980 (green); the bars for the cursor flat at 20 at every depth.
  *     page-cost-two: "no page 500 jump" and "(created_at, id)".
+ *     page-index: ", indexed" after the pair.
  *   auth: QuestionCard 7; three cards, session, JWT, OAuth, each with the
  *     question it answers. auth-session: a cookie holding the 43-character
  *     ID, an arrow into the server's session store. auth-jwt: the 164-character
@@ -86,7 +89,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (sub 42, role editor, exp); the role changed to admin and the
  *     signature check failing (red). auth-oauth: a user, an app and a
  *     service; the app reaching the service with a token, no password
- *     crossing.
+ *     crossing. auth-oidc: "logging in: OpenID Connect, an ID token".
  *   revoke: QuestionCard 8. revoke-session: two servers reading one shared
  *     session store; the session deleted from it, the next request refused
  *     at once (green). revoke-jwt: the same
@@ -110,11 +113,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   rapid-in: the RapidFire list, 11 to 16. r-naming: the page's three
  *     paths, and "PATCH /articles/42 {status: published}". r-blog: the
  *     page's verb and path table, then "201 Created, Location:
- *     /articles/43". r-version: "/v1/orders"; a removed field (red), an
- *     added optional one (green). r-errors: the page's 422 body.
+ *     /articles/43". r-version: an article as v1 clients read it, a
+ *     removed field (red) and a retyped one; r-version-path: "GET
+ *     /v1/articles/42", the default, more visible and cache-friendly than a
+ *     header or "?version=2" (the page's three strategies);
+ *     r-version-add: an added optional field (green). r-errors: the page's 422 body.
  *     r-hateoas: a response with "next" and "comments" links; "REST as
  *     defined: required" beside "in practice: often skipped". r-content:
- *     Accept and Content-Type on two arrows; 3,663 bytes against 610.
+ *     Accept and Content-Type on two arrows, a second pair asking for
+ *     text/csv; 3,663 bytes against 610.
  *   next: the RapidFire list complete; NextLine "Next: databases".
  *
  * Facts. check.mjs writes results.json, which data.ts reads:
@@ -126,7 +133,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     of the page before) returns 20 at both depths, and page 500 by either
  *     method is the same 20 rows (EXCEPT finds none different). Drift: page
  *     one ends on article 99,981; after article 100,001 is inserted, page
- *     two by offset starts on 99,981, by cursor on 99,980.
+ *     two by offset starts on 99,981, by cursor on 99,980. A cursor on
+ *     (created_at, id) at page 500: with no index on the pair, a Seq Scan
+ *     reading all 100,001 rows and a top-N sort; with one, an Index Scan
+ *     reading 20 ("page-index", said in words).
  *   - "idem", on the same Postgres: three plain POSTs of 5000 cents (the
  *     page's example body, {"amount": 5000, "currency": "usd"}, read as
  *     cents, the smallest unit of the currency: "fifty dollars"; the body on
@@ -154,7 +164,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *       - RFC 9110, 9.2.2: idempotency is about the intended effect on the
  *         server, not the response, so a repeated DELETE may answer 404 and
  *         still be idempotent.
- *       - RFC 9110, 15.5.4: a server that wants to hide that a forbidden
+ *       - Answering a racing retry with the stored result, and rejecting a
+         key reused with a different body ("idem-reply"): the page's "returns
+         the original result on any retry", and the IETF Idempotency-Key
+         header draft (a mismatched payload is refused).
+       - OpenID Connect as the login layer on OAuth ("auth-oidc"): OpenID
+         Connect Core 1.0, which adds the ID token.
+       - RFC 9110, 15.5.4: a server that wants to hide that a forbidden
  *         resource exists may answer 404 instead of 403 ("authn-404").
  *       - Fielding's dissertation (2000), 5.1.5, lists hypermedia as the
  *         engine of application state among REST's four interface

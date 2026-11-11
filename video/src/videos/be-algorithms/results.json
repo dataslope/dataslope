@@ -88,6 +88,7 @@
       "sameInsertEq": 595679,
       "sameMissEq": 1296
     },
+    "hashRandomized": 1,
     "setLoad": {
       "setGrows": [
         [
@@ -536,6 +537,12 @@
         "D",
         "C"
       ]
+    },
+    "chain": {
+      "nodes": 1000000,
+      "bfsPeak": 1,
+      "dfsPath": 1000000,
+      "recursive": "RecursionError: maximum recursion depth exceeded"
     },
     "heap": {
       "n": 1000000,
@@ -3989,6 +3996,90 @@
       "recursionLimit": 1000
     },
     "rapid": {
+      "backtrackTried": [
+        [
+          [
+            1
+          ],
+          false
+        ],
+        [
+          [
+            2
+          ],
+          true
+        ],
+        [
+          [
+            2,
+            1
+          ],
+          true
+        ],
+        [
+          [
+            2,
+            1,
+            3
+          ],
+          false
+        ],
+        [
+          [
+            2,
+            3
+          ],
+          true
+        ],
+        [
+          [
+            2,
+            3,
+            1
+          ],
+          true
+        ],
+        [
+          [
+            3
+          ],
+          true
+        ],
+        [
+          [
+            3,
+            1
+          ],
+          true
+        ],
+        [
+          [
+            3,
+            1,
+            2
+          ],
+          true
+        ],
+        [
+          [
+            3,
+            2
+          ],
+          false
+        ]
+      ],
+      "backtrackFound": [
+        [
+          2,
+          3,
+          1
+        ],
+        [
+          3,
+          1,
+          2
+        ]
+      ],
       "kahnCyclicEdges": [
         [
           0,

@@ -87,10 +87,9 @@ export const DailyScene: React.FC = () => {
         { text: "and how you caught it", at: n.word("daily-concrete", "how you caught it") },
       ],
       example: [
-        { text: "a parameter our payments", at: n.word("daily-example", "called our payments client") },
-        { text: "client doesn't have;", at: n.word("daily-example", "a parameter that doesn't exist") },
-        { text: "the integration test", at: n.word("daily-example", "the integration test caught it") },
-        { text: "caught it before review", at: n.word("daily-example", "before review") },
+        { text: "called our payments client", at: n.word("daily-example", "called our payments client") },
+        { text: "with a made-up parameter;", at: n.word("daily-example", "a parameter that doesn't exist") },
+        { text: "the integration test caught it", at: n.word("daily-example", "the integration test caught it") },
       ],
     },
   ];
@@ -126,6 +125,7 @@ export const DailyScene: React.FC = () => {
       {bins.flatMap((b) => b.items).map((it) => (
         <Sfx key={it.text} name="el-tap" at={it.at} level={-37} />
       ))}
+      <Sfx name="el-pencil" at={exampleAt} level={-35} />
       <Sfx name="el-whoosh" at={measureAt} level={-37} />
       <Sfx name="el-tap" at={longerAt + 10} level={-30} />
       <Sfx name="el-pop" at={fasterAt} level={-30} />
@@ -176,7 +176,7 @@ export const DailyScene: React.FC = () => {
                 ))}
                 {/* A worked example, in the right answer's green: what a
                     strong answer actually says. */}
-                {"example" in b
+                {"example" in b && b.example
                   ? b.example.map((it) => (
                       <div key={it.text} style={{ ...note(24, OK_INK), fontWeight: 500, marginBottom: 4, whiteSpace: "nowrap", opacity: ease(frame, it.at - 2, 10) }}>
                         {it.text}

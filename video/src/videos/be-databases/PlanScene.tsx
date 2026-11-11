@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -13,15 +13,12 @@ import {
   Drift,
   lineOf,
   Listing,
-  listingCharX,
   listingHeight,
-  listingLineMid,
   MARK_GREEN,
   MARK_RED,
   planLineMid,
   PlanBox,
   SmallMono,
-  Svg,
   X0,
 } from "./parts";
 
@@ -64,6 +61,9 @@ export const PlanScene: React.FC = () => {
   const expectedAt = n.word("plan-bad", "It expected five thousand rows");
   const foundAt = n.word("plan-bad", "found two thousand seven hundred thirty-two");
   const millionAt = n.word("plan-bad", "threw away nearly a million");
+  const picksAt = n.word("plan-gap", "Postgres picks its plan from that estimate");
+  const gapAt = n.word("plan-gap", "a big gap means a bad choice");
+  const loopAt = n.word("plan-gap", "like a nested loop");
   const causeAt = n.word("plan-why", "The cause is the filter");
   const dateAt = n.word("plan-why", "turns each timestamp into a date");
   const cantAt = n.word("plan-why", "can't search a function of it");
@@ -72,24 +72,17 @@ export const PlanScene: React.FC = () => {
   const rightAt = n.word("plan-fix", "exactly right");
   const sargAt = n.word("plan-sarg", "a sargable filter");
   const searchAt = n.word("plan-sarg", "one the index can search");
-  const otherAt = n.word("plan-sarg", "The other usual fixes");
-  const newAt = n.word("plan-sarg", "a new index");
-  const statsAt = n.word("plan-sarg", "fresh statistics");
-  const end = n.beat("plan-sarg").to;
+  const otherAt = n.word("plan-fixes", "The other usual fixes");
+  const exprAt = n.word("plan-fixes", "an index on the expression itself");
+  const statsAt = n.word("plan-fixes", "fresh statistics");
+  const staleAt = n.word("plan-fixes", "when the estimates are stale");
+  const end = n.beat("plan-fixes").to;
 
   const fixOut = rangeAt - 4;
   const listTop = y(TOP);
   const planTop = listTop + listingHeight(PLAN.fn.length, SIZE) + h(24);
   const rangePlanTop = listTop + listingHeight(PLAN.range.length, SIZE) + h(24);
   const rangeShown = PLAN.rangePlan.filter((l) => !l.includes("Index Cond"));
-
-  // The cast, circled where the statement writes it.
-  const castLine = lineOf(PLAN.fn, "::date");
-  const castCol = PLAN.fn[castLine].indexOf("created_at::date");
-  const castX0 = listingCharX(X0, castCol, SIZE);
-  const castX1 = listingCharX(X0, castCol + "created_at::date".length, SIZE);
-  const castY = listingLineMid(listTop, castLine, SIZE);
-  const ring = ease(frame, dateAt, 14) * (1 - ease(frame, fixOut, 10));
 
   // The tree's arrow: from the Seq Scan up to the Aggregate it feeds.
   const aggY = planLineMid(planTop, lineOf(PLAN.fnPlan, "Aggregate"), PSIZE);
@@ -120,10 +113,19 @@ export const PlanScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── The statement and its plan ── */}
-        <Listing lines={PLAN.fn} x={X0} top={listTop} width={860} size={SIZE} at={explainAt - 4} out={fixOut} marks={[{ line: "EXPLAIN", at: explainAt + 4, out: firstAt }]} />
-        <Svg opacity={ring}>
-          <ellipse cx={(castX0 + castX1) / 2} cy={castY} rx={(castX1 - castX0) / 2 + 16} ry={h(26)} fill="none" stroke={ACCENT} strokeWidth={3} pathLength={1} strokeDasharray={`${ease(frame, dateAt, 16)} 1`} />
-        </Svg>
+        <Listing
+          lines={PLAN.fn}
+          x={X0}
+          top={listTop}
+          width={860}
+          size={SIZE}
+          at={explainAt - 4}
+          out={fixOut}
+          marks={[
+            { line: "EXPLAIN", at: explainAt + 4, out: firstAt },
+            { line: "::date", text: "created_at::date", at: dateAt, color: MARK_RED },
+          ]}
+        />
         <PlanBox
           lines={PLAN.fnPlan}
           x={X0}
@@ -195,6 +197,12 @@ export const PlanScene: React.FC = () => {
             threw away <b><Num>{thousands(PLAN.fnRemoved)}</Num></b>
           </span>
         </Note>
+        {/* Why the gap matters: the plan is chosen from the estimate. */}
+        <Note at={picksAt} x={R_X} y={rows(4) + h(20)} out={fixOut}>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Postgres plans from the estimate,</div>
+          <div style={{ ...note(22, INK), whiteSpace: "nowrap", marginTop: h(6), opacity: ease(frame, gapAt, 10) }}>so a big gap means a bad choice</div>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(6), opacity: ease(frame, loopAt, 10) }}>such as a nested loop over too many rows</div>
+        </Note>
         <Note at={causeAt} x={X0} y={planTop + h(206)} out={fixOut}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             The cause: <SmallMono color={ACCENT_INK}>created_at::date</SmallMono>
@@ -248,11 +256,15 @@ export const PlanScene: React.FC = () => {
         <Note at={otherAt} x={X0} y={rangePlanTop + h(258)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             The other usual fixes:
-            <span style={{ color: INK, opacity: ease(frame, newAt, 10) }}> a new index,</span>
+            <span style={{ color: INK, opacity: ease(frame, exprAt, 10) }}>
+              {" "}
+              an index on <SmallMono>created_at::date</SmallMono>,
+            </span>
             <span style={{ color: INK, opacity: ease(frame, statsAt, 10) }}>
               {" "}
-              fresh statistics (<SmallMono>ANALYZE</SmallMono>)
+              or <SmallMono>ANALYZE</SmallMono>
             </span>
+            <span style={{ opacity: ease(frame, staleAt, 10) }}> when estimates are stale</span>
           </span>
         </Note>
       </Drift>

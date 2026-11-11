@@ -378,6 +378,10 @@ def eq_calls(keys, probe):
 spread = eq_calls([Key(i, i) for i in range(1000)], Key(-1, -1))
 same = eq_calls([Key(i, 7) for i in range(1000)], Key(-1, 7))
 R["hashWorst"] = {"keys": 1000, "spreadInsertEq": spread[0], "spreadMissEq": spread[1], "sameInsertEq": same[0], "sameMissEq": same[1]}
+# What a runtime does about keys picked to collide: str and bytes hashes are
+# salted per process (PEP 456), so an attacker cannot precompute a set of
+# colliding strings. 1 when this interpreter does it.
+R["hashRandomized"] = sys.flags.hash_randomization
 # The hash set's resize point, for the page's "resizes when the load factor
 # exceeds ~2/3": how full a set's table is (items over slots) when it grows,
 # read off sys.getsizeof. A set entry is a key pointer and a hash, two words;
@@ -503,6 +507,30 @@ def dfs_order(graph, start):
     return out
 g = {"A": ["B", "C"], "B": ["D"], "C": ["D"], "D": []}
 R["traversal"] = {"nodes": N, "levels": 20, "widestLevel": 2 ** 19, "bfsPeak": peak_q, "dfsPeak": peak_s, "listShifts": shifted, "dfsOrder": dfs_order(g, "A")}
+# The other shape: a chain of a million nodes, each pointing at the next. BFS
+# holds one node at a time; DFS keeps the path it is on, which is the whole
+# chain (the page: "DFS memory is proportional to depth"), and a recursive
+# DFS stops at Python's recursion limit long before the end.
+CH = 1_000_000
+q = deque([0]); chain_bfs_peak = 1
+while q:
+    u = q.popleft()
+    if u + 1 < CH:
+        q.append(u + 1)
+    chain_bfs_peak = max(chain_bfs_peak, len(q))
+path = [0]; chain_dfs_path = 1
+while path[-1] + 1 < CH:
+    path.append(path[-1] + 1)
+    chain_dfs_path = max(chain_dfs_path, len(path))
+def dfs_rec(u):
+    if u + 1 < CH:
+        dfs_rec(u + 1)
+try:
+    dfs_rec(0); chain_recursive = "ok"
+except RecursionError as e:
+    chain_recursive = f"RecursionError: {e}"
+del path
+R["chain"] = {"nodes": CH, "bfsPeak": chain_bfs_peak, "dfsPath": chain_dfs_path, "recursive": chain_recursive}
 
 # 6. Heap. A million items: levels in the tree, and the most a push or pop
 #    can move (its height). Building it: the most moves heapify can make is
@@ -740,7 +768,27 @@ kahn_cyclic = ns["kahns"](4, cyc_edges)
 ns = {}
 exec(_page["topo"].split("# Task dependencies")[0], ns)
 topo_cyclic = ns["topo_sort"]({"A": ["B"], "B": ["C"], "C": ["B", "D"], "D": []})
+# Backtracking on a constrained example: orderings of 1, 2, 3 with no digit
+# in its own place (1 not first, 2 not second, 3 not third). Every candidate
+# tried, in order, with whether it can still succeed; a branch that cannot
+# is dropped at once, so nothing under it is tried.
+bt_tried = []
+bt_found = []
+def bt(path, remaining):
+    if not remaining:
+        bt_found.append(path[:])
+        return
+    for i, v in enumerate(remaining):
+        ok = v != len(path) + 1
+        bt_tried.append([path + [v], ok])
+        if not ok:
+            continue
+        path.append(v)
+        bt(path, remaining[:i] + remaining[i + 1:])
+        path.pop()
+bt([], [1, 2, 3])
 R["rapid"] = {
+    "backtrackTried": bt_tried, "backtrackFound": bt_found,
     "kahnCyclicEdges": cyc_edges, "kahnCyclic": kahn_cyclic, "topoCyclic": topo_cyclic,
     "bstSortedHeight": bst_height(keys),
     "bstShuffledHeight": bst_height(shuffled),
@@ -854,6 +902,7 @@ const claims = [
   ["hash-worst", "a thousand keys", c.hashWorst.keys === 1000],
   ["hash-worst", "nearly six hundred thousand", c.hashWorst.sameInsertEq >= 550000 && c.hashWorst.sameInsertEq < 600000],
   ["hash-worst", "with distinct hashes, none", c.hashWorst.spreadInsertEq === 0],
+  ["hash-when", "python randomizes string hashes", c.hashRandomized === 1],
   // 3
   ["amort-run", "a million items", c.amortized.appends === 1e6],
   ["amort-run", "eighty-six times", c.amortized.resizes === 86],
@@ -871,6 +920,9 @@ const claims = [
   ["bfs-memory", "a million nodes", near(c.traversal.nodes, 1e6, 5e4)],
   ["bfs-memory", "five hundred twenty-four thousand", Math.round(c.traversal.bfsPeak / 1000) === 524],
   ["bfs-memory", "one path, twenty", c.traversal.dfsPeak === 20],
+  ["bfs-chain", "bfs holds one node", c.chain.bfsPeak === 1],
+  ["bfs-chain", "dfs the whole chain", c.chain.dfsPath === c.chain.nodes],
+  ["bfs-chain", "recursion overflows", c.chain.recursive.startsWith("RecursionError")],
   ["bfs-deque", "two hundred seventy-five billion", Math.round(c.traversal.listShifts / 1e9) === 275],
   // 6
   ["heap-choose", "half a million on average", c.heap.sortedInsertMeanShift === 500000],
@@ -881,9 +933,9 @@ const claims = [
   ["heap-build", "linear", c.heap.heightsSum < c.heap.n],
   // 7
   ["dijk-run", "three through b. d costs four", pageOut.dijkstra[0] === "{'A': 0, 'B': 1, 'C': 3, 'D': 4}"],
-  ["dijk-neg", "b leaves at two", c.dijkstra.settled.B === 2 && c.dijkstra.settledOrder[1] === "B"],
-  ["dijk-neg", "reach it at one", c.dijkstra.bellmanFord.B === 1],
-  ["dijk-neg", "and so is d", c.dijkstra.settled.D !== c.dijkstra.bellmanFord.D],
+  ["dijk-late", "b leaves at two", c.dijkstra.settled.B === 2 && c.dijkstra.settledOrder[1] === "B"],
+  ["dijk-late", "reach it at one", c.dijkstra.bellmanFord.B === 1],
+  ["dijk-late", "and so is d", c.dijkstra.settled.D !== c.dijkstra.bellmanFord.D],
   // 8
   ["quick-sorted", "n squared", q.lastPivotSorted.compares === q.pairs],
   ["quick-sorted", "a thousand sorted numbers", q.n === 1000],
@@ -897,7 +949,8 @@ const claims = [
   ["r-memo", "two point seven million calls", Math.round(c.rapid.fibNaiveCalls / 1e5) === 27],
   ["r-memo", "memoized, fifty-nine", c.rapid.fibMemoCalls === 59],
   ["r-greedy", "it takes three coins. two threes do it", c.rapid.greedy.length === 3 && c.rapid.fewest.join() === "3,3"],
-  ["r-bst", "a thousand levels tall; shuffled, twenty-one", c.rapid.bstSortedHeight === 1000 && c.rapid.bstShuffledHeight === 21],
+  ["bst-heights", "a thousand levels tall; shuffled, twenty-one", c.rapid.bstSortedHeight === 1000 && c.rapid.bstShuffledHeight === 21],
+  ["r-backtrack", "drops a branch the moment it can't succeed", c.rapid.backtrackTried.some(([, ok]) => !ok) && c.rapid.backtrackFound.length > 0],
   ["r-traverse", "in-order traversal visits a bst in sorted order", pageOut.inorder.join(" ") === "1 3 4 5 7"],
   ["r-binary", "twenty probes", c.rapid.binaryProbesMillion === 20],
   ["r-adjacency", "a hundred million entries", a.adjacency.listEntries === 1e8],

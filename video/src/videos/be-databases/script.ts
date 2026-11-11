@@ -267,6 +267,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "nosql-scale",
+      text: "Relational scales further than people think, with replicas and sharding, so decide on the access pattern and the consistency you need, not on size alone.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "nosql-next",
       text: "So ask which queries you'll need next year. Relational answers a new one with a join; a store built around one access pattern may need the data copied again, arranged for the new one.",
       pauseAfter: 0.8,
@@ -338,7 +343,7 @@ export const script: NarrationScript = {
     {
       id: "composite-prefix",
       text: "So it serves a left prefix: every Lovelace, or Ada Lovelace, but not every Ada.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
     {
       id: "composite-run",
@@ -384,18 +389,28 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "plan-gap",
+      text: "Postgres picks its plan from that estimate, so a big gap means a bad choice, like a nested loop over far more rows than it guessed.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "plan-why",
       text: "The cause is the filter. It turns each timestamp into a date, and an index on a column can't search a function of it.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.0,
     },
     {
       id: "plan-fix",
       text: "Write it as a range on the column itself, and the plan becomes an index-only scan, with an estimate that's exactly right.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.0,
     },
     {
       id: "plan-sarg",
-      text: "That's a sargable filter: one the index can search. The other usual fixes are a new index, and fresh statistics.",
+      text: "That's a sargable filter: one the index can search.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "plan-fixes",
+      text: "The other usual fixes: an index on the expression itself, or fresh statistics when the estimates are stale.",
       pauseAfter: 0.8,
     },
 
@@ -417,8 +432,13 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "fanout-grow",
+      text: "The error grows with the items per order, so a test on single-item orders can hide it.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "fanout-check",
-      text: "The error multiplies, so a small sample can hide it. Check the row count before and after every join.",
+      text: "Check the row count before and after every join.",
       pauseAfter: 0.8,
     },
 
@@ -469,7 +489,17 @@ export const script: NarrationScript = {
     },
     {
       id: "anomalies-serial",
-      text: "Serializable promises an outcome some one-at-a-time order could give. In exchange, Postgres may abort a transaction with a serialization failure, to be retried.",
+      text: "Serializable promises an outcome some one-at-a-time order could give.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "anomalies-skew",
+      text: "That stops write skew, which repeatable read allows: two transactions each check a rule, then each change a different row, and together they break it.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "anomalies-abort",
+      text: "In exchange, Postgres may abort a transaction with a serialization failure, to be retried.",
       pauseAfter: 0.8,
     },
 
@@ -498,6 +528,11 @@ export const script: NarrationScript = {
     {
       id: "lock-choose",
       text: "Optimistic wins when conflicts are rare, since one costs only a retry. Pessimistic wins when they're frequent, and retries would pile up.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "lock-cost",
+      text: "Pessimistic makes others wait, which costs throughput and risks deadlocks. And across two requests, with no transaction held open, only optimistic works: send the version back with the write.",
       pauseAfter: 0.8,
     },
 
@@ -550,6 +585,11 @@ export const script: NarrationScript = {
       id: "r-keys",
       text: "A primary key identifies each row: unique, never null, and indexed automatically. A foreign key points at another table's primary key, so no order can name a missing customer. Postgres doesn't index the foreign key's column for you.",
       pauseAfter: 0.6,
+    },
+    {
+      id: "r-keys-fix",
+      text: "Index it yourself, or finding a customer's orders, or deleting a customer, scans the whole orders table.",
+      pauseAfter: 1.2,
     },
     {
       id: "r-cover",

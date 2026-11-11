@@ -587,6 +587,9 @@ export const ART = {
   coins: { id: "be-databases-coins", w: 896, h: 895 },
   cylinder: { id: "be-databases-cylinder", w: 853, h: 884 },
   cylinderCopy: { id: "be-databases-cylinder-yellow", w: 867, h: 935 },
+  padlock: { id: "be-databases-padlock", w: 792, h: 997 },
+  padlocks: { id: "be-databases-padlocks", w: 1024, h: 895 },
+  steps: { id: "be-databases-steps", w: 1024, h: 874 },
 } as const;
 export type ArtName = keyof typeof ART;
 

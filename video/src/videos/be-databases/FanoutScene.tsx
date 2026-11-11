@@ -92,8 +92,8 @@ export const FanoutScene: React.FC = () => {
   const thenAt = n.word("fanout-fix", "then join");
   const oneRowAt = n.word("fanout-fix", "One row per order");
   const rightAt = n.word("fanout-fix", "the revenue is right again");
-  const multAt = n.word("fanout-check", "The error multiplies");
-  const sampleAt = n.word("fanout-check", "a small sample can hide it");
+  const multAt = n.word("fanout-grow", "The error grows with the items per order");
+  const sampleAt = n.word("fanout-grow", "a test on single-item orders can hide it");
   const checkAt = n.word("fanout-check", "Check the row count");
   const end = n.beat("fanout-check").to;
 
@@ -145,7 +145,7 @@ export const FanoutScene: React.FC = () => {
 
         {/* ── Joined to its items ── */}
         <Flow points={[[X0 + leftW + 22, top + gridH / 2], [R_X - 22, top + gridH / 2]]} at={itemsAt} color={INK} width={2.6} />
-        <Note at={itemsAt + 4} x={X0 + leftW + 6} y={top + gridH / 2 - h(46)}>
+        <Note at={itemsAt + 4} x={X0 + leftW + 22} y={top + gridH / 2 - h(46)}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>join items</span>
         </Note>
         <Note at={rowsAt - 4} x={R_X} y={top - h(48)}>
@@ -183,6 +183,12 @@ export const FanoutScene: React.FC = () => {
             <SmallCode>SUM(amount)</SmallCode> = <b style={{ color: OK_INK }}>{money(Number(FANOUT.fixedTotal))}</b>
           </span>
         </Note>
+        {/* The item counts survive the fix, counted once per order. */}
+        <Note at={rightAt + 8} x={R_X} y={sumY + h(44)}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            <SmallCode>SUM(items)</SmallCode> = <b style={{ color: OK_INK }}><Num>{FANOUT.fixedItems}</Num></b>, each order&rsquo;s count kept
+          </span>
+        </Note>
         <Spot art="coins" at={doublesAt} out={fixAt - 4} left={1612} top={top + h(30)} width={170} />
 
         {/* ── Sara ── */}
@@ -210,7 +216,7 @@ export const FanoutScene: React.FC = () => {
         {/* ── Row counts, step by step ── */}
         <Note at={multAt} x={R_X} y={listTop + h(56)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            the error multiplies<span style={{ opacity: ease(frame, sampleAt, 10) }}>: a small sample can hide it</span>
+            the error grows with items per order<span style={{ opacity: ease(frame, sampleAt, 10) }}>: single-item test data hides it</span>
           </span>
         </Note>
         <Note at={checkAt} x={R_X} y={listTop + h(112)}>

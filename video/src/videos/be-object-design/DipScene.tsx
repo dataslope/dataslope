@@ -7,7 +7,7 @@ import { ACCENT, BLUE_INK, INK, INK_SOFT, label } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FAKE_SENT } from "./data";
-import { ArtSpot, Box, Drift, Flow, lerp, Line, Mark2, OK, OK_INK, pulse, VRule, X0 } from "./parts";
+import { ArtSpot, Box, Drift, Flow, lerp, Line, Mark, Mark2, OK, OK_INK, pulse, VRule, X0 } from "./parts";
 
 const CONF = { x: X0, w: 400, top: 420, h: 110 };
 const SOCKET = { w: 116, h: 76 };
@@ -43,9 +43,9 @@ export const DipScene: React.FC = () => {
   const allAt = n.word("dip-ex", "that's all it knows");
   const prodAt = n.word("dip-ex", "In production");
   const emailAt = n.word("dip-ex", "the email sender");
-  const testAt = n.word("dip-ex", "A test hands it a fake");
-  const recordsAt = n.word("dip-ex", "only records what it was asked to send");
-  const checksAt = n.word("dip-ex", "checks the message with no mail server");
+  const testAt = n.word("dip-test", "A test hands it a fake");
+  const recordsAt = n.word("dip-test", "only records what it was asked to send");
+  const checksAt = n.word("dip-test", "checks the message with no mail server");
   const lampAt = n.word("dip-plug", "a lamp with a plug");
   const socketAt = n.word("dip-plug", "The socket is the abstraction");
   const fitsAt = n.word("dip-plug", "anything that fits it works");
@@ -54,7 +54,9 @@ export const DipScene: React.FC = () => {
   const shapeAt = n.word("dip-arrows", "the emailer fits the shape");
   const askedAt = n.word("dip-arrows", "the confirmation asked for");
   const policyAt = n.word("dip-arrows", "Policy stops depending on detail");
-  const end = n.beat("dip-arrows").to;
+  const injectionAt = n.word("dip-di", "Injection is just how");
+  const ownsAt = n.word("dip-di", "the inversion is that the confirmation owns the interface");
+  const end = n.beat("dip-di").to;
 
   const top = y(CONF.top);
   const mid = top + CONF.h / 2;
@@ -68,7 +70,7 @@ export const DipScene: React.FC = () => {
   const socketLit = pulse(frame, socketAt + 4, 30) + pulse(frame, fitsAt, 24);
 
   // Before and after.
-  const rowTop = y(744);
+  const rowTop = y(724);
   const rowH = 60;
   const rowMid = rowTop + rowH / 2;
   const B = { conf: { x: X0, w: 250 }, email: { x: 520, w: 200 } };
@@ -129,7 +131,7 @@ export const DipScene: React.FC = () => {
         <Line x={dockX} y={mid - PLUG.h / 2 - 40} at={testAt + 8} size={21} color={INK_SOFT} weight={500}>
           in a test
         </Line>
-        <Box x={lerp(HOME_X, dockX, emailIn)} y={emailY} w={PLUG.w} h={PLUG.h} at={passedAt + 4} title="Email sender" sub={frame < emailAt ? "the concrete piece" : undefined} subSize={20} tone="data" dim={testAt + 6} />
+        <Box x={lerp(HOME_X, dockX, emailIn)} y={emailY} w={PLUG.w} h={PLUG.h} at={passedAt + 4} title="Email sender" sub={frame < emailAt ? "the concrete piece" : undefined} subSize={20} tone="data" dim={testAt + 6} out={inversionAt} />
         <Box x={lerp(HOME_X, dockX, fakeIn)} y={fakeY} w={PLUG.w} h={PLUG.h} at={testAt + 2} title="Recording fake" tone="data" />
 
         {/* What the fake recorded. */}
@@ -153,7 +155,7 @@ export const DipScene: React.FC = () => {
           before
         </Line>
         <Box x={B.conf.x} y={rowTop} w={B.conf.w} h={rowH} at={inversionAt} title="Confirmation" size={23} tones={[[noLongerAt + 10, "bad"]]} />
-        <Box x={B.email.x} y={rowTop} w={B.email.w} h={rowH} at={inversionAt + 4} title="Emailer" size={23} />
+        <Box x={B.email.x} y={rowTop} w={B.email.w} h={rowH} at={inversionAt + 4} title="Email sender" size={23} />
         <Flow points={[[B.conf.x + B.conf.w + 6, rowMid], [B.email.x - 8, rowMid]]} at={inversionAt + 8} color={frame >= noLongerAt + 10 ? ACCENT : INK} />
         <Mark2 at={noLongerAt + 12} kind="cross" size={30} style={{ left: (B.conf.x + B.conf.w + B.email.x) / 2 - 15, top: rowMid - 50 }} />
 
@@ -164,7 +166,7 @@ export const DipScene: React.FC = () => {
         <Box x={A.conf.x} y={rowTop} w={A.conf.w} h={rowH} at={noLongerAt + 4} title="Confirmation" size={23} tone="ok" />
         <Box x={A.shape.x} y={rowTop} w={A.shape.w} h={rowH} at={askedAt - 4} title="sends a message" size={22} tone="ok" dashed lit={pulse(frame, askedAt + 4, 20)} />
         <Flow points={[[A.conf.x + A.conf.w + 4, rowMid], [A.shape.x - 6, rowMid]]} at={askedAt} head={0} color={OK} width={3} />
-        <Box x={A.email.x} y={rowTop} w={A.email.w} h={rowH} at={shapeAt - 4} title="Emailer" size={23} />
+        <Box x={A.email.x} y={rowTop} w={A.email.w} h={rowH} at={shapeAt - 4} title="Email sender" size={23} />
         <Flow points={[[A.email.x - 6, rowMid], [A.shape.x + A.shape.w + 8, rowMid]]} at={shapeAt + 4} color={OK} />
         <div
           style={{
@@ -179,6 +181,14 @@ export const DipScene: React.FC = () => {
             opacity: ease(frame, askedAt + 8, 12),
           }}
         />
+        {/* Injection against inversion: how the piece gets in, and who owns
+            the shape it fits. */}
+        <Line x={X0} y={rowTop + rowH + 78} at={injectionAt} size={24} weight={500}>
+          Injection: how the sender gets in.
+          <span style={{ opacity: ease(frame, ownsAt, 10) }}>
+            {" "}Inversion: <Mark at={ownsAt + 6}>the confirmation owns the interface</Mark>.
+          </span>
+        </Line>
         {[
           { x: B.conf.x + B.conf.w / 2, t: "policy" },
           { x: B.email.x + B.email.w / 2, t: "detail" },

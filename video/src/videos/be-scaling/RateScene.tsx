@@ -15,30 +15,40 @@ const AX = { x0: 440, k: 11, y: 420 };
 const CELL = 26;
 const CELL_GAP = 4;
 const MINUTE_X = AX.x0 + 60 * AX.k;
-const A_X = MINUTE_X - 12 - 10 * (CELL + CELL_GAP);
+/** Each group of ten arrives at one instant (59 s, 61 s), so it is drawn as a
+ *  block of two rows of five against the minute line, not spread along the
+ *  time axis, where a row of ten would read as requests from 33 s to 59 s. */
+const GROUP_COLS = 5;
+const A_X = MINUTE_X - 12 - GROUP_COLS * (CELL + CELL_GAP);
 const B_X = MINUTE_X + 14;
 const NOTE_X = 1450;
 const ROWS = [520, 606, 692, 778];
-const GAUGE_X = 720;
+const GAUGE_X = 860;
 
-/** One request's cell: green if it passed, red if refused. */
-const Cells: React.FC<{ cells: readonly RateCell[]; top: number; at: number; bAt: number; out?: number }> = ({ cells, top, at, bAt, out }) => {
+/** One request's cell: green if it passed, red if refused. The second ten's
+ *  refusals may come in on their own cue (`noAt`). */
+const Cells: React.FC<{ cells: readonly RateCell[]; top: number; at: number; bAt: number; noAt?: number; out?: number }> = ({ cells, top, at, bAt, noAt, out }) => {
   const frame = useCurrentFrame();
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (o >= 1) return null;
   return (
     <>
       {cells.map((c, i) => {
-        const p = ease(frame, i < 10 ? at + i * 2 : bAt + (i - 10) * 2, 6);
+        const k = i % 10;
+        const second = i >= 10;
+        const cue = !second ? at + k * 2 : !c.ok && noAt !== undefined ? noAt + k * 2 : bAt + k * 2;
+        const p = ease(frame, cue, 6);
         if (p <= 0) return null;
-        const x = i < 10 ? A_X + i * (CELL + CELL_GAP) : B_X + (i - 10) * (CELL + CELL_GAP);
+        const col = k % GROUP_COLS;
+        const row = Math.floor(k / GROUP_COLS);
+        const x = (second ? B_X : A_X) + col * (CELL + CELL_GAP);
         return (
           <div
             key={i}
             style={{
               position: "absolute",
               left: x,
-              top,
+              top: top - 15 + row * (CELL + CELL_GAP),
               width: CELL,
               height: CELL,
               borderRadius: 5,
@@ -104,13 +114,16 @@ export const RateScene: React.FC = () => {
   const constantAt = n.word("q9-leaky", "at a constant rate");
   const smoothAt = n.word("q9-leaky", "a smooth stream");
   const waitsAt = n.word("q9-leaky", "a burst waits its turn");
+  const restAt = n.word("q9-full", "the rest are refused");
   const followAt = n.word("q9-shared", "The follow-up is where the count lives");
   const fourAt = n.word("q9-shared", "With four app servers");
   const ownAt = n.word("q9-shared", "each keeping its own bucket");
   const handsAt = n.word("q9-shared", "round-robin hands one client four buckets");
   const fourTimesAt = n.word("q9-shared", "four times the limit");
   const shareAt = n.word("q9-shared", "The count belongs in a store they all share");
-  const end = n.beat("q9-shared").to;
+  const atomicAt = n.word("q9-atomic", "one atomic step");
+  const lastAt = n.word("q9-atomic", "both take the last token");
+  const end = n.beat("q9-atomic").to;
 
   const ax = (t: number) => AX.x0 + t * AX.k;
   const axY = y(AX.y);
@@ -129,6 +142,8 @@ export const RateScene: React.FC = () => {
   const srvX = (i: number) => X0 + i * 190;
   const shX = (i: number) => 1010 + i * 196;
   const sharedBox = { x: 1180, w: 420, top: y(612), h: 62 };
+  /** Where each server's connector drops into the shared bucket. */
+  const DROP_X = [1236, 1336, 1440, 1544];
 
   return (
     <AbsoluteFill>
@@ -142,9 +157,11 @@ export const RateScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={spendAt} level={-32} />
       <Sfx name="el-tap" at={tooManyAt} level={-30} />
       <Sfx name="el-sprinkle" at={leakyAt + 4} level={-32} />
+      <Sfx name="el-tap" at={restAt} level={-30} />
       <Sfx name="el-sprinkle" at={handsAt} level={-32} />
       <Sfx name="el-tap" at={fourTimesAt} level={-30} />
       <Sfx name="el-sprinkle" at={shareAt + 6} level={-32} />
+      <Sfx name="el-pencil" at={atomicAt + 2} level={-35} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE} width={Q_W}>
@@ -172,7 +189,7 @@ export const RateScene: React.FC = () => {
           ))}
           {/* The minute boundary, down through the rows. */}
           <line x1={MINUTE_X} x2={MINUTE_X} y1={axY - 120} y2={axY + 6} stroke={INK_SOFT} strokeWidth={1.6} strokeDasharray="6 6" />
-          <line x1={MINUTE_X} x2={MINUTE_X} y1={axY + 46} y2={axY + 46 + (rowY(3) + 4 - axY) * ease(frame, fixedAt, 20)} stroke={INK_SOFT} strokeWidth={1.6} strokeDasharray="6 6" />
+          <line x1={MINUTE_X} x2={MINUTE_X} y1={axY + 46} y2={axY + 46 + (rowY(3) + 44 - axY) * ease(frame, fixedAt, 20)} stroke={INK_SOFT} strokeWidth={1.6} strokeDasharray="6 6" />
           {/* Two stacks of ten requests. */}
           {Array.from({ length: 20 }, (_, i) => {
             const at = i < 10 ? fiftyNineAt + i * 1.5 : sixtyOneAt + (i - 10) * 1.5;
@@ -207,7 +224,7 @@ export const RateScene: React.FC = () => {
         <Cells cells={RATE.fixed.cells} top={rowY(0)} at={fixedAt + 4} bAt={twentyAt} out={rowsOut} />
         <Cells cells={RATE.sliding.cells} top={rowY(1)} at={slidingAt + 4} bAt={refusesAt} out={rowsOut} />
         <Cells cells={RATE.token.cells} top={rowY(2)} at={spendAt} bAt={secondAt} out={rowsOut} />
-        <Cells cells={RATE.leaky.cells} top={rowY(3)} at={leakyAt + 4} bAt={waitsAt} out={rowsOut} />
+        <Cells cells={RATE.leaky.cells} top={rowY(3)} at={leakyAt + 4} bAt={waitsAt} noAt={restAt} out={rowsOut} />
         <Gauge x={GAUGE_X} top={rowY(2) - 14} level={tokenLevel} max={10} color={BAR} opacity={ease(frame, tokenAt, 10) * (1 - ease(frame, rowsOut, 10))} />
         <Gauge x={GAUGE_X} top={rowY(3) - 14} level={leakyLevel} max={10} color={BAR} opacity={ease(frame, leakyAt, 10) * (1 - ease(frame, rowsOut, 10))} />
         {/* The leak: one drop every six seconds, at the video's pace. */}
@@ -254,6 +271,9 @@ export const RateScene: React.FC = () => {
         <Line at={waitsAt} x={NOTE_X} y={rowY(3) + 28} size={20} color={INK_SOFT} out={rowsOut}>
           <Num>{RATE.leaky.accepted}</Num> queued: one had drained by 61 s
         </Line>
+        <Line at={restAt} x={NOTE_X} y={rowY(3) + 58} size={20} weight={500} color={ACCENT_INK} out={rowsOut}>
+          queue full: the other <Num>{RATE.trace.length - RATE.leaky.accepted}</Num> refused
+        </Line>
 
         {/* ── The follow-up: each server its own bucket, or one shared. ── */}
         <Line at={fourAt} x={X0} y={y(330)} size={23} weight={500}>
@@ -283,7 +303,9 @@ export const RateScene: React.FC = () => {
         {[0, 1, 2, 3].map((i) => (
           <React.Fragment key={i}>
             <Node x={shX(i)} y={y(390)} w={160} h={58} at={shareAt + 2 + i * 2} tone="plain" title={`server ${i + 1}`} size={21} />
-            <Flow points={[[shX(i) + 80, y(390) + 64], [shX(i) + 80, y(390) + 84], [sharedBox.x + sharedBox.w / 2 + (i - 1.5) * 60, y(390) + 84], [sharedBox.x + sharedBox.w / 2 + (i - 1.5) * 60, sharedBox.top - 8]]} at={shareAt + 8 + i * 2} color={OK} width={2} head={11} />
+            {/* Each connector lands on its own stretch of the bucket's top, so no
+                run passes through another's corner. */}
+            <Flow points={[[shX(i) + 80, y(390) + 64], [shX(i) + 80, y(390) + 84 + [24, 0, 0, 24][i]], [DROP_X[i], y(390) + 84 + [24, 0, 0, 24][i]], [DROP_X[i], sharedBox.top - 8]]} at={shareAt + 8 + i * 2} color={OK} width={2} head={11} />
           </React.Fragment>
         ))}
         <Node x={sharedBox.x} y={sharedBox.top} w={sharedBox.w} h={sharedBox.h} at={shareAt + 10} tone="ok" title="one shared bucket" size={22} />
@@ -295,6 +317,10 @@ export const RateScene: React.FC = () => {
         </div>
         <Line at={shareAt + 30} x={1010} y={sharedBox.top + sharedBox.h + 30 + 2 * (CELL + CELL_GAP) + 22} size={23} weight={500} color={OK_INK}>
           <Num>{RATE.sharedOk}</Num> pass
+        </Line>
+        <Line at={atomicAt} x={1010} y={sharedBox.top + sharedBox.h + 30 + 2 * (CELL + CELL_GAP) + 66} size={21} weight={500} color={INK}>
+          check and spend in <Mark at={atomicAt + 2}>one atomic step</Mark>
+          <span style={{ color: INK_SOFT, opacity: ease(frame, lastAt, 10) }}>, or two servers take the last token</span>
         </Line>
       </Drift>
     </AbsoluteFill>

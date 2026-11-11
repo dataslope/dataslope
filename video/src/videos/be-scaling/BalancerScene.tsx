@@ -98,7 +98,9 @@ export const BalancerScene: React.FC = () => {
   const pointsAt = n.word("q2-ring", "a hundred points a server");
   const twentyAt = n.word("q2-ring", "only twenty-three percent move");
   const newAt = n.word("q2-ring", "all of them to the new server");
-  const end = n.beat("q2-ring").to;
+  const clockAt = n.word("q2-clock", "the next point clockwise");
+  const justAt = n.word("q2-clock", "take only the keys just before them");
+  const end = n.beat("q2-clock").to;
 
   const phaseOut = whyAt - 4;
   const lbMid = y(LB.mid);
@@ -342,14 +344,23 @@ export const BalancerScene: React.FC = () => {
             );
           })}
         </Svg>
-        <Ink at={ringAt + 6} dur={14} style={{ left: RING.cx - 110, top: ringCy - 34, width: 220, textAlign: "center" }}>
-          <span style={{ ...note(20, INK_SOFT) }}>
-            a key goes to the next
+        <Ink at={clockAt} dur={14} style={{ left: RING.cx - 110, top: ringCy - 34, width: 220, textAlign: "center" }}>
+          <span style={{ ...note(21, INK), fontWeight: 500 }}>
+            <Mark at={clockAt + 2}>a key goes to the next</Mark>
             <br />
-            point clockwise
+            <Mark at={clockAt + 6}>point clockwise</Mark>
           </span>
         </Ink>
-        {/* Which color is which server. */}
+        <Line at={justAt} x={RING.cx - RING.r - 24} y={y(GRID_TOP) + 416} size={21} weight={500} color={INK_SOFT}>
+          a new point takes only the keys just before it
+        </Line>
+        {/* Which color is which server, and what a faded square means. */}
+        <Ink at={sevAt} dur={12} style={{ left: 1580, top: y(GRID_TOP) + 40 + 4 * 40 + 14, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, fontWeight: 500 }}>
+            <span style={{ width: 20, height: 20, borderRadius: 4, background: SERVER[1], opacity: 0.2 }} />
+            faded: did not move
+          </span>
+        </Ink>
         {[0, 1, 2, 3].map((s) => {
           const at = s < 3 ? simAt + 8 + s * 3 : fourthAt;
           return (

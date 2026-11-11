@@ -5,12 +5,12 @@ import { during, ease } from "../../components/motion";
 import { OK, OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Badge, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { ISOLATION } from "./data";
-import { DataTable, Drift, Listing, Svg, tableGeometry, X0 } from "./parts";
+import { DataTable, Drift, Listing, Spot, Svg, tableGeometry, X0 } from "./parts";
 
 const GRID_HIGH = 318;
 const GRID_LOW = 566;
@@ -27,6 +27,8 @@ const LEVELS = ["read uncommitted", "read committed", "repeatable read", "serial
  *  wide): 8px of yellow on either side of the words, not cut off at the d. */
 const DEFAULT_MARK_W = 194;
 const ANOMALIES = ["dirty read", "non-repeatable", "phantom"];
+/** "possible" at 22px (Inter, weight 400): about 91px. */
+const POSSIBLE_W = 92;
 /** The SQL standard's table: which anomaly each level allows. */
 const ALLOWS = [
   [true, true, true],
@@ -123,10 +125,15 @@ export const IsoScene: React.FC = () => {
   const pgRrAt = n.word("anomalies-phantom", "Postgres's repeatable read already does");
   const serialAt = n.word("anomalies-serial", "Serializable promises");
   const orderAt = n.word("anomalies-serial", "some one-at-a-time order");
-  const exchangeAt = n.word("anomalies-serial", "In exchange");
-  const failureAt = n.word("anomalies-serial", "a serialization failure");
-  const retriedAt = n.word("anomalies-serial", "to be retried");
-  const end = n.beat("anomalies-serial").to;
+  const skewAt = n.word("anomalies-skew", "That stops write skew");
+  const rrAllowsAt = n.word("anomalies-skew", "which repeatable read allows");
+  const checkAt = n.word("anomalies-skew", "each check a rule");
+  const changeAt = n.word("anomalies-skew", "each change a different row");
+  const breakAt = n.word("anomalies-skew", "together they break it");
+  const exchangeAt = n.word("anomalies-abort", "In exchange");
+  const failureAt = n.word("anomalies-abort", "a serialization failure");
+  const retriedAt = n.word("anomalies-abort", "to be retried");
+  const end = n.beat("anomalies-abort").to;
 
   // ── The grid: high for question 8, low once the lanes need the top ──
   const move = ease(frame, q9At - 2, 24);
@@ -155,17 +162,24 @@ export const IsoScene: React.FC = () => {
   // Postgres's default, from SHOW.
   const showG = tableGeometry({ x: R_X, top: y(540) + h(10), cols: [{ name: "default_transaction_isolation" }], rows: [[ISOLATION.default]], headH: h(44), rowH: h(50), headSize: 20, bodySize: 24 });
 
-  // Serializable's retry: a curve from the failed commit back to the start.
-  const failX = tx(0.72);
+  // Serializable's retry: a curve from the failed commit back to the start,
+  // landing above BEGIN's label rather than on it.
+  const beginX = tx(0.04);
+  const failX = tx(0.76);
   const retry: Pt[] = sampleCubic([
-    [failX - 10, laneA - 44],
-    [failX - 160, laneA - 84],
-    [tx(0.06) + 120, laneA - 84],
-    [tx(0.06) + 4, laneA - 42],
+    [failX - 10, laneA - 48],
+    [failX - 160, laneA - 96],
+    [beginX + 150, laneA - 96],
+    [beginX + 30, laneA - 62],
   ]);
 
-  const strikeRu = ease(frame, evenAt + 4, 12);
-  const strikeRr = ease(frame, pgRrAt + 2, 12);
+  // Where Postgres is stricter than the standard: a badge beside the
+  // standard's "possible", which stays as the standard has it.
+  const pgRu = ease(frame, evenAt + 4, 12);
+  const pgRr = ease(frame, pgRrAt + 2, 12);
+  // Question 8: the anomalies a level is defined by, named early and grey.
+  const defined = ease(frame, definedAt, 14);
+  const ruleW = LEVEL_W + 120 + (3 * COL_W - 120) * Math.max(move, defined);
 
   return (
     <AbsoluteFill>
@@ -185,7 +199,11 @@ export const IsoScene: React.FC = () => {
       <Sfx name="el-scratch" at={failureAt + 2} level={-32} />
       <Sfx name="el-pencil" at={retriedAt} level={-35} />
 
+      <Sfx name="el-pop" at={fourAt + 6} level={-32} />
       <Drift from={from} to={end + 40}>
+        {/* Four levels, as four steps: Question 8's spot, gone when 9's grid
+            comes down into its space. */}
+        <Spot art="steps" at={fourAt + 6} out={q9At - 8} left={720} top={y(620)} width={220} />
         <QuestionCard n={8} at={q8At - 4} textAt={text8At - 4} out={q9At - 6} size={58}>
           What are the SQL isolation levels?
         </QuestionCard>
@@ -195,14 +213,14 @@ export const IsoScene: React.FC = () => {
 
         {/* ── The grid ── */}
         <Svg>
-          <g opacity={ease(frame, threeAt - 4, 12)}>
+          <g opacity={Math.max(0.5 * defined, ease(frame, threeAt - 4, 12))}>
             {ANOMALIES.map((a, j) => (
               <text key={a} x={colX(j)} y={gridTop + headH - 14} style={svgText(label(21, INK_SOFT))}>
                 {a}
               </text>
             ))}
           </g>
-          <line x1={X0} y1={gridTop + headH} x2={X0 + (LEVEL_W + 120 + (3 * COL_W - 120) * move) * ease(frame, fourAt, 14)} y2={gridTop + headH} stroke={INK} strokeWidth={2} opacity={ease(frame, fourAt, 8)} />
+          <line x1={X0} y1={gridTop + headH} x2={X0 + ruleW * ease(frame, fourAt, 14)} y2={gridTop + headH} stroke={INK} strokeWidth={2} opacity={ease(frame, fourAt, 8)} />
           {/* The cell the narration is on, banded behind its word. */}
           {[
             { i: 1, j: 1, from: rcAllowsAt, to: rrPreventsAt, color: ACCENT },
@@ -213,6 +231,8 @@ export const IsoScene: React.FC = () => {
             if (p <= 0) return null;
             return <rect key={k} x={colX(r.j) - 8} y={rowY(r.i) + 10} width={COL_W - 90} height={rowH - 20} rx={3} fill={`color-mix(in srgb, ${r.color} 22%, transparent)`} opacity={p} />;
           })}
+          {/* Write skew: repeatable read lets it through. */}
+          <rect x={X0 - 8} y={rowY(2) + 8} width={LEVEL_W - 70} height={rowH - 16} rx={4} fill={`color-mix(in srgb, ${ACCENT} 22%, transparent)`} opacity={during(frame, rrAllowsAt, exchangeAt, 8)} />
           {LEVELS.map((lv, i) => {
             const p = ease(frame, levelAt[i], 12);
             if (p <= 0) return null;
@@ -223,7 +243,7 @@ export const IsoScene: React.FC = () => {
               <g key={lv} opacity={p}>
                 {serial > 0 ? <rect x={X0 - 10} y={yy + 6} width={gridW + 10} height={rowH - 12} rx={5} fill={`color-mix(in srgb, ${OK} ${20 * serial}%, transparent)`} /> : null}
                 {isDefault > 0 ? <rect x={X0 - 8} y={yy + 8} width={DEFAULT_MARK_W} height={rowH - 16} rx={4} fill={HIGHLIGHT} opacity={isDefault} /> : null}
-                <line x1={X0} y1={yy + rowH} x2={X0 + LEVEL_W + 120 + (3 * COL_W - 120) * move} y2={yy + rowH} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} />
+                <line x1={X0} y1={yy + rowH} x2={X0 + ruleW} y2={yy + rowH} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} />
                 <text x={X0} y={yy + rowH / 2 + 8} style={svgText({ ...note(23, INK), fontWeight: 500 })}>
                   {lv}
                 </text>
@@ -235,22 +255,12 @@ export const IsoScene: React.FC = () => {
                 {ALLOWS[i].map((allowed, j) => {
                   const cp = ease(frame, colAt[j] + 6 + i * 3, 10);
                   if (cp <= 0) return null;
-                  const struck = (i === 0 && j === 0 && strikeRu) || (i === 2 && j === 2 && strikeRr) || 0;
                   const word = allowed ? "possible" : "prevented";
-                  const w = word.length * 11.6;
                   return (
                     <g key={j} opacity={cp}>
                       <text x={colX(j)} y={yy + rowH / 2 + 8} style={svgText(note(22, allowed ? ACCENT_INK : OK_INK))}>
                         {word}
                       </text>
-                      {struck > 0 ? (
-                        <>
-                          <line x1={colX(j) - 4} x2={colX(j) - 4 + (w + 8) * struck} y1={yy + rowH / 2 + 1} y2={yy + rowH / 2 - 1} stroke={ACCENT} strokeWidth={3} />
-                          <text x={colX(j) + w + 14} y={yy + rowH / 2 + 8} style={svgText({ ...note(22, OK_INK), fontWeight: 500 })} opacity={struck}>
-                            Postgres: no
-                          </text>
-                        </>
-                      ) : null}
                     </g>
                   );
                 })}
@@ -258,6 +268,22 @@ export const IsoScene: React.FC = () => {
             );
           })}
         </Svg>
+
+        {[
+          { i: 0, j: 0, p: pgRu },
+          { i: 2, j: 2, p: pgRr },
+        ].map((b) =>
+          b.p > 0 ? (
+            <div
+              key={`${b.i}-${b.j}`}
+              style={{ position: "absolute", left: colX(b.j) + POSSIBLE_W + 12, top: rowY(b.i), height: rowH, display: "flex", alignItems: "center", opacity: b.p }}
+            >
+              <Badge tone="yellow" size={20}>
+                Postgres: no
+              </Badge>
+            </div>
+          ) : null,
+        )}
 
         {/* ── Question 8's notes: what defines a level, and the default ── */}
         <Note at={definedAt} x={R_X} y={y(GRID_HIGH) + h(8)} out={q9At - 6}>
@@ -323,16 +349,26 @@ export const IsoScene: React.FC = () => {
           <Event x={tx(0.8)} y={laneA} at={newRowsAt - 6} out={phase.phantom.out} text="the same SELECT" color={BLUE_INK} />
           <Value x={tx(0.8)} y={laneA} at={newRowsAt} out={phase.phantom.out} value="3 rows" color={ACCENT_INK} w={100} />
 
-          {/* Serializable: a transaction aborted, and retried. */}
-          <Event x={tx(0.06)} y={laneA} at={serialAt + 4} out={phase.serial.out} text="BEGIN" color={INK} />
-          <Event x={tx(0.3)} y={laneA} at={orderAt} out={phase.serial.out} text="UPDATE" color={BLUE_INK} />
-          <Event x={tx(0.2)} y={laneB} at={orderAt + 4} out={phase.serial.out} text="UPDATE" color={BLUE_INK} />
-          <Event x={tx(0.5)} y={laneB} at={exchangeAt} out={phase.serial.out} text="COMMIT" color={OK_INK} />
+          {/* Serializable: write skew. Both check the rule, each takes a
+              different doctor off call; Postgres aborts one, which retries. */}
+          <text x={X0} y={laneA - 74} style={svgText(note(21, INK_SOFT))} opacity={ease(frame, checkAt - 4, 10) * (1 - ease(frame, phase.serial.out, 8))}>
+            rule: one doctor stays on call
+          </text>
+          <Event x={beginX} y={laneA} at={serialAt + 4} out={phase.serial.out} text="BEGIN" color={INK} />
+          <Event x={beginX} y={laneB} at={orderAt} out={phase.serial.out} text="BEGIN" color={INK} />
+          <Event x={tx(0.2)} y={laneA} at={checkAt} out={phase.serial.out} text="SELECT → 2 on call" color={BLUE_INK} />
+          <Event x={tx(0.25)} y={laneB} at={checkAt + 4} out={phase.serial.out} text="SELECT → 2 on call" color={BLUE_INK} />
+          <Event x={tx(0.44)} y={laneA} at={changeAt} out={phase.serial.out} text="UPDATE doctor A" color={BLUE_INK} />
+          <Event x={tx(0.49)} y={laneB} at={changeAt + 4} out={phase.serial.out} text="UPDATE doctor B" color={BLUE_INK} />
+          <text x={T1} y={laneB + 44} textAnchor="end" style={svgText({ ...note(21, ACCENT_INK), fontWeight: 500 })} opacity={ease(frame, breakAt, 10) * (1 - ease(frame, exchangeAt, 10))}>
+            under repeatable read, both commit: nobody on call
+          </text>
+          <Event x={tx(0.62)} y={laneB} at={exchangeAt} out={phase.serial.out} text="COMMIT" color={OK_INK} />
           <Event x={failX} y={laneA} at={failureAt - 2} out={phase.serial.out} text="serialization failure" color={ACCENT_INK} />
           <g opacity={ease(frame, retriedAt, 10)}>
             <path d={`M${retry.map(([a, b]) => `${a},${b}`).join(" L")}`} fill="none" stroke={OK} strokeWidth={2.6} pathLength={1} strokeDasharray={`${ease(frame, retriedAt, 18)} 1`} />
             <path d={arrowHead(retry, 13, 7, { filled: true })} fill={OK} opacity={ease(frame, retriedAt + 14, 5)} />
-            <text x={(failX + tx(0.06)) / 2} y={laneA - 90} textAnchor="middle" style={svgText({ ...label(21, OK_INK), fontWeight: 500 })}>
+            <text x={(failX + beginX) / 2} y={laneA - 106} textAnchor="middle" style={svgText({ ...label(21, OK_INK), fontWeight: 500 })}>
               retry
             </text>
           </g>
@@ -343,12 +379,13 @@ export const IsoScene: React.FC = () => {
           { at: dirtyAt, out: phase.dirty.out, head: "Dirty read", body: "sees another transaction's change before it commits", foot: { at: neverAt, text: "Postgres never shows one: its read uncommitted acts as read committed" } },
           { at: nonrepAt, out: phase.nonrep.out, head: "Non-repeatable read", body: "the same row, read twice, differs: a commit landed in between" },
           { at: phantomAt, out: phase.phantom.out, head: "Phantom", body: "a rerun query matches new rows another transaction inserted", foot: { at: pgRrAt, text: "Postgres's repeatable read already stops phantoms" } },
-          { at: serialAt, out: phase.serial.out, head: "Serializable", body: "the outcome of some one-at-a-time order", foot: { at: exchangeAt, text: "may abort a transaction: catch the failure and retry" } },
+          { at: serialAt, out: phase.serial.out, head: "Serializable", body: "the outcome of some one-at-a-time order", mid: { at: skewAt, text: "also stops write skew, which repeatable read allows" }, foot: { at: exchangeAt, text: "may abort: catch it and retry" } },
         ].map((d) => (
           <Note key={d.head} at={d.at} x={R_X} y={y(GRID_LOW) + h(14)} out={d.out}>
             <div style={{ width: 520 }}>
               <div style={{ ...note(24, INK), fontWeight: 500 }}>{d.head}</div>
               <div style={{ ...note(23, INK), marginTop: h(8) }}>{d.body}</div>
+              {"mid" in d && d.mid ? <div style={{ ...note(23, INK), marginTop: h(8), opacity: ease(frame, d.mid.at, 10) }}>{d.mid.text}</div> : null}
               {d.foot ? <div style={{ ...note(22, OK_INK), fontWeight: 500, marginTop: h(14), opacity: ease(frame, d.foot.at, 10) }}>{d.foot.text}</div> : null}
             </div>
           </Note>

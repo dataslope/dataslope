@@ -75,7 +75,7 @@ export const BlockScene: React.FC = () => {
   const stalled = ease(frame, stallsAt, 10) * (1 - flow);
   const callX = lerp(AXIS.x, POOL.x + 24, moved);
   const callY = lerp(laneY, y(POOL.y) + h(46), moved);
-  const callText = frame >= heavyAt ? "a heavy computation" : frame >= httpAt ? "a sync HTTP request" : "time.sleep(…)";
+  const callText = frame >= heavyAt ? "a heavy computation" : frame >= httpAt ? "a sync HTTP request" : "a blocking sleep";
 
   return (
     <AbsoluteFill>
@@ -216,7 +216,7 @@ export const BlockScene: React.FC = () => {
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>await its result: the loop runs on</span>
         </Note>
         <Note at={poolAt + 6} x={POOL.x} y={y(POOL.y + POOL.h) + h(14)}>
-          <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK_SOFT, whiteSpace: "nowrap" }}>loop.run_in_executor(…)</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>runs off the loop&apos;s thread; the loop doesn&apos;t wait</span>
         </Note>
         <Note at={libsAt} x={POOL.x} y={y(612)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The fix: async-native libraries, or</span>

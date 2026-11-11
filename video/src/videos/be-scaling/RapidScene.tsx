@@ -114,45 +114,68 @@ const Consist: React.FC<{ c: Ctx }> = ({ c }) => {
   const lineY = c.y(560);
   const x0 = R_X + 40;
   const x1 = 1760;
-  const marks = [
-    { x: x0, t: "eventual", at: eventualAt, sub: "replicas converge once writes stop", sub2: "a read can be stale meanwhile", sub2At: staleAt },
-    { x: x0 + (x1 - x0) * 0.36, t: "read-your-writes", at: ryAt, sub: "the fix from question 5", sub2: "", sub2At: ryAt },
-    { x: x0 + (x1 - x0) * 0.68, t: "monotonic reads", at: monoAt, sub: "time never goes backwards", sub2: "", sub2At: backAt },
-    { x: x1, t: "strong", at: strongAt, sub: "every read reflects", sub2: "the latest write", sub2At: strongAt + 6 },
+  const mid = (x0 + x1) / 2;
+  // The two ends are ordered; the two session guarantees between them are
+  // not ordered against each other (neither implies the other), so they
+  // share one point, stacked, under one label.
+  const ends = [
+    { x: x0, t: "eventual", at: eventualAt, sub: "replicas converge once writes stop", sub2: "a read can be stale meanwhile", sub2At: staleAt, align: "left" as const },
+    { x: x1, t: "strong", at: strongAt, sub: "every read reflects", sub2: "the latest write", sub2At: strongAt + 6, align: "right" as const },
+  ];
+  const session = [
+    { t: "read-your-writes", at: ryAt, sub: "the fix from question 5", subAt: ryAt },
+    { t: "monotonic reads", at: monoAt, sub: "time never goes backwards", subAt: backAt },
   ];
   const lineP = ease(frame, strongAt - 6, 18);
+  const midP = ease(frame, ryAt, 12);
   return (
     <>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: lineP }}>
         <line x1={x0} x2={x1} y1={lineY} y2={lineY} stroke={INK_SOFT} strokeWidth={3} strokeLinecap="round" />
       </svg>
-      {marks.map((m, i) => {
+      {ends.map((m, i) => {
         const p = ease(frame, m.at, 12);
         if (p <= 0) return null;
-        const align = i === 0 ? "left" : i === 3 ? "right" : "center";
-        const left = i === 0 ? m.x - 10 : i === 3 ? m.x - 300 : m.x - 150;
+        const left = m.align === "left" ? m.x - 10 : m.x - 300;
         return (
           <React.Fragment key={i}>
-            <div style={{ position: "absolute", left: m.x - 11, top: lineY - 11, width: 22, height: 22, borderRadius: 11, background: i === 0 || i === 3 ? INK : BAR, opacity: p, border: `3px solid ${PAPER}`, boxSizing: "border-box" }} />
-            <div style={{ position: "absolute", left, top: lineY - 64, width: 300, textAlign: align, opacity: p, ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <div style={{ position: "absolute", left: m.x - 11, top: lineY - 11, width: 22, height: 22, borderRadius: 11, background: INK, opacity: p, border: `3px solid ${PAPER}`, boxSizing: "border-box" }} />
+            <div style={{ position: "absolute", left, top: lineY - 64, width: 300, textAlign: m.align, opacity: p, ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               {m.t}
             </div>
-            <div style={{ position: "absolute", left, top: lineY + (i === 1 || i === 2 ? 92 : 28), width: 300, textAlign: align, opacity: p, ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
+            <div style={{ position: "absolute", left, top: lineY + 28, width: 300, textAlign: m.align, opacity: p, ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
               {m.sub}
             </div>
-            {m.sub2 ? (
-              <div style={{ position: "absolute", left, top: lineY + 58, width: 300, textAlign: align, opacity: ease(frame, m.sub2At, 10), ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
-                {m.sub2}
-              </div>
-            ) : null}
+            <div style={{ position: "absolute", left, top: lineY + 58, width: 300, textAlign: m.align, opacity: ease(frame, m.sub2At, 10), ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
+              {m.sub2}
+            </div>
           </React.Fragment>
         );
       })}
+      {midP > 0 ? (
+        <>
+          <div style={{ position: "absolute", left: mid - 0.75, top: lineY + 14, width: 1.5, height: 68, background: INK_SOFT, opacity: 0.5 * midP }} />
+          <div style={{ position: "absolute", left: mid - 11, top: lineY - 11, width: 22, height: 22, borderRadius: 11, background: BAR, opacity: midP, border: `3px solid ${PAPER}`, boxSizing: "border-box" }} />
+          <div style={{ position: "absolute", left: mid - 150, top: lineY - 60, width: 300, textAlign: "center", opacity: midP, ...label(23, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+            session guarantees
+          </div>
+        </>
+      ) : null}
+      {session.map((m, i) => (
+        <React.Fragment key={m.t}>
+          <div style={{ position: "absolute", left: mid - 150, top: lineY + 92 + i * 74, width: 300, textAlign: "center", opacity: ease(frame, m.at, 12), ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            {m.t}
+          </div>
+          <div style={{ position: "absolute", left: mid - 150, top: lineY + 124 + i * 74, width: 300, textAlign: "center", opacity: ease(frame, m.subAt, 10), ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
+            {m.sub}
+          </div>
+        </React.Fragment>
+      ))}
       {/* What each end suits. */}
-      <Ink at={feedAt} dur={12} style={{ left: x0 - 10, top: lineY + c.h(150), whiteSpace: "nowrap" }}>
+      <Ink at={feedAt} dur={12} style={{ left: x0 - 10, top: lineY + c.h(250), whiteSpace: "nowrap" }}>
         <span style={{ ...note(23, INK), fontWeight: 500 }}>a feed can be eventual</span>
       </Ink>
-      <Ink at={bankAt} dur={12} style={{ left: x1 - 380, top: lineY + c.h(150), whiteSpace: "nowrap" }}>
+      <Ink at={bankAt} dur={12} style={{ left: x1 - 380, top: lineY + c.h(250), whiteSpace: "nowrap" }}>
         <span style={{ ...note(23, INK), fontWeight: 500 }}>a bank balance usually needs strong</span>
       </Ink>
     </>

@@ -416,7 +416,7 @@ export const MAP = { x: 1384, w: 440, h: 150 };
  * drawn small in the top right of every deep dive, with the part the question
  * is about lit yellow and named under the map. It grows as the questions add
  * to the design: `stage` is the last question whose change is already in
- * (1: more app servers, 3: a cache replica, 5: followers, 6: shards, 8: a
+ * (1: more app servers, 3: a cache replica, 5: followers, 6: eight shards, 8: a
  * queue, 9: a rate limiter), and `grow` names a change this scene makes, with
  * the frame it happens on.
  */
@@ -516,11 +516,12 @@ export const MiniMap: React.FC<{
         {/* The cache, with its replica behind it. */}
         {replica > 0 ? <rect x={cache.x + 10} y={cache.y + 9} width={cache.w} height={cache.h} rx={5} {...box("cache")} opacity={replica} /> : null}
         <rect x={cache.x} y={cache.y} width={cache.w} height={cache.h} rx={5} {...box("cache")} />
-        {/* The store: one box, then four shards, with two followers beside it. */}
-        {[0, 1, 2, 3].map((k) => {
-          const w = lerp(store.w, (store.w - 9) / 4, shards);
-          const x = lerp(store.x, store.x + k * ((store.w - 9) / 4 + 3), shards);
-          return <rect key={k} x={x} y={store.y} width={w} height={store.h} rx={4} {...box("store")} opacity={k === 0 ? 1 : shards} />;
+        {/* The store: one box, then the eight shards of question 6, with two
+            followers beside it. */}
+        {Array.from({ length: 8 }, (_, k) => {
+          const w = lerp(store.w, (store.w - 7 * 2) / 8, shards);
+          const x = lerp(store.x, store.x + k * ((store.w - 7 * 2) / 8 + 2), shards);
+          return <rect key={k} x={x} y={store.y} width={w} height={store.h} rx={lerp(4, 2, shards)} {...box("store")} opacity={k === 0 ? 1 : shards} />;
         })}
         {followers > 0
           ? [0, 1].map((k) => (

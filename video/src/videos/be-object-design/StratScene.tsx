@@ -16,6 +16,8 @@ const COST_X = 1420;
 
 /** "5.0" → "5", 6 → "6": a price as the narration says it. */
 const price = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2));
+// The third rule's light parcel falls back to the flat rate, as its label says.
+if (SHIPPING.third.light.cost !== SHIPPING.flat) throw new Error("the third rule no longer charges the flat rate below 10");
 
 /**
  * Question 6. A shipment holds a pricing card and asks it for the cost of a
@@ -162,7 +164,7 @@ export const StratScene: React.FC = () => {
           {SHIPPING.weight} × 2 = <b style={{ color: BLUE_INK }}>{price(SHIPPING.byWeight)}</b>
         </Line>
         <Line x={COST_X} y={cardMid(2) - 16} at={freeAt + 8} size={26} weight={500} out={fold + 8}>
-          weight {SHIPPING.third.light.weight}: <b style={{ color: BLUE_INK }}>{price(SHIPPING.third.light.cost)}</b>
+          weight {SHIPPING.third.light.weight}: flat <b style={{ color: BLUE_INK }}>{price(SHIPPING.third.light.cost)}</b>
           <span style={{ opacity: ease(frame, classAt, 10) }}>
             , weight {SHIPPING.third.heavy.weight}: <b style={{ color: OK_INK }}>{price(SHIPPING.third.heavy.cost)}</b>
           </span>

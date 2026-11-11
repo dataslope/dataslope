@@ -239,7 +239,19 @@ export const IndexScene: React.FC = () => {
             { index: 0, at: tableAt + 6, out: kindAt - 2, color: OK },
           ]}
         />
-        <Note at={keepAt + 4} x={R_X + 40} y={gridBottom + h(18)} out={structAt}>
+        {/* The one page that holds the row: a page square at reading size,
+            with a leader up the grid's left edge to page 1. */}
+        <Svg opacity={ease(frame, keepAt + 2, 10) * (1 - ease(frame, structAt, 10))}>
+          <path
+            d={`M${R_X + 2},${gridTop + 2} H${R_X - 14} V${gridBottom + h(18) + 18} H${R_X - 2}`}
+            fill="none"
+            stroke={inkOf.yellow}
+            strokeWidth={2.5}
+            strokeLinejoin="round"
+          />
+          <rect x={R_X} y={gridBottom + h(18)} width={36} height={36} rx={4} fill={`color-mix(in srgb, ${inkOf.yellow} 45%, ${PAPER})`} stroke={inkOf.yellow} strokeWidth={2.5} />
+        </Svg>
+        <Note at={keepAt + 4} x={R_X + 56} y={gridBottom + h(18) + 2} out={structAt}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             every page read, <b>1</b> row kept: the first page holds it
           </span>
@@ -319,8 +331,10 @@ export const IndexScene: React.FC = () => {
             hash(email)
           </text>
           {Array.from({ length: BUCKETS }, (_, i) => {
-            const eq = i === eqBucket ? ease(frame, straightAt + 8, 10) : 0;
-            const bad = rangeBuckets.includes(i) ? ease(frame, rangeAt + 14, 10) * (1 - ease(frame, againAt, 10)) : 0;
+            // Equality's bucket lets go when the range is asked for; the
+            // range's scattered buckets stay marked to the end.
+            const eq = i === eqBucket ? ease(frame, straightAt + 8, 10) * (1 - ease(frame, rangeAt, 10)) : 0;
+            const bad = rangeBuckets.includes(i) ? ease(frame, rangeAt + 14, 10) : 0;
             return (
               <rect
                 key={i}

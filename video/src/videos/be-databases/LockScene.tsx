@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { LOCK } from "./data";
-import { ColumnRule, DataTable, Drift, Flow, Listing, listingHeight, MARK_BAD, MARK_OK, Mark, Node, PgError, tableGeometry, X0 } from "./parts";
+import { ColumnRule, DataTable, Drift, Flow, Listing, listingHeight, MARK_BAD, MARK_OK, Mark, Node, PgError, Spot, tableGeometry, X0 } from "./parts";
 
 const HEAD_Y = 302;
 const R_X = 980;
@@ -117,7 +117,11 @@ export const LockScene: React.FC = () => {
   const retryAt = n.word("lock-choose", "costs only a retry");
   const pessWinsAt = n.word("lock-choose", "Pessimistic wins when they're frequent");
   const pileAt = n.word("lock-choose", "retries would pile up");
-  const end = n.beat("lock-choose").to;
+  const waitAt = n.word("lock-cost", "Pessimistic makes others wait");
+  const deadlocksAt = n.word("lock-cost", "risks deadlocks");
+  const twoReqAt = n.word("lock-cost", "across two requests");
+  const sendAt = n.word("lock-cost", "send the version back with the write");
+  const end = n.beat("lock-cost").to;
 
   // ── Left: pessimistic ──
   const rowsTop = y(HEAD_Y) + h(58);
@@ -171,7 +175,11 @@ export const LockScene: React.FC = () => {
       <Sfx name="el-pop" at={retriesAt + 4} level={-31} />
       <Sfx name="el-whoosh" at={pessWinsAt} level={-35} />
 
+      <Sfx name="el-pop" at={pessAt + 4} level={-32} />
       <Drift from={from} to={end + 40}>
+        {/* A padlock in the space the pessimistic panel leaves on its left,
+            until the optimistic panel arrives and the panel moves over. */}
+        <Spot art="padlock" at={pessAt + 4} out={optAt - 14} left={180} top={y(380)} width={170} />
         <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} size={58}>
           What is an optimistic vs pessimistic locking strategy?
         </QuestionCard>
@@ -196,8 +204,22 @@ export const LockScene: React.FC = () => {
         <Note at={holdsAt} x={X0 + ROW_W + 40} y={rowsTop + h(8)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>held by another transaction</span>
         </Note>
-        <Listing lines={LOCK.nowait} x={X0} top={lockTop} width={740} size={20} at={notWaitAt - 2} marks={[{ line: "NOWAIT", text: "NOWAIT", at: notWaitAt + 6 }]} />
-        <PgError x={X0} top={lockTop + listingHeight(LOCK.nowait.length, 20) + h(10)} width={704} at={refusesAt} message={LOCK.refused} size={19} />
+        <Listing lines={LOCK.nowait} x={X0} top={lockTop} width={740} size={20} at={notWaitAt - 2} out={waitAt - 6} marks={[{ line: "NOWAIT", text: "NOWAIT", at: notWaitAt + 6 }]} />
+        <PgError x={X0} top={lockTop + listingHeight(LOCK.nowait.length, 20) + h(10)} width={704} at={refusesAt} message={LOCK.refused} size={19} out={waitAt - 6} />
+        {/* Once the refusal has made its point, its place holds what
+            pessimistic costs and the case only optimistic can take. */}
+        <Note at={waitAt} x={X0} y={lockTop + h(6)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            Its price: <b style={{ color: ACCENT_INK }}>others wait</b>
+            <span style={{ opacity: ease(frame, deadlocksAt, 10) }}>, and locks can deadlock</span>
+          </span>
+        </Note>
+        <Note at={twoReqAt} x={X0} y={lockTop + h(56)}>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            Across two requests: <b style={{ color: OK_INK }}>only optimistic</b>
+          </div>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, sendAt, 10) }}>no transaction stays open; the version goes back with the write</div>
+        </Note>
         <Note at={freeAt + 4} x={X0 + ROW_W + 40} y={row2 + h(8)}>
           <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>granted at once</span>
         </Note>

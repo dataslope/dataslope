@@ -95,21 +95,27 @@ const ArrayList: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 21. BST ──────────────────────────────────────────────────────────────────
 
 const Bst: React.FC<{ c: Ctx }> = ({ c }) => {
-  const heightAt = c.w("r-bst", "costs its height per operation");
-  const orderAt = c.w("r-bst", "A thousand keys inserted in order");
-  const shuffledAt = c.w("r-bst", "shuffled, twenty-one");
-  const avlAt = c.w("r-bst", "AVL and red-black trees stay at log n");
+  const bstAt = c.w("r-bst", "A binary search tree");
+  const ruleAt = c.w("r-bst", "keeps smaller keys to the left of each node");
+  const heightAt = c.w("r-bst", "so an operation costs its height");
+  const orderAt = c.w("bst-heights", "A thousand keys inserted in order");
+  const shuffledAt = c.w("bst-heights", "shuffled, twenty-one");
+  const avlAt = c.w("bst-heights", "AVL and red-black trees stay at log n");
   const frame = useCurrentFrame();
-  const colH = c.h(400);
+  const colH = c.h(340);
   const base = c.T + c.h(480);
   const scale = colH / RAPID.bstSortedHeight;
   const tall = RAPID.bstSortedHeight * scale * ease(frame, orderAt + 4, Math.max(24, shuffledAt - orderAt - 10));
   const short = RAPID.bstShuffledHeight * scale * ease(frame, shuffledAt, 10);
   return (
     <>
-      <Line at={c.w("r-bst", "A binary search tree")} x={R_X} y={c.T} size={24} weight={500}>
-        A BST
-        <span style={{ opacity: ease(frame, heightAt, 10) }}> costs its height per operation.</span>
+      {/* The rule first: it is what a BST is, and why in-order comes out sorted. */}
+      <Line at={bstAt} x={R_X} y={c.T} size={24} weight={500}>
+        A BST: at every node, smaller keys left
+        <span style={{ opacity: ease(frame, ruleAt + 8, 10) }}>, larger keys right</span>
+      </Line>
+      <Line at={heightAt} x={R_X} y={c.T + c.h(46)} size={24} weight={500}>
+        An operation costs the tree&apos;s height.
         <span style={{ opacity: ease(frame, orderAt, 10) }}>
           {" "}
           Height, <Num>{int(RAPID.bstKeys)}</Num> keys:
@@ -126,10 +132,10 @@ const Bst: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={shuffledAt} x={R_X + 350} y={base - 40} size={24} weight={500} color={OK_INK}>
         <Num>{RAPID.bstShuffledHeight}</Num>, shuffled
       </Line>
-      <Line at={avlAt} x={R_X + 620} y={c.T + c.h(160)} size={24} weight={500}>
+      <Line at={avlAt} x={R_X + 620} y={c.T + c.h(190)} size={24} weight={500}>
         AVL, red-black:
       </Line>
-      <Line at={avlAt + 6} x={R_X + 620} y={c.T + c.h(204)} size={24} weight={500} color={OK_INK}>
+      <Line at={avlAt + 6} x={R_X + 620} y={c.T + c.h(234)} size={24} weight={500} color={OK_INK}>
         stay at O(log n)
       </Line>
     </>
@@ -353,10 +359,10 @@ const Binary: React.FC<{ c: Ctx }> = ({ c }) => {
         Bugs: off-by-one bounds
       </Line>
       <Line at={overflowAt} x={R_X} y={barY + c.h(294)} size={24} color={ACCENT_INK} weight={500}>
-        <span style={{ fontFamily: MONO }}>(lo + hi) / 2</span> overflows a fixed-width integer
+        In C or Java, <span style={{ fontFamily: MONO }}>(lo + hi) / 2</span> can overflow an <span style={{ fontFamily: MONO }}>int</span>
       </Line>
       <Line at={overflowAt + 16} x={R_X} y={barY + c.h(338)} size={24} color={OK_INK} weight={500}>
-        the page writes <span style={{ fontFamily: MONO }}>lo + (hi - lo) // 2</span>
+        the safe midpoint: <span style={{ fontFamily: MONO }}>lo + (hi - lo) / 2</span>
       </Line>
     </>
   );
@@ -389,6 +395,11 @@ const Pointers: React.FC<{ c: Ctx }> = ({ c }) => {
   const cw = 80;
   const rowY = c.T + c.h(110);
   const found = s.sum === target;
+  // The page's two_sum_sorted returns indices, not values: say which values
+  // they hold, so "(1, 3)" cannot be read as the numbers 1 and 3.
+  const returned = PAGE.twoPointers[0].replace(/[()\s]/g, "").split(",").map(Number);
+  const [va, vb] = returned.map((i) => nums[i]);
+  if (va + vb !== target) throw new Error(`two_sum_sorted's ${PAGE.twoPointers[0]} does not sum to ${target}`);
   return (
     <>
       <Line at={walkAt} x={R_X} y={c.T} size={24} weight={500}>
@@ -397,6 +408,15 @@ const Pointers: React.FC<{ c: Ctx }> = ({ c }) => {
       {nums.map((v, i) => (
         <Cell key={i} x={R_X + i * cw} y={rowY} at={walkAt + i * 2} value={v} w={cw - 10} h={58} tone={(i === s.lo || i === s.hi) && frame >= walkAt + 10 ? (found ? "ok" : "look") : "data"} />
       ))}
+      {/* Each cell's index, above it, as the Two Sum row in HashScene has. */}
+      {nums.map((_, i) => (
+        <div key={`i${i}`} style={{ position: "absolute", left: R_X + i * cw, width: cw - 10, top: rowY - 34, textAlign: "center", ...label(20, INK_SOFT), ...TABULAR, opacity: ease(frame, walkAt + 6, 10) }}>
+          {i}
+        </div>
+      ))}
+      <Line at={walkAt + 6} x={R_X + nums.length * cw + 30} y={rowY - 36} size={20} color={INK_SOFT}>
+        index
+      </Line>
       {[
         { i: s.lo, t: "left" },
         { i: s.hi, t: "right" },
@@ -416,7 +436,10 @@ const Pointers: React.FC<{ c: Ctx }> = ({ c }) => {
         Too big: move the right
       </Line>
       <Line at={linearAt} x={R_X} y={rowY + c.h(230)} size={25} weight={500} color={OK_INK}>
-        Returns <span style={{ fontFamily: MONO }}>{PAGE.twoPointers[0]}</span>: O(n), not O(n²)
+        Returns indices <span style={{ fontFamily: MONO }}>{PAGE.twoPointers[0]}</span>: <Num>{va}</Num> + <Num>{vb}</Num> = <Num>{target}</Num>
+      </Line>
+      <Line at={linearAt + 8} x={R_X} y={rowY + c.h(274)} size={25} weight={500}>
+        One pass: O(n), not O(n²)
       </Line>
     </>
   );
@@ -640,7 +663,7 @@ const Kahn: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Line at={removesAt} x={R_X} y={c.T} size={24} weight={500}>
-        Remove nodes with nothing pointing in, one by one
+        Remove nodes with nothing pointing in (in-degree 0), one by one
       </Line>
       {edges.map(([a, b]) => (
         <Edge key={`${a}${b}`} from={pos(a)} to={pos(b)} at={removesAt + 4} r={30} side={a > b ? -22 : 22} color={removed(a) ? INK_SOFT : a === 2 && b === 1 && frame >= cycleAt ? ACCENT : INK_SOFT} opacity={removed(a) ? 0.25 : 1} />
@@ -649,7 +672,7 @@ const Kahn: React.FC<{ c: Ctx }> = ({ c }) => {
         <GraphNode key={i} x={pos(i)[0]} y={pos(i)[1]} at={removesAt + 2} name={String(i)} tone={removed(i) ? "ok" : frame >= leftAt ? "bad" : "data"} />
       ))}
       <Line at={removesAt + 16} x={R_X} y={c.T + c.h(380)} size={24}>
-        Removed: <span style={{ fontFamily: MONO, fontWeight: 500, color: OK_INK }}>[{out.join(", ")}]</span>, then nothing has in-degree 0
+        Removed: <span style={{ fontFamily: MONO, fontWeight: 500, color: OK_INK }}>[{out.join(", ")}]</span>; every node left has an edge pointing in
       </Line>
       <Line at={leftAt} x={R_X} y={c.T + c.h(424)} size={24} weight={500} color={ACCENT_INK}>
         <Num>{nodes.length - out.length}</Num> of <Num>{nodes.length}</Num> left<span style={{ opacity: ease(frame, cycleAt, 10) }}>: the graph has a cycle</span>
@@ -694,14 +717,17 @@ const Bits: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ fontFamily: MONO, fontWeight: 500, color: OK_INK, width: 40, textAlign: "right" }}>{result}</span>
         <span style={{ fontFamily: MONO, fontWeight: 500, letterSpacing: "0.2em", color: OK_INK }}>{bin(result)}</span>
       </div>
-      <VRule x={1095} top={c.T + c.h(64)} bottom={c.T + c.h(64) + (nums.length + 1) * rowH + 30} at={cancelAt} />
-      <Line at={cancelAt} x={R_X + 400} y={c.T + c.h(110)} size={24}>
-        Each pair cancels: <span style={{ fontFamily: MONO }}>x ^ x = 0</span>
+      <VRule x={1095} top={c.T + c.h(64)} bottom={c.T + c.h(64) + (nums.length + 1) * rowH + 30} at={xorAt} />
+      <Line at={xorAt} x={R_X + 400} y={c.T + c.h(64)} size={24}>
+        XOR, exclusive or: 1 where the bits differ
+      </Line>
+      <Line at={cancelAt} x={R_X + 400} y={c.T + c.h(112)} size={24}>
+        So each pair cancels: <span style={{ fontFamily: MONO }}>x ^ x = 0</span>
       </Line>
       <Line at={leftAt} x={R_X + 400} y={c.T + c.h(160)} size={24} weight={500} color={OK_INK}>
         The unpaired one is left: <Num>{result}</Num>
       </Line>
-      <Line at={spaceAt} x={R_X + 400} y={c.T + c.h(210)} size={24}>
+      <Line at={spaceAt} x={R_X + 400} y={c.T + c.h(208)} size={24}>
         O(n) time, <Mark at={spaceAt + 4}>O(1) space</Mark>
       </Line>
     </>

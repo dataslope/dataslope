@@ -173,7 +173,11 @@ export const PqScene: React.FC = () => {
 
         <VRule x={1060} top={laneY[0]} bottom={y(814) + 56} at={levelsAt} />
 
-        {/* The heap: twenty levels for a million, one push climbing. */}
+        {/* The heap: twenty levels for a million, one push climbing. The
+            page's own question on heap costs, answered inside this one. */}
+        <Line at={heapAt - 4} x={TREE.x0} y={apexY - 126} size={22} weight={500} color={ACCENT_INK}>
+          Also asked: What are the time complexities of heap operations?
+        </Line>
         <Line at={levelsAt} x={TREE.x0} y={apexY - 72} size={22} weight={500}>
           A heap of a million: <Num>{HEAP.levels}</Num> levels
         </Line>
@@ -189,6 +193,16 @@ export const PqScene: React.FC = () => {
               fill="none"
               stroke={HIGHLIGHT}
               strokeWidth={8}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          ) : null}
+          {climb > 0 ? (
+            <polyline
+              points={climbPath.slice(0, ci + 1).map(([px, py]) => `${px},${py}`).concat(dot ? [`${dot[0]},${dot[1]}`] : []).join(" ")}
+              fill="none"
+              stroke={INK}
+              strokeWidth={2}
               strokeLinejoin="round"
               strokeLinecap="round"
             />
@@ -221,12 +235,12 @@ export const PqScene: React.FC = () => {
         </Line>
 
         {/* Building one. */}
-        <Line at={linearAt} x={140} y={y(716)} size={22} weight={500}>
+        <Line at={linearAt} x={140} y={y(708)} size={22} weight={500}>
           Building a heap: O(n), not O(n log n). Comparisons, a million items:
         </Line>
         <HBar
           x={140}
-          y={y(752)}
+          y={y(746)}
           w={680}
           max={HEAP.pushesCompares}
           value={HEAP.heapifyCompares}
@@ -240,7 +254,7 @@ export const PqScene: React.FC = () => {
         />
         <HBar
           x={140}
-          y={y(814)}
+          y={y(832)}
           w={680}
           max={HEAP.pushesCompares}
           value={HEAP.pushesCompares}
@@ -256,7 +270,7 @@ export const PqScene: React.FC = () => {
           Most nodes sit near the bottom:
         </Line>
         <Line at={bottomAt + 10} x={TREE.x0} y={y(838)} size={23}>
-          heights sum to <b style={{ ...TABULAR, color: OK_INK }}>{int(HEAP.heightsSum)}</b>, under <i>n</i>
+          heapify makes at most <b style={{ ...TABULAR, color: OK_INK }}>{int(HEAP.heightsSum)}</b> swaps, under <i>n</i>
         </Line>
       </Drift>
     </AbsoluteFill>

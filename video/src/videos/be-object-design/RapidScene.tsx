@@ -169,8 +169,11 @@ const Poly: React.FC<{ c: Ctx }> = ({ c }) => {
   const noAt = c.w("r-poly", "with no ladder of type checks");
   const top = c.y(390);
   const shapes = c.y(560);
-  const circle = Math.PI * 1 ** 2;
-  if (Math.abs(circle + 4 - TOTAL_AREA) > 0.01) throw new Error("the parts no longer add up to the run's total");
+  // The page's run: total_area([Circle(1), Square(2)]).
+  const radius = 1;
+  const side = 2;
+  const circle = Math.PI * radius ** 2;
+  if (Math.abs(circle + side ** 2 - TOTAL_AREA) > 0.01) throw new Error("the parts no longer add up to the run's total");
   const R = 54;
   return (
     <>
@@ -193,7 +196,13 @@ const Poly: React.FC<{ c: Ctx }> = ({ c }) => {
         {circle.toFixed(2)}
       </Line>
       <Line x={1360} y={shapes + 150} at={squareAt + 10} size={26} weight={500} color={BLUE_INK} align="center" width={200}>
-        4
+        {side ** 2}
+      </Line>
+      <Line x={960} y={shapes + 192} at={circleAt + 10} size={21} color={INK_SOFT} weight={500} align="center" width={200}>
+        radius {radius}
+      </Line>
+      <Line x={1360} y={shapes + 192} at={squareAt + 10} size={21} color={INK_SOFT} weight={500} align="center" width={200}>
+        side {side}
       </Line>
       <Line x={1336} y={top + 18} at={squareAt + 16} size={26} weight={500} color={BLUE_INK}>
         = {TOTAL_AREA.toFixed(2)}
@@ -371,8 +380,11 @@ const Abstract: React.FC<{ c: Ctx }> = ({ c }) => {
   const declaresAt = c.w("r-abstract", "An interface declares");
   const noImplAt = c.w("r-abstract", "with no implementation");
   const abstractAt = c.w("r-abstract", "An abstract class can also share code and state");
-  const contractAt = c.w("r-abstract", "Use an interface for a pure contract");
-  const sharedAt = c.w("r-abstract", "an abstract class when subclasses share code");
+  const manyAt = c.w("r-abstract-many", "implement many interfaces");
+  const oneAt = c.w("r-abstract-many", "extend only one");
+  const defaultsAt = c.w("r-abstract-many", "can now carry default methods");
+  const contractAt = c.w("r-abstract-use", "Use an interface for a pure contract");
+  const sharedAt = c.w("r-abstract-use", "an abstract class when subclasses share code");
   const top = c.y(390);
   const w = 360;
   const h = 260;
@@ -388,7 +400,7 @@ const Abstract: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line x={A} y={top + h + 22} at={noImplAt} size={22} color={INK_SOFT} weight={500}>
         methods named, none written
       </Line>
-      <VRule x={(A + w + B) / 2} top={top} bottom={top + h + 104} at={abstractAt} />
+      <VRule x={(A + w + B) / 2} top={top} bottom={top + h + 156} at={abstractAt} />
       <Box x={B} y={top} w={w} h={h} at={abstractAt} tone="plain" />
       <Line x={B + 24} y={top + 18} at={abstractAt} size={25} weight={500}>
         Abstract class
@@ -397,11 +409,20 @@ const Abstract: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line x={B} y={top + h + 22} at={abstractAt + 10} size={22} color={INK_SOFT} weight={500}>
         some code and state shared
       </Line>
-      <Line x={A} y={top + h + 74} at={contractAt} size={24} weight={500} color={OK_INK}>
+      <Line x={A} y={top + h + 74} at={manyAt} size={24} weight={500}>
+        a class implements many
+      </Line>
+      <Line x={B} y={top + h + 74} at={oneAt} size={24} weight={500}>
+        a class extends only one
+      </Line>
+      <Line x={A} y={top + h + 126} at={contractAt} size={24} weight={500} color={OK_INK}>
         a pure contract
       </Line>
-      <Line x={B} y={top + h + 74} at={sharedAt} size={24} weight={500} color={OK_INK}>
+      <Line x={B} y={top + h + 126} at={sharedAt} size={24} weight={500} color={OK_INK}>
         subclasses share code
+      </Line>
+      <Line x={A} y={top + h + 196} at={defaultsAt} size={21} color={INK_SOFT} weight={500}>
+        Java and C# interfaces may carry default methods, but never instance fields.
       </Line>
     </>
   );

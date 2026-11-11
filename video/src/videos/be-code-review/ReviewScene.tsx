@@ -79,7 +79,6 @@ export const ReviewScene: React.FC = () => {
   const c5At = n.word("review-list", "And that its tests would fail");
   const runAt = n.word("review-list", "Then run it");
   const caughtAt = n.word("review-back", "would have caught all three");
-  const backAt = n.word("review-back", "Go back to the diff as it arrived");
   const touchesAt = n.word("review-diff", "It touches one function");
   const callsAt = n.word("review-diff", "It calls nothing that doesn't exist");
   const passAt = n.word("review-diff", "It makes one pass over the input");

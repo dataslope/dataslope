@@ -8,7 +8,7 @@ import { Num } from "../../editorial/ui";
 import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { AMORTIZED, DOUBLING_CAPS, doublingCopiesAt, listCopiesAt } from "./data";
+import { AMORTIZED, DOUBLING_CAPS } from "./data";
 import { BAR, BLUE_INK, Drift, HIGHLIGHT, INK, INK_SOFT, Line, Mark, OK_INK, Svg, int, VRule } from "./parts";
 
 /** The chart: items appended across, slots allocated up. */
@@ -142,6 +142,8 @@ export const AmortScene: React.FC = () => {
           <path d={dd} fill="none" stroke={INK_SOFT} strokeWidth={2.4} strokeDasharray="7 6" clipPath="url(#be-alg-double)" opacity={dbl > 0 ? 1 : 0} />
           {/* The last resize, lit. */}
           <line x1={px(lastItems)} x2={px(lastItems)} y1={py(prevSlots)} y2={py(lastSlots)} stroke={HIGHLIGHT} strokeWidth={16} strokeLinecap="round" opacity={spike} />
+          {/* An ink outline round the band, so the lit step can be found. */}
+          <rect x={px(lastItems) - 11} y={py(lastSlots) - 11} width={22} height={py(prevSlots) - py(lastSlots) + 22} rx={11} fill="none" stroke={INK} strokeWidth={2} opacity={spike} />
           <path d={d} fill="none" stroke={BAR} strokeWidth={3} strokeLinejoin="round" clipPath="url(#be-alg-sweep)" />
           {sweep > 0 && sweep < 1 ? <line x1={px(k)} x2={px(k)} y1={top - 20} y2={base} stroke={INK_SOFT} strokeWidth={1.6} strokeDasharray="4 4" /> : null}
         </Svg>
@@ -160,7 +162,7 @@ export const AmortScene: React.FC = () => {
           Resizes: <span style={{ ...TABULAR, color: BLUE_INK }}>{resizes}</span>
         </Line>
         <Line at={copyAt} x={RX} y={y(418)} size={24} color={INK_SOFT}>
-          each one can copy every item so far
+          each can copy every item so far: <Num>{int(AMORTIZED.copiesIfEveryResizeCopies)}</Num> in all
         </Line>
         <Line at={addAt} x={RX} y={y(488)} size={28} weight={500}>
           Copies per append: <span style={{ ...TABULAR, color: BLUE_INK }}>{perAppend.toFixed(1)}</span>
@@ -177,7 +179,7 @@ export const AmortScene: React.FC = () => {
           Doubling: <Num>{AMORTIZED.doublingResizes}</Num> resizes,{" "}
           <span style={{ opacity: ease(frame, underAt, 10) }}>
             <b>
-              <Num>{(doublingCopiesAt(X_MAX + 1) / X_MAX).toFixed(2)}</Num>
+              under <Num>2</Num>
             </b>{" "}
             copies per append
           </span>
@@ -199,10 +201,7 @@ export const AmortScene: React.FC = () => {
         <Line at={budgetAt} x={RX} y={y(850)} size={24} weight={500} color={OK_INK}>
           On a latency budget, allocate up front
         </Line>
-        <Line at={appendAt + 30} x={CX0} y={base + 56} size={20} color={INK_SOFT} weight={500}>
-          {"copies if every resize copied all: "}
-          <Num>{int(listCopiesAt(k))}</Num>
-        </Line>
+
       </Drift>
     </AbsoluteFill>
   );

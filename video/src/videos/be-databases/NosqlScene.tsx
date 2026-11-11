@@ -133,6 +133,9 @@ export const NosqlScene: React.FC = () => {
   const bothAt = n.word("nosql-both", "many systems use both");
   const coreAt = n.word("nosql-both", "SQL for the core transactions");
   const logsAt = n.word("nosql-both", "NoSQL for high-volume logs");
+  const scaleAt = n.word("nosql-scale", "Relational scales further");
+  const shardAt = n.word("nosql-scale", "with replicas and sharding");
+  const sizeAt = n.word("nosql-scale", "not on size alone");
   const askAt = n.word("nosql-next", "ask which queries");
   const relNewAt = n.word("nosql-next", "Relational answers a new one");
   const joinAt = n.word("nosql-next", "with a join");
@@ -322,6 +325,16 @@ export const NosqlScene: React.FC = () => {
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             core transactions: <b>orders, payments</b>
           </span>
+        </Note>
+        {/* Relational scales out too: what decides is the access pattern. */}
+        <Note at={scaleAt} x={sqlX + store.w / 2} y={underY + h(36)} style={{ transform: "translateX(-50%)" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            scales too: <span style={{ color: INK, opacity: ease(frame, shardAt, 10) }}>replicas, sharding</span>
+          </span>
+        </Note>
+        <Note at={sizeAt - 4} x={app.x + app.w / 2} y={store.y + storeH * 0.42} style={{ transform: "translateX(-50%)" }} out={askAt - 4}>
+          <div style={{ ...note(23, INK), whiteSpace: "nowrap", textAlign: "center" }}>decide by access pattern</div>
+          <div style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", textAlign: "center", marginTop: h(6) }}>and consistency, not size</div>
         </Note>
         <Note at={logsAt + 6} x={noX + store.w / 2} y={underY} style={{ transform: "translateX(-50%)" }}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>

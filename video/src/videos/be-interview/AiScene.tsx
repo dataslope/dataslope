@@ -80,10 +80,11 @@ const FormatRow: React.FC<{ c: number; i: number; format: Format; out: number }>
       }}
     >
       {format.text}
-      {/* The part that answers this format, inked just after it, in the
-          style the "where the time went" blocks label theirs. */}
+      {/* The part that answers this format, a tag set apart from the line
+          (40px, so it reads as a label rather than a word in another
+          size), in the style the "where the time went" blocks use. */}
       {format.part ? (
-        <span style={{ ...label(22, BLUE_INK), marginLeft: 18, opacity: ease(frame, format.at + 12, 12) }}>Part {format.part}</span>
+        <span style={{ ...label(22, BLUE_INK), marginLeft: 40, opacity: ease(frame, format.at + 12, 12) }}>Part {format.part}</span>
       ) : null}
     </div>
   );

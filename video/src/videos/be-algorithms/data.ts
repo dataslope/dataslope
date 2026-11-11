@@ -90,6 +90,11 @@ export const TRAVERSAL = {
   listShifts: C.traversal.listShifts,
 } as const;
 
+/** 5, the other shape: a chain of a million, each node pointing at the next.
+ *  BFS's queue peak, the path DFS keeps (its depth), and what a recursive DFS
+ *  does on it. */
+export const CHAIN = C.chain;
+
 /** 6. The heap of a million. */
 export const HEAP = C.heap;
 
@@ -124,5 +129,7 @@ export const PAGE_INPUTS = {
   cyclic: { A: ["B"], B: ["C"], C: ["A"] } as Record<string, string[]>,
 } as const;
 
-/** The quick rounds' numbers, and the adjacency arithmetic. */
+/** The quick rounds' numbers, and the adjacency arithmetic. `backtrackTried`
+ *  is every candidate the backtracking run tried, in order, [path, can still
+ *  succeed], on orderings of 1, 2, 3 with no digit in its own place. */
 export const RAPID = { ...C.rapid, adjacency: A.adjacency } as const;

@@ -3,11 +3,11 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { halo, note } from "../../editorial/style";
+import { note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Art, BAR, BLUE_FILL, BLUE_INK, Drift, HIGHLIGHT, Headline, INK, INK_SOFT, Kicker, Line, OK_INK, Svg, VRule } from "./parts";
+import { Art, BAR, BLUE_FILL, BLUE_INK, Drift, HIGHLIGHT, Headline, INK, INK_SOFT, Kicker, Line, Mark, OK_INK, Svg, VRule } from "./parts";
 
 /** The million drawn as a square, a thousand items a side. */
 const SQ = 440;
@@ -69,7 +69,12 @@ export const HookScene: React.FC = () => {
         <Line at={hundredAt} x={SQ_X} y={y(286)} size={24} weight={500} out={millionAt}>
           <Num>100</Num> items
         </Line>
-        <Line at={millionAt + 10} x={SQ_X} y={y(286)} size={24} weight={500}>
+        {/* "the hundred" leads the line, above the corner it is in, with a
+            leader down to the ring. */}
+        <Line at={millionAt + 10} x={SQ_X - 44} y={y(286)} size={24} weight={500}>
+          <span style={{ opacity: ease(frame, millionAt + 28, 10) }}>
+            <Mark at={millionAt + 30}>the hundred</Mark> <span style={{ color: INK_SOFT }}>in</span>
+          </span>{" "}
           <Num>1,000,000</Num> items, a thousand a side
         </Line>
 
@@ -93,7 +98,13 @@ export const HookScene: React.FC = () => {
             })}
           </g>
           {ring > 0 ? (
-            <circle cx={SQ_X + 2} cy={top + 2} r={10 + 6 * (1 - ring)} fill="none" stroke={HIGHLIGHT} strokeWidth={5} opacity={ring} />
+            <>
+              <circle cx={SQ_X + 2} cy={top + 2} r={14 + 6 * (1 - ring)} fill="none" stroke={HIGHLIGHT} strokeWidth={6} opacity={ring} />
+              {/* An ink ring over the yellow, so the speck can be found on the page. */}
+              <circle cx={SQ_X + 2} cy={top + 2} r={14 + 6 * (1 - ring)} fill="none" stroke={INK} strokeWidth={2} opacity={ring} />
+              {/* The leader from the label down to the ring. */}
+              <line x1={SQ_X - 14} y1={top - 22} x2={SQ_X - 7} y2={top - 7} stroke={INK} strokeWidth={1.6} opacity={ease(frame, millionAt + 28, 10)} />
+            </>
           ) : null}
         </Svg>
         {/* Fast, while the hundred fills the box. */}
@@ -101,9 +112,7 @@ export const HookScene: React.FC = () => {
           <Tick at={fastAt} size={28} />
           <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>fast</span>
         </div>
-        <Line at={millionAt + 28} x={SQ_X + 26} y={top + 10} size={22} weight={500}>
-          <span style={halo}>← the hundred</span>
-        </Line>
+
 
         <VRule x={(SQ_X + SQ + CHIP_X) / 2} top={top} bottom={top + SQ} at={structureAt - 2} />
 

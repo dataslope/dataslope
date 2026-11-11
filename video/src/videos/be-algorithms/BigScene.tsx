@@ -181,7 +181,7 @@ export const BigScene: React.FC = () => {
               ))}
               {r.counted ? (
                 <div style={{ position: "absolute", left: COLS[2].right + 44, top: rowTop(i) + 14, ...note(22, INK_SOFT), opacity: p, whiteSpace: "nowrap" }}>
-                  counted as it ran
+                  counted; the rest worked out
                 </div>
               ) : null}
             </React.Fragment>

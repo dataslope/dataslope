@@ -3,24 +3,28 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE, KEY } from "./data";
-import { Arrow, artH, Drift, InlineArrow, int, Line, Mark, Spot, VRule, X0 } from "./parts";
+import { Arrow, artH, Drift, InlineArrow, int, Line, Mark, OK_INK, Spot, VRule, X0 } from "./parts";
 
 const CARD_W = 600;
 const RX = 1060;
+/** The third column of the API row: which kind of redirect. */
+const TX = 1250;
 
 /**
  * Question 3, the API and the key. Two calls, said in words: create (a long
  * URL in, a short key out) and redirect (a key in, a redirect out). The key is
  * base 62, the 62 characters in three groups; an auto-incrementing ID
  * encoded in six of them gives 62⁶, about 57 billion keys, over fifteen years
- * at the estimate's ten million a day (check.mjs). Or hash the long URL, and
- * check the key is not already taken before storing it.
+ * at the estimate's ten million a day (check.mjs). The redirect is
+ * temporary, since browsers keep a permanent one. Or hash the long URL and
+ * keep a few characters: if that key is taken, add a salt and hash again, and
+ * store only if absent, so two servers cannot both claim it.
  */
 export const KeyScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -41,9 +45,14 @@ export const KeyScene: React.FC = () => {
   const sixAt = n.word("q3-key", "six characters");
   const billionAt = n.word("q3-key", "fifty-seven billion links");
   const yearsAt = n.word("q3-key", "over fifteen years at ten million a day");
+  const tempAt = n.word("q3-temp", "Make that redirect temporary");
+  const permAt = n.word("q3-temp", "Browsers keep a permanent one");
   const hashAt = n.word("q3-hash", "Or hash the long URL");
-  const checkAt = n.word("q3-hash", "check each key for a collision");
-  const storeAt = n.word("q3-hash", "before you store it");
+  const fewAt = n.word("q3-hash", "keep a few characters");
+  const takenAt = n.word("q3-hash", "If that key is taken");
+  const saltAt = n.word("q3-hash", "add a salt and hash again");
+  const condAt = n.word("q3-hash", "make the write conditional");
+  const claimAt = n.word("q3-hash", "so two servers can't both claim it");
   const end = n.beat("q3-hash").to;
 
   const cardY = y(314);
@@ -66,14 +75,16 @@ export const KeyScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={idAt + 10} level={-35} />
       <Sfx name="el-pencil" at={billionAt} level={-36} />
       <Sfx name="el-tap" at={hashAt + 4} level={-35} />
-      <Sfx name="el-tap" at={checkAt} level={-35} />
-      <Sfx name="el-tap" at={storeAt} level={-35} />
+      <Sfx name="el-tap" at={tempAt} level={-35} />
+      <Sfx name="el-scratch" at={permAt + 4} level={-37} />
+      <Sfx name="el-tap" at={takenAt} level={-35} />
+      <Sfx name="el-chime" at={condAt + 4} level={-37} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4}>
           Design a URL shortener at a high level.
         </QuestionCard>
-        <Spot id="key" at={keyAt} left={1440} top={y(668)} width={180} height={artH("key", 180)} />
+        <Spot id="key" at={keyAt} left={1560} top={y(716)} width={160} height={artH("key", 160)} />
 
         {/* The API, in words. */}
         {[
@@ -101,6 +112,18 @@ export const KeyScene: React.FC = () => {
           );
         })}
         <VRule x={645} top={cardY} bottom={cardY + 80} at={otherAt - 2} />
+
+        {/* Which redirect: temporary, since browsers keep a permanent one. */}
+        <VRule x={1190} top={cardY} bottom={cardY + 112} at={tempAt} />
+        <Line x={TX} y={cardY} at={tempAt} size={23} color={INK_SOFT}>
+          which kind
+        </Line>
+        <Line x={TX} y={cardY + 36} at={tempAt + 6} size={30} color={OK_INK}>
+          temporary (<Num>302</Num>)
+        </Line>
+        <Line x={TX} y={cardY + 86} at={permAt} size={23} color={ACCENT_INK}>
+          permanent (<Num>301</Num>): browsers keep it
+        </Line>
         <Line x={X0} y={cardY - 52} at={apiAt} size={22} weight={500} color={INK_SOFT}>
           The API, in two calls
         </Line>
@@ -169,15 +192,26 @@ export const KeyScene: React.FC = () => {
           <span style={{ ...note(27, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, hashAt + 4, 10) }}>long URL</span>
           <InlineArrow at={hashAt + 10} w={40} />
           <span style={{ ...note(27, INK), fontWeight: 500, opacity: ease(frame, hashAt + 14, 10) }}>hash</span>
-          <InlineArrow at={checkAt - 4} w={40} />
-          <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, checkAt, 10) }}>
-            <Mark at={checkAt + 2} color={HIGHLIGHT}>
-              already taken?
+          <InlineArrow at={fewAt - 4} w={40} />
+          <span style={{ ...note(27, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, fewAt, 10) }}>a few characters</span>
+        </div>
+        {/* The follow-up: a key that is taken, and two servers racing for one. */}
+        <div style={{ position: "absolute", left: RX, top: secY + 124, display: "flex", alignItems: "center", gap: 16, fontSize: 27 }}>
+          <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, takenAt, 10) }}>
+            <Mark at={takenAt + 2} color={HIGHLIGHT}>
+              taken?
             </Mark>
           </span>
-          <InlineArrow at={storeAt - 4} w={40} />
-          <span style={{ ...note(27, BLUE_INK), fontWeight: 500, opacity: ease(frame, storeAt, 10) }}>store</span>
+          <InlineArrow at={saltAt - 4} w={40} />
+          <span style={{ ...note(27, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, saltAt, 10) }}>add a salt, hash again</span>
         </div>
+        <Line x={RX} y={secY + 188} at={condAt} size={26} color={OK_INK}>
+          store only if absent
+          <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, claimAt, 10) }}>: no two servers claim one key</span>
+        </Line>
+        <Line x={RX} y={secY + 240} at={claimAt + 24} size={23} weight={400} color={INK_SOFT}>
+          and the same long URL always gets the same key
+        </Line>
       </Drift>
     </AbsoluteFill>
   );

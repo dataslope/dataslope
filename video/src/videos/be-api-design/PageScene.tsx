@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PAGE, PAGE_SIZE, thousands } from "./data";
-import { Drift, Mark, MARK_BAD, MARK_OK, METHOD_INK, OK, OK_INK, Strike, X0, VRule } from "./parts";
+import { Drift, Mark, MARK_BAD, MARK_OK, METHOD_INK, OK, OK_INK, X0, VRule } from "./parts";
 
 /** The chart: rows read for one page of twenty, on a log scale. */
 const BAR_X0 = 300;
@@ -116,7 +116,7 @@ export const PageScene: React.FC = () => {
       <Sfx name="el-tap" at={startsAt + 6} level={-29} />
       <Sfx name="el-tap" at={idAt + 4} level={-31} />
       <Sfx name="el-sprinkle" at={depthAt + 2} level={-32} />
-      <Sfx name="el-scratch" at={noJumpAt + 8} level={-32} />
+      <Sfx name="el-tap" at={noJumpAt + 2} level={-32} />
       <Sfx name="el-pencil" at={tieAt} level={-34} />
 
       <Drift from={from} to={end + 30}>
@@ -303,7 +303,7 @@ export const PageScene: React.FC = () => {
         </Note>
         <Note at={noJumpAt} x={LIST_X[0]} y={y(770) + h(44)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            no jump to <Strike at={noJumpAt + 10}>page 500</Strike>
+            no jump straight to page 500
           </span>
         </Note>
         <Note at={orderAt} x={LIST_X[0]} y={y(770) + h(88)}>

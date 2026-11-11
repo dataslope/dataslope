@@ -11,7 +11,7 @@ import { Sfx } from "../../sound/Sfx";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { DEADLOCK } from "./data";
-import { ColumnRule, Drift, PgError, Svg, X0 } from "./parts";
+import { ColumnRule, Drift, PgError, Spot, Svg, X0 } from "./parts";
 
 const LANE_1 = 352;
 const LANE_2 = 512;
@@ -165,7 +165,11 @@ export const DeadlockScene: React.FC = () => {
       <Sfx name="el-pencil" at={simplyAt} level={-35} />
       <Sfx name="el-chime" at={noCycleAt + 2} level={-33} />
 
+      <Sfx name="el-pop" at={cycleAt + 4} level={-32} />
       <Drift from={from} to={end + 40}>
+        {/* Two locks caught in each other, bottom right, clear of the lanes
+            and of every note. */}
+        <Spot art="padlocks" at={cycleAt + 4} left={1570} top={y(700)} width={230} />
         <QuestionCard n={11} at={qAt - 4} textAt={textAt - 4} size={58}>
           What is a deadlock, and how do you avoid it?
         </QuestionCard>

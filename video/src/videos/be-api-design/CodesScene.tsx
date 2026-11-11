@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Cross, Drift, Flow, Http, Mark, Msg, msgHeight, OK_INK, Strike, X0, VRule } from "./parts";
+import { Cross, Drift, Flow, Http, Mark, Msg, msgHeight, OK_INK, X0, VRule } from "./parts";
 
 const CODE_SIZE = 23;
 
@@ -94,7 +94,7 @@ export const CodesScene: React.FC = () => {
       {classAt.map((at, i) => (
         <Sfx key={i} name="el-tap" at={at + 2} level={-31} />
       ))}
-      <Sfx name="el-scratch" at={parseAt + 24} level={-31} />
+      <Sfx name="el-scratch" at={parseAt + 8} level={-31} />
       <Sfx name="el-whoosh" at={q4At + 2} level={-36} />
       <Sfx name="el-tap" at={challengeAt + 4} level={-31} />
       <Sfx name="el-tap" at={a404 + 10} level={-31} />
@@ -159,7 +159,7 @@ export const CodesScene: React.FC = () => {
           <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 22 }}>
             <Cross at={parseAt + 8} size={22} />
             <span style={{ fontFamily: MONO, fontSize: 22, color: ACCENT_INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
-              <Strike at={parseAt + 24}>if "not found" in message: …</Strike>
+              if "not found" in message: …
             </span>
           </div>
         </Note>

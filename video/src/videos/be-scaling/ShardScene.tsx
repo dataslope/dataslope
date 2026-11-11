@@ -7,11 +7,14 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, lab
 import { Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { SHARDS } from "./data";
-import { commas, Drift, lerp, Line, Mark, MiniMap, Node, OK, OK_INK, Q_SIZE, Q_W, Svg, VRule, X0 } from "./parts";
+import { RESHARD, SHARDS } from "./data";
+import { commas, Drift, lerp, Line, Mark, MiniMap, Node, OK, OK_INK, pct, Q_SIZE, Q_W, Svg, VRule, X0 } from "./parts";
 
-const TABLE = { x: X0, w: 260, top: 382, h: 176 };
-const SERVER = { x0: 600, step: 180, w: 150, h: 120 };
+const TABLE = { x: X0, w: 260, top: 382, h: 200 };
+/** Eight servers, one piece each: the eight shards the simulation uses. */
+const SERVER = { x0: 600, step: 108, w: 96, h: 120 };
+const PIECES = 8;
+const PIECE_W = 78;
 const COL = { w: 54, gap: 18 };
 const DATE_X = X0;
 const HASH_X = 880;
@@ -46,6 +49,9 @@ export const ShardScene: React.FC = () => {
   const simAt = n.word("q6-key", "in a simulation");
   const millionAt = n.word("q6-key", "a million keys land on eight shards");
   const withinAt = n.word("q6-key", "within one percent");
+  const ninthAt = n.word("q6-ring", "Add a ninth shard");
+  const modAt = n.word("q6-ring", "modulo moves eighty-nine percent");
+  const ringAt = n.word("q6-ring", "a hash ring, as in question two");
   const redirectAt = n.word("q6-cost", "A redirect touches one shard");
   const listAt = n.word("q6-cost", "listing one user's links");
   const allAt = n.word("q6-cost", "asks all eight");
@@ -55,7 +61,7 @@ export const ShardScene: React.FC = () => {
 
   const split = ease(frame, piecesAt, 16);
   const move = ease(frame, serversAt, 26);
-  const pieceH = (h(TABLE.h) - 3 * 12) / 4;
+  const pieceH = (h(TABLE.h) - (PIECES - 1) * 6) / PIECES;
   const tableTop = y(TABLE.top);
   const srvTop = y(392);
 
@@ -67,7 +73,8 @@ export const ShardScene: React.FC = () => {
   const hashFill = (i: number) => ease(frame, millionAt + i * 2, 18);
   const one = SHARDS.counts.length - 3;
   const redirectLit = Math.min(ease(frame, redirectAt, 8), 1 - ease(frame, listAt, 8));
-  const allLit = ease(frame, allAt, 10);
+  /** One user's links, a red dot each, stacked on the shard that holds it. */
+  const dotStep = 12.5;
   const evenY = base - h(COL_H) * (SHARDS.keys / SHARDS.shards / maxCount);
 
   return (
@@ -81,6 +88,8 @@ export const ShardScene: React.FC = () => {
       <Sfx name="el-tap" at={redirectAt} level={-31} />
       <Sfx name="el-sprinkle" at={allAt} level={-32} />
       <Sfx name="el-tap" at={copyAt + 4} level={-31} />
+      <Sfx name="el-tap" at={modAt} level={-31} />
+      <Sfx name="el-tap" at={ringAt} level={-31} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE} width={Q_W}>
@@ -92,14 +101,14 @@ export const ShardScene: React.FC = () => {
         <Line at={partAt} x={X0} y={y(334)} size={22} weight={500} dim={serversAt + 26}>
           Partitioning: one table, in pieces
         </Line>
-        {[0, 1, 2, 3].map((i) => {
+        {Array.from({ length: PIECES }, (_, i) => {
           const p = ease(frame, partAt, 12);
           if (p <= 0) return null;
-          const stacked = tableTop + i * (h(TABLE.h) / 4);
-          const apart = tableTop + i * (pieceH + 12);
-          const x = lerp(TABLE.x, SERVER.x0 + i * SERVER.step + (SERVER.w - 130) / 2, move);
+          const stacked = tableTop + i * (h(TABLE.h) / PIECES);
+          const apart = tableTop + i * (pieceH + 6);
+          const x = lerp(TABLE.x, SERVER.x0 + i * SERVER.step + (SERVER.w - PIECE_W) / 2, move);
           const top = lerp(lerp(stacked, apart, split), srvTop + 18, move);
-          const w = lerp(TABLE.w, 130, move);
+          const w = lerp(TABLE.w, PIECE_W, move);
           return (
             <div
               key={i}
@@ -108,11 +117,11 @@ export const ShardScene: React.FC = () => {
                 left: x,
                 top,
                 width: w,
-                height: lerp(h(TABLE.h) / 4, pieceH, split),
+                height: lerp(lerp(h(TABLE.h) / PIECES, pieceH, split), 34, move),
                 boxSizing: "border-box",
                 border: `2px solid ${BAR}`,
                 borderRadius: lerp(0, 6, split),
-                background: `color-mix(in srgb, ${BAR} ${14 + i * 8}%, ${PAPER})`,
+                background: `color-mix(in srgb, ${BAR} ${12 + i * 4}%, ${PAPER})`,
                 opacity: p,
                 display: "flex",
                 alignItems: "center",
@@ -121,27 +130,29 @@ export const ShardScene: React.FC = () => {
                 fontWeight: 500,
               }}
             >
-              {i === 0 && move < 0.5 ? "links" : ""}
+              {i === 0 && split < 0.5 ? "links" : ""}
             </div>
           );
         })}
-        {[0, 1, 2, 3].map((i) => (
+        {Array.from({ length: PIECES }, (_, i) => (
           <Node
             key={i}
             x={SERVER.x0 + i * SERVER.step}
             y={srvTop}
             w={SERVER.w}
             h={SERVER.h}
-            at={serversAt + i * 3}
+            at={serversAt + i * 2}
             tone="plain"
             fill="transparent"
             size={20}
           >
-            <span style={{ ...label(20, INK_SOFT), fontWeight: 500, marginTop: 64 }}>server {i + 1}</span>
+            <span style={{ ...label(20, INK_SOFT), fontWeight: 500, marginTop: 64 }}>
+              <Num>{i + 1}</Num>
+            </span>
           </Node>
         ))}
         <Line at={shardAt} x={SERVER.x0} y={y(334)} size={22} weight={500}>
-          Sharding: the pieces on separate servers
+          Sharding: the pieces on <Num>{PIECES}</Num> separate servers
           <span style={{ opacity: ease(frame, keyAt, 10) }}>
             , by a <Mark at={keyAt + 2}>shard key</Mark>
           </span>
@@ -187,10 +198,19 @@ export const ShardScene: React.FC = () => {
           {SHARDS.counts.map((c, i) => {
             const x = colX(HASH_X, i);
             const top = base - h(COL_H) * (c / maxCount) * hashFill(i);
-            const solid = allLit > 0 ? `color-mix(in srgb, ${ACCENT} ${allLit * 100}%, ${OK})` : i === one && redirectLit > 0 ? HIGHLIGHT : OK;
-            const fill = i === one && redirectLit > 0 && allLit <= 0 ? solid : `color-mix(in srgb, ${solid} 70%, ${PAPER})`;
-            return <rect key={i} x={x} y={top} width={COL.w} height={base - top} fill={fill} rx={3} opacity={i === one || allLit > 0 ? 1 : 1 - 0.5 * redirectLit} />;
+            const solid = i === one && redirectLit > 0 ? HIGHLIGHT : OK;
+            const fill = i === one && redirectLit > 0 ? solid : `color-mix(in srgb, ${solid} 70%, ${PAPER})`;
+            return <rect key={i} x={x} y={top} width={COL.w} height={base - top} fill={fill} rx={3} opacity={i === one ? 1 : 1 - 0.5 * redirectLit} />;
           })}
+          {/* One user's links, a dot each on the shard that holds it: every shard has some. */}
+          {SHARDS.userPerShard.map((count, i) =>
+            Array.from({ length: count }, (_, k) => {
+              const p = ease(frame, allAt + i * 2 + k, 6);
+              return p > 0 ? (
+                <circle key={`${i}-${k}`} cx={colX(HASH_X, i) + COL.w / 2} cy={base - 9 - k * dotStep} r={5.2 * p} fill={ACCENT} stroke={PAPER} strokeWidth={1.6} />
+              ) : null;
+            }),
+          )}
           <line x1={HASH_X} x2={colX(HASH_X, 7) + COL.w} y1={base + 1} y2={base + 1} stroke={INK_SOFT} strokeWidth={1.4} />
           <line
             x1={HASH_X - 10}
@@ -203,13 +223,24 @@ export const ShardScene: React.FC = () => {
             opacity={ease(frame, withinAt, 10)}
           />
         </Svg>
+        {/* A ninth shard: what moves, by modulo and on a hash ring. */}
+        <Line at={ninthAt} x={1490} y={y(744)} size={21} weight={500} color={INK}>
+          add a ninth shard:
+        </Line>
+        <Line at={modAt} x={1490} y={y(744) + h(36)} size={21} weight={500} color={ACCENT_INK}>
+          modulo moves <Num>{pct(RESHARD.shareMod)}</Num>
+        </Line>
+        <Line at={ringAt} x={1490} y={y(744) + h(72)} size={21} weight={500} color={OK_INK}>
+          a hash ring moves <Num>{pct(RESHARD.shareRing)}</Num>
+        </Line>
+
         {/* One redirect lights one shard; one user's links light all eight. */}
         <Ink at={redirectAt} dur={10} out={listAt} style={{ left: colX(HASH_X, one) - 40, top: base + 10, whiteSpace: "nowrap" }}>
           <span style={{ ...label(21, INK), fontWeight: 500 }}>a redirect</span>
         </Ink>
         <Ink at={allAt} dur={12} style={{ left: HASH_X, top: base + 10, whiteSpace: "nowrap" }}>
           <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>
-            one user&apos;s <Num>{SHARDS.userLinks}</Num> links: all <Num>{SHARDS.userShards}</Num> shards
+            one user&apos;s <Num>{SHARDS.userLinks}</Num> links, a dot each: all <Num>{SHARDS.userShards}</Num> shards
             <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, priceAt, 10) }}>, the price of a cross-shard query</span>
           </span>
         </Ink>

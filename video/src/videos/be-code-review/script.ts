@@ -59,32 +59,40 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     out, as a test. "debug-trace": the traced copy (one print line added,
  *     as a diff) and its two printed lines, the second in red. "debug-hypo":
  *     the call with sorted() around the input, [[1, 2], [3, 4]] in green.
+ *     "debug-ai", "debug-ai-sub" (here, inside step three, since what an
+ *     assistant offers is a hypothesis): the two questions it is good for,
+ *     and step two lit again, until step four.
  *     "debug-symptom": the symptom patch as a diff, and the report's result,
  *     [], with an empty box. "debug-cause": the one-line diff that sorts
  *     inside the function; the report, the reproduction and both old tests,
  *     all green. "debug-explain": step five lit, its three parts as three
- *     short lines, the first two answered from the listing. "debug-ai": an
- *     assistant panel beside the listing with the two questions it is good
- *     for, and step two ringed. "debug-past": the two old tests, green before
- *     the fix and green after, side by side, and the reproduction added as a
- *     third.
+ *     short lines, the first two answered from the listing (the sort
+ *     guarantees the order the loop needs, and no more). "debug-past": the
+ *     two old tests, green before the fix and green after, side by side, and
+ *     the reproduction added as a third. "debug-more": the two lines beside
+ *     the sort marked, red: the report found one bug, and two more remain,
+ *     which is what the review then finds before shipping.
  *   - "review" to "review-past": a clipboard (spot art), and the page's five
  *     checks as a checklist beside the diff as it arrived, each ticked or
  *     flagged as the narration reaches it. "review-edges": `<` highlighted;
  *     [[1, 2], [2, 3]] in, the same out, on a number line where the two share
  *     the point 2. "review-contain": `merged[-1][1] = end` highlighted; [[1,
  *     10], [2, 3]] in, [[1, 3]] out, the lost 3-to-10 drawn in red on the
- *     number line. "review-tests": the assistant's two tests, each with two
- *     marks (this code, the correct one): the first green on both, grayed as
+ *     number line. "review-empty": the empty list and a single interval,
+ *     in and back, ticked; no try or except. "review-tests": the
+ *     assistant's two tests, each with two marks (this code, the correct one): the first green on both, grayed as
  *     "can't tell them apart"; the second green then red, flagged.
  *     "review-fix": the three-line fix as a diff, then the reviewer's tests
  *     as a grid: three rows, two columns (the assistant's code: three red;
  *     the fix: three green). "review-where": the three bugs, labelled
- *     boundary, boundary, assumption. "review-past": two number lines, closed
+ *     assumption (the sort), boundary (<=), assumption (a later interval
+ *     ends later). "review-past": two number lines, closed
  *     [1, 2] [2, 3] touching at a filled point, and half-open slots 9 to 10
  *     and 10 to 11 meeting at an open one.
- *   - "next": the fixed listing, sorted() highlighted, "one pass" becoming "n
- *     log n", and the NextLine.
+ *   - "next" to "next-line": the fixed listing, sorted() highlighted, "one
+ *     pass" becoming "n log n"; the sort's comparisons on 1,000 intervals in
+ *     order and shuffled; the decision (sort inside, for a helper this
+ *     small); and the NextLine.
  *
  * Facts. check.mjs runs every listing in Pyodide 314.0.7 (Python 3.14), the
  * runtime the track's blocks run in, into results.json, which data.ts reads;
@@ -123,6 +131,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     contained) fail on the assistant's code, all three, and pass on the
  *     fix, all three. With only the debugging round's sort, one of the three
  *     passes (results.json; not said).
+ *   - "next-cost": Python's sort makes 999 comparisons on 1,000 intervals
+ *     already in order (one pass) and 8,658 on the same 1,000 shuffled.
  * From the page, as it words them (check.mjs fails if the page stops saying
  * them): the survey's 66% and 45% (Stack Overflow, 2025 Developer Survey, AI
  * section, the page's footnote); the seven kinds of bug, and the supply-chain
