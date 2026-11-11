@@ -5,7 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { badgeStyle, Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, SRM } from "./data";
@@ -150,19 +150,25 @@ export const SrmScene: React.FC = () => {
           </span>
         </Note>
         <Note at={chiAt + 6} x={RIGHT_X} y={y(440)} out={formulaOut}>
-          <span style={{ fontFamily: MONO, fontSize: 27, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
-            χ² = Σ (observed − expected)² / expected
-          </span>
+          <MathRun style={{ fontSize: 29, color: INK }}>
+            <I>χ</I>² = Σ (observed − expected)² / expected
+          </MathRun>
         </Note>
         <Note at={sixteenAt - 2} x={RIGHT_X} y={y(500)} out={formulaOut}>
-          <span style={{ fontFamily: MONO, fontSize: 27, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none", ...TABULAR }}>
-            {"   = 200² / 5,000 + 200² / 5,000 = "}
-            <Mark at={sixteenAt + 4}>{bad.chi2.toFixed(0)}</Mark>
-          </span>
+          {/* The χ² is held, unseen, so this line's = sits under the one above. */}
+          <MathRun style={{ fontSize: 29, color: INK, ...TABULAR }}>
+            <span style={{ visibility: "hidden" }}>
+              <I>χ</I>²
+            </span>{" "}
+            = 200² / 5,000 + 200² / 5,000 = <Mark at={sixteenAt + 4}>{bad.chi2.toFixed(0)}</Mark>
+          </MathRun>
         </Note>
         <Note at={pAt - 2} x={RIGHT_X} y={y(580)} out={formulaOut}>
           <span style={{ ...note(32, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-            p ≈ {bad.p.toFixed(5)}, about 1 in {count(Math.round(1 / bad.p / 1000) * 1000)}
+            <MathRun>
+              <I>p</I> ≈ {bad.p.toFixed(5)}
+            </MathRun>
+            , about 1 in {count(Math.round(1 / bad.p / 1000) * 1000)}
           </span>
         </Note>
         <Note at={srmAt} x={RIGHT_X} y={y(650)} out={formulaOut}>
@@ -220,11 +226,19 @@ export const SrmScene: React.FC = () => {
             formula, as the contrast split's does. */}
         <Note at={formulaOut + 4} x={BARS_X - 40} y={sy(bad.observed[1]) - h(96)}>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            p ≈ <span style={TABULAR}>{bad.p.toFixed(5)}</span>: an SRM
+            <MathRun>
+              <I>p</I> ≈ <span style={TABULAR}>{bad.p.toFixed(5)}</span>
+            </MathRun>
+            : an SRM
           </span>
         </Note>
         <Note at={fineP - 2} x={MINI_X - 20} y={y(MINI_TOP) - h(62)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>p = {fine.p.toFixed(2)}: chance</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+            <MathRun>
+              <I>p</I> = {fine.p.toFixed(2)}
+            </MathRun>
+            : chance
+          </span>
         </Note>
 
         {/* What usually causes it. */}

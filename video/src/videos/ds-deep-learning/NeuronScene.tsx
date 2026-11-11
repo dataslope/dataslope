@@ -5,7 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COLLAPSE, NEURON } from "./data";
@@ -99,11 +99,19 @@ export const NeuronScene: React.FC = () => {
 
         {/* ── Question 1: the formula, then one neuron worked ── */}
         <Note at={sumAt - 4} x={X0} y={y(290)} out={q1Out}>
-          <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
-            a = <Mark at={fAt}>f(</Mark>
-            <Mark at={sumAt + 2}>w · x</Mark> <Mark at={biasAt}>+ b</Mark>
+          <MathRun style={{ fontSize: 36, color: INK }}>
+            <I>a</I> ={" "}
+            <Mark at={fAt}>
+              <I>f</I>(
+            </Mark>
+            <Mark at={sumAt + 2}>
+              <I>w</I> · <I>x</I>
+            </Mark>{" "}
+            <Mark at={biasAt}>
+              + <I>b</I>
+            </Mark>
             <Mark at={fAt}>)</Mark>
-          </span>
+          </MathRun>
         </Note>
 
         {NEURON.x.map((v, i) => (
@@ -135,7 +143,7 @@ export const NeuronScene: React.FC = () => {
           <line x1={NX} x2={NX} y1={y(NY) + NR + 70} y2={y(NY) + NR + 6} stroke={INK_SOFT} strokeWidth={2} opacity={ease(frame, plusAt - 2, 10)} />
         </Svg>
         <Tagline x={NX} y={y(NY) - h(22)} width={140} align="center" at={inputsAt + 2} out={zAt - 2} size={40} color={INK} weight={500}>
-          Σ
+          <MathRun>Σ</MathRun>
         </Tagline>
         <Tagline x={NX} y={y(NY) - h(20)} width={140} align="center" at={zAt} out={q1Out} size={34} color={INK} weight={500}>
           {NEURON.z}

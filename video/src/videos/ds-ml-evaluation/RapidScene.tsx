@@ -5,6 +5,7 @@ import { RapidFire, type RapidItem, Tick } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LOSS, METRICS } from "./data";
@@ -102,7 +103,10 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={r2At - 2} x={R_X + 40} y={c.y(704)}>
         <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-          <b>R²</b>: the share of variance explained; 1 is perfect, 0 is no better than the mean
+          <MathRun>
+            <I>R</I>²
+          </MathRun>
+          : the share of variance explained; 1 is perfect, 0 is no better than the mean
         </span>
         <br />
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, noUnitsAt - 2, 10) }}>
@@ -111,7 +115,11 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={valuesAt} x={R_X + 40} y={c.y(800)}>
         <span style={{ ...note(28, BLUE_INK), whiteSpace: "nowrap", ...TABULAR }}>
-          RMSE <b>{fmt(METRICS.rmse)}</b> · MAE <b>{fmt(METRICS.mae)}</b> · R² <b>{fmt(METRICS.r2)}</b>
+          RMSE <b>{fmt(METRICS.rmse)}</b> · MAE <b>{fmt(METRICS.mae)}</b> ·{" "}
+          <MathRun>
+            <I>R</I>²
+          </MathRun>{" "}
+          <b>{fmt(METRICS.r2)}</b>
         </span>
       </Note>
     </>
@@ -255,7 +263,14 @@ export const RapidScene: React.FC = () => {
   const end = n.beat("next").from;
 
   const items: RapidItem[] = [
-    { n: 13, label: "RMSE, MAE and R²", beat: "r-metrics", body: <Metrics c={c} /> },
+    { n: 13, label: (
+        <>
+          RMSE, MAE and{" "}
+          <MathRun>
+            <I>R</I>²
+          </MathRun>
+        </>
+      ), beat: "r-metrics", body: <Metrics c={c} /> },
     { n: 14, label: "Cross-entropy or MSE", beat: "r-xent", body: <Xent c={c} /> },
     { n: 15, label: "Choosing between two models", beat: "r-select", body: <Select c={c} /> },
   ].map(({ beat, ...item }) => ({ ...item, at: n.beat(beat).from }));

@@ -18,6 +18,7 @@ import {
   svgText,
 } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ADA, ENS, FOREST } from "./data";
@@ -281,8 +282,10 @@ export const ForestScene: React.FC = () => {
             <span
               style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}
             >
-              the usual default: about √{FOREST.features} ≈{" "}
-              {fmt(Math.sqrt(FOREST.features), 1)}
+              the usual default: about{" "}
+              <MathRun>
+                √{FOREST.features} ≈ {fmt(Math.sqrt(FOREST.features), 1)}
+              </MathRun>
             </span>
           </Note>
           <Note

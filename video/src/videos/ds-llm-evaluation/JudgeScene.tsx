@@ -5,6 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -222,7 +223,9 @@ export const JudgeScene: React.FC = () => {
           </Note>
           <Note at={kappaAt} x={R_X} y={y(GRID.top + 190)}>
             <div style={{ display: "flex", alignItems: "center", gap: 18, ...math(40, INK) }}>
-              <span style={{ fontStyle: "italic" }}>Cohen&apos;s κ</span>
+              <span>
+                Cohen&apos;s <I>κ</I>
+              </span>
               <span>=</span>
               <Frac top={<span>{JUDGE.po.toFixed(2)} − {JUDGE.pe.toFixed(2)}</span>} bottom={<span>1 − {JUDGE.pe.toFixed(2)}</span>} />
               <span style={{ opacity: ease(frame, aboveAt, 10) }}>=</span>
@@ -244,7 +247,9 @@ export const JudgeScene: React.FC = () => {
               a judge that always says pass: agrees {Math.round(JUDGE.alwaysPass.po * 100)}%,{" "}
               <span style={{ opacity: ease(frame, zeroAt, 10), color: ACCENT_INK, fontWeight: 500 }}>
                 <Mark at={zeroAt + 6} color={MARK_BAD}>
-                  κ = {JUDGE.alwaysPass.kappa}
+                  <MathRun>
+                    <I>κ</I> = {JUDGE.alwaysPass.kappa}
+                  </MathRun>
                 </Mark>
               </span>
             </span>

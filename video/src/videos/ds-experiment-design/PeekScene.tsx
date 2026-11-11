@@ -5,6 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { M } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PEEK, PEEK_RATES, pct } from "./data";
@@ -136,7 +137,9 @@ export const PeekScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={dipAt} x={BOX.right} y={at(ys, 0.05) - h(36)} width={150} align="right">
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>p = 0.05</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <M>p = 0.05</M>
+          </span>
         </Note>
         {/* The two crossings are named in the open space above the dip, where
             no part of the line runs through them. */}

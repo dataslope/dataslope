@@ -5,6 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, TABULAR, halo, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { NONINF, pct, SIDES } from "./data";
@@ -181,7 +182,11 @@ export const SidesScene: React.FC = () => {
         </Note>
         <Note at={nullAt - 2} x={330} y={y(348)}>
           <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            H<sub style={{ fontSize: "0.8em", verticalAlign: "-0.25em", lineHeight: 0 }}>0</sub>: worse by more than the margin
+            <MathRun>
+              <I>H</I>
+              <sub style={{ fontSize: "0.8em", verticalAlign: "-0.25em", lineHeight: 0 }}>0</sub>
+            </MathRun>
+            : worse by more than the margin
             <span style={{ opacity: ease(frame, rejectAt - 2, 10) }}>
               {" · "}rejected when the{" "}
               <Mark at={lowerEndAt} out={bigRunsAt - 4}>

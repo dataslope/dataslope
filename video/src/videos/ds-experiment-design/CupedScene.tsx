@@ -5,7 +5,8 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { MONO, SANS } from "../../theme/fonts";
+import { SANS } from "../../theme/fonts";
+import { I, MATH_STYLE, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CUPED } from "./data";
@@ -13,12 +14,15 @@ import { at, Axes, Drift, Mark, OK, OK_INK, type Scale, Svg } from "./parts";
 
 const BOX = { left: 190, right: 1010, top: 380, bottom: 820 };
 const COL_X = 1140;
+/** A subscript in the math face, set low. */
+const SUB: React.CSSProperties = { fontSize: "0.8em", verticalAlign: "-0.25em", lineHeight: 0 };
 const BAR_W = 560;
 const VAR_MAX = 9;
 /** The shared Axes' title face (its `tickText(19)`, set bold), drawn here so
  *  the titles can name X and Y in the formula's mono and switch to Y_adj. */
 const AXIS_TITLE: React.CSSProperties = { fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT };
-const AXIS_LETTER: React.CSSProperties = { fontFamily: MONO, fontWeight: 500, fill: INK };
+/** The axis variables, in the math face: italic, as in the formula. */
+const AXIS_LETTER: React.CSSProperties = { ...MATH_STYLE, fontStyle: "italic", fill: INK };
 
 /** The name, with each of its initials marked as it is read. */
 const WORDS = [
@@ -116,13 +120,25 @@ export const CupedScene: React.FC = () => {
         {/* The axis titles name X and Y, so the formula's letters land on the plot. */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: titlesP }}>
           <text x={BOX.right} y={y(BOX.bottom) + 58} textAnchor="end" style={AXIS_TITLE}>
-            <tspan style={AXIS_LETTER}>X</tspan>: each user before the test
+            <tspan data-math="" style={AXIS_LETTER}>
+              X
+            </tspan>
+            : each user before the test
           </text>
           <text x={BOX.left - 14} y={y(BOX.top) - 26} textAnchor="start" style={AXIS_TITLE} opacity={1 - adjTitle}>
-            <tspan style={AXIS_LETTER}>Y</tspan>: the same user during it
+            <tspan data-math="" style={AXIS_LETTER}>
+              Y
+            </tspan>
+            : the same user during it
           </text>
           <text x={BOX.left - 14} y={y(BOX.top) - 26} textAnchor="start" style={AXIS_TITLE} opacity={adjTitle}>
-            <tspan style={AXIS_LETTER}>Y_adj</tspan>: during it, adjusted
+            <tspan data-math="" style={AXIS_LETTER}>
+              Y
+              <tspan dy={5} style={{ fontStyle: "normal", fontSize: 19 }}>
+                adj
+              </tspan>
+            </tspan>
+            <tspan dy={-5}>: during</tspan> it, adjusted
           </text>
         </svg>
         <Svg opacity={shown}>
@@ -144,15 +160,25 @@ export const CupedScene: React.FC = () => {
           <line x1={BOX.left} x2={BOX.right} y1={at(ys, CUPED.meanY)} y2={at(ys, CUPED.meanY)} stroke={OK} strokeWidth={2.4} strokeDasharray="8 6" />
         </Svg>
         <Note at={predictsAt + 4} x={at(xs, -1)} y={at(ys, 15)} dim={thetaAt + 6}>
-          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>slope θ = {CUPED.theta}</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
+            slope{" "}
+            <MathRun>
+              <I>θ</I> = {CUPED.theta}
+            </MathRun>
+          </span>
         </Note>
 
         {/* The adjustment, then what it buys. */}
         <Note at={subtractAt} x={COL_X} y={y(380)}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>subtract what the pre-period predicts</span>
-          <div style={{ fontFamily: MONO, fontSize: 25, fontWeight: 500, color: INK, marginTop: 10, whiteSpace: "pre", fontVariantLigatures: "none" }}>
-            {"Y_adj = Y − "}
-            <Mark at={thetaAt}>{"θ(X − X̄)"}</Mark>
+          <div style={{ fontSize: 26, color: INK, marginTop: 10, whiteSpace: "nowrap" }}>
+            <MathRun>
+              <I>Y</I>
+              <sub style={SUB}>adj</sub> = <I>Y</I> −{" "}
+              <Mark at={thetaAt}>
+                <I>θ</I>(<I>X</I> − <I>X̄</I>)
+              </Mark>
+            </MathRun>
           </div>
         </Note>
         <Note at={pageAt} x={COL_X} y={y(500)}>
@@ -187,9 +213,15 @@ export const CupedScene: React.FC = () => {
         </Note>
         <Note at={shareAt - 2} x={COL_X} y={y(880)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            share removed = r²
+            share removed{" "}
+            <MathRun>
+              = <I>r</I>²
+            </MathRun>
             <span style={{ opacity: ease(frame, seventyFiveAt - 2, 10) }}>
-              , with r(X, Y) = <span style={TABULAR}>{CUPED.corr.toFixed(2)}</span>
+              , with{" "}
+              <MathRun>
+                <I>r</I>(<I>X</I>, <I>Y</I>) = <span style={TABULAR}>{CUPED.corr.toFixed(2)}</span>
+              </MathRun>
             </span>
           </span>
         </Note>

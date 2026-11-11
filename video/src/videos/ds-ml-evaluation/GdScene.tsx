@@ -5,7 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GD } from "./data";
@@ -148,13 +148,21 @@ export const GdScene: React.FC = () => {
         <Note at={againstAt - 2} x={LEFTS[0]} y={y(310)} out={end - 8}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             each step:{" "}
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500 }}>
-              x ← x − <Mark at={sizeAt - 2}>rate</Mark> × gradient
-            </span>
+            <MathRun>
+              <I>x</I> ← <I>x</I> − <Mark at={sizeAt - 2}>rate</Mark> × gradient
+            </MathRun>
           </span>
         </Note>
         <Note at={startAt - 2} x={LEFTS[0] + 760} y={y(316)} out={clearAt}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>loss = x², starting at x = {GD.start}</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+            <MathRun>
+              loss = <I>x</I>²
+            </MathRun>
+            , starting at{" "}
+            <MathRun>
+              <I>x</I> = {GD.start}
+            </MathRun>
+          </span>
         </Note>
 
         {runs.map((run, i) => (

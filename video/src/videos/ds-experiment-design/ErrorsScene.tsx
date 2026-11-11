@@ -5,6 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ERRORS, pct, POWER } from "./data";
@@ -140,7 +141,10 @@ export const ErrorsScene: React.FC = () => {
         </Note>
         <Note at={fpAt + 4} x={xs(crit) + 10} y={y(BASE) + h(14)}>
           <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            threshold, z = <span style={TABULAR}>{crit}</span>
+            threshold,{" "}
+            <MathRun>
+              <I>z</I> = <span style={TABULAR}>{crit}</span>
+            </MathRun>
           </span>
         </Note>
         {/* The axis, named a row below the threshold so the two never read as one line. */}
@@ -154,7 +158,10 @@ export const ErrorsScene: React.FC = () => {
         </Note>
         <Note at={alphaAt} x={COL_X} y={y(430)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            α = {pct(ERRORS.alpha)}<span style={{ opacity: ease(frame, firstAt, 10) }}>: ships features that do nothing</span>
+            <MathRun>
+              <I>α</I> = {pct(ERRORS.alpha)}
+            </MathRun>
+            <span style={{ opacity: ease(frame, firstAt, 10) }}>: ships features that do nothing</span>
           </span>
         </Note>
         <Note at={missAt - 2} x={COL_X} y={y(490)}>
@@ -162,14 +169,22 @@ export const ErrorsScene: React.FC = () => {
         </Note>
         <Note at={betaAt} x={COL_X} y={y(530)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            β<span style={{ opacity: stale }}> = {pct(ERRORS.beta)}</span><span style={{ opacity: ease(frame, secondAt, 10) }}>: abandons features that work</span>
+            <MathRun>
+              <I>β</I>
+              <span style={{ opacity: stale }}> = {pct(ERRORS.beta)}</span>
+            </MathRun>
+            <span style={{ opacity: ease(frame, secondAt, 10) }}>: abandons features that work</span>
           </span>
         </Note>
 
         {/* Power, and what moves it. */}
         <Note at={oneMinusAt} x={COL_X} y={y(596)}>
           <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-            power = 1 − β<span style={{ opacity: stale }}> = {pct(POWER.base)}</span>
+            power{" "}
+            <MathRun>
+              = 1 − <I>β</I>
+              <span style={{ opacity: stale }}> = {pct(POWER.base)}</span>
+            </MathRun>
           </span>
         </Note>
         <Note at={codeAt} x={COL_X} y={y(644)}>

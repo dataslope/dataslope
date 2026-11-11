@@ -5,6 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -177,9 +178,9 @@ export const SizeScene: React.FC = () => {
             {/* One line, one face: the name, the formula and what it means
                 are all set in the math serif at one size. */}
             <span style={math(28, INK_SOFT)}>half-width</span>
-            <span style={math(28, INK)}>
-              = 1.96 √(p(1 − p) / n)
-            </span>
+            <MathRun style={{ fontSize: 28, color: INK }}>
+              = 1.96 √(<I>p</I>(1 − <I>p</I>) / <I>n</I>)
+            </MathRun>
             <span style={{ ...math(28, INK), opacity: ease(frame, halvesAt - 2, 10) }}>
               <Mark at={halvesAt + 6} out={habitsAt}>
                 4× the items, half the width
@@ -240,7 +241,9 @@ export const SizeScene: React.FC = () => {
             as two separate samples:{" "}
             <span style={{ opacity: ease(frame, p23At - 2, 10), color: ACCENT_INK, fontWeight: 500 }}>
               <Strike at={sameAt} color={ACCENT}>
-                p = {PAIR.pUnpaired.toFixed(2)}
+                <MathRun>
+                  <I>p</I> = {PAIR.pUnpaired.toFixed(2)}
+                </MathRun>
               </Strike>
             </span>
           </span>
@@ -250,7 +253,9 @@ export const SizeScene: React.FC = () => {
             paired, McNemar&apos;s test:{" "}
             <span style={{ opacity: ease(frame, p02At - 2, 10), color: OK_INK, fontWeight: 500 }}>
               <Mark at={p02At + 6} color={MARK_OK}>
-                p = {PAIR.pMcNemar.toFixed(2)}
+                <MathRun>
+                  <I>p</I> = {PAIR.pMcNemar.toFixed(2)}
+                </MathRun>
               </Mark>
             </span>
           </span>
