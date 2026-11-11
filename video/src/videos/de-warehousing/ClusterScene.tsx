@@ -171,7 +171,7 @@ export const ClusterScene: React.FC = () => {
 
         {/* ── In date order ── */}
         <div style={{ position: "absolute", left: X0, top: y(SORTED_Y) - 4, width: AX0 - X0 - 20, opacity: ease(frame, likeAt - 2, 12) }}>
-          <div style={{ ...label(23, INK) }}>in date order</div>
+          <div style={{ ...label(23, INK) }}>In date order</div>
           <div style={{ ...note(20, INK_SOFT), marginTop: 4, opacity: ease(frame, weeksAt, 10) }}>
             <Num>{CLUSTER.sorted.groups.length}</Num> row groups, about six weeks each
           </div>
@@ -188,7 +188,7 @@ export const ClusterScene: React.FC = () => {
 
         {/* ── Shuffled ── */}
         <div style={{ position: "absolute", left: X0, top: y(SHUFFLED_Y) - 4, width: AX0 - X0 - 20, opacity: ease(frame, shuffleAt, 12) }}>
-          <div style={{ ...label(23, INK) }}>shuffled</div>
+          <div style={{ ...label(23, INK) }}>Shuffled</div>
           <div style={{ ...note(20, INK_SOFT), marginTop: 4, opacity: ease(frame, yearAt, 10) }}>every group spans the year</div>
         </div>
         {panel(SHUFFLED_Y, CLUSTER.shuffled.groups, shuffleAt + 4, nothingAt, ACCENT, false, STEP)}

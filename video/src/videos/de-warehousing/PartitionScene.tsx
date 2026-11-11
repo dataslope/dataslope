@@ -203,7 +203,7 @@ export const PartitionScene: React.FC = () => {
           </span>
         </Note>
         <Note at={keyAt + 8} x={PLAN_X} y={y(LIST_Y) + h(146)} out={fnAt - 2}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>pruning: skipping the folders that can&apos;t match</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Pruning: skipping the folders that can&apos;t match</span>
         </Note>
 
         {/* ── A good key ── */}

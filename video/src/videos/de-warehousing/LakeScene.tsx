@@ -4,12 +4,12 @@ import { during, ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
-import { NextLine, Note } from "../../editorial/ui";
+import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { COLUMN_TINT, Drift, OK, OK_INK, READ, Spot, X0 } from "./parts";
+import { COLUMN_TINT, Drift, OK, OK_INK, READ, X0 } from "./parts";
 
 const TOP = 296;
 const PANEL_W = 520;
@@ -91,7 +91,6 @@ export const LakeScene: React.FC = () => {
   const reliableAt = n.word("lake-gives", "warehouse reliability");
   const nextFrom = n.beat("next").from;
   const landsAt = n.word("next", "the data lands on time");
-  const nextAt = n.word("next", "Next:", { nth: 2 });
   const end = n.beat("next").to;
 
   const px = (i: number) => X0 + i * (PANEL_W + PANEL_GAP);
@@ -154,7 +153,6 @@ export const LakeScene: React.FC = () => {
       <Sfx name="el-tap" at={versionAt + 2} level={-36} />
       <Sfx name="el-tap" at={travelAt + 2} level={-36} />
       <Sfx name="el-pop" at={landsAt} level={-35} />
-      <Sfx name="el-chime" at={nextAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={9} at={qAt - 4} textAt={qTextAt - 2} size={60}>
@@ -200,7 +198,7 @@ export const LakeScene: React.FC = () => {
             </div>
           </div>
           <Note at={sqlAt} x={px(0)} y={y(NOTES_Y)}>
-            <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>tuned for SQL</span>
+            <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Tuned for SQL</span>
           </Note>
 
           {/* ── The lake ── */}
@@ -210,10 +208,10 @@ export const LakeScene: React.FC = () => {
             <FileChip key={f} x={px(1) + 24 + (k % 2) * 220} y={boxY + h(26) + Math.floor(k / 2) * h(52)} name={f} at={filesAt + k * 3} />
           ))}
           <Note at={openAt} x={px(1)} y={y(NOTES_Y)}>
-            <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>open, cheap, flexible</span>
+            <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Open, cheap, flexible</span>
           </Note>
           <Note at={noTxAt} x={px(1)} y={y(NOTES_Y) + h(40)}>
-            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no transactions, no schema enforcement</span>
+            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>No transactions, no schema enforcement</span>
           </Note>
 
           {/* ── The lakehouse: a log over the files ── */}
@@ -265,21 +263,21 @@ export const LakeScene: React.FC = () => {
           </div>
           <Note at={versionAt + 4} x={px(2)} y={y(NOTES_Y)} out={travelAt}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-              a reader sees <b>v3</b>: files 2, 3 and 4
+              A reader sees <b>v3</b>: files 2, 3 and 4
             </span>
           </Note>
           <Note at={travelAt + 4} x={px(2)} y={y(NOTES_Y)}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-              time travel: read <b>v1</b>, files 1 and 2
+              Time travel: read <b>v1</b>, files 1 and 2
             </span>
           </Note>
 
           {/* ── What the log gives: under the lakehouse, two by two ── */}
           {[
             { at: acidAt, text: "ACID transactions" },
-            { at: schemasAt, text: "enforced schemas" },
-            { at: upsertAt, text: "upserts" },
-            { at: travelAt, text: "time travel" },
+            { at: schemasAt, text: "Enforced schemas" },
+            { at: upsertAt, text: "Upserts" },
+            { at: travelAt, text: "Time travel" },
           ].map((g, k) => (
             <div
               key={g.text}
@@ -303,22 +301,17 @@ export const LakeScene: React.FC = () => {
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>ACID: atomic, consistent, isolated, durable</span>
           </Note>
           <Note at={upsertAt + 8} x={px(2)} y={y(770)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>upsert: update the row with that key, or insert it</span>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Upsert: update the row with that key, or insert it</span>
           </Note>
           <Note at={reliableAt} x={X0} y={y(790)}>
-            <span style={{ ...note(27, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a warehouse&apos;s reliability, on the lake&apos;s open, cheaper storage</span>
+            <span style={{ ...note(27, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A warehouse&apos;s reliability, on the lake&apos;s open, cheaper storage</span>
           </Note>
         </div>
 
-        {/* ── The bridge into Part 10 ── */}
-        {/* Its baseline on the Next line's. */}
+        {/* ── The closing line; the bridge into Part 10 has its own page (NextScene). ── */}
         <Note at={landsAt} x={X0} y={y(852) + 15}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>All of it assumes the data lands on time, every day.</span>
         </Note>
-        <Spot id="de-warehousing-hamster" at={landsAt} left={1020} top={y(700)} width={183} height={140} />
-        <NextLine at={nextAt} x={780} y={y(842)} width={640}>
-          orchestration and reliability
-        </NextLine>
       </Drift>
     </AbsoluteFill>
   );

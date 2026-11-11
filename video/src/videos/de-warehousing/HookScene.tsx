@@ -119,7 +119,7 @@ export const HookScene: React.FC = () => {
             opacity: ease(frame, askAt, 12) * (1 - ease(frame, dim, 14) * 0.55),
           }}
         >
-          the page&apos;s query: revenue and units by <QCode>category</QCode>
+          The page&apos;s query: revenue and units by <QCode>category</QCode>
           <span style={{ ...note(22, INK_SOFT) }}>, run in DuckDB, a columnar engine</span>
         </div>
         <ReadMark x={X0} y={y(ROW1)} width={CSV_W} height={h(BAR_H)} at={everyAt + 4} out={dim} />

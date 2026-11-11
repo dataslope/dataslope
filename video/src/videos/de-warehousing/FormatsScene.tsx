@@ -174,10 +174,10 @@ export const FormatsScene: React.FC = () => {
       kindAt: bothAt,
       diagram: <Columnar x={cardX(0)} y={y(DIAGRAM_Y)} h={h(DIAGRAM_H)} at={bothAt} part="row group" statsAt={statsAt} />,
       lines: [
-        { at: bothAt + 4, text: "columnar, compressed" },
-        { at: statsAt + 4, text: "min and max per column, to skip data" },
+        { at: bothAt + 4, text: "Columnar, compressed" },
+        { at: statsAt + 4, text: "Min and max per column, to skip data" },
         // Read by all of these; BigQuery and Snowflake store their own tables in their own formats.
-        { at: defaultAt, text: "read by nearly every engine: Spark, pandas, DuckDB, BigQuery, Snowflake" },
+        { at: defaultAt, text: "Read by nearly every engine: Spark, pandas, DuckDB, BigQuery, Snowflake" },
       ],
     },
     {
@@ -187,9 +187,9 @@ export const FormatsScene: React.FC = () => {
       kindAt: orcAt + 6,
       diagram: <Columnar x={cardX(1)} y={y(DIAGRAM_Y)} h={h(DIAGRAM_H)} at={bothAt + 6} part="stripe" statsAt={statsAt + 6} />,
       lines: [
-        { at: bothAt + 10, text: "columnar, compressed" },
-        { at: statsAt + 10, text: "statistics to skip data" },
-        { at: hiveAt, text: "grew up with Hive, in Hadoop" },
+        { at: bothAt + 10, text: "Columnar, compressed" },
+        { at: statsAt + 10, text: "Statistics to skip data" },
+        { at: hiveAt, text: "Grew up with Hive, in Hadoop" },
       ],
     },
     {
@@ -200,17 +200,17 @@ export const FormatsScene: React.FC = () => {
       diagram: <Rows x={cardX(2)} y={y(DIAGRAM_Y)} h={h(DIAGRAM_H)} at={recordsAt} schemaAt={schemaAt} />,
       // A file carries its schema; a single message on Kafka carries only an ID.
       lines: [
-        { at: schemaAt + 4, text: "files: the writer's schema in the header" },
-        { at: streamAt, text: "a record at a time: streaming, Kafka" },
+        { at: schemaAt + 4, text: "Files: the writer's schema in the header" },
+        { at: streamAt, text: "A record at a time: streaming, Kafka" },
         {
           at: compatAt,
           text: (
             <>
-              evolves by rules<span style={{ opacity: ease(frame, fieldAt, 10) }}>: a new field takes a default</span>
+              Evolves by rules<span style={{ opacity: ease(frame, fieldAt, 10) }}>: a new field takes a default</span>
             </>
           ),
         },
-        { at: idAt, text: "per message: a schema ID, from a registry" },
+        { at: idAt, text: "Per message: a schema ID, from a registry" },
       ],
     },
   ];

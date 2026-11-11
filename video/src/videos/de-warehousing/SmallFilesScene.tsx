@@ -124,11 +124,11 @@ export const SmallFilesScene: React.FC = () => {
             opacity: ease(frame, dayAt, 12) * (1 - ease(frame, rewriteAt + 16, 8)),
           }}
         >
-          by day <span style={{ color: INK_SOFT, fontWeight: 500 }}>· one Parquet file per day</span>
+          By day <span style={{ color: INK_SOFT, fontWeight: 500 }}>· one Parquet file per day</span>
         </div>
         {/* The same place, once the day files have folded into months. */}
         <div style={{ position: "absolute", left: X0, top: gridY - h(40), ...label(22, INK), whiteSpace: "nowrap", opacity: ease(frame, rewriteAt + 22, 12) }}>
-          after compaction{" "}
+          After compaction{" "}
           <span style={{ color: INK_SOFT, fontWeight: 500 }}>
             · <Num>{SMALL.month.files}</Num> files of about <Num>{KB(SMALL.month.avg)}</Num>
           </span>
@@ -185,11 +185,11 @@ export const SmallFilesScene: React.FC = () => {
           </span>
         </Note>
         <Note at={footerAt + 12} x={PANEL_X + 20} y={gridY + h(90)} out={fixAt - 4}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>a footer: the file&apos;s schema and statistics, read before any data</span>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>A footer: the file&apos;s schema and statistics, read before any data</span>
         </Note>
         <Note at={openAt + 4} x={PANEL_X} y={gridY + h(130)} out={fixAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            a scan of the year opens <b style={{ color: ACCENT_INK }}>{SMALL.day.read} files</b>
+            A scan of the year opens <b style={{ color: ACCENT_INK }}>{SMALL.day.read} files</b>
             <span style={{ color: INK_SOFT }}>
               {" "}
               · by month <Num>{SMALL.month.read}</Num> · as one file <Num>{SMALL.one.read}</Num>
@@ -197,7 +197,7 @@ export const SmallFilesScene: React.FC = () => {
           </span>
         </Note>
         <Note at={timeAt} x={PANEL_X} y={gridY + h(180)} out={fixAt - 4}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>time on files, not data</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Time on files, not data</span>
         </Note>
 
         {/* ── Compaction ── */}
@@ -216,7 +216,7 @@ export const SmallFilesScene: React.FC = () => {
           </span>
         </Note>
         <Note at={formatAt + 12} x={PANEL_X + 20} y={gridY + h(132)}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>a table format: a log of which files make up the table (Question 9)</span>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>A table format: a log of which files make up the table (Question 9)</span>
         </Note>
 
         {/* ── Prevention ── */}
@@ -225,7 +225,7 @@ export const SmallFilesScene: React.FC = () => {
         </Note>
         <Note at={keyAt} x={PANEL_X} y={gridY + h(232)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            a coarser key
+            A coarser key
             <span style={{ opacity: ease(frame, writersAt, 10) }}> · fewer writers per partition</span>
             <span style={{ opacity: ease(frame, batchesAt, 10) }}> · bigger batches</span>
           </span>
@@ -325,7 +325,7 @@ export const SmallFilesScene: React.FC = () => {
             opacity: ease(frame, gbAt + 10, 10),
           }}
         >
-          a million rows is small: the target is for tables far larger than this one
+          A million rows is small: the target is for tables far larger than this one
         </div>
       </Drift>
     </AbsoluteFill>

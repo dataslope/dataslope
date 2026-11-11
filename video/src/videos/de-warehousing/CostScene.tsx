@@ -55,8 +55,8 @@ export const CostScene: React.FC = () => {
 
   const w = (bytes: number) => Math.max(4, (BAR_W * bytes) / COST.csv.read);
   const bills = [
-    { at: scansAt, sub: bqAt, title: "billed by the data a query scans", who: "BigQuery" },
-    { at: computeAt, sub: sfAt, title: "billed by compute time", who: "Snowflake, Redshift" },
+    { at: scansAt, sub: bqAt, title: "Billed by the data a query scans", who: "BigQuery" },
+    { at: computeAt, sub: sfAt, title: "Billed by compute time", who: "Snowflake, Redshift" },
     { at: storeAt, sub: smallerAt, title: "and storage, billed too", who: "usually the smaller part" },
   ];
   const reads = [
@@ -65,9 +65,9 @@ export const CostScene: React.FC = () => {
     { at: marchAt + 4, sizeAt: kbAt, bytes: COST.march.read, size: KB(COST.march.read), what: "Parquet by month: March's file, three columns" },
   ];
   const levers = [
-    { at: incAt, text: "incremental models, not full refreshes" },
-    { at: storedAt, text: "stored results for heavy, repeated queries" },
-    { at: suspendAt, text: "warehouses that suspend when idle" },
+    { at: incAt, text: "Incremental models, not full refreshes" },
+    { at: storedAt, text: "Stored results for heavy, repeated queries" },
+    { at: suspendAt, text: "Warehouses that suspend when idle" },
   ];
 
   return (
@@ -178,7 +178,7 @@ export const CostScene: React.FC = () => {
           }}
         >
           <Tick at={coldAt + 4} size={24} color={OK} />
-          cold data on cheaper storage
+          Cold data on cheaper storage
         </div>
       </Drift>
     </AbsoluteFill>
