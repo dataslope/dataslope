@@ -38,7 +38,7 @@ const Compaction: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={startAt} x={R_X} y={c.y(330)}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>profile updates, keyed by user: the log, oldest first</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Profile updates, keyed by user: the log, oldest first</span>
       </Note>
       {COMPACTION.log.map((r) => {
         const p = ease(frame, startAt + 2 + r.offset * 2, 8);
@@ -58,7 +58,7 @@ const Compaction: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <Note at={ageAt} x={R_X} y={logY + c.h(66)}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>by key, not by age</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>By key, not by age</span>
       </Note>
       {COMPACTION.log
         .filter((r) => r.kept)
@@ -69,7 +69,7 @@ const Compaction: React.FC<{ c: Ctx }> = ({ c }) => {
         ))}
       <Note at={snapAt} x={R_X} y={keptY + c.h(4)}>
         <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          compacted: <Num>{COMPACTION.kept}</Num> of <Num>{COMPACTION.log.length}</Num>
+          Compacted: <Num>{COMPACTION.kept}</Num> of <Num>{COMPACTION.log.length}</Num>
         </span>
       </Note>
       <Note at={profileAt} x={R_X} y={keptY + c.h(40)}>
@@ -129,18 +129,18 @@ const Join: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={batchAt} x={R_X} y={c.y(330)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>batch join: both tables are complete, so it waits for every row</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Batch join: both tables are complete, so it waits for every row</span>
       </Note>
       <Note at={cantAt} x={R_X} y={c.y(372)}>
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          stream join: can't wait<span style={{ opacity: ease(frame, neverAt, 10) }}>; neither side ever ends</span>
+          Stream join: can't wait<span style={{ opacity: ease(frame, neverAt, 10) }}>; neither side ever ends</span>
         </span>
       </Note>
       <Note at={s2sAt} x={R_X} y={cy - c.h(30) - c.h(34)}>
-        <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>stream to stream</span>
+        <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Stream to stream</span>
       </Note>
       <Note at={tableAt} x={R_X} y={c.y(690) - c.h(36)}>
-        <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>stream to table</span>
+        <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Stream to table</span>
       </Note>
       {[
         { name: "clicks", y: cy, ts: CLICKS },
@@ -228,9 +228,9 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const startAt = c.w("r-dlq", "a dead-letter queue catches");
   const kinds = [
-    { text: "malformed", at: c.w("r-dlq", "malformed") },
-    { text: "off-schema", at: c.w("r-dlq", "off-schema") },
-    { text: "failing again and again", at: c.w("r-dlq", "failing again and again") },
+    { text: "Malformed", at: c.w("r-dlq", "malformed") },
+    { text: "Off-schema", at: c.w("r-dlq", "off-schema") },
+    { text: "Failing again and again", at: c.w("r-dlq", "failing again and again") },
   ];
   const flowAt = c.w("r-dlq", "The main stream keeps flowing");
   const stallAt = c.w("r-dlq", "stalling on one poison message");
@@ -332,7 +332,7 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
       ))}
       <Note at={flowAt} x={lane.x} y={lane.y - c.h(76)}>
         <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          the main stream keeps flowing<span style={{ ...label(22, INK_SOFT), opacity: ease(frame, stallAt, 10) }}>, never stalled by one poison message</span>
+          The main stream keeps flowing<span style={{ ...label(22, INK_SOFT), opacity: ease(frame, stallAt, 10) }}>, never stalled by one poison message</span>
         </span>
       </Note>
       <ElbowArrow
@@ -353,11 +353,11 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={batchAt} x={R_X} y={c.y(720)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          in a batch pipeline: <span style={{ opacity: ease(frame, rowsAt, 10) }}>bad rows, or whole tasks, set aside</span>
+          In a batch pipeline: <span style={{ opacity: ease(frame, rowsAt, 10) }}>bad rows, or whole tasks, set aside</span>
         </span>
       </Note>
       <Note at={vanishAt - 6} x={R_X} y={c.y(764)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a few don't stop everything, and none vanish</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A few don't stop everything, and none vanish</span>
       </Note>
     </>
   );

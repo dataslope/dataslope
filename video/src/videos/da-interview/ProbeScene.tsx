@@ -26,10 +26,10 @@ export const ProbeScene: React.FC = () => {
   const from = n.beat("probe").from;
   const fourAt = n.word("probe", "four things");
   const rows = [
-    { at: n.word("probe", "SQL fluency"), name: "SQL fluency", detail: <>joins, <Mono>GROUP BY</Mono>, <Mono>WHERE</Mono> vs <Mono>HAVING</Mono>, <Mono>CASE</Mono>, window functions</> },
-    { at: n.word("probe", "Framing"), name: "Framing", detail: <>the right grain (what one row is), nulls handled, nothing counted twice after a join</> },
-    { at: n.word("probe", "Communication"), name: "Communication", detail: <>assumptions, caveats, what you&apos;d check next</> },
-    { at: n.word("probe", "And tools"), name: "Tools", detail: <>a spreadsheet, and a BI (business intelligence) tool: Tableau, Power BI, Looker</> },
+    { at: n.word("probe", "SQL fluency"), name: "SQL fluency", detail: <>Joins, <Mono>GROUP BY</Mono>, <Mono>WHERE</Mono> vs <Mono>HAVING</Mono>, <Mono>CASE</Mono>, window functions</> },
+    { at: n.word("probe", "Framing"), name: "Framing", detail: <>The right grain (what one row is), nulls handled, nothing counted twice after a join</> },
+    { at: n.word("probe", "Communication"), name: "Communication", detail: <>Assumptions, caveats, what you&apos;d check next</> },
+    { at: n.word("probe", "And tools"), name: "Tools", detail: <>A spreadsheet, and a BI (business intelligence) tool: Tableau, Power BI, Looker</> },
   ];
   const end = n.beat("probe").to;
 

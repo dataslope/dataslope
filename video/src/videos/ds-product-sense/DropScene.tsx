@@ -154,18 +154,18 @@ export const DropScene: React.FC = () => {
           </Tag>
         ))}
         <Note at={shapeAt} x={CHART.x0} y={y(BARS.top) + h(74)} out={fakeOut}>
-          <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>each can make that shape on its own</span>
+          <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>Each can make that shape on its own</span>
         </Note>
         <Note at={ruleAt} x={CHART.x0} y={y(BARS.top) + h(128)} out={fakeOut}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <b>rule them out:</b> <span style={{ opacity: ease(frame, yearAt, 10) }}>the same week last year</span>
+            <b>Rule them out:</b> <span style={{ opacity: ease(frame, yearAt, 10) }}>the same week last year</span>
             <span style={{ opacity: ease(frame, relatedAt, 10) }}>, related metrics</span>
           </span>
         </Note>
 
         {/* Step 2: split by platform. */}
         <Note at={hundredAt} x={CHART.x0} y={y(BARS.top) - h(48)}>
-          <span style={madeUp(20)}>say the app had {num(DROP.totalBefore)} daily users (made up)</span>
+          <span style={madeUp(20)}>Say the app had {num(DROP.totalBefore)} daily users (made up)</span>
         </Note>
         {platforms.map((p, i) => {
           const top = y(BARS.top) + i * h(BARS.gap);

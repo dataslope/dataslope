@@ -15,10 +15,11 @@ const BW_X = 1520;
 const E = ESTIMATE;
 const A = E.assumptions;
 
-/** An assumption, as said: in gray, "assume" first. */
-const assume = (text: React.ReactNode) => (
+/** An assumption, as said: in gray, "assume" first, with a capital when it
+ *  starts the line. */
+const assume = (text: React.ReactNode, lead = false) => (
   <span style={{ color: INK_SOFT }}>
-    assume {text}
+    {lead ? "Assume" : "assume"} {text}
   </span>
 );
 
@@ -27,7 +28,8 @@ const assume = (text: React.ReactNode) => (
  * own assumptions, each said as one. The rule that does most of the work (a
  * million a day is about twelve a second), then writes, reads at a hundred to
  * one, and the peak at three times; storage and bandwidth beside it, both
- * small. What decides this system is its read traffic, and the cache.
+ * small. What decides this system is its read traffic, and the cache, and
+ * the cache is small: a whole day of new links is 5 GB, one machine's memory.
  */
 export const EstimateScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -61,7 +63,9 @@ export const EstimateScene: React.FC = () => {
   const neitherAt = n.word("q2-verdict", "Neither is hard");
   const decidedAt = n.word("q2-verdict", "decided by its read traffic");
   const cacheAt = n.word("q2-verdict", "a cache can answer");
-  const end = n.beat("q2-verdict").to;
+  const dayAt = n.word("q2-cache", "Even a whole day of new links is five gigabytes");
+  const memAt = n.word("q2-cache", "fits in one machine's memory");
+  const end = n.beat("q2-cache").to;
 
   const headY = y(296);
   const ruleY = y(360);
@@ -89,6 +93,7 @@ export const EstimateScene: React.FC = () => {
       <Sfx name="el-tap" at={tbAt} level={-35} />
       <Sfx name="el-tap" at={mbAt} level={-35} />
       <Sfx name="el-chime" at={cacheAt + 4} level={-36} />
+      <Sfx name="el-tap" at={memAt} level={-36} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={2} at={qAt - 4} textAt={textAt - 4} size={58}>
@@ -133,13 +138,14 @@ export const EstimateScene: React.FC = () => {
             <>
               <Num>{int(A.newLinksPerDay)}</Num> new links a day
             </>,
+            true,
           )}
         </Line>
         <Line x={X0} y={pair(0) + 48} at={writesAt} size={28} weight={500} color={BLUE_INK}>
           ≈ <Num>{int(sig(E.writeQps))}</Num> writes a second
         </Line>
         <Line x={X0} y={pair(1)} at={ratioAt} size={25}>
-          <span style={{ color: INK_SOFT }}>read-heavy, 100 : 1 or more, so</span>
+          <span style={{ color: INK_SOFT }}>Read-heavy, 100 : 1 or more, so</span>
           <span style={{ opacity: ease(frame, perLinkAt, 10) }}>
             {" "}
             {assume(
@@ -157,7 +163,7 @@ export const EstimateScene: React.FC = () => {
           </span>
         </Line>
         <Line x={X0} y={pair(2)} at={peakAt} size={25}>
-          <span style={{ color: INK_SOFT }}>peaks run 2 to 3 times the average, so</span>
+          <span style={{ color: INK_SOFT }}>Peaks run 2 to 3 times the average, so</span>
           <span style={{ opacity: ease(frame, threeAt, 10) }}>
             {" "}
             {assume(
@@ -175,6 +181,11 @@ export const EstimateScene: React.FC = () => {
         <Line x={X0 + 450} y={pair(2) + 48} at={cacheAt} size={28} weight={500} color={OK_INK}>
           and a cache
         </Line>
+        {/* How big that cache is: a whole day of new links. */}
+        <Line x={X0 + 450} y={pair(2) + 100} at={dayAt} size={25} color={INK_SOFT}>
+          A whole day of new links: <Num>{Math.round(E.dayInMemoryBytes / 1e9)}</Num> GB
+          <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, memAt, 10) }}>, fits in one machine&apos;s memory</span>
+        </Line>
 
         {/* Storage. */}
         <Line x={ST_X} y={ruleY} at={bytesAt} size={25} dim={neitherAt}>
@@ -182,6 +193,7 @@ export const EstimateScene: React.FC = () => {
             <>
               <Num>{A.bytesPerLink}</Num> bytes a link
             </>,
+            true,
           )}
         </Line>
         <Line x={ST_X} y={ruleY + 60} at={gbAt - 4} size={27} dim={neitherAt}>
@@ -200,6 +212,7 @@ export const EstimateScene: React.FC = () => {
             <>
               <Num>{A.bytesPerRedirect}</Num> B a redirect
             </>,
+            true,
           )}
         </Line>
         <Line x={BW_X} y={ruleY + 60} at={mbAt - 6} size={27} dim={neitherAt}>

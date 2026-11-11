@@ -104,28 +104,28 @@ export const HookScene: React.FC = () => {
             Sorry, returns close 30 days after purchase.
           </Reply>
           <Note at={sureAt} x={X0} y={y(CARD_Y + 150)}>
-            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>both sound sure of themselves</span>
+            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Both sound sure of themselves</span>
           </Note>
           <Note at={policyAt} x={X0 + CARD_W + CARD_GAP} y={y(CARD_Y + 150)}>
-            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the refund policy: 30 days</span>
+            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The refund policy: 30 days</span>
           </Note>
           <Note at={decideAt} x={X0} y={y(700)}>
             <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
-              which version ships? <span style={{ opacity: ease(frame, measureAt - 2, 10) }}>That&apos;s </span>
+              Which version ships? <span style={{ opacity: ease(frame, measureAt - 2, 10) }}>That&apos;s </span>
               <span style={{ opacity: ease(frame, measureAt - 2, 10) }}>
                 <Mark at={measureAt + 4}>a measurement problem.</Mark>
               </span>
             </span>
           </Note>
           <Note at={shipsAt + 4} x={X0} y={y(764)}>
-            <span style={madeUp()}>the question and both replies are made up for this video</span>
+            <span style={madeUp()}>The question and both replies are made up for this video</span>
           </Note>
           <Spot id="ds-llm-evaluation-parrot" at={sureAt} left={1340} top={y(300)} width={460} height={420} />
         </Clear>
 
         {/* The plan: what you know, what's new, and how the page splits. */}
         <Note at={knowAt + 4} x={X0} y={y(ROW_KNOW - 44)}>
-          <span style={label(22, INK_SOFT)}>you already know</span>
+          <span style={label(22, INK_SOFT)}>You already know</span>
         </Note>
         {known.map((c, i) => (
           <Tag key={c.text} x={X0 + [0, 260, 470, 618][i]} y={y(ROW_KNOW)} at={c.at - 2} size={28} tone="blue">
@@ -133,7 +133,7 @@ export const HookScene: React.FC = () => {
           </Tag>
         ))}
         <Note at={newAt} x={X0} y={y(ROW_NEW - 44)}>
-          <span style={{ ...label(22, INK), fontWeight: 500 }}>what&apos;s new</span>
+          <span style={{ ...label(22, INK), fontWeight: 500 }}>What&apos;s new</span>
         </Note>
         {fresh.map((c, i) => (
           <Tag key={c.text} x={X0 + [0, 290, 708][i]} y={y(ROW_NEW)} at={c.at - 2} size={28}>

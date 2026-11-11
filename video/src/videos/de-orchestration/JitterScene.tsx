@@ -11,8 +11,8 @@ import { Drift, Headline, Kicker, OK, OK_INK, TaskBox } from "./parts";
 
 const PANEL_W = 720;
 const PANELS = [
-  { key: "plain", x: 170, title: "one backoff schedule" },
-  { key: "jitter", x: 1060, title: "with random jitter" },
+  { key: "plain", x: 170, title: "One backoff schedule" },
+  { key: "jitter", x: 1060, title: "With random jitter" },
 ] as const;
 /** The axis tops out at 300 retries a window; the plain spikes run past it. */
 const Y_MAX = 300;
@@ -83,7 +83,7 @@ export const JitterScene: React.FC = () => {
         {/* The kicker's left edge, the headline's column. */}
         <Note at={codeAt + 4} x={96} y={y(250)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            in code that calls a shared service<span style={{ color: INK_SOFT, opacity: ease(frame, partAt, 10) }}>: a random part of each wait</span>
+            In code that calls a shared service<span style={{ color: INK_SOFT, opacity: ease(frame, partAt, 10) }}>: a random part of each wait</span>
           </span>
         </Note>
 
@@ -133,7 +133,7 @@ export const JitterScene: React.FC = () => {
         })}
         <Note at={modelAt + 4} x={PANELS[0].x} y={y(372)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            a model: <Num>{count(STORM.clients)}</Num> tasks, a <Num>{STORM.base}</Num> ms base, retries per <Num>{STORM.bucket}</Num> ms
+            A model: <Num>{count(STORM.clients)}</Num> tasks, a <Num>{STORM.base}</Num> ms base, retries per <Num>{STORM.bucket}</Num> ms
           </span>
         </Note>
 
@@ -228,7 +228,7 @@ export const JitterScene: React.FC = () => {
           </span>
         </Note>
         <div style={{ position: "absolute", left: PANELS[1].x, top: y(372), ...label(21, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, landsAt, 10) }}>
-          each retry at a random point in its wait
+          Each retry at a random point in its wait
         </div>
       </Drift>
     </AbsoluteFill>

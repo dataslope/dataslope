@@ -57,7 +57,7 @@ const Prompt: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={at - 4} x={R_X} y={c.T - c.h(40)}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>a prompt</span>
+        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>A prompt</span>
       </Note>
       <TextPanel lines={PROMPT} x={R_X} top={c.T} width={980} size={size} mono at={at - 2} lineAt={cue}>
         {/* The two lines that matter most. */}
@@ -75,7 +75,7 @@ const Prompt: React.FC<{ c: Ctx }> = ({ c }) => {
         />
       </TextPanel>
       <Note at={checkAt} x={R_X} y={c.T + 2 * pad + PROMPT.length * lineH + c.h(16)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>its guesses come out, and you get a total to check against</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Its guesses come out, and you get a total to check against</span>
       </Note>
     </>
   );
@@ -94,9 +94,9 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
   const T = c.T + c.h(30);
   const layerX = R_X + 380;
   const layers = [
-    { at: metricsAt, text: "defined metrics" },
-    { at: tablesAt, text: "clean, documented tables" },
-    { at: modelAt, text: "a semantic model: how tables join" },
+    { at: metricsAt, text: "Defined metrics" },
+    { at: tablesAt, text: "Clean, documented tables" },
+    { at: modelAt, text: "A semantic model: how tables join" },
   ];
   // The layers as three rows of text with a hairline between each, 64px
   // apart: the rule sits in the middle of the gap under each row.
@@ -110,12 +110,12 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* The question, as the words someone types, with its label 12px under it. */}
       <div style={{ position: "absolute", left: R_X, top: T, width: 300, opacity: askP, transform: `translateY(${(1 - askP) * 8}px)` }}>
         <div style={{ ...note(26, INK), fontWeight: 500, lineHeight: "34px", textWrap: "balance" }}>&ldquo;Which region grew fastest?&rdquo;</div>
-        <div style={{ ...label(20, INK_SOFT), lineHeight: "26px", marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, askAt + 2, 14) }}>a question in plain words</div>
+        <div style={{ ...label(20, INK_SOFT), lineHeight: "26px", marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, askAt + 2, 14) }}>A question in plain words</div>
       </div>
       {/* Over the stack, so the layers read as what the tool stands on, not as
           what the question turns into. */}
       <Note at={metricsAt - 2} x={layerX} y={T - c.h(40)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>what it has to stand on to answer correctly</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>What it has to stand on to answer correctly</span>
       </Note>
       {layers.map((l, i) => {
         const p = ease(frame, l.at - 2, 12);
@@ -144,10 +144,10 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <Note at={messyAt - 2} x={layerX} y={below + c.h(4)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>on messy raw tables: confidently wrong, at scale</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>On messy raw tables: confidently wrong, at scale</span>
       </Note>
       <Note at={jobAt - 2} x={layerX} y={below + c.h(52)}>
-        <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the analyst builds these, and checks the answers</span>
+        <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The analyst builds these, and checks the answers</span>
       </Note>
     </>
   );

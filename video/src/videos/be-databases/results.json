@@ -395,7 +395,7 @@
           ]
         },
         "dayCount": {
-          "sql": "SELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31';",
+          "sql": "SELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31'\n  AND created_at <  '2025-01-01';",
           "ok": true,
           "columns": [
             "count"
@@ -407,20 +407,20 @@
           ]
         },
         "dayPlan": {
-          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31';",
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31'\n  AND created_at <  '2025-01-01';",
           "ok": true,
           "columns": [
             "QUERY PLAN"
           ],
           "rows": [
             [
-              "Aggregate  (cost=19866.64..19866.65 rows=1 width=8) (actual rows=1.00 loops=1)"
+              "Aggregate  (cost=22366.64..22366.65 rows=1 width=8) (actual rows=1.00 loops=1)"
             ],
             [
-              "  ->  Seq Scan on orders  (cost=0.00..19860.00 rows=2657 width=0) (actual rows=2656.00 loops=1)"
+              "  ->  Seq Scan on orders  (cost=0.00..22360.00 rows=2656 width=0) (actual rows=2656.00 loops=1)"
             ],
             [
-              "        Filter: (created_at >= '2024-12-31 00:00:00'::timestamp without time zone)"
+              "        Filter: ((created_at >= '2024-12-31 00:00:00'::timestamp without time zone) AND (created_at < '2025-01-01 00:00:00'::timestamp without time zone))"
             ],
             [
               "        Rows Removed by Filter: 997344"
@@ -473,20 +473,20 @@
           "rows": []
         },
         "skipPlan": {
-          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31';",
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31'\n  AND created_at <  '2025-01-01';",
           "ok": true,
           "columns": [
             "QUERY PLAN"
           ],
           "rows": [
             [
-              "Aggregate  (cost=126.97..126.98 rows=1 width=8) (actual rows=1.00 loops=1)"
+              "Aggregate  (cost=133.59..133.60 rows=1 width=8) (actual rows=1.00 loops=1)"
             ],
             [
-              "  ->  Index Only Scan using orders_status_created_idx on orders  (cost=0.42..120.33 rows=2657 width=0) (actual rows=2656.00 loops=1)"
+              "  ->  Index Only Scan using orders_status_created_idx on orders  (cost=0.42..126.95 rows=2656 width=0) (actual rows=2656.00 loops=1)"
             ],
             [
-              "        Index Cond: (created_at >= '2024-12-31 00:00:00'::timestamp without time zone)"
+              "        Index Cond: ((created_at >= '2024-12-31 00:00:00'::timestamp without time zone) AND (created_at < '2025-01-01 00:00:00'::timestamp without time zone))"
             ],
             [
               "        Heap Fetches: 0"
@@ -1251,6 +1251,30 @@
           "rows": [
             [
               "2661.50"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    },
+    "keys": {
+      "setup": "CREATE TABLE customers (id int PRIMARY KEY, name text NOT NULL);\nCREATE TABLE orders (\n  order_id int PRIMARY KEY,\n  customer_id int NOT NULL REFERENCES customers,\n  amount numeric NOT NULL)",
+      "steps": {
+        "indexes": {
+          "sql": "SELECT tablename, indexname FROM pg_indexes\nWHERE tablename IN ('customers', 'orders')\nORDER BY tablename, indexname;",
+          "ok": true,
+          "columns": [
+            "tablename",
+            "indexname"
+          ],
+          "rows": [
+            [
+              "customers",
+              "customers_pkey"
+            ],
+            [
+              "orders",
+              "orders_pkey"
             ]
           ]
         }

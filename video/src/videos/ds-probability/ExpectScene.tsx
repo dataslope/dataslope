@@ -4,12 +4,13 @@ import { Illustration } from "../../components/Illustration";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
+import { MathRun } from "../../editorial/math";
 import { HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DIE, HATS, pct, VIDEO } from "./data";
-import { Clear, DATA, DATA_LIGHT, DieFace, Drift, Frac, Mark, math, OK, OK_INK, Person, PERSON, pulse, Svg, V, X0 } from "./parts";
+import { Clear, DATA, DATA_LIGHT, DieFace, Drift, Frac, Mark, math, mathFace, OK, OK_INK, Person, PERSON, pulse, Svg, V, X0 } from "./parts";
 
 const BEAM = { x0: 170, pitch: 150, y: 540, face: 92 };
 const SQ = { x0: 1150, pitch: 108, w: 72, base: 780, unit: 46 };
@@ -125,21 +126,24 @@ export const ExpectScene: React.FC = () => {
           />
         ))}
         <Note at={weightedAt} x={X0} y={y(320)} out={out6}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>the probability-weighted average:</span>
-          <span style={{ ...math(40), marginLeft: 14 }}>
-            <E>
-              <V>X</V>
-            </E>{" "}
-            = Σ <V>x</V> P(<V>x</V>)
+          {/* One sentence, the formula at the size of its words. */}
+          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+            The probability-weighted average:{" "}
+            <MathRun style={mathFace()}>
+              <E>
+                <V>X</V>
+              </E>{" "}
+              = Σ <V>x</V> P(<V>x</V>)
+            </MathRun>
           </span>
         </Note>
         <Note at={halfAt} x={beamX(3.5) - 120} width={240} y={beamY + 72} out={out6} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...math(40, OK_INK) }}>
+          <MathRun style={{ ...math(40, OK_INK) }}>
             <E>
               <V>X</V>
             </E>{" "}
             = {DIE.mean}
-          </span>
+          </MathRun>
         </Note>
 
         {/* The squared distances, and their average. */}
@@ -188,7 +192,7 @@ export const ExpectScene: React.FC = () => {
         ))}
         {/* The definition the bars compute, in both forms the page gives. */}
         <Ink at={squaredAt + 2} dur={22} out={out6} style={{ left: X0, top: y(760) }}>
-          <span style={math(36)}>
+          <MathRun style={math(36)}>
             Var(<V>X</V>) ={" "}
             <E>
               (<V>X</V> −{" "}
@@ -206,15 +210,15 @@ export const ExpectScene: React.FC = () => {
               <V>X</V>
             </E>
             ²
-          </span>
+          </MathRun>
         </Ink>
         <Note at={squaredAt} x={SQ.x0 - 20} y={y(360)} out={out6}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>squared distance from 3.5</span>
         </Note>
         <Note at={averagedAt + 6} x={SQ.x0 + 2 * SQ.pitch - 40} y={y(SQ.base) - h(DIE.varFloat * SQ.unit) - 64} out={out6}>
-          <span style={math(36, OK_INK)}>
+          <MathRun style={math(36, OK_INK)}>
             Var(<V>X</V>) = {DIE.var} ≈ {fmt(DIE.varFloat)}
-          </span>
+          </MathRun>
         </Note>
 
         {/* ── Question 7: linearity, and ten hats, cleared on the bridge ── */}
@@ -223,7 +227,7 @@ export const ExpectScene: React.FC = () => {
             What is linearity of expectation, and why is it so useful?
           </QuestionCard>
           <Ink at={sumAt} dur={18} style={{ left: X0, top: y(320) }}>
-            <span style={math(54)}>
+            <MathRun style={math(54)}>
               <E>
                 <V>X</V> + <V>Y</V>
               </E>{" "}
@@ -235,7 +239,7 @@ export const ExpectScene: React.FC = () => {
               <E>
                 <V>Y</V>
               </E>
-            </span>
+            </MathRun>
           </Ink>
           <Note at={evenWhenAt} x={X0 + 640} y={y(334)}>
             <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
@@ -245,7 +249,7 @@ export const ExpectScene: React.FC = () => {
           {/* Each person is an indicator: the count of matches is their sum. */}
           <Note at={indicatorAt} x={X0} y={y(418)}>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-              each person is an indicator: <span style={TABULAR}>1</span> if they get their own hat, <span style={TABULAR}>0</span> if not
+              Each person is an indicator: <span style={TABULAR}>1</span> if they get their own hat, <span style={TABULAR}>0</span> if not
             </span>
           </Note>
 
@@ -324,15 +328,15 @@ export const ExpectScene: React.FC = () => {
           })}
           {SHUFFLE.map((_, i) => (
             <Note key={i} at={chanceAt + i} x={HATS_ROW.x0 + i * HATS_ROW.pitch - 40} width={80} y={y(HATS_ROW.y) + 60} from="up" style={{ textAlign: "center" }}>
-              <span style={{ ...math(28, INK) }}>
+              <MathRun style={{ ...math(28, INK) }}>
                 <Frac top="1" bottom="10" gap={2} />
-              </span>
+              </MathRun>
             </Note>
           ))}
           <Note at={oneAt} x={X0} y={y(HATS_ROW.y + 152)}>
-            <span style={{ ...math(40, OK_INK) }}>
+            <MathRun style={{ ...math(40, OK_INK) }}>
               <Mark at={nowAt + 2}>10 × 1/10 = 1 match, on average</Mark>
-            </span>
+            </MathRun>
           </Note>
 
           {/* The video's own 100,000 shuffles. */}
@@ -374,11 +378,14 @@ export const ExpectScene: React.FC = () => {
           </Note>
 
           <Note at={varAt} x={X0} y={y(HATS_ROW.y + 226)}>
-            <span style={{ ...math(32, INK) }}>
-              Var(<V>X</V> + <V>Y</V>) = Var(<V>X</V>) + Var(<V>Y</V>)
-            </span>
-            <span style={{ ...note(26, INK), fontWeight: 500, marginLeft: 16, whiteSpace: "nowrap" }}>
-              only when <Mark at={uncorrAt}>uncorrelated</Mark>
+            {/* The rule and its condition are one sentence, in one size. */}
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+              <MathRun style={mathFace()}>
+                Var(<V>X</V> + <V>Y</V>) = Var(<V>X</V>) + Var(<V>Y</V>)
+              </MathRun>
+              <span style={{ fontWeight: 500, marginLeft: 16 }}>
+                only when <Mark at={uncorrAt}>uncorrelated</Mark>
+              </span>
             </span>
           </Note>
         </Clear>

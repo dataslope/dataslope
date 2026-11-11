@@ -87,7 +87,7 @@ export const TrapScene: React.FC = () => {
           out={onAt - 2}
         />
         <TableName g={g} at={rowsAt} out={onAt - 2}>
-          the left join&apos;s rows
+          The left join&apos;s rows
         </TableName>
         <DataTable
           g={g}
@@ -122,7 +122,7 @@ export const TrapScene: React.FC = () => {
           marks={[{ line: onLine, at: onAt + 12, color: MARK_OK }]}
         />
         <TableName g={rg} at={onAt + 6}>
-          result
+          Result
         </TableName>
         <DataTable
           g={rg}

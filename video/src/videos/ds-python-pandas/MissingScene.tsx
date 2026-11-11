@@ -112,7 +112,7 @@ export const MissingScene: React.FC = () => {
           ]}
         />
         <Note at={neverAt - 2} x={EQ_X} y={y(TOP) - h(40)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>never with equals</span>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Never with equals</span>
         </Note>
         <Listing lines={MISSING.nanEq.lines} x={EQ_X} top={y(TOP)} width={300} size={SIZE} at={neverAt} />
         <Note at={itselfAt - 4} x={EQ_X + 316} y={y(TOP) + h(12)}>
@@ -130,7 +130,7 @@ export const MissingScene: React.FC = () => {
         <Listing lines={filled.lines} x={ISNA_X} top={y(FILL_Y)} width={780} size={SIZE} at={meanAt - 2} marks={[{ line: 0, at: ninetyAt, color: MARK_OK }]} />
         <Note at={ninetyAt} x={ISNA_X} y={y(FILL_Y) + listingHeight(filled.lines.length, SIZE) + h(16)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            the mean of 100 and 80: <span style={{ color: OK_INK, fontWeight: 500 }}>{Number(MISSING.mean).toFixed(1)}</span>
+            The mean of 100 and 80: <span style={{ color: OK_INK, fontWeight: 500 }}>{Number(MISSING.mean).toFixed(1)}</span>
           </span>
         </Note>
 
@@ -162,7 +162,7 @@ export const MissingScene: React.FC = () => {
         </Note>
         <Note at={decisionAt} x={COL_X + 90} y={colTop + h(110)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <Mark at={decisionAt + 6}>a modeling</Mark>
+            <Mark at={decisionAt + 6}>A modeling</Mark>
           </span>
           <br />
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>

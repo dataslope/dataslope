@@ -7,11 +7,14 @@ import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../..
 import { Note } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ATTN } from "./data";
 import { Cells, Drift, Mark, num, OK, OK_INK, pulse, Svg, Tagline, WARM, X0 } from "./parts";
 
+/** A superscript in the math face, as `M` sets one. */
+const SUP: React.CSSProperties = { fontSize: "0.7em", verticalAlign: "0.45em", lineHeight: 0 };
 const TOK_X = 130;
 const ROW0 = 450;
 const ROW_H = 74;
@@ -79,19 +82,43 @@ export const AttnScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={makesAt - 2} x={X0} y={y(300)}>
-          <span style={{ fontFamily: MONO, fontSize: 32, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+          <MathRun style={{ fontSize: 34, color: INK }}>
             <Mark at={softAt}>softmax(</Mark>
-            <Mark at={scoreAt + 2}>QKᵀ</Mark> <Mark at={rootAt}>/ √d</Mark>
-            <Mark at={softAt}>)</Mark> V
-          </span>
+            <Mark at={scoreAt + 2}>
+              <I>QK</I>
+              <sup style={SUP}>T</sup>
+            </Mark>{" "}
+            <Mark at={rootAt}>
+              / √<I>d</I>
+            </Mark>
+            <Mark at={softAt}>)</Mark> <I>V</I>
+          </MathRun>
         </Note>
         <Note at={makesAt} x={X0 + 560} y={y(290)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Q, K, V: each token&apos;s vector × three learned matrices</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}><MathRun>
+              <I>Q</I>, <I>K</I>, <I>V</I>
+            </MathRun>
+            : each token&apos;s vector × three learned matrices</span>
         </Note>
         <Note at={entriesAt - 2} x={X0 + 560} y={y(326)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-            d = {A.d}, the entries in each q and k;{" "}
-            <span style={{ opacity: ease(frame, oneKeyAt - 2, 10) }}>√d keeps the softmax from putting all its weight on one key</span>
+            <MathRun>
+              <I>d</I> = {A.d}
+            </MathRun>
+            , the entries in each{" "}
+            <MathRun>
+              <I>q</I>
+            </MathRun>{" "}
+            and{" "}
+            <MathRun>
+              <I>k</I>
+            </MathRun>
+            ;{" "}
+            <span style={{ opacity: ease(frame, oneKeyAt - 2, 10) }}>
+              <MathRun>
+                √<I>d</I>
+              </MathRun>{" "}
+              keeps the softmax from putting all its weight on one key</span>
           </span>
         </Note>
 
@@ -139,10 +166,10 @@ export const AttnScene: React.FC = () => {
           fill={{ color: OK, at: softAt + 6, max: 0.8 }}
         />
         <Tagline x={GX + 2 * GW} y={rowY(4) + h(10)} width={4 * GW} align="center" at={scoreAt + 6} out={softAt} size={19}>
-          each query against each key<span style={{ opacity: ease(frame, dotAt - 2, 10) }}>, by dot product</span>
+          Each query against each key<span style={{ opacity: ease(frame, dotAt - 2, 10) }}>, by dot product</span>
         </Tagline>
         <Tagline x={GX + 2 * GW} y={rowY(4) + h(10)} width={4 * GW} align="center" at={softAt + 6} size={19}>
-          weights: how much each token takes from each
+          Weights: how much each token takes from each
         </Tagline>
         {A.roundedSums.map((s, i) => (
           <Tagline key={i} x={SUM_X} y={rowY(i) + h(20)} at={rowAt + i * 3} size={24} color={OK_INK} weight={500}>
@@ -173,13 +200,13 @@ export const AttnScene: React.FC = () => {
           })}
         </Svg>
         <Note at={hereAt - 2} x={GX} y={rowY(4) + h(52)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>four tokens, random vectors of length {A.d}</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Four tokens, random vectors of length {A.d}</span>
         </Note>
 
         {/* ── One row's output, spelled out ── */}
         <Note at={blendAt - 2} x={BLEND_X} y={rowY(0)}>
           <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            output for &ldquo;{A.tokens[PICK]}&rdquo; =
+            Output for &ldquo;{A.tokens[PICK]}&rdquo; =
           </span>
         </Note>
         {A.tokens.map((t, j) => (
@@ -193,7 +220,7 @@ export const AttnScene: React.FC = () => {
         ))}
         <Note at={onceAt + 2} x={BLEND_X} y={rowY(0) + h(52) + 4 * h(46) + h(20)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={onceAt + 6}>all four rows at once</Mark>
+            <Mark at={onceAt + 6}>All four rows at once</Mark>
           </span>
         </Note>
       </Drift>

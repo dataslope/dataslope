@@ -16,6 +16,8 @@ const COST_X = 1420;
 
 /** "5.0" → "5", 6 → "6": a price as the narration says it. */
 const price = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2));
+// The third rule's light parcel falls back to the flat rate, as its label says.
+if (SHIPPING.third.light.cost !== SHIPPING.flat) throw new Error("the third rule no longer charges the flat rate below 10");
 
 /**
  * Question 6. A shipment holds a pricing card and asks it for the cost of a
@@ -122,7 +124,7 @@ export const StratScene: React.FC = () => {
           }}
         />
         <Line x={CARD.x - 22} y={brTop - 40} at={behindAt + 6} size={21} weight={500} color={frame >= indirectionAt ? ACCENT_INK : INK_SOFT}>
-          <Strike at={indirectionAt + 6}>one interface: a cost for a weight</Strike>
+          <Strike at={indirectionAt + 6}>One interface: a cost for a weight</Strike>
         </Line>
         {cards.map((c, i) => (
           <React.Fragment key={c.title}>
@@ -162,7 +164,7 @@ export const StratScene: React.FC = () => {
           {SHIPPING.weight} × 2 = <b style={{ color: BLUE_INK }}>{price(SHIPPING.byWeight)}</b>
         </Line>
         <Line x={COST_X} y={cardMid(2) - 16} at={freeAt + 8} size={26} weight={500} out={fold + 8}>
-          weight {SHIPPING.third.light.weight}: <b style={{ color: BLUE_INK }}>{price(SHIPPING.third.light.cost)}</b>
+          weight {SHIPPING.third.light.weight}: flat <b style={{ color: BLUE_INK }}>{price(SHIPPING.third.light.cost)}</b>
           <span style={{ opacity: ease(frame, classAt, 10) }}>
             , weight {SHIPPING.third.heavy.weight}: <b style={{ color: OK_INK }}>{price(SHIPPING.third.heavy.cost)}</b>
           </span>
@@ -173,7 +175,7 @@ export const StratScene: React.FC = () => {
           One rule: the interface is just <span style={{ color: ACCENT_INK }}>indirection</span>
         </Line>
         <Line x={CARD.x - 22} y={y(740) + 48} at={plainAt} size={26}>
-          <Mark at={plainAt + 6}>a plain function</Mark> does the job
+          <Mark at={plainAt + 6}>A plain function</Mark> does the job
           <span style={{ color: INK_SOFT, opacity: ease(frame, secondAt, 10) }}>, until a second rule</span>
         </Line>
       </Drift>

@@ -6,7 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, PAPER, headline, label } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ACCENT_INK, Box, Drift, Flow, Line, Mark, Mark2, OK_INK, Strike, VRule, X0 } from "./parts";
+import { ACCENT_INK, Box, Drift, Flow, Line, Mark, Mark2, OK_INK, pulse, Strike, VRule, X0 } from "./parts";
 
 const ROW_TOP = 290;
 const PITCH = 100;
@@ -51,11 +51,11 @@ export const SolidScene: React.FC = () => {
   const end = n.beat("solid-laws").to;
 
   const ROWS = [
-    { letter: "S", at: sAt, name: "Single responsibility", def: "a class has one reason to change" },
-    { letter: "O", at: oAt, name: "Open-closed", def: "open for extension, closed for modification" },
-    { letter: "L", at: lAt, name: "Liskov substitution", def: "subtypes stand in for their base type" },
-    { letter: "I", at: iAt, name: "Interface segregation", def: "many small interfaces over one fat one" },
-    { letter: "D", at: dAt, name: "Dependency inversion", def: "depend on abstractions, inject the concrete" },
+    { letter: "S", at: sAt, name: "Single responsibility", def: "A class has one reason to change" },
+    { letter: "O", at: oAt, name: "Open-closed", def: "Open for extension, closed for modification" },
+    { letter: "L", at: lAt, name: "Liskov substitution", def: "Subtypes stand in for their base type" },
+    { letter: "I", at: iAt, name: "Interface segregation", def: "Many small interfaces over one fat one" },
+    { letter: "D", at: dAt, name: "Dependency inversion", def: "Depend on abstractions, inject the concrete" },
   ];
   const top = (i: number) => y(ROW_TOP + i * PITCH);
   const mid = (i: number) => top(i) + TILE / 2;
@@ -120,7 +120,7 @@ export const SolidScene: React.FC = () => {
         ))}
         <Box x={EX_X + 380 + 30 * (1 - ease(frame, newAt + 4, 14))} y={exTop(1)} w={190} h={BOX_H} at={newAt + 4} title="+ new option" size={22} tone="ok" dashed dim={dim} />
         <Line x={EX_X + 610} y={mid(1) - 16} at={newCodeAt} size={24} color={OK_INK} weight={500} dim={dim}>
-          new code<span style={{ color: INK, fontWeight: 500, opacity: ease(frame, notEditAt, 10) }}>, not an edit</span>
+          New code<span style={{ color: INK, fontWeight: 500, opacity: ease(frame, notEditAt, 10) }}>, not an edit</span>
         </Line>
 
         {/* L: the square, from question 3. */}
@@ -129,7 +129,7 @@ export const SolidScene: React.FC = () => {
         <Box x={EX_X + 240} y={exTop(2)} w={250} h={BOX_H} at={lAt + 14} title="where a rectangle fits" size={21} dashed dim={dim} />
         <Mark2 at={couldntAt + 4} kind="cross" size={32} style={{ left: EX_X + 512, top: mid(2) - 16, opacity: 1 - ease(frame, dim, 14) * 0.6 }} />
         <Line x={EX_X + 566} y={mid(2) - 16} at={couldntAt + 2} size={24} color={ACCENT_INK} weight={500} dim={dim}>
-          the square couldn&apos;t
+          The square couldn&apos;t
         </Line>
 
         {/* I: the stock screen, on a small interface. */}
@@ -142,9 +142,16 @@ export const SolidScene: React.FC = () => {
           </span>
         </Box>
 
-        {/* D: on to question 5. */}
-        <Line x={EX_X} y={mid(4) - 16} at={nextAt} size={24} weight={500} color={BLUE_INK} dim={dim}>
-          → the next question
+        {/* D: question 5 in small. The confirmation and the email sender both
+            point at the shape the confirmation owns; it lights on "the next
+            question". */}
+        <Box x={EX_X} y={exTop(4)} w={190} h={BOX_H} at={dAt + 8} title="Confirmation" size={22} dim={dim} />
+        <Flow points={[[EX_X + 196, mid(4)], [EX_X + 262, mid(4)]]} at={dAt + 14} dur={8} width={2.2} head={12} dim={dim} />
+        <Box x={EX_X + 270} y={exTop(4)} w={220} h={BOX_H} at={dAt + 12} title="sends a message" size={22} tone="ok" dashed dim={dim} lit={pulse(frame, nextAt, 24)} />
+        <Flow points={[[EX_X + 572, mid(4)], [EX_X + 498, mid(4)]]} at={dAt + 22} dur={8} width={2.2} head={12} dim={dim} />
+        <Box x={EX_X + 580} y={exTop(4)} w={190} h={BOX_H} at={dAt + 18} title="Email sender" size={22} dim={dim} />
+        <Line x={EX_X + 800} y={mid(4) - 16} at={nextAt} size={24} weight={500} color={BLUE_INK} dim={dim}>
+          Question 5
         </Line>
 
         {/* Guidelines, not laws. */}
@@ -152,7 +159,7 @@ export const SolidScene: React.FC = () => {
           Guidelines for low coupling and high cohesion, <Mark at={notLawsAt}>not laws</Mark>
         </Line>
         <Line x={X0} y={y(800) + 50} at={everywhereAt} size={24} color={INK_SOFT} weight={500}>
-          applied everywhere, they become <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, overAt, 10) }}>over-engineering</span>
+          Applied everywhere, they become <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, overAt, 10) }}>over-engineering</span>
         </Line>
       </Drift>
     </AbsoluteFill>

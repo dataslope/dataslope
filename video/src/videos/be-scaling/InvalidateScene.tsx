@@ -42,12 +42,12 @@ export const InvalidateScene: React.FC = () => {
   const ttlAt = n.word("q4", "Set the TTL");
   const longAt = n.word("q4", "too long");
   const shortAt = n.word("q4", "too short");
-  const modelsAt = n.word("q4-model", "The page models a key");
-  const leastAt = n.word("q4-model", "The least bad TTL");
-  const crossAt = n.word("q4-model", "the two failures cross");
-  const fifteenAt = n.word("q4-model", "about fifteen seconds");
-  const missAt = n.word("q4-model", "six percent of reads miss");
-  const staleAt = n.word("q4-model", "six percent are stale");
+  const modelsAt = n.word("q4-model", "Take a simple model");
+  const leastAt = n.word("q4-cross", "The least bad TTL");
+  const crossAt = n.word("q4-cross", "the two failures cross");
+  const fifteenAt = n.word("q4-cross", "about fifteen seconds");
+  const missAt = n.word("q4-cross", "six percent of reads miss");
+  const staleAt = n.word("q4-cross", "six percent are stale");
   const barelyAt = n.word("q4-ours", "A short link barely changes");
   const takenAt = n.word("q4-ours", "taken down for abuse");
   const deleteAt = n.word("q4-ours", "delete its cached entry");
@@ -55,7 +55,9 @@ export const InvalidateScene: React.FC = () => {
   const firstAt = n.word("q4-ours", "Delete it first");
   const betweenAt = n.word("q4-ours", "a read in between");
   const backAt = n.word("q4-ours", "puts the old value back");
-  const backstopAt = n.word("q4-ours", "The TTL stays as a backstop");
+  const raceAt = n.word("q4-backstop", "a slow read can race the delete");
+  const backstopAt = n.word("q4-backstop", "the TTL stays as a backstop");
+  const boundsAt = n.word("q4-backstop", "it bounds how long");
   const throughAt = n.word("q4-write", "Write-through updates both together");
   const costAt = n.word("q4-write", "consistent at a cost on every write");
   const behindAt = n.word("q4-write", "Write-behind batches writes");
@@ -63,6 +65,9 @@ export const InvalidateScene: React.FC = () => {
   const end = n.beat("q4-write").to;
 
   const phaseOut = barelyAt - 6;
+  // The chart holds until the next row has something to say, so the page is
+  // never down to one line while "A short link barely changes" is read.
+  const chartOut = takenAt - 12;
   const drifted = ease(frame, driftAt, 12);
 
   // ── The chart. ──
@@ -124,25 +129,25 @@ export const InvalidateScene: React.FC = () => {
           out={phaseOut}
         />
         <Line at={driftAt + 6} x={X0} y={y(352) + 72 + h(24)} size={22} color={INK_SOFT} out={phaseOut}>
-          the database changed; the cache still says the old value
+          The database changed; the cache still says the old value
         </Line>
         <Line at={ttlAt} x={X0} y={y(600)} size={23} weight={500} out={phaseOut}>
           The TTL, the time to live:
         </Line>
         <Line at={longAt} x={X0} y={y(650)} size={23} out={phaseOut}>
-          <b style={{ color: ACCENT_INK }}>too long</b>, and users see stale data
+          <b style={{ color: ACCENT_INK }}>Too long</b>, and users see stale data
         </Line>
         <Line at={shortAt} x={X0} y={y(700)} size={23} out={phaseOut}>
-          <b style={{ color: ACCENT_INK }}>too short</b>, and you lose the cache&apos;s benefit
+          <b style={{ color: ACCENT_INK }}>Too short</b>, and you lose the cache&apos;s benefit
         </Line>
 
-        <VRule x={800} top={y(352)} bottom={y(730)} at={modelsAt} out={phaseOut} />
+        <VRule x={800} top={y(352)} bottom={y(730)} at={modelsAt} out={chartOut} />
 
         {/* ── The page's model: misses and stale reads against the TTL. ── */}
-        <Line at={modelsAt} x={C.x0 - 60} y={y(352)} size={21} weight={500} color={INK_SOFT} out={phaseOut}>
-          The page&apos;s model: a key read once a second, changed every two minutes
+        <Line at={modelsAt} x={C.x0 - 60} y={y(352)} size={21} weight={500} color={INK_SOFT} out={chartOut}>
+          A simple model: a key read once a second, changed every two minutes
         </Line>
-        <Svg opacity={chartIn * (1 - ease(frame, phaseOut, 10))}>
+        <Svg opacity={chartIn * (1 - ease(frame, chartOut, 10))}>
           <defs>
             <clipPath id="be-scaling-ttl">
               <rect x={C.x0} y={y(C.top) - 2} width={C.x1 - C.x0} height={y(C.base) - y(C.top) + 4} />
@@ -184,7 +189,7 @@ export const InvalidateScene: React.FC = () => {
             </g>
           ) : null}
         </Svg>
-        <Ink at={fifteenAt} dur={14} out={phaseOut} style={{ left: lx(cross.ttl) - 150, top: ly(0.4) - 40, width: 300, textAlign: "center", whiteSpace: "nowrap" }}>
+        <Ink at={fifteenAt} dur={14} out={chartOut} style={{ left: lx(cross.ttl) - 150, top: ly(0.4) - 40, width: 300, textAlign: "center", whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, INK), fontWeight: 500 }}>
             <Mark at={leastAt}>about {Math.round(cross.ttl)} s</Mark>
             <span style={{ color: BLUE_INK, opacity: ease(frame, missAt, 10) }}> {pct(cross.miss)} miss</span>
@@ -198,33 +203,37 @@ export const InvalidateScene: React.FC = () => {
           <span style={{ color: ACCENT_INK, opacity: ease(frame, takenAt, 10) }}> until one is taken down for abuse</span>
         </Line>
         <Line at={deleteAt} x={X0} y={y(420)} size={21} weight={500} color={OK_INK}>
-          delete the cached entry after the database commits
+          Delete the cached entry after the database commits
         </Line>
         <StepRow
           x={X0}
           y={y(454)}
           steps={[
-            { text: "mark it taken down", at: takenAt + 4 },
-            { text: "commit", at: commitsAt, color: OK_INK },
-            { text: "delete the cached entry", at: commitsAt + 10, color: OK_INK, lit: [commitsAt + 10, firstAt] },
+            { text: "Mark it taken down", at: takenAt + 4 },
+            { text: "Commit", at: commitsAt, color: OK_INK },
+            { text: "Delete the cached entry", at: commitsAt + 10, color: OK_INK, lit: [commitsAt + 10, firstAt] },
           ]}
         />
+        <Line at={raceAt} x={X0} y={y(506)} size={20} color={INK_SOFT}>
+          even so, a slow read can still race the delete
+        </Line>
         <Line at={firstAt} x={X0} y={y(560)} size={21} weight={500} color={ACCENT_INK}>
-          delete it first, and a read in between puts the old value back
+          Delete it first, and a read in between puts the old value back
         </Line>
         <StepRow
           x={X0}
           y={y(594)}
           steps={[
-            { text: "delete the cached entry", at: firstAt },
-            { text: "a read reloads the old value", at: betweenAt, lit: [betweenAt, backAt] },
-            { text: "commit", at: betweenAt + 18 },
-            { text: "the cache holds the old value", at: backAt, color: ACCENT_INK },
+            { text: "Delete the cached entry", at: firstAt },
+            { text: "A read reloads the old value", at: betweenAt, lit: [betweenAt, backAt] },
+            { text: "Commit", at: betweenAt + 18 },
+            { text: "The cache holds the old value", at: backAt, color: ACCENT_INK },
           ]}
         />
         <Spot id="timer" at={backstopAt} x={1560} y={y(366)} w={150} />
         <Line at={backstopAt + 4} x={X0} y={y(690)} size={22} weight={500}>
-          The TTL stays as a backstop: a stale entry still expires
+          The TTL stays as a backstop
+          <span style={{ opacity: ease(frame, boundsAt, 10) }}>: it bounds how long a wrong value lives</span>
         </Line>
 
         {/* ── Write-through and write-behind. ── */}
@@ -232,7 +241,7 @@ export const InvalidateScene: React.FC = () => {
           <span style={{ ...note(23, INK), display: "inline-flex", alignItems: "center", gap: 16 }}>
             <b style={{ width: 190 }}>Write-through</b>
             <span>
-              <b style={{ color: BLUE_INK }}>cache</b> and <b style={{ color: BLUE_INK }}>database</b> written together
+              <b style={{ color: BLUE_INK }}>Cache</b> and <b style={{ color: BLUE_INK }}>database</b> written together
               <span style={{ color: INK_SOFT, opacity: ease(frame, costAt, 10) }}>: consistent, at a cost on every write</span>
             </span>
           </span>
@@ -250,7 +259,7 @@ export const InvalidateScene: React.FC = () => {
               </svg>
             </span>
             <span>
-              batched, for speed
+              Batched, for speed
               <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, crashAt, 10) }}>: a crash loses what it hadn&apos;t written</span>
             </span>
           </span>

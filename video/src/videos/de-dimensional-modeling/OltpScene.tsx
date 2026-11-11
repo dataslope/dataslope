@@ -214,15 +214,15 @@ export const OltpScene: React.FC = () => {
         <Stream at={shortAt} x={X0} top={y(STRIP_Y) - h(10)} width={700} height={h(118)} step={11} />
 
         <Note at={shortAt} x={X0} y={PROP(0)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>many short reads and writes, an order at a time</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Many short reads and writes, an order at a time</span>
         </Note>
         <Note at={normAt} x={X0} y={PROP(46)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            normalized: <b style={{ color: BLUE_INK }}>third normal form</b>
+            Normalized: <b style={{ color: BLUE_INK }}>third normal form</b>
           </span>
         </Note>
         <Note at={rowAt} x={X0} y={PROP(92)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>each write touches one row, holds few locks</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Each write touches one row, holds few locks</span>
         </Note>
 
         {/* ── OLAP ── */}
@@ -241,16 +241,16 @@ export const OltpScene: React.FC = () => {
         <Strip at={historyAt} scanAt={scanAt} appendAt={appendAt} x={R_X} top={y(STRIP_Y) - h(4)} width={790} height={h(112)} />
 
         <Note at={scanAt - 4} x={R_X} y={PROP(0)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>fewer queries, each scanning a lot of rows</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Fewer queries, each scanning a lot of rows</span>
         </Note>
         <Note at={starAt} x={R_X} y={PROP(46)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            denormalized: <b style={{ color: BLUE_INK }}>stars</b>
+            Denormalized: <b style={{ color: BLUE_INK }}>stars</b>
           </span>
         </Note>
         <Note at={wideAt} x={R_X} y={PROP(92)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            wide tables, <span style={{ opacity: ease(frame, appendAt, 10), fontWeight: 500 }}>mostly appended to</span>
+            Wide tables, <span style={{ opacity: ease(frame, appendAt, 10), fontWeight: 500 }}>mostly appended to</span>
           </span>
         </Note>
 

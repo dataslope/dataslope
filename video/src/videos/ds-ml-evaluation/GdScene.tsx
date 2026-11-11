@@ -5,7 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GD } from "./data";
@@ -118,14 +118,14 @@ export const GdScene: React.FC = () => {
   ];
   const slow = GD.runs["0.004"][GD.steps - 1];
   const labels = [
-    { text: `still at ${fmt(slow)} after ${GD.steps - 1} steps`, at: stillAt - 2, ink: ACCENT_INK },
-    { text: "halves the distance every step", at: halvesAt + 4, ink: OK_INK },
-    { text: "overshoots: the loss explodes", at: explodesAt - 2, ink: ACCENT_INK },
+    { text: `Still at ${fmt(slow)} after ${GD.steps - 1} steps`, at: stillAt - 2, ink: ACCENT_INK },
+    { text: "Halves the distance every step", at: halvesAt + 4, ink: OK_INK },
+    { text: "Overshoots: the loss explodes", at: explodesAt - 2, ink: ACCENT_INK },
   ];
   const titles = [
-    { text: "learning rate 0.004", at: smallAt - 4 },
-    { text: "learning rate 0.25", at: quarterAt - 4 },
-    { text: "learning rate 1.05", at: bigAt - 4 },
+    { text: "Learning rate 0.004", at: smallAt - 4 },
+    { text: "Learning rate 0.25", at: quarterAt - 4 },
+    { text: "Learning rate 1.05", at: bigAt - 4 },
   ];
 
   return (
@@ -147,14 +147,22 @@ export const GdScene: React.FC = () => {
 
         <Note at={againstAt - 2} x={LEFTS[0]} y={y(310)} out={end - 8}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            each step:{" "}
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500 }}>
-              x ← x − <Mark at={sizeAt - 2}>rate</Mark> × gradient
-            </span>
+            Each step:{" "}
+            <MathRun>
+              <I>x</I> ← <I>x</I> − <Mark at={sizeAt - 2}>rate</Mark> × gradient
+            </MathRun>
           </span>
         </Note>
         <Note at={startAt - 2} x={LEFTS[0] + 760} y={y(316)} out={clearAt}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>loss = x², starting at x = {GD.start}</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+            <MathRun>
+              loss = <I>x</I>²
+            </MathRun>
+            , starting at{" "}
+            <MathRun>
+              <I>x</I> = {GD.start}
+            </MathRun>
+          </span>
         </Note>
 
         {runs.map((run, i) => (
@@ -172,12 +180,12 @@ export const GdScene: React.FC = () => {
         {/* ── Three ways to take the step: a list of its own, once the bowls
             have cleared, so none sits under a learning rate's outcome ── */}
         <Note at={clearAt + 6} x={LEFTS[0]} y={y(420)} out={end - 8}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>three ways to take each step</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Three ways to take each step</span>
         </Note>
         {[
-          { at: Math.max(clearAt + 12, oneAt), head: "SGD, stochastic gradient descent", body: "one example a step" },
-          { at: miniAt, head: "mini-batch", body: "a few examples a step" },
-          { at: adamAt, head: "Adam", body: "its own step size for each parameter" },
+          { at: Math.max(clearAt + 12, oneAt), head: "SGD, stochastic gradient descent", body: "One example a step" },
+          { at: miniAt, head: "Mini-batch", body: "A few examples a step" },
+          { at: adamAt, head: "Adam", body: "Its own step size for each parameter" },
         ].map((s, i) => (
           <Note key={s.head} at={s.at - 2} x={LEFTS[0]} y={y(480) + i * h(84)} out={end - 8}>
             <div style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>

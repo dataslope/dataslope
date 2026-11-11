@@ -141,7 +141,7 @@ export const LateScene: React.FC = () => {
         />
         <Note at={beforeAt + 8} x={gd.x} y={gd.rowTop(2) + h(10)} out={insteadAt + 4}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            no customer <Num>77</Num> yet
+            No customer <Num>77</Num> yet
           </span>
         </Note>
 
@@ -154,7 +154,7 @@ export const LateScene: React.FC = () => {
           size={SIDE_SIZE}
           at={insteadAt - 2}
           out={arrivesAt - 2}
-          title="placeholder for each staged customer it lacks"
+          title="Placeholder for each staged customer it lacks"
           marks={[
             { line: lineOf(LATE.placeholder.lines, "NOT EXISTS"), at: forAt + 4 },
             { line: lineOf(LATE.placeholder.lines, "'Unknown'"), at: unknownAt + 2 },
@@ -167,7 +167,7 @@ export const LateScene: React.FC = () => {
           width={sideW}
           size={SIDE_SIZE}
           at={arrivesAt}
-          title="when 77 arrives"
+          title="When 77 arrives"
           marks={[{ line: lineOf(LATE.arrive.lines, "'Tulsa'"), at: placeAt + 2 }]}
         />
 
@@ -179,7 +179,7 @@ export const LateScene: React.FC = () => {
           width={loadW}
           size={SIZE}
           at={lookAt - 2}
-          title="the load's key lookup"
+          title="The load's key lookup"
           marks={[{ line: lineOf(Lq.lines, "JOIN dim_customer"), at: lookAt + 8, out: againstAt }]}
         />
         <TableName g={gf} at={lookAt + 6}>
@@ -206,12 +206,12 @@ export const LateScene: React.FC = () => {
           </span>
         </Note>
         <Note at={againstAt + 10} x={gf.x} y={gf.rowTop(3) + h(14)} out={touchedAt - 2}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>all three loaded</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>All three loaded</span>
         </Note>
 
         {/* The report, once the customer is real. */}
         <TableName g={gr} at={pointsAt}>
-          the report
+          The report
         </TableName>
         <DataTable
           g={gr}
@@ -222,7 +222,7 @@ export const LateScene: React.FC = () => {
         />
         <Note at={touchedAt + 4} x={gf.x} y={gf.rowTop(3) + h(14)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            the fact still holds <Num>{F.rows[2][fKey]}</Num>: never touched
+            The fact still holds <Num>{F.rows[2][fKey]}</Num>: never touched
           </span>
         </Note>
 

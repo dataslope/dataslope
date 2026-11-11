@@ -116,7 +116,7 @@ export const EtlScene: React.FC = () => {
         {/* Where ETL still fits, under its own transform step. */}
         <Note at={fitsAt} x={760} y={ey + BOX_H + h(20)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            still fits: <b style={{ opacity: ease(frame, littleAt, 10) }}>little compute</b>
+            Still fits: <b style={{ opacity: ease(frame, littleAt, 10) }}>little compute</b>
             <span style={{ opacity: ease(frame, strictAt, 10) }}>
               , <b>a strict schema</b>
             </span>

@@ -150,7 +150,7 @@ export const OverfitScene: React.FC = () => {
 
         {/* ── What it ends up drawing ── */}
         <Tagline x={FIT.left} y={y(FIT.top) - h(46)} at={toyAt} size={22} color={INK}>
-          a toy network: {O.hidden} hidden units, {O.n} noisy points
+          A toy network: {O.hidden} hidden units, {O.n} noisy points
         </Tagline>
         <div
           style={{
@@ -168,7 +168,7 @@ export const OverfitScene: React.FC = () => {
         <Curve points={fit} x={fx} y={fy} at={noiseAt - 8} dur={22} color={ACCENT} width={3} clip={fitClip} />
         <Note at={noiseAt + 2} x={FIT.left + 10} y={y(FIT.bottom) + h(10)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            at the end: it <Mark at={noiseAt + 8}>bends to fit the noise</Mark>
+            At the end: it <Mark at={noiseAt + 8}>bends to fit the noise</Mark>
           </span>
         </Note>
 

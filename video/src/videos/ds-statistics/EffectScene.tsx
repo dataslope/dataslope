@@ -6,6 +6,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, TABULAR, fmt } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EFFECT } from "./data";
@@ -73,7 +74,7 @@ export const EffectScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={howBigAt} x={X0} y={y(300)}>
-          <span style={{ ...noteText(26, INK) }}>how big a difference is, which a p-value doesn&apos;t say</span>
+          <span style={{ ...noteText(26, INK) }}>How big a difference is, which a p-value doesn&apos;t say</span>
         </Note>
         <Axes
           x={XS}
@@ -115,24 +116,29 @@ export const EffectScene: React.FC = () => {
 
         <Note at={pAt + 4} x={SIDE_X} y={y(580)}>
           <span style={{ ...noteText(30, INK), ...TABULAR }}>
-            p = <b>{EFFECT.p.toFixed(5)}</b>
+            <MathRun>
+              <I>p</I> = <b>{EFFECT.p.toFixed(5)}</b>
+            </MathRun>
           </span>
         </Note>
         <Note at={dAt} x={SIDE_X} y={y(636)}>
           <span style={{ ...noteText(30, WARM_INK), ...TABULAR }}>
-            Cohen&apos;s d ={" "}
-            <span style={{ opacity: ease(frame, lessAt - 2, 10) }}>
-              <b>{fmt(EFFECT.d, 4)}</b>
-            </span>
+            Cohen&apos;s{" "}
+            <MathRun>
+              <I>d</I> ={" "}
+              <span style={{ opacity: ease(frame, lessAt - 2, 10) }}>
+                <b>{fmt(EFFECT.d, 4)}</b>
+              </span>
+            </MathRun>
           </span>
         </Note>
         <Note at={dAt + 8} x={SIDE_X} y={y(686)}>
-          <span style={{ ...noteText(22, INK_SOFT) }}>the gap, in standard deviations</span>
+          <span style={{ ...noteText(22, INK_SOFT) }}>The gap, in standard deviations</span>
         </Note>
         <Note at={sigAt} x={SIDE_X} y={y(750)}>
           <span style={{ ...noteText(28, INK) }}>
             <Mark at={sigAt + 2} color={MARK_OK}>
-              significant
+              Significant
             </Mark>
             <span style={{ opacity: ease(frame, smallAt - 2, 10) }}>
               , and{" "}
@@ -146,13 +152,13 @@ export const EffectScene: React.FC = () => {
         </Note>
         <Note at={reportAt} x={X0} y={y(866)}>
           <span style={{ ...noteText(26, OK_INK) }}>
-            report the effect size
+            Report the effect size
             <span style={{ opacity: ease(frame, intervalAt - 2, 10) }}>, with its interval,</span> beside every p-value
           </span>
         </Note>
         <Note at={reverseAt} x={SIDE_X} y={y(806)}>
           <div style={{ lineHeight: 1.4 }}>
-            <span style={{ ...noteText(22, INK_SOFT) }}>the reverse happens too:</span>
+            <span style={{ ...noteText(22, INK_SOFT) }}>The reverse happens too:</span>
             <br />
             <span style={{ ...noteText(24, INK), opacity: ease(frame, bigAt - 2, 10) }}>
               a <Mark at={bigAt + 6}>big effect</Mark> can miss significance in a small sample

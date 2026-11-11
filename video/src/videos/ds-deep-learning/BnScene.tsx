@@ -45,11 +45,11 @@ export const BnScene: React.FC = () => {
   const gammaAt = n.word("bn-mean", "gamma and beta");
   const wantsAt = n.word("bn-mean", "the network actually wants");
   const reasons = [
-    { text: "steadier training", at: n.word("bn-why", "It steadies training") },
-    { text: "larger learning rates", at: n.word("bn-why", "tolerates larger learning rates") },
-    { text: "the starting weights matter less", at: n.word("bn-why", "makes the starting weights matter less") },
-    { text: "inference: running averages", at: n.word("bn-why", "At inference it uses running averages") },
-    { text: "transformers: layer norm, per example", at: n.word("bn-why", "Transformers use layer norm") },
+    { text: "Steadier training", at: n.word("bn-why", "It steadies training") },
+    { text: "Larger learning rates", at: n.word("bn-why", "tolerates larger learning rates") },
+    { text: "The starting weights matter less", at: n.word("bn-why", "makes the starting weights matter less") },
+    { text: "Inference: running averages", at: n.word("bn-why", "At inference it uses running averages") },
+    { text: "Transformers: layer norm, per example", at: n.word("bn-why", "Transformers use layer norm") },
   ];
   const archInAt = n.word("arch-in", "The last two long ones");
   const end = n.beat("arch-in").to;
@@ -98,12 +98,12 @@ export const BnScene: React.FC = () => {
           <Tagline x={X0} y={y(LINES[0].y) - h(62)} at={eachAt} size={22} color={INK}>
             {/* Words, so not tabular: that sets the hyphen a digit wide. */}
             <span style={{ fontVariantNumeric: "normal" }}>
-              one unit&apos;s input,{" "}
+              One unit&apos;s input,{" "}
               <span style={{ opacity: ease(frame, acrossAt - 2, 10) }}>across a mini-batch of {BN.batch.length} examples</span>
             </span>
           </Tagline>
           <Tagline x={X0} y={y(LINES[1].y) - h(62)} at={scalesAt + 2} size={22} color={INK}>
-            normalized: mean 0, variance 1
+            Normalized: mean 0, variance 1
           </Tagline>
           <Tagline x={X0} y={y(LINES[2].y) - h(62)} at={gammaAt - 2} size={22} color={INK}>
             × gamma, + beta (say 2 and 1): the scale and shift it learns

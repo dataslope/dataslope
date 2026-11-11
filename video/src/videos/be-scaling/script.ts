@@ -55,7 +55,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   hook: the diagram, drawn box by box as named, "35,000 redirects/s at
  *     peak" beside it in blue. The bison hero at the right.
  *   hook-10x: the figure becomes "350,000/s" in yellow on "ten times"; every
- *     box gets a small red question mark on "every box".
+ *     box gets a small yellow question mark on "every box" (an open
+ *     question, not a fault, so not red).
  *   plan: twelve numbered chips in a row, nine blue, two gray (quick), the
  *     last set apart in a different outline, lit on "a news feed".
  *   q1: question card; one server box grows into a taller one (vertical)
@@ -68,8 +69,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     green, with no count on it (question nine's follow-up draws four).
  *   q1-headroom, q1-buy: the page's queue chart (queue-utilization-latency),
  *     redrawn from results.json: mean wait against load, with dots at 50%
- *     ("1×"), 90% ("9×") and 99% ("99×", off the top, an arrow) lit as said;
- *     the span from 90% to 99% shaded yellow on "Headroom".
+ *     ("1×", green: where to run), 90% ("9×") and 99% ("99×", off the top,
+ *     an arrow), both red, lit as said; the curve leaves the frame still
+ *     climbing (clipped, never clamped flat); the flat run from 0 to 70% shaded
+ *     green on "Headroom", under "run where the wait is still flat".
+ *   q1-db: the vertical column comes back, its box renamed "database",
+ *     "still the first move for a database" in green; the map lights the
+ *     store.
  *   q2: question card; a load balancer box with a fan of arrows to four
  *     servers.
  *   q2-algos: three small panels, one per algorithm, each lit on its name:
@@ -84,10 +90,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     on "seventy-four"; then the same grid on the ring: only the squares
  *     that turn the new server's color change, "23% moved, all to the new
  *     server" in green. A small hash ring beside it, 100 points a server.
- *     A "simulation" note. The ring spot.
+ *     A "simulation" note. A legend row, "faded: did not move", on
+ *     "seventy-four".
+ *   q2-clock: "a key goes to the next point clockwise" lit inside the ring;
+ *     "a new point takes only the keys just before it" under it.
  *   q3: question card; the read path as four steps along an arrow: check
  *     the cache; miss; read the database and write the cache; return. The
- *     write path below: update the database, then invalidate the entry.
+ *     write path below: update the database, then invalidate the entry. Under
+ *     them, app, cache and database boxes, the path traced on them as each
+ *     step is said; they slide right when the simulation starts, and become
+ *     the dead-cache figure.
  *   q3-props: "first request pays the miss" under the miss step, yellow.
  *   q3-sim: three bars, cache size against share of redirects answered
  *     (0.1% → 40%, 1% → 58%, 10% → 77%, results.json), each lit on its size;
@@ -98,12 +110,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     that drift apart (one changes color).
  *   q4-model: the page's chart (cache-ttl-staleness), redrawn from
  *     results.json: misses falling and stale reads rising against a log TTL
- *     axis, the crossing at about 15 s marked, "6% / 6%"; "the page's model"
- *     as its note.
+ *     axis, the crossing at about 15 s marked, "6% / 6%" (q4-cross); "A
+ *     simple model" as its note. It stays until "taken down for abuse".
  *   q4-ours: a link marked "taken down": its cached entry is deleted after
  *     a "commit" tick (green); then the wrong order (delete, a read slips in,
  *     the old value written back) in red; a small TTL clock stays on the
  *     entry as the backstop.
+ *   q4-backstop: "even so, a slow read can still race the delete" under the
+ *     green row; "The TTL stays as a backstop: it bounds how long a wrong
+ *     value lives".
  *   q4-write: two short rows, write-through (cache and database written
  *     together, a clock for the cost) and write-behind (writes batched, a
  *     red crash mark over the batch).
@@ -115,15 +130,21 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the follower and comes back "not found", red.
  *   q5-fix: the same timeline with that user's read routed to the leader for
  *     a window after the write, green; then, separately, a follower promoted
- *     with its last two writes missing, red.
- *   q6: question card; one table split into pieces (partitioning), then the
- *     pieces moved onto separate server boxes (sharding). The shards spot.
+ *     with its last two writes missing, red. The promoted follower is
+ *     relabelled "takes writes", and the writes arrow moves to it.
+ *   q5-sync: under the lost writes, "Semi-synchronous": a write waits for one
+ *     follower; promote that one: nothing lost; the price, slower writes.
+ *   q6: question card; one table split into eight pieces (partitioning),
+ *     then the pieces moved onto eight server boxes (sharding), the eight
+ *     shards the simulation uses.
  *   q6-key: eight shard columns. By creation date, all of today's new links
  *     stack on the last column, red; by hash, the million keys spread to
  *     eight near-equal bars (results.json counts), green, "within 1%".
- *   q6-cost: one redirect lights one shard; "my links" lights all eight
- *     (one user's 50 links, results.json userShards), red; a small second
- *     table "by user" answers it, green.
+ *   q6-ring: beside the bars, "add a ninth shard: modulo moves 89%" (red),
+ *     "a hash ring moves 13%" (green), results.json reshard.
+ *   q6-cost: one redirect lights one shard; one user's 50 links appear as red
+ *     dots on the bars, a dot each, on all eight (results.json userPerShard;
+ *     the bars stay green); a small second table "by user" answers it, green.
  *   q7: question card; the page's grid (cap-theorem-grid): rows "network
  *     healthy" and "during a partition", columns "stay consistent" and "stay
  *     available"; the top row lit first, then the bottom row on "refuses"
@@ -152,15 +173,22 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     refused red (results.json cells): fixed 20 of 20 (with "2× the limit"
  *     in red), sliding 10, token bucket 10 with its level drawn (full at the
  *     start, "burst of 10" on "burst ten"), leaky bucket with its queue and a
- *     steady drip out, one every 6 s, on "smooth stream".
+ *     steady drip out, one every 6 s, on "smooth stream". Each group of ten
+ *     is a block of two rows of five against the minute line, since all ten
+ *     arrive at one instant.
+ *   q9-full: the leaky row's refusals in red, "queue full: the other 9
+ *     refused", held about 3 s before the next panel.
  *   q9-shared: four server boxes, each with its own bucket, a burst of forty
  *     dealt round-robin, all forty green: "4× the limit" in red; then one
  *     shared bucket, ten pass.
+ *   q9-atomic: "check and spend in one atomic step, or two servers take the
+ *     last token".
  *   rapid-in: the quick round's two numbered rows (RapidFire), 10 and 11.
  *   r-evict: four small panels, LRU, LFU, first in first out, TTL, each lit on
  *     its name; "LRU + TTL" ticked green at the end.
  *   r-consist: a scale from "eventual" to "strong" with read-your-writes and
- *     monotonic reads placed between; a feed icon at the eventual end and a
+ *     monotonic reads stacked at one point between, as "session guarantees"
+ *     (neither implies the other); a feed icon at the eventual end and a
  *     bank balance at the strong end.
  *   q12: question card; a poster and four followers' feed boxes; on "push",
  *     the post's ID drops into each feed. The newspaper spot.
@@ -168,13 +196,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "50,000,000 followers: 50,000,000 writes", the second in red.
  *   q12-pull: a reader's feed assembled on request from 300 timelines,
  *     "300 reads per load" in red.
- *   q12-why: "posts: once" against "feed loads: every time", push lit green.
+ *   q12-why, q12-pays: "push pays once per post, pull on every load", push
+ *     lit green.
  *   q12-hybrid: one feed built from the precomputed list plus five
  *     celebrity timelines, "1 + 5 = 6 reads", green; the celebrity's post is
  *     no longer pushed.
  *   next: the whole grown diagram small, "350,000/s" beside it: more app
  *     servers behind the load balancer, the cache with replicas, leader and
- *     followers, eight shards, a queue, a limiter, each lit as named.
+ *     followers, eight shards, a queue, a limiter ("shared count"), each lit
+ *     as named; the app servers reach the cache, queue and shards through
+ *     one bracket spanning all six.
  *   next-api: every arrow between them lit on "API"; <NextLine> "Next: API
  *     design".
  *
@@ -188,7 +219,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     thousand"), from be-system-design/results.json.
  *   - q1: vertical's ceiling and single point of failure, horizontal's
  *     redundancy and statelessness, session state to a shared store: the
- *     page. Headroom: the page's chart (queue-utilization-latency), mean wait
+ *     page; vertical as the usual first move for the stateful database is the
+ *     standard answer the page's "ceiling" implies. Headroom: the page's chart (queue-utilization-latency), mean wait
  *     rho / (1 - rho) service times, the simplest (M/M/1) queue: 1 at 50%, 9
  *     at 90%, 99 at 99%, checked against the chart's caption ("headroom is
  *     the thing you are buying" is the page's).
@@ -216,12 +248,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     can't see their own update: the page. Reading your own recent writes
  *     from the leader is the usual way to give read-your-writes; that
  *     promoting a lagging follower loses what it never received holds for
- *     asynchronous replication, which the narration says.
+ *     asynchronous replication, which the narration says. Semi-synchronous
+ *     replication (the leader waits for one follower before acknowledging)
+ *     is the standard remedy, at a cost in write latency.
  *   - q6: the definitions, shard key, cross-shard cost and hot spots: the
  *     page. The simulation: 1,000,000 keys hashed onto eight shards, every
  *     shard within 1% of 125,000 (worst deviation in results.json); one
  *     user's 50 links, seeded, land on all eight (and 50 random keys cover
- *     all eight with probability 0.99, by inclusion-exclusion).
+ *     all eight with probability 0.99, by inclusion-exclusion). A ninth
+ *     shard: the same million keys move 89% by modulo, 13% on a hash ring of
+ *     100 points a shard (results.json reshard), every mover to the new one.
  *   - q7: the page's CAP answer (a linearizable single-copy view; every
  *     request to a non-failing node answered; CP may refuse, AP may serve
  *     stale or conflicting versions; "not a label for an entire database";
@@ -242,8 +278,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     window counter none of the second ten, the token bucket (ten tokens, one
  *     every 6 s, full at the start) none of the second ten, the leaky bucket
  *     (a queue of ten, one out every 6 s) one of them, since one has drained
- *     by then (shown on screen, not said). Four servers with their own
- *     buckets pass all forty of a burst, a shared bucket ten.
+ *     by then (shown on screen), and refuses the rest once its queue is full
+ *     (said). Four servers with their own buckets pass all forty of a burst,
+ *     a shared bucket ten; the shared check-and-spend must be atomic, the
+ *     standard race on a shared counter.
  *   - r-evict, r-consist: the page's answers.
  *   - q12: push and pull, the write storm, the hybrid: the page. Fifty
  *     million followers: the page's concept check. Two hundred followers,
@@ -309,6 +347,11 @@ export const script: NarrationScript = {
       text: "Headroom is what the extra servers buy.",
       pauseAfter: 0.8,
     },
+    {
+      id: "q1-db",
+      text: "Vertical still has its place: the database holds the state, so it usually scales up first, until it nears that ceiling.",
+      pauseAfter: 0.8,
+    },
 
     // ── 2. Load balancers ─────────────────────────────────────────────────
     {
@@ -335,6 +378,11 @@ export const script: NarrationScript = {
     {
       id: "q2-ring",
       text: "On a hash ring, with a hundred points a server, only twenty-three percent move, all of them to the new server.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "q2-clock",
+      text: "Each key belongs to the next point clockwise, so a new server's points take only the keys just before them.",
       pauseAfter: 0.8,
     },
 
@@ -370,12 +418,22 @@ export const script: NarrationScript = {
     },
     {
       id: "q4-model",
-      text: "The page models a key read about once a second and changed every two minutes. The least bad TTL is where the two failures cross, about fifteen seconds, and even there six percent of reads miss and six percent are stale.",
+      text: "Take a simple model: a key read about once a second and changed every two minutes.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q4-cross",
+      text: "The least bad TTL is where the two failures cross, about fifteen seconds, and even there six percent of reads miss and six percent are stale.",
       pauseAfter: 0.9,
     },
     {
       id: "q4-ours",
-      text: "A short link barely changes, so its TTL can be long, until one is taken down for abuse. Then delete its cached entry after the database commits. Delete it first, and a read in between puts the old value back. The TTL stays as a backstop.",
+      text: "A short link barely changes, so its TTL can be long, until one is taken down for abuse. Then delete its cached entry after the database commits. Delete it first, and a read in between puts the old value back.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q4-backstop",
+      text: "Even then, a slow read can race the delete, so the TTL stays as a backstop: it bounds how long a wrong value lives.",
       pauseAfter: 0.7,
     },
     {
@@ -399,6 +457,11 @@ export const script: NarrationScript = {
     {
       id: "q5-fix",
       text: "So for a short while after a user writes, send their reads to the leader. And with asynchronous replication, promoting a lagging follower loses the writes it never received.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q5-sync",
+      text: "Semi-synchronous replication fixes that: each write waits until one follower has it, so promoting that follower loses nothing, but every write is slower.",
       pauseAfter: 0.8,
     },
 
@@ -412,6 +475,11 @@ export const script: NarrationScript = {
     {
       id: "q6-key",
       text: "Shard by creation date, and today's shard takes every new link: a hot spot. Shard by a hash of the short key, and in a simulation, a million keys land on eight shards within one percent of an eighth each.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q6-ring",
+      text: "Add a ninth shard and modulo moves eighty-nine percent of the keys; a hash ring, as in question two, moves thirteen percent.",
       pauseAfter: 0.8,
     },
     {
@@ -484,8 +552,18 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "q9-full",
+      text: "Once its queue of ten is full, the rest are refused.",
+      pauseAfter: 1.4,
+    },
+    {
       id: "q9-shared",
       text: "The follow-up is where the count lives. With four app servers, each keeping its own bucket, round-robin hands one client four buckets: four times the limit. The count belongs in a store they all share.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q9-atomic",
+      text: "There, the check and the spend must be one atomic step, or two servers both take the last token.",
       pauseAfter: 0.8,
     },
 
@@ -526,7 +604,12 @@ export const script: NarrationScript = {
     },
     {
       id: "q12-why",
-      text: "Feeds are read far more often than people post, so push usually wins: it does the work once per post, not on every load.",
+      text: "Feeds are read far more often than people post, so push usually wins:",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "q12-pays",
+      text: "it pays its writes once, when someone posts, and pull pays its reads on every load.",
       pauseAfter: 0.6,
     },
     {

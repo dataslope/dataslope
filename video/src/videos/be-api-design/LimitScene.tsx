@@ -50,7 +50,6 @@ export const LimitScene: React.FC = () => {
   const remH = n.word("limit-contract", "what's remaining");
   const resetH = n.word("limit-contract", "when the window resets");
   const retryH = n.word("limit-contract", "and Retry-After");
-  const waitH = n.word("limit-contract", "how long to wait");
   const watchesAt = n.word("limit-client", "watches what's remaining");
   const slowsAt = n.word("limit-client", "slows down before it's refused");
   const on429At = n.word("limit-client", "On a four twenty-nine");
@@ -96,6 +95,9 @@ export const LimitScene: React.FC = () => {
 
   // ── The waits ──
   const wTop = y(520);
+  /** The wait bars: low enough under the heading for the 429s above them. */
+  const barTop = wTop + h(80);
+  const notesTop = wTop + h(174);
   const total = WAITS.reduce((a, b) => a + b, 0) * (1 + JITTER);
   const scale = (R_W - 40) / total;
   const waitX = WAITS.map((_, i) => R_X + WAITS.slice(0, i).reduce((a, b) => a + b * (1 + JITTER), 0) * scale);
@@ -160,11 +162,6 @@ export const LimitScene: React.FC = () => {
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{s}</span>
           </Note>
         ))}
-        <Note at={waitH} x={X0} y={cardTop + 2 * Math.round(CARD_SIZE * 0.55) + 5 * lineH + h(16)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 500 }}>Retry-After</span>: how long to wait
-          </span>
-        </Note>
 
         {/* A well-behaved client: watching what's remaining, slowing down. */}
         <Note at={watchesAt} x={R_X} y={gTop}>
@@ -199,13 +196,13 @@ export const LimitScene: React.FC = () => {
           const len = w * scale;
           const grow = ease(frame, at, 16);
           const jit = ease(frame, jitterAt + i * 4, 12);
-          const top = wTop + h(56);
+          const top = barTop;
           return (
             <React.Fragment key={i}>
               <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, at - 2, 6) }}>
                 <line x1={x} y1={top - 8} x2={x} y2={top + 34} stroke={ACCENT} strokeWidth={2.6} />
               </svg>
-              <Note at={at - 2} x={x - 18} y={top - h(34)}>
+              <Note at={at - 2} x={i === 0 ? x - 2 : x - 18} y={top - h(34)}>
                 <span style={{ fontFamily: MONO, fontSize: 19, fontWeight: 500, color: ACCENT_INK }}>429</span>
               </Note>
               <div style={{ position: "absolute", left: x + 4, top, width: Math.max(0, len - 4) * grow, height: 26, background: BAR, borderRadius: 4 }} />
@@ -228,7 +225,7 @@ export const LimitScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Note at={jitterAt + 6} x={R_X} y={wTop + h(150)}>
+        <Note at={jitterAt + 6} x={R_X} y={notesTop}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <span style={{ color: BLUE_INK, fontWeight: 500 }}>dashed</span>: random jitter on top
           </span>
@@ -238,10 +235,10 @@ export const LimitScene: React.FC = () => {
           {SPREAD.map((s, i) => {
             const x = waitX[2] + WAITS[2] * scale * (1 + JITTER * s);
             const p = ease(frame, crowdAt + 4 + i * 3, 8);
-            return <circle key={i} cx={x} cy={wTop + h(56) + 26 + 12 + (i % 3) * 11} r={6} fill={OK} opacity={p} />;
+            return <circle key={i} cx={x} cy={barTop + 26 + 12 + (i % 3) * 11} r={6} fill={OK} opacity={p} />;
           })}
         </svg>
-        <Note at={crowdAt + 10} x={waitX[2] + 60} y={wTop + h(150)}>
+        <Note at={crowdAt + 10} x={waitX[2] + 60} y={notesTop}>
           <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a crowd returns spread out</span>
         </Note>
 
@@ -253,7 +250,7 @@ export const LimitScene: React.FC = () => {
           </span>
         </Note>
         <Note at={onlyAt} x={X0} y={safeTop + h(50)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>safe to repeat:</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Safe to repeat:</span>
         </Note>
         {chips.map((c, i) => {
           const x = [X0 + 200, X0 + 360, X0 + 520, X0 + 950][i];
@@ -276,7 +273,7 @@ export const LimitScene: React.FC = () => {
         <div style={{ position: "absolute", left: X0, top: safeTop - h(20), width: 1680, height: 1, background: HAIRLINE, opacity: ease(frame, sameAt, 10) }} />
 
         {/* A hairline between the contract and the client that reads it. */}
-        <VRule x={955} top={cardTop - h(44)} bottom={wTop + h(150) + 30} at={watchesAt} />
+        <VRule x={955} top={cardTop - h(44)} bottom={notesTop + 30} at={watchesAt} />
       </Drift>
     </AbsoluteFill>
   );

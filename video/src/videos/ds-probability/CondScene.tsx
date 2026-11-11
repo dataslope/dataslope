@@ -3,12 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
+import { MathRun } from "../../editorial/math";
 import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COND } from "./data";
-import { DieFace, Drift, Frac, Given, Labeled, Mark, MARK_OK, math, OK, OK_INK, pulse, V, X0 } from "./parts";
+import { DieFace, Drift, Frac, Given, Labeled, Mark, MARK_OK, math, mathFace, OK, OK_INK, pulse, V, X0 } from "./parts";
 
 const DIE = { size: 110, pitch: 140, y: 470 };
 /** A probability's own column, so the note after it lines up row to row. */
@@ -101,16 +102,18 @@ export const CondScene: React.FC = () => {
 
         {/* ── Question 1: the probability of A, given B ── */}
         <Ink at={answerAt} dur={18} out={out1} style={{ left: X0, top: y(300) }}>
-          <span style={math(64)}>
+          <MathRun style={math(64)}>
             <P>
               <V>A</V>
               <Given />
               <V>B</V>
             </P>
-          </span>
+          </MathRun>
         </Ink>
-        <Note at={answerAt + 10} x={X0 + 250} y={y(318)} out={out1}>
-          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>the probability of A, given that B has happened</span>
+        {/* Read out on a line of its own: the formula is a display, twice
+            the size of the words, so the two do not share a line. */}
+        <Note at={answerAt + 10} x={X0} y={y(394)} out={out1}>
+          <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>The probability of A, given that B has happened</span>
         </Note>
 
         {[1, 2, 3, 4, 5, 6].map((v, i) => {
@@ -138,26 +141,26 @@ export const CondScene: React.FC = () => {
         })}
         {/* Both stay true: each line says which faces it counts over. */}
         <Note at={rollAt + 16} x={X0} y={y(DIE.y + DIE.size + 34)} out={out1}>
-          <span style={{ ...math(38, `color-mix(in srgb, ${INK_SOFT} ${quiet * 100}%, ${INK})`), ...ROW }}>
+          <MathRun style={{ ...math(38, `color-mix(in srgb, ${INK_SOFT} ${quiet * 100}%, ${INK})`), ...ROW }}>
             <P>six</P> = {COND.pSix}
-          </span>
+          </MathRun>
           <span style={{ ...note(24, INK_SOFT), opacity: quiet, whiteSpace: "nowrap" }}>out of all six faces</span>
         </Note>
         <Note at={sixAt + 2} x={X0} y={y(DIE.y + DIE.size + 96)} out={out1}>
-          <span style={{ ...math(38, OK_INK), ...ROW }}>
+          <MathRun style={{ ...math(38, OK_INK), ...ROW }}>
             <P>
               six
               <Given />
               even
             </P>{" "}
             = {COND.pSixGivenEven}
-          </span>
+          </MathRun>
           <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, sixAt + 10, 12), whiteSpace: "nowrap" }}>out of the three even faces</span>
         </Note>
 
         {/* The definition, beside the die. */}
         <Ink at={symbolsAt} dur={20} out={out1} style={{ left: RULE_X, top: y(470) }}>
-          <span style={math(52)}>
+          <MathRun style={math(52)}>
             <P>
               <V>A</V>
               <Given />
@@ -180,12 +183,12 @@ export const CondScene: React.FC = () => {
                 </Mark>
               }
             />
-          </span>
+          </MathRun>
         </Ink>
         {/* The die's own numbers in it, under the fraction they fill:
             P(six and even) over P(even). */}
         <Ink at={plugAt} dur={18} out={out1} style={{ left: RULE_X + PLUG_DX, top: y(612) }}>
-          <span style={math(46)}>
+          <MathRun style={math(46)}>
             = <Frac top={COND.pSixAndEven} bottom={COND.pEven} /> =
             {/* Clear of the "=": the mark's wash reaches 0.14em past its text. */}
             <span style={{ display: "inline-block", marginLeft: "0.32em" }}>
@@ -193,12 +196,12 @@ export const CondScene: React.FC = () => {
                 <span style={{ color: OK_INK }}>{COND.pSixGivenEven}</span>
               </Mark>
             </span>
-          </span>
+          </MathRun>
         </Ink>
 
         {/* ── Question 2: Bayes' theorem ── */}
         <Ink at={turnsAt} dur={20} style={{ left: X0, top: formulaY }}>
-          <span style={math(64)}>
+          <MathRun style={math(64)}>
             <Mark at={aGivenBAt} color={MARK_OK}>
               <P>
                 <V>A</V>
@@ -235,54 +238,60 @@ export const CondScene: React.FC = () => {
                 </Labeled>
               }
             />
-          </span>
+          </MathRun>
         </Ink>
 
         {/* Which event is which, then what you know (the likelihood, marked as
             it is in the theorem) and what you want (the answer, in green). */}
         <Note at={diseaseAt} x={X0} y={y(590)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            <span style={math(30, INK)}>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
+            <MathRun style={mathFace(INK)}>
               <V>A</V>
-            </span>{" "}
+            </MathRun>{" "}
             = disease,
-            <span style={{ ...math(30, INK), marginLeft: 26 }}>
+            <MathRun style={{ ...mathFace(INK), marginLeft: 26 }}>
               <V>B</V>
-            </span>{" "}
+            </MathRun>{" "}
             = positive
           </span>
         </Note>
+        {/* "You know" and "You want" are sentences with the formula in them,
+            set at the size of their words. */}
         <Note at={knowAt + 2} x={X0} y={y(650)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>you know </span>
-          <span style={math(36, INK)}>
-            <Mark at={knowAt + 10}>
-              <P>
-                positive
-                <Given />
-                disease
-              </P>
-            </Mark>
+          <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>
+            You know{" "}
+            <MathRun style={mathFace(INK)}>
+              <Mark at={knowAt + 10}>
+                <P>
+                  positive
+                  <Given />
+                  disease
+                </P>
+              </Mark>
+            </MathRun>
           </span>
         </Note>
         {/* The bridge points at what the next question computes: washed green
             on "that test", and swelling on "with numbers". */}
         <Note at={wantAt + 2} x={X0} y={y(720)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>you want </span>
-          <span
-            style={{
-              ...math(36, OK_INK),
-              display: "inline-block",
-              transform: `scale(${1 + 0.07 * pulse(frame, numbersAt, 22)})`,
-              transformOrigin: "0 50%",
-            }}
-          >
-            <Mark at={thatTestAt} color={MARK_OK}>
-              <P>
-                disease
-                <Given />
-                positive
-              </P>
-            </Mark>
+          <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>
+            You want{" "}
+            <MathRun
+              style={{
+                ...mathFace(OK_INK),
+                display: "inline-block",
+                transform: `scale(${1 + 0.07 * pulse(frame, numbersAt, 22)})`,
+                transformOrigin: "0 50%",
+              }}
+            >
+              <Mark at={thatTestAt} color={MARK_OK}>
+                <P>
+                  disease
+                  <Given />
+                  positive
+                </P>
+              </Mark>
+            </MathRun>
           </span>
         </Note>
 
@@ -290,7 +299,7 @@ export const CondScene: React.FC = () => {
             among the sick, then among the healthy, each weighted by how
             common its group is. Those weights are where the base rate comes in. */}
         <Ink at={bottomAt - 2} dur={20} style={{ left: 900, top: y(668) }}>
-          <span style={math(34)}>
+          <MathRun style={math(34)}>
             <P>
               <V>B</V>
             </P>{" "}
@@ -324,10 +333,10 @@ export const CondScene: React.FC = () => {
                 </P>
               </Mark>
             </Labeled>
-          </span>
+          </MathRun>
         </Ink>
         <Note at={breaksAt} x={900} y={y(762)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>where intuition breaks</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Where intuition breaks</span>
         </Note>
       </Drift>
     </AbsoluteFill>

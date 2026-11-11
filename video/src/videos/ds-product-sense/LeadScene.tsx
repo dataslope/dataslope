@@ -64,7 +64,8 @@ const Bar: React.FC<{ x: number; base: number; height: number; at: number; color
   return (
     <>
       <div style={{ position: "absolute", left: x, top: base - height * p, width: BARS.w, height: height * p, background: color, borderRadius: "4px 4px 0 0", opacity: 0.88 }} />
-      <div style={{ position: "absolute", left: x - 40, width: BARS.w + 80, top: base - height * p - 40, textAlign: "center", ...note(28, ink), fontWeight: 500, ...TABULAR, opacity: ease(frame, from + 8, 10) }}>
+      {/* The value at the size of the bar's own name under it (the owner, 2026-11-11). */}
+      <div style={{ position: "absolute", left: x - 40, width: BARS.w + 80, top: base - height * p - 36, textAlign: "center", ...label(21, ink), fontWeight: 500, ...TABULAR, opacity: ease(frame, from + 8, 10) }}>
         {value}
       </div>
       <div style={{ position: "absolute", left: x - 40, width: BARS.w + 80, top: base + 10, textAlign: "center", ...label(21, INK_SOFT), opacity: p }}>{name}</div>
@@ -184,12 +185,12 @@ export const LeadScene: React.FC = () => {
           </span>
         </Bracket>
         <Note at={leadDefAt + 4} x={CHART.x0} y={y(CHART.bottom) + h(64)} out={out3}>
-          <span style={madeUp()}>the made-up app, with simulated week-to-week noise</span>
+          <span style={madeUp()}>The made-up app, with simulated week-to-week noise</span>
         </Note>
 
         <Note at={leadDefAt} x={SIDE_X} y={y(360)} out={out3}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: BLUE_INK }}>leading</b>: moves before the outcome
+            <b style={{ color: BLUE_INK }}>Leading</b>: moves before the outcome
           </span>
         </Note>
         <Note at={leadExAt} x={SIDE_X + 24} y={y(404)} out={out3}>
@@ -197,7 +198,7 @@ export const LeadScene: React.FC = () => {
         </Note>
         <Note at={lagDefAt} x={SIDE_X} y={y(460)} out={out3}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: WARM_INK }}>lagging</b>: confirms it afterwards
+            <b style={{ color: WARM_INK }}>Lagging</b>: confirms it afterwards
           </span>
         </Note>
         <Note at={lagExAt} x={SIDE_X + 24} y={y(504)} out={out3}>
@@ -206,7 +207,7 @@ export const LeadScene: React.FC = () => {
         <Note at={steerAt} x={SIDE_X} y={y(590)} out={out3}>
           <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={steerAt + 6} out={causesAt}>
-              steer by the leading line
+              Steer by the leading line
             </Mark>
           </span>
         </Note>
@@ -230,19 +231,19 @@ export const LeadScene: React.FC = () => {
           </Note>
           <Note at={rewardAt} x={X0} y={y(380)}>
             <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
-              reward closing tickets fast
+              Reward closing tickets fast
               <span style={{ opacity: ease(frame, earlyAt, 10) }}>, and some close before it&apos;s solved</span>
             </span>
           </Note>
           <Note at={closeAt - 2} x={X0} y={y(BARS.top) - h(96)}>
-            <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>median time to close</span>
+            <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Median time to close</span>
           </Note>
           <Bar x={X0 + 30} base={base} height={GOODHART.closeHoursWas * hourScale} at={closeAt} color={DATA} value={`${GOODHART.closeHoursWas} h`} name="before" ink={BLUE_INK} />
           <Bar x={X0 + 210} base={base} height={GOODHART.closeHoursNow * hourScale} at={threeAt - 2} color={DATA} value={`${GOODHART.closeHoursNow} h`} name="after" ink={BLUE_INK} />
           <Note at={reopenAt - 2} x={760} y={y(BARS.top) - h(96)}>
             <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
               <Mark at={handsAt} color={`color-mix(in srgb, ${ACCENT} 22%, transparent)`}>
-                tickets reopened
+                Tickets reopened
               </Mark>
             </span>
           </Note>
@@ -255,7 +256,7 @@ export const LeadScene: React.FC = () => {
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>that catches it</span>
           </Note>
           <Note at={closeAt} x={X0} y={base + h(56)}>
-            <span style={madeUp()}>made up for this video</span>
+            <span style={madeUp()}>Made up for this video</span>
           </Note>
         </Clear>
       </Drift>

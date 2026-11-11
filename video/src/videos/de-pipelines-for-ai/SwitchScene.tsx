@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { arrowHead, cubicPath, sampleCubic, type Cubic, type Pt } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
@@ -9,10 +10,62 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { SWITCH } from "./data";
-import { Box, DATA, DATA_TINT, Drift, head, LineArrow, Mark, MARK_BAD, MARK_OK, OK, OK_INK, say, X0 } from "./parts";
+import { Box, DATA, DATA_TINT, Drift, head, Mark, MARK_BAD, MARK_OK, OK, OK_INK, say, X0 } from "./parts";
 
 const T = { x: X0, top: 360, rowH: 52, cols: [150, 120, 100, 140, 160] };
 const BG = { x1: 1010, x2: 1430, w: 380, top: 470, h: 130 };
+
+/** The alias pill's size: 180 by 48, fully rounded. */
+const PILL = { w: 180, h: 48 };
+
+/**
+ * The alias pointing at the live index: a curve that leaves the pill's side
+ * nearest the index, level, and turns down into the middle of the box's top
+ * edge, arriving straight down so the head points at the box's centre (the
+ * owner, 2026-11-11: the straight arrow stopped short of both and aimed at
+ * the box's right side). While the alias swings, the start slides round the
+ * pill's foot from one side to the other.
+ */
+const AliasArrow: React.FC<{ pillX: number; pillY: number; target: number; bgTop: number; at: number }> = ({
+  pillX,
+  pillY,
+  target,
+  bgTop,
+  at: start,
+}) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, start, 14);
+  if (p <= 0) return null;
+  const s = Math.max(-1, Math.min(1, (target - pillX) / (PILL.w / 2 + 120)));
+  const a = Math.abs(s);
+  // On the outline: the side's midpoint at |s| = 1, the foot's centre at 0.
+  const from: Pt = [pillX + (PILL.w / 2) * s, pillY + PILL.h / 2 + (PILL.h / 2) * (1 - a)];
+  const to: Pt = [target, bgTop - 1];
+  const drop = to[1] - from[1];
+  const curve: Cubic = [
+    from,
+    [from[0] + s * Math.abs(to[0] - from[0]) * 0.6, from[1] + (1 - a) * drop * 0.5],
+    [to[0], to[1] - drop * 0.6],
+    to,
+  ];
+  const line = sampleCubic(curve);
+  const head = 13;
+  return (
+    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+      <path d={cubicPath(curve)} fill="none" stroke={INK} strokeWidth={2.4} strokeLinecap="round" pathLength={1} strokeDasharray={`${p} 1`} />
+      <path
+        d={arrowHead(line, head, head * 0.62)}
+        fill="none"
+        stroke={INK}
+        strokeWidth={2.4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={ease(frame, start + 10, 4)}
+      />
+    </svg>
+  );
+};
+
 
 /**
  * Question 5. Left: drawn as the narration says each model has its own
@@ -93,18 +146,18 @@ export const SwitchScene: React.FC = () => {
         </QuestionCard>
         <Note at={allAt} x={X0} y={y(240)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <Mark at={allAt + 4}>everything gets re-embedded</Mark>
+            <Mark at={allAt + 4}>Everything gets re-embedded</Mark>
             <span style={{ opacity: ease(frame, spaceAt - 2, 10), color: INK_SOFT }}>: each model has its own space</span>
           </span>
         </Note>
 
         {/* The tiny space, and a second model's kitten searched in it. */}
         <Note at={tinyAt - 2} x={T.x} y={y(T.top) - 34}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>a tiny space from the How LLMs Work course: five words, three numbers each</span>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>A tiny space from the How LLMs Work course: five words, three numbers each</span>
         </Note>
         {["word", ...SWITCH.axes, "from its kitten"].map((t, j) => (
           <Note key={t} at={(j === 4 ? searchAt : spaceAt) + j * 2} x={colX(j) + 12} y={y(T.top) + 8}>
-            <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{t}</span>
+            <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{t.charAt(0).toUpperCase() + t.slice(1)}</span>
           </Note>
         ))}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, spaceAt, 12) }}>
@@ -146,7 +199,7 @@ export const SwitchScene: React.FC = () => {
         {/* The second model's kitten. */}
         <Note at={pretendAt} x={T.x} y={qTop}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            a second model, same meanings
+            A second model, same meanings
             <span style={{ opacity: ease(frame, axesAt - 2, 10) }}>, axes in another order: {SWITCH.newAxes.join(", ")}</span>
           </span>
         </Note>
@@ -170,14 +223,14 @@ export const SwitchScene: React.FC = () => {
         ))}
         <Note at={truckAt + 4} x={T.x} y={qTop + 112}>
           <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            nearest: {nearest}
+            Nearest: {nearest}
             <span style={{ ...note(25, INK_SOFT), fontWeight: 500 }}> (the old model&apos;s own kitten lands nearest {SWITCH.nearestSame})</span>
           </span>
         </Note>
 
         {/* The blue-green switch. */}
         <Note at={bgAt} x={BG.x1} y={y(250)}>
-          <span style={head(22, INK)}>a blue-green switch</span>
+          <span style={head(22, INK)}>A blue-green switch</span>
         </Note>
         <div
           style={{
@@ -198,7 +251,7 @@ export const SwitchScene: React.FC = () => {
         >
           alias: live
         </div>
-        <LineArrow from={[pillX, pillY + 52]} to={[target, bgTop - 10]} at={bgAt + 6} color={INK} width={2.4} />
+        <AliasArrow pillX={pillX} pillY={pillY} target={target} bgTop={bgTop} at={bgAt + 6} />
         <Box x={BG.x1} y={bgTop} w={BG.w} h={BG.h} at={bgAt + 4} tone={DATA} fill={DATA_TINT} size={25}>
           <span style={{ color: BLUE_INK }}>
             index v1
@@ -231,11 +284,11 @@ export const SwitchScene: React.FC = () => {
           }}
         />
         {[
-          { text: "1. build beside the old", at: buildAt },
-          { text: "2. backfill", at: backfillAt },
-          { text: "3. compare retrieval on both", at: compareAt + 4 },
-          { text: "4. switch the alias atomically", at: aliasAt },
-          { text: "5. keep v1 for rollback", at: rollbackAt },
+          { text: "1. Build beside the old", at: buildAt },
+          { text: "2. Backfill", at: backfillAt },
+          { text: "3. Compare retrieval on both", at: compareAt + 4 },
+          { text: "4. Switch the alias atomically", at: aliasAt },
+          { text: "5. Keep v1 for rollback", at: rollbackAt },
         ].map((s, i) => (
           <Note key={s.text} at={s.at - 2} x={BG.x1} y={bgTop + BG.h + 30 + i * 44}>
             <span style={say(24, i === 3 ? INK : INK_SOFT, i === 3 ? 650 : 500)}>
@@ -246,7 +299,7 @@ export const SwitchScene: React.FC = () => {
         <Note at={tagAt - 2} x={BG.x1} y={bgTop + BG.h + 30 + 5 * 44 + 22}>
           <span style={say(25, OK_INK, 650)}>
             <Mark at={tagAt + 6} color={MARK_OK}>
-              every vector stores its model and version
+              Every vector stores its model and version
             </Mark>
           </span>
         </Note>

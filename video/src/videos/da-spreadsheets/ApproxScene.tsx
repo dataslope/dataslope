@@ -88,12 +88,12 @@ export const ApproxScene: React.FC = () => {
         />
         <RangeBox g={tg} r0={2} r1={5} c0={0} c1={0} at={sortedAt} out={codesAt} color={ds("blue", 500)} />
         <Note at={sortedAt + 4} x={X0} y={tg.top - h(36)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>sorted, smallest first</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Sorted, smallest first</span>
         </Note>
         {/* Each mode is named over its own formula: approximate here, exact under FALSE. */}
         <Note at={approxAt - 2} x={BAR_X} y={tg.top - h(4)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b>approximate</b> (<Mono>TRUE</Mono>): the largest value not above the key
+            <b>Approximate</b> (<Mono>TRUE</Mono>): the largest value not above the key
           </span>
         </Note>
         <FormulaBar
@@ -108,13 +108,13 @@ export const ApproxScene: React.FC = () => {
         />
         <Note at={sixFortyAt + 4} x={BAR_X} y={tg.top + h(98)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            the largest &ldquo;from&rdquo; not above {key} is <b>{L.tiers[tierRow - 1][0]}</b>
+            The largest &ldquo;from&rdquo; not above {key} is <b>{L.tiers[tierRow - 1][0]}</b>
           </span>
         </Note>
         {/* What leaving the argument off means, which differs by function. */}
         <Note at={fallsAt} x={BAR_X} y={tg.top + h(150)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            left off: <b style={{ color: INK }}>VLOOKUP</b> and <b style={{ color: INK }}>MATCH</b> mean approximate, <b style={{ color: INK }}>XLOOKUP</b> means exact
+            Left off: <b style={{ color: INK }}>VLOOKUP</b> and <b style={{ color: INK }}>MATCH</b> mean approximate, <b style={{ color: INK }}>XLOOKUP</b> means exact
           </span>
         </Note>
 
@@ -153,12 +153,12 @@ export const ApproxScene: React.FC = () => {
         />
         <Note at={naAt + 6} x={BAR_X} y={pg.top + h(150)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b>exact</b> (<Mono>FALSE</Mono>): a precise hit, or #N/A
+            <b>Exact</b> (<Mono>FALSE</Mono>): a precise hit, or #N/A
           </span>
         </Note>
         <Note at={unsortedAt - 2} x={BAR_X} y={pg.top + h(200)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            unsorted? <span style={{ color: ACCENT_INK }}>approximate match can land anywhere</span>
+            Unsorted? <span style={{ color: ACCENT_INK }}>approximate match can land anywhere</span>
           </span>
         </Note>
         <RangeBox g={pg} r0={lampRow} r1={lampRow} c0={0} c1={2} at={lampAt + 4} color={ACCENT} dash />

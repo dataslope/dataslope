@@ -682,6 +682,11 @@
       ]
     }
   },
+  "cost": {
+    "n": 1000,
+    "inOrder": 999,
+    "shuffled": 8658
+  },
   "pageSays": {
     "survey66": "66% of respondents named \"AI solutions that are almost right, but not quite\" as their top frustration",
     "survey45": "45% said debugging AI-generated code takes longer than expected",

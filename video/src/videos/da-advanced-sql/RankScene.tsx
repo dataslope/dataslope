@@ -130,7 +130,7 @@ export const RankScene: React.FC = () => {
         <Listing lines={RANK.lines} x={X0} top={y(TOP)} width={700} size={SIZE} at={asked - 6} out={out3} />
         <Note at={asked} x={RESULT_X} y={y(TOP)} out={out3}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-            ranks 7 to 14 of the page&apos;s {RANK.rows}
+            Ranks 7 to 14 of the page&apos;s {RANK.rows}
           </span>
         </Note>
         <DataTable
@@ -233,36 +233,36 @@ export const RankScene: React.FC = () => {
         <Note at={noWrapAt} x={TOPN_LIST_X} y={y(TOP) + listingHeight(q.lines.length, 19) + h(24)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <Mark at={bridgeAt}>
-              like <QMono>HAVING</QMono>, for a window function
+              Like <QMono>HAVING</QMono>, for a window function
             </Mark>
           </span>
         </Note>
         {/* Where it runs, in the column the results had: Postgres, which ran
             every other listing here, is one of the engines without it. */}
         <Note at={supportAt - 2} x={QUALIFY_NOTE_X} y={y(TOP) + h(4)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>runs in</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Runs in</span>
         </Note>
         <Note at={supportAt} x={QUALIFY_NOTE_X} y={y(TOP) + h(38)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>DuckDB, Snowflake, BigQuery</span>
         </Note>
         <Note at={wrapAt - 2} x={QUALIFY_NOTE_X} y={y(TOP) + h(104)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>not in</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Not in</span>
         </Note>
         <Note at={wrapAt} x={QUALIFY_NOTE_X} y={y(TOP) + h(138)}>
           <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>Postgres or SQL Server</span>
         </Note>
         <Note at={wrapQueryAt} x={QUALIFY_NOTE_X} y={y(TOP) + h(182)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>there, wrap the query as in question 4</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>There, wrap the query as in question 4</span>
         </Note>
         <Note at={tieAt + 4} x={X0} y={pg.rowTop(P.rows.length) + h(20)} out={useRankAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>Emma and Ulysses: 310 each</span>
         </Note>
         <Note at={onlyAt + 6} x={X0} y={pg.rowTop(P.rows.length) + h(56)} out={useRankAt}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>only one makes it</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>Only one makes it</span>
         </Note>
         <Note at={arbitraryOneAt + 2} x={X0} y={pg.rowTop(P.rows.length) + h(92)} out={useRankAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            which one is arbitrary, unless <QMono>ORDER BY</QMono> breaks the tie
+            Which one is arbitrary, unless <QMono>ORDER BY</QMono> breaks the tie
           </span>
         </Note>
         </AbsoluteFill>

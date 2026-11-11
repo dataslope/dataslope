@@ -36,10 +36,10 @@ const Trade: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={pullAt - 2} x={R_X + 40} y={c.y(330)}>
-        <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>two metrics pulling apart: name the goal, and the limit</span>
+        <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>Two metrics pulling apart: name the goal, and the limit</span>
       </Note>
       <Note at={sessionsAt - 4} x={R_X + 40} y={c.y(392)}>
-        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>a notification change:</span>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>A notification change:</span>
       </Note>
       {rows.map((r, i) => {
         const p = ease(frame, r.at - 2, 14);
@@ -60,7 +60,7 @@ const Trade: React.FC<{ c: Ctx }> = ({ c }) => {
       })}
       <Note at={winAt} x={R_X + 40} y={c.y(620)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-          a win only if <Mark at={winAt + 10}>the long-run math nets out positive</Mark>
+          A win only if <Mark at={winAt + 10}>the long-run math nets out positive</Mark>
         </span>
       </Note>
     </>
@@ -87,7 +87,7 @@ const Vanity: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={vanityAt - 2} x={R_X + 40} y={c.y(330)}>
-        <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>looks good, and only goes up</span>
+        <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>Looks good, and only goes up</span>
       </Note>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
         <line x1={x0} x2={x0 + W} y1={base} y2={base} stroke={INK} strokeWidth={1.6} opacity={draw > 0 ? 1 : 0} />
@@ -111,7 +111,7 @@ const Vanity: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={preferAt - 2} x={R_X + 40} y={c.y(640)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-          prefer rates and cohorts:{" "}
+          Prefer rates and cohorts:{" "}
           <Badge tone="green" size={27} style={{ opacity: ease(frame, retentionAt - 2, 12) }}>
             week-four retention
           </Badge>
@@ -158,14 +158,14 @@ const Ratio: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={topAt - 2} x={R_X + 40} y={c.y(330)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-          a ratio moves with its top
+          A ratio moves with its top
           <span style={{ opacity: ease(frame, bottomAt, 10) }}>, its bottom</span>
           <span style={{ opacity: ease(frame, mixAt, 10) }}>, or the mix underneath</span>
         </span>
       </Note>
       <Note at={fallAt - 2} x={R_X + 64} y={c.y(374)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          a rate can fall in every group
+          A rate can fall in every group
           <span style={{ opacity: ease(frame, riseAt, 10) }}> yet rise overall</span>
           <span style={{ opacity: ease(frame, simpsonAt, 10) }}>
             : <b style={{ color: INK }}>Simpson&apos;s paradox</b>
@@ -185,12 +185,12 @@ const Ratio: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={readAt - 2} x={R_X + 40} y={c.y(630)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-          <Mark at={readAt + 4}>read both halves</Mark>
+          <Mark at={readAt + 4}>Read both halves</Mark>
         </span>
       </Note>
       <Note at={addAt - 2} x={R_X + 40} y={c.y(684)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-          add up counts across groups,{" "}
+          Add up counts across groups,{" "}
           <span style={{ color: ACCENT_INK, opacity: ease(frame, avgAt - 2, 10) }}>
             don&apos;t <Strike at={avgAt + 6}>average the ratios</Strike>
           </span>
@@ -198,12 +198,12 @@ const Ratio: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={tenAt - 2} x={R_X + 64} y={c.y(732)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          an average of ratios counts a group of 10
+          An average of ratios counts a group of 10
           <span style={{ opacity: ease(frame, thousandAt, 10) }}> as much as a group of 10,000</span>
         </span>
       </Note>
       <Note at={roseAt} x={R_X + 40} y={c.y(560)}>
-        <span style={madeUp()}>made up for this video</span>
+        <span style={madeUp()}>Made up for this video</span>
       </Note>
     </>
   );
@@ -254,11 +254,11 @@ export const RapidScene: React.FC = () => {
         {/* The bridge: someone pulls the numbers, and next time it's you. */}
         <Note at={everyAt} x={R_X + 40} y={y(360)}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
-            every case ends with <Mark at={pullingAt + 4}>someone pulling the numbers</Mark>
+            Every case ends with <Mark at={pullingAt + 4}>someone pulling the numbers</Mark>
           </span>
         </Note>
         <Note at={youAt} x={R_X + 40} y={y(430)}>
-          <span style={{ ...note(30, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>next time, that&apos;s you, in Python</span>
+          <span style={{ ...note(30, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Next time, that&apos;s you, in Python</span>
         </Note>
         <NextLine at={nextAt} x={R_X + 40} y={y(560)} width={860}>
           Python &amp; pandas

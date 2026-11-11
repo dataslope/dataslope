@@ -5,6 +5,7 @@ import { RapidFire, type RapidItem, Tick } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LOSS, METRICS } from "./data";
@@ -44,7 +45,7 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={rmseAt - 4} x={R_X + 40} y={c.y(330)}>
-        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>the page&apos;s five predictions: each miss&apos;s share of the total</span>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>The page&apos;s five predictions: each miss&apos;s share of the total</span>
       </Note>
       {rows.map((r, i) => {
         const total = r.vals.reduce((a, b) => a + b, 0);
@@ -80,7 +81,10 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
                     ...TABULAR,
                   }}
                 >
-                  {v / total > 0.08 ? `${Math.round((100 * v) / total)}%` : ""}
+                  {/* The share inks in once the bars are near their width:
+                      while they grow from nothing, every label sits on its
+                      neighbours. */}
+                  <span style={{ opacity: ease(frame, r.at + 10, 8) }}>{v / total > 0.08 ? `${Math.round((100 * v) / total)}%` : ""}</span>
                 </div>
               );
             })}
@@ -88,13 +92,13 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <Note at={dominateAt} x={R_X + 40} y={c.y(600)}>
-        <span style={{ ...note(25, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>squared, the two big misses dominate</span>
+        <span style={{ ...note(25, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Squared, the two big misses dominate</span>
       </Note>
       {/* RMSE's root brings it back to the target's units too: the choice is
           about what a big miss costs, not about units. */}
       <Note at={unitsAt - 2} x={R_X + 40} y={c.y(652)}>
         <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-          both in the target&apos;s units
+          Both in the target&apos;s units
           <span style={{ opacity: ease(frame, useAt - 2, 10) }}>
             : <b>RMSE</b> when big misses cost more
           </span>
@@ -102,7 +106,10 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={r2At - 2} x={R_X + 40} y={c.y(704)}>
         <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-          <b>R²</b>: the share of variance explained; 1 is perfect, 0 is no better than the mean
+          <MathRun>
+            <I>R</I>²
+          </MathRun>
+          : the share of variance explained; 1 is perfect, 0 is no better than the mean
         </span>
         <br />
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, noUnitsAt - 2, 10) }}>
@@ -111,7 +118,11 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={valuesAt} x={R_X + 40} y={c.y(800)}>
         <span style={{ ...note(28, BLUE_INK), whiteSpace: "nowrap", ...TABULAR }}>
-          RMSE <b>{fmt(METRICS.rmse)}</b> · MAE <b>{fmt(METRICS.mae)}</b> · R² <b>{fmt(METRICS.r2)}</b>
+          RMSE <b>{fmt(METRICS.rmse)}</b> · MAE <b>{fmt(METRICS.mae)}</b> ·{" "}
+          <MathRun>
+            <I>R</I>²
+          </MathRun>{" "}
+          <b>{fmt(METRICS.r2)}</b>
         </span>
       </Note>
     </>
@@ -158,20 +169,20 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
         <circle cx={at(xs, LOSS.at)} cy={at(ys, LOSS.xentAt)} r={8 * ease(frame, xentAt, 10)} fill={OK} />
       </Svg>
       <Note at={predictAt} x={box.right + 30} y={c.y(box.top) + c.h(10)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>predict {LOSS.at} for a true positive:</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>Predict {LOSS.at} for a true positive:</span>
       </Note>
       <Note at={sqAt + 2} x={box.right + 30} y={c.y(box.top) + c.h(56)}>
         <span style={{ ...note(26, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          squared error <span style={TABULAR}>{fmt(LOSS.sqAt)}</span>
+          Squared error <span style={TABULAR}>{fmt(LOSS.sqAt)}</span>
         </span>
       </Note>
       <Note at={xentAt + 2} x={box.right + 30} y={c.y(box.top) + c.h(100)}>
         <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          cross-entropy <span style={TABULAR}>{fmt(LOSS.xentAt)}</span>
+          Cross-entropy <span style={TABULAR}>{fmt(LOSS.xentAt)}</span>
         </span>
       </Note>
       <Note at={climbAt} x={box.right + 30} y={c.y(box.top) + c.h(170)}>
-        <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>more confidently wrong:</span>
+        <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>More confidently wrong:</span>
         <br />
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>it keeps climbing</span>
       </Note>
@@ -179,19 +190,19 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
           behind a sigmoid when the model is this wrong. */}
       <Note at={useAt - 2} x={box.right + 30} y={c.y(box.top) + c.h(250)}>
         <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          <Mark at={useAt + 4}>so use cross-entropy</Mark>
+          <Mark at={useAt + 4}>So use cross-entropy</Mark>
         </span>
       </Note>
       <Note at={gradAt - 2} x={box.right + 30} y={c.y(box.top) + c.h(302)}>
         <div style={{ whiteSpace: "nowrap" }}>
           <div style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>
-            gradient at <span style={TABULAR}>{LOSS.at}</span>, behind a sigmoid:
+            Gradient at <span style={TABULAR}>{LOSS.at}</span>, behind a sigmoid:
           </div>
           <div style={{ ...note(24, OK_INK), fontWeight: 500 }}>
-            cross-entropy <span style={TABULAR}>{fmt(LOSS.xentGrad)}</span>
+            Cross-entropy <span style={TABULAR}>{fmt(LOSS.xentGrad)}</span>
           </div>
           <div style={{ ...note(24, BLUE_INK), fontWeight: 500, opacity: ease(frame, flatAt - 4, 10) }}>
-            squared error <span style={TABULAR}>{fmt(LOSS.sqGrad)}</span>
+            Squared error <span style={TABULAR}>{fmt(LOSS.sqGrad)}</span>
             <span style={{ color: ACCENT_INK }}>: flat</span>
           </div>
         </div>
@@ -205,9 +216,9 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
 const Select: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const steps = [
-    { text: "compare on validation data", at: c.w("r-select", "compare them on validation data") },
-    { text: "with a metric that matches the goal", at: c.w("r-select", "a metric that matches the goal") },
-    { text: "weigh speed, interpretability and cost", at: c.w("r-select", "weigh speed") },
+    { text: "Compare on validation data", at: c.w("r-select", "compare them on validation data") },
+    { text: "With a metric that matches the goal", at: c.w("r-select", "a metric that matches the goal") },
+    { text: "Weigh speed, interpretability and cost", at: c.w("r-select", "weigh speed") },
   ];
   const noiseAt = c.w("r-close", "If the gap is within its noise");
   const simplerAt = c.w("r-close", "take the simpler one");
@@ -224,14 +235,14 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
       ))}
       <Note at={noiseAt - 2} x={R_X + 40} y={c.y(380) + 3 * c.h(72) + c.h(20)}>
         <span style={{ ...note(32, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          gap within its noise? <span style={{ opacity: ease(frame, simplerAt - 4, 10) }}><Mark at={simplerAt}>take the simpler one</Mark></span>
+          Gap within its noise? <span style={{ opacity: ease(frame, simplerAt - 4, 10) }}><Mark at={simplerAt}>Take the simpler one</Mark></span>
         </span>
         <br />
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>a paired bootstrap on held-out predictions measures that noise</span>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>A paired bootstrap on held-out predictions measures that noise</span>
       </Note>
       <Note at={testAt - 2} x={R_X + 40} y={c.y(380) + 3 * c.h(72) + c.h(130)}>
         <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-          then score the winner <b>once</b>, on the untouched test set
+          Then score the winner <b>once</b>, on the untouched test set
         </span>
       </Note>
     </>
@@ -255,7 +266,14 @@ export const RapidScene: React.FC = () => {
   const end = n.beat("next").from;
 
   const items: RapidItem[] = [
-    { n: 13, label: "RMSE, MAE and R²", beat: "r-metrics", body: <Metrics c={c} /> },
+    { n: 13, label: (
+        <>
+          RMSE, MAE and{" "}
+          <MathRun>
+            <I>R</I>²
+          </MathRun>
+        </>
+      ), beat: "r-metrics", body: <Metrics c={c} /> },
     { n: 14, label: "Cross-entropy or MSE", beat: "r-xent", body: <Xent c={c} /> },
     { n: 15, label: "Choosing between two models", beat: "r-select", body: <Select c={c} /> },
   ].map(({ beat, ...item }) => ({ ...item, at: n.beat(beat).from }));

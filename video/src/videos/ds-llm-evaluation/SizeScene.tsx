@@ -5,6 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -160,7 +161,7 @@ export const SizeScene: React.FC = () => {
         </Note>
         <Note at={rangeAt - 2} x={CHART.x0 - 40} y={y(CHART.top) - h(110)}>
           <span style={{ ...note(28, BLUE_INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
-            at 100 items:{" "}
+            At 100 items:{" "}
             <Mark at={rangeAt + 6} out={habitsAt}>
               {pct(SIZE.at100.lo)} to {pct(SIZE.at100.hi)}
             </Mark>
@@ -177,9 +178,9 @@ export const SizeScene: React.FC = () => {
             {/* One line, one face: the name, the formula and what it means
                 are all set in the math serif at one size. */}
             <span style={math(28, INK_SOFT)}>half-width</span>
-            <span style={math(28, INK)}>
-              = 1.96 √(p(1 − p) / n)
-            </span>
+            <MathRun style={{ fontSize: 28, color: INK }}>
+              = 1.96 √(<I>p</I>(1 − <I>p</I>) / <I>n</I>)
+            </MathRun>
             <span style={{ ...math(28, INK), opacity: ease(frame, halvesAt - 2, 10) }}>
               <Mark at={halvesAt + 6} out={habitsAt}>
                 4× the items, half the width
@@ -191,7 +192,7 @@ export const SizeScene: React.FC = () => {
         {/* The second half: the same 500 items under both versions. */}
         <Note at={pairAt} x={TABLE.x} y={y(TABLE.top - 104)}>
           <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={pairAt + 6}>1. pair the comparison</Mark>
+            <Mark at={pairAt + 6}>1. Pair the comparison</Mark>
           </span>
         </Note>
         <Note at={itemsAt} x={TABLE.x} y={y(TABLE.top - 50)}>
@@ -228,7 +229,7 @@ export const SizeScene: React.FC = () => {
         </Note>
         <Note at={equalAt - 2} x={TABLE.x + TABLE.head + 2 * TABLE.cw + 4} y={y(TABLE.top) + h(TABLE.rh) + h(104)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
-            if equally good,
+            If equally good,
             <br />
             <span style={{ opacity: ease(frame, evenAt - 2, 10) }}>
               about <b style={{ color: INK, ...TABULAR }}>{PAIR.evenSplit}</b> each way
@@ -237,20 +238,24 @@ export const SizeScene: React.FC = () => {
         </Note>
         <Note at={separateAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 20)}>
           <span style={{ ...note(26, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
-            as two separate samples:{" "}
+            As two separate samples:{" "}
             <span style={{ opacity: ease(frame, p23At - 2, 10), color: ACCENT_INK, fontWeight: 500 }}>
               <Strike at={sameAt} color={ACCENT}>
-                p = {PAIR.pUnpaired.toFixed(2)}
+                <MathRun>
+                  <I>p</I> = {PAIR.pUnpaired.toFixed(2)}
+                </MathRun>
               </Strike>
             </span>
           </span>
         </Note>
         <Note at={mcAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 70)}>
           <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>
-            paired, McNemar&apos;s test:{" "}
+            Paired, McNemar&apos;s test:{" "}
             <span style={{ opacity: ease(frame, p02At - 2, 10), color: OK_INK, fontWeight: 500 }}>
               <Mark at={p02At + 6} color={MARK_OK}>
-                p = {PAIR.pMcNemar.toFixed(2)}
+                <MathRun>
+                  <I>p</I> = {PAIR.pMcNemar.toFixed(2)}
+                </MathRun>
               </Mark>
             </span>
           </span>
@@ -259,14 +264,14 @@ export const SizeScene: React.FC = () => {
         {/* The second habit. */}
         <Note at={stratAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 150)}>
           <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={stratAt + 6}>2. stratify</Mark>
+            <Mark at={stratAt + 6}>2. Stratify</Mark>
           </span>
         </Note>
         {/* What it keeps, on a line of its own under the habit, as the first
             habit's note sits under it. */}
         <Note at={sliceAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 150) + h(50)}>
           <span style={{ ...note(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            a small slice that regresses{" "}
+            A small slice that regresses{" "}
             <Mark at={awayAt} color={MARK_BAD}>
               isn&apos;t averaged away
             </Mark>

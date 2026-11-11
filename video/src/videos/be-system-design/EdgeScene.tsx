@@ -62,10 +62,12 @@ const WordRow: React.FC<{ x: number; y: number; size?: number; weight?: number; 
  * Question 5, when to use one: it cuts latency, takes traffic off the
  * origin and absorbs spikes. Anything static or cacheable goes at the edge
  * (images, JavaScript, CSS, video); dynamic, user-specific responses go to
- * the origin, or get a short time to live. A popular short link is the same
- * redirect for everyone, so the edge can answer it too, at a price your
- * servers pay twice: the click is never counted, and a link taken down keeps
- * working until its time to live runs out. A short time to live answers both.
+ * the origin, or get a short time to live (how long the edge may keep a
+ * copy), and even those save their handshake round trips at the edge. A
+ * popular short link is the same redirect for everyone, so the edge can
+ * answer it too, at a price, set under it in the edge's column: the click is
+ * never counted, and a link taken down keeps working until its time to live
+ * runs out. A short time to live answers both.
  */
 export const EdgeScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -74,20 +76,22 @@ export const EdgeScene: React.FC = () => {
 
   const from = n.beat("q5-use").from;
   const benefits = [
-    { text: "cuts latency", at: n.word("q5-use", "it cuts latency") },
-    { text: "takes traffic off your origin", at: n.word("q5-use", "takes traffic off your origin") },
-    { text: "absorbs spikes", at: n.word("q5-use", "absorbs spikes") },
+    { text: "Cuts latency", at: n.word("q5-use", "it cuts latency") },
+    { text: "Takes traffic off your origin", at: n.word("q5-use", "takes traffic off your origin") },
+    { text: "Absorbs spikes", at: n.word("q5-use", "absorbs spikes") },
   ];
   const useAt = n.word("q5-use", "Use it for anything static or cacheable");
   const kinds = [
-    { text: "images", at: n.word("q5-use", "images") },
+    { text: "Images", at: n.word("q5-use", "images") },
     { text: "JavaScript", at: n.word("q5-use", "JavaScript") },
     { text: "CSS", at: n.word("q5-use", "CSS") },
-    { text: "video", at: n.word("q5-use", "and video") },
+    { text: "Video", at: n.word("q5-use", "and video") },
   ];
-  const dynAt = n.word("q5-use", "Dynamic, user-specific responses");
-  const bypassAt = n.word("q5-use", "usually bypass it");
-  const ttlAt = n.word("q5-use", "or get a short time to live");
+  const dynAt = n.word("q5-dyn", "Dynamic, user-specific responses");
+  const bypassAt = n.word("q5-dyn", "usually bypass it");
+  const ttlAt = n.word("q5-dyn", "or get a short time to live");
+  const glossAt = n.word("q5-dyn", "how long the edge may keep a copy");
+  const handAt = n.word("q5-dyn", "Even those save handshake round trips");
   const popularAt = n.word("q5-redirect", "A popular short link");
   const answerAt = n.word("q5-redirect", "so the edge can answer it too");
   const priceAt = n.word("q5-redirect", "The price");
@@ -101,11 +105,12 @@ export const EdgeScene: React.FC = () => {
   const benY = y(282);
   const headY = y(380);
   const itemY = y(440);
-  // The redirect: arrives on the origin's side, then moves to the edge.
+  // The redirect: arrives on the origin's side, under its notes, then moves
+  // to the edge; its price is set under it there.
   const move = ease(frame, answerAt, 20);
   const redirX = map(move, [0, 1], [COL_B, X0]);
-  const redirY = map(move, [0, 1], [y(548), y(522)]);
-  const noteY = y(604);
+  const redirY = map(move, [0, 1], [itemY + 196, y(522)]);
+  const noteY = y(522) + 58;
 
   return (
     <AbsoluteFill>
@@ -124,7 +129,7 @@ export const EdgeScene: React.FC = () => {
       <Sfx name="el-pencil" at={cheapAt} level={-36} />
 
       <Drift from={from} to={end + 30}>
-        <Kicker at={from}>Question 5 · What is a CDN, and when do you use one?</Kicker>
+        <Kicker at={from}>Question 5 · CDNs</Kicker>
         <Headline lead="When to use one" at={from + 4} size={64} />
 
         {/* What it buys. */}
@@ -136,9 +141,10 @@ export const EdgeScene: React.FC = () => {
           top={headY}
           bottom={reach(frame, itemY + 40, [
             [ttlAt, itemY + 96],
-            [priceAt, noteY + 34],
+            [handAt, itemY + 160],
             [countAt - 6, noteY + 110],
-            [downAt, noteY + 212],
+            [downAt, noteY + 196],
+            [shortAt, noteY + 262],
           ])}
           at={dynAt}
         />
@@ -150,34 +156,39 @@ export const EdgeScene: React.FC = () => {
           To the origin
         </Line>
         <Line x={COL_B} y={itemY + 4} at={dynAt + 4} size={26} weight={500}>
-          dynamic, user-specific responses
+          Dynamic, user-specific responses
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, bypassAt, 10) }}> usually bypass it</span>
         </Line>
         <Line x={COL_B} y={itemY + 64} at={ttlAt} size={24} color={INK_SOFT}>
-          or get a short time to live at the edge
+          or get a short time to live
+          <span style={{ opacity: ease(frame, glossAt, 10) }}>: how long the edge may keep a copy</span>
+        </Line>
+        <Line x={COL_B} y={itemY + 128} at={handAt} size={24} weight={500} color={OK_INK}>
+          even those save handshake round trips at the edge
         </Line>
 
         {/* The short link's redirect: from the origin's side to the edge. */}
         <Line x={redirX} y={redirY} at={popularAt + 4} size={26} weight={500} color={BLUE_INK}>
-          a popular short link&apos;s redirect, the same for everyone
+          A popular short link&apos;s redirect, the same for everyone
         </Line>
-        {/* The timer at the line's own size, centred on it, 10px before it. */}
-        <Timer x={X0 + 72 - 10 - TIMER_TEXT / 2} y={y(616) + (TIMER_TEXT * 1.3) / 2} size={TIMER_TEXT} at={shortAt} />
-        <Line x={X0 + 72} y={y(616)} at={shortAt + 4} size={TIMER_TEXT} weight={500} color={OK_INK}>
-          so keep that time to live short
-        </Line>
-        <Line x={COL_B} y={noteY} at={priceAt} size={25} weight={500}>
+        {/* Its price, under it in the edge's column, then the fix. */}
+        <Line x={X0} y={noteY} at={priceAt} size={25} weight={500}>
           The price
         </Line>
-        <Line x={COL_B} y={noteY + 48} at={countAt - 6} size={24} weight={500} color={ACCENT_INK} width={740}>
-          a click the edge answers never reaches your servers, so they can&apos;t count it
+        <Line x={X0} y={noteY + 44} at={countAt - 6} size={24} weight={500} color={ACCENT_INK} width={720}>
+          A click the edge answers never reaches your servers, so they can&apos;t count it
         </Line>
-        <Line x={COL_B} y={noteY + 150} at={downAt} size={24} weight={500} color={ACCENT_INK} width={740}>
-          a link you take down keeps working there until its time to live runs out
+        <Line x={X0} y={noteY + 128} at={downAt} size={24} weight={500} color={ACCENT_INK} width={720}>
+          A link you take down keeps working there until its time to live runs out
+        </Line>
+        {/* The timer at the line's own size, centred on it, 10px before it. */}
+        <Timer x={X0 + 36 - 10 - TIMER_TEXT / 2} y={noteY + 226 + (TIMER_TEXT * 1.3) / 2} size={TIMER_TEXT} at={shortAt} />
+        <Line x={X0 + 36} y={noteY + 226} at={shortAt + 4} size={TIMER_TEXT} weight={500} color={OK_INK}>
+          so keep that time to live short
         </Line>
 
         {/* The verdict. */}
-        <div style={{ position: "absolute", left: X0, top: y(824), display: "flex", alignItems: "baseline", fontSize: 32, opacity: ease(frame, winAt, 14) }}>
+        <div style={{ position: "absolute", left: X0, top: y(846), display: "flex", alignItems: "baseline", fontSize: 32, opacity: ease(frame, winAt, 14) }}>
           <span style={{ ...label(32, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             A read-heavy product with users everywhere:{" "}
             <Mark at={cheapAt} color={HIGHLIGHT}>

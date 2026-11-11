@@ -34,9 +34,9 @@ export const NoiseScene: React.FC = () => {
   const weeksAt = n.word("noise-band", "In eight simulated weeks");
   const countAt = n.word("noise-band", "twenty-four days moved further");
   const real = [
-    { text: "persists for days", at: n.word("noise-real", "persists for days") },
-    { text: "clears the band", at: n.word("noise-real", "clears the band") },
-    { text: "shows up in related metrics too", at: n.word("noise-real", "shows up in related metrics") },
+    { text: "Persists for days", at: n.word("noise-real", "persists for days") },
+    { text: "Clears the band", at: n.word("noise-real", "clears the band") },
+    { text: "Shows up in related metrics too", at: n.word("noise-real", "shows up in related metrics") },
   ];
   const testingAt = n.word("rec-in", "testing a change");
   const cantAt = n.word("rec-in", "when you can't");
@@ -128,11 +128,11 @@ export const NoiseScene: React.FC = () => {
             </span>
           </Note>
           <Note at={weeksAt} x={CHART.x0} y={y(CHART.bottom) + h(64)}>
-            <span style={madeUp()}>simulated: 8 ordinary weeks of the made-up app, nothing wrong</span>
+            <span style={madeUp()}>Simulated: 8 ordinary weeks of the made-up app, nothing wrong</span>
           </Note>
 
           <Note at={threeAt} x={SIDE_X} y={y(370)}>
-            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>an ordinary day: about ±3%</span>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>An ordinary day: about ±3%</span>
           </Note>
           <Note at={threeAt + 6} x={SIDE_X} y={y(412)}>
             <span style={{ ...label(21, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>

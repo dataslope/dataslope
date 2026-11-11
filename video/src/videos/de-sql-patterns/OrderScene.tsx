@@ -176,7 +176,7 @@ export const OrderScene: React.FC = () => {
           {/* Window functions are computed at SELECT, QUALIFY right after. */}
           <Note at={windowsAt} x={arrowX + 90} y={rowY(4) + h(6)} out={madeAt - 4}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              window functions here,{" "}
+              Window functions here,{" "}
               <span style={{ opacity: ease(frame, qualifyAt - 2, 10) }}>
                 then <QMono>QUALIFY</QMono>
               </span>
@@ -201,7 +201,7 @@ export const OrderScene: React.FC = () => {
             </span>
           </Note>
           <Note at={madeAt + 2} x={arrowX + 90} y={rowY(4) + h(6)} out={aliasOut}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>row numbers and aliases are made here</span>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Row numbers and aliases are made here</span>
           </Note>
           <ElbowArrow
             points={[

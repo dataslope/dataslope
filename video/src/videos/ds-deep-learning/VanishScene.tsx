@@ -5,6 +5,7 @@ import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, TABULAR, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { VANISH } from "./data";
@@ -49,10 +50,10 @@ export const VanishScene: React.FC = () => {
   const largeAt = n.word("vanish-why", "large weights push the factor above one");
   const fixes = [
     { text: "ReLU", at: n.word("vanish-fix", "ReLU") },
-    { text: "careful initialization", at: n.word("vanish-fix", "careful initialization") },
-    { text: "skip connections, around layers", at: n.word("vanish-fix", "skip connections") },
-    { text: "normalization", at: n.word("vanish-fix", "normalization") },
-    { text: "exploding: clipping", at: n.word("vanish-fix", "clipping") },
+    { text: "Careful initialization", at: n.word("vanish-fix", "careful initialization") },
+    { text: "Skip connections, around layers", at: n.word("vanish-fix", "skip connections") },
+    { text: "Normalization", at: n.word("vanish-fix", "normalization") },
+    { text: "Exploding: clipping", at: n.word("vanish-fix", "clipping") },
   ];
   const stepAt = n.word("opt-in", "The step size");
   const end = n.beat("opt-in").to;
@@ -103,13 +104,13 @@ export const VanishScene: React.FC = () => {
                 question ends, then each line on its words, so the page never
                 holds still for 3 s while the question is read. */}
             <Tagline x={120} y={y(236)} at={sweepAt} size={24} color={INK}>
-              each layer:{" "}
+              Each layer:{" "}
               <span style={{ opacity: ease(frame, productAt + 2, 10) }}>
                 <Mark at={whyAt + 4}>× its weight × its activation&apos;s slope</Mark>
               </span>
             </Tagline>
             <Tagline x={120} y={y(290)} at={slopeAt - 2} size={24} color={ACCENT_INK}>
-              the sigmoid&apos;s slope: <Mark at={quarterAt + 4}>at most 0.25</Mark>, so × 0.25 a layer
+              The sigmoid&apos;s slope: <Mark at={quarterAt + 4}>at most 0.25</Mark>, so × 0.25 a layer
               <span style={{ opacity: ease(frame, nearAt - 2, 10) }}>, with weights near 1</span>
             </Tagline>
             <Svg>
@@ -151,15 +152,21 @@ export const VanishScene: React.FC = () => {
             </Svg>
             <Note at={millionAt} x={px(0.3)} y={py(1e-5)}>
               <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-                0.25<sup>10</sup> = {VANISH.ten.toFixed(8)}: under one in a million
+                <MathRun>
+                  0.25<sup>10</sup> = {VANISH.ten.toFixed(8)}
+                </MathRun>
+                : under one in a million
               </span>
             </Note>
             <Note at={earlyAt + 2} x={px(0.3)} y={py(1e-5) + h(40)}>
-              <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>the early layers barely learn</span>
+              <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>The early layers barely learn</span>
             </Note>
             <Note at={explodesAt - 2} x={px(10) - 330} y={py(VANISH.tenBig) - h(50)}>
               <span style={{ ...note(25, WARM_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-                1.5<sup>10</sup> = {VANISH.tenBig}: it explodes
+                <MathRun>
+                  1.5<sup>10</sup> = {VANISH.tenBig}
+                </MathRun>
+                : it explodes
               </span>
             </Note>
             {/* Under the gridline at 1, clear of both lines (it sat on the gridline). */}
@@ -170,7 +177,7 @@ export const VanishScene: React.FC = () => {
 
           {/* ── The fixes ── */}
           <Tagline x={FIX_X} y={y(FIX_Y) - h(48)} at={fixes[0].at - 6} size={22} color={INK}>
-            the fixes
+            The fixes
           </Tagline>
           {fixes.map((f, i) => (
             <Note key={f.text} at={f.at - 2} x={FIX_X} y={y(FIX_Y) + i * h(FIX_ROW)}>

@@ -42,7 +42,7 @@ const Sensitive: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={sensAt - 2} x={R_X + 40} y={c.y(330)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-          <b>sensitive</b>: moves reliably when the treatment works
+          <b>Sensitive</b>: moves reliably when the treatment works
         </span>
       </Note>
       <Note at={smallAt} x={R_X + 64} y={c.y(370)}>
@@ -50,7 +50,7 @@ const Sensitive: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={robustAt - 2} x={R_X + 40} y={c.y(418)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-          <b>robust</b>: hard to game
+          <b>Robust</b>: hard to game
           <span style={{ opacity: ease(frame, outlierAt - 4, 10) }}>, not thrown by outliers</span>
         </span>
       </Note>
@@ -70,7 +70,7 @@ const Sensitive: React.FC<{ c: Ctx }> = ({ c }) => {
       })}
       <Note at={smallerAt - 2} x={R_X + 40} y={c.y(690)}>
         <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          capped: more sensitive<span style={{ opacity: ease(frame, swingAt - 4, 10) }}>, and more robust</span>
+          Capped: more sensitive<span style={{ opacity: ease(frame, swingAt - 4, 10) }}>, and more robust</span>
         </span>
       </Note>
     </>
@@ -119,17 +119,17 @@ const Strata: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={splitsAt - 2} x={R_X + 40} y={c.y(330)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          group first<span style={{ ...note(24, INK_SOFT), opacity: ease(frame, likeAt, 10) }}> (country, device)</span>
+          Group first<span style={{ ...note(24, INK_SOFT), opacity: ease(frame, likeAt, 10) }}> (country, device)</span>
           <span style={{ opacity: ease(frame, insideAt - 2, 10) }}>, then randomize within each</span>
         </span>
       </Note>
       <Note at={sixAt} x={R_X + 40} y={c.y(390)}>
         <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          twenty users, <b style={{ color: WARM }}>six heavy users</b> ringed · <b style={{ color: BLUE_INK }}>A</b> or <b style={{ color: OK_INK }}>B</b>
+          Twenty users, <b style={{ color: WARM }}>six heavy users</b> ringed · <b style={{ color: BLUE_INK }}>A</b> or <b style={{ color: OK_INK }}>B</b>
         </span>
       </Note>
       <Note at={coinAt - 2} x={R_X + 40} y={c.y(444)}>
-        <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>a coin per user</span>
+        <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A coin per user</span>
       </Note>
       <Users arms={STRATA.coin} top={c.y(510)} at={coinAt} />
       <Note at={fiveAt} x={R_X + 40} y={c.y(546)}>
@@ -139,19 +139,19 @@ const Strata: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={oneInFiveAt - 2} x={R_X + 40} y={c.y(580)}>
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-          a coin puts 5 or 6 in one arm about 1 time in 5 ({pct(STRATA.lopsided, 1)})
+          A coin puts 5 or 6 in one arm about 1 time in 5 ({pct(STRATA.lopsided, 1)})
         </span>
       </Note>
       <Note at={stratAt - 2} x={R_X + 40} y={c.y(636)}>
-        <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>stratified</span>
+        <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Stratified</span>
       </Note>
       <Users arms={stratified} top={c.y(700)} at={stratAt} />
       <Note at={stratAt + 10} x={R_X + 40} y={c.y(736)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>three heavy users in each arm</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Three heavy users in each arm</span>
       </Note>
       <Note at={varAt - 2} x={R_X + 40} y={c.y(796)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          also: lower variance when groups differ
+          Also: lower variance when groups differ
           <span style={{ opacity: ease(frame, smallAt - 4, 10) }}>, most useful in small tests</span>
         </span>
       </Note>
@@ -177,10 +177,10 @@ const AaTest: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={platformAt} x={R_X + 40} y={c.y(390)}>
-        <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>it tests the platform, not a feature</span>
+        <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>It tests the platform, not a feature</span>
       </Note>
       <Note at={codeAt - 2} x={R_X + 40} y={c.y(470)}>
-        <span style={{ ...note(25, INK), whiteSpace: "nowrap", ...TABULAR }}>the page&apos;s code: {AA.tests.toLocaleString("en-US")} A/A tests</span>
+        <span style={{ ...note(25, INK), whiteSpace: "nowrap", ...TABULAR }}>The page&apos;s code: {AA.tests.toLocaleString("en-US")} A/A tests</span>
       </Note>
       <Note at={fiveAt} x={R_X + 40} y={c.y(520)}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -195,7 +195,7 @@ const AaTest: React.FC<{ c: Ctx }> = ({ c }) => {
         </div>
       </Note>
       <Note at={bugAt} x={R_X + 40} y={c.y(610)}>
-        <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>far more than 5%: a bug</span>
+        <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Far more than 5%: a bug</span>
       </Note>
     </>
   );
@@ -218,9 +218,9 @@ export const RapidScene: React.FC = () => {
   const nextAt = n.word("next", "Next");
   const end = n.beat("next").from;
   const troubles = [
-    { text: "the split comes back uneven", at: n.word("next", "the split comes back uneven") },
-    { text: "the effect fades", at: n.word("next", "the effect fades") },
-    { text: "ten metrics read at once", at: n.word("next", "ten metrics get read at once") },
+    { text: "The split comes back uneven", at: n.word("next", "the split comes back uneven") },
+    { text: "The effect fades", at: n.word("next", "the effect fades") },
+    { text: "Ten metrics read at once", at: n.word("next", "ten metrics get read at once") },
   ];
 
   const items: RapidItem[] = [
@@ -249,7 +249,7 @@ export const RapidScene: React.FC = () => {
 
         {/* The bridge: what can still go wrong once the test is live. */}
         <Note at={liveAt} x={R_X + 40} y={y(340)}>
-          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>once it&apos;s live, it can still go wrong:</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Once it&apos;s live, it can still go wrong:</span>
         </Note>
         {troubles.map((t, i) => (
           <Note key={t.text} at={t.at - 2} x={R_X + 70} y={y(410) + i * h(60)}>

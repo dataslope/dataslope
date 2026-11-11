@@ -165,7 +165,7 @@ export const DedupScene: React.FC = () => {
         </Note>
         <Console lines={DEDUP.first.out} x={RIGHT_X} top={y(TOP) + h(80)} width={300} at={orderAt - 4} out={out7} marks={[{ line: 0, at: orderAt + 4, color: MARK_OK }]} />
         <Note at={keptAt} x={RIGHT_X} y={y(TOP) + h(160)} out={out7}>
-          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>the first of each, in order</span>
+          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>The first of each, in order</span>
         </Note>
 
         {/* ── The latest instead: plain records, and a dict ── */}
@@ -249,15 +249,15 @@ export const DedupScene: React.FC = () => {
         />
         <Note at={sqlAt} x={MID_X} y={y(TOP) + llH + h(22)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            the pandas <Mono>ROW_NUMBER() = 1</Mono> <span style={{ color: INK_SOFT }}>of SQL</span>
+            The pandas <Mono>ROW_NUMBER() = 1</Mono> <span style={{ color: INK_SOFT }}>of SQL</span>
           </span>
         </Note>
         <Note at={tieAt} x={MID_X} y={y(TOP) + llH + h(90)}>
-          <Title>a tie on ts?</Title>
+          <Title>A tie on ts?</Title>
         </Note>
         <Note at={breakAt} x={MID_X} y={y(TOP) + llH + h(134)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <Mark at={breakAt + 6} color={MARK_OK}>add a tiebreaker column to the sort</Mark>
+            <Mark at={breakAt + 6} color={MARK_OK}>Add a tiebreaker column to the sort</Mark>
             <span style={{ color: INK_SOFT, opacity: ease(frame, arbitraryAt - 4, 10) }}>, or the row kept is arbitrary</span>
           </span>
         </Note>

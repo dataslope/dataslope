@@ -15,6 +15,10 @@
       "watercolor illustration": {
         "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
         "softAlphaWarn": 0.3
+      },
+      "neutral watercolor": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Paint every wash in neutral earth tones only: warm stone grey, sandy beige and a soft taupe where they overlap, the deepest pigment a warm grey-brown; the color list that follows does not apply to this picture, and no wash is red, orange, blue, green or bright yellow. Never outline in black. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
       }
     }
   },
@@ -42,6 +46,12 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a round kitchen timer with a dial and a short knob on top, its face plain with no numbers"
+    },
+    {
+      "id": "be-scaling-crack",
+      "category": "video-icon",
+      "style": "neutral watercolor",
+      "subject": "a single tall, jagged crack running straight down the middle of the picture from top to bottom, like a fracture through dry stone seen from directly above: a narrow zigzag fissure of deep warm grey pigment whose edges bleed into soft washes of sandy beige, with two short hairline branches splitting off it, the whole crack long and thin, about five times taller than it is wide"
     }
   ]
 }

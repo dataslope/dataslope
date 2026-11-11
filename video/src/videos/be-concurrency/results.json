@@ -1,6 +1,11 @@
 {
   "runtime": {
-    "python": "3.14.2"
+    "python": "3.14.2",
+    "gil": {
+      "probe": true,
+      "enabled": true,
+      "freeThreadedBuild": false
+    }
   },
   "amdahl": {
     "0.01": {

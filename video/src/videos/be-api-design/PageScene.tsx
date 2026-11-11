@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PAGE, PAGE_SIZE, thousands } from "./data";
-import { Drift, Mark, MARK_BAD, MARK_OK, METHOD_INK, OK, OK_INK, Strike, X0, VRule } from "./parts";
+import { Drift, Mark, MARK_BAD, MARK_OK, METHOD_INK, OK, OK_INK, X0, VRule } from "./parts";
 
 /** The chart: rows read for one page of twenty, on a log scale. */
 const BAR_X0 = 300;
@@ -72,7 +72,8 @@ export const PageScene: React.FC = () => {
   const noJumpAt = n.word("page-cost-two", "no jumping straight");
   const orderAt = n.word("page-cost-two", "an order that's unique and never changes");
   const tieAt = n.word("page-cost-two", "adds the ID as a tiebreaker");
-  const end = n.beat("page-cost-two").to;
+  const indexAt = n.word("page-index", "needs an index to match");
+  const end = n.beat("page-index").to;
 
   // ── The request, broken into its parts ──
   const qTop = y(300);
@@ -97,9 +98,9 @@ export const PageScene: React.FC = () => {
   const p1 = PAGE.page1;
   const shown = (ids: readonly number[]) => [ids[0], ids[1], null, ids[ids.length - 1]];
   const lists = [
-    { title: "page 1", ids: shown(p1), at: takesAt },
-    { title: "page 2, by offset", ids: shown(PAGE.page2Offset), at: startsAt, tone: "bad" as const },
-    { title: "page 2, by cursor", ids: shown(PAGE.page2Cursor), at: afterAt + 6, tone: "ok" as const },
+    { title: "Page 1", ids: shown(p1), at: takesAt },
+    { title: "Page 2, by offset", ids: shown(PAGE.page2Offset), at: startsAt, tone: "bad" as const },
+    { title: "Page 2, by cursor", ids: shown(PAGE.page2Cursor), at: afterAt + 6, tone: "ok" as const },
   ];
   const cursorTop = y(600);
   const page500 = PAGE.offset.find((o) => o.page === 500)!;
@@ -115,7 +116,7 @@ export const PageScene: React.FC = () => {
       <Sfx name="el-tap" at={startsAt + 6} level={-29} />
       <Sfx name="el-tap" at={idAt + 4} level={-31} />
       <Sfx name="el-sprinkle" at={depthAt + 2} level={-32} />
-      <Sfx name="el-scratch" at={noJumpAt + 8} level={-32} />
+      <Sfx name="el-tap" at={noJumpAt + 2} level={-32} />
       <Sfx name="el-pencil" at={tieAt} level={-34} />
 
       <Drift from={from} to={end + 30}>
@@ -234,7 +235,7 @@ export const PageScene: React.FC = () => {
         ))}
         <Note at={p500At + 24} x={LIST_X[0]} y={listTop + h(56) + page500.query.length * h(38)} out={repeatAt - 6}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            the index scan reads <b style={{ color: BLUE_INK }}><Num>{thousands(page500.read)}</Num> rows</b>, and LIMIT keeps <Num>{PAGE_SIZE}</Num>
+            The index scan reads <b style={{ color: BLUE_INK }}><Num>{thousands(page500.read)}</Num> rows</b>, and LIMIT keeps <Num>{PAGE_SIZE}</Num>
           </span>
         </Note>
 
@@ -270,10 +271,10 @@ export const PageScene: React.FC = () => {
           </span>
         </Note>
         <Note at={startsAt + 14} x={LIST_X[1]} y={rowTop(4)}>
-          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>shown twice</span>
+          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>Shown twice</span>
         </Note>
         <Note at={shiftAt} x={LIST_X[2]} y={rowTop(4)}>
-          <span style={{ ...note(22, OK_INK), whiteSpace: "nowrap" }}>nothing shifts</span>
+          <span style={{ ...note(22, OK_INK), whiteSpace: "nowrap" }}>Nothing shifts</span>
         </Note>
 
         {/* The cursor, and what it decodes to. */}
@@ -285,7 +286,7 @@ export const PageScene: React.FC = () => {
         </Note>
         <Note at={idAt} x={LIST_X[0]} y={cursorTop + h(46)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            decodes to{" "}
+            Decodes to{" "}
             <span style={{ fontFamily: MONO, fontSize: 24, color: INK, fontWeight: 500 }}>{JSON.stringify(PAGE.cursorDecoded).replace(":", ": ")}</span>
             , page 1's last ID
           </span>
@@ -302,14 +303,17 @@ export const PageScene: React.FC = () => {
         </Note>
         <Note at={noJumpAt} x={LIST_X[0]} y={y(770) + h(44)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            no jump to <Strike at={noJumpAt + 10}>page 500</Strike>
+            No jump straight to page 500
           </span>
         </Note>
         <Note at={orderAt} x={LIST_X[0]} y={y(770) + h(88)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            a unique, unchanging order:{" "}
+            A unique, unchanging order:{" "}
             <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 500 }}>
               (created_at, <Mark at={tieAt + 4}>id</Mark>)
+            </span>
+            <span style={{ opacity: ease(frame, indexAt, 10) }}>
+              , <Mark at={indexAt + 4}>indexed</Mark>
             </span>
           </span>
         </Note>

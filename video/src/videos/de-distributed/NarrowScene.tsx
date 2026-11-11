@@ -84,7 +84,7 @@ export const NarrowScene: React.FC = () => {
         </Note>
         <Note at={feedsAt - 2} x={C_X} y={y(366)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            after a filter, salary &gt; {KEEP}
+            After a filter, salary &gt; {KEEP}
           </span>
         </Note>
         {parents.map((rows, b) => (
@@ -116,7 +116,7 @@ export const NarrowScene: React.FC = () => {
         ))}
         <Note at={stayAt - 2} x={P_X} y={y(842)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            rows stay put<span style={{ opacity: ease(frame, backAt, 10) }}> · steps run back to back</span>
+            Rows stay put<span style={{ opacity: ease(frame, backAt, 10) }}> · steps run back to back</span>
           </span>
         </Note>
 
@@ -182,7 +182,7 @@ export const NarrowScene: React.FC = () => {
           );
         })}
         <Note at={forcesAt} x={WP_X} y={y(842)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a child needs many parents: a shuffle</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A child needs many parents: a shuffle</span>
         </Note>
         <Note at={manyAt + 6} x={(WP_X + BLOCK_W + WC_X) / 2 - 80} y={y(372)} width={160} style={{ textAlign: "center" }}>
           <span style={{ ...label(21, ACCENT_INK), opacity: ease(frame, forcesAt, 10) }}>shuffle</span>

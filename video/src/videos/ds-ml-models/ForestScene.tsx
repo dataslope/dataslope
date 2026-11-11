@@ -18,6 +18,7 @@ import {
   svgText,
 } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ADA, ENS, FOREST } from "./data";
@@ -226,7 +227,7 @@ export const ForestScene: React.FC = () => {
               whiteSpace: "nowrap",
             }}
           >
-            the tumor data&apos;s {FOREST.features} features
+            The tumor data&apos;s {FOREST.features} features
           </div>
           {Array.from({ length: FOREST.features }, (_, i) => {
             const on = lit.has(i) ? subsetOn : 0;
@@ -281,8 +282,10 @@ export const ForestScene: React.FC = () => {
             <span
               style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}
             >
-              the usual default: about √{FOREST.features} ≈{" "}
-              {fmt(Math.sqrt(FOREST.features), 1)}
+              The usual default: about{" "}
+              <MathRun>
+                √{FOREST.features} ≈ {fmt(Math.sqrt(FOREST.features), 1)}
+              </MathRun>
             </span>
           </Note>
           <Note
@@ -314,7 +317,7 @@ export const ForestScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              accuracy on {FOREST.nTest} held-out tumors
+              Accuracy on {FOREST.nTest} held-out tumors
             </span>
           </Note>
           <Svg opacity={ease(frame, heldAt, 12) * (1 - ease(frame, out5, 10))}>
@@ -400,7 +403,7 @@ export const ForestScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              question 4&apos;s sine wave: the fit after one tree
+              Question 4&apos;s sine wave: the fit after one tree
             </span>
           </Note>
           <Points
@@ -568,7 +571,7 @@ export const ForestScene: React.FC = () => {
           </Note>
           <Note at={gbAt + 4} x={COL} y={y(370) + h(48)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              each new tree fits the{" "}
+              Each new tree fits the{" "}
               <Mark at={negAt + 2}>negative gradient</Mark> of the loss
             </span>
           </Note>
@@ -598,7 +601,7 @@ export const ForestScene: React.FC = () => {
           </Note>
           <Note at={reweightAt} x={COL} y={y(590) + h(48)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              re-weights the data:{" "}
+              Re-weights the data:{" "}
               <span
                 style={{ color: ACCENT_INK, opacity: ease(frame, wrongAt, 10) }}
               >

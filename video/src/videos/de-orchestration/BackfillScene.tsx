@@ -119,7 +119,7 @@ export const BackfillScene: React.FC = () => {
 
         <Note at={histAt} x={X0} y={y(284)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            reprocess history to{" "}
+            Reprocess history to{" "}
             {reasons.map((r, i) => (
               <span key={r.text} style={{ opacity: ease(frame, r.at - 2, 8), fontWeight: 500, color: BLUE_INK }}>
                 {r.text}
@@ -144,7 +144,7 @@ export const BackfillScene: React.FC = () => {
         />
         <Note at={ownAt} x={X0} y={y(612)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            each date overwrites its own partition: run it once or twice, same table
+            Each date overwrites its own partition: run it once or twice, same table
           </span>
         </Note>
 
@@ -156,7 +156,7 @@ export const BackfillScene: React.FC = () => {
         </Note>
         <Note at={thrAt} x={GRID_X - 44} y={y(652)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            throttled
+            Throttled
             <span style={{ opacity: ease(frame, fourAt, 10) }}>
               : <CodeSpan size={21}>max_active_runs={BACKFILL.parallel}</CodeSpan>, <Num>{BACKFILL.waves}</Num> waves
             </span>
@@ -209,7 +209,7 @@ export const BackfillScene: React.FC = () => {
         {/* Why the loop: the cost of one run, a model. */}
         <Note at={loopAt} x={X0} y={y(656)}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            rows one run processes
+            Rows one run processes
             <span style={{ ...label(22, INK_SOFT), fontWeight: 500, opacity: ease(frame, modelAt, 10) }}>
               {" "}
               · a model, <Num>{count(REFRESH.daily)}</Num> new rows a day, log scale

@@ -76,7 +76,7 @@ const Rdd: React.FC<{ c: Ctx }> = ({ c }) => {
         </div>
       ))}
       <Line at={seeAt - 2} x={R_X + 410} top={c.y(352)} color={INK_SOFT} size={23}>
-        objects Spark can&apos;t see inside
+        Objects Spark can&apos;t see inside
       </Line>
       <Line at={dfAt - 2} top={c.y(436)} size={27} weight={500}>
         DataFrame
@@ -91,7 +91,7 @@ const Rdd: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Line at={catAt - 2} top={c.y(500)} size={24}>
-        a schema, so <b>Catalyst</b> can
+        A schema, so <b>Catalyst</b> can
         <span style={{ opacity: ease(frame, pushAt, 10) }}> push filters down,</span>
         <span style={{ opacity: ease(frame, pruneAt, 10) }}> prune columns,</span>
         <span style={{ opacity: ease(frame, codeAt, 10) }}> generate code</span>
@@ -137,10 +137,10 @@ const Collect: React.FC<{ c: Ctx }> = ({ c }) => {
         and the work is no longer distributed
       </Line>
       <Line at={lookAt - 2} top={c.y(700)} size={24} color={OK_INK} weight={500}>
-        to look: <span style={{ fontFamily: MONO, fontSize: 22 }}>show(n)</span>, <span style={{ fontFamily: MONO, fontSize: 22 }}>take(n)</span>
+        To look: <span style={{ fontFamily: MONO, fontSize: 22 }}>show(n)</span>, <span style={{ fontFamily: MONO, fontSize: 22 }}>take(n)</span>
       </Line>
       <Line at={saveAt - 2} top={c.y(746)} size={24} color={OK_INK} weight={500}>
-        to save: <span style={{ fontFamily: MONO, fontSize: 22 }}>write</span>, from the executors in parallel
+        To save: <span style={{ fontFamily: MONO, fontSize: 22 }}>write</span>, from the executors in parallel
       </Line>
     </>
   );
@@ -175,7 +175,7 @@ const Push: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Line>
       <Line at={parquetAt} top={c.y(392)} size={22} color={INK_SOFT}>
-        a Parquet file&apos;s row groups
+        A Parquet file&apos;s row groups
       </Line>
       {GROUPS.map((g, k) => {
         const can = g.max > CUT;

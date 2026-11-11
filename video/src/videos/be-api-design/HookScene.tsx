@@ -59,7 +59,7 @@ export const HookScene: React.FC = () => {
   const answer = ride(answersAt);
   const rideOn = (at: number) => (frame >= at && frame < at + 26 ? 1 : 0);
 
-  const blogTop = y(590);
+  const blogTop = y(650);
   const puffin = artBox("puffin", 360);
   const planTop = y(800);
 
@@ -104,21 +104,22 @@ export const HookScene: React.FC = () => {
         <Note at={answersAt} x={GAPS[0].from + 26} y={top + BOX_H + h(52)}>
           <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>← answers</span>
         </Note>
-        {/* Both sides agree on how: a bracket under the whole row. */}
+        {/* Both sides agree on how: a bracket under the whole row, below the
+            asks and answers labels, from the client to the last service. */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, agreeAt, 12) }}>
           <path
-            d={`M${GAPS[1].from - 10},${top + BOX_H + h(26)} v${h(14)} H${BOXES[2].x + BOXES[2].w} v${-h(14)}`}
+            d={`M${BOXES[0].x},${top + BOX_H + h(82)} v${h(14)} H${BOXES[2].x + BOXES[2].w} v${-h(14)}`}
             fill="none"
             stroke={HAIRLINE}
             strokeWidth={1.6}
           />
         </svg>
-        <Note at={agreeAt + 4} x={GAPS[1].from + 40} y={top + BOX_H + h(52)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>both sides agree on how</span>
+        <Note at={agreeAt + 4} x={BOXES[0].x} y={top + BOX_H + h(108)} width={BOXES[2].x + BOXES[2].w - BOXES[0].x} style={{ textAlign: "center" }}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Both sides agree on how</span>
         </Note>
 
         {/* What the interview tests the design for. */}
-        <Note at={predAt - 4} x={X0} y={y(510)}>
+        <Note at={predAt - 4} x={X0} y={y(570)}>
           <span style={{ ...note(36, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={predAt}>Predictable,</Mark> <Mark at={consAt}>consistent,</Mark> <Mark at={misuseAt}>hard to misuse.</Mark>
           </span>
@@ -155,7 +156,7 @@ export const HookScene: React.FC = () => {
                   style={{
                     width: s,
                     height: s,
-                    borderRadius: 7,
+                    borderRadius: 5,
                     boxSizing: "border-box",
                     border: `2px solid ${BAR}`,
                     background: big ? `color-mix(in srgb, ${BAR} 16%, ${PAPER})` : PAPER,

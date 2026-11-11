@@ -87,7 +87,7 @@ export const MetricScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={assumeAt - 2} x={X0} y={y(LIST_Y) - h(58)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>state your assumptions, then take it apart:</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>State your assumptions, then take it apart:</span>
         </Note>
         {steps.map((s, i) => {
           const trap = i === steps.length - 1;
@@ -168,35 +168,35 @@ export const MetricScene: React.FC = () => {
         </Note>
         <Note at={becauseAt - 2} x={TABLE_X} y={g.rowTop(3) + h(44)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            the rate rose <b>because the traffic dropped</b>
+            The rate rose <b>because the traffic dropped</b>
           </span>
         </Note>
 
         {/* ── This example's driver, and what to check next ── */}
         <Note at={lostAt - 2} x={TABLE_X} y={g.rowTop(3) + h(92)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            lost: <Num>{count(String(lost[0]))}</Num> sessions
+            Lost: <Num>{count(String(lost[0]))}</Num> sessions
             <span style={{ opacity: ease(frame, twelveAt - 2, 10) }}>
               , only <Num>{lost[1]}</Num> orders (<Num>{fmt(lost[2], 1)}%</Num>)
             </span>
           </span>
         </Note>
         <Note at={driverAt - 2} x={TABLE_X} y={g.rowTop(3) + h(132)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>likeliest: low-intent traffic dropped away</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Likeliest: low-intent traffic dropped away</span>
         </Note>
         <Note at={campaignAt - 2} x={TABLE_X} y={g.rowTop(3) + h(162)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>a paused campaign, or bots now filtered out</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>A paused campaign, or bots now filtered out</span>
         </Note>
         <Note at={checkAt - 2} x={TABLE_X} y={g.rowTop(3) + h(200)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            check next: sessions by channel
+            Check next: sessions by channel
             <span style={{ opacity: ease(frame, ordersFellAt - 2, 10) }}>; say orders fell</span>
           </span>
         </Note>
 
         <Note at={finishAt - 2} x={X0} y={y(LIST_Y) + 4 * h(PITCH) + h(40)}>
           <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            finish with the likeliest driver, and what you&apos;d check next
+            Finish with the likeliest driver, and what you&apos;d check next
           </span>
         </Note>
       </Drift>

@@ -76,7 +76,7 @@ export const LogScene: React.FC = () => {
         </QuestionCard>
         <Note at={answerAt} x={LEFT.x0} y={y(300)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            rates of change, or values that span <span style={{ opacity: ease(frame, magnitudeAt - 2, 10) }}>orders of magnitude</span>
+            Rates of change, or values that span <span style={{ opacity: ease(frame, magnitudeAt - 2, 10) }}>orders of magnitude</span>
           </span>
         </Note>
 
@@ -90,7 +90,7 @@ export const LogScene: React.FC = () => {
         <EndLabel at={oneAt + 20} x={LEFT.x1 + 14} y={linY(big.values.at(-1)!)} start={big.start} growth={big.growthPct} />
         <EndLabel at={otherAt + 10} x={LEFT.x1 + 14} y={linY(small.values.at(-1)!)} start={small.start} growth={small.growthPct} />
         <Verdict ok={false} x={LEFT.x0} y={base + h(50)} at={floorAt}>
-          the small one: hugs the floor until the end
+          The small one: hugs the floor until the end
         </Verdict>
 
         {/* ── Log ── */}
@@ -115,10 +115,10 @@ export const LogScene: React.FC = () => {
         <EndLabel at={logAxisAt + 10} x={RIGHT.x1 + 14} y={logY(big.values.at(-1)!)} start={big.start} growth={big.growthPct} />
         <EndLabel at={steeperAt - 2} x={RIGHT.x1 + 14} y={logY(small.values.at(-1)!)} start={small.start} growth={small.growthPct} />
         <Verdict ok x={RIGHT.x0} y={base + h(50)} at={steeperAt}>
-          steady growth is straight; steeper is faster
+          Steady growth is straight; steeper is faster
         </Verdict>
         <Note at={labelAt - 2} x={RIGHT.x0} y={base + h(96)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>label it, or it reads as linear</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Label it, or it reads as linear</span>
         </Note>
       </Drift>
     </AbsoluteFill>

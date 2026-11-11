@@ -182,7 +182,7 @@ export const CopyScene: React.FC = () => {
         />
         <Note at={olderAt} x={RIGHT_X} y={y(FRAME_Y) + h(220)} out={outChain}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            older pandas: <Mono>SettingWithCopyWarning</Mono>
+            Older pandas: <Mono>SettingWithCopyWarning</Mono>
           </span>
         </Note>
 

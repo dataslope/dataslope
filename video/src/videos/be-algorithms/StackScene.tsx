@@ -32,7 +32,7 @@ const Verdict: React.FC<{ at: number; accepts: boolean; right: boolean; x: numbe
   return (
     <div style={{ position: "absolute", left: x - 90, top, width: 180, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 24, opacity: p }}>
       {right ? <Tick at={at} size={24} /> : <Cross at={at} size={22} />}
-      <span style={{ ...note(24, right ? OK_INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{accepts ? "accepts" : "rejects"}</span>
+      <span style={{ ...note(24, right ? OK_INK : ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{accepts ? "Accepts" : "Rejects"}</span>
     </div>
   );
 };
@@ -50,7 +50,7 @@ const Glyph: React.FC<{ ch: string; x: number; y: number; at: number; mark?: str
         top: y,
         width: CH - 10,
         height: 92,
-        borderRadius: 8,
+        borderRadius: 5,
         background: m > 0 && mark ? mark : undefined,
         opacity: p,
         display: "flex",
@@ -142,10 +142,10 @@ export const StackScene: React.FC = () => {
           />
         ))}
         <Line at={stringAt + 14} x={SX} y={sTop + 112} size={24} color={INK_SOFT}>
-          round: +1 − 1 = 0
+          Round: +1 − 1 = 0
         </Line>
         <Line at={stringAt + 20} x={SX} y={sTop + 152} size={24} color={INK_SOFT}>
-          square: +1 − 1 = 0
+          Square: +1 − 1 = 0
         </Line>
         <Line at={acceptsAt} x={SX} y={sTop + 200} size={24} weight={500} color={ACCENT_INK}>
           A counter accepts it
@@ -176,7 +176,7 @@ export const StackScene: React.FC = () => {
           <Cross at={matchAt + 8} size={26} />
         </div>
         <Line at={rejectedAt - 2} x={COL_X - 8} y={colBase + 18} size={24} weight={500} color={OK_INK}>
-          rejected
+          Rejected
         </Line>
 
         {/* The queue: the oldest opener at the front. */}
@@ -209,7 +209,7 @@ export const StackScene: React.FC = () => {
               <div style={{ position: "absolute", left: q.x + 170, top: qTop + 14, fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, opacity: ease(frame, q.at, 10) }}>{q.s}</div>
               <div style={{ position: "absolute", left: q.x + 170, top: qTop + 96, display: "flex", alignItems: "center", gap: 10, fontSize: 24, opacity: ease(frame, q.verdictAt, 10) }}>
                 <Cross at={q.verdictAt} size={22} />
-                <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{q.ok ? "accepts" : "rejects"}</span>
+                <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{q.ok ? "Accepts" : "Rejects"}</span>
               </div>
             </React.Fragment>
           );
@@ -230,10 +230,10 @@ export const StackScene: React.FC = () => {
           <line x1={TX} x2={COL2 + 100} y1={tTop + 42} y2={tTop + 42} stroke={INK} strokeWidth={1.4} />
         </Svg>
         {[
-          { name: "correct", r: -1 },
-          { name: "counter", r: 0 },
-          { name: "queue", r: 1 },
-          { name: "stack", r: 2 },
+          { name: "Correct", r: -1 },
+          { name: "Counter", r: 0 },
+          { name: "Queue", r: 1 },
+          { name: "Stack", r: 2 },
         ].map((r, i) => (
           <div
             key={r.name}
@@ -243,8 +243,8 @@ export const StackScene: React.FC = () => {
           </div>
         ))}
         {[
-          { col: COL1, should: "reject", at: counterAt + 2 },
-          { col: COL2, should: "accept", at: nestedAt - 2 },
+          { col: COL1, should: "Reject", at: counterAt + 2 },
+          { col: COL2, should: "Accept", at: nestedAt - 2 },
         ].map((c) => (
           <div key={c.col} style={{ position: "absolute", left: c.col - 90, width: 180, top: row(0) + 14, textAlign: "center", ...note(24, INK_SOFT), opacity: ease(frame, c.at, 10) }}>
             {c.should}

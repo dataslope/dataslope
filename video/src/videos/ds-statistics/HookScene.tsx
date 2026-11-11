@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, body, label } from "../../editorial/style";
+import { ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -88,14 +88,16 @@ export const HookScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>One sentence gives it away</span>
         </Note>
         {[
-          { at: pAt, term: "a p-value", read: "the chance the null is true", strike: hookEnd - 18 },
-          { at: ciAt, term: "a 95% interval", read: "a 95% chance", strike: hookEnd - 8 },
+          { at: pAt, term: "A p-value", read: "the chance the null is true", strike: hookEnd - 18 },
+          { at: ciAt, term: "A 95% interval", read: "a 95% chance", strike: hookEnd - 8 },
         ].map((m, i) => (
           <Note key={m.term} at={m.at} x={X0} y={y(MISREAD_Y + 56 + i * 110)} out={misreadOut}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, whiteSpace: "nowrap" }}>
+              {/* One line, one size and one face: the misreading is told
+                  apart by its color and the strike, not by a bigger serif. */}
               <span style={{ ...noteText(36, INK), fontWeight: 500 }}>{m.term}</span>
-              <span style={{ ...label(22, INK_SOFT) }}>read as</span>
-              <span style={{ ...body(42, true), color: ACCENT_INK }}>
+              <span style={{ ...noteText(36, INK_SOFT) }}>read as</span>
+              <span style={{ ...noteText(36, ACCENT_INK) }}>
                 <Strike at={m.strike}>“{m.read}”</Strike>
               </span>
             </div>
@@ -146,7 +148,7 @@ export const HookScene: React.FC = () => {
           );
         })}
         <Note at={shortAt + 4} x={shortX} y={roadY + h(48)} dim={bridgeAt + 2} out={clearAt}>
-          <span style={{ ...noteText(26, INK_SOFT) }}>short</span>
+          <span style={{ ...noteText(26, INK_SOFT) }}>Short</span>
         </Note>
         <Note at={figureAt + 6} x={X0} y={roadY + h(110)} dim={bridgeAt + 2} out={clearAt}>
           <span style={{ ...noteText(24, INK_SOFT) }}>

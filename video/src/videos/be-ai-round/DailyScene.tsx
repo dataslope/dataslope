@@ -1,16 +1,22 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QuestionCard } from "../../editorial/interview";
+import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { METR } from "./data";
-import { Clear, ColumnRule, Drift, line, Mark, Spot, Strike, X0 } from "./parts";
+import { Clear, Drift, line, Mark, Spot, Strike, X0 } from "./parts";
 
 const BIN_Y = 372;
+/** The bins' spots, in bin order: hand it, keep it, verify, the time it was
+ *  wrong. A clear 100px under the longest list, and as much again left free
+ *  under them. */
+const BIN_ART = ["be-ai-round-robot-papers", "be-ai-round-padlock", "be-ai-round-magnifier", "be-ai-round-glass"];
+const BIN_ART_Y = 690;
+const BIN_ART_SIZE = 170;
 const BIN_W = 362;
 const BIN_GAP = 60;
 /** METR's two results, on one axis of time taken: zero, and a percent in px. */
@@ -41,43 +47,53 @@ export const DailyScene: React.FC = () => {
   const from = n.beat("daily").from;
   const qAt = n.word("daily", "Question seven");
   const textAt = n.word("daily", "How do you use AI tools");
-  const vagueAt = n.word("daily", "A vague answer");
-  const copilotAt = n.word("daily", "like I use Copilot a lot");
-  const poorlyAt = n.word("daily", "scores poorly");
+  const vagueAt = n.word("daily-vague", "A vague answer");
+  const quoteAt = n.word("daily-vague", "like I use Claude Code a lot");
+  const poorlyAt = n.word("daily-vague", "scores poorly");
   const concreteAt = n.word("daily-concrete", "Give a concrete workflow");
   const bins = [
     {
       title: "Hand it",
       at: n.word("daily-concrete", "What you hand to the assistant"),
       items: [
-        { text: "boilerplate", at: n.word("daily-concrete", "boilerplate") },
-        { text: "test scaffolding", at: n.word("daily-concrete", "test scaffolding") },
-        { text: "unfamiliar APIs", at: n.word("daily-concrete", "unfamiliar APIs") },
-        { text: "first drafts", at: n.word("daily-concrete", "first drafts") },
+        { text: "Boilerplate", at: n.word("daily-concrete", "boilerplate") },
+        { text: "Test scaffolding", at: n.word("daily-concrete", "test scaffolding") },
+        { text: "Unfamiliar APIs", at: n.word("daily-concrete", "unfamiliar APIs") },
+        { text: "First drafts", at: n.word("daily-concrete", "first drafts") },
       ],
     },
     {
       title: "Keep it",
       at: n.word("daily-concrete", "What you don't"),
       items: [
-        { text: "security-sensitive code", at: n.word("daily-concrete", "security-sensitive code") },
-        { text: "the core design", at: n.word("daily-concrete", "the core design") },
+        { text: "Security-sensitive code", at: n.word("daily-concrete", "security-sensitive code") },
+        { text: "The core design", at: n.word("daily-concrete", "the core design") },
       ],
     },
     {
       title: "Verify",
       at: n.word("daily-concrete", "How you verify what it writes"),
-      items: [{ text: "how you check what it writes", at: n.word("daily-concrete", "How you verify what it writes") + 8 }],
+      items: [{ text: "How you check what it writes", at: n.word("daily-concrete", "How you verify what it writes") + 8 }],
+      example: [
+        { text: "Run the tests,", at: n.word("daily-example", "I run the tests") },
+        { text: "read the diff like a PR", at: n.word("daily-example", "read its diff like a pull request") },
+      ],
     },
     {
       title: "The time it was wrong",
       at: n.word("daily-concrete", "one specific time it was wrong"),
       items: [
-        { text: "one specific time", at: n.word("daily-concrete", "one specific time it was wrong") + 6 },
+        { text: "One specific time", at: n.word("daily-concrete", "one specific time it was wrong") + 6 },
         { text: "and how you caught it", at: n.word("daily-concrete", "how you caught it") },
+      ],
+      example: [
+        { text: "Called our payments client", at: n.word("daily-example", "called our payments client") },
+        { text: "with a made-up parameter;", at: n.word("daily-example", "a parameter that doesn't exist") },
+        { text: "the integration test caught it", at: n.word("daily-example", "the integration test caught it") },
       ],
     },
   ];
+  const exampleAt = n.word("daily-example", "For example");
   const measureAt = n.word("daily-metr", "you measure rather than assume");
   const metrAt = n.word("daily-metr", "In METR's twenty twenty-five randomized trial");
   const longerAt = n.word("daily-metr", "took nineteen percent longer");
@@ -109,6 +125,7 @@ export const DailyScene: React.FC = () => {
       {bins.flatMap((b) => b.items).map((it) => (
         <Sfx key={it.text} name="el-tap" at={it.at} level={-37} />
       ))}
+      <Sfx name="el-pencil" at={exampleAt} level={-35} />
       <Sfx name="el-whoosh" at={measureAt} level={-37} />
       <Sfx name="el-tap" at={longerAt + 10} level={-30} />
       <Sfx name="el-pop" at={fasterAt} level={-30} />
@@ -124,10 +141,10 @@ export const DailyScene: React.FC = () => {
           {/* A vague answer, struck. */}
           <Note at={vagueAt} x={X0} y={y(262)}>
             <span style={line(28, INK)}>
-              <span style={{ opacity: ease(frame, copilotAt - 2, 10) }}>
-                <Strike at={poorlyAt}>&ldquo;I use Copilot a lot.&rdquo;</Strike>
+              <span style={{ opacity: ease(frame, quoteAt - 2, 10) }}>
+                <Strike at={poorlyAt}>&ldquo;I use Claude Code a lot.&rdquo;</Strike>
               </span>
-              <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, poorlyAt, 10) }}> A vague answer scores poorly.</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 500, marginLeft: "0.45em", opacity: ease(frame, poorlyAt, 10) }}> A vague answer scores poorly.</span>
             </span>
           </Note>
 
@@ -135,9 +152,6 @@ export const DailyScene: React.FC = () => {
           <Note at={concreteAt} x={X0} y={binTop - 46}>
             <span style={{ ...label(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A concrete workflow</span>
           </Note>
-          {bins.slice(1).map((b, i) => (
-            <ColumnRule key={b.title} x={X0 + (i + 1) * (BIN_W + BIN_GAP) - BIN_GAP / 2} top={binTop} height={h(212)} at={b.at} />
-          ))}
           {bins.map((b, i) => {
             const p = ease(frame, b.at - 2, 12);
             if (p <= 0) return null;
@@ -160,9 +174,33 @@ export const DailyScene: React.FC = () => {
                     {it.text}
                   </div>
                 ))}
+                {/* A worked example, in the right answer's green: what a
+                    strong answer actually says. */}
+                {"example" in b && b.example
+                  ? b.example.map((it) => (
+                      <div key={it.text} style={{ ...note(24, OK_INK), fontWeight: 500, marginBottom: 4, whiteSpace: "nowrap", opacity: ease(frame, it.at - 2, 10) }}>
+                        {it.text}
+                      </div>
+                    ))
+                  : null}
               </div>
             );
           })}
+          {/* One spot per bin, well under the longest list, so the four
+              read as a row of their own. */}
+          {bins.map((b, i) => (
+            <Spot
+              key={b.title}
+              id={BIN_ART[i]}
+              at={b.at + 8}
+              left={X0 + i * (BIN_W + BIN_GAP)}
+              top={y(BIN_ART_Y)}
+              width={BIN_ART_SIZE}
+              height={BIN_ART_SIZE}
+              phase={i * 29}
+              amp={3}
+            />
+          ))}
         </Clear>
 
         {/* Measure rather than assume: METR's trial. */}
@@ -181,6 +219,13 @@ export const DailyScene: React.FC = () => {
         </svg>
         <Note at={metrAt + 10} x={ZERO} y={measuredTop - h(30) - 34} width={0}>
           <div style={{ position: "absolute", left: -100, width: 200, ...note(20, INK_SOFT), textAlign: "center", whiteSpace: "nowrap" }}>no change</div>
+        </Note>
+        {/* The axis is time on task: left is less of it, right more. */}
+        <Note at={metrAt + 16} x={ZERO - 80} y={measuredTop - h(30) - 34} align="right">
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>← less time on a task</span>
+        </Note>
+        <Note at={metrAt + 16} x={ZERO + 80} y={measuredTop - h(30) - 34}>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>more time →</span>
         </Note>
         {/* Measured: took longer. */}
         <div style={{ position: "absolute", left: ZERO, top: measuredTop, width: MEASURED * PCT * m, height: barH, background: BAR, borderRadius: "0 6px 6px 0" }} />
@@ -230,7 +275,7 @@ export const DailyScene: React.FC = () => {
         </svg>
         <Note at={gapAt + 6} x={ZERO - 260} y={gapY + 12} width={520}>
           <div style={{ ...note(24, INK), fontWeight: 500, textAlign: "center", whiteSpace: "nowrap" }}>
-            <Mark at={gapAt + 12}>the gap: felt faster, measured slower</Mark>
+            <Mark at={gapAt + 12}>The gap: felt faster, measured slower</Mark>
           </div>
         </Note>
         <Note at={sinceAt} x={X0} y={y(800)}>

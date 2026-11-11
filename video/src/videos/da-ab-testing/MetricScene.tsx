@@ -76,12 +76,12 @@ export const MetricScene: React.FC = () => {
   const textAt = n.word("metric", "What makes a good metric");
   const asked = n.beat("metric").to;
   const props: Box[] = [
-    { text: "specific", at: n.word("metric-good", "specific") },
-    { text: "measurable", at: n.word("metric-good", "measurable") },
-    { text: "tied to the outcome", at: n.word("metric-good", "tied to the outcome") },
-    { text: "sensitive to change", at: n.word("metric-good", "sensitive enough") },
-    { text: "a rate, not a count", at: n.word("metric-good", "Prefer rates to counts") },
-    { text: "hard to game", at: n.word("metric-good", "hard to game") },
+    { text: "Specific", at: n.word("metric-good", "specific") },
+    { text: "Measurable", at: n.word("metric-good", "measurable") },
+    { text: "Tied to the outcome", at: n.word("metric-good", "tied to the outcome") },
+    { text: "Sensitive to change", at: n.word("metric-good", "sensitive enough") },
+    { text: "A rate, not a count", at: n.word("metric-good", "Prefer rates to counts") },
+    { text: "Hard to game", at: n.word("metric-good", "hard to game") },
   ];
   const specificAt = n.word("metric-drift", "Specific matters most");
   const threeAt = n.word("metric-drift", "three reasonable definitions");
@@ -157,7 +157,7 @@ export const MetricScene: React.FC = () => {
 
         {/* ── Question 1: a checklist, then the drift ── */}
         <div style={{ position: "absolute", left: X0, top: y(LIST_Y) - h(46), ...label(21, INK_SOFT), opacity: ease(frame, asked - 6, 12) * (1 - ease(frame, out1, 10)) }}>
-          a good metric is
+          A good metric is
         </div>
         {props.map((p, i) => {
           const s = ease(frame, p.at - 2, 12);
@@ -270,7 +270,7 @@ export const MetricScene: React.FC = () => {
         </div>
         <Note at={beforeAt - 2} x={X0} y={y(610)} out={out2}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            primary and guardrails: <b>chosen before the test starts</b>
+            Primary and guardrails: <b>chosen before the test starts</b>
           </span>
         </Note>
 
@@ -302,7 +302,7 @@ export const MetricScene: React.FC = () => {
           );
         })}
         <Note at={dayAt + 20} x={340} y={y(740)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the day-to-day metrics, pointed at durable value</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The day-to-day metrics, pointed at durable value</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -159,7 +159,7 @@ export const CohScene: React.FC = () => {
             height: godH,
             boxSizing: "border-box",
             border: `${2.5 + 2 * pulse(frame, godAt + 4, 24)}px solid ${ACCENT}`,
-            borderRadius: 14,
+            borderRadius: 8,
             background: `color-mix(in srgb, ${ACCENT} 6%, transparent)`,
             opacity: ease(frame, managerAt, 12) * (1 - split),
           }}
@@ -186,7 +186,7 @@ export const CohScene: React.FC = () => {
                 width: GOD.w - 48,
                 height: GOD.rowH,
                 boxSizing: "border-box",
-                borderRadius: 10,
+                borderRadius: 6,
                 border: `2.5px solid color-mix(in srgb, ${c.line} ${Math.round(Math.max(split, i === EMAIL ? emailRed : 0) * 100)}%, transparent)`,
                 background: `color-mix(in srgb, ${c.fill} ${Math.round(Math.max(split, i === EMAIL ? emailRed : 0) * 100)}%, transparent)`,
                 borderBottom: split < 0.5 && i < 4 && !(i === EMAIL && emailRed > 0.5) ? `1px solid color-mix(in srgb, ${INK} 25%, transparent)` : undefined,
@@ -254,8 +254,8 @@ export const CohScene: React.FC = () => {
           In a review, count
         </Line>
         {[
-          { at: reasonsAt, text: "its reasons to change" },
-          { at: withAt, text: "what has to change with it" },
+          { at: reasonsAt, text: "Its reasons to change" },
+          { at: withAt, text: "What has to change with it" },
         ].map((r, i) => (
           <React.Fragment key={r.text}>
             <div style={{ position: "absolute", left: CHECKOUT.x, top: y(800) + i * h(46), opacity: ease(frame, r.at, 10) }}>
@@ -267,7 +267,7 @@ export const CohScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Line x={(GAUGE.xs[0] + GAUGE.xs[1]) / 2} y={solidY} at={solidAt} size={21} color={OK_INK} weight={500} align="center" width={420}>
-          most of SOLID pushes this way
+          Most of SOLID pushes this way
         </Line>
       </Drift>
     </AbsoluteFill>

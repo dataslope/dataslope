@@ -88,7 +88,7 @@ export const HookScene: React.FC = () => {
           {/* Whose line this is. */}
           <Note at={bostonAt - 6} x={TL_X0} y={bandTop - h(40)}>
             <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
-              customer <Num>42</Num>
+              Customer <Num>42</Num>
             </span>
           </Note>
 
@@ -171,14 +171,14 @@ export const HookScene: React.FC = () => {
               whiteSpace: "nowrap",
             }}
           >
-            <span style={{ ...note(28, ACCENT_INK), fontWeight: 500 }}>which city?</span>
+            <span style={{ ...note(28, ACCENT_INK), fontWeight: 500 }}>Which city?</span>
             <span style={{ ...note(28, BOSTON_INK), fontWeight: 500 }}>Boston</span>
             <span style={{ ...note(26, INK_SOFT) }}>or</span>
             <span style={{ ...note(28, AUSTIN_INK), fontWeight: 500 }}>Austin</span>
           </div>
           <Note at={dependsAt} x={orderX + 170} y={y(CARD_Y) + h(58)}>
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-              <span style={{ opacity: ease(frame, rowAt, 10) }}>depends on how her customer row handled the move</span>
+              <span style={{ opacity: ease(frame, rowAt, 10) }}>Depends on how her customer row handled the move</span>
             </span>
           </Note>
         </div>

@@ -126,7 +126,7 @@ export const AbtestScene: React.FC = () => {
 
         {/* ── Question 6: random assignment, one change, one metric ── */}
         <Note at={controlledAt - 2} x={X0} y={y(TOP) - h(24)} out={out6}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>a controlled experiment</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>A controlled experiment</span>
         </Note>
         <Svg opacity={ease(frame, asked - 4, 12) * (1 - ease(frame, out6, 10))}>
           <circle cx={userX} cy={forkY} r={26} fill={INK_SOFT} opacity={0.25} />
@@ -170,11 +170,11 @@ export const AbtestScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={oneThingAt - 2} x={X0} y={y(TOP + 380)} out={out6}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>change one thing, compare one metric</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Change one thing, compare one metric</span>
         </Note>
         <Note at={alikeAt - 2} x={X0} y={y(TOP + 430)} out={out6}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            random groups are alike
+            Random groups are alike
             <span style={{ opacity: ease(frame, neverAt - 2, 10) }}>, even on what you never measured</span>
           </span>
         </Note>
@@ -182,7 +182,7 @@ export const AbtestScene: React.FC = () => {
           <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>so a difference is the change: causation</span>
         </Note>
         <Note at={compareAt} x={armX} y={y(TOP + 330)} out={out6}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>same metric, both arms</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Same metric, both arms</span>
         </Note>
 
         {/* The page's chart: ten traits, users choosing against a coin. */}
@@ -227,7 +227,7 @@ export const AbtestScene: React.FC = () => {
           </Note>
         ))}
         <Note at={pickAt} x={BAL.x0} y={y(BAL.top) - h(40)} out={out6}>
-          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>gap between the arms, standardized</span>
+          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>Gap between the arms, standardized</span>
         </Note>
         <Note at={tenAt + 10} x={BAL.x0} y={rowY(BALANCE.rows.length - 1) + h(70)} out={out6}>
           <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
@@ -242,7 +242,7 @@ export const AbtestScene: React.FC = () => {
 
         {/* ── Question 7: the course's experiment, and a do-nothing world ── */}
         <Note at={countsAt - 4} x={tableX} y={tableTop}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>one test</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>One test</span>
         </Note>
         {[
           { name: "A", x: EXPERIMENT.xA, n: EXPERIMENT.nA, ink: A_INK, at: countsAt },
@@ -289,7 +289,7 @@ export const AbtestScene: React.FC = () => {
           <line x1={zx} x2={zx} y1={base - height * 0.55} y2={base} stroke={B_COLOR} strokeWidth={3.4} />
         </Svg>
         <Note at={nothingAt + 2} x={NULL.x0} y={base - height - h(46)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>gaps a do-nothing change would give, in standard errors</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Gaps a do-nothing change would give, in standard errors</span>
         </Note>
         <Note at={seAt} x={NULL.x1} width={320} y={base - height * 0.55 - h(80)} align="right">
           <span style={{ ...note(25, B_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
@@ -314,12 +314,12 @@ export const AbtestScene: React.FC = () => {
         </Note>
         <Note at={notAt - 2} x={tableX} y={tableTop + h(336)}>
           <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>
-            <Strike at={notAt + 6}>the chance there&apos;s no effect</Strike>
+            <Strike at={notAt + 6}>The chance there&apos;s no effect</Strike>
           </span>
         </Note>
         <Note at={sizeAt - 2} x={tableX} y={tableTop + h(382)}>
           <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>
-            <Strike at={sizeAt + 8}>how big the effect is</Strike>
+            <Strike at={sizeAt + 8}>How big the effect is</Strike>
           </span>
         </Note>
       </Drift>

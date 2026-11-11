@@ -10,6 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HASH, sharedChance } from "./data";
 import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Cell, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, Mark, Mono, OK_INK, Svg, int, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 const AX = 140;
 const PITCH_X = 84;
@@ -19,8 +20,10 @@ const BX = 1010;
 const COLS = 50;
 const BP = 12;
 
-/** Where each key lands, for the drawing: a seeded scatter of distinct
- *  buckets (mulberry32). Only the chance beside it is a claim. */
+/** Where each key lands, for the drawing: a seeded scatter (mulberry32) of
+ *  distinct buckets, then the last key into a bucket already taken, so the
+ *  shared bucket the chance is about is on screen. The one taken is the
+ *  rightmost, next to its label. Only the chance beside it is a claim. */
 const landings = (() => {
   let a = 20261106;
   const rand = () => {
@@ -30,12 +33,14 @@ const landings = (() => {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
   const out: number[] = [];
-  while (out.length < HASH.evenMoneyKeys) {
+  while (out.length < HASH.evenMoneyKeys - 1) {
     const b = Math.floor(rand() * HASH.buckets);
     if (!out.includes(b)) out.push(b);
   }
-  return out;
+  const shared = out.reduce((best, b) => (b % COLS > best % COLS ? b : best), out[0]);
+  return [...out, shared];
 })();
+const SHARED = landings[landings.length - 1];
 
 /**
  * Question 2, with the hash set's complexity answered inside it. When a map
@@ -68,6 +73,7 @@ export const HashScene: React.FC = () => {
   const averageAt = n.word("hash-collide", "Average is the key word");
   const bucketsAt = n.word("hash-collide", "With a thousand buckets");
   const evenAt = n.word("hash-collide", "by the thirty-eighth key");
+  const whyAt = n.word("hash-why", "Each new key can collide with every key already in");
   const worstAt = n.word("hash-worst", "The follow-up is the worst case");
   const sameAt = n.word("hash-worst", "Give a thousand keys the same hash");
   const nearlyAt = n.word("hash-worst", "nearly six hundred thousand");
@@ -76,7 +82,10 @@ export const HashScene: React.FC = () => {
   const avgAt = n.word("hash-set", "constant on average");
   const spaceAt = n.word("hash-set", "linear space");
   const atWorstAt = n.word("hash-set", "linear per operation at worst");
-  const end = n.beat("hash-set").to;
+  const weakAt = n.word("hash-when", "a weak hash, or keys picked to collide");
+  const randomizesAt = n.word("hash-when", "Python randomizes string hashes");
+  const orderAt = n.word("hash-when", "Need the keys in order");
+  const end = n.beat("hash-when").to;
 
   const aTop = y(426);
   const nums = HASH.twoSum.nums;
@@ -114,7 +123,7 @@ export const HashScene: React.FC = () => {
           When do you reach for a hash map?
         </QuestionCard>
         <Line at={lookupsAt} x={96} y={y(262)} size={24} color={INK_SOFT}>
-          Lookups and inserts by key, in O(1) on average:
+          Lookups and inserts by key, in <M>O(1)</M> on average:
         </Line>
         <div style={{ position: "absolute", left: 670, top: y(262), display: "flex", gap: 14, fontSize: 24, whiteSpace: "nowrap" }}>
           {uses.map((u, i) => (
@@ -144,18 +153,18 @@ export const HashScene: React.FC = () => {
         ))}
         {/* The map, filling as the pass moves. */}
         <Line at={twoSumAt + 6} x={MAP_X} y={aTop - 50} size={22} weight={500} color={INK_SOFT}>
-          map: number → index
+          Map: number → index
         </Line>
         <div style={{ position: "absolute", left: MAP_X, top: aTop, width: 190, height: 64, boxSizing: "border-box", borderRadius: 8, background: BLUE_FILL, opacity: ease(frame, twoSumAt + 6, 10) }} />
         <div style={{ position: "absolute", left: MAP_X, width: 190, top: aTop + 14, textAlign: "center", fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, opacity: ease(frame, storeAt + 2, 10) }}>
           {nums[0]} → 0
         </div>
         <div style={{ position: "absolute", left: MAP_X, top: aTop + 92, opacity: ease(frame, linearAt - 6, 10), display: "flex", alignItems: "center", gap: 12, fontSize: 26 }}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>returns</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Returns</span>
           <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: OK_INK }}>{HASH.twoSum.answer}</span>
         </div>
         <Line at={linearAt} x={AX} y={aTop + 214} size={24} weight={500}>
-          O(n) time, at the cost of O(n) memory
+          <M>O(n)</M> time, at the cost of <M>O(n)</M> memory
         </Line>
 
         <VRule x={945} top={aTop - 50} bottom={y(800) + 60} at={averageAt} />
@@ -171,22 +180,45 @@ export const HashScene: React.FC = () => {
           {landings.slice(0, landed).map((b, k) => {
             const p = ease(frame, dropFrom + k * dropStep, 6);
             const lastOne = k === HASH.evenMoneyKeys - 1;
+            // The second key in a taken bucket sits on the first, offset up
+            // and right: two keys, one bucket.
+            const dx = lastOne ? 4 : 0;
             return (
               <rect
-                key={b}
-                x={BX + (b % COLS) * BP - 1}
-                y={bTop + Math.floor(b / COLS) * BP - 1}
+                key={k}
+                x={BX + (b % COLS) * BP - 1 + dx}
+                y={bTop + Math.floor(b / COLS) * BP - 1 - dx}
                 width={BP - 1}
                 height={BP - 1}
                 rx={2}
-                fill={lastOne && last > 0 ? HIGHLIGHT : BAR}
-                stroke={lastOne && last > 0 ? INK : "none"}
-                strokeWidth={1.2}
+                fill={lastOne ? HIGHLIGHT : b === SHARED && last > 0 ? HIGHLIGHT : BAR}
+                stroke={lastOne || (b === SHARED && last > 0) ? INK : "none"}
+                strokeWidth={1.4}
                 opacity={p}
               />
             );
           })}
+          {/* The shared bucket, ringed, with its label off the grid's right edge. */}
+          <circle cx={BX + (SHARED % COLS) * BP + 6} cy={bTop + Math.floor(SHARED / COLS) * BP + 2} r={15} fill="none" stroke={INK} strokeWidth={2} opacity={last} />
+          <line
+            x1={BX + (SHARED % COLS) * BP + 21}
+            x2={BX + COLS * BP + 18}
+            y1={bTop + Math.floor(SHARED / COLS) * BP + 2}
+            y2={bTop + Math.floor(SHARED / COLS) * BP + 2}
+            stroke={INK}
+            strokeWidth={1.4}
+            opacity={last}
+          />
         </Svg>
+        <Line at={evenAt + 10} x={BX + COLS * BP + 26} y={bTop + Math.floor(SHARED / COLS) * BP - 12} size={21} weight={500}>
+          first shared bucket
+        </Line>
+        <Line at={whyAt} x={BX + COLS * BP + 26} y={bTop + Math.floor(SHARED / COLS) * BP + 34} size={21} color={INK_SOFT}>
+          each new key can hit
+        </Line>
+        <Line at={whyAt + 6} x={BX + COLS * BP + 26} y={bTop + Math.floor(SHARED / COLS) * BP + 62} size={21} color={INK_SOFT}>
+          any key already in
+        </Line>
         <div style={{ position: "absolute", left: BX, top: bTop + 20 * BP + 24, ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, bucketsAt, 10) }}>
           <span style={TABULAR}>{landed}</span> keys: chance two share a bucket{" "}
           <Mark at={evenAt + 8}>
@@ -197,7 +229,7 @@ export const HashScene: React.FC = () => {
 
         {/* The worst case, counted. */}
         <Line at={worstAt} x={AX} y={y(684)} size={22} weight={500}>
-          Worst case: <Mono>__eq__</Mono> calls filling a Python set with <Num>{int(HASH.keys)}</Num> keys
+          Worst case: key comparisons (<Mono>__eq__</Mono>) filling a set of <Num>{int(HASH.keys)}</Num> keys
         </Line>
         <HBar x={AX} y={y(724)} w={640} max={HASH.eqSame} value={HASH.eqSpread} at={noneAt - 2} color={BAR} label="Distinct hashes" valueText={<Num>{int(HASH.eqSpread)}</Num>} size={22} barH={22} />
         <HBar
@@ -216,19 +248,24 @@ export const HashScene: React.FC = () => {
           barH={22}
         />
 
-        {/* The hash set, answered. */}
-        <div style={{ position: "absolute", left: BX, top: y(708), opacity: ease(frame, setAt, 12) }}>
-          <div style={{ ...label(22, INK), fontWeight: 500 }}>A hash set</div>
+        {/* The hash set, answered: the page's own question, asked inside this one. */}
+        <div style={{ position: "absolute", left: BX, top: y(704), opacity: ease(frame, worstAt, 12) }}>
+          <div style={{ ...label(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Also asked: What is the time and space complexity of a hash set?</div>
           {[
-            { at: avgAt, k: "time, on average", v: "O(1)", c: OK_INK },
-            { at: spaceAt, k: "space", v: "O(n)", c: INK },
-            { at: atWorstAt, k: "time per operation, at worst", v: "O(n)", c: ACCENT_INK },
-          ].map((r) => (
-            <div key={r.k} style={{ display: "flex", gap: 16, marginTop: 12, fontSize: 24, opacity: ease(frame, r.at - 2, 10), whiteSpace: "nowrap" }}>
+            { at: avgAt, k: "time, on average", v: <M>O(1)</M>, c: OK_INK },
+            { at: spaceAt, k: "space", v: <M>O(n)</M>, c: INK },
+            { at: atWorstAt, k: "time per operation, at worst", v: <M>O(n)</M>, c: ACCENT_INK },
+          ].map((r, i) => (
+            <div key={r.k} style={{ display: "flex", alignItems: "baseline", gap: 16, marginTop: 10, fontSize: 24, opacity: ease(frame, Math.max(r.at, setAt) - 2, 10), whiteSpace: "nowrap" }}>
               <span style={{ ...note(24, r.c), fontWeight: 500, width: 70 }}>{r.v}</span>
               <span style={note(24, INK)}>{r.k}</span>
+              {i === 2 ? <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, weakAt, 10) }}>(a weak hash, or keys picked to collide)</span> : null}
             </div>
           ))}
+          <div style={{ marginTop: 14, fontSize: 22, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, randomizesAt, 10) }}>Python randomizes string hashes.</span>
+            <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, orderAt, 10) }}> Keys in order? A balanced tree.</span>
+          </div>
         </div>
       </Drift>
     </AbsoluteFill>

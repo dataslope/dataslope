@@ -117,16 +117,16 @@ export const ChangedScene: React.FC = () => {
   const textAt = n.word("changed", "How have data scientist interviews");
   const loopAt = n.word("changed", "The core loop hasn't");
   const blocks = [
-    { text: "statistics", at: n.word("changed", "statistics") },
-    { text: "experiments", at: n.word("changed", "experiments") },
+    { text: "Statistics", at: n.word("changed", "statistics") },
+    { text: "Experiments", at: n.word("changed", "experiments") },
     { text: "SQL", at: n.word("changed", "SQL") },
-    { text: "product sense", at: n.word("changed", "product sense") },
+    { text: "Product sense", at: n.word("changed", "product sense") },
   ];
   const layers = [
-    { text: "evaluating LLM features", at: n.word("changed-layer", "evaluating features built on") },
-    { text: "experiments where the treatment is itself random", at: n.word("changed-layer", "Experimenting on AI features") },
-    { text: "checking code and analysis an assistant wrote", at: n.word("changed-layer", "Checking code and analysis") },
-    { text: "rounds with AI allowed, or banned", at: n.word("changed-layer", "rounds where AI is allowed") },
+    { text: "Evaluating LLM features", at: n.word("changed-layer", "evaluating features built on") },
+    { text: "Experiments where the treatment is itself random", at: n.word("changed-layer", "Experimenting on AI features") },
+    { text: "Checking code and analysis an assistant wrote", at: n.word("changed-layer", "Checking code and analysis") },
+    { text: "Rounds with AI allowed, or banned", at: n.word("changed-layer", "rounds where AI is allowed") },
   ];
   const askAt = n.word("changed-layer", "Ask the recruiter");
   const firstAt = n.word("measure-in", "the first of those");
@@ -137,9 +137,9 @@ export const ChangedScene: React.FC = () => {
   const SIDE = X0 + 4 * BLOCK_W + 3 * BLOCK_GAP + 30;
   /** What each layer is in the rest of the video, named beside it as the bridge says so. */
   const where = [
-    { text: "most of what follows", at: firstAt },
-    { text: "question 5", at: nextAt },
-    { text: "question 7", at: nextAt + 6 },
+    { text: "Most of what follows", at: firstAt },
+    { text: "Question 5", at: nextAt },
+    { text: "Question 7", at: nextAt + 6 },
   ];
 
   return (
@@ -169,7 +169,7 @@ export const ChangedScene: React.FC = () => {
           ))}
         </div>
         <Note at={loopAt} x={X0} y={y(BASE_Y) + 24 + 36 + 12}>
-          <span style={{ ...label(22, BLUE_INK), fontWeight: 500 }}>the core loop, the same as ever</span>
+          <span style={{ ...label(22, BLUE_INK), fontWeight: 500 }}>The core loop, the same as ever</span>
         </Note>
 
         {layers.map((l, i) => (
@@ -185,7 +185,7 @@ export const ChangedScene: React.FC = () => {
           </Layer>
         ))}
         <Note at={layers[0].at - 2} x={X0} y={layerTop(3) - 32}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>layered on top, mostly at mid and senior levels</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Layered on top, mostly at mid and senior levels</span>
         </Note>
         {where.map((w, i) => (
           <Note key={w.text} at={w.at} x={SIDE} y={layerTop(i) + 16} from="right">
@@ -194,7 +194,7 @@ export const ChangedScene: React.FC = () => {
         ))}
         <Note at={askAt} x={SIDE} y={layerTop(3) - 2} from="right" dim={firstAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <Mark at={askAt + 6}>ask the recruiter,</Mark>
+            <Mark at={askAt + 6}>Ask the recruiter,</Mark>
             <br />
             <Mark at={askAt + 14}>round by round</Mark>
           </span>

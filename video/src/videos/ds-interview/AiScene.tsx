@@ -126,11 +126,11 @@ export const AiScene: React.FC = () => {
 
         <Panel i={0} at={llmAt} title="Evaluating an LLM feature">
           <div style={{ ...line(frame, measureAt), color: INK }}>
-            <Mark at={measureAt + 4}>a measurement problem</Mark>
+            <Mark at={measureAt + 4}>A measurement problem</Mark>
           </div>
-          <div style={line(frame, setAt)}>an eval set of test prompts</div>
-          <div style={line(frame, ciAt)}>an interval on its pass rate</div>
-          <div style={line(frame, judgeAt)}>does the LLM judge agree with experts?</div>
+          <div style={line(frame, setAt)}>An eval set of test prompts</div>
+          <div style={line(frame, ciAt)}>An interval on its pass rate</div>
+          <div style={line(frame, judgeAt)}>Does the LLM judge agree with experts?</div>
           <svg style={{ position: "absolute", left: FIG_X, top: 66, overflow: "visible" }} width={220} height={80}>
             <line x1={0} x2={220} y1={60} y2={60} stroke={INK_SOFT} strokeWidth={1.4} opacity={ciP} />
             {[0, 220].map((x) => (
@@ -155,7 +155,7 @@ export const AiScene: React.FC = () => {
         </Panel>
 
         <Panel i={1} at={expAt} title="Experiments on AI features">
-          <div style={line(frame, runAt)}>the output changes</div>
+          <div style={line(frame, runAt)}>The output changes</div>
           <div style={line(frame, runAt + 6)}>from one run to the next,</div>
           <div style={line(frame, swapAt)}>and the model can change mid-test</div>
           <svg style={{ position: "absolute", left: FIG_X, top: 24, overflow: "visible" }} width={220} height={140}>
@@ -172,7 +172,7 @@ export const AiScene: React.FC = () => {
         </Panel>
 
         <Panel i={2} at={checkAt} title="Checking what an assistant wrote">
-          <div style={line(frame, checkAt + 4)}>its code</div>
+          <div style={line(frame, checkAt + 4)}>Its code</div>
           <div style={line(frame, analysisAt)}>or a whole analysis</div>
           <div
             style={{
@@ -219,9 +219,9 @@ export const AiScene: React.FC = () => {
             })}
           </div>
           <div style={{ ...line(frame, gradeAt), color: INK, marginTop: h(14) }}>
-            if allowed, <Mark at={gradeAt + 4}>graded on how you check its work</Mark>
+            If allowed, <Mark at={gradeAt + 4}>graded on how you check its work</Mark>
           </div>
-          <div style={{ ...line(frame, askAt), color: INK }}>ask the recruiter about each round</div>
+          <div style={{ ...line(frame, askAt), color: INK }}>Ask the recruiter about each round</div>
         </Panel>
       </Drift>
     </AbsoluteFill>

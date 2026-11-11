@@ -106,7 +106,7 @@ export const BackfillScene: React.FC = () => {
 
         {/* Count tokens. */}
         <Note at={countAt - 2} x={X0} y={eqY - 46}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>count tokens</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Count tokens</span>
         </Note>
         <Note at={tenAt - 2} x={X0} y={eqY}>
           <span style={{ ...note(36, INK), whiteSpace: "nowrap" }}>
@@ -121,7 +121,7 @@ export const BackfillScene: React.FC = () => {
         </Note>
         <Note at={costAt - 2} x={X0} y={eqY + 70}>
           <span style={{ ...note(29, INK), whiteSpace: "nowrap" }}>
-            <b>cost</b> ={" "}
+            <b>Cost</b> ={" "}
             <span style={{ opacity: ease(frame, thousandAt - 2, 10) }}>
               <Num>{num(BACKFILL.millions)}</Num> × the price per million tokens
             </span>
@@ -135,7 +135,7 @@ export const BackfillScene: React.FC = () => {
         </Note>
         <Note at={timeAt - 2} x={X0} y={eqY + 122}>
           <span style={{ ...note(29, INK), whiteSpace: "nowrap" }}>
-            <b>time</b> = 4 billion ÷ your rate limit
+            <b>Time</b> = 4 billion ÷ your rate limit
             <span style={{ opacity: ease(frame, rateAt - 2, 10), color: INK_SOFT }}>
               ; at <Num>{num(BACKFILL.rate)}</Num> tokens a minute,
             </span>
@@ -151,13 +151,13 @@ export const BackfillScene: React.FC = () => {
           </span>
         </Note>
         <Note at={rateAt + 6} x={X0} y={eqY + 170}>
-          <span style={madeUp(19)}>the page&apos;s numbers; the rate and the price range are for scale, not a provider&apos;s quote</span>
+          <span style={madeUp(19)}>The page&apos;s numbers; the rate and the price range are for scale, not a provider&apos;s quote</span>
         </Note>
 
         {/* The run, designed to fail partway. */}
         <Note at={failAt} x={X0} y={barTop - 104}>
           <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={failAt + 4}>design for failure partway</Mark>
+            <Mark at={failAt + 4}>Design for failure partway</Mark>
           </span>
         </Note>
         {/* The key, on a line of its own just over the squares it names. */}
@@ -243,7 +243,7 @@ export const BackfillScene: React.FC = () => {
         </Note>
         <Note at={upsertAt - 2} x={X0} y={row2Top + 28}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            upserts are idempotent: a batch written twice
+            Upserts are idempotent: a batch written twice
             <br />
             is still one copy of each chunk
           </span>

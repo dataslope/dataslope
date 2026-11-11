@@ -11,9 +11,9 @@ import { ColumnRule, Drift, hasArt, Kicker, line, Mark, Spot, X0 } from "./parts
 
 const COL_W = 168;
 const LEFT = (1920 - SERIES.length * COL_W) / 2;
-const ART_W = 138;
-const ART_H = 124;
-const ROW_V = 176;
+const ART_W = 108;
+const ART_H = 98;
+const ROW_V = 190;
 const CARD_V = 700;
 const CARD_W = 500;
 const CARD_GAP = 60;
@@ -81,7 +81,7 @@ export const CloseScene: React.FC = () => {
                     height: h(ART_H),
                     boxSizing: "border-box",
                     border: `1.5px dashed ${HAIRLINE}`,
-                    borderRadius: 12,
+                    borderRadius: 8,
                     opacity: ease(frame, at, 10),
                   }}
                 />

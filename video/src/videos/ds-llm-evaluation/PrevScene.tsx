@@ -112,7 +112,7 @@ export const PrevScene: React.FC = () => {
 
         <Note at={notAt} x={X0} y={y(330)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            not as the share it labels complaints:{" "}
+            Not as the share it labels complaints:{" "}
             <span style={{ opacity: ease(frame, biasAt - 2, 10) }}>
               <Mark at={biasAt + 4} color={MARK_BAD}>
                 its errors bias that number
@@ -122,7 +122,7 @@ export const PrevScene: React.FC = () => {
         </Note>
         <Note at={checkAt} x={X0} y={y(384)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            on a hand-labeled sample, it{" "}
+            On a hand-labeled sample, it{" "}
             <span style={{ opacity: ease(frame, catchesAt - 2, 10), color: BLUE_INK, fontWeight: 500 }}>catches 90% of real complaints</span>
             <span style={{ opacity: ease(frame, sensAt - 2, 10), fontSize: 22 }}> (sensitivity {PREV.sens.toFixed(2)})</span>
             <span style={{ opacity: ease(frame, flagsAt - 2, 10) }}>
@@ -134,7 +134,7 @@ export const PrevScene: React.FC = () => {
 
         {/* What the classifier reports. */}
         <Note at={twentyAt - 2} x={X0} y={y(ROW_LABEL) - h(36)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>what the LLM labels complaints, out of {num(PREV.tickets)}</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>What the LLM labels complaints, out of {num(PREV.tickets)}</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: labelBar }}>
           <rect x={BAR.x0} y={y(ROW_LABEL)} width={W} height={BAR.h} fill="none" stroke={INK_SOFT} strokeWidth={1.4} strokeDasharray="3 6" />
@@ -169,7 +169,7 @@ export const PrevScene: React.FC = () => {
 
         {/* The truth, revealed by the correction. */}
         <Note at={correctAt} x={X0} y={y(ROW_TRUTH) - h(36)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>corrected: what the tickets really are</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>Corrected: what the tickets really are</span>
         </Note>
         {truth > 0 ? (
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: truth }}>
@@ -250,7 +250,7 @@ export const PrevScene: React.FC = () => {
           </div>
         </Note>
         <Note at={rgAt - 4} x={1370} y={y(ROW_FORMULA) + h(30)}>
-          <div style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>the Rogan-Gladen estimator</div>
+          <div style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>The Rogan-Gladen estimator</div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: 12, opacity: ease(frame, intervalAt, 12) }}>
             <Mark at={intervalAt + 6} out={lastAt}>
               + its interval: both rates

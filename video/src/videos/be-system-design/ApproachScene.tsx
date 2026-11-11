@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { ACCENT, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -119,7 +119,7 @@ export const ApproachScene: React.FC = () => {
                   height: 76,
                   boxSizing: "border-box",
                   border: `2.4px solid ${INK_SOFT}`,
-                  borderRadius: 10,
+                  borderRadius: 8,
                   opacity: p,
                 }}
               />
@@ -210,15 +210,15 @@ export const ApproachScene: React.FC = () => {
 
         {/* Same features, different systems. */}
         {[
-          { x: X0, at: thousandAt, n: 1000, unit: "users", servers: 1 },
-          { x: X0 + 620, at: billionAt, n: ESTIMATE.readsPerDay, unit: "redirects a day", servers: 12 },
+          { x: X0, at: thousandAt, n: 1000, unit: "users", system: "One server" },
+          { x: X0 + 620, at: billionAt, n: ESTIMATE.readsPerDay, unit: "redirects a day", system: "Many servers, caches" },
         ].map((f) => (
           <React.Fragment key={f.unit}>
             <Line x={f.x} y={figY} at={f.at} size={27} weight={500} color={BLUE_INK}>
               <Num>{int(f.n)}</Num> {f.unit}
             </Line>
             <Line x={f.x} y={figY + 48} at={Math.max(f.at, sameAt)} size={22} weight={500} color={INK}>
-              shorten · redirect
+              Shorten · Redirect
             </Line>
             <Arrow
               points={[
@@ -230,27 +230,10 @@ export const ApproachScene: React.FC = () => {
               head={11}
               color={INK_SOFT}
             />
-            <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-              {Array.from({ length: f.servers }, (_, k) => {
-                const col = k % 6;
-                const rowK = Math.floor(k / 6);
-                const p = ease(frame, differentAt + 4 + k, 8);
-                return (
-                  <rect
-                    key={k}
-                    x={f.x + 280 + col * 34}
-                    y={figY + (f.servers > 1 ? 40 + rowK * 26 : 46)}
-                    width={26}
-                    height={f.servers > 1 ? 20 : 34}
-                    rx={4}
-                    fill={`color-mix(in srgb, ${BAR} 14%, ${PAPER})`}
-                    stroke={BAR}
-                    strokeWidth={2}
-                    opacity={p}
-                  />
-                );
-              })}
-            </svg>
+            {/* What each scale takes, named rather than counted. */}
+            <Line x={f.x + 280} y={figY + 48} at={differentAt + 4} size={22} weight={500} color={BLUE_INK}>
+              {f.system}
+            </Line>
           </React.Fragment>
         ))}
         <VRule x={583} top={figY} bottom={figY + 92} at={billionAt} />

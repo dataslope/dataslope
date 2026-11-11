@@ -119,7 +119,7 @@ export const HadoopScene: React.FC = () => {
         })}
         <Note at={everyAt + 4} x={NOTE_X} y={hMid - h(44)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
-            every reduce:
+            Every reduce:
             <br />
             HDFS, read back
             <br />
@@ -161,7 +161,7 @@ export const HadoopScene: React.FC = () => {
         </Note>
         <Note at={memAt + 8} x={NOTE_X} y={sMid - h(28)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
-            memory between steps,
+            Memory between steps,
             <br />
             <span style={{ opacity: ease(frame, shuffleAt, 10) }}>disk only at a shuffle</span>
           </span>

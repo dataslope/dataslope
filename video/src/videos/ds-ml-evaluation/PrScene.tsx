@@ -79,12 +79,12 @@ export const PrScene: React.FC = () => {
         </QuestionCard>
         <Note at={precAt - 2} x={PLOT.left - 60} y={y(270)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: BLUE_INK }}>precision</b>: the share of flagged cases that are real
+            <b style={{ color: BLUE_INK }}>Precision</b>: the share of flagged cases that are real
           </span>
         </Note>
         <Note at={recAt - 2} x={PLOT.left - 60} y={y(318)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: WARM_INK }}>recall</b>: the share of real cases you flag
+            <b style={{ color: WARM_INK }}>Recall</b>: the share of real cases you flag
           </span>
         </Note>
 
@@ -120,16 +120,16 @@ export const PrScene: React.FC = () => {
         <Note at={eightAt} x={RIGHT_X} y={y(PLOT.top)}>
           <div style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap", lineHeight: 1.7 }}>
             <div>
-              threshold <b>{t.toFixed(2)}</b>
+              Threshold <b>{t.toFixed(2)}</b>
             </div>
             <div>
-              precision{" "}
+              Precision{" "}
               <Mark at={fallsAt}>
                 <b style={{ color: BLUE_INK }}>{readout(r.precision)}</b>
               </Mark>
             </div>
             <div style={{ opacity: ease(frame, eightyAt + 8, 10) }}>
-              recall{" "}
+              Recall{" "}
               <Mark at={climbAt}>
                 <b style={{ color: WARM_INK }}>{readout(r.recall)}</b>
               </Mark>
@@ -140,14 +140,14 @@ export const PrScene: React.FC = () => {
         {/* ── When to favor each ── */}
         <Note at={missAt - 2} x={RIGHT_X} y={y(610)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            favor <b style={{ color: WARM_INK }}>recall</b> when a miss is costly
+            Favor <b style={{ color: WARM_INK }}>recall</b> when a miss is costly
           </span>
           <br />
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>a disease screen, fraud</span>
         </Note>
         <Note at={alarmAt - 2} x={RIGHT_X} y={y(700)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            favor <b style={{ color: BLUE_INK }}>precision</b> when a false alarm is
+            Favor <b style={{ color: BLUE_INK }}>precision</b> when a false alarm is
           </span>
           <br />
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>a spam filter</span>

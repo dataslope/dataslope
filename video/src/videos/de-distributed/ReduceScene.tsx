@@ -201,7 +201,7 @@ export const ReduceScene: React.FC = () => {
         </Note>
         <Note at={preferAt - 2} x={R_X} y={y(752)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            prefer <span style={{ fontFamily: MONO, fontSize: 21 }}>reduceByKey</span>
+            Prefer <span style={{ fontFamily: MONO, fontSize: 21 }}>reduceByKey</span>
             <span style={{ opacity: ease(frame, dfAt, 10) }}>
               , or <span style={{ fontFamily: MONO, fontSize: 21 }}>groupBy().agg()</span>
             </span>

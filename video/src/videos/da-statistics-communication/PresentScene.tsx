@@ -254,7 +254,7 @@ export const PresentScene: React.FC = () => {
         {/* The interval is right; it is only jargon. So it is labelled, not struck. */}
         <Note at={jargonAt - 2} x={X0} y={y(LIST_Y) + h(130)} out={out9}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <span style={{ color: INK_SOFT }}>jargon: </span>
+            <span style={{ color: INK_SOFT }}>Jargon: </span>
             <span style={{ opacity: ease(frame, insteadAt - 2, 10) }}>
               <Num>95%</Num> confidence interval: [<Num>{LIFT.lo}%</Num>, <Num>{LIFT.hi}%</Num>]
             </span>
@@ -262,7 +262,7 @@ export const PresentScene: React.FC = () => {
         </Note>
         <Note at={sayAt - 2} x={X0} y={y(LIST_Y) + h(200)} out={out9} width={860}>
           <span style={{ ...note(30, OK_INK), fontWeight: 500, display: "block", textWrap: "balance" }}>
-            <span style={{ color: INK_SOFT, fontWeight: 500 }}>say: </span>
+            <span style={{ color: INK_SOFT, fontWeight: 500 }}>Say: </span>
             &ldquo;We&apos;re highly confident the true lift is between {LIFT.lo}% and {LIFT.hi}%.&rdquo;
           </span>
         </Note>
@@ -281,7 +281,7 @@ export const PresentScene: React.FC = () => {
           ]}
         />
         <Note at={preciseAt - 2} x={X0} y={y(LIST_Y) + 3 * h(PITCH) + h(40)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>no false precision:</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>No false precision:</span>
         </Note>
         <Note at={twelveThreeAt - 2} x={X0} y={y(LIST_Y) + 3 * h(PITCH) + h(86)}>
           <span style={{ ...note(34, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
@@ -290,7 +290,7 @@ export const PresentScene: React.FC = () => {
         </Note>
         <Note at={aboutAt - 2} x={X0 + 300} y={y(LIST_Y) + 3 * h(PITCH) + h(86)}>
           <span style={{ ...note(34, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-            about {LIFT.point}% ({LIFT.lo}% to {LIFT.hi}%)
+            About {LIFT.point}% ({LIFT.lo}% to {LIFT.hi}%)
           </span>
         </Note>
       </Drift>

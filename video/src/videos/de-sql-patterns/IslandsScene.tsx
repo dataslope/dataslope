@@ -107,7 +107,7 @@ export const IslandsScene: React.FC = () => {
 
           {/* ── User 1's logins, numbered, and the key ── */}
           <TableName g={kg} at={runsAt - 4} out={out}>
-            user 1&rsquo;s logins
+            User 1&rsquo;s logins
           </TableName>
           <DataTable
             g={kg}
@@ -134,7 +134,7 @@ export const IslandsScene: React.FC = () => {
           </Note>
 
           <TableName g={kg} at={catchAt} >
-            the same, with a second login on Jan 2
+            The same, with a second login on Jan 2
           </TableName>
           <DataTable
             g={kg}
@@ -167,7 +167,7 @@ export const IslandsScene: React.FC = () => {
 
           {/* ── User 1's islands ── */}
           <TableName g={rg} at={groupAt + 4} out={out}>
-            user 1&rsquo;s islands
+            User 1&rsquo;s islands
           </TableName>
           <DataTable
             g={rg}
@@ -178,7 +178,7 @@ export const IslandsScene: React.FC = () => {
             bands={R.rows.map((_, row) => ({ row, at: threeAt + row * 6, color: TINTS[row % TINTS.length] }))}
           />
           <TableName g={rg} at={mergeAt - 2}>
-            with the duplicate
+            With the duplicate
           </TableName>
           <DataTable
             g={rg}
@@ -197,7 +197,7 @@ export const IslandsScene: React.FC = () => {
             </span>
           </Note>
           <TableName g={dg} at={dedupAt + 2}>
-            deduplicated first
+            Deduplicated first
           </TableName>
           <DataTable
             g={dg}

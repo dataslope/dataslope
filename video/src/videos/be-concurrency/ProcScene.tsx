@@ -29,9 +29,12 @@ const P_H = 280;
 /**
  * Question 2. Threads share one process's memory: one writes a cell, another
  * reads it, cheaply; two writing the same cell corrupt it. Processes each
- * get their own: one crashes and the others run on, in parallel, but what
- * passes between them is serialized through a pipe, and each one's memory is
- * its own copy.
+ * get their own: one crashes and the others run on. In CPython the threads
+ * take turns (question 4), so processes are how Python runs in parallel; the
+ * screen says "in CPython" because in Java, Go or C++ threads run in parallel
+ * too. What passes between processes is usually serialized through a pipe
+ * joining two of them (shared memory is the exception), and each one's
+ * memory is its own copy.
  */
 export const ProcScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -48,11 +51,13 @@ export const ProcScene: React.FC = () => {
   const readsAt = n.word("proc", "another reads it");
   const dangerAt = n.word("proc-risk", "That sharing is also the danger");
   const corruptAt = n.word("proc-risk", "corrupt the same state");
-  const ownAt = n.word("proc-iso", "Processes each get their own memory");
+  const ownAt = n.word("proc-own", "Processes each get their own memory");
   const crashAt = n.word("proc-iso", "A crash in one");
-  const parallelAt = n.word("proc-iso", "they run truly in parallel");
+  const cpythonAt = n.word("proc-iso", "In CPython");
+  const parallelAt = n.word("proc-iso", "how Python runs in parallel");
+  const turnsAt = n.word("proc-iso", "its threads take turns");
   const priceAt = n.word("proc-iso", "The price is talking");
-  const serialAt = n.word("proc-iso", "serialized through pipes or queues");
+  const serialAt = n.word("proc-iso", "usually serialized");
   const memAt = n.word("proc-iso", "every process costs more memory");
   const end = n.beat("proc-iso").to;
 
@@ -73,6 +78,8 @@ export const ProcScene: React.FC = () => {
   const crashed = ease(frame, crashAt + 4, 10);
   const run = ease(frame, parallelAt, 50);
   // The message through the pipe: packed, then carried from process 1 to 3.
+  // The pipe leaves process 1's bottom edge and enters process 3's.
+  const pipeTop = pTop + pH;
   const pipeY = y(716);
   const pipeX0 = pX(0) + P_W / 2;
   const pipeX1 = pX(2) + P_W / 2;
@@ -147,6 +154,16 @@ export const ProcScene: React.FC = () => {
         <Note at={corruptAt + 4} x={L.x} y={y(L.top + L.h + 24)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Two threads, one cell: corrupted state</span>
         </Note>
+        {/* Which runtime the parallel claim is about. */}
+        <Note at={cpythonAt} x={L.x} y={y(L.top + L.h + 76)}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <b style={{ color: BLUE_INK }}>In CPython</b>
+            <span style={{ opacity: ease(frame, turnsAt, 10) }}>, these threads take turns (question 4)</span>
+          </span>
+        </Note>
+        <Note at={parallelAt} x={L.x} y={y(L.top + L.h + 116)}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Processes are how Python runs in parallel</span>
+        </Note>
 
         {/* Processes: each its own memory. */}
         <Note at={ownAt} x={R_X} y={y(292)}>
@@ -176,36 +193,30 @@ export const ProcScene: React.FC = () => {
                   dim={j === 1 ? crashAt + 4 : undefined}
                 />
               ))}
-              <ThreadName t={j} x={pX(j) + 20} y={pTop + h(152)} at={at + 10} ink={j === 1 && crashed > 0.5 ? ACCENT_INK : undefined}>
-                {j === 1 && crashed > 0.5 ? "thread 2: crashed" : `thread ${j + 1}`}
+              {/* Each process's own thread, a worker; the crashed one's goes pale. */}
+              <ThreadName t={j} x={pX(j) + 20} y={pTop + h(146)} at={at + 10} dim={j === 1 ? crashAt + 4 : undefined}>
+                worker
               </ThreadName>
-              {/* Running: a bar under each thread that fills, all at once. */}
+              {/* Running: a bar under each worker that fills, all at once. */}
               {j !== 1 ? (
-                <div style={{ position: "absolute", left: pX(j) + 20, top: pTop + h(208), width: (P_W - 40) * run, height: 8, borderRadius: 4, background: OK, opacity: run > 0 ? 1 : 0 }} />
+                <div style={{ position: "absolute", left: pX(j) + 20, top: pTop + h(192), width: (P_W - 40) * run, height: 8, borderRadius: 4, background: OK, opacity: run > 0 ? 1 : 0 }} />
               ) : null}
             </React.Fragment>
           );
         })}
-        {/* The crash: one goes down, the others run on. */}
-        <Note at={crashAt + 10} x={pX(0)} y={pTop + pH + h(14)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            runs on<span style={{ opacity: ease(frame, parallelAt, 10) }}>, in parallel</span>
-          </span>
-        </Note>
-        <Note at={crashAt + 10} x={pX(1)} y={pTop + pH + h(14)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>crashed alone</span>
-        </Note>
-        <Note at={crashAt + 10} x={pX(2)} y={pTop + pH + h(14)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            runs on<span style={{ opacity: ease(frame, parallelAt, 10) }}>, in parallel</span>
-          </span>
-        </Note>
+        {/* The crash: one goes down, the others run on. Inside the boxes, so
+            the pipe below can leave from their bottom edges. */}
+        {[0, 1, 2].map((j) => (
+          <Note key={j} at={crashAt + 10} x={pX(j) + 20} y={pTop + h(222)}>
+            <span style={{ ...label(21, j === 1 ? ACCENT_INK : OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{j === 1 ? "process 2: crashed" : "runs on"}</span>
+          </Note>
+        ))}
 
         {/* The price: a pipe, with the message packed into bytes. */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, priceAt, 12) }}>
           {/* A tube: a wide stroke with a narrower one in the page's color inside it. */}
-          <path d={`M${pipeX0},${pTop + pH + h(54)} V${pipeY} H${pipeX1} V${pTop + pH + h(54)}`} fill="none" stroke={INK_SOFT} strokeWidth={22} strokeLinejoin="round" strokeOpacity={0.55} />
-          <path d={`M${pipeX0},${pTop + pH + h(54)} V${pipeY} H${pipeX1} V${pTop + pH + h(54)}`} fill="none" stroke={PAPER} strokeWidth={16} strokeLinejoin="round" />
+          <path d={`M${pipeX0},${pipeTop} V${pipeY} H${pipeX1} V${pipeTop}`} fill="none" stroke={INK_SOFT} strokeWidth={22} strokeLinejoin="round" strokeOpacity={0.55} />
+          <path d={`M${pipeX0},${pipeTop - 2} V${pipeY} H${pipeX1} V${pipeTop - 2}`} fill="none" stroke={PAPER} strokeWidth={16} strokeLinejoin="round" />
         </svg>
         {carry >= 0 ? (
           <div
@@ -223,13 +234,16 @@ export const ProcScene: React.FC = () => {
         ) : null}
         <Note at={serialAt} x={R_X} y={pipeY + h(30)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            Data between them is <Band at={serialAt + 4}>serialized</Band>, through a pipe or a queue
+            Data between them is usually <Band at={serialAt + 4}>serialized</Band>, through a pipe or a queue
           </span>
         </Note>
         <Note at={memAt} x={R_X} y={pipeY + h(84)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             and each process costs <b style={{ color: BLUE_INK }}>more memory</b>
           </span>
+        </Note>
+        <Note at={memAt + 16} x={R_X} y={pipeY + h(132)}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>(the exception: memory shared on purpose, with its own locks)</span>
         </Note>
       </Drift>
     </AbsoluteFill>

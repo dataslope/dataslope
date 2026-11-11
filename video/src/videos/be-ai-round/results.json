@@ -146,7 +146,9 @@
     "inputShareOfTokens": 0.8695652173913043,
     "outputPerTokenRatio": 5,
     "halvePromptSaves": 1000,
-    "halveAnswerSaves": 750
+    "halveAnswerSaves": 750,
+    "perRequest": 0.0035,
+    "perRequestCents": 0.35
   },
   "retry": {
     "n": 1000,
@@ -336,7 +338,8 @@
           23
         ]
       }
-    ]
+    ],
+    "peakRatio": 8.695652173913043
   },
   "practice": {
     "bank": 110,

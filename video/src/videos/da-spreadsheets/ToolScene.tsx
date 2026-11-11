@@ -129,9 +129,9 @@ export const ToolScene: React.FC = () => {
           pitch={h(PITCH)}
           out={out9}
           items={[
-            { at: quickAt, text: "quick exploration" },
-            { at: smallAt, text: "small data" },
-            { at: handAt, text: "something to hand a stakeholder" },
+            { at: quickAt, text: "Quick exploration" },
+            { at: smallAt, text: "Small data" },
+            { at: handAt, text: "Something to hand a stakeholder" },
           ]}
         />
         <Column
@@ -142,19 +142,19 @@ export const ToolScene: React.FC = () => {
           pitch={h(PITCH)}
           out={out9}
           items={[
-            { at: outgrowAt, text: "data past what a sheet handles" },
-            { at: repeatAt, text: "work that's repeated and audited" },
-            { at: joinsAt, text: "joins across several tables" },
+            { at: outgrowAt, text: "Data past what a sheet handles" },
+            { at: repeatAt, text: "Work that's repeated and audited" },
+            { at: joinsAt, text: "Joins across several tables" },
           ]}
         />
         {/* As tall as the two lists, from their headings to their third lines. */}
         <ColumnRule x={RULE_X} top={y(LIST_Y)} height={54 + 2 * h(PITCH) + 38} at={asked - 2} out={out9} />
         <Note at={outgrowAt + 10} x={RIGHT_X + 24} y={y(LIST_Y) + h(54) + h(PITCH) * 3} out={out9}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>sheets slow down well before a million rows</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Sheets slow down well before a million rows</span>
         </Note>
         <Note at={weeklyAt - 2} x={X0} y={y(LIST_Y) + h(54) + h(PITCH) * 4 + h(20)} out={out9}>
           <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            the same manual steps every week? <Mark at={sqlAt}>it belongs in SQL</Mark>
+            The same manual steps every week? <Mark at={sqlAt}>it belongs in SQL</Mark>
           </span>
         </Note>
 
@@ -166,10 +166,10 @@ export const ToolScene: React.FC = () => {
           titleAt={q10TextAt + 10}
           pitch={h(PITCH)}
           items={[
-            { at: manualAt, text: "manual steps nobody can rerun" },
-            { at: breakAt, text: "formulas that break when rows move" },
-            { at: schemaAt, text: "no schema: a number can be text" },
-            { at: crawlAt, text: "big files that crawl, then crash" },
+            { at: manualAt, text: "Manual steps nobody can rerun" },
+            { at: breakAt, text: "Formulas that break when rows move" },
+            { at: schemaAt, text: "No schema: a number can be text" },
+            { at: crawlAt, text: "Big files that crawl, then crash" },
           ]}
         />
         <Sheet
@@ -184,7 +184,7 @@ export const ToolScene: React.FC = () => {
         />
         <Note at={textNumAt + 4} x={g.right + 24} y={g.rowTop(textRow)}>
           <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
-            typed as text: it sits <b>left</b>, where numbers sit right
+            Typed as text: it sits <b>left</b>, where numbers sit right
           </span>
         </Note>
         <FormulaBar
@@ -200,7 +200,7 @@ export const ToolScene: React.FC = () => {
         />
         <Note at={insteadAt - 2} x={g.right + 24} y={g.rowTop(8) + h(60)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            with it as a number: <b style={TABULAR}>{printed(C.total.value)}</b>
+            With it as a number: <b style={TABULAR}>{printed(C.total.value)}</b>
           </span>
         </Note>
         {/* How to catch it, and the fix. */}

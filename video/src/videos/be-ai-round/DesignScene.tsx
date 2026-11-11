@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
@@ -50,7 +50,9 @@ const RISKS = [
 
 /**
  * Question 4: a feature that calls an LLM API. The model is a dependency with
- * six risks, named in red; the page's flowchart is drawn around it, and then
+ * six risks, named in red, the provider drawn alone in the middle of the page;
+ * the page's flowchart is built around it box by box as the request path is
+ * walked (quota, cache, provider on a miss, validation, streamed back), and then
  * each concern the page lists lights the part of the drawing it changes or
  * adds to it: latency the streamed edge back to the client and a queue with a
  * status endpoint; failure the provider edge's timeout, retries, breaker and
@@ -69,7 +71,14 @@ export const DesignScene: React.FC = () => {
   const textAt = n.word("design", "How would you design");
   const modelAt = n.word("design", "Treat the model");
   const risks = RISKS.map((r) => ({ ...r, at: n.word("design", r.cue) }));
-  const buildAt = n.word("design", "and design for that");
+  // The request path, walked: each box of the flowchart on its word.
+  const reqAt = n.word("design-path", "The request passes");
+  const quotaAt = n.word("design-path", "a quota check");
+  const cacheBoxAt = n.word("design-path", "then the cache");
+  const missAt = n.word("design-path", "On a miss");
+  const providerAt = n.word("design-path", "it goes to the provider");
+  const validAt = n.word("design-path", "the reply is validated");
+  const backAt = n.word("design-path", "the app streams it back to the client");
   const concerns = CONCERNS.map((c) => ({ ...c, at: n.word(c.beat, c.cue, "nth" in c ? { nth: c.nth } : undefined) }));
   const [latAt, failAt, shapeAt, costAt, cacheAt, qualityAt] = concerns.map((c) => c.at);
   const streamAt = n.word("design-latency", "stream tokens to the client");
@@ -79,6 +88,7 @@ export const DesignScene: React.FC = () => {
   const retryAt = n.word("design-fail", "retries with exponential backoff");
   const codesAt = n.word("design-fail", "four twenty-nines");
   const breakerAt = n.word("design-fail", "a circuit breaker");
+  const stopsAt = n.word("design-breaker", "stops calling a provider");
   const fallbackAt = n.word("design-fail", "a fallback");
   const validateAt = n.word("design-shape", "validate every response");
   const trustAt = n.word("design-shape", "Never trust the shape");
@@ -108,8 +118,12 @@ export const DesignScene: React.FC = () => {
   const mid = (id: keyof typeof BOX) => top(id) + bh / 2;
   const right = (id: keyof typeof BOX) => BOX[id].x + BOX[id].w;
   const bottom = (id: keyof typeof BOX) => top(id) + bh;
-  const boxAt = { LLM: modelAt, C: buildAt, API: buildAt + 5, Q: buildAt + 10, Cache: buildAt + 15, V: buildAt + 20 };
-  const edgeAt = buildAt + 24;
+  const boxAt = { LLM: modelAt, C: reqAt - 2, API: reqAt + 6, Q: quotaAt - 2, Cache: cacheBoxAt - 2, V: validAt - 2 };
+  // The provider is drawn first, alone, beside the risks it carries; it
+  // moves to its place in the flowchart as the request path starts.
+  const settle = ease(frame, reqAt - 6, 22);
+  const llmX = interpolate(settle, [0, 1], [(1920 - BOX.LLM.w) / 2, BOX.LLM.x]);
+  const llmY = interpolate(settle, [0, 1], [y(430), y(BOX.LLM.row)]);
   const loopY = y(LOOP_Y);
   const cacheX = BOX.Cache.x + BOX.Cache.w / 2;
   const vToApiX = 650;
@@ -118,12 +132,13 @@ export const DesignScene: React.FC = () => {
   const missLabel = edge("Cache", "LLM").label;
   const invalidLabel = edge("V", "LLM").label;
   const risksOut = latAt - 8;
+  const lead = (fy: number) => (fy + 13 > top("LLM") - 8 ? right("LLM") + 8 : cacheX + 10);
   // The failure stack on the provider edge, right of it, between the rows.
   const fails = [
     { text: "timeout", at: timeoutAt, v: 450 },
     { text: "retries: backoff and jitter", at: retryAt, v: 488 },
     { text: "circuit breaker", at: breakerAt, v: 548 },
-    { text: "fallback", at: fallbackAt, v: 586 },
+    { text: "fallback", at: fallbackAt, v: 614 },
   ];
 
   return (
@@ -132,7 +147,11 @@ export const DesignScene: React.FC = () => {
         <Sfx key={r.text} name="el-tap" at={r.at} level={-36} />
       ))}
       <Sfx name="el-pop" at={modelAt} level={-31} />
-      <Sfx name="el-pencil" at={edgeAt} level={-34} />
+      {[reqAt, quotaAt, cacheBoxAt, validAt].map((at) => (
+        <Sfx key={at} name="el-tap" at={at} level={-35} />
+      ))}
+      <Sfx name="el-pencil" at={missAt} level={-35} />
+      <Sfx name="el-pencil" at={backAt + 8} level={-35} />
       {concerns.map((c) => (
         <Sfx key={c.name} name="el-tap" at={c.at} level={-31} />
       ))}
@@ -189,9 +208,10 @@ export const DesignScene: React.FC = () => {
         {/* The page's flowchart. */}
         {(Object.keys(BOX) as (keyof typeof BOX)[]).map((id) => {
           const lit =
-            id === "Q" ? { lit: costAt, litOut: cacheAt - 4 } : id === "Cache" ? { lit: cacheAt, litOut: qualityAt - 4 } : id === "V" ? { lit: shapeAt, litOut: costAt - 4 } : {};
+            id === "Q" ? { lit: costAt, litOut: cacheAt - 4 } : id === "Cache" ? { lit: cacheAt, litOut: qualityAt - 4 } : id === "V" ? { lit: shapeAt, litOut: costAt - 4 } : id === "LLM" ? { lit: providerAt, litOut: validAt + 4 } : {};
+          const subAt = { Q: tokensAt, Cache: exactAt, V: validateAt, LLM: prefixAt, C: null, API: null }[id];
           const sub =
-            id === "Q" ? (
+            subAt === null || frame < subAt - 1 ? undefined : id === "Q" ? (
               <span style={{ opacity: ease(frame, tokensAt, 10) }}>counted in tokens</span>
             ) : id === "Cache" ? (
               <span style={{ opacity: ease(frame, exactAt, 10) }}>exact match</span>
@@ -203,8 +223,8 @@ export const DesignScene: React.FC = () => {
           return (
             <Node
               key={id}
-              x={BOX[id].x}
-              y={top(id)}
+              x={id === "LLM" ? llmX : BOX[id].x}
+              y={id === "LLM" ? llmY : top(id)}
               w={BOX[id].w}
               h={bh}
               at={boxAt[id]}
@@ -217,18 +237,18 @@ export const DesignScene: React.FC = () => {
           );
         })}
         {/* Client and app server, both ways: the request, and tokens streamed back. */}
-        <Flow points={[[right("C") + 6, mid("C") - 18], [BOX.API.x - 8, mid("API") - 18]]} at={edgeAt} color={INK} head={13} />
-        <Flow points={[[BOX.API.x - 6, mid("C") + 18], [right("C") + 8, mid("C") + 18]]} at={edgeAt + 4} color={BAR} head={13} lit={streamAt} litOut={failAt - 4} />
-        <Note at={edgeAt + 10} x={right("C") + 8} y={mid("C") + 28}>
+        <Flow points={[[right("C") + 6, mid("C") - 18], [BOX.API.x - 8, mid("API") - 18]]} at={reqAt + 8} color={INK} head={13} />
+        <Flow points={[[BOX.API.x - 6, mid("C") + 18], [right("C") + 8, mid("C") + 18]]} at={backAt + 8} color={BAR} head={13} lit={streamAt} litOut={failAt - 4} />
+        <Note at={backAt + 14} x={right("C") + 8} y={mid("C") + 28}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>{streamLabel}</span>
         </Note>
-        <Flow points={[[right("API") + 6, mid("API")], [BOX.Q.x - 8, mid("Q")]]} at={edgeAt + 6} head={13} />
-        <Flow points={[[right("Q") + 6, mid("Q")], [BOX.Cache.x - 8, mid("Cache")]]} at={edgeAt + 10} head={13} lit={cacheAt} litOut={qualityAt - 4} />
-        <Flow points={[[cacheX, bottom("Cache") + 6], [cacheX, top("LLM") - 8]]} at={edgeAt + 14} head={13} lit={failAt} litOut={shapeAt - 4} />
-        <Note at={edgeAt + 18} x={cacheX - 14} y={y(510)} align="right">
+        <Flow points={[[right("API") + 6, mid("API")], [BOX.Q.x - 8, mid("Q")]]} at={quotaAt - 6} head={13} />
+        <Flow points={[[right("Q") + 6, mid("Q")], [BOX.Cache.x - 8, mid("Cache")]]} at={cacheBoxAt - 6} head={13} lit={cacheAt} litOut={qualityAt - 4} />
+        <Flow points={[[cacheX, bottom("Cache") + 6], [cacheX, top("LLM") - 8]]} at={missAt} head={13} lit={failAt} litOut={shapeAt - 4} />
+        <Note at={missAt + 4} x={cacheX - 14} y={y(510)} align="right">
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>{missLabel}</span>
         </Note>
-        <Flow points={[[BOX.LLM.x - 6, mid("LLM")], [right("V") + 8, mid("V")]]} at={edgeAt + 18} head={13} />
+        <Flow points={[[BOX.LLM.x - 6, mid("LLM")], [right("V") + 8, mid("V")]]} at={validAt - 6} head={13} />
         <Flow
           points={[
             [990, bottom("V") + 6],
@@ -236,13 +256,13 @@ export const DesignScene: React.FC = () => {
             [1170, loopY],
             [1170, bottom("LLM") + 8],
           ]}
-          at={edgeAt + 22}
+          at={validAt + 10}
           head={13}
           color={ACCENT_INK}
           lit={shapeAt}
           litOut={costAt - 4}
         />
-        <Note at={edgeAt + 26} x={1000} y={loopY + 8}>
+        <Note at={validAt + 14} x={1000} y={loopY + 8}>
           <span style={{ ...note(20, ACCENT_INK), whiteSpace: "nowrap" }}>{invalidLabel}</span>
         </Note>
         <Flow
@@ -251,7 +271,7 @@ export const DesignScene: React.FC = () => {
             [vToApiX, mid("V")],
             [vToApiX, bottom("API") + 8],
           ]}
-          at={edgeAt + 26}
+          at={backAt - 4}
           head={13}
           color={INK}
         />
@@ -284,7 +304,8 @@ export const DesignScene: React.FC = () => {
           const fy = y(f.v);
           return (
             <React.Fragment key={f.text}>
-              <div style={{ position: "absolute", left: cacheX + 10, top: fy + 13, width: (LABEL_X - 14 - cacheX - 10) * p, height: 1.6, background: INK_SOFT }} />
+              {/* A label level with the provider box leads from its edge, not across it. */}
+              <div style={{ position: "absolute", left: lead(fy), top: fy + 13, width: (LABEL_X - 14 - lead(fy)) * p, height: 1.6, background: INK_SOFT }} />
               <Ink at={f.at} dur={12} style={{ left: LABEL_X, top: fy }}>
                 <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{f.text}</span>
               </Ink>
@@ -294,16 +315,19 @@ export const DesignScene: React.FC = () => {
         <Note at={codesAt} x={LABEL_X} y={y(514)}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>on 429s and server errors</span>
         </Note>
-        <Note at={fallbackAt + 8} x={LABEL_X} y={y(612)}>
+        <Note at={stopsAt - 2} x={LABEL_X} y={y(576)}>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>stops calling a failing provider</span>
+        </Note>
+        <Note at={fallbackAt + 8} x={LABEL_X} y={y(640)}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>smaller model, cached answer,</span>
         </Note>
-        <Note at={fallbackAt + 20} x={LABEL_X} y={y(638)}>
+        <Note at={fallbackAt + 20} x={LABEL_X} y={y(666)}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>or a graceful &ldquo;try again&rdquo;</span>
         </Note>
 
         {/* Structured output: validate, retry or repair. */}
         <Ink at={trustAt} dur={12} style={{ left: BOX.V.x, top: y(800) }}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>never trust the shape</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Never trust the shape</span>
         </Ink>
 
         {/* Cost: a spend alert on the quota. */}

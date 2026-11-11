@@ -49,10 +49,10 @@ export const BiasScene: React.FC = () => {
   const valNineAt = n.word("overfit", "five point seven");
   const fixAt = n.word("overfit", "To fix it");
   const fixes = [
-    { text: "more data", at: n.word("overfit", "more data") },
-    { text: "a simpler model", at: n.word("overfit", "a simpler model") },
-    { text: "regularization", at: n.word("overfit", "regularization") },
-    { text: "early stopping", gloss: ": halt when validation error turns up", at: n.word("overfit", "early stopping") },
+    { text: "More data", at: n.word("overfit", "more data") },
+    { text: "A simpler model", at: n.word("overfit", "a simpler model") },
+    { text: "Regularization", at: n.word("overfit", "regularization") },
+    { text: "Early stopping", gloss: ": halt when validation error turns up", at: n.word("overfit", "early stopping") },
   ];
   // Cross-validation measures the gap rather than closing it, so it gets its
   // own line under the ticked fixes rather than a tick of its own.
@@ -107,7 +107,7 @@ export const BiasScene: React.FC = () => {
         {/* ── Left: three fits through twenty points ── */}
         <Fade from={asked - 8} out={fixAt - 4}>
           <PanelTitle x={FIT.left} y={y(FIT.top) - h(56)} at={pointsAt - 4}>
-            twenty noisy points from a sine wave
+            Twenty noisy points from a sine wave
           </PanelTitle>
           <Dots dots={dots} r={7} />
           <Curve points={curve("1")} x={fx} y={fy} at={lineAt + 2} dur={18} color={ACCENT} width={3} dash="10 8" clip={fitBox} dim={nineAt} />
@@ -126,7 +126,7 @@ export const BiasScene: React.FC = () => {
 
         {/* ── Right: the two errors against the degree ── */}
         <PanelTitle x={ERR.left} y={y(ERR.top) - h(64)} at={trainAt - 6}>
-          error, as the model gets more flexible
+          Error, as the model gets more flexible
         </PanelTitle>
         <Axes
           x={ex}
@@ -180,12 +180,12 @@ export const BiasScene: React.FC = () => {
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>{fmt(lastVal)}</span>
         </Note>
         <Note at={gapAt + 4} x={ERR.left} y={y(ERR.bottom) + h(84)}>
-          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>good on training data, poor on held-out data</span>
+          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>Good on training data, poor on held-out data</span>
         </Note>
 
         {/* ── The fixes, where the fits were ── */}
         {fixes.map((f, i) => {
-          const isReg = f.text === "regularization";
+          const isReg = f.text === "Regularization";
           const rowY = y(FIT.top) + h(10) + i * h(70);
           return (
             <Note key={f.text} at={f.at - 2} x={FIT.left} y={rowY} dim={isReg ? undefined : ownAt}>
@@ -193,7 +193,8 @@ export const BiasScene: React.FC = () => {
                 <Tick at={f.at + 2} size={26} color={OK} />
                 <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
                   {isReg ? <Mark at={oneAt}>{f.text}</Mark> : f.text}
-                  {f.gloss ? <span style={{ ...note(24, INK_SOFT) }}>{f.gloss}</span> : null}
+                  {/* Within 12% of the fix it glosses, so the line reads as one line. */}
+                  {f.gloss ? <span style={{ ...note(29, INK_SOFT) }}>{f.gloss}</span> : null}
                 </span>
               </div>
             </Note>
@@ -201,11 +202,11 @@ export const BiasScene: React.FC = () => {
         })}
         <Note at={cvAt - 2} x={FIT.left} y={y(FIT.top) + h(10) + fixes.length * h(70) + h(24)} dim={ownAt}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            measure with <b>cross-validation</b>, so the estimate is honest
+            Measure with <b>cross-validation</b>, so the estimate is honest
           </span>
         </Note>
         <Note at={fixAt} x={FIT.left} y={y(FIT.top) - h(56)} dim={ownAt}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>to fix it</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>To fix it</span>
         </Note>
       </Drift>
     </AbsoluteFill>

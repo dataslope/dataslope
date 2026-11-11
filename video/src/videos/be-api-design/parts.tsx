@@ -291,7 +291,7 @@ export const Node: React.FC<{
         height: h,
         boxSizing: "border-box",
         border: `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${t.line}`,
-        borderRadius: 12,
+        borderRadius: 8,
         background: fill ?? t.fill,
         display: "flex",
         flexDirection: "column",

@@ -108,7 +108,7 @@ const StreamBody: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <Console lines={S.out} x={R_X} top={top + lH + c.h(16)} width={360} at={c.w("r-stream", "Memory grows with the groups")} />
       <Line at={c.w("r-stream", "not the rows")} top={top + lH + c.h(96)}>
-        five rows in, <Mark at={c.w("r-stream", "here, two")}>two groups held</Mark>
+        Five rows in, <Mark at={c.w("r-stream", "here, two")}>two groups held</Mark>
       </Line>
     </>
   );
@@ -129,10 +129,10 @@ const PandasBody: React.FC<{ c: Ctx }> = ({ c }) => {
         <Mono color={BLUE_INK}>pandas</Mono>: fits in memory; vectorized columns, <Mono>groupby</Mono>, joins
       </Line>
       <Line at={gens} top={c.y(432)} color={OK_INK}>
-        generators: it streams, or it won&apos;t fit
+        Generators: it streams, or it won&apos;t fit
       </Line>
       <Line at={fits + 6} top={c.y(520)} color={INK_SOFT} size={22}>
-        the same totals by name, 1,000,000 rows: peak memory in Pyodide
+        The same totals by name, 1,000,000 rows: peak memory in Pyodide
       </Line>
       <Bars
         x={R_X}
@@ -188,11 +188,11 @@ const GroupbyBody: React.FC<{ c: Ctx }> = ({ c }) => {
 /** 18. The page's five pitfalls, each struck, with its fix. */
 const PitfallsBody: React.FC<{ c: Ctx }> = ({ c }) => {
   const items: { bad: React.ReactNode; fix: React.ReactNode; at: number }[] = [
-    { bad: <><Mono>x in a_list</Mono> in a loop</>, fix: <>a set</>, at: c.w("r-pitfalls", "membership tests against a list") },
+    { bad: <><Mono>x in a_list</Mono> in a loop</>, fix: <>A set</>, at: c.w("r-pitfalls", "membership tests against a list") },
     { bad: <><Mono>s += row</Mono> in a loop</>, fix: <><Mono>&quot;&quot;.join</Mono> once</>, at: c.w("r-pitfalls", "strings built with plus") },
-    { bad: <Mono>df.iterrows()</Mono>, fix: <>a column operation</>, at: c.w("r-pitfalls", "iter rows") },
-    { bad: <><Mono>pd.concat</Mono> row by row</>, fix: <>collect rows, build once</>, at: c.w("r-pitfalls", "a data frame grown concat by concat") },
-    { bad: <><Mono>f.read()</Mono> of a whole file</>, fix: <>stream it</>, at: c.w("r-pitfalls", "a whole file read") },
+    { bad: <Mono>df.iterrows()</Mono>, fix: <>A column operation</>, at: c.w("r-pitfalls", "iter rows") },
+    { bad: <><Mono>pd.concat</Mono> row by row</>, fix: <>Collect rows, build once</>, at: c.w("r-pitfalls", "a data frame grown concat by concat") },
+    { bad: <><Mono>f.read()</Mono> of a whole file</>, fix: <>Stream it</>, at: c.w("r-pitfalls", "a whole file read") },
   ];
   return (
     <>
@@ -211,7 +211,7 @@ const PitfallsBody: React.FC<{ c: Ctx }> = ({ c }) => {
         </Note>
       ))}
       <Line at={c.w("r-pitfalls", "iter rows") + 20} top={c.y(372) + 5 * c.h(66) + c.h(8)} color={INK_SOFT} size={22}>
-        the page: a column operation is often 10–100× faster than <Mono>iterrows</Mono>
+        The page: a column operation is often 10–100× faster than <Mono>iterrows</Mono>
       </Line>
     </>
   );
@@ -263,14 +263,14 @@ export const RapidScene: React.FC = () => {
 
         {/* ── The bridge: the same script, every night ── */}
         <Line at={togetherAt} top={y(400)}>
-          the script from these questions
+          The script from these questions
         </Line>
         <Line at={nightAt} top={y(460)}>
-          <Mark at={nightAt + 6}>every night, on a schedule</Mark>
+          <Mark at={nightAt + 6}>Every night, on a schedule</Mark>
         </Line>
         <Nights x={R_X + 400} top={y(460) + h(2)} at={nightAt + 8} />
         <Line at={pipelineAt} top={y(520)} color={OK_INK}>
-          <span style={{ fontWeight: 500 }}>a pipeline</span>
+          <span style={{ fontWeight: 500 }}>A pipeline</span>
         </Line>
         <NextLine at={nextAt} x={R_X} y={y(640)} width={900}>
           pipelines and systems

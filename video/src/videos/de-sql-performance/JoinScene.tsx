@@ -129,7 +129,7 @@ export const JoinScene: React.FC = () => {
           ]}
         />
         <Note at={reachAt + 4} x={R_X} y={y(TOP) + listingHeight(JOIN.december.length, 20) + h(24)}>
-          <div style={{ ...label(21, INK_SOFT) }}>orders into the join</div>
+          <div style={{ ...label(21, INK_SOFT) }}>Orders into the join</div>
           {/* The count on a line of its own, so it may stay large; what it
               is not, under it at the label's size. */}
           <div style={{ ...note(40, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
@@ -184,7 +184,7 @@ export const JoinScene: React.FC = () => {
                 })
               : null}
             <text x={bucketX(0)} y={diagY + 176} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, streamAt, 10)}>
-              the big side streams past, probing
+              The big side streams past, probing
             </text>
           </g>
 
@@ -216,13 +216,13 @@ export const JoinScene: React.FC = () => {
               ) : null;
             })}
             <text x={p2 + 300} y={diagY + 40} style={svgText(note(20, INK))} opacity={ease(frame, mergeAt + 6, 10)}>
-              both sorted on the key,
+              Both sorted on the key,
             </text>
             <text x={p2 + 300} y={diagY + 68} style={svgText(note(20, INK))} opacity={ease(frame, walksAt, 10)}>
               walked once, together
             </text>
             <text x={p2 + 300} y={diagY + 124} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, sortedAt, 10)}>
-              wins if already sorted,
+              Wins if already sorted,
             </text>
             <text x={p2 + 300} y={diagY + 152} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, memoryAt, 10)}>
               or too big to hash
@@ -264,10 +264,10 @@ export const JoinScene: React.FC = () => {
               );
             })}
             <text x={p3} y={diagY + 176} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, movingAt, 10) * (1 - ease(frame, togetherAt, 10))}>
-              the cost is moving rows between machines
+              The cost is moving rows between machines
             </text>
             <text x={p3} y={diagY + 176} style={svgText(note(20, INK))} opacity={ease(frame, togetherAt, 10)}>
-              bucketed by customer_id: matches sit together
+              Bucketed by customer_id: matches sit together
             </text>
           </g>
         </svg>

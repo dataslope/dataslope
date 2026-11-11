@@ -91,7 +91,10 @@ export const CompositeScene: React.FC = () => {
   const end = n.beat("composite-skip").to;
 
   // ── Phase A: the phone book ──
-  const bookOut = runAt - 8;
+  // The book holds through "An index on customer", so "every Ada" stays up
+  // well past the prefix beat; the strip and its statement draw after it.
+  const bookOut = runAt + 4;
+  const stripAt = runAt + 14;
   const bookTop = y(TOP) + h(14);
   const rowTop = (i: number) => bookTop + 46 + i * h(BOOK_ROW);
   const rowMid = (i: number) => rowTop(i) + h(BOOK_ROW) / 2;
@@ -120,7 +123,7 @@ export const CompositeScene: React.FC = () => {
   // Every second customer happens to have an order on the last day (drawn).
   const dayGroups = [0, 2, 3, 5, 7, 8];
 
-  const modeRun = ease(frame, runAt - 2, 12) * (1 - ease(frame, swapAt - 2, 10));
+  const modeRun = ease(frame, stripAt - 2, 12) * (1 - ease(frame, swapAt - 2, 10));
   const modeTime = ease(frame, swapAt, 12) * (1 - ease(frame, skipAt - 2, 10));
   const modeStatus = ease(frame, skipAt + 2, 12);
   const STATUSES = ["paid", "pending", "returned", "shipped"];
@@ -160,10 +163,10 @@ export const CompositeScene: React.FC = () => {
             <g opacity={ease(frame, sortsAt, 12)}>
               <line x1={lastX} x2={lastX + bookW} y1={bookTop} y2={bookTop} stroke={INK} strokeWidth={2} />
               <text x={lastX + 16} y={bookTop + 30} style={svgText(label(21, ease(frame, lastAt, 8) > 0.5 ? INK : INK_SOFT))}>
-                last name
+                Last name
               </text>
               <text x={firstX + 16} y={bookTop + 30} style={svgText(label(21, ease(frame, firstAt, 8) > 0.5 ? INK : INK_SOFT))}>
-                first name
+                First name
               </text>
               <line x1={lastX} x2={lastX + bookW} y1={bookTop + 44} y2={bookTop + 44} stroke={HAIRLINE} strokeWidth={1} />
             </g>
@@ -171,15 +174,17 @@ export const CompositeScene: React.FC = () => {
               const p = ease(frame, sortsAt + 4 + i * 2, 10);
               if (p <= 0) return null;
               const love = loves.includes(i) ? ease(frame, everyLoveAt + 2, 10) * (1 - ease(frame, adaLoveAt, 8)) : 0;
-              const single = i === adaLove ? ease(frame, adaLoveAt + 2, 10) * (1 - ease(frame, everyAdaAt, 8)) : 0;
+              // Ada Lovelace keeps its green outline when every Ada turns red:
+              // it is both the hit and one of the Adas.
+              const single = i === adaLove ? ease(frame, adaLoveAt + 2, 10) : 0;
               const ada = adas.includes(i) ? ease(frame, everyAdaAt + 4 + adas.indexOf(i) * 3, 8) : 0;
-              const band = love > 0 || single > 0 ? `color-mix(in srgb, ${OK} ${24 * Math.max(love, single)}%, transparent)` : ada > 0 ? `color-mix(in srgb, ${ACCENT} ${26 * ada}%, transparent)` : "none";
+              const band = ada > 0 ? `color-mix(in srgb, ${ACCENT} ${26 * ada}%, transparent)` : love > 0 || single > 0 ? `color-mix(in srgb, ${OK} ${24 * Math.max(love, single)}%, transparent)` : "none";
               // The first column's runs: a bar beside each group.
               const groupStart = i === 0 || BOOK[i - 1][0] !== last;
               const groupLen = BOOK.filter(([l]) => l === last).length;
               return (
                 <g key={i} opacity={p}>
-                  <rect x={lastX + 4} y={rowTop(i) + 3} width={bookW - 8} height={h(BOOK_ROW) - 6} rx={3} fill={band} />
+                  <rect x={lastX + 4} y={rowTop(i) + 3} width={bookW - 8} height={h(BOOK_ROW) - 6} rx={3} fill={band} stroke={single > 0.5 && ada > 0 ? OK : "none"} strokeWidth={2.5} />
                   {i > 0 ? <line x1={lastX} x2={lastX + bookW} y1={rowTop(i)} y2={rowTop(i)} stroke={`color-mix(in srgb, ${INK} 14%, transparent)`} /> : null}
                   <text x={lastX + 16} y={rowMid(i) + 8} style={svgText({ ...note(23, groupStart ? INK : INK_SOFT), fontWeight: groupStart ? 500 : 500 })}>
                     {last}
@@ -205,11 +210,11 @@ export const CompositeScene: React.FC = () => {
             <line x1={lastX} x2={lastX + bookW} y1={rowTop(BOOK.length)} y2={rowTop(BOOK.length)} stroke={INK} strokeWidth={1.5} opacity={ease(frame, sortsAt + 20, 10)} />
           </Svg>
           <Note at={secondAt + 6} x={lastX + bookW + 40} y={rowTop(0) - h(2)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>sorted by last name; within each, by first</span>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Sorted by last name; within each, by first</span>
           </Note>
           <Note at={everyLoveAt + 2} x={720} y={rowMid(loves[0]) - h(64)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              <b style={{ color: OK_INK }}>every Lovelace:</b> one run
+              <b style={{ color: OK_INK }}>Every Lovelace:</b> one run
             </span>
           </Note>
           <Note at={adaLoveAt + 2} x={720} y={rowMid(adaLove) - h(14)}>
@@ -219,48 +224,46 @@ export const CompositeScene: React.FC = () => {
           </Note>
           <Note at={everyAdaAt + 4} x={720} y={rowMid(loves[2]) + h(44)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              <b style={{ color: ACCENT_INK }}>every Ada:</b> scattered through the book
+              <b style={{ color: ACCENT_INK }}>Every Ada:</b> scattered through the book
             </span>
           </Note>
         </div>
-        <Spot art="phoneBook" at={bookAt} out={runAt - 24} left={1540} top={y(480)} width={200} />
+        <Spot art="phoneBook" at={bookAt} out={runAt + 2} left={1540} top={y(480)} width={200} />
 
         {/* ── Phase B: the statements, top left and top right ── */}
-        <Listing lines={COMPOSITE.create} x={X0} top={listTop} width={720} size={20} at={runAt} out={swapAt - 4} marks={[{ line: "ON orders", text: "(customer_id, created_at)", at: runAt + 10 }]} />
+        <Listing lines={COMPOSITE.create} x={X0} top={listTop} width={720} size={20} at={stripAt} out={swapAt - 4} marks={[{ line: "ON orders", text: "(customer_id, created_at)", at: stripAt + 10 }]} />
         <Listing lines={COMPOSITE.query} x={960} top={listTop} width={720} size={20} at={fortyTwoAt - 4} out={dayAt - 4} marks={[{ line: "WHERE", at: fortyTwoAt + 6 }, { line: "ORDER BY", at: newestAt }]} />
-        <Listing lines={COMPOSITE.dayQuery} x={960} top={listTop} width={720} size={20} at={dayAt} out={swapAt - 4} marks={[{ line: "WHERE", at: dayAt + 8, color: MARK_RED }]} />
+        <Listing lines={COMPOSITE.dayQuery} x={960} top={listTop} width={720} size={20} at={dayAt} out={swapAt - 4} marks={[{ line: "WHERE", at: dayAt + 8, color: MARK_RED }, { line: "AND", at: dayAt + 12, color: MARK_RED }]} />
         <Listing lines={COMPOSITE.reverse} x={X0} top={listTop} width={720} size={20} at={swapAt} out={skipAt - 4} marks={[{ line: "ON orders", text: "(created_at, customer_id)", at: swapAt + 10 }]} />
         <Listing lines={COMPOSITE.query} x={960} top={listTop} width={720} size={20} at={sameAt - 4} out={skipAt - 4} marks={[{ line: "WHERE", at: sameAt + 4 }]} />
         <Listing lines={COMPOSITE.skip} x={X0} top={listTop} width={720} size={20} at={statusAt - 4} marks={[{ line: "ON orders", text: "(status, created_at)", at: statusAt + 6 }]} />
-        <Listing lines={COMPOSITE.dayQuery} x={960} top={listTop} width={720} size={20} at={statusAt} marks={[{ line: "WHERE", at: fiveAt - 4 }]} />
+        <Listing lines={COMPOSITE.dayQuery} x={960} top={listTop} width={720} size={20} at={statusAt} marks={[{ line: "WHERE", at: fiveAt - 4 }, { line: "AND", at: fiveAt }]} />
 
         {/* ── The strip: the index's entries, in index order ── */}
-        <Note at={runAt + 4} x={STRIP_X} y={stripY - h(80)} out={swapAt - 2}>
+        <Note at={stripAt + 4} x={STRIP_X} y={stripY - h(80)} out={swapAt - 2}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            index entries in order: <span style={{ color: INK }}>by customer, then time</span>
+            Index entries in order: <span style={{ color: INK }}>by customer, then time</span>
           </span>
         </Note>
         <Note at={swapAt + 4} x={STRIP_X} y={stripY - h(80)} out={skipAt - 2}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            index entries in order: <span style={{ color: INK }}>by time, then customer</span>
+            Index entries in order: <span style={{ color: INK }}>by time, then customer</span>
           </span>
         </Note>
         <Note at={statusAt} x={STRIP_X} y={stripY - h(80)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            index entries in order: <span style={{ color: INK }}>by status, then time</span>
+            Index entries in order: <span style={{ color: INK }}>by status, then time</span>
           </span>
         </Note>
         <Svg>
           <rect
             x={STRIP_X}
             y={stripY}
-            width={STRIP_W * ease(frame, runAt, 18)}
+            width={STRIP_W * ease(frame, stripAt, 18)}
             height={stripH}
-            rx={6}
+            rx={4}
             fill={`color-mix(in srgb, ${BAR} 8%, ${PAPER})`}
-            stroke={`color-mix(in srgb, ${BAR} 45%, ${PAPER})`}
-            strokeWidth={1.5}
-            opacity={ease(frame, runAt, 6)}
+            opacity={ease(frame, stripAt, 6)}
           />
 
           {/* (customer_id, created_at): one run per customer */}
@@ -269,8 +272,9 @@ export const CompositeScene: React.FC = () => {
               <g key={c}>
                 {g > 0 ? <line x1={STRIP_X + g * groupW} x2={STRIP_X + g * groupW} y1={stripY - 6} y2={stripY + stripH + 6} stroke={INK_SOFT} strokeWidth={1.5} /> : null}
                 {Array.from({ length: 20 }, (_, k) => {
-                  const lit42 = g === g42 ? ease(frame, fortyTwoAt + 4, 10) : 0;
-                  const read = g === g42 && k >= 10 ? ease(frame, newestAt + (19 - k) * 2, 6) : 0;
+                  const dayOff = 1 - ease(frame, dayAt, 10);
+                  const lit42 = g === g42 ? ease(frame, fortyTwoAt + 4, 10) * dayOff : 0;
+                  const read = g === g42 && k >= 10 ? ease(frame, newestAt + (19 - k) * 2, 6) * dayOff : 0;
                   const day = dayGroups.includes(g) && k === 19 ? ease(frame, dayAt + 8 + g * 2, 8) : 0;
                   const fill = read > 0 ? inkOf.yellow : day > 0 ? ACCENT : lit42 > 0 ? BAR : `color-mix(in srgb, ${BAR} 45%, ${PAPER})`;
                   return <rect key={k} x={tick(g, k) - 2.5} y={stripY + 10} width={5} height={stripH - 20} rx={2} fill={fill} />;
@@ -336,8 +340,14 @@ export const CompositeScene: React.FC = () => {
           {Array.from({ length: COMPOSITE.skipSearches }, (_, k) => {
             const x = k < STATUSES.length ? STRIP_X + (k + 1) * runW - 21 : STRIP_X + STRIP_W + 26;
             const p = ease(frame, fiveAt + 2 + k * 4, 8);
+            const last = k === STATUSES.length;
             return (
               <g key={k} opacity={p}>
+                {last ? (
+                  <text x={x} y={stripY - h(34) - 12} textAnchor="middle" style={svgText({ ...label(20, OK_INK), fontWeight: 500 })}>
+                    end
+                  </text>
+                ) : null}
                 <line x1={x} x2={x} y1={stripY - h(34)} y2={stripY - h(34) + (h(34) - 6) * p} stroke={OK} strokeWidth={3} />
                 <path d={`M${x - 7},${stripY - 16} L${x},${stripY - 4} L${x + 7},${stripY - 16} Z`} fill={OK} />
               </g>
@@ -352,11 +362,11 @@ export const CompositeScene: React.FC = () => {
         ]} />
         <Note at={thirteenAt} x={NOTE_X} y={planTop + h(4)} out={dayAt - 4}>
           <div style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{COMPOSITE.latestPages} pages</div>
-          <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(10), opacity: ease(frame, noSortAt, 10) }}>newest first, no Sort node</div>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(10), opacity: ease(frame, noSortAt, 10) }}>Newest first, no Sort node</div>
         </Note>
         <PlanBox lines={dayShown} x={X0} top={planTop} width={1260} size={19} at={dayAt + 4} out={swapAt - 4} marks={[{ line: "Seq Scan", text: "Seq Scan", at: tableAt, color: MARK_RED }]} />
         <Note at={tableAt + 4} x={NOTE_X} y={planTop + h(4)} out={swapAt - 4}>
-          <div style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one day, in every run:</div>
+          <div style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>One day, scattered across runs:</div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(6) }}>
             <Num>{thousands(COMPOSITE.dayCount)}</Num> orders, read from the table
           </div>
@@ -368,7 +378,7 @@ export const CompositeScene: React.FC = () => {
         </Note>
         <Note at={ruleAt} x={NOTE_X} y={planTop + h(4)} out={skipAt - 4}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Order the columns:</div>
-          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, equalityAt, 10) }}>equality first,</div>
+          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, equalityAt, 10) }}>Equality first,</div>
           <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(4), opacity: ease(frame, rangeAt, 10) }}>then range or sort</div>
         </Note>
         <PlanBox lines={skipShown} x={X0} top={planTop} width={1260} size={19} at={statusAt + 4} marks={[
@@ -381,7 +391,10 @@ export const CompositeScene: React.FC = () => {
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, fewAt, 10) }}>
             when <SmallMono>status</SmallMono> has few values
           </div>
-          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, neverAt, 10) }}>never touched the table</div>
+          <div style={{ ...note(22, INK), whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, fiveAt + 4, 10) }}>
+            <Num>{COMPOSITE.skipSearches}</Num> searches: <Num>{STATUSES.length}</Num> statuses + the end
+          </div>
+          <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, neverAt, 10) }}>Never touched the table</div>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -72,7 +72,7 @@ export const Type0Scene: React.FC = () => {
   const sent = TYPE0.mixStaged.rows[0][TYPE0.mixStaged.cols.indexOf("signup_date")];
 
   const columns = [
-    { name: "customer_key", type: "surrogate key", at: perAt + 4, lit: undefined },
+    { name: "customer_key", type: "Surrogate key", at: perAt + 4, lit: undefined },
     { name: "signup_date", type: "Type 0: never changes", at: zeroAt - 2, lit: zeroAt },
     { name: "city", type: "Type 2: a new version", at: twoAt - 2, lit: twoAt },
   ];
@@ -108,7 +108,7 @@ export const Type0Scene: React.FC = () => {
           width={listW}
           size={SIZE}
           at={onceAt - 2}
-          title="first load (customer_id is the primary key)"
+          title="First load (customer_id is the primary key)"
           marks={[{ line: lineOf(F.lines, "ON CONFLICT"), at: ignoreAt, out: secondAt }]}
         />
         <Note at={onceAt + 12} x={X0 + listW + 24} y={firstTop + h(44)}>
@@ -123,7 +123,7 @@ export const Type0Scene: React.FC = () => {
           width={listW}
           size={SIZE}
           at={secondAt - 2}
-          title="a later load"
+          title="A later load"
           marks={[
             { line: lineOf(L.lines, laterDate), at: secondAt + 8 },
             { line: lineOf(L.lines, "ON CONFLICT"), at: nothingAt, color: MARK_OK },
@@ -153,7 +153,7 @@ export const Type0Scene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>ignored</span>
         </Note>
         <Note at={standsAt + 26} x={TABLE_X} y={g.rowTop(1) + h(20)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the first value stands</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The first value stands</span>
         </Note>
 
         {/* In a Type 2 dimension: each new version copies the date. */}
@@ -175,13 +175,13 @@ export const Type0Scene: React.FC = () => {
         />
         <Note at={sourceAt} x={TABLE_X} y={gm.rowTop(M.rows.length) + h(16)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            the source sent {sent}: ignored
+            The source sent {sent}: ignored
           </span>
         </Note>
 
         {/* Types are per column: one row, each column with its own. */}
         <Note at={perAt} x={X0} y={stripY - h(42)}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>one customer row, a type per column</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>One customer row, a type per column</span>
         </Note>
         {/* Three columns of plain text, a column's name over its type,
             with a hairline in each gap that inks in with the column to its

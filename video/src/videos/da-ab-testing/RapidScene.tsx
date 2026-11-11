@@ -186,11 +186,11 @@ const Novelty: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={primacyAt - 2} x={at(x, 3)} y={c.y(PLOT.top) + c.h(10)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <b>primacy effect</b>: the reverse, a change resisted at first
+          <b>Primacy effect</b>: the reverse, a change resisted at first
         </span>
       </Note>
       <Note at={longAt - 2} x={at(x, 3)} y={c.y(PLOT.top) + c.h(56)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>run it long enough to settle</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Run it long enough to settle</span>
       </Note>
       {/* Below the 10% gridline, clear of both curves. */}
       <Note at={checkAt - 2} x={at(x, 3)} y={c.y(PLOT.top) + c.h(162)}>
@@ -264,7 +264,7 @@ const Cohorts: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={blendedAt - 2} x={PLOT.x0 - 60} y={c.y(PLOT.base) + c.h(96)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          one blended retention number hides this
+          One blended retention number hides this
           <span style={{ opacity: ease(frame, acquisitionAt - 4, 10) }}>: it moves whenever acquisition does</span>
         </span>
       </Note>

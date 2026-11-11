@@ -58,8 +58,8 @@ export const FeedScene: React.FC = () => {
   const loadAt = n.word("q12-pull", "every load reads three hundred timelines");
   const readAt = n.word("q12-why", "Feeds are read far more often than people post");
   const winsAt = n.word("q12-why", "push usually wins");
-  const onceAt = n.word("q12-why", "once per post");
-  const everyLoadAt = n.word("q12-why", "not on every load");
+  const onceAt = n.word("q12-pays", "pays its writes once");
+  const everyLoadAt = n.word("q12-pays", "pull pays its reads on every load");
   const mixAt = n.word("q12-hybrid", "real systems mix them");
   const ordinaryAt = n.word("q12-hybrid", "push for ordinary accounts");
   const celebsAt = n.word("q12-hybrid", "pull for celebrities");
@@ -99,6 +99,7 @@ export const FeedScene: React.FC = () => {
   const edge = BAR;
   const edgeW = 2.4;
   const tenfold = roundTo(TRAFFIC.peak, 2);
+  const BRACKET_X = G.app.x + G.app.w + 34;
 
   return (
     <AbsoluteFill>
@@ -163,7 +164,7 @@ export const FeedScene: React.FC = () => {
                   left: PUSH.feed.x + PUSH.feed.w + 14,
                   top: m - 16 - (1 - drop(i)) * 20,
                   padding: "3px 9px",
-                  borderRadius: 7,
+                  borderRadius: 5,
                   background: BAR,
                   ...label(19, PAPER),
                   fontWeight: 500,
@@ -176,10 +177,10 @@ export const FeedScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Line at={lookupAt} x={X0} y={y(640)} size={22} color={OK_INK} weight={500} out={feedOut}>
-          reading a feed: one cheap lookup
+          Reading a feed: one cheap lookup
         </Line>
         <Line at={perAt} x={X0} y={y(690)} size={22} out={hybridIn}>
-          cost per post: one write per follower
+          Cost per post: one write per follower
         </Line>
         <Line at={twoHAt} x={X0} y={y(736)} size={22} out={hybridIn}>
           <Num>{FEED.ordinaryFollowers}</Num> followers: <b><Num>{FEED.pushWritesOrdinary}</Num> writes</b>
@@ -226,16 +227,16 @@ export const FeedScene: React.FC = () => {
         <Flow points={[[PULL.x + g.cols * (g.cell + g.gap) + 10, y(PULL.feed.mid)], [PULL.feed.x - 8, y(PULL.feed.mid)]]} at={buildsAt + 10} color={gather > 0.5 ? ACCENT : BAR} width={2.4 + gather * 2} out={feedOut} />
         <Node x={PULL.feed.x} y={y(PULL.feed.mid) - PULL.feed.h / 2} w={PULL.feed.w} h={PULL.feed.h} at={buildsAt + 12} tone="data" title="your feed" sub="built on request" size={22} out={feedOut} />
         <Line at={cheapAt} x={PULL.feed.x} y={y(PULL.feed.mid) + PULL.feed.h / 2 + h(20)} size={20} color={INK_SOFT} out={feedOut}>
-          posting is cheap
+          Posting is cheap
         </Line>
         <Line at={loadAt + 6} x={PULL.x} y={y(690)} size={22} weight={500} color={ACCENT_INK} out={hybridIn}>
-          every load: <Num>{FEED.pullReads}</Num> reads
+          Every load: <Num>{FEED.pullReads}</Num> reads
         </Line>
 
         {/* ── Why push usually wins. ── */}
         <Line at={readAt} x={X0} y={y(850)} size={22} weight={500} out={hybridIn}>
           Feeds are read far more often than people post:
-          <span style={{ color: OK_INK, opacity: ease(frame, onceAt, 10) }}> push works once per post</span>
+          <span style={{ color: OK_INK, opacity: ease(frame, onceAt, 10) }}> push pays once per post</span>
           <span style={{ color: ACCENT_INK, opacity: ease(frame, everyLoadAt, 10) }}>, pull on every load</span>
         </Line>
         {why > 0 ? (
@@ -269,7 +270,7 @@ export const FeedScene: React.FC = () => {
           </span>
         </Ink>
         <Node x={G.client.x} y={gm - 32} w={G.client.w} h={64} at={designAt} tone="plain" title="client" size={21} lit={lit(0)} />
-        <Node x={G.limit.x} y={gm - 32} w={G.limit.w} h={64} at={designAt + 2} tone="plain" title="rate limiter" size={21} lit={lit(1)} />
+        <Node x={G.limit.x} y={gm - 37} w={G.limit.w} h={74} at={designAt + 2} tone="plain" title="rate limiter" sub="shared count" size={21} lit={lit(1)} />
         <Node x={G.lb.x} y={gm - 32} w={G.lb.w} h={64} at={designAt + 4} tone="plain" title="load balancer" size={21} lit={lit(2)} />
         {Array.from({ length: G.app.n }, (_, k) => (
           <Node key={k} x={G.app.x} y={appMid(k) - G.app.h / 2} w={G.app.w} h={G.app.h} at={designAt + 6 + k} tone="plain" title="app" size={19} lit={lit(3)} />
@@ -301,9 +302,15 @@ export const FeedScene: React.FC = () => {
             head={10}
           />
         ))}
-        <Flow points={[[G.app.x + G.app.w + 6, appMid(0)], [G.app.x + G.app.w + 40, appMid(0)], [G.app.x + G.app.w + 40, y(G.cache.mid)], [G.cache.x - 8, y(G.cache.mid)]]} at={designAt + 14} color={edge} width={edgeW} glow={api} head={12} />
-        <Flow points={[[G.app.x + G.app.w + 6, appMid(2) + 14], [G.queue.x - 8, appMid(2) + 14]]} at={designAt + 16} color={edge} width={edgeW} glow={api} head={12} />
-        <Flow points={[[G.app.x + G.app.w + 6, appMid(5)], [G.store.x - 8, appMid(5)]]} at={designAt + 18} color={edge} width={edgeW} glow={api} head={12} />
+        {/* Every app server reaches the cache, the queue and the shards: a short
+            stub from each into one bracket, and the three arrows leave that. */}
+        {Array.from({ length: G.app.n }, (_, k) => (
+          <Flow key={k} points={[[G.app.x + G.app.w + 6, appMid(k)], [BRACKET_X, appMid(k)]]} at={designAt + 12} dur={8} color={edge} width={edgeW - 0.4} glow={api} head={0} />
+        ))}
+        <Flow points={[[BRACKET_X, appMid(0)], [BRACKET_X, appMid(G.app.n - 1)]]} at={designAt + 13} color={edge} width={edgeW} glow={api} head={0} />
+        <Flow points={[[BRACKET_X, y(G.cache.mid)], [G.cache.x - 8, y(G.cache.mid)]]} at={designAt + 14} color={edge} width={edgeW} glow={api} head={12} />
+        <Flow points={[[BRACKET_X, y(G.queue.mid)], [G.queue.x - 8, y(G.queue.mid)]]} at={designAt + 16} color={edge} width={edgeW} glow={api} head={12} />
+        <Flow points={[[BRACKET_X, y(G.store.mid)], [G.store.x - 8, y(G.store.mid)]]} at={designAt + 18} color={edge} width={edgeW} glow={api} head={12} />
         <Flow
           points={[
             [G.queue.x + G.queue.w + 6, y(G.queue.mid)],
@@ -319,7 +326,7 @@ export const FeedScene: React.FC = () => {
         />
         <Ink at={apiAt + 4} dur={14} style={{ left: G.cache.x + G.cache.w + 50, top: y(G.cache.mid) - 18, whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, INK), fontWeight: 500 }}>
-            every arrow: <Mark at={apiAt + 6}>an API</Mark>
+            Every arrow: <Mark at={apiAt + 6}>an API</Mark>
           </span>
         </Ink>
         <NextLine at={nextAt} x={X0} y={y(820)} width={900}>

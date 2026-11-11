@@ -313,7 +313,7 @@ export const PromptScene: React.FC = () => {
                       share the row's one line, so they share one face. */}
                   {deeper > 0 ? (
                     <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", ...note(30, INK_SOFT), opacity: deeper, whiteSpace: "nowrap" }}>
-                      a level deeper than an analyst screen
+                      A level deeper than an analyst screen
                     </div>
                   ) : null}
                 </div>
@@ -339,7 +339,7 @@ export const PromptScene: React.FC = () => {
           </svg>
         ) : null}
         <div style={{ position: "absolute", left: DESIGN_X + 6, top: designTop, width: 1900 - DESIGN_X }}>
-          <div style={{ ...body(32, true), color: INK, whiteSpace: "nowrap", opacity: ease(frame, designAt - 2, 12) }}>design a pipeline for X</div>
+          <div style={{ ...body(32, true), color: INK, whiteSpace: "nowrap", opacity: ease(frame, designAt - 2, 12) }}>Design a pipeline for X</div>
           <div style={{ ...label(21, BLUE_INK), marginTop: 8, opacity: ease(frame, elevenAt - 2, 12) }}>
             <PartsLabel parts={[partOf("de-pipelines-for-ai")]} /> walks one through
           </div>

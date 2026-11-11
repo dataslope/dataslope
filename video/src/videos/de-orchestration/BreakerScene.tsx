@@ -196,19 +196,19 @@ export const BreakerScene: React.FC = () => {
           <circle cx={badX} cy={midY} r={106 + 8 * ring} fill="none" stroke={ACCENT} strokeWidth={2.4} opacity={ease(frame, oneAt, 10) * (0.5 + 0.5 * ring)} strokeDasharray="6 5" />
         </svg>
         <Note at={oneAt + 6} x={badX - 100} y={midY + h(116)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>stays one bad table</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Stays one bad table</span>
         </Note>
         <Note at={spreadAt + 4} x={downX - 92} y={downY(DOWN.length - 1) + h(40)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>downstream untouched</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Downstream untouched</span>
         </Note>
         <Note at={fastAt + 4} x={X0} y={y(262)}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            in a pipeline: fail fast<span style={{ opacity: ease(frame, alertAt, 8) }}>, alert</span>
+            In a pipeline: fail fast<span style={{ opacity: ease(frame, alertAt, 8) }}>, alert</span>
             <span style={{ opacity: ease(frame, haltAt, 8) }}>, halt</span>
           </span>
         </Note>
         <Note at={pointAt} x={X0} y={y(760)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>in services, the point isn&apos;t failing faster:</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>In services, the point isn&apos;t failing faster:</span>
         </Note>
         <Note at={loadAt} x={X0} y={y(800)}>
           <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>stop the load on what can&apos;t recover under it</span>
@@ -216,11 +216,11 @@ export const BreakerScene: React.FC = () => {
 
         {/* The name's home: a failing dependency, a model. */}
         <div style={{ position: "absolute", left: TX0, top: errTop - h(44), ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
-          error rate at the dependency
+          Error rate at the dependency
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, modelAt, 10) }}> · a service&apos;s breaker, a model</span>
         </div>
         <div style={{ position: "absolute", left: TX0, top: reqTop - h(44), ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
-          requests per second reaching it
+          Requests per second reaching it
         </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: chartIn }}>
           {/* The breaker's states, across both panels. */}

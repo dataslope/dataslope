@@ -135,19 +135,19 @@ const Cte: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Listing lines={S.lines} x={R_X} top={c.T} width={600} size={SIZE} at={at - 4} marks={[{ line: lineOf(S.lines, "FROM (SELECT"), at: at + 10 }]} />
       <Note at={at + 10} x={R_X} y={under(c, S.lines.length) - c.h(6)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the step, nested inside</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>The step, nested inside</span>
       </Note>
       <Listing lines={C.lines} x={R_X} top={cteTop} width={600} size={SIZE} at={namesAt - 4} marks={[{ line: lineOf(C.lines, "WITH user_totals"), at: namesAt + 8, color: MARK_OK }]} />
       <Note at={twiceAt - 2} x={R_X} y={under(c, C.lines.length, cteTop) - c.h(6)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the step, named first: read top to bottom, usable twice</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>The step, named first: read top to bottom, usable twice</span>
       </Note>
       <Note at={sameAt - 4} x={R_X + 680} y={c.T}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>both return</span>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Both return</span>
       </Note>
       <DataTable g={rg} cols={colsOf(C)} at={sameAt - 2} rows={rowsAt(C.rows, sameAt + 2, 3)} bands={C.rows.map((_, row) => ({ row, at: sameAt + 10 + row * 2, color: MARK_OK }))} />
       <Note at={sameAt + 8} x={R_X + 680} y={rg.rowTop(C.rows.length) + c.h(16)}>
         <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          the page&apos;s orders, totals over <Num>{RAPID.threshold}</Num>
+          The page&apos;s orders, totals over <Num>{RAPID.threshold}</Num>
         </div>
         <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>
           ({RAPID.pagePasses === 0 ? "none" : <Num>{RAPID.pagePasses}</Num>} passes the page&apos;s <Num>{RAPID.pageThreshold}</Num>)
@@ -201,7 +201,7 @@ const Union: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={preferAt - 2} x={ag2.right + 50} y={resultTop + c.h(102)}>
-        <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", fontWeight: 500 }}>the default, unless you need the dedup</span>
+        <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", fontWeight: 500 }}>The default, unless you need the dedup</span>
       </Note>
     </>
   );
@@ -257,7 +257,7 @@ const Lag: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={edgesAt} x={g.right + 30} y={g.rowTop(0)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>nothing before the first day:</span>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Nothing before the first day:</span>
         <br />
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, zeroAt - 2, 10) }}>
           <QMono>LAG(revenue, 1, 0)</QMono> gives 0
@@ -265,12 +265,12 @@ const Lag: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={nullAt} x={g.right + 30} y={g.rowTop(last)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          nothing after: <QMono>LEAD</QMono> gives null
+          Nothing after: <QMono>LEAD</QMono> gives null
         </span>
       </Note>
       <Note at={deltaAt + 4} x={R_X} y={g.rowTop(L.rows.length) + c.h(22)}>
         <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
-          in a delta, the <Num>{L.rows[0][prev]}</Num> makes day one a jump of <Num>{L.rows[0][delta]}</Num>: leave it null there
+          In a delta, the <Num>{L.rows[0][prev]}</Num> makes day one a jump of <Num>{L.rows[0][delta]}</Num>: leave it null there
         </span>
       </Note>
     </>
@@ -317,10 +317,10 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={R.rows.map((_, row) => ({ row, col: rt, at: framedAt + 4 + row * 3, color: MARK_OK }))}
       />
       <Note at={at + 8} x={rg.x} y={rg.rowTop(R.rows.length) + c.h(10)}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>the page&apos;s orders, user 1</span>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>The page&apos;s orders, user 1</span>
       </Note>
       <TableName g={tg} at={leaveAt - 2}>
-        no frame written, two rows on one day
+        No frame written, two rows on one day
       </TableName>
       <DataTable
         g={tg}
@@ -333,7 +333,7 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={rangeAt} x={R_X} y={under(c, R.lines.length) + c.h(10)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>with no frame written:</span>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>With no frame written:</span>
         <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
           RANGE BETWEEN UNBOUNDED PRECEDING{"\n"}  AND CURRENT ROW
         </div>
@@ -377,18 +377,18 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
       <DataTable g={g} cols={colsOf(P, { mobile: { ink: BLUE_INK }, desktop: { ink: BLUE_INK } })} at={groupedAt - 2} rows={rowsAt(P.rows, groupedAt + 2)} />
       <Note at={clauseAt - 4} x={sideX} y={g.rowTop(0) - c.h(34)}>
         <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
-          a <QMono>PIVOT</QMono> clause
+          A <QMono>PIVOT</QMono> clause
         </span>
       </Note>
       <Note at={clauseAt - 2} x={sideX} y={g.rowTop(0) + c.h(4)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Snowflake, SQL Server, DuckDB</span>
       </Note>
       <Note at={notAt - 2} x={sideX} y={g.rowTop(0) + c.h(50)}>
-        <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>not Postgres</span>
+        <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>Not Postgres</span>
       </Note>
       <Note at={dynamicAt - 2} x={R_X} y={g.rowTop(P.rows.length) + c.h(34)}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-          unknown values: the <QMono>CASE</QMono> version needs dynamic SQL
+          Unknown values: the <QMono>CASE</QMono> version needs dynamic SQL
         </span>
       </Note>
     </>
@@ -560,7 +560,7 @@ const Percent: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={valuesAt + 4} x={g.right + 40} y={g.rowTop(2) + c.h(16)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          the 20s: rank 2 of 4, and 3 of 4 rows at or below
+          The 20s: rank 2 of 4, and 3 of 4 rows at or below
         </span>
       </Note>
     </>

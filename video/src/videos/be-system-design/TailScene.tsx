@@ -14,12 +14,18 @@ const HX0 = X0;
 const HX1 = 1700;
 const SQ = 12;
 const SQ_GAP = 3.5;
+/** The tail is drawn this many times taller from MAG_FROM ms on, so its
+ *  bins (10 to 24 requests each, against a peak of 7,744) can be seen. */
+const MAG = 100;
+const MAG_FROM = 100;
 
 /**
  * Question 2, the habit: latency quoted as a percentile, never a mean.
  * charts/latency-percentiles.mjs's simulated sample (its seed, 40,000 draws,
  * check.mjs), binned as the chart bins it: the median 24 ms, the mean 31,
- * pulled right by the tail, and the 99th percentile 286 ms. Then a page of a
+ * pulled right by the tail, and the 99th percentile 286 ms. Past 100 ms the
+ * bars grow a hundred times taller, so the tail the mean hides is seen, and
+ * the requests past the chart's 320 ms edge are counted beside it. Then a page of a
  * hundred calls, each with a one-in-a-hundred chance of the tail: at least
  * one on 63% of loads.
  */
@@ -56,6 +62,10 @@ export const TailScene: React.FC = () => {
     return p > 0 ? <line x1={sx(ms)} x2={sx(ms)} y1={base - (base - from) * p} y2={base} stroke={color} strokeWidth={3} strokeDasharray={dash} /> : null;
   };
 
+  // The tallest magnified bin, and the note over it.
+  const magPeak = Math.max(...P.counts.filter((_, i) => lo + i * bw >= MAG_FROM));
+  const magTop = base - ((magPeak * MAG) / peak) * (base - top) - 44;
+
   const sqY = y(752);
   const sqX = (i: number) => X0 + i * (SQ + SQ_GAP);
   const slow = 63;
@@ -73,7 +83,7 @@ export const TailScene: React.FC = () => {
 
       <Drift from={from} to={end + 30}>
         <Kicker at={from}>Question 2 · Back-of-the-envelope numbers</Kicker>
-        <Headline lead="A percentile," turn="never a mean." at={quoteAt - 4} turnAt={quoteAt + 18} size={70} />
+        <Headline lead="A percentile," turn="never a mean" at={quoteAt - 4} turnAt={quoteAt + 18} size={70} />
 
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           {/* The tail past the p99. */}
@@ -86,7 +96,9 @@ export const TailScene: React.FC = () => {
           />
           {P.counts.map((c, i) => {
             const p = ease(frame, sampleAt + 2 + i * 0.6, 12);
-            const h = (base - hy(c)) * p;
+            // The tail grows to MAG times its height as it is named.
+            const mag = lo + i * bw >= MAG_FROM ? 1 + (MAG - 1) * ease(frame, oneAt, 18) : 1;
+            const h = (base - hy(c)) * p * mag;
             if (c === 0) return null;
             return (
               <rect
@@ -112,6 +124,8 @@ export const TailScene: React.FC = () => {
           <text x={HX1} y={base + 62} textAnchor="end" style={svgText({ ...label(20, INK_SOFT) })} opacity={ease(frame, sampleAt + 8, 12)}>
             milliseconds
           </text>
+          {/* Where the magnified tail starts. */}
+          <line x1={sx(MAG_FROM)} x2={sx(MAG_FROM)} y1={base} y2={magTop} stroke={INK_SOFT} strokeWidth={1.4} strokeDasharray="4 5" opacity={ease(frame, oneAt + 6, 12)} />
           {rule(P.marks.median, medianAt, rowA - 4, INK)}
           {rule(P.marks.mean, meanAt, rowB - 4, INK_SOFT, "6 5")}
           {rule(P.marks.p99, p99At, rowA - 4, ACCENT)}
@@ -129,8 +143,14 @@ export const TailScene: React.FC = () => {
         <Line x={sx(P.marks.p99) - 14} y={rowB} at={oneAt + 4} size={24} weight={500} color={ACCENT_INK} align="right">
           one request in a hundred, or slower
         </Line>
+        <Line x={sx(MAG_FROM) + 12} y={magTop - 6} at={oneAt + 6} size={21} weight={500} color={INK_SOFT}>
+          from <Num>{MAG_FROM}</Num> ms on, drawn <Num>{MAG}</Num> times taller
+        </Line>
+        <Line x={sx(P.marks.p99) - 14} y={rowB + 46} at={p99At + 14} size={21} weight={500} color={ACCENT_INK} align="right">
+          <Num>{P.tailCount}</Num> requests, <Num>{P.offChart}</Num> of them past <Num>{hi}</Num> ms, off the chart
+        </Line>
         <Line x={X0} y={y(262)} at={sampleAt} size={22} color={INK_SOFT}>
-          a simulated sample of <Num>{int(P.n)}</Num> requests
+          A simulated sample of <Num>{int(P.n)}</Num> requests
         </Line>
 
         {/* A hundred calls, one page load. */}

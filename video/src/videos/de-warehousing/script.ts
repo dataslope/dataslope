@@ -370,7 +370,15 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
-      text: "All of it assumes the data lands on time, every day. Keeping it running on time is the next round. Next: orchestration and reliability.",
+      text: "All of it assumes the data lands on time, every day.",
+      // A held breath before the bridge gets its own page (the owner,
+      // 2026-11-11): the closing line stays on the lakehouse page, finished.
+      pauseAfter: 2.5,
+    },
+    {
+      id: "next-round",
+      scene: true,
+      text: "Keeping it running on time is the next round. Next: orchestration and reliability.",
     },
   ],
 };

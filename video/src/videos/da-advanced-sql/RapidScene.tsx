@@ -68,10 +68,10 @@ const Lag: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={at + 20} x={R_X} y={g.rowTop(t.rows.length) + c.h(20)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the row before, not the day before</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>The row before, not the day before</span>
       </Note>
       <Note at={nullAt + 4} x={g.right + 24} y={g.rowTop(0)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>nothing before day 1</span>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Nothing before day 1</span>
       </Note>
       <Note at={defaultAt} x={g.right + 24} y={g.rowTop(0) + c.h(36)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -135,7 +135,7 @@ const Where: React.FC<{ c: Ctx }> = ({ c }) => {
       <ErrorBox x={R_X} top={errTop} width={700} at={noAt - 4} kind={e.kind} message={e.message} size={21} />
       <Note at={outerAt - 2} x={R_X} y={errTop + c.h(100)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          windows run after <QMono>WHERE</QMono> and <QMono>HAVING</QMono>: filter outside
+          Windows run after <QMono>WHERE</QMono> and <QMono>HAVING</QMono>: filter outside
         </span>
       </Note>
       {/* Question 5 said Postgres has no QUALIFY. */}
@@ -212,10 +212,10 @@ const Bucket: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={mondayAt + 6} x={WEEKS_X} y={g.rowTop(W.rows.length) + c.h(16)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>each a Monday</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Each a Monday</span>
       </Note>
       <Note at={shortAt + 4} x={WEEKS_X} y={g.rowTop(W.rows.length) + c.h(50)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>the last week is partial</span>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>The last week is partial</span>
       </Note>
     </>
   );

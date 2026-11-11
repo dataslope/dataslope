@@ -15,6 +15,10 @@
       "watercolor illustration": {
         "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
         "softAlphaWarn": 0.3
+      },
+      "single-hue watercolor": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Paint the whole subject in the single hue its description names, in lighter and deeper washes of that one hue only; the color list that follows is for reference, and no other hue appears. Never outline in black, never shade with grey or black. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
       }
     }
   },
@@ -24,6 +28,24 @@
       "category": "video-hero",
       "style": "watercolor illustration",
       "subject": "a plump hamster sitting upright beside three neatly stacked wooden crates, its cheeks round and full"
+    },
+    {
+      "id": "de-warehousing-folder-blue",
+      "category": "video-hero",
+      "style": "single-hue watercolor",
+      "subject": "a single closed file folder seen straight from the front, about one and a half times as wide as it is tall, with a short rounded tab on the left of its top edge; its front face is one smooth, pale, even wash with no writing, no label and no papers showing, so text can sit on it; painted in soft light blue washes"
+    },
+    {
+      "id": "de-warehousing-folder-yellow",
+      "category": "video-hero",
+      "style": "single-hue watercolor",
+      "subject": "a single closed file folder seen straight from the front, about one and a half times as wide as it is tall, with a short rounded tab on the left of its top edge; its front face is one smooth, pale, even wash with no writing, no label and no papers showing, so text can sit on it; painted in soft light yellow washes"
+    },
+    {
+      "id": "de-warehousing-folder-red",
+      "category": "video-hero",
+      "style": "single-hue watercolor",
+      "subject": "a single closed file folder seen straight from the front, about one and a half times as wide as it is tall, with a short rounded tab on the left of its top edge; its front face is one smooth, pale, even wash with no writing, no label and no papers showing, so text can sit on it; painted in soft light pink-red washes"
     }
   ]
 }

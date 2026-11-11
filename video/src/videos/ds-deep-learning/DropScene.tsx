@@ -5,7 +5,7 @@ import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, TABULAR, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DECAY, DROPOUT, OVERFIT } from "./data";
@@ -105,7 +105,10 @@ export const DropScene: React.FC = () => {
           </Tagline>
           <Cells values={[D.act.map((v) => v.toFixed(2))]} x={CX} y={y(R1)} w={CW} h={h(CH)} at={stepAt} color={BLUE_INK} size={25} />
           <Tagline x={X0} y={y(R2) + h(14)} at={zeroesAt - 2} size={22} color={INK}>
-            mask, p = {D.p}
+            mask,{" "}
+            <MathRun>
+              <I>p</I> = {D.p}
+            </MathRun>
           </Tagline>
           <Cells
             values={[D.mask.map((m) => (m ? "× 2" : "× 0"))]}
@@ -142,18 +145,18 @@ export const DropScene: React.FC = () => {
           </Tagline>
           <Note at={expectedAt - 2} x={SUM_X} y={y(R3) + h(64)}>
             <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
-              averaged over 100,000 draws: {D.meanSum.toFixed(2)}
+              Averaged over 100,000 draws: {D.meanSum.toFixed(2)}
             </span>
           </Note>
           <Note at={leanAt - 2} x={X0} y={y(700)}>
             <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-              no unit can lean on any one neighbor:{" "}
+              No unit can lean on any one neighbor:{" "}
               <span style={{ opacity: ease(frame, thinnedAt - 4, 10) }}>like training many thinned networks at once</span>
             </span>
           </Note>
           <Note at={inferenceAt - 2} x={X0} y={y(770)}>
             <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-              <Mark at={inferenceAt + 4}>at inference: off</Mark>, all eight pass through
+              <Mark at={inferenceAt + 4}>At inference: off</Mark>, all eight pass through
             </span>
           </Note>
         </Fade>
@@ -162,20 +165,47 @@ export const DropScene: React.FC = () => {
         <Fade from={q9At}>
           <Note at={shrinksAt - 2} x={X0} y={y(330)}>
             <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
-              each step, every weight <Mark at={shrinksAt + 4}>shrinks a little toward zero</Mark>
+              Each step, every weight <Mark at={shrinksAt + 4}>shrinks a little toward zero</Mark>
             </span>
           </Note>
           <Tagline x={X0} y={y(390)} at={sgdAt - 2} size={21}>
-            plain SGD, from w = ({DECAY.w.map((v) => num(v, 1)).join(", ")}), gradient g = ({DECAY.g.map((v) => num(v, 1)).join(", ")}), step η = {DECAY.eta},
-            λ = {DECAY.lam}
+            Plain SGD, from{" "}
+            <MathRun>
+              <I>w</I> = ({DECAY.w.map((v) => num(v, 1)).join(", ")})
+            </MathRun>
+            , gradient{" "}
+            <MathRun>
+              <I>g</I> = ({DECAY.g.map((v) => num(v, 1)).join(", ")})
+            </MathRun>
+            , step{" "}
+            <MathRun>
+              <I>η</I> = {DECAY.eta}
+            </MathRun>
+            ,{" "}
+            <MathRun>
+              <I>λ</I> = {DECAY.lam}
+            </MathRun>
           </Tagline>
           <Tagline x={X0} y={y(ROW_A) - h(36)} at={penaltyAt - 2} size={22} color={INK}>
-            an L2 penalty in the loss<span style={{ opacity: ease(frame, lambdaAt - 2, 10) }}>, λ/2 · ‖w‖², whose gradient is λw</span>
+            An L2 penalty in the loss<span style={{ opacity: ease(frame, lambdaAt - 2, 10) }}>
+              ,{" "}
+              <MathRun>
+                <I>λ</I>/2 · ‖<I>w</I>‖²
+              </MathRun>
+              , whose gradient is{" "}
+              <MathRun>
+                <I>λw</I>
+              </MathRun>
+            </span>
           </Tagline>
           <Note at={penaltyAt} x={X0} y={y(ROW_A) + h(8)}>
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
-              w − η(g + <Mark at={gradAt + 4}>λw</Mark>) =
-            </span>
+            <MathRun style={{ fontSize: 28, color: INK }}>
+              <I>w</I> − <I>η</I>(<I>g</I> +{" "}
+              <Mark at={gradAt + 4}>
+                <I>λw</I>
+              </Mark>
+              ) =
+            </MathRun>
           </Note>
           <Cells
             values={[DECAY.l2.map((v) => num(v, 3))]}
@@ -188,10 +218,12 @@ export const DropScene: React.FC = () => {
             look={() => ({ tint: { color: CELL_OK, at: sameAt + 4 } })}
           />
           <Tagline x={X0} y={y(ROW_B) - h(36)} at={shrinksAt} size={22} color={INK}>
-            weight decay: shrink by {DECAY.shrink}, then the usual step
+            Weight decay: shrink by {DECAY.shrink}, then the usual step
           </Tagline>
           <Note at={shrinksAt + 2} x={X0} y={y(ROW_B) + h(8)}>
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>(1 − ηλ)w − ηg =</span>
+            <MathRun style={{ fontSize: 28, color: INK }}>
+              (1 − <I>ηλ</I>)<I>w</I> − <I>ηg</I> =
+            </MathRun>
           </Note>
           <Cells
             values={[DECAY.decay.map((v) => num(v, 3))]}
@@ -206,12 +238,16 @@ export const DropScene: React.FC = () => {
           <Note at={sameAt + 4} x={790} y={(y(ROW_A) + y(ROW_B)) / 2 + h(10)}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <Tick at={sameAt + 8} size={26} />
-              <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>identical</span>
+              <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Identical</span>
             </div>
           </Note>
           {/* Why Adam breaks the equivalence, then the fix. */}
           <Note at={butAt - 2} x={X0} y={y(690)}>
-            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>with Adam, the two differ: it divides λw by each weight&apos;s gradient size too,</span>
+            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>With Adam, the two differ: it divides{" "}
+              <MathRun>
+                <I>λw</I>
+              </MathRun>{" "}
+              by each weight&apos;s gradient size too,</span>
           </Note>
           <Note at={barelyAt - 4} x={X0} y={y(732)}>
             <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>so weights with big gradients are barely decayed</span>

@@ -66,10 +66,10 @@ export const StoryScene: React.FC = () => {
   const marked = ease(frame, markAt, 14);
 
   const steps = [
-    { at: leadAt, text: "the takeaway, first", strong: true },
-    { at: contextAt, text: "then the context" },
-    { at: insightAt, text: "then the insight" },
-    { at: doAt, text: "then what to do about it" },
+    { at: leadAt, text: "The takeaway, first", strong: true },
+    { at: contextAt, text: "Then the context" },
+    { at: insightAt, text: "Then the insight" },
+    { at: doAt, text: "Then what to do about it" },
   ];
 
   return (
@@ -151,10 +151,10 @@ export const StoryScene: React.FC = () => {
           </span>
         </Note>
         <Verdict ok={false} x={STEPS_X} y={y(780)} at={datasetAt} out={out13}>
-          a topic: hands them a dataset
+          A topic: hands them a dataset
         </Verdict>
         <Verdict ok x={STEPS_X} y={y(830)} at={claimAt} out={out13}>
-          a finding: a claim to check
+          A finding: a claim to check
         </Verdict>
 
         {/* ── Question 14: one marked change ── */}
@@ -199,7 +199,7 @@ export const StoryScene: React.FC = () => {
         </Note>
         <Note at={pastedAt - 2} x={STEPS_X} y={y(520)}>
           <span style={{ ...note(26, INK) }}>
-            a chart that says its own point
+            A chart that says its own point
             <br />
             travels without you
           </span>

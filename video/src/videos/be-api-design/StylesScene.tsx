@@ -57,34 +57,34 @@ export const StylesScene: React.FC = () => {
   const figTop = y(400);
   const plusTop = y(625);
   const heads = [
-    { name: "REST", what: "resources over HTTP and JSON", at: restAt },
-    { name: "GraphQL", what: "the client names its fields", at: gqlAt },
+    { name: "REST", what: "Resources over HTTP and JSON", at: restAt },
+    { name: "GraphQL", what: "The client names its fields", at: gqlAt },
     { name: "gRPC", what: "Protocol Buffers over HTTP/2", at: grpcAt },
   ];
   const lines: { plus: [string, number][]; minus: [string, number][] }[] = [
     {
       plus: [
-        ["understood everywhere, easy to cache", understoodAt],
-        ["the safe default for a public API", defaultAt],
+        ["Understood everywhere, easy to cache", understoodAt],
+        ["The safe default for a public API", defaultAt],
       ],
-      minus: [["round trips, fields it never shows", fieldsAt]],
+      minus: [["Round trips, fields it never shows", fieldsAt]],
     },
     {
       plus: [
-        ["exactly the fields, in one query", oneAt + 6],
-        ["suits rich, varied front ends", richAt],
+        ["Exactly the fields, in one query", oneAt + 6],
+        ["Suits rich, varied front ends", richAt],
       ],
       minus: [
-        ["caching and rate limits get harder", harderAt],
-        ["a limit weighs each query's cost", weighAt],
+        ["Caching and rate limits get harder", harderAt],
+        ["A limit weighs each query's cost", weighAt],
       ],
     },
     {
       plus: [
-        ["fast, strongly typed, streams", fastAt],
-        ["ideal between internal services", internalAt],
+        ["Fast, strongly typed, streams", fastAt],
+        ["Ideal between internal services", internalAt],
       ],
-      minus: [["weak browser support, not human-readable", browserAt]],
+      minus: [["Weak browser support, not human-readable", browserAt]],
     },
   ];
   const trips = ["GET /articles/42", "GET /users/7", "GET /articles/42/comments"];
@@ -92,6 +92,12 @@ export const StylesScene: React.FC = () => {
   const sTop = figTop + h(40);
   const mixTop = y(835);
   const mixMid = mixTop + h(36);
+  /** The internal services, stacked, and the point where gRPC fans out. */
+  const svcH = h(38);
+  const svcGap = h(7);
+  const svcMid = mixMid - h(8);
+  const FORK_X = 1000;
+  const SVC_X = 1180;
   const bitOffset = Math.max(0, frame - streamAt) * 1.2;
 
   return (
@@ -137,7 +143,7 @@ export const StylesScene: React.FC = () => {
 
         {/* REST: one screen, three round trips. */}
         <Note at={screenAt} x={COLS[0]} y={figTop}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>one screen: an article, its author, its comments</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>One screen: an article, its author, its comments</span>
         </Note>
         {trips.map((t, i) => {
           const at = screenAt + 8 + i * 8;
@@ -197,7 +203,7 @@ export const StylesScene: React.FC = () => {
             opacity: ease(frame, grpcAt + 12, 10),
           }}
         >
-          <div style={{ position: "absolute", left: -((bitOffset * 4) % 216), top: 2, fontFamily: MONO, fontSize: 19, lineHeight: "24px", color: BLUE_INK, whiteSpace: "pre" }}>
+          <div style={{ position: "absolute", left: -((bitOffset * 4) % 239), top: 1, fontFamily: MONO, fontSize: 21, lineHeight: "26px", color: BLUE_INK, whiteSpace: "pre" }}>
             {BITS.repeat(4)}
           </div>
         </div>
@@ -212,13 +218,20 @@ export const StylesScene: React.FC = () => {
           REST
         </Pill>
         <Node x={610} y={mixTop} w={240} h={h(72)} at={publicAt + 6} tone="data" title="your API" size={23} />
-        <Flow points={[[858, mixMid], [1170, mixMid]]} at={betweenAt} color={OK} width={3} head={14} />
-        <Pill x={940} y={mixMid - h(44)} at={betweenAt + 4} tone="ok" size={21}>
+        {/* gRPC fans out to each of its own services, stacked in a column. */}
+        <Flow points={[[858, mixMid], [FORK_X, mixMid]]} at={betweenAt} color={OK} width={3} cut={1} />
+        <Pill x={880} y={mixMid - h(44)} at={betweenAt + 4} tone="ok" size={21}>
           gRPC
         </Pill>
-        {["orders", "search", "billing"].map((s, i) => (
-          <Node key={s} x={1180 + i * 205} y={mixTop} w={185} h={h(72)} at={betweenAt + 6 + i * 4} tone="data" title={s} size={23} />
-        ))}
+        {["orders", "search", "billing"].map((s, i) => {
+          const boxTop = svcMid - (3 * svcH + 2 * svcGap) / 2 + i * (svcH + svcGap);
+          return (
+            <React.Fragment key={s}>
+              <Flow points={[[FORK_X, mixMid], [SVC_X - 10, boxTop + svcH / 2]]} at={betweenAt + 8 + i * 4} color={OK} width={3} head={14} />
+              <Node x={SVC_X} y={boxTop} w={185} h={svcH} at={betweenAt + 6 + i * 4} tone="data" title={s} size={23} />
+            </React.Fragment>
+          );
+        })}
 
         {/* Hairlines between the three columns, each with the column to its right. */}
         {[650, 1250].map((x, i) => (

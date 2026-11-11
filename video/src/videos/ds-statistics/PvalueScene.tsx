@@ -71,7 +71,7 @@ export const PvalueScene: React.FC = () => {
 
         <Note at={defAt} x={X0} y={y(290)}>
           <span style={{ ...noteText(28, INK) }}>
-            the probability of data at least as extreme as yours,{" "}
+            The probability of data at least as extreme as yours,{" "}
             <span style={{ opacity: ease(frame, nullAt - 2, 10) }}>
               <Mark at={nullAt + 2}>if the null is true</Mark>
             </span>
@@ -119,7 +119,7 @@ export const PvalueScene: React.FC = () => {
         </Note>
         <Note at={sidedAt} x={at(XS, 34)} y={base - h(178)} align="right">
           <div style={{ ...noteText(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            two-sided:
+            Two-sided:
             <br />
             both tails count
           </div>
@@ -140,17 +140,17 @@ export const PvalueScene: React.FC = () => {
 
         <Note at={notNullAt} x={SIDE_X} y={y(580)}>
           <div style={{ ...body(28, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
-            not <Strike at={notNullAt + 12}>“the chance the null is true”</Strike>
+            Not <Strike at={notNullAt + 12}>“the chance the null is true”</Strike>
           </div>
         </Note>
         <Note at={flukeAt} x={SIDE_X} y={y(636)}>
           <div style={{ ...body(28, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
-            not <Strike at={flukeAt + 12}>“the chance it&apos;s a fluke”</Strike>
+            Not <Strike at={flukeAt + 12}>“the chance it&apos;s a fluke”</Strike>
           </div>
         </Note>
         <Note at={assumingAt} x={SIDE_X} y={y(720)}>
           <span style={{ ...noteText(26, OK_INK) }}>
-            computed <Mark at={assumingAt + 4}>assuming</Mark> the null holds
+            Computed <Mark at={assumingAt + 4}>assuming</Mark> the null holds
           </span>
         </Note>
       </Drift>

@@ -160,13 +160,13 @@ export const BatchScene: React.FC = () => {
         {/* Batch's one result, at the end of the hour: an output, not a verdict. */}
         <Node x={ax(1) - 120} y={by + h(56)} w={240} h={h(62)} at={resultAt} tone="plain" title="one result" size={23} />
         <Note at={hourAt + 4} x={ax(0)} y={by - h(108)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a bounded chunk: one hour of events</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>A bounded chunk: one hour of events</span>
         </Note>
         <Note at={simpleAt} x={ax(0)} y={by + h(60)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>simple, cheap, easy to rerun</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Simple, cheap, easy to rerun</span>
         </Note>
         <Note at={oldAt - 2} x={ax(0)} y={by + h(100)}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>results minutes to hours old</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Results minutes to hours old</span>
         </Note>
 
         {/* Streaming's results, each seconds after its event. */}
@@ -174,7 +174,7 @@ export const BatchScene: React.FC = () => {
           <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>a result per event</span>
         </Note>
         <Note at={secondsAt - 2} x={AX1 + 30} y={sy - h(44)}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>results seconds old</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Results seconds old</span>
         </Note>
         <Note at={priceAt} x={AX0} y={sy + h(104)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>The price, all yours to run:</span>

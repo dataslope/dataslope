@@ -127,11 +127,11 @@ export const DidScene: React.FC = () => {
         </Note>
         {/* The evidence for parallel trends: the weeks before the policy. */}
         <Note at={beforeAt - 2} x={at(x, 0.6) + 12} y={y(PLOT.top) + h(58)}>
-          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>before the policy, the two rose together</span>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Before the policy, the two rose together</span>
         </Note>
         <Note at={beforeAt + 8} x={at(x, 0.6) + 12} y={y(PLOT.top) + h(88)}>
           <span style={{ ...label(19, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            the gap between them drifted {fixed(DID.preGap, 2)} a week
+            The gap between them drifted {fixed(DID.preGap, 2)} a week
           </span>
         </Note>
         <Note at={notAt + 8} x={at(x, 12.4) + 12} y={at(yS, DID.control[11]) - 16}>
@@ -143,8 +143,8 @@ export const DidScene: React.FC = () => {
 
         {/* The arithmetic. */}
         {[
-          { text: "treated city", v: DID.treatedChange, at: roseAt + 2, ink: BLUE_INK },
-          { text: "comparison city", v: DID.controlChange, at: compAt + 6, ink: INK_SOFT },
+          { text: "Treated city", v: DID.treatedChange, at: roseAt + 2, ink: BLUE_INK },
+          { text: "Comparison city", v: DID.controlChange, at: compAt + 6, ink: INK_SOFT },
         ].map((r, i) => (
           <Note key={r.text} at={r.at} x={SUM_X} y={y(500) + i * h(60)}>
             <span style={{ display: "inline-flex", width: SUM_W, justifyContent: "space-between", ...note(27, r.ink), fontWeight: 500, ...TABULAR }}>
@@ -175,7 +175,7 @@ export const DidScene: React.FC = () => {
           </span>
         </Note>
         <Note at={trueAt} x={SUM_X} y={y(500) + h(226)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>true effect in the simulation: +{DID.truth}</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>True effect in the simulation: +{DID.truth}</span>
         </Note>
         <Note at={parallelAt} x={SUM_X} y={y(780)} width={SUM_W}>
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 500 }}>

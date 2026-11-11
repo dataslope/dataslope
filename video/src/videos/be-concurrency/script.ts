@@ -32,9 +32,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * once) without naming it. Close: the plan's bridge into Part 6 (code that
  * has to keep changing without breaking).
  *
- * No syntax. The only code on screen is the four bytecode instructions of
- * `counter += 1` (question 4), read as a list, because what that one line
- * does is the question. Every other figure is a mechanism.
+ * No syntax. The only code on screen is `counter += 1` and its four bytecode
+ * instructions (question 4, and the line again in question 11), because
+ * what that one line does is the question. Every other figure is a
+ * mechanism, and API names stay off the screen as well as out of the voice.
  *
  * On screen, beat by beat (what phase 2 builds):
  *   hook        A second of a server's time as a bar per request, mostly
@@ -51,41 +52,59 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *               ceiling at 20x dashed; a dot at 100 cores, "16.8x".
  *   proc        One process box with three threads inside sharing one memory
  *               block; "proc-risk": two threads' arrows hit the same cell,
- *               red. "proc-iso": three process boxes, each its own memory;
- *               one crashes (struck), the others carry on; between them a
- *               pipe with a packed message.
+ *               red. "proc-own", "proc-iso": three process boxes, each its
+ *               own memory and its own worker; one crashes, the others run
+ *               on; "in CPython, these threads take turns" under the threads
+ *               (the parallel claim is CPython's, not every language's);
+ *               between processes 1 and 3 a pipe with a packed message,
+ *               "usually serialized", shared memory the exception.
  *   race        The tally counter at 5, two threads A and B, each a strip of
  *               three steps: read, add, write. "race-lost": both read 5,
  *               both write 6; one increment struck. "race-count": a grid of
- *               the 20 orders, two green (7), eighteen red (6). "race-lock":
- *               the three steps fused into one block under a padlock; two
- *               orders, both 7. "race-hides": a test marked pass, then fail,
- *               same code.
+ *               the 20 orders, two green (7), eighteen red (6). "race-hides"
+ *               (while the grid is up): a test marked pass, then fail, same
+ *               code, one 7 and one 6 lit on the words. "race-lock": the
+ *               cure, the three steps fused into one block under a padlock;
+ *               two orders, both 7.
  *   gil         A single key labelled GIL passed between threads; only the
  *               holder's bytecode runs. "gil-why": an object with its
  *               reference count, one lock around the interpreter instead of
  *               a lock on each object. "gil-cost": CPU-bound threads take
  *               turns (no speedup); IO-bound threads hand the key over while
  *               they wait. "gil-race": `counter += 1` and under it its four
- *               instructions, from a real compile. "gil-proc": several
- *               interpreters, each with its own key, on separate cores.
+ *               instructions, from a real compile (the interpreter box stays
+ *               on the right, dimmed). "gil-proc": several interpreters, each
+ *               with its own key, on separate cores. "gil-free": under the
+ *               counter, the free-threaded build (no GIL, supported since
+ *               3.14, experimental in 3.13), and this run's build (GIL on).
  *   dead        Two threads, locks A and B; T1 holds A and reaches for B, T2
  *               holds B and reaches for A; the two waits form a cycle (the
  *               schedule from results.json). "dead-four": four links of a
  *               chain, one per condition. "dead-break": one link opens.
  *   prevent     The same four links. Each fix arrives beside the condition
- *               it breaks and strikes it: "prevent-order" circular wait, with
- *               both threads taking A first and T2 waiting holding nothing;
- *               "prevent-timeout" no preemption (the hourglass); "prevent-
- *               hold" hold and wait (one coarse lock); "prevent-share"
- *               mutual exclusion (one owner fed by a queue). "prevent-
- *               short" a critical section shrinking. "prevent-live": two
- *               threads retrying in step, a pointer to the quick round.
+ *               it breaks and strikes it, and the lock diagram on the left
+ *               redraws for each: "prevent-order" circular wait, with both
+ *               threads taking A first and T2 waiting holding nothing;
+ *               "prevent-timeout" no preemption (the stuck pair again, an
+ *               hourglass, T2 lets go of B, T1 takes it, T2 waits to retry);
+ *               "prevent-hold", "prevent-all" hold and wait (A and B merge
+ *               into one lock; or take them all at once); "prevent-share"
+ *               mutual exclusion (both threads send work into a queue that
+ *               one owner thread drains). "prevent-short" a critical section
+ *               shrinking. "prevent-detect": a thread dump of the stuck
+ *               schedule (who holds what, who waits for what: a cycle).
+ *               "prevent-live": two threads retrying in step, a pointer to
+ *               the quick round.
  *   async       One thread, an event loop as a ring, coroutines queued on it;
- *               one awaits and steps off, the next steps on. "async-run": a
- *               timeline, a's wait 20 ms, b's 10 ms, overlapping; b finishes
- *               first; the results list reads a, b. "async-coop": a
- *               coroutine with no await holding the ring, the rest frozen.
+ *               one awaits and steps off, the next steps on. "async-os": the
+ *               loop asks the OS which sockets are ready; the parked one is
+ *               woken back on. "async-run": a timeline, a's wait 20 ms, b's
+ *               10 ms, overlapping; b finishes first; the results read "a,
+ *               then b" (the ring holds still, dimmed, meanwhile).
+ *               "async-nopre", "async-coop": nothing interrupts a coroutine
+ *               (said that way, since question 6's "no preemption" is
+ *               Coffman's); one with no await holding the ring, the rest
+ *               frozen.
  *   block       The same timeline with a's wait a blocking sleep: a's bar
  *               now holds the thread; b's wait starts only after it; total
  *               30 ms against 20; a finishes first. "block-server": a row of
@@ -98,18 +117,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   r-lock      One door with a single key (mutex), a turnstile counting five
  *               through (semaphore, peak 5 of 12 downloads from the run), a
  *               key that opens its own lock again (reentrant).
- *   r-atomic    The increment's three steps fused into one (compare-and-swap,
- *               or a lock around it).
+ *   r-atomic    The increment's three steps. "r-cas": fused into one by an
+ *               atomic add; or compare-and-swap (read, add, write only if
+ *               still the value read, else round again); or a lock.
  *   r-safe      Three remedies; the third, one owner thread fed by a queue,
  *               highlighted.
  *   r-live      Two figures stepping aside the same way, repeatedly; a CPU
  *               meter busy; then random waits and they pass.
  *   r-starve    A queue where one low-priority thread is passed again and
  *               again; a fair lock serves in arrival order.
- *   r-pool      Four workers taking tasks from one queue; results back in
- *               input order.
+ *   r-pool      Four workers taking tasks from one queue, a round at a time;
+ *               one task still queued at the end.
  *   r-future    A claim ticket handed over at once; the result collected
- *               later.
+ *               later. "r-promise": the promise as the side that fills the
+ *               value in (in JavaScript one object is both).
  *   next        A hairline and "Next: designing objects".
  *
  * Facts. check.mjs computes every number in Pyodide 314.0.7 (Python 3.14.2)
@@ -160,7 +181,17 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "choose-mix": the page's fix for blocking work (offload to a thread or
  *     process pool with run_in_executor), applied to the CPU-bound branch.
  *   - "r-lock" (screen): twelve downloads through a semaphore of five, run
- *     on asyncio: never more than five in flight.
+ *     on asyncio: never more than five in flight. The figure frees one slot
+ *     at a time, as a semaphore does; its timing is drawn, not measured.
+ *   - "gil-free": the free-threaded build is PEP 703 (experimental in 3.13)
+ *     and PEP 779 (supported in 3.14). check.mjs records this run's build:
+ *     sys._is_gil_enabled() exists (3.13+), the GIL is on, and it is not the
+ *     free-threaded build (runtime.gil).
+ *   - "r-cas": an atomic add (fetch-and-add) is one instruction; compare-
+ *     and-swap writes only if the location still holds the value read, and
+ *     an increment built on it loops until it does.
+ *   - "prevent-detect": the dump's lines are the stuck schedule's own holds
+ *     and waits (results.json).
  *   - "r-future": "claim ticket" is the video's image for the page's
  *     "placeholder for a result that is not ready yet".
  *
@@ -215,7 +246,7 @@ export const script: NarrationScript = {
     {
       id: "conc-amdahl",
       text: "The follow-up is what parallelism can buy. If five percent of the work can't be split, no number of cores makes it more than twenty times faster, and a hundred cores already get about seventeen. That's Amdahl's law.",
-      pauseAfter: 0.8,
+      pauseAfter: 2.4,
     },
 
     // ── 2. Processes and threads ──────────────────────────────────────────
@@ -230,9 +261,10 @@ export const script: NarrationScript = {
       text: "That sharing is also the danger. Two threads can corrupt the same state.",
       pauseAfter: 0.6,
     },
+    { id: "proc-own", text: "Processes each get their own memory.", pauseAfter: 0.55 },
     {
       id: "proc-iso",
-      text: "Processes each get their own memory. A crash in one can't corrupt another, and they run truly in parallel. The price is talking: data passed between them has to be serialized through pipes or queues, and every process costs more memory.",
+      text: "A crash in one can't corrupt another. In CPython, they're also how Python runs in parallel, since its threads take turns. The price is talking: data between them is usually serialized, through pipes or queues, and every process costs more memory.",
       pauseAfter: 0.8,
     },
 
@@ -259,13 +291,13 @@ export const script: NarrationScript = {
       pauseAfter: 0.8,
     },
     {
-      id: "race-lock",
-      text: "The fix is a lock around the three steps, so they run as one critical section. Then two orders are left, one thread first or the other, and both give seven.",
-      pauseAfter: 0.6,
-    },
-    {
       id: "race-hides",
       text: "And since the bad orders depend on where a thread happens to pause, the same test can pass today and fail tomorrow, with no change to the code.",
+      pauseAfter: 1.0,
+    },
+    {
+      id: "race-lock",
+      text: "The fix is a lock around the three steps, so they run as one critical section. Then two orders are left, one thread first or the other, and both give seven.",
       pauseAfter: 0.8,
     },
 
@@ -294,6 +326,11 @@ export const script: NarrationScript = {
     {
       id: "gil-proc",
       text: "For CPU-bound work, use processes instead. Each has its own interpreter and its own GIL, so they really do run in parallel.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "gil-free",
+      text: "Since Python three fourteen, there's also an officially supported build with no GIL. There, threads do run in parallel, so the counter's lock matters even more.",
       pauseAfter: 0.8,
     },
 
@@ -333,14 +370,16 @@ export const script: NarrationScript = {
     {
       id: "prevent-hold",
       text: "Hold and wait: one coarse lock instead of several, so no thread holds one while it waits for another.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.55,
     },
+    { id: "prevent-all", text: "Or take every lock you need at once.", pauseAfter: 0.6 },
     {
       id: "prevent-share",
       text: "Mutual exclusion: share nothing. Give the state one owner thread and send it work through a queue, so no other thread needs a lock on it.",
       pauseAfter: 0.5,
     },
     { id: "prevent-short", text: "And keep critical sections short, so contention stays low.", pauseAfter: 0.6 },
+    { id: "prevent-detect", text: "If one happens anyway, a thread dump shows who's waiting on whom.", pauseAfter: 0.7 },
     {
       id: "prevent-live",
       text: "One catch: threads that time out and retry in lockstep can collide forever. That's livelock, in the quick round.",
@@ -355,13 +394,19 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "async-os",
+      text: "Under it, the loop asks the operating system which sockets are ready, and wakes the coroutines waiting on them.",
+      pauseAfter: 0.7,
+    },
+    {
       id: "async-run",
       text: "Two fetches: a waits twenty milliseconds, b waits ten. The waits overlap, so b finishes first, and the pair takes about twenty, not thirty. Gathered together, the results still come back in the order you asked: a, then b.",
       pauseAfter: 0.7,
     },
+    { id: "async-nopre", text: "Nothing interrupts a running coroutine.", pauseAfter: 0.55 },
     {
       id: "async-coop",
-      text: "There's no preemption. The loop can only switch at an await, so a coroutine that never awaits, like a tight CPU loop, starves every other one.",
+      text: "The loop can only switch at an await, so a coroutine that never awaits, like a tight CPU loop, starves every other one.",
       pauseAfter: 0.6,
     },
     {
@@ -426,7 +471,12 @@ export const script: NarrationScript = {
     },
     {
       id: "r-atomic",
-      text: "An atomic operation completes in one indivisible step: no other thread can see it half done. Adding one to the counter isn't atomic. Compare-and-swap instructions make it so, or a lock held around the whole thing.",
+      text: "An atomic operation completes in one indivisible step: no other thread can see it half done. Adding one to the counter isn't atomic.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "r-cas",
+      text: "An atomic add instruction makes it so, or compare-and-swap: write only if the value is unchanged since the read, and retry if not. Or hold a lock around all three.",
       pauseAfter: 0.6,
     },
     {
@@ -446,13 +496,18 @@ export const script: NarrationScript = {
     },
     {
       id: "r-pool",
-      text: "A thread pool keeps a fixed set of reusable workers and a queue of tasks. You skip creating a thread per task, and you bound how many run at once. Map a function over a list with it, and the results come back in input order.",
+      text: "A thread pool keeps a fixed set of reusable workers and a queue of tasks. You skip creating a thread per task, and you bound how many run at once.",
       pauseAfter: 0.6,
     },
     {
       id: "r-future",
       text: "And a future is a claim ticket for a result that isn't ready yet. Start the work, take the ticket at once, and collect the value later, by blocking on it or awaiting it.",
-      pauseAfter: 1.0,
+      pauseAfter: 0.7,
+    },
+    {
+      id: "r-promise",
+      text: "A promise is the same idea, seen from the side that fills in the value.",
+      pauseAfter: 1.2,
     },
     {
       id: "next",

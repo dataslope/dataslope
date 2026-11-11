@@ -5,6 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -188,7 +189,7 @@ export const JudgeScene: React.FC = () => {
         </Note>
         <Note at={agreeAt + 14} x={GRID.x} y={y(GRID.top) + gridW + h(96)}>
           <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>
-            judge and expert each pass{" "}
+            Judge and expert each pass{" "}
             <b style={{ color: INK, ...TABULAR }}>
               {JUDGE.cells.passPass} + {JUDGE.cells.passFail} = {JUDGE.judgePasses}
             </b>{" "}
@@ -199,16 +200,16 @@ export const JudgeScene: React.FC = () => {
         {/* The arithmetic, in the page's numbers. */}
         <Clear at={biasAt - 4}>
           <Note at={eachAt} x={R_X} y={y(GRID.top)}>
-            <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>judge and expert each mark 90% as a pass</span>
+            <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>Judge and expert each mark 90% as a pass</span>
           </Note>
           <Note at={agreeAt} x={R_X} y={y(GRID.top + 50)}>
             <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
-              they agree on <Mark at={strongAt}>{Math.round(JUDGE.po * 100)}% of items</Mark>
+              They agree on <Mark at={strongAt}>{Math.round(JUDGE.po * 100)}% of items</Mark>
             </span>
           </Note>
           <Note at={chanceAt} x={R_X} y={y(GRID.top + 120)}>
             <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
-              agreement by chance alone:{" "}
+              Agreement by chance alone:{" "}
               <span style={{ opacity: ease(frame, peAt - 2, 10) }}>
                 <b style={{ color: INK }}>{JUDGE.pe.toFixed(2)}</b> ={" "}
               </span>
@@ -222,7 +223,9 @@ export const JudgeScene: React.FC = () => {
           </Note>
           <Note at={kappaAt} x={R_X} y={y(GRID.top + 190)}>
             <div style={{ display: "flex", alignItems: "center", gap: 18, ...math(40, INK) }}>
-              <span style={{ fontStyle: "italic" }}>Cohen&apos;s κ</span>
+              <span>
+                Cohen&apos;s <I>κ</I>
+              </span>
               <span>=</span>
               <Frac top={<span>{JUDGE.po.toFixed(2)} − {JUDGE.pe.toFixed(2)}</span>} bottom={<span>1 − {JUDGE.pe.toFixed(2)}</span>} />
               <span style={{ opacity: ease(frame, aboveAt, 10) }}>=</span>
@@ -237,14 +240,16 @@ export const JudgeScene: React.FC = () => {
             </div>
           </Note>
           <Note at={moderateAt} x={R_X + 760} y={y(GRID.top + 216)}>
-            <span style={{ ...note(28, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>moderate</span>
+            <span style={{ ...note(28, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Moderate</span>
           </Note>
           <Note at={alwaysAt - 6} x={R_X} y={y(GRID.top + 330)}>
             <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>
-              a judge that always says pass: agrees {Math.round(JUDGE.alwaysPass.po * 100)}%,{" "}
+              A judge that always says pass: agrees {Math.round(JUDGE.alwaysPass.po * 100)}%,{" "}
               <span style={{ opacity: ease(frame, zeroAt, 10), color: ACCENT_INK, fontWeight: 500 }}>
                 <Mark at={zeroAt + 6} color={MARK_BAD}>
-                  κ = {JUDGE.alwaysPass.kappa}
+                  <MathRun>
+                    <I>κ</I> = {JUDGE.alwaysPass.kappa}
+                  </MathRun>
                 </Mark>
               </span>
             </span>
@@ -253,7 +258,7 @@ export const JudgeScene: React.FC = () => {
 
         {/* The known biases, each drawn as what it does. */}
         <Note at={biasAt} x={R_X} y={y(GRID.top)}>
-          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>test its known biases: a pull toward</span>
+          <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Test its known biases: a pull toward</span>
         </Note>
         {[
           { title: "the first answer shown", at: firstAt },
@@ -300,16 +305,16 @@ export const JudgeScene: React.FC = () => {
           </Note>
         ))}
         <Note at={expertsAt} x={R_X} y={y(GRID.top + 320)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>the bar: how well the experts agree with each other</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>The bar: how well the experts agree with each other</span>
         </Note>
         <Note at={beatAt} x={R_X} y={y(GRID.top + 370)}>
           <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={beatAt + 6}>don&apos;t expect a judge to beat the humans it imitates</Mark>
+            <Mark at={beatAt + 6}>Don&apos;t expect a judge to beat the humans it imitates</Mark>
           </span>
         </Note>
         <Note at={offlineAt} x={R_X} y={y(GRID.top + 450)}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
-            offline scores decide what&apos;s worth trying{" "}
+            Offline scores decide what&apos;s worth trying{" "}
             <span style={{ opacity: ease(frame, usersAt - 2, 10), color: BLUE_INK, fontWeight: 500 }}>on real users</span>
           </span>
         </Note>

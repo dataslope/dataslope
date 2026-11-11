@@ -70,8 +70,8 @@ export const DESIGN = results.design as {
 };
 
 /** Question 5: the page's block, its source line by line, what it printed,
- *  and the arithmetic past it (each side's share, and what halving each
- *  saves a day). */
+ *  and the arithmetic past it (each side's share, what halving each saves a
+ *  day, and the cost of one request). */
 export const COST = results.cost;
 
 /** Question 4's step past: the seeded simulation of one thousand requests
@@ -84,6 +84,8 @@ export const RETRY = results.retry as {
   attempts: number;
   bin: number;
   seed: number;
+  /** The first wave's busiest tenth without jitter over with it (1,000 / 115). */
+  peakRatio: number;
   plain: Wave[];
   jitter: Wave[];
 };

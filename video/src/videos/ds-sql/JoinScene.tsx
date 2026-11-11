@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard, Tick } from "../../editorial/interview";
+import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, headline, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RETAIN } from "./data";
-import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, listingHeight, MARK_BAD, MARK_OK, OK, OK_INK, rowsAt, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, listingHeight, MARK_BAD, MARK_OK, OK, OK_INK, QMono, rowsAt, TableName, X0 } from "./parts";
 
 const TOP = 350;
 const FEB_X = X0 + 230;
@@ -149,11 +149,11 @@ export const JoinScene: React.FC = () => {
         <Listing lines={RETAIN.inner.lines} x={SQL_X} top={y(TOP)} width={700} size={SIZE} at={innerAt - 4} out={leftAt - 2} marks={[{ line: 2, at: innerAt + 2 }]} />
         <DataTable g={ig} cols={colsOf(RETAIN.inner, { feb: { ink: BLUE_INK } })} at={threeAt - 4} out={leftAt - 2} rows={rowsAt(RETAIN.inner.rows, threeAt, 3)} />
         <Chip at={countAt + 4} out={leftAt} x={CHIP_X} y={y(TOP) + h(40)} value={pct(RETAIN.innerRate)} color={ACCENT_INK}>
-          retention, counted over the inner join
+          Retention, counted over the inner join
         </Chip>
         <Note at={droppedAt + 4} x={CHIP_X} y={y(TOP) + h(210)} out={leftAt}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
-            users 1, 4 and 6
+            Users 1, 4 and 6
             <br />
             were never counted
           </span>
@@ -182,7 +182,7 @@ export const JoinScene: React.FC = () => {
           bands={leftNulls.map((row, k) => ({ row, at: nullsAt + k * 3, color: MARK_OK }))}
         />
         <Chip at={halfAt - 4} out={q2At} x={CHIP_X} y={y(TOP) + h(40)} value={pct(RETAIN.leftRate)} color={OK_INK}>
-          retention, over the left join
+          Retention, over the left join
         </Chip>
 
         {/* ── 2. The nulls are the churn ── */}

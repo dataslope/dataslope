@@ -172,7 +172,7 @@ export const CdcScene: React.FC = () => {
         </TableName>
         <DataTable g={rg} cols={colsOf(CDC.poll)} at={findsAt} rows={CDC.poll.rows.map((cells, i) => ({ cells, at: findsAt + 4 + i * 4 }))} />
         <Note at={notThereAt} x={rg.right + 28} y={resultTop + h(6)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", background: MARK_BAD, padding: "2px 6px" }}>order 3's delete:</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", background: MARK_BAD, padding: "2px 6px" }}>Order 3's delete:</span>
           <br />
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no row left to select</span>
         </Note>
@@ -196,7 +196,7 @@ export const CdcScene: React.FC = () => {
         {/* What the letters mean: Debezium's op codes. */}
         <Note at={debeziumAt} x={OPS_X} y={logTop - 38}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            op codes as <b style={{ color: INK }}>Debezium</b> writes them:{" "}
+            Op codes as <b style={{ color: INK }}>Debezium</b> writes them:{" "}
             {OPS.map(([op, word], i) => (
               <React.Fragment key={op}>
                 {i ? ", " : null}
@@ -211,7 +211,7 @@ export const CdcScene: React.FC = () => {
         <Node x={whX} y={logTop} w={210} h={76} at={kafkaAt + 16} title="warehouse" size={24} />
         <Note at={kafkaAt + 22} x={whX + 230} y={logTop + 6}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            all three changes,
+            All three changes,
             <br />
             the delete included
           </span>

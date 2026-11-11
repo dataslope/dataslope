@@ -74,14 +74,14 @@ export const CompScene: React.FC = () => {
   const threeAt = n.word("comp-cart", "three items count three");
   const speedsAt = n.word("comp-break", "Then the cart team speeds add-all up");
   const stopsAt = n.word("comp-break", "it stops adding them one at a time");
-  const zeroAt = n.word("comp-break", "drops to zero");
-  const nobodyAt = n.word("comp-break", "nobody touched the loyalty code");
+  const zeroAt = n.word("comp-zero", "drops to zero");
+  const nobodyAt = n.word("comp-zero", "nobody touched the loyalty code");
   const holdsAt = n.word("comp-hold", "Composition holds a cart");
   const ownAt = n.word("comp-hold", "counting in its own methods");
   const promisesAt = n.word("comp-hold", "what the cart promises");
   const beforeAt = n.word("comp-hold", "three before the change");
   const afterAt = n.word("comp-hold", "three after");
-  const mixAt = n.word("comp-mix", "It also combines freely");
+  const notificationsAt = n.word("comp-mix", "Notifications go by");
   const channelsAt = n.word("comp-mix", "email, text or push");
   const timingsAt = n.word("comp-mix", "at one of three timings");
   const nineAt = n.word("comp-mix", "A subclass per pair is nine");
@@ -103,7 +103,8 @@ export const CompScene: React.FC = () => {
   const chipTop = cartTop + 72;
   const chipMid = chipTop + CHIP_H / 2;
   const childTop = y(CHILD.top);
-  const aOut = mixAt - 6;
+  // The cart stays up, "after: 3" at rest, through "It also combines freely".
+  const aOut = notificationsAt;
   const run1 = [0, 1, 2].map((i) => oneAtATimeAt + 4 + i * 12);
   const path1: P[] = [
     [ADD_ALL.x + ADD_ALL.w / 2, chipMid],
@@ -130,6 +131,9 @@ export const CompScene: React.FC = () => {
   // ── Part B: the combinations ──
   const channels = [...NOTIFIERS.channels, NOTIFIERS.added];
   const timings = NOTIFIERS.timings;
+  /** A grid heading stands on its own, so it starts with a capital; the same
+   *  names on the parts' boxes stay as the run spells them. */
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   const cellX = (j: number) => GRID_X + j * (CELL.w + 14);
   const rowY = (i: number) => y(GRID_TOP + i * GRID_PITCH);
   const subclasses = frame >= twelveAt ? NOTIFIERS.inheritance[1] : NOTIFIERS.inheritance[0];
@@ -162,7 +166,7 @@ export const CompScene: React.FC = () => {
         </QuestionCard>
         <Line x={X0} y={y(270)} at={tiesAt} size={26}>
           Inheritance ties a subclass to its parent&apos;s implementation
-          <span style={{ opacity: ease(frame, breakUpAt, 10) }}>, so a change upstream can break it</span>
+          <span style={{ opacity: ease(frame, breakUpAt, 10) }}>, so a change upstream can break it.</span>
         </Line>
         <Line x={X0} y={y(316)} at={fragileAt - 2} size={26} out={aOut}>
           That&apos;s the <Mark at={fragileAt + 4} color={MARK_BAD}>fragile base class</Mark> problem.
@@ -289,13 +293,13 @@ export const CompScene: React.FC = () => {
         </Line>
         {timings.map((t, j) => (
           <Line key={t} x={cellX(j) + CELL.w / 2} y={y(GRID_TOP - 48)} at={timingsAt + j * 4} size={20} color={INK_SOFT} weight={500} align="center" width={CELL.w}>
-            {t}
+            {cap(t)}
           </Line>
         ))}
         {channels.map((c, i) => (
           <React.Fragment key={c}>
             <Line x={X0} y={rowY(i) + 12} at={i < 3 ? channelsAt + i * 5 : fourthAt} size={21} weight={500}>
-              {c}
+              {cap(c)}
             </Line>
             {timings.map((t, j) => (
               <Box
@@ -334,7 +338,7 @@ export const CompScene: React.FC = () => {
 
         {/* One customer's notifier swaps its timing part. */}
         <Line x={1520} y={rowY(0) - 4} at={customerAt} size={20} color={INK_SOFT} weight={500}>
-          one customer
+          One customer
         </Line>
         <Box x={1520} y={rowY(0) + 28} w={110} h={CELL.h} at={customerAt + 2} title="text" size={21} />
         <Box x={1520} y={rowY(1) + 28} w={220} h={CELL.h} at={customerAt + 6} tone="ok" size={21}>

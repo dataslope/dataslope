@@ -12,6 +12,8 @@ import { artH, Drift, Headline, Kicker, Line, OK, OK_INK, Spot } from "./parts";
 const TX0 = 300;
 const TX1 = 1260;
 const LX = TX1 + 16;
+/** The closing advice, clear of the time axis's "seconds". */
+const HOW_X = TX1 + 76;
 
 /**
  * Question 4, the other half: not burying a dependency that is already
@@ -21,6 +23,8 @@ const LX = TX1 + 16;
  * rate never comes down. A breaker trips past 50% errors, sends nothing for
  * 12 seconds, then lets a tenth through as a probe: the first fails and it
  * opens again, the second passes and it closes, and the service recovers.
+ * So: retry with backoff and jitter under a budget, and while the breaker is
+ * open, fail fast or fall back to a cached answer.
  */
 export const BreakerScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -44,7 +48,11 @@ export const BreakerScene: React.FC = () => {
   const closesAt = n.word("q4-states", "and it closes");
   const aloneAt = n.word("q4-close", "Left alone, the service recovers");
   const neverAt = n.word("q4-close", "Under retries, it never does");
-  const end = n.beat("q4-close").to;
+  const howAt = n.word("q4-how", "So retry with backoff and jitter");
+  const budgetAt = n.word("q4-how", "under a small budget");
+  const openAt = n.word("q4-how", "while the breaker is open");
+  const fastAt = n.word("q4-how", "fail fast or serve a cached answer");
+  const end = n.beat("q4-how").to;
 
   const N = BREAKER.seconds;
   const tx = (t: number) => TX0 + (t / N) * (TX1 - TX0);
@@ -105,18 +113,19 @@ export const BreakerScene: React.FC = () => {
       <Sfx name="el-tap" at={passesAt + 4} level={-36} />
       <Sfx name="el-chime" at={aloneAt + 6} level={-36} />
       <Sfx name="el-scratch" at={neverAt + 6} level={-35} />
+      <Sfx name="el-chime" at={fastAt + 6} level={-37} />
 
       <Drift from={from} to={end + 30}>
         <Kicker at={from}>Question 4 · Single points of failure</Kicker>
-        <Headline lead="Don't bury a dependency" turn="that's already failing." at={halfAt} turnAt={halfAt + 20} size={60} />
+        <Headline lead="Don't bury a dependency" turn="that's already failing" at={halfAt} turnAt={halfAt + 20} size={60} />
         <Spot id="breaker" at={breakerAt} left={1600} top={118} width={160} height={artH("breaker", 160)} />
 
         {/* Panel titles. */}
         <div style={{ position: "absolute", left: TX0, top: errTop - h(48), ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
-          error rate at the dependency
+          Error rate at the dependency
         </div>
         <div style={{ position: "absolute", left: TX0, top: reqTop - h(48), ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: chartIn }}>
-          requests per second reaching it
+          Requests per second reaching it
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, simAt, 10) }}> · the page&apos;s simulation</span>
         </div>
 
@@ -219,6 +228,20 @@ export const BreakerScene: React.FC = () => {
         </Line>
         <Line x={LX} y={ey(BREAKER.retryEndErrorRate) - 14} at={neverAt + 4} size={21} weight={500} color={ACCENT_INK}>
           never recovers
+        </Line>
+
+        {/* How to retry, and what callers do while it is open. */}
+        <Line x={HOW_X} y={reqBot + 8} at={howAt} size={23} weight={500} color={OK_INK}>
+          Retry with backoff and jitter,
+        </Line>
+        <Line x={HOW_X} y={reqBot + 44} at={budgetAt} size={23} weight={500} color={OK_INK}>
+          under a small retry budget
+        </Line>
+        <Line x={HOW_X} y={reqBot + 96} at={openAt} size={23} weight={500} color={OK_INK}>
+          While it&apos;s open: fail fast,
+        </Line>
+        <Line x={HOW_X} y={reqBot + 132} at={fastAt + 6} size={23} weight={500} color={OK_INK}>
+          or serve a cached answer
         </Line>
       </Drift>
     </AbsoluteFill>

@@ -29,7 +29,7 @@ const LEVELS = [
   { name: "Repeatable read", allows: [false, false, true] },
   { name: "Serializable", allows: [false, false, false] },
 ];
-const ANOMALIES = ["dirty read", "non-repeatable", "phantom"];
+const ANOMALIES = ["Dirty read", "Non-repeatable", "Phantom"];
 
 const mono = (size: number, color: string = INK) => svgText({ fontFamily: MONO, fontSize: size, fontWeight: 500, color });
 /** "Postgres default", as a yellow badge beside its row. */
@@ -211,7 +211,7 @@ export const IsoScene: React.FC = () => {
                 </text>
                 {lv.allows.map((allowed, j) => (
                   <text key={j} x={colX(j)} y={yy} style={svgText(note(22, allowed ? ACCENT_INK : OK_INK))} opacity={ease(frame, at + 6 + j * 3, 10)}>
-                    {allowed ? "allowed" : "prevented"}
+                    {allowed ? "Allowed" : "Prevented"}
                   </text>
                 ))}
                 {isDefault ? (
@@ -253,9 +253,9 @@ export const IsoScene: React.FC = () => {
           </g>
         </svg>
         <Note at={upAt + 4} x={R_X + 30} y={gridTop + h(60)}>
-          <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>prevents more,</div>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Prevents more,</div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, concurrencyAt, 10) }}>allows less concurrency</div>
-          <div style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, retriedAt, 10) }}>serializable: a transaction</div>
+          <div style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, retriedAt, 10) }}>Serializable: a transaction</div>
           <div style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, retriedAt, 10) }}>can fail; retry it</div>
         </Note>
         <Note at={onlyAt} x={GRID_X} y={gridTop + 14 + 4 * ROW_H + h(18)}>

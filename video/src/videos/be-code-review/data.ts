@@ -106,3 +106,7 @@ export const REVIEW = {
   onSorted: run(results.review.reviewTestsOnSorted),
   onFix: run(results.review.reviewTestsOnFix),
 };
+
+/** The closing: Python's sort, its comparisons counted, on 1,000 intervals
+ *  already in order (999, one pass) and on the same 1,000 shuffled. */
+export const COST = results.cost as { n: number; inOrder: number; shuffled: number };

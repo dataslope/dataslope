@@ -82,9 +82,9 @@ export const KeysScene: React.FC = () => {
   const target = (i: number) => dim.rows.findIndex((r) => r[dKey] === fact.rows[i][fKey]);
   const panelsDim = twoRowsAt;
   const problems = [
-    { what: "changes", code: "ada@old.test → ada@new.test", text: "", at: changeAt },
-    { what: "gets reused", code: "SKU-XYZ", text: ", given to a new product", at: reusedAt },
-    { what: "long strings", code: "", text: "a wide key on every fact row, in every join", at: longAt },
+    { what: "Changes", code: "ada@old.test → ada@new.test", text: "", at: changeAt },
+    { what: "Gets reused", code: "SKU-XYZ", text: ", given to a new product", at: reusedAt },
+    { what: "Long strings", code: "", text: "a wide key on every fact row, in every join", at: longAt },
   ];
 
   return (
@@ -142,13 +142,13 @@ export const KeysScene: React.FC = () => {
           </PanelHead>
           <Note at={nothingAt} x={R_X} y={y(372)}>
             <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-              means nothing,
+              Means nothing,
               <span style={{ opacity: ease(frame, upstreamAt, 10) }}> so nothing upstream can change it</span>
             </span>
           </Note>
           <Note at={smallAt} x={R_X} y={y(424)}>
             <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-              small: an integer, <Mono>1001</Mono>
+              Small: an integer, <Mono>1001</Mono>
             </span>
           </Note>
         </div>
@@ -192,11 +192,11 @@ export const KeysScene: React.FC = () => {
           <KeyArrow key={i} from={[fg.x - 10, fg.rowMid(i)]} to={[dg.right + 12, dg.rowMid(target(i))]} at={pointsAt + 8 + i * 6} />
         ))}
         <Note at={trueAt + 8} x={fg.x} y={fg.rowTop(fact.rows.length) + h(22)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>each order: the version true when it was placed</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Each order: the version true when it was placed</span>
         </Note>
         <Note at={lookAt} x={fg.x} y={fg.rowTop(fact.rows.length) + h(62)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            each load: <Mono>customer_id</Mono> + date
+            Each load: <Mono>customer_id</Mono> + date
             <span style={{ opacity: ease(frame, newOrderAt, 10) }}> → a new order&apos;s key</span>
           </span>
         </Note>

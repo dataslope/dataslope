@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { QUICKSORT } from "./data";
 import { ACCENT, ACCENT_INK, Art, BAR, Drift, OK, HIGHLIGHT, INK, INK_SOFT, Line, Mark, OK_INK, PAPER, Svg, int, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 /** Two panels on one horizontal scale: a thousand items across 720px. */
 const W = 720;
@@ -16,8 +17,9 @@ const LX = 140;
 const RXP = 1040;
 /** Vertical scale, the same in both: one level of splits a row. */
 const STAIR_H = 360;
-/** The random run's band, enlarged this many times below it. */
-const ZOOM = 20;
+/** The random run's band, enlarged this many times in the small detail below
+ *  it: enough to show its splits, small enough not to read as its depth. */
+const ZOOM = 10;
 
 /**
  * Question 8. A thousand numbers already in order, drawn as a ramp of bars.
@@ -53,7 +55,9 @@ export const QuickScene: React.FC = () => {
   const randomizeAt = n.word("quick-next", "so randomize");
   const edgeAt = n.word("quick-next", "Quicksort's edge over merge sort");
   const placeAt = n.word("quick-next", "sorting in place");
-  const end = n.beat("quick-next").to;
+  const stableAt = n.word("quick-trade", "But it isn't stable");
+  const heapsortAt = n.word("quick-trade", "libraries cap its worst case by switching to heapsort");
+  const end = n.beat("quick-trade").to;
 
   const N = QUICKSORT.n;
   const rampTop = y(370);
@@ -73,7 +77,10 @@ export const QuickScene: React.FC = () => {
   // The random run, row by row.
   const randP = ease(frame, randomAt + 4, 24);
   const bandTop = stairTop;
-  const insetTop = bandTop + QUICKSORT.randomPivotSorted.depth * perLevel + 46;
+  const bandBottom = bandTop + QUICKSORT.randomPivotSorted.depth * perLevel;
+  // The to-scale labels sit right under the band, as the left's sit by its
+  // staircase; the detail comes after them.
+  const insetTop = bandBottom + 118;
   const insetRow = perLevel * ZOOM;
   const randDepth = Math.round(randP * QUICKSORT.randomPivotSorted.depth);
   const parts = QUICKSORT.randomPartitions.filter(([d]) => d <= randDepth);
@@ -97,7 +104,7 @@ export const QuickScene: React.FC = () => {
         <Line at={pickAt} x={96} y={y(262)} size={24} color={INK_SOFT}>
           Pick a pivot, split the rest into smaller and larger, sort each side
           <span style={{ opacity: ease(frame, avgAt, 10) }}>
-            : <b style={{ color: INK }}>O(n log n)</b> on average
+            : <b style={{ color: INK }}><M>O(n log n)</M></b> on average
           </span>
         </Line>
         <Art name="cards" at={sortAt} out={randomAt - 24} left={1290} top={y(470)} h={150} />
@@ -122,7 +129,7 @@ export const QuickScene: React.FC = () => {
           <Num>{int(QUICKSORT.lastPivotSorted.compares)}</Num> comparisons
         </Line>
         <Line at={halfAt + 10} x={600} y={y(666)} size={22} color={INK_SOFT}>
-          n(n − 1)/2, about n²/2
+          <M>n(n − 1)/2</M>, about <M>n²/2</M>
         </Line>
         <Line at={limitAt} x={520} y={y(712)} size={22} weight={500}>
           Recursive: past Python&apos;s limit of <Num>{int(QUICKSORT.recursionLimit)}</Num>
@@ -144,7 +151,7 @@ export const QuickScene: React.FC = () => {
           {QUICKSORT.recursiveLastPivot.replace(": ", ":\n")}
         </div>
 
-        <VRule x={1004} top={rampTop - 50} bottom={insetBottom + 262} at={randomAt} />
+        <VRule x={1004} top={rampTop - 50} bottom={insetBottom + 280} at={randomAt} />
 
         {/* Random pivots, the same input, the same scale. */}
         <Line at={randomAt} x={RXP} y={rampTop - 50} size={22} weight={500}>
@@ -156,50 +163,46 @@ export const QuickScene: React.FC = () => {
           {parts.map(([d, lo, hi], i) => (
             <rect key={`b${i}`} x={ix(RXP, lo)} y={bandTop + (d - 1) * perLevel} width={Math.max(0.6, ix(RXP, hi + 1) - ix(RXP, lo) - 0.6)} height={perLevel} fill={OK} />
           ))}
-          {/* The same band, twenty times taller. */}
-          <path
-            d={`M${RXP},${bandTop + QUICKSORT.randomPivotSorted.depth * perLevel + 4} L${RXP},${insetTop - 6} M${RXP + W},${bandTop + QUICKSORT.randomPivotSorted.depth * perLevel + 4} L${RXP + W},${insetTop - 6}`}
-            stroke={INK_SOFT}
-            strokeWidth={1.2}
-            strokeDasharray="3 4"
-            opacity={ease(frame, randomAt + 10, 10)}
-          />
+          {/* A small detail of the same band, to show its splits. */}
           {parts.map(([d, lo, hi], i) => (
             <rect
               key={`z${i}`}
               x={ix(RXP, lo)}
-              y={insetTop + (d - 1) * insetRow + 1}
+              y={insetTop + (d - 1) * insetRow + 0.4}
               width={Math.max(0.8, ix(RXP, hi + 1) - ix(RXP, lo) - 1.2)}
-              height={insetRow - 2}
-              rx={1}
+              height={insetRow - 0.8}
               fill={`color-mix(in srgb, ${OK} 55%, ${PAPER})`}
-              stroke={OK}
-              strokeWidth={0.6}
+              opacity={ease(frame, twentyAt + 10, 12)}
             />
           ))}
         </Svg>
-        <Line at={randomAt + 10} x={RXP + W - 300} y={insetTop - 40} size={21} color={INK_SOFT} weight={500} width={300} align="right">
-          the band, <Num>{ZOOM}</Num> times taller
+        {/* At the shared scale, labelled like the left's 999. */}
+        <Line at={twentyAt} x={RXP} y={bandBottom + 16} size={24} weight={500}>
+          <Num>{QUICKSORT.randomPivotSorted.depth}</Num> levels, to scale
         </Line>
-        <Line at={twentyAt} x={RXP} y={insetBottom + 20} size={24} weight={500}>
-          <Num>{QUICKSORT.randomPivotSorted.depth}</Num> levels
-        </Line>
-        <Line at={elevenAt} x={RXP + 180} y={insetBottom + 20} size={24} weight={500} color={OK_INK}>
+        <Line at={elevenAt} x={RXP + 260} y={bandBottom + 16} size={24} weight={500} color={OK_INK}>
           <Num>{int(QUICKSORT.randomPivotSorted.compares)}</Num> comparisons
+        </Line>
+        <Line at={twentyAt + 10} x={RXP} y={insetTop - 38} size={21} color={INK_SOFT} weight={500}>
+          Detail, zoomed <Num>{ZOOM}</Num>× to show the splits
         </Line>
 
         {/* Why it matters. */}
-        <Line at={commonAt} x={RXP} y={insetBottom + 86} size={24}>
+        <Line at={commonAt} x={RXP} y={insetBottom + 50} size={24}>
           Sorted input is common: rows by ID, events by time.
         </Line>
-        <Line at={randomizeAt} x={RXP} y={insetBottom + 128} size={24} weight={500} color={OK_INK}>
+        <Line at={randomizeAt} x={RXP} y={insetBottom + 92} size={24} weight={500} color={OK_INK}>
           Randomize the pivot.
         </Line>
-        <Line at={edgeAt} x={RXP} y={insetBottom + 190} size={24}>
+        <Line at={edgeAt} x={RXP} y={insetBottom + 150} size={24}>
           Its edge over merge sort: it sorts <Mark at={placeAt}>in place</Mark>
         </Line>
-        <Line at={edgeAt + 10} x={RXP} y={insetBottom + 232} size={24} color={INK_SOFT}>
+        <Line at={edgeAt + 10} x={RXP} y={insetBottom + 192} size={24} color={INK_SOFT}>
           where merge sort needs a buffer as big as the input
+        </Line>
+        <Line at={stableAt} x={RXP} y={insetBottom + 250} size={24} color={ACCENT_INK}>
+          But it isn&apos;t stable
+          <span style={{ opacity: ease(frame, heapsortAt, 10), color: INK }}>; introsort falls back to heapsort</span>
         </Line>
       </Drift>
     </AbsoluteFill>

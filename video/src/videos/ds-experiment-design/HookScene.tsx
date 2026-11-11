@@ -198,7 +198,7 @@ export const HookScene: React.FC = () => {
           })}
         </div>
         <Note at={undoAt - 2} x={DOTS_X} y={y(LINE_Y) + h(70)}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a mistake is hard to undo once it's live</span>
+          <span style={{ ...note(27, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A mistake is hard to undo once it's live</span>
         </Note>
 
         {/* The round. */}

@@ -105,7 +105,7 @@ export const QueueScene: React.FC = () => {
         </QuestionCard>
         <MiniMap at={qAt} stage={6} lit={[["store", qAt], ["queue", queueAt]]} grow={{ queue: queueAt }} />
         <Line at={insideAt} x={X0} y={y(334)} size={22} weight={500} color={INK_SOFT}>
-          when work doesn&apos;t need to finish inside the request
+          When work doesn&apos;t need to finish inside the request
         </Line>
 
         {/* ── The request path ── */}
@@ -156,7 +156,7 @@ export const QueueScene: React.FC = () => {
 
         {/* ── After: the click is queued; workers drain it. ── */}
         <Svg opacity={queueIn}>
-          <rect x={QUEUE.x} y={mid - QUEUE.h / 2} width={QUEUE.w} height={QUEUE.h} rx={12} fill={`color-mix(in srgb, ${BAR} 6%, ${PAPER})`} stroke={BAR} strokeWidth={2.5} />
+          <rect x={QUEUE.x} y={mid - QUEUE.h / 2} width={QUEUE.w} height={QUEUE.h} rx={8} fill={`color-mix(in srgb, ${BAR} 6%, ${PAPER})`} stroke={BAR} strokeWidth={2.5} />
         </Svg>
         <Ink at={queueAt + 4} dur={12} style={{ left: QUEUE.x, top: mid - QUEUE.h / 2 - 40, whiteSpace: "nowrap" }}>
           <span style={{ ...label(22, BLUE_INK), fontWeight: 500 }}>queue</span>
@@ -172,7 +172,7 @@ export const QueueScene: React.FC = () => {
                 top: mid - TOKEN.h / 2,
                 width: TOKEN.w,
                 height: TOKEN.h,
-                borderRadius: 7,
+                borderRadius: 5,
                 background: BAR,
                 opacity: t.o,
               }}
@@ -211,7 +211,7 @@ export const QueueScene: React.FC = () => {
           </span>
         </Ink>
         <Line at={slowAt} x={QUEUE.x} y={mid + QUEUE.h / 2 + h(66)} size={21} color={INK_SOFT}>
-          slow work goes the same way
+          Slow work goes the same way
           <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, emailAt, 10) }}>: email, video transcoding</span>
         </Line>
         <Spot id="conveyor" at={queueAt} x={1620} y={y(730)} w={180} />
@@ -247,10 +247,10 @@ export const QueueScene: React.FC = () => {
           <span style={{ fontWeight: 500, color: INK, opacity: ease(frame, txAt, 10) }}> recorded in the same transaction as the count</span>
         </Line>
         <Line at={repeatAt} x={X0} y={y(712) + h(92)} size={22} weight={500} color={OK_INK}>
-          a repeat of 47 changes nothing
+          A repeat of 47 changes nothing
         </Line>
         <Line at={behindAt} x={X0} y={y(712) + h(138)} size={22} color={INK_SOFT}>
-          the totals run a little behind
+          The totals run a little behind
         </Line>
         {repeat > 0 ? (
           <div

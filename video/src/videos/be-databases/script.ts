@@ -51,7 +51,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     row, labelled key-value, document, wide-column, each with its one
  *     access pattern; "weaker consistency, limited joins" under them in the soft
  *     ink. nosql-both: one diagram, SQL box ("orders, payments") beside a
- *     NoSQL box ("logs, sessions, feeds"). nosql-next: a new query arrives as
+ *     NoSQL box ("logs, sessions, feeds"). nosql-scale: "scales
+ *     too: replicas, sharding" under SQL, and "decide by access pattern and
+ *     consistency, not size" between the two. nosql-next: a new query arrives as
  *     a dashed arrow; the relational side draws a join, the other side
  *     copies its data into a second arrangement for it.
  *   index: QuestionCard 2. index-scan: the users table as 7,360 small page
@@ -83,9 +85,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     marked as running first. plan-look: three labels pinned to it: scan,
  *     estimate vs actual, rows removed. plan-bad: the function filter's plan,
  *     "rows=5000" against "actual rows=2732" in yellow, "Rows Removed by
- *     Filter: 997268" in red. plan-why: the filter's cast circled.
+ *     Filter: 997268" in red. plan-gap: "Postgres plans from the estimate, so
+ *     a big gap means a bad choice". plan-why: the filter's cast banded red.
  *     plan-fix: the range's plan, an Index Only Scan, both counts 2,732
- *     (green). plan-sarg: "sargable", and the other two fixes.
+ *     (green). plan-sarg: "sargable". plan-fixes: the other fixes, an index on
+ *     the expression, or ANALYZE when estimates are stale.
  *   fanout: QuestionCard 6. fanout-run: the page's 24 orders (the total
  *     2,661.50), then joined to order_items: 48 rows, each order repeated per
  *     item, the total 5,451.75 in red; Sara's two orders, three items each,
@@ -93,7 +97,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     row per order, the total back to 2,661.50 (green). fanout-check: row
  *     counts beside each step.
  *   txn: QuestionCard 7; BEGIN, two statements, COMMIT or ROLLBACK as a
- *     bracket. txn-run: accounts 1 and 2 at 100; the debit takes 1 to 70;
+ *     bracket. txn-run: account 1 at 100 (account 2, a bystander, left
+ *     out), "to account 99, which doesn't exist"; the debit takes 1 to 70;
  *     the transfer row fails its foreign key (the error, as Postgres printed
  *     it, in red). txn-abort: the next statement refused ("current
  *     transaction is aborted"); ROLLBACK; account 1 back at 100 (green);
@@ -108,15 +113,22 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     timelines again, drawn (not run): read 100, the other commits 50, read
  *     50. anomalies-phantom: a filter's result gaining a row between reruns,
  *     drawn; the repeatable read cell marked for Postgres.
- *     anomalies-serial: serializable's row; a transaction aborted with
- *     "serialization failure" and an arrow back to its start, "retry".
+ *     The standard's "possible" cells stay as the standard has them, with
+ *     a yellow "Postgres: no" badge beside the two Postgres prevents.
+ *     anomalies-serial: serializable's row. anomalies-skew: write skew,
+ *     drawn: both check "2 on call", each takes a different doctor off,
+ *     "under repeatable read, both commit". anomalies-abort: the other
+ *     commits, this one aborted with "serialization failure" and an arrow
+ *     back to its start, "retry".
  *   lock: QuestionCard 10; pessimistic: a row with a padlock.
  *     lock-pess-run: the other transaction holds account 1 (padlock); the
  *     NOWAIT read refused (the error, red); account 2 granted (green).
  *     lock-opt: a row with "version 3" beside it. lock-opt-run: clients A
  *     and B both read v3; B writes, v4 (stock 4); A's write "where version =
  *     3" returns 0 rows (red); A rereads v4 and retries, v5, stock 3 (green).
- *     lock-choose: a dial from rare to frequent conflicts.
+ *     lock-choose: a dial from rare to frequent conflicts. lock-cost: in the
+ *     place of the NOWAIT error, pessimistic's price (others wait, deadlocks)
+ *     and "across two requests: only optimistic".
  *   deadlock: QuestionCard 11. deadlock-cycle: two transfers as two
  *     timelines, each taking one account's lock, then reaching for the
  *     other's: the two waits drawn as arrows closing a cycle (drawn, not
@@ -130,8 +142,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     every order, one copy changed and the others stale (red).
  *     r-joins: the page's Venn-style pair, inner 24 rows, left 30, the six
  *     names with no orders. r-keys: orders.customer_id pointing at
- *     customers.id; "accounts_pkey" listed, no index on the foreign key's
- *     column. r-cover: the index with amount inside it; "Index Only Scan,
+ *     customers.id; pg_indexes on the two, primary keys only, "no index on
+ *     customer_id". r-keys-fix: "index it yourself". r-cover: the index with amount inside it; "Index Only Scan,
  *     Heap Fetches: 0" against the plain index's 20 heap pages.
  *   next: the RapidFire list complete; NextLine "Next: concurrency".
  *
@@ -202,8 +214,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     block comments "Cy has no orders"; run, Cy has two, 104 and 124, so
  *     the video names no one and says "the six who never ordered".
  *     Reported.) "r-keys": pg_indexes on
- *     accounts and transfers lists only the two primary keys
- *     (accounts_pkey, transfers_pkey), none on from_id or to_id. "r-cover":
+ *     the quick round's own customers and orders, orders.customer_id
+ *     declared a foreign key, lists only the two primary keys
+ *     (customers_pkey, orders_pkey), none on customer_id. "r-cover":
  *     SUM(amount) for customer 42 on an index on customer_id is a Bitmap Heap
  *     Scan of 20 table pages; with INCLUDE (amount), after VACUUM, an Index
  *     Only Scan with "Heap Fetches: 0".
@@ -264,6 +277,11 @@ export const script: NarrationScript = {
     {
       id: "nosql-both",
       text: "At scale, many systems use both: SQL for the core transactions, NoSQL for high-volume logs, sessions or feeds.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "nosql-scale",
+      text: "Relational scales further than people think, with replicas and sharding, so decide on the access pattern and the consistency you need, not on size alone.",
       pauseAfter: 0.6,
     },
     {
@@ -338,7 +356,7 @@ export const script: NarrationScript = {
     {
       id: "composite-prefix",
       text: "So it serves a left prefix: every Lovelace, or Ada Lovelace, but not every Ada.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
     {
       id: "composite-run",
@@ -384,18 +402,28 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "plan-gap",
+      text: "Postgres picks its plan from that estimate, so a big gap means a bad choice, like a nested loop over far more rows than it guessed.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "plan-why",
       text: "The cause is the filter. It turns each timestamp into a date, and an index on a column can't search a function of it.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.0,
     },
     {
       id: "plan-fix",
       text: "Write it as a range on the column itself, and the plan becomes an index-only scan, with an estimate that's exactly right.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.0,
     },
     {
       id: "plan-sarg",
-      text: "That's a sargable filter: one the index can search. The other usual fixes are a new index, and fresh statistics.",
+      text: "That's a sargable filter: one the index can search.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "plan-fixes",
+      text: "The other usual fixes: an index on the expression itself, or fresh statistics when the estimates are stale.",
       pauseAfter: 0.8,
     },
 
@@ -417,8 +445,13 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "fanout-grow",
+      text: "The error grows with the items per order, so a test on single-item orders can hide it.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "fanout-check",
-      text: "The error multiplies, so a small sample can hide it. Check the row count before and after every join.",
+      text: "Check the row count before and after every join.",
       pauseAfter: 0.8,
     },
 
@@ -469,7 +502,17 @@ export const script: NarrationScript = {
     },
     {
       id: "anomalies-serial",
-      text: "Serializable promises an outcome some one-at-a-time order could give. In exchange, Postgres may abort a transaction with a serialization failure, to be retried.",
+      text: "Serializable promises an outcome some one-at-a-time order could give.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "anomalies-skew",
+      text: "That stops write skew, which repeatable read allows: two transactions each check a rule, then each change a different row, and together they break it.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "anomalies-abort",
+      text: "In exchange, Postgres may abort a transaction with a serialization failure, to be retried.",
       pauseAfter: 0.8,
     },
 
@@ -498,6 +541,11 @@ export const script: NarrationScript = {
     {
       id: "lock-choose",
       text: "Optimistic wins when conflicts are rare, since one costs only a retry. Pessimistic wins when they're frequent, and retries would pile up.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "lock-cost",
+      text: "Pessimistic makes others wait, which costs throughput and risks deadlocks. And across two requests, with no transaction held open, only optimistic works: send the version back with the write.",
       pauseAfter: 0.8,
     },
 
@@ -550,6 +598,11 @@ export const script: NarrationScript = {
       id: "r-keys",
       text: "A primary key identifies each row: unique, never null, and indexed automatically. A foreign key points at another table's primary key, so no order can name a missing customer. Postgres doesn't index the foreign key's column for you.",
       pauseAfter: 0.6,
+    },
+    {
+      id: "r-keys-fix",
+      text: "Index it yourself, or finding a customer's orders, or deleting a customer, scans the whole orders table.",
+      pauseAfter: 1.2,
     },
     {
       id: "r-cover",

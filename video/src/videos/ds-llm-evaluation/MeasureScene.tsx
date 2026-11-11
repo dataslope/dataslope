@@ -51,18 +51,18 @@ export const MeasureScene: React.FC = () => {
   const decisionAt = n.word("measure", "Start from the decision");
   const goodAt = n.word("measure", "what a good reply is");
   const lines = [
-    { text: "correct", at: n.word("measure", "correct") },
-    { text: "complete", at: n.word("measure", "complete") },
-    { text: "on policy", at: n.word("measure", "on policy") },
-    { text: "the right tone", at: n.word("measure", "the right tone") },
+    { text: "Correct", at: n.word("measure", "correct") },
+    { text: "Complete", at: n.word("measure", "complete") },
+    { text: "On policy", at: n.word("measure", "on policy") },
+    { text: "The right tone", at: n.word("measure", "the right tone") },
   ];
   const rubricAt = n.word("measure", "turn that into a rubric");
   const passAt = n.word("measure", "pass or fail on each");
   const steps = [
-    { text: "sample real traffic, by intent and difficulty", at: n.word("measure-steps", "Sample real traffic") },
-    { text: "expert labels, two raters on some items", at: n.word("measure-steps", "Have experts label a subset") },
-    { text: "every version on the same items", at: n.word("measure-steps", "Score every version") },
-    { text: "report the uncertainty", at: n.word("measure-steps", "report the uncertainty") },
+    { text: "Sample real traffic, by intent and difficulty", at: n.word("measure-steps", "Sample real traffic") },
+    { text: "Expert labels, two raters on some items", at: n.word("measure-steps", "Have experts label a subset") },
+    { text: "Every version on the same items", at: n.word("measure-steps", "Score every version") },
+    { text: "Report the uncertainty", at: n.word("measure-steps", "report the uncertainty") },
   ];
   const rareAt = n.word("measure-steps", "so the rare cases are in it");
   const humansAt = n.word("measure-steps", "how much humans agree");
@@ -90,7 +90,7 @@ export const MeasureScene: React.FC = () => {
 
         <Note at={decisionAt} x={CARD.x} y={y(CARD.top - 62)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <Mark at={decisionAt + 6}>start from the decision</Mark>, not the metric
+            <Mark at={decisionAt + 6}>Start from the decision</Mark>, not the metric
           </span>
         </Note>
 
@@ -98,11 +98,11 @@ export const MeasureScene: React.FC = () => {
             list of plain text under its label. */}
         <Note at={goodAt - 2} x={CARD.x} y={y(CARD.top + 40)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>
-            <span style={{ opacity: 1 - ease(frame, rubricAt, 12) }}>a good reply is</span>
+            <span style={{ opacity: 1 - ease(frame, rubricAt, 12) }}>A good reply is</span>
           </span>
         </Note>
         <Note at={rubricAt} x={CARD.x} y={y(CARD.top + 40)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>the rubric</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>The rubric</span>
         </Note>
         {lines.map((l, i) => (
           <React.Fragment key={l.text}>
@@ -143,14 +143,14 @@ export const MeasureScene: React.FC = () => {
             {s.text}
           </Step>
         ))}
-        <Note at={rareAt} x={STEPS_X + 58} y={y(STEPS_TOP) + h(44)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>so the rare cases are in it</span>
+        <Note at={rareAt} x={STEPS_X + 58} y={y(STEPS_TOP) + h(48)}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>so the rare cases are in it</span>
         </Note>
-        <Note at={humansAt} x={STEPS_X + 58} y={y(STEPS_TOP) + h(STEP_ROW + 44)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>to see how much humans agree</span>
+        <Note at={humansAt} x={STEPS_X + 58} y={y(STEPS_TOP) + h(STEP_ROW + 48)}>
+          <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>to see how much humans agree</span>
         </Note>
-        <Note at={noiseAt - 4} x={STEPS_X + 58} y={y(STEPS_TOP) + h(3 * STEP_ROW + 44)}>
-          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>a pass rate with no interval invites people to ship noise</span>
+        <Note at={noiseAt - 4} x={STEPS_X + 58} y={y(STEPS_TOP) + h(3 * STEP_ROW + 48)}>
+          <span style={{ ...label(24, ACCENT_INK), whiteSpace: "nowrap" }}>A pass rate with no interval invites people to ship noise</span>
         </Note>
       </Drift>
     </AbsoluteFill>

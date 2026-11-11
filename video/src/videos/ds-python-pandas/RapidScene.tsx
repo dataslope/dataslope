@@ -115,7 +115,7 @@ const ChainBody: React.FC<{ c: Ctx }> = ({ c }) => {
         rows={C.rows.map((cells, i) => ({ cells, at: steps[3] + 4 + i * 3 }))}
       />
       <Line at={c.w("r-chain", "no throwaway variables")} top={c.y(370) + listingHeight(C.lines.length, SIZE) + c.h(22)}>
-        no throwaway variables in between
+        No throwaway variables in between
       </Line>
     </>
   );
@@ -170,11 +170,11 @@ const CaseBody: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={S.rows.map((_, row) => ({ row, col: size, at: c.w("r-case", "a list of conditions") + row * 2, color: MARK_KEY }))}
       />
       <Note at={startAt + 4} x={R_X} y={g.top - c.h(40)}>
-        <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>started from the default</span>
+        <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Started from the default</span>
       </Note>
       <Note at={matchAt} x={bx} y={bg.top - c.h(40)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          started from <Mono>amount</Mono>
+          Started from <Mono>amount</Mono>
         </span>
       </Note>
       <DataTable
@@ -254,7 +254,7 @@ const DatesBody: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={W.rows.map((_, row) => ({ row, col: 1, at: said[row] }))}
       />
       <Line at={sumsAt + 6} x={g.right + 30} top={g.rowMid(0) - c.h(16)} color={INK_SOFT}>
-        weeks end on Sunday
+        Weeks end on Sunday
       </Line>
     </>
   );
@@ -281,7 +281,7 @@ export const RapidScene: React.FC = () => {
   const pairs = [
     { pandas: "groupby", sql: "GROUP BY", at: n.word("next", "Groupby becomes group by") },
     { pandas: "merge", sql: "JOIN", at: n.word("next", "merge becomes a join") },
-    { pandas: "transform", sql: "a window function", at: n.word("next", "transform becomes a window function") },
+    { pandas: "transform", sql: "A window function", at: n.word("next", "transform becomes a window function") },
   ];
   const nextAt = n.word("next", "Next: SQL");
   const end = n.beat("next").to;

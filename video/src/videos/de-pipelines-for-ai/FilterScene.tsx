@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -112,7 +112,7 @@ export const FilterScene: React.FC = () => {
         </QuestionCard>
         <Note at={simAt - 2} x={X0} y={y(244)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            the index is built for similarity
+            The index is built for similarity
             <span style={{ opacity: ease(frame, yourAt - 2, 10) }}>
               , <Mark at={yourAt + 4}>not for your filter</Mark>
             </span>
@@ -169,20 +169,20 @@ export const FilterScene: React.FC = () => {
         </Note>
         <Note at={postAt} x={SC.x} y={top + SC.h + 60} dim={preAt}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <b>post-filter</b>: the ten nearest
+            <b>Post-filter</b>: the ten nearest
             <span style={{ opacity: ease(frame, dropsAt - 2, 10) }}>, then drop the rest</span>
             <span style={{ opacity: ease(frame, fewerAt - 2, 10), color: ACCENT_INK, fontWeight: 500 }}>: 0 of 10 left</span>
           </span>
         </Note>
         <Note at={preAt} x={SC.x} y={top + SC.h + 100}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <b>pre-filter</b>: this tenant first, a full ten
+            <b>Pre-filter</b>: this tenant first, a full ten
             <span style={{ opacity: ease(frame, correctAt - 2, 10), color: OK_INK, fontWeight: 500 }}>, correct</span>
           </span>
         </Note>
         <Note at={smallAt - 2} x={SC.x} y={top + SC.h + 140}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            a small subset: scan it exactly
+            A small subset: scan it exactly
             <span style={{ opacity: ease(frame, bigAt - 2, 10) }}> · too big to scan: use the index</span>
           </span>
         </Note>
@@ -196,7 +196,7 @@ export const FilterScene: React.FC = () => {
         {/* The simulation's 200 searches. */}
         <Note at={sameAt - 2} x={GRID.x} y={gridTop - 112}>
           <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            the same simulation
+            The same simulation
             <span style={{ opacity: ease(frame, tenantsAt - 2, 10), fontWeight: 500 }}>: {FILTER.tenants} tenants</span>
             <span style={{ opacity: ease(frame, keepAt - 2, 10), fontWeight: 500 }}>, top {FILTER.k} kept to one</span>
           </span>
@@ -213,9 +213,12 @@ export const FilterScene: React.FC = () => {
             const e = ease(frame, keepAt + 4 + r * 1.2, 10);
             const x = GRID.x + c * (GRID.cell + GRID.gap);
             const yy = gridTop + r * (GRID.cell + GRID.gap);
-            const fill = k > 0 ? DATA : `color-mix(in srgb, ${ACCENT} ${22 * e}%, ${PAPER})`;
-            const stroke = k > 0 ? BLUE_INK : `color-mix(in srgb, ${ACCENT} ${100 * e}%, ${INK_SOFT})`;
-            return <rect key={i} x={x + (GRID.cell / 2) * (1 - s)} y={yy + (GRID.cell / 2) * (1 - s)} width={GRID.cell * s} height={GRID.cell * s} rx={4} fill={e > 0 ? fill : PAPER} stroke={stroke} strokeWidth={1.8} />;
+            // Filled squares, no outlines (the owner, 2026-11-11): a pale
+            // grey square until the run is read, then red if it came back
+            // empty or blue if it found one.
+            const blank = `color-mix(in srgb, ${INK_SOFT} 16%, ${PAPER})`;
+            const fill = k > 0 ? `color-mix(in srgb, ${DATA} ${100 * e}%, ${blank})` : `color-mix(in srgb, color-mix(in srgb, ${ACCENT} 40%, ${PAPER}) ${100 * e}%, ${blank})`;
+            return <rect key={i} x={x + (GRID.cell / 2) * (1 - s)} y={yy + (GRID.cell / 2) * (1 - s)} width={GRID.cell * s} height={GRID.cell * s} rx={4} fill={fill} />;
           })}
         </svg>
         <Note at={emptyAt - 2} x={GRID.x} y={gridTop + 10 * (GRID.cell + GRID.gap) + 18}>

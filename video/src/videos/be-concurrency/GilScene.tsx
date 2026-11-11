@@ -8,7 +8,7 @@ import { Ink, Note, Num } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { BYTECODE } from "./data";
+import { BYTECODE, GIL_BUILD, PYTHON } from "./data";
 import { Band, Drift, KeyGlyph, lineOf, Listing, listingHeight, LockGlyph, MARK_OK, Node, OK, OK_INK, Spot, THREAD, tint, VRule, X0 } from "./parts";
 
 const LANE_X = 250;
@@ -52,7 +52,7 @@ const Slice: React.FC<{ t: number; x: number; y: number; w: number; h: number; a
         width: (w - 4) * p,
         height: h,
         boxSizing: "border-box",
-        borderRadius: 6,
+        borderRadius: 4,
         border: kind === "run" ? `2.5px solid ${th.fill}` : `1.5px dashed ${kind === "wait" ? th.fill : HAIRLINE}`,
         background: kind === "run" ? tint(th.fill, 34) : kind === "wait" ? tint(th.fill, 8) : "transparent",
         display: "flex",
@@ -108,10 +108,16 @@ export const GilScene: React.FC = () => {
   const procAt = n.word("gil-proc", "use processes instead");
   const ownAt = n.word("gil-proc", "its own interpreter and its own GIL");
   const parAt = n.word("gil-proc", "really do run in parallel");
-  const end = n.beat("gil-proc").to;
+  const freeAt = n.word("gil-free", "Since Python three fourteen");
+  const noGilAt = n.word("gil-free", "build with no GIL");
+  const thereAt = n.word("gil-free", "threads do run in parallel");
+  const mattersAt = n.word("gil-free", "the counter's lock matters even more");
+  const end = n.beat("gil-free").to;
 
   // The first page (the key, why, what it costs) gives way to the second.
   const page1Out = notSafeAt - 2;
+  // The interpreter box outlives page 1, dimmed, until the processes come.
+  const boxOut = procAt - 8;
   const cpuY = CPU_LANES.map((v) => y(v));
   const ioY = IO_LANES.map((v) => y(v));
   const laneH = h(LANE_H);
@@ -134,6 +140,7 @@ export const GilScene: React.FC = () => {
   const P_X = 1130;
   const pRow = (j: number) => y(330) + j * h(126);
   const runP = ease(frame, parAt, 40);
+  const FREE_Y = y(744);
 
   return (
     <AbsoluteFill>
@@ -186,27 +193,30 @@ export const GilScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={releasesAt + 6} x={X0} y={y(816)} out={page1Out}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>IO-bound: the waits overlap, so threads still help</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>I/O-bound: the waits overlap, so threads still help</span>
         </Note>
 
-        {/* Why one lock: every object's reference count. */}
+        {/* Why one lock: every object's reference count. It stays on the right,
+            dimmed, while the four instructions are read, so that half of the
+            page isn't left empty; the processes take its place. */}
         <Spot id="key" at={gilAt} out={memAt - 8} left={1360} top={y(400)} width={210} height={h(190)} />
-        <Node x={BOX.x} y={y(BOX.top)} w={BOX.w} h={h(BOX.h)} at={memAt} tone="plain" fill="transparent" out={page1Out} stroke={frame >= oneLockAt + 4 ? 2.5 : 1.5} line={frame >= oneLockAt + 4 ? OK : HAIRLINE} />
-        <Note at={memAt + 4} x={BOX.x + 24} y={y(BOX.top) + h(14)} out={page1Out}>
+        <div style={{ opacity: 1 - 0.6 * ease(frame, page1Out, 14) }}>
+        <Node x={BOX.x} y={y(BOX.top)} w={BOX.w} h={h(BOX.h)} at={memAt} tone="plain" fill="transparent" out={boxOut} stroke={frame >= oneLockAt + 4 ? 2.5 : 1.5} line={frame >= oneLockAt + 4 ? OK : HAIRLINE} />
+        <Note at={memAt + 4} x={BOX.x + 24} y={y(BOX.top) + h(14)} out={boxOut}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>the interpreter: memory management</span>
         </Note>
         {OBJECTS.map((o, k) => {
           const x = BOX.x + 30 + k * 160;
           return (
             <React.Fragment key={o.name}>
-              <Note at={countsAt + k * 4} x={x} y={y(BOX.top + 84)} width={140} from="up" out={page1Out} style={{ textAlign: "center" }}>
-                <div style={{ ...label(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{o.name}</div>
+              <Note at={countsAt + k * 4} x={x} y={y(BOX.top + 84)} width={140} from="up" out={boxOut} style={{ textAlign: "center" }}>
+                <div style={{ ...label(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{o.name}</div>
                 <div style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", marginTop: 6 }}>
                   refs: <Num>{o.refs}</Num>
                 </div>
               </Note>
-              {k > 0 ? <VRule x={x - 10} top={y(BOX.top + 84)} height={h(56)} at={countsAt + k * 4} out={page1Out} /> : null}
-              <Ink at={withoutAt - 4 + k * 3} dur={10} out={page1Out} style={{ left: x + 54, top: y(BOX.top + 196) }}>
+              {k > 0 ? <VRule x={x - 10} top={y(BOX.top + 84)} height={h(56)} at={countsAt + k * 4} out={boxOut} /> : null}
+              <Ink at={withoutAt - 4 + k * 3} dur={10} out={boxOut} style={{ left: x + 54, top: y(BOX.top + 196) }}>
                 <span style={{ position: "relative", display: "inline-block" }}>
                   <LockGlyph size={30} color={ds("gray", 400)} />
                   <svg width={40} height={40} style={{ position: "absolute", left: -5, top: -5, overflow: "visible" }}>
@@ -217,17 +227,18 @@ export const GilScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Ink at={oneLockAt + 4} dur={10} out={page1Out} style={{ left: BOX.x + BOX.w - 52, top: y(BOX.top) - 22 }}>
+        <Ink at={oneLockAt + 4} dur={10} out={boxOut} style={{ left: BOX.x + BOX.w - 52, top: y(BOX.top) - 22 }}>
           <span style={{ display: "inline-block", background: PAPER, padding: 4, borderRadius: 8 }}>
             <LockGlyph size={40} color={OK} />
           </span>
         </Ink>
-        <Note at={oneLockAt} x={BOX.x} y={y(BOX.top + BOX.h + 26)} out={page1Out}>
+        <Note at={oneLockAt} x={BOX.x} y={y(BOX.top + BOX.h + 26)} out={boxOut}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>one lock around the interpreter</b>
+            <b style={{ color: OK_INK }}>One lock around the interpreter</b>
             <span style={{ opacity: ease(frame, withoutAt, 10) }}>, not one on every object</span>
           </span>
         </Note>
+        </div>
 
         {/* ── Page 2: four instructions, then processes ───────────────── */}
         <Note at={notSafeAt} x={X0} y={y(290)}>
@@ -260,7 +271,7 @@ export const GilScene: React.FC = () => {
         </Note>
         <Note at={nothingAt} x={brX + 36} y={opsTop + h(52)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            nothing promises
+            Nothing promises
             <br />
             the four run together
           </span>
@@ -268,7 +279,7 @@ export const GilScene: React.FC = () => {
         <Note at={stillAt} x={brX + 36} y={opsTop + h(150)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.4em" }}>
             <LockGlyph size={24} color={OK} />
-            <span style={{ background: MARK_OK, padding: "0 4px", borderRadius: 4 }}>the lock is still needed</span>
+            <span style={{ background: MARK_OK, padding: "0 4px", borderRadius: 4 }}>The lock is still needed</span>
           </span>
         </Note>
 
@@ -306,6 +317,25 @@ export const GilScene: React.FC = () => {
         ))}
         <Note at={parAt + 8} x={P_X} y={pRow(3) + h(36)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>so they really do run in parallel</span>
+        </Note>
+
+        {/* The follow-up: the free-threaded build. Under the counter, whose
+            lock it makes matter more. */}
+        <div style={{ position: "absolute", left: X0, top: FREE_Y - h(30), width: 900, height: 1, background: HAIRLINE, opacity: ease(frame, freeAt, 12) }} />
+        <Note at={freeAt} x={X0} y={FREE_Y}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            Since Python 3.14: a supported build with <b style={{ color: BLUE_INK, opacity: ease(frame, noGilAt, 10) }}>no GIL</b>
+          </span>
+        </Note>
+        <Note at={thereAt} x={X0} y={FREE_Y + h(44)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            There, threads run in parallel<span style={{ opacity: ease(frame, mattersAt, 10) }}>, so <b style={{ color: OK_INK }}>the lock matters even more</b></span>
+          </span>
+        </Note>
+        <Note at={noGilAt + 20} x={X0} y={FREE_Y + h(90)}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            Free-threaded, opt-in (experimental in 3.13); this video&apos;s Python {PYTHON} is the default build, GIL {GIL_BUILD.enabled ? "on" : "off"}
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

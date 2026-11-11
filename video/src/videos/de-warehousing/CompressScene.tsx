@@ -155,7 +155,7 @@ export const CompressScene: React.FC = () => {
 
         {/* The dictionary: each value once, then a short code per row. */}
         <div style={{ position: "absolute", left: 1400, top: R - 6, opacity: ease(frame, dictAt, 12) }}>
-          <div style={{ ...label(20, INK_SOFT), marginBottom: 8 }}>dictionary</div>
+          <div style={{ ...label(20, INK_SOFT), marginBottom: 8 }}>Dictionary</div>
           {firstSeen.map((v, i) => (
             <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", height: 30, fontFamily: MONO, fontSize: 21, color: INK }}>
               <span style={{ width: 26, textAlign: "right", color: INK_SOFT }}>{i}</span>
@@ -164,7 +164,7 @@ export const CompressScene: React.FC = () => {
           ))}
         </div>
         <div style={{ position: "absolute", left: 1600, top: R - 6, opacity: ease(frame, bitsAt - 4, 12) }}>
-          <div style={{ ...label(20, INK_SOFT), marginBottom: 8, whiteSpace: "nowrap" }}>first rows</div>
+          <div style={{ ...label(20, INK_SOFT), marginBottom: 8, whiteSpace: "nowrap" }}>First rows</div>
           {sample.rows.map((r, i) => (
             <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", height: 30, fontFamily: MONO, fontSize: 21, color: INK, whiteSpace: "nowrap" }}>
               <span style={{ display: "inline-block", minWidth: 28, padding: "0 6px", borderRadius: 4, background: COLUMN_TINT.region, textAlign: "center" }}>
@@ -199,7 +199,7 @@ export const CompressScene: React.FC = () => {
 
         {/* ── The whole file, by codec ── */}
         <div style={{ position: "absolute", left: X0, top: C - 6, width: BAR_X - X0 - 20, opacity: ease(frame, codecAt, 12) }}>
-          <div style={{ ...label(23, INK) }}>the whole file</div>
+          <div style={{ ...label(23, INK) }}>The whole file</div>
           <div style={{ ...note(20, INK_SOFT), marginTop: 2 }}>by codec</div>
         </div>
         {/* The section's hairline, where it was, with 30px of room under it

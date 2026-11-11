@@ -134,7 +134,7 @@ export const HybridScene: React.FC = () => {
         </QuestionCard>
         <Note at={meaningAt} x={X0} y={y(240)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            embeddings capture meaning
+            Embeddings capture meaning
             <span style={{ opacity: ease(frame, blurAt - 2, 10) }}>
               , but <Mark at={blurAt + 4}>blur exact tokens</Mark>:
             </span>
@@ -149,7 +149,7 @@ export const HybridScene: React.FC = () => {
         {/* The search. */}
         <Note at={setupAt} x={X0} y={y(312)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            search the tickets for{" "}
+            Search the tickets for{" "}
             {/* The query as a house badge in the mono face; the highlighter's
                 yellow lays over its tint while the search is said. */}
             <span
@@ -169,13 +169,13 @@ export const HybridScene: React.FC = () => {
         {/* Where the figure's data comes from, set apart at the right
             margin rather than run on from the search in a smaller size. */}
         <Note at={setupAt} x={COLS[2] - 8 + COL_W} y={y(312) + 4} align="right">
-          <span style={madeUp(19)}>tickets and the vector ranking made up; BM25 run on them</span>
+          <span style={madeUp(19)}>Tickets and the vector ranking made up; BM25 run on them</span>
         </Note>
 
         {/* The vector side. */}
         <Note at={setupAt + 4} x={COLS[0]} y={y(LIST_TOP) - 44}>
           <span style={head(22, headInk(BLUE_INK, vectorAt))}>
-            vector search<span style={{ opacity: ease(frame, vectorAt - 2, 10) }}>, by meaning</span>
+            Vector search<span style={{ opacity: ease(frame, vectorAt - 2, 10) }}>, by meaning</span>
           </span>
         </Note>
         {HYBRID.vector.map((id, i) => (
@@ -207,7 +207,7 @@ export const HybridScene: React.FC = () => {
         {/* The keyword side. */}
         <Note at={setupAt + 8} x={COLS[1]} y={y(LIST_TOP) - 44}>
           <span style={head(22, headInk(INK, addsAt))}>
-            keyword search<span style={{ opacity: ease(frame, bm25At - 2, 10) }}>, BM25</span>
+            Keyword search<span style={{ opacity: ease(frame, bm25At - 2, 10) }}>, BM25</span>
           </span>
         </Note>
         {HYBRID.keyword.map((id, i) => (
@@ -238,12 +238,12 @@ export const HybridScene: React.FC = () => {
         {/* Fused. */}
         <Note at={setupAt + 12} x={COLS[2]} y={y(LIST_TOP) - 44}>
           <span style={head(22, headInk(OK_INK, fuseAt))}>
-            fused<span style={{ opacity: ease(frame, rrfAt - 2, 10) }}>: reciprocal rank fusion</span>
+            Fused<span style={{ opacity: ease(frame, rrfAt - 2, 10) }}>: reciprocal rank fusion</span>
           </span>
         </Note>
         <Note at={fuseAt + 2} x={COLS[2]} y={rowY(5) + 24}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", lineHeight: 1.45 }}>
-            <b style={{ color: INK }}>ranks, not scores</b>: a BM25 score
+            <b style={{ color: INK }}>Ranks, not scores</b>: a BM25 score
             <br />
             and a similarity aren&apos;t on one scale
           </span>
@@ -260,7 +260,7 @@ export const HybridScene: React.FC = () => {
         })}
         <Note at={sixtyAt - 2} x={COLS[2]} y={rowY(3) + 6}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            each list gives{" "}
+            Each list gives{" "}
             <span style={{ ...note(23, INK), ...TABULAR }}>
               1 / ({HYBRID.k} + <i>rank</i>)
             </span>
@@ -280,7 +280,7 @@ export const HybridScene: React.FC = () => {
         </svg>
         <Note at={cheapAt} x={X0} y={y(850) + 29}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            cheap to add
+            Cheap to add
             <span style={{ opacity: ease(frame, helpsAt - 2, 10) }}>, and it usually helps on technical content</span>
           </span>
         </Note>

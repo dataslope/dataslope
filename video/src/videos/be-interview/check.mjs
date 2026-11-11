@@ -90,6 +90,9 @@ const quotes = [
   ["ai-assisted-coding.mdx", "Karat's 2026 survey of 400 engineering leaders, 71% said AI\nmakes technical skills harder to assess, and 62% of organizations still\nprohibited AI in technical interviews"],
   ["ai-assisted-coding.mdx", "sells interviewing services, so read the figures as one vendor's survey"],
   ["ai-assisted-coding.mdx", "Ask the recruiter, for every round, whether AI is allowed."],
+  // "ai-ask-practice", and the take-home line's "or an online test".
+  ["ai-assisted-coding.mdx", "algorithm practice still matters for AI-off rounds and phone screens"],
+  ["ai-assisted-coding.mdx", "take-home projects and automated code tests have lost"],
   ["index.mdx", "multi-file projects to extend"],
   ["index.mdx", "streaming, retries, cost measured in tokens, and prompt injection"],
   ["index.mdx", "**Fewer take-homes**"],
@@ -122,7 +125,7 @@ const claims = [
   ["series-parts", `${below100(PARTS.length)} videos`],
   ["series-parts", `${said(QUESTIONS)} of the track's questions`],
   ["practice", results.conceptCheckPages === results.topicPages ? "every topic page has concept checks" : "(not every page has concept checks)"],
-  ["practice", `${below100(results.challengePages)} add challenges`],
+  ["practice", `${below100(results.challengePages)} of them add challenges`],
   ["practice", `${said(bank)} multiple-choice questions`],
   ["ai-survey", "four hundred engineering leaders"],
   ["ai-survey", "which sells interviewing services"],
@@ -134,6 +137,7 @@ const claims = [
   ["ai-banned", "without permission can disqualify you"],
   ["ai-banned", "back in person"],
   ["ai", "since 2025"],
+  ["ai-ask-practice", "and in phone screens"],
 ];
 for (const [id, phrase] of claims) if (!text(id).includes(phrase)) problems.push(`script.ts "${id}" no longer says "${phrase}"`);
 

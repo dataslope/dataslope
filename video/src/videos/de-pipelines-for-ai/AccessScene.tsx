@@ -56,9 +56,9 @@ export const AccessScene: React.FC = () => {
   const realAt = n.word("access-delete", "make deletion real");
   const requestAt = n.word("access-delete", "An erasure request or a removed document");
   const targets = [
-    { text: "the vectors", at: n.word("access-delete", "deletes the vectors") },
-    { text: "the cached chunks", at: n.word("access-delete", "the cached chunks") },
-    { text: "copies in evaluation sets", at: n.word("access-delete", "copies in evaluation sets") },
+    { text: "The vectors", at: n.word("access-delete", "deletes the vectors") },
+    { text: "The cached chunks", at: n.word("access-delete", "the cached chunks") },
+    { text: "Copies in evaluation sets", at: n.word("access-delete", "copies in evaluation sets") },
   ];
   const notJustAt = n.word("access-delete", "not just the source row");
   const end = n.beat("access-delete").to;
@@ -87,11 +87,11 @@ export const AccessScene: React.FC = () => {
 
         {/* Permissions on every chunk, and the filter at query time. */}
         <Note at={permAt} x={CARD.x} y={y(CARD.top) - 92}>
-          <span style={head(22, INK)}>permissions on every chunk</span>
+          <span style={head(22, INK)}>Permissions on every chunk</span>
         </Note>
         <Note at={queryAt - 2} x={CARD.x} y={y(CARD.top) - 52}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            filtered at query time, inside the search,
+            Filtered at query time, inside the search,
             <span style={{ opacity: ease(frame, identityAt - 2, 10) }}>
               {" "}for{" "}
               <span style={badgeStyle("gray", 23)}>Dana, {USER_TEAM}</span>
@@ -134,13 +134,13 @@ export const AccessScene: React.FC = () => {
         <Note at={onlyAt - 2} x={CARD.x} y={cardY(CHUNKS.length) + 8}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={onlyAt + 4} color={MARK_OK}>
-              only what Dana could open herself
+              Only what Dana could open herself
             </Mark>
           </span>
         </Note>
         <Note at={changeAt - 2} x={CARD.x} y={cardY(CHUNKS.length) + 56}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            a permission changes upstream
+            A permission changes upstream
             <span style={{ opacity: ease(frame, updateAt - 2, 10) }}>
               : update the <span style={{ fontFamily: MONO, fontSize: 20, color: BLUE_INK, fontVariantLigatures: "none" }}>readers</span>
             </span>
@@ -148,12 +148,12 @@ export const AccessScene: React.FC = () => {
           </span>
         </Note>
         <Note at={permAt + 30} x={CARD.x} y={cardY(CHUNKS.length) + 100}>
-          <span style={madeUp(19)}>chunks and user made up for this video</span>
+          <span style={madeUp(19)}>Chunks and user made up for this video</span>
         </Note>
 
         {/* Redact before embedding. */}
         <Note at={redactAt - 2} x={RIGHT_X} y={y(CARD.top) - 92}>
-          <span style={head(22, INK)}>redact before embedding</span>
+          <span style={head(22, INK)}>Redact before embedding</span>
         </Note>
         <div
           style={{
@@ -206,7 +206,7 @@ export const AccessScene: React.FC = () => {
         {/* Deletion, made real. */}
         <Note at={realAt - 2} x={RIGHT_X} y={delTop - 50}>
           <span style={head(22, INK)}>
-            <Mark at={realAt + 4}>deletion, made real</Mark>
+            <Mark at={realAt + 4}>Deletion, made real</Mark>
           </span>
         </Note>
         <Box x={RIGHT_X} y={delTop} w={290} h={100} at={requestAt} tone={INK} size={22}>
@@ -228,7 +228,7 @@ export const AccessScene: React.FC = () => {
         <Note at={notJustAt - 2} x={RIGHT_X} y={delTop + 186}>
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Mark at={notJustAt + 4} color={MARK_BAD}>
-              not just the source row
+              Not just the source row
             </Mark>
           </span>
         </Note>

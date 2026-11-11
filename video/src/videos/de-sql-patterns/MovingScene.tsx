@@ -218,7 +218,7 @@ export const MovingScene: React.FC = () => {
           {/* The ROWS frame's short windows, and the CASE that nulls them. */}
           <Note at={shortAt} x={X0} y={underList(P.lines.length)} out={generateAt - 2}>
             <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-              the first <Num>{MOVING.full.nulled}</Num> rows have short frames:{" "}
+              The first <Num>{MOVING.full.nulled}</Num> rows have short frames:{" "}
               <span style={{ opacity: ease(frame, nullFirstAt - 2, 10) }}>null them</span>
             </div>
             <div style={{ ...code, marginTop: 6, opacity: ease(frame, nullFirstAt + 2, 12) }}>
@@ -230,7 +230,7 @@ export const MovingScene: React.FC = () => {
 
           {/* ── The 13th, under each frame ── */}
           <TableName g={sg} at={thirteenthAt + 4}>
-            the 13th&rsquo;s seven-day average
+            The 13th&rsquo;s seven-day average
           </TableName>
           <DataTable
             g={sg}
@@ -250,14 +250,14 @@ export const MovingScene: React.FC = () => {
             ]}
           />
           <Note at={calendarAt} x={SUM_X} y={sg.rowTop(3) + h(26)}>
-            <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>by the calendar:</div>
+            <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>By the calendar:</div>
             <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
               {MOVING.rangeClause.replace(/\)$/, "")}
             </div>
           </Note>
           <Note at={skipsAt} x={SUM_X} y={sg.rowTop(3) + h(110)} out={q8At}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              the missing days are skipped, <b style={{ opacity: ease(frame, backAt - 2, 10) }}>not counted as zero</b>
+              The missing days are skipped, <b style={{ opacity: ease(frame, backAt - 2, 10) }}>not counted as zero</b>
             </span>
           </Note>
 
@@ -280,12 +280,12 @@ export const MovingScene: React.FC = () => {
           />
           {/* The step the 95.0 comes from: the same frame, over the filled days. */}
           <Note at={againAt + 4} x={X0} y={underList(F.lines.length)}>
-            <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>then the same frame, over these rows:</div>
+            <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Then the same frame, over these rows:</div>
             <div style={{ ...code, marginTop: 6 }}>{`${spineAvg[0]}\n  ${spineAvg[1]}`}</div>
           </Note>
           <Note at={calendarTableAt - 2} x={SUM_X} y={sg.rowTop(3) + h(110)}>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-              no <QMono>generate_series</QMono>? join a calendar table
+              No <QMono>generate_series</QMono>? Join a calendar table
             </span>
           </Note>
         </>

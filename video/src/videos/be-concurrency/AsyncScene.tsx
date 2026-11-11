@@ -10,7 +10,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ASYNC, ms } from "./data";
-import { Band, Drift, lerp, OK, OK_INK, X0 } from "./parts";
+import { Band, Drift, Flow, lerp, OK, OK_INK, X0 } from "./parts";
 import { type Axis, msX, MsAxis, WaitBar } from "./timeline";
 
 /** The event loop: a ring, its coroutines riding it, the one on top running. */
@@ -24,14 +24,20 @@ const ROW_B = 474;
 const ROW_H = 48;
 /** Python's list, as print() writes it. */
 export const pyList = (xs: readonly string[]) => `[${xs.map((x) => `'${x}'`).join(", ")}]`;
+/** gather's results in words, from the run: "a, then b". */
+const GATHERED = ASYNC.awaiting.results.map((r) => r.split(" ")[0]).join(", then ");
 
 /**
  * Question 7. One thread, an event loop: coroutines ride it, the one on top
  * runs, and one that awaits the network steps off while the next runs. The
  * page's two fetches, run (data.ts): their waits overlap, b finishes first,
- * the pair takes the longer wait, and gather still returns a, then b. With
- * no preemption, a coroutine that never awaits holds the loop. And what it is
- * for: thousands of sockets on one thread.
+ * the pair takes the longer wait, and gather still returns a, then b. Under
+ * the loop, the OS says which sockets are ready, and the parked coroutine is
+ * woken back onto the ring. The ring holds still, dimmed, while the
+ * timeline is read, so its own a to d never race the timeline's a and b.
+ * Nothing interrupts a coroutine (said so, not "no preemption", which
+ * question 6 used for Coffman's condition), so one that never awaits holds
+ * the loop. And what it is for: thousands of sockets on one thread.
  */
 export const AsyncScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -46,7 +52,9 @@ export const AsyncScene: React.FC = () => {
   const loopAt = n.word("async", "Coroutines run on an event loop");
   const awaitsAt = n.word("async", "When one awaits a network call");
   const handsAt = n.word("async", "it hands control back");
-  const anotherAt = n.word("async", "the loop runs another");
+  const osAt = n.word("async-os", "asks the operating system");
+  const readyAt = n.word("async-os", "which sockets are ready");
+  const wakeAt = n.word("async-os", "wakes the coroutines");
   const fetchesAt = n.word("async-run", "Two fetches");
   const aWaitsAt = n.word("async-run", "a waits twenty milliseconds");
   const bWaitsAt = n.word("async-run", "b waits ten");
@@ -55,7 +63,7 @@ export const AsyncScene: React.FC = () => {
   const twentyAt = n.word("async-run", "about twenty");
   const gatheredAt = n.word("async-run", "Gathered together");
   const orderAt = n.word("async-run", "in the order you asked");
-  const noPreAt = n.word("async-coop", "There's no preemption");
+  const noPreAt = n.word("async-nopre", "Nothing interrupts a running coroutine");
   const onlyAt = n.word("async-coop", "only switch at an await");
   const neverAt = n.word("async-coop", "a coroutine that never awaits");
   const starvesAt = n.word("async-coop", "starves every other one");
@@ -76,11 +84,14 @@ export const AsyncScene: React.FC = () => {
   const hogStart = neverAt + 4;
   const hogEnd = shinesAt;
   const hog = ease(frame, hogStart, 14) * (1 - ease(frame, hogEnd, 14));
-  const turning = (f: number) => Math.max(0, f - loopAt) / (fps * 9);
-  const stoppedFor = Math.max(0, Math.min(frame, hogEnd + 14) - hogStart);
-  const turn = turning(frame) - (frame > hogStart ? stoppedFor / (fps * 9) : 0);
-  // a steps off to wait on the network, and comes back when it's ready.
-  const park = ease(frame, awaitsAt + 6, 16) * (1 - ease(frame, anotherAt + 40, 16));
+  // It also holds still while the timeline beside it is read.
+  const held = (f: number, s0: number, s1: number) => Math.max(0, Math.min(f, s1) - s0);
+  const turnOf = (f: number) => (Math.max(0, f - loopAt) - held(f, fetchesAt, noPreAt) - held(f, hogStart, hogEnd + 14)) / (fps * 9);
+  const turn = turnOf(frame);
+  const ringDim = 1 - 0.6 * ease(frame, fetchesAt, 12) * (1 - ease(frame, noPreAt - 4, 12));
+  // a steps off to wait on the network, and comes back when the OS says its
+  // socket is ready.
+  const park = ease(frame, awaitsAt + 6, 16) * (1 - ease(frame, wakeAt + 12, 18));
   const PARK = { x: 650, y: y(RING.y - 120) };
 
   const disc = (k: number) => {
@@ -96,6 +107,15 @@ export const AsyncScene: React.FC = () => {
     return { x, y: yy, top: k === 0 ? top * (1 - park) : top };
   };
   const sockets = ease(frame, thousandsAt, 20);
+  // The woken arrow: from the parked disc to the ring's edge nearest it,
+  // "back onto the loop", drawn while a is still parked at its tail and gone
+  // by the time a has ridden back to its own slot.
+  const awayX = PARK.x - cx;
+  const awayY = PARK.y - cy;
+  const away = Math.hypot(awayX, awayY);
+  // It stops short of the discs riding the ring, so it never points at one.
+  const homeTip = { x: cx + (awayX / away) * (RING.r + DISC + 14), y: cy + (awayY / away) * (RING.r + DISC + 14) };
+  const homeTail = { x: PARK.x - (awayX / away) * (DISC + 8), y: PARK.y - (awayY / away) * (DISC + 8) };
 
   return (
     <AbsoluteFill>
@@ -118,6 +138,7 @@ export const AsyncScene: React.FC = () => {
         </Note>
 
         {/* The loop. */}
+        <div style={{ opacity: ringDim }}>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, loopAt - 4, 14) }}>
           <circle cx={cx} cy={cy} r={RING.r} fill="none" stroke={ds("gray", 300)} strokeWidth={10} />
           {/* The sockets one thread can serve. */}
@@ -187,17 +208,28 @@ export const AsyncScene: React.FC = () => {
             <span style={{ ...label(20, PAPER), fontWeight: 500 }}>CPU</span>
           </div>
         ) : null}
-        <Note at={handsAt} x={PARK.x - 40} y={PARK.y + DISC + 10} out={anotherAt + 40}>
+        <Note at={handsAt} x={PARK.x - 40} y={PARK.y + DISC + 10} out={wakeAt + 6}>
           <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>awaiting the network</span>
         </Note>
+        {/* Under the loop: the OS says which sockets are ready, and a goes back on. */}
+        <Note at={osAt} x={PARK.x - 40} y={PARK.y - DISC - 52} out={fetchesAt - 6}>
+          <span style={{ ...label(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            the loop asks the OS<span style={{ opacity: ease(frame, readyAt, 10) }}>: which sockets are ready?</span>
+          </span>
+        </Note>
+        <Flow points={[[homeTail.x, homeTail.y], [homeTip.x, homeTip.y]]} at={wakeAt - 4} color={OK} width={2.8} head={13} out={wakeAt + 16} />
+        <Note at={wakeAt} x={PARK.x + DISC + 12} y={PARK.y - 14} out={wakeAt + 30}>
+          <span style={{ ...label(20, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>ready: woken</span>
+        </Note>
+        </div>
         <Note at={noPreAt} x={X0} y={y(800)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b>No preemption</b>: it switches <Band at={onlyAt}>only at an await</Band>
+            <b>Nothing interrupts it</b>: it switches <Band at={onlyAt}>only at an await</Band>
           </span>
         </Note>
         <Note at={neverAt + 6} x={X0} y={y(842)} out={hogEnd}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            a loop that never awaits<span style={{ opacity: ease(frame, starvesAt, 10) }} >: every other one starves</span>
+            A loop that never awaits<span style={{ opacity: ease(frame, starvesAt, 10) }} >: every other one starves</span>
           </span>
         </Note>
         <Note at={thousandsAt + 6} x={X0} y={y(842)}>
@@ -241,7 +273,7 @@ export const AsyncScene: React.FC = () => {
         </Note>
         <Note at={gatheredAt} x={AXIS.x} y={y(712)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            gather returns <Band at={orderAt}>{<span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 500, color: INK }}>{pyList(ASYNC.awaiting.results)}</span>}</Band>
+            Gathered, the results come back <Band at={orderAt}>{GATHERED}</Band>
           </span>
         </Note>
         <Note at={orderAt + 4} x={AXIS.x} y={y(756)}>

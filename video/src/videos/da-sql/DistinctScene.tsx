@@ -124,7 +124,7 @@ export const DistinctScene: React.FC = () => {
         />
 
         <TableName g={jg} at={joinedAt - 4}>
-          joined to their items
+          Joined to their items
         </TableName>
         <DataTable
           g={jg}
@@ -136,7 +136,7 @@ export const DistinctScene: React.FC = () => {
 
         {/* ── DISTINCT makes three rows again ── */}
         <Caption at={addsAt - 4} x={LIST_X} top={y(TOP) - 40} out={totalAt - 4}>
-          the rows: <Mono>SELECT DISTINCT</Mono>
+          The rows: <Mono>SELECT DISTINCT</Mono>
         </Caption>
         <Listing lines={DISTINCT.rows.lines} x={LIST_X} top={y(TOP)} width={LIST_W} size={24} at={addsAt - 4} marks={[{ line: 0, at: addsAt + 6 }]} out={totalAt - 4} />
         <DataTable
@@ -149,7 +149,7 @@ export const DistinctScene: React.FC = () => {
 
         {/* ── Then the total: SUM(DISTINCT amount) counts 50.00 once ── */}
         <Caption at={totalAt + 2} x={LIST_X} top={y(TOP) - 40}>
-          then the total: <Mono>DISTINCT</Mono> inside <Mono>SUM</Mono>
+          Then the total: <Mono>DISTINCT</Mono> inside <Mono>SUM</Mono>
         </Caption>
         <Listing lines={DISTINCT.sum.lines} x={LIST_X} top={y(TOP)} width={LIST_W} size={24} at={totalAt + 4} marks={[{ line: 0, at: sumAt + 8, color: MARK_BAD }]} />
         <DataTable
@@ -162,7 +162,7 @@ export const DistinctScene: React.FC = () => {
         {/* The real total, beside the wrong one. */}
         <Note at={truthAt - 2} x={sg.right + 48} y={sg.top + h(HEAD_H) + h(6)}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
-            the real total:{" "}
+            The real total:{" "}
             <Mark at={truthAt + 8} color={MARK_OK}>
               {DISTINCT.truth}
             </Mark>

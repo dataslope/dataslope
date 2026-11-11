@@ -17,6 +17,7 @@ import {
   BLUE_FILL,
   BLUE_INK,
   Cell,
+  Cross,
   Drift,
   HBar,
   HIGHLIGHT,
@@ -33,6 +34,7 @@ import {
   X0,
   int,
 } from "./parts";
+import { M } from "../../editorial/math";
 
 const R_X = 780;
 const LIST_TOP = 300;
@@ -85,17 +87,17 @@ const Merge: React.FC<{ c: Ctx }> = ({ c }) => {
       <Row values={sorted(right)} x={R_X + 3 * 68 + 40} y={c.T + 2 * step} at={sortsAt + 4} />
       <Row values={out} x={R_X} y={c.T + 3 * step} at={mergesAt} tone="ok" />
       {[
-        { t: "the input", at: halvesAt - 8, k: 0 },
-        { t: "halves", at: halvesAt, k: 1 },
-        { t: "each sorted", at: sortsAt, k: 2 },
-        { t: "merged in O(n)", at: mergesAt, k: 3 },
+        { t: "The input", at: halvesAt - 8, k: 0 },
+        { t: "Halves", at: halvesAt, k: 1 },
+        { t: "Each sorted", at: sortsAt, k: 2 },
+        { t: <>Merged in <M>O(n)</M></>, at: mergesAt, k: 3 },
       ].map((r) => (
-        <Line key={r.t} at={r.at} x={R_X + 7 * 68 + 100} y={c.T + r.k * step + 12} size={23} color={INK_SOFT}>
+        <Line key={r.k} at={r.at} x={R_X + 7 * 68 + 100} y={c.T + r.k * step + 12} size={23} color={INK_SOFT}>
           {r.t}
         </Line>
       ))}
       <Line at={alwaysAt} x={R_X} y={c.T + 4 * step + c.h(10)} size={25} weight={500}>
-        O(n log n) always, stable, O(n) extra memory
+        <M>O(n log n)</M> always, stable, <M>O(n)</M> extra memory
       </Line>
       <Line at={pythonAt} x={R_X} y={c.T + 4 * step + c.h(54)} size={24} color={INK_SOFT}>
         Python&apos;s own sort builds on it
@@ -122,8 +124,8 @@ const Heapsort: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Line at={guaranteesAt} x={R_X} y={c.T} size={26} weight={500}>
-        Heapsort: O(n log n) guaranteed
-        <span style={{ opacity: ease(frame, spaceAt, 10) }}>, O(1) extra space</span>
+        Heapsort: <M>O(n log n)</M> guaranteed
+        <span style={{ opacity: ease(frame, spaceAt, 10) }}>, <M>O(1)</M> extra space</span>
       </Line>
       {Array.from({ length: cells }, (_, i) => (
         <Cell key={i} x={R_X + i * cw} y={rowY} at={guaranteesAt + 6 + i} value="" w={cw - 6} h={44} />
@@ -210,11 +212,11 @@ const InPlace: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Line at={inAt} x={R_X} y={c.T} size={25} weight={500}>
-        In place: O(1) extra<span style={{ opacity: ease(frame, stackAt, 10) }}>, or O(log n) of stack</span>
+        In place: <M>O(1)</M> extra<span style={{ opacity: ease(frame, stackAt, 10) }}>, or <M>O(log n)</M> of stack</span>
       </Line>
       <Row values={values} x={R_X} y={c.T + c.h(52)} at={inAt + 4} />
       <Line at={quickAt} x={R_X} y={c.T + c.h(122)} size={24} color={BLUE_INK} weight={500}>
-        quicksort, with random pivots
+        Quicksort, with random pivots
       </Line>
       <Line at={outAt} x={R_X} y={b2} size={25} weight={500}>
         Out of place: extra memory grows with the input
@@ -225,7 +227,7 @@ const InPlace: React.FC<{ c: Ctx }> = ({ c }) => {
         a buffer as big as the input
       </Line>
       <Line at={mergeAt} x={R_X} y={b2 + c.h(52) + 140} size={24} color={BLUE_INK} weight={500}>
-        merge sort
+        Merge sort
       </Line>
     </>
   );
@@ -240,13 +242,18 @@ const Master: React.FC<{ c: Ctx }> = ({ c }) => {
   const piecesAt = c.w("r-master", "the number of smallest pieces");
   const tieAt = c.w("r-master", "For merge sort they tie");
   const nlognAt = c.w("r-master", "so n log n");
+  const combDomAt = c.w("master-cases", "If combining dominates");
+  const piecesDomAt = c.w("master-cases", "if the pieces dominate");
   const levels = 5;
   const W = 640;
-  const rowY = (k: number) => c.T + c.h(110) + k * c.h(58);
+  const rowY = (k: number) => c.T + c.h(100) + k * c.h(50);
   return (
     <>
       <Line at={solvesAt} x={R_X} y={c.T} size={25} weight={500}>
-        Merge sort: <span style={{ fontFamily: MONO, fontWeight: 500 }}>T(n) = 2 T(n/2) + n</span>
+        Merge sort: <M>T(n) = 2 T(n/2) + n</M>
+      </Line>
+      <Line at={solvesAt + 10} x={R_X} y={c.T + c.h(42)} size={22} color={INK_SOFT}>
+        two halves, each sorted, plus <M>n</M> to merge them
       </Line>
       {Array.from({ length: levels }, (_, k) => {
         const parts = 2 ** k;
@@ -257,16 +264,22 @@ const Master: React.FC<{ c: Ctx }> = ({ c }) => {
               <Cell key={i} x={R_X + i * pw} y={rowY(k)} at={solvesAt + 6 + k * 4} value="" w={Math.max(4, pw - 6)} h={c.h(38)} tone={k === levels - 1 ? "look" : "data"} />
             ))}
             <Line at={combiningAt + k * 2} x={R_X + W + 30} y={rowY(k) + 6} size={22} color={INK_SOFT}>
-              {k === levels - 1 ? "smallest pieces: n" : <>combine: <b style={{ color: INK }}>n</b></>}
+              {k === levels - 1 ? <>smallest pieces: <M>n</M></> : <>combine: <M style={{ color: INK }}>n</M></>}
             </Line>
           </React.Fragment>
         );
       })}
       <Line at={piecesAt} x={R_X} y={rowY(levels) + c.h(4)} size={24}>
-        Combining costs n a level; the smallest pieces number n
+        Combining costs <M>n</M> a level; the smallest pieces number <M>n</M>
       </Line>
-      <Line at={tieAt} x={R_X} y={rowY(levels) + c.h(48)} size={25} weight={500} color={OK_INK}>
-        They tie: n a level, log n levels<span style={{ opacity: ease(frame, nlognAt, 10) }}>, so O(n log n)</span>
+      <Line at={tieAt} x={R_X} y={rowY(levels) + c.h(46)} size={25} weight={500} color={OK_INK}>
+        They tie: <M>n</M> a level, <M>log n</M> levels<span style={{ opacity: ease(frame, nlognAt, 10) }}>, so <M>O(n log n)</M></span>
+      </Line>
+      <Line at={combDomAt} x={R_X} y={rowY(levels) + c.h(96)} size={24}>
+        Combining dominates: the top level sets the cost
+      </Line>
+      <Line at={piecesDomAt} x={R_X} y={rowY(levels) + c.h(138)} size={24}>
+        The pieces dominate: the bottom level sets it
       </Line>
     </>
   );
@@ -352,7 +365,7 @@ const DivideDp: React.FC<{ c: Ctx }> = ({ c }) => {
         )),
       )}
       <Line at={mergeAt} x={R_X} y={ly(3) + c.h(4)} size={23} color={INK_SOFT}>
-        merge sort: no piece is solved twice
+        Merge sort: no piece is solved twice
       </Line>
       <VRule x={1237} top={c.T} bottom={ly(5) + c.h(4) + 30} at={dpAt} />
       <Line at={dpAt} x={fx} y={c.T} size={24} weight={500}>
@@ -431,11 +444,11 @@ const Classic: React.FC<{ c: Ctx }> = ({ c }) => {
   const knowAt = c.w("r-classic", "Know coin change");
   const stateAt = c.w("r-classic", "each teaches a way to define the state");
   const problems = [
-    { name: "coin change", state: "fewest coins for each amount", at: knowAt },
-    { name: "longest common subsequence", state: "a prefix of each string", at: c.w("r-classic", "longest common subsequence") },
-    { name: "knapsack", state: "items so far, capacity left", at: c.w("r-classic", "knapsack") },
-    { name: "edit distance", state: "a prefix of each string", at: c.w("r-classic", "edit distance") },
-    { name: "word break", state: "can this prefix be split?", at: c.w("r-classic", "word break") },
+    { name: "Coin change", state: "fewest coins for each amount", at: knowAt },
+    { name: "Longest common subsequence", state: "a prefix of each string", at: c.w("r-classic", "longest common subsequence") },
+    { name: "Knapsack", state: "items so far, capacity left", at: c.w("r-classic", "knapsack") },
+    { name: "Edit distance", state: "a prefix of each string", at: c.w("r-classic", "edit distance") },
+    { name: "Word break", state: "can this prefix be split?", at: c.w("r-classic", "word break") },
   ];
   return (
     <>
@@ -444,12 +457,12 @@ const Classic: React.FC<{ c: Ctx }> = ({ c }) => {
           <Line at={p.at - 2} x={R_X} y={c.T + i * c.h(76) + 8} size={24} weight={500} color={BLUE_INK}>
             {p.name}
           </Line>
-          <Line at={stateAt + i * 4} x={R_X + 470} y={c.T + i * c.h(76) + 8} size={23} color={INK_SOFT}>
-            state: {p.state}
+          <Line at={p.at + 8} x={R_X + 470} y={c.T + i * c.h(76) + 8} size={23} color={INK_SOFT}>
+            State: {p.state}
           </Line>
         </React.Fragment>
       ))}
-      <VRule x={1185} top={c.T} bottom={c.T + 4 * c.h(76) + 40} at={stateAt} />
+      <VRule x={1185} top={c.T} bottom={c.T + 4 * c.h(76) + 40} at={knowAt + 8} />
       <Line at={stateAt} x={R_X} y={c.T + 5 * c.h(76) + c.h(12)} size={25} weight={500}>
         Each teaches a way to <Mark at={stateAt + 6}>define the state</Mark>
       </Line>
@@ -495,6 +508,7 @@ const Greedy: React.FC<{ c: Ctx }> = ({ c }) => {
   const sixAt = c.w("r-greedy", "To make six from coins of one, three and four");
   const threeAt = c.w("r-greedy", "it takes three coins");
   const twoAt = c.w("r-greedy", "Two threes do it");
+  const schedAt = c.w("greedy-safe", "Scheduling by earliest finish time");
   const coinX = (coins: readonly number[], i: number) => R_X + 260 + coins.slice(0, i).reduce((s, v) => s + 2 * (22 + v * 5) + 18, 0);
   const g = RAPID.greedy;
   const f = RAPID.fewest;
@@ -529,6 +543,9 @@ const Greedy: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={twoAt + 10} x={coinX(f, f.length) + 20} y={y2 - 16} size={24} weight={500} color={OK_INK}>
         <Num>{f.length}</Num> coins
       </Line>
+      <Line at={schedAt} x={R_X} y={c.T + c.h(400)} size={24} weight={500} color={OK_INK}>
+        Safe: scheduling by earliest finish time
+      </Line>
     </>
   );
 };
@@ -540,67 +557,106 @@ const Backtrack: React.FC<{ c: Ctx }> = ({ c }) => {
   const buildsAt = c.w("r-backtrack", "Backtracking builds a candidate step by step");
   const dropsAt = c.w("r-backtrack", "drops a branch the moment it can't succeed");
   const usesAt = c.w("r-backtrack", "N-Queens, Sudoku, permutations");
-  const perms = JSON.parse(PAGE.permutations[0]) as number[][];
-  const nums = PAGE_INPUTS.permutations;
+  // check.mjs's run: orderings of 1, 2, 3 with no digit in its own place,
+  // every candidate it tried, in order, and whether it could still succeed.
+  const tried = RAPID.backtrackTried as unknown as [number[], boolean][];
+  const found = RAPID.backtrackFound as unknown as number[][];
+  const nums = [1, 2, 3];
   const W = 840;
   const lx = (k: number, i: number) => R_X + ((i + 0.5) / k) * W;
-  const ly = (d: number) => c.T + c.h(70) + d * c.h(92);
-  // Level 1: three first choices; level 2: two each; level 3: the six leaves.
-  const level1 = nums.map((v) => [v]);
-  const level2 = level1.flatMap((p) => nums.filter((v) => !p.includes(v)).map((v) => [...p, v]));
-  const at = (d: number) => buildsAt + 6 + d * 8;
-  const node = (path: number[], d: number, i: number, k: number) => (
-    <div
-      key={`${d}-${i}`}
-      style={{
-        position: "absolute",
-        left: lx(k, i) - 22,
-        top: ly(d) - 22,
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        border: `2px solid ${d === 3 ? OK : BAR}`,
-        background: d === 3 ? `color-mix(in srgb, ${OK} 14%, ${PAPER})` : BLUE_FILL,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        ...label(22, d === 3 ? OK_INK : BLUE_INK),
-        ...TABULAR,
-        opacity: ease(frame, at(d), 8),
-      }}
-    >
-      {path[path.length - 1]}
-    </div>
-  );
+  const ly = (d: number) => c.T + c.h(104) + d * c.h(88);
+  const rootY = ly(0);
+  // Where each candidate sits in the full tree of orderings: a first digit
+  // over its two continuations, each over its one completion.
+  const slot = (p: number[]) => {
+    const first = nums.indexOf(p[0]);
+    if (p.length === 1) return { k: 3, i: first };
+    const rest = nums.filter((v) => v !== p[0]);
+    return { k: 6, i: 2 * first + rest.indexOf(p[1]) };
+  };
+  const xy = (p: number[]) => {
+    const s = slot(p);
+    return [lx(s.k, s.i), ly(p.length)] as const;
+  };
+  const parentXY = (p: number[]) => (p.length === 1 ? ([R_X + W / 2, rootY] as const) : xy(p.slice(0, -1)));
+  // Tried in order across the first clause; the dead ends cross out, in
+  // order, on "drops a branch".
+  const step = Math.max(5, (dropsAt - buildsAt - 10) / tried.length);
+  const triedAt = (j: number) => buildsAt + 8 + j * step;
+  const dead = tried.map(([, ok], j) => (ok ? -1 : j)).filter((j) => j >= 0);
+  const droppedAt = (j: number) => dropsAt + dead.indexOf(j) * 6;
+  const isFound = (p: number[]) => found.some((f) => f.join() === p.join());
   return (
     <>
       <Line at={buildsAt} x={R_X} y={c.T} size={24} weight={500}>
         Build a candidate step by step; undo a step to try the next
       </Line>
-      <Svg>
-        {level1.map((_, i) => (
-          <line key={`a${i}`} x1={R_X + W / 2} y1={ly(0) + 22} x2={lx(3, i)} y2={ly(1) - 22} stroke={INK_SOFT} strokeWidth={1.4} opacity={ease(frame, at(1), 8)} />
-        ))}
-        {level2.map((_, i) => (
-          <line key={`b${i}`} x1={lx(3, Math.floor(i / 2))} y1={ly(1) + 22} x2={lx(6, i)} y2={ly(2) - 22} stroke={INK_SOFT} strokeWidth={1.4} opacity={ease(frame, at(2), 8)} />
-        ))}
-        {perms.map((_, i) => (
-          <line key={`c${i}`} x1={lx(6, i)} y1={ly(2) + 22} x2={lx(6, i)} y2={ly(3) - 22} stroke={INK_SOFT} strokeWidth={1.4} opacity={ease(frame, at(3), 8)} />
-        ))}
-      </Svg>
-      <div style={{ position: "absolute", left: R_X + W / 2 - 22, top: ly(0) - 22, width: 44, height: 44, borderRadius: 22, border: `2px solid ${INK}`, background: PAPER, opacity: ease(frame, at(0), 8) }} />
-      {level1.map((p, i) => node(p, 1, i, 3))}
-      {level2.map((p, i) => node(p, 2, i, 6))}
-      {perms.map((p, i) => node(p, 3, i, 6))}
-      {perms.map((p, i) => (
-        <div key={`t${i}`} style={{ position: "absolute", left: lx(6, i) - 60, width: 120, top: ly(3) + 32, textAlign: "center", fontFamily: MONO, fontSize: 20, fontWeight: 500, color: OK_INK, opacity: ease(frame, at(3) + 6, 8) }}>
-          {p.join("")}
-        </div>
-      ))}
-      <Line at={dropsAt} x={R_X} y={ly(3) + c.h(76)} size={24}>
-        A branch that can&apos;t succeed is dropped at once
+      <Line at={buildsAt + 6} x={R_X} y={c.T + c.h(42)} size={22} color={INK_SOFT}>
+        Orderings of 1, 2, 3 with no digit in its own place
       </Line>
-      <Line at={usesAt} x={R_X} y={ly(3) + c.h(118)} size={24} weight={500} color={BLUE_INK}>
+      <div style={{ position: "absolute", left: R_X + W / 2 - 18, top: rootY - 18, width: 36, height: 36, borderRadius: 18, border: `2px solid ${INK}`, boxSizing: "border-box", background: PAPER, opacity: ease(frame, buildsAt + 4, 8) }} />
+      <Svg>
+        {tried.map(([p, ok], j) => {
+          const [x2, y2] = xy(p);
+          const [x1, y1] = parentXY(p);
+          const off = ok ? 0 : ease(frame, droppedAt(j), 8);
+          return (
+            <line
+              key={p.join()}
+              x1={x1}
+              y1={y1 + (p.length === 1 ? 18 : 22)}
+              x2={x2}
+              y2={y2 - 22}
+              stroke={off > 0 ? ACCENT : INK_SOFT}
+              strokeWidth={1.6}
+              strokeDasharray={off > 0 ? "5 5" : undefined}
+              opacity={ease(frame, triedAt(j), 8)}
+            />
+          );
+        })}
+      </Svg>
+      {tried.map(([p, ok], j) => {
+        const [x, y] = xy(p);
+        const off = !ok && frame >= droppedAt(j);
+        const win = isFound(p);
+        return (
+          <React.Fragment key={p.join()}>
+            <div
+              style={{
+                position: "absolute",
+                left: x - 22,
+                top: y - 22,
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                background: off ? `color-mix(in srgb, ${ACCENT} 22%, ${PAPER})` : win ? `color-mix(in srgb, ${OK} 26%, ${PAPER})` : BLUE_FILL,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                ...label(22, off ? ACCENT_INK : win ? OK_INK : BLUE_INK),
+                ...TABULAR,
+                opacity: ease(frame, triedAt(j), 8),
+              }}
+            >
+              {p[p.length - 1]}
+            </div>
+            {!ok ? (
+              <div style={{ position: "absolute", left: x + 26, top: y - 13 }}>
+                <Cross at={droppedAt(j)} size={22} />
+              </div>
+            ) : null}
+            {win ? (
+              <div style={{ position: "absolute", left: x - 60, width: 120, top: y + 30, textAlign: "center", fontFamily: MONO, fontSize: 20, fontWeight: 500, color: OK_INK, opacity: ease(frame, triedAt(j) + 6, 8) }}>
+                {p.join("")}
+              </div>
+            ) : null}
+          </React.Fragment>
+        );
+      })}
+      <Line at={dropsAt} x={R_X} y={ly(3) + c.h(70)} size={24}>
+        A branch that can&apos;t succeed is dropped at once: <span style={{ color: ACCENT_INK }}>nothing under it is tried</span>
+      </Line>
+      <Line at={usesAt} x={R_X} y={ly(3) + c.h(112)} size={24} weight={500} color={BLUE_INK}>
         N-Queens, Sudoku, permutations
       </Line>
     </>
@@ -610,9 +666,9 @@ const Backtrack: React.FC<{ c: Ctx }> = ({ c }) => {
 /**
  * The first quick round, questions 9 to 19, numbered on screen only:
  * sorting, recursion and dynamic programming. Each answer is drawn on the
- * right while it is read, from the page's own outputs (merge_sort, the
- * permutations, fib) and the video's counts (the Hoppers, the two Fibonacci
- * call counts, the coins).
+ * right while it is read, from the page's own outputs (merge_sort, fib) and
+ * the video's counts (the Hoppers, the two Fibonacci call counts, the coins,
+ * the backtracking run's tried and dropped candidates).
  */
 export const RapidOneScene: React.FC = () => {
   const n = useNarration();

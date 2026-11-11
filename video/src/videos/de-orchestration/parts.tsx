@@ -174,7 +174,6 @@ export const TaskBox: React.FC<{
       {shape === "asset" ? (
         <>
           <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: band, background: t.border, opacity: 0.85 }} />
-          <div style={{ position: "absolute", left: 10, right: 10, bottom: h * 0.18, height: 1.5, background: t.border, opacity: 0.25 }} />
         </>
       ) : null}
       <span

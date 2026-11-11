@@ -67,7 +67,7 @@ export const ActScene: React.FC = () => {
       dash: undefined,
       text: (
         <>
-          sigmoid: 0 to 1, <Mark at={flatAt + 2}>flat at both ends</Mark>
+          Sigmoid: 0 to 1, <Mark at={flatAt + 2}>flat at both ends</Mark>
         </>
       ),
       ink: BLUE_INK,
@@ -86,7 +86,7 @@ export const ActScene: React.FC = () => {
       ),
       ink: OK_INK,
     },
-    { at: leakyAt, color: OK, dash: "7 6", text: <>leaky ReLU: a small slope below zero</>, ink: OK_INK },
+    { at: leakyAt, color: OK, dash: "7 6", text: <>Leaky ReLU: a small slope below zero</>, ink: OK_INK },
   ];
 
   return (
@@ -116,7 +116,7 @@ export const ActScene: React.FC = () => {
         </Svg>
         <Note at={stuckAt + 2} x={BOX.left + 24} y={y(BOX.top) + h(18)}>
           <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            stuck here, a ReLU unit stops learning
+            Stuck here, a ReLU unit stops learning
             <br />
             <span style={{ opacity: ease(frame, dyingAt - 2, 10) }}>the dying ReLU problem</span>
           </span>
@@ -134,13 +134,13 @@ export const ActScene: React.FC = () => {
           </Note>
         ))}
         <Tagline x={LEG_X + 60} y={y(LEG_Y) + h(38)} at={gradAt} size={20}>
-          flat ends: slope, and so gradient, near 0
+          Flat ends: slope, and so gradient, near 0
         </Tagline>
         <Tagline x={LEG_X + 60} y={y(LEG_Y) + 2 * h(LEG_ROW) + h(38)} at={zeroesAt + 2} size={20}>
-          passes positives, zeroes the rest
+          Passes positives, zeroes the rest
         </Tagline>
         <Tagline x={LEG_X + 60} y={y(LEG_Y) + 1 * h(LEG_ROW) + h(38)} at={centeredAt} size={20}>
-          the same shape, centered: the next layer gets inputs around 0
+          The same shape, centered: the next layer gets inputs around 0
         </Tagline>
         <Tagline x={LEG_X + 60} y={y(LEG_Y) + 3 * h(LEG_ROW) + h(38)} at={geluAt - 2} size={20}>
           or GELU: a smooth curve through 0
@@ -148,7 +148,7 @@ export const ActScene: React.FC = () => {
 
         {/* ── Softmax: three scores into probabilities ── */}
         <Tagline x={LEG_X} y={y(SOFT_Y) - h(46)} at={softAt} size={22} color={INK}>
-          softmax: scores into probabilities that <Mark at={addAt}>add to one</Mark>
+          Softmax: scores into probabilities that <Mark at={addAt}>add to one</Mark>
         </Tagline>
         <Cells values={[ACT.scores.map((v) => v.toFixed(1))]} x={LEG_X} y={y(SOFT_Y)} w={96} h={h(56)} at={scoresAt - 2} color={BLUE_INK} />
         <ElbowArrow points={[[LEG_X + 3 * 96 + 22, y(SOFT_Y) + h(28)], [LEG_X + 3 * 96 + 96, y(SOFT_Y) + h(28)]]} at={becomeAt - 6} color={INK_SOFT} width={2} head={11} />

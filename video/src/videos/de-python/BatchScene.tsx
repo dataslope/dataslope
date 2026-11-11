@@ -88,7 +88,7 @@ export const BatchScene: React.FC = () => {
 
         {/* ── Why: calls per million rows ── */}
         <Note at={perRowAt} x={RIGHT_X - 40} y={y(TOP) - h(6)} out={pullAt - 4}>
-          <Title>calls to write 1,000,000 rows</Title>
+          <Title>Calls to write 1,000,000 rows</Title>
         </Note>
         <Bars
           x={RIGHT_X - 40}
@@ -128,11 +128,11 @@ export const BatchScene: React.FC = () => {
         {/* Without iter(): islice on the list starts at the front each time. */}
         <Note at={frontAt} x={X0} y={builtinTop} out={sinceAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            without <Mono>iter()</Mono>, on a list: <Mono>{`${noIter.join(", ")}, …`}</Mono>
+            Without <Mono>iter()</Mono>, on a list: <Mono>{`${noIter.join(", ")}, …`}</Mono>
           </span>
         </Note>
         <Note at={neverAt} x={X0} y={builtinTop + h(44)} out={sinceAt - 4}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same first three, forever</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The same first three, forever</span>
         </Note>
 
         {/* The stream, opening into batches of three. */}

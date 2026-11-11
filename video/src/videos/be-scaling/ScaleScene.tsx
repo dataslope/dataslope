@@ -4,7 +4,7 @@ import { arrowHead, type Pt } from "../../components/arrow";
 import { ease, pop } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
 import { Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -57,7 +57,10 @@ export const ScaleScene: React.FC = () => {
   const ninetyAt = n.word("q1-headroom", "nine at ninety percent");
   const nn99At = n.word("q1-headroom", "ninety-nine at ninety-nine");
   const roomAt = n.word("q1-buy", "Headroom");
-  const end = n.beat("q1-buy").to;
+  const placeAt = n.word("q1-db", "Vertical still has its place");
+  const dbAt = n.word("q1-db", "the database holds the state");
+  const upAt = n.word("q1-db", "scales up first");
+  const end = n.beat("q1-db").to;
 
   // ── Vertical: one box grows until it meets the ceiling. ──
   const base = y(860);
@@ -67,6 +70,9 @@ export const ScaleScene: React.FC = () => {
   const ceilRed = ease(frame, ceilAt, 10);
   const ring = ease(frame, oneAt, 18);
   const vDim = theseAt - 4;
+  // The vertical column dims while the answer moves on, and comes back on
+  // "Vertical still has its place": the database scales up first.
+  const vFade = 1 - 0.65 * Math.max(0, ease(frame, vDim, 12) - ease(frame, placeAt - 4, 12));
 
   // ── Horizontal: the box multiplies into a row behind a load balancer. ──
   const rowY = y(610);
@@ -86,7 +92,9 @@ export const ScaleScene: React.FC = () => {
 
   // ── The chart. ──
   const cx = (rho: number) => C.x0 + rho * (C.x1 - C.x0);
-  const cy = (wait: number) => y(C.base) - (Math.min(wait, C.max) / C.max) * (y(C.base) - y(C.top));
+  // Unclamped: the clip path cuts the curve at the frame's top, so it leaves
+  // the chart still climbing rather than running flat along the top.
+  const cy = (wait: number) => y(C.base) - (wait / C.max) * (y(C.base) - y(C.top));
   const chartAt = howAt + 6;
   const curveP = ease(frame, modelAt, 40);
   const pts = HEADROOM.curve.filter((d) => d.rho <= 0.985);
@@ -116,24 +124,25 @@ export const ScaleScene: React.FC = () => {
         <QuestionCard n={1} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE} width={Q_W}>
           Horizontal vs vertical scaling, which do you reach for?
         </QuestionCard>
-        <MiniMap at={qAt} stage={0} lit="app" grow={{ apps: moreAt }} />
+        <MiniMap at={qAt} stage={0} lit={[["app", -1e6], ["store", dbAt]]} grow={{ apps: moreAt }} />
 
         {/* ── Vertical ── */}
-        <Line at={vertAt} x={X0} y={y(340)} size={24} weight={500} dim={vDim}>
+        <div style={{ position: "absolute", inset: 0, opacity: vFade }}>
+        <Line at={vertAt} x={X0} y={y(340)} size={24} weight={500}>
           Vertical: a bigger machine
         </Line>
-        <Line at={simpleAt} x={X0} y={y(388)} size={22} color={INK_SOFT} dim={vDim}>
-          simple<span style={{ opacity: ease(frame, ceilAt, 10), color: ACCENT_INK }}>, but a ceiling</span>
+        <Line at={simpleAt} x={X0} y={y(388)} size={22} color={INK_SOFT}>
+          Simple<span style={{ opacity: ease(frame, ceilAt, 10), color: ACCENT_INK }}>, but a ceiling</span>
           <span style={{ opacity: ease(frame, oneAt, 10), color: ACCENT_INK }}>, and one machine</span>
         </Line>
-        <Svg opacity={(ease(frame, vertAt, 12)) * (1 - ease(frame, vDim, 12) * 0.65)}>
+        <Svg opacity={ease(frame, vertAt, 12)}>
           <line x1={X0} x2={X0 + 400} y1={ceiling} y2={ceiling} stroke={ceilRed > 0.5 ? ACCENT : INK_SOFT} strokeWidth={2.4} strokeDasharray="10 8" />
           <text x={X0 + 400} y={ceiling + 32} textAnchor="end" style={svgText({ ...label(21, ceilRed > 0.5 ? ACCENT_INK : INK_SOFT), fontWeight: 500 })}>
             ceiling
           </text>
         </Svg>
-        <Node x={V.x} y={base - boxH} w={V.w} h={boxH} at={vertAt} tone="data" title="server" dim={vDim} />
-        <Svg opacity={1 - ease(frame, vDim, 12) * 0.65}>
+        <Node x={V.x} y={base - boxH} w={V.w} h={boxH} at={vertAt} tone="data" title={ease(frame, dbAt, 10) > 0.5 ? "database" : "server"} />
+        <Svg>
           {ring > 0 ? (
             <rect
               x={V.x - 14}
@@ -149,13 +158,17 @@ export const ScaleScene: React.FC = () => {
             />
           ) : null}
         </Svg>
+        </div>
+        <Line at={upAt} x={X0} y={y(904)} size={21} weight={500} color={OK_INK}>
+          Still the first move for a database
+        </Line>
 
         {/* ── Horizontal ── */}
         <Line at={horizAt} x={H_X} y={y(340)} size={24} weight={500}>
           Horizontal: more machines behind the load balancer
         </Line>
         <Line at={unlimitedAt} x={H_X} y={y(388)} size={22} color={INK_SOFT}>
-          nearly unlimited<span style={{ opacity: ease(frame, redundantAt, 10) }}>, and redundant</span>
+          Nearly unlimited<span style={{ opacity: ease(frame, redundantAt, 10) }}>, and redundant</span>
         </Line>
         <Node x={LBX.x} y={lbY} w={LBX.w} h={LBX.h} at={behindAt} tone="plain" title="load balancer" size={22} />
         {[0, 1, 2, 3].map((i) => (
@@ -239,7 +252,7 @@ export const ScaleScene: React.FC = () => {
                 width: 54,
                 height: 44,
                 boxSizing: "border-box",
-                borderRadius: 8,
+                borderRadius: 5,
                 border: `2.5px solid ${OK}`,
                 background: `color-mix(in srgb, ${OK} 12%, ${PAPER})`,
                 opacity: Math.min(1, p),
@@ -259,9 +272,10 @@ export const ScaleScene: React.FC = () => {
               <rect x={C.x0} y={y(C.top) - 2} width={C.x1 - C.x0} height={y(C.base) - y(C.top) + 4} />
             </clipPath>
           </defs>
-          {/* Headroom: the last tenth before full, where the wait climbs from 9 to 99. */}
+          {/* Headroom: run in the flat stretch, up to about 70% load, well short of
+              the last tenth, where the wait climbs from 9 to 99. */}
           {shade > 0 ? (
-            <rect x={cx(0.9)} y={y(C.top)} width={(cx(0.99) - cx(0.9)) * shade} height={y(C.base) - y(C.top)} fill={HIGHLIGHT} opacity={0.75} />
+            <rect x={cx(0)} y={y(C.top)} width={(cx(0.7) - cx(0)) * shade} height={y(C.base) - y(C.top)} fill={`color-mix(in srgb, ${OK} 14%, ${PAPER})`} />
           ) : null}
           {[0, 10, 20].map((v) => (
             <g key={v}>
@@ -280,17 +294,18 @@ export const ScaleScene: React.FC = () => {
             <path d={path} fill="none" stroke={BAR} strokeWidth={3} pathLength={1} strokeDasharray={`${curveP} 1`} />
           </g>
           {/* The three readings, each as it is said. */}
+          {/* 50% is where to run (green); 90% and 99% are the trap (red). */}
           {[
-            [m50, fiftyAt, "1× at 50%"],
-            [m90, ninetyAt, "9× at 90%"],
-          ].map(([m, at, t]) => {
+            [m50, fiftyAt, "1× at 50%", OK, OK_INK],
+            [m90, ninetyAt, "9× at 90%", ACCENT, ACCENT_INK],
+          ].map(([m, at, t, dot, ink]) => {
             const mm = m as { rho: number; wait: number };
             const p = ease(frame, at as number, 10);
             return p > 0 ? (
               <g key={String(t)} opacity={p}>
                 <line x1={cx(mm.rho)} x2={cx(mm.rho)} y1={y(C.base)} y2={cy(mm.wait)} stroke={INK_SOFT} strokeWidth={1.2} strokeDasharray="4 4" />
-                <circle cx={cx(mm.rho)} cy={cy(mm.wait)} r={7} fill={ACCENT} />
-                <text x={cx(mm.rho) - 14} y={cy(mm.wait) - 14} textAnchor="end" style={svgText({ ...note(24, ACCENT_INK), fontWeight: 500 })}>
+                <circle cx={cx(mm.rho)} cy={cy(mm.wait)} r={7} fill={dot as string} />
+                <text x={cx(mm.rho) - 14} y={cy(mm.wait) - 14} textAnchor="end" style={svgText({ ...note(24, ink as string), fontWeight: 500 })}>
                   {t as string}
                 </text>
               </g>

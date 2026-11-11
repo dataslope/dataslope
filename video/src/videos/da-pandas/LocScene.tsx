@@ -147,7 +147,7 @@ export const LocScene: React.FC = () => {
           </span>
         </Note>
         <Note at={labelTwoAt + 2} x={LIST_X} y={y(TOP) + lineH + h(14)} out={northAt - 2}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>up to label {LOC.frame.rows[endLabel][0]}, and including it</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Up to label {LOC.frame.rows[endLabel][0]}, and including it</span>
         </Note>
         <Listing lines={LOC.ilocSlice.lines} x={LIST_X} top={secondY} width={SLICE_W} size={SIZE} at={ilocSliceAt - 4} out={northAt - 2} />
         <Note at={twoRowsAt - 2} x={LIST_X + SLICE_W + 24} y={secondY + h(14)} out={northAt - 2}>
@@ -156,7 +156,7 @@ export const LocScene: React.FC = () => {
           </span>
         </Note>
         <Note at={twoRowsAt} x={LIST_X} y={secondY + lineH + h(14)} out={northAt - 2}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>stops before position {endLabel}</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Stops before position {endLabel}</span>
         </Note>
 
         {/* ── The North rows keep their labels ── */}
@@ -193,7 +193,7 @@ export const LocScene: React.FC = () => {
         />
         <Note at={lockZeroAt + 4} x={NORTH_X} y={ng.rowTop(north.rows.length) + h(22)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            no row is labelled 0
+            No row is labelled 0
           </span>
         </Note>
       </Drift>

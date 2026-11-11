@@ -2,10 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { ds } from "../../theme/brand";
 import { TRAFFIC } from "./data";
 import { commas, Drift, Flow, Headline, Kicker, Mark, Node, roundTo, Spot, X0 } from "./parts";
 
@@ -19,7 +20,8 @@ const ROW = { mid: 470, upper: 400, lower: 540 };
 const CHIP = 50;
 const CHIP_GAP = 14;
 
-/** A small red question mark on a box's corner: "every box has to answer". */
+/** A small question mark on a box's corner, in the pointer yellow with ink
+ *  type: "every box has to answer". An open question, not a fault, so not red. */
 const Query: React.FC<{ x: number; y: number; at: number; dim: number }> = ({ x, y, at, dim }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -34,13 +36,13 @@ const Query: React.FC<{ x: number; y: number; at: number; dim: number }> = ({ x,
         width: 34,
         height: 34,
         borderRadius: 17,
-        background: ACCENT,
+        background: ds("yellow", 500),
         border: `3px solid ${PAPER}`,
         boxSizing: "border-box",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        ...label(21, PAPER),
+        ...label(21, INK),
         fontWeight: 500,
         transform: `scale(${Math.min(1.2, p)})`,
         opacity: Math.min(1, p) * (1 - ease(frame, dim, 12) * 0.65),

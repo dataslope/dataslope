@@ -137,22 +137,22 @@ export const ConcurrentScene: React.FC = () => {
           })}
         </svg>
         <Note at={pricingAt + 6} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) - h(64)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>pricing's lift, without and with</span>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>Pricing's lift, without and with</span>
         </Note>
         <Note at={recsAt} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) - h(28)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>the new recommendations</span>
         </Note>
         <Note at={interactAt} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) + h(24)}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>if they differ, the two interact</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>If they differ, the two interact</span>
         </Note>
 
         {/* What a factorial design does. */}
         <Note at={indepAt} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) + h(92)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>factorial: randomize each test independently</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Factorial: randomize each test independently</span>
         </Note>
         <Note at={fillAt} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) + h(130)}>
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
-            all four cells fill<span style={{ opacity: ease(frame, estAt, 10) }}>; estimate the interaction</span>
+            All four cells fill<span style={{ opacity: ease(frame, estAt, 10) }}>; estimate the interaction</span>
           </span>
         </Note>
 

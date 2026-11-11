@@ -234,7 +234,7 @@ export const StageScene: React.FC = () => {
 
         {/* The fix for a straggler. */}
         <Note at={specAt - 2} x={SPEC_X} y={y(712)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, display: "block", whiteSpace: "nowrap" }}>speculative execution</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, display: "block", whiteSpace: "nowrap" }}>Speculative execution</span>
           <span style={{ ...note(22, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, copyAt, 10) }}>
             a copy of a slow task
             <br />

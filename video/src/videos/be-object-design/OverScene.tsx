@@ -10,8 +10,10 @@ import { ACCENT_INK, Box, Drift, Flow, lerp, Line, Mark, OK_INK, toneAt, VRule, 
 
 const COL_X = [X0, 700, 1280];
 const COL_W = 440;
-const LAYER = { top: 392, h: 74 };
-const THING = { top: 548, h: 64 };
+const LAYER = { top: 392, h: 84 };
+const THING = { top: 580, h: 72 };
+/** The notes under the columns. */
+const NOTES = 704;
 
 /**
  * Question 8. Three patterns, each wrapped around one thing: a factory with
@@ -91,7 +93,7 @@ export const OverScene: React.FC = () => {
           return (
             <React.Fragment key={c.layer}>
               <Box x={x} y={layerTop} w={COL_W} h={LAYER.h} at={c.at} dashed tone="plain" tones={[[eachAt + 6 + i * 6, "bad"], ...(i === 1 ? ([[earnsAt, "ok"]] as const) : [])]} dim={dim}>
-                <span style={{ position: "relative", ...label(25, c2.ink), fontWeight: 500, whiteSpace: "nowrap" }}>
+                <span style={{ position: "relative", ...label(27, c2.ink), fontWeight: 500, whiteSpace: "nowrap" }}>
                   {c.layer}
                   <span
                     style={{
@@ -106,15 +108,15 @@ export const OverScene: React.FC = () => {
                     }}
                   />
                 </span>
-                <span style={{ ...note(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, c.at + 8, 10) }}>
+                <span style={{ ...note(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, c.at + 8, 10) }}>
                   {keep > 0.5 ? "earned: two rules" : "a layer to read through"}
                 </span>
               </Box>
               <Flow points={[[x + thingW / 2, layerTop + LAYER.h + 6], [x + thingW / 2, thingTop - 8]]} at={c.at + 6} dur={8} width={2.2} head={12} dim={dim} />
-              <Box x={x} y={thingTop} w={thingW} h={THING.h} at={whenAt + 6 + i * 5} title={i === 1 && second > 0.5 ? "flat rate" : c.thing} size={22} tone="data" dim={dim} />
+              <Box x={x} y={thingTop} w={thingW} h={THING.h} at={whenAt + 6 + i * 5} title={i === 1 && second > 0.5 ? "flat rate" : c.thing} size={24} tone="data" dim={dim} />
               {i === 1 ? (
                 <>
-                  <Box x={x + (COL_W + 20) / 2 + 30 * (1 - second)} y={thingTop} w={(COL_W - 20) / 2} h={THING.h} at={secondAt + 4} title="by weight" size={22} tone="ok" />
+                  <Box x={x + (COL_W + 20) / 2 + 30 * (1 - second)} y={thingTop} w={(COL_W - 20) / 2} h={THING.h} at={secondAt + 4} title="by weight" size={24} tone="ok" />
                   <Flow points={[[x + (COL_W * 3) / 4 + 5, layerTop + LAYER.h + 6], [x + (COL_W * 3) / 4 + 5, thingTop - 8]]} at={secondAt + 12} dur={8} width={2.2} head={12} />
                 </>
               ) : null}
@@ -127,25 +129,27 @@ export const OverScene: React.FC = () => {
         ))}
 
         {/* The cost, and the rule. */}
-        <Line x={X0} y={y(660)} at={eachAt} size={26} out={notesOut}>
+        <Line x={X0} y={y(NOTES)} at={eachAt} size={26} out={notesOut}>
           Abstraction you have to read through
           <span style={{ opacity: ease(frame, nobodyAt, 10) }}>
             , for <span style={{ color: ACCENT_INK, fontWeight: 500 }}>flexibility nobody uses</span>
           </span>
         </Line>
-        <Line x={X0} y={y(660) + 52} at={variationAt} size={26} out={notesOut}>
+        <Line x={X0} y={y(NOTES) + 52} at={variationAt} size={26} out={notesOut}>
           Patterns solve variation you expect
           <span style={{ color: INK_SOFT, opacity: ease(frame, specAt, 10) }}>; added speculatively, they break</span>
         </Line>
-        <Line x={X0} y={y(660) + 116} at={yagniAt} size={30} weight={500} out={notesOut}>
+        <Line x={X0} y={y(NOTES) + 116} at={yagniAt} size={30} weight={500} out={notesOut}>
           YAGNI: <Mark at={gonnaAt}>you aren&apos;t gonna need it</Mark>
         </Line>
 
-        <Line x={X0} y={y(660)} at={triggerAt} size={28} weight={500}>
+        <Line x={X0} y={y(NOTES)} at={triggerAt} size={28} weight={500}>
           Name the trigger, not the pattern
-          <span style={{ color: OK_INK, opacity: ease(frame, secondAt, 10) }}>: the second shipping rule</span>
+          <span style={{ opacity: ease(frame, secondAt, 10) }}>
+            : <span style={{ color: OK_INK }}>the second shipping rule</span>
+          </span>
         </Line>
-        <Line x={X0} y={y(660) + 56} at={reachAt} size={26}>
+        <Line x={X0} y={y(NOTES) + 56} at={reachAt} size={26}>
           Reach for a pattern when the duplication, or the pressure to change, <Mark at={realAt}>is real</Mark>.
         </Line>
       </Drift>

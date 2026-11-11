@@ -8,22 +8,22 @@ import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Cross, Drift, Flow, Http, Mark, Msg, msgHeight, OK_INK, Strike, X0, VRule } from "./parts";
+import { Cross, Drift, Flow, Http, Mark, Msg, msgHeight, OK_INK, X0, VRule } from "./parts";
 
 const CODE_SIZE = 23;
 
 type Column = { cls: string; name: string; x: number; w: number; codes: string[] };
 const COLUMNS: Column[] = [
-  { cls: "2xx", name: "success", x: X0, w: 340, codes: ["200 OK", "201 Created", "204 No Content"] },
-  { cls: "3xx", name: "redirection", x: 500, w: 340, codes: ["301", "304 Not Modified"] },
+  { cls: "2xx", name: "Success", x: X0, w: 340, codes: ["200 OK", "201 Created", "204 No Content"] },
+  { cls: "3xx", name: "Redirection", x: 470, w: 340, codes: ["301 Moved Permanently", "304 Not Modified"] },
   {
     cls: "4xx",
-    name: "client error",
+    name: "Client error",
     x: 880,
     w: 420,
     codes: ["400 Bad Request", "401 Unauthorized", "403 Forbidden", "404 Not Found", "409 Conflict", "422 Unprocessable Entity", "429 Too Many Requests"],
   },
-  { cls: "5xx", name: "server error", x: 1360, w: 420, codes: ["500", "503 Service Unavailable"] },
+  { cls: "5xx", name: "Server error", x: 1360, w: 420, codes: ["500 Internal Server Error", "503 Service Unavailable"] },
 ];
 
 /** The three answers to one request, on the right once Question 4 is up. */
@@ -94,10 +94,9 @@ export const CodesScene: React.FC = () => {
       {classAt.map((at, i) => (
         <Sfx key={i} name="el-tap" at={at + 2} level={-31} />
       ))}
-      <Sfx name="el-scratch" at={parseAt + 10} level={-31} />
+      <Sfx name="el-scratch" at={parseAt + 8} level={-31} />
       <Sfx name="el-whoosh" at={q4At + 2} level={-36} />
       <Sfx name="el-tap" at={challengeAt + 4} level={-31} />
-      <Sfx name="el-scratch" at={againAt + 10} level={-31} />
       <Sfx name="el-tap" at={a404 + 10} level={-31} />
 
       <Drift from={from} to={end + 30}>
@@ -160,7 +159,7 @@ export const CodesScene: React.FC = () => {
           <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 22 }}>
             <Cross at={parseAt + 8} size={22} />
             <span style={{ fontFamily: MONO, fontSize: 22, color: ACCENT_INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
-              <Strike at={parseAt + 10}>if "not found" in message: …</Strike>
+              if "not found" in message: …
             </span>
           </div>
         </Note>
@@ -179,7 +178,7 @@ export const CodesScene: React.FC = () => {
         />
         <Note at={authnAt} x={RESP_X} y={rowTop(0) + twoH + h(12)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            really: <b>not authenticated</b>
+            Really: <b>not authenticated</b>
           </span>
         </Note>
 
@@ -194,27 +193,24 @@ export const CodesScene: React.FC = () => {
         <Flow points={[[REQ_X + REQ_W + 8, rowTop(1) + twoH / 2], [RESP_X - 8, rowTop(1) + twoH / 2]]} at={a403 + 8} color={INK_SOFT} width={2.2} head={11} />
         <Msg x={RESP_X} y={rowTop(1)} w={RESP_W} at={refusesAt} tone="bad" lines={[{ t: "403 Forbidden" }, { t: "understood, and refused", color: INK_SOFT }]} />
         <Note at={enoughAt} x={REQ_X} y={rowTop(1) + twoH + h(12)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>valid credentials, not enough permission</span>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Valid credentials, not enough permission</span>
         </Note>
         <Note at={againAt} x={RESP_X} y={rowTop(1) + twoH + h(12)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <Strike at={againAt + 10}>log in again</Strike> <span style={{ color: INK_SOFT }}>won't necessarily help</span>
+            Logging in again won't necessarily help
           </span>
         </Note>
 
-        {/* 404, on purpose: the resource drawn faint. */}
+        {/* 404, on purpose. */}
         <Msg x={REQ_X} y={rowTop(2)} w={REQ_W} at={a404} lines={[{ t: "DELETE /articles/42" }, { t: "(from a stranger)", color: INK_SOFT }]} />
         <Flow points={[[REQ_X + REQ_W + 8, rowTop(2) + twoH / 2], [RESP_X - 8, rowTop(2) + twoH / 2]]} at={a404 + 8} color={INK_SOFT} width={2.2} head={11} />
         <Msg x={RESP_X} y={rowTop(2)} w={RESP_W} at={a404 + 10} tone="data" lines={[{ t: "404 Not Found" }, { t: "on purpose", at: purposeAt, color: INK_SOFT }]} />
-        <Note at={strangerAt} x={1640} y={rowTop(2) + h(26)}>
-          <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT, opacity: 0.5, whiteSpace: "nowrap" }}>article 42</span>
-        </Note>
         <Note at={strangerAt + 6} x={RESP_X} y={rowTop(2) + twoH + h(12)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>hides that it exists</span>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Hides that it exists</span>
         </Note>
 
         {/* Hairlines between the four classes, each with the column to its right. */}
-        {[410, 803, 1289].map((x, i) => (
+        {[390, 822, 1289].map((x, i) => (
           <VRule key={x} x={x} top={colTop} bottom={codeTop + (Math.max(COLUMNS[i].codes.length, COLUMNS[i + 1].codes.length) - 1) * codeStep + 32} at={classAt[i + 1] - 2} out={leave} />
         ))}
         <VRule x={552} top={colTop} bottom={Math.max(codeTop + 6 * codeStep + 32, rowTop(2) + twoH + h(12) + 30)} at={a401} />

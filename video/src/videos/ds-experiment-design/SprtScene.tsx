@@ -143,12 +143,12 @@ export const SprtScene: React.FC = () => {
         </Note>
         <Note at={wrongAt} x={COL_X} y={y(514)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            false positives <b style={{ color: ACCENT_INK }}>{pct(SPRT.falsePositive, 1)}</b>
+            False positives <b style={{ color: ACCENT_INK }}>{pct(SPRT.falsePositive, 1)}</b>
             <span style={{ ...note(25, INK_SOFT), opacity: ease(frame, builtAt, 10) }}> · built for 2.5%</span>
           </span>
         </Note>
         <Note at={realAt} x={COL_X} y={y(590)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>pairs needed when the effect is real</span>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>Pairs needed when the effect is real</span>
         </Note>
         {bars.map((b, i) => {
           const p = ease(frame, b.at - 4, 14);
@@ -172,10 +172,10 @@ export const SprtScene: React.FC = () => {
           );
         })}
         <Note at={classicAt} x={COL_X} y={y(826)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>classic SPRT: two fixed hypotheses only</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Classic SPRT: two fixed hypotheses only</span>
         </Note>
         <Note at={liveAt} x={COL_X} y={y(862)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>live metrics: mixture SPRT, group-sequential</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Live metrics: mixture SPRT, group-sequential</span>
         </Note>
       </Drift>
     </AbsoluteFill>

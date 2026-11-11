@@ -90,7 +90,7 @@ export const ManyScene: React.FC = () => {
   const leftDim = ease(frame, tenAt, 14) * 0.55;
 
   const legend = [
-    { color: INK, dash: "6 5", text: `under 0.05: keeps ${METRICS.counts.raw}, ${METRICS.counts.rawFalse} false`, at: fiveAt + 4, ink: INK },
+    { color: INK, dash: "6 5", text: `Under 0.05: keeps ${METRICS.counts.raw}, ${METRICS.counts.rawFalse} false`, at: fiveAt + 4, ink: INK },
     { color: WARM, dash: undefined, text: `Bonferroni (0.05 ÷ ${m}): keeps ${METRICS.counts.bonferroni}`, at: keepsTwoAt, ink: WARM_INK },
     // Named as the narration names it, so its notes below have a heading;
     // what it keeps arrives with the answer.
@@ -114,14 +114,14 @@ export const ManyScene: React.FC = () => {
         </QuestionCard>
         <Note at={eachAt} x={X0} y={y(300)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            each test at 5%: <span style={{ opacity: ease(frame, oneAt, 10) }}>a one-in-twenty chance of a false alarm</span>
+            Each test at 5%: <span style={{ opacity: ease(frame, oneAt, 10) }}>a one-in-twenty chance of a false alarm</span>
           </span>
         </Note>
 
         {/* Left: how fast "at least one" climbs. */}
         <div style={{ opacity: 1 - leftDim }}>
           <PanelTitle x={LEFT.x0 - 20} y={y(LEFT.top) - 54} at={twentyAt - 6}>
-            chance of at least one false alarm
+            Chance of at least one false alarm
           </PanelTitle>
           <Axes x={kx} y={ky} xTicks={[1, 5, 10, 15, 20]} yTicks={[0, 0.2, 0.4, 0.6]} yFormat={(v) => `${Math.round(v * 100)}%`} xTitle="independent metrics read, none really moved" at={twentyAt - 8} />
           <Curve points={fam} x={kx} y={ky} at={twentyAt} dur={Math.max(18, sixtyAt - twentyAt)} color={ACCENT} />
@@ -140,7 +140,7 @@ export const ManyScene: React.FC = () => {
         {/* Right: ten metrics against three cut-offs. */}
         <div style={{ opacity: rightIn }}>
           <PanelTitle x={RIGHT.x0 - 20} y={y(RIGHT.top) - 54} at={tenAt}>
-            ten simulated metrics, by p-value
+            Ten simulated metrics, by p-value
           </PanelTitle>
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
             <line x1={RIGHT.x0} x2={RIGHT.x1} y1={y(RIGHT.base)} y2={y(RIGHT.base)} stroke={INK} strokeWidth={1.6} />
@@ -216,16 +216,16 @@ export const ManyScene: React.FC = () => {
           </Note>
         ))}
         <Note at={dropsAt + 2} x={LEGEND_X + 56} y={y(440) + 76 + 34}>
-          <span style={{ ...label(19, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>safe, but it drops a real one</span>
+          <span style={{ ...label(19, WARM_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Safe, but it drops a real one</span>
         </Note>
         <Note at={fdrAt + 2} x={LEGEND_X + 56} y={y(440) + 152 + 34} width={370}>
-          <span style={{ ...label(19, OK_INK), fontWeight: 500 }}>controls the false discovery rate: the expected share of false hits</span>
+          <span style={{ ...label(19, OK_INK), fontWeight: 500 }}>Controls the false discovery rate: the expected share of false hits</span>
         </Note>
 
         {/* The rule, and the three ranks that decide it. */}
         <Note at={ruleAt + 4} x={LEGEND_X + 56} y={y(440) + 152 + 104}>
           <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            rank <i>k</i>'s bar: <i>k</i>/{m} × {cut}
+            Rank <i>k</i>'s bar: <i>k</i>/{m} × {cut}
           </span>
         </Note>
         {deciding.map((r, i) => {

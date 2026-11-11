@@ -5,6 +5,7 @@ import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, fmt, label } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CORR } from "../da-statistics-communication/data";
@@ -46,7 +47,7 @@ const Bayes: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={freqAt} x={R_X} y={c.y(330)}>
         <span style={{ ...noteText(25, INK) }}>
-          <b>frequentist</b>: the parameter is <Mark at={fixedAt + 2}>fixed</Mark>, the data <Mark at={randomAt + 4}>random</Mark>
+          <b>Frequentist</b>: the parameter is <Mark at={fixedAt + 2}>fixed</Mark>, the data <Mark at={randomAt + 4}>random</Mark>
         </span>
       </Note>
       <Note at={reportsAt} x={R_X + 24} y={c.y(372)}>
@@ -68,7 +69,7 @@ const Bayes: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={flatAt} x={R_X + 30} y={c.y(836)}>
         <span style={{ ...noteText(24, INK), ...TABULAR }}>
-          <span style={{ color: INK_SOFT }}>from flat priors: </span>
+          <span style={{ color: INK_SOFT }}>From flat priors: </span>
           <span style={{ opacity: ease(frame, distAt - 2, 10) }}>a distribution for each rate</span>
           <span style={{ opacity: ease(frame, pctAt - 2, 10) }}>
             , and <Mark at={pctAt + 2} color={MARK_OK}>a {fmt(BAYES.pBetter * 100, 1)}% chance</Mark> B&apos;s is higher
@@ -106,12 +107,12 @@ const Ranks: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={paraAt} x={R_X} y={c.y(330)}>
         <span style={{ ...noteText(25, INK) }}>
-          <b>parametric</b>: assumes a distribution, usually normal
+          <b>Parametric</b>: assumes a distribution, usually normal
         </span>
       </Note>
       <Note at={nonAt} x={R_X} y={c.y(380)}>
         <span style={{ ...noteText(25, INK) }}>
-          <b>non-parametric</b>: works on ranks
+          <b>Non-parametric</b>: works on ranks
         </span>
       </Note>
       <Svg opacity={ease(frame, queuesAt, 12)}>
@@ -156,13 +157,16 @@ const Ranks: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={tAt - 4} x={R_X} y={c.y(740)}>
         <span style={{ ...noteText(26, ACCENT_INK) }}>
-          t-test: <span style={{ ...TABULAR }}>p = {fmt(RANKS.t, 2)}</span>
-          <span style={{ ...noteText(22, INK_SOFT), marginLeft: 14 }}>sees nothing</span>
+          t-test:{" "}
+          <MathRun style={{ ...TABULAR }}>
+            <I>p</I> = {fmt(RANKS.t, 2)}
+          </MathRun>
+          <span style={{ color: INK_SOFT, marginLeft: 14 }}>sees nothing</span>
         </span>
       </Note>
       <Note at={swampAt} x={R_X + 24} y={c.y(792)}>
         <span style={{ ...noteText(22, INK_SOFT) }}>
-          the monsters blow up the spread;
+          The monsters blow up the spread;
           <span style={{ opacity: ease(frame, ranksAt - 2, 10) }}> on ranks, a monster is just the largest</span>
         </span>
       </Note>
@@ -170,9 +174,11 @@ const Ranks: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...noteText(26, OK_INK) }}>
           Mann-Whitney:{" "}
           <Mark at={uAt + 4} color={MARK_OK}>
-            <span style={{ ...TABULAR }}>p = {fmt(RANKS.u, 3)}</span>
+            <MathRun style={{ ...TABULAR }}>
+              <I>p</I> = {fmt(RANKS.u, 3)}
+            </MathRun>
           </Mark>
-          <span style={{ ...noteText(22, INK_SOFT), marginLeft: 14 }}>finds the shift</span>
+          <span style={{ color: INK_SOFT, marginLeft: 14 }}>finds the shift</span>
         </span>
       </Note>
     </>
@@ -213,12 +219,12 @@ const Corr: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={corrAt} x={R_X} y={c.y(330)}>
         <span style={{ ...noteText(25, INK) }}>
-          <b>correlation</b>: two variables moving together
+          <b>Correlation</b>: two variables moving together
         </span>
       </Note>
       <Note at={causeAt} x={R_X} y={c.y(376)}>
         <span style={{ ...noteText(25, INK) }}>
-          <b>causation</b>: one changing the other
+          <b>Causation</b>: one changing the other
         </span>
       </Note>
       <Axes x={sx} y={{ lo: 0, hi: 1, a: base, b: base - c.h(300) }} xTicks={[]} xTitle="ice cream sold" yTitle="drownings" at={iceAt} size={19} />
@@ -238,14 +244,16 @@ const Corr: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={confAt} x={1440} y={c.y(620)}>
         <div style={{ ...noteText(22, INK_SOFT), lineHeight: 1.35 }}>
-          <span style={{ color: WARM_INK }}>temperature, the confounder,</span>
+          <span style={{ color: WARM_INK }}>Temperature, the confounder,</span>
           <br />
-          <span style={{ opacity: ease(frame, holdAt - 2, 10) }}>held fixed: </span>
-          <span style={{ ...noteText(28, OK_INK), fontWeight: 500, opacity: ease(frame, partialAt - 2, 10), ...TABULAR }}>{fmt(CORR.partial, 2)}</span>
+          {/* The answer line in one size: the partial r is told apart by its
+              color and weight. */}
+          <span style={{ fontSize: 26, opacity: ease(frame, holdAt - 2, 10) }}>held fixed: </span>
+          <span style={{ ...noteText(26, OK_INK), fontWeight: 600, opacity: ease(frame, partialAt - 2, 10), ...TABULAR }}>{fmt(CORR.partial, 2)}</span>
         </div>
       </Note>
       <Note at={expAt} x={R_X} y={c.y(860)}>
-        <span style={{ ...noteText(24, OK_INK) }}>a cause takes an experiment, or a careful causal design</span>
+        <span style={{ ...noteText(24, OK_INK) }}>A cause takes an experiment, or a careful causal design</span>
       </Note>
     </>
   );
@@ -295,7 +303,7 @@ export const RapidScene: React.FC = () => {
           probability
         </NextLine>
         <Note at={restsAt} x={R_X} y={y(760)}>
-          <span style={{ ...noteText(24, INK_SOFT) }}>every test here rests on probability</span>
+          <span style={{ ...noteText(24, INK_SOFT) }}>Every test here rests on probability</span>
         </Note>
       </Drift>
     </AbsoluteFill>

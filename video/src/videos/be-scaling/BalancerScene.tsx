@@ -98,7 +98,9 @@ export const BalancerScene: React.FC = () => {
   const pointsAt = n.word("q2-ring", "a hundred points a server");
   const twentyAt = n.word("q2-ring", "only twenty-three percent move");
   const newAt = n.word("q2-ring", "all of them to the new server");
-  const end = n.beat("q2-ring").to;
+  const clockAt = n.word("q2-clock", "the next point clockwise");
+  const justAt = n.word("q2-clock", "take only the keys just before them");
+  const end = n.beat("q2-clock").to;
 
   const phaseOut = whyAt - 4;
   const lbMid = y(LB.mid);
@@ -180,17 +182,17 @@ export const BalancerScene: React.FC = () => {
           so no one server is overwhelmed
         </Line>
         <Line at={healthAt} x={X0} y={y(820)} size={22} out={phaseOut}>
-          <Mark at={healthAt}>health checks</Mark> pull a dead server out
+          <Mark at={healthAt}>Health checks</Mark> pull a dead server out
         </Line>
         <Line at={availAt} x={X0} y={y(870)} size={22} color={OK_INK} weight={500} out={phaseOut}>
-          a stateless pool stays highly available
+          A stateless pool stays highly available
         </Line>
 
         {/* ── The three ways to pick a server, each lit as named. ── */}
         {[
-          ["Round-robin", rrAt, "deals them in turn"],
-          ["Least-connections", lcAt, "fewest open connections"],
-          ["Consistent hashing", chAt, "the same key, the same server"],
+          ["Round-robin", rrAt, "Deals them in turn"],
+          ["Least-connections", lcAt, "Fewest open connections"],
+          ["Consistent hashing", chAt, "The same key, the same server"],
         ].map(([name, at, sub], i) => (
           <React.Fragment key={i}>
             <Ink at={(at as number) - 2} dur={14} out={phaseOut} style={{ left: PANEL_X[i], top: panelTop, whiteSpace: "nowrap" }}>
@@ -230,7 +232,7 @@ export const BalancerScene: React.FC = () => {
                 top,
                 width: 48,
                 height: 32,
-                borderRadius: 7,
+                borderRadius: 5,
                 background: `color-mix(in srgb, ${BAR} 14%, ${PAPER})`,
                 border: `2px solid ${BAR}`,
                 boxSizing: "border-box",
@@ -270,10 +272,10 @@ export const BalancerScene: React.FC = () => {
           );
         })}
         <Line at={fewestAt + 10} x={PANEL_X[1]} y={lcRow(3) + h(60)} size={20} color={OK_INK} weight={500} out={phaseOut}>
-          new request: server {lcPick + 1}
+          New request: server {lcPick + 1}
         </Line>
         <Line at={slowAt} x={PANEL_X[1]} y={lcRow(3) + h(104)} size={20} color={INK_SOFT} out={phaseOut}>
-          copes with slow requests
+          Copes with slow requests
         </Line>
 
         {/* Consistent hashing: the same key reaches the same server, every time. */}
@@ -291,7 +293,7 @@ export const BalancerScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Line at={hotAt} x={PANEL_X[2]} y={y(660)} size={20} color={INK_SOFT} out={phaseOut}>
-          for servers that cache
+          For servers that cache
         </Line>
         <Line at={hotAt + 4} x={PANEL_X[2]} y={y(660) + 30} size={20} color={INK_SOFT} out={phaseOut}>
           their own hot links
@@ -342,14 +344,23 @@ export const BalancerScene: React.FC = () => {
             );
           })}
         </Svg>
-        <Ink at={ringAt + 6} dur={14} style={{ left: RING.cx - 110, top: ringCy - 34, width: 220, textAlign: "center" }}>
-          <span style={{ ...note(20, INK_SOFT) }}>
-            a key goes to the next
+        <Ink at={clockAt} dur={14} style={{ left: RING.cx - 130, top: ringCy - 34, width: 260, textAlign: "center", whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, INK), fontWeight: 500 }}>
+            <Mark at={clockAt + 2}>A key goes to the next</Mark>
             <br />
-            point clockwise
+            <Mark at={clockAt + 6}>point clockwise</Mark>
           </span>
         </Ink>
-        {/* Which color is which server. */}
+        <Line at={justAt} x={RING.cx - RING.r - 24} y={y(GRID_TOP) + 416} size={21} weight={500} color={INK_SOFT}>
+          A new point takes only the keys just before it
+        </Line>
+        {/* Which color is which server, and what a faded square means. */}
+        <Ink at={sevAt} dur={12} style={{ left: 1580, top: y(GRID_TOP) + 40 + 4 * 40 + 14, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, fontWeight: 500 }}>
+            <span style={{ width: 20, height: 20, borderRadius: 4, background: SERVER[1], opacity: 0.2 }} />
+            faded: did not move
+          </span>
+        </Ink>
         {[0, 1, 2, 3].map((s) => {
           const at = s < 3 ? simAt + 8 + s * 3 : fourthAt;
           return (

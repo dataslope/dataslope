@@ -66,11 +66,16 @@ export const TxnScene: React.FC = () => {
   const schemOut = transferAt - 4;
   const sTop = y(TOP) + h(10);
   const step = h(70);
+  // Only account 1 takes part: the transfer's other end is account 99, which
+  // does not exist, so account 2 would only be a bystander the eye expects
+  // the money to reach.
+  const before = TXN.before.rows.filter(([id]) => id === "1");
+  const after = TXN.after.rows.filter(([id]) => id === "1");
   const g = tableGeometry({
     x: R_X,
     top: y(TOP) + h(56),
     cols: TXN.before.cols.map((c) => ({ name: c })),
-    rows: TXN.before.rows,
+    rows: before,
     headH: h(46),
     rowH: h(54),
     bodySize: 26,
@@ -117,7 +122,7 @@ export const TxnScene: React.FC = () => {
           </svg>
           <Note at={oneAt + 4} x={X0 + 560} y={sTop + step + h(40)}>
             <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-              succeed or fail <b>as one</b>
+              Succeed or fail <b>as one</b>
             </span>
           </Note>
         </div>
@@ -138,7 +143,7 @@ export const TxnScene: React.FC = () => {
         <DataTable
           g={g}
           cols={TXN.before.cols.map((c) => ({ name: c, numeric: true, ink: c === "id" ? BLUE_INK : undefined }))}
-          rows={TXN.before.rows.map((cells, i) => ({ cells, at: transferAt + 4 + i * 3 }))}
+          rows={before.map((cells, i) => ({ cells, at: transferAt + 4 + i * 3 }))}
           at={transferAt}
           swaps={[{ row: 0, col: 1, at: seventyAt, value: TXN.debited.rows[0][1], color: INK }]}
           out={rollbackAt}
@@ -149,15 +154,18 @@ export const TxnScene: React.FC = () => {
         <DataTable
           g={g}
           cols={TXN.after.cols.map((c) => ({ name: c, numeric: true, ink: c === "id" ? BLUE_INK : undefined }))}
-          rows={TXN.after.rows.map((cells) => ({ cells, at: rollbackAt + 2 }))}
+          rows={after.map((cells) => ({ cells, at: rollbackAt + 2 }))}
           at={rollbackAt}
           marks={[{ row: 0, col: 1, at: hundredAt, color: MARK_OK }]}
         />
-        <Note at={transferAt + 6} x={R_X} y={g.rowTop(2) + h(24)} out={rollbackAt}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>moving 30 from account 1</span>
+        <Note at={transferAt + 6} x={R_X} y={g.rowTop(1) + h(24)} out={rollbackAt}>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Moving 30 from account 1</div>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(6), opacity: ease(frame, recordAt, 10) }}>
+            to account 99, <span style={{ color: ACCENT_INK }}>which doesn&rsquo;t exist</span>
+          </div>
         </Note>
-        <Note at={hundredAt + 4} x={R_X} y={g.rowTop(2) + h(24)}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the debit is undone</span>
+        <Note at={hundredAt + 4} x={R_X} y={g.rowTop(1) + h(24)}>
+          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The debit is undone</span>
         </Note>
 
         {/* ── What the application does ── */}
@@ -165,9 +173,9 @@ export const TxnScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>The application, on an error:</span>
         </Note>
         {[
-          { at: catchAt, text: "catch it" },
-          { at: catchAt + 10, text: "roll back" },
-          { at: retryAt, text: "retry, or report it" },
+          { at: catchAt, text: "Catch it" },
+          { at: catchAt + 10, text: "Roll back" },
+          { at: retryAt, text: "Retry, or report it" },
         ].map((s, i) => (
           <Note key={s.text} at={s.at} x={R_X} y={y(640) + h(44) + i * h(48)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -177,7 +185,7 @@ export const TxnScene: React.FC = () => {
         ))}
         <Note at={neverAt} x={R_X} y={y(640) + h(196)}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
-            <Strike at={neverAt + 6}>carry on</Strike>
+            <Strike at={neverAt + 6}>Carry on</Strike>
           </span>
         </Note>
         <div style={{ position: "absolute", left: R_X - 24, top: y(640) + h(44), width: 3, height: h(134), background: OK, opacity: ease(frame, catchAt, 10) * 0.6 }} />

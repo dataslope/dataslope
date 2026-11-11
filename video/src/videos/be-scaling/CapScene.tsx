@@ -7,12 +7,15 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, lab
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Line, Mark, MiniMap, Node, Q_SIZE, Q_W, Svg, VRule, X0 } from "./parts";
+import { Illustration } from "../../components/Illustration";
+import { Drift, Line, Mark, MiniMap, Node, Q_SIZE, Q_W, spotH, VRule, X0 } from "./parts";
 
 /** The page's grid: two rows (the network's state), two columns (the choice). */
 const G = { head: X0, col: [420, 800], colW: 360, top: 400, rowH: 104, gap: 12 };
 /** The shortener, split by a partition, at the right. */
 const P = { left: 1290, cut: 1560, right: 1640, top: 420, pacelc: 1420 };
+/** The crack's drawn width: 250px tall, spanning both rows of nodes. */
+const CRACK_W = 77;
 
 /** A cell of the grid: a tinted box that inks its text in. */
 const Cell: React.FC<{ x: number; y: number; w: number; h: number; at: number; fill: string; lit?: number; children: React.ReactNode }> = ({
@@ -36,7 +39,7 @@ const Cell: React.FC<{ x: number; y: number; w: number; h: number; at: number; f
         top: y,
         width: w,
         height: h,
-        borderRadius: 10,
+        borderRadius: 8,
         background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${lit * 100}%, ${fill})` : fill,
         display: "flex",
         alignItems: "center",
@@ -125,15 +128,15 @@ export const CapScene: React.FC = () => {
 
         {/* ── The grid ── */}
         {[
-          ["stay consistent", "every read sees the latest write", consistentAt],
-          ["stay available", "every working node answers", availableAt],
+          ["Stay consistent", "Every read sees the latest write", consistentAt],
+          ["Stay available", "Every working node answers", availableAt],
         ].map(([t, sub, at], i) => (
           <Ink key={i} at={(at as number) - 6} dur={14} style={{ left: G.col[i], top: y(G.top) - h(84), width: G.colW, textAlign: "center" }}>
             <div style={{ ...label(23, INK), fontWeight: 500 }}>{t as string}</div>
             <div style={{ ...note(20, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>{sub as string}</div>
           </Ink>
         ))}
-        {["network healthy", "during a partition"].map((t, r) => (
+        {["Network healthy", "During a partition"].map((t, r) => (
           <Ink key={t} at={partitionAt + r * 6} dur={14} style={{ left: G.head, top: row(r), height: rowH, display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
             <span style={{ ...label(22, r ? ACCENT_INK : INK), fontWeight: 500 }}>{t}</span>
           </Ink>
@@ -142,18 +145,18 @@ export const CapScene: React.FC = () => {
           <span>
             {waiting > 0.5 ? (
               <>
-                waiting on replicas:<span style={{ color: BLUE_INK, opacity: ease(frame, tradesAt, 10) }}> latency or consistency</span>
+                Waiting on replicas:<span style={{ color: BLUE_INK, opacity: ease(frame, tradesAt, 10) }}> latency or consistency</span>
               </>
             ) : (
-              "consistent and available"
+              "Consistent and available"
             )}
           </span>
         </Cell>
         <Cell x={G.col[0]} y={row(1)} w={G.colW} h={rowH} at={refusesAt} fill={partFill} lit={bottomLit}>
-          refuse
+          Refuse
         </Cell>
         <Cell x={G.col[1]} y={row(1)} w={G.colW} h={rowH} at={answersAt} fill={partFill} lit={bottomLit}>
-          answer, maybe stale
+          Answer, maybe stale
         </Cell>
 
         {/* ── The shortener, per operation ── */}
@@ -165,29 +168,29 @@ export const CapScene: React.FC = () => {
         </Line>
         {/* Available: the redirect and the new key, each with its notes under it. */}
         <Line at={redirectAt} x={apX} y={opsTop} size={22} weight={500} color={BLUE_INK}>
-          redirect
+          Redirect
         </Line>
         <Line at={notFoundAt} x={apX} y={opsTop + h(34)} size={20} color={INK_SOFT}>
-          at worst, a new link not found yet,
+          At worst, a new link not found yet,
         </Line>
         <Line at={takenAt} x={apX} y={opsTop + h(62)} size={20} color={INK_SOFT}>
           a taken-down link still working
         </Line>
         <Line at={mintAt} x={apX} y={opsTop + h(124)} size={22} weight={500} color={BLUE_INK}>
-          new key
+          New key
         </Line>
         <Line at={blockAt} x={apX} y={opsTop + h(158)} size={20} color={INK_SOFT}>
-          each server mints from
+          Each server mints from
         </Line>
         <Line at={blockAt + 4} x={apX} y={opsTop + h(186)} size={20} color={INK_SOFT}>
           its own block of IDs
         </Line>
         {/* Consistent: the custom alias. */}
         <Line at={aliasAt} x={cpX} y={opsTop + h(124)} size={22} weight={500} color={BLUE_INK}>
-          custom alias
+          Custom alias
         </Line>
         <Line at={aliasAt + 6} x={cpX} y={opsTop + h(158)} size={20} color={INK_SOFT}>
-          must be unique, so
+          Must be unique, so
         </Line>
         <Line at={majorityAt} x={cpX} y={opsTop + h(186)} size={20} color={ACCENT_INK} weight={500}>
           the minority side refuses it
@@ -205,16 +208,21 @@ export const CapScene: React.FC = () => {
         ].map(([x, r, t], i) => (
           <Node key={i} x={x as number} y={pTop + (r as number) * h(96)} w={170} h={68} at={choiceAt + 4 + i * 3} tone="data" title={t as string} size={21} />
         ))}
-        <Svg opacity={cutP}>
-          <path
-            d={`M${P.cut},${pTop - 14} l-14,${h(44)} l28,${h(44)} l-28,${h(44)} l28,${h(44)} l-14,${h(30)}`}
-            fill="none"
-            stroke={ACCENT}
-            strokeWidth={3.2}
-            strokeDasharray="10 7"
-            pathLength={1}
-          />
-        </Svg>
+        {/* The partition: a watercolor crack between the two sides, wiped
+            in from the top as the dashed line it replaces drew on. */}
+        <Illustration
+          video="be-scaling"
+          id="be-scaling-crack"
+          style={{
+            position: "absolute",
+            left: P.cut - CRACK_W / 2,
+            top: pTop - 20,
+            width: CRACK_W,
+            height: spotH("crack", CRACK_W),
+            opacity: Math.min(1, cutP * 3),
+            clipPath: `inset(0 0 ${(1 - cutP) * 100}% 0)`,
+          }}
+        />
         <Line at={choiceAt + 10} x={P.left} y={pTop + h(190)} size={20} color={INK_SOFT}>
           majority side
         </Line>
@@ -236,10 +244,10 @@ export const CapScene: React.FC = () => {
           </span>
         </Ink>
         <Line at={pacelcAt + 6} x={P.pacelc} y={y(744) + h(62)} size={20} color={INK_SOFT}>
-          partition: availability or consistency
+          Partition: availability or consistency
         </Line>
         <Line at={pacelcAt + 10} x={P.pacelc} y={y(744) + h(96)} size={20} color={INK}>
-          <Mark at={pacelcAt + 14}>else:</Mark> latency or consistency
+          <Mark at={pacelcAt + 14}>Else:</Mark> latency or consistency
         </Line>
       </Drift>
     </AbsoluteFill>

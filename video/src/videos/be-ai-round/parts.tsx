@@ -106,6 +106,9 @@ export const Cross: React.FC<{ at: number; size?: number; color?: string }> = ({
 
 /** What a box is: data (blue), the right answer (green), the trap (red),
  *  plain ink (a tool, a process), or what the narration points at (yellow). */
+/** A lit box's outline: the yellow's darker step, which holds an edge on it. */
+const LIT_LINE = ds("yellow", 600);
+
 export type Tone = "data" | "ok" | "bad" | "plain" | "lit";
 const TONE: Record<Tone, { line: string; fill: string; ink: string }> = {
   data: { line: BAR, fill: `color-mix(in srgb, ${BAR} 10%, ${PAPER})`, ink: BLUE_INK },
@@ -159,8 +162,10 @@ export const Node: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        border: `${2.5 + 1.5 * l}px ${dashed ? "dashed" : "solid"} ${t.line}`,
-        borderRadius: 12,
+        // Lit, the box takes the highlighter's own hue: a gold outline and
+        // ink type, since blue reads poorly on yellow.
+        border: `${2.5 + 1.5 * l}px ${dashed ? "dashed" : "solid"} color-mix(in srgb, ${LIT_LINE} ${l * 100}%, ${t.line})`,
+        borderRadius: 8,
         background: `color-mix(in srgb, ${HIGHLIGHT} ${l * 100}%, ${t.fill})`,
         display: "flex",
         flexDirection: "column",
@@ -173,7 +178,7 @@ export const Node: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      <span style={{ ...label(size, t.ink), fontWeight: 500, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span>
+      <span style={{ ...label(size, `color-mix(in srgb, ${INK} ${l * 100}%, ${t.ink})`), fontWeight: 500, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span>
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: "center" }}>{sub}</span> : null}
       {children}
     </div>

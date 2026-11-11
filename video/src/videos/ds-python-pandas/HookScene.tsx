@@ -89,7 +89,7 @@ export const HookScene: React.FC = () => {
         {/* ── The merge that runs ── */}
         <Listing lines={M.lines} x={X0} top={y(TOP)} width={1260} size={SIZE} at={mergeAt - 4} out={out} />
         <Note at={warnAt + 4} x={X0 + 1290} y={y(TOP) + 18} out={out}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>no error, no warning</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>No error, no warning</span>
         </Note>
 
         <TableName g={og} at={fourAt - 4} out={out}>
@@ -140,7 +140,7 @@ export const HookScene: React.FC = () => {
         />
         <Note at={backAt} x={X0} y={pg.rowTop(PLAN.rows.length) + h(36)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            the merge: <Mark at={backAt + 8}>question 6</Mark>
+            The merge: <Mark at={backAt + 8}>question 6</Mark>
           </span>
         </Note>
         <Note at={loopAt - 2} x={X0} y={pg.rowTop(PLAN.rows.length) + h(110)}>

@@ -11,6 +11,7 @@ import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { INDEX, thousands } from "./data";
 import { Drift, Flow, Listing, listingHeight, MARK_GREEN, MARK_RED, PageGrid, PlanBox, Svg, X0 } from "./parts";
+import { M } from "../../editorial/math";
 
 const TOP = 304;
 const SIZE = 21;
@@ -211,9 +212,9 @@ export const IndexScene: React.FC = () => {
         {/* log n against n, under the plan */}
         <Note at={logAt} x={X0} y={planTop + h(196)} out={kindAt - 4}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
-            index: <i>O</i>(log <i>n</i>)
+            Index: <M>O(log n)</M>
             <span style={{ color: INK_SOFT }}> against </span>
-            scan: <i>O</i>(<i>n</i>)
+            scan: <M>O(n)</M>
           </span>
         </Note>
 
@@ -239,7 +240,19 @@ export const IndexScene: React.FC = () => {
             { index: 0, at: tableAt + 6, out: kindAt - 2, color: OK },
           ]}
         />
-        <Note at={keepAt + 4} x={R_X + 40} y={gridBottom + h(18)} out={structAt}>
+        {/* The one page that holds the row: a page square at reading size,
+            with a leader up the grid's left edge to page 1. */}
+        <Svg opacity={ease(frame, keepAt + 2, 10) * (1 - ease(frame, structAt, 10))}>
+          <path
+            d={`M${R_X + 2},${gridTop + 2} H${R_X - 14} V${gridBottom + h(18) + 18} H${R_X - 2}`}
+            fill="none"
+            stroke={inkOf.yellow}
+            strokeWidth={2.5}
+            strokeLinejoin="round"
+          />
+          <rect x={R_X} y={gridBottom + h(18)} width={36} height={36} rx={4} fill={`color-mix(in srgb, ${inkOf.yellow} 45%, ${PAPER})`} stroke={inkOf.yellow} strokeWidth={2.5} />
+        </Svg>
+        <Note at={keepAt + 4} x={R_X + 56} y={gridBottom + h(18) + 2} out={structAt}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             every page read, <b>1</b> row kept: the first page holds it
           </span>
@@ -319,8 +332,10 @@ export const IndexScene: React.FC = () => {
             hash(email)
           </text>
           {Array.from({ length: BUCKETS }, (_, i) => {
-            const eq = i === eqBucket ? ease(frame, straightAt + 8, 10) : 0;
-            const bad = rangeBuckets.includes(i) ? ease(frame, rangeAt + 14, 10) * (1 - ease(frame, againAt, 10)) : 0;
+            // Equality's bucket lets go when the range is asked for; the
+            // range's scattered buckets stay marked to the end.
+            const eq = i === eqBucket ? ease(frame, straightAt + 8, 10) * (1 - ease(frame, rangeAt, 10)) : 0;
+            const bad = rangeBuckets.includes(i) ? ease(frame, rangeAt + 14, 10) : 0;
             return (
               <rect
                 key={i}
@@ -328,7 +343,7 @@ export const IndexScene: React.FC = () => {
                 y={bucketY}
                 width={bucketW}
                 height={h(46)}
-                rx={6}
+                rx={4}
                 fill={eq > 0 ? `color-mix(in srgb, ${OK} ${30 * eq}%, ${PAPER})` : PAPER}
                 stroke={eq > 0.5 ? OK : bad > 0.5 ? ACCENT : INK_SOFT}
                 strokeWidth={eq > 0.5 || bad > 0.5 ? 2.5 : 1.5}
@@ -341,7 +356,7 @@ export const IndexScene: React.FC = () => {
         <Flow points={[[hashBox.x + hashBox.w - 30, hashBox.y + hashBox.h + 6], [bucketX(eqBucket) + bucketW / 2, bucketY - 10]]} at={straightAt} color={OK} width={3} out={rangeAt} />
         <Note at={straightAt + 6} x={hashBox.x + hashBox.w + 36} y={hashTop + h(10)} out={rangeAt}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>equality:</b> one bucket
+            <b style={{ color: OK_INK }}>Equality:</b> one bucket
           </span>
         </Note>
         {rangeBuckets.map((b, k) => (
@@ -357,7 +372,7 @@ export const IndexScene: React.FC = () => {
         ))}
         <Note at={rangeAt + 10} x={hashBox.x + hashBox.w + 36} y={hashTop + h(10)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: ACCENT_INK }}>a range:</b>
+            <b style={{ color: ACCENT_INK }}>A range:</b>
           </span>
           <div style={{ ...note(22, INK), whiteSpace: "nowrap", marginTop: h(6) }}>scattered buckets, nothing to walk</div>
         </Note>

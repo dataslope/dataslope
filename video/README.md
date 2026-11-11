@@ -307,6 +307,16 @@ Every video follows these rules.
 - **No tracked capitals.** Kickers, figure numbers and axis titles are set in
   sentence case. All caps with wide letter spacing shouts, and it blurs at
   small sizes.
+- **A line that stands on its own starts with a capital** (the owner,
+  2026-11-11). List and step items, column entries and their headings,
+  takeaway and summary lines, verdict lines, captions and notes that read
+  as statements: "Sample real traffic", "Cut what doesn't earn its place",
+  "The rubric". **Lowercase stays** for text tied to a mark (axis titles
+  and ticks, bar and point labels such as "before", "after" and "9 h",
+  legend entries, badges and chips such as "pass", "fail" and "session 1:
+  B") and for a line that continues the one above it ("so the rare cases
+  are in it" under "Sample real traffic"). Never recase code, identifiers,
+  file names, units or a product's own casing (pandas, iPhone, p95).
 - **Nothing under 19px** on the 1080p layout, which is about the smallest that
   still reads on a phone. Running text and notes sit at 20px and up.
 - **Room between neighbours.** A figure label, the heading under it and an

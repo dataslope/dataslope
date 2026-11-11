@@ -48,6 +48,30 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a round car speedometer gauge in a thick chrome rim, a plain dial face with evenly spaced tick marks and no numbers, a single red needle pointing a little past the middle"
+    },
+    {
+      "id": "be-ai-round-robot-papers",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small friendly desk robot with a rounded head and short arms, holding a neat stack of plain blank paper sheets against its chest"
+    },
+    {
+      "id": "be-ai-round-padlock",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a sturdy closed padlock with a thick shackle resting beside a rolled-up blueprint tied with a short string, the blueprint plain with no markings visible"
+    },
+    {
+      "id": "be-ai-round-magnifier",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a large round magnifying glass with a thick wooden handle lying across a single sheet of paper ruled with a few plain lines"
+    },
+    {
+      "id": "be-ai-round-glass",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "an empty upturned clear drinking glass standing on a plain flat round coaster, nothing under or inside the glass"
     }
   ]
 }

@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BIG_O } from "./data";
 import { ACCENT, ACCENT_INK, Art, BAR, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, OK_INK, PAPER, Svg, int, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 /** The schematic grid: n items down and across; a cell above the diagonal
  *  is one pair the double loop checks. Drawn, not counted (the table is). */
@@ -19,8 +20,8 @@ const GX = 140;
 const TX = 540;
 const COLS = [
   { name: "n", right: TX + 150 },
-  { name: "pairs, double loop", right: TX + 470 },
-  { name: "one pass", right: TX + 680 },
+  { name: "Pairs, double loop", right: TX + 470 },
+  { name: "One pass", right: TX + 680 },
 ];
 const ROW_H = 56;
 const BAR_X = 540;
@@ -88,7 +89,7 @@ export const BigScene: React.FC = () => {
           What is Big-O notation, and why do interviewers care?
         </QuestionCard>
         <Line at={saysAt} x={96} y={y(262)} size={26} color={INK_SOFT}>
-          How time or memory grows with the input size <i>n</i>, constants ignored
+          How time or memory grows with the input size <M>n</M>, constants ignored
         </Line>
 
         {/* Every pair, and one pass. */}
@@ -181,7 +182,7 @@ export const BigScene: React.FC = () => {
               ))}
               {r.counted ? (
                 <div style={{ position: "absolute", left: COLS[2].right + 44, top: rowTop(i) + 14, ...note(22, INK_SOFT), opacity: p, whiteSpace: "nowrap" }}>
-                  counted as it ran
+                  Counted; the rest worked out
                 </div>
               ) : null}
             </React.Fragment>
@@ -224,7 +225,7 @@ export const BigScene: React.FC = () => {
           It predicts whether a solution survives its real input.
           <span style={{ opacity: ease(frame, gameAt, 10) }}>
             {" "}
-            The usual game: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>O(n²)</span> → <span style={{ color: OK_INK, fontWeight: 500 }}>O(n)</span>
+            The usual game: <span style={{ color: ACCENT_INK, fontWeight: 500 }}><M>O(n²)</M></span> → <span style={{ color: OK_INK, fontWeight: 500 }}><M>O(n)</M></span>
           </span>
         </Line>
         <Line at={dropAt} x={GX} y={y(836)} size={26} weight={500}>

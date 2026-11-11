@@ -50,8 +50,8 @@ export const HookScene: React.FC = () => {
   const ROWS = [
     { key: "users", name: "Users per arm", value: "", at: splitAt, flag: sizeAt, note: "not the size you asked for" },
     { key: "lift", name: "Conversion lift", value: `+${NOVELTY.novelty[0].toFixed(1)}%`, at: wonAt - 2, flag: undefined, note: "" },
-    { key: "week", name: "Data from", value: "week 1", at: readoutAt + 8, flag: weekAt, note: "only week one" },
-    { key: "metric", name: "Metric", value: "best of 10", at: readoutAt + 12, flag: bestAt, note: "the best of ten metrics" },
+    { key: "week", name: "Data from", value: "Week 1", at: readoutAt + 8, flag: weekAt, note: "only week one" },
+    { key: "metric", name: "Metric", value: "Best of 10", at: readoutAt + 12, flag: bestAt, note: "the best of ten metrics" },
   ];
 
   const cardP = ease(frame, startAt + 4, 14);

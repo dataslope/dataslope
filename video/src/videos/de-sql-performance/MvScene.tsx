@@ -97,7 +97,7 @@ export const MvScene: React.FC = () => {
         <PlanBox lines={MV.dayPlan} x={X0} top={plansTop} width={780} size={PLAN} at={dashAt} out={plansOut} marks={[{ line: "Rows Removed", at: dashAt + 14, color: MARK_OK }]} />
         <Note at={lookupAt} x={X0} y={plansTop + planHeight(MV.dayPlan.length, PLAN) + h(16)} out={plansOut}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            reads <Num>{thousands(MV.dayRead)}</Num> rows
+            Reads <Num>{thousands(MV.dayRead)}</Num> rows
           </span>
         </Note>
         <Note at={insteadAt - 2} x={BASE_X} y={plansTop - h(40)} out={plansOut}>
@@ -106,7 +106,7 @@ export const MvScene: React.FC = () => {
         <PlanBox lines={MV.basePlan} x={BASE_X} top={plansTop} width={800} size={PLAN} at={insteadAt} out={plansOut} marks={[{ line: "Rows Removed", at: insteadAt + 14, color: MARK_RED }]} />
         <Note at={millionAt} x={BASE_X} y={plansTop + planHeight(MV.basePlan.length, PLAN) + h(16)} out={plansOut}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            reads <Num>{thousands(MV.baseRead)}</Num> rows
+            Reads <Num>{thousands(MV.baseRead)}</Num> rows
           </span>
         </Note>
 
@@ -131,7 +131,7 @@ export const MvScene: React.FC = () => {
         />
         <Note at={stillAt + 10} x={vg.right + 40} y={vg.rowTop(0) - h(4)} out={refreshAt + 4}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
-            the orders now hold <Num>{thousands(Number(MV.truth.rows[0][ordersCol]))}</Num>
+            The orders now hold <Num>{thousands(Number(MV.truth.rows[0][ordersCol]))}</Num>
           </span>
         </Note>
         <Note at={refreshAt} x={vg.right + 40} y={vg.rowTop(0) - h(10)}>
@@ -149,9 +149,9 @@ export const MvScene: React.FC = () => {
         <Note at={useAt} x={R_X} y={createTop + h(10)}>
           <div style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Use one when</div>
           {[
-            { at: expensiveAt, text: "the query is an expensive aggregation" },
-            { at: oftenAt, text: "it is read far more than its data changes" },
-            { at: lagAt, text: "some lag is fine" },
+            { at: expensiveAt, text: "The query is an expensive aggregation" },
+            { at: oftenAt, text: "It is read far more than its data changes" },
+            { at: lagAt, text: "Some lag is fine" },
           ].map((it) => (
             <div key={it.text} style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: h(10), opacity: ease(frame, it.at, 10) }}>
               {it.text}

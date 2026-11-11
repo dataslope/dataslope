@@ -99,7 +99,7 @@ export const ArchScene: React.FC = () => {
   const titles = [
     { at: cnnAt, head: "CNN", what: "convolutional neural network" },
     { at: rnnAt, head: "RNN", what: "recurrent neural network" },
-    { at: tfAt, head: "transformer", what: "" },
+    { at: tfAt, head: "Transformer", what: "" },
   ];
 
   return (
@@ -180,11 +180,11 @@ export const ArchScene: React.FC = () => {
           what it found
         </Tagline>
         <Note at={sameAt - 2} x={PANELS[0]} y={y(GY) + GRID * CELL + h(24)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one filter, the same weights everywhere</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>One filter, the same weights everywhere</span>
         </Note>
         <Note at={imagesAt - 2} x={PANELS[0]} y={y(GY) + GRID * CELL + h(64)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            for <Mark at={imagesAt + 2}>images and audio</Mark>
+            For <Mark at={imagesAt + 2}>images and audio</Mark>
           </span>
         </Note>
 
@@ -219,7 +219,7 @@ export const ArchScene: React.FC = () => {
         </Tagline>
         <Note at={slowAt - 2} x={PANELS[1]} y={y(TOK_Y) + h(76)}>
           <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
-            slow, step by step; <span style={{ opacity: ease(frame, forgetsAt - 2, 10) }}>forgets over long spans</span>
+            Slow, step by step; <span style={{ opacity: ease(frame, forgetsAt - 2, 10) }}>forgets over long spans</span>
           </span>
         </Note>
         <Note at={lstmAt - 2} x={PANELS[1]} y={y(TOK_Y) + h(114)}>
@@ -258,10 +258,10 @@ export const ArchScene: React.FC = () => {
           </Tagline>
         ))}
         <Note at={onceAt + 4} x={PANELS[2]} y={y(TOK_Y) + h(76)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>every pair at once, in parallel</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Every pair at once, in parallel</span>
         </Note>
         <Note at={backboneAt - 2} x={PANELS[2]} y={y(TOK_Y) + h(114)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>the backbone of modern language models</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>The backbone of modern language models</span>
         </Note>
         <Svg opacity={pulse(frame, longAt, 24)}>
           <rect x={PANELS[2] + 10} y={y(TOK_Y) - h(230)} width={PANEL_W - 20} height={h(300)} rx={10} fill="none" stroke={OK} strokeWidth={2} strokeDasharray="6 6" />

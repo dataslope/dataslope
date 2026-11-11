@@ -8,14 +8,16 @@ import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COST, thousands } from "./data";
-import { Clear, Console, DATA_LIGHT, Drift, line, lineOf, Listing, Mark, X0 } from "./parts";
+import { Clear, DATA_LIGHT, Drift, line, Mark, X0 } from "./parts";
 
-const LIST_SIZE = 20;
 const LIST_Y = 340;
+/** The example's three inputs, a row each, and the arithmetic beside them. */
+const ROW_H = 62;
+const SUM_H = 48;
 const RIGHT_X = 1100;
 /** The day's bill as a bar: where it first sits beside the listing, and
  *  where it moves once the listing has gone. */
-const BAR_A = { x: RIGHT_X, v: 520, px: 0.2 };
+const BAR_A = { x: RIGHT_X, v: 590, px: 0.2 };
 const BAR_B = { x: X0, v: 372, px: 0.36 };
 const BAR_H = 58;
 const HALF_P = 650;
@@ -104,9 +106,10 @@ const Bill: React.FC<{
 
 /**
  * Question 5: what an LLM feature costs. The formula in words, then the
- * page's block as a listing, each of its numbers marked as the narration
- * reads it, and what it printed when check.mjs ran it; the day's bill as a
- * bar, input and output. The bar then takes the page: the levers that act on
+ * page's block as its three inputs, each marked as the narration reads it,
+ * and the arithmetic it does, to what it printed when check.mjs ran it, and
+ * one step on, the cost of one request; the day's bill as a bar, input and
+ * output. The bar then takes the page: the levers that act on
  * the input go on its input segment, the next two beside it. Then the step
  * the page now takes too: per token, output costs five times input, but
  * halving the prompt saves 1,000 a day and halving the answer 750, both
@@ -135,17 +138,18 @@ export const CostScene: React.FC = () => {
   const outputAt = n.word("cost-result", "and output to fifteen hundred");
   const totalAt = n.word("cost-result", "That's thirty-five hundred a day");
   const monthAt = n.word("cost-result", "about a hundred and five thousand a month");
+  const centAt = n.word("cost-cent", "about a third of a cent");
   const leverAt = n.word("cost-lever", "The breakdown says which lever");
   const largerAt = n.word("cost-lever", "Input is the larger share");
   const levers = [
-    { text: "trim the prompt", at: n.word("cost-lever", "trimming the prompt") },
-    { text: "cache the shared prefix", at: n.word("cost-lever", "caching the shared prefix") },
-    { text: "retrieve fewer documents", at: n.word("cost-lever", "retrieving fewer documents") },
+    { text: "Trim the prompt", at: n.word("cost-lever", "trimming the prompt") },
+    { text: "Cache the shared prefix", at: n.word("cost-lever", "caching the shared prefix") },
+    { text: "Retrieve fewer documents", at: n.word("cost-lever", "retrieving fewer documents") },
   ];
   const afterAt = n.word("cost-lever", "After that");
   const nexts = [
-    { text: "easy requests → a smaller model", at: n.word("cost-lever", "route easy requests to a smaller model") },
-    { text: "offline work → a batch API", at: n.word("cost-lever", "send offline work") },
+    { text: "Easy requests → a smaller model", at: n.word("cost-lever", "route easy requests to a smaller model") },
+    { text: "Offline work → a batch API", at: n.word("cost-lever", "send offline work") },
   ];
   const fiveAt = n.word("cost-past", "costs five times an input token");
   const fewerAt = n.word("cost-past", "far fewer of them to cut");
@@ -155,21 +159,87 @@ export const CostScene: React.FC = () => {
   const savedAAt = n.word("cost-past", "seven hundred and fifty");
   const end = n.beat("cost-past").to;
 
-  const code = COST.code;
-  const marks = [
-    { line: lineOf(code, "requests_per_day ="), at: reqAt },
-    { line: lineOf(code, "input_tokens, output_tokens ="), at: tokensAt },
-    { line: lineOf(code, "# Illustrative prices"), at: illusAt },
-    { line: lineOf(code, "price_in, price_out ="), at: dollarAt },
+  // The page's block, as its inputs and the arithmetic it does, rather than
+  // as code: this series argues decisions, not syntax. Every number is the
+  // block's own (results.json).
+  const price = (p: number) => p.toFixed(2);
+  const inputs = [
+    { name: "Requests a day", at: dailyAt, markAt: reqAt, value: <Num>{thousands(COST.requestsPerDay)}</Num> },
+    {
+      name: "Tokens per request",
+      at: inOutAt,
+      markAt: tokensAt,
+      value: (
+        <>
+          <Num>{thousands(COST.inputTokens)}</Num> in, <Num>{COST.outputTokens}</Num> out
+        </>
+      ),
+    },
+    {
+      name: "USD per million tokens",
+      at: pricesAt,
+      markAt: dollarAt,
+      value: (
+        <>
+          <Num>{price(COST.priceIn)}</Num> in, <Num>{price(COST.priceOut)}</Num> out
+        </>
+      ),
+    },
   ];
-  const after = (text: string) => lineOf(code, text);
-  const lineAt = code.map((_, i) => {
-    if (i === after("requests_per_day =")) return dailyAt;
-    if (i === after("input_tokens, output_tokens =")) return inOutAt;
-    if (i === after("# Illustrative prices")) return pricesAt;
-    if (i === after("price_in, price_out =")) return differAt;
-    return exampleAt + 2 + Math.max(0, i - after("input_cost =")) * 3;
-  });
+  const sums = [
+    {
+      name: "Input",
+      at: inputAt,
+      value: (
+        <>
+          <Num>{thousands(COST.requestsPerDay)}</Num> × <Num>{thousands(COST.inputTokens)}</Num> × <Num>{price(COST.priceIn)}</Num> / 1M ={" "}
+          <b>
+            <Num>{thousands(COST.input)}</Num>
+          </b>{" "}
+          USD a day
+        </>
+      ),
+    },
+    {
+      name: "Output",
+      at: outputAt,
+      value: (
+        <>
+          <Num>{thousands(COST.requestsPerDay)}</Num> × <Num>{COST.outputTokens}</Num> × <Num>{price(COST.priceOut)}</Num> / 1M ={" "}
+          <b>
+            <Num>{thousands(COST.output)}</Num>
+          </b>{" "}
+          USD a day
+        </>
+      ),
+    },
+    {
+      name: "Total",
+      at: totalAt,
+      value: (
+        <>
+          <b>
+            <Num>{thousands(COST.daily)}</Num>
+          </b>{" "}
+          USD a day,{" "}
+          <span style={{ opacity: ease(frame, monthAt - 2, 10) }}>
+            <Mark at={monthAt + 4}>
+              about <Num>{thousands(COST.monthly)}</Num> a month
+            </Mark>
+          </span>
+        </>
+      ),
+    },
+    {
+      name: "A request",
+      at: centAt,
+      value: (
+        <>
+          <Num>{COST.perRequest}</Num> USD, <Mark at={centAt + 6}>about a third of a cent</Mark>
+        </>
+      ),
+    },
+  ];
   // The bill moves from beside the listing to across the page.
   const move = ease(frame, leverAt, 26);
   const bx = interpolate(move, [0, 1], [BAR_A.x, BAR_B.x]);
@@ -183,9 +253,10 @@ export const CostScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Sfx name="el-pencil" at={exampleAt} level={-35} />
-      {marks.map((m) => (
-        <Sfx key={m.line} name="el-tap" at={m.at + 2} level={-36} />
+      {inputs.map((r) => (
+        <Sfx key={r.name} name="el-tap" at={r.markAt + 2} level={-36} />
       ))}
+      <Sfx name="el-tap" at={centAt} level={-33} />
       <Sfx name="el-tap" at={inputAt} level={-31} />
       <Sfx name="el-tap" at={outputAt} level={-31} />
       <Sfx name="el-whoosh" at={leverAt} level={-36} />
@@ -213,22 +284,37 @@ export const CostScene: React.FC = () => {
             </span>
           </Note>
 
-          {/* The page's block, and what it printed. */}
-          {/* The block builds as the formula is said: each quantity's line
-              on its word, the arithmetic and the prints with the example. */}
-          <Listing lines={code} x={X0} top={y(LIST_Y)} width={930} size={LIST_SIZE} at={dailyAt - 4} lineAt={lineAt} marks={marks} />
-          <Note at={inputAt - 4} x={RIGHT_X} y={y(LIST_Y)}>
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>What it prints</span>
+          {/* The example's inputs, each on its word in the formula, marked
+              as the example gives its value. */}
+          <Note at={exampleAt - 4} x={X0} y={y(LIST_Y)}>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>The page&apos;s example</span>
           </Note>
-          <Console
-            lines={COST.printed}
-            x={RIGHT_X}
-            top={y(LIST_Y) + 40}
-            width={700}
-            at={inputAt - 2}
-            lineAt={[inputAt, outputAt, totalAt]}
-            marks={[{ line: 2, at: monthAt + 4 }]}
-          />
+          {inputs.map((r, i) => (
+            <Ink key={r.name} at={r.at - 2} dur={12} style={{ left: X0, top: y(LIST_Y + 44 + i * ROW_H) }}>
+              <span style={{ ...line(26, INK), display: "inline-flex", alignItems: "baseline" }}>
+                <span style={{ display: "inline-block", width: 330, color: INK_SOFT }}>{r.name}</span>
+                <span style={{ fontWeight: 500 }}>
+                  <Mark at={r.markAt}>{r.value}</Mark>
+                </span>
+              </span>
+            </Ink>
+          ))}
+          <Ink at={illusAt} dur={12} style={{ left: X0 + 330, top: y(LIST_Y + 44 + 3 * ROW_H) - 14 }}>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Illustrative prices</span>
+          </Ink>
+
+          {/* The arithmetic the block does, and what it prints. */}
+          <Note at={inputAt - 4} x={RIGHT_X} y={y(LIST_Y)}>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>What it comes to</span>
+          </Note>
+          {sums.map((r, i) => (
+            <Ink key={r.name} at={r.at - 2} dur={12} style={{ left: RIGHT_X, top: y(LIST_Y + 44 + i * SUM_H) }}>
+              <span style={{ ...line(24, INK), display: "inline-flex", alignItems: "baseline" }}>
+                <span style={{ display: "inline-block", width: 130, color: INK_SOFT }}>{r.name}</span>
+                <span>{r.value}</span>
+              </span>
+            </Ink>
+          ))}
         </Clear>
 
         {/* The day's bill: beside the listing, then across the page. */}
@@ -236,6 +322,7 @@ export const CostScene: React.FC = () => {
         <Note at={leverAt + 20} x={X0} y={y(BAR_B.v) - 44}>
           <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             As written: <Num>{thousands(COST.daily)}</Num> USD a day
+            <span style={{ color: INK_SOFT, fontWeight: 400 }}>, about a third of a cent a request</span>
           </span>
         </Note>
 
@@ -257,7 +344,7 @@ export const CostScene: React.FC = () => {
           </div>
         ))}
         <Note at={afterAt} x={NEXT_X} y={y(BAR_B.v) - 40}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>after that</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>After that</span>
         </Note>
         {nexts.map((l, i) => (
           <Ink key={l.text} at={l.at} dur={12} style={{ left: NEXT_X, top: y(BAR_B.v) + h(-2 + i * 40) }}>
@@ -268,7 +355,7 @@ export const CostScene: React.FC = () => {
         {/* Per token, and per request. */}
         <Note at={fiveAt - 2} x={X0 + COST.input * BAR_B.px + 3} y={y(BAR_B.v) + barH + h(12)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            per token, output costs <b>{COST.outputPerTokenRatio}×</b> input
+            Per token, output costs <b>{COST.outputPerTokenRatio}×</b> input
           </span>
         </Note>
         <Note at={fewerAt - 2} x={X0 + COST.input * BAR_B.px + 3} y={y(BAR_B.v) + barH + h(48)}>

@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CohortGrid } from "./CohortGrid";
 import { COHORT } from "./data";
-import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, MARK_OK, rowsAt, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, MARK_OK, QMono, rowsAt, TableName, X0 } from "./parts";
 
 const TOP = 350;
 const SQL_X = 640;
@@ -98,7 +98,7 @@ export const CohortScene: React.FC = () => {
         <DataTable g={sg} cols={colsOf(sample, { user_id: { ink: BLUE_INK } })} at={logAt} out={countAt} rows={rowsAt(sample.rows, logAt + 4)} />
         <Note at={logAt + 10} x={X0} y={sg.rowTop(sample.rows.length) + h(14)} out={countAt}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-            the first 6 of {COHORT.events} events
+            The first 6 of {COHORT.events} events
             <br />
             from {COHORT.users} users, made up for this video
           </span>
@@ -121,7 +121,7 @@ export const CohortScene: React.FC = () => {
         />
         <Note at={cohortAt + 2} x={SQL_X + SQL_W + NOTE_GAP} y={y(TOP) + h(28)} out={divideAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            each user&rsquo;s
+            Each user&rsquo;s
             <br />
             cohort month
           </span>

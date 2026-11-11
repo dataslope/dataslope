@@ -48,6 +48,24 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "one solid upright cylinder standing on its own, the classic database drum, a little wider than it is tall: a round flat top seen from slightly above as a wide ellipse washed in deeper golden yellow, and a smooth curved body washed in pale warm yellow that is lightest and most even across the middle of its front and darkens softly toward its two sides and its rounded bottom edge"
+    },
+    {
+      "id": "be-databases-padlock",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one chunky closed padlock standing upright on its own, a thick rounded body washed in warm golden yellow and a heavy curved shackle washed in deeper blue, a small round keyhole in the middle of the body"
+    },
+    {
+      "id": "be-databases-padlocks",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "two chunky closed padlocks hanging with their thick curved shackles hooked through each other so neither can come free, one padlock body washed in blue and the other in coral red, their shackles in deeper tones of the same colors"
+    },
+    {
+      "id": "be-databases-steps",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a short flight of four thick solid stone steps rising from left to right, each step a single deep block a little higher than the one before, the lowest washed in yellow, the next in green, the next in blue and the highest in coral red"
     }
   ]
 }

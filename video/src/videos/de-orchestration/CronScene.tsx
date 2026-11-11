@@ -186,7 +186,7 @@ export const CronScene: React.FC = () => {
         {/* The orchestrator: the page's DAG. */}
         <Note at={dagAt} x={DAG_X - NODE_W / 2} y={y(236)}>
           <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            an orchestrator runs a DAG<span style={{ opacity: ease(frame, expandAt, 10) }}>: directed acyclic graph</span>
+            An orchestrator runs a DAG<span style={{ opacity: ease(frame, expandAt, 10) }}>: directed acyclic graph</span>
           </span>
         </Note>
         {NODES.map((nd, i) => (
@@ -259,7 +259,7 @@ export const CronScene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Airflow · Dagster · Prefect</span>
         </Note>
         <Note at={historyAt - 2} x={DAG_X - NODE_W / 2} y={y(760)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>run history</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Run history</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           {Array.from({ length: 8 }, (_, i) => {

@@ -73,6 +73,19 @@ export const SHARDS = results.shards as {
   userLinks: number;
   userShards: number;
   allCovered: number;
+  /** How many of the user's 50 links each shard holds. */
+  userPerShard: number[];
+};
+
+/** The same million keys when a ninth shard is added: the share that moves
+ *  by hash modulo the count, and on a hash ring with 100 points a shard. */
+export const RESHARD = results.reshard as {
+  from: number;
+  to: number;
+  keys: number;
+  pointsPerShard: number;
+  shareMod: number;
+  shareRing: number;
 };
 
 export type RateCell = { t: number; ok: boolean };

@@ -48,13 +48,19 @@ if (LOST.result !== RACE.bothRead.result) throw new Error(`race: the chips say $
 const EVERY = RACE.one.every ?? [];
 if (EVERY.length !== RACE.one.orders) throw new Error("race: results.json has no list of every order");
 const LOCKED = RACE.locked.every ?? [];
+/** The two orders "today" and "tomorrow" point at: the first that leaves
+ *  seven, and the first that loses an update. */
+const K_PASS = EVERY.findIndex((o) => o.result === RACE.one.right);
+const K_FAIL = EVERY.findIndex((o) => o.result !== RACE.one.right);
 
 /** One order of the six steps: a square per step in its thread's color, then the counter it leaves. */
-const Order: React.FC<{ threads: string; result: number; x: number; y: number; at: number; judged: number; dim: number }> = ({ threads, result, x, y, at, judged, dim }) => {
+const Order: React.FC<{ threads: string; result: number; x: number; y: number; at: number; judged: number; dim: number; flash?: number }> = ({ threads, result, x, y, at, judged, dim, flash }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
   if (p <= 0.001) return null;
+  // The order the pass/fail line points at is ringed once, on its word.
+  const lit = flash === undefined ? 0 : pulse(frame, flash, 22);
   const right = result === RACE.one.right;
   const ink = judged > 0.5 ? (right ? OK_INK : ACCENT_INK) : INK;
   return (
@@ -69,7 +75,8 @@ const Order: React.FC<{ threads: string; result: number; x: number; y: number; a
           fontWeight: 500,
           padding: "0 6px",
           borderRadius: 5,
-          background: judged > 0 ? tint(right ? OK : ACCENT, 18 * judged) : "transparent",
+          background: judged > 0 ? tint(right ? OK : ACCENT, 18 * judged + 30 * lit) : "transparent",
+          boxShadow: lit > 0 ? `0 0 0 ${2.5 * lit}px ${right ? OK : ACCENT}` : undefined,
         }}
       >
         <Num>{result}</Num>
@@ -83,7 +90,9 @@ const Order: React.FC<{ threads: string; result: number; x: number; y: number; a
  * Both read five and both write six: one increment lost. Every order the six
  * steps can run in is drawn from results.json: twenty, two leave seven. With
  * the three steps under a lock, two orders are left and both leave seven.
- * Which order runs is timing, so the same test passes and fails.
+ * Before the lock: which order runs is timing, so the same test passes and
+ * fails, said while the twenty orders are still up (one 7 lit for "today",
+ * one 6 for "tomorrow"); then the lock cures it.
  */
 export const RaceScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -117,7 +126,7 @@ export const RaceScene: React.FC = () => {
   const passAt = n.word("race-hides", "pass today");
   const failAt = n.word("race-hides", "fail tomorrow");
   const sameAt = n.word("race-hides", "no change to the code");
-  const end = n.beat("race-hides").to;
+  const end = n.beat("race-lock").to;
 
   const rowY = ROWS.map((v) => y(v));
   const chipH = h(CHIP_H);
@@ -160,7 +169,7 @@ export const RaceScene: React.FC = () => {
 
         {/* The shared counter. */}
         <Note at={classicAt} x={X0} y={y(356)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>the counter</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>The counter</span>
         </Note>
         <div
           style={{
@@ -208,7 +217,7 @@ export const RaceScene: React.FC = () => {
                   width: CHIP_W - (toFuse > 0 ? 0 : 8),
                   height: chipH,
                   boxSizing: "border-box",
-                  borderRadius: toFuse > 0.5 ? 0 : 8,
+                  borderRadius: toFuse > 0.5 ? 0 : 5,
                   border: `2.5px solid ${lost > 0 ? ACCENT : th.fill}`,
                   background: tint(lost > 0 ? ACCENT : th.fill, 20),
                   display: "flex",
@@ -240,7 +249,7 @@ export const RaceScene: React.FC = () => {
               width: 3 * CHIP_W,
               height: chipH,
               boxSizing: "border-box",
-              borderRadius: 8,
+              borderRadius: 5,
               border: `2.5px solid ${THREAD[t].fill}`,
               background: tint(THREAD[t].fill, 20),
               display: "flex",
@@ -285,6 +294,7 @@ export const RaceScene: React.FC = () => {
             at={countAt + 4 + k * 2}
             judged={o.result === RACE.one.right ? judge7 : judge6}
             dim={gridOut}
+            flash={k === K_PASS ? passAt : k === K_FAIL ? failAt : undefined}
           />
         ))}
         <Note at={sevenAt} x={G_X} y={y(G_TOP) + 5 * h(ROW_H) + h(10)} out={fixAt + 2}>
@@ -318,7 +328,7 @@ export const RaceScene: React.FC = () => {
                   style={{
                     width: 150,
                     height: h(48),
-                    borderRadius: 7,
+                    borderRadius: 5,
                     border: `2.5px solid ${THREAD[who(c)].fill}`,
                     background: tint(THREAD[who(c)].fill, 20),
                     display: "flex",
@@ -338,8 +348,8 @@ export const RaceScene: React.FC = () => {
           );
         })}
 
-        {/* The same test, two days. */}
-        <Note at={pauseAt} x={X0} y={y(846)}>
+        {/* The same test, two days: said while the losing orders are up, gone with the lock. */}
+        <Note at={pauseAt} x={X0} y={y(846)} out={fixAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Which order runs is timing:
             <b style={{ color: OK_INK, opacity: ease(frame, passAt, 10) }}> ✓ today: pass</b>

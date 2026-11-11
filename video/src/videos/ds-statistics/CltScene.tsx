@@ -6,6 +6,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, fmt } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CLT } from "./data";
@@ -15,7 +16,7 @@ const PANEL_W = 470;
 const PANEL_GAP = 100;
 const PANEL_BASE = 610;
 const PANEL_H = 230;
-const LABELS = ["one draw", "the average of 5", "the average of 30"] as const;
+const LABELS = ["One draw", "The average of 5", "The average of 30"] as const;
 
 /** The running average: log-scaled draws across, the value up. */
 const RUN_X: Scale = { lo: 0, hi: Math.log10(2000), a: X0, b: 1200 };
@@ -130,7 +131,7 @@ export const CltScene: React.FC = () => {
         {/* ── Question 4: the mean of more draws, closer to a bell ── */}
         <Note at={saysAt} x={X0} y={y(300)} out={panelOut}>
           <span style={{ ...noteText(26, INK) }}>
-            the mean of many independent draws is close to normal,{" "}
+            The mean of many independent draws is close to normal,{" "}
             <span style={{ opacity: ease(frame, finiteAt - 2, 10) }}>if the variance is finite</span>
           </span>
         </Note>
@@ -152,7 +153,7 @@ export const CltScene: React.FC = () => {
           );
         })}
         <Note at={halfAt} x={X0 + PANEL_W + PANEL_GAP} y={base + h(58)} out={panelOut}>
-          <span style={{ ...noteText(24, BLUE_INK) }}>the skew falls by half</span>
+          <span style={{ ...noteText(24, BLUE_INK) }}>The skew falls by half</span>
         </Note>
         <Note at={againAt} x={X0 + 2 * (PANEL_W + PANEL_GAP)} y={base + h(58)} out={panelOut}>
           <span style={{ ...noteText(24, OK_INK) }}>and halves again</span>
@@ -178,7 +179,7 @@ export const CltScene: React.FC = () => {
 
         {/* ── Question 5: one running average, settling ── */}
         <Note at={settleAt} x={X0} y={y(300)} out={clearAt}>
-          <span style={{ ...noteText(26, INK) }}>as a sample grows, its mean settles on the population&apos;s</span>
+          <span style={{ ...noteText(26, INK) }}>As a sample grows, its mean settles on the population&apos;s</span>
         </Note>
         <Axes
           x={RUN_X}
@@ -193,7 +194,11 @@ export const CltScene: React.FC = () => {
         />
         <Curve points={[[RUN_X.a, ry(CLT.mu)], [RUN_X.b, ry(CLT.mu)]]} at={runAt - 2} dur={16} out={clearAt} color={INK} width={2.2} dash="7 6" />
         <Note at={runAt + 4} x={RUN_X.b + 14} y={ry(CLT.mu) - 16} out={clearAt}>
-          <span style={{ ...noteText(22, INK), ...TABULAR }}>μ = {fmt(CLT.mu, 2)}</span>
+          <span style={{ ...noteText(22, INK), ...TABULAR }}>
+            <MathRun>
+              <I>μ</I> = {fmt(CLT.mu, 2)}
+            </MathRun>
+          </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: 1 - ease(frame, clearAt, 10) }}>
           <defs>
@@ -246,7 +251,12 @@ export const CltScene: React.FC = () => {
           <line x1={(bell.x0 + bell.x1) / 2} x2={(bell.x0 + bell.x1) / 2} y1={bell.base} y2={bell.base + 8} stroke={INK} strokeWidth={1.4} />
         </Svg>
         <Note at={shapeAt + 12} x={bell.x0 + 40} y={bell.base + h(14)} out={clearAt}>
-          <span style={{ ...noteText(22, INK_SOFT) }}>the spread of the mean around μ</span>
+          <span style={{ ...noteText(22, INK_SOFT) }}>
+            the spread of the mean around{" "}
+            <MathRun>
+              <I>μ</I>
+            </MathRun>
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
+import { MathRun } from "../../editorial/math";
 import { ACCENT, ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -14,9 +15,11 @@ const BARS = { top: 360, height: 420, w: 230, xs: [1010, 1370] };
 const DISC = { y: 560, r: 150, xs: [300, 640] };
 /** Question 5's column of formulas: where each starts, how wide a formula's
  *  column is (so the note after it lines up row to row), and the rows. */
-const COL = { x: 1040, w: 470, prod: 330, zero: 400, two: 500, twoGiven: 565, far: 660, never: 716 };
-/** Question 4's product line, under P(A | B) = P(A), behind "equivalently". */
-const PROD4 = { y: 460, lead: 190 };
+const COL = { x: 1040, w: 500, prod: 330, zero: 400, two: 500, twoGiven: 565, far: 660, never: 716 };
+/** Question 4's product line, under P(A | B) = P(A), with "Equivalently" on
+ *  the line above it: a word of 26px beside a 46px formula is two sizes on
+ *  one line. */
+const PROD4 = { y: 516, lead: 474 };
 
 const P: React.FC<{ children: React.ReactNode }> = ({ children }) => <span>P({children})</span>;
 
@@ -104,7 +107,7 @@ export const IndepScene: React.FC = () => {
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>Knowing one tells you nothing about the other.</span>
         </Note>
         <Ink at={ruleAt} dur={18} out={out4} style={{ left: X0, top: y(390) }}>
-          <span style={math(58)}>
+          <MathRun style={math(58)}>
             <P>
               <V>A</V>
               <Given />
@@ -114,23 +117,25 @@ export const IndepScene: React.FC = () => {
             <P>
               <V>A</V>
             </P>
-          </span>
+          </MathRun>
         </Ink>
         {/* Equivalently, the product rule: it stays on into Question 5. */}
+        <Note at={justAt + 6} x={X0} y={y(PROD4.lead)} out={out4}>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Equivalently</span>
+        </Note>
         <Ink
           at={justAt + 6}
           dur={20}
           out={clearAt}
           style={{
-            left: lerp(X0, COL.x - PROD4.lead, move),
+            left: lerp(X0, COL.x, move),
             top: lerp(y(PROD4.y), y(COL.prod), move),
             display: "flex",
             alignItems: "baseline",
             whiteSpace: "nowrap",
           }}
         >
-          <span style={{ ...note(26, INK_SOFT), display: "inline-block", width: PROD4.lead, opacity: 1 - move }}>equivalently</span>
-          <span style={{ ...math(46), display: "inline-block", width: COL.w }}>
+          <MathRun style={{ ...math(46), display: "inline-block", width: COL.w }}>
             <P>
               <V>A</V> and <V>B</V>
             </P>{" "}
@@ -141,17 +146,17 @@ export const IndepScene: React.FC = () => {
             <P>
               <V>B</V>
             </P>
-          </span>
+          </MathRun>
           <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, q5At + 14, 12) }}>independent</span>
         </Ink>
-        <Note at={claimAt} x={X0} y={y(540)} out={out4}>
+        <Note at={claimAt} x={X0} y={y(596)} out={out4}>
           <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A claim to justify. These break it:</span>
         </Note>
-        <Note at={visitsAt} x={X0 + 24} y={y(600)} out={out4}>
-          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>repeat visits by the same user</span>
+        <Note at={visitsAt} x={X0 + 24} y={y(656)} out={out4}>
+          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>Repeat visits by the same user</span>
         </Note>
-        <Note at={networkAt} x={X0 + 24} y={y(650)} out={out4}>
-          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>network effects</span>
+        <Note at={networkAt} x={X0 + 24} y={y(706)} out={out4}>
+          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>Network effects</span>
         </Note>
 
         {/* A thousand users, split by plan, as area. */}
@@ -253,38 +258,38 @@ export const IndepScene: React.FC = () => {
           ))}
           {/* Mutually exclusive, directly under the product it never equals. */}
           <Note at={zeroAt} x={COL.x} y={y(COL.zero)} style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <span style={{ ...math(46), display: "inline-block", width: COL.w }}>
+            <MathRun style={{ ...math(46), display: "inline-block", width: COL.w }}>
               <P>
                 <V>A</V> and <V>B</V>
               </P>{" "}
               = 0
-            </span>
+            </MathRun>
             <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, zeroAt + 10, 12) }}>mutually exclusive</span>
           </Note>
           {/* The die: P(two) stays 1/6; given a one, it is 0. Both are true. */}
           <Note at={dropsAt} x={COL.x} y={y(COL.two)} style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <span style={{ ...math(42, `color-mix(in srgb, ${INK_SOFT} ${quiet * 100}%, ${INK})`), display: "inline-block", width: COL.w }}>
+            <MathRun style={{ ...math(42, `color-mix(in srgb, ${INK_SOFT} ${quiet * 100}%, ${INK})`), display: "inline-block", width: COL.w }}>
               <P>two</P> = {EXCL.pTwo}
-            </span>
+            </MathRun>
             <span style={{ ...note(24, INK_SOFT), opacity: quiet }}>out of all six faces</span>
           </Note>
           <Note at={toZeroAt - 2} x={COL.x} y={y(COL.twoGiven)} style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <span style={{ ...math(42, INK), display: "inline-block", width: COL.w }}>
+            <MathRun style={{ ...math(42, INK), display: "inline-block", width: COL.w }}>
               <P>
                 two
                 <Given />
                 one
               </P>{" "}
               = {EXCL.pTwoGivenOne}
-            </span>
+            </MathRun>
             <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, toZeroAt + 8, 12) }}>out of the one face left</span>
           </Note>
           <Note at={farAt} x={COL.x} y={y(COL.far)}>
-            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>as far from independent as it gets</span>
+            <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>As far from independent as it gets</span>
           </Note>
           <Note at={neverAt - 8} x={COL.x} y={y(COL.never)}>
             <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              <Mark at={neverAt}>exclusive, and each possible: never independent</Mark>
+              <Mark at={neverAt}>Exclusive, and each possible: never independent</Mark>
             </span>
           </Note>
           <Svg opacity={ease(frame, twoAt + 6, 10)}>

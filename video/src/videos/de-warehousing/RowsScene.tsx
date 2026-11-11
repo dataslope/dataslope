@@ -174,7 +174,7 @@ export const RowsScene: React.FC = () => {
         </Note>
         <Note at={appAt} x={RIGHT_X} y={y(TOP) + h(38)} out={q2At - 2}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            runs the application
+            Runs the application
             <span style={{ opacity: ease(frame, smallAt, 10) }}>: many small reads and writes</span>
           </span>
         </Note>
@@ -186,7 +186,7 @@ export const RowsScene: React.FC = () => {
         </Note>
         <Note at={reportsAt} x={RIGHT_X} y={y(TOP) + h(134)} out={q2At - 2}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            runs the reports
+            Runs the reports
             <span style={{ opacity: ease(frame, fewAt, 10) }}>: a few columns, millions of rows</span>
           </span>
         </Note>
@@ -245,7 +245,7 @@ export const RowsScene: React.FC = () => {
         })}
         <Note at={typeAt} x={colX(0, 0)} y={colY + sh + h(46)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            one type, side by side: it compresses well
+            One type, side by side: it compresses well
             <span style={{ opacity: ease(frame, batchAt, 10) }}>
               {" "}
               and is processed in batches <span style={{ color: INK_SOFT }}>(vectorized execution)</span>

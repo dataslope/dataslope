@@ -63,10 +63,10 @@ export const OptScene: React.FC = () => {
   const unitY = (y(BOX.bottom) - y(BOX.top)) / (DOM.y1 - DOM.y0);
 
   const runs: Run[] = [
-    { key: "sgd", color: ACCENT, ink: ACCENT_INK, name: "SGD", what: "stochastic gradient descent", at: valleyAt },
-    { key: "momentum", color: BAR, ink: BLUE_INK, name: "momentum", what: "a running velocity", at: momAt },
-    { key: "rmsprop", color: WARM, ink: WARM_INK, name: "RMSProp", what: "root mean square propagation", at: rmsAt },
-    { key: "adam", color: OK, ink: OK_INK, name: "Adam", what: "adaptive moment estimation: both", at: adamAt },
+    { key: "sgd", color: ACCENT, ink: ACCENT_INK, name: "SGD", what: "Stochastic gradient descent", at: valleyAt },
+    { key: "momentum", color: BAR, ink: BLUE_INK, name: "Momentum", what: "A running velocity", at: momAt },
+    { key: "rmsprop", color: WARM, ink: WARM_INK, name: "RMSProp", what: "Root mean square propagation", at: rmsAt },
+    { key: "adam", color: OK, ink: OK_INK, name: "Adam", what: "Adaptive moment estimation: both", at: adamAt },
   ];
   const nameAt: Record<Optimizer, number> = { sgd: sgdAt, momentum: momAt, rmsprop: rmsAt, adam: adamAt };
   // Where each run stopped: ringed on top of every path, SGD's when its
@@ -187,7 +187,7 @@ export const OptScene: React.FC = () => {
           </Tagline>
           <Note at={zigAt - 2} x={BOX.left} y={y(BOX.top) - h(48)}>
             <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
-              plain steps: <Mark at={zigAt + 2}>zigzag across</Mark>, <span style={{ opacity: ease(frame, creepAt - 2, 10) }}>creep along</span>
+              Plain steps: <Mark at={zigAt + 2}>zigzag across</Mark>, <span style={{ opacity: ease(frame, creepAt - 2, 10) }}>creep along</span>
             </span>
           </Note>
           <Note at={paceAt - 2} x={BOX.left + 560} y={y(BOX.top) - h(48)}>
@@ -195,7 +195,7 @@ export const OptScene: React.FC = () => {
           </Note>
           <Tagline x={BOX.left} y={y(BOX.bottom) + h(14)} at={valleyAt + 8} size={19}>
             {/* Tagline sets tabular figures, which would set this hyphen a digit wide. */}
-            a <span style={{ fontVariantNumeric: "normal" }}>made-up</span> valley; 50 steps each, each at a learning rate that suits it
+            A <span style={{ fontVariantNumeric: "normal" }}>made-up</span> valley; 50 steps each, each at a learning rate that suits it
           </Tagline>
 
           {/* ── The legend, and where each one got to ── */}
@@ -216,7 +216,7 @@ export const OptScene: React.FC = () => {
                 <Note at={nameAt[r.key] + 4} x={LEG_X + 48} y={top + h(40)}>
                   <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
                     {r.key === "sgd" ? (
-                      <span style={{ opacity: ease(frame, batchAt - 2, 10) }}>here, plain steps on the exact gradient</span>
+                      <span style={{ opacity: ease(frame, batchAt - 2, 10) }}>Here, plain steps on the exact gradient</span>
                     ) : r.key === "momentum" ? (
                       <>
                         {r.what}
@@ -234,11 +234,11 @@ export const OptScene: React.FC = () => {
             );
           })}
           <Tagline x={1720} y={y(LEG_Y) - h(40)} width={330} align="right" at={fiftyAt} size={20}>
-            distance after {OPT.steps} steps
+            Distance after {OPT.steps} steps
           </Tagline>
           <Note at={needAt - 2} x={LEG_X} y={y(LEG_Y) + 4 * h(LEG_ROW) + h(4)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
-              plain steps need <b style={{ color: ACCENT_INK }}>{OPT.sgdStepsToAdam}</b> to get as close as Adam
+              Plain steps need <b style={{ color: ACCENT_INK }}>{OPT.sgdStepsToAdam}</b> to get as close as Adam
             </span>
           </Note>
         </Fade>

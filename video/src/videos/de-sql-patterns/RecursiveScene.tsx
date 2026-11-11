@@ -111,7 +111,7 @@ export const RecursiveScene: React.FC = () => {
         />
         <Note at={halvesAt} x={X0} y={y(TOP) + listingHeight(L.lines.length, SIZE) + h(24)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            anchor <QMono>UNION ALL</QMono> recursive half, run until a pass adds no rows
+            Anchor <QMono>UNION ALL</QMono> recursive half, run until a pass adds no rows
           </span>
         </Note>
 
@@ -170,7 +170,7 @@ export const RecursiveScene: React.FC = () => {
 
         {/* ── The pass that adds nothing, and the cap ── */}
         <Note at={nothingAt} x={TREE_X0} y={bottom + h(28)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>pass 3 adds no rows: done</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Pass 3 adds no rows: done</span>
         </Note>
         <Note at={sevenAt} x={TREE_X0} y={bottom + h(70)}>
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", fontWeight: 500 }}>
@@ -179,7 +179,7 @@ export const RecursiveScene: React.FC = () => {
         </Note>
         <Note at={loopAt} x={TREE_X0} y={bottom + h(128)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            a loop in the data never runs dry:{" "}
+            A loop in the data never runs dry:{" "}
             {/* The cap arrives before it is named, so it and its run can
                 both be read before the cut. */}
             <span style={{ opacity: ease(frame, dryAt + 4, 10) }}>

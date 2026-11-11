@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { BUBBLES, INK_WEEK, PARTS, SCATTER } from "./data";
-import { bandMid, BarSet, CATS, Drift, FlexRule, Headline, Kicker, LineSet, pulse, Spot, Svg, Verdict, X0 } from "./parts";
+import { bandMid, BarSet, CATS, Drift, Headline, Kicker, LineSet, pulse, Spot, Svg, Verdict, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 760;
@@ -93,7 +93,7 @@ const ThreeD: React.FC<{ c: Ctx }> = ({ c }) => {
         </Note>
       ))}
       <Verdict ok={false} x={axisX} y={base + c.h(40)} at={whichAt}>
-        two readings, no rule for which
+        Two readings, no rule for which
       </Verdict>
 
       {rows.map((row) => {
@@ -190,7 +190,7 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
 
       <Note at={at0} x={R_X + 680} y={c.y(420)} width={R_END - R_X - 680}>
         <span style={{ ...note(26, INK) }}>
-          <b>data-ink ratio</b>: the share of the ink that shows data
+          <b>Data-ink ratio</b>: the share of the ink that shows data
         </span>
       </Note>
       <Note at={tufteAt} x={R_X + 680} y={c.y(530)} width={R_END - R_X - 680}>
@@ -199,10 +199,10 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={deleteAt} x={R_X + 680} y={c.y(620)} width={R_END - R_X - 680}>
-        <span style={{ ...note(24, INK) }}>delete a mark: if nothing is lost, it was clutter</span>
+        <span style={{ ...note(24, INK) }}>Delete a mark: if nothing is lost, it was clutter</span>
       </Note>
       <Verdict ok x={R_X + 680} y={c.y(720)} at={clutterAt}>
-        same week, less ink
+        Same week, less ink
       </Verdict>
       {/* The legend's one job, naming what the bars count, done as a title. */}
       <Note at={losesAt} x={x0 - 30} y={top - c.h(62)}>
@@ -214,6 +214,10 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 20. Tableau, Power BI and Looker ────────────────────────────────────────
 
+/** Each tool's logo over its name: its height, and the space under it. */
+const LOGO_H = 56;
+const LOGO_GAP = 20;
+
 const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const at0 = c.w("r-tools", "Tableau, Power BI and Looker");
@@ -223,9 +227,9 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
   const framingAt = c.w("r-tools", "framing the question");
   const checkAt = c.w("r-tools", "checking the numbers");
   const cards = [
-    { name: "Tableau", at: c.w("r-tools", "Tableau is built for exploring"), text: "built for exploring" },
-    { name: "Power BI", at: c.w("r-tools", "Power BI fits the Microsoft stack"), text: "fits the Microsoft stack" },
-    { name: "Looker", at: c.w("r-tools", "Looker defines metrics as code"), text: "metrics defined as code" },
+    { name: "Tableau", logo: "logo-tableau", at: c.w("r-tools", "Tableau is built for exploring"), text: "Built for exploring" },
+    { name: "Power BI", logo: "logo-power-bi", at: c.w("r-tools", "Power BI fits the Microsoft stack"), text: "Fits the Microsoft stack" },
+    { name: "Looker", logo: "logo-looker", at: c.w("r-tools", "Looker defines metrics as code"), text: "Metrics defined as code" },
   ];
   // Three columns of plain text spread across the answer area, a hairline
   // centred in each gap: each name, and under it what it is for.
@@ -236,7 +240,8 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
         style={{
           position: "absolute",
           left: R_X + 40,
-          top: c.y(416),
+          // Raised by the logo row, so the names and what follows stay put.
+          top: c.y(416) - LOGO_H - LOGO_GAP,
           width: R_END - (R_X + 40),
           display: "flex",
           justifyContent: "space-between",
@@ -248,8 +253,11 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
           const p = ease(frame, at0 + k * 6, 14);
           return (
             <React.Fragment key={card.name}>
-              {k > 0 ? <FlexRule at={at0 + k * 6} /> : null}
               <div style={{ opacity: p, transform: `translateY(${(1 - p) * 12}px)` }}>
+                {/* The product's own logo over its name (the owner, 2026-11-11):
+                    Tableau's mark and Power BI's icon from their brand art,
+                    Looker's from Simple Icons. */}
+                <Img src={staticFile(`images/da-visualization/${card.logo}.svg`)} style={{ display: "block", height: LOGO_H, width: "auto", marginBottom: LOGO_GAP }} />
                 <div style={{ ...headline(38), color: INK, lineHeight: "44px", whiteSpace: "nowrap" }}>{card.name}</div>
                 <div style={{ ...note(24, INK_SOFT), lineHeight: "31px", marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, card.at - 2, 12) }}>{card.text}</div>
               </div>
@@ -259,17 +267,17 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
       </div>
       <Note at={biAt - 2} x={R_X + 40} y={c.y(600)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          all three are <b>BI</b> tools<span style={{ opacity: ease(frame, busAt - 2, 10) }}>: business intelligence</span>
+          All three are <b>BI</b> tools<span style={{ opacity: ease(frame, busAt - 2, 10) }}>: business intelligence</span>
         </span>
       </Note>
       <Note at={transfersAt - 2} x={R_X + 40} y={c.y(670)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>what transfers between them:</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>What transfers between them:</span>
       </Note>
       <Verdict ok x={R_X + 60} y={c.y(720)} at={framingAt}>
-        framing the question
+        Framing the question
       </Verdict>
       <Verdict ok x={R_X + 60} y={c.y(764)} at={checkAt}>
-        checking the numbers
+        Checking the numbers
       </Verdict>
     </>
   );
@@ -312,10 +320,10 @@ const Scatter: React.FC<{ c: Ctx }> = ({ c }) => {
         ))}
       </Svg>
       <Note at={pileAt - 2} x={R_X + 580} y={c.y(400)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>two continuous variables, one dot each</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Two continuous variables, one dot each</span>
       </Note>
       <Note at={lowerAt - 2} x={R_X + 580} y={c.y(450)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>piled up? lower the opacity</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Piled up? lower the opacity</span>
       </Note>
       <Note at={fourAt - 2} x={R_X + 580} y={c.y(500)}>
         <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -323,10 +331,10 @@ const Scatter: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Verdict ok={false} x={R_X + 580} y={c.y(570)} at={fourAt + 12}>
-        solid dots: one blob
+        Solid dots: one blob
       </Verdict>
       <Verdict ok x={R_X + 580} y={c.y(620)} at={clustersAt}>
-        faint dots: two clusters and a bridge
+        Faint dots: two clusters and a bridge
       </Verdict>
     </>
   );
@@ -360,7 +368,8 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
   const reveal = ease(frame, stackAt - 2, 22);
   const web = channels.findIndex((ch) => ch.key === "Web");
   const webLift = pulse(frame, hidesAt, 40);
-  const L = { x0: R_X + 600, x1: R_X + 920 };
+  // The web line, a clear 120px past the stack's channel labels (the owner, 2026-11-11).
+  const L = { x0: R_X + 700, x1: R_X + 1000 };
 
   return (
     <>
@@ -426,10 +435,10 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Verdict ok={false} x={x0} y={base + c.h(46)} at={hidesAt}>
-        stacked, it seems to climb
+        Stacked, it seems to climb
       </Verdict>
       <Verdict ok x={L.x0} y={base + c.h(46)} at={webAt + 8}>
-        flat all year
+        Flat all year
       </Verdict>
     </>
   );

@@ -283,15 +283,15 @@ export const RefsScene: React.FC = () => {
           out={ifnaAt}
         />
         <Note at={hidesAt} x={BAR_X} y={lg.top + h(70)} out={ifnaAt}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>every error looks the same</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>Every error looks the same</span>
         </Note>
         <Note at={causeAt - 2} x={BAR_X} y={lg.top + h(150)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            fix the cause first: <Mark at={trimAt}>trim the key</Mark>, fix the column
+            Fix the cause first: <Mark at={trimAt}>trim the key</Mark>, fix the column
           </span>
         </Note>
         <Note at={stillAt + 4} x={BAR_X} y={lg.top + h(190)}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>the stray space is #N/A too: IFNA still hides it</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>The stray space is #N/A too: IFNA still hides it</span>
         </Note>
         <FormulaBar
           x={BAR_X}

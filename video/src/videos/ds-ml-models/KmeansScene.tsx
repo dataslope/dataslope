@@ -304,7 +304,7 @@ export const KmeansScene: React.FC = () => {
           </Note>
           <Note at={roundAt} x={box.left} y={box.top + box.height + h(14)}>
             <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-              assumes round clusters of similar size
+              Assumes round clusters of similar size
               <span
                 style={{ color: INK_SOFT, opacity: ease(frame, outlierAt, 10) }}
               >
@@ -314,7 +314,7 @@ export const KmeansScene: React.FC = () => {
           </Note>
           <Note at={startsAt} x={box.left} y={box.top + box.height + h(54)}>
             <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-              <Mark at={troubleAt}>run several starts, or k-means++</Mark>
+              <Mark at={troubleAt}>Run several starts, or k-means++</Mark>
               <span
                 style={{ color: INK_SOFT, opacity: ease(frame, wrongAt, 10) }}
               >
@@ -332,7 +332,7 @@ export const KmeansScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              within-cluster sum of squares
+              Within-cluster sum of squares
             </span>
           </Note>
           <Axes
@@ -425,7 +425,7 @@ export const KmeansScene: React.FC = () => {
             from="right"
           >
             <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
-              always falls: look for the bend
+              Always falls: look for the bend
             </span>
           </Note>
 
@@ -438,11 +438,20 @@ export const KmeansScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              silhouette score
+              Silhouette score
             </span>
           </Note>
-          <Note at={nearerAt} x={CH_X + 190} y={y(SIL_TOP) - h(52)}>
-            <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>
+          {/* Its gloss at the right end of the title line, as the elbow
+              chart's is, and at the gloss size used there: 20px beside the
+              22px title is one line in one size, give or take 12%. */}
+          <Note
+            at={nearerAt}
+            x={CH_X + CH_W}
+            y={y(SIL_TOP) - h(52)}
+            align="right"
+            from="right"
+          >
+            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
               how much nearer a point sits to its own cluster
             </span>
           </Note>

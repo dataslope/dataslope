@@ -41,7 +41,7 @@ export const WaitBar: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        borderRadius: 6,
+        borderRadius: 4,
         border: `2.5px ${solid ? "solid" : "dashed"} ${color}`,
         background: tint(color, solid ? 34 : 10),
         display: "flex",

@@ -100,8 +100,6 @@ export const ClusterScene: React.FC = () => {
               height={h(BAR_H)}
               rx={3}
               fill={hit && r > 0 ? `color-mix(in srgb, ${readColor} ${100 * r}%, ${COLUMN_TINT.sale_date})` : COLUMN_TINT.sale_date}
-              stroke={INK}
-              strokeOpacity={0.25}
             />
             {labels && hit ? (
               <text x={x1 + 10} y={yy + h(BAR_H) - 2} style={svgText(label(19, INK))} opacity={ease(frame, readAt + 6, 10)}>
@@ -173,7 +171,7 @@ export const ClusterScene: React.FC = () => {
 
         {/* ── In date order ── */}
         <div style={{ position: "absolute", left: X0, top: y(SORTED_Y) - 4, width: AX0 - X0 - 20, opacity: ease(frame, likeAt - 2, 12) }}>
-          <div style={{ ...label(23, INK) }}>in date order</div>
+          <div style={{ ...label(23, INK) }}>In date order</div>
           <div style={{ ...note(20, INK_SOFT), marginTop: 4, opacity: ease(frame, weeksAt, 10) }}>
             <Num>{CLUSTER.sorted.groups.length}</Num> row groups, about six weeks each
           </div>
@@ -190,7 +188,7 @@ export const ClusterScene: React.FC = () => {
 
         {/* ── Shuffled ── */}
         <div style={{ position: "absolute", left: X0, top: y(SHUFFLED_Y) - 4, width: AX0 - X0 - 20, opacity: ease(frame, shuffleAt, 12) }}>
-          <div style={{ ...label(23, INK) }}>shuffled</div>
+          <div style={{ ...label(23, INK) }}>Shuffled</div>
           <div style={{ ...note(20, INK_SOFT), marginTop: 4, opacity: ease(frame, yearAt, 10) }}>every group spans the year</div>
         </div>
         {panel(SHUFFLED_Y, CLUSTER.shuffled.groups, shuffleAt + 4, nothingAt, ACCENT, false, STEP)}

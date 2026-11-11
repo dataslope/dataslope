@@ -3,13 +3,14 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
+import { MathRun } from "../../editorial/math";
 import { HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { ds } from "../../theme/brand";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MEMORY, pct } from "./data";
-import { at, Axes, DATA, Drift, Given, math, OK_INK, pulse, type Scale, Svg, V, X0 } from "./parts";
+import { at, Axes, DATA, Drift, Given, math, mathFace, OK_INK, pulse, type Scale, Svg, V, X0 } from "./parts";
 
 const PLOT = { left: 200, right: 1160, top: 420, base: 800 };
 const TABLE = { x: 1300, top: 430, row: 74 };
@@ -67,24 +68,24 @@ export const MemoryScene: React.FC = () => {
         </QuestionCard>
 
         <Ink at={answerAt} dur={18} style={{ left: X0, top: y(300) }}>
-          <span style={math(44)}>
+          <MathRun style={math(44)}>
             P(<V>X</V> &gt; <V>s</V> + <V>t</V>
             <Given />
             <V>X</V> &gt; <V>s</V>) = P(<V>X</V> &gt; <V>t</V>)
-          </span>
+          </MathRun>
         </Ink>
         <Note at={answerAt + 12} x={X0 + 720} y={y(312)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>time already waited changes nothing</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Time already waited changes nothing</span>
         </Note>
         <Note at={answerAt + 22} x={X0 + 720} y={y(350)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            <span style={math(28, INK)}>
+            <MathRun style={mathFace(INK)}>
               <V>s</V>
-            </span>{" "}
+            </MathRun>{" "}
             already waited,{" "}
-            <span style={math(28, INK)}>
+            <MathRun style={mathFace(INK)}>
               <V>t</V>
-            </span>{" "}
+            </MathRun>{" "}
             more
           </span>
         </Note>
@@ -153,7 +154,7 @@ export const MemoryScene: React.FC = () => {
 
         {/* The same answer, three times. */}
         <Note at={pctAt} x={TABLE.x} y={y(TABLE.top) - 56}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>already waited · chance of 10 more</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Already waited · chance of 10 more</span>
         </Note>
         {windows.map((w, i) => (
           <Note key={w.s} at={i === 0 ? pctAt : w.at} x={TABLE.x} y={y(TABLE.top) + i * TABLE.row}>

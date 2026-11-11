@@ -104,7 +104,7 @@ export const CoverScene: React.FC = () => {
         />
         <Note at={aloneAt} x={X0 + 1150 - 12} y={planTop + h(4)} align="right" out={includeAt - 8}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            with an index on <SmallMono>customer_id</SmallMono> alone
+            With an index on <SmallMono>customer_id</SmallMono> alone
           </span>
         </Note>
         <Listing
@@ -132,7 +132,7 @@ export const CoverScene: React.FC = () => {
 
         {/* ── Right: the index's entries, and the table's pages ── */}
         <TableName g={ig} at={holdsAt}>
-          the index, at 42
+          The index, at 42
         </TableName>
         <DataTable
           g={ig}
@@ -157,7 +157,7 @@ export const CoverScene: React.FC = () => {
           out={sizeAt}
         />
         <div style={{ position: "absolute", left: R_X, top: stripY + h(64), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, holdsAt + 6, 12) * (1 - ease(frame, sizeAt, 10)) }}>
-          the table&rsquo;s pages
+          The table&rsquo;s pages
         </div>
         <Note at={heapAt + 4} x={R_X} y={stripY + h(100)} out={includeAt - 4}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>

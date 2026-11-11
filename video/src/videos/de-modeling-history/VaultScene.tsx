@@ -97,9 +97,9 @@ export const VaultScene: React.FC = () => {
   const midTop = link.bottom + h(40);
 
   const whenNotes = [
-    { at: vaultWhenAt, head: "Choose a vault", lines: ["many changing sources", "strict audit"], ink: BLUE_INK },
-    { at: starAt, head: "Choose a star", lines: ["a stable domain", "analysts query it directly"], ink: BLUE_INK },
-    { at: bothAt, head: "Often both", lines: ["the vault stores history", "stars on top serve reports"], ink: OK_INK },
+    { at: vaultWhenAt, head: "Choose a vault", lines: ["Many changing sources", "Strict audit"], ink: BLUE_INK },
+    { at: starAt, head: "Choose a star", lines: ["A stable domain", "Analysts query it directly"], ink: BLUE_INK },
+    { at: bothAt, head: "Often both", lines: ["The vault stores history", "Stars on top serve reports"], ink: OK_INK },
   ];
   const lineAt = [
     [vaultWhenAt + 10, vaultWhenAt + 24],
@@ -149,12 +149,12 @@ export const VaultScene: React.FC = () => {
 
         {/* The three kinds, named under the diagram's middle. */}
         <Note at={threeAt} x={midX} y={midTop}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>three kinds of table</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Three kinds of table</span>
         </Note>
         {[
-          { at: hubsAt, name: "hubs", what: "business keys" },
-          { at: linksAt, name: "links", what: "relationships" },
-          { at: satsAt, name: "satellites", what: "attributes" },
+          { at: hubsAt, name: "Hubs", what: "business keys" },
+          { at: linksAt, name: "Links", what: "relationships" },
+          { at: satsAt, name: "Satellites", what: "attributes" },
         ].map((k, i) => (
           <Note key={k.name} at={k.at} x={midX} y={midTop + (i + 1) * h(36)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -166,10 +166,10 @@ export const VaultScene: React.FC = () => {
 
         {/* Why it loads well. */}
         {[
-          { at: insertsAt, text: "loading only inserts", bold: true },
-          { at: ownAt, text: "a satellite per source" },
-          { at: parallelAt, text: "teams add sources in parallel" },
-          { at: tracesAt, text: "every value traced to its source" },
+          { at: insertsAt, text: "Loading only inserts", bold: true },
+          { at: ownAt, text: "A satellite per source" },
+          { at: parallelAt, text: "Teams add sources in parallel" },
+          { at: tracesAt, text: "Every value traced to its source" },
         ].map((r, i) => (
           <Note key={r.text} at={r.at} x={midX} y={midTop + h(160) + i * h(36)}>
             <span style={{ ...note(24, INK), fontWeight: r.bold ? 500 : 500, whiteSpace: "nowrap" }}>{r.text}</span>
@@ -187,7 +187,7 @@ export const VaultScene: React.FC = () => {
             ))}
             {i === 0 ? (
               <div style={{ ...label(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, priceAt, 10) }}>
-                price: <span style={{ opacity: 0.4 + 0.6 * ease(frame, joinsAt, 10) }}>a stack of joins</span>
+                Price: <span style={{ opacity: 0.4 + 0.6 * ease(frame, joinsAt, 10) }}>a stack of joins</span>
               </div>
             ) : null}
           </Note>

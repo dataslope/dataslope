@@ -120,7 +120,7 @@ export const SimpsonScene: React.FC = () => {
           </span>
         </Note>
         <TableName g={pg} at={losesAt - 6} out={out14}>
-          pooled
+          Pooled
         </TableName>
         <DataTable
           g={pg}
@@ -142,13 +142,13 @@ export const SimpsonScene: React.FC = () => {
           </span>
         </Note>
         <Note at={segmentAt - 2} x={POOLED_X} y={pg.rowTop(Pd.rows.length) + h(160)} out={out14}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>segment before you conclude</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Segment before you conclude</span>
         </Note>
 
         {/* ── Question 15: two ratios that mislead ── */}
         <Note at={bothAt - 4} x={X0} y={y(TOP - 20)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            revenue per session: watch the top and the bottom
+            Revenue per session: watch the top and the bottom
             <span style={{ opacity: ease(frame, fellAt - 2, 10) }}>; it rises when sessions fall</span>
           </span>
         </Note>
@@ -173,12 +173,12 @@ export const SimpsonScene: React.FC = () => {
         </Note>
         <Note at={fortyAt + 4} x={resultX} y={rg.rowTop(4) + h(20)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            the Islands&apos; {R.rows[islands][1]} counts as much as North&apos;s {R.rows[0][1]}, for {R.rows[islands][2]} customers
+            The Islands&apos; {R.rows[islands][1]} counts as much as North&apos;s {R.rows[0][1]}, for {R.rows[islands][2]} customers
           </span>
         </Note>
         <Note at={sumAt - 2} x={resultX} y={rg.rowTop(4) + h(70)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            sum, then divide once:{" "}
+            Sum, then divide once:{" "}
             <span style={{ opacity: ease(frame, onceAt - 4, 10) }}>
               <Num>{RATIO.revenue.toLocaleString("en-US")}</Num> revenue / <Num>{RATIO.customers.toLocaleString("en-US")}</Num> customers ={" "}
               <Num>{fmt(RATIO.weighted, 1)}</Num>

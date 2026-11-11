@@ -7,16 +7,16 @@ import { BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Band, Drift, Flow, OK_INK, X0 } from "./parts";
+import { Band, Drift, Flow, OK_INK, pulse, X0 } from "./parts";
 
 const ROOT = { cx: 960, y: 330, w: 600, h: 78 };
 const SPLIT = 470;
 const LEAF_Y = 586;
 const LEAF_W = 420;
 const LEAVES = [
-  { x: X0, title: "async", when: "waiting, on many connections", why: "one thread, the lowest overhead", branch: 0 },
-  { x: 580, title: "threads, in a pool", when: "waiting, through blocking libraries", why: "they release the GIL while they wait", branch: 0 },
-  { x: 1240, title: "multiprocessing", when: "burning CPU", why: "sidesteps the GIL: true parallelism", branch: 1 },
+  { x: X0, title: "async", when: "Waiting, on many connections", why: "One thread, the lowest overhead", branch: 0 },
+  { x: 580, title: "Threads, in a pool", when: "Waiting, through blocking libraries", why: "They release the GIL while they wait", branch: 0 },
+  { x: 1240, title: "multiprocessing", when: "Burning CPU", why: "Sidesteps the GIL: true parallelism", branch: 1 },
 ];
 const BRANCHES = [
   { cx: (X0 + LEAF_W / 2 + 580 + LEAF_W / 2) / 2, text: "waiting on I/O" },
@@ -56,7 +56,11 @@ export const ChooseScene: React.FC = () => {
   const rootH = h(ROOT.h);
   const splitY = y(SPLIT);
   const leafY = y(LEAF_Y);
-  const branchAt = [waitingAt, burningAt];
+  // The fork is drawn as soon as the bottleneck is named, so the page isn't
+  // one line while the question is read; each branch is lit on its words.
+  const rootAt = matchAt + 8;
+  const branchAt = [matchAt + 16, matchAt + 22];
+  const saidAt = [waitingAt, burningAt];
   // Which branch the narration is on: lit while its leaves are read.
   const onBranch = (b: number) => (b === 0 ? Math.max(ease(frame, whenAt[0], 10) * (1 - ease(frame, whenAt[2], 10)), 0) : ease(frame, whenAt[2], 10) * (1 - ease(frame, mixAt, 10)));
   const mixY = y(806);
@@ -78,7 +82,7 @@ export const ChooseScene: React.FC = () => {
         </Note>
 
         {/* The deciding question. */}
-        <Note at={decidingAt} x={ROOT.cx - ROOT.w / 2} y={rootTop + rootH / 2 - 20} width={ROOT.w} from="up" style={{ textAlign: "center" }}>
+        <Note at={rootAt} x={ROOT.cx - ROOT.w / 2} y={rootTop + rootH / 2 - 20} width={ROOT.w} from="up" style={{ textAlign: "center" }}>
           <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Band at={decidingAt + 6}>Waiting on I/O, or burning CPU?</Band>
           </span>
@@ -89,7 +93,7 @@ export const ChooseScene: React.FC = () => {
             <React.Fragment key={b.text}>
               <Flow points={[[ROOT.cx + (i ? 120 : -120), rootTop + rootH + 4], [ROOT.cx + (i ? 120 : -120), splitY - h(34)], [b.cx, splitY - h(34)], [b.cx, splitY - 8]]} at={branchAt[i]} color={lit > 0.5 ? INK : INK_SOFT} width={2.4} head={13} />
               <Note at={branchAt[i] + 8} x={b.cx - 150} y={splitY + h(25) - 16} width={300} from="up" style={{ textAlign: "center" }}>
-                <span style={{ ...label(24, BLUE_INK), fontWeight: lit > 0.5 ? 500 : 500, whiteSpace: "nowrap" }}>{b.text}</span>
+                <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-block", transform: `scale(${1 + 0.12 * pulse(frame, saidAt[i], 20)})` }}>{b.text}</span>
               </Note>
             </React.Fragment>
           );
@@ -123,7 +127,7 @@ export const ChooseScene: React.FC = () => {
                 <span style={{ ...label(30, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: named }}>
                   {i === 1 ? (
                     <>
-                      threads, <Band at={capAt}>in a pool</Band>
+                      Threads, <Band at={capAt}>in a pool</Band>
                     </>
                   ) : (
                     l.title

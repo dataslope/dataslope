@@ -20,19 +20,19 @@ const STRIP_W = 480;
 const FAMILIES = [
   {
     title: "Categories",
-    caption: "distinct hues",
+    caption: "Distinct hues",
     cells: categorical,
     ticks: TICKETS.byChannel.slice(0, categorical.length).map((c) => c.key),
   },
   {
     title: "Ordered values",
-    caption: "one hue, light to dark",
+    caption: "One hue, light to dark",
     cells: ([100, 200, 300, 400, 500, 600, 700] as const).map((s) => ds("blue", s)),
     ends: ["low", "", "high"],
   },
   {
     title: "A meaningful middle",
-    caption: "two hues, a neutral center",
+    caption: "Two hues, a neutral center",
     cells: [ds("orange", 700), ds("orange", 500), ds("orange", 300), ds("gray", 100), ds("blue", 300), ds("blue", 500), ds("blue", 700)],
     ends: ["loss", "0", "profit"],
   },
@@ -187,7 +187,7 @@ export const PaletteScene: React.FC = () => {
 
         {/* ── Question 15: three families, then one accent ── */}
         <Note at={matchAt - 2} x={FAMILIES_X[0]} y={y(290)} out={out15}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>match the palette to the data</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Match the palette to the data</span>
         </Note>
         {FAMILIES.map((f, k) => {
           const x = FAMILIES_X[k];
@@ -289,7 +289,7 @@ export const PaletteScene: React.FC = () => {
         </Note>
         <Note at={accentAt} x={ACC.x1 + 160} y={y(650)} out={out15}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b>one bold accent</b>
+            <b>One bold accent</b>
           </span>
         </Note>
         <Note at={seeAt} x={ACC.x1 + 160} y={y(700)} out={out15}>
@@ -359,7 +359,7 @@ export const PaletteScene: React.FC = () => {
           })}
         </Svg>
         <Verdict ok x={discX(5) + DISC_R + 40} y={foldY - h(16)} at={foldAt + 14} out={out16}>
-          one color, one group
+          One color, one group
         </Verdict>
 
         <PanelTitle x={SMALL.x0} y={y(SMALL.top) - h(52)} at={panelsAt - 2} out={out16}>
@@ -384,7 +384,7 @@ export const PaletteScene: React.FC = () => {
 
         {/* ── Question 17: red and green, as two readers see them ── */}
         <Note at={eightAt - 2} x={PANELS[0].x0} y={y(300)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>about 8% of men have red-green color blindness</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>About 8% of men have red-green color blindness</span>
         </Note>
         <Note at={aloneAt - 2} x={PANELS[0].x0} y={y(350)}>
           <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>so color can&apos;t be the only cue</span>
@@ -404,7 +404,7 @@ export const PaletteScene: React.FC = () => {
           {legend(PANELS[1], cbAt + 8)}
         </div>
         <Verdict ok={false} x={PANELS[1].x0} y={pBase + h(90)} at={cbAt + 14}>
-          which line is which?
+          Which line is which?
         </Verdict>
 
         {/* The fix, built up as it is said: a safe pair, then labels, then gray. */}
@@ -425,7 +425,7 @@ export const PaletteScene: React.FC = () => {
           ))}
         </div>
         <Verdict ok x={PANELS[2].x0} y={pBase + h(90)} at={robustAt - 4}>
-          still reads: robust
+          Still reads: robust
         </Verdict>
       </Drift>
     </AbsoluteFill>

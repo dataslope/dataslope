@@ -4,10 +4,10 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, body, label, note } from "../../editorial/style";
-import { Ink, NextLine, Note } from "../../editorial/ui";
+import { Ink, NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ARRIVED, DIFFS, LINES, LISTINGS, REVIEW, WHOLE } from "./data";
+import { ARRIVED, COST, DIFFS, LINES, LISTINGS, REVIEW, WHOLE } from "./data";
 import {
   Checklist,
   Code,
@@ -22,13 +22,13 @@ import {
   Mark,
   MARK_BAD,
   NumberLine,
-  OK,
   OK_INK,
   Py,
   Spot,
   TestGrid,
   Verdict,
 } from "./parts";
+import { M } from "../../editorial/math";
 
 const LIST_X = 660;
 const SIZE = 20;
@@ -73,12 +73,13 @@ export const ReviewScene: React.FC = () => {
   const textAt = n.word("review", "How do you review code");
   const strangerAt = n.word("review", "Like a pull request from a capable stranger");
   const c1At = n.word("review-list", "Check that it does what was asked");
+  const elseAt = n.word("review-list", "and nothing else");
   const c2At = n.word("review-list", "That every import");
   const c3At = n.word("review-list", "That it handles the boundaries");
   const c4At = n.word("review-list", "That it doesn't add an accidental");
   const c5At = n.word("review-list", "And that its tests would fail");
   const runAt = n.word("review-list", "Then run it");
-  const backAt = n.word("review-diff", "Go back to the diff as it arrived");
+  const caughtAt = n.word("review-back", "would have caught all three");
   const touchesAt = n.word("review-diff", "It touches one function");
   const callsAt = n.word("review-diff", "It calls nothing that doesn't exist");
   const passAt = n.word("review-diff", "It makes one pass over the input");
@@ -93,6 +94,10 @@ export const ReviewScene: React.FC = () => {
   const tenAt = n.word("review-contain", "One to ten, then two to three");
   const becomesAt = n.word("review-contain", "becomes one to three");
   const shrankAt = n.word("review-contain", "The merge shrank the interval");
+  const emptyAt = n.word("review-empty", "The empty list");
+  const singleAt = n.word("review-empty", "and a single interval");
+  const fineAt = n.word("review-empty", "come back fine");
+  const hidesAt = n.word("review-empty", "it hides no errors");
   const lastAt = n.word("review-tests", "Last check");
   const firstAt = n.word("review-tests", "The first passes on this code");
   const aliveAt = n.word("review-tests", "on a correct version alike");
@@ -122,9 +127,13 @@ export const ReviewScene: React.FC = () => {
   const addedAt = n.word("next", "The fix also added a sort");
   const onePassAt = n.word("next", "from one pass");
   const nlognAt = n.word("next", "to n log n");
-  const costAt = n.word("next", "Reading code includes judging what it costs");
-  const nextAt = n.word("next", "Next");
-  const end = n.beat("next").to + 60;
+  const inOrderAt = n.word("next-cost", "On input already in order");
+  const closeAt = n.word("next-cost", "close to one pass");
+  const otherAt = n.word("next-cost", "The other choice is to require sorted input");
+  const insideAt = n.word("next-cost", "For a helper this small, sort inside");
+  const callerAt = n.word("next-cost", "the bug report came from a caller");
+  const nextAt = n.word("next-line", "Next");
+  const end = n.beat("next-line").to + 60;
 
   const top = y(330);
   const fn = DIFFS.arrived["intervals.py"];
@@ -159,7 +168,7 @@ export const ReviewScene: React.FC = () => {
 
   // The where-labels sit beside the three added lines of the fix.
   const added = fix.map((l, i) => (l.startsWith("+") ? i : -1)).filter((i) => i >= 0);
-  const kinds = ["assumption", "boundary", "boundary"];
+  const kinds = ["assumption", "boundary", "assumption"];
 
   // The closing shows the fixed function plain, its sort highlighted.
   const FIXED = LISTINGS.fixed;
@@ -210,19 +219,20 @@ export const ReviewScene: React.FC = () => {
           rowH={CHECK_ROW}
           out={listOut}
           items={[
-            { label: "does what was asked, nothing else", at: c1At, okAt: touchesAt + 8 },
-            { label: "everything it uses exists", at: c2At, okAt: callsAt + 8 },
-            { label: "handles boundaries and error paths", at: c3At, badAt: breaksAt + 4 },
+            { label: "Does what was asked", at: c1At, badAt: apartAt + 4 },
+            { label: "and nothing else", at: elseAt, okAt: touchesAt + 8 },
+            { label: "Everything it uses exists", at: c2At, okAt: callsAt + 8 },
+            { label: "Handles boundaries and error paths", at: c3At, badAt: breaksAt + 4 },
             {
               label: (
                 <>
-                  no accidental O(<i>n</i>²) loop or N+1 query
+                  No accidental <M>O(n²)</M> loop or N+1 query
                 </>
               ),
               at: c4At,
               okAt: passAt + 8,
             },
-            { label: "its tests fail without the change", at: c5At, badAt: tellAt + 4 },
+            { label: "Its tests fail without the change", at: c5At, badAt: tellAt + 4 },
             { label: "then run it", at: runAt, okAt: allPassAt + 8 },
           ]}
         />
@@ -231,11 +241,11 @@ export const ReviewScene: React.FC = () => {
         <FileTab x={LIST_X} top={top - 44} at={diffIn} out={fixIn} on={[[diffIn, testsIn]]} name="intervals.py">
           +{LINES}
         </FileTab>
-        <FileTab x={LIST_X + 270} top={top - 44} at={diffIn + 4} on={[[testsIn, fixIn]]} name="test_intervals.py">
+        <FileTab x={LIST_X + 270} top={top - 44} at={diffIn + 4} out={closeIn} on={[[testsIn, fixIn]]} name="test_intervals.py">
           +{tests.length}
         </FileTab>
-        <Note at={backAt} x={LIST_X + 620} y={top - 44} out={testsIn}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>as it arrived, before it shipped</span>
+        <Note at={caughtAt} x={LIST_X + 620} y={top - 44} out={testsIn}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>As it arrived, before it shipped</span>
         </Note>
         <DiffListing
           lines={fn}
@@ -256,7 +266,7 @@ export const ReviewScene: React.FC = () => {
 
         {/* ── Touching intervals ── */}
         <Note at={closedAt} x={R_X} y={rTop} out={rOut}>
-          <Pair name="in" value={REVIEW.touching.arg} />
+          <Pair name="In" value={REVIEW.touching.arg} />
         </Note>
         <NumberLine
           x={R_X + 20}
@@ -271,15 +281,15 @@ export const ReviewScene: React.FC = () => {
           points={[{ v: touchIn[1][0], dy: 37, at: shareAt + 4, r: 26 }]}
         />
         <Note at={mergeAt} x={R_X} y={rTop + 178} out={rOut}>
-          <Pair name="should be" value={REVIEW.fixed.touching.repr ?? ""} ink={OK_INK} />
+          <Pair name="Should be" value={REVIEW.fixed.touching.repr ?? ""} ink={OK_INK} />
         </Note>
         <Note at={apartAt} x={R_X} y={rTop + 232} out={rOut}>
-          <Pair name="returns" value={REVIEW.touching.repr ?? ""} ink={ACCENT_INK} />
+          <Pair name="Returns" value={REVIEW.touching.repr ?? ""} ink={ACCENT_INK} />
         </Note>
 
         {/* ── A contained interval ── */}
         <Note at={tenAt} x={R_X} y={cTop} out={rOut}>
-          <Pair name="in" value={REVIEW.contained.arg} />
+          <Pair name="In" value={REVIEW.contained.arg} />
         </Note>
         <NumberLine
           x={R_X + 20}
@@ -296,15 +306,35 @@ export const ReviewScene: React.FC = () => {
             { s: containOut[0][1], e: containIn[0][1], dy: 52, color: ACCENT, at: becomesAt + 6, dashed: true, open: [true, false] },
           ]}
         />
-        <Note at={becomesAt} x={R_X} y={cTop + 190} out={rOut}>
-          <Pair name="returns" value={REVIEW.contained.repr ?? ""} ink={ACCENT_INK} />
+        <Note at={shrankAt} x={R_X} y={cTop + 190} out={rOut}>
+          <Pair name="Should be" value={REVIEW.fixed.contained.repr ?? ""} ink={OK_INK} />
         </Note>
-        <Note at={shrankAt} x={R_X} y={cTop + 244} out={rOut}>
+        <Note at={becomesAt} x={R_X} y={cTop + 244} out={rOut}>
+          <Pair name="Returns" value={REVIEW.contained.repr ?? ""} ink={ACCENT_INK} />
+        </Note>
+        <Note at={shrankAt + 8} x={R_X} y={cTop + 298} out={rOut}>
           <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>
-            <Mark at={shrankAt + 4} color={MARK_BAD}>
-              the merge shrank it
+            <Mark at={shrankAt + 12} color={MARK_BAD}>
+              The merge shrank it
             </Mark>
           </span>
+        </Note>
+
+        {/* ── The boundaries that pass, and no error hidden ── */}
+        {[
+          { at: emptyAt, call: REVIEW.empty, okAt: fineAt },
+          { at: singleAt, call: REVIEW.single, okAt: fineAt + 4 },
+        ].map((r, i) => (
+          <Note key={i} at={r.at} x={LIST_X} y={top + diffHeight(fn.length, SIZE) + 34 + i * 52} out={rOut}>
+            <span style={{ display: "flex", gap: 28, alignItems: "center", whiteSpace: "nowrap" }}>
+              <Pair name="In" value={r.call.arg} />
+              <Pair name="Returns" value={r.call.repr ?? ""} ink={OK_INK} />
+              <Verdict ok={r.call.ok} at={r.okAt} size={24} />
+            </span>
+          </Note>
+        ))}
+        <Note at={hidesAt} x={LIST_X} y={top + diffHeight(fn.length, SIZE) + 138} out={rOut}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>No try or except: no error is hidden</span>
         </Note>
 
         {/* ── Its tests: this code, and a correct one ── */}
@@ -319,7 +349,7 @@ export const ReviewScene: React.FC = () => {
           out={fixIn}
           marks={[{ line: assertRow(ARRIVED.tests[1].name), at: bugAt + 2, color: MARK_BAD }]}
         />
-        {["this code", "correct"].map((t, j) => (
+        {["This code", "Correct"].map((t, j) => (
           <Note key={t} at={firstAt - 4} x={verdictX[j] - 60} y={top - 44} out={fixIn}>
             <span style={{ ...label(21, INK_SOFT), display: "inline-block", width: 120, textAlign: "center", whiteSpace: "nowrap" }}>{t}</span>
           </Note>
@@ -341,16 +371,16 @@ export const ReviewScene: React.FC = () => {
           );
         })}
         <Note at={tellAt} x={LIST_X} y={top + diffHeight(tests.length, TEST_SIZE) + 30} out={fixIn}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the first passes on both: it can&apos;t tell them apart</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The first passes on both: it can&apos;t tell them apart</span>
         </Note>
         <Note at={bugAt} x={LIST_X} y={top + diffHeight(tests.length, TEST_SIZE) + 86} out={fixIn}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
-            the second is <Mark at={bugAt + 6} color={MARK_BAD}>the bug, written down as a requirement</Mark>
+            The second is <Mark at={bugAt + 6} color={MARK_BAD}>the bug, written down as a requirement</Mark>
           </span>
         </Note>
 
         {/* ── The fix, and the tests the review wanted ── */}
-        <FileTab x={LIST_X} top={top - 44} at={fixIn} name="intervals.py">
+        <FileTab x={LIST_X} top={top - 44} at={fixIn} out={closeIn} name="intervals.py">
           <span style={{ color: OK_INK }}>+{added.length}</span> <span style={{ color: ACCENT_INK }}>−{fix.filter((l) => l.startsWith("-")).length}</span>
         </FileTab>
         <DiffListing
@@ -370,6 +400,7 @@ export const ReviewScene: React.FC = () => {
           ]}
         />
         {/* The closing: the function as it now reads. */}
+        <FileTab x={LIST_X} top={top - 44} at={closeIn} name="intervals.py" />
         <DiffListing
           lines={FIXED}
           diff={false}
@@ -394,8 +425,8 @@ export const ReviewScene: React.FC = () => {
           headAt={writeAt}
           out={followAt - 6}
           cols={[
-            { title: "the assistant's code", x: LIST_X + 560 },
-            { title: "the fix", x: LIST_X + 800 },
+            { title: "The assistant's code", x: LIST_X + 560 },
+            { title: "The fix", x: LIST_X + 800 },
           ]}
           rows={REVIEW.onAssistant.tests.map((t, i) => {
             const named = [undefined, unsortedAt, touchingAt, containedAt][i];
@@ -411,13 +442,13 @@ export const ReviewScene: React.FC = () => {
           })}
         />
         <Note at={obviousAt + 10} x={LIST_X + 920} y={gridTop + 34 + 4} out={followAt - 6}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>touched none of them</span>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Touched none of them</span>
         </Note>
 
         {/* ── The follow-up: is the end inclusive? ── */}
         <Note at={pastIn} x={120} y={top - 6}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            closed: <Py text={REVIEW.touching.arg} size={22} />
+            Closed: <Py text={REVIEW.touching.arg} size={22} />
           </span>
         </Note>
         <NumberLine
@@ -432,10 +463,10 @@ export const ReviewScene: React.FC = () => {
           points={[{ v: touchIn[1][0], dy: 37, at: pastIn + 16, r: 26 }]}
         />
         <Note at={pastIn + 10} x={120} y={top + 158}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>both hold 2: they touch</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Both hold 2: they touch</span>
         </Note>
         <Note at={slotsAt} x={120} y={top + 230}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>half-open: booking slots</span>
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Half-open: booking slots</span>
         </Note>
         <NumberLine
           x={150}
@@ -446,8 +477,8 @@ export const ReviewScene: React.FC = () => {
           ticks={[8, 9, 10, 11, 12]}
           at={slotsAt + 2}
           segs={[
-            { s: 9, e: 10, dy: 24, color: OK, at: nineAt, open: [false, true] },
-            { s: 10, e: 11, dy: 50, color: OK, at: nineAt + 10, open: [false, true] },
+            { s: 9, e: 10, dy: 24, color: BAR, at: nineAt, open: [false, true] },
+            { s: 10, e: 11, dy: 50, color: BAR, at: nineAt + 10, open: [false, true] },
           ]}
         />
         <Note at={overlapAt} x={120} y={top + 388}>
@@ -455,7 +486,7 @@ export const ReviewScene: React.FC = () => {
         </Note>
         <Note at={askAt} x={LIST_X} y={gridTop + 6} out={addedAt - 6}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            ask: <Mark at={askAt + 8}>is the end inclusive?</Mark>
+            Ask: <Mark at={askAt + 8}>is the end inclusive?</Mark>
             <FadeIn at={writeDownAt}> Then write the answer down as a test.</FadeIn>
           </span>
         </Note>
@@ -463,17 +494,50 @@ export const ReviewScene: React.FC = () => {
         {/* ── What the sort costs ── */}
         <Note at={onePassAt} x={LIST_X + fnW + 40} y={top + lineTop(sortedRow, SIZE) - 2}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <span style={{ color: INK_SOFT }}>one pass</span>
+            <span style={{ color: INK_SOFT }}>One pass</span>
             <FadeIn at={nlognAt - 2}>
               {" "}→{" "}
               <Mark at={nlognAt + 6}>
-                <i>n</i> log <i>n</i>
+                <M>n log n</M>
               </Mark>
             </FadeIn>
           </span>
         </Note>
-        <Note at={costAt} x={LIST_X + fnW + 40} y={top + lineTop(sortedRow, SIZE) + 46}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>what the fix costs</span>
+        <Note at={inOrderAt} x={LIST_X + fnW + 40} y={top + lineTop(sortedRow, SIZE) + 56}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            Comparisons, <Num>{COST.n.toLocaleString("en-US")}</Num> intervals
+          </span>
+        </Note>
+        {[
+          { name: "Already in order", value: COST.inOrder, at: inOrderAt + 6, mark: closeAt + 2 },
+          { name: "Shuffled", value: COST.shuffled, at: inOrderAt + 12 },
+        ].map((r, i) => (
+          <Note key={r.name} at={r.at} x={LIST_X + fnW + 40} y={top + lineTop(sortedRow, SIZE) + 94 + i * 38}>
+            <span style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap", ...note(22, INK) }}>
+              <span style={{ width: 200 }}>{r.name}</span>
+              <span style={{ width: 70, textAlign: "right" }}>
+                {r.mark === undefined ? <Num>{r.value.toLocaleString("en-US")}</Num> : (
+                  // The highlight's margin is given back, so 999 stays right-aligned with the row below.
+                  <span style={{ marginRight: "-0.14em" }}>
+                    <Mark at={r.mark}>
+                      <Num>{r.value.toLocaleString("en-US")}</Num>
+                    </Mark>
+                  </span>
+                )}
+              </span>
+            </span>
+          </Note>
+        ))}
+        <Note at={otherAt} x={LIST_X + fnW + 40} y={top + lineTop(sortedRow, SIZE) + 196}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>or require sorted input?</span>
+        </Note>
+        <Note at={insideAt} x={LIST_X + fnW + 40} y={top + lineTop(sortedRow, SIZE) + 238}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            Small helper: <span style={{ color: OK_INK, fontWeight: 500 }}>sort inside</span>
+          </span>
+        </Note>
+        <Note at={callerAt} x={LIST_X + fnW + 40} y={top + lineTop(sortedRow, SIZE) + 276}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>a caller already didn&apos;t sort</span>
         </Note>
         <NextLine at={nextAt} x={LIST_X} y={gridTop + 40} width={1140}>
           algorithms as reasoning

@@ -108,7 +108,7 @@ export const HookScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <Kicker at={from}>Backend engineer interview questions</Kicker>
-        <Headline lead="Most of the code," turn="you didn't write." at={mostAt - 4} turnAt={didntAt - 2} out={hookOut} />
+        <Headline lead="Most interview code," turn="you didn't write." at={mostAt - 4} turnAt={didntAt - 2} out={hookOut} />
         <Headline lead="Three questions," turn="one piece of code." at={threeAt + 2} turnAt={pieceAt - 2} />
 
         {/* ── The listing, then the diff it arrived as ── */}
@@ -142,13 +142,13 @@ export const HookScene: React.FC = () => {
         {/* ── What reading it means ── */}
         <Note at={doesAt - 4} x={HOOK_X} y={wordsY} out={hookOut}>
           <span style={{ display: "flex", gap: 44, fontSize: 30, ...note(30, INK), whiteSpace: "nowrap" }}>
-            <Mark at={doesAt}>what it does</Mark>
+            <Mark at={doesAt}>What it does</Mark>
             <span style={{ opacity: ease(frame, assumesAt - 4, 10) }}>
-              <Mark at={assumesAt}>what it assumes</Mark>
+              <Mark at={assumesAt}>What it assumes</Mark>
             </span>
             <span style={{ opacity: ease(frame, wrongAt - 4, 10), color: ACCENT_INK }}>
               <Mark at={wrongAt} color={MARK_BAD}>
-                where it&apos;s wrong
+                Where it&apos;s wrong
               </Mark>
             </span>
           </span>

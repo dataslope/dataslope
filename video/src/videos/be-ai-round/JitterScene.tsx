@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QuestionCard } from "../../editorial/interview";
+import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -102,7 +102,10 @@ export const JitterScene: React.FC = () => {
   const withAt = n.word("design-jitter", "With a random wait");
   const tenthAt = n.word("design-jitter", "no tenth of it gets more than");
   const n115At = n.word("design-jitter", "a hundred and fifteen");
-  const end = n.beat("design-jitter").to;
+  const lowerAt = n.word("design-herd", "nearly nine times lower");
+  const trickleAt = n.word("design-herd", "a trickle the provider can absorb");
+  const herdAt = n.word("design-herd", "a thundering herd");
+  const end = n.beat("design-herd").to;
 
   const base = y(BASE);
   const jitterBar = (LEFT_X: number) => LEFT_X + ((busiest * RETRY.bin) / SPAN) * PLOT_W + ((PLOT_W / SPAN) * RETRY.bin) / 2;
@@ -141,7 +144,7 @@ export const JitterScene: React.FC = () => {
         {/* The single wave: every request in one tenth. */}
         <Note at={sameAt} x={LEFT_X + ((plainBin * RETRY.bin) / SPAN) * PLOT_W - 24} y={y(PLOT_TOP) + 44} align="right">
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            all <Num>{thousands(plain.busiest)}</Num> in the same tenth
+            All <Num>{thousands(plain.busiest)}</Num> in the same tenth
           </span>
         </Note>
         <Note at={againAt} x={LEFT_X + ((plainBin * RETRY.bin) / SPAN) * PLOT_W - 24} y={y(PLOT_TOP) + 84} align="right">
@@ -158,12 +161,25 @@ export const JitterScene: React.FC = () => {
           <div style={{ ...note(20, INK_SOFT), textAlign: "center", whiteSpace: "nowrap" }}>the busiest tenth</div>
         </Note>
 
-        <Note at={tenthAt + 20} x={X0} y={y(816)}>
+        {/* What 115 means: the peak, set against the 1,000 without. */}
+        <Note at={lowerAt - 2} x={RIGHT_X + 24} y={y(PLOT_TOP) + 44}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            A peak <Num>{RETRY.peakRatio.toFixed(1)}</Num> times lower
+          </span>
+        </Note>
+        <Note at={trickleAt - 2} x={RIGHT_X + 24} y={y(PLOT_TOP) + 84}>
+          <span style={{ ...note(22, OK_INK), whiteSpace: "nowrap" }}>
+            a trickle the provider can absorb<span style={{ opacity: ease(frame, herdAt - 2, 10) }}>, not a herd</span>
+          </span>
+        </Note>
+
+        {/* The footnote comes in with the simulation, so it has the scene to be read in. */}
+        <Note at={simAt + 20} x={X0} y={y(816)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
             Requests per tenth of a second, in a simulation (Python&apos;s random.Random, seed {RETRY.seed}); no provider is called.
           </span>
         </Note>
-        <Note at={tenthAt + 30} x={X0} y={y(844)}>
+        <Note at={n115At + 10} x={X0} y={y(844)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
             The next two waves, after 2 and 4 s: busiest tenths <Num>{RETRY.jitter[1].busiest}</Num> and <Num>{RETRY.jitter[2].busiest}</Num> with jitter,{" "}
             <Num>{thousands(RETRY.plain[1].busiest)}</Num> without.

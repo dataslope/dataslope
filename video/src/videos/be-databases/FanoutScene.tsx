@@ -22,7 +22,12 @@ const R_X = 890;
 /** How far each repeated copy of an order sits behind the one in front. */
 const STACK = 7;
 
-const money = (v: number) => thousands(Math.floor(v)) + (v % 1).toFixed(2).slice(1);
+/** An amount to one decimal place ("40.0", "95.3", "2,661.5"): two places
+ *  overfilled the chips, and the cents are never the point here. */
+const money = (v: number) => {
+  const [whole, tenth] = v.toFixed(1).split(".");
+  return `${thousands(Number(whole))}.${tenth}`;
+};
 
 /** One order as a chip: its amount, in mono. */
 const Chip: React.FC<{ x: number; y: number; amount: number; tone: "data" | "bad" | "ok" | "sara"; opacity: number; behind?: boolean }> = ({ x, y, amount, tone, opacity, behind }) => {
@@ -87,8 +92,8 @@ export const FanoutScene: React.FC = () => {
   const thenAt = n.word("fanout-fix", "then join");
   const oneRowAt = n.word("fanout-fix", "One row per order");
   const rightAt = n.word("fanout-fix", "the revenue is right again");
-  const multAt = n.word("fanout-check", "The error multiplies");
-  const sampleAt = n.word("fanout-check", "a small sample can hide it");
+  const multAt = n.word("fanout-grow", "The error grows with the items per order");
+  const sampleAt = n.word("fanout-grow", "a test on single-item orders can hide it");
   const checkAt = n.word("fanout-check", "Check the row count");
   const end = n.beat("fanout-check").to;
 
@@ -140,12 +145,12 @@ export const FanoutScene: React.FC = () => {
 
         {/* ── Joined to its items ── */}
         <Flow points={[[X0 + leftW + 22, top + gridH / 2], [R_X - 22, top + gridH / 2]]} at={itemsAt} color={INK} width={2.6} />
-        <Note at={itemsAt + 4} x={X0 + leftW + 6} y={top + gridH / 2 - h(46)}>
+        <Note at={itemsAt + 4} x={X0 + leftW + 22} y={top + gridH / 2 - h(46)}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>join items</span>
         </Note>
         <Note at={rowsAt - 4} x={R_X} y={top - h(48)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            joined:{" "}
+            Joined:{" "}
             <span style={{ color: fold > 0.5 ? OK_INK : ACCENT_INK }}>
               <Num>{fold > 0.5 ? FANOUT.orders : FANOUT.joinedRows}</Num> rows
             </span>
@@ -178,19 +183,25 @@ export const FanoutScene: React.FC = () => {
             <SmallCode>SUM(amount)</SmallCode> = <b style={{ color: OK_INK }}>{money(Number(FANOUT.fixedTotal))}</b>
           </span>
         </Note>
+        {/* The item counts survive the fix, counted once per order. */}
+        <Note at={rightAt + 8} x={R_X} y={sumY + h(44)}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            <SmallCode>SUM(items)</SmallCode> = <b style={{ color: OK_INK }}><Num>{FANOUT.fixedItems}</Num></b>, each order&rsquo;s count kept
+          </span>
+        </Note>
         <Spot art="coins" at={doublesAt} out={fixAt - 4} left={1612} top={top + h(30)} width={170} />
 
         {/* ── Sara ── */}
         <Note at={saraAt + 2} x={X0} y={listTop} out={fixAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b style={{ background: `color-mix(in srgb, ${inkOf.yellow} 30%, transparent)`, padding: "0 6px", borderRadius: 4, margin: "0 0.1em" }}>Sara</b>, two orders:{" "}
-            {saras.map((i) => money(FANOUT.list[i].amount)).join(" + ")} = <b style={{ color: BLUE_INK }}>{FANOUT.sara.right}</b>
+            {saras.map((i) => money(FANOUT.list[i].amount)).join(" + ")} = <b style={{ color: BLUE_INK }}>{money(Number(FANOUT.sara.right))}</b>
           </span>
         </Note>
         <Note at={nineAt} x={R_X} y={listTop} out={fixAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ opacity: ease(frame, bothAt, 10) }}>three items each, so three copies each: </span>
-            <b style={{ color: ACCENT_INK }}>{FANOUT.sara.wrong}</b>
+            <span style={{ opacity: ease(frame, bothAt, 10) }}>Three items each, so three copies each: </span>
+            <b style={{ color: ACCENT_INK }}>{money(Number(FANOUT.sara.wrong))}</b>
           </span>
         </Note>
 
@@ -205,7 +216,7 @@ export const FanoutScene: React.FC = () => {
         {/* ── Row counts, step by step ── */}
         <Note at={multAt} x={R_X} y={listTop + h(56)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            the error multiplies<span style={{ opacity: ease(frame, sampleAt, 10) }}>: a small sample can hide it</span>
+            The error grows with items per order<span style={{ opacity: ease(frame, sampleAt, 10) }}>: single-item test data hides it</span>
           </span>
         </Note>
         <Note at={checkAt} x={R_X} y={listTop + h(112)}>

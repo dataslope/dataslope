@@ -104,7 +104,7 @@ export const FreshScene: React.FC = () => {
 
         <Note at={howAt} x={X0} y={y(268)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            how recently it was updated<span style={{ color: INK_SOFT, opacity: ease(frame, expectAt, 10) }}>, against what you expect</span>
+            How recently it was updated<span style={{ color: INK_SOFT, opacity: ease(frame, expectAt, 10) }}>, against what you expect</span>
           </span>
         </Note>
 
@@ -120,7 +120,7 @@ export const FreshScene: React.FC = () => {
         />
         <Note at={alertAt} x={X0} y={y(318) + h(148)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            alert when age is over <b style={{ opacity: ease(frame, twelveAt, 10) }}><Num>{FRESH.thresholdHours}</Num> hours</b>
+            Alert when age is over <b style={{ opacity: ease(frame, twelveAt, 10) }}><Num>{FRESH.thresholdHours}</Num> hours</b>
           </span>
         </Note>
 
@@ -248,15 +248,15 @@ export const FreshScene: React.FC = () => {
         </Pill>
         <VRule x={X0 + 1011} top={y(770)} height={y(832) + PILL_H - y(770)} at={catchAt} />
         <Note at={catchAt} x={X0 + NOTES_DX} y={y(762)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>catches data that never arrived</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Catches data that never arrived</span>
         </Note>
         <Note at={cantAt} x={X0 + NOTES_DX} y={y(802)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            row-level checks only read the rows <span style={{ opacity: ease(frame, thereAt, 10) }}>that are there</span>
+            Row-level checks only read the rows <span style={{ opacity: ease(frame, thereAt, 10) }}>that are there</span>
           </span>
         </Note>
         <Note at={countAt + 6} x={X0 + NOTES_DX} y={y(840)}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>a row count on the day&apos;s load catches it too</span>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>A row count on the day&apos;s load catches it too</span>
         </Note>
       </Drift>
     </AbsoluteFill>

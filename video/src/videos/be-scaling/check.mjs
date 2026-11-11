@@ -16,7 +16,8 @@
 //         9,876,543,210 on), each hashed with MD5 (its first four bytes), on
 //         three servers and then four, by hash modulo the count and on a
 //         hash ring with 100 points a server; and 1,000,000 keys on eight
-//         shards; and one user's 50 links among them;
+//         shards; and one user's 50 links among them; and those million keys
+//         when a ninth shard is added, by modulo and on a hash ring;
 //       * cache-aside: 2,000,000 redirects over 1,000,000 links whose
 //         popularity falls off as 1 / rank (Zipf, exponent 1), seed 12,
 //         through an LRU cache holding a thousandth, a hundredth and a tenth
@@ -250,7 +251,11 @@ const h32 = (s) => createHash("md5").update(s).digest().readUInt32BE(0);
   // their keys hash to, and the chance 50 random keys miss at least one shard.
   const u = rng(50);
   const USER_LINKS = 50;
-  const userShards = new Set(Array.from({ length: USER_LINKS }, () => h32(keyOf(Math.floor(u() * KEYS))) % SHARDS));
+  const userShardOf = Array.from({ length: USER_LINKS }, () => h32(keyOf(Math.floor(u() * KEYS))) % SHARDS);
+  const userShards = new Set(userShardOf);
+  // How many of the 50 each shard holds (the figure draws them, a dot each).
+  const userPerShard = Array.from({ length: SHARDS }, (_, s) => userShardOf.filter((x) => x === s).length);
+  check(userPerShard.reduce((a, b) => a + b, 0) === USER_LINKS, "the user's links are all on some shard");
   // Inclusion-exclusion: P(all eight shards hold at least one of the 50).
   let allCovered = 0;
   const choose = (n, k) => {
@@ -259,7 +264,50 @@ const h32 = (s) => createHash("md5").update(s).digest().readUInt32BE(0);
     return c;
   };
   for (let j = 0; j <= SHARDS; j++) allCovered += (-1) ** j * choose(SHARDS, j) * ((SHARDS - j) / SHARDS) ** USER_LINKS;
-  R.shards = { shards: SHARDS, keys: KEYS, counts, worstDeviation: worst, userLinks: USER_LINKS, userShards: userShards.size, allCovered };
+  R.shards = { shards: SHARDS, keys: KEYS, counts, worstDeviation: worst, userLinks: USER_LINKS, userShards: userShards.size, allCovered, userPerShard };
+}
+
+// ── 6. A ninth shard: modulo against a hash ring, on the same million keys ──
+// The follow-up to sharding by hash: what adding a shard costs. By hash
+// modulo the count (eight, then nine), and on a hash ring with 100 points a
+// shard, as in question 2 (points named shard-<s>#<j>); on the ring every key
+// that moves goes to the new shard (asserted).
+{
+  const SHARDS = 8;
+  const KEYS = 1_000_000;
+  const POINTS = 100;
+  const ring = (n) => {
+    const pts = [];
+    for (let s = 0; s < n; s++) for (let j = 0; j < POINTS; j++) pts.push([h32(`shard-${s}#${j}`), s]);
+    return pts.sort((a, b) => a[0] - b[0]);
+  };
+  const onRing = (pts, h) => {
+    let lo = 0;
+    let hi = pts.length;
+    while (lo < hi) {
+      const m = (lo + hi) >> 1;
+      if (pts[m][0] < h) lo = m + 1;
+      else hi = m;
+    }
+    return pts[lo % pts.length][1];
+  };
+  const r8 = ring(SHARDS);
+  const r9 = ring(SHARDS + 1);
+  let movedMod = 0;
+  let movedRing = 0;
+  let movedRingToNew = 0;
+  for (let i = 0; i < KEYS; i++) {
+    const h = h32(keyOf(i));
+    if (h % SHARDS !== h % (SHARDS + 1)) movedMod += 1;
+    const a = onRing(r8, h);
+    const b = onRing(r9, h);
+    if (a !== b) {
+      movedRing += 1;
+      if (b === SHARDS) movedRingToNew += 1;
+    }
+  }
+  check(movedRing === movedRingToNew, "on the ring, every key that moves goes to the ninth shard");
+  R.reshard = { from: SHARDS, to: SHARDS + 1, keys: KEYS, pointsPerShard: POINTS, shareMod: movedMod / KEYS, shareRing: movedRing / KEYS };
 }
 
 // ── 9. Rate limiting: one client, four algorithms ───────────────────────────
@@ -398,11 +446,14 @@ const said = [
   ["q3-loss", "at fifty-eight percent", 58, pct(hundredth.hitRate)],
   ["q3-loss", "more than four at seventy-seven", 4, Math.floor(tenth.lossMultiplier)],
   ["q3-loss", "more than four at seventy-seven", 77, pct(tenth.hitRate)],
-  ["q4-model", "about fifteen seconds", 15, Math.round(R.ttl.cross.ttl)],
-  ["q4-model", "six percent of reads miss", 6, pct(R.ttl.cross.miss)],
-  ["q4-model", "six percent are stale", 6, pct(R.ttl.cross.stale)],
+  ["q4-cross", "about fifteen seconds", 15, Math.round(R.ttl.cross.ttl)],
+  ["q4-cross", "six percent of reads miss", 6, pct(R.ttl.cross.miss)],
+  ["q4-cross", "six percent are stale", 6, pct(R.ttl.cross.stale)],
   ["q6-key", "a million keys land on eight shards", 1e6, R.shards.keys],
   ["q6-key", "within one percent of an eighth", 1, Math.ceil(R.shards.worstDeviation * 100)],
+  ["q6-ring", "Add a ninth shard", 9, R.reshard.to],
+  ["q6-ring", "modulo moves eighty-nine percent of the keys", 89, pct(R.reshard.shareMod)],
+  ["q6-ring", "moves thirteen percent", 13, pct(R.reshard.shareRing)],
   ["q6-cost", "asks all eight", 8, R.shards.userShards],
   ["q9", "ten new links a minute", 10, R.rate.limit],
   ["q9-fixed", "all twenty get through", 20, R.rate.fixed.accepted],
@@ -412,6 +463,7 @@ const said = [
   ["q9-token", "burst ten at once", 10, R.rate.token.accepted - R.rate.token.second],
   ["q9-token", "the second is refused", 0, R.rate.token.second],
   ["q9-leaky", "one every six seconds", 6, R.rate.refillSeconds],
+  ["q9-full", "its queue of ten is full", 10, R.rate.limit],
   ["q9-shared", "four app servers", 4, R.rate.servers],
   ["q9-shared", "four times the limit", 4, R.rate.localOk / R.rate.sharedOk],
   ["q12-storm", "two hundred followers, two hundred writes", 200, R.feed.pushWritesOrdinary],
@@ -441,6 +493,7 @@ console.log(
       cache: R.cache.sizes,
       ttl: R.ttl.cross,
       shards: R.shards,
+      reshard: R.reshard,
       rate: Object.fromEntries(["fixed", "sliding", "token", "leaky"].map((k) => [k, { accepted: R.rate[k].accepted, second: R.rate[k].second }])),
       local: [R.rate.localOk, R.rate.sharedOk],
       feed: R.feed,

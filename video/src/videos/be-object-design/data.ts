@@ -96,6 +96,10 @@ export const SHIPPING = {
 export const OBSERVER = {
   first: printed("observer", "place")[0],
   withFourth: printed("observer", "fourth")[0],
+  /** The same four on one order, analytics broken: what place() raised, and
+   *  who heard before it did. */
+  failed: printed("observer", "fails")[0],
+  heardBeforeFailing: printed("observer", "fails")[1],
 };
 
 // ── Quick round ─────────────────────────────────────────────────────────────
@@ -109,6 +113,8 @@ export const ACCOUNT = {
   /** 100, withdraw -30: a negative withdrawal is a deposit. */
   negativeWithdrawal: Number(printed("encapsulation", "negative")[0]),
   readonly: raised("encapsulation", "readonly"),
+  /** The page's class as it is now, constructor checked: BankAccount(-50). */
+  guardedOpening: raised("encapsulationGuarded", "opening"),
 };
 
 export const TOTAL_AREA = Number(printed("polymorphism", "page")[0]);

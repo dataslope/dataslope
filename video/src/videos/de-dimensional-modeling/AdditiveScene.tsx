@@ -180,13 +180,13 @@ export const AdditiveScene: React.FC = () => {
             at={kindAt[0]}
             litFrom={amountAt}
             litTo={semiAt}
-            name="additive"
+            name="Additive"
             eg="an amount"
             noteAt={everyAt}
-            note={<span style={{ ...note(22, OK_INK), fontWeight: 500 }}>sums across every dimension</span>}
+            note={<span style={{ ...note(22, OK_INK), fontWeight: 500 }}>Sums across every dimension</span>}
           />
           <Gap at={kindAt[1]} />
-          <Kind at={kindAt[1]} litFrom={semiAt} litTo={nonAt} name="semi-additive" eg="a balance" />
+          <Kind at={kindAt[1]} litFrom={semiAt} litTo={nonAt} name="Semi-additive" eg="a balance" />
           <Gap at={kindAt[2]} />
           {/* Its note under it, as "sums across every dimension" sits under
               additive. */}
@@ -194,10 +194,10 @@ export const AdditiveScene: React.FC = () => {
             at={kindAt[2]}
             litFrom={nonAt}
             litTo={end + 60}
-            name="non-additive"
+            name="Non-additive"
             eg="a ratio, a distinct count"
             noteAt={ratiosAt}
-            note={<span style={{ ...note(22, INK), fontWeight: 500 }}>don&apos;t sum at all</span>}
+            note={<span style={{ ...note(22, INK), fontWeight: 500 }}>Don&apos;t sum at all</span>}
           />
         </div>
 
@@ -216,14 +216,14 @@ export const AdditiveScene: React.FC = () => {
             ...march.map((r, k) => ({ row: r, col: bal, at: lastAt + 4 + k * 4, color: MARK_OK })),
           ]}
         />
-        <Verdict at={rightAt} x={R_X} y={y(430)} label={`across accounts, ${lastMonth}`} value={money(ACROSS)} tone="ok" />
+        <Verdict at={rightAt} x={R_X} y={y(430)} label={`Across accounts, ${lastMonth}`} value={money(ACROSS)} tone="ok" />
         <Verdict
           at={nonsenseAt}
           x={R_X}
           y={y(492)}
           label={
             <>
-              the quarter&apos;s month-ends,{" "}
+              The quarter&apos;s month-ends,{" "}
               {monthEnds.map((v, i) => (
                 <React.Fragment key={v + i}>
                   {i ? " + " : ""}
@@ -238,13 +238,13 @@ export const AdditiveScene: React.FC = () => {
           strikeAt={neverAt}
         />
         <Note at={fortyAt + 4} x={R_X} y={y(540)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>money that never existed</span>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Money that never existed</span>
         </Note>
         <Verdict
           at={lastAt}
           x={R_X}
           y={y(600)}
-          label="last value per account"
+          label="Last value per account"
           value={
             <>
               {closing} = <span style={{ color: OK_INK }}>{money(CLOSING_TOTAL)}</span>
@@ -281,7 +281,7 @@ export const AdditiveScene: React.FC = () => {
             opacity: ease(frame, fourAt - 2, 10),
           }}
         >
-          <span style={{ ...label(23, INK_SOFT), fontWeight: 500, width: 64 }}>both</span>
+          <span style={{ ...label(23, INK_SOFT), fontWeight: 500, width: 64 }}>Both</span>
           {everyone.map((p, i) => (
             <Who key={p} name={p} at={fourAt + i * 2} />
           ))}
@@ -295,14 +295,14 @@ export const AdditiveScene: React.FC = () => {
         {/* One remedy for each kind, beside the visitors they are about. */}
         <Note at={recountAt} x={FIX_X} y={y(732) - h(6)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            distinct counts: recount
+            Distinct counts: recount
             <br />
             <span style={{ opacity: ease(frame, detailAt, 10) }}>from the detail rows</span>
           </span>
         </Note>
         <Note at={ratioAt} x={FIX_X} y={y(732) + h(102)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            ratios: store both parts,
+            Ratios: store both parts,
             <br />
             <span style={{ opacity: ease(frame, divideAt - 2, 10) }}>divide in the query</span>
           </span>

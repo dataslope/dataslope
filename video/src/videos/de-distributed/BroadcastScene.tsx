@@ -215,11 +215,11 @@ export const BroadcastScene: React.FC = () => {
           );
         })}
         <Note at={noShuffleAt - 2} x={EX_X} y={y(EX_TOPS[3]) + h(EX_H) + h(12)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>joined where it sits: no shuffle</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Joined where it sits: no shuffle</span>
         </Note>
         <Note at={fitsAt - 2} x={NOTE_X} y={y(436)} out={caseAt}>
           <span style={{ ...note(23, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap" }}>
-            when one side fits
+            When one side fits
             <br />
             comfortably in memory<span style={{ opacity: ease(frame, lookupAt, 10) }}>:</span>
             <br />
@@ -228,7 +228,7 @@ export const BroadcastScene: React.FC = () => {
         </Note>
         <Note at={caseAt} x={NOTE_X} y={y(436)}>
           <span style={{ ...note(23, INK), display: "block", lineHeight: 1.4, whiteSpace: "nowrap" }}>
-            <span style={{ ...label(20, INK_SOFT) }}>the page&apos;s case</span>
+            <span style={{ ...label(20, INK_SOFT) }}>The page&apos;s case</span>
             <br />
             <span style={{ opacity: ease(frame, tbAt, 10) }}>
               <Num>{BROADCAST.factTB}</Num> TB fact table
@@ -250,14 +250,14 @@ export const BroadcastScene: React.FC = () => {
           </span>
         </Note>
         <Note at={thresholdAt - 2} x={NOTE_X} y={y(640)}>
-          <span style={{ ...label(20, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>automatic below</span>
+          <span style={{ ...label(20, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>Automatic below</span>
           <span style={{ fontFamily: MONO, fontSize: 19, fontWeight: 500, color: INK, fontVariantLigatures: "none", whiteSpace: "nowrap" }}>
             spark.sql.autoBroadcastJoinThreshold
           </span>
         </Note>
         <Note at={thresholdAt + 10} x={NOTE_X} y={y(694)}>
           <span style={{ ...label(20, INK_SOFT), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
-            default <Num>{BROADCAST.autoThresholdMB}</Num> MB
+            Default <Num>{BROADCAST.autoThresholdMB}</Num> MB
             {BROADCAST.dimOverThreshold ? (
               <span style={{ opacity: ease(frame, hintAt - 2, 10) }}>
                 :
@@ -331,10 +331,10 @@ export const BroadcastScene: React.FC = () => {
           );
         })}
         <Note at={defaultAt} x={R0} y={y(SRC_TOPS[0]) - h(36)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>both sides large</span>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Both sides large</span>
         </Note>
         <Note at={bothAt + 4} x={R0} y={y(SRC_TOPS[3]) + h(66)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>both shuffled</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Both shuffled</span>
         </Note>
         {co.map((c, r) => {
           const p = ease(frame, bothAt + 10 + r * 3, 12);
@@ -387,14 +387,14 @@ export const BroadcastScene: React.FC = () => {
         })}
         <Note at={sortAt} x={CO_X} y={y(CO_TOPS[0]) - h(40)}>
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
-            sort each<span style={{ opacity: ease(frame, mergeAt, 10), color: OK_INK }}>, merge in one pass</span>
+            Sort each<span style={{ opacity: ease(frame, mergeAt, 10), color: OK_INK }}>, merge in one pass</span>
           </span>
         </Note>
 
         {/* What it costs here, and the rule. */}
         <Note at={anyAt} x={R0} y={y(790)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            any size
+            Any size
             <span style={{ opacity: ease(frame, twoTbAt, 10), color: ACCENT_INK, fontWeight: 500 }}>
               , but here about <Num>{BROADCAST.factTB}</Num> TB shuffled
             </span>

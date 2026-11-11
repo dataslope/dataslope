@@ -241,7 +241,7 @@ export const RagScene: React.FC = () => {
         </Note>
         <Note at={retryAt - 2} x={X0 + 760} y={noteY(3) + 10}>
           <span style={say(25, OK_INK, 600)}>
-            <Mark at={retryAt + 6} color={MARK_OK}>a retried batch overwrites</Mark>
+            <Mark at={retryAt + 6} color={MARK_OK}>A retried batch overwrites</Mark>
             <span style={{ color: INK_SOFT, opacity: ease(frame, dupAt - 2, 10), fontWeight: 500 }}>, never a second copy</span>
           </span>
         </Note>

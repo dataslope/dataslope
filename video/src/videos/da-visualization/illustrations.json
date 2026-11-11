@@ -24,6 +24,18 @@
       "category": "video-hero",
       "style": "watercolor illustration",
       "subject": "a duck standing beside a large sheet of paper on a wooden drawing board, holding a thick paintbrush in its beak, the paper painted with a simple rising line chart of three bold strokes"
+    },
+    {
+      "id": "da-visualization-dashboard",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a computer monitor on a small stand showing a live dashboard made of simple shapes: one large round gauge, a few short bars and one rising line, with no numbers, letters or words"
+    },
+    {
+      "id": "da-visualization-report",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a printed report of a few stapled pages, slightly fanned, its cover showing one simple bar chart shape above soft blocks of color standing for paragraphs, with no readable letters or words"
     }
   ]
 }

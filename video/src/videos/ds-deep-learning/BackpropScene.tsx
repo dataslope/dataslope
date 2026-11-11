@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, note } from "../../editorial/style";
 import { badgeStyle, Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
+import { I, M, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BACKPROP, PAGE_CHECK } from "./data";
@@ -16,13 +17,13 @@ const BOX_H = 80;
 /** The chain, left to right: an operation, the value it hands on, with
  *  arrows of 60 px between them (they were 20 px stubs that read as glyphs). */
 const OPS = [
-  { x: 150, w: 230, text: "w · x + b" },
-  { x: 640, w: 150, text: "sigmoid" },
-  { x: 1080, w: 220, text: "(a − y)²" },
+  { x: 150, w: 230, text: <M>w · x + b</M> },
+  { x: 640, w: 150, text: <M>sigmoid</M> },
+  { x: 1080, w: 220, text: <M>(a − y)²</M> },
 ];
 const VALS = [
-  { x: 460, name: "z" },
-  { x: 870, name: "a" },
+  { x: 460, name: <I>z</I> },
+  { x: 870, name: <I>a</I> },
   { x: 1380, name: "loss" },
 ];
 const ARROW = 60;
@@ -109,9 +110,9 @@ export const BackpropScene: React.FC = () => {
   const B = BACKPROP;
   const fwd = [num(B.z, 1), B.a.toFixed(3), B.loss.toFixed(3)];
   const slopes = [
-    { x: OPS[0].x, w: OPS[0].w, text: `∂z/∂w = ${B.dz_dw}`, at: s3At },
-    { x: OPS[1].x - 30, w: OPS[1].w + 60, text: `∂a/∂z = ${B.da_dz.toFixed(3)}`, at: s2At },
-    { x: OPS[2].x, w: OPS[2].w, text: `∂loss/∂a = ${num(B.dL_da, 3)}`, at: s1At },
+    { x: OPS[0].x, w: OPS[0].w, text: <M>{`∂z/∂w = ${B.dz_dw}`}</M>, at: s3At },
+    { x: OPS[1].x - 30, w: OPS[1].w + 60, text: <M>{`∂a/∂z = ${B.da_dz.toFixed(3)}`}</M>, at: s2At },
+    { x: OPS[2].x, w: OPS[2].w, text: <M>{`∂loss/∂a = ${num(B.dL_da, 3)}`}</M>, at: s1At },
   ];
   const mid = y(ROW) + h(BOX_H) / 2;
   const midLit = ease(frame, middleAt, 10);
@@ -133,7 +134,7 @@ export const BackpropScene: React.FC = () => {
 
         <Note at={chainAt - 2} x={X0} y={y(300)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            the chain rule, run backward:{" "}
+            The chain rule, run backward:{" "}
             <span style={{ opacity: ease(frame, sweepAt - 2, 10) }}>
               one sweep gives every weight its gradient,{" "}
               <span style={{ opacity: ease(frame, costAt - 2, 10) }}>at about the cost of the forward pass</span>
@@ -143,19 +144,21 @@ export const BackpropScene: React.FC = () => {
 
         {/* ── The forward pass, left to right ── */}
         <Tagline x={OPS[0].x + OPS[0].w / 2} y={y(ROW) - h(44)} width={OPS[0].w + 160} align="center" at={thisAt - 4} size={21} color={BLUE_INK}>
-          w = {B.w}, x = {B.x}, b = {num(B.b, 1)}
+          <M>{`w = ${B.w}, x = ${B.x}, b = ${num(B.b, 1)}`}</M>
         </Tagline>
         <Tagline x={OPS[2].x + OPS[2].w / 2} y={y(ROW) - h(44)} width={OPS[2].w} align="center" at={thisAt} size={21} color={BLUE_INK}>
-          target y = {B.y}
+          target <M>{`y = ${B.y}`}</M>
         </Tagline>
         {OPS.map((op, i) => (
-          <React.Fragment key={op.text}>
+          <React.Fragment key={op.x}>
             <Op x={op.x} w={op.w} top={y(ROW)} height={h(BOX_H)} at={chainAt + i * 4} lit={i === 1 ? midLit : 0}>
               {op.text}
             </Op>
             <ElbowArrow points={[[op.x + op.w + 8, mid], [op.x + op.w + 8 + ARROW, mid]]} at={chainAt + 2 + i * 4} color={INK_SOFT} width={2} head={11} />
             <Tagline x={VALS[i].x} y={mid - h(18)} at={chainAt + 4 + i * 4} size={26} color={BLUE_INK}>
-              {VALS[i].name} = {fwd[i]}
+              <MathRun>
+                {VALS[i].name} = {fwd[i]}
+              </MathRun>
             </Tagline>
             {i < OPS.length - 1 ? (
               <ElbowArrow points={[[OPS[i + 1].x - 8 - ARROW, mid], [OPS[i + 1].x - 8, mid]]} at={chainAt + 4 + i * 4} color={INK_SOFT} width={2} head={11} />
@@ -176,34 +179,46 @@ export const BackpropScene: React.FC = () => {
           <rect x={OPS[1].x - 40} y={y(SLOPE_Y) - 6} width={OPS[1].w + 80} height={h(40)} rx={8} style={{ fill: String(SLOPE_BADGE.background) }} />
         </Svg>
         {slopes.map((s) => (
-          <Tagline key={s.text} x={s.x + s.w / 2} y={y(SLOPE_Y)} width={s.w + 80} align="center" at={s.at - 2} size={23} color={ACCENT_INK}>
-            <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500 }}>{s.text}</span>
+          <Tagline key={s.x} x={s.x + s.w / 2} y={y(SLOPE_Y)} width={s.w + 80} align="center" at={s.at - 2} size={23} color={ACCENT_INK}>
+            {s.text}
           </Tagline>
         ))}
 
         {/* ── Multiplied: the weight's gradient, and the same by hand ── */}
         <Note at={prodAt - 2} x={X0} y={y(PRODUCT_Y)}>
-          <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK, whiteSpace: "pre", ...TABULAR, fontVariantLigatures: "none" }}>
-            ∂loss/∂w = {num(B.dL_da, 3)} × {B.da_dz.toFixed(3)} × {B.dz_dw} ={" "}
+          <MathRun style={{ fontSize: 30, color: INK, ...TABULAR }}>
+            ∂loss/∂<I>w</I> = {num(B.dL_da, 3)} × {B.da_dz.toFixed(3)} × {B.dz_dw} ={" "}
             <Mark at={prodAt + 6}>
               <span style={{ color: ACCENT_INK }}>{num(B.grad, 3)}</span>
             </Mark>
-          </span>
+          </MathRun>
         </Note>
         <Note at={handAt - 2} x={1000} y={y(PRODUCT_Y)}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Tick at={handAt + 4} size={26} />
-            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>nudging w by hand: {num(B.finiteDiff, 3)}</span>
+            <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>Nudging{" "}
+              <MathRun>
+                <I>w</I>
+              </MathRun>{" "}
+              by hand: {num(B.finiteDiff, 3)}</span>
           </div>
         </Note>
 
         {/* ── The page's own check of the middle slope ── */}
         <Tagline x={X0} y={y(PAGE_Y)} at={pageAt - 4} size={22} color={INK}>
-          the page&apos;s check:{" "}
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500 }}>σ′(z) = σ(z)(1 − σ(z))</span>
+          The page&apos;s check:{" "}
+          <MathRun>
+            <I>σ</I>′(<I>z</I>) = <I>σ</I>(<I>z</I>)(1 − <I>σ</I>(<I>z</I>))
+          </MathRun>
         </Tagline>
-        {["z", "formula", "nudged"].map((name, r) => (
-          <Tagline key={name} x={X0} y={y(PAGE_Y) + h(44) + r * h(42)} at={pageAt + r * 3} size={21}>
+        {[
+          <MathRun key="z">
+            <I>z</I>
+          </MathRun>,
+          "formula",
+          "nudged",
+        ].map((name, r) => (
+          <Tagline key={r} x={X0} y={y(PAGE_Y) + h(44) + r * h(42)} at={pageAt + r * 3} size={21}>
             {name}
           </Tagline>
         ))}

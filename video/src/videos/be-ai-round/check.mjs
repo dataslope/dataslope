@@ -160,6 +160,10 @@ c["inputShareOfTokens"] = c["inputTokens"] / (c["inputTokens"] + c["outputTokens
 c["outputPerTokenRatio"] = c["priceOut"] / c["priceIn"]
 c["halvePromptSaves"] = c["daily"] - daily_cost(c["inputTokens"] / 2, c["outputTokens"])
 c["halveAnswerSaves"] = c["daily"] - daily_cost(c["inputTokens"], c["outputTokens"] / 2)
+# Per request, in dollars and in cents: the figure set against what a user
+# is worth.
+c["perRequest"] = c["daily"] / c["requestsPerDay"]
+c["perRequestCents"] = round(c["perRequest"] * 100, 4)
 
 # The retry simulation: N requests rejected together at t = 0, each retrying
 # up to three times after a backoff of 1, 2, then 4 seconds. Without jitter
@@ -226,7 +230,7 @@ const results = {
   prompt: { weak, better, fence: promptLines },
   design: { nodes, edges },
   cost: { code: costCode.split("\n"), ...out.cost },
-  retry: out.retry,
+  retry: { ...out.retry, peakRatio: out.retry.plain[0].busiest / out.retry.jitter[0].busiest },
   practice,
   pageSays: PAGE_SAYS,
 };
@@ -245,6 +249,8 @@ const expect = [
   ["an output token costs five input tokens", c.outputPerTokenRatio === 5],
   ["halving the prompt saves a thousand", c.halvePromptSaves === 1000],
   ["halving the answer saves seven fifty", c.halveAnswerSaves === 750],
+  ["a request costs about a third of a cent", c.perRequestCents > 0.3 && c.perRequestCents < 0.4],
+  ["jitter's peak is nearly nine times lower", results.retry.peakRatio > 8.5 && results.retry.peakRatio < 9],
   ["without jitter every wave is one instant", results.retry.plain.every((w) => w.busiest === 1000)],
   ["every topic page has concept checks", practice.checkPages === practice.topicPages],
   ["most topic pages have code that runs", practice.runnablePages > practice.topicPages / 2 && practice.runnablePages < practice.topicPages],
@@ -284,6 +290,8 @@ const claims = [
   ["cost-past", "seven hundred and fifty"],
   ["design-jitter", results.retry.n === 1000 ? "a thousand requests" : `${results.retry.n} requests`],
   ["design-jitter", `more than ${below1000(jitterFirst)}`],
+  ["design-herd", "nearly nine times lower"],
+  ["cost-cent", "about a third of a cent"],
   ["daily-metr", "nineteen percent longer"],
   ["daily-metr", "about twenty percent faster"],
   ["close-practice", `${below1000(practice.bank)} multiple-choice`],

@@ -75,7 +75,7 @@ export const BlockScene: React.FC = () => {
   const stalled = ease(frame, stallsAt, 10) * (1 - flow);
   const callX = lerp(AXIS.x, POOL.x + 24, moved);
   const callY = lerp(laneY, y(POOL.y) + h(46), moved);
-  const callText = frame >= heavyAt ? "a heavy computation" : frame >= httpAt ? "a sync HTTP request" : "time.sleep(…)";
+  const callText = frame >= heavyAt ? "a heavy computation" : frame >= httpAt ? "a sync HTTP request" : "a blocking sleep";
 
   return (
     <AbsoluteFill>
@@ -139,11 +139,11 @@ export const BlockScene: React.FC = () => {
         <MsAxis axis={AXIS} y={rowY("b") + rowH + h(26)} to={serial} at={swapAt + 4} />
         <Note at={thirtyAt} x={RIGHT_X} y={rowY("a") + h(4)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            blocking: <Num>{serial}</Num> ms
+            Blocking: <Num>{serial}</Num> ms
           </span>
         </Note>
         <Note at={addUpAt} x={RIGHT_X} y={rowY("a") + h(44)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>the waits add up instead of overlapping</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>The waits add up instead of overlapping</span>
         </Note>
 
         {/* In a server: one call, and every request on the loop behind it. */}
@@ -168,7 +168,7 @@ export const BlockScene: React.FC = () => {
                 top: laneY + 7,
                 width: 84,
                 height: laneH - 14,
-                borderRadius: 8,
+                borderRadius: 5,
                 boxSizing: "border-box",
                 border: `2.5px solid ${done > 0.5 ? OK : stalled > 0.5 ? ds("gray", 400) : BAR}`,
                 background: done > 0.5 ? tint(OK, 16) : stalled > 0.5 ? ds("gray", 100) : tint(BAR, 12),
@@ -199,7 +199,7 @@ export const BlockScene: React.FC = () => {
             top: callY + 4,
             width: CALL_W,
             height: laneH - 8,
-            borderRadius: 8,
+            borderRadius: 5,
             boxSizing: "border-box",
             border: `2.5px solid ${moved > 0.5 ? INK : ACCENT}`,
             background: moved > 0.5 ? PAPER : tint(ACCENT, 30),
@@ -213,10 +213,10 @@ export const BlockScene: React.FC = () => {
         </div>
         <Flow points={[[POOL.x - 8, laneY + laneH / 2], [AXIS.x + 916, laneY + laneH / 2]]} at={awaitAt} color={OK} width={2.8} dash="8 6" />
         <Note at={awaitAt + 6} x={AXIS.x} y={laneY + laneH + h(26)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>await its result: the loop runs on</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Await its result: the loop runs on</span>
         </Note>
         <Note at={poolAt + 6} x={POOL.x} y={y(POOL.y + POOL.h) + h(14)}>
-          <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK_SOFT, whiteSpace: "nowrap" }}>loop.run_in_executor(…)</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>runs off the loop&apos;s thread; the loop doesn&apos;t wait</span>
         </Note>
         <Note at={libsAt} x={POOL.x} y={y(612)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The fix: async-native libraries, or</span>

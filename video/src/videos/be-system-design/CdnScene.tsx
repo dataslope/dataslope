@@ -103,8 +103,8 @@ export const CdnScene: React.FC = () => {
   const pxPerMs = (BAR_END - BAR_X) / DISTANCE.roundTripMs;
   const rows = [
     { at: msAt, text: "Sydney to Virginia, round trip", ms: DISTANCE.roundTripMs, value: <>at least <Num>{Math.round(DISTANCE.roundTripMs)}</Num> ms</>, color: BAR },
-    { at: hundredAt, text: "inside the data center", ms: LADDER.path.hitMs, value: <>≈ <Num>{LADDER.path.hitMs}</Num> ms</>, color: BAR },
-    { at: edgeAt, text: "an edge server across town", ms: DISTANCE.edgeRoundTripMs, value: <>under <Num>1</Num> ms</>, color: OK },
+    { at: hundredAt, text: "Inside the data center", ms: LADDER.path.hitMs, value: <>≈ <Num>{LADDER.path.hitMs}</Num> ms</>, color: BAR },
+    { at: edgeAt, text: "An edge server across town", ms: DISTANCE.edgeRoundTripMs, value: <>under <Num>1</Num> ms</>, color: OK },
   ];
   const rowY = (i: number) => y(712) + i * 54;
 
@@ -140,8 +140,9 @@ export const CdnScene: React.FC = () => {
           })}
           <circle cx={ox} cy={oy} r={10 * ease(frame, originAt, 10)} fill={BLUE_INK} stroke={PAPER} strokeWidth={2.5} />
           <circle cx={ux} cy={uy} r={10 * ease(frame, sydneyAt, 10)} fill={INK} stroke={PAPER} strokeWidth={2.5} />
-          {/* The edge server across town. */}
-          <circle cx={ux + 16} cy={uy - 14} r={8 * ease(frame, edgeAt + 4, 10)} fill={OK} stroke={PAPER} strokeWidth={2} />
+          {/* The edge server across town: west of the user, clear of the arc,
+              which leaves Sydney to the north-east. */}
+          <circle cx={ux - 18} cy={uy - 12} r={8 * ease(frame, edgeAt + 4, 10)} fill={OK} stroke={PAPER} strokeWidth={2} />
         </svg>
         <Line x={MAP_X + ox + 18} y={top + oy - 14} at={originAt + 2} size={21} weight={500} color={BLUE_INK} style={halo}>
           origin
@@ -153,7 +154,7 @@ export const CdnScene: React.FC = () => {
         <Line x={MAP_X + mid[0]} y={top + mid[1] + 18} at={msAt + 4} size={24} weight={500} color={BLUE_INK} style={halo}>
           ≥ <Num>{Math.round(DISTANCE.roundTripMs)}</Num> ms round trip
         </Line>
-        <Line x={MAP_X + ux + 30} y={top + uy - 54} at={underAt} size={21} weight={500} color={OK_INK} style={halo}>
+        <Line x={MAP_X + ux - 34} y={top + uy - 56} at={underAt} size={21} weight={500} color={OK_INK} style={halo} align="right">
           edge
         </Line>
 
@@ -162,18 +163,18 @@ export const CdnScene: React.FC = () => {
           Content delivery network
         </Line>
         <Line x={RX} y={top + 58} at={edgesAt} size={23} color={INK_SOFT} width={440}>
-          <span style={{ color: OK_INK, fontWeight: 500 }}>edge servers</span> close to your users, caching what your{" "}
+          <span style={{ color: OK_INK, fontWeight: 500 }}>Edge servers</span> close to your users, caching what your{" "}
           <span style={{ color: BLUE_INK, fontWeight: 500, opacity: ease(frame, originAt, 10) }}>origin</span>
           <span style={{ opacity: ease(frame, originAt, 10) }}> serves</span>
         </Line>
         <Line x={RX} y={top + 190} at={lightAt} size={24} weight={500}>
-          light in fiber: about <Num>{DISTANCE.kmPerMs}</Num> km per ms
+          Light in fiber: about <Num>{DISTANCE.kmPerMs}</Num> km per ms
         </Line>
         <Line x={RX} y={top + 236} at={msAt} size={24} weight={500} color={BLUE_INK}>
           <Num>{int(kmShown)}</Num> km ÷ <Num>{DISTANCE.kmPerMs}</Num> km/ms × <Num>2</Num> ≈ <Num>{Math.round(DISTANCE.roundTripMs)}</Num> ms
         </Line>
         <Line x={RX} y={top + 282} at={floorAt} size={21} color={INK_SOFT}>
-          <span style={{ opacity: ease(frame, msAt + 10, 10) }}>a floor set by physics, not a measurement</span>
+          <span style={{ opacity: ease(frame, msAt + 10, 10) }}>A floor set by physics, not a measurement</span>
         </Line>
 
         {/* One scale: the trip, the data center, the edge. */}
@@ -193,7 +194,7 @@ export const CdnScene: React.FC = () => {
           );
         })}
         <Line x={BAR_END} y={rowY(2) + 34} at={hundredAt + 10} size={21} color={INK_SOFT} align="right">
-          all three drawn to one scale
+          All three drawn to one scale
         </Line>
       </Drift>
     </AbsoluteFill>

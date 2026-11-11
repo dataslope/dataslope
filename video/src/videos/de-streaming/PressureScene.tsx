@@ -293,16 +293,16 @@ export const PressureScene: React.FC = () => {
           at={modelAt}
         />
         <Note at={modelAt + 2} x={X0} y={sy.b - h(4)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>model</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Model</span>
         </Note>
         <Note at={hundredAt} x={X0} y={sy.b + h(36)}>
           <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            in: about <Num>{BACKPRESSURE.rate}</Num> a second
+            In: about <Num>{BACKPRESSURE.rate}</Num> a second
           </span>
         </Note>
         <Note at={eightyAt} x={X0} y={sy.b + h(70)}>
           <span style={{ ...label(20, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            handled: <Num>{BACKPRESSURE.one}</Num> a second
+            Handled: <Num>{BACKPRESSURE.one}</Num> a second
           </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
@@ -326,7 +326,7 @@ export const PressureScene: React.FC = () => {
         </Note>
         <Note at={risingAt} x={1460} y={y(660)}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            rising lag:
+            Rising lag:
             <br />
             more partitions and consumers,
             <br />

@@ -162,7 +162,7 @@ export const JoinScene: React.FC = () => {
             takes the lower half. ── */}
         <Note at={hashAt} x={OUT_X} y={costTop}>
           <span style={{ ...note(30, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            hash join{" "}
+            Hash join{" "}
             <Mark at={plusAt} color={MARK_OK}>
               <i>O</i>(<i>n</i> + <i>m</i>)
             </Mark>
@@ -170,7 +170,7 @@ export const JoinScene: React.FC = () => {
         </Note>
         <Note at={everyAt} x={OUT_X} y={costTop + h(50)}>
           <span style={{ ...note(30, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            every pair{" "}
+            Every pair{" "}
             <Mark at={timesAt} color={MARK_BAD}>
               <i>O</i>(<i>n</i> × <i>m</i>)
             </Mark>

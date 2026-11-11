@@ -82,10 +82,10 @@ export const AxisScene: React.FC = () => {
         <YTicks ticks={[0, 25, 50, 75, 100]} x={LEFT.x0} base={base} top={top} lo={0} hi={T.top} at={asked - 4} out={out6} />
         <BarSet values={scores} labels={teams} x0={LEFT.x0} x1={LEFT.x1} base={base} top={top} lo={0} hi={T.top} at={fiveAt - 2} out={out6} />
         <Verdict ok x={LEFT.x0} y={base + h(50)} at={honestAt} out={out6}>
-          about {fmt(T.realPct, 1)}% apart, and it looks it
+          About {fmt(T.realPct, 1)}% apart, and it looks it
         </Verdict>
         <Note at={equalAt} x={LEFT.x1 - 140} y={top - h(70)} out={out6}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>nearly equal</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Nearly equal</span>
         </Note>
 
         <PanelTitle x={RIGHT.x0} y={top - h(70)} at={cropAt - 4} out={out6}>
@@ -94,10 +94,10 @@ export const AxisScene: React.FC = () => {
         <YTicks ticks={[94, 96, 98, 100]} x={RIGHT.x0} base={base} top={top} lo={T.crop} hi={T.top} at={cropAt} out={out6} color={ACCENT_INK} />
         <BarSet values={scores} labels={teams} x0={RIGHT.x0} x1={RIGHT.x1} base={base} top={top} lo={T.crop} hi={T.top} at={cropAt + 2} out={out6} />
         <Verdict ok={false} x={RIGHT.x0} y={base + h(50)} at={fiftyAt} out={out6}>
-          the top bar {T.croppedRatio} times as tall
+          The top bar {T.croppedRatio} times as tall
         </Verdict>
         <Note at={lengthAt} x={RIGHT.x0} y={base + h(96)} out={out6}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>a bar&apos;s length is its value: bars start at zero</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>A bar&apos;s length is its value: bars start at zero</span>
         </Note>
 
         {/* ── Question 7: a year of scores on an axis from 92, each drawn as its rule is said ── */}
@@ -119,7 +119,7 @@ export const AxisScene: React.FC = () => {
         />
         <BarSet values={B.score} labels={B.months.map((m) => m[0])} x0={LEFT.x0} x1={LEFT.x1} base={base} top={top} lo={B.floor} hi={98} at={barsRuleAt + 2} step={1} dim={axisAt - 4} />
         <Verdict ok={false} x={LEFT.x0} y={base + h(50)} at={tallAt}>
-          bars are length: a {fmt(B.risePct, 1)}% rise, the last bar {fmt(B.barRatio, 2)} times as tall
+          Bars are length: a {fmt(B.risePct, 1)}% rise, the last bar {fmt(B.barRatio, 2)} times as tall
         </Verdict>
         <YTicks
           ticks={[92, 94, 96, 98]}
@@ -133,12 +133,12 @@ export const AxisScene: React.FC = () => {
         />
         <LineSet values={B.score} x0={RIGHT.x0} x1={RIGHT.x1} base={base} top={top} lo={B.floor} hi={98} at={positionAt + 2} labels={B.months.map((m) => m[0])} />
         <Verdict ok x={RIGHT.x0} y={base + h(50)} at={asLineAt + 10}>
-          lines are position: a slope you can read
+          Lines are position: a slope you can read
         </Verdict>
         {/* The rule is for both panels, so it sits under both. */}
         <Note at={labelAt - 2} x={LEFT.x0} y={base + h(104)} width={RIGHT.x1 - LEFT.x0} from="up" style={{ textAlign: "center" }}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <Mark at={bridgeAt + 2}>either way, label the axis</Mark>
+            <Mark at={bridgeAt + 2}>Either way, label the axis</Mark>
           </span>
         </Note>
       </Drift>

@@ -398,6 +398,63 @@
               "Article 99961"
             ]
           ]
+        },
+        "tieScan": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT id, title FROM articles\nWHERE (created_at, id) < (TIMESTAMP '2024-04-11 20:45:00', 90021)\nORDER BY created_at DESC, id DESC\nLIMIT 20;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Limit (actual rows=20.00 loops=1)"
+            ],
+            [
+              "  ->  Sort (actual rows=20.00 loops=1)"
+            ],
+            [
+              "        Sort Key: created_at DESC, id DESC"
+            ],
+            [
+              "        Sort Method: top-N heapsort  Memory: 19kB"
+            ],
+            [
+              "        ->  Seq Scan on articles (actual rows=90020.00 loops=1)"
+            ],
+            [
+              "              Filter: (ROW(created_at, id) < ROW('2024-04-11 20:45:00'::timestamp without time zone, 90021))"
+            ],
+            [
+              "              Rows Removed by Filter: 9981"
+            ]
+          ]
+        },
+        "tieIndex": {
+          "sql": "CREATE INDEX articles_created_id ON articles (created_at, id);",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "tieSeek": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT id, title FROM articles\nWHERE (created_at, id) < (TIMESTAMP '2024-04-11 20:45:00', 90021)\nORDER BY created_at DESC, id DESC\nLIMIT 20;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Limit (actual rows=20.00 loops=1)"
+            ],
+            [
+              "  ->  Index Scan Backward using articles_created_id on articles (actual rows=20.00 loops=1)"
+            ],
+            [
+              "        Index Cond: (ROW(created_at, id) < ROW('2024-04-11 20:45:00'::timestamp without time zone, 90021))"
+            ],
+            [
+              "        Index Searches: 1"
+            ]
+          ]
         }
       },
       "version": "PostgreSQL 18.3"

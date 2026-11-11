@@ -152,7 +152,7 @@ export const ConcScene: React.FC = () => {
                   width: SLICE * p,
                   height: laneH,
                   boxSizing: "border-box",
-                  borderRadius: 7,
+                  borderRadius: 5,
                   border: `2.5px solid ${th.fill}`,
                   background: tint(th.fill, 32),
                   display: "flex",
@@ -257,6 +257,9 @@ export const ConcScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", fontFamily: SANS }}>
             <b>Amdahl&apos;s law</b>: speedup = 1 / (s + (1 − s) / n)
           </span>
+        </Note>
+        <Note at={lawAt + 10} x={CX0} y={y(856)}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", fontFamily: SANS }}>s: the share that can&apos;t be split · n: the cores</span>
         </Note>
       </Drift>
     </AbsoluteFill>

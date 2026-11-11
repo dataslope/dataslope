@@ -48,7 +48,7 @@ const Degenerate: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <TableName g={gd} at={groupAt - 10}>
-        grouped by it, no join
+        Grouped by it, no join
       </TableName>
       <DataTable g={gd} cols={colsOf(D)} at={groupAt - 10} rows={D.rows.map((cells, i) => ({ cells, at: groupAt - 6 + i * 3 }))} />
     </>
@@ -96,7 +96,7 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={flagsAt} x={R_X} y={top - c.h(56)}>
-        <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>small flags, each a column on the fact</span>
+        <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Small flags, each a column on the fact</span>
       </Note>
       {/* Three columns of value chips, a "×" between them, then "=" and
           the count on a line of its own with its label under it. Every gap
@@ -126,7 +126,7 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
       </div>
       <Note at={oneAt} x={R_X} y={c.y(660)}>
         <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          the fact carries one <QMono>junk_key</QMono> instead of three columns
+          The fact carries one <QMono>junk_key</QMono> instead of three columns
         </span>
       </Note>
     </>
@@ -175,7 +175,7 @@ const Role: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <TableName g={gr} at={orderAt}>
-        joined twice
+        Joined twice
       </TableName>
       <DataTable
         g={gr}
@@ -235,7 +235,7 @@ const Mini: React.FC<{ c: Ctx }> = ({ c }) => {
       <Relation name="customer to fact" points={[cA, [1290, cA[1]], [1290, fA[1]], fA]} from="exactly-one" to="zero-or-many" at={bigAt + 6} />
       <Relation name="demographics to fact" points={[dA, [1240, dA[1]], [1240, fB[1]], fB]} from="exactly-one" to="zero-or-many" at={keyAt + 2} />
       <Note at={ageAt} x={R_X} y={c.y(340)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>age band, income tier: change often</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Age band, income tier: change often</span>
       </Note>
       <Note at={twentyAt} x={dimD.x} y={dimD.bottom + c.h(14)}>
         <span style={{ ...note(23, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
@@ -247,7 +247,7 @@ const Mini: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={stopsAt} x={R_X} y={fact.bottom + c.h(30)}>
         <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          no new customer version
+          No new customer version
           <br />
           when a band changes
         </span>
@@ -279,7 +279,7 @@ const Factless: React.FC<{ c: Ctx }> = ({ c }) => {
       </TableName>
       <DataTable g={ga} cols={colsOf(A)} at={noneAt - 2} rows={A.rows.map((cells, i) => ({ cells, at: eventAt + i * 4 }))} />
       <Note at={noneAt + 6} x={ga.x} y={ga.rowTop(A.rows.length) + c.h(16)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>names stand in for keys; no measure column</span>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Names stand in for keys; no measure column</span>
       </Note>
       {/* The code at 23px, so QMono's 0.92em stays well above 19px. */}
       <TableName g={gx} at={coverAt}>
@@ -375,7 +375,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={costAt} x={R_X} y={barTop - c.h(48)}>
         <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          primary key index, <Num>100,000</Num> rows, Postgres
+          Primary key index, <Num>100,000</Num> rows, Postgres
         </span>
       </Note>
       {bars.map((b) => {
@@ -477,9 +477,9 @@ export const RapidScene: React.FC = () => {
     { n: 15, label: "Sequence or UUID", at: n.word("r-uuid", "a surrogate key from a sequence"), body: <Uuid c={c} /> },
   ];
   const steps = [
-    { text: "close a version", at: closeAt },
-    { text: "insert a placeholder", at: placeAt },
-    { text: "split a weight", at: splitAt },
+    { text: "Close a version", at: closeAt },
+    { text: "Insert a placeholder", at: placeAt },
+    { text: "Split a weight", at: splitAt },
   ];
 
   return (

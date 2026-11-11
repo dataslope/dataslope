@@ -7,8 +7,9 @@ import { TABULAR } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { TRAVERSAL } from "./data";
-import { ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Cell, Drift, Edge, GraphNode, HIGHLIGHT, INK_SOFT, Line, OK_INK, Svg, int, VRule } from "./parts";
+import { CHAIN, TRAVERSAL } from "./data";
+import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Cell, Drift, Edge, Flow, GraphNode, HIGHLIGHT, INK_SOFT, Line, OK_INK, Svg, int, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 type P = readonly [number, number];
 /** The page's graph, a diamond: A over B and C, both over D. */
@@ -21,6 +22,9 @@ const diamond = (cx: number, top: number): Record<string, P> => ({
 /** The million-node tree, drawn as a triangle of its twenty levels. */
 const TREE = { apexX: 1430, x0: 1090, x1: 1770 };
 const CELLS = 8;
+/** What the queue holds, for the drawing: letters, so a cell can be followed
+ *  as it shifts. */
+const QUEUED = "ABCDEFGH";
 
 /**
  * Question 5, with the deque answered inside it. The page's graph twice,
@@ -41,7 +45,10 @@ export const BfsScene: React.FC = () => {
   const breadthAt = n.word("bfs", "Breadth-first search takes a queue");
   const depthAt = n.word("bfs", "Depth-first takes a stack");
   const w = (word: string, nth: number) => n.word("bfs-graph", word, { nth });
-  const nodeAt = { A: w("A", 1), B: w("B", 1), C: w("C", 1), D: w("D", 1) } as Record<string, number>;
+  // Each graph inks in as its search is defined, so the definitions have a
+  // picture; the visiting orders are then read onto them.
+  const leftAt = { A: breadthAt + 4, B: breadthAt + 8, C: breadthAt + 12, D: breadthAt + 16 } as Record<string, number>;
+  const rightAt = { A: depthAt + 4, B: depthAt + 8, C: depthAt + 12, D: depthAt + 16 } as Record<string, number>;
   const bfsAt = { A: w("A", 2), B: w("B", 2), C: w("C", 2), D: w("D", 2) } as Record<string, number>;
   const dfsAt = { A: w("A", 3), B: w("B", 3), D: w("D", 3), C: w("C", 3) } as Record<string, number>;
   const shortAt = n.word("bfs-short", "Choose BFS for shortest paths");
@@ -51,6 +58,8 @@ export const BfsScene: React.FC = () => {
   const treeAt = n.word("bfs-memory", "On a full binary tree of a million nodes");
   const widestAt = n.word("bfs-memory", "BFS holds the widest level");
   const pathAt = n.word("bfs-memory", "DFS holds one path");
+  const flipsAt = n.word("bfs-chain", "On a long chain it flips");
+  const wholeAt = n.word("bfs-chain", "DFS the whole chain");
   const dequeAt = n.word("bfs-deque", "And make the queue a deque");
   const poppingAt = n.word("bfs-deque", "Popping a Python list's front");
   const billionAt = n.word("bfs-deque", "two hundred seventy-five billion moves here");
@@ -66,7 +75,7 @@ export const BfsScene: React.FC = () => {
 
   // The tree.
   const apexY = y(392);
-  const baseY = y(640);
+  const baseY = y(604);
   const lv = (k: number) => apexY + ((baseY - apexY) * k) / (TRAVERSAL.levels - 1);
   const half = (k: number) => ((TREE.x1 - TREE.x0) / 2) * (k / (TRAVERSAL.levels - 1));
   const tri = ease(frame, treeAt, 18);
@@ -82,8 +91,8 @@ export const BfsScene: React.FC = () => {
   const shown = Math.max(1, Math.round(dfsP * path.length));
 
   // The queue rows: a list's pop shifts every cell; a deque's front detaches.
-  const rowY1 = y(752);
-  const rowY2 = y(828);
+  const rowY1 = y(754);
+  const rowY2 = rowY1 + 90;
   const cx0 = 360;
   const pop1 = ease(frame, poppingAt + 8, 12);
   const shift = ease(frame, poppingAt + 18, 16);
@@ -114,22 +123,22 @@ export const BfsScene: React.FC = () => {
 
         {/* The page's graph, numbered both ways. */}
         {[
-          { g: left, title: "Breadth-first", order: bfsOrder, at: bfsAt, titleAt: bfsAt.A - 4, side: "right" as const },
-          { g: right, title: "Depth-first", order: dfsOrder, at: dfsAt, titleAt: dfsAt.A - 4, side: "right" as const },
+          { g: left, title: "Breadth-first", order: bfsOrder, at: bfsAt, titleAt: bfsAt.A - 4, nodeAt: leftAt },
+          { g: right, title: "Depth-first", order: dfsOrder, at: dfsAt, titleAt: dfsAt.A - 4, nodeAt: rightAt },
         ].map((v) => (
           <React.Fragment key={v.title}>
             <Line at={v.titleAt} x={v.g.A[0] - 130} y={gTop - 76} size={22} weight={500}>
               {v.title}: {v.order.join(", ")}
             </Line>
             {edges.map(([a, b]) => (
-              <Edge key={`${a}${b}`} from={v.g[a]} to={v.g[b]} at={nodeAt[b] + 2} color={INK_SOFT} width={2.4} />
+              <Edge key={`${a}${b}`} from={v.g[a]} to={v.g[b]} at={v.nodeAt[b] + 2} color={INK_SOFT} width={2.4} />
             ))}
             {(["A", "B", "C", "D"] as const).map((k) => (
               <GraphNode
                 key={k}
                 x={v.g[k][0]}
                 y={v.g[k][1]}
-                at={nodeAt[k]}
+                at={v.nodeAt[k]}
                 name={k}
                 tone={frame >= v.at[k] ? "data" : "plain"}
                 badge={v.order.indexOf(k) + 1}
@@ -140,15 +149,15 @@ export const BfsScene: React.FC = () => {
             ))}
           </React.Fragment>
         ))}
-        <Line at={shortAt} x={140} y={y(650)} size={24}>
+        <Line at={shortAt} x={140} y={y(626)} size={24}>
           <b style={{ color: BLUE_INK }}>BFS</b>: shortest paths, unweighted<span style={{ opacity: ease(frame, fewestAt, 10) }}>; fewest edges first</span>
         </Line>
-        <Line at={dfsForAt} x={140} y={y(692)} size={24}>
+        <Line at={dfsForAt} x={140} y={y(666)} size={24}>
           <b style={{ color: BLUE_INK }}>DFS</b>: cycle detection, topological sort, backtracking
         </Line>
 
-        <VRule x={510} top={gTop - 76} bottom={gTop + 250} at={nodeAt.A} />
-        <VRule x={985} top={apexY - 72} bottom={baseY + 96} at={memoryAt} />
+        <VRule x={510} top={gTop - 76} bottom={gTop + 250} at={rightAt.A} />
+        <VRule x={985} top={apexY - 72} bottom={baseY + 138} at={memoryAt} />
 
         {/* Memory: a million-node tree. */}
         <Line at={memoryAt} x={TREE.x0} y={apexY - 72} size={22} weight={500}>
@@ -179,6 +188,16 @@ export const BfsScene: React.FC = () => {
         <Line at={pathAt} x={TREE.x0} y={baseY + 64} size={24}>
           DFS stack: one path, <b style={{ ...TABULAR, color: BLUE_INK }}>{TRAVERSAL.dfsPeak}</b> nodes
         </Line>
+        {/* The other shape, where it flips. */}
+        <Line at={flipsAt} x={TREE.x0} y={baseY + 106} size={24}>
+          A chain of <Num>{int(CHAIN.nodes)}</Num>: BFS <b style={{ ...TABULAR, color: BLUE_INK }}>{CHAIN.bfsPeak}</b>
+          <span style={{ opacity: ease(frame, wholeAt, 10) }}>
+            , DFS <b style={{ ...TABULAR, color: ACCENT_INK }}>{int(CHAIN.dfsPath)}</b>
+          </span>
+        </Line>
+        <Line at={dequeAt - 4} x={140} y={rowY1 - 48} size={22} weight={500} color={ACCENT_INK}>
+          Also asked: What is a deque, and when should you prefer it over a list?
+        </Line>
 
         {/* The queue itself: list or deque. */}
         <Line at={poppingAt - 2} x={140} y={rowY1 + 14} size={23} weight={500}>
@@ -193,7 +212,8 @@ export const BfsScene: React.FC = () => {
               x={cx0 + i * 76}
               y={rowY1}
               at={dequeAt + i * 2}
-              value=""
+              value={QUEUED[i]}
+              size={22}
               w={64}
               h={52}
               tone={first ? "look" : "data"}
@@ -202,8 +222,12 @@ export const BfsScene: React.FC = () => {
             />
           );
         })}
+        {/* Each cell behind the popped one moves a place: an arrow under each. */}
+        {Array.from({ length: CELLS - 1 }, (_, i) => (
+          <Flow key={`s${i}`} points={[[cx0 + (i + 1) * 76 + 46, rowY1 + 71], [cx0 + (i + 1) * 76 - 12, rowY1 + 71]]} at={poppingAt + 18 + i * 2} dur={10} color={ACCENT} width={2} head={9} />
+        ))}
         <Line at={poppingAt + 18} x={cx0 + CELLS * 76 + 20} y={rowY1 + 12} size={23} color={ACCENT_INK} weight={500}>
-          every item behind it shifts
+          Every item behind it shifts
           <span style={{ opacity: ease(frame, billionAt, 10) }}>
             : <b style={TABULAR}>{int(TRAVERSAL.listShifts)}</b> moves for this tree
           </span>
@@ -219,7 +243,8 @@ export const BfsScene: React.FC = () => {
               x={cx0 + i * 76}
               y={rowY2}
               at={dequeAt + 6 + i * 2}
-              value=""
+              value={QUEUED[i]}
+              size={22}
               w={64}
               h={52}
               tone={first ? "look" : "data"}
@@ -229,7 +254,7 @@ export const BfsScene: React.FC = () => {
           );
         })}
         <Line at={eitherAt + 6} x={cx0 + CELLS * 76 + 20} y={rowY2 + 12} size={23} color={OK_INK} weight={500}>
-          pops either end in O(1)
+          Pops either end in <M>O(1)</M>
         </Line>
       </Drift>
     </AbsoluteFill>

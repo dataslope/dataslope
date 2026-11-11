@@ -38,13 +38,20 @@ const Locks: React.FC<{ c: Ctx }> = ({ c }) => {
   const reAt = c.w("r-lock", "a reentrant lock can be taken again");
   const recAt = c.w("r-lock", "recursive code doesn't deadlock on itself");
   const { limit, downloads, peak } = SEMAPHORE;
-  // Twelve downloads through five slots, a wave at a time.
-  const WAVE = 30;
-  const waves = Math.ceil(downloads / limit);
-  // The twelve go through, five at most at a time, and then again, so the
-  // slots keep moving while the answer is up.
-  const tau = Math.max(0, frame - fiveAt - 6) % (waves * WAVE + 24);
-  const wave = Math.floor(tau / WAVE);
+  // Twelve downloads through five slots. Each slot starts a little after the
+  // one before, so each frees on its own and the next download waiting takes
+  // it at once: a semaphore hands back one permit per finished download, not
+  // five at a time. Download k is slot k % 5's round k / 5; the start times
+  // rise with k, so this is first come, first served.
+  const DL = 30;
+  const STAGGER = 6;
+  const startOf = (k: number) => (k % limit) * STAGGER + Math.floor(k / limit) * DL;
+  const lastEnd = startOf(downloads - 1) + DL;
+  // Then again, so the slots keep moving while the answer is up.
+  const tau = Math.max(0, frame - fiveAt - 6) % (lastEnd + 24);
+  const running = (k: number) => tau >= startOf(k) && tau < startOf(k) + DL;
+  const doneN = Array.from({ length: downloads }, (_, k) => k).filter((k) => tau >= startOf(k) + DL).length;
+  const waitingN = Array.from({ length: downloads }, (_, k) => k).filter((k) => tau < startOf(k)).length;
   const slotY = c.y(548);
   const slotH = c.h(46);
   return (
@@ -69,20 +76,20 @@ const Locks: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       {Array.from({ length: limit }, (_, s) => {
-        const k = wave * limit + s;
-        const live = frame >= fiveAt + 6 && wave < waves && k < downloads;
+        const k = Array.from({ length: downloads }, (_, j) => j).find((j) => j % limit === s && running(j)) ?? -1;
+        const live = frame >= fiveAt + 6 && k >= 0;
         return (
           <Node key={s} x={R_X + s * 84} y={slotY} w={74} h={slotH} at={fiveAt + s * 2} tone="data" fill="transparent" line={live ? BAR : HAIRLINE} stroke={1.5} title={live ? <Num>{k + 1}</Num> : ""} size={22} />
         );
       })}
       <Note at={fiveAt + 10} x={R_X + limit * 84 + 20} y={slotY + slotH / 2 - 15}>
         <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-          waiting: <Num>{Math.max(0, downloads - Math.min(downloads, (Math.min(wave, waves - 1) + 1) * limit))}</Num>, done: <Num>{Math.min(downloads, Math.min(wave, waves) * limit)}</Num>
+          waiting: <Num>{waitingN}</Num>, done: <Num>{doneN}</Num>
         </span>
       </Note>
       <Note at={fiveAt + 24} x={R_X} y={slotY + slotH + c.h(14)}>
         <span style={{ ...note(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          run on asyncio: never more than <Num>{peak}</Num> of the <Num>{downloads}</Num> in flight
+          Run for real: never more than <Num>{peak}</Num> of the <Num>{downloads}</Num> in flight
         </span>
       </Note>
 
@@ -112,11 +119,24 @@ const Atomic: React.FC<{ c: Ctx }> = ({ c }) => {
   const indivAt = c.w("r-atomic", "one indivisible step");
   const halfAt = c.w("r-atomic", "no other thread can see it half done");
   const notAt = c.w("r-atomic", "Adding one to the counter isn't atomic");
-  const casAt = c.w("r-atomic", "Compare-and-swap instructions make it so");
-  const lockAt = c.w("r-atomic", "or a lock held around the whole thing");
+  const casAt = c.w("r-cas", "An atomic add instruction makes it so");
+  const cmpAt = c.w("r-cas", "compare-and-swap");
+  const onlyAt = c.w("r-cas", "write only if the value is unchanged");
+  const retryAt = c.w("r-cas", "retry if not");
+  const lockAt = c.w("r-cas", "hold a lock around all three");
   const fuse = ease(frame, casAt + 4, 18);
-  const rowY = c.y(476);
+  const rowY = c.y(456);
   const chipH = c.h(56);
+  // Compare-and-swap, under it: read, compute, then a write that only lands
+  // if the value is still what was read; otherwise round again.
+  const casY = c.y(606);
+  const casH = c.h(50);
+  const CAS = [
+    { x: R_X + 284, w: 126, text: "read: 5", at: cmpAt + 4 },
+    { x: R_X + 424, w: 126, text: "add: 6", at: cmpAt + 8 },
+    { x: R_X + 564, w: 270, text: "write 6, only if still 5", at: onlyAt },
+  ];
+  const loopY = casY + casH + c.h(30);
   return (
     <>
       <Lead at={opAt} c={c} term="Atomic">
@@ -145,7 +165,7 @@ const Atomic: React.FC<{ c: Ctx }> = ({ c }) => {
               border: `2.5px solid ${fuse > 0.5 ? OK : ACCENT}`,
               borderLeftWidth: fuse > 0.9 && s > 0 ? 0 : 2.5,
               borderRightWidth: fuse > 0.9 && s < 2 ? 0 : 2.5,
-              borderRadius: fuse > 0.9 ? (s === 0 ? "8px 0 0 8px" : s === 2 ? "0 8px 8px 0" : 0) : 8,
+              borderRadius: fuse > 0.9 ? (s === 0 ? "5px 0 0 5px" : s === 2 ? "0 5px 5px 0" : 0) : 5,
               background: tint(fuse > 0.5 ? OK : ACCENT, 14),
               display: "flex",
               alignItems: "center",
@@ -158,15 +178,42 @@ const Atomic: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <Note at={notAt + 14} x={R_X + 250} y={rowY + chipH + c.h(14)} out={casAt + 4}>
-        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>three steps, so another thread can land between them</span>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Three steps, so another thread can land between them</span>
       </Note>
       <Note at={casAt + 10} x={R_X + 250} y={rowY + chipH + c.h(14)}>
-        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>compare-and-swap: one instruction</span>
+        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>An atomic add: one instruction</span>
       </Note>
-      <Note at={lockAt} x={R_X + 250} y={rowY + chipH + c.h(60)}>
+      <Note at={cmpAt} x={R_X} y={casY + casH / 2 - 15}>
+        <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>or compare-and-swap:</span>
+      </Note>
+      {CAS.map((k) => (
+        <Note key={k.text} at={k.at} x={k.x} y={casY} width={k.w} from="up">
+          <div style={{ height: casH, boxSizing: "border-box", border: `2.5px solid ${BAR}`, borderRadius: 5, background: tint(BAR, 12), display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{k.text}</span>
+          </div>
+        </Note>
+      ))}
+      {/* Changed since the read: round again. */}
+      <Flow
+        points={[
+          [CAS[2].x + CAS[2].w / 2, casY + casH + 6],
+          [CAS[2].x + CAS[2].w / 2, loopY],
+          [CAS[0].x + CAS[0].w / 2, loopY],
+          [CAS[0].x + CAS[0].w / 2, casY + casH + 6],
+        ]}
+        at={retryAt}
+        color={INK_SOFT}
+        width={2.4}
+        head={12}
+        dash="7 5"
+      />
+      <Note at={retryAt + 6} x={CAS[2].x + CAS[2].w / 2 + 16} y={loopY - 15}>
+        <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>changed? retry</span>
+      </Note>
+      <Note at={lockAt} x={R_X} y={loopY + c.h(30)}>
         <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.4em" }}>
           <LockGlyph size={24} color={OK} />
-          <span>or a lock held around the whole thing</span>
+          <span>or a lock held around all three</span>
         </span>
       </Note>
     </>
@@ -184,9 +231,9 @@ const Safe: React.FC<{ c: Ctx }> = ({ c }) => {
   const queueAt = c.w("r-safe", "a thread-safe queue");
   const shareAt = c.w("r-safe", "Share by communicating");
   const ways = [
-    { at: avoidAt, text: "avoid shared mutable state" },
-    { at: guardAt, text: "guard it with a lock" },
-    { at: oneAt, text: "keep it in one thread, fed by a queue" },
+    { at: avoidAt, text: "Avoid shared mutable state" },
+    { at: guardAt, text: "Guard it with a lock" },
+    { at: oneAt, text: "Keep it in one thread, fed by a queue" },
   ];
   const qX = R_X + 230;
   const ownerX = qX + 310;
@@ -302,13 +349,13 @@ const Live: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={busyAt} x={1600} y={top - c.h(36)}>
         <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>CPU</span>
       </Note>
-      <div style={{ position: "absolute", left: 1600, top, width: 64, height: bottom - top, borderRadius: 8, border: `2px solid ${HAIRLINE}`, boxSizing: "border-box", opacity: ease(frame, busyAt, 10) }} />
+      <div style={{ position: "absolute", left: 1600, top, width: 64, height: bottom - top, borderRadius: 5, border: `2px solid ${HAIRLINE}`, boxSizing: "border-box", opacity: ease(frame, busyAt, 10) }} />
       <div style={{ position: "absolute", left: 1604, top: bottom - 4 - (bottom - top - 8) * busy * (0.9 + 0.1 * Math.sin(frame / 3)), width: 56, height: (bottom - top - 8) * busy * (0.9 + 0.1 * Math.sin(frame / 3)), borderRadius: 5, background: ACCENT, opacity: busy }} />
       <Note at={harderAt} x={R_X} y={c.y(660)}>
-        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the CPU looks busy, so it&apos;s harder to spot than a deadlock</span>
+        <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The CPU looks busy, so it&apos;s harder to spot than a deadlock</span>
       </Note>
       <Note at={backoffAt} x={R_X} y={c.y(708)}>
-        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>randomized backoff: one waits, the other gets past</span>
+        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Randomized backoff: one waits, the other gets past</span>
       </Note>
     </>
   );
@@ -343,7 +390,7 @@ const Starve: React.FC<{ c: Ctx }> = ({ c }) => {
         top: ty,
         width: 130,
         height: rowH,
-        borderRadius: 8,
+        borderRadius: 5,
         boxSizing: "border-box",
         border: `2.5px solid ${green > 0.5 ? OK : high ? THREAD[2].fill : ds("gray", 400)}`,
         background: green > 0.5 ? tint(OK, 16) : high ? tint(THREAD[2].fill, 20) : ds("gray", 100),
@@ -376,7 +423,8 @@ const Starve: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* Under the fair lock, the ones that arrived before and after it. */}
       {fairIn > 0 ? (
         <>
-          <Token x={lerp(slot(0), LOCK_X - 40, serve1)} y={rowY} text="1 high" high opacity={fairIn * (1 - serve1)} />
+          {/* Served: it fades where the high ones stop, short of the lock. */}
+          <Token x={lerp(slot(0), LOCK_X - 150, serve1)} y={rowY} text="1 high" high opacity={fairIn * Math.max(0, 1 - 1.6 * serve1)} />
           <Token x={lerp(slot(2), slot(1), serve1)} y={rowY} text="3 high" high opacity={fairIn} />
         </>
       ) : null}
@@ -390,11 +438,13 @@ const Starve: React.FC<{ c: Ctx }> = ({ c }) => {
       })}
       <Note at={lowAt} x={R_X} y={rowY + c.h(82)} out={fairAt}>
         <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          the low-priority thread, passed over <Num>{passes}</Num> times
+          The low-priority thread, passed over <Num>{passes}</Num> times
         </span>
       </Note>
       <Note at={fairAt + 6} x={R_X} y={c.y(640)}>
-        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a fair lock serves in arrival order</span>
+        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+          A fair lock serves in arrival order <span style={{ color: INK_SOFT, fontWeight: 400 }}>(the numbers)</span>
+        </span>
       </Note>
       <Note at={notByAt} x={R_X} y={c.y(688)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>and don&apos;t hand shared resources out by priority</span>
@@ -411,16 +461,22 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
   const queueAt = c.w("r-pool", "a queue of tasks");
   const skipAt = c.w("r-pool", "skip creating a thread per task");
   const boundAt = c.w("r-pool", "bound how many run at once");
-  const mapAt = c.w("r-pool", "Map a function over a list");
-  const orderAt = c.w("r-pool", "the results come back in input order");
-  const { workers, inputs, results } = POOL;
+  const { workers } = POOL;
+  const TASKS = 9;
+  const GAP = 66;
   const qY = c.y(430);
   const chip = c.h(52);
   const wX = R_X + 520;
-  const resY = c.y(640);
-  // Tasks go to the workers four at a time; results fill in by input order.
+  // Six tasks queued, three more arriving. The workers take four, finish,
+  // take four more; the ninth is still queued at the end, so the queue is
+  // never shown empty.
   const slot = (k: number) => k % workers;
-  const takeAt = (k: number) => mapAt + 8 + Math.floor(k / workers) * 26 + slot(k) * 3;
+  const round = (k: number) => Math.floor(k / workers);
+  const arriveAt = (k: number) => (k < 6 ? queueAt + 2 + k * 2 : skipAt + 16 + (k - 6) * 12);
+  // A frame no video reaches: ease() needs a finite cue.
+  const NEVER = 1e7;
+  const takeAt = (k: number) => (round(k) < 2 ? skipAt + 6 + round(k) * 44 + slot(k) * 3 : NEVER);
+  const doneAt = (k: number) => (round(k) < 1 ? takeAt(k) + 38 : NEVER);
   return (
     <>
       <Lead at={fixedAt - 4} c={c} term="Thread pool">
@@ -429,25 +485,28 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={queueAt} x={R_X} y={qY - c.h(40)}>
         <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>a queue of tasks</span>
       </Note>
-      {inputs.map((v, k) => {
-        const p = ease(frame, queueAt + 2 + k * 2, 10);
+      {Array.from({ length: TASKS }, (_, k) => {
+        const p = ease(frame, arriveAt(k), 10);
         if (p <= 0) return null;
+        // Its place in the queue: the ones ahead of it that have left move it up.
+        let ahead = k;
+        for (let j = 0; j < k; j++) ahead -= ease(frame, takeAt(j), 12);
         const taken = ease(frame, takeAt(k), 12);
-        const done = ease(frame, takeAt(k) + 18, 8);
-        const x = lerp(R_X + k * 70, wX + slot(k) * 112 + 26, taken);
+        const done = ease(frame, doneAt(k), 8);
+        const x = lerp(R_X + ahead * GAP, wX + slot(k) * 112 + 23, taken);
         return (
           <div
-            key={v}
+            key={k}
             style={{
               position: "absolute",
               left: x,
               top: qY + c.h(6) * taken,
               width: 58,
               height: chip - c.h(12) * taken,
-              borderRadius: 7,
+              borderRadius: 5,
               boxSizing: "border-box",
               border: `2.5px solid ${BAR}`,
-              background: tint(BAR, 14),
+              background: tint(BAR, 14 + 20 * taken),
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -455,7 +514,7 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
             }}
           >
             <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>
-              <Num>{v}</Num>
+              <Num>{k + 1}</Num>
             </span>
           </div>
         );
@@ -470,23 +529,7 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={skipAt} x={R_X} y={qY + chip + c.h(18)}>
-        <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no new thread per task</span>
-      </Note>
-      <Note at={mapAt} x={R_X} y={c.y(582)}>
-        <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>pool.map(square, range(6))</span>
-      </Note>
-      <div style={{ position: "absolute", left: R_X, top: resY, fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK_SOFT, whiteSpace: "pre", opacity: ease(frame, mapAt + 6, 10) }}>
-        [
-        {results.map((r, k) => (
-          <span key={k}>
-            <span style={{ fontWeight: 500, color: OK_INK, opacity: ease(frame, takeAt(k) + 18, 8) }}>{r}</span>
-            {k < results.length - 1 ? ", " : ""}
-          </span>
-        ))}
-        ]
-      </div>
-      <Note at={orderAt} x={R_X} y={resY + c.h(50)}>
-        <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>in input order, the page&apos;s example</span>
+        <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>No new thread per task</span>
       </Note>
     </>
   );
@@ -526,6 +569,8 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
   const onceAt = c.w("r-future", "take the ticket at once");
   const laterAt = c.w("r-future", "collect the value later");
   const blockAt = c.w("r-future", "by blocking on it or awaiting it");
+  const promiseAt = c.w("r-promise", "A promise is the same idea");
+  const fillsAt = c.w("r-promise", "the side that fills in the value");
   const axisY = c.y(720);
   const t0 = R_X + 30;
   const tEnd = 1700;
@@ -556,7 +601,7 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
           top: c.y(456),
           width: (1300 - t0 - 200) * work,
           height: c.h(40),
-          borderRadius: 7,
+          borderRadius: 5,
           background: tint(BAR, 30),
           border: `2px solid ${BAR}`,
           boxSizing: "border-box",
@@ -567,7 +612,7 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
           opacity: work > 0 ? 1 : 0,
         }}
       >
-        <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the work, running</span>
+        <span style={{ ...label(20, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{ready > 0.5 ? "the work, done" : "the work, running"}</span>
       </div>
       {/* The ticket: handed over at once, redeemed later. */}
       <Ticket x={tX} y={tTop} w={tW} at={onceAt}>
@@ -582,9 +627,16 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...label(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the value, later</span>
       </Note>
       <Note at={blockAt} x={R_X} y={c.y(808)}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Collect it by blocking or by awaiting it</span>
+      </Note>
+      {/* The promise: the work's end, which fills the value in. */}
+      <Note at={promiseAt} x={R_X} y={c.y(404)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          collect it by blocking (<span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500 }}>.result()</span>) or by awaiting it
+          <b style={{ color: BLUE_INK }}>Promise</b>: the same idea, <Band at={fillsAt}>from the side that fills in the value</Band>
         </span>
+      </Note>
+      <Note at={fillsAt + 12} x={R_X} y={c.y(850)}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>(in JavaScript, one Promise object is both)</span>
       </Note>
     </>
   );

@@ -29,6 +29,9 @@
 //     delays are what the screen shows.
 //   - semaphore: twelve downloads through an asyncio.Semaphore(5), the
 //     page's "at most 5 simultaneous downloads", and the most ever in flight.
+//   - runtime.gil: whether this Python has 3.13's sys._is_gil_enabled() (the
+//     free-threaded build's probe), whether the GIL is on, and whether this
+//     is the free-threaded build (it isn't: Pyodide is the default build).
 //
 // asyncio.run() needs WebAssembly stack switching, which Node's Pyodide
 // lacks ("WebAssembly stack switching not supported in this JavaScript
@@ -50,6 +53,17 @@ import dis, json, sys
 from itertools import combinations
 
 R = {"runtime": {"python": sys.version.split()[0]}}
+
+# ── Free-threaded CPython: is this build one? ────────────────────────────────
+# sys._is_gil_enabled() arrived in 3.13 with the free-threaded build (PEP
+# 703); Py_GIL_DISABLED is set only in that build. The default build, which
+# Pyodide is, has the GIL on.
+import sysconfig
+R["runtime"]["gil"] = {
+    "probe": hasattr(sys, "_is_gil_enabled"),
+    "enabled": sys._is_gil_enabled() if hasattr(sys, "_is_gil_enabled") else None,
+    "freeThreadedBuild": bool(sysconfig.get_config_var("Py_GIL_DISABLED")),
+}
 
 # ── Amdahl's law, the page's chart ───────────────────────────────────────────
 def speedup(s, n):
@@ -320,6 +334,8 @@ delete blocking.elapsed;
 if (R.semaphore.peak !== R.semaphore.limit) fail(`semaphore peak ${R.semaphore.peak}`);
 if (R.race.one.every.filter((o) => o.result === R.race.one.right).length !== R.race.one.rightOrders) fail("race: every order disagrees with the count");
 if (R.pool.results.join() !== "0,1,4,9,16,25") fail(`pool map: ${R.pool.results}`);
+const gil = R.runtime.gil;
+if (!gil.probe || gil.enabled !== true || gil.freeThreadedBuild) fail(`expected a default (GIL) build with the 3.13+ probe: ${JSON.stringify(gil)}`);
 
 const file = join(here, "results.json");
 writeFileSync(file, `${JSON.stringify(R, null, 2)}\n`);

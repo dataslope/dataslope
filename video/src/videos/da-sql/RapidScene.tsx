@@ -108,7 +108,7 @@ const Union: React.FC<{ c: Ctx }> = ({ c }) => {
       </CodeName>
       <DataTable g={ag2} cols={numeric(RAPID.unionAll.cols)} at={allAt} rows={RAPID.unionAll.rows.map((cells, i) => ({ cells, at: allAt + 4 + i * 3 }))} bands={dup(RAPID.unionAll.rows).map((row, k) => ({ row, at: allAt + 18 + k * 4 }))} />
       <Note at={fasterAt - 4} x={ag2.right + 40} y={ag2.top + c.h(60)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>keeps every row, and it&apos;s faster:</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Keeps every row, and it&apos;s faster:</span>
       </Note>
       <Note at={checkAt - 2} x={ag2.right + 40} y={ag2.top + c.h(100)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>it skips the duplicate check</span>
@@ -363,12 +363,12 @@ const IndexFigure: React.FC<{ c: Ctx; tableAt: number; storedAt: number; indexAt
       />
       <Note at={storedAt} x={R_X} y={ug.rowTop(n + (insertAt === undefined ? 0 : 1)) + 16}>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <span style={{ fontWeight: 500 }}>clustered:</span> the rows themselves,
+          <span style={{ fontWeight: 500 }}>Clustered:</span> the rows themselves,
         </div>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>in id order (one per table)</div>
       </Note>
       <TableName g={ig} at={indexAt}>
-        an index on email
+        An index on email
       </TableName>
       <DataTable
         g={ig}
@@ -389,7 +389,7 @@ const IndexFigure: React.FC<{ c: Ctx; tableAt: number; storedAt: number; indexAt
       )}
       <Note at={lookupAt + 6} x={ig.x} y={ig.rowTop(n + (insertAt === undefined ? 0 : 1)) + 16}>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          <span style={{ fontWeight: 500 }}>non-clustered:</span> a separate lookup
+          <span style={{ fontWeight: 500 }}>Non-clustered:</span> a separate lookup
         </div>
         <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>(many per table)</div>
       </Note>

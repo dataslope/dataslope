@@ -59,11 +59,11 @@ export const MethodsScene: React.FC = () => {
   const head = y(330);
   const rowY = (i: number) => y(430) + i * h(66);
   const ROWS: { m: string; what: string; at: number; safe: [Cell, number]; idem: [Cell, number] }[] = [
-    { m: "GET", what: "reads", at: getAt, safe: ["yes", bothAt], idem: ["yes", bothAt + 4] },
-    { m: "PUT", what: "replaces a whole resource", at: putAt, safe: ["no", bothIdemAt], idem: ["yes", bothIdemAt] },
-    { m: "DELETE", what: "removes one", at: deleteAt, safe: ["no", bothIdemAt + 4], idem: ["yes", bothIdemAt + 4] },
-    { m: "POST", what: "submits data to be processed", at: postAt, safe: ["no", neitherAt], idem: ["no", neitherAt + 4] },
-    { m: "PATCH", what: "changes part of a resource", at: patchAt, safe: ["no", maybeAt], idem: ["maybe", maybeAt] },
+    { m: "GET", what: "Reads", at: getAt, safe: ["yes", bothAt], idem: ["yes", bothAt + 4] },
+    { m: "PUT", what: "Replaces a whole resource", at: putAt, safe: ["no", bothIdemAt], idem: ["yes", bothIdemAt] },
+    { m: "DELETE", what: "Removes one", at: deleteAt, safe: ["no", bothIdemAt + 4], idem: ["yes", bothIdemAt + 4] },
+    { m: "POST", what: "Submits data to be processed", at: postAt, safe: ["no", neitherAt], idem: ["no", neitherAt + 4] },
+    { m: "PATCH", what: "Changes part of a resource", at: patchAt, safe: ["no", maybeAt], idem: ["maybe", maybeAt] },
   ];
   const cell = ([c, at]: [Cell, number], x: number, top: number, key: string) =>
     c === "yes" ? (
@@ -73,10 +73,10 @@ export const MethodsScene: React.FC = () => {
     ) : (
       <Note key={key} at={at} x={x} y={top + 2} width={PROP_W} style={{ textAlign: "center" }}>
         {c === "no" ? (
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>no</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>No</span>
         ) : (
           <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={at + 6}>not necessarily</Mark>
+            <Mark at={at + 6}>Not necessarily</Mark>
           </span>
         )}
       </Note>
@@ -109,12 +109,12 @@ export const MethodsScene: React.FC = () => {
 
         {/* The grid's head: the two properties, each with what it means. */}
         <Note at={safeAt} x={COL.safe} y={head} width={PROP_W} style={{ textAlign: "center" }}>
-          <div style={{ ...label(24, INK), fontWeight: 500 }}>safe</div>
-          <div style={{ ...note(19, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>state unchanged</div>
+          <div style={{ ...label(24, INK), fontWeight: 500 }}>Safe</div>
+          <div style={{ ...note(19, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>State unchanged</div>
         </Note>
         <Note at={idemAt} x={COL.idem} y={head} width={PROP_W + 30} style={{ textAlign: "center" }}>
-          <div style={{ ...label(24, INK), fontWeight: 500 }}>idempotent</div>
-          <div style={{ ...note(19, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>twice = once</div>
+          <div style={{ ...label(24, INK), fontWeight: 500 }}>Idempotent</div>
+          <div style={{ ...note(19, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>Twice = once</div>
         </Note>
         <div style={{ position: "absolute", left: X0, top: head + h(70), width: COL.idem + PROP_W + 30 - X0, height: 1, background: HAIRLINE, opacity: ease(frame, sortAt, 12) }} />
 
@@ -156,12 +156,12 @@ export const MethodsScene: React.FC = () => {
         })}
         <Note at={goneAt} x={R_X} y={delTop(2) + h(4)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            article 42 gone after either: <b style={{ color: OK_INK }}>same state</b>
+            Article 42 gone after either: <b style={{ color: OK_INK }}>same state</b>
           </span>
         </Note>
         <Note at={stillAt} x={R_X} y={delTop(2) + h(46)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            <Mark at={stateAt}>about state, not the reply</Mark>
+            <Mark at={stateAt}>About state, not the reply</Mark>
           </span>
         </Note>
 
@@ -179,7 +179,7 @@ export const MethodsScene: React.FC = () => {
           lines={[{ t: "PATCH /articles/42" }, { t: '{"status": "published"}' }]}
         />
         <Note at={isIdemAt} x={R_X + 430} y={patchTop(0) + h(10)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>still published</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Still published</span>
           <div style={{ ...note(21, INK_SOFT), marginTop: 2, whiteSpace: "nowrap" }}>nothing changes</div>
         </Note>
         <Msg

@@ -138,12 +138,12 @@ export const CoefScene: React.FC = () => {
 
         <Note at={ideaAt - 2} x={96} y={y(300)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <b>correlation</b>: the idea, two things moving together
+            <b>Correlation</b>: the idea, two things moving together
           </span>
         </Note>
         <Note at={numberAt - 2} x={960} y={y(300)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <b>the coefficient</b>: a number for it
+            <b>The coefficient</b>: a number for it
           </span>
         </Note>
 
@@ -216,7 +216,7 @@ export const CoefScene: React.FC = () => {
           </span>
         </Note>
         <Note at={plotAt - 2} x={(U_X.a + U_X.b) / 2 - 200} width={400} y={y(586) + 40} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>plot the data first</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Plot the data first</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -123,6 +123,8 @@ export const AuthScene: React.FC = () => {
   const appAt = n.word("auth-oauth", "letting one app reach your data");
   const passAt = n.word("auth-oauth", "without your password");
   const tokensAt = n.word("auth-oauth", "Its access tokens may be JWTs");
+  const oidcAt = n.word("auth-oidc", "Logging users in on top of OAuth");
+  const idTokenAt = n.word("auth-oidc", "it adds an ID token");
   const q8At = n.word("revoke", "Question eight");
   const q8TextAt = n.word("revoke", "When would you choose");
   const instantAt = n.word("revoke-session", "When you need instant revocation");
@@ -226,7 +228,7 @@ export const AuthScene: React.FC = () => {
         {/* Session: an opaque ID in a cookie, and the server's store. */}
         <Note at={cookieAt} x={S.x} y={bodyTop} out={leave}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            in a cookie:{" "}
+            In a cookie:{" "}
             <span style={{ color: INK }}>
               <Mark at={charsAt}>
                 <Num>{AUTH.sessionChars}</Num> random characters
@@ -273,13 +275,14 @@ export const AuthScene: React.FC = () => {
           </Note>
         ))}
         <Note at={decodeAt + 4} x={J.x} y={claimsTop - h(40)} out={leave}>
-          <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>the payload, decoded without the key</span>
+          <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>The payload, decoded without the key</span>
         </Note>
         <Note at={decodeAt + 8} x={J.x} y={claimsTop} out={leave}>
           <div style={{ borderTop: `2px solid ${BAR}`, borderBottom: `1px solid ${HAIRLINE}`, padding: "8px 16px", background: LISTING_PAPER, width: 440 }}>
             {[
               { k: "sub", v: AUTH.claims.sub, at: userAt },
               { k: "role", v: AUTH.claims.role, at: roleAt },
+              { k: "iat", v: AUTH.claims.iat, at: roleAt + 8, plain: true },
               { k: "exp", v: AUTH.claims.exp, at: expAt },
             ].map((c) => (
               <div key={c.k} style={{ fontFamily: MONO, fontSize: 22, lineHeight: "34px", color: INK, whiteSpace: "pre", opacity: ease(frame, c.at - 4, 10) }}>
@@ -288,6 +291,8 @@ export const AuthScene: React.FC = () => {
                     <span style={{ fontWeight: 500 }}>&quot;role&quot;</span>: <Strike at={adminAt + 10}>&quot;{AUTH.claims.role}&quot;</Strike>
                     <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, adminAt + 16, 10) }}> &quot;admin&quot;</span>
                   </>
+                ) : "plain" in c ? (
+                  claimLine(c.k, c.v)
                 ) : (
                   <Mark at={c.at + 2}>{claimLine(c.k, c.v)}</Mark>
                 )}
@@ -295,15 +300,15 @@ export const AuthScene: React.FC = () => {
             ))}
           </div>
         </Note>
-        <Note at={sigAt} x={J.x} y={claimsTop + h(150)} out={leave}>
+        <Note at={sigAt} x={J.x} y={claimsTop + h(184)} out={leave}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            the <span style={{ color: PART_INK.signature, fontWeight: 500 }}>signature</span> proves who issued it
+            The <span style={{ color: PART_INK.signature, fontWeight: 500 }}>signature</span> proves who issued it
           </span>
         </Note>
-        <Note at={verifiesAt} x={J.x} y={claimsTop + h(194)} out={leave}>
+        <Note at={verifiesAt} x={J.x} y={claimsTop + h(228)} out={leave}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 23 }}>
             <Cross at={verifiesAt + 2} size={22} />
-            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>role changed: it no longer verifies</span>
+            <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Role changed: it no longer verifies</span>
           </div>
         </Note>
 
@@ -326,11 +331,17 @@ export const AuthScene: React.FC = () => {
         </Note>
         <Note at={delegAt} x={O.x} y={svcTop + h(80) + h(28)} out={leave}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <b>delegated</b> authorization, not a token format
+            <b>Delegated</b> authorization, not a token format
           </span>
         </Note>
         <Note at={tokensAt} x={O.x} y={svcTop + h(80) + h(68)} out={leave}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>its tokens: JWTs or opaque strings</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Its tokens: JWTs or opaque strings</span>
+        </Note>
+        <Note at={oidcAt} x={O.x} y={svcTop + h(80) + h(108)} out={leave}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            Logging in: <span style={{ color: INK }}>OpenID Connect</span>
+            <span style={{ opacity: ease(frame, idTokenAt, 10) }}>, an ID token</span>
+          </span>
         </Note>
 
         {/* Question 8, sessions: one shared store, and a deleted session. */}
@@ -339,11 +350,11 @@ export const AuthScene: React.FC = () => {
         </Note>
         {[0, 1].map((i) => (
           <React.Fragment key={i}>
-            <Node x={X0 + 40 + i * 300} y={srvTop} w={220} h={h(66)} at={sharesAt + i * 5} tone="data" title={`server ${i + 1}`} size={23} />
-            <Flow points={[[X0 + 150 + i * 300, srvTop + h(66) + 8], [X0 + 150 + i * 300, storeB.y - 10]]} at={sharesAt + 6 + i * 5} color={BAR} width={2.2} head={12} />
+            <Node x={X0 + 40 + i * 300} y={srvTop} w={220} h={h(66)} at={instantAt + 4 + i * 5} tone="data" title={`server ${i + 1}`} size={23} />
+            <Flow points={[[X0 + 150 + i * 300, srvTop + h(66) + 8], [X0 + 150 + i * 300, storeB.y - 10]]} at={instantAt + 10 + i * 5} color={BAR} width={2.2} head={12} />
           </React.Fragment>
         ))}
-        <Node x={storeB.x - 80} y={storeB.y} w={storeB.w + 120} h={storeB.h} at={sharesAt + 2} tone="data" title="one shared session store" size={23}>
+        <Node x={storeB.x - 80} y={storeB.y} w={storeB.w + 120} h={storeB.h} at={instantAt + 6} lit={pulse(frame, sharesAt + 4, 20)} tone="data" title="one shared session store" size={23}>
           <span style={{ fontFamily: MONO, fontSize: 21, color: INK, whiteSpace: "nowrap", opacity: 1 - deleted * 0.75 }}>
             <Strike at={deleteAt + 4}>{sid.slice(0, 6)}… → user 42</Strike>
           </span>
@@ -363,7 +374,7 @@ export const AuthScene: React.FC = () => {
         <Clock x={jx + 74 - 10 - CLOCK_TEXT / 2} y={srvTop + twoH + h(40) + (CLOCK_TEXT * 1.3) / 2} size={CLOCK_TEXT} at={validAt + 8} color={ACCENT} />
         <Note at={validAt + 10} x={jx + 74} y={srvTop + twoH + h(40)}>
           <span style={{ ...note(CLOCK_TEXT, INK), whiteSpace: "nowrap" }}>
-            valid until <span style={{ fontFamily: MONO, fontWeight: 500 }}>exp</span>, deleted session or not
+            Valid until <span style={{ fontFamily: MONO, fontWeight: 500 }}>exp</span>, deleted session or not
           </span>
         </Note>
         <Note at={lookupAt} x={jx + 74} y={srvTop + twoH + h(80)}>
@@ -372,14 +383,14 @@ export const AuthScene: React.FC = () => {
         {["orders", "search", "billing"].map((s, i) => (
           <React.Fragment key={s}>
             <Node x={jx + i * 280} y={svcRow} w={240} h={h(70)} at={fitAt + 2 + i * 4} tone="data" title={s} size={23} />
-            <div style={{ position: "absolute", left: jx + i * 280 + 200, top: svcRow - 12, opacity: frame >= fitAt + 10 + i * 4 ? 1 : 0 }}>
+            <div style={{ position: "absolute", left: jx + i * 280 + 196, top: svcRow + h(70) / 2 - 13, opacity: frame >= fitAt + 10 + i * 4 ? 1 : 0 }}>
               <Tick at={fitAt + 10 + i * 4} size={26} />
             </div>
           </React.Fragment>
         ))}
-        <Note at={withoutAt} x={jx} y={svcRow + h(80)}>
+        <Note at={withoutAt} x={jx} y={svcRow + h(96)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            each verifies the signature itself, <b style={{ color: OK_INK }}>no session store</b>
+            Each verifies the signature itself, <b style={{ color: OK_INK }}>no session store</b>
           </span>
         </Note>
 
@@ -462,9 +473,9 @@ export const AuthScene: React.FC = () => {
 
         {/* Hairlines between the panels, and between Question 8's two sides. */}
         {[610, 1247].map((x, i) => (
-          <VRule key={x} x={x} top={headTop} bottom={claimsTop + h(194) + 30} at={diffAt + (i + 1) * 6} out={leave} />
+          <VRule key={x} x={x} top={headTop} bottom={claimsTop + h(228) + 30} at={diffAt + (i + 1) * 6} out={leave} />
         ))}
-        <VRule x={890} top={bTop} bottom={Math.max(storeB.y + storeB.h + h(28) + twoH, svcRow + h(80) + 30)} at={locallyAt} />
+        <VRule x={890} top={bTop} bottom={Math.max(storeB.y + storeB.h + h(28) + twoH, svcRow + h(96) + 30)} at={locallyAt} />
       </Drift>
     </AbsoluteFill>
   );

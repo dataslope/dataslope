@@ -105,10 +105,10 @@ export const LineScene: React.FC = () => {
         <BarSet values={V} {...P[1]} at={barsAt - 2} labels={LINE_BAR.weeks} out={out2} />
         <Verdict ok x={COLS[1].x1 + 20} y={y(ROWS[0].top)} at={barsAt + 10} out={out2} />
         <Note at={honestAt - 2} out={out2} x={CHOOSE_X} y={y(ROWS[0].top) - h(4)}>
-          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>both honest, so choose:</span>
+          <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Both honest, so choose:</span>
         </Note>
         <Note at={neighbourAt} out={out2} x={CHOOSE_X} y={y(ROWS[0].top) + h(36)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>bars compare neighbours,</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Bars compare neighbours,</span>
         </Note>
         <Note at={shapeAt} out={out2} x={CHOOSE_X} y={y(ROWS[0].top) + h(72)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>a line carries the shape;</span>
@@ -123,7 +123,7 @@ export const LineScene: React.FC = () => {
         {/* The cross sits beside its chart like the ticks; its words go under it, clear of the bars. */}
         <Verdict ok={false} x={COLS[0].x1 + 20} y={y(ROWS[1].top)} at={wrongAt} out={out2} />
         <Note at={wrongAt + 4} out={out2} x={COLS[0].x0} y={y(ROWS[1].base) + h(46)}>
-          <span style={{ ...label(22, ACCENT_INK), whiteSpace: "nowrap" }}>a trend through no order</span>
+          <span style={{ ...label(22, ACCENT_INK), whiteSpace: "nowrap" }}>A trend through no order</span>
         </Note>
         <PanelTitle x={COLS[1].x0} y={y(ROWS[1].top) - h(62)} at={typesAt} out={out2}>
           As bars, over six issue types
@@ -152,7 +152,7 @@ export const LineScene: React.FC = () => {
           </div>
         ))}
         <Note at={fewAt} x={PIE_C.x - 200} y={y(PIE_C.y) + h(PIE_C.r) + h(50)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>pies: two to four slices of one whole</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Pies: two to four slices of one whole</span>
         </Note>
         {shares.map((s, i) => {
           const p = ease(frame, sortedAt + i * 3, 14);
@@ -186,7 +186,7 @@ export const LineScene: React.FC = () => {
           </span>
         </Note>
         <Note at={neverAt} x={SHARE_X} y={y(410) + 5 * h(78) + h(48)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>not for groups, not over time</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Not for groups, not over time</span>
         </Note>
       </Drift>
     </AbsoluteFill>

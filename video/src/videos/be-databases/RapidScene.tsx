@@ -1,12 +1,13 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { OK, OK_INK, RapidFire, type RapidItem } from "../../editorial/interview";
+import { OK_INK, RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, headline, label, note, svgText } from "../../editorial/style";
 import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { ds } from "../../theme/brand";
 import { RAPID } from "./data";
 import {
   ColumnRule,
@@ -29,6 +30,9 @@ import {
   X0,
 } from "./parts";
 
+/** The Venn lens, inner join's matches: a deep green that white type reads on. */
+const MATCH = ds("green", 700);
+
 const R_X = 800;
 const LIST_TOP = 380;
 const ROW = 62;
@@ -42,10 +46,10 @@ type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Lay
 const Acid: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const parts = [
-    { letter: "A", word: "atomicity", gist: "all or nothing", at: c.w("r-acid", "atomicity") },
-    { letter: "C", word: "consistency", gist: "every constraint holds", at: c.w("r-acid", "consistency") },
-    { letter: "I", word: "isolation", gist: "concurrent transactions don't corrupt each other", at: c.w("r-acid", "isolation") },
-    { letter: "D", word: "durability", gist: "a commit survives a crash", at: c.w("r-acid", "durability") },
+    { letter: "A", word: "Atomicity", gist: "All or nothing", at: c.w("r-acid", "atomicity") },
+    { letter: "C", word: "Consistency", gist: "Every constraint holds", at: c.w("r-acid", "consistency") },
+    { letter: "I", word: "Isolation", gist: "Concurrent transactions don't corrupt each other", at: c.w("r-acid", "isolation") },
+    { letter: "D", word: "Durability", gist: "A commit survives a crash", at: c.w("r-acid", "durability") },
   ];
   const top = c.y(360);
   return (
@@ -113,7 +117,7 @@ const Norm: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={harderAt + 14} x={dg.x} y={dg.rowTop(3) + c.h(14)}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one copy changed, two stale</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>One copy changed, two stale</span>
       </Note>
       <Note at={disagreeAt} x={R_X} y={notesTop}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
@@ -169,14 +173,14 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
         </defs>
         <circle cx={lx} cy={cy} r={r} fill={`color-mix(in srgb, ${BAR} ${30 * fillL}%, ${PAPER})`} stroke={BAR} strokeWidth={2.5} />
         <circle cx={rx} cy={cy} r={r} fill={`color-mix(in srgb, ${BAR} ${30 * fillR}%, transparent)`} stroke={BAR} strokeWidth={2.5} />
-        <circle cx={rx} cy={cy} r={r} clipPath="url(#be-joins-left)" fill={`color-mix(in srgb, ${OK} ${45 * inner}%, transparent)`} />
+        <circle cx={rx} cy={cy} r={r} clipPath="url(#be-joins-left)" fill={`color-mix(in srgb, ${MATCH} ${85 * inner}%, transparent)`} />
         <text x={lx - r * 0.5} y={cy - r - 18} textAnchor="middle" style={svgText(label(22, INK))}>
           customers
         </text>
         <text x={rx + r * 0.5} y={cy - r - 18} textAnchor="middle" style={svgText(label(22, INK))}>
           orders
         </text>
-        <text x={(lx + rx) / 2} y={cy + 8} textAnchor="middle" style={svgText({ ...label(22, OK_INK), fontWeight: 500 })} opacity={ease(frame, innerRowsAt, 10)}>
+        <text x={(lx + rx) / 2} y={cy + 8} textAnchor="middle" style={svgText({ ...label(22, PAPER), fontWeight: 600 })} opacity={ease(frame, innerRowsAt, 10)}>
           matches
         </text>
       </Svg>
@@ -192,7 +196,7 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={nullsAt} x={R_X + 700} y={c.y(400) + c.h(96)}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          order columns <i>null</i> for:
+          Order columns <i>null</i> for:
         </span>
       </Note>
       {RAPID.joins.none.map((name, i) => (
@@ -222,6 +226,8 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
   const fkAt = c.w("r-keys", "A foreign key points at");
   const missingAt = c.w("r-keys", "no order can name a missing customer");
   const doesntAt = c.w("r-keys", "Postgres doesn't index the foreign key's column");
+  const yourselfAt = c.w("r-keys-fix", "Index it yourself");
+  const scansAt = c.w("r-keys-fix", "scans the whole orders table");
   const top = c.y(372);
   const cg = tableGeometry({
     x: 1330,
@@ -273,18 +279,20 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
         <KeyArrow key={i} from={[og.right + 8, og.rowMid(i)]} to={[cg.x - 8, cg.rowMid(i)]} at={fkAt + 8 + i * 4} />
       ))}
       <Note at={missingAt + 10} x={og.x} y={og.rowTop(3) + c.h(14)}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no customer 9: refused</span>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>No customer 9: refused</span>
       </Note>
       <Note at={doesntAt - 4} x={R_X} y={idxTop - c.h(48)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          Indexes on the transfer example&rsquo;s tables, from <SmallMono color={INK}>pg_indexes</SmallMono>:
+          Indexes on these two tables, from <SmallMono color={INK}>pg_indexes</SmallMono>:
         </span>
       </Note>
       <DataTable g={ig} cols={RAPID.keys.cols.map((n) => ({ name: n }))} rows={RAPID.keys.rows.map((cells, i) => ({ cells, at: doesntAt + i * 3 }))} at={doesntAt - 2} />
       <Note at={doesntAt + 12} x={ig.right + 40} y={idxTop + c.h(30)}>
-        <div style={{ ...note(22, INK), width: 400 }}>
-          primary keys only: <b style={{ color: ACCENT_INK }}>nothing on</b> <SmallMono>from_id</SmallMono> or <SmallMono>to_id</SmallMono>, the foreign keys
+        <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <b style={{ color: ACCENT_INK }}>No index on</b> <SmallMono>customer_id</SmallMono>
         </div>
+        <div style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: c.h(14), opacity: ease(frame, yourselfAt, 10) }}>Index it yourself</div>
+        <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: c.h(8), opacity: ease(frame, scansAt, 10) }}>or lookups and deletes scan all orders</div>
       </Note>
     </>
   );
@@ -305,7 +313,7 @@ const Cover: React.FC<{ c: Ctx }> = ({ c }) => {
       <Listing lines={cv.include} x={R_X} top={top + c.h(118)} width={760} size={20} at={holdsAt} marks={[{ line: "INCLUDE", text: "INCLUDE (amount)", at: holdsAt + 8 }]} />
       <Note at={aloneAt - 6} x={R_X} y={top + c.h(250)}>
         <div style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          index on <SmallMono>customer_id</SmallMono> alone: <SmallMono>Bitmap Heap Scan</SmallMono>,{" "}
+          Index on <SmallMono>customer_id</SmallMono> alone: <SmallMono>Bitmap Heap Scan</SmallMono>,{" "}
           <b style={{ color: ACCENT_INK }}>
             <Num>{cv.heapBlocks}</Num> table pages
           </b>
@@ -313,7 +321,7 @@ const Cover: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={aloneAt} x={R_X} y={top + c.h(300)}>
         <div style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          with <SmallMono>amount</SmallMono> inside: <SmallMono>Index Only Scan</SmallMono>,{" "}
+          With <SmallMono>amount</SmallMono> inside: <SmallMono>Index Only Scan</SmallMono>,{" "}
           <b style={{ color: OK_INK }}>
             <SmallMono>Heap Fetches: {cv.heapFetches}</SmallMono>
           </b>
@@ -321,12 +329,12 @@ const Cover: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={zeroAt + 4} x={R_X} y={top + c.h(360)}>
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-          the same <SmallMono>SUM</SmallMono>, {cv.spend}, <b style={{ color: OK_INK }}>zero trips to the table</b>
+          The same <SmallMono>SUM</SmallMono>, {cv.spend}, <b style={{ color: OK_INK }}>zero trips to the table</b>
         </span>
       </Note>
       <Note at={priceAt - 4} x={R_X} y={top + c.h(420)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          the price: <b>a wider index</b>
+          The price: <b>a wider index</b>
         </span>
       </Note>
     </>

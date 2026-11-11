@@ -23,6 +23,10 @@ const Title: React.FC<{ n: number; x: number; y: number; at: number; children: R
   </Note>
 );
 
+/** This scene's badges' top and bottom padding: 0.32em, against the house
+ *  badge's 0.21em. */
+const PAD_Y = (size: number) => Math.round(size * 0.32);
+
 /** A rounded tag on the page: a session, an arm, an output. The house
  *  badge (a light tint of its hue, in that hue's ink, no border, its own
  *  padding) at a width of its own, which grows in as it inks. */
@@ -42,10 +46,13 @@ const Tag: React.FC<{ x: number; y: number; w: number; at: number; tone: BadgeTo
       style={{
         ...label(19),
         ...badgeStyle(tone, 19),
+        // A little more air top and bottom than the house badge (the owner,
+        // 2026-11-11).
+        padding: `${PAD_Y(19)}px ${Math.round(19 * 0.55)}px`,
         position: "absolute",
         left: x,
         // Its own padding, centred where the 46px box's middle was.
-        top: y + Math.round((46 - (19 * 1.15 + 2 * Math.round(19 * 0.21))) / 2),
+        top: y + Math.round((46 - (19 * 1.15 + 2 * PAD_Y(19))) / 2),
         width: w * (0.5 + 0.5 * p),
         boxSizing: "border-box",
         textAlign: "center",
@@ -125,13 +132,13 @@ export const AbScene: React.FC = () => {
         </QuestionCard>
         <Note at={fourAt - 4} x={X0} y={y(250)}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
-            the usual machinery, with <Mark at={fourAt + 4}>four adjustments</Mark>
+            The usual machinery, with <Mark at={fourAt + 4}>four adjustments</Mark>
           </span>
         </Note>
 
         {/* 1. Sticky by user. */}
         <Title n={1} x={COL[0]} y={y(ROW[0])} at={userAt - 2}>
-          randomize by user, and keep it sticky
+          Randomize by user, and keep it sticky
         </Title>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, userAt, 12) }}>
           <circle cx={COL[0] + 40} cy={y(ROW[0]) + 92} r={18} fill={INK} />
@@ -143,12 +150,12 @@ export const AbScene: React.FC = () => {
           </Tag>
         ))}
         <Note at={bothAt} x={COL[0] + 110} y={y(ROW[0]) + 160}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>nobody sees both arms</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Nobody sees both arms</span>
         </Note>
 
         {/* 2. More variance. */}
         <Title n={2} x={COL[1]} y={y(ROW[0])} at={varianceAt - 2}>
-          expect more variance
+          Expect more variance
         </Title>
         <Tag x={COL[1]} y={y(ROW[0]) + 94} w={160} at={varianceAt + 2} tone="blue">
           same input
@@ -161,14 +168,14 @@ export const AbScene: React.FC = () => {
         <Note at={distAt} x={COL[1] + 560} y={y(ROW[0]) + 106}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Mark at={distAt + 6}>
-              the treatment is
+              The treatment is
               <br />a distribution
             </Mark>
           </span>
         </Note>
         <Note at={sizeAt} x={COL[1]} y={y(ROW[0]) + 236}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            size it from an A/A test
+            Size it from an A/A test
             <span style={{ opacity: ease(frame, aaAt - 2, 10) }}> (both arms identical)</span>
             <span style={{ opacity: ease(frame, pilotAt - 2, 10) }}>, or a pilot</span>
           </span>
@@ -176,7 +183,7 @@ export const AbScene: React.FC = () => {
 
         {/* 3. Pin the version. */}
         <Title n={3} x={COL[0]} y={y(ROW[1])} at={pinAt - 2}>
-          pin the model version
+          Pin the model version
         </Title>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           <line x1={TL.x0} x2={TL.x0 + (TL.x1 - TL.x0) * run} y1={TL.y} y2={TL.y} stroke={INK} strokeWidth={2} />
@@ -202,23 +209,23 @@ export const AbScene: React.FC = () => {
           <span style={{ ...label(19, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>updated under the same name</span>
         </Note>
         <Note at={halfAt} x={TL.x0} y={TL.y + 50}>
-          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>the treatment changes halfway through</span>
+          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>The treatment changes halfway through</span>
         </Note>
         <Note at={logAt + 6} x={TL.x0} y={TL.y + 86}>
           <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={logAt + 10}>log the version on every request</Mark>
+            <Mark at={logAt + 10}>Log the version on every request</Mark>
           </span>
         </Note>
 
         {/* 4. Guardrails. */}
         <Title n={4} x={COL[1]} y={y(ROW[1])} at={guardAt - 2}>
-          add guardrails
+          Add guardrails
         </Title>
         {/* The guardrails as blue house badges, two to a row. */}
         {guards.map((g) => (
           <Note key={g.text} at={g.at - 2} x={COL[1] + (g.w % 2) * 330} y={y(ROW[1]) + 77 + Math.floor(g.w / 2) * 64} from="up">
             <span style={note(23)}>
-              <Badge tone="blue" size={23}>
+              <Badge tone="blue" size={23} style={{ padding: `${PAD_Y(23)}px ${Math.round(23 * 0.55)}px` }}>
                 {g.text}
               </Badge>
             </span>
@@ -226,7 +233,7 @@ export const AbScene: React.FC = () => {
         ))}
         <Note at={slowAt} x={COL[1]} y={y(ROW[1]) + 210}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            better but twice as slow{" "}
+            Better but twice as slow{" "}
             <span style={{ opacity: ease(frame, lossAt - 2, 10) }}>
               <Mark at={lossAt + 4} color={MARK_BAD}>
                 can still be a loss
@@ -237,7 +244,7 @@ export const AbScene: React.FC = () => {
 
         <Note at={nextAt - 4} x={COL[1]} y={y(ROW[1]) + 266}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", maxWidth: PANEL_W }}>
-            next: the model as the measuring tool
+            Next: the model as the measuring tool
           </span>
         </Note>
       </Drift>

@@ -8,6 +8,7 @@ import { CostScene } from "./CostScene";
 import { FormatsScene } from "./FormatsScene";
 import { HookScene } from "./HookScene";
 import { LakeScene } from "./LakeScene";
+import { NextScene } from "./NextScene";
 import { PartitionScene } from "./PartitionScene";
 import { RowsScene } from "./RowsScene";
 import { SmallFilesScene } from "./SmallFilesScene";
@@ -37,6 +38,7 @@ const SCENES: [string, React.FC][] = [
   ["sm", SmallFilesScene],
   ["cost", CostScene],
   ["lake", LakeScene],
+  ["next-round", NextScene],
 ];
 
 const Scenes: React.FC = () => {

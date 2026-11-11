@@ -135,7 +135,7 @@ export const PowerScene: React.FC = () => {
 
         {/* ── Question 10 ── */}
         <Note at={shrinkAt - 2} x={X0} y={y(TOP)} out={out10}>
-          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>more users, a smaller standard error, smaller effects detectable</span>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>More users, a smaller standard error, smaller effects detectable</span>
         </Note>
         <Note at={mdeAt - 4} x={X0} y={y(TOP + 56)} out={out10}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
@@ -144,17 +144,17 @@ export const PowerScene: React.FC = () => {
         </Note>
         <Note at={pickAt - 2} x={X0} y={y(TOP + 112)} out={out10}>
           <span style={{ ...note(27, INK_SOFT), whiteSpace: "nowrap" }}>
-            set it before launch, with power and significance
+            Set it before launch, with power and significance
             <span style={{ opacity: ease(frame, followsAt - 2, 10), color: INK }}>, and the sample size follows</span>
           </span>
         </Note>
         <Note at={worthAt - 4} x={X0} y={y(TOP + 168)} out={out10}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            pick the MDE as the <b>smallest lift worth the cost of shipping</b>
+            Pick the MDE as the <b>smallest lift worth the cost of shipping</b>
           </span>
         </Note>
         <Note at={twelveAt - 6} x={X0} y={y(BARS.y) - h(64)} out={out10}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>users in each arm, 80% power, 5% significance</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Users in each arm, 80% power, 5% significance</span>
         </Note>
         {sizes.map((s, i) => {
           const p = ease(frame, s.at, 20);
@@ -194,7 +194,7 @@ export const PowerScene: React.FC = () => {
           );
         })}
         <Note at={fourAt - 2} x={BARS.x0} y={y(BARS.y) + 2 * h(BARS.pitch) + h(4)} out={out10}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>half the lift, {fmt(SAMPLE.ratio)} times the users</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>Half the lift, {fmt(SAMPLE.ratio)} times the users</span>
         </Note>
 
         {/* ── Questions 11 and 12: no effect, and an effect placed for 80% power ── */}
@@ -254,13 +254,13 @@ export const PowerScene: React.FC = () => {
         </Note>
         <Note at={minusAt - 2} x={X0} y={y(TOP)}>
           <span style={{ ...note(27, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>
-            <b>power</b> = 1 − β: the chance of catching a real effect
+            <b>Power</b> = 1 − β: the chance of catching a real effect
             <span style={{ opacity: ease(frame, eightyAt - 2, 10) }}>, usually {Math.round(ERRORS.power * 100)}%</span>
           </span>
         </Note>
         <Note at={moveAt + 4} x={X0} y={y(TOP + 48)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            moving the line trades one error for the other
+            Moving the line trades one error for the other
             <span style={{ opacity: ease(frame, onlyAt - 2, 10), fontWeight: 500 }}>; only more data shrinks both</span>
           </span>
         </Note>

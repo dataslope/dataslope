@@ -125,12 +125,12 @@ export const CalScene: React.FC = () => {
         {/* ── The key, in the order the narration names them ── */}
         <Note at={plainAt} x={NOTE_X} y={y(400)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: BLUE_INK }}>plain model</b>: near the diagonal
+            <b style={{ color: BLUE_INK }}>Plain model</b>: near the diagonal
           </span>
         </Note>
         <Note at={weightedAt} x={NOTE_X} y={y(470)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: ACCENT_INK }}>class-weighted</b>: far below it
+            <b style={{ color: ACCENT_INK }}>Class-weighted</b>: far below it
           </span>
         </Note>
         <Note at={nineAt} x={NOTE_X} y={y(512)}>
@@ -149,7 +149,7 @@ export const CalScene: React.FC = () => {
         </Note>
         <Note at={fitAt - 2} x={NOTE_X} y={y(676)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>class-weighted, recalibrated</b> on held-out data
+            <b style={{ color: OK_INK }}>Class-weighted, recalibrated</b> on held-out data
           </span>
           <br />
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, plattAt - 2, 10) }}>
@@ -158,14 +158,14 @@ export const CalScene: React.FC = () => {
         </Note>
         <Note at={lineAt - 2} x={NOTE_X} y={y(792)}>
           <span style={{ ...note(30, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={lineAt + 4}>back on the line</Mark>
+            <Mark at={lineAt + 4}>Back on the line</Mark>
           </span>
         </Note>
 
         {/* ── How it is measured: this plot, or one number ── */}
         <Note at={diagramAt - 2} x={PLOT.left} y={y(PLOT.top) - h(80)}>
           <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={diagramAt + 4}>a reliability diagram</Mark>
+            <Mark at={diagramAt + 4}>A reliability diagram</Mark>
           </span>
         </Note>
         <Note at={brierAt - 2} x={NOTE_X} y={y(850)}>

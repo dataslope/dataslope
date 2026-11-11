@@ -73,10 +73,10 @@ export const ChooseScene: React.FC = () => {
   const textAt = n.word("choose", "How do you choose");
   const startAt = n.word("choose-map", "Start from the question");
   const rows = [
-    { at: n.word("choose-map", "Change over time"), q: "Change over time", chart: "line", glyph: "line" },
-    { at: n.word("choose-map", "Comparing categories"), q: "Comparing categories", chart: "bar", glyph: "bar" },
-    { at: n.word("choose-map", "A part of a whole"), q: "A part of a whole", chart: "stacked bar", glyph: "stack" },
-    { at: n.word("choose-map", "A distribution"), q: "A distribution", chart: "histogram or box plot", glyph: "hist" },
+    { at: n.word("choose-map", "Change over time"), q: "Change over time", chart: "Line", glyph: "line" },
+    { at: n.word("choose-map", "Comparing categories"), q: "Comparing categories", chart: "Bar", glyph: "bar" },
+    { at: n.word("choose-map", "A part of a whole"), q: "A part of a whole", chart: "Stacked bar", glyph: "stack" },
+    { at: n.word("choose-map", "A distribution"), q: "A distribution", chart: "Histogram or box plot", glyph: "hist" },
     { at: n.word("choose-map", "a relationship"), q: "A relationship", chart: "scatter", glyph: "scatter" },
   ];
   const underAt = n.word("choose-under", "how accurately people read");
@@ -103,7 +103,7 @@ export const ChooseScene: React.FC = () => {
         </QuestionCard>
 
         <Note at={startAt - 2} x={X0} y={y(ROW0 - 52)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>the question → the chart</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>The question → the chart</span>
         </Note>
         {rows.map((r, i) => {
           const p = ease(frame, r.at - 2, 12);
@@ -125,7 +125,7 @@ export const ChooseScene: React.FC = () => {
 
         {/* ── How accurately each encoding is read ── */}
         <Note at={underAt - 2} x={1020} y={y(ROW0 - 52)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>judgement error, relative to position</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Judgement error, relative to position</span>
         </Note>
         {ENCODINGS.rows.map((e, i) => {
           const at0 = rankAts[i];
@@ -146,7 +146,7 @@ export const ChooseScene: React.FC = () => {
         })}
         <Note at={threeAt - 2} x={1020} y={y(ROW0) + 5 * h(PITCH) + h(6)}>
           <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
-            color saturation: about {fmt(ENCODINGS.colorVsPosition, 0)}× the error of position
+            Color saturation: about {fmt(ENCODINGS.colorVsPosition, 0)}× the error of position
           </span>
         </Note>
       </Drift>

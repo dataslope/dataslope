@@ -43,9 +43,9 @@ export const RetryScene: React.FC = () => {
   const textAt = n.word("retry", "How should you configure retries");
   const transAt = n.word("retry", "Retry transient failures");
   const okItems = [
-    { text: "a network blip", at: n.word("retry", "a network blip") },
-    { text: "a rate limit", at: n.word("retry", "a rate limit") },
-    { text: "a brief outage", at: n.word("retry", "a brief outage") },
+    { text: "A network blip", at: n.word("retry", "a network blip") },
+    { text: "A rate limit", at: n.word("retry", "a rate limit") },
+    { text: "A brief outage", at: n.word("retry", "a brief outage") },
   ];
   const smallAt = n.word("retry", "Keep the count small");
   const expAt = n.word("retry", "back off exponentially");
@@ -53,8 +53,8 @@ export const RetryScene: React.FC = () => {
   const capAt = n.word("retry", "never more than thirty");
   const dontAt = n.word("retry-not", "Don't retry deterministic failures");
   const badItems = [
-    { text: "a bad SQL query", at: n.word("retry-not", "a bad sequel query") },
-    { text: "a schema mismatch", at: n.word("retry-not", "a schema mismatch") },
+    { text: "A bad SQL query", at: n.word("retry-not", "a bad sequel query") },
+    { text: "A schema mismatch", at: n.word("retry-not", "a schema mismatch") },
   ];
   const sameAt = n.word("retry-not", "they fail the same way every time");
   const idemAt = n.word("retry-not", "Retry only idempotent tasks");
@@ -96,7 +96,7 @@ export const RetryScene: React.FC = () => {
 
         {/* What to retry, and what never to. */}
         <Note at={transAt} x={X0} y={y(286)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>retry: transient failures</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Retry: transient failures</span>
         </Note>
         {okItems.map((it, i) => (
           <Note key={it.text} at={it.at - 2} x={X0 + 20} y={y(336) + i * h(44)}>
@@ -104,7 +104,7 @@ export const RetryScene: React.FC = () => {
           </Note>
         ))}
         <Note at={dontAt} x={X0} y={y(500)}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>don&apos;t retry: deterministic failures</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Don&apos;t retry: deterministic failures</span>
         </Note>
         {badItems.map((it, i) => (
           <Note key={it.text} at={it.at - 2} x={X0 + 20} y={y(550) + i * h(44)}>
@@ -112,7 +112,7 @@ export const RetryScene: React.FC = () => {
           </Note>
         ))}
         <Note at={sameAt} x={X0 + 20} y={y(646)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the same failure, every time</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The same failure, every time</span>
         </Note>
         <Pill x={X0} y={y(740)} at={idemAt} tone="green" size={24}>
           retry only idempotent tasks
@@ -196,7 +196,7 @@ export const RetryScene: React.FC = () => {
         ))}
         <Note at={capAt + 2} x={LINE_X0 - R} y={lineY + h(66)}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            each wait doubles, never more than <Num>{RETRY.max}</Num> min
+            Each wait doubles, never more than <Num>{RETRY.max}</Num> min
           </span>
         </Note>
         <Note at={capAt + 10} x={LINE_X0 - R} y={lineY + h(122)}>

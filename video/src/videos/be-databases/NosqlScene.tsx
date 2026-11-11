@@ -27,28 +27,36 @@ const MiniTable: React.FC<{
   rowH: number;
   name: string;
   at: number;
-  lit?: { rows: readonly number[]; at: number; color: string };
+  lit?: { rows: readonly number[]; at: number; color: string; ink: string };
 }> = ({ x, y, w, rows, rowH, name, at, lit }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 14);
   if (p <= 0) return null;
   const headH = 34;
   const litP = lit ? ease(frame, lit.at, 12) : 0;
+  /** A skeleton bar's fill: `base` on a plain row; on a lit row, the row's
+   *  ink at `strength`% over paper, faded in with the tint. */
+  const skeleton = (i: number, base: string, strength: number) =>
+    lit && lit.rows.includes(i) && litP > 0
+      ? `color-mix(in srgb, color-mix(in srgb, ${lit.ink} ${strength}%, ${PAPER}) ${Math.round(litP * 100)}%, ${base})`
+      : base;
   return (
     <g opacity={p}>
-      <rect x={x} y={y} width={w} height={headH + rows * rowH} rx={6} fill={PAPER} stroke={BAR} strokeWidth={2} />
-      <rect x={x} y={y} width={w} height={headH} rx={6} fill={`color-mix(in srgb, ${BAR} 18%, ${PAPER})`} />
+      <rect x={x} y={y} width={w} height={headH + rows * rowH} rx={4} fill={PAPER} stroke={BAR} strokeWidth={2} />
+      <rect x={x} y={y} width={w} height={headH} rx={4} fill={`color-mix(in srgb, ${BAR} 18%, ${PAPER})`} />
       <text x={x + 14} y={y + 24} style={svgText({ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: INK })}>
         {name}
       </text>
       {Array.from({ length: rows }, (_, i) => (
         <g key={i} opacity={ease(frame, at + 4 + i * 2, 10)}>
+          {/* On a lit row the skeleton darkens into the row's own hue, so it
+              reads on the tint instead of greying it out. */}
           {lit && lit.rows.includes(i) ? (
             <rect x={x + 3} y={y + headH + i * rowH + 3} width={w - 6} height={rowH - 6} rx={3} fill={lit.color} opacity={0.35 * litP} />
           ) : null}
           <line x1={x} x2={x + w} y1={y + headH + i * rowH} y2={y + headH + i * rowH} stroke={`color-mix(in srgb, ${INK} 18%, transparent)`} strokeWidth={1} />
-          <rect x={x + 16} y={y + headH + i * rowH + rowH / 2 - 4} width={w * 0.22} height={8} rx={4} fill={`color-mix(in srgb, ${BAR} 55%, ${PAPER})`} />
-          <rect x={x + 26 + w * 0.22} y={y + headH + i * rowH + rowH / 2 - 4} width={w * (0.25 + ((i * 37) % 30) / 100)} height={8} rx={4} fill={`color-mix(in srgb, ${INK} 22%, ${PAPER})`} />
+          <rect x={x + 16} y={y + headH + i * rowH + rowH / 2 - 4} width={w * 0.22} height={8} rx={4} fill={skeleton(i, `color-mix(in srgb, ${BAR} 55%, ${PAPER})`, 85)} />
+          <rect x={x + 26 + w * 0.22} y={y + headH + i * rowH + rowH / 2 - 4} width={w * (0.25 + ((i * 37) % 30) / 100)} height={8} rx={4} fill={skeleton(i, `color-mix(in srgb, ${INK} 22%, ${PAPER})`, 50)} />
         </g>
       ))}
     </g>
@@ -125,6 +133,9 @@ export const NosqlScene: React.FC = () => {
   const bothAt = n.word("nosql-both", "many systems use both");
   const coreAt = n.word("nosql-both", "SQL for the core transactions");
   const logsAt = n.word("nosql-both", "NoSQL for high-volume logs");
+  const scaleAt = n.word("nosql-scale", "Relational scales further");
+  const shardAt = n.word("nosql-scale", "with replicas and sharding");
+  const sizeAt = n.word("nosql-scale", "not on size alone");
   const askAt = n.word("nosql-next", "ask which queries");
   const relNewAt = n.word("nosql-next", "Relational answers a new one");
   const joinAt = n.word("nosql-next", "with a join");
@@ -190,8 +201,8 @@ export const NosqlScene: React.FC = () => {
             <span style={{ ...label(26, INK), fontWeight: 500 }}>Relational</span>
           </Ink>
           <Svg>
-            <MiniTable x={cust.x} y={tTop} w={cust.w} rows={4} rowH={rowH} name="customers" at={relAt} lit={{ rows: [1], at: joinsAt, color: BAR }} />
-            <MiniTable x={ord.x} y={tTop} w={ord.w} rows={5} rowH={rowH} name="orders" at={relAt + 4} lit={{ rows: txnRows, at: txnAt + 2, color: OK }} />
+            <MiniTable x={cust.x} y={tTop} w={cust.w} rows={4} rowH={rowH} name="customers" at={relAt} lit={{ rows: [1], at: joinsAt, color: BAR, ink: BLUE_INK }} />
+            <MiniTable x={ord.x} y={tTop} w={ord.w} rows={5} rowH={rowH} name="orders" at={relAt + 4} lit={{ rows: txnRows, at: txnAt + 2, color: OK, ink: OK_INK }} />
             {/* customer 2's orders, joined */}
             {[0, 2].map((r, k) => (
               <path
@@ -221,7 +232,7 @@ export const NosqlScene: React.FC = () => {
           </Note>
           <div style={{ position: "absolute", left: X0, top: tTop + 34 + 5 * rowH + h(40), display: "flex", gap: "0.7em", fontSize: 24, whiteSpace: "nowrap" }}>
             {[
-              { at: joinsAt, text: "joins" },
+              { at: joinsAt, text: "Joins" },
               { at: txnAt, text: "transactions across rows" },
               { at: strongAt, text: "strong consistency" },
             ].map((r, i) => (
@@ -232,7 +243,7 @@ export const NosqlScene: React.FC = () => {
             ))}
           </div>
           <Note at={safeAt} x={X0} y={tTop + 34 + 5 * rowH + h(96)}>
-            <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the safe default for most applications</span>
+            <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The safe default for most applications</span>
           </Note>
         </div>
 
@@ -264,7 +275,7 @@ export const NosqlScene: React.FC = () => {
               ))}
             </span>
           </Note>
-          <Shape x={R_X} y={y(SHAPES_TOP)} at={schemaAt} name="document" pattern="any shape, changing">
+          <Shape x={R_X} y={y(SHAPES_TOP)} at={schemaAt} name="Document" pattern="Any shape, changing">
             <div style={{ position: "absolute", left: 0, top: 26 }}>
               {['{', '  "name": "Ava",', '  "tags": ["vip"],', '  "address": {…}', '}'].map((l, i) => (
                 <div key={i} style={mono(i === 0 || i === 4 ? INK_SOFT : INK)}>
@@ -273,7 +284,7 @@ export const NosqlScene: React.FC = () => {
               ))}
             </div>
           </Shape>
-          <Shape x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP)} at={kvAt} name="key-value" pattern="one value per key">
+          <Shape x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP)} at={kvAt} name="Key-value" pattern="One value per key">
             <div style={{ position: "absolute", left: 0, top: 22, display: "flex", flexDirection: "column", gap: 14 }}>
               {["user:41", "user:42", "user:43", "user:44"].map((k, i) => (
                 <div key={k} style={{ display: "flex", gap: 10, alignItems: "center", opacity: ease(frame, kvAt + 2 + i * 2, 8) }}>
@@ -284,7 +295,7 @@ export const NosqlScene: React.FC = () => {
               ))}
             </div>
           </Shape>
-          <Shape x={R_X + 2 * (SHAPE_W + SHAPE_GAP)} y={y(SHAPES_TOP)} at={wideAt} name="wide-column" pattern="rows by key, at volume">
+          <Shape x={R_X + 2 * (SHAPE_W + SHAPE_GAP)} y={y(SHAPES_TOP)} at={wideAt} name="Wide-column" pattern="Rows by key, at volume">
             <div style={{ position: "absolute", left: 0, top: 26, display: "flex", flexDirection: "column", gap: 18 }}>
               {[5, 2, 4, 3].map((cells, i) => (
                 <div key={i} style={{ display: "flex", gap: 6, alignItems: "center", opacity: ease(frame, wideAt + 2 + i * 2, 8) }}>
@@ -297,7 +308,7 @@ export const NosqlScene: React.FC = () => {
             </div>
           </Shape>
           <Note at={patternAt} x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP) - h(40)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>one access pattern, known in advance, at huge volume</span>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>One access pattern, known in advance, at huge volume</span>
           </Note>
           <Note at={priceAt} x={R_X} y={y(SHAPES_TOP) + SHAPE_H + h(122)}>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The price: weaker consistency, limited joins</span>
@@ -314,6 +325,16 @@ export const NosqlScene: React.FC = () => {
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             core transactions: <b>orders, payments</b>
           </span>
+        </Note>
+        {/* Relational scales out too: what decides is the access pattern. */}
+        <Note at={scaleAt} x={sqlX + store.w / 2} y={underY + h(36)} style={{ transform: "translateX(-50%)" }} out={relNewAt - 6}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            scales too: <span style={{ color: INK, opacity: ease(frame, shardAt, 10) }}>replicas, sharding</span>
+          </span>
+        </Note>
+        <Note at={sizeAt - 4} x={app.x + app.w / 2} y={store.y + storeH * 0.42} style={{ transform: "translateX(-50%)" }} out={askAt - 4}>
+          <div style={{ ...note(23, INK), whiteSpace: "nowrap", textAlign: "center" }}>Decide by access pattern</div>
+          <div style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", textAlign: "center", marginTop: h(6) }}>and consistency, not size</div>
         </Note>
         <Note at={logsAt + 6} x={noX + store.w / 2} y={underY} style={{ transform: "translateX(-50%)" }}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>

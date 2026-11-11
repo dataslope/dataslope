@@ -176,17 +176,17 @@ export const GenScene: React.FC = () => {
 
         {/* ── 1. A list against a generator, as blocks ── */}
         <Note at={listAt - 2} x={RIGHT_X} y={lTop - h(6)} out={millionAt - 6}>
-          <Title color={ACCENT_INK}>a list: every element at once</Title>
+          <Title color={ACCENT_INK}>A list: every element at once</Title>
         </Note>
         <Blocks x={RIGHT_X} top={lTop + h(36)} at={listAt + 2} out={millionAt - 6} color={ACCENT} />
         <Note at={genAt - 2} x={RIGHT_X} y={lTop + h(126)} out={millionAt - 6}>
-          <Title color={OK_INK}>a generator: one at a time, on demand</Title>
+          <Title color={OK_INK}>A generator: one at a time, on demand</Title>
         </Note>
         <Blocks x={RIGHT_X} top={lTop + h(168)} at={genAt + 4} out={millionAt - 6} one color={OK} />
 
         {/* ── The page's parser ── */}
         <Note at={parserAt - 4} x={X0} y={lTop - h(40)} out={fig1Out}>
-          <Title>the page&apos;s parser</Title>
+          <Title>The page&apos;s parser</Title>
         </Note>
         <Listing
           lines={P}
@@ -205,7 +205,7 @@ export const GenScene: React.FC = () => {
 
         {/* ── The same file read both ways ── */}
         <Note at={collectAt - 4} x={RIGHT_X} y={lTop - h(40)} out={fig1Out}>
-          <Title color={ACCENT_INK}>held in a list</Title>
+          <Title color={ACCENT_INK}>Held in a list</Title>
         </Note>
         <Listing
           lines={L}
@@ -218,7 +218,7 @@ export const GenScene: React.FC = () => {
           marks={[{ line: lineOf(L, "list(parse_rows"), at: collectAt + 6, color: MARK_BAD }]}
         />
         <Note at={sumAt - 4} x={RIGHT_X} y={gTop - h(40)} out={fig1Out}>
-          <Title color={OK_INK}>streamed by the generator</Title>
+          <Title color={OK_INK}>Streamed by the generator</Title>
         </Note>
         <Listing
           lines={G}
@@ -233,7 +233,7 @@ export const GenScene: React.FC = () => {
 
         <Note at={millionAt} x={X0} y={y(BARS_Y) - h(44)} out={fig1Out}>
           <span style={{ display: "flex", gap: 28, alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <Title>peak memory</Title>
+            <Title>Peak memory</Title>
             <Source>tracemalloc, in Pyodide: Python in WebAssembly</Source>
           </span>
         </Note>
@@ -253,16 +253,16 @@ export const GenScene: React.FC = () => {
         />
         <Note at={moveAt + 10} x={NOTE_X} y={y(BARS_Y) + 3 * h(54) + h(8)} out={fig1Out}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={moveAt + 16}>the same, whatever the input&apos;s size</Mark>
+            <Mark at={moveAt + 16}>The same, whatever the input&apos;s size</Mark>
           </span>
         </Note>
         <Note at={soAt + 6} x={NOTE_X} y={y(BARS_Y) + 2 * h(54) + h(8)} out={fig1Out}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a tenth of the rows, a tenth of the memory</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>A tenth of the rows, a tenth of the memory</span>
         </Note>
 
         {/* ── 2. The pipeline, in square brackets and in round ones ── */}
         <Note at={squareAt - 4} x={X0} y={lTop - h(40)} dim={placeAt}>
-          <Title color={ACCENT_INK}>square brackets: three lists</Title>
+          <Title color={ACCENT_INK}>Square brackets: three lists</Title>
         </Note>
         <Listing
           lines={PL}
@@ -275,13 +275,13 @@ export const GenScene: React.FC = () => {
           marks={stages.map((s, i) => ({ line: lineOf(PL, s), at: aliveAt + i * 2, color: MARK_BAD }))}
         />
         <Note at={roundAt - 4} x={RIGHT_X} y={lTop - h(40)} dim={placeAt}>
-          <Title color={OK_INK}>round brackets: three generators</Title>
+          <Title color={OK_INK}>Round brackets: three generators</Title>
         </Note>
         <Listing lines={PG} x={RIGHT_X} top={lTop} width={800} size={SIZE} at={roundAt - 2} dim={placeAt} marks={stepMarks} />
 
         <Note at={mbAt - 10} x={X0} y={pBarsY - h(42)} out={placeAt - 4}>
           <span style={{ display: "flex", gap: 28, alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <Title>peak memory</Title>
+            <Title>Peak memory</Title>
             <Source>tracemalloc, in Pyodide</Source>
           </span>
         </Note>
@@ -300,7 +300,7 @@ export const GenScene: React.FC = () => {
 
         {/* ── The trade-off ── */}
         <Note at={printAt} x={X0} y={againTop - h(40)}>
-          <Title>a generator, summed twice</Title>
+          <Title>A generator, summed twice</Title>
         </Note>
         <Listing
           lines={A}
@@ -320,16 +320,16 @@ export const GenScene: React.FC = () => {
           marks={[{ line: 0, at: zeroAt + 2, color: MARK_BAD }]}
         />
         <Note at={printAt} x={RIGHT_X} y={againTop + h(6)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>a list: print it, read it twice</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>A list: print it, read it twice</span>
         </Note>
         <Note at={smallAt} x={RIGHT_X} y={againTop + h(70)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <Mark at={smallAt + 4} color={MARK}>small data you rescan:</Mark> lists
+            <Mark at={smallAt + 4} color={MARK}>Small data you rescan:</Mark> lists
           </span>
         </Note>
         <Note at={largeAt} x={RIGHT_X} y={againTop + h(122)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={largeAt + 4} color={MARK_OK}>large or endless data:</Mark> generators
+            <Mark at={largeAt + 4} color={MARK_OK}>Large or endless data:</Mark> generators
           </span>
         </Note>
         {/* A thin rule between the two halves of the trade-off. */}

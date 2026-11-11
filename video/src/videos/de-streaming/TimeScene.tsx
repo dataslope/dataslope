@@ -52,7 +52,7 @@ export const TimeScene: React.FC = () => {
   const stampedAt = n.word("time-def", "stamped in the event");
   const procAt = n.word("time-def", "Processing time is when");
   const causes = [
-    { text: "network delay", at: n.word("time-def", "Network delay") },
+    { text: "Network delay", at: n.word("time-def", "Network delay") },
     { text: "retries", at: n.word("time-def", "retries") },
     { text: "a phone that was offline", at: n.word("time-def", "a phone that was offline") },
     { text: "batched uploads", at: n.word("time-def", "batched uploads") },
@@ -394,7 +394,7 @@ export const TimeScene: React.FC = () => {
 
         <Note at={estAt} x={X0} y={y(720)} out={q9Out}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: BLUE_INK }}>watermark</b>: everything before it has (probably) arrived
+            <b style={{ color: BLUE_INK }}>Watermark</b>: everything before it has (probably) arrived
             <span style={{ opacity: ease(frame, closeAt, 10) }}>, so a window can close</span>
           </span>
         </Note>
@@ -416,7 +416,7 @@ export const TimeScene: React.FC = () => {
         </Note>
         <Note at={withFourAt - 4} x={X0} y={y(812)} out={q9Out}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            delay <Num>{t3.delay}</Num> s: first window closes at <Num>{t3.closeFirst}</Num> s
+            Delay <Num>{t3.delay}</Num> s: first window closes at <Num>{t3.closeFirst}</Num> s
             <span style={{ opacity: ease(frame, withFourAt + 4, 8) }}>
               , with <Num>{WATERMARK.firstOnTime}</Num>
             </span>
@@ -427,7 +427,7 @@ export const TimeScene: React.FC = () => {
         </Note>
         <Note at={laterAt + 4} x={X0} y={y(854)} out={q9Out}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            delay <Num>{t10.delay}</Num> s: it counts, <Num>{t10.firstCount}</Num> clicks, but closes at <Num>{t10.closeFirst}</Num> s,{" "}
+            Delay <Num>{t10.delay}</Num> s: it counts, <Num>{t10.firstCount}</Num> clicks, but closes at <Num>{t10.closeFirst}</Num> s,{" "}
             <b style={{ color: ACCENT_INK }}>
               <Num>{WATERMARK.closeLater}</Num> s later
             </b>
@@ -435,7 +435,7 @@ export const TimeScene: React.FC = () => {
         </Note>
         <Note at={buysAt} x={1260} y={y(812)} out={q9Out}>
           <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            longer delay: more complete, later
+            Longer delay: more complete, later
             <br />
             <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, stateAt, 10) }}>and more state held</span>
           </span>
@@ -447,7 +447,7 @@ export const TimeScene: React.FC = () => {
             at: keepAt,
             body: (
               <>
-                <b>1</b> allowed lateness <Num>{WATERMARK.threeLate.lateness}</Num> s: window 0 to 10 s stays open until the watermark passes{" "}
+                <b>1</b> Allowed lateness <Num>{WATERMARK.threeLate.lateness}</Num> s: window 0 to 10 s stays open until the watermark passes{" "}
                 <Num>{WINDOWS.size + WATERMARK.threeLate.lateness}</Num> s
               </>
             ),
@@ -456,7 +456,7 @@ export const TimeScene: React.FC = () => {
             at: sideAt - 2,
             body: (
               <>
-                <b>2</b> later than that: a side output
+                <b>2</b> Later than that: a side output
                 <span style={{ opacity: ease(frame, streamAt, 10) }}>, a separate stream</span>
                 <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, silenceAt, 10) }}>, never silently dropped</span>
               </>
@@ -466,7 +466,7 @@ export const TimeScene: React.FC = () => {
             at: upsertAt,
             body: (
               <>
-                <b>3</b> the sink upserts<span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, replacesAt, 10) }}>: one row, replaced</span>
+                <b>3</b> The sink upserts<span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, replacesAt, 10) }}>: one row, replaced</span>
               </>
             ),
           },
@@ -476,7 +476,7 @@ export const TimeScene: React.FC = () => {
           </Note>
         ))}
         <Note at={mixAt} x={X0} y={y(720) + 3 * h(44) + h(6)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>early, on-time and late results: how late, and how much it matters, decides the mix</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Early, on-time and late results: how late, and how much it matters, decides the mix</span>
         </Note>
         {/* The window's row in the sink: four, then five, in place. */}
         <Box x={1420} y={y(712)} w={380} h={h(64)} at={updateAt} size={24}>

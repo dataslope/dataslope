@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, fmt, label } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
+import { M } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HACK } from "./data";
@@ -84,7 +85,7 @@ export const HackScene: React.FC = () => {
 
         <Note at={tryingAt} x={X0} y={y(290)}>
           <span style={{ ...noteText(26, INK) }}>
-            try analyses until one is significant,{" "}
+            Try analyses until one is significant,{" "}
             <span style={{ opacity: ease(frame, onlyAt - 2, 10) }}>
               then report <Mark at={onlyAt + 4} color={MARK_BAD}>only that one</Mark>
             </span>
@@ -129,8 +130,8 @@ export const HackScene: React.FC = () => {
         </Note>
         <Note at={chanceAt} x={X0} y={y(540)}>
           <span style={{ ...noteText(26, INK), ...TABULAR }}>
-            the chance of at least one in 20:{" "}
-            <span style={{ fontFamily: MONO, fontWeight: 500 }}>1 − 0.95²⁰</span>{" "}
+            The chance of at least one in 20:{" "}
+            <M>{"1 − 0.95^{20}"}</M>{" "}
             <span style={{ opacity: ease(frame, pctAt - 2, 10) }}>
               = <Mark at={pctAt + 2} color={MARK_BAD}>{Math.round(HACK.atLeastOne * 100)}%</Mark>
             </span>
@@ -139,7 +140,7 @@ export const HackScene: React.FC = () => {
 
         {/* ── Five reasonable choices, thirty-two analyses ── */}
         <Note at={deliberateAt} x={SIDE_X + 140} y={y(610)}>
-          <span style={{ ...noteText(24, INK_SOFT) }}>it needn&apos;t be deliberate</span>
+          <span style={{ ...noteText(24, INK_SOFT) }}>It needn&apos;t be deliberate</span>
         </Note>
         <Svg>
           {LEVELS.map((_, k) => {
@@ -190,7 +191,7 @@ export const HackScene: React.FC = () => {
           <Note key={i} at={t} x={SIDE_X + 140} y={y([660, 720, 812][i])}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <Tick at={t + 4} size={26} />
-              <span style={{ ...noteText(26, OK_INK) }}>{["pre-register the plan", "correct for the number of tests", "confirm on fresh data"][i]}</span>
+              <span style={{ ...noteText(26, OK_INK) }}>{["Pre-register the plan", "Correct for the number of tests", "Confirm on fresh data"][i]}</span>
             </div>
           </Note>
         ))}

@@ -117,7 +117,7 @@ export const KnnScene: React.FC = () => {
       at: oneAt,
       score: newOnesAt,
       under: varianceAt,
-      tag: "high variance",
+      tag: "High variance",
       tagInk: ACCENT_INK,
     },
     {
@@ -133,7 +133,7 @@ export const KnnScene: React.FC = () => {
       at: seventyFiveAt,
       score: eightySevenAt,
       under: biasAt,
-      tag: "high bias",
+      tag: "High bias",
       tagInk: ACCENT_INK,
     },
   ];
@@ -219,12 +219,12 @@ export const KnnScene: React.FC = () => {
 
         <Note at={keepAt} x={COL} y={y(350)} out={out1}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            keeps all {MOONS.nTrain} training points
+            Keeps all {MOONS.nTrain} training points
           </span>
         </Note>
         <Note at={newAt} x={COL} y={y(410)} out={out1}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            a new point{" "}
+            A new point{" "}
             <span style={{ opacity: ease(frame, closestAt, 10) }}>
               → its k closest
             </span>{" "}
@@ -252,7 +252,7 @@ export const KnnScene: React.FC = () => {
         </Note>
         <Note at={noTrainAt} x={COL} y={y(660)} out={out1}>
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>
-            no training step,
+            No training step,
           </span>
         </Note>
         <Note at={slowAt} x={COL} y={y(700)} out={out1}>
@@ -282,7 +282,10 @@ export const KnnScene: React.FC = () => {
                 k = {p.k}
               </PanelTitle>
               <Regions grid={m.grid} box={box} at={p.at} dur={18} />
-              <Frame box={box} at={tradeAt} />
+              {/* The outline holds the empty plot; once the regions fill it,
+                  their edge is the box, so the outline goes (the owner,
+                  2026-11-11). */}
+              <Frame box={box} at={tradeAt} out={p.at + 12} />
               <Points
                 xs={MOONS.x}
                 ys={MOONS.y}
@@ -319,9 +322,9 @@ export const KnnScene: React.FC = () => {
                   }}
                 >
                   {p.k === "1"
-                    ? `training ${Math.round(m.train * 100)}% · `
+                    ? `Training ${Math.round(m.train * 100)}% · `
                     : ""}
-                  new {Math.round(m.test * 100)}%
+                  {p.k === "1" ? "new" : "New"} {Math.round(m.test * 100)}%
                 </span>
               </Note>
               {p.tag ? (
@@ -353,12 +356,12 @@ export const KnnScene: React.FC = () => {
               padding: "0 6px",
             }}
           >
-            every point owns a patch
+            Every point owns a patch
           </span>
         </Note>
         <Note at={cvAt} x={LEFTS[0]} y={y(TOP) + h(PH) + h(104)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <Mark at={labelsAt}>choose k by cross-validation</Mark>
+            <Mark at={labelsAt}>Choose k by cross-validation</Mark>
           </span>
         </Note>
       </Drift>

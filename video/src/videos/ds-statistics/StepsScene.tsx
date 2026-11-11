@@ -6,14 +6,14 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Mark, MARK_OK, noteText, OK_INK, Svg, X0 } from "./parts";
 
 const STEP_TOP = 390;
 const STEP_PITCH = 92;
-const HYP_X = 360;
+const HYP_X = 400;
 const SKETCH_X = 1300;
 const SKETCH_W = 300;
 const SKETCH_H = 70;
@@ -90,19 +90,27 @@ export const StepsScene: React.FC = () => {
   const STEPS = [
     <>State the null and the alternative</>,
     <>
-      Choose the significance level, <i>α</i>, and size the sample
+      Choose the significance level,{" "}
+      <MathRun>
+        <I>α</I>
+      </MathRun>
+      , and size the sample
     </>,
     <>Collect the data; compute the test statistic and its p-value</>,
     <>
-      Reject the null if <i>p</i> &lt; <i>α</i>, and say what that means
+      Reject the null if{" "}
+      <MathRun>
+        <I>p</I> &lt; <I>α</I>
+      </MathRun>
+      , and say what that means
     </>,
   ];
   const stepY = (i: number) => y(STEP_TOP + i * STEP_PITCH);
   const hyp = [
-    { y: y(420), name: "the null", formula: <>
+    { y: y(420), name: "The null", formula: <>
         <Ctr of="new" /> = <Ctr of="old" />
       </>, at: nullAt, tag: null },
-    { y: y(530), name: "the alternative", formula: <>
+    { y: y(530), name: "The alternative", formula: <>
         <Ctr of="new" /> ≠ <Ctr of="old" />
       </>, at: differAt, tag: { text: "two-sided", at: twoAt, sides: 2 as const, area: "2.5% each side" } },
     { y: y(640), name: "", formula: <>
@@ -131,22 +139,23 @@ export const StepsScene: React.FC = () => {
 
         {/* ── Question 9: the four steps ── */}
         <Note at={defAt} x={X0} y={y(300)} out={stepsOut}>
-          <span style={{ ...noteText(26, INK_SOFT) }}>deciding whether the data give enough evidence against a null hypothesis</span>
+          <span style={{ ...noteText(26, INK_SOFT) }}>Deciding whether the data give enough evidence against a null hypothesis</span>
         </Note>
         {STEPS.map((text, i) => (
           <Note key={i} at={stepAt[i]} x={X0} y={stepY(i)} out={stepsOut}>
             <div style={{ display: "flex", alignItems: "center", gap: 22, whiteSpace: "nowrap" }}>
               <span
                 style={{
-                  width: 46,
-                  height: 46,
+                  width: 50,
+                  height: 50,
                   borderRadius: "50%",
                   border: `2.5px solid ${BAR}`,
                   background: i < 2 ? `color-mix(in srgb, ${BAR} ${ease(frame, beforeAt + 4 + i * 3, 12) * 100}%, ${PAPER})` : PAPER,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  ...label(24),
+                  // Within 12% of the step's 32px text beside it: one line.
+                  ...label(29),
                   // After label(), which sets its own color.
                   color: i < 2 && frame > beforeAt + 8 ? PAPER : BLUE_INK,
                   fontWeight: 500,
@@ -180,7 +189,7 @@ export const StepsScene: React.FC = () => {
         <Note at={beforeAt + 6} x={1204} y={stepY(0) + h(28)} out={stepsOut}>
           <span style={{ ...noteText(26, OK_INK) }}>
             <Mark at={beforeAt + 10} color={MARK_OK}>
-              before you see any data
+              Before you see any data
             </Mark>
           </span>
         </Note>
@@ -192,9 +201,7 @@ export const StepsScene: React.FC = () => {
               <span style={{ ...noteText(28, INK_SOFT), fontWeight: 500 }}>{r.name}</span>
             </Note>
             <Note at={r.at + 2} x={HYP_X} y={r.y - h(4)}>
-              <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 500, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
-                {r.formula}
-              </span>
+              <MathRun style={{ fontSize: 36, color: INK }}>{r.formula}</MathRun>
             </Note>
             {r.tag ? (
               <>
@@ -219,11 +226,11 @@ export const StepsScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={pickAt} x={X0} y={y(750)}>
-          <span style={{ ...noteText(26, INK) }}>chosen before you look</span>
+          <span style={{ ...noteText(26, INK) }}>Chosen before you look</span>
         </Note>
         <Note at={saferAt + 6} x={X0} y={y(810)}>
           <span style={{ ...noteText(26, OK_INK) }}>
-            two-sided: the safer default, it catches a change{" "}
+            Two-sided: the safer default, it catches a change{" "}
             <span style={{ opacity: ease(frame, eitherAt - 2, 10) }}>in either direction</span>
           </span>
         </Note>

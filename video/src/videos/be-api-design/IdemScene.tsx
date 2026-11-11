@@ -58,7 +58,11 @@ export const IdemScene: React.FC = () => {
   const constraintAt = n.word("idem-race", "a unique constraint on the key");
   const racingAt = n.word("idem-race", "two retries racing each other");
   const refusesAt = n.word("idem-race", "the database refuses the second");
-  const end = n.beat("idem-race").to;
+  const catchesAt = n.word("idem-reply", "The server catches that refusal");
+  const storedAt = n.word("idem-reply", "answers with the stored payment");
+  const reusedAt = n.word("idem-reply", "a key reused with a different body");
+  const rejectedAt = n.word("idem-reply", "is rejected");
+  const end = n.beat("idem-reply").to;
 
   // Why it matters: the retry, up for its own beat, gone as the run starts.
   const gone = runAt - 8;
@@ -139,7 +143,7 @@ export const IdemScene: React.FC = () => {
         <Msg x={X0} y={msgTop} w={540} at={postAt} lines={[{ t: "POST /payments" }, { t: BODY }]} />
         {plainRows.map((r, i) => (
           <Note key={i} at={r.at - 2} x={X0} y={plainG.rowTop(i) + h(8)}>
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>{i === 0 ? "attempt" : "retry"}</span>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>{i === 0 ? "Attempt" : "Retry"}</span>
           </Note>
         ))}
         <DataTable g={plainG} cols={plainCols} rows={plainRows} at={chargedAt} />
@@ -170,7 +174,7 @@ export const IdemScene: React.FC = () => {
         {keyedBack.map((back, i) => (
           <Note key={i} at={i === 0 ? storesAt + 8 : findsAt + (i - 1) * 8} x={R_X} y={attemptsTop + i * h(40)}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-              <span style={{ color: INK_SOFT }}>{i === 0 ? "attempt" : "retry"} →</span>{" "}
+              <span style={{ color: INK_SOFT }}>{i === 0 ? "Attempt" : "Retry"} →</span>{" "}
               {i === 0 ? back : <Mark at={originalAt + (i - 1) * 6}><span style={{ color: OK_INK, fontWeight: 500 }}>{back}</span></Mark>}
             </span>
           </Note>
@@ -213,6 +217,18 @@ export const IdemScene: React.FC = () => {
           >
             {IDEM.duplicate}
           </div>
+        </Note>
+
+        {/* What the losing request gets back, and a key reused with another body. */}
+        <Note at={catchesAt} x={1290} y={raceTop + h(44)}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            Caught: <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, storedAt, 10) }}>→ payment {storedId}, as stored</span>
+          </span>
+        </Note>
+        <Note at={reusedAt} x={1290} y={raceTop + h(92) + 4}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            Same key, new body: <b style={{ color: ACCENT_INK, opacity: ease(frame, rejectedAt, 10) }}>rejected</b>
+          </span>
         </Note>
 
         {/* A hairline between the two runs. */}

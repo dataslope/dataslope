@@ -123,10 +123,10 @@ export const MistakesScene: React.FC = () => {
   const pitch = h(54);
   const restTop = y(TOP);
   const rest = [
-    { at: restFrom - 12, text: "date boundaries" },
-    { at: restFrom - 6, text: "averaging ratios" },
-    { at: fanAt - 2, text: "fan-out", silent: true },
-    { at: rulesAt - 2, text: "business rules it couldn't know", silent: true },
+    { at: restFrom - 12, text: "Date boundaries" },
+    { at: restFrom - 6, text: "Averaging ratios" },
+    { at: fanAt - 2, text: "Fan-out", silent: true },
+    { at: rulesAt - 2, text: "Business rules it couldn't know", silent: true },
   ];
   const labelY = restTop + rest.length * pitch + h(4);
   const loudY = labelY + h(64);
@@ -157,12 +157,12 @@ export const MistakesScene: React.FC = () => {
           What mistakes do AI-generated queries make most often?
         </QuestionCard>
         <Note at={sameAt - 2} x={X0} y={y(TOP) - h(92)} out={firstAt - 2}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the ones people make, said with more confidence</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The ones people make, said with more confidence</span>
         </Note>
         {/* The worked mistake, named while it is on screen. */}
-        {running(firstAt + 8, outA, 1, "date boundaries")}
+        {running(firstAt + 8, outA, 1, "Date boundaries")}
         {/* The second waits until the first has gone, so the two never overlap. */}
-        {running(outA + 10, undefined, 2, "averaging ratios")}
+        {running(outA + 10, undefined, 2, "Averaging ratios")}
 
         {/* ── The date boundary, on the page's nine orders ── */}
         <TableName g={kg} at={asked - 6} out={outA}>
@@ -188,12 +188,12 @@ export const MistakesScene: React.FC = () => {
           </span>
         </Note>
         <Note at={totalAt + 2} x={X0} y={notesTop + h(60)} out={outA}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>order 5 is cancelled: out of both totals</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Order 5 is cancelled: out of both totals</span>
         </Note>
         {/* Why half-open, not an end one second before midnight (check.mjs's lastSecond). */}
         <Note at={precisionAt - 2} x={X0} y={notesTop + h(100)} out={outA}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            half-open is right at any precision
+            Half-open is right at any precision
             <span style={{ ...note(23, INK), fontWeight: 400, opacity: ease(frame, secondAt - 2, 10) }}>
               : an end at <Mono>{last[0].slice(11, 19)}</Mono> still drops <Mono color={ACCENT_INK}>{lastTime}</Mono>
             </span>
@@ -229,7 +229,7 @@ export const MistakesScene: React.FC = () => {
         />
         <Note at={halfAt - 2} x={LIST_X} y={pg.rowTop(1) + h(18)} out={outA}>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            the assistant misses <Num>{BOUNDARY.missed}%</Num> of January&apos;s revenue
+            The assistant misses <Num>{BOUNDARY.missed}%</Num> of January&apos;s revenue
           </span>
         </Note>
 
@@ -250,7 +250,7 @@ export const MistakesScene: React.FC = () => {
         <DataTable g={ag} cols={colsOf(RATIOS.averaged)} at={averageAt + 4} rows={rowsAt(RATIOS.averaged.rows, twentySixAt - 2)} marks={[{ row: 0, col: 0, at: twentySixAt + 4, color: MARK_BAD }]} />
         <Note at={countsAt - 2} x={X0} y={avgTop + avgH + h(12)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            a {small}-session day counts as much as a {large}-session one
+            A {small}-session day counts as much as a {large}-session one
           </span>
         </Note>
         <Listing
@@ -291,18 +291,18 @@ export const MistakesScene: React.FC = () => {
           }}
         />
         <Note at={silentAt - 2} x={REST_X} y={labelY}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>the silent ones are the danger</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The silent ones are the danger</span>
         </Note>
         <Note at={inventedAt - 2} x={REST_X} y={loudY}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <span style={{ ...label(24, INK_SOFT), marginRight: 12 }}>
               <Num>5</Num>
             </span>
-            invented columns, wrong-dialect functions
+            Invented columns, wrong-dialect functions
           </span>
         </Note>
         <Note at={loudAt - 2} x={REST_X + 26} y={loudY + h(40)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>they fail loudly: the harmless kind</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>They fail loudly: the harmless kind</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -23,16 +23,16 @@ type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Lay
 
 const Loss: React.FC<{ c: Ctx }> = ({ c }) => {
   const rows = [
-    { task: "several classes", out: "softmax", loss: "cross-entropy", at: c.w("r-loss", "A softmax output with cross-entropy") },
-    { task: "two classes", out: "sigmoid", loss: "binary cross-entropy", at: c.w("r-loss", "or a sigmoid with binary cross-entropy") },
-    { task: "regression", out: "linear", loss: "mean squared error", at: c.w("r-loss", "For regression") },
+    { task: "Several classes", out: "Softmax", loss: "Cross-entropy", at: c.w("r-loss", "A softmax output with cross-entropy") },
+    { task: "Two classes", out: "Sigmoid", loss: "Binary cross-entropy", at: c.w("r-loss", "or a sigmoid with binary cross-entropy") },
+    { task: "Regression", out: "Linear", loss: "Mean squared error", at: c.w("r-loss", "For regression") },
   ];
   const robustAt = c.w("r-loss", "a robust loss when outliers matter");
   const stallsAt = c.w("r-loss", "Squared error on a sigmoid output stalls");
   const COLS = [R_X + 40, R_X + 330, R_X + 560];
   return (
     <>
-      {["task", "output layer", "loss"].map((t, i) => (
+      {["Task", "Output layer", "Loss"].map((t, i) => (
         <Tagline key={t} x={COLS[i]} y={c.y(380)} at={rows[0].at - 6} size={21}>
           {t}
         </Tagline>
@@ -51,11 +51,11 @@ const Loss: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={stallsAt - 2} x={COLS[0]} y={c.y(730)}>
         <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          squared error on a sigmoid output: <Mark at={stallsAt + 6}>stalls once it saturates</Mark>
+          Squared error on a sigmoid output: <Mark at={stallsAt + 6}>stalls once it saturates</Mark>
         </span>
       </Note>
       <Note at={stallsAt + 10} x={COLS[0]} y={c.y(776)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>saturated: on a flat end of the curve, where the gradient is nearly 0</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Saturated: on a flat end of the curve, where the gradient is nearly 0</span>
       </Note>
     </>
   );
@@ -87,7 +87,7 @@ const Init: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={equalAt - 2} x={R_X + 40} y={c.y(330)}>
         <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-          every weight equal: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>the units stay copies</span>
+          Every weight equal: <span style={{ color: ACCENT_INK, fontWeight: 500 }}>the units stay copies</span>
         </span>
       </Note>
       <Axes x={xs} y={ys} xTicks={[0, 2, 4, 6, 8, 10]} xTitle={`ReLU layers, ${INIT.width} wide`} yTitle="the signal's spread" at={scaleAt - 4} />
@@ -176,7 +176,7 @@ const Epoch: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Tagline x={bar.x} y={bar.y - c.h(46)} at={epochAt} size={22} color={INK}>
-        one epoch: one pass over the training set
+        One epoch: one pass over the training set
       </Tagline>
       <div style={{ position: "absolute", left: bar.x, top: bar.y, width: W * full, height: bar.h, background: `color-mix(in srgb, ${BAR} 22%, transparent)`, border: `2px solid ${BAR}`, borderRadius: 4, boxSizing: "border-box" }} />
       <Svg>
@@ -188,10 +188,10 @@ const Epoch: React.FC<{ c: Ctx }> = ({ c }) => {
         <rect x={bar.x} y={bar.y - 8} width={seg} height={bar.h + 16} fill={OK} opacity={ease(frame, batchAt, 10)} />
       </Svg>
       <Note at={batchAt + 2} x={bar.x} y={bar.y + bar.h + c.h(14)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>one batch → one update: an iteration</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>One batch → one update: an iteration</span>
       </Note>
       <Note at={iterAt + 6} x={bar.x} y={bar.y + bar.h + c.h(54)}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>batch: the examples behind one update; iteration: the update</span>
+        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Batch: the examples behind one update; iteration: the update</span>
       </Note>
       <Note at={tenAt - 2} x={bar.x} y={c.y(760)}>
         <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
@@ -203,7 +203,7 @@ const Epoch: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={makeAt + 6} x={bar.x + W} y={bar.y + bar.h + c.h(14)} align="right" width={300}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>the last batch holds {EPOCH.lastBatch}</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>The last batch holds {EPOCH.lastBatch}</span>
       </Note>
     </>
   );

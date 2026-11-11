@@ -7,7 +7,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * (agent-outputs/20261106-backend-interview-video-plan.md, "0, The
  * interview, now"), after content/interview/backend-engineer/index.mdx and
  * ai-assisted-coding.mdx's "How have coding interviews changed since AI
- * assistants became standard?", which it answers ("ai" to "ai-ask"): what
+ * assistants became standard?", which it answers ("ai" to "ai-ask-practice"): what
  * the rounds test, the two kinds of AI round, why take-homes lost their
  * signal, where the time went, and the map of the series, then the bridge
  * into Part 1.
@@ -31,22 +31,29 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     here: "Part 8" on the first three, "Parts 1 to 5" on the backend row,
  *     and "Python page: not in this series" in grey on language
  *     fundamentals (the series comes back to it on "series-python").
- *   - "ai" to "ai-ask": the heading "Coding round" forking into two
+ *   - "ai" to "ai-ask-practice": the heading "Coding round" forking into two
  *     columns, "AI allowed" and "AI banned", in neutral ink (neither is the
  *     right answer, so neither is green or red). The two formats are named,
  *     not the companies, so the video does not date: under allowed, on
  *     "ai-allowed-who", "Extend a multi-file project, assistant built in" and
  *     "Read, debug and speed up unfamiliar code", each inking in on its
- *     words, and "Part 9" under the column; under banned, "Unapproved AI can
- *     disqualify you" and "Some rounds back in person". Then the envelope
- *     spot for a take-home, faded ("ai-why"), beside two bars,
+ *     words, and each followed by the part that answers it, "Part 9" and
+ *     "Part 7" (the code comprehension round is Part 7's, as the page and
+ *     the plan say); under banned, "Unapproved AI can disqualify you" and
+ *     "Some rounds back in person". Then the envelope spot for a take-home,
+ *     faded ("ai-why"; the screen adds the page's "or an online test"),
+ *     beside two bars, with the fork's heads receding while they are up,
  *     71% and 62%, inked on "ai-survey-data" and sourced "Karat, Engineering
  *     Interview Trends 2026, 400 engineering leaders; one vendor's survey".
  *     Then where the time went: three blocks of text (extend a multi-file
  *     project, read and debug unfamiliar code, design discussion), with
  *     "Part 9", "Part 7" and "Parts 1 and 2" under them, and the four LLM
  *     topics as a line of words, labelled "Part 9". "ai-ask" writes "Ask the
- *     recruiter, for every round" across the fork.
+ *     recruiter, for every round" across the fork; "ai-ask-practice" puts
+ *     how to prepare under each head, "algorithm practice still matters:
+ *     Part 8" under banned and "practise driving and checking the
+ *     assistant: Part 9" under allowed. "ai-moved" says "including those
+ *     two", so the live rounds read as the allowed formats seen again.
  *   - "series" to "next": "Decisions, not syntax" as the headline; then the
  *     nine topic videos as a bar chart of the questions each answers (PARTS
  *     in data.ts), each bar topped by its own small hero, in series order,
@@ -84,8 +91,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     caveat both.
  *   - "ai-moved": the AI page's live rounds and the index's "multi-file
  *     projects to extend". "ai-llm": the index, "LLM features in system
- *     design". "ai-ask": the AI page's bold line and "algorithm practice
- *     still matters for AI-off rounds and phone screens".
+ *     design". "ai-ask": the AI page's bold line. "ai-ask-practice": its
+ *     "algorithm practice still matters for AI-off rounds and phone
+ *     screens, and the habits on this page matter for AI-on ones".
  *   - "series": the plan's "decisions and trade-offs, never coding syntax".
  *     "series-parts": nine videos after this one, 125 questions, each
  *     answered once: the plan's table, held in data.ts (PARTS). The seven
@@ -132,6 +140,7 @@ export const script: NarrationScript = {
     {
       id: "ai-allowed",
       text: "Some rounds hand you an assistant and grade how you drive and check it.",
+      pauseAfter: 0.8,
     },
     {
       id: "ai-allowed-who",
@@ -159,7 +168,7 @@ export const script: NarrationScript = {
     },
     {
       id: "ai-moved",
-      text: "So the time has moved to live rounds where the interviewer watches you reason: extending a multi-file project, reading and debugging unfamiliar code, and design discussions with follow-ups.",
+      text: "So the time has moved to live rounds, including those two, where the interviewer watches you reason: extending a multi-file project, reading and debugging unfamiliar code, and design discussions with follow-ups.",
       pauseAfter: 0.6,
     },
     {
@@ -167,9 +176,10 @@ export const script: NarrationScript = {
       text: "And system design now takes in features that call a large language model, or LLM: streaming, retries, cost measured in tokens, and prompt injection.",
       pauseAfter: 0.6,
     },
+    { id: "ai-ask", text: "Ask the recruiter, round by round, whether AI is allowed, and prepare for both." },
     {
-      id: "ai-ask",
-      text: "Ask the recruiter, round by round, whether AI is allowed, and prepare for both. Algorithm practice still matters where it isn't.",
+      id: "ai-ask-practice",
+      text: "Algorithm practice still matters where it isn't, and in phone screens; where it is, practise driving and checking the assistant.",
       pauseAfter: 0.8,
     },
     { id: "series", scene: true, text: "This series argues decisions, not syntax.", pauseAfter: 0.6 },
@@ -185,7 +195,7 @@ export const script: NarrationScript = {
     },
     {
       id: "practice",
-      text: "Every topic page has concept checks, three add challenges that run in the browser, and a bank of a hundred and ten multiple-choice questions covers the whole track.",
+      text: "Every topic page has concept checks, three of them add challenges that run in the browser, and a bank of a hundred and ten multiple-choice questions covers the whole track.",
       pauseAfter: 0.8,
     },
     { id: "next", text: "As take-homes faded, the round that grew was design. Next: approaching system design." },

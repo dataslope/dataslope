@@ -49,10 +49,10 @@ const TEXT_MID = 29;
 
 const Pillars: React.FC<{ c: Ctx }> = ({ c }) => {
   const rows = [
-    { at: c.w("r-pillars", "Encapsulation bundles data"), word: "Encapsulation", gloss: "bundles data with its methods, hides the state", color: BAR },
-    { at: c.w("r-pillars", "Inheritance reuses"), word: "Inheritance", gloss: "reuses and specializes a class", color: ds("green", 500) },
-    { at: c.w("r-pillars", "Polymorphism gives one call"), word: "Polymorphism", gloss: "one call, the right behavior for each type", color: ACCENT },
-    { at: c.w("r-pillars", "Abstraction shows what an object does"), word: "Abstraction", gloss: "what an object does, not how", color: ds("yellow", 600) },
+    { at: c.w("r-pillars", "Encapsulation bundles data"), word: "Encapsulation", gloss: "Bundles data with its methods, hides the state", color: BAR },
+    { at: c.w("r-pillars", "Inheritance reuses"), word: "Inheritance", gloss: "Reuses and specializes a class", color: ds("green", 500) },
+    { at: c.w("r-pillars", "Polymorphism gives one call"), word: "Polymorphism", gloss: "One call, the right behavior for each type", color: ACCENT },
+    { at: c.w("r-pillars", "Abstraction shows what an object does"), word: "Abstraction", gloss: "What an object does, not how", color: ds("yellow", 600) },
   ];
   const pw = artW("pillar", PILLAR_H);
   return (
@@ -83,15 +83,19 @@ const Encap: React.FC<{ c: Ctx }> = ({ c }) => {
   const hidesAt = c.w("r-encap", "an account hides its balance");
   const checkAt = c.w("r-encap", "methods that check");
   const overdrawAt = c.w("r-encap", "no withdrawal can overdraw it");
-  const guardAt = c.w("r-encap", "Guard every way in");
-  const ctorAt = c.w("r-encap", "the constructor too");
-  const opensAt = c.w("r-encap", "An account that opens at minus fifty");
-  const alreadyAt = c.w("r-encap", "is overdrawn already");
+  const opensAt = c.w("r-encap-ctor", "But an account that opens at minus fifty");
+  const alreadyAt = c.w("r-encap-ctor", "is overdrawn already");
+  const guardAt = c.w("r-encap-ctor", "so guard every way in");
+  const ctorAt = c.w("r-encap-ctor", "the constructor too");
+  if (!ACCOUNT.guardedOpening.startsWith("ValueError")) throw new Error(`the guarded constructor now says ${ACCOUNT.guardedOpening}`);
   const shell = { x: 1090, w: 320, top: c.y(420), h: 210 };
   const mid = shell.top + shell.h / 2;
   const bounce = ease(frame, overdrawAt + 4, 10) - ease(frame, overdrawAt + 16, 10);
-  const opened = ease(frame, opensAt + 10, 12);
-  const value = opened > 0.5 ? ACCOUNT.opening : 100;
+  // The unguarded door lets -50 in; once guarded, the arrow stops outside
+  // it, refused, and the balance is the account's own again.
+  const opened = ease(frame, opensAt + 14, 12);
+  const guarded = ease(frame, guardAt + 6, 12);
+  const value = opened > 0.5 && guarded < 0.5 ? ACCOUNT.opening : 100;
   const overdraw = ACCOUNT.overdraw.replace(/^ValueError: /, "");
   return (
     <>
@@ -131,18 +135,21 @@ const Encap: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
 
       {/* The constructor's door, unguarded, then guarded. */}
-      <Box x={shell.x - 16} y={mid - 30} w={26} h={60} at={guardAt} tone="bad" tones={[[alreadyAt + 16, "ok"]]} dashed radius={6} />
-      <Line x={R_X} y={mid - 112} at={ctorAt} size={22} weight={500} color={ACCENT_INK}>
-        <span style={{ opacity: 1 - ease(frame, alreadyAt + 16, 10) }}>opening: no check</span>
+      <Box x={shell.x - 16} y={mid - 30} w={26} h={60} at={opensAt - 4} tone="bad" tones={[[guardAt + 6, "ok"]]} dashed radius={6} />
+      <Line x={R_X} y={mid - 112} at={opensAt} size={22} weight={500} color={ACCENT_INK}>
+        <span style={{ opacity: 1 - ease(frame, guardAt + 6, 10) }}>opening: no check</span>
       </Line>
-      <Line x={R_X} y={mid - 112} at={alreadyAt + 16} size={22} weight={500} color={OK_INK}>
+      <Line x={R_X} y={mid - 112} at={ctorAt} size={22} weight={500} color={OK_INK}>
         opening: checked too
       </Line>
-      <Flow points={[[R_X, mid], [shell.x - 26, mid]]} at={opensAt} dur={10} color={ACCENT} />
-      <Line x={R_X} y={mid - 46} at={opensAt} size={22} weight={500}>
+      <Flow points={[[R_X, mid], [shell.x - 26 - 30 * guarded, mid]]} at={opensAt + 4} dur={10} color={ACCENT} />
+      <Line x={R_X} y={mid - 46} at={opensAt + 4} size={22} weight={500}>
         open at −50
       </Line>
-      <Line x={shell.x} y={shell.top + shell.h + 26} at={alreadyAt} size={24} color={ACCENT_INK} weight={500}>
+      <Line x={R_X} y={mid + 22} at={guardAt + 12} size={22} color={ACCENT_INK} weight={500}>
+        refused
+      </Line>
+      <Line x={shell.x} y={shell.top + shell.h + 26} at={alreadyAt} out={guardAt + 6} size={24} color={ACCENT_INK} weight={500}>
         overdrawn already
       </Line>
       <Line x={shell.x} y={shell.top + shell.h + 76} at={guardAt} size={24} weight={500}>
@@ -162,8 +169,11 @@ const Poly: React.FC<{ c: Ctx }> = ({ c }) => {
   const noAt = c.w("r-poly", "with no ladder of type checks");
   const top = c.y(390);
   const shapes = c.y(560);
-  const circle = Math.PI * 1 ** 2;
-  if (Math.abs(circle + 4 - TOTAL_AREA) > 0.01) throw new Error("the parts no longer add up to the run's total");
+  // The page's run: total_area([Circle(1), Square(2)]).
+  const radius = 1;
+  const side = 2;
+  const circle = Math.PI * radius ** 2;
+  if (Math.abs(circle + side ** 2 - TOTAL_AREA) > 0.01) throw new Error("the parts no longer add up to the run's total");
   const R = 54;
   return (
     <>
@@ -186,13 +196,19 @@ const Poly: React.FC<{ c: Ctx }> = ({ c }) => {
         {circle.toFixed(2)}
       </Line>
       <Line x={1360} y={shapes + 150} at={squareAt + 10} size={26} weight={500} color={BLUE_INK} align="center" width={200}>
-        4
+        {side ** 2}
+      </Line>
+      <Line x={960} y={shapes + 192} at={circleAt + 10} size={21} color={INK_SOFT} weight={500} align="center" width={200}>
+        radius {radius}
+      </Line>
+      <Line x={1360} y={shapes + 192} at={squareAt + 10} size={21} color={INK_SOFT} weight={500} align="center" width={200}>
+        side {side}
       </Line>
       <Line x={1336} y={top + 18} at={squareAt + 16} size={26} weight={500} color={BLUE_INK}>
         = {TOTAL_AREA.toFixed(2)}
       </Line>
       <Line x={R_X} y={c.y(800)} at={noAt} size={24} color={INK_SOFT}>
-        no ladder of <Strike at={noAt + 8}>type checks</Strike>
+        No ladder of <Strike at={noAt + 8}>type checks</Strike>
       </Line>
     </>
   );
@@ -297,7 +313,7 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
 
       {/* Two tests, in order, then the second alone. */}
       <Line x={R_X} y={testTop} at={passesAt - 4} size={21} color={INK_SOFT} weight={500}>
-        in order
+        In order
       </Line>
       {inOrder.map(([name, result], i) => {
         const ok = result === "pass";
@@ -313,7 +329,7 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
       })}
       <VRule x={1395} top={testTop} bottom={testTop + 114} at={passesAt} />
       <Line x={1430} y={testTop} at={passesAt} size={21} color={INK_SOFT} weight={500}>
-        alone
+        Alone
       </Line>
       {alone.map(([name, result]) => (
         <React.Fragment key={name}>
@@ -324,7 +340,7 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
         </React.Fragment>
       ))}
       <Line x={R_X} y={c.y(810)} at={cleanerAt} size={24} weight={500} color={OK_INK}>
-        often cleaner: a module-level value, or plain injection
+        Often cleaner: a module-level value, or plain injection
       </Line>
     </>
   );
@@ -348,7 +364,7 @@ const Slots: React.FC<{ x: number; top: number; w: number; at: number; filled: r
               width: w - 48,
               height: 34,
               boxSizing: "border-box",
-              borderRadius: 6,
+              borderRadius: 4,
               border: `2px ${f ? "solid" : "dashed"} ${f ? BAR : ds("gray", 400)}`,
               background: f ? `color-mix(in srgb, ${BAR} ${tone === "data" ? 22 : 0}%, ${PAPER})` : "transparent",
               opacity: p,
@@ -364,8 +380,11 @@ const Abstract: React.FC<{ c: Ctx }> = ({ c }) => {
   const declaresAt = c.w("r-abstract", "An interface declares");
   const noImplAt = c.w("r-abstract", "with no implementation");
   const abstractAt = c.w("r-abstract", "An abstract class can also share code and state");
-  const contractAt = c.w("r-abstract", "Use an interface for a pure contract");
-  const sharedAt = c.w("r-abstract", "an abstract class when subclasses share code");
+  const manyAt = c.w("r-abstract-many", "implement many interfaces");
+  const oneAt = c.w("r-abstract-many", "extend only one");
+  const defaultsAt = c.w("r-abstract-many", "can now carry default methods");
+  const contractAt = c.w("r-abstract-use", "Use an interface for a pure contract");
+  const sharedAt = c.w("r-abstract-use", "an abstract class when subclasses share code");
   const top = c.y(390);
   const w = 360;
   const h = 260;
@@ -379,22 +398,31 @@ const Abstract: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
       <Slots x={A} top={top} w={w} at={declaresAt + 6} filled={[false, false, false]} tone="plain" />
       <Line x={A} y={top + h + 22} at={noImplAt} size={22} color={INK_SOFT} weight={500}>
-        methods named, none written
+        Methods named, none written
       </Line>
-      <VRule x={(A + w + B) / 2} top={top} bottom={top + h + 104} at={abstractAt} />
+      <VRule x={(A + w + B) / 2} top={top} bottom={top + h + 156} at={abstractAt} />
       <Box x={B} y={top} w={w} h={h} at={abstractAt} tone="plain" />
       <Line x={B + 24} y={top + 18} at={abstractAt} size={25} weight={500}>
         Abstract class
       </Line>
       <Slots x={B} top={top} w={w} at={abstractAt + 6} filled={[true, true, false]} tone="data" />
       <Line x={B} y={top + h + 22} at={abstractAt + 10} size={22} color={INK_SOFT} weight={500}>
-        some code and state shared
+        Some code and state shared
       </Line>
-      <Line x={A} y={top + h + 74} at={contractAt} size={24} weight={500} color={OK_INK}>
-        a pure contract
+      <Line x={A} y={top + h + 74} at={manyAt} size={24} weight={500}>
+        A class implements many
       </Line>
-      <Line x={B} y={top + h + 74} at={sharedAt} size={24} weight={500} color={OK_INK}>
-        subclasses share code
+      <Line x={B} y={top + h + 74} at={oneAt} size={24} weight={500}>
+        A class extends only one
+      </Line>
+      <Line x={A} y={top + h + 126} at={contractAt} size={24} weight={500} color={OK_INK}>
+        A pure contract
+      </Line>
+      <Line x={B} y={top + h + 126} at={sharedAt} size={24} weight={500} color={OK_INK}>
+        Subclasses share code
+      </Line>
+      <Line x={A} y={top + h + 196} at={defaultsAt} size={21} color={INK_SOFT} weight={500}>
+        Java and C# interfaces may carry default methods, but never instance fields.
       </Line>
     </>
   );
@@ -417,9 +445,9 @@ const IsA: React.FC<{ c: Ctx }> = ({ c }) => {
   const H = 58;
   const cols = [R_X, 1160, 1500];
   const kinds = [
-    { at: isAt, upper: "Vehicle", lower: "Car", link: "is a", ok: true, note: "inheritance", noteAt: inhAt },
-    { at: hasAt, upper: "Car", lower: "Engine", link: "has a", ok: true, note: "composition", noteAt: compAt },
-    { at: extendAt, upper: "Engine", lower: "Car", link: "is a?", ok: false, note: "inherits it all", noteAt: wholeAt },
+    { at: isAt, upper: "Vehicle", lower: "Car", link: "is a", ok: true, note: "Inheritance", noteAt: inhAt },
+    { at: hasAt, upper: "Car", lower: "Engine", link: "has a", ok: true, note: "Composition", noteAt: compAt },
+    { at: extendAt, upper: "Engine", lower: "Car", link: "is a?", ok: false, note: "Inherits it all", noteAt: wholeAt },
   ];
   return (
     <>

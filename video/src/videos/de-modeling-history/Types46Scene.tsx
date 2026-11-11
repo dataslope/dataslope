@@ -125,7 +125,7 @@ export const Types46Scene: React.FC = () => {
           <DataTable g={gm} cols={colsOf(M)} at={mainAt} rows={[{ cells: M.rows[0], at: mainAt + 6 }]} />
           <Note at={fifteenAt - 2} x={gm.x} y={gm.rowTop(1) + h(12)}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-              current only: <b><Num>{TYPES46.mainRows}</Num></b> rows
+              Current only: <b><Num>{TYPES46.mainRows}</Num></b> rows
             </span>
           </Note>
           <TableName g={gh} at={historyAt}>
@@ -134,12 +134,12 @@ export const Types46Scene: React.FC = () => {
           <DataTable g={gh} cols={colsOf(H)} at={historyAt} rows={[{ cells: H.rows[0], at: historyAt + 6 }, { cells: H.rows[1], at: historyAt + 10 }]} />
           <Note at={twentyFourAt - 2} x={gh.x} y={gh.rowTop(2) + h(12)}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-              every version: <b><Num>{TYPES46.historyRows}</Num></b> rows
+              Every version: <b><Num>{TYPES46.historyRows}</Num></b> rows
             </span>
           </Note>
           <Note at={useAt} x={gh.right + 36} y={gh.rowTop(0)}>
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-              for history that is
+              For history that is
               <br />
               large and rarely read
             </span>
@@ -173,7 +173,7 @@ export const Types46Scene: React.FC = () => {
           ]}
         />
         <TableName g={go} at={o101At - 4}>
-          her orders, one join
+          Her orders, one join
         </TableName>
         <DataTable
           g={go}
@@ -195,14 +195,14 @@ export const Types46Scene: React.FC = () => {
           </span>
         </Note>
         <Note at={joinAt} x={go.right + 30} y={go.rowTop(0) + h(40)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>no second join</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>No second join</span>
         </Note>
         <Note at={part1At} x={gr.right + 30} y={gr.rowTop(0) - h(34)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Type 1: overwriting it</span>
         </Note>
         <Note at={priceAt} x={gr.right + 30} y={gr.rowTop(0) + h(2)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            the price:
+            The price:
             <span style={{ opacity: ease(frame, rewritesAt, 10) }}>
               {" "}a move rewrites
               <br />

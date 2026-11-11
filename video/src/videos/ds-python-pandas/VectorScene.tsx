@@ -94,7 +94,7 @@ export const VectorScene: React.FC = () => {
 
         {/* ── The loop, and the one line ── */}
         <Note at={loopAt - 4} x={X0} y={y(TOP) - h(40)} dim={onlyAt + 4}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a Python loop</span>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A Python loop</span>
         </Note>
         <Listing
           lines={L.lines}
@@ -113,7 +113,7 @@ export const VectorScene: React.FC = () => {
           dim={onlyAt + 4}
         />
         <Note at={vecAt - 4} x={X0} y={vecTop - h(40)}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>vectorized</span>
+          <span style={{ ...note(22, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Vectorized</span>
         </Note>
         <Listing
           lines={V.lines}
@@ -125,7 +125,7 @@ export const VectorScene: React.FC = () => {
           marks={[{ line: 0, at: oneAt, color: MARK_OK }]}
         />
         <Note at={numpyAt + 4} x={X0 + 700} y={vecTop + 20}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>one call into NumPy</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>One call into NumPy</span>
         </Note>
 
         {/* ── The page's frame, and the revenues both ways ── */}
@@ -157,7 +157,7 @@ export const VectorScene: React.FC = () => {
         />
         <Note at={stillAt} x={TABLE_X} y={y(TOP) + applyH + h(20)} dim={onlyAt + 4}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            a Python call per row: still a loop
+            A Python call per row: still a loop
           </span>
         </Note>
 
@@ -191,12 +191,12 @@ export const VectorScene: React.FC = () => {
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>1,000,000 rows</span>
         </Note>
         <Note at={wasmAt + 4} x={X0 + 240} y={y(BARS_Y) - h(44)}>
-          <Source>timed in Pyodide, Python in WebAssembly; a laptop will differ</Source>
+          <Source>Timed in Pyodide, Python in WebAssembly; a laptop will differ</Source>
         </Note>
         <Note at={hundredsAt} x={X0 + 600} y={y(BARS_Y) + h(66) + h(16)}>
           <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap", ...TABULAR }}>
             <Mark at={hundredsAt + 6} out={patternAt + 4}>
-              about {VECTOR.ratio}× faster here
+              About {VECTOR.ratio}× faster here
             </Mark>
             <FadeIn at={laptopAt}>
               <span style={{ ...note(28, INK_SOFT), fontWeight: 400, marginLeft: "0.8em" }}>

@@ -197,7 +197,7 @@ export const Box: React.FC<{
         height: r.h,
         boxSizing: "border-box",
         border: `2.4px ${dashed || t.quiet > 0.5 ? "dashed" : "solid"} ${t.border}`,
-        borderRadius: 12,
+        borderRadius: 8,
         background: t.fill,
         display: "flex",
         flexDirection: "column",

@@ -136,10 +136,10 @@ export const HistScene: React.FC = () => {
           </svg>
         ) : null}
         <Note at={gapsAt + 2} out={out4} x={LEFT.x0} y={base + h(56)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>gaps: the bars are separate things</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Gaps: the bars are separate things</span>
         </Note>
         <Note at={sortAt + 10} out={out4} x={LEFT.x0} y={base + h(92)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>any order you like, here largest first</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Any order you like, here largest first</span>
         </Note>
 
         {/* ── Question 4, right: a histogram of a number ── */}
@@ -150,15 +150,15 @@ export const HistScene: React.FC = () => {
         <BarSet values={TICKETS.bins.map((b) => b.count)} x0={RIGHT.x0} x1={RIGHT.x1} base={base} top={top} lo={RIGHT.lo} hi={RIGHT.hi} at={hoursAt - 4} step={1} fill={1} edge out={out4} />
         <XTicks ticks={[0, 6, 12, 18, 24]} x0={RIGHT.x0} x1={RIGHT.x1} lo={0} hi={TICKETS.hoursMax} y={base + 26} at={hoursAt + 6} out={out4} format={(v) => `${v} h`} lift={lift} />
         <Note at={touchAt} out={out4} x={RIGHT.x0} y={base + h(56)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>no gaps: one continuous axis, cut into 2-hour bins</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>No gaps: one continuous axis, cut into 2-hour bins</span>
         </Note>
         <Note at={numberAt} out={out4} x={RIGHT.x0} y={base + h(92)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the order is the number line&apos;s, not yours</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The order is the number line&apos;s, not yours</span>
         </Note>
 
         {/* ── Question 5: one sample, three bin widths ── */}
         <Note at={tryAt} x={PANELS[0].x0} y={y(P_TOP) - h(118)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>the same {BINS.n.toLocaleString("en-US")} values, three bin widths</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>The same {BINS.n.toLocaleString("en-US")} values, three bin widths</span>
         </Note>
         <PanelTitle x={PANELS[0].x0} y={y(P_TOP) - h(66)} at={fiveAt - 2}>
           Bins {wide.width} wide
@@ -166,7 +166,7 @@ export const HistScene: React.FC = () => {
         <BarSet values={wide.density} {...p(0)} at={fiveAt} step={2} fill={1} edge dim={liesAt - 6} />
         <XTicks ticks={[2, 12, 22]} x0={PANELS[0].x0} x1={PANELS[0].x1} lo={BINS.domain[0]} hi={BINS.domain[1]} y={y(P_BASE) + 26} at={fiveAt + 4} />
         <Verdict ok={false} x={PANELS[0].x0} y={y(P_BASE) + h(52)} at={fuseAt + 4}>
-          one peak where there are two
+          One peak where there are two
         </Verdict>
 
         <PanelTitle x={PANELS[2].x0} y={y(P_TOP) - h(66)} at={quarterAt - 2}>
@@ -175,7 +175,7 @@ export const HistScene: React.FC = () => {
         <BarSet values={narrow.density} {...p(2)} at={quarterAt} step={0.25} fill={1} dim={liesAt - 2} />
         <XTicks ticks={[2, 12, 22]} x0={PANELS[2].x0} x1={PANELS[2].x1} lo={BINS.domain[0]} hi={BINS.domain[1]} y={y(P_BASE) + 26} at={quarterAt + 4} />
         <Verdict ok={false} x={PANELS[2].x0} y={y(P_BASE) + h(52)} at={noiseAt}>
-          noise: bumps that aren&apos;t real
+          Noise: bumps that aren&apos;t real
         </Verdict>
 
         <PanelTitle x={PANELS[1].x0} y={y(P_TOP) - h(66)} at={oneAt - 2}>
@@ -185,7 +185,7 @@ export const HistScene: React.FC = () => {
         <XTicks ticks={[2, 12, 22]} x0={PANELS[1].x0} x1={PANELS[1].x1} lo={BINS.domain[0]} hi={BINS.domain[1]} y={y(P_BASE) + 26} at={oneAt + 4} />
         <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transformOrigin: `${PANELS[1].x0}px ${y(P_BASE) + h(66)}px`, transform: `scale(${1 + 0.08 * reportLift})` }}>
           <Verdict ok x={PANELS[1].x0} y={y(P_BASE) + h(52)} at={clearAt}>
-            both peaks clear
+            Both peaks clear
           </Verdict>
         </div>
 
@@ -201,7 +201,7 @@ export const HistScene: React.FC = () => {
         <Note at={reportAt + 4} x={PANELS[2].x0} y={y(P_BASE) + h(110)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <Mark at={bridgeAt + 2}>
-              report the shape that holds<span style={{ opacity: ease(frame, widthsAt - 2, 10) }}> across widths</span>
+              Report the shape that holds<span style={{ opacity: ease(frame, widthsAt - 2, 10) }}> across widths</span>
             </Mark>
           </span>
         </Note>

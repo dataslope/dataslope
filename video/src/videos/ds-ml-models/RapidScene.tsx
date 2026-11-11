@@ -30,6 +30,7 @@ import {
   Svg,
   X0,
 } from "./parts";
+import { M } from "../../editorial/math";
 
 /** Where the answers go: right of the list. */
 const R_X = 800;
@@ -83,7 +84,7 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         at={c.w("r-gen", "the probability of the label given the input")}
         top={c.y(404)}
       >
-        learns P(label | input)
+        Learns <M>P(label | input)</M>
       </Line>
       <Line
         at={c.w("r-gen", "like logistic regression")}
@@ -105,7 +106,7 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         at={c.w("r-gen", "how the inputs are spread within each class")}
         top={c.y(564)}
       >
-        learns P(input | class)
+        Learns <M>P(input | class)</M>
         <span style={{ opacity: ease(frame, bayesAt, 10) }}>
           , then Bayes&apos; theorem
         </span>
@@ -123,13 +124,13 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         top={c.y(660)}
         color={OK_INK}
       >
-        can generate data
+        Can generate data
         <span style={{ opacity: ease(frame, fewAt, 10) }}>
           , copes better with few labels
         </span>
       </Line>
       <Line at={c.w("r-gen-more", "With plenty of labels")} top={c.y(700)}>
-        with plenty of labels, discriminative usually wins
+        With plenty of labels, discriminative usually wins
       </Line>
     </>
   );
@@ -161,7 +162,7 @@ const Scale13: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Line at={c.w("r-scale", "Scale features")} top={c.y(360)}>
-        needed for distances or gradient descent:
+        Needed for distances or gradient descent:
       </Line>
       <Line
         at={c.w("r-scale", "KNN, k-means")}
@@ -172,7 +173,7 @@ const Scale13: React.FC<{ c: Ctx }> = ({ c }) => {
         KNN, k-means, support vector machines, linear models
       </Line>
       <Line at={wineAt} top={c.y(470)} size={21} color={INK_SOFT}>
-        wine data, five-fold cross-validation
+        Wine data, five-fold cross-validation
       </Line>
       {bars.map((b, i) => {
         const p = ease(frame, b.at, 16);
@@ -236,7 +237,7 @@ const Encode: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Line at={oneHotAt} top={c.y(352)} size={25} weight={500}>
-        one-hot: a column of 0s and 1s per category
+        One-hot: a column of 0s and 1s per category
       </Line>
       {[
         ["color", ...ONEHOT.columns],
@@ -271,10 +272,10 @@ const Encode: React.FC<{ c: Ctx }> = ({ c }) => {
         </div>
       ))}
       <Line at={c.w("r-encode", "Ordinal encoding")} top={c.y(610)}>
-        ordinal: small, medium, large → 0, 1, 2
+        Ordinal: small, medium, large → 0, 1, 2
       </Line>
       <Line at={c.w("r-encode", "Target encoding")} top={c.y(656)}>
-        target: each category → its mean outcome
+        Target: each category → its mean outcome
       </Line>
       <Line
         at={c.w("r-encode", "which leaks")}
@@ -293,17 +294,17 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
   const kinds = [
     {
       name: "Filter",
-      text: "scores each feature on its own",
+      text: "Scores each feature on its own",
       at: c.w("r-select", "Filters score each feature"),
     },
     {
       name: "Wrapper",
-      text: "tries subsets with a model: RFE",
+      text: "Tries subsets with a model: RFE",
       at: c.w("r-select", "Wrappers, like recursive feature elimination"),
     },
     {
       name: "Embedded",
-      text: "selects while training: the lasso",
+      text: "Selects while training: the lasso",
       at: c.w("r-select", "Embedded methods select while training"),
     },
   ];
@@ -484,12 +485,12 @@ export const RapidScene: React.FC = () => {
         </Svg>
         <Note at={nextFrom} x={gx} y={gy - h(70)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            every model here, built from parts you can point to
+            Every model here, built from parts you can point to
           </span>
         </Note>
         <Note at={learnsAt} x={gx + 560} y={gy - h(4)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <Mark at={learnsAt + 4}>a neural network learns its own</Mark>
+            <Mark at={learnsAt + 4}>A neural network learns its own</Mark>
           </span>
         </Note>
         <NextLine at={nextAt} x={X0} y={y(818)} width={900}>

@@ -1,25 +1,32 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { count, PARTITION } from "./data";
-import { COLUMN_TINT, Drift, lineOf, Listing, MARK_BAD, OK, OK_INK, PlanBox, QCode, READ, X0 } from "./parts";
+import { Drift, lineOf, Listing, MARK_BAD, OK, OK_INK, PlanBox, QCode, X0 } from "./parts";
 
 const FOLDER_Y = 336;
 const FOLDER_W = 130;
 const FOLDER_GAP = 12;
-const FOLDER_H = 78;
+const FOLDER_H = 90;
 const LIST_Y = 528;
 const PLAN_X = 940;
 const MARCH = PARTITION.months.indexOf("2024-03");
 
-/** One folder of the partitioned table, by its month. */
+/** One folder of the partitioned table, by its month: a watercolor folder
+ *  (the owner, 2026-11-11) in blue, cross-fading to yellow when a query
+ *  reads it and to pink for the trap, its month set on the front. */
+const FOLDER_ART = {
+  blue: "de-warehousing-folder-blue",
+  read: "de-warehousing-folder-yellow",
+  trap: "de-warehousing-folder-red",
+} as const;
 const Folder: React.FC<{ x: number; y: number; h: number; name: string; at: number; read: number; trap: number; pruned: number }> = ({
   x,
   y,
@@ -33,21 +40,26 @@ const Folder: React.FC<{ x: number; y: number; h: number; name: string; at: numb
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
   if (p <= 0) return null;
-  // The trap's pink fades into the folder's own blue, not through white.
-  const fill = trap > 0 ? `color-mix(in srgb, color-mix(in srgb, ${ACCENT} 26%, ${PAPER}) ${100 * trap}%, ${COLUMN_TINT.sale_id})` : read > 0 ? `color-mix(in srgb, ${READ} ${100 * read}%, ${COLUMN_TINT.sale_id})` : COLUMN_TINT.sale_id;
+  const art = (id: string, o: number) =>
+    o > 0 ? (
+      <Img
+        src={staticFile(`images/de-warehousing/${id}.webp`)}
+        style={{ position: "absolute", inset: 0, width: FOLDER_W, height: h, objectFit: "fill", opacity: o }}
+      />
+    ) : null;
   return (
     <div style={{ position: "absolute", left: x, top: y + (1 - p) * 12, width: FOLDER_W, height: h, opacity: p * (1 - 0.62 * pruned) }}>
-      <div style={{ position: "absolute", left: 0, top: 0, width: 54, height: 14, borderRadius: "5px 5px 0 0", background: fill, boxShadow: `inset 0 0 0 1.5px ${INK}` }} />
+      {art(FOLDER_ART.blue, 1)}
+      {art(FOLDER_ART.read, read * (1 - trap))}
+      {art(FOLDER_ART.trap, trap)}
+      {/* The month on the front, below the tab. */}
       <div
         style={{
           position: "absolute",
           left: 0,
-          top: 12,
+          top: h * 0.18,
           width: FOLDER_W,
-          height: h - 12,
-          borderRadius: "0 6px 6px 6px",
-          background: fill,
-          boxShadow: `inset 0 0 0 1.5px ${INK}`,
+          height: h * 0.82,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -191,7 +203,7 @@ export const PartitionScene: React.FC = () => {
           </span>
         </Note>
         <Note at={keyAt + 8} x={PLAN_X} y={y(LIST_Y) + h(146)} out={fnAt - 2}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>pruning: skipping the folders that can&apos;t match</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Pruning: skipping the folders that can&apos;t match</span>
         </Note>
 
         {/* ── A good key ── */}

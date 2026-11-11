@@ -5,6 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
+import { M } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PEEK, PEEK_RATES, pct } from "./data";
@@ -111,7 +112,7 @@ export const PeekScene: React.FC = () => {
           at={asked - 4}
         />
         <Note at={everyAt - 2} x={BOX.left + 20} y={y(BOX.top) - h(4)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>both arms identical · recomputed every 100 visitors</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Both arms identical · recomputed every 100 visitors</span>
         </Note>
         <Svg>
           <line
@@ -136,18 +137,20 @@ export const PeekScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={dipAt} x={BOX.right} y={at(ys, 0.05) - h(36)} width={150} align="right">
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>p = 0.05</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            <M>p = 0.05</M>
+          </span>
         </Note>
         {/* The two crossings are named in the open space above the dip, where
             no part of the line runs through them. */}
         <Note at={eightHundredAt} x={at(xs, 800) + 20} y={y(426)}>
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            under 0.05 at 800<span style={{ opacity: ease(frame, twoThousandAt, 8) }}>, and again at 2,000</span>
+            Under 0.05 at 800<span style={{ opacity: ease(frame, twoThousandAt, 8) }}>, and again at 2,000</span>
           </span>
         </Note>
         <Note at={stopAt} x={at(xs, 800) + 20} y={y(470)}>
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            stop at either<span style={{ opacity: ease(frame, noiseAt, 8) }}>: you&apos;ve shipped noise</span>
+            Stop at either<span style={{ opacity: ease(frame, noiseAt, 8) }}>: you&apos;ve shipped noise</span>
           </span>
         </Note>
         <Note at={finalAt} x={at(xs, PEEK.planned) - 14} y={at(ys, PEEK.final) + h(16)} width={250} align="right">
@@ -204,11 +207,11 @@ export const PeekScene: React.FC = () => {
 
         {/* Why the bars grow, and what to do instead. */}
         <Note at={lookAt} x={COL_X} y={y(858)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>each look: one more chance at a false positive</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Each look: one more chance at a false positive</span>
         </Note>
         <Note at={fixAt} x={COL_X} y={y(896)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            fix n in advance<span style={{ opacity: ease(frame, sequentialAt, 8) }}>, or test sequentially</span>
+            Fix n in advance<span style={{ opacity: ease(frame, sequentialAt, 8) }}>, or test sequentially</span>
           </span>
         </Note>
       </Drift>

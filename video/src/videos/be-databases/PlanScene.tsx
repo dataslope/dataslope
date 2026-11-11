@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -13,15 +13,12 @@ import {
   Drift,
   lineOf,
   Listing,
-  listingCharX,
   listingHeight,
-  listingLineMid,
   MARK_GREEN,
   MARK_RED,
   planLineMid,
   PlanBox,
   SmallMono,
-  Svg,
   X0,
 } from "./parts";
 
@@ -36,8 +33,9 @@ const R_X = 1320;
  * first (the indented Seq Scan runs first and feeds the Aggregate above it),
  * then the three things to read, each a band on its span with its label on
  * the right: the kind of scan, estimated rows against actual rows, the rows
- * a filter threw away. Then the numbers themselves, and the cause: the cast,
- * circled in the statement and marked in the filter. Last, the range on the
+ * a filter threw away. Then the numbers themselves, why the gap matters
+ * (the plan is chosen from the estimate), and the cause: the cast, banded
+ * red in the statement and in the filter. Last, the range on the
  * column itself and its plan, an Index Only Scan whose estimate and actual
  * rows agree, and the word for it, with the other two usual fixes.
  */
@@ -64,6 +62,9 @@ export const PlanScene: React.FC = () => {
   const expectedAt = n.word("plan-bad", "It expected five thousand rows");
   const foundAt = n.word("plan-bad", "found two thousand seven hundred thirty-two");
   const millionAt = n.word("plan-bad", "threw away nearly a million");
+  const picksAt = n.word("plan-gap", "Postgres picks its plan from that estimate");
+  const gapAt = n.word("plan-gap", "a big gap means a bad choice");
+  const loopAt = n.word("plan-gap", "like a nested loop");
   const causeAt = n.word("plan-why", "The cause is the filter");
   const dateAt = n.word("plan-why", "turns each timestamp into a date");
   const cantAt = n.word("plan-why", "can't search a function of it");
@@ -72,24 +73,17 @@ export const PlanScene: React.FC = () => {
   const rightAt = n.word("plan-fix", "exactly right");
   const sargAt = n.word("plan-sarg", "a sargable filter");
   const searchAt = n.word("plan-sarg", "one the index can search");
-  const otherAt = n.word("plan-sarg", "The other usual fixes");
-  const newAt = n.word("plan-sarg", "a new index");
-  const statsAt = n.word("plan-sarg", "fresh statistics");
-  const end = n.beat("plan-sarg").to;
+  const otherAt = n.word("plan-fixes", "The other usual fixes");
+  const exprAt = n.word("plan-fixes", "an index on the expression itself");
+  const statsAt = n.word("plan-fixes", "fresh statistics");
+  const staleAt = n.word("plan-fixes", "when the estimates are stale");
+  const end = n.beat("plan-fixes").to;
 
   const fixOut = rangeAt - 4;
   const listTop = y(TOP);
   const planTop = listTop + listingHeight(PLAN.fn.length, SIZE) + h(24);
   const rangePlanTop = listTop + listingHeight(PLAN.range.length, SIZE) + h(24);
   const rangeShown = PLAN.rangePlan.filter((l) => !l.includes("Index Cond"));
-
-  // The cast, circled where the statement writes it.
-  const castLine = lineOf(PLAN.fn, "::date");
-  const castCol = PLAN.fn[castLine].indexOf("created_at::date");
-  const castX0 = listingCharX(X0, castCol, SIZE);
-  const castX1 = listingCharX(X0, castCol + "created_at::date".length, SIZE);
-  const castY = listingLineMid(listTop, castLine, SIZE);
-  const ring = ease(frame, dateAt, 14) * (1 - ease(frame, fixOut, 10));
 
   // The tree's arrow: from the Seq Scan up to the Aggregate it feeds.
   const aggY = planLineMid(planTop, lineOf(PLAN.fnPlan, "Aggregate"), PSIZE);
@@ -120,10 +114,19 @@ export const PlanScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── The statement and its plan ── */}
-        <Listing lines={PLAN.fn} x={X0} top={listTop} width={860} size={SIZE} at={explainAt - 4} out={fixOut} marks={[{ line: "EXPLAIN", at: explainAt + 4, out: firstAt }]} />
-        <Svg opacity={ring}>
-          <ellipse cx={(castX0 + castX1) / 2} cy={castY} rx={(castX1 - castX0) / 2 + 16} ry={h(26)} fill="none" stroke={ACCENT} strokeWidth={3} pathLength={1} strokeDasharray={`${ease(frame, dateAt, 16)} 1`} />
-        </Svg>
+        <Listing
+          lines={PLAN.fn}
+          x={X0}
+          top={listTop}
+          width={860}
+          size={SIZE}
+          at={explainAt - 4}
+          out={fixOut}
+          marks={[
+            { line: "EXPLAIN", at: explainAt + 4, out: firstAt },
+            { line: "::date", text: "created_at::date", at: dateAt, color: MARK_RED },
+          ]}
+        />
         <PlanBox
           lines={PLAN.fnPlan}
           x={X0}
@@ -149,7 +152,7 @@ export const PlanScene: React.FC = () => {
         {/* Read as a tree: the indented step first, feeding the one above. */}
         <Note at={firstAt + 4} x={arrowX} y={seqY - h(16)} out={threeAt}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: inkOf.yellow }}>1</b>&nbsp;&nbsp;the indented step runs first
+            <b style={{ color: inkOf.yellow }}>1</b>&nbsp;&nbsp;The indented step runs first
           </span>
         </Note>
         <Note at={feedsAt + 2} x={arrowX} y={aggY - h(16)} out={threeAt}>
@@ -163,9 +166,9 @@ export const PlanScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Read three things</span>
         </Note>
         {[
-          { at: kindAt, text: "the kind of scan", row: 1 },
-          { at: estAt, text: "estimated rows against actual", row: 2 },
-          { at: awayAt, text: "rows a filter threw away", row: 3 },
+          { at: kindAt, text: "The kind of scan", row: 1 },
+          { at: estAt, text: "Estimated rows against actual", row: 2 },
+          { at: awayAt, text: "Rows a filter threw away", row: 3 },
         ].map((t, i) => (
           <Note key={t.text} at={t.at} x={R_X} y={rows(t.row)} out={countAt}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
@@ -177,23 +180,29 @@ export const PlanScene: React.FC = () => {
         {/* ── What this plan says ── */}
         <Note at={hasAt} x={R_X} y={rows(0)} out={fixOut}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            an index on <SmallMono color={INK}>created_at</SmallMono> exists
+            An index on <SmallMono color={INK}>created_at</SmallMono> exists
           </span>
         </Note>
         <Note at={expectedAt} x={R_X} y={rows(1)} out={fixOut}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            expected <b><Num>{thousands(PLAN.fnEstimate)}</Num></b> rows
+            Expected <b><Num>{thousands(PLAN.fnEstimate)}</Num></b> rows
           </span>
         </Note>
         <Note at={foundAt} x={R_X} y={rows(2)} out={fixOut}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            found <b><Num>{thousands(PLAN.fnActual)}</Num></b>
+            Found <b><Num>{thousands(PLAN.fnActual)}</Num></b>
           </span>
         </Note>
         <Note at={millionAt} x={R_X} y={rows(3)} out={fixOut}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
-            threw away <b><Num>{thousands(PLAN.fnRemoved)}</Num></b>
+            Threw away <b><Num>{thousands(PLAN.fnRemoved)}</Num></b>
           </span>
+        </Note>
+        {/* Why the gap matters: the plan is chosen from the estimate. */}
+        <Note at={picksAt} x={R_X} y={rows(4) + h(20)} out={fixOut}>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Postgres plans from the estimate,</div>
+          <div style={{ ...note(22, INK), whiteSpace: "nowrap", marginTop: h(6), opacity: ease(frame, gapAt, 10) }}>so a big gap means a bad choice</div>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(6), opacity: ease(frame, loopAt, 10) }}>such as a nested loop over too many rows</div>
         </Note>
         <Note at={causeAt} x={X0} y={planTop + h(206)} out={fixOut}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -233,10 +242,10 @@ export const PlanScene: React.FC = () => {
         />
         <Note at={rightAt} x={R_X + 30} y={rangePlanTop + h(20)}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            estimated <b><Num>{thousands(PLAN.rangeEstimate)}</Num></b>
+            Estimated <b><Num>{thousands(PLAN.rangeEstimate)}</Num></b>
           </div>
           <div style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap", marginTop: h(8) }}>
-            actual <Num>{thousands(PLAN.rangeActual)}</Num>
+            Actual <Num>{thousands(PLAN.rangeActual)}</Num>
           </div>
         </Note>
         <Note at={sargAt} x={X0} y={rangePlanTop + h(200)}>
@@ -248,11 +257,15 @@ export const PlanScene: React.FC = () => {
         <Note at={otherAt} x={X0} y={rangePlanTop + h(258)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             The other usual fixes:
-            <span style={{ color: INK, opacity: ease(frame, newAt, 10) }}> a new index,</span>
+            <span style={{ color: INK, opacity: ease(frame, exprAt, 10) }}>
+              {" "}
+              an index on <SmallMono>created_at::date</SmallMono>,
+            </span>
             <span style={{ color: INK, opacity: ease(frame, statsAt, 10) }}>
               {" "}
-              fresh statistics (<SmallMono>ANALYZE</SmallMono>)
+              or <SmallMono>ANALYZE</SmallMono>
             </span>
+            <span style={{ opacity: ease(frame, staleAt, 10) }}> when estimates are stale</span>
           </span>
         </Note>
       </Drift>

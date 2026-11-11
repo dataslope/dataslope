@@ -97,12 +97,12 @@ export const LoopScene: React.FC = () => {
               <span style={{ color: BLUE_INK, fontWeight: 500 }}>FROM</span> orders …
             </div>
           </div>
-          <div style={{ ...note(24, INK_SOFT), marginTop: 22, opacity: ease(frame, takeAt - 2, 12) }}>live, or as a take-home</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 22, opacity: ease(frame, takeAt - 2, 12) }}>Live, or as a take-home</div>
         </Column>
         <Column i={1} at={sheetAt} title="Spreadsheets and statistics">
-          <div style={{ ...note(26, INK), lineHeight: 1.5 }}>a few questions each:</div>
+          <div style={{ ...note(26, INK), lineHeight: 1.5 }}>A few questions each:</div>
           <div style={{ ...note(24, INK_SOFT), lineHeight: 1.5 }}>
-            <div>a pivot table, a lookup,</div>
+            <div>A pivot table, a lookup,</div>
             <div>a median, a p&#8209;value</div>
           </div>
         </Column>

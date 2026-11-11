@@ -230,7 +230,7 @@ export const StarScene: React.FC = () => {
         {/* ── The fact table, its grain, measures and keys ── */}
         <Note at={grainAt} x={fact.left} y={fact.top - 44}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
-            grain: <span style={{ color: INK }}>one row per order line</span>
+            Grain: <span style={{ color: INK }}>one row per order line</span>
           </span>
         </Note>
         <Entity
@@ -311,7 +311,7 @@ export const StarScene: React.FC = () => {
         />
         <Note at={threeAt + 4} x={SNOW_X} y={category.bottom + 22} out={snowOut}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            revenue by department: <b style={{ color: BLUE_INK }}>3 joins</b>
+            Revenue by department: <b style={{ color: BLUE_INK }}>3 joins</b>
           </span>
           <div style={{ ...note(22, INK_SOFT), opacity: ease(frame, insteadAt, 10), whiteSpace: "nowrap" }}>in the star, 1</div>
         </Note>

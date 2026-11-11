@@ -82,10 +82,10 @@ export const FrameScene: React.FC = () => {
           </TableName>
           <DataTable g={pg} cols={colsOf(P)} at={asked - 6} rows={rowsAt(P.rows, asked - 2)} bands={peers.map((row) => ({ row, at: sameDayAt, color: MARK }))} />
           <Note at={setAt} x={TABLE_X} y={pg.rowTop(P.rows.length) + h(24)} width={440}>
-            <span style={{ ...note(25, INK), display: "block", textWrap: "balance" }}>the frame: the rows the function sees</span>
+            <span style={{ ...note(25, INK), display: "block", textWrap: "balance" }}>The frame: the rows the function sees</span>
           </Note>
           <Note at={upToAt} x={TABLE_X} y={pg.rowTop(P.rows.length) + h(110)} width={440}>
-            <span style={{ ...note(23, INK_SOFT) }}>a running total: every row up to this one</span>
+            <span style={{ ...note(23, INK_SOFT) }}>A running total: every row up to this one</span>
           </Note>
           <RowBracket
             g={pg}

@@ -10,6 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DIJKSTRA } from "./data";
 import { ACCENT, ACCENT_INK, Art, Cross, Drift, Edge, GraphNode, HIGHLIGHT, INK, INK_SOFT, Line, NODE_R, OK_INK, Strike, Svg, VRule } from "./parts";
+import { M } from "../../editorial/math";
 
 type P = readonly [number, number];
 
@@ -62,10 +63,10 @@ export const DijkScene: React.FC = () => {
   const timesAt = n.word("dijk-cost", "V plus E, times log V");
   const whyAt = n.word("dijk-neg", "Why no negative weights");
   const finalAt = n.word("dijk-neg", "A node is final when it leaves the heap");
-  const bLeavesAt = n.word("dijk-neg", "B leaves at two");
-  const laterAt = n.word("dijk-neg", "only later does the minus-two edge from C reach it at one");
-  const wrongAt = n.word("dijk-neg", "B is wrong");
-  const soDAt = n.word("dijk-neg", "and so is D");
+  const bLeavesAt = n.word("dijk-late", "B leaves at two");
+  const laterAt = n.word("dijk-late", "only later does the minus-two edge from C reach it at one");
+  const wrongAt = n.word("dijk-late", "B is wrong");
+  const soDAt = n.word("dijk-late", "and so is D");
   const bfAt = n.word("dijk-bf", "Bellman-Ford instead tries every edge");
   const vMinusAt = n.word("dijk-bf", "V minus one times");
   const vtimesAt = n.word("dijk-bf", "V times E");
@@ -130,7 +131,7 @@ export const DijkScene: React.FC = () => {
             from={L[e.a]}
             to={L[e.b]}
             at={findsAt + 4}
-            weight={e.a === "A" && e.b === "C" ? <Strike at={throughBAt}>{e.w}</Strike> : e.w}
+            weight={e.w}
             side={SIDE[`${e.a}${e.b}`]}
           />
         ))}
@@ -141,7 +142,17 @@ export const DijkScene: React.FC = () => {
             y={L[k][1]}
             at={findsAt + 2}
             name={k}
-            badge={k === "C" && frame < throughBAt ? direct : dist(k)}
+            badge={
+              k === "C" ? (
+                // The edge still costs 4; what changes is C's distance.
+                <span style={{ display: "inline-flex", gap: "0.4em" }}>
+                  {frame < throughBAt ? direct : <span style={{ color: INK_SOFT }}><Strike at={throughBAt}>{direct}</Strike></span>}
+                  {frame >= throughBAt ? <span style={{ opacity: ease(frame, throughBAt + 10, 10) }}>{dist(k)}</span> : null}
+                </span>
+              ) : (
+                dist(k)
+              )
+            }
             badgeAt={k === "C" ? cDirectAt - 4 : k === "D" ? dAt - 2 : settleAt[k]}
             badgeTone={frame >= settleAt[k] ? "ok" : "plain"}
             badgeSide={k === "A" ? "below" : k === "D" ? "below" : k === "B" ? "above" : "below"}
@@ -159,10 +170,10 @@ export const DijkScene: React.FC = () => {
           <Num>V</Num> nodes<span style={{ opacity: ease(frame, onceAt, 10) }}>, each finished once</span>
         </Line>
         <Line at={edgeAt} x={140} y={y(790)} size={24}>
-          <Num>E</Num> edges, each a heap push of log V
+          <Num>E</Num> edges, each a heap push of <M>log V</M>
         </Line>
         <Line at={timesAt} x={140} y={y(838)} size={30} weight={500} color={OK_INK}>
-          O((V + E) log V)
+          <M>O((V + E) log V)</M>
         </Line>
 
         <VRule x={915} top={y(320)} bottom={y(838) + 36} at={whyAt - 6} />
@@ -226,7 +237,7 @@ export const DijkScene: React.FC = () => {
           every edge, V − 1 times: <Num>{DIJKSTRA.bfRounds}</Num> rounds over <Num>{DIJKSTRA.bfEdges}</Num> edges
         </Line>
         <Line at={vtimesAt} x={1094} y={y(838)} size={23} weight={500}>
-          O(V · E)<span style={{ opacity: ease(frame, rightAt, 10), color: INK_SOFT, fontWeight: 500 }}>: slower, and right</span>
+          <M>O(V · E)</M><span style={{ opacity: ease(frame, rightAt, 10), color: INK_SOFT, fontWeight: 500 }}>: slower, and right</span>
         </Line>
       </Drift>
     </AbsoluteFill>

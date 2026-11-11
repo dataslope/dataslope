@@ -56,6 +56,14 @@ export const CacheScene: React.FC = () => {
   const appMid = y(752);
   const cacheMid = y(684);
   const storeMid = y(820);
+  // The app, cache and database come in on "On a read", under the steps,
+  // and the read path is traced on them as each step is said; when the
+  // simulation starts they slide to the right, where the dead cache is shown.
+  const slide = -560 * (1 - ease(frame, dimA, 22));
+  const ax = D.app.x + slide;
+  const bx = D.box.x + slide;
+  const trace = (a: number, b: number) => Math.min(ease(frame, a, 8), 1 - ease(frame, b, 10));
+  const missing = frame >= missAt - 2 && frame < readsAt + 10;
 
   return (
     <AbsoluteFill>
@@ -89,14 +97,14 @@ export const CacheScene: React.FC = () => {
           size={26}
           dim={dimA}
           steps={[
-            { text: "check the cache", at: checksAt - 2, lit: [checksAt, missAt] },
-            { text: "miss", at: missAt - 2, lit: [missAt, readsAt] },
-            { text: "read the database, write the cache", at: readsAt - 2, lit: [readsAt, returnsAt] },
-            { text: "return it", at: returnsAt - 2, lit: [returnsAt, writeAt] },
+            { text: "Check the cache", at: checksAt - 2, lit: [checksAt, missAt] },
+            { text: "Miss", at: missAt - 2, lit: [missAt, readsAt] },
+            { text: "Read the database, write the cache", at: readsAt - 2, lit: [readsAt, returnsAt] },
+            { text: "Return it", at: returnsAt - 2, lit: [returnsAt, writeAt] },
           ]}
         />
         <Line at={firstAt} x={X0} y={y(422)} size={22} color={INK_SOFT} dim={dimA}>
-          every key&apos;s first request pays <Mark at={firstAt + 2}>the miss</Mark>
+          Every key&apos;s first request pays <Mark at={firstAt + 2}>the miss</Mark>
         </Line>
         <Line at={writeAt - 4} x={X0} y={y(482)} size={22} weight={500} color={INK_SOFT} dim={dimA}>
           On a write
@@ -107,17 +115,17 @@ export const CacheScene: React.FC = () => {
           size={26}
           dim={dimA}
           steps={[
-            { text: "update the database", at: writeAt, lit: [writeAt, invalAt] },
-            { text: "invalidate the cached copy", at: invalAt - 2, lit: [invalAt, onlyAt] },
+            { text: "Update the database", at: writeAt, lit: [writeAt, invalAt] },
+            { text: "Invalidate the cached copy", at: invalAt - 2, lit: [invalAt, onlyAt] },
           ]}
         />
 
         {/* ── What follows ── */}
         <Line at={onlyAt} x={1400} y={y(338)} size={22} dim={dimA}>
-          only what&apos;s asked for is cached
+          Only what&apos;s asked for is cached
         </Line>
         <Line at={failAt} x={1400} y={y(388)} size={22} dim={dimA}>
-          a failure falls through to the database
+          A failure falls through to the database
         </Line>
 
         {/* ── The simulation ── */}
@@ -157,11 +165,32 @@ export const CacheScene: React.FC = () => {
         <VRule x={1250} top={y(338)} bottom={y(420)} at={onlyAt} out={dimA} />
         <VRule x={1265} top={y(640)} bottom={y(900)} at={betterAt} />
 
-        {/* ── A dead cache sends every read to the store. ── */}
-        <Node x={D.app.x} y={appMid - 30} w={D.app.w} h={60} at={betterAt} tone="plain" title="app" size={22} />
-        <Node x={D.box.x} y={cacheMid - 30} w={D.box.w} h={60} at={betterAt + 4} tone={dead > 0.5 ? "bad" : "data"} title={dead > 0.5 ? "cache ✕" : "cache"} size={22} out={replicaAt} />
-        <Node x={D.box.x} y={cacheMid - 30} w={D.box.w} h={60} at={replicaAt} tone="ok" title="cache replica" size={21} />
-        <Node x={D.box.x} y={storeMid - 30} w={D.box.w} h={60} at={betterAt + 8} tone={dead > 0.5 && replica < 0.5 ? "bad" : "data"} title="database" size={22} />
+        {/* ── App, cache and database: the read path traced on them, then a dead
+            cache sending every read to the store. ── */}
+        <Node x={ax} y={appMid - 30} w={D.app.w} h={60} at={onReadAt} tone="plain" title="app" size={22} />
+        <Node
+          x={bx}
+          y={cacheMid - 30}
+          w={D.box.w}
+          h={60}
+          at={onReadAt + 4}
+          tone={dead > 0.5 ? "bad" : missing ? "lit" : "data"}
+          title={dead > 0.5 ? "cache ✕" : missing ? "cache: miss" : "cache"}
+          dashed={frame >= invalAt && frame < dimA}
+          size={22}
+          out={replicaAt}
+        />
+        <Node x={bx} y={cacheMid - 30} w={D.box.w} h={60} at={replicaAt} tone="ok" title="cache replica" size={21} />
+        <Node x={bx} y={storeMid - 30} w={D.box.w} h={60} at={onReadAt + 8} tone={dead > 0.5 && replica < 0.5 ? "bad" : "data"} title="database" size={22} />
+        {/* The read path, step by step: check, (miss), read, write the cache, return. */}
+        <Flow points={[[ax + D.app.w + 6, appMid - 14], [bx - 60, appMid - 14], [bx - 60, cacheMid], [bx - 8, cacheMid]]} at={checksAt} color={BAR} width={2.4} head={12} glow={trace(checksAt, missAt + 10)} out={dimA} />
+        <Flow points={[[ax + D.app.w + 6, appMid + 14], [bx - 60, appMid + 14], [bx - 60, storeMid], [bx - 8, storeMid]]} at={readsAt} color={BAR} width={2.4} head={12} glow={trace(readsAt, readsAt + 24) + trace(writeAt, invalAt)} out={dimA} />
+        <Flow points={[[bx + D.box.w / 2, storeMid - 34], [bx + D.box.w / 2, cacheMid + 38]]} at={readsAt + 22} color={BAR} width={2.4} head={12} glow={trace(readsAt + 22, returnsAt)} out={dimA} />
+        <Flow points={[[ax - 6, appMid], [ax - 110, appMid]]} at={returnsAt} color={BAR} width={2.4} head={12} glow={trace(returnsAt, writeAt)} out={dimA} />
+        <Ink at={invalAt} dur={12} out={dimA} style={{ left: bx, top: cacheMid - 30 - 40, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(20, INK_SOFT), fontWeight: 500 }}>entry invalidated</span>
+        </Ink>
+        {/* After the simulation: the cache as it serves, then dead. */}
         <Flow points={[[D.app.x + D.app.w + 6, appMid - 14], [D.box.x - 60, appMid - 14], [D.box.x - 60, cacheMid], [D.box.x - 8, cacheMid]]} at={betterAt + 8} color={BAR} width={2.4} head={12} out={deadAt} />
         <Flow points={[[D.app.x + D.app.w + 6, appMid - 14], [D.box.x - 60, appMid - 14], [D.box.x - 60, cacheMid], [D.box.x - 8, cacheMid]]} at={replicaAt + 4} color={OK} width={2.4} head={12} />
         <Flow
@@ -172,7 +201,7 @@ export const CacheScene: React.FC = () => {
           head={12 + 4 * dead * (1 - replica)}
         />
         <Ink at={deadAt + 6} dur={12} out={replicaAt} style={{ left: D.app.x, top: storeMid + 44, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>every read reaches the database</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 500 }}>Every read reaches the database</span>
         </Ink>
         <Ink at={replicaAt + 8} dur={12} style={{ left: D.app.x, top: storeMid + 44, whiteSpace: "nowrap" }}>
           <span style={{ ...label(21, OK_INK), fontWeight: 500 }}>so the cache needs replicas too</span>

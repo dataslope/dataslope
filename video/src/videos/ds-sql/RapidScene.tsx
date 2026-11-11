@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, RapidFire, type RapidItem } from "../../editorial/interview";
+import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
-import { colsOf, DataTable, Drift, ErrorBox, geoOf, Headline, Kicker, lineOf, Listing, listingHeight, MARK_BAD, MARK_OK, rowsAt, Spot, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, ErrorBox, geoOf, Headline, Kicker, lineOf, Listing, listingHeight, MARK_BAD, MARK_OK, QMono, rowsAt, Spot, TableName, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 740;
@@ -238,11 +238,11 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <Note at={frameAt} x={R_X} y={g.rowTop(R.rows.length) + c.h(18)}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-          the frame by default: <QMono>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</QMono>
+          The frame by default: <QMono>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</QMono>
         </span>
       </Note>
       <TableName g={tg} at={tieAt - 4}>
-        the video&rsquo;s own tie: two rows on one day
+        The video&rsquo;s own tie: two rows on one day
       </TableName>
       <DataTable
         g={tg}
@@ -322,7 +322,7 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
       <DataTable g={g} cols={colsOf(P, { mobile: { ink: BLUE_INK }, desktop: { ink: BLUE_INK } })} at={desktopAt + 4} rows={rowsAt(P.rows, regionAt)} />
       <Note at={desktopAt + 6} x={g.right + 24} y={g.rowTop(0)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          the video&rsquo;s own
+          The video&rsquo;s own
           <br />
           traffic table
         </span>
@@ -364,7 +364,7 @@ const Count: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={eightAt} x={g.right + 24} y={g.rowTop(0)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          the video&rsquo;s own
+          The video&rsquo;s own
           <br />8 page views
         </span>
       </Note>

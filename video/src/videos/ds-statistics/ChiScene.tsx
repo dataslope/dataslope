@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, HAIRLINE, INK, INK_SOFT, TABULAR, fmt, label } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CHI } from "./data";
@@ -79,19 +80,19 @@ export const ChiScene: React.FC = () => {
 
         <Note at={countsAt} x={X0} y={y(290)}>
           <span style={{ ...noteText(28, INK) }}>
-            <Mark at={countsAt + 4}>counts in categories</Mark>
+            <Mark at={countsAt + 4}>Counts in categories</Mark>
             <span style={{ opacity: ease(frame, compareAt, 10) }}>: observed against expected</span>
           </span>
         </Note>
         <Note at={mixAt} x={X0} y={y(350)}>
           <span style={{ ...noteText(24, INK_SOFT) }}>
-            one variable against a claimed mix:{" "}
+            One variable against a claimed mix:{" "}
             <b style={{ color: INK, opacity: ease(frame, fitAt - 2, 10) }}>goodness of fit</b>
           </span>
         </Note>
         <Note at={twoAt} x={X0} y={y(394)}>
           <span style={{ ...noteText(24, INK_SOFT) }}>
-            two categorical variables:{" "}
+            Two categorical variables:{" "}
             <b style={{ color: INK, opacity: ease(frame, indepAt - 2, 10) }}>independence</b>
           </span>
         </Note>
@@ -145,18 +146,24 @@ export const ChiScene: React.FC = () => {
         )}
 
         <Note at={sumAt} x={SIDE_X} y={y(500)}>
-          <div style={{ fontFamily: MONO, fontSize: 32, fontWeight: 500, color: INK, whiteSpace: "nowrap", ...TABULAR }}>
-            χ² = Σ (O − E)² / E
-          </div>
+          <MathRun style={{ fontSize: 34, color: INK, ...TABULAR }}>
+            <I>χ</I>² = Σ (<I>O</I> − <I>E</I>)² / <I>E</I>
+          </MathRun>
         </Note>
         <Note at={chiAt - 2} x={SIDE_X} y={y(566)}>
-          <div style={{ fontFamily: MONO, fontSize: 32, fontWeight: 500, color: BLUE_INK, whiteSpace: "nowrap", ...TABULAR }}>
-            &nbsp;&nbsp;= <Mark at={chiAt + 2}>{fmt(CHI.chi2, 1)}</Mark>
-          </div>
+          {/* The χ² is held, unseen, so this line's = sits under the one above. */}
+          <MathRun style={{ fontSize: 34, color: BLUE_INK, ...TABULAR }}>
+            <span style={{ visibility: "hidden" }}>
+              <I>χ</I>²
+            </span>{" "}
+            = <Mark at={chiAt + 2}>{fmt(CHI.chi2, 1)}</Mark>
+          </MathRun>
         </Note>
         <Note at={pAt} x={SIDE_X} y={y(640)}>
           <span style={{ ...noteText(30, INK), ...TABULAR }}>
-            p = <b>{fmt(CHI.p, 4)}</b>
+            <MathRun>
+              <I>p</I> = <b>{fmt(CHI.p, 4)}</b>
+            </MathRun>
           </span>
         </Note>
         <Note at={curveAt} x={SIDE_X} y={y(696)}>
@@ -171,7 +178,7 @@ export const ChiScene: React.FC = () => {
         </Note>
         <Note at={fiveAt} x={SIDE_X} y={y(770)}>
           <span style={{ ...noteText(26, OK_INK) }}>
-            one condition: expected counts of <Mark at={atLeastAt + 2} color={MARK_OK}>at least 5</Mark> in most cells
+            One condition: expected counts of <Mark at={atLeastAt + 2} color={MARK_OK}>at least 5</Mark> in most cells
           </span>
         </Note>
       </Drift>

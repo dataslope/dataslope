@@ -176,7 +176,7 @@ export const SplitScene: React.FC = () => {
         </Note>
         <Note at={nothingAt} x={X0} y={objTop + listingHeight(1, SIZE) + h(96)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            <Mark at={nothingAt + 6}>nothing aggregated yet</Mark>
+            <Mark at={nothingAt + 6}>Nothing aggregated yet</Mark>
           </span>
         </Note>
 
@@ -213,7 +213,7 @@ export const SplitScene: React.FC = () => {
         </Note>
         <Note at={resetAt} x={X0} y={y(744)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            the regions are the index, until <Mono color={BLUE_INK}>.reset_index()</Mono>
+            The regions are the index, until <Mono color={BLUE_INK}>.reset_index()</Mono>
           </span>
         </Note>
       </Drift>

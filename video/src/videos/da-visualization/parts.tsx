@@ -312,12 +312,13 @@ export const Pie: React.FC<{
  * that answers the question, a red cross for the one that misleads, with a
  * few words beside it.
  */
-export const Verdict: React.FC<{ ok: boolean; x: number; y: number; at: number; out?: number; children?: React.ReactNode }> = ({
+export const Verdict: React.FC<{ ok: boolean; x: number; y: number; at: number; out?: number; mark?: number; children?: React.ReactNode }> = ({
   ok,
   x,
   y,
   at: from,
   out,
+  mark = 28,
   children,
 }) => {
   const frame = useCurrentFrame();
@@ -327,7 +328,7 @@ export const Verdict: React.FC<{ ok: boolean; x: number; y: number; at: number; 
   const color = ok ? OK : ACCENT;
   return (
     <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "center", gap: 10, opacity: (1 - o) * p, whiteSpace: "nowrap" }}>
-      <svg width={28} height={28} viewBox="0 0 24 24" style={{ overflow: "visible" }}>
+      <svg width={mark} height={mark} viewBox="0 0 24 24" style={{ overflow: "visible" }}>
         {ok ? (
           <path d="M4 12.5 L10 18 L20 6" fill="none" stroke={color} strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={`${p} 1`} />
         ) : (

@@ -11,7 +11,7 @@ import { MONO } from "../../theme/fonts";
 import { Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, Q_SIZE, Q_W, Svg, VRule, X0 } from "./parts";
 
 const LEADER = { x: 330, w: 230, h: 80, mid: 490 };
-const FOLLOW = { x: 760, w: 240, h: 68, mids: [400, 580] };
+const FOLLOW = { x: 760, w: 240, h: 84, mids: [400, 580] };
 const READS_X = 1170;
 /** The timeline: a leader row and a follower row, time running right. */
 const T = { x0: 330, x1: 1240, leader: 744, follower: 828, create: 400, copy: 820, open: 560, window: 940 };
@@ -50,7 +50,11 @@ export const ReplicaScene: React.FC = () => {
   const asyncAt = n.word("q5-fix", "with asynchronous replication");
   const laggingAt = n.word("q5-fix", "promoting a lagging follower");
   const losesAt = n.word("q5-fix", "loses the writes it never received");
-  const end = n.beat("q5-fix").to;
+  const semiAt = n.word("q5-sync", "Semi-synchronous replication fixes that");
+  const waitsAt = n.word("q5-sync", "each write waits until one follower has it");
+  const nothingAt = n.word("q5-sync", "loses nothing");
+  const slowerAt = n.word("q5-sync", "every write is slower");
+  const end = n.beat("q5-sync").to;
 
   const lMid = y(LEADER.mid);
   const fMid = FOLLOW.mids.map((m) => y(m));
@@ -84,12 +88,25 @@ export const ReplicaScene: React.FC = () => {
 
         {/* ── Leader and followers ── */}
         <Line at={copiesAt} x={X0} y={y(340)} size={22} weight={500} color={INK_SOFT} dim={dimTop}>
-          copies of the data on several nodes
+          Copies of the data on several nodes
         </Line>
         <Ink at={writesAt - 2} dur={12} style={{ left: X0, top: lMid - 44, whiteSpace: "nowrap", opacity: 1 - ease(frame, dimTop, 12) * 0.65 }}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 500 }}>writes</span>
         </Ink>
-        <Flow points={[[X0, lMid], [LEADER.x - 8, lMid]]} at={writesAt} color={BAR} dim={dimTop} />
+        <Flow points={[[X0, lMid], [LEADER.x - 8, lMid]]} at={writesAt} color={BAR} dim={dimTop} out={promotedAt} />
+        {/* Once promoted, the new leader takes the writes. */}
+        <Flow
+          points={[
+            [X0, lMid],
+            [LEADER.x - 70, lMid],
+            [LEADER.x - 70, fMid[0]],
+            [FOLLOW.x - 8, fMid[0]],
+          ]}
+          at={promotedAt + 4}
+          dur={18}
+          color={BAR}
+          dim={dimTop}
+        />
         <Node
           x={LEADER.x}
           y={lMid - LEADER.h / 2}
@@ -122,7 +139,7 @@ export const ReplicaScene: React.FC = () => {
               at={streamAt + 4 + i * 4}
               tone={i === 0 && promoted > 0.5 ? "ok" : "data"}
               title={i === 0 && promoted > 0.5 ? "new leader" : "follower"}
-              sub="read-only"
+              sub={i === 0 && promoted > 0.5 ? "takes writes" : "read-only"}
               lit={i === 0 ? promoted * 0.6 : 0}
               dim={dimTop}
             />
@@ -181,7 +198,7 @@ export const ReplicaScene: React.FC = () => {
           for a short while after a write
         </Line>
 
-        <VRule x={1257} top={y(340)} bottom={y(640)} at={asyncAt} />
+        <VRule x={1257} top={y(340)} bottom={y(780)} at={asyncAt} />
 
         {/* ── A lagging follower, promoted. ── */}
         <Line at={asyncAt} x={LOG.x} y={y(352)} size={22} weight={500} color={INK}>
@@ -205,7 +222,7 @@ export const ReplicaScene: React.FC = () => {
                     width: LOG.cell,
                     height: 34,
                     boxSizing: "border-box",
-                    borderRadius: 6,
+                    borderRadius: 4,
                     border: missing ? `2.5px dashed ${ACCENT}` : `2px solid ${BAR}`,
                     background: missing ? PAPER : `color-mix(in srgb, ${BAR} 18%, ${PAPER})`,
                     display: "flex",
@@ -223,7 +240,19 @@ export const ReplicaScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Line at={losesAt} x={LOG.x} y={y(402) + h(148)} size={21} color={ACCENT_INK} weight={500}>
-          promoted: w5 and w6 are lost
+          Promoted: w5 and w6 are lost
+        </Line>
+        <Line at={semiAt} x={LOG.x} y={y(402) + h(214)} size={22} weight={500} color={INK}>
+          <Mark at={semiAt + 2}>Semi-synchronous</Mark>
+        </Line>
+        <Line at={waitsAt} x={LOG.x} y={y(402) + h(262)} size={21} color={OK_INK} weight={500}>
+          A write waits for one follower
+        </Line>
+        <Line at={nothingAt} x={LOG.x} y={y(402) + h(302)} size={21} color={OK_INK} weight={500}>
+          Promote that one: nothing lost
+        </Line>
+        <Line at={slowerAt} x={LOG.x} y={y(402) + h(342)} size={21} color={INK_SOFT}>
+          The price: every write is slower
         </Line>
       </Drift>
     </AbsoluteFill>

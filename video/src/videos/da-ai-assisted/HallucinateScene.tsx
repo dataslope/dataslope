@@ -34,9 +34,9 @@ export const HallucinateScene: React.FC = () => {
   // The first line arrives as the question ends, so it never sits alone.
   const asked = n.beat("hallucinate").to;
   const kinds = [
-    { at: n.word("hallucinate-what", "a trend that isn't there"), text: "a trend that isn't there" },
-    { at: n.word("hallucinate-what", "a number nobody computed"), text: "a number nobody computed" },
-    { at: n.word("hallucinate-what", "a cause stated as fact"), text: "a cause stated as fact" },
+    { at: n.word("hallucinate-what", "a trend that isn't there"), text: "A trend that isn't there" },
+    { at: n.word("hallucinate-what", "a number nobody computed"), text: "A number nobody computed" },
+    { at: n.word("hallucinate-what", "a cause stated as fact"), text: "A cause stated as fact" },
   ];
   const fluentAt = n.word("hallucinate-what", "writes fluent text");
   const exampleAt = n.word("hallucinate-example", "Signups fell");
@@ -71,7 +71,7 @@ export const HallucinateScene: React.FC = () => {
 
         {/* ── Three kinds of claim with nothing under them ── */}
         <Note at={Math.min(claimAt, asked) - 6} x={X0} y={y(KINDS_Y) - h(48)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a claim the data doesn&apos;t support:</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>A claim the data doesn&apos;t support:</span>
         </Note>
         <div style={{ position: "absolute", left: X0, top: y(KINDS_Y), width: KINDS_R - X0, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           {kinds.map((k, i) => {
@@ -87,7 +87,7 @@ export const HallucinateScene: React.FC = () => {
           })}
         </div>
         <Note at={fluentAt - 2} x={X0} y={y(KINDS_Y) + h(66)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>a language model writes fluent text either way</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>A language model writes fluent text either way</span>
         </Note>
 
         {/* ── The page's example, as a line in a weekly report: its source
@@ -118,7 +118,7 @@ export const HallucinateScene: React.FC = () => {
         </Note>
         <Note at={guessAt + 6} x={X0 + 526} y={verdictY}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            the &ldquo;because&rdquo; is a guess
+            The &ldquo;because&rdquo; is a guess
             <span style={{ opacity: ease(frame, checkAt - 2, 10) }}>: check the timing and the segments, or cut it</span>
           </span>
         </Note>
@@ -137,7 +137,7 @@ export const HallucinateScene: React.FC = () => {
             <Mark at={tracesAt}>Every number and every claim traces to a query or a cell.</Mark>
           </span>
           <div style={{ ...note(24, INK_SOFT), marginTop: 12, whiteSpace: "nowrap" }}>
-            <span style={{ opacity: ease(frame, draftAt - 2, 10) }}>the model drafts the words around numbers you computed</span>
+            <span style={{ opacity: ease(frame, draftAt - 2, 10) }}>The model drafts the words around numbers you computed</span>
             <span style={{ opacity: ease(frame, neverAt - 2, 10) }}>, never the numbers</span>
             <span style={{ opacity: ease(frame, cutAt - 2, 10) }}>; untested causes come out</span>
           </div>

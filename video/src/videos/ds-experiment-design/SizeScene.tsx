@@ -5,6 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { badgeStyle, Note } from "../../editorial/ui";
+import { I, M, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SIZE } from "./data";
@@ -96,7 +97,7 @@ export const SizeScene: React.FC = () => {
 
         {/* The four inputs, and where each comes from. */}
         <Note at={inputsAt - 2} x={X0} y={y(282)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>four inputs</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Four inputs</span>
         </Note>
         {inputs.map((c, i) => {
           const p = ease(frame, inputAts[i] - 2, 10);
@@ -162,19 +163,50 @@ export const SizeScene: React.FC = () => {
 
         {/* The formula, its terms as the narration names them, and its two answers. */}
         <Note at={formulaAt} x={COL_X} y={y(486)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>the page&apos;s formula</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>The page&apos;s formula</span>
           <div style={{ ...note(27, INK), fontWeight: 500, marginTop: 6, whiteSpace: "nowrap" }}>
-            n = (z<sub style={SUB}>α/2</sub> + z<sub style={SUB}>β</sub>)² · <Mark at={varianceAt - 2}>2p(1 − p)</Mark> / MDE²
+            <MathRun>
+              <I>n</I> = (<I>z</I>
+              <sub style={SUB}>
+                <I>α</I>/2
+              </sub>{" "}
+              + <I>z</I>
+              <sub style={SUB}>
+                <I>β</I>
+              </sub>
+              )² ·{" "}
+              <Mark at={varianceAt - 2}>
+                2<I>p</I>(1 − <I>p</I>)
+              </Mark>{" "}
+              / MDE²
+            </MathRun>
           </div>
           <div style={{ ...label(24, INK_SOFT), fontWeight: 500, marginTop: 14, whiteSpace: "nowrap" }}>
             <span style={{ opacity: ease(frame, zAlphaAt - 2, 10) }}>
-              z<sub style={SUB}>α/2</sub> = {SIZE.zAlpha.toFixed(2)}
+              <MathRun>
+                <I>z</I>
+                <sub style={SUB}>
+                  <I>α</I>/2
+                </sub>{" "}
+                = {SIZE.zAlpha.toFixed(2)}
+              </MathRun>
             </span>
             <span style={{ opacity: ease(frame, zBetaAt - 2, 10) }}>
-              {" · "}z<sub style={SUB}>β</sub> = {SIZE.zBeta.toFixed(2)}
+              {" · "}
+              <MathRun>
+                <I>z</I>
+                <sub style={SUB}>
+                  <I>β</I>
+                </sub>{" "}
+                = {SIZE.zBeta.toFixed(2)}
+              </MathRun>
             </span>
             <span style={{ opacity: ease(frame, pAt - 2, 10) }}>
-              {" · "}p = {Math.round(SIZE.pPool * 100)}%, the average rate
+              {" · "}
+              <MathRun>
+                <I>p</I> = {Math.round(SIZE.pPool * 100)}%
+              </MathRun>
+              , the average rate
             </span>
           </div>
         </Note>
@@ -190,12 +222,14 @@ export const SizeScene: React.FC = () => {
         </Note>
         <Note at={fourAt} x={COL_X} y={y(720)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            half the lift, <b>×{SIZE.ratio}</b> the users
+            Half the lift, <b>×{SIZE.ratio}</b> the users
           </span>
         </Note>
         <Note at={squaredAt - 2} x={COL_X} y={y(784)}>
           <span style={{ ...note(36, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Mark at={directionAt - 6}>n ∝ 1 / MDE²</Mark>
+            <Mark at={directionAt - 6}>
+              <M>n ∝ 1 / MDE²</M>
+            </Mark>
           </span>
         </Note>
       </Drift>

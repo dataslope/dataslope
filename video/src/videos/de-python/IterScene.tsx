@@ -200,7 +200,7 @@ export const IterScene: React.FC = () => {
         {/* ── The two definitions, each with its pass over four rows ── */}
         <Note at={iterableAt - 2} x={X0} y={defTop} out={outDefs}>
           <span style={{ display: "flex", gap: 36, alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <Title size={26}>iterable</Title>
+            <Title size={26}>Iterable</Title>
             <span style={{ ...note(22, INK_SOFT) }}>
               <Mono>list</Mono>, <Mono>dict</Mono>
             </span>
@@ -208,7 +208,7 @@ export const IterScene: React.FC = () => {
         </Note>
         <Note at={freshAt} x={X0} y={defTop + h(42)} out={outDefs}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            a fresh iterator for every loop
+            A fresh iterator for every loop
             <FadeIn at={dunderIterAt - 4}>
               : <Mark at={dunderIterAt + 2} out={listAt}>
                 <Mono>__iter__()</Mono>
@@ -220,7 +220,7 @@ export const IterScene: React.FC = () => {
         <Pass x={X0} top={row2} at={freshAt + 4 + PER} label="loop 2" out={outPasses} />
         <Note at={iteratorAt - 2} x={RIGHT_X} y={defTop} out={outDefs}>
           <span style={{ display: "flex", gap: 36, alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <Title size={26}>iterator</Title>
+            <Title size={26}>Iterator</Title>
             <span style={{ ...note(22, INK_SOFT) }}>
               a generator<span style={{ opacity: ease(useCurrentFrame(), fileAt, 10) }}>, an open file</span>
             </span>
@@ -255,7 +255,7 @@ export const IterScene: React.FC = () => {
 
         {/* ── Read twice ── */}
         <Note at={listAt - 4} x={X0} y={twiceTop - h(40)}>
-          <Title>a list, read twice</Title>
+          <Title>A list, read twice</Title>
         </Note>
         <Listing lines={LI} x={X0} top={twiceTop} width={800} size={SIZE} at={listAt - 2} />
         <Console
@@ -275,7 +275,7 @@ export const IterScene: React.FC = () => {
         </Note>
 
         <Note at={genAt - 4} x={RIGHT_X} y={twiceTop - h(40)}>
-          <Title>a generator, read twice</Title>
+          <Title>A generator, read twice</Title>
         </Note>
         <Listing lines={GI} x={RIGHT_X} top={twiceTop} width={800} size={SIZE} at={genAt - 2} />
         <Console
@@ -296,7 +296,7 @@ export const IterScene: React.FC = () => {
 
         {/* ── The trap: counted, then loaded ── */}
         <Note at={bitesAt} x={X0} y={defTop - h(40)}>
-          <Title color={ACCENT_INK}>counted for the log, then loaded</Title>
+          <Title color={ACCENT_INK}>Counted for the log, then loaded</Title>
         </Note>
         <Listing
           lines={T}
@@ -319,11 +319,11 @@ export const IterScene: React.FC = () => {
           marks={[{ line: 0, at: countedAt + 8, color: MARK_BAD }]}
         />
         <Note at={errorAt} x={RIGHT_X + 330} y={defTop + h(18)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>zero rows loaded, no error</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Zero rows loaded, no error</span>
         </Note>
         <Note at={listFixAt} x={RIGHT_X} y={defTop + consoleHeight(1) + h(40)}>
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
-            two passes: <Mono>rows = list(...)</Mono>
+            Two passes: <Mono>rows = list(...)</Mono>
             <span style={{ opacity: ease(useCurrentFrame(), againAt, 10) }}>, or call <Mono>parse_rows</Mono> again</span>
           </span>
         </Note>
