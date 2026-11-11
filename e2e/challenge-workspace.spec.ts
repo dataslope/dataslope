@@ -603,6 +603,29 @@ test.describe("Challenge workspace", () => {
     expect(duplicates).toEqual([]);
   });
 
+  test("TABLES-1: a database challenge previews its tables", async ({ page }) => {
+    await openWorkspace(page, "top-products-by-month");
+    // A fifth tab, on database challenges only (A11Y-1 counts four on two-sum).
+    const tabs = page.getByRole("tablist", { name: "Results" }).getByRole("tab");
+    await expect(tabs).toHaveCount(5);
+
+    // "Preview" beside a table in the instructions opens that table's rows.
+    await page.getByRole("button", { name: "Preview rows of products" }).click();
+    await expect(page.getByRole("tab", { name: "Tables" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    const panel = page.getByRole("tabpanel");
+    await expect(panel.locator("tbody tr")).toHaveCount(7, { timeout: 150_000 });
+    await expect(panel).toContainText("Cold Brew Concentrate");
+    await expect(panel).toContainText("7 rows");
+
+    // The picker inside the tab moves between tables.
+    await panel.getByRole("button", { name: /^customers/ }).click();
+    await expect(panel).toContainText("Maya Chen");
+    await expect(panel.locator("tbody tr")).toHaveCount(5);
+  });
+
   test("SEO-1: the catalog's HTML carries challenge links, and the sitemap lists them", async ({
     browser,
     request,

@@ -268,42 +268,46 @@
 .undoBtn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  border: 1px solid var(--cw-pass-ink);
+  border: 0;
   border-radius: 2px;
-  background: var(--cw-pass-tint);
-  padding: 6px 8px;
+  background: transparent;
+  padding: 7px 10px;
   font-family: inherit;
   font-size: 13px;
-  font-weight: 600;
   letter-spacing: -0.015em;
+  font-weight: 600;
   color: var(--cw-pass-ink);
 }
 .undoBtn:hover {
-  background: var(--cw-pass-ink);
-  color: #fff;
+  background: var(--cw-pass-tint);
 }
 .mIconBtnUndo {
   color: var(--cw-pass-ink);
 }
 
+/* The actions carry no box: no outline and no fill. Rank is in the type
+   instead. The secondary action is medium weight, the primary one is
+   semibold in the accent, and both tint on hover like every other control
+   in the bar. */
 .secondaryBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  border: 1px solid var(--cw-border-strong);
+  border: 0;
   border-radius: 2px;
-  background: var(--cw-bg);
-  padding: 7px 12px;
+  background: transparent;
+  padding: 7px 10px;
   font-family: inherit;
   font-size: 13px;
-  font-weight: 500;
   letter-spacing: -0.015em;
+  font-weight: 500;
   color: var(--cw-ink);
 }
-.secondaryBtn:hover {
-  border-color: var(--cw-ink);
+.secondaryBtn:hover:not(:disabled) {
+  background: var(--cw-bg-hover);
 }
 
 .primaryBtn {
@@ -313,16 +317,17 @@
   gap: 6px;
   border: 0;
   border-radius: 2px;
-  background: var(--cw-ink);
-  padding: 8px 14px;
+  background: transparent;
+  padding: 7px 10px;
   font-family: inherit;
   font-size: 13px;
-  font-weight: 500;
   letter-spacing: -0.015em;
-  color: var(--cw-bg);
+  font-weight: 600;
+  color: var(--cw-accent-link);
 }
-.primaryBtn:hover {
-  background: var(--cw-ink-hover);
+.primaryBtn:hover:not(:disabled) {
+  background: var(--cw-accent-tint);
+  color: var(--cw-accent-link-hover);
 }
 
 .iconBtn {
@@ -542,37 +547,25 @@ a.primaryBtn {
   color: var(--cw-ink);
 }
 
+/* Section titles are sentence case, tightened a little, and carry their
+   weight in the type rather than in capitals. */
 .blockLabel {
-  margin: 26px 0 0;
-  font-size: 11.5px;
+  margin: 28px 0 0;
+  font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--cw-text-faint);
+  letter-spacing: -0.02em;
+  color: var(--cw-text-strong);
 }
 
-.card {
-  margin-top: 12px;
-  border: 1px solid var(--cw-border-light);
-  border-radius: 8px;
-  overflow: hidden;
+/* Nothing in the instructions sits in a box. A table is its header rule and
+   its rows; code is a flat tinted block. */
+.columns {
+  margin-top: 8px;
 }
 
-.cardScroll {
-  margin-top: 12px;
-  border: 1px solid var(--cw-border-light);
-  border-radius: 8px;
+.tableScroll {
+  margin-top: 8px;
   overflow-x: auto;
-}
-
-.cardHead {
-  background: var(--cw-bg-muted);
-  padding: 7px 12px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--cw-text-faint);
 }
 
 .columnsHead,
@@ -580,22 +573,23 @@ a.primaryBtn {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) 84px;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 5px 0;
 }
 .columnsHead {
-  background: var(--cw-bg-muted);
-  padding: 7px 12px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--cw-text-faint);
+  border-bottom: 1px solid var(--cw-border);
+  padding-bottom: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--cw-text-muted);
 }
 .columnsRow {
-  border-top: 1px solid var(--cw-border-light);
   font-family: var(--cw-font-mono);
   font-size: 12.5px;
   color: var(--cw-text-body);
+}
+.columnsHead + .columnsRow {
+  padding-top: 8px;
 }
 .columnsType {
   color: var(--cw-text-faint);
@@ -608,32 +602,36 @@ a.primaryBtn {
   font-size: 12px;
 }
 .previewTable th {
-  border-bottom: 1px solid var(--cw-border-light);
-  background: var(--cw-bg-muted);
-  padding: 7px 10px;
+  border-bottom: 1px solid var(--cw-border);
+  padding: 0 20px 6px 0;
   text-align: left;
+  font-family: var(--cw-font-ui);
   font-weight: 500;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   color: var(--cw-text-muted);
 }
 .previewTable td {
-  border-bottom: 1px solid var(--cw-border-faint);
-  padding: 6px 10px;
+  padding: 5px 20px 5px 0;
   white-space: nowrap;
   color: var(--cw-text-body);
 }
-.previewTable tr:last-child td {
-  border-bottom: 0;
+.previewTable tbody tr:first-child td {
+  padding-top: 8px;
 }
+.previewTable th:last-child,
+.previewTable td:last-child {
+  padding-right: 0;
+}
+
 .alignRight {
   text-align: right;
 }
 
 .signatureBlock {
-  margin: 12px 0 0;
+  margin: 10px 0 0;
   overflow-x: auto;
-  border: 1px solid var(--cw-border-light);
-  border-radius: 8px;
+  border-radius: 2px;
   background: var(--cw-bg-muted);
   padding: 10px 12px;
   /* `pre-wrap`, not `pre`: a signature that runs past the pane used to clip
@@ -647,17 +645,30 @@ a.primaryBtn {
 }
 
 .exampleList {
-  margin-top: 12px;
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
+}
+
+/* One worked example: a rule down its left edge groups the label, the
+   values and the note without drawing a box around them. */
+.example {
+  border-left: 2px solid var(--cw-border);
+  padding-left: 12px;
+}
+.exampleLabel {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--cw-text-muted);
 }
 
 .exampleGrid {
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr);
-  gap: 6px 12px;
-  padding: 10px 12px;
+  gap: 4px 12px;
+  padding: 6px 0 0;
   font-family: var(--cw-font-mono);
   font-size: 12.5px;
   line-height: 1.6;
@@ -675,8 +686,7 @@ a.primaryBtn {
 }
 .exampleNote {
   margin: 0;
-  border-top: 1px solid var(--cw-border-light);
-  padding: 9px 12px;
+  padding: 6px 0 0;
   font-size: 13px;
   line-height: 1.6;
   text-wrap: pretty;
@@ -697,15 +707,12 @@ a.primaryBtn {
   font-size: 12.5px;
 }
 
-.lockedCard {
+.locked {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 14px;
-  border: 1px solid var(--cw-border);
-  border-radius: 8px;
-  background: var(--cw-bg-muted);
-  padding: 20px;
+  gap: 12px;
+  color: var(--cw-text-faint);
 }
 .lockedTitle {
   margin: 0;
@@ -728,52 +735,81 @@ a.primaryBtn {
   margin-top: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
+}
+/* Phone: the tables are collapsed rows, so they sit closer together. */
+.schemaListCompact {
+  margin-top: 4px;
+  gap: 0;
 }
 
-.schemaCard {
-  border: 1px solid var(--cw-border-light);
-  border-radius: 8px;
-  overflow: hidden;
+.schemaTable {
+  min-width: 0;
 }
 
 .schemaHead {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  background: var(--cw-bg-muted);
-  padding: 8px 12px;
+  align-items: baseline;
+  gap: 10px;
+  border-bottom: 1px solid var(--cw-border);
+  padding-bottom: 6px;
 }
 
 .schemaName {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
   font-family: var(--cw-font-mono);
-  font-size: 12.5px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--cw-ink);
 }
 .schemaName svg {
   flex-shrink: 0;
-  color: var(--cw-accent);
+  color: var(--cw-text-faint);
 }
 
 .schemaRows {
-  font-size: 11.5px;
+  flex: 1;
+  font-size: 12px;
   color: var(--cw-text-faint);
   white-space: nowrap;
+}
+
+/* A quiet text action: "Preview" on a table. */
+.textBtn {
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  padding: 0;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--cw-accent-link);
+}
+.textBtn:hover {
+  color: var(--cw-accent-link-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* Phone: the whole head row is the disclosure control, at a 44px target. */
 .schemaToggle {
   width: 100%;
   min-height: 44px;
+  align-items: center;
   border: 0;
+  border-bottom: 1px solid var(--cw-border-light);
+  background: transparent;
+  padding: 0;
   text-align: left;
   font-family: inherit;
+}
+.schemaToggle .schemaRows {
+  text-align: right;
 }
 
 .schemaCaret {
@@ -788,15 +824,12 @@ a.primaryBtn {
 .schemaCols {
   display: flex;
   flex-direction: column;
-  padding: 4px 0;
-}
-.schemaColsOpen {
-  border-top: 1px solid var(--cw-border-light);
+  padding-top: 6px;
 }
 
 /* The schema heading clears the instruction blocks above it. */
 .schemaLabel {
-  margin-top: 30px;
+  margin-top: 32px;
 }
 
 .schemaCol {
@@ -804,13 +837,68 @@ a.primaryBtn {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 4px 12px;
+  padding: 3px 0;
   font-family: var(--cw-font-mono);
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--cw-text-body);
 }
 .schemaKey,
 .schemaType {
+  color: var(--cw-text-faint);
+}
+
+/* Phone: the way to a table's rows, under its open column list. */
+.schemaPreviewRow {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  border-bottom: 1px solid var(--cw-border-light);
+}
+.schemaPreviewRow .textBtn {
+  padding: 10px 0;
+}
+
+/* ─── Tables tab ────────────────────────────────────────────────────── */
+
+.tablePicker {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  padding: 10px 8px 6px;
+}
+
+.tablePick {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  padding: 5px 8px;
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--cw-text-muted);
+}
+.tablePick:hover {
+  color: var(--cw-ink);
+}
+.tablePickOn {
+  background: var(--cw-bg-hover);
+  color: var(--cw-ink);
+}
+.tablePickRows {
+  font-family: var(--cw-font-ui);
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--cw-text-faint);
+}
+.tablePickSpin {
+  margin-left: 6px;
   color: var(--cw-text-faint);
 }
 
@@ -1029,10 +1117,17 @@ a.primaryBtn {
 
 /* ─── Result tabs ───────────────────────────────────────────────────── */
 
+/* The tabs sit flush: edge to edge in the strip and against each other, each
+   the full height of the row, so the selected one is a block of tint rather
+   than a pill floating in padding. */
+.paneHeadTabs {
+  padding: 0;
+}
+
 .tabStrip {
   display: flex;
-  align-items: center;
-  gap: 2px;
+  align-items: stretch;
+  align-self: stretch;
   flex: 1;
   min-width: 0;
   overflow-x: auto;
@@ -1042,16 +1137,23 @@ a.primaryBtn {
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  flex-shrink: 0;
   border: 0;
-  border-radius: 2px;
+  border-radius: 0;
   background: transparent;
-  padding: 6px 10px;
+  padding: 0 14px;
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 500;
   letter-spacing: -0.015em;
   color: var(--cw-text-muted);
   white-space: nowrap;
+}
+.tab:hover {
+  color: var(--cw-ink);
+}
+.tab svg {
+  flex-shrink: 0;
 }
 .tabOn {
   background: var(--cw-bg-hover);
@@ -1103,18 +1205,22 @@ a.primaryBtn {
   position: sticky;
   top: 0;
   border-bottom: 1px solid var(--cw-border);
-  background: var(--cw-bg-muted);
+  background: var(--cw-bg);
   padding: 8px 14px;
   text-align: left;
+  font-family: var(--cw-font-ui);
   font-weight: 500;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   color: var(--cw-text-muted);
 }
 .outTable td {
-  border-bottom: 1px solid var(--cw-border-faint);
-  padding: 7px 14px;
+  padding: 6px 14px;
   white-space: nowrap;
   color: var(--cw-text-body);
+}
+.outTable tbody tr:hover td {
+  background: var(--cw-bg-muted);
 }
 
 .outFooter {
@@ -1163,22 +1269,17 @@ a.primaryBtn {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  border-bottom: 1px solid var(--cw-border-light);
-  background: var(--cw-bg-muted);
-  padding: 7px 14px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--cw-text-faint);
+  padding: 12px 14px 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--cw-text-muted);
 }
 
 .stdioMatch {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  text-transform: none;
-  letter-spacing: -0.01em;
   font-size: 11.5px;
   color: var(--cw-pass-ink);
 }
@@ -1186,7 +1287,7 @@ a.primaryBtn {
 .stdioPre {
   margin: 0;
   overflow-x: auto;
-  padding: 12px 14px;
+  padding: 6px 14px 12px;
   white-space: pre;
   font-family: var(--cw-font-mono);
   font-size: 12.5px;
@@ -1210,87 +1311,62 @@ a.primaryBtn {
 
 /* ─── Test cases ────────────────────────────────────────────────────── */
 
+/* The verdict is a line of type, not a colored bar: the icon and the ink
+   say pass or fail, and the row below it is the first check. */
 .testBanner {
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 1px solid var(--cw-border-light);
-  background: var(--cw-fail-tint);
-  padding: 10px 14px;
+  min-height: 44px;
+  padding: 6px 14px 0;
 }
 .testBanner svg {
   flex-shrink: 0;
   color: var(--cw-fail-ink);
 }
 .testBannerText {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   color: var(--cw-fail-ink);
 }
 .testBannerSub {
   font-size: 12.5px;
   white-space: nowrap;
-  color: var(--cw-fail-ink-strong);
+  color: var(--cw-text-muted);
 }
-.testBannerPass {
-  background: var(--cw-pass-tint);
-}
-.testBannerPass svg,
-.testBannerPass .testBannerText,
-.testBannerPass .testBannerSub {
+.testBannerPass > svg,
+.testBannerPass .testBannerText {
   color: var(--cw-pass-ink);
 }
 
-/* The next step, offered at the moment of highest momentum. Pushed right so
-   it reads as the banner's action rather than part of the verdict text. */
-.continueBtn {
+/* The way on, offered at the moment of highest momentum, and the way to the
+   full output when a submission never reached its checks. Text actions,
+   pushed right so they read as the row's action rather than its verdict. */
+.continueBtn,
+.errorBtn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   margin-left: auto;
   border: 0;
-  border-radius: 3px;
-  background: var(--cw-pass-ink);
-  padding: 5px 9px;
+  border-radius: 2px;
+  background: transparent;
+  padding: 6px 8px;
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.015em;
   white-space: nowrap;
-  color: #fff;
-}
-.continueBtn svg {
-  color: #fff;
-}
-/* The last step's "Next challenge" is a link to another page. */
-a.continueBtn {
   text-decoration: none;
+  color: var(--cw-accent-link);
 }
-.continueBtn:hover {
-  filter: brightness(1.12);
+.testBanner .continueBtn svg {
+  color: currentColor;
 }
-
-/* The banner's action when the submission never reached its checks: the
-   way to the full output, in the banner's own red rather than the pass
-   green, since nothing here passed. */
-.errorBtn {
-  display: inline-flex;
-  align-items: center;
-  margin-left: auto;
-  border: 1px solid var(--cw-fail-ink);
-  border-radius: 3px;
-  background: var(--cw-bg);
-  padding: 4px 9px;
-  font-family: inherit;
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  white-space: nowrap;
-  color: var(--cw-fail-ink);
-}
+.continueBtn:hover,
 .errorBtn:hover {
-  background: var(--cw-fail-ink);
-  color: #fff;
+  background: var(--cw-accent-tint);
+  color: var(--cw-accent-link-hover);
 }
 
 .submitErrorLead {
@@ -1338,11 +1414,13 @@ a.continueBtn {
 
 .testRow {
   display: grid;
-  grid-template-columns: 20px minmax(0, 1fr) auto;
+  grid-template-columns: 20px minmax(0, 1fr);
   align-items: start;
-  gap: 12px;
-  border-bottom: 1px solid var(--cw-border-faint);
-  padding: 12px 14px;
+  gap: 10px;
+  padding: 11px 14px 0;
+}
+.testRow:last-child {
+  padding-bottom: 16px;
 }
 
 .testIcon {
@@ -1381,25 +1459,6 @@ a.continueBtn {
   line-height: 1.6;
   color: var(--cw-fail-ink);
   overflow-wrap: anywhere;
-}
-
-.testBadge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 9999px;
-  padding: 3px 9px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0;
-  white-space: nowrap;
-}
-.testBadgePass {
-  background: var(--cw-pass-tint);
-  color: var(--cw-pass-ink);
-}
-.testBadgeFail {
-  background: var(--cw-fail-badge);
-  color: var(--cw-fail-ink);
 }
 
 /* ─── Solution ──────────────────────────────────────────────────────── */
@@ -1450,27 +1509,19 @@ a.continueBtn {
   color: var(--cw-ink);
 }
 
-.solutionCard {
-  border: 1px solid var(--cw-border-light);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
 .solutionHead {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-  border-bottom: 1px solid var(--cw-border-light);
-  background: var(--cw-bg-muted);
-  padding: 7px 12px;
+  margin-top: 4px;
 }
 .solutionLabel {
-  font-size: 11px;
+  margin: 0;
+  font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--cw-text-faint);
+  letter-spacing: -0.02em;
+  color: var(--cw-text-strong);
 }
 
 .copyBtn {
@@ -1490,9 +1541,11 @@ a.continueBtn {
 }
 
 .solutionPre {
-  margin: 0;
+  margin: -4px 0 0;
   overflow-x: auto;
-  padding: 12px;
+  border-radius: 2px;
+  background: var(--cw-bg-muted);
+  padding: 14px 16px;
   white-space: pre;
   font-family: var(--cw-font-mono);
   font-size: 12.5px;
@@ -1504,19 +1557,18 @@ a.continueBtn {
 
 .subsHead,
 .subsRow {
-  display: grid;
-  gap: 12px;
-  padding: 10px 14px;
+  align-items: center;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--cw-text-body);
 }
 .subsHead {
-  border-bottom: 1px solid var(--cw-border-light);
-  background: var(--cw-bg-muted);
+  border-bottom: 1px solid var(--cw-border);
   padding: 8px 14px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--cw-text-faint);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--cw-text-muted);
 }
 .subsRow {
   align-items: center;
@@ -1708,9 +1760,6 @@ a.continueBtn {
   font-size: 15px;
   margin-top: 12px;
 }
-.mProblem .blockLabel {
-  font-size: 11px;
-}
 
 .mCodePane {
   display: flex;
@@ -1791,8 +1840,8 @@ a.continueBtn {
   flex-shrink: 0;
   min-width: 44px;
   min-height: 44px;
-  border: 1px solid var(--cw-border);
-  border-radius: 6px;
+  border: 0;
+  border-radius: 2px;
   background: var(--cw-bg);
   padding: 6px 10px;
   font-family: var(--cw-font-mono);
@@ -1802,7 +1851,6 @@ a.continueBtn {
   color: var(--cw-text-body);
 }
 .mKey:hover {
-  border-color: var(--cw-accent);
   color: var(--cw-accent-link);
 }
 /* End-of-row cue: without it the strip looks clipped rather than scrollable. */
@@ -1818,18 +1866,16 @@ a.continueBtn {
 
 .mResultTabs {
   display: flex;
-  align-items: center;
-  gap: 4px;
+  align-items: stretch;
   flex-shrink: 0;
   border-bottom: 1px solid var(--cw-border-light);
-  padding: 8px 10px;
   overflow-x: auto;
 }
 .mTab {
   min-height: 44px;
   min-width: 44px;
   justify-content: center;
-  padding: 7px 10px;
+  padding: 0 12px;
 }
 
 .mResultPanel {
@@ -1869,8 +1915,7 @@ a.continueBtn {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border-bottom: 1px solid var(--cw-border-faint);
-  padding: 12px 14px;
+  padding: 10px 14px;
 }
 .mSubMain {
   display: flex;
@@ -2096,7 +2141,7 @@ a.continueBtn {
   min-width: 220px;
   max-width: min(320px, calc(100vw - 24px));
   border: 1px solid var(--cw-border);
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--cw-bg);
   box-shadow: 0 8px 24px rgb(17 24 39 / 12%);
   padding: 4px;
@@ -2147,10 +2192,9 @@ a.continueBtn {
 
 .menuLabel {
   padding: 8px 8px 4px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   color: var(--cw-text-muted);
 }
 
@@ -2158,4 +2202,10 @@ a.continueBtn {
   height: 1px;
   margin: 4px 0;
   background: var(--cw-border-light);
+}
+
+/* Phone: the table picker's buttons are touch targets. */
+.mResultPanel .tablePick {
+  min-height: 44px;
+  padding: 5px 10px;
 }

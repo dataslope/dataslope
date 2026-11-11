@@ -40,12 +40,16 @@ import {
   Database,
   Eye,
   History,
+  Lightbulb,
+  ListChecks,
   Loader2,
   Lock,
   Play,
   RotateCcw,
+  SquareTerminal,
   Table2,
   Undo2,
+  type LucideIcon,
 } from "lucide-react";
 // Not "@/lib/challenges": that module imports every challenge, and this is
 // client code. See lib/challenges/steps.ts.
@@ -82,6 +86,7 @@ import {
   SolutionPanelView,
   SubmissionsPanel,
   SubmitErrorPanel,
+  TablesPanel,
   TestsPanel,
 } from "./parts";
 import { ChallengeEditor } from "./ChallengeEditor";
@@ -90,14 +95,21 @@ import { useChallengeRunner, type RunMode } from "./useChallengeRunner";
 import { registerWorkspaceForTests } from "./testRegistry";
 import s from "./ChallengeWorkspace.module.css";
 
-type ResultTab = "output" | "tests" | "solution" | "subs";
+type ResultTab = "output" | "tests" | "tables" | "solution" | "subs";
 type MobileView = "problem" | "code" | "results";
 
-const RESULT_TABS: { id: ResultTab; label: string; shortLabel?: string }[] = [
-  { id: "output", label: "Output" },
-  { id: "tests", label: "Test cases", shortLabel: "Tests" },
-  { id: "solution", label: "Solution" },
-  { id: "subs", label: "Submissions" },
+const RESULT_TABS: {
+  id: ResultTab;
+  label: string;
+  shortLabel?: string;
+  Icon: LucideIcon;
+}[] = [
+  { id: "output", label: "Output", Icon: SquareTerminal },
+  { id: "tests", label: "Test cases", shortLabel: "Tests", Icon: ListChecks },
+  // Database challenges only: see `resultTabList`.
+  { id: "tables", label: "Tables", Icon: Table2 },
+  { id: "solution", label: "Solution", Icon: Lightbulb },
+  { id: "subs", label: "Submissions", Icon: History },
 ];
 
 /** Minimum instructions width, and the workspace width it must leave behind. */
@@ -109,8 +121,14 @@ const MIN_EDITOR = 180;
 /** Pixels a resizer moves per arrow-key press. */
 const KEY_STEP = 24;
 
-function timeAgoLabel(): string {
-  return "just now";
+/** When a submission was made, as a clock time: "14:07". */
+function clockLabel(): string {
+  return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+/** A store that never changes: for values read once from the browser. */
+function subscribeNever() {
+  return () => {};
 }
 
 /** Focus whichever of the two layouts' copies of an element is on screen. */
@@ -175,7 +193,67 @@ export function ChallengeWorkspace({
   const langWrapRef = useRef<HTMLDivElement>(null);
 
   const runner = useChallengeRunner(challenge);
-  const { execute, reset: resetEngine, dispose } = runner;
+  const { execute, reset: resetEngine, dispose, previewTable } = runner;
+
+  // ─── Table previews (database challenges) ──────────────────────────
+
+  const hasTables = challenge.schema.length > 0;
+  const resultTabList = hasTables
+    ? RESULT_TABS
+    : RESULT_TABS.filter((tab) => tab.id !== "tables");
+  /** The table the Tables tab is showing. */
+  const [previewName, setPreviewName] = useState(challenge.schema[0]?.name ?? "");
+  /** Rows by table name, as last read from the live database. */
+  const [previews, setPreviews] = useState<Record<string, OutputPanel>>({});
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const previewSeq = useRef(0);
+
+  /**
+   * Read a table's rows. Every visit re-reads rather than trusting what is
+   * cached: the learner's own statements can change a table, and a warm
+   * engine answers in a millisecond. The cached rows stay on screen
+   * meanwhile, so a re-read does not blink.
+   */
+  const loadPreview = useCallback(
+    async (name: string) => {
+      const mine = ++previewSeq.current;
+      setPreviewLoading(true);
+      const panel = await previewTable(name);
+      setPreviews((all) => ({ ...all, [name]: panel }));
+      if (previewSeq.current === mine) setPreviewLoading(false);
+    },
+    [previewTable],
+  );
+
+  /** Open the Tables tab, on `name` when a particular table was asked for. */
+  const showTable = useCallback(
+    (name?: string) => {
+      const target = name ?? previewName;
+      if (!target) return;
+      setPreviewName(target);
+      setResultTab("tables");
+      setMobileView("results");
+      void loadPreview(target);
+    },
+    [loadPreview, previewName],
+  );
+
+  /** Every way of picking a result tab goes through here. */
+  const chooseTab = useCallback(
+    (id: ResultTab) => {
+      if (id === "tables") showTable();
+      else setResultTab(id);
+    },
+    [showTable],
+  );
+
+  // The chord's modifier, named the way this keyboard labels it. The server
+  // cannot know, so it answers Ctrl and a Mac corrects itself at hydration.
+  const modKey = useSyncExternalStore(
+    subscribeNever,
+    () => (/Mac|iPhone|iPad/.test(navigator.platform) ? "Cmd" : "Ctrl"),
+    () => "Ctrl",
+  );
 
   const stepIndex = chosenStep ?? openStepIndex(challenge, progress.passedSteps);
   const setStepIndex = setChosenStep;
@@ -340,7 +418,7 @@ export function ChallengeWorkspace({
           ok: result.accepted,
           lang: language.label,
           runtime: `${Math.round(result.elapsedMs)}ms`,
-          when: timeAgoLabel(),
+          when: clockLabel(),
         },
         ...prev,
       ]);
@@ -393,6 +471,7 @@ export function ChallengeWorkspace({
     setUndoableDraft(discarded.trim() === task.starterCode.trim() ? null : discarded);
     // A fresh database too, so a challenge that wrote rows starts clean.
     resetEngine();
+    setPreviews({});
   }, [challenge.slug, code, resetEngine, task, taskKey]);
 
   const undoReset = useCallback(() => {
@@ -655,6 +734,17 @@ export function ChallengeWorkspace({
         ) : (
           <EmptyResults text={`Submit to run the checks for ${scope}.`} />
         );
+      case "tables":
+        return (
+          <TablesPanel
+            tables={challenge.schema}
+            selected={previewName}
+            onSelect={showTable}
+            preview={previews[previewName] ?? null}
+            loading={previewLoading}
+            mobile={mobile}
+          />
+        );
       case "solution":
         // Readable on every step, including the ones still locked. The gate is
         // on the editor, not on the explanation: a learner who wants to read
@@ -672,8 +762,8 @@ export function ChallengeWorkspace({
             language={editorLanguage}
             label={
               multiStep
-                ? `Reference solution · step ${Number(taskKey)}`
-                : `Reference solution · ${language?.shortLabel ?? ""}`
+                ? `Reference solution, step ${Number(taskKey)}`
+                : `Reference solution in ${language?.shortLabel ?? ""}`
             }
           />
         );
@@ -712,25 +802,25 @@ export function ChallengeWorkspace({
       aria-label="Results"
       className={mobile ? `${s.mResultTabs} ${s.noScrollbar}` : `${s.tabStrip} ${s.noScrollbar}`}
       onKeyDown={(e) => {
-        const at = RESULT_TABS.findIndex((t) => t.id === resultTab);
+        const at = resultTabList.findIndex((t) => t.id === resultTab);
         const to =
           e.key === "ArrowRight"
-            ? (at + 1) % RESULT_TABS.length
+            ? (at + 1) % resultTabList.length
             : e.key === "ArrowLeft"
-              ? (at - 1 + RESULT_TABS.length) % RESULT_TABS.length
+              ? (at - 1 + resultTabList.length) % resultTabList.length
               : e.key === "Home"
                 ? 0
                 : e.key === "End"
-                  ? RESULT_TABS.length - 1
+                  ? resultTabList.length - 1
                   : null;
         if (to === null) return;
         e.preventDefault();
-        const id = RESULT_TABS[to].id;
-        setResultTab(id);
+        const id = resultTabList[to].id;
+        chooseTab(id);
         document.getElementById(tabId(mobile, id))?.focus();
       }}
     >
-      {RESULT_TABS.map((tab) => {
+      {resultTabList.map((tab) => {
         const on = resultTab === tab.id;
         const showBadge = tab.id === "tests" && testsBadge !== null;
         return (
@@ -745,8 +835,9 @@ export function ChallengeWorkspace({
             className={[s.tab, mobile ? s.mTab : "", on ? s.tabOn : ""]
               .filter(Boolean)
               .join(" ")}
-            onClick={() => setResultTab(tab.id)}
+            onClick={() => chooseTab(tab.id)}
           >
+            <tab.Icon size={14} strokeWidth={2} aria-hidden="true" />
             <span>{mobile ? (tab.shortLabel ?? tab.label) : tab.label}</span>
             {showBadge ? (
               <span
@@ -793,6 +884,16 @@ export function ChallengeWorkspace({
           icon: <Undo2 size={15} strokeWidth={2} aria-hidden="true" />,
           onSelect: undoReset,
         },
+    ...(hasTables
+      ? [
+          {
+            kind: "action" as const,
+            label: "Preview tables",
+            icon: <Table2 size={15} strokeWidth={2} aria-hidden="true" />,
+            onSelect: () => showTable(),
+          },
+        ]
+      : []),
     {
       kind: "action",
       label: "Solution",
@@ -924,6 +1025,7 @@ export function ChallengeWorkspace({
               className={s.secondaryBtn}
               onClick={run}
               disabled={busy !== null || !stepUnlocked}
+              title={`Run without grading (${modKey}+Shift+Enter)`}
             >
               {busy === "run" ? (
                 <Loader2 size={13} className={s.spin} aria-hidden="true" />
@@ -939,6 +1041,7 @@ export function ChallengeWorkspace({
               className={finished ? s.secondaryBtn : s.primaryBtn}
               onClick={submit}
               disabled={busy !== null || !stepUnlocked}
+              title={`Run the checks (${modKey}+Enter)`}
             >
               {busy === "submit" ? (
                 <Loader2 size={13} className={s.spin} aria-hidden="true" />
@@ -1042,7 +1145,7 @@ export function ChallengeWorkspace({
 
             <div className={s.instructionsBody}>
               {multiStep && !stepUnlocked ? (
-                <div className={s.lockedCard}>
+                <div className={s.locked}>
                   <Lock
                     size={18}
                     strokeWidth={2}
@@ -1072,8 +1175,8 @@ export function ChallengeWorkspace({
               )}
               {challenge.schema.length > 0 ? (
                 <>
-                  <h3 className={`${s.blockLabel} ${s.schemaLabel}`}>Schema</h3>
-                  <SchemaList tables={challenge.schema} />
+                  <h3 className={`${s.blockLabel} ${s.schemaLabel}`}>Tables</h3>
+                  <SchemaList tables={challenge.schema} onPreview={showTable} />
                 </>
               ) : null}
             </div>
@@ -1171,7 +1274,7 @@ export function ChallengeWorkspace({
             />
 
             <div className={s.paneColumn}>
-              <div className={s.paneHead}>{resultTabs(false)}</div>
+              <div className={`${s.paneHead} ${s.paneHeadTabs}`}>{resultTabs(false)}</div>
               <div
                 ref={panelRef}
                 role="tabpanel"
@@ -1288,7 +1391,7 @@ export function ChallengeWorkspace({
           {mobileView === "problem" ? (
             <div className={s.mProblem}>
               {multiStep && !stepUnlocked ? (
-                <div className={s.lockedCard}>
+                <div className={s.locked}>
                   <Lock
                     size={18}
                     strokeWidth={2}
@@ -1307,9 +1410,10 @@ export function ChallengeWorkspace({
               )}
               {challenge.schema.length > 0 ? (
                 <>
-                  <h3 className={s.blockLabel}>Schema</h3>
+                  <h3 className={s.blockLabel}>Tables</h3>
                   <SchemaAccordion
                     tables={challenge.schema}
+                    onPreview={showTable}
                     openTable={openTable}
                     onToggle={(name) =>
                       setOpenTable((cur) => (cur === name ? null : name))
