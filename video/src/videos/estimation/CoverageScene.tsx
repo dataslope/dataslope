@@ -246,7 +246,7 @@ export const CoverageScene: React.FC = () => {
           <span style={{ ...body(32, true), color: INK, opacity: ease(frame, catchAt - 2, 10) }}>catch the true mean</span>
         </div>
       </Ink>
-      <Ink at={sixAt - 4} dur={14} style={{ left: COL, top: y(514), width: 420 }}>
+      <Ink at={sixAt - 4} dur={14} style={{ left: COL, top: y(496), width: 420 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: "0.3em", fontSize: 32 }}>
           <span style={{ ...headline(33), color: EST_INK, ...TABULAR }}>{COVERAGE.misses}</span>
           <span style={{ ...body(32, true), color: EST_INK }}>miss it</span>

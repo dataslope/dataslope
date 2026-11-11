@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, HAIRLINE, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EXPERIMENT, TINY } from "./data";
@@ -207,6 +207,8 @@ export const DecideScene: React.FC = () => {
           <span style={{ ...note(22, INK), fontWeight: 500 }}>Yes, real</span>
         </Ink>
       </div>
+      {/* The two questions side by side: a hairline between the columns. */}
+      <ColumnRule x={1378} top={y(HEAD_Y)} height={y(HUGE) + 30 - y(HEAD_Y)} at={bigAt - 6} />
       <Ink at={bigAt - 6} dur={14} style={{ left: COL[1], top: y(HEAD_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...body(32, true), color: INK }}>
           <Marker at={sizeAt - 4}>Big enough to matter?</Marker>
