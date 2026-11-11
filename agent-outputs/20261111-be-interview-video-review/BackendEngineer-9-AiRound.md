@@ -39,7 +39,7 @@
 
 ### 5. [P2] answer: the jitter follow-up gives "115" with nothing to measure it against
 - When: 305.8-327.8 s, beat `design-jitter` (frames element-322.jpeg, element-326.jpeg)
-- What: "No tenth of it gets more than a hundred and fifteen" is the conclusion, but the video never says whether 115 gets through. The simulation has no capacity line. The name an interviewer listens for, the thundering herd or synchronized retries, is never said. The page's own Q4 calls this pattern "backoff and jitter", and the video names neither the herd nor the ratio (the peak falls from 1,000 to 115, about nine times lower).
+- What: "No tenth of it gets more than a hundred and fifteen" is the conclusion, but the video never says whether 115 gets through. The simulation has no capacity line. The name an interviewer listens for, the thundering herd (synchronized retries), is never said, and neither is the ratio: the peak falls from 1,000 to 115, about nine times lower.
 - Why it matters: "Why jitter?" is answered with a number rather than a reason, which is exactly where the interviewer presses next ("so what?").
 - Cause: `script.ts` beat `design-jitter`; `video/src/videos/be-ai-round/JitterScene.tsx:152` (115 marked with no reference line).
 - Fix: Reword the last sentence to "With a random wait of up to that second, the busiest tenth gets 115, a peak nearly nine times lower: retries arrive as a trickle the provider can absorb instead of a herd that knocks it over again." Optionally draw a dashed "what the provider takes" line (for example 200 per tenth) across both charts.
