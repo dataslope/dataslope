@@ -140,17 +140,17 @@ export const SharpScene: React.FC = () => {
           </span>
         </Note>
         <Note at={aimedAt - 2} x={WX0 + WW + 24} y={top + 108}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>if the target came first,</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>If the target came first,</span>
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>about {fmt(SHOTS.expected, 1)} by chance</div>
         </Note>
         <Note at={lookingAt - 2} x={160} y={top + wh + 30}>
           <span style={{ ...label(24, INK), whiteSpace: "nowrap", ...halo }}>
-            a pattern you found has to hold up on <Marker at={freshAt - 2}>fresh data</Marker>
+            A pattern you found has to hold up on <Marker at={freshAt - 2}>fresh data</Marker>
           </span>
         </Note>
         <Note at={purposeAt + 4} x={1460} y={y(300) + 400}>
           <span style={{ ...note(21, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            cherry-picking, on purpose
+            Cherry-picking, on purpose
           </span>
         </Note>
       </Drift>

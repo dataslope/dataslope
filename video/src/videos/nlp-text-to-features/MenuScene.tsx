@@ -22,7 +22,6 @@ import {
   NumCell,
   pulse,
   Spot,
-  SURFACE,
   X0,
 } from "./parts";
 
@@ -38,7 +37,7 @@ const TOKENIZE = { x: X0, w: 210 };
 const OPTIONAL_X0 = 380;
 const OPTIONAL_W = 220;
 const OPTIONAL_STEP = 260;
-const QUESTIONS = ["lowercase?", "drop stopwords?", "stem or lemmatize?", "add n-grams?"];
+const QUESTIONS = ["Lowercase?", "Drop stopwords?", "Stem or lemmatize?", "Add n-grams?"];
 const TEST_Y = 708;
 const PILL_Y = 788;
 
@@ -146,8 +145,8 @@ export const MenuScene: React.FC = () => {
 
       {/* ── Fig. 2: tokenize, then a question at every step ── */}
       <FigLabel n="2" title="The cleaning steps: a menu, not a recipe" at={menuAt - 4} x={X0} y={y(FIG2_Y)} />
-      <Card at={tokenizeAt - 4} x={TOKENIZE.x} y={y(STATION_Y)} w={TOKENIZE.w} h={h(STATION_H)} fill={SURFACE} line={INK}>
-        <span style={label(26, INK)}>tokenize</span>
+      <Card at={tokenizeAt - 4} x={TOKENIZE.x} y={y(STATION_Y)} w={TOKENIZE.w} h={h(STATION_H)}>
+        <span style={label(26, INK)}>Tokenize</span>
         <span style={{ ...note(20, INK_SOFT), marginTop: 6 }}>nearly always</span>
       </Card>
       {QUESTIONS.map((q, k) => (
@@ -155,8 +154,8 @@ export const MenuScene: React.FC = () => {
           {/* One arrow out of tokenize; the optional steps are a menu, not a chain. */}
           {k === 0 ? (
             <Arrow
-              from={[TOKENIZE.x + TOKENIZE.w + 6, stationMid]}
-              to={[optionalX(0) - 8, stationMid]}
+              from={[TOKENIZE.x + TOKENIZE.w + 2, stationMid]}
+              to={[optionalX(0) - 2, stationMid]}
               at={questionAt - 4}
               dur={8}
               color={INK_SOFT}

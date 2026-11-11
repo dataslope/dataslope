@@ -33,6 +33,8 @@ export const MARK_BAD = `color-mix(in srgb, ${ACCENT} 26%, transparent)`;
 export const MARK_KEY = `color-mix(in srgb, ${BAR} 18%, transparent)`;
 export const KEY = BAR;
 export const KEY_INK = BLUE_INK;
+/** A plain node's fill: neutral gray, opaque, with no outline. */
+export const NODE = ds("gray", 100);
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
@@ -258,7 +260,7 @@ export const Spot: React.FC<{
   );
 };
 
-/** A program that writes to the database: a small rounded chip. */
+/** A program that writes to the database: a small gray node, fill only. */
 export const Chip: React.FC<{
   at: number;
   x: number;
@@ -282,10 +284,10 @@ export const Chip: React.FC<{
         top: y,
         width,
         boxSizing: "border-box",
-        padding: "10px 18px",
-        borderRadius: 10,
-        border: `2px solid ${glow > 0 ? `color-mix(in srgb, ${ACCENT} ${Math.round(glow * 100)}%, ${INK})` : INK}`,
-        background: PAPER,
+        padding: "12px 20px",
+        borderRadius: 8,
+        // Fill only: neutral gray, warming to the accent's tint as it glows.
+        background: glow > 0 ? `color-mix(in srgb, ${ACCENT} ${Math.round(glow * 24)}%, ${NODE})` : NODE,
         opacity: p * (1 - o) * (1 - d),
         transform: `translate(${(1 - p) * 16 + o * 16}px, ${0}px) scale(${1 + glow * 0.04})`,
         transformOrigin: "50% 50%",

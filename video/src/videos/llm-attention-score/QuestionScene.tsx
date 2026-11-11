@@ -12,7 +12,6 @@ import {
   Arrow,
   Cells,
   DATA,
-  DATA_TINT,
   Fade,
   FIG_Y,
   HEAD_Y,
@@ -32,6 +31,7 @@ import {
   Spot,
   Svg,
   Tag,
+  tintOf,
   TokenChip,
   VALUE,
   VALUE_INK,
@@ -158,7 +158,7 @@ export const QuestionScene: React.FC = () => {
       <Headline
         lead={
           <>
-            What does <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: "0.86em" }}>it</span> mean?
+            What does <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: "0.92em" }}>it</span> mean?
           </>
         }
         at={from}
@@ -253,9 +253,7 @@ export const QuestionScene: React.FC = () => {
             width={CELL - 4}
             height={42}
             rx={4}
-            fill={DATA_TINT}
-            stroke={DATA}
-            strokeWidth={1.4}
+            fill={tintOf(DATA)}
             opacity={ease(frame, embeddingAt - 4 + i, 8)}
           />
         ))}
@@ -266,8 +264,9 @@ export const QuestionScene: React.FC = () => {
       {QKV.map((c, i) => (
         <Arrow
           key={c.name}
-          from={[STRIP_X + STRIP_N * CELL + 14, stripY + 23]}
-          to={[VX - 16, rowY(i) + 23]}
+          // From the embedding's last cell to each vector's first: edge to edge.
+          from={[STRIP_X + (STRIP_N - 1) * CELL + CELL - 4, stripY + 23]}
+          to={[VX - 2, rowY(i) + 23]}
           at={vectorsAt - 4 + i * 4}
           color={c.color}
           width={2.6}
@@ -279,7 +278,8 @@ export const QuestionScene: React.FC = () => {
             <Cells values={c.values} numAt={twoAt + 14 + i * 4} cells={cells} cell={cellW} border={c.color} />
           </Fade>
           <Fade at={cardAt[i] - 4} style={{ left: VX + 230, top: rowY(i) + 6, display: "flex", alignItems: "baseline", gap: 22 }}>
-            <span style={{ ...label(28, c.ink), width: 92 }}>{c.name}</span>
+            {/* The name in the serif, beside its question: one line, one face. */}
+            <span style={{ ...body(34), color: c.ink, width: 108 }}>{c.name}</span>
             <span
               style={{
                 ...body(34, true),

@@ -102,7 +102,7 @@ export const CheckScene: React.FC = () => {
       <Kicker at={open - 10}>Rules about values</Kicker>
       <Head lead="A test every row must pass." at={checkAt - 6} out={outA} />
       <Ink at={trueAt - 4} dur={16} out={outA} style={{ left: 96, top: y(252), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(34, true), color: INK }}>true, and the row is stored; false, and it is refused</span>
+        <span style={{ ...body(34, true), color: INK }}>True, and the row is stored; false, and it is refused</span>
       </Ink>
       <Head lead="It can compare columns, too." at={compareAt - 6} />
 

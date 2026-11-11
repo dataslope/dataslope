@@ -3,10 +3,10 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import { arrowHead } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
-import { SERIF } from "../../editorial/fonts";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, fmt, headline as headlineStyle, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
 import { H, Ink, W } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -284,15 +284,22 @@ export const Count: React.FC<{
   );
 };
 
-/** Symbols, set in the serif whatever face surrounds them. */
+/** Symbols, set in the math face (editorial/math.tsx) at the size of the
+ *  words around them, whatever face surrounds them. */
 export const XBar: React.FC<{ color?: string }> = ({ color }) => (
-  <span style={{ fontFamily: SERIF, fontStyle: "italic", color }}>{"x̄"}</span>
+  <MathRun style={{ color }}>
+    <I>{"x̄"}</I>
+  </MathRun>
 );
 export const Mu: React.FC<{ color?: string }> = ({ color }) => (
-  <span style={{ fontFamily: SERIF, fontStyle: "normal", color }}>μ</span>
+  <MathRun style={{ color }}>
+    <I>μ</I>
+  </MathRun>
 );
 export const PHat: React.FC<{ color?: string }> = ({ color }) => (
-  <span style={{ fontFamily: SERIF, fontStyle: "italic", color }}>{"p̂"}</span>
+  <MathRun style={{ color }}>
+    <I>{"p̂"}</I>
+  </MathRun>
 );
 
 /**

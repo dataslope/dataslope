@@ -5,7 +5,7 @@ import { HAIRLINE, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Arrow, Card, CHIP_LINE, Drift, FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, Reveal, Svg, SURFACE, X0 } from "./parts";
+import { Arrow, Card, CHIP_LINE, Drift, FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, Reveal, Svg, X0 } from "./parts";
 
 /**
  * The lesson's task-by-task table (choosing-your-pipeline.mdx, "Task by
@@ -13,10 +13,10 @@ import { Arrow, Card, CHIP_LINE, Drift, FIG_Y, Headline, INK, INK_SOFT, Kicker, 
  * lesson words each cell.
  */
 const TASKS = [
-  { task: "Search indexing", stop: "yes", stem: "stem" },
-  { task: "Topics and keywords", stop: "yes", stem: "lemmatize" },
-  { task: "Sentiment analysis", stop: "no, keep negation", stem: "light, if any" },
-  { task: "Authorship attribution", stop: "no, it’s the signal", stem: "no" },
+  { task: "Search indexing", stop: "Yes", stem: "Stem" },
+  { task: "Topics and keywords", stop: "Yes", stem: "Lemmatize" },
+  { task: "Sentiment analysis", stop: "No, keep negation", stem: "Light, if any" },
+  { task: "Authorship attribution", stop: "No, it’s the signal", stem: "No" },
 ] as const;
 
 const COLS = [
@@ -119,27 +119,27 @@ export const TasksScene: React.FC = () => {
         {/* The authorship row's reason, from the lesson: the rate of function words. */}
         <Note at={wordsAt - 2} x={COLS[1].x} y={rowTop(3) + 40}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            how often <i>the</i>, <i>of</i>, <i>that</i> appear: <Reveal at={fingerprintAt - 2}>a fingerprint</Reveal>
+            How often <i>the</i>, <i>of</i>, <i>that</i> appear: <Reveal at={fingerprintAt - 2}>a fingerprint</Reveal>
           </span>
         </Note>
 
         {/* ── Fig. 5: an ablation ── */}
         <FigLabel n="5" title="One step at a time" at={changeAt - 6} x={X0} y={y(FIG5_Y)} />
-        <Card at={changeAt - 4} x={X0} y={flowTop} w={340} h={flowH} fill={SURFACE} line={INK}>
-          <span style={label(24, INK)}>change one step</span>
+        <Card at={changeAt - 4} x={X0} y={flowTop} w={340} h={flowH}>
+          <span style={label(24, INK)}>Change one step</span>
         </Card>
-        <Arrow from={[X0 + 346, mid - 14]} to={[b.x - 10, flowTop + half / 2 + 4]} at={changeAt + 4} dur={10} color={INK_SOFT} width={2} head={11} />
-        <Arrow from={[X0 + 346, mid + 14]} to={[b.x - 10, flowTop + flowH - half / 2 - 4]} at={changeAt + 6} dur={10} color={INK_SOFT} width={2} head={11} />
+        <Arrow from={[X0 + 342, mid - 14]} to={[b.x - 2, flowTop + half / 2]} at={changeAt + 4} dur={10} color={INK_SOFT} width={2} head={11} />
+        <Arrow from={[X0 + 342, mid + 14]} to={[b.x - 2, flowTop + flowH - half / 2]} at={changeAt + 6} dur={10} color={INK_SOFT} width={2} head={11} />
         <Card at={changeAt + 8} x={b.x} y={flowTop} w={b.w} h={half} line={CHIP_LINE}>
-          <span style={note(23, INK)}>with it</span>
+          <span style={note(23, INK)}>With it</span>
         </Card>
         <Card at={changeAt + 12} x={b.x} y={flowTop + flowH - half} w={b.w} h={half} line={CHIP_LINE}>
-          <span style={note(23, INK)}>without it</span>
+          <span style={note(23, INK)}>Without it</span>
         </Card>
-        <Arrow from={[b.x + b.w + 8, flowTop + half / 2 + 4]} to={[c.x - 10, mid - 14]} at={measureAt - 4} dur={10} color={INK_SOFT} width={2} head={11} />
-        <Arrow from={[b.x + b.w + 8, flowTop + flowH - half / 2 - 4]} to={[c.x - 10, mid + 14]} at={measureAt - 2} dur={10} color={INK_SOFT} width={2} head={11} />
-        <Card at={measureAt} x={c.x} y={flowTop} w={c.w} h={flowH} fill={SURFACE} line={INK}>
-          <span style={label(24, INK)}>measure on your own task</span>
+        <Arrow from={[b.x + b.w + 2, flowTop + half / 2]} to={[c.x - 2, mid - 14]} at={measureAt - 4} dur={10} color={INK_SOFT} width={2} head={11} />
+        <Arrow from={[b.x + b.w + 2, flowTop + flowH - half / 2]} to={[c.x - 2, mid + 14]} at={measureAt - 2} dur={10} color={INK_SOFT} width={2} head={11} />
+        <Card at={measureAt} x={c.x} y={flowTop} w={c.w} h={flowH}>
+          <span style={label(24, INK)}>Measure on your own task</span>
         </Card>
         <Note at={ablationAt - 2} x={c.x + c.w + 40} y={mid - 22}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
@@ -151,7 +151,7 @@ export const TasksScene: React.FC = () => {
         <Note at={safeAt - 2} x={X0} y={y(DEFAULT_Y)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <span style={{ ...label(23, INK_SOFT), marginRight: 14 }}>A safe default</span>
-            tokenize, lowercase, and <Mark at={keepAt - 2}>keep the stopwords</Mark>
+            Tokenize, lowercase, and <Mark at={keepAt - 2}>keep the stopwords</Mark>
             <Reveal at={untilAt - 2} style={{ color: INK_SOFT }}>
               {" until a measurement says to drop them"}
             </Reveal>

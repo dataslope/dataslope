@@ -112,14 +112,14 @@ export const RequirementsScene: React.FC = () => {
       <Ink at={nounsAt + 2} dur={16} style={{ left: 120, top: y(720), display: "flex", gap: 40, whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: INK }}>
           <Mark at={nounsAt + 2} color={MARK_KEY}>
-            nouns
+            Nouns
           </Mark>{" "}
           become entities
         </span>
       </Ink>
       <Ink at={verbsAt + 2} dur={16} style={{ left: 580, top: y(720), whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: INK }}>
-          <Underline at={verbsAt + 2}>verbs</Underline> become how they connect
+          <Underline at={verbsAt + 2}>Verbs</Underline> become how they connect
         </span>
       </Ink>
       {/* A hairline in each gap between the three, inking in with the one to
@@ -130,7 +130,7 @@ export const RequirementsScene: React.FC = () => {
       {/* The third mark's meaning, unspoken, so it gets the pause before the cut to read in. */}
       <Ink at={connectAt - 4} dur={16} style={{ left: 1080, top: y(720), whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: INK }}>
-          <Mark at={connectAt - 2}>facts</Mark> become columns
+          <Mark at={connectAt - 2}>Facts</Mark> become columns
         </span>
       </Ink>
     </AbsoluteFill>

@@ -3,6 +3,7 @@ import { useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { I } from "../../editorial/math";
 import { COUNTS, DF, IDF, MAX_COUNT, MAX_TFIDF, N, num, OWNER, TFIDF, THE, VOCAB } from "./data";
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
@@ -288,7 +289,7 @@ export const IdfRow: React.FC<{ at: number }> = ({ at }) => {
           whiteSpace: "nowrap",
         }}
       >
-        times idf
+        Times idf
       </div>
       {VOCAB.map((w, j) => (
         <div
@@ -332,10 +333,8 @@ export const Frac: React.FC<{ top: React.ReactNode; bottom: React.ReactNode }> =
   </span>
 );
 
-/** An italic variable in a formula. */
-export const V: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <i style={{ fontStyle: "italic" }}>{children}</i>
-);
+/** An italic variable in a formula: the math kit's own. */
+export const V = I;
 
 /**
  * Which of the three documents hold a word: one square per document, filled
@@ -353,7 +352,9 @@ export const DocPips: React.FC<{ word: number; p: number; size?: number }> = ({ 
             width: size,
             height: size,
             boxSizing: "border-box",
-            border: `2px solid ${has ? INK : HAIRLINE}`,
+            // A document that holds the word is a filled square, with no
+            // outline; one that does not is an empty slot, outlined.
+            border: `2px solid ${has && fill > 0 ? `color-mix(in srgb, ${HAIRLINE} ${((1 - fill) * 100).toFixed(0)}%, transparent)` : HAIRLINE}`,
             background: tint(fill),
             display: "inline-flex",
             alignItems: "center",

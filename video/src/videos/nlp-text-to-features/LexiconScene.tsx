@@ -22,6 +22,7 @@ const VERDICT_X = 1290;
 const CHIP = 28;
 const BLIND_Y = 812;
 
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const inkFor = (label: string) => (label === "positive" ? POS_INK : label === "negative" ? NEG_INK : INK_SOFT);
 
 /**
@@ -107,10 +108,10 @@ export const LexiconScene: React.FC = () => {
       {/* ── Fig. 15: the naive counter ── */}
       <FigLabel n="15" title="The naive counter, on the lesson’s three reviews" at={rowAt[0] - 8} x={FIG15_X} y={y(FIG_Y)} />
       <Note at={rowAt[0] - 4} x={SUM_X} y={y(LEX_HEAD_Y)}>
-        <span style={label(21, INK_SOFT)}>sum</span>
+        <span style={label(21, INK_SOFT)}>Sum</span>
       </Note>
       <Note at={rowAt[0] - 4} x={VERDICT_X} y={y(LEX_HEAD_Y)}>
-        <span style={label(21, INK_SOFT)}>verdict</span>
+        <span style={label(21, INK_SOFT)}>Verdict</span>
       </Note>
       {NAIVE.map((r, i) => (
         <ReviewRow
@@ -125,7 +126,7 @@ export const LexiconScene: React.FC = () => {
         />
       ))}
       <Note at={neverAt + 8} x={VERDICT_X} y={y(REVIEW_Y[wrongIdx]) + 52}>
-        <span style={{ ...note(22, LOST_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: wrongMark }}>wrong</span>
+        <span style={{ ...note(22, LOST_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: wrongMark }}>Wrong</span>
       </Note>
 
       <Note at={countingAt - 2} x={FIG15_X} y={y(BLIND_Y)}>
@@ -200,7 +201,8 @@ const ReviewRow: React.FC<{
         {signed(trace.score)}
       </div>
       <div style={{ position: "absolute", left: VERDICT_X, top: top + 4, ...note(30, inkFor(trace.label)), fontWeight: 500, opacity: v }}>
-        {struck !== undefined ? <Strike at={struck}>{trace.label}</Strike> : trace.label}
+        {/* A verdict stands on its own, so it starts with a capital. */}
+        {struck !== undefined ? <Strike at={struck}>{cap(trace.label)}</Strike> : cap(trace.label)}
       </div>
     </>
   );

@@ -110,7 +110,8 @@ export const StemScene: React.FC = () => {
             return (
               <React.Fragment key={`${g}-${i}`}>
                 <Chip text={r.word} x={GROUP_X[g]} y={top} at={r.at} size={SIZE} />
-                <Arrow from={[geo[g].a0, mid]} to={[geo[g].a0 + ARROW, mid]} at={r.arrowAt} />
+                {/* From this word's own chip to its stem's, touching both. */}
+                <Arrow from={[GROUP_X[g] + chipWidth(r.word, SIZE) + 2, mid]} to={[geo[g].stemX - 2, mid]} at={r.arrowAt} />
                 <Chip text={stemOf(r.word)} x={geo[g].stemX} y={top} at={stemAt(g, i, r)} size={SIZE} tones={r.tones} marks={r.marks} />
               </React.Fragment>
             );

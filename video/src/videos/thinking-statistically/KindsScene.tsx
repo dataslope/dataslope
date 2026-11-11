@@ -267,7 +267,7 @@ export const KindsScene: React.FC = () => {
         {Array.from({ length: 7 }, (_, k) => {
           const a = ease(frame, leafAt[2] + 4 + k * 2.5, 8);
           if (a <= 0) return null;
-          return <circle key={k} cx={LEAVES[2].x + 14 + k * 38} cy={y(PICTURE_Y) + 36} r={13 * a} fill={RAW} stroke={INK} strokeWidth={1.6} />;
+          return <circle key={k} cx={LEAVES[2].x + 14 + k * 38} cy={y(PICTURE_Y) + 36} r={13 * a} fill={RAW} />;
         })}
       </Svg>
 

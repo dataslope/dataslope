@@ -161,7 +161,7 @@ export const BlindScene: React.FC = () => {
       ))}
       <Note at={tensAt - 2} x={px[1]} y={y(STRIP_Y + 56)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          the same row, against <Mark at={tensAt}>tens of thousands</Mark> of words
+          The same row, against <Mark at={tensAt}>tens of thousands</Mark> of words
         </span>
       </Note>
       <div style={{ position: "absolute", left: px[1], top: y(STRIP_Y + 100), display: "flex", gap: 0 }}>

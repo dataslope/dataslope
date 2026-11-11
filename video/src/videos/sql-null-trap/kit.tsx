@@ -428,7 +428,7 @@ export const Table: React.FC<{
               width: wFull - 8,
               height: g.rowH - 8,
               border: `3px solid ${m.color ?? UNKNOWN_INK}`,
-              borderRadius: 6,
+              borderRadius: 5,
               opacity: w * (1 - o),
               transform: `scale(${1.12 - 0.12 * w})`,
             }}

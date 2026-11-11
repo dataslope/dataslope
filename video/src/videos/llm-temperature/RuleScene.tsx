@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { ACCENT_INK, body, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -36,7 +37,9 @@ const MiniBars: React.FC<{ t: number; x: number; top: number; height: number; at
           ...note(20, INK_SOFT),
         }}
       >
-        T = {t}
+        <MathRun>
+          <I>T</I> = {t}
+        </MathRun>
       </div>
     </>
   );

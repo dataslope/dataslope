@@ -65,8 +65,10 @@ export const ColumnsScene: React.FC = () => {
 
   // From where the second column would have gone to where it went: down,
   // then left, ending on its right edge.
-  const p0: [number, number] = [ROW_X + c1.w + c1.w / 2, g.top + g.colH + 10];
-  const p3: [number, number] = [c2.x + c2.w + 16, g.top + g.colH + g.colH / 2];
+  // From the ghost's bottom edge to the wrapped column's right edge, with no
+  // gap at either end.
+  const p0: [number, number] = [ROW_X + c1.w + c1.w / 2, g.top + g.colH];
+  const p3: [number, number] = [c2.x + c2.w + 2, g.top + g.colH + g.colH / 2];
   const k1: [number, number] = [p0[0], p3[1]];
   const k2: [number, number] = [p3[0] + 110, p3[1]];
   const trail = ease(frame, wrapsAt + 10, 18);

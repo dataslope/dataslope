@@ -3,7 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { M } from "../../editorial/math";
+import { fmt, halo, INK, INK_SOFT, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -164,13 +165,6 @@ export const CorrScene: React.FC = () => {
       <Svg>
         <line x1={BOX.x0} x2={BOX.x1} y1={bottom} y2={bottom} stroke={INK} strokeWidth={1.6} opacity={ease(frame, corrFrom + 2, 12)} />
         <line x1={BOX.x0} x2={BOX.x0} y1={bottom} y2={top} stroke={INK} strokeWidth={1.6} opacity={ease(frame, corrFrom + 2, 12)} />
-        {/* The two axes' names, at their ends. */}
-        <text x={BOX.x1 + 14} y={bottom + 7} style={{ ...label(21, INK_SOFT), fontStyle: "italic" }} fill={INK_SOFT} opacity={ease(frame, corrFrom + 6, 12)}>
-          x
-        </text>
-        <text x={BOX.x0 - 14} y={top + 7} textAnchor="end" style={{ ...label(21, INK_SOFT), fontStyle: "italic" }} fill={INK_SOFT} opacity={ease(frame, corrFrom + 6, 12)}>
-          y
-        </text>
         {/* The rising curve, sliding into its ranks. */}
         {curveOut < 1
           ? CURVE.x.map((xv, i) => {
@@ -233,6 +227,15 @@ export const CorrScene: React.FC = () => {
           />
         ) : null}
       </Svg>
+      {/* The two axes' names, at their ends, in the math face. */}
+      <div style={{ position: "absolute", left: BOX.x1 + 14, top: bottom - 15, ...note(23, INK_SOFT), opacity: ease(frame, corrFrom + 6, 12) }}>
+        <M>x</M>
+      </div>
+      <div
+        style={{ position: "absolute", right: 1920 - (BOX.x0 - 14), top: top - 15, ...note(23, INK_SOFT), opacity: ease(frame, corrFrom + 6, 12) }}
+      >
+        <M>y</M>
+      </div>
       <Note at={straightAt + 4} x={BOX.x1 - 10} y={bottom - 50} align="right" out={ranksAt - 4}>
         <Label size={21} color={STAT_INK} style={halo}>
           Pearson&apos;s straight line
@@ -261,7 +264,9 @@ export const CorrScene: React.FC = () => {
         </Label>
       </Note>
       <Ink at={onXAt - 2} dur={14} style={{ left: px(0, U.xlo, U.xhi), top: py(19, U.ylo, U.yhi), whiteSpace: "nowrap" }}>
-        <span style={{ display: "inline-block", transform: "translateX(-50%)", ...note(40, DATA_INK), fontWeight: 500 }}>y = x²</span>
+        <span style={{ display: "inline-block", transform: "translateX(-50%)", ...note(40, DATA_INK), fontWeight: 500 }}>
+          <M>y = x²</M>
+        </span>
       </Ink>
     </AbsoluteFill>
   );

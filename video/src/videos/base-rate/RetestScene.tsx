@@ -89,21 +89,22 @@ export const RetestScene: React.FC = () => {
       </Ink>
 
       <Note at={realAt} x={BLOCK_RIGHT + 30} y={y(BLOCK.top) + h(BLOCK.pitch / 2) - 15}>
-        <span style={{ ...label(24, COLOR_INK.hasIt), whiteSpace: "nowrap" }}>
+        {/* Each count's working on a line of its own under it. */}
+        <div style={{ ...label(24, COLOR_INK.hasIt), whiteSpace: "nowrap" }}>
           {num(COUNT.retestTp)} positive again
-        </span>
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", marginLeft: 14 }}>
+        </div>
+        <div style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>
           {pct(SENSITIVITY)} of {num(COUNT.tp)}, rounded
-        </span>
+        </div>
       </Note>
       <RowBracket fromRow={1} toRow={10} at={clearAt} color={COLOR.falseAlarm} />
       <Note at={clearAt + 6} x={BLOCK_RIGHT + 30} y={y(BLOCK.top) + h(BLOCK.pitch * 6) - 30}>
         <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>{num(cleared)} cleared</div>
         <div style={{ ...label(24, COLOR_INK.falseAlarm), whiteSpace: "nowrap", marginTop: 6 }}>
           {num(COUNT.retestFp)} still positive
-          <span style={{ ...note(20, INK_SOFT), marginLeft: 14 }}>
-            {pct(1 - SPECIFICITY)} of {num(COUNT.fp)}
-          </span>
+        </div>
+        <div style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>
+          {pct(1 - SPECIFICITY)} of {num(COUNT.fp)}
         </div>
       </Note>
 

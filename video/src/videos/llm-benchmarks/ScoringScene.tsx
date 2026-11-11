@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { ColumnRule, FigLabel, Ink } from "../../editorial/ui";
+import { badgeStyle, ColumnRule, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { TICKETS } from "./data";
-import { A_INK, B, Check, Drift, FAINT, Headline, Marked, OK, pulse, Spot, Svg, TRAP_INK, X0 } from "./parts";
+import { B, Check, Drift, FAINT, Headline, Marked, OK, pulse, Spot, Svg, TRAP_INK, X0 } from "./parts";
 
 /** The three approaches as three columns of plain text and pictures, no
  *  cards: each column's left edge and the width its widest piece (the JSON
@@ -110,7 +110,23 @@ export const ScoringScene: React.FC = () => {
               />
             ) : null}
             <Ink at={t.at} dur={14} style={{ left: COL_X[i], top: y(TITLE_Y) - 4, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(28, A_INK), fontWeight: 500, marginRight: 14 }}>{i + 1}</span>
+              {/* The approach's number on a tinted disc, 26px beside the 28px title. */}
+              <span
+                style={{
+                  ...badgeStyle("blue", 26),
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 40,
+                  height: 40,
+                  padding: 0,
+                  borderRadius: 20,
+                  marginRight: 14,
+                  verticalAlign: "middle",
+                }}
+              >
+                {i + 1}
+              </span>
               <span style={{ ...label(28, INK), fontWeight: 500 }}>{t.text}</span>
             </Ink>
           </React.Fragment>
@@ -118,7 +134,7 @@ export const ScoringScene: React.FC = () => {
 
         {/* 1. Structured output: fields compared exactly. */}
         <Ink at={checkableAt} dur={14} style={{ left: COL_X[0], top: y(GLYPH_Y) + 10, width: COL_W }}>
-          <div style={{ background: PAPER, border: `1.6px solid ${FAINT}`, borderRadius: 10, padding: "18px 22px", fontFamily: MONO, fontSize: 26, lineHeight: 1.7, color: INK }}>
+          <div style={{ background: PAPER, border: `1.6px solid ${FAINT}`, borderRadius: 8, padding: "18px 22px", fontFamily: MONO, fontSize: 26, lineHeight: 1.7, color: INK }}>
             <div>{"{"}</div>
             <div style={{ paddingLeft: 26 }}>
               <span style={{ color: INK_SOFT }}>&quot;queue&quot;:</span> <Marked at={fieldsAt - 2}>&quot;{ticket.expected}&quot;</Marked>
@@ -130,7 +146,7 @@ export const ScoringScene: React.FC = () => {
           <Check x={COL_X[0] + 400} y={y(GLYPH_Y) + 10 + 82} at={compareAt} size={34} />
         </Svg>
         <Ink at={compareAt - 2} dur={12} style={{ left: COL_X[0], top: y(GLYPH_Y) + 236, width: COL_W }}>
-          <span style={{ ...note(24, INK) }}>fields you can compare exactly</span>
+          <span style={{ ...note(24, INK) }}>Fields you can compare exactly</span>
         </Ink>
 
         {/* 2. Properties of the text, each a yes or no: here, of a summary. */}
@@ -138,15 +154,15 @@ export const ScoringScene: React.FC = () => {
           <span style={{ ...note(23, INK_SOFT) }}>of a summary</span>
         </Ink>
         {[
-          { text: "names the three facts", at: factsAt },
-          { text: "stays under the length limit", at: limitAt },
+          { text: "Names the three facts", at: factsAt },
+          { text: "Stays under the length limit", at: limitAt },
         ].map((p, i) => (
           <React.Fragment key={p.text}>
             <Ink at={p.at - 4} dur={12} style={{ left: COL_X[1] + 54, top: y(GLYPH_Y) + 24 + i * 96, whiteSpace: "nowrap" }}>
               <span style={{ ...note(28, INK), fontWeight: 500 }}>{p.text}</span>
             </Ink>
             <Svg opacity={ease(frame, propertiesAt - 2, 12)}>
-              <rect x={COL_X[1]} y={y(GLYPH_Y) + 22 + i * 96} width={36} height={36} rx={7} fill={PAPER} stroke={INK_SOFT} strokeWidth={2} />
+              <rect x={COL_X[1]} y={y(GLYPH_Y) + 22 + i * 96} width={36} height={36} rx={5} fill={PAPER} stroke={INK_SOFT} strokeWidth={2} />
               <Check x={COL_X[1] + 19} y={y(GLYPH_Y) + 40 + i * 96} at={p.at + 6} size={26} />
             </Svg>
           </React.Fragment>
@@ -186,7 +202,7 @@ export const ScoringScene: React.FC = () => {
           );
         })}
         <Ink at={longerAt - 2} dur={14} style={{ left: COL_X[2], top: y(GLYPH_Y) + LONGER_Y, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, TRAP_INK), fontWeight: 500 }}>favors longer answers</span>
+          <span style={{ ...note(23, TRAP_INK), fontWeight: 500 }}>Favors longer answers</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

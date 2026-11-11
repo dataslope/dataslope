@@ -6,10 +6,12 @@ import { body, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editoria
 import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { ds } from "../../theme/brand";
 import { DIST, num, SHOWN_SUM, VOCAB } from "./data";
 import { Arrow, ChipFace, Drift, FIG_Y, FOCUS_INK, Headline, Kicker, Mark, pulse, Spot, TOKEN, X0 } from "./parts";
 
 /** The model, a plain box between what it reads and what it returns. */
+const PLAIN = `color-mix(in srgb, ${ds("gray", 400)} 22%, ${PAPER})`;
 const BOX = { x: 330, y: 470, w: 300, h: 150 };
 /** The context it reads: one token, the lesson's toy loop's first. */
 const CTX = { x: X0, y: 520 };
@@ -79,7 +81,8 @@ export const ModelScene: React.FC = () => {
         <div style={{ position: "absolute", left: CTX.x, top: y(CTX.y), opacity: ease(frame, hookFrom + 4, 12) }}>
           <ChipFace text="the" size={32} />
         </div>
-        <Arrow from={[CTX.x + 104, y(CTX.y) + 26]} to={[BOX.x - 14, y(CTX.y) + 26]} at={takesAt - 4} dur={12} />
+        {/* From the chip's right edge (3 characters at 0.6em, its padding) to the box's left. */}
+        <Arrow from={[CTX.x + 84, y(CTX.y) + 24]} to={[BOX.x - 1, y(CTX.y) + 24]} at={takesAt - 4} dur={12} />
 
         {/* The model. */}
         <div
@@ -90,9 +93,9 @@ export const ModelScene: React.FC = () => {
             width: BOX.w,
             height: h(BOX.h),
             boxSizing: "border-box",
-            borderRadius: 14,
-            border: `2.5px solid ${INK}`,
-            background: `color-mix(in srgb, ${TOKEN} ${Math.round(think * 14)}%, ${PAPER})`,
+            borderRadius: 8,
+            // A plain item: neutral gray, warming to the token blue while it works.
+            background: `color-mix(in srgb, ${TOKEN} ${Math.round(think * 16)}%, ${PLAIN})`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -102,7 +105,7 @@ export const ModelScene: React.FC = () => {
         >
           <span style={{ ...body(34), color: INK, opacity: ease(frame, modelAt - 2, 12) }}>language model</span>
         </div>
-        <Arrow from={[BOX.x + BOX.w + 14, y(CTX.y) + 26]} to={[BARS.x - 18, y(CTX.y) + 26]} at={probAt - 6} dur={12} />
+        <Arrow from={[BOX.x + BOX.w + 1, y(CTX.y) + 24]} to={[BARS.x - 6, y(CTX.y) + 24]} at={probAt - 6} dur={12} />
 
         {/* What it returns: a probability for every token. */}
         <Note at={probAt - 2} x={BARS.x} y={rowY(0) - 50}>

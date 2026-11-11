@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -57,7 +58,6 @@ const NucleusBar: React.FC<{ nuc: Nucleus; top: number; height: number; at: numb
                 height: "100%",
                 boxSizing: "border-box",
                 background: isKept ? `color-mix(in srgb, ${fill} ${kept * 100}%, ${tint(ds("gray", 400), 30)})` : fill,
-                borderBottom: `4px solid ${isKept ? BAR : ds("gray", 400)}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: nuc.kept.length === 1 ? "flex-start" : "center",
@@ -128,7 +128,12 @@ export const TopPScene: React.FC = () => {
 
       {/* Bar A: the distribution at T = 1.5, one segment per token. */}
       <Ink at={start - 4} dur={14} style={{ left: A0, top: barA - 40 }}>
-        <span style={label(20)}>At T = {HOT.t}</span>
+        <span style={label(20)}>
+          At{" "}
+          <MathRun>
+            <I>T</I> = {HOT.t}
+          </MathRun>
+        </span>
       </Ink>
       {TOKENS.map((_, i) => {
         const x = px(startsA[i]);
@@ -143,7 +148,6 @@ export const TopPScene: React.FC = () => {
                   height: "100%",
                   boxSizing: "border-box",
                   background: isRock ? `color-mix(in srgb, ${TINT[i]} ${(1 - rockGone) * 100}%, transparent)` : TINT[i],
-                  borderBottom: `5px solid ${FILL[i]}`,
                   outline: isRock ? `2px dashed color-mix(in srgb, ${FILL[i]} ${rockGone * 100}%, transparent)` : undefined,
                   outlineOffset: -2,
                   display: "flex",
@@ -223,7 +227,6 @@ export const TopPScene: React.FC = () => {
                 height: "100%",
                 boxSizing: "border-box",
                 background: TINT[tok],
-                borderBottom: `5px solid ${FILL[tok]}`,
                 display: "flex",
                 alignItems: "center",
                 paddingLeft: 14,

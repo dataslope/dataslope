@@ -149,7 +149,8 @@ export const CaseScene: React.FC = () => {
           return (
             <React.Fragment key={r.word}>
               <Chip text={r.word} x={FIG7_X} y={top} at={names[i]} size={SIZE} />
-              <Arrow from={[arrowX0, mid]} to={[arrowX0 + 64, mid]} at={becomes[i]} />
+              {/* From this word's own chip to the lowercased one, touching both. */}
+              <Arrow from={[FIG7_X + chipWidth(r.word, SIZE) + 2, mid]} to={[lowX - 2, mid]} at={becomes[i]} />
               <Chip text={r.lower} x={lowX} y={top} at={becomes[i] + 4} size={SIZE} tones={[{ at: results[i], tone: "bad" }]} />
               <Ink at={names[i] + 6} dur={14} style={{ left: glossX, top: top - 2, whiteSpace: "nowrap" }}>
                 <span style={note(22, INK_SOFT)}>{r.before}</span>

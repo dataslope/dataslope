@@ -80,7 +80,7 @@ export const ContaminationScene: React.FC = () => {
               {c.text}
             </Tag>
             {i > 0 ? (
-              <Arrow from={[PIPE[i - 1].x + PIPE[i - 1].w + 8, y(PIPE_Y) + 22]} to={[c.x - 10, y(PIPE_Y) + 22]} at={chipAt[i] - 6} dur={8} width={2} />
+              <Arrow from={[PIPE[i - 1].x + PIPE[i - 1].w + 1, y(PIPE_Y) + 24]} to={[c.x - 2, y(PIPE_Y) + 24]} at={chipAt[i] - 6} dur={8} width={2} />
             ) : null}
           </React.Fragment>
         ))}
@@ -88,8 +88,8 @@ export const ContaminationScene: React.FC = () => {
         {/* benchmark-pitfalls' table, its first two rows. */}
         <Ink at={memorizedAt - 8} dur={12} style={{ left: X0, top: y(TABLE_Y) - 4, width: 900 }}>
           <div style={{ position: "relative", height: 30 }}>
-            <span style={{ ...label(22, INK_SOFT), position: "absolute", left: 0 }}>situation</span>
-            <span style={{ ...label(22, INK_SOFT), position: "absolute", left: RESULT_X - X0 }}>reported result</span>
+            <span style={{ ...label(22, INK_SOFT), position: "absolute", left: 0 }}>Situation</span>
+            <span style={{ ...label(22, INK_SOFT), position: "absolute", left: RESULT_X - X0 }}>Reported result</span>
           </div>
         </Ink>
         <Svg opacity={ease(frame, memorizedAt - 6, 12)}>
@@ -140,7 +140,7 @@ export const ContaminationScene: React.FC = () => {
           <span style={note(23, INK_SOFT)}>OpenAI stopped reporting it, February 2026</span>
         </Ink>
         <Ink at={reciteAt - 2} dur={12} style={{ left: X0, top: y(690) + 40, whiteSpace: "nowrap" }}>
-          <span style={note(23, INK)}>models could recite some of its fixes from memory</span>
+          <span style={note(23, INK)}>Models could recite some of its fixes from memory</span>
         </Ink>
 
         {/* The defense. */}

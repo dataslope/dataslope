@@ -212,7 +212,7 @@ export const ChatScene: React.FC = () => {
 
         {/* The bill, counting with the bars. */}
         <div style={{ position: "absolute", left: RX, top: y(FIG_Y) + 4, opacity: billP > 0 ? 1 : 0 }}>
-          <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>input tokens billed</div>
+          <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Input tokens billed</div>
           <div style={{ ...headline(64), color: frame >= fortyAt - 2 ? FOCUS_INK : INK, marginTop: 6, ...TABULAR }}>{num(billed)}</div>
           <div style={{ ...note(24, INK), marginTop: 8, whiteSpace: "nowrap", opacity: ease(frame, sixAt - 2, 12) }}>
             <span style={{ fontWeight: 500, color: FOCUS_INK, ...TABULAR }}>{CONVERSATION.ratio}×</span> the conversation&apos;s length

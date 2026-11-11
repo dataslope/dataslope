@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { HAIRLINE, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { compared, FIG2 } from "./data";
@@ -128,10 +128,9 @@ export const HeapScene: React.FC = () => {
           top: rowTop(0) - 18,
           width: CELL_W + 36,
           height: rowTop(3) + rowH + 18 - (rowTop(0) - 18),
-          boxSizing: "border-box",
-          border: `1.5px solid ${HAIRLINE}`,
+          // A filled panel, no outline: the cells on it are a deeper gray.
           borderRadius: 8,
-          background: `color-mix(in srgb, ${INK} 2%, ${PAPER})`,
+          background: `color-mix(in srgb, var(--ds-gray-400) 9%, ${PAPER})`,
           opacity: ease(frame, Math.max(start - 5, variableAt - 6), 14),
         }}
       />
@@ -147,7 +146,7 @@ export const HeapScene: React.FC = () => {
             height: poolBottom - poolTop,
             boxSizing: "border-box",
             border: `2px dashed ${INK_SOFT}`,
-            borderRadius: 12,
+            borderRadius: 8,
             opacity: pool,
           }}
         >
@@ -225,15 +224,15 @@ export const HeapScene: React.FC = () => {
       />
 
       {/* The references. */}
-      <RefArrow points={[dot(0), [POOL_X - 8, mid(0)]]} dotAt={referenceAt} at={arrowAt} dur={18} />
-      <RefArrow points={[dot(1), [NEAR_X - 8, mid(1)]]} dotAt={referenceAt + 3} at={arrowAt + 4} dur={14} />
+      <RefArrow points={[dot(0), [POOL_X - 1, mid(0)]]} dotAt={referenceAt} at={arrowAt} dur={18} />
+      <RefArrow points={[dot(1), [NEAR_X - 1, mid(1)]]} dotAt={referenceAt + 3} at={arrowAt + 4} dur={14} />
       <RefArrow
-        points={[dot(2), [poolMid, mid(2)], [poolMid, rowTop(0) + rowH + 8]]}
+        points={[dot(2), [poolMid, mid(2)], [poolMid, rowTop(0) + rowH + 1]]}
         dotAt={twiceAt + 4}
         at={bothAt - 2}
         dur={20}
       />
-      <RefArrow points={[dot(3), [NEAR_X - 8, mid(3)]]} dotAt={builtAt} at={runsAt - 4} dur={12} />
+      <RefArrow points={[dot(3), [NEAR_X - 1, mid(3)]]} dotAt={builtAt} at={runsAt - 4} dur={12} />
 
       {/* What makes each object. */}
       <Note at={freshAt} x={NEAR_X + OBJ_W + 24} y={mid(1) - 14}>

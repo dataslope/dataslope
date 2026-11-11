@@ -2,13 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, fmt, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, fmt, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { LBF_S } from "./data";
-import { Arrow, Drift, FIG_Y, Headline, LISTING_PAPER, Mark, pulse, Spot, X0 } from "./parts";
+import { Arrow, Drift, FIG_Y, Headline, LISTING_PAPER, Mark, NODE, pulse, Spot, X0 } from "./parts";
 
 const CARD_W = 480;
 const A_Y = 352;
@@ -77,8 +77,7 @@ export const OrbiterScene: React.FC = () => {
           justifyContent: "center",
           gap: 6,
           borderRadius: 8,
-          border: `2px solid ${INK}`,
-          background: PAPER,
+          background: NODE,
         }}
       >
         <div style={label(21, INK_SOFT)}>{who}</div>
@@ -122,7 +121,7 @@ export const OrbiterScene: React.FC = () => {
         <div style={{ position: "absolute", inset: 0, opacity: 1 - settle }}>
           <FigLabel n="7" title="The Mars Climate Orbiter, lost on 23 September 1999" at={yearAt - 4} x={X0} y={y(FIG_Y - 20)} />
           {card(y(A_Y), wroteAt - 6, "One program wrote", "pound-force seconds", "lbf·s", poundAt)}
-          <Arrow from={[mid, aBottom + 6]} to={[mid, fileTop - 6]} at={readAt - 8} dur={10} />
+          <Arrow from={[mid, aBottom]} to={[mid, fileTop]} at={readAt - 8} dur={10} />
 
           {/* The file between them: numbers, and no unit. */}
           <Ink at={readAt - 4} dur={16} style={{ left: X0, top: fileTop, width: CARD_W }}>
@@ -144,7 +143,7 @@ export const OrbiterScene: React.FC = () => {
               <span style={{ ...body(26, true), color: INK, opacity: ease(frame, justAt - 2, 12) }}>just numbers</span>
             </div>
           </Ink>
-          <Arrow from={[mid, fileTop + fileH + 6]} to={[mid, bTop - 6]} at={readAt + 2} dur={10} />
+          <Arrow from={[mid, fileTop + fileH]} to={[mid, bTop]} at={readAt + 2} dur={10} />
           {card(bTop, readAt, "Another read", "newton-seconds", "N·s", newtonAt)}
 
           {/* The unit nobody wrote down: an empty slot beside the file. */}
@@ -156,7 +155,7 @@ export const OrbiterScene: React.FC = () => {
                 gap: 12,
                 height: 48,
                 padding: "0 16px",
-                borderRadius: 6,
+                borderRadius: 5,
                 border: `2px dashed ${ACCENT}`,
                 whiteSpace: "nowrap",
                 transform: `scale(${1 + unknown * 0.08})`,
@@ -175,11 +174,10 @@ export const OrbiterScene: React.FC = () => {
                 alignItems: "center",
                 gap: 14,
                 height: 48,
-                padding: "0 16px",
+                padding: "0 18px",
                 boxSizing: "border-box",
-                borderRadius: 6,
-                border: `2px solid ${INK}`,
-                background: PAPER,
+                borderRadius: 5,
+                background: NODE,
                 whiteSpace: "nowrap",
               }}
             >

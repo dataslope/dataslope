@@ -143,16 +143,16 @@ export const HarnessScene: React.FC = () => {
 
         {/* Header. */}
         <Ink at={from + 4} dur={12} style={{ left: COL.ticket, top: y(HEAD_Y) - 16, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>ticket</span>
+          <span style={label(21, INK_SOFT)}>Ticket</span>
         </Ink>
         <Ink at={queueAt - 4} dur={12} style={{ left: COL.expected, top: y(HEAD_Y) - 16, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>right queue</span>
+          <span style={label(21, INK_SOFT)}>Right queue</span>
         </Ink>
         <Ink at={modelsAt - 4} dur={12} style={{ left: COL.cheap, top: y(HEAD_Y) - 16, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>cheap stand-in</span>
+          <span style={label(21, INK_SOFT)}>Cheap stand-in</span>
         </Ink>
         <Ink at={modelsAt} dur={12} style={{ left: COL.good, top: y(HEAD_Y) - 16, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>good stand-in</span>
+          <span style={label(21, INK_SOFT)}>Good stand-in</span>
         </Ink>
         <Svg opacity={ease(frame, from + 6, 12)}>
           <line x1={X0} x2={TABLE_X1} y1={y(HEAD_Y) + 16} y2={y(HEAD_Y) + 16} stroke={INK} strokeWidth={2} />
@@ -194,7 +194,7 @@ export const HarnessScene: React.FC = () => {
 
         {/* The two scores. */}
         <Ink at={threeAt - 2} dur={12} style={{ left: TOTAL_X, top: y(400), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>cheap stand-in</span>
+          <span style={label(22, INK_SOFT)}>Cheap stand-in</span>
         </Ink>
         <Ink at={thirtyAt - 2} dur={14} style={{ left: TOTAL_X, top: y(400) + 34, whiteSpace: "nowrap" }}>
           <span style={{ ...body(64), color: TRAP_INK, ...TABULAR }}>{HARNESS.cheap}%</span>
@@ -205,7 +205,7 @@ export const HarnessScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={otherAt - 2} dur={12} style={{ left: TOTAL_X, top: y(620), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>good stand-in</span>
+          <span style={label(22, INK_SOFT)}>Good stand-in</span>
         </Ink>
         <Ink at={allTenAt - 2} dur={14} style={{ left: TOTAL_X, top: y(620) + 34, whiteSpace: "nowrap" }}>
           <span style={{ ...body(64), color: OK_INK, ...TABULAR }}>{HARNESS.good}%</span>
@@ -213,12 +213,12 @@ export const HarnessScene: React.FC = () => {
         {/* The failure list, read: every miss went to one queue. */}
         <Ink at={sevenAt - 2} dur={14} style={{ left: TOTAL_X, top: y(800), whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, INK), fontWeight: 500 }}>
-            all <span style={TABULAR}>{HARNESS.cheapMisses.length}</span> misses sent to{" "}
-            <span style={{ fontFamily: MONO, color: TRAP_INK }}>{MISS_QUEUE}</span>
+            All <span style={TABULAR}>{HARNESS.cheapMisses.length}</span> misses sent to{" "}
+            <span style={{ fontFamily: MONO, fontSize: "0.92em", color: TRAP_INK }}>{MISS_QUEUE}</span>
           </span>
         </Ink>
         <Ink at={queueEndAt - 2} dur={14} style={{ left: TOTAL_X, top: y(800) + 36, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK) }}>who reads that queue?</span>
+          <span style={{ ...note(22, INK) }}>Who reads that queue?</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

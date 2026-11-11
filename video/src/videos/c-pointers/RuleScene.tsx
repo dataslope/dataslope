@@ -33,7 +33,11 @@ export const RuleScene: React.FC = () => {
   const rows = [
     {
       code: "&n",
-      text: "asks where n lives.",
+      text: (
+        <>
+          asks where <span style={{ fontStyle: "normal" }}><Mono>n</Mono></span> lives.
+        </>
+      ),
       at: ampAt,
       backAt: livesAt + 4,
       back: (
@@ -91,13 +95,15 @@ export const RuleScene: React.FC = () => {
               display: "flex",
               alignItems: "baseline",
               gap: "0.5em",
+              fontSize: 58,
               whiteSpace: "nowrap",
             }}
           >
             <span
               style={{
                 fontFamily: MONO,
-                fontSize: 104,
+                // Within 12% of the words beside it (one line, one size).
+                fontSize: 64,
                 fontWeight: 500,
                 color: ADDR_INK,
                 fontVariantLigatures: "none",
@@ -109,7 +115,7 @@ export const RuleScene: React.FC = () => {
             </span>
             <span style={{ ...body(58, true), color: INK }}>{r.text}</span>
           </Ink>
-          <Note at={r.backAt} x={RIGHT} y={y(ROWS[i]) + 50} align="right" from="right">
+          <Note at={r.backAt} x={RIGHT} y={y(ROWS[i]) + 34} align="right" from="right">
             <span style={note(21, INK_SOFT)}>{r.back}</span>
           </Note>
         </React.Fragment>

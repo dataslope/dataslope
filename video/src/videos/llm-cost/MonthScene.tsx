@@ -124,7 +124,7 @@ export const MonthScene: React.FC = () => {
                 }}
               />
               <Note at={fourAt - 2 + i * 5} x={X0} y={ry}>
-                <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.name}</span>
+                <span style={{ ...note(25, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{r.name[0].toUpperCase() + r.name.slice(1)}</span>
               </Note>
               <Note at={modelAt - 2 + i * 3} x={MODEL_X} y={ry}>
                 <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>{NAME[r.model]}</span>

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { body, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -39,9 +39,10 @@ const Layer: React.FC<{
         width: BOX_W,
         height,
         boxSizing: "border-box",
-        border: `2px solid ${INK}`,
-        borderRadius: 12,
-        background: PAPER,
+        // A filled node with no outline (the owner, 2026-11-11): the gray
+        // badge's tint, the corners a little less round.
+        background: "color-mix(in srgb, var(--ds-gray-400) 16%, transparent)",
+        borderRadius: 8,
         opacity: p,
         transform: `translateY(${(1 - p) * 12}px)`,
       }}
@@ -147,7 +148,7 @@ export const LayersScene: React.FC = () => {
       <Drift from={from} to={end} amount={0.012} origin="50% 45%">
         <FigLabel n="7" title="From characters to counts, on three words of one sentence" at={from + 2} x={X0} y={y(FIG_Y)} />
         {at.slice(1).map((t, i) => (
-          <Arrow key={i} from={[boxX(i) + BOX_W + 8, top + height / 2]} to={[boxX(i + 1) - 8, top + height / 2]} at={t - 6} dur={10} />
+          <Arrow key={i} from={[boxX(i) + BOX_W + 2, top + height / 2]} to={[boxX(i + 1) - 2, top + height / 2]} at={t - 6} dur={10} />
         ))}
 
         <Layer x={boxX(0)} top={top} height={height} at={at[0]} name="Characters" gloss="one flat string">
@@ -204,7 +205,7 @@ export const LayersScene: React.FC = () => {
         <div style={{ position: "absolute", left: X0, top: y(UNDER_Y), display: "flex", alignItems: "baseline", gap: 40, whiteSpace: "nowrap" }}>
           <Ink at={noneAt - 4} dur={16} style={{ position: "relative" }}>
             <span style={{ position: "relative", display: "inline-block", ...body(44, true), color: INK }}>
-              understands
+              Understands
               <span
                 style={{
                   position: "absolute",
@@ -220,7 +221,7 @@ export const LayersScene: React.FC = () => {
               />
             </span>
           </Ink>
-          {["counts", "matches", "transforms"].map((w, i) => (
+          {["Counts", "Matches", "Transforms"].map((w, i) => (
             <Ink key={w} at={verbs[i] - 2} dur={12} style={{ position: "relative" }}>
               <span style={{ ...body(44), color: INK }}>{w}</span>
             </Ink>

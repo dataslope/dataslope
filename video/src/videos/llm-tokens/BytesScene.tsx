@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { body, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ENCODING, GREETINGS } from "./data";
-import { BYTE, Drift, FIG_Y, FOCUS, FOCUS_INK, Headline, Kicker, pulse, TOKEN, TOKEN_TINT, X0 } from "./parts";
+import { BYTE, Drift, FIG_Y, FOCUS, FOCUS_INK, Headline, Kicker, pulse, TOKEN, X0 } from "./parts";
 
 const CELL = 32;
 const CELL_GAP = 9;
@@ -18,6 +18,8 @@ const ROW0 = 420;
 const ROW_STEP = 104;
 const COUNT_X = 1330;
 const KEY_Y = 846;
+/** A token's pad: a stronger tint than a chip's, since it sits under gray squares. */
+const TOKEN_PAD = `color-mix(in srgb, ${TOKEN} 30%, ${PAPER})`;
 
 /** Where byte `b` of a row sits, with its character's bytes kept together. */
 const byteX = (b: number, perChar: number) => BX + b * (CELL + CELL_GAP) + Math.floor(b / perChar) * CHAR_GAP;
@@ -109,8 +111,10 @@ export const BytesScene: React.FC = () => {
                 const at = tokensAt[i] - 2 + (rare ? j * 2 : j * 3);
                 const q = ease(frame, at, 10);
                 if (q <= 0) return null;
-                const x0 = byteX(gr.from, perChar) - 4;
-                const x1 = byteX(gr.to, perChar) + CELL + 4;
+                // A token is a tinted pad under its bytes, no outline; 2px of
+                // pad each side leaves a clear gap between neighbouring tokens.
+                const x0 = byteX(gr.from, perChar) - 3;
+                const x1 = byteX(gr.to, perChar) + CELL + 3;
                 const hot = rare ? 1 - 0.4 * ease(frame, at + 30, 20) : pulse(frame, at, 24);
                 return (
                   <div
@@ -118,13 +122,11 @@ export const BytesScene: React.FC = () => {
                     style={{
                       position: "absolute",
                       left: x0,
-                      top: top - 4,
+                      top: top - 6,
                       width: x1 - x0,
-                      height: CELL + 8,
-                      boxSizing: "border-box",
-                      borderRadius: 8,
-                      border: `2.5px solid ${hot > 0 ? `color-mix(in srgb, ${FOCUS} ${Math.round(hot * 100)}%, ${TOKEN})` : TOKEN}`,
-                      background: TOKEN_TINT,
+                      height: CELL + 12,
+                      borderRadius: 5,
+                      background: hot > 0 ? `color-mix(in srgb, ${FOCUS} ${Math.round(hot * 30)}%, ${TOKEN_PAD})` : TOKEN_PAD,
                       opacity: q,
                       transform: `scale(${0.94 + 0.06 * q})`,
                     }}
@@ -169,9 +171,8 @@ export const BytesScene: React.FC = () => {
               width: 40,
               height: 26,
               marginLeft: 30,
-              borderRadius: 6,
-              border: `2.5px solid ${TOKEN}`,
-              background: TOKEN_TINT,
+              borderRadius: 4,
+              background: TOKEN_PAD,
               opacity: ease(frame, startsAt, 12),
             }}
           />
@@ -190,7 +191,7 @@ export const BytesScene: React.FC = () => {
             opacity: ease(frame, twelveTokensAt + 16, 12),
           }}
         >
-          a script it rarely saw: one token a byte
+          A script it rarely saw: one token a byte
         </div>
       </Drift>
     </AbsoluteFill>

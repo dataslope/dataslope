@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, HAIRLINE, halo, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { body, fmt, HAIRLINE, halo, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { SANS } from "../../theme/fonts";
 import { HALF_MILLION, MILLION, ROWS, SET_NS_RANGE } from "./data";
@@ -81,7 +81,7 @@ export const GrowthScene: React.FC = () => {
 
       {/* ── a: both, in milliseconds ── */}
       <Ink at={start - 10} dur={14} style={{ left: A.x0 - 94, top: y(TITLE_Y), display: "flex", alignItems: "baseline", gap: 14 }}>
-        <span style={label(22, INK_SOFT)}>a</span>
+        <span style={{ ...body(30), color: INK_SOFT, fontWeight: 600 }}>a</span>
         <span style={{ ...body(30, true), color: INK }}>Both, in milliseconds</span>
       </Ink>
       <Grid
@@ -144,7 +144,7 @@ export const GrowthScene: React.FC = () => {
 
       {/* ── b: the set alone, in nanoseconds ── */}
       <Ink at={flatAt - 6} dur={14} style={{ left: B.x0 - 84, top: y(TITLE_Y), display: "flex", alignItems: "baseline", gap: 14 }}>
-        <span style={label(22, INK_SOFT)}>b</span>
+        <span style={{ ...body(30), color: INK_SOFT, fontWeight: 600 }}>b</span>
         <span style={{ ...body(30, true), color: INK }}>The set, in nanoseconds</span>
       </Ink>
       <Grid

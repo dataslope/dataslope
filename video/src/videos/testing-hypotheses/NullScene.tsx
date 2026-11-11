@@ -174,7 +174,7 @@ export const NullScene: React.FC = () => {
       {/* The turn to the courtroom: the gavel arrives where the next scene keeps it. */}
       <Spot id="testing-hypotheses-gavel" at={trialAt - 4} left={GAVEL.left} top={y(GAVEL.top)} width={GAVEL.width} height={GAVEL.height} />
       <Ink at={trialAt + 6} dur={16} style={{ left: GAVEL.left + GAVEL.width + 30, top: y(GAVEL.top) + 110, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(36, true), color: INK_SOFT }}>a trial, in other words</span>
+        <span style={{ ...body(36, true), color: INK_SOFT }}>A trial, in other words</span>
       </Ink>
     </AbsoluteFill>
   );

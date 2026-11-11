@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, halo, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
+import { I, M, MathRun } from "../../editorial/math";
 import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -10,7 +11,6 @@ import { MONO } from "../../theme/fonts";
 import { D, ROOT, SPREAD, three, TOKENS, TROPHY, two, UNSCALED } from "./data";
 import {
   DATA,
-  DATA_TINT,
   Fade,
   FIG_Y,
   Headline,
@@ -40,6 +40,9 @@ const Head: React.FC<{ x: number; lines: [React.ReactNode, React.ReactNode]; opa
     <div>{lines[1]}</div>
   </div>
 );
+
+/** A bar: the data blue as a fill, no outline. */
+const BAR_FILL = `color-mix(in srgb, ${DATA} 26%, ${PAPER})`;
 
 /** Fig. 6: pixels per unit of a sum's typical size. */
 const SU = 34;
@@ -139,8 +142,8 @@ export const WeightsScene: React.FC = () => {
       <FigLabel n="5" title="From dot products to weights" at={from} x={X0} y={y(FIG_Y)} />
       <Fade at={from} style={{ left: 0, top: headY, width: 1500 }}>
         <Head x={C.dot} lines={["Raw score", "(dot product)"]} />
-        <Head x={C.score} lines={["Scaled score", "÷ √2"]} opacity={ease(frame, dividedAt - 2, 10)} />
-        <Head x={C.power} lines={["e to the", "scaled score"]} opacity={ease(frame, raiseAt - 2, 10)} />
+        <Head x={C.score} lines={["Scaled score", <M key="r">÷ √2</M>]} opacity={ease(frame, dividedAt - 2, 10)} />
+        <Head x={C.power} lines={[<React.Fragment key="e"><M>e</M> to the</React.Fragment>, "scaled score"]} opacity={ease(frame, raiseAt - 2, 10)} />
         <Head x={C.weight} lines={["Weight", "÷ total"]} opacity={ease(frame, divideAt - 2, 10)} />
       </Fade>
       <Svg opacity={ease(frame, from + 4, 12)}>
@@ -217,27 +220,40 @@ export const WeightsScene: React.FC = () => {
       </Svg>
       <Fade at={addUpAt - 2} style={{ left: C.weight, top: rowY(3) - 6, display: "flex", gap: 14, alignItems: "baseline" }}>
         <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: NUM, color: INK, ...TABULAR }}>1.000</span>
-        <span style={{ ...label(22, INK_SOFT) }}>in all</span>
+        <span style={{ ...label(31, INK_SOFT) }}>in all</span>
       </Fade>
 
       {/* The two rules, on the right, as the narration states them. */}
       <Note at={dividedAt - 2} x={1390} y={headY - 4} width={450}>
         <div style={{ ...body(32), color: INK }}>
-          scaled = raw score{" "}
+          Scaled = raw score{" "}
           <Mark at={squareAt}>
-            ÷ <span style={{ fontFamily: MONO, fontWeight: 500 }}>√d</span>
+            <MathRun>
+              ÷ √<I>d</I>
+            </MathRun>
           </Mark>
         </div>
-        <div style={{ ...body(27), color: INK_SOFT, marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, howManyAt - 2, 10) }}>
-          <span style={{ fontFamily: MONO, fontWeight: 500, color: INK }}>d</span>: <Mark at={howManyAt}>how many numbers</Mark> a vector holds
+        <div style={{ ...body(28), color: INK_SOFT, marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, howManyAt - 2, 10) }}>
+          <MathRun style={{ color: INK }}>
+            <I>d</I>
+          </MathRun>
+          : <Mark at={howManyAt}>how many numbers</Mark> a vector holds
         </div>
         <div style={{ ...body(28), color: INK_SOFT, marginTop: 10, opacity: ease(frame, rootTwoAt - 2, 10) }}>
-          here <span style={{ fontFamily: MONO, fontWeight: 500, color: INK }}>d = {D}</span>, so ÷ <Mark at={rootTwoAt}>{ROOT.toFixed(3)}</Mark>
+          Here{" "}
+          <MathRun style={{ color: INK }}>
+            <I>d</I> = {D}
+          </MathRun>
+          , so <M>÷</M> <Mark at={rootTwoAt}>{ROOT.toFixed(3)}</Mark>
         </div>
       </Note>
       <Note at={stepsAt - 2} x={1390} y={y(640)} width={430}>
         <div style={{ ...body(32), color: INK }}>
-          softmax: <Mark at={raiseAt}>raise e</Mark> to each scaled score, then <Mark at={divideAt}>divide</Mark> by the total
+          Softmax:{" "}
+          <Mark at={raiseAt}>
+            raise <M>e</M>
+          </Mark>{" "}
+          to each scaled score, then <Mark at={divideAt}>divide</Mark> by the total
         </div>
       </Note>
       <Fade at={realAt - 2} out={dividedAt - 6} style={{ left: 1390, top: headY + 4 }}>
@@ -253,7 +269,9 @@ export const WeightsScene: React.FC = () => {
       </Fade>
       <Fade at={squareAt - 2} out={spreadOut} style={{ left: SB, top: SY + 50 }}>
         <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>
-          ÷ <span style={{ fontFamily: MONO, fontWeight: 500 }}>√d</span>
+          <MathRun>
+            ÷ √<I>d</I>
+          </MathRun>
         </span>
       </Fade>
       {SPREAD.map((sp, i) => {
@@ -271,10 +289,8 @@ export const WeightsScene: React.FC = () => {
                 top: sRow(i),
                 width: Math.max(0, v * SU * p),
                 height: 36,
-                borderRadius: 5,
-                background: DATA_TINT,
-                border: `2px solid ${DATA}`,
-                boxSizing: "border-box",
+                borderRadius: 4,
+                background: BAR_FILL,
                 opacity: p > 0 ? 1 : 0,
               }}
             />
@@ -306,7 +322,7 @@ export const WeightsScene: React.FC = () => {
         );
       })}
       <Fade at={bigAt + 12} out={spreadOut} style={{ left: X0, top: sRow(2) + 4 }}>
-        <Tag size={20}>each bar: the sum&apos;s typical size, over 1,000 random pairs</Tag>
+        <Tag size={20}>Each bar: the sum&apos;s typical size, over 1,000 random pairs</Tag>
       </Fade>
 
       {/* ── Fig. 7: add them up, then divide by the total ── */}
@@ -324,9 +340,8 @@ export const WeightsScene: React.FC = () => {
                 top: BY,
                 width: Math.max(0, s.w * p - 4),
                 height: BH,
-                borderRadius: 6,
-                background: hot > 0 ? `color-mix(in srgb, ${POINT} ${Math.round(hot * 28)}%, ${PAPER})` : DATA_TINT,
-                border: `${2 + hot}px solid ${hot > 0.5 ? POINT : DATA}`,
+                borderRadius: 5,
+                background: hot > 0 ? `color-mix(in srgb, ${POINT} ${Math.round(hot * 30)}%, ${BAR_FILL})` : BAR_FILL,
               }}
             />
             <div style={{ position: "absolute", left: s.x + 16, top: BY + 13, opacity: ease(frame, addThemAt + 4 + i * 5, 10), display: "flex", gap: 14, alignItems: "baseline", whiteSpace: "nowrap" }}>
@@ -370,7 +385,8 @@ export const WeightsScene: React.FC = () => {
                 top: GY,
                 width: Math.max(0, g.w * p - 4),
                 height: GH,
-                borderRadius: 6,
+                borderRadius: 5,
+                // Dashed and empty: the shares it would have been, not a bar.
                 border: `2px dashed ${hot > 0.5 ? POINT : INK_SOFT}`,
                 boxSizing: "border-box",
               }}
@@ -394,7 +410,9 @@ export const WeightsScene: React.FC = () => {
         );
       })}
       <Fade at={withoutAt + 4} style={{ left: end + 26, top: GY + 6 }}>
-        <Tag size={22}>without the ÷ √2</Tag>
+        <Tag size={22}>
+          without the <M>÷ √2</M>
+        </Tag>
       </Fade>
     </AbsoluteFill>
   );

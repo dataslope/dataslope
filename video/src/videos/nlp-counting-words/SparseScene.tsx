@@ -158,7 +158,7 @@ export const SparseScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={orderAt + 6} x={barX(4) + BAR_W + 20} y={base + 44}>
-          <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>a square for each word of order</div>
+          <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>A square for each word of order</div>
         </Note>
         <Bracket x0={barX(1) - 6} x1={barX(2) + BAR_W + 6} y={base + 84} at={sweetAt - 4} color={INK} up />
         <Note at={sweetAt} x={barX(1) - 6} y={base + 94} width={barX(2) + BAR_W + 12 - barX(1)}>
@@ -182,7 +182,7 @@ export const SparseScene: React.FC = () => {
           </Note>
           <Note at={sweetAt - 2} x={NOTE_X} y={y(300) + 240} from="right">
             <div style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              bigrams<span style={{ opacity: ease(frame, plentyAt - 2, 10) }}>, and trigrams with plenty of text:</span>
+              Bigrams<span style={{ opacity: ease(frame, plentyAt - 2, 10) }}>, and trigrams with plenty of text:</span>
             </div>
             <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, orderAt - 2, 10) }}>enough order to help,</div>
             <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, commonAt - 2, 10) }}>

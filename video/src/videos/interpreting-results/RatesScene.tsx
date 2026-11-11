@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RATES } from "./data";
-import { DATA, DATA_INK, Dashed, Drift, Headline, Marker, Ring, STAT, STAT_INK, Svg } from "./parts";
+import { Dashed, DATA, DATA_INK, Drift, Headline, Marker, MathVar, Ring, STAT, STAT_INK, Svg } from "./parts";
 
 /** Conversion, 0 to 5%. */
 const RX: XScale = { lo: 0, hi: 0.05, x0: 420, x1: 1300 };
@@ -201,14 +201,14 @@ export const RatesScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={fortyAt - 2} x={SAY_X} y={y(BAR_Y[0]) - 30}>
-          <div style={label(21, INK_SOFT)}>relative</div>
+          <div style={label(21, INK_SOFT)}>Relative</div>
           <div style={{ ...note(28, INK), fontWeight: 500, marginTop: 6, whiteSpace: "nowrap" }}>
             <Marker at={biggerAt - 2}>+{Math.round(RATES.uplift * 100)}%</Marker>
             <span style={{ ...note(26, INK_SOFT), fontWeight: 500, marginLeft: 12 }}>{fmt(RATES.ratio, 1)} times the rate</span>
           </div>
         </Note>
         <Note at={pointsAt - 2} x={SAY_X} y={y(BAR_Y[1]) - 2}>
-          <div style={label(21, INK_SOFT)}>absolute</div>
+          <div style={label(21, INK_SOFT)}>Absolute</div>
           <div style={{ ...note(28, STAT_INK), fontWeight: 500, marginTop: 6, whiteSpace: "nowrap" }}>
             <Marker at={ppAt + 4}>+{fmt(RATES.difference * 100, 1)} points</Marker>
           </div>
@@ -218,7 +218,7 @@ export const RatesScene: React.FC = () => {
             spacing, with "report both" under them; no box round the pair. */}
         <Note at={bothAt - 2} x={SAY_X} y={y(BAR_Y[1]) + 104}>
           <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>
-            <Marker at={bothAt + 4}>report both</Marker>
+            <Marker at={bothAt + 4}>Report both</Marker>
           </span>
         </Note>
       </div>
@@ -309,7 +309,14 @@ export const RatesScene: React.FC = () => {
           <Ink key={t.q} at={t.at - 4} dur={14} style={{ left: 160 + i * 560, top: y(TRIO_Y), whiteSpace: "nowrap" }}>
             <div style={label(22, INK_SOFT)}>{t.q}</div>
             <div style={{ ...note(30, INK), ...TABULAR, fontWeight: 500, marginTop: 8 }}>
-              {t.a}
+              {t.a.startsWith("p = ") ? (
+                <>
+                  <MathVar>p</MathVar>
+                  {t.a.slice(1)}
+                </>
+              ) : (
+                t.a
+              )}
             </div>
           </Ink>
         ))}

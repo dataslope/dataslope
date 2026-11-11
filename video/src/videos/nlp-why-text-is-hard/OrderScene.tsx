@@ -139,7 +139,7 @@ export const OrderScene: React.FC = () => {
       <FigLabel n="11" title="The lesson's tiny test, in two orders" at={from + 2} x={X0} y={y(FIG_Y)} />
 
       {/* ── The input ── */}
-      <RowName text="tokens" at={testAt - 4} top={top(IN_Y)} />
+      <RowName text="Tokens" at={testAt - 4} top={top(IN_Y)} />
       {ORDER.tokens.map((t, c) => (
         <Chip
           key={c}
@@ -184,16 +184,16 @@ export const OrderScene: React.FC = () => {
       ) : null}
 
       {/* ── Order A: lowercase, then filter ── */}
-      <RowName lane="A" text="lowercase" at={aLowerAt - 4} top={top(ROW_Y.a1)} markAt={stepsAt} />
+      <RowName lane="A" text="Lowercase" at={aLowerAt - 4} top={top(ROW_Y.a1)} markAt={stepsAt} />
       <ChipLine row={ORDER.a.lowered} top={top(ROW_Y.a1)} at={aLowerAt} strikeAt={(c) => (isStop(c) ? goneAt - 8 + c * 2 : undefined)} />
       <RowName text="then filter" at={aRemoveAt - 4} top={top(ROW_Y.a2)} markAt={stepsAt + 4} />
       <ChipLine row={ORDER.a.filtered} top={top(ROW_Y.a2)} at={goneAt + 2} good={endNearAt} />
       <Ink at={endNearAt + 2} dur={14} style={{ left: ROW_RIGHT + 40, top: top(ROW_Y.a2) + 8, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(30, true), color: GOOD_INK }}>every the is gone</span>
+        <span style={{ ...body(30, true), color: GOOD_INK }}>Every the is gone</span>
       </Ink>
 
       {/* ── Order B: filter, then lowercase ── */}
-      <RowName lane="B" text="filter" at={bRemoveAt - 4} top={top(ROW_Y.b1)} markAt={stepsAt + 8} />
+      <RowName lane="B" text="Filter" at={bRemoveAt - 4} top={top(ROW_Y.b1)} markAt={stepsAt + 8} />
       <ChipLine row={ORDER.b.filtered} top={top(ROW_Y.b1)} at={bRemoveAt + 2} bad={(c) => (theCols.includes(c) ? slipAt + theCols.indexOf(c) * 3 : undefined)} />
       <RowName text="then lowercase" at={listAt - 4} top={top(ROW_Y.b2)} markAt={stepsAt + 12} />
       <ChipLine
@@ -207,11 +207,11 @@ export const OrderScene: React.FC = () => {
       />
       <Ink at={crashedAt - 2} dur={14} style={{ left: ROW_RIGHT + 40, top: top(ROW_Y.b2) + 8, whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: BAD_INK }}>
-          no error, <Mark at={wrongAt - 2}>just wrong</Mark>
+          No error, <Mark at={wrongAt - 2}>just wrong</Mark>
         </span>
       </Ink>
       <Ink at={silentAt - 4} dur={14} style={{ left: ROW_RIGHT + 40, top: top(ROW_Y.b2) + 56, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK_SOFT) }}>order bugs are silent</span>
+        <span style={{ ...note(22, INK_SOFT) }}>Order bugs are silent</span>
       </Ink>
 
       {/* "Where one word ends": a cursor hops from gap to gap along the

@@ -111,10 +111,10 @@ export const MoneyScene: React.FC = () => {
       {/* Column titles. */}
       {(
         [
-          [COL.type, "type", tenAt - 4],
-          [COL.sum, "sum", tenAt - 2],
-          [COL.result, "result", approxAt - 4],
-          [COL.test, "equals 0.3?", thirtyAt - 4],
+          [COL.type, "Type", tenAt - 4],
+          [COL.sum, "Sum", tenAt - 2],
+          [COL.result, "Result", approxAt - 4],
+          [COL.test, "Equals 0.3?", thirtyAt - 4],
         ] as const
       ).map(([x, t, at]) => (
         <Ink key={t} at={at} dur={12} style={{ left: x, top: y(420 - LIFT), whiteSpace: "nowrap", opacity: 1 - dimAll }}>
@@ -193,7 +193,7 @@ export const MoneyScene: React.FC = () => {
         {verdict(String(MONEY.floatEquals), falseAt, MONEY.floatEquals)}
       </div>
       <Note at={approxAt - 4} x={COL.result} y={rowA + h(34)} dim={trueAt}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>approximate: a binary fraction</span>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Approximate: a binary fraction</span>
       </Note>
 
       {/* ── As numeric ── */}
@@ -206,7 +206,7 @@ export const MoneyScene: React.FC = () => {
         {verdict(String(MONEY.exactEquals), trueAt, MONEY.exactEquals)}
       </div>
       <Note at={priceAt - 6} x={COL.result} y={rowB + h(34)}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>exact: the type for a price</span>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Exact: the type for a price</span>
       </Note>
 
       {/* "Does it have to be there at all?": an empty cell, held open. */}
@@ -217,7 +217,7 @@ export const MoneyScene: React.FC = () => {
             width: 150,
             height: 56,
             border: `2.5px dashed ${ACCENT}`,
-            borderRadius: 6,
+            borderRadius: 5,
           }}
         />
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>And if there's no value at all?</span>

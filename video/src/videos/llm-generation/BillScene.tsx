@@ -81,7 +81,7 @@ export const BillScene: React.FC = () => {
         <span style={{ ...label(22, INK), fontWeight: 500 }}>You read</span>
       </Ink>
       <Ink at={readAt - 2} dur={12} style={{ left: B0, top: readY, width: answerW, height: bh }}>
-        <div style={{ width: "100%", height: "100%", boxSizing: "border-box", background: tint(BAR, 30), borderBottom: `5px solid ${BAR}` }} />
+        <div style={{ width: "100%", height: "100%", boxSizing: "border-box", background: tint(BAR, 30) }} />
       </Ink>
       <Note at={readAt} x={B0 + answerW + 16} y={readY + bh / 2 - 17}>
         <span style={{ ...note(24, BLUE_INK), fontWeight: 500, ...TABULAR }}>{ANSWER_TOKENS} tokens, the answer</span>

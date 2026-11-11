@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { M } from "../../editorial/math";
 import { ACCENT, body, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -214,7 +215,7 @@ export const ScoreScene: React.FC = () => {
       <Arrow from={[ARROW_X[0], mid]} to={[ARROW_X[1], mid]} at={softAt} />
       <Ink at={raisesAt - 2} dur={16} style={{ left: ARROW_X[0] - 30, width: ARROW_X[1] - ARROW_X[0] + 60, top: mid + 18, textAlign: "center" }}>
         <span style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>
-          e<sup style={{ fontSize: "0.68em" }}>score</sup> ÷ total
+          <M>{"e^{score} ÷ total"}</M>
         </span>
       </Ink>
 
@@ -247,7 +248,6 @@ export const ScoreScene: React.FC = () => {
               textAlign: "center",
               padding: "6px 14px",
               background: TINT[tok],
-              borderBottom: `4px solid ${FILL[tok]}`,
               ...note(26, TEXT[tok]),
               fontWeight: 500,
             }}

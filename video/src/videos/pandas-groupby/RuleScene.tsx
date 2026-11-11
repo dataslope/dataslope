@@ -76,8 +76,8 @@ export const RuleScene: React.FC = () => {
               );
             })}
             <Arrow
-              from={[panel.x + BAR_W + 26, mid]}
-              to={[panel.x + OUT_DX - 26, mid]}
+              from={[panel.x + BAR_W, mid]}
+              to={[panel.x + OUT_DX - 2, mid]}
               at={at + 10}
               color={INK}
             />

@@ -181,7 +181,9 @@ export const FormatScene: React.FC = () => {
                 style={{ position: "absolute", left: f.x, top: y(TEXT_Y), display: "flex", alignItems: "baseline", gap: 14, opacity: ease(frame, f.at - 2, 10) }}
               >
                 <span style={label(24, INK)}>{f.name}</span>
-                <span style={{ ...note(28, INK), fontWeight: 500, ...TABULAR }}>{f.count} tokens</span>
+                <span style={{ ...note(26, INK), fontWeight: 500 }}>
+                  <span style={TABULAR}>{f.count}</span> tokens
+                </span>
               </div>
             ))}
             <div style={{ position: "absolute", left: X0, top: y(TEXT_Y) + 46, opacity: ease(frame, recordsAt, 8) }}>
@@ -264,7 +266,7 @@ export const FormatScene: React.FC = () => {
             ].map((c, i) => (
               <React.Fragment key={i}>
                 {i > 0 ? (
-                  <span style={{ ...headline(56), color: INK_SOFT, opacity: ease(frame, c.at - 4, 10), marginTop: 10 }}>{i === 1 ? "×" : "="}</span>
+                  <span style={{ ...headline(72), color: INK_SOFT, opacity: ease(frame, c.at - 4, 10), marginTop: 2 }}>{i === 1 ? "×" : "="}</span>
                 ) : null}
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", opacity: ease(frame, c.at - 2, 10) }}>
                   <span style={{ ...headline(76), color: i === 2 ? FOCUS_INK : INK, ...TABULAR }}>{c.v}</span>

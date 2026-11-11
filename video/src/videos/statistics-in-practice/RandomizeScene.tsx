@@ -106,7 +106,7 @@ export const RandomizeScene: React.FC = () => {
                 y={y(rowY(i)) - 19}
                 width={(x1 - x0) * p}
                 height={38}
-                rx={8}
+                rx={5}
                 fill={r.unmeasured ? STAT : HIGHLIGHT}
                 opacity={(r.unmeasured ? 0.16 : 0.85) * (1 - off)}
               />

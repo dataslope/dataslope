@@ -443,6 +443,9 @@ export const RefArrow: React.FC<{
   );
 };
 
+/** A plain cell's or object's fill: neutral gray. A tint mixes into it. */
+const PLAIN = `color-mix(in srgb, var(--ds-gray-400) 24%, ${PAPER})`;
+
 /** A variable's cell on the stack: its name, and room on the right for the
  *  dot a RefArrow starts from (see `cellDot`). */
 export const VarCell: React.FC<{
@@ -462,11 +465,10 @@ export const VarCell: React.FC<{
         style={{
           position: "absolute",
           inset: 0,
-          boxSizing: "border-box",
-          border: `2px solid ${INK}`,
+          // A filled cell, no outline (the owner, 2026-11-11).
           borderRadius: 4,
-          background: `color-mix(in srgb, ${INK} 3%, ${PAPER})`,
-          clipPath: `inset(-2px ${(1 - p) * 100}% -2px -2px)`,
+          background: PLAIN,
+          clipPath: `inset(0 ${(1 - p) * 100}% 0 0)`,
         }}
       />
       <div
@@ -479,7 +481,8 @@ export const VarCell: React.FC<{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          borderRight: `1.5px solid ${HAIRLINE}`,
+          // The name's half is cut from the dot's by a line of paper.
+          borderRight: `2px solid ${PAPER}`,
           opacity: ease(frame, at + 4, 10),
           fontFamily: MONO,
           fontSize: 32,
@@ -535,12 +538,16 @@ export const HeapObj: React.FC<{
           position: "absolute",
           inset: 0,
           boxSizing: "border-box",
-          border: dashed ? `2px dashed ${INK_SOFT}` : `2px solid ${INK}`,
-          borderRadius: 10,
+          // Filled, no outline; a dashed one stays, since there the outline
+          // is the meaning.
+          border: dashed ? `2px dashed ${INK_SOFT}` : undefined,
+          borderRadius: 8,
           background:
             tint > 0
-              ? `color-mix(in srgb, ${tintColor} ${Math.round(tint * 100)}%, ${PAPER})`
-              : `color-mix(in srgb, ${INK} 3%, ${PAPER})`,
+              ? `color-mix(in srgb, ${tintColor} ${Math.round(tint * 100)}%, ${PLAIN})`
+              : dashed
+                ? "transparent"
+                : PLAIN,
         }}
       />
       <div

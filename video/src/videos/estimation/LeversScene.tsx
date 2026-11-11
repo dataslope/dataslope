@@ -5,6 +5,7 @@ import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, HAIRLINE, halo, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LEVELS, SIZES, SPREAD } from "./data";
@@ -69,7 +70,7 @@ export const LeversScene: React.FC = () => {
   const panels: { title: string; sub: string; at: number; rows: Row[]; lesson: string; lessonAt: number }[] = [
     {
       title: "Confidence level",
-      sub: `one simulated sample of ${LEVELS.n}, values near 50`,
+      sub: `One simulated sample of ${LEVELS.n}, values near 50`,
       at: confidenceAt - 4,
       rows: LEVELS.rows.map((r, i) => ({ name: `${r.level}%`, lo: r.lo, hi: r.hi, width: r.width, at: levelAt[i] - 4, lit: levelLit[i] })),
       lesson: "More confidence: wider",
@@ -77,7 +78,7 @@ export const LeversScene: React.FC = () => {
     },
     {
       title: "Sample size",
-      sub: "at 95%",
+      sub: "At 95%",
       at: sizeAt - 4,
       rows: SIZES.rows.map((r, i) => ({
         name: `n = ${r.n.toLocaleString("en-US")}`,
@@ -92,7 +93,7 @@ export const LeversScene: React.FC = () => {
     },
     {
       title: "Spread",
-      sub: `the same ${LEVELS.n}, at 95%`,
+      sub: `The same ${LEVELS.n}, at 95%`,
       at: spreadAt - 6,
       rows: [
         { name: `spread ${fmt(SPREAD.s, 1)}`, lo: SPREAD.lo, hi: SPREAD.hi, width: SPREAD.width, at: spreadAt - 2, lit: -1 },
@@ -141,7 +142,18 @@ export const LeversScene: React.FC = () => {
               return (
                 <React.Fragment key={r.name}>
                   <Ink at={r.at - 2} dur={12} style={{ left: x0, top: ry - 15, whiteSpace: "nowrap" }}>
-                    <span style={{ ...note(22, INK), fontWeight: 500 }}>{r.name}</span>
+                    <span style={{ ...note(22, INK), fontWeight: 500 }}>
+                      {r.name.startsWith("n = ") ? (
+                        <>
+                          <MathRun>
+                            <I>n</I>
+                          </MathRun>
+                          {r.name.slice(1)}
+                        </>
+                      ) : (
+                        r.name
+                      )}
+                    </span>
                   </Ink>
                   <IntervalBar x0={sx(X, r.lo)} x1={sx(X, r.hi)} y={ry} at={r.at} dur={14} color={INK} width={4} tick={10} />
                   <Svg>
@@ -164,10 +176,10 @@ export const LeversScene: React.FC = () => {
         );
       })}
       <Note at={widerAt - 2} x={PANELS[0]} y={y(384)}>
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>each interval’s width beside it</span>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>Each interval’s width beside it</span>
       </Note>
       <Note at={quadruplesAt - 2} x={PANELS[1] + BAR_X0} y={y(384)}>
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>each row has four times the data</span>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>Each row has four times the data</span>
       </Note>
 
       {/* The recipe the next scene reuses: short enough to read in the pause

@@ -306,7 +306,7 @@ const Step: React.FC<{ name: string; litAt?: number }> = ({ name, litAt }) => {
       {name}
       {litAt !== undefined ? (
         <span style={{ position: "absolute", left: 14, top: "100%", marginTop: 10, fontWeight: 400, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: lit }}>
-          one value per cell
+          One value per cell
         </span>
       ) : null}
     </span>

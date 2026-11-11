@@ -120,8 +120,15 @@ export const MemoScene: React.FC = () => {
                 width: CELL_W,
                 height: cellH,
                 boxSizing: "border-box",
-                border: `2px ${w < 0 ? "dashed" : "solid"} ${w < 0 ? HAIRLINE : MEMO}`,
-                background: written > 0 ? `color-mix(in srgb, ${MEMO} ${Math.round(16 * written)}%, ${PAPER})` : PAPER,
+                // A slot that is never written keeps a dashed outline (an
+                // empty slot); every other cell is a fill with no outline,
+                // gray until its answer is stored, then blue.
+                border: w < 0 ? `2px dashed ${HAIRLINE}` : undefined,
+                borderRadius: 4,
+                background:
+                  w < 0
+                    ? "transparent"
+                    : `color-mix(in srgb, ${MEMO} ${Math.round(24 * written)}%, color-mix(in srgb, var(--ds-gray-400) 24%, ${PAPER}))`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

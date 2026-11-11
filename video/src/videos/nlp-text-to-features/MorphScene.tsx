@@ -8,6 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CAT, COUNTS, DOC0_TOP, IDF, LENGTHS, N, num, spell, TFIDF, THE, TWICE, VOCAB } from "./data";
 import { FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, pulse, X0 } from "./parts";
+import { MathRun } from "../../editorial/math";
 import { DocTable, Frac, idfRow, IdfRow, tableGeo } from "./tfidf";
 
 const G = tableGeo(330);
@@ -72,13 +73,20 @@ const Worked: React.FC<{
       {val(1, <i>{VOCAB[j]}</i>)}
       <span style={{ gridRow: "1 / span 2", gridColumn: 2, width: 1.5, alignSelf: "stretch", background: HAIRLINE, margin: "0 6px" }} />
       {cap("tf", 3)}
-      {val(3, <Frac top={ghost ? ghost.count : COUNTS[0][j]} bottom={LENGTHS[0]} />)}
-      {val(4, "×", INK_SOFT)}
+      {/* The product is a formula, so its figures and signs are in the
+          math face; the word it is for stays a word. */}
+      {val(
+        3,
+        <MathRun>
+          <Frac top={ghost ? ghost.count : COUNTS[0][j]} bottom={LENGTHS[0]} />
+        </MathRun>,
+      )}
+      {val(4, <MathRun>×</MathRun>, INK_SOFT)}
       {cap("idf", 5)}
-      {val(5, num(IDF[j]))}
-      {val(6, "=", INK_SOFT, r)}
+      {val(5, <MathRun>{num(IDF[j])}</MathRun>)}
+      {val(6, <MathRun>=</MathRun>, INK_SOFT, r)}
       {cap("tf-idf", 7, r)}
-      {val(7, num(ghost ? ghost.score : TFIDF[0][j]), color, r)}
+      {val(7, <MathRun>{num(ghost ? ghost.score : TFIDF[0][j])}</MathRun>, color, r)}
     </div>
   );
 };

@@ -125,7 +125,7 @@ export const SummaryScene: React.FC = () => {
         </Reply>
 
         {/* The derived copy. */}
-        <SmallArrow from={[ig.x + ig.width + 24, arrowY]} to={[sg.x - 24, arrowY]} at={storeAt - 2} color={INK} width={2.4} />
+        <SmallArrow from={[ig.x + ig.width, arrowY]} to={[sg.x, arrowY]} at={storeAt - 2} color={INK} width={2.4} />
         <Ink at={storeAt + 4} dur={12} style={{ left: ig.x + ig.width + 34, top: arrowY - 42, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK_SOFT) }}>summed per day</span>
         </Ink>

@@ -121,7 +121,7 @@ export const ExamplesScene: React.FC = () => {
               {i === 0 ? <Marked at={howAt - 2}>{s.text}</Marked> : s.text}
             </Tag>
             {i > 0 ? (
-              <Arrow from={[stepX[i] - STEP_GAP + 10, y(340) + 24]} to={[stepX[i] - 10, y(340) + 24]} at={stepAt[i] - 6} dur={8} width={2} />
+              <Arrow from={[stepX[i] - STEP_GAP + 1, y(340) + 24]} to={[stepX[i] - 2, y(340) + 24]} at={stepAt[i] - 6} dur={8} width={2} />
             ) : null}
           </React.Fragment>
         ))}

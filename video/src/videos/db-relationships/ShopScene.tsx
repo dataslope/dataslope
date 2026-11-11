@@ -218,7 +218,7 @@ export const ShopScene: React.FC = () => {
         {/* The first key on two columns: said in a line, left to Unit 4. */}
         <Ink at={itemsAt + 24} dur={14} style={{ left: items.x, top: items.bottom + 14, whiteSpace: "nowrap" }}>
           <span style={note(21, INK_SOFT)}>
-            Two PKs: <Mark at={nameAt + 15}>together, they name each row</Mark>.
+            Two PKs: <Mark at={nameAt + 15}>together, they name each row.</Mark>
           </span>
         </Ink>
         <Entity
@@ -271,7 +271,7 @@ export const ShopScene: React.FC = () => {
           ))}
           <Ink at={wrongFrom - 2} dur={16} style={{ left: TEXT_X, top: y(SENT_Y + 3 * SENT_STEP + 20), width: 640 }}>
             <span style={{ ...note(24, INK_SOFT) }}>
-              If a sentence sounds <Mark at={wrongAt}>wrong</Mark> to the business, the diagram <Mark at={workAt}>needs work</Mark>.
+              If a sentence sounds <Mark at={wrongAt}>wrong</Mark> to the business, the diagram <Mark at={workAt}>needs work.</Mark>
             </span>
           </Ink>
         </AbsoluteFill>

@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { ACCENT, ACCENT_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -59,7 +60,12 @@ export const TopPScene: React.FC = () => {
 
       {/* Bar A: the distribution at T = 1.5, one segment per token. */}
       <Ink at={start - 4} dur={14} style={{ left: X0, top: barA - 50 }}>
-        <span style={label(20)}>At T = {HOT.t}</span>
+        <span style={label(20)}>
+          At{" "}
+          <MathRun>
+            <I>T</I> = {HOT.t}
+          </MathRun>
+        </span>
       </Ink>
       {TOKENS.map((_, i) => {
         const x = px(startsA[i]);
@@ -75,7 +81,6 @@ export const TopPScene: React.FC = () => {
                   height: "100%",
                   boxSizing: "border-box",
                   background: isRock ? `color-mix(in srgb, ${TINT[i]} ${(1 - rockGone) * 100}%, transparent)` : TINT[i],
-                  borderBottom: `5px solid ${FILL[i]}`,
                   outline: isRock ? `2px dashed color-mix(in srgb, ${FILL[i]} ${rockGone * 100}%, transparent)` : undefined,
                   outlineOffset: -2,
                   display: "flex",
@@ -159,7 +164,6 @@ export const TopPScene: React.FC = () => {
                 height: "100%",
                 boxSizing: "border-box",
                 background: TINT[tok],
-                borderBottom: `5px solid ${FILL[tok]}`,
                 display: "flex",
                 alignItems: "center",
                 paddingLeft: 14,
@@ -179,7 +183,15 @@ export const TopPScene: React.FC = () => {
 
       <Note at={cutAt + 10} x={120} y={y(830)}>
         <span style={note(20, INK_SOFT)}>
-          The same rule keeps {row(0.7).topP.kept.length} tokens at T = 0.7 and {row(0.2).topP.kept.length} at T = 0.2:
+          The same rule keeps {row(0.7).topP.kept.length} tokens at{" "}
+          <MathRun>
+            <I>T</I> = 0.7
+          </MathRun>{" "}
+          and {row(0.2).topP.kept.length} at{" "}
+          <MathRun>
+            <I>T</I> = 0.2
+          </MathRun>
+          :
           the cut moves with the shape.
         </span>
       </Note>

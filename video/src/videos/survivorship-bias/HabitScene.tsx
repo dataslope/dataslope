@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
+import { ACCENT_INK, body, headline, HIGHLIGHT, INK, label } from "../../editorial/style";
 import { badgeStyle, ColumnRule, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -12,9 +12,9 @@ import { useMergedPart } from "../sampling/merged";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 const ROWS = [
-  { key: "planes", here: "The planes that made it home", gone: "the planes that went down" },
-  { key: "funds", here: "The funds still open", gone: "the funds that closed" },
-  { key: "customers", here: "The customers who stayed", gone: "the customers who left" },
+  { key: "planes", here: "The planes that made it home", gone: "The planes that went down" },
+  { key: "funds", here: "The funds still open", gone: "The funds that closed" },
+  { key: "customers", here: "The customers who stayed", gone: "The customers who left" },
 ] as const;
 const ROW_Y = (i: number) => 330 + i * 126;
 const HERE_X = 120;
@@ -96,19 +96,10 @@ export const HabitScene: React.FC = () => {
               <Ink at={at - 4} dur={16} style={{ left: HERE_X, top: y(ROW_Y(i)) }}>
                 <span style={{ ...body(40), color: INK, whiteSpace: "nowrap" }}>{r.here}</span>
               </Ink>
-              {/* What is missing, as a gray house badge: its text in the soft
-                  ink and on a lighter tint than a badge's, for something absent
-                  (the dashed outline it had says this no more). */}
+              {/* What is missing, as a gray house badge, kept as badgeStyle
+                  draws it; a column entry, so it starts with a capital. */}
               <Ink at={missingAt + i * 5} dur={16} style={{ left: GONE_X - 22, top: y(ROW_Y(i)) - 6 }}>
-                <span
-                  style={{
-                    ...body(40, true),
-                    ...badgeStyle("gray", 40),
-                    fontWeight: 400,
-                    color: INK_SOFT,
-                    background: "color-mix(in srgb, var(--ds-gray-400) 13%, transparent)",
-                  }}
-                >
+                <span style={{ ...body(40, true), ...badgeStyle("gray", 40) }}>
                   {r.gone}
                 </span>
               </Ink>

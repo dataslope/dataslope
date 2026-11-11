@@ -186,8 +186,7 @@ export const PennScene: React.FC = () => {
                 justifyContent: "center",
                 width: 52,
                 height: 34,
-                borderRadius: 6,
-                border: `2px solid ${FAMILY[fam].fill}`,
+                borderRadius: 4,
                 background: FAMILY[fam].tint,
                 fontFamily: MONO,
                 fontWeight: 500,
@@ -233,7 +232,6 @@ export const PennScene: React.FC = () => {
             size={ESIZE}
             at={land.at}
             tint={FAMILY[fam].tint}
-            border={FAMILY[fam].fill}
             to={{ x: land.x, y: land.y, at: land.at, dur: 18, via: { x: t.x, y: land.y, dur: land.fall } }}
           />
         );

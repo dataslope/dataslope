@@ -11,8 +11,6 @@ import { IDS, ORDER, SPACE, spaceWord, thousands } from "./data";
 import {
   clamp01,
   DATA,
-  DATA_SOFT,
-  DATA_TINT,
   Drift,
   Fade,
   FAINT,
@@ -163,8 +161,8 @@ const TableRow: React.FC<{ top: number; id: number; text: string; at: number; fi
                 height: 42,
                 marginRight: 4,
                 borderRadius: 4,
-                border: `1.5px solid ${strong ? DATA : DATA_SOFT}`,
-                background: f > 0 ? `color-mix(in srgb, ${DATA} ${Math.round(f * (strong ? 34 : 18))}%, ${PAPER})` : PAPER,
+                // A cell is a fill, no outline: pale before it fills, then its blue.
+                background: `color-mix(in srgb, ${DATA} ${Math.round(8 + f * (strong ? 30 : 12))}%, ${PAPER})`,
               }}
             />
           );
@@ -411,8 +409,9 @@ export const SpaceScene: React.FC = () => {
         <div style={{ position: "relative", height: 30, ...label(21, INK_SOFT) }}>
           {SPACE.axes.map((ax, i) => (
             <span key={ax} style={{ position: "absolute", left: VEC_X[i] - 12, opacity: 1 - unnamed * 0.75 }}>
+              {/* A column heading: capitalized where it is set, not in the data. */}
               <Mark at={namedAt + i * 4} out={noNamesAt}>
-                {ax}
+                {ax[0].toUpperCase() + ax.slice(1)}
               </Mark>
             </span>
           ))}
@@ -496,8 +495,7 @@ export const SpaceScene: React.FC = () => {
                   height: 36,
                   marginRight: 4,
                   borderRadius: 4,
-                  border: `1.5px solid ${hot ? POINT : DATA_SOFT}`,
-                  background: hot ? `color-mix(in srgb, ${POINT} ${Math.round(18 + 30 * pulse(frame, pointAt, 30))}%, ${PAPER})` : DATA_TINT,
+                  background: hot ? `color-mix(in srgb, ${POINT} ${Math.round(24 + 30 * pulse(frame, pointAt, 30))}%, ${PAPER})` : `color-mix(in srgb, ${DATA} 18%, ${PAPER})`,
                 }}
               />
             );
@@ -672,7 +670,7 @@ const Card: React.FC<{
       }}
     >
       <TokenChip text={word} size={28} border={ring > 0.05 ? POINT : INK} />
-      <div style={{ borderRadius: 8, boxShadow: ring > 0.02 ? `0 0 0 ${3 + 3 * ring}px color-mix(in srgb, ${POINT} ${Math.round(ring * 100)}%, transparent)` : undefined }}>
+      <div style={{ borderRadius: 4, boxShadow: ring > 0.02 ? `0 0 0 ${3 + 3 * ring}px color-mix(in srgb, ${POINT} ${Math.round(ring * 100)}%, transparent)` : undefined }}>
         <VectorCells values={shown} size={24} highlight={changed.map((c) => c * flash)} />
       </div>
     </div>
@@ -775,7 +773,7 @@ export const OrderScene: React.FC = () => {
               y={top - 16}
               width={(x1 - x0) * p}
               height={132}
-              rx={24}
+              rx={10}
               fill="none"
               stroke={INK_SOFT}
               strokeWidth={2}

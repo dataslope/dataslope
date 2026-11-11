@@ -159,7 +159,7 @@ export const TwoPipelinesScene: React.FC = () => {
       </Note>
       {/* What the topic pipeline threw away, as it closes up. */}
       <Note at={leftAt - 2} x={X0} y={y(DROPPED_Y) + 8}>
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>dropped</span>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>Dropped</span>
       </Note>
       <ChipRow x={ROW_X} y={y(DROPPED_Y)}>
         {topicStops.map((k, i) => (
@@ -221,7 +221,7 @@ export const TwoPipelinesScene: React.FC = () => {
       />
       <Note at={sentRecipeAt + 12} x={RECIPE_X} y={y(SENT_Y) + 50}>
         <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
-          drops every stopword except {[...PIPE.keep].sort((a, b) => SPOKEN_KEEP.indexOf(a) - SPOKEN_KEEP.indexOf(b)).map((w, k, all) => (
+          Drops every stopword except {[...PIPE.keep].sort((a, b) => SPOKEN_KEEP.indexOf(a) - SPOKEN_KEEP.indexOf(b)).map((w, k, all) => (
             <React.Fragment key={w}>
               {k > 0 ? (k === all.length - 1 ? " and " : ", ") : null}
               <i>{w}</i>
@@ -230,7 +230,7 @@ export const TwoPipelinesScene: React.FC = () => {
         </span>
       </Note>
       <Note at={pairsAt - 4} x={X0} y={y(PAIRS_Y) + 8}>
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>word pairs</span>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>Word pairs</span>
       </Note>
       <ChipRow x={ROW_X} y={y(PAIRS_Y)}>
         {PIPE.bigrams.map(([a, b], k) => (

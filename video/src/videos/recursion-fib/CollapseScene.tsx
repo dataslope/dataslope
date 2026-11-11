@@ -3,12 +3,12 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
 import { useLayout } from "../../editorial/layout";
-import { INK, INK_SOFT, note, PAPER } from "../../editorial/style";
+import { INK, INK_SOFT, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MEMO_CALLS, MEMO_HITS, MEMO_TREE, memoAt, NAIVE_CALLS, NAIVE_TREE, TREE_N } from "./data";
 import { COUNTER_TOP, levelTop, nodeX, SIDE_X } from "./geometry";
 import { Fig, Key, MEMO, MEMO_INK, Mono, NAIVE_INK } from "./kit";
-import { Counter, TreeEdge, TreeNode } from "./tree";
+import { Counter, NODE_LOOK, TreeEdge, TreeNode } from "./tree";
 
 /** The memoized tree keeps its root where the naive root was. */
 const ROOT = NAIVE_TREE[0];
@@ -51,9 +51,9 @@ export const CollapseScene: React.FC = () => {
       </Fig>
       <Note at={tableAt} x={1800} y={y(104) + 1} align="right" from="right">
         <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
-          <Key stroke={INK_SOFT} fill={PAPER} /> <span>computed</span>
+          <Key fill={NODE_LOOK.call.fill} /> <span>computed</span>
           <span style={{ width: 16 }} />
-          <Key stroke={MEMO} dashed fill={`color-mix(in srgb, ${MEMO} 14%, ${PAPER})`} />
+          <Key stroke={MEMO} dashed />
           <span style={{ color: MEMO_INK, fontWeight: 500 }}>read from the table</span>
         </span>
       </Note>

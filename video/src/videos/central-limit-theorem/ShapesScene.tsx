@@ -62,7 +62,7 @@ const COLUMNS: Column[] = [
   {
     letter: "A",
     title: "Wait times",
-    sub: "a long tail to the right",
+    sub: "A long tail to the right",
     pop: WAITS,
     popLo: 0,
     popHi: 50,
@@ -79,7 +79,7 @@ const COLUMNS: Column[] = [
   {
     letter: "B",
     title: "One die",
-    sub: "flat: each face 1 in 6",
+    sub: "Flat: each face 1 in 6",
     pop: DIE_ROLLS,
     popLo: 0.5,
     popHi: 6.5,
@@ -95,7 +95,7 @@ const COLUMNS: Column[] = [
   {
     letter: "C",
     title: "Two humps",
-    sub: "half near 5, half near 15",
+    sub: "Half near 5, half near 15",
     pop: HUMPS,
     popLo: 0,
     popHi: 20,
@@ -209,12 +209,12 @@ export const ShapesScene: React.FC = () => {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={label(19, INK_SOFT)}>↓ Averages of 30</span>
                 <span style={note(20, INK_SOFT)}>
-                  spread <b style={{ color: ACCENT_INK }}>{fmt(c.simSpread)}</b>
+                  Spread <b style={{ color: ACCENT_INK }}>{fmt(c.simSpread)}</b>
                 </span>
               </div>
               {/* Each pile fills its panel: say how far it is magnified, so
                   its width is not read against the population's. */}
-              <div style={{ ...note(19, INK_SOFT), marginTop: 2 }}>axis zoomed in {fmt(c.zoom, 1)}×</div>
+              <div style={{ ...note(19, INK_SOFT), marginTop: 2 }}>Axis zoomed in {fmt(c.zoom, 1)}×</div>
             </Ink>
             <Bars
               counts={c.mCounts}

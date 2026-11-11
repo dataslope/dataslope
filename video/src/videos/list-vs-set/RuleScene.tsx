@@ -90,9 +90,7 @@ export const RuleScene: React.FC = () => {
               y={y(BUILD_Y) + 4}
               width={Math.max(0, w - 4)}
               height={30}
-              fill={`color-mix(in srgb, ${LIST} 14%, ${PAPER})`}
-              stroke={LIST}
-              strokeWidth={1.6}
+              fill={`color-mix(in srgb, ${LIST} 22%, ${PAPER})`}
             />
           );
         })}
@@ -140,13 +138,14 @@ export const RuleScene: React.FC = () => {
       {/* ── Every lookup after ── */}
       <div style={{ position: "absolute", left: LEFT, top: y(LOOK_Y) - 6, width: 1680, height: 1, background: HAIRLINE, opacity: ease(frame, afterAt - 6, 12) }} />
       <RowLabel at={afterAt - 4} y={y(LOOK_Y) + 22} title="Each lookup after" sub="999_999 in big_set" />
-      <Ink at={freeAt - 6} dur={16} style={{ left: BAR_X, top: y(LOOK_Y) + 16, display: "flex", alignItems: "baseline", gap: "0.45em", whiteSpace: "nowrap" }}>
-        <span style={{ ...headline(58), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums" }}>
+      {/* The hero value on its own line, the comparison under it. */}
+      <Ink at={freeAt - 6} dur={16} style={{ left: BAR_X, top: y(LOOK_Y) + 12, whiteSpace: "nowrap" }}>
+        <div style={{ ...headline(58), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums" }}>
           {fmt(MILLION.setNs, 1)} ns
-        </span>
-        <span style={{ ...body(30, true), color: INK_SOFT }}>
+        </div>
+        <div style={{ ...body(30, true), color: INK_SOFT, marginTop: 10 }}>
           where a scan of the list takes {fmt(MILLION.listMs)} ms
-        </span>
+        </div>
       </Ink>
     </AbsoluteFill>
   );

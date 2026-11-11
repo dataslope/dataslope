@@ -152,7 +152,7 @@ export const LookupScene: React.FC = () => {
         <Ink at={c.as} dur={10} style={{ left: AS_X, top: textTop(i), whiteSpace: "nowrap" }}>
           <span style={label(24, INK)}>
             <Mark at={posAt + i * 3} out={posAt + 60}>
-              {t.posName}
+              {t.posName.charAt(0).toUpperCase() + t.posName.slice(1)}
             </Mark>
           </span>
         </Ink>
@@ -175,14 +175,14 @@ export const LookupScene: React.FC = () => {
           ))
         ) : (
           <Ink at={c.list} dur={10} style={{ left: COL[0], top: textTop(i) }}>
-            <span style={faint}>not listed</span>
+            <span style={faint}>Not listed</span>
           </Ink>
         )}
 
         {/* 2. Suffix rules, only for a word that is not listed. */}
         {t.listed ? (
           <Ink at={c.rules} dur={10} style={{ left: COL[1], top: textTop(i) }}>
-            <span style={faint}>not needed</span>
+            <span style={faint}>Not needed</span>
           </Ink>
         ) : guess ? (
           <>
@@ -193,7 +193,7 @@ export const LookupScene: React.FC = () => {
           </>
         ) : (
           <Ink at={c.rules} dur={10} style={{ left: COL[1], top: textTop(i) }}>
-            <span style={faint}>no rule fits</span>
+            <span style={faint}>No rule fits</span>
           </Ink>
         )}
 
@@ -225,7 +225,7 @@ export const LookupScene: React.FC = () => {
           marks={[{ at: c.result, out: c.result + 30 }, ...(i === TIE.row ? [{ at: firstListedAt + 8, out: firstListedAt + 48 }] : [])]}
         />
         {t.unchanged ? (
-          <Tag at={c.result + 6} x={RES_X + chipWidth(t.result, SIZE) + 16} y={textTop(i) + 2} color={INK_SOFT} size={22}>
+          <Tag at={c.result + 6} x={RES_X + chipWidth(t.result, SIZE) + 16} y={textTop(i) - 1} color={INK_SOFT} size={26}>
             unchanged
           </Tag>
         ) : null}
@@ -261,11 +261,11 @@ export const LookupScene: React.FC = () => {
       {/* Fig. 3: six lookups through the three steps. */}
       <FigLabel n="3" title="Six lookups, step by step" at={from} x={X0} y={y(FIG_Y)} />
       <Head x={X0} y={headY} at={from + 6}>
-        word
+        Word
       </Head>
       <Head x={AS_X} y={headY} at={partAt - 4}>
         <Mark at={partAt} out={partAt + 36}>
-          part of speech
+          Part of speech
         </Mark>
       </Head>
       <Head x={COL[0]} y={headY} n="1" nAt={threeAt} at={listAt}>
@@ -278,7 +278,7 @@ export const LookupScene: React.FC = () => {
         In WordNet?
       </Head>
       <Head x={RES_X} y={headY} at={shortestAt - 6}>
-        result
+        Result
       </Head>
       {/* Two of the rules, as the narration names them. */}
       <Ink at={sAt - 2} dur={10} style={{ left: COL[1] + 26, top: headY + 34, whiteSpace: "nowrap" }}>
@@ -296,7 +296,7 @@ export const LookupScene: React.FC = () => {
       {/* What WordNet is, under its column, as the narration says it. */}
       <Ink at={dictionaryAt - 2} dur={12} style={{ left: COL[2] + 26, top: headY + 34, whiteSpace: "nowrap" }}>
         <span style={faint}>
-          the dictionary
+          The dictionary
           <Fade at={lemmatizerAt - 2}>
             <span>&nbsp;behind the lemmatizer</span>
           </Fade>
@@ -305,7 +305,7 @@ export const LookupScene: React.FC = () => {
 
       {TRACES.map(row)}
 
-      <Tag at={washingtonAt} x={waCheck[waIdx].right + 16} y={rowTop(waRow) + chipH / 2 - 15} color={INK} size={22}>
+      <Tag at={washingtonAt} x={waCheck[waIdx].right + 16} y={rowTop(waRow) + chipH / 2 - 17} color={INK} size={26}>
         {WA.lemmas[0]}, the state
       </Tag>
     </AbsoluteFill>

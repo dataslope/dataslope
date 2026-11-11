@@ -4,6 +4,7 @@ import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, fmt, HAIRLINE, halo, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { M } from "../../editorial/math";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -112,7 +113,7 @@ export const DivisorScene: React.FC = () => {
       </Ink>
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
         <Ink at={measuredFrom - 2} dur={20} out={swampAt + 4} outDur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          Divide by n,
+          Divide by <M>n</M>,
         </Ink>
         <Ink at={lowAt - 6} dur={18} out={swampAt + 4} outDur={14} style={{ position: "relative", ...headline(80, true), color: INK, whiteSpace: "nowrap" }}>
           and you come up short.
@@ -255,7 +256,9 @@ export const DivisorScene: React.FC = () => {
         </Ink>
         <div style={{ position: "absolute", left: 1330, top: y(750), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...note(23, STAT_INK), fontWeight: 500 }}>
           <Ink at={divideByAt - 4} dur={14} style={{ position: "relative" }}>
-            <span style={halo}>Divided by n,</span>
+            <span style={halo}>
+              Divided by <M>n</M>,
+            </span>
           </Ink>
           <Ink at={underAt - 4} dur={14} style={{ position: "relative" }}>
             <span style={halo}>too small.</span>
@@ -263,7 +266,7 @@ export const DivisorScene: React.FC = () => {
         </div>
         <Ink at={numberAt - 4} dur={16} style={{ left: 1330, top: y(750) + 38, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK_SOFT), ...halo }}>
-            n, the number of values: here, {DIVISOR.five.length}
+            <M>n</M>, the number of values: here, {DIVISOR.five.length}
           </span>
         </Ink>
         <Sfx name="el-pop" at={growAt - 2} level={-31} />
@@ -312,10 +315,10 @@ export const DivisorScene: React.FC = () => {
               true variance {DIVISOR.sigma2}
             </Tag>
             <Tag x={V.x0 - 18} y={y(BAR_N) - 15} opacity={ease(frame, byNAt - 4, 12)} size={23} bold align="right">
-              Divide by n
+              Divide by <M>n</M>
             </Tag>
             <Tag x={V.x0 - 18} y={y(BAR_N1) - 15} opacity={ease(frame, byN1At - 4, 12)} size={23} bold align="right">
-              by n − 1
+              by <M>n − 1</M>
             </Tag>
             <Tag x={sx(V, DIVISOR.byN * nGrow) + 16} y={y(BAR_N) - 15} opacity={ease(frame, byNAt, 10)} color={STAT_INK} size={24} bold align="left" knockout>
               <span style={TABULAR}>{counted(frame, byNAt - 2, 0, DIVISOR.byN, 1, 22)}</span>
@@ -333,8 +336,8 @@ export const DivisorScene: React.FC = () => {
 
           {/* Two libraries, two divisors, one column. */}
           {[
-            { code: "np.std(x)", note: "divides by n", value: DIVISOR.numpyStd, at: numpyAt, noteAt: numpyNoteAt },
-            { code: "pd.Series(x).std()", note: "divides by n − 1", value: DIVISOR.pandasStd, at: pandasAt, noteAt: pandasNoteAt },
+            { code: "np.std(x)", note: <>divides by <M>n</M></>, value: DIVISOR.numpyStd, at: numpyAt, noteAt: numpyNoteAt },
+            { code: "pd.Series(x).std()", note: <>divides by <M>n − 1</M></>, value: DIVISOR.pandasStd, at: pandasAt, noteAt: pandasNoteAt },
           ].map((c, i) => {
             const p = ease(frame, c.at - 6, 14) * (1 - 0.6 * ease(frame, wildAt - 4, 12));
             if (p <= 0) return null;

@@ -161,10 +161,13 @@ export const TailScene: React.FC = () => {
 
       {/* Where heavy tails live: the lesson's examples. */}
       <div style={{ position: "absolute", left: 160, top: y(915), display: "flex", gap: 36, whiteSpace: "nowrap" }}>
-        {["Financial returns", "insurance losses", "network delays"].map((t, i) => {
+        {/* Three examples on one line, each its own item: capitalized, and
+            kept apart by a middle dot. */}
+        {["Financial returns", "Insurance losses", "Network delays"].map((t, i) => {
           const p = ease(frame, examples[i] - 4, 14);
           return (
             <span key={t} style={{ ...label(23, INK), opacity: p, transform: `translateY(${(1 - p) * 10}px)`, display: "inline-block", ...halo }}>
+              {i > 0 ? <span style={{ color: INK_SOFT, marginRight: 36 }}>·</span> : null}
               {t}
             </span>
           );

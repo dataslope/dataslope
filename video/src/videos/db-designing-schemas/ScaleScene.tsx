@@ -280,7 +280,7 @@ export const ScaleScene: React.FC = () => {
             height: L.products.bottom + 24 - (L.customers.top - 24),
             boxSizing: "border-box",
             border: `2px dashed ${INK_SOFT}`,
-            borderRadius: 12,
+            borderRadius: 10,
             clipPath: `inset(0 ${(1 - ease(frame, clearAt - 4, 18)) * 100}% 0 0)`,
             opacity: ease(frame, clearAt - 4, 6),
           }}

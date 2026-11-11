@@ -27,7 +27,7 @@ export const FIG_Y = 300;
 
 // ── Colors: one meaning each ─────────────────────────────────────────────────
 
-/** A token: a pale blue ground, its edge the brand blue. */
+/** A token: a pale blue ground, no edge (fill only). */
 export const TOKEN = BAR;
 export const TOKEN_TINT = `color-mix(in srgb, ${BAR} 16%, ${PAPER})`;
 /** The second of two neighbouring tokens, so their boundary shows. */
@@ -319,10 +319,6 @@ export const chipGround = (focus: number, alt = false) =>
       ? TOKEN_TINT_2
       : TOKEN_TINT;
 
-/** A token's edge: the brand blue, or red when pointed at. */
-export const chipEdge = (focus: number) =>
-  focus > 0 ? `color-mix(in srgb, ${ACCENT} ${Math.round(100 * Math.min(1, focus))}%, ${TOKEN})` : TOKEN;
-
 /**
  * A run of text as its tokens: each on its own pale ground, neighbours in
  * two tints so every boundary shows, set in the code face. A token that ends
@@ -360,12 +356,8 @@ export const TokenRun: React.FC<{
                 color: INK,
                 padding: "0 1px",
                 margin: "0 1px",
-                borderRadius: 5,
+                borderRadius: 4,
                 background: t > 0 ? chipGround(f, i % 2 === 1) : "transparent",
-                boxShadow:
-                  t > 0
-                    ? `inset 0 -3px 0 color-mix(in srgb, ${f > 0 ? chipEdge(f) : TOKEN} ${Math.round(t * 70 + f * 30)}%, transparent)`
-                    : undefined,
                 opacity: faint + (1 - faint) * t,
                 fontVariantLigatures: "none",
               }}
@@ -458,8 +450,7 @@ export const ChipFace: React.FC<{ text: string; size?: number; focus?: number; a
       boxSizing: "border-box",
       width,
       padding: `${Math.round(size * 0.2)}px ${Math.round(size * 0.4)}px`,
-      borderRadius: 8,
-      border: `2px solid ${chipEdge(focus)}`,
+      borderRadius: 5,
       background: chipGround(focus, alt),
       fontFamily: MONO,
       fontSize: size,

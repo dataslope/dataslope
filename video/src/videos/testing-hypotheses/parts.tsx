@@ -5,6 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, fmt, headline, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
+import { I, MathRun } from "../../editorial/math";
 import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { SANS, waitForFonts } from "../../theme/fonts";
@@ -95,20 +96,35 @@ export const Head: React.FC<{
  *  subscript and not as a second size on the line; it is lowered by an
  *  offset rather than by vertical-align, so the line box keeps its height,
  *  and never set under 19px. */
-export const H0: React.FC<{ one?: boolean }> = ({ one }) => (
-  <span style={{ whiteSpace: "nowrap" }}>
-    H
-    <sub style={{ fontSize: "max(0.68em, 19px)", verticalAlign: "baseline", position: "relative", top: "0.28em", marginLeft: "0.04em" }}>
-      {one ? "1" : "0"}
-    </sub>
-  </span>
+export const H0: React.FC<{ one?: boolean; bare?: boolean }> = ({ one, bare }) => {
+  // In the math face (editorial/math.tsx), as a formula is set: the H
+  // italic, the digit a subscript. `bare` is for an H0 already inside a
+  // MathRun, which would otherwise scale the face twice.
+  const h = (
+    <span style={{ whiteSpace: "nowrap" }}>
+      <I>H</I>
+      <sub style={{ fontSize: "max(0.68em, 19px)", verticalAlign: "baseline", position: "relative", top: "0.28em", marginLeft: "0.04em" }}>
+        {one ? "1" : "0"}
+      </sub>
+    </span>
+  );
+  return bare ? h : <MathRun>{h}</MathRun>;
+};
+
+/** A Greek letter in the math face, at the size of the words around it
+ *  (the owner, 2026-11-11: notation in the kit, not in Inter). The page
+ *  audit allows math beside Inter on one line. */
+export const Greek: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color }) => (
+  <MathRun style={{ color }}>
+    <I>{children}</I>
+  </MathRun>
 );
 
-/** Greek, upright, in the face of the line it sits in: Inter on the
- *  charts' labels (its Greek subset is waited for above), the serif in a
- *  serif line. A serif letter in an Inter line read as a second face. */
-export const Greek: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color }) => (
-  <span style={{ fontStyle: "normal", color }}>{children}</span>
+/** One italic variable in the math face: the p of a p-value, a t or an F. */
+export const MathVar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <MathRun>
+    <I>{children}</I>
+  </MathRun>
 );
 
 /** A number that counts from `from` to `to` over `dur` frames, eased. */

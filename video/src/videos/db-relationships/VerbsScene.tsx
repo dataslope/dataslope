@@ -173,13 +173,13 @@ export const VerbsScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={moreAt - 2} dur={12} style={{ left: XS[0], top: y(SENT_Y) + VERDICT_DY, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, INK_SOFT) }}>specific</span>
+          <span style={{ ...note(23, INK_SOFT) }}>Specific</span>
         </Ink>
         <Ink at={hasAt - 4} dur={16} style={{ left: XS[0], top: y(SENT_Y) + SENT_STEP, whiteSpace: "nowrap" }}>
           <span style={{ ...body(46), color: INK_SOFT, opacity: 0.8 }}>Customer has order.</span>
         </Ink>
         <Ink at={hasAt + 10} dur={12} style={{ left: XS[0], top: y(SENT_Y) + SENT_STEP + VERDICT_DY, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, INK_SOFT) }}>less precise</span>
+          <span style={{ ...note(23, INK_SOFT) }}>Less precise</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

@@ -192,7 +192,7 @@ export const SentenceScene: React.FC = () => {
 
       {/* Fig. 4: the pos-tagging lesson's sentence, row by row. */}
       <FigLabel n="4" title="The runners sentence, tagged and lemmatized" at={from} x={X0} y={y(FIG_Y)} />
-      {rowLabel(ROW.word, from + 6, "word")}
+      {rowLabel(ROW.word, from + 6, "Word")}
       {S.tokens.map((t, i) => (
         <Chip
           key={`w${i}`}
@@ -252,7 +252,7 @@ export const SentenceScene: React.FC = () => {
       ))}
 
       {/* The lesson's two printed lines: without tags, then with them. */}
-      {rowLabel(ROW.naive, withoutAt, "lemma, no tag")}
+      {rowLabel(ROW.naive, withoutAt, "Lemma, no tag")}
       {S.naive.map((l, i) => (
         <Chip
           key={`n${i}`}
@@ -265,7 +265,7 @@ export const SentenceScene: React.FC = () => {
         />
       ))}
 
-      {rowLabel(ROW.aware, withAt, "lemma, with tag")}
+      {rowLabel(ROW.aware, withAt, "Lemma, with tag")}
       {S.aware.map((l, i) => (
         <Chip
           key={`l${i}`}
@@ -295,7 +295,7 @@ export const SentenceScene: React.FC = () => {
         />
       ))}
       <Ink at={endingsAt} dur={12} out={closeAt + 4} style={{ left: CHIP_X, top: rowTop(ROW.porter) + chipH + 16, whiteSpace: "nowrap" }}>
-        <span style={label(22, INK)}>only cuts endings, and lowercases</span>
+        <span style={label(22, INK)}>Only cuts endings, and lowercases</span>
       </Ink>
 
       {/* The fix as code, under the figure, where Fig. 1 left the bug. */}
@@ -308,7 +308,7 @@ export const SentenceScene: React.FC = () => {
           <span>)</span>
         </div>
       </Ink>
-      <Arrow from={[callArrowX, callTop + chipH / 2]} to={[callResultX - 18, callTop + chipH / 2]} at={neededAt + 8} dur={10} />
+      <Arrow from={[callArrowX, callTop + chipH / 2]} to={[callResultX - 2, callTop + chipH / 2]} at={neededAt + 8} dur={10} />
       <Chip text={fix.lemma} x={callResultX} y={callTop} at={neededAt + 14} size={SIZE} />
 
       {/* Fig. 5: the lesson's to_wordnet_pos, as a legend. */}
@@ -323,11 +323,11 @@ export const SentenceScene: React.FC = () => {
             <Ink at={at} dur={10} style={{ left: LEGEND_X, ...middle }}>
               <span style={legendCode}>{m.letter}</span>
             </Ink>
-            <Arrow from={[LEGEND_X + 84, mid]} to={[LEGEND_X + 128, mid]} at={at + 4} dur={8} />
+            <Arrow from={[LEGEND_X + 30, mid]} to={[LEGEND_X + 96, mid]} at={at + 4} dur={8} />
             {/* The code as the WordNet pos row draws it, so "a" reads as a code. */}
-            <Chip text={m.pos} x={LEGEND_X + 146} y={top} at={at + 8} size={SIZE} />
-            <Ink at={at + 10} dur={10} style={{ left: LEGEND_X + 146 + chipWidth(m.pos, SIZE) + 14, ...middle }}>
-              <span style={label(24, INK)}>
+            <Chip text={m.pos} x={LEGEND_X + 98} y={top} at={at + 8} size={SIZE} />
+            <Ink at={at + 10} dur={10} style={{ left: LEGEND_X + 98 + chipWidth(m.pos, SIZE) + 14, ...middle }}>
+              <span style={label(26, INK)}>
                 <Mark at={at + 8} out={at + 32}>
                   {m.name}
                 </Mark>

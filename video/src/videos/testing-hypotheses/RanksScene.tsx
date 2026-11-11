@@ -8,7 +8,7 @@ import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, MWU } from "./data";
-import { Bracket, DATA, DATA_INK, DOT, Head, Label, lerp, Mark, pulse, STAT, STAT_INK, STAT_WASH, Svg } from "./parts";
+import { Bracket, DATA, DATA_INK, DOT, Head, Label, lerp, Mark, MathVar, pulse, STAT, STAT_INK, STAT_WASH, Svg } from "./parts";
 
 /**
  * Minutes to resolve a ticket, on a broken axis: the ordinary tickets get
@@ -141,7 +141,7 @@ export const RanksScene: React.FC = () => {
               height={72}
               fill={STAT_WASH}
               opacity={0.9}
-              rx={8}
+              rx={5}
             />
           ) : null}
         </Svg>
@@ -245,7 +245,7 @@ export const RanksScene: React.FC = () => {
         </Note>
         <Note at={nothingAt - 4} x={WELCH_X} y={y(AXIS) + 46}>
           <span style={{ ...note(26, INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
-            means {fmt(MWU.meanA, 0)} and {fmt(MWU.meanB, 0)}: Welch&apos;s t-test, p = <Mark at={sevenAt - 2}>{fmt(MWU.welchP, 2)}</Mark>
+            Means {fmt(MWU.meanA, 0)} and {fmt(MWU.meanB, 0)}: Welch&apos;s t-test, <MathVar>p</MathVar> = <Mark at={sevenAt - 2}>{fmt(MWU.welchP, 2)}</Mark>
           </span>
         </Note>
         {/* Gone with the mean lines it names. */}
@@ -256,7 +256,7 @@ export const RanksScene: React.FC = () => {
         </Note>
         <Note at={p033At - 4} x={rankX(MEAN_RANK[1]) + 16} y={y(RANK_Y) - 128}>
           <span style={{ ...note(26, DATA_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
-            Mann-Whitney, p = {fmt(MWU.mwuP, 3)}
+            Mann-Whitney, <MathVar>p</MathVar> = {fmt(MWU.mwuP, 3)}
           </span>
         </Note>
         <Note at={shiftAt} x={rankX(MEAN_RANK[0]) - 14} y={y(RANK_Y) - 62} align="right">

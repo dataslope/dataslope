@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, note, PAPER } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -180,7 +180,7 @@ export const MechanismScene: React.FC = () => {
             width: CELL_W + 14,
             height: CELL_H + 14,
             border: `3px solid ${LIST}`,
-            borderRadius: 6,
+            borderRadius: 5,
             opacity: markerIn * (1 - found),
           }}
         />
@@ -192,8 +192,8 @@ export const MechanismScene: React.FC = () => {
         <span style={{ ...note(22, LIST_INK), fontWeight: 500 }}>found at the very end</span>
       </Note>
       <Ink at={notThereAt - 2} dur={16} style={{ left: LEFT, top: ya(A_NOTE), display: "flex", alignItems: "baseline", gap: "0.6em", whiteSpace: "nowrap" }}>
-        <Code line="-1 in big_list" size={CODE} />
-        <span style={note(24, INK_SOFT)}>
+        <Code line="-1 in big_list" size={24} />
+        <span style={note(26, INK_SOFT)}>
           not there: all <b style={{ color: LIST_INK, opacity: ease(frame, allAt - 2, 8) }}>1,000,000</b> compared, then{" "}
           <Mono color={inkOf.purple}>False</Mono>
         </span>
@@ -229,7 +229,7 @@ export const MechanismScene: React.FC = () => {
       >
         <span style={{ ...body(30, true), color: INK }}>bucket 999,999</span>
         <span style={{ ...body(30, true), color: INK_SOFT }}>of</span>
-        <span style={{ position: "relative", ...headline(34), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums", marginLeft: "0.15em" }}>
+        <span style={{ position: "relative", ...headline(31), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums", marginLeft: "0.15em" }}>
           {/* The highlight reaches 0.1em past the number, so the number keeps
               0.15em of margin: a full space between the highlight and "of". */}
           <span
@@ -304,10 +304,12 @@ export const MechanismScene: React.FC = () => {
           id="lvs-card-catalog"
           style={{
             position: "absolute",
-            left: 1510,
-            top: y(500),
-            width: 270,
-            height: 150,
+            // Clear of panel b's counter, which now runs the number and its
+            // word along the title line.
+            left: 1540,
+            top: y(560),
+            width: 234,
+            height: 130,
             opacity: catalog,
             transform: `translateY(${bob(frame + 20, 4, 96) + (1 - catalog) * 24}px)`,
           }}
@@ -326,12 +328,14 @@ const RowTitle: React.FC<{ at: number; y: number; letter: string; color: string;
   title,
 }) => (
   <Ink at={at} dur={16} style={{ left: LEFT, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
-    <span style={label(22, color)}>{letter}</span>
+    <span style={{ ...body(34), color, fontWeight: 600 }}>{letter}</span>
     <span style={{ ...body(34, true), color: INK }}>{title}</span>
   </Ink>
 );
 
-/** "comparisons 1,000,000", at the right end of a panel's title line. */
+/** "1,000,000 comparisons", at the right end of a panel's title line. The
+ *  word is set at the number's size, in its face, so the two read as one
+ *  line (one line, one size). */
 const Counter: React.FC<{ at: number; y: number; value: number; color: string; hot: number }> = ({
   at,
   y,
@@ -339,12 +343,11 @@ const Counter: React.FC<{ at: number; y: number; value: number; color: string; h
   color,
   hot,
 }) => (
-  <Note at={at} x={RIGHT} y={y - 10} align="right" from="right">
-    <div style={{ display: "flex", alignItems: "baseline", gap: 16, justifyContent: "flex-end" }}>
-      <span style={label(21, INK_SOFT)}>comparisons</span>
+  <Note at={at} x={RIGHT} y={y - 6} align="right" from="right">
+    <div style={{ display: "flex", alignItems: "baseline", gap: "0.3em", justifyContent: "flex-end", fontSize: 40 }}>
       <span
         style={{
-          ...headline(52),
+          ...headline(42),
           color,
           fontVariantNumeric: "tabular-nums lining-nums",
           minWidth: "4.6em",
@@ -355,6 +358,7 @@ const Counter: React.FC<{ at: number; y: number; value: number; color: string; h
       >
         {commas(value)}
       </span>
+      <span style={{ ...body(40, true), color: INK_SOFT }}>comparisons</span>
     </div>
   </Note>
 );
@@ -381,14 +385,16 @@ const Cell: React.FC<{
         width: CELL_W,
         height: CELL_H,
         boxSizing: "border-box",
-        border: dashed ? `1.5px dashed ${HAIRLINE}` : `1.5px solid ${INK}`,
+        // A filled cell is fill only; an empty bucket keeps its dashed
+        // outline, which is what says "nothing here".
+        border: dashed ? `1.5px dashed ${HAIRLINE}` : undefined,
         borderRadius: 4,
         background:
           tint > 0
-            ? `color-mix(in srgb, ${color} ${Math.round(tint * 100)}%, ${PAPER})`
+            ? `color-mix(in srgb, ${color} ${Math.round(tint * 100)}%, ${PLAIN})`
             : dashed
               ? "transparent"
-              : `color-mix(in srgb, ${INK} 3%, ${PAPER})`,
+              : PLAIN,
         opacity: p,
         transform: `translateY(${(1 - p) * 10}px)`,
         display: "flex",
@@ -403,6 +409,9 @@ const Cell: React.FC<{
     </div>
   );
 };
+
+/** A plain cell's fill: neutral gray, with no outline. */
+const PLAIN = `color-mix(in srgb, var(--ds-gray-400) 24%, ${PAPER})`;
 
 /** "…" between two runs of cells. */
 const Gap: React.FC<{ x: number; y: number; at: number }> = ({ x, y, at }) => {

@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OVERLAP } from "./data";
-import { Bracket, Drift, GROUP_COLOR, Headline, lerp, Marker, Ring, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { Bracket, Drift, GROUP_COLOR, Headline, lerp, Marker, MathVar, Ring, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 /** Standard deviations: group A sits at 0, group B at d. */
 const X: XScale = { lo: -3.5, hi: 4.5, x0: 160, x1: 1180 };
@@ -187,11 +187,11 @@ export const DScene: React.FC = () => {
             ...halo,
           }}
         >
-          d = {fmt(d, d === 1 ? 0 : 1)}
+          <MathVar>d</MathVar> = {fmt(d, d === 1 ? 0 : 1)}
         </div>
         <Note at={unitsAt - 2} x={160} y={y(318)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            <Marker at={unitsAt}>no units</Marker>: the same for dollars, milliseconds or test scores
+            <Marker at={unitsAt}>No units</Marker>: the same for dollars, milliseconds or test scores
           </span>
         </Note>
         <div
@@ -214,7 +214,7 @@ export const DScene: React.FC = () => {
           comes back to: no sample size in it. */}
       <Note at={sdAt - 2} x={TABLE_X} y={y(258)}>
         <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          d = gap <span style={{ color: INK_SOFT }}>÷</span> standard deviation
+          <MathVar>d</MathVar> = gap <span style={{ color: INK_SOFT }}>÷</span> standard deviation
         </span>
       </Note>
 
@@ -294,7 +294,7 @@ export const DScene: React.FC = () => {
       <Ring x={TABLE_X + COLS[1] + 50} y={y(TABLE_Y) + 56 + 2 * ROW + 24} at={evenAt - 2} r1={70} />
       <Note at={startAt - 2} x={TABLE_X} y={y(TABLE_Y) + 56 + 3 * ROW + 6}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          only a start: <Marker at={stakeAt - 2}>what&apos;s at stake</Marker> decides big
+          Only a start: <Marker at={stakeAt - 2}>what&apos;s at stake</Marker> decides big
         </span>
       </Note>
       <Spot id="interpreting-results-caliper" at={bigAt - 4} left={1600} top={y(662)} width={100} height={258} />

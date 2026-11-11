@@ -242,7 +242,7 @@ export const RtmScene: React.FC = () => {
         </Note>
         <Note at={coachAt - 4} x={NOTE_X + 60} y={y(640)}>
           <span style={{ ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
-            <Strike at={creditAt}>a coaching program?</Strike>
+            <Strike at={creditAt}>A coaching program?</Strike>
           </span>
         </Note>
         <Note at={anywayAt - 2} x={NOTE_X + 60} y={y(640) + 54}>
@@ -256,7 +256,7 @@ export const RtmScene: React.FC = () => {
         </Note>
         <Note at={controlAt + 6} x={NOTE_X + 60} y={y(780) + 36}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            a group just as extreme, <Marker at={aloneAt - 2}>left alone</Marker>
+            A group just as extreme, <Marker at={aloneAt - 2}>left alone</Marker>
           </span>
         </Note>
       </div>

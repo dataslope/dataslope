@@ -12,7 +12,6 @@ import { COSINE, num, SEARCH } from "./data";
 import {
   Arrow,
   DATA,
-  DATA_TINT,
   Fade,
   FAINT,
   FIG_Y,
@@ -27,6 +26,7 @@ import {
   Spot,
   Svg,
   Tag,
+  tintOf,
   TokenChip,
   X0,
 } from "./parts";
@@ -341,7 +341,7 @@ export const SearchScene: React.FC = () => {
       <Fade at={themesAt - 4} style={{ left: 0, top: y(366), width: 1920 }}>
         {SEARCH.axes.map((ax, i) => (
           <span key={ax} style={{ position: "absolute", left: THEME_X[i], transform: "translateX(-50%)", ...label(21, INK_SOFT), opacity: ease(frame, themesAt - 4 + i * 4, 10) }}>
-            {ax}
+            {ax[0].toUpperCase() + ax.slice(1)}
           </span>
         ))}
         <span style={{ position: "absolute", left: SCORE_X, transform: "translateX(-50%)", ...label(21, POINT_INK), opacity: ease(frame, topAt - 4, 10) }}>
@@ -486,6 +486,8 @@ const Sentence: React.FC<{ children: React.ReactNode; style?: React.CSSPropertie
 /** Fig. 9: where the sentences' text sits, and the pitch the second lands at
  *  under the first (a 55px line and about 25px between them). */
 const SENTENCE_DY = 18;
+/** A hit in a node: the data blue as a fill. */
+const HIT = `color-mix(in srgb, ${DATA} 32%, ${PAPER})`;
 const LANDED = 80;
 
 const Box: React.FC<{ x: number; y: number; w: number; at: number; title: string; children?: React.ReactNode; accent?: boolean }> = ({
@@ -498,12 +500,12 @@ const Box: React.FC<{ x: number; y: number; w: number; at: number; title: string
   accent = false,
 }) => (
   <Fade at={at} style={{ left: x, top: y, width: w }}>
+    {/* A node of the pipeline: a fill, no outline (gray, or red for the pass). */}
     <div
       style={{
-        border: `2px solid ${accent ? POINT : INK}`,
-        borderRadius: 12,
-        padding: "18px 22px 22px",
-        background: accent ? `color-mix(in srgb, ${POINT} 6%, ${PAPER})` : PAPER,
+        borderRadius: 8,
+        padding: "20px 24px 24px",
+        background: accent ? `color-mix(in srgb, ${POINT} 14%, ${PAPER})` : tintOf(INK),
       }}
     >
       <div style={{ ...label(25, accent ? POINT_INK : INK) }}>{title}</div>
@@ -578,17 +580,18 @@ export const BlindScene: React.FC = () => {
       <FigLabel n="10" title="A second pass reads the top hits" at={secondAt - 6} x={pipeX[0]} y={y(FIG_Y)} />
       <Box x={pipeX[0]} y={PY} w={260} at={secondAt - 4} title="Nearest by cosine">
         {[0, 1, 2].map((i) => (
-          <div key={i} style={{ height: 18, marginTop: i ? 12 : 4, borderRadius: 4, background: DATA_TINT, border: `1.5px solid ${DATA}`, width: `${92 - i * 14}%` }} />
+          <div key={i} style={{ height: 18, marginTop: i ? 12 : 4, borderRadius: 4, background: HIT, width: `${92 - i * 14}%` }} />
         ))}
       </Box>
       <Box x={pipeX[1]} y={PY} w={260} at={readsAt - 4} title="A second pass" accent>
         <div style={{ ...note(25, INK_SOFT) }}>reads each one</div>
       </Box>
       <Box x={pipeX[2]} y={PY} w={220} at={hitsAt} title="The answer">
-        <div style={{ height: 18, marginTop: 4, borderRadius: 4, background: DATA_TINT, border: `1.5px solid ${DATA}`, width: "88%" }} />
+        <div style={{ height: 18, marginTop: 4, borderRadius: 4, background: HIT, width: "88%" }} />
       </Box>
-      <Arrow from={[pipeX[0] + 266, PY + 64]} to={[pipeX[1] - 8, PY + 64]} at={readsAt - 4} />
-      <Arrow from={[pipeX[1] + 266, PY + 64]} to={[pipeX[2] - 8, PY + 64]} at={hitsAt} />
+      {/* Node edge to node edge. */}
+      <Arrow from={[pipeX[0] + 260, PY + 64]} to={[pipeX[1] - 1, PY + 64]} at={readsAt - 4} />
+      <Arrow from={[pipeX[1] + 260, PY + 64]} to={[pipeX[2] - 1, PY + 64]} at={hitsAt} />
       </div>
 
       {/* The turn: one word that means nothing on its own. */}

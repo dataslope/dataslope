@@ -140,7 +140,7 @@ export const Fig: React.FC<{ n: string; at: number; x: number; y: number; out?: 
 
 const tint = (dept: Dept, k = 14) => `color-mix(in srgb, ${DEPT_COLOR[dept]} ${k}%, ${PAPER})`;
 
-/** A card's paper, its department bar and, in flight, a soft shadow. */
+/** A card's paper in its department's tint and, in flight, a soft shadow. */
 const cardStyle = (dept: Dept, x: number, top: number, width: number, height: number, lift = 0): React.CSSProperties => ({
   position: "absolute",
   left: x,
@@ -150,8 +150,12 @@ const cardStyle = (dept: Dept, x: number, top: number, width: number, height: nu
   boxSizing: "border-box",
   display: "flex",
   alignItems: "center",
-  background: tint(dept),
-  borderLeft: `${BAR}px solid ${DEPT_COLOR[dept]}`,
+  // A filled row, no colored edge (the owner, 2026-11-11): the tint and the
+  // department's ink carry the group. The edge's width stays as padding so
+  // the columns keep their places.
+  background: tint(dept, 20),
+  paddingLeft: BAR,
+  borderRadius: 4,
   boxShadow:
     lift > 0
       ? `0 ${10 * lift}px ${22 * lift}px color-mix(in srgb, ${INK} ${22 * lift}%, transparent)`
@@ -165,7 +169,7 @@ const deptText = (dept: Dept): React.CSSProperties => ({
   color: DEPT_INK[dept],
 });
 const numText: React.CSSProperties = { ...note(26, INK), fontWeight: 520, lineHeight: 1 };
-const idxText: React.CSSProperties = { fontFamily: MONO, fontSize: 21, color: INK_SOFT };
+const idxText: React.CSSProperties = { fontFamily: MONO, fontSize: 22, color: INK_SOFT };
 
 /** Where a card is, how far it has lifted, and how it is turned. */
 export type Pose = { x: number; top: number; lift?: number; turn?: number; opacity?: number };

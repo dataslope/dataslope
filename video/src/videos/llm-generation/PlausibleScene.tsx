@@ -91,7 +91,6 @@ export const PlausibleScene: React.FC = () => {
                   marginLeft: "0.3em",
                   padding: "2px 14px 4px",
                   background: tint(BAR, 20),
-                  borderBottom: `4px solid ${BAR}`,
                   ...body(36),
                   color: BLUE_INK,
                   transform: `scale(${1 + swell * 0.04})`,
@@ -139,7 +138,9 @@ export const PlausibleScene: React.FC = () => {
                 width: "100%",
                 height: "100%",
                 boxSizing: "border-box",
-                border: `2px dashed ${filled > 0.5 ? BAR : INK_SOFT}`,
+                borderRadius: 5,
+                // An empty slot is dashed; once filled it is a fill, its dashes gone.
+                border: `2px dashed color-mix(in srgb, ${INK_SOFT} ${Math.round((1 - filled) * 100)}%, transparent)`,
                 background: `color-mix(in srgb, ${tint(BAR, 22)} ${filled * 100}%, transparent)`,
                 display: "flex",
                 alignItems: "center",

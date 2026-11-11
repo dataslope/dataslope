@@ -145,7 +145,7 @@ export const ListScene: React.FC = () => {
             {after} orders, and Ada's row edited
           </Tag>
           <Tag at={checkAt + 6} x={CUSTOMERS_X} y={bad.rowTop(2) + 52} italic size={22} out={fkAt - 4}>
-            nothing can check what's in it
+            Nothing can check what's in it
           </Tag>
           </Drift>
           </div>

@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, body, halo, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { M } from "../../editorial/math";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -26,6 +27,7 @@ import {
   lerp,
   LINE,
   Mark,
+  Mono,
   POINT,
   POINT_INK,
   pulse,
@@ -34,6 +36,7 @@ import {
   Spot,
   Svg,
   Tag,
+  tintOf,
   TokenChip,
   VALUE,
   VALUE_INK,
@@ -118,7 +121,7 @@ export const TrophyScene: React.FC = () => {
       {/* "The pronoun never changed": the same token in both. */}
       <Svg opacity={ring}>
         {[R1, R2].map((r) => (
-          <rect key={r} x={it1 - CW * 1.6} y={r - 6} width={CW * 3.2} height={SIZE + 22} rx={10} fill="none" stroke={POINT} strokeWidth={2.6} />
+          <rect key={r} x={it1 - CW * 1.6} y={r - 6} width={CW * 3.2} height={SIZE + 22} rx={8} fill="none" stroke={POINT} strokeWidth={2.6} />
         ))}
       </Svg>
       <PathArrow
@@ -233,7 +236,6 @@ export const QkvScene: React.FC = () => {
               height: 44,
               marginRight: 4,
               borderRadius: 4,
-              border: `1.5px solid ${DATA}`,
               background: `color-mix(in srgb, ${DATA} ${Math.round(22 + 30 * glow)}%, ${PAPER})`,
             }}
           />
@@ -252,7 +254,8 @@ export const QkvScene: React.FC = () => {
         const named = ease(frame, nameAt[i] - 2, 10);
         return (
           <React.Fragment key={r.name}>
-            <Arrow from={[stripEnd + 14, stripMid]} to={[VX - 18, top + 22]} at={threeAt + i * 4} color={r.color} width={2.6} />
+            {/* From the embedding's last cell to the vector's first: edge to edge. */}
+            <Arrow from={[stripEnd - 4, stripMid]} to={[VX - 2, top + 22]} at={threeAt + i * 4} color={r.color} width={2.6} />
             <Fade at={threeAt + i * 4 + 6} style={{ left: VX, top }}>
               <span style={{ position: "relative", display: "inline-block" }}>
                 <span style={{ opacity: 1 - named }}>
@@ -284,7 +287,8 @@ export const QkvScene: React.FC = () => {
 
 // ═══ Scene 9: one score worked through, and the blend it makes ═════════════
 
-const T_X = { tok: X0, key: 310, value: 500, score: 700, weight: 500 };
+/** The weight column sits right of the score's, never over the values. */
+const T_X = { tok: X0, key: 310, value: 500, score: 700, weight: 890 };
 const T_ROW = 78;
 
 /** A number that changes in place through `steps`, each inked on its frame
@@ -454,7 +458,7 @@ export const BlendScene: React.FC = () => {
       <FigLabel n="13" title="The lesson's real vectors, three tokens of two numbers" at={from} x={X0} y={y(FIG_Y)} />
       <Fade at={from + 2} style={{ left: X0, top: QY, display: "flex", alignItems: "center", gap: 20 }}>
         <span style={{ ...label(24, QUERY_INK) }}>
-          Query, from <span style={{ fontFamily: MONO, fontWeight: 500 }}>it</span>
+          Query, from <Mono>it</Mono>
         </span>
         <span
           style={{
@@ -472,7 +476,9 @@ export const BlendScene: React.FC = () => {
         <span style={{ position: "absolute", left: T_X.value, ...label(21, VALUE_INK) }}>Value</span>
         <span style={{ position: "absolute", left: T_X.score, ...label(21, INK_SOFT), opacity: ease(frame, scoreWordAt - 2, 10) }}>
           Score
-          <span style={{ marginLeft: 10, color: POINT_INK, opacity: ease(frame, dividedAt, 10) }}>÷ √{QKV.dim}</span>
+          <span style={{ marginLeft: 10, color: POINT_INK, opacity: ease(frame, dividedAt, 10) }}>
+            <M>{`÷ √${QKV.dim}`}</M>
+          </span>
         </span>
         <span style={{ position: "absolute", left: T_X.weight, ...label(21, INK_SOFT), opacity: ease(frame, weightsWordAt - 2, 10) }}>Weight</span>
       </Fade>
@@ -599,7 +605,7 @@ export const BlendScene: React.FC = () => {
       <Note at={newAt - 2} x={X0} y={workY + 150}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <span style={{ ...label(24, POINT_INK) }}>
-            New vector for <span style={{ fontFamily: MONO, fontWeight: 500 }}>it</span>
+            New vector for <Mono>it</Mono>
           </span>
           <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 24, color: POINT_INK, ...TABULAR }}>
             {(move < 0.5 ? A.output : B.output).map((v) => v.toFixed(3)).join(", ")}
@@ -616,7 +622,7 @@ export const BlendScene: React.FC = () => {
       </Note>
       <Note at={thatAt - 2} out={blendPronounsAt - 8} x={1100} y={y(560)} width={640}>
         <div style={{ ...note(26, INK_SOFT) }}>
-          Dividing by √{QKV.dim}, the square root of the vector size, <Mark at={smallAt - 2}>keeps the scores small</Mark> as vectors grow.
+          Dividing by <M>{`√${QKV.dim}`}</M>, the square root of the vector size, <Mark at={smallAt - 2}>keeps the scores small</Mark> as vectors grow.
         </div>
       </Note>
 
@@ -681,7 +687,7 @@ export const BlendScene: React.FC = () => {
               ...halo,
             }}
           >
-            value of <span style={{ fontFamily: MONO, fontWeight: 500 }}>{t}</span>
+            value of <Mono>{t}</Mono>
           </div>
         );
       })}
@@ -712,7 +718,8 @@ const HeadBox: React.FC<{ x: number; y: number; kind: number; at: number; w: num
   const cell = Math.min((w - 24) / N, (h - 20) / N);
   return (
     <g opacity={p} transform={`translate(${x}, ${y + (1 - p) * 10})`}>
-      <rect width={w} height={h} rx={10} fill={PAPER} stroke={INK} strokeWidth={1.8} />
+      {/* A head is a gray sheet, no outline. */}
+      <rect width={w} height={h} rx={6} fill={tintOf(INK)} />
       {Array.from({ length: N * N }, (_, k) => {
         const r = Math.floor(k / N);
         const c = k % N;

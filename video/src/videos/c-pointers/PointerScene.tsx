@@ -33,9 +33,10 @@ const STRIP_R = 1800;
 const STRIP_L = STRIP_R - BYTE * (SIZEOF_INT + SIZEOF_PTR + 2);
 const N_X = STRIP_L + BYTE;
 const N_W = BYTE * SIZEOF_INT;
-/** p starts on the byte after n's last, so their borders are one line. */
-const P_X = N_X + N_W - 2;
-const P_W = BYTE * SIZEOF_PTR + 2;
+/** p starts on the byte after n's last; a sliver of paper keeps the two
+ *  borderless boxes apart. */
+const P_X = N_X + N_W + 4;
+const P_W = BYTE * SIZEOF_PTR - 4;
 
 /** Rows of the figure, before `y()`. */
 const NAME_Y = 432;
@@ -205,8 +206,8 @@ export const PointerScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={label(20, INK_SOFT)}>prints</span>
-              <span style={{ fontSize: 26, color: VALUE_INK }}>
+              <span style={label(22, INK_SOFT)}>prints</span>
+              <span style={{ fontSize: 23, color: VALUE_INK }}>
                 <Mono weight={500}>{out}</Mono>
               </span>
             </Ink>
@@ -330,7 +331,7 @@ export const PointerScene: React.FC = () => {
           [arrowX0, boxBottom],
           [arrowX0 - (arrowX0 - arrowX1) * 0.28, boxBottom + dip],
           [arrowX1 + (arrowX0 - arrowX1) * 0.28, boxBottom + dip],
-          [arrowX1, boxBottom + 5],
+          [arrowX1, boxBottom + 1],
         ]}
         at={livesAt - 2}
         dur={18}

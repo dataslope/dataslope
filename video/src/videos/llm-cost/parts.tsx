@@ -281,14 +281,14 @@ export const Chip: React.FC<{
       alignItems: "center",
       height: size * 1.75,
       padding: "0 0.42em",
-      borderRadius: 6,
+      borderRadius: 4,
       fontFamily: MONO,
       fontSize: size,
       fontWeight: 500,
       color: ink,
       whiteSpace: "pre",
-      background: `color-mix(in srgb, ${color} ${Math.round(18 + glow * 40)}%, ${PAPER})`,
-      boxShadow: `inset 0 0 0 2px ${color}`,
+      // A fill, no outline: the tint carries the chip's hue.
+      background: `color-mix(in srgb, ${color} ${Math.round(24 + glow * 40)}%, ${PAPER})`,
       ...style,
     }}
   >

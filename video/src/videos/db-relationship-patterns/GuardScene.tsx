@@ -166,7 +166,7 @@ export const GuardScene: React.FC = () => {
 
           {/* ── The self-join's result: a left join keeps Ada ── */}
           <Caption at={leftAt - 4} x={rg.x} y={top - 48}>
-            the self-join, as a left join
+            The self-join, as a left join
           </Caption>
           <DbTable
             g={rg}
@@ -181,7 +181,7 @@ export const GuardScene: React.FC = () => {
             swaps={[{ row: ada, col: 2, at: updatedAt, value: SR.joinAfter[0][2] ?? "", color: ACCENT_INK }]}
           />
           <Tag at={keepsAt + 8} x={rg.x} y={rg.rowTop(rows.length) + 18} italic size={22} out={whatIfAt - 4}>
-            an inner join would drop Ada
+            An inner join would drop Ada
           </Tag>
 
           {/* ── What the key does not check ── */}

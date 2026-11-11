@@ -151,7 +151,7 @@ export function rowLayout(tokens: readonly string[], x: number, size = CHIP_SIZE
 export type Tone = "plain" | "good";
 const TONE = {
   plain: { bg: ds("gray", 50), line: `color-mix(in srgb, ${INK} 38%, transparent)` },
-  good: { bg: `color-mix(in srgb, ${BAR} 15%, ${PAPER})`, line: BAR },
+  good: { bg: `color-mix(in srgb, ${BAR} 20%, ${PAPER})`, line: BAR },
 } as const;
 
 /** A tone that takes over from the one before at `at`. */
@@ -212,8 +212,10 @@ export const Chip: React.FC<{
         width: w,
         height: chipHeight(size),
         boxSizing: "border-box",
-        borderRadius: Math.round(size * 0.28),
-        border: `${BORDER}px ${g > 0.5 ? "dashed" : "solid"} ${line}`,
+        borderRadius: Math.round(size * 0.14),
+        // Fill only: the line shows only once a chip turns into a dashed
+        // ghost, where the outline is the meaning ("not in WordNet").
+        border: `${BORDER}px ${g > 0.5 ? "dashed" : "solid"} ${g > 0.5 ? line : "transparent"}`,
         background: mark > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${(mark * 100).toFixed(1)}%, ${bg})` : bg,
         opacity: Math.min(1, p) * (1 - o) * (1 - g * 0.6),
         transform: `translateY(${(1 - Math.min(1, p)) * 12}px) scale(${0.9 + 0.1 * Math.min(1, p)})`,

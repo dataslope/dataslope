@@ -4,7 +4,7 @@ import type { Pt } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { BLUE_INK, body, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
@@ -162,10 +162,9 @@ export const ExpandScene: React.FC = () => {
                 width: 34,
                 height: 34,
                 borderRadius: "50%",
-                boxSizing: "border-box",
-                border: `2px solid ${KEY}`,
-                background: `color-mix(in srgb, ${KEY} ${Math.round(done * 100)}%, ${PAPER})`,
-                color: done > 0.5 ? PAPER : INK,
+                // A tinted disc with no ring, filling solid once the step is done.
+                background: `color-mix(in srgb, ${KEY} ${Math.round(24 + done * 76)}%, ${PAPER})`,
+                color: done > 0.5 ? PAPER : BLUE_INK,
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",

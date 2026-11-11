@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { FIXED_ORDER, FLAT, MISSED_ORDER, NEW_EMAIL, OLD_EMAIL, rowsChanged } from "./data";
-import { Chip, Drift, Headline, lerp, Listing, Mark, pulse, X0 } from "./parts";
+import { Chip, Drift, Headline, lerp, Listing, Mark, NODE, pulse, X0 } from "./parts";
 
 /** The programs that touch the table: the lesson's own list ("the web app,
  *  the admin dashboard, the import job, the reporting script"). */
@@ -156,12 +156,12 @@ export const CostScene: React.FC = () => {
                       justifyContent: "center",
                       gap: 6,
                       borderRadius: 8,
-                      border: `2px solid ${split > 0.5 ? ACCENT : INK}`,
-                      // Opaque, so the copy underneath never shows through.
+                      // Fill only, and opaque, so the copy underneath never shows through:
+                      // the one fact in the plain gray, its copies in the accent's tint.
                       background:
                         split > 0.5
-                          ? `color-mix(in srgb, ${ACCENT} ${Math.round(10 + stepped * 16)}%, ${PAPER})`
-                          : PAPER,
+                          ? `color-mix(in srgb, ${ACCENT} ${Math.round(14 + stepped * 16)}%, ${PAPER})`
+                          : NODE,
                       opacity: shown,
                       transform: `scale(${1 + stepped * 0.025})`,
                     }}
@@ -188,8 +188,8 @@ export const CostScene: React.FC = () => {
                 <Leader
                   key={k}
                   points={[
-                    [CHIP_X - 8, chipY(i) + 26],
-                    [X0 + CARD_W + 10, y(COPY_Y[k]) + h(CARD_H) / 2],
+                    [CHIP_X, chipY(i) + 26],
+                    [X0 + CARD_W, y(COPY_Y[k]) + h(CARD_H) / 2],
                   ]}
                   at={stepAt - 6 + i * 4 + k * 2}
                   dur={14}

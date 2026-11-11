@@ -394,9 +394,9 @@ export const RecordNode: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        border: `2px solid ${INK}`,
-        borderRadius: 8,
-        background: PAPER,
+        // Fill only: a record is a gray block with no outline.
+        borderRadius: 5,
+        background: ds("gray", 100),
         opacity: p * (1 - o) * (1 - d),
         transform: `scale(${(0.85 + 0.15 * p) * (1 + swell * 0.08)})`,
         display: "flex",

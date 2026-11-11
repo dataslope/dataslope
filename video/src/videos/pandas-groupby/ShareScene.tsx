@@ -85,8 +85,8 @@ export const ShareScene: React.FC = () => {
         <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 500 }}>df</span>
       </Ink>
       <Header x={A_X} top={y(HEADER_Y)} width={CARD_W} at={start - 14} cols={FRAME_COLS} />
-      <Header x={T_X} top={y(HEADER_Y)} width={T_W} at={start - 14} cols={[{ text: "group total", right: 18 }]} />
-      <Header x={S_X} top={y(HEADER_Y)} width={S_W} at={divideAt - 4} cols={[{ text: "share", right: 18 }]} />
+      <Header x={T_X} top={y(HEADER_Y)} width={T_W} at={start - 14} cols={[{ text: "Group total", right: 18 }]} />
+      <Header x={S_X} top={y(HEADER_Y)} width={S_W} at={divideAt - 4} cols={[{ text: "Share", right: 18 }]} />
       {/* The row the narration reads, marked across all three columns: a
           highlighter stroke laid down behind the cards, so it shows around them. */}
       {band > 0 ? (
@@ -131,12 +131,13 @@ export const ShareScene: React.FC = () => {
       })}
 
       <Leader points={[[NOTE_X - 16, exMid], [S_X + S_W + 10, exMid]]} at={pctAt - 6} dur={10} />
-      <Note at={pctAt - 4} x={NOTE_X} y={exMid - 44}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 16, whiteSpace: "nowrap" }}>
-          <span style={{ ...headline(64), color: DEPT_INK[EXAMPLE.dept] }}>{pct(SHARES[ex])}</span>
-          <span style={{ ...body(30), opacity: ease(frame, engAt - 4, 12) }}>
+      {/* The hero number on its own line, what it is a share of under it. */}
+      <Note at={pctAt - 4} x={NOTE_X} y={exMid - 38}>
+        <div style={{ whiteSpace: "nowrap" }}>
+          <div style={{ ...headline(64), color: DEPT_INK[EXAMPLE.dept] }}>{pct(SHARES[ex])}</div>
+          <div style={{ ...body(30), marginTop: 10, opacity: ease(frame, engAt - 4, 12) }}>
             {EXAMPLE.salary} of engineering&apos;s {TOTALS[ex]}
-          </span>
+          </div>
         </div>
       </Note>
 

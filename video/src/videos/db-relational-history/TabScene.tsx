@@ -163,7 +163,7 @@ export const TabScene: React.FC = () => {
             opacity: frameIn * (1 - frameDim),
             transform: `translateY(${(1 - frameIn) * 16}px)`,
             border: `2px solid ${INK}`,
-            borderRadius: 12,
+            borderRadius: 10,
             background: `color-mix(in srgb, ${PAPER} 70%, white)`,
             overflow: "hidden",
             boxSizing: "border-box",

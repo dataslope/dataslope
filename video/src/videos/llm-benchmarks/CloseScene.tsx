@@ -122,7 +122,8 @@ export const CloseScene: React.FC = () => {
                 rx={5}
                 fill={run > 0 ? A : "none"}
                 fillOpacity={0.25 + 0.6 * run}
-                stroke={run > 0 ? A : FAINT}
+                // A run card is a fill; one not yet run, an empty outlined slot.
+                stroke={run > 0 ? "none" : FAINT}
                 strokeWidth={1.6}
                 opacity={ease(frame, runAt - 8 + (i % 15), 10)}
               />

@@ -40,6 +40,9 @@ export const LOST = ACCENT;
 export const LOST_INK = ACCENT_INK;
 export const CHIP_LINE = `color-mix(in srgb, ${INK} 28%, transparent)`;
 export const SURFACE = ds("gray", 50);
+/** A station's fill: the gray badge's tint, which reads on the page without
+ *  an outline (gray 50 alone does not). */
+export const STATION_FILL = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 export const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
@@ -462,7 +465,9 @@ export const Reveal: React.FC<{ at: number; dur?: number; children: React.ReactN
   );
 };
 
-/** A small rounded card with a label in it, for a pipeline station. */
+/** A pipeline station: a label on a gray fill with no outline. Only a
+ *  dashed station, one that may or may not run, keeps its line, since there
+ *  the dashes are the meaning. */
 export const Card: React.FC<{
   at: number;
   x: number;
@@ -474,7 +479,7 @@ export const Card: React.FC<{
   line?: string;
   children: React.ReactNode;
   style?: React.CSSProperties;
-}> = ({ at, x, y, w, h, dashed, fill = PAPER, line = CHIP_LINE, children, style }) => {
+}> = ({ at, x, y, w, h, dashed, fill, line = CHIP_LINE, children, style }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 14);
   if (p <= 0) return null;
@@ -487,9 +492,9 @@ export const Card: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        border: `2px ${dashed ? "dashed" : "solid"} ${line}`,
-        borderRadius: 10,
-        background: fill,
+        border: `2px ${dashed ? "dashed" : "solid"} ${dashed ? line : "transparent"}`,
+        borderRadius: 8,
+        background: fill ?? (dashed ? PAPER : STATION_FILL),
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

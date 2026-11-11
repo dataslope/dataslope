@@ -239,18 +239,18 @@ export const Mono: React.FC<{ children: string; color?: string }> = ({ children,
   <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: 500, color }}>{children}</span>
 );
 
-/** A legend key: a small node outline, filled or dashed the way the figure
- *  draws it. */
-export const Key: React.FC<{ fill?: string; stroke: string; dashed?: boolean }> = ({ fill, stroke, dashed }) => (
+/** A legend key: a small node, filled, or outlined and dashed, the way the
+ *  figure draws it. A filled key has no outline; pass no `stroke`. */
+export const Key: React.FC<{ fill?: string; stroke?: string; dashed?: boolean }> = ({ fill, stroke, dashed }) => (
   <svg width={30} height={18} style={{ overflow: "visible", flex: "none" }}>
     <rect
       x={1}
       y={1}
       width={28}
       height={16}
-      rx={8}
+      rx={4}
       fill={fill ?? "none"}
-      stroke={stroke}
+      stroke={stroke ?? "none"}
       strokeWidth={2}
       strokeDasharray={dashed ? "4 3" : undefined}
     />

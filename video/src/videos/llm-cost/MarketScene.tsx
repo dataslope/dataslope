@@ -319,7 +319,6 @@ export const MarketScene: React.FC = () => {
           at={dollarAt - 4}
           dur={20}
           fill={`repeating-linear-gradient(135deg, ${POINT} 0 4px, transparent 4px 9px)`}
-          outline={POINT}
           radius={3}
         />
         <Guide x={axX(OVERSIZED.threshold)} y0={y(AXIS_Y - 62)} y1={y(AXIS_Y) + 4} at={promptAt + 4} color={INK} />

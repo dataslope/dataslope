@@ -3,11 +3,11 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { COMPARISONS, ILLUSTRATIONS, VIDEO } from "./data";
-import { Code, Fig, LISTING_PAPER, Mono, TRUTH, truthKey, TruthWord, Underline, UNKNOWN_INK } from "./kit";
+import { Code, Fig, Mono, TRUTH, truthKey, TruthWord, Underline, UNKNOWN_INK } from "./kit";
 
 const LEFT = 120;
 /** The grid: a column of row titles, then one column per comparison. */
@@ -26,6 +26,10 @@ const ROW_H = 72;
 /** The comparisons' code size. */
 const EXPR = 42;
 
+/** A row token's fill: neutral gray, no outline; its cells are cut apart
+ *  by lines of paper. */
+const ROW_FILL = `color-mix(in srgb, var(--ds-gray-400) 30%, ${PAPER})`;
+
 /** A row of a table, drawn small: the thing WHERE keeps or drops. */
 const RowToken: React.FC<{ kept: number; dropped: number }> = ({ kept, dropped }) => {
   const w = 132;
@@ -41,11 +45,9 @@ const RowToken: React.FC<{ kept: number; dropped: number }> = ({ kept, dropped }
           rx={3}
           fill={
             kept > 0
-              ? `color-mix(in srgb, ${TRUTH.true.lamp} ${Math.round(kept * 30)}%, ${LISTING_PAPER})`
-              : LISTING_PAPER
+              ? `color-mix(in srgb, ${TRUTH.true.lamp} ${Math.round(kept * 40)}%, ${ROW_FILL})`
+              : ROW_FILL
           }
-          stroke={INK}
-          strokeWidth={1.6}
         />
         {[1, 2].map((k) => (
           <line
@@ -54,8 +56,8 @@ const RowToken: React.FC<{ kept: number; dropped: number }> = ({ kept, dropped }
             x2={4 + (w * k) / 3}
             y1={4}
             y2={4 + hgt}
-            stroke={HAIRLINE}
-            strokeWidth={1.2}
+            stroke={PAPER}
+            strokeWidth={2}
           />
         ))}
       </g>

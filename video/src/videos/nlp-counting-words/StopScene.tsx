@@ -57,8 +57,8 @@ export const StopScene: React.FC = () => {
   const rowY = (i: number) => y(ROWS_Y) + i * h(ROW_STEP);
   const rowH = h(44);
   const panels = [
-    { rows: EMMA.withStop, title: "every word", ats: wordAts, titleAt: sixAt - 4, dim: notOneAt },
-    { rows: EMMA.withoutStop, title: "stopwords removed first", ats: rightAts, titleAt: dropAt - 4, dim: undefined },
+    { rows: EMMA.withStop, title: "Every word", ats: wordAts, titleAt: sixAt - 4, dim: notOneAt },
+    { rows: EMMA.withoutStop, title: "Stopwords removed first", ats: rightAts, titleAt: dropAt - 4, dim: undefined },
   ];
 
   return (

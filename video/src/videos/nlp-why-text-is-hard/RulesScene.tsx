@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { STOPWORDS } from "./data";
-import { Drift, FIG_Y, Headline, Kicker, MARK, X0 } from "./parts";
+import { Drift, FIG_Y, Headline, Kicker, Mark, X0 } from "./parts";
 
 const COL_X = [560, 1220];
 const COL_W = 600;
@@ -41,11 +41,10 @@ export const RulesScene: React.FC = () => {
   const pipelineAt = n.word("pipe-in", "pipeline");
   const end = n.beat("pipeline").from;
 
-  const band = ease(frame, courseAt, 16);
   const rows = [
-    { head: "Built from", headAt: knowAt - 6, cells: [{ text: "what people already know", at: knowAt - 2 }, { text: "labeled examples", at: examplesAt - 2 }] },
-    { head: "Training data", headAt: noDataAt - 6, cells: [{ text: "none", at: noDataAt }, { text: "lots of it", at: examplesAt + 6 }] },
-    { head: "You get", headAt: readAt - 6, cells: [{ text: "reasons you can read", at: readAt }, { text: "powerful, but opaque", at: powerfulAt - 2 }] },
+    { head: "Built from", headAt: knowAt - 6, cells: [{ text: "What people already know", at: knowAt - 2 }, { text: "Labeled examples", at: examplesAt - 2 }] },
+    { head: "Training data", headAt: noDataAt - 6, cells: [{ text: "None", at: noDataAt }, { text: "Lots of it", at: examplesAt + 6 }] },
+    { head: "You get", headAt: readAt - 6, cells: [{ text: "Reasons you can read", at: readAt }, { text: "Powerful, but opaque", at: powerfulAt - 2 }] },
   ];
 
   return (
@@ -62,25 +61,17 @@ export const RulesScene: React.FC = () => {
       <Drift from={from} to={end} amount={0.012} origin="50% 50%">
         <FigLabel n="8" title="Two ways to build a step" at={from + 2} x={X0} y={y(FIG_Y)} />
 
-        {/* The course's side: a wash behind the rules column. */}
-        <div
-          style={{
-            position: "absolute",
-            left: COL_X[0] - 24,
-            top: y(HEAD_Y) - 18,
-            width: (COL_W - 20) * band,
-            height: y(ROW_Y[2] + 74) - y(HEAD_Y) + 18,
-            background: `color-mix(in srgb, ${MARK} 38%, transparent)`,
-            borderRadius: 10,
-          }}
-        />
+        {/* The course's side: the highlighter on its column's head, where a
+            wash behind the whole column once sat as a card. */}
         <Ink at={countsAt} dur={14} style={{ left: COL_X[0], top: y(ROW_Y[2] + 92), whiteSpace: "nowrap" }}>
           <span style={{ ...label(24, INK), fontWeight: 500 }}>This course: rules and counts</span>
         </Ink>
 
         {/* Column heads */}
         <Ink at={rulesAt - 4} dur={14} style={{ left: COL_X[0], top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(44), color: INK, fontWeight: 500 }}>Rules</span>
+          <span style={{ ...body(44), color: INK, fontWeight: 500 }}>
+            <Mark at={courseAt}>Rules</Mark>
+          </span>
         </Ink>
         <Ink at={learnedAt - 4} dur={14} style={{ left: COL_X[1], top: y(HEAD_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...body(44), color: INK, fontWeight: 500 }}>Learning</span>

@@ -3,15 +3,16 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { halo, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
-import { FigLabel } from "../../editorial/ui";
+import { M } from "../../editorial/math";
+import { badgeStyle, FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { one, ROOT, three, TOKENS, TROPHY, two } from "./data";
 import {
   Arrow,
   DATA,
-  DATA_TINT,
   Fade,
   FIG_Y,
   Headline,
@@ -31,8 +32,17 @@ import {
 
 // ═══ Scene 5: the five steps in a row, and the many heads that run them ═══
 
+/** A head's sheet: opaque, so the heads behind it are covered. */
+const SHEET = `color-mix(in srgb, ${ds("gray", 400)} 18%, ${PAPER})`;
+
 const BOX_W = 290;
 const GAP = 40;
+/** A value's size, and the width of one of its characters (mono, 0.6em). */
+const VALUE_SIZE = 34;
+const VALUE_CH = VALUE_SIZE * 0.6;
+/** Where each column's three lines sit, below the top of the row. */
+const HOW_DY = 54;
+const VALUE_DY = 96;
 const r0 = TROPHY.rows[0];
 const STEPS = [
   {
@@ -124,36 +134,65 @@ export const RecapScene: React.FC = () => {
       <Fade at={stepAt[4] + 4} style={{ left: boxX(4) + 4, top: boxY - 60 }}>
         <Tag size={21}>with all three weights</Tag>
       </Fade>
+      {/* Five columns, no boxes: a numbered step, how it is done, and the
+          value it hands on, which an arrow carries to the next step's value. */}
       {STEPS.map((s, i) => {
         const p = ease(frame, stepAt[i] - 4, 12);
+        const prev = STEPS[i - 1];
+        const arrowY = boxY + VALUE_DY + VALUE_SIZE * 0.62;
         return (
           <React.Fragment key={s.name}>
-            {i ? <Arrow from={[boxX(i) - GAP + 6, boxY + 80]} to={[boxX(i) - 6, boxY + 80]} at={stepAt[i] - 6} color={INK_SOFT} width={2.2} /> : null}
+            {prev ? (
+              <Arrow
+                from={[boxX(i - 1) + prev.value.length * VALUE_CH + 14, arrowY]}
+                to={[boxX(i) - 12, arrowY]}
+                at={stepAt[i] - 6}
+                color={INK_SOFT}
+                width={2.2}
+              />
+            ) : null}
             <Fade at={stepAt[i] - 4} style={{ left: boxX(i), top: boxY, width: BOX_W }}>
-              <div
-                style={{
-                  boxSizing: "border-box",
-                  width: BOX_W,
-                  height: 160,
-                  border: `2px solid ${i === 4 ? POINT : DATA}`,
-                  borderRadius: 12,
-                  background: i === 4 ? PAPER : DATA_TINT,
-                  padding: "16px 20px",
-                  opacity: p,
-                }}
-              >
-                <div style={{ ...label(24, INK) }}>
-                  <span style={{ color: INK_SOFT, marginRight: 10 }}>{i + 1}</span>
-                  {s.name}
+              <div style={{ opacity: p }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, whiteSpace: "nowrap" }}>
+                  {/* The step's number on a tinted disc: 22px beside the 24px name. */}
+                  <span
+                    style={{
+                      ...badgeStyle(i === 4 ? "red" : "gray", 22),
+                      width: 34,
+                      height: 34,
+                      flex: "none",
+                      padding: 0,
+                      borderRadius: 17,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      ...TABULAR,
+                    }}
+                  >
+                    {i + 1}
+                  </span>
+                  <span style={{ ...label(24, INK) }}>
+                    {s.name === "Raise e" ? (
+                      <>
+                        Raise <M>e</M>
+                      </>
+                    ) : (
+                      s.name
+                    )}
+                  </span>
                 </div>
-                <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: INK_SOFT, marginTop: 12, whiteSpace: "nowrap" }}>{s.how}</div>
+                <div style={{ position: "absolute", top: HOW_DY, fontSize: 22, color: INK_SOFT, whiteSpace: "nowrap" }}>
+                  <M>{s.how}</M>
+                </div>
                 <div
                   style={{
+                    position: "absolute",
+                    top: VALUE_DY,
                     fontFamily: MONO,
-                    fontSize: 34,
+                    fontSize: VALUE_SIZE,
                     fontWeight: 500,
+                    lineHeight: 1.2,
                     color: i === 3 || i === 4 ? POINT_INK : INK,
-                    marginTop: 10,
                     whiteSpace: "nowrap",
                     ...TABULAR,
                   }}
@@ -176,7 +215,9 @@ export const RecapScene: React.FC = () => {
           const dy = -h * (22 + 6 * shift);
           return (
             <g key={h} opacity={h === 0 ? 1 : p * 0.85} transform={`translate(${dx}, ${dy})`}>
-              <rect x={GX - 8} y={GY - 8} width={3 * CELL + 16} height={3 * CELL + 16} rx={8} fill={PAPER} stroke={INK} strokeWidth={1.6} />
+              {/* A head is a sheet: an opaque gray ground, no outline, so the
+                  heads behind show as offset sheets. */}
+              <rect x={GX - 8} y={GY - 8} width={3 * CELL + 16} height={3 * CELL + 16} rx={8} fill={SHEET} />
               {Array.from({ length: 9 }, (_, k) => {
                 const r = Math.floor(k / 3);
                 const c = k % 3;
@@ -229,7 +270,7 @@ export const RecapScene: React.FC = () => {
               top: GY + i * CELL + 12,
               transform: "translateX(-100%)",
               opacity: ease(frame, pairAt, 10),
-              ...label(20, QUERY_INK),
+              ...label(21, QUERY_INK),
               whiteSpace: "nowrap",
             }}
           >
@@ -238,12 +279,14 @@ export const RecapScene: React.FC = () => {
           <div
             style={{
               position: "absolute",
-              left: GX + i * CELL + CELL / 2 + 4,
+              // Set upright, reading up to its column: slanted, the three
+              // names' boxes crossed one another.
+              left: GX + i * CELL + CELL / 2 - 12,
               top: GY + 3 * CELL + 14,
-              transform: "translateX(-100%) rotate(-50deg)",
+              transform: "translateX(-100%) rotate(-90deg)",
               transformOrigin: "100% 0",
               opacity: ease(frame, pairAt + 2, 10),
-              ...label(20, KEY_INK),
+              ...label(21, KEY_INK),
               whiteSpace: "nowrap",
             }}
           >

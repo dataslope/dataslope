@@ -147,6 +147,10 @@ export const CurveScene: React.FC = () => {
     if (o > 0.01) for (let v = s; v < win; v += s) if (linX(v - 0.5) < CX1 - 90) ticks.push(v);
     return { s, o, ticks };
   });
+  // A rank two step sets share (20 is on the 10s and the 20s) is drawn once,
+  // at their combined opacity, so its label never sits on a copy of itself.
+  const tickO = new Map<number, number>();
+  for (const { o, ticks } of tickSets) for (const v of ticks) tickO.set(v, Math.min(1, (tickO.get(v) ?? 0) + o));
   const counterOn = ease(frame, keepAt - 2, 8);
   const wordsOut = 1 - ease(frame, countsAt, 12);
 
@@ -377,20 +381,16 @@ export const CurveScene: React.FC = () => {
       <div style={{ position: "absolute", left: linX(0.5), top: CY1 + 14, transform: "translateX(-50%)", opacity: ease(frame, countsAt + 6, 10) * linTicksO, ...note(20, INK_SOFT), ...TABULAR }}>
         1
       </div>
-      {tickSets.map(({ s, o, ticks }) =>
-        o > 0.01
-          ? ticks.map((v) => (
-              <React.Fragment key={`${s}-${v}`}>
-                <Svg opacity={o}>
-                  <line x1={linX(v - 0.5)} x2={linX(v - 0.5)} y1={CY1 + 1} y2={CY1 + 8} stroke={INK} strokeWidth={1.2} />
-                </Svg>
-                <div style={{ position: "absolute", left: linX(v - 0.5), top: CY1 + 14, transform: "translateX(-50%)", opacity: o, ...note(20, INK_SOFT), ...TABULAR }}>
-                  {niceRank(v)}
-                </div>
-              </React.Fragment>
-            ))
-          : null,
-      )}
+      {[...tickO].map(([v, o]) => (
+        <React.Fragment key={v}>
+          <Svg opacity={o}>
+            <line x1={linX(v - 0.5)} x2={linX(v - 0.5)} y1={CY1 + 1} y2={CY1 + 8} stroke={INK} strokeWidth={1.2} />
+          </Svg>
+          <div style={{ position: "absolute", left: linX(v - 0.5), top: CY1 + 14, transform: "translateX(-50%)", opacity: o, ...note(20, INK_SOFT), ...TABULAR }}>
+            {niceRank(v)}
+          </div>
+        </React.Fragment>
+      ))}
       {/* The last rank in the window, counting as the axis widens. */}
       <div
         style={{

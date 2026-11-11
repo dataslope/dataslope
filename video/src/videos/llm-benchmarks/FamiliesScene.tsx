@@ -2,10 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR, svgText } from "../../editorial/style";
+import { INK, INK_SOFT, label, note, PAPER, TABULAR, svgText } from "../../editorial/style";
 import { ColumnRule, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { QUOTED } from "./data";
 import { A, A_INK, Arrow, B, Check, Count, Drift, FAINT, Headline, lerp, OK, pulse, Svg, X0 } from "./parts";
@@ -185,7 +186,7 @@ const GpqaBar: React.FC<{ x: number; y: number; w: number; at: number; fill: num
   return (
     <>
       <Svg opacity={t}>
-        <rect x={x} y={y} width={w} height={28} rx={4} fill={PAPER} stroke={HAIRLINE} strokeWidth={1.4} />
+        <rect x={x} y={y} width={w} height={28} rx={4} fill={STEP_FILL} />
         <rect x={x} y={y} width={(w * value * p) / 100} height={28} rx={4} fill={B} />
         <text x={x} y={y + 58} style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
           0
@@ -203,6 +204,10 @@ const GpqaBar: React.FC<{ x: number; y: number; w: number; at: number; fill: num
   );
 };
 
+/** A plain box's gray, and a step box's height (8px padding about a 22px line). */
+const STEP_FILL = `color-mix(in srgb, ${ds("gray", 400)} 22%, ${PAPER})`;
+const BOX_H = 42;
+
 /** SWE-bench as three steps: the issue, the patch, the tests that judge it. */
 const SweFlow: React.FC<{ x: number; y: number; issueAt: number; patchAt: number; testsAt: number }> = ({ x, y, issueAt, patchAt, testsAt }) => {
   const frame = useCurrentFrame();
@@ -214,10 +219,10 @@ const SweFlow: React.FC<{ x: number; y: number; issueAt: number; patchAt: number
         style={{
           width: 220,
           boxSizing: "border-box",
-          padding: "6px 14px",
-          borderRadius: 8,
-          border: `2px solid ${i === 2 && frame >= testsAt + 6 ? OK : INK}`,
-          background: PAPER,
+          padding: "8px 16px",
+          borderRadius: 5,
+          // A step is a fill, no outline: gray, and green once the tests pass.
+          background: i === 2 && frame >= testsAt + 6 ? `color-mix(in srgb, ${OK} 22%, ${PAPER})` : STEP_FILL,
           ...(mono ? { fontFamily: MONO, fontSize: 21, color: INK } : { ...label(22, INK), fontWeight: 500 }),
         }}
       >
@@ -228,9 +233,10 @@ const SweFlow: React.FC<{ x: number; y: number; issueAt: number; patchAt: number
   return (
     <>
       {box(issueAt, 0, "GitHub issue")}
-      <Arrow from={[x + 110, y + 44]} to={[x + 110, y + step - 4]} at={patchAt - 6} dur={8} width={2} />
+      {/* Box bottom to the next box's top. */}
+      <Arrow from={[x + 110, y + BOX_H]} to={[x + 110, y + step - 1]} at={patchAt - 6} dur={8} width={2} />
       {box(patchAt, 1, "+ patch", true)}
-      <Arrow from={[x + 110, y + step + 44]} to={[x + 110, y + 2 * step - 4]} at={testsAt - 6} dur={8} width={2} />
+      <Arrow from={[x + 110, y + step + BOX_H]} to={[x + 110, y + 2 * step - 1]} at={testsAt - 6} dur={8} width={2} />
       {box(testsAt, 2, "project's tests")}
       <Svg>
         <Check x={x + 250} y={y + 2 * step + 20} at={testsAt + 6} size={26} />
@@ -256,7 +262,8 @@ const ArcGrids: React.FC<{ x: number; y: number; gridAt: number; ruleAt: number 
             height={cell}
             rx={3}
             fill={c ? A : PAPER}
-            stroke={c ? A : FAINT}
+            // A filled cell is a fill; an empty one keeps its outline, as a slot.
+            stroke={c ? "none" : FAINT}
             strokeWidth={1.5}
             opacity={p}
           />

@@ -17,7 +17,7 @@ const ROW_STEP = 70;
 /** The rows build on the right, once the ring has moved to the left. */
 const CTX_X = 960;
 /** Width of a chip of `text` at SIZE: JetBrains Mono advances 0.6 em. */
-const chipW = (text: string) => text.length * 0.6 * SIZE + 2 * Math.round(SIZE * 0.4) + 4;
+const chipW = (text: string) => text.length * 0.6 * SIZE + 2 * Math.round(SIZE * 0.4);
 /** Each context chip's left edge, in a row. */
 const lefts = (ctx: readonly string[]) => {
   const out: number[] = [];
@@ -327,7 +327,7 @@ export const LoopScene: React.FC = () => {
         </React.Fragment>
       ))}
       <Note at={machineryAt - 2} x={LX + 10} y={y(470) + h(326) + 44}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the same machinery, and just as sure</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>The same machinery, and just as sure</span>
       </Note>
     </AbsoluteFill>
   );

@@ -120,7 +120,7 @@ export const ReturnsScene: React.FC = () => {
       <Ink at={paysAt - 2} dur={14} style={{ left: RIGHT_X, top: y(330) }}>
         <span style={label(22, GOOD_INK)}>Helps where steps can be checked</span>
       </Ink>
-      {["math", "code", "planning"].map((t, k) => (
+      {["Math", "Code", "Planning"].map((t, k) => (
         <Ink key={t} at={itemAt[k] - 2} dur={12} style={{ left: RIGHT_X, top: y(370 + k * 46) }}>
           <span style={{ ...body(32), color: INK }}>{t}</span>
         </Ink>
@@ -129,13 +129,13 @@ export const ReturnsScene: React.FC = () => {
         <span style={label(22, ACCENT_INK)}>Can&apos;t help</span>
       </Ink>
       <Ink at={neverAt - 8} dur={14} style={{ left: RIGHT_X, top: y(580), width: 420 }}>
-        <div style={{ ...body(32), color: INK }}>recalling a fact it never had</div>
+        <div style={{ ...body(32), color: INK }}>Recalling a fact it never had</div>
       </Ink>
       <Ink at={easyAt - 2} dur={14} style={{ left: RIGHT_X, top: y(690) }}>
         <span style={label(22, ACCENT_INK)}>Can hurt</span>
       </Ink>
       <Ink at={talkAt - 4} dur={14} style={{ left: RIGHT_X, top: y(730), width: 420 }}>
-        <div style={{ ...body(32), color: INK }}>an easy problem, talked out of a right answer</div>
+        <div style={{ ...body(32), color: INK }}>An easy problem, talked out of a right answer</div>
       </Ink>
       </Drift>
     </AbsoluteFill>

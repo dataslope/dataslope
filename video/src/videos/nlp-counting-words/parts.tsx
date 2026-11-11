@@ -46,11 +46,12 @@ export const FADED = `color-mix(in srgb, ${INK_SOFT} 34%, ${PAPER})`;
 export const RULE = `color-mix(in srgb, ${INK} 22%, transparent)`;
 
 export const FAMILY: Record<Family, { fill: string; ink: string; tint: string; name: string }> = {
-  noun: { fill: ds("teal"), ink: inkOf.teal, tint: `color-mix(in srgb, ${ds("teal")} 18%, ${PAPER})`, name: "noun" },
-  verb: { fill: ds("purple"), ink: inkOf.purple, tint: `color-mix(in srgb, ${ds("purple")} 16%, ${PAPER})`, name: "verb" },
-  adj: { fill: ds("orange"), ink: inkOf.orange, tint: `color-mix(in srgb, ${ds("orange")} 16%, ${PAPER})`, name: "adjective" },
-  adv: { fill: ds("green"), ink: inkOf.green, tint: `color-mix(in srgb, ${ds("green")} 16%, ${PAPER})`, name: "adverb" },
-  other: { fill: ds("gray", 400), ink: INK_SOFT, tint: ds("gray", 50), name: "other" },
+  // Tints strong enough to read with no outline round them.
+  noun: { fill: ds("teal"), ink: inkOf.teal, tint: `color-mix(in srgb, ${ds("teal")} 22%, ${PAPER})`, name: "noun" },
+  verb: { fill: ds("purple"), ink: inkOf.purple, tint: `color-mix(in srgb, ${ds("purple")} 22%, ${PAPER})`, name: "verb" },
+  adj: { fill: ds("orange"), ink: inkOf.orange, tint: `color-mix(in srgb, ${ds("orange")} 22%, ${PAPER})`, name: "adjective" },
+  adv: { fill: ds("green"), ink: inkOf.green, tint: `color-mix(in srgb, ${ds("green")} 22%, ${PAPER})`, name: "adverb" },
+  other: { fill: ds("gray", 400), ink: INK_SOFT, tint: "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)", name: "other" },
 };
 
 export const Svg: React.FC<{ opacity?: number; children: React.ReactNode }> = ({ opacity = 1, children }) => (
@@ -303,6 +304,9 @@ export type TileMark = { at: number; out?: number; color?: string };
  * straight legs instead, each eased on its own: to `via` over `via.dur`,
  * then on to `to` over `to.dur`, with no arc.
  */
+/** A plain tile's fill: the gray badge's tint. */
+const TILE_FILL = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
+
 export const Tile: React.FC<{
   text: string;
   x: number;
@@ -343,9 +347,12 @@ export const Tile: React.FC<{
         width,
         height: tileH(size),
         boxSizing: "border-box",
-        borderRadius: Math.round(size * 0.3),
-        border: `1.5px solid ${border ?? `color-mix(in srgb, ${INK} 30%, transparent)`}`,
-        background: tint ?? PAPER,
+        borderRadius: Math.round(size * 0.17),
+        // Fill only (the owner, 2026-11-11): a plain tile takes the gray
+        // badge's tint, a family its own. `border` is kept for a ring that
+        // marks one tile out, the one place an outline means something.
+        border: `1.5px solid ${border ?? "transparent"}`,
+        background: tint ?? TILE_FILL,
         opacity: p * (1 - o) * (1 - d),
         overflow: "hidden",
       }}
@@ -425,8 +432,7 @@ export const TagChip: React.FC<{
           width: w,
           height: Math.round(size * 1.6),
           boxSizing: "border-box",
-          borderRadius: 6,
-          border: `2px solid ${f.fill}`,
+          borderRadius: 4,
           background: f.tint,
           display: "flex",
           alignItems: "center",

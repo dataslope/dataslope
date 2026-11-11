@@ -161,9 +161,8 @@ export const DesignScene: React.FC = () => {
                   width: 240,
                   textAlign: "center",
                   padding: "16px 0",
-                  borderRadius: g === "A" ? 6 : 30,
+                  borderRadius: g === "A" ? 4 : 30,
                   background: g === "A" ? `color-mix(in srgb, ${INK_SOFT} 22%, ${PAPER})` : BAR,
-                  border: g === "A" ? `2px solid ${HAIRLINE}` : "none",
                 }}
               >
                 Buy now

@@ -79,7 +79,7 @@ export const CountsScene: React.FC = () => {
             The same in all three rows, so this column cannot tell Doc 1 from Doc 3.
           </div>
           <div style={{ ...note(21, INK_SOFT), marginTop: 18 }}>
-            Counts of the lesson&apos;s <span style={{ fontFamily: MONO, color: INK }}>.split()</span> tokens.
+            Counts of the lesson&apos;s <span style={{ fontFamily: MONO, fontSize: "0.92em", color: INK }}>.split()</span> tokens.
             {LENGTH ? ` Every document is ${spell(LENGTH)} words long.` : null}
           </div>
         </Ink>

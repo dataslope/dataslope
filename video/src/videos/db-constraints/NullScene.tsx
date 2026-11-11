@@ -3,10 +3,11 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { NOT_NULL } from "./data";
 import {
@@ -137,9 +138,11 @@ export const NullScene: React.FC = () => {
                 width: 200,
                 height: 96,
                 boxSizing: "border-box",
-                border: isNull ? `3px dashed ${ACCENT}` : `2px solid ${INK}`,
-                borderRadius: 8,
-                background: isNull ? "transparent" : PAPER,
+                // A value is a filled cell; null is the empty slot, its dashed
+                // outline the only thing there.
+                border: isNull ? `3px dashed ${ACCENT}` : undefined,
+                borderRadius: 5,
+                background: isNull ? "transparent" : ds("gray", 100),
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

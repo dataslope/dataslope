@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { DISTRICTS, signed } from "./data";
-import { DATA, DATA_INK, Drift, Headline, lerp, Marker, partial, Ring, STAT_INK, Svg } from "./parts";
+import { DATA, DATA_INK, Drift, Headline, lerp, Marker, MathVar, partial, Ring, STAT_INK, Svg } from "./parts";
 
 const XD = [10, 86] as const;
 const YD = [24, 94] as const;
@@ -128,7 +128,9 @@ export const UnitScene: React.FC = () => {
           dependsAt - 4,
           <>
             <Marker at={districtsAt - 2}>Districts</Marker>
-            <span style={{ opacity: ease(frame, nineAt - 6, 8) }}>: r = {signed(DISTRICTS.rGroup)}</span>
+            <span style={{ opacity: ease(frame, nineAt - 6, 8) }}>
+              : <MathVar>r</MathVar> = {signed(DISTRICTS.rGroup)}
+            </span>
           </>,
           DATA_INK,
           "average income, one dot per district",
@@ -139,7 +141,7 @@ export const UnitScene: React.FC = () => {
           <>
             <Marker at={peopleAt - 2}>People</Marker>, within a district
             <span style={{ opacity: ease(frame, sevenAt - 6, 8) }}>
-              : r = <span style={TABULAR}>{signed(DISTRICTS.rWithin)}</span>
+              : <MathVar>r</MathVar> = <span style={TABULAR}>{signed(DISTRICTS.rWithin)}</span>
               <span style={{ ...note(22, INK_SOFT), marginLeft: 10, opacity: ease(frame, averagesAt - 4, 10) }}>averaged over the six</span>
             </span>
           </>,
@@ -217,7 +219,7 @@ export const UnitScene: React.FC = () => {
         <Ring x={AGG.x0 + 230} y={top - 30} at={quoteAt - 2} color={DATA} r0={20} r1={90} />
         <Ring x={IND.x0 + 330} y={top - 30} at={quoteAt + 4} r0={20} r1={90} />
         <Note at={bothAt - 2} x={IND.x1 + 24} y={bottom - 80}>
-          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>same data,</span>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Same data,</span>
           <div style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>different unit</div>
         </Note>
       </Drift>

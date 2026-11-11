@@ -308,7 +308,7 @@ export const PriceScene: React.FC = () => {
       {/* The two totals, from the price charged and from today's. Each gloss
           is in the line's own face, Inter, so the line keeps one family. */}
       <Ink at={linesAt - 4} dur={16} style={{ left: STORE_X[0], top: y(800), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT), width: 250 }}>From its lines</span>
+        <span style={{ ...label(25, INK_SOFT), width: 250 }}>From its lines</span>
         <span style={{ ...note(28, INK) }}>{charged} =</span>
         <span style={{ ...note(30, INK), ...TABULAR, fontWeight: 500, ...lands(fortyFourAt) }}>
           <Mark at={paidAt - 2}>{fmt(Number(TOTAL_CHARGED), 2)}</Mark>
@@ -316,7 +316,7 @@ export const PriceScene: React.FC = () => {
         <span style={{ ...note(28, INK_SOFT), opacity: ease(frame, paidAt - 2, 12) }}>what she paid</span>
       </Ink>
       <Ink at={todayAt - 4} dur={16} style={{ left: STORE_X[0], top: y(856), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT), width: 250, display: "grid" }}>
+        <span style={{ ...label(25, INK_SOFT), width: 250, display: "grid" }}>
           <span style={{ gridArea: "1 / 1", opacity: 1 - swap }}>From today&rsquo;s prices</span>
           <span style={{ gridArea: "1 / 1", opacity: swap, color: ACCENT_INK, fontWeight: 500 }}>Without the copy</span>
         </span>

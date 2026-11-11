@@ -36,9 +36,10 @@ const B_TOP = 376;
 const PIECE_GAP = 32;
 /** The apply column: a bracket on each piece, an arrow, the piece's answer. */
 const BRACKET_X = B_X + CARD_W + 22;
-const ARROW_X0 = BRACKET_X + 14;
-const ARROW_X1 = ARROW_X0 + 82;
-const C_X = ARROW_X1 + 18;
+/** The arrow runs from the bracket to the answer's edge, with no gap. */
+const ARROW_X0 = BRACKET_X + 1;
+const ARROW_X1 = ARROW_X0 + 95;
+const C_X = ARROW_X1 + 2;
 
 /** Top of slot `s` of piece `k`, in layout units. */
 const pieceTop = (k: number, s: number) => {
@@ -145,9 +146,10 @@ export const SplitScene: React.FC = () => {
       <Header x={A_X} top={y(HEADER_Y)} width={CARD_W} at={open + 6} cols={FRAME_COLS} />
       {ROWS.map((r, i) => {
         const appear = ease(frame, sevenAt - 4 + i * 3, 12);
-        // A row dims as its copy lifts off, and comes back when the narration
-        // counts the rows that went in.
-        const dim = ease(frame, breakAt + i * 4 - 2, 10) * (1 - ease(frame, inAt - 6, 12));
+        // The frame dims as the copies start to lift off, all at once, so a
+        // copy in flight never crosses a row still at full strength; it comes
+        // back when the narration counts the rows that went in.
+        const dim = ease(frame, breakAt - 2, 10) * (1 - ease(frame, inAt - 6, 12));
         return (
           <RowCard
             key={r.index}
@@ -159,8 +161,9 @@ export const SplitScene: React.FC = () => {
       })}
       <Note at={inAt - 2} x={A_X} y={y(ROW0 + 7 * RH + 14)}>
         <span style={{ display: "flex", alignItems: "baseline", gap: 10, whiteSpace: "nowrap" }}>
-          <span style={headline(44)}>7</span>
-          <span style={body(28)}>rows in</span>
+          {/* The count and its words within 12% of each other: one line, one size. */}
+          <span style={headline(36)}>7</span>
+          <span style={body(34)}>rows in</span>
         </span>
       </Note>
 
@@ -243,8 +246,8 @@ export const SplitScene: React.FC = () => {
       <Header x={D_X} top={y(D_HEADER)} width={260} at={combineAt} cols={KEY_COLS} />
       <Note at={outAt - 2} x={D_X} y={y(D_ROW0 + 3 * RH + 14)}>
         <span style={{ display: "flex", alignItems: "baseline", gap: 10, whiteSpace: "nowrap" }}>
-          <span style={headline(44)}>{AGG.length}</span>
-          <span style={body(28)}>rows out</span>
+          <span style={headline(36)}>{AGG.length}</span>
+          <span style={body(34)}>rows out</span>
         </span>
       </Note>
     </AbsoluteFill>

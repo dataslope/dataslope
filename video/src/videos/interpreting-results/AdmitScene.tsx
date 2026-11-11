@@ -304,7 +304,7 @@ export const AdmitScene: React.FC = () => {
         ))}
 
         <Note at={dragsAt + 2} x={px(0.72)} y={rowY(0) + 40}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>line width: share of each group&apos;s applicants</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Line width: share of each group&apos;s applicants</span>
         </Note>
         <Ring x={px(DEPTS[1].women.rate)} y={rowY(2)} at={turnsAt - 2} color={GROUP_COLOR.women} r0={radius(600)} r1={radius(600) + 50} />
 

@@ -16,11 +16,17 @@ const TEXT = 24;
  *  (naive), or an answer read from the table (memo). */
 export type NodeLook = "call" | "repeat" | "lookup";
 
-const LOOK: Record<NodeLook, { fill: string; stroke: string; ink: string; dash?: string }> = {
-  call: { fill: PAPER, stroke: INK_SOFT, ink: INK },
-  repeat: { fill: `color-mix(in srgb, ${NAIVE} 20%, ${PAPER})`, stroke: NAIVE, ink: NAIVE_INK },
-  lookup: { fill: `color-mix(in srgb, ${MEMO} 14%, ${PAPER})`, stroke: MEMO, ink: MEMO_INK, dash: "7 5" },
+/** Filled shapes with no outline (the owner, 2026-11-11): a call in neutral
+ *  gray, a repeat in a red tint. A lookup does no work of its own, so it is
+ *  the one drawn as an outline, dashed: there the outline is the meaning. */
+export const NODE_LOOK: Record<NodeLook, { fill: string; stroke: string; ink: string; dash?: string }> = {
+  call: { fill: `color-mix(in srgb, var(--ds-gray-400) 24%, ${PAPER})`, stroke: "transparent", ink: INK },
+  repeat: { fill: `color-mix(in srgb, ${NAIVE} 22%, ${PAPER})`, stroke: "transparent", ink: NAIVE_INK },
+  lookup: { fill: PAPER, stroke: MEMO, ink: MEMO_INK, dash: "7 5" },
 };
+const LOOK = NODE_LOOK;
+/** The node's corner radius: rounded, not a pill. */
+const NODE_R = 8;
 
 /**
  * A node, centred on `x` with its top at `top` (page px, already through the
@@ -66,7 +72,7 @@ export const TreeNode: React.FC<{
           style={{
             position: "absolute",
             inset: -9,
-            borderRadius: NODE_H,
+            borderRadius: NODE_R + 9,
             background: HIGHLIGHT,
             opacity: glow,
           }}
@@ -78,7 +84,7 @@ export const TreeNode: React.FC<{
           y={1.5}
           width={w - 3}
           height={NODE_H - 3}
-          rx={(NODE_H - 3) / 2}
+          rx={NODE_R}
           fill={blend(a.fill, b.fill)}
           stroke={blend(a.stroke, b.stroke)}
           strokeWidth={2.4}
@@ -90,7 +96,7 @@ export const TreeNode: React.FC<{
             y={-6}
             width={w + 12}
             height={NODE_H + 12}
-            rx={(NODE_H + 12) / 2}
+            rx={NODE_R + 6}
             fill="none"
             stroke={NAIVE}
             strokeWidth={3}
@@ -141,8 +147,9 @@ export const TreeEdge: React.FC<{
   opacity?: number;
 }> = ({ from, to, draw, color = INK_SOFT, width = 1.8, opacity = 1 }) => {
   if (draw <= 0 || opacity <= 0) return null;
-  const [x1, y1] = [from[0], from[1] + NODE_H + 3];
-  const [x2, y2] = [to[0], to[1] - 3];
+  // From the parent's bottom edge to the child's top edge, with no gap.
+  const [x1, y1] = [from[0], from[1] + NODE_H - 1.5];
+  const [x2, y2] = [to[0], to[1] + 1.5];
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity }}>
       <path
@@ -150,7 +157,7 @@ export const TreeEdge: React.FC<{
         fill="none"
         stroke={color}
         strokeWidth={width}
-        strokeLinecap="round"
+        strokeLinecap="butt"
         pathLength={1}
         strokeDasharray={`${draw} 1`}
       />

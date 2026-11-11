@@ -2,13 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { W2V, W2V_PAPER } from "./data";
-import { DATA, DATA_INK, DATA_WASH, Headline, Kicker, Mark, pulse, SOFT, Svg, Tag, Wire } from "./parts";
+import { DATA, DATA_INK, DATA_WASH, Headline, Kicker, Mark, pulse, SHEET, SOFT, Svg, Tag, Wire } from "./parts";
 
 type Word = "man" | "woman" | "king" | "queen";
 
@@ -81,8 +81,7 @@ const PaperCard: React.FC<{
         height,
         opacity: p * (1 - o),
         transform: `translate(${(1 - p) * 30 + o * 30}px, 0) rotate(${(1 - p) * 1.5 - 0.5}deg)`,
-        background: PAPER,
-        border: `1.5px solid ${HAIRLINE}`,
+        background: SHEET,
         borderRadius: 3,
         boxSizing: "border-box",
       }}
@@ -224,8 +223,8 @@ export const VectorScene: React.FC = () => {
       <FigLabel n="12" title="The six words nearest to excellent" at={rememberAt - 2} x={LX} y={y(290)} />
       <Ink at={rememberAt} style={{ left: LX, top: LTOP - 4, whiteSpace: "nowrap" }}>
         <div style={{ ...label(22, INK_SOFT) }}>
-          in a bag of words, <span style={{ fontFamily: MONO, color: INK }}>great</span> and{" "}
-          <span style={{ fontFamily: MONO, color: INK }}>excellent</span> share <Mark at={columnsAt}>nothing</Mark>
+          In a bag of words, <span style={{ fontFamily: MONO, fontSize: "0.92em", color: INK }}>great</span> and{" "}
+          <span style={{ fontFamily: MONO, fontSize: "0.92em", color: INK }}>excellent</span> share <Mark at={columnsAt}>nothing</Mark>
         </div>
       </Ink>
       {W2V.excellent.map((w, i) => {

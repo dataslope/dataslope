@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ZIPF } from "./data";
-import { DATA, DATA_INK, DATA_WASH, drift, Headline, Kicker, LISTING_PAPER, Mark, pulse, Svg, Tag } from "./parts";
+import { DATA, DATA_INK, DATA_WASH, drift, Headline, Kicker, Mark, SHEET, pulse, Svg, Tag } from "./parts";
 
 /** The log-log frame: rank 1 to 10,000 across, count about 0.6 to 12,000 up. */
 const CX0 = 880;
@@ -68,9 +68,9 @@ export const ZipfScene: React.FC = () => {
   const TTOP = y(366);
   const ROW = 48;
   const COLS = [
-    { title: "rank", w: 80, align: "right" as const },
-    { title: "word", w: 170, align: "left" as const },
-    { title: "count", w: 140, align: "right" as const },
+    { title: "Rank", w: 80, align: "right" as const },
+    { title: "Word", w: 170, align: "left" as const },
+    { title: "Count", w: 140, align: "right" as const },
   ];
   const colX = COLS.map((_, i) => TX0 + COLS.slice(0, i).reduce((s, c) => s + c.w + 24, 0));
   /** The law aside sits past 1.2em from the table, so it reads as a note, not the same line. */
@@ -118,7 +118,7 @@ export const ZipfScene: React.FC = () => {
       <div style={{ opacity: 1 - settle * 0.25 }}>
         {COLS.map((c, i) => (
           <Ink key={c.title} at={from + 4 + i * 3} dur={12} style={{ left: colX[i], top: TTOP, width: c.w, textAlign: c.align }}>
-            <span style={{ ...label(21, INK_SOFT) }}>{c.title === "count" ? <Mark at={countedAt}>{c.title}</Mark> : c.title}</span>
+            <span style={{ ...label(21, INK_SOFT) }}>{c.title === "Count" ? <Mark at={countedAt}>{c.title}</Mark> : c.title}</span>
           </Ink>
         ))}
         <Svg opacity={ease(frame, from + 6, 12)}>
@@ -205,7 +205,7 @@ export const ZipfScene: React.FC = () => {
             <Ink at={b.at} dur={14} style={{ left: TX0, top: b.top, whiteSpace: "nowrap" }}>
               <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>{b.text}</span>
             </Ink>
-            <div style={{ position: "absolute", left: TX0, top: b.top + 30, width: BAR_W, height: 20, borderRadius: 4, background: LISTING_PAPER, border: `1px solid ${HAIRLINE}`, opacity: ease(frame, b.at, 10), boxSizing: "border-box" }} />
+            <div style={{ position: "absolute", left: TX0, top: b.top + 30, width: BAR_W, height: 20, borderRadius: 4, background: SHEET, opacity: ease(frame, b.at, 10), boxSizing: "border-box" }} />
             <div style={{ position: "absolute", left: TX0, top: b.top + 30, width: BAR_W * b.share * p, height: 20, borderRadius: 4, background: b.color, opacity: p > 0 ? 1 : 0 }} />
           </React.Fragment>
         );

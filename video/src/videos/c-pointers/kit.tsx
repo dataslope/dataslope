@@ -272,6 +272,9 @@ export const Marked: React.FC<{ p: number; color?: string; children: React.React
 export const markP = (frame: number, at: number, out?: number) =>
   ease(frame, at, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
 
+/** A plain box's fill: neutral gray. A tint mixes into it. */
+const PLAIN = `color-mix(in srgb, var(--ds-gray-400) 24%, ${PAPER})`;
+
 /**
  * One variable's box. It draws itself left to right, like the listing's
  * paper. `bytes` and `ticks` mark the bytes it spans along its top and
@@ -294,8 +297,8 @@ export const MemBox: React.FC<{
   if (p <= 0) return null;
   const fill =
     tint > 0
-      ? `color-mix(in srgb, ${tintColor} ${Math.round(tint * 100)}%, ${PAPER})`
-      : `color-mix(in srgb, ${INK} 3%, ${PAPER})`;
+      ? `color-mix(in srgb, ${tintColor} ${Math.round(tint * 100)}%, ${PLAIN})`
+      : PLAIN;
   const tick = Math.round(height * 0.14) * ticks;
   return (
     <div style={{ position: "absolute", left: x, top, width, height }}>
@@ -303,11 +306,10 @@ export const MemBox: React.FC<{
         style={{
           position: "absolute",
           inset: 0,
-          boxSizing: "border-box",
-          border: `2px solid ${INK}`,
+          // A filled box, no outline (the owner, 2026-11-11).
           borderRadius: 4,
           background: fill,
-          clipPath: `inset(-2px ${(1 - p) * 100}% -2px -2px)`,
+          clipPath: `inset(0 ${(1 - p) * 100}% 0 0)`,
         }}
       />
       {tick > 0
@@ -381,7 +383,8 @@ export const AddrLabel: React.FC<{
 }> = ({ x, y, name, addr, at, nameAt = at, mark = 0, tag }) => {
   const frame = useCurrentFrame();
   const tagP = tag ? markP(frame, tag.at, tag.out) : 0;
-  const nameStyle: React.CSSProperties = { fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK };
+  // The name and its address within 12% of each other (one line, one size).
+  const nameStyle: React.CSSProperties = { fontFamily: MONO, fontSize: 24, fontWeight: 500, color: INK };
   return (
     <div
       style={{
@@ -404,7 +407,7 @@ export const AddrLabel: React.FC<{
       </span>
       <Ink at={at} dur={14} style={{ position: "relative" }}>
         <span style={{ position: "relative", display: "inline-block" }}>
-          <span style={{ ...note(20, ADDR_INK), fontWeight: 500 }}>
+          <span style={{ ...note(22, ADDR_INK), fontWeight: 500 }}>
             <Marked p={mark}>{addr}</Marked>
           </span>
           {tagP > 0 ? (

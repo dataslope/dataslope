@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { fmt, halo, headline, HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { M } from "../../editorial/math";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -33,11 +34,12 @@ const NAMES: Record<string, string> = {
   slant_down: "slant down",
 };
 
-const ROWS: { key: keyof DinoStats; name: string }[] = [
-  { key: "meanX", name: "Mean of x" },
-  { key: "meanY", name: "Mean of y" },
-  { key: "sdX", name: "SD of x" },
-  { key: "sdY", name: "SD of y" },
+/** The row names, the variable in each set in the math face. */
+const ROWS: { key: keyof DinoStats; name: React.ReactNode }[] = [
+  { key: "meanX", name: <>Mean of <M>x</M></> },
+  { key: "meanY", name: <>Mean of <M>y</M></> },
+  { key: "sdX", name: <>SD of <M>x</M></> },
+  { key: "sdY", name: <>SD of <M>y</M></> },
   { key: "corr", name: "Correlation" },
 ];
 

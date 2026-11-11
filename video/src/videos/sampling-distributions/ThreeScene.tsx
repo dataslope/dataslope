@@ -395,7 +395,7 @@ export const ThreeScene: React.FC = () => {
       )}
       {/* Its own axis while it is built, said in the label row's free end. */}
       <Note at={thirdFrom + 8} x={X.x1} y={y(MEANS_LABEL) + 2} align="right" from="right" out={zoomAt}>
-        <span style={note(22, INK_SOFT)}>on its own axis, zoomed in</span>
+        <span style={note(22, INK_SOFT)}>On its own axis, zoomed in</span>
       </Note>
       <PileAxis scale={PX} z={z} base={y(MEANS_BASE)} at={thirdFrom + 2} />
       {/* Clipped to the axis: on $40-$60 a rare far average has no room. */}

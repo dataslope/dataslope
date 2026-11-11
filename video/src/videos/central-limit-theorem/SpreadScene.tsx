@@ -8,6 +8,7 @@ import { Marker, swell } from "../sampling/emphasis";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { histogram, SPREADS, WAIT_SD } from "./data";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import {
   ACCENT,
   ACCENT_INK,
@@ -109,8 +110,10 @@ export const SpreadScene: React.FC = () => {
         return (
           <React.Fragment key={r.n}>
             <Ink at={at - 4} dur={14} style={{ left: 120, top: Y(r.base - ROW_H - 18) }}>
-              <span style={{ ...body(34, true), color: INK }}>
-                n = {r.n}
+              <span style={{ ...body(34), color: INK }}>
+                <MathRun>
+                  <I>n</I> = {r.n}
+                </MathRun>
               </span>
             </Ink>
             <Bars
@@ -180,13 +183,15 @@ export const SpreadScene: React.FC = () => {
               position: "absolute",
               left: COLS[2] - TABLE_X,
               top: -10,
-              ...body(28, true),
+              ...body(28),
               color: INK,
               whiteSpace: "nowrap",
               opacity: ease(frame, rootAt - 4, 12),
             }}
           >
-            σ ÷ √n
+            <MathRun>
+              <I>σ</I> ÷ √<I>n</I>
+            </MathRun>
           </span>
         </div>
         <div style={{ height: 2, background: INK }} />
@@ -269,8 +274,10 @@ export const SpreadScene: React.FC = () => {
         <div style={{ ...body(30), color: INK, marginTop: 10 }}>
           <Marker at={thatSpreadAt - 2}>Spread of the average</Marker>
         </div>
-        <div style={{ ...headline(76, true), marginTop: 6 }}>
-          = σ ÷ √<span style={{ fontStyle: "italic" }}>n</span>
+        <div style={{ fontSize: 76, lineHeight: 1.1, color: INK, marginTop: 6 }}>
+          <MathRun>
+            = <I>σ</I> ÷ √<I>n</I>
+          </MathRun>
         </div>
         <div
           style={{
@@ -281,7 +288,12 @@ export const SpreadScene: React.FC = () => {
             transform: `scale(${swell(frame, deviationAt - 2, 0.1, 44)})`,
           }}
         >
-          <Marker at={deviationAt - 2}>σ, the population&apos;s spread</Marker>, is {fmt(WAIT_SD)} min.
+          <Marker at={deviationAt - 2}>
+            <MathRun>
+              <I>σ</I>
+            </MathRun>
+            , the population&apos;s spread
+          </Marker>, is {fmt(WAIT_SD)} min.
         </div>
       </Ink>
       <Ink at={fourAt - 2} dur={16} style={{ left: TABLE_X, top: Y(800), width: 530 }}>

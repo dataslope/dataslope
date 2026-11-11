@@ -13,6 +13,9 @@ const X = { lo: 0, hi: 280, x0: 230, x1: 1150 };
 const Y = { lo: 100, hi: 150 };
 const TOP = 330;
 const BOTTOM = 840;
+/** The causal sketch's nodes: a gray tint, fill only. */
+const NODE_H = 46;
+const NODE_FILL = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
 const BAND_NAME = ["age around 30", "around 45", "around 60", "around 75"];
 /** The causal sketch: three boxes. */
 const AGE = [1560, 420] as const;
@@ -77,13 +80,37 @@ export const ConfoundScene: React.FC = () => {
   const lowY = y(EXERCISE[1]);
   const diagram = ease(frame, drivesAt - 8, 12);
 
+  // A node is a gray tint with no outline (the owner, 2026-11-11), NODE_H
+  // tall and centred on its y, so the arrows can start and end on its edges.
   const box = (label_: string, x: number, yy: number, at: number, color = INK) => (
-    <Ink at={at} dur={12} style={{ left: x, top: yy - 26, whiteSpace: "nowrap" }}>
-      <div style={{ transform: "translateX(-50%)", padding: "8px 18px", border: `2px solid ${color}`, borderRadius: 8, background: PAPER, ...label(24, color) }}>
+    <Ink at={at} dur={12} style={{ left: x, top: yy - NODE_H / 2, whiteSpace: "nowrap" }}>
+      <div
+        style={{
+          transform: "translateX(-50%)",
+          height: NODE_H,
+          boxSizing: "border-box",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 18px",
+          borderRadius: 8,
+          background: NODE_FILL,
+          ...label(24, color),
+        }}
+      >
         {label_}
       </div>
     </Ink>
   );
+  /** Where a line from one node's centre to another's crosses the first
+   *  node's top or bottom edge, `sign` 1 for the bottom. */
+  const edge = (from: readonly [number, number], to: readonly [number, number], sign: 1 | -1): [number, number] => {
+    const dy = to[1] - from[1];
+    const t = (sign * NODE_H) / 2 / dy;
+    return [from[0] + (to[0] - from[0]) * t, from[1] + dy * t];
+  };
+  const ageC = [AGE[0], ageY] as const;
+  const exC = [EXERCISE[0], lowY] as const;
+  const bpC = [PRESSURE[0], lowY] as const;
 
   return (
     <AbsoluteFill>
@@ -236,8 +263,10 @@ export const ConfoundScene: React.FC = () => {
       <Svg opacity={diagram}>
         <line x1={EXERCISE[0] + 72} x2={PRESSURE[0] - 106} y1={lowY} y2={lowY} stroke={INK_SOFT} strokeWidth={2} strokeDasharray="3 6" />
       </Svg>
-      <Arrow from={[AGE[0] - 30, ageY + 34]} to={[EXERCISE[0] + 20, lowY - 34]} at={drivesAt - 4} dur={14} dim={coinAt + 6} />
-      <Arrow from={[AGE[0] + 30, ageY + 34]} to={[PRESSURE[0] - 20, lowY - 34]} at={drivesAt + 2} dur={14} />
+      {/* From the edge of Age to the edge of each node it drives, along the
+          line between their centres. */}
+      <Arrow from={edge(ageC, exC, 1)} to={edge(exC, ageC, -1)} at={drivesAt - 4} dur={14} dim={coinAt + 6} />
+      <Arrow from={edge(ageC, bpC, 1)} to={edge(bpC, ageC, -1)} at={drivesAt + 2} dur={14} />
       {box("Age", AGE[0], ageY, drivesAt - 8)}
       {box("Exercise", EXERCISE[0], lowY, drivesAt - 6)}
       {box("Blood pressure", PRESSURE[0], lowY, drivesAt - 4)}
@@ -265,7 +294,7 @@ export const ConfoundScene: React.FC = () => {
         </Svg>
       ) : null}
       <Spot id="interpreting-results-coin" at={coinAt - 6} left={1230} top={y(760)} width={180} height={200} />
-      <Arrow from={[1390, y(790)]} to={[EXERCISE[0], lowY + 32]} at={coinAt + 4} dur={12} color={STAT} />
+      <Arrow from={[1390, y(790)]} to={[EXERCISE[0], lowY + NODE_H / 2]} at={coinAt + 4} dur={12} color={STAT} />
       <Note at={randomAt - 2} x={1440} y={y(800)}>
         <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
           randomize who <Marker at={cantAt - 4}>exercises</Marker>

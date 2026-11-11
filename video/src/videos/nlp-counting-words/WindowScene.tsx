@@ -6,6 +6,7 @@ import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, label, SERIF_ITALIC 
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { I, MathRun } from "../../editorial/math";
 import { WINDOW } from "./data";
 import { flow, Kicker, lerp, Marked, numStyle, REPEAT_WASH, Svg, Tile, tileH, tileW } from "./parts";
 
@@ -134,17 +135,33 @@ export const WindowScene: React.FC = () => {
       {/* What an n-gram is. */}
       <Ink at={ngramAt - 4} dur={16} style={{ left: X0, top: y(280), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36), color: INK }}>
-          An <span style={{ fontStyle: SERIF_ITALIC }}>n-gram</span>: <Slot at={rowAt - 2}>n words in a row.</Slot>
+          An <span style={{ fontStyle: SERIF_ITALIC }}>n-gram</span>:{" "}
+          <Slot at={rowAt - 2}>
+            <MathRun>
+              <I>n</I>
+            </MathRun>{" "}
+            words in a row.
+          </Slot>
         </span>
       </Ink>
       <Note at={bigramAt - 2} x={X0 + 640} y={y(280) + 4}>
         <div style={{ ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          bigram <span style={{ ...numStyle(26, INK_SOFT) }}>n = 2</span>
+          bigram{" "}
+          <span style={{ ...numStyle(24, INK_SOFT) }}>
+            <MathRun>
+              <I>n</I> = 2
+            </MathRun>
+          </span>
         </div>
       </Note>
       <Note at={trigramAt - 2} x={X0 + 900} y={y(280) + 4}>
         <div style={{ ...label(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          trigram <span style={{ ...numStyle(26, INK_SOFT) }}>n = 3</span>
+          trigram{" "}
+          <span style={{ ...numStyle(24, INK_SOFT) }}>
+            <MathRun>
+              <I>n</I> = 3
+            </MathRun>
+          </span>
         </div>
       </Note>
 
@@ -166,16 +183,16 @@ export const WindowScene: React.FC = () => {
       ))}
       <Svg>
         {biOn > 0 ? (
-          <rect x={bl} y={tiles[0].y - 9} width={br - bl} height={th + 18} rx={12} fill="none" stroke={ACCENT} strokeWidth={3.5} opacity={biOn} />
+          <rect x={bl} y={tiles[0].y - 9} width={br - bl} height={th + 18} rx={8} fill="none" stroke={ACCENT} strokeWidth={3.5} opacity={biOn} />
         ) : null}
         {triOn > 0 ? (
-          <rect x={tl} y={tiles[0].y - 9} width={tr - tl} height={th + 18} rx={12} fill="none" stroke={ACCENT} strokeWidth={3.5} opacity={triOn} />
+          <rect x={tl} y={tiles[0].y - 9} width={tr - tl} height={th + 18} rx={8} fill="none" stroke={ACCENT} strokeWidth={3.5} opacity={triOn} />
         ) : null}
       </Svg>
 
       {/* What the windows framed. */}
       <Ink at={biSteps[0]} dur={12} style={{ left: X0, top: biY, height: tileH(CHIP), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK), fontWeight: 500 }}>bigrams</span>
+        <span style={{ ...label(24, INK), fontWeight: 500 }}>Bigrams</span>
       </Ink>
       {chipList(WINDOW.bigrams, biSteps, biY, (i) => (i < 2 ? overlapAt + i * 4 : undefined))}
       {/* "four bigrams": each chip counted in turn. */}
@@ -196,20 +213,21 @@ export const WindowScene: React.FC = () => {
       <Note at={fourAt - 2} x={biRight + 16} y={biY}>
         <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...numStyle(26, ACCENT_INK) }}>
           {WINDOW.bigrams.length}
-          <span style={{ ...label(22, INK_SOFT), marginLeft: 10, fontWeight: 500, opacity: ease(frame, minusAt - 2, 10) }}>
-            = {tokens.length} − 2 + 1
+          {/* The arithmetic in the math face, at the count's size. */}
+          <span style={{ ...label(24, INK_SOFT), marginLeft: 10, fontWeight: 500, opacity: ease(frame, minusAt - 2, 10) }}>
+            <MathRun>= {tokens.length} − 2 + 1</MathRun>
           </span>
         </div>
       </Note>
       <Ink at={triSteps[0]} dur={12} style={{ left: X0, top: triY, height: tileH(CHIP), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, INK), fontWeight: 500 }}>trigrams</span>
+        <span style={{ ...label(24, INK), fontWeight: 500 }}>Trigrams</span>
       </Ink>
       {chipList(WINDOW.trigrams, triSteps, triY)}
       <Note at={triSteps[2] + 6} x={triRight + 16} y={triY}>
         <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...numStyle(26, ACCENT_INK) }}>
           {WINDOW.trigrams.length}
-          <span style={{ ...label(22, INK_SOFT), marginLeft: 10, fontWeight: 500, opacity: ease(frame, minusAt + 4, 10) }}>
-            = {tokens.length} − 3 + 1
+          <span style={{ ...label(24, INK_SOFT), marginLeft: 10, fontWeight: 500, opacity: ease(frame, minusAt + 4, 10) }}>
+            <MathRun>= {tokens.length} − 3 + 1</MathRun>
           </span>
         </div>
       </Note>
@@ -217,7 +235,15 @@ export const WindowScene: React.FC = () => {
       {/* The count, in words. */}
       <Ink at={numberAt - 4} dur={18} style={{ left: X0, top: y(800), whiteSpace: "nowrap" }}>
         <span style={{ ...body(38), color: INK }}>
-          n-grams = number of words <Slot at={minusAt - 2}>− n</Slot> <Slot at={plusAt - 2}>+ 1</Slot>
+          n-grams = number of words{" "}
+          <Slot at={minusAt - 2}>
+            <MathRun>
+              − <I>n</I>
+            </MathRun>
+          </Slot>{" "}
+          <Slot at={plusAt - 2}>
+            <MathRun>+ 1</MathRun>
+          </Slot>
         </span>
       </Ink>
     </AbsoluteFill>

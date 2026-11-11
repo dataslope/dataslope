@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, headline, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { ACCENT_INK, headline, INK, INK_SOFT, label } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -42,7 +42,8 @@ const Slip: React.FC<{ pts: readonly (readonly [number, number])[]; at: number; 
   return (
     <Svg opacity={ease(frame, at, 8) * (1 - o)}>
       <g transform={`translate(${x} ${y})`}>
-        <rect x={-15} y={-11} width={30} height={22} rx={2} fill={PAPER} stroke={INK} strokeWidth={1.8} />
+        {/* A slip of paper: a filled sheet, no outline. */}
+        <rect x={-15} y={-11} width={30} height={22} rx={2} fill="color-mix(in srgb, var(--ds-gray-400) 40%, transparent)" />
         <line x1={-8} x2={8} y1={-3} y2={-3} stroke={INK_SOFT} strokeWidth={1.6} />
         <line x1={-8} x2={4} y1={3} y2={3} stroke={INK_SOFT} strokeWidth={1.6} />
       </g>

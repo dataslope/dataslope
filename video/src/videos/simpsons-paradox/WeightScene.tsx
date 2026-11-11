@@ -134,7 +134,8 @@ export const WeightScene: React.FC = () => {
       <Note at={weightedAt + 6} x={menX} y={y(328)} align="left" style={{ transform: "translateX(-50%)" }}>
         <span style={{ ...label(21, COLOR_INK.men), whiteSpace: "nowrap" }}>Men, {pct(TOTAL.men.rate)}</span>
       </Note>
-      <Note at={aheadAt} x={px(WOMEN_AT_MEN_MIX) + 190} y={y(ROWS[1].top) + h(BAR_H) / 2 - 14}>
+      {/* Under the rate it qualifies, on a line of its own. */}
+      <Note at={aheadAt} x={px(WOMEN_AT_MEN_MIX) + 20} y={y(ROWS[1].top) + h(BAR_H) / 2 + 34}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           {((WOMEN_AT_MEN_MIX - TOTAL.men.rate) * 100).toFixed(1)} points ahead of the men
         </span>

@@ -17,9 +17,9 @@ const X1_NARROW = 860;
 
 /** A row of the when-to-use table: a small shape, the case, the center. */
 const ROWS = [
-  { beat: "symmetric", word: "Symmetric", center: "mean", what: "Symmetric, no wild values", answer: "Mean", red: true, sub: "uses every value" },
-  { beat: "skewed", word: "Skewed", center: "median", what: "Skewed, or outliers", answer: "Median", red: false, sub: "incomes, prices, wait times" },
-  { beat: "categories", word: "Categories", center: "mode", what: "Categories", answer: "Mode", red: false, sub: "the most common one" },
+  { beat: "symmetric", word: "Symmetric", center: "mean", what: "Symmetric, no wild values", answer: "Mean", red: true, sub: "Uses every value" },
+  { beat: "skewed", word: "Skewed", center: "median", what: "Skewed, or outliers", answer: "Median", red: false, sub: "Incomes, prices, wait times" },
+  { beat: "categories", word: "Categories", center: "mode", what: "Categories", answer: "Mode", red: false, sub: "The most common one" },
   { beat: "peaks", word: "two peaks", center: "single", what: "Two peaks", answer: "No single center", red: false, sub: "" },
 ] as const;
 

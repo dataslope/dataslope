@@ -2,11 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK_SOFT, label, note, INK } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { DRAWS, ROWS, SEED, TOKENS, UNIFORMS } from "./data";
-import { FILL, Legend, Marked, TEXT, TINT } from "./kit";
+import { Legend, Marked, TEXT, TINT } from "./kit";
 
 /** Rows of tiles, in layout y, and the tiles' columns. */
 const ROW_Y = (k: number) => 344 + k * 112;
@@ -117,7 +118,9 @@ export const DrawScene: React.FC = () => {
             />
             <Ink at={rowAt(k) - 6} dur={12} style={{ left: 120, top: top + h(TILE_H) / 2 - 24 }}>
               <span style={{ ...headline(40), fontVariantNumeric: "tabular-nums lining-nums", whiteSpace: "nowrap" }}>
-                T = {r.t.toFixed(1)}
+                <MathRun style={{ fontVariantNumeric: "tabular-nums lining-nums" }}>
+                  <I>T</I> = {r.t.toFixed(1)}
+                </MathRun>
               </span>
             </Ink>
             {r.draws.map((tok, j) => {
@@ -134,7 +137,6 @@ export const DrawScene: React.FC = () => {
                     height: h(TILE_H),
                     boxSizing: "border-box",
                     background: TINT[tok],
-                    borderBottom: `4px solid ${FILL[tok]}`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",

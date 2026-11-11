@@ -103,7 +103,8 @@ export const CacheScene: React.FC = () => {
   const dot = (v: keyof typeof ROWS): Pt => cellDot(CELL_X, rowTop(v), CELL_W, rowH);
   const stripTop = y(STRIP_TOP);
   const stripH = h(STRIP_H);
-  const under = stripTop + stripH + 8;
+  // The references end on the cached object's edge, with no gap.
+  const under = stripTop + stripH + 1;
 
   const lowMark = markP(frame, lowAt - 2, insideAt - 6);
   const highMark = markP(frame, highAt - 2, insideAt - 6);
@@ -171,10 +172,9 @@ export const CacheScene: React.FC = () => {
           top: frameTop,
           width: CELL_W + 32,
           height: frameBottom - frameTop,
-          boxSizing: "border-box",
-          border: `1.5px solid ${HAIRLINE}`,
+          // A filled panel, no outline: the cells on it are a deeper gray.
           borderRadius: 8,
-          background: `color-mix(in srgb, ${INK} 2%, ${PAPER})`,
+          background: `color-mix(in srgb, var(--ds-gray-400) 9%, ${PAPER})`,
           opacity: ease(frame, insideAt - 6, 14),
         }}
       />
@@ -236,9 +236,12 @@ export const CacheScene: React.FC = () => {
         at={bothAt + 6}
         dur={20}
       />
-      <Note at={sameAt + 4} x={LAST.x + BOX_W + 40} y={mid("a") - 22}>
-        <Verdict expr="a == b" value={BOXED.aSameB} size={30} />
-        <div style={{ ...note(20, INK_SOFT), marginTop: 12 }}>one cached object</div>
+      {/* Each verdict and its gloss share a line, within 12% of each other. */}
+      <Note at={sameAt + 4} x={LAST.x + BOX_W + 40} y={mid("a") - 18}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "0.8em", fontSize: 26, whiteSpace: "nowrap" }}>
+          <Verdict expr="a == b" value={BOXED.aSameB} size={26} />
+          <span style={note(24, INK_SOFT)}>one cached object</span>
+        </div>
       </Note>
 
       {/* x and y: two new objects. */}
@@ -258,19 +261,19 @@ export const CacheScene: React.FC = () => {
             tint={ease(frame, newAt + 4, 12) * 0.22}
             tintColor={FRESH_TINT}
           />
-          <RefArrow points={[dot(v), [NEW_X - 8, mid(v)]]} dotAt={outsideAt + 6 + k * 2} at={newAt + k * 4} dur={14} />
+          <RefArrow points={[dot(v), [NEW_X - 1, mid(v)]]} dotAt={outsideAt + 6 + k * 2} at={newAt + k * 4} dur={14} />
         </React.Fragment>
       ))}
-      <Note at={differAt - 2} x={VERDICT_X} y={mid("x") - 20}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: "0.8em" }}>
-          <Verdict expr="x == y" value={BOXED.xSameY} size={30} />
-          <span style={note(20, INK_SOFT)}>two objects</span>
+      <Note at={differAt - 2} x={VERDICT_X} y={mid("x") - 17}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "0.8em", fontSize: 26, whiteSpace: "nowrap" }}>
+          <Verdict expr="x == y" value={BOXED.xSameY} size={26} />
+          <span style={note(24, INK_SOFT)}>two objects</span>
         </div>
       </Note>
-      <Note at={differAt + 10} x={VERDICT_X} y={mid("y") - 20}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: "0.8em" }}>
-          <Verdict expr="x.equals(y)" value={BOXED.xEqualsY} size={30} />
-          <span style={note(20, INK_SOFT)}>same value</span>
+      <Note at={differAt + 10} x={VERDICT_X} y={mid("y") - 17}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "0.8em", fontSize: 26, whiteSpace: "nowrap" }}>
+          <Verdict expr="x.equals(y)" value={BOXED.xEqualsY} size={26} />
+          <span style={note(24, INK_SOFT)}>same value</span>
         </div>
       </Note>
 
@@ -283,6 +286,9 @@ export const CacheScene: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+/** A cached Integer's fill: neutral gray, as the kit's cells. */
+const CELL_FILL = `color-mix(in srgb, var(--ds-gray-400) 24%, ${PAPER})`;
 
 /** One cached Integer in the strip: its value, in the number ink. */
 const HeapCell: React.FC<{
@@ -305,13 +311,12 @@ const HeapCell: React.FC<{
         top,
         width: BOX_W,
         height,
-        boxSizing: "border-box",
-        border: `2px solid ${INK}`,
-        borderRadius: 8,
+        // A filled cell, no outline (the owner, 2026-11-11).
+        borderRadius: 5,
         background:
           tint > 0
-            ? `color-mix(in srgb, ${SHARED_TINT} ${Math.round(tint * 100)}%, ${PAPER})`
-            : `color-mix(in srgb, ${INK} 3%, ${PAPER})`,
+            ? `color-mix(in srgb, ${SHARED_TINT} ${Math.round(tint * 100)}%, ${CELL_FILL})`
+            : CELL_FILL,
         opacity: p,
         transform: `translateY(${(1 - p) * 10}px)`,
         display: "flex",

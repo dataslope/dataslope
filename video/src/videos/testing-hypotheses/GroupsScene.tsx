@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ANOVA, jitter, PAIRWISE, WAREHOUSES } from "./data";
-import { Count, DOT, Head, Kicker, Label, Mark, pct, pulse, RAW, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { Count, DOT, Head, Kicker, Label, Mark, MathVar, pct, pulse, RAW, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 /** Five groups in a ring, drawn centred on the page until F arrives, then slid here. */
 const RING = { x: 440, y: 560, r: 170 };
@@ -150,7 +150,7 @@ export const GroupsScene: React.FC = () => {
         ))}
         <Note at={sameAt - 2} x={160} y={ry(RING.y + RING.r + 110)}>
           <Label size={22} color={INK_SOFT} weight={520}>
-            all five drawn from the same process
+            All five drawn from the same process
           </Label>
         </Note>
         <Note at={thirtyAt - 4} x={160} y={ry(RING.y + RING.r + 110) + 40}>
@@ -164,13 +164,13 @@ export const GroupsScene: React.FC = () => {
               transformOrigin: "0 50%",
             }}
           >
-            some pair fires in <Count at={thirtyAt - 4} to={PAIRWISE.rate} dur={20} format={(v) => pct(v, 0)} /> of{" "}
+            Some pair fires in <Count at={thirtyAt - 4} to={PAIRWISE.rate} dur={20} format={(v) => pct(v, 0)} /> of{" "}
             {fmt(PAIRWISE.trials, 0)} trials
           </span>
         </Note>
         <Note at={manyAt - 2} x={160} y={ry(RING.y + RING.r + 110) + 84}>
           <Label size={21} color={INK_SOFT} weight={520}>
-            the many-looks problem, again
+            The many-looks problem, again
           </Label>
         </Note>
         <Note at={anyAt + 6} x={RING.x} y={ry(RING.y - RING.r - 130)} from="up">
@@ -183,7 +183,9 @@ export const GroupsScene: React.FC = () => {
       {/* ── F: between over within ── */}
       <Ink at={fAt - 4} dur={16} style={{ left: W.x0, top: y(310), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 22 }}>
         {/* "F =" at the size of the terms it equals, as the t-test scene sets "t =". */}
-        <span style={{ ...body(34, true), color: INK }}>F =</span>
+        <span style={{ ...body(34), color: INK }}>
+          <MathVar>F</MathVar> =
+        </span>
         <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
           <span style={{ ...body(32, true), color: STAT_INK, opacity: ease(frame, betweenAt - 4, 12) }}>
             <Mark at={groupMeansAt}>spread between the group means</Mark>
@@ -195,9 +197,9 @@ export const GroupsScene: React.FC = () => {
       {/* The baseline that makes twelve mean something. */}
       <Ink at={noDiffAt - 2} dur={14} style={{ left: W.x0, top: y(310) + 112, whiteSpace: "nowrap" }}>
         <Label size={24} color={INK_SOFT} weight={520}>
-          no real difference:{" "}
+          No real difference:{" "}
           <span style={{ color: INK, opacity: ease(frame, nearOneAt - 4, 12) }}>
-            F ≈ 1
+            <MathVar>F</MathVar> ≈ 1
           </span>
         </Label>
       </Ink>
@@ -270,11 +272,13 @@ export const GroupsScene: React.FC = () => {
       </Note>
       <Note at={wareAt + 24} x={W.x0} y={y(AXIS) + 72}>
         <Label size={21} color={INK} weight={520}>
-          black bars: the spread within, at the scale of a mean (SD ÷ √{WAREHOUSES[0].values.length})
+          Black bars: the spread within, at the scale of a mean (SD ÷ √{WAREHOUSES[0].values.length})
         </Label>
       </Note>
       <Note at={twelveAt - 4} x={W.x1} y={y(ROW_Y[0]) - h(52) - 52} align="right">
-        <span style={{ ...note(34, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>F = {fmt(ANOVA.F, 1)}</span>
+        <span style={{ ...note(34, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
+          <MathVar>F</MathVar> = {fmt(ANOVA.F, 1)}
+        </span>
       </Note>
       <Spot id="testing-hypotheses-alarm" at={whichAt - 6} left={240} top={y(470)} width={260} height={260} />
       <Note at={whichAt - 2} x={170} y={y(470) + 290}>

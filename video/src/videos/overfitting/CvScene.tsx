@@ -103,7 +103,7 @@ export const CvScene: React.FC = () => {
 
       {/* a: who is held out in each round. */}
       <Ink at={splitAt - 8} dur={14} style={{ left: 120, top: y(300), display: "flex", alignItems: "baseline", gap: 14 }}>
-        <span style={label(22, INK_SOFT)}>a</span>
+        <span style={{ ...body(30), color: INK_SOFT }}>a</span>
         <span style={{ ...body(30, true), color: INK }}>Who is held out, round by round</span>
       </Ink>
       {ROUNDS.map((k) => {
@@ -143,7 +143,7 @@ export const CvScene: React.FC = () => {
 
       {/* b: the error averaged over the five rounds. */}
       <Ink at={rotateAt - 4} dur={14} style={{ left: 1080, top: y(300), display: "flex", alignItems: "baseline", gap: 14 }}>
-        <span style={label(22, INK_SOFT)}>b</span>
+        <span style={{ ...body(30), color: INK_SOFT }}>b</span>
         <span style={{ ...body(30, true), color: INK }}>Average error on the held-out fold</span>
       </Ink>
       <Grid

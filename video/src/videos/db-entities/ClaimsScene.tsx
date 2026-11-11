@@ -26,8 +26,8 @@ const RIBBON_CY = 714;
 
 /** The two sides of the lesson's callout, "When in doubt, constrain what you control". */
 const SIDES = [
-  { x: 120, head: "What you control", items: "statuses, roles, internal codes", verdict: "Be strict" },
-  { x: 760, head: "What the world sends", items: "names, addresses", verdict: "Go easy" },
+  { x: 120, head: "What you control", items: "Statuses, roles, internal codes", verdict: "Be strict" },
+  { x: 760, head: "What the world sends", items: "Names, addresses", verdict: "Go easy" },
 ] as const;
 /** The gap between the two sides, where their hairline sits: centred between the
  *  first side's longest line and the second side's left edge. */

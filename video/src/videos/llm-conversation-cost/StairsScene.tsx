@@ -38,14 +38,17 @@ import {
   X0,
 } from "./kit";
 
+/** A bubble before it fills: a light gray, no outline. */
+const BUBBLE_GRAY = `color-mix(in srgb, ${LINE_EDGE} 22%, ${PAPER})`;
+
 /** The chat as the app sends it: role, x, width (layout px). */
 const BUBBLES = [
-  { text: "system prompt", x: 200, w: 560, r: 6 },
-  { text: "your message", x: 500, w: 260, r: 16 },
-  { text: "reply", x: 200, w: 380, r: 16 },
-  { text: "your message", x: 500, w: 260, r: 16 },
-  { text: "reply", x: 200, w: 380, r: 16 },
-  { text: "your next message", x: 460, w: 300, r: 16 },
+  { text: "system prompt", x: 200, w: 560, r: 4 },
+  { text: "your message", x: 500, w: 260, r: 10 },
+  { text: "reply", x: 200, w: 380, r: 10 },
+  { text: "your message", x: 500, w: 260, r: 10 },
+  { text: "reply", x: 200, w: 380, r: 10 },
+  { text: "your next message", x: 460, w: 300, r: 10 },
 ];
 const BUBBLE_Y = 372;
 const BUBBLE_H = 48;
@@ -250,8 +253,8 @@ export const StairsScene: React.FC = () => {
               height: BUBBLE_H,
               borderRadius: b.r,
               boxSizing: "border-box",
-              border: `2px solid ${isNew ? mix(LINE_EDGE, NEW, fill) : LINE_EDGE}`,
-              background: `color-mix(in srgb, ${isNew ? NEW : SENT} ${Math.round(fill * 100)}%, ${PAPER})`,
+              // A fill, no outline: gray until it takes its hue.
+              background: `color-mix(in srgb, ${isNew ? NEW : SENT} ${Math.round(fill * 100)}%, ${BUBBLE_GRAY})`,
               display: "flex",
               alignItems: "center",
               paddingLeft: 18,
@@ -454,21 +457,18 @@ export const StairsScene: React.FC = () => {
         </Key>
       </div>
       <Note at={longAt + 4} x={RX} y={y(500) + 40}>
-        <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
-          <span style={{ ...headline(54), color: LINE_EDGE, ...TABULAR }}>×2</span>
-          <span style={note(22, INK_SOFT)}>twice as long</span>
-        </span>
+        {/* The hero number on its own line, its gloss under it. */}
+        <div style={{ ...headline(54), color: LINE_EDGE, ...TABULAR }}>×2</div>
+        <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>twice as long</div>
       </Note>
-      <div style={{ position: "absolute", left: RX, top: y(660) }}>
+      <div style={{ position: "absolute", left: RX, top: y(700) }}>
         <Key at={triAt} swatch={TRI_FILL} edge={TRI}>
           the triangle
         </Key>
       </div>
-      <Note at={fourAt} x={RX} y={y(660) + 40}>
-        <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
-          <span style={{ ...headline(54), color: TRI_INK, ...TABULAR }}>×4</span>
-          <span style={note(22, INK_SOFT)}>twice as long and tall</span>
-        </span>
+      <Note at={fourAt} x={RX} y={y(700) + 40}>
+        <div style={{ ...headline(54), color: TRI_INK, ...TABULAR }}>×4</div>
+        <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>twice as long and tall</div>
       </Note>
 
       {/* Doubling: twenty turns, then forty. */}

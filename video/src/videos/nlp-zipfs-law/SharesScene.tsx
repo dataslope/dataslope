@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { fmt, HAIRLINE, INK, INK_SOFT, note, TABULAR } from "../../editorial/style";
+import { fmt, INK, INK_SOFT, note, TABULAR } from "../../editorial/style";
 import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -82,7 +82,6 @@ export const SharesScene: React.FC = () => {
         width: SW * ease(frame, at, 18),
         height,
         background: EMPTY,
-        border: `1px solid ${HAIRLINE}`,
         boxSizing: "border-box",
         borderRadius: 4,
       }}

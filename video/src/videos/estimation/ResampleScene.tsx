@@ -5,6 +5,7 @@ import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, HAIRLINE, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -138,13 +139,19 @@ export const ResampleScene: React.FC = () => {
 
       {/* The mean's own formula, which stands, beside the median's, which
           doesn't exist. */}
-      <Ink at={formulaWordAt - 4} dur={14} out={treatAt - 8} style={{ left: 1100, top: y(262), whiteSpace: "nowrap", display: "flex", gap: 64 }}>
+      <Ink at={formulaWordAt - 4} dur={14} out={treatAt - 8} style={{ left: 1100, top: y(262), whiteSpace: "nowrap", display: "flex", gap: 32 }}>
         <div>
-          <div style={label(20, INK_SOFT)}>a mean’s standard error</div>
-          <div style={{ ...headline(48), marginTop: 6 }}>s ÷ √n</div>
+          <div style={label(20, INK_SOFT)}>A mean’s standard error</div>
+          <div style={{ fontSize: 48, lineHeight: 1.02, color: INK, marginTop: 6 }}>
+            <MathRun>
+              <I>s</I> ÷ √<I>n</I>
+            </MathRun>
+          </div>
         </div>
+        {/* Two columns side by side: a hairline between them (README). */}
+        <div style={{ width: 1, alignSelf: "stretch", background: HAIRLINE, opacity: ease(frame, uglyAt - 4, 12) }} />
         <div style={{ opacity: ease(frame, uglyAt - 4, 12) }}>
-          <div style={label(20, INK_SOFT)}>a median’s</div>
+          <div style={label(20, INK_SOFT)}>A median’s</div>
           <div style={{ ...headline(48), marginTop: 6, color: EST_INK, opacity: ease(frame, existAt - 4, 12) }}>?</div>
         </div>
       </Ink>
@@ -263,13 +270,19 @@ export const ResampleScene: React.FC = () => {
         <div style={{ height: 1, background: HAIRLINE, marginBottom: 12 }} />
         <div style={label(21, INK_SOFT)}>Standard error</div>
       </Ink>
-      <Ink at={fourEightAt - 4} dur={14} style={{ left: COL, top: y(738), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
-        <span style={{ ...headline(52), color: EST_INK }}>{fmt(BOOT.bootSe)}</span>
-        <span style={body(26, true)}>the bootstrap’s spread</span>
+      {/* Each value and its gloss on one line at one size. */}
+      <Ink at={fourEightAt - 4} dur={14} style={{ left: COL, top: y(738), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: "0.3em", fontSize: 30 }}>
+        <span style={{ ...headline(31), color: EST_INK }}>{fmt(BOOT.bootSe)}</span>
+        <span style={body(30, true)}>the bootstrap’s spread</span>
       </Ink>
-      <Ink at={formulaAt - 4} dur={14} style={{ left: COL, top: y(800), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
-        <span style={{ ...headline(52), opacity: ease(frame, fourNineAt - 4, 10) }}>{fmt(BOOT.formulaSe)}</span>
-        <span style={body(26, true)}>the formula, s ÷ √{BOOT.n}</span>
+      <Ink at={formulaAt - 4} dur={14} style={{ left: COL, top: y(788), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: "0.3em", fontSize: 30 }}>
+        <span style={{ ...headline(31), opacity: ease(frame, fourNineAt - 4, 10) }}>{fmt(BOOT.formulaSe)}</span>
+        <span style={body(30, true)}>
+          the formula,{" "}
+          <MathRun>
+            <I>s</I> ÷ √{BOOT.n}
+          </MathRun>
+        </span>
       </Ink>
       <Note at={longAt - 4} x={COL} y={y(880)} out={payoffAt - 6}>
         <span style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>For a mean, the long way round.</span>

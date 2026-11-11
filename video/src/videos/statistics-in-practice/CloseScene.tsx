@@ -19,7 +19,7 @@ const JIT = 26;
 const JIT_A = jitter(140, CALLBACK.n);
 const JIT_B = jitter(141, CALLBACK.n);
 /** The course, in the order it built its tools. */
-const TOOLS = ["distributions", "standard errors", "intervals", "tests", "effect sizes", "experiments"];
+const TOOLS = ["Distributions", "Standard errors", "Intervals", "Tests", "Effect sizes", "Experiments"];
 
 /**
  * The close, for the whole course: its first picture (two groups of forty
@@ -135,7 +135,7 @@ export const CloseScene: React.FC = () => {
         </Ink>
         {/* The course's first answer: the two groups were one process. */}
         <Note at={answerFrom + 4} x={X.x1 + 50} y={y((ROW_A + ROW_B) / 2) - 28}>
-          <span style={{ ...note(21, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>both drawn from</span>
+          <span style={{ ...note(21, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>Both drawn from</span>
           <span style={{ ...note(21, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>the same process</span>
         </Note>
         <div style={{ position: "absolute", left: 160, top: y(668), display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...body(48, true) }}>

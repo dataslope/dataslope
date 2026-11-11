@@ -2,12 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { body, fmt, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CHI } from "./data";
-import { Count, DATA, DATA_INK, Greek, Head, Label, Mark, pulse, STAT, STAT_INK, Svg } from "./parts";
+import { Count, DATA, DATA_INK, Head, Label, Mark, MathVar, pulse, STAT, STAT_INK, Svg } from "./parts";
 
 const LABEL_X = 160;
 const COL_X = { stayed: 470, churned: 1130 };
@@ -91,7 +92,7 @@ export const ChiScene: React.FC = () => {
         <FigLabel n="20" title={`Device and churn for ${fmt(CHI.n, 0)} users`} at={categoriesAt} x={LABEL_X} y={y(290)} />
         <Ink at={usersAt - 2} dur={14} style={{ left: LABEL_X, top: y(290) + 40, whiteSpace: "nowrap" }}>
           <Label size={21} color={INK_SOFT} weight={520}>
-            bars: users counted; dashed boxes: expected if device made no difference
+            Bars: users counted; dashed boxes: expected if device made no difference
           </Label>
         </Ink>
         {(["stayed", "churned"] as Col[]).map((c) => (
@@ -219,20 +220,25 @@ export const ChiScene: React.FC = () => {
 
         <Note at={expectedAt + 4} x={1720} y={y(372)} align="right">
           <Label size={21} color={STAT_INK} weight={520}>
-            each cell adds gap² ÷ expected
+            Each cell adds gap² ÷ expected
           </Label>
         </Note>
 
         {/* The statistic: every cell's share, added up. */}
         <div style={{ position: "absolute", left: LABEL_X, top: y(830), opacity: total, whiteSpace: "nowrap" }}>
           <span style={{ ...note(38, STAT_INK), fontWeight: 500 }}>
-            <Greek>χ</Greek>² = <Count at={twelveAt - 8} to={CHI.chi2} dur={20} format={(v) => fmt(v, 1)} />
+            <MathRun>
+              <I>χ</I>²
+            </MathRun>{" "}
+            = <Count at={twelveAt - 8} to={CHI.chi2} dur={20} format={(v) => fmt(v, 1)} />
           </span>
-          <span style={{ ...note(36, STAT_INK), fontWeight: 500, marginLeft: 30, opacity: ease(frame, pAt - 4, 12) }}>p = {fmt(CHI.p, 3)}</span>
+          <span style={{ ...note(36, STAT_INK), fontWeight: 500, marginLeft: 30, opacity: ease(frame, pAt - 4, 12) }}>
+            <MathVar>p</MathVar> = {fmt(CHI.p, 3)}
+          </span>
         </div>
         <Note at={pAt + 6} x={LABEL_X + 520} y={y(830) + 8}>
           <Label size={22} color={INK_SOFT} weight={520}>
-            device and churn are related
+            Device and churn are related
           </Label>
         </Note>
       </div>

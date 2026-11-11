@@ -143,9 +143,9 @@ export const HookScene: React.FC = () => {
           <FigLabel n="1" title="The lesson's opening sentence" at={sentenceAt - 8} x={X0} y={y(FIG_Y)} />
           <Ink at={sentenceAt - 4} dur={22} style={{ left: X0, top: y(SENT_Y), whiteSpace: "nowrap" }}>
             <span style={{ ...body(50), color: INK }}>
-              I <Asked at={qAt[0]} question="one word, or two?">can't</Asked> believe{" "}
-              <Asked at={qAt[1]} question="the end of a sentence?">Dr.</Asked> Smith's startup raised{" "}
-              <Asked at={qAt[2]} question="a word?">$2.5M,</Asked> it's unreal!
+              I <Asked at={qAt[0]} question="One word, or two?">can't</Asked> believe{" "}
+              <Asked at={qAt[1]} question="The end of a sentence?">Dr.</Asked> Smith's startup raised{" "}
+              <Asked at={qAt[2]} question="A word?">$2.5M,</Asked> it's unreal!
             </span>
           </Ink>
         </div>
@@ -169,9 +169,11 @@ export const HookScene: React.FC = () => {
                 width: CELL,
                 height: cellH,
                 boxSizing: "border-box",
-                border: `1px solid color-mix(in srgb, ${flare > 0 ? BAD : INK_SOFT} ${Math.round(45 + flare * 55)}%, transparent)`,
+                // The string's grid stays gray; a questioned character fills
+                // red, with no red outline of its own.
+                border: `1px solid color-mix(in srgb, ${INK_SOFT} 45%, transparent)`,
                 marginLeft: i === 0 ? 0 : -1,
-                background: flare > 0 ? `color-mix(in srgb, ${BAD} ${Math.round(flare * 14)}%, transparent)` : "transparent",
+                background: flare > 0 ? `color-mix(in srgb, ${BAD} ${Math.round(flare * 20)}%, transparent)` : "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

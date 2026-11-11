@@ -101,8 +101,9 @@ export const HookScene: React.FC = () => {
         dur={18}
         style={{ left: 752, top: y(552), ...headline(200, true), color: INK, whiteSpace: "nowrap" }}
       >
-        <span style={{ fontSize: "0.36em", marginRight: "0.3em" }}>about</span>
-        {pct(PPV)}
+        {/* "About", as the figure's own sign: a word set small beside a hero
+            number reads as two lines in two sizes. */}
+        ≈ {pct(PPV)}
       </Ink>
     </AbsoluteFill>
   );

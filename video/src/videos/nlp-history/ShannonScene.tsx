@@ -2,14 +2,14 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { BIGRAM, SHANNON_PAPER, SHANNON_SAMPLE } from "./data";
-import { DATA, DATA_INK, Headline, InlineArrow, Kicker, lerp, Mark, pulse, SOFT, Spot, Svg, Tick, Wire } from "./parts";
+import { CHIP_FILL, DATA, DATA_INK, Headline, InlineArrow, Kicker, lerp, Mark, pulse, SHEET, SOFT, Spot, Svg, Tick, Wire } from "./parts";
 
 /** The paper's first page: the journal and the month, the title, the author,
  *  then lines of text setting themselves one after another. */
@@ -39,8 +39,7 @@ const PaperPage: React.FC<{ x: number; top: number; width: number; height: numbe
         height,
         opacity: p * (1 - o),
         transform: `translate(${(1 - p) * -30 - o * 40}px, 0) rotate(${(1 - p) * -1.5 + 0.6}deg)`,
-        background: PAPER,
-        border: `1.5px solid ${HAIRLINE}`,
+        background: SHEET,
         borderRadius: 3,
         boxSizing: "border-box",
       }}
@@ -119,8 +118,7 @@ const ContentsPage: React.FC<{ x: number; top: number; width: number; height: nu
         height,
         opacity: p * (1 - o),
         transform: `translate(${(1 - p) * 30 + o * 30}px, 0) rotate(${(1 - p) * 1.2 - 0.4}deg)`,
-        background: PAPER,
-        border: `1.5px solid ${HAIRLINE}`,
+        background: SHEET,
         borderRadius: 3,
         boxSizing: "border-box",
       }}
@@ -176,9 +174,8 @@ const WordChip: React.FC<{ x: number; y: number; w: number; text: string; at: nu
         width: w,
         height: 48,
         boxSizing: "border-box",
-        border: `2px solid ${t > 0 ? tone : HAIRLINE}`,
-        borderRadius: 8,
-        background: PAPER,
+        borderRadius: 5,
+        background: CHIP_FILL,
         opacity: p,
         transform: `translateY(${(1 - p) * 10}px)`,
         display: "flex",
@@ -189,7 +186,7 @@ const WordChip: React.FC<{ x: number; y: number; w: number; text: string; at: nu
         color: INK,
       }}
     >
-      {t > 0 ? <div style={{ position: "absolute", inset: 0, background: tone, opacity: 0.16 * t, borderRadius: 6 }} /> : null}
+      {t > 0 ? <div style={{ position: "absolute", inset: 0, background: tone, opacity: 0.22 * t, borderRadius: 5 }} /> : null}
       <span style={{ position: "relative" }}>{text}</span>
     </div>
   );
@@ -409,7 +406,7 @@ export const ShannonScene: React.FC = () => {
       {/* The tally after "the", and the guess. */}
       <Ink at={afterAt - 2} style={{ left: 96, top: TALLY_Y + 8, whiteSpace: "nowrap" }}>
         <div style={{ ...label(26, INK), display: "flex", alignItems: "center", gap: 14 }}>
-          after <span style={{ fontFamily: MONO, fontWeight: 500, background: `color-mix(in srgb, ${ds("yellow", 500)} 30%, transparent)`, padding: "2px 10px", borderRadius: 6 }}>the</span>
+          After <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 500, background: `color-mix(in srgb, ${ds("yellow", 500)} 30%, transparent)`, padding: "2px 10px", borderRadius: 4 }}>the</span>
         </div>
       </Ink>
       {tallyOrder.map((w, r) => {

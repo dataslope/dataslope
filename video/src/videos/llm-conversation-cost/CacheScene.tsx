@@ -207,7 +207,6 @@ export const CacheScene: React.FC = () => {
         // changed, the new part, fills solid blue.
         const fill = ease(frame, fillAt[i] - 2, 12);
         const mark = i === 0 ? pulse(frame, neverAt - 2, 26) : 0;
-        const tone = row.cached ? CACHED : NEW;
         return (
           <div
             key={i}
@@ -219,10 +218,10 @@ export const CacheScene: React.FC = () => {
               height: 40,
               borderRadius: 4,
               boxSizing: "border-box",
-              border: `2px solid ${tone}`,
+              // A fill, no outline: its hue's light tint, deepening as it fills.
               background: row.cached
-                ? `color-mix(in srgb, ${CACHED} ${Math.round(fill * 34 + mark * 20)}%, ${PAPER})`
-                : `color-mix(in srgb, ${NEW} ${Math.round(fill * 100)}%, ${PAPER})`,
+                ? `color-mix(in srgb, ${CACHED} ${Math.round(16 + fill * 22 + mark * 20)}%, ${PAPER})`
+                : `color-mix(in srgb, ${NEW} ${Math.round(16 + fill * 84)}%, ${PAPER})`,
               display: "flex",
               alignItems: "center",
               paddingLeft: 12,

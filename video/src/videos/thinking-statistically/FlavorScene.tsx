@@ -14,6 +14,8 @@ const CHIP = 96;
 const CHIP_PITCH = 132;
 const CHIP_X = 160;
 const CHIP_Y = 440;
+/** The answer cells' fill: a light gray, the ground the codes sit on. */
+const CHIP_FILL = `color-mix(in srgb, ${INK_SOFT} 14%, ${PAPER})`;
 /** The tally: one block per answer, stacked by flavor. */
 const STACK_X = [860, 1110, 1360];
 const STACK_W = 170;
@@ -145,9 +147,9 @@ export const FlavorScene: React.FC = () => {
               style={{
                 height: CHIP,
                 boxSizing: "border-box",
-                border: `2px solid ${INK}`,
-                borderRadius: 10,
-                background: PAPER,
+                // A cell of the column: a light gray fill and no outline.
+                borderRadius: 6,
+                background: CHIP_FILL,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -178,7 +180,7 @@ export const FlavorScene: React.FC = () => {
 
       {/* The computer's view of the column: integers, as pandas stores them. */}
       <Ink at={computerAt - 4} dur={14} style={{ left: DTYPE_X, top: y(CHIP_Y) + 4, whiteSpace: "nowrap" }}>
-        <div style={label(20, INK_SOFT)}>stored as whole numbers</div>
+        <div style={label(20, INK_SOFT)}>Stored as whole numbers</div>
         {/* A gray house badge that turns the highlighter's yellow on "stored". */}
         <div
           style={{
@@ -261,10 +263,8 @@ export const FlavorScene: React.FC = () => {
               top: lerp(fromY, toY, t),
               width: lerp(CHIP, STACK_W, t),
               height: lerp(CHIP, h(BLOCK) - 4, t),
-              borderRadius: lerp(10, 3, t),
+              borderRadius: lerp(6, 3, t),
               background: s.col === 0 ? `color-mix(in srgb, ${STAT} ${Math.round(vanilla * 70)}%, ${RAW})` : RAW,
-              border: `2px solid color-mix(in srgb, ${INK} ${Math.round(t * 40)}%, transparent)`,
-              boxSizing: "border-box",
               opacity: Math.min(1, t * 3),
             }}
           />

@@ -2,9 +2,10 @@ import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { badgeStyle, FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, ElbowArrow, FIG_Y, Headline, Mark, Spot, Tag } from "./parts";
@@ -45,9 +46,9 @@ export const ChooseScene: React.FC = () => {
 
   const rootMid = y(BRANCH_Y[1]);
   const answers = [
-    { q: "Nothing?", action: "CASCADE", eg: "comments on a deleted draft, items in a temporary cart", at: nothingAt, actAt: cascadeAt },
-    { q: "It can stand alone?", action: "SET NULL", eg: "a support ticket whose assigned employee left", at: aloneAt - 4, actAt: setNullAt },
-    { q: "A record you must keep?", action: "RESTRICT", eg: "invoices, payments, orders that keep their customer", at: recordAt - 6, actAt: restrictAt },
+    { q: "Nothing?", action: "CASCADE", eg: "Comments on a deleted draft, items in a temporary cart", at: nothingAt, actAt: cascadeAt },
+    { q: "It can stand alone?", action: "SET NULL", eg: "A support ticket whose assigned employee left", at: aloneAt - 4, actAt: setNullAt },
+    { q: "A record you must keep?", action: "RESTRICT", eg: "Invoices, payments, orders that keep their customer", at: recordAt - 6, actAt: restrictAt },
   ];
   // As the video ends, the tree steps back slowly behind the closing line.
   const settle = interpolate(frame, [end - 6, end + 74], [0, 0.6], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
@@ -77,9 +78,8 @@ export const ChooseScene: React.FC = () => {
                 width: ROOT_W,
                 height: ROOT_H,
                 boxSizing: "border-box",
-                border: `2px solid ${INK}`,
                 borderRadius: 8,
-                background: PAPER,
+                background: ds("gray", 100),
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
@@ -96,7 +96,7 @@ export const ChooseScene: React.FC = () => {
             const by = y(BRANCH_Y[i]);
             const fork = ROOT_X + ROOT_W + 70;
             const pts = [
-              [ROOT_X + ROOT_W + 4, rootMid],
+              [ROOT_X + ROOT_W, rootMid],
               [fork, rootMid],
               [fork, by],
               [ANSWER_X - 14, by],
@@ -137,7 +137,7 @@ export const ChooseScene: React.FC = () => {
               <span style={{ opacity: ease(frame, sameAt - 4, 10) }}>asks the same question.</span>
               <span style={{ opacity: ease(frame, neverAt - 10, 10) }}>
                 {" "}
-                So pick a key that <Mark at={neverAt}>never changes</Mark>.
+                So pick a key that <Mark at={neverAt}>never changes.</Mark>
               </span>
             </span>
           </Ink>

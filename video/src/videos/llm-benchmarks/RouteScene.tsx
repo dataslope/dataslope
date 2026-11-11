@@ -109,7 +109,7 @@ export const RouteScene: React.FC = () => {
                   y={ry - GATE_W / 2}
                   width={GATE_W}
                   height={GATE_W}
-                  rx={6}
+                  rx={5}
                   fill="none"
                   stroke={TRAP}
                   strokeWidth={2.4}
@@ -133,7 +133,7 @@ export const RouteScene: React.FC = () => {
             y={y(ROW_Y[0]) - 34}
             width={GATE_W + 36}
             height={(y(ROW_Y[3]) - y(ROW_Y[0])) * gateBox + 68}
-            rx={12}
+            rx={8}
             fill="none"
             stroke={TRAP}
             strokeWidth={2}

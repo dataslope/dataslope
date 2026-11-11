@@ -87,7 +87,7 @@ export const KindsScene: React.FC = () => {
           </span>
         </Ink>
         <Note at={alreadyAt - 2} x={LEFT_X} y={y(PANEL_Y) + 50}>
-          <span style={{ ...body(30, true), color: INK_SOFT, whiteSpace: "nowrap" }}>a real-world value the thing already has</span>
+          <span style={{ ...body(30, true), color: INK_SOFT, whiteSpace: "nowrap" }}>A real-world value the thing already has</span>
         </Note>
         {/* The table's frame arrives with "natural key"; its rows with "country code". */}
         <TableName g={countries} at={naturalAt + 10}>
@@ -120,7 +120,7 @@ export const KindsScene: React.FC = () => {
         </Ink>
         <Note at={makesAt - 2} x={RIGHT_X} y={y(PANEL_Y) + 50}>
           <span style={{ ...body(27, true), color: INK_SOFT, whiteSpace: "nowrap" }}>
-            made up by the database: <Mono>GENERATED ALWAYS AS IDENTITY</Mono>
+            Made up by the database: <Mono>GENERATED ALWAYS AS IDENTITY</Mono>
           </span>
         </Note>
         <TableName g={customers} at={makesAt - 8}>
