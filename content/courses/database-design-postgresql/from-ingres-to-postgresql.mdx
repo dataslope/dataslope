@@ -62,7 +62,6 @@ flowchart TD
     A["Ingres<br/>Berkeley, 1970s<br/>QUEL"] --> B["POSTGRES<br/>Berkeley, 1986<br/>POSTQUEL"]
     B --> C["Postgres95<br/>1994 to 95<br/>SQL added"]
     C --> D["PostgreSQL<br/>1996 onward<br/>open-source community"]
-    D --> E["PGlite<br/>PostgreSQL in WebAssembly<br/>running in this page"]
 ```
 
 ## Two grad students and a rename
@@ -92,18 +91,12 @@ The project's elephant mascot is named Slonik. Stonebraker, like Codd
 before him, eventually received the Turing Award (2014) for his
 contributions to database systems.
 
-## The part where it ends up in your browser
+## Ask it yourself
 
-PostgreSQL is written in portable C, and WebAssembly lets browsers
-run compiled languages at near-native speed. **PGlite** is exactly
-what it sounds like: PostgreSQL compiled to WebAssembly, booting as a
-library inside a web page, no server anywhere. It is the engine
-behind every runnable block in this course.
-
-Which means you can do something pleasantly circular: ask the
-database to tell you its own version, and read the answer from a
-lineage that runs Codd → System R's SQL → Ingres → POSTGRES →
-Postgres95 → PostgreSQL → the tab you have open right now.
+Every runnable block in this course is answered by PostgreSQL, which
+means you can do something pleasantly circular: ask the database to
+tell you its own version, and read the answer from a lineage that runs
+Codd → System R's SQL → Ingres → POSTGRES → Postgres95 → PostgreSQL.
 
 <SqlCodeBlock
   dialect="postgres"
