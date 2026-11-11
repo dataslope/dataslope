@@ -39,6 +39,24 @@
         }
       }
     },
+    "encapsulationGuarded": {
+      "setup": "class BankAccount:\n    def __init__(self, balance=0):\n        if balance < 0:\n            raise ValueError(\"starting balance can't be negative\")\n        self._balance = balance          # \"internal\", not to be poked directly\n\n    def withdraw(self, amount):\n        if amount <= 0:\n            raise ValueError(\"amount must be positive\")\n        if amount > self._balance:\n            raise ValueError(\"insufficient funds\")\n        self._balance -= amount\n\n    @property\n    def balance(self):                   # read-only view of internal state\n        return self._balance\n",
+      "steps": {
+        "page": {
+          "code": "acct = BankAccount(100)\nacct.withdraw(30)\nprint(acct.balance)",
+          "ok": true,
+          "printed": [
+            "70"
+          ]
+        },
+        "opening": {
+          "code": "BankAccount(-50)",
+          "ok": false,
+          "printed": [],
+          "error": "ValueError: starting balance can't be negative"
+        }
+      }
+    },
     "polymorphism": {
       "setup": "import math\n\nclass Circle:\n    def __init__(self, r):\n        self.r = r\n    def area(self):\n        return math.pi * self.r ** 2\n\nclass Square:\n    def __init__(self, s):\n        self.s = s\n    def area(self):\n        return self.s ** 2\n\ndef total_area(shapes):\n    return sum(shape.area() for shape in shapes)   # duck typing\n",
       "steps": {
@@ -193,6 +211,14 @@
           "ok": true,
           "printed": [
             "['email: confirm 1043', 'stock: reserve 1043', 'analytics: count 1043', 'loyalty: points for 1043']"
+          ]
+        },
+        "fails": {
+          "code": "heard.clear()\ndef analytics(n):\n    raise RuntimeError(\"analytics is down\")\nbroken = Order()\nbroken.subscribe(lambda n: heard.append(f\"email: confirm {n}\"))\nbroken.subscribe(lambda n: heard.append(f\"stock: reserve {n}\"))\nbroken.subscribe(analytics)\nbroken.subscribe(lambda n: heard.append(f\"loyalty: points for {n}\"))\ntry:\n    broken.place(1043)\n    print(\"placed\")\nexcept RuntimeError as e:\n    print(f\"place(1043) raised: {e}\")\nprint(heard)",
+          "ok": true,
+          "printed": [
+            "place(1043) raised: analytics is down",
+            "['email: confirm 1043', 'stock: reserve 1043']"
           ]
         }
       }

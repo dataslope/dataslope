@@ -99,7 +99,14 @@ check(six.keys >= linksTotal, "six characters hold five years of links");
 // IDs past 62^5 (916,132,832) take six characters, the length the video uses.
 const counted = [9_876_543_210, 9_876_543_211, 9_876_543_212].map((id) => ({ id, key: base62(id) }));
 check(counted.every((c) => c.key.length === 6), "the counted keys are six characters");
-R.key = { alphabet: ALPHABET, keyLengths, counted, idBlock: 1_000_000 };
+// The blocks two app servers hold, a million IDs each, numbered from 1: the
+// first is the block the counted IDs above came from, so the diagram's
+// servers could have issued them.
+const ID_BLOCK = 1_000_000;
+const firstBlock = Math.floor((counted[0].id - 1) / ID_BLOCK);
+const blocks = [0, 1].map((i) => ({ lo: (firstBlock + i) * ID_BLOCK + 1, hi: (firstBlock + i + 1) * ID_BLOCK }));
+check(counted.every((c) => c.id >= blocks[0].lo && c.id <= blocks[0].hi), "the counted IDs sit in the first server's block");
+R.key = { alphabet: ALPHABET, keyLengths, counted, idBlock: ID_BLOCK, blocks };
 
 // ── 2. The latency ladder (charts/memory-latency-ladder.mjs, read) ──────────
 {
@@ -153,7 +160,11 @@ R.key = { alphabet: ALPHABET, keyLengths, counted, idBlock: 1_000_000 };
   const hitsTail = 1 - 0.99 ** calls;
   // "One request in a hundred takes 286 or more": the sample's own share at
   // or past the p99 mark.
-  const tailShare = sample.filter((ms) => ms >= marks.p99).length / N;
+  const tailCount = sample.filter((ms) => ms >= marks.p99).length;
+  const tailShare = tailCount / N;
+  // How many of those the histogram cannot draw: past its domain's end.
+  const offChart = sample.filter((ms) => ms >= top).length;
+  check(offChart === N - counts.reduce((a, b) => a + b, 0), "the histogram's counts and the off-chart requests make the sample");
   R.percentiles = {
     n: N,
     seed: 4242,
@@ -163,6 +174,8 @@ R.key = { alphabet: ALPHABET, keyLengths, counted, idBlock: 1_000_000 };
     calls,
     hitsTail,
     tailShare,
+    tailCount,
+    offChart,
   };
 }
 
@@ -315,7 +328,9 @@ const said = [
   ["q3-path", "about one point six", 1.6, R.ladder.path.missMs],
   ["q3-key", "fifty-seven billion", 57e9, sig2(six.keys)],
   ["q3-key", "over fifteen years", 15, Math.floor(six.years)],
-  ["q3-counter", "a million at a time", 1e6, R.key.idBlock],
+  ["q3-blocks", "a million at a time", 1e6, R.key.idBlock],
+  ["q3-coord", "once per million IDs", 1e6, R.key.idBlock],
+  ["q2-cache", "five gigabytes", 5e9, R.estimate.dayInMemoryBytes],
   ["q4-retry", "three hundred requests a second", 300, R.breaker.retryPeak],
   ["q4-retry", "a hundred", 100, R.breaker.offered],
   ["q4-states", "errors pass half", 0.5, R.breaker.trip],

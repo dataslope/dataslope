@@ -27,7 +27,8 @@ const assume = (text: React.ReactNode) => (
  * own assumptions, each said as one. The rule that does most of the work (a
  * million a day is about twelve a second), then writes, reads at a hundred to
  * one, and the peak at three times; storage and bandwidth beside it, both
- * small. What decides this system is its read traffic, and the cache.
+ * small. What decides this system is its read traffic, and the cache, and
+ * the cache is small: a whole day of new links is 5 GB, one machine's memory.
  */
 export const EstimateScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -61,7 +62,9 @@ export const EstimateScene: React.FC = () => {
   const neitherAt = n.word("q2-verdict", "Neither is hard");
   const decidedAt = n.word("q2-verdict", "decided by its read traffic");
   const cacheAt = n.word("q2-verdict", "a cache can answer");
-  const end = n.beat("q2-verdict").to;
+  const dayAt = n.word("q2-cache", "Even a whole day of new links is five gigabytes");
+  const memAt = n.word("q2-cache", "fits in one machine's memory");
+  const end = n.beat("q2-cache").to;
 
   const headY = y(296);
   const ruleY = y(360);
@@ -89,6 +92,7 @@ export const EstimateScene: React.FC = () => {
       <Sfx name="el-tap" at={tbAt} level={-35} />
       <Sfx name="el-tap" at={mbAt} level={-35} />
       <Sfx name="el-chime" at={cacheAt + 4} level={-36} />
+      <Sfx name="el-tap" at={memAt} level={-36} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={2} at={qAt - 4} textAt={textAt - 4} size={58}>
@@ -174,6 +178,11 @@ export const EstimateScene: React.FC = () => {
         </Line>
         <Line x={X0 + 450} y={pair(2) + 48} at={cacheAt} size={28} weight={500} color={OK_INK}>
           and a cache
+        </Line>
+        {/* How big that cache is: a whole day of new links. */}
+        <Line x={X0 + 450} y={pair(2) + 100} at={dayAt} size={25} color={INK_SOFT}>
+          a whole day of new links: <Num>{Math.round(E.dayInMemoryBytes / 1e9)}</Num> GB
+          <span style={{ color: OK_INK, fontWeight: 500, opacity: ease(frame, memAt, 10) }}>, fits in one machine&apos;s memory</span>
         </Line>
 
         {/* Storage. */}

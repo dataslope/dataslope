@@ -221,7 +221,16 @@ export const script: NarrationScript = {
     },
     {
       id: "hour-past",
-      text: "That's fifty to fifty-five minutes, and building is only half of it. Narrate throughout: the interviewer can't grade reasoning they can't hear.",
+      text: "That's fifty to fifty-five minutes, and building is only half of it.",
+    },
+    {
+      // Added in the review fixes (2026-11-11): what the rest of the hour is for.
+      id: "hour-spare",
+      text: "Keep the rest spare, for questions or a bug that bites late.",
+    },
+    {
+      id: "hour-narrate",
+      text: "Narrate throughout: the interviewer can't grade reasoning they can't hear.",
       pauseAfter: 0.8,
     },
 
@@ -261,12 +270,24 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      // Added in the review fixes: the request path, walked, so the flowchart
+      // builds box by box on its words.
+      id: "design-path",
+      text: "The request passes a quota check, then the cache. On a miss, it goes to the provider, the reply is validated, and the app streams it back to the client.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "design-latency",
       text: "Latency: stream tokens to the client with server-sent events, so the user sees the first token instead of waiting for the last. Put long jobs on a queue, with a status endpoint.",
     },
     {
       id: "design-fail",
       text: "Failure: timeouts, and retries with exponential backoff and jitter on four twenty-nines and server errors. Then a circuit breaker, and a fallback: a smaller model, a cached answer, or a graceful try again.",
+    },
+    {
+      // Added in the review fixes: what the breaker does that retries don't.
+      id: "design-breaker",
+      text: "The breaker stops calling a provider that keeps failing, so retries don't pile onto an outage.",
       pauseAfter: 0.6,
     },
     {
@@ -286,6 +307,11 @@ export const script: NarrationScript = {
       id: "design-jitter",
       scene: true,
       text: "Expect the follow-up: why jitter? Model it with a seeded simulation: a thousand requests rejected at once, each retrying after a second. Without jitter, all thousand come back in the same instant, and can be rejected together again. With a random wait of up to that second, no tenth of it gets more than a hundred and fifteen.",
+    },
+    {
+      // Added in the review fixes: what the 115 means, and the name.
+      id: "design-herd",
+      text: "That's a peak nearly nine times lower: a trickle the provider can absorb, instead of a thundering herd that knocks it over again.",
       pauseAfter: 0.8,
     },
 
@@ -304,6 +330,11 @@ export const script: NarrationScript = {
     {
       id: "cost-result",
       text: "Input comes to two thousand dollars a day, and output to fifteen hundred. That's thirty-five hundred a day, about a hundred and five thousand a month.",
+    },
+    {
+      // Added in the review fixes: the figure a product decision is made with.
+      id: "cost-cent",
+      text: "Per request, that's about a third of a cent.",
       pauseAfter: 0.8,
     },
     {
@@ -341,7 +372,16 @@ export const script: NarrationScript = {
     },
     {
       id: "inj-defend",
-      text: "There's no complete fix, so limit what a successful injection can do. Least privilege: scope the refund tool to the current user's own orders. Human confirmation before anything consequential: sending, paying, deleting. And treat the model's output as untrusted input: never pass it unvalidated to a shell, an eval, a SQL string or an HTML page.",
+      text: "There's no complete fix, so limit what a successful injection can do. Least privilege: scope the refund tool to the current user's own orders.",
+    },
+    {
+      // Added in the review fixes: what the scoping stops.
+      id: "inj-scope",
+      text: "So an email can't refund anyone else's order.",
+    },
+    {
+      id: "inj-confirm",
+      text: "Human confirmation before anything consequential: sending, paying, deleting. And treat the model's output as untrusted input: never pass it unvalidated to a shell, an eval, a SQL string or an HTML page.",
       pauseAfter: 0.6,
     },
     {
@@ -371,6 +411,11 @@ export const script: NarrationScript = {
     {
       id: "daily-concrete",
       text: "Give a concrete workflow. What you hand to the assistant: boilerplate, test scaffolding, unfamiliar APIs, first drafts. What you don't: security-sensitive code, and the core design. How you verify what it writes. And one specific time it was wrong, and how you caught it.",
+    },
+    {
+      // Added in the review fixes: a worked example of the last two parts.
+      id: "daily-example",
+      text: "For example: I run the tests and read its diff like a pull request. Once it called our payments client with a parameter that doesn't exist, and the integration test caught it before review.",
       pauseAfter: 0.6,
     },
     {

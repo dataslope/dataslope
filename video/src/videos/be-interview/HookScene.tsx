@@ -160,7 +160,7 @@ export const HookScene: React.FC = () => {
           This series is about answering them.
         </Ink>
 
-        <Headline lead="The ground," turn="and what backend adds." at={groundAt} turnAt={addAt} size={62} />
+        <Headline lead="What every round tests," turn="and what backend adds." at={groundAt} turnAt={addAt} size={62} />
 
         {/* The capybara is there from the first frame (the video's poster),
             beside the questions, and stays to the cut. */}

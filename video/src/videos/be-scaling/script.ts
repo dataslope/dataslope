@@ -309,6 +309,11 @@ export const script: NarrationScript = {
       text: "Headroom is what the extra servers buy.",
       pauseAfter: 0.8,
     },
+    {
+      id: "q1-db",
+      text: "Vertical still has its place: the database holds the state, so it usually scales up first, until it nears that ceiling.",
+      pauseAfter: 0.8,
+    },
 
     // ── 2. Load balancers ─────────────────────────────────────────────────
     {
@@ -335,6 +340,11 @@ export const script: NarrationScript = {
     {
       id: "q2-ring",
       text: "On a hash ring, with a hundred points a server, only twenty-three percent move, all of them to the new server.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "q2-clock",
+      text: "Each key belongs to the next point clockwise, so a new server's points take only the keys just before them.",
       pauseAfter: 0.8,
     },
 
@@ -370,12 +380,22 @@ export const script: NarrationScript = {
     },
     {
       id: "q4-model",
-      text: "The page models a key read about once a second and changed every two minutes. The least bad TTL is where the two failures cross, about fifteen seconds, and even there six percent of reads miss and six percent are stale.",
+      text: "Take a simple model: a key read about once a second and changed every two minutes.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q4-cross",
+      text: "The least bad TTL is where the two failures cross, about fifteen seconds, and even there six percent of reads miss and six percent are stale.",
       pauseAfter: 0.9,
     },
     {
       id: "q4-ours",
-      text: "A short link barely changes, so its TTL can be long, until one is taken down for abuse. Then delete its cached entry after the database commits. Delete it first, and a read in between puts the old value back. The TTL stays as a backstop.",
+      text: "A short link barely changes, so its TTL can be long, until one is taken down for abuse. Then delete its cached entry after the database commits. Delete it first, and a read in between puts the old value back.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q4-backstop",
+      text: "Even then, a slow read can race the delete, so the TTL stays as a backstop: it bounds how long a wrong value lives.",
       pauseAfter: 0.7,
     },
     {
@@ -399,6 +419,11 @@ export const script: NarrationScript = {
     {
       id: "q5-fix",
       text: "So for a short while after a user writes, send their reads to the leader. And with asynchronous replication, promoting a lagging follower loses the writes it never received.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q5-sync",
+      text: "Semi-synchronous replication fixes that: each write waits until one follower has it, so promoting that follower loses nothing, but every write is slower.",
       pauseAfter: 0.8,
     },
 
@@ -412,6 +437,11 @@ export const script: NarrationScript = {
     {
       id: "q6-key",
       text: "Shard by creation date, and today's shard takes every new link: a hot spot. Shard by a hash of the short key, and in a simulation, a million keys land on eight shards within one percent of an eighth each.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q6-ring",
+      text: "Add a ninth shard and modulo moves eighty-nine percent of the keys; a hash ring, as in question two, moves thirteen percent.",
       pauseAfter: 0.8,
     },
     {
@@ -484,8 +514,18 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "q9-full",
+      text: "Once its queue of ten is full, the rest are refused.",
+      pauseAfter: 1.4,
+    },
+    {
       id: "q9-shared",
       text: "The follow-up is where the count lives. With four app servers, each keeping its own bucket, round-robin hands one client four buckets: four times the limit. The count belongs in a store they all share.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q9-atomic",
+      text: "There, the check and the spend must be one atomic step, or two servers both take the last token.",
       pauseAfter: 0.8,
     },
 
@@ -526,7 +566,12 @@ export const script: NarrationScript = {
     },
     {
       id: "q12-why",
-      text: "Feeds are read far more often than people post, so push usually wins: it does the work once per post, not on every load.",
+      text: "Feeds are read far more often than people post, so push usually wins:",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "q12-pays",
+      text: "it pays its writes once, when someone posts, and pull pays its reads on every load.",
       pauseAfter: 0.6,
     },
     {

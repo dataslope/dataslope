@@ -126,29 +126,40 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
   const protectAt = c.w("r-version", "protect clients from breaking changes");
   const removingAt = c.w("r-version", "removing a field");
   const typeAt = c.w("r-version", "changing its type");
-  const pathAt = c.w("r-version", "A version in the path");
-  const defaultAt = c.w("r-version", "the pragmatic default");
-  const addingAt = c.w("r-version", "Adding an optional field");
+  const pathAt = c.w("r-version-path", "A version in the path");
+  const defaultAt = c.w("r-version-path", "the pragmatic default");
+  const visibleAt = c.w("r-version-path", "more visible and cache-friendly");
+  const headerAt = c.w("r-version-path", "a header or a query parameter");
+  const addingAt = c.w("r-version-add", "Adding an optional field");
   const top = c.y(340);
-  const body = c.y(470);
+  const body = c.y(570);
   const fields = [
-    { t: '"id": 7,', at: protectAt },
-    { t: '"total": 4200,', at: protectAt + 4, strike: removingAt + 6 },
-    { t: '"currency": "usd",', at: protectAt + 8 },
-    { t: '"status": "paid",', at: protectAt + 12, swap: typeAt + 6 },
+    { t: '"id": 42,', at: protectAt },
+    { t: '"title": "Designing APIs",', at: protectAt + 4 },
+    { t: '"views": 1200,', at: protectAt + 8, strike: removingAt + 6 },
+    { t: '"status": "published",', at: protectAt + 12, swap: typeAt + 6 },
   ];
   return (
     <>
       <Note at={pathAt} x={R_X} y={top}>
         <span style={{ fontFamily: MONO, fontSize: 40, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>
-          <span style={{ color: METHOD_INK }}>GET</span> /<Mark at={pathAt + 6}>v1</Mark>/orders
+          <span style={{ color: METHOD_INK }}>GET</span> /<Mark at={pathAt + 6}>v1</Mark>/articles/42
         </span>
       </Note>
-      <Note at={defaultAt} x={R_X + 480} y={top + 12}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>the most visible, the default</span>
+      <Note at={defaultAt} x={R_X} y={top + c.h(72)}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <b style={{ color: OK_INK }}>the default</b>
+          <span style={{ opacity: ease(frame, visibleAt, 10) }}>: more visible and cache-friendly than</span>
+        </span>
+      </Note>
+      <Note at={headerAt} x={R_X} y={top + c.h(112)}>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          a header, <span style={{ fontFamily: MONO, fontSize: 22, color: INK }}>Accept: application/vnd.api.v2+json</span>, or{" "}
+          <span style={{ fontFamily: MONO, fontSize: 22, color: INK }}>?version=2</span>
+        </span>
       </Note>
       <Note at={protectAt} x={R_X} y={body - c.h(44)}>
-        <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>An order, as v1 clients read it</span>
+        <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>An article, as v1 clients read it</span>
       </Note>
       <Note at={protectAt} x={R_X} y={body}>
         <div style={{ borderTop: `2px solid ${INK}`, borderBottom: `1px solid ${HAIRLINE}`, background: LISTING_PAPER, padding: "6px 22px", width: 820, fontFamily: MONO, fontSize: 24, lineHeight: "38px" }}>
@@ -171,7 +182,7 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
             </div>
           ))}
           <div style={{ paddingLeft: 28, whiteSpace: "pre", opacity: ease(frame, addingAt, 10), display: "flex", gap: 16, alignItems: "baseline" }}>
-            <span style={{ color: OK_INK }}>&quot;note&quot;: null</span>
+            <span style={{ color: OK_INK }}>&quot;summary&quot;: null</span>
             <span style={{ ...note(22, OK_INK), fontWeight: 500 }}>optional, added: still v1</span>
           </div>
           <div style={{ color: INK_SOFT }}>{"}"}</div>
@@ -269,6 +280,7 @@ const Hateoas: React.FC<{ c: Ctx }> = ({ c }) => {
 const Content: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const oneUrlAt = c.w("r-content", "lets one URL serve several representations");
+  const severalAt = c.w("r-content", "several representations");
   const acceptAt = c.w("r-content", "Accept says what the client can take");
   const typeAt = c.w("r-content", "and Content-Type what it got");
   const encodingAt = c.w("r-content", "Encoding works the same way");
@@ -276,6 +288,7 @@ const Content: React.FC<{ c: Ctx }> = ({ c }) => {
   const sixthAt = c.w("r-content", "about a sixth of its size");
   const top = c.y(340);
   const twoH = msgHeight(3, 21);
+  const oneH = msgHeight(1, 20);
   const respX = R_X + 540;
   const barTop = c.y(620);
   const BAR_W = 760;
@@ -309,6 +322,10 @@ const Content: React.FC<{ c: Ctx }> = ({ c }) => {
           { t: "Content-Encoding: gzip", at: gzipAt + 10, mark: { at: gzipAt + 14 } },
         ]}
       />
+      {/* The same URL, asked for another representation. */}
+      <Msg x={R_X} y={top + twoH + c.h(30)} w={480} at={severalAt + 6} size={20} lines={[{ t: "Accept: text/csv" }]} />
+      <Flow points={[[R_X + 488, top + twoH + c.h(30) + oneH / 2], [respX - 8, top + twoH + c.h(30) + oneH / 2]]} at={severalAt + 10} color={INK_SOFT} width={2.2} head={11} />
+      <Msg x={respX} y={top + twoH + c.h(30)} w={420} at={severalAt + 14} tone="data" size={20} lines={[{ t: "Content-Type: text/csv" }]} />
       <Note at={encodingAt} x={R_X} y={barTop - c.h(48)}>
         <span style={{ ...label(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>This page of 20 articles, as JSON</span>
       </Note>

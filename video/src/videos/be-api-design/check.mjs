@@ -72,6 +72,12 @@ const byOffset = (page) => `SELECT id, title FROM articles\nORDER BY id DESC\nLI
 const byCursor = (after) => `SELECT id, title FROM articles\nWHERE id < ${after}\nORDER BY id DESC\nLIMIT ${PAGE_SIZE};`;
 /** The last id on page `page` of the newest-first listing. */
 const lastIdOf = (page) => ARTICLES - page * PAGE_SIZE + 1;
+/** When article `id` was created (the setup's 25-minute steps), as SQL. */
+const createdAt = (id) => new Date(Date.UTC(2020, 0, 1) + id * 25 * 60 * 1000).toISOString().replace("T", " ").replace(".000Z", "");
+/** A cursor on a time order, with the id as its tiebreaker: the page after
+ *  the row (`id`, its created_at). */
+const byTime = (id) =>
+  `SELECT id, title FROM articles\nWHERE (created_at, id) < (TIMESTAMP '${createdAt(id)}', ${id})\nORDER BY created_at DESC, id DESC\nLIMIT ${PAGE_SIZE};`;
 
 const results = { figures: {}, pageSize: PAGE_SIZE };
 
@@ -99,6 +105,11 @@ VACUUM ANALYZE articles`,
     publish: `INSERT INTO articles VALUES (${ARTICLES + 1}, 'Article ${ARTICLES + 1}', TIMESTAMP '2024-10-03');`,
     page2Offset: byOffset(2),
     page2Cursor: byCursor(lastIdOf(1)),
+    // A cursor on (created_at, id) needs an index on that pair: page 500
+    // without one, then with one.
+    tieScan: `${EXPLAIN}\n${byTime(lastIdOf(499))}`,
+    tieIndex: "CREATE INDEX articles_created_id ON articles (created_at, id);",
+    tieSeek: `${EXPLAIN}\n${byTime(lastIdOf(499))}`,
   },
 );
 

@@ -290,6 +290,11 @@ export const script: NarrationScript = {
     {
       id: "q2-verdict",
       text: "Neither is hard. This system is decided by its read traffic, and by how much of it a cache can answer.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q2-cache",
+      text: "Even a whole day of new links is five gigabytes, so the hot set fits in one machine's memory.",
       pauseAfter: 0.8,
     },
     {
@@ -318,34 +323,54 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "q3-temp",
+      text: "Make that redirect temporary. Browsers keep a permanent one, so later clicks never reach you: you can't count them, or take the link down.",
+      pauseAfter: 0.7,
+    },
+    {
       id: "q3-key",
       text: "The key is base sixty-two: lowercase, uppercase and digits. Encode an auto-incrementing ID, and six characters hold fifty-seven billion links, over fifteen years at ten million a day.",
       pauseAfter: 0.7,
     },
     {
       id: "q3-hash",
-      text: "Or hash the long URL, and check each key for a collision before you store it.",
+      text: "Or hash the long URL and keep a few characters. If that key is taken, add a salt and hash again, and make the write conditional, so two servers can't both claim it.",
       pauseAfter: 0.6,
     },
     {
       id: "q3-diagram",
       scene: true,
       text: "Store the mapping in a key-value store, since every lookup is by key. Put a cache in front of it, because reads outnumber writes a hundred to one. And keep the app servers stateless, behind a load balancer, so scaling out is just adding one.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.2,
     },
     {
       id: "q3-path",
       text: "Follow one redirect through it. On a cache hit, that's two round trips inside the data center, about a millisecond by the ladder. A miss adds a third, to the store, and an SSD read: about one point six milliseconds.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.4,
     },
     {
       id: "q3-counter",
-      text: "The follow-up is the counter. One counter that every server asks is a bottleneck, and one more thing that can fail. Hand each server a block of IDs instead, say a million at a time, and it counts on its own.",
-      pauseAfter: 0.6,
+      text: "The follow-up is the counter. One counter that every server asks is a bottleneck, and one more thing that can fail.",
+      pauseAfter: 0.8,
+    },
+    {
+      id: "q3-blocks",
+      text: "Hand each server a block of IDs instead, say a million at a time, and it counts on its own.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "q3-coord",
+      text: "The counter still hands out the blocks, but it's asked once per million IDs, and a server that dies just leaves a gap.",
+      pauseAfter: 1.0,
     },
     {
       id: "q3-guess",
       text: "And counted IDs make consecutive keys, so anyone can walk through everyone's links. If that matters, scramble the ID before encoding it, or use the hash.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "q3-edges",
+      text: "Custom aliases share the key space, stored only if free, and expiry is a column the redirect checks.",
       pauseAfter: 0.8,
     },
 
@@ -380,6 +405,11 @@ export const script: NarrationScript = {
     {
       id: "q4-close",
       text: "Left alone, the service recovers. Under retries, it never does.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "q4-how",
+      text: "So retry with backoff and jitter, under a small budget, and while the breaker is open, fail fast or serve a cached answer.",
       pauseAfter: 0.8,
     },
 
@@ -398,7 +428,12 @@ export const script: NarrationScript = {
     {
       id: "q5-use",
       scene: true,
-      text: "So it cuts latency, takes traffic off your origin, and absorbs spikes. Use it for anything static or cacheable: images, JavaScript, CSS and video. Dynamic, user-specific responses usually bypass it, or get a short time to live at the edge.",
+      text: "So it cuts latency, takes traffic off your origin, and absorbs spikes. Use it for anything static or cacheable: images, JavaScript, CSS and video.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q5-dyn",
+      text: "Dynamic, user-specific responses usually bypass it, or get a short time to live: how long the edge may keep a copy. Even those save handshake round trips, since the connection ends at the edge.",
       pauseAfter: 0.6,
     },
     {

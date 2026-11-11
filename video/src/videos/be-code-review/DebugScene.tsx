@@ -128,13 +128,18 @@ export const DebugScene: React.FC = () => {
   const aiAt = n.word("debug-ai", "If the round allows an assistant");
   const doesAt = n.word("debug-ai", "what a function does");
   const couldAt = n.word("debug-ai", "what could make it return");
-  const noSubAt = n.word("debug-ai", "It's no substitute for step two");
+  const noSubAt = n.word("debug-ai-sub", "It's no substitute for step two");
+  const guessAt = n.word("debug-ai-sub", "what it tells you is a hypothesis");
+  const provesAt = n.word("debug-ai-sub", "only a failing test proves it");
   const pastAt = n.word("debug-past", "And what else shares the flaw");
   const testsAt = n.word("debug-past", "Start with the tests");
   const bothAt = n.word("debug-past", "passed before the fix and after it");
   const neitherAt = n.word("debug-past", "so neither ever tested the order");
   const keepAt = n.word("debug-past", "Keep the reproduction as a third");
-  const end = n.beat("debug-past").to;
+  const moreAt = n.word("debug-more", "Then read the lines beside the sort");
+  const oneBugAt = n.word("debug-more", "the report found one bug");
+  const twoMoreAt = n.word("debug-more", "there are two more");
+  const end = n.beat("debug-more").to;
 
   const top = y(330);
   const listW = diffWidth([...WHOLE.trace, ...WHOLE.symptom, ...WHOLE.cause], SIZE);
@@ -180,6 +185,8 @@ export const DebugScene: React.FC = () => {
       <Sfx name="el-pencil" at={step5} level={-36} />
       <Sfx name="el-pencil" at={noSubAt} level={-34} />
       <Sfx name="el-tap" at={keepAt + 6} level={-30} />
+      <Sfx name="el-pencil" at={moreAt + 4} level={-36} />
+      <Sfx name="el-scratch" at={twoMoreAt + 4} level={-34} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={2} at={qAt - 4} textAt={textAt - 4} size={60}>
@@ -210,7 +217,7 @@ export const DebugScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>where an assistant is allowed, the brief:</span>
         </Note>
         <Ink at={plainAt} dur={20} out={introOut} style={{ left: 120, top: y(525), ...body(44, true), color: INK, whiteSpace: "nowrap" }}>
-          &ldquo;<Mark at={readAt}>read, debug and optimize</Mark>&rdquo; an existing codebase
+          <Mark at={readAt}>&ldquo;read, debug and optimize&rdquo;</Mark> an existing codebase
         </Ink>
         <div style={{ position: "absolute", left: 1360, top: sketchTop, opacity: 1 - ease(frame, introOut, 10) }}>
           {SKETCH.map((l, i) => {
@@ -243,7 +250,17 @@ export const DebugScene: React.FC = () => {
         ]} />
         <DiffListing lines={WHOLE.trace} x={LIST_X} top={top} width={listW} size={SIZE} at={printAt} wipe={false} out={tracedOut} />
         <DiffListing lines={PLAIN} x={LIST_X} top={top} width={listW} size={SIZE} at={plainBackAt} wipe={false} out={symptomAt} />
-        <DiffListing lines={WHOLE.symptom} x={LIST_X} top={top} width={listW} size={SIZE} at={symptomAt} wipe={false} out={fixAt} />
+        <DiffListing
+          lines={WHOLE.symptom}
+          x={LIST_X}
+          top={top}
+          width={listW}
+          size={SIZE}
+          at={symptomAt}
+          wipe={false}
+          out={fixAt}
+          marks={[{ line: lineOf(WHOLE.symptom, "if iv[0] <= iv[1]"), text: "if iv[0] <= iv[1]", at: emptyAt + 6, color: MARK_BAD }]}
+        />
         <DiffListing
           lines={WHOLE.cause}
           x={LIST_X}
@@ -252,7 +269,13 @@ export const DebugScene: React.FC = () => {
           size={SIZE}
           at={fixAt}
           wipe={false}
-          marks={[{ line: lineOf(WHOLE.cause, "sorted(intervals)"), text: "sorted(intervals)", at: hereAt + 6, color: MARK_OK }]}
+          marks={[
+            { line: lineOf(WHOLE.cause, "sorted(intervals)"), text: "sorted(intervals)", at: hereAt + 6, color: MARK_OK },
+            { line: lineOf(WHOLE.cause, "start < merged[-1][1]"), text: "start < merged[-1][1]", at: moreAt + 6, out: twoMoreAt + 2 },
+            { line: lineOf(WHOLE.cause, "merged[-1][1] = end"), text: "merged[-1][1] = end", at: moreAt + 12, out: twoMoreAt + 2 },
+            { line: lineOf(WHOLE.cause, "start < merged[-1][1]"), text: "<", at: twoMoreAt + 4, color: MARK_BAD },
+            { line: lineOf(WHOLE.cause, "merged[-1][1] = end"), text: "merged[-1][1] = end", at: twoMoreAt + 8, color: MARK_BAD },
+          ]}
         />
 
         {/* ── The five steps ── */}
@@ -262,7 +285,7 @@ export const DebugScene: React.FC = () => {
           rowH={STEP_ROW}
           width={438}
           at={step1 - 4}
-          end={aiAt}
+          end={end}
           items={[
             { label: "Read before you run", at: step1 },
             { label: "Reproduce", at: step2 },
@@ -270,7 +293,7 @@ export const DebugScene: React.FC = () => {
             { label: "Fix the cause, not the symptom", at: step4 },
             { label: "Explain", at: step5 },
           ]}
-          relight={{ row: 1, at: noSubAt }}
+          relight={{ row: 1, at: noSubAt, until: step4 - 2 }}
         />
 
         {/* ── What it returns: the report and the reproduction ── */}
@@ -287,7 +310,7 @@ export const DebugScene: React.FC = () => {
               versions={[
                 { at: eightSixAt - 6, text: DEBUG.report.repr ?? "", ink: ACCENT_INK },
                 { at: emptyAt, text: DEBUG.symptomReport.repr ?? "", ink: ACCENT_INK },
-                { at: allAt, text: DEBUG.causeReport.repr ?? "", ink: OK_INK, ok: true },
+                { at: allAt - 2, text: DEBUG.causeReport.repr ?? "", ink: OK_INK, ok: true },
               ]}
             />
           </span>
@@ -305,7 +328,7 @@ export const DebugScene: React.FC = () => {
               versions={[
                 { at: threeTwoAt - 4, text: DEBUG.repro.repr ?? "", ink: ACCENT_INK },
                 { at: emptyAt + 4, text: DEBUG.symptomRepro.repr ?? "", ink: ACCENT_INK },
-                { at: allAt + 4, text: DEBUG.causeRepro.repr ?? "", ink: OK_INK, ok: true },
+                { at: allAt, text: DEBUG.causeRepro.repr ?? "", ink: OK_INK, ok: true },
               ]}
             />
           </span>
@@ -325,8 +348,7 @@ export const DebugScene: React.FC = () => {
         <DiffListing lines={LISTINGS.reproTest} diff={false} x={LIST_X} top={B} width={diffWidth(LISTINGS.reproTest, 20, false)} size={20} at={asTestAt} out={step3 - 6} />
         <Note at={enoughAt} x={LIST_X} y={B + diffHeight(2, 20) + 22} out={step3 - 6}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            of every input with ends 0 to 4: one interval, {DEBUG.search.oneInterval} of {DEBUG.search.spans} fail; two intervals, {DEBUG.search.twoIntervals} of{" "}
-            {DEBUG.search.inputsOfTwo}
+            with ends 0 to 4, no single interval fails; {DEBUG.search.twoIntervals} of {DEBUG.search.inputsOfTwo} pairs do
           </span>
         </Note>
 
@@ -352,12 +374,12 @@ export const DebugScene: React.FC = () => {
         </Note>
 
         {/* ── The hypothesis, tested from outside ── */}
-        <Note at={hypoAt} x={LIST_X} y={B} out={step4 - 6}>
+        <Note at={hypoAt} x={LIST_X} y={B} out={aiAt - 6}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             hypothesis: the loop assumes its input is <Mark at={sortedAt + 10}>sorted</Mark>
           </span>
         </Note>
-        <Note at={beforeAt} x={LIST_X} y={B + 60} out={step4 - 6}>
+        <Note at={beforeAt} x={LIST_X} y={B + 60} out={aiAt - 6}>
           <span style={{ display: "flex", gap: 16, alignItems: "center", whiteSpace: "nowrap", fontSize: 22 }}>
             <Code line={`merge_intervals(sorted(${DEBUG.repro.arg}))`} size={22} />
             <span style={note(22, INK_SOFT)}>returns</span>
@@ -377,12 +399,12 @@ export const DebugScene: React.FC = () => {
             </FadeIn>
           </span>
         </Note>
-        <Note at={rerunAt} x={LIST_X} y={B} out={step5 - 6}>
+        <Note at={rerunAt} x={LIST_X} y={B} out={hereAt}>
           <span style={{ display: "flex", gap: 16, alignItems: "center", whiteSpace: "nowrap", fontSize: 22 }}>
             <span style={note(22, INK_SOFT)}>rerun</span>
             {DEBUG.causeTests.tests.map((t, i) => (
               <span key={t.name} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 21 }}>
-                <Verdict ok={t.ok} at={allAt + 12 + i * 6} size={24} />
+                <Verdict ok={t.ok} at={allAt + 2 + i * 4} size={24} />
                 <Code line={t.name} size={21} />
               </span>
             ))}
@@ -392,12 +414,12 @@ export const DebugScene: React.FC = () => {
         {/* ── Step 5: say why ── */}
         {[
           { at: step5 + 4, q: "What was wrong?", a: "the loop relied on sorted input that nothing guaranteed", aAt: hereAt },
-          { at: whyAt, q: "Why is the fix right?", a: "the sort guarantees it", aAt: guaranteesAt },
+          { at: whyAt, q: "Why is the fix right?", a: "the sort guarantees the order the loop needs", aAt: guaranteesAt },
           { at: elseAt, q: "What else might share the flaw?", a: "", aAt: elseAt },
         ].map((r, i) => (
-          <Note key={i} at={r.at} x={LIST_X} y={B + i * 56} out={aiAt - 6}>
+          <Note key={i} at={r.at} x={LIST_X} y={B + 56 + i * 56} out={testsAt - 6}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              <span style={{ fontWeight: 500 }}>{r.q}</span>
+              <span style={{ fontWeight: 500 }}>{i === 2 ? <Mark at={pastAt + 2}>{r.q}</Mark> : r.q}</span>
               {r.a ? (
                 <FadeIn at={r.aAt}>
                   {" "}
@@ -409,20 +431,22 @@ export const DebugScene: React.FC = () => {
         ))}
 
         {/* ── With an assistant ── */}
-        <Note at={aiAt} x={LIST_X} y={B - 4} out={pastAt - 6}>
+        <Note at={aiAt} x={LIST_X} y={B - 4} out={step4 - 6}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>ask an assistant</span>
         </Note>
         {[
           { at: doesAt, text: "What does this function do?" },
           { at: couldAt, text: "What could make it return an interval that ends before it starts?" },
         ].map((b, i) => (
-          <Note key={i} at={b.at} x={LIST_X} y={B + 36 + i * 58} out={pastAt - 6}>
+          <Note key={i} at={b.at} x={LIST_X} y={B + 36 + i * 58} out={step4 - 6}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>&ldquo;{b.text}&rdquo;</span>
           </Note>
         ))}
-        <Note at={noSubAt + 4} x={LIST_X} y={B + 162} out={pastAt - 6}>
+        <Note at={noSubAt + 4} x={LIST_X} y={B + 162} out={step4 - 6}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             no substitute for <Mark at={noSubAt + 10}>step 2, reproducing it</Mark>
+            <FadeIn at={guessAt}>: its answer is a hypothesis,</FadeIn>
+            <FadeIn at={provesAt}> a failing test proves it</FadeIn>
           </span>
         </Note>
 
@@ -457,6 +481,16 @@ export const DebugScene: React.FC = () => {
         <Note at={keepAt + 14} x={LIST_X + 860} y={B + 114}>
           <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
             got <Py text={DEBUG.keptBefore.tests[2].got} size={23} ink={ACCENT_INK} />
+          </span>
+        </Note>
+
+        {/* ── And the lines beside the sort ── */}
+        <Note at={oneBugAt} x={LIST_X} y={B + 176}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            the report found one bug;{" "}
+            <FadeIn at={twoMoreAt}>
+              <span style={{ color: ACCENT_INK }}>two more sit beside the sort</span>
+            </FadeIn>
           </span>
         </Note>
       </Drift>

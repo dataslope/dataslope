@@ -70,9 +70,12 @@ export const HourScene: React.FC = () => {
   const fourAt = n.word("hour", "In four phases");
   const totalAt = n.word("hour-past", "That's fifty to fifty-five minutes");
   const halfAt = n.word("hour-past", "building is only half of it");
-  const narrateAt = n.word("hour-past", "Narrate throughout");
-  const hearAt = n.word("hour-past", "can't grade reasoning");
-  const end = n.beat("hour-past").to;
+  const spareAt = n.word("hour-spare", "Keep the rest spare");
+  const questionsAt = n.word("hour-spare", "for questions");
+  const lateAt = n.word("hour-spare", "a bug that bites late");
+  const narrateAt = n.word("hour-narrate", "Narrate throughout");
+  const hearAt = n.word("hour-narrate", "can't grade reasoning");
+  const end = n.beat("hour-narrate").to;
 
   // Orient runs from 0; its 5 to 10 minutes are drawn at 10, the second
   // five paler. The others follow on.
@@ -237,6 +240,16 @@ export const HourScene: React.FC = () => {
           <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Num>{HOUR.lo}</Num> to <Num>{HOUR.hi}</Num> minutes of the <Num>60</Num>
           </span>
+        </Note>
+
+        {/* What the rest of the hour is for, beside its dashed tail. */}
+        <Note at={spareAt} x={xAt(HOUR.hi) + 16} y={y(TOTAL_Y) + 8}>
+          <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", lineHeight: 1.3 }}>
+            the rest is spare,
+            <div style={{ opacity: ease(frame, questionsAt - 2, 10) }}>
+              for questions<span style={{ opacity: ease(frame, lateAt - 2, 10) }}> or a late bug</span>
+            </div>
+          </div>
         </Note>
 
         <Spot id="be-ai-round-hourglass" at={sixtyAt} left={1664} top={y(330)} width={118} height={210} />

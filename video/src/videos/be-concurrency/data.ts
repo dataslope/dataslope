@@ -17,6 +17,15 @@ export const ILLUSTRATIONS = true;
 
 export const PYTHON = results.runtime.python;
 
+/**
+ * This Python's build (check.mjs): it has 3.13's sys._is_gil_enabled(), the
+ * GIL is on, and it is not the free-threaded build. Question 4 says so beside
+ * the free-threaded line, so the screen's claim about the default build is
+ * this run's.
+ */
+export const GIL_BUILD = results.runtime.gil as { probe: boolean; enabled: boolean; freeThreadedBuild: boolean };
+if (!GIL_BUILD.probe || !GIL_BUILD.enabled || GIL_BUILD.freeThreadedBuild) throw new Error("results.json: expected the default build, GIL on");
+
 // ── 1. Amdahl's law (the page's chart) ──────────────────────────────────────
 
 type Curve = { ceiling: number; at: Record<string, number>; curve: [number, number][] };

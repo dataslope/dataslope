@@ -172,7 +172,9 @@ results.figures.hurt = await pgFigure(USERS, {
 
 // ── 4. A composite index: order matters, and Postgres 18 can skip ──────────
 const LATEST = "SELECT id, created_at, amount FROM orders\nWHERE customer_id = 42\nORDER BY created_at DESC\nLIMIT 10;";
-const ONE_DAY = "SELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31';";
+// One day, written as a half-open range (the form Question 5 teaches), not
+// an open-ended ">=" that is one day only because the data ends there.
+const ONE_DAY = "SELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31'\n  AND created_at <  '2025-01-01';";
 results.figures.composite = await pgFigure(ORDERS, {
   customers: "SELECT COUNT(*) AS orders, COUNT(DISTINCT customer_id) AS customers,\n  COUNT(*) / COUNT(DISTINCT customer_id) AS each\nFROM orders;",
   create: "CREATE INDEX orders_customer_created_idx\n  ON orders (customer_id, created_at);\nANALYZE orders;",
@@ -303,6 +305,16 @@ results.figures.joins = await pgFigure(PAGE_TABLES, {
   fixed: FIXED,
   fixedTotal: `SELECT SUM(revenue) AS revenue FROM (${FIXED.replace(/\nORDER BY c.name;$/, "")}) t;`,
 });
+
+// ── 15. Keys: the quick round's own orders and customers ──────────────────
+// The same two tables the quick round draws, with the foreign key declared:
+// Postgres indexes each primary key, and nothing on orders.customer_id.
+results.figures.keys = await pgFigure(
+  "CREATE TABLE customers (id int PRIMARY KEY, name text NOT NULL);\nCREATE TABLE orders (\n  order_id int PRIMARY KEY,\n  customer_id int NOT NULL REFERENCES customers,\n  amount numeric NOT NULL)",
+  {
+    indexes: "SELECT tablename, indexname FROM pg_indexes\nWHERE tablename IN ('customers', 'orders')\nORDER BY tablename, indexname;",
+  },
+);
 
 // ── 16. A covering index ───────────────────────────────────────────────────
 const SPEND = "SELECT SUM(amount) FROM orders\nWHERE customer_id = 42;";

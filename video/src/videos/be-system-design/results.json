@@ -53,7 +53,17 @@
         "key": "aMoY44"
       }
     ],
-    "idBlock": 1000000
+    "idBlock": 1000000,
+    "blocks": [
+      {
+        "lo": 9876000001,
+        "hi": 9877000000
+      },
+      {
+        "lo": 9877000001,
+        "hi": 9878000000
+      }
+    ]
   },
   "ladder": {
     "levels": [
@@ -180,7 +190,9 @@
     ],
     "calls": 100,
     "hitsTail": 0.6339676587267709,
-    "tailShare": 0.010025
+    "tailShare": 0.010025,
+    "tailCount": 401,
+    "offChart": 294
   },
   "breaker": {
     "seconds": 120,
@@ -835,9 +847,19 @@
       "means": 15
     },
     {
-      "beat": "q3-counter",
+      "beat": "q3-blocks",
       "words": "a million at a time",
       "means": 1000000
+    },
+    {
+      "beat": "q3-coord",
+      "words": "once per million IDs",
+      "means": 1000000
+    },
+    {
+      "beat": "q2-cache",
+      "words": "five gigabytes",
+      "means": 5000000000
     },
     {
       "beat": "q4-retry",

@@ -48,17 +48,23 @@ if (LOST.result !== RACE.bothRead.result) throw new Error(`race: the chips say $
 const EVERY = RACE.one.every ?? [];
 if (EVERY.length !== RACE.one.orders) throw new Error("race: results.json has no list of every order");
 const LOCKED = RACE.locked.every ?? [];
+/** The two orders "today" and "tomorrow" point at: the first that leaves
+ *  seven, and the first that loses an update. */
+const K_PASS = EVERY.findIndex((o) => o.result === RACE.one.right);
+const K_FAIL = EVERY.findIndex((o) => o.result !== RACE.one.right);
 
 /** One order of the six steps: a square per step in its thread's color, then the counter it leaves. */
-const Order: React.FC<{ threads: string; result: number; x: number; y: number; at: number; judged: number; dim: number }> = ({ threads, result, x, y, at, judged, dim }) => {
+const Order: React.FC<{ threads: string; result: number; x: number; y: number; at: number; judged: number; dim: number; flash?: number }> = ({ threads, result, x, y, at, judged, dim, flash }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
   if (p <= 0.001) return null;
+  // The order the pass/fail line points at swells once, on its word.
+  const lit = flash === undefined ? 0 : pulse(frame, flash, 22);
   const right = result === RACE.one.right;
   const ink = judged > 0.5 ? (right ? OK_INK : ACCENT_INK) : INK;
   return (
-    <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "center", gap: 4, fontSize: 22, opacity: Math.min(1, p) * (1 - dim), transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`, transformOrigin: "0 50%" }}>
+    <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "center", gap: 4, fontSize: 22, opacity: Math.min(1, p) * (1 - dim), transform: `scale(${(0.85 + 0.15 * Math.min(1, p)) * (1 + 0.22 * lit)})`, transformOrigin: "0 50%" }}>
       {[...threads].map((c, i) => (
         <span key={i} style={{ width: SQ, height: SQ, borderRadius: 4, background: THREAD[who(c)].fill }} />
       ))}
@@ -83,7 +89,9 @@ const Order: React.FC<{ threads: string; result: number; x: number; y: number; a
  * Both read five and both write six: one increment lost. Every order the six
  * steps can run in is drawn from results.json: twenty, two leave seven. With
  * the three steps under a lock, two orders are left and both leave seven.
- * Which order runs is timing, so the same test passes and fails.
+ * Before the lock: which order runs is timing, so the same test passes and
+ * fails, said while the twenty orders are still up (one 7 lit for "today",
+ * one 6 for "tomorrow"); then the lock cures it.
  */
 export const RaceScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -117,7 +125,7 @@ export const RaceScene: React.FC = () => {
   const passAt = n.word("race-hides", "pass today");
   const failAt = n.word("race-hides", "fail tomorrow");
   const sameAt = n.word("race-hides", "no change to the code");
-  const end = n.beat("race-hides").to;
+  const end = n.beat("race-lock").to;
 
   const rowY = ROWS.map((v) => y(v));
   const chipH = h(CHIP_H);
@@ -285,6 +293,7 @@ export const RaceScene: React.FC = () => {
             at={countAt + 4 + k * 2}
             judged={o.result === RACE.one.right ? judge7 : judge6}
             dim={gridOut}
+            flash={k === K_PASS ? passAt : k === K_FAIL ? failAt : undefined}
           />
         ))}
         <Note at={sevenAt} x={G_X} y={y(G_TOP) + 5 * h(ROW_H) + h(10)} out={fixAt + 2}>
@@ -338,8 +347,8 @@ export const RaceScene: React.FC = () => {
           );
         })}
 
-        {/* The same test, two days. */}
-        <Note at={pauseAt} x={X0} y={y(846)}>
+        {/* The same test, two days: said while the losing orders are up, gone with the lock. */}
+        <Note at={pauseAt} x={X0} y={y(846)} out={fixAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Which order runs is timing:
             <b style={{ color: OK_INK, opacity: ease(frame, passAt, 10) }}> ✓ today: pass</b>

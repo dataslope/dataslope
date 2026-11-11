@@ -265,6 +265,7 @@ export const script: NarrationScript = {
       text: "Average is the key word. With a thousand buckets, a shared bucket is more likely than not by the thirty-eighth key.",
       pauseAfter: 0.6,
     },
+    { id: "hash-why", text: "Each new key can collide with every key already in.", pauseAfter: 0.8 },
     {
       id: "hash-worst",
       text: "The follow-up is the worst case. Give a thousand keys the same hash, and filling a Python set takes nearly six hundred thousand key comparisons. With distinct hashes, none.",
@@ -273,6 +274,11 @@ export const script: NarrationScript = {
     {
       id: "hash-set",
       text: "That's a hash set: constant on average, linear space, and linear per operation at worst.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "hash-when",
+      text: "That worst case comes from a weak hash, or keys picked to collide, which is why Python randomizes string hashes. Need the keys in order? Use a balanced tree.",
       pauseAfter: 0.8,
     },
 
@@ -348,6 +354,11 @@ export const script: NarrationScript = {
     {
       id: "bfs-memory",
       text: "Memory decides it too. On a full binary tree of a million nodes, BFS holds the widest level, five hundred twenty-four thousand nodes; DFS holds one path, twenty.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "bfs-chain",
+      text: "On a long chain it flips: BFS holds one node, DFS the whole chain, and recursion overflows.",
       pauseAfter: 0.8,
     },
     {
@@ -394,8 +405,13 @@ export const script: NarrationScript = {
     },
     {
       id: "dijk-neg",
-      text: "Why no negative weights? A node is final when it leaves the heap. B leaves at two, and only later does the minus-two edge from C reach it at one. B is wrong, and so is D.",
-      pauseAfter: 0.7,
+      text: "Why no negative weights? A node is final when it leaves the heap.",
+      pauseAfter: 0.8,
+    },
+    {
+      id: "dijk-late",
+      text: "B leaves at two, and only later does the minus-two edge from C reach it at one. B is wrong, and so is D.",
+      pauseAfter: 0.9,
     },
     {
       id: "dijk-bf",
@@ -424,6 +440,11 @@ export const script: NarrationScript = {
     {
       id: "quick-next",
       text: "And sorted input is common, rows by ID or events by time, so randomize. Quicksort's edge over merge sort is sorting in place.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "quick-trade",
+      text: "But it isn't stable, and libraries cap its worst case by switching to heapsort.",
       pauseAfter: 0.9,
     },
 
@@ -456,6 +477,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.7,
     },
     {
+      id: "master-cases",
+      text: "If combining dominates, the top level sets the cost; if the pieces dominate, the bottom does.",
+      pauseAfter: 1.0,
+    },
+    {
       id: "r-recursion",
       text: "Recursion fits trees, but every call takes a stack frame, and Python stops at a thousand. A loop with an explicit stack avoids that.",
     },
@@ -471,12 +497,14 @@ export const script: NarrationScript = {
     {
       id: "r-classic",
       text: "Know coin change, longest common subsequence, knapsack, edit distance and word break: each teaches a way to define the state.",
+      pauseAfter: 1.5,
     },
     {
       id: "r-greedy",
       text: "Greedy takes the best-looking step, safe only when local choices provably add up. To make six from coins of one, three and four, it takes three coins. Two threes do it.",
       pauseAfter: 0.7,
     },
+    { id: "greedy-safe", text: "Scheduling by earliest finish time is the classic safe case.", pauseAfter: 0.7 },
     {
       id: "r-backtrack",
       text: "Backtracking builds a candidate step by step and drops a branch the moment it can't succeed: N-Queens, Sudoku, permutations.",
@@ -491,7 +519,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-bst",
-      text: "A binary search tree, or BST, costs its height per operation. A thousand keys inserted in order stand a thousand levels tall; shuffled, twenty-one. AVL and red-black trees stay at log n.",
+      text: "A binary search tree, or BST, keeps smaller keys to the left of each node and larger ones to the right, so an operation costs its height.",
+    },
+    {
+      id: "bst-heights",
+      text: "A thousand keys inserted in order stand a thousand levels tall; shuffled, twenty-one. AVL and red-black trees stay at log n.",
       pauseAfter: 0.7,
     },
     {
@@ -505,10 +537,12 @@ export const script: NarrationScript = {
     {
       id: "r-trie",
       text: "A trie stores strings a character per level, so a lookup costs the key's length, however many keys: autocomplete, IP routing. It takes more memory.",
+      pauseAfter: 1.5,
     },
     {
       id: "r-binary",
       text: "Binary search needs sorted, indexable data: twenty probes at most for a million. Its bugs: off-by-one bounds, and a midpoint sum overflowing fixed-width integers.",
+      pauseAfter: 2.0,
     },
     {
       id: "r-pointers",
@@ -526,10 +560,12 @@ export const script: NarrationScript = {
     {
       id: "r-cycle",
       text: "To find a cycle in a directed graph, run DFS marking nodes unvisited, on the path, or done. An edge back to the path is a cycle.",
+      pauseAfter: 1.5,
     },
     {
       id: "r-topo",
       text: "Topological sort orders a graph with no cycles so every edge points forward, like build steps, in linear time.",
+      pauseAfter: 1.5,
     },
     {
       id: "r-kahn",

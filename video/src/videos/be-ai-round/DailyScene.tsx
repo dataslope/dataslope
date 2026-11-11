@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QuestionCard } from "../../editorial/interview";
+import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink, Note, Num } from "../../editorial/ui";
@@ -74,6 +74,10 @@ export const DailyScene: React.FC = () => {
       title: "Verify",
       at: n.word("daily-concrete", "How you verify what it writes"),
       items: [{ text: "how you check what it writes", at: n.word("daily-concrete", "How you verify what it writes") + 8 }],
+      example: [
+        { text: "run the tests,", at: n.word("daily-example", "I run the tests") },
+        { text: "read the diff like a PR", at: n.word("daily-example", "read its diff like a pull request") },
+      ],
     },
     {
       title: "The time it was wrong",
@@ -82,8 +86,15 @@ export const DailyScene: React.FC = () => {
         { text: "one specific time", at: n.word("daily-concrete", "one specific time it was wrong") + 6 },
         { text: "and how you caught it", at: n.word("daily-concrete", "how you caught it") },
       ],
+      example: [
+        { text: "a parameter our payments", at: n.word("daily-example", "called our payments client") },
+        { text: "client doesn't have;", at: n.word("daily-example", "a parameter that doesn't exist") },
+        { text: "the integration test", at: n.word("daily-example", "the integration test caught it") },
+        { text: "caught it before review", at: n.word("daily-example", "before review") },
+      ],
     },
   ];
+  const exampleAt = n.word("daily-example", "For example");
   const measureAt = n.word("daily-metr", "you measure rather than assume");
   const metrAt = n.word("daily-metr", "In METR's twenty twenty-five randomized trial");
   const longerAt = n.word("daily-metr", "took nineteen percent longer");
@@ -163,6 +174,15 @@ export const DailyScene: React.FC = () => {
                     {it.text}
                   </div>
                 ))}
+                {/* A worked example, in the right answer's green: what a
+                    strong answer actually says. */}
+                {"example" in b
+                  ? b.example.map((it) => (
+                      <div key={it.text} style={{ ...note(24, OK_INK), fontWeight: 500, marginBottom: 4, whiteSpace: "nowrap", opacity: ease(frame, it.at - 2, 10) }}>
+                        {it.text}
+                      </div>
+                    ))
+                  : null}
               </div>
             );
           })}
@@ -199,6 +219,13 @@ export const DailyScene: React.FC = () => {
         </svg>
         <Note at={metrAt + 10} x={ZERO} y={measuredTop - h(30) - 34} width={0}>
           <div style={{ position: "absolute", left: -100, width: 200, ...note(20, INK_SOFT), textAlign: "center", whiteSpace: "nowrap" }}>no change</div>
+        </Note>
+        {/* The axis is time on task: left is less of it, right more. */}
+        <Note at={metrAt + 16} x={ZERO - 80} y={measuredTop - h(30) - 34} align="right">
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>← less time on a task</span>
+        </Note>
+        <Note at={metrAt + 16} x={ZERO + 80} y={measuredTop - h(30) - 34}>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>more time →</span>
         </Note>
         {/* Measured: took longer. */}
         <div style={{ position: "absolute", left: ZERO, top: measuredTop, width: MEASURED * PCT * m, height: barH, background: BAR, borderRadius: "0 6px 6px 0" }} />

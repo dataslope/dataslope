@@ -295,6 +295,28 @@ r["review"] = {
     "reviewTestsOnFix": run_tests(FIXED, REVIEW_TESTS),
 }
 
+# The closing: what the sort costs. Python's sort, its comparisons counted,
+# on n intervals already in order (one pass: n - 1) and on the same n
+# shuffled with a fixed seed (about n log n).
+import random
+COMPARED = [0]
+class Counted:
+    __slots__ = ("v",)
+    def __init__(self, v):
+        self.v = v
+    def __lt__(self, other):
+        COMPARED[0] += 1
+        return self.v < other.v
+def comparisons(items):
+    COMPARED[0] = 0
+    sorted(items, key=Counted)
+    return COMPARED[0]
+N = 1000
+in_order = [[2 * i, 2 * i + 1] for i in range(N)]
+shuffled = in_order[:]
+random.Random(7).shuffle(shuffled)
+r["cost"] = {"n": N, "inOrder": comparisons(in_order), "shuffled": comparisons(shuffled)}
+
 json.dumps(r)
 `);
 
@@ -326,6 +348,7 @@ const expect = [
   ["the three new tests fail on the assistant's code", rv.reviewTestsOnAssistant.tests.slice(1).every((t) => !t.ok)],
   ["the sort alone passes one of the three", rv.reviewTestsOnSorted.tests.slice(1).filter((t) => t.ok).length === 1],
   ["the three new tests pass on the fix", rv.reviewTestsOnFix.failed === 0],
+  ["the sort is one pass on input already in order", results.cost.inOrder === results.cost.n - 1 && results.cost.shuffled > 5 * results.cost.n],
 ];
 const broken = expect.filter(([, ok]) => !ok);
 if (broken.length) {
@@ -355,6 +378,8 @@ const claims = [
   ["debug-repro", "three to two"],
   ["debug-symptom", "empty list"],
   ["review-contain", "becomes one to three"],
+  ["review-empty", "empty list and a single interval come back fine"],
+  ["next-cost", "already in order, the sort costs close to one pass"],
 ];
 const wrong = claims.filter(([id, words]) => !text(id).includes(words));
 if (wrong.length) {

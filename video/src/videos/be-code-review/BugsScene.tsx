@@ -234,7 +234,7 @@ export const BugsScene: React.FC = () => {
         </Note>
 
         {/* ── Seven kinds ── */}
-        <Card x={cx(0)} y={R1} w={CARD_W} h={CARD_H} at={boundAt - 4} title="Boundaries" dim={quietAt} undim={lift - 4}>
+        <Card x={cx(0)} y={R1} w={CARD_W} h={CARD_H} at={suspectsAt + 2} title="Boundaries" dim={quietAt} undim={lift - 4}>
           <Line at={ltAt} size={26} color={INK_SOFT}>
             <Op color={ACCENT_INK}>&lt;</Op> where <Op color={OK_INK}>&lt;=</Op> belongs
           </Line>
@@ -294,7 +294,7 @@ export const BugsScene: React.FC = () => {
           </div>
           <Line at={packageAt} color={ACCENT_INK}>
             an invented package name:{" "}
-            <span style={{ opacity: ease(frame, registerAt - 2, 10) }}>
+            <span style={{ opacity: ease(frame, registerAt - 2, 10), marginLeft: "-0.14em" }}>
               <Mark at={registeredAt} color={MARK_BAD}>
                 an attacker can register it
               </Mark>
@@ -314,7 +314,9 @@ export const BugsScene: React.FC = () => {
 
         <Card x={cx(1)} y={R2} w={CARD_W} h={CARD_H} at={secAt - 4} title="Security" dim={quietAt} out={gone}>
           <div style={{ opacity: ease(frame, sqlAt - 2, 10), fontSize: 20 }}>
-            <Code line={'f"... WHERE id = {user_id}"'} size={20} />
+            <Mark at={sqlAt + 8} color={MARK_BAD}>
+              <Code line={'f"... WHERE id = {user_id}"'} size={20} />
+            </Mark>
           </div>
           <Line at={secretsAt}>a secret pasted into the code</Line>
           <Line at={authAt}>a missing authorization check</Line>

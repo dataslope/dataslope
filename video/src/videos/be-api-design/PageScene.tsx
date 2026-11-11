@@ -72,7 +72,8 @@ export const PageScene: React.FC = () => {
   const noJumpAt = n.word("page-cost-two", "no jumping straight");
   const orderAt = n.word("page-cost-two", "an order that's unique and never changes");
   const tieAt = n.word("page-cost-two", "adds the ID as a tiebreaker");
-  const end = n.beat("page-cost-two").to;
+  const indexAt = n.word("page-index", "needs an index to match");
+  const end = n.beat("page-index").to;
 
   // ── The request, broken into its parts ──
   const qTop = y(300);
@@ -310,6 +311,9 @@ export const PageScene: React.FC = () => {
             a unique, unchanging order:{" "}
             <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 500 }}>
               (created_at, <Mark at={tieAt + 4}>id</Mark>)
+            </span>
+            <span style={{ opacity: ease(frame, indexAt, 10) }}>
+              , <Mark at={indexAt + 4}>indexed</Mark>
             </span>
           </span>
         </Note>

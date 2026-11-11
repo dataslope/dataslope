@@ -101,6 +101,16 @@ if (PAGE.page2Offset[0] !== PAGE.page1.at(-1)) throw new Error("the narration sa
 if (PAGE.page2Cursor[0] !== PAGE.page1.at(-1)! - 1) throw new Error("the cursor's page two must start right after page one");
 if (PAGE.differ !== 0) throw new Error("page 500 must be the same rows both ways");
 
+/** A cursor on (created_at, id), page 500: without an index on the pair the
+ *  plan scans the whole table and sorts it; with one it seeks and reads a
+ *  page. Nothing here is shown as a number: "page-index" says it in words. */
+const tieScan = plan("page", "tieScan");
+const scanned = actualRows(tieScan, "Seq Scan") + Number(tieScan.find((l) => l.includes("Rows Removed by Filter"))!.match(/(\d+)$/)![1]);
+export const TIE_INDEX = {
+  scanned,
+  seekRead: actualRows(plan("page", "tieSeek"), "Index Scan"),
+};
+
 // ── 7, 8. Sessions, JWTs, OAuth ─────────────────────────────────────────────
 
 export const AUTH = {
@@ -155,6 +165,7 @@ if (Math.round(1 / GZIP.fraction) !== 6) throw new Error("the narration says abo
     ["a hundred thousand articles", PAGE.articles === 100_000],
     ["page one reads twenty, page five hundred ten thousand, page five thousand all hundred thousand", read("offset", 1) === 20 && read("offset", 500) === 10_000 && read("offset", 5000) === 100_000],
     ["twenty rows read at any depth", PAGE.cursor.every((p) => p.read === PAGE_SIZE)],
+    ["without an index on that order, every page scans the whole table", TIE_INDEX.scanned === PAGE.articles + 1 && TIE_INDEX.seekRead === PAGE_SIZE],
     ["forty-three random characters", AUTH.sessionChars === 43],
     ["a hundred sixty-four characters", AUTH.chars === 164],
     ["say fifteen minutes", AUTH.lifetimeMinutes === 15],

@@ -340,8 +340,9 @@ export const RAPID = {
     /** The customers with no orders, in id order. */
     none: table("joins", "none").rows.map((r) => r[0]),
   },
-  /** Postgres's indexes on accounts and transfers: the primary keys only. */
-  keys: table("txn", "indexes"),
+  /** Postgres's indexes on the quick round's own customers and orders, with
+   *  orders.customer_id declared a foreign key: the primary keys only. */
+  keys: table("keys", "indexes"),
   cover: {
     include: lines("cover", "include").slice(0, 2),
     query: explained("cover", "after"),

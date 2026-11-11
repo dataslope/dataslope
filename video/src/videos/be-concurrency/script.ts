@@ -230,9 +230,10 @@ export const script: NarrationScript = {
       text: "That sharing is also the danger. Two threads can corrupt the same state.",
       pauseAfter: 0.6,
     },
+    { id: "proc-own", text: "Processes each get their own memory.", pauseAfter: 0.55 },
     {
       id: "proc-iso",
-      text: "Processes each get their own memory. A crash in one can't corrupt another, and they run truly in parallel. The price is talking: data passed between them has to be serialized through pipes or queues, and every process costs more memory.",
+      text: "A crash in one can't corrupt another. In CPython, they're also how Python runs in parallel, since its threads take turns. The price is talking: data between them is usually serialized, through pipes or queues, and every process costs more memory.",
       pauseAfter: 0.8,
     },
 
@@ -259,13 +260,13 @@ export const script: NarrationScript = {
       pauseAfter: 0.8,
     },
     {
-      id: "race-lock",
-      text: "The fix is a lock around the three steps, so they run as one critical section. Then two orders are left, one thread first or the other, and both give seven.",
-      pauseAfter: 0.6,
-    },
-    {
       id: "race-hides",
       text: "And since the bad orders depend on where a thread happens to pause, the same test can pass today and fail tomorrow, with no change to the code.",
+      pauseAfter: 1.0,
+    },
+    {
+      id: "race-lock",
+      text: "The fix is a lock around the three steps, so they run as one critical section. Then two orders are left, one thread first or the other, and both give seven.",
       pauseAfter: 0.8,
     },
 
@@ -294,6 +295,11 @@ export const script: NarrationScript = {
     {
       id: "gil-proc",
       text: "For CPU-bound work, use processes instead. Each has its own interpreter and its own GIL, so they really do run in parallel.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "gil-free",
+      text: "Since Python three fourteen, there's also an officially supported build with no GIL. There, threads do run in parallel, so the counter's lock matters even more.",
       pauseAfter: 0.8,
     },
 
@@ -333,14 +339,16 @@ export const script: NarrationScript = {
     {
       id: "prevent-hold",
       text: "Hold and wait: one coarse lock instead of several, so no thread holds one while it waits for another.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.55,
     },
+    { id: "prevent-all", text: "Or take every lock you need at once.", pauseAfter: 0.6 },
     {
       id: "prevent-share",
       text: "Mutual exclusion: share nothing. Give the state one owner thread and send it work through a queue, so no other thread needs a lock on it.",
       pauseAfter: 0.5,
     },
     { id: "prevent-short", text: "And keep critical sections short, so contention stays low.", pauseAfter: 0.6 },
+    { id: "prevent-detect", text: "If one happens anyway, a thread dump shows who's waiting on whom.", pauseAfter: 0.7 },
     {
       id: "prevent-live",
       text: "One catch: threads that time out and retry in lockstep can collide forever. That's livelock, in the quick round.",
@@ -355,13 +363,19 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "async-os",
+      text: "Under it, the loop asks the operating system which sockets are ready, and wakes the coroutines waiting on them.",
+      pauseAfter: 0.7,
+    },
+    {
       id: "async-run",
       text: "Two fetches: a waits twenty milliseconds, b waits ten. The waits overlap, so b finishes first, and the pair takes about twenty, not thirty. Gathered together, the results still come back in the order you asked: a, then b.",
       pauseAfter: 0.7,
     },
+    { id: "async-nopre", text: "Nothing interrupts a running coroutine.", pauseAfter: 0.55 },
     {
       id: "async-coop",
-      text: "There's no preemption. The loop can only switch at an await, so a coroutine that never awaits, like a tight CPU loop, starves every other one.",
+      text: "The loop can only switch at an await, so a coroutine that never awaits, like a tight CPU loop, starves every other one.",
       pauseAfter: 0.6,
     },
     {
@@ -426,7 +440,12 @@ export const script: NarrationScript = {
     },
     {
       id: "r-atomic",
-      text: "An atomic operation completes in one indivisible step: no other thread can see it half done. Adding one to the counter isn't atomic. Compare-and-swap instructions make it so, or a lock held around the whole thing.",
+      text: "An atomic operation completes in one indivisible step: no other thread can see it half done. Adding one to the counter isn't atomic.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "r-cas",
+      text: "An atomic add instruction makes it so, or compare-and-swap: write only if the value is unchanged since the read, and retry if not. Or hold a lock around all three.",
       pauseAfter: 0.6,
     },
     {
@@ -446,13 +465,18 @@ export const script: NarrationScript = {
     },
     {
       id: "r-pool",
-      text: "A thread pool keeps a fixed set of reusable workers and a queue of tasks. You skip creating a thread per task, and you bound how many run at once. Map a function over a list with it, and the results come back in input order.",
+      text: "A thread pool keeps a fixed set of reusable workers and a queue of tasks. You skip creating a thread per task, and you bound how many run at once.",
       pauseAfter: 0.6,
     },
     {
       id: "r-future",
       text: "And a future is a claim ticket for a result that isn't ready yet. Start the work, take the ticket at once, and collect the value later, by blocking on it or awaiting it.",
-      pauseAfter: 1.0,
+      pauseAfter: 0.7,
+    },
+    {
+      id: "r-promise",
+      text: "A promise is the same idea, seen from the side that fills in the value.",
+      pauseAfter: 1.2,
     },
     {
       id: "next",

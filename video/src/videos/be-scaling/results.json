@@ -2507,7 +2507,25 @@
     "worstDeviation": 0.0036160000000000636,
     "userLinks": 50,
     "userShards": 8,
-    "allCovered": 0.9899351083119388
+    "allCovered": 0.9899351083119388,
+    "userPerShard": [
+      11,
+      10,
+      3,
+      6,
+      5,
+      5,
+      5,
+      5
+    ]
+  },
+  "reshard": {
+    "from": 8,
+    "to": 9,
+    "keys": 1000000,
+    "pointsPerShard": 100,
+    "shareMod": 0.888881,
+    "shareRing": 0.13346
   },
   "rate": {
     "limit": 10,
@@ -2991,17 +3009,17 @@
       "means": 77
     },
     {
-      "beat": "q4-model",
+      "beat": "q4-cross",
       "words": "about fifteen seconds",
       "means": 15
     },
     {
-      "beat": "q4-model",
+      "beat": "q4-cross",
       "words": "six percent of reads miss",
       "means": 6
     },
     {
-      "beat": "q4-model",
+      "beat": "q4-cross",
       "words": "six percent are stale",
       "means": 6
     },
@@ -3014,6 +3032,21 @@
       "beat": "q6-key",
       "words": "within one percent of an eighth",
       "means": 1
+    },
+    {
+      "beat": "q6-ring",
+      "words": "Add a ninth shard",
+      "means": 9
+    },
+    {
+      "beat": "q6-ring",
+      "words": "modulo moves eighty-nine percent of the keys",
+      "means": 89
+    },
+    {
+      "beat": "q6-ring",
+      "words": "moves thirteen percent",
+      "means": 13
     },
     {
       "beat": "q6-cost",
@@ -3059,6 +3092,11 @@
       "beat": "q9-leaky",
       "words": "one every six seconds",
       "means": 6
+    },
+    {
+      "beat": "q9-full",
+      "words": "its queue of ten is full",
+      "means": 10
     },
     {
       "beat": "q9-shared",

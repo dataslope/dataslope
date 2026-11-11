@@ -255,7 +255,7 @@ export const script: NarrationScript = {
     {
       id: "codes-why",
       text: "The right code lets a client handle a failure in code, instead of parsing an error message.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.6,
     },
     {
       id: "authn",
@@ -303,6 +303,11 @@ export const script: NarrationScript = {
     {
       id: "idem-race",
       text: "What makes it safe is a unique constraint on the key: even two retries racing each other can't both get in, because the database refuses the second.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "idem-reply",
+      text: "The server catches that refusal and answers with the stored payment, and a key reused with a different body is rejected.",
       pauseAfter: 0.8,
     },
 
@@ -331,6 +336,11 @@ export const script: NarrationScript = {
     {
       id: "page-cost-two",
       text: "It costs two things: no jumping straight to page five hundred, and an order that's unique and never changes, so a sort by time adds the ID as a tiebreaker.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "page-index",
+      text: "And that order needs an index to match, or every page scans the whole table.",
       pauseAfter: 0.8,
     },
 
@@ -354,6 +364,11 @@ export const script: NarrationScript = {
     {
       id: "auth-oauth",
       text: "OAuth isn't a token format at all. It's a framework for delegated authorization: letting one app reach your data on another service without your password. Its access tokens may be JWTs or opaque strings.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "auth-oidc",
+      text: "Logging users in on top of OAuth is OpenID Connect's job: it adds an ID token.",
       pauseAfter: 0.7,
     },
     {
@@ -447,7 +462,15 @@ export const script: NarrationScript = {
     },
     {
       id: "r-version",
-      text: "Version an API to protect clients from breaking changes, like removing a field or changing its type. A version in the path, slash v one, is the most visible and the pragmatic default. Adding an optional field needs no new version.",
+      text: "Version an API to protect clients from breaking changes, like removing a field or changing its type.",
+    },
+    {
+      id: "r-version-path",
+      text: "A version in the path, slash v one, is the pragmatic default: more visible and cache-friendly than a header or a query parameter.",
+    },
+    {
+      id: "r-version-add",
+      text: "Adding an optional field needs no new version.",
       pauseAfter: 0.6,
     },
     {

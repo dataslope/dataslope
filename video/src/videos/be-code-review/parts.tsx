@@ -374,8 +374,9 @@ export const Steps: React.FC<{
   width: number;
   at: number;
   end: number;
-  /** Light a row again from a frame on (the step an assistant cannot do). */
-  relight?: { row: number; at: number };
+  /** Light a row again from a frame on (the step an assistant cannot do),
+   *  until a frame if given; while it is lit, it is the only current row. */
+  relight?: { row: number; at: number; until?: number };
   out?: number;
 }> = ({ items, x, top, rowH, width, at, end, relight, out }) => {
   const frame = useCurrentFrame();
@@ -383,8 +384,9 @@ export const Steps: React.FC<{
     <>
       {items.map((item, i) => {
         const next = items[i + 1]?.at ?? end;
-        const again = relight && relight.row === i ? ease(frame, relight.at, 10) : 0;
-        const current = Math.max(during(frame, item.at - 2, next, 8), again);
+        const ringing = relight === undefined ? 0 : relight.until === undefined ? ease(frame, relight.at, 10) : during(frame, relight.at, relight.until, 10);
+        const again = relight && relight.row === i ? ringing : 0;
+        const current = Math.max(during(frame, item.at - 2, next, 8) * (1 - ringing), again);
         const done = ease(frame, next - 2, 10);
         return (
           <Ink key={i} at={at + i * 3} dur={12} out={out} style={{ left: x, top: top + i * rowH, width, height: rowH }}>

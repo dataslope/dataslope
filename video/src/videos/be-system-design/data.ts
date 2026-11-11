@@ -44,6 +44,8 @@ export const KEY = results.key as {
   keyLengths: { len: number; keys: number; years: number }[];
   counted: { id: number; key: string }[];
   idBlock: number;
+  /** The two app servers' blocks of IDs; the counted IDs are in the first. */
+  blocks: { lo: number; hi: number }[];
 };
 
 /** charts/memory-latency-ladder.mjs's levels, in nanoseconds, and one
@@ -68,6 +70,9 @@ export const PERCENTILES = results.percentiles as {
   calls: number;
   hitsTail: number;
   tailShare: number;
+  /** Requests at or past the p99, and how many of them lie past `domain`. */
+  tailCount: number;
+  offChart: number;
 };
 
 export type BreakerBand = { state: "open" | "half-open"; t0: number; t1: number };

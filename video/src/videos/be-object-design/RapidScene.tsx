@@ -83,15 +83,19 @@ const Encap: React.FC<{ c: Ctx }> = ({ c }) => {
   const hidesAt = c.w("r-encap", "an account hides its balance");
   const checkAt = c.w("r-encap", "methods that check");
   const overdrawAt = c.w("r-encap", "no withdrawal can overdraw it");
-  const guardAt = c.w("r-encap", "Guard every way in");
-  const ctorAt = c.w("r-encap", "the constructor too");
-  const opensAt = c.w("r-encap", "An account that opens at minus fifty");
-  const alreadyAt = c.w("r-encap", "is overdrawn already");
+  const opensAt = c.w("r-encap-ctor", "But an account that opens at minus fifty");
+  const alreadyAt = c.w("r-encap-ctor", "is overdrawn already");
+  const guardAt = c.w("r-encap-ctor", "so guard every way in");
+  const ctorAt = c.w("r-encap-ctor", "the constructor too");
+  if (!ACCOUNT.guardedOpening.startsWith("ValueError")) throw new Error(`the guarded constructor now says ${ACCOUNT.guardedOpening}`);
   const shell = { x: 1090, w: 320, top: c.y(420), h: 210 };
   const mid = shell.top + shell.h / 2;
   const bounce = ease(frame, overdrawAt + 4, 10) - ease(frame, overdrawAt + 16, 10);
-  const opened = ease(frame, opensAt + 10, 12);
-  const value = opened > 0.5 ? ACCOUNT.opening : 100;
+  // The unguarded door lets -50 in; once guarded, the arrow stops outside
+  // it, refused, and the balance is the account's own again.
+  const opened = ease(frame, opensAt + 14, 12);
+  const guarded = ease(frame, guardAt + 6, 12);
+  const value = opened > 0.5 && guarded < 0.5 ? ACCOUNT.opening : 100;
   const overdraw = ACCOUNT.overdraw.replace(/^ValueError: /, "");
   return (
     <>
@@ -131,18 +135,21 @@ const Encap: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
 
       {/* The constructor's door, unguarded, then guarded. */}
-      <Box x={shell.x - 16} y={mid - 30} w={26} h={60} at={guardAt} tone="bad" tones={[[alreadyAt + 16, "ok"]]} dashed radius={6} />
-      <Line x={R_X} y={mid - 112} at={ctorAt} size={22} weight={500} color={ACCENT_INK}>
-        <span style={{ opacity: 1 - ease(frame, alreadyAt + 16, 10) }}>opening: no check</span>
+      <Box x={shell.x - 16} y={mid - 30} w={26} h={60} at={opensAt - 4} tone="bad" tones={[[guardAt + 6, "ok"]]} dashed radius={6} />
+      <Line x={R_X} y={mid - 112} at={opensAt} size={22} weight={500} color={ACCENT_INK}>
+        <span style={{ opacity: 1 - ease(frame, guardAt + 6, 10) }}>opening: no check</span>
       </Line>
-      <Line x={R_X} y={mid - 112} at={alreadyAt + 16} size={22} weight={500} color={OK_INK}>
+      <Line x={R_X} y={mid - 112} at={ctorAt} size={22} weight={500} color={OK_INK}>
         opening: checked too
       </Line>
-      <Flow points={[[R_X, mid], [shell.x - 26, mid]]} at={opensAt} dur={10} color={ACCENT} />
-      <Line x={R_X} y={mid - 46} at={opensAt} size={22} weight={500}>
+      <Flow points={[[R_X, mid], [shell.x - 26 - 30 * guarded, mid]]} at={opensAt + 4} dur={10} color={ACCENT} />
+      <Line x={R_X} y={mid - 46} at={opensAt + 4} size={22} weight={500}>
         open at −50
       </Line>
-      <Line x={shell.x} y={shell.top + shell.h + 26} at={alreadyAt} size={24} color={ACCENT_INK} weight={500}>
+      <Line x={R_X} y={mid + 22} at={guardAt + 12} size={22} color={ACCENT_INK} weight={500}>
+        refused
+      </Line>
+      <Line x={shell.x} y={shell.top + shell.h + 26} at={alreadyAt} out={guardAt + 6} size={24} color={ACCENT_INK} weight={500}>
         overdrawn already
       </Line>
       <Line x={shell.x} y={shell.top + shell.h + 76} at={guardAt} size={24} weight={500}>

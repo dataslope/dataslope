@@ -92,6 +92,12 @@ export const StylesScene: React.FC = () => {
   const sTop = figTop + h(40);
   const mixTop = y(835);
   const mixMid = mixTop + h(36);
+  /** The internal services, stacked, and the point where gRPC fans out. */
+  const svcH = h(38);
+  const svcGap = h(7);
+  const svcMid = mixMid - h(8);
+  const FORK_X = 1000;
+  const SVC_X = 1180;
   const bitOffset = Math.max(0, frame - streamAt) * 1.2;
 
   return (
@@ -212,13 +218,20 @@ export const StylesScene: React.FC = () => {
           REST
         </Pill>
         <Node x={610} y={mixTop} w={240} h={h(72)} at={publicAt + 6} tone="data" title="your API" size={23} />
-        <Flow points={[[858, mixMid], [1170, mixMid]]} at={betweenAt} color={OK} width={3} head={14} />
-        <Pill x={940} y={mixMid - h(44)} at={betweenAt + 4} tone="ok" size={21}>
+        {/* gRPC fans out to each of its own services, stacked in a column. */}
+        <Flow points={[[858, mixMid], [FORK_X, mixMid]]} at={betweenAt} color={OK} width={3} cut={1} />
+        <Pill x={880} y={mixMid - h(44)} at={betweenAt + 4} tone="ok" size={21}>
           gRPC
         </Pill>
-        {["orders", "search", "billing"].map((s, i) => (
-          <Node key={s} x={1180 + i * 205} y={mixTop} w={185} h={h(72)} at={betweenAt + 6 + i * 4} tone="data" title={s} size={23} />
-        ))}
+        {["orders", "search", "billing"].map((s, i) => {
+          const boxTop = svcMid - (3 * svcH + 2 * svcGap) / 2 + i * (svcH + svcGap);
+          return (
+            <React.Fragment key={s}>
+              <Flow points={[[FORK_X, mixMid], [SVC_X - 10, boxTop + svcH / 2]]} at={betweenAt + 8 + i * 4} color={OK} width={3} head={14} />
+              <Node x={SVC_X} y={boxTop} w={185} h={svcH} at={betweenAt + 6 + i * 4} tone="data" title={s} size={23} />
+            </React.Fragment>
+          );
+        })}
 
         {/* Hairlines between the three columns, each with the column to its right. */}
         {[650, 1250].map((x, i) => (

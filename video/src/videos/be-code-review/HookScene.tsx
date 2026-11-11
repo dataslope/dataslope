@@ -108,7 +108,7 @@ export const HookScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <Kicker at={from}>Backend engineer interview questions</Kicker>
-        <Headline lead="Most of the code," turn="you didn't write." at={mostAt - 4} turnAt={didntAt - 2} out={hookOut} />
+        <Headline lead="Most interview code," turn="you didn't write." at={mostAt - 4} turnAt={didntAt - 2} out={hookOut} />
         <Headline lead="Three questions," turn="one piece of code." at={threeAt + 2} turnAt={pieceAt - 2} />
 
         {/* ── The listing, then the diff it arrived as ── */}

@@ -243,6 +243,15 @@ export const script: NarrationScript = {
       pauseAfter: 0.7,
     },
     {
+      id: "debug-ai",
+      text: "If the round allows an assistant, it's a fine tool for asking what a function does, or what could make it return an interval that ends before it starts.",
+    },
+    {
+      id: "debug-ai-sub",
+      text: "It's no substitute for step two: what it tells you is a hypothesis, and only a failing test proves it.",
+      pauseAfter: 0.8,
+    },
+    {
       id: "debug-symptom",
       text: "Step four: fix the cause, not the symptom. Patch the symptom, by dropping any interval that ends before it starts, and the report's three intervals come back as an empty list, with no error at all.",
       pauseAfter: 0.8,
@@ -250,7 +259,7 @@ export const script: NarrationScript = {
     {
       id: "debug-cause",
       text: "The cause is the missing sort. Sort inside the function, then rerun the reproduction and the existing tests. All of them pass.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.2,
     },
     {
       id: "debug-explain",
@@ -258,13 +267,13 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
-      id: "debug-ai",
-      text: "If the round allows an assistant, it's a fine tool for asking what a function does, or what could make it return an interval that ends before it starts. It's no substitute for step two.",
+      id: "debug-past",
+      text: "And what else shares the flaw? Start with the tests. The two old ones passed before the fix and after it, so neither ever tested the order. Keep the reproduction as a third.",
       pauseAfter: 0.6,
     },
     {
-      id: "debug-past",
-      text: "And what else shares the flaw? Start with the tests. The two old ones passed before the fix and after it, so neither ever tested the order. Keep the reproduction as a third.",
+      id: "debug-more",
+      text: "Then read the lines beside the sort: the report found one bug, and there are two more.",
       pauseAfter: 0.8,
     },
 
@@ -281,8 +290,12 @@ export const script: NarrationScript = {
       pauseAfter: 0.7,
     },
     {
+      id: "review-back",
+      text: "A review before it shipped would have caught all three. Go back to the diff as it arrived.",
+    },
+    {
       id: "review-diff",
-      text: "Go back to the diff as it arrived, before it shipped. It touches one function and its tests, and nothing else. It calls nothing that doesn't exist. It makes one pass over the input. So far, so good.",
+      text: "It touches one function and its tests, and nothing else. It calls nothing that doesn't exist. It makes one pass over the input. So far, so good.",
       pauseAfter: 0.6,
     },
     {
@@ -293,6 +306,11 @@ export const script: NarrationScript = {
     {
       id: "review-contain",
       text: "And a merge sets the end to the new interval's end, even when that's smaller. One to ten, then two to three, becomes one to three. The merge shrank the interval it should have kept.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "review-empty",
+      text: "The empty list and a single interval come back fine, and it hides no errors.",
       pauseAfter: 0.8,
     },
     {
@@ -317,7 +335,15 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
-      text: "The fix also added a sort, which takes the merge from one pass to n log n. Reading code includes judging what it costs. Next: algorithms as reasoning.",
+      text: "The fix also added a sort, which takes the merge from one pass to n log n.",
+    },
+    {
+      id: "next-cost",
+      text: "On input already in order, the sort costs close to one pass. The other choice is to require sorted input and let callers sort. For a helper this small, sort inside: the bug report came from a caller who didn't.",
+    },
+    {
+      id: "next-line",
+      text: "Next: algorithms as reasoning.",
     },
   ],
 };

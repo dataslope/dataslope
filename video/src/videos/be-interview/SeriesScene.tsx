@@ -81,8 +81,9 @@ export const SeriesScene: React.FC = () => {
     { text: "the GIL", at: n.word("series-python", "the global interpreter lock") },
   ];
   const checksAt = n.word("practice", "Every topic page has concept checks");
-  const threeAt = n.word("practice", "three add challenges");
+  const threeAt = n.word("practice", "three of them add challenges");
   const bankAt = n.word("practice", "a bank of a hundred and ten");
+  const practiceFrom = n.beat("practice").from;
   const designAt = n.word("next", "was design");
   const nextAt = n.word("next", "Next");
   const end = n.beat("next").to;
@@ -93,7 +94,7 @@ export const SeriesScene: React.FC = () => {
   const barH = (i: number) => h(BAR_MAX) * (PARTS[i].questions / MOST);
   const concurrency = PARTS.findIndex((p) => p.video === "be-concurrency");
   const lit = (i: number) =>
-    i === concurrency ? during(frame, concurrencyAt - 2, designAt, 10) : i <= 1 ? ease(frame, designAt - 2, 12) : 0;
+    i === concurrency ? during(frame, concurrencyAt - 2, practiceFrom - 4, 10) : i <= 1 ? ease(frame, designAt - 2, 12) : 0;
   const dimmed = (i: number) => (i <= 1 ? 0 : ease(frame, designAt, 16) * 0.55);
 
   const ghostTop = y(GHOST_Y);

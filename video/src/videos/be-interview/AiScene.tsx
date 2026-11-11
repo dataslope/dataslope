@@ -53,7 +53,8 @@ const MOVED_R = 1800;
 const MOVED_DROP = 76;
 const LLM_DROP = 196;
 
-type Format = { text: string; at: number };
+/** A format, and the part that answers it where one does. */
+type Format = { text: string; at: number; part?: number };
 
 /** One kind of round, as a centred line of text under its column's head.
  *  Formats, not companies, so the video does not date. Neutral ink in both
@@ -79,6 +80,11 @@ const FormatRow: React.FC<{ c: number; i: number; format: Format; out: number }>
       }}
     >
       {format.text}
+      {/* The part that answers this format, inked just after it, in the
+          style the "where the time went" blocks label theirs. */}
+      {format.part ? (
+        <span style={{ ...label(22, BLUE_INK), marginLeft: 18, opacity: ease(frame, format.at + 12, 12) }}>Part {format.part}</span>
+      ) : null}
     </div>
   );
 };
@@ -142,18 +148,21 @@ const Divider: React.FC<{ at: number }> = ({ at }) => {
  * changed since AI assistants became standard?". The coding round as one
  * heading that forks into two columns, AI allowed and AI banned, each filling
  * with the two formats the page's table describes as they are said (formats,
- * not companies, so the video does not date), and Part 9 under the allowed
- * column. Then, under the fork, why: a take-home an assistant
+ * not companies, so the video does not date), each allowed one with the part
+ * that answers it (Part 9 the multi-file project, Part 7 the code
+ * comprehension round). Then, under the fork, why: a take-home an assistant
  * finishes unseen, its envelope (the scene's one spot) fading, beside
  * Karat's two figures with its caveat; then where the time went, three live
  * rounds with the parts that answer them, and the four LLM topics system
  * design now takes in. "Ask the recruiter" is written
- * across the fork at the end, and algorithm practice under the banned head.
+ * across the fork at the end, algorithm practice under the banned head and
+ * practising with the assistant under the allowed one. The fork recedes
+ * while the take-home and the survey are up under it.
  */
 export const AiScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y, h } = useLayout();
+  const { y } = useLayout();
 
   const from = n.beat("ai").from;
   const roundAt = n.word("ai", "the coding round");
@@ -162,7 +171,6 @@ export const AiScene: React.FC = () => {
   const someAt = n.word("ai-allowed", "Some rounds hand you");
   const gradeAt = n.word("ai-allowed", "grade how you drive");
   const othersAt = n.word("ai-banned", "Others ban assistants");
-  const allowedEnd = n.beat("ai-allowed-who").to;
   const whyFrom = n.beat("ai-why").from;
   const finishAt = n.word("ai-why", "an assistant can finish");
   const takeAt = n.word("ai-why", "a take-home");
@@ -188,12 +196,21 @@ export const AiScene: React.FC = () => {
   ];
   const askAt = n.word("ai-ask", "Ask the recruiter");
   const roundByRoundAt = n.word("ai-ask", "round by round");
-  const practiceAt = n.word("ai-ask", "Algorithm practice still matters");
-  const end = n.beat("ai-ask").to;
+  const practiceAt = n.word("ai-ask-practice", "Algorithm practice still matters");
+  const drivingAt = n.word("ai-ask-practice", "practise driving and checking the assistant");
+  const end = n.beat("ai-ask-practice").to;
 
   const allowed: Format[] = [
-    { text: "Extend a multi-file project, assistant built in", at: n.word("ai-allowed-who", "an hour extending a multi-file project") },
-    { text: "Read, debug and speed up unfamiliar code", at: n.word("ai-allowed-who", "unfamiliar code to read, debug and speed up") },
+    {
+      text: "Extend a multi-file project, assistant built in",
+      at: n.word("ai-allowed-who", "an hour extending a multi-file project"),
+      part: partOf("be-ai-round"),
+    },
+    {
+      text: "Read, debug and speed up unfamiliar code",
+      at: n.word("ai-allowed-who", "unfamiliar code to read, debug and speed up"),
+      part: partOf("be-code-review"),
+    },
   ];
   const banned: Format[] = [
     { text: "Unapproved AI can disqualify you", at: n.word("ai-banned", "Using one without permission") },
@@ -217,6 +234,10 @@ export const AiScene: React.FC = () => {
     [colCx(c), headTop - 14],
   ];
   const headIn = (at: number) => ease(frame, at - 2, 12);
+  // The fork recedes while the take-home and the survey are up under it, so
+  // neither reads as belonging to the head above it, and returns as the
+  // time moves to the live rounds.
+  const recede = 1 - 0.6 * panel;
   const moved = ease(frame, movedAt - 2, 12);
   const surveyTop = y(PANEL_Y);
 
@@ -280,7 +301,7 @@ export const AiScene: React.FC = () => {
               textAlign: "center",
               ...note(30, INK),
               fontWeight: 500,
-              opacity: headIn(head.at),
+              opacity: headIn(head.at) * recede,
               transform: `translateY(${(1 - headIn(head.at)) * 8}px)`,
             }}
           >
@@ -306,10 +327,25 @@ export const AiScene: React.FC = () => {
             top: y(CAPTION_Y),
             textAlign: "center",
             ...note(22, INK_SOFT),
-            opacity: ease(frame, gradeAt - 2, 12),
+            opacity: ease(frame, gradeAt - 2, 12) * recede * (1 - ease(frame, drivingAt - 2, 10)),
           }}
         >
           graded on how you drive and check it
+        </div>
+        {/* How to prepare for it, in its place, as the banned side's
+            caption says how to prepare for that one. */}
+        <div
+          style={{
+            position: "absolute",
+            left: colX(0),
+            width: COL_W,
+            top: y(CAPTION_Y),
+            textAlign: "center",
+            ...note(22, INK_SOFT),
+            opacity: ease(frame, drivingAt + 4, 12),
+          }}
+        >
+          practise driving and checking the assistant: <span style={label(22, BLUE_INK)}>Part {partOf("be-ai-round")}</span>
         </div>
         <div
           style={{
@@ -319,7 +355,7 @@ export const AiScene: React.FC = () => {
             top: y(CAPTION_Y),
             textAlign: "center",
             ...note(22, INK_SOFT),
-            opacity: ease(frame, practiceAt - 2, 12),
+            opacity: ease(frame, practiceAt - 2, 12) * recede,
           }}
         >
           algorithm practice still matters: <span style={label(22, BLUE_INK)}>Part {partOf("be-algorithms")}</span>
@@ -330,20 +366,6 @@ export const AiScene: React.FC = () => {
         {banned.map((f, i) => (
           <FormatRow key={f.text} c={1} i={i} format={f} out={cardsOut} />
         ))}
-        <div
-          style={{
-            position: "absolute",
-            left: colX(0),
-            width: COL_W,
-            textAlign: "center",
-            top: y(ROWS_Y) + 2 * h(ROW_STEP) + 18,
-            ...label(22, BLUE_INK),
-            whiteSpace: "nowrap",
-            opacity: ease(frame, allowedEnd - 10, 12) * (1 - ease(frame, cardsOut, 12)),
-          }}
-        >
-          Part {partOf("be-ai-round")}: the AI-allowed round
-        </div>
 
         {/* Why: the take-home an assistant finishes unseen, its envelope
             fading as "nobody sees how" is said, and gone before the time
@@ -361,11 +383,17 @@ export const AiScene: React.FC = () => {
           phase={20}
           amp={3}
         />
-        {/* Level with the middle of the survey beside it. */}
+        {/* Level with the middle of the survey beside it. The online test
+            is the page's other format ("take-home projects and automated
+            code tests"), carried on screen only; the narration names the
+            take-home. */}
         <div style={{ position: "absolute", left: TAKE_X, top: surveyTop + 136, opacity: panel }}>
-          <div style={{ ...note(26, INK), whiteSpace: "nowrap", opacity: ease(frame, finishAt - 2, 12) }}>An assistant can finish a take-home,</div>
-          <div style={{ ...note(26, INK), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, unseenAt - 2, 12) }}>
-            and <Mark at={unseenAt + 2}>nobody sees how.</Mark>
+          <div style={{ ...note(26, INK), whiteSpace: "nowrap", opacity: ease(frame, finishAt - 2, 12) }}>An assistant can finish a take-home</div>
+          <div style={{ ...note(26, INK), marginTop: 10, whiteSpace: "nowrap" }}>
+            <span style={{ opacity: ease(frame, takeAt + 10, 12) }}>or an online test,</span>{" "}
+            <span style={{ opacity: ease(frame, unseenAt - 2, 12) }}>
+              and <Mark at={unseenAt + 2}>nobody sees how.</Mark>
+            </span>
           </div>
         </div>
 
@@ -401,7 +429,7 @@ export const AiScene: React.FC = () => {
         </div>
         <div style={{ opacity: panel }}>
           <SurveyBar top={surveyTop + STAT_1} pct={KARAT.harderToAssess} at={harderAt}>
-            say AI makes technical skills harder to assess
+            of leaders say AI makes technical skills harder to assess
           </SurveyBar>
           <SurveyBar top={surveyTop + STAT_2} pct={KARAT.stillProhibit} at={bannedAt}>
             of organizations still banned AI in technical interviews

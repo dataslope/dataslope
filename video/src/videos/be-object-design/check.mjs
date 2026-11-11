@@ -10,10 +10,13 @@
 // the code below is shown on screen: it is what makes each claim a run
 // rather than an assertion.
 //
-//   - encapsulation: the page's BankAccount, verbatim, then the three holes
-//     the video's answer closes: an opening balance of -50 is accepted, a
-//     withdrawal of -30 adds thirty, and the read-only property refuses an
-//     assignment.
+//   - encapsulation: the page's BankAccount as it stood before #725, then
+//     the three holes the video's answer closes: an opening balance of -50
+//     is accepted, a withdrawal of -30 adds thirty, and the read-only
+//     property refuses an assignment.
+//   - encapsulationGuarded: the page's BankAccount as it is now, verbatim,
+//     which checks the constructor too: it still prints 70, and refuses an
+//     opening balance of -50 (the figure's guarded door).
 //   - polymorphism: the page's total_area block (7.14).
 //   - strategy: the page's Shipment block (5.0 and 6.0).
 //   - liskov: the page's Rectangle with set_width / set_height and a Square
@@ -32,7 +35,9 @@
 //   - singleton: the video's own config singleton and two tests, run in
 //     order and each alone, with the result of each.
 //   - observer: the video's own order subject and three subscribers, then a
-//     fourth added without touching the subject.
+//     fourth added without touching the subject; then the same four on one
+//     order, with analytics broken: placing the order raises, and loyalty,
+//     after analytics in the list, never hears.
 /* global console */
 import { writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -92,6 +97,31 @@ R.figures.encapsulation = figure(BANK, {
   negative: "acct = BankAccount(100)\nacct.withdraw(-30)\nprint(acct.balance)",
   readonly: "acct = BankAccount(100)\nacct.balance = 1_000_000",
 });
+
+// The page's class as it is now: every way in is checked, the constructor too.
+R.figures.encapsulationGuarded = figure(
+  `class BankAccount:
+    def __init__(self, balance=0):
+        if balance < 0:
+            raise ValueError("starting balance can't be negative")
+        self._balance = balance          # "internal", not to be poked directly
+
+    def withdraw(self, amount):
+        if amount <= 0:
+            raise ValueError("amount must be positive")
+        if amount > self._balance:
+            raise ValueError("insufficient funds")
+        self._balance -= amount
+
+    @property
+    def balance(self):                   # read-only view of internal state
+        return self._balance
+`,
+  {
+    page: "acct = BankAccount(100)\nacct.withdraw(30)\nprint(acct.balance)",
+    opening: "BankAccount(-50)",
+  },
+);
 
 // ── Polymorphism: the page's block ──────────────────────────────────────────
 R.figures.polymorphism = figure(
@@ -326,6 +356,21 @@ order.subscribe(lambda n: heard.append(f"analytics: count {n}"))
   {
     place: "order.place(1042)\nprint(heard)",
     fourth: 'heard.clear()\norder.subscribe(lambda n: heard.append(f"loyalty: points for {n}"))\norder.place(1043)\nprint(heard)',
+    // The same four, called inside place(), with analytics broken.
+    fails: `heard.clear()
+def analytics(n):
+    raise RuntimeError("analytics is down")
+broken = Order()
+broken.subscribe(lambda n: heard.append(f"email: confirm {n}"))
+broken.subscribe(lambda n: heard.append(f"stock: reserve {n}"))
+broken.subscribe(analytics)
+broken.subscribe(lambda n: heard.append(f"loyalty: points for {n}"))
+try:
+    broken.place(1043)
+    print("placed")
+except RuntimeError as e:
+    print(f"place(1043) raised: {e}")
+print(heard)`,
   },
 );
 
@@ -368,6 +413,13 @@ if (printed("factory", "csv") !== "CsvParser" || raised("factory", "xml") !== "V
 if (!printed("singleton", "alone").includes("test_default_currency: pass")) fail("singleton alone");
 if (!printed("singleton", "inOrder").includes("test_default_currency: FAIL (currency is EUR)")) fail("singleton order");
 if (!printed("observer", "fourth").includes("loyalty")) fail("observer");
+if (printed("encapsulationGuarded", "page") !== "70") fail("the page's guarded account should print 70");
+if (raised("encapsulationGuarded", "opening") !== "ValueError: starting balance can't be negative") fail("the guarded constructor");
+{
+  const [said, who] = printed("observer", "fails").split("\n");
+  if (said !== "place(1043) raised: analytics is down") fail(`a broken listener should fail the order, got ${said}`);
+  if (who.includes("loyalty") || !who.includes("stock")) fail(`loyalty should never hear, got ${who}`);
+}
 
 const file = join(here, "results.json");
 writeFileSync(file, `${JSON.stringify(R, null, 2)}\n`);

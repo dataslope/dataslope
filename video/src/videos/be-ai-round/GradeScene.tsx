@@ -153,12 +153,14 @@ export const GradeScene: React.FC = () => {
 
         {/* Whether you drove. */}
         <Clear at={signalsAt - 8}>
+          {/* The struck line is the claim rejected, not its negation: a
+              struck "Not ..." would read as its opposite. */}
           <Ink at={notAt - 2} dur={16} style={{ left: X0, top: y(306) }}>
             <span style={line(30, INK_SOFT)}>
-              <Strike at={endAt + 4}>Not whether working code exists at the end.</Strike>
+              <Strike at={endAt + 4}>Whether working code exists at the end.</Strike>
             </span>
           </Ink>
-          <Ink at={droveAt - 2} dur={14} style={{ left: X0 + 660, top: y(306) }}>
+          <Ink at={droveAt - 2} dur={14} style={{ left: X0 + 620, top: y(306) }}>
             <span style={{ ...line(30, INK), fontWeight: 500 }}>
               Whether <Mark at={droveAt + 6}>you drove.</Mark>
             </span>

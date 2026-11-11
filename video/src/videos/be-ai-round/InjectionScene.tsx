@@ -15,6 +15,8 @@ import { Clear, Drift, Flow, line, Mark, Node, Spot, Strike, X0 } from "./parts"
 const MODEL = { x: 780, w: 240, v: 440, hh: 92 };
 const USER = { x: X0, w: 190, v: 372, hh: 70 };
 const SOURCES_V = [524, 572, 620, 668];
+/** Just right of the longest source line, "a retrieved document". */
+const SRC_BRACKET_X = 380;
 const TILES_V = 772;
 // Part two: the support bot.
 const ROW_V = 330;
@@ -90,15 +92,16 @@ export const InjectionScene: React.FC = () => {
   const limitAt = n.word("inj-defend", "limit what a successful injection can do");
   const leastAt = n.word("inj-defend", "Least privilege");
   const scopeAt = n.word("inj-defend", "scope the refund tool");
-  const humanAt = n.word("inj-defend", "Human confirmation");
-  const actsAt = n.word("inj-defend", "sending, paying, deleting");
-  const untrustedAt = n.word("inj-defend", "treat the model's output as untrusted input");
-  const neverAt = n.word("inj-defend", "never pass it unvalidated");
+  const elseAt = n.word("inj-scope", "anyone else's order");
+  const humanAt = n.word("inj-confirm", "Human confirmation");
+  const actsAt = n.word("inj-confirm", "sending, paying, deleting");
+  const untrustedAt = n.word("inj-confirm", "treat the model's output as untrusted input");
+  const neverAt = n.word("inj-confirm", "never pass it unvalidated");
   const sinks = [
-    { text: "a shell", at: n.word("inj-defend", "a shell") },
-    { text: "an eval", at: n.word("inj-defend", "an eval") },
-    { text: "a SQL string", at: n.word("inj-defend", "a SQL string") },
-    { text: "an HTML page", at: n.word("inj-defend", "an HTML page") },
+    { text: "a shell", at: n.word("inj-confirm", "a shell") },
+    { text: "an eval", at: n.word("inj-confirm", "an eval") },
+    { text: "a SQL string", at: n.word("inj-confirm", "a SQL string") },
+    { text: "an HTML page", at: n.word("inj-confirm", "an HTML page") },
   ];
   const secretsAt = n.word("inj-log", "Keep secrets out of prompts");
   const logAt = n.word("inj-log", "log tool calls");
@@ -118,6 +121,9 @@ export const InjectionScene: React.FC = () => {
   const modelH = h(MODEL.hh);
   const userTop = y(USER.v);
   const userH = h(USER.hh);
+  const srcTop = y(SOURCES_V[0]) - 2;
+  const srcBottom = y(SOURCES_V[SOURCES_V.length - 1]) + 32;
+  const srcMid = (srcTop + srcBottom) / 2;
   const plain = ease(frame, tokensAt + 4, 16);
   // Part two.
   const rowTop = y(ROW_V);
@@ -195,7 +201,16 @@ export const InjectionScene: React.FC = () => {
           <Note at={indirectAt} x={USER.x} y={y(SOURCES_V[0]) - h(40)}>
             <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>content it reads for the user</span>
           </Note>
-          <Flow points={[[400, y(600)], [MODEL.x - 10, modelTop + modelH * 0.75]]} at={indirectAt + 8} color={ACCENT} />
+          {/* The four sources, gathered by a bracket the indirect arrow leaves from. */}
+          <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, indirectAt + 4, 10) }}>
+            <path
+              d={`M${SRC_BRACKET_X - 10},${srcTop} L${SRC_BRACKET_X},${srcTop} L${SRC_BRACKET_X},${srcBottom} L${SRC_BRACKET_X - 10},${srcBottom}`}
+              fill="none"
+              stroke={ACCENT}
+              strokeWidth={2}
+            />
+          </svg>
+          <Flow points={[[SRC_BRACKET_X + 6, srcMid], [MODEL.x - 10, modelTop + modelH * 0.75]]} at={indirectAt + 8} color={ACCENT} />
           <Note at={indirectAt + 14} x={560} y={y(596)}>
             <span style={{ ...note(23, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>indirect</span>
           </Note>
@@ -282,6 +297,7 @@ export const InjectionScene: React.FC = () => {
           />
           <Note at={scopeAt + 6} x={TOOL.x - 20} y={rowTop + rowH + h(26)} width={TOOL.w + 40}>
             <div style={{ ...note(20, OK_INK), textAlign: "center", whiteSpace: "nowrap" }}>only this user&apos;s orders</div>
+            <div style={{ ...note(20, OK_INK), textAlign: "center", whiteSpace: "nowrap", opacity: ease(frame, elseAt - 2, 10) }}>never anyone else&apos;s</div>
           </Note>
 
           {/* The three that don't work. */}

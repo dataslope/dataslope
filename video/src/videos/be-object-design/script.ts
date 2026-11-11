@@ -230,13 +230,18 @@ export const script: NarrationScript = {
     },
     {
       id: "comp-break",
-      text: "Then the cart team speeds add-all up, and it stops adding them one at a time. The count for those three drops to zero, and nobody touched the loyalty code.",
+      text: "Then the cart team speeds add-all up, and it stops adding them one at a time.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "comp-zero",
+      text: "The count for those three drops to zero, and nobody touched the loyalty code.",
       pauseAfter: 0.8,
     },
     {
       id: "comp-hold",
       text: "Composition holds a cart and delegates to it, counting in its own methods. It relies only on what the cart promises: three before the change, three after.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.2,
     },
     {
       id: "comp-mix",
@@ -263,12 +268,22 @@ export const script: NarrationScript = {
     },
     {
       id: "lsp-break",
-      text: "Code written for rectangles sets the width to five, then the height to four, and expects an area of twenty. Hand it a square, and it gets sixteen.",
+      text: "Code written for rectangles sets the width to five, then the height to four, and expects an area of twenty.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "lsp-hand",
+      text: "Hand it a square, and it gets sixteen.",
       pauseAfter: 0.8,
     },
     {
       id: "lsp-rule",
       text: "So a subclass mustn't demand more of its callers, or promise them less.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "lsp-which",
+      text: "The square promises less: setting its width no longer leaves the height alone.",
       pauseAfter: 0.6,
     },
     {
@@ -319,8 +334,13 @@ export const script: NarrationScript = {
     },
     {
       id: "dip-ex",
-      text: "The order confirmation needs something that can send a message, and that's all it knows. In production, it's handed the email sender. A test hands it a fake that only records what it was asked to send, and checks the message with no mail server.",
+      text: "The order confirmation needs something that can send a message, and that's all it knows. In production, it's handed the email sender.",
       pauseAfter: 0.6,
+    },
+    {
+      id: "dip-test",
+      text: "A test hands it a fake that only records what it was asked to send, and checks the message with no mail server.",
+      pauseAfter: 0.8,
     },
     {
       id: "dip-plug",
@@ -330,6 +350,11 @@ export const script: NarrationScript = {
     {
       id: "dip-arrows",
       text: "The inversion is in the arrows. The confirmation no longer points at the emailer; the emailer fits the shape the confirmation asked for. Policy stops depending on detail.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "dip-di",
+      text: "Injection is just how the email sender gets passed in; the inversion is that the confirmation owns the interface.",
       pauseAfter: 0.8,
     },
 
@@ -376,6 +401,11 @@ export const script: NarrationScript = {
     {
       id: "obs-cost",
       text: "The cost is indirection. Reading the checkout no longer tells you what happens after an order; you have to go and find who subscribed.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "obs-fail",
+      text: "And in the simple version, the listeners run inside the order's own call. If analytics breaks, the order fails with it, and loyalty never hears. So backends often put a broker between them: publish-subscribe.",
       pauseAfter: 0.8,
     },
 
@@ -411,7 +441,12 @@ export const script: NarrationScript = {
     },
     {
       id: "r-encap",
-      text: "Encapsulation, concretely: an account hides its balance and changes it only through methods that check, so no withdrawal can overdraw it. Guard every way in, the constructor too. An account that opens at minus fifty is overdrawn already.",
+      text: "Encapsulation, concretely: an account hides its balance and changes it only through methods that check, so no withdrawal can overdraw it.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-encap-ctor",
+      text: "But an account that opens at minus fifty is overdrawn already, so guard every way in, the constructor too.",
       pauseAfter: 0.6,
     },
     {
@@ -431,7 +466,17 @@ export const script: NarrationScript = {
     },
     {
       id: "r-abstract",
-      text: "An interface declares what methods a type must provide, with no implementation. An abstract class can also share code and state. Use an interface for a pure contract, and an abstract class when subclasses share code.",
+      text: "An interface declares what methods a type must provide, with no implementation. An abstract class can also share code and state.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-abstract-many",
+      text: "And a class can implement many interfaces, but extend only one. Java and C sharp interfaces can now carry default methods, but never instance fields.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-abstract-use",
+      text: "Use an interface for a pure contract, and an abstract class when subclasses share code.",
       pauseAfter: 0.6,
     },
     {
