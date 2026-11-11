@@ -217,7 +217,7 @@ export const ObsScene: React.FC = () => {
                 </Line>
               ) : null}
               {i === 3 ? (
-                <Line x={RES_X + 230} y={lisMid(i) - 15} at={neverAt + 8} size={22} weight={500} color={ACCENT_INK}>
+                <Line x={RES_X + 240} y={lisMid(i) - 17} at={neverAt + 8} size={27} weight={500} color={ACCENT_INK}>
                   never heard
                 </Line>
               ) : null}

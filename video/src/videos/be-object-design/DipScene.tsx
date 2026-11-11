@@ -183,7 +183,7 @@ export const DipScene: React.FC = () => {
         />
         {/* Injection against inversion: how the piece gets in, and who owns
             the shape it fits. */}
-        <Line x={X0} y={rowTop + rowH + 78} at={injectionAt} size={24} weight={500}>
+        <Line x={X0} y={rowTop + rowH + 90} at={injectionAt} size={24} weight={500}>
           Injection: how the sender gets in.
           <span style={{ opacity: ease(frame, ownsAt, 10) }}>
             {" "}Inversion: <Mark at={ownsAt + 6}>the confirmation owns the interface</Mark>.

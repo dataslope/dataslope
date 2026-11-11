@@ -134,7 +134,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     __eq__ 595,679 times ("nearly six hundred thousand"; more than a
  *     chain's n(n - 1)/2 because open addressing revisits slots); with
  *     distinct hashes, 0. "hash-set": the page's answer (average O(1), O(n)
- *     space, O(n) per operation at worst).
+ *     space, O(n) per operation at worst). "hash-when": the interpreter's
+ *     sys.flags.hash_randomization is 1 (str hashes are salted per process).
  *   - "amort-*": a million appends to a Python list, its allocated slots
  *     read from sys.getsizeof after each: 86 resizes; if each copied every
  *     item, 8,445,096 copies, 8.4 per append (7.6 at a thousand, 8.6 at two
@@ -152,7 +153,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     2^20 - 1 = 1,048,575 nodes ("a million"): the BFS queue peaks at
  *     524,288, an explicit DFS stack at 20. "bfs-deque": that BFS with a
  *     list popped from the front would shift 274,876,858,369 elements, each
- *     pop moving the len - 1 behind it.
+ *     pop moving the len - 1 behind it. "bfs-chain": a chain of a million,
+ *     each node pointing at the next: the BFS queue peaks at 1, the path DFS
+ *     keeps reaches 1,000,000, and a recursive DFS raises RecursionError.
  *   - "heap-choose": a sorted list of a million shifts n / 2 = 500,000 on an
  *     average insert, at a uniformly random position (said "on average").
  *     "heap-height": a million items make 20 levels, so a push or pop moves
@@ -181,7 +184,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     calls ("two point seven million"), memoized 59; greedy change for 6
  *     from {1, 3, 4} takes 4, 1, 1, the fewest is 3, 3; sorted by first name
  *     and then stably by last, the two Hoppers stay Ada, Grace; binary
- *     search over a million takes at most 20 probes; the page's kahns and
+ *     search over a million takes at most 20 probes; backtracking over
+ *     orderings of 1, 2, 3 with no digit in its own place tries ten
+ *     candidates, drops three at once and finds 231 and 312; the page's kahns and
  *     topo_sort on a graph with a cycle return fewer nodes than it has; the
  *     page's inorder, single_number, two_sum_sorted, window, merge_sort and
  *     permutations outputs (results.json, "page"). The adjacency figures are

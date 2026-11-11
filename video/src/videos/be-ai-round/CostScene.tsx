@@ -310,7 +310,7 @@ export const CostScene: React.FC = () => {
           {sums.map((r, i) => (
             <Ink key={r.name} at={r.at - 2} dur={12} style={{ left: RIGHT_X, top: y(LIST_Y + 44 + i * SUM_H) }}>
               <span style={{ ...line(24, INK), display: "inline-flex", alignItems: "baseline" }}>
-                <span style={{ display: "inline-block", width: 116, color: INK_SOFT }}>{r.name}</span>
+                <span style={{ display: "inline-block", width: 130, color: INK_SOFT }}>{r.name}</span>
                 <span>{r.value}</span>
               </span>
             </Ink>

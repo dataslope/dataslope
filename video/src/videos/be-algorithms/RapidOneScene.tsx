@@ -665,9 +665,9 @@ const Backtrack: React.FC<{ c: Ctx }> = ({ c }) => {
 /**
  * The first quick round, questions 9 to 19, numbered on screen only:
  * sorting, recursion and dynamic programming. Each answer is drawn on the
- * right while it is read, from the page's own outputs (merge_sort, the
- * permutations, fib) and the video's counts (the Hoppers, the two Fibonacci
- * call counts, the coins).
+ * right while it is read, from the page's own outputs (merge_sort, fib) and
+ * the video's counts (the Hoppers, the two Fibonacci call counts, the coins,
+ * the backtracking run's tried and dropped candidates).
  */
 export const RapidOneScene: React.FC = () => {
   const n = useNarration();

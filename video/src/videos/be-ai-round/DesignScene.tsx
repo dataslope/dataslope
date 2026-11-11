@@ -132,6 +132,7 @@ export const DesignScene: React.FC = () => {
   const missLabel = edge("Cache", "LLM").label;
   const invalidLabel = edge("V", "LLM").label;
   const risksOut = latAt - 8;
+  const lead = (fy: number) => (fy + 13 > top("LLM") - 8 ? right("LLM") + 8 : cacheX + 10);
   // The failure stack on the provider edge, right of it, between the rows.
   const fails = [
     { text: "timeout", at: timeoutAt, v: 450 },
@@ -303,7 +304,8 @@ export const DesignScene: React.FC = () => {
           const fy = y(f.v);
           return (
             <React.Fragment key={f.text}>
-              <div style={{ position: "absolute", left: cacheX + 10, top: fy + 13, width: (LABEL_X - 14 - cacheX - 10) * p, height: 1.6, background: INK_SOFT }} />
+              {/* A label level with the provider box leads from its edge, not across it. */}
+              <div style={{ position: "absolute", left: lead(fy), top: fy + 13, width: (LABEL_X - 14 - lead(fy)) * p, height: 1.6, background: INK_SOFT }} />
               <Ink at={f.at} dur={12} style={{ left: LABEL_X, top: fy }}>
                 <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{f.text}</span>
               </Ink>
