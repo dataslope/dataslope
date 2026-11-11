@@ -33,6 +33,8 @@ The review had 16 findings: 0 P1, 6 P2 (3 of them answer findings) and 10 P3
 - **Q6, "no jump to ~~page 500~~"**: the same struck-correct-statement pattern
   as finding 11. Now "no jump straight to page 500", with no strike. The
   scratch sound became a tap.
+- **Q10's gRPC binary stream** went from 19 px to 21 px so that
+  `check:frames` passes (see below).
 - The script header (`script.ts`) describes the new beats and screens, and
   lists the two new points that go past the page: answering a racing retry
   with the stored result and rejecting a mismatched body (the page's "returns
@@ -69,7 +71,28 @@ changes.
 **New length: 677.2 s (11:17), was 650.3 s (10:50).** That is 56 beats, 1,596
 words, 141 wpm (`npm run cues -- be-api-design`).
 
-CHECKS_PLACEHOLDER
+All checks ran on the final code, through my entry and the render queue:
+
+- **Typecheck and lint:** no errors in `src/videos/be-api-design/`.
+- **`npm test`:** 79 pass, 0 fail on the last run. An earlier run had two
+  failures, in other fixers' half-edited folders (be-algorithms,
+  be-concurrency, be-databases), none in mine.
+- **`npm run check:cues`:** nothing in be-api-design.
+- **`check:motion`:** passes, "nothing holds still for 3 s" (0 stretches of
+  2 s or more over 11:17.3).
+- **`check:sync`:** passes. All 56 beats start within ±0.12 s of their cues;
+  the worst is +0.03 s, `auth-oidc`.
+- **`check:mix`:** exit 0. Narration is −19.9 LUFS, effects are 28.4 LU under
+  it, and the closest is 9.9 dB at 3:44.3, in `idem-run`, which is unchanged.
+- **`check:frames`:** passes. The first run failed one `[mixed]` line: the
+  gRPC binary stream in Q10 (19 px mono) shares a line with "orders"
+  (23 px). That code predates this pass, but I fixed it: the stream is now
+  set at 21 px (line 26 px, its scroll period re-measured), within 12 % of
+  the box titles. Re-run, every check passes.
+- **Stills** were taken at every place I changed and looked at: hook 16.5 and
+  30, codes 149.2, 150.5 and 186, idem 257.8 and 258, page 329 and 330, auth
+  391.5, 401.5 and 422, limit 485, styles 545 and 561, rapid 620.5, 654 and
+  666.
 
 ## Notes for the coordinator
 
