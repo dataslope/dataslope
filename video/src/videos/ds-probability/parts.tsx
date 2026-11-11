@@ -47,16 +47,19 @@ export const DATA_LIGHT = ds("blue", 200);
 
 /** Notation in Source Serif, upright: P, E, Var, brackets, numbers. Fixed to
  *  Source Serif whatever face the page's titles use (typefaces.ts), since a
- *  formula reads best in a serif. */
-export const math = (size: number, color: string = INK): React.CSSProperties => ({
+ *  formula reads best in a serif. Set on a `MathRun` (editorial/math.tsx),
+ *  which marks the run as math for the page audit: `<MathRun style={math(46)}>`
+ *  for a display formula on a line of its own, `mathFace()` for one inside a
+ *  sentence, where it takes the kit's 1.08em of the words around it. */
+export const mathFace = (color?: string): React.CSSProperties => ({
   fontFamily: TYPEFACES["source-serif"].family,
-  fontSize: size,
   fontWeight: 450,
   color,
   whiteSpace: "nowrap",
   lineHeight: 1.1,
   fontVariantNumeric: "lining-nums",
 });
+export const math = (size: number, color: string = INK): React.CSSProperties => ({ ...mathFace(color), fontSize: size });
 
 /** A variable, in italic: the A and B of an event, an X. */
 export const V: React.FC<{ children: React.ReactNode }> = ({ children }) => (
