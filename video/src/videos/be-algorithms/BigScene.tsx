@@ -20,8 +20,8 @@ const GX = 140;
 const TX = 540;
 const COLS = [
   { name: "n", right: TX + 150 },
-  { name: "pairs, double loop", right: TX + 470 },
-  { name: "one pass", right: TX + 680 },
+  { name: "Pairs, double loop", right: TX + 470 },
+  { name: "One pass", right: TX + 680 },
 ];
 const ROW_H = 56;
 const BAR_X = 540;
@@ -182,7 +182,7 @@ export const BigScene: React.FC = () => {
               ))}
               {r.counted ? (
                 <div style={{ position: "absolute", left: COLS[2].right + 44, top: rowTop(i) + 14, ...note(22, INK_SOFT), opacity: p, whiteSpace: "nowrap" }}>
-                  counted; the rest worked out
+                  Counted; the rest worked out
                 </div>
               ) : null}
             </React.Fragment>

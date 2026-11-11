@@ -331,7 +331,7 @@ export const AiScene: React.FC = () => {
             opacity: ease(frame, gradeAt - 2, 12) * recede * (1 - ease(frame, drivingAt - 2, 10)),
           }}
         >
-          graded on how you drive and check it
+          Graded on how you drive and check it
         </div>
         {/* How to prepare for it, in its place, as the banned side's
             caption says how to prepare for that one. */}
@@ -346,7 +346,7 @@ export const AiScene: React.FC = () => {
             opacity: ease(frame, drivingAt + 4, 12),
           }}
         >
-          practise driving and checking the assistant: <span style={label(22, BLUE_INK)}>Part {partOf("be-ai-round")}</span>
+          Practise driving and checking the assistant: <span style={label(22, BLUE_INK)}>Part {partOf("be-ai-round")}</span>
         </div>
         <div
           style={{
@@ -359,7 +359,7 @@ export const AiScene: React.FC = () => {
             opacity: ease(frame, practiceAt - 2, 12) * recede,
           }}
         >
-          algorithm practice still matters: <span style={label(22, BLUE_INK)}>Part {partOf("be-algorithms")}</span>
+          Algorithm practice still matters: <span style={label(22, BLUE_INK)}>Part {partOf("be-algorithms")}</span>
         </div>
         {allowed.map((f, i) => (
           <FormatRow key={f.text} c={0} i={i} format={f} out={cardsOut} />

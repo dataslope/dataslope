@@ -128,7 +128,7 @@ export const CteScene: React.FC = () => {
           ]}
         />
         <TableName g={ag} at={avaAt - 6}>
-          each customer&apos;s average
+          Each customer&apos;s average
         </TableName>
         <DataTable
           g={ag}
@@ -139,7 +139,7 @@ export const CteScene: React.FC = () => {
         />
         <Note at={everyoneAt - 2} x={AVGS_X} y={ag.rowTop(SUBQUERIES.averages.rows.length) + 18} out={sameAt - 2}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            everyone: <span style={TABULAR}>{SUBQUERIES.overall.toFixed(2)}</span>
+            Everyone: <span style={TABULAR}>{SUBQUERIES.overall.toFixed(2)}</span>
           </span>
         </Note>
 

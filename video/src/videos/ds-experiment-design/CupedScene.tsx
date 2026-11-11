@@ -81,7 +81,16 @@ export const CupedScene: React.FC = () => {
   const titlesP = ease(frame, beforeAt, 12);
 
   const bars = [
-    { text: "variance of Y", v: CUPED.varY, at: fromAt, color: BAR, ink: BLUE_INK },
+    {
+      text: (
+        <>
+          variance of{" "}
+          <MathRun>
+            <I>Y</I>
+          </MathRun>
+        </>
+      ),
+      v: CUPED.varY, at: fromAt, color: BAR, ink: BLUE_INK },
     { text: "after CUPED", v: CUPED.varAdj, at: toAt, color: OK, ink: OK_INK },
   ];
   const xb = (v: number) => COL_X + (v / VAR_MAX) * BAR_W;
@@ -189,7 +198,7 @@ export const CupedScene: React.FC = () => {
           if (p <= 0) return null;
           const top = y(540) + i * h(90);
           return (
-            <React.Fragment key={b.text}>
+            <React.Fragment key={i}>
               <div style={{ position: "absolute", left: COL_X, top, ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap", opacity: p }}>{b.text}</div>
               <div
                 style={{ position: "absolute", left: COL_X, top: top + h(34), width: (xb(b.v) - COL_X) * p, height: h(34), background: b.color, opacity: 0.85, borderRadius: 3 }}

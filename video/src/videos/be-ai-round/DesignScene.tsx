@@ -327,7 +327,7 @@ export const DesignScene: React.FC = () => {
 
         {/* Structured output: validate, retry or repair. */}
         <Ink at={trustAt} dur={12} style={{ left: BOX.V.x, top: y(800) }}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>never trust the shape</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Never trust the shape</span>
         </Ink>
 
         {/* Cost: a spend alert on the quota. */}

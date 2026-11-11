@@ -239,7 +239,7 @@ export const RankScene: React.FC = () => {
 
           {/* The tie: two events for user 3 at one moment. */}
           <TableName g={ug} at={notRankAt + 6} out={tieOut}>
-            user 3, with a second event at the same moment
+            User 3, with a second event at the same moment
           </TableName>
           <DataTable
             g={ug}
@@ -283,24 +283,24 @@ export const RankScene: React.FC = () => {
           <Note at={havingAt + 4} x={X0} y={qNotesY}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               <Mark at={bridgeAt}>
-                like <QMono>HAVING</QMono>, for a window function
+                Like <QMono>HAVING</QMono>, for a window function
               </Mark>
             </span>
           </Note>
           <Note at={inQueryAt - 2} x={X0} y={qNotesY + h(56)}>
-            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>no subquery: the filter sits in the query itself</span>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>No subquery: the filter sits in the query itself</span>
           </Note>
           {/* Where it runs, in the column question 2's subquery leaves:
               Postgres, which ran every other listing here, is one of the
               engines without it. */}
           <Note at={enginesAt - 4} x={Q3_SIDE_X} y={y(TOP) + h(4)}>
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>runs in</span>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Runs in</span>
           </Note>
           <Note at={enginesAt - 2} x={Q3_SIDE_X} y={y(TOP) + h(42)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>DuckDB, BigQuery, Snowflake, Databricks</span>
           </Note>
           <Note at={notAt - 4} x={Q3_SIDE_X} y={y(TOP) + h(126)}>
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>not in</span>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Not in</span>
           </Note>
           <Note at={notAt - 2} x={Q3_SIDE_X} y={y(TOP) + h(164)}>
             <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>Postgres or MySQL</span>

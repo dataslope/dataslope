@@ -142,14 +142,14 @@ export const CostScene: React.FC = () => {
   const leverAt = n.word("cost-lever", "The breakdown says which lever");
   const largerAt = n.word("cost-lever", "Input is the larger share");
   const levers = [
-    { text: "trim the prompt", at: n.word("cost-lever", "trimming the prompt") },
-    { text: "cache the shared prefix", at: n.word("cost-lever", "caching the shared prefix") },
-    { text: "retrieve fewer documents", at: n.word("cost-lever", "retrieving fewer documents") },
+    { text: "Trim the prompt", at: n.word("cost-lever", "trimming the prompt") },
+    { text: "Cache the shared prefix", at: n.word("cost-lever", "caching the shared prefix") },
+    { text: "Retrieve fewer documents", at: n.word("cost-lever", "retrieving fewer documents") },
   ];
   const afterAt = n.word("cost-lever", "After that");
   const nexts = [
-    { text: "easy requests → a smaller model", at: n.word("cost-lever", "route easy requests to a smaller model") },
-    { text: "offline work → a batch API", at: n.word("cost-lever", "send offline work") },
+    { text: "Easy requests → a smaller model", at: n.word("cost-lever", "route easy requests to a smaller model") },
+    { text: "Offline work → a batch API", at: n.word("cost-lever", "send offline work") },
   ];
   const fiveAt = n.word("cost-past", "costs five times an input token");
   const fewerAt = n.word("cost-past", "far fewer of them to cut");
@@ -164,9 +164,9 @@ export const CostScene: React.FC = () => {
   // block's own (results.json).
   const price = (p: number) => p.toFixed(2);
   const inputs = [
-    { name: "requests a day", at: dailyAt, markAt: reqAt, value: <Num>{thousands(COST.requestsPerDay)}</Num> },
+    { name: "Requests a day", at: dailyAt, markAt: reqAt, value: <Num>{thousands(COST.requestsPerDay)}</Num> },
     {
-      name: "tokens per request",
+      name: "Tokens per request",
       at: inOutAt,
       markAt: tokensAt,
       value: (
@@ -188,7 +188,7 @@ export const CostScene: React.FC = () => {
   ];
   const sums = [
     {
-      name: "input",
+      name: "Input",
       at: inputAt,
       value: (
         <>
@@ -201,7 +201,7 @@ export const CostScene: React.FC = () => {
       ),
     },
     {
-      name: "output",
+      name: "Output",
       at: outputAt,
       value: (
         <>
@@ -214,7 +214,7 @@ export const CostScene: React.FC = () => {
       ),
     },
     {
-      name: "total",
+      name: "Total",
       at: totalAt,
       value: (
         <>
@@ -231,7 +231,7 @@ export const CostScene: React.FC = () => {
       ),
     },
     {
-      name: "a request",
+      name: "A request",
       at: centAt,
       value: (
         <>
@@ -300,7 +300,7 @@ export const CostScene: React.FC = () => {
             </Ink>
           ))}
           <Ink at={illusAt} dur={12} style={{ left: X0 + 330, top: y(LIST_Y + 44 + 3 * ROW_H) - 14 }}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>illustrative prices</span>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Illustrative prices</span>
           </Ink>
 
           {/* The arithmetic the block does, and what it prints. */}
@@ -344,7 +344,7 @@ export const CostScene: React.FC = () => {
           </div>
         ))}
         <Note at={afterAt} x={NEXT_X} y={y(BAR_B.v) - 40}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>after that</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>After that</span>
         </Note>
         {nexts.map((l, i) => (
           <Ink key={l.text} at={l.at} dur={12} style={{ left: NEXT_X, top: y(BAR_B.v) + h(-2 + i * 40) }}>
@@ -355,7 +355,7 @@ export const CostScene: React.FC = () => {
         {/* Per token, and per request. */}
         <Note at={fiveAt - 2} x={X0 + COST.input * BAR_B.px + 3} y={y(BAR_B.v) + barH + h(12)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            per token, output costs <b>{COST.outputPerTokenRatio}×</b> input
+            Per token, output costs <b>{COST.outputPerTokenRatio}×</b> input
           </span>
         </Note>
         <Note at={fewerAt - 2} x={X0 + COST.input * BAR_B.px + 3} y={y(BAR_B.v) + barH + h(48)}>

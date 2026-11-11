@@ -241,7 +241,7 @@ export const SeriesScene: React.FC = () => {
               Python fundamentals page<span style={{ opacity: ease(frame, leftOutAt - 2, 12) }}>, left out: it&apos;s syntax</span>
             </div>
             <div style={{ ...note(22, INK_SOFT), marginTop: 14, whiteSpace: "nowrap", opacity: ease(frame, designQAt - 2, 12) }}>
-              its design questions:{" "}
+              Its design questions:{" "}
               {topics.map((t, k) => (
                 <span key={t.text} style={{ opacity: ease(frame, t.at - 2, 10) }}>
                   {t.text}

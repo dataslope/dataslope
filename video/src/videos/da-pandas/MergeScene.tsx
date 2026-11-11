@@ -168,7 +168,7 @@ export const MergeScene: React.FC = () => {
         />
         <Note at={linesUpAt - 2} x={RIGHT_X} y={dg.rowTop(MERGE.dupLabel.rows.length) + h(26)} out={ignoreAt - 6}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            anything aligned on the index
+            Anything aligned on the index
             <br />
             pairs the wrong rows
           </span>
@@ -231,7 +231,7 @@ export const MergeScene: React.FC = () => {
         />
         <Note at={differAt - 2} x={tg.right + 40} y={tg.rowTop(0) + h(4)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            names differ? <Mono>left_on=</Mono> and <Mono>right_on=</Mono>
+            Names differ? <Mono>left_on=</Mono> and <Mono>right_on=</Mono>
           </span>
         </Note>
 

@@ -227,7 +227,7 @@ export const BfsScene: React.FC = () => {
           <Flow key={`s${i}`} points={[[cx0 + (i + 1) * 76 + 46, rowY1 + 71], [cx0 + (i + 1) * 76 - 12, rowY1 + 71]]} at={poppingAt + 18 + i * 2} dur={10} color={ACCENT} width={2} head={9} />
         ))}
         <Line at={poppingAt + 18} x={cx0 + CELLS * 76 + 20} y={rowY1 + 12} size={23} color={ACCENT_INK} weight={500}>
-          every item behind it shifts
+          Every item behind it shifts
           <span style={{ opacity: ease(frame, billionAt, 10) }}>
             : <b style={TABULAR}>{int(TRAVERSAL.listShifts)}</b> moves for this tree
           </span>
@@ -254,7 +254,7 @@ export const BfsScene: React.FC = () => {
           );
         })}
         <Line at={eitherAt + 6} x={cx0 + CELLS * 76 + 20} y={rowY2 + 12} size={23} color={OK_INK} weight={500}>
-          pops either end in <M>O(1)</M>
+          Pops either end in <M>O(1)</M>
         </Line>
       </Drift>
     </AbsoluteFill>

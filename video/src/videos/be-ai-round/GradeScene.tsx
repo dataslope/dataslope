@@ -103,9 +103,9 @@ export const GradeScene: React.FC = () => {
   const abilityAt = n.word("grade-canva", "not the ability to code");
   const googleAt = n.word("grade-canva", "Google's twenty twenty-six pilot rubric");
   const skills = [
-    { text: "writing prompts", at: n.word("grade-canva", "writing prompts") },
-    { text: "validating the output", at: n.word("grade-canva", "validating the output") },
-    { text: "debugging", at: n.word("grade-canva", "and debugging") },
+    { text: "Writing prompts", at: n.word("grade-canva", "writing prompts") },
+    { text: "Validating the output", at: n.word("grade-canva", "validating the output") },
+    { text: "Debugging", at: n.word("grade-canva", "and debugging") },
   ];
   const signalsAt = n.word("grade-signals", "What scores well");
   const signals = [
@@ -232,7 +232,7 @@ export const GradeScene: React.FC = () => {
         <Blocks x={X0} y={pastY} at={partAt} built={3} fill={`color-mix(in srgb, ${OK} 34%, ${PAPER})`} />
         <Note at={partAt + 12} x={X0} y={pastY + BLOCK * 0.78 + h(18)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            part of it, by hand: <b style={{ color: OK_INK }}>explained</b>
+            Part of it, by hand: <b style={{ color: OK_INK }}>explained</b>
           </span>
         </Note>
         <Blocks x={RED_X} y={pastY} at={presentAt} built={6} fill={`color-mix(in srgb, ${INK_SOFT} 26%, ${PAPER})`} />
@@ -252,7 +252,7 @@ export const GradeScene: React.FC = () => {
         />
         <Note at={cantAt} x={RED_X} y={pastY + BLOCK * 0.78 + h(18)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            a whole solution: <b style={{ color: ACCENT_INK }}>can&apos;t explain</b>
+            A whole solution: <b style={{ color: ACCENT_INK }}>can&apos;t explain</b>
           </span>
         </Note>
       </Drift>

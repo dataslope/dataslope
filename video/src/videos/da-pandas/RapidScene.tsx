@@ -204,7 +204,7 @@ const Resample: React.FC<{ c: Ctx }> = ({ c }) => {
       <Listing lines={RAPID.monthly.lines} x={R_X} top={c.T} width={760} size={SIZE} at={at - 4} />
       <DataTable g={mg} cols={colsOf(RAPID.monthly)} at={at + 4} rows={rowsAt(RAPID.monthly.rows, at + 8, 4)} marks={[{ row: 0, col: 1, at: janAt + 4 }]} />
       <Note at={at + 10} x={mg.right + 30} y={mg.rowTop(0) + c.h(6)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>each label is a month&apos;s end</span>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Each label is a month&apos;s end</span>
       </Note>
     </>
   );
@@ -255,7 +255,7 @@ const Duplicates: React.FC<{ c: Ctx }> = ({ c }) => {
       <Console lines={[String(D.count)]} x={listX} top={c.T + lineH + c.h(12)} width={100} at={twoAt - 2} />
       <Note at={twoAt + 8} x={listX + 124} y={c.T + lineH + c.h(12) + c.h(8)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          on every column instead: <Num>{D.countAll}</Num>
+          On every column instead: <Num>{D.countAll}</Num>
         </span>
       </Note>
       <Listing
@@ -333,7 +333,7 @@ const Case: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <Note at={winsAt + 6} x={tg.right + 30} y={tg.rowTop(both[0]) + c.h(8)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          both conditions hold:
+          Both conditions hold:
           <br />
           the first wins, {choices}
         </span>
@@ -369,7 +369,7 @@ const Csv: React.FC<{ c: Ctx }> = ({ c }) => {
       <Console lines={firstOut} x={R_X} top={fileTop} width={300} at={toAt} marks={[{ line: 0, at: unnamedAt - 4, color: MARK_BAD }]} />
       <Note at={toAt + 6} x={R_X + 320} y={fileTop + c.h(10)}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-          in <QMono>{file}</QMono>
+          In <QMono>{file}</QMono>
         </span>
       </Note>
       <Listing lines={readBack.lines} x={R_X} top={readTop} width={420} size={SIZE} at={toAt + 8} />
@@ -433,7 +433,7 @@ const Shape: React.FC<{ c: Ctx }> = ({ c }) => {
       <Console lines={[`${S.memory}`]} x={R_X} top={rowTop(3) + lineH + c.h(10)} width={120} at={bytesAt + 8} />
       <Listing lines={S.infoLines} x={R_X} top={infoTop} width={300} size={SIZE} at={infoAt - 4} />
       <Note at={allAt} x={R_X + 320} y={infoTop + c.h(14)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>all three in one printout, with non-null counts</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>All three in one printout, with non-null counts</span>
       </Note>
     </>
   );

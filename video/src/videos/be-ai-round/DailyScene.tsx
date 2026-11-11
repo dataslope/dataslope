@@ -56,26 +56,26 @@ export const DailyScene: React.FC = () => {
       title: "Hand it",
       at: n.word("daily-concrete", "What you hand to the assistant"),
       items: [
-        { text: "boilerplate", at: n.word("daily-concrete", "boilerplate") },
-        { text: "test scaffolding", at: n.word("daily-concrete", "test scaffolding") },
-        { text: "unfamiliar APIs", at: n.word("daily-concrete", "unfamiliar APIs") },
-        { text: "first drafts", at: n.word("daily-concrete", "first drafts") },
+        { text: "Boilerplate", at: n.word("daily-concrete", "boilerplate") },
+        { text: "Test scaffolding", at: n.word("daily-concrete", "test scaffolding") },
+        { text: "Unfamiliar APIs", at: n.word("daily-concrete", "unfamiliar APIs") },
+        { text: "First drafts", at: n.word("daily-concrete", "first drafts") },
       ],
     },
     {
       title: "Keep it",
       at: n.word("daily-concrete", "What you don't"),
       items: [
-        { text: "security-sensitive code", at: n.word("daily-concrete", "security-sensitive code") },
-        { text: "the core design", at: n.word("daily-concrete", "the core design") },
+        { text: "Security-sensitive code", at: n.word("daily-concrete", "security-sensitive code") },
+        { text: "The core design", at: n.word("daily-concrete", "the core design") },
       ],
     },
     {
       title: "Verify",
       at: n.word("daily-concrete", "How you verify what it writes"),
-      items: [{ text: "how you check what it writes", at: n.word("daily-concrete", "How you verify what it writes") + 8 }],
+      items: [{ text: "How you check what it writes", at: n.word("daily-concrete", "How you verify what it writes") + 8 }],
       example: [
-        { text: "run the tests,", at: n.word("daily-example", "I run the tests") },
+        { text: "Run the tests,", at: n.word("daily-example", "I run the tests") },
         { text: "read the diff like a PR", at: n.word("daily-example", "read its diff like a pull request") },
       ],
     },
@@ -83,11 +83,11 @@ export const DailyScene: React.FC = () => {
       title: "The time it was wrong",
       at: n.word("daily-concrete", "one specific time it was wrong"),
       items: [
-        { text: "one specific time", at: n.word("daily-concrete", "one specific time it was wrong") + 6 },
+        { text: "One specific time", at: n.word("daily-concrete", "one specific time it was wrong") + 6 },
         { text: "and how you caught it", at: n.word("daily-concrete", "how you caught it") },
       ],
       example: [
-        { text: "called our payments client", at: n.word("daily-example", "called our payments client") },
+        { text: "Called our payments client", at: n.word("daily-example", "called our payments client") },
         { text: "with a made-up parameter;", at: n.word("daily-example", "a parameter that doesn't exist") },
         { text: "the integration test caught it", at: n.word("daily-example", "the integration test caught it") },
       ],
@@ -275,7 +275,7 @@ export const DailyScene: React.FC = () => {
         </svg>
         <Note at={gapAt + 6} x={ZERO - 260} y={gapY + 12} width={520}>
           <div style={{ ...note(24, INK), fontWeight: 500, textAlign: "center", whiteSpace: "nowrap" }}>
-            <Mark at={gapAt + 12}>the gap: felt faster, measured slower</Mark>
+            <Mark at={gapAt + 12}>The gap: felt faster, measured slower</Mark>
           </div>
         </Note>
         <Note at={sinceAt} x={X0} y={y(800)}>

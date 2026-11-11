@@ -128,10 +128,10 @@ export const AiScene: React.FC = () => {
           <div style={{ ...note(24, INK_SOFT), marginTop: 4, opacity: ease(frame, expandAt - 2, 12) }}>retrieval-augmented generation</div>
           {/* What RAG does, once, for a viewer who has not built one. */}
           <div style={{ ...note(22, INK_SOFT), marginTop: 2, textWrap: "balance", opacity: ease(frame, expandAt + 10, 12) }}>
-            a model answers from documents it looks up
+            A model answers from documents it looks up
           </div>
           <div style={{ ...note(24, INK), marginTop: 10, opacity: ease(frame, promptAt - 2, 12) }}>
-            <Mark at={promptAt + 4}>a system design prompt</Mark>
+            <Mark at={promptAt + 4}>A system design prompt</Mark>
           </div>
         </div>
 
@@ -221,7 +221,7 @@ export const AiScene: React.FC = () => {
             opacity: ease(frame, freshAt + 10, 12),
           }}
         >
-          keep it fresh, incrementally, <span style={{ opacity: ease(frame, likeAt - 2, 12) }}>like any other pipeline</span>
+          Keep it fresh, incrementally, <span style={{ opacity: ease(frame, likeAt - 2, 12) }}>like any other pipeline</span>
         </div>
 
         {/* The other three points, side by side, a hairline in each gap. */}
@@ -237,25 +237,25 @@ export const AiScene: React.FC = () => {
           }}
         >
           <Column at={vecAt} title="Vector search trade-offs">
-            <Line at={n.word("ai-vector", "exact or approximate")}>exact or approximate</Line>
+            <Line at={n.word("ai-vector", "exact or approximate")}>Exact or approximate</Line>
             <Line at={n.word("ai-vector", "Postgres with its vector extension")}>Postgres (pgvector) or a dedicated store</Line>
-            <Line at={n.word("ai-vector", "metadata filters")}>metadata filters</Line>
-            <Line at={n.word("ai-vector", "hybrid keyword search")}>hybrid keyword search</Line>
+            <Line at={n.word("ai-vector", "metadata filters")}>Metadata filters</Line>
+            <Line at={n.word("ai-vector", "hybrid keyword search")}>Hybrid keyword search</Line>
           </Column>
           <Gap at={govAt} />
           <Column at={govAt} title="Governance for AI data">
-            <Line at={n.word("ai-gov", "permissions checked at query time")}>permissions checked at query time</Line>
-            <Line at={n.word("ai-gov", "deletions that reach the vectors")}>deletions that reach the vectors</Line>
+            <Line at={n.word("ai-gov", "permissions checked at query time")}>Permissions checked at query time</Line>
+            <Line at={n.word("ai-gov", "deletions that reach the vectors")}>Deletions that reach the vectors</Line>
             {/* The page's wording, which cannot be misread at its line break
                 ("kept from outside" read as a whole phrase). */}
-            <Line at={n.word("ai-gov", "personal data kept from")}>personal data kept away from external embedding APIs</Line>
+            <Line at={n.word("ai-gov", "personal data kept from")}>Personal data kept away from external embedding APIs</Line>
           </Column>
           <Gap at={codeAt} />
           <Column at={codeAt} title="AI-written pipeline code">
-            <Line at={n.word("ai-code", "needs review for idempotency")}>reviewed for idempotency, time zones and schema drift</Line>
-            <Line at={n.word("ai-code", "Some coding rounds now allow an assistant")}>some coding rounds allow an assistant</Line>
+            <Line at={n.word("ai-code", "needs review for idempotency")}>Reviewed for idempotency, time zones and schema drift</Line>
+            <Line at={n.word("ai-code", "Some coding rounds now allow an assistant")}>Some coding rounds allow an assistant</Line>
             <div style={{ ...note(24, INK), lineHeight: 1.3, opacity: ease(frame, n.word("ai-code", "ask the recruiter") - 2, 12) }}>
-              <Mark at={n.word("ai-code", "ask the recruiter") + 4}>ask the recruiter about each one</Mark>
+              <Mark at={n.word("ai-code", "ask the recruiter") + 4}>Ask the recruiter about each one</Mark>
             </div>
           </Column>
         </div>

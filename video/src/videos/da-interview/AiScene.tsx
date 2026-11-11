@@ -117,7 +117,7 @@ export const AiScene: React.FC = () => {
             opacity: ease(frame, askAt - 2, 12),
           }}
         >
-          <Mark at={askAt + 4}>ask the recruiter about each round</Mark>
+          <Mark at={askAt + 4}>Ask the recruiter about each round</Mark>
         </div>
       </Drift>
     </AbsoluteFill>

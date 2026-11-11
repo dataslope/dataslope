@@ -195,7 +195,7 @@ export const HookScene: React.FC = () => {
             opacity: ease(frame, liveAt - 2, 12),
           }}
         >
-          all four usually in live coding
+          All four usually in live coding
         </div>
 
         {/* The backend row, set apart below: its name under the

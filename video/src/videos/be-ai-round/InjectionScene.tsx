@@ -327,9 +327,9 @@ export const InjectionScene: React.FC = () => {
           </Note>
           <div style={{ position: "absolute", left: X0, top: y(572), display: "flex", alignItems: "baseline", gap: 14, fontSize: 23 }}>
             {[
-              { text: "least privilege", at: leastAt },
-              { text: "human confirmation", at: humanAt },
-              { text: "output as untrusted input", at: untrustedAt },
+              { text: "Least privilege", at: leastAt },
+              { text: "Human confirmation", at: humanAt },
+              { text: "Output as untrusted input", at: untrustedAt },
             ].map((d, i) => {
               const p = ease(frame, d.at - 2, 12);
               return (
@@ -358,9 +358,9 @@ export const InjectionScene: React.FC = () => {
 
           {/* Secrets, and a log. */}
           <div style={{ position: "absolute", left: X0, top: y(782), display: "flex", alignItems: "baseline", gap: 14, fontSize: 23 }}>
-            <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, secretsAt - 2, 12) }}>secrets kept out of prompts</span>
+            <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, secretsAt - 2, 12) }}>Secrets kept out of prompts</span>
             <span style={{ ...note(23, INK_SOFT), opacity: ease(frame, logAt - 2, 12) }}>·</span>
-            <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, logAt - 2, 12) }}>every tool call logged</span>
+            <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, logAt - 2, 12) }}>Every tool call logged</span>
           </div>
           <Note at={tracedAt} x={X0 + 640} y={y(782)}>
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>so an incident can be traced</span>

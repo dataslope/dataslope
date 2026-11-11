@@ -138,7 +138,7 @@ export const PromptScene: React.FC = () => {
         <PromptListing lines={WEAK} x={X0} top={listTop} width={LEFT_W} size={SIZE} at={weakAt} />
         <Note at={wishAt} x={X0} y={listTop + 104}>
           <span style={line(26, ACCENT_INK)}>
-            <b>a wish</b>
+            <b>A wish</b>
           </span>
         </Note>
         <ColumnRule x={(X0 + LEFT_W + BETTER_X) / 2} top={y(LABEL_Y)} height={y(744) + 100 - y(LABEL_Y)} at={betterAt} />

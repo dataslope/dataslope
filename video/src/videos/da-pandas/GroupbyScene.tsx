@@ -121,9 +121,9 @@ export const GroupbyScene: React.FC = () => {
   // The three stages, each headed on its word, over the pieces, the sums
   // and the combined Series.
   const stages = [
-    { text: "split", x: PIECES_X, at: splitAt },
-    { text: "apply", x: PIECES_X + 340, at: applyAt },
-    { text: "combine", x: RESULT_X, at: combineAt },
+    { text: "Split", x: PIECES_X, at: splitAt },
+    { text: "Apply", x: PIECES_X + 340, at: applyAt },
+    { text: "Combine", x: RESULT_X, at: combineAt },
   ];
 
   return (
@@ -182,7 +182,7 @@ export const GroupbyScene: React.FC = () => {
           marks={[{ line: 0, at: objectAt + 6 }]}
         />
         <Note at={nothingAt} x={X0} y={below + lineH + h(12) + consoleHeight(1) + h(16)} out={returnsAt - 4}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>nothing computed until you aggregate</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Nothing computed until you aggregate</span>
         </Note>
 
         {/* ── Split: one piece per region ── */}
@@ -289,7 +289,7 @@ export const GroupbyScene: React.FC = () => {
           out={q4At - 4}
         />
         <Note at={seriesAt} x={sg.right + 28} y={sg.rowTop(1)} out={q4At - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>a Series</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>A Series</span>
         </Note>
         <Listing lines={GROUPBY.agg.lines} x={PIECES_X} top={y(TOP)} width={500} size={SIZE} at={aggAt - 2} out={q4At - 4} />
         <DataTable
@@ -300,7 +300,7 @@ export const GroupbyScene: React.FC = () => {
           out={q4At - 4}
         />
         <Note at={frameAt + 2} x={ag.right + 28} y={ag.rowTop(1)} out={q4At - 4}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>a DataFrame</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>A DataFrame</span>
         </Note>
 
         {/* ── agg: one row per group; transform: one per row ── */}

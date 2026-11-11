@@ -144,7 +144,7 @@ export const JitterScene: React.FC = () => {
         {/* The single wave: every request in one tenth. */}
         <Note at={sameAt} x={LEFT_X + ((plainBin * RETRY.bin) / SPAN) * PLOT_W - 24} y={y(PLOT_TOP) + 44} align="right">
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            all <Num>{thousands(plain.busiest)}</Num> in the same tenth
+            All <Num>{thousands(plain.busiest)}</Num> in the same tenth
           </span>
         </Note>
         <Note at={againAt} x={LEFT_X + ((plainBin * RETRY.bin) / SPAN) * PLOT_W - 24} y={y(PLOT_TOP) + 84} align="right">
@@ -164,7 +164,7 @@ export const JitterScene: React.FC = () => {
         {/* What 115 means: the peak, set against the 1,000 without. */}
         <Note at={lowerAt - 2} x={RIGHT_X + 24} y={y(PLOT_TOP) + 44}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            a peak <Num>{RETRY.peakRatio.toFixed(1)}</Num> times lower
+            A peak <Num>{RETRY.peakRatio.toFixed(1)}</Num> times lower
           </span>
         </Note>
         <Note at={trickleAt - 2} x={RIGHT_X + 24} y={y(PLOT_TOP) + 84}>

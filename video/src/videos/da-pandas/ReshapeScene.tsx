@@ -165,7 +165,7 @@ export const ReshapeScene: React.FC = () => {
         />
         <Note at={meanAt - 2} x={pg.x} y={pg.rowTop(PT.rows.length) + h(30)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            with no <Mono>aggfunc</Mono>, the mean:
+            With no <Mono>aggfunc</Mono>, the mean:
             <br />
             {dupRegion} and {dupCat} would be <Num>{meanValue}</Num>
           </span>
