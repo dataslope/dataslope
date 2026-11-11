@@ -15,9 +15,11 @@ const BARS = { top: 360, height: 420, w: 230, xs: [1010, 1370] };
 const DISC = { y: 560, r: 150, xs: [300, 640] };
 /** Question 5's column of formulas: where each starts, how wide a formula's
  *  column is (so the note after it lines up row to row), and the rows. */
-const COL = { x: 1040, w: 470, prod: 330, zero: 400, two: 500, twoGiven: 565, far: 660, never: 716 };
-/** Question 4's product line, under P(A | B) = P(A), behind "equivalently". */
-const PROD4 = { y: 460, lead: 190 };
+const COL = { x: 1040, w: 500, prod: 330, zero: 400, two: 500, twoGiven: 565, far: 660, never: 716 };
+/** Question 4's product line, under P(A | B) = P(A), with "Equivalently" on
+ *  the line above it: a word of 26px beside a 46px formula is two sizes on
+ *  one line. */
+const PROD4 = { y: 516, lead: 474 };
 
 const P: React.FC<{ children: React.ReactNode }> = ({ children }) => <span>P({children})</span>;
 
@@ -118,19 +120,21 @@ export const IndepScene: React.FC = () => {
           </MathRun>
         </Ink>
         {/* Equivalently, the product rule: it stays on into Question 5. */}
+        <Note at={justAt + 6} x={X0} y={y(PROD4.lead)} out={out4}>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Equivalently</span>
+        </Note>
         <Ink
           at={justAt + 6}
           dur={20}
           out={clearAt}
           style={{
-            left: lerp(X0, COL.x - PROD4.lead, move),
+            left: lerp(X0, COL.x, move),
             top: lerp(y(PROD4.y), y(COL.prod), move),
             display: "flex",
             alignItems: "baseline",
             whiteSpace: "nowrap",
           }}
         >
-          <span style={{ ...note(26, INK_SOFT), display: "inline-block", width: PROD4.lead, opacity: 1 - move }}>Equivalently</span>
           <MathRun style={{ ...math(46), display: "inline-block", width: COL.w }}>
             <P>
               <V>A</V> and <V>B</V>
@@ -145,13 +149,13 @@ export const IndepScene: React.FC = () => {
           </MathRun>
           <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, q5At + 14, 12) }}>independent</span>
         </Ink>
-        <Note at={claimAt} x={X0} y={y(540)} out={out4}>
+        <Note at={claimAt} x={X0} y={y(596)} out={out4}>
           <span style={{ ...note(30, INK), fontWeight: 500, whiteSpace: "nowrap" }}>A claim to justify. These break it:</span>
         </Note>
-        <Note at={visitsAt} x={X0 + 24} y={y(600)} out={out4}>
+        <Note at={visitsAt} x={X0 + 24} y={y(656)} out={out4}>
           <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>Repeat visits by the same user</span>
         </Note>
-        <Note at={networkAt} x={X0 + 24} y={y(650)} out={out4}>
+        <Note at={networkAt} x={X0 + 24} y={y(706)} out={out4}>
           <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>Network effects</span>
         </Note>
 

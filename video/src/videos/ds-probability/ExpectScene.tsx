@@ -10,7 +10,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DIE, HATS, pct, VIDEO } from "./data";
-import { Clear, DATA, DATA_LIGHT, DieFace, Drift, Frac, Mark, math, OK, OK_INK, Person, PERSON, pulse, Svg, V, X0 } from "./parts";
+import { Clear, DATA, DATA_LIGHT, DieFace, Drift, Frac, Mark, math, mathFace, OK, OK_INK, Person, PERSON, pulse, Svg, V, X0 } from "./parts";
 
 const BEAM = { x0: 170, pitch: 150, y: 540, face: 92 };
 const SQ = { x0: 1150, pitch: 108, w: 72, base: 780, unit: 46 };
@@ -126,13 +126,16 @@ export const ExpectScene: React.FC = () => {
           />
         ))}
         <Note at={weightedAt} x={X0} y={y(320)} out={out6}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>The probability-weighted average:</span>
-          <MathRun style={{ ...math(40), marginLeft: 14 }}>
-            <E>
-              <V>X</V>
-            </E>{" "}
-            = Σ <V>x</V> P(<V>x</V>)
-          </MathRun>
+          {/* One sentence, the formula at the size of its words. */}
+          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+            The probability-weighted average:{" "}
+            <MathRun style={mathFace()}>
+              <E>
+                <V>X</V>
+              </E>{" "}
+              = Σ <V>x</V> P(<V>x</V>)
+            </MathRun>
+          </span>
         </Note>
         <Note at={halfAt} x={beamX(3.5) - 120} width={240} y={beamY + 72} out={out6} from="up" style={{ textAlign: "center" }}>
           <MathRun style={{ ...math(40, OK_INK) }}>
@@ -375,11 +378,14 @@ export const ExpectScene: React.FC = () => {
           </Note>
 
           <Note at={varAt} x={X0} y={y(HATS_ROW.y + 226)}>
-            <MathRun style={{ ...math(32, INK) }}>
-              Var(<V>X</V> + <V>Y</V>) = Var(<V>X</V>) + Var(<V>Y</V>)
-            </MathRun>
-            <span style={{ ...note(26, INK), fontWeight: 500, marginLeft: 16, whiteSpace: "nowrap" }}>
-              only when <Mark at={uncorrAt}>uncorrelated</Mark>
+            {/* The rule and its condition are one sentence, in one size. */}
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+              <MathRun style={mathFace()}>
+                Var(<V>X</V> + <V>Y</V>) = Var(<V>X</V>) + Var(<V>Y</V>)
+              </MathRun>
+              <span style={{ fontWeight: 500, marginLeft: 16 }}>
+                only when <Mark at={uncorrAt}>uncorrelated</Mark>
+              </span>
             </span>
           </Note>
         </Clear>

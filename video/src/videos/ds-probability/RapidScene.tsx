@@ -138,7 +138,8 @@ const Bet: React.FC<{ w: Words; out?: number }> = ({ w, out: dim }) => {
               y={top + 54}
               style={{ whiteSpace: "nowrap" }}
             >
-              <span style={{ ...label(24, INK_SOFT), ...TABULAR }}>
+              {/* The sum and its answer read as one line: within 12% in size. */}
+              <span style={{ ...label(26, INK_SOFT), ...TABULAR }}>
                 {r.weight} × {dollars(r.pay)} ={" "}
               </span>
               <span style={{ ...label(28, r.ink), ...TABULAR, opacity: ease(frame, r.partAt + 8, 12) }}>{money(r.part)}</span>

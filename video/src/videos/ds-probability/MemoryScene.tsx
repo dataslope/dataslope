@@ -10,7 +10,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MEMORY, pct } from "./data";
-import { at, Axes, DATA, Drift, Given, math, OK_INK, pulse, type Scale, Svg, V, X0 } from "./parts";
+import { at, Axes, DATA, Drift, Given, math, mathFace, OK_INK, pulse, type Scale, Svg, V, X0 } from "./parts";
 
 const PLOT = { left: 200, right: 1160, top: 420, base: 800 };
 const TABLE = { x: 1300, top: 430, row: 74 };
@@ -79,11 +79,11 @@ export const MemoryScene: React.FC = () => {
         </Note>
         <Note at={answerAt + 22} x={X0 + 720} y={y(350)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            <MathRun style={math(28, INK)}>
+            <MathRun style={mathFace(INK)}>
               <V>s</V>
             </MathRun>{" "}
             already waited,{" "}
-            <MathRun style={math(28, INK)}>
+            <MathRun style={mathFace(INK)}>
               <V>t</V>
             </MathRun>{" "}
             more

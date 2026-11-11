@@ -9,7 +9,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COND } from "./data";
-import { DieFace, Drift, Frac, Given, Labeled, Mark, MARK_OK, math, OK, OK_INK, pulse, V, X0 } from "./parts";
+import { DieFace, Drift, Frac, Given, Labeled, Mark, MARK_OK, math, mathFace, OK, OK_INK, pulse, V, X0 } from "./parts";
 
 const DIE = { size: 110, pitch: 140, y: 470 };
 /** A probability's own column, so the note after it lines up row to row. */
@@ -110,7 +110,9 @@ export const CondScene: React.FC = () => {
             </P>
           </MathRun>
         </Ink>
-        <Note at={answerAt + 10} x={X0 + 250} y={y(318)} out={out1}>
+        {/* Read out on a line of its own: the formula is a display, twice
+            the size of the words, so the two do not share a line. */}
+        <Note at={answerAt + 10} x={X0} y={y(394)} out={out1}>
           <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>The probability of A, given that B has happened</span>
         </Note>
 
@@ -242,48 +244,54 @@ export const CondScene: React.FC = () => {
         {/* Which event is which, then what you know (the likelihood, marked as
             it is in the theorem) and what you want (the answer, in green). */}
         <Note at={diseaseAt} x={X0} y={y(590)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            <MathRun style={math(30, INK)}>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
+            <MathRun style={mathFace(INK)}>
               <V>A</V>
             </MathRun>{" "}
             = disease,
-            <MathRun style={{ ...math(30, INK), marginLeft: 26 }}>
+            <MathRun style={{ ...mathFace(INK), marginLeft: 26 }}>
               <V>B</V>
             </MathRun>{" "}
             = positive
           </span>
         </Note>
+        {/* "You know" and "You want" are sentences with the formula in them,
+            set at the size of their words. */}
         <Note at={knowAt + 2} x={X0} y={y(650)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>You know </span>
-          <MathRun style={math(36, INK)}>
-            <Mark at={knowAt + 10}>
-              <P>
-                positive
-                <Given />
-                disease
-              </P>
-            </Mark>
-          </MathRun>
+          <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>
+            You know{" "}
+            <MathRun style={mathFace(INK)}>
+              <Mark at={knowAt + 10}>
+                <P>
+                  positive
+                  <Given />
+                  disease
+                </P>
+              </Mark>
+            </MathRun>
+          </span>
         </Note>
         {/* The bridge points at what the next question computes: washed green
             on "that test", and swelling on "with numbers". */}
         <Note at={wantAt + 2} x={X0} y={y(720)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>You want </span>
-          <span
-            style={{
-              ...math(36, OK_INK),
-              display: "inline-block",
-              transform: `scale(${1 + 0.07 * pulse(frame, numbersAt, 22)})`,
-              transformOrigin: "0 50%",
-            }}
-          >
-            <Mark at={thatTestAt} color={MARK_OK}>
-              <P>
-                disease
-                <Given />
-                positive
-              </P>
-            </Mark>
+          <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>
+            You want{" "}
+            <MathRun
+              style={{
+                ...mathFace(OK_INK),
+                display: "inline-block",
+                transform: `scale(${1 + 0.07 * pulse(frame, numbersAt, 22)})`,
+                transformOrigin: "0 50%",
+              }}
+            >
+              <Mark at={thatTestAt} color={MARK_OK}>
+                <P>
+                  disease
+                  <Given />
+                  positive
+                </P>
+              </Mark>
+            </MathRun>
           </span>
         </Note>
 

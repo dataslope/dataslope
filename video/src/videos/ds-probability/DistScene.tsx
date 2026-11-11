@@ -9,7 +9,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DISTS, pct } from "./data";
-import { DATA, DATA_LIGHT, Drift, math, Svg, V } from "./parts";
+import { DATA, DATA_LIGHT, Drift, math, mathFace, Svg, V } from "./parts";
 
 const PANEL = { x0: 120, w: 300, gap: 42, top: 400, height: 300 };
 const panelX = (i: number) => PANEL.x0 + i * (PANEL.w + PANEL.gap);
@@ -163,7 +163,7 @@ export const DistScene: React.FC = () => {
           </MathRun>
         </Note>
         <Note at={binAt + 8} x={panelX(1)} y={capY} width={PANEL.w}>
-          <span style={{ ...note(23, INK) }}>Successes in <MathRun style={math(26)}><V>n</V></MathRun> trials</span>
+          <span style={{ ...note(23, INK) }}>Successes in <MathRun style={mathFace()}><V>n</V></MathRun> trials</span>
         </Note>
         <Note at={npAt} x={panelX(1)} y={capY + 40} width={PANEL.w}>
           <MathRun style={math(28)}>

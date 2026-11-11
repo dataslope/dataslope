@@ -10,7 +10,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LIMIT } from "./data";
-import { at, Axes, DATA, DATA_LIGHT, Drift, Mark, math, mulberry32, type Scale, Svg, V, X0 } from "./parts";
+import { at, Axes, DATA, DATA_LIGHT, Drift, Mark, math, mathFace, mulberry32, type Scale, Svg, V, X0 } from "./parts";
 
 const COL_R = 1000;
 const IMPRESSIONS = { cols: 20, rows: 2, size: 30, gap: 8, top: 470 };
@@ -195,7 +195,7 @@ export const PoisScene: React.FC = () => {
         <Note at={npAt} x={PLOT.right - 300} y={y(PLOT.top) + 150}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Many trials, small chance:{" "}
-            <MathRun style={math(30)}>
+            <MathRun style={mathFace()}>
               λ = <V>n</V>
               <V>p</V>
             </MathRun>
