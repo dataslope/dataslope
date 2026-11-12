@@ -96,10 +96,12 @@ export const TotalsScene: React.FC = () => {
             <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
               <rect x={SCALE.x0} y={top} width={w} height={h(BAR_H)} fill={COLOR[g]} />
             </svg>
-            <Note at={growAt[g] + 10} x={SCALE.x0 + w + 22} y={top + h(BAR_H) / 2 - 32}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
-                <span style={{ ...headline(56), color: COLOR_INK[g] }}>{pct(t.rate)}</span>
-                <span style={note(21, INK_SOFT)}>{t.admitted.toLocaleString("en-US")} admitted</span>
+            {/* The rate, and under it on a line of its own the count it is
+                made of: one line, one size. */}
+            <Note at={growAt[g] + 10} x={SCALE.x0 + w + 22} y={top + h(BAR_H) / 2 - 46}>
+              <div style={{ ...headline(56), color: COLOR_INK[g], whiteSpace: "nowrap" }}>{pct(t.rate)}</div>
+              <div style={{ ...note(21, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>
+                {t.admitted.toLocaleString("en-US")} admitted
               </div>
             </Note>
           </React.Fragment>

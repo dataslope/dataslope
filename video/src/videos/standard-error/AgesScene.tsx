@@ -103,7 +103,7 @@ export const AgesScene: React.FC = () => {
         </Ink>
         <span style={{ display: "flex", alignItems: "baseline", gap: "0.25em", ...body(36, true), color: BLUE_INK }}>
           <Ink at={spreadAt - 2} dur={14} style={{ position: "relative" }}>
-            the spread of
+            The spread of
           </Ink>
           <Ink at={dataAt + 4} dur={12} style={{ position: "relative" }}>
             the data
@@ -119,7 +119,7 @@ export const AgesScene: React.FC = () => {
         </Ink>
         <span style={{ display: "flex", alignItems: "baseline", gap: "0.25em", ...body(36, true), color: ACCENT_INK }}>
           <Ink at={spreadAt + 4} dur={14} style={{ position: "relative" }}>
-            the spread of
+            The spread of
           </Ink>
           <Ink at={estimateAt + 4} dur={12} style={{ position: "relative" }}>
             the estimate

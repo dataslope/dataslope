@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BERKSON, signed } from "./data";
-import { Count, DATA_INK, Dashed, DOT, Drift, Headline, lerp, Marker, RAW, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { Count, Dashed, DATA_INK, DOT, Drift, Headline, lerp, Marker, MathVar, RAW, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 const DOM = [6, 94] as const;
 const TOP = 350;
@@ -121,7 +121,7 @@ export const BerksonScene: React.FC = () => {
           STAT_INK,
           getInAt - 4,
           <span style={{ opacity: ease(frame, minusAt - 6, 8), ...TABULAR }}>
-            <Count from={BERKSON.rAll} to={BERKSON.rIn} at={minusAt - 6} dur={18} format={(v) => `r = ${signed(v)}`} />
+            <MathVar>r</MathVar> = <Count from={BERKSON.rAll} to={BERKSON.rIn} at={minusAt - 6} dur={18} format={(v) => signed(v)} />
           </span>,
         )}
         <Spot id="interpreting-results-rope" at={admitAt - 6} left={700} top={y(490)} width={340} height={194} />
@@ -184,7 +184,7 @@ export const BerksonScene: React.FC = () => {
           </span>
         </Note>
         <Note at={abilityInAt - 4} x={IN.x1 + 20} y={py(42) - 16}>
-          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>weak interview,</span>
+          <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Weak interview,</span>
           <div style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>so strong ability</div>
         </Note>
         <Note at={barAt + 8} x={ALL.x0 + 14} y={py(20) - 6}>
@@ -192,7 +192,7 @@ export const BerksonScene: React.FC = () => {
         </Note>
         <Note at={customersAt - 2} x={160} y={bottom + 64}>
           <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>
-            among our customers, among patients, among people who replied:{" "}
+            Among our customers, among patients, among people who replied:{" "}
             <Marker at={dataAt - 4}>who got in?</Marker>
           </span>
         </Note>

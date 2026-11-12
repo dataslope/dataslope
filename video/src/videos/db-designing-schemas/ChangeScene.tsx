@@ -120,8 +120,8 @@ export const ChangeScene: React.FC = () => {
         <PathArrow
           key={i}
           points={[
-            [CHIP_X[i] + CHIP_W - 20, y(CHIP_Y) + 22],
-            [CHIP_X[i + 1] - 6, y(CHIP_Y) + 22],
+            [CHIP_X[i] + CHIP_W - 24, y(CHIP_Y) + 22],
+            [CHIP_X[i + 1], y(CHIP_Y) + 22],
           ]}
           at={v.at - 8}
           dur={8}
@@ -132,8 +132,8 @@ export const ChangeScene: React.FC = () => {
       {/* "Learning about the world": the run goes on past v5. */}
       <PathArrow
         points={[
-          [CHIP_X[4] + CHIP_W - 20, y(CHIP_Y) + 22],
-          [CHIP_X[5] - 6, y(CHIP_Y) + 22],
+          [CHIP_X[4] + CHIP_W - 24, y(CHIP_Y) + 22],
+          [CHIP_X[5], y(CHIP_Y) + 22],
         ]}
         at={learningAt - 6}
         dur={10}
@@ -146,7 +146,7 @@ export const ChangeScene: React.FC = () => {
           style={{
             display: "inline-flex",
             padding: "6px 14px",
-            borderRadius: 8,
+            borderRadius: 5,
             border: `2px dashed ${HAIRLINE}`,
             width: CHIP_W - 24,
             boxSizing: "border-box",
@@ -188,7 +188,7 @@ export const ChangeScene: React.FC = () => {
       {dependents.map((d, i) => (
         <React.Fragment key={d}>
           <Leader
-            points={[from, [from[0] + 90, from[1]], [depX - 70, depY(i) + 22], [depX - 12, depY(i) + 22]]}
+            points={[from, [from[0] + 90, from[1]], [depX - 70, depY(i) + 22], [depX - 4, depY(i) + 22]]}
             at={leanAt[i] - 6}
             dur={12}
             color={INK_SOFT}
@@ -198,7 +198,7 @@ export const ChangeScene: React.FC = () => {
             <Chip tone="soft">{d}</Chip>
           </Ink>
           {/* "Leaning on its shape": each dependent's end of its line, the last once it has arrived. */}
-          <Ping x={depX - 12} y={depY(i) + 22} at={i < 4 ? shapeAt + i * 3 : leanAt[4] + 8} color={INK} r={22} dur={20} />
+          <Ping x={depX - 4} y={depY(i) + 22} at={i < 4 ? shapeAt + i * 3 : leanAt[4] + 8} color={INK} r={22} dur={20} />
         </React.Fragment>
       ))}
       <div

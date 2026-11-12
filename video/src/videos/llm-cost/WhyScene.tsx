@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { ds } from "../../theme/brand";
 import { body, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -31,6 +32,8 @@ const RIGHT_X = 990;
 const RIGHT_ROW = 492;
 const COUNT_Y = 646;
 const METER_W = 240;
+/** The model box's plain gray. */
+const MODEL_FILL = `color-mix(in srgb, ${ds("gray", 400)} 22%, ${PAPER})`;
 
 /**
  * Why output costs more: the prompt goes through the model in one pass, all
@@ -105,9 +108,9 @@ export const WhyScene: React.FC = () => {
           width: BOX.w,
           height: boxY1 - boxY0,
           boxSizing: "border-box",
-          borderRadius: 14,
-          border: `3px solid ${INK}`,
-          background: `color-mix(in srgb, ${inFlash > outFlash ? INPUT : OUTPUT} ${Math.round(Math.max(inFlash, outFlash) * 30)}%, ${PAPER})`,
+          borderRadius: 8,
+          // A plain box: neutral gray, no outline, flushing the hue of what passes through.
+          background: `color-mix(in srgb, ${inFlash > outFlash ? INPUT : OUTPUT} ${Math.round(Math.max(inFlash, outFlash) * 30)}%, ${MODEL_FILL})`,
           opacity: boxIn,
           transform: `scale(${1 + Math.max(inFlash, outFlash) * 0.04})`,
           display: "flex",
@@ -136,7 +139,7 @@ export const WhyScene: React.FC = () => {
           })}
         </div>
       ))}
-      <Arrow from={[BOX.x - 110, midY]} to={[BOX.x - 12, midY]} at={onceAt - 2} dur={10} color={INPUT} width={3} />
+      <Arrow from={[BOX.x - 110, midY]} to={[BOX.x - 1, midY]} at={onceAt - 2} dur={10} color={INPUT} width={3} />
       <Note at={passAt - 4} x={X0} y={y(COUNT_Y)}>
         <span style={{ ...note(27, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
           {prompt.length} tokens, 1 pass
@@ -147,7 +150,7 @@ export const WhyScene: React.FC = () => {
       <Ink at={answerAt - 4} dur={12} style={{ left: RIGHT_X, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...label(25, OUTPUT_INK), fontWeight: 500 }}>Writing the answer</span>
       </Ink>
-      <Arrow from={[BOX.x + BOX.w + 12, midY]} to={[RIGHT_X - 12, midY]} at={oneAt - 10} dur={10} color={OUTPUT} width={3} />
+      <Arrow from={[BOX.x + BOX.w + 1, midY]} to={[RIGHT_X - 2, midY]} at={oneAt - 10} dur={10} color={OUTPUT} width={3} />
       <div style={{ position: "absolute", left: RIGHT_X, top: y(RIGHT_ROW), display: "flex", gap: 6 }}>
         {answer.map((t, k) => {
           const p = ease(frame, outAt(k), 8);
@@ -171,10 +174,10 @@ export const WhyScene: React.FC = () => {
 
       {/* What a pass costs: every weight moved, for eleven tokens of work or one. */}
       <Note at={weightAt - 2} x={X0} y={y(COUNT_Y) + 44}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>every weight moved once</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Every weight moved once</span>
       </Note>
       <Note at={weightAt + 4} x={RIGHT_X} y={y(COUNT_Y) + 44}>
-        <span style={{ ...note(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>every weight moved {answer.length} times</span>
+        <span style={{ ...note(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>Every weight moved {answer.length} times</span>
       </Note>
       {[
         { x: X0, share: 1, color: INPUT, at: elevenAt - 4, value: `${prompt.length} tokens` },

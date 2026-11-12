@@ -5,6 +5,7 @@ import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { ds } from "../../theme/brand";
 import { Sfx } from "../../sound/Sfx";
@@ -145,7 +146,7 @@ export const TestScene: React.FC = () => {
       {/* Why 5% goes with 95%: the test and the interval draw the same line. */}
       <Note at={togetherAt - 4} x={sx(X, clear.lo)} y={y(ROW1) + 60}>
         <span style={{ ...note(21, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>
-          a{" "}
+          A{" "}
           <Marked at={pairTestAt - 2} color={HIGHLIGHT}>
             5% test
           </Marked>{" "}
@@ -218,12 +219,15 @@ export const TestScene: React.FC = () => {
 
       {/* ── The formula all of it leaned on ── */}
       <Ink at={formulaFrom - 4} dur={16} style={{ left: 160, top: y(830), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT) }}>Every interval so far:</span>
+        <span style={{ ...label(28, INK_SOFT) }}>Every interval so far:</span>
         <span style={{ ...note(30, INK), fontWeight: 500, marginLeft: 18, opacity: ease(frame, formulaAt - 4, 12) }}>
           <Marked at={seAt - 2} color={HIGHLIGHT}>
             standard error
           </Marked>{" "}
-          = a formula, like s ÷ √n
+          = a formula, like{" "}
+          <MathRun>
+            <I>s</I> ÷ √<I>n</I>
+          </MathRun>
         </span>
       </Ink>
     </AbsoluteFill>

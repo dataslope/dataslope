@@ -141,13 +141,13 @@ export const ChooseScene: React.FC = () => {
           2.7
         </Centered>
         <Note at={wholeAt + 8} x={LINE_X0 + 4 * PER + 70} y={lineY - 44}>
-          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>counting: whole steps</span>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Counting: whole steps</span>
         </Note>
         <Note at={measuringAt} x={LINE_X0 + 4 * PER + 70} y={lineY - 8}>
-          <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>measuring: anything in between</span>
+          <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>Measuring: anything in between</span>
         </Note>
         <Note at={notAt} x={LINE_X0 + 4 * PER + 70} y={lineY + 28}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>a different kind of model</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>A different kind of model</span>
         </Note>
       </Drift>
     </AbsoluteFill>

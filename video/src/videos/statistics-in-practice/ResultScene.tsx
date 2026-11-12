@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EXPERIMENT } from "./data";
-import { Count, Headline, lerp, STAT, STAT_INK, Svg } from "./parts";
+import { Count, Headline, lerp, MathVar, STAT, STAT_INK, Svg } from "./parts";
 
 /** Every user as one square: 100 to a row, 60 rows, per arm. */
 const COLS = 100;
@@ -111,13 +111,22 @@ export const ResultScene: React.FC = () => {
     { g: "B", name: "the new button", x: GRID_X[1], set: EXPERIMENT.convertedB, lit: litB, at: newAt, k: EXPERIMENT.xB, rate: EXPERIMENT.pB, rateAt: elevenAt, color: BAR },
   ] as const;
 
-  const CARD = [
+  const CARD: { name: string; value: React.ReactNode; extra: React.ReactNode; extraAt: number; at: number; mark: number }[] = [
     { name: "Lift", value: `+${fmt(lift)} points`, extra: `+${Math.round(EXPERIMENT.relLift * 100)}% relative`, extraAt: fifthAt - 4, at: liftAt, mark: theLiftAt },
     { name: "95% interval", value: `${fmt(pp(EXPERIMENT.ciLow))} to ${fmt(pp(EXPERIMENT.ciHigh))} points`, extra: "", extraAt: 0, at: oneAt, mark: itsIntervalAt },
     { name: "p-value", value: fmt(EXPERIMENT.p, 4), extra: "", extraAt: 0, at: pAt, mark: thePAt },
     // Cohen's h is Unit 8's d for two rates; by the scale that unit gave (0.2
     // small), 0.07 is very small, however much "a fifth more sales" sounds.
-    { name: "Effect size", value: `Cohen's h = ${fmt(EXPERIMENT.h)}`, extra: "like d, for rates: under 0.2, very small", extraAt: effectAt + 8, at: effectAt - 6, mark: effectAt },
+    { name: "Effect size", value: (
+        <>
+          Cohen&apos;s <MathVar>h</MathVar> = {fmt(EXPERIMENT.h)}
+        </>
+      ),
+      extra: (
+        <>
+          Like <MathVar>d</MathVar>, for rates: under 0.2, very small
+        </>
+      ), extraAt: effectAt + 8, at: effectAt - 6, mark: effectAt },
   ];
 
   return (
@@ -172,9 +181,8 @@ export const ResultScene: React.FC = () => {
               transform: `translateY(${(1 - p) * 10}px)`,
               ...label(20, i ? PAPER : INK),
               padding: "4px 16px",
-              borderRadius: i ? 20 : 5,
+              borderRadius: i ? 20 : 4,
               background: i ? BAR : `color-mix(in srgb, ${INK_SOFT} 22%, ${PAPER})`,
-              border: i ? "none" : `1.6px solid ${HAIRLINE}`,
               whiteSpace: "nowrap",
             }}
           >
@@ -270,7 +278,7 @@ export const ResultScene: React.FC = () => {
           const top = y(CARD_Y[i]) - 10;
           const bottom = y((CARD_Y[i + 1] ?? CARD_END) - 14);
           return (
-            <rect key={c.name} x={CARD_X - 14} y={top} width={428 * p} height={bottom - top} rx={8} fill={HIGHLIGHT} opacity={0.9 * (1 - off * 0.75)} />
+            <rect key={c.name} x={CARD_X - 14} y={top} width={428 * p} height={bottom - top} rx={5} fill={HIGHLIGHT} opacity={0.9 * (1 - off * 0.75)} />
           );
         })}
       </Svg>

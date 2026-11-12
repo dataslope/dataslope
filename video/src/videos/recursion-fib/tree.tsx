@@ -16,11 +16,15 @@ const TEXT = 24;
  *  (naive), or an answer read from the table (memo). */
 export type NodeLook = "call" | "repeat" | "lookup";
 
-const LOOK: Record<NodeLook, { fill: string; stroke: string; ink: string; dash?: string }> = {
+/** Pills with an outline (the owner, 2026-11-12): a call on the page's own
+ *  white with a near-black outline, a repeat in the red, and a lookup in the
+ *  memo's tint, its outline dashed because it does no work of its own. */
+export const NODE_LOOK: Record<NodeLook, { fill: string; stroke: string; ink: string; dash?: string }> = {
   call: { fill: PAPER, stroke: INK_SOFT, ink: INK },
   repeat: { fill: `color-mix(in srgb, ${NAIVE} 20%, ${PAPER})`, stroke: NAIVE, ink: NAIVE_INK },
   lookup: { fill: `color-mix(in srgb, ${MEMO} 14%, ${PAPER})`, stroke: MEMO, ink: MEMO_INK, dash: "7 5" },
 };
+const LOOK = NODE_LOOK;
 
 /**
  * A node, centred on `x` with its top at `top` (page px, already through the
@@ -141,8 +145,9 @@ export const TreeEdge: React.FC<{
   opacity?: number;
 }> = ({ from, to, draw, color = INK_SOFT, width = 1.8, opacity = 1 }) => {
   if (draw <= 0 || opacity <= 0) return null;
-  const [x1, y1] = [from[0], from[1] + NODE_H + 3];
-  const [x2, y2] = [to[0], to[1] - 3];
+  // From the parent's bottom edge to the child's top edge, with no gap.
+  const [x1, y1] = [from[0], from[1] + NODE_H - 1.5];
+  const [x2, y2] = [to[0], to[1] + 1.5];
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity }}>
       <path
@@ -150,7 +155,7 @@ export const TreeEdge: React.FC<{
         fill="none"
         stroke={color}
         strokeWidth={width}
-        strokeLinecap="round"
+        strokeLinecap="butt"
         pathLength={1}
         strokeDasharray={`${draw} 1`}
       />

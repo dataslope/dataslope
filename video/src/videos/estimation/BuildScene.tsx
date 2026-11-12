@@ -5,6 +5,7 @@ import { Axis, normalPdf, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, USERS } from "./data";
@@ -162,7 +163,7 @@ export const BuildScene: React.FC = () => {
       </div>
       <Ink at={marginAt - 4} dur={16} style={{ left: 98, top: y(300), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK_SOFT) }}>
-          margin of error: {fmt(USERS.tCrit)} × {money(USERS.se)} ={" "}
+          Margin of error: {fmt(USERS.tCrit)} × {money(USERS.se)} ={" "}
           <span style={{ color: EST_INK, fontWeight: 500, opacity: ease(frame, threeAt - 2, 10) }}>{money(USERS.margin)}</span>
         </span>
       </Ink>
@@ -215,7 +216,11 @@ export const BuildScene: React.FC = () => {
       />
       <Note at={sameAt - 4} x={sx(X, USERS.xBar + USERS.s) + 16} y={y(STRIP) - h(44) - 16} out={easyAt}>
         <span style={{ ...note(22, INK), ...halo, whiteSpace: "nowrap" }}>
-          spread s = {money(USERS.s)}, from the same {USERS.n}
+          spread{" "}
+          <MathRun>
+            <I>s</I>
+          </MathRun>{" "}
+          = {money(USERS.s)}, from the same {USERS.n}
         </span>
       </Note>
 

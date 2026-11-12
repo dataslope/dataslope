@@ -176,8 +176,6 @@ export const RulerScene: React.FC = () => {
             width={R.x1 - R.x0}
             height={y(RULER_TOP + RULER_H) - y(RULER_TOP)}
             fill={`color-mix(in srgb, ${HIGHLIGHT} 70%, ${PAPER})`}
-            stroke={INK}
-            strokeWidth={1.6}
           />
           {STEPS.flatMap((k) => [k, k + 0.5]).filter((k) => k <= 5).map((k) => {
             const v = TIMES.mean + k * TIMES.se;

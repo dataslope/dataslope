@@ -141,19 +141,19 @@ repeatedly but has little room to hold intermediate conclusions.
 
 ## Mixture of experts: not every parameter runs
 
-Most of the largest open-weight models released since late 2024 change
-one thing about this picture. The feed-forward half of each block is
+Many of the largest open-weight models change one thing about this
+picture. The feed-forward half of each block is
 split into many smaller networks called **experts**, and a small
 router picks a few of them for each token. The rest of that layer's
 feed-forward parameters sit idle for that token.
 
-So a model now has two parameter counts. DeepSeek-V3 has 671 billion
+So such a model has two parameter counts. DeepSeek-V3 has 671 billion
 parameters and uses 37 billion of them for each token,[^deepseek-v3]
 and OpenAI's open-weight gpt-oss-120b has 117 billion and uses about
 5 billion.[^gpt-oss] The total sets how much the model can store and
 how much memory it takes to serve. The active count sets how much
-computation each token costs. (The closed frontier models do not
-publish their architectures, so neither number is known for them.)
+computation each token costs. (Closed models generally do not publish
+their architectures, so neither number is known for them.)
 
 <CodeBlock
   adapter="python"

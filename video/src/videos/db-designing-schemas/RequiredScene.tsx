@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BLUE_INK, body, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { ds } from "../../theme/brand";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -139,11 +139,11 @@ export const RequiredScene: React.FC = () => {
       ))}
       {/* "Priority": the new requirement, beside the table it lands on. */}
       <Ink at={priorityAt - 2} dur={14} out={stepsAt - 4} style={{ left: g.x + g.width + 30, top: g.top + 8, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(30, true), color: INK_SOFT }}>every task needs one</span>
+        <span style={{ ...body(30, true), color: INK_SOFT }}>Every task needs one</span>
       </Ink>
       <ErrorBox x={X} top={g.rowTop(TASKS.length) + 40} width={1000} at={refusesAt - 2} out={ghostOut} message={ONE_STEP.message} detail={ONE_STEP.detail} />
       <Ink at={brokenAt - 4} dur={14} out={ghostOut} style={{ left: X, top: g.rowTop(TASKS.length) + 150, whiteSpace: "nowrap" }}>
-        <span style={{ ...body(30, true), color: INK }}>broken the moment it existed</span>
+        <span style={{ ...body(30, true), color: INK }}>Broken the moment it existed</span>
       </Ink>
 
       {/* ── The four steps ── */}
@@ -158,10 +158,9 @@ export const RequiredScene: React.FC = () => {
                 width: 34,
                 height: 34,
                 borderRadius: "50%",
-                boxSizing: "border-box",
-                border: `2px solid ${KEY}`,
-                background: `color-mix(in srgb, ${KEY} ${Math.round(done * 100)}%, ${PAPER})`,
-                color: done > 0.5 ? PAPER : INK,
+                // A tinted disc with no ring, filling solid once the step is done.
+                background: `color-mix(in srgb, ${KEY} ${Math.round(24 + done * 76)}%, ${PAPER})`,
+                color: done > 0.5 ? PAPER : BLUE_INK,
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -186,7 +185,7 @@ export const RequiredScene: React.FC = () => {
 
       <Ink at={decisionAt - 2} dur={16} style={{ left: X, top: g.rowTop(TASKS.length) + 44, whiteSpace: "nowrap" }}>
         <span style={{ ...body(32, true), color: INK }}>
-          A backfill decides what the old rows <Mark at={meanAt - 2}>mean</Mark>.
+          A backfill decides what the old rows <Mark at={meanAt - 2}>mean.</Mark>
         </span>
       </Ink>
     </AbsoluteFill>

@@ -93,7 +93,7 @@ export const LemmaScene: React.FC = () => {
       <FigLabel n="11" title="Lemmas without tags, and with them" at={from - 2} x={LABEL_X} y={y(262)} />
 
       {/* The sentence. */}
-      {rowLabel("the words", from + 4, "words")}
+      {rowLabel("The words", from + 4, "words")}
       {words.map((w, i) => (
         <Tile
           key={`w${i}`}
@@ -119,7 +119,7 @@ export const LemmaScene: React.FC = () => {
 
       {/* Lemmas with the default noun. */}
       <div style={{ position: "absolute", inset: 0, opacity: back }}>
-      {rowLabel("no tags", soAt - 2, "naive")}
+      {rowLabel("No tags", soAt - 2, "naive")}
       {LEMMA.naive.map((w, i) => (
         <Tile
           key={`n${i}`}
@@ -134,7 +134,7 @@ export const LemmaScene: React.FC = () => {
       ))}
 
       {/* The tags. */}
-      {rowLabel("tags", tagFirstAt - 6, "tags")}
+      {rowLabel("Tags", tagFirstAt - 6, "tags")}
       {LEMMA.tagged.map(([, tag], i) => (
         <TagChip
           key={`t${i}`}
@@ -144,7 +144,7 @@ export const LemmaScene: React.FC = () => {
       ))}
 
       {/* Lemmas with each tag passed along. */}
-      {rowLabel("with tags", handAt - 2, "aware", INK)}
+      {rowLabel("With tags", handAt - 2, "aware", INK)}
       {LEMMA.aware.map((w, i) => {
         const fam = familyOf(LEMMA.tagged[i][1]);
         return (
@@ -157,7 +157,6 @@ export const LemmaScene: React.FC = () => {
             size={SIZE}
             at={awareAt(i)}
             tint={changed[i] ? FAMILY[fam].tint : undefined}
-            border={changed[i] ? FAMILY[fam].fill : undefined}
           />
         );
       })}
@@ -166,7 +165,7 @@ export const LemmaScene: React.FC = () => {
       </Note>
       <Note at={runAt} x={cols.right + 24} y={row("aware")}>
         <div style={{ height: tileH(SIZE), display: "flex", alignItems: "center", ...label(22, FAMILY.verb.ink), fontWeight: 500, whiteSpace: "nowrap" }}>
-          the verbs, fixed
+          The verbs, fixed
         </div>
       </Note>
 

@@ -143,7 +143,7 @@ export const ThumbScene: React.FC = () => {
         enough.”
       </Ink>
       <Note at={alwaysAt + 2} x={200} y={y(358)}>
-        <span style={note(22, INK_SOFT)}>the 30-or-more rule</span>
+        <span style={note(22, INK_SOFT)}>The 30-or-more rule</span>
       </Note>
       <Ink at={thumbAt - 2} dur={18} style={{ left: 196, top: y(432), ...headline(50) }}>
         A rule of thumb,

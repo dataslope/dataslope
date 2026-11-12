@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { BAR, body, fmt, halo, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -279,7 +280,9 @@ export const ParameterScene: React.FC = () => {
           ...halo,
         }}
       >
-        <Mu inline /> = {KNOWN.mu}
+        <MathRun>
+            <I>μ</I> = {KNOWN.mu}
+          </MathRun>
       </div>
 
       <Svg>
@@ -328,10 +331,12 @@ export const ParameterScene: React.FC = () => {
             transformOrigin: "0 100%",
           }}
         >
-          <XBar inline /> ={" "}
-          <Mark at={pointFourAt - 2} out={closeAt + 6}>
-            {fmt(KNOWN.xBar)}
-          </Mark>
+          <MathRun>
+            <I>{"x\u0304"}</I> ={" "}
+            <Mark at={pointFourAt - 2} out={closeAt + 6}>
+              {fmt(KNOWN.xBar)}
+            </Mark>
+          </MathRun>
         </span>
       </Note>
 

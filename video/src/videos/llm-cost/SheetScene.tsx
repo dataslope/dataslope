@@ -161,7 +161,7 @@ export const SheetScene: React.FC = () => {
         <Outline x={BAR_X} y={barY(2)} w={unit} h={bh} at={rowAt[2]} />
         <HBar x={BAR_X} y={barY(2)} w={Math.max(3, unit * CACHE_FRACTION.haiku)} h={bh} at={rowAt[2] + 6} fill={CACHED} radius={1} />
         {/* Cache write: input's length, and a little more. */}
-        <HBar x={BAR_X} y={barY(3)} w={unit} h={bh} at={rowAt[3] + 2} fill={CACHED_SOFT} outline={CACHED} />
+        <HBar x={BAR_X} y={barY(3)} w={unit} h={bh} at={rowAt[3] + 2} fill={CACHED_SOFT} />
         <Note at={rowAt[3] + 10} x={BAR_X + unit + 8} y={barY(3) + bh / 2 - 19}>
           <span style={{ ...label(28, CACHED_INK), fontWeight: 500 }}>+</span>
         </Note>

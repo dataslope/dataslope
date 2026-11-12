@@ -109,7 +109,7 @@ export const ReportingScene: React.FC = () => {
                   y={ry - ICON_H / 2}
                   width={ICON_W}
                   height={ICON_H}
-                  rx={14}
+                  rx={8}
                   fill="none"
                   stroke={i === 1 ? TRAP : INK}
                   strokeWidth={2.2 + swell * 1.6}
@@ -120,7 +120,7 @@ export const ReportingScene: React.FC = () => {
                   y={ry - 48}
                   width={ICON_W - 100}
                   height={40}
-                  rx={8}
+                  rx={5}
                   fill={A}
                   opacity={ease(frame, modelAt - 2 + i * 3, 10)}
                 />
@@ -132,10 +132,8 @@ export const ReportingScene: React.FC = () => {
                     y={ry + 6}
                     width={i === 0 ? 68 : 184}
                     height={30}
-                    rx={5}
-                    fill={PAPER}
-                    stroke={i === 1 ? TRAP : INK_SOFT}
-                    strokeWidth={1.6}
+                    rx={4}
+                    fill={i === 1 ? `color-mix(in srgb, ${TRAP} 18%, ${PAPER})` : `color-mix(in srgb, ${INK_SOFT} 16%, ${PAPER})`}
                   />
                   <text x={ICON_X + ICON_W / 2} y={ry + 28} textAnchor="middle" style={{ ...label(19, i === 1 ? TRAP_INK : INK_SOFT), fill: i === 1 ? TRAP_INK : INK_SOFT }}>
                     {i === 0 ? "notes" : "all its reasoning"}

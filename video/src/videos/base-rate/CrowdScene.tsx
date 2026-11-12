@@ -200,10 +200,11 @@ export const CrowdScene: React.FC = () => {
         1 in {ONE_IN}
       </Ink>
       <Ink at={nineAt - 2} dur={16} style={{ left: 1000, top: y(590), whiteSpace: "nowrap" }}>
-        <span style={{ ...headline(64, true), color: COLOR_INK.falseAlarm }}>about {pct(PPV)}</span>
-        <span style={{ ...note(22, INK_SOFT), marginLeft: 18 }}>
+        <div style={{ ...headline(64, true), color: COLOR_INK.falseAlarm }}>about {pct(PPV)}</div>
+        {/* The count under the share, on a line of its own. */}
+        <div style={{ ...note(22, INK_SOFT), marginTop: 10 }}>
           {num(COUNT.tp)} of {num(COUNT.positives)}
-        </span>
+        </div>
       </Ink>
     </AbsoluteFill>
   );

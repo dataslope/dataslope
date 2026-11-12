@@ -108,7 +108,7 @@ export const LemmaScene: React.FC = () => {
       {/* Fig. 15: the lemmatizer with no part of speech, then with one. */}
       <FigLabel n="15" title="WordNet lemmas, with and without a part of speech" at={from} x={X0} y={y(FIG_Y)} />
       <Ink at={from + 6} dur={12} style={{ left: COL[0], top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-        <span style={label(21, INK_SOFT)}>word</span>
+        <span style={label(21, INK_SOFT)}>Word</span>
       </Ink>
       <Ink at={lemmatizerAt} dur={12} style={{ left: COL[1], top: y(HEAD_Y) }}>
         <span style={head}>lemmatize(w)</span>

@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, HAIRLINE, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EXPERIMENT, TINY } from "./data";
@@ -147,7 +147,7 @@ export const DecideScene: React.FC = () => {
       </Ink>
       {ease(frame, eightAt - 6, 16) > 0 ? (
         <Svg opacity={ease(frame, eightAt - 6, 16)}>
-          <rect x={150} y={y(HUGE) - 74} width={(COL[1] + 300 - 150) * ease(frame, eightAt - 6, 22)} height={110} rx={10} fill={STAT} opacity={0.1} />
+          <rect x={150} y={y(HUGE) - 74} width={(COL[1] + 300 - 150) * ease(frame, eightAt - 6, 22)} height={110} rx={5} fill={STAT} opacity={0.1} />
         </Svg>
       ) : null}
       <Interval lo={pp(TINY.ciLow)} hi={pp(TINY.ciHigh)} mid={pp(TINY.pB - TINY.pA)} y={y(HUGE)} t={huge} min={8} />
@@ -189,7 +189,7 @@ export const DecideScene: React.FC = () => {
       ) : null}
       <Note at={sigAt - 6} x={sx(ZOOM, 0) + 22} y={zoomTop + 6}>
         <span style={{ ...note(21, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-          magnified: {fmt(pp(TINY.ciLow), 3)} to {fmt(pp(TINY.ciHigh), 3)} points, clear of zero too
+          Magnified: {fmt(pp(TINY.ciLow), 3)} to {fmt(pp(TINY.ciHigh), 3)} points, clear of zero too
         </span>
       </Note>
 
@@ -200,32 +200,34 @@ export const DecideScene: React.FC = () => {
         </Ink>
         <Check x={COL[0] + 20} y={y(OURS)} at={yesAt - 4} />
         <Ink at={yesAt} dur={12} style={{ left: COL[0] + 62, top: y(OURS) - 16, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK), fontWeight: 500 }}>yes</span>
+          <span style={{ ...note(22, INK), fontWeight: 500 }}>Yes</span>
         </Ink>
         <Check x={COL[0] + 20} y={y(HUGE)} at={sigAt - 4} />
         <Ink at={realAt - 4} dur={12} style={{ left: COL[0] + 62, top: y(HUGE) - 16, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK), fontWeight: 500 }}>yes, real</span>
+          <span style={{ ...note(22, INK), fontWeight: 500 }}>Yes, real</span>
         </Ink>
       </div>
+      {/* The two questions side by side: a hairline between the columns. */}
+      <ColumnRule x={1378} top={y(HEAD_Y)} height={y(HUGE) + 30 - y(HEAD_Y)} at={bigAt - 6} />
       <Ink at={bigAt - 6} dur={14} style={{ left: COL[1], top: y(HEAD_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...body(32, true), color: INK }}>
           <Marker at={sizeAt - 4}>Big enough to matter?</Marker>
         </span>
       </Ink>
       <Ink at={moneyAt - 6} dur={16} style={{ left: COL[1], top: y(OURS) - 16, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK) }}>a call about money,</span>
+        <span style={{ ...note(22, INK) }}>A call about money,</span>
       </Ink>
       <Ink at={moneyAt + 6} dur={16} style={{ left: COL[1], top: y(OURS) + 16, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>not math</span>
       </Ink>
       <Ink at={onlyAt - 4} dur={16} style={{ left: COL[1], top: y(OURS) + 58, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, STAT_INK), fontWeight: 500 }}>
-          ship only if <Marker at={worthAt - 4}>1 point is worth it</Marker>
+          Ship only if <Marker at={worthAt - 4}>1 point is worth it</Marker>
         </span>
       </Ink>
       <Cross x={COL[1] + 16} y={y(HUGE)} at={worthlessAt - 4} />
       <Ink at={worthlessAt - 2} dur={12} style={{ left: COL[1] + 46, top: y(HUGE) - 16, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 500 }}>no: worthless</span>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 500 }}>No: worthless</span>
       </Ink>
     </AbsoluteFill>
   );

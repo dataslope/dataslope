@@ -225,7 +225,7 @@ export const DotScene: React.FC = () => {
       </Fade>
       {/* The dot-product column, outlined when it is named. */}
       <Svg opacity={dotGlow * (1 - 0.6 * ease(frame, metAt, 14))}>
-        <rect x={L.result - 16} y={rowY(0) - 8} width={150} height={rowY(2) - rowY(0) + 66} rx={10} fill="none" stroke={POINT} strokeWidth={2.4} />
+        <rect x={L.result - 16} y={rowY(0) - 8} width={150} height={rowY(2) - rowY(0) + 66} rx={8} fill="none" stroke={POINT} strokeWidth={2.4} />
       </Svg>
       {TOKENS.map((t, i) => {
         const row = TROPHY.rows[i];
@@ -262,7 +262,7 @@ export const DotScene: React.FC = () => {
               </span>
             </div>
             <div style={{ position: "absolute", left: L.result - 44, top: 6, opacity: sum, display: "flex", gap: 36, alignItems: "baseline" }}>
-              <span style={{ fontFamily: MONO, fontSize: EXPR, fontWeight: 500, color: INK_SOFT }}>=</span>
+              <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 500, color: INK_SOFT }}>=</span>
               <span
                 style={{
                   fontFamily: MONO,
@@ -281,7 +281,7 @@ export const DotScene: React.FC = () => {
         );
       })}
       <Fade at={matchingAt - 2} out={addAt + 30} style={{ left: L.key, top: rowY(3) - 18 }}>
-        <Tag size={21}>first with first, second with second</Tag>
+        <Tag size={21}>First with first, second with second</Tag>
       </Fade>
 
       {/* Cosine, the course's earlier measure, is this same sum. */}

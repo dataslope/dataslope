@@ -45,7 +45,7 @@ export const RuleScene: React.FC = () => {
         <Code line="a == b" size={CODE} />
       </Ink>
       <Ink at={primitivesAt - 6} dur={22} style={{ left: TEXT_X, top: y(324), width: TEXT_W }}>
-        <div style={{ ...headline(64), color: INK, lineHeight: 1.1 }}>
+        <div style={{ ...headline(54), color: INK, lineHeight: 1.1 }}>
           for primitives, or when you mean the <Marked p={markP(frame, objectAt)}>same object</Marked>
           <After>.</After>
         </div>
@@ -66,7 +66,7 @@ export const RuleScene: React.FC = () => {
         <Code line="a.equals(b)" size={CODE} />
       </Ink>
       <Ink at={contentsAt} dur={22} style={{ left: TEXT_X, top: y(584), width: TEXT_W }}>
-        <div style={{ ...headline(64, true), color: INK, lineHeight: 1.1 }}>
+        <div style={{ ...headline(54, true), color: INK, lineHeight: 1.1 }}>
           to compare <Marked p={markP(frame, dotAt)}>contents</Marked>
           <After>.</After>
         </div>

@@ -72,12 +72,12 @@ export const CloseScene: React.FC = () => {
   // Each list line, the story it points back to, and when it is said.
   const still = [
     { story: "zipf", at: vectorsAt, mark: tokensAt, text: "word2vec still starts from tokens", markText: "tokens" },
-    { story: "sparck", at: searchAt, mark: idfAt, text: "search still leans on IDF", markText: "IDF" },
-    { story: "shannon", at: modelsAt, mark: nextAt, text: "language models still guess the next word", markText: "the next word" },
+    { story: "sparck", at: searchAt, mark: idfAt, text: "Search still leans on IDF", markText: "IDF" },
+    { story: "shannon", at: modelsAt, mark: nextAt, text: "Language models still guess the next word", markText: "the next word" },
   ];
   const warn = [
-    { story: "georgetown", at: demoAt, text: "a demo isn't a system" },
-    { story: "eliza", at: fluentAt, text: "fluent text isn't understanding" },
+    { story: "georgetown", at: demoAt, text: "A demo isn't a system" },
+    { story: "eliza", at: fluentAt, text: "Fluent text isn't understanding" },
   ];
   const swellOf = (id: string) => {
     const s = still.find((l) => l.story === id) ?? warn.find((l) => l.story === id);
@@ -164,7 +164,7 @@ export const CloseScene: React.FC = () => {
 
         {/* ── What still sits underneath ── */}
         <Ink at={vectorsAt - 4} dur={14} style={{ left: 96, top: LIST - 4, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, INK_SOFT) }}>still underneath, and the year it came from</span>
+          <span style={{ ...label(22, INK_SOFT) }}>Still underneath, and the year it came from</span>
         </Ink>
         {still.map((l, i) => (
           <Ink key={l.story} at={l.at - 2} dur={16} style={{ left: 96, top: LIST + 40 + i * ROW, whiteSpace: "nowrap" }}>
@@ -179,7 +179,7 @@ export const CloseScene: React.FC = () => {
         ))}
         {/* ── And the two warnings ── */}
         <Ink at={warningsAt - 2} dur={14} style={{ left: WARN_X, top: LIST - 4, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, INK_SOFT) }}>two warnings</span>
+          <span style={{ ...label(22, INK_SOFT) }}>Two warnings</span>
         </Ink>
         {warn.map((l, i) => (
           <Ink key={l.story} at={l.at - 2} dur={16} style={{ left: WARN_X, top: LIST + 40 + i * ROW, whiteSpace: "nowrap" }}>

@@ -87,7 +87,7 @@ export const ElizaScene: React.FC = () => {
           width: PW,
           height: PH,
           background: LISTING_PAPER,
-          borderRadius: 10,
+          borderRadius: 8,
           opacity: panel * (1 - settle * 0.3),
           transform: `translateY(${(1 - panel) * 12}px)`,
         }}

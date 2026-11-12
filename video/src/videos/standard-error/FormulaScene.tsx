@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import {
   ACCENT,
   ACCENT_INK,
@@ -94,18 +95,28 @@ export const FormulaScene: React.FC = () => {
       <Ink at={divideAt - 6} dur={14} style={{ left: 120, top: y(214) }}>
         <span style={label(21, INK_SOFT)}>The standard error of an average</span>
       </Ink>
-      <Ink at={divideAt} dur={18} style={{ left: 116, top: y(248), ...headline(124, true), whiteSpace: "nowrap" }}>
-        <span style={{ color: BLUE_INK }}>s</span> ÷{" "}
-        <span style={{ display: "inline-block", transformOrigin: "50% 70%", transform: `scale(${swell(frame, rootWordAt - 2, 0.14, 20)})` }}>
-          √<span>n</span>
-        </span>
+      <Ink at={divideAt} dur={18} style={{ left: 116, top: y(248), fontSize: 124, lineHeight: 1.02, color: INK, whiteSpace: "nowrap" }}>
+        <MathRun>
+          <span style={{ color: BLUE_INK }}>
+            <I>s</I>
+          </span>{" "}
+          ÷{" "}
+          <span style={{ display: "inline-block", transformOrigin: "50% 70%", transform: `scale(${swell(frame, rootWordAt - 2, 0.14, 20)})` }}>
+            √<I>n</I>
+          </span>
+        </MathRun>
       </Ink>
       <Definition at={deviationAt - 2} top={y(268)} symbol="s" color={BLUE_INK}>
-        the standard deviation of the sample
-        <span style={{ opacity: ease(frame, standingAt - 2, 14) }}>, our stand-in for σ</span>
+        The standard deviation of the sample
+        <span style={{ opacity: ease(frame, standingAt - 2, 14) }}>
+          , our stand-in for{" "}
+          <MathRun>
+            <I>σ</I>
+          </MathRun>
+        </span>
       </Definition>
       <Definition at={sizeAt - 2} top={y(332)} symbol="n" color={INK}>
-        the sample size
+        The sample size
       </Definition>
 
       {/* ── The lesson's numbers through it ── */}
@@ -235,7 +246,11 @@ const Definition: React.FC<{ at: number; top: number; symbol: string; color: str
   <Ink at={at} dur={16} style={{ left: 640, top, display: "flex", alignItems: "baseline", gap: 22, whiteSpace: "nowrap" }}>
     {/* The symbol at the definition's own size, set apart by the head
         face's italic and its color: one size to a line. */}
-    <span style={{ ...headline(32, true), color, width: 34 }}>{symbol}</span>
+    <span style={{ ...body(32), color, width: 34 }}>
+      <MathRun>
+        <I>{symbol}</I>
+      </MathRun>
+    </span>
     <span style={{ ...body(32), color: INK }}>{children}</span>
   </Ink>
 );

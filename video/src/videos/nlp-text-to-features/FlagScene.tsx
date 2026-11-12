@@ -114,7 +114,7 @@ export const FlagScene: React.FC = () => {
       </ChipRow>
       {/* The reset, run on a sentence: the lamp under each token is the flag after it. */}
       <Ink at={exAt - 4} dur={12} style={{ left: X0, top: y(EX_Y) + 49, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-        flag
+        Flag
       </Ink>
       <TraceRow
         trace={RESET_EXAMPLE}
@@ -130,7 +130,7 @@ export const FlagScene: React.FC = () => {
       />
       <Note at={plusOneAt + 14} x={VERDICT_X} y={y(EX_Y) + 48}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          with no reset: {signed(RESET_EXAMPLE.scoreWithoutReset)}, {RESET_EXAMPLE.labelWithoutReset}
+          With no reset: {signed(RESET_EXAMPLE.scoreWithoutReset)}, {RESET_EXAMPLE.labelWithoutReset}
         </span>
       </Note>
 
@@ -234,7 +234,8 @@ const TraceRow: React.FC<{
         {signed(trace.score)}
       </div>
       <div style={{ position: "absolute", left: VERDICT_X, top: top + 2, ...note(30, inkFor(trace.label)), fontWeight: 500, opacity: ease(frame, verdictAt - 2, 10) }}>
-        {trace.label}
+        {/* A verdict stands on its own, so it starts with a capital. */}
+        {trace.label.charAt(0).toUpperCase() + trace.label.slice(1)}
       </div>
     </>
   );
@@ -252,8 +253,9 @@ const Lamp: React.FC<{ on: boolean; at: number }> = ({ on, at }) => {
         height: 16,
         borderRadius: 999,
         boxSizing: "border-box",
-        border: `2px solid ${on ? ds("yellow", 700) : CHIP_LINE}`,
-        background: on ? ds("yellow", 400) : "transparent",
+        // Lit, a filled lamp with no ring; off, an empty ring.
+        border: `2px solid ${on ? "transparent" : CHIP_LINE}`,
+        background: on ? ds("yellow", 500) : "transparent",
         opacity: p,
         transform: `scale(${0.6 + 0.4 * p})`,
       }}

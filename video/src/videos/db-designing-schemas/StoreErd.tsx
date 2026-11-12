@@ -256,7 +256,7 @@ export const StoreErd: React.FC = () => {
             height: slot.height,
             boxSizing: "border-box",
             border: `2px dashed ${INK_SOFT}`,
-            borderRadius: 6,
+            borderRadius: 5,
             background: `color-mix(in srgb, ${PAPER} 80%, transparent)`,
             opacity: ownIn,
             display: "flex",

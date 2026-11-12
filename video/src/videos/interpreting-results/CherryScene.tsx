@@ -123,8 +123,6 @@ export const CherryScene: React.FC = () => {
               height={y(BOTTOM) - py(HI) + 6}
               fill={HIGHLIGHT}
               opacity={lerp(0.45, 0.75, settle)}
-              stroke={STAT}
-              strokeWidth={3}
             />
           </Svg>
         ) : null}
@@ -191,9 +189,9 @@ export const CherryScene: React.FC = () => {
         ))}
         {/* What the bars alone say, as they land; what they leave out, on "real". */}
         <Note at={thoseAt + 8} x={ZX[3] + ZW + 70} y={y(700)}>
-          <span style={{ ...body(36, true), color: STAT_INK, whiteSpace: "nowrap" }}>a breakout?</span>
+          <span style={{ ...body(36, true), color: STAT_INK, whiteSpace: "nowrap" }}>A breakout?</span>
           <div style={{ ...note(22, INK_SOFT), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, realAt - 4, 12) }}>
-            missing: the other {S.length - WANDER.length} months
+            Missing: the other {S.length - WANDER.length} months
           </div>
         </Note>
       </Drift>

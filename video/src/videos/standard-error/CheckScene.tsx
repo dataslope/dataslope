@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import {
   ACCENT,
   ACCENT_INK,
@@ -238,7 +239,10 @@ export const CheckScene: React.FC = () => {
         <div style={{ height: 1, background: HAIRLINE, marginBottom: 28 }} />
         {/* The sample's own s, which stands in for σ: where 3.67 comes from. */}
         <div style={label(20, INK_SOFT)}>
-          One sample: s = {fmt(CHECK.oneSampleSd)}, ÷ √{CHECK.n}
+          One sample:{" "}
+          <MathRun>
+            <I>s</I> = {fmt(CHECK.oneSampleSd)}, ÷ √{CHECK.n}
+          </MathRun>
         </div>
       </Ink>
       <Ink at={sevenAt - 2} dur={14} style={{ left: COL, top: y(754) }}>
@@ -249,7 +253,11 @@ export const CheckScene: React.FC = () => {
       </Ink>
       <Note at={closeAt + 2} x={COL} y={y(884)}>
         <span style={note(20, INK_SOFT)}>
-          Theory, {CHECK.sigma} ÷ √{CHECK.n}: {fmt(CHECK.theory)}
+          Theory,{" "}
+          <MathRun>
+            {CHECK.sigma} ÷ √{CHECK.n}
+          </MathRun>
+          : {fmt(CHECK.theory)}
         </span>
       </Note>
     </AbsoluteFill>

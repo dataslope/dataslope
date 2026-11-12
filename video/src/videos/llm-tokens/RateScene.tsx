@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { body, headline, INK, INK_SOFT, note, TABULAR } from "../../editorial/style";
 import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -14,21 +14,22 @@ const PARA_Y = 548;
 const PARA_SIZE = 30;
 const CUT_Y = 800;
 
-/** One cell of the rule of thumb: a number, and what it counts. */
+/** One cell of the rule of thumb: a number, and what it counts, one size
+ *  (one line, one size: the number is bold, not bigger). */
 const Cell: React.FC<{ at: number; value: string; unit: string; glow?: number }> = ({ at, value, unit, glow = 0 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   return (
     <div style={{ display: "flex", alignItems: "baseline", gap: 12, opacity: p, transform: `translateY(${(1 - p) * 8}px)` }}>
-      <span style={{ ...headline(60), color: glow > 0.3 ? FOCUS_INK : INK, ...TABULAR }}>{value}</span>
-      <span style={{ ...body(30), color: INK_SOFT, whiteSpace: "nowrap" }}>{unit}</span>
+      <span style={{ ...headline(44), color: glow > 0.3 ? FOCUS_INK : INK, ...TABULAR }}>{value}</span>
+      <span style={{ ...body(42), color: INK_SOFT, whiteSpace: "nowrap" }}>{unit}</span>
     </div>
   );
 };
 
 const Approx: React.FC<{ at: number }> = ({ at }) => {
   const frame = useCurrentFrame();
-  return <span style={{ ...headline(48), color: INK_SOFT, opacity: ease(frame, at, 10), margin: "0 26px" }}>≈</span>;
+  return <span style={{ ...headline(44), color: INK_SOFT, opacity: ease(frame, at, 10), margin: "0 22px" }}>≈</span>;
 };
 
 /**
@@ -89,7 +90,7 @@ export const RateScene: React.FC = () => {
           <Cell at={fourAt - 2} value="4" unit="characters" />
           <Approx at={quartersAt - 4} />
           <Cell at={quartersAt - 2} value="0.75" unit="words" />
-          <span style={{ width: 110 }} />
+          <span style={{ width: 90 }} />
           <Cell at={thousandAt - 2} value={num(1000)} unit="tokens" />
           <Approx at={sevenAt - 4} />
           <Cell at={sevenAt - 2} value={num(750)} unit="words" />
@@ -156,7 +157,7 @@ export const RateScene: React.FC = () => {
           <span style={{ ...body(30), color: INK, marginLeft: 34, whiteSpace: "nowrap", opacity: ease(frame, nobodyAt - 2, 12) }}>
             Nobody chose these cuts.
           </span>
-          <span style={{ ...label(22, FOCUS_INK), marginLeft: 18, whiteSpace: "nowrap", opacity: ease(frame, learnedAt - 2, 12) }}>
+          <span style={{ ...body(30), color: FOCUS_INK, marginLeft: 14, whiteSpace: "nowrap", opacity: ease(frame, learnedAt - 2, 12) }}>
             They were learned.
           </span>
         </div>

@@ -144,7 +144,7 @@ export const RobustScene: React.FC = () => {
         />
         <Ink at={fourteenAt - 2} dur={14} style={{ left: IQR_X, top: statsY, whiteSpace: "nowrap" }}>
           <div style={{ ...note(32, INK), fontWeight: 500, display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ display: "inline-block", width: 22, height: 22, background: HIGHLIGHT, opacity: 0.8, border: `2px solid ${INK}` }} />
+            <span style={{ display: "inline-block", width: 22, height: 22, background: HIGHLIGHT }} />
             <span>
               IQR <span style={TABULAR}>{fmt(ROBUST.iqr, 1)}</span>
             </span>
@@ -164,9 +164,6 @@ export const RobustScene: React.FC = () => {
                 width={(q3x - q1x) * box}
                 height={BOX_H}
                 fill={HIGHLIGHT}
-                opacity={0.6}
-                stroke={INK}
-                strokeWidth={2}
               />
             </Svg>
           ) : null}

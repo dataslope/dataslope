@@ -6,6 +6,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, HAIRLINE, headline, INK, INK_S
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { CAT, DF, IDF, N, num, THE, VOCAB } from "./data";
+import { MathRun } from "../../editorial/math";
 import { DocPips, dfText, Frac, V } from "./parts";
 
 /** Rows of Fig. 3, in layout units. */
@@ -18,20 +19,23 @@ const BAR_X0 = 1260;
 const PER_UNIT = 400;
 const BAR_H = 40;
 
+/** The math face, laid out as a row so a stacked fraction centres on it. */
+const ROW_MATH: React.CSSProperties = { display: "inline-flex", alignItems: "center" };
+
 /** ln, then N over df, as one line of type with a stacked fraction. */
 const Ln: React.FC<{ top: React.ReactNode; bottom: React.ReactNode }> = ({ top, bottom }) => (
-  <>
+  <MathRun style={ROW_MATH}>
     <span style={{ marginRight: "0.12em" }}>ln</span>
     <Frac top={top} bottom={bottom} />
-  </>
+  </MathRun>
 );
 
 /** "= value", with the sign set apart from what it equals. */
 const Eq: React.FC<{ color?: string; children: React.ReactNode }> = ({ color, children }) => (
-  <span style={{ color }}>
+  <MathRun style={{ color }}>
     <span style={{ marginRight: "0.3em" }}>=</span>
     {children}
-  </span>
+  </MathRun>
 );
 
 /** One fade-in piece of a worked line. */
@@ -121,18 +125,23 @@ export const IdfScene: React.FC = () => {
         dur={20}
         style={{ left: 120, top: y(FORMULA_Y), display: "flex", alignItems: "center", ...headline(64), whiteSpace: "nowrap" }}
       >
-        <span>
-          <V>idf</V>(<V>w</V>)
-        </span>
-        <span style={{ margin: "0 0.3em" }}>=</span>
-        <Ln
-          top={<V>N</V>}
-          bottom={
-            <>
-              <V>df</V>(<V>w</V>)
-            </>
-          }
-        />
+        {/* In the math face: idf and df are names, set upright; w and N
+            are variables, in italic. */}
+        <MathRun style={ROW_MATH}>
+          <span>
+            idf(<V>w</V>)
+          </span>
+          <span style={{ margin: "0 0.3em" }}>=</span>
+          <span style={{ marginRight: "0.12em" }}>ln</span>
+          <Frac
+            top={<V>N</V>}
+            bottom={
+              <>
+                df(<V>w</V>)
+              </>
+            }
+          />
+        </MathRun>
       </Ink>
       {[
         { at: divideAt + 2, sym: <V>N</V>, text: `the number of documents, here ${N}` },
@@ -140,7 +149,7 @@ export const IdfScene: React.FC = () => {
           at: howManyAt - 2,
           sym: (
             <>
-              <V>df</V>(<V>w</V>)
+              df(<V>w</V>)
             </>
           ),
           text: "how many of them contain the word",
@@ -149,7 +158,10 @@ export const IdfScene: React.FC = () => {
       ].map((d, k) => (
         <Note key={k} at={d.at} x={760} y={y(FORMULA_Y + 6) + k * 50}>
           <span style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-            <span style={{ ...body(32), color: INK, width: 96 }}>{d.sym}</span>
+            {/* The symbol in the math face at the size of its gloss. */}
+            <span style={{ ...note(22, INK), width: 96 }}>
+              <MathRun>{d.sym}</MathRun>
+            </span>
             <span style={note(22, INK_SOFT)}>{d.text}</span>
           </span>
         </Note>

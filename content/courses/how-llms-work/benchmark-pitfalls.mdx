@@ -19,9 +19,9 @@ being informative once everyone scores near its ceiling.** MMLU is the
 canonical case. The frontier moved past what the test can measure, and
 the reported numbers now differ by less than the measurement error.
 
-It is also happening faster. GPQA Diamond, built to replace MMLU, was
-saturated by 2026, and ARC-AGI-2 went from real headroom at its March
-2025 launch to verified scores above 90% by mid-2026. A benchmark
+It is also happening faster. GPQA Diamond, built to replace MMLU,
+saturated within a few years, and ARC-AGI-2 went from real headroom at
+launch to verified scores above 90% in about sixteen months. A benchmark
 in a launch table may have been informative when the table's template
 was first drawn up and not since.
 
@@ -53,9 +53,9 @@ every benchmark.
 
 It is also not hypothetical. SWE-bench Verified was the coding
 benchmark everyone reported, and was considered hard to contaminate
-because it grades a patch by running the project's tests. In February
-2026 OpenAI stopped reporting it after finding that frontier models
-could reproduce some of its reference fixes from memory (see the
+because it grades a patch by running the project's tests. OpenAI
+stopped reporting it after finding that frontier models could
+reproduce some of its reference fixes from memory (see the
 previous chapter). Running the tests verifies that the patch works; it
 cannot tell you whether the model wrote it or remembered it.
 
@@ -111,15 +111,15 @@ The diagnostic questions:
   model in a harness that decides what it remembers between steps, and
   the harness can matter more than the model.
 
-Those last two matter more every year. The clearest example so far is
-from September 2026: ARC Prize ran OpenAI's GPT-6 Astra on ARC-AGI-3 in
-two harnesses. In ARC's own standard harness, which carries forward
-only the notes the model chooses to keep, it scored 62.7%. In OpenAI's
-harness, which preserves the model's hidden reasoning between moves,
-it scored 99.9%, and for less money.[^arc-astra] Same model, same
-benchmark, same week. Two numbers produced under different
-configurations are not measuring the same thing, and only one of them
-is comparable with other providers' scores.
+Those last two can be decisive. One clear example: ARC Prize ran a
+single frontier model on ARC-AGI-3 in two harnesses. In ARC's own
+standard harness, which carries forward only the notes the model
+chooses to keep, it scored 62.7%. In its vendor's harness, which
+preserves the model's hidden reasoning between moves, it scored 99.9%,
+and for less money.[^arc-astra] Same model, same benchmark, same week.
+Two numbers produced under different configurations are not measuring
+the same thing, and only one of them is comparable with other
+providers' scores.
 
 ## 4. Construct mismatch
 
@@ -312,7 +312,7 @@ skip.`}
 />
 
 [^arc-astra]:
-    ARC Prize, ["OpenAI's GPT-6 Astra on ARC-AGI-3"](https://arcprize.org/blog/astra),
+    ARC Prize, [report on one frontier model's ARC-AGI-3 results](https://arcprize.org/blog/astra),
     September 3, 2026: 62.7% at maximum effort in ARC's standard harness
-    (\$26,098), and 99.9% at high effort in OpenAI's Provider Adapter
+    (\$26,098), and 99.9% at high effort in the vendor's Provider Adapter
     harness (\$18,817).

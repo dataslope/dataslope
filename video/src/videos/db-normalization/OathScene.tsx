@@ -122,13 +122,13 @@ export const OathScene: React.FC = () => {
             <Phrase at={wholeAt - 2} underlineAt={wholeIsAt} color={BAR}>
               the whole key,
             </Phrase>
-            <Gloss at={secondAt - 2} form="Second normal form" gist="no partial dependencies" color={BLUE_INK} />
+            <Gloss at={secondAt - 2} form="Second normal form" gist="No partial dependencies" color={BLUE_INK} />
           </div>
           <div style={{ ...line(530), transform: `translateY(${-lift * 4}px)` }}>
             <Phrase at={nothingAt - 2} underlineAt={nothingIsAt} color={ACCENT}>
               and nothing but the key.
             </Phrase>
-            <Gloss at={thirdAt - 2} form="Third normal form" gist="no transitive dependencies" color={ACCENT_INK} />
+            <Gloss at={thirdAt - 2} form="Third normal form" gist="No transitive dependencies" color={ACCENT_INK} />
           </div>
 
           {/* Who said it that way, and what got added. */}

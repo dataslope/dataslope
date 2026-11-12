@@ -8,7 +8,7 @@ import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DESIGN, PEEKING } from "./data";
-import { Count, Headline, lerp, partial, Ring, STAT, STAT_INK, Svg } from "./parts";
+import { Count, Headline, lerp, MathVar, partial, Ring, STAT, STAT_INK, Svg } from "./parts";
 
 const X: XScale = { lo: 0, hi: PEEKING.planned, x0: 260, x1: 1640 };
 const BASE = 864;
@@ -150,7 +150,7 @@ export const PeekScene: React.FC = () => {
       <FigLabel n="3" title="Two identical arms: the p-value, after every hundred visitors" at={hereAt + 4} x={160} y={y(FIG_Y)} />
       <Ink at={recomputeAt} dur={10} style={{ left: X.x1, top: y(FIG_Y), whiteSpace: "nowrap", transform: "translateX(-100%)" }}>
         <span style={{ ...note(22, INK_SOFT) }}>
-          visitors per arm so far: <span style={{ ...TABULAR, color: INK, fontWeight: 500 }}>{num(reach > 0 ? shownN : 0)}</span>
+          Visitors per arm so far: <span style={{ ...TABULAR, color: INK, fontWeight: 500 }}>{num(reach > 0 ? shownN : 0)}</span>
         </span>
       </Ink>
       <Axis
@@ -197,13 +197,13 @@ export const PeekScene: React.FC = () => {
         <span style={{ ...note(20, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>under {PEEKING.alpha}: &ldquo;significant&rdquo;</span>
       </Note>
       <Note at={nothingAt - 2} x={X.x1 - 44} y={py(P_MAX) + 8} align="right">
-        <span style={{ ...note(21, INK_SOFT), fontWeight: 500, ...halo }}>no effect anywhere in this data</span>
+        <span style={{ ...note(21, INK_SOFT), fontWeight: 500, ...halo }}>No effect anywhere in this data</span>
       </Note>
 
       {/* The planned size: the one look that counts, lit when it is named. */}
       {ease(frame, theEndAt - 4, 14) > 0 ? (
         <Svg opacity={ease(frame, theEndAt - 4, 14)}>
-          <rect x={X.x1 - 7} y={py(P_MAX) - 14} width={34} height={y(BASE) - py(P_MAX) + 14} rx={8} fill={HIGHLIGHT} opacity={0.9} />
+          <rect x={X.x1 - 7} y={py(P_MAX) - 14} width={34} height={y(BASE) - py(P_MAX) + 14} rx={5} fill={HIGHLIGHT} opacity={0.9} />
         </Svg>
       ) : null}
       <Note at={theEndAt} x={PLAN_X} y={py(P_MAX) + 66}>
@@ -264,7 +264,9 @@ export const PeekScene: React.FC = () => {
         <span style={{ ...note(22, STAT_INK), whiteSpace: "nowrap", ...halo }}>and you ship noise</span>
       </Note>
       <Note at={nineteenAt - 4} x={pts[last][0] - 16} y={pts[last][1] + 14} align="right">
-        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>p = {fmt(PEEKING.final)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
+          <MathVar>p</MathVar> = {fmt(PEEKING.final)}
+        </span>
       </Note>
       <Ring x={pts[last][0]} y={pts[last][1]} at={numberAt - 2} color={INK} />
     </AbsoluteFill>

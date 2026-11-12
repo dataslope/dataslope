@@ -173,7 +173,7 @@ export const CompareScene: React.FC = () => {
               width: TABLE_W,
               height: g.rowH,
               border: `2px dashed ${LOST}`,
-              borderRadius: 6,
+              borderRadius: 4,
               opacity: p,
               transform: `translateY(${(1 - p) * -10}px)`,
               display: "flex",

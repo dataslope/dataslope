@@ -8,8 +8,8 @@ import { Ink, Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { DEEP_PATH, DISTINCT, NAIVE_CALLS, NAIVE_TREE, REPEATS, TREE_DEPTH, TREE_N } from "./data";
 import { COUNTER_TOP, levelTop, nodeX, SIDE_W, SIDE_X } from "./geometry";
-import { Fig, Key, Mono, NAIVE, NAIVE_INK } from "./kit";
-import { Counter, NODE_H, TreeEdge, TreeNode } from "./tree";
+import { Fig, Key, Mono, NAIVE_INK } from "./kit";
+import { Counter, NODE_H, NODE_LOOK, TreeEdge, TreeNode } from "./tree";
 
 /** The stack column: frame height and gap, in layout units, and its base. */
 const FRAME_H = 50;
@@ -52,9 +52,9 @@ export const TreeScene: React.FC = () => {
       {/* The legend, at the right end of the label's line. */}
       <Note at={branchAt} x={1800} y={y(104) + 1} align="right" from="right">
         <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
-          <Key stroke={INK_SOFT} fill={PAPER} /> <span>first time</span>
+          <Key fill={NODE_LOOK.call.fill} stroke={NODE_LOOK.call.stroke} /> <span>first time</span>
           <span style={{ width: 16 }} />
-          <Key stroke={NAIVE} fill={`color-mix(in srgb, ${NAIVE} 20%, ${PAPER})`} />
+          <Key fill={NODE_LOOK.repeat.fill} stroke={NODE_LOOK.repeat.stroke} />
           <span style={{ color: NAIVE_INK, fontWeight: 500 }}>repeat</span>
         </span>
       </Note>
@@ -126,9 +126,9 @@ export const TreeScene: React.FC = () => {
               top: top - (1 - p) * 24,
               width: 240,
               height: h(FRAME_H),
-              boxSizing: "border-box",
-              border: `2px solid ${INK}`,
-              background: `color-mix(in srgb, ${HIGHLIGHT} 70%, ${PAPER})`,
+              // A stack frame is a filled block, no outline.
+              borderRadius: 5,
+              background: `color-mix(in srgb, ${HIGHLIGHT} 90%, ${PAPER})`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

@@ -3,12 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { body, fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, KNOWN, ROWS } from "./data";
-import { Bracket, DOT, lerp, Mark, Mu, pulse, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
+import { Bracket, DOT, lerp, Mark, pulse, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
 
 /** The rows: every value of every sample, 50 to 150. */
 const X: XScale = { lo: 50, hi: 150, x0: 160, x1: 1240 };
@@ -176,8 +177,10 @@ export const TwentyScene: React.FC = () => {
       {/* Already up at the cut, where ParameterScene's mu ends its ride. */}
       <Note at={twentyFrom - 30} x={muX + 12} y={y(ROW0 - 50)}>
         <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
-          <Mu inline /> = {KNOWN.mu}
-          <span style={{ ...note(21, INK_SOFT), marginLeft: 12, opacity: ease(frame, parameterAt + 4, 10) }}>never moves</span>
+          <MathRun>
+            <I>μ</I> = {KNOWN.mu}
+          </MathRun>
+          <span style={{ ...note(23, INK_SOFT), marginLeft: 12, opacity: ease(frame, parameterAt + 4, 10) }}>never moves</span>
         </span>
       </Note>
 
@@ -234,7 +237,7 @@ export const TwentyScene: React.FC = () => {
       </Svg>
       <Note at={statisticAt} x={muX - 14} y={y(ROW0 - 50)} align="right" out={summarizeAt - 2}>
         <span style={{ ...note(23, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", ...halo }}>
-          <XBar inline />: different every time
+          <XBar />: different every time
         </span>
       </Note>
 

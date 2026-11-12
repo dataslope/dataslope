@@ -131,7 +131,7 @@ export const CacheScene: React.FC = () => {
               </div>
             ) : null}
             {/* The new message each turn. */}
-            <HBar x={x + PREFIX_W + 6} y={ry} w={TAIL_W} h={rh} at={rowAt[i] + 14} fill={INPUT_SOFT} outline={INPUT} />
+            <HBar x={x + PREFIX_W + 6} y={ry} w={TAIL_W} h={rh} at={rowAt[i] + 14} fill={INPUT_SOFT} />
             <Ink at={rowAt[i] + 8} dur={12} style={{ left: x + PREFIX_W + TAIL_W + 22, top: ry + rh / 2 - 15, whiteSpace: "nowrap" }}>
               <span style={label(22, INK_SOFT)}>turn {i + 1}</span>
             </Ink>
@@ -156,9 +156,8 @@ export const CacheScene: React.FC = () => {
           width: STAMP_W - 10,
           height: rh + 8,
           boxSizing: "border-box",
-          borderRadius: 6,
-          border: `2px solid ${POINT}`,
-          background: `color-mix(in srgb, ${POINT} 10%, ${PAPER})`,
+          borderRadius: 4,
+          background: `color-mix(in srgb, ${POINT} 20%, ${PAPER})`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -174,7 +173,7 @@ export const CacheScene: React.FC = () => {
         {STAMP}
       </div>
       <Note at={byteAt - 2} x={X0} y={rowY(2) + rh + 14}>
-        <span style={{ ...note(23, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a timestamp on top: new bytes every turn</span>
+        <span style={{ ...note(23, POINT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A timestamp on top: new bytes every turn</span>
       </Note>
       <Note at={fullAt - 2} x={X0 + STAMP_W + PREFIX_W + TAIL_W + 22} y={rowY(2) + rh + 14} align="right">
         <span style={{ ...note(23, INPUT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>back to full price</span>

@@ -156,7 +156,7 @@ export const HoldoutScene: React.FC = () => {
       </Ink>
       <Check x={box.x0 + 2} y={box.y1 + 76} at={onceAt - 4} />
       <Ink at={onceAt - 2} dur={14} style={{ left: box.x0 + 44, top: box.y1 + 56, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(24, INK), fontWeight: 500 }}>tested once</span>
+        <span style={{ ...note(24, INK), fontWeight: 500 }}>Tested once</span>
       </Ink>
       <Ink at={sayAt - 4} dur={14} style={{ left: box.x0 + 200, top: box.y1 + 58, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>on bills that never shaped the hunch</span>

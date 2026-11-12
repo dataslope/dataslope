@@ -4,7 +4,7 @@ import { arrowHead, type Pt } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
@@ -31,6 +31,12 @@ export const DATA_WASH = `color-mix(in srgb, ${BAR} 16%, transparent)`;
 export const WARN_WASH = `color-mix(in srgb, ${ACCENT} 14%, transparent)`;
 export const SOFT = `color-mix(in srgb, ${INK} 22%, transparent)`;
 export const LISTING_PAPER = ds("gray", 50);
+/** A sheet of paper drawn on the page (a paper's first page, a book): a
+ *  light gray fill and no outline, as the owner asked of every filled shape
+ *  (2026-11-11). */
+export const SHEET = "color-mix(in srgb, var(--ds-gray-400) 14%, transparent)";
+/** A plain chip's fill: the gray badge's tint. */
+export const CHIP_FILL = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
 
 /** 0 → 1 → 0 over `dur` frames from `at`: a swell for a mark named again. */
 export const pulse = (frame: number, at: number, dur = 18) => {
@@ -422,7 +428,7 @@ export const Chip: React.FC<{
   mono?: boolean;
   swell?: number;
   children: React.ReactNode;
-}> = ({ x, y, at, out, dim, align = "center", size = 24, color = INK, fill = PAPER, border = HAIRLINE, mono = false, swell = 0, children }) => {
+}> = ({ x, y, at, out, dim, align = "center", size = 24, color = INK, fill = CHIP_FILL, border = "transparent", mono = false, swell = 0, children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = Math.min(1, pop(frame, at, fps, 14));
@@ -438,7 +444,7 @@ export const Chip: React.FC<{
         transform: `translate(${align === "center" ? "-50%" : "0"}, -50%) scale(${(0.85 + 0.15 * p) * (1 + swell * 0.06)})`,
         opacity: p * (1 - o) * (1 - d),
         padding: "6px 16px 8px",
-        borderRadius: 10,
+        borderRadius: 8,
         border: `2px solid ${border}`,
         background: fill,
         whiteSpace: "nowrap",

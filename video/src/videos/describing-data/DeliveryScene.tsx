@@ -296,9 +296,8 @@ export const DeliveryScene: React.FC = () => {
                     top: rowY(k) - side / 2,
                     width: side,
                     height: side,
-                    background: `color-mix(in srgb, ${STAT} 35%, transparent)`,
-                    border: `1.5px solid ${STAT}`,
-                    boxSizing: "border-box",
+                    // Fill only: a square's area is the value, no outline needed.
+                    background: `color-mix(in srgb, ${STAT} 45%, transparent)`,
                   }}
                 />
               ) : null}

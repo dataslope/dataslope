@@ -156,7 +156,7 @@ export const CoverageScene: React.FC = () => {
       <FigLabel n="4" title={`A 95% interval from each sample of ${COVERAGE.n}`} at={buildAt - 6} x={160} y={y(500)} />
       <Note at={buildAt} x={XI.x1} y={y(500) + 2} align="right" from="right">
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          zoomed in: {XI.lo} to {XI.hi}
+          Zoomed in: {XI.lo} to {XI.hi}
         </span>
       </Note>
       <Axis scale={XI} base={y(AXIS)} ticks={[86, 93, 100, 107, 114]} at={buildAt - 4} opacity={1 - 0.75 * hidden} />
@@ -228,7 +228,7 @@ export const CoverageScene: React.FC = () => {
       </Note>
       <Note at={seeAt + 6} x={truthX} y={y(POP_BASE + 14)} from="up">
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
-          in real life, the true mean is hidden
+          In real life, the true mean is hidden
         </span>
       </Note>
 
@@ -238,16 +238,18 @@ export const CoverageScene: React.FC = () => {
         <div style={{ ...headline(88), ...TABULAR, marginTop: 4 }}>{drawn}</div>
       </div>
       <Ink at={ninetyFourAt - 4} dur={14} style={{ left: COL, top: y(400), width: 420 }}>
-        <div style={{ height: 1, background: HAIRLINE, marginBottom: 14 }} />
-        <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
-          <span style={{ ...headline(60), ...TABULAR }}>{COVERAGE.hits}</span>
-          <span style={{ ...body(28, true), color: INK, opacity: ease(frame, catchAt - 2, 10) }}>catch the true mean</span>
+        <div style={{ height: 1, background: HAIRLINE, marginBottom: 28 }} />
+        {/* One line, one size: the count is set as the first word of its
+            sentence, not as a hero number beside a smaller gloss. */}
+        <div style={{ display: "flex", alignItems: "baseline", gap: "0.3em", fontSize: 32 }}>
+          <span style={{ ...headline(33), ...TABULAR }}>{COVERAGE.hits}</span>
+          <span style={{ ...body(32, true), color: INK, opacity: ease(frame, catchAt - 2, 10) }}>catch the true mean</span>
         </div>
       </Ink>
-      <Ink at={sixAt - 4} dur={14} style={{ left: COL, top: y(500), width: 420 }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
-          <span style={{ ...headline(60), color: EST_INK, ...TABULAR }}>{COVERAGE.misses}</span>
-          <span style={{ ...body(28, true), color: EST_INK }}>miss it</span>
+      <Ink at={sixAt - 4} dur={14} style={{ left: COL, top: y(496), width: 420 }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "0.3em", fontSize: 32 }}>
+          <span style={{ ...headline(33), color: EST_INK, ...TABULAR }}>{COVERAGE.misses}</span>
+          <span style={{ ...body(32, true), color: EST_INK }}>miss it</span>
         </div>
       </Ink>
       <Note at={unluckyAt - 2} x={COL} y={y(580)}>

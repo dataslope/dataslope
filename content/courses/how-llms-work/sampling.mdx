@@ -237,18 +237,17 @@ drafting, higher temperature genuinely helps. Most APIs default around
 ## On reasoning models, the knobs are often gone
 
 Everything above is how sampling works on every model. Whether *you*
-get to set it is a different question, and on the newest reasoning
-models the answer is increasingly no. As of October 2026, the Claude
-models released since Opus 4.7 reject a non-default `temperature` or
-`top_p`, and OpenAI's GPT-6 Astra accepts neither. The sampling step
-still runs; the provider chooses its settings and does not let you
-change them.
+get to set it is a different question, and on many reasoning models
+the answer is no. Some reject a non-default `temperature` or `top_p`,
+and some accept neither parameter at all. The sampling step still
+runs; the provider chooses its settings and does not let you change
+them.
 
 On those models, the levers for consistency move elsewhere: a tighter
 prompt, structured output that constrains the answer's shape, and the
-reasoning effort setting covered in *Reasoning Models*. Older and
-non-reasoning models still take the settings in this chapter, and the
-mechanism they control is unchanged.
+reasoning effort setting covered in *Reasoning Models*. Models without
+that restriction take the settings in this chapter, and the mechanism
+they control is unchanged.
 
 ## Concept check
 
@@ -379,12 +378,12 @@ probability, which is why the distribution is usually quite peaked.`}
 />
 
 <MultipleChoice
-  markdown={`You send \`temperature=0\` to a 2026 reasoning model to make its output repeatable, and the request is rejected. Why?
+  markdown={`You send \`temperature=0\` to a reasoning model to make its output repeatable, and the request is rejected. Why?
 
 - Temperature 0 divides the logits by zero.
   > Temperature 0 is implemented as argmax, so no division by zero happens.
 - [o] The model does not accept custom sampling settings.
-  > Several 2026 reasoning models fix their sampling settings and reject a non-default temperature or top-p.
+  > Some reasoning models fix their sampling settings and reject a non-default temperature or top-p.
 - Reasoning models do not sample at all.
   > They still sample every token; the provider just chooses the settings.
 - Repeatable output requires top-p instead.

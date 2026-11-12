@@ -8,7 +8,7 @@ import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COIN } from "./data";
-import { Bracket, Count, DATA, Drift, Head, Kicker, Label, lerp, Mark, pct, pulse, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { Bracket, Count, DATA, Drift, Head, Kicker, Label, lerp, Mark, MathVar, pct, pulse, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 const LO = 30;
 const HI = 70;
@@ -90,7 +90,7 @@ export const CoinScene: React.FC = () => {
           <FigLabel n="6" title="Heads in a hundred flips of a fair coin" at={coinFrom} x={160} y={y(300)} />
           <Ink at={fairAt - 4} dur={14} style={{ left: 1100, top: y(300), whiteSpace: "nowrap" }}>
             <Label size={22} color={INK_SOFT} weight={520}>
-              simulated runs:{" "}
+              Simulated runs:{" "}
               <Count
                 at={simulateAt - 2}
                 to={COIN.runs}
@@ -199,7 +199,7 @@ export const CoinScene: React.FC = () => {
                 transformOrigin: "100% 50%",
               }}
             >
-              p = {pct(COIN.p)}
+              <MathVar>p</MathVar> = {pct(COIN.p)}
             </span>
           </Note>
         </Drift>

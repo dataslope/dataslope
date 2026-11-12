@@ -192,7 +192,7 @@ export const PairScene: React.FC = () => {
           detailMark={existsAt}
         />
         <Ink at={noAt + 10} dur={12} style={{ left: LIST_X, top: listTop + listH + 220, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 500 }}>the second time: still {JT.againCount} rows</span>
+          <span style={{ ...label(22, ACCENT_INK), fontWeight: 500 }}>The second time: still {JT.againCount} rows</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

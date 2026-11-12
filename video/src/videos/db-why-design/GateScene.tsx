@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { COUNTS_AFTER, REFUSED, ruleTag } from "./data";
-import { Badge, Chip, Code, Drift, ErrorBox, Headline, lerp, LISTING_PAPER, pulse, SpanBracket, Spot, Strike, X0 } from "./parts";
+import { Badge, Chip, Code, Drift, ErrorBox, Headline, lerp, LISTING_PAPER, PROGRAM_ICON, pulse, SpanBracket, Spot, Strike, X0 } from "./parts";
 
 const BLOCK_Y = 312;
 const BLOCK_STEP = 180;
@@ -24,7 +24,7 @@ const CHIP_H = 50;
 const CHIP_W = 320;
 /** The bracket that shows how far a rule reaches. */
 const REACH_X = RIGHT_X - 30;
-const PROGRAMS = ["web app", "admin dashboard", "import job", "reporting script"] as const;
+const PROGRAMS = ["Web App", "Admin Dashboard", "Import Job", "Reporting Script"] as const;
 
 /**
  * Bad data starts small: three rows of the video's own, one for each rule
@@ -150,6 +150,7 @@ export const GateScene: React.FC = () => {
             x={RIGHT_X}
             y={chipY(i)}
             width={CHIP_W}
+            icon={PROGRAM_ICON[p]}
             glow={Math.min(1, lit * 0.8 + pulse(frame, wholeAt + i * 4, 18) * 0.4)}
           >
             {p}
@@ -158,7 +159,7 @@ export const GateScene: React.FC = () => {
       })}
       {/* The dimmed three come back for the whole building. */}
       {PROGRAMS.slice(1).map((p, i) => (
-        <Chip key={p} at={wholeAt - 2 + i * 4} x={RIGHT_X} y={chipY(i + 1)} width={CHIP_W} glow={0.8}>
+        <Chip key={p} at={wholeAt - 2 + i * 4} x={RIGHT_X} y={chipY(i + 1)} width={CHIP_W} icon={PROGRAM_ICON[p]} glow={0.8}>
           {p}
         </Chip>
       ))}

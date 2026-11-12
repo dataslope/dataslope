@@ -8,7 +8,7 @@ import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, PAIRED } from "./data";
-import { DATA, DATA_INK, DOT, Head, Label, lerp, pulse, STAT, STAT_INK, Svg, VBracket } from "./parts";
+import { DATA, DATA_INK, DOT, Head, Label, lerp, MathVar, pulse, STAT, STAT_INK, Svg, VBracket } from "./parts";
 
 /** Blood pressure, up the page: 100 to 180 mmHg. */
 const V_LO = 100;
@@ -166,7 +166,7 @@ export const PairsScene: React.FC = () => {
         </Note>
         <Note at={p115At - 2} x={COL[0] - 100} y={y(BOTTOM) + 64}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            as two separate groups: p = {fmt(PAIRED.unpairedP, 3)}
+            As two separate groups: <MathVar>p</MathVar> = {fmt(PAIRED.unpairedP, 3)}
           </span>
         </Note>
 
@@ -223,7 +223,7 @@ export const PairsScene: React.FC = () => {
         </Note>
         <div style={{ position: "absolute", left: D.x0, top: y(720), opacity: ease(frame, tenAt - 4, 12), whiteSpace: "nowrap" }}>
           <span style={{ ...note(40, STAT_INK), fontWeight: 500 }}>
-            <span style={{ fontStyle: "italic" }}>t</span> = {fmt(PAIRED.pairedT, 1)}
+            <MathVar>t</MathVar> = {fmt(PAIRED.pairedT, 1)}
           </span>
           <span
             style={{
@@ -233,7 +233,7 @@ export const PairsScene: React.FC = () => {
               opacity: ease(frame, billionAt - 6, 12),
             }}
           >
-            p = {PAIRED.pairedP.toFixed(11)}
+            <MathVar>p</MathVar> = {PAIRED.pairedP.toFixed(11)}
           </span>
         </div>
         <Note at={billionAt} x={D.x0} y={y(720) + 64}>

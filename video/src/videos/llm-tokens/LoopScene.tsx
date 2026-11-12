@@ -17,7 +17,7 @@ const ROW_STEP = 70;
 /** The rows build on the right, once the ring has moved to the left. */
 const CTX_X = 960;
 /** Width of a chip of `text` at SIZE: JetBrains Mono advances 0.6 em. */
-const chipW = (text: string) => text.length * 0.6 * SIZE + 2 * Math.round(SIZE * 0.4) + 4;
+const chipW = (text: string) => text.length * 0.6 * SIZE + 2 * Math.round(SIZE * 0.4);
 /** Each context chip's left edge, in a row. */
 const lefts = (ctx: readonly string[]) => {
   const out: number[] = [];
@@ -39,7 +39,8 @@ const RING_LEFT = 470;
 const LX = X0;
 /** The three stations round the ring, clockwise from the top, in degrees. */
 const STATIONS = [-90, 30, 150];
-const ARC_GAP = 16;
+/** Degrees each arc stops short of a station: its head ends just off the dot. */
+const ARC_GAP = 5;
 const arc = (from: number, to: number): Pt[] =>
   Array.from({ length: 81 }, (_, i) => {
     const a = ((from + ((to - from) * i) / 80) * Math.PI) / 180;
@@ -327,7 +328,7 @@ export const LoopScene: React.FC = () => {
         </React.Fragment>
       ))}
       <Note at={machineryAt - 2} x={LX + 10} y={y(470) + h(326) + 44}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the same machinery, and just as sure</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>The same machinery, and just as sure</span>
       </Note>
     </AbsoluteFill>
   );

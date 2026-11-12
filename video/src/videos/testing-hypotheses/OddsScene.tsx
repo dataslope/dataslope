@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { AT_LEAST, PEEK, TWENTY } from "./data";
-import { Count, DATA, DATA_WASH, DOT, Head, Label, lerp, Mark, pct, pulse, RAW, STAT, STAT_INK, Svg, Tick } from "./parts";
+import { Count, DATA, DATA_WASH, Head, Label, lerp, Mark, MathVar, pct, pulse, RAW, STAT, STAT_INK, Svg, Tick } from "./parts";
 
 /** The chance that at least one of k tests fires. */
 const X: XScale = { lo: 0, hi: 20.5, x0: 220, x1: 980 };
@@ -141,7 +141,7 @@ export const OddsScene: React.FC = () => {
           <FigLabel n="11" title="One test with nothing to find, peeked at" at={peekAt - 4} x={PK.x0} y={y(290)} />
           <Ink at={peekAt} dur={14} style={{ left: PK.x0, top: y(290) + 40, whiteSpace: "nowrap" }}>
             <Label size={21} color={INK_SOFT} weight={520}>
-              p after every {PEEK.step} visitors, two identical arms
+              <MathVar>p</MathVar> after every {PEEK.step} visitors, two identical arms
             </Label>
           </Ink>
           <Axis scale={PK} base={y(PK_BASE)} ticks={[0, 2000, 4000, 6000, 8000]} format={(v) => fmt(v, 0)} at={peekAt} />
@@ -174,7 +174,7 @@ export const OddsScene: React.FC = () => {
           </Note>
           <Note at={dipsAt + 10} x={PK.x1} y={y(PK_BASE) + 94} align="right">
             <span style={{ ...note(24, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-              dips under 0.05: {dips} {dips === 1 ? "time" : "times"}, with nothing there
+              Dips under 0.05: {dips} {dips === 1 ? "time" : "times"}, with nothing there
             </span>
           </Note>
         </div>
@@ -186,9 +186,9 @@ export const OddsScene: React.FC = () => {
           </span>
         </Ink>
         {[
-          ["the question", questionAt],
-          ["the sample size", sampleAt],
-          ["the analysis", analysisAt],
+          ["The question", questionAt],
+          ["The sample size", sampleAt],
+          ["The analysis", analysisAt],
         ].map(([t, at], i) => (
           <React.Fragment key={t as string}>
             <Ink at={(at as number) - 4} dur={12} style={{ left: B.x0 + 52, top: y(358 + i * 58), whiteSpace: "nowrap" }}>
@@ -199,7 +199,7 @@ export const OddsScene: React.FC = () => {
         ))}
         <Ink at={advanceAt - 4} dur={14} style={{ left: B.x0 + 52, top: y(358 + 3 * 58), whiteSpace: "nowrap" }}>
           <Label size={24} color={STAT_INK}>
-            <Mark at={advanceAt}>all fixed in advance</Mark>
+            <Mark at={advanceAt}>All fixed in advance</Mark>
           </Label>
         </Ink>
 
@@ -221,7 +221,7 @@ export const OddsScene: React.FC = () => {
         <Svg opacity={ease(frame, raiseAt - 2, 14)}>
           <line x1={sx(B, bar)} x2={sx(B, bar)} y1={y(B_BASE)} y2={y(B_BASE) - h(86)} stroke={STAT} strokeWidth={2.6 + 2.4 * barGlow} strokeDasharray="5 4" />
           <rect x={B.x0} y={y(B_BASE) - h(86)} width={sx(B, bar) - B.x0} height={h(86)} fill={STAT} opacity={0.12} />
-          <circle cx={sx(B, hitP)} cy={y(B_BASE) - h(40)} r={10} fill={passes ? STAT : RAW} stroke={passes ? PAPER : DOT} strokeWidth={2} />
+          <circle cx={sx(B, hitP)} cy={y(B_BASE) - h(40)} r={10} fill={passes ? STAT : RAW} stroke={PAPER} strokeWidth={2} />
         </Svg>
         <Note at={raiseAt + 4} x={sx(B, hitP) + 16} y={y(B_BASE) - h(40) - 15}>
           <Label size={21} color={passes ? STAT_INK : INK_SOFT} style={halo}>

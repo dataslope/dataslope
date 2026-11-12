@@ -104,7 +104,9 @@ export const CodeScene: React.FC = () => {
         marks={[{ line: 3, at: definitionAt - 2, from: 9, chars: 23 }]}
       />
       <Note at={definitionAt + 6} x={LIST_X} y={listingBottom + 22} from="up">
-        <span style={note(21, INK_SOFT)}>Every call with n above 1 makes two more calls.</span>
+        <span style={note(21, INK_SOFT)}>
+          Every call with <Mono>n</Mono> above 1 makes two more calls.
+        </span>
       </Note>
 
       {/* fib(40): the answer, then the bill. */}
@@ -120,20 +122,21 @@ export const CodeScene: React.FC = () => {
         </Ink>
         <Ink at={fortyAt - 2} dur={14} style={{ position: "relative" }}>
           <div style={label(24, INK_SOFT)}>after making</div>
-          {/* fontSize: the gap is 0.3em of "calls", not of the page default. */}
-          <div style={{ display: "flex", alignItems: "baseline", fontSize: 42, gap: "0.3em", marginTop: 8, whiteSpace: "nowrap" }}>
-            <span
-              style={{
-                ...headline(104),
-                color: NAIVE_INK,
-                fontVariantNumeric: "tabular-nums lining-nums",
-                opacity: ease(frame, millionAt - 4, 12),
-              }}
-            >
-              {commas(FORTY.naiveCalls)}
-            </span>
-            <span style={{ ...body(42, true), color: INK, opacity: ease(frame, callsAt - 4, 10) }}>calls</span>
+          {/* The hero number on a line of its own (one line, one size), and
+              what it counts under it. */}
+          <div
+            style={{
+              ...headline(104),
+              color: NAIVE_INK,
+              fontVariantNumeric: "tabular-nums lining-nums",
+              marginTop: 8,
+              whiteSpace: "nowrap",
+              opacity: ease(frame, millionAt - 4, 12),
+            }}
+          >
+            {commas(FORTY.naiveCalls)}
           </div>
+          <div style={{ ...body(42, true), color: INK, marginTop: 4, opacity: ease(frame, callsAt - 4, 10) }}>calls</div>
         </Ink>
       </div>
       <Note at={callsAt + 8} x={SIDE_X} y={listingBottom + 22} from="up" width={660}>

@@ -80,7 +80,7 @@ export const IngresScene: React.FC = () => {
         at={relationalAt - 6}
         title="Codd, 1970"
         titleSize={34}
-        lines={[{ at: relationalAt, children: "the relational papers" }]}
+        lines={[{ at: relationalAt, children: "The relational papers" }]}
         dim={costAt}
       />
       <Wire
@@ -114,14 +114,14 @@ export const IngresScene: React.FC = () => {
               </>
             ),
           },
-          { at: ownAt - 2, children: "its own query language, QUEL" },
+          { at: ownAt - 2, children: "Its own query language, QUEL" },
         ]}
       />
 
       {/* ── The tape ── */}
       <Spot id="db-relational-history-tape" at={tapeAt - 6} left={560} top={y(640)} width={210} height={210} />
       <Ink at={costAt - 2} dur={14} style={{ left: 800, top: y(690), whiteSpace: "nowrap" }}>
-        <div style={{ ...note(23, INK) }}>its source code, on tape</div>
+        <div style={{ ...note(23, INK) }}>Its source code, on tape</div>
         <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>
           <Mark at={tapeAt}>for a nominal fee</Mark>
         </div>
@@ -144,7 +144,7 @@ export const IngresScene: React.FC = () => {
         at={sybaseAt - 4}
         title="Sybase, 1984"
         titleSize={36}
-        lines={[{ at: sybaseAt + 4, children: "co-founded by an Ingres alum" }]}
+        lines={[{ at: sybaseAt + 4, children: "Co-founded by an Ingres alum" }]}
       />
       <Wire
         points={[
@@ -162,7 +162,7 @@ export const IngresScene: React.FC = () => {
         at={microsoftAt - 4}
         title="Microsoft SQL Server"
         titleSize={36}
-        lines={[{ at: microsoftAt + 6, children: "licensed from Sybase, version 1.0 in 1989" }]}
+        lines={[{ at: microsoftAt + 6, children: "Licensed from Sybase, version 1.0 in 1989" }]}
         swell={pulse(frame, microsoftAt + 14, 20)}
       />
     </AbsoluteFill>

@@ -54,7 +54,7 @@ const Door: React.FC<{ x: number; top: number; w: number; h: number; at: number;
             y={top - RING}
             width={dw + 2 * RING}
             height={h + 2 * RING}
-            rx={16}
+            rx={8}
             fill="none"
             stroke={STAT}
             strokeWidth={4}

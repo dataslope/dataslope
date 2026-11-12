@@ -33,14 +33,16 @@ export const FIG_Y = 270;
 
 export const TOKEN = BAR;
 export const TOKEN_INK = BLUE_INK;
-export const TOKEN_FILL = `color-mix(in srgb, ${BAR} 10%, ${PAPER})`;
+export const TOKEN_FILL = `color-mix(in srgb, ${BAR} 18%, ${PAPER})`;
 export const BAD = ACCENT;
 export const BAD_INK = ACCENT_INK;
-export const BAD_FILL = `color-mix(in srgb, ${ACCENT} 14%, ${PAPER})`;
+export const BAD_FILL = `color-mix(in srgb, ${ACCENT} 20%, ${PAPER})`;
 export const GOOD = ds("green", 500);
 export const GOOD_INK = inkOf.green;
-export const GOOD_FILL = `color-mix(in srgb, ${ds("green", 500)} 14%, ${PAPER})`;
+export const GOOD_FILL = `color-mix(in srgb, ${ds("green", 500)} 20%, ${PAPER})`;
 export const PIECE_FILL = ds("gray", 50);
+/** A piece chip's fill: the gray badge's tint, which reads with no outline. */
+const PIECE_CHIP_FILL = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
 export const MARK = HIGHLIGHT;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -336,11 +338,10 @@ export const Chip: React.FC<{
     kind === "token"
       ? { border: TOKEN, fill: TOKEN_FILL }
       : kind === "piece"
-        ? { border: INK_SOFT, fill: PIECE_FILL }
+        ? { border: INK_SOFT, fill: PIECE_CHIP_FILL }
         : { border: "transparent", fill: "transparent" };
   const mix = (a: string, c: string, t: number) => (t <= 0 ? a : t >= 1 ? c : `color-mix(in srgb, ${c} ${Math.round(t * 100)}%, ${a})`);
   const red = Math.max(b, f, s);
-  const border = mix(mix(base.border, GOOD, g), BAD, red);
   const fill = mix(mix(base.fill, GOOD_FILL, g), BAD_FILL, red);
   const chars = badChars
     ? (() => {
@@ -363,8 +364,10 @@ export const Chip: React.FC<{
         width: w,
         height: ht,
         boxSizing: "border-box",
-        border: `2px solid ${border}`,
-        borderRadius: 8,
+        // Fill only, no outline (the owner, 2026-11-11). The 2px stays as
+        // transparent room, so every row keeps its measured widths.
+        border: "2px solid transparent",
+        borderRadius: 4,
         background: fill,
         display: "flex",
         alignItems: "center",

@@ -351,10 +351,10 @@ export const CastScene: React.FC = () => {
           <span style={label(22, INK_SOFT)}>The binomial assumes</span>
         </Ink>
         {[
-          { text: "a fixed number of visitors", at: holdsAt + 2 },
-          { text: "each decides alone", at: aloneAt - 4, strike: crowdAt - 2 },
-          { text: "the same chance for each", at: sameAt - 4 },
-          { text: "just yes or no", at: sameAt + 10 },
+          { text: "A fixed number of visitors", at: holdsAt + 2 },
+          { text: "Each decides alone", at: aloneAt - 4, strike: crowdAt - 2 },
+          { text: "The same chance for each", at: sameAt - 4 },
+          { text: "Just yes or no", at: sameAt + 10 },
         ].map((r, i) => (
           <Ink key={r.text} at={r.at} dur={14} style={{ left: 160, top: y(390 + i * 66), whiteSpace: "nowrap" }}>
             <span style={{ ...body(32), color: INK }}>

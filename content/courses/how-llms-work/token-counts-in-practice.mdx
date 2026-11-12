@@ -68,9 +68,10 @@ print("Same information, up to 2.7x the cost, depending on encoding.")
 The JSON row is worth dwelling on. Wrapping data in JSON costs several
 times the tokens of a compact tabular format, because every key is
 repeated on every record and every brace and quote is a token. The
-block below estimates about four times; GPT-4o's tokenizer, run on the
-same three records, counts 89 tokens against 33, about 2.7 times. If you are sending many records to a model, CSV is markedly
-cheaper than JSON for identical content.
+block below estimates about four times; `o200k_base`, a widely used
+tokenizer, run on the same three records counts 89 tokens against 33,
+about 2.7 times. If you are sending many records to a model, CSV is
+markedly cheaper than JSON for identical content.
 
 <Figure
   slug="llm-token-counts-in-practice-measuring-compression-across-inline-cutout"
@@ -116,9 +117,9 @@ budget line.
 Every ratio above depends on the tokenizer, and each model family has
 its own. The same paragraph is not the same number of tokens on two
 models, and it is not always the same on two generations of one
-vendor's models: Anthropic reports that the tokenizer its models have
-used since Claude Opus 4.7 produces about 30% more tokens for the same
-text than the one before it.[^anthropic-tokenizer]
+vendor's models: one vendor reports that the tokenizer its newer models
+use produces about 30% more tokens for the same text than the one
+before it.[^anthropic-tokenizer]
 
 That matters whenever you compare prices. A model that is 20% cheaper
 per token but counts your text as 30% more tokens is the more expensive
@@ -336,7 +337,6 @@ A per-token price only compares models that count tokens the same way.`}
 />
 
 [^anthropic-tokenizer]:
-    Anthropic, [Pricing](https://platform.claude.com/docs/en/about-claude/pricing),
-    as of October 2026, which notes that Claude Opus 4.7 and later
-    models use a tokenizer that "produces approximately 30% more tokens
-    for the same text".
+    Anthropic, API pricing documentation,
+    which notes that its newer models use a tokenizer that "produces
+    approximately 30% more tokens for the same text".

@@ -4,6 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { sx } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
+import { M } from "../../editorial/math";
 import { ACCENT_INK, body, fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -32,7 +33,7 @@ const Y_HI = 1.5;
 const COL_X = 1370;
 const COL_W = 440;
 const ROW_Y: Record<Shown, number> = { 1: 506, 3: 604, 11: 702 };
-const WORDS: Record<Shown, string> = { 1: "too stiff", 3: "follows the curve", 11: "through every point" };
+const WORDS: Record<Shown, string> = { 1: "Too stiff", 3: "Follows the curve", 11: "Through every point" };
 
 /**
  * Hook, sample and the three fits: twelve noisy points, a line, a cubic and a
@@ -222,7 +223,7 @@ export const FitScene: React.FC = () => {
       })}
       <Note at={lineAt + 8} x={COL_X} y={y(806)} width={COL_W}>
         <span style={prose(20)}>
-          Points from sin 1.5x plus noise with a standard deviation of 0.25. Least-squares fits, scikit-learn.
+          Points from <M>sin 1.5x</M> plus noise with a standard deviation of 0.25. Least-squares fits, scikit-learn.
         </span>
       </Note>
     </AbsoluteFill>

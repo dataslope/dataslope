@@ -9,6 +9,7 @@ import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { CAT, COUNTS, DEFAULT_IDF, DEFAULT_ROWS, DEFAULT_THE_TOPS, DF, IDF, N, num, THE, VOCAB } from "./data";
 import { FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, NEG_INK, POS_INK, Reveal, Spot, X0 } from "./parts";
+import { MathRun } from "../../editorial/math";
 import { Frac, V } from "./tfidf";
 
 /** The comparison, left; Doc 1's scores under the default, right. Layout units. */
@@ -34,7 +35,7 @@ const DOC1 = VOCAB.map((w, j) => ({ w, j, v: DEFAULT_ROWS[0][j] })).filter((d) =
 const TOP_V = Math.max(...DOC1.map((d) => d.v));
 
 const Code: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: "0.95em", color: INK }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: "0.92em", color: INK }}>{children}</span>
 );
 
 /**
@@ -110,13 +111,13 @@ export const DefaultScene: React.FC = () => {
         <Code>TfidfVectorizer()</Code> default
       </div>
       <Ink at={textbookAt - 2} dur={18} style={{ left: COL_A, top: y(FORMULA_Y), ...headline(42), whiteSpace: "nowrap" }}>
-        <span style={{ display: "inline-flex", alignItems: "center" }}>
+        <MathRun style={{ display: "inline-flex", alignItems: "center" }}>
           <span style={{ marginRight: "0.12em" }}>ln</span>
-          <Frac top={<V>N</V>} bottom={<V>df</V>} />
-        </span>
+          <Frac top={<V>N</V>} bottom={<>df</>} />
+        </MathRun>
       </Ink>
       <Ink at={smoothsAt - 2} dur={18} style={{ left: COL_B, top: y(FORMULA_Y), ...headline(42), whiteSpace: "nowrap" }}>
-        <span style={{ display: "inline-flex", alignItems: "center" }}>
+        <MathRun style={{ display: "inline-flex", alignItems: "center" }}>
           <span style={{ marginRight: "0.12em" }}>ln</span>
           <Frac
             top={
@@ -126,12 +127,12 @@ export const DefaultScene: React.FC = () => {
             }
             bottom={
               <>
-                1 + <V>df</V>
+                1 + df
               </>
             }
           />
           <span style={{ marginLeft: "0.25em", opacity: plusOne, color: ACCENT_INK }}>+ 1</span>
-        </span>
+        </MathRun>
       </Ink>
 
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: a }}>
@@ -162,7 +163,10 @@ export const DefaultScene: React.FC = () => {
       ))}
       <Note at={textbookAt + 8} x={WORD_X} y={y(ROW_Y[1] + ROW_H + 22)}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          <V>N</V> is {N}. <i>{VOCAB[THE]}</i> is in {DF[THE]} documents, <i>{VOCAB[CAT]}</i> in {DF[CAT]}.
+          <MathRun>
+            <V>N</V>
+          </MathRun>{" "}
+          is {N}. <i>{VOCAB[THE]}</i> is in {DF[THE]} documents, <i>{VOCAB[CAT]}</i> in {DF[CAT]}.
         </span>
       </Note>
 
@@ -228,7 +232,7 @@ export const DefaultScene: React.FC = () => {
       <Spot id="gauge" at={countsAt - 2} left={X0} top={y(GAUGE_Y)} width={170} height={h(170)} />
       <Ink at={callAt + 4} dur={16} style={{ left: X0 + 200, top: y(GAUGE_Y) + 50, ...body(40, true), color: INK, whiteSpace: "nowrap" }}>
         <Reveal at={posAt - 2} style={{ color: POS_INK }}>
-          positive
+          Positive
         </Reveal>
         <Reveal at={posAt + 4}>{", or "}</Reveal>
         <Reveal at={negAt - 2} style={{ color: NEG_INK }}>

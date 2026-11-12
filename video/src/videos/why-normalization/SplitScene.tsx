@@ -163,8 +163,8 @@ export const SplitScene: React.FC = () => {
       {ORDERS.map((_, i) => (
         <KeyArrow
           key={i}
-          from={[og.x + og.width + 10, og.rowMid(i)]}
-          to={[cg.x - 6, cg.rowMid(POINTS_AT[i])]}
+          from={[og.x + og.width + 4, og.rowMid(i)]}
+          to={[cg.x - 1, cg.rowMid(POINTS_AT[i])]}
           at={pointAt + i * 5}
           out={i === grace ? ordersAt : undefined}
         />

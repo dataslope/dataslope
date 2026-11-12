@@ -12,7 +12,6 @@ import { LOGITS, MOE, PARAMS, PROMPT, thousands } from "./data";
 import {
   Arrow,
   DATA,
-  DATA_SOFT,
   DATA_TINT,
   Fade,
   FAINT,
@@ -29,6 +28,7 @@ import {
   Spot,
   Svg,
   Tag,
+  tintOf,
   TokenChip,
   X0,
 } from "./parts";
@@ -53,8 +53,8 @@ const Strip: React.FC<{ cells: number; w?: number; h?: number; at: number; frame
             height: h,
             marginRight: 3,
             borderRadius: 3,
-            border: `1.5px solid ${strong ? DATA : DATA_SOFT}`,
-            background: `color-mix(in srgb, ${DATA} ${Math.round(f * (strong ? 34 : 20))}%, ${PAPER})`,
+            // A cell is a fill, no outline: pale until it fills.
+            background: `color-mix(in srgb, ${DATA} ${Math.round(10 + f * (strong ? 30 : 16))}%, ${PAPER})`,
             opacity: 0.35 + 0.65 * f,
           }}
         />
@@ -158,13 +158,13 @@ export const PathScene: React.FC = () => {
             <span style={{ display: "inline-flex", alignItems: "center", gap: 6, opacity: ease(frame, positionAt + i * 2, 8) }}>
               <span style={{ ...note(22, POINT_INK), fontWeight: 500 }}>+</span>
               {[0, 1, 2].map((c) => (
-                <span key={c} style={{ width: 14, height: 30, borderRadius: 3, border: `1.5px solid ${POINT}`, background: PAPER }} />
+                <span key={c} style={{ width: 14, height: 30, borderRadius: 3, background: `color-mix(in srgb, ${POINT} 30%, ${PAPER})` }} />
               ))}
             </span>
           </Fade>
           {/* Feed-forward: each token through its own small box. */}
           <Fade at={aloneAt - 6 + i * 2} style={{ left: X.ff + 10, top: rowY(i) + 4 }}>
-            <div style={{ width: 200, height: 40, borderRadius: 8, border: `2px solid ${DATA}`, background: DATA_TINT }} />
+            <div style={{ width: 200, height: 40, borderRadius: 5, background: `color-mix(in srgb, ${DATA} 24%, ${PAPER})` }} />
           </Fade>
         </React.Fragment>
       ))}
@@ -213,10 +213,8 @@ export const PathScene: React.FC = () => {
               y={top + (1 - p) * 12}
               width={220}
               height={h}
-              rx={6}
-              fill={k === 0 ? DATA : DATA_TINT}
-              stroke={k === 0 ? INK : DATA}
-              strokeWidth={k === 0 ? 2 : 1.6}
+              rx={4}
+              fill={k === 0 ? DATA : `color-mix(in srgb, ${DATA} 24%, ${PAPER})`}
               opacity={p}
             />
           );
@@ -226,7 +224,7 @@ export const PathScene: React.FC = () => {
           y={blockTop}
           width={blockR - blockL}
           height={blockBot - blockTop}
-          rx={16}
+          rx={10}
           fill="none"
           stroke={INK}
           strokeWidth={2.4}
@@ -256,8 +254,9 @@ export const PathScene: React.FC = () => {
       </Svg>
       <Arrow from={[X.text + 118, mid]} to={[X.ids - 22, mid]} at={idsAt - 4} color={INK_SOFT} />
       <Arrow from={[X.ids + 96, mid]} to={[X.emb - 22, mid]} at={embeddingAt - 4} color={INK_SOFT} />
-      <Arrow from={[X.emb + 230, mid]} to={[blockL - 14, mid]} at={blockAt - 2} color={INK_SOFT} />
-      <Arrow from={[blockR + 70, mid]} to={[X.stack - 20, mid]} at={repeatsAt - 4} color={INK_SOFT} />
+      {/* Into the block's outline, and from it to the stack: edge to edge. */}
+      <Arrow from={[X.emb + 230, mid]} to={[blockL - 2, mid]} at={blockAt - 2} color={INK_SOFT} />
+      <Arrow from={[blockR + 2, mid]} to={[X.stack - 2, mid]} at={repeatsAt - 4} color={INK_SOFT} />
       <Fade at={aroundAt + 4} style={{ left: X.att - 10, top: blockBot + 52 }}>
         <Tag size={21} color={POINT_INK}>
           The input, added back in
@@ -265,7 +264,7 @@ export const PathScene: React.FC = () => {
       </Fade>
       {/* On top of the stack, the output layer the parameter count will name. */}
       <Fade at={modelAt - 2} style={{ left: X.stack, top: blockBot - SLABS * 40 - 66, width: 220 }}>
-        <div style={{ border: `2px solid ${INK}`, borderRadius: 8, padding: "6px 12px 8px", background: PAPER }}>
+        <div style={{ borderRadius: 6, padding: "8px 14px 10px", background: tintOf(INK) }}>
           <div style={{ ...label(21, INK) }}>Output layer</div>
           <div style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>a score per token</div>
         </div>
@@ -372,6 +371,8 @@ export const ParamsScene: React.FC = () => {
           strokeWidth={2}
           strokeDasharray="8 6"
           rx={4}
+          // The empty bar's dashes go once the last part has filled it.
+          opacity={1 - ease(frame, segAt[3] + 12, 14)}
         />
         {segs.map((s, i) => {
           const p = ease(frame, s.at - 2, 16);
@@ -439,7 +440,7 @@ export const ParamsScene: React.FC = () => {
           const p = ease(frame, depthAt - 2 + k * 3, 10);
           if (p <= 0) return null;
           return (
-            <rect key={k} x={DX} y={DY - k * 30 - 24} width={250} height={22} rx={5} fill={k === 7 ? DATA : DATA_TINT} stroke={DATA} strokeWidth={1.6} opacity={p} />
+            <rect key={k} x={DX} y={DY - k * 30 - 24} width={250} height={22} rx={4} fill={k === 7 ? DATA : `color-mix(in srgb, ${DATA} 24%, ${PAPER})`} opacity={p} />
           );
         })}
       </Svg>
@@ -530,10 +531,9 @@ export const ExpertsScene: React.FC = () => {
               y={GY + r * (EH + EG)}
               width={EW}
               height={EH}
-              rx={8}
-              fill={on > 0 ? `color-mix(in srgb, ${ds("yellow", 400)} ${Math.round(on * 100)}%, ${PAPER})` : PAPER}
-              stroke={on > 0.5 ? INK : DATA}
-              strokeWidth={on > 0.5 ? 2.6 : 1.8}
+              rx={5}
+              // A plain expert is gray; a routed one fills yellow. No outline.
+              fill={on > 0 ? `color-mix(in srgb, ${ds("yellow", 400)} ${Math.round(on * 100)}%, ${tintOf(INK)})` : tintOf(INK)}
               opacity={p}
             />
           );
@@ -623,7 +623,8 @@ export const TopScene: React.FC = () => {
       <Fade at={lastAt - 2} style={{ left: X0, top: VY, display: "flex", alignItems: "center", gap: 16 }}>
         <Strip cells={14} w={26} h={34} at={lastAt} frame={frame} strong />
       </Fade>
-      <Arrow from={[X0 + 14 * 26 + 30, VY + 17]} to={[LX - 30, VY + 17]} at={scoreAt - 4} />
+      {/* From the vector's last cell to the column of tokens. */}
+      <Arrow from={[X0 + 14 * 26 - 1, VY + 17]} to={[LX - 4, VY + 17]} at={scoreAt - 4} />
       <Fade at={scoreAt - 2} style={{ left: LX, top: y(350) }}>
         <span style={{ ...label(21, INK_SOFT) }}>Token</span>
         <span style={{ ...label(21, INK_SOFT), position: "absolute", left: ZERO - LX + 60 }}>Score</span>

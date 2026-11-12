@@ -99,9 +99,9 @@ export const PredictScene: React.FC = () => {
 
       {/* ── Column heads ── */}
       {[
-        { x: RANK_R, align: "right" as const, text: "rank", at: from + 2 },
-        { x: WORD_L, align: "left" as const, text: "word", at: from + 4 },
-        { x: LAW_R, align: "right" as const, text: "predicted", at: predictionAt - 4 },
+        { x: RANK_R, align: "right" as const, text: "Rank", at: from + 2 },
+        { x: WORD_L, align: "left" as const, text: "Word", at: from + 4 },
+        { x: LAW_R, align: "right" as const, text: "Predicted", at: predictionAt - 4 },
         { x: EMMA_R, align: "right" as const, text: "Emma", at: inEmmaAt - 4 },
       ].map((c) => (
         <Tag key={c.text} x={c.x} y={HEAD_Y} at={c.at} align={c.align} size={21} weight={500}>
@@ -116,7 +116,7 @@ export const PredictScene: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, transform: `translateY(${settle}px)` }}>
         {/* The tenth row, washed as it is named (behind its text). */}
         <Svg opacity={ease(frame, tenthRealAt - 2, 12)}>
-          <rect x={86} y={rowY(9) - 6} width={BX0 + BAR_W - 76} height={ROW + 34} rx={6} fill={POINT_WASH} opacity={0.5} />
+          <rect x={86} y={rowY(9) - 6} width={BX0 + BAR_W - 76} height={ROW + 34} rx={4} fill={POINT_WASH} opacity={0.5} />
         </Svg>
         {EMMA.predict.map((r, i) => {
           const top = rowY(i);
@@ -187,7 +187,7 @@ export const PredictScene: React.FC = () => {
             y={rowY(0) - 2}
             width={tieX1 - tieX0}
             height={ROW + 46}
-            rx={18}
+            rx={8}
             fill="none"
             stroke={POINT}
             strokeWidth={2.6 + 1.6 * pulse(frame, crowdAt - 2, 26)}

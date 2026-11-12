@@ -109,7 +109,7 @@ export const RouteScene: React.FC = () => {
                   y={ry - GATE_W / 2}
                   width={GATE_W}
                   height={GATE_W}
-                  rx={6}
+                  rx={5}
                   fill="none"
                   stroke={TRAP}
                   strokeWidth={2.4}
@@ -133,7 +133,7 @@ export const RouteScene: React.FC = () => {
             y={y(ROW_Y[0]) - 34}
             width={GATE_W + 36}
             height={(y(ROW_Y[3]) - y(ROW_Y[0])) * gateBox + 68}
-            rx={12}
+            rx={8}
             fill="none"
             stroke={TRAP}
             strokeWidth={2}
@@ -182,7 +182,7 @@ export const RouteScene: React.FC = () => {
           );
         })}
         <Ink at={scoresAt + 10} dur={14} style={{ left: TABLE_X, top: y(LINE_Y[2]) + 56, whiteSpace: "nowrap" }}>
-          <span style={note(21, INK_SOFT)}>percent of questions right</span>
+          <span style={note(21, INK_SOFT)}>Percent of questions right</span>
         </Ink>
         {/* "...that looks like one": the table offered as the test. */}
         <Arrow from={[TABLE_X - 24, y(548)]} to={[GATE_X + GATE_W + 34, y(548)]} at={looksAt - 4} dur={14} color={TRAP} />

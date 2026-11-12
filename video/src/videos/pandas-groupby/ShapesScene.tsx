@@ -36,8 +36,8 @@ import {
 /** "7 rows in": a count in the headline face, then what it counts. */
 export const Count: React.FC<{ value: number; text: string }> = ({ value, text }) => (
   <span style={{ display: "flex", alignItems: "baseline", gap: 10, whiteSpace: "nowrap" }}>
-    <span style={headline(44)}>{value}</span>
-    <span style={body(28)}>{text}</span>
+    <span style={headline(36)}>{value}</span>
+    <span style={body(34)}>{text}</span>
   </span>
 );
 
@@ -115,7 +115,7 @@ export const ShapesScene: React.FC = () => {
         top={y(HEADER_Y)}
         width={T_W}
         at={transAt}
-        cols={[{ text: "group total", right: 18 }]}
+        cols={[{ text: "Group total", right: 18 }]}
       />
       {ROWS.map((r, i) => {
         const p = ease(frame, handsAt + i * 5, 24);
@@ -139,8 +139,8 @@ export const ShapesScene: React.FC = () => {
       <Note at={outAt - 2} x={T_X} y={y(ROW0 + 7 * RH + 14)}>
         <Count value={TOTALS.length} text="rows out" />
       </Note>
-      <Note at={orderAt + 2} x={T_X + 190} y={y(ROW0 + 7 * RH + 22)}>
-        <span style={{ ...body(26, true), whiteSpace: "nowrap" }}>indexed {TOTAL_INDEX[0]} to {TOTAL_INDEX[TOTAL_INDEX.length - 1]}, like the frame</span>
+      <Note at={orderAt + 2} x={T_X + 190} y={y(ROW0 + 7 * RH + 19)}>
+        <span style={{ ...body(31, true), whiteSpace: "nowrap" }}>indexed {TOTAL_INDEX[0]} to {TOTAL_INDEX[TOTAL_INDEX.length - 1]}, like the frame</span>
       </Note>
     </AbsoluteFill>
   );

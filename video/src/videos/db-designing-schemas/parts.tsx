@@ -506,9 +506,9 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
                 height: RAIL.dot,
                 flex: "none",
                 borderRadius: "50%",
-                boxSizing: "border-box",
-                border: `2px solid ${fill > 0.5 ? BAR : INK}`,
-                background: `color-mix(in srgb, ${BAR} ${Math.round(fill * 100)}%, color-mix(in srgb, ${INK_SOFT} ${Math.round(done * rail * 22)}%, ${PAPER}))`,
+                // A tinted disc with no ring: gray while waiting, a step
+                // deeper once done, the solid blue while in hand.
+                background: `color-mix(in srgb, ${BAR} ${Math.round(fill * 100)}%, color-mix(in srgb, ${INK_SOFT} ${Math.round(16 + done * rail * 12)}%, ${PAPER}))`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

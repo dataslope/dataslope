@@ -8,28 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, STEPS } from "./data";
-import {
-  Bracket,
-  Count,
-  Mark,
-  RAW,
-  curvePath,
-  DOT,
-  Greek,
-  H0,
-  Head,
-  Label,
-  lerp,
-  pct,
-  phi,
-  pulse,
-  STAT,
-  STAT_INK,
-  STAT_WASH,
-  Strike,
-  Svg,
-  Tick,
-} from "./parts";
+import { Bracket, Count, curvePath, DOT, Greek, H0, Head, Label, lerp, Mark, MathVar, pct, phi, pulse, RAW, STAT, STAT_INK, STAT_WASH, Strike, Svg, Tick } from "./parts";
 
 /** The forty users. */
 const X: XScale = { lo: 4000, hi: 11000, x0: 800, x1: 1760 };
@@ -275,7 +254,7 @@ export const StepsScene: React.FC = () => {
       ))}
       <Note at={noiseAt + 6} x={Z.x0} y={y(Z_BASE) + 106}>
         <Label size={21} color={INK_SOFT} weight={520}>
-          one notch = one standard error, {steps(se)} steps
+          One notch = one standard error, {steps(se)} steps
         </Label>
       </Note>
       <div
@@ -289,7 +268,7 @@ export const StepsScene: React.FC = () => {
           whiteSpace: "nowrap",
         }}
       >
-        <span style={{ fontStyle: "italic" }}>t</span> = <Count at={tAt - 6} to={STEPS.t} dur={22} format={(v) => fmt(v, 2).replace("-", "−")} />
+        <MathVar>t</MathVar> = <Count at={tAt - 6} to={STEPS.t} dur={22} format={(v) => fmt(v, 2).replace("-", "−")} />
       </div>
 
       {/* If the claim held: the averages a test expects, and the two tails beyond this one. */}
@@ -335,7 +314,9 @@ export const StepsScene: React.FC = () => {
         </Label>
       </Note>
       <Note at={threeAt - 2} x={zMirror + 16} y={y(Z_BASE) - h(110)}>
-        <span style={{ ...note(30, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>p = {fmt(STEPS.p, 3)}</span>
+        <span style={{ ...note(30, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
+          <MathVar>p</MathVar> = {fmt(STEPS.p, 3)}
+        </span>
       </Note>
       {/* The p-value as the narration says it. */}
       <Note at={threeAt + 6} x={zMirror + 16} y={y(Z_BASE) - h(110) + 42}>

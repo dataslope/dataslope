@@ -26,6 +26,10 @@ import { Headline, Held } from "./parts";
 
 /** Fig. 4's bars run from here, one pixel per 8.3 people. */
 const BARS = { x0: 440, x1: 1640, top: 622, gap: 60, height: 40 } as const;
+/** Extra room, past the grid's gap, between the answer and the readings
+ *  column, so the readings stand apart from the big figures rather than
+ *  sharing their line. */
+const READINGS_GAP = 110;
 
 /**
  * Bayes and neglect: the answer as a count, true positives over all
@@ -66,7 +70,9 @@ export const BayesScene: React.FC = () => {
       />
       <FigLabel n="3" title="Bayes' rule, as a count" at={start + 4} x={160} y={y(196)} />
 
-      {/* The fraction, its two readings beside it, and the answer. */}
+      {/* The fraction and the answer at one size, as one line of math; the
+          two readings in a column of their own, well clear of the big
+          figures, each level with the term it reads. */}
       <div
         style={{
           position: "absolute",
@@ -81,14 +87,14 @@ export const BayesScene: React.FC = () => {
         <Held at={numAt - 2} style={{ justifySelf: "center", ...headline(104), color: COLOR_INK.hasIt }}>
           {num(COUNT.tp)}
         </Held>
-        <Held at={shareAt + 4}>
+        <Held at={resultAt} style={{ gridRow: "1 / 4", gridColumn: 2, ...headline(104, true), color: COLOR_INK.falseAlarm }}>
+          ≈ {pct(PPV)}
+        </Held>
+        <Held at={shareAt + 4} style={{ gridColumn: 3, marginLeft: READINGS_GAP }}>
           <div style={label(24, COLOR_INK.hasIt)}>Positive, and have it</div>
           <div style={{ ...note(22, INK_SOFT), marginTop: 4 }}>
             {pct(SENSITIVITY)} of the {num(COUNT.sick)} who have it
           </div>
-        </Held>
-        <Held at={resultAt} style={{ gridRow: "1 / 4", gridColumn: 3, ...headline(132, true), color: COLOR_INK.falseAlarm }}>
-          ≈ {pct(PPV)}
         </Held>
 
         <div
@@ -103,14 +109,14 @@ export const BayesScene: React.FC = () => {
             transform: `scaleX(${ease(frame, everyoneAt, 14)})`,
           }}
         />
-        <div style={{ gridColumn: 2 }} />
+        <div style={{ gridColumn: 3 }} />
 
-        <Held at={denAt - 2} style={{ justifySelf: "center", ...headline(104), color: INK }}>
+        <Held at={denAt - 2} style={{ gridColumn: 1, justifySelf: "center", ...headline(104), color: INK }}>
           <span style={{ color: COLOR_INK.hasIt }}>{num(COUNT.tp)}</span>
           <span style={{ color: INK_SOFT }}> + </span>
           <span style={{ color: COLOR_INK.falseAlarm }}>{num(COUNT.fp)}</span>
         </Held>
-        <Held at={everyoneAt + 4}>
+        <Held at={everyoneAt + 4} style={{ gridColumn: 3, marginLeft: READINGS_GAP }}>
           <div style={label(24, INK)}>Everyone who tests positive</div>
           <div style={{ ...note(22, INK_SOFT), marginTop: 4 }}>
             plus {pct(1 - SPECIFICITY)} of the {num(COUNT.healthy)} who don&apos;t

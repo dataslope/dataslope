@@ -66,14 +66,14 @@ export const RuleScene: React.FC = () => {
   const head = y(400);
   const row = (i: number) => y(470) + i * 104;
   const rows = [
-    { at: walkAt, verdictAt: failsAt, spark: "walk" as const, name: "Walk a", p: dec(ADF_WALK), verdict: "non-stationary", ink: ACCENT_INK },
+    { at: walkAt, verdictAt: failsAt, spark: "walk" as const, name: "Walk a", p: dec(ADF_WALK), verdict: "Non-stationary", ink: ACCENT_INK },
     {
       at: diffsAt,
       verdictAt: passAt,
       spark: "flips" as const,
       name: "Its differences",
       p: ADF_DIFF < 0.001 ? "below 0.001" : dec(ADF_DIFF, 3),
-      verdict: "stationary",
+      verdict: "Stationary",
       ink: PASS_INK,
     },
   ];

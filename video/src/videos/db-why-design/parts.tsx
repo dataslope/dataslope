@@ -1,3 +1,4 @@
+import { AppWindow, FileInput, FileChartColumn, LayoutDashboard, type LucideIcon } from "lucide-react";
 import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { arrowHead } from "../../components/arrow";
@@ -33,6 +34,8 @@ export const MARK_BAD = `color-mix(in srgb, ${ACCENT} 26%, transparent)`;
 export const MARK_KEY = `color-mix(in srgb, ${BAR} 18%, transparent)`;
 export const KEY = BAR;
 export const KEY_INK = BLUE_INK;
+/** A plain node's fill: neutral gray, opaque, with no outline. */
+export const NODE = ds("gray", 100);
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
@@ -258,7 +261,19 @@ export const Spot: React.FC<{
   );
 };
 
-/** A program that writes to the database: a small rounded chip. */
+/** A program that writes to the database: a small gray node, fill only. */
+/** The lesson's four programs, each with its lucide icon. */
+export const PROGRAM_ICON: Record<string, LucideIcon> = {
+  "Web App": AppWindow,
+  "Admin Dashboard": LayoutDashboard,
+  "Import Job": FileInput,
+  "Reporting Script": FileChartColumn,
+};
+
+/** The chip's height at a given vertical padding: Inter 22's line, the
+ *  padding and the 2px outline, top and bottom. */
+export const chipHeight = (padY = 10) => 27 + 2 * padY + 4;
+
 export const Chip: React.FC<{
   at: number;
   x: number;
@@ -267,8 +282,12 @@ export const Chip: React.FC<{
   dim?: number;
   glow?: number;
   width?: number;
+  /** A lucide icon drawn before the label, in the label's ink. */
+  icon?: LucideIcon;
+  /** Vertical padding, px. */
+  padY?: number;
   children: React.ReactNode;
-}> = ({ at, x, y, out, dim, glow = 0, width, children }) => {
+}> = ({ at, x, y, out, dim, glow = 0, width, icon: Icon, padY = 10, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -282,10 +301,15 @@ export const Chip: React.FC<{
         top: y,
         width,
         boxSizing: "border-box",
-        padding: "10px 18px",
-        borderRadius: 10,
-        border: `2px solid ${glow > 0 ? `color-mix(in srgb, ${ACCENT} ${Math.round(glow * 100)}%, ${INK})` : INK}`,
-        background: PAPER,
+        padding: `${padY}px 20px`,
+        borderRadius: 8,
+        // The owner's badge (2026-11-12): no fill, a near-black outline, black
+        // text. A glow is a swell, not a color, so the outline stays black.
+        border: `2px solid ${INK}`,
+        background: "transparent",
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
         opacity: p * (1 - o) * (1 - d),
         transform: `translate(${(1 - p) * 16 + o * 16}px, ${0}px) scale(${1 + glow * 0.04})`,
         transformOrigin: "50% 50%",
@@ -294,6 +318,7 @@ export const Chip: React.FC<{
         whiteSpace: "nowrap",
       }}
     >
+      {Icon ? <Icon size={24} strokeWidth={2} color={INK} style={{ flex: "none" }} /> : null}
       {children}
     </div>
   );

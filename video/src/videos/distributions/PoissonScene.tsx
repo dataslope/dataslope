@@ -217,13 +217,13 @@ export const PoissonScene: React.FC = () => {
           <Ink at={formulaAt - 6} dur={14} style={{ left: PANEL_X, top: y(540), whiteSpace: "nowrap" }}>
             <span style={{ ...note(24, INK), fontWeight: 500 }}>
               <Sweep at={formulaAt - 2}>
-                formula <span style={askNote(24)}>{fmt(POISSON.sfAtLeast * 100, 2)}%</span>
+                Formula <span style={askNote(24)}>{fmt(POISSON.sfAtLeast * 100, 2)}%</span>
               </Sweep>
             </span>
           </Ink>
           <Ink at={simulateAt - 4} dur={14} style={{ left: PANEL_X, top: y(584), whiteSpace: "nowrap" }}>
             <span style={{ ...note(24, INK), fontWeight: 500 }}>
-              simulated <span style={askNote(24)}>{sims >= 1 || frame >= sevenAt - 4 ? `${fmt(POISSON.simulatedAtLeast * 100, 2)}%` : "…"}</span>
+              Simulated <span style={askNote(24)}>{sims >= 1 || frame >= sevenAt - 4 ? `${fmt(POISSON.simulatedAtLeast * 100, 2)}%` : "…"}</span>
             </span>
           </Ink>
           <Note at={simulateAt} x={PANEL_X} y={y(624)}>
@@ -233,11 +233,11 @@ export const PoissonScene: React.FC = () => {
           </Note>
           <Ink at={varianceAt - 4} dur={14} style={{ left: PANEL_X, top: y(690), whiteSpace: "nowrap" }}>
             <span style={{ ...note(24, INK), fontWeight: 500 }}>
-              mean {POISSON.mean} = variance {POISSON.variance}
+              Mean {POISSON.mean} = variance {POISSON.variance}
             </span>
           </Ink>
           <Note at={varyAt} x={PANEL_X} y={y(734)}>
-            <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>real variance far above the mean?</span>
+            <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>Real variance far above the mean?</span>
           </Note>
           <Note at={clumpingAt - 2} x={PANEL_X} y={y(770)}>
             <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 10 }}>

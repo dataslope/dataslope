@@ -6,6 +6,7 @@ import { ACCENT_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, note } from "
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { CAT, COUNTS, DF, IDF, LENGTHS, N, num, spell, TFIDF, THE, VOCAB } from "./data";
+import { MathRun } from "../../editorial/math";
 import { DocTable, Frac, IDF_ROW, IdfRow } from "./parts";
 
 /** Rows under the table, in layout units. */
@@ -60,13 +61,15 @@ const Worked: React.FC<{
       {val(1, <i>{VOCAB[j]}</i>)}
       <span style={{ gridRow: "1 / span 2", gridColumn: 2, width: 1.5, alignSelf: "stretch", background: HAIRLINE, margin: "0 6px" }} />
       {cap("tf", 3)}
-      {val(3, <Frac top={COUNTS[0][j]} bottom={LENGTHS[0]} />)}
-      {val(4, "×", INK_SOFT)}
+      {/* The product is a formula, so its figures and signs are in the
+          math face; the word it is for stays a word. */}
+      {val(3, <MathRun><Frac top={COUNTS[0][j]} bottom={LENGTHS[0]} /></MathRun>)}
+      {val(4, <MathRun>×</MathRun>, INK_SOFT)}
       {cap("idf", 5)}
-      {val(5, num(IDF[j]))}
-      {val(6, "=", INK_SOFT, r)}
+      {val(5, <MathRun>{num(IDF[j])}</MathRun>)}
+      {val(6, <MathRun>=</MathRun>, INK_SOFT, r)}
       {cap("tf-idf", 7, r)}
-      {val(7, num(TFIDF[0][j]), color, r)}
+      {val(7, <MathRun>{num(TFIDF[0][j])}</MathRun>, color, r)}
     </div>
   );
 };

@@ -98,7 +98,7 @@ export const OneManyScene: React.FC = () => {
         <Pulse x={customers.x + customers.width / 2} y={customers.top + customers.head / 2} at={whichAt} r={40} />
         <Pulse x={orders.x + orders.width / 2} y={orders.top + orders.head / 2} at={holdsAt} r={40} />
         <Tag at={whichAt + 4} x={midX} y={y(750)} italic size={24} align="center">
-          which side stores it?
+          Which side stores it?
         </Tag>
       </Drift>
     </AbsoluteFill>

@@ -216,7 +216,7 @@ export const QuantileScene: React.FC = () => {
             </span>
           </Ink>
           <Ink at={cutoffAt - 4} dur={14} style={{ left: PANEL_X, top: y(800), whiteSpace: "nowrap" }}>
-            <span style={{ ...body(30, true), color: INK }}>a cutoff, or a promise:</span>
+            <span style={{ ...body(30, true), color: INK }}>A cutoff, or a promise:</span>
           </Ink>
           <Ink at={promiseAt + 6} dur={14} style={{ left: PANEL_X, top: y(846), whiteSpace: "nowrap" }}>
             <span style={{ ...askNote(23) }}>95% within {fmt(QUANTILE.ppf, 0)} ms</span>

@@ -8,7 +8,7 @@ import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { NULL_P, TWENTY } from "./data";
-import { DATA, DOT, Head, Kicker, Label, pulse, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { DATA, DOT, Head, Kicker, Label, MathVar, pulse, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 /** The 5,000 null p-values, in twenty bins of 0.05. */
 const HX: XScale = { lo: 0, hi: 1, x0: 160, x1: 860 };
@@ -70,7 +70,11 @@ export const UniformScene: React.FC = () => {
       <Sfx name="el-tap" at={hackingAt - 4} level={-28} />
 
       <Kicker at={uniformFrom - 10}>Looking many times</Kicker>
-      <Head a="When nothing is real," b="p is a random number." at={uniformFrom - 6} bAt={randomAt - 4} out={hackingAt - 8} />
+      <Head a="When nothing is real," b={
+          <>
+            <MathVar>p</MathVar> is a random number.
+          </>
+        } at={uniformFrom - 6} bAt={randomAt - 4} out={hackingAt - 8} />
       <Head a="Keep the winner:" b="that's p-hacking." at={hackingAt - 4} bAt={hackingAt + 4} />
 
       {/* ── Fig. 8: 5,000 p-values from a world with no effect ── */}
@@ -198,7 +202,7 @@ export const UniformScene: React.FC = () => {
       {/* On the hit's own row, past the 0.05 line: no other dot shares it. */}
       <Note at={pointAt - 2} x={sx(TX, 0.05) + 24} y={y(T_ROW0 + HIT * T_DY) - 16}>
         <span style={{ ...note(24, STAT_INK), fontWeight: 500, ...halo, whiteSpace: "nowrap" }}>
-          p = {fmt(TWENTY.p[HIT], 3)}
+          <MathVar>p</MathVar> = {fmt(TWENTY.p[HIT], 3)}
           <span style={{ ...note(22, STAT_INK), fontWeight: 520, opacity: ease(frame, discoveryAt - 4, 12) }}>
             {" "}· reported as a discovery
           </span>

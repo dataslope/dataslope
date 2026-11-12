@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -46,7 +47,7 @@ const Cell: React.FC<{ x: number; y: number; at: number; lit?: number; dim?: num
           ...note(42, INK),
           fontWeight: bold ? 500 : 500,
           padding: "0 10px",
-          borderRadius: 6,
+          borderRadius: 4,
           background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, transparent)`,
         }}
       >
@@ -224,7 +225,7 @@ export const TableScene: React.FC = () => {
           y={fenceY - 50}
           width={(COL.total + CELL_W / 2 - COL.label + 48) * Math.min(1, fence * 1.2)}
           height={100}
-          rx={12}
+          rx={8}
           fill={`color-mix(in srgb, ${STAT} ${Math.round(fenceBold * 8)}%, transparent)`}
           stroke={STAT}
           strokeWidth={lerp(3, 5, fenceBold)}
@@ -237,10 +238,10 @@ export const TableScene: React.FC = () => {
       {/* ── Each rate, on its own row ── */}
       {chips.map((c) => (
         <Ink key={c.key} at={c.at - 8} dur={16} style={{ left: CHIP_X, top: y(c.rowY) - 24, opacity: c.key === "all" ? 1 - ease(frame, comparingAt - 4, 12) * 0.6 : 1, whiteSpace: "nowrap" }}>
-          {/* One line, one size: the rate is the line's own Inter, in the
-              accent and bold. */}
-          <span style={{ ...note(30, INK) }}>
-            P(churn{c.given ? <span style={{ color: INK_SOFT }}> | {c.given}</span> : null}) = {num(c.top)} /{" "}
+          {/* One line, one size, in the math face: the rate in the accent
+              and bold. */}
+          <MathRun style={{ fontSize: 32, color: INK }}>
+            <I>P</I>(churn{c.given ? <span style={{ color: INK_SOFT }}> | {c.given}</span> : null}) = {num(c.top)} /{" "}
             {c.key === "free" ? (
               <Sweep at={fractionAt} dur={14}>
                 {num(c.bottom)}
@@ -250,7 +251,7 @@ export const TableScene: React.FC = () => {
             )}{" "}
             ={" "}
             <span style={{ color: STAT_INK, fontWeight: 500 }}>{c.key === "all" ? pct(c.p) : <Sweep at={c.mark}>{pct(c.p)}</Sweep>}</span>
-          </span>
+          </MathRun>
         </Ink>
       ))}
       {/* After the first "|" it explains is on screen. */}

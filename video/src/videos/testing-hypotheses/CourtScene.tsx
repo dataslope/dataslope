@@ -7,7 +7,7 @@ import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GAVEL } from "./NullScene";
-import { H0, Head, Label, Mark, pulse, Spot, STAT_INK } from "./parts";
+import { Greek, H0, Head, Label, Mark, pulse, Spot, STAT_INK } from "./parts";
 
 const COURT_X = 540;
 const TEST_X = 1130;
@@ -62,7 +62,9 @@ export const CourtScene: React.FC = () => {
       court: "Beyond reasonable doubt",
       test: (
         <>
-          <Mark at={clearAt}>α, the bar</Mark>: usually <Mark at={fiveAt}>5%</Mark>
+          <Mark at={clearAt}>
+            <Greek>α</Greek>, the bar
+          </Mark>: usually <Mark at={fiveAt}>5%</Mark>
         </>
       ),
       at: beyondAt - 4,

@@ -420,7 +420,7 @@ export const Table: React.FC<{
               width: wFull - 10,
               height: hRow - 10,
               border: `3px solid ${m.color ?? NULL_RING}`,
-              borderRadius: 8,
+              borderRadius: 5,
               opacity: w * (1 - o) * s,
               transform: `scale(${1.12 - 0.12 * w})`,
             }}

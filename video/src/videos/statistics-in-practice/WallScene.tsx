@@ -213,7 +213,7 @@ export const WallScene: React.FC = () => {
         </Ink>
         {suggested > 0 ? (
           <Svg opacity={suggested}>
-            <rect x={THUMB_X[DAY_THUMB] - 12} y={y(THUMB_Y[0]) - 10} width={THUMB_W + 24} height={h(THUMB_H) + 20} rx={10} fill={STAT} opacity={0.14} />
+            <rect x={THUMB_X[DAY_THUMB] - 12} y={y(THUMB_Y[0]) - 10} width={THUMB_W + 24} height={h(THUMB_H) + 20} rx={5} fill={STAT} opacity={0.14} />
           </Svg>
         ) : null}
         <Ring x={FRI_X} y={y(THUMB_Y[0]) + h(THUMB_H) - 18} at={pickedAt} r0={16} r1={70} />
@@ -239,7 +239,7 @@ export const WallScene: React.FC = () => {
             y={y(SEALED.y0)}
             width={SEALED.x1 - SEALED.x0}
             height={y(SEALED.y1) - y(SEALED.y0)}
-            rx={12}
+            rx={8}
             fill="none"
             stroke={INK}
             strokeWidth={2}
@@ -254,7 +254,7 @@ export const WallScene: React.FC = () => {
       ) : null}
       <Check x={NOTE_X - 42} y={y(SEALED.y0 + 40)} at={onceAt - 4} />
       <Ink at={onceAt - 2} dur={14} style={{ left: NOTE_X, top: y(SEALED.y0 + 40) - 18, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK), fontWeight: 500 }}>tested once</span>
+        <span style={{ ...note(22, INK), fontWeight: 500 }}>Tested once</span>
       </Ink>
       <Ink at={nobodyAt - 4} dur={14} style={{ left: NOTE_X, top: y(SEALED.y0 + 90) - 6, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>on data nobody has seen</span>
@@ -285,7 +285,7 @@ export const WallScene: React.FC = () => {
       </Ink>
       {/* Below and right of the cross, whose lower arm ends at x 988, 60 px under the card's top. */}
       <Ink at={tiltedAt - 4} dur={14} style={{ left: 1004, top: y(CARD_TO.y) + 74, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(24, STAT_INK), fontWeight: 500 }}>tilted before it runs:</span>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 500 }}>Tilted before it runs:</span>
       </Ink>
       <div style={{ position: "absolute", left: 1004, top: y(CARD_TO.y) + 108, display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...note(22, STAT_INK) }}>
         <Ink at={luckFrom - 2} dur={14} style={{ position: "relative" }}>

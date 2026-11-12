@@ -116,7 +116,6 @@ export const RunsScene: React.FC = () => {
                     height: h(TILE),
                     boxSizing: "border-box",
                     background: tint(HUE[tok], 26),
-                    borderBottom: `4px solid ${HUE[tok]}`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -180,7 +179,6 @@ export const RunsScene: React.FC = () => {
                 height: h(FTILE),
                 boxSizing: "border-box",
                 background: tint(color, 24),
-                borderBottom: `4px solid ${color}`,
                 opacity: p,
               }}
             />

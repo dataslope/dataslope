@@ -69,7 +69,7 @@ export const CurseScene: React.FC = () => {
           <FigLabel n="16" title={`${fmt(CURSE.runs, 0)} estimates of one real effect`} at={curseFrom} x={160} y={y(290)} />
           <Ink at={fifteenAt - 4} dur={14} style={{ left: 160, top: y(290) + 40, whiteSpace: "nowrap" }}>
             <Label size={21} color={INK_SOFT} weight={520}>
-              true effect {CURSE.effect}, {CURSE.n} per group, the estimate from each run
+              True effect {CURSE.effect}, {CURSE.n} per group, the estimate from each run
             </Label>
           </Ink>
           <Axis scale={X} base={y(BASE)} ticks={[-1, -0.5, 0, 0.5, 1, 1.5, 2]} format={(v) => (v < 0 ? `−${-v}` : String(v))} at={curseFrom + 2} />

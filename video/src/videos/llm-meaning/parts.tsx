@@ -282,8 +282,16 @@ export const Spot: React.FC<{
 
 // ── Tokens and vectors ───────────────────────────────────────────────────────
 
-/** A token as a chip: its text in mono on a rounded box. A leading space is
- *  drawn as a faint dot, the way the tokenizer lessons show it. */
+/** The light ground of a filled shape in hue `c`: the house draws chips and
+ *  cells as fills with no outline, so the hue a figure used to stroke an
+ *  edge with now tints the fill (ink, the neutral case, a light gray). */
+export const tintOf = (c: string) =>
+  c === INK ? `color-mix(in srgb, ${ds("gray", 400)} 24%, ${PAPER})` : `color-mix(in srgb, ${c} 16%, ${PAPER})`;
+
+/** A token as a chip: its text in mono on a tinted ground, no outline. A
+ *  leading space is drawn as a faint dot, the way the tokenizer lessons show
+ *  it. `border` names the chip's hue (ink for a plain token), which tints its
+ *  ground when no `fill` is given. */
 export const TokenChip: React.FC<{
   text: string;
   size?: number;
@@ -302,10 +310,9 @@ export const TokenChip: React.FC<{
         fontSize: size,
         fontWeight: 500,
         color,
-        background: fill,
-        border: `2px solid ${border}`,
-        borderRadius: 10,
-        padding: "6px 14px 8px",
+        background: fill === PAPER ? tintOf(border) : fill,
+        borderRadius: 5,
+        padding: "8px 16px 10px",
         whiteSpace: "pre",
         lineHeight: 1.1,
         ...style,
@@ -339,8 +346,11 @@ export const VectorCells: React.FC<{
   highlightColor?: string;
 }> = ({ values, digits = 1, size = 24, cell, color = INK, border = DATA, fill = DATA_TINT, highlight, highlightColor = MARK }) => {
   const w = cell ?? Math.round(size * (digits + 2.4) * 0.8);
+  const ground = fill === PAPER ? tintOf(border) : fill;
   return (
-    <span style={{ display: "inline-flex", border: `2px solid ${border}`, borderRadius: 6, overflow: "hidden", background: fill }}>
+    // Cells are fills with no outline, parted by a sliver of paper; a cell
+    // that was outlined on paper takes a tint of its outline's hue.
+    <span style={{ display: "inline-flex", gap: 2, borderRadius: 4, overflow: "hidden" }}>
       {values.map((v, i) => {
         const h = highlight?.[i] ?? 0;
         return (
@@ -354,8 +364,7 @@ export const VectorCells: React.FC<{
               fontSize: size,
               fontWeight: 500,
               color,
-              borderLeft: i ? `1px solid color-mix(in srgb, ${border} 45%, transparent)` : undefined,
-              background: h > 0 ? `color-mix(in srgb, ${highlightColor} ${Math.round(h * 100)}%, transparent)` : undefined,
+              background: h > 0 ? `color-mix(in srgb, ${highlightColor} ${Math.round(h * 100)}%, ${ground})` : ground,
               ...TABULAR,
             }}
           >
@@ -385,7 +394,7 @@ export const Say: React.FC<{ children: React.ReactNode; size?: number; color?: s
 
 /** Text in the mono face, inside running text, at the text's own size. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight = 500 }) => (
-  <span style={{ fontFamily: MONO, fontWeight: weight, color, fontVariantLigatures: "none" }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: weight, color, fontVariantLigatures: "none" }}>{children}</span>
 );
 
 /** Fades its children in on `at` (and out on `out`), sliding up a little. */

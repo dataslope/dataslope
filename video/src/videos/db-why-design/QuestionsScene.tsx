@@ -39,11 +39,11 @@ export const QuestionsScene: React.FC = () => {
   const end = n.beat("library").from;
 
   const ROWS = [
-    { q: "Which things become tables?", decides: "tables", sql: "CREATE TABLE", at: n.word("questions", "things"), key: n.word("questions", "tables", { nth: 1 }) },
-    { q: "Which facts become columns?", decides: "columns", sql: "email text", at: n.word("questions", "facts"), key: n.word("questions", "columns") },
+    { q: "Which things become tables?", decides: "Tables", sql: "CREATE TABLE", at: n.word("questions", "things"), key: n.word("questions", "tables", { nth: 1 }) },
+    { q: "Which facts become columns?", decides: "Columns", sql: "email text", at: n.word("questions", "facts"), key: n.word("questions", "columns") },
     {
       q: "Which rows need an identity?",
-      decides: "keys",
+      decides: "Keys",
       badge: "PK",
       sql: "PRIMARY KEY",
       at: n.word("questions", "rows"),
@@ -51,7 +51,7 @@ export const QuestionsScene: React.FC = () => {
     },
     {
       q: "Which tables point to which?",
-      decides: "relationships",
+      decides: "Relationships",
       badge: "FK",
       sql: "REFERENCES",
       at: n.word("questions", "tables", { nth: 2 }),
@@ -59,7 +59,7 @@ export const QuestionsScene: React.FC = () => {
     },
     {
       q: "Which values must be present, unique, or limited?",
-      decides: "constraints",
+      decides: "Constraints",
       sql: "NOT NULL, UNIQUE, CHECK",
       at: n.word("questions", "values"),
       key: n.word("questions", "limited"),

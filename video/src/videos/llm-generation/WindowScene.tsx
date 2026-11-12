@@ -180,7 +180,6 @@ export const WindowScene: React.FC = () => {
               height: th,
               boxSizing: "border-box",
               background: tint(TURN, 24),
-              borderBottom: `4px solid ${TURN}`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

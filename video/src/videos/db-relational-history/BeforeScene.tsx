@@ -237,7 +237,7 @@ export const BeforeScene: React.FC = () => {
       ))}
       <Ink at={everyAt} dur={12} style={{ left: 126, top: y(444 + 4 * 58), whiteSpace: "nowrap" }}>
         <span style={{ ...note(21, ACCENT_INK), fontWeight: 500 }}>
-          child 1 is now {last.name}
+          Child 1 is now {last.name}
         </span>
       </Ink>
 

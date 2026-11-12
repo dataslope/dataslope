@@ -10,9 +10,9 @@ import { Drift, Fade, Spot } from "./parts";
 
 /** The rules the unit built, as the lessons' path of normal forms names them. */
 const FORMS = [
-  { name: "1NF", gist: "one value per cell" },
-  { name: "2NF", gist: "the whole key" },
-  { name: "3NF", gist: "nothing but the key" },
+  { name: "1NF", gist: "One value per cell" },
+  { name: "2NF", gist: "The whole key" },
+  { name: "3NF", gist: "Nothing but the key" },
 ] as const;
 
 /**

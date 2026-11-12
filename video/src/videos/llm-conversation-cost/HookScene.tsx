@@ -89,9 +89,8 @@ export const HookScene: React.FC = () => {
                     width: TILE,
                     height: h(ROW_H),
                     borderRadius: 3,
-                    boxSizing: "border-box",
-                    border: `2px solid ${LINE_EDGE}`,
-                    background: PAPER,
+                    // A message is a gray fill, no outline.
+                    background: `color-mix(in srgb, ${LINE_EDGE} 30%, ${PAPER})`,
                     opacity: p,
                   }}
                 />
@@ -106,17 +105,14 @@ export const HookScene: React.FC = () => {
       })}
 
       {/* Twice the turns; three times the bill. */}
-      <Note at={twiceAt + 4} x={TILE_X} y={y(790)}>
-        <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
-          <span style={{ ...headline(56), ...TABULAR }}>×2</span>
-          <span style={note(24, INK_SOFT)}>the turns</span>
-        </span>
+      {/* Each hero number on a line of its own, its label on the line above. */}
+      <Note at={twiceAt + 4} x={TILE_X} y={y(770)}>
+        <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The turns</div>
+        <div style={{ ...headline(56), ...TABULAR, marginTop: 6 }}>×2</div>
       </Note>
-      <Note at={triplesAt - 2} x={BILL_X} y={y(790)}>
-        <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
-          <span style={{ ...headline(56), color: POINT_INK, ...TABULAR }}>{times(doubling.times)}</span>
-          <span style={note(24, INK_SOFT)}>the bill</span>
-        </span>
+      <Note at={triplesAt - 2} x={BILL_X} y={y(770)}>
+        <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The bill</div>
+        <div style={{ ...headline(56), color: POINT_INK, ...TABULAR, marginTop: 6 }}>{times(doubling.times)}</div>
       </Note>
 
       {/* Where a doubled bill would stop, and the part past it. */}

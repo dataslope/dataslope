@@ -118,7 +118,7 @@ export const FreshScene: React.FC = () => {
 
       {/* One chat of forty turns. */}
       <Note at={longAt - 4} x={CHART.x0} y={y(BASES[0] - 220)}>
-        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>one chat of forty turns</span>
+        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>One chat of forty turns</span>
       </Note>
       <Svg opacity={ease(frame, from - 2, 12)}>
         <line x1={CHART.x0 - 12} x2={right + 10} y1={long.base + 0.5} y2={long.base + 0.5} stroke={INK} strokeWidth={1.6} />
@@ -156,7 +156,7 @@ export const FreshScene: React.FC = () => {
 
       {/* Eight chats of five turns, each starting over. */}
       <Note at={eightAt - 4} x={CHART.x0} y={y(BASES[1] - 110)}>
-        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>eight chats of five turns each</span>
+        <span style={{ ...label(24, INK), whiteSpace: "nowrap" }}>Eight chats of five turns each</span>
       </Note>
       <Stairs
         geo={short}
@@ -191,10 +191,10 @@ export const FreshScene: React.FC = () => {
 
       {/* The bills: a column without a cache, then one with it. */}
       <Note at={withoutAt - 2} x={COLS[0]} y={long.base - 112}>
-        <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>no cache</span>
+        <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>No cache</span>
       </Note>
       <Note at={withAt - 2} x={COLS[1]} y={long.base - 112}>
-        <span style={{ ...label(22, CACHED_INK), whiteSpace: "nowrap" }}>with the cache</span>
+        <span style={{ ...label(22, CACHED_INK), whiteSpace: "nowrap" }}>With the cache</span>
       </Note>
       {bill(FRESH.one, dollarAt - 4, false, long.base, 0)}
       {bill(FRESH.eight, fortyTwoAt - 4, false, short.base, 0)}
@@ -203,7 +203,7 @@ export const FreshScene: React.FC = () => {
       {/* With the gap nearly closed, what is left is the other half of the
           lesson's "a cost decision as well as an accuracy one". */}
       <Note at={accuracyAt - 2} x={COLS[0]} y={long.base + 40} width={360}>
-        <span style={{ display: "block", ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the bigger reason left:</span>
+        <span style={{ display: "block", ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>The bigger reason left:</span>
         <span style={{ display: "block", ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>accuracy</span>
       </Note>
 

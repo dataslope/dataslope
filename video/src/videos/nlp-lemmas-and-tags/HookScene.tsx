@@ -48,22 +48,19 @@ const Call: React.FC<{
   const hl = (k: number): React.CSSProperties =>
     k > 0 ? { background: `color-mix(in srgb, ${HIGHLIGHT} ${(k * 100).toFixed(0)}%, transparent)`, borderRadius: 4 } : {};
   const ghost = GHOST.split(`"${DEFAULT_POS}"`);
+  // The default argument types itself in, a character at a time, so no
+  // glyph is ever half hidden under the closing parenthesis.
+  const typed = Math.round(g * GHOST.length);
+  const lead = GHOST.slice(0, Math.min(typed, ghost[0].length));
+  const quoted = GHOST.slice(ghost[0].length, typed);
   return (
     <Ink at={at} dur={16} style={{ left: X0, top: y, whiteSpace: "pre" }}>
       <div style={{ fontFamily: MONO, fontSize: SIZE, fontWeight: 500, lineHeight: 1.3, color: INK, fontVariantLigatures: "none", display: "flex" }}>
         <span>lemmatize(</span>
         <span style={hl(wm)}>&quot;{word}&quot;</span>
-        <span
-          style={{
-            display: "inline-block",
-            overflow: "hidden",
-            width: GHOST.length * ADV * g,
-            opacity: g,
-            color: INK_SOFT,
-          }}
-        >
-          {ghost[0]}
-          <span style={hl(nm)}>&quot;{DEFAULT_POS}&quot;</span>
+        <span style={{ display: "inline-block", whiteSpace: "pre", color: INK_SOFT }}>
+          {lead}
+          {quoted ? <span style={hl(nm)}>{quoted}</span> : null}
         </span>
         <span>)</span>
       </div>
@@ -143,7 +140,7 @@ export const HookScene: React.FC = () => {
               ]}
               nMark={{ at: nounAt, out: oneWordAt - 4 }}
             />
-            <Arrow from={[ARROW_X, mid]} to={[RESULT_X - 18, mid]} at={resultAt[i] - 6} dur={10} />
+            <Arrow from={[ARROW_X, mid]} to={[RESULT_X - 2, mid]} at={resultAt[i] - 6} dur={10} />
             <Chip
               text={d.lemma}
               x={RESULT_X}
@@ -180,7 +177,7 @@ export const HookScene: React.FC = () => {
       </Tag>
       <Ink at={oneWordAt} dur={14} out={raceAt - 10} style={{ left: RIGHT_X, top: phraseTop + 6, whiteSpace: "nowrap" }}>
         <span style={label(26, INK_SOFT)}>
-          one word at a time, <Fade at={sentenceAt - 2}>never the sentence</Fade>
+          One word at a time, <Fade at={sentenceAt - 2}>never the sentence</Fade>
         </span>
       </Ink>
 

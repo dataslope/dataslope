@@ -7,8 +7,9 @@ import { Badge, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
+import { MathRun } from "../../editorial/math";
 import { IDF } from "./data";
-import { DATA, DATA_INK, Headline, Kicker, Mark, pulse } from "./parts";
+import { CHIP_FILL, DATA, DATA_INK, Headline, Kicker, Mark, pulse } from "./parts";
 
 /** mulberry32, for which documents hold each word: layout only, seeded. */
 function mulberry32(seed: number) {
@@ -124,7 +125,7 @@ export const IdfScene: React.FC = () => {
       <>
         <Ink at={at - 4} style={{ left: RX, top, whiteSpace: "nowrap" }}>
           <div style={{ ...label(27, INK) }}>
-            a match on <span style={{ color: inkColor }}>{name}</span>
+            A match on <span style={{ color: inkColor }}>{name}</span>
           </div>
         </Ink>
         <Ink at={docsAt} style={{ left: RX, top: top + R.docs, whiteSpace: "nowrap" }}>
@@ -142,7 +143,10 @@ export const IdfScene: React.FC = () => {
         </Ink>
         <Ink at={weightAt + 12} style={{ left: BAR_X, top: top + R.formula, whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, INK_SOFT) }}>
-            her weight, about log<sub style={{ fontSize: "0.7em" }}>2</sub>({IDF.N} ÷ {ex.docs}) + 1 ={" "}
+            her weight, about{" "}
+            <MathRun>
+              log<sub style={{ fontSize: "0.7em" }}>2</sub>({IDF.N} ÷ {ex.docs}) + 1 =
+            </MathRun>{" "}
             <span style={TABULAR}>{fmt(ex.log2, 2)}</span>
           </span>
         </Ink>
@@ -209,7 +213,8 @@ export const IdfScene: React.FC = () => {
                 opacity={p}
                 transform={`translate(${x} ${top + (1 - p) * 8 - wave(c, r) * 6})`}
               >
-                <rect width={DW} height={DH} rx={3} fill={PAPER} stroke={ds("gray", 400)} strokeWidth={1.4} />
+                {/* A document: a gray sheet with no outline. */}
+                <rect width={DW} height={DH} rx={3} fill={CHIP_FILL} />
                 {fill !== PAPER ? <rect width={DW} height={DH} rx={3} fill={fill} opacity={fillOpacity} /> : null}
                 {[9, 16, 23].map((ly) => (
                   <line key={ly} x1={6} x2={DW - 6} y1={ly} y2={ly} stroke={tr > 0 ? PAPER : ds("gray", 300)} strokeWidth={1.4} />
@@ -229,7 +234,7 @@ export const IdfScene: React.FC = () => {
           {/* The two words as house badges, in the gray and the blue the
               rows and the grid below give them. */}
           <div style={{ display: "flex", alignItems: "baseline", gap: 14, ...label(23, INK_SOFT) }}>
-            a search for
+            A search for
             <Badge tone="gray" size={23}>
               a common word
             </Badge>
@@ -268,7 +273,7 @@ export const IdfScene: React.FC = () => {
           threeAt - 2,
         )}
         <Ink at={muchAt} out={fewerAt - 6} style={{ left: RX, top: CLOSE_Y, whiteSpace: "nowrap" }}>
-          <div style={{ ...headline(36, true), color: INK }}>one match, one point, either way</div>
+          <div style={{ ...headline(36, true), color: INK }}>One match, one point, either way</div>
         </Ink>
       </div>
       <div style={{ position: "absolute", left: RX, top: CLOSE_Y, display: "flex", gap: "0.3em", ...headline(36, true), whiteSpace: "nowrap" }}>

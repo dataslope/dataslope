@@ -2,12 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { body, fmt, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TINY } from "./data";
-import { curvePath, DATA, DATA_INK, H0, Head, Label, Mark, MARK, phi, pulse, RAW, STAT, STAT_INK, Strike, Svg } from "./parts";
+import { curvePath, DATA, DATA_INK, H0, Head, Label, MARK, Mark, MathVar, phi, pulse, RAW, STAT, STAT_INK, Strike, Svg } from "./parts";
 
 const LEFT = 160;
 const TABLE_X = 1010;
@@ -29,8 +30,10 @@ const COND_STEP = 136;
 
 /** A conditional probability set the way the lesson writes it. */
 const Cond: React.FC<{ a: React.ReactNode; b: React.ReactNode; color: string }> = ({ a, b, color }) => (
-  <span style={{ ...body(44, true), color, whiteSpace: "nowrap" }}>
-    P( {a} <span style={{ color: INK_SOFT }}>|</span> {b} )
+  <span style={{ ...body(44), color, whiteSpace: "nowrap" }}>
+    <MathRun>
+      <I>P</I>({a} <span style={{ color: INK_SOFT }}>|</span> {b})
+    </MathRun>
   </span>
 );
 
@@ -102,9 +105,11 @@ export const IsntScene: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, opacity: dim }}>
         {/* ── Not the chance the null is true ── */}
         <Ink at={notAt - 2} dur={16} style={{ left: LEFT, top: y(310), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(44, true), color: ease(frame, trueAt + 4, 10) > 0.5 ? INK_SOFT : INK }}>
+          <span style={{ ...body(44), color: ease(frame, trueAt + 4, 10) > 0.5 ? INK_SOFT : INK }}>
             <Strike at={trueAt + 4}>
-              P( <H0 /> is true )
+              <MathRun>
+                <I>P</I>(<H0 bare /> is true)
+              </MathRun>
             </Strike>
           </span>
         </Ink>
@@ -119,7 +124,7 @@ export const IsntScene: React.FC = () => {
             22px Inter gloss on the line of a 44px serif formula read as one
             line in two sizes and two faces. */}
         <Ink at={dataAt - 4} dur={16} style={{ left: LEFT, top: y(530), whiteSpace: "nowrap" }}>
-          <Cond a="data" b={<H0 />} color={DATA_INK} />
+          <Cond a="data" b={<H0 bare />} color={DATA_INK} />
           <div style={{ ...label(22, DATA_INK), marginTop: GLOSS_DY, opacity: ease(frame, givenAt, 12) }}>the p-value</div>
         </Ink>
         <Ink
@@ -127,7 +132,7 @@ export const IsntScene: React.FC = () => {
           dur={16}
           style={{ left: LEFT, top: y(530) + COND_STEP, whiteSpace: "nowrap", transform: `translateX(${Math.sin(shake * Math.PI * 3) * 6}px)` }}
         >
-          <Cond a={<H0 />} b="data" color={INK} />
+          <Cond a={<H0 bare />} b="data" color={INK} />
           <div style={{ ...label(22, INK_SOFT), marginTop: GLOSS_DY, opacity: ease(frame, givenDataAt, 12) }}>not the p-value</div>
         </Ink>
         <Ink at={fallacyAt - 4} dur={18} style={{ left: LEFT, top: y(530) + 2 * COND_STEP, whiteSpace: "nowrap" }}>
@@ -162,8 +167,10 @@ export const IsntScene: React.FC = () => {
               />
             </Svg>
             <Note at={dataAt + 2} x={TABLE_X + 780} y={y(NW.base) - 96} align="right">
-              <span style={{ ...body(30, true), color: DATA_INK, whiteSpace: "nowrap" }}>
-                P( data <span style={{ color: INK_SOFT }}>|</span> <H0 /> )
+              <span style={{ ...body(30), color: DATA_INK, whiteSpace: "nowrap" }}>
+                <MathRun>
+                  <I>P</I>(data <span style={{ color: INK_SOFT }}>|</span> <H0 bare />)
+                </MathRun>
               </span>
             </Note>
             <Note at={givenAt + 4} x={TABLE_X + 780} y={y(NW.base) + 14} align="right">
@@ -205,7 +212,7 @@ export const IsntScene: React.FC = () => {
                 width: c.w,
                 height: (y(ROW_Y0 + 5 * ROW_DY) - y(ROW_Y0)) * p,
                 background: MARK,
-                borderRadius: 8,
+                borderRadius: 4,
                 opacity: 0.6,
               }}
             />
@@ -263,7 +270,7 @@ export const IsntScene: React.FC = () => {
         {/* The legend arrives with the first bar. */}
         <Ink at={rowAt[0] + 4} dur={14} style={{ left: BAR_X, top: y(ROW_Y0 + 5 * ROW_DY) - 4, whiteSpace: "nowrap" }}>
           <Label size={21} color={INK_SOFT} weight={520}>
-            bar: p from 0 to 1
+            Bar: <MathVar>p</MathVar> from 0 to 1
           </Label>
         </Ink>
       </div>

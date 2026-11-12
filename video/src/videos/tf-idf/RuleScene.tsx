@@ -7,6 +7,7 @@ import { headline, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { ILLUSTRATIONS, VIDEO } from "./data";
+import { MathRun } from "../../editorial/math";
 import { Frac, V } from "./parts";
 
 /** Rule: what counts reward, and what TF-IDF rewards instead. */
@@ -32,24 +33,28 @@ export const RuleScene: React.FC = () => {
       </Ink>
       <Ink at={tfidfAt + 10} dur={20} style={{ left: 120, top: y(590) }}>
         <div style={{ ...label(21, INK_SOFT), marginBottom: 14 }}>The lesson&apos;s formula</div>
-        <div style={{ display: "flex", alignItems: "center", ...headline(44), whiteSpace: "nowrap" }}>
-          <span>
-            <V>tf-idf</V>(<V>w</V>, <V>d</V>)
-          </span>
-          <span style={{ margin: "0 0.3em" }}>=</span>
-          <span>
-            <V>tf</V>(<V>w</V>, <V>d</V>)
-          </span>
-          <span style={{ margin: "0 0.3em" }}>×</span>
-          <span style={{ marginRight: "0.12em" }}>ln</span>
-          <Frac
-            top={<V>N</V>}
-            bottom={
-              <>
-                <V>df</V>(<V>w</V>)
-              </>
-            }
-          />
+        {/* In the math face: tf, idf and df are names, upright; w, d and N
+            are variables, in italic. */}
+        <div style={{ ...headline(44), whiteSpace: "nowrap" }}>
+          <MathRun style={{ display: "flex", alignItems: "center" }}>
+            <span>
+              tf-idf(<V>w</V>, <V>d</V>)
+            </span>
+            <span style={{ margin: "0 0.3em" }}>=</span>
+            <span>
+              tf(<V>w</V>, <V>d</V>)
+            </span>
+            <span style={{ margin: "0 0.3em" }}>×</span>
+            <span style={{ marginRight: "0.12em" }}>ln</span>
+            <Frac
+              top={<V>N</V>}
+              bottom={
+                <>
+                  df(<V>w</V>)
+                </>
+              }
+            />
+          </MathRun>
         </div>
       </Ink>
       {ILLUSTRATIONS ? (

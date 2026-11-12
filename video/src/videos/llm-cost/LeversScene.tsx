@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, INK, INK_SOFT, note, PAPER, TABULAR } from "../../editorial/style";
-import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
+import { badgeStyle, FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -48,6 +48,24 @@ const F9_MAX = 460;
  * are said as the list builds. "Passes" is marked where it is said twice,
  * and the bridge to Unit 5 picks it up.
  */
+/** A lever's number on a tinted disc, no ring: the house badge as a disc,
+ *  its numeral in the list's serif at 29px, within 12% of the 32px line. */
+const stepDisc = (tone: "red" | "gray"): React.CSSProperties => ({
+  ...badgeStyle(tone, 29),
+  ...body(29),
+  color: tone === "red" ? POINT_INK : INK_SOFT,
+  fontWeight: 500,
+  width: 44,
+  height: 44,
+  padding: 0,
+  borderRadius: 22,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flex: "none",
+  ...TABULAR,
+});
+
 export const LeversScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
@@ -171,11 +189,11 @@ export const LeversScene: React.FC = () => {
             />
             {/* The numerals are set in the list's own face, so each line is one
                 size and one family. */}
-            <div style={{ position: "absolute", left: X0, top: ry, opacity: slot * 0.25 * (1 - ease(frame, at - 6, 8)) }}>
-              <span style={{ ...body(32), color: INK_SOFT, fontWeight: 500 }}>{i + 1}</span>
+            <div style={{ position: "absolute", left: X0, top: ry - 1, opacity: slot * 0.5 * (1 - ease(frame, at - 6, 8)) }}>
+              <span style={stepDisc("gray")}>{i + 1}</span>
             </div>
-            <Ink at={at - 6} dur={14} style={{ left: X0, top: ry, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 24 }}>
-              <span style={{ ...body(32), color: POINT_INK, fontWeight: 500, width: 34 }}>{i + 1}</span>
+            <Ink at={at - 6} dur={14} style={{ left: X0, top: ry - 1, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 14 }}>
+              <span style={stepDisc("red")}>{i + 1}</span>
               <span style={{ ...body(32), color: INK }}>{text}</span>
             </Ink>
           </React.Fragment>
@@ -293,7 +311,7 @@ export const LeversScene: React.FC = () => {
         {/* Still resent in full: the provider recognises the prefix and reads it back. */}
         <Note at={resendAt - 4} x={RX} y={y(F13_Y + 168)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            every turn still sent in full
+            Every turn still sent in full
             <span style={{ opacity: ease(frame, readsAt - 6, 12), color: CACHED_INK }}>, the prefix read back</span>
           </span>
         </Note>
@@ -377,6 +395,9 @@ const NEEDED = [3, 4, 9];
  * card swells on "every turn", the three needed light up while the rest fall
  * back, and move to a card of their own, labelled as retrieval.
  */
+/** A page of the document: light gray, no outline. */
+const PAGE = `color-mix(in srgb, ${ds("gray", 400)} 16%, ${PAPER})`;
+
 const RetrievalFig: React.FC<{
   at: number;
   documentAt: number;
@@ -413,9 +434,9 @@ const RetrievalFig: React.FC<{
           width: cardW,
           height: cardH,
           boxSizing: "border-box",
-          borderRadius: 8,
-          border: `2px solid color-mix(in srgb, ${INK} 45%, transparent)`,
-          background: PAPER,
+          borderRadius: 5,
+          // A page is a fill, no outline.
+          background: PAGE,
           opacity: ease(frame, documentAt - 6, 10),
           transform: `scale(${1 + swell * 0.03})`,
           transformOrigin: "50% 50%",
@@ -449,8 +470,8 @@ const RetrievalFig: React.FC<{
       </Note>
       {/* The three it needs, on a card of their own. */}
       <Arrow
-        from={[x + cardW + 14, smallTop + smallH / 2]}
-        to={[smallX - 14, smallTop + smallH / 2]}
+        from={[x + cardW + 1, smallTop + smallH / 2]}
+        to={[smallX - 2, smallTop + smallH / 2]}
         at={threeAt + 6}
         dur={12}
         color={INK}
@@ -464,9 +485,8 @@ const RetrievalFig: React.FC<{
           width: smallW,
           height: smallH,
           boxSizing: "border-box",
-          borderRadius: 8,
-          border: `2px solid ${POINT}`,
-          background: PAPER,
+          borderRadius: 5,
+          background: PAGE,
           opacity: moved,
         }}
       />

@@ -185,7 +185,7 @@ export const RowsScene: React.FC = () => {
           <div style={{ ...note(24, INK), fontWeight: 500 }}>how many orders?</div>
         </Ink>
         <Ink at={zeroAt} dur={14} style={{ left: b[0] - 324, top: noteY + 72, width: 300, textAlign: "right", whiteSpace: "nowrap" }}>
-          <span style={{ ...label(26, ACCENT_INK) }}>zero, one or many</span>
+          <span style={{ ...label(26, ACCENT_INK) }}>Zero, one or many</span>
         </Ink>
         {/* One order: how many customers? Asked at the customers end. */}
         <Ink at={oneOrderAt - 4} dur={14} style={{ left: a[0] + 24, top: noteY, width: 300, whiteSpace: "nowrap" }}>
@@ -193,12 +193,12 @@ export const RowsScene: React.FC = () => {
           <div style={{ ...note(24, INK), fontWeight: 500 }}>how many customers?</div>
         </Ink>
         <Ink at={exactlyAt} dur={14} style={{ left: a[0] + 24, top: noteY + 72, width: 300, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(26, ACCENT_INK) }}>exactly one</span>
+          <span style={{ ...label(26, ACCENT_INK) }}>Exactly one</span>
         </Ink>
 
         {/* ── Zoom in: the rows under the line ── */}
-        <Leader points={[[cust.x + cust.width / 2, cust.bottom + 14], [cg.x + cg.width / 2, y(CAPTION_Y) - 10]]} at={zoomAt} dur={18} dot={false} color={INK_SOFT} width={1.4} />
-        <Leader points={[[ord.x + ord.width / 2, ord.bottom + 14], [og.x + og.width / 2, y(CAPTION_Y) - 10]]} at={zoomAt + 4} dur={18} dot={false} color={INK_SOFT} width={1.4} />
+        <Leader points={[[cust.x + cust.width / 2, cust.bottom], [cg.x + cg.width / 2, y(CAPTION_Y) - 10]]} at={zoomAt} dur={18} dot={false} color={INK_SOFT} width={1.4} />
+        <Leader points={[[ord.x + ord.width / 2, ord.bottom], [og.x + og.width / 2, y(CAPTION_Y) - 10]]} at={zoomAt + 4} dur={18} dot={false} color={INK_SOFT} width={1.4} />
         <AbsoluteFill style={{ opacity: rowsOp }}>
           <Ink at={rowsAt - 2} dur={14} style={{ left: cg.x, top: y(CAPTION_Y) }}>
             <span style={label(24, INK)}>

@@ -2,16 +2,18 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { HAIRLINE, INK, PAPER, TABULAR } from "../../editorial/style";
+import { HAIRLINE, INK, TABULAR } from "../../editorial/style";
 import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA, pct } from "./data";
-import { DATA_INK, EMPTY, Headline, Mark, POINT, POINT_INK, Spot, Strike, Tag } from "./kit";
+import { DATA_INK, DATA_WASH, Headline, Mark, POINT, POINT_INK, Spot, Strike, Tag } from "./kit";
 
 /** The top hundred as a 10 by 10 grid of word chips, in rank order. */
 const GX = 96;
+/** A plain chip: the gray badge's tint. */
+const CHIP_GRAY = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
 const CHIP_W = 126;
 const CHIP_H = 38;
 const COL = CHIP_W + 6;
@@ -79,10 +81,10 @@ export const WhyScene: React.FC = () => {
               width: CHIP_W,
               height: CHIP_H,
               boxSizing: "border-box",
-              borderRadius: 6,
-              border: `1px solid ${HAIRLINE}`,
-              background: kept > 0 ? `color-mix(in srgb, ${EMPTY} ${100 - 60 * kept}%, ${PAPER})` : EMPTY,
-              boxShadow: kept > 0 ? `inset 0 0 0 ${2 * kept}px color-mix(in srgb, ${DATA_INK} 70%, transparent)` : undefined,
+              borderRadius: 4,
+              // Fill only: gray for every word, a blue tint for the book's
+              // own words once the stopwords are struck (no ring).
+              background: kept > 0 ? `color-mix(in srgb, ${DATA_WASH} ${(100 * kept).toFixed(0)}%, ${CHIP_GRAY})` : CHIP_GRAY,
               opacity: p * (1 - 0.55 * struck),
               display: "flex",
               alignItems: "center",
@@ -98,7 +100,7 @@ export const WhyScene: React.FC = () => {
         );
       })}
       <Tag x={GX} y={gridBottom + 18} at={fillAt} size={21} color={INK} weight={500}>
-        these 100 are <span style={TABULAR}>{pct(EMMA.top100Share)}</span> of the book
+        These 100 are <span style={TABULAR}>{pct(EMMA.top100Share)}</span> of the book
         <span style={{ opacity: ease(frame, seventyAt, 12), color: POINT_INK }}>
           {" "}
           · <span style={TABULAR}>{EMMA.top100Stop}</span> are on <Mark at={listAt}>NLTK&apos;s stopword list</Mark>
@@ -108,7 +110,7 @@ export const WhyScene: React.FC = () => {
       {/* ── Stopwords and IDF ── */}
       <Spot id="nlp-zipfs-law-sieve" at={stopwordsAt - 2} left={SPOT_X} top={y(340)} width={SPOT} height={SPOT} />
       <Tag x={SPOT_X + SPOT / 2} y={y(340) + SPOT + 8} at={stopwordsAt + 2} align="center" size={22} color={INK} weight={500}>
-        drop the <Mark at={leastAt}>stopwords</Mark>
+        Drop the <Mark at={leastAt}>stopwords</Mark>
       </Tag>
       <Spot id="nlp-zipfs-law-balance" at={idfAt - 2} left={SPOT_X} top={y(640)} width={SPOT} height={SPOT} />
       <Tag x={SPOT_X + SPOT / 2} y={y(640) + SPOT + 8} at={idfAt + 2} align="center" size={22} color={INK} weight={500} style={{ textAlign: "center" }}>

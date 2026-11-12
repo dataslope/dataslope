@@ -185,14 +185,15 @@ export const CodeScene: React.FC = () => {
         <span style={note(20, INK_SOFT)}>timeit, best of 30 runs, CPython 3.13</span>
       </Note>
 
-      {/* The ratio, on one line: the number, then what it means. */}
-      <div style={{ position: "absolute", left: LIST_X, top: y(742), display: "flex", flexDirection: "column", gap: 18 }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: "0.5em", whiteSpace: "nowrap", fontSize: 34 }}>
-          <Ink at={timesAt - 4} dur={18} style={{ position: "relative" }}>
-            <span style={{ ...headline(116), fontVariantNumeric: "tabular-nums lining-nums" }}>
-              {ratio.toLocaleString("en-US")}×
-            </span>
-          </Ink>
+      {/* The ratio on a line of its own, then what it means: a hero number
+          stays large only on its own line. */}
+      <div style={{ position: "absolute", left: LIST_X, top: y(704), display: "flex", flexDirection: "column", gap: 4 }}>
+        <Ink at={timesAt - 4} dur={18} style={{ position: "relative" }}>
+          <span style={{ ...headline(116), fontVariantNumeric: "tabular-nums lining-nums" }}>
+            {ratio.toLocaleString("en-US")}×
+          </span>
+        </Ink>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "0.3em", whiteSpace: "nowrap", fontSize: 40 }}>
           <Ink at={fasterAt - 2} dur={16} style={{ position: "relative" }}>
             <span style={{ ...body(40, true), color: SET_INK }}>faster,</span>
           </Ink>
@@ -200,7 +201,7 @@ export const CodeScene: React.FC = () => {
             <span style={{ ...body(40, true) }}>for the same answer.</span>
           </Ink>
         </div>
-        <Ink at={timesAt + 8} dur={14} style={{ position: "relative" }}>
+        <Ink at={timesAt + 8} dur={14} style={{ position: "relative", marginTop: 18 }}>
           <span style={note(21, INK_SOFT)}>
             {fmt(MILLION.listMs)} ms ÷ {fmt(MILLION.setNs, 1)} ns, rounded to the nearest thousand
           </span>

@@ -135,7 +135,7 @@ export const ErasureScene: React.FC = () => {
         erase={strikeAt}
       />
 
-      <Arrow points={[[LEFT + TS_W + 22, arrowY], [JS_X - 22, arrowY]]} at={compilerAt - 2} dur={12} />
+      <Arrow points={[[LEFT + TS_W, arrowY], [JS_X - 2, arrowY]]} at={compilerAt - 2} dur={12} />
       <Ink at={compilerAt} dur={12} style={{ left: LEFT + TS_W + 22, width: JS_X - LEFT - TS_W - 44, top: arrowY - 48, textAlign: "center" }}>
         <span style={{ fontSize: 26, color: INK_SOFT }}>
           <Mono weight={500}>tsc</Mono>

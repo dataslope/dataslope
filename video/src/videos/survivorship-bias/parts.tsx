@@ -90,9 +90,14 @@ export const Plane: React.FC<{
   );
 };
 
-/** A small key swatch, sized to the text it sits in. */
+/** A part's share of the plane: a plain gray bar, fill only (the owner,
+ *  2026-11-11: no outlines round filled shapes). */
+export const AREA_FILL = ds("gray", 300);
+
+/** A small key swatch, sized to the text it sits in. Only "closed" keeps an
+ *  outline, a dashed one: there the outline is the meaning (deleted). */
 export const Swatch: React.FC<{ kind: "area" | "holes" | "closed" | "open" }> = ({ kind }) => {
-  const outline = kind === "area" || kind === "closed";
+  const closed = kind === "closed";
   return (
     <span
       style={{
@@ -100,8 +105,8 @@ export const Swatch: React.FC<{ kind: "area" | "holes" | "closed" | "open" }> = 
         width: "1.1em",
         height: "0.8em",
         boxSizing: "border-box",
-        background: outline ? "transparent" : BAR,
-        border: outline ? `1.6px ${kind === "closed" ? "dashed" : "solid"} ${INK_SOFT}` : undefined,
+        background: closed ? "transparent" : kind === "area" ? AREA_FILL : BAR,
+        border: closed ? `1.6px dashed ${INK_SOFT}` : undefined,
       }}
     />
   );

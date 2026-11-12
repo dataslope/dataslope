@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SIDES, STEPS } from "./data";
-import { Arrow, curvePath, Drift, Head, Label, lerp, Mark, phi, pulse, STAT, STAT_INK, STAT_WASH, Svg } from "./parts";
+import { Arrow, curvePath, Drift, Head, Label, lerp, Mark, MathVar, phi, pulse, STAT, STAT_INK, STAT_WASH, Svg } from "./parts";
 
 const X: XScale = { lo: -4, hi: 4, x0: 300, x1: 1620 };
 const BASE = 760;
@@ -183,7 +183,7 @@ export const SidesScene: React.FC = () => {
               ...halo,
             }}
           >
-            our <span style={{ fontStyle: "italic" }}>t</span>
+            our <MathVar>t</MathVar>
           </div>
 
           {/* The one-sided reading. */}

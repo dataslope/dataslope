@@ -517,7 +517,7 @@ export const Ring: React.FC<{
         width: COL_W[g.cols[col]] - 8,
         height: g.rowTop(to + 1) - g.rowTop(from) - 8,
         border: `3px solid ${color}`,
-        borderRadius: 8,
+        borderRadius: 5,
         opacity: p * (1 - o),
         transform: `scale(${1.1 - 0.1 * p})`,
       }}

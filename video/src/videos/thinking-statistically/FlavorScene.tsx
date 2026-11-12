@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -145,9 +145,11 @@ export const FlavorScene: React.FC = () => {
               style={{
                 height: CHIP,
                 boxSizing: "border-box",
+                // A cell of the column, the owner's badge (2026-11-12): no
+                // fill, a near-black outline.
                 border: `2px solid ${INK}`,
-                borderRadius: 10,
-                background: PAPER,
+                borderRadius: 6,
+                background: "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -178,7 +180,7 @@ export const FlavorScene: React.FC = () => {
 
       {/* The computer's view of the column: integers, as pandas stores them. */}
       <Ink at={computerAt - 4} dur={14} style={{ left: DTYPE_X, top: y(CHIP_Y) + 4, whiteSpace: "nowrap" }}>
-        <div style={label(20, INK_SOFT)}>stored as whole numbers</div>
+        <div style={label(20, INK_SOFT)}>Stored as whole numbers</div>
         {/* A gray house badge that turns the highlighter's yellow on "stored". */}
         <div
           style={{
@@ -261,9 +263,10 @@ export const FlavorScene: React.FC = () => {
               top: lerp(fromY, toY, t),
               width: lerp(CHIP, STACK_W, t),
               height: lerp(CHIP, h(BLOCK) - 4, t),
-              borderRadius: lerp(10, 3, t),
+              borderRadius: lerp(6, 3, t),
               background: s.col === 0 ? `color-mix(in srgb, ${STAT} ${Math.round(vanilla * 70)}%, ${RAW})` : RAW,
-              border: `2px solid color-mix(in srgb, ${INK} ${Math.round(t * 40)}%, transparent)`,
+              // Leaves the chip with the chip's outline, which fades as it lands.
+              border: `2px solid color-mix(in srgb, ${INK} ${Math.round((1 - t) * 100)}%, transparent)`,
               boxSizing: "border-box",
               opacity: Math.min(1, t * 3),
             }}

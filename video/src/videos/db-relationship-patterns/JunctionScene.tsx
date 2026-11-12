@@ -147,7 +147,7 @@ export const JunctionScene: React.FC = () => {
           </Tag>
         ))}
         <Tag at={junctionAt + 6} x={g.x} y={g.rowTop(rows.length) + 18} italic size={22}>
-          one row per pairing: {MTM.enrollments} in all
+          One row per pairing: {MTM.enrollments} in all
         </Tag>
         <Pulse x={enrollments.x + enrollments.width / 2} y={enrollments.top + enrollments.head / 2} at={nameAt} r={46} color={KEY_INK} />
       </Drift>

@@ -20,7 +20,6 @@ import {
   InlineArrow,
   Kicker,
   pulse,
-  TOKEN,
   UnderBracket,
   X0,
 } from "./parts";
@@ -58,7 +57,8 @@ const Sym: React.FC<{ text: string; size?: number }> = ({ text, size = 28 }) => 
   return (
     <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: size, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
       {body}
-      {end ? <span style={{ fontSize: Math.max(20, size * 0.72), color: INK_SOFT }}>{END}</span> : null}
+      {/* Softer, and a little smaller: within 12% of the symbol it ends. */}
+      {end ? <span style={{ fontSize: Math.max(20, Math.round(size * 0.9)), color: INK_SOFT }}>{END}</span> : null}
     </span>
   );
 };
@@ -81,10 +81,12 @@ const TileBox: React.FC<{ t: Tile; top: number; opacity: number; focus: number; 
         width: tileW(t.units),
         height: TILE_H,
         boxSizing: "border-box",
-        borderRadius: 8,
-        border: `2px ${marker ? "dashed" : "solid"} ${
-          focus > 0 ? `color-mix(in srgb, ${FOCUS} ${Math.round(focus * 100)}%, ${marker ? INK_SOFT : TOKEN})` : marker ? INK_SOFT : TOKEN
-        }`,
+        borderRadius: 5,
+        // A symbol is a fill, no outline. The lone end marker is not a
+        // character, so it stays an empty dashed slot.
+        border: marker
+          ? `2px dashed ${focus > 0 ? `color-mix(in srgb, ${FOCUS} ${Math.round(focus * 100)}%, ${INK_SOFT})` : INK_SOFT}`
+          : undefined,
         background: marker ? PAPER : chipGround(focus),
         display: "flex",
         alignItems: "center",
@@ -247,7 +249,7 @@ export const BpeScene: React.FC = () => {
             <React.Fragment key={w}>
               <div style={{ position: "absolute", left: X0, top: top + 8, opacity: p, display: "flex", alignItems: "baseline", gap: 14 }}>
                 <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 500, color: INK }}>{w}</span>
-                <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>×{FREQS[w]}</span>
+                <span style={{ ...note(26, INK_SOFT), ...TABULAR }}>×{FREQS[w]}</span>
               </div>
               {/* Before the split: the word, whole. */}
               {splitP < 1 ? (
@@ -327,12 +329,12 @@ export const BpeScene: React.FC = () => {
               <span style={{ ...note(26, hit > 0.5 ? FOCUS_INK : INK), marginLeft: 14, fontWeight: 500, ...TABULAR }}>
                 {p.count}
               </span>
-              <span style={{ ...note(21, INK_SOFT) }}>{i === 0 ? "times" : ""}</span>
+              <span style={{ ...note(24, INK_SOFT) }}>{i === 0 ? "times" : ""}</span>
             </div>
           );
         })}
         <Note at={sevenAt} x={RX} y={y(LIST_Y) + 5 * h(LIST_STEP + 6) + 4} out={writeAt - 2}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>five lows and two lowers: seven</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Five lows and two lowers: seven</span>
         </Note>
 
         {/* Fig. 10: the merges, in the order learned. That list is the tokenizer. */}
@@ -378,7 +380,7 @@ export const BpeScene: React.FC = () => {
           );
         })}
         <Note at={orderAt - 2} x={RX + 42} y={y(LIST_Y) + MERGES.length * h(LIST_STEP) + 2}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>new text: split, then replay these in order</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>New text: split, then replay these in order</span>
         </Note>
       </Drift>
     </AbsoluteFill>

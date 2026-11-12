@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { body, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
 import { badgeStyle, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -15,6 +15,11 @@ const TAG_Y = 360;
 const STEPS = ["Decide", "Look", "Confirm"];
 const STEP_X = [160, 560, 960];
 const STEP_Y = 620;
+/** Each step's box, wide enough for its words, so an arrow can run from
+ *  one box's edge to the next's; STEP_MID is the boxes' middle. */
+const STEP_W = [220, 200, 250];
+const STEP_MID = 30;
+const STEP_FILL = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
 
 /**
  * The close: the traps that share one flaw, the order that cures it, and the
@@ -81,7 +86,7 @@ export const CloseScene: React.FC = () => {
       <Bracket x0={TAG_X[0]} x1={TAG_X[2] + 420} y={y(TAG_Y) + 96} at={flawAt - 4} up tick={14} color={STAT} width={2.6} />
       <Ink at={dataAt - 6} dur={14} style={{ left: TAG_X[0], top: y(TAG_Y) + 118, whiteSpace: "nowrap" }}>
         <span style={label(26, STAT_INK)}>
-          one flaw: the data chose the analysis, <Marker at={advanceAt - 4}>not the plan</Marker>
+          One flaw: the data chose the analysis, <Marker at={advanceAt - 4}>not the plan</Marker>
         </span>
       </Ink>
 
@@ -90,10 +95,14 @@ export const CloseScene: React.FC = () => {
         <Ink key={s} at={stepAt[i]} dur={14} style={{ left: STEP_X[i], top: y(STEP_Y), whiteSpace: "nowrap" }}>
           <div
             style={{
-              padding: "12px 26px",
+              width: STEP_W[i],
+              boxSizing: "border-box",
+              textAlign: "center",
+              padding: "12px 0",
               borderRadius: 8,
-              background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(100 * (i === 0 ? 1 - toConfirm : i === 2 ? toConfirm : 0))}%, ${PAPER})`,
-              border: `2px solid ${INK}`,
+              // A gray tint with no outline (the owner, 2026-11-11), lit
+              // yellow while the narration is on it.
+              background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(100 * (i === 0 ? 1 - toConfirm : i === 2 ? toConfirm : 0))}%, ${STEP_FILL})`,
               ...label(30, INK),
             }}
           >
@@ -101,8 +110,8 @@ export const CloseScene: React.FC = () => {
           </div>
         </Ink>
       ))}
-      <Arrow from={[STEP_X[0] + 220, y(STEP_Y) + 32]} to={[STEP_X[1] - 26, y(STEP_Y) + 32]} at={testAt - 2} dur={10} />
-      <Arrow from={[STEP_X[1] + 170, y(STEP_Y) + 32]} to={[STEP_X[2] - 26, y(STEP_Y) + 32]} at={confirmAt - 8} dur={10} />
+      <Arrow from={[STEP_X[0] + STEP_W[0], y(STEP_Y) + STEP_MID]} to={[STEP_X[1], y(STEP_Y) + STEP_MID]} at={testAt - 2} dur={10} />
+      <Arrow from={[STEP_X[1] + STEP_W[1], y(STEP_Y) + STEP_MID]} to={[STEP_X[2], y(STEP_Y) + STEP_MID]} at={confirmAt - 8} dur={10} />
       <Ink at={testAt - 2} dur={12} style={{ left: STEP_X[0], top: y(STEP_Y) + 90, whiteSpace: "nowrap" }}>
         <span style={{ ...body(28, true), color: INK_SOFT }}>what you&apos;ll test, before you look</span>
       </Ink>
@@ -118,7 +127,7 @@ export const CloseScene: React.FC = () => {
         const m = ease(frame, confirmAt - 2, 26);
         return (
           <Svg>
-            <rect x={lerp(STEP_X[0], STEP_X[2], m)} y={y(STEP_Y) + 72} width={lerp(170, 210, m) * a} height={6} rx={3} fill={STAT} />
+            <rect x={lerp(STEP_X[0], STEP_X[2], m)} y={y(STEP_Y) + 72} width={lerp(STEP_W[0], STEP_W[2], m) * a} height={6} rx={3} fill={STAT} />
           </Svg>
         );
       })()}

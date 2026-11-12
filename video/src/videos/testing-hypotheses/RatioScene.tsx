@@ -7,7 +7,7 @@ import { ColumnRule, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter } from "./data";
-import { Bracket, curvePath, DATA, DOT, Head, Kicker, Label, lerp, Mark, phi, RAW, STAT, STAT_INK, Svg } from "./parts";
+import { Bracket, curvePath, DATA, DOT, Head, Kicker, Label, lerp, Mark, MathVar, phi, RAW, STAT, STAT_INK, Svg } from "./parts";
 
 /** The schematic mounds: two groups, their gap and their width. */
 const CX = 1340;
@@ -118,7 +118,9 @@ export const RatioScene: React.FC = () => {
       <div style={{ position: "absolute", left: 160, top: y(330), opacity: ease(frame, ratioAt - 6, 14), display: "flex", alignItems: "center", gap: 28 }}>
         {/* "t =" at the size of the terms it equals, as a display formula
             sets it: at twice their size it read as a second line size. */}
-        <span style={{ ...body(44, true), color: INK }}>t =</span>
+        <span style={{ ...body(44), color: INK }}>
+          <MathVar>t</MathVar> =
+        </span>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
           <span style={{ ...body(40, true), color: STAT_INK, opacity: sig, whiteSpace: "nowrap" }}>the gap you observed</span>
           <div style={{ width: 430 * ease(frame, ratioAt - 4, 16), height: 3, background: INK }} />
@@ -127,12 +129,16 @@ export const RatioScene: React.FC = () => {
       </div>
       <Note at={bigAt} x={160 + 140} y={y(330) + 200}>
         <Label size={22} color={INK_SOFT} weight={520}>
-          <Mark at={dwarfsAt}>big t: the gap dwarfs the noise</Mark>
+          <Mark at={dwarfsAt}>
+            Big <MathVar>t</MathVar>: the gap dwarfs the noise
+          </Mark>
         </Label>
       </Note>
       <Note at={smallAt + 4} x={160 + 140} y={y(330) + 240}>
         <Label size={22} color={INK_SOFT} weight={520}>
-          <Mark at={wobbleAt}>small t: an ordinary wobble</Mark>
+          <Mark at={wobbleAt}>
+            Small <MathVar>t</MathVar>: an ordinary wobble
+          </Mark>
         </Label>
       </Note>
 
@@ -170,7 +176,7 @@ export const RatioScene: React.FC = () => {
       </Note>
       <Note at={noiseAt} x={CX + 420} y={y(M_BASE) + 12} align="right">
         <Label size={21} color={INK_SOFT} weight={520}>
-          each mound: where a group&apos;s average could land
+          Each mound: where a group&apos;s average could land
         </Label>
       </Note>
 

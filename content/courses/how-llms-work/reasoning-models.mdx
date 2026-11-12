@@ -153,17 +153,15 @@ times a direct one for the same visible text.
   caption="The reasoning tokens are billed whether or not you ever see them."
 />
 
-Providers expose a control over this. For a while it came in three
-forms (an *effort* level, a thinking budget in tokens, or a distinct
-model tier), and by October 2026 the effort level has largely won.
-Anthropic's newest models reject a fixed thinking budget outright, and
-several flagships no longer let you switch thinking off at all: Claude
-Opus 5.5 and Fable 5.1 always think, and OpenAI's GPT-6 Astra does not
-offer a "none" setting. On those models the lowest effort level is the
-floor.
+Providers expose a control over this, in one of three forms: an
+*effort* level, a thinking budget in tokens, or a distinct model tier.
+The effort level has become the most common, and not every model
+accepts the others: some reject a fixed thinking budget outright, and
+some flagship models do not let you switch thinking off at all. They
+always think, and on them the lowest effort level is the floor.
 
-Defaults move too. Claude Opus 5.5 defaults to a lower effort than the
-Opus 5 it replaced, so the same request can produce a different number
+Defaults move too. A new model can default to a lower effort than the
+one it replaced, so the same request can produce a different number
 of thinking tokens after a model swap even at an identical price. The
 specific parameter names change frequently, but the concept is stable,
 and the right default for most production work is **the lowest setting
@@ -288,10 +286,10 @@ Route by task, and let your own evaluation set the level.`}
 />
 
 <MultipleChoice
-  markdown={`You move a classification workload to a 2026 flagship that always thinks. How do you keep thinking costs down?
+  markdown={`You move a classification workload to a flagship model that always thinks. How do you keep thinking costs down?
 
 - Set the thinking budget to zero tokens.
-  > The newest models reject a fixed thinking budget, so the request fails instead.
+  > Models like this one reject a fixed thinking budget, so the request fails instead.
 - Disable thinking in the request parameters.
   > On these models that setting is refused; thinking is always on.
 - [o] Set the lowest effort level explicitly.

@@ -20,7 +20,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PARTS, pct, type PartKey, WALD } from "./data";
-import { Plane, Swatch } from "./parts";
+import { AREA_FILL, Plane, Swatch } from "./parts";
 import { swell } from "../sampling/emphasis";
 import { useFigNumber } from "../sampling/merged";
 
@@ -186,9 +186,7 @@ export const WaldScene: React.FC = () => {
                   y={c - GAP - THICK}
                   width={p.areaShare * 100 * PX * areaGrow}
                   height={THICK}
-                  fill="none"
-                  stroke={INK_SOFT}
-                  strokeWidth={1.6}
+                  fill={AREA_FILL}
                 />
               ) : null}
               {holesGrow > 0 ? (

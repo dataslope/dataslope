@@ -91,10 +91,10 @@ export const BillsScene: React.FC = () => {
       {/* ── Fig. 4: the three bills, split ── */}
       <FigLabel n="4" title={`Each bill on ${NAME}, split the same way`} at={from - 2} x={X0} y={y(FIG_Y)} />
       <div style={{ position: "absolute", right: 1920 - 1800, top: y(FIG_Y) + 2, display: "flex", gap: 30, alignItems: "center" }}>
-        <Key at={rowAt[0] - 4} swatch={LINE} edge={LINE_EDGE}>
+        <Key at={rowAt[0] - 4} swatch={LINE}>
           rectangle and replies
         </Key>
-        <Key at={rowAt[0]} swatch={TRI_FILL} edge={TRI}>
+        <Key at={rowAt[0]} swatch={TRI_FILL}>
           triangle
         </Key>
       </div>
@@ -132,7 +132,6 @@ export const BillsScene: React.FC = () => {
                     width: Math.max(0, shown - lineW),
                     height: rowH + glow * 8,
                     background: TRI_FILL,
-                    boxShadow: `inset 0 0 0 2px ${TRI}`,
                     borderRadius: "0 3px 3px 0",
                   }}
                 />

@@ -31,7 +31,7 @@ const times = (k: number) => (k === 1 ? "once" : k === 2 ? "twice" : `${k} times
 
 /** The lesson's list of what the free-text version would take, one every
  *  CHORE_STEP frames from "notebooks", so each can be read before the next. */
-const PROJECT = ["parse the text", "handle misspellings", "notebook or notebooks?", "clean up old rows"] as const;
+const PROJECT = ["Parse the text", "Handle misspellings", "Notebook or notebooks?", "Clean up old rows"] as const;
 const CHORE_STEP = 18;
 /** The chores' second column, and the gap before it that holds their hairline. */
 const CHORE_COL = 470;

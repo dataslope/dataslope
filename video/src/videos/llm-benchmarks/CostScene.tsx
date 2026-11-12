@@ -92,10 +92,10 @@ export const CostScene: React.FC = () => {
 
       <Drift from={from} to={end} amount={0.01} origin="50% 55%">
         <Ink at={ninetyOneAt - 8} dur={12} style={{ left: ACC.x0, top: y(352), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>accuracy on the task</span>
+          <span style={label(22, INK_SOFT)}>Accuracy on the task</span>
         </Ink>
         <Ink at={millionAt - 8} dur={12} style={{ left: BILL.x0, top: y(352), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>monthly bill</span>
+          <span style={label(22, INK_SOFT)}>Monthly bill</span>
         </Ink>
         {TIERS.map((t, i) => {
           const ry = y(ROW_Y[i]);

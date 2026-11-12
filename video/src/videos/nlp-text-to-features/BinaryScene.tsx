@@ -45,8 +45,8 @@ export const BinaryScene: React.FC = () => {
   const presentAt = n.word("vectors", "present");
 
   const rows = [
-    { name: "count vector", values: SPAM.count, at: countAt, top: COUNT_Y, markAt: keepsAt },
-    { name: "binary vector", values: SPAM.binary, at: binAt, top: BINARY_Y, markAt: oneAt },
+    { name: "Count vector", values: SPAM.count, at: countAt, top: COUNT_Y, markAt: keepsAt },
+    { name: "Binary vector", values: SPAM.binary, at: binAt, top: BINARY_Y, markAt: oneAt },
   ];
   const frees = SPAM.tokens.map((w, k) => (w === "free" ? k : -1)).filter((k) => k >= 0);
   const max = Math.max(...SPAM.count);
@@ -80,12 +80,12 @@ export const BinaryScene: React.FC = () => {
       {/* When presence is enough, in the lesson's words. */}
       <Note at={shortAt - 2} x={1140} y={y(SPAM_Y) + 12}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          for <Mark at={shortAt}>short texts</Mark>, presence is enough: less swayed by length
+          For <Mark at={shortAt}>short texts</Mark>, presence is enough: less swayed by length
         </span>
       </Note>
 
       <Note at={whetherAt + 4} x={X0} y={y(HEAD_ROW_Y) + 4}>
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the lesson’s vocabulary</span>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>The lesson’s vocabulary</span>
       </Note>
       {SPAM.vocab.map((w, j) => (
         <Ink

@@ -66,7 +66,7 @@ export const AbScene: React.FC = () => {
         <FigLabel n="15" title="Users needed in each arm, from a 10% baseline" at={abFrom} x={160} y={y(300)} />
         <Ink at={powerAt - 4} dur={14} style={{ left: 160, top: y(300) + 44, whiteSpace: "nowrap" }}>
           <Label size={22} color={INK_SOFT} weight={520}>
-            for 80% power at <Greek>α</Greek> = 0.05
+            For 80% power at <Greek>α</Greek> = 0.05
           </Label>
         </Ink>
         {/* The chart is up on "sized", the first row named on "lift". */}

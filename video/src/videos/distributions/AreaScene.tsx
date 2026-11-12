@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
+import { I, MathRun } from "../../editorial/math";
 import { fmt, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -164,7 +165,11 @@ export const AreaScene: React.FC = () => {
             <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>exactly 5</span>
           </Note>
           <Note at={zeroAt - 2} x={px5 + 16} y={py(f(5)) - h(150) + 34} out={rangesAt - 4}>
-            <span style={{ ...askNote(30), whiteSpace: "nowrap" }}>P(wait = 5) = 0</span>
+            <span style={{ ...askNote(30), whiteSpace: "nowrap" }}>
+              <MathRun>
+                <I>P</I>(wait = 5) = 0
+              </MathRun>
+            </span>
           </Note>
           <Note at={widthAt - 2} x={px5 + 16} y={py(f(5)) - h(150) + 80} out={rangesAt - 4}>
             <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>no width, so no area</span>

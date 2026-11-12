@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SWEEP } from "./data";
-import { Arrow, DATA, DATA_INK, Dashed, Drift, Headline, lerp, Marker, partial, Ring, STAT, STAT_INK, Svg } from "./parts";
+import { Arrow, Dashed, DATA, DATA_INK, Drift, Headline, lerp, Marker, MathVar, partial, Ring, STAT, STAT_INK, Svg } from "./parts";
 
 /** Both panels share the x axis: observations per group, log 10 to 100,000. */
 const PANELS = [
@@ -203,7 +203,9 @@ export const SweepScene: React.FC = () => {
         {/* p = 0.05, on the p panel, in the stretched top band. */}
         <Dashed x0={P.x0} y0={pY(0.05)} x1={P.x1} y1={pY(0.05)} at={growAt} dur={14} color={INK_SOFT} width={1.4} dash="4 4" />
         <Note at={growAt + 6} x={P.x1} y={pY(0.05) - 30} align="right">
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", ...halo }}>p = 0.05</span>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", ...halo }}>
+            <MathVar>p</MathVar> = 0.05
+          </span>
         </Note>
 
         {/* Each sample size arrives as a guide down both panels. */}

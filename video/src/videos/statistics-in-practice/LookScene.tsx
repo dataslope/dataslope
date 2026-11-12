@@ -135,7 +135,7 @@ export const LookScene: React.FC = () => {
         {/* Friday's row, then Sunday's: the day the narration is reading. */}
         {band > 0 ? (
           <Svg opacity={band * 0.5}>
-            <rect x={150} y={y(bandRow) - h(38)} width={1660} height={h(76)} rx={8} fill={HIGHLIGHT} />
+            <rect x={150} y={y(bandRow) - h(38)} width={1660} height={h(76)} rx={5} fill={HIGHLIGHT} />
           </Svg>
         ) : null}
 
@@ -277,7 +277,7 @@ export const LookScene: React.FC = () => {
         <Ring x={sx(X2, fri.mean - fri.half)} y={y(ROW_Y[FRI])} at={fromAt - 2} r0={8} r1={34} />
         <Ring x={sx(X2, fri.mean + fri.half)} y={y(ROW_Y[FRI])} at={toAt - 2} r0={8} r1={34} />
         <Note at={wobblesAt + 4} out={medianAt - 6} x={X2.x0} y={y(AXIS) + 44}>
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>how far each average could wobble</span>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>How far each average could wobble</span>
         </Note>
         <Svg>
           {DAYS.map((d, k) => {

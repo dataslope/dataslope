@@ -8,7 +8,7 @@ import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HUGE } from "./data";
-import { Bracket, Drift, GROUP_COLOR, GROUP_INK, Headline, Kicker, lerp, Marker, Ring, STAT_INK, Svg } from "./parts";
+import { Bracket, Drift, GROUP_COLOR, GROUP_INK, Headline, Kicker, lerp, Marker, MathVar, Ring, STAT_INK, Svg } from "./parts";
 
 /** The scores: 40 to 160, about four standard deviations either side. */
 const X: XScale = { lo: 40, hi: 160, x0: 160, x1: 1000 };
@@ -229,12 +229,12 @@ export const HugeScene: React.FC = () => {
           whiteSpace: "nowrap",
         }}
       >
-        p = {fmt(HUGE.p, 5)}
+        <MathVar>p</MathVar> = {fmt(HUGE.p, 5)}
       </div>
       <Ring x={RIGHT + 170} y={y(ROW1) + 78} at={passingAt - 2} r0={40} r1={130} />
       <Note at={sigAt - 2} x={RIGHT} y={y(ROW1) + 126}>
         <span style={{ ...note(26, STAT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: 1 - pDim }}>
-          <Marker at={realAt - 2}>yes: significant</Marker>
+          <Marker at={realAt - 2}>Yes: significant</Marker>
         </span>
       </Note>
       <Note at={dataAt - 2} x={RIGHT} y={y(ROW1) + 172}>
@@ -260,15 +260,15 @@ export const HugeScene: React.FC = () => {
           whiteSpace: "nowrap",
         }}
       >
-        d = {fmt(HUGE.d, 3)}
+        <MathVar>d</MathVar> = {fmt(HUGE.d, 3)}
       </div>
       <Note at={percentAt + 6} x={RIGHT} y={y(ROW2) + 126}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          the gap, {fmt(HUGE.gap, 2)}, over the spread, <Marker at={deviationAt - 2}>{fmt(HUGE.sd, 1)}</Marker>
+          The gap, {fmt(HUGE.gap, 2)}, over the spread, <Marker at={deviationAt - 2}>{fmt(HUGE.sd, 1)}</Marker>
         </span>
       </Note>
       <Note at={smallAt - 2} x={RIGHT} y={y(ROW2) + 166}>
-        <span style={{ ...note(26, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>no: negligible</span>
+        <span style={{ ...note(26, STAT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>No: negligible</span>
       </Note>
     </AbsoluteFill>
   );

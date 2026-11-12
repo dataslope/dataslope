@@ -22,7 +22,8 @@ const WRITERS = [
 const FORGETS = 2;
 const WRITER_X = 150;
 const PILL_X = 400;
-const ARROW_X0 = 600;
+/** The rule pills' right edge (400 + 22px padding + ten 12px glyphs), where each arrow leaves. */
+const ARROW_X0 = 543;
 /** Fig. 1's line, 50px over order_items, the higher of its two tables; and
  *  Fig. 2's, 50px over the first writer's row. */
 const FIG1_Y = 344;
@@ -176,7 +177,7 @@ export const HookScene: React.FC = () => {
           price {BAD}
         </span>
       </Ink>
-      <Arrow from={[372, products.rows[2].mid]} to={[products.left - 10, products.rows[2].mid]} at={dollarsAt - 2} out={chipOut} />
+      <Arrow from={[352, products.rows[2].mid]} to={[products.left, products.rows[2].mid]} at={dollarsAt - 2} out={chipOut} />
       <Note at={saleAt - 4} x={122} y={products.rows[2].mid + 40} out={chipOut}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Not a sale,{" "}
@@ -220,7 +221,7 @@ export const HookScene: React.FC = () => {
             </Pill>
             <Arrow
               from={[ARROW_X0, rowY(i)]}
-              to={[products.left - 8, targetY(i)]}
+              to={[products.left, targetY(i)]}
               at={Math.max(arrowAt(i), rarelyAt + 18)}
               dur={14}
               color={forgot && frame >= forgetsAt ? ACCENT : INK_SOFT}

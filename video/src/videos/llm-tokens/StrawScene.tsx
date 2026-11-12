@@ -59,7 +59,7 @@ export const StrawScene: React.FC = () => {
 
   // The word splits into its three pieces on "cuts".
   const split = ease(frame, cutsAt - 2, 18);
-  const pieceW = STRAWBERRY.map((p) => p.text.length * 0.6 * WORD.size + 2 * Math.round(WORD.size * 0.4) + 4);
+  const pieceW = STRAWBERRY.map((p) => p.text.length * 0.6 * WORD.size + 2 * Math.round(WORD.size * 0.4));
   // Each piece of the unsplit word starts where the text before it ends, at
   // the size it is drawn (JetBrains Mono advances 0.6 em).
   const joinedX = (k: number) => WORD.x + STRAWBERRY.slice(0, k).reduce((s, p) => s + p.text.length * 0.6 * JOIN_SIZE, 0);
@@ -90,8 +90,8 @@ export const StrawScene: React.FC = () => {
         {/* Fig. 4: a few rows of the vocabulary. */}
         <FigLabel n="4" title={`Six entries of GPT-4o's ${ENCODING}`} at={chunkAt - 4} x={X0} y={y(FIG_Y)} />
         <div style={{ position: "absolute", left: VOC.x, top: rowY(0) - 44, display: "flex", opacity: ease(frame, vocabAt - 4, 12) }}>
-          <span style={{ ...label(21, INK_SOFT), width: VOC.idW }}>id</span>
-          <span style={label(21, INK_SOFT)}>token</span>
+          <span style={{ ...label(21, INK_SOFT), width: VOC.idW }}>Id</span>
+          <span style={label(21, INK_SOFT)}>Token</span>
         </div>
         {VOCAB_ROWS.map((r, i) => {
           const p = ease(frame, vocabAt + i * 4, 12);
@@ -118,7 +118,7 @@ export const StrawScene: React.FC = () => {
               <ChipFace text={r.text} size={26} focus={g} />
               <span
                 style={{
-                  ...note(21, INK_SOFT),
+                  ...note(24, INK_SOFT),
                   marginLeft: 16,
                   opacity: ease(frame, (r.kind === "word" ? wholeAt : pieceAt) - 2, 12),
                   whiteSpace: "nowrap",
@@ -136,7 +136,7 @@ export const StrawScene: React.FC = () => {
         </Note>
 
         {/* Fig. 5: strawberry, as the tokenizer cuts it. */}
-        <FigLabel n="5" title="strawberry, cut by the tokenizer" at={takeAt - 4} x={WORD.x} y={y(FIG_Y)} />
+        <FigLabel n="5" title="Strawberry, cut by the tokenizer" at={takeAt - 4} x={WORD.x} y={y(FIG_Y)} />
         {STRAWBERRY.map((p, k) => {
           const x = lerp(joinedX(k), splitX(k), split);
           const shown = ease(frame, takeAt, 12);
@@ -181,12 +181,12 @@ export const StrawScene: React.FC = () => {
           );
         })}
         <Note at={threeIdsAt - 2} x={WORD.x} y={y(WORD.y) + h(110)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>what the model gets: three ids</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>What the model gets: three ids</span>
         </Note>
 
         {/* With its leading space, as it sits in a sentence: one token. */}
         <Note at={spaceAt - 2} x={WORD.x} y={y(SPACED_Y) - 44}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>with the space it has inside a sentence</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>With the space it has inside a sentence</span>
         </Note>
         <div
           style={{
@@ -203,7 +203,7 @@ export const StrawScene: React.FC = () => {
           <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK_SOFT, opacity: ease(frame, oneIdAt - 2, 10), ...TABULAR }}>
             {SPACED.id}
           </span>
-          <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, oneIdAt + 4, 10), whiteSpace: "nowrap" }}>one id</span>
+          <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, oneIdAt + 4, 10), whiteSpace: "nowrap" }}>one id</span>
         </div>
         {/* The dot is the space: said, and labelled under it. */}
         <Note at={spaceAt + 8} x={WORD.x + 6} y={y(SPACED_Y) + 54}>
@@ -245,8 +245,8 @@ export const StrawScene: React.FC = () => {
               </span>
             );
           })}
-          <span style={{ ...note(26, FOCUS_INK), marginLeft: 22, fontWeight: 500, opacity: ease(frame, rsAt + 18, 10), ...TABULAR }}>
-            {RS} R&apos;s
+          <span style={{ ...note(34, FOCUS_INK), marginLeft: 22, fontWeight: 500, opacity: ease(frame, rsAt + 18, 10) }}>
+            <span style={TABULAR}>{RS}</span> R&apos;s
           </span>
         </div>
         <Note at={neverAt + 2} x={WORD.x} y={y(LETTERS_Y) + h(60)}>

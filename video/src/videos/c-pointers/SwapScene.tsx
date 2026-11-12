@@ -3,10 +3,10 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { Badge, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { FIG2, FIG3, ILLUSTRATIONS, SIZEOF_INT, SIZEOF_PTR, VIDEO } from "./data";
 import {
   ADDR,
@@ -204,7 +204,8 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
     const sx = COL[i] + PTR_W - 70;
     const ex = COL[i] + INT_W / 2;
     const gap = swapBoxTop - mainBottom;
-    const tip = mainBottom + 5;
+    // The tip meets the box it points at, with no gap.
+    const tip = mainBottom + 1;
     const arrive = (55 * Math.PI) / 180;
     return [
       [sx, swapBoxTop],
@@ -413,7 +414,7 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
           ))
         : ([0, 1] as const).map((i) => (
             <React.Fragment key={i}>
-              <CopyArrow x={COL[i] + INT_W / 2} y0={mainBottom + 8} y1={swapBoxTop - 8} at={c.arrowsAt + i * 6} />
+              <CopyArrow x={COL[i] + INT_W / 2} y0={mainBottom} y1={swapBoxTop} at={c.arrowsAt + i * 6} />
               <Ink
                 at={c.arrowsAt + 8 + i * 6}
                 dur={10}
@@ -436,19 +437,13 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
         dur={14}
         style={{ left: FRAME_L, top: y(OUT_Y), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}
       >
-        <span style={label(21, INK_SOFT)}>It prints</span>
-        <span style={{ fontFamily: MONO, fontSize: 32, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>
+        <span style={label(26, INK_SOFT)}>It prints</span>
+        <span style={{ fontFamily: MONO, fontSize: 27, fontWeight: 500, color: INK, fontVariantLigatures: "none" }}>
           {fig.stdout}
         </span>
-        <span
-          style={{
-            ...note(22, isPtr ? ADDR_INK : ACCENT_INK),
-            fontWeight: 500,
-            opacity: ease(frame, c.doneAt - 2, 10),
-          }}
-        >
+        <Badge tone={isPtr ? "blue" : "red"} size={26} style={{ fontFamily: SANS, opacity: ease(frame, c.doneAt - 2, 10) }}>
           {isPtr ? "swapped" : "unchanged"}
-        </span>
+        </Badge>
       </Ink>
       <Note at={c.namesAt + 14} x={FRAME_L} y={y(NOTE_Y)} from="up">
         <span style={note(21, INK_SOFT)}>
@@ -480,11 +475,10 @@ const FramePanel: React.FC<{ name: string; at: number; top: number; bottom: numb
           top,
           width: FRAME_R - FRAME_L,
           height: bottom - top,
-          boxSizing: "border-box",
-          border: `1.5px solid ${HAIRLINE}`,
+          // A filled panel, no outline: the boxes on it are a deeper gray.
           borderRadius: 8,
-          background: `color-mix(in srgb, ${INK} 2.5%, ${PAPER})`,
-          clipPath: `inset(-2px ${(1 - p) * 100}% -2px -2px)`,
+          background: `color-mix(in srgb, var(--ds-gray-400) 9%, ${PAPER})`,
+          clipPath: `inset(0 ${(1 - p) * 100}% 0 0)`,
         }}
       />
       <Ink

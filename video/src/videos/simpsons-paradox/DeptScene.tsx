@@ -147,7 +147,7 @@ export const DeptScene: React.FC = () => {
               >
                 {signed(d.gap)}
               </span>
-              <span style={{ ...note(20, INK_SOFT), marginLeft: 8 }}>points</span>
+              <span style={{ ...note(26, INK_SOFT), marginLeft: 8 }}>points</span>
             </Note>
           </React.Fragment>
         );

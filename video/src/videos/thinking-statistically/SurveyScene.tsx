@@ -143,7 +143,7 @@ export const SurveyScene: React.FC = () => {
             y={y(TOP) - 16}
             width={fieldW + 32}
             height={fieldH + 32}
-            rx={10}
+            rx={8}
             fill="none"
             stroke={INK}
             strokeWidth={1.6 + pulse(frame, listPopAt - 2, 20) * 2.2}

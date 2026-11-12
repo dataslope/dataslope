@@ -163,7 +163,7 @@ export const SplitScene: React.FC = () => {
         ))}
         {/* "hiding its not" */}
         <Ink at={hidingAt} dur={12} out={tokFrom} style={{ left: pieceX(P("can't")), top: aTop + ch + 12, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(26, true), color: BAD_INK }}>the not is hidden</span>
+          <span style={{ ...body(26, true), color: BAD_INK }}>The not is hidden</span>
         </Ink>
         {/* "a different word from plain butter" */}
         {aside > 0 ? (
@@ -201,8 +201,9 @@ export const SplitScene: React.FC = () => {
             const i = SPLIT.tokenPiece[j];
             const x1 = pieceX(i) + COLS[i].pw / 2;
             const x2 = TOK_XS[j] + chipWidth(t, SIZE) / 2;
-            const y1 = aTop + ch + 6;
-            const y2 = bTop - 8;
+            // Each link runs from the piece's edge to the token's, touching both.
+            const y1 = aTop + ch;
+            const y2 = bTop;
             const p = linkP(j);
             if (p <= 0) return null;
             return (

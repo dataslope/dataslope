@@ -75,7 +75,7 @@ export const AttrScene: React.FC = () => {
           </RowType>
         ))}
 
-        <Arrow from={[orders.right + 22, headMid]} to={[TABLE_X - 26, headMid]} at={columnAt - 8} dur={14} color={INK_SOFT} />
+        <Arrow from={[orders.right, headMid]} to={[TABLE_X, headMid]} at={columnAt - 8} dur={14} color={INK_SOFT} />
         <Fig n="5" at={columnAt - 6} x={TABLE_X} y={orders.top - FIG_GAP}>
           The table, a column each
         </Fig>

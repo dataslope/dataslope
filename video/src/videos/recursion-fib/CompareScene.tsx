@@ -6,6 +6,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
+import { M } from "../../editorial/math";
 import { commas, fmtTime, ILLUSTRATIONS, MACHINE, ROWS, VIDEO } from "./data";
 import { Fig, MEMO, MEMO_INK, Mono, NAIVE, NAIVE_INK } from "./kit";
 
@@ -99,13 +100,13 @@ export const CompareScene: React.FC = () => {
       ))}
       {(
         [
-          ["n", "n", start - 10],
-          ["naiveCalls", "calls", start - 8],
-          ["naiveTime", "time", start - 8],
-          ["naiveDepth", "stack depth", start - 8],
-          ["memoCalls", "calls", ninetyAt - 6],
-          ["memoTime", "time", microAt - 6],
-          ["memoDepth", "stack depth", stillAt - 6],
+          ["n", <M key="n">n</M>, start - 10],
+          ["naiveCalls", "Calls", start - 8],
+          ["naiveTime", "Time", start - 8],
+          ["naiveDepth", "Stack depth", start - 8],
+          ["memoCalls", "Calls", ninetyAt - 6],
+          ["memoTime", "Time", microAt - 6],
+          ["memoDepth", "Stack depth", stillAt - 6],
         ] as const
       ).map(([key, title, at]) => (
         <Ink key={key} at={at} dur={12} style={{ left: COL[key] - 200, width: 200, top: y(HEAD_Y), textAlign: "right" }}>
@@ -168,11 +169,13 @@ export const CompareScene: React.FC = () => {
       {/* What the columns say, one note under each group. */}
       <Note at={twoAt} x={GROUP.memo[0]} y={y(NOTE_Y)} from="up" width={GROUP.memo[1] - GROUP.memo[0]}>
         <span style={note(21, INK_SOFT)}>
-          Calls: <span style={{ color: MEMO_INK, fontWeight: 500 }}>2n − 1</span> at every n, two more per step.
+          Calls: <M style={{ color: MEMO_INK }}>2n - 1</M> at every <M>n</M>, two more per step.
         </span>
       </Note>
       <Note at={removesAt} x={GROUP.naive[0]} y={y(NOTE_Y)} from="up" width={GROUP.naive[1] - GROUP.naive[0]}>
-        <span style={note(21, INK_SOFT)}>Stack depth: the most calls open at once, the same n in both.</span>
+        <span style={note(21, INK_SOFT)}>
+          Stack depth: the most calls open at once, the same <M>n</M> in both.
+        </span>
       </Note>
       <Note at={microAt + 10} x={LEFT} y={y(FOOT_Y)} from="up">
         <span style={note(20, INK_SOFT)}>

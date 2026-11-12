@@ -22,6 +22,7 @@ const NEXT_Y = 858;
 /** A run-in label before 26px text: within 12% of it, so each is one line. */
 const LEAD_SIZE = 24;
 
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const inkFor = (l: string) => (l === "positive" ? POS_INK : l === "negative" ? NEG_INK : INK_SOFT);
 
 /**
@@ -93,7 +94,7 @@ export const LimitsScene: React.FC = () => {
       {rowLabel("Sarcasm", sarcasmAt - 2, ROW_Y.sarcasm)}
       <TraceRow trace={SARCASM} top={y(ROW_Y.sarcasm)} at={ohAt - 2} verdictAt={scoresAt} struck={winkAt} />
       <Note at={winkAt + 4} x={VERDICT_X} y={y(ROW_Y.sarcasm) + 48}>
-        <span style={{ ...note(21, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>it can’t see the wink</span>
+        <span style={{ ...note(21, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>It can’t see the wink</span>
       </Note>
 
       {/* Context: one word, two senses. Put "unpredictable" in the negative
@@ -109,11 +110,11 @@ export const LimitsScene: React.FC = () => {
       />
       <Note at={brakesAt + 2} x={CHIPS_X} y={y(ROW_Y.context) + 86}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          with <i>{CONTEXT.added}</i> added to the negative list, as brakes would want
+          With <i>{CONTEXT.added}</i> added to the negative list, as brakes would want
         </span>
       </Note>
       <Note at={thrillerAt + 14} x={VERDICT_X} y={y(ROW_Y.context) + 48}>
-        <span style={{ ...note(21, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a good thriller</span>
+        <span style={{ ...note(21, LOST_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A good thriller</span>
       </Note>
 
       {/* Missing words: in neither list, so worth nothing. */}
@@ -121,7 +122,7 @@ export const LimitsScene: React.FC = () => {
       <TraceRow trace={UNKNOWN} top={y(ROW_Y.missing)} at={missingAt - 2} verdictAt={nothingAt} />
       <Note at={nothingAt + 4} x={CHIPS_X} y={y(ROW_Y.missing) + 46}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          in the lesson’s lists, <i>unpredictable</i> is in neither
+          In the lesson’s lists, <i>unpredictable</i> is in neither
         </span>
       </Note>
 
@@ -129,7 +130,7 @@ export const LimitsScene: React.FC = () => {
       <Note at={baselineAt - 2} x={X0} y={y(BASELINE_Y)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           <span style={{ ...label(LEAD_SIZE, INK_SOFT), marginRight: 16 }}>A baseline first</span>
-          <Reveal at={fastAt - 2}>fast</Reveal>
+          <Reveal at={fastAt - 2}>Fast</Reveal>
           <Reveal at={dataAt - 2}>{", no training data"}</Reveal>
           <Reveal at={beatAt - 2}>{", a score to beat"}</Reveal>
         </span>
@@ -151,7 +152,7 @@ export const LimitsScene: React.FC = () => {
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           <span style={{ ...label(LEAD_SIZE, INK_SOFT), marginRight: 16 }}>Older than they look</span>
           <Reveal at={idfAt - 2}>IDF, 1972</Reveal>
-          <Reveal at={pairsAt - 2}>{"  ·  counting word pairs, 1948"}</Reveal>
+          <Reveal at={pairsAt - 2}>{"  ·  Counting word pairs, 1948"}</Reveal>
         </span>
       </Note>
       <NextLine at={pairsAt + 10} x={X0} y={y(NEXT_Y)} width={760}>
@@ -207,7 +208,8 @@ const TraceRow: React.FC<{ trace: Trace; top: number; at: number; verdictAt: num
         {signed(trace.score)}
       </div>
       <div style={{ position: "absolute", left: VERDICT_X, top: top + 2, ...note(30, inkFor(trace.label)), fontWeight: 500, opacity: ease(frame, verdictAt - 2, 10) }}>
-        {struck !== undefined ? <Strike at={struck}>{trace.label}</Strike> : trace.label}
+        {/* A verdict stands on its own, so it starts with a capital. */}
+        {struck !== undefined ? <Strike at={struck}>{cap(trace.label)}</Strike> : cap(trace.label)}
       </div>
     </>
   );

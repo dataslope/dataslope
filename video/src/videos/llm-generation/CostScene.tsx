@@ -71,7 +71,6 @@ export const CostScene: React.FC = () => {
                 height: bh,
                 boxSizing: "border-box",
                 background: tint(BAR, 24),
-                borderBottom: `5px solid ${BAR}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

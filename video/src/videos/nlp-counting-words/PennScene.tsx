@@ -170,7 +170,7 @@ export const PennScene: React.FC = () => {
       {/* The first-letter shortcut. */}
       <Note at={thirtySixAt - 2} x={LX} y={y(266)}>
         <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          about <span style={numStyle(22, INK)}>36</span> tags in all
+          About <span style={numStyle(22, INK)}>36</span> tags in all
         </div>
       </Note>
       <Ink at={firstLetterAt - 2} dur={14} style={{ left: LX, top: y(266) + 40, whiteSpace: "nowrap" }}>
@@ -186,8 +186,7 @@ export const PennScene: React.FC = () => {
                 justifyContent: "center",
                 width: 52,
                 height: 34,
-                borderRadius: 6,
-                border: `2px solid ${FAMILY[fam].fill}`,
+                borderRadius: 4,
                 background: FAMILY[fam].tint,
                 fontFamily: MONO,
                 fontWeight: 500,
@@ -233,7 +232,6 @@ export const PennScene: React.FC = () => {
             size={ESIZE}
             at={land.at}
             tint={FAMILY[fam].tint}
-            border={FAMILY[fam].fill}
             to={{ x: land.x, y: land.y, at: land.at, dur: 18, via: { x: t.x, y: land.y, dur: land.fall } }}
           />
         );

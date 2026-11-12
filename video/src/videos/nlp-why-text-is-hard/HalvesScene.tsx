@@ -139,10 +139,10 @@ export const HalvesScene: React.FC = () => {
         </div>
       ))}
       <Ink at={sameAt - 2} dur={16} style={{ left: LEFT_X, top: pillY + 64, whiteSpace: "nowrap", opacity: clear }}>
-        <span style={{ ...body(28, true), color: INK_SOFT }}>the same toolbox in every project</span>
+        <span style={{ ...body(28, true), color: INK_SOFT }}>The same toolbox in every project</span>
       </Ink>
       <Ink at={optionalAt} dur={14} style={{ right: 1920 - PILLS_RIGHT, top: pillY + 66, whiteSpace: "nowrap", opacity: clear }}>
-        <span style={{ ...label(22, INK_SOFT) }}>lighter: optional</span>
+        <span style={{ ...label(22, INK_SOFT) }}>Lighter: optional</span>
       </Ink>
       {/* The optional steps, bracketed: what the goal decides. */}
       {bracket > 0 ? (

@@ -3,7 +3,7 @@ import { useCurrentFrame } from "remotion";
 import { arrowHead, type Cubic, cubicPath, lineLength, sampleCubic } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink, type Pt } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -645,8 +645,12 @@ export const ErrorBox: React.FC<{
   <Ink at={at} dur={16} style={{ left: x, top, width }}>
     <div
       style={{
-        borderLeft: `4px solid ${ACCENT}`,
-        background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
+        // Printed the way the listings are (the house look for code and
+        // its output): the listing's paper, a rule above in the error's red
+        // and a hairline below, not a tinted card with a colored edge.
+        borderTop: `2px solid ${ACCENT}`,
+        borderBottom: `1px solid ${HAIRLINE}`,
+        background: LISTING_PAPER,
         padding: "16px 22px 18px",
         fontFamily: MONO,
         fontSize: 21,

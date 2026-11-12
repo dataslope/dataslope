@@ -188,8 +188,8 @@ export const ThinkScene: React.FC = () => {
         <div style={{ ...body(28), color: INK, whiteSpace: "nowrap" }}>Rewarded for answers that can be checked:</div>
       </Ink>
       {[
-        { at: mathAt, text: "math with a known result", yy: 600 },
-        { at: codeAt, text: "code that passes its tests", yy: 648 },
+        { at: mathAt, text: "Math with a known result", yy: 600 },
+        { at: codeAt, text: "Code that passes its tests", yy: 648 },
       ].map((r) => (
         <React.Fragment key={r.text}>
           <Tick at={r.at - 2} x={RIGHT_X + 16} y={y(r.yy) + 20} />

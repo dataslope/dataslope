@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
+import { I, M, MathRun } from "../../editorial/math";
 import { ACCENT, ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -156,7 +157,7 @@ export const TempScene: React.FC = () => {
           ...label(20),
         }}
       >
-        Score ÷ T
+        Score ÷ <M>T</M>
       </div>
 
       {/* The temperature, its formula and its dial. */}
@@ -169,7 +170,11 @@ export const TempScene: React.FC = () => {
         <span style={label(21)}>Temperature</span>
       </Ink>
       <Ink at={start + 6} dur={16} style={{ left: PANEL - 4, top: y(424) }}>
-        <span style={{ ...headline(100), fontVariantNumeric: "tabular-nums lining-nums", whiteSpace: "nowrap" }}>T = {tLabel(t)}</span>
+        <span style={{ ...headline(100), fontVariantNumeric: "tabular-nums lining-nums", whiteSpace: "nowrap" }}>
+          <MathRun style={{ fontVariantNumeric: "tabular-nums lining-nums" }}>
+            <I>T</I> = {tLabel(t)}
+          </MathRun>
+        </span>
       </Ink>
       <Svg opacity={ease(frame, start + 8, 14)}>
         <line x1={TRACK[0]} x2={TRACK[1]} y1={y(612)} y2={y(612)} stroke={INK} strokeWidth={1.6} />

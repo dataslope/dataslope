@@ -156,7 +156,7 @@ export const WideScene: React.FC = () => {
             bands={[{ row: linus, at: linusAt + 2, color: MARK }]}
           />
           <Caption at={ownAt - 2} x={uid.x} y={pg.top - 48}>
-            its own table
+            Its own table
           </Caption>
         </div>
         {empty.map((row) => (
@@ -191,7 +191,7 @@ export const WideScene: React.FC = () => {
         <Pulse x={u[0] + 16} y={u[1]} at={exactlyAt} r={12} color={KEY_INK} />
         <Pulse x={profiles.x + profiles.width / 2} y={profiles.top + profiles.head / 2} at={profileSideAt} r={46} color={KEY_INK} />
         <Tag at={aloneAt - 6} x={profiles.x} y={profiles.bottom + 22} italic size={22}>
-          a profile needs its user; a user can go without
+          A profile needs its user; a user can go without
         </Tag>
       </Drift>
     </AbsoluteFill>

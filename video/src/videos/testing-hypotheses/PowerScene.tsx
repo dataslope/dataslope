@@ -118,7 +118,7 @@ export const PowerScene: React.FC = () => {
       <FigLabel n="13" title="2,000 experiments, each one square" at={simFrom} x={GRID_X} y={y(300)} />
       <Ink at={halfAt - 4} dur={14} style={{ left: GRID_X, top: y(300) + 40, whiteSpace: "nowrap" }}>
         <Label size={21} color={INK_SOFT} weight={520}>
-          a real effect of {POWER.effect} SD
+          A real effect of {POWER.effect} SD
           <span style={{ opacity: ease(frame, thirtyAt - 2, 10) }}>, {POWER.n} per group</span>
         </Label>
       </Ink>
@@ -144,7 +144,7 @@ export const PowerScene: React.FC = () => {
       </Svg>
       <div style={{ position: "absolute", left: GRID_X, top: y(GRID_Y) + 22 + 40 * CELL_H + 18, opacity: ease(frame, repeatAt - 2, 8), whiteSpace: "nowrap" }}>
         <Label size={24}>
-          <span style={{ color: DATA_INK }}>rejected: {fmt(caught, 0)}</span>
+          <span style={{ color: DATA_INK }}>Rejected: {fmt(caught, 0)}</span>
           <span style={{ color: INK_SOFT, marginLeft: 22 }}>of {fmt(done, 0)} runs</span>
         </Label>
       </div>

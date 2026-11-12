@@ -22,7 +22,6 @@ import {
   NumCell,
   pulse,
   Spot,
-  SURFACE,
   X0,
 } from "./parts";
 
@@ -38,7 +37,7 @@ const TOKENIZE = { x: X0, w: 210 };
 const OPTIONAL_X0 = 380;
 const OPTIONAL_W = 220;
 const OPTIONAL_STEP = 260;
-const QUESTIONS = ["lowercase?", "drop stopwords?", "stem or lemmatize?", "add n-grams?"];
+const QUESTIONS = ["Lowercase?", "Drop stopwords?", "Stem or lemmatize?", "Add n-grams?"];
 const TEST_Y = 708;
 const PILL_Y = 788;
 
@@ -119,7 +118,8 @@ export const MenuScene: React.FC = () => {
       <Note at={turnsAt} x={X0} y={y(WORDS_LABEL_Y)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>a list of words</span>
       </Note>
-      <Arrow from={[740, y(ROW_Y) + 22]} to={[880, y(ROW_Y) + 22]} at={turnsAt} dur={16} color={INK_SOFT} />
+      {/* From just past the last chip (it ends near x 592) to the first cell. */}
+      <Arrow from={[604, y(ROW_Y) + 22]} to={[CELL.x0 - 2, y(ROW_Y) + 22]} at={turnsAt} dur={16} color={INK_SOFT} />
       {BOW.vocab.map((w, j) => (
         <Note key={w} at={numbersAt + j} x={CELL.x0 + j * CELL.step + CELL.w / 2} y={y(CELL.top) - 34} style={{ transform: "translateX(-50%)" }}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>{w}</span>
@@ -146,8 +146,8 @@ export const MenuScene: React.FC = () => {
 
       {/* ── Fig. 2: tokenize, then a question at every step ── */}
       <FigLabel n="2" title="The cleaning steps: a menu, not a recipe" at={menuAt - 4} x={X0} y={y(FIG2_Y)} />
-      <Card at={tokenizeAt - 4} x={TOKENIZE.x} y={y(STATION_Y)} w={TOKENIZE.w} h={h(STATION_H)} fill={SURFACE} line={INK}>
-        <span style={label(26, INK)}>tokenize</span>
+      <Card at={tokenizeAt - 4} x={TOKENIZE.x} y={y(STATION_Y)} w={TOKENIZE.w} h={h(STATION_H)}>
+        <span style={label(26, INK)}>Tokenize</span>
         <span style={{ ...note(20, INK_SOFT), marginTop: 6 }}>nearly always</span>
       </Card>
       {QUESTIONS.map((q, k) => (
@@ -155,8 +155,8 @@ export const MenuScene: React.FC = () => {
           {/* One arrow out of tokenize; the optional steps are a menu, not a chain. */}
           {k === 0 ? (
             <Arrow
-              from={[TOKENIZE.x + TOKENIZE.w + 6, stationMid]}
-              to={[optionalX(0) - 8, stationMid]}
+              from={[TOKENIZE.x + TOKENIZE.w + 2, stationMid]}
+              to={[optionalX(0) - 2, stationMid]}
               at={questionAt - 4}
               dur={8}
               color={INK_SOFT}

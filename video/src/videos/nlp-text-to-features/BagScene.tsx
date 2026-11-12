@@ -135,7 +135,7 @@ export const BagScene: React.FC = () => {
         ))}
       </div>
       <Note at={orderAt} x={BAG_X} y={y(TALLY_Y) + 58}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>which words and how many times; their order is gone</span>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Which words and how many times; their order is gone</span>
       </Note>
       </div>
 

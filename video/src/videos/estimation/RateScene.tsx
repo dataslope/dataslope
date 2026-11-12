@@ -2,10 +2,10 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
-import { SERIF } from "../../editorial/fonts";
 import { useLayout } from "../../editorial/layout";
 import { fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { mulberry32, RATE } from "./data";
@@ -123,8 +123,10 @@ export const RateScene: React.FC = () => {
         </span>
       </Ink>
       <div style={{ position: "absolute", left: COL, top: y(282), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-        <Ink at={fiveFortyAt - 4} dur={16} style={{ position: "relative", ...headline(52) }}>
-          <PHat /> = {RATE.successes} ÷ {RATE.n.toLocaleString("en-US")}
+        <Ink at={fiveFortyAt - 4} dur={16} style={{ position: "relative", fontSize: 52, lineHeight: 1.02, color: INK }}>
+          <MathRun>
+            <I>{"p̂"}</I> = {RATE.successes} ÷ {RATE.n.toLocaleString("en-US")}
+          </MathRun>
         </Ink>
         <Ink at={eighteenAt - 6} dur={12} style={{ position: "relative", ...headline(52), color: EST_INK }}>
           = <Count at={eighteenAt - 6} to={RATE.pHat * 100} dur={14} digits={0} suffix="%" />
@@ -134,8 +136,10 @@ export const RateScene: React.FC = () => {
         <span style={label(22, INK_SOFT)}>A rate’s standard error</span>
       </Ink>
       <div style={{ position: "absolute", left: COL, top: y(432), display: "flex", alignItems: "baseline", gap: 16, whiteSpace: "nowrap" }}>
-        <Ink at={itselfAt - 6} dur={18} style={{ position: "relative", fontFamily: SERIF, fontSize: 42, color: INK }}>
-          √(<PHat /> (1 − <PHat />) ÷ <i>n</i>)
+        <Ink at={itselfAt - 6} dur={18} style={{ position: "relative", fontSize: 32, color: INK }}>
+          <MathRun>
+            √(<I>{"p̂"}</I> (1 − <I>{"p̂"}</I>) ÷ <I>n</I>)
+          </MathRun>
         </Ink>
         <Ink at={tenthsAt - 4} dur={14} style={{ position: "relative", ...note(34, INK), fontWeight: 500 }}>
           = <Count at={tenthsAt - 4} to={RATE.se * 100} dur={14} digits={2} /> points

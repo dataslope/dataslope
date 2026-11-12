@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, Bars, sx } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
+import { M } from "../../editorial/math";
 import { ACCENT, ACCENT_INK, HAIRLINE, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -84,7 +85,9 @@ export const ManyScene: React.FC = () => {
       />
       <Axis scale={HIST_X} base={base} ticks={TICKS} format={(v) => (v === 0 ? "0" : dec(v, v % 1 ? 1 : 0))} at={start - 4} size={20} />
       <Note at={start} x={(HIST_X.x0 + HIST_X.x1) / 2} y={base + 48} style={{ transform: "translateX(-50%)" }}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Correlation of the two walks in a pair, r</span>
+        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+          Correlation of the two walks in a pair, <M>r</M>
+        </span>
       </Note>
 
       <Layer opacity={tail}>

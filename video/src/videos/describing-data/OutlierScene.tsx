@@ -22,9 +22,9 @@ const JIT_Y = jitter(73, OUTLIERS.values.length);
 
 /** The lesson's three kinds of outlier, and what each one calls for. */
 const KINDS = [
-  { word: "error", egWord: "typo", actWord: "fix", title: "An error", eg: "a typo, a unit mix-up", act: "Fix it, or drop it and say why" },
+  { word: "error", egWord: "typo", actWord: "fix", title: "An error", eg: "A typo, a unit mix-up", act: "Fix it, or drop it and say why" },
   { word: "placeholder", egWord: "minus nine", actWord: "treat", title: "A placeholder", eg: "−999 standing for missing", act: "Treat it as missing" },
-  { word: "real", egWord: "biggest customer", actWord: "keep", title: "Something real", eg: "your biggest customer, a fraud", act: "Keep it, and use robust statistics" },
+  { word: "real", egWord: "biggest customer", actWord: "keep", title: "Something real", eg: "Your biggest customer, a fraud", act: "Keep it, and use robust statistics" },
 ] as const;
 
 /**
@@ -240,7 +240,7 @@ export const OutlierScene: React.FC = () => {
             <div style={{ ...body(28), color: INK_SOFT, marginTop: 8, whiteSpace: "nowrap", opacity: Math.max(ease(frame, egAt[i] - 4, 12), acts) }}>
               {i === 2 ? (
                 <>
-                  your biggest customer, <Mark at={fraudAt - 2}>a fraud</Mark>
+                  Your biggest customer, <Mark at={fraudAt - 2}>a fraud</Mark>
                 </>
               ) : (
                 k.eg

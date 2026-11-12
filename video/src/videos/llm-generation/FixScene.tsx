@@ -14,9 +14,9 @@ const ROW_Y = (k: number) => 340 + k * 120;
 const ITEM_Y = (k: number) => 330 + k * 96;
 /** The lesson's reason under each of the first three fixes ("What actually reduces it"). */
 const GLOSS = [
-  "the fact is in the context, not the weights",
-  "a query you can run beats a number you must trust",
-  "a schema leaves no field to invent",
+  "The fact is in the context, not the weights",
+  "A query you can run beats a number you must trust",
+  "A schema leaves no field to invent",
 ] as const;
 
 /** The house badge's blue tint and ink, for the numbered discs. */

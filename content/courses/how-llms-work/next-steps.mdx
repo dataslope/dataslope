@@ -20,8 +20,8 @@ You opened the box. Here is what was inside, compressed.
    builds an updated representation from a weighted blend. Cost is
    quadratic in length.
 4. **Layers.** Attention and feed-forward, stacked dozens deep, with
-   most parameters in the feed-forward halves, which the largest open
-   models now split into experts that each token only partly uses.
+   most parameters in the feed-forward halves, which many of the largest
+   open models split into experts that each token only partly uses.
 5. **Softmax and sampling.** Scores become a distribution, and a
    configurable draw picks one token. Then the whole thing repeats.
 
@@ -134,12 +134,12 @@ Measuring your own task beats reading about someone else's.`}
 
 - [o] They change quickly, while the structural ratios behind them do not.
   > The output multiple and the batch discount have held across many rounds of price cuts, and the caching discount has only grown.
-- They are irrelevant, since only architecture matters.
+- They are irrelevant, since only a model's architecture matters for practical decisions.
   > Prices and capabilities matter a great deal for practical decisions.
-- They change only when a new architecture is introduced.
+- They change only when a new architecture is introduced, not between releases.
   > Prices change without architectural change.
-- They are stable enough to plan around for several years.
-  > Prices fell roughly 80% in a single year, the cheapest tiers fell tenfold in two months of 2026, and names change faster.
+- They are stable enough to plan a budget around for several years at a time.
+  > Prices have fallen roughly 80% in a single year and the cheapest tiers tenfold within months, and names change faster.
 
 Learn the ratios and the mechanisms, and re-check the numbers when they
 matter.`}

@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
+import { I, M, MathRun } from "../../editorial/math";
 import { fmt, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -95,15 +96,15 @@ export const ZScene: React.FC = () => {
           { text: "a position.", at: positionAt - 6, italic: true },
         ]}
       />
-      {/* The formula on one line in Inter at one size: the worked numbers
-          in the accent, and the z they come to in weight as well. */}
+      {/* The formula on one line in the math face at one size: the worked
+          numbers in the accent, and the z they come to in weight as well. */}
       <Ink at={zScoreAt - 2} dur={16} style={{ left: 96, top: y(254), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(34, INK) }}>
-          z = (score − mean) / SD{" "}
+        <MathRun style={{ fontSize: 36, color: INK }}>
+          <I>z</I> = (score − mean) / SD{" "}
           <span style={{ color: ASK_INK, opacity: ease(frame, isTwoAt - 6, 14) }}>
             = ({x} − {mu}) / {sigma} = <b style={{ fontWeight: 600 }}>{fmt(Z.z, 0)}</b>
           </span>
-        </span>
+        </MathRun>
       </Ink>
 
       <Drift from={zFrom} to={n.beat("skew-in").to + 40}>
@@ -155,7 +156,9 @@ export const ZScene: React.FC = () => {
               </text>
             ))}
           </Svg>
-          <div style={{ position: "absolute", left: 96, top: zY + 10, opacity: ease(frame, zScoreAt, 14), ...label(21, INK_SOFT) }}>z</div>
+          <div style={{ position: "absolute", left: 96, top: zY + 10, opacity: ease(frame, zScoreAt, 14), ...label(21, INK_SOFT) }}>
+            <M>z</M>
+          </div>
 
           {/* Thirty points: two steps of fifteen. */}
           <Bracket x0={zx(0)} x1={x130} y={py(pdf(mu)) - h(30)} at={thirtyAt - 4} color={ASK} up />
@@ -178,7 +181,11 @@ export const ZScene: React.FC = () => {
             {ring > 0 ? <circle cx={x130} cy={base} r={10 + ring * 16} fill="none" stroke={ASK} strokeWidth={2} opacity={ring} /> : null}
           </Svg>
           <Note at={isTwoEnd - 2} x={x130 + 18} y={zY - 44}>
-            <span style={{ ...askNote(26), whiteSpace: "nowrap" }}>z = {fmt(Z.z, 0)}</span>
+            <span style={{ ...askNote(26), whiteSpace: "nowrap" }}>
+              <MathRun>
+                <I>z</I> = {fmt(Z.z, 0)}
+              </MathRun>
+            </span>
           </Note>
 
           {/* A position, not a chance; the area is the percentile. */}

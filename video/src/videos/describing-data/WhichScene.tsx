@@ -20,6 +20,8 @@ const ROW1_TITLE = 376;
 const ROW2_TITLE = 646;
 const BOX_H = 56;
 const VIOLIN_H = 62;
+/** The box plot's box: a fill only, a step stronger than the violin's, since it has no outline to hold its edge. */
+const BOX_FILL = `color-mix(in srgb, ${DATA} 32%, transparent)`;
 
 const scaleAt = (x0: number): XScale => ({ lo: BINS.lo, hi: BINS.hi, x0, x1: x0 + W });
 
@@ -201,7 +203,7 @@ export const WhichScene: React.FC = () => {
               <line x1={q3} x2={wHi} y1={mid2} y2={mid2} stroke={INK} strokeWidth={2} />
               <line x1={wLo} x2={wLo} y1={mid2 - 14} y2={mid2 + 14} stroke={INK} strokeWidth={2} />
               <line x1={wHi} x2={wHi} y1={mid2 - 14} y2={mid2 + 14} stroke={INK} strokeWidth={2} />
-              <rect x={med - (med - q1) * box} y={mid2 - h(BOX_H) / 2} width={(q3 - q1) * box} height={h(BOX_H)} fill={SOFT_FILL} stroke={DATA} strokeWidth={2.4} />
+              <rect x={med - (med - q1) * box} y={mid2 - h(BOX_H) / 2} width={(q3 - q1) * box} height={h(BOX_H)} fill={BOX_FILL} />
               <line x1={med} x2={med} y1={mid2 - h(BOX_H) / 2} y2={mid2 + h(BOX_H) / 2} stroke={INK} strokeWidth={3.2} />
             </Svg>
           ) : null}

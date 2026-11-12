@@ -314,6 +314,7 @@ export const Chip: React.FC<{
   const t = tone ? ease(frame, tone.at, 10) * (1 - (tone.out === undefined ? 0 : ease(frame, tone.out, 10))) : 0;
   const moved = fromX === undefined ? x : lerp(fromX, x, ease(frame, at, travel));
   const height = sub ? CHIP_H + 26 : CHIP_H;
+  const base = dashed ? PAPER : ds("gray", 100);
   return (
     <div
       style={{
@@ -323,9 +324,11 @@ export const Chip: React.FC<{
         width,
         height,
         boxSizing: "border-box",
-        border: `2px ${dashed ? "dashed" : "solid"} ${border}`,
-        borderRadius: 10,
-        background: t > 0 ? `color-mix(in srgb, ${tone!.color} ${Math.round(t * 100)}%, ${PAPER})` : PAPER,
+        // Fill only: a gray node, washed by its tone. A dashed outline stays,
+        // because there the outline is the meaning (a row that should not exist).
+        border: dashed ? `2px dashed ${border}` : undefined,
+        borderRadius: 8,
+        background: t > 0 ? `color-mix(in srgb, ${tone!.color} ${Math.round(t * 100)}%, ${base})` : base,
         opacity: p * (1 - o) * (1 - d),
         transform: fromX === undefined ? `translateY(${(1 - p) * 10}px)` : undefined,
         display: "flex",

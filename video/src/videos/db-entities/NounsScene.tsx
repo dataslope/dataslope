@@ -175,7 +175,7 @@ export const NounsScene: React.FC = () => {
               height: orders.row,
               boxSizing: "border-box",
               border: `2px dashed ${INK_SOFT}`,
-              borderRadius: 6,
+              borderRadius: 5,
               background: PAPER,
               display: "flex",
               alignItems: "center",
@@ -202,7 +202,7 @@ export const NounsScene: React.FC = () => {
             y={orders.y - 6}
             width={BOX_W + 12}
             height={orders.head + 12}
-            rx={9}
+            rx={8}
             fill="none"
             stroke={INK}
             strokeWidth={1.5}

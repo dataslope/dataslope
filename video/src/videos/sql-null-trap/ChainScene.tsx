@@ -111,7 +111,8 @@ export const ChainScene: React.FC = () => {
         <Code line={`${GRACE.id} NOT IN (${LIST})`} size={CODE} />
         <span
           style={{
-            ...body(32, true),
+            // Within 12% of the code it follows (one line, one size).
+            ...body(35, true),
             color: INK_SOFT,
             opacity: ease(frame, termAt[0] - 10, 12),
           }}

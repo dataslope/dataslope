@@ -5,6 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { I, MathRun } from "../../editorial/math";
 import { Ink } from "../../editorial/ui";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -424,3 +425,11 @@ export const Spot: React.FC<{
     />
   );
 };
+
+/** One italic variable in the math face (editorial/math.tsx), at the size
+ *  of the words around it: the p of a p-value, a d or an h. */
+export const MathVar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <MathRun>
+    <I>{children}</I>
+  </MathRun>
+);

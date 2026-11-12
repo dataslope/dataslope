@@ -56,7 +56,6 @@ export const SplitScene: React.FC = () => {
   const aWordAt = n.word("token-kinds", "word");
   const markAt = n.word("token-kinds", "punctuation");
   const levelAt = n.word("sent-in", "period");
-  const end = n.beat("sent-in").to;
 
   // ── Geometry ──
   const row1 = rowLayout(WORDS.split, X0, SIZE);
@@ -181,7 +180,18 @@ export const SplitScene: React.FC = () => {
         countAt={sixteenAt}
       />
       {WORDS.tokens.map((w, j) => (
-        <Chip key={j} text={w} x={row2[j].x} y={y(ROW2_Y)} at={row2At[j]} size={SIZE} tones={tones2(j)} marks={marks2(j)} />
+        <Chip
+          key={j}
+          text={w}
+          x={row2[j].x}
+          y={y(ROW2_Y)}
+          at={row2At[j]}
+          size={SIZE}
+          tones={tones2(j)}
+          // The Mr. period the next scene is about lights on its own chip
+          // as it is named, rather than on a copy drawn over it.
+          marks={j === t.mr ? [...marks2(j), { at: levelAt + 2 }] : marks2(j)}
+        />
       ))}
       <Tag at={negAt} x={row2[t.nt].mid} y={tag2} align="center" color={BLUE_INK}>
         negation, a token
@@ -189,17 +199,6 @@ export const SplitScene: React.FC = () => {
       <Tag at={periodAt} x={row2[t.mr].mid} y={tag2} align="center" color={BLUE_INK}>
         period kept
       </Tag>
-      {/* "Each piece is a token" carries the scene to its end; the Mr. period
-          that the next scene is about lights as it is named. */}
-      <Chip
-        text={WORDS.tokens[t.mr]}
-        x={row2[t.mr].x}
-        y={y(ROW2_Y)}
-        at={levelAt}
-        size={SIZE}
-        marks={[{ at: levelAt + 2 }]}
-        out={end + 30}
-      />
     </AbsoluteFill>
   );
 };

@@ -4,6 +4,7 @@ import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, HAIRLINE, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
+import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DATA_INK, Greek, H0, Head, Kicker, Label, Mark, STAT_INK, Tick } from "./parts";
@@ -163,7 +164,9 @@ export const GridScene: React.FC = () => {
         catchingAt + 8,
         <Label size={26} color={DATA_INK}>
           <Mark at={oneMinusAt - 2}>
-            1 − <Greek>β</Greek>
+            <MathRun>
+              1 − <I>β</I>
+            </MathRun>
           </Mark>
         </Label>,
       )}
