@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -14,8 +14,6 @@ const CHIP = 96;
 const CHIP_PITCH = 132;
 const CHIP_X = 160;
 const CHIP_Y = 440;
-/** The answer cells' fill: a light gray, the ground the codes sit on. */
-const CHIP_FILL = `color-mix(in srgb, ${INK_SOFT} 14%, ${PAPER})`;
 /** The tally: one block per answer, stacked by flavor. */
 const STACK_X = [860, 1110, 1360];
 const STACK_W = 170;
@@ -147,9 +145,11 @@ export const FlavorScene: React.FC = () => {
               style={{
                 height: CHIP,
                 boxSizing: "border-box",
-                // A cell of the column: a light gray fill and no outline.
+                // A cell of the column, the owner's badge (2026-11-12): no
+                // fill, a near-black outline.
+                border: `2px solid ${INK}`,
                 borderRadius: 6,
-                background: CHIP_FILL,
+                background: "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -265,6 +265,9 @@ export const FlavorScene: React.FC = () => {
               height: lerp(CHIP, h(BLOCK) - 4, t),
               borderRadius: lerp(6, 3, t),
               background: s.col === 0 ? `color-mix(in srgb, ${STAT} ${Math.round(vanilla * 70)}%, ${RAW})` : RAW,
+              // Leaves the chip with the chip's outline, which fades as it lands.
+              border: `2px solid color-mix(in srgb, ${INK} ${Math.round((1 - t) * 100)}%, transparent)`,
+              boxSizing: "border-box",
               opacity: Math.min(1, t * 3),
             }}
           />

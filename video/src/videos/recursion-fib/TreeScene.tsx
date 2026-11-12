@@ -52,9 +52,9 @@ export const TreeScene: React.FC = () => {
       {/* The legend, at the right end of the label's line. */}
       <Note at={branchAt} x={1800} y={y(104) + 1} align="right" from="right">
         <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
-          <Key fill={NODE_LOOK.call.fill} /> <span>first time</span>
+          <Key fill={NODE_LOOK.call.fill} stroke={NODE_LOOK.call.stroke} /> <span>first time</span>
           <span style={{ width: 16 }} />
-          <Key fill={NODE_LOOK.repeat.fill} />
+          <Key fill={NODE_LOOK.repeat.fill} stroke={NODE_LOOK.repeat.stroke} />
           <span style={{ color: NAIVE_INK, fontWeight: 500 }}>repeat</span>
         </span>
       </Note>

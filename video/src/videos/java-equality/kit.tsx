@@ -13,7 +13,6 @@ import {
   HIGHLIGHT,
   INK,
   INK_SOFT,
-  PAPER,
   label,
 } from "../../editorial/style";
 import { Ink, W, H } from "../../editorial/ui";
@@ -443,8 +442,10 @@ export const RefArrow: React.FC<{
   );
 };
 
-/** A plain cell's or object's fill: neutral gray. A tint mixes into it. */
-const PLAIN = `color-mix(in srgb, var(--ds-gray-400) 24%, ${PAPER})`;
+/** A cell's or object's outline (the owner's badge, 2026-11-12): no fill,
+ *  black text, a near-black outline. A tint is a color for the outline and
+ *  the value, never a fill. */
+const OUTLINE = `2px solid ${INK}`;
 
 /** A variable's cell on the stack: its name, and room on the right for the
  *  dot a RefArrow starts from (see `cellDot`). */
@@ -465,9 +466,9 @@ export const VarCell: React.FC<{
         style={{
           position: "absolute",
           inset: 0,
-          // A filled cell, no outline (the owner, 2026-11-11).
+          boxSizing: "border-box",
+          border: OUTLINE,
           borderRadius: 4,
-          background: PLAIN,
           clipPath: `inset(0 ${(1 - p) * 100}% 0 0)`,
         }}
       />
@@ -481,8 +482,8 @@ export const VarCell: React.FC<{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          // The name's half is cut from the dot's by a line of paper.
-          borderRight: `2px solid ${PAPER}`,
+          // The name's half is cut from the dot's by a line of the outline's ink.
+          borderRight: OUTLINE,
           opacity: ease(frame, at + 4, 10),
           fontFamily: MONO,
           fontSize: 32,
@@ -508,7 +509,8 @@ export const HeapObj: React.FC<{
   top: number;
   width: number;
   height: number;
-  type: string;
+  /** The class, in small Inter above the value; omit when it adds nothing. */
+  type?: string;
   value: string;
   valueInk: string;
   at: number;
@@ -538,16 +540,9 @@ export const HeapObj: React.FC<{
           position: "absolute",
           inset: 0,
           boxSizing: "border-box",
-          // Filled, no outline; a dashed one stays, since there the outline
-          // is the meaning.
-          border: dashed ? `2px dashed ${INK_SOFT}` : undefined,
+          border: dashed ? `2px dashed ${INK_SOFT}` : `2px solid ${tint > 0 ? `color-mix(in srgb, ${tintColor} ${Math.round(tint * 100)}%, ${INK})` : INK}`,
           borderRadius: 8,
-          background:
-            tint > 0
-              ? `color-mix(in srgb, ${tintColor} ${Math.round(tint * 100)}%, ${PLAIN})`
-              : dashed
-                ? "transparent"
-                : PLAIN,
+          background: "transparent",
         }}
       />
       <div
@@ -561,23 +556,25 @@ export const HeapObj: React.FC<{
           gap: 2,
         }}
       >
-        <span
-          style={{
-            fontFamily: SANS,
-            fontSize: 20,
-            fontWeight: 500,
-            color: INK_SOFT,
-            lineHeight: 1.1,
-          }}
-        >
-          {type}
-        </span>
+        {type ? (
+          <span
+            style={{
+              fontFamily: SANS,
+              fontSize: 20,
+              fontWeight: 500,
+              color: INK_SOFT,
+              lineHeight: 1.1,
+            }}
+          >
+            {type}
+          </span>
+        ) : null}
         <span
           style={{
             fontFamily: MONO,
             fontSize: 32,
             fontWeight: 500,
-            color: valueInk,
+            color: tint > 0 ? `color-mix(in srgb, ${tintColor} ${Math.round(tint * 100)}%, ${valueInk})` : valueInk,
             lineHeight: 1.2,
             fontVariantLigatures: "none",
             whiteSpace: "pre",

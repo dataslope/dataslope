@@ -5,7 +5,7 @@ import { HAIRLINE, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Arrow, Card, CHIP_LINE, Drift, FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, Reveal, Svg, X0 } from "./parts";
+import { Arrow, Card, Drift, FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, Reveal, Svg, X0 } from "./parts";
 
 /**
  * The lesson's task-by-task table (choosing-your-pipeline.mdx, "Task by
@@ -40,6 +40,8 @@ const DEFAULT_Y = 868;
  * spoken cell marked in each; then an ablation, one step changed and
  * measured on the task; then the lesson's safe default.
  */
+const OUTLINED = { fill: "transparent", style: { border: `2px solid ${INK}` } };
+
 export const TasksScene: React.FC = () => {
   const n = useNarration();
   const { y, h } = useLayout();
@@ -124,21 +126,22 @@ export const TasksScene: React.FC = () => {
         </Note>
 
         {/* ── Fig. 5: an ablation ── */}
+        {/* The owner's badge (2026-11-12): no fill, black text, a near-black outline. */}
         <FigLabel n="5" title="One step at a time" at={changeAt - 6} x={X0} y={y(FIG5_Y)} />
-        <Card at={changeAt - 4} x={X0} y={flowTop} w={340} h={flowH}>
+        <Card at={changeAt - 4} x={X0} y={flowTop} w={340} h={flowH} {...OUTLINED}>
           <span style={label(24, INK)}>Change one step</span>
         </Card>
         <Arrow from={[X0 + 342, mid - 14]} to={[b.x - 2, flowTop + half / 2]} at={changeAt + 4} dur={10} color={INK_SOFT} width={2} head={11} />
         <Arrow from={[X0 + 342, mid + 14]} to={[b.x - 2, flowTop + flowH - half / 2]} at={changeAt + 6} dur={10} color={INK_SOFT} width={2} head={11} />
-        <Card at={changeAt + 8} x={b.x} y={flowTop} w={b.w} h={half} line={CHIP_LINE}>
+        <Card at={changeAt + 8} x={b.x} y={flowTop} w={b.w} h={half} {...OUTLINED}>
           <span style={note(23, INK)}>With it</span>
         </Card>
-        <Card at={changeAt + 12} x={b.x} y={flowTop + flowH - half} w={b.w} h={half} line={CHIP_LINE}>
+        <Card at={changeAt + 12} x={b.x} y={flowTop + flowH - half} w={b.w} h={half} {...OUTLINED}>
           <span style={note(23, INK)}>Without it</span>
         </Card>
         <Arrow from={[b.x + b.w + 2, flowTop + half / 2]} to={[c.x - 2, mid - 14]} at={measureAt - 4} dur={10} color={INK_SOFT} width={2} head={11} />
         <Arrow from={[b.x + b.w + 2, flowTop + flowH - half / 2]} to={[c.x - 2, mid + 14]} at={measureAt - 2} dur={10} color={INK_SOFT} width={2} head={11} />
-        <Card at={measureAt} x={c.x} y={flowTop} w={c.w} h={flowH}>
+        <Card at={measureAt} x={c.x} y={flowTop} w={c.w} h={flowH} {...OUTLINED}>
           <span style={label(24, INK)}>Measure on your own task</span>
         </Card>
         <Note at={ablationAt - 2} x={c.x + c.w + 40} y={mid - 22}>

@@ -16,17 +16,15 @@ const TEXT = 24;
  *  (naive), or an answer read from the table (memo). */
 export type NodeLook = "call" | "repeat" | "lookup";
 
-/** Filled shapes with no outline (the owner, 2026-11-11): a call in neutral
- *  gray, a repeat in a red tint. A lookup does no work of its own, so it is
- *  the one drawn as an outline, dashed: there the outline is the meaning. */
+/** Pills with an outline (the owner, 2026-11-12): a call on the page's own
+ *  white with a near-black outline, a repeat in the red, and a lookup in the
+ *  memo's tint, its outline dashed because it does no work of its own. */
 export const NODE_LOOK: Record<NodeLook, { fill: string; stroke: string; ink: string; dash?: string }> = {
-  call: { fill: `color-mix(in srgb, var(--ds-gray-400) 24%, ${PAPER})`, stroke: "transparent", ink: INK },
-  repeat: { fill: `color-mix(in srgb, ${NAIVE} 22%, ${PAPER})`, stroke: "transparent", ink: NAIVE_INK },
-  lookup: { fill: PAPER, stroke: MEMO, ink: MEMO_INK, dash: "7 5" },
+  call: { fill: PAPER, stroke: INK_SOFT, ink: INK },
+  repeat: { fill: `color-mix(in srgb, ${NAIVE} 20%, ${PAPER})`, stroke: NAIVE, ink: NAIVE_INK },
+  lookup: { fill: `color-mix(in srgb, ${MEMO} 14%, ${PAPER})`, stroke: MEMO, ink: MEMO_INK, dash: "7 5" },
 };
 const LOOK = NODE_LOOK;
-/** The node's corner radius: rounded, not a pill. */
-const NODE_R = 8;
 
 /**
  * A node, centred on `x` with its top at `top` (page px, already through the
@@ -72,7 +70,7 @@ export const TreeNode: React.FC<{
           style={{
             position: "absolute",
             inset: -9,
-            borderRadius: NODE_R + 9,
+            borderRadius: NODE_H,
             background: HIGHLIGHT,
             opacity: glow,
           }}
@@ -84,7 +82,7 @@ export const TreeNode: React.FC<{
           y={1.5}
           width={w - 3}
           height={NODE_H - 3}
-          rx={NODE_R}
+          rx={(NODE_H - 3) / 2}
           fill={blend(a.fill, b.fill)}
           stroke={blend(a.stroke, b.stroke)}
           strokeWidth={2.4}
@@ -96,7 +94,7 @@ export const TreeNode: React.FC<{
             y={-6}
             width={w + 12}
             height={NODE_H + 12}
-            rx={NODE_R + 6}
+            rx={(NODE_H + 12) / 2}
             fill="none"
             stroke={NAIVE}
             strokeWidth={3}

@@ -239,8 +239,8 @@ export const Mono: React.FC<{ children: string; color?: string }> = ({ children,
   <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: 500, color }}>{children}</span>
 );
 
-/** A legend key: a small node, filled, or outlined and dashed, the way the
- *  figure draws it. A filled key has no outline; pass no `stroke`. */
+/** A legend key: a small pill, filled and outlined the way the figure draws
+ *  its nodes. */
 export const Key: React.FC<{ fill?: string; stroke?: string; dashed?: boolean }> = ({ fill, stroke, dashed }) => (
   <svg width={30} height={18} style={{ overflow: "visible", flex: "none" }}>
     <rect
@@ -248,7 +248,7 @@ export const Key: React.FC<{ fill?: string; stroke?: string; dashed?: boolean }>
       y={1}
       width={28}
       height={16}
-      rx={4}
+      rx={8}
       fill={fill ?? "none"}
       stroke={stroke ?? "none"}
       strokeWidth={2}

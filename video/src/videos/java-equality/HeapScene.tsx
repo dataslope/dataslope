@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { HAIRLINE, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { HAIRLINE, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { compared, FIG2 } from "./data";
@@ -10,7 +10,6 @@ import {
   cellDot,
   Code,
   Fig,
-  FRESH_TINT,
   HeapObj,
   InkSlot,
   markP,
@@ -128,9 +127,10 @@ export const HeapScene: React.FC = () => {
           top: rowTop(0) - 18,
           width: CELL_W + 36,
           height: rowTop(3) + rowH + 18 - (rowTop(0) - 18),
-          // A filled panel, no outline: the cells on it are a deeper gray.
+          // The frame: a gray outline around the cells, no fill.
+          boxSizing: "border-box",
+          border: `1.5px solid ${INK_SOFT}`,
           borderRadius: 8,
-          background: `color-mix(in srgb, var(--ds-gray-400) 9%, ${PAPER})`,
           opacity: ease(frame, Math.max(start - 5, variableAt - 6), 14),
         }}
       />
@@ -192,7 +192,7 @@ export const HeapScene: React.FC = () => {
         value={'"hi"'}
         valueInk={STRING_INK}
         at={objectAt - 2}
-        tint={ease(frame, sharedAt, 12) * 0.3}
+        tint={ease(frame, sharedAt, 12)}
         tintColor={SHARED_TINT}
         mark={letters}
       />
@@ -205,8 +205,6 @@ export const HeapScene: React.FC = () => {
         value={'"hi"'}
         valueInk={STRING_INK}
         at={objectAt + 2}
-        tint={ease(frame, freshAt - 2, 12) * 0.22}
-        tintColor={FRESH_TINT}
         mark={letters}
       />
       <HeapObj
@@ -218,8 +216,6 @@ export const HeapScene: React.FC = () => {
         value={'"hi"'}
         valueInk={STRING_INK}
         at={runsAt - 6}
-        tint={ease(frame, runsAt + 4, 12) * 0.22}
-        tintColor={FRESH_TINT}
         mark={letters}
       />
 

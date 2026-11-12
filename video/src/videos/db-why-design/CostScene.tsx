@@ -8,14 +8,17 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { FIXED_ORDER, FLAT, MISSED_ORDER, NEW_EMAIL, OLD_EMAIL, rowsChanged } from "./data";
-import { Chip, Drift, Headline, lerp, Listing, Mark, NODE, pulse, X0 } from "./parts";
+import { Chip, chipHeight, Drift, Headline, lerp, Listing, Mark, PROGRAM_ICON, pulse, X0 } from "./parts";
 
 /** The programs that touch the table: the lesson's own list ("the web app,
  *  the admin dashboard, the import job, the reporting script"). */
-const PROGRAMS = ["web app", "admin dashboard", "import job", "reporting script"] as const;
+const PROGRAMS = ["Web App", "Admin Dashboard", "Import Job", "Reporting Script"] as const;
 const CHIP_X = 1300;
-const CHIP_W = 330;
+const CHIP_W = 400;
 const CHIP_Y = [404, 504, 604, 704];
+/** The programs' chips get a little more air than the house chip. */
+const CHIP_PAD = 18;
+const CHIP_H = chipHeight(CHIP_PAD);
 const CARD_W = 560;
 const CARD_H = 96;
 /** The one fact, and the two copies it became. */
@@ -156,17 +159,16 @@ export const CostScene: React.FC = () => {
                       justifyContent: "center",
                       gap: 6,
                       borderRadius: 8,
-                      // Fill only, and opaque, so the copy underneath never shows through:
-                      // the one fact in the plain gray, its copies in the accent's tint.
-                      background:
-                        split > 0.5
-                          ? `color-mix(in srgb, ${ACCENT} ${Math.round(14 + stepped * 16)}%, ${PAPER})`
-                          : NODE,
+                      // The owner's badge (2026-11-12): a near-black outline, black
+                      // text, and the page's own white, opaque so the copy underneath
+                      // never shows through.
+                      border: `2px solid ${INK}`,
+                      background: PAPER,
                       opacity: shown,
                       transform: `scale(${1 + stepped * 0.025})`,
                     }}
                   >
-                    <div style={label(20, INK_SOFT)}>{one ? "Ada's email: one fact" : `copy on order ${c.order}`}</div>
+                    <div style={label(20, INK_SOFT)}>{one ? "Ada's email: one fact" : `Copy on order ${c.order}`}</div>
                     <div style={{ fontFamily: MONO, fontSize: 26, color: INK, fontWeight: 500 }}>
                       <span style={{ opacity: swap < 0.5 ? 1 - 2 * swap : 2 * swap - 1 }}>{swap < 0.5 ? OLD_EMAIL : c.email}</span>
                     </div>
@@ -178,29 +180,29 @@ export const CostScene: React.FC = () => {
           {/* Every program that touches the table, each with both copies to keep in step. */}
           {PROGRAMS.map((p, i) => (
             <React.Fragment key={p}>
-              <Chip at={programAt - 4 + i * 5} out={rewritten(i)} x={CHIP_X} y={chipY(i)} width={CHIP_W} glow={pulse(frame, handAt + 4 + i * 5, 20)}>
+              <Chip at={programAt - 4 + i * 5} out={rewritten(i)} x={CHIP_X} y={chipY(i)} width={CHIP_W} padY={CHIP_PAD} icon={PROGRAM_ICON[p]} glow={pulse(frame, handAt + 4 + i * 5, 20)}>
                 {p}
               </Chip>
-              <Chip at={rewritten(i) + 6} x={CHIP_X} y={chipY(i)} width={CHIP_W} glow={pulse(frame, outlivesAt + 6 + i * 4, 18)}>
+              <Chip at={rewritten(i) + 6} x={CHIP_X} y={chipY(i)} width={CHIP_W} padY={CHIP_PAD} icon={PROGRAM_ICON[p]} glow={pulse(frame, outlivesAt + 6 + i * 4, 18)}>
                 {p}, rewritten
               </Chip>
               {[0, 1].map((k) => (
                 <Leader
                   key={k}
                   points={[
-                    [CHIP_X, chipY(i) + 26],
+                    [CHIP_X, chipY(i) + CHIP_H / 2],
                     [X0 + CARD_W, y(COPY_Y[k]) + h(CARD_H) / 2],
                   ]}
                   at={stepAt - 6 + i * 4 + k * 2}
                   dur={14}
-                  color={`color-mix(in srgb, ${ACCENT} ${Math.round(35 + 50 * pulse(frame, foreverAt + i * 4, 22))}%, ${INK_SOFT})`}
-                  width={1.6}
+                  color={INK}
+                  width={1.6 + 0.8 * pulse(frame, foreverAt + i * 4, 22)}
                   dot={false}
                 />
               ))}
             </React.Fragment>
           ))}
-          <Note at={foreverAt - 2} x={CHIP_X} y={chipY(3) + 84} dim={anomalyAt + 10}>
+          <Note at={foreverAt - 2} x={CHIP_X} y={chipY(3) + CHIP_H + 18} dim={anomalyAt + 10}>
             <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>By hand, forever.</span>
           </Note>
 

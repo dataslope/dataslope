@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
@@ -11,13 +11,11 @@ import {
   cellDot,
   Code,
   Fig,
-  FRESH_TINT,
   HeapObj,
   InkSlot,
   Marked,
   markP,
   Mono,
-  NUMBER_INK,
   type Pt,
   RefArrow,
   SHARED_TINT,
@@ -172,9 +170,10 @@ export const CacheScene: React.FC = () => {
           top: frameTop,
           width: CELL_W + 32,
           height: frameBottom - frameTop,
-          // A filled panel, no outline: the cells on it are a deeper gray.
+          // The frame: a gray outline around the cells, no fill.
+          boxSizing: "border-box",
+          border: `1.5px solid ${INK_SOFT}`,
           borderRadius: 8,
-          background: `color-mix(in srgb, var(--ds-gray-400) 9%, ${PAPER})`,
           opacity: ease(frame, insideAt - 6, 14),
         }}
       />
@@ -202,7 +201,7 @@ export const CacheScene: React.FC = () => {
             at={at}
             value={c.value}
             mark={isLow ? lowMark : isHigh ? highMark : 0}
-            tint={isHigh ? shared * 0.3 : 0}
+            tint={isHigh ? shared : 0}
           />
         );
       })}
@@ -254,12 +253,9 @@ export const CacheScene: React.FC = () => {
             top={rowTop(v)}
             width={OBJ_W}
             height={rowH}
-            type="Integer"
             value="128"
-            valueInk={NUMBER_INK}
+            valueInk={INK}
             at={newAt - 4 + k * 4}
-            tint={ease(frame, newAt + 4, 12) * 0.22}
-            tintColor={FRESH_TINT}
           />
           <RefArrow points={[dot(v), [NEW_X - 1, mid(v)]]} dotAt={outsideAt + 6 + k * 2} at={newAt + k * 4} dur={14} />
         </React.Fragment>
@@ -287,10 +283,8 @@ export const CacheScene: React.FC = () => {
   );
 };
 
-/** A cached Integer's fill: neutral gray, as the kit's cells. */
-const CELL_FILL = `color-mix(in srgb, var(--ds-gray-400) 24%, ${PAPER})`;
-
-/** One cached Integer in the strip: its value, in the number ink. */
+/** One cached Integer in the strip: its value in black in a near-black
+ *  outline; the shared one turns both blue, the references' color. */
 const HeapCell: React.FC<{
   x: number;
   top: number;
@@ -303,6 +297,7 @@ const HeapCell: React.FC<{
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
+  const blue = (base: string) => (tint > 0 ? `color-mix(in srgb, ${SHARED_TINT} ${Math.round(tint * 100)}%, ${base})` : base);
   return (
     <div
       style={{
@@ -311,12 +306,10 @@ const HeapCell: React.FC<{
         top,
         width: BOX_W,
         height,
-        // A filled cell, no outline (the owner, 2026-11-11).
+        // The owner's badge (2026-11-12): no fill.
+        boxSizing: "border-box",
+        border: `2px solid ${blue(INK)}`,
         borderRadius: 5,
-        background:
-          tint > 0
-            ? `color-mix(in srgb, ${SHARED_TINT} ${Math.round(tint * 100)}%, ${CELL_FILL})`
-            : CELL_FILL,
         opacity: p,
         transform: `translateY(${(1 - p) * 10}px)`,
         display: "flex",
@@ -325,7 +318,7 @@ const HeapCell: React.FC<{
         fontFamily: MONO,
         fontSize: 30,
         fontWeight: 500,
-        color: NUMBER_INK,
+        color: blue(INK),
         fontVariantLigatures: "none",
       }}
     >

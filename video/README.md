@@ -381,6 +381,18 @@ Every video follows these rules.
   override either. A line of text under a row of badges keeps at least
   20px clear of the tint (the owner: "make sure the description text under
   each badge has enough top spacing").
+  **A diagram's boxes are outlined, not filled** (the owner, 2026-11-12: "I
+  actually like the old badge design with a transparent background and
+  black border better"): the nodes of a causal sketch or a flow, the cells
+  of a column or a stack frame, a heap object, a program's chip, a call
+  tree's pills. No fill, black text, a 2px near-black (`INK`) outline. A
+  highlight is a color for the outline and the text together, never a
+  fill: the shared cached `127` is a blue outline with blue text. The lines
+  that join such boxes are black too. A box holding a stack of
+  highlighted rows (the call stack's yellow frames) keeps its tint and no
+  outline. A program or a tool named in a chip may carry its lucide icon
+  (`lucide-react`, at the label's size, in the label's ink), and its name
+  is in Title Case ("Web App", "Admin Dashboard").
   **Items set side by side take a vertical hairline between them** (the
   owner: "When there are items laid out horizontally, I think subtle
   separators will help"): two, three or four columns of text get a 1px

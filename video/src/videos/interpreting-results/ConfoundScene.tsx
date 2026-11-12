@@ -13,9 +13,8 @@ const X = { lo: 0, hi: 280, x0: 230, x1: 1150 };
 const Y = { lo: 100, hi: 150 };
 const TOP = 330;
 const BOTTOM = 840;
-/** The causal sketch's nodes: a gray tint, fill only. */
+/** The causal sketch's nodes: no fill, a near-black outline, NODE_H tall. */
 const NODE_H = 46;
-const NODE_FILL = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
 const BAND_NAME = ["age around 30", "around 45", "around 60", "around 75"];
 /** The causal sketch: three boxes. */
 const AGE = [1560, 420] as const;
@@ -80,8 +79,9 @@ export const ConfoundScene: React.FC = () => {
   const lowY = y(EXERCISE[1]);
   const diagram = ease(frame, drivesAt - 8, 12);
 
-  // A node is a gray tint with no outline (the owner, 2026-11-11), NODE_H
-  // tall and centred on its y, so the arrows can start and end on its edges.
+  // A node is the owner's badge (2026-11-12): no fill, black text and a
+  // near-black outline, NODE_H tall (outline included) and centred on its y,
+  // so the arrows can start and end on its edges.
   const box = (label_: string, x: number, yy: number, at: number, color = INK) => (
     <Ink at={at} dur={12} style={{ left: x, top: yy - NODE_H / 2, whiteSpace: "nowrap" }}>
       <div
@@ -93,7 +93,8 @@ export const ConfoundScene: React.FC = () => {
           alignItems: "center",
           padding: "0 18px",
           borderRadius: 8,
-          background: NODE_FILL,
+          border: `2px solid ${color}`,
+          background: "transparent",
           ...label(24, color),
         }}
       >

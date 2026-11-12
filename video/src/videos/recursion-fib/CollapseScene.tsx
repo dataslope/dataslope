@@ -7,7 +7,7 @@ import { INK, INK_SOFT, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MEMO_CALLS, MEMO_HITS, MEMO_TREE, memoAt, NAIVE_CALLS, NAIVE_TREE, TREE_N } from "./data";
 import { COUNTER_TOP, levelTop, nodeX, SIDE_X } from "./geometry";
-import { Fig, Key, MEMO, MEMO_INK, Mono, NAIVE_INK } from "./kit";
+import { Fig, Key, MEMO_INK, Mono, NAIVE_INK } from "./kit";
 import { Counter, NODE_LOOK, TreeEdge, TreeNode } from "./tree";
 
 /** The memoized tree keeps its root where the naive root was. */
@@ -51,9 +51,9 @@ export const CollapseScene: React.FC = () => {
       </Fig>
       <Note at={tableAt} x={1800} y={y(104) + 1} align="right" from="right">
         <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
-          <Key fill={NODE_LOOK.call.fill} /> <span>computed</span>
+          <Key fill={NODE_LOOK.call.fill} stroke={NODE_LOOK.call.stroke} /> <span>computed</span>
           <span style={{ width: 16 }} />
-          <Key stroke={MEMO} dashed />
+          <Key fill={NODE_LOOK.lookup.fill} stroke={NODE_LOOK.lookup.stroke} dashed />
           <span style={{ color: MEMO_INK, fontWeight: 500 }}>read from the table</span>
         </span>
       </Note>
