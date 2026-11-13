@@ -33,6 +33,8 @@ import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Toggle } from "@base-ui/react/toggle";
 import {
   ArrowDownToLine,
+  ArrowDown,
+  ArrowUp,
   Binary,
   Calendar,
   CheckCircle,
@@ -41,7 +43,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  ChevronUp,
+  ChevronsUpDown,
   Clock,
   Hash,
   Lock,
@@ -96,6 +98,7 @@ import {
 } from "../utils/cellUtils";
 import {
   classifyCellEditor,
+  isNumericSqlType,
   toDateEditorValue,
   fromDateEditorValue,
   resolveTemporalEditorKind,
@@ -513,7 +516,7 @@ function ResultSetExportButton({
       </Popover.Root>
       <Menu.Portal>
         <Menu.Positioner sideOffset={6} align="end" side="top">
-          <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+          <Menu.Popup className="bui-popup examples-dropdown sql-ctx-menu export-dropdown">
             {hasMultiplePages && (
               <div
                 className="sql-result-export-scope-options"
@@ -2154,8 +2157,8 @@ function ResultViewImpl({
               {pendingCount} row{pendingCount === 1 ? "" : "s"} will be
               permanently deleted from{" "}
               <strong>{sourceTable ?? "this table"}</strong>. The change is
-              in-memory only and will be undone next page load, but cannot be
-              reversed within this session.
+              saved with this workspace, so reloading the page will not bring
+              it back.
             </Dialog.Description>
             <div className="confirm-actions">
               <Dialog.Close className="confirm-btn confirm-btn-secondary">
@@ -2186,8 +2189,8 @@ function ResultViewImpl({
             <Dialog.Description className="confirm-desc">
               This row will be permanently deleted from{" "}
               <strong>{sourceTable ?? "this table"}</strong>. The change is
-              in-memory only and will be undone next page load, but cannot be
-              reversed within this session.
+              saved with this workspace, so reloading the page will not bring
+              it back.
             </Dialog.Description>
             <div className="confirm-actions">
               <Dialog.Close className="confirm-btn confirm-btn-secondary">
@@ -2614,7 +2617,7 @@ export function ResultTableBody({
         return {
             id: `col-${ci}-${c}`,
             accessorFn: (row) => row.values[ci],
-            meta: { ci },
+            meta: { ci, numeric: isNumericSqlType(resolvedType) },
             header: ({ column }) => {
               const isPk = keyHints?.pk.has(c) ?? false;
               const fk = keyHints?.fk.get(c);
@@ -2681,10 +2684,15 @@ export function ResultTableBody({
                       }
                       aria-hidden="true"
                     >
+                      {/* Three states, three glyphs. A lone chevron-down for
+                          both "unsorted" and "sorted descending" read as a
+                          dropdown and gave no sign that a sort was on. */}
                       {sorted === "asc" ? (
-                        <ChevronUp size={11} />
+                        <ArrowUp size={12} />
+                      ) : sorted === "desc" ? (
+                        <ArrowDown size={12} />
                       ) : (
-                        <ChevronDown size={11} />
+                        <ChevronsUpDown size={11} />
                       )}
                     </span>
                   </span>
@@ -2706,7 +2714,7 @@ export function ResultTableBody({
                   />
                   <ContextMenu.Portal>
                     <ContextMenu.Positioner sideOffset={4}>
-                      <ContextMenu.Popup className="bui-popup examples-dropdown sql-th-context-menu">
+                      <ContextMenu.Popup className="bui-popup examples-dropdown sql-ctx-menu sql-th-context-menu">
                         <ContextMenu.Item
                           className="example-item"
                           onClick={() => {
@@ -3151,6 +3159,10 @@ export function ResultTableBody({
     state: { sorting },
     onSortingChange: handleSortingChange,
     manualSorting: true,
+    // TanStack sorts numeric columns descending on the first click unless
+    // told otherwise, which contradicted the header's own "Click to sort
+    // ascending" tip and every other table the reader has used.
+    sortDescFirst: false,
   });
   const tableRows = table.getRowModel().rows;
   // eslint-disable-next-line react-hooks/incompatible-library -- row virtualization has no compatible alternative here.
@@ -3280,10 +3292,11 @@ export function ResultTableBody({
     const cells = row.getAllCells().map((cell) => {
       const isSelect = cell.column.id === "select";
       const rawVal = isSelect ? undefined : cell.getValue();
-      const ci = isSelect
-        ? -1
-        : ((cell.column.columnDef.meta as { ci: number } | undefined)?.ci ??
-          -1);
+      const cellMeta = cell.column.columnDef.meta as
+        | { ci: number; numeric?: boolean }
+        | undefined;
+      const ci = isSelect ? -1 : (cellMeta?.ci ?? -1);
+      const numericClass = !isSelect && cellMeta?.numeric ? " sql-cell-num" : "";
       const cellKey = `${absoluteRow}:${ci}`;
       const hasPendingEdit =
         !isSelect && ci >= 0 && (pendingEdits?.has(cellKey) ?? false);
@@ -3300,10 +3313,10 @@ export function ResultTableBody({
             isSelect
               ? "sql-result-td-select"
               : hasPendingEdit
-                ? "sql-cell-edited-td"
+                ? `sql-cell-edited-td${numericClass}`
                 : rawVal === null
-                  ? "sql-cell-null"
-                  : undefined
+                  ? `sql-cell-null${numericClass}`
+                  : numericClass.trim() || undefined
           }
           onContextMenu={
             !isSelect && ci >= 0
@@ -3362,7 +3375,7 @@ export function ResultTableBody({
   const rowContextMenu = (
     <ContextMenu.Portal>
       <ContextMenu.Positioner sideOffset={4}>
-        <ContextMenu.Popup className="bui-popup examples-dropdown sql-row-context-menu">
+        <ContextMenu.Popup className="bui-popup examples-dropdown sql-ctx-menu sql-row-context-menu">
           {ctxMenuRow !== null &&
             (() => {
               const { absoluteRow, values: rowValues } = ctxMenuRow;
@@ -3627,9 +3640,29 @@ export function ResultTableBody({
                       className={
                         header.column.id === "select"
                           ? "sql-result-th-select"
-                          : header.column.getIsSorted()
-                            ? "sql-result-th-sorted"
-                            : undefined
+                          : [
+                              header.column.getIsSorted()
+                                ? "sql-result-th-sorted"
+                                : "",
+                              (
+                                header.column.columnDef.meta as
+                                  | { numeric?: boolean }
+                                  | undefined
+                              )?.numeric
+                                ? "sql-result-th-num"
+                                : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ") || undefined
+                      }
+                      aria-sort={
+                        header.column.id === "select"
+                          ? undefined
+                          : header.column.getIsSorted() === "asc"
+                            ? "ascending"
+                            : header.column.getIsSorted() === "desc"
+                              ? "descending"
+                              : "none"
                       }
                     >
                       {header.isPlaceholder

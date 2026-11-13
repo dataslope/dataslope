@@ -424,19 +424,19 @@ CREATE VIEW fraud_summary AS
 
 const CREDIT_CARD_TABS: QueryTabSeed[] = [
   {
-    title: "Query 1",
+    title: "Explore users",
     code: `-- Explore the users table\nSELECT *\nFROM users\nLIMIT 10;`,
   },
   {
-    title: "Query 2",
+    title: "Flagged transactions",
     code: `-- Flagged transactions with customer context\nSELECT t.transaction_id, u.name, t.amount, t.merchant_name, t.transaction_date\nFROM transactions t\nJOIN users u ON u.user_id = t.user_id\nWHERE t.is_fraud = true\nORDER BY t.transaction_date DESC;`,
   },
   {
-    title: "Query 3",
+    title: "Revenue by vendor",
     code: `-- Revenue by merchant and category\nSELECT *\nFROM vendor_summary\nORDER BY total_revenue DESC;`,
   },
   {
-    title: "Query 4",
+    title: "Non-US activity",
     code: `-- Non-US card activity\nSELECT transaction_id, user_name, merchant_country, amount\nFROM foreign_transactions\nORDER BY amount DESC;`,
   },
 ];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { flushSync } from "react-dom";
 import type { EditorView } from "@codemirror/view";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
@@ -135,7 +135,12 @@ export function useSqlTabManagement(options: SqlTabManagementOptions) {
     ],
   );
 
-  const closeTab = useCallback(
+  // The tab awaiting a "discard this query?" answer, if any.
+  const [confirmCloseTabId, setConfirmCloseTabId] = useState<string | null>(
+    null,
+  );
+
+  const closeTabNow = useCallback(
     (id: string) => {
       const currentTabs = tabsRef.current;
       const next = currentTabs.filter((tab) => tab.id !== id);
@@ -179,6 +184,33 @@ export function useSqlTabManagement(options: SqlTabManagementOptions) {
       setResultsByTab,
     ],
   );
+
+  /** Close a tab, asking first when it holds a query that was edited. The
+   *  SQLite playground has always asked; here the tab simply went, and with
+   *  it whatever had been written in it. The last remaining tab is exempt,
+   *  as it is there: closing it only resets it. */
+  const closeTab = useCallback(
+    (id: string) => {
+      const currentTabs = tabsRef.current;
+      const target = currentTabs.find((tab) => tab.id === id);
+      if (!target) return;
+      const isDirty = target.code !== target.pristineCode;
+      if (isDirty && currentTabs.length > 1) {
+        setConfirmCloseTabId(id);
+        return;
+      }
+      closeTabNow(id);
+    },
+    [tabsRef, closeTabNow],
+  );
+
+  const confirmCloseTab = useCallback(() => {
+    const id = confirmCloseTabId;
+    setConfirmCloseTabId(null);
+    if (id) closeTabNow(id);
+  }, [confirmCloseTabId, closeTabNow]);
+
+  const cancelCloseTab = useCallback(() => setConfirmCloseTabId(null), []);
 
   const resetTabsForCurrentDb = useCallback(() => {
     const sample = findSampleDatabase(activeDbIdRef.current);
@@ -301,6 +333,9 @@ export function useSqlTabManagement(options: SqlTabManagementOptions) {
     addTab,
     openTabAndRun,
     closeTab,
+    confirmCloseTabId,
+    confirmCloseTab,
+    cancelCloseTab,
     resetTabsForCurrentDb,
     handleTabDragStart,
     handleTabDragEnd,

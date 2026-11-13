@@ -37,7 +37,8 @@ import type { ColumnTypeGroup } from "../utils/columnTypeSelector";
 import { DdlViewer } from "./DdlViewer";
 import { GenExprEditor } from "./GenExprEditor";
 import { ColumnHeaderPopover } from "./PragmaSettingsTab";
-import { StructureCombobox, FkCombobox } from "./StructureCombobox";
+import { FkCombobox } from "./StructureCombobox";
+import { ColumnTypeCombobox } from "./ColumnTypeCombobox";
 
 /** SQLite type affinities, surfaced as a single flat group in the type
  *  combobox. Freeform entry keeps any custom declared type (e.g.
@@ -45,6 +46,12 @@ import { StructureCombobox, FkCombobox } from "./StructureCombobox";
 const SQLITE_TYPE_GROUPS: ColumnTypeGroup[] = [
   { label: "", types: COLUMN_TYPES },
 ];
+
+/** SQLite takes nearly any words as a declared type; this only keeps out
+ *  text that would break the CREATE statement (quotes, semicolons, commas
+ *  outside a length). */
+const SQLITE_CUSTOM_TYPE =
+  /^[A-Za-z_][A-Za-z0-9_]*(?:\s+[A-Za-z_][A-Za-z0-9_]*)*(?:\s*\(\s*\d+\s*(?:,\s*\d+\s*)?\))?$/;
 
 function newDraftId(): string {
   return `c_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
@@ -176,14 +183,13 @@ export function ModifyColumnRow({
         {/* SQLite columns can declare any type (e.g. `VARCHAR(15)` from an
             imported schema); the freeform combobox preserves whatever is
             typed while still offering the built-in affinities. */}
-        <StructureCombobox
+        <ColumnTypeCombobox
           value={col.type}
           onChange={(type) => onChange({ type })}
           groups={SQLITE_TYPE_GROUPS}
+          isValidCustomType={(type) => SQLITE_CUSTOM_TYPE.test(type)}
           placeholder="e.g. TEXT"
-          ariaLabel="Column type"
-          triggerAriaLabel="Open type list"
-          freeform
+          classPrefix="playground-type"
         />
       </td>
       <td>
@@ -230,7 +236,7 @@ export function ModifyColumnRow({
             className="sql-rename-input sql-modify-col-default"
             value={col.defaultValue}
             onChange={(e) => onChange({ defaultValue: e.target.value })}
-            placeholder="e.g. 'foo' or 0"
+            placeholder="'text' or 0"
             aria-label="Default value"
           />
         </label>
@@ -383,10 +389,17 @@ export function ModifyStructureForm({
   activeTab: activeTabProp,
   onTabChange,
   refreshKey,
+  errors,
+  previewSql,
 }: {
   state: ModifyStructureState;
   onChange: (next: ModifyStructureState) => void;
   invalidColumnIds?: Set<string>;
+  /** Problems that block saving, shown under the column list. */
+  errors?: readonly string[];
+  /** The statement Save will run, shown live under the form. Only the Add
+   *  Table drawer passes it: an edit is a rebuild, not one statement. */
+  previewSql?: string;
   knownTables: string[];
   engine: SqliteEngine | null;
   /** Called when the user clicks the drop button on an index/trigger item. */
@@ -549,6 +562,20 @@ export function ModifyStructureForm({
     };
   }, [engine, state.originalName, refreshKey]);
 
+  // A column that was only just added has an empty name by construction;
+  // saying so before the reader has had a chance to type is noise. Every
+  // other problem is shown as soon as it exists.
+  const blankNameTouched = state.columns.some(
+    (col) =>
+      !col.generated &&
+      !col.name.trim() &&
+      (touchedColIds.has(col.id) || (invalidColumnIds?.has(col.id) ?? false)),
+  );
+  const visibleErrors = (errors ?? ["Column names cannot be empty."]).filter(
+    (message) =>
+      message !== "Column names cannot be empty." || blankNameTouched,
+  );
+
   return (
     <div className="sql-modify-body" ref={formBodyRef}>
       <label className="sql-modify-field">
@@ -707,13 +734,18 @@ export function ModifyStructureForm({
             <Plus size={12} aria-hidden="true" /> Add column
           </button>
 
-          {regularColumns.some(
-            (col) =>
-              !col.name.trim() &&
-              (touchedColIds.has(col.id) || (invalidColumnIds?.has(col.id) ?? false)),
-          ) && (
+          {visibleErrors.length > 0 && (
             <div className="sql-modify-validation" role="alert">
-              Column names cannot be empty.
+              {visibleErrors.map((message) => (
+                <div key={message}>{message}</div>
+              ))}
+            </div>
+          )}
+
+          {previewSql !== undefined && (
+            <div className="sql-modify-preview">
+              <div className="sql-modify-preview-label">SQL preview</div>
+              <DdlViewer sql={previewSql} theme={theme ?? "default"} />
             </div>
           )}
 

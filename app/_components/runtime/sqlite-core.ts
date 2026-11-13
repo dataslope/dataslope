@@ -14,6 +14,8 @@ import {
   type QueryExecResult,
   type SqlValue,
 } from "./sqlite-wasm";
+import { extractCheckConstraints } from "../sql/utils/tableConstraints";
+import { describePartialScriptFailure } from "../sql/utils/scriptFailure";
 import {
   findSampleDatabase,
   isSqliteSampleId,
@@ -171,7 +173,7 @@ function runStatements(db: Database, sql: string): SqliteRunDetail {
     try {
       next = iterator.next();
     } catch (err) {
-      throw statementError(err, index, sets.length);
+      throw statementError(err, index + 1, sets.length);
     }
     if (next.done) break;
     const stmt = next.value;
@@ -219,14 +221,12 @@ function runStatements(db: Database, sql: string): SqliteRunDetail {
 
 /** Prefix an engine error with the failing statement's position, and say how
  *  many statements before it were applied. Single-statement scripts are left
- *  alone: there the prefix would be noise. */
+ *  alone: there the prefix would be noise. The wording is shared with the
+ *  DuckDB engine, which runs scripts the same way. */
 function statementError(err: unknown, index: number, applied: number): Error {
   const message = err instanceof Error ? err.message : String(err);
   if (index <= 1) return err instanceof Error ? err : new Error(message);
-  const ran = applied === 1 ? "1 statement" : `${applied} statements`;
-  return new Error(
-    `Statement ${index} failed: ${message}\n(${ran} before it already ran; the rest of the script did not.)`,
-  );
+  return new Error(describePartialScriptFailure(message, index, applied));
 }
 
 export interface SqliteEngine {
@@ -1166,6 +1166,57 @@ export async function createSqliteEngineInProcess(
         }
       }
 
+      // CHECK constraints live only in the original CREATE text, and the
+      // form does not model them, so they are read back out and re-declared
+      // (as table-level constraints, which is legal for either kind). One
+      // written on a column goes with that column; a table-level one that
+      // still names a dropped column blocks the drop, as SQLite's own
+      // `ALTER TABLE … DROP COLUMN` does.
+      {
+        const keptSources = new Set(
+          spec.columns.map((c) => (c.originalName ?? c.name).toLowerCase()),
+        );
+        const droppedCols = [...existing].filter(
+          (name) => !keptSources.has(name.toLowerCase()),
+        );
+        const droppedSet = new Set(droppedCols.map((name) => name.toLowerCase()));
+        let originalSql = "";
+        const stmt = d.prepare(
+          `SELECT sql FROM sqlite_master WHERE type = 'table' AND name = $n`,
+        );
+        try {
+          stmt.bind({ $n: spec.originalName });
+          if (stmt.step()) originalSql = String(getRow(stmt)[0] ?? "");
+        } finally {
+          stmt.finalize();
+        }
+        for (const check of extractCheckConstraints(originalSql)) {
+          if (check.column && droppedSet.has(check.column.toLowerCase())) continue;
+          const blocker = droppedCols.find((col) =>
+            referencesIdentifier(check.expression, col),
+          );
+          if (blocker) {
+            throw new Error(
+              `Cannot drop column "${blocker}": a CHECK constraint still uses it (${check.expression}). ` +
+                `Remove the constraint first.`,
+            );
+          }
+          // Only column renames apply inside an expression; `patchDdl` would
+          // also rewrite a column that happens to share the table's name.
+          let expression = check.expression;
+          for (const [oldCol, newCol] of renameMap) {
+            const escaped = oldCol.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            expression = expression.replace(
+              new RegExp(`(?<![\\w"])"?${escaped}"?(?![\\w"])`, "g"),
+              quoteIdent(newCol),
+            );
+          }
+          defs.push(
+            `${check.name ? `CONSTRAINT ${quoteIdent(check.name)} ` : ""}CHECK (${expression})`,
+          );
+        }
+      }
+
       const tmpName = `${spec.newName}__new`;
       // Foreign keys stay off inside the transaction during the rebuild.
       d.exec("PRAGMA foreign_keys = OFF;");
@@ -1217,6 +1268,11 @@ export async function createSqliteEngineInProcess(
           d.exec("ROLLBACK");
         } catch {
           // ignore rollback failure
+        }
+        // The failure names the staging table (`orders__new.note`), which
+        // the reader has never seen. Report it against the real one.
+        if (err instanceof Error && err.message.includes(tmpName)) {
+          throw new Error(err.message.split(tmpName).join(spec.newName));
         }
         throw err;
       } finally {

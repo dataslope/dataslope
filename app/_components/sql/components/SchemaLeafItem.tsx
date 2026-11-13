@@ -101,7 +101,7 @@ function SchemaLeafItemImpl({
         />
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={6}>
-            <ContextMenu.Popup className="bui-popup examples-dropdown">
+            <ContextMenu.Popup className="bui-popup examples-dropdown sql-ctx-menu">
               <ContextMenu.Item
                 className="example-item"
                 onClick={() => onViewDDL(name, kind)}
@@ -114,8 +114,9 @@ function SchemaLeafItemImpl({
               >
                 <div className="ex-title">Copy Name</div>
               </ContextMenu.Item>
+              <div className="ctx-separator" role="separator" />
               <ContextMenu.Item
-                className="example-item"
+                className="example-item sql-ctx-danger"
                 onClick={() => onDrop(name, kind)}
               >
                 <div className="ex-title">Drop {LEAF_DROP_LABEL[kind]}</div>

@@ -182,6 +182,12 @@ import { useQueryHistory } from "./hooks/useQueryHistory";
 import { useEditorResultsSplit } from "./hooks/useEditorResultsSplit";
 import { EDITOR_SPLIT_STORAGE_SUFFIX } from "./utils/editorSplit";
 import { ModifyStructureForm } from "./components/ModifyStructureForm";
+import { useDiscardGuard } from "./components/DiscardGuard";
+import { consumeStoppedNotice, STOPPED_NOTICE } from "./utils/stopQuery";
+import {
+  buildSqliteCreateTableSql,
+  validateSqliteStructure,
+} from "./utils/structureValidation";
 import { ResultView } from "./components/ResultView";
 import { SchemaItem } from "./components/SchemaItem";
 import { SchemaLeafItem } from "./components/SchemaLeafItem";
@@ -795,6 +801,50 @@ function SqlPlaygroundInner() {
     openTabAndRun,
   );
 
+  // ── Structure drawers: validation and the unsaved-changes guard ──
+  const existingEntityNames = useMemo(() => [...tables, ...views], [tables, views]);
+  const addTableValidation = useMemo(
+    () =>
+      addTableDialog
+        ? validateSqliteStructure(
+            { ...addTableDialog, originalName: "" },
+            existingEntityNames,
+          )
+        : null,
+    [addTableDialog, existingEntityNames],
+  );
+  const modifyValidation = useMemo(
+    () =>
+      modifyDialog
+        ? validateSqliteStructure(modifyDialog, existingEntityNames)
+        : null,
+    [modifyDialog, existingEntityNames],
+  );
+  const addTableGuard = useDiscardGuard({
+    // A new table has no saved state to compare with, so "dirty" means it
+    // differs from the form as it first opened.
+    isDirty:
+      addTableDialog !== null &&
+      modifyDialogSignature(addTableDialog) !== addTableDialog.pristineSignature,
+    onDiscard: useCallback(() => {
+      setAddTableDialog(null);
+      setAddTableInvalidColIds(new Set());
+    }, [setAddTableDialog, setAddTableInvalidColIds]),
+    title: "Discard this table?",
+    description: "The table you were defining has not been created.",
+  });
+  const modifyGuard = useDiscardGuard({
+    isDirty:
+      modifyDialog !== null &&
+      modifyDialogSignature(modifyDialog) !== modifyDialog.originalSignature,
+    onDiscard: useCallback(() => {
+      setModifyDialog(null);
+      setModifyInvalidColIds(new Set());
+      setModifyStructureTab("columns");
+    }, [setModifyDialog, setModifyInvalidColIds, setModifyStructureTab]),
+    description: "Your edits to this table's structure have not been saved.",
+  });
+
   const [createIndexOpen, setCreateIndexOpen] = useState(false);
   const [createViewOpen, setCreateViewOpen] = useState(false);
   const [createViewBody, setCreateViewBody] = useState("");
@@ -1361,6 +1411,9 @@ function SqlPlaygroundInner() {
         }
 
         setLoaded(true);
+        // The page was reloaded by the toolbar's Stop button: say what
+        // became of the query and the database.
+        if (consumeStoppedNotice()) showToast(STOPPED_NOTICE);
         setStatusState("ready");
       } catch (err) {
         if (cancelled) return;
@@ -2199,6 +2252,11 @@ function SqlPlaygroundInner() {
           onOpenChange={(next) => { if (!next) setPendingDbId(null); }}
           currentWorkspaceName={activeWorkspace?.name ?? "Default SQLite Workspace"}
           newDbFilename={pendingDbFilename}
+          isReload={
+            pendingDbId !== null &&
+            pendingDbId === activeDbId &&
+            pendingDbId !== "__blank__"
+          }
           onOverwrite={() => {
             if (pendingDbId) performDbSwitch(pendingDbId);
             setPendingDbId(null);
@@ -2276,8 +2334,10 @@ function SqlPlaygroundInner() {
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
                 Truncate table <strong>{truncateConfirm}</strong>? This deletes
-                every row but keeps the schema. The change is in-memory only and
-                will be undone next page load.
+                every row but keeps the schema. The change is saved with this
+                workspace, so reloading the page will not bring the rows back.
+                To get a sample database back, pick it again in the database
+                menu.
               </Dialog.Description>
               <p className="confirm-desc-note">
                 Runs as a plain <strong>DELETE</strong> (SQLite has no
@@ -2320,8 +2380,10 @@ function SqlPlaygroundInner() {
                 {pendingDropEntity
                   ? DROP_KIND_LABELS[pendingDropEntity.kind].toLowerCase()
                   : ""}{" "}
-                <strong>{pendingDropEntity?.name}</strong>? This change is
-                in-memory only and will be undone next page load.
+                <strong>{pendingDropEntity?.name}</strong>? The change is saved
+                with this workspace, so reloading the page will not bring it
+                back. To get a sample database back, pick it again in the
+                database menu.
               </Dialog.Description>
               <div className="confirm-actions">
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
@@ -3183,11 +3245,7 @@ function SqlPlaygroundInner() {
         <Dialog.Root
           open={modifyDialog !== null}
           onOpenChange={(next) => {
-            if (!next) {
-              setModifyDialog(null);
-              setModifyInvalidColIds(new Set());
-              setModifyStructureTab("columns");
-            }
+            if (!next) modifyGuard.requestClose();
           }}
         >
           <Dialog.Portal>
@@ -3224,7 +3282,13 @@ function SqlPlaygroundInner() {
                       });
                     }
                   }}
-                  invalidColumnIds={modifyInvalidColIds}
+                  invalidColumnIds={
+                    new Set([
+                      ...modifyInvalidColIds,
+                      ...(modifyValidation?.invalidColumnIds ?? []),
+                    ])
+                  }
+                  errors={modifyValidation?.errors}
                   knownTables={tables}
                   engine={engineForRender}
                   onDropLeaf={dropLeafEntity}
@@ -3264,6 +3328,7 @@ function SqlPlaygroundInner() {
                     onClick={submitModifyStructure}
                     disabled={
                       !modifyDialog ||
+                      !modifyValidation?.isValid ||
                       modifyDialogSignature(modifyDialog) ===
                         modifyDialog.originalSignature
                     }
@@ -3382,10 +3447,7 @@ function SqlPlaygroundInner() {
         <Dialog.Root
           open={addTableDialog !== null}
           onOpenChange={(next) => {
-            if (!next) {
-              setAddTableDialog(null);
-              setAddTableInvalidColIds(new Set());
-            }
+            if (!next) addTableGuard.requestClose();
           }}
         >
           <Dialog.Portal>
@@ -3414,6 +3476,7 @@ function SqlPlaygroundInner() {
                     setAddTableDialog({
                       ...next,
                       originalSignature: addTableDialog!.originalSignature,
+                      pristineSignature: addTableDialog!.pristineSignature,
                     });
                     if (addTableInvalidColIds.size > 0) {
                       setAddTableInvalidColIds((prev) => {
@@ -3425,9 +3488,19 @@ function SqlPlaygroundInner() {
                       });
                     }
                   }}
-                  invalidColumnIds={addTableInvalidColIds}
+                  invalidColumnIds={
+                    new Set([
+                      ...addTableInvalidColIds,
+                      ...(addTableValidation?.invalidColumnIds ?? []),
+                    ])
+                  }
                   knownTables={tables}
                   engine={engineForRender}
+                  theme={editorTheme}
+                  errors={addTableValidation?.errors}
+                  previewSql={buildSqliteCreateTableSql(addTableDialog, {
+                    pretty: true,
+                  })}
                 />
               )}
               <footer className="sql-modify-drawer-footer">
@@ -3438,7 +3511,7 @@ function SqlPlaygroundInner() {
                   type="button"
                   className="confirm-btn confirm-btn-primary"
                   onClick={submitAddTable}
-                  disabled={!addTableDialog}
+                  disabled={!addTableDialog || !addTableValidation?.isValid}
                 >
                   Create Table
                 </button>
@@ -3446,6 +3519,9 @@ function SqlPlaygroundInner() {
             </Dialog.Popup>
           </Dialog.Portal>
         </Dialog.Root>
+
+        {addTableGuard.dialog}
+        {modifyGuard.dialog}
 
         <CreateIndexDialog
           open={createIndexOpen}

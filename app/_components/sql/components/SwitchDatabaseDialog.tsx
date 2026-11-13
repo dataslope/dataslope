@@ -15,6 +15,11 @@ export interface SwitchDatabaseDialogProps {
   onOverwrite: () => void;
   /** Called when the user chooses to open the new database in a new workspace. */
   onCreateNew: () => Promise<void>;
+  /** The database picked is the one already open: this reloads a fresh
+   *  copy of it. Changes to a database are kept with the workspace, so
+   *  picking the sample again is how a reader gets the original back after
+   *  dropping or truncating something. */
+  isReload?: boolean;
 }
 
 export function SwitchDatabaseDialog({
@@ -24,6 +29,7 @@ export function SwitchDatabaseDialog({
   newDbFilename,
   onOverwrite,
   onCreateNew,
+  isReload = false,
 }: SwitchDatabaseDialogProps) {
   // Cancel sits at the bottom of the stack, so it is no longer the first
   // tabbable button Base UI would focus by default. Keep it focused on open
@@ -35,11 +41,21 @@ export function SwitchDatabaseDialog({
         <Dialog.Backdrop className="confirm-backdrop" />
         <Dialog.Popup className="confirm-popup" initialFocus={cancelRef}>
           <Dialog.Title className="confirm-title">
-            Switch to <strong>{newDbFilename}</strong>?
+            {isReload ? "Reload" : "Switch to"} <strong>{newDbFilename}</strong>?
           </Dialog.Title>
           <Dialog.Description className="confirm-desc">
-            Choose how to open this database in workspace{" "}
-            <strong>{currentWorkspaceName}</strong>.
+            {isReload ? (
+              <>
+                This replaces the database in workspace{" "}
+                <strong>{currentWorkspaceName}</strong> with a fresh copy of
+                the sample. Everything you changed in it will be lost.
+              </>
+            ) : (
+              <>
+                Choose how to open this database in workspace{" "}
+                <strong>{currentWorkspaceName}</strong>.
+              </>
+            )}
           </Dialog.Description>
           <div className="confirm-actions confirm-actions-stack">
             <Dialog.Close
@@ -54,7 +70,7 @@ export function SwitchDatabaseDialog({
               onClick={onOverwrite}
             >
               <Replace size={15} aria-hidden="true" />
-              Overwrite this workspace
+              {isReload ? "Reload the sample" : "Overwrite this workspace"}
             </Dialog.Close>
             <Dialog.Close
               ref={cancelRef}
