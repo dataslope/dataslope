@@ -30,7 +30,7 @@ const READ = ["not", "no", "nor", "but", "don't", "won't", "never"];
  *  "never", which Fig. 11 has just shown is not on NLTK's list at all. */
 const Inline: React.FC<{ text: string; at: number; marks?: readonly MarkSpan[]; ghost?: boolean }> = ({ text, at, marks, ghost }) => (
   <span style={{ position: "relative", display: "inline-block", width: chipWidth(text, SMALL), height: chipHeight(SMALL) }}>
-    <Chip text={text} x={0} y={0} at={at} size={SMALL} marks={marks} gone={ghost ? at + 6 : undefined} strike={ghost ? at + 10 : undefined} />
+    <Chip look="inkOutline" text={text} x={0} y={0} at={at} size={SMALL} marks={marks} gone={ghost ? at + 6 : undefined} strike={ghost ? at + 10 : undefined} />
   </span>
 );
 
@@ -72,6 +72,7 @@ const Filter: React.FC<{
           const fall = ease(frame, when, 16);
           return (
             <Chip
+              look="inkOutline"
               key={i}
               text={t}
               x={row[i].x}
@@ -88,6 +89,7 @@ const Filter: React.FC<{
         const x = lerp(row[i].x, final[k++].x, c);
         return (
           <Chip
+            look="inkOutline"
             key={i}
             text={t}
             x={x}
@@ -191,6 +193,7 @@ export const TrapScene: React.FC = () => {
             return (
               <React.Fragment key={r.word}>
                 <Chip
+                  look="inkOutline"
                   text={r.word}
                   x={X0}
                   y={top}

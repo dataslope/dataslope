@@ -291,15 +291,22 @@ export const tintOf = (c: string) =>
 /** A token as a chip: its text in mono on a tinted ground, no outline. A
  *  leading space is drawn as a faint dot, the way the tokenizer lessons show
  *  it. `border` names the chip's hue (ink for a plain token), which tints its
- *  ground when no `fill` is given. */
+ *  ground when no `fill` is given.
+ *
+ *  `outline` draws the chip the other way (the owner, 2026-11-13: "black
+ *  border, black text, and a transparent background"; "red border and text"
+ *  for the one a figure points at): no fill, a 2px border and the text both in
+ *  `border`'s hue (INK or POINT here, the same inks `outlineBadgeStyle` uses).
+ *  The border comes out of the padding, so the chip's box does not move. */
 export const TokenChip: React.FC<{
   text: string;
   size?: number;
   color?: string;
   border?: string;
   fill?: string;
+  outline?: boolean;
   style?: React.CSSProperties;
-}> = ({ text, size = 28, color = INK, border = INK, fill = PAPER, style }) => {
+}> = ({ text, size = 28, color = INK, border = INK, fill = PAPER, outline = false, style }) => {
   const lead = text.startsWith(" ");
   return (
     <span
@@ -309,10 +316,11 @@ export const TokenChip: React.FC<{
         fontFamily: MONO,
         fontSize: size,
         fontWeight: 500,
-        color,
-        background: fill === PAPER ? tintOf(border) : fill,
+        color: outline ? border : color,
+        background: outline ? "transparent" : fill === PAPER ? tintOf(border) : fill,
+        border: outline ? `2px solid ${border}` : undefined,
         borderRadius: 5,
-        padding: "8px 16px 10px",
+        padding: outline ? "6px 14px 8px" : "8px 16px 10px",
         whiteSpace: "pre",
         lineHeight: 1.1,
         ...style,

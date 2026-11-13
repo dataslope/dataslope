@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Ink, outlineInk } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -292,13 +292,17 @@ export const rowXs = (widths: readonly number[], x0: number, gap: number) => {
 };
 export const rowWidth = (widths: readonly number[], gap: number) => widths.reduce((a, b) => a + b, 0) + gap * Math.max(0, widths.length - 1);
 
-export type ChipKind = "token" | "piece" | "plain";
+export type ChipKind = "token" | "piece" | "plain" | "outline";
 
 /**
  * One token as a program holds it: monospace, in a rounded box. It pops in
  * on `at`; `bad` turns it red (from that frame), `good` green; `flash` swells
  * it red briefly; `strike` draws a red line through it and fades it to a
  * ghost; `hl` sweeps the highlighter under its text; `dim` and `out` fade it.
+ * A tinted chip's text is its hue's ink, and follows the fill when it turns
+ * (the owner, 2026-11-13: "for red badges, use red text color; for blue
+ * badges, use blue text color"). `outline` is the unfilled chip: a 2px ink
+ * border and ink text (the owner, 2026-11-13, on Fig. 7).
  */
 export const Chip: React.FC<{
   text: string;
@@ -336,13 +340,16 @@ export const Chip: React.FC<{
   const ht = chipHeight(size);
   const base =
     kind === "token"
-      ? { border: TOKEN, fill: TOKEN_FILL }
+      ? { border: "transparent", fill: TOKEN_FILL, ink: outlineInk("blue") }
       : kind === "piece"
-        ? { border: INK_SOFT, fill: PIECE_CHIP_FILL }
-        : { border: "transparent", fill: "transparent" };
+        ? { border: "transparent", fill: PIECE_CHIP_FILL, ink: INK }
+        : kind === "outline"
+          ? { border: INK, fill: "transparent", ink: INK }
+          : { border: "transparent", fill: "transparent", ink: INK };
   const mix = (a: string, c: string, t: number) => (t <= 0 ? a : t >= 1 ? c : `color-mix(in srgb, ${c} ${Math.round(t * 100)}%, ${a})`);
   const red = Math.max(b, f, s);
   const fill = mix(mix(base.fill, GOOD_FILL, g), BAD_FILL, red);
+  const ink = mix(mix(base.ink, outlineInk("green"), g), outlineInk("red"), red);
   const chars = badChars
     ? (() => {
         const bc = ease(frame, badChars.at, 10);
@@ -365,8 +372,9 @@ export const Chip: React.FC<{
         height: ht,
         boxSizing: "border-box",
         // Fill only, no outline (the owner, 2026-11-11). The 2px stays as
-        // transparent room, so every row keeps its measured widths.
-        border: "2px solid transparent",
+        // transparent room, so every row keeps its measured widths; only the
+        // outline chip inks it.
+        border: `2px solid ${base.border}`,
         borderRadius: 4,
         background: fill,
         display: "flex",
@@ -377,7 +385,7 @@ export const Chip: React.FC<{
         fontWeight: 500,
         whiteSpace: "pre",
         fontVariantLigatures: "none",
-        color: INK,
+        color: ink,
         opacity: Math.min(1, p) * (1 - o) * (1 - d) * (1 - gone * 0.72),
         transform: `translateY(${(1 - p) * 10}px) scale(${0.9 + 0.1 * Math.min(1, p) + f * 0.06})`,
       }}

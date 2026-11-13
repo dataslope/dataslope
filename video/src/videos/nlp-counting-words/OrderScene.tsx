@@ -3,11 +3,11 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, fmt, INK, INK_SOFT, label } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA, ORDER, PHRASES } from "./data";
-import { flow, HBar, Headline, Kicker, MARK_BAD, Marked, Mono, numStyle, pulse, Spot, Tile, tileH, tileW } from "./parts";
+import { flow, HBar, Headline, Kicker, MARK_BAD, Marked, Mono, numStyle, pulse, Spot, subtleRing, Tile, tileH, tileW } from "./parts";
 
 const X0 = 120;
 const SIZE = 26;
@@ -112,7 +112,8 @@ export const OrderScene: React.FC = () => {
           dim={inB.has(t.text) ? setsAt + 6 : undefined}
           undim={bigramsAt - 6}
           marks={inB.has(t.text) ? [] : [{ at: notAt - 2, color: MARK_BAD }]}
-          border={inB.has(t.text) ? undefined : ACCENT_INK}
+          border={inB.has(t.text) ? undefined : subtleRing("red")}
+          ink={inB.has(t.text) ? undefined : outlineInk("red")}
           lift={inB.has(t.text) ? 0 : 10 * pulse(frame, loneAt - 2, 26)}
         />
       ))}
@@ -136,7 +137,7 @@ export const OrderScene: React.FC = () => {
           size={CHIP}
           at={bigramsAt + 4 + i * 3}
           marks={i === notGood ? [{ at: hasAt - 2 }] : []}
-          border={i === notGood ? INK : undefined}
+          border={i === notGood ? subtleRing("yellow") : undefined}
         />
       ))}
       {/* A lone "not" turns up in praise too: the pair is what carries the sign. */}
@@ -176,7 +177,7 @@ export const OrderScene: React.FC = () => {
         const x = T1 + ml.slice(0, i).reduce((sum, [q]) => sum + tileW(q, CHIP) + 70, 0);
         return (
           <React.Fragment key={p}>
-            <Tile text={p} x={x} y={rowY(2) - 6} size={CHIP} at={mlAts[i] - 2} marks={i === 0 ? [{ at: topPairAt - 2 }] : []} border={i === 0 ? INK : undefined} />
+            <Tile text={p} x={x} y={rowY(2) - 6} size={CHIP} at={mlAts[i] - 2} marks={i === 0 ? [{ at: topPairAt - 2 }] : []} border={i === 0 ? subtleRing("yellow") : undefined} />
             <Note at={mlAts[i] + 4} x={x + tileW(p, CHIP) + 8} y={rowY(2) - 6}>
               <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...numStyle(22, i === 0 ? ACCENT_INK : INK) }}>
                 {i === 0 ? <Marked at={timesAt - 2}>×{c}</Marked> : `×${c}`}

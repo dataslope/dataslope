@@ -518,7 +518,8 @@ export const BlendScene: React.FC = () => {
               />
             ) : null}
             <div style={{ position: "absolute", left: T_X.tok, top: 8 }}>
-              <TokenChip text={t} size={24} />
+              {/* Outlined in ink (the owner, 2026-11-13). */}
+              <TokenChip text={t} size={24} outline />
             </div>
             <div
               style={{

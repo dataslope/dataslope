@@ -317,7 +317,7 @@ export const BeforeScene: React.FC = () => {
                 c.id === ADA.id
                   ? { at: adasAt + 2 + k * 3, color: HIGHLIGHT, out: knowAt }
                   : i === 2
-                    ? { at: breaksAt - 2, color: `color-mix(in srgb, ${ACCENT} 22%, transparent)` }
+                    ? { at: breaksAt - 2, ink: ACCENT }
                     : undefined
               }
             />

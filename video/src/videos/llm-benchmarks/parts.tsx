@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, fmt, HAIRLINE, headline as headlineStyle, HIGHLIGHT, INK, INK_SOFT, label, PAPER, svgText, TABULAR } from "../../editorial/style";
-import { type BadgeTone, badgeStyle, H, Ink, W } from "../../editorial/ui";
+import { type BadgeTone, badgeStyle, H, Ink, outlineBadgeStyle, W } from "../../editorial/ui";
 import { colors, ds } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -421,6 +421,11 @@ export const Dot: React.FC<{ x: number; y: number; at: number; r?: number; color
   );
 };
 
+/** An outlined tag's padding: 9px above and below a 22px line (with its 2px
+ *  border, the 48px box), 18px at the sides. */
+const OUTLINE_PAD_Y = 9;
+const OUTLINE_PAD_X = 18;
+
 /** A small tag, inked in on `at`: the house badge (a light tint of its hue,
  *  in that hue's ink, no border, its own padding), centred on the 48px box
  *  the outlined tag had, so the arrows between tags still meet it in the
@@ -437,14 +442,19 @@ export const Tag: React.FC<{
   width?: number;
   /** A brief swell when the tag is named again. */
   pulseAt?: number;
+  /** Outlined in ink, no fill, with roomier padding that fills the whole 48px
+   *  box (the owner, 2026-11-13, on Fig. 10's steps: "black border, black
+   *  text, and a transparent background … add more padding"). */
+  outline?: boolean;
   children: React.ReactNode;
-}> = ({ at, x, y, out, dim, tone = "gray", light = false, width, pulseAt, children }) => {
+}> = ({ at, x, y, out, dim, tone = "gray", light = false, width, pulseAt, outline = false, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.65;
   if (p <= 0 || o >= 1) return null;
-  const badge = badgeStyle(tone, 22);
+  const badge = outline ? { ...outlineBadgeStyle("ink", 22), padding: `${OUTLINE_PAD_Y}px ${OUTLINE_PAD_X}px` } : badgeStyle(tone, 22);
+  const outer = outline ? 22 * 1.15 + 2 * OUTLINE_PAD_Y + 4 : 22 * 1.15 + 2 * Math.round(22 * 0.21);
   return (
     <div
       style={{
@@ -452,10 +462,10 @@ export const Tag: React.FC<{
         ...badge,
         position: "absolute",
         left: x,
-        top: y + Math.round((48 - (22 * 1.15 + 2 * Math.round(22 * 0.21))) / 2),
+        top: y + Math.round((48 - outer) / 2),
         width,
         boxSizing: "border-box",
-        background: light ? `color-mix(in srgb, ${badge.background} 50%, transparent)` : badge.background,
+        background: outline ? "transparent" : light ? `color-mix(in srgb, ${badge.background} 50%, transparent)` : badge.background,
         opacity: p * (1 - o) * (1 - d),
         transform: `translateX(${(1 - p) * -14}px) scale(${1 + (pulseAt === undefined ? 0 : pulse(frame, pulseAt, 18)) * 0.05})`,
         transformOrigin: "0 50%",

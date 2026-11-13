@@ -268,10 +268,11 @@ export const StoreErd: React.FC = () => {
         >
           <span style={{ ...label(22, INK_SOFT) }}>facts of the link</span>
           <span style={{ opacity: ease(frame, howManyAt - 2, 10), transform: `translateY(${(1 - ease(frame, howManyAt - 2, 10)) * 8}px)` }}>
-            <Chip>how many</Chip>
+            {/* Outlined on white (the owner, 2026-11-13): the slot's line runs behind them. */}
+            <Chip outline="paper">how many</Chip>
           </span>
           <span style={{ opacity: ease(frame, whatPriceAt - 2, 10), transform: `translateY(${(1 - ease(frame, whatPriceAt - 2, 10)) * 8}px)` }}>
-            <Chip>at what price</Chip>
+            <Chip outline="paper">at what price</Chip>
           </span>
         </div>
       ) : null}

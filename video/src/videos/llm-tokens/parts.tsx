@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Ink, outlineInk } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, shown, VIDEO } from "./data";
@@ -14,7 +14,7 @@ import { ILLUSTRATIONS, shown, VIDEO } from "./data";
  * Pieces this video needs beyond the shared editorial kit: a part's kicker, a
  * two-ink headline, highlighter marks, a slow push on a finished figure, the
  * watercolor spots (after DbDesign-1's parts.tsx), and the one new thing, a
- * token chip: a piece of text on a pale blue ground, its id under it, which
+ * token chip: a piece of text in an outlined box, its id under it, which
  * every figure of the video draws its tokens with.
  */
 
@@ -373,9 +373,9 @@ export const TokenRun: React.FC<{
 };
 
 /**
- * A token: its text in the code face on a pale blue chip, a leading space
+ * A token: its text in the code face on an outlined chip, a leading space
  * shown as a middle dot, and optionally its id under it. It inks in on `at`
- * (a short rise), `focus` (0..1) turns its edge and ground red, and `idAt`
+ * (a short rise), `focus` (0..1) turns its edge and text red, and `idAt`
  * brings the id in on its own word.
  */
 export const Chip: React.FC<{
@@ -435,35 +435,53 @@ export const Chip: React.FC<{
   );
 };
 
-/** Just the chip, for laying out in a flex row. */
-export const ChipFace: React.FC<{ text: string; size?: number; focus?: number; alt?: boolean; width?: number }> = ({
-  text,
-  size = 30,
-  focus = 0,
-  alt,
-  width,
-}) => (
-  <span
-    style={{
-      display: "inline-flex",
-      justifyContent: "center",
-      boxSizing: "border-box",
-      width,
-      padding: `${Math.round(size * 0.2)}px ${Math.round(size * 0.4)}px`,
-      borderRadius: 5,
-      background: chipGround(focus, alt),
-      fontFamily: MONO,
-      fontSize: size,
-      fontWeight: 500,
-      lineHeight: 1.15,
-      color: INK,
-      whiteSpace: "pre",
-      fontVariantLigatures: "none",
-    }}
-  >
-    <ChipText text={text} />
-  </span>
-);
+/**
+ * Just the chip, for laying out in a flex row. Outlined by default (the owner,
+ * 2026-11-13: "black border, black text, and a transparent background"): no
+ * fill, a 2px ink edge and ink text, both turning red as `focus` rises. The
+ * border comes out of the padding, so the box is the size the tinted chip was.
+ * `tinted` keeps the old pale blue ground for the BPE figure, where the owner
+ * asked instead for the text in the ground's hue: blue, or red when focused.
+ * `padX` widens the sides, for the lone end marker.
+ */
+export const ChipFace: React.FC<{
+  text: string;
+  size?: number;
+  focus?: number;
+  alt?: boolean;
+  width?: number;
+  tinted?: boolean;
+  padX?: number;
+}> = ({ text, size = 30, focus = 0, alt, width, tinted, padX = 0 }) => {
+  const f = Math.round(100 * clamp01(focus));
+  const ink = tinted
+    ? `color-mix(in srgb, ${outlineInk("red")} ${f}%, ${outlineInk("blue")})`
+    : `color-mix(in srgb, ${outlineInk("red")} ${f}%, ${outlineInk("ink")})`;
+  const edge = tinted ? 0 : 2;
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        justifyContent: "center",
+        boxSizing: "border-box",
+        width,
+        padding: `${Math.round(size * 0.2) - edge}px ${Math.round(size * 0.4) - edge + padX}px`,
+        borderRadius: 5,
+        border: tinted ? undefined : `2px solid ${ink}`,
+        background: tinted ? chipGround(focus, alt) : "transparent",
+        fontFamily: MONO,
+        fontSize: size,
+        fontWeight: 500,
+        lineHeight: 1.15,
+        color: ink,
+        whiteSpace: "pre",
+        fontVariantLigatures: "none",
+      }}
+    >
+      <ChipText text={text} />
+    </span>
+  );
+};
 
 /** A token's text with its leading space drawn as a soft middle dot. */
 export const ChipText: React.FC<{ text: string }> = ({ text }) => {

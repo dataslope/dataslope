@@ -1,9 +1,10 @@
+import { ShoppingCart } from "lucide-react";
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, body, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { badgeStyle, Ink } from "../../editorial/ui";
+import { Ink, outlineBadgeStyle, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Bracket, Headline, Kicker, lerp, Marker, Ring, STAT_INK, Strike, Svg } from "./parts";
@@ -27,13 +28,20 @@ const METRICS = [
   "Page views",
 ];
 const MOVER = METRICS.indexOf("Scroll depth");
-/** The ten as house badges, gray, five to a row, 12px between rows; the one
- *  that moved turns red as it is cheered, then is struck. "Conversion
+/** The ten as outlined badges, ink, five to a row, 12px between rows; the
+ *  one that moved turns red as it is cheered, then is struck. (The owner,
+ *  2026-11-13: "black border, transparent background, and black text", and
+ *  for the one that moved "red border and red text with a red
+ *  strikethrough".) "Conversion
  *  rate" (42px serif) in the column beside them is centred on the two rows
  *  rather than set on either, and "chosen now" sits 10px under it. Offsets in
  *  px from y(METRIC_Y). */
-const GRAY_BADGE = badgeStyle("gray", 21);
-const RED_BADGE = badgeStyle("red", 21);
+const METRIC_BADGE = outlineBadgeStyle("ink", 21);
+/** The mover's border and text, mixed from ink to red by `hot`. */
+const moverInk = (hot: number): React.CSSProperties => {
+  const ink = `color-mix(in srgb, ${outlineInk("red")} ${Math.round(hot * 100)}%, ${outlineInk("ink")})`;
+  return { border: `2px solid ${ink}`, color: ink };
+};
 const METRIC_ROWS = [METRICS.slice(0, 5), METRICS.slice(5)];
 const METRIC_ROW_GAP = 12;
 const METRIC_Y = 726;
@@ -157,14 +165,19 @@ export const DesignScene: React.FC = () => {
               <span
                 style={{
                   ...label(26, g === "A" ? INK : PAPER),
-                  display: "inline-block",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 10,
                   width: 240,
-                  textAlign: "center",
                   padding: "16px 0",
                   borderRadius: g === "A" ? 4 : 30,
                   background: g === "A" ? `color-mix(in srgb, ${INK_SOFT} 22%, ${PAPER})` : BAR,
                 }}
               >
+                {/* A cart before the label, in the label's ink (the owner,
+                    2026-11-13: "add a shopping cart lucide icon"). */}
+                <ShoppingCart size={26} strokeWidth={2} color={g === "A" ? INK : PAPER} style={{ flex: "none" }} />
                 Buy now
               </span>
             </div>
@@ -206,14 +219,10 @@ export const DesignScene: React.FC = () => {
                     <span
                       style={{
                         ...note(21),
-                        ...GRAY_BADGE,
-                        // The one that moved turns from gray to red as it is cheered.
-                        ...(mover
-                          ? {
-                              background: `color-mix(in srgb, ${RED_BADGE.background} ${Math.round(hot * 100)}%, ${GRAY_BADGE.background})`,
-                              color: `color-mix(in srgb, ${RED_BADGE.color} ${Math.round(hot * 100)}%, ${GRAY_BADGE.color})`,
-                            }
-                          : null),
+                        ...METRIC_BADGE,
+                        // The one that moved turns from ink to red, border
+                        // and text, as it is cheered.
+                        ...(mover ? moverInk(hot) : null),
                       }}
                     >
                       {mover ? <Strike at={hackingAt - 4}>{m}</Strike> : m}

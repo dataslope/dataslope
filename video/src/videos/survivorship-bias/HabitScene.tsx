@@ -4,7 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, headline, HIGHLIGHT, INK, label } from "../../editorial/style";
-import { badgeStyle, ColumnRule, Ink } from "../../editorial/ui";
+import { Ink, outlineBadgeStyle } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Bridge } from "../sampling/Bridge";
@@ -19,10 +19,6 @@ const ROWS = [
 const ROW_Y = (i: number) => 330 + i * 126;
 const HERE_X = 120;
 const GONE_X = 780;
-/** The hairline between the columns: centred between the end of the longest
- *  row on the left ("The planes that made it home", ~626) and the tint of
- *  the missing column's badges (GONE_X - 22). */
-const RULE_X = 692;
 
 /**
  * The habit: every dataset of survivors, and the column it is missing. Ends
@@ -96,21 +92,19 @@ export const HabitScene: React.FC = () => {
               <Ink at={at - 4} dur={16} style={{ left: HERE_X, top: y(ROW_Y(i)) }}>
                 <span style={{ ...body(40), color: INK, whiteSpace: "nowrap" }}>{r.here}</span>
               </Ink>
-              {/* What is missing, as a gray house badge, kept as badgeStyle
-                  draws it; a column entry, so it starts with a capital. */}
+              {/* What is missing, as an outlined badge (the owner,
+                  2026-11-13: "use black border, transparent background, and
+                  black text"); a column entry, so it starts with a capital. */}
               <Ink at={missingAt + i * 5} dur={16} style={{ left: GONE_X - 22, top: y(ROW_Y(i)) - 6 }}>
-                <span style={{ ...body(40, true), ...badgeStyle("gray", 40) }}>
+                <span style={{ ...body(40, true), ...outlineBadgeStyle("ink", 40) }}>
                   {r.gone}
                 </span>
               </Ink>
             </React.Fragment>
           );
         })}
-
-        {/* The two columns, side by side: a hairline in the gap, from the
-            heads to the last row, inking in with the column it introduces. */}
-        <ColumnRule x={RULE_X} top={y(224)} height={y(ROW_Y(ROWS.length - 1)) + 50 - y(224)} at={missingAt - 4} />
-
+        {/* No hairline between the two columns (the owner, 2026-11-13:
+            "remove the vertical separator"); the gap holds them apart. */}
       </div>
 
       {/* The question, in two inks. */}

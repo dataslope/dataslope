@@ -2,9 +2,10 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK } from "../../editorial/style";
 import { FigLabel, type Pt } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { ds } from "../../theme/brand";
 import { Sfx } from "../../sound/Sfx";
 import { courseId, MTM, studentId } from "./data";
 import {
@@ -41,6 +42,8 @@ const NAMES_Y = 380;
 const RIGHT_X = 980;
 const SLOT_Y = 440;
 const FLIP_Y = 690;
+/** The outlined chips' border before "neither" darkens it to the ink. */
+const SOFT_EDGE = ds("gray", 400);
 /** A table cell's side padding (parts.tsx), to set a tag flush with a number. */
 const CELL_PAD = 20;
 
@@ -144,7 +147,11 @@ export const CrossScene: React.FC = () => {
               width={STUDENT_W}
               at={studentAt + 6 + k * 5}
               name={name}
-              tone={{ at: neitherAt, color: MARK }}
+              // Outlined (the owner, 2026-11-13): the yellow wash on "neither"
+              // becomes the border darkening from gray to black.
+              outline
+              border={SOFT_EDGE}
+              tone={{ at: neitherAt, color: INK }}
             />
           ))}
           {Object.keys(COURSE_Y).map((title, k) => (
@@ -155,7 +162,9 @@ export const CrossScene: React.FC = () => {
               width={COURSE_W}
               at={coursesAt + 6 + k * 5}
               name={title}
-              tone={{ at: neitherAt + 6, color: MARK }}
+              outline
+              border={SOFT_EDGE}
+              tone={{ at: neitherAt + 6, color: INK }}
             />
           ))}
           <Pulse x={knot[0]} y={knot[1]} at={crossAt} r={8} />
@@ -196,7 +205,10 @@ export const CrossScene: React.FC = () => {
           name="History?"
           border={ACCENT}
           dashed
-          tone={{ at: forcesAt, color: MARK_BAD }}
+          // Red border and red text, no fill (the owner, 2026-11-13): the red
+          // wash on "forces" becomes the text turning red.
+          outline
+          tone={{ at: forcesAt, color: ACCENT }}
         />
       </div>
 
@@ -231,7 +243,8 @@ export const CrossScene: React.FC = () => {
           name="Grace?"
           border={ACCENT}
           dashed
-          tone={{ at: forcesAt + 4, color: MARK_BAD }}
+          outline
+          tone={{ at: forcesAt + 4, color: ACCENT }}
         />
       </div>
 

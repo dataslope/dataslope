@@ -145,17 +145,20 @@ export const TestScene: React.FC = () => {
           </Ink>
         ))}
         <Ink at={positiveAt - 2} dur={14} style={{ left: 160, top: y(712), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 18 }}>
+          {/* Outlined, not filled (the owner, 2026-11-13: "use black border,
+              transparent background, and black text"). */}
           <span
             style={{
+              boxSizing: "border-box",
               width: 56,
               height: 56,
               borderRadius: 8,
-              background: STAT,
-              color: "var(--ds-white)",
+              border: `2px solid ${INK}`,
+              background: "transparent",
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              ...note(30, "var(--ds-white)"),
+              ...note(30, INK),
               fontWeight: 500,
             }}
           >

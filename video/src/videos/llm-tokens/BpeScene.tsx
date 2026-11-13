@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
-import { FigLabel, Note } from "../../editorial/ui";
+import { FigLabel, Note, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -50,18 +50,32 @@ const tileX = (start: number) => TX + start * (U + G);
 const tileW = (units: number) => units * U + (units - 1) * G;
 const same = (a: Tile, b: Tile) => a.start === b.start && a.units === b.units && a.text === b.text;
 
-/** A symbol in the code face, the end marker set smaller and softer. */
-const Sym: React.FC<{ text: string; size?: number }> = ({ text, size = 28 }) => {
+/** A symbol in the code face, the end marker set smaller and softer. `color`
+ *  inks the whole symbol (its end marker at 70%). */
+const Sym: React.FC<{ text: string; size?: number; color?: string }> = ({ text, size = 28, color }) => {
   const body = text.endsWith(END) ? text.slice(0, -END.length) : text;
   const end = text.endsWith(END);
   return (
-    <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: size, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+    <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: size, color: color ?? INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
       {body}
       {/* Softer, and a little smaller: within 12% of the symbol it ends. */}
-      {end ? <span style={{ fontSize: Math.max(20, Math.round(size * 0.9)), color: INK_SOFT }}>{END}</span> : null}
+      {end ? (
+        <span style={{ fontSize: Math.max(20, Math.round(size * 0.9)), color: color ? `color-mix(in srgb, ${color} 70%, transparent)` : INK_SOFT }}>
+          {END}
+        </span>
+      ) : null}
     </span>
   );
 };
+
+/** A tile's text: the blue of its ground, or red as `focus` turns it red (the
+ *  owner, 2026-11-13: "a blue text color for blue boxes and red text color
+ *  for red boxes"). */
+const tileInk = (focus: number) => `color-mix(in srgb, ${outlineInk("red")} ${Math.round(100 * clamp01(focus))}%, ${outlineInk("blue")})`;
+
+/** The lone end marker's extra width, so its four characters have room at
+ *  each side (the owner, 2026-11-13: more horizontal padding on "</w>"). */
+const MARKER_EXTRA = 28;
 
 /** One symbol tile, on its units, in its state. */
 const TileBox: React.FC<{ t: Tile; top: number; opacity: number; focus: number; scale?: number }> = ({
@@ -78,7 +92,7 @@ const TileBox: React.FC<{ t: Tile; top: number; opacity: number; focus: number; 
         position: "absolute",
         left: tileX(t.start),
         top,
-        width: tileW(t.units),
+        width: tileW(t.units) + (marker ? MARKER_EXTRA : 0),
         height: TILE_H,
         boxSizing: "border-box",
         borderRadius: 5,
@@ -95,7 +109,7 @@ const TileBox: React.FC<{ t: Tile; top: number; opacity: number; focus: number; 
         transform: `scale(${scale})`,
       }}
     >
-      <Sym text={t.text} size={marker ? 26 : 28} />
+      {marker ? <Sym text={t.text} size={26} /> : <Sym text={t.text} size={28} color={tileInk(focus)} />}
     </div>
   );
 };
@@ -324,8 +338,9 @@ export const BpeScene: React.FC = () => {
                 opacity: on,
               }}
             >
-              <ChipFace text={p.pair[0]} size={24} focus={Math.min(1, hit)} />
-              <ChipFace text={p.pair[1]} size={24} focus={Math.min(1, hit)} />
+              {p.pair.map((t, j) => (
+                <ChipFace key={j} text={t} size={24} focus={Math.min(1, hit)} tinted padX={t === END ? 6 : 0} />
+              ))}
               <span style={{ ...note(26, hit > 0.5 ? FOCUS_INK : INK), marginLeft: 14, fontWeight: 500, ...TABULAR }}>
                 {p.count}
               </span>
@@ -369,7 +384,7 @@ export const BpeScene: React.FC = () => {
                 <Sym text={m.b} size={24} />
               </span>
               <InlineArrow width={34} size={24} />
-              <ChipFace text={m.a + m.b} size={22} focus={Math.max(clamp01(hot), lit)} />
+              <ChipFace text={m.a + m.b} size={22} focus={Math.max(clamp01(hot), lit)} tinted />
               <span style={{ ...note(21, INK_SOFT), marginLeft: 6, ...TABULAR }}>×{m.count}</span>
               {i === 0 ? (
                 <span style={{ ...note(21, INK_SOFT), marginLeft: 14, whiteSpace: "nowrap", opacity: ease(frame, firstAt + 4, 12) }}>

@@ -147,7 +147,8 @@ export const PathScene: React.FC = () => {
       {toks.map((t, i) => (
         <React.Fragment key={i}>
           <Fade at={textAt - 2 + i * 2} style={{ left: X.text, top: rowY(i) }}>
-            <TokenChip text={t.piece} size={23} />
+            {/* Outlined in ink (the owner, 2026-11-13). */}
+            <TokenChip text={t.piece} size={23} outline />
           </Fade>
           <Fade at={idsAt + i * 3} style={{ left: X.ids, top: rowY(i) + 8 }}>
             <span style={{ fontFamily: MONO, fontWeight: 500, fontSize: 24, color: INK, ...TABULAR }}>{t.id}</span>
@@ -541,7 +542,8 @@ export const ExpertsScene: React.FC = () => {
       </Svg>
       {frame >= fewAt - 6 ? (
         <div style={{ position: "absolute", left: GX + 2 * (EW + EG) - 8 - 40, top: GY - 64, opacity: tp, transform: `translateY(${(1 - tp) * -10}px)` }}>
-          <TokenChip text={tok.piece} size={24} border={POINT} />
+          {/* Outlined in ink, every token the same as it cycles (the owner, 2026-11-13). */}
+          <TokenChip text={tok.piece} size={24} outline />
         </div>
       ) : null}
       <Fade at={fewAt + 4} style={{ left: GX, top: GY + 4 * (EH + EG) + 6 }}>
@@ -642,7 +644,8 @@ export const TopScene: React.FC = () => {
         return (
           <React.Fragment key={t}>
             <Fade at={scoreAt + i * 5} style={{ left: LX, top }}>
-              <TokenChip text={` ${t}`} size={23} border={on ? POINT : INK} />
+              {/* Outlined: ink, and red on the token the marker is on (the owner, 2026-11-13). */}
+              <TokenChip text={` ${t}`} size={23} border={on ? POINT : INK} outline />
             </Fade>
             <Svg>
               <rect x={v >= 0 ? ZERO : ZERO - w} y={top + 8} width={w} height={34} rx={3} fill={on ? POINT : DATA} />
