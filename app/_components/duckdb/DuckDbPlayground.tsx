@@ -2702,6 +2702,11 @@ function DuckDbPlaygroundInner() {
         report?.("Reading schema");
         await refreshSchema();
         setStatusState("ready");
+        // Close on success, as the SQLite and Postgres playgrounds do: a
+        // live dropzone over a database that was just replaced invites
+        // dropping a second file onto it by accident.
+        setImportDuckDbOpen(false);
+        setImportSqlDumpOpen(false);
         showToast(`Loaded "${filename}".`);
       } catch (err) {
         // importSqlDump restored the previous sample on failure; re-read
@@ -2765,6 +2770,11 @@ function DuckDbPlaygroundInner() {
         report?.("Reading schema");
         await refreshSchema();
         setStatusState("ready");
+        // Close on success, as the SQLite and Postgres playgrounds do: a
+        // live dropzone over a database that was just replaced invites
+        // dropping a second file onto it by accident.
+        setImportDuckDbOpen(false);
+        setImportSqlDumpOpen(false);
         showToast(`Loaded "${filename}".`);
       } catch (err) {
         // importBinaryImage restored the previous sample on failure; re-read

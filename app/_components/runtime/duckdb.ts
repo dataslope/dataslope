@@ -83,11 +83,11 @@ interface AsyncDuckDB {
     progress?: (p: { bytesLoaded: number; bytesTotal: number }) => void,
   ): Promise<void>;
   connect(): Promise<DuckDbConnection>;
+  open?(config: { path: string; accessMode?: number }): Promise<void>;
   registerFileBuffer(name: string, buffer: Uint8Array): Promise<void>;
   registerFileText?(name: string, text: string): Promise<void>;
   copyFileToBuffer?(name: string): Promise<Uint8Array>;
   globFiles?(pattern: string): Promise<{ fileName: string }[]>;
-  registerEmptyFileBuffer?(name: string): Promise<void>;
   dropFile?(name: string): Promise<void>;
   terminate(): Promise<void>;
 }
@@ -98,6 +98,7 @@ interface DuckDbModule {
   VoidLogger: new () => unknown;
   selectBundle(bundles: DuckDbBundles): Promise<DuckDbBundle>;
   getJsDelivrBundles(): DuckDbBundles;
+  DuckDBAccessMode?: { READ_WRITE: number };
 }
 
 // ─── Module-level lazy initializer ──────────────────────────────────
@@ -874,6 +875,77 @@ export function unpackDuckDbArchive(bytes: Uint8Array): DuckDbArchiveFile[] | nu
   }
 }
 
+/** Write a real `.duckdb` file holding the contents of a catalog archive.
+ *
+ *  The obvious route does not work in this build: ATTACH a registered
+ *  buffer, copy the catalog into it, DETACH, read the buffer back. DuckDB
+ *  1.4 keeps the file open after DETACH (and after re-opening the instance
+ *  on `:memory:`), and duckdb-wasm refuses to copy a buffer that is still
+ *  open, so the export failed every time with an empty error.
+ *
+ *  What does work is letting DuckDB write to a file it does not own: a
+ *  second, throwaway instance opens an OPFS file as its database, loads
+ *  the archive, checkpoints and is terminated, which is the one thing that
+ *  reliably releases the file. The bytes are then read from OPFS like any
+ *  other file and the scratch file is removed. The reader's own instance is
+ *  never touched, so a failure here cannot disturb their session. */
+async function writeNativeDuckDbImage(files: DuckDbArchiveFile[]): Promise<Uint8Array> {
+  const storage = typeof navigator === "undefined" ? undefined : navigator.storage;
+  if (!storage?.getDirectory) {
+    throw new Error(
+      "This browser has no private file storage (OPFS), which writing a .duckdb file needs. Export a SQL dump instead.",
+    );
+  }
+  const root = await storage.getDirectory();
+  const name = `_dataslope_export_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}.duckdb`;
+  const duckdb = await loadDuckDbModule();
+  const { db: scratch } = await instantiateDuckDb();
+  try {
+    try {
+      if (!scratch.open) throw new Error("no file-backed databases");
+      await scratch.open({
+        path: `opfs://${name}`,
+        accessMode: duckdb.DuckDBAccessMode?.READ_WRITE ?? 3,
+      });
+      const scratchConn = await scratch.connect();
+      const dir = "_archive";
+      const decoder = new TextDecoder();
+      const encoder = new TextEncoder();
+      for (const file of files) {
+        await scratch.registerFileBuffer(
+          `${dir}/${file.name}`,
+          file.name === "load.sql"
+            ? encoder.encode(
+                decoder.decode(file.bytes).split("'{{dir}}/").join(`'${dir}/`),
+              )
+            : file.bytes,
+        );
+      }
+      await scratchConn.query(`IMPORT DATABASE '${dir}'`);
+      await scratchConn.query("CHECKPOINT");
+      await scratchConn.close();
+    } finally {
+      // Terminating the worker is what releases the file.
+      await scratch.terminate();
+    }
+    const handle = await root.getFileHandle(name);
+    return new Uint8Array(await (await handle.getFile()).arrayBuffer());
+  } catch (err) {
+    const detail = err instanceof Error ? err.message.trim() : "";
+    throw new Error(
+      `Could not write the .duckdb file${detail ? ` (${detail})` : ""}. Export a SQL dump instead.`,
+    );
+  } finally {
+    for (const leftover of [name, `${name}.wal`]) {
+      try {
+        await root.removeEntry(leftover);
+      } catch {
+        /* never created, or already gone */
+      }
+    }
+  }
+}
+
 // ─── Engine interface ───────────────────────────────────────────────
 
 export interface DuckDbEngine {
@@ -1204,46 +1276,11 @@ export async function createDuckDbEngine(
    *  .duckdb" menu item. Attempted the documented way (ATTACH a file, copy
    *  the catalog in, DETACH, read the file); whether the last step works
    *  depends on the DuckDB build, so a failure there is reported plainly. */
+  /** A native `.duckdb` file of the current catalog. */
   async function exportAsBinaryInternal(): Promise<Uint8Array> {
-    if (!db.copyFileToBuffer) {
-      throw new Error("This DuckDB-Wasm build does not support binary file export.");
-    }
-    const exportFile = "_playground_export_tmp.duckdb";
-    const alias = "_playground_export_alias";
-    try {
-      await db.dropFile?.(exportFile);
-    } catch {
-      /* nothing left over from an earlier attempt */
-    }
-    // An *empty* registration, not a zero-byte buffer: DuckDB 1.4 opens a
-    // zero-byte buffer, finds no header and refuses to attach it ("exists,
-    // but it is not a valid DuckDB database file").
-    await db.registerEmptyFileBuffer?.(exportFile);
-    try {
-      await conn.query(`ATTACH '${exportFile}' AS ${quoteIdent(alias)}`);
-      await copyDuckDbCatalog((sql) => conn.query(sql), "memory", alias);
-      await conn.query(`DETACH ${quoteIdent(alias)}`);
-      try {
-        return await db.copyFileToBuffer(exportFile);
-      } catch (err) {
-        const detail = err instanceof Error ? err.message.trim() : "";
-        throw new Error(
-          `This DuckDB build wrote the database file but could not read it back${detail ? ` (${detail})` : ""}; ` +
-            `it keeps the file locked after detaching it. Export a SQL dump instead.`,
-        );
-      }
-    } finally {
-      try {
-        await conn.query(`DETACH ${quoteIdent(alias)}`);
-      } catch {
-        /* already detached */
-      }
-      try {
-        await db.dropFile?.(exportFile);
-      } catch {
-        /* ignore */
-      }
-    }
+    const files = unpackDuckDbArchive(await exportCatalogArchive());
+    if (!files) throw new Error("The database export produced no archive.");
+    return writeNativeDuckDbImage(files);
   }
 
   const dropArchiveFiles = async (names: readonly string[]) => {
