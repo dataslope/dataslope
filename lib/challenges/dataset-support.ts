@@ -29,8 +29,8 @@
  *  - Zoe Lambert has just joined and holds no tickets; Wren Adeyemi and
  *    Yusuf Karaca have resolved everything they were given.
  *
- * Timestamps are ISO text with whole minutes, so `unixepoch()` differences
- * are exact and the text itself compares in time order.
+ * Timestamps are `TIMESTAMP` values on whole minutes, so an
+ * `EXTRACT(EPOCH FROM b - a)` difference is an exact number of minutes.
  */
 
 import type { ChallengeDataset } from "./datasets";
