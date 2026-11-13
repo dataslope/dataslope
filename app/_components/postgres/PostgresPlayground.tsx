@@ -104,6 +104,7 @@ import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmD
 import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
 import { DdlViewer } from "../sql/components/DdlViewer";
 import { useDiscardGuard } from "../sql/components/DiscardGuard";
+import { CloseTabConfirmDialog } from "../sql/components/CloseTabConfirmDialog";
 import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
 import {
   topoSortByForeignKeys,
@@ -1330,6 +1331,7 @@ function PostgresPlaygroundInner() {
         page?: number,
         baseSql?: string,
         explicitPageSize?: number,
+        recordHistory?: boolean,
       ) => void)
     | null
   >(null);
@@ -1634,6 +1636,10 @@ function PostgresPlaygroundInner() {
       page = 0,
       baseSql?: string,
       explicitPageSize?: number,
+      // False for the grid's own re-queries (a sort, a filter, the next
+      // page). They wrap the reader's SQL in `SELECT * FROM (…) AS __sort`,
+      // and logging them filled Query History with statements nobody wrote.
+      recordHistory = true,
     ) => {
       const engine = engineRef.current;
       if (!engine) return;
@@ -1649,6 +1655,7 @@ function PostgresPlaygroundInner() {
             page,
             baseSql,
             explicitPageSize,
+            recordHistory,
           );
         return;
       }
@@ -1732,7 +1739,7 @@ function PostgresPlaygroundInner() {
             affectedRows,
           },
         }));
-        addHistoryEntry({
+        if (recordHistory) addHistoryEntry({
           sql: trimmed,
           source,
           executedAt: Date.now(),
@@ -1763,7 +1770,7 @@ function PostgresPlaygroundInner() {
             querySql: trimmed,
           },
         }));
-        addHistoryEntry({
+        if (recordHistory) addHistoryEntry({
           sql: trimmed,
           source,
           executedAt: Date.now(),
@@ -2252,7 +2259,8 @@ function PostgresPlaygroundInner() {
       // "New Database" over the blank slot is a real overwrite: that slot
       // also holds imports, and skipping it left their data and name in place.
       if (!engine) return;
-      if (nextId !== POSTGRES_BLANK_DATABASE.id && nextId === activeDbIdRef.current) return;
+      // No early return when `nextId` is the open database: that is the
+      // "reload a fresh copy of the sample" path.
       setStatusState("loading");
       setDbLoading(true);
       try {
@@ -2406,7 +2414,8 @@ function PostgresPlaygroundInner() {
 
   const requestDbSwitch = useCallback(
     (nextId: string) => {
-      if (nextId !== POSTGRES_BLANK_DATABASE.id && nextId === activeDbIdRef.current) return;
+      // Picking the open database is allowed: the dialog offers to reload
+      // a fresh copy of the sample.
       setPendingDbId(nextId);
     },
     [setPendingDbId],
@@ -2578,6 +2587,9 @@ function PostgresPlaygroundInner() {
     addTab,
     openTabAndRun,
     closeTab,
+    confirmCloseTabId,
+    confirmCloseTab,
+    cancelCloseTab,
     resetTabsForCurrentDb,
     reorderTabs,
     openErDiagramTab,
@@ -2838,6 +2850,7 @@ function PostgresPlaygroundInner() {
         page,
         curResult?.lazyBaseSql ?? curResult?.lazySql,
         explicitPageSize,
+        false,
       );
     },
     [resultsByTab, runSqlForTab],
@@ -4376,6 +4389,11 @@ function PostgresPlaygroundInner() {
           onOpenChange={(next) => { if (!next) setPendingDbId(null); }}
           currentWorkspaceName={activeWorkspace?.name ?? "Default Postgres Workspace"}
           newDbFilename={pendingDbId ? findPostgresSampleDatabase(pendingDbId).filename : ""}
+          isReload={
+            pendingDbId !== null &&
+            pendingDbId === activeDbId &&
+            pendingDbId !== POSTGRES_BLANK_DATABASE.id
+          }
           onOverwrite={() => {
             if (pendingDbId) void performDbSwitch(pendingDbId);
             setPendingDbId(null);
@@ -4928,6 +4946,11 @@ function PostgresPlaygroundInner() {
 
         {addTableGuard.dialog}
         {viewStructureGuard.dialog}
+        <CloseTabConfirmDialog
+          open={confirmCloseTabId !== null}
+          onCancel={cancelCloseTab}
+          onConfirm={confirmCloseTab}
+        />
 
         {/* ── Import CSV dialog ── */}
         <ImportDialog

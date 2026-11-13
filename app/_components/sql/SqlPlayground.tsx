@@ -2248,6 +2248,11 @@ function SqlPlaygroundInner() {
           onOpenChange={(next) => { if (!next) setPendingDbId(null); }}
           currentWorkspaceName={activeWorkspace?.name ?? "Default SQLite Workspace"}
           newDbFilename={pendingDbFilename}
+          isReload={
+            pendingDbId !== null &&
+            pendingDbId === activeDbId &&
+            pendingDbId !== "__blank__"
+          }
           onOverwrite={() => {
             if (pendingDbId) performDbSwitch(pendingDbId);
             setPendingDbId(null);
@@ -2325,8 +2330,10 @@ function SqlPlaygroundInner() {
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
                 Truncate table <strong>{truncateConfirm}</strong>? This deletes
-                every row but keeps the schema. The change is in-memory only and
-                will be undone next page load.
+                every row but keeps the schema. The change is saved with this
+                workspace, so reloading the page will not bring the rows back.
+                To get a sample database back, pick it again in the database
+                menu.
               </Dialog.Description>
               <p className="confirm-desc-note">
                 Runs as a plain <strong>DELETE</strong> (SQLite has no
@@ -2369,8 +2376,10 @@ function SqlPlaygroundInner() {
                 {pendingDropEntity
                   ? DROP_KIND_LABELS[pendingDropEntity.kind].toLowerCase()
                   : ""}{" "}
-                <strong>{pendingDropEntity?.name}</strong>? This change is
-                in-memory only and will be undone next page load.
+                <strong>{pendingDropEntity?.name}</strong>? The change is saved
+                with this workspace, so reloading the page will not bring it
+                back. To get a sample database back, pick it again in the
+                database menu.
               </Dialog.Description>
               <div className="confirm-actions">
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">

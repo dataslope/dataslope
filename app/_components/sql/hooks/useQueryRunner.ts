@@ -113,6 +113,10 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       page = 0,
       baseSql?: string,
       explicitPageSize?: number,
+      // False for the grid's own re-queries (a sort, a filter, the next
+      // page). They wrap the reader's SQL in `SELECT * FROM (…) AS __sort`,
+      // and logging them filled Query History with statements nobody wrote.
+      recordHistory = true,
     ) => {
       const engine = engineRef.current;
       if (!engine) return;
@@ -192,7 +196,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           querySql: trimmed.replace(/\s*;+\s*$/, ""),
           affectedRows,
         });
-        addHistoryEntry({
+        if (recordHistory) addHistoryEntry({
           sql: trimmed,
           source,
           executedAt: Date.now(),
@@ -266,7 +270,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           // editor's contents; the error panel shows it beside the message.
           querySql: trimmed,
         });
-        addHistoryEntry({
+        if (recordHistory) addHistoryEntry({
           sql: trimmed,
           source,
           executedAt: Date.now(),
@@ -312,6 +316,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         page,
         curResult?.lazyBaseSql ?? curResult?.lazySql,
         explicitPageSize,
+        false,
       );
     },
     [runSqlForTab, activeTabIdRef],

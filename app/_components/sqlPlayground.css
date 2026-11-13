@@ -3530,9 +3530,10 @@ html[data-playground-theme="light"] .sql-result-ok {
   transition: color 120ms ease;
 }
 
-/* Active sort chevron inherits the column-name text color */
+/* The active sort arrow takes the accent, so a sorted column is findable
+   at a glance across a wide grid. */
 .sql-result-th-chevron-active {
-  color: var(--text);
+  color: var(--primary);
 }
 
 /* Highlight the <th> of the currently sorted column */

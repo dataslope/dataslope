@@ -203,3 +203,56 @@ export function extractCheckConstraints(createSql: string): CheckConstraint[] {
   }
   return out;
 }
+
+/** Names of the generated columns a `CREATE TABLE` statement declares
+ *  (`col TYPE GENERATED ALWAYS AS (…)`, or the bare `col TYPE AS (…)` form).
+ *  DuckDB's column catalog does not flag them, and copying rows needs to
+ *  know which columns it must not write to. */
+export function generatedColumnsOf(createSql: string): string[] {
+  if (!/^\s*CREATE\s+(?:TEMP(?:ORARY)?\s+)?TABLE\b/i.test(createSql)) return [];
+  let open = -1;
+  for (let i = 0; i < createSql.length; ) {
+    const skipped = skipComment(createSql, skipQuoted(createSql, i));
+    if (skipped !== i) {
+      i = skipped;
+      continue;
+    }
+    if (createSql[i] === "(") {
+      open = i;
+      break;
+    }
+    i += 1;
+  }
+  if (open === -1) return [];
+  const close = matchParen(createSql, open);
+  if (close === -1) return [];
+  const out: string[] = [];
+  for (const item of splitTopLevel(createSql.slice(open + 1, close))) {
+    if (TABLE_CONSTRAINT_START.test(item)) continue;
+    const name = leadingIdentifier(item);
+    if (!name) continue;
+    // Look outside quotes and nested parentheses, so a default expression
+    // or a comment that happens to say "AS (" does not count.
+    let depth = 0;
+    let flat = "";
+    for (let i = 0; i < item.length; ) {
+      const skipped = skipComment(item, skipQuoted(item, i));
+      if (skipped !== i) {
+        flat += " ";
+        i = skipped;
+        continue;
+      }
+      if (item[i] === "(") {
+        if (depth === 0) flat += "(";
+        depth += 1;
+      } else if (item[i] === ")") {
+        depth -= 1;
+      } else if (depth === 0) {
+        flat += item[i];
+      }
+      i += 1;
+    }
+    if (/\bGENERATED\s+ALWAYS\s+AS\b|\bAS\s*\(/i.test(flat)) out.push(name);
+  }
+  return out;
+}

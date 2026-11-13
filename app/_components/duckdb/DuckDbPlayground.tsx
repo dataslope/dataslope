@@ -103,6 +103,7 @@ import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmD
 import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
 import { DdlViewer } from "../sql/components/DdlViewer";
 import { useDiscardGuard } from "../sql/components/DiscardGuard";
+import { CloseTabConfirmDialog } from "../sql/components/CloseTabConfirmDialog";
 import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
 import {
   topoSortByForeignKeys,
@@ -1343,6 +1344,7 @@ function DuckDbPlaygroundInner() {
         page?: number,
         baseSql?: string,
         explicitPageSize?: number,
+        recordHistory?: boolean,
       ) => void)
     | null
   >(null);
@@ -1635,6 +1637,10 @@ function DuckDbPlaygroundInner() {
       page = 0,
       baseSql?: string,
       explicitPageSize?: number,
+      // False for the grid's own re-queries (a sort, a filter, the next
+      // page). They wrap the reader's SQL in `SELECT * FROM (…) AS __sort`,
+      // and logging them filled Query History with statements nobody wrote.
+      recordHistory = true,
     ) => {
       const engine = engineRef.current;
       if (!engine) return;
@@ -1650,6 +1656,7 @@ function DuckDbPlaygroundInner() {
             page,
             baseSql,
             explicitPageSize,
+            recordHistory,
           );
         return;
       }
@@ -1729,7 +1736,7 @@ function DuckDbPlaygroundInner() {
             querySql: trimmed.replace(/\s*;+\s*$/, ""),
           },
         }));
-        addHistoryEntry({
+        if (recordHistory) addHistoryEntry({
           sql: trimmed,
           source,
           executedAt: Date.now(),
@@ -1760,7 +1767,7 @@ function DuckDbPlaygroundInner() {
             querySql: trimmed,
           },
         }));
-        addHistoryEntry({
+        if (recordHistory) addHistoryEntry({
           sql: trimmed,
           source,
           executedAt: Date.now(),
@@ -2295,7 +2302,8 @@ function DuckDbPlaygroundInner() {
       // "New Database" over the blank slot is a real overwrite: that slot
       // also holds imports, and skipping it left their data and name in place.
       if (!engine) return;
-      if (nextId !== DUCKDB_BLANK_DATABASE.id && nextId === activeDbIdRef.current) return;
+      // No early return when `nextId` is the open database: that is the
+      // "reload a fresh copy of the sample" path.
       // Persist pending edits before the outgoing database's tabs go out of scope.
       flushPendingSave();
       setStatusState("loading");
@@ -2353,7 +2361,8 @@ function DuckDbPlaygroundInner() {
 
   const requestDbSwitch = useCallback(
     (nextId: string) => {
-      if (nextId !== DUCKDB_BLANK_DATABASE.id && nextId === activeDbIdRef.current) return;
+      // Picking the open database is allowed: the dialog offers to reload
+      // a fresh copy of the sample.
       setPendingDbId(nextId);
     },
     [setPendingDbId],
@@ -2804,6 +2813,9 @@ function DuckDbPlaygroundInner() {
     addTab,
     openTabAndRun,
     closeTab,
+    confirmCloseTabId,
+    confirmCloseTab,
+    cancelCloseTab,
     resetTabsForCurrentDb,
     reorderTabs,
     openErDiagramTab,
@@ -3088,6 +3100,7 @@ function DuckDbPlaygroundInner() {
         page,
         curResult?.lazyBaseSql ?? curResult?.lazySql,
         explicitPageSize,
+        false,
       );
     },
     [resultsByTab, runSqlForTab],
@@ -3863,7 +3876,10 @@ function DuckDbPlaygroundInner() {
     async (opts) => {
       const engine = engineRef.current;
       if (!engine) return null;
-      const image = await engine.exportBinaryImage();
+      // The catalog archive, not a native .duckdb file: this DuckDB build
+      // cannot produce one (see runtime/duckdb.ts), and a bundle only has
+      // to be something `importBinaryImage` can read back.
+      const image = await engine.exportCatalogArchive();
       const { tabs: bundleTabs, activeTabIndex } = sqlTabsForBundle(
         tabsRef.current,
         activeTabIdRef.current,
@@ -4717,6 +4733,11 @@ function DuckDbPlaygroundInner() {
           onOpenChange={(next) => { if (!next) setPendingDbId(null); }}
           currentWorkspaceName={activeWorkspace?.name ?? "Default DuckDB Workspace"}
           newDbFilename={pendingDbId ? findDuckDbSampleDatabase(pendingDbId).filename : ""}
+          isReload={
+            pendingDbId !== null &&
+            pendingDbId === activeDbId &&
+            pendingDbId !== DUCKDB_BLANK_DATABASE.id
+          }
           onOverwrite={() => {
             if (pendingDbId) void performDbSwitch(pendingDbId);
             setPendingDbId(null);
@@ -5277,6 +5298,11 @@ function DuckDbPlaygroundInner() {
 
         {addTableGuard.dialog}
         {viewStructureGuard.dialog}
+        <CloseTabConfirmDialog
+          open={confirmCloseTabId !== null}
+          onCancel={cancelCloseTab}
+          onConfirm={confirmCloseTab}
+        />
 
         {/* ── Import CSV dialog ── */}
         <ImportDialog

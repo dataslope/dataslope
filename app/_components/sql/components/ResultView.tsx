@@ -33,6 +33,8 @@ import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Toggle } from "@base-ui/react/toggle";
 import {
   ArrowDownToLine,
+  ArrowDown,
+  ArrowUp,
   Binary,
   Calendar,
   CheckCircle,
@@ -41,7 +43,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  ChevronUp,
+  ChevronsUpDown,
   Clock,
   Hash,
   Lock,
@@ -2154,8 +2156,8 @@ function ResultViewImpl({
               {pendingCount} row{pendingCount === 1 ? "" : "s"} will be
               permanently deleted from{" "}
               <strong>{sourceTable ?? "this table"}</strong>. The change is
-              in-memory only and will be undone next page load, but cannot be
-              reversed within this session.
+              saved with this workspace, so reloading the page will not bring
+              it back.
             </Dialog.Description>
             <div className="confirm-actions">
               <Dialog.Close className="confirm-btn confirm-btn-secondary">
@@ -2186,8 +2188,8 @@ function ResultViewImpl({
             <Dialog.Description className="confirm-desc">
               This row will be permanently deleted from{" "}
               <strong>{sourceTable ?? "this table"}</strong>. The change is
-              in-memory only and will be undone next page load, but cannot be
-              reversed within this session.
+              saved with this workspace, so reloading the page will not bring
+              it back.
             </Dialog.Description>
             <div className="confirm-actions">
               <Dialog.Close className="confirm-btn confirm-btn-secondary">
@@ -2681,10 +2683,15 @@ export function ResultTableBody({
                       }
                       aria-hidden="true"
                     >
+                      {/* Three states, three glyphs. A lone chevron-down for
+                          both "unsorted" and "sorted descending" read as a
+                          dropdown and gave no sign that a sort was on. */}
                       {sorted === "asc" ? (
-                        <ChevronUp size={11} />
+                        <ArrowUp size={12} />
+                      ) : sorted === "desc" ? (
+                        <ArrowDown size={12} />
                       ) : (
-                        <ChevronDown size={11} />
+                        <ChevronsUpDown size={11} />
                       )}
                     </span>
                   </span>
@@ -3151,6 +3158,10 @@ export function ResultTableBody({
     state: { sorting },
     onSortingChange: handleSortingChange,
     manualSorting: true,
+    // TanStack sorts numeric columns descending on the first click unless
+    // told otherwise, which contradicted the header's own "Click to sort
+    // ascending" tip and every other table the reader has used.
+    sortDescFirst: false,
   });
   const tableRows = table.getRowModel().rows;
   // eslint-disable-next-line react-hooks/incompatible-library -- row virtualization has no compatible alternative here.
@@ -3630,6 +3641,15 @@ export function ResultTableBody({
                           : header.column.getIsSorted()
                             ? "sql-result-th-sorted"
                             : undefined
+                      }
+                      aria-sort={
+                        header.column.id === "select"
+                          ? undefined
+                          : header.column.getIsSorted() === "asc"
+                            ? "ascending"
+                            : header.column.getIsSorted() === "desc"
+                              ? "descending"
+                              : "none"
                       }
                     >
                       {header.isPlaceholder

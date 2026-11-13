@@ -172,7 +172,7 @@ function runStatements(db: Database, sql: string): SqliteRunDetail {
     try {
       next = iterator.next();
     } catch (err) {
-      throw statementError(err, index, sets.length);
+      throw statementError(err, index + 1, sets.length);
     }
     if (next.done) break;
     const stmt = next.value;

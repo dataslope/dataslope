@@ -19,6 +19,8 @@ import {
 } from "./duckdbSamples";
 import { datasetFileName, fetchDatasetBytes, fetchDatasetText } from "./remoteDatasets";
 import { constraintInfoFromColumns } from "../sql/utils/duplicateRow";
+import { topoSortByForeignKeys } from "../sql/utils/exportOrder";
+import { generatedColumnsOf } from "../sql/utils/tableConstraints";
 import {
   toDateOnlyString,
   toTimestampString,
@@ -80,6 +82,8 @@ interface AsyncDuckDB {
   registerFileBuffer(name: string, buffer: Uint8Array): Promise<void>;
   registerFileText?(name: string, text: string): Promise<void>;
   copyFileToBuffer?(name: string): Promise<Uint8Array>;
+  globFiles?(pattern: string): Promise<{ fileName: string }[]>;
+  registerEmptyFileBuffer?(name: string): Promise<void>;
   dropFile?(name: string): Promise<void>;
   terminate(): Promise<void>;
 }
@@ -731,6 +735,141 @@ export function previewDuckDbCreateTable(
 
 let duckRebuildCounter = 0;
 
+/** Copy every schema object and row from one attached database to another.
+ *
+ *  `COPY FROM DATABASE a TO b` is the obvious way and does not survive
+ *  foreign keys: it loads tables in catalog order, so a child table can be
+ *  filled before its parent and the copy dies on the constraint ("key …
+ *  does not exist in the referenced table"). The default sample database
+ *  has foreign keys, so the workspace snapshot, the restore after a reload
+ *  and the `.duckdb` export all failed on it, quietly, since snapshots are
+ *  best-effort.
+ *
+ *  So the schema is copied first (which also carries views, indexes and
+ *  each sequence's position) and the rows after, parents before children.
+ *  Generated columns are left out of the row copy: DuckDB computes them and
+ *  rejects an INSERT that names one. */
+async function copyDuckDbCatalog(
+  query: (sql: string) => Promise<DuckDbArrowTable>,
+  from: string,
+  to: string,
+): Promise<void> {
+  const rows = async (sql: string): Promise<unknown[][]> =>
+    arrowToQueryExecResult(await query(sql))?.values ?? [];
+  const lit = (value: string) => `'${value.replace(/'/g, "''")}'`;
+  await query(
+    `COPY FROM DATABASE ${quoteIdent(from)} TO ${quoteIdent(to)} (SCHEMA)`,
+  );
+  const tableRows = await rows(
+    `SELECT schema_name, table_name, sql FROM duckdb_tables()
+     WHERE database_name = ${lit(from)} AND NOT internal AND NOT temporary
+     ORDER BY schema_name, table_name`,
+  );
+  const fkRows = await rows(
+    `SELECT schema_name, table_name, referenced_table FROM duckdb_constraints()
+     WHERE database_name = ${lit(from)} AND constraint_type = 'FOREIGN KEY'`,
+  );
+  const keyOf = (schema: unknown, table: unknown) => `${String(schema)}\u0000${String(table)}`;
+  const parents = new Map<string, string[]>();
+  for (const [schema, table, referenced] of fkRows) {
+    const key = keyOf(schema, table);
+    parents.set(key, [...(parents.get(key) ?? []), keyOf(schema, referenced)]);
+  }
+  const byKey = new Map(tableRows.map((row) => [keyOf(row[0], row[1]), row]));
+  const order = topoSortByForeignKeys([...byKey.keys()], (key) => parents.get(key) ?? []);
+  for (const key of order) {
+    const [schema, table, createSql] = byKey.get(key)!;
+    const qualified = (db: string) =>
+      `${quoteIdent(db)}.${quoteIdent(String(schema))}.${quoteIdent(String(table))}`;
+    const generated = generatedColumnsOf(String(createSql ?? ""));
+    await query(
+      generated.length > 0
+        ? `INSERT INTO ${qualified(to)} BY NAME SELECT * EXCLUDE (${generated.map(quoteIdent).join(", ")}) FROM ${qualified(from)}`
+        : `INSERT INTO ${qualified(to)} SELECT * FROM ${qualified(from)}`,
+    );
+  }
+}
+
+// ─── Catalog archive ────────────────────────────────────────────────
+// How a workspace's database is kept between visits, and how a cloud or
+// share bundle carries it: the files `EXPORT DATABASE` writes (schema.sql,
+// load.sql, one data file per table) packed into a single blob.
+//
+// It replaces a native `.duckdb` image for those two jobs because this
+// DuckDB build can no longer produce one: a database file written through
+// ATTACH stays locked after DETACH, so its bytes cannot be read back out of
+// the virtual filesystem. Every snapshot failed on that, the failure was
+// swallowed (snapshots are best-effort), and a reload brought back the
+// sample database while the header said "All changes saved".
+//
+// `EXPORT DATABASE` also gets right the things a hand-rolled copy has to
+// work at: tables are loaded parents-first, generated columns are skipped,
+// and each sequence resumes where it stopped.
+
+const ARCHIVE_MAGIC = "DSDUCKAR";
+
+export interface DuckDbArchiveFile {
+  /** File name inside the export directory, without the directory. */
+  name: string;
+  bytes: Uint8Array;
+}
+
+/** `[8-byte magic][u32 LE manifest length][manifest JSON][file bytes…]`. */
+export function packDuckDbArchive(files: DuckDbArchiveFile[]): Uint8Array {
+  const encoder = new TextEncoder();
+  const manifest = encoder.encode(
+    JSON.stringify(files.map((f) => ({ name: f.name, size: f.bytes.byteLength }))),
+  );
+  const total =
+    ARCHIVE_MAGIC.length +
+    4 +
+    manifest.byteLength +
+    files.reduce((sum, f) => sum + f.bytes.byteLength, 0);
+  const out = new Uint8Array(total);
+  out.set(encoder.encode(ARCHIVE_MAGIC), 0);
+  new DataView(out.buffer).setUint32(ARCHIVE_MAGIC.length, manifest.byteLength, true);
+  let offset = ARCHIVE_MAGIC.length + 4;
+  out.set(manifest, offset);
+  offset += manifest.byteLength;
+  for (const file of files) {
+    out.set(file.bytes, offset);
+    offset += file.bytes.byteLength;
+  }
+  return out;
+}
+
+/** The files in an archive, or null when the bytes are something else (a
+ *  native `.duckdb` image, which older snapshots and real exports are). */
+export function unpackDuckDbArchive(bytes: Uint8Array): DuckDbArchiveFile[] | null {
+  const headerLength = ARCHIVE_MAGIC.length + 4;
+  if (bytes.byteLength < headerLength) return null;
+  const decoder = new TextDecoder();
+  if (decoder.decode(bytes.subarray(0, ARCHIVE_MAGIC.length)) !== ARCHIVE_MAGIC) {
+    return null;
+  }
+  try {
+    const manifestLength = new DataView(
+      bytes.buffer,
+      bytes.byteOffset,
+      bytes.byteLength,
+    ).getUint32(ARCHIVE_MAGIC.length, true);
+    const manifestEnd = headerLength + manifestLength;
+    const manifest = JSON.parse(
+      decoder.decode(bytes.subarray(headerLength, manifestEnd)),
+    ) as { name: string; size: number }[];
+    const files: DuckDbArchiveFile[] = [];
+    let offset = manifestEnd;
+    for (const entry of manifest) {
+      if (offset + entry.size > bytes.byteLength) return null;
+      files.push({ name: entry.name, bytes: bytes.slice(offset, offset + entry.size) });
+      offset += entry.size;
+    }
+    return files;
+  } catch {
+    return null;
+  }
+}
+
 // ─── Engine interface ───────────────────────────────────────────────
 
 export interface DuckDbEngine {
@@ -798,11 +937,16 @@ export interface DuckDbEngine {
   /** Import a SQL dump as a new blank database. On failure the previous
    *  sample is restored, then the SQL error is rethrown. */
   importSqlDump: (sql: string) => Promise<DuckDbSampleDatabase>;
-  /** Binary .duckdb image of the whole catalog — the same bytes the OPFS
-   *  snapshot persists. Used for cloud/share bundles. */
+  /** A native `.duckdb` file of the whole catalog, for downloading. Can
+   *  fail on a DuckDB build that cannot read back a file it attached. */
   exportBinaryImage: () => Promise<Uint8Array>;
-  /** Replace the catalog from a .duckdb image. On failure the previous
-   *  sample is restored, mirroring importSqlDump. */
+  /** The whole catalog as a catalog archive: what the workspace snapshot
+   *  stores and what cloud and share bundles carry. `importBinaryImage`
+   *  reads it back. */
+  exportCatalogArchive: () => Promise<Uint8Array>;
+  /** Replace the catalog from a catalog archive or a native `.duckdb`
+   *  image. On failure the previous sample is restored, mirroring
+   *  importSqlDump. */
   importBinaryImage: (bytes: Uint8Array) => Promise<DuckDbSampleDatabase>;
   /** Whole-database export as a portable SQL script (CREATE TABLE / INSERT). */
   exportDatabase: () => Promise<{ data: Uint8Array; mimeType: string; suggestedExtension: string }>;
@@ -994,7 +1138,7 @@ export async function createDuckDbEngine(
     }
     snapshotInFlight = true;
     try {
-      const bytes = await exportAsBinaryInternal();
+      const bytes = await exportCatalogArchive();
       if (!destroyed) {
         const { writeDatabase } = await import("../opfs/databaseStorage");
         writeDatabase(workspaceId, DUCKDB_FILE, bytes);
@@ -1052,20 +1196,38 @@ export async function createDuckDbEngine(
     window.addEventListener("pagehide", onHide);
   }
 
-  /** Snapshot helper outside the engine surface (usable during construction
-   *  and destroy): ATTACH a temp VFS file, COPY FROM DATABASE, read bytes. */
+  /** A native `.duckdb` file of the whole catalog, for the "Export as
+   *  .duckdb" menu item. Attempted the documented way (ATTACH a file, copy
+   *  the catalog in, DETACH, read the file); whether the last step works
+   *  depends on the DuckDB build, so a failure there is reported plainly. */
   async function exportAsBinaryInternal(): Promise<Uint8Array> {
     if (!db.copyFileToBuffer) {
       throw new Error("This DuckDB-Wasm build does not support binary file export.");
     }
-    const exportFile = "_playground_snapshot_tmp.duckdb";
-    const alias = "_playground_snapshot_alias";
-    await db.registerFileBuffer(exportFile, new Uint8Array());
+    const exportFile = "_playground_export_tmp.duckdb";
+    const alias = "_playground_export_alias";
+    try {
+      await db.dropFile?.(exportFile);
+    } catch {
+      /* nothing left over from an earlier attempt */
+    }
+    // An *empty* registration, not a zero-byte buffer: DuckDB 1.4 opens a
+    // zero-byte buffer, finds no header and refuses to attach it ("exists,
+    // but it is not a valid DuckDB database file").
+    await db.registerEmptyFileBuffer?.(exportFile);
     try {
       await conn.query(`ATTACH '${exportFile}' AS ${quoteIdent(alias)}`);
-      await conn.query(`COPY FROM DATABASE memory TO ${quoteIdent(alias)}`);
+      await copyDuckDbCatalog((sql) => conn.query(sql), "memory", alias);
       await conn.query(`DETACH ${quoteIdent(alias)}`);
-      return await db.copyFileToBuffer(exportFile);
+      try {
+        return await db.copyFileToBuffer(exportFile);
+      } catch (err) {
+        const detail = err instanceof Error ? err.message.trim() : "";
+        throw new Error(
+          `This DuckDB build wrote the database file but could not read it back${detail ? ` (${detail})` : ""}; ` +
+            `it keeps the file locked after detaching it. Export a SQL dump instead.`,
+        );
+      }
     } finally {
       try {
         await conn.query(`DETACH ${quoteIdent(alias)}`);
@@ -1080,6 +1242,144 @@ export async function createDuckDbEngine(
     }
   }
 
+  const dropArchiveFiles = async (names: readonly string[]) => {
+    for (const name of names) {
+      try {
+        await db.dropFile?.(name);
+      } catch {
+        /* never registered, or already gone */
+      }
+    }
+  };
+
+  /** The whole catalog as a catalog archive (see above). Parquet keeps
+   *  types exactly; CSV is the fallback for a build where the Parquet
+   *  extension cannot load (it is fetched on first use). */
+  async function exportCatalogArchive(): Promise<Uint8Array> {
+    if (!db.copyFileToBuffer || !db.globFiles) {
+      throw new Error("This DuckDB-Wasm build cannot read back exported files.");
+    }
+    const dir = `_playground_snapshot_${++duckRebuildCounter}`;
+    const listed = async () => (await db.globFiles!(`${dir}/*`)).map((f) => f.fileName);
+    try {
+      try {
+        await conn.query(`EXPORT DATABASE '${dir}' (FORMAT PARQUET)`);
+      } catch {
+        await dropArchiveFiles(await listed());
+        await conn.query(`EXPORT DATABASE '${dir}' (FORMAT CSV)`);
+      }
+      const files: DuckDbArchiveFile[] = [];
+      for (const path of await listed()) {
+        files.push({
+          name: path.slice(dir.length + 1),
+          bytes: await db.copyFileToBuffer(path),
+        });
+      }
+      if (!files.some((f) => f.name === "schema.sql")) {
+        throw new Error("The database export produced no schema.");
+      }
+      // `load.sql` names its data files by the export directory; the
+      // import side puts them under a directory of its own.
+      const decoder = new TextDecoder();
+      const encoder = new TextEncoder();
+      return packDuckDbArchive(
+        files.map((f) =>
+          f.name === "load.sql"
+            ? {
+                name: f.name,
+                bytes: encoder.encode(
+                  decoder.decode(f.bytes).split(`'${dir}/`).join("'{{dir}}/"),
+                ),
+              }
+            : f,
+        ),
+      );
+    } finally {
+      await dropArchiveFiles(await listed().catch(() => []));
+    }
+  }
+
+  /** Load a catalog archive into the (already emptied) current catalog of
+   *  `target`. Runs in one transaction, so a failed import leaves nothing
+   *  half-loaded. */
+  async function importCatalogArchive(
+    target: DuckDbConnection,
+    files: DuckDbArchiveFile[],
+    prepare?: () => Promise<void>,
+  ): Promise<void> {
+    const dir = `_playground_restore_${++duckRebuildCounter}`;
+    const decoder = new TextDecoder();
+    const encoder = new TextEncoder();
+    const paths: string[] = [];
+    try {
+      for (const file of files) {
+        const path = `${dir}/${file.name}`;
+        paths.push(path);
+        await db.registerFileBuffer(
+          path,
+          file.name === "load.sql"
+            ? encoder.encode(
+                decoder.decode(file.bytes).split("'{{dir}}/").join(`'${dir}/`),
+              )
+            : file.bytes,
+        );
+      }
+      await target.query("BEGIN TRANSACTION");
+      try {
+        await prepare?.();
+        await target.query(`IMPORT DATABASE '${dir}'`);
+        await target.query("COMMIT");
+      } catch (err) {
+        try {
+          await target.query("ROLLBACK");
+        } catch {
+          /* ignore */
+        }
+        throw err;
+      }
+    } finally {
+      await dropArchiveFiles(paths);
+    }
+  }
+
+  /** Load a native `.duckdb` image (a real exported file, or a snapshot
+   *  from before the archive format) into the current catalog of `target`. */
+  async function importDuckDbImage(
+    target: DuckDbConnection,
+    bytes: Uint8Array,
+    prepare?: () => Promise<void>,
+  ): Promise<void> {
+    const importFile = `_playground_import_${++duckRebuildCounter}.duckdb`;
+    const alias = "_playground_import_alias";
+    await db.registerFileBuffer(importFile, bytes);
+    try {
+      await prepare?.();
+      await target.query(
+        `ATTACH '${importFile}' AS ${quoteIdent(alias)} (READ_ONLY)`,
+      );
+      await copyDuckDbCatalog((sql) => target.query(sql), alias, "memory");
+      await target.query(`DETACH ${quoteIdent(alias)}`);
+    } finally {
+      try {
+        await target.query(`DETACH ${quoteIdent(alias)}`);
+      } catch {
+        /* already detached */
+      }
+      await dropArchiveFiles([importFile]);
+    }
+  }
+
+  /** Either format, told apart by its first bytes. */
+  async function importCatalogBytes(
+    target: DuckDbConnection,
+    bytes: Uint8Array,
+    prepare?: () => Promise<void>,
+  ): Promise<void> {
+    const archive = unpackDuckDbArchive(bytes);
+    if (archive) await importCatalogArchive(target, archive, prepare);
+    else await importDuckDbImage(target, bytes, prepare);
+  }
+
   /** Restore a saved snapshot, replacing the freshly-bootstrapped sample
    *  data. Failure leaves the sample data intact. */
   async function restoreFromOpfs(): Promise<boolean> {
@@ -1088,29 +1388,10 @@ export async function createDuckDbEngine(
       const { readDatabase } = await import("../opfs/databaseStorage");
       const bytes = await readDatabase(workspaceId, DUCKDB_FILE);
       if (!bytes || bytes.byteLength === 0) return false;
-      const importFile = "_playground_restore_tmp.duckdb";
-      const alias = "_playground_restore_alias";
-      await db.registerFileBuffer(importFile, bytes);
-      try {
-        await cleanDuckDbSchema(conn);
-        await conn.query(
-          `ATTACH '${importFile}' AS ${quoteIdent(alias)} (READ_ONLY)`,
-        );
-        await conn.query(`COPY FROM DATABASE ${quoteIdent(alias)} TO memory`);
-        await conn.query(`DETACH ${quoteIdent(alias)}`);
-        return true;
-      } finally {
-        try {
-          await conn.query(`DETACH ${quoteIdent(alias)}`);
-        } catch {
-          /* ignore */
-        }
-        try {
-          await db.dropFile?.(importFile);
-        } catch {
-          /* ignore */
-        }
-      }
+      // The sample is cleared inside the import's own transaction where the
+      // format allows it, so a snapshot that will not load leaves it alone.
+      await importCatalogBytes(conn, bytes, () => cleanDuckDbSchema(conn));
+      return true;
     } catch {
       return false;
     }
@@ -1273,32 +1554,16 @@ export async function createDuckDbEngine(
       return exportAsBinaryInternal();
     },
 
+    async exportCatalogArchive() {
+      return exportCatalogArchive();
+    },
+
     async importBinaryImage(bytes) {
       // Same sandboxing caveat as importSqlDump.
       const previousSample = sample;
-      const importFile = "_playground_bundle_import_tmp.duckdb";
-      const alias = "_playground_bundle_import_alias";
       const next = await bootstrapDatabase(DUCKDB_BLANK_DATABASE, db);
       try {
-        await db.registerFileBuffer(importFile, bytes);
-        try {
-          await next.query(
-            `ATTACH '${importFile}' AS ${quoteIdent(alias)} (READ_ONLY)`,
-          );
-          await next.query(`COPY FROM DATABASE ${quoteIdent(alias)} TO memory`);
-          await next.query(`DETACH ${quoteIdent(alias)}`);
-        } finally {
-          try {
-            await next.query(`DETACH ${quoteIdent(alias)}`);
-          } catch {
-            /* already detached */
-          }
-          try {
-            await db.dropFile?.(importFile);
-          } catch {
-            /* ignore */
-          }
-        }
+        await importCatalogBytes(next, bytes);
       } catch (err) {
         try {
           await next.close();
