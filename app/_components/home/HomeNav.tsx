@@ -403,12 +403,17 @@ export function HomeNav() {
             Measured headroom — twice the slack on the tighter flexible edge,
             since a centred menu spends it on both — is 262px at 1280, 518px
             at 1536 and 902px at 1920, against the +32px and +64px these two
-            steps cost. lg–xl steps the least because it is the tight band:
-            120px of headroom at 1024, and the one a sixth item has to fit.
-            6px is what that affords. Measured at 1024 with a real sixth
+            steps cost. lg–xl is the tight band, and the one a sixth item has
+            to fit, so its gap is fluid rather than fixed: 10px at 1024,
+            growing with the viewport to 16px at 1279, the xl value. A fixed
+            6px held the band to 22px between labels against 40px at xl, so
+            the menu visibly bunched up as the type stepped down; the fluid
+            gap keeps that drop small and spends the room only where it
+            exists. Measured at 1024, the tightest point, with a real sixth
             item injected (not the widest label as a proxy, which is 40px
-            pessimistic): 6px clears by 17px a side, 8px by 12px. */}
-        <div className="ds-nav-menu items-center justify-center gap-1.5 xl:gap-4 2xl:gap-6">
+            pessimistic) and signed out: 10px clears the right-hand cluster
+            by 17px, the margin the old 6px was chosen for at 13px type. */}
+        <div className="ds-nav-menu items-center justify-center gap-[clamp(10px,calc(10px_+_(100vw_-_1024px)_*_0.0235),16px)] xl:gap-4 2xl:gap-6">
           {NAV_SECTIONS.map(({ href, label, prefetch, badge, activeClass }) => (
             <NavLink
               key={href}
