@@ -74,7 +74,7 @@ challenges.
 | <img src="https://cdn.simpleicons.org/python/3776ab" width="18" alt=""> | **Python** | 3.14 | Pyodide (CPython compiled to WASM), with NumPy, pandas, Plotly, Matplotlib |
 | <img src="https://cdn.simpleicons.org/r/276dc3" width="18" alt=""> | **R** | 4.6 | WebR, with ggplot2, dplyr and friends |
 | <img src="https://cdn.simpleicons.org/javascript/f7df1e" width="18" alt=""> | **JavaScript** | ES2023+ | The browser's own engine |
-| <img src="https://cdn.simpleicons.org/typescript/3178c6" width="18" alt=""> | **TypeScript** | 5.9 | In-browser transpilation, with a real language service |
+| <img src="https://cdn.simpleicons.org/typescript/3178c6" width="18" alt=""> | **TypeScript** | 6.0 | In-browser transpilation, with a real language service |
 | <img src="https://cdn.simpleicons.org/php/777bb4" width="18" alt=""> | **PHP** | 8.4 | php-wasm |
 | <img src="https://cdn.simpleicons.org/c/a8b9cc" width="18" alt=""> | **C** | C17 | Clang, compiled to WASM in the tab |
 | <img src="https://cdn.simpleicons.org/cplusplus/00599c" width="18" alt=""> | **C++** | C++20 | Clang, compiled to WASM in the tab |
@@ -83,7 +83,7 @@ challenges.
 | <img src="https://cdn.simpleicons.org/html5/e34f26" width="18" alt=""> | **HTML / CSS** | HTML5, CSS3 | Live preview of your own markup |
 | <img src="https://cdn.simpleicons.org/react/61dafb" width="18" alt=""> | **React** | 19.3 | JSX bundled in the browser |
 | <img src="https://cdn.simpleicons.org/postgresql/4169E1" width="18" alt=""> | **PostgreSQL** | 18 | PGlite |
-| <img src="https://cdn.simpleicons.org/sqlite/003b57" width="18" alt=""> | **SQLite** | 3.53 | The official SQLite WASM build |
+| <img src="https://cdn.simpleicons.org/sqlite/003b57" width="18" alt=""> | **SQLite** | 3.54 | The official SQLite WASM build |
 | <img src="https://cdn.simpleicons.org/duckdb/FFBE11" width="18" alt=""> | **DuckDB** | 1.32 | DuckDB-Wasm |
 
 <img src="docs/screenshots/playground-index.webp" alt="The playground index, grouped into Code Editors, Web Sandboxes, and SQL Workbench">

@@ -13,7 +13,7 @@
  * must not drop the rows with nothing on the other side, and set operations
  * for "everyone except".
  *
- * Every solution is executed against node:sqlite by
+ * Every solution is executed against PGlite (Postgres) by
  * `__tests__/challengeSolutions`, so a wrong expectation fails CI.
  */
 
@@ -51,7 +51,7 @@ export const SQL_SUBSCRIPTIONS: Challenge[] = [
       columns: [
         { name: "invoice_id", type: "integer" },
         { name: "company", type: "text" },
-        { name: "amount", type: "real" },
+        { name: "amount", type: "numeric" },
       ],
       starter: `SELECT i.invoice_id, a.company, i.amount
 FROM invoices i
@@ -93,7 +93,7 @@ ORDER BY i.invoice_id`,
       columns: [
         { name: "company", type: "text" },
         { name: "plan_name", type: "text" },
-        { name: "started_on", type: "text" },
+        { name: "started_on", type: "date" },
       ],
       starter: `SELECT a.company, p.plan_name, s.started_on
 FROM subscriptions s
@@ -138,7 +138,7 @@ ORDER BY a.company`,
       ],
       columns: [
         { name: "active_subscriptions", type: "integer" },
-        { name: "mrr", type: "real" },
+        { name: "mrr", type: "numeric" },
       ],
       starter: `SELECT
 FROM subscriptions s
@@ -166,9 +166,11 @@ WHERE s.ended_on IS NULL`,
       dataset: SUBSCRIPTIONS,
       description: "Measure how long customers take to pay, in days.",
       solutionNote: [
-        "SQLite stores dates as text, so subtracting them directly does nothing useful. ",
-        { code: "julianday()" },
-        " converts a date to a number of days, and the difference of two of those is a span. The ",
+        "Subtracting one ",
+        { code: "date" },
+        " from another gives a whole number of days, so the span needs no conversion at all, and averaging those integers gives a ",
+        { code: "numeric" },
+        " that rounds cleanly. The ",
         { code: "IS NOT NULL" },
         " filter matters more than it looks: without it the unpaid invoices contribute NULL, and while ",
         { code: "AVG" },
@@ -179,16 +181,14 @@ WHERE s.ended_on IS NULL`,
       prompt: [
         "For the invoices that have been paid, how long did payment take on average?",
         [
-          "Dates here are text, so subtract them with ",
-          { code: "julianday()" },
-          ". Round the answer to 2 decimal places.",
+          "Both columns are dates, and subtracting one date from another gives a number of days. Round the answer to 2 decimal places.",
         ],
       ],
-      columns: [{ name: "avg_days", type: "real" }],
+      columns: [{ name: "avg_days", type: "numeric" }],
       starter: `SELECT
 FROM invoices
 `,
-      solution: `SELECT ROUND(AVG(julianday(paid_on) - julianday(issued_on)), 2) AS avg_days
+      solution: `SELECT ROUND(AVG(paid_on - issued_on), 2) AS avg_days
 FROM invoices
 WHERE paid_on IS NOT NULL`,
       tests: resultShape(
@@ -221,7 +221,7 @@ WHERE paid_on IS NOT NULL`,
       columns: [
         { name: "country", type: "text" },
         { name: "invoices", type: "integer" },
-        { name: "billed", type: "real" },
+        { name: "billed", type: "numeric" },
       ],
       starter: `SELECT a.country
 FROM invoices i
@@ -300,7 +300,7 @@ ORDER BY a.company`,
         "Find accounts that switched plans, by matching each ended subscription to the one that started the next day.",
       solutionNote: [
         "Joining a table to itself is how you relate two rows of the same kind: here, the subscription that ended and the one that replaced it. The join condition does the real work: ",
-        { code: "date(old.ended_on, '+1 day') = new.started_on" },
+        { code: "new_sub.started_on = old_sub.ended_on + 1" },
         " is what distinguishes a switch from a customer who left and came back months later.",
       ],
     },
@@ -313,16 +313,18 @@ ORDER BY a.company`,
           " to itself to find the switches. Return the company, the plan it came from, the plan it moved to, and the date of the change, oldest first.",
         ],
         [
-          "SQLite can do date maths in the join: ",
-          { code: "date(old_sub.ended_on, '+1 day')" },
-          ".",
+          "Date maths works in the join condition: adding an integer to a ",
+          { code: "date" },
+          " moves it that many days, so ",
+          { code: "old_sub.ended_on + 1" },
+          " is the day after.",
         ],
       ],
       columns: [
         { name: "company", type: "text" },
         { name: "from_plan", type: "text" },
         { name: "to_plan", type: "text" },
-        { name: "changed_on", type: "text" },
+        { name: "changed_on", type: "date" },
       ],
       starter: `SELECT a.company
 FROM subscriptions old_sub
@@ -337,7 +339,7 @@ JOIN accounts a ON a.account_id = old_sub.account_id
 FROM subscriptions old_sub
 JOIN subscriptions new_sub
   ON new_sub.account_id = old_sub.account_id
- AND new_sub.started_on = date(old_sub.ended_on, '+1 day')
+ AND new_sub.started_on = old_sub.ended_on + 1
 JOIN accounts a     ON a.account_id = old_sub.account_id
 JOIN plans old_plan ON old_plan.plan_id = old_sub.plan_id
 JOIN plans new_plan ON new_plan.plan_id = new_sub.plan_id
@@ -362,7 +364,7 @@ ORDER BY changed_on`,
         "Measure how long each subscription has run, treating the ones still open as running to the export date.",
       solutionNote: [
         "A subscription that has not ended has no end date, and subtracting NULL gives NULL, so the longest-running customers would vanish from a report that ignores it. ",
-        { code: "COALESCE(ended_on, '" + AS_OF + "')" },
+        { code: "COALESCE(ended_on, DATE '" + AS_OF + "')" },
         " substitutes the as-of date for the missing one, which is the standard way to measure something still in progress.",
       ],
     },
@@ -381,8 +383,8 @@ ORDER BY changed_on`,
       ],
       columns: [
         { name: "company", type: "text" },
-        { name: "started_on", type: "text" },
-        { name: "through", type: "text" },
+        { name: "started_on", type: "date" },
+        { name: "through", type: "date" },
         { name: "days", type: "integer" },
       ],
       starter: `SELECT a.company, s.started_on
@@ -391,9 +393,8 @@ JOIN accounts a ON a.account_id = s.account_id
 `,
       solution: `SELECT a.company,
        s.started_on,
-       COALESCE(s.ended_on, '${AS_OF}') AS through,
-       CAST(julianday(COALESCE(s.ended_on, '${AS_OF}'))
-            - julianday(s.started_on) AS INTEGER) AS days
+       COALESCE(s.ended_on, DATE '${AS_OF}') AS through,
+       COALESCE(s.ended_on, DATE '${AS_OF}') - s.started_on AS days
 FROM subscriptions s
 JOIN accounts a ON a.account_id = s.account_id
 ORDER BY days DESC, a.company
@@ -462,8 +463,10 @@ ORDER BY company`,
         "Score each account on how much of what it was billed has actually been paid.",
       solutionNote: [
         "Counting two different things over the same group is what ",
-        { code: "SUM(CASE WHEN ... THEN 1 ELSE 0 END)" },
-        " is for: one pass, no self join, no subquery per account. The ",
+        { code: "COUNT(*) FILTER (WHERE ...)" },
+        " is for: one pass, no self join, no subquery per account. Postgres does not let ",
+        { code: "HAVING" },
+        " refer to a select-list alias, so the filter repeats the aggregate. The ",
         { code: "100.0" },
         " rather than ",
         { code: "100" },
@@ -481,7 +484,7 @@ ORDER BY company`,
         { name: "company", type: "text" },
         { name: "invoices", type: "integer" },
         { name: "unpaid", type: "integer" },
-        { name: "paid_pct", type: "real" },
+        { name: "paid_pct", type: "numeric" },
       ],
       starter: `SELECT a.company, COUNT(*) AS invoices
 FROM invoices i
@@ -490,13 +493,13 @@ GROUP BY a.account_id, a.company
 `,
       solution: `SELECT a.company,
        COUNT(*) AS invoices,
-       SUM(CASE WHEN i.paid_on IS NULL THEN 1 ELSE 0 END) AS unpaid,
-       ROUND(100.0 * SUM(CASE WHEN i.paid_on IS NOT NULL THEN 1 ELSE 0 END)
+       COUNT(*) FILTER (WHERE i.paid_on IS NULL) AS unpaid,
+       ROUND(100.0 * COUNT(*) FILTER (WHERE i.paid_on IS NOT NULL)
              / COUNT(*), 1) AS paid_pct
 FROM invoices i
 JOIN accounts a ON a.account_id = i.account_id
 GROUP BY a.account_id, a.company
-HAVING unpaid > 0
+HAVING COUNT(*) FILTER (WHERE i.paid_on IS NULL) > 0
 ORDER BY paid_pct, a.company`,
       tests: resultShape(
         ["company", "invoices", "unpaid", "paid_pct"],

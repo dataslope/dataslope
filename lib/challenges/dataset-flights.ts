@@ -62,10 +62,10 @@ CREATE TABLE flights (
   tail_number   TEXT    NOT NULL REFERENCES aircraft(tail_number),
   origin        TEXT    NOT NULL REFERENCES airports(airport_code),
   destination   TEXT    NOT NULL REFERENCES airports(airport_code),
-  scheduled_dep TEXT    NOT NULL,
-  scheduled_arr TEXT    NOT NULL,
-  actual_dep    TEXT,
-  actual_arr    TEXT
+  scheduled_dep TIMESTAMP NOT NULL,
+  scheduled_arr TIMESTAMP NOT NULL,
+  actual_dep    TIMESTAMP,
+  actual_arr    TIMESTAMP
 );
 INSERT INTO flights VALUES
   (1,  'HL101', 'HL-01', 'BRK', 'TLM', '2024-06-14 06:30', '2024-06-14 07:20', '2024-06-14 06:28', '2024-06-14 07:14'),
@@ -120,7 +120,7 @@ CREATE TABLE bookings (
   flight_id    INTEGER NOT NULL REFERENCES flights(flight_id),
   passenger_id INTEGER NOT NULL REFERENCES passengers(passenger_id),
   cabin        TEXT    NOT NULL,
-  fare         REAL    NOT NULL
+  fare         NUMERIC(10,2) NOT NULL
 );
 INSERT INTO bookings VALUES
   (1,  1,  1,  'economy',  64.00),
@@ -176,10 +176,10 @@ export const FLIGHTS: ChallengeDataset = {
         { name: "tail_number", type: "text", key: "fk" },
         { name: "origin", type: "text", key: "fk" },
         { name: "destination", type: "text", key: "fk" },
-        { name: "scheduled_dep", type: "text" },
-        { name: "scheduled_arr", type: "text" },
-        { name: "actual_dep", type: "text" },
-        { name: "actual_arr", type: "text" },
+        { name: "scheduled_dep", type: "timestamp" },
+        { name: "scheduled_arr", type: "timestamp" },
+        { name: "actual_dep", type: "timestamp" },
+        { name: "actual_arr", type: "timestamp" },
       ],
     },
     {
@@ -190,7 +190,7 @@ export const FLIGHTS: ChallengeDataset = {
         { name: "flight_id", type: "integer", key: "fk" },
         { name: "passenger_id", type: "integer", key: "fk" },
         { name: "cabin", type: "text" },
-        { name: "fare", type: "real" },
+        { name: "fare", type: "numeric" },
       ],
     },
     {

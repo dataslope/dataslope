@@ -5,13 +5,13 @@
  * that is not there. An unanswered ticket has no `first_response_at` and an
  * open one has no `resolved_at`, and a comparison with either is NULL rather
  * than false, so the query that forgets them returns a tidy, plausible,
- * flattering answer. The rest is the toolkit for working with timestamps
- * stored as ISO text: `strftime` to pull a field out, `datetime` modifiers to
- * build a deadline, `unixepoch` for exact differences, and `LAG` / `LEAD` to
- * read an event log as intervals.
+ * flattering answer. The rest is the Postgres toolkit for timestamps:
+ * `EXTRACT` to pull a field out, interval arithmetic to build a deadline,
+ * `EXTRACT(EPOCH FROM ...)` for exact differences, `date_trunc` for weeks, and
+ * `LAG` / `LEAD` to read an event log as intervals.
  *
  * The export time, `'2024-03-22 18:00:00'`, stands in for "now" wherever a
- * ticket is still open. Every solution is executed against node:sqlite by
+ * ticket is still open. Every solution is executed against PGlite by
  * `__tests__/challengeSolutions`, so a wrong expectation fails CI.
  */
 
@@ -44,7 +44,7 @@ export const SQL_SUPPORT: Challenge[] = [
         { name: "ticket_id", type: "integer" },
         { name: "company", type: "text" },
         { name: "priority", type: "text" },
-        { name: "opened_at", type: "text" },
+        { name: "opened_at", type: "timestamp" },
       ],
       starter: `SELECT t.ticket_id, c.company, t.priority, t.opened_at
 FROM tickets t
@@ -76,19 +76,19 @@ ORDER BY s.first_response_hours, t.opened_at`,
       description:
         "Average how long each plan's customers wait for a first reply, leaving out the tickets nobody has answered.",
       solutionNote:
-        "Aggregates skip NULLs, and that does real work twice here: `COUNT(first_response_at)` counts only answered tickets where `COUNT(*)` counts them all, and `AVG` leaves out the unanswered ones because their difference is NULL. Dividing by `3600.0` rather than `3600` keeps the hours fractional instead of truncating them to whole hours.",
+        "Aggregates skip NULLs, and that does real work twice here: `COUNT(first_response_at)` counts only answered tickets where `COUNT(*)` counts them all, and `AVG` leaves out the unanswered ones because their difference is NULL. `EXTRACT` returns a `numeric`, so dividing it by `3600` keeps the hours fractional instead of truncating them to whole hours.",
     },
     {
       prompt: [
         "Are paying customers answered faster? For each `plan`, count the tickets, count how many have had a first response, and average the time to first response in hours, rounded to 2 decimal places.",
-        "`unixepoch()` turns a timestamp into seconds, so `(unixepoch(first_response_at) - unixepoch(opened_at)) / 3600.0` is the wait in hours. A ticket nobody has answered has no response time: leave it out of the average, though it still counts in `tickets`.",
+        "Subtracting one timestamp from another gives an `interval`, and `EXTRACT(EPOCH FROM ...)` turns an interval into seconds, so `EXTRACT(EPOCH FROM first_response_at - opened_at) / 3600` is the wait in hours. A ticket nobody has answered has no response time: leave it out of the average, though it still counts in `tickets`.",
         "Slowest plan first.",
       ],
       columns: [
         { name: "plan", type: "text" },
         { name: "tickets", type: "integer" },
         { name: "answered", type: "integer" },
-        { name: "avg_response_hours", type: "real" },
+        { name: "avg_response_hours", type: "numeric" },
       ],
       starter: `SELECT c.plan, COUNT(*) AS tickets
 FROM tickets t
@@ -98,7 +98,7 @@ GROUP BY c.plan
       solution: `SELECT c.plan,
        COUNT(*) AS tickets,
        COUNT(t.first_response_at) AS answered,
-       ROUND(AVG((unixepoch(t.first_response_at) - unixepoch(t.opened_at)) / 3600.0), 2)
+       ROUND(AVG(EXTRACT(EPOCH FROM t.first_response_at - t.opened_at) / 3600), 2)
          AS avg_response_hours
 FROM tickets t
 JOIN customers c ON c.customer_id = t.customer_id
@@ -122,12 +122,12 @@ ORDER BY avg_response_hours DESC`,
       dataset: SUPPORT,
       description: "Find out which hours of the day bring in the most tickets.",
       solutionNote:
-        "`strftime` pulls one field out of a timestamp, and grouping by it folds nineteen days into a single 24-hour profile. Nine and ten o'clock tie at the top, which is why the sort needs `hour` as a second key: without one, tied rows come out in whatever order the engine produces.",
+        "`EXTRACT` pulls one field out of a timestamp, and grouping by it folds nineteen days into a single 24-hour profile. Nine and ten o'clock tie at the top, which is why the sort needs `hour` as a second key: without one, tied rows come out in whatever order the engine produces.",
     },
     {
       prompt: [
         "When do tickets arrive? Count the tickets opened in each hour of the day, across all dates.",
-        "`strftime('%H', opened_at)` extracts the hour as two-digit text; cast it to an integer for the `hour` column. Only hours with at least one ticket appear.",
+        "`EXTRACT(HOUR FROM opened_at)` gives the hour as a `numeric`; cast it to an integer (`::int`) for the `hour` column. Only hours with at least one ticket appear.",
         "Busiest hour first, ties by `hour`.",
       ],
       columns: [
@@ -137,7 +137,7 @@ ORDER BY avg_response_hours DESC`,
       starter: `SELECT COUNT(*) AS tickets
 FROM tickets
 `,
-      solution: `SELECT CAST(strftime('%H', opened_at) AS INTEGER) AS hour,
+      solution: `SELECT EXTRACT(HOUR FROM opened_at)::int AS hour,
        COUNT(*) AS tickets
 FROM tickets
 GROUP BY hour
@@ -166,14 +166,14 @@ ORDER BY tickets DESC, hour`,
     {
       prompt: [
         `Each priority has a resolution target, \`resolution_hours\` in \`sla_targets\`. A ticket breaches it when it is resolved later than \`opened_at\` plus that many hours, or when it is still open and that deadline had already passed at the export time, \`'${AS_OF}'\`.`,
-        "Build the deadline with `datetime(opened_at, '+' || resolution_hours || ' hours')`. Timestamps in this format compare correctly as text, so no more arithmetic is needed after that. A ticket resolved exactly at its deadline has met it.",
+        "Build the deadline with `opened_at + resolution_hours * INTERVAL '1 hour'`: multiplying an interval by a number scales it, and a timestamp plus an interval is another timestamp, so no more arithmetic is needed after that. A ticket resolved exactly at its deadline has met it.",
         "List the breaches with their `deadline` and `resolved_at` (NULL for the open ones). Sort by `ticket_id`.",
       ],
       columns: [
         { name: "ticket_id", type: "integer" },
         { name: "priority", type: "text" },
-        { name: "deadline", type: "text" },
-        { name: "resolved_at", type: "text" },
+        { name: "deadline", type: "timestamp" },
+        { name: "resolved_at", type: "timestamp" },
       ],
       starter: `SELECT t.ticket_id, t.priority, t.resolved_at
 FROM tickets t
@@ -181,12 +181,12 @@ JOIN sla_targets s ON s.priority = t.priority
 ORDER BY t.ticket_id
 `,
       solution: `SELECT t.ticket_id, t.priority,
-       datetime(t.opened_at, '+' || s.resolution_hours || ' hours') AS deadline,
+       t.opened_at + s.resolution_hours * INTERVAL '1 hour' AS deadline,
        t.resolved_at
 FROM tickets t
 JOIN sla_targets s ON s.priority = t.priority
 WHERE COALESCE(t.resolved_at, '${AS_OF}')
-      > datetime(t.opened_at, '+' || s.resolution_hours || ' hours')
+      > t.opened_at + s.resolution_hours * INTERVAL '1 hour'
 ORDER BY t.ticket_id`,
       tests: resultShape(
         ["ticket_id", "priority", "deadline", "resolved_at"],
@@ -218,7 +218,7 @@ ORDER BY t.ticket_id`,
       columns: [
         { name: "full_name", type: "text" },
         { name: "open_tickets", type: "integer" },
-        { name: "oldest_open", type: "text" },
+        { name: "oldest_open", type: "timestamp" },
       ],
       starter: `SELECT a.full_name, COUNT(t.ticket_id) AS open_tickets
 FROM agents a
@@ -263,8 +263,8 @@ ORDER BY open_tickets DESC, a.full_name`,
       columns: [
         { name: "ticket_id", type: "integer" },
         { name: "company", type: "text" },
-        { name: "closed_at", type: "text" },
-        { name: "reopened_at", type: "text" },
+        { name: "closed_at", type: "timestamp" },
+        { name: "reopened_at", type: "timestamp" },
       ],
       starter: `SELECT e.ticket_id, e.status, e.changed_at
 FROM ticket_events e
@@ -305,19 +305,19 @@ ORDER BY h.changed_at`,
       description:
         "Find the tickets a customer opened within a week of their previous one.",
       solutionNote:
-        "Partitioned by customer and ordered by time, `LAG` puts each customer's previous ticket on the same row, so the gap is a subtraction. Everly Bakes' third ticket lands exactly 168 hours after its second and Brightwell Dental's second misses by five minutes, which is why the boundary is `<=` and measured in exact seconds rather than in rounded days.",
+        "Partitioned by customer and ordered by time, `LAG` puts each customer's previous ticket on the same row, so the gap is a subtraction. Everly Bakes' third ticket lands exactly 168 hours after its second and Brightwell Dental's second misses by five minutes, which is why the boundary is `<=` and measured on the exact interval rather than in rounded days.",
     },
     {
       prompt: [
         "A repeat contact is a ticket opened within 7 days of the same customer's previous ticket. Customers who keep coming back are often customers whose first problem was never really fixed.",
-        "Find each ticket's previous ticket from the same customer with `LAG` over that customer's tickets in `opened_at` order. Keep the tickets opened at most 7 days (168 hours) after it; exactly 7 days still counts. `unixepoch()` differences are whole seconds, so the comparison is exact.",
+        "Find each ticket's previous ticket from the same customer with `LAG` over that customer's tickets in `opened_at` order. Keep the tickets opened at most 7 days (168 hours) after it; exactly 7 days still counts. Subtracting the two timestamps gives an exact `interval`, which compares directly with `INTERVAL '7 days'`.",
         "Return the `company`, the ticket, the previous ticket and `hours_apart` rounded to 2 decimal places. Sort by `ticket_id`.",
       ],
       columns: [
         { name: "company", type: "text" },
         { name: "ticket_id", type: "integer" },
         { name: "previous_ticket_id", type: "integer" },
-        { name: "hours_apart", type: "real" },
+        { name: "hours_apart", type: "numeric" },
       ],
       starter: `SELECT c.company, t.ticket_id, t.opened_at
 FROM tickets t
@@ -332,11 +332,11 @@ ORDER BY c.company, t.opened_at
   WINDOW w AS (PARTITION BY t.customer_id ORDER BY t.opened_at)
 )
 SELECT c.company, o.ticket_id, o.previous_ticket_id,
-       ROUND((unixepoch(o.opened_at) - unixepoch(o.previous_opened_at)) / 3600.0, 2)
+       ROUND(EXTRACT(EPOCH FROM o.opened_at - o.previous_opened_at) / 3600, 2)
          AS hours_apart
 FROM ordered o
 JOIN customers c ON c.customer_id = o.customer_id
-WHERE unixepoch(o.opened_at) - unixepoch(o.previous_opened_at) <= 7 * 24 * 3600
+WHERE o.opened_at - o.previous_opened_at <= INTERVAL '7 days'
 ORDER BY o.ticket_id`,
       tests: resultShape(
         ["company", "ticket_id", "previous_ticket_id", "hours_apart"],
@@ -357,16 +357,16 @@ ORDER BY o.ticket_id`,
       description:
         "Count each week's tickets by channel, with weeks that start on Monday.",
       solutionNote:
-        "The `weekday 1` modifier moves a date forward to the next Monday, or leaves it alone if it already is one, so stepping back six days first is what lands every day on its own week's Monday; `date(opened_at, 'weekday 1')` alone files a Wednesday under the following week. After that the pivot is conditional counting, one `COUNT(*) FILTER (WHERE channel = ...)` per column over the same group.",
+        "`date_trunc('week', ...)` rounds a timestamp down to midnight on the Monday of its ISO week, so every day from Monday to Sunday lands on the same `week_start`. Grouping by `EXTRACT(WEEK FROM opened_at)` gives the same buckets, but labels them with a bare week number instead of a date. After that the pivot is conditional counting, one `COUNT(*) FILTER (WHERE channel = ...)` per column over the same group.",
     },
     {
       prompt: [
         "Report ticket volume per week, split by channel: one row per week, a column each for `email`, `chat` and `phone`, and a `total`.",
-        "Weeks start on Monday. `date(opened_at, '-6 days', 'weekday 1')` gives the Monday on or before a timestamp: step back six days, then forward to the next Monday. Label each row with that Monday as `week_start`.",
+        "Weeks start on Monday, which is how Postgres counts them too: `date_trunc('week', opened_at)` truncates a timestamp to the Monday on or before it. Cast that to a date (`::date`) and label each row with it as `week_start`.",
         "Weekend tickets belong to the week that began on the Monday before them. Sort by `week_start`.",
       ],
       columns: [
-        { name: "week_start", type: "text" },
+        { name: "week_start", type: "date" },
         { name: "email", type: "integer" },
         { name: "chat", type: "integer" },
         { name: "phone", type: "integer" },
@@ -376,7 +376,7 @@ ORDER BY o.ticket_id`,
 FROM tickets
 GROUP BY channel
 `,
-      solution: `SELECT date(opened_at, '-6 days', 'weekday 1') AS week_start,
+      solution: `SELECT date_trunc('week', opened_at)::date AS week_start,
        COUNT(*) FILTER (WHERE channel = 'email') AS email,
        COUNT(*) FILTER (WHERE channel = 'chat')  AS chat,
        COUNT(*) FILTER (WHERE channel = 'phone') AS phone,
@@ -408,25 +408,25 @@ ORDER BY week_start`,
     {
       prompt: [
         "How long does it take to resolve a ticket? A mean is dragged about by one ticket stuck over a weekend, so report the median resolution time in hours for each priority, over resolved tickets only.",
-        "SQLite has no `median()`. Number each priority's resolution times in order with `ROW_NUMBER()`, count them with `COUNT(*) OVER`, and take the middle value, or the average of the middle two when the count is even.",
+        "Postgres would do this with `percentile_cont(0.5) WITHIN GROUP (ORDER BY ...)`, but build it by hand here, the way that works in any database: number each priority's resolution times in order with `ROW_NUMBER()`, count them with `COUNT(*) OVER`, and take the middle value, or the average of the middle two when the count is even.",
         "Return the `priority`, the number of `resolved` tickets and `median_hours` rounded to 2 decimal places. Sort from the tightest resolution target to the loosest, using `resolution_hours` in `sla_targets`.",
       ],
       columns: [
         { name: "priority", type: "text" },
         { name: "resolved", type: "integer" },
-        { name: "median_hours", type: "real" },
+        { name: "median_hours", type: "numeric" },
       ],
       starter: `-- This is the mean, not the median: replace it with the middle value.
 SELECT t.priority,
        COUNT(*) AS resolved,
-       ROUND(AVG((unixepoch(t.resolved_at) - unixepoch(t.opened_at)) / 3600.0), 2) AS median_hours
+       ROUND(AVG(EXTRACT(EPOCH FROM t.resolved_at - t.opened_at) / 3600), 2) AS median_hours
 FROM tickets t
 WHERE t.resolved_at IS NOT NULL
 GROUP BY t.priority
 `,
       solution: `WITH durations AS (
   SELECT t.priority,
-         (unixepoch(t.resolved_at) - unixepoch(t.opened_at)) / 3600.0 AS hours
+         EXTRACT(EPOCH FROM t.resolved_at - t.opened_at) / 3600 AS hours
   FROM tickets t
   WHERE t.resolved_at IS NOT NULL
 ), ranked AS (
@@ -472,7 +472,7 @@ ORDER BY s.resolution_hours`,
         { name: "ticket_id", type: "integer" },
         { name: "company", type: "text" },
         { name: "pending_spells", type: "integer" },
-        { name: "hours_pending", type: "real" },
+        { name: "hours_pending", type: "numeric" },
       ],
       starter: `SELECT e.ticket_id, e.status, e.changed_at
 FROM ticket_events e
@@ -488,8 +488,8 @@ ORDER BY e.ticket_id, e.changed_at
 )
 SELECT sp.ticket_id, c.company,
        COUNT(*) AS pending_spells,
-       ROUND(SUM(unixepoch(COALESCE(sp.next_at, '${AS_OF}'))
-                 - unixepoch(sp.changed_at)) / 3600.0, 2) AS hours_pending
+       ROUND(EXTRACT(EPOCH FROM SUM(COALESCE(sp.next_at, '${AS_OF}') - sp.changed_at))
+             / 3600, 2) AS hours_pending
 FROM spells sp
 JOIN tickets   t ON t.ticket_id   = sp.ticket_id
 JOIN customers c ON c.customer_id = t.customer_id

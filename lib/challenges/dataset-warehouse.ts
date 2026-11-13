@@ -57,7 +57,7 @@ CREATE TABLE products (
   sku           TEXT    PRIMARY KEY,
   product_name  TEXT    NOT NULL,
   category      TEXT    NOT NULL,
-  unit_cost     REAL    NOT NULL,
+  unit_cost     NUMERIC(10,2) NOT NULL,
   reorder_level INTEGER NOT NULL
 );
 INSERT INTO products VALUES
@@ -77,8 +77,8 @@ CREATE TABLE purchase_orders (
   po_id        TEXT    PRIMARY KEY,
   supplier_id  INTEGER NOT NULL REFERENCES suppliers(supplier_id),
   sku          TEXT    NOT NULL REFERENCES products(sku),
-  ordered_on   TEXT    NOT NULL,
-  expected_on  TEXT    NOT NULL,
+  ordered_on   DATE    NOT NULL,
+  expected_on  DATE    NOT NULL,
   ordered_qty  INTEGER NOT NULL,
   received_qty INTEGER
 );
@@ -102,7 +102,7 @@ CREATE TABLE stock_movements (
   movement_id  INTEGER PRIMARY KEY,
   sku          TEXT    NOT NULL REFERENCES products(sku),
   warehouse_id INTEGER NOT NULL REFERENCES warehouses(warehouse_id),
-  moved_at     TEXT    NOT NULL,
+  moved_at     TIMESTAMP NOT NULL,
   quantity     INTEGER NOT NULL,
   reason       TEXT    NOT NULL,
   ref          TEXT
@@ -167,7 +167,7 @@ export const WAREHOUSE: ChallengeDataset = {
         { name: "movement_id", type: "integer", key: "pk" },
         { name: "sku", type: "text", key: "fk" },
         { name: "warehouse_id", type: "integer", key: "fk" },
-        { name: "moved_at", type: "text" },
+        { name: "moved_at", type: "timestamp" },
         { name: "quantity", type: "integer" },
         { name: "reason", type: "text" },
         { name: "ref", type: "text" },
@@ -180,7 +180,7 @@ export const WAREHOUSE: ChallengeDataset = {
         { name: "sku", type: "text", key: "pk" },
         { name: "product_name", type: "text" },
         { name: "category", type: "text" },
-        { name: "unit_cost", type: "real" },
+        { name: "unit_cost", type: "numeric" },
         { name: "reorder_level", type: "integer" },
       ],
     },
@@ -191,8 +191,8 @@ export const WAREHOUSE: ChallengeDataset = {
         { name: "po_id", type: "text", key: "pk" },
         { name: "supplier_id", type: "integer", key: "fk" },
         { name: "sku", type: "text", key: "fk" },
-        { name: "ordered_on", type: "text" },
-        { name: "expected_on", type: "text" },
+        { name: "ordered_on", type: "date" },
+        { name: "expected_on", type: "date" },
         { name: "ordered_qty", type: "integer" },
         { name: "received_qty", type: "integer" },
       ],

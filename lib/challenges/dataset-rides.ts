@@ -39,7 +39,7 @@ import type { ChallengeDataset } from "./datasets";
 const RIDES_SQL = `
 CREATE TABLE tiers (
   tier            TEXT PRIMARY KEY,
-  commission_rate REAL NOT NULL
+  commission_rate NUMERIC(4,2) NOT NULL
 );
 INSERT INTO tiers VALUES
   ('standard', 0.25),
@@ -50,7 +50,7 @@ CREATE TABLE drivers (
   driver_name TEXT NOT NULL,
   city        TEXT NOT NULL,
   tier        TEXT NOT NULL REFERENCES tiers(tier),
-  joined_on   TEXT NOT NULL
+  joined_on   DATE NOT NULL
 );
 INSERT INTO drivers VALUES
   (1, 'Tomas Reyna',   'Seville',  'pro',      '2023-03-14'),
@@ -65,7 +65,7 @@ INSERT INTO drivers VALUES
 CREATE TABLE riders (
   rider_id     INTEGER PRIMARY KEY,
   rider_name   TEXT NOT NULL,
-  signed_up_on TEXT NOT NULL
+  signed_up_on DATE NOT NULL
 );
 INSERT INTO riders VALUES
   (1,  'Noor Haddad',     '2023-11-04'),
@@ -85,11 +85,11 @@ CREATE TABLE trips (
   trip_id      INTEGER PRIMARY KEY,
   driver_id    INTEGER NOT NULL REFERENCES drivers(driver_id),
   rider_id     INTEGER NOT NULL REFERENCES riders(rider_id),
-  requested_at TEXT    NOT NULL,
-  started_at   TEXT,
-  ended_at     TEXT,
-  distance_km  REAL,
-  fare         REAL,
+  requested_at TIMESTAMP NOT NULL,
+  started_at   TIMESTAMP,
+  ended_at     TIMESTAMP,
+  distance_km  NUMERIC(5,1),
+  fare         NUMERIC(10,2),
   rating       INTEGER
 );
 INSERT INTO trips VALUES
@@ -150,11 +150,11 @@ export const RIDES: ChallengeDataset = {
         { name: "trip_id", type: "integer", key: "pk" },
         { name: "driver_id", type: "integer", key: "fk" },
         { name: "rider_id", type: "integer", key: "fk" },
-        { name: "requested_at", type: "text" },
-        { name: "started_at", type: "text" },
-        { name: "ended_at", type: "text" },
-        { name: "distance_km", type: "real" },
-        { name: "fare", type: "real" },
+        { name: "requested_at", type: "timestamp" },
+        { name: "started_at", type: "timestamp" },
+        { name: "ended_at", type: "timestamp" },
+        { name: "distance_km", type: "numeric" },
+        { name: "fare", type: "numeric" },
         { name: "rating", type: "integer" },
       ],
     },
@@ -166,7 +166,7 @@ export const RIDES: ChallengeDataset = {
         { name: "driver_name", type: "text" },
         { name: "city", type: "text" },
         { name: "tier", type: "text", key: "fk" },
-        { name: "joined_on", type: "text" },
+        { name: "joined_on", type: "date" },
       ],
     },
     {
@@ -175,7 +175,7 @@ export const RIDES: ChallengeDataset = {
       columns: [
         { name: "rider_id", type: "integer", key: "pk" },
         { name: "rider_name", type: "text" },
-        { name: "signed_up_on", type: "text" },
+        { name: "signed_up_on", type: "date" },
       ],
     },
     {
@@ -183,7 +183,7 @@ export const RIDES: ChallengeDataset = {
       rows: "2",
       columns: [
         { name: "tier", type: "text", key: "pk" },
-        { name: "commission_rate", type: "real" },
+        { name: "commission_rate", type: "numeric" },
       ],
     },
   ],

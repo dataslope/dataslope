@@ -11,7 +11,7 @@
  * solution; keeping them as one value means a fix to step 1 cannot leave the
  * later steps quoting a query that no longer exists.
  *
- * Every step's solution runs against node:sqlite in
+ * Every step's solution runs against PGlite (Postgres) in
  * `__tests__/challengeSolutions`, so an expectation that disagrees with the
  * seed data fails CI.
  */
@@ -81,7 +81,7 @@ const DEPARTMENT_PAY_GAP = sqlSteps(
       columns: [
         { name: "dept_name", type: "text" },
         { name: "headcount", type: "integer" },
-        { name: "avg_salary", type: "real" },
+        { name: "avg_salary", type: "numeric" },
       ],
       starter: `SELECT d.dept_name
 FROM employees e
@@ -184,8 +184,8 @@ ORDER BY d.dept_name
         { name: "dept_name", type: "text" },
         { name: "full_name", type: "text" },
         { name: "salary", type: "integer" },
-        { name: "avg_salary", type: "real" },
-        { name: "above_average", type: "real" },
+        { name: "avg_salary", type: "numeric" },
+        { name: "above_average", type: "numeric" },
       ],
       starter: `${DEPT_GAP_CTE}
 SELECT d.dept_name, r.full_name, r.salary, a.avg_salary
@@ -391,7 +391,7 @@ FROM per_user
       columns: [
         { name: "stage", type: "text" },
         { name: "users", type: "integer" },
-        { name: "pct_of_viewers", type: "real" },
+        { name: "pct_of_viewers", type: "numeric" },
       ],
       starter: `${FUNNEL_STAGES_CTE}
 SELECT 'viewed' AS stage, viewers AS users, 100.0 AS pct_of_viewers
@@ -435,7 +435,7 @@ ORDER BY ord`,
 
 // ─── Monthly order growth ────────────────────────────────────────────
 
-const GROWTH_MONTHLY = `SELECT strftime('%Y-%m', o.order_date) AS month,
+const GROWTH_MONTHLY = `SELECT to_char(o.order_date, 'YYYY-MM') AS month,
        COUNT(DISTINCT o.order_id) AS orders,
        ROUND(SUM(i.quantity * i.unit_price), 2) AS revenue
 FROM orders o
@@ -493,11 +493,11 @@ const MONTHLY_ORDER_GROWTH = sqlSteps(
       ],
       prompt: [
         [
-          "Total the completed orders by calendar month. SQLite has no ",
-          { code: "date_trunc" },
-          ", so group by ",
-          { code: "strftime('%Y-%m', o.order_date)" },
-          ".",
+          "Total the completed orders by calendar month, labelling each month ",
+          { code: "YYYY-MM" },
+          " with ",
+          { code: "to_char(o.order_date, 'YYYY-MM')" },
+          " and grouping by that label.",
         ],
         [
           "Revenue is quantity times unit price, summed and rounded to 2 places. Because the join to ",
@@ -510,7 +510,7 @@ const MONTHLY_ORDER_GROWTH = sqlSteps(
       columns: [
         { name: "month", type: "text" },
         { name: "orders", type: "integer" },
-        { name: "revenue", type: "real" },
+        { name: "revenue", type: "numeric" },
       ],
       starter: `SELECT
 FROM orders o
@@ -559,8 +559,8 @@ WHERE o.status = 'completed'
       columns: [
         { name: "month", type: "text" },
         { name: "orders", type: "integer" },
-        { name: "revenue", type: "real" },
-        { name: "prev_revenue", type: "real" },
+        { name: "revenue", type: "numeric" },
+        { name: "prev_revenue", type: "numeric" },
       ],
       starter: `WITH monthly AS (
 ${indentSql(GROWTH_MONTHLY_CTE)}
@@ -607,9 +607,9 @@ ORDER BY month
       ],
       columns: [
         { name: "month", type: "text" },
-        { name: "revenue", type: "real" },
-        { name: "prev_revenue", type: "real" },
-        { name: "growth_pct", type: "real" },
+        { name: "revenue", type: "numeric" },
+        { name: "prev_revenue", type: "numeric" },
+        { name: "growth_pct", type: "numeric" },
       ],
       starter: `${GROWTH_PCT_CTE}
 SELECT month, revenue, prev_revenue
@@ -712,7 +712,7 @@ const CUSTOMER_REVENUE_PARETO = sqlSteps(
       columns: [
         { name: "full_name", type: "text" },
         { name: "orders", type: "integer" },
-        { name: "revenue", type: "real" },
+        { name: "revenue", type: "numeric" },
       ],
       starter: `SELECT c.full_name
 FROM orders o
@@ -763,8 +763,8 @@ WHERE o.status = 'completed'
       columns: [
         { name: "full_name", type: "text" },
         { name: "orders", type: "integer" },
-        { name: "revenue", type: "real" },
-        { name: "pct_of_total", type: "real" },
+        { name: "revenue", type: "numeric" },
+        { name: "pct_of_total", type: "numeric" },
       ],
       starter: `WITH per_customer AS (
 ${indentSql(PARETO_TOTALS_CTE)}
@@ -822,9 +822,9 @@ ORDER BY revenue DESC
       ],
       columns: [
         { name: "full_name", type: "text" },
-        { name: "revenue", type: "real" },
-        { name: "pct_of_total", type: "real" },
-        { name: "cumulative_pct", type: "real" },
+        { name: "revenue", type: "numeric" },
+        { name: "pct_of_total", type: "numeric" },
+        { name: "cumulative_pct", type: "numeric" },
         { name: "tier", type: "text" },
       ],
       starter: `${PARETO_TIER_CTE}

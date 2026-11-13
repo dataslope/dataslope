@@ -9,7 +9,7 @@
  * step 3 is where it stops being enough.
  *
  * `__tests__/challengeSolutions` runs every step's solution against
- * node:sqlite.
+ * PGlite (Postgres).
  */
 
 import { indentSql, sqlSteps } from "./authoring";
@@ -23,18 +23,17 @@ const LOAN_DAYS = 21;
 
 // ─── Overdue report ──────────────────────────────────────────────────
 
-const DAYS_OUT = `julianday(COALESCE(l.returned_on, '${AS_OF}'))
-            - julianday(l.borrowed_on)`;
+const DAYS_OUT = `COALESCE(l.returned_on, DATE '${AS_OF}') - l.borrowed_on`;
 
 const LOAN_SPANS = `SELECT l.loan_id, m.full_name, b.title,
-       CAST(${DAYS_OUT} AS INTEGER) AS days_out
+       ${DAYS_OUT} AS days_out
 FROM loans l
 JOIN members m ON m.member_id = l.member_id
 JOIN books   b ON b.book_id   = l.book_id
 ORDER BY l.loan_id`;
 
 const LOAN_FLAGGED = `SELECT l.loan_id, m.full_name, b.title,
-       CAST(${DAYS_OUT} AS INTEGER) AS days_out,
+       ${DAYS_OUT} AS days_out,
        CASE WHEN ${DAYS_OUT} > ${LOAN_DAYS} THEN 1 ELSE 0 END AS late
 FROM loans l
 JOIN members m ON m.member_id = l.member_id
@@ -58,7 +57,7 @@ const OVERDUE_REPORT = sqlSteps(
       "Score members on how often they return books late, counting the books they have not returned at all.",
     solutionNote: [
       "The trap is the four books still out. Measuring only returned loans makes the worst offenders look spotless, because the longer they keep a book the more certain it is to be excluded. ",
-      { code: "COALESCE(returned_on, '" + AS_OF + "')" },
+      { code: "COALESCE(returned_on, DATE '" + AS_OF + "')" },
       " brings them back in and counts them as late from the day they cross the lending period.",
     ],
   },
@@ -196,7 +195,7 @@ JOIN books   b ON b.book_id   = l.book_id
         { name: "full_name", type: "text" },
         { name: "loans", type: "integer" },
         { name: "late_loans", type: "integer" },
-        { name: "late_pct", type: "real" },
+        { name: "late_pct", type: "numeric" },
       ],
       starter: `${SCORED_CTE}
 SELECT m.full_name, COUNT(*) AS loans
