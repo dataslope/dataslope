@@ -46,10 +46,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Applies the persisted light/dark choice before first paint (same contract
-// as the home page) so returning dark-mode visitors see no light flash.
-const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
-
 export default function PlaygroundPage() {
   // BreadcrumbList + an ItemList of the language playgrounds, for the
   // "online <lang> playground" queries these pages target.
@@ -70,7 +66,6 @@ export default function PlaygroundPage() {
 
   return (
     <>
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       <JsonLd data={structuredData} />
       <div
         style={{ fontFamily: "var(--font-sans, Inter, system-ui, sans-serif)" }}

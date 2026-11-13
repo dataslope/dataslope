@@ -4,11 +4,11 @@
  *
  * Ported from the Create Studio design handoff (its applyVars() light/dark
  * maps, classic sidebar variant). The tokens live on `.ds-studio` and flip
- * with the site's `.dark` class on <html> (set pre-hydration by
- * THEME_BOOTSTRAP), so the shell renders in the right theme on first paint
- * with no flash. The shell markup reads these as `var(--ink)`, `var(--muted)`,
- * etc. — keeping the many one-off design colors out of the component while
- * still resolving against the site theme.
+ * with the site's `.dark` class on <html> (set before first paint by the
+ * theme script in app/layout.tsx), so the shell renders in the right theme
+ * on first paint with no flash. The shell markup reads these as
+ * `var(--ink)`, `var(--muted)`, etc. — keeping the many one-off design colors
+ * out of the component while still resolving against the site theme.
  *
  * These intentionally shadow a few brand hues with the design's exact values
  * (e.g. --green-text #008B03 = brand green-700); the shell is a self-contained

@@ -1,9 +1,5 @@
 import Link from "../Link";
 
-// Applies the persisted light/dark choice before first paint (same contract as
-// the home page) so a returning dark-mode visitor doesn't see a light flash.
-const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
-
 /** Minimal, readable chrome for the static legal pages (Terms, Privacy).
  *  Inter throughout; prose elements are styled via arbitrary child variants
  *  so each page can just write semantic markup. */
@@ -18,7 +14,6 @@ export function LegalShell({
 }) {
   return (
     <>
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       <div
         style={{ fontFamily: "var(--font-sans, Inter, system-ui, sans-serif)" }}
         className="min-h-screen bg-white text-[var(--ds-gray-800)] dark:bg-[#121212] dark:text-[var(--ds-gray-100)]"

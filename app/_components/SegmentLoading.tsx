@@ -1,13 +1,11 @@
 // Shared lightweight loading state for the per-request (D1-backed) segments.
-// Server component: renders the pre-hydration theme script so a hard load in
-// dark mode doesn't flash white while the segment streams.
+// The theme is already on <html> before this paints (app/layout.tsx), so a
+// hard load in dark mode doesn't flash white while the segment streams.
 //
 // NOTE: this file has its own entry in app/tailwind.shared.css's @source
 // list (both Tailwind roots compile with source(none)); if it moves,
 // update that glob or its utilities stop being generated.
 import "@/app/tailwind.css";
-
-import { THEME_BOOTSTRAP } from "@/app/_components/home/themeBootstrap";
 
 export default function SegmentLoading({
   fullScreen = true,
@@ -18,9 +16,6 @@ export default function SegmentLoading({
 }) {
   return (
     <>
-      {fullScreen && (
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
-      )}
       <div
         className={`flex items-center justify-center ${
           fullScreen ? "min-h-screen bg-white dark:bg-[#121212]" : "py-24"

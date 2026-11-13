@@ -34,15 +34,10 @@ export const metadata: Metadata = {
   },
 };
 
-// Applies the persisted light/dark choice before first paint (same contract as
-// the home page) so a returning dark-mode visitor never sees a light flash.
-const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
-
 export default async function CoursesPage() {
   const courses = await getCourseCatalog();
   return (
     <>
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       <div
         style={{ fontFamily: "var(--font-sans, Inter, system-ui, sans-serif)" }}
         className="ds-home min-h-screen bg-white text-[var(--ds-gray-800)] dark:bg-[#121212] dark:text-[var(--ds-gray-100)]"

@@ -21,7 +21,6 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getChallengeIndex } from "@/lib/challenges";
 import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
-import { THEME_BOOTSTRAP } from "@/app/_components/home/themeBootstrap";
 import { HomeNav } from "@/app/_components/home/HomeNav";
 import { HomeFooter } from "@/app/_components/home/HomeFooter";
 import { ChallengesList, ChallengesListFallback } from "./_components/ChallengesList";
@@ -66,7 +65,6 @@ export default function ChallengesPage() {
   // list.
   return (
     <>
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       <div
         style={{ fontFamily: "var(--font-sans, Inter, system-ui, sans-serif)" }}
         className="ds-home min-h-screen bg-white text-[var(--ds-gray-800)] dark:bg-[#121212] dark:text-[var(--ds-gray-100)]"

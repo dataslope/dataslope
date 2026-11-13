@@ -72,12 +72,30 @@ export const metadata: Metadata = {
   },
 };
 
-// Runs before React hydrates, on EVERY route. Normalizes localStorage
-// "theme" to the site's binary "light" | "dark" contract (anything else is
-// removed so every consumer resolves a missing value to light). Then, on
-// /playground routes only, applies the choice to the playground CSS custom
-// properties + `data-playground-theme` so the chrome never paints in the
-// wrong palette; the palettes mirror THEME_PALETTES in playgroundTheme.ts.
+// Runs before first paint, on EVERY route, and is the only theme script the
+// site has. Normalizes localStorage "theme" to the site's binary
+// "light" | "dark" contract (anything else is removed, so every consumer
+// resolves a missing value to light) and applies it to <html>: the `dark` or
+// `light` class plus `color-scheme`, so a returning dark-mode visitor never
+// sees a light flash. The explicit `light` class also stops scheme-detecting
+// components from falling back to the OS preference.
+//
+// It lives here rather than in each page because the root layout is the one
+// component that is never rendered on the client: it streams once with the
+// first document and survives every navigation. Pages used to inline their own
+// copy, and React rejects a <script> rendered on the client ("Encountered a
+// script tag while rendering React component"), so every in-app navigation to
+// one of them logged that error. The class this sets also persists across
+// navigations, which is what keeps a client-rendered page in the right theme.
+//
+// The Fumadocs routes (/courses/<lesson>, /interview-prep/<track>,
+// /fumadocs-dev) run next-themes as well, which reads the same key with the
+// same light default, so the two agree.
+//
+// Then, on /playground routes only, it applies the choice to the playground
+// CSS custom properties + `data-playground-theme` so the chrome never paints
+// in the wrong palette; the palettes mirror THEME_PALETTES in
+// playgroundTheme.ts.
 const themeBootstrapScript = `
 (function () {
   try {
@@ -89,16 +107,15 @@ const themeBootstrapScript = `
         stored = null;
       }
     } catch (e) {}
-    if (location.pathname.indexOf("/playground") !== 0) return;
-    var dark = stored === "dark" ||
-      (stored !== "light" && document.documentElement.classList.contains("dark"));
-    var p = dark
-      ? {bg:"#121212",bg2:"#0a0a0a",bg3:"#1c1c1c",border:"#2a2a2a",text:"#c9d1d9",dim:"#8b949e",textMuted:"#b1bac4",fn:"#d2a8ff",kw:"#ff7b72",a1:"#d2a8ff",a2:"#79c0ff"}
-      : {bg:"#ffffff",bg2:"#f6f8fa",bg3:"#eaeef2",border:"#d0d7de",text:"#24292f",dim:"#6e7781",textMuted:"#57606a",fn:"#8250df",kw:"#cf222e",a1:"#8250df",a2:"#0550ae"};
+    var dark = stored === "dark";
     var r = document.documentElement;
     r.classList.toggle("dark", dark);
     r.classList.toggle("light", !dark);
     r.style.colorScheme = dark ? "dark" : "light";
+    if (location.pathname.indexOf("/playground") !== 0) return;
+    var p = dark
+      ? {bg:"#121212",bg2:"#0a0a0a",bg3:"#1c1c1c",border:"#2a2a2a",text:"#c9d1d9",dim:"#8b949e",textMuted:"#b1bac4",fn:"#d2a8ff",kw:"#ff7b72",a1:"#d2a8ff",a2:"#79c0ff"}
+      : {bg:"#ffffff",bg2:"#f6f8fa",bg3:"#eaeef2",border:"#d0d7de",text:"#24292f",dim:"#6e7781",textMuted:"#57606a",fn:"#8250df",kw:"#cf222e",a1:"#8250df",a2:"#0550ae"};
     r.style.setProperty("--bg", p.bg);
     r.style.setProperty("--bg2", p.bg2);
     r.style.setProperty("--bg3", p.bg3);

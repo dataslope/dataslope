@@ -4,8 +4,8 @@
  * The tokens the list reads (`var(--ink)`, `var(--muted)`, …) live here on
  * `.catalog` rather than on the dashboard's `.ds-studio`, now that the catalog
  * sits in the main site's header and footer instead of the Studio shell. They
- * flip with the site's `.dark` class on <html>, which THEME_BOOTSTRAP sets
- * before first paint.
+ * flip with the site's `.dark` class on <html>, which the theme script in
+ * app/layout.tsx sets before first paint.
  *
  * Two type sizes and no more: 14px for anything a reader acts on or scans
  * (titles, values, controls), 13px for what describes it (topics, column
