@@ -9,10 +9,10 @@
  * twice.
  *
  * The loans table adds the other half: open-ended records (`returned_on` is
- * NULL while a book is out) and date spans, which is where `julianday` and a
- * recursive date spine earn their place.
+ * NULL while a book is out) and date spans, which is where date subtraction
+ * and a recursive date spine earn their place.
  *
- * Every solution is executed against node:sqlite by
+ * Every solution is executed against PGlite (Postgres) by
  * `__tests__/challengeSolutions`, so a wrong expectation fails CI.
  */
 
@@ -135,16 +135,18 @@ ORDER BY b.title`,
       dataset: LIBRARY,
       description: "Collapse each book's authors into a single readable cell.",
       solutionNote: [
-        { code: "GROUP_CONCAT" },
+        { code: "STRING_AGG" },
         " is the aggregate that produces text instead of a number, which is how you turn a many-to-many join back into one row per book. It is a reporting convenience, not a data model: the moment you need to filter or join on an individual author again, you want the rows back.",
       ],
     },
     {
       prompt: [
-        "Show every book with its authors listed in one cell, separated by a comma and a space.",
+        "Show every book with its authors listed in one cell, in alphabetical order, separated by a comma and a space.",
         [
-          { code: "GROUP_CONCAT(expression, separator)" },
-          " does the joining. Sort by title.",
+          { code: "STRING_AGG(expression, separator ORDER BY ...)" },
+          " does the joining, and the ",
+          { code: "ORDER BY" },
+          " inside it decides the order of the names. Sort the rows by title.",
         ],
       ],
       columns: [
@@ -158,7 +160,7 @@ JOIN authors au      ON au.author_id = ba.author_id
 GROUP BY b.book_id, b.title
 `,
       solution: `SELECT b.title,
-       GROUP_CONCAT(au.author_name, ', ') AS authors
+       STRING_AGG(au.author_name, ', ' ORDER BY au.author_name) AS authors
 FROM books b
 JOIN book_authors ba ON ba.book_id = b.book_id
 JOIN authors au      ON au.author_id = ba.author_id
@@ -195,7 +197,7 @@ ORDER BY b.title`,
       columns: [
         { name: "title", type: "text" },
         { name: "full_name", type: "text" },
-        { name: "borrowed_on", type: "text" },
+        { name: "borrowed_on", type: "date" },
       ],
       starter: `SELECT b.title, m.full_name, l.borrowed_on
 FROM loans l
@@ -226,19 +228,20 @@ ORDER BY l.borrowed_on`,
       dataset: LIBRARY,
       description: "Rank completed loans by how many days the book was out.",
       solutionNote: [
-        { code: "julianday()" },
-        " turns a date into a number, so the difference between two of them is a count of days. The ",
-        { code: "CAST(... AS INTEGER)" },
-        " is cosmetic but worth the habit: without it the result is a float, and a report that says a book was out 12.0 days invites the question of what the .0 means.",
+        "Subtracting one ",
+        { code: "date" },
+        " from another gives an integer count of days, so the span needs no conversion. Subtract two ",
+        { code: "timestamp" },
+        " values instead and you get an ",
+        { code: "interval" },
+        ", which is why a date column is the right type for a day that has no time.",
       ],
     },
     {
       prompt: [
         "Of the loans that have been returned, which were out the longest?",
         [
-          "Subtract the dates with ",
-          { code: "julianday()" },
-          " and return a whole number of days. Longest first, ties by title, top 5 only.",
+          "Subtracting one date from another gives a whole number of days. Longest first, ties by title, top 5 only.",
         ],
       ],
       columns: [
@@ -253,7 +256,7 @@ JOIN members m ON m.member_id = l.member_id
 `,
       solution: `SELECT b.title,
        m.full_name,
-       CAST(julianday(l.returned_on) - julianday(l.borrowed_on) AS INTEGER) AS days_out
+       l.returned_on - l.borrowed_on AS days_out
 FROM loans l
 JOIN books   b ON b.book_id   = l.book_id
 JOIN members m ON m.member_id = l.member_id
@@ -280,9 +283,11 @@ LIMIT 5`,
       solutionNote: [
         "The filter is on something no column holds (a span you compute), so it goes in the ",
         { code: "WHERE" },
-        " clause spelled out in full. SQLite will let you reference a ",
+        " clause spelled out in full. Postgres will not let you reference a ",
         { code: "SELECT" },
-        " alias there, but most engines will not, so writing the expression twice is the portable habit.",
+        " alias there, because ",
+        { code: "WHERE" },
+        " runs before the select list is computed.",
       ],
     },
     {
@@ -299,8 +304,8 @@ LIMIT 5`,
       columns: [
         { name: "full_name", type: "text" },
         { name: "title", type: "text" },
-        { name: "borrowed_on", type: "text" },
-        { name: "returned_on", type: "text" },
+        { name: "borrowed_on", type: "date" },
+        { name: "returned_on", type: "date" },
       ],
       starter: `SELECT m.full_name, b.title, l.borrowed_on, l.returned_on
 FROM loans l
@@ -313,7 +318,7 @@ FROM loans l
 JOIN books   b ON b.book_id   = l.book_id
 JOIN members m ON m.member_id = l.member_id
 WHERE l.returned_on IS NOT NULL
-  AND julianday(l.returned_on) - julianday(l.borrowed_on) > ${LOAN_DAYS}
+  AND l.returned_on - l.borrowed_on > ${LOAN_DAYS}
 ORDER BY l.borrowed_on`,
       tests: resultShape(
         ["full_name", "title", "borrowed_on", "returned_on"],
@@ -410,11 +415,11 @@ ORDER BY title`,
         { code: "MIN" },
         " and ",
         { code: "MAX" },
-        " work on text dates because ISO dates sort the same way they compare, which is the whole reason to store dates as ",
-        { code: "YYYY-MM-DD" },
-        " rather than any friendlier format. Written as ",
+        " work on dates as well as numbers, because a ",
+        { code: "date" },
+        " column orders chronologically. That is the reason to store dates in a date type rather than as text: written as ",
         { code: "03/04/2024" },
-        " this query would return nonsense.",
+        " in a text column, this query would return nonsense.",
       ],
     },
     {
@@ -425,8 +430,8 @@ ORDER BY title`,
       columns: [
         { name: "full_name", type: "text" },
         { name: "loans", type: "integer" },
-        { name: "first_loan", type: "text" },
-        { name: "last_loan", type: "text" },
+        { name: "first_loan", type: "date" },
+        { name: "last_loan", type: "date" },
       ],
       starter: `SELECT m.full_name, COUNT(*) AS loans
 FROM loans l
@@ -466,7 +471,9 @@ ORDER BY loans DESC, m.full_name`,
         { code: "COUNT(l.loan_id)" },
         " rather than ",
         { code: "COUNT(*)" },
-        " is what makes an empty day report 0.",
+        " is what makes an empty day report 0. Postgres can also build the spine in one call, ",
+        { code: "generate_series(DATE '2024-02-01', DATE '2024-02-29', INTERVAL '1 day')::date" },
+        "; the recursive CTE is the version that works on any engine.",
       ],
     },
     {
@@ -474,29 +481,29 @@ ORDER BY loans DESC, m.full_name`,
         "Count the loans that started on each day of February 2024: all 29 of them, including the days when nothing was borrowed.",
         [
           "Build the dates with a recursive CTE: start at ",
-          { code: "'2024-02-01'" },
+          { code: "DATE '2024-02-01'" },
           " and keep adding a day with ",
-          { code: "date(day, '+1 day')" },
+          { code: "day + 1" },
           " while the day is before ",
           { code: "'2024-02-29'" },
           ". Then left-join the loans onto it.",
         ],
       ],
       columns: [
-        { name: "day", type: "text" },
+        { name: "day", type: "date" },
         { name: "loans_started", type: "integer" },
       ],
       starter: `WITH RECURSIVE days(day) AS (
-  SELECT '2024-02-01'
+  SELECT DATE '2024-02-01'
   -- Add a day at a time until the end of the month.
 )
 SELECT d.day
 FROM days d
 `,
       solution: `WITH RECURSIVE days(day) AS (
-  SELECT '2024-02-01'
+  SELECT DATE '2024-02-01'
   UNION ALL
-  SELECT date(day, '+1 day') FROM days WHERE day < '2024-02-29'
+  SELECT day + 1 FROM days WHERE day < '2024-02-29'
 )
 SELECT d.day, COUNT(l.loan_id) AS loans_started
 FROM days d

@@ -6,7 +6,7 @@
  * same idea. The dataset each one runs against is the shared seed from
  * `./datasets`, so adding a challenge here costs nothing to boot.
  *
- * Every solution below is executed against node:sqlite by
+ * Every solution below is executed against PGlite (Postgres) by
  * `__tests__/challengeSolutions`, and every check is evaluated with the same
  * grader the browser uses, so a wrong expectation fails CI.
  */
@@ -71,7 +71,7 @@ ORDER BY p.product_name`,
       ],
       columns: [
         { name: "category", type: "text" },
-        { name: "revenue", type: "real" },
+        { name: "revenue", type: "numeric" },
       ],
       starter: `SELECT p.category
 FROM order_items i
@@ -139,7 +139,7 @@ ORDER BY order_count DESC, c.city`,
         "What is the average value of a completed order? Total each order first, then average those totals; averaging the item rows directly gives a different (and wrong) answer.",
         "Round to 2 decimal places.",
       ],
-      columns: [{ name: "average_order_value", type: "real" }],
+      columns: [{ name: "average_order_value", type: "numeric" }],
       starter: `SELECT ROUND(AVG(order_total), 2) AS average_order_value
 FROM (
   -- Total each completed order here.
@@ -218,7 +218,7 @@ ORDER BY order_count DESC, c.full_name`,
       columns: [
         { name: "full_name", type: "text" },
         { name: "order_id", type: "integer" },
-        { name: "order_total", type: "real" },
+        { name: "order_total", type: "numeric" },
       ],
       starter: `WITH totals AS (
   SELECT o.customer_id, o.order_id,
@@ -275,7 +275,7 @@ ORDER BY c.full_name`,
         "What percentage of all orders were cancelled? Count cancelled orders as a share of every order in the table, rounded to 1 decimal place.",
         "Do it in a single pass: no subquery needed.",
       ],
-      columns: [{ name: "cancelled_pct", type: "real" }],
+      columns: [{ name: "cancelled_pct", type: "numeric" }],
       starter: `SELECT ROUND(0, 1) AS cancelled_pct
 FROM orders
 `,
@@ -307,15 +307,15 @@ FROM orders`,
     {
       prompt: [
         "Total completed revenue per calendar month, and add a running total alongside it so the last row shows revenue for the whole period.",
-        "Truncate the order date with `strftime('%Y-%m-01', o.order_date)`. Round both money columns to 2 decimal places and sort by month.",
+        "Truncate the order date to the first of its month with `date_trunc('month', o.order_date)::date`. Round both money columns to 2 decimal places and sort by month.",
       ],
       columns: [
-        { name: "month", type: "text" },
-        { name: "revenue", type: "real" },
-        { name: "running_total", type: "real" },
+        { name: "month", type: "date" },
+        { name: "revenue", type: "numeric" },
+        { name: "running_total", type: "numeric" },
       ],
       starter: `WITH monthly AS (
-  SELECT strftime('%Y-%m-01', o.order_date) AS month,
+  SELECT date_trunc('month', o.order_date)::date AS month,
          ROUND(SUM(i.quantity * i.unit_price), 2) AS revenue
   FROM orders o
   JOIN order_items i ON i.order_id = o.order_id
@@ -327,7 +327,7 @@ FROM monthly
 ORDER BY month
 `,
       solution: `WITH monthly AS (
-  SELECT strftime('%Y-%m-01', o.order_date) AS month,
+  SELECT date_trunc('month', o.order_date)::date AS month,
          ROUND(SUM(i.quantity * i.unit_price), 2) AS revenue
   FROM orders o
   JOIN order_items i ON i.order_id = o.order_id
@@ -497,11 +497,11 @@ ORDER BY headcount DESC, band`,
     {
       prompt: [
         "Who are the three longest-serving employees? Return their name and hire date, earliest first.",
-        "Dates are stored as `YYYY-MM-DD` text, which sorts correctly as text.",
+        "`hired_on` is a `date` column, so ordering by it is chronological.",
       ],
       columns: [
         { name: "full_name", type: "text" },
-        { name: "hired_on", type: "text" },
+        { name: "hired_on", type: "date" },
       ],
       starter: `SELECT full_name, hired_on
 FROM employees
@@ -565,19 +565,19 @@ ORDER BY e.full_name`,
     },
     {
       prompt: [
-        "How many distinct users were active on each day? `occurred_at` is a timestamp, so cut it down to a date with `date(occurred_at)`.",
+        "How many distinct users were active on each day? `occurred_at` is a timestamp, so cut it down to a date with `occurred_at::date`.",
         "Return one row per day, earliest first.",
       ],
       columns: [
-        { name: "day", type: "text" },
+        { name: "day", type: "date" },
         { name: "active_users", type: "integer" },
       ],
-      starter: `SELECT date(occurred_at) AS day
+      starter: `SELECT occurred_at::date AS day
 FROM events
 GROUP BY day
 ORDER BY day
 `,
-      solution: `SELECT date(occurred_at) AS day, COUNT(DISTINCT user_id) AS active_users
+      solution: `SELECT occurred_at::date AS day, COUNT(DISTINCT user_id) AS active_users
 FROM events
 GROUP BY day
 ORDER BY day`,
@@ -634,7 +634,7 @@ ORDER BY views DESC, page`,
       columns: [
         { name: "signed_up", type: "integer" },
         { name: "visitors", type: "integer" },
-        { name: "conversion_pct", type: "real" },
+        { name: "conversion_pct", type: "numeric" },
       ],
       starter: `SELECT COUNT(DISTINCT user_id) AS visitors
 FROM events

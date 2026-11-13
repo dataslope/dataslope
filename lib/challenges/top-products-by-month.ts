@@ -19,7 +19,7 @@ const indent = (sql: string) =>
     .join("\n");
 
 /** Step 1's accepted query, reused as the CTE the later steps build on. */
-const MONTHLY = `SELECT strftime('%Y-%m-01', o.order_date) AS month,
+const MONTHLY = `SELECT date_trunc('month', o.order_date)::date AS month,
        p.product_name,
        ROUND(SUM(i.quantity * i.unit_price), 2) AS revenue
 FROM order_items i
@@ -41,11 +41,11 @@ export const TOP_PRODUCTS_BY_MONTH: Challenge = {
   slug: "top-products-by-month",
   title: "Top Products by Month",
   difficulty: "Intermediate",
-  catalog: { topic: "Window functions", langs: ["sqlite"] },
-  languageLabel: "SQLite",
+  catalog: { topic: "Window functions", langs: ["postgres"] },
+  languageLabel: "PostgreSQL",
   description:
     "Break a monthly revenue ranking into three gated steps: total revenue per product per month, rank within each month, then cut to the top three.",
-  runtime: { kind: "sql", dialect: "sqlite", initSql: RETAIL.initSql },
+  runtime: { kind: "sql", dialect: "postgres", initSql: RETAIL.initSql },
   schema: RETAIL.schema,
   submitLabel: "Submit step",
   submissionColumns: ["step", "result", "lang", "when"],
@@ -66,8 +66,8 @@ export const TOP_PRODUCTS_BY_MONTH: Challenge = {
   languages: [
     {
       id: "sql",
-      label: "SQLite",
-      shortLabel: "SQLite",
+      label: "PostgreSQL",
+      shortLabel: "PostgreSQL",
       starterCode: "",
       solutionCode: "",
       tests: [],
@@ -86,13 +86,10 @@ export const TOP_PRODUCTS_BY_MONTH: Challenge = {
       title: "Monthly revenue",
       short: "Revenue",
       solutionNote: [
-        "SQLite has no ",
-        { code: "date_trunc" },
-        ", so the month comes from ",
-        { code: "strftime" },
-        ", and because that returns text, it groups and sorts correctly only while the format stays ",
-        { code: "YYYY-MM-DD" },
-        ". Grouping by the two select expressions positionally (",
+        { code: "date_trunc('month', ...)" },
+        " returns a timestamp at midnight on the first of the month, so the ",
+        { code: "::date" },
+        " cast keeps the month a plain date, which groups and sorts chronologically and prints without a time. Grouping by the two select expressions positionally (",
         { code: "GROUP BY 1, 2" },
         ") saves repeating them, at the cost of a query that breaks quietly if the select list is reordered.",
       ],
@@ -109,20 +106,18 @@ export const TOP_PRODUCTS_BY_MONTH: Challenge = {
         {
           kind: "prose",
           spans: [
-            "SQLite has no ",
-            { code: "date_trunc" },
-            ", so truncate the order date with ",
-            { code: "strftime('%Y-%m-01', o.order_date)" },
-            " to get the first of the month.",
+            "Truncate the order date to the first of its month with ",
+            { code: "date_trunc('month', o.order_date)::date" },
+            ".",
           ],
         },
         { kind: "label", text: "Return these columns" },
         {
           kind: "columns",
           rows: [
-            { name: "month", type: "text" },
+            { name: "month", type: "date" },
             { name: "product_name", type: "text" },
-            { name: "revenue", type: "real" },
+            { name: "revenue", type: "numeric" },
           ],
         },
       ],
@@ -183,9 +178,9 @@ JOIN products p ON p.product_id = i.product_id
         {
           kind: "columns",
           rows: [
-            { name: "month", type: "text" },
+            { name: "month", type: "date" },
             { name: "product_name", type: "text" },
-            { name: "revenue", type: "real" },
+            { name: "revenue", type: "numeric" },
             { name: "revenue_rank", type: "integer" },
           ],
         },
