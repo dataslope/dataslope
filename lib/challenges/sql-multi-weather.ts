@@ -11,7 +11,7 @@
  * Shared constants carry each step's accepted query into the next step's
  * starter and CTE, so a fix in step 1 cannot leave step 3 quoting a version
  * that no longer exists. `__tests__/challengeSolutions` runs every step's
- * solution against node:sqlite.
+ * solution against PGlite.
  */
 
 import { indentSql, sqlSteps } from "./authoring";
@@ -68,7 +68,7 @@ marked AS (
   SELECT station_name, reading_date, max_temp_c,
          CASE
            WHEN LAG(reading_date) OVER (PARTITION BY station_name ORDER BY reading_date)
-                = date(reading_date, '-1 day')
+                = reading_date - 1
            THEN 0
            ELSE 1
          END AS new_streak
@@ -113,8 +113,8 @@ const HEATWAVE_DETECTOR = sqlSteps(
       ],
       columns: [
         { name: "station_name", type: "text" },
-        { name: "reading_date", type: "text" },
-        { name: "max_temp_c", type: "real" },
+        { name: "reading_date", type: "date" },
+        { name: "max_temp_c", type: "numeric" },
       ],
       starter: `SELECT s.station_name, r.reading_date, r.max_temp_c
 FROM readings r
@@ -138,12 +138,12 @@ ORDER BY s.station_name, r.reading_date
       prompt: [
         "Group each station's hot days into streaks of consecutive calendar days, and return each streak's first day, last day and length.",
         "Consecutive means the next calendar date, not the next reading. A date with no reading ends a streak, because nobody knows whether it was hot, and Harbour Mill has no reading for 6 September.",
-        "One way: flag a hot day as starting a new streak unless the previous hot day at that station was the day before (`LAG` and `date(reading_date, '-1 day')`), then a running `SUM` of the flags numbers the streaks. Sort by `station_name`, then `streak_start`.",
+        "One way: flag a hot day as starting a new streak unless the previous hot day at that station was the day before (`LAG`, and `reading_date - 1` for the day before), then a running `SUM` of the flags numbers the streaks. Sort by `station_name`, then `streak_start`.",
       ],
       columns: [
         { name: "station_name", type: "text" },
-        { name: "streak_start", type: "text" },
-        { name: "streak_end", type: "text" },
+        { name: "streak_start", type: "date" },
+        { name: "streak_end", type: "date" },
         { name: "days", type: "integer" },
       ],
       starter: `WITH hot AS (
@@ -173,10 +173,10 @@ ORDER BY station_name, reading_date
       ],
       columns: [
         { name: "station_name", type: "text" },
-        { name: "streak_start", type: "text" },
-        { name: "streak_end", type: "text" },
+        { name: "streak_start", type: "date" },
+        { name: "streak_end", type: "date" },
         { name: "days", type: "integer" },
-        { name: "peak_c", type: "real" },
+        { name: "peak_c", type: "numeric" },
       ],
       starter: `${STREAKS}
 `,
@@ -206,10 +206,9 @@ ORDER BY streak_start, station_name`,
 const PERIOD_START = "2024-09-02";
 const PERIOD_END = "2024-09-15";
 
-const EXPECTED_CTES = `WITH RECURSIVE days(day) AS (
-  SELECT '${PERIOD_START}'
-  UNION ALL
-  SELECT date(day, '+1 day') FROM days WHERE day < '${PERIOD_END}'
+const EXPECTED_CTES = `WITH days AS (
+  SELECT d::date AS day
+  FROM generate_series(DATE '${PERIOD_START}', DATE '${PERIOD_END}', INTERVAL '1 day') AS d
 ),
 expected AS (
   SELECT s.station_id, s.station_name, d.day
@@ -227,16 +226,16 @@ const STATION_DATA_QUALITY = sqlSteps(
     description:
       "Work out which days each station owed, find the ones it missed, and score its coverage for temperature and rain separately.",
     solutionNote:
-      "Missing data comes in two shapes: a row that is not there, and a row that is there with a hole in it. The first can only be seen against a calendar, which a recursive CTE builds because nothing in the table lists the days that are absent; the second needs `COUNT(column)` rather than `COUNT(*)`. A report that checks only for missing rows calls Saltmarsh Point and Kestrel Fell complete.",
+      "Missing data comes in two shapes: a row that is not there, and a row that is there with a hole in it. The first can only be seen against a calendar, which `generate_series` builds because nothing in the table lists the days that are absent; the second needs `COUNT(column)` rather than `COUNT(*)`. A report that checks only for missing rows calls Saltmarsh Point and Kestrel Fell complete.",
   },
   [
     {
       title: "Expected days per station",
       short: "Expected",
       solutionNote:
-        "A recursive CTE is how you get rows for dates that appear nowhere in the data: an anchor row, and a step that adds a day until the end date. Joining it to `stations` on `d.day >= commissioned_on`, instead of cross joining, is what stops Hollin Moss owing twelve days from before it existed.",
+        "`generate_series` is how you get rows for dates that appear nowhere in the data: given a first date, a last date and a step of `INTERVAL '1 day'`, it returns one row per day, both ends included. Joining it to `stations` on `d.day >= commissioned_on`, instead of cross joining, is what stops Hollin Moss owing twelve days from before it existed.",
       prompt: [
-        `The report covers ${PERIOD_START} to ${PERIOD_END}. Build that calendar with a recursive CTE, one row per date, and work out how many days each station was expected to report.`,
+        `The report covers ${PERIOD_START} to ${PERIOD_END}. Build that calendar with \`generate_series\`, one row per date, and work out how many days each station was expected to report.`,
         "A station only owes readings from its `commissioned_on` date. Hollin Moss was commissioned on 14 September, so it owes two days, not fourteen.",
         "Every station appears, sorted by `station_name`.",
       ],
@@ -244,9 +243,9 @@ const STATION_DATA_QUALITY = sqlSteps(
         { name: "station_name", type: "text" },
         { name: "expected_days", type: "integer" },
       ],
-      starter: `WITH RECURSIVE days(day) AS (
-  SELECT '${PERIOD_START}'
-  -- add the recursive step that walks forward one day at a time to ${PERIOD_END}
+      starter: `WITH days AS (
+  SELECT DATE '${PERIOD_START}' AS day
+  -- one row for every date up to ${PERIOD_END}, not just the first
 )
 SELECT s.station_name, COUNT(*) AS expected_days
 FROM stations s
@@ -278,7 +277,7 @@ ORDER BY station_name`,
       ],
       columns: [
         { name: "station_name", type: "text" },
-        { name: "missing_date", type: "text" },
+        { name: "missing_date", type: "date" },
       ],
       starter: `${EXPECTED_CTES}
 SELECT e.station_name, e.day AS missing_date
@@ -315,8 +314,8 @@ ORDER BY e.station_name, e.day`,
       columns: [
         { name: "station_name", type: "text" },
         { name: "expected_days", type: "integer" },
-        { name: "temp_coverage_pct", type: "real" },
-        { name: "rain_coverage_pct", type: "real" },
+        { name: "temp_coverage_pct", type: "numeric" },
+        { name: "rain_coverage_pct", type: "numeric" },
       ],
       starter: `${EXPECTED_CTES}
 SELECT e.station_name, COUNT(*) AS expected_days

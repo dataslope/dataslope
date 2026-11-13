@@ -37,7 +37,7 @@ const CATEGORIES: Category[] = [
       { id: "python", label: "Python", version: "3.14" },
       { id: "r", label: "R", version: "4.6" },
       { id: "javascript", label: "JavaScript", version: "ES2023+" },
-      { id: "typescript", label: "TypeScript", version: "5.9" },
+      { id: "typescript", label: "TypeScript", version: "6.0" },
       { id: "php", label: "PHP", version: "8.4" },
       { id: "c", label: "C", version: "C17" },
       { id: "cpp", label: "C++", version: "C++20" },
@@ -70,7 +70,7 @@ const CATEGORIES: Category[] = [
     items: [
       // Same order as `PLAYGROUNDS`: PostgreSQL · SQLite · DuckDB.
       { id: "postgres", label: "PostgreSQL", version: "18" },
-      { id: "sqlite", label: "SQLite", version: "3.53" },
+      { id: "sqlite", label: "SQLite", version: "3.54" },
       { id: "duckdb", label: "DuckDB", version: "1.32" },
     ],
   },

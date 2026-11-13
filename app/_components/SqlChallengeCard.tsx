@@ -188,7 +188,7 @@ async function createSqliteChallengeEngine(): Promise<SqlEngineLike> {
       );
     },
     label: "SQLite",
-    version: "3.53",
+    version: "3.54",
   };
 }
 
@@ -253,7 +253,7 @@ export function sqlDialectColdMB(dialect: SqlDialect): number {
 /** Engine label shown before the live runtime reports its exact version. */
 function defaultSqlEngineLabel(dialect: SqlDialect): string {
   return dialect === "sqlite"
-    ? "SQLite 3.53"
+    ? "SQLite 3.54"
     : dialect === "duckdb"
       ? `DuckDB ${DUCKDB_VERSION}`
       : "PostgreSQL 18";

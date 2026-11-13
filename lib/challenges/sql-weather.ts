@@ -13,7 +13,7 @@
  * It means "not measured", never "dry", and each challenge that touches rain
  * says which way it wants that treated.
  *
- * Every solution is executed against node:sqlite by
+ * Every solution is executed against PGlite by
  * `__tests__/challengeSolutions`, so a wrong expectation fails CI.
  */
 
@@ -31,7 +31,7 @@ export const SQL_WEATHER: Challenge[] = [
       dataset: WEATHER,
       description: "Find each station's coldest night, hottest day and the spread between them.",
       solutionNote:
-        "The range is the highest high minus the lowest low: two aggregates over two different columns. `MAX(max_temp_c - min_temp_c)` looks similar and answers another question, the biggest swing within a single day. The `ROUND` is not cosmetic either: 26.4 minus 9.8 is 16.599999999999998 in floating point.",
+        "The range is the highest high minus the lowest low: two aggregates over two different columns. `MAX(max_temp_c - min_temp_c)` looks similar and answers another question, the biggest swing within a single day. The temperatures are stored as `numeric`, so the subtraction is exact and 26.4 minus 9.8 is 16.6; the same sum on floating-point columns gives 16.599999999999998, which is what the `ROUND` guards against.",
     },
     {
       prompt: [
@@ -40,9 +40,9 @@ export const SQL_WEATHER: Challenge[] = [
       ],
       columns: [
         { name: "station_name", type: "text" },
-        { name: "lowest_c", type: "real" },
-        { name: "highest_c", type: "real" },
-        { name: "range_c", type: "real" },
+        { name: "lowest_c", type: "numeric" },
+        { name: "highest_c", type: "numeric" },
+        { name: "range_c", type: "numeric" },
       ],
       starter: `SELECT s.station_name
 FROM stations s
@@ -87,7 +87,7 @@ ORDER BY range_c DESC, s.station_name`,
         { name: "station_name", type: "text" },
         { name: "days_reported", type: "integer" },
         { name: "days_measured", type: "integer" },
-        { name: "avg_precip_mm", type: "real" },
+        { name: "avg_precip_mm", type: "numeric" },
       ],
       starter: `SELECT s.station_name, COUNT(*) AS days_reported
 FROM stations s
@@ -120,7 +120,7 @@ ORDER BY avg_precip_mm DESC, s.station_name`,
       dataset: WEATHER,
       description: "Find the first night each station fell to freezing, and how many frosts it had.",
       solutionNote:
-        "Filter to the frosty nights with `WHERE`, and `MIN(reading_date)` is then the first of them, because ISO dates sort as text in date order. Writing `< 0` instead of `<= 0` loses Brackenridge completely: its only frost was a low of exactly 0.0.",
+        "Filter to the frosty nights with `WHERE`, and `MIN(reading_date)` is then the first of them, because the minimum of a `date` column is its earliest day. Writing `< 0` instead of `<= 0` loses Brackenridge completely: its only frost was a low of exactly 0.0.",
     },
     {
       prompt: [
@@ -129,7 +129,7 @@ ORDER BY avg_precip_mm DESC, s.station_name`,
       ],
       columns: [
         { name: "station_name", type: "text" },
-        { name: "first_frost", type: "text" },
+        { name: "first_frost", type: "date" },
         { name: "frost_days", type: "integer" },
       ],
       starter: `SELECT s.station_name, r.reading_date, r.min_temp_c
@@ -162,7 +162,7 @@ ORDER BY first_frost, s.station_name`,
       dataset: WEATHER,
       description: "Compare each day's high with the day before, without comparing across a missing day.",
       solutionNote:
-        "`LAG` returns the previous row, not the previous day, so on 7 September it hands back the reading from the 5th. Fetching the previous row's date alongside its temperature, and using the change only when that date equals `date(reading_date, '-1 day')`, turns previous row back into yesterday.",
+        "`LAG` returns the previous row, not the previous day, so on 7 September it hands back the reading from the 5th. Fetching the previous row's date alongside its temperature, and using the change only when that date equals `reading_date - 1` (subtracting an integer from a `date` steps back that many days), turns previous row back into yesterday.",
     },
     {
       prompt: [
@@ -171,9 +171,9 @@ ORDER BY first_frost, s.station_name`,
         "Return every Harbour Mill reading, oldest first.",
       ],
       columns: [
-        { name: "reading_date", type: "text" },
-        { name: "max_temp_c", type: "real" },
-        { name: "change_c", type: "real" },
+        { name: "reading_date", type: "date" },
+        { name: "max_temp_c", type: "numeric" },
+        { name: "change_c", type: "numeric" },
       ],
       starter: `SELECT r.reading_date, r.max_temp_c
 FROM readings r
@@ -190,7 +190,7 @@ ORDER BY r.reading_date
   WHERE s.station_name = 'Harbour Mill'
 )
 SELECT reading_date, max_temp_c,
-       CASE WHEN prev_date = date(reading_date, '-1 day')
+       CASE WHEN prev_date = reading_date - 1
             THEN ROUND(max_temp_c - prev_max, 1)
        END AS change_c
 FROM harbour
@@ -222,9 +222,9 @@ ORDER BY reading_date`,
         "Use an explicit frame, `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW`. Oldest first.",
       ],
       columns: [
-        { name: "reading_date", type: "text" },
-        { name: "max_temp_c", type: "real" },
-        { name: "avg_3day_c", type: "real" },
+        { name: "reading_date", type: "date" },
+        { name: "max_temp_c", type: "numeric" },
+        { name: "avg_3day_c", type: "numeric" },
       ],
       starter: `SELECT r.reading_date, r.max_temp_c
 FROM readings r
@@ -273,7 +273,7 @@ ORDER BY reading_date`,
       columns: [
         { name: "region", type: "text" },
         { name: "station_name", type: "text" },
-        { name: "total_precip_mm", type: "real" },
+        { name: "total_precip_mm", type: "numeric" },
       ],
       starter: `SELECT s.region, s.station_name, SUM(r.precip_mm) AS total_precip_mm
 FROM stations s
@@ -322,8 +322,8 @@ ORDER BY region, station_name`,
       ],
       columns: [
         { name: "station_name", type: "text" },
-        { name: "reading_date", type: "text" },
-        { name: "max_temp_c", type: "real" },
+        { name: "reading_date", type: "date" },
+        { name: "max_temp_c", type: "numeric" },
         { name: "heat_rank", type: "integer" },
       ],
       starter: `SELECT s.station_name, r.reading_date, r.max_temp_c
@@ -362,7 +362,7 @@ ORDER BY station_name, heat_rank, reading_date`,
       dataset: WEATHER,
       description: "Add up how much heating each station's fortnight would have needed.",
       solutionNote:
-        "Each day has to be clamped at zero before the sum. `SUM(18 - mean)` lets the warm days of the first week cancel out cold ones, and at Saltmarsh Point that shrinks 21.2 degree days to under 5. Given two or more arguments, SQLite's `MAX(0, 18 - mean)` is an ordinary scalar function rather than the aggregate, so it clamps each row inside the `SUM`.",
+        "Each day has to be clamped at zero before the sum. `SUM(18 - mean)` lets the warm days of the first week cancel out cold ones, and at Saltmarsh Point that shrinks 21.2 degree days to under 5. `GREATEST(0, 18 - mean)` is a scalar function that returns the larger of its arguments for each row, so it clamps every day inside the `SUM`. `MAX` cannot do this: in Postgres it is only the aggregate.",
     },
     {
       prompt: [
@@ -371,7 +371,7 @@ ORDER BY station_name, heat_rank, reading_date`,
       ],
       columns: [
         { name: "station_name", type: "text" },
-        { name: "heating_degree_days", type: "real" },
+        { name: "heating_degree_days", type: "numeric" },
       ],
       starter: `SELECT s.station_name, r.reading_date,
        (r.min_temp_c + r.max_temp_c) / 2 AS mean_c
@@ -379,7 +379,7 @@ FROM stations s
 JOIN readings r ON r.station_id = s.station_id
 `,
       solution: `SELECT s.station_name,
-       ROUND(SUM(MAX(0, 18 - (r.min_temp_c + r.max_temp_c) / 2)), 2) AS heating_degree_days
+       ROUND(SUM(GREATEST(0, 18 - (r.min_temp_c + r.max_temp_c) / 2)), 2) AS heating_degree_days
 FROM stations s
 JOIN readings r ON r.station_id = s.station_id
 GROUP BY s.station_id, s.station_name
@@ -412,8 +412,8 @@ ORDER BY heating_degree_days DESC, s.station_name`,
       ],
       columns: [
         { name: "station_name", type: "text" },
-        { name: "streak_start", type: "text" },
-        { name: "streak_end", type: "text" },
+        { name: "streak_start", type: "date" },
+        { name: "streak_end", type: "date" },
         { name: "days", type: "integer" },
       ],
       starter: `SELECT s.station_name, r.reading_date, r.precip_mm
@@ -423,8 +423,8 @@ ORDER BY s.station_name, r.reading_date
 `,
       solution: `WITH dry AS (
   SELECT station_id, reading_date,
-         julianday(reading_date)
-           - ROW_NUMBER() OVER (PARTITION BY station_id ORDER BY reading_date) AS run_id
+         reading_date
+           - (ROW_NUMBER() OVER (PARTITION BY station_id ORDER BY reading_date))::integer AS run_id
   FROM readings
   WHERE precip_mm = 0
 ),
@@ -467,17 +467,17 @@ ORDER BY s.station_name`,
       dataset: WEATHER,
       description: "Compute each station's median daily high without a MEDIAN function.",
       solutionNote:
-        "`ROW_NUMBER()` gives each high its position in the station's sorted list and `COUNT(*) OVER` the list's length n, so the middle positions are `(n + 1) / 2` and `(n + 2) / 2` in integer division: the same position twice when n is odd, the two middle ones when it is even. Averaging whatever sits at those positions covers both cases in one query. Taking only `(n + 1) / 2` is the usual slip, and it is wrong for every station with an even count.",
+        "`ROW_NUMBER()` gives each high its position in the station's sorted list and `COUNT(*) OVER` the list's length n, so the middle positions are `(n + 1) / 2` and `(n + 2) / 2` in integer division: the same position twice when n is odd, the two middle ones when it is even. Averaging whatever sits at those positions covers both cases in one query. Taking only `(n + 1) / 2` is the usual slip, and it is wrong for every station with an even count. Postgres can also do the whole thing in one ordered-set aggregate, `percentile_cont(0.5) WITHIN GROUP (ORDER BY max_temp_c)`, which averages the two middle values the same way.",
     },
     {
       prompt: [
-        "SQLite has no `MEDIAN`. Compute each station's median `max_temp_c` with window functions: sort each station's highs and take the middle value, or the average of the two middle values when the station has an even number of readings.",
+        "Postgres has no `MEDIAN` function. Compute each station's median `max_temp_c` with window functions: sort each station's highs and take the middle value, or the average of the two middle values when the station has an even number of readings.",
         "The stations have 12, 13 and 14 readings, so both cases occur. Return the number of readings and the median rounded to 2 decimal places, for stations with readings only. Highest median first; ties by `station_name`.",
       ],
       columns: [
         { name: "station_name", type: "text" },
         { name: "readings", type: "integer" },
-        { name: "median_high_c", type: "real" },
+        { name: "median_high_c", type: "numeric" },
       ],
       starter: `SELECT s.station_name, COUNT(*) AS readings
 FROM readings r

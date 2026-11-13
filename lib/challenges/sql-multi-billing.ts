@@ -9,7 +9,7 @@
  * Shared constants carry each step's accepted query into the next step's
  * starter and CTE, so a fix in step 1 cannot leave step 3 quoting a version
  * that no longer exists. `__tests__/challengeSolutions` runs every step's
- * solution against node:sqlite.
+ * solution against PGlite (Postgres).
  */
 
 import { indentSql, sqlSteps } from "./authoring";
@@ -21,10 +21,10 @@ const AS_OF = "2024-03-31";
 
 // ─── Invoice aging ───────────────────────────────────────────────────
 
-const AGED_DAYS = `julianday('${AS_OF}') - julianday(i.issued_on)`;
+const AGED_DAYS = `DATE '${AS_OF}' - i.issued_on`;
 
 const AGING_OPEN = `SELECT i.invoice_id, a.company, i.amount,
-       CAST(${AGED_DAYS} AS INTEGER) AS days_outstanding
+       ${AGED_DAYS} AS days_outstanding
 FROM invoices i
 JOIN accounts a ON a.account_id = i.account_id
 WHERE i.paid_on IS NULL
@@ -37,7 +37,7 @@ const AGING_BUCKET = `CASE
        END`;
 
 const AGING_TAGGED = `SELECT i.invoice_id, a.company, i.amount,
-       CAST(${AGED_DAYS} AS INTEGER) AS days_outstanding,
+       ${AGED_DAYS} AS days_outstanding,
        ${AGING_BUCKET} AS bucket
 FROM invoices i
 JOIN accounts a ON a.account_id = i.account_id
@@ -71,11 +71,9 @@ const INVOICE_AGING = sqlSteps(
       title: "What is still owed",
       short: "Open",
       solutionNote: [
-        "Filtering to the open invoices first is what keeps the rest simple: everything after this step works on a set that is already the right shape. ",
-        { code: "julianday()" },
-        " turns a text date into a number so two of them can be subtracted, and the ",
-        { code: "CAST" },
-        " is the difference between a report that says 30 days and one that says 30.0.",
+        "Filtering to the open invoices first is what keeps the rest simple: everything after this step works on a set that is already the right shape. Subtracting one ",
+        { code: "date" },
+        " from another gives a whole number of days, so the age needs no conversion and no rounding.",
       ],
       prompt: [
         [
@@ -84,15 +82,15 @@ const INVOICE_AGING = sqlSteps(
           ".",
         ],
         [
-          "Dates are text, so subtract them with ",
-          { code: "julianday()" },
-          " and return a whole number of days. Oldest debt first.",
+          "Subtract the issue date from ",
+          { code: "DATE '" + AS_OF + "'" },
+          ", which gives a whole number of days. Oldest debt first.",
         ],
       ],
       columns: [
         { name: "invoice_id", type: "integer" },
         { name: "company", type: "text" },
-        { name: "amount", type: "real" },
+        { name: "amount", type: "numeric" },
         { name: "days_outstanding", type: "integer" },
       ],
       starter: `SELECT i.invoice_id, a.company, i.amount
@@ -154,7 +152,7 @@ JOIN accounts a ON a.account_id = i.account_id
       columns: [
         { name: "invoice_id", type: "integer" },
         { name: "company", type: "text" },
-        { name: "amount", type: "real" },
+        { name: "amount", type: "numeric" },
         { name: "days_outstanding", type: "integer" },
         { name: "bucket", type: "text" },
       ],
@@ -206,7 +204,7 @@ JOIN accounts a ON a.account_id = i.account_id
       columns: [
         { name: "bucket", type: "text" },
         { name: "invoices", type: "integer" },
-        { name: "owed", type: "real" },
+        { name: "owed", type: "numeric" },
       ],
       starter: `${AGING_CTE}
 SELECT bucket, amount
@@ -244,8 +242,7 @@ ORDER BY bucket`,
 // ─── Retention by plan ───────────────────────────────────────────────
 
 const SPANS = `SELECT s.subscription_id, p.plan_name,
-       CAST(julianday(COALESCE(s.ended_on, '${AS_OF}'))
-            - julianday(s.started_on) AS INTEGER) AS days,
+       COALESCE(s.ended_on, DATE '${AS_OF}') - s.started_on AS days,
        CASE WHEN s.ended_on IS NULL THEN 0 ELSE 1 END AS churned
 FROM subscriptions s
 JOIN plans p ON p.plan_id = s.plan_id
@@ -268,7 +265,7 @@ const RETENTION_BY_PLAN = sqlSteps(
       "Work out which plans keep customers: measure every subscription's life, average it by plan, then add the churn rate.",
     solutionNote: [
       "Two tricks carry the whole report. ",
-      { code: "COALESCE(ended_on, '" + AS_OF + "')" },
+      { code: "COALESCE(ended_on, DATE '" + AS_OF + "')" },
       ' lets a subscription that has not ended still have a length, so your best customers are not silently excluded. And turning "has it ended" into a 1-or-0 column means the churn rate is just ',
       { code: "AVG" },
       " of that flag: no second query, no self join.",
@@ -341,7 +338,7 @@ JOIN plans p ON p.plan_id = s.plan_id
       columns: [
         { name: "plan_name", type: "text" },
         { name: "subscriptions", type: "integer" },
-        { name: "avg_days", type: "real" },
+        { name: "avg_days", type: "numeric" },
       ],
       starter: `${SPANS_CTE}
 SELECT plan_name, days
@@ -394,8 +391,8 @@ ORDER BY avg_days DESC`,
       columns: [
         { name: "plan_name", type: "text" },
         { name: "subscriptions", type: "integer" },
-        { name: "avg_days", type: "real" },
-        { name: "churn_pct", type: "real" },
+        { name: "avg_days", type: "numeric" },
+        { name: "churn_pct", type: "numeric" },
       ],
       starter: `${SPANS_CTE}
 SELECT plan_name, COUNT(*) AS subscriptions, ROUND(AVG(days), 1) AS avg_days
@@ -536,7 +533,7 @@ JOIN plans p ON p.plan_id = s.plan_id
       columns: [
         { name: "plan_name", type: "text" },
         { name: "active", type: "integer" },
-        { name: "pct_of_accounts", type: "real" },
+        { name: "pct_of_accounts", type: "numeric" },
       ],
       starter: `${ACTIVE_CTE}
 SELECT plan_name, active
@@ -591,9 +588,9 @@ ORDER BY active DESC, plan_name`,
       columns: [
         { name: "plan_name", type: "text" },
         { name: "active", type: "integer" },
-        { name: "pct_of_accounts", type: "real" },
-        { name: "mrr", type: "real" },
-        { name: "pct_of_mrr", type: "real" },
+        { name: "pct_of_accounts", type: "numeric" },
+        { name: "mrr", type: "numeric" },
+        { name: "pct_of_mrr", type: "numeric" },
       ],
       starter: `${ACTIVE_CTE}
 SELECT plan_name, active,

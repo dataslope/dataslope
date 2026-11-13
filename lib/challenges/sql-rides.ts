@@ -10,7 +10,7 @@
  * the ones that started.
  *
  * Anything open-ended is measured as of 2024-06-03, the Monday after the
- * data ends. Every solution is executed against node:sqlite by
+ * data ends. Every solution is executed against Postgres (PGlite) by
  * `__tests__/challengeSolutions`, so a wrong expectation fails CI.
  */
 
@@ -32,7 +32,7 @@ export const SQL_RIDES: Challenge[] = [
       description:
         "Count ride requests by the hour they were made, and how many of them turned into trips.",
       solutionNote:
-        "`strftime('%H', requested_at)` pulls the hour out of a timestamp as text, and `CAST(... AS INTEGER)` makes it the number 8 rather than the string '08'. `COUNT(started_at)` counts only non-NULL values, so it counts completed trips with no `CASE` at all, while `COUNT(*)` counts every request.",
+        "`EXTRACT(HOUR FROM requested_at)` pulls the hour out of a timestamp as a number, and the `::int` cast makes it a plain integer, 8, rather than the numeric 8 `EXTRACT` returns. `COUNT(started_at)` counts only non-NULL values, so it counts completed trips with no `CASE` at all, while `COUNT(*)` counts every request.",
     },
     {
       prompt: [
@@ -47,7 +47,7 @@ export const SQL_RIDES: Challenge[] = [
       starter: `SELECT requested_at
 FROM trips
 `,
-      solution: `SELECT CAST(strftime('%H', requested_at) AS INTEGER) AS hour,
+      solution: `SELECT EXTRACT(HOUR FROM requested_at)::int AS hour,
        COUNT(*) AS requests,
        COUNT(started_at) AS completed
 FROM trips
@@ -82,7 +82,7 @@ ORDER BY hour`,
         { name: "driver_name", type: "text" },
         { name: "completed_trips", type: "integer" },
         { name: "rated_trips", type: "integer" },
-        { name: "avg_rating", type: "real" },
+        { name: "avg_rating", type: "numeric" },
       ],
       starter: `SELECT d.driver_name, COUNT(*) AS completed_trips
 FROM trips t
@@ -161,7 +161,7 @@ ORDER BY trips DESC, r.rider_name, d.driver_name`,
       dataset: RIDES,
       description: "Compare how often ride requests are cancelled in each city.",
       solutionNote:
-        "`COUNT(*)` counts rows and `COUNT(t.started_at)` counts non-NULL values, so their difference is the number of cancellations without a single `CASE`. The `100.0` keeps the division real: in integer arithmetic `100 * 2 / 12` is 16, and Bilbao's rate would lose its decimal.",
+        "`COUNT(*)` counts rows and `COUNT(t.started_at)` counts non-NULL values, so their difference is the number of cancellations without a single `CASE`. The `100.0` makes the division decimal: in integer arithmetic `100 * 2 / 12` is 16, and Bilbao's rate would lose its decimal.",
     },
     {
       prompt: [
@@ -172,7 +172,7 @@ ORDER BY trips DESC, r.rider_name, d.driver_name`,
         { name: "city", type: "text" },
         { name: "requests", type: "integer" },
         { name: "cancelled", type: "integer" },
-        { name: "cancel_pct", type: "real" },
+        { name: "cancel_pct", type: "numeric" },
       ],
       starter: `SELECT d.city, COUNT(*) AS requests
 FROM trips t
@@ -206,26 +206,26 @@ ORDER BY cancel_pct DESC, d.city`,
       description:
         "Total each driver's fares by the Monday-to-Sunday week the trips were requested in.",
       solutionNote:
-        "Grouping by a computed week label is the whole trick: every timestamp in a week maps to the same Monday, so `GROUP BY driver, week_start` buckets them. `strftime('%W')` would give a week number instead, which restarts every January and cannot be checked against a calendar at a glance the way a date can.",
+        "Grouping by a computed week label is the whole trick: every timestamp in a week maps to the same Monday, so `GROUP BY driver, week_start` buckets them. `EXTRACT(WEEK FROM ...)` would give a week number instead, which restarts every year and cannot be checked against a calendar at a glance the way a date can.",
     },
     {
       prompt: [
         "Drivers are paid weekly, and a week runs Monday to Sunday. For each driver and week, count the completed `trips` and total their fares as `earnings`, rounded to 2 decimal places.",
-        "Label each week by its Monday, as `week_start`. SQLite's date modifiers get there in one call: `date(requested_at, 'weekday 0', '-6 days')` moves forward to that week's Sunday (staying put on a Sunday) and then back six days. A trip belongs to the week it was requested in.",
+        "Label each week by its Monday, as `week_start`. Postgres gets there in one call: `date_trunc('week', requested_at)` cuts a timestamp back to midnight on that week's Monday, and `::date` drops the time. A trip belongs to the week it was requested in.",
         "Leave out cancelled requests, and leave out any week in which a driver completed nothing. Sort by `week_start`, then `driver_name`.",
       ],
       columns: [
         { name: "driver_name", type: "text" },
-        { name: "week_start", type: "text" },
+        { name: "week_start", type: "date" },
         { name: "trips", type: "integer" },
-        { name: "earnings", type: "real" },
+        { name: "earnings", type: "numeric" },
       ],
       starter: `SELECT d.driver_name, t.requested_at, t.fare
 FROM trips t
 JOIN drivers d ON d.driver_id = t.driver_id
 `,
       solution: `SELECT d.driver_name,
-       date(t.requested_at, 'weekday 0', '-6 days') AS week_start,
+       date_trunc('week', t.requested_at)::date AS week_start,
        COUNT(*) AS trips,
        ROUND(SUM(t.fare), 2) AS earnings
 FROM trips t
@@ -261,9 +261,9 @@ ORDER BY week_start, d.driver_name`,
       ],
       columns: [
         { name: "rider_name", type: "text" },
-        { name: "requested_at", type: "text" },
+        { name: "requested_at", type: "timestamp" },
         { name: "driver_name", type: "text" },
-        { name: "fare", type: "real" },
+        { name: "fare", type: "numeric" },
       ],
       starter: `SELECT r.rider_name, t.requested_at, t.fare
 FROM trips t
@@ -307,28 +307,32 @@ ORDER BY r.rider_name`,
     },
     {
       prompt: [
-        `Operations checks in with drivers who have gone quiet. As of \`'${AS_OF}'\`, a driver is idle when their last completed trip was requested 7 or more days earlier. A driver who has never completed a trip is measured from the day they joined.`,
+        `Operations checks in with drivers who have gone quiet. As of \`DATE '${AS_OF}'\`, a driver is idle when their last completed trip was requested 7 or more days earlier. A driver who has never completed a trip is measured from the day they joined.`,
         "Only completed trips count: a request the rider cancelled is not work. Return the `driver_name`, `city`, `last_trip_on` (the date of their last completed trip, NULL if there is none) and `days_idle`, counted in whole days from that date. Longest idle first, ties by `driver_name`.",
       ],
       columns: [
         { name: "driver_name", type: "text" },
         { name: "city", type: "text" },
-        { name: "last_trip_on", type: "text" },
+        { name: "last_trip_on", type: "date" },
         { name: "days_idle", type: "integer" },
       ],
       starter: `SELECT d.driver_name, d.city
 FROM drivers d
 `,
-      solution: `SELECT d.driver_name, d.city,
-       date(MAX(t.requested_at)) AS last_trip_on,
-       CAST(julianday('${AS_OF}')
-            - julianday(COALESCE(date(MAX(t.requested_at)), d.joined_on)) AS INTEGER) AS days_idle
-FROM drivers d
-LEFT JOIN trips t
-  ON t.driver_id = d.driver_id AND t.started_at IS NOT NULL
-GROUP BY d.driver_id, d.driver_name, d.city, d.joined_on
-HAVING days_idle >= 7
-ORDER BY days_idle DESC, d.driver_name`,
+      solution: `WITH idle AS (
+  SELECT d.driver_name, d.city,
+         MAX(t.requested_at)::date AS last_trip_on,
+         DATE '${AS_OF}'
+           - COALESCE(MAX(t.requested_at)::date, d.joined_on) AS days_idle
+  FROM drivers d
+  LEFT JOIN trips t
+    ON t.driver_id = d.driver_id AND t.started_at IS NOT NULL
+  GROUP BY d.driver_id, d.driver_name, d.city, d.joined_on
+)
+SELECT driver_name, city, last_trip_on, days_idle
+FROM idle
+WHERE days_idle >= 7
+ORDER BY days_idle DESC, driver_name`,
       tests: resultShape(
         ["driver_name", "city", "last_trip_on", "days_idle"],
         3,
@@ -409,23 +413,22 @@ ORDER BY city, driver_name`,
       ],
       columns: [
         { name: "driver_name", type: "text" },
-        { name: "streak_start", type: "text" },
-        { name: "streak_end", type: "text" },
+        { name: "streak_start", type: "date" },
+        { name: "streak_end", type: "date" },
         { name: "days", type: "integer" },
       ],
-      starter: `SELECT d.driver_name, date(t.requested_at) AS day
+      starter: `SELECT d.driver_name, t.requested_at::date AS day
 FROM trips t
 JOIN drivers d ON d.driver_id = t.driver_id
 ORDER BY d.driver_name, day
 `,
       solution: `WITH active_days AS (
-  SELECT DISTINCT driver_id, date(requested_at) AS day
+  SELECT DISTINCT driver_id, requested_at::date AS day
   FROM trips
   WHERE started_at IS NOT NULL
 ), islands AS (
   SELECT driver_id, day,
-         julianday(day)
-           - ROW_NUMBER() OVER (PARTITION BY driver_id ORDER BY day) AS island
+         day - (ROW_NUMBER() OVER (PARTITION BY driver_id ORDER BY day))::int AS island
   FROM active_days
 )
 SELECT d.driver_name,
@@ -455,18 +458,18 @@ ORDER BY d.driver_name, streak_start`,
       dataset: RIDES,
       description: "Compute the median completed fare in each city without a median function.",
       solutionNote:
-        "For `n` rows, positions `(n + 1) / 2` and `(n + 2) / 2` in integer division are the same row when `n` is odd and the two middle rows when it is even, so one `WHERE rn IN (...)` and an `AVG` cover both cases. Bilbao's two middle fares are both 13.40, and the `trip_id` tie-break keeps `ROW_NUMBER` deterministic even there.",
+        "For `n` rows, positions `(n + 1) / 2` and `(n + 2) / 2` in integer division are the same row when `n` is odd and the two middle rows when it is even, so one `WHERE rn IN (...)` and an `AVG` cover both cases. Bilbao's two middle fares are both 13.40, and the `trip_id` tie-break keeps `ROW_NUMBER` deterministic even there. In production, `percentile_cont(0.5) WITHIN GROUP (ORDER BY fare)` gives the same answer in one aggregate.",
     },
     {
       prompt: [
         "A few long trips pull the average fare around, so finance wants the median: the middle fare once a city's completed trips are sorted by fare, or the mean of the two middle fares when there is an even number of them.",
-        "SQLite has no `MEDIAN`. Number each city's fares in order with `ROW_NUMBER()` (ties broken by `trip_id`), count them with `COUNT(*) OVER`, and keep the middle row or rows.",
+        "Do it without `percentile_cont`, the median Postgres has built in: number each city's fares in order with `ROW_NUMBER()` (ties broken by `trip_id`), count them with `COUNT(*) OVER`, and keep the middle row or rows.",
         "Return the `city`, the number of `completed_trips` and `median_fare` rounded to 2 decimal places. Sort by `city`.",
       ],
       columns: [
         { name: "city", type: "text" },
         { name: "completed_trips", type: "integer" },
-        { name: "median_fare", type: "real" },
+        { name: "median_fare", type: "numeric" },
       ],
       starter: `SELECT d.city, t.fare
 FROM trips t

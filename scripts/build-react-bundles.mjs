@@ -36,6 +36,21 @@ const { REACT_BUILD_OPTIONS, splitBundleOutput, vfsPlugin } = await import(
 const { ESBUILD_WASM_VERSION } = await import(
   "../app/_components/runtime/cdn.ts"
 );
+const { REACT_VERSION } = await import("../app/_components/runtime/esmResolve.ts");
+
+/**
+ * Whether a committed bundle still imports the React this build pins.
+ *
+ * The key is a hash of the block's files, because that is what the page looks
+ * a bundle up by, so it cannot see `REACT_VERSION`. Without this check a bump
+ * reuses every bundle as it was, each one still importing the old React from
+ * esm.sh, while the reader's own Run imports the new one: a preview and a Run
+ * on two different Reacts.
+ */
+function pinsCurrentReact(entry) {
+  const versions = entry.js.match(/\breact(?:-dom)?@[^/?"'\s]+/g) ?? [];
+  return versions.every((v) => v.endsWith(`@${REACT_VERSION}`));
+}
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_FILE = join(ROOT, "lib/generated/react-bundles.json");
@@ -126,7 +141,7 @@ for (const block of blocks) {
   const key = workspaceOutputKey(ADAPTER, block.files, entryName);
 
   const reusable = previous[block.file]?.[key];
-  if (reusable) {
+  if (reusable && pinsCurrentReact(reusable)) {
     (manifest[block.file] ??= {})[key] = reusable;
     reused++;
     bytes += reusable.js.length + (reusable.css?.length ?? 0);

@@ -13,7 +13,7 @@
  * (every track of an album), date bucketing by week, a share of a grand total,
  * and consecutive-day streaks.
  *
- * Every solution is executed against node:sqlite by
+ * Every solution is executed against PGlite by
  * `__tests__/challengeSolutions`, so a wrong expectation fails CI.
  */
 
@@ -97,12 +97,12 @@ ORDER BY plays DESC, t.track_title`,
       description:
         "Add up each album's track lengths and show the total as minutes and seconds.",
       solutionNote:
-        "Integer division does the work: `SUM(duration_s) / 60` drops the remainder because both sides are integers, and `% 60` is that remainder. The `%02d` is the part that gets missed; with a plain `%d`, Low Tide Radio comes out as `7:5`.",
+        "Integer division does the work: `SUM(duration_s) / 60` drops the remainder because both sides are integers, and `% 60` is that remainder. The `lpad` is the part that gets missed; without it, Low Tide Radio comes out as `7:5`.",
     },
     {
       prompt: [
         "Each track stores its length in whole seconds (`duration_s`). For every album, show the title, the artist, how many tracks it has and its total running time.",
-        "Format the running time as `m:ss`, the way a music player shows it: `7:05`, not `7:5` and not `425`. `printf('%d:%02d', minutes, seconds)` pads the seconds to two digits, and integer division (`/ 60`) and the remainder (`% 60`) give you the two parts.",
+        "Format the running time as `m:ss`, the way a music player shows it: `7:05`, not `7:5` and not `425`. Integer division (`/ 60`) and the remainder (`% 60`) give you the two parts, `lpad(seconds::text, 2, '0')` pads the seconds to two digits, and `||` joins the pieces.",
         "Longest album first.",
       ],
       columns: [
@@ -120,7 +120,8 @@ GROUP BY al.album_id, al.album_title, ar.artist_name
 ORDER BY SUM(t.duration_s) DESC
 `,
       solution: `SELECT al.album_title, ar.artist_name, COUNT(*) AS tracks,
-       printf('%d:%02d', SUM(t.duration_s) / 60, SUM(t.duration_s) % 60) AS running_time
+       (SUM(t.duration_s) / 60) || ':' || lpad((SUM(t.duration_s) % 60)::text, 2, '0')
+         AS running_time
 FROM albums al
 JOIN artists ar ON ar.artist_id = al.artist_id
 JOIN tracks  t  ON t.album_id   = al.album_id
@@ -192,7 +193,7 @@ ORDER BY t.track_title`,
       dataset: MUSIC,
       description: "Work out what share of each track's plays were skips.",
       solutionNote:
-        "In SQLite a comparison is an integer, 1 or 0, so `SUM(ms_played < 30000)` counts the skips in the same pass that `COUNT(*)` counts the plays. Multiply by `100.0` before dividing: with integers on both sides, `100 * 1 / 3` is 33 and `1 / 3 * 100` is 0.",
+        "`COUNT(*) FILTER (WHERE ms_played < 30000)` counts the skips in the same pass that `COUNT(*)` counts the plays. Multiply by `100.0` before dividing: with integers on both sides, `100 * 1 / 3` is 33 and `1 / 3 * 100` is 0.",
     },
     {
       prompt: [
@@ -203,7 +204,7 @@ ORDER BY t.track_title`,
         { name: "track_title", type: "text" },
         { name: "plays", type: "integer" },
         { name: "skips", type: "integer" },
-        { name: "skip_pct", type: "real" },
+        { name: "skip_pct", type: "numeric" },
       ],
       starter: `SELECT t.track_title, COUNT(*) AS plays
 FROM plays p
@@ -213,8 +214,8 @@ ORDER BY t.track_title
 `,
       solution: `SELECT t.track_title,
        COUNT(*) AS plays,
-       SUM(p.ms_played < 30000) AS skips,
-       ROUND(100.0 * SUM(p.ms_played < 30000) / COUNT(*), 1) AS skip_pct
+       COUNT(*) FILTER (WHERE p.ms_played < 30000) AS skips,
+       ROUND(100.0 * COUNT(*) FILTER (WHERE p.ms_played < 30000) / COUNT(*), 1) AS skip_pct
 FROM plays p
 JOIN tracks t ON t.track_id = p.track_id
 GROUP BY t.track_id, t.track_title
@@ -299,16 +300,16 @@ ORDER BY genre`,
       dataset: MUSIC,
       description: "Count sign-ups per Monday-to-Sunday week, with a running total.",
       solutionNote:
-        "Bucketing by date means mapping every day to one representative day, here its week's Monday, and grouping on that. The running total is a window over the grouped rows, `SUM(COUNT(*)) OVER (ORDER BY week_start)`. `date(d, 'weekday 1')` looks as if it finds the Monday, but it moves forward, so it files every sign-up that is not on a Monday in the following week.",
+        "Bucketing by date means mapping every day to one representative day, here its week's Monday, and grouping on that. The running total is a window over the grouped rows, `SUM(COUNT(*)) OVER (ORDER BY week_start)`. `EXTRACT(WEEK FROM d)` finds the same buckets, but only as a bare week number, which makes a poor label and repeats every year.",
     },
     {
       prompt: [
         "Group listeners by the week they signed up in, where a week runs Monday to Sunday and is labelled by the date of its Monday. Show that Monday, how many listeners signed up that week, and the running total of listeners up to and including that week.",
-        "SQLite's date modifiers can find the Monday: `date(d, 'weekday 0')` moves a date forward to the next Sunday (or leaves it alone if it already is one), and `'-6 days'` then steps back to that week's Monday. Watch the listeners who signed up on a Sunday; they belong to the week that started six days earlier.",
+        "Postgres finds the Monday for you: `date_trunc('week', d)` truncates a date to the start of its ISO week, which is always a Monday, and `::date` turns the result back into a plain date. Watch the listeners who signed up on a Sunday; they belong to the week that started six days earlier.",
         "Only weeks with at least one sign-up. Oldest week first.",
       ],
       columns: [
-        { name: "week_start", type: "text" },
+        { name: "week_start", type: "date" },
         { name: "new_listeners", type: "integer" },
         { name: "total_listeners", type: "integer" },
       ],
@@ -318,7 +319,7 @@ GROUP BY week_start
 ORDER BY week_start
 `,
       solution: `WITH signups AS (
-  SELECT date(signed_up_on, 'weekday 0', '-6 days') AS week_start
+  SELECT date_trunc('week', signed_up_on)::date AS week_start
   FROM listeners
 )
 SELECT week_start,
@@ -355,8 +356,8 @@ ORDER BY week_start`,
       ],
       columns: [
         { name: "genre", type: "text" },
-        { name: "minutes", type: "real" },
-        { name: "share_pct", type: "real" },
+        { name: "minutes", type: "numeric" },
+        { name: "share_pct", type: "numeric" },
       ],
       starter: `SELECT t.genre, ROUND(SUM(p.ms_played) / 60000.0, 1) AS minutes
 FROM plays p
@@ -389,7 +390,7 @@ ORDER BY share_pct DESC, t.genre`,
       dataset: MUSIC,
       description: "For each listener and artist, find the track they heard first.",
       solutionNote:
-        "`MIN(played_at)` finds when, but not what: the track is another column of the same row, and grouping cannot pick it. `ROW_NUMBER()` over each listener and artist, ordered by `played_at`, keeps the whole first row. SQLite will hand back the matching row's other columns beside a lone `MIN()`, but that is a SQLite quirk, and it stops working the moment the query has a second aggregate.",
+        "`MIN(played_at)` finds when, but not what: the track is another column of the same row, and grouping cannot pick it. `ROW_NUMBER()` over each listener and artist, ordered by `played_at`, keeps the whole first row. Postgres also has a shorthand for exactly this: `DISTINCT ON (listener_id, artist_id)` with an `ORDER BY` that ends in `played_at` keeps the first row of each pair.",
     },
     {
       prompt: [
@@ -400,7 +401,7 @@ ORDER BY share_pct DESC, t.genre`,
         { name: "username", type: "text" },
         { name: "artist_name", type: "text" },
         { name: "track_title", type: "text" },
-        { name: "discovered_at", type: "text" },
+        { name: "discovered_at", type: "timestamp" },
       ],
       starter: `SELECT l.username, ar.artist_name, MIN(p.played_at) AS discovered_at
 FROM plays p
@@ -511,22 +512,21 @@ ORDER BY l.username, al.album_title`,
       columns: [
         { name: "username", type: "text" },
         { name: "streak_days", type: "integer" },
-        { name: "started_on", type: "text" },
-        { name: "ended_on", type: "text" },
+        { name: "started_on", type: "date" },
+        { name: "ended_on", type: "date" },
       ],
-      starter: `SELECT l.username, COUNT(DISTINCT date(p.played_at)) AS streak_days
+      starter: `SELECT l.username, COUNT(DISTINCT p.played_at::date) AS streak_days
 FROM plays p
 JOIN listeners l ON l.listener_id = p.listener_id
 GROUP BY l.listener_id, l.username
 ORDER BY streak_days DESC, l.username
 `,
       solution: `WITH days AS (
-  SELECT DISTINCT listener_id, date(played_at) AS day
+  SELECT DISTINCT listener_id, played_at::date AS day
   FROM plays
 ), islands AS (
   SELECT listener_id, day,
-         julianday(day)
-           - ROW_NUMBER() OVER (PARTITION BY listener_id ORDER BY day) AS grp
+         day - (ROW_NUMBER() OVER (PARTITION BY listener_id ORDER BY day))::int AS grp
   FROM days
 ), streaks AS (
   SELECT listener_id,

@@ -36,7 +36,7 @@ CREATE TABLE stations (
   station_name    TEXT    NOT NULL,
   region          TEXT    NOT NULL,
   elevation_m     INTEGER NOT NULL,
-  commissioned_on TEXT    NOT NULL
+  commissioned_on DATE    NOT NULL
 );
 INSERT INTO stations VALUES
   (1, 'Saltmarsh Point', 'Coast',   4,   '2016-03-01'),
@@ -47,10 +47,10 @@ INSERT INTO stations VALUES
 
 CREATE TABLE readings (
   station_id   INTEGER NOT NULL REFERENCES stations(station_id),
-  reading_date TEXT    NOT NULL,
-  min_temp_c   REAL    NOT NULL,
-  max_temp_c   REAL    NOT NULL,
-  precip_mm    REAL,
+  reading_date DATE    NOT NULL,
+  min_temp_c   NUMERIC(4,1) NOT NULL,
+  max_temp_c   NUMERIC(4,1) NOT NULL,
+  precip_mm    NUMERIC(5,1),
   PRIMARY KEY (station_id, reading_date)
 );
 INSERT INTO readings VALUES
@@ -120,10 +120,10 @@ export const WEATHER: ChallengeDataset = {
       rows: "53",
       columns: [
         { name: "station_id", type: "integer", key: "fk" },
-        { name: "reading_date", type: "text" },
-        { name: "min_temp_c", type: "real" },
-        { name: "max_temp_c", type: "real" },
-        { name: "precip_mm", type: "real" },
+        { name: "reading_date", type: "date" },
+        { name: "min_temp_c", type: "numeric" },
+        { name: "max_temp_c", type: "numeric" },
+        { name: "precip_mm", type: "numeric" },
       ],
     },
     {
@@ -134,7 +134,7 @@ export const WEATHER: ChallengeDataset = {
         { name: "station_name", type: "text" },
         { name: "region", type: "text" },
         { name: "elevation_m", type: "integer" },
-        { name: "commissioned_on", type: "text" },
+        { name: "commissioned_on", type: "date" },
       ],
     },
   ],
