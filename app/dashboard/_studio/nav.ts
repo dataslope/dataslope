@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 
 export type StudioRouteKey =
-  | "challenges"
   | "playground"
   | "account"
   | "admin";
@@ -95,12 +94,6 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
 /** The sidebar's dashboard pages. Admin is filtered by the shell. */
 export const PAGE_ITEMS: StudioNavItem[] = [
   {
-    key: "challenges",
-    label: "Challenges",
-    href: "/dashboard/challenges",
-    icon: Code2,
-  },
-  {
     key: "playground",
     label: "Playground",
     href: "/dashboard/playground",
@@ -111,13 +104,13 @@ export const PAGE_ITEMS: StudioNavItem[] = [
 ];
 
 /**
- * The rest of the site, listed under the dashboard pages. The header's
- * "Challenges" link lands inside this shell, and without these the only way
- * back to Courses or Interview Prep was the logo. They leave the shell (the
- * main site has its own layout) but stay in this tab.
+ * The rest of the site, listed under the dashboard pages, so the logo is not
+ * the only way back to it. They leave the shell (the main site has its own
+ * header and footer) but stay in this tab.
  */
 export const SITE_ITEMS: StudioNavItem[] = [
   { key: "courses", label: "Courses", href: "/courses", icon: GraduationCap },
+  { key: "challenges", label: "Challenges", href: "/challenges", icon: Code2 },
   {
     key: "interview-prep",
     label: "Interview Prep",
@@ -128,7 +121,7 @@ export const SITE_ITEMS: StudioNavItem[] = [
 
 /** Human breadcrumb label for a route key. */
 export function crumbFor(key: StudioRouteKey): string {
-  return PAGE_ITEMS.find((i) => i.key === key)?.label ?? "Challenges";
+  return PAGE_ITEMS.find((i) => i.key === key)?.label ?? "Playground";
 }
 
 /**
@@ -137,10 +130,9 @@ export function crumbFor(key: StudioRouteKey): string {
  */
 export function activeKeyForPath(pathname: string): StudioRouteKey {
   const path = pathname.replace(/\/+$/, "") || "/";
-  if (path.startsWith("/dashboard/playground")) return "playground";
   if (path.startsWith("/dashboard/account")) return "account";
   if (path.startsWith("/dashboard/admin")) return "admin";
-  return "challenges";
+  return "playground";
 }
 
 /** The admin sub-item a pathname is on, or null. `/dashboard/admin` is the

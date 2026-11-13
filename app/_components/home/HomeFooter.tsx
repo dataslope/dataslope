@@ -15,6 +15,7 @@ const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 // The header's destinations plus the home page's FAQ.
 const EXPLORE_LINKS = [
   { href: "/courses", label: "Courses", external: false },
+  { href: "/challenges", label: "Challenges", external: false },
   { href: "/interview-prep", label: "Interview Prep", external: false },
   { href: "/playground", label: "Playgrounds", external: false },
   { href: "/pricing", label: "Pricing", external: false },

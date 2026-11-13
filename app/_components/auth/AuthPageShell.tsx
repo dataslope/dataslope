@@ -9,13 +9,9 @@ import Link from "../Link";
 import { ThemePillToggle } from "../ThemePillToggle";
 import { AuthGlobe } from "./AuthGlobe";
 
-// Applies the persisted light/dark choice before first paint (no flash).
-const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
-
 export function AuthPageShell({ children }: { children: ReactNode }) {
   return (
     <>
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       {/* `dark:[--ui-card:#121212]` repaints every `bg-card` descendant (the
           card body + the "or continue with" separator) so they match the page,
           keeping the dark surface seamless.

@@ -42,7 +42,7 @@ const NAV_SECTIONS: {
 }[] = [
   { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
   // Learn → do → drill, so this sits between Courses and Interview Prep.
-  { href: "/dashboard/challenges", label: "Challenges", icon: Code2 },
+  { href: "/challenges", label: "Challenges", icon: Code2 },
   // The slot after this one is reserved for a sixth item, a "Projects" page,
   // to be added once that surface exists. It replaces an earlier "Practice"
   // plan, dropped because Challenges is already the practice surface and two
@@ -103,9 +103,13 @@ function NavLink({
       // font-size animates with the color so the step down moves with the
       // nav's height. Base size and padding target the tightest desktop band,
       // now lg–xl: that is where six items first have to fit, so the step up
-      // waits for xl rather than lg.
+      // waits for xl rather than lg. That band is 14px rather than 13px: the
+      // drop from 15px read as a different menu, and measured at 1024 (its
+      // tightest point, signed out) the menu still clears the brand by
+      // 131px and the right-hand cluster by 65px. The brand steps down in
+      // the same band (see `BrandLogo`) to keep the two in proportion.
       className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 font-medium transition-[color,font-size] duration-200 xl:px-3 ${
-        compact ? "text-[13px] xl:text-[14.5px]" : "text-[13px] xl:text-[15px]"
+        compact ? "text-sm xl:text-[14.5px]" : "text-sm xl:text-[15px]"
       } ${
         active
           ? activeClass
@@ -130,7 +134,7 @@ function GitHubLink({ compact }: { compact?: boolean }) {
         compact ? "size-[34px]" : "size-9"
       }`}
     >
-      <GitHubIcon size={compact ? 17 : 18} />
+      <GitHubIcon size={compact ? 19 : 20} />
     </a>
   );
 }
@@ -159,8 +163,11 @@ function BrandLogo({ compact }: { compact?: boolean }) {
         alt=""
         // `height` (not `transform: scale`) so it can't fight the hover
         // rotate on the same property.
+        // One step smaller across lg–xl, the band where the inline menu first
+        // appears at its smaller size, so the brand does not outweigh it.
+        // Phones keep the full size: they have no inline menu beside it.
         className={`relative top-px w-auto transition-[transform,height] duration-200 will-change-transform group-hover:rotate-[8deg] ${
-          compact ? "h-[12px]" : "h-[13px]"
+          compact ? "h-[12px] lg:h-[11px] xl:h-[12px]" : "h-[13px] lg:h-[12px] xl:h-[13px]"
         }`}
         aria-hidden="true"
       />
@@ -173,7 +180,7 @@ function BrandLogo({ compact }: { compact?: boolean }) {
           and no overflow. */}
       <span
         className={`font-semibold tracking-tight text-[#121212] transition-[transform,font-size] duration-200 will-change-transform group-hover:translate-x-0.5 dark:text-white ${
-          compact ? "text-[17px]" : "text-lg"
+          compact ? "text-[17px] lg:text-base xl:text-[17px]" : "text-lg lg:text-[17px] xl:text-lg"
         }`}
       >
         Dataslope
@@ -396,12 +403,17 @@ export function HomeNav() {
             Measured headroom — twice the slack on the tighter flexible edge,
             since a centred menu spends it on both — is 262px at 1280, 518px
             at 1536 and 902px at 1920, against the +32px and +64px these two
-            steps cost. lg–xl steps the least because it is the tight band:
-            120px of headroom at 1024, and the one a sixth item has to fit.
-            6px is what that affords. Measured at 1024 with a real sixth
+            steps cost. lg–xl is the tight band, and the one a sixth item has
+            to fit, so its gap is fluid rather than fixed: 10px at 1024,
+            growing with the viewport to 16px at 1279, the xl value. A fixed
+            6px held the band to 22px between labels against 40px at xl, so
+            the menu visibly bunched up as the type stepped down; the fluid
+            gap keeps that drop small and spends the room only where it
+            exists. Measured at 1024, the tightest point, with a real sixth
             item injected (not the widest label as a proxy, which is 40px
-            pessimistic): 6px clears by 17px a side, 8px by 12px. */}
-        <div className="ds-nav-menu items-center justify-center gap-1.5 xl:gap-4 2xl:gap-6">
+            pessimistic) and signed out: 10px clears the right-hand cluster
+            by 17px, the margin the old 6px was chosen for at 13px type. */}
+        <div className="ds-nav-menu items-center justify-center gap-[clamp(10px,calc(10px_+_(100vw_-_1024px)_*_0.0235),16px)] xl:gap-4 2xl:gap-6">
           {NAV_SECTIONS.map(({ href, label, prefetch, badge, activeClass }) => (
             <NavLink
               key={href}

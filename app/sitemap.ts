@@ -59,11 +59,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   }
 
-  // The challenge catalog and every workspace. The catalog stays at its
-  // /dashboard URL (`/challenges` only redirects there), and every slug is
-  // prerendered, so each entry here is a real page.
-  entries.set(abs("/dashboard/challenges"), {
-    url: abs("/dashboard/challenges"),
+  // The challenge catalog and every workspace. Every slug is prerendered, so
+  // each entry here is a real page.
+  entries.set(abs("/challenges"), {
+    url: abs("/challenges"),
     changeFrequency: "weekly",
     priority: 0.9,
   });

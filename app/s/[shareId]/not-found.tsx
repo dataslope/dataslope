@@ -5,12 +5,10 @@ import Link from "next/link";
 
 import { HomeNav } from "@/app/_components/home/HomeNav";
 import { HomeFooter } from "@/app/_components/home/HomeFooter";
-import { THEME_BOOTSTRAP } from "@/app/_components/home/themeBootstrap";
 
 export default function ShareNotFound() {
   return (
     <>
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       <div
         style={{ fontFamily: "var(--font-sans, Inter, system-ui, sans-serif)" }}
         className="ds-home min-h-screen bg-white text-[var(--ds-gray-800)] dark:bg-[#121212] dark:text-[var(--ds-gray-100)]"

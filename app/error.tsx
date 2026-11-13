@@ -7,7 +7,6 @@
 import "@/app/tailwind.css";
 import { useEffect, useSyncExternalStore } from "react";
 
-import { THEME_BOOTSTRAP } from "@/app/_components/home/themeBootstrap";
 import {
   isStaleBuildCrash,
   neverStale,
@@ -42,7 +41,6 @@ export default function GlobalError({
 
   return (
     <>
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       <main
         style={{ fontFamily: "var(--font-sans, Inter, system-ui, sans-serif)" }}
         className="flex min-h-screen items-center justify-center bg-white px-4 text-[var(--ds-gray-800)] dark:bg-[#121212] dark:text-[var(--ds-gray-100)]"

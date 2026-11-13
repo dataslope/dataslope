@@ -91,12 +91,16 @@ const nextConfig: NextConfig = {
   // mirrors are NOT rewrites — they're static assets emitted into
   // `public/courses/` by scripts/build-course-md.mjs, keeping ~780 prerenders
   // out of `next build` and the R2 cache populate.
-  // `/dashboard` has no page of its own; land it on the challenge catalog.
+  // `/dashboard` has no page of its own; land it on the first page of the
+  // shell. `/dashboard/challenges` is where the challenge catalog lived before
+  // it moved out of the shell onto the main site's header and footer, so old
+  // links and bookmarks follow it.
   // Flat `/courses/<lesson>` links redirect via lib/courseAliasRedirects.ts
   // (see there for why ambiguous slugs deliberately 404); redirects run
   // before the catch-all route can reject them.
   redirects: async () => [
-    { source: "/dashboard", destination: "/dashboard/challenges", permanent: false },
+    { source: "/dashboard", destination: "/dashboard/playground", permanent: false },
+    { source: "/dashboard/challenges", destination: "/challenges", permanent: true },
     ...courseAliasRedirects(),
   ],
   rewrites: async () => ({

@@ -15,7 +15,6 @@ import {
   ChevronDown,
   ChevronRight,
   Copy,
-  Eye,
   Loader2,
   Table2,
   XCircle,
@@ -438,8 +437,11 @@ export function TablesPanel({
               className={[s.tablePick, on ? s.tablePickOn : ""].filter(Boolean).join(" ")}
               onClick={() => onSelect(table.name)}
             >
+              <Table2 size={13} strokeWidth={2} aria-hidden="true" />
               {table.name}
-              <span className={s.tablePickRows}>{table.rows}</span>
+              <span className={s.tablePickRows}>
+                {table.rows} {table.rows === "1" ? "row" : "rows"}
+              </span>
             </button>
           );
         })}
@@ -722,39 +724,6 @@ function TestRow({ test, mobile }: { test: TestOutcome; mobile?: boolean }) {
 }
 
 // ─── Solution ────────────────────────────────────────────────────────
-
-/**
- * What the Solution tab shows until the learner asks for the answer.
- *
- * One click used to put the whole reference solution on screen, which is an
- * easy way to spoil a problem by accident while looking for the Submissions
- * tab. Asking once more, in place rather than in a dialog, is enough to make
- * it a decision. Nothing is locked: a step the learner has not reached yet
- * can still be read ahead, as before.
- */
-export function SolutionGate({
-  scope,
-  onReveal,
-}: {
-  /** "this step" or "this challenge". */
-  scope: string;
-  onReveal: () => void;
-}) {
-  return (
-    <div className={s.solutionGate}>
-      <p className={s.solutionGateTitle}>Reveal the reference solution?</p>
-      <p className={s.solutionGateText}>
-        It shows a complete answer to {scope}. If a check is failing, the Test
-        cases tab says which one and what came back, which is often enough to
-        find the bug yourself.
-      </p>
-      <button type="button" className={s.secondaryBtn} onClick={onReveal}>
-        <Eye size={13} strokeWidth={2} aria-hidden="true" />
-        Reveal solution
-      </button>
-    </div>
-  );
-}
 
 export function SolutionPanelView({
   note,

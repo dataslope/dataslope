@@ -37,7 +37,7 @@ import {
 import { useViewportWidth } from "./useViewportWidth";
 
 export function StudioShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname() ?? "/dashboard/challenges";
+  const pathname = usePathname() ?? "/dashboard/playground";
   const active = activeKeyForPath(pathname);
   const { data: session } = useSession();
 

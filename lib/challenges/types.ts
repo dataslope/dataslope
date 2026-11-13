@@ -290,7 +290,7 @@ export interface Challenge {
   difficulty: Difficulty;
   /** This challenge's row in the catalog list. */
   catalog: ChallengeCatalogMeta;
-  /** Subtitle beside the difficulty meter on mobile, e.g. "SQL". */
+  /** Subtitle beside the difficulty meter on mobile, e.g. "SQLite". */
   languageLabel: string;
   description: string;
   runtime: ChallengeRuntimeSpec;
@@ -326,7 +326,7 @@ export interface ChallengeLink {
 
 // ─── Catalog index ───────────────────────────────────────────────────
 
-/** One row of the challenge list at `/dashboard/challenges`. */
+/** One row of the challenge list at `/challenges`. */
 export interface ChallengeIndexEntry extends ChallengeCatalogMeta {
   title: string;
   /** 1 Beginner, 2 Intermediate, 3 Advanced — the filled difficulty bars. */

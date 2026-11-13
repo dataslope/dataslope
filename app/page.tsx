@@ -39,15 +39,10 @@ export const metadata: Metadata = {
   },
 };
 
-// Applies the persisted theme before first paint so a returning dark-mode
-// visitor never sees a light flash. The explicit `light` class also stops
-// scheme-detecting components from falling back to the OS preference.
-const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
-
 // Figures for the home page's bento grid. Corpus counts come from
 // `scripts/build-home-stats.mjs` at build time — keep this path free of
 // `node:fs`, which does not exist on Cloudflare Workers. The challenge count
-// is the catalog module itself, the same list /dashboard/challenges renders.
+// is the catalog module itself, the same list /challenges renders.
 // Flooring is a display choice; the grid appends "+" so the figure stays
 // honest.
 function getHomeStats(courses: CatalogCourse[]): HomeStats {
@@ -68,7 +63,6 @@ export default async function Home() {
   const stats = getHomeStats(courses);
   return (
     <>
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       <JsonLd data={[organizationLd(), websiteLd()]} />
       <HomeClient courses={courses} stats={stats} />
     </>

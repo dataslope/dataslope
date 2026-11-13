@@ -100,7 +100,7 @@ export function StatsBento({
       Icon: ChallengesIcon,
       name: `${stats.challenges.toLocaleString()}+ code challenges`,
       description: `Graded SQL and coding problems, plus ${stats.lessonExercises.toLocaleString()}+ in-lesson exercises.`,
-      href: "/dashboard/challenges",
+      href: "/challenges",
       cta: "Browse challenges",
       className: "col-span-3 lg:col-span-1",
       iconClassName: ICON_SIZE,
