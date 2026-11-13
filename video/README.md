@@ -381,6 +381,13 @@ Every video follows these rules.
   override either. A line of text under a row of badges keeps at least
   20px clear of the tint (the owner: "make sure the description text under
   each badge has enough top spacing").
+  **Or outlined** (the owner, 2026-11-13: "I like the badge or pill design
+  with transparent (white) background and black text and border, or colored
+  border with colored text"): `OutlineBadge` / `outlineBadgeStyle(tone,
+  size)`, no fill, a 2px border and text in one ink, `"ink"` for near-black
+  or a hue for an accent. The owner chooses per slide which badges take it;
+  where a tinted badge stays, its text may take its hue's ink
+  (`outlineInk(tone)`) rather than black.
   **A diagram's boxes are outlined, not filled** (the owner, 2026-11-12: "I
   actually like the old badge design with a transparent background and
   black border better"): the nodes of a causal sketch or a flow, the cells
