@@ -56,6 +56,16 @@ async function catalogSlugs(page: Page): Promise<string[]> {
   return slugs;
 }
 
+/**
+ * Choose an option in one of the catalog's filter dropdowns. They are Base UI
+ * selects (a button and a listbox), not native `<select>`s, so each option can
+ * carry an icon; `selectOption` does not apply to them.
+ */
+async function pickOption(page: Page, label: string, option: string): Promise<void> {
+  await page.getByRole("combobox", { name: label }).click();
+  await page.getByRole("option", { name: option, exact: false }).first().click();
+}
+
 async function openWorkspace(page: Page, slug: string): Promise<void> {
   await page.goto(`/challenges/${slug}`);
   await page.waitForFunction(
@@ -277,12 +287,12 @@ test.describe("Challenge workspace", () => {
     await expect(page.locator("body")).toContainText("Editor unlocks when step 1 passes");
 
     // The solution is readable in advance, by design — step 2's answer
-    // reverses each transposed row. It is one confirmation away (CH-9), not
-    // one click: the tab asks first, then shows it.
-    await page.getByRole("tab", { name: "Solution", exact: true }).click();
+    // reverses each transposed row. Opening the tab shows it, with no
+    // second confirmation.
     await expect(page.locator("body")).not.toContainText("row.reverse()");
-    await page.getByRole("button", { name: "Reveal solution" }).click();
+    await page.getByRole("tab", { name: "Solution", exact: true }).click();
     await expect(page.locator("body")).toContainText("row.reverse()");
+    await expect(page.getByRole("button", { name: "Reveal solution" })).toHaveCount(0);
   });
 
   test("the editor can be left with the keyboard", async ({ page }) => {
@@ -328,41 +338,41 @@ test.describe("Challenge workspace", () => {
   test("lists 50 a page, and changing the size keeps your place", async ({ page }) => {
     await page.goto("/challenges?page=3");
     await page.waitForLoadState("networkidle");
-    const perPage = page.getByLabel("Challenges per page");
-    await expect(perPage).toHaveValue("50");
+    const perPage = page.getByRole("combobox", { name: "Challenges per page" });
+    await expect(perPage).toHaveText("50");
     await expect(page.locator("table tbody tr")).toHaveCount(50);
     await expect(page.getByText("101–150 of 300")).toBeVisible();
 
     // Row 101 was at the top; at 10 a page it lives on page 11.
-    await perPage.selectOption("10");
+    await pickOption(page, "Challenges per page", "10");
     await expect(page).toHaveURL(/page=11/);
     await expect(page).toHaveURL(/per=10/);
     await expect(page.locator("table tbody tr")).toHaveCount(10);
     await expect(page.getByText("101–110 of 300")).toBeVisible();
 
     await page.reload();
-    await expect(page.getByLabel("Challenges per page")).toHaveValue("10");
+    await expect(perPage).toHaveText("10");
 
     // The default is left out of the URL, like an empty filter. The select is
     // server-rendered, so wait for hydration before changing it (see the
-    // next test): a change before React attaches is a DOM change only.
+    // next test): a pick before React attaches goes nowhere.
     await page.waitForLoadState("networkidle");
-    await page.getByLabel("Challenges per page").selectOption("50");
+    await pickOption(page, "Challenges per page", "50");
     await expect(page).not.toHaveURL(/per=/);
   });
 
   test("filters live in the URL and survive a reload", async ({ page }) => {
     await page.goto("/challenges");
     // The rows are server-rendered, so the select exists before React has
-    // attached to it. Setting it pre-hydration changes the DOM value and
-    // nothing else, so wait for the chunks to land first.
+    // attached to it. A pick before hydration goes nowhere, so wait for the
+    // chunks to land first.
     await page.waitForLoadState("networkidle");
-    await page.getByLabel("Language").selectOption("python");
+    await pickOption(page, "Language", "Python");
     await expect(page).toHaveURL(/lang=python/);
 
     const beforeReload = await page.locator("table tbody tr").count();
     await page.reload();
-    await expect(page.getByLabel("Language")).toHaveValue("python");
+    await expect(page.getByRole("combobox", { name: "Language" })).toHaveText(/^Python/);
     expect(await page.locator("table tbody tr").count()).toBe(beforeReload);
   });
 
@@ -427,10 +437,17 @@ test.describe("Challenge workspace", () => {
     page,
   }) => {
     await page.goto("/challenges");
-    const labels = await page.getByLabel("Language").locator("option").allTextContents();
-    expect(labels[0]).toBe("All languages");
-    for (const label of labels.slice(1)) expect(label).toMatch(/^[\w+#. ]+ \(\d+\)$/);
-    expect(labels.some((l) => l.startsWith("Python ("))).toBe(true);
+    await page.waitForLoadState("networkidle");
+    await page.getByRole("combobox", { name: "Language" }).click();
+    const options = page.getByRole("option");
+    await expect(options.first()).toHaveText("All languages");
+    const labels = await options.allTextContents();
+    // Each language option is its name followed by its count, which sits in
+    // its own element (`data-count`) so the menu can align the numbers.
+    const counts = await page.locator("[role=option] [data-count]").allTextContents();
+    expect(counts).toHaveLength(labels.length - 1);
+    for (const count of counts) expect(count).toMatch(/^\d+$/);
+    expect(labels.some((l) => l.startsWith("Python"))).toBe(true);
     expect(labels.some((l) => l.startsWith("PostgreSQL"))).toBe(false);
     expect(labels.some((l) => l.startsWith("DuckDB"))).toBe(false);
   });
@@ -543,14 +560,14 @@ test.describe("Challenge workspace", () => {
       page.evaluate(() => window.__dsChallengeWorkspace?.["two-sum"]?.currentTaskKey()),
     ).toBe("javascript");
 
-    // Solution opens the results on that tab, behind its confirmation.
+    // Solution opens the results on that tab, showing the solution itself.
     await more.click();
     await menu.getByRole("menuitem", { name: "Solution" }).click();
     await expect(page.getByRole("tab", { name: "Solution" })).toHaveAttribute(
       "aria-selected",
       "true",
     );
-    await expect(page.getByRole("button", { name: "Reveal solution" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Reference solution/ })).toBeVisible();
 
     // And the next challenge.
     await more.click();

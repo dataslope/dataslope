@@ -37,7 +37,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Code2,
-  Database,
   Eye,
   History,
   Lightbulb,
@@ -82,7 +81,6 @@ import {
   OutputPanelView,
   SchemaAccordion,
   SchemaList,
-  SolutionGate,
   SolutionPanelView,
   SubmissionsPanel,
   SubmitErrorPanel,
@@ -93,6 +91,7 @@ import { ChallengeEditor } from "./ChallengeEditor";
 import { MoreMenu, type MoreMenuItem } from "./MoreMenu";
 import { useChallengeRunner, type RunMode } from "./useChallengeRunner";
 import { registerWorkspaceForTests } from "./testRegistry";
+import { LangIcon } from "@/app/_components/languageIcons";
 import s from "./ChallengeWorkspace.module.css";
 
 type ResultTab = "output" | "tests" | "tables" | "solution" | "subs";
@@ -161,8 +160,6 @@ export function ChallengeWorkspace({
   // The phone tab the learner picked, or null for the default (see below).
   const [mobileChoice, setMobileView] = useState<MobileView | null>(null);
   const [openTable, setOpenTable] = useState<string | null>(null);
-  /** Tasks whose reference solution the learner asked to see this session. */
-  const [revealed, setRevealed] = useState<string[]>([]);
   const [outcome, setOutcome] = useState<{
     mode: RunMode;
     output: OutputPanel;
@@ -182,7 +179,7 @@ export function ChallengeWorkspace({
   /** The results banner, focused after a submission so Tab continues there. */
   const bannerRef = useRef<HTMLDivElement>(null);
   const mobileBannerRef = useRef<HTMLDivElement>(null);
-  /** The result panels, which take focus when the solution is revealed. */
+  /** The result panels, focusable so they scroll by keyboard. */
   const panelRef = useRef<HTMLDivElement>(null);
   const mobilePanelRef = useRef<HTMLDivElement>(null);
   /** Ids for the result tabs; both layouts render a set, so each gets a prefix. */
@@ -262,6 +259,13 @@ export function ChallengeWorkspace({
 
   const language: ChallengeLanguage | undefined =
     challenge.languages.find((l) => l.id === langId) ?? challenge.languages[0];
+  /**
+   * The logo beside a language's name in the editor header. A database
+   * challenge is written in its engine's dialect, so it shows that engine
+   * (SQLite, PostgreSQL) rather than a generic database glyph.
+   */
+  const languageIconId = (l: ChallengeLanguage | undefined) =>
+    challenge.runtime.kind === "sql" ? challenge.runtime.dialect : (l?.id ?? "");
   const step: ChallengeStep | undefined = multiStep
     ? challenge.steps[stepIndex]
     : undefined;
@@ -664,21 +668,6 @@ export function ChallengeWorkspace({
     outcome?.mode === "submit" && allPassed && nextStepIndex === null && next !== null;
   const nextChallengeLabel = next ? `Next challenge: ${next.title}` : "";
 
-  /**
-   * A solution the learner has earned is shown straight away: the task has
-   * passed, or they already asked for it this session. Otherwise the tab asks
-   * first (see `SolutionGate`).
-   */
-  const taskPassed = multiStep
-    ? step !== undefined && progress.passedSteps.includes(step.n)
-    : progress.solved;
-  const solutionOpen = taskPassed || revealed.includes(taskKey);
-  const revealSolution = useCallback(() => {
-    setRevealed((keys) => (keys.includes(taskKey) ? keys : [...keys, taskKey]));
-    // The button that had focus is gone; the panel it opened takes it.
-    requestAnimationFrame(() => focusVisible(panelRef.current, mobilePanelRef.current));
-  }, [taskKey]);
-
   const resultPanel = (mobile: boolean) => {
     switch (resultTab) {
       case "output":
@@ -750,11 +739,9 @@ export function ChallengeWorkspace({
         // on the editor, not on the explanation: a learner who wants to read
         // ahead is allowed to, and someone stuck on step 1 can see where the
         // build is going before committing to it. Deliberate product choice —
-        // `e2e/challenge-workspace` pins both halves of it. The one thing in
-        // the way is `SolutionGate`, which asks once, so a stray click on the
-        // tab does not spoil the problem.
+        // `e2e/challenge-workspace` pins both halves of it. Opening the tab
+        // is the decision to look, so there is no second "Reveal" step.
         if (!task) return null;
-        if (!solutionOpen) return <SolutionGate scope={scope} onReveal={revealSolution} />;
         return (
           <SolutionPanelView
             note={step?.solutionNote ?? challenge.solutionNote}
@@ -1210,7 +1197,7 @@ export function ChallengeWorkspace({
                       aria-expanded={langOpen}
                       onClick={() => setLangOpen((v) => !v)}
                     >
-                      <Code2 size={13} strokeWidth={2} aria-hidden="true" />
+                      <LangIcon id={languageIconId(language)} size={13} />
                       <span>{language?.label}</span>
                       <ChevronDown
                         size={12}
@@ -1233,6 +1220,7 @@ export function ChallengeWorkspace({
                               setLangOpen(false);
                             }}
                           >
+                            <LangIcon id={languageIconId(l)} size={13} />
                             <span className={s.langOptionLabel}>{l.label}</span>
                             {l.id === language?.id ? (
                               <Check size={13} strokeWidth={2.5} aria-hidden="true" />
@@ -1244,7 +1232,7 @@ export function ChallengeWorkspace({
                   </div>
                 ) : (
                   <span className={s.editorLabel}>
-                    <Database size={13} strokeWidth={2} aria-hidden="true" />
+                    <LangIcon id={languageIconId(language)} size={13} />
                     {language?.shortLabel}
                   </span>
                 )}
@@ -1428,11 +1416,7 @@ export function ChallengeWorkspace({
             <div className={s.mCodePane}>
               <div className={s.mCodeHead}>
                 <span className={s.editorLabel}>
-                  {challenge.languages.length > 1 ? (
-                    <Code2 size={13} strokeWidth={2} aria-hidden="true" />
-                  ) : (
-                    <Database size={13} strokeWidth={2} aria-hidden="true" />
-                  )}
+                  <LangIcon id={languageIconId(language)} size={13} />
                   {language?.shortLabel}
                 </span>
                 <span className={s.mCodeHeadRight}>

@@ -180,7 +180,7 @@ function sqlBase(common: SqlCommon): Omit<Challenge, "steps" | "instructions" | 
     title: common.title,
     difficulty: common.difficulty,
     catalog: { topic: common.topic, langs: ["sqlite"] as IndexLanguage[] },
-    languageLabel: "SQL",
+    languageLabel: "SQLite",
     description: common.description,
     runtime: { kind: "sql", dialect: "sqlite", initSql: common.dataset.initSql },
     schema: common.dataset.schema,
@@ -204,8 +204,8 @@ export function sqlChallenge(common: SqlCommon, task: SqlTaskSpec): Challenge {
     languages: [
       {
         id: "sql",
-        label: "SQL · SQLite",
-        shortLabel: "SQL",
+        label: "SQLite",
+        shortLabel: "SQLite",
         starterCode: task.starter,
         solutionCode: task.solution,
         tests: task.tests,
@@ -232,8 +232,8 @@ export function sqlSteps(common: SqlCommon, steps: SqlStepSpec[]): Challenge {
     languages: [
       {
         id: "sql",
-        label: "SQL · SQLite",
-        shortLabel: "SQL",
+        label: "SQLite",
+        shortLabel: "SQLite",
         starterCode: "",
         solutionCode: "",
         tests: [],

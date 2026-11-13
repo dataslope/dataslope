@@ -860,22 +860,24 @@ a.primaryBtn {
 
 /* ─── Tables tab ────────────────────────────────────────────────────── */
 
+/* One choice per table, styled like the result tabs above it: no fill on
+   hover or selection, only the label and icon changing color. */
 .tablePicker {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   flex-shrink: 0;
   overflow-x: auto;
-  padding: 10px 8px 6px;
+  padding: 10px 6px 8px;
 }
 
 .tablePick {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
   flex-shrink: 0;
   border: 0;
-  border-radius: 2px;
+  border-radius: 6px;
   background: transparent;
   padding: 5px 8px;
   font-family: var(--cw-font-mono);
@@ -883,19 +885,39 @@ a.primaryBtn {
   font-weight: 500;
   white-space: nowrap;
   color: var(--cw-text-muted);
+  transition: color 0.12s;
+}
+.tablePick svg {
+  flex-shrink: 0;
+  color: var(--cw-text-faint);
+  transition: color 0.12s;
 }
 .tablePick:hover {
-  color: var(--cw-ink);
+  color: var(--cw-text-strong);
 }
-.tablePickOn {
-  background: var(--cw-bg-hover);
-  color: var(--cw-ink);
+.tablePick:hover svg {
+  color: var(--cw-text-muted);
+}
+.tablePickOn,
+.tablePickOn:hover {
+  color: var(--cw-accent-link);
+}
+.tablePickOn svg,
+.tablePickOn:hover svg {
+  color: var(--cw-accent-link);
+}
+.tablePick:focus-visible {
+  outline: 2px solid var(--cw-focus);
+  outline-offset: -2px;
 }
 .tablePickRows {
   font-family: var(--cw-font-ui);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 400;
   color: var(--cw-text-faint);
+}
+.tablePickOn .tablePickRows {
+  color: var(--cw-text-muted);
 }
 .tablePickSpin {
   margin-left: 6px;
@@ -1118,8 +1140,9 @@ a.primaryBtn {
 /* ─── Result tabs ───────────────────────────────────────────────────── */
 
 /* The tabs sit flush: edge to edge in the strip and against each other, each
-   the full height of the row, so the selected one is a block of tint rather
-   than a pill floating in padding. */
+   the full height of the row. Neither hover nor the selected tab paints a
+   background: hover darkens the label and icon, and the selected tab turns
+   them brand blue, so the strip stays one quiet surface. */
 .paneHeadTabs {
   padding: 0;
 }
@@ -1149,15 +1172,18 @@ a.primaryBtn {
   color: var(--cw-text-muted);
   white-space: nowrap;
 }
+.tab {
+  transition: color 0.12s;
+}
 .tab:hover {
-  color: var(--cw-ink);
+  color: var(--cw-text-strong);
 }
 .tab svg {
   flex-shrink: 0;
 }
-.tabOn {
-  background: var(--cw-bg-hover);
-  color: var(--cw-ink);
+.tabOn,
+.tabOn:hover {
+  color: var(--cw-accent-link);
 }
 .tab:focus-visible {
   outline: 2px solid var(--cw-focus);
@@ -1185,8 +1211,7 @@ a.primaryBtn {
   min-height: 0;
   overflow: auto;
 }
-/* The result panels take focus: to scroll by keyboard, and after the
-   solution is revealed. */
+/* The result panels take focus, to scroll by keyboard. */
 .resultBody:focus-visible,
 .mResultPanel:focus-visible {
   outline: 2px solid var(--cw-focus);
@@ -1195,32 +1220,41 @@ a.primaryBtn {
 
 /* ─── Output: result table ──────────────────────────────────────────── */
 
+/* A data grid, shared by the Output and Tables tabs. Column names are
+   identifiers, so they are set in mono like the values beneath them, on a
+   tinted header that stays put while the rows scroll. Rows are told apart by
+   alternating tint rather than a rule under each one. */
 .outTable {
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   width: 100%;
   font-family: var(--cw-font-mono);
   font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
 }
 .outTable th {
   position: sticky;
   top: 0;
-  border-bottom: 1px solid var(--cw-border);
-  background: var(--cw-bg);
+  z-index: 1;
+  border-top: 1px solid var(--cw-border-light);
+  border-bottom: 1px solid var(--cw-border-light);
+  background: var(--cw-bg-muted);
   padding: 8px 14px;
   text-align: left;
-  font-family: var(--cw-font-ui);
   font-weight: 500;
-  letter-spacing: -0.01em;
   white-space: nowrap;
-  color: var(--cw-text-muted);
+  color: var(--cw-text-secondary);
 }
 .outTable td {
-  padding: 6px 14px;
+  padding: 7px 14px;
   white-space: nowrap;
   color: var(--cw-text-body);
 }
-.outTable tbody tr:hover td {
+.outTable tbody tr:nth-child(even) td {
   background: var(--cw-bg-muted);
+}
+.outTable tbody tr:hover td {
+  background: var(--cw-accent-tint);
 }
 
 .outFooter {
@@ -1468,29 +1502,6 @@ a.primaryBtn {
   flex-direction: column;
   gap: 14px;
   padding: 16px 14px 24px;
-}
-
-/* Asked before the reference solution is shown (see `SolutionGate`). */
-.solutionGate {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 18px 14px 24px;
-}
-.solutionGateTitle {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--cw-text-strong);
-}
-.solutionGateText {
-  margin: 0 0 4px;
-  max-width: 560px;
-  font-size: 13px;
-  line-height: 1.65;
-  text-wrap: pretty;
-  color: var(--cw-text-body);
 }
 
 .solutionText {

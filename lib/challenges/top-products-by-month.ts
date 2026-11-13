@@ -42,7 +42,7 @@ export const TOP_PRODUCTS_BY_MONTH: Challenge = {
   title: "Top Products by Month",
   difficulty: "Intermediate",
   catalog: { topic: "Window functions", langs: ["sqlite"] },
-  languageLabel: "SQL",
+  languageLabel: "SQLite",
   description:
     "Break a monthly revenue ranking into three gated steps: total revenue per product per month, rank within each month, then cut to the top three.",
   runtime: { kind: "sql", dialect: "sqlite", initSql: RETAIL.initSql },
@@ -66,8 +66,8 @@ export const TOP_PRODUCTS_BY_MONTH: Challenge = {
   languages: [
     {
       id: "sql",
-      label: "SQL · SQLite",
-      shortLabel: "SQL",
+      label: "SQLite",
+      shortLabel: "SQLite",
       starterCode: "",
       solutionCode: "",
       tests: [],
