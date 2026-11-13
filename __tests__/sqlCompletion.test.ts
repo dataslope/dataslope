@@ -1077,3 +1077,26 @@ describe("what a bare Enter may take", () => {
     expect(accepts("SELECT cust|", "customers")).toBe(false);
   });
 });
+
+describe("statement shapes that used to lose scope", () => {
+  it("keeps a comma-joined table that sits on its own line", () => {
+    const oneLine = labels(complete("SELECT  FROM customers c, orders o WHERE o.|"));
+    const multiLine = labels(complete("SELECT *\nFROM customers c,\n     orders o\nWHERE o.|"));
+    expect(oneLine).toContain("customer_id");
+    expect(multiLine).toEqual(oneLine);
+  });
+
+  it("reads the outer SELECT list, not a CTE's, for ORDER BY aliases", () => {
+    const result = labels(
+      complete(
+        "WITH big AS (SELECT id AS inner_id, total FROM orders WHERE total > 100)\n" +
+          "SELECT total AS amount FROM big ORDER BY ",
+      ),
+    );
+    expect(result).toContain("amount");
+    const cteOnly = complete(
+      "WITH big AS (SELECT total AS hidden_alias FROM orders)\nSELECT total FROM big ORDER BY ",
+    );
+    expect(findOption(cteOnly, "hidden_alias")?.detail).not.toBe("alias");
+  });
+});

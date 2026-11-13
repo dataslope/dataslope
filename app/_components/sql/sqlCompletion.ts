@@ -2237,7 +2237,10 @@ function extractTableRefList(
 
   commaTableReferencePattern.lastIndex = 0;
   while ((match = commaTableReferencePattern.exec(masked))) {
-    const beforeComma = masked.slice(0, match.index).toUpperCase();
+    // Whitespace is flattened so a clause keyword at the start of a line
+    // (`\nFROM users u,\n  cards c`) is found by the space-delimited
+    // search below; it used to be missed, and the second table with it.
+    const beforeComma = ` ${masked.slice(0, match.index).toUpperCase().replace(/\s/g, " ")}`;
     const lastBoundary = Math.max(
       beforeComma.lastIndexOf(" FROM "),
       beforeComma.lastIndexOf(" JOIN "),
@@ -3346,7 +3349,18 @@ function parseSelectList(
   dialect: SqlDialect,
 ): SelectListInfo | null {
   const masked = maskCommentsAndStrings(statement);
-  const start = masked.search(/\bSELECT\b/i);
+  // The first SELECT outside parentheses: the first one of all is a CTE's
+  // whenever the statement opens with WITH, and its aliases are not
+  // visible to the outer ORDER BY.
+  let start = -1;
+  const selectPattern = /\bSELECT\b/gi;
+  for (let m = selectPattern.exec(masked); m; m = selectPattern.exec(masked)) {
+    if (parenDepth(masked.slice(0, m.index)) === 0) {
+      start = m.index;
+      break;
+    }
+  }
+  if (start < 0) start = masked.search(/\bSELECT\b/i);
   if (start < 0) return null;
   let depth = 0;
   let end = masked.length;
