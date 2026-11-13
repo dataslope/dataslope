@@ -26,7 +26,7 @@ const LANGS = process.env.LANGS
 
 /** Every slug the catalog lists, collected by walking its pagination. */
 async function catalogSlugs(page: Page): Promise<string[]> {
-  await page.goto("/dashboard/challenges");
+  await page.goto("/challenges");
   const slugs: string[] = [];
   for (;;) {
     const hrefs = await page
@@ -326,7 +326,7 @@ test.describe("Challenge workspace", () => {
   });
 
   test("lists 50 a page, and changing the size keeps your place", async ({ page }) => {
-    await page.goto("/dashboard/challenges?page=3");
+    await page.goto("/challenges?page=3");
     await page.waitForLoadState("networkidle");
     const perPage = page.getByLabel("Challenges per page");
     await expect(perPage).toHaveValue("50");
@@ -352,7 +352,7 @@ test.describe("Challenge workspace", () => {
   });
 
   test("filters live in the URL and survive a reload", async ({ page }) => {
-    await page.goto("/dashboard/challenges");
+    await page.goto("/challenges");
     // The rows are server-rendered, so the select exists before React has
     // attached to it. Setting it pre-hydration changes the DOM value and
     // nothing else, so wait for the chunks to land first.
@@ -397,7 +397,7 @@ test.describe("Challenge workspace", () => {
   // ─── Audit regressions (CH-1 to CH-4, CH-7 to CH-9, A11Y-1, SEO-1) ────
 
   test("CH-1: the search box keeps every keystroke, and the URL follows", async ({ page }) => {
-    await page.goto("/dashboard/challenges");
+    await page.goto("/challenges");
     // Typing before hydration goes to the server-rendered copy, which React
     // replaces; wait for the chunks so the keystrokes reach the real list.
     await page.waitForLoadState("networkidle");
@@ -426,7 +426,7 @@ test.describe("Challenge workspace", () => {
   test("CH-7: the language filter offers only languages with challenges, with counts", async ({
     page,
   }) => {
-    await page.goto("/dashboard/challenges");
+    await page.goto("/challenges");
     const labels = await page.getByLabel("Language").locator("option").allTextContents();
     expect(labels[0]).toBe("All languages");
     for (const label of labels.slice(1)) expect(label).toMatch(/^[\w+#. ]+ \(\d+\)$/);
@@ -633,12 +633,12 @@ test.describe("Challenge workspace", () => {
     // No JavaScript: what a crawler that does not render gets.
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
-    await page.goto("/dashboard/challenges");
+    await page.goto("/challenges");
     expect(await page.locator('a[href^="/challenges/"]').count()).toBeGreaterThanOrEqual(10);
     await context.close();
 
     const sitemap = await (await request.get("/sitemap.xml")).text();
-    expect(sitemap).toContain("/dashboard/challenges</loc>");
+    expect(sitemap).toContain("/challenges</loc>");
     expect(sitemap).toContain("/challenges/two-sum</loc>");
     expect(sitemap.match(/\/challenges\/[a-z0-9-]+<\/loc>/g)?.length).toBe(300);
   });

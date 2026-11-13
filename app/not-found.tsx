@@ -97,7 +97,7 @@ export default function NotFound() {
                   <GraduationCap size={16} aria-hidden="true" />
                   Courses
                 </Link>
-                <Link href="/dashboard/challenges" className={SECONDARY}>
+                <Link href="/challenges" className={SECONDARY}>
                   <Code2 size={16} aria-hidden="true" />
                   Challenges
                 </Link>

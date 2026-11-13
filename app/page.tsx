@@ -47,7 +47,7 @@ const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='
 // Figures for the home page's bento grid. Corpus counts come from
 // `scripts/build-home-stats.mjs` at build time — keep this path free of
 // `node:fs`, which does not exist on Cloudflare Workers. The challenge count
-// is the catalog module itself, the same list /dashboard/challenges renders.
+// is the catalog module itself, the same list /challenges renders.
 // Flooring is a display choice; the grid appends "+" so the figure stays
 // honest.
 function getHomeStats(courses: CatalogCourse[]): HomeStats {

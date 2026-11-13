@@ -1,12 +1,11 @@
 "use client";
 
 /**
- * The challenge catalog at `/dashboard/challenges`.
+ * The challenge catalog at `/challenges`.
  *
- * Built from the "Challenges Page Studio" design. The Studio shell
- * (`_studio/StudioShell`) already supplies the sidebar, the top bar and the
- * 1280px content container, so this renders only the page body: heading,
- * filter row, table and pagination.
+ * Built from the "Challenges Page Studio" design. The page (`../page.tsx`)
+ * supplies the site's shared header and footer and the content container, so
+ * this renders only the page body: heading, filter row, table and pagination.
  *
  * Rows arrive as a prop from the server page, derived from the challenges
  * themselves, so every one links to a workspace that exists.
@@ -202,7 +201,7 @@ type Requested = Filters & { page: number; per: number };
  * `useSearchParams` in sync with and which costs no server round trip.
  */
 export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) {
-  const pathname = usePathname() ?? "/dashboard/challenges";
+  const pathname = usePathname() ?? "/challenges";
   const params = useSearchParams();
 
   const urlFilters: Filters = useMemo(

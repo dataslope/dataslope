@@ -42,7 +42,7 @@ const NAV_SECTIONS: {
 }[] = [
   { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
   // Learn → do → drill, so this sits between Courses and Interview Prep.
-  { href: "/dashboard/challenges", label: "Challenges", icon: Code2 },
+  { href: "/challenges", label: "Challenges", icon: Code2 },
   // The slot after this one is reserved for a sixth item, a "Projects" page,
   // to be added once that surface exists. It replaces an earlier "Practice"
   // plan, dropped because Challenges is already the practice surface and two

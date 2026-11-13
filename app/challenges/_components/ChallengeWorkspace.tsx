@@ -990,7 +990,7 @@ export function ChallengeWorkspace({
         <header className={s.topBar}>
           <div className={s.topBarLeft}>
             {/* Not prefetched: see the mobile back link. */}
-            <Link href="/dashboard/challenges" prefetch={false} className={s.backLink}>
+            <Link href="/challenges" prefetch={false} className={s.backLink}>
               <ArrowLeft size={14} strokeWidth={2} aria-hidden="true" />
               Challenges
             </Link>
@@ -1300,7 +1300,7 @@ export function ChallengeWorkspace({
               desktop one both point there: a prefetch on every visit bought
               nothing. */}
           <Link
-            href="/dashboard/challenges"
+            href="/challenges"
             prefetch={false}
             className={`${s.mIconBtn} ${s.mIconBtnLead}`}
             aria-label="Back to challenges"

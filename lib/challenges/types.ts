@@ -326,7 +326,7 @@ export interface ChallengeLink {
 
 // ─── Catalog index ───────────────────────────────────────────────────
 
-/** One row of the challenge list at `/dashboard/challenges`. */
+/** One row of the challenge list at `/challenges`. */
 export interface ChallengeIndexEntry extends ChallengeCatalogMeta {
   title: string;
   /** 1 Beginner, 2 Intermediate, 3 Advanced — the filled difficulty bars. */
