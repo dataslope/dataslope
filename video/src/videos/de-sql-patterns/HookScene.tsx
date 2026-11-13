@@ -108,6 +108,7 @@ export const HookScene: React.FC = () => {
           g={g}
           days={days}
           at={loginsAt}
+          bare
           marks={[
             ...missing.map((index, k) => ({ index, at: fourAt + 2 + k * 3, out: streaksAt, color: MARK, edge: MARK_EDGE })),
             ...missing.map((index, k) => ({ index, at: missingAt + 2 + k * 2, out: longAt, color: MARK, edge: MARK_EDGE })),

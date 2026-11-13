@@ -53,7 +53,9 @@ const Slice: React.FC<{ t: number; x: number; y: number; w: number; h: number; a
         height: h,
         boxSizing: "border-box",
         borderRadius: 4,
-        border: kind === "run" ? `2.5px solid ${th.fill}` : `1.5px dashed ${kind === "wait" ? th.fill : HAIRLINE}`,
+        // Running and waiting slices are tint only, no border; the hollow
+        // "block" slice keeps its dashed one: the owner, 2026-11-13.
+        border: kind === "block" ? `1.5px dashed ${HAIRLINE}` : undefined,
         background: kind === "run" ? tint(th.fill, 34) : kind === "wait" ? tint(th.fill, 8) : "transparent",
         display: "flex",
         alignItems: "center",

@@ -6,7 +6,7 @@ import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../
 import { Ink, type Pt } from "../../editorial/ui";
 import { inkOf } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
-import { DEPT_COLOR, DEPT_INK, type Dept, type Row } from "./data";
+import { DEPT_INK, type Dept, type Row } from "./data";
 
 /**
  * Pieces this video needs beyond the shared editorial kit: the frame's rows
@@ -138,9 +138,7 @@ export const Fig: React.FC<{ n: string; at: number; x: number; y: number; out?: 
 
 /* ── Rows ── */
 
-const tint = (dept: Dept, k = 14) => `color-mix(in srgb, ${DEPT_COLOR[dept]} ${k}%, ${PAPER})`;
-
-/** A card's paper in its department's tint and, in flight, a soft shadow. */
+/** A card's paper, outlined in its department's ink and, in flight, a soft shadow. */
 const cardStyle = (dept: Dept, x: number, top: number, width: number, height: number, lift = 0): React.CSSProperties => ({
   position: "absolute",
   left: x,
@@ -150,11 +148,14 @@ const cardStyle = (dept: Dept, x: number, top: number, width: number, height: nu
   boxSizing: "border-box",
   display: "flex",
   alignItems: "center",
-  // A filled row, no colored edge (the owner, 2026-11-11): the tint and the
-  // department's ink carry the group. The edge's width stays as padding so
-  // the columns keep their places.
-  background: tint(dept, 20),
-  paddingLeft: BAR,
+  // An outlined row (the owner, 2026-11-13, replacing the 2026-11-11 tint):
+  // no fill, a 2px border and the text in the department's ink, which still
+  // carries the group. Paper rather than clear, because a card in flight
+  // passes over the others. The old edge's width stays as padding, less the
+  // border, so the columns keep their places.
+  background: PAPER,
+  border: `2px solid ${DEPT_INK[dept]}`,
+  paddingLeft: BAR - 2,
   borderRadius: 4,
   boxShadow:
     lift > 0
@@ -168,7 +169,7 @@ const deptText = (dept: Dept): React.CSSProperties => ({
   fontWeight: 500,
   color: DEPT_INK[dept],
 });
-const numText: React.CSSProperties = { ...note(26, INK), fontWeight: 520, lineHeight: 1 };
+const numText = (dept: Dept): React.CSSProperties => ({ ...note(26, DEPT_INK[dept]), fontWeight: 520, lineHeight: 1 });
 const idxText: React.CSSProperties = { fontFamily: MONO, fontSize: 22, color: INK_SOFT };
 
 /** Where a card is, how far it has lifted, and how it is turned. */
@@ -187,7 +188,7 @@ export const RowCard: React.FC<{ row: Row; pose: Pose; height: number }> = ({ ro
       {row.index}
     </span>
     <span style={{ ...deptText(row.dept), width: DEPT_W, paddingLeft: 16, boxSizing: "border-box" }}>{row.dept}</span>
-    <span style={{ ...numText, flex: 1, textAlign: "right", paddingRight: 18 }}>{row.salary}</span>
+    <span style={{ ...numText(row.dept), flex: 1, textAlign: "right", paddingRight: 18 }}>{row.salary}</span>
   </div>
 );
 
@@ -208,7 +209,7 @@ export const KeyCard: React.FC<{ dept: Dept; value: number; pose: Pose; height: 
     <span style={{ ...deptText(dept), fontWeight: 500, width: KEY_W, paddingLeft: 14, boxSizing: "border-box" }}>
       {dept}
     </span>
-    <span style={{ ...numText, flex: 1, textAlign: "right", paddingRight: 18 }}>{value}</span>
+    <span style={{ ...numText(dept), flex: 1, textAlign: "right", paddingRight: 18 }}>{value}</span>
   </div>
 );
 
@@ -235,7 +236,7 @@ export const ValueCell: React.FC<{
         {index}
       </span>
     )}
-    <span style={{ ...numText, flex: 1, textAlign: "right", paddingRight: 18, fontWeight: strong ? 500 : 520 }}>{text}</span>
+    <span style={{ ...numText(dept), flex: 1, textAlign: "right", paddingRight: 18, fontWeight: strong ? 500 : 520 }}>{text}</span>
   </div>
 );
 

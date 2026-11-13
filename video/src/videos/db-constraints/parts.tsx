@@ -6,7 +6,7 @@ import { bob, ease, pop } from "../../components/motion";
 import type { EntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
-import { badgeStyle, Ink } from "../../editorial/ui";
+import { badgeStyle, Ink, outlineBadgeStyle, outlineInk } from "../../editorial/ui";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { type Cell, ILLUSTRATIONS, VIDEO } from "./data";
@@ -300,10 +300,11 @@ const ruleBadge = (size: number, swell: number): React.CSSProperties => {
   };
 };
 
-export const Code: React.FC<{ children: string; size?: number }> = ({ children, size }) => (
+/** `color` sets every token in one ink, for code on an outlined badge. */
+export const Code: React.FC<{ children: string; size?: number; color?: string }> = ({ children, size, color }) => (
   <span style={{ fontFamily: MONO, fontSize: size, whiteSpace: "pre", fontVariantLigatures: "none" }}>
     {tokenize(children).map((t, i) => (
-      <span key={i} style={{ color: t.color, fontWeight: t.weight ?? 500 }}>
+      <span key={i} style={{ color: color ?? t.color, fontWeight: t.weight ?? 500 }}>
         {t.text}
       </span>
     ))}
@@ -330,14 +331,26 @@ export const Pill: React.FC<{
   out?: number;
   dim?: number;
   size?: number;
-}> = ({ x, y, at, children, pulses = [], strikeAt, out, dim, size = TAG_SIZE }) => {
+  /** Outlined, not filled (the owner, 2026-11-13, on Part 1's four writers'
+   *  rules: "black border, black text, and a transparent background"). The
+   *  swell moves the border and the text toward the yellow's ink instead of
+   *  washing the fill. */
+  outline?: boolean;
+}> = ({ x, y, at, children, pulses = [], strikeAt, out, dim, size = TAG_SIZE, outline }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
   if (p <= 0 || o >= 1) return null;
   const swell = Math.max(0, ...pulses.map((t) => pulse(frame, t, 22)));
-  const pill = (
+  const ink = `color-mix(in srgb, ${outlineInk("yellow")} ${Math.round(swell * 100)}%, ${outlineInk("ink")})`;
+  const pill = outline ? (
+    <div style={{ ...outlineBadgeStyle("ink", size), borderColor: ink, color: ink, lineHeight: 1.2, display: "block" }}>
+      <Code size={size} color={ink}>
+        {children}
+      </Code>
+    </div>
+  ) : (
     <div style={{ ...ruleBadge(size, swell), display: "block" }}>
       <Code size={size}>{children}</Code>
     </div>

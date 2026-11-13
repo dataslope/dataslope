@@ -11,7 +11,9 @@ import { FEED, TRAFFIC } from "./data";
 import { commas, Drift, Flow, Line, Mark, Node, OK, OK_INK, Q_SIZE, Q_W, roundTo, Spot, VRule, X0 } from "./parts";
 
 const PUSH = { poster: { x: X0, w: 150, h: 64 }, feed: { x: 470, w: 250, h: 52 }, mids: [392, 456, 520, 584] };
-const PULL = { x: 1000, grid: { cols: 20, rows: 15, cell: 12, gap: 3 }, feed: { x: 1520, w: 250, h: 64, mid: 488 } };
+// The feed box has room around its two lines (the owner, 2026-11-13: "add
+// more padding around the same badge"); it was 250 by 64.
+const PULL = { x: 1000, grid: { cols: 20, rows: 15, cell: 12, gap: 3 }, feed: { x: 1520, w: 286, h: 92, mid: 488 } };
 const POST_ID = 81;
 
 /** The grown design, for the close: x positions and row centres. */
@@ -225,7 +227,20 @@ export const FeedScene: React.FC = () => {
           <Num>{FEED.following}</Num> accounts followed, a timeline each
         </Line>
         <Flow points={[[PULL.x + g.cols * (g.cell + g.gap) + 10, y(PULL.feed.mid)], [PULL.feed.x - 8, y(PULL.feed.mid)]]} at={buildsAt + 10} color={gather > 0.5 ? ACCENT : BAR} width={2.4 + gather * 2} out={feedOut} />
-        <Node x={PULL.feed.x} y={y(PULL.feed.mid) - PULL.feed.h / 2} w={PULL.feed.w} h={PULL.feed.h} at={buildsAt + 12} tone="data" title="your feed" sub="built on request" size={22} out={feedOut} />
+        <Node
+          x={PULL.feed.x}
+          y={y(PULL.feed.mid) - PULL.feed.h / 2}
+          w={PULL.feed.w}
+          h={PULL.feed.h}
+          at={buildsAt + 12}
+          tone="data"
+          title="your feed"
+          // Blue, like the title (the owner, 2026-11-13: "Change the text color
+          // of 'built on request' to blue").
+          sub={<span style={{ color: BLUE_INK }}>built on request</span>}
+          size={22}
+          out={feedOut}
+        />
         <Line at={cheapAt} x={PULL.feed.x} y={y(PULL.feed.mid) + PULL.feed.h / 2 + h(20)} size={20} color={INK_SOFT} out={feedOut}>
           Posting is cheap
         </Line>

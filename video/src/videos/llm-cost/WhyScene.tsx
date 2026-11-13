@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ds } from "../../theme/brand";
 import { body, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TOKENS } from "./data";
@@ -125,6 +125,8 @@ export const WhyScene: React.FC = () => {
       <Ink at={promptAt - 6} dur={12} style={{ left: X0, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...label(25, INPUT_INK), fontWeight: 500 }}>Reading the prompt</span>
       </Ink>
+      {/* Each chip's text in its own hue (the owner, 2026-11-13: "blue text
+          color for blue badges, and orange text color for orange badges"). */}
       {rows.map((row, r) => (
         <div key={r} style={{ position: "absolute", left: X0, top: y(LEFT_ROWS[r]), display: "flex", gap: 6 }}>
           {row.map((t, i) => {
@@ -133,7 +135,7 @@ export const WhyScene: React.FC = () => {
             const p = ease(frame, at, 8);
             return (
               <span key={k} style={{ opacity: p, transform: `translateY(${(1 - p) * 8}px)` }}>
-                <Chip piece={t.piece} color={INPUT} glow={pulse(frame, onceAt - 2, 22)} />
+                <Chip piece={t.piece} color={INPUT} ink={outlineInk("blue")} glow={pulse(frame, onceAt - 2, 22)} />
               </span>
             );
           })}
@@ -156,7 +158,7 @@ export const WhyScene: React.FC = () => {
           const p = ease(frame, outAt(k), 8);
           return (
             <span key={k} style={{ opacity: p, transform: `translateX(${(1 - p) * -24}px)` }}>
-              <Chip piece={t.piece} color={OUTPUT} glow={pulse(frame, outAt(k), 16)} />
+              <Chip piece={t.piece} color={OUTPUT} ink={outlineInk("orange")} glow={pulse(frame, outAt(k), 16)} />
             </span>
           );
         })}

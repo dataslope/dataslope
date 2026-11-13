@@ -6,7 +6,7 @@ import { bob, ease, pop } from "../../components/motion";
 import { ENTITY, type EntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
-import { badgeStyle, Ink } from "../../editorial/ui";
+import { badgeStyle, Ink, outlineBadgeStyle } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
 import { type Cell, ILLUSTRATIONS, VIDEO } from "./data";
@@ -862,18 +862,28 @@ export const Aside: React.FC<{ size?: number; color?: string; children: React.Re
  * A chip: a few words of Inter as the house badge (editorial/ui), a light
  * tint of its hue in that hue's ink, no border. "soft" is gray on a lighter
  * tint, in the soft ink.
+ *
+ * `outline` draws it as the outlined badge instead (the owner, 2026-11-13:
+ * "black border, black text"): no tint, a 2px border in the ink. "clear"
+ * leaves the paper showing through; "paper" fills it white, for a chip set
+ * over a line it should hide ("white (not transparent) background").
  */
-export const Chip: React.FC<{ tone?: "ink" | "key" | "warn" | "soft"; size?: number; width?: number; children: React.ReactNode }> = ({
-  tone = "ink",
-  size = 22,
-  width,
-  children,
-}) => (
+export const Chip: React.FC<{
+  tone?: "ink" | "key" | "warn" | "soft";
+  size?: number;
+  width?: number;
+  outline?: "clear" | "paper";
+  children: React.ReactNode;
+}> = ({ tone = "ink", size = 22, width, outline, children }) => (
   <span
     style={{
       ...label(size),
-      ...badgeStyle(tone === "key" ? "blue" : tone === "warn" ? "red" : "gray", size),
-      ...(tone === "soft" ? { color: INK_SOFT, background: "color-mix(in srgb, var(--ds-gray-400) 13%, transparent)" } : null),
+      ...(outline
+        ? { ...outlineBadgeStyle("ink", size), background: outline === "paper" ? PAPER : "transparent" }
+        : {
+            ...badgeStyle(tone === "key" ? "blue" : tone === "warn" ? "red" : "gray", size),
+            ...(tone === "soft" ? { color: INK_SOFT, background: "color-mix(in srgb, var(--ds-gray-400) 13%, transparent)" } : null),
+          }),
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",

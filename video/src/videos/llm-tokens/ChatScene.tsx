@@ -224,8 +224,10 @@ export const ChatScene: React.FC = () => {
 
         {/* Fig. 17: two tokens, two ids, given the page once the chart has gone. */}
         <FigLabel n="17" title="Two tokens, two ids" at={idAt - 4} x={X0} y={figY} />
+        {/* The chips sit 16px further below their art than they did (the owner,
+            2026-11-13: "slightly add more top margin to both"). */}
         <Spot id="llm-tokens-strawberry" at={idAt - 2} left={BERRY_X - 223} top={figY + 56} width={446} height={250} />
-        <div style={{ position: "absolute", left: BERRY_X, top: figY + 330, transform: "translateX(-50%)", opacity: ease(frame, idAt, 12) }}>
+        <div style={{ position: "absolute", left: BERRY_X, top: figY + 346, transform: "translateX(-50%)", opacity: ease(frame, idAt, 12) }}>
           <BridgeChip
             text={BERRY.text}
             id={BERRY.id}
@@ -233,7 +235,7 @@ export const ChatScene: React.FC = () => {
           />
         </div>
         <Spot id="llm-tokens-cherries" at={cherryAt - 4} left={CHERRY_X - 117} top={figY + 56} width={233} height={250} />
-        <div style={{ position: "absolute", left: CHERRY_X, top: figY + 330, transform: "translateX(-50%)", opacity: ease(frame, cherryAt - 2, 12) }}>
+        <div style={{ position: "absolute", left: CHERRY_X, top: figY + 346, transform: "translateX(-50%)", opacity: ease(frame, cherryAt - 2, 12) }}>
           <BridgeChip text={CHERRY.text} id={CHERRY.id} glow={pulse(frame, cherryAt + 4, 24)} />
         </div>
       </Drift>

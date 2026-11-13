@@ -1,3 +1,4 @@
+import { ShoppingCart } from "lucide-react";
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
@@ -180,12 +181,18 @@ export const ResultScene: React.FC = () => {
               opacity: p,
               transform: `translateY(${(1 - p) * 10}px)`,
               ...label(20, i ? PAPER : INK),
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
               padding: "4px 16px",
               borderRadius: i ? 20 : 4,
               background: i ? BAR : `color-mix(in srgb, ${INK_SOFT} 22%, ${PAPER})`,
               whiteSpace: "nowrap",
             }}
           >
+            {/* A cart before the label, in the label's ink (the owner,
+                2026-11-13: "add a shopping cart lucide icon"). */}
+            <ShoppingCart size={20} strokeWidth={2} color={i ? PAPER : INK} style={{ flex: "none" }} />
             Buy now
           </div>
         );

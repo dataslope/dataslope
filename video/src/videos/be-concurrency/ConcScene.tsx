@@ -153,7 +153,7 @@ export const ConcScene: React.FC = () => {
                   height: laneH,
                   boxSizing: "border-box",
                   borderRadius: 5,
-                  border: `2.5px solid ${th.fill}`,
+                  // Tint only, no border: the owner, 2026-11-13.
                   background: tint(th.fill, 32),
                   display: "flex",
                   alignItems: "center",

@@ -5,7 +5,6 @@ import { OK, RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { TABULAR, label } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -20,7 +19,6 @@ import {
   Cross,
   Drift,
   HBar,
-  HIGHLIGHT,
   Headline,
   INK,
   INK_SOFT,
@@ -352,8 +350,6 @@ const DivideDp: React.FC<{ c: Ctx }> = ({ c }) => {
   const W = 480;
   const fx = R_X + 500;
   const ly = (d: number) => c.T + c.h(90) + d * c.h(66);
-  const repeated = (m: number) => fib.filter((f) => f.n === m).length > 1 && m >= 2;
-  const tint: Record<number, string> = { 3: HIGHLIGHT, 2: `color-mix(in srgb, ${ds("teal", 300)} 70%, ${PAPER})` };
   return (
     <>
       <Line at={dcAt} x={R_X} y={c.T} size={24} weight={500}>
@@ -371,10 +367,14 @@ const DivideDp: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={dpAt} x={fx} y={c.T} size={24} weight={500}>
         Dynamic programming: overlapping
       </Line>
+      {/* The owner, 2026-11-13: black edges, and every call a hollow pill
+          with a black border and black text. The pill is border-box, 56 by
+          36 (the old 52 by 32 plus its border), centred on its point, so an
+          edge runs from a parent's bottom edge to a child's top edge. */}
       <Svg opacity={ease(frame, dpAt + 4, 12)}>
         {fib.map((f, i) =>
           f.parent === undefined ? null : (
-            <line key={i} x1={fx + fib[f.parent].x * W} y1={ly(fib[f.parent].depth) + 16} x2={fx + f.x * W} y2={ly(f.depth) - 16} stroke={INK_SOFT} strokeWidth={1.4} />
+            <line key={i} x1={fx + fib[f.parent].x * W} y1={ly(fib[f.parent].depth) + 18} x2={fx + f.x * W} y2={ly(f.depth) - 18} stroke={INK} strokeWidth={1.4} />
           ),
         )}
       </Svg>
@@ -383,13 +383,14 @@ const DivideDp: React.FC<{ c: Ctx }> = ({ c }) => {
           key={i}
           style={{
             position: "absolute",
-            left: fx + f.x * W - 26,
-            top: ly(f.depth) - 16,
-            width: 52,
-            height: 32,
-            borderRadius: 16,
-            border: `2px solid ${repeated(f.n) ? INK : BAR}`,
-            background: repeated(f.n) ? tint[f.n] ?? BLUE_FILL : BLUE_FILL,
+            left: fx + f.x * W - 28,
+            top: ly(f.depth) - 18,
+            width: 56,
+            height: 36,
+            boxSizing: "border-box",
+            borderRadius: 18,
+            border: `2px solid ${INK}`,
+            background: "transparent",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -607,7 +608,9 @@ const Backtrack: React.FC<{ c: Ctx }> = ({ c }) => {
               y1={y1 + (p.length === 1 ? 18 : 22)}
               x2={x2}
               y2={y2 - 22}
-              stroke={off > 0 ? ACCENT : INK_SOFT}
+              // The owner, 2026-11-13: black edges. A dropped branch still
+              // turns red and dashed on its cue.
+              stroke={off > 0 ? ACCENT : INK}
               strokeWidth={1.6}
               strokeDasharray={off > 0 ? "5 5" : undefined}
               opacity={ease(frame, triedAt(j), 8)}

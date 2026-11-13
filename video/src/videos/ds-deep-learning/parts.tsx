@@ -3,6 +3,7 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label } from "../../editorial/style";
+import { outlineInk } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -51,6 +52,17 @@ export const atLog = (s: LogScale, v: number) =>
 export const CELL_MARK = HIGHLIGHT;
 export const CELL_OK = `color-mix(in srgb, ${ds("green", 500)} 22%, transparent)`;
 export const CELL_BAD = `color-mix(in srgb, ${ds("red", 500)} 18%, transparent)`;
+
+/**
+ * A tinted cell's number takes its tint's hue (the owner, 2026-11-13: "change
+ * the text color of the badges to have a matching hue with the
+ * backgrounds"), so a yellow cell reads in amber ink and a green one in green.
+ */
+const TINT_INK: ReadonlyMap<string, string> = new Map([
+  [CELL_MARK, outlineInk("yellow")],
+  [CELL_OK, outlineInk("green")],
+  [CELL_BAD, outlineInk("red")],
+]);
 
 export type CellLook = {
   /** Fill from `at` (a highlight, a verdict). */
@@ -133,7 +145,12 @@ export const Cells: React.FC<{
                 fontSize: size,
                 fontWeight: 500,
                 fontVariantLigatures: "none",
-                color: ink > 0 && lk?.ink ? `color-mix(in srgb, ${lk.ink.color} ${ink * 100}%, ${color})` : color,
+                color:
+                  ink > 0 && lk?.ink
+                    ? `color-mix(in srgb, ${lk.ink.color} ${ink * 100}%, ${color})`
+                    : tint > 0 && lk?.tint && TINT_INK.has(lk.tint.color)
+                      ? `color-mix(in srgb, ${TINT_INK.get(lk.tint.color)} ${tint * 100}%, ${color})`
+                      : color,
                 ...TABULAR,
                 transform: `translateY(${(1 - q) * 6}px)`,
               }}

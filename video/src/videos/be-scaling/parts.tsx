@@ -188,9 +188,13 @@ export const Node: React.FC<{
   out?: number;
   lit?: number;
   dashed?: boolean;
+  /** The tint alone, no border (the owner, 2026-11-13, on question 7's
+   *  "node A/B/C": "Remove the borders around each badge"). The box keeps
+   *  its size: it is border-box and its content is centred. */
+  bare?: boolean;
   opacity?: number;
   children?: React.ReactNode;
-}> = ({ x, y, w, h, at, title, sub, tone = "data", fill, size = 24, subSize = 20, dim, out, lit = 0, dashed, opacity = 1, children }) => {
+}> = ({ x, y, w, h, at, title, sub, tone = "data", fill, size = 24, subSize = 20, dim, out, lit = 0, dashed, bare, opacity = 1, children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
@@ -207,7 +211,7 @@ export const Node: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        border: `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${t.line}`,
+        border: bare ? "none" : `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${t.line}`,
         borderRadius: 8,
         background: fill ?? t.fill,
         display: "flex",

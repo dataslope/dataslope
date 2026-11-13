@@ -2,8 +2,9 @@ import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
-import { INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { MONO } from "../../theme/fonts";
+import { type CellMark, type CellSwap, MARK_BAD } from "../da-pandas/parts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -46,6 +47,34 @@ export {
   Tag,
   X0,
 } from "../da-pandas/parts";
+
+/**
+ * A cell under a red mark, re-inked in red while the mark is on it (the
+ * owner, 2026-11-13: "The red highlights with blue text don't work well ...
+ * change the font color to red upon red highlight"). DataTable inks a cell
+ * from its column, so a blue column stays blue under a red mark; these swaps
+ * put back the cell's own value, already swapped before the table appears (so
+ * nothing re-wipes), in a color that follows the mark in and out.
+ */
+export const useRedUnderMarks = (
+  rows: readonly (readonly string[])[],
+  marks: readonly CellMark[],
+  base: string,
+): CellSwap[] => {
+  const frame = useCurrentFrame();
+  return marks
+    .filter((m) => m.color === MARK_BAD)
+    .map((m) => {
+      const p = ease(frame, m.at, 12) * (m.out === undefined ? 1 : 1 - ease(frame, m.out, 10));
+      return {
+        row: m.row,
+        col: m.col,
+        at: -1000,
+        value: rows[m.row][m.col],
+        color: p > 0 ? `color-mix(in srgb, ${ACCENT_INK} ${Math.round(p * 100)}%, ${base})` : base,
+      };
+    });
+};
 
 /** A watercolor spot: this video's own from illustrations.json, or another
  *  video's (`video`), which pops in on `at`, bobs gently and fades on `out`.

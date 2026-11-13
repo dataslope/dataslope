@@ -133,13 +133,15 @@ export const MiddleScene: React.FC = () => {
         <Ink at={lostAt - 2} dur={18} style={{ left: xAt(worst.at) - 220, width: 440, top: yAt(0.87), textAlign: "center" }}>
           <span style={{ ...headline(46, true), color: INK }}>Lost in the middle</span>
         </Ink>
-        {/* The lesson's rule: what matters goes where recall is strong. */}
-        <Note at={firstLastAt - 2} x={CX0 - 40} y={y(C_BASE) + 40}>
+        {/* The lesson's rule: what matters goes where recall is strong. 14px
+            more room under the axis labels than before (the owner, 2026-11-13:
+            "add more top spacing to both green badges"). */}
+        <Note at={firstLastAt - 2} x={CX0 - 40} y={y(C_BASE) + 54}>
           <Tag tone="green" size={22}>
             key facts here
           </Tag>
         </Note>
-        <Note at={firstLastAt + 6} x={CX1 + 40} y={y(C_BASE) + 40} align="right">
+        <Note at={firstLastAt + 6} x={CX1 + 40} y={y(C_BASE) + 54} align="right">
           <Tag tone="green" size={22}>
             or here
           </Tag>

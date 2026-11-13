@@ -13,7 +13,7 @@ import { tint } from "./parts";
 export type Axis = { x: number; perMs: number };
 export const msX = (a: Axis, ms: number) => a.x + ms * a.perMs;
 
-/** A fetch's bar: from `start` to `stop` ms, grown in on `at`. */
+/** A fetch's bar: from `start` to `stop` ms, grown in on `at`. `bare` drops its border, leaving the tint. */
 export const WaitBar: React.FC<{
   axis: Axis;
   y: number;
@@ -23,10 +23,11 @@ export const WaitBar: React.FC<{
   at: number;
   color: string;
   solid?: boolean;
+  bare?: boolean;
   dur?: number;
   opacity?: number;
   children?: React.ReactNode;
-}> = ({ axis, y, h, start, stop, at, color, solid, dur = 24, opacity = 1, children }) => {
+}> = ({ axis, y, h, start, stop, at, color, solid, bare, dur = 24, opacity = 1, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, dur);
   if (p <= 0) return null;
@@ -42,7 +43,7 @@ export const WaitBar: React.FC<{
         height: h,
         boxSizing: "border-box",
         borderRadius: 4,
-        border: `2.5px ${solid ? "solid" : "dashed"} ${color}`,
+        border: bare ? undefined : `2.5px ${solid ? "solid" : "dashed"} ${color}`,
         background: tint(color, solid ? 34 : 10),
         display: "flex",
         alignItems: "center",

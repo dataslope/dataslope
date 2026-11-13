@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Ink, outlineInk } from "../../editorial/ui";
 import { colors } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -323,10 +323,24 @@ export const rowWidth = (tokens: readonly string[], size = CHIP_SIZE, gap = 14) 
 export type Tone = "plain" | "bad" | "good";
 const TONE = {
   // The gray badge's tint: with no outline, gray 50 alone did not read.
-  plain: { bg: "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)", line: `color-mix(in srgb, ${INK} 38%, transparent)` },
-  bad: { bg: `color-mix(in srgb, ${ACCENT} 20%, ${PAPER})`, line: ACCENT },
-  good: { bg: `color-mix(in srgb, ${BAR} 20%, ${PAPER})`, line: BAR },
+  // `ink` is the tone's text and outline color in the "tinted" and
+  // "outline" looks (see `ChipLook`).
+  plain: { bg: "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)", line: `color-mix(in srgb, ${INK} 38%, transparent)`, ink: outlineInk("ink") },
+  bad: { bg: `color-mix(in srgb, ${ACCENT} 20%, ${PAPER})`, line: ACCENT, ink: outlineInk("red") },
+  good: { bg: `color-mix(in srgb, ${BAR} 20%, ${PAPER})`, line: BAR, ink: outlineInk("blue") },
 } as const;
+
+/**
+ * How a chip draws its tone (the owner, 2026-11-13, slide by slide):
+ * "fill" is the tint with ink text; "tinted" keeps the tint and sets the
+ * text in the tone's hue ("For red badges, use red text color. For blue
+ * badges, use blue text color"); "outline" drops the fill for a 2px border
+ * and text in one ink, near-black for a plain chip and the hue for a red or
+ * blue one ("black border, black text, and a transparent background");
+ * "inkOutline" is the outline in near-black whatever the tone ("for all
+ * badges", on the negation trap).
+ */
+export type ChipLook = "fill" | "tinted" | "outline" | "inkOutline";
 
 /** A tone that takes over from the one before at `at`. */
 export type ToneStep = { at: number; tone: Tone };
@@ -346,13 +360,13 @@ function toneAt(frame: number, steps: readonly ToneStep[]) {
     p = ease(frame, s.at, 10);
   }
   const mix = (a: string, b: string) => (p >= 1 ? b : `color-mix(in srgb, ${b} ${(p * 100).toFixed(1)}%, ${a})`);
-  return { bg: mix(TONE[from].bg, TONE[to].bg), line: mix(TONE[from].line, TONE[to].line) };
+  return { bg: mix(TONE[from].bg, TONE[to].bg), line: mix(TONE[from].line, TONE[to].line), ink: mix(TONE[from].ink, TONE[to].ink) };
 }
 
 /**
  * One token: `text` in the code face, in a rounded box at (x, y), its top
  * left corner. It pops in at `at`. `tones` change its fill and line over
- * time, `marks` lay the highlighter over it, `gone` fades it to a dashed
+ * time (drawn as `look` says), `marks` lay the highlighter over it, `gone` fades it to a dashed
  * ghost (a step removed it), `strike` draws a red line through it, and
  * `hot` colors a run of its characters red from a frame on (a mark glued to
  * a word). Spaces are drawn as they are, so " Lee" shows its leading space.
@@ -375,14 +389,24 @@ export const Chip: React.FC<{
   /** Draws a leading space as a faint open box, so the space a split left
    *  behind reads as part of the string rather than as padding. */
   showSpace?: boolean;
-}> = ({ text, x, y, at, size = CHIP_SIZE, tones = [], marks = [], gone, strike, hot, out, opacity = 1, display, showSpace }) => {
+  look?: ChipLook;
+}> = ({ text, x, y, at, size = CHIP_SIZE, tones = [], marks = [], gone, strike, hot, out, opacity = 1, display, showSpace, look = "fill" }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 15);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (frame < at || o >= 1) return null;
   const g = gone === undefined ? 0 : ease(frame, gone, 14);
-  const { bg, line } = toneAt(frame, tones);
+  const toned = toneAt(frame, tones);
+  const { bg } = toned;
+  const line = look === "inkOutline" ? TONE.plain.line : toned.line;
+  const ink = look === "inkOutline" ? TONE.plain.ink : toned.ink;
+  const outline = look === "outline" || look === "inkOutline";
+  const textInk = look === "fill" ? INK : ink;
+  // An outlined chip's border is its ink; as it turns into a ghost the
+  // border fades to the faint dashed line every ghost wears.
+  const edge = outline ? (g > 0 ? `color-mix(in srgb, ${line} ${(g * 100).toFixed(0)}%, ${ink})` : ink) : g > 0.5 ? line : "transparent";
+  const fill = outline ? "transparent" : bg;
   const mark = marks.reduce((m, s) => Math.max(m, ease(frame, s.at, 10) * (s.out === undefined ? 1 : 1 - ease(frame, s.out, 12))), 0);
   const st = strike === undefined ? 0 : ease(frame, strike, 12);
   const h = hot === undefined ? 0 : ease(frame, hot.at, 10);
@@ -400,8 +424,9 @@ export const Chip: React.FC<{
         borderRadius: Math.round(size * 0.14),
         // Fill only: the line shows only once a chip turns into a dashed
         // ghost, where the outline is the meaning (a chip a step removed).
-        border: `${BORDER}px ${g > 0.5 ? "dashed" : "solid"} ${g > 0.5 ? line : "transparent"}`,
-        background: mark > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${(mark * 100).toFixed(1)}%, ${bg})` : bg,
+        // The "outline" look draws it from the start instead.
+        border: `${BORDER}px ${g > 0.5 ? "dashed" : "solid"} ${edge}`,
+        background: mark > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${(mark * 100).toFixed(1)}%, ${fill})` : fill,
         opacity: Math.min(1, p) * (1 - o) * (1 - g * 0.6) * opacity,
         transform: `translateY(${(1 - Math.min(1, p)) * 12}px) scale(${0.9 + 0.1 * Math.min(1, p)})`,
         transformOrigin: "50% 100%",
@@ -412,7 +437,7 @@ export const Chip: React.FC<{
         fontSize: size,
         fontWeight: 500,
         lineHeight: 1,
-        color: g > 0 ? `color-mix(in srgb, ${INK_SOFT} ${(g * 100).toFixed(0)}%, ${INK})` : INK,
+        color: g > 0 ? `color-mix(in srgb, ${INK_SOFT} ${(g * 100).toFixed(0)}%, ${textInk})` : textInk,
         whiteSpace: "pre",
         fontVariantLigatures: "none",
       }}
@@ -438,7 +463,7 @@ export const Chip: React.FC<{
       ) : hot ? (
         <span>
           {shown.slice(0, hot.from)}
-          <span style={{ color: h > 0 ? `color-mix(in srgb, ${ACCENT_INK} ${(h * 100).toFixed(0)}%, ${INK})` : INK }}>
+          <span style={{ color: h > 0 ? `color-mix(in srgb, ${ACCENT_INK} ${(h * 100).toFixed(0)}%, ${textInk})` : textInk }}>
             {shown.slice(hot.from, hot.to)}
           </span>
           {shown.slice(hot.to)}

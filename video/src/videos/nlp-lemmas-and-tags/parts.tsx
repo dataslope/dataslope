@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Ink, outlineInk } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -148,10 +148,12 @@ export function rowLayout(tokens: readonly string[], x: number, size = CHIP_SIZE
 }
 
 export type Tone = "plain" | "good";
+// A blue chip's text is blue's ink (the owner, 2026-11-13: "for blue badges,
+// use blue text color").
 const TONE = {
   // The gray badge's tint: with no outline, gray 50 alone did not read.
-  plain: { bg: "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)", line: `color-mix(in srgb, ${INK} 38%, transparent)` },
-  good: { bg: `color-mix(in srgb, ${BAR} 20%, ${PAPER})`, line: BAR },
+  plain: { bg: "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)", line: `color-mix(in srgb, ${INK} 38%, transparent)`, text: INK },
+  good: { bg: `color-mix(in srgb, ${BAR} 20%, ${PAPER})`, line: BAR, text: outlineInk("blue") },
 } as const;
 
 /** A tone that takes over from the one before at `at`. */
@@ -172,7 +174,7 @@ function toneAt(frame: number, steps: readonly ToneStep[]) {
     p = ease(frame, s.at, 10);
   }
   const mix = (a: string, b: string) => (p >= 1 ? b : `color-mix(in srgb, ${b} ${(p * 100).toFixed(1)}%, ${a})`);
-  return { bg: mix(TONE[from].bg, TONE[to].bg), line: mix(TONE[from].line, TONE[to].line) };
+  return { bg: mix(TONE[from].bg, TONE[to].bg), line: mix(TONE[from].line, TONE[to].line), text: mix(TONE[from].text, TONE[to].text) };
 }
 
 /**
@@ -181,6 +183,9 @@ function toneAt(frame: number, steps: readonly ToneStep[]) {
  * time, `marks` lay the highlighter over it, and `gone` fades it to a dashed
  * ghost (a candidate WordNet does not have). `content` is drawn in place of
  * the text, in the chip's face, while the width still follows `text`.
+ * `outline` draws it unfilled, a 2px ink border around ink text (the owner,
+ * 2026-11-13, on Fig. 4: "black border, black text, and a transparent
+ * background for all badges"); the border fits in the room the width keeps.
  */
 export const Chip: React.FC<{
   text: string;
@@ -193,14 +198,18 @@ export const Chip: React.FC<{
   gone?: number;
   out?: number;
   content?: React.ReactNode;
-}> = ({ text, x, y, at, size = CHIP_SIZE, tones = [], marks = [], gone, out, content }) => {
+  outline?: boolean;
+}> = ({ text, x, y, at, size = CHIP_SIZE, tones = [], marks = [], gone, out, content, outline = false }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 15);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (frame < at || o >= 1) return null;
   const g = gone === undefined ? 0 : ease(frame, gone, 14);
-  const { bg, line } = toneAt(frame, tones);
+  const tone = toneAt(frame, tones);
+  const bg = outline ? "transparent" : tone.bg;
+  const line = tone.line;
+  const ink = outline ? INK : tone.text;
   const mark = marks.reduce((m, s) => Math.max(m, ease(frame, s.at, 10) * (s.out === undefined ? 1 : 1 - ease(frame, s.out, 12))), 0);
   const w = chipWidth(text, size);
   return (
@@ -215,7 +224,7 @@ export const Chip: React.FC<{
         borderRadius: Math.round(size * 0.14),
         // Fill only: the line shows only once a chip turns into a dashed
         // ghost, where the outline is the meaning ("not in WordNet").
-        border: `${BORDER}px ${g > 0.5 ? "dashed" : "solid"} ${g > 0.5 ? line : "transparent"}`,
+        border: `${BORDER}px ${g > 0.5 ? "dashed" : "solid"} ${g > 0.5 ? line : outline ? INK : "transparent"}`,
         background: mark > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${(mark * 100).toFixed(1)}%, ${bg})` : bg,
         opacity: Math.min(1, p) * (1 - o) * (1 - g * 0.6),
         transform: `translateY(${(1 - Math.min(1, p)) * 12}px) scale(${0.9 + 0.1 * Math.min(1, p)})`,
@@ -227,7 +236,7 @@ export const Chip: React.FC<{
         fontSize: size,
         fontWeight: 500,
         lineHeight: 1,
-        color: g > 0 ? `color-mix(in srgb, ${INK_SOFT} ${(g * 100).toFixed(0)}%, ${INK})` : INK,
+        color: g > 0 ? `color-mix(in srgb, ${INK_SOFT} ${(g * 100).toFixed(0)}%, ${ink})` : ink,
         whiteSpace: "pre",
         fontVariantLigatures: "none",
       }}

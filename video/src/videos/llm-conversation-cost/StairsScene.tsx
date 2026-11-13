@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { halo, headline, label, note, TABULAR } from "../../editorial/style";
-import { FigLabel, Leader, Note } from "../../editorial/ui";
+import { FigLabel, Leader, Note, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { int, LAST, SYSTEM, TURNS, USER, REPLY } from "./data";
@@ -259,7 +259,10 @@ export const StairsScene: React.FC = () => {
               alignItems: "center",
               paddingLeft: 18,
               opacity: p * (1 - o),
-              ...note(22, isNew ? mix(INK, PAPER, fill) : INK),
+              // A sent bubble's text turns blue with its fill (the owner,
+              // 2026-11-13: "use a blue text color for 'system prompt'"),
+              // so every light blue bubble reads the same way.
+              ...note(22, isNew ? mix(INK, PAPER, fill) : mix(INK, outlineInk("blue"), fill)),
               fontWeight: isNew ? 500 : undefined,
             }}
           >

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { badgeStyle, Note } from "../../editorial/ui";
+import { badgeStyle, Note, outlineInk } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -188,6 +188,10 @@ export const HookScene: React.FC = () => {
                   ...note(22),
                   ...DECISION_BADGE,
                   background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, ${DECISION_BADGE.background})` : DECISION_BADGE.background,
+                  // A yellow badge's text in the yellow's own ink (the owner,
+                  // 2026-11-13: "text color ... matching hues with the
+                  // backgrounds (including yellow badges)").
+                  color: lit > 0 ? `color-mix(in srgb, ${outlineInk("yellow")} ${Math.round(lit * 100)}%, ${DECISION_BADGE.color})` : DECISION_BADGE.color,
                   opacity: p,
                   transform: `translateY(${(1 - p) * -14}px) scale(${1 + 0.06 * bump})`,
                 }}

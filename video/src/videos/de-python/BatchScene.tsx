@@ -4,9 +4,10 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Note, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { BATCH } from "./data";
 import { Bars, Console, consoleHeight, Drift, lineOf, Listing, listingHeight, MARK, MARK_OK, OK, OK_INK, Title, X0 } from "./parts";
@@ -18,6 +19,8 @@ const RIGHT_X = 1000;
 const BLOCK = 54;
 const PITCH = 66;
 const GROUP_GAP = 40;
+/** The house badge's green tint (badgeStyle("green")), on paper. */
+const GREEN_TINT = `color-mix(in srgb, ${ds("green", 400)} 24%, ${PAPER})`;
 
 /**
  * Question 10. Why batch: a million single-row inserts are a million round
@@ -157,8 +160,12 @@ export const BatchScene: React.FC = () => {
                 height: h(BLOCK),
                 borderRadius: 5,
                 boxSizing: "border-box",
-                border: `2px solid ${BAR}`,
-                background: `color-mix(in srgb, ${named > 0 ? OK : BAR} ${Math.round(18 + named * 30)}%, ${PAPER})`,
+                // No border; once its batch is named the item turns from the
+                // blue tint to the house badge's light green, its digit from
+                // blue to green (the owner, 2026-11-13: "Remove the borders,
+                // and use a light green background with a green text to
+                // match the green background").
+                background: `color-mix(in srgb, ${GREEN_TINT} ${Math.round(named * 100)}%, color-mix(in srgb, ${BAR} 18%, ${PAPER}))`,
                 opacity: p,
                 display: "flex",
                 alignItems: "center",
@@ -166,7 +173,7 @@ export const BatchScene: React.FC = () => {
                 fontFamily: MONO,
                 fontSize: 26,
                 fontWeight: 500,
-                color: BLUE_INK,
+                color: `color-mix(in srgb, ${outlineInk("green")} ${Math.round(named * 100)}%, ${BLUE_INK})`,
               }}
             >
               {i}

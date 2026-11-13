@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Ink, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds, inkOf } from "../../theme/brand";
@@ -236,12 +236,21 @@ export const HookScene: React.FC = () => {
                 height: 34,
                 boxSizing: "border-box",
                 borderRadius: 5,
-                border: `2px solid ${INK_SOFT}`,
-                background: `color-mix(in srgb, ${HIGHLIGHT} ${b.at === null ? 0 : lit(b.at) * 100}%, ${PAPER})`,
+                // Accept is the house badge in green, no border, its tint
+                // deepening to full as the narration names it (the owner,
+                // 2026-11-13: "Use a light green badge with green text and no
+                // border"; it was ink-bordered, lit yellow on the cue).
+                // Reject keeps its plain bordered button.
+                ...(b.at === null
+                  ? { border: `2px solid ${INK_SOFT}`, background: PAPER, ...label(19, INK) }
+                  : {
+                      background: `color-mix(in srgb, ${ds("green", 400)} ${12 + 12 * lit(b.at)}%, ${PAPER})`,
+                      ...label(19, outlineInk("green")),
+                      fontWeight: 500,
+                    }),
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...label(19, INK),
                 opacity: ease(frame, writtenAt + 22, 10),
               }}
             >

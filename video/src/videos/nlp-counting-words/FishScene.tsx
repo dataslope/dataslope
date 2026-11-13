@@ -6,7 +6,7 @@ import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { familyOf, FISH } from "./data";
-import { FAMILY, flow, Headline, Kicker, Marked, Spot, TagChip, Tile, tileH } from "./parts";
+import { FAMILY, flow, Headline, Kicker, Marked, Spot, subtleRing, TagChip, Tile, tileH } from "./parts";
 
 const X0 = 120;
 const SIZE = 30;
@@ -77,7 +77,7 @@ export const FishScene: React.FC = () => {
               ...(i === r.fish ? [{ at: (k === 0 ? nounAt : verbAt) - 6 }] : []),
               ...(near(k, i) ? [{ at: aroundAt - 2 + i * 2, color: `color-mix(in srgb, ${INK_SOFT} 16%, transparent)` }] : []),
             ]}
-            border={i === r.fish ? INK : undefined}
+            border={i === r.fish ? subtleRing("yellow") : undefined}
           />
         )),
       )}

@@ -23,6 +23,7 @@ import {
   Spot,
   Strike,
   TableName,
+  useRedUnderMarks,
   X0,
 } from "./parts";
 
@@ -66,6 +67,8 @@ export const HookScene: React.FC = () => {
   const order = M.cols.indexOf("order_id");
   const extra = M.rows.flatMap((r, i) => (i > 0 && M.rows[i - 1][order] === r[order] ? [i] : []));
   const amount = M.cols.indexOf("amount");
+  const badMarks = extra.map((row) => ({ row, col: amount, at: nowAt + 8, color: MARK_BAD }));
+  const redInk = useRedUnderMarks(M.rows, badMarks, BLUE_INK);
   const [nBefore, sumBefore] = FANOUT.before;
   const [nAfter, sumAfter] = FANOUT.after;
 
@@ -113,7 +116,8 @@ export const HookScene: React.FC = () => {
           out={out}
           rows={M.rows.map((cells, i) => ({ cells, at: sixAt + i * 3 }))}
           bands={extra.map((row) => ({ row, at: nowAt + 4, color: MARK_BAD }))}
-          marks={extra.map((row) => ({ row, col: amount, at: nowAt + 8, color: MARK_BAD }))}
+          marks={badMarks}
+          swaps={redInk}
         />
         <Note at={revAt} x={X0} y={og.rowTop(FANOUT.orders.rows.length) + h(18)} out={out}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>

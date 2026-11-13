@@ -142,12 +142,15 @@ export const RecursiveScene: React.FC = () => {
                 height: h(NODE_H),
                 boxSizing: "border-box",
                 borderRadius: 8,
-                border: `2.5px solid ${BAR}`,
+                // The tint alone, its name in blue (the owner, 2026-11-13:
+                // "Remove borders around every blue badge. Then, use a blue
+                // text"). Border-box, so each node keeps its size and the
+                // tree's lines still meet it.
                 background: `color-mix(in srgb, ${BAR} ${pl.level === 0 ? 30 : 16}%, ${PAPER})`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...label(23, INK),
+                ...label(23, BLUE_INK),
                 opacity: p,
                 transform: `scale(${0.85 + 0.15 * p})`,
               }}

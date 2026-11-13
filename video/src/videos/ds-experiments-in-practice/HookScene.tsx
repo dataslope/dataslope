@@ -153,13 +153,15 @@ export const HookScene: React.FC = () => {
                 }}
               >
                 {/* A flagged row fills between its rules, as a table row is
-                    highlighted. */}
+                    highlighted: at under half the mark's strength (the owner,
+                    2026-11-13: "make the highlighted background (in red) more
+                    subtle"). */}
                 {flag > 0 ? (
                   <div
                     style={{
                       position: "absolute",
                       inset: 0,
-                      background: `color-mix(in srgb, ${MARK_BAD} ${flag * 100}%, transparent)`,
+                      background: `color-mix(in srgb, ${MARK_BAD} ${flag * 45}%, transparent)`,
                     }}
                   />
                 ) : null}

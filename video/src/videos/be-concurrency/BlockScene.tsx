@@ -121,10 +121,12 @@ export const BlockScene: React.FC = () => {
             <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: BLUE_INK }}>{name}</span>
           </Note>
         ))}
-        <WaitBar axis={AXIS} y={rowY("a")} h={rowH} start={0} stop={msA} at={holdsAt} color={ACCENT} solid>
+        {/* Both bars are tint only, no border; the gray ghosts above keep
+            their dashed one: the owner, 2026-11-13. */}
+        <WaitBar axis={AXIS} y={rowY("a")} h={rowH} start={0} stop={msA} at={holdsAt} color={ACCENT} solid bare>
           <span style={{ ...label(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>blocking sleep: holds the thread</span>
         </WaitBar>
-        <WaitBar axis={AXIS} y={rowY("b")} h={rowH} start={msA} stop={msA + msB} at={bCantAt + 8} color={BAR}>
+        <WaitBar axis={AXIS} y={rowY("b")} h={rowH} start={msA} stop={msA + msB} at={bCantAt + 8} color={BAR} bare>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>await, {ms(msB / 1000)}</span>
         </WaitBar>
         <Note at={bCantAt + 2} x={AXIS.x + 12} y={rowY("b") + rowH / 2 - 14} out={bCantAt + 8}>
@@ -170,7 +172,7 @@ export const BlockScene: React.FC = () => {
                 height: laneH - 14,
                 borderRadius: 5,
                 boxSizing: "border-box",
-                border: `2.5px solid ${done > 0.5 ? OK : stalled > 0.5 ? ds("gray", 400) : BAR}`,
+                // Tint only, no border: the owner, 2026-11-13.
                 background: done > 0.5 ? tint(OK, 16) : stalled > 0.5 ? ds("gray", 100) : tint(BAR, 12),
                 display: "flex",
                 alignItems: "center",
@@ -201,7 +203,9 @@ export const BlockScene: React.FC = () => {
             height: laneH - 8,
             borderRadius: 5,
             boxSizing: "border-box",
-            border: `2.5px solid ${moved > 0.5 ? INK : ACCENT}`,
+            // Tint only while it blocks the loop (the owner, 2026-11-13);
+            // once moved into the pool it is a white box and keeps its ink edge.
+            border: moved > 0.5 ? `2.5px solid ${INK}` : undefined,
             background: moved > 0.5 ? PAPER : tint(ACCENT, 30),
             display: "flex",
             alignItems: "center",

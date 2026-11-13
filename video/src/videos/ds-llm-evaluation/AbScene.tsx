@@ -23,9 +23,10 @@ const Title: React.FC<{ n: number; x: number; y: number; at: number; children: R
   </Note>
 );
 
-/** This scene's badges' top and bottom padding: 0.32em, against the house
- *  badge's 0.21em. */
-const PAD_Y = (size: number) => Math.round(size * 0.32);
+/** This scene's badges' top and bottom padding: 0.42em, against the house
+ *  badge's 0.21em (0.32em until the owner, 2026-11-13: "add slight more
+ *  vertical padding to the badges"). */
+const PAD_Y = (size: number) => Math.round(size * 0.42);
 
 /** A rounded tag on the page: a session, an arm, an output. The house
  *  badge (a light tint of its hue, in that hue's ink, no border, its own
@@ -221,11 +222,14 @@ export const AbScene: React.FC = () => {
         <Title n={4} x={COL[1]} y={y(ROW[1])} at={guardAt - 2}>
           Add guardrails
         </Title>
-        {/* The guardrails as blue house badges, two to a row. */}
+        {/* The guardrails as blue house badges, two to a row, a little wider
+            at the ends than the house badge (the owner, 2026-11-13: "in the
+            blue badges for 'Add guardrails', add slight more horizontal
+            padding too"). */}
         {guards.map((g) => (
           <Note key={g.text} at={g.at - 2} x={COL[1] + (g.w % 2) * 330} y={y(ROW[1]) + 77 + Math.floor(g.w / 2) * 64} from="up">
             <span style={note(23)}>
-              <Badge tone="blue" size={23} style={{ padding: `${PAD_Y(23)}px ${Math.round(23 * 0.55)}px` }}>
+              <Badge tone="blue" size={23} style={{ padding: `${PAD_Y(23)}px ${Math.round(23 * 0.8)}px` }}>
                 {g.text}
               </Badge>
             </span>

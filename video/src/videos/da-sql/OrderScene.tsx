@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { badgeStyle, Ink, Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -294,9 +294,13 @@ const Count: React.FC<{ at: number; x: number; top: number; children: React.Reac
   </Ink>
 );
 
-/** One region group, as a block with its name. */
+/** One region group, as a block with its name. No fill: a GROUP BY group
+ *  is drawn in ink, a group HAVING keeps in blue, border and text alike (the
+ *  owner, 2026-11-13: "use black text and border with a transparent
+ *  background", and for the HAVING row "blue text and border"). */
 const Group: React.FC<{ region: string; at: number; x: number; top: number; kept?: boolean }> = ({ region, at, x, top, kept }) => {
   const { h } = useLayout();
+  const ink = kept ? BAR : INK;
   return (
     <Ink at={at} dur={10} style={{ left: x, top }}>
       <div
@@ -304,12 +308,12 @@ const Group: React.FC<{ region: string; at: number; x: number; top: number; kept
           width: 100,
           height: h(36),
           borderRadius: 4,
-          border: `2px solid ${BAR}`,
-          background: kept ? `color-mix(in srgb, ${BAR} 18%, ${PAPER})` : PAPER,
+          border: `2px solid ${ink}`,
+          background: "transparent",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...label(20, INK),
+          ...label(20, ink),
         }}
       >
         {region}

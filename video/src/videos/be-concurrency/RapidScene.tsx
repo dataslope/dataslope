@@ -159,12 +159,13 @@ const Atomic: React.FC<{ c: Ctx }> = ({ c }) => {
               position: "absolute",
               left: x,
               top: rowY,
-              width: lerp(122, 116, fuse),
+              // Fused, each overlaps the next by a pixel so no seam shows
+              // between the tints now there is no border to hide it.
+              width: lerp(122, 117, fuse),
               height: chipH,
               boxSizing: "border-box",
-              border: `2.5px solid ${fuse > 0.5 ? OK : ACCENT}`,
-              borderLeftWidth: fuse > 0.9 && s > 0 ? 0 : 2.5,
-              borderRightWidth: fuse > 0.9 && s < 2 ? 0 : 2.5,
+              // Tint only, no border; fused, the three tints meet as one
+              // block: the owner, 2026-11-13.
               borderRadius: fuse > 0.9 ? (s === 0 ? "5px 0 0 5px" : s === 2 ? "0 5px 5px 0" : 0) : 5,
               background: tint(fuse > 0.5 ? OK : ACCENT, 14),
               display: "flex",
@@ -188,7 +189,8 @@ const Atomic: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       {CAS.map((k) => (
         <Note key={k.text} at={k.at} x={k.x} y={casY} width={k.w} from="up">
-          <div style={{ height: casH, boxSizing: "border-box", border: `2.5px solid ${BAR}`, borderRadius: 5, background: tint(BAR, 12), display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {/* Tint only, no border: the owner, 2026-11-13. */}
+          <div style={{ height: casH, boxSizing: "border-box", borderRadius: 5, background: tint(BAR, 12), display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span style={{ ...label(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>{k.text}</span>
           </div>
         </Note>
@@ -392,7 +394,7 @@ const Starve: React.FC<{ c: Ctx }> = ({ c }) => {
         height: rowH,
         borderRadius: 5,
         boxSizing: "border-box",
-        border: `2.5px solid ${green > 0.5 ? OK : high ? THREAD[2].fill : ds("gray", 400)}`,
+        // Tint only, no border: the owner, 2026-11-13.
         background: green > 0.5 ? tint(OK, 16) : high ? tint(THREAD[2].fill, 20) : ds("gray", 100),
         display: "flex",
         alignItems: "center",
@@ -505,7 +507,8 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
               height: chip - c.h(12) * taken,
               borderRadius: 5,
               boxSizing: "border-box",
-              border: `2.5px solid ${BAR}`,
+              // Tint only, no border; the workers' dashed slots keep theirs:
+              // the owner, 2026-11-13.
               background: tint(BAR, 14 + 20 * taken),
               display: "flex",
               alignItems: "center",
@@ -602,8 +605,8 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
           width: (1300 - t0 - 200) * work,
           height: c.h(40),
           borderRadius: 5,
+          // Tint only, no border: the owner, 2026-11-13.
           background: tint(BAR, 30),
-          border: `2px solid ${BAR}`,
           boxSizing: "border-box",
           display: "flex",
           alignItems: "center",

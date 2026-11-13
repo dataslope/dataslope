@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Ink, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Illustration } from "../../components/Illustration";
@@ -206,7 +206,7 @@ export const CapScene: React.FC = () => {
           [P.left, 1, "node B"],
           [P.right, 0, "node C"],
         ].map(([x, r, t], i) => (
-          <Node key={i} x={x as number} y={pTop + (r as number) * h(96)} w={170} h={68} at={choiceAt + 4 + i * 3} tone="data" title={t as string} size={21} />
+          <Node key={i} x={x as number} y={pTop + (r as number) * h(96)} w={170} h={68} at={choiceAt + 4 + i * 3} tone="data" bare title={t as string} size={21} />
         ))}
         {/* The partition: a watercolor crack between the two sides, wiped
             in from the top as the dashed line it replaces drew on. */}
@@ -247,7 +247,12 @@ export const CapScene: React.FC = () => {
           Partition: availability or consistency
         </Line>
         <Line at={pacelcAt + 10} x={P.pacelc} y={y(744) + h(96)} size={20} color={INK}>
-          <Mark at={pacelcAt + 14}>Else:</Mark> latency or consistency
+          {/* The yellow mark's word in yellow ink (the owner, 2026-11-13: text
+              in the hue of its background, "including yellow badges"). */}
+          <Mark at={pacelcAt + 14}>
+            <span style={{ color: outlineInk("yellow") }}>Else:</span>
+          </Mark>{" "}
+          latency or consistency
         </Line>
       </Drift>
     </AbsoluteFill>

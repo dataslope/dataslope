@@ -4,7 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, MEMO_TABLE, MEMO_WRITES, TREE_N, VIDEO } from "./data";
@@ -112,6 +112,8 @@ export const MemoScene: React.FC = () => {
         const written = w < 0 ? 0 : ease(frame, storeAt + w * writeStep, 10);
         const shown = written >= 0.5 ? final : -1;
         const rowTop = tableTop + i * (cellH + 6);
+        // Border and text move from the ink to the memo's blue as the answer lands.
+        const cellInk = `color-mix(in srgb, ${MEMO_INK} ${Math.round(100 * written)}%, ${INK})`;
         return (
           <div key={i} style={{ position: "absolute", left: TABLE_X, top: rowTop, height: cellH, display: "flex", alignItems: "center", opacity: appear }}>
             <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT, width: INDEX_W }}>memo[{i}]</span>
@@ -121,21 +123,19 @@ export const MemoScene: React.FC = () => {
                 height: cellH,
                 boxSizing: "border-box",
                 // A slot that is never written keeps a dashed outline (an
-                // empty slot); every other cell is a fill with no outline,
-                // gray until its answer is stored, then blue.
-                border: w < 0 ? `2px dashed ${HAIRLINE}` : undefined,
+                // empty slot); every other cell is outlined, no fill (the
+                // owner, 2026-11-13, replacing the gray and blue fills): black
+                // until its answer is stored, then blue, border and text alike.
+                border: w < 0 ? `2px dashed ${HAIRLINE}` : `2px solid ${cellInk}`,
                 borderRadius: 4,
-                background:
-                  w < 0
-                    ? "transparent"
-                    : `color-mix(in srgb, ${MEMO} ${Math.round(24 * written)}%, color-mix(in srgb, var(--ds-gray-400) 24%, ${PAPER}))`,
+                background: "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: MONO,
                 fontSize: 26,
                 fontWeight: 500,
-                color: shown === -1 ? INK_SOFT : MEMO_INK,
+                color: w < 0 ? INK_SOFT : cellInk,
                 position: "relative",
               }}
             >

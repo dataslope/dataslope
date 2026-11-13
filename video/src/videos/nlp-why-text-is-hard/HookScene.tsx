@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { ART, HOOK } from "./data";
-import { BAD, BAD_INK, Chip, chipWidth, Count, Drift, FIG_Y, Headline, Kicker, Mark, pulse, Spot, X0 } from "./parts";
+import { BAD_INK, Chip, chipWidth, Count, Drift, FIG_Y, Headline, Kicker, Mark, pulse, Spot, X0 } from "./parts";
 
 /** One character cell of the flat string, in px. */
 const CELL = 26;
@@ -164,22 +164,24 @@ export const HookScene: React.FC = () => {
               key={i}
               style={{
                 position: "absolute",
-                left: STRIP_X + i * CELL,
+                left: STRIP_X + i * CELL - 1,
                 top: stripTop,
-                width: CELL,
+                width: CELL + 2,
                 height: cellH,
                 boxSizing: "border-box",
-                // The string's grid stays gray; a questioned character fills
-                // red, with no red outline of its own.
-                border: `1px solid color-mix(in srgb, ${INK_SOFT} 45%, transparent)`,
-                marginLeft: i === 0 ? 0 : -1,
-                background: flare > 0 ? `color-mix(in srgb, ${BAD} ${Math.round(flare * 20)}%, transparent)` : "transparent",
+                // A black grid with no fill (the owner, 2026-11-13: "use black
+                // borders"); each cell reaches 1px past its pitch either side,
+                // so neighbours share one 2px wall. A questioned
+                // character turns its text red rather than filling red.
+                border: `2px solid ${INK}`,
+                background: "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: MONO,
                 fontSize: 24,
-                color: INK,
+                fontWeight: flare > 0.5 ? 500 : 400,
+                color: flare > 0 ? `color-mix(in srgb, ${BAD_INK} ${Math.round(flare * 100)}%, ${INK})` : INK,
                 opacity: p,
                 transform: `translateY(${(1 - p) * 8 - swell * 6}px)`,
               }}

@@ -303,10 +303,9 @@ export const INGREDIENT_INK = {
   constraints: inkOf.orange,
   check: inkOf.teal,
 } as const;
-export const ingredientBand = (role: keyof typeof INGREDIENT_INK) => {
-  const hue = { context: "blue", interface: "purple", constraints: "orange", check: "teal" } as const;
-  return `color-mix(in srgb, ${ds(hue[role], 400)} 34%, transparent)`;
-};
+/** Each ingredient's brand hue, by name, for the badge helpers. */
+export const INGREDIENT_HUE = { context: "blue", interface: "purple", constraints: "orange", check: "teal" } as const;
+export const ingredientBand = (role: keyof typeof INGREDIENT_INK) => `color-mix(in srgb, ${ds(INGREDIENT_HUE[role], 400)} 34%, transparent)`;
 
 /**
  * Where a span of the joined text sits in the printed lines: one

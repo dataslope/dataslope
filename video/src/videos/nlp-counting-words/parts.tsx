@@ -4,7 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, fmt, headline as headlineStyle, HIGHLIGHT, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
-import { H, Ink, W } from "../../editorial/ui";
+import { H, Ink, outlineInk, W } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { type Family, ILLUSTRATIONS, VIDEO } from "./data";
@@ -307,6 +307,11 @@ export type TileMark = { at: number; out?: number; color?: string };
 /** A plain tile's fill: the gray badge's tint. */
 const TILE_FILL = "color-mix(in srgb, var(--ds-gray-400) 13%, transparent)";
 
+/** A ring that marks one tile out, in its hue at 40% (the owner,
+ *  2026-11-13: "For yellow badges with borders, use a more subtle border
+ *  color", and "a subtle red border" on the lone "not"). */
+export const subtleRing = (tone: "yellow" | "red") => `color-mix(in srgb, ${outlineInk(tone)} 40%, transparent)`;
+
 export const Tile: React.FC<{
   text: string;
   x: number;
@@ -323,7 +328,10 @@ export const Tile: React.FC<{
   out?: number;
   to?: { x: number; y: number; at: number; dur?: number; via?: { x: number; y: number; dur: number } };
   lift?: number;
-}> = ({ text, x, y, at, size = 26, w, marks = [], tint, border, ink = INK, dim, undim, out, to, lift = 0 }) => {
+  /** No fill: a 2px near-black border and near-black text (the owner,
+   *  2026-11-13: "black border, black text, and a transparent background"). */
+  outline?: boolean;
+}> = ({ text, x, y, at, size = 26, w, marks = [], tint, border, ink = INK, dim, undim, out, to, lift = 0, outline = false }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -351,8 +359,8 @@ export const Tile: React.FC<{
         // Fill only (the owner, 2026-11-11): a plain tile takes the gray
         // badge's tint, a family its own. `border` is kept for a ring that
         // marks one tile out, the one place an outline means something.
-        border: `1.5px solid ${border ?? "transparent"}`,
-        background: tint ?? TILE_FILL,
+        border: outline ? `2px solid ${outlineInk("ink")}` : `1.5px solid ${border ?? "transparent"}`,
+        background: outline ? "transparent" : (tint ?? TILE_FILL),
         opacity: p * (1 - o) * (1 - d),
         overflow: "hidden",
       }}
@@ -383,7 +391,7 @@ export const Tile: React.FC<{
           justifyContent: "center",
           fontFamily: MONO,
           fontSize: size,
-          color: ink,
+          color: outline ? outlineInk("ink") : ink,
           whiteSpace: "pre",
           fontVariantLigatures: "none",
         }}
