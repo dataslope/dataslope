@@ -9,9 +9,8 @@
  * two movements booked in the same minute cancel out before anyone sees the
  * dip between them.
  *
- * The count date is 2024-06-30. Every solution is executed against
- * node:sqlite by `__tests__/challengeSolutions`, so a wrong expectation fails
- * CI.
+ * The count date is 2024-06-30. Every solution is executed against PGlite
+ * by `__tests__/challengeSolutions`, so a wrong expectation fails CI.
  */
 
 import { resultShape, sqlChallenge } from "./authoring";
@@ -73,7 +72,7 @@ ORDER BY w.warehouse_name, m.sku`,
       dataset: WAREHOUSE,
       description: "Value the stock on hand at cost, one category at a time.",
       solutionNote:
-        "Multiply inside the sum, `SUM(m.quantity * p.unit_cost)`, so every movement is priced at its own product's cost. `SUM(m.quantity) * p.unit_cost` looks equivalent and is not: a category holds products at different costs, and SQLite quietly picks one of them to price the whole category with.",
+        "Multiply inside the sum, `SUM(m.quantity * p.unit_cost)`, so every movement is priced at its own product's cost. `SUM(m.quantity) * p.unit_cost` looks equivalent and is not: a category holds products at different costs, so there is no one `unit_cost` to multiply by, and Postgres rejects the query because `p.unit_cost` is neither grouped nor aggregated.",
     },
     {
       prompt: [
@@ -83,7 +82,7 @@ ORDER BY w.warehouse_name, m.sku`,
       columns: [
         { name: "category", type: "text" },
         { name: "units", type: "integer" },
-        { name: "stock_value", type: "real" },
+        { name: "stock_value", type: "numeric" },
       ],
       starter: `SELECT p.category
 FROM stock_movements m
@@ -256,7 +255,7 @@ ORDER BY w.warehouse_name`,
       description:
         "Measure how long ago each SKU last had a delivery, with the ones never delivered first.",
       solutionNote:
-        "Putting `m.reason = 'receipt'` in the `ON` clause of the `LEFT JOIN`, not in `WHERE`, is what keeps the SKU that has never been received: a `WHERE` would filter out its all-NULL row after the join. `NULLS FIRST` then lifts it to the top, where a descending sort in SQLite would otherwise leave it last. Counting any positive movement instead would date the packing tape by a transfer on June 13.",
+        "Putting `m.reason = 'receipt'` in the `ON` clause of the `LEFT JOIN`, not in `WHERE`, is what keeps the SKU that has never been received: a `WHERE` would filter out its all-NULL row after the join. `NULLS FIRST` then keeps it at the top. Postgres already sorts NULL first in a descending sort, because it treats NULL as larger than any value, but other databases do the opposite, and saying so in the query costs nothing. Counting any positive movement instead would date the packing tape by a transfer on June 13.",
     },
     {
       prompt: [
@@ -266,15 +265,15 @@ ORDER BY w.warehouse_name`,
       ],
       columns: [
         { name: "sku", type: "text" },
-        { name: "last_receipt", type: "text" },
+        { name: "last_receipt", type: "date" },
         { name: "days_since", type: "integer" },
       ],
       starter: `SELECT p.sku
 FROM products p
 `,
       solution: `SELECT p.sku,
-       date(MAX(m.moved_at)) AS last_receipt,
-       CAST(julianday('${AS_OF}') - julianday(date(MAX(m.moved_at))) AS INTEGER) AS days_since
+       MAX(m.moved_at)::date AS last_receipt,
+       DATE '${AS_OF}' - MAX(m.moved_at)::date AS days_since
 FROM products p
 LEFT JOIN stock_movements m
   ON m.sku = p.sku AND m.reason = 'receipt'
@@ -299,7 +298,7 @@ ORDER BY days_since DESC NULLS FIRST, p.sku`,
       description:
         "Match the two halves of every stock transfer, including one still on the road.",
       solutionNote:
-        "Joining the ledger to itself on `ref` gives each departure its arrival, and making it a `LEFT JOIN` keeps the transfer that has not arrived. The warehouses table then joins twice under two aliases, once for each end, and the second of those has to be a `LEFT JOIN` as well or the missing arrival drops the row again. `julianday` differences are in days, so multiply by 24 for hours.",
+        "Joining the ledger to itself on `ref` gives each departure its arrival, and making it a `LEFT JOIN` keeps the transfer that has not arrived. The warehouses table then joins twice under two aliases, once for each end, and the second of those has to be a `LEFT JOIN` as well or the missing arrival drops the row again. Subtracting the two timestamps gives an `interval`; `EXTRACT(EPOCH FROM ...)` turns it into seconds, so divide by 3600 for hours.",
     },
     {
       prompt: [
@@ -313,9 +312,9 @@ ORDER BY days_since DESC NULLS FIRST, p.sku`,
         { name: "from_warehouse", type: "text" },
         { name: "to_warehouse", type: "text" },
         { name: "quantity", type: "integer" },
-        { name: "shipped_at", type: "text" },
-        { name: "arrived_at", type: "text" },
-        { name: "hours_in_transit", type: "real" },
+        { name: "shipped_at", type: "timestamp" },
+        { name: "arrived_at", type: "timestamp" },
+        { name: "hours_in_transit", type: "numeric" },
       ],
       starter: `SELECT o.ref AS transfer_ref, o.sku, o.moved_at AS shipped_at
 FROM stock_movements o
@@ -328,7 +327,7 @@ WHERE o.reason = 'transfer' AND o.quantity < 0
        -o.quantity AS quantity,
        o.moved_at AS shipped_at,
        i.moved_at AS arrived_at,
-       ROUND((julianday(i.moved_at) - julianday(o.moved_at)) * 24, 1) AS hours_in_transit
+       ROUND(EXTRACT(EPOCH FROM i.moved_at - o.moved_at) / 3600, 1) AS hours_in_transit
 FROM stock_movements o
 JOIN warehouses wo ON wo.warehouse_id = o.warehouse_id
 LEFT JOIN stock_movements i
@@ -376,7 +375,7 @@ ORDER BY o.ref`,
         { name: "sku", type: "text" },
         { name: "product_name", type: "text" },
         { name: "on_hand", type: "integer" },
-        { name: "last_sale", type: "text" },
+        { name: "last_sale", type: "date" },
       ],
       starter: `SELECT p.sku, p.product_name, SUM(m.quantity) AS on_hand
 FROM products p
@@ -385,7 +384,7 @@ GROUP BY p.sku, p.product_name
 `,
       solution: `SELECT p.sku, p.product_name,
        SUM(m.quantity) AS on_hand,
-       date(MAX(m.moved_at) FILTER (WHERE m.reason = 'sale')) AS last_sale
+       (MAX(m.moved_at) FILTER (WHERE m.reason = 'sale'))::date AS last_sale
 FROM products p
 JOIN stock_movements m ON m.sku = p.sku
 GROUP BY p.sku, p.product_name
@@ -428,7 +427,7 @@ ORDER BY p.sku`,
       columns: [
         { name: "sku", type: "text" },
         { name: "warehouse_name", type: "text" },
-        { name: "moved_at", type: "text" },
+        { name: "moved_at", type: "timestamp" },
         { name: "balance", type: "integer" },
       ],
       starter: `SELECT m.sku, m.warehouse_id, m.moved_at, m.quantity
@@ -486,8 +485,8 @@ ORDER BY d.moved_at, d.sku`,
       ],
       columns: [
         { name: "sku", type: "text" },
-        { name: "sold_value", type: "real" },
-        { name: "cumulative_pct", type: "real" },
+        { name: "sold_value", type: "numeric" },
+        { name: "cumulative_pct", type: "numeric" },
         { name: "abc_class", type: "text" },
       ],
       starter: `SELECT p.sku, -SUM(m.quantity * p.unit_cost) AS sold_value
