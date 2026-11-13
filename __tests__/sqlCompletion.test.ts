@@ -3,6 +3,7 @@ import type { CompletionResult } from "@codemirror/autocomplete";
 import { EditorState } from "@codemirror/state";
 import { describe, expect, it } from "vitest";
 import {
+  completionAcceptsEnter,
   createSqlCompletionSource,
   type SqlCompletionOptions,
   type SqlCompletionSchema,
@@ -67,12 +68,19 @@ function makeComplete(
 
 const complete = makeComplete();
 
+// What the popup shows for an option. An ambiguous column is matched on its
+// bare name (`label`) and shown qualified (`displayLabel`), so the tests read
+// the shown text.
+function shownLabel(option: { label: string; displayLabel?: string }): string {
+  return option.displayLabel ?? option.label;
+}
+
 function labels(result: CompletionResult | null): string[] {
-  return result?.options.map((option) => option.label) ?? [];
+  return result?.options.map(shownLabel) ?? [];
 }
 
 function findOption(result: CompletionResult | null, label: string) {
-  return result?.options.find((option) => option.label === label);
+  return result?.options.find((option) => shownLabel(option) === label);
 }
 
 function topKeywords(result: CompletionResult | null, n = 8): string[] {
@@ -542,7 +550,7 @@ function applyOf(result: CompletionResult | null, label: string) {
 function columnLabels(result: CompletionResult | null): string[] {
   return (result?.options ?? [])
     .filter((option) => option.type === "property")
-    .map((option) => option.label);
+    .map(shownLabel);
 }
 
 function keywordLabels(result: CompletionResult | null): string[] {
@@ -1004,5 +1012,68 @@ describe("an empty table slot offers only what can start a table reference", () 
     expect(top).toEqual(
       expect.arrayContaining(["WHERE", "JOIN", "AS", "ANTI", "ASOF"]),
     );
+  });
+});
+
+describe("an ambiguous column is found by its name, not its qualifier", () => {
+  const users = {
+    name: "users",
+    kind: "table" as const,
+    columns: [{ name: "user_id", type: "INTEGER" }, { name: "name", type: "TEXT" }],
+  };
+  const cards = {
+    name: "cards",
+    kind: "table" as const,
+    columns: [{ name: "card_id", type: "INTEGER" }, { name: "user_id", type: "INTEGER" }],
+  };
+  const source = makeComplete({ dialect: "postgres" }, { entities: [users, cards] });
+
+  it("matches on the bare column and shows the alias", () => {
+    const result = source(
+      "SELECT * FROM cards c JOIN users u ON c.user_id = u.user_id WHERE user|",
+    );
+    const column = result?.options.find((o) => o.displayLabel === "u.user_id");
+    // `label` is what CodeMirror filters and ranks on. With the qualifier in
+    // it, typing `user` hit `u.user_id` mid-word and a table called `users`
+    // outranked the column.
+    expect(column?.label).toBe("user_id");
+    expect(column?.apply).toBe("u.user_id");
+  });
+});
+
+describe("what a bare Enter may take", () => {
+  const source = makeComplete({ dialect: "postgres" });
+  const accepts = (doc: string, label: string) => {
+    const option = findOption(source(doc), label);
+    expect(option, `${label} should be offered for ${doc}`).toBeDefined();
+    return completionAcceptsEnter(option!);
+  };
+
+  it("takes columns that are in scope", () => {
+    expect(accepts("SELECT na| FROM customers", "name")).toBe(true);
+  });
+
+  it("takes the keyword the grammar expects next", () => {
+    expect(accepts("SEL|", "SELECT")).toBe(true);
+    expect(accepts("SELECT * FRO|", "FROM")).toBe(true);
+  });
+
+  it("does not take a loosely matched keyword for a column typed before its FROM", () => {
+    // These rewrote what the reader had typed: name -> rename, id -> uuid,
+    // value -> values, data -> database.
+    expect(accepts("SELECT name|", "RENAME")).toBe(false);
+    expect(accepts("SELECT id|", "UUID")).toBe(false);
+    expect(accepts("SELECT value|", "VALUES")).toBe(false);
+    expect(accepts("SELECT data|", "DATABASE")).toBe(false);
+  });
+
+  it("does not take a function while the columns are unknown, and does once they are known", () => {
+    expect(accepts("SELECT date|", "DATE_PART")).toBe(false);
+    expect(accepts("SELECT cou| FROM customers", "COUNT")).toBe(true);
+  });
+
+  it("takes a table only where a table goes", () => {
+    expect(accepts("SELECT * FROM cust|", "customers")).toBe(true);
+    expect(accepts("SELECT cust|", "customers")).toBe(false);
   });
 });

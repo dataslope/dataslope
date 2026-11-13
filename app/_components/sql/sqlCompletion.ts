@@ -93,6 +93,23 @@ interface SqlCompletionContextInfo {
   keywordContext?: KeywordContext;
 }
 
+/** A completion plus what this source knows about it that the editor's
+ *  Enter key needs (see `acceptCompletionOnEnter` in shared/editorSetup.ts). */
+interface SqlCompletion extends Completion {
+  /** `false` when taking this on a bare Enter would be a guess: the reader
+   *  may well be typing a name the schema does not know yet. Tab, or moving
+   *  the selection first, still takes it. */
+  enterAccepts?: boolean;
+  /** Where a keyword sits in the current slot's grammar. */
+  keywordRank?: "primary" | "secondary" | "off";
+}
+
+/** Whether a bare Enter may take this completion. True for anything this
+ *  source did not flag, so a completion from elsewhere behaves as before. */
+export function completionAcceptsEnter(completion: Completion): boolean {
+  return (completion as SqlCompletion).enterAccepts !== false;
+}
+
 interface KeywordContext {
   // Most-likely follow-ups (highest keyword boost).
   primary: readonly string[];
@@ -2898,13 +2915,21 @@ function keywordOptions(
       else if (isSecondary) kwBoost = boost + KEYWORD_SECONDARY_BUMP;
       else kwBoost = boost - KEYWORD_OFF_CONTEXT_PENALTY;
     }
-    out.push({
+    const ranked: SqlCompletion = {
       label: keyword,
       apply: casing === "lower" ? keyword.toLowerCase() : undefined,
       type: "keyword",
       section: keywordSection,
       boost: kwBoost,
-    });
+      keywordRank: !hasContext
+        ? undefined
+        : isPrimary
+          ? "primary"
+          : isSecondary
+            ? "secondary"
+            : "off",
+    };
+    out.push(ranked);
   }
   for (const fn of functions) {
     const insert = casing === "lower" ? fn.toLowerCase() : fn;
@@ -3009,11 +3034,16 @@ function columnOptions(
       // unaliased derived table has no name to qualify with.
       const qualified =
         (ownerCount.get(name.toLowerCase()) ?? 0) > 1 && display !== "";
-      const label = qualified ? `${display}.${name}` : name;
-      if (seen.has(label)) continue;
-      seen.add(label);
+      const shown = qualified ? `${display}.${name}` : name;
+      if (seen.has(shown)) continue;
+      seen.add(shown);
       options.push({
-        label,
+        // Matched on the column name, shown with its qualifier. With the
+        // qualifier in `label`, typing `user` matched `c.user_id` only as a
+        // mid-word hit, and the popup ranked a table named `users` (and the
+        // keyword USER) above the two columns the reader was reaching for.
+        label: name,
+        displayLabel: qualified ? shown : undefined,
         apply: qualified
           ? `${quoteIdentifier(display, dialect)}.${quoteIdentifier(name, dialect)}`
           : quoteIdentifier(name, dialect),
@@ -3436,6 +3466,9 @@ export function createSqlCompletionSource(
     const localSchema = scope.schema;
 
     const kw = info.keywordContext;
+    // Set when the cursor is where a column goes and no table is in scope:
+    // the SELECT list being written before its FROM, most often.
+    let columnsUnknown = false;
     const completions = (() => {
       switch (info.mode) {
         case "tables": {
@@ -3474,6 +3507,7 @@ export function createSqlCompletionSource(
           if (cols.length === 0 && joins.length === 0) {
             // No FROM/JOIN/UPDATE/INTO target in scope yet, column suggestions
             // would be misleading, so offer keywords + tables instead.
+            columnsUnknown = true;
             return [
               ...keywordOptions(dialect, BOOST.keywordInColumnContext, kw, {
                 casing,
@@ -3604,6 +3638,35 @@ export function createSqlCompletionSource(
         info.joinConditionSlot && option.type === "property"
           ? Math.min(base + bump, BOOST.bumpCeiling)
           : base + bump;
+    }
+
+    // What a bare Enter may take. The popup lists everything that matches
+    // loosely, which is right for browsing and wrong for Enter: with no
+    // table in scope, `name` matched RENAME, `id` matched UUID and `value`
+    // matched VALUES, and Enter (meant as a newline) rewrote the column the
+    // reader had just typed. So Enter is limited to what the grammar or the
+    // schema actually backs at this position:
+    //   - keywords the slot expects, never the off-context tail;
+    //   - functions, unless the columns here are unknown (then a bare word
+    //     is far more likely a column: `date`, not `date_part()`);
+    //   - tables only where a table goes.
+    // Columns, join conditions, aliases and types are always backed.
+    const tableSlot =
+      info.mode === "tables" || info.mode === "qualified-columns";
+    for (const option of uniqueOptions as SqlCompletion[]) {
+      if (option.type === "keyword") {
+        option.enterAccepts = columnsUnknown
+          ? option.keywordRank === "primary"
+          : option.keywordRank !== "off";
+      } else if (option.type === "function") {
+        option.enterAccepts = !columnsUnknown;
+      } else if (
+        option.section === tableSection ||
+        option.section === viewSection ||
+        option.section === cteSection
+      ) {
+        option.enterAccepts = tableSlot;
+      }
     }
 
     if (uniqueOptions.length === 0) return null;

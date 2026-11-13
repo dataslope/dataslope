@@ -2176,6 +2176,9 @@ function PostgresPlaygroundInner() {
           type: column.type,
         })),
         kind: "table",
+        // The sidebar lists one schema at a time; saying which lets
+        // `other_schema.|` come up empty instead of listing these.
+        schema: selectedSchema,
         foreignKeys: (foreignKeysByEntity[name] ?? []).map((fk) => ({
           column: fk.from,
           refEntity: fk.table,
@@ -2193,6 +2196,7 @@ function PostgresPlaygroundInner() {
           type: column.type,
         })),
         kind: "view",
+        schema: selectedSchema,
       });
     }
     const key = JSON.stringify(completionSchema);
@@ -2221,7 +2225,7 @@ function PostgresPlaygroundInner() {
     return () => {
       cancelled = true;
     };
-  }, [tables, views, columnsByEntity, foreignKeysByEntity, schemas]);
+  }, [tables, views, columnsByEntity, foreignKeysByEntity, schemas, selectedSchema]);
 
   // Drop result entries whose owning tab no longer exists.
   useEffect(() => {

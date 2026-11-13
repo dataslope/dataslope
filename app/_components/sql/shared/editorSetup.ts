@@ -5,7 +5,11 @@ import {
   autocompletion,
   closeBrackets,
   closeBracketsKeymap,
+  closeCompletion,
   completionKeymap,
+  completionStatus,
+  selectedCompletion,
+  selectedCompletionIndex,
   startCompletion,
 } from "@codemirror/autocomplete";
 import {
@@ -43,6 +47,7 @@ import {
 } from "@codemirror/view";
 import { themeFor, redoKeymap } from "../../cmExtensions";
 import {
+  completionAcceptsEnter,
   createSqlCompletionSource,
   type SqlCompletionSchema,
   type SqlDialect,
@@ -53,14 +58,75 @@ import { splitSqlStatements, statementAtCursor } from "../utils/sqlAnalysis";
 // typing (CodeMirror's default is 100 ms).
 const AUTOCOMPLETE_DELAY_MS = 75;
 
+/** Editors whose completion popup was opened on purpose (Ctrl+Space),
+ *  until it closes. A popup someone asked for is one they mean to pick from. */
+const explicitCompletion = new WeakSet<EditorView>();
+
+const startCompletionExplicitly = (view: EditorView): boolean => {
+  explicitCompletion.add(view);
+  return startCompletion(view);
+};
+
+/** Forget the "asked for it" mark once the popup is gone, however it went. */
+const explicitCompletionReset = EditorView.updateListener.of((update) => {
+  if (completionStatus(update.state) === null) {
+    explicitCompletion.delete(update.view);
+  }
+});
+
+/** Enter takes the highlighted suggestion when the reader has shown they
+ *  want it, and is a newline otherwise.
+ *
+ *  It used to take whatever was highlighted. The popup opens by itself while
+ *  typing and matches loosely, so pressing Enter at the end of a line could
+ *  replace the word just typed with something else entirely: `SELECT name`
+ *  became `SELECT rename`, `id` became `uuid`, and `id,` gained an `ALL`.
+ *
+ *  Enter now completes when any of these holds:
+ *    - the popup was opened with Ctrl+Space;
+ *    - the selection was moved with the arrow keys;
+ *    - what has been typed is the start of the suggestion (so there is
+ *      something to complete), and the completion source vouches for it at
+ *      this position (`completionAcceptsEnter`).
+ *  Tab always takes the highlighted suggestion. */
+function acceptCompletionOnEnter(view: EditorView): boolean {
+  const { state } = view;
+  if (completionStatus(state) !== "active") return false;
+  const selected = selectedCompletion(state);
+  if (!selected) return false;
+
+  const deliberate =
+    explicitCompletion.has(view) || (selectedCompletionIndex(state) ?? 0) > 0;
+  if (!deliberate) {
+    const head = state.selection.main.head;
+    const line = state.doc.lineAt(head);
+    const typed = (
+      /[A-Za-z_][\w$]*$/.exec(line.text.slice(0, head - line.from))?.[0] ?? ""
+    ).toLowerCase();
+    const label = selected.label.toLowerCase();
+    // `u.user_id` is offered for a typed `user`: compare the name part too.
+    const name = label.slice(label.lastIndexOf(".") + 1);
+    const extendsTyped =
+      typed !== "" &&
+      ((label.startsWith(typed) && label !== typed) ||
+        (name.startsWith(typed) && name !== typed));
+    if (!extendsTyped || !completionAcceptsEnter(selected)) {
+      // Not taken: close the popup and let Enter be a newline.
+      closeCompletion(view);
+      return false;
+    }
+  }
+  return acceptCompletion(view);
+}
+
 /** Completion keys for every SQL editor: the playgrounds, the challenge
  *  cards, and the embedded code blocks.
  *
  *  Register these ahead of `defaultKeymap` so ArrowUp/Down move the popup
- *  selection instead of the cursor. Enter and Tab both take the highlighted
- *  suggestion, the way an editor's intellisense is expected to;
- *  `acceptCompletion` returns false when no popup is open, so Enter falls
- *  through to `defaultKeymap`'s newline the rest of the time. A newline is
+ *  selection instead of the cursor. Tab takes the highlighted suggestion;
+ *  Enter takes it when that is clearly what was meant (see
+ *  `acceptCompletionOnEnter`) and otherwise falls through to
+ *  `defaultKeymap`'s newline, as it does when no popup is open. A newline is
  *  not lost to a popup that has only just appeared either: CodeMirror's
  *  `interactionDelay` (75 ms) refuses an accept that arrives with the popup,
  *  which is the window a keystroke already in flight lands in.
@@ -70,8 +136,12 @@ const AUTOCOMPLETE_DELAY_MS = 75;
  *  registers at the highest precedence: its Enter would sit ahead of each
  *  editor's own Mod-Enter → Run. */
 export const sqlCompletionKeymap: readonly KeyBinding[] = [
-  ...completionKeymap.filter((b) => b.key !== "Enter"),
-  { key: "Enter", run: acceptCompletion },
+  ...completionKeymap
+    .filter((b) => b.key !== "Enter")
+    .map((b) =>
+      b.run === startCompletion ? { ...b, run: startCompletionExplicitly } : b,
+    ),
+  { key: "Enter", run: acceptCompletionOnEnter },
   { key: "Tab", run: acceptCompletion },
 ];
 
@@ -148,6 +218,7 @@ export function makeSqlAutocompletionExtension(
           }),
     ),
     completionPopupTheme,
+    explicitCompletionReset,
   ];
 }
 
