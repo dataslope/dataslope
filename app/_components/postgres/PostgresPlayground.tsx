@@ -3448,7 +3448,7 @@ function PostgresPlaygroundInner() {
     }
     if (!validation.isDirty) return;
     try {
-      await engine.rebuildTable({
+      const outcome = await engine.rebuildTable({
         originalName: dialog.tableName,
         newName: dialog.newTableName.trim(),
         columns: dialog.columns.map((col) => ({
@@ -3478,7 +3478,13 @@ function PostgresPlaygroundInner() {
         })),
       }, selectedSchemaRef.current);
       await refreshSchema();
-      showToast(`Updated structure of "${dialog.newTableName.trim()}".`);
+      // Postgres cannot move an existing column without recreating the
+      // table, so a reorder is reported instead of silently not happening.
+      showToast(
+        outcome.reorderIgnored
+          ? `Updated structure of "${dialog.newTableName.trim()}". Column order was left as it is: PostgreSQL cannot reorder existing columns.`
+          : `Updated structure of "${dialog.newTableName.trim()}".`,
+      );
       setViewStructureDialog(null);
     } catch (err) {
       showToast(

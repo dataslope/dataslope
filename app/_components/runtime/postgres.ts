@@ -24,6 +24,7 @@ import { PGLITE_WORKER_CDN } from "./cdn";
 import { topoSortByForeignKeys } from "../sql/utils/exportOrder";
 import { defaultGeneratesUniqueValue } from "../sql/utils/duplicateRow";
 import { fetchDatasetText } from "./remoteDatasets";
+import { planPgAlter, type PgCurrentTable } from "./pgAlterPlan";
 import {
   toDateOnlyString,
   toPgArrayLiteral,
@@ -137,7 +138,6 @@ const PG_TYPE_NAMES: Record<number, string> = {
   1561: "bit[]",
 };
 
-let pgRebuildCounter = 0;
 
 /** `serial` / `bigserial` / `smallserial` when a column is an integer whose
  *  default reads from a sequence it owns — i.e. it was declared `serial`.
@@ -314,7 +314,13 @@ export interface PostgresEngine {
   listForeignKeys: (name: string, schema?: string) => Promise<ForeignKeyInfo[]>;
   getColumnConstraintInfo: (tableName: string, schema?: string) => Promise<ColumnConstraintInfo[]>;
   createTable: (name: string, columns: ColumnSpec[], schema?: string) => Promise<void>;
-  rebuildTable: (spec: TableRebuildSpec, schema?: string) => Promise<void>;
+  /** Applies the structure editor's changes with `ALTER TABLE`. Resolves
+   *  with `reorderIgnored` when the form moved existing columns, which
+   *  Postgres cannot do in place. */
+  rebuildTable: (
+    spec: TableRebuildSpec,
+    schema?: string,
+  ) => Promise<{ reorderIgnored: boolean }>;
   dropEntity: (
     name: string,
     kind: PgEntityKind,
@@ -1001,102 +1007,116 @@ export async function createPostgresEngine(
     },
 
     async rebuildTable(spec, schema = "public") {
-      const finalName = spec.newName.trim();
-      if (!finalName) throw new Error("Table name cannot be empty.");
-      const columns = spec.columns.filter((col) => col.name.trim()).map((col) => ({
-        ...col,
-        name: col.name.trim(),
-        type: (col.type || "text").trim(),
-      }));
-      if (columns.length === 0) throw new Error("A table must have at least one column.");
-
-      // Build rename map: originalName → new name for all renamed columns.
-      const renameMap = new Map<string, string>();
-      for (const col of columns) {
-        if (col.originalName && col.originalName !== col.name) {
-          renameMap.set(col.originalName, col.name);
-        }
+      // Despite the name (shared with the SQLite engine, which really does
+      // rebuild), this alters the table in place. See pgAlterPlan.ts for why
+      // a rebuild is the wrong tool in Postgres.
+      const table = spec.originalName;
+      const [cols, fks, constraintRows, sequenceRows] = await Promise.all([
+        engine.listColumns(table, schema),
+        queryRows<{
+          conname: string;
+          from_column: string;
+          to_table: string;
+          to_column: string;
+          delete_rule: string;
+          update_rule: string;
+        }>(
+          `
+          SELECT con.conname,
+                 a.attname AS from_column,
+                 ref.relname AS to_table,
+                 ra.attname AS to_column,
+                 CASE con.confdeltype WHEN 'c' THEN 'CASCADE' WHEN 'r' THEN 'RESTRICT'
+                   WHEN 'n' THEN 'SET NULL' WHEN 'd' THEN 'SET DEFAULT' ELSE 'NO ACTION' END AS delete_rule,
+                 CASE con.confupdtype WHEN 'c' THEN 'CASCADE' WHEN 'r' THEN 'RESTRICT'
+                   WHEN 'n' THEN 'SET NULL' WHEN 'd' THEN 'SET DEFAULT' ELSE 'NO ACTION' END AS update_rule
+          FROM pg_catalog.pg_constraint con
+          JOIN pg_catalog.pg_class cls ON cls.oid = con.conrelid
+          JOIN pg_catalog.pg_namespace n ON n.oid = cls.relnamespace
+          JOIN pg_catalog.pg_class ref ON ref.oid = con.confrelid
+          JOIN pg_catalog.pg_attribute a ON a.attrelid = cls.oid AND a.attnum = con.conkey[1]
+          JOIN pg_catalog.pg_attribute ra ON ra.attrelid = ref.oid AND ra.attnum = con.confkey[1]
+          WHERE n.nspname = $2 AND cls.relname = $1
+            AND con.contype = 'f'
+            AND array_length(con.conkey, 1) = 1
+          `,
+          [table, schema],
+        ),
+        queryRows<{ conname: string; contype: string; column_name: string | null }>(
+          `
+          SELECT con.conname, con.contype::text AS contype,
+                 CASE WHEN array_length(con.conkey, 1) = 1 THEN a.attname END AS column_name
+          FROM pg_catalog.pg_constraint con
+          JOIN pg_catalog.pg_class cls ON cls.oid = con.conrelid
+          JOIN pg_catalog.pg_namespace n ON n.oid = cls.relnamespace
+          LEFT JOIN pg_catalog.pg_attribute a ON a.attrelid = cls.oid AND a.attnum = con.conkey[1]
+          WHERE n.nspname = $2 AND cls.relname = $1 AND con.contype IN ('p', 'u')
+          `,
+          [table, schema],
+        ),
+        queryRows<{ column_name: string; seq: string | null; is_identity: string }>(
+          `
+          SELECT c.column_name,
+                 pg_get_serial_sequence(format('%I.%I', c.table_schema, c.table_name), c.column_name) AS seq,
+                 c.is_identity
+          FROM information_schema.columns c
+          WHERE c.table_schema = $2 AND c.table_name = $1
+          `,
+          [table, schema],
+        ),
+      ]);
+      if (cols.length === 0) {
+        throw new Error(`Table "${table}" no longer exists.`);
       }
+      const sequenceByCol = new Map(sequenceRows.map((r) => [r.column_name, r]));
+      const uniqueByCol = new Map<string, string>();
+      let primaryKeyConstraint: string | null = null;
+      for (const row of constraintRows) {
+        if (row.contype === "p") primaryKeyConstraint = row.conname;
+        else if (row.column_name) uniqueByCol.set(row.column_name, row.conname);
+      }
+      const current: PgCurrentTable = {
+        schema,
+        name: table,
+        primaryKeyConstraint,
+        columns: cols.map((col) => ({
+          name: col.name,
+          type: col.type,
+          notNull: col.notNull,
+          primaryKey: col.pk > 0,
+          defaultValue: col.defaultValue ?? null,
+          identity: sequenceByCol.get(col.name)?.is_identity === "YES",
+          ownedSequence: sequenceByCol.get(col.name)?.seq ?? null,
+          uniqueConstraint: uniqueByCol.get(col.name) ?? null,
+          foreignKeys: fks
+            .filter((fk) => fk.from_column === col.name)
+            .map((fk) => ({
+              constraint: fk.conname,
+              table: fk.to_table,
+              column: fk.to_column,
+              onDelete: fk.delete_rule,
+              onUpdate: fk.update_rule,
+            })),
+          generatedExpression: col.generated?.expression ?? null,
+        })),
+      };
 
-      // Patch generated-column expressions referencing a renamed column so
-      // CREATE TABLE doesn't fail. validatePgStructure guarantees names are
-      // valid unquoted identifiers, so newName is safe unquoted.
-      const patchedColumns =
-        renameMap.size > 0
-          ? columns.map((col) => {
-              if (!col.generated) return col;
-              let expr = col.generated.expression;
-              for (const [oldName, newName] of renameMap) {
-                expr = expr.replace(
-                  new RegExp(
-                    `\\b${oldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
-                    "g",
-                  ),
-                  newName,
-                );
-              }
-              return expr === col.generated.expression
-                ? col
-                : { ...col, generated: { ...col.generated, expression: expr } };
-            })
-          : columns;
-
-      const tmpName = `${spec.originalName}__tmp_rebuild_${++pgRebuildCounter}`;
-      const schemaPrefix = `${quoteIdent(schema)}.`;
-      const createSql = renderPgCreateTable(schema, tmpName, patchedColumns);
-      const copyable = patchedColumns.filter((col) => col.originalName && !col.generated);
-      const targetCols = copyable.map((col) => quoteIdent(col.name)).join(", ");
-      const sourceCols = copyable.map((col) => quoteIdent(col.originalName!)).join(", ");
-      // SERIAL columns get auto-created `<table>_<col>_seq` sequences that
-      // keep the tmpName prefix after RENAME TO; rename them too so the
-      // final schema has no __tmp_rebuild artifacts.
-      const serialRenames = patchedColumns
-        .filter((col) => col.autoIncrement && !col.generated)
-        .map((col) => ({
-          oldSeq: `${tmpName}_${col.name}_seq`,
-          newSeq: `${finalName}_${col.name}_seq`,
-        }));
-      try {
-        await db.exec("BEGIN");
-        await db.exec(createSql);
-        if (copyable.length > 0) {
-          await db.exec(
-            `INSERT INTO ${schemaPrefix}${quoteIdent(tmpName)} (${targetCols}) SELECT ${sourceCols} FROM ${schemaPrefix}${quoteIdent(spec.originalName)}`,
-          );
-        }
-        await db.exec(`DROP TABLE ${schemaPrefix}${quoteIdent(spec.originalName)} CASCADE`);
-        await db.exec(`ALTER TABLE ${schemaPrefix}${quoteIdent(tmpName)} RENAME TO ${quoteIdent(finalName)}`);
-        for (const { oldSeq, newSeq } of serialRenames) {
-          if (oldSeq === newSeq) continue;
-          await db.exec(
-            `ALTER SEQUENCE ${schemaPrefix}${quoteIdent(oldSeq)} RENAME TO ${quoteIdent(newSeq)}`,
-          );
-        }
-        // Auto-named constraints (`<tmpName>_pkey`, …) also keep the temp
-        // prefix after RENAME TO; rename them (which also renames their
-        // backing indexes).
-        const likePattern = `${tmpName.replace(/([%_\\])/g, "\\$1")}%`;
-        const tmpConstraints = await db.query<{ conname: string }>(
-          `SELECT conname FROM pg_constraint
-           WHERE conrelid = $1::regclass AND conname LIKE $2`,
-          [`${schemaPrefix}${quoteIdent(finalName)}`, likePattern],
-        );
-        for (const { conname } of tmpConstraints.rows) {
-          const renamed = conname.replace(tmpName, finalName);
-          if (renamed === conname) continue;
-          await db.exec(
-            `ALTER TABLE ${schemaPrefix}${quoteIdent(finalName)} RENAME CONSTRAINT ${quoteIdent(conname)} TO ${quoteIdent(renamed)}`,
-          );
-        }
-        await db.exec("COMMIT");
-      } catch (err) {
+      const plan = planPgAlter(current, spec);
+      if (plan.statements.length > 0) {
         try {
-          await db.exec("ROLLBACK");
-        } catch {
-          // ignore rollback failures
+          await db.exec("BEGIN");
+          for (const statement of plan.statements) await db.exec(statement);
+          await db.exec("COMMIT");
+        } catch (err) {
+          try {
+            await db.exec("ROLLBACK");
+          } catch {
+            // ignore rollback failures
+          }
+          throw err;
         }
-        throw err;
       }
+      return { reorderIgnored: plan.reorderIgnored };
     },
 
     async dropEntity(name, kind, schema = "public") {

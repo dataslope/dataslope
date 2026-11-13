@@ -182,6 +182,11 @@ import { useQueryHistory } from "./hooks/useQueryHistory";
 import { useEditorResultsSplit } from "./hooks/useEditorResultsSplit";
 import { EDITOR_SPLIT_STORAGE_SUFFIX } from "./utils/editorSplit";
 import { ModifyStructureForm } from "./components/ModifyStructureForm";
+import { useDiscardGuard } from "./components/DiscardGuard";
+import {
+  buildSqliteCreateTableSql,
+  validateSqliteStructure,
+} from "./utils/structureValidation";
 import { ResultView } from "./components/ResultView";
 import { SchemaItem } from "./components/SchemaItem";
 import { SchemaLeafItem } from "./components/SchemaLeafItem";
@@ -794,6 +799,50 @@ function SqlPlaygroundInner() {
     { engineRef, activeTabIdRef, activeDbIdRef },
     openTabAndRun,
   );
+
+  // ── Structure drawers: validation and the unsaved-changes guard ──
+  const existingEntityNames = useMemo(() => [...tables, ...views], [tables, views]);
+  const addTableValidation = useMemo(
+    () =>
+      addTableDialog
+        ? validateSqliteStructure(
+            { ...addTableDialog, originalName: "" },
+            existingEntityNames,
+          )
+        : null,
+    [addTableDialog, existingEntityNames],
+  );
+  const modifyValidation = useMemo(
+    () =>
+      modifyDialog
+        ? validateSqliteStructure(modifyDialog, existingEntityNames)
+        : null,
+    [modifyDialog, existingEntityNames],
+  );
+  const addTableGuard = useDiscardGuard({
+    // A new table has no saved state to compare with, so "dirty" means it
+    // differs from the form as it first opened.
+    isDirty:
+      addTableDialog !== null &&
+      modifyDialogSignature(addTableDialog) !== addTableDialog.pristineSignature,
+    onDiscard: useCallback(() => {
+      setAddTableDialog(null);
+      setAddTableInvalidColIds(new Set());
+    }, [setAddTableDialog, setAddTableInvalidColIds]),
+    title: "Discard this table?",
+    description: "The table you were defining has not been created.",
+  });
+  const modifyGuard = useDiscardGuard({
+    isDirty:
+      modifyDialog !== null &&
+      modifyDialogSignature(modifyDialog) !== modifyDialog.originalSignature,
+    onDiscard: useCallback(() => {
+      setModifyDialog(null);
+      setModifyInvalidColIds(new Set());
+      setModifyStructureTab("columns");
+    }, [setModifyDialog, setModifyInvalidColIds, setModifyStructureTab]),
+    description: "Your edits to this table's structure have not been saved.",
+  });
 
   const [createIndexOpen, setCreateIndexOpen] = useState(false);
   const [createViewOpen, setCreateViewOpen] = useState(false);
@@ -3183,11 +3232,7 @@ function SqlPlaygroundInner() {
         <Dialog.Root
           open={modifyDialog !== null}
           onOpenChange={(next) => {
-            if (!next) {
-              setModifyDialog(null);
-              setModifyInvalidColIds(new Set());
-              setModifyStructureTab("columns");
-            }
+            if (!next) modifyGuard.requestClose();
           }}
         >
           <Dialog.Portal>
@@ -3224,7 +3269,13 @@ function SqlPlaygroundInner() {
                       });
                     }
                   }}
-                  invalidColumnIds={modifyInvalidColIds}
+                  invalidColumnIds={
+                    new Set([
+                      ...modifyInvalidColIds,
+                      ...(modifyValidation?.invalidColumnIds ?? []),
+                    ])
+                  }
+                  errors={modifyValidation?.errors}
                   knownTables={tables}
                   engine={engineForRender}
                   onDropLeaf={dropLeafEntity}
@@ -3264,6 +3315,7 @@ function SqlPlaygroundInner() {
                     onClick={submitModifyStructure}
                     disabled={
                       !modifyDialog ||
+                      !modifyValidation?.isValid ||
                       modifyDialogSignature(modifyDialog) ===
                         modifyDialog.originalSignature
                     }
@@ -3382,10 +3434,7 @@ function SqlPlaygroundInner() {
         <Dialog.Root
           open={addTableDialog !== null}
           onOpenChange={(next) => {
-            if (!next) {
-              setAddTableDialog(null);
-              setAddTableInvalidColIds(new Set());
-            }
+            if (!next) addTableGuard.requestClose();
           }}
         >
           <Dialog.Portal>
@@ -3414,6 +3463,7 @@ function SqlPlaygroundInner() {
                     setAddTableDialog({
                       ...next,
                       originalSignature: addTableDialog!.originalSignature,
+                      pristineSignature: addTableDialog!.pristineSignature,
                     });
                     if (addTableInvalidColIds.size > 0) {
                       setAddTableInvalidColIds((prev) => {
@@ -3425,9 +3475,19 @@ function SqlPlaygroundInner() {
                       });
                     }
                   }}
-                  invalidColumnIds={addTableInvalidColIds}
+                  invalidColumnIds={
+                    new Set([
+                      ...addTableInvalidColIds,
+                      ...(addTableValidation?.invalidColumnIds ?? []),
+                    ])
+                  }
                   knownTables={tables}
                   engine={engineForRender}
+                  theme={editorTheme}
+                  errors={addTableValidation?.errors}
+                  previewSql={buildSqliteCreateTableSql(addTableDialog, {
+                    pretty: true,
+                  })}
                 />
               )}
               <footer className="sql-modify-drawer-footer">
@@ -3438,7 +3498,7 @@ function SqlPlaygroundInner() {
                   type="button"
                   className="confirm-btn confirm-btn-primary"
                   onClick={submitAddTable}
-                  disabled={!addTableDialog}
+                  disabled={!addTableDialog || !addTableValidation?.isValid}
                 >
                   Create Table
                 </button>
@@ -3446,6 +3506,9 @@ function SqlPlaygroundInner() {
             </Dialog.Popup>
           </Dialog.Portal>
         </Dialog.Root>
+
+        {addTableGuard.dialog}
+        {modifyGuard.dialog}
 
         <CreateIndexDialog
           open={createIndexOpen}

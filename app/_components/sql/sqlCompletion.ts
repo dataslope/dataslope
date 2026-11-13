@@ -37,6 +37,10 @@ export interface SqlCompletionEntity {
   columns: SqlCompletionColumn[];
   kind: "table" | "view" | "cte";
   foreignKeys?: SqlForeignKeyMeta[];
+  /** Namespace the entity lives in (`public`, `main`, `analytics`). An
+   *  entity without one is taken to live in the dialect's default schema,
+   *  so `public.|` lists it and `pg_catalog.|` does not. */
+  schema?: string;
 }
 
 export interface SqlCompletionSchema {
@@ -98,6 +102,10 @@ interface KeywordContext {
   // everything else is suppressed (used for tightly-scoped slots like
   // CREATE TABLE name, ORDER, etc.).
   restrict?: boolean;
+  // Functions a restricted slot still offers. `restrict` drops the function
+  // catalog along with the keywords, which is wrong for the one slot where a
+  // function is the point: `FROM read_csv(…)`, `FROM generate_series(…)`.
+  functions?: readonly string[];
 }
 
 const completeIdentifierPattern = /^[A-Za-z_][A-Za-z0-9_$]*$/;
@@ -298,7 +306,6 @@ const FUNCTION_META: Record<string, { sig: string; doc?: string }> = {
   ARRAY_LENGTH: { sig: "(array, dimension)", doc: "Length of an array dimension." },
   CARDINALITY: { sig: "(array)", doc: "Total number of elements." },
   LIST: { sig: "(expr)", doc: "Collect the group's values into a list." },
-  LIST_AGG: { sig: "(expr, separator)", doc: "Concatenate the group's values." },
   LIST_VALUE: { sig: "(value, ...)", doc: "A list from the arguments." },
   STRUCT_PACK: { sig: "(name := value, ...)", doc: "A struct from named values." },
   STRUCT_EXTRACT: { sig: "(struct, name)", doc: "One field of a struct." },
@@ -319,6 +326,30 @@ const FUNCTION_META: Record<string, { sig: string; doc?: string }> = {
   READ_PARQUET: { sig: "('file.parquet')", doc: "Read a Parquet file as a table." },
   READ_JSON_AUTO: { sig: "('file.json')", doc: "Read a JSON file, detecting its shape." },
 };
+
+/** Where a dialect spells the same function differently. SQLite's
+ *  `strftime` takes the format first and DuckDB's the value first, and a
+ *  signature copied across is how a reader ends up with the arguments
+ *  swapped; DuckDB's `to_timestamp` takes epoch seconds, not text and a
+ *  format. */
+const DIALECT_FUNCTION_META: Partial<
+  Record<SqlDialect, Record<string, { sig: string; doc?: string }>>
+> = {
+  duckdb: {
+    STRFTIME: { sig: "(timestamp, format)", doc: "Format a date/time." },
+    TO_TIMESTAMP: {
+      sig: "(seconds)",
+      doc: "Timestamp from seconds since 1970-01-01.",
+    },
+  },
+};
+
+function functionMeta(
+  fn: string,
+  dialect: SqlDialect,
+): { sig: string; doc?: string } | undefined {
+  return DIALECT_FUNCTION_META[dialect]?.[fn] ?? FUNCTION_META[fn];
+}
 
 /** Functions written without parentheses. */
 const NO_PAREN_FUNCTIONS = new Set(["CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP"]);
@@ -631,7 +662,6 @@ const DUCKDB_KEYWORDS = [
 
 const DUCKDB_FUNCTIONS = [
   "LIST",
-  "LIST_AGG",
   "LIST_VALUE",
   "ARRAY_AGG",
   "STRING_AGG",
@@ -672,6 +702,41 @@ const DUCKDB_FUNCTIONS = [
   "READ_PARQUET",
   "READ_JSON_AUTO",
 ] as const;
+
+// Postgres functions DuckDB does not have, checked against
+// `duckdb_functions()` in duckdb-wasm 1.32. DuckDB borrows Postgres's
+// syntax, not its catalog: formatting goes through strftime/strptime and
+// JSON through json_group_array/json_object, so offering these completes to
+// a "function does not exist" error.
+const DUCKDB_MISSING_POSTGRES_FUNCTIONS = new Set<string>([
+  "TO_CHAR",
+  "TO_DATE",
+  "TO_NUMBER",
+  "JSON_AGG",
+  "JSONB_AGG",
+  "JSON_BUILD_OBJECT",
+  "JSONB_BUILD_OBJECT",
+  "JSON_OBJECT_AGG",
+  "JSONB_OBJECT_AGG",
+  "REGEXP_MATCH",
+  "INITCAP",
+]);
+
+// Functions that return rows, so they may open a table reference. These are
+// the only functions the `FROM |` slot offers.
+const TABLE_FUNCTIONS: Record<SqlDialect, readonly string[]> = {
+  sqlite: [],
+  postgres: ["GENERATE_SERIES", "UNNEST"],
+  duckdb: [
+    "READ_CSV",
+    "READ_CSV_AUTO",
+    "READ_PARQUET",
+    "READ_JSON_AUTO",
+    "GENERATE_SERIES",
+    "RANGE",
+    "UNNEST",
+  ],
+};
 
 // Data types offered inside CREATE TABLE column definitions, most common
 // first. Detection (is the previous token a type?) uses the shared
@@ -744,6 +809,15 @@ const DEFAULT_SCHEMA_NAMES: Record<SqlDialect, readonly string[]> = {
   duckdb: ["main", "memory"],
 };
 
+// Where an entity that carries no `schema` of its own lives. `memory` is
+// DuckDB's default catalog, and `memory.t` resolves to `memory.main.t`, so it
+// lists the same tables `main` does.
+const DEFAULT_SCHEMA: Record<SqlDialect, readonly string[]> = {
+  sqlite: ["main"],
+  postgres: ["public"],
+  duckdb: ["main", "memory"],
+};
+
 interface DialectProfile {
   keywords: string[];
   functions: string[];
@@ -764,10 +838,16 @@ function buildProfile(
 const DIALECT_PROFILES: Record<SqlDialect, DialectProfile> = {
   sqlite: buildProfile(SQLITE_KEYWORDS, SQLITE_FUNCTIONS),
   postgres: buildProfile(POSTGRES_KEYWORDS, POSTGRES_FUNCTIONS),
-  // DuckDB stacks its extensions on top of the Postgres dialect.
+  // DuckDB stacks its extensions on top of the Postgres dialect, minus the
+  // Postgres functions it never implemented.
   duckdb: buildProfile(
     [...POSTGRES_KEYWORDS, ...DUCKDB_KEYWORDS],
-    [...POSTGRES_FUNCTIONS, ...DUCKDB_FUNCTIONS],
+    [
+      ...POSTGRES_FUNCTIONS.filter(
+        (fn) => !DUCKDB_MISSING_POSTGRES_FUNCTIONS.has(fn),
+      ),
+      ...DUCKDB_FUNCTIONS,
+    ],
   ),
 };
 
@@ -870,7 +950,16 @@ function columnType(column: SqlCompletionColumn): string | undefined {
   return type ? type : undefined;
 }
 
-function normalizeIdentifier(identifier: string | undefined): string {
+/** The name an identifier token stands for. Pass `dialect` for a name read
+ *  out of the statement (an alias, a CTE, a SELECT-list label) that may be
+ *  inserted again later: Postgres folds an unquoted name to lowercase, so
+ *  `FROM users U` declares `u`, and that is the spelling `quoteIdentifier`
+ *  can leave bare. Kept as typed, `U` would be quoted on the way back in and
+ *  `"U".id` names an alias the query never declared. */
+function normalizeIdentifier(
+  identifier: string | undefined,
+  dialect?: SqlDialect,
+): string {
   if (!identifier) return "";
   const trimmed = identifier.trim();
   if (
@@ -880,14 +969,84 @@ function normalizeIdentifier(identifier: string | undefined): string {
   ) {
     return trimmed.slice(1, -1).replace(/""/g, '"');
   }
-  return trimmed;
+  return dialect === "postgres" ? trimmed.toLowerCase() : trimmed;
 }
 
-function quoteIdentifier(identifier: string): string {
-  if (completeIdentifierPattern.test(identifier)) return identifier;
-  // SQLite accepts several identifier quote styles; double quotes are the
-  // SQL-standard form and match the rest of the playground's generated SQL.
+// Words each engine refuses, or silently reads as something else, when they
+// are written bare where a column or table name belongs. Measured, not taken
+// from a keyword list: every keyword the three engines know was created as a
+// quoted column and as a quoted table, then referenced bare in a SELECT list,
+// WHERE, ORDER BY, FROM, JOIN and INSERT (SQLite 3.53, PGlite, duckdb-wasm
+// 1.32). A word is here if any of those failed or returned a different value,
+// which is how `current_date` qualifies: it parses, and returns today.
+//
+// The lists are short on purpose. Most keywords are not reserved, so `name`,
+// `date`, `value`, `status`, `type`, `key`, `year` and `text` stay bare in all
+// three. `user` is reserved in Postgres only (it is `current_user` there).
+const RESERVED_WORDS: Record<SqlDialect, ReadonlySet<string>> = {
+  sqlite: new Set(
+    (
+      "add all alter and as autoincrement between case cast check collate " +
+      "commit constraint create current_date current_time current_timestamp " +
+      "default deferrable delete distinct drop else escape except exists " +
+      "foreign from group having in index insert intersect into is isnull " +
+      "join limit not nothing notnull null on or order primary raise " +
+      "references returning select set table then to transaction union " +
+      "unique update using values when where"
+    ).split(" "),
+  ),
+  // Exactly the `reserved` and `reserved (can be function or type)` rows of
+  // pg_get_keywords().
+  postgres: new Set(
+    (
+      "all analyse analyze and any array as asc asymmetric authorization " +
+      "binary both case cast check collate collation column concurrently " +
+      "constraint create cross current_catalog current_date current_role " +
+      "current_schema current_time current_timestamp current_user default " +
+      "deferrable desc distinct do else end except false fetch for foreign " +
+      "freeze from full grant group having ilike in initially inner " +
+      "intersect into is isnull join lateral leading left like limit " +
+      "localtime localtimestamp natural not notnull null offset on only or " +
+      "order outer overlaps placing primary references returning right " +
+      "select session_user similar some symmetric system_user table " +
+      "tablesample then to trailing true union unique user using variadic " +
+      "verbose when where window with"
+    ).split(" "),
+  ),
+  duckdb: new Set(
+    (
+      "all analyse analyze and anti any array as asc asof asymmetric at " +
+      "authorization binary both by case cast check collate collation " +
+      "column concurrently constraint create cross default deferrable desc " +
+      "describe distinct do else end except false fetch for foreign freeze " +
+      "from full glob group having ilike in initially inner intersect into " +
+      "is isnull join lambda lateral leading left like limit natural not " +
+      "notnull null offset on only or order outer overlaps pivot " +
+      "pivot_longer pivot_wider placing positional primary qualify " +
+      "references returning right select semi show similar some summarize " +
+      "symmetric table tablesample then to trailing true union unique " +
+      "unpack unpivot using variadic verbose when where window with"
+    ).split(" "),
+  ),
+};
+
+/** Always-quoted form. Double quotes are the SQL-standard style, accepted by
+ *  all three engines, and match the rest of the playground's generated SQL. */
+function forceQuoteIdentifier(identifier: string): string {
   return `"${identifier.replace(/"/g, '""')}"`;
+}
+
+/** `identifier` as it has to be written for `dialect` to read it as that
+ *  name: bare when the engine would read it back unchanged, quoted when it
+ *  has characters a bare name cannot hold, is a reserved word, or (Postgres
+ *  only) has an uppercase letter that an unquoted name would lose. SQLite and
+ *  DuckDB match names case-insensitively, so they have no case rule. */
+function quoteIdentifier(identifier: string, dialect: SqlDialect): string {
+  const bare =
+    completeIdentifierPattern.test(identifier) &&
+    !RESERVED_WORDS[dialect].has(identifier.toLowerCase()) &&
+    !(dialect === "postgres" && /[A-Z]/.test(identifier));
+  return bare ? identifier : forceQuoteIdentifier(identifier);
 }
 
 function maskRangePreservingNewlines(
@@ -951,6 +1110,101 @@ function maskCommentsAndStrings(sql: string): string {
     i += 1;
   }
   return masked;
+}
+
+type LexicalState = "code" | "string" | "comment" | "quoted-identifier";
+
+/** End of the quoted span opening at `start`, and whether it was closed. A
+ *  doubled quote character is the escape for one, in a string literal and in
+ *  a quoted identifier alike. */
+function quotedSpanEnd(
+  sql: string,
+  start: number,
+): { end: number; closed: boolean } {
+  const quote = sql[start];
+  let i = start + 1;
+  while (i < sql.length) {
+    if (sql[i] === quote) {
+      if (sql[i + 1] === quote) {
+        i += 2;
+        continue;
+      }
+      return { end: i + 1, closed: true };
+    }
+    i += 1;
+  }
+  return { end: sql.length, closed: false };
+}
+
+// `$$` or `$tag$`, the opening (and closing) delimiter of a dollar-quoted
+// string. `$1` is a parameter and does not match: a tag cannot start with a
+// digit.
+const dollarQuoteTagPattern = /\$(?:[A-Za-z_][A-Za-z0-9_]*)?\$/y;
+
+/** What the text at `pos` is part of. Completions are for code: inside a
+ *  string literal or a comment the reader is writing prose, and a popup
+ *  offering `users` after `'us` gets accepted by the next Enter. A
+ *  double-quoted span is an identifier, not a string, so it is reported
+ *  separately and still completes.
+ *
+ *  Scans from the top of the document because a string or a block comment
+ *  can open on any earlier line. */
+function lexicalStateAt(
+  sql: string,
+  pos: number,
+  dialect: SqlDialect,
+): LexicalState {
+  let i = 0;
+  while (i < pos) {
+    const ch = sql[i];
+    const next = sql[i + 1];
+    if (ch === "-" && next === "-") {
+      const newline = sql.indexOf("\n", i + 2);
+      const end = newline === -1 ? sql.length : newline;
+      // The end of the line still belongs to the comment being typed.
+      if (pos >= i + 2 && pos <= end) return "comment";
+      i = end;
+      continue;
+    }
+    if (ch === "/" && next === "*") {
+      const close = sql.indexOf("*/", i + 2);
+      const end = close === -1 ? sql.length : close + 2;
+      if (pos >= i + 2 && (close === -1 || pos < end)) return "comment";
+      i = end;
+      continue;
+    }
+    if (ch === "'" || ch === '"') {
+      const { end, closed } = quotedSpanEnd(sql, i);
+      // Straight after the closing quote is code again; anywhere before it,
+      // or anywhere at all in a span that never closes, is inside.
+      if (!closed || pos < end) {
+        return ch === "'" ? "string" : "quoted-identifier";
+      }
+      i = end;
+      continue;
+    }
+    // Dollar quoting is Postgres syntax that DuckDB also reads. SQLite has
+    // none: `$name` there is a bind parameter.
+    if (
+      ch === "$" &&
+      dialect !== "sqlite" &&
+      !/[A-Za-z0-9_$]/.test(sql[i - 1] ?? "")
+    ) {
+      dollarQuoteTagPattern.lastIndex = i;
+      const tag = dollarQuoteTagPattern.exec(sql)?.[0];
+      if (tag) {
+        const close = sql.indexOf(tag, i + tag.length);
+        const end = close === -1 ? sql.length : close + tag.length;
+        if (pos >= i + tag.length && (close === -1 || pos < end)) {
+          return "string";
+        }
+        i = end;
+        continue;
+      }
+    }
+    i += 1;
+  }
+  return "code";
 }
 
 /** The statement containing `pos`, split at the cursor. `before` drives
@@ -1083,6 +1337,56 @@ function inOpenCaseExpression(tokens: string[]): boolean {
     else if (token === "END" && open > 0) open -= 1;
   }
   return open > 0;
+}
+
+/** Keywords for a FROM/JOIN slot that has no table reference in it yet:
+ *  straight after the keyword, after a comma in the FROM list, or inside
+ *  the paren that opens one. Null anywhere else.
+ *
+ *  Nothing that follows a table (AS, JOIN, WHERE, ANTI, ASOF, ...) can start
+ *  one, and offered directly under the table names they read as if they
+ *  could. What can start a reference is short: a table, LATERAL where the
+ *  dialect has it, a row-returning function, or a parenthesised subquery. */
+function emptyTableSlotContext(
+  tokens: string[],
+  lastToken: string | undefined,
+  dialect: SqlDialect,
+): KeywordContext | null {
+  const opensReference = (token: string | undefined) =>
+    token === "FROM" || token === "JOIN" || token === ",";
+  if (opensReference(lastToken)) {
+    // A comma inside a paren separates arguments (`FROM range(1, |`), not
+    // table references.
+    const clauseIndex = Math.max(
+      tokens.lastIndexOf("FROM"),
+      tokens.lastIndexOf("JOIN"),
+    );
+    let depth = 0;
+    for (const token of tokens.slice(clauseIndex + 1)) {
+      if (token === "(") depth += 1;
+      else if (token === ")") depth -= 1;
+    }
+    if (lastToken === "," && depth > 0) return null;
+    // `DELETE FROM |` names one plain table.
+    if (lastToken === "FROM" && tokens.at(-2) === "DELETE") {
+      return { primary: [], restrict: true };
+    }
+    return {
+      primary: [],
+      secondary: dialect === "sqlite" ? [] : ["LATERAL"],
+      restrict: true,
+      functions: TABLE_FUNCTIONS[dialect],
+    };
+  }
+  // `FROM (|`: a derived table. A paren after anything else is a function's
+  // argument list or a join condition and keeps its usual keywords.
+  if (
+    lastToken === "(" &&
+    (opensReference(tokens.at(-2)) || tokens.at(-2) === "LATERAL")
+  ) {
+    return { primary: ["SELECT"], secondary: ["WITH", "VALUES"], restrict: true };
+  }
+  return null;
 }
 
 // Resolve which keywords to surface at the cursor. Returns `null` when no
@@ -1346,12 +1650,16 @@ function resolveKeywordContext(
           ],
         };
       }
+      const tableSlot = emptyTableSlotContext(tokens, lastToken, dialect);
+      if (tableSlot) return tableSlot;
       return {
         primary: ["AS"],
         secondary: ["JOIN", "WHERE", ...dialectJoinExtras],
       };
     }
-    case "JOIN":
+    case "JOIN": {
+      const tableSlot = emptyTableSlotContext(tokens, lastToken, dialect);
+      if (tableSlot) return tableSlot;
       if (isIdentifierToken(lastToken)) {
         return {
           primary: ["ON", "USING", "AS"],
@@ -1374,6 +1682,7 @@ function resolveKeywordContext(
         };
       }
       return { primary: ["AS"] };
+    }
     case "ON":
     case "WHERE":
     case "HAVING":
@@ -1868,13 +2177,18 @@ interface TableReference {
   alias?: string;
   /** Clause keyword that introduced the reference, lowercased. */
   via: "from" | "join" | "update" | "into" | "table" | "comma";
+  /** Offset of the reference in the scanned text. */
+  at: number;
 }
 
 /** Ordered table references in the statement (FROM/JOIN/UPDATE/INTO/
  *  ALTER-TABLE targets plus comma-separated FROM lists), with aliases and
  *  optional schema qualifiers stripped. */
-function extractTableRefList(sql: string): TableReference[] {
-  const refs: Array<TableReference & { at: number }> = [];
+function extractTableRefList(
+  sql: string,
+  dialect: SqlDialect,
+): TableReference[] {
+  const refs: TableReference[] = [];
   const masked = maskCommentsAndStrings(sql);
   const push = (
     tableToken: string,
@@ -1882,9 +2196,9 @@ function extractTableRefList(sql: string): TableReference[] {
     via: TableReference["via"],
     at: number,
   ) => {
-    const table = normalizeIdentifier(tableToken);
+    const table = normalizeIdentifier(tableToken, dialect);
     if (!table) return;
-    const alias = normalizeIdentifier(aliasToken);
+    const alias = normalizeIdentifier(aliasToken, dialect);
     refs.push({
       table,
       alias: alias && !isClauseBoundaryKeyword(alias) ? alias : undefined,
@@ -1925,9 +2239,7 @@ function extractTableRefList(sql: string): TableReference[] {
   // The two scans above each emit in their own document order; merge them
   // so positional logic ("which table was joined last?") sees the true
   // statement order.
-  return refs
-    .sort((a, b) => a.at - b.at)
-    .map(({ table, alias, via }) => ({ table, alias, via }));
+  return refs.sort((a, b) => a.at - b.at);
 }
 
 /** alias/table-name (lowercased) → canonical table name. */
@@ -1949,36 +2261,48 @@ const cteContinuationPattern = new RegExp(
   "g",
 );
 
-function parseColumnList(list: string | undefined): string[] {
+function parseColumnList(
+  list: string | undefined,
+  dialect: SqlDialect,
+): string[] {
   if (!list) return [];
   return list
     .split(",")
-    .map((part) => normalizeIdentifier(part.trim()))
+    .map((part) => normalizeIdentifier(part.trim(), dialect))
     .filter((name) => name.length > 0);
 }
 
-function extractCtes(sql: string): SqlCompletionEntity[] {
-  const masked = maskCommentsAndStrings(sql);
-  const seen = new Set<string>();
-  const result: SqlCompletionEntity[] = [];
+interface CteDefinition {
+  entity: SqlCompletionEntity;
+  /** Offset of the paren that opens the CTE's body. */
+  bodyOpen: number;
+  /** `WITH x(a, b) AS …` named its columns itself. */
+  explicitColumns: boolean;
+}
 
-  const addCte = (rawName: string, columnList: string | undefined) => {
-    const name = normalizeIdentifier(rawName);
+function extractCtes(masked: string, dialect: SqlDialect): CteDefinition[] {
+  const seen = new Set<string>();
+  const result: CteDefinition[] = [];
+
+  const addCte = (match: RegExpExecArray) => {
+    const name = normalizeIdentifier(match[1], dialect);
     if (!name) return;
     const key = name.toLowerCase();
     if (seen.has(key)) return;
     seen.add(key);
+    const columns = parseColumnList(match[2], dialect);
     result.push({
-      name,
-      kind: "cte",
-      columns: parseColumnList(columnList),
+      entity: { name, kind: "cte", columns },
+      // Both patterns end on the body's opening paren.
+      bodyOpen: match.index + match[0].length - 1,
+      explicitColumns: columns.length > 0,
     });
   };
 
   let match: RegExpExecArray | null;
   cteHeadPattern.lastIndex = 0;
   while ((match = cteHeadPattern.exec(masked))) {
-    addCte(match[1], match[2]);
+    addCte(match);
   }
 
   // Continuation `, name AS (...)`, only honor those that fall outside any
@@ -1987,11 +2311,13 @@ function extractCtes(sql: string): SqlCompletionEntity[] {
   while ((match = cteContinuationPattern.exec(masked))) {
     const upTo = masked.slice(0, match.index);
     if (parenDepth(upTo) === 0) {
-      addCte(match[1], match[2]);
+      addCte(match);
     }
   }
 
-  return result;
+  // Definition order, so a CTE that selects from an earlier one finds that
+  // one's columns already worked out.
+  return result.sort((a, b) => a.bodyOpen - b.bodyOpen);
 }
 
 function parenDepth(masked: string): number {
@@ -2004,20 +2330,411 @@ function parenDepth(masked: string): number {
   return depth;
 }
 
-function effectiveSchema(
+/** One SELECT's worth of scope: the statement itself, or a parenthesised
+ *  subquery inside it. */
+interface QueryBlock {
+  /** Offset of the opening paren, -1 for the statement itself. */
+  open: number;
+  /** Offset of the closing paren, or the statement length when unclosed. */
+  close: number;
+  parent: QueryBlock | null;
+  children: QueryBlock[];
+}
+
+const subqueryOpenPattern = /\(\s*(?:SELECT|WITH)\b/iy;
+
+/** The statement's subqueries as a tree. Only a paren that opens with SELECT
+ *  or WITH starts a block; a function call or an IN list belongs to the
+ *  block around it. */
+function parseQueryBlocks(masked: string): QueryBlock {
+  const root: QueryBlock = {
+    open: -1,
+    close: masked.length,
+    parent: null,
+    children: [],
+  };
+  // One entry per open paren, null for a paren that is not a subquery.
+  const stack: Array<QueryBlock | null> = [];
+  let current = root;
+  for (let i = 0; i < masked.length; i += 1) {
+    const ch = masked[i];
+    if (ch === "(") {
+      subqueryOpenPattern.lastIndex = i;
+      if (subqueryOpenPattern.test(masked)) {
+        const block: QueryBlock = {
+          open: i,
+          close: masked.length,
+          parent: current,
+          children: [],
+        };
+        current.children.push(block);
+        stack.push(block);
+        current = block;
+      } else {
+        stack.push(null);
+      }
+    } else if (ch === ")") {
+      const closed = stack.pop();
+      if (closed) {
+        closed.close = i;
+        current = closed.parent ?? root;
+      }
+    }
+  }
+  return root;
+}
+
+/** The block's text at statement offsets, with everything before it and the
+ *  inside of each nested subquery blanked, so a scan of it sees only what
+ *  this SELECT itself wrote. */
+function blockOwnText(masked: string, block: QueryBlock): string {
+  let text = " ".repeat(block.open + 1);
+  let at = block.open + 1;
+  for (const child of block.children) {
+    text +=
+      masked.slice(at, child.open + 1) +
+      " ".repeat(child.close - child.open - 1);
+    at = child.close;
+  }
+  return text + masked.slice(at, block.close);
+}
+
+/** The innermost block containing `offset`. */
+function blockAt(root: QueryBlock, offset: number): QueryBlock {
+  let block = root;
+  for (;;) {
+    const inner = block.children.find(
+      (child) => offset > child.open && offset <= child.close,
+    );
+    if (!inner) return block;
+    block = inner;
+  }
+}
+
+// Keywords that end a SELECT list when they appear outside any paren.
+const selectListEndPattern =
+  /(?:FROM|WHERE|GROUP|HAVING|WINDOW|QUALIFY|ORDER|LIMIT|OFFSET|UNION|INTERSECT|EXCEPT)\b/iy;
+
+/** The items of the first SELECT list in `text`, split at its top-level
+ *  commas. Null when there is no SELECT to read. */
+function firstSelectListItems(text: string): string[] | null {
+  const select = /\bSELECT\b/i.exec(text);
+  if (!select) return null;
+  const items: string[] = [];
+  let itemStart = select.index + select[0].length;
+  let depth = 0;
+  let i = itemStart;
+  for (; i < text.length; i += 1) {
+    const ch = text[i];
+    if (ch === "(") {
+      depth += 1;
+    } else if (ch === ")") {
+      if (depth === 0) break;
+      depth -= 1;
+    } else if (depth > 0) {
+      continue;
+    } else if (ch === ",") {
+      items.push(text.slice(itemStart, i));
+      itemStart = i + 1;
+    } else if (
+      /[A-Za-z]/.test(ch) &&
+      !/[A-Za-z0-9_$."]/.test(text[i - 1] ?? " ")
+    ) {
+      selectListEndPattern.lastIndex = i;
+      if (selectListEndPattern.test(text)) break;
+    }
+  }
+  items.push(text.slice(itemStart, i));
+  return items
+    .map((item, index) =>
+      index === 0
+        ? item.replace(/^\s*(?:DISTINCT(?:\s+ON\s*\([^)]*\))?|ALL)\b/i, "")
+        : item,
+    )
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
+/** `*` or `alias.*`. Group 1 is the qualifier. */
+const starItemPattern = new RegExp(
+  String.raw`^(?:(${sqlIdentifierPattern})\s*\.\s*)?\*$`,
+);
+/** `col`, `t.col` or `schema.t.col`. Group 1 is the nearest qualifier,
+ *  group 2 the column. */
+const plainColumnItemPattern = new RegExp(
+  String.raw`^(?:${sqlIdentifierPattern}\s*\.\s*)*?(?:(${sqlIdentifierPattern})\s*\.\s*)?(${sqlIdentifierPattern})$`,
+);
+/** `expr label`: a trailing identifier after whitespace. */
+const implicitAliasItemPattern = new RegExp(
+  String.raw`^([\s\S]*\S)\s+(${sqlIdentifierPattern})$`,
+);
+// Words that leave an expression waiting for its next operand. An identifier
+// after one of these is that operand (`x AND y`, `x COLLATE nocase`), not a
+// label for the column.
+const OPERAND_EXPECTING_WORDS = new Set([
+  "AND", "OR", "NOT", "IS", "IN", "LIKE", "ILIKE", "BETWEEN", "SIMILAR",
+  "GLOB", "REGEXP", "MATCH", "ESCAPE", "COLLATE", "ZONE", "DISTINCT", "ALL",
+  "CASE", "WHEN", "THEN", "ELSE", "BY", "AS", "FROM", "FOR", "INTERVAL",
+  "EXCLUDE", "REPLACE",
+]);
+
+/** The name a SELECT-list item gives its output column, when the text says
+ *  so: an `AS label`, a trailing label, or a plain column reference. Null
+ *  for a bare expression, whose name each engine invents differently
+ *  (`count`, `count_star()`, `COUNT(*)`). */
+function selectItemName(item: string, dialect: SqlDialect): string | null {
+  const explicit = selectAliasPattern.exec(item);
+  if (explicit) return normalizeIdentifier(explicit[1], dialect);
+  const plain = plainColumnItemPattern.exec(item);
+  if (plain) {
+    return SELECT_LIST_KEYWORDS.has(plain[2].toUpperCase())
+      ? null
+      : normalizeIdentifier(plain[2], dialect);
+  }
+  const implicit = implicitAliasItemPattern.exec(item);
+  if (!implicit) return null;
+  const [, expr, label] = implicit;
+  if (SELECT_LIST_KEYWORDS.has(label.toUpperCase())) return null;
+  if (/[.+\-*/%<>=|!,(:]$/.test(expr)) return null;
+  const lastWord = /([A-Za-z_]+)$/.exec(expr)?.[1].toUpperCase();
+  if (lastWord && OPERAND_EXPECTING_WORDS.has(lastWord)) return null;
+  return normalizeIdentifier(label, dialect);
+}
+
+/** A table reference paired with what it names. */
+interface ResolvedRef {
+  ref: TableReference;
+  /** The catalog table, CTE or derived table behind the reference, when it
+   *  is one completion knows. */
+  entity?: SqlCompletionEntity;
+}
+
+interface StatementScope {
+  /** The host's schema plus the statement's CTEs: what a table slot lists. */
+  schema: SqlCompletionSchema;
+  /** References made by the SELECT the cursor is in, in statement order. */
+  own: ResolvedRef[];
+  /** `own`, followed by those of each enclosing SELECT that can see out. */
+  visible: ResolvedRef[];
+}
+
+function refMatchesQualifier(ref: TableReference, qualifier: string): boolean {
+  return (
+    ref.alias?.toLowerCase() === qualifier ||
+    ref.table.toLowerCase() === qualifier
+  );
+}
+
+// What follows a derived table's closing paren: its alias, and optionally
+// the column names it gives the subquery's output.
+const derivedAliasPattern = new RegExp(
+  String.raw`^\)\s*(?:AS\s+)?(?!${aliasBlockListSource}\b)(${sqlIdentifierPattern})\s*(?:\(([^()]*)\))?`,
+  "i",
+);
+
+/** Works out which tables the cursor can see, and what columns the
+ *  statement's CTEs and derived tables produce.
+ *
+ *  Scope follows the SELECT the cursor is in. A table named inside a
+ *  subquery is not visible to the query around it, and the other way round
+ *  only a correlated subquery (one in an expression, or after LATERAL) sees
+ *  out; a CTE body and a plain derived table do not. Treating the whole
+ *  statement as one flat scope is what made `WITH r AS (SELECT * FROM users)
+ *  SELECT | FROM r` offer every column twice, as `users.id` and `r.id`.
+ *
+ *  A CTE or a derived table gets its columns from its own SELECT list: `*`
+ *  expands to the tables in that SELECT's FROM, and `col`, `t.col` and
+ *  `expr AS label` contribute their names. This is not a SQL parser. An item
+ *  it cannot name is skipped, and a list it cannot read at all leaves the
+ *  inner tables showing through, which is what completion did before. */
+function resolveStatementScope(
   base: SqlCompletionSchema,
   statement: string,
-): SqlCompletionSchema {
-  const ctes = extractCtes(statement);
-  if (ctes.length === 0) return base;
+  cursor: number,
+  dialect: SqlDialect,
+): StatementScope {
+  const masked = maskCommentsAndStrings(statement);
+  const root = parseQueryBlocks(masked);
+  const ctes = extractCtes(masked, dialect);
   const knownNames = new Set(
     base.entities.map((entity) => entity.name.toLowerCase()),
   );
-  const merged = [
-    ...base.entities,
-    ...ctes.filter((cte) => !knownNames.has(cte.name.toLowerCase())),
-  ];
-  return { ...base, entities: merged };
+  const schema: SqlCompletionSchema =
+    ctes.length === 0
+      ? base
+      : {
+          ...base,
+          entities: [
+            ...base.entities,
+            ...ctes
+              .map((cte) => cte.entity)
+              .filter((entity) => !knownNames.has(entity.name.toLowerCase())),
+          ],
+        };
+
+  const blockByOpen = new Map<number, QueryBlock>();
+  const indexBlocks = (block: QueryBlock) => {
+    blockByOpen.set(block.open, block);
+    block.children.forEach(indexBlocks);
+  };
+  indexBlocks(root);
+  const cteBodyOpens = new Set(ctes.map((cte) => cte.bodyOpen));
+  // CTEs whose SELECT list could not be read, with the body to fall back on.
+  const unreadBodies = new Map<SqlCompletionEntity, QueryBlock>();
+
+  const ownTexts = new Map<QueryBlock, string>();
+  const ownText = (block: QueryBlock): string => {
+    let text = ownTexts.get(block);
+    if (text === undefined) {
+      text = blockOwnText(masked, block);
+      ownTexts.set(block, text);
+    }
+    return text;
+  };
+
+  interface BlockRole {
+    kind: "cte" | "derived" | "expression";
+    /** Whether the block can refer to the tables of the query around it. */
+    seesOut: boolean;
+    alias?: string;
+    columnList?: string;
+  }
+  const roles = new Map<QueryBlock, BlockRole>();
+  const roleOf = (block: QueryBlock): BlockRole => {
+    const known = roles.get(block);
+    if (known) return known;
+    let role: BlockRole = { kind: "expression", seesOut: true };
+    if (cteBodyOpens.has(block.open)) {
+      role = { kind: "cte", seesOut: false };
+    } else if (block.parent) {
+      const parentText = ownText(block.parent);
+      // Trimmed first: a blanked sibling subquery leaves a long run of
+      // spaces, and `\s*$` would rescan it from every position.
+      const head = parentText.slice(0, block.open).trimEnd();
+      const opener = /(?:\b(FROM|JOIN|LATERAL)|(,))$/i.exec(head);
+      // A comma opens a table reference only in a FROM list; in a SELECT
+      // list the same shape is a scalar subquery.
+      const inFromList = () => {
+        const clause = tokenize(head)
+          .reverse()
+          .find((token) => isClauseBoundaryKeyword(token));
+        return /^(?:FROM|JOIN)$/i.test(clause ?? "");
+      };
+      if (opener && (opener[2] === undefined || inFromList())) {
+        const tail = derivedAliasPattern.exec(parentText.slice(block.close));
+        role = {
+          kind: "derived",
+          seesOut: opener[1]?.toUpperCase() === "LATERAL",
+          alias: tail ? normalizeIdentifier(tail[1], dialect) : "",
+          columnList: tail?.[2],
+        };
+      }
+    }
+    roles.set(block, role);
+    return role;
+  };
+
+  const refCache = new Map<QueryBlock, ResolvedRef[]>();
+  const resolving = new Set<QueryBlock>();
+  const ownRefs = (block: QueryBlock): ResolvedRef[] => {
+    const cached = refCache.get(block);
+    if (cached) return cached;
+    // A recursive CTE selects from itself; the second visit adds nothing.
+    if (resolving.has(block)) return [];
+    resolving.add(block);
+    const refs: ResolvedRef[] = [];
+    for (const ref of extractTableRefList(ownText(block), dialect)) {
+      const entity = findEntity(schema, ref.table);
+      refs.push({ ref, entity });
+      const unread = entity ? unreadBodies.get(entity) : undefined;
+      if (unread) refs.push(...ownRefs(unread));
+    }
+    for (const child of block.children) {
+      const role = roleOf(child);
+      if (role.kind !== "derived") continue;
+      const columns = role.columnList
+        ? parseColumnList(role.columnList, dialect)
+        : selectColumns(child);
+      // An unaliased derived table (SQLite and DuckDB allow one) keeps an
+      // empty name: its columns are in scope but cannot be qualified.
+      const name = role.alias ?? "";
+      refs.push({
+        ref: { table: name, via: "from", at: child.open },
+        entity: { name: name || "subquery", kind: "cte", columns: columns ?? [] },
+      });
+      if (!columns) refs.push(...ownRefs(child));
+    }
+    refs.sort((a, b) => a.ref.at - b.ref.at);
+    resolving.delete(block);
+    refCache.set(block, refs);
+    return refs;
+  };
+
+  const selectColumns = (block: QueryBlock): SqlCompletionColumn[] | null => {
+    const items = firstSelectListItems(ownText(block));
+    if (!items) return null;
+    const refs = ownRefs(block);
+    const columns: SqlCompletionColumn[] = [];
+    const seen = new Set<string>();
+    const add = (column: SqlCompletionColumn) => {
+      const key = columnName(column).toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      columns.push(column);
+    };
+    for (const item of items) {
+      const star = starItemPattern.exec(item);
+      if (star) {
+        const qualifier = normalizeIdentifier(star[1]).toLowerCase();
+        const sources = refs.filter(
+          ({ ref, entity }) =>
+            entity !== undefined &&
+            entity.columns.length > 0 &&
+            (!qualifier || refMatchesQualifier(ref, qualifier)),
+        );
+        // `*` over tables completion has never heard of (a table function,
+        // a file) could be anything.
+        if (sources.length === 0) return null;
+        for (const source of sources) source.entity?.columns.forEach(add);
+        continue;
+      }
+      const name = selectItemName(item, dialect);
+      if (!name) continue;
+      // A plain column reference carries its declared type along.
+      const plain = plainColumnItemPattern.exec(item);
+      const qualifier = normalizeIdentifier(plain?.[1]).toLowerCase();
+      const source = plain
+        ? refs
+            .filter(({ ref }) => !qualifier || refMatchesQualifier(ref, qualifier))
+            .flatMap(({ entity }) => entity?.columns ?? [])
+            .find((column) => columnName(column).toLowerCase() === name.toLowerCase())
+        : undefined;
+      add(source ?? name);
+    }
+    return columns;
+  };
+
+  for (const cte of ctes) {
+    // `WITH x(a, b) AS (…)` named its columns; nothing to work out.
+    if (cte.explicitColumns) continue;
+    const body = blockByOpen.get(cte.bodyOpen);
+    if (!body) continue;
+    const columns = selectColumns(body);
+    if (columns) cte.entity.columns = columns;
+    else unreadBodies.set(cte.entity, body);
+  }
+
+  const cursorBlock = blockAt(root, cursor);
+  const visible: ResolvedRef[] = [];
+  for (
+    let block: QueryBlock | null = cursorBlock;
+    block;
+    block = block.parent
+  ) {
+    visible.push(...ownRefs(block));
+    if (!roleOf(block).seesOut) break;
+  }
+  return { schema, own: ownRefs(cursorBlock), visible };
 }
 
 function findEntity(
@@ -2084,6 +2801,7 @@ function fkRelatedTables(
 function tableOptions(
   schema: SqlCompletionSchema,
   defaultBoost: number,
+  dialect: SqlDialect,
   related?: Set<string>,
 ): Completion[] {
   return schema.entities.map((entity) => {
@@ -2092,7 +2810,7 @@ function tableOptions(
     const isRelated = related?.has(entity.name.toLowerCase()) ?? false;
     return {
       label: entity.name,
-      apply: quoteIdentifier(entity.name),
+      apply: quoteIdentifier(entity.name, dialect),
       detail: entity.kind,
       type: entityType(entity),
       section: entitySection(entity),
@@ -2137,6 +2855,13 @@ function keywordOptions(
   const hasContext = primary !== null;
   const emitFunctions = includeFunctions && !restrict;
   const functionLabels = emitFunctions ? new Set(profile.functions) : null;
+  // A restricted slot drops the catalog but may still name a few functions
+  // of its own (the row-returning ones, in a FROM slot).
+  const functions = emitFunctions
+    ? profile.functions
+    : includeFunctions
+      ? (keywordContext?.functions ?? [])
+      : [];
 
   // Context entries may reference keywords outside the active dialect; keep
   // them (the resolver is dialect-aware) and fall back to the dialect
@@ -2181,24 +2906,22 @@ function keywordOptions(
       boost: kwBoost,
     });
   }
-  if (emitFunctions) {
-    for (const fn of profile.functions) {
-      const insert = casing === "lower" ? fn.toLowerCase() : fn;
-      const meta = FUNCTION_META[fn];
-      const base: Completion = {
-        label: fn,
-        detail: meta?.sig || "function",
-        info: meta?.doc,
-        type: "function",
-        section: keywordSection,
-        boost: boost - BOOST.functionPenalty,
-      };
-      out.push(
-        NO_PAREN_FUNCTIONS.has(fn)
-          ? { ...base, apply: insert }
-          : snippetCompletion(`${insert}(#{})`, base),
-      );
-    }
+  for (const fn of functions) {
+    const insert = casing === "lower" ? fn.toLowerCase() : fn;
+    const meta = functionMeta(fn, dialect);
+    const base: Completion = {
+      label: fn,
+      detail: meta?.sig || "function",
+      info: meta?.doc,
+      type: "function",
+      section: keywordSection,
+      boost: boost - BOOST.functionPenalty,
+    };
+    out.push(
+      NO_PAREN_FUNCTIONS.has(fn)
+        ? { ...base, apply: insert }
+        : snippetCompletion(`${insert}(#{})`, base),
+    );
   }
   return out;
 }
@@ -2230,48 +2953,71 @@ function formatColumnDetail(
   return multipleEntities ? `${entity.name} · ${shortType}` : shortType;
 }
 
+/** Display name for a table reference: the alias when one was declared,
+ *  the table name otherwise. Once a table is aliased the alias is the only
+ *  name every engine accepts for it. */
+function refDisplay(ref: TableReference): string {
+  return ref.alias ?? ref.table;
+}
+
+/** The distinct entities behind a list of references, in reference order. */
+function entitiesOf(refs: ResolvedRef[]): SqlCompletionEntity[] {
+  const entities = new Set<SqlCompletionEntity>();
+  for (const { entity } of refs) {
+    if (entity) entities.add(entity);
+  }
+  return [...entities];
+}
+
 function columnOptions(
-  schema: SqlCompletionSchema,
-  statement: string,
+  refs: ResolvedRef[],
   boost: number,
+  dialect: SqlDialect,
 ): Completion[] {
-  const references = referenceMap(extractTableRefList(statement));
-  const referencedTables = new Set(
-    [...references.values()].map((name) => name.toLowerCase()),
-  );
-  const entities = referencedTables.size
-    ? schema.entities.filter((entity) =>
-        referencedTables.has(entity.name.toLowerCase()),
-      )
-    : [];
+  // One source per name a column can be reached through. The two sides of a
+  // self-join are two sources (`e.id`, `m.id`); the same table written the
+  // same way twice, in a query and its correlated subquery, is one.
+  const sources: Array<{ display: string; entity: SqlCompletionEntity }> = [];
+  const seenSources = new Set<string>();
+  for (const { ref, entity } of refs) {
+    if (!entity) continue;
+    const display = refDisplay(ref);
+    const key = display ? display.toLowerCase() : `#${sources.length}`;
+    if (seenSources.has(key)) continue;
+    seenSources.add(key);
+    sources.push({ display, entity });
+  }
+  if (sources.length === 0) return [];
 
-  if (entities.length === 0) return [];
-
-  const columnOwners = new Map<string, SqlCompletionEntity[]>();
-  for (const entity of entities) {
+  const ownerCount = new Map<string, number>();
+  for (const { entity } of sources) {
     for (const column of entity.columns) {
       const key = columnName(column).toLowerCase();
-      columnOwners.set(key, [...(columnOwners.get(key) ?? []), entity]);
+      ownerCount.set(key, (ownerCount.get(key) ?? 0) + 1);
     }
   }
 
-  const multipleEntities = entities.length > 1;
+  const multipleSources = sources.length > 1;
   const options: Completion[] = [];
   const seen = new Set<string>();
-  for (const entity of entities) {
+  for (const { display, entity } of sources) {
     for (const column of entity.columns) {
       const name = columnName(column);
-      const owners = columnOwners.get(name.toLowerCase()) ?? [];
-      const ambiguous = owners.length > 1;
-      const label = ambiguous ? `${entity.name}.${name}` : name;
+      // A column two sources share has to say which one it means. The
+      // qualifier is the reference's alias when it has one: `users.user_id`
+      // is an error on every engine once the query says `FROM users u`. An
+      // unaliased derived table has no name to qualify with.
+      const qualified =
+        (ownerCount.get(name.toLowerCase()) ?? 0) > 1 && display !== "";
+      const label = qualified ? `${display}.${name}` : name;
       if (seen.has(label)) continue;
       seen.add(label);
       options.push({
         label,
-        apply: ambiguous
-          ? `${quoteIdentifier(entity.name)}.${quoteIdentifier(name)}`
-          : quoteIdentifier(name),
-        detail: formatColumnDetail(entity, column, multipleEntities),
+        apply: qualified
+          ? `${quoteIdentifier(display, dialect)}.${quoteIdentifier(name, dialect)}`
+          : quoteIdentifier(name, dialect),
+        detail: formatColumnDetail(entity, column, multipleSources),
         type: "property",
         section: columnSection,
         boost,
@@ -2285,16 +3031,10 @@ function columnOptions(
  *  more of the joined tables float to the top (those are the only ones
  *  USING accepts); the rest trail at low rank as a fallback. */
 function usingColumnOptions(
-  schema: SqlCompletionSchema,
-  statement: string,
+  refs: ResolvedRef[],
+  dialect: SqlDialect,
 ): Completion[] {
-  const references = referenceMap(extractTableRefList(statement));
-  const referencedTables = new Set(
-    [...references.values()].map((name) => name.toLowerCase()),
-  );
-  const entities = schema.entities.filter((entity) =>
-    referencedTables.has(entity.name.toLowerCase()),
-  );
+  const entities = entitiesOf(refs);
   if (entities.length === 0) return [];
 
   const owners = new Map<string, { display: string; entities: string[] }>();
@@ -2310,7 +3050,7 @@ function usingColumnOptions(
 
   return [...owners.values()].map(({ display, entities: ownerNames }) => ({
     label: display,
-    apply: quoteIdentifier(display),
+    apply: quoteIdentifier(display, dialect),
     detail: ownerNames.join(", "),
     type: "property",
     section: columnSection,
@@ -2322,20 +3062,32 @@ function usingColumnOptions(
 }
 
 function qualifiedColumnOptions(
-  schema: SqlCompletionSchema,
+  scope: StatementScope,
   statement: string,
   qualifier: string | undefined,
   boost: number,
   includeStar: boolean,
+  dialect: SqlDialect,
 ): Completion[] {
   if (!qualifier) return [];
-  const references = referenceMap(extractTableRefList(statement));
-  const tableName = references.get(qualifier.toLowerCase()) ?? qualifier;
-  const entity = findEntity(schema, tableName);
+  const lower = qualifier.toLowerCase();
+  // Nearest scope first, an alias before a table of the same name. The
+  // statement-wide lookup after it keeps a qualifier resolving when the
+  // block structure could not be read (unbalanced parens mid-edit).
+  const inScope =
+    scope.visible.find(({ ref }) => ref.alias?.toLowerCase() === lower) ??
+    scope.visible.find(({ ref }) => ref.table.toLowerCase() === lower);
+  const entity =
+    inScope?.entity ??
+    findEntity(
+      scope.schema,
+      referenceMap(extractTableRefList(statement, dialect)).get(lower) ??
+        qualifier,
+    );
   if (!entity) return [];
   const options: Completion[] = entity.columns.map((column) => ({
     label: columnName(column),
-    apply: quoteIdentifier(columnName(column)),
+    apply: quoteIdentifier(columnName(column), dialect),
     detail: formatColumnDetail(entity, column, false),
     type: "property",
     section: columnSection,
@@ -2354,20 +3106,16 @@ function qualifiedColumnOptions(
   return options;
 }
 
-/** Display name for a table reference inside a join condition, the
- *  alias when one was declared, the table name otherwise. */
-function refDisplay(ref: TableReference): string {
-  return ref.alias ?? ref.table;
-}
-
 function joinConditionCompletion(
   left: TableReference,
   leftColumn: string,
   right: TableReference,
   rightColumn: string,
+  dialect: SqlDialect,
 ): Completion {
+  const quote = (name: string) => quoteIdentifier(name, dialect);
   const label = `${refDisplay(left)}.${leftColumn} = ${refDisplay(right)}.${rightColumn}`;
-  const apply = `${quoteIdentifier(refDisplay(left))}.${quoteIdentifier(leftColumn)} = ${quoteIdentifier(refDisplay(right))}.${quoteIdentifier(rightColumn)}`;
+  const apply = `${quote(refDisplay(left))}.${quote(leftColumn)} = ${quote(refDisplay(right))}.${quote(rightColumn)}`;
   return {
     label,
     apply,
@@ -2381,15 +3129,24 @@ function joinConditionCompletion(
  *  metadata drives the suggestions when available; otherwise name-matching
  *  heuristics (`x.customer_id = customers.id`, shared column names). */
 function joinConditionOptions(
-  schema: SqlCompletionSchema,
-  statementBefore: string,
+  refsBeforeCursor: ResolvedRef[],
+  dialect: SqlDialect,
 ): Completion[] {
-  const refs = extractTableRefList(statementBefore);
-  if (refs.length < 2) return [];
+  if (refsBeforeCursor.length < 2) return [];
+  const entityOf = new Map(
+    refsBeforeCursor.map(({ ref, entity }) => [ref, entity] as const),
+  );
+  const refs = refsBeforeCursor.map(({ ref }) => ref);
   const target = refs[refs.length - 1];
   if (target.via !== "join") return [];
   const others = refs.slice(0, -1);
-  const targetEntity = findEntity(schema, target.table);
+  const targetEntity = entityOf.get(target);
+  const condition = (
+    left: TableReference,
+    leftColumn: string,
+    right: TableReference,
+    rightColumn: string,
+  ) => joinConditionCompletion(left, leftColumn, right, rightColumn, dialect);
 
   const out: Completion[] = [];
   const seen = new Set<string>();
@@ -2406,15 +3163,15 @@ function joinConditionOptions(
       (ref) => ref.table.toLowerCase() === fk.refEntity.toLowerCase(),
     );
     if (other) {
-      add(joinConditionCompletion(target, fk.column, other, fk.refColumn));
+      add(condition(target, fk.column, other, fk.refColumn));
     }
   }
   // 2. …and foreign keys on already-referenced tables pointing at it.
   for (const other of others) {
-    const otherEntity = findEntity(schema, other.table);
+    const otherEntity = entityOf.get(other);
     for (const fk of otherEntity?.foreignKeys ?? []) {
       if (fk.refEntity.toLowerCase() === target.table.toLowerCase()) {
-        add(joinConditionCompletion(target, fk.refColumn, other, fk.column));
+        add(condition(target, fk.refColumn, other, fk.column));
       }
     }
   }
@@ -2424,7 +3181,7 @@ function joinConditionOptions(
   if (out.length === 0 && targetEntity) {
     const targetColumns = targetEntity.columns.map(columnName);
     for (const other of others) {
-      const otherEntity = findEntity(schema, other.table);
+      const otherEntity = entityOf.get(other);
       if (!otherEntity) continue;
       const otherColumns = new Set(
         otherEntity.columns.map((column) => columnName(column).toLowerCase()),
@@ -2434,13 +3191,13 @@ function joinConditionOptions(
         // A column named exactly the same on both sides is the classic
         // join key, except bare `id`, which is both tables' own pk.
         if (lower !== "id" && otherColumns.has(lower)) {
-          add(joinConditionCompletion(target, column, other, column));
+          add(condition(target, column, other, column));
         }
         // orders.customer_id ↔ customers.id
         if (lower.endsWith("_id") && otherColumns.has("id")) {
           const base = lower.slice(0, -3);
           if (base && other.table.toLowerCase().startsWith(base)) {
-            add(joinConditionCompletion(target, column, other, "id"));
+            add(condition(target, column, other, "id"));
           }
         }
       }
@@ -2454,7 +3211,7 @@ function joinConditionOptions(
             target.table.toLowerCase().startsWith(base) &&
             targetColumns.some((c) => c.toLowerCase() === "id")
           ) {
-            add(joinConditionCompletion(target, "id", other, column));
+            add(condition(target, "id", other, column));
           }
         }
       }
@@ -2475,6 +3232,24 @@ function schemaNamesFor(
     names.add(name.toLowerCase());
   }
   return names;
+}
+
+/** The entities a `<schemaName>.|` qualifier may list. An entity that does
+ *  not say which schema it is in belongs to the default one, so `public.|`
+ *  lists the reader's tables and `pg_catalog.|` or `information_schema.|`
+ *  no longer do: completing `pg_catalog.users` is a relation that does not
+ *  exist. Statement-local CTEs are never schema-qualified, which is why this
+ *  reads the host's schema rather than the statement's. */
+function entitiesInSchema(
+  schema: SqlCompletionSchema,
+  schemaName: string,
+  dialect: SqlDialect,
+): SqlCompletionEntity[] {
+  const lower = schemaName.toLowerCase();
+  const isDefault = DEFAULT_SCHEMA[dialect].includes(lower);
+  return schema.entities.filter((entity) =>
+    entity.schema ? entity.schema.toLowerCase() === lower : isDefault,
+  );
 }
 
 const lowercaseIdentifierCache = new WeakMap<Text, Set<string>>();
@@ -2536,7 +3311,10 @@ const SELECT_LIST_KEYWORDS = new Set([
 
 /** The outermost SELECT list of the statement: which columns it uses and
  *  which aliases it defines. Null for `SELECT *` or no SELECT. */
-function parseSelectList(statement: string): SelectListInfo | null {
+function parseSelectList(
+  statement: string,
+  dialect: SqlDialect,
+): SelectListInfo | null {
   const masked = maskCommentsAndStrings(statement);
   const start = masked.search(/\bSELECT\b/i);
   if (start < 0) return null;
@@ -2582,7 +3360,7 @@ function parseSelectList(statement: string): SelectListInfo | null {
     let expr = item;
     const asMatch = selectAliasPattern.exec(item);
     if (asMatch) {
-      aliases.push(normalizeIdentifier(asMatch[1]));
+      aliases.push(normalizeIdentifier(asMatch[1], dialect));
       expr = item.slice(0, asMatch.index);
     } else {
       // `SUM(total) total_sum`, a trailing bare identifier after an
@@ -2594,7 +3372,7 @@ function parseSelectList(statement: string): SelectListInfo | null {
         !SELECT_LIST_KEYWORDS.has(implicit[2].toUpperCase()) &&
         !/^[A-Za-z_][A-Za-z0-9_$]*$/.test(implicit[1].trim())
       ) {
-        aliases.push(implicit[2]);
+        aliases.push(normalizeIdentifier(implicit[2], dialect));
         expr = implicit[1];
       }
     }
@@ -2641,23 +3419,39 @@ export function createSqlCompletionSource(
   const dialect: SqlDialect = options.dialect ?? "sqlite";
   return (context) => {
     const doc = context.state.doc.toString();
+    // Nothing completes inside a string literal or a comment, and that holds
+    // for an explicit Ctrl+Space too: there is no code there to complete.
+    const lexical = lexicalStateAt(doc, context.pos, dialect);
+    if (lexical === "string" || lexical === "comment") return null;
+
     const { before, full } = statementAround(doc, context.pos);
     const info = inferCompletionContext(context, before, dialect);
     if (!info) return null;
 
     const typed = doc.slice(info.from, context.pos);
     const casing = casingOf(typed);
-    const localSchema = effectiveSchema(schema, full);
+    // `full` starts where `before` does, so the cursor's offset in it is
+    // the length of `before`.
+    const scope = resolveStatementScope(schema, full, before.length, dialect);
+    const localSchema = scope.schema;
 
     const kw = info.keywordContext;
     const completions = (() => {
       switch (info.mode) {
         case "tables": {
           const related = info.joinTableSlot
-            ? fkRelatedTables(localSchema, extractTableRefList(before))
+            ? fkRelatedTables(
+                localSchema,
+                extractTableRefList(before, dialect),
+              )
             : undefined;
           return [
-            ...tableOptions(localSchema, BOOST.tableInTableContext, related),
+            ...tableOptions(
+              localSchema,
+              BOOST.tableInTableContext,
+              dialect,
+              related,
+            ),
             ...keywordOptions(dialect, BOOST.keywordInTableContext, kw, {
               casing,
             }),
@@ -2665,10 +3459,17 @@ export function createSqlCompletionSource(
         }
         case "columns": {
           const cols = info.usingSlot
-            ? usingColumnOptions(localSchema, full)
-            : columnOptions(localSchema, full, BOOST.columnInColumnContext);
+            ? usingColumnOptions(scope.own, dialect)
+            : columnOptions(
+                scope.visible,
+                BOOST.columnInColumnContext,
+                dialect,
+              );
           const joins = info.joinConditionSlot
-            ? joinConditionOptions(localSchema, before)
+            ? joinConditionOptions(
+                scope.own.filter(({ ref }) => ref.at < before.length),
+                dialect,
+              )
             : [];
           if (cols.length === 0 && joins.length === 0) {
             // No FROM/JOIN/UPDATE/INTO target in scope yet, column suggestions
@@ -2677,7 +3478,7 @@ export function createSqlCompletionSource(
               ...keywordOptions(dialect, BOOST.keywordInColumnContext, kw, {
                 casing,
               }),
-              ...tableOptions(localSchema, BOOST.tableInColumnContext),
+              ...tableOptions(localSchema, BOOST.tableInColumnContext, dialect),
             ];
           }
           return [
@@ -2686,25 +3487,33 @@ export function createSqlCompletionSource(
             ...keywordOptions(dialect, BOOST.keywordInColumnContext, kw, {
               casing,
             }),
-            ...tableOptions(localSchema, BOOST.tableInColumnContext),
+            ...tableOptions(localSchema, BOOST.tableInColumnContext, dialect),
           ];
         }
         case "qualified-columns": {
           const qualified = qualifiedColumnOptions(
-            localSchema,
+            scope,
             full,
             info.qualifier,
             BOOST.qualifiedColumn,
             info.viaDot ?? false,
+            dialect,
           );
           if (qualified.length > 0) return qualified;
-          // `public.|` / `main.|`, a schema qualifier completes to its
-          // tables rather than columns.
+          // `public.|` / `main.|`, a schema qualifier completes to the
+          // tables in that schema rather than columns.
           if (
             info.qualifier &&
             schemaNamesFor(schema, dialect).has(info.qualifier.toLowerCase())
           ) {
-            return tableOptions(localSchema, BOOST.qualifiedColumn);
+            return tableOptions(
+              {
+                ...schema,
+                entities: entitiesInSchema(schema, info.qualifier, dialect),
+              },
+              BOOST.qualifiedColumn,
+              dialect,
+            );
           }
           return [];
         }
@@ -2732,7 +3541,7 @@ export function createSqlCompletionSource(
             ...keywordOptions(dialect, BOOST.keywordInKeywordContext, kw, {
               casing,
             }),
-            ...tableOptions(localSchema, BOOST.tableInKeywordContext),
+            ...tableOptions(localSchema, BOOST.tableInKeywordContext, dialect),
           ];
       }
     })();
@@ -2742,7 +3551,7 @@ export function createSqlCompletionSource(
     // ORDER BY / GROUP BY / HAVING: what the SELECT list already names is
     // the likeliest pick, and its aliases are legal here too.
     const clause = info.mode === "columns" ? orderingClauseOf(before) : null;
-    const selectList = clause ? parseSelectList(full) : null;
+    const selectList = clause ? parseSelectList(full, dialect) : null;
     if (clause && selectList) {
       for (const option of uniqueOptions) {
         if (option.type !== "property") continue;
@@ -2757,13 +3566,25 @@ export function createSqlCompletionSource(
           .filter((alias) => alias && !existing.has(alias.toLowerCase()))
           .map((alias) => ({
             label: alias,
-            apply: quoteIdentifier(alias),
+            apply: quoteIdentifier(alias, dialect),
             detail: "alias",
             type: "property",
             section: columnSection,
             boost: BOOST.selectAlias,
           }));
         uniqueOptions = dedupeOptions([...aliasOptions, ...uniqueOptions]);
+      }
+    }
+
+    // Inside an open `"…` the reader has typed the opening quote already and
+    // the closing one is theirs (or the editor's bracket matching) to supply,
+    // so a name that would be quoted goes in bare. A second pair would leave
+    // `""Mixed Case""`.
+    if (lexical === "quoted-identifier") {
+      for (const option of uniqueOptions) {
+        if (option.apply === forceQuoteIdentifier(option.label)) {
+          option.apply = option.apply.slice(1, -1);
+        }
       }
     }
 

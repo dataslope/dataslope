@@ -383,10 +383,17 @@ export function ModifyStructureForm({
   activeTab: activeTabProp,
   onTabChange,
   refreshKey,
+  errors,
+  previewSql,
 }: {
   state: ModifyStructureState;
   onChange: (next: ModifyStructureState) => void;
   invalidColumnIds?: Set<string>;
+  /** Problems that block saving, shown under the column list. */
+  errors?: readonly string[];
+  /** The statement Save will run, shown live under the form. Only the Add
+   *  Table drawer passes it: an edit is a rebuild, not one statement. */
+  previewSql?: string;
   knownTables: string[];
   engine: SqliteEngine | null;
   /** Called when the user clicks the drop button on an index/trigger item. */
@@ -549,6 +556,20 @@ export function ModifyStructureForm({
     };
   }, [engine, state.originalName, refreshKey]);
 
+  // A column that was only just added has an empty name by construction;
+  // saying so before the reader has had a chance to type is noise. Every
+  // other problem is shown as soon as it exists.
+  const blankNameTouched = state.columns.some(
+    (col) =>
+      !col.generated &&
+      !col.name.trim() &&
+      (touchedColIds.has(col.id) || (invalidColumnIds?.has(col.id) ?? false)),
+  );
+  const visibleErrors = (errors ?? ["Column names cannot be empty."]).filter(
+    (message) =>
+      message !== "Column names cannot be empty." || blankNameTouched,
+  );
+
   return (
     <div className="sql-modify-body" ref={formBodyRef}>
       <label className="sql-modify-field">
@@ -707,13 +728,18 @@ export function ModifyStructureForm({
             <Plus size={12} aria-hidden="true" /> Add column
           </button>
 
-          {regularColumns.some(
-            (col) =>
-              !col.name.trim() &&
-              (touchedColIds.has(col.id) || (invalidColumnIds?.has(col.id) ?? false)),
-          ) && (
+          {visibleErrors.length > 0 && (
             <div className="sql-modify-validation" role="alert">
-              Column names cannot be empty.
+              {visibleErrors.map((message) => (
+                <div key={message}>{message}</div>
+              ))}
+            </div>
+          )}
+
+          {previewSql !== undefined && (
+            <div className="sql-modify-preview">
+              <div className="sql-modify-preview-label">SQL preview</div>
+              <DdlViewer sql={previewSql} theme={theme ?? "default"} />
             </div>
           )}
 

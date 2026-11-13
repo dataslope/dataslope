@@ -14,6 +14,7 @@ import {
   type QueryExecResult,
   type SqlValue,
 } from "./sqlite-wasm";
+import { extractCheckConstraints } from "../sql/utils/tableConstraints";
 import {
   findSampleDatabase,
   isSqliteSampleId,
@@ -1166,6 +1167,57 @@ export async function createSqliteEngineInProcess(
         }
       }
 
+      // CHECK constraints live only in the original CREATE text, and the
+      // form does not model them, so they are read back out and re-declared
+      // (as table-level constraints, which is legal for either kind). One
+      // written on a column goes with that column; a table-level one that
+      // still names a dropped column blocks the drop, as SQLite's own
+      // `ALTER TABLE … DROP COLUMN` does.
+      {
+        const keptSources = new Set(
+          spec.columns.map((c) => (c.originalName ?? c.name).toLowerCase()),
+        );
+        const droppedCols = [...existing].filter(
+          (name) => !keptSources.has(name.toLowerCase()),
+        );
+        const droppedSet = new Set(droppedCols.map((name) => name.toLowerCase()));
+        let originalSql = "";
+        const stmt = d.prepare(
+          `SELECT sql FROM sqlite_master WHERE type = 'table' AND name = $n`,
+        );
+        try {
+          stmt.bind({ $n: spec.originalName });
+          if (stmt.step()) originalSql = String(getRow(stmt)[0] ?? "");
+        } finally {
+          stmt.finalize();
+        }
+        for (const check of extractCheckConstraints(originalSql)) {
+          if (check.column && droppedSet.has(check.column.toLowerCase())) continue;
+          const blocker = droppedCols.find((col) =>
+            referencesIdentifier(check.expression, col),
+          );
+          if (blocker) {
+            throw new Error(
+              `Cannot drop column "${blocker}": a CHECK constraint still uses it (${check.expression}). ` +
+                `Remove the constraint first.`,
+            );
+          }
+          // Only column renames apply inside an expression; `patchDdl` would
+          // also rewrite a column that happens to share the table's name.
+          let expression = check.expression;
+          for (const [oldCol, newCol] of renameMap) {
+            const escaped = oldCol.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            expression = expression.replace(
+              new RegExp(`(?<![\\w"])"?${escaped}"?(?![\\w"])`, "g"),
+              quoteIdent(newCol),
+            );
+          }
+          defs.push(
+            `${check.name ? `CONSTRAINT ${quoteIdent(check.name)} ` : ""}CHECK (${expression})`,
+          );
+        }
+      }
+
       const tmpName = `${spec.newName}__new`;
       // Foreign keys stay off inside the transaction during the rebuild.
       d.exec("PRAGMA foreign_keys = OFF;");
@@ -1217,6 +1269,11 @@ export async function createSqliteEngineInProcess(
           d.exec("ROLLBACK");
         } catch {
           // ignore rollback failure
+        }
+        // The failure names the staging table (`orders__new.note`), which
+        // the reader has never seen. Report it against the real one.
+        if (err instanceof Error && err.message.includes(tmpName)) {
+          throw new Error(err.message.split(tmpName).join(spec.newName));
         }
         throw err;
       } finally {
