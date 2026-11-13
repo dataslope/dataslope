@@ -466,6 +466,9 @@ export const Tag: React.FC<{
         width,
         boxSizing: "border-box",
         background: outline ? "transparent" : light ? `color-mix(in srgb, ${badge.background} 50%, transparent)` : badge.background,
+        // An outlined tag's box is wider than its words: centre them, so the
+        // room is even at both sides.
+        textAlign: outline ? "center" : undefined,
         opacity: p * (1 - o) * (1 - d),
         transform: `translateX(${(1 - p) * -14}px) scale(${1 + (pulseAt === undefined ? 0 : pulse(frame, pulseAt, 18)) * 0.05})`,
         transformOrigin: "0 50%",
