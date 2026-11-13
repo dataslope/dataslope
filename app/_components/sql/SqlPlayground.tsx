@@ -246,7 +246,7 @@ const SQLITE_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
 
 const RUNTIME_INFO: RuntimeInfo = {
   language: "SQLite",
-  version: "3.53",
+  version: "3.54",
   engine: `@sqlite.org/sqlite-wasm ${SQLITE_WASM_VERSION.replace(/-build\d+$/, "")}`,
   engineUrl: "https://sqlite.org/wasm",
   notes:
