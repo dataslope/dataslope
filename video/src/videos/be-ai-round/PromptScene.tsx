@@ -4,11 +4,11 @@ import { ease } from "../../components/motion";
 import { OK, OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { Ink, Note, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { INGREDIENTS, PROMPT } from "./data";
-import { ColumnRule, Drift, INGREDIENT_INK, ingredientBand, line, Mark, PromptListing, X0 } from "./parts";
+import { ColumnRule, Drift, INGREDIENT_HUE, ingredientBand, line, Mark, PromptListing, X0 } from "./parts";
 
 const SIZE = 25;
 const LABEL_Y = 350;
@@ -118,7 +118,10 @@ export const PromptScene: React.FC = () => {
                   padding: "5px 13px",
                   borderRadius: 8,
                   background: ingredientBand(c.role),
-                  ...note(24, INGREDIENT_INK[c.role]),
+                  // Text in its band's own hue, the badge ink (the owner,
+                  // 2026-11-13: "Make sure each colored badge's text color
+                  // matches the background hue").
+                  ...note(24, outlineInk(INGREDIENT_HUE[c.role])),
                   fontWeight: 500,
                   whiteSpace: "nowrap",
                   opacity: p,

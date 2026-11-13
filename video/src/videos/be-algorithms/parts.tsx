@@ -507,7 +507,9 @@ export const GraphNode: React.FC<{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...label(26, outline ? INK : t.ink),
+          // A ring takes 2px off each side, so a hollow node's name is set
+          // a step smaller to keep clear of it.
+          ...label(outline ? Math.min(26, Math.round(r * 0.9)) : 26, outline ? INK : t.ink),
           fontWeight: 500,
           opacity: Math.min(1, p),
           transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`,

@@ -46,6 +46,9 @@ const Chip: React.FC<{ x: number; y: number; amount: number; tone: "data" | "bad
         height: CHIP_H,
         boxSizing: "border-box",
         borderRadius: 3,
+        // A ring of paper, invisible on the page, keeps the copies in a stack
+        // apart now that no border edges them.
+        boxShadow: `0 0 0 2px ${PAPER}`,
         background: tone === "sara" ? `color-mix(in srgb, ${inkOf.yellow} 22%, ${PAPER})` : `color-mix(in srgb, ${line} 9%, ${PAPER})`,
         display: "flex",
         alignItems: "center",
