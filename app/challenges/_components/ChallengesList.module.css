@@ -20,6 +20,9 @@
   --field: var(--ds-gray-100);
   --field-hover: var(--ds-gray-200);
   --row-hover: rgba(17, 24, 39, 0.035);
+  --title-hover: var(--ds-blue-700);
+  --tip-bg: var(--ds-gray-900);
+  --tip-text: #ffffff;
   /* Hairline between rows: there to guide the eye across a wide row, not
      to box anything in. */
   --divider: rgba(17, 24, 39, 0.07);
@@ -37,6 +40,9 @@
   --field: rgba(255, 255, 255, 0.06);
   --field-hover: rgba(255, 255, 255, 0.1);
   --row-hover: rgba(255, 255, 255, 0.04);
+  --title-hover: var(--ds-blue-400);
+  --tip-bg: #fafafa;
+  --tip-text: #121212;
   --divider: rgba(255, 255, 255, 0.08);
   --green-text: var(--ds-green-400);
   --blue-text: var(--ds-blue-400);
@@ -47,13 +53,13 @@
    A hairline between each pair of rows and under the header, and nothing
    around the table: no frame, no line above the header or after the last
    row. Each row's line is its cells' top border, so the first one doubles
-   as the header's. The hover fill is square so it meets those lines. */
+   as the header's. */
 .table tbody td {
   border-top: 1px solid var(--divider);
 }
 /* The table is the width of the content column, and so are its lines: the
-   first and last columns drop their outer padding, so nothing (text, line or
-   hover fill) reaches past the filter row above. */
+   first and last columns drop their outer padding, so neither text nor line
+   reaches past the filter row above. */
 .table th:first-child,
 .table td:first-child {
   padding-left: 0;
@@ -62,11 +68,26 @@
 .table td:last-child {
   padding-right: 0;
 }
-.row > td {
-  transition: background 0.12s;
+
+/* Hover changes color, never background: a row has no horizontal padding
+   (its text is flush with the content column), so a fill would sit tight
+   against the words with nothing around them. The title takes the brand
+   blue and the topic beneath it darkens a step. */
+.title {
+  color: var(--ink);
+  transition: color 0.12s;
 }
-.row:hover > td {
-  background: var(--row-hover);
+.topic {
+  color: var(--muted);
+  transition: color 0.12s;
+}
+.row:hover .title,
+.card:hover .title {
+  color: var(--title-hover);
+}
+.row:hover .topic,
+.card:hover .topic {
+  color: var(--text);
 }
 
 /* The whole row is the hit area, not just the title. `position: relative`
@@ -90,16 +111,48 @@
   outline-offset: -2px;
 }
 
+/* ── Status icon ─────────────────────────────────────────────────────────
+   Icon only, with its word as a tooltip on hover. In a table row the icon
+   sits in its own link raised above the row's overlay (see `StatusMark`),
+   or the overlay would take the hover. */
+.statusLink {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+}
+.statusMark {
+  position: relative;
+  display: inline-flex;
+}
+.statusMark::after {
+  content: attr(data-tip);
+  position: absolute;
+  right: -6px;
+  bottom: calc(100% + 6px);
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--tip-bg);
+  color: var(--tip-text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(2px);
+  pointer-events: none;
+  transition:
+    opacity 0.12s,
+    transform 0.12s;
+}
+.statusMark:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* ── Phone cards ─────────────────────────────────────────────────────────
    The same rows stacked, with the same hairline between them. */
 .cards > li + li {
   border-top: 1px solid var(--divider);
-}
-.card {
-  transition: background 0.12s;
-}
-.card:hover {
-  background: var(--row-hover);
 }
 .card:focus-visible {
   outline: 2px solid var(--ds-blue-500);

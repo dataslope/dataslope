@@ -94,31 +94,58 @@ function HalfCircle({ size = 16 }: { size?: number }) {
 }
 
 /**
- * Where the learner stands, as an icon and a word.
+ * Where the learner stands, as an icon whose word appears on hover.
  *
  * "Not started" draws nothing visible. An empty circle on every row used to
  * stand in for it, and a column of those read as radio buttons: something to
- * pick, rather than a record of progress. Leaving the cell blank keeps the
- * two states that mean something (solved, in progress) the only marks there.
+ * pick, rather than a record of progress. The two marks that remain are
+ * distinct enough to read without their words, so the words are a tooltip
+ * (`data-tip`, drawn by `.statusMark` in the stylesheet) and, for screen
+ * readers, visually hidden text beside the icon.
+ *
+ * `href` is for a table row. The row's title link stretches an overlay over
+ * the whole row, which would take the pointer before the icon could see it,
+ * so the icon gets its own link to the same challenge, raised above the
+ * overlay: the tooltip shows, and a click on the icon still opens the
+ * challenge. That link is a duplicate of the title's, so it is hidden from
+ * assistive technology and taken out of the tab order. On a phone card the
+ * card itself is the link, so no `href` is passed.
  */
-function StatusMark({ status }: { status: ChallengeStatus }) {
-  if (status === "solved") {
-    return (
-      <span className="inline-flex items-center gap-1.5" style={{ color: "var(--green-text)" }}>
+function StatusMark({ status, href }: { status: ChallengeStatus; href?: string }) {
+  if (status === "new") return <span className="sr-only">{CHALLENGE_STATUS_LABELS.new}</span>;
+  const label = CHALLENGE_STATUS_LABELS[status];
+  const mark = (
+    <span
+      className={styles.statusMark}
+      data-tip={label}
+      aria-hidden="true"
+      style={{ color: status === "solved" ? "var(--green-text)" : "var(--blue-text)" }}
+    >
+      {status === "solved" ? (
         <CircleCheckBig size={16} strokeWidth={2.2} aria-hidden="true" />
-        {CHALLENGE_STATUS_LABELS.solved}
-      </span>
-    );
-  }
-  if (status === "attempted") {
-    return (
-      <span className="inline-flex items-center gap-1.5" style={{ color: "var(--blue-text)" }}>
+      ) : (
         <HalfCircle />
-        {CHALLENGE_STATUS_LABELS.attempted}
-      </span>
-    );
-  }
-  return <span className="sr-only">{CHALLENGE_STATUS_LABELS.new}</span>;
+      )}
+    </span>
+  );
+  return (
+    <>
+      <span className="sr-only">{label}</span>
+      {href ? (
+        <Link
+          href={href}
+          prefetch={false}
+          tabIndex={-1}
+          aria-hidden="true"
+          className={styles.statusLink}
+        >
+          {mark}
+        </Link>
+      ) : (
+        mark
+      )}
+    </>
+  );
 }
 
 /** One choice in a {@link FilterSelect}. */
@@ -230,6 +257,12 @@ function pageWindow(page: number, pageCount: number): (number | null)[] {
     i > 0 && n - nums[i - 1] > 1 ? [null, n] : [n],
   );
 }
+
+/**
+ * Space left above the filter row when a page change scrolls back to it: the
+ * sticky site header (64px on desktop, 56px on a phone) plus some air.
+ */
+const TOOLBAR_SCROLL_MARGIN = 88;
 
 /** How long typing has to pause before the search reaches the URL. */
 const SEARCH_DEBOUNCE_MS = 250;
@@ -554,6 +587,25 @@ function CatalogView({
   const solvedInView = filtered.filter((e) => e.status === "solved").length;
   const hasFilters = Boolean(query) || Object.values({ ...filters, q: "" }).some(Boolean);
 
+  /**
+   * Turn the page and bring the reader back to the top of the list.
+   *
+   * The pagination sits under the last row, so without this a new page
+   * arrived with the reader looking at its bottom. The scroll target is the
+   * filter row rather than the column headings, so the filters and the
+   * "solved" count are in view as the new page starts. Its scroll margin
+   * (`TOOLBAR_SCROLL_MARGIN`) clears the sticky site header. Nothing moves
+   * if the row is already in view below that header.
+   */
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  const goToPage = (n: number) => {
+    onPage?.(n);
+    const toolbar = toolbarRef.current;
+    if (!toolbar || toolbar.getBoundingClientRect().top >= TOOLBAR_SCROLL_MARGIN) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    toolbar.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
+  };
+
   return (
     <div className={styles.catalog}>
       {/* Centered heading, matching the /courses and /pricing title blocks. */}
@@ -567,7 +619,11 @@ function CatalogView({
         </p>
       </div>
 
-      <div className="mt-12 flex flex-wrap items-center gap-2">
+      <div
+        ref={toolbarRef}
+        className="mt-12 flex flex-wrap items-center gap-2"
+        style={{ scrollMarginTop: TOOLBAR_SCROLL_MARGIN }}
+      >
         <label className="flex h-9 min-w-[200px] max-w-[320px] flex-[1_1_220px] items-center gap-2 rounded bg-[var(--field)] px-3 focus-within:ring-2 focus-within:ring-[var(--ds-blue-400)]">
           <Search size={15} aria-hidden="true" className="shrink-0" style={{ color: "var(--muted)" }} />
           <input
@@ -660,8 +716,8 @@ function CatalogView({
 
           {/* Exactly as wide as the filter row: the outermost cells carry no
               outer padding (see `.table` in the stylesheet), so the row
-              separators, the hover fill and the text all start and end at
-              the content column's edges. */}
+              separators and the text start and end at the content column's
+              edges. */}
           <div className="mt-4 hidden md:block">
             <table className={`${styles.table} w-full border-separate border-spacing-0`}>
               <thead>
@@ -711,7 +767,7 @@ function CatalogView({
                   type="button"
                   className={styles.pageBtn}
                   disabled={current <= 1}
-                  onClick={() => onPage?.(Math.max(1, current - 1))}
+                  onClick={() => goToPage(Math.max(1, current - 1))}
                 >
                   <ChevronLeft size={16} aria-hidden="true" />
                   Previous
@@ -730,7 +786,7 @@ function CatalogView({
                     <button
                       key={n}
                       type="button"
-                      onClick={() => onPage?.(n)}
+                      onClick={() => goToPage(n)}
                       aria-label={`Page ${n}`}
                       aria-current={n === current ? "page" : undefined}
                       data-active={n === current || undefined}
@@ -744,7 +800,7 @@ function CatalogView({
                   type="button"
                   className={styles.pageBtn}
                   disabled={current >= pageCount}
-                  onClick={() => onPage?.(Math.min(pageCount, current + 1))}
+                  onClick={() => goToPage(Math.min(pageCount, current + 1))}
                 >
                   Next
                   <ChevronRight size={16} aria-hidden="true" />
@@ -800,14 +856,14 @@ function MobileRow({ entry }: { entry: ResolvedEntry }) {
         className={`${styles.card} flex flex-col gap-1 py-3 text-inherit no-underline`}
       >
         <span className="flex items-start justify-between gap-3">
-          <span className="text-sm font-medium leading-5" style={{ color: "var(--ink)" }}>
+          <span className={`${styles.title} text-sm font-medium leading-5`}>
             {entry.title}
           </span>
           <span className="shrink-0 text-[13px] leading-5">
             <StatusMark status={entry.status} />
           </span>
         </span>
-        <span className="text-[13px]" style={{ color: "var(--muted)" }}>
+        <span className={`${styles.topic} text-[13px]`}>
           {entry.topic}
         </span>
         <span
@@ -852,12 +908,12 @@ function Row({ entry }: { entry: ResolvedEntry }) {
           prefetch={false}
           className={`${styles.rowLink} flex flex-col gap-0.5 text-inherit no-underline`}
         >
-          <span className="text-sm font-medium leading-5" style={{ color: "var(--ink)" }}>
+          <span className={`${styles.title} text-sm font-medium leading-5`}>
             {entry.title}
           </span>
           {/* --muted, not --faint: the topic is the only place a challenge's
               subject appears, and --faint fails contrast on white. */}
-          <span className="text-[13px] leading-5" style={{ color: "var(--muted)" }}>
+          <span className={`${styles.topic} text-[13px] leading-5`}>
             {entry.topic}
           </span>
         </Link>
@@ -889,7 +945,7 @@ function Row({ entry }: { entry: ResolvedEntry }) {
         {/* A block flex box like `Cell`'s: an inline one rests on the text
             baseline and sat a few pixels above the row's other values. */}
         <span className="flex h-5 items-center justify-end whitespace-nowrap text-sm leading-5">
-          <StatusMark status={entry.status} />
+          <StatusMark status={entry.status} href={`/challenges/${entry.slug}`} />
         </span>
       </td>
     </tr>
