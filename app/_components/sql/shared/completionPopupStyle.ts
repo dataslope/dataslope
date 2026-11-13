@@ -53,9 +53,9 @@ const ICONS: Record<string, string> = {
 };
 
 const SURFACE = {
-  backgroundColor: "var(--bg, #fff)",
+  backgroundColor: "var(--bg)",
   color: "var(--text, inherit)",
-  border: "1px solid var(--border, #d0d7de)",
+  border: "1px solid var(--border)",
   borderRadius: "8px",
   boxShadow: "var(--sql-popup-shadow, 0 8px 24px rgb(0 0 0 / 0.14))",
 } as const;
@@ -80,7 +80,7 @@ export const sqlCompletionPopupStyle = Prec.highest(
       alignItems: "center",
     },
     ".cm-tooltip.cm-tooltip-autocomplete > ul > li[aria-selected]": {
-      backgroundColor: "color-mix(in srgb, var(--primary, #148cff) 16%, transparent)",
+      backgroundColor: "color-mix(in srgb, var(--primary, var(--ds-blue-500)) 16%, transparent)",
       color: "var(--text, inherit)",
     },
     ".cm-tooltip.cm-completionInfo": { ...SURFACE, padding: "8px 10px" },
