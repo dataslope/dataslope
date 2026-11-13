@@ -222,7 +222,10 @@ function renderPgCreateTable(
   return `CREATE TABLE ${quoteIdent(schema)}.${quoteIdent(name)} (\n${defs.join(",\n")}\n)`;
 }
 
-function resultToQueryExecResult(result: PgliteResult): QueryExecResult & { columnTypes?: string[] } | null {
+/** Exported so `__tests__/challengeSolutions` grades a Node PGlite's
+ *  results in exactly the shape the browser hands the grader: a `date` as
+ *  `YYYY-MM-DD`, a `bigint` as a number, a `numeric` as PGlite's string. */
+export function resultToQueryExecResult(result: PgliteResult): QueryExecResult & { columnTypes?: string[] } | null {
   if (result.fields.length === 0) return null;
   const columns = result.fields.map((field) => field.name);
   const columnTypes = result.fields.map((field) => pgTypeName(field.dataTypeID));

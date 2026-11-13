@@ -66,7 +66,7 @@ export interface RunOutcome {
   output: OutputPanel;
   /** Graded checks. Empty for a plain Run. */
   tests: TestOutcome[];
-  /** Mono line for the editor header, e.g. "sqlite · 0.42s · 8 rows". */
+  /** Mono line for the editor header, e.g. "postgresql 18 · 42ms · 8 rows". */
   meta: string;
   /** True when every check passed. Always false for a plain Run. */
   accepted: boolean;

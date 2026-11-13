@@ -87,7 +87,7 @@ INSERT INTO prerequisites VALUES
 
 CREATE TABLE grade_points (
   grade  TEXT PRIMARY KEY,
-  points REAL NOT NULL
+  points NUMERIC(3,1) NOT NULL
 );
 INSERT INTO grade_points VALUES
   ('A', 4.0), ('A-', 3.7), ('B+', 3.3), ('B', 3.0), ('B-', 2.7),
@@ -213,7 +213,7 @@ export const SCHOOL: ChallengeDataset = {
       rows: "9",
       columns: [
         { name: "grade", type: "text", key: "pk" },
-        { name: "points", type: "real" },
+        { name: "points", type: "numeric" },
       ],
     },
     {

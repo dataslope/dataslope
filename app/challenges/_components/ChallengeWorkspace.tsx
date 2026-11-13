@@ -939,6 +939,7 @@ export function ChallengeWorkspace({
       <ChallengeEditor
         value={code}
         language={editorLanguage}
+        sqlDialect={challenge.runtime.kind === "sql" ? challenge.runtime.dialect : undefined}
         onChange={setCode}
         taskKey={taskKey}
         label={`${multiStep ? challenge.languageLabel : (language?.shortLabel ?? "Code")} editor`}

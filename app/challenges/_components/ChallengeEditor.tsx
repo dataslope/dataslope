@@ -37,7 +37,7 @@ import {
   redoKeymap,
   themeFor,
 } from "@/app/_components/cmExtensions";
-import type { CodeLanguage } from "@/lib/challenges/types";
+import type { CodeLanguage, SqlDialect } from "@/lib/challenges/types";
 import s from "./ChallengeWorkspace.module.css";
 
 /** Spaces per indent level, per language. */
@@ -48,11 +48,19 @@ const INDENT: Record<CodeLanguage, number> = {
   typescript: 2,
 };
 
-/** Resolve the language extension for a challenge language. */
-async function extensionFor(language: CodeLanguage) {
+/**
+ * Resolve the language extension for a challenge language. SQL is highlighted
+ * in the engine's own dialect, as the site's other SQL editors do
+ * (`pickLangDialect` in sql/shared/editorSetup): Postgres's `::` casts and
+ * `ILIKE` read as syntax rather than as stray punctuation. DuckDB has no
+ * descriptor of its own and keeps the generic grammar.
+ */
+async function extensionFor(language: CodeLanguage, sqlDialect?: SqlDialect) {
   if (language === "sql") {
-    const { sql } = await import("@codemirror/lang-sql");
-    return sql();
+    const mod = await import("@codemirror/lang-sql");
+    const dialect =
+      sqlDialect === "postgres" ? mod.PostgreSQL : sqlDialect === "sqlite" ? mod.SQLite : undefined;
+    return mod.sql(dialect ? { dialect } : {});
   }
   return loadLanguage(language === "typescript" ? "text/typescript" : language);
 }
@@ -60,6 +68,7 @@ async function extensionFor(language: CodeLanguage) {
 export function ChallengeEditor({
   value,
   language,
+  sqlDialect,
   onChange,
   /** Changes when the learner moves to a different step or language. */
   taskKey,
@@ -70,6 +79,8 @@ export function ChallengeEditor({
 }: {
   value: string;
   language: CodeLanguage;
+  /** The engine a SQL challenge runs on, for dialect-aware highlighting. */
+  sqlDialect?: SqlDialect;
   onChange: (next: string) => void;
   taskKey: string;
   readOnly?: boolean;
@@ -198,7 +209,7 @@ export function ChallengeEditor({
   // Language follows the active task.
   useEffect(() => {
     let cancelled = false;
-    void extensionFor(language).then((ext) => {
+    void extensionFor(language, sqlDialect).then((ext) => {
       const view = viewRef.current;
       if (cancelled || !view) return;
       // Indent width rides along with the mode, so Tab inserts what the
@@ -214,7 +225,7 @@ export function ChallengeEditor({
     return () => {
       cancelled = true;
     };
-  }, [language]);
+  }, [language, sqlDialect]);
 
   useEffect(() => {
     viewRef.current?.dispatch({

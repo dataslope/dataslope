@@ -10,12 +10,15 @@
  * Every dataset is deliberately tiny (tens of rows). The point is that a
  * learner can reason about the answer, and that the expected result of a
  * correct query is small enough to eyeball. `__tests__/challengeSolutions`
- * runs each dataset through node:sqlite, so a typo here fails CI rather than
- * the first learner.
+ * seeds each dataset into PGlite, so a typo here fails CI rather than the
+ * first learner.
  *
- * Dialect is SQLite for the whole pilot: it is the lightest engine to
- * download, and the only one the offline verifier can execute. Nothing in the
- * types stops a challenge from asking for DuckDB or Postgres later.
+ * Dialect is PostgreSQL throughout, run in the browser by PGlite. The schemas
+ * use the types a Postgres schema would: `DATE` and `TIMESTAMP` rather than
+ * text, so date arithmetic is subtraction and `EXTRACT`; `NUMERIC(p,s)` for
+ * money and measurements, so `ROUND(x, 2)` works and sums come out exact;
+ * `BOOLEAN` for flags. The schema browser's `type` strings are checked
+ * against `information_schema` by the same test.
  */
 
 import type { SchemaTable } from "./types";
@@ -34,7 +37,7 @@ CREATE TABLE products (
   product_id   INTEGER PRIMARY KEY,
   product_name TEXT    NOT NULL,
   category     TEXT    NOT NULL,
-  unit_cost    REAL    NOT NULL
+  unit_cost    NUMERIC(10,2) NOT NULL
 );
 INSERT INTO products VALUES
   (1, 'Cold Brew Concentrate', 'Coffee', 4.10),
@@ -49,7 +52,7 @@ CREATE TABLE customers (
   customer_id INTEGER PRIMARY KEY,
   full_name   TEXT NOT NULL,
   city        TEXT NOT NULL,
-  signed_up   TEXT NOT NULL
+  signed_up   DATE NOT NULL
 );
 INSERT INTO customers VALUES
   (1, 'Maya Chen',   'Portland', '2023-11-02'),
@@ -61,7 +64,7 @@ INSERT INTO customers VALUES
 CREATE TABLE orders (
   order_id    INTEGER PRIMARY KEY,
   customer_id INTEGER NOT NULL REFERENCES customers(customer_id),
-  order_date  TEXT    NOT NULL,
+  order_date  DATE    NOT NULL,
   status      TEXT    NOT NULL
 );
 INSERT INTO orders VALUES
@@ -88,7 +91,7 @@ CREATE TABLE order_items (
   order_id   INTEGER NOT NULL REFERENCES orders(order_id),
   product_id INTEGER NOT NULL REFERENCES products(product_id),
   quantity   INTEGER NOT NULL,
-  unit_price REAL    NOT NULL
+  unit_price NUMERIC(10,2) NOT NULL
 );
 INSERT INTO order_items VALUES
   (1001, 1, 12, 9.50), (1001, 3, 20, 2.40), (1001, 4, 100, 0.15),
@@ -120,7 +123,7 @@ export const RETAIL: ChallengeDataset = {
       columns: [
         { name: "order_id", type: "integer", key: "pk" },
         { name: "customer_id", type: "integer", key: "fk" },
-        { name: "order_date", type: "text" },
+        { name: "order_date", type: "date" },
         { name: "status", type: "text" },
       ],
     },
@@ -131,7 +134,7 @@ export const RETAIL: ChallengeDataset = {
         { name: "order_id", type: "integer", key: "fk" },
         { name: "product_id", type: "integer", key: "fk" },
         { name: "quantity", type: "integer" },
-        { name: "unit_price", type: "real" },
+        { name: "unit_price", type: "numeric" },
       ],
     },
     {
@@ -141,7 +144,7 @@ export const RETAIL: ChallengeDataset = {
         { name: "product_id", type: "integer", key: "pk" },
         { name: "product_name", type: "text" },
         { name: "category", type: "text" },
-        { name: "unit_cost", type: "real" },
+        { name: "unit_cost", type: "numeric" },
       ],
     },
     {
@@ -151,7 +154,7 @@ export const RETAIL: ChallengeDataset = {
         { name: "customer_id", type: "integer", key: "pk" },
         { name: "full_name", type: "text" },
         { name: "city", type: "text" },
-        { name: "signed_up", type: "text" },
+        { name: "signed_up", type: "date" },
       ],
     },
   ],
@@ -173,7 +176,7 @@ CREATE TABLE employees (
   dept_id     INTEGER REFERENCES departments(dept_id),
   manager_id  INTEGER REFERENCES employees(employee_id),
   salary      INTEGER NOT NULL,
-  hired_on    TEXT    NOT NULL
+  hired_on    DATE    NOT NULL
 );
 INSERT INTO employees VALUES
   (1,  'Dana Whitfield', 1, NULL, 185000, '2019-03-04'),
@@ -204,7 +207,7 @@ export const HR: ChallengeDataset = {
         { name: "dept_id", type: "integer", key: "fk" },
         { name: "manager_id", type: "integer", key: "fk" },
         { name: "salary", type: "integer" },
-        { name: "hired_on", type: "text" },
+        { name: "hired_on", type: "date" },
       ],
     },
     {
@@ -226,7 +229,7 @@ CREATE TABLE events (
   user_id    INTEGER NOT NULL,
   event_name TEXT    NOT NULL,
   page       TEXT    NOT NULL,
-  occurred_at TEXT   NOT NULL
+  occurred_at TIMESTAMP NOT NULL
 );
 INSERT INTO events VALUES
   (1,  1, 'view',   '/pricing', '2024-05-01 09:14:00'),
@@ -262,7 +265,7 @@ export const EVENTS: ChallengeDataset = {
         { name: "user_id", type: "integer" },
         { name: "event_name", type: "text" },
         { name: "page", type: "text" },
-        { name: "occurred_at", type: "text" },
+        { name: "occurred_at", type: "timestamp" },
       ],
     },
   ],
@@ -280,7 +283,7 @@ const SUBSCRIPTIONS_SQL = `
 CREATE TABLE plans (
   plan_id       INTEGER PRIMARY KEY,
   plan_name     TEXT    NOT NULL,
-  monthly_price REAL    NOT NULL
+  monthly_price NUMERIC(10,2) NOT NULL
 );
 INSERT INTO plans VALUES
   (1, 'Starter',  12.00),
@@ -291,7 +294,7 @@ CREATE TABLE accounts (
   account_id INTEGER PRIMARY KEY,
   company    TEXT NOT NULL,
   country    TEXT NOT NULL,
-  created_on TEXT NOT NULL
+  created_on DATE NOT NULL
 );
 INSERT INTO accounts VALUES
   (1,  'Northwind Foods', 'US', '2023-01-15'),
@@ -309,8 +312,8 @@ CREATE TABLE subscriptions (
   subscription_id INTEGER PRIMARY KEY,
   account_id      INTEGER NOT NULL REFERENCES accounts(account_id),
   plan_id         INTEGER NOT NULL REFERENCES plans(plan_id),
-  started_on      TEXT    NOT NULL,
-  ended_on        TEXT
+  started_on      DATE    NOT NULL,
+  ended_on        DATE
 );
 INSERT INTO subscriptions VALUES
   (1,  1,  1, '2023-01-20', '2023-07-19'),
@@ -331,9 +334,9 @@ INSERT INTO subscriptions VALUES
 CREATE TABLE invoices (
   invoice_id INTEGER PRIMARY KEY,
   account_id INTEGER NOT NULL REFERENCES accounts(account_id),
-  issued_on  TEXT    NOT NULL,
-  amount     REAL    NOT NULL,
-  paid_on    TEXT
+  issued_on  DATE    NOT NULL,
+  amount     NUMERIC(10,2) NOT NULL,
+  paid_on    DATE
 );
 INSERT INTO invoices VALUES
   (1,  1,  '2024-01-01',  45.00, '2024-01-05'),
@@ -368,7 +371,7 @@ export const SUBSCRIPTIONS: ChallengeDataset = {
         { name: "account_id", type: "integer", key: "pk" },
         { name: "company", type: "text" },
         { name: "country", type: "text" },
-        { name: "created_on", type: "text" },
+        { name: "created_on", type: "date" },
       ],
     },
     {
@@ -378,8 +381,8 @@ export const SUBSCRIPTIONS: ChallengeDataset = {
         { name: "subscription_id", type: "integer", key: "pk" },
         { name: "account_id", type: "integer", key: "fk" },
         { name: "plan_id", type: "integer", key: "fk" },
-        { name: "started_on", type: "text" },
-        { name: "ended_on", type: "text" },
+        { name: "started_on", type: "date" },
+        { name: "ended_on", type: "date" },
       ],
     },
     {
@@ -388,9 +391,9 @@ export const SUBSCRIPTIONS: ChallengeDataset = {
       columns: [
         { name: "invoice_id", type: "integer", key: "pk" },
         { name: "account_id", type: "integer", key: "fk" },
-        { name: "issued_on", type: "text" },
-        { name: "amount", type: "real" },
-        { name: "paid_on", type: "text" },
+        { name: "issued_on", type: "date" },
+        { name: "amount", type: "numeric" },
+        { name: "paid_on", type: "date" },
       ],
     },
     {
@@ -399,7 +402,7 @@ export const SUBSCRIPTIONS: ChallengeDataset = {
       columns: [
         { name: "plan_id", type: "integer", key: "pk" },
         { name: "plan_name", type: "text" },
-        { name: "monthly_price", type: "real" },
+        { name: "monthly_price", type: "numeric" },
       ],
     },
   ],
@@ -460,7 +463,7 @@ INSERT INTO book_authors VALUES
 CREATE TABLE members (
   member_id INTEGER PRIMARY KEY,
   full_name TEXT NOT NULL,
-  joined_on TEXT NOT NULL
+  joined_on DATE NOT NULL
 );
 INSERT INTO members VALUES
   (1, 'Hana Brennan',    '2023-01-10'),
@@ -476,8 +479,8 @@ CREATE TABLE loans (
   loan_id     INTEGER PRIMARY KEY,
   book_id     INTEGER NOT NULL REFERENCES books(book_id),
   member_id   INTEGER NOT NULL REFERENCES members(member_id),
-  borrowed_on TEXT    NOT NULL,
-  returned_on TEXT
+  borrowed_on DATE    NOT NULL,
+  returned_on DATE
 );
 INSERT INTO loans VALUES
   (1,  1,  1, '2024-01-03', '2024-01-15'),
@@ -517,8 +520,8 @@ export const LIBRARY: ChallengeDataset = {
         { name: "loan_id", type: "integer", key: "pk" },
         { name: "book_id", type: "integer", key: "fk" },
         { name: "member_id", type: "integer", key: "fk" },
-        { name: "borrowed_on", type: "text" },
-        { name: "returned_on", type: "text" },
+        { name: "borrowed_on", type: "date" },
+        { name: "returned_on", type: "date" },
       ],
     },
     {
@@ -554,7 +557,7 @@ export const LIBRARY: ChallengeDataset = {
       columns: [
         { name: "member_id", type: "integer", key: "pk" },
         { name: "full_name", type: "text" },
-        { name: "joined_on", type: "text" },
+        { name: "joined_on", type: "date" },
       ],
     },
   ],

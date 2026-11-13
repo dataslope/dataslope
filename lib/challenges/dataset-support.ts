@@ -84,9 +84,9 @@ CREATE TABLE tickets (
   agent_id          INTEGER REFERENCES agents(agent_id),
   priority          TEXT    NOT NULL REFERENCES sla_targets(priority),
   channel           TEXT    NOT NULL,
-  opened_at         TEXT    NOT NULL,
-  first_response_at TEXT,
-  resolved_at       TEXT
+  opened_at         TIMESTAMP NOT NULL,
+  first_response_at TIMESTAMP,
+  resolved_at       TIMESTAMP
 );
 INSERT INTO tickets VALUES
   (1,  4,  1,    'normal', 'email', '2024-03-04 09:12:00', '2024-03-04 11:40:00', '2024-03-05 16:30:00'),
@@ -123,7 +123,7 @@ CREATE TABLE ticket_events (
   event_id   INTEGER PRIMARY KEY,
   ticket_id  INTEGER NOT NULL REFERENCES tickets(ticket_id),
   status     TEXT    NOT NULL,
-  changed_at TEXT    NOT NULL
+  changed_at TIMESTAMP NOT NULL
 );
 INSERT INTO ticket_events VALUES
   (1,  2,  'resolved', '2024-03-04 15:50:00'),
@@ -174,9 +174,9 @@ export const SUPPORT: ChallengeDataset = {
         { name: "agent_id", type: "integer", key: "fk" },
         { name: "priority", type: "text", key: "fk" },
         { name: "channel", type: "text" },
-        { name: "opened_at", type: "text" },
-        { name: "first_response_at", type: "text" },
-        { name: "resolved_at", type: "text" },
+        { name: "opened_at", type: "timestamp" },
+        { name: "first_response_at", type: "timestamp" },
+        { name: "resolved_at", type: "timestamp" },
       ],
     },
     {
@@ -186,7 +186,7 @@ export const SUPPORT: ChallengeDataset = {
         { name: "event_id", type: "integer", key: "pk" },
         { name: "ticket_id", type: "integer", key: "fk" },
         { name: "status", type: "text" },
-        { name: "changed_at", type: "text" },
+        { name: "changed_at", type: "timestamp" },
       ],
     },
     {
