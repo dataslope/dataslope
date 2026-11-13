@@ -19,8 +19,19 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ChevronDown, Circle, CircleCheckBig, Search, X } from "lucide-react";
+import { Select } from "@base-ui/react/select";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  CircleCheckBig,
+  Layers,
+  Search,
+  Square,
+  X,
+} from "lucide-react";
 import { LangIcon } from "@/app/_components/languageIcons";
+import { HOME_SELECT_ITEM, HOME_SELECT_POPUP } from "@/app/_components/home/homeSelect";
 import { statusOf } from "@/lib/challenges/progress";
 import { useAllProgress } from "@/app/challenges/_components/useProgress";
 import {
@@ -30,6 +41,7 @@ import {
   type ChallengeStatus,
   type IndexLanguage,
 } from "@/lib/challenges/types";
+import styles from "./ChallengesList.module.css";
 
 /**
  * Rows per page on offer. The default sits high because the catalog is long
@@ -50,7 +62,7 @@ const LEVELS = ["Beginner", "Intermediate", "Advanced"];
 /** Difficulty meter, matching the workspace's three-bar mark. */
 function LevelBars({ level }: { level: number }) {
   return (
-    <span aria-hidden="true" className="inline-flex gap-0.5">
+    <span aria-hidden="true" className="inline-flex shrink-0 gap-0.5">
       {[1, 2, 3].map((n) => (
         <span
           key={n}
@@ -62,81 +74,118 @@ function LevelBars({ level }: { level: number }) {
   );
 }
 
-function StatusIcon({ status }: { status: ChallengeStatus }) {
-  const label = CHALLENGE_STATUS_LABELS[status];
-  if (status === "solved") {
-    return (
-      <CircleCheckBig
-        size={17}
-        strokeWidth={2.2}
-        aria-label={label}
-        style={{ color: "var(--green-text)" }}
-      />
-    );
-  }
-  if (status === "attempted") {
-    // A half-filled circle: started, not finished. Drawn inline because
-    // lucide has no half-fill, and a plain dot reads as a bullet rather than
-    // as progress.
-    return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="17"
-        height="17"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        role="img"
-        aria-label={label}
-        style={{ color: "var(--ds-blue-500)" }}
-      >
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor" stroke="none" />
-      </svg>
-    );
-  }
-  return <Circle size={17} strokeWidth={2} aria-label={label} style={{ color: "var(--ds-gray-300)" }} />;
+/** Started, not finished: a half-filled circle, since lucide has none. */
+function HalfCircle({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor" stroke="none" />
+    </svg>
+  );
 }
 
 /**
- * A `<select>` with the chevron the design draws over it. `compact` matches
- * the 32px pagination buttons it sits beside in the footer; the filter row's
- * 38px is the design's field height.
+ * Where the learner stands, as an icon and a word.
+ *
+ * "Not started" draws nothing visible. An empty circle on every row used to
+ * stand in for it, and a column of those read as radio buttons: something to
+ * pick, rather than a record of progress. Leaving the cell blank keeps the
+ * two states that mean something (solved, in progress) the only marks there.
  */
-function Select({
+function StatusMark({ status }: { status: ChallengeStatus }) {
+  if (status === "solved") {
+    return (
+      <span className="inline-flex items-center gap-1.5" style={{ color: "var(--green-text)" }}>
+        <CircleCheckBig size={16} strokeWidth={2.2} aria-hidden="true" />
+        {CHALLENGE_STATUS_LABELS.solved}
+      </span>
+    );
+  }
+  if (status === "attempted") {
+    return (
+      <span className="inline-flex items-center gap-1.5" style={{ color: "var(--blue-text)" }}>
+        <HalfCircle />
+        {CHALLENGE_STATUS_LABELS.attempted}
+      </span>
+    );
+  }
+  return <span className="sr-only">{CHALLENGE_STATUS_LABELS.new}</span>;
+}
+
+/** One choice in a {@link FilterSelect}. */
+interface FilterOption {
+  value: string;
+  label: string;
+  /** Drawn before the label, in the menu and on the trigger once chosen. */
+  icon?: React.ReactNode;
+  /** Drawn after the label in the menu only, muted. */
+  count?: number;
+}
+
+/**
+ * A filter dropdown: a Base UI Select styled as a borderless chip, the same
+ * control the /courses catalog sorts with, so each option can carry an icon
+ * (a language's logo, the level meter) where a native `<option>` takes only
+ * text. The trigger shows the chosen option's icon beside its label.
+ */
+function FilterSelect({
   value,
   onChange,
   label,
-  compact,
-  children,
+  options,
 }: {
   value: string;
   onChange: (value: string) => void;
+  /** The control's accessible name. */
   label: string;
-  compact?: boolean;
-  children: React.ReactNode;
+  options: FilterOption[];
 }) {
+  const active = options.find((o) => o.value === value) ?? options[0];
   return (
-    <span className="relative inline-flex">
-      <select
-        className="ds-select w-auto"
+    <Select.Root
+      value={value}
+      onValueChange={(next) => onChange(typeof next === "string" ? next : "")}
+    >
+      <Select.Trigger
         aria-label={label}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        // Inline, because `.ds-select` is unlayered CSS and outranks a
-        // Tailwind height utility.
-        style={compact ? { height: 32, fontSize: 13 } : undefined}
+        className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border-0 bg-[var(--field)] px-3 text-sm font-medium text-[var(--ink)] outline-none transition-colors hover:bg-[var(--field-hover)] focus-visible:ring-2 focus-visible:ring-[var(--ds-blue-400)] data-[popup-open]:bg-[var(--field-hover)]"
       >
-        {children}
-      </select>
-      <ChevronDown
-        size={14}
-        aria-hidden="true"
-        className={`pointer-events-none absolute right-[11px] ${compact ? "top-[9px]" : "top-3"}`}
-        style={{ color: "var(--muted)" }}
-      />
-    </span>
+        {active.icon}
+        <Select.Value className="whitespace-nowrap text-left">{active.label}</Select.Value>
+        <Select.Icon className="flex" style={{ color: "var(--muted)" }}>
+          <ChevronDown size={14} />
+        </Select.Icon>
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Positioner sideOffset={6} alignItemWithTrigger={false} className="z-50">
+          <Select.Popup className={`${HOME_SELECT_POPUP} min-w-[max(var(--anchor-width),11rem)]`}>
+            {options.map((o) => (
+              <Select.Item key={o.value || "all"} value={o.value} className={HOME_SELECT_ITEM}>
+                {o.icon}
+                <Select.ItemText className="flex-1">{o.label}</Select.ItemText>
+                {o.count !== undefined ? (
+                  <span
+                    data-count={o.count}
+                    className="pl-4 text-[13px] tabular-nums text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]"
+                  >
+                    {o.count}
+                  </span>
+                ) : null}
+              </Select.Item>
+            ))}
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Portal>
+    </Select.Root>
   );
 }
 
@@ -378,6 +427,55 @@ interface LanguageOption {
   count: number;
 }
 
+// The menu is portaled out of `.catalog`, so its icons cannot read the list's
+// tokens and take the brand shades directly.
+const STATUS_OPTIONS: FilterOption[] = [
+  { value: "", label: "All statuses" },
+  {
+    value: "solved",
+    label: CHALLENGE_STATUS_LABELS.solved,
+    icon: (
+      <span className="flex text-[var(--ds-green-700)] dark:text-[var(--ds-green-400)]">
+        <CircleCheckBig size={15} strokeWidth={2.2} aria-hidden="true" />
+      </span>
+    ),
+  },
+  {
+    value: "attempted",
+    label: CHALLENGE_STATUS_LABELS.attempted,
+    icon: (
+      <span className="flex text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]">
+        <HalfCircle size={15} />
+      </span>
+    ),
+  },
+  { value: "new", label: CHALLENGE_STATUS_LABELS.new },
+];
+
+const LEVEL_OPTIONS: FilterOption[] = [
+  { value: "", label: "All levels" },
+  ...LEVELS.map((label, i) => ({
+    value: String(i + 1),
+    label,
+    icon: <LevelBars level={i + 1} />,
+  })),
+];
+
+const FORMAT_OPTIONS: FilterOption[] = [
+  { value: "", label: "Any format" },
+  { value: "single", label: "Single step", icon: <Square size={14} aria-hidden="true" /> },
+  { value: "multi", label: "Multi-step", icon: <Layers size={14} aria-hidden="true" /> },
+];
+
+const PAGE_SIZE_OPTIONS: FilterOption[] = PAGE_SIZES.map((n) => ({
+  value: String(n),
+  label: String(n),
+}));
+
+function formatLabel(steps: number): string {
+  return steps > 1 ? `${steps} steps` : "Single step";
+}
+
 function CatalogView({
   entries,
   filters,
@@ -430,6 +528,18 @@ function CatalogView({
       .filter((id) => counts.has(id) || id === filters.lang)
       .map((id) => ({ id, count: counts.get(id) ?? 0 }));
   }, [entries, filters.lang]);
+  const languageOptions: FilterOption[] = useMemo(
+    () => [
+      { value: "", label: "All languages" },
+      ...languages.map(({ id, count }) => ({
+        value: id,
+        label: INDEX_LANGUAGE_LABELS[id],
+        icon: <LangIcon id={id} size={15} />,
+        count,
+      })),
+    ],
+    [languages],
+  );
 
   const filterBy = (key: Exclude<keyof Filters, "q">) => onFilter?.(key) ?? (() => {});
 
@@ -445,21 +555,20 @@ function CatalogView({
   const hasFilters = Boolean(query) || Object.values({ ...filters, q: "" }).some(Boolean);
 
   return (
-    <div>
-      <h1 className="ds-h1">Challenges</h1>
-      <p
-        className="mt-2.5 text-[15px] leading-relaxed [text-wrap:pretty]"
-        style={{ color: "var(--muted)" }}
-      >
-        Short problems with instant feedback. Some are one query or one function;
-        the harder ones are broken into steps that unlock as you pass them.
-      </p>
+    <div className={styles.catalog}>
+      {/* Centered heading, matching the /courses and /pricing title blocks. */}
+      <div className="mx-auto max-w-2xl text-center">
+        <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
+          Challenges
+        </h1>
+        <p className="mt-6 text-base text-[var(--ds-gray-900)] [text-wrap:pretty] sm:text-lg dark:text-white">
+          Short problems with instant feedback. Some are one query or one function;
+          the harder ones are broken into steps that unlock as you pass them.
+        </p>
+      </div>
 
-      <div className="mt-7 flex flex-wrap items-center gap-2.5">
-        <label
-          className="flex h-[38px] min-w-[200px] max-w-[340px] flex-[1_1_220px] items-center gap-2 rounded-[7px] px-3 focus-within:shadow-[0_0_0_2px_rgba(20,140,255,0.35)]"
-          style={{ background: "var(--field)" }}
-        >
+      <div className="mt-12 flex flex-wrap items-center gap-2">
+        <label className="flex h-9 min-w-[200px] max-w-[320px] flex-[1_1_220px] items-center gap-2 rounded-lg bg-[var(--field)] px-3 focus-within:ring-2 focus-within:ring-[var(--ds-blue-400)]">
           <Search size={15} aria-hidden="true" className="shrink-0" style={{ color: "var(--muted)" }} />
           <input
             type="text"
@@ -467,51 +576,44 @@ function CatalogView({
             onChange={(e) => onSearch?.(e.target.value)}
             placeholder="Search challenges…"
             aria-label="Search challenges"
-            className="min-w-0 flex-1 border-none bg-transparent text-sm outline-none"
+            className="min-w-0 flex-1 border-none bg-transparent text-sm outline-none placeholder:text-[var(--muted)]"
             style={{ color: "var(--ink)" }}
           />
         </label>
 
-        <Select value={filters.status} onChange={filterBy("status")} label="Status">
-          <option value="">All statuses</option>
-          {(["solved", "attempted", "new"] as const).map((s) => (
-            <option key={s} value={s}>
-              {CHALLENGE_STATUS_LABELS[s]}
-            </option>
-          ))}
-        </Select>
-
-        <Select value={filters.lang} onChange={filterBy("lang")} label="Language">
-          <option value="">All languages</option>
-          {languages.map(({ id, count }) => (
-            <option key={id} value={id}>
-              {INDEX_LANGUAGE_LABELS[id]} ({count})
-            </option>
-          ))}
-        </Select>
-
-        <Select value={filters.level} onChange={filterBy("level")} label="Level">
-          <option value="">All levels</option>
-          {LEVELS.map((label, i) => (
-            <option key={label} value={String(i + 1)}>
-              {label}
-            </option>
-          ))}
-        </Select>
-
-        <Select value={filters.format} onChange={filterBy("format")} label="Format">
-          <option value="">Any format</option>
-          <option value="single">Single step</option>
-          <option value="multi">Multi-step</option>
-        </Select>
+        <FilterSelect
+          value={filters.status}
+          onChange={filterBy("status")}
+          label="Status"
+          options={STATUS_OPTIONS}
+        />
+        <FilterSelect
+          value={filters.lang}
+          onChange={filterBy("lang")}
+          label="Language"
+          options={languageOptions}
+        />
+        <FilterSelect
+          value={filters.level}
+          onChange={filterBy("level")}
+          label="Level"
+          options={LEVEL_OPTIONS}
+        />
+        <FilterSelect
+          value={filters.format}
+          onChange={filterBy("format")}
+          label="Format"
+          options={FORMAT_OPTIONS}
+        />
 
         {hasFilters ? (
           <button
             type="button"
             onClick={onClear}
-            className="ds-btn-chip"
+            className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2.5 text-sm font-medium transition-colors hover:text-[var(--ink)]"
+            style={{ color: "var(--muted)" }}
           >
-            <X size={12} aria-hidden="true" />
+            <X size={14} aria-hidden="true" />
             Clear
           </button>
         ) : null}
@@ -520,10 +622,10 @@ function CatalogView({
         {/* Scoped to whatever is filtered, because it sits in the same row
             as "1-10 of 43" and two different totals there read as a bug. */}
         <span
-          className="inline-flex items-center gap-2 whitespace-nowrap text-[13px]"
+          className="inline-flex items-center gap-1.5 whitespace-nowrap text-[13px]"
           style={{ color: "var(--muted)" }}
         >
-          <CircleCheckBig size={15} aria-hidden="true" style={{ color: "var(--green-text)" }} />
+          <CircleCheckBig size={14} aria-hidden="true" style={{ color: "var(--green-text)" }} />
           {solvedInView} of {total} solved
           {hasFilters ? <span className="sr-only"> in the current filter</span> : null}
         </span>
@@ -531,15 +633,15 @@ function CatalogView({
 
       {total === 0 ? (
         <p
-          className="mt-5 rounded-lg px-4 py-3 text-sm"
-          style={{ background: "var(--panel)", color: "var(--muted)" }}
+          className="mt-6 rounded-lg bg-[var(--field)] px-4 py-3 text-sm"
+          style={{ color: "var(--muted)" }}
         >
           No challenges match.{" "}
           <button
             type="button"
             onClick={onClear}
-            className="border-0 bg-transparent p-0 text-sm font-medium underline underline-offset-2"
-            style={{ color: "var(--green-text)" }}
+            className="cursor-pointer border-0 bg-transparent p-0 text-sm font-medium underline underline-offset-2"
+            style={{ color: "var(--blue-text)" }}
           >
             Clear the filters
           </button>{" "}
@@ -547,43 +649,37 @@ function CatalogView({
         </p>
       ) : (
         <>
-          {/* Narrow viewports get stacked cards, not a 576px table scrolling
+          {/* Narrow viewports get stacked cards, not a table scrolling
               sideways with its last columns off-screen and nothing saying so.
-              The switch is at 900px rather than a smaller breakpoint because
-              the studio sidebar takes ~300px: at an 800px viewport the content
-              column is still too narrow for five columns, which is where the
-              Format column was being clipped. Same rows, same order. */}
-          <ul className="mt-5 flex list-none flex-col gap-2 p-0 min-[900px]:hidden">
+              Same rows, same order. */}
+          <ul className="-mx-3 mt-4 flex list-none flex-col p-0 md:hidden">
             {rows.map((entry) => (
               <MobileRow key={entry.slug} entry={entry} />
             ))}
           </ul>
 
-          <div
-            className="mt-5 hidden overflow-hidden rounded-[10px] min-[900px]:block"
-            style={{ border: "1px solid var(--divider)" }}
-          >
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr>
-                    <Th className="w-11 pl-4 pr-0" />
-                    <Th className="w-full min-w-[180px]">Title</Th>
-                    <Th>Level</Th>
-                    <Th>Language</Th>
-                    <Th>Format</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((entry) => (
-                    <Row key={entry.slug} entry={entry} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          {/* `-mx-3` lines the cell text up with the filter row above while
+              the hover fill reaches past it, so a row reads as one block. */}
+          <div className="-mx-3 mt-4 hidden md:block">
+            <table className="w-full border-separate border-spacing-0">
+              <thead>
+                <tr>
+                  <Th className="w-full min-w-[220px]">Title</Th>
+                  <Th>Level</Th>
+                  <Th>Language</Th>
+                  <Th>Format</Th>
+                  <Th className="text-right">Status</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((entry) => (
+                  <Row key={entry.slug} entry={entry} />
+                ))}
+              </tbody>
+            </table>
           </div>
 
-          <div className="mt-3.5 flex flex-wrap items-center gap-1.5 px-1">
+          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
             <span className="whitespace-nowrap text-[13px]" style={{ color: "var(--muted)" }}>
               {start + 1}–{start + rows.length} of {total}
             </span>
@@ -591,36 +687,31 @@ function CatalogView({
                 ten or fewer. */}
             {total > PAGE_SIZES[0] ? (
               <span
-                className="ml-3 inline-flex items-center gap-2 whitespace-nowrap text-[13px]"
+                className="inline-flex items-center gap-2 whitespace-nowrap text-[13px]"
                 style={{ color: "var(--muted)" }}
               >
                 <span aria-hidden="true">Show</span>
-                <Select
+                <FilterSelect
                   value={String(pageSize)}
                   // Changing the size keeps the first row on screen in view,
                   // rather than jumping back to the top: row 120 of 300 at 10
                   // a page is page 12, and at 50 a page it is on page 3.
                   onChange={(v) => onPageSize?.(Number(v), start)}
                   label="Challenges per page"
-                  compact
-                >
-                  {PAGE_SIZES.map((n) => (
-                    <option key={n} value={String(n)}>
-                      {n}
-                    </option>
-                  ))}
-                </Select>
+                  options={PAGE_SIZE_OPTIONS}
+                />
                 <span aria-hidden="true">per page</span>
               </span>
             ) : null}
             {pageCount > 1 ? (
-              <nav aria-label="Pagination" className="ml-auto flex flex-wrap items-center gap-1.5">
+              <nav aria-label="Pagination" className="ml-auto flex flex-wrap items-center gap-1">
                 <button
                   type="button"
-                  className="ds-page-btn"
+                  className={styles.pageBtn}
                   disabled={current <= 1}
                   onClick={() => onPage?.(Math.max(1, current - 1))}
                 >
+                  <ChevronLeft size={16} aria-hidden="true" />
                   Previous
                 </button>
                 {pageWindow(current, pageCount).map((n, i) =>
@@ -628,7 +719,7 @@ function CatalogView({
                     <span
                       key={`gap-${i}`}
                       aria-hidden="true"
-                      className="inline-flex h-8 w-8 items-center justify-center text-[13px]"
+                      className="inline-flex h-8 w-8 items-center justify-center text-sm"
                       style={{ color: "var(--faint)" }}
                     >
                       …
@@ -641,7 +732,7 @@ function CatalogView({
                       aria-label={`Page ${n}`}
                       aria-current={n === current ? "page" : undefined}
                       data-active={n === current || undefined}
-                      className="ds-page-num"
+                      className={styles.pageNum}
                     >
                       {n}
                     </button>
@@ -649,11 +740,12 @@ function CatalogView({
                 )}
                 <button
                   type="button"
-                  className="ds-page-btn"
+                  className={styles.pageBtn}
                   disabled={current >= pageCount}
                   onClick={() => onPage?.(Math.min(pageCount, current + 1))}
                 >
                   Next
+                  <ChevronRight size={16} aria-hidden="true" />
                 </button>
               </nav>
             ) : null}
@@ -667,7 +759,7 @@ function CatalogView({
 function Th({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
   return (
     <th
-      className={`h-10 whitespace-nowrap px-3 text-left text-[13px] font-medium ${className}`}
+      className={`whitespace-nowrap px-3 pb-2 text-left text-[13px] font-medium ${className}`}
       style={{ color: "var(--muted)" }}
     >
       {children}
@@ -676,57 +768,65 @@ function Th({ children, className = "" }: { children?: React.ReactNode; classNam
 }
 
 /**
+ * The shared body of the level, language and format cells.
+ *
+ * One height, one line-height and one type size, centred on the row's
+ * middle: those cells used to mix 11, 13 and 14px type, a pill and
+ * baseline-aligned inline boxes, and came to rest a few pixels apart.
+ */
+function Cell({ children, tone = "var(--text)" }: { children: React.ReactNode; tone?: string }) {
+  return (
+    <span className="flex h-5 items-center gap-2 whitespace-nowrap text-sm leading-5" style={{ color: tone }}>
+      {children}
+    </span>
+  );
+}
+
+/**
  * One challenge as a card, for viewports too narrow for five columns.
  *
  * Level, language and format collapse into a single metadata line under the
- * title — the same facts the table's last three columns carry, in the order
- * the table shows them.
+ * title, in the order the table's columns show them.
  */
 function MobileRow({ entry }: { entry: ResolvedEntry }) {
   return (
-    <li
-      className="rounded-[10px] p-3"
-      style={{ border: "1px solid var(--divider)" }}
-    >
+    <li>
       <Link
         href={`/challenges/${entry.slug}`}
         // See `Row`.
         prefetch={false}
-        className="flex items-start gap-2.5 text-inherit no-underline"
+        className={`${styles.card} flex flex-col gap-1 px-3 py-3 text-inherit no-underline`}
       >
-        <span className="mt-0.5 shrink-0">
-          <StatusIcon status={entry.status} />
-        </span>
-        <span className="flex min-w-0 flex-col gap-1">
-          <span
-            className="text-sm font-medium leading-tight"
-            style={{ color: "var(--ink)" }}
-          >
+        <span className="flex items-start justify-between gap-3">
+          <span className="text-sm font-medium leading-5" style={{ color: "var(--ink)" }}>
             {entry.title}
           </span>
-          <span className="text-[12.5px]" style={{ color: "var(--muted)" }}>
-            {entry.topic}
+          <span className="shrink-0 text-[13px] leading-5">
+            <StatusMark status={entry.status} />
           </span>
-          <span
-            className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px]"
-            style={{ color: "var(--text)" }}
-          >
-            <span className="inline-flex items-center gap-1.5">
-              <LevelBars level={entry.level} />
-              {LEVELS[entry.level - 1]}
-            </span>
-            <span aria-hidden="true" style={{ color: "var(--faint)" }}>
-              ·
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <LangIcon id={entry.langs[0]} size={13} />
-              {entry.langs.map((l) => INDEX_LANGUAGE_LABELS[l]).join(", ")}
-            </span>
-            <span aria-hidden="true" style={{ color: "var(--faint)" }}>
-              ·
-            </span>
-            <span>{entry.steps > 1 ? `${entry.steps} steps` : "Single step"}</span>
+        </span>
+        <span className="text-[13px]" style={{ color: "var(--muted)" }}>
+          {entry.topic}
+        </span>
+        <span
+          className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]"
+          style={{ color: "var(--text)" }}
+        >
+          <span className="inline-flex items-center gap-1.5">
+            <LevelBars level={entry.level} />
+            {LEVELS[entry.level - 1]}
           </span>
+          <span aria-hidden="true" style={{ color: "var(--faint)" }}>
+            ·
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <LangIcon id={entry.langs[0]} size={13} />
+            {entry.langs.map((l) => INDEX_LANGUAGE_LABELS[l]).join(", ")}
+          </span>
+          <span aria-hidden="true" style={{ color: "var(--faint)" }}>
+            ·
+          </span>
+          <span>{formatLabel(entry.steps)}</span>
         </span>
       </Link>
     </li>
@@ -737,74 +837,57 @@ function Row({ entry }: { entry: ResolvedEntry }) {
   const lang = entry.langs[0];
   const more = entry.langs.length - 1;
   return (
-    // `.ds-challenge-row` in studio.css makes the row the containing block
-    // and stretches the title link's ::after across it, so the whole row is
-    // the hit area — matching the full-width hover.
-    <tr
-      className="ds-challenge-row"
-      data-clickable="true"
-      style={{ borderTop: "1px solid var(--divider)" }}
-    >
-      <td className="py-3 pl-4 pr-0 align-middle">
-        <StatusIcon status={entry.status} />
-      </td>
-      <td className="p-3 align-middle">
+    // `.row` makes the row the containing block and stretches the title
+    // link's ::after across it, so the whole row is the hit area, matching
+    // the full-width hover.
+    <tr className={styles.row}>
+      <td className="px-3 py-3 align-middle">
         <Link
           href={`/challenges/${entry.slug}`}
           // Fifty rows a page, each a whole workspace (prompt, dataset,
           // reference solutions): prefetching every row that scrolls into
           // view fetched far more than anyone opens. See app/_components/Link.tsx.
           prefetch={false}
-          className="ds-row-link flex flex-col gap-0.5 text-inherit no-underline"
+          className={`${styles.rowLink} flex flex-col gap-0.5 text-inherit no-underline`}
         >
-          <span className="text-sm font-medium leading-tight" style={{ color: "var(--ink)" }}>
+          <span className="text-sm font-medium leading-5" style={{ color: "var(--ink)" }}>
             {entry.title}
           </span>
           {/* --muted, not --faint: the topic is the only place a challenge's
-              subject appears, and --faint is 2.42:1 on white. */}
-          <span className="text-[12.5px]" style={{ color: "var(--muted)" }}>
+              subject appears, and --faint fails contrast on white. */}
+          <span className="text-[13px] leading-5" style={{ color: "var(--muted)" }}>
             {entry.topic}
           </span>
         </Link>
       </td>
-      <td className="whitespace-nowrap p-3 align-middle">
-        <span
-          className="inline-flex items-center gap-2.5 text-[13px] font-medium"
-          style={{ color: "var(--text)" }}
-        >
+      <td className="px-3 py-3 align-middle">
+        <Cell>
           <LevelBars level={entry.level} />
           {LEVELS[entry.level - 1]}
-        </span>
+        </Cell>
       </td>
-      <td className="whitespace-nowrap p-3 align-middle">
-        <span
-          className="inline-flex items-center gap-[7px] text-[13px]"
-          style={{ color: "var(--ink)" }}
-        >
-          <LangIcon id={lang} size={14} />
-          <span>{INDEX_LANGUAGE_LABELS[lang]}</span>
+      <td className="px-3 py-3 align-middle">
+        <Cell tone="var(--ink)">
+          <LangIcon id={lang} size={15} />
+          {INDEX_LANGUAGE_LABELS[lang]}
           {more > 0 ? (
             <span
-              className="rounded-full px-[7px] py-px text-[11px] font-semibold"
-              style={{ background: "var(--chip-bg)", color: "var(--muted)" }}
+              style={{ color: "var(--muted)" }}
               title={entry.langs.map((l) => INDEX_LANGUAGE_LABELS[l]).join(", ")}
             >
               +{more}
             </span>
           ) : null}
-        </span>
+        </Cell>
       </td>
-      <td className="whitespace-nowrap p-3 align-middle">
-        <span
-          className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold"
-          // 11px bold does not qualify as large text, so this needs the full
-          // 4.5:1 rather than --muted's 4.17:1 against the chip.
-          style={{ background: "var(--chip-bg)", color: "var(--text)" }}
-        >
-          {entry.steps > 1 ? `${entry.steps} steps` : "Single step"}
+      <td className="px-3 py-3 align-middle">
+        <Cell>{formatLabel(entry.steps)}</Cell>
+      </td>
+      <td className="px-3 py-3 text-right align-middle">
+        <span className="inline-flex h-5 items-center justify-end whitespace-nowrap text-sm leading-5">
+          <StatusMark status={entry.status} />
         </span>
       </td>
     </tr>
   );
 }
-

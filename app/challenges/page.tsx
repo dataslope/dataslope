@@ -14,12 +14,9 @@
 
 // Same Tailwind bundle + home-route hardening as the home page, so the reused
 // HomeNav/HomeFooter (`.ds-home`-scoped rules) lay out correctly. The list
-// itself is drawn with the Studio's tokens and component classes
-// (`.ds-select`, `.ds-page-btn`, `--ink`, `--muted`…), which live on
-// `.ds-studio` in studio.css.
+// brings its own tokens in `_components/ChallengesList.module.css`.
 import "@/app/tailwind.css";
 import "@/app/home.css";
-import "@/app/dashboard/_studio/studio.css";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getChallengeIndex } from "@/lib/challenges";
@@ -76,12 +73,9 @@ export default function ChallengesPage() {
       >
         <HomeNav />
 
-        {/* `ds-studio` supplies the list's color tokens; its own page
-            background is overridden so the site's shows through. */}
         <main
           id="main"
-          className="ds-studio mx-auto w-full max-w-[1120px] px-4 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-16"
-          style={{ background: "transparent" }}
+          className="mx-auto w-full max-w-[1120px] px-4 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-16"
         >
           <Suspense fallback={<ChallengesListFallback entries={entries} />}>
             <ChallengesList entries={entries} />
