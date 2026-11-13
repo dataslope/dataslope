@@ -103,9 +103,13 @@ function NavLink({
       // font-size animates with the color so the step down moves with the
       // nav's height. Base size and padding target the tightest desktop band,
       // now lg–xl: that is where six items first have to fit, so the step up
-      // waits for xl rather than lg.
+      // waits for xl rather than lg. That band is 14px rather than 13px: the
+      // drop from 15px read as a different menu, and measured at 1024 (its
+      // tightest point, signed out) the menu still clears the brand by
+      // 131px and the right-hand cluster by 65px. The brand steps down in
+      // the same band (see `BrandLogo`) to keep the two in proportion.
       className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 font-medium transition-[color,font-size] duration-200 xl:px-3 ${
-        compact ? "text-[13px] xl:text-[14.5px]" : "text-[13px] xl:text-[15px]"
+        compact ? "text-sm xl:text-[14.5px]" : "text-sm xl:text-[15px]"
       } ${
         active
           ? activeClass
@@ -130,7 +134,7 @@ function GitHubLink({ compact }: { compact?: boolean }) {
         compact ? "size-[34px]" : "size-9"
       }`}
     >
-      <GitHubIcon size={compact ? 17 : 18} />
+      <GitHubIcon size={compact ? 19 : 20} />
     </a>
   );
 }
@@ -159,8 +163,11 @@ function BrandLogo({ compact }: { compact?: boolean }) {
         alt=""
         // `height` (not `transform: scale`) so it can't fight the hover
         // rotate on the same property.
+        // One step smaller across lg–xl, the band where the inline menu first
+        // appears at its smaller size, so the brand does not outweigh it.
+        // Phones keep the full size: they have no inline menu beside it.
         className={`relative top-px w-auto transition-[transform,height] duration-200 will-change-transform group-hover:rotate-[8deg] ${
-          compact ? "h-[12px]" : "h-[13px]"
+          compact ? "h-[12px] lg:h-[11px] xl:h-[12px]" : "h-[13px] lg:h-[12px] xl:h-[13px]"
         }`}
         aria-hidden="true"
       />
@@ -173,7 +180,7 @@ function BrandLogo({ compact }: { compact?: boolean }) {
           and no overflow. */}
       <span
         className={`font-semibold tracking-tight text-[#121212] transition-[transform,font-size] duration-200 will-change-transform group-hover:translate-x-0.5 dark:text-white ${
-          compact ? "text-[17px]" : "text-lg"
+          compact ? "text-[17px] lg:text-base xl:text-[17px]" : "text-lg lg:text-[17px] xl:text-lg"
         }`}
       >
         Dataslope
