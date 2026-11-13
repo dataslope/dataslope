@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, headline as headlineStyle, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
-import { badgeStyle, type BadgeTone, H, Ink, W } from "../../editorial/ui";
+import { badgeStyle, type BadgeTone, H, Ink, outlineInk, W } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -192,6 +192,13 @@ const hueOf = (color: string): BadgeTone | undefined => {
  * so the tokens after it slide up to meet the ones before; `mark` lays the
  * highlighter over its tint; `tone` turns it to that hue's badge, tint and
  * ink (a polarity). `ink` overrides the gray ink of a plain chip.
+ *
+ * Two of the owner's requests (2026-11-13): a highlighted chip's text turns
+ * to the yellow ink as the highlighter lands ("use a hue that matches the
+ * yellow background"), and `outline` draws a plain chip as the outlined
+ * badge, a 2px near-black border and near-black text on no fill ("for the
+ * gray badges, use black text, black border, and a transparent background").
+ * The border comes out of the padding, so the chip's outer box is unchanged.
  */
 export const Chip: React.FC<{
   text: string;
@@ -206,10 +213,12 @@ export const Chip: React.FC<{
   ink?: string;
   dim?: number;
   mono?: boolean;
+  /** Draw the plain chip outlined in near-black instead of on the gray tint. */
+  outline?: boolean;
   /** Frames at which the chip swells briefly, as the narration names it. */
   bump?: number | readonly number[];
   style?: React.CSSProperties;
-}> = ({ text, at, size = 26, strike, drop, mark, markOut, tone, toneAt, ink, dim, mono, bump, style }) => {
+}> = ({ text, at, size = 26, strike, drop, mark, markOut, tone, toneAt, ink, dim, mono, outline, bump, style }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const s = strike === undefined ? 0 : ease(frame, strike, 10);
@@ -223,8 +232,12 @@ export const Chip: React.FC<{
   const plain = badgeStyle("gray", size);
   const hue = tone === undefined ? undefined : hueOf(tone);
   const toned = hue === undefined ? undefined : badgeStyle(hue, size);
-  const plainInk = ink ?? String(plain.color);
-  const under = m > 0 ? mixTo(HIGHLIGHT, m, String(plain.background)) : String(plain.background);
+  const lineInk = outlineInk("ink");
+  const plainFill = outline ? "transparent" : String(plain.background);
+  const restInk = ink ?? (outline ? lineInk : String(plain.color));
+  // Under the highlighter the text takes the yellow ink (the owner, 2026-11-13).
+  const plainInk = m > 0 ? mixTo(outlineInk("yellow"), m, restInk) : restInk;
+  const under = m > 0 ? mixTo(HIGHLIGHT, m, plainFill) : plainFill;
   const background = tone && tn > 0 ? mixTo(toned ? String(toned.background) : tint(1, tone, 26), tn, under) : under;
   const color = toned && tn > 0 ? mixTo(String(toned.color), tn, plainInk) : plainInk;
   return (
@@ -249,8 +262,9 @@ export const Chip: React.FC<{
           // Even top and bottom, as the house badge; the sides keep the
           // bordered chip's outer width (its 1.5px rule is now padding), so
           // rows, arrows and the labels under chips stay where they were.
-          padding: "0.21em calc(0.42em + 1.5px)",
+          padding: outline ? "calc(0.21em - 2px) calc(0.42em - 0.5px)" : "0.21em calc(0.42em + 1.5px)",
           borderRadius: plain.borderRadius,
+          border: outline ? `2px solid ${lineInk}` : undefined,
           background,
           ...note(size, color),
           ...(mono ? { fontFamily: '"JetBrains Mono", ui-monospace, monospace' } : {}),
@@ -312,7 +326,13 @@ export const TokenCol: React.FC<{ chip: React.ReactNode; below?: React.ReactNode
   </div>
 );
 
-/** A number in a box tinted by `heat`, inked on `at`. */
+/**
+ * A number in a box tinted by `heat`, inked on `at`. A tinted cell's number
+ * is in the blue ink, as strong as its tint (the owner, 2026-11-13: "for blue
+ * badges, use a blue text color"); an untinted zero stays in ink. `outline`
+ * is drawn at 40% of its color ("if a blue badge has a border, use subtle
+ * blue-hue border").
+ */
 export const NumCell: React.FC<{
   value: React.ReactNode;
   at: number;
@@ -327,10 +347,11 @@ export const NumCell: React.FC<{
   bold?: boolean;
   faint?: boolean;
   outline?: string;
-}> = ({ value, at, x, y, w, h, heat = 0, color = BAR, ink = INK, size = 30, bold, faint, outline }) => {
+}> = ({ value, at, x, y, w, h, heat = 0, color = BAR, ink, size = 30, bold, faint, outline }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
+  const text = ink ?? mixTo(outlineInk("blue"), clamp01(heat * 2.5), INK);
   return (
     <div
       style={{
@@ -341,13 +362,13 @@ export const NumCell: React.FC<{
         height: h,
         boxSizing: "border-box",
         background: tint(heat, color),
-        border: outline ? `3px solid ${outline}` : undefined,
+        border: outline ? `3px solid color-mix(in srgb, ${outline} 40%, transparent)` : undefined,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         opacity: p,
         transform: `translateY(${(1 - p) * 8}px)`,
-        ...note(size, ink),
+        ...note(size, text),
         ...TABULAR,
         fontWeight: bold ? 500 : faint ? 450 : 500,
       }}

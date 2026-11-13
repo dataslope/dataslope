@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { OK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { TABULAR, label, note } from "../../editorial/style";
-import { Num } from "../../editorial/ui";
+import { Num, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HEAP } from "./data";
@@ -124,12 +124,14 @@ export const PqScene: React.FC = () => {
                     height: 54,
                     boxSizing: "border-box",
                     borderRadius: 27,
-                    border: `2px solid ${u === 1 ? INK : BAR}`,
+                    // The owner, 2026-11-13: no border on the number chips,
+                    // and the yellow one's number in the yellow's own ink.
+                    // Same outer box: it is border-box at a fixed size.
                     background: u === 1 ? HIGHLIGHT : BLUE_FILL,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    ...label(24, u === 1 ? INK : BLUE_INK),
+                    ...label(24, u === 1 ? outlineInk("yellow") : BLUE_INK),
                     ...TABULAR,
                     fontWeight: 500,
                     opacity: p,
@@ -145,7 +147,7 @@ export const PqScene: React.FC = () => {
             </div>
           </React.Fragment>
         ))}
-        <Line at={urgentAt + 10} x={LANE_X} y={laneY[1] + 62} size={21} color={INK_SOFT} weight={500}>
+        <Line at={urgentAt + 10} x={LANE_X} y={laneY[1] + 78} size={21} color={INK_SOFT} weight={500}>
           1 is the most urgent
           <span style={{ opacity: ease(frame, schedAt, 10) }}>: a scheduler, Dijkstra&apos;s algorithm</span>
         </Line>

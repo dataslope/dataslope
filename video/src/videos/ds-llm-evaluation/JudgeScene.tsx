@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Note, outlineInk } from "../../editorial/ui";
 import { I, MathRun } from "../../editorial/math";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -64,12 +64,18 @@ const Mini: React.FC<{ x: number; y: number; w: number; h?: number; color?: stri
         width: w,
         height: h,
         borderRadius: 8,
-        border: `2px solid ${color}`,
+        // No visible border, the tint alone, and the family's cards in its own
+        // purple ink (the owner, 2026-11-13: "remove the borders around each
+        // badge. Change the text color of the badges to have a matching hues
+        // with the backgrounds (the purple ones here). The gray ones look
+        // fine"). The border stays as a transparent one so the box keeps its
+        // size.
+        border: "2px solid transparent",
         background: `color-mix(in srgb, ${color} 10%, ${PAPER})`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        ...label(18, INK),
+        ...label(18, color === FAMILY ? outlineInk("purple") : INK),
         fontWeight: 500,
       }}
     >

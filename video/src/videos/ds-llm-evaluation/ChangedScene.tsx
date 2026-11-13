@@ -168,7 +168,9 @@ export const ChangedScene: React.FC = () => {
             </React.Fragment>
           ))}
         </div>
-        <Note at={loopAt} x={X0} y={y(BASE_Y) + 24 + 36 + 12}>
+        {/* 12px more air over the name than it had (the owner, 2026-11-13:
+            "add more top spacing to 'The core loop, the same as ever'"). */}
+        <Note at={loopAt} x={X0} y={y(BASE_Y) + 24 + 36 + 24}>
           <span style={{ ...label(22, BLUE_INK), fontWeight: 500 }}>The core loop, the same as ever</span>
         </Note>
 

@@ -113,10 +113,12 @@ export const OverScene: React.FC = () => {
                 </span>
               </Box>
               <Flow points={[[x + thingW / 2, layerTop + LAYER.h + 6], [x + thingW / 2, thingTop - 8]]} at={c.at + 6} dur={8} width={2.2} head={12} dim={dim} />
-              <Box x={x} y={thingTop} w={thingW} h={THING.h} at={whenAt + 6 + i * 5} title={i === 1 && second > 0.5 ? "flat rate" : c.thing} size={24} tone="data" dim={dim} />
+              {/* The one thing each layer wraps, as an outlined badge in its
+                  hue (the owner, 2026-11-13); the second rule beside it too. */}
+              <Box x={x} y={thingTop} w={thingW} h={THING.h} at={whenAt + 6 + i * 5} title={i === 1 && second > 0.5 ? "flat rate" : c.thing} size={24} tone="data" outline dim={dim} />
               {i === 1 ? (
                 <>
-                  <Box x={x + (COL_W + 20) / 2 + 30 * (1 - second)} y={thingTop} w={(COL_W - 20) / 2} h={THING.h} at={secondAt + 4} title="by weight" size={24} tone="ok" />
+                  <Box x={x + (COL_W + 20) / 2 + 30 * (1 - second)} y={thingTop} w={(COL_W - 20) / 2} h={THING.h} at={secondAt + 4} title="by weight" size={24} tone="ok" outline />
                   <Flow points={[[x + (COL_W * 3) / 4 + 5, layerTop + LAYER.h + 6], [x + (COL_W * 3) / 4 + 5, thingTop - 8]]} at={secondAt + 12} dur={8} width={2.2} head={12} />
                 </>
               ) : null}

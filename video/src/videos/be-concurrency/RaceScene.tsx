@@ -218,7 +218,8 @@ export const RaceScene: React.FC = () => {
                   height: chipH,
                   boxSizing: "border-box",
                   borderRadius: toFuse > 0.5 ? 0 : 5,
-                  border: `2.5px solid ${lost > 0 ? ACCENT : th.fill}`,
+                  // Tint only, no border, and the text in the tint's own hue
+                  // (the value too, which was blue): the owner, 2026-11-13.
                   background: tint(lost > 0 ? ACCENT : th.fill, 20),
                   display: "flex",
                   alignItems: "center",
@@ -228,9 +229,9 @@ export const RaceScene: React.FC = () => {
                   opacity: p * (1 - fused),
                 }}
               >
-                <span style={{ ...label(21, th.ink), fontWeight: 500 }}>{step}</span>
+                <span style={{ ...label(21, lost > 0 ? ACCENT_INK : th.ink), fontWeight: 500 }}>{step}</span>
                 {valued > 0 ? (
-                  <span style={{ ...label(21, lost > 0 ? ACCENT_INK : BLUE_INK), fontWeight: 500, opacity: valued }}>
+                  <span style={{ ...label(21, lost > 0 ? ACCENT_INK : th.ink), fontWeight: 500, opacity: valued }}>
                     <Num>{seen.value}</Num>
                   </span>
                 ) : null}
@@ -250,7 +251,7 @@ export const RaceScene: React.FC = () => {
               height: chipH,
               boxSizing: "border-box",
               borderRadius: 5,
-              border: `2.5px solid ${THREAD[t].fill}`,
+              // Tint only, no border, and the padlock in the text's color: the owner, 2026-11-13.
               background: tint(THREAD[t].fill, 20),
               display: "flex",
               alignItems: "center",
@@ -259,7 +260,7 @@ export const RaceScene: React.FC = () => {
               opacity: fused,
             }}
           >
-            <LockGlyph size={24} color={INK} />
+            <LockGlyph size={24} color={THREAD[t].ink} />
             <span style={{ ...label(21, THREAD[t].ink), fontWeight: 500, whiteSpace: "nowrap" }}>read, add, write</span>
           </div>
         ))}
@@ -326,10 +327,11 @@ export const RaceScene: React.FC = () => {
                 <span
                   key={i}
                   style={{
-                    width: 150,
-                    height: h(48),
+                    // Tint only, no border (the owner, 2026-11-13); the box
+                    // keeps the 2.5px it gave up on each side.
+                    width: 155,
+                    height: h(48) + 5,
                     borderRadius: 5,
-                    border: `2.5px solid ${THREAD[who(c)].fill}`,
                     background: tint(THREAD[who(c)].fill, 20),
                     display: "flex",
                     alignItems: "center",

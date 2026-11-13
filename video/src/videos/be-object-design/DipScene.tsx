@@ -65,7 +65,12 @@ export const DipScene: React.FC = () => {
   // The email sender docks, then leaves; the fake docks after it.
   const emailIn = ease(frame, emailAt + 2, 14) * (1 - ease(frame, testAt + 4, 14));
   const fakeIn = ease(frame, testAt + 10, 14);
-  const emailY = lerp(mid - SWING - PLUG.h / 2, mid - PLUG.h / 2, emailIn);
+  // The email sender waits taller, with air round its two lines (the owner,
+  // 2026-11-13: "add vertical padding"), and settles to a plug's height as
+  // its note fades and it docks.
+  const emailNote = 1 - ease(frame, emailAt - 10, 10);
+  const emailH = PLUG.h + 20 * emailNote;
+  const emailY = lerp(mid - SWING - emailH / 2, mid - emailH / 2, emailIn);
   const fakeY = lerp(mid + SWING - PLUG.h / 2, mid - PLUG.h / 2, fakeIn);
   const socketLit = pulse(frame, socketAt + 4, 30) + pulse(frame, fitsAt, 24);
 
@@ -131,7 +136,20 @@ export const DipScene: React.FC = () => {
         <Line x={dockX} y={mid - PLUG.h / 2 - 40} at={testAt + 8} size={21} color={INK_SOFT} weight={500}>
           in a test
         </Line>
-        <Box x={lerp(HOME_X, dockX, emailIn)} y={emailY} w={PLUG.w} h={PLUG.h} at={passedAt + 4} title="Email sender" sub={frame < emailAt ? "the concrete piece" : undefined} subSize={20} tone="data" dim={testAt + 6} out={inversionAt} />
+        {/* Its note in blue, not gray (the owner, 2026-11-13). */}
+        <Box
+          x={lerp(HOME_X, dockX, emailIn)}
+          y={emailY}
+          w={PLUG.w}
+          h={emailH}
+          at={passedAt + 4}
+          title="Email sender"
+          sub={emailNote > 0 ? <span style={{ color: BLUE_INK, opacity: emailNote }}>the concrete piece</span> : undefined}
+          subSize={20}
+          tone="data"
+          dim={testAt + 6}
+          out={inversionAt}
+        />
         <Box x={lerp(HOME_X, dockX, fakeIn)} y={fakeY} w={PLUG.w} h={PLUG.h} at={testAt + 2} title="Recording fake" tone="data" />
 
         {/* What the fake recorded. */}

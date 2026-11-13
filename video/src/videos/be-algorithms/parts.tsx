@@ -454,7 +454,11 @@ const NODE_FILL: Record<Tone, string> = {
 };
 
 /** A graph's node: a circle with its name, and an optional badge (a visiting
- *  order or a distance) on its upper right. */
+ *  order or a distance) on its upper right. `outline` draws it hollow, a 2px
+ *  near-black ring around its name in the same ink and no fill (the owner,
+ *  2026-11-13, on the tree slides: "a black border and text, with a
+ *  transparent background"); the ring is inside `r`, so an edge drawn to the
+ *  circle's edge still meets it. */
 export const GraphNode: React.FC<{
   x: number;
   y: number;
@@ -467,7 +471,8 @@ export const GraphNode: React.FC<{
   badgeSide?: "right" | "left" | "below" | "above";
   r?: number;
   lit?: number;
-}> = ({ x, y, at, name, tone = "data", badge, badgeAt, badgeTone = "plain", badgeSide = "right", r = NODE_R, lit = 0 }) => {
+  outline?: boolean;
+}> = ({ x, y, at, name, tone = "data", badge, badgeAt, badgeTone = "plain", badgeSide = "right", r = NODE_R, lit = 0, outline = false }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
@@ -496,12 +501,13 @@ export const GraphNode: React.FC<{
           borderRadius: "50%",
           // No outline: a node is a solid disc of its tone, a step deeper
           // than a box's fill so it holds its shape on its own.
-          background: NODE_FILL[tone],
+          background: outline ? "transparent" : NODE_FILL[tone],
+          border: outline ? `2px solid ${INK}` : undefined,
           boxShadow: lit > 0 ? `0 0 0 ${2 * lit}px ${t.line}` : undefined,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...label(26, t.ink),
+          ...label(26, outline ? INK : t.ink),
           fontWeight: 500,
           opacity: Math.min(1, p),
           transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`,

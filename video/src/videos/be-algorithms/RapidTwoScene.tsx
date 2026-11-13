@@ -192,7 +192,8 @@ const Traverse: React.FC<{ c: Ctx }> = ({ c }) => {
         {all.flatMap((t) =>
           [t.left, t.right]
             .filter((k): k is TNode => !!k)
-            .map((k) => <line key={`${t.v}-${k.v}`} x1={pos(t)[0]} y1={pos(t)[1] + 22} x2={pos(k)[0]} y2={pos(k)[1] - 22} stroke={INK_SOFT} strokeWidth={1.6} />),
+            // The owner, 2026-11-13: blue edges.
+            .map((k) => <line key={`${t.v}-${k.v}`} x1={pos(t)[0]} y1={pos(t)[1] + 22} x2={pos(k)[0]} y2={pos(k)[1] - 22} stroke={BAR} strokeWidth={1.6} />),
         )}
       </Svg>
       {all.map((t) => (
@@ -242,11 +243,15 @@ const BstHeap: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={topAt} x={R_X} y={c.T} size={24} weight={500}>
         A heap: only its top is in order
       </Line>
+      {/* The owner, 2026-11-13: hollow nodes with a black border and black
+          text, joined by black edges. A hollow node shows what runs under
+          it, so each edge runs from a parent's lowest point to a child's
+          highest, r = 24 from each centre, and stops on the ring. */}
       <Svg opacity={ease(frame, topAt + 4, 10)}>
-        {heap.map((_, i) => (i === 0 ? null : <line key={i} x1={hx(Math.floor((i - 1) / 2))} y1={hy(Math.floor((i - 1) / 2)) + 22} x2={hx(i)} y2={hy(i) - 22} stroke={INK_SOFT} strokeWidth={1.6} />))}
+        {heap.map((_, i) => (i === 0 ? null : <line key={i} x1={hx(Math.floor((i - 1) / 2))} y1={hy(Math.floor((i - 1) / 2)) + 24} x2={hx(i)} y2={hy(i) - 24} stroke={INK} strokeWidth={1.6} />))}
       </Svg>
       {heap.map((v, i) => (
-        <GraphNode key={i} x={hx(i)} y={hy(i)} at={topAt + 4 + i * 2} name={String(v)} r={24} tone={i === 0 ? "look" : "plain"} />
+        <GraphNode key={i} x={hx(i)} y={hy(i)} at={topAt + 4 + i * 2} name={String(v)} r={24} outline />
       ))}
       <Line at={orderAt} x={R_X} y={sTop - c.h(54)} size={24} weight={500}>
         A balanced BST: the whole order
@@ -632,7 +637,8 @@ const Topo: React.FC<{ c: Ctx }> = ({ c }) => {
                 [x2 - 10, rowY - 36],
               ]}
               at={forwardAt + order.indexOf(a) * 4}
-              color={OK}
+              // The owner, 2026-11-13: blue edges, not green.
+              color={BAR}
               width={2.4}
               head={13}
             />

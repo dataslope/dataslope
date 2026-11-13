@@ -111,6 +111,10 @@ export const SizeScene: React.FC = () => {
                 style={{
                   ...note(23),
                   ...badgeStyle(c.data ? "blue" : "gray", 23),
+                  // A little more height than the house badge (the owner,
+                  // 2026-11-13: "add slight more vertical padding").
+                  paddingTop: 8,
+                  paddingBottom: 8,
                   position: "absolute",
                   left: lefts[i],
                   top: y(318),
