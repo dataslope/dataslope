@@ -20,6 +20,10 @@ import {
 import { datasetFileName, fetchDatasetBytes, fetchDatasetText } from "./remoteDatasets";
 import { constraintInfoFromColumns } from "../sql/utils/duplicateRow";
 import { topoSortByForeignKeys } from "../sql/utils/exportOrder";
+import {
+  describePartialScriptFailure,
+  dropRepeatedErrorBlocks,
+} from "../sql/utils/scriptFailure";
 import { generatedColumnsOf } from "../sql/utils/tableConstraints";
 import {
   toDateOnlyString,
@@ -1595,9 +1599,22 @@ export async function createDuckDbEngine(
     async exec(sql) {
       const stmts = splitDuckDbStatements(sql);
       const out: (QueryExecResult | null)[] = [];
-      for (const stmt of stmts) {
-        const table = await conn.query(stmt);
-        out.push(arrowToQueryExecResult(table));
+      for (let i = 0; i < stmts.length; i++) {
+        try {
+          const table = await conn.query(stmts[i]);
+          out.push(arrowToQueryExecResult(table));
+        } catch (err) {
+          // Statements run one at a time, so the ones before this already
+          // took effect: snapshot those, and say so in the error.
+          if (i > 0) scheduleSnapshot();
+          if (err instanceof Error) {
+            err.message = dropRepeatedErrorBlocks(err.message);
+            if (stmts.length > 1) {
+              err.message = describePartialScriptFailure(err.message, i + 1, i);
+            }
+          }
+          throw err;
+        }
       }
       // Queue an OPFS snapshot (debounced) after every user-driven exec.
       scheduleSnapshot();

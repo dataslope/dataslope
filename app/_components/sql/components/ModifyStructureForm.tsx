@@ -236,7 +236,7 @@ export function ModifyColumnRow({
             className="sql-rename-input sql-modify-col-default"
             value={col.defaultValue}
             onChange={(e) => onChange({ defaultValue: e.target.value })}
-            placeholder="e.g. 'foo' or 0"
+            placeholder="'text' or 0"
             aria-label="Default value"
           />
         </label>

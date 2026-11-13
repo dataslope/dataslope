@@ -26,6 +26,7 @@ import {
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { withCompletionTrigger } from "../../completion/completionPrefs";
 import { completionPopupTheme } from "../../completion/popupTheme";
+import { sqlCompletionPopupStyle } from "./completionPopupStyle";
 import {
   Compartment,
   EditorState,
@@ -334,6 +335,7 @@ export function createSqlEditorExtensions(
     compartments.completion.of(
       makeSqlAutocompletionExtension(initialSchema, dialect),
     ),
+    sqlCompletionPopupStyle,
     compartments.theme.of(themeFor(initialTheme)),
     compartments.wrap.of(initialWordWrap ? EditorView.lineWrapping : []),
     EditorView.updateListener.of((update) => {

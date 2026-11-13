@@ -98,6 +98,7 @@ import {
 } from "../utils/cellUtils";
 import {
   classifyCellEditor,
+  isNumericSqlType,
   toDateEditorValue,
   fromDateEditorValue,
   resolveTemporalEditorKind,
@@ -515,7 +516,7 @@ function ResultSetExportButton({
       </Popover.Root>
       <Menu.Portal>
         <Menu.Positioner sideOffset={6} align="end" side="top">
-          <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+          <Menu.Popup className="bui-popup examples-dropdown sql-ctx-menu export-dropdown">
             {hasMultiplePages && (
               <div
                 className="sql-result-export-scope-options"
@@ -2616,7 +2617,7 @@ export function ResultTableBody({
         return {
             id: `col-${ci}-${c}`,
             accessorFn: (row) => row.values[ci],
-            meta: { ci },
+            meta: { ci, numeric: isNumericSqlType(resolvedType) },
             header: ({ column }) => {
               const isPk = keyHints?.pk.has(c) ?? false;
               const fk = keyHints?.fk.get(c);
@@ -2713,7 +2714,7 @@ export function ResultTableBody({
                   />
                   <ContextMenu.Portal>
                     <ContextMenu.Positioner sideOffset={4}>
-                      <ContextMenu.Popup className="bui-popup examples-dropdown sql-th-context-menu">
+                      <ContextMenu.Popup className="bui-popup examples-dropdown sql-ctx-menu sql-th-context-menu">
                         <ContextMenu.Item
                           className="example-item"
                           onClick={() => {
@@ -3291,10 +3292,11 @@ export function ResultTableBody({
     const cells = row.getAllCells().map((cell) => {
       const isSelect = cell.column.id === "select";
       const rawVal = isSelect ? undefined : cell.getValue();
-      const ci = isSelect
-        ? -1
-        : ((cell.column.columnDef.meta as { ci: number } | undefined)?.ci ??
-          -1);
+      const cellMeta = cell.column.columnDef.meta as
+        | { ci: number; numeric?: boolean }
+        | undefined;
+      const ci = isSelect ? -1 : (cellMeta?.ci ?? -1);
+      const numericClass = !isSelect && cellMeta?.numeric ? " sql-cell-num" : "";
       const cellKey = `${absoluteRow}:${ci}`;
       const hasPendingEdit =
         !isSelect && ci >= 0 && (pendingEdits?.has(cellKey) ?? false);
@@ -3311,10 +3313,10 @@ export function ResultTableBody({
             isSelect
               ? "sql-result-td-select"
               : hasPendingEdit
-                ? "sql-cell-edited-td"
+                ? `sql-cell-edited-td${numericClass}`
                 : rawVal === null
-                  ? "sql-cell-null"
-                  : undefined
+                  ? `sql-cell-null${numericClass}`
+                  : numericClass.trim() || undefined
           }
           onContextMenu={
             !isSelect && ci >= 0
@@ -3373,7 +3375,7 @@ export function ResultTableBody({
   const rowContextMenu = (
     <ContextMenu.Portal>
       <ContextMenu.Positioner sideOffset={4}>
-        <ContextMenu.Popup className="bui-popup examples-dropdown sql-row-context-menu">
+        <ContextMenu.Popup className="bui-popup examples-dropdown sql-ctx-menu sql-row-context-menu">
           {ctxMenuRow !== null &&
             (() => {
               const { absoluteRow, values: rowValues } = ctxMenuRow;
@@ -3638,9 +3640,20 @@ export function ResultTableBody({
                       className={
                         header.column.id === "select"
                           ? "sql-result-th-select"
-                          : header.column.getIsSorted()
-                            ? "sql-result-th-sorted"
-                            : undefined
+                          : [
+                              header.column.getIsSorted()
+                                ? "sql-result-th-sorted"
+                                : "",
+                              (
+                                header.column.columnDef.meta as
+                                  | { numeric?: boolean }
+                                  | undefined
+                              )?.numeric
+                                ? "sql-result-th-num"
+                                : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ") || undefined
                       }
                       aria-sort={
                         header.column.id === "select"

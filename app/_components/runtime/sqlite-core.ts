@@ -15,6 +15,7 @@ import {
   type SqlValue,
 } from "./sqlite-wasm";
 import { extractCheckConstraints } from "../sql/utils/tableConstraints";
+import { describePartialScriptFailure } from "../sql/utils/scriptFailure";
 import {
   findSampleDatabase,
   isSqliteSampleId,
@@ -220,14 +221,12 @@ function runStatements(db: Database, sql: string): SqliteRunDetail {
 
 /** Prefix an engine error with the failing statement's position, and say how
  *  many statements before it were applied. Single-statement scripts are left
- *  alone: there the prefix would be noise. */
+ *  alone: there the prefix would be noise. The wording is shared with the
+ *  DuckDB engine, which runs scripts the same way. */
 function statementError(err: unknown, index: number, applied: number): Error {
   const message = err instanceof Error ? err.message : String(err);
   if (index <= 1) return err instanceof Error ? err : new Error(message);
-  const ran = applied === 1 ? "1 statement" : `${applied} statements`;
-  return new Error(
-    `Statement ${index} failed: ${message}\n(${ran} before it already ran; the rest of the script did not.)`,
-  );
+  return new Error(describePartialScriptFailure(message, index, applied));
 }
 
 export interface SqliteEngine {

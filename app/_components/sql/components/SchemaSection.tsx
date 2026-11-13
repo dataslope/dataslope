@@ -140,7 +140,7 @@ function SchemaSectionImpl({
           <ContextMenu.Trigger render={(props) => <div {...props}>{header}</div>} />
           <ContextMenu.Portal>
             <ContextMenu.Positioner sideOffset={6}>
-              <ContextMenu.Popup className="bui-popup examples-dropdown">
+              <ContextMenu.Popup className="bui-popup examples-dropdown sql-ctx-menu">
                 {(onExpandAll || onCollapseAll) && count > 0 && (
                   <ContextMenu.Item
                     className="example-item"

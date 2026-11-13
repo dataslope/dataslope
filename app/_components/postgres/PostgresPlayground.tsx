@@ -104,6 +104,7 @@ import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmD
 import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
 import { DdlViewer } from "../sql/components/DdlViewer";
 import { useDiscardGuard } from "../sql/components/DiscardGuard";
+import { consumeStoppedNotice, STOPPED_NOTICE } from "../sql/utils/stopQuery";
 import { CloseTabConfirmDialog } from "../sql/components/CloseTabConfirmDialog";
 import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
 import {
@@ -739,7 +740,7 @@ function PgStructureColumnRow({
             className="sql-rename-input sql-modify-col-default"
             value={col.defaultValue}
             onChange={(e) => onChange({ defaultValue: e.target.value })}
-            placeholder="e.g. now() or 0"
+            placeholder="'text' or 0"
             aria-label="Default value"
             disabled={col.autoIncrement || serialType}
           />
@@ -2058,6 +2059,9 @@ function PostgresPlaygroundInner() {
         setCustomDbFilenameState(claimDbFilename(bootDbId));
         await Promise.all([refreshSchema(), refreshSchemas()]);
         setLoaded(true);
+        // The page was reloaded by the toolbar's Stop button: say what
+        // became of the query and the database.
+        if (consumeStoppedNotice()) showToast(STOPPED_NOTICE);
         setStatusState("ready");
       } catch (err) {
         if (cancelled) return;
@@ -4792,17 +4796,24 @@ function PostgresPlaygroundInner() {
                 <div className="sql-modify-body" ref={addTableBodyRef}>
                   <label className="sql-modify-field">
                     <span className="sql-modify-field-label">Table name</span>
-                    <input
-                      className={`sql-rename-input${addTableDisplayValidation.hasTableNameError ? " sql-modify-col-name-error" : ""}`}
-                      value={addTableDialog.newTableName}
-                      onChange={(e) =>
-                        setAddTableDialog((prev) =>
-                          prev
-                            ? { ...prev, newTableName: e.target.value }
-                            : null,
-                        )
-                      }
-                    />
+                    <div className="sql-modify-table-name-wrap">
+                      <Table
+                        size={14}
+                        className="sql-modify-table-name-icon"
+                        aria-hidden="true"
+                      />
+                      <input
+                        className={`sql-rename-input sql-modify-table-name-input${addTableDisplayValidation.hasTableNameError ? " sql-modify-col-name-error" : ""}`}
+                        value={addTableDialog.newTableName}
+                        onChange={(e) =>
+                          setAddTableDialog((prev) =>
+                            prev
+                              ? { ...prev, newTableName: e.target.value }
+                              : null,
+                          )
+                        }
+                      />
+                    </div>
                   </label>
                   {(() => {
                     const regularCols = addTableDialog.columns.filter(

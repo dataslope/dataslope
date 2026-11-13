@@ -25,6 +25,11 @@ import { topoSortByForeignKeys } from "../sql/utils/exportOrder";
 import { defaultGeneratesUniqueValue } from "../sql/utils/duplicateRow";
 import { fetchDatasetText } from "./remoteDatasets";
 import { planPgAlter, type PgCurrentTable } from "./pgAlterPlan";
+import { splitSqlStatements } from "../sql/utils/sqlAnalysis";
+import {
+  describeAtomicScriptFailure,
+  hasExplicitTransactionControl,
+} from "../sql/utils/scriptFailure";
 import { renderPgCreateTable } from "./pgDdl";
 import {
   toDateOnlyString,
@@ -604,7 +609,49 @@ export async function createPostgresEngine(
     },
 
     async execWithCounts(sql) {
-      const results = await db.exec(sql);
+      let results: PgliteResult[];
+      try {
+        results = await db.exec(sql);
+      } catch (err) {
+        // A failed multi-statement script was one transaction and is gone.
+        // Say so, and say which statement it was: the script is replayed
+        // statement by statement inside a transaction that is always rolled
+        // back, purely to find the one that fails.
+        const statements = splitSqlStatements(sql).map((s) => s.text);
+        if (
+          !(err instanceof Error) ||
+          statements.length <= 1 ||
+          hasExplicitTransactionControl(statements)
+        ) {
+          throw err;
+        }
+        let failing: number | null = null;
+        try {
+          await db.exec("BEGIN");
+          for (let i = 0; i < statements.length; i++) {
+            try {
+              await db.exec(statements[i]);
+            } catch {
+              failing = i + 1;
+              break;
+            }
+          }
+        } catch {
+          // The replay is only for the message; the original error stands.
+        } finally {
+          try {
+            await db.exec("ROLLBACK");
+          } catch {
+            /* nothing open */
+          }
+        }
+        err.message = describeAtomicScriptFailure(
+          err.message,
+          failing,
+          statements.length,
+        );
+        throw err;
+      }
       return {
         sets: results.map(resultToQueryExecResult),
         affectedRows: results.map((r) =>

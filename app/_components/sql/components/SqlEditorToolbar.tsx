@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Menu } from "@base-ui/react/menu";
-import { ChevronDown, ListTree, Play } from "lucide-react";
+import { ChevronDown, ListTree, Play, Square } from "lucide-react";
+import { stopRunningQuery } from "../utils/stopQuery";
 
 export interface SqlEditorToolbarProps {
   loaded: boolean;
@@ -53,6 +54,29 @@ function RunningElapsed() {
   if (elapsedMs < 500) return null;
   return (
     <span className="run-btn-elapsed"> {(elapsedMs / 1000).toFixed(1)}s</span>
+  );
+}
+
+/** Stop, offered once a query has been running long enough to be worth
+ *  stopping (a button that flashed up on every fast query would be noise).
+ *  See utils/stopQuery.ts for what it does and why it cannot be gentler. */
+function StopButton() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const id = window.setTimeout(() => setVisible(true), 1500);
+    return () => window.clearTimeout(id);
+  }, []);
+  if (!visible) return null;
+  return (
+    <button
+      type="button"
+      className="sql-stop-btn"
+      onClick={stopRunningQuery}
+      title="Stop this query. The engine cannot be interrupted, so the page reloads and reopens your workspace from its last saved state."
+    >
+      <Square size={10} aria-hidden="true" />
+      Stop
+    </button>
   );
 }
 
@@ -202,16 +226,20 @@ export function SqlEditorToolbar({
             )}
           </button>
         )}
-        <button
-          type="button"
-          className="sql-explain-btn"
-          disabled={disabled}
-          onClick={onExplain}
-          title="Show the execution plan (EXPLAIN) for the current statement"
-        >
-          <ListTree size={12} aria-hidden="true" />
-          Explain
-        </button>
+        {running ? (
+          <StopButton />
+        ) : (
+          <button
+            type="button"
+            className="sql-explain-btn"
+            disabled={disabled}
+            onClick={onExplain}
+            title="Show the execution plan (EXPLAIN) for the current statement"
+          >
+            <ListTree size={12} aria-hidden="true" />
+            Explain
+          </button>
+        )}
       </div>
     </div>
   );

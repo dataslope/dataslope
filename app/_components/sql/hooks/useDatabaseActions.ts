@@ -81,7 +81,6 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     [toastManager],
   );
 
-  const activeDbId = useEngineStore((s) => s.activeDbId);
   const customDbFilename = useEngineStore((s) => s.customDbFilename);
   const tables = useEngineStore((s) => s.tables);
   const setTables = useEngineStore((s) => s.setTables);

@@ -1835,16 +1835,6 @@ html[data-playground-theme="light"] .sql-result-ok {
   margin: 0 1px;
 }
 
-/* On a phone the group covers the end of the first line, which is where a
-   short query's own text runs out to. Push the text below it instead of
-   narrowing every line: CodeMirror measures its content padding, so the
-   gutter's line numbers follow. */
-@media (max-width: 640px) {
-  .sql-editor-pane .cm-editor .cm-content {
-    padding-top: 42px;
-  }
-}
-
 /* Positioner for editor-corner tooltip popovers. z-index: 500 ensures they
    appear above the editor pane contents but below the portalled
    Import / Export / Settings menus which use bui-popup (z-index: 9999). */
@@ -5720,4 +5710,348 @@ html[data-playground-theme="dark"] .sql-result-th-type {
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Visual pass over the three SQL playgrounds.
+
+   Everything below adjusts something that already existed; it is kept
+   in one block so the intent of each change can be read next to the
+   others, and because several of them only make sense together (the
+   docked toolbar, the corner actions that move into it, the hairline
+   splitter above it). This stylesheet is loaded by the SQL playgrounds
+   alone, so nothing here reaches the other languages' playgrounds.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ─── Splitters ───
+   Both resizers were 6px bars of solid border colour, the heaviest lines
+   on the page, drawn around the two things the reader came for. They are
+   now a hairline with the same 6px grab area, and tint on hover and while
+   dragging so the handle is still easy to find. */
+.sql-sidebar-resizer,
+.sql-resizer {
+  background: transparent;
+  position: relative;
+}
+
+.sql-resizer::before,
+.sql-sidebar-resizer::before {
+  content: "";
+  position: absolute;
+  background: var(--border);
+  transition: background 120ms ease;
+}
+
+.sql-resizer::before {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+}
+
+/* The sidebar already draws its own right border; the handle sits over it. */
+.sql-sidebar-resizer {
+  margin-left: -3px;
+  z-index: 3;
+}
+
+.sql-sidebar-resizer::before {
+  display: none;
+}
+
+.sql-resizer:hover,
+.sql-resizer.dragging,
+.sql-sidebar-resizer:hover,
+.sql-sidebar-resizer.dragging {
+  background: color-mix(in srgb, var(--primary) 28%, transparent);
+}
+
+.sql-resizer:hover::before,
+.sql-resizer.dragging::before {
+  background: var(--primary);
+}
+
+/* ─── Editor toolbar, docked ───
+   Run and Explain floated over the bottom-right of the editor and the
+   format/history buttons over its top-right, so both could sit on top of
+   the query being written. They now share a slim bar under the editor. */
+.sql-editor-pane > .sql-toolbar {
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  gap: 8px;
+  min-height: 41px;
+  padding: 6px 10px 6px 84px;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--bg);
+  overflow: visible;
+}
+
+.sql-editor-pane > .sql-toolbar .sql-toolbar-shortcuts,
+.sql-editor-pane > .sql-toolbar .sql-toolbar-actions {
+  position: static;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+  border-radius: 0;
+}
+
+/* The pane is a flex column, so the bar's z-index applies to it even
+   though it is no longer positioned; the buttons need to out-rank it. */
+.sql-editor-pane > .sql-editor-corner-actions {
+  top: auto;
+  right: auto;
+  left: 10px;
+  bottom: 7px;
+  margin: 0;
+  z-index: 6;
+  background: transparent;
+  backdrop-filter: none;
+  border-color: transparent;
+}
+
+/* Run and Explain stood 26px and 28px tall side by side. */
+.sql-toolbar .run-btn,
+.sql-toolbar .run-btn-split,
+.sql-toolbar .run-btn-split-main,
+.sql-toolbar .run-btn-split-chevron {
+  height: 28px;
+}
+
+.sql-toolbar .sql-explain-btn {
+  margin-left: 8px;
+}
+
+/* Stop, shown in Explain's place once a query has run a while. */
+.sql-stop-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  height: 28px;
+  padding: 0 11px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--red);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--red) 55%, var(--border));
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+html[data-playground-theme="light"] .sql-stop-btn {
+  color: var(--ds-red-ink);
+}
+
+.sql-stop-btn:hover {
+  background: color-mix(in srgb, var(--red) 10%, transparent);
+}
+
+.sql-stop-btn svg {
+  fill: currentColor;
+}
+
+/* ─── Sidebar ───
+   Section labels rendered at the browser's default button size (13.33px),
+   larger than the 12px items under them. As quiet captions they head the
+   lists instead of competing with them. */
+.sql-tree-section-toggle {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Tables, views, indexes and triggers all took the editor theme's purple
+   accent, a hue used nowhere else on the page. The brand blue ties the tree
+   to the Run button and leaves purple for syntax. */
+.sql-tree-item svg:not(.lucide-chevron-right):not(.lucide-chevron-down),
+.sql-ctx-menu .ctx-name-icon,
+.sql-modify-table-name-icon {
+  color: var(--ds-blue-400);
+}
+
+html[data-playground-theme="light"]
+  .sql-tree-item
+  svg:not(.lucide-chevron-right):not(.lucide-chevron-down),
+html[data-playground-theme="light"] .sql-ctx-menu .ctx-name-icon,
+html[data-playground-theme="light"] .sql-modify-table-name-icon {
+  color: var(--ds-blue-600);
+}
+
+/* The row's "more actions" button only needs to be seen when the row is
+   being pointed at or tabbed to; on touch there is no hover, so it stays. */
+@media (hover: hover) {
+  .sql-tree-item-row:not(:hover):not(:focus-within) .sql-tree-entity-more-btn {
+    opacity: 0;
+  }
+}
+
+/* ─── Tabs ───
+   Every tab showed its close button all the time; on a row of five that is
+   five × marks competing with five names. */
+@media (hover: hover) {
+  .sql-tabbar
+    .playground-tab:not(.active):not(:hover):not(:focus-within)
+    .playground-tab-close {
+    opacity: 0;
+  }
+}
+
+/* ─── Popups ───
+   `0 8px 32px #0008` is a 53% black shadow: right on the near-black theme,
+   heavy as a smear on white. */
+:root {
+  --sql-popup-shadow: 0 8px 32px #0008;
+}
+
+html[data-playground-theme="light"] {
+  --sql-popup-shadow: 0 8px 24px rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.06);
+}
+
+html[data-playground-theme="light"] .bui-popup,
+html[data-playground-theme="light"] .bui-select-popup {
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 0.12),
+    0 1px 2px rgb(0 0 0 / 0.06);
+}
+
+/* Context menus owned by the SQL playgrounds. Each row was 39px tall with
+   a rule under it, so a nine-item menu read as a table; destructive
+   actions looked like every other. */
+.bui-popup.sql-ctx-menu {
+  padding: 4px;
+  min-width: 190px;
+}
+
+.sql-ctx-menu .example-item {
+  padding: 6px 10px;
+  border-bottom: 0;
+  border-radius: 5px;
+}
+
+.sql-ctx-menu .ctx-table-name {
+  margin: -4px -4px 4px;
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+}
+
+.sql-ctx-menu .ctx-separator {
+  height: 1px;
+  margin: 4px -4px;
+  background: var(--border);
+}
+
+html[data-playground-theme="light"] .sql-ctx-danger .ex-title,
+html[data-playground-theme="light"] .sql-ctx-danger:hover .ex-title,
+html[data-playground-theme="light"] .sql-ctx-danger[data-highlighted] .ex-title {
+  color: var(--ds-red-ink);
+}
+
+.sql-ctx-danger[data-highlighted],
+.sql-ctx-danger:hover {
+  background: color-mix(in srgb, var(--red) 9%, transparent);
+}
+
+/* ─── Result grid ─── */
+.sql-result-table td.sql-cell-num,
+.sql-result-table th.sql-result-th-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sql-result-table th.sql-result-th-num .sql-result-th-btn {
+  align-items: flex-end;
+}
+
+.sql-result-table th.sql-result-th-num .sql-result-th-top {
+  flex-direction: row-reverse;
+}
+
+.sql-result-table thead th {
+  background: var(--bg2);
+}
+
+/* Footer controls: one height and one radius. */
+.sql-result-filter,
+.sql-result-pager-page-input {
+  height: 24px;
+  border-radius: 6px;
+}
+
+/* ─── Danger buttons that outweighed the primary action beside them ─── */
+.sql-history-clear-btn,
+.sql-modify-drawer-drop.confirm-btn-danger {
+  background: transparent;
+  color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red) 55%, var(--border));
+}
+
+html[data-playground-theme="light"] .sql-history-clear-btn,
+html[data-playground-theme="light"] .sql-modify-drawer-drop.confirm-btn-danger {
+  color: var(--ds-red-ink);
+}
+
+.sql-history-clear-btn:hover,
+.sql-modify-drawer-drop.confirm-btn-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--red) 10%, transparent);
+  color: var(--red);
+  filter: none;
+}
+
+html[data-playground-theme="light"] .sql-history-clear-btn:hover,
+html[data-playground-theme="light"]
+  .sql-modify-drawer-drop.confirm-btn-danger:hover:not(:disabled) {
+  color: var(--ds-red-ink);
+}
+
+/* ─── Structure drawers ─── */
+.sql-modify-drawer {
+  width: min(1180px, calc(100vw - 48px));
+}
+
+/* A sentence, not an identifier. */
+.sql-modify-drawer-subtitle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+}
+
+/* `CURRENT_TIMESTAMP` did not fit the Default field. */
+.sql-modify-col-default {
+  min-width: 150px;
+}
+
+/* A flag that does not apply was drawn as a box with a diagonal stroke
+   through it, which read as a broken checkbox. A plain dimmed box says
+   "not available" without the alarm. */
+.sql-modify-flag.is-disabled .sql-modify-flag-box::after {
+  content: none;
+}
+
+.sql-modify-flag.is-disabled .sql-modify-flag-box {
+  background: var(--bg3);
+  border-style: dashed;
+}
+
+/* ─── Toasts ───
+   Bottom-centre put them on top of the grid's pagination and the "Update
+   1 cell…" button they were often announcing. */
+.toast-viewport {
+  left: auto;
+  right: 16px;
+  bottom: 56px;
+  transform: none;
+}
+
+@media (max-width: 720px) {
+  .toast-viewport {
+    right: 16px;
+    left: 16px;
+    width: auto;
+    bottom: 72px;
+  }
 }

@@ -183,6 +183,7 @@ import { useEditorResultsSplit } from "./hooks/useEditorResultsSplit";
 import { EDITOR_SPLIT_STORAGE_SUFFIX } from "./utils/editorSplit";
 import { ModifyStructureForm } from "./components/ModifyStructureForm";
 import { useDiscardGuard } from "./components/DiscardGuard";
+import { consumeStoppedNotice, STOPPED_NOTICE } from "./utils/stopQuery";
 import {
   buildSqliteCreateTableSql,
   validateSqliteStructure,
@@ -1410,6 +1411,9 @@ function SqlPlaygroundInner() {
         }
 
         setLoaded(true);
+        // The page was reloaded by the toolbar's Stop button: say what
+        // became of the query and the database.
+        if (consumeStoppedNotice()) showToast(STOPPED_NOTICE);
         setStatusState("ready");
       } catch (err) {
         if (cancelled) return;
