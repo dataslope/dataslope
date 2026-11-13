@@ -707,6 +707,28 @@ function renderDuckDbCreateTable(
   return `CREATE TABLE ${quoteIdent(name)} (\n${defs.join(",\n")}\n)`;
 }
 
+/** The statements the Add Table drawer will run, for its live preview:
+ *  the sequence behind each auto-numbered column, then the table. */
+export function previewDuckDbCreateTable(
+  name: string,
+  columns: ColumnSpec[],
+): string {
+  const finalName = name.trim() || "new_table";
+  const named = columns
+    .filter((col) => col.name.trim())
+    .map((col) => ({ ...col, name: col.name.trim(), type: (col.type || "INTEGER").trim() }));
+  const sequenceDefaults = new Map<string, string>();
+  const statements: string[] = [];
+  for (const col of named) {
+    if (!col.autoIncrement || col.generated) continue;
+    const seq = duckDbSequenceName(finalName, col.name);
+    statements.push(`CREATE SEQUENCE ${quoteIdent(seq)} START 1;`);
+    sequenceDefaults.set(col.name, `nextval('${seq.replace(/'/g, "''")}')`);
+  }
+  statements.push(`${renderDuckDbCreateTable(finalName, named, { sequenceDefaults })};`);
+  return statements.join("\n");
+}
+
 let duckRebuildCounter = 0;
 
 // ─── Engine interface ───────────────────────────────────────────────

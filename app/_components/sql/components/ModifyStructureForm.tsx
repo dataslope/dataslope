@@ -37,7 +37,8 @@ import type { ColumnTypeGroup } from "../utils/columnTypeSelector";
 import { DdlViewer } from "./DdlViewer";
 import { GenExprEditor } from "./GenExprEditor";
 import { ColumnHeaderPopover } from "./PragmaSettingsTab";
-import { StructureCombobox, FkCombobox } from "./StructureCombobox";
+import { FkCombobox } from "./StructureCombobox";
+import { ColumnTypeCombobox } from "./ColumnTypeCombobox";
 
 /** SQLite type affinities, surfaced as a single flat group in the type
  *  combobox. Freeform entry keeps any custom declared type (e.g.
@@ -45,6 +46,12 @@ import { StructureCombobox, FkCombobox } from "./StructureCombobox";
 const SQLITE_TYPE_GROUPS: ColumnTypeGroup[] = [
   { label: "", types: COLUMN_TYPES },
 ];
+
+/** SQLite takes nearly any words as a declared type; this only keeps out
+ *  text that would break the CREATE statement (quotes, semicolons, commas
+ *  outside a length). */
+const SQLITE_CUSTOM_TYPE =
+  /^[A-Za-z_][A-Za-z0-9_]*(?:\s+[A-Za-z_][A-Za-z0-9_]*)*(?:\s*\(\s*\d+\s*(?:,\s*\d+\s*)?\))?$/;
 
 function newDraftId(): string {
   return `c_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
@@ -176,14 +183,13 @@ export function ModifyColumnRow({
         {/* SQLite columns can declare any type (e.g. `VARCHAR(15)` from an
             imported schema); the freeform combobox preserves whatever is
             typed while still offering the built-in affinities. */}
-        <StructureCombobox
+        <ColumnTypeCombobox
           value={col.type}
           onChange={(type) => onChange({ type })}
           groups={SQLITE_TYPE_GROUPS}
+          isValidCustomType={(type) => SQLITE_CUSTOM_TYPE.test(type)}
           placeholder="e.g. TEXT"
-          ariaLabel="Column type"
-          triggerAriaLabel="Open type list"
-          freeform
+          classPrefix="playground-type"
         />
       </td>
       <td>

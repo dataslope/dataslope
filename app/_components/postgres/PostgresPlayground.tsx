@@ -29,7 +29,6 @@ import {
   DEFAULT_COMPLETION_TRIGGER,
   setCompletionTrigger,
 } from "../completion/completionPrefs";
-import { Combobox } from "@base-ui/react/combobox";
 import { Dialog } from "@base-ui/react/dialog";
 import { Popover } from "@base-ui/react/popover";
 import { Select } from "@base-ui/react/select";
@@ -103,6 +102,8 @@ import {
 } from "../sql/components/SqlSettingsPanel";
 import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmDialogs";
 import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
+import { DdlViewer } from "../sql/components/DdlViewer";
+import { useDiscardGuard } from "../sql/components/DiscardGuard";
 import { SwitchDatabaseDialog } from "../sql/components/SwitchDatabaseDialog";
 import {
   topoSortByForeignKeys,
@@ -156,11 +157,13 @@ import {
 } from "@/lib/workspaces/types";
 import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
 import { type PgEntityKind, type PostgresEngine } from "../runtime/postgres";
+import { previewPgCreateTable } from "../runtime/pgDdl";
 
 const POSTGRES_SAMPLE_DATABASES = postgresAdapter.samples;
 const POSTGRES_BLANK_DATABASE = postgresAdapter.blankSample!;
 import type {
   ColumnConstraintInfo,
+  ColumnSpec,
   ForeignKeyInfo,
   TableColumnInfo,
 } from "../runtime/sqlite";
@@ -198,6 +201,7 @@ import { GenExprEditor } from "../sql/components/GenExprEditor";
 import { ToastList } from "../sql/components/ToastList";
 import { ColumnFlag } from "../sql/components/ModifyStructureForm";
 import { FkCombobox } from "../sql/components/StructureCombobox";
+import { ColumnTypeCombobox } from "../sql/components/ColumnTypeCombobox";
 import { StructureTableHeader } from "../sql/components/StructureTableHeader";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
 import { useQueryHistory } from "../sql/hooks/useQueryHistory";
@@ -261,7 +265,6 @@ import {
   tableNameFromFilename,
 } from "./postgresImport";
 import { FK_ACTIONS } from "../sql/constants";
-import { computeVisibleTypeGroups } from "../sql/utils/columnTypeSelector";
 
 const PLAYGROUND_ID = postgresAdapter.playgroundId;
 const STORAGE_PREFIX = postgresAdapter.storagePrefix;
@@ -374,6 +377,9 @@ interface PgStructureDialogState {
   newTableName: string;
   columns: PgStructureColumn[];
   originalSignature: string;
+  /** Signature of a new-table form as it first opened, for the
+   *  unsaved-changes guard (`originalSignature` is empty there). */
+  pristineSignature?: string;
 }
 
 let _pgStructureIdCounter = 0;
@@ -413,9 +419,6 @@ const PG_TYPE_GROUPS = [
   },
 ] as const;
 
-const PG_TYPE_OPTIONS: readonly string[] = PG_TYPE_GROUPS.flatMap(
-  (group) => group.types,
-);
 const PG_SERIAL_TYPES = new Set(["serial", "bigserial", "smallserial"]);
 // Accepts common PostgreSQL type text, including multi-word types,
 // parameterized types such as varchar(255), and array suffixes.
@@ -547,6 +550,36 @@ function validatePgStructure(
   };
 }
 
+/** The form's columns as the engine's `ColumnSpec`s. Shared by the submit
+ *  and the live preview so the statement shown is the statement run. */
+function pgDialogColumnSpecs(dialog: PgStructureDialogState): ColumnSpec[] {
+  return dialog.columns.map((col) => ({
+    name: col.name.trim(),
+    type: col.type.trim(),
+    notNull: !col.nullable,
+    primaryKey: col.isPk,
+    unique: col.unique,
+    autoIncrement: col.autoIncrement || isPgSerialType(col.type),
+    defaultValue: col.defaultValue.trim() || undefined,
+    foreignKey:
+      col.fkTable && col.fkColumn
+        ? {
+            table: col.fkTable,
+            column: col.fkColumn,
+            onDelete: normalizePgFkAction(col.fkOnDelete),
+            onUpdate: normalizePgFkAction(col.fkOnUpdate),
+          }
+        : undefined,
+    originalName: col.originalName ?? undefined,
+    generated: col.generated
+      ? {
+          expression: col.generated.expression.trim(),
+          storageType: "STORED" as const,
+        }
+      : undefined,
+  }));
+}
+
 function makeNewPgColumn(): PgStructureColumn {
   return {
     id: newPgStructureId(),
@@ -573,128 +606,15 @@ function PgTypeSelector({
   value: string;
   onChange: (value: string) => void;
 }) {
-  const [inputVal, setInputVal] = useState(value);
-  // Whether the user is editing right now. Base UI's Combobox clears its
-  // input when it closes with no list item selected — which is *always* the
-  // case for a custom type like `numeric(10,2)`, since that matches no group
-  // entry. The value was still applied, but the field went back to showing
-  // its placeholder, so the user could not see what would be created.
-  const focusedRef = useRef(false);
-  // The committed type, readable synchronously: the `value` prop in this
-  // closure is one render stale during the blur that commits a new one, and
-  // guarding against the reset with the stale value would restore the old
-  // type. (This used to be a 100ms timer, which raced with Base UI's reset.)
-  const committedRef = useRef(value);
-
-  // Sync inputVal when the committed value changes externally (e.g. a
-  // different column row is selected) but never mid-edit.
-  useEffect(() => {
-    committedRef.current = value;
-    if (!focusedRef.current) setInputVal(value);
-  }, [value]);
-
-  // Show every group while the field is empty or still holds the committed
-  // type; only filter once the user types a partial that isn't a known type.
-  const visibleGroups = useMemo(
-    () =>
-      computeVisibleTypeGroups(PG_TYPE_GROUPS, PG_TYPE_OPTIONS, inputVal, value),
-    [inputVal, value],
-  );
-
   return (
-    <Combobox.Root
-      value={PG_TYPE_OPTIONS.includes(inputVal) ? inputVal : null}
-      onValueChange={(newValue) => {
-        if (newValue) {
-          const v = newValue as string;
-          committedRef.current = v;
-          setInputVal(v);
-          onChange(v);
-        }
-      }}
-      inputValue={inputVal}
-      onInputValueChange={(v) => {
-        // Outside of active editing the committed type wins over the
-        // Combobox's close-time reset to "".
-        if (!focusedRef.current && v === "" && committedRef.current !== "") {
-          setInputVal(committedRef.current);
-          return;
-        }
-        setInputVal(v);
-      }}
-      filter={null}
-      openOnInputClick
-      autoHighlight
-    >
-      <div className="playground-type-input-group">
-        <Combobox.Input
-          className="sql-rename-input sql-modify-col-type playground-type-input"
-          placeholder="e.g. varchar(255)"
-          aria-label="Column type"
-          onFocus={() => {
-            focusedRef.current = true;
-          }}
-          onBlur={() => {
-            focusedRef.current = false;
-            const typed = inputVal.trim();
-            let finalVal: string;
-            if (
-              PG_TYPE_OPTIONS.includes(value) &&
-              !PG_TYPE_OPTIONS.includes(typed) &&
-              !PG_TYPE_VALIDATION_REGEX.test(typed)
-            ) {
-              // Original was a known type; typed value is neither a known type
-              // nor a valid custom type (e.g. varchar(255)) → revert.
-              finalVal = value;
-            } else {
-              finalVal = typed || value;
-              if (finalVal !== value) onChange(finalVal);
-            }
-            committedRef.current = finalVal;
-            setInputVal(finalVal);
-          }}
-        />
-        <Combobox.Trigger
-          className="playground-type-trigger"
-          aria-label="Open type list"
-        >
-          <ChevronDown size={14} />
-        </Combobox.Trigger>
-      </div>
-      <Combobox.Portal>
-        <Combobox.Positioner
-          sideOffset={4}
-          align="start"
-          className="playground-type-positioner"
-        >
-          <Combobox.Popup className="bui-select-popup playground-type-popup">
-            <Combobox.List>
-              {visibleGroups.map((group) => (
-                <Combobox.Group key={group.label} className="playground-type-group">
-                  <Combobox.GroupLabel className="playground-type-group-label">
-                    {group.label}
-                  </Combobox.GroupLabel>
-                  {group.types.map((type) => (
-                    <Combobox.Item
-                      key={type}
-                      value={type}
-                      className="bui-select-item"
-                    >
-                      {type}
-                    </Combobox.Item>
-                  ))}
-                </Combobox.Group>
-              ))}
-              {visibleGroups.length === 0 && (
-                <div className="playground-type-empty">
-                  No matching built-in types. You can keep the typed value.
-                </div>
-              )}
-            </Combobox.List>
-          </Combobox.Popup>
-        </Combobox.Positioner>
-      </Combobox.Portal>
-    </Combobox.Root>
+    <ColumnTypeCombobox
+      value={value}
+      onChange={onChange}
+      groups={PG_TYPE_GROUPS}
+      isValidCustomType={(type) => PG_TYPE_VALIDATION_REGEX.test(type)}
+      placeholder="e.g. varchar(255)"
+      classPrefix="playground-type"
+    />
   );
 }
 
@@ -1325,6 +1245,29 @@ function PostgresPlaygroundInner() {
       columnsByEntity,
     );
   }, [addTableDialog, addTableTouchedColIds, columnsByEntity]);
+
+  // Every way of closing a structure drawer (Escape, a click outside, the X,
+  // Cancel) goes through these, so a half-written definition is not lost to
+  // one stray keypress.
+  const addTableGuard = useDiscardGuard({
+    isDirty:
+      addTableDialog !== null &&
+      pgStructureSignature(addTableDialog) !== addTableDialog.pristineSignature,
+    onDiscard: useCallback(() => {
+      setAddTableDialog(null);
+      setAddTableTouchedColIds(new Set());
+    }, []),
+    title: "Discard this table?",
+    description: "The table you were defining has not been created.",
+  });
+  const viewStructureGuard = useDiscardGuard({
+    isDirty: viewStructureDialog !== null && pgStructureValidation.isDirty,
+    onDiscard: useCallback(() => {
+      setViewStructureDialog(null);
+      setViewStructureTouchedColIds(new Set());
+    }, []),
+    description: "Your edits to this table's structure have not been saved.",
+  });
 
   // ─── Refs ─────────────────────────────────────────────────────────────
   const editorHostRef = useRef<HTMLDivElement | null>(null);
@@ -3451,31 +3394,7 @@ function PostgresPlaygroundInner() {
       const outcome = await engine.rebuildTable({
         originalName: dialog.tableName,
         newName: dialog.newTableName.trim(),
-        columns: dialog.columns.map((col) => ({
-          name: col.name.trim(),
-          type: col.type.trim(),
-          notNull: !col.nullable,
-          primaryKey: col.isPk,
-          unique: col.unique,
-          autoIncrement: col.autoIncrement || isPgSerialType(col.type),
-          defaultValue: col.defaultValue.trim() || undefined,
-          foreignKey:
-            col.fkTable && col.fkColumn
-              ? {
-                  table: col.fkTable,
-                  column: col.fkColumn,
-                  onDelete: normalizePgFkAction(col.fkOnDelete),
-                  onUpdate: normalizePgFkAction(col.fkOnUpdate),
-                }
-              : undefined,
-          originalName: col.originalName ?? undefined,
-          generated: col.generated
-            ? {
-                expression: col.generated.expression.trim(),
-                storageType: "STORED" as const,
-              }
-            : undefined,
-        })),
+        columns: pgDialogColumnSpecs(dialog),
       }, selectedSchemaRef.current);
       await refreshSchema();
       // Postgres cannot move an existing column without recreating the
@@ -3496,7 +3415,7 @@ function PostgresPlaygroundInner() {
 
   const openAddTable = useCallback(() => {
     setAddTableTouchedColIds(new Set());
-    setAddTableDialog({
+    const initial = {
       tableName: "",
       newTableName: "new_table",
       columns: [
@@ -3518,6 +3437,10 @@ function PostgresPlaygroundInner() {
         },
       ],
       originalSignature: "",
+    };
+    setAddTableDialog({
+      ...initial,
+      pristineSignature: pgStructureSignature(initial),
     });
   }, []);
 
@@ -3539,30 +3462,7 @@ function PostgresPlaygroundInner() {
     try {
       await engine.createTable(
         trimmedName,
-        dialog.columns.map((col) => ({
-          name: col.name.trim(),
-          type: col.type.trim(),
-          notNull: !col.nullable,
-          primaryKey: col.isPk,
-          unique: col.unique,
-          autoIncrement: col.autoIncrement || isPgSerialType(col.type),
-          defaultValue: col.defaultValue.trim() || undefined,
-          foreignKey:
-            col.fkTable && col.fkColumn
-              ? {
-                  table: col.fkTable,
-                  column: col.fkColumn,
-                  onDelete: normalizePgFkAction(col.fkOnDelete),
-                  onUpdate: normalizePgFkAction(col.fkOnUpdate),
-                }
-              : undefined,
-          generated: col.generated
-            ? {
-                expression: col.generated.expression.trim(),
-                storageType: "STORED" as const,
-              }
-            : undefined,
-        })),
+        pgDialogColumnSpecs(dialog),
         selectedSchemaRef.current,
       );
       await refreshSchema();
@@ -4526,10 +4426,7 @@ function PostgresPlaygroundInner() {
         <Dialog.Root
           open={viewStructureDialog !== null}
           onOpenChange={(next) => {
-            if (!next) {
-              setViewStructureDialog(null);
-              setViewStructureTouchedColIds(new Set());
-            }
+            if (!next) viewStructureGuard.requestClose();
           }}
         >
           <Dialog.Portal>
@@ -4847,10 +4744,7 @@ function PostgresPlaygroundInner() {
         <Dialog.Root
           open={addTableDialog !== null}
           onOpenChange={(next) => {
-            if (!next) {
-              setAddTableDialog(null);
-              setAddTableTouchedColIds(new Set());
-            }
+            if (!next) addTableGuard.requestClose();
           }}
         >
           <Dialog.Portal>
@@ -4997,6 +4891,15 @@ function PostgresPlaygroundInner() {
                             ))}
                           </div>
                         )}
+                        <div className="sql-modify-preview">
+                          <div className="sql-modify-preview-label">
+                            SQL preview
+                          </div>
+                          <DdlViewer
+                            sql={previewPgCreateTable(selectedSchema, addTableDialog.newTableName, pgDialogColumnSpecs(addTableDialog))}
+                            theme={editorTheme}
+                          />
+                        </div>
                       </>
                     );
                   })()}
@@ -5018,6 +4921,9 @@ function PostgresPlaygroundInner() {
             </Dialog.Popup>
           </Dialog.Portal>
         </Dialog.Root>
+
+        {addTableGuard.dialog}
+        {viewStructureGuard.dialog}
 
         {/* ── Import CSV dialog ── */}
         <ImportDialog

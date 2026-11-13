@@ -14,26 +14,45 @@ export interface ColumnTypeGroup {
 /** Decide which built-in type groups to show in a column-type combobox: all
  *  groups while the field is empty or still equals the committed type
  *  (including custom/parameterized types absent from the built-in list, e.g.
- *  `character varying(15)`); otherwise filter by the typed fragment. */
+ *  `character varying(15)`); otherwise filter by the typed fragment.
+ *
+ *  Within the filtered list the best match comes first: an exact match, then
+ *  types that start with the fragment, then the rest. The combobox highlights
+ *  its first row and Enter takes it, so the order is what decides whether
+ *  typing `int` and pressing Enter gives `integer` or `smallint`. (Typing a
+ *  complete built-in type used to show the whole list again, first row
+ *  highlighted, and Enter then committed whatever that row happened to be.) */
 export function computeVisibleTypeGroups(
   groups: readonly ColumnTypeGroup[],
-  options: readonly string[],
+  _options: readonly string[],
   inputValue: string,
   committedValue: string,
 ): { label: string; types: string[] }[] {
   const query = inputValue.trim().toLowerCase();
   const showAll =
-    query === "" ||
-    query === committedValue.trim().toLowerCase() ||
-    options.some((type) => type.toLowerCase() === query);
+    query === "" || query === committedValue.trim().toLowerCase();
+  if (showAll) {
+    return groups
+      .map((group) => ({ label: group.label, types: [...group.types] }))
+      .filter((group) => group.types.length > 0);
+  }
+  const rank = (type: string) => {
+    const lower = type.toLowerCase();
+    if (lower === query) return 0;
+    return lower.startsWith(query) ? 1 : 2;
+  };
   return groups
     .map((group) => ({
       label: group.label,
-      types: showAll
-        ? [...group.types]
-        : group.types.filter((type) => type.toLowerCase().includes(query)),
+      types: group.types
+        .filter((type) => type.toLowerCase().includes(query))
+        .sort((a, b) => rank(a) - rank(b)),
     }))
-    .filter((group) => group.types.length > 0);
+    .filter((group) => group.types.length > 0)
+    .sort(
+      (a, b) =>
+        Math.min(...a.types.map(rank)) - Math.min(...b.types.map(rank)),
+    );
 }
 
 /** A native `<select>` can only display a value that exactly matches one of

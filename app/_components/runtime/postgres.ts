@@ -25,6 +25,7 @@ import { topoSortByForeignKeys } from "../sql/utils/exportOrder";
 import { defaultGeneratesUniqueValue } from "../sql/utils/duplicateRow";
 import { fetchDatasetText } from "./remoteDatasets";
 import { planPgAlter, type PgCurrentTable } from "./pgAlterPlan";
+import { renderPgCreateTable } from "./pgDdl";
 import {
   toDateOnlyString,
   toPgArrayLiteral,
@@ -167,59 +168,6 @@ function serialTypeFor(
 
 function pgTypeName(dataTypeID: number): string {
   return PG_TYPE_NAMES[dataTypeID] ?? "";
-}
-
-const FK_ACTIONS = new Set(["NO ACTION", "RESTRICT", "CASCADE", "SET NULL", "SET DEFAULT"]);
-
-function normalizeFkAction(action: string | undefined): string {
-  const normalized = (action || "NO ACTION").trim().toUpperCase();
-  return FK_ACTIONS.has(normalized) ? normalized : "NO ACTION";
-}
-
-function renderPgType(col: ColumnSpec): string {
-  const type = (col.type || "text").trim();
-  if (col.autoIncrement) {
-    if (/^big(serial|int)$/i.test(type)) return "bigserial";
-    if (/^small(serial|int)$/i.test(type)) return "smallserial";
-    return "serial";
-  }
-  return type;
-}
-
-function renderPgColumnDef(col: ColumnSpec): string {
-  const name = quoteIdent(col.name);
-  const type = renderPgType(col);
-  if (col.generated) {
-    return `${name} ${type} GENERATED ALWAYS AS (${col.generated.expression}) STORED`;
-  }
-  const parts = [name, type];
-  if (col.notNull) parts.push("NOT NULL");
-  if (col.unique && !col.primaryKey) parts.push("UNIQUE");
-  if (col.defaultValue && !col.autoIncrement) parts.push(`DEFAULT ${col.defaultValue}`);
-  return parts.join(" ");
-}
-
-function renderPgCreateTable(
-  schema: string,
-  name: string,
-  columns: ColumnSpec[],
-): string {
-  const defs = columns.map((col) => `  ${renderPgColumnDef(col)}`);
-  const pk = columns.filter((col) => col.primaryKey);
-  if (pk.length > 0) {
-    defs.push(`  PRIMARY KEY (${pk.map((col) => quoteIdent(col.name)).join(", ")})`);
-  }
-  for (const col of columns) {
-    if (!col.foreignKey?.table || !col.foreignKey.column) continue;
-    defs.push(
-      [
-        `  FOREIGN KEY (${quoteIdent(col.name)}) REFERENCES ${quoteIdent(col.foreignKey.table)}(${quoteIdent(col.foreignKey.column)})`,
-        `ON DELETE ${normalizeFkAction(col.foreignKey.onDelete)}`,
-        `ON UPDATE ${normalizeFkAction(col.foreignKey.onUpdate)}`,
-      ].join(" "),
-    );
-  }
-  return `CREATE TABLE ${quoteIdent(schema)}.${quoteIdent(name)} (\n${defs.join(",\n")}\n)`;
 }
 
 function resultToQueryExecResult(result: PgliteResult): QueryExecResult & { columnTypes?: string[] } | null {
