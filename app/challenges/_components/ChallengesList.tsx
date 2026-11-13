@@ -652,15 +652,17 @@ function CatalogView({
           {/* Narrow viewports get stacked cards, not a table scrolling
               sideways with its last columns off-screen and nothing saying so.
               Same rows, same order. */}
-          <ul className={`${styles.cards} -mx-3 mt-4 flex list-none flex-col p-0 md:hidden`}>
+          <ul className={`${styles.cards} mt-4 flex list-none flex-col p-0 md:hidden`}>
             {rows.map((entry) => (
               <MobileRow key={entry.slug} entry={entry} />
             ))}
           </ul>
 
-          {/* `-mx-3` lines the cell text up with the filter row above while
-              the hover fill reaches past it, so a row reads as one block. */}
-          <div className="-mx-3 mt-4 hidden md:block">
+          {/* Exactly as wide as the filter row: the outermost cells carry no
+              outer padding (see `.table` in the stylesheet), so the row
+              separators, the hover fill and the text all start and end at
+              the content column's edges. */}
+          <div className="mt-4 hidden md:block">
             <table className={`${styles.table} w-full border-separate border-spacing-0`}>
               <thead>
                 <tr>
@@ -795,7 +797,7 @@ function MobileRow({ entry }: { entry: ResolvedEntry }) {
         href={`/challenges/${entry.slug}`}
         // See `Row`.
         prefetch={false}
-        className={`${styles.card} flex flex-col gap-1 px-3 py-3 text-inherit no-underline`}
+        className={`${styles.card} flex flex-col gap-1 py-3 text-inherit no-underline`}
       >
         <span className="flex items-start justify-between gap-3">
           <span className="text-sm font-medium leading-5" style={{ color: "var(--ink)" }}>

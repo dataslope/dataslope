@@ -51,6 +51,17 @@
 .table tbody td {
   border-top: 1px solid var(--divider);
 }
+/* The table is the width of the content column, and so are its lines: the
+   first and last columns drop their outer padding, so nothing (text, line or
+   hover fill) reaches past the filter row above. */
+.table th:first-child,
+.table td:first-child {
+  padding-left: 0;
+}
+.table th:last-child,
+.table td:last-child {
+  padding-right: 0;
+}
 .row > td {
   transition: background 0.12s;
 }
