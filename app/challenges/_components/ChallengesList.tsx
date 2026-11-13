@@ -157,7 +157,7 @@ function FilterSelect({
     >
       <Select.Trigger
         aria-label={label}
-        className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border-0 bg-[var(--field)] px-3 text-sm font-medium text-[var(--ink)] outline-none transition-colors hover:bg-[var(--field-hover)] focus-visible:ring-2 focus-visible:ring-[var(--ds-blue-400)] data-[popup-open]:bg-[var(--field-hover)]"
+        className="inline-flex h-9 cursor-pointer items-center gap-2 rounded border-0 bg-[var(--field)] px-3 text-sm font-medium text-[var(--ink)] outline-none transition-colors hover:bg-[var(--field-hover)] focus-visible:ring-2 focus-visible:ring-[var(--ds-blue-400)] data-[popup-open]:bg-[var(--field-hover)]"
       >
         {active.icon}
         <Select.Value className="whitespace-nowrap text-left">{active.label}</Select.Value>
@@ -568,7 +568,7 @@ function CatalogView({
       </div>
 
       <div className="mt-12 flex flex-wrap items-center gap-2">
-        <label className="flex h-9 min-w-[200px] max-w-[320px] flex-[1_1_220px] items-center gap-2 rounded-lg bg-[var(--field)] px-3 focus-within:ring-2 focus-within:ring-[var(--ds-blue-400)]">
+        <label className="flex h-9 min-w-[200px] max-w-[320px] flex-[1_1_220px] items-center gap-2 rounded bg-[var(--field)] px-3 focus-within:ring-2 focus-within:ring-[var(--ds-blue-400)]">
           <Search size={15} aria-hidden="true" className="shrink-0" style={{ color: "var(--muted)" }} />
           <input
             type="text"
@@ -610,7 +610,7 @@ function CatalogView({
           <button
             type="button"
             onClick={onClear}
-            className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2.5 text-sm font-medium transition-colors hover:text-[var(--ink)]"
+            className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded border-0 bg-transparent px-2.5 text-sm font-medium transition-colors hover:text-[var(--ink)]"
             style={{ color: "var(--muted)" }}
           >
             <X size={14} aria-hidden="true" />
@@ -652,7 +652,7 @@ function CatalogView({
           {/* Narrow viewports get stacked cards, not a table scrolling
               sideways with its last columns off-screen and nothing saying so.
               Same rows, same order. */}
-          <ul className="-mx-3 mt-4 flex list-none flex-col p-0 md:hidden">
+          <ul className={`${styles.cards} -mx-3 mt-4 flex list-none flex-col p-0 md:hidden`}>
             {rows.map((entry) => (
               <MobileRow key={entry.slug} entry={entry} />
             ))}
@@ -661,7 +661,7 @@ function CatalogView({
           {/* `-mx-3` lines the cell text up with the filter row above while
               the hover fill reaches past it, so a row reads as one block. */}
           <div className="-mx-3 mt-4 hidden md:block">
-            <table className="w-full border-separate border-spacing-0">
+            <table className={`${styles.table} w-full border-separate border-spacing-0`}>
               <thead>
                 <tr>
                   <Th className="w-full min-w-[220px]">Title</Th>
@@ -884,7 +884,9 @@ function Row({ entry }: { entry: ResolvedEntry }) {
         <Cell>{formatLabel(entry.steps)}</Cell>
       </td>
       <td className="px-3 py-3 text-right align-middle">
-        <span className="inline-flex h-5 items-center justify-end whitespace-nowrap text-sm leading-5">
+        {/* A block flex box like `Cell`'s: an inline one rests on the text
+            baseline and sat a few pixels above the row's other values. */}
+        <span className="flex h-5 items-center justify-end whitespace-nowrap text-sm leading-5">
           <StatusMark status={entry.status} />
         </span>
       </td>

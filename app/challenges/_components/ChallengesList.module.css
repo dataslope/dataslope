@@ -20,6 +20,9 @@
   --field: var(--ds-gray-100);
   --field-hover: var(--ds-gray-200);
   --row-hover: rgba(17, 24, 39, 0.035);
+  /* Hairline between rows: there to guide the eye across a wide row, not
+     to box anything in. */
+  --divider: rgba(17, 24, 39, 0.07);
   --green-text: var(--ds-green-700);
   --blue-text: var(--ds-blue-700);
   /* Unfilled segment of the three-bar difficulty meter. */
@@ -34,26 +37,25 @@
   --field: rgba(255, 255, 255, 0.06);
   --field-hover: rgba(255, 255, 255, 0.1);
   --row-hover: rgba(255, 255, 255, 0.04);
+  --divider: rgba(255, 255, 255, 0.08);
   --green-text: var(--ds-green-400);
   --blue-text: var(--ds-blue-400);
   --meter-off: rgba(255, 255, 255, 0.14);
 }
 
 /* ── Table rows ──────────────────────────────────────────────────────────
-   No rules between rows: they are told apart by spacing and by a rounded
-   fill on hover. The fill is painted on the cells, because a <tr> takes
-   neither a background radius nor padding. */
+   A hairline between each pair of rows and under the header, and nothing
+   around the table: no frame, no line above the header or after the last
+   row. Each row's line is its cells' top border, so the first one doubles
+   as the header's. The hover fill is square so it meets those lines. */
+.table tbody td {
+  border-top: 1px solid var(--divider);
+}
 .row > td {
   transition: background 0.12s;
 }
 .row:hover > td {
   background: var(--row-hover);
-}
-.row > td:first-child {
-  border-radius: 10px 0 0 10px;
-}
-.row > td:last-child {
-  border-radius: 0 10px 10px 0;
 }
 
 /* The whole row is the hit area, not just the title. `position: relative`
@@ -68,7 +70,6 @@
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 10px;
 }
 .rowLink:focus-visible {
   outline: none;
@@ -78,9 +79,12 @@
   outline-offset: -2px;
 }
 
-/* ── Phone cards ─────────────────────────────────────────────────────── */
+/* ── Phone cards ─────────────────────────────────────────────────────────
+   The same rows stacked, with the same hairline between them. */
+.cards > li + li {
+  border-top: 1px solid var(--divider);
+}
 .card {
-  border-radius: 10px;
   transition: background 0.12s;
 }
 .card:hover {
