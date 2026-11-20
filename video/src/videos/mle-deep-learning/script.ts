@@ -73,11 +73,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * On screen, beat by beat (for the builder; nothing is built yet). Colors keep
  * the series' meanings (interview.tsx): red the trap or the error, green the
  * right answer, yellow what the narration points at, blue data. The
- * orangutan hero sits beside the opening and the close only. Four small
- * watercolor spots (illustrations.json), each beside the figure it names: a
- * chain at "q4" (the chain rule), dice at "q9-bug" (ten calls, ten draws), a
- * magnifying glass at "q10-a" (a filter's small patch), a padlock at
- * "r-transfer" (a frozen backbone).
+ * orangutan hero sits beside the opening and the close only. Three small
+ * watercolor spots (illustrations.json), each beside the figure it names, as
+ * built: dice at "q6-sym" (Xavier's random start breaks the tie), a
+ * magnifying glass at "q10-a" (a filter's small patch), dominoes at
+ * "q14-slow" (step fifty waits for step forty-nine).
  *   hook: three small diagrams in a row, inked as named: a logistic
  *     regression (inputs, one weighted sum, a sigmoid), then the same thing
  *     stacked many layers deep, then a gradient arrow running back down the
