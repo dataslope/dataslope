@@ -358,10 +358,10 @@ export const FanScene: React.FC = () => {
         </Note>
 
         {/* ── Why every test passed, and the one that fails ── */}
-        <Note at={inputsAt} x={RESULT_X} y={tellTop + h(140)}>
+        <Note at={inputsAt} x={RESULT_X} y={tellTop + h(158)}>
           <span style={noteLine(22, INK_SOFT)}>Every test ran on an input table</span>
         </Note>
-        <Note at={uniqueAt} x={RESULT_X} y={tellTop + h(182)}>
+        <Note at={uniqueAt} x={RESULT_X} y={tellTop + h(198)}>
           <span style={{ ...noteLine(22, INK), display: "inline-flex", alignItems: "center", gap: "0.45em" }}>
             <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500 }}>unique</span>
             on the joined rows
@@ -370,7 +370,7 @@ export const FanScene: React.FC = () => {
             </Badge>
           </span>
         </Note>
-        <Note at={repeatAt} x={RESULT_X} y={tellTop + h(224)}>
+        <Note at={repeatAt} x={RESULT_X} y={tellTop + h(238)}>
           <span style={noteLine(22, ACCENT_INK)}>
             <b>
               <Num>{FAN.joinedRepeats}</Num> orders repeat
