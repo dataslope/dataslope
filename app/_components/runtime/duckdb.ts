@@ -123,6 +123,10 @@ async function loadDuckDbModule(): Promise<DuckDbModule> {
   return _duckdbModulePromise;
 }
 
+/** Scratch directory for an OPFS snapshot's `EXPORT DATABASE` (numbered per
+ *  snapshot); the worker prelude in `instantiateDuckDb` keys on it. */
+const SNAPSHOT_DIR_PREFIX = "_playground_snapshot_";
+
 async function instantiateDuckDb(
   onProgress?: (fraction: number) => void,
 ): Promise<{
@@ -133,8 +137,27 @@ async function instantiateDuckDb(
   const bundles = duckdb.getJsDelivrBundles();
   const bundle = await duckdb.selectBundle(bundles);
   // Standard duckdb-wasm pattern: wrap the worker script in a Blob.
+  //
+  // The prelude drops one warning. Every OPFS snapshot runs `EXPORT DATABASE`
+  // into a scratch directory the worker has never seen, and the worker warns
+  // "Buffering missing file: _playground_snapshot_N/<table>.parquet" for each
+  // file it writes there, which is how it is meant to work. That was about
+  // thirty console warnings per session, all saying nothing. Only that
+  // message, for that directory, is dropped.
+  const workerPrelude = `(() => {
+    const warn = console.warn.bind(console);
+    console.warn = (...args) => {
+      if (
+        typeof args[0] === "string" &&
+        args[0].startsWith("Buffering missing file: ${SNAPSHOT_DIR_PREFIX}")
+      ) {
+        return;
+      }
+      warn(...args);
+    };
+  })();`;
   const workerUrl = URL.createObjectURL(
-    new Blob([`importScripts("${bundle.mainWorker}");`], {
+    new Blob([`${workerPrelude}\nimportScripts("${bundle.mainWorker}");`], {
       type: "text/javascript",
     }),
   );
@@ -1300,7 +1323,7 @@ export async function createDuckDbEngine(
     if (!db.copyFileToBuffer || !db.globFiles) {
       throw new Error("This DuckDB-Wasm build cannot read back exported files.");
     }
-    const dir = `_playground_snapshot_${++duckRebuildCounter}`;
+    const dir = `${SNAPSHOT_DIR_PREFIX}${++duckRebuildCounter}`;
     const listed = async () => (await db.globFiles!(`${dir}/*`)).map((f) => f.fileName);
     try {
       try {
@@ -1687,9 +1710,20 @@ export async function createDuckDbEngine(
       }
       const safePageSize = Math.max(1, pageSize);
       const safeOffset = Math.max(0, offset);
-      const pageStmts = await engine.exec(
-        `${base} LIMIT ${safePageSize} OFFSET ${safeOffset}`,
-      );
+      let pageStmts: (QueryExecResult | null)[];
+      try {
+        pageStmts = await engine.exec(
+          `${base} LIMIT ${safePageSize} OFFSET ${safeOffset}`,
+        );
+      } catch {
+        // DuckDB quotes the failing line back ("LINE 1: SELECT … LIMIT 50
+        // OFFSET 0" with a caret under it), so the reader was shown a query
+        // they never wrote. Run their SQL as written instead: if it fails, that
+        // error is about their text; if it succeeds, the paging clause was
+        // the problem and the rows come back unpaged.
+        pageStmts = await engine.exec(base);
+        totalCount = 0;
+      }
       const result = pageStmts.filter(
         (r): r is QueryExecResult => r !== null,
       );
