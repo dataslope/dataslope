@@ -118,6 +118,7 @@ export const PeriodScene: React.FC = () => {
         />
         {SENTENCES.naive.map((w, i) => (
           <Chip
+            look="tinted"
             key={i}
             text={w}
             x={row[i].x}
@@ -159,7 +160,7 @@ export const PeriodScene: React.FC = () => {
           countAt={threeAt}
         />
         {SENTENCES.sentences.map((s, i) => (
-          <Chip key={i} text={s} x={row4[i].x} y={y(ROW4_Y)} at={row4At[i]} size={SIZE} tones={[{ at: cleanAt, tone: "good" }]} />
+          <Chip look="tinted" key={i} text={s} x={row4[i].x} y={y(ROW4_Y)} at={row4At[i]} size={SIZE} tones={[{ at: cleanAt, tone: "good" }]} />
         ))}
         <Tag at={cleanAt + 6} x={X0} y={y(ROW4_Y) + chipHeight(SIZE) + 12} color={BLUE_INK}>
           knows abbreviations and decimals

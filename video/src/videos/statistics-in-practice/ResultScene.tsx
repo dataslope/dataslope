@@ -1,3 +1,4 @@
+import { ShoppingCart } from "lucide-react";
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
@@ -24,6 +25,16 @@ const CARD_X = 1390;
 const CARD_Y = [352, 478, 578, 678];
 /** Where the last row ends: as deep as the first, since both carry a gloss. */
 const CARD_END = 804;
+/** Below each grid: the arm's name with its button, then its count. The
+ *  owner, 2026-11-13: "add more vertical spacing around the button rows",
+ *  so the row sits further under the grid and further above the count
+ *  (it was 14 and 50). */
+const NAME_DY = 26;
+const COUNT_DY = 76;
+/** The button's vertical padding (the owner: "slight more vertical padding";
+ *  it was 4), and its top, set so its middle meets the name's beside it. */
+const BUTTON_PAD = 7;
+const BUTTON_DY = NAME_DY - 6;
 
 const pp = (v: number) => v * 100;
 const num = (v: number) => Math.round(v).toLocaleString("en-US");
@@ -148,12 +159,12 @@ export const ResultScene: React.FC = () => {
       {arms.map((a) => (
         <React.Fragment key={a.g}>
           <Grid x={a.x} top={top} converted={a.set} fill={fill} lit={a.lit} color={a.color} />
-          <Ink at={sixAt} dur={14} style={{ left: a.x, top: top + gridH + 14, whiteSpace: "nowrap" }}>
+          <Ink at={sixAt} dur={14} style={{ left: a.x, top: top + gridH + NAME_DY, whiteSpace: "nowrap" }}>
             <span style={{ ...label(22, INK) }}>
               {a.g}: {a.name}
             </span>
           </Ink>
-          <Ink at={a.at - 4} dur={12} style={{ left: a.x, top: top + gridH + 50, whiteSpace: "nowrap" }}>
+          <Ink at={a.at - 4} dur={12} style={{ left: a.x, top: top + gridH + COUNT_DY, whiteSpace: "nowrap" }}>
             {/* The count, its gloss and the rate share one line, so they are
                 set within a size of each other. */}
             <span style={{ ...note(26, INK), ...TABULAR, fontWeight: 500 }}>
@@ -161,7 +172,7 @@ export const ResultScene: React.FC = () => {
             </span>
             <span style={{ ...note(24, INK_SOFT), marginLeft: 10 }}>of {num(EXPERIMENT.n)} bought</span>
           </Ink>
-          <Ink at={a.rateAt - 4} dur={12} style={{ left: a.x + 300, top: top + gridH + 50, whiteSpace: "nowrap" }}>
+          <Ink at={a.rateAt - 4} dur={12} style={{ left: a.x + 300, top: top + gridH + COUNT_DY, whiteSpace: "nowrap" }}>
             <span style={{ ...note(26, INK), fontWeight: 500 }}>{fmt(pp(a.rate))}%</span>
           </Ink>
         </React.Fragment>
@@ -176,16 +187,24 @@ export const ResultScene: React.FC = () => {
             style={{
               position: "absolute",
               left: a.x + 228,
-              top: top + gridH + 8,
+              top: top + gridH + BUTTON_DY,
               opacity: p,
               transform: `translateY(${(1 - p) * 10}px)`,
               ...label(20, i ? PAPER : INK),
-              padding: "4px 16px",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: `${BUTTON_PAD}px 16px`,
               borderRadius: i ? 20 : 4,
               background: i ? BAR : `color-mix(in srgb, ${INK_SOFT} 22%, ${PAPER})`,
               whiteSpace: "nowrap",
             }}
           >
+            {/* A cart before the label, in the label's ink (the owner,
+                2026-11-13: "add a shopping cart lucide icon"), a little
+                under the label's size ("make the cart icons slightly
+                smaller"). */}
+            <ShoppingCart size={17} strokeWidth={2} color={i ? PAPER : INK} style={{ flex: "none" }} />
             Buy now
           </div>
         );

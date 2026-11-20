@@ -121,7 +121,8 @@ export const BagScene: React.FC = () => {
                 opacity: 1 - ease(frame, tipAt + 12 + k * 2, 8),
               }}
             >
-              <Chip text={w} size={SIZE} at={start + 2 + k * 2} />
+              {/* Outlined in near-black, not on the gray tint (the owner, 2026-11-13). */}
+              <Chip text={w} size={SIZE} at={start + 2 + k * 2} outline />
             </span>
           );
         })}
@@ -213,7 +214,8 @@ const TallyChip: React.FC<{ word: string; count: number; at: number; countAt: nu
   const c = ease(frame, countAt, 10);
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-      <Chip text={word} size={24} at={at} style={{ marginRight: 0 }} />
+      {/* Outlined, as the document's chips above it (the owner, 2026-11-13). */}
+      <Chip text={word} size={24} at={at} outline style={{ marginRight: 0 }} />
       <span style={{ ...note(26, BLUE_INK), ...TABULAR, fontWeight: 500, opacity: c, transform: `translateY(${(1 - c) * 6}px)` }}>
         ×{count}
       </span>

@@ -73,10 +73,13 @@ export const ContaminationScene: React.FC = () => {
       <FigLabel n="6" title="What the score can see" at={from - 2} x={X0} y={y(296)} />
 
       <Drift from={from} to={end} amount={0.012} origin="35% 55%">
-        {/* How a test leaks: published, crawled, trained on. */}
+        {/* How a test leaks: published, crawled, trained on. Outlined, in
+            ink and the last in red (the owner, 2026-11-13: "test questions,
+            published, crawled: black border and text color with a
+            transparent background. training data: red border and text"). */}
         {PIPE.map((c, i) => (
           <React.Fragment key={c.text}>
-            <Tag at={chipAt[i]} x={c.x} y={y(PIPE_Y) - 4} width={c.w} tone={i === 3 ? "red" : "gray"}>
+            <Tag at={chipAt[i]} x={c.x} y={y(PIPE_Y) - 4} width={c.w} tone={i === 3 ? "red" : "gray"} outline>
               {c.text}
             </Tag>
             {i > 0 ? (

@@ -65,7 +65,8 @@ const Evict: React.FC<{ c: Ctx }> = ({ c }) => {
                       height: 52,
                       boxSizing: "border-box",
                       borderRadius: 5,
-                      border: `2px solid ${out > 0.5 ? ACCENT : BAR}`,
+                      // No border, only the tint (the owner, 2026-11-13: "Remove
+                      // the borders around the badges").
                       background: out > 0.5 ? `color-mix(in srgb, ${ACCENT} 10%, ${PAPER})` : `color-mix(in srgb, ${BAR} 10%, ${PAPER})`,
                       display: "flex",
                       alignItems: "center",

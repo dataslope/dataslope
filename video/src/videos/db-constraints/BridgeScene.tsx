@@ -113,7 +113,8 @@ export const BridgeScene: React.FC = () => {
         }}
       />
       {checks.map((c, i) => (
-        <RuleTags key={c} layout={card} row={c} chips={[{ code: "NOT NULL", at: ruleAt + i * 4, pulses: [everyValueAt + i * 5, badValuesAt] }]} />
+        // Outlined in black, black text (the owner, 2026-11-13).
+        <RuleTags key={c} layout={card} row={c} outline chips={[{ code: "NOT NULL", at: ruleAt + i * 4, pulses: [everyValueAt + i * 5, badValuesAt] }]} />
       ))}
       {/* Every rule holds, the key included. */}
       <Tick x={card.right + 150} y={card.rows[0].mid} at={everyValueAt - 4} />

@@ -19,7 +19,6 @@ const STEP_Y = 620;
  *  one box's edge to the next's; STEP_MID is the boxes' middle. */
 const STEP_W = [220, 200, 250];
 const STEP_MID = 30;
-const STEP_FILL = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
 
 /**
  * The close: the traps that share one flaw, the order that cures it, and the
@@ -91,25 +90,42 @@ export const CloseScene: React.FC = () => {
       </Ink>
 
       {/* ── The order that cures it ── */}
-      {STEPS.map((s, i) => (
-        <Ink key={s} at={stepAt[i]} dur={14} style={{ left: STEP_X[i], top: y(STEP_Y), whiteSpace: "nowrap" }}>
-          <div
-            style={{
-              width: STEP_W[i],
-              boxSizing: "border-box",
-              textAlign: "center",
-              padding: "12px 0",
-              borderRadius: 8,
-              // A gray tint with no outline (the owner, 2026-11-11), lit
-              // yellow while the narration is on it.
-              background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(100 * (i === 0 ? 1 - toConfirm : i === 2 ? toConfirm : 0))}%, ${STEP_FILL})`,
-              ...label(30, INK),
-            }}
-          >
-            {i + 1}. {s}
-          </div>
-        </Ink>
-      ))}
+      {STEPS.map((s, i) => {
+        const lit = i === 0 ? 1 - toConfirm : i === 2 ? toConfirm : 0;
+        return (
+          <Ink key={s} at={stepAt[i]} dur={14} style={{ left: STEP_X[i], top: y(STEP_Y), whiteSpace: "nowrap" }}>
+            <div
+              style={{
+                width: STEP_W[i],
+                boxSizing: "border-box",
+                textAlign: "center",
+                // 2px less padding for the 2px border, so the box keeps its size.
+                padding: "10px 0",
+                borderRadius: 8,
+                // Outlined in ink with no fill (the owner, 2026-11-13: "use
+                // black border, transparent background, and black text"), and
+                // only the step's word is lit while the narration is on it,
+                // not the whole box ("highlight only the Confirm text").
+                border: `2px solid ${INK}`,
+                background: "transparent",
+                ...label(30, INK),
+              }}
+            >
+              {i + 1}.{" "}
+              <span
+                style={{
+                  padding: "0 0.12em",
+                  margin: "0 -0.12em",
+                  borderRadius: "0.12em",
+                  background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(85 * lit)}%, transparent)`,
+                }}
+              >
+                {s}
+              </span>
+            </div>
+          </Ink>
+        );
+      })}
       <Arrow from={[STEP_X[0] + STEP_W[0], y(STEP_Y) + STEP_MID]} to={[STEP_X[1], y(STEP_Y) + STEP_MID]} at={testAt - 2} dur={10} />
       <Arrow from={[STEP_X[1] + STEP_W[1], y(STEP_Y) + STEP_MID]} to={[STEP_X[2], y(STEP_Y) + STEP_MID]} at={confirmAt - 8} dur={10} />
       <Ink at={testAt - 2} dur={12} style={{ left: STEP_X[0], top: y(STEP_Y) + 90, whiteSpace: "nowrap" }}>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, INK, INK_SOFT, label } from "../../editorial/style";
-import { badgeStyle, FigLabel, Ink } from "../../editorial/ui";
+import { FigLabel, Ink, outlineBadgeStyle, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ART } from "./data";
@@ -34,11 +34,13 @@ const PILLS_RIGHT = PILL_XS[STEPS.length - 1] + pillW(STEPS[STEPS.length - 1]);
 const BR_LEFT = PILL_XS[1];
 const BR_MID = (BR_LEFT + PILLS_RIGHT) / 2;
 
-/** A named step or use, as a gray house badge (a light tint, no border, its
- *  own padding) of a fixed width, centred where the old pill's middle was;
- *  from `lightAt` its tint pales and its ink softens, which marks the step
- *  optional. */
-const Pill: React.FC<{ text: string; x: number; y: number; at: number; lightAt?: number; size?: number; width?: number }> = ({
+/** A named step or use, as an outlined badge (the owner, 2026-11-13: "black
+ *  border, black text, and a transparent background") of a fixed width,
+ *  centred where the old pill's middle was; from `lightAt` its border and
+ *  ink soften, which marks the step optional. `padY` adds vertical padding
+ *  (the owner, same day, on the three analysis badges) and keeps the badge
+ *  centred on the same line. */
+const Pill: React.FC<{ text: string; x: number; y: number; at: number; lightAt?: number; size?: number; width?: number; padY?: number }> = ({
   text,
   x,
   y,
@@ -46,12 +48,15 @@ const Pill: React.FC<{ text: string; x: number; y: number; at: number; lightAt?:
   lightAt,
   size = STEP_SIZE,
   width,
+  padY = 0,
 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
   const light = lightAt === undefined ? 0 : ease(frame, lightAt, 10);
-  const badge = badgeStyle("gray", size);
+  const badge = outlineBadgeStyle("ink", size);
+  const ink = `color-mix(in srgb, ${INK_SOFT} ${Math.round(light * 100)}%, ${outlineInk("ink")})`;
+  const padV = Math.max(0, Math.round(size * 0.21) - 2) + padY;
   return (
     <div
       style={{
@@ -59,12 +64,14 @@ const Pill: React.FC<{ text: string; x: number; y: number; at: number; lightAt?:
         ...badge,
         position: "absolute",
         left: x,
-        top: y + Math.round((size * 1.9 - (size * 1.15 + 2 * Math.round(size * 0.21))) / 2),
+        top: y + Math.round((size * 1.9 - (size * 1.15 + 2 * Math.round(size * 0.21))) / 2) - padY,
         width: width ?? pillW(text),
         boxSizing: "border-box",
         textAlign: "center",
-        background: `color-mix(in srgb, ${badge.background} ${Math.round(100 - light * 70)}%, transparent)`,
-        color: `color-mix(in srgb, ${INK_SOFT} ${Math.round(light * 100)}%, ${badge.color})`,
+        paddingTop: padV,
+        paddingBottom: padV,
+        border: `2px solid color-mix(in srgb, ${ink} ${Math.round(100 - light * 55)}%, transparent)`,
+        color: ink,
         opacity: p,
         transform: `translateY(${(1 - p) * 10}px)`,
       }}
@@ -162,7 +169,7 @@ export const HalvesScene: React.FC = () => {
         <span style={{ ...body(44), color: INK, fontWeight: 500 }}>Analysis</span>
       </Ink>
       {["counting", "tagging", "building features"].map((u, i) => (
-        <Pill key={u} text={u} x={RIGHT_X} y={y(TITLE_Y + 96 + i * 82)} at={uses[i] - 4} size={26} width={360} />
+        <Pill key={u} text={u} x={RIGHT_X} y={y(TITLE_Y + 96 + i * 82)} at={uses[i] - 4} size={26} width={360} padY={8} />
       ))}
       <Ink at={goalAt - 4} dur={16} style={{ left: RIGHT_X, top: y(TITLE_Y + 96 + 3 * 82) + 6, whiteSpace: "nowrap" }}>
         <span style={{ ...body(32, true), color: INK }}>depends on your goal</span>

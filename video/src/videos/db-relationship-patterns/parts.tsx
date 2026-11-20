@@ -305,7 +305,13 @@ export const Chip: React.FC<{
   /** Where (x) the chip slides in from, for one that travels into place. */
   fromX?: number;
   travel?: number;
-}> = ({ x, y, width, at, name, sub, tone, dim, out, border = INK, dashed, fromX, travel = 18 }) => {
+  /** Outlined, not filled (the owner, 2026-11-13, on Part 2's students,
+   *  courses and the two that do not fit: "black border, black text, and a
+   *  transparent background", and "red text and red border" for the misfits).
+   *  No fill; `tone` moves the border and the text to its color instead of
+   *  washing the box, the border from `border`, the text from INK. */
+  outline?: boolean;
+}> = ({ x, y, width, at, name, sub, tone, dim, out, border = INK, dashed, fromX, travel = 18, outline }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 14);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -315,6 +321,7 @@ export const Chip: React.FC<{
   const moved = fromX === undefined ? x : lerp(fromX, x, ease(frame, at, travel));
   const height = sub ? CHIP_H + 26 : CHIP_H;
   const base = dashed ? PAPER : ds("gray", 100);
+  const toward = (from: string) => (t > 0 ? `color-mix(in srgb, ${tone!.color} ${Math.round(t * 100)}%, ${from})` : from);
   return (
     <div
       style={{
@@ -326,9 +333,9 @@ export const Chip: React.FC<{
         boxSizing: "border-box",
         // Fill only: a gray node, washed by its tone. A dashed outline stays,
         // because there the outline is the meaning (a row that should not exist).
-        border: dashed ? `2px dashed ${border}` : undefined,
+        border: outline ? `2px ${dashed ? "dashed" : "solid"} ${toward(border)}` : dashed ? `2px dashed ${border}` : undefined,
         borderRadius: 8,
-        background: t > 0 ? `color-mix(in srgb, ${tone!.color} ${Math.round(t * 100)}%, ${base})` : base,
+        background: outline ? "transparent" : t > 0 ? `color-mix(in srgb, ${tone!.color} ${Math.round(t * 100)}%, ${base})` : base,
         opacity: p * (1 - o) * (1 - d),
         transform: fromX === undefined ? `translateY(${(1 - p) * 10}px)` : undefined,
         display: "flex",
@@ -338,7 +345,7 @@ export const Chip: React.FC<{
         gap: 2,
       }}
     >
-      <span style={{ fontFamily: SANS, fontWeight: 500, fontSize: 24, color: INK, whiteSpace: "nowrap" }}>{name}</span>
+      <span style={{ fontFamily: SANS, fontWeight: 500, fontSize: 24, color: outline ? toward(INK) : INK, whiteSpace: "nowrap" }}>{name}</span>
       {sub ? <span style={{ fontFamily: MONO, fontSize: 19, color: INK_SOFT, whiteSpace: "nowrap" }}>{sub}</span> : null}
     </div>
   );

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, label, note } from "../../editorial/style";
-import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note, outlineBadgeStyle } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BOW } from "./data";
@@ -112,7 +112,8 @@ export const MenuScene: React.FC = () => {
       <FigLabel n="1" title="One document, as words and as counts over a shared vocabulary" at={hookFrom - 2} x={X0} y={y(FIG_Y)} />
       <ChipRow x={X0} y={y(ROW_Y)}>
         {DOC.map((w, k) => (
-          <Chip key={k} text={w} size={28} at={listsAt - 2 + k * 2} />
+          // Outlined in near-black, not on the gray tint (the owner, 2026-11-13).
+          <Chip key={k} text={w} size={28} at={listsAt - 2 + k * 2} outline />
         ))}
       </ChipRow>
       <Note at={turnsAt} x={X0} y={y(WORDS_LABEL_Y)}>
@@ -183,8 +184,10 @@ export const MenuScene: React.FC = () => {
         { at: signalAt - 2, x: X0 + 400, text: "If it’s signal: keep it." },
       ].map((p) => (
         <Note key={p.text} at={p.at} x={p.x} y={y(PILL_Y)}>
-          {/* The house badge: a gray tint, no border. */}
-          <span style={{ ...note(24, INK), ...badgeStyle("gray", 24), opacity: 0.4 + 0.6 * ease(frame, p.at, 12) }}>{p.text}</span>
+          {/* The outlined badge: near-black border and text, no fill (the
+              owner, 2026-11-13: "for the gray badges, use black text, black
+              border, and a transparent background"). */}
+          <span style={{ ...note(24, INK), ...outlineBadgeStyle("ink", 24), opacity: 0.4 + 0.6 * ease(frame, p.at, 12) }}>{p.text}</span>
         </Note>
       ))}
     </AbsoluteFill>

@@ -2,17 +2,27 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { body, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds } from "../../theme/brand";
-import { DIST, num, SHOWN_SUM, VOCAB } from "./data";
+import { Illustration } from "../../components/Illustration";
+import { DIST, ILLUSTRATIONS, num, SHOWN_SUM, VIDEO, VOCAB } from "./data";
 import { Arrow, ChipFace, Drift, FIG_Y, FOCUS_INK, Headline, Kicker, Mark, pulse, Spot, TOKEN, X0 } from "./parts";
 
-/** The model, a plain box between what it reads and what it returns. */
-const PLAIN = `color-mix(in srgb, ${ds("gray", 400)} 22%, ${PAPER})`;
-const BOX = { x: 330, y: 470, w: 300, h: 150 };
+/**
+ * The model: a pen-and-ink drawing of a printing press (llm-tokens-model; the
+ * owner picked it from three candidates, 2026-11-20) with its
+ * label under it, in place of the plain gray box (the owner, 2026-11-13: "remove
+ * the gray box and use the image along with the model label", with clear
+ * horizontal space between the arrows, the drawing and the label). The
+ * press's feed and delivery trays sit about 40% of the way down it, so it is
+ * hung with that height on the arrows' line. 300 wide is 600 device pixels at
+ * 4K, inside the art's 1536x911.
+ */
+const MODEL = { x: 332, w: 300, aspect: 911 / 1536, portY: 0.4 };
+/** Clear space between an arrow's tip or tail and the drawing. */
+const GAP = 26;
 /** The context it reads: one token, the lesson's toy loop's first. */
 const CTX = { x: X0, y: 520 };
 /** The next-token table: one row per token, bars to scale. */
@@ -48,6 +58,9 @@ export const ModelScene: React.FC = () => {
   const rest = Math.round((1 - SHOWN_SUM) * 100) / 100;
   const boxIn = ease(frame, hookFrom + 2, 14);
   const think = pulse(frame, takesAt + 8, 22) + pulse(frame, probAt - 6, 18);
+  const lineY = y(CTX.y) + 24;
+  const modelH = MODEL.w * MODEL.aspect;
+  const modelTop = lineY - modelH * MODEL.portY;
 
   return (
     <AbsoluteFill>
@@ -81,31 +94,43 @@ export const ModelScene: React.FC = () => {
         <div style={{ position: "absolute", left: CTX.x, top: y(CTX.y), opacity: ease(frame, hookFrom + 4, 12) }}>
           <ChipFace text="the" size={32} />
         </div>
-        {/* From the chip's right edge (3 characters at 0.6em, its padding) to the box's left. */}
-        <Arrow from={[CTX.x + 84, y(CTX.y) + 24]} to={[BOX.x - 1, y(CTX.y) + 24]} at={takesAt - 4} dur={12} />
+        {/* From the chip's right edge (3 characters at 0.6em, its padding) to just short of the drawing. */}
+        <Arrow from={[CTX.x + 84, lineY]} to={[MODEL.x - GAP, lineY]} at={takesAt - 4} dur={12} />
 
-        {/* The model. */}
+        {/* The model: the drawing, swelling a little while it works, and its name under it. */}
+        {ILLUSTRATIONS ? (
+          <Illustration
+            video={VIDEO}
+            id="llm-tokens-model"
+            style={{
+              position: "absolute",
+              left: MODEL.x,
+              top: modelTop,
+              width: MODEL.w,
+              height: modelH,
+              opacity: boxIn,
+              transform: `scale(${0.96 + boxIn * 0.04 + think * 0.02})`,
+            }}
+          />
+        ) : null}
+        {/* In the sans face, at the size of the "the" chip on its line (the
+            owner, 2026-11-13: "use a sans-serif font for the language
+            model"). */}
         <div
           style={{
             position: "absolute",
-            left: BOX.x,
-            top: y(BOX.y),
-            width: BOX.w,
-            height: h(BOX.h),
-            boxSizing: "border-box",
-            borderRadius: 8,
-            // A plain item: neutral gray, warming to the token blue while it works.
-            background: `color-mix(in srgb, ${TOKEN} ${Math.round(think * 16)}%, ${PLAIN})`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: boxIn,
-            transform: `scale(${0.96 + boxIn * 0.04 + think * 0.02})`,
+            left: MODEL.x,
+            top: modelTop + modelH + 14,
+            width: MODEL.w,
+            textAlign: "center",
+            ...note(32, INK),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, modelAt - 2, 12),
           }}
         >
-          <span style={{ ...body(34), color: INK, opacity: ease(frame, modelAt - 2, 12) }}>language model</span>
+          language model
         </div>
-        <Arrow from={[BOX.x + BOX.w + 1, y(CTX.y) + 24]} to={[BARS.x - 6, y(CTX.y) + 24]} at={probAt - 6} dur={12} />
+        <Arrow from={[MODEL.x + MODEL.w + GAP, lineY]} to={[BARS.x - 6, lineY]} at={probAt - 6} dur={12} />
 
         {/* What it returns: a probability for every token. */}
         <Note at={probAt - 2} x={BARS.x} y={rowY(0) - 50}>

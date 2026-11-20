@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { FigLabel, Ink, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -150,14 +150,30 @@ const ContentsPage: React.FC<{ x: number; top: number; width: number; height: nu
   );
 };
 
-/** One word of the course's fifteen-word text, as a monospace chip. */
-const WordChip: React.FC<{ x: number; y: number; w: number; text: string; at: number; tone?: string; toneAt?: number; lift?: number }> = ({
+/**
+ * One word of the course's fifteen-word text, as a monospace chip. Its text
+ * is in the ink of the hue behind it (the owner, 2026-11-13: "make sure that
+ * the text color of each badge has a similar hue as the background"): the
+ * gray badge's ink on the plain fill, turning to `toneInk` as `tone` washes in.
+ */
+const WordChip: React.FC<{
+  x: number;
+  y: number;
+  w: number;
+  text: string;
+  at: number;
+  tone?: string;
+  toneInk?: string;
+  toneAt?: number;
+  lift?: number;
+}> = ({
   x,
   y,
   w,
   text,
   at,
   tone,
+  toneInk,
   toneAt,
   lift = 0,
 }) => {
@@ -165,6 +181,8 @@ const WordChip: React.FC<{ x: number; y: number; w: number; text: string; at: nu
   const p = ease(frame, at, 10);
   if (p <= 0) return null;
   const t = tone && toneAt !== undefined ? ease(frame, toneAt, 10) : 0;
+  const plainInk = outlineInk("gray");
+  const color = t > 0 && toneInk ? `color-mix(in srgb, ${toneInk} ${(t * 100).toFixed(1)}%, ${plainInk})` : plainInk;
   return (
     <div
       style={{
@@ -183,7 +201,7 @@ const WordChip: React.FC<{ x: number; y: number; w: number; text: string; at: nu
         justifyContent: "center",
         fontFamily: MONO,
         fontSize: 26,
-        color: INK,
+        color,
       }}
     >
       {t > 0 ? <div style={{ position: "absolute", inset: 0, background: tone, opacity: 0.22 * t, borderRadius: 5 }} /> : null}
@@ -385,6 +403,7 @@ export const ShannonScene: React.FC = () => {
             text={w}
             at={demoAt + i * 2}
             tone={isThe ? ds("yellow", 500) : isNext ? COLOR[w] : undefined}
+            toneInk={isThe ? outlineInk("yellow") : isNext ? INK_OF[w] : undefined}
             toneAt={isThe || isNext ? afterAt + 4 + k * 5 : undefined}
             lift={isNext ? 4 * pulse(frame, afterAt + 6 + k * 5, 14) : 0}
           />
@@ -406,7 +425,8 @@ export const ShannonScene: React.FC = () => {
       {/* The tally after "the", and the guess. */}
       <Ink at={afterAt - 2} style={{ left: 96, top: TALLY_Y + 8, whiteSpace: "nowrap" }}>
         <div style={{ ...label(26, INK), display: "flex", alignItems: "center", gap: 14 }}>
-          After <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 500, background: `color-mix(in srgb, ${ds("yellow", 500)} 30%, transparent)`, padding: "2px 10px", borderRadius: 4 }}>the</span>
+          {/* The yellow badge's text in the yellow ink (the owner, 2026-11-13). */}
+          After <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 500, color: outlineInk("yellow"), background: `color-mix(in srgb, ${ds("yellow", 500)} 30%, transparent)`, padding: "2px 10px", borderRadius: 4 }}>the</span>
         </div>
       </Ink>
       {tallyOrder.map((w, r) => {

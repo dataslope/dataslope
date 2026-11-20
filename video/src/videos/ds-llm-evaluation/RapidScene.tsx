@@ -192,8 +192,21 @@ export const RapidScene: React.FC = () => {
         <Note at={practice[0].at - 6} x={X0} y={y(450)}>
           <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>To practice</span>
         </Note>
+        {/* The bank turns to a green house badge on its cue, where it was
+            washed in the highlighter (the owner, 2026-11-13: "use a light
+            green background and green text for the '110 multiple-choice
+            questions' badge"). */}
         {practice.map((p, i) => (
-          <Tag key={p.text} x={X0} y={y(500) + i * h(74)} at={p.at - 2} size={28} tone="blue" lit={i === 2 ? workAt : undefined}>
+          <Tag
+            key={p.text}
+            x={X0}
+            y={y(500) + i * h(74)}
+            at={p.at - 2}
+            size={28}
+            tone="blue"
+            turn={i === 2 ? "green" : undefined}
+            turnAt={i === 2 ? workAt : undefined}
+          >
             {p.text}
           </Tag>
         ))}

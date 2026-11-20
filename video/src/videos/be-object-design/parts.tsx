@@ -6,7 +6,7 @@ import { bob, drift, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Ink, outlineInk, type OutlineTone } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -171,15 +171,21 @@ export const Strike: React.FC<{ at: number; color?: string; top?: string; childr
 // ── Boxes and arrows ─────────────────────────────────────────────────────────
 
 /** What a box is: data (blue), the right answer (green), the trap (red), the
- *  thing the narration points at (yellow), or plain ink (a class, a part). */
+ *  thing the narration points at (yellow), or plain ink (a class, a part).
+ *  `line` is the tone's hue (a needle, a dashed edge); `edge` is the border a
+ *  solid box draws in it. A tinted box draws none (the owner, 2026-11-13:
+ *  "remove the borders around each badge"): its tint is the shape, as on
+ *  the house badge. Only a plain box keeps its ink outline. */
 export type Tone = "data" | "ok" | "bad" | "plain" | "look";
-const TONE: Record<Tone, { line: string; fill: string; ink: string }> = {
-  data: { line: BAR, fill: `color-mix(in srgb, ${BAR} 10%, ${PAPER})`, ink: BLUE_INK },
-  ok: { line: OK, fill: `color-mix(in srgb, ${OK} 12%, ${PAPER})`, ink: OK_INK },
-  bad: { line: ACCENT, fill: `color-mix(in srgb, ${ACCENT} 10%, ${PAPER})`, ink: ACCENT_INK },
-  plain: { line: INK, fill: PAPER, ink: INK },
-  look: { line: ds("yellow", 600), fill: `color-mix(in srgb, ${ds("yellow", 400)} 30%, ${PAPER})`, ink: INK },
+const TONE: Record<Tone, { line: string; edge: string; fill: string; ink: string }> = {
+  data: { line: BAR, edge: "transparent", fill: `color-mix(in srgb, ${BAR} 10%, ${PAPER})`, ink: BLUE_INK },
+  ok: { line: OK, edge: "transparent", fill: `color-mix(in srgb, ${OK} 12%, ${PAPER})`, ink: OK_INK },
+  bad: { line: ACCENT, edge: "transparent", fill: `color-mix(in srgb, ${ACCENT} 10%, ${PAPER})`, ink: ACCENT_INK },
+  plain: { line: INK, edge: INK, fill: PAPER, ink: INK },
+  look: { line: ds("yellow", 600), edge: "transparent", fill: `color-mix(in srgb, ${ds("yellow", 400)} 30%, ${PAPER})`, ink: INK },
 };
+/** Each tone's hue as an outlined badge's (editorial/ui.tsx). */
+const OUTLINE: Record<Tone, OutlineTone> = { data: "blue", ok: "green", bad: "red", plain: "ink", look: "yellow" };
 export const toneInk = (t: Tone) => TONE[t].ink;
 export const toneLine = (t: Tone) => TONE[t].line;
 export const toneFill = (t: Tone) => TONE[t].fill;
@@ -192,7 +198,7 @@ export const toneAt = (frame: number, tone: Tone, tones: readonly (readonly [num
     const k = ease(frame, at, 12);
     if (k <= 0) continue;
     const mix = (u: string, v: string) => (k >= 1 ? v : `color-mix(in srgb, ${v} ${Math.round(k * 100)}%, ${u})`);
-    c = { line: mix(c.line, TONE[t].line), fill: mix(c.fill, TONE[t].fill), ink: mix(c.ink, TONE[t].ink) };
+    c = { line: mix(c.line, TONE[t].line), edge: mix(c.edge, TONE[t].edge), fill: mix(c.fill, TONE[t].fill), ink: mix(c.ink, TONE[t].ink) };
   }
   return c;
 };
@@ -200,7 +206,10 @@ export const toneAt = (frame: number, tone: Tone, tones: readonly (readonly [num
 /**
  * A box: a class, a part or a stage. It pops in on `at`, with a title and an
  * optional line under it. `tone` may change while it is up (`tones`). `lit` swells its border
- * for a box the narration names again.
+ * for a box the narration names again. A solid tinted box has no border
+ * (TONE's `edge`); a dashed one keeps its dashes in the tone's hue, and
+ * `framed` keeps a solid one's too. `outline` draws the outlined badge
+ * instead: no fill, a 2px border and the title in the tone's ink.
  */
 export const Box: React.FC<{
   x: number;
@@ -220,17 +229,25 @@ export const Box: React.FC<{
   out?: number;
   lit?: number;
   dashed?: boolean;
+  /** Keep a tinted solid box's border in its hue (a door on a shell, not a badge). */
+  framed?: boolean;
+  /** The outlined badge: no fill, a 2px border and title in the tone's ink. */
+  outline?: boolean;
   align?: "center" | "left";
   radius?: number;
   children?: React.ReactNode;
-}> = ({ x, y, w, h, at, title, sub, tone = "plain", tones = [], size = 25, subSize = 21, dim, undim, out, lit = 0, dashed, align = "center", radius = 8, children }) => {
+}> = ({ x, y, w, h, at, title, sub, tone = "plain", tones = [], size = 25, subSize = 21, dim, undim, out, lit = 0, dashed, framed, outline, align = "center", radius = 8, children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.62 * (undim === undefined ? 1 : 1 - ease(frame, undim, 14));
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0.001 || o >= 1) return null;
-  const c = toneAt(frame, tone, tones);
+  const t = toneAt(frame, tone, tones);
+  const c = outline ? { ...t, fill: "transparent", ink: outlineInk(OUTLINE[tone]) } : t;
+  const border = outline
+    ? `${2 + 2 * lit}px solid ${c.ink}`
+    : `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${dashed || framed ? c.line : c.edge}`;
   return (
     <div
       style={{
@@ -240,7 +257,7 @@ export const Box: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        border: `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${c.line}`,
+        border,
         borderRadius: radius,
         background: c.fill,
         display: "flex",

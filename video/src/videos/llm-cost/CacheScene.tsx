@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -164,7 +164,8 @@ export const CacheScene: React.FC = () => {
           fontFamily: MONO,
           fontSize: 20,
           fontWeight: 500,
-          color: INK,
+          // Red text on its red tint (the owner, 2026-11-13).
+          color: outlineInk("red"),
           opacity: ease(frame, stampAt, 12),
           transform: `translateY(${(1 - ease(frame, stampAt, 14)) * -30}px)`,
           whiteSpace: "nowrap",
@@ -245,7 +246,8 @@ export const CacheScene: React.FC = () => {
           opacity: ease(frame, tenthAt, 10),
         }}
       >
-        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>a tenth</span>
+        {/* Blue text on its blue tint (the owner, 2026-11-13). */}
+        <span style={{ ...label(21, outlineInk("blue")), whiteSpace: "nowrap" }}>a tenth</span>
       </div>
       <Note at={twentiethAt + 2} x={PRICE_X + FULL_W * CACHE_FRACTION.sonnet + 130} y={y(PRICE_ROW_Y[1]) + h(16) - 16}>
         <span style={{ ...note(25, CACHED_INK), fontWeight: 500, whiteSpace: "nowrap" }}>a twentieth</span>

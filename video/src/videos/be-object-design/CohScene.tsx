@@ -187,7 +187,10 @@ export const CohScene: React.FC = () => {
                 height: GOD.rowH,
                 boxSizing: "border-box",
                 borderRadius: 6,
-                border: `2.5px solid color-mix(in srgb, ${c.line} ${Math.round(Math.max(split, i === EMAIL ? emailRed : 0) * 100)}%, transparent)`,
+                // No border round a job, only its tint (the owner, 2026-11-13:
+                // "remove the borders around each badge"); the width stays so
+                // the row keeps its size.
+                border: "2.5px solid transparent",
                 background: `color-mix(in srgb, ${c.fill} ${Math.round(Math.max(split, i === EMAIL ? emailRed : 0) * 100)}%, transparent)`,
                 borderBottom: split < 0.5 && i < 4 && !(i === EMAIL && emailRed > 0.5) ? `1px solid color-mix(in srgb, ${INK} 25%, transparent)` : undefined,
                 display: "flex",

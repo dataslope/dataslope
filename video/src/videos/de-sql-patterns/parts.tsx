@@ -180,7 +180,12 @@ export const DayStrip: React.FC<{
   /** Missing cells take a solid fill from this frame (a spine has filled them). */
   solidAt?: number;
   valueSize?: number;
-}> = ({ g, days, at, step = 2, out, fills = [], marks = [], spans = [], solidAt, valueSize = 26 }) => {
+  /** Present days as the tint alone, no blue edge (the owner, 2026-11-13, on
+   *  the opening's strip: "Remove the blue borders around blue hollow
+   *  boxes"). The edge goes transparent rather than away, so a cell keeps
+   *  its size and a mark's edge still draws in over it. */
+  bare?: boolean;
+}> = ({ g, days, at, step = 2, out, fills = [], marks = [], spans = [], solidAt, valueSize = 26, bare }) => {
   const frame = useCurrentFrame();
   const { h } = useLayout();
   const gone = out === undefined ? 0 : ease(frame, out, 10);
@@ -197,7 +202,7 @@ export const DayStrip: React.FC<{
         const tints = marks
           .filter((m) => m.index === i)
           .map((m) => ({ m, w: ease(frame, m.at, 12) * (m.out === undefined ? 1 : 1 - ease(frame, m.out, 10)) }));
-        const baseEdge = d.present || solid > 0.5 ? BAR : INK_SOFT;
+        const baseEdge = d.present || solid > 0.5 ? (bare ? "transparent" : BAR) : INK_SOFT;
         const edged = tints.filter((t) => t.m.edge && t.w > 0).pop();
         const edge = edged ? `color-mix(in srgb, ${edged.m.edge} ${Math.round(edged.w * 100)}%, ${baseEdge})` : baseEdge;
         return (

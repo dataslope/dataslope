@@ -106,7 +106,7 @@ export const CaseScene: React.FC = () => {
         {/* Fig. 6: six cased words fold into two. */}
         <FigLabel n="6" title="Six strings, lowercased" at={from} x={X0} y={y(FIG_Y)} />
         {CASE.words.map((w, i) => (
-          <Chip key={`s${i}`} text={w} x={X0} y={rowY(i)} at={appearAt[i]} size={SIZE} gone={foldingAt + i * 2} />
+          <Chip look="tinted" key={`s${i}`} text={w} x={X0} y={rowY(i)} at={appearAt[i]} size={SIZE} gone={foldingAt + i * 2} />
         ))}
         {CASE.words.map((w, i) => {
           const m = ease(frame, foldingAt + i * 2, 20);
@@ -117,6 +117,7 @@ export const CaseScene: React.FC = () => {
           const first = group.indexOf(g) === i;
           return (
             <Chip
+              look="tinted"
               key={`m${i}`}
               opacity={first ? 1 : 1 - ease(frame, foldingAt + i * 2 + 6, 10)}
               text={w}
@@ -152,10 +153,10 @@ export const CaseScene: React.FC = () => {
           const mid = top + chipH / 2;
           return (
             <React.Fragment key={r.word}>
-              <Chip text={r.word} x={FIG7_X} y={top} at={names[i]} size={SIZE} />
+              <Chip look="tinted" text={r.word} x={FIG7_X} y={top} at={names[i]} size={SIZE} />
               {/* From this word's own chip to the lowercased one, touching both. */}
               <Arrow from={[FIG7_X + chipWidth(r.word, SIZE) + 2, mid]} to={[lowX - 2, mid]} at={becomes[i]} />
-              <Chip text={r.lower} x={lowX} y={top} at={becomes[i] + 4} size={SIZE} tones={[{ at: results[i], tone: "bad" }]} />
+              <Chip look="tinted" text={r.lower} x={lowX} y={top} at={becomes[i] + 4} size={SIZE} tones={[{ at: results[i], tone: "bad" }]} />
               <Ink at={names[i] + 6} dur={14} style={{ left: glossX, top: top - 2, whiteSpace: "nowrap" }}>
                 <span style={note(22, INK_SOFT)}>{r.before}</span>
               </Ink>

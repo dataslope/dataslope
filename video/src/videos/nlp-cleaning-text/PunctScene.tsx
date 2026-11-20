@@ -205,6 +205,7 @@ export const PunctScene: React.FC = () => {
         {rows.map((r, k) =>
           r.map((t, i) => (
             <Chip
+              look="tinted"
               key={`${k}-${i}`}
               text={t}
               x={layouts[k][i].x}

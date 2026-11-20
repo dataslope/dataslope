@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, body, label, note } from "../../editorial/style";
+import { HAIRLINE, HIGHLIGHT, INK, INK_SOFT, body, label, note } from "../../editorial/style";
 import { Badge, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -277,13 +277,16 @@ export const PromptScene: React.FC = () => {
                   </div>
                   {/* The parts open a line under the name as they ink in, so
                       the name rises to make room and the two stay centred in
-                      the row together. */}
+                      the row together. In ink, with more air above (the
+                      owner, 2026-11-13: "Use black text for 'Parts n...'
+                      under each title. Add more top spacing"; they were blue,
+                      6px under the name). */}
                   <div
                     style={{
-                      ...label(21, BLUE_INK),
+                      ...label(21, INK),
                       lineHeight: "26px",
                       height: 26 * partsIn(i),
-                      marginTop: 6 * partsIn(i),
+                      marginTop: 12 * partsIn(i),
                       overflow: "hidden",
                       whiteSpace: "nowrap",
                       opacity: partsIn(i),
@@ -340,7 +343,9 @@ export const PromptScene: React.FC = () => {
         ) : null}
         <div style={{ position: "absolute", left: DESIGN_X + 6, top: designTop, width: 1900 - DESIGN_X }}>
           <div style={{ ...body(32, true), color: INK, whiteSpace: "nowrap", opacity: ease(frame, designAt - 2, 12) }}>Design a pipeline for X</div>
-          <div style={{ ...label(21, BLUE_INK), marginTop: 8, opacity: ease(frame, elevenAt - 2, 12) }}>
+          {/* In ink and with the same air above as the layers' parts (the
+              owner, 2026-11-13). */}
+          <div style={{ ...label(21, INK), marginTop: 12, opacity: ease(frame, elevenAt - 2, 12) }}>
             <PartsLabel parts={[partOf("de-pipelines-for-ai")]} /> walks one through
           </div>
         </div>

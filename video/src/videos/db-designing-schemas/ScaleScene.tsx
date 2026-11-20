@@ -39,9 +39,12 @@ for (const r of WIDE_ROWS) if (r[EMAIL] !== null) emailCounts.set(r[EMAIL]!, (em
 const [COPIED_EMAIL, EMAIL_ROWS] = [...emailCounts].sort((a, b) => b[1] - a[1])[0];
 const NULLS = WIDE_ROWS.flat().filter((v) => v === null).length;
 
-/** The spread chips, then crammed edge to edge where the wide table's header goes. */
+/** The spread chips, then crammed together where the wide table's header goes.
+ *  Crammed, they keep a gap (the owner, 2026-11-13: "increase spacing between
+ *  the badges"): outlined, two borders touching read as one double rule. */
 const CHIP_W = 200;
 const CHIP_PITCH = 300;
+const CRAMMED_PITCH = 220;
 
 /**
  * The close, after design-and-scale: the store's tables, then the whole store
@@ -125,10 +128,12 @@ export const ScaleScene: React.FC = () => {
         const cram = ease(frame, crammAt - 2, 18);
         const gone = ease(frame, wideAt - 16, 10);
         if (inP <= 0 || gone >= 1) return null;
-        const x = STRIP_X + k * (CHIP_PITCH + (CHIP_W - CHIP_PITCH) * cram);
+        const x = STRIP_X + k * (CHIP_PITCH + (CRAMMED_PITCH - CHIP_PITCH) * cram);
         return (
           <div key={t} style={{ position: "absolute", left: x, top: stripTop + 5, opacity: inP * (1 - gone), transform: `translateY(${(1 - inP) * 12}px)` }}>
-            <Chip width={CHIP_W}>{t}</Chip>
+            <Chip width={CHIP_W} outline="clear">
+              {t}
+            </Chip>
           </div>
         );
       })}

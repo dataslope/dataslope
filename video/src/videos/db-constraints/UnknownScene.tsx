@@ -101,6 +101,7 @@ export const UnknownScene: React.FC = () => {
       <FigLabel n="13" title="A missing price, and what stops it" at={open - 4} x={X0} y={y(FIG_Y)} />
       <Entity layout={card} at={open - 2} marks={{ price: { at: outAt, out: testOut } }} />
       <TypeMark layout={card} row="price" at={numericAt - 2} />
+      {/* Outlined, syntax colors kept (the owner, 2026-11-13). */}
       <RuleTags
         layout={card}
         row="price"

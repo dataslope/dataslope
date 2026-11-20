@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { badgeStyle, Ink, type Pt } from "../../editorial/ui";
+import { badgeStyle, Ink, outlineBadgeStyle, type Pt } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -197,17 +197,22 @@ export const Strike: React.FC<{ at: number; color?: string; top?: string; childr
  * A tag ("PK", "FK", "UNIQUE", "parent"): the house badge (editorial/ui), a
  * light tint of its hue in that hue's ink, no border. `color` picks the hue:
  * the key blue, the accent red, or gray for anything in the plain ink.
+ * `outline` draws it with no fill, a 2px border and text in that hue's ink
+ * (near-black for the plain ink), the same outer box (the owner, 2026-11-13).
  */
-export const Tag: React.FC<{ children: React.ReactNode; color?: string; size?: number; mono?: boolean }> = ({
+export const Tag: React.FC<{ children: React.ReactNode; color?: string; size?: number; mono?: boolean; outline?: boolean }> = ({
   children,
   color = KEY_INK,
   size = 19,
   mono = false,
+  outline = false,
 }) => (
   <span
     style={{
       ...label(size),
-      ...badgeStyle(color === KEY_INK ? "blue" : color === ACCENT_INK ? "red" : "gray", size),
+      ...(outline
+        ? outlineBadgeStyle(color === KEY_INK ? "blue" : color === ACCENT_INK ? "red" : "ink", size)
+        : badgeStyle(color === KEY_INK ? "blue" : color === ACCENT_INK ? "red" : "gray", size)),
       fontFamily: mono ? MONO : label(size).fontFamily,
     }}
   >
