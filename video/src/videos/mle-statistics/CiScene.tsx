@@ -115,7 +115,8 @@ export const CiScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is a confidence interval, really?
+          What is a <Mark at={n.word("q4", "confidence interval, really?")}>confidence interval</Mark>,{" "}
+          <Mark at={n.word("q4", "really?")}>really</Mark>?
         </QuestionCard>
 
         {/* ── A procedure ── */}

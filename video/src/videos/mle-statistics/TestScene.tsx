@@ -112,10 +112,11 @@ export const TestScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} out={out} size={60}>
-          What exactly is a p-value?
+          What exactly is a <Mark at={n.word("q6", "exactly is a p-value?")}>p-value</Mark>?
         </QuestionCard>
         <QuestionCard n={7} at={q7At} textAt={q7TextAt - 2} size={60}>
-          What is hypothesis testing, and what are its steps?
+          What is <Mark at={n.word("q7", "hypothesis testing, and")}>hypothesis testing</Mark>, and what are{" "}
+          <Mark at={n.word("q7", "its steps?")}>its steps</Mark>?
         </QuestionCard>
 
         {/* ── Question 6: the p-value as an area ── */}

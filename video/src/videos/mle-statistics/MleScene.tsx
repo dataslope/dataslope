@@ -72,7 +72,7 @@ export const MleScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={11} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is Maximum Likelihood Estimation (MLE)?
+          What is <Mark at={n.word("q11", "maximum likelihood estimation?")}>Maximum Likelihood Estimation</Mark> (MLE)?
         </QuestionCard>
         <Line at={pickAt} x={X0} y={y(282)} size={28}>
           Pick the parameters that make the observed data{" "}

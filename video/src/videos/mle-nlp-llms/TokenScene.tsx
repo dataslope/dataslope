@@ -233,8 +233,8 @@ export const TokenScene: React.FC = () => {
                   {w}
                 </span>
               </div>
-              <Flow points={[[COL.words + 208, rowY(i) + 17], [COL.words + 250, rowY(i) + 17]]} at={toUnknown} dur={8} head={10} width={2} />
-              <Chip x={COL.words + 262} y={rowY(i)} at={toUnknown + 4} tone="red" size={21}>
+              <Flow points={[[COL.words + 224, rowY(i) + 17], [COL.words + 266, rowY(i) + 17]]} at={toUnknown} dur={8} head={10} width={2} />
+              <Chip x={COL.words + 278} y={rowY(i)} at={toUnknown + 4} tone="red" size={21}>
                 unknown
               </Chip>
             </React.Fragment>

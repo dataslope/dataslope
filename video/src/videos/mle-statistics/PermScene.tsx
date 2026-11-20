@@ -118,7 +118,7 @@ export const PermScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is a permutation test?
+          What is a <Mark at={n.word("q8", "a permutation test?")}>permutation test</Mark>?
         </QuestionCard>
 
         {/* ── The page's two groups, shuffled ── */}

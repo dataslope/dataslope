@@ -108,10 +108,12 @@ export const CltScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={2} at={qAt - 4} textAt={textAt - 4} out={q2Out} size={60}>
-          What does the Central Limit Theorem say, and why does it matter?
+          What does the <Mark at={n.word("q2", "Central Limit Theorem")}>Central Limit Theorem</Mark> say, and{" "}
+          <Mark at={n.word("q2", "why does it matter?")}>why does it matter</Mark>?
         </QuestionCard>
         <QuestionCard n={3} at={q3At} textAt={q3TextAt - 2} size={60}>
-          What is the Law of Large Numbers, and how is it different from the CLT?
+          What is the <Mark at={n.word("q3", "Law of Large Numbers")}>Law of Large Numbers</Mark>, and how is it different from the{" "}
+          <Mark at={n.word("q3", "CLT?", { nth: 1 })}>CLT</Mark>?
         </QuestionCard>
 
         {/* ── The theorem, in a line and a half ── */}

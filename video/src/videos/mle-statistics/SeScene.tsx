@@ -109,7 +109,8 @@ export const SeScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={1} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is the difference between standard deviation and standard error?
+          What is the difference between <Mark at={n.word("q1", "standard deviation and standard error", { nth: 1 })}>standard deviation</Mark> and{" "}
+          <Mark at={n.word("q1", "standard error?")}>standard error</Mark>?
         </QuestionCard>
 
         {/* ── Left: the standard deviation ── */}

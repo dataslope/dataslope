@@ -59,8 +59,16 @@ const Row: React.FC<{ top: number; slot: number; from: readonly number[]; at: nu
         );
       })}
       {from.map((j, k) => {
-        const side = j < slot ? -1 : 1;
-        const off = side * (10 + 18 * (Math.abs(j - slot) - 1));
+        // Ends spread across the slot so no arrow crosses another: the nearest
+        // source lands at the slot's outer edge, farther ones nearer its middle
+        // (or, with every source on one side, across its whole width).
+        const half = widths[slot] / 2 - 8;
+        const same = from.filter((f) => (f < slot) === (j < slot)).sort((a, b) => Math.abs(a - slot) - Math.abs(b - slot));
+        const rank = same.indexOf(j);
+        const oneSide = from.every((f) => f < slot) || from.every((f) => f > slot);
+        const span = oneSide ? [half, -half] : [half, 6];
+        const t = same.length > 1 ? rank / (same.length - 1) : 0;
+        const off = (j < slot ? -1 : 1) * (span[0] + (span[1] - span[0]) * t);
         const up = lift + Math.abs(j - slot) * 12;
         return (
           <Flow

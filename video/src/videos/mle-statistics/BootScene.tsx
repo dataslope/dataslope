@@ -119,7 +119,8 @@ export const BootScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={5} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is bootstrapping, and when do you use it?
+          What is <Mark at={n.word("q5", "bootstrapping, and")}>bootstrapping</Mark>, and{" "}
+          <Mark at={n.word("q5", "when do you use it?")}>when do you use it</Mark>?
         </QuestionCard>
 
         {/* ── Left: ten points, resampled ── */}

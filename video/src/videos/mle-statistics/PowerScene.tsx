@@ -128,7 +128,8 @@ export const PowerScene: React.FC = () => {
       <Drift from={from} to={end + 40}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.5 * ease(frame, trustedAt, Math.max(60, rightOneAt + 20 - trustedAt)) }}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What are Type I and Type II errors, and what is power?
+          What are <Mark at={n.word("q9", "type one and type two errors")}>Type I and Type II errors</Mark>, and what is{" "}
+          <Mark at={n.word("q9", "what is power?")}>power</Mark>?
         </QuestionCard>
 
         {/* ── The two worlds ── */}

@@ -74,7 +74,7 @@ export const BayesScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={12} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is Bayes&apos; theorem?
+          What is <Mark at={n.word("q12", "Bayes' theorem?")}>Bayes&apos; theorem</Mark>?
         </QuestionCard>
 
         {/* ── The theorem: lower and larger while it is alone on the page,

@@ -106,14 +106,21 @@ export const ContextScene: React.FC = () => {
           {ease(frame, bankAt + 4, 10) > 0 ? (
             <circle cx={px(0, STATIC_BANK[0])} cy={py(STATIC_BANK[1])} r={11} fill={INK} opacity={ease(frame, bankAt + 4, 10)} />
           ) : null}
-          {/* On "attention": each contextual bank drawn from the words around it. */}
+          {/* On "attention": each contextual bank drawn from a word around it,
+              one each, approached from the side away from the word's label. */}
           {BANKS.map((b, i) =>
-            (i === 0 ? RIVER.slice(0, 2) : MONEY.slice(0, 2)).map(([word, u, v], k) => {
+            (i === 0 ? [RIVER[1]] : [MONEY[0]]).map(([word, u, v], k) => {
               const p = ease(frame, attnAt + i * 6 + k * 3, 12);
               if (p <= 0) return null;
               const x1 = px(1, b.at[0]);
               const y1 = py(b.at[1]);
-              return <line key={`${i}-${word}`} x1={x1} y1={y1} x2={x1 + (px(1, u) - x1) * p} y2={y1 + (py(v) - y1) * p} stroke={GOLD} strokeWidth={2.4} />;
+              // Stop short of both dots, so the line never runs into a dot or its label.
+              const dx = px(1, u) - x1;
+              const dy = py(v) - y1;
+              const len = Math.hypot(dx, dy);
+              const a = 16 / len;
+              const z = a + (1 - 2 * a) * p;
+              return <line key={`${i}-${word}`} x1={x1 + dx * a} y1={y1 + dy * a} x2={x1 + dx * z} y2={y1 + dy * z} stroke={GOLD} strokeWidth={2.4} />;
             }),
           )}
           {/* Contextual: one point per occurrence, each into its own sense. */}

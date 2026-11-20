@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { SELECTION } from "./data";
-import { BAD, BAD_INK, DATA, Drift, Heading, Line, MUTED, mulberry32, OK, OK_INK, pulse, Spot, Svg, X0 } from "./parts";
+import { BAD, BAD_INK, DATA, Drift, Heading, Line, Mark, MUTED, mulberry32, OK, OK_INK, pulse, Spot, Svg, X0 } from "./parts";
 
 const COLS = 25;
 const ROWS = 16;
@@ -116,7 +116,7 @@ export const BiasScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is selection (sampling) bias?
+          What is <Mark at={n.word("q10", "What is selection bias?")}>selection (sampling) bias</Mark>?
         </QuestionCard>
 
         <Line at={sampleAt} x={X0} y={y(282)} size={28}>

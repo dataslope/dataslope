@@ -341,7 +341,8 @@ export const RapidScene: React.FC = () => {
 
   const from = n.beat("rapid-in").from;
   const fiveAt = n.word("rapid-in", "Five more");
-  const end = n.beat("r-eval").to + 30;
+  // Past the cut into the bridge, so the last answer stays up until the scene goes.
+  const end = n.beat("next").from + 30;
 
   const items: RapidItem[] = [
     { n: 15, label: "Embeddings beyond the input", beat: "r-beyond", body: <Beyond c={c} /> },
