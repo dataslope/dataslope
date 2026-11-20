@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO, SANS } from "../../theme/fonts";
 import { BY_ORDER, money } from "./data";
-import { DataTable, Drift, Flow, Mono, noteLine, OK_INK, TableName, tableGeometry, X0 } from "./parts";
+import { DataTable, Drift, Flow, Mark, Mono, noteLine, OK_INK, TableName, tableGeometry, X0 } from "./parts";
 
 const COLS_Y = 290;
 const COL_W = 500;
@@ -101,8 +101,11 @@ export const EntitiesScene: React.FC = () => {
     },
   ];
   const triadAt = n.word("entities-dbt", "That triad is LookML's");
+  const originalAt = n.word("entities-dbt", "the original MetricFlow spec's");
+  const currentAt = n.word("entities-dbt", "In dbt's current spec");
   const foldedAt = n.word("entities-dbt", "the measure is folded into a simple metric");
   const declaredAt = n.word("entities-run", "Declared on the page's two tables");
+  const entitiesRunAt = n.beat("entities-run").from;
   const revenueAt = n.word("entities-run", "revenue lives on orders");
   const unitsOnAt = n.word("entities-run", "units on items");
   const askAt = n.word("entities-run", "Ask for both by order");
@@ -153,7 +156,15 @@ export const EntitiesScene: React.FC = () => {
           <React.Fragment key={c.title}>
             {i > 0 ? <ColumnRule x={colX(i) - COL_GAP / 2} top={colsTop + 4} height={h(118)} at={c.at} /> : null}
             <Ink at={c.at - 2} dur={14} style={{ left: colX(i), top: colsTop }}>
-              <div style={{ ...label(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{c.title}</div>
+              <div style={{ ...label(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+                {i === 2 ? (
+                  <Mark at={currentAt} out={entitiesRunAt}>
+                    {c.title}
+                  </Mark>
+                ) : (
+                  c.title
+                )}
+              </div>
             </Ink>
             <Ink at={c.lineAt} dur={14} style={{ left: colX(i), top: colsTop + h(46) }}>
               <div style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>{c.line}</div>
@@ -170,7 +181,10 @@ export const EntitiesScene: React.FC = () => {
 
         {/* ── Whose triad it is, and where dbt puts the measure now ── */}
         <Ink at={triadAt} dur={14} style={{ left: X0, top: colsTop + h(146) }}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>LookML&rsquo;s triad, and the original MetricFlow spec&rsquo;s</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            LookML&rsquo;s triad
+            <span style={{ opacity: ease(frame, originalAt, 12) }}>, and the original MetricFlow spec&rsquo;s</span>
+          </span>
         </Ink>
         <Ink at={foldedAt} dur={14} style={{ left: colX(2), top: colsTop + h(146) }}>
           <span style={{ ...note(22, BLUE_INK), whiteSpace: "nowrap" }}>In dbt today: inside a simple metric</span>

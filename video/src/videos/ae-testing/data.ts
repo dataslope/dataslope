@@ -54,7 +54,7 @@ const test = (figure: string, id: string): Test => {
 /** The rows a setup inserted into `name`, as printed cells, read from the
  *  setup SQL that ran (results.json), so the figure's inputs are the run's. */
 const inserted = (setup: string, name: string): string[][] => {
-  const m = setup.match(new RegExp(`INSERT INTO ${name} VALUES ([^;]*);`));
+  const m = setup.match(new RegExp(`INSERT INTO ${name} VALUES\\s+([^;]*);`));
   if (!m) throw new Error(`the setup inserts nothing into ${name}`);
   return [...m[1].matchAll(/\(([^()]*)\)/g)].map((t) => t[1].split(",").map((v) => v.trim().replace(/^'|'$/g, "")));
 };

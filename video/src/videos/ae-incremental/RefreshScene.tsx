@@ -52,7 +52,9 @@ const RunFlow: React.FC<{ x: number; top: number; at: number; arrowAt: number; e
         transformOrigin: "0 50%",
       }}
     >
-      {children}
+      {/* One inline run: as flex items, the words and the code would each be
+          trimmed, eating the space between them. */}
+      <span>{children}</span>
     </div>
   );
   return (

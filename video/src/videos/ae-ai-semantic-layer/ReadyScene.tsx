@@ -87,8 +87,12 @@ export const ReadyScene: React.FC = () => {
   const modelTop = accessTop + h(108);
   const modelH = h(62);
   const modelX = (i: number) => R_X + i * (MODEL_W + MODEL_GAP);
-  const asstTop = modelTop + modelH + h(82);
-  const ASST_X = modelX(1) + MODEL_W / 2 + 25;
+  const asstTop = modelTop + modelH + h(100);
+  const ASST_X = modelX(1) + MODEL_W / 2 - 40;
+  /** The two reads the assistant tries: the mart, granted; an intermediate
+   *  model, refused, stopped half way. */
+  const granted = { from: [ASST_X + MODEL_W - 40, asstTop - 8] as const, to: [modelX(2) + MODEL_W / 2, modelTop + modelH + 8] as const };
+  const refused = { from: [ASST_X + 40, asstTop - 8] as const, to: [modelX(1) + 40, modelTop + modelH + 8] as const };
   const padlock = artBox("ae-ai-semantic-layer-padlock", 88);
   const restTop = y(758);
 
@@ -229,21 +233,21 @@ export const ReadyScene: React.FC = () => {
           ))}
           <Box x={ASST_X} y={asstTop} w={MODEL_W} h={modelH} at={grantAt + 10} title="Assistant" size={24} />
           {/* Granted: SELECT on the mart. */}
-          <Flow points={[[ASST_X + MODEL_W - 40, asstTop - 8], [modelX(2) + MODEL_W / 2, modelTop + modelH + 8]]} at={martsAt} color={OK} />
-          <Ink at={martsAt + 8} dur={12} style={{ left: modelX(2) + MODEL_W / 2 + 34, top: (asstTop + modelTop + modelH) / 2 - 18 }}>
+          <Flow points={[granted.from, granted.to]} at={martsAt} color={OK} />
+          <Ink at={martsAt + 8} dur={12} style={{ left: (granted.from[0] + granted.to[0]) / 2 + 30, top: (granted.from[1] + granted.to[1]) / 2 - 18 }}>
             <Chip tone="green" size={21}>
               <span style={{ fontFamily: MONO }}>SELECT</span> granted
             </Chip>
           </Ink>
           {/* Not granted: the arrow to an intermediate model stops. */}
-          <Flow points={[[ASST_X + 40, asstTop - 8], [modelX(1) + MODEL_W / 2, modelTop + modelH + 8]]} at={martsAt + 14} cut={0.5} color={ACCENT} />
+          <Flow points={[refused.from, refused.to]} at={martsAt + 14} cut={0.5} color={ACCENT} />
           {frame >= martsAt + 26 ? (
-            <div style={{ position: "absolute", left: (ASST_X + 40 + modelX(1) + MODEL_W / 2) / 2 - 13, top: (asstTop - 8 + modelTop + modelH + 8) / 2 - 13 }}>
+            <div style={{ position: "absolute", left: (refused.from[0] + refused.to[0]) / 2 - 13, top: (refused.from[1] + refused.to[1]) / 2 - 13 }}>
               <Cross at={martsAt + 26} size={26} />
             </div>
           ) : null}
           <Spot id="ae-ai-semantic-layer-padlock" at={markAt + 6} left={modelX(0) + MODEL_W / 2 - padlock.width / 2} top={modelTop + modelH + 82} {...padlock} />
-          <Ink at={removesAt} dur={14} style={{ left: ASST_X + MODEL_W, top: asstTop + modelH + h(22), transform: "translateX(-100%)" }}>
+          <Ink at={removesAt} dur={14} style={{ left: ASST_X, top: asstTop + modelH + h(20) }}>
             <span style={line(23, INK_SOFT)}>No wrong model to choose</span>
           </Ink>
 

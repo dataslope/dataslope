@@ -151,7 +151,8 @@ const slice = (lines: readonly string[], from: string, to: string) => {
   return part.map((l) => l.slice(indent));
 };
 
-const MetricFlow: React.FC<{ c: Ctx }> = ({ c }) => {
+const MetricFlow: React.FC<{ c: Ctx; askedAt: number }> = ({ c, askedAt }) => {
+  const frame = useCurrentFrame();
   const entitiesAt = c.w("r-metricflow-yaml", "Entities");
   const dimensionsAt = c.w("r-metricflow-yaml", "dimensions");
   const metricsAt = c.w("r-metricflow-yaml", "metrics");
@@ -176,8 +177,11 @@ const MetricFlow: React.FC<{ c: Ctx }> = ({ c }) => {
   );
   return (
     <>
-      <Line at={modelAt} top={top}>
-        In the YAML of the model they describe, <Mono>{model}</Mono>
+      <Line at={askedAt} top={top}>
+        In the YAML of the model they describe
+        <span style={{ opacity: ease(frame, modelAt, 12) }}>
+          , <Mono>{model}</Mono>
+        </span>
       </Line>
       <Listing lines={entity} x={R_X} top={partsTop} width={320} size={size} at={entitiesAt - 2} yaml marks={[{ line: "entity:", text: "entity", at: entitiesAt + 4 }]} />
       {tag(entitiesAt + 6, R_X + 340, partsTop + c.h(10), "an entity")}
@@ -560,7 +564,7 @@ export const RapidScene: React.FC = () => {
   const items: RapidItem[] = [
     { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "Why does a single source of truth"), body: <Truth c={c} unifyAt={n.beat("r-truth").to} /> },
     { n: 10, label: "Metric drift, and preventing it", at: n.word("r-drift", "What is metric drift"), body: <Drifting c={c} /> },
-    { n: 11, label: "The dbt Semantic Layer, MetricFlow", at: n.word("r-metricflow", "What is the dbt Semantic Layer"), body: <MetricFlow c={c} /> },
+    { n: 11, label: "The dbt Semantic Layer, MetricFlow", at: n.word("r-metricflow", "What is the dbt Semantic Layer"), body: <MetricFlow c={c} askedAt={n.beat("r-metricflow").to - 4} /> },
     { n: 12, label: "LookML and Looker", at: n.word("r-lookml", "What is LookML"), body: <LookMl c={c} /> },
     { n: 13, label: "Measure or metric", at: n.word("r-measure", "What is the difference between a measure and a metric"), body: <MeasureMetric c={c} /> },
     { n: 14, label: "What a metric definition holds", at: n.word("r-contains", "What does a metric definition contain"), body: <Contains c={c} /> },

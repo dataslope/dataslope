@@ -177,7 +177,7 @@ export const FilterScene: React.FC = () => {
     if (id === 24) t.push({ at: sourceAt, tone: "look" }, { at: loadsAt, tone: "plain" }, { at: skipAt, tone: "off" });
     if (id >= 21 && id <= 23) t.push({ at: sevenRowsAt, tone: "off" });
     if (id >= 18 && id <= 20) t.push({ at: moreAt, tone: "off" });
-    if (t.length) t.push({ at: reset, tone: "plain" });
+    if (t.length) t.push({ at: microAt, tone: "plain" });
     return t;
   };
 
@@ -299,7 +299,7 @@ export const FilterScene: React.FC = () => {
             { line: "WHERE event_at >", text: "(SELECT MAX(event_at) FROM fct_events)", at: loadedAt, out: newerAt },
             { line: "WHERE event_at >", text: ">", at: strictAt, out: gteAt - 2 },
             { line: "WHERE event_at >", text: ">=", at: gteAt + 8, out: overlapAt },
-            { line: "INTERVAL", text: "- INTERVAL '3 days'", at: overlapAt + 14, out: thisAt },
+            { line: "INTERVAL", text: "- INTERVAL '3 days'", at: overlapAt + 14, out: microAt },
           ]}
         />
         <Note at={newerAt} x={SQL_X} y={y(LANES_C.src)}>
@@ -355,9 +355,22 @@ export const FilterScene: React.FC = () => {
         </Note>
         {dividersP > 0 ? (
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: dividersP }}>
-            {Array.from({ length: 24 }, (_, i) => (
-              <line key={i} x1={AFTER(i + 1)} x2={AFTER(i + 1)} y1={RULE_TOP} y2={RULE_TOP + (RULE_BOT - RULE_TOP) * ease(frame, batchAt + i * 0.8, 10)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="3 4" />
-            ))}
+            {/* Between the days of each table's own lane only: the late lanes
+                hold 26, which sits between two days. */}
+            {Array.from({ length: 24 }, (_, i) =>
+              [FCT, RAW].map((laneTop) => (
+                <line
+                  key={`${i}-${laneTop}`}
+                  x1={AFTER(i + 1)}
+                  x2={AFTER(i + 1)}
+                  y1={laneTop - 6}
+                  y2={laneTop - 6 + (TS + 12) * ease(frame, batchAt + i * 0.8, 10)}
+                  stroke={INK_SOFT}
+                  strokeWidth={1}
+                  strokeDasharray="3 4"
+                />
+              )),
+            )}
           </svg>
         ) : null}
         <Note at={threeDaysAt} x={(bandLeft + BEFORE(24)) / 2 - 36} y={RULE_TOP - 34} out={wideAt - 4}>
