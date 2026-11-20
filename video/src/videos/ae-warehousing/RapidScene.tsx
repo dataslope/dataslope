@@ -226,8 +226,8 @@ const Dist: React.FC<{ c: Ctx }> = ({ c }) => {
         </Item>
       </div>
       <Item x={R_X} top={top + nodeH + c.h(16)} at={mostAt + 2} color={ACCENT_INK}>
-        <b>Skew:</b>
-        <span style={{ opacity: ease(frame, skewAt, 10) }}> one value dominates, one node does most of the work</span>
+        <b style={{ opacity: ease(frame, skewAt, 10) }}>Skew: </b>
+        one value dominates, one node does most of the work
       </Item>
       <Note at={joinAt + 14} x={R_X} y={top + nodeH + c.h(58)} out={dominatesAt}>
         <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.5em", fontSize: 20 }}>
@@ -284,7 +284,9 @@ export const RapidScene: React.FC = () => {
   const from = n.beat("rapid-in").from;
   const threeAt = n.word("rapid-in", "Three quick ones");
   const closeAt = n.word("rapid-in", "to close");
-  const end = n.beat("next").from - 4;
+  // The last answer stays up into the bridge's first sentence, so "skew",
+  // the round's last word, is on the page for two seconds.
+  const end = n.word("next", "None of them makes it right") - 4;
   const leverAt = n.word("next", "Every lever here makes a model cheaper");
   const rightAt = n.word("next", "None of them makes it right");
   const wrongAt = n.word("next", "a cheap model that's wrong");
@@ -304,7 +306,7 @@ export const RapidScene: React.FC = () => {
       {items.map((it) => (
         <Sfx key={it.n} name="el-tap" at={it.at} level={-32} />
       ))}
-      <Sfx name="el-pop" at={leverAt + 4} level={-30} />
+      <Sfx name="el-pop" at={rightAt + 2} level={-30} />
       <Sfx name="el-scratch" at={wrongAt + 4} level={-35} />
       <Sfx name="el-pencil" at={nextAt} level={-34} />
 
@@ -314,7 +316,7 @@ export const RapidScene: React.FC = () => {
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={LIST_W} at={threeAt + 6} end={end} />
 
         {/* ── The bridge ── */}
-        <Spot art="camel" at={leverAt + 4} left={1310} top={y(330)} width={460} />
+        <Spot art="camel" at={rightAt + 2} left={1310} top={y(330)} width={460} />
         <div style={{ position: "absolute", left: X0, top: listBottom + h(60), display: "flex", alignItems: "center", gap: 12, ...note(26, INK), whiteSpace: "nowrap", opacity: ease(frame, leverAt - 2, 12) }}>
           <Tick at={leverAt + 6} size={26} color={OK} />
           <span>Every lever here makes a model cheaper</span>

@@ -283,10 +283,10 @@ export const CiScene: React.FC = () => {
             </Chip>
           </Ink>
         ))}
-        <Note at={yesterdayAt} x={nodeX("fct_orders", prodDag.x)} y={nodeY("fct_orders", prodDag.top, prodDag.gap) + h(NODE.h) + h(52)}>
+        <Note at={yesterdayAt} x={nodeX("fct_orders", prodDag.x)} y={nodeY("fct_orders", prodDag.top, prodDag.gap) + h(NODE.h) + h(60)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Keeps yesterday&rsquo;s rows</span>
         </Note>
-        <Spot art="pager" at={pagesAt} left={1600} top={prodDag.top + prodDag.gap + h(80)} width={140} />
+        <Spot art="pager" at={pagesAt} left={1600} top={prodDag.top + prodDag.gap + h(122)} width={130} />
         <Ink at={warningAt} dur={10} style={{ left: PROD_COL, top: prodDag.top + prodDag.gap + h(NODE.h) + h(78), whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, INK), display: "inline-flex", alignItems: "center", gap: "0.5em", fontSize: 22 }}>
             <Chip tone="yellow" size={22}>

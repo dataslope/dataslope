@@ -230,7 +230,7 @@ const MeasureMetric: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={logicAt} x={col2} top={top + c.h(84)} color={INK_SOFT} size={22}>
         with filters, ratios or time logic
       </Line>
-      <Line at={completedAt} x={col2} top={top + c.h(130)} size={26} color={OK_INK} bold>
+      <Line at={completedAt} x={col2} top={top + c.h(130)} size={26} bold>
         completed revenue
       </Line>
     </>

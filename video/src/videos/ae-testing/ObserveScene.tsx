@@ -233,7 +233,7 @@ export const ObserveScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Note at={surpriseAt + 4} x={MON.x1 - 210} y={monY(0) + mh + h(10)}>
+        <Note at={surpriseAt + 4} x={MON.x1 - 230} y={monY(0) - h(34)}>
           <span style={{ ...note(21, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Flagged: out of its band</span>
         </Note>
         <Note at={normalAt} x={MON.x0} y={monY(3) + mh + h(16)}>

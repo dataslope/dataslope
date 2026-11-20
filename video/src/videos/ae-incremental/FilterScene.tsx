@@ -177,7 +177,8 @@ export const FilterScene: React.FC = () => {
   const ruleX = (() => {
     const steps: [number, number][] = [
       [loadedAt, AFTER(14)],
-      [afterAt, AFTER(24)],
+      // Once the ten have crossed.
+      [afterAt + 20, AFTER(24)],
       [gteAt, BEFORE(24)],
     ];
     let x = steps[0][1];
@@ -187,7 +188,7 @@ export const FilterScene: React.FC = () => {
   const ruleP = ease(frame, loadedAt, 14) * (1 - ease(frame, goneAt, 12));
   const bandLeft = BEFORE(24) - (BEFORE(24) - BEFORE(21)) * ease(frame, overlapAt, 18) - (BEFORE(21) - BEFORE(18)) * ease(frame, wideAt, 18);
   const bandP = ease(frame, overlapAt, 10) * (1 - ease(frame, reset, 12));
-  const wmText = frame < afterAt + 6 ? date(FILTER.watermarkBefore) : date(FILTER.watermarkAfter);
+  const wmText = frame < afterAt + 26 ? date(FILTER.watermarkBefore) : date(FILTER.watermarkAfter);
 
   // `{{ this }}` in the model, and the arrow to the table it names.
   const thisLine = MODEL.findIndex((l) => l.includes("{{ this }}"));
@@ -352,7 +353,7 @@ export const FilterScene: React.FC = () => {
           size={20}
           steps={[
             { at: loadedAt, text: rows(FILTER.before.target) },
-            { at: afterAt, text: rows(FILTER.after.target) },
+            { at: afterAt + 20, text: rows(FILTER.after.target) },
             { at: onlyAt + 6, text: rows(STRATEGY.strictAppend.first.target) },
             { at: comesAt + 6, text: rows(STRATEGY.atLeastMerge.first.target) },
             { at: allAt + 6, text: rows(STRATEGY.overlapMerge.first.target), color: OK_INK },

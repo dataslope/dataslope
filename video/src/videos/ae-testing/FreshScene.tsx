@@ -179,7 +179,8 @@ export const FreshScene: React.FC = () => {
           <text x={ax(warnFrom) + 10} y={zoneTop + 28} style={svgText(label(20, inkOf.yellow))} opacity={ease(frame, warnAt + 10, 10)}>
             warn
           </text>
-          <text x={ax(errorFrom) + 10} y={zoneTop + 28} style={svgText(label(20, ACCENT_INK))} opacity={ease(frame, errorAt + 10, 10)}>
+          {/* Right of the 14:00 check's line, which runs up through the zone. */}
+          <text x={ax(hourOf(FRESHNESS.checks[FRESHNESS.checks.length - 1].checkedAt)) + 10} y={zoneTop + 28} style={svgText(label(20, ACCENT_INK))} opacity={ease(frame, errorAt + 10, 10)}>
             error
           </text>
           {/* The newest row. */}
@@ -187,7 +188,7 @@ export const FreshScene: React.FC = () => {
         </Svg>
         <Note at={newestAt + 4} x={ax(newest) + 16} y={axisY - h(44)}>
           <span style={{ ...note(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            newest row, {clockOf(FRESHNESS.newest)}
+            newest, {clockOf(FRESHNESS.newest)}
           </span>
         </Note>
         {FRESHNESS.checks.map((c, i) => {
