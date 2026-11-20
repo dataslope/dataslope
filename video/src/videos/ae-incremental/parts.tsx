@@ -509,7 +509,6 @@ export const Gap: React.FC<{ x: number; y0: number; y1: number; at: number; out?
 export const ART = {
   snail: { id: "ae-incremental-snail", w: 1485, h: 864 },
   key: { id: "ae-incremental-key", w: 1024, h: 1018 },
-  envelope: { id: "ae-incremental-envelope", w: 1024, h: 769 },
 } as const;
 export type ArtName = keyof typeof ART;
 

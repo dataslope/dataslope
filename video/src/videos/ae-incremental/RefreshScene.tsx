@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { OK_INK, QMono, QuestionCard } from "../../editorial/interview";
+import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { ColumnRule, NextLine, Note, Num } from "../../editorial/ui";
@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { COST, FILTER, LATE, REFRESH, thousands } from "./data";
-import { Cell, type CellTone, Count, costScale, CostChart, Drift, Mark, X0 } from "./parts";
+import { Cell, type CellTone, Count, costScale, CostChart, Drift, Flow, Mark, SmallMono, X0 } from "./parts";
 
 const TL = 330;
 const P = 46;
@@ -20,7 +20,52 @@ const CH = { x0: 230, x1: 860 };
 const SPLIT_X = 1200;
 const SPLIT_W = 520;
 /** Layout values (through `y()`). */
-const ROW_C = { cols: 286, follow: 382, answer: 418, fct: 486, raw: 546, note1: 606, note2: 642, chartLabel: 296, chartTop: 352, chartBot: 580, split: 340, rule: 680, rule2: 720, next: 778, fixes: 574 };
+const ROW_C = { cols: 286, flow: 330, follow: 425, answer: 460, fct: 515, raw: 568, note1: 625, note2: 660, chartLabel: 296, chartTop: 352, chartBot: 580, split: 340, rule: 680, rule2: 720, next: 778, fixes: 574 };
+
+/**
+ * One run drawn as two steps: the source, an arrow carrying what the run
+ * reads, and what it does to the model's table. Boxes outlined in ink (the
+ * house's diagram box), the arrow black, each part arriving on its cue.
+ */
+const RunFlow: React.FC<{ x: number; top: number; at: number; arrowAt: number; endAt: number; arrow: string; end: React.ReactNode }> = ({ x, top, at, arrowAt, endAt, arrow, end }) => {
+  const frame = useCurrentFrame();
+  const H = 46;
+  const srcW = 156;
+  const gap = 190;
+  const box = (left: number, p: number, children: React.ReactNode) => (
+    <div
+      style={{
+        position: "absolute",
+        left,
+        top,
+        height: H,
+        padding: "0 16px",
+        boxSizing: "border-box",
+        border: `2px solid ${INK}`,
+        borderRadius: 6,
+        display: "flex",
+        alignItems: "center",
+        ...label(21, INK),
+        whiteSpace: "nowrap",
+        opacity: p,
+        transform: `scale(${0.92 + 0.08 * p})`,
+        transformOrigin: "0 50%",
+      }}
+    >
+      {children}
+    </div>
+  );
+  return (
+    <>
+      {box(x, ease(frame, at, 12), <SmallMono>raw_events</SmallMono>)}
+      <Flow points={[[x + srcW + 12, top + H / 2], [x + srcW + gap - 12, top + H / 2]]} at={arrowAt} color={INK} width={2.4} head={13} />
+      <div style={{ position: "absolute", left: x + srcW, width: gap, top: top + H + 10, textAlign: "center", ...note(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, arrowAt + 6, 10) }}>
+        {arrow}
+      </div>
+      {box(x + srcW + gap, ease(frame, endAt, 12), end)}
+    </>
+  );
+};
 
 /**
  * Question 7. A normal run filters and merges; --full-refresh skips the
@@ -43,7 +88,9 @@ export const RefreshScene: React.FC = () => {
   const normalAt = n.word("refresh", "A normal run filters");
   const mergesAt = n.word("refresh", "merges them in");
   const fullAt = n.word("refresh", "A full refresh ignores");
-  const everyAt = n.word("refresh", "from every source row");
+  const filtersAt = n.word("refresh", "filters to new rows");
+  const ignoresAt = n.word("refresh", "ignores the incremental check");
+  const rebuildsAt = n.word("refresh", "rebuilds the table");
 
   const whyAt = n.word("refresh-why", "So why are periodic full refreshes");
   const becauseAt = n.word("refresh-why", "Because incremental logic");
@@ -80,6 +127,8 @@ export const RefreshScene: React.FC = () => {
 
   const row = (k: keyof typeof ROW_C) => y(ROW_C[k]);
   const phase1Out = costAt - 6;
+  // The tables arrive with the answer, before the narration takes them up.
+  const stripsAt = becauseAt + 14;
 
   // ── The strict run's table, then event 3 deleted upstream ─────────────────
   const loaded = [...Array.from({ length: FILTER.after.target }, (_, i) => i + 1), ...LATE.strict];
@@ -87,7 +136,9 @@ export const RefreshScene: React.FC = () => {
   const extra = REFRESH.extra;
   const missing = REFRESH.missing;
   const rawTones = (id: number): { at: number; tone: CellTone }[] => (extra.includes(id) ? [{ at: deleteAt + 2, tone: "bad" }] : []);
-  const fctTones = (id: number): { at: number; tone: CellTone }[] => (extra.includes(id) ? [{ at: existsAt, tone: "bad" }] : []);
+  // "The strict filter's table": its last row, 27, where the strict run ended.
+  const fctTones = (id: number): { at: number; tone: CellTone }[] =>
+    extra.includes(id) ? [{ at: existsAt, tone: "bad" }] : id === LATE.strict[0] ? [{ at: takeAt, tone: "look" }, { at: deleteAt, tone: "plain" }] : [];
   // The refresh: every source row, read again, in green.
   const refreshed = sourceIds.filter((id) => !extra.includes(id));
 
@@ -107,7 +158,7 @@ export const RefreshScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-pencil" at={normalAt} level={-37} />
       <Sfx name="el-pencil" at={fullAt} level={-37} />
-      <Sfx name="el-sprinkle" at={takeAt} level={-36} />
+      <Sfx name="el-sprinkle" at={stripsAt + 4} level={-36} />
       <Sfx name="el-scratch" at={deleteAt + 2} level={-34} />
       <Sfx name="el-tap" at={missingAt} level={-34} />
       <Sfx name="el-tap" at={existsAt} level={-34} />
@@ -121,26 +172,46 @@ export const RefreshScene: React.FC = () => {
 
       <Drift from={from} to={n.beat("next").to + 60}>
         <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} size={52}>
-          What is the difference between <span style={{ whiteSpace: "nowrap" }}><QMono>dbt run --full-refresh</QMono></span> and a normal incremental run?
+          What is the difference between <span style={{ whiteSpace: "nowrap" }}><SmallMono>dbt run --full-refresh</SmallMono></span> and a normal incremental run?
         </QuestionCard>
 
         {/* ── Two runs, side by side ── */}
         <div style={{ opacity: 1 - ease(frame, phase1Out, 10) }}>
           <Note at={normalAt - 2} x={X0} y={row("cols")}>
             <div style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>A normal run</div>
-            <div style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", marginTop: 8 }}>
-              filters to new rows<span style={{ opacity: ease(frame, mergesAt, 10) }}>, and merges them in</span>
-            </div>
           </Note>
-          <ColumnRule x={COL2 - 125} top={row("cols")} height={70} at={fullAt - 2} />
+          <RunFlow
+            x={X0}
+            top={row("flow")}
+            at={normalAt}
+            arrowAt={filtersAt}
+            endAt={mergesAt}
+            arrow="new rows only"
+            end={
+              <>
+                Merged into <SmallMono>fct_events</SmallMono>
+              </>
+            }
+          />
+          <ColumnRule x={COL2 - 60} top={row("cols")} height={row("flow") + 50 - row("cols")} at={fullAt - 2} />
           <Note at={fullAt - 2} x={COL2} y={row("cols")}>
             <div style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-              <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 600 }}>--full-refresh</span>
-            </div>
-            <div style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", marginTop: 8 }}>
-              skips the check, drops the table<span style={{ opacity: ease(frame, everyAt, 10) }}>, rebuilds from every source row</span>
+              <SmallMono>--full-refresh</SmallMono>
             </div>
           </Note>
+          <RunFlow
+            x={COL2}
+            top={row("flow")}
+            at={fullAt}
+            arrowAt={ignoresAt}
+            endAt={rebuildsAt}
+            arrow="every row, no check"
+            end={
+              <>
+                <SmallMono>fct_events</SmallMono>, dropped and rebuilt
+              </>
+            }
+          />
 
           <Note at={whyAt - 2} x={X0} y={row("follow")}>
             <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -154,20 +225,20 @@ export const RefreshScene: React.FC = () => {
           </Note>
 
           {/* The strict filter's table, and its source. */}
-          <Note at={takeAt} x={X0} y={row("fct") + 6}>
+          <Note at={stripsAt} x={X0} y={row("fct") + 6}>
             <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>fct_events</span>
           </Note>
-          <Note at={takeAt} x={X0} y={row("raw") + 6}>
+          <Note at={stripsAt} x={X0} y={row("raw") + 6}>
             <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>raw_events</span>
           </Note>
           {sourceIds.map((id, i) => (
-            <Cell key={`r${id}`} x={X(id)} y={row("raw")} at={takeAt + 4 + i * 0.6} label={id} tones={rawTones(id)} out={extra.includes(id) ? nothingAt : undefined} />
+            <Cell key={`r${id}`} x={X(id)} y={row("raw")} at={stripsAt + 4 + i * 0.6} label={id} tones={rawTones(id)} out={extra.includes(id) ? nothingAt : undefined} />
           ))}
           {extra.map((id) => (
             <Cell key={`gone${id}`} x={X(id)} y={row("raw")} at={nothingAt} label={id} dashed tones={[{ at: nothingAt, tone: "bad" }]} opacity={0.6} />
           ))}
           {loaded.map((id, i) => (
-            <Cell key={`f${id}`} x={X(id)} y={row("fct")} at={takeAt + 8 + i * 0.6} out={readsAt} label={id} tones={fctTones(id)} />
+            <Cell key={`f${id}`} x={X(id)} y={row("fct")} at={stripsAt + 8 + i * 0.6} out={readsAt} label={id} tones={fctTones(id)} />
           ))}
           {missing.map((id) => (
             <Cell key={`m${id}`} x={X(id)} y={row("fct")} at={missingAt} out={readsAt} label={id} dashed tones={[{ at: missingAt, tone: "bad" }]} />
@@ -185,20 +256,20 @@ export const RefreshScene: React.FC = () => {
           <Count
             x={X(27) + 40}
             y={row("fct") + 6}
-            at={takeAt + 10}
+            at={stripsAt + 10}
             size={22}
             steps={[
-              { at: takeAt, text: <><Num>{REFRESH.afterStrict.target}</Num> rows</>, color: INK_SOFT },
+              { at: stripsAt, text: <><Num>{REFRESH.afterStrict.target}</Num> rows</>, color: INK_SOFT },
               { at: readsAt + 10, text: <><Num>{REFRESH.refreshed.target}</Num> rows</>, color: OK_INK },
             ]}
           />
           <Count
             x={X(27) + 40}
             y={row("raw") + 6}
-            at={takeAt + 6}
+            at={stripsAt + 6}
             size={22}
             steps={[
-              { at: takeAt, text: <><Num>{REFRESH.afterStrict.source}</Num> rows</>, color: INK_SOFT },
+              { at: stripsAt, text: <><Num>{REFRESH.afterStrict.source}</Num> rows</>, color: INK_SOFT },
               { at: deleteAt + 6, text: <><Num>{REFRESH.drift.source}</Num> rows</>, color: INK_SOFT },
             ]}
           />

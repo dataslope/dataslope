@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
+import { ease, map } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
@@ -112,7 +112,7 @@ export const LatestScene: React.FC = () => {
   const frameInAt = n.beat("frame-in").from;
   const end = n.beat("frame-in").to;
   // On the turn back to the frame the page settles back, slowly, into the cut.
-  const settle = 1 - 0.6 * ease(frame, frameInAt, n.beat("running").from - 8 - frameInAt);
+  const settle = 1 - 0.6 * map(frame, [frameInAt, n.beat("running").from - 8], [0, 1]);
 
   const out4 = q5At - 4;
 

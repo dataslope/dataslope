@@ -35,7 +35,9 @@ const Line: React.FC<{ at: number; x?: number; top: number; size?: number; color
 
 // ── 9. A single source of truth ─────────────────────────────────────────────
 
-const Truth: React.FC<{ c: Ctx }> = ({ c }) => {
+const Truth: React.FC<{ c: Ctx; unifyAt: number }> = ({ c, unifyAt }) => {
+  const frame = useCurrentFrame();
+  const unify = ease(frame, unifyAt, 14);
   const withoutAt = c.w("r-truth", "Without one");
   const reimplAt = c.w("r-truth", "re-implements revenue slightly differently");
   const oneAt = c.w("r-truth", "One definition means");
@@ -62,8 +64,17 @@ const Truth: React.FC<{ c: Ctx }> = ({ c }) => {
           h={c.h(84)}
           at={reimplAt + i * 5}
           title={t.name}
-          sub={<span style={{ fontFamily: MONO, fontSize: 19, color: i ? ACCENT_INK : INK }}>{t.sql}</span>}
+          sub={
+            <span style={{ position: "relative", display: "inline-block", fontFamily: MONO, fontSize: 19 }}>
+              <span style={{ color: i ? ACCENT_INK : INK, opacity: 1 - unify }}>{t.sql}</span>
+              {/* Once said, the one definition replaces all three. */}
+              <span style={{ position: "absolute", left: 0, right: 0, top: 0, textAlign: "center", color: OK_INK, opacity: unify }}>{tools[0].sql}</span>
+            </span>
+          }
           size={22}
+          tone="plain"
+          toneTo="ok"
+          toneAt={unifyAt + 4}
         />
       ))}
       <Line at={oneAt} top={top + c.h(186)} color={OK_INK} bold>
@@ -465,7 +476,7 @@ export const RapidScene: React.FC = () => {
   const nextAt = n.word("next", "Next:");
 
   const items: RapidItem[] = [
-    { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "Why does a single source of truth"), body: <Truth c={c} /> },
+    { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "Why does a single source of truth"), body: <Truth c={c} unifyAt={n.beat("r-truth").to} /> },
     { n: 10, label: "Metric drift, and preventing it", at: n.word("r-drift", "What is metric drift"), body: <Drifting c={c} /> },
     { n: 11, label: "The dbt Semantic Layer, MetricFlow", at: n.word("r-metricflow", "What is the dbt Semantic Layer"), body: <MetricFlow c={c} /> },
     { n: 12, label: "LookML and Looker", at: n.word("r-lookml", "What is LookML"), body: <LookMl c={c} /> },

@@ -20,6 +20,7 @@ import {
   MARK_BAD,
   MARK_OK,
   PgError,
+  SmallMono,
   Spot,
   SqlListing,
   tableGeometry,
@@ -204,7 +205,7 @@ export const KeyScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} size={52}>
-          What is the <span style={{ fontFamily: MONO, fontSize: "0.86em", fontWeight: 500 }}>unique_key</span> config on an incremental model, and what does it control?
+          What is the <SmallMono>unique_key</SmallMono> config on an incremental model, and what does it control?
         </QuestionCard>
         <Note at={tellsAt} x={X0} y={row("answer")}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>

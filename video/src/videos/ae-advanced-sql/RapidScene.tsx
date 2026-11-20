@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { ColumnRule, NextLine, Note } from "../../editorial/ui";
+import { ColumnRule, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
@@ -47,20 +47,36 @@ type Ctx = { w: (beat: string, phrase: string, o?: { nth?: number }) => number; 
 const geo = (c: Ctx, t: { cols: readonly string[]; rows: readonly (readonly string[])[] }, x: number, top: number, rowH = 40) =>
   geoOf(t, x, top, c.h, { headH: 40, rowH, bodySize: 21, headSize: 20 });
 
-/** The answer's key fact, the first line of each answer. */
+/**
+ * The question as it is read, in the page's words, inking in across the
+ * time it takes to say it (the series' rapid-round convention: the question
+ * read aloud, then its answer's key fact).
+ */
+const Asked: React.FC<{ c: Ctx; beat: string; from: string; until: string; children: React.ReactNode }> = ({ c, beat, from, until, children }) => {
+  const at = c.w(beat, from);
+  const end = c.w(beat, until);
+  return (
+    <Ink at={at - 2} dur={Math.max(14, end - at - 6)} style={{ left: R_X, top: c.T, whiteSpace: "nowrap" }}>
+      <span style={{ ...note(24, INK_SOFT) }}>{children}</span>
+    </Ink>
+  );
+};
+
+/** The answer's key fact, under the question. */
 const Fact: React.FC<{ c: Ctx; at: number; children: React.ReactNode }> = ({ c, at, children }) => (
-  <Note at={at} x={R_X} y={c.T}>
+  <Note at={at} x={R_X} y={c.T + c.h(46)}>
     <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>{children}</span>
   </Note>
 );
 
 /** Where an answer's evidence starts, under its key fact. */
-const body = (c: Ctx) => c.T + c.h(62);
+const body = (c: Ctx) => c.T + c.h(108);
 
 // ── 13. Divide by zero ──────────────────────────────────────────────────────
 
 const Zero: React.FC<{ c: Ctx }> = ({ c }) => {
   const wrapAt = c.w("r-zero", "Wrap the denominator in null if");
+  const zeroAt = c.w("r-zero", "a zero becomes null");
   const nullAt = c.w("r-zero", "a day with no orders gives null");
   const stopAt = c.w("r-zero", "instead of stopping the query");
   const coalesceAt = c.w("r-zero", "coalesce can turn that into zero");
@@ -73,6 +89,9 @@ const Zero: React.FC<{ c: Ctx }> = ({ c }) => {
   const errX = g.right + 50;
   return (
     <>
+      <Asked c={c} beat="r-zero" from="How do you avoid" until="Wrap the denominator">
+        How do you avoid a divide-by-zero error?
+      </Asked>
       <Fact c={c} at={wrapAt - 2}>
         Wrap the denominator in <QMono>NULLIF(…, 0)</QMono>
       </Fact>
@@ -84,6 +103,7 @@ const Zero: React.FC<{ c: Ctx }> = ({ c }) => {
         rows={rowsAt(Z.rows, wrapAt + 8)}
         swaps={[{ row: empty, col: av, at: coalesceAt + 6, value: coalesced, color: INK }]}
         marks={[
+          { row: empty, col: Z.cols.indexOf("order_count"), at: zeroAt + 2 },
           { row: empty, col: av, at: nullAt + 4, out: coalesceAt + 2 },
           { row: empty, col: av, at: coalesceAt + 8, color: MARK_GREEN },
         ]}
@@ -122,6 +142,9 @@ const Rank: React.FC<{ c: Ctx }> = ({ c }) => {
   const notesY = g.rowTop(B.rows.length) + c.h(30);
   return (
     <>
+      <Asked c={c} beat="r-rank" from="Explain row number" until="four books with a tie">
+        Explain <QMono>ROW_NUMBER</QMono> vs <QMono>RANK</QMono> vs <QMono>DENSE_RANK</QMono>.
+      </Asked>
       <Fact c={c} at={booksAt - 4}>
         On a tie, only <QMono>ROW_NUMBER</QMono> stays unique
       </Fact>
@@ -159,8 +182,10 @@ const Rank: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
   const rankInAt = c.w("r-topn", "Rank inside each group");
+  const subAt = c.w("r-topn", "in a subquery");
   const keepAt = c.w("r-topn", "keep N or fewer");
   const exactlyAt = c.w("r-topn", "Row number keeps exactly two per category");
+  const perCatAt = c.w("r-topn", "two per category");
   const pairAt = c.w("r-topn", "rank keeps the tied pair of books");
   const fiveAt = c.w("r-topn", "five rows instead of four");
   const RN = RAPID.topRowNumber;
@@ -175,10 +200,23 @@ const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
   const tie = RN.rows.findIndex((r) => r[prod] === RK.rows[extra - 1]?.[prod]);
   return (
     <>
+      <Asked c={c} beat="r-topn" from="How do you find" until="Rank inside each group">
+        How do you find the top-N rows per group?
+      </Asked>
       <Fact c={c} at={rankInAt - 4}>
         Rank inside each group, then keep <QMono>rn &lt;= N</QMono>
       </Fact>
-      <Listing lines={filter} x={R_X} top={top} size={SIZE} at={rankInAt} marks={[{ line: "rn <= 2", text: "WHERE rn <= 2", at: keepAt }]} />
+      <Listing
+        lines={filter}
+        x={R_X}
+        top={top}
+        size={SIZE}
+        at={rankInAt}
+        marks={[
+          { line: "rn <= 2", text: "ranked", at: subAt + 2, out: keepAt },
+          { line: "rn <= 2", text: "WHERE rn <= 2", at: keepAt },
+        ]}
+      />
       <Note at={exactlyAt - 4} x={R_X} y={tTop - c.h(40)}>
         <span style={{ ...label(21, INK), whiteSpace: "nowrap", ...TABULAR }}>
           <QMono>ROW_NUMBER</QMono>: {RN.rows.length} rows
@@ -189,7 +227,10 @@ const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
         cols={colsOf(RN, { rn: { ink: BLUE_INK } })}
         at={exactlyAt - 2}
         rows={rowsAt(RN.rows, exactlyAt + 2)}
-        marks={tie >= 0 ? [{ row: tie, col: prod, at: pairAt + 4, color: MARK }] : []}
+        marks={[
+          ...RN.rows.map((_, row) => ({ row, col: RN.cols.indexOf("rn"), at: perCatAt + row * 3, out: pairAt })),
+          ...(tie >= 0 ? [{ row: tie, col: prod, at: pairAt + 4, color: MARK }] : []),
+        ]}
       />
       <ColumnRule x={rg.right + 45} top={tTop - c.h(40)} height={c.h(40) + rg.headH + RK.rows.length * rg.rowH} at={pairAt - 4} />
       <Note at={pairAt - 4} x={kg.x} y={tTop - c.h(40)}>
@@ -234,6 +275,9 @@ const Cte: React.FC<{ c: Ctx }> = ({ c }) => {
   const g = geo(c, C, R_X, rTop, 36);
   return (
     <>
+      <Asked c={c} beat="r-cte" from="What is a CTE" until="A common table expression">
+        What is a CTE, and when do you prefer it over a subquery?
+      </Asked>
       <Fact c={c} at={namedAt - 4}>
         A named result, declared up front
       </Fact>
@@ -277,6 +321,9 @@ const Recursive: React.FC<{ c: Ctx }> = ({ c }) => {
   const lg = geo(c, L, R_X + 260, rTop, 36);
   return (
     <>
+      <Asked c={c} beat="r-recursive" from="What is a recursive CTE" until="It refers to itself">
+        What is a recursive CTE, and when do you need one?
+      </Asked>
       <Fact c={c} at={selfAt - 4}>
         A CTE that refers to itself
       </Fact>
@@ -332,6 +379,9 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
   const under = top + listingHeight(P.lines.length, SIZE) + c.h(26);
   return (
     <>
+      <Asked c={c} beat="r-pivot" from="How do you pivot" until="Sum a case expression">
+        How do you pivot rows into columns?
+      </Asked>
       <Fact c={c} at={caseAt - 4}>
         One <QMono>SUM(CASE ...)</QMono> per new column
       </Fact>
@@ -388,17 +438,20 @@ const Unpivot: React.FC<{ c: Ctx }> = ({ c }) => {
   const from = U.lines.findIndex((l) => l.startsWith("SELECT region, u.quarter"));
   const lines = U.lines.slice(from);
   const top = body(c);
-  const tTop = top + listingHeight(lines.length, SIZE) + c.h(76);
+  const tTop = top + listingHeight(lines.length, SIZE) + c.h(72);
   const P = RAPID.pivotCase;
-  const wg = geo(c, P, R_X, tTop, 40);
-  const lg = geo(c, U, wg.right + 130, tTop, 34);
+  const wg = geo(c, P, R_X, tTop, 38);
+  const lg = geo(c, U, wg.right + 130, tTop, 32);
   return (
     <>
+      <Asked c={c} beat="r-unpivot" from="How do you unpivot" until="Union all one select per column">
+        How do you unpivot columns into rows?
+      </Asked>
       <Fact c={c} at={unionAt - 2}>
         <QMono>UNION ALL</QMono> a select per column, or one <QMono>VALUES</QMono> list
       </Fact>
-      <Listing lines={lines} x={R_X} top={top} size={SIZE} at={lateralAt - 6} marks={[{ line: "CROSS JOIN LATERAL", text: "CROSS JOIN LATERAL (VALUES ('Q1', q1), ('Q2', q2))", at: lateralAt + 4 }]} />
-      <Note at={fourAt - 4} x={R_X} y={tTop - c.h(38)}>
+      <Listing lines={lines} x={R_X} top={top} size={SIZE} at={unionAt + 8} marks={[{ line: "CROSS JOIN LATERAL", text: "CROSS JOIN LATERAL (VALUES ('Q1', q1), ('Q2', q2))", at: lateralAt + 4 }]} />
+      <Note at={fourAt - 4} x={R_X} y={tTop - c.h(36)}>
         <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
           <QMono>wide</QMono>: the pivot
         </span>

@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { OK_INK, QMono, QuestionCard } from "../../editorial/interview";
+import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { MERGE, PAGE_MERGE } from "./data";
-import { type Col, Count, DataTable, Drift, MARK, MARK_BAD, MARK_OK, SqlListing, tableGeometry, TableName, type TableRow, X0 } from "./parts";
+import { type Col, Count, DataTable, Drift, MARK, MARK_BAD, MARK_OK, SmallMono, SqlListing, tableGeometry, TableName, type TableRow, X0 } from "./parts";
 
 const SIZE = 19;
 const STAGED_X = X0;
@@ -110,7 +110,7 @@ export const MergeScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} size={56}>
-          How does a <QMono>MERGE</QMono> support idempotent upserts?
+          How does a <SmallMono>MERGE</SmallMono> support idempotent upserts?
         </QuestionCard>
 
         {/* The page's MERGE. */}

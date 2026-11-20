@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { OK_INK, QMono, QuestionCard } from "../../editorial/interview";
+import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
 import { Note, Num, OutlineBadge } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -241,7 +241,7 @@ export const FilterScene: React.FC = () => {
           How does an incremental model actually filter new rows?
         </QuestionCard>
         <QuestionCard n={3} at={thisAt - 2} textAt={thisTextAt - 2} size={56}>
-          What is the <QMono>{"{{ this }}"}</QMono> variable in dbt?
+          What is the <SmallMono>{"{{ this }}"}</SmallMono> variable in dbt?
         </QuestionCard>
 
         {/* ── The model, and the SQL it runs ── */}
