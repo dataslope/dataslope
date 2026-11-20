@@ -51,4 +51,5 @@ export const TRACKS: Record<string, Track> = {
   // The beaver and its servers make a wide picture; 440px keeps 46px clear
   // of "Backend Engineer", which ends at x 730.
   BackendEngineer: { kind: "interview", title: ["Backend Engineer"], art: { video: "thumbnails", id: "thumb-beaver" }, artWidth: 440 },
+  AnalyticsEngineer: { kind: "interview", title: ["Analytics Engineer"], art: { video: "thumbnails", id: "thumb-platypus" } },
 };

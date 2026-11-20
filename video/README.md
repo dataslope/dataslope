@@ -853,12 +853,14 @@ would also time every video, and log a 404 for each one with no recorded
 narration. A PNG is about 200 to
 300 kB, well inside YouTube's 2 MB limit.
 
-Each track has its own watercolor animal, so the eight read apart at a
+Each track has its own watercolor animal, so the nine read apart at a
 glance in a list of results: an owl on a die (Statistics), an elephant at a
 card catalog (Database Design), a llama with books (LLMs), a parrot (NLP), a
 raccoon (Data Analyst), the otter and meerkat of the Data Scientist and
-Data Engineer overviews, and a beaver with a log beside a stack of servers
-(Backend Engineer).
+Data Engineer overviews, a beaver with a log beside a stack of servers
+(Backend Engineer), and a platypus beside three blocks of rising height
+(Analytics Engineer: the overview's platypus is a wide picture, which reads
+small in the corner, so the thumbnail has its own).
 
 A white page, the Dataslope mark alone in the top-left corner (no
 wordmark), the words low on the left and the animal on the right: standing
