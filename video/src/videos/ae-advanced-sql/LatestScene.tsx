@@ -410,7 +410,7 @@ export const LatestScene: React.FC = () => {
             const p = ease(frame, cloudAt + i * 5, 10);
             return (
               <span key={e} style={{ opacity: p, transform: `translateY(${(1 - p) * 8}px)` }}>
-                <Chip tone="blue" size={24}>
+                <Chip tone="ink" size={24}>
                   {e}
                 </Chip>
               </span>

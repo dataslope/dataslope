@@ -4,12 +4,12 @@ import { during, ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
-import { Badge, Leader, Note, Num } from "../../editorial/ui";
+import { Leader, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { PRUNE } from "./data";
-import { Box, Drift, Listing, MARK_BAD, OK, OK_INK, X0 } from "./parts";
+import { Box, Drift, Listing, MARK_BAD, OK, OK_INK, X0, KindTag } from "./parts";
 
 const BADGE_Y = 300;
 // The chart (the page's partition-pruning-scan), in page pixels on x and
@@ -126,9 +126,7 @@ export const PruneScene: React.FC = () => {
         </Note>
         <Note at={duckAt} x={FX} y={y(BADGE_Y)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.6em", fontSize: 23 }}>
-            <Badge tone="blue" size={23}>
-              measured
-            </Badge>
+            <KindTag kind="measured" />
             <span>
               DuckDB, the million sales<span style={{ opacity: ease(frame, monthAt, 10) }}>, a folder per month</span>
             </span>
@@ -172,9 +170,7 @@ export const PruneScene: React.FC = () => {
         {/* ── The page's model ── */}
         <Note at={modelAt} x={X0} y={y(BADGE_Y)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.6em", fontSize: 23 }}>
-            <Badge tone="purple" size={23}>
-              model
-            </Badge>
+            <KindTag kind="model" />
             <span style={{ opacity: ease(frame, yearAt, 10) }}>
               <Num>{m.days}</Num> days × <Num>{m.gbPerDay}</Num> GB a day
             </span>

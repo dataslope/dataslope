@@ -356,7 +356,7 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
         {RAPID.pivotEngines.map((e, i) => (
           <span key={e} style={{ opacity: ease(frame, clauseAt + i * 4, 10) }}>
-            <Chip tone="blue" size={22}>
+            <Chip tone="ink" size={22}>
               {e}
             </Chip>
           </span>

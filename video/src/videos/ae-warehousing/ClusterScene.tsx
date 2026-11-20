@@ -4,11 +4,11 @@ import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
-import { Badge, ColumnRule, Note, Num } from "../../editorial/ui";
+import { ColumnRule, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CLUSTER, mb } from "./data";
-import { COLUMN_TINT, Drift, OK, OK_INK, X0 } from "./parts";
+import { COLUMN_TINT, Drift, OK, OK_INK, X0, KindTag } from "./parts";
 
 const AX0 = 420;
 const AX1 = 1480;
@@ -132,9 +132,7 @@ export const ClusterScene: React.FC = () => {
         </Note>
         <Note at={fileAt} x={X0} y={y(280) + h(38)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.6em", fontSize: 23 }}>
-            <Badge tone="blue" size={23}>
-              measured
-            </Badge>
+            <KindTag kind="measured" />
             <span>
               The sales file<span style={{ opacity: ease(frame, recordsAt, 10) }}>: each block of rows records its first and last date, drawn as a span</span>
             </span>

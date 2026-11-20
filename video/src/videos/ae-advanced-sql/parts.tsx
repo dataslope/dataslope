@@ -4,7 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BAR, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, note } from "../../editorial/style";
-import { Badge, type BadgeTone, Ink } from "../../editorial/ui";
+import { Ink, OutlineBadge, type OutlineTone } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -545,10 +545,11 @@ export const StrikeBar: React.FC<{ x: number; y: number; w: number; at: number; 
   return <div style={{ position: "absolute", left: x, top: y - 1.5, width: w * p, height: 3, borderRadius: 2, background: ACCENT, opacity: 1 - o }} />;
 };
 
-/** The house badge (editorial/ui.tsx) in the label face: on its own it takes
- *  the page's serif. */
-export const Chip: React.FC<{ tone: BadgeTone; size?: number; children: React.ReactNode }> = ({ tone, size = 24, children }) => (
-  <Badge tone={tone} size={size} style={{ fontFamily: SANS }}>
+/** The house's outlined badge (editorial/ui.tsx, the owner's badge review):
+ *  no fill, a 2px border and text in one ink, in the label face (on its own
+ *  it takes the page's serif). */
+export const Chip: React.FC<{ tone: OutlineTone; size?: number; children: React.ReactNode }> = ({ tone, size = 24, children }) => (
+  <OutlineBadge tone={tone} size={size} style={{ fontFamily: SANS }}>
     {children}
-  </Badge>
+  </OutlineBadge>
 );

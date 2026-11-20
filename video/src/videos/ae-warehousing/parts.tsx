@@ -6,7 +6,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Ink, OutlineBadge } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -46,6 +46,18 @@ export {
   type TableRow,
 } from "../da-pandas/parts";
 export { OK, OK_INK };
+
+/**
+ * The tag on every number's source: "measured" (DuckDB, on the million
+ * sales) in the data blue, "model" (stated assumptions) in purple. Outlined,
+ * the owner's newer badge (README, "Or outlined"): no fill, a 2px border and
+ * its text in one hue.
+ */
+export const KindTag: React.FC<{ kind: "measured" | "model"; size?: number }> = ({ kind, size = 23 }) => (
+  <OutlineBadge tone={kind === "measured" ? "blue" : "purple"} size={size}>
+    {kind}
+  </OutlineBadge>
+);
 
 /** The series' kicker. */
 export const SERIES = "Analytics engineer interview questions";

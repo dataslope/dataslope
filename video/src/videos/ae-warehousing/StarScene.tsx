@@ -4,13 +4,13 @@ import { ease } from "../../components/motion";
 import { QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Badge, Note, Num } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { mb, SELECT_STAR, TABLE } from "./data";
-import { COLUMN_TINT, Drift, FileBar, Listing, MARK_OK, Mark, OK_INK, READ, READ_BAD, READ_OK, ReadMark, SmallMono, X0 } from "./parts";
+import { COLUMN_TINT, Drift, FileBar, Listing, MARK_OK, Mark, OK_INK, READ, READ_BAD, READ_OK, ReadMark, SmallMono, X0, KindTag } from "./parts";
 
 const MODEL_Y = 396;
 const STRIP_W = 5;
@@ -121,9 +121,7 @@ export const StarScene: React.FC = () => {
         </Note>
         <Note at={modelAt} x={X0} y={y(BADGE_Y) + h(46)} out={runOut}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.6em", fontSize: 23 }}>
-            <Badge tone="purple" size={23}>
-              model
-            </Badge>
+            <KindTag kind="model" />
             <span>
               <Num>{model.columns}</Num> columns
               <span style={{ opacity: ease(frame, widthAt, 10) }}>, every one the same width</span>
@@ -157,9 +155,7 @@ export const StarScene: React.FC = () => {
         {/* ── Measured: the million sales, column by column ── */}
         <Note at={measuredAt} x={X0} y={y(BADGE_Y)} dim={dim}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.6em", fontSize: 23 }}>
-            <Badge tone="blue" size={23}>
-              measured
-            </Badge>
+            <KindTag kind="measured" />
             <span>
               DuckDB, the million sales in one Parquet file, by column
             </span>

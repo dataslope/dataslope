@@ -248,7 +248,7 @@ export const DistinctScene: React.FC = () => {
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 12 }}>
             <QMono>approx_count_distinct</QMono>
             <span style={{ opacity: ease(frame, hllAt - 2, 10) }}>
-              <Chip tone="blue" size={23}>
+              <Chip tone="ink" size={23}>
                 HyperLogLog
               </Chip>
             </span>

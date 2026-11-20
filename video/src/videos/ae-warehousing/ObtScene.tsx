@@ -5,11 +5,11 @@ import { during, ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, body, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Badge, Ink, Note, Num } from "../../editorial/ui";
+import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { kb, mb, OBT, SAMPLE } from "./data";
-import { Box, COLUMN_TINT, DataTable, Drift, FileBar, Flow, MARK_BAD, MARK_OK, OK_INK, SmallMono, TableName, tableGeometry, X0 } from "./parts";
+import { Box, COLUMN_TINT, DataTable, Drift, FileBar, Flow, MARK_BAD, MARK_OK, OK_INK, SmallMono, TableName, tableGeometry, X0, KindTag } from "./parts";
 
 const TABLE_Y = 382;
 const HEAD_H = 38;
@@ -155,9 +155,7 @@ export const ObtScene: React.FC = () => {
         {/* ── The copies are cheap: measured ── */}
         <Note at={cheapAt} x={X0} y={lowTop(0) - h(10)} out={cheapOut}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.6em", fontSize: 23 }}>
-            <Badge tone="blue" size={23}>
-              measured
-            </Badge>
+            <KindTag kind="measured" />
             <span>The million sales, both ways, column by column</span>
           </span>
         </Note>

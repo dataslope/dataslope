@@ -4,12 +4,12 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Badge, ColumnRule, Note, Num } from "../../editorial/ui";
+import { ColumnRule, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { COMPUTE_MODEL } from "./data";
-import { Drift, Mark, OK, OK_INK, Spot, X0 } from "./parts";
+import { Drift, Mark, OK, OK_INK, Spot, X0, KindTag } from "./parts";
 
 const COL_X = [120, 700, 1280];
 const RULES = [650, 1230];
@@ -169,9 +169,7 @@ export const ComputeScene: React.FC = () => {
         {/* ── A model: one hour, two busy minutes ── */}
         <Note at={modelAt} x={X0} y={y(BADGE_Y)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.6em", fontSize: 23 }}>
-            <Badge tone="purple" size={23}>
-              model
-            </Badge>
+            <KindTag kind="model" />
             <span style={{ opacity: ease(frame, busyAt - 4, 10) }}>
               A dashboard keeps a cluster busy <Num>{m.busyMinutes}</Num> minutes in an hour
             </span>

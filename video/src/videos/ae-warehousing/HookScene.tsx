@@ -4,11 +4,11 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Badge, Note, Num } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TABLE } from "./data";
-import { Box, Drift, Flow, Headline, Kicker, Mark, pulse, SERIES, Spot, X0 } from "./parts";
+import { Box, Drift, Flow, Headline, Kicker, Mark, pulse, SERIES, Spot, X0, KindTag } from "./parts";
 
 const MODELS = ["stg_sales", "int_sales", "fct_sales"];
 const MODEL_W = 230;
@@ -172,9 +172,7 @@ export const HookScene: React.FC = () => {
         </Note>
         <Note at={measuredAt} x={X0} y={y(782)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.6em", fontSize: 23 }}>
-            <Badge tone="blue" size={23}>
-              measured
-            </Badge>
+            <KindTag kind="measured" />
             <span>
               in DuckDB
               <span style={{ opacity: ease(frame, millionAt, 10) }}>
@@ -185,9 +183,7 @@ export const HookScene: React.FC = () => {
         </Note>
         <Note at={modelBadgeAt} x={X0} y={y(838)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.6em", fontSize: 23 }}>
-            <Badge tone="purple" size={23}>
-              model
-            </Badge>
+            <KindTag kind="model" />
             <span>anything bigger, from stated assumptions</span>
           </span>
         </Note>
