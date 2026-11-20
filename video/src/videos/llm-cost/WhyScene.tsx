@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ds } from "../../theme/brand";
-import { body, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { Illustration } from "../../components/Illustration";
+import { body, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { TOKENS } from "./data";
+import { ILLUSTRATIONS, TOKENS, VIDEO } from "./data";
 import {
   Arrow,
   Bracket,
@@ -25,15 +25,25 @@ import {
   X0,
 } from "./parts";
 
-const BOX = { x: 700, w: 210, top: 440, bottom: 620 };
+/**
+ * The model: llm-tokens' pen-and-ink machine (copied in as llm-cost-model, so
+ * the two videos draw the same model) with its label under it, in place of
+ * the plain gray box (the owner, 2026-11-13: "remove the gray box and use the
+ * image along with the model label", with clear horizontal space between the
+ * arrows, the drawing and the label). Its intake pipe and output spout sit
+ * about 42% of the way down it, so it hangs with that height on the arrows'
+ * line, the box's old middle. 210 wide is 420 device pixels at 4K, inside the
+ * art's 1531x970.
+ */
+const MODEL = { x: 692, w: 210, aspect: 970 / 1531, portY: 0.42, lineY: 530 };
+/** Clear space between an arrow's tip or tail and the drawing. */
+const GAP = 24;
 const HEAD_Y = 378;
 const LEFT_ROWS = [452, 530];
 const RIGHT_X = 990;
 const RIGHT_ROW = 492;
 const COUNT_Y = 646;
 const METER_W = 240;
-/** The model box's plain gray. */
-const MODEL_FILL = `color-mix(in srgb, ${ds("gray", 400)} 22%, ${PAPER})`;
 
 /**
  * Why output costs more: the prompt goes through the model in one pass, all
@@ -74,12 +84,12 @@ export const WhyScene: React.FC = () => {
   const outAt = (k: number) => Math.round(lerp(oneAt, modelAt, k / (answer.length - 1)));
   const passesDone = answer.filter((_, k) => frame >= outAt(k)).length;
 
-  // The model box lights once for the whole prompt, then once per answer token.
+  // The model swells once for the whole prompt, then once per answer token.
   const inFlash = pulse(frame, onceAt + 6, 20);
   const outFlash = Math.max(0, ...answer.map((_, k) => pulse(frame, outAt(k) - 8, 12)));
-  const boxY0 = y(BOX.top);
-  const boxY1 = y(BOX.bottom);
-  const midY = (boxY0 + boxY1) / 2;
+  const midY = y(MODEL.lineY);
+  const modelH = MODEL.w * MODEL.aspect;
+  const modelTop = midY - modelH * MODEL.portY;
   const boxIn = ease(frame, outputAt, 14);
 
   return (
@@ -99,23 +109,31 @@ export const WhyScene: React.FC = () => {
 
       <FigLabel n="3" title="Reading takes one pass, writing takes one per token" at={outputAt - 4} x={X0} y={y(FIG_Y)} />
 
-      {/* The model. */}
+      {/* The model: the drawing (no box behind it), and its name under it. */}
+      {ILLUSTRATIONS ? (
+        <Illustration
+          video={VIDEO}
+          id={`${VIDEO}-model`}
+          style={{
+            position: "absolute",
+            left: MODEL.x,
+            top: modelTop,
+            width: MODEL.w,
+            height: modelH,
+            opacity: boxIn,
+            transform: `scale(${1 + Math.max(inFlash, outFlash) * 0.04})`,
+          }}
+        />
+      ) : null}
       <div
         style={{
           position: "absolute",
-          left: BOX.x,
-          top: boxY0,
-          width: BOX.w,
-          height: boxY1 - boxY0,
-          boxSizing: "border-box",
-          borderRadius: 8,
-          // A plain box: neutral gray, no outline, flushing the hue of what passes through.
-          background: `color-mix(in srgb, ${inFlash > outFlash ? INPUT : OUTPUT} ${Math.round(Math.max(inFlash, outFlash) * 30)}%, ${MODEL_FILL})`,
+          left: MODEL.x,
+          top: modelTop + modelH + 12,
+          width: MODEL.w,
+          textAlign: "center",
+          whiteSpace: "nowrap",
           opacity: boxIn,
-          transform: `scale(${1 + Math.max(inFlash, outFlash) * 0.04})`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
         }}
       >
         <span style={label(30, INK)}>model</span>
@@ -141,7 +159,7 @@ export const WhyScene: React.FC = () => {
           })}
         </div>
       ))}
-      <Arrow from={[BOX.x - 110, midY]} to={[BOX.x - 1, midY]} at={onceAt - 2} dur={10} color={INPUT} width={3} />
+      <Arrow from={[MODEL.x - 112, midY]} to={[MODEL.x - GAP, midY]} at={onceAt - 2} dur={10} color={INPUT} width={3} />
       <Note at={passAt - 4} x={X0} y={y(COUNT_Y)}>
         <span style={{ ...note(27, INK), fontWeight: 500, ...TABULAR, whiteSpace: "nowrap" }}>
           {prompt.length} tokens, 1 pass
@@ -152,7 +170,7 @@ export const WhyScene: React.FC = () => {
       <Ink at={answerAt - 4} dur={12} style={{ left: RIGHT_X, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...label(25, OUTPUT_INK), fontWeight: 500 }}>Writing the answer</span>
       </Ink>
-      <Arrow from={[BOX.x + BOX.w + 1, midY]} to={[RIGHT_X - 2, midY]} at={oneAt - 10} dur={10} color={OUTPUT} width={3} />
+      <Arrow from={[MODEL.x + MODEL.w + GAP, midY]} to={[RIGHT_X - 2, midY]} at={oneAt - 10} dur={10} color={OUTPUT} width={3} />
       <div style={{ position: "absolute", left: RIGHT_X, top: y(RIGHT_ROW), display: "flex", gap: 6 }}>
         {answer.map((t, k) => {
           const p = ease(frame, outAt(k), 8);

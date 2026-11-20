@@ -150,7 +150,11 @@ export const MismatchScene: React.FC = () => {
                   make them slightly smaller. Ensure that the circle is
                   vertically centered in the middle with the text to the
                   right"). Line height 1 puts Inter's figures in the middle
-                  of the disc. */}
+                  of the disc. The sans numeral beside the 40px serif breaks
+                  "one line, one size, one family", at the owner's word, so
+                  the disc stands clear of its question, a marker in a
+                  column of its own: more than the 1.2em the [mixed] audit
+                  reads as two words on one line. */}
               <span
                 style={{
                   ...badgeStyle("blue", 30),
@@ -167,7 +171,7 @@ export const MismatchScene: React.FC = () => {
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  marginRight: 18,
+                  marginRight: 36,
                 }}
               >
                 {i + 1}
