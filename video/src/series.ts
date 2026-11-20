@@ -152,6 +152,23 @@ export const SERIES = {
       { n: 9, title: "The AI-allowed round", videos: ["BackendEngineer-9-AiRound"] },
     ],
   },
+  MachineLearningEngineer: {
+    kind: "interview",
+    name: "Machine Learning Engineer Interview Questions",
+    units: [
+      { n: 0, title: "The interview, now", videos: ["MachineLearningEngineer-0-Interview"] },
+      { n: 1, title: "Generalization and evaluation", videos: ["MachineLearningEngineer-1-Generalization"] },
+      { n: 2, title: "Models and how they learn", videos: ["MachineLearningEngineer-2-Models"] },
+      { n: 3, title: "Coding for machine learning", videos: ["MachineLearningEngineer-3-Coding"] },
+      { n: 4, title: "Statistics and probability", videos: ["MachineLearningEngineer-4-Statistics"] },
+      { n: 5, title: "Deep learning", videos: ["MachineLearningEngineer-5-DeepLearning"] },
+      { n: 6, title: "NLP and LLMs", videos: ["MachineLearningEngineer-6-NlpAndLlms"] },
+      { n: 7, title: "ML system design", videos: ["MachineLearningEngineer-7-SystemDesign"] },
+      { n: 8, title: "Shipping and monitoring models", videos: ["MachineLearningEngineer-8-Mlops"] },
+      { n: 9, title: "Serving LLMs", videos: ["MachineLearningEngineer-9-ServingLlms"] },
+      { n: 10, title: "Evaluating LLM systems", videos: ["MachineLearningEngineer-10-LlmEvals"] },
+    ],
+  },
 } satisfies Record<string, SeriesDef>;
 
 export type SeriesKey = keyof typeof SERIES;
