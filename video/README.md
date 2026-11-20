@@ -883,6 +883,8 @@ the mark and as far in from the edge.
 - **One size of animal.** The raccoon is drawn at 86% of its box
   (`artScale` in `TRACKS`): its body fills more of its picture than the
   otter's or the meerkat's, and at full size it read larger than them.
+  The red panda is drawn at 80% for the same reason: at full size its tall,
+  solid figure covers about half as much again of the box as the others.
 - **Seen small.** A thumbnail is about 168x94 on a phone, where 80px is about
   10px, so the words are few. "Interview Questions", the widest line at
   about 730px, fits beside the animal hung top-right; "Interview
