@@ -125,10 +125,10 @@ export const listingCharX = (x: number, col: number, size: number) => x + geomet
 
 /**
  * A listing line: its text, the texts it changes to (`swaps`, each from a
- * frame on), and `growAt` for a line that opens on that frame, pushing the
+ * frame on), `growAt` for a line that opens on that frame, pushing the
  * lines under it down.
  */
-export type ListingLine = string | { text: string; swaps?: readonly { at: number; text: string }[]; growAt?: number };
+export type ListingLine = string | { text: string; swaps?: readonly { at: number; text: string }[]; growAt?: number; closeAt?: number };
 const textOfLine = (l: ListingLine) => (typeof l === "string" ? l : l.text);
 const versions = (l: ListingLine) => (typeof l === "string" ? [{ at: -Infinity, text: l }] : [{ at: -Infinity, text: l.text }, ...(l.swaps ?? [])]);
 /** The text a line shows at `frame`. */
@@ -174,7 +174,10 @@ export const SqlListing: React.FC<{
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || o >= 1) return null;
-  const open = lines.map((l) => (typeof l !== "string" && l.growAt !== undefined ? ease(frame, l.growAt, 14) : 1));
+  // A line opens on `growAt` and, given `closeAt`, closes again.
+  const open = lines.map((l) =>
+    typeof l === "string" ? 1 : (l.growAt === undefined ? 1 : ease(frame, l.growAt, 14)) * (l.closeAt === undefined ? 1 : 1 - ease(frame, l.closeAt, 14)),
+  );
   const tops = open.map((_, i) => g.padY + open.slice(0, i).reduce((s, v) => s + v * g.lineH, 0));
   const height = g.padY * 2 + open.reduce((s, v) => s + v * g.lineH, 0);
   return (

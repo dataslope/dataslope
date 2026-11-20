@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { DBT_MODEL, FILTER, LATE, SQL, STRATEGY, WATERMARK_SQL } from "./data";
-import { Cell, type CellTone, Count, Drift, Flow, listingCharX, listingLineMid, Mark, pulse, SmallMono, SqlListing, X0 } from "./parts";
+import { Cell, type CellTone, Count, type ListingLine, Drift, Flow, listingCharX, listingLineMid, Mark, pulse, SmallMono, SqlListing, X0 } from "./parts";
 
 /** dbt.mdx's model, its file-name comment and blank lines set aside (the
  *  file name is the listing's title). */
@@ -24,8 +24,8 @@ const MODEL_W = 720;
 const SQL_X = 930;
 const SQL_W = 690;
 /** Vertical positions are layout values (through `y()`). */
-const LIST_TOP_C = 276;
-const TITLE_C = 243;
+const LIST_TOP_C = 266;
+const TITLE_C = 233;
 
 // ── The timeline: one column a day, events placed at their event_at ──────────
 const TL0 = 360;
@@ -40,12 +40,37 @@ const LANES_C = { fct: 595, fctNew: 634, rawNew: 704, raw: 743, axis: 790, verdi
 const AFTER = (d: number) => X(d) + P / 2;
 const BEFORE = (d: number) => X(d) - P / 2;
 
-const ARRIVALS = [
-  { id: 25, day: 24 },
-  { id: 26, day: 22.5 },
-  { id: 27, day: 25 },
-];
 const date = (ts: string) => ts.slice(0, 10);
+/** A timestamp's place on the timeline: January's day, with the hours as a
+ *  fraction (2024-01-22 12:00 is 22.5). */
+const dayOf = (ts: string) => (Date.parse(`${ts.replace(" ", "T")}Z`) - Date.parse("2024-01-01T00:00:00Z")) / 86_400_000 + 1;
+/** The three events that land after the page's run, where their event_at
+ *  puts them. */
+const ARRIVALS = LATE.arrived.rows.map((r) => ({ id: Number(r[0]), day: dayOf(r[1]) }));
+const arrival = (id: number) => {
+  const a = ARRIVALS.find((x) => x.id === id);
+  if (!a) throw new Error(`no arrival ${id}`);
+  return a;
+};
+/** The page's watermark after its run, and the overlap window's width as the
+ *  run's SQL writes it: the window reaches back from one to the other. */
+const WM_DAY = dayOf(FILTER.watermarkAfter);
+const WINDOW_DAYS = Number(SQL.OVERLAP.join("\n").match(/INTERVAL '(\d+) days'/)?.[1]);
+const WINDOW_START = WM_DAY - WINDOW_DAYS;
+/** Every row the overlap's run read (LATE.overlap), by the day it sits at. */
+const READ = LATE.overlapRows.rows.map((r) => ({ id: Number(r[0]), day: dayOf(r[1]) }));
+/** The microbatch figure's lookback: the page gives no count, so the band's
+ *  label says how many it draws. */
+const LOOKBACK = 2;
+/** The latest day any event sits at: the current batch. */
+const LAST_DAY = Math.max(...ARRIVALS.map((a) => a.day));
+
+/** The model's filter in the three forms the scene walks through: the page's
+ *  strict `>`, `>=`, and `>=` reaching back over the window, its interval on a
+ *  line of its own as the compiled SQL sets it. */
+const MODEL_WHERE = MODEL.find((l) => l.includes("WHERE event_at >")) ?? "";
+const MODEL_AT_LEAST = MODEL_WHERE.replace("event_at > (", "event_at >= (");
+const MODEL_INTERVAL = `${" ".repeat(MODEL_AT_LEAST.indexOf("("))}${SQL.OVERLAP[3].trim()}`;
 
 /**
  * Questions 2 and 3. The dbt page's model beside the SQL it compiles to (the
@@ -161,9 +186,9 @@ export const FilterScene: React.FC = () => {
     // The page's run: 15 to 24 cross.
     ...loaded.map((id, i) => ({ id, day: id, lane: "main" as const, at: loadsAt + 4 + i * 2.5, move: loadsAt + 4 + i * 2.5, out: goneAt })),
     // `>`: 27. `>=`: 25. The overlap: 26.
-    { id: 27, day: 25, lane: "new", at: onlyAt, move: onlyAt, tones: [{ at: onlyAt + 6, tone: "ok" }, { at: reset, tone: "plain" }], out: goneAt },
-    { id: 25, day: 24, lane: "new", at: comesAt, move: comesAt, tones: [{ at: comesAt + 6, tone: "ok" }, { at: reset, tone: "plain" }], out: goneAt },
-    { id: 26, day: 22.5, lane: "new", at: allAt, move: allAt, tones: [{ at: allAt + 6, tone: "ok" }, { at: reset, tone: "plain" }], out: goneAt },
+    { id: 27, day: arrival(27).day, lane: "new", at: onlyAt, move: onlyAt, tones: [{ at: onlyAt + 6, tone: "ok" }, { at: reset, tone: "plain" }], out: goneAt },
+    { id: 25, day: arrival(25).day, lane: "new", at: comesAt, move: comesAt, tones: [{ at: comesAt + 6, tone: "ok" }, { at: reset, tone: "plain" }], out: goneAt },
+    { id: 26, day: arrival(26).day, lane: "new", at: allAt, move: allAt, tones: [{ at: allAt + 6, tone: "ok" }, { at: reset, tone: "plain" }], out: goneAt },
     // The first run: everything.
     ...Array.from({ length: 24 }, (_, i) => ({ id: i + 1, day: i + 1, lane: "main" as const, at: everythingAt + i * 0.5, move: everythingAt + i * 0.5 })),
     ...ARRIVALS.map((a, k) => ({ id: a.id, day: a.day, lane: "new" as const, at: everythingAt + 6 + k * 2, move: everythingAt + 6 + k * 2 })),
@@ -175,8 +200,11 @@ export const FilterScene: React.FC = () => {
     if (id === 27) t.push({ at: sevenAt, tone: "look" }, { at: onlyAt, tone: "plain" });
     // "The source has twenty-four": its last.
     if (id === 24) t.push({ at: sourceAt, tone: "look" }, { at: loadsAt, tone: "plain" }, { at: skipAt, tone: "off" });
-    if (id >= 21 && id <= 23) t.push({ at: sevenRowsAt, tone: "off" });
-    if (id >= 18 && id <= 20) t.push({ at: moreAt, tone: "off" });
+    // "The window reads seven rows": exactly the rows the overlap's run read,
+    // lit; then the ones already loaded set aside as re-reads.
+    if (READ.some((r) => r.id === id)) t.push({ at: sevenRowsAt, tone: "look" }, { at: allAt, tone: id <= FILTER.after.target ? "off" : "plain" });
+    // A wider window re-reads more.
+    if (id < WINDOW_START && id >= WINDOW_START - WINDOW_DAYS) t.push({ at: moreAt, tone: "off" });
     if (t.length) t.push({ at: microAt, tone: "plain" });
     return t;
   };
@@ -186,8 +214,10 @@ export const FilterScene: React.FC = () => {
     const steps: [number, number][] = [
       [loadedAt, AFTER(14)],
       // Once the ten have crossed.
-      [afterAt + 20, AFTER(24)],
-      [gteAt, BEFORE(24)],
+      [afterAt + 20, AFTER(WM_DAY)],
+      [gteAt, BEFORE(WM_DAY)],
+      // The overlap: the watermark is the window's far end.
+      [overlapAt, AFTER(WM_DAY)],
     ];
     let x = steps[0][1];
     for (let i = 1; i < steps.length; i++) x = x + (steps[i][1] - x) * ease(frame, steps[i][0], 18);
@@ -195,7 +225,13 @@ export const FilterScene: React.FC = () => {
   })();
   // No watermark while microbatch filters by period; back for `{{ this }}`.
   const ruleP = ease(frame, loadedAt, 14) * (1 - ease(frame, goneAt, 12)) * (1 - ease(frame, microAt, 12) + ease(frame, thisAt, 12));
-  const bandLeft = BEFORE(24) - (BEFORE(24) - BEFORE(21)) * ease(frame, overlapAt, 18) - (BEFORE(21) - BEFORE(18)) * ease(frame, wideAt, 18);
+  // The window, from WINDOW_DAYS before the watermark to the watermark: it
+  // opens back from the rule, then a wider one reaches as far again.
+  const bandRight = AFTER(WM_DAY);
+  const bandLeft =
+    bandRight -
+    (bandRight - BEFORE(WINDOW_START)) * ease(frame, overlapAt, 18) -
+    (BEFORE(WINDOW_START) - BEFORE(WINDOW_START - WINDOW_DAYS)) * ease(frame, wideAt, 18);
   const bandP = ease(frame, overlapAt, 10) * (1 - ease(frame, microAt, 12));
   // Microbatch: a batch per day, and the last few re-processed.
   const dividersP = ease(frame, batchAt, 16) * (1 - ease(frame, reset, 12));
@@ -213,12 +249,24 @@ export const FilterScene: React.FC = () => {
   // The compiled SQL: the filter's line changes in place, and the overlap
   // opens a line under it. ORDER BY, which only sorts the page's output, is
   // left out: this is the statement the model runs.
+  // Both go back to the page's strict form for question 3, which asks about
+  // the page's model.
   const compiled = [
     WATERMARK_SQL[0],
     WATERMARK_SQL[1],
-    { text: WATERMARK_SQL[2], swaps: [{ at: gteAt, text: SQL.AT_LEAST[2] }] },
-    { text: SQL.OVERLAP[3], growAt: overlapAt + 2 },
+    { text: WATERMARK_SQL[2], swaps: [{ at: gteAt, text: SQL.AT_LEAST[2] }, { at: thisAt, text: WATERMARK_SQL[2] }] },
+    { text: SQL.OVERLAP[3], growAt: overlapAt + 2, closeAt: thisAt },
   ];
+  // The model on the left changes with it, so the SQL on the right is always
+  // what the model beside it compiles to.
+  const model: ListingLine[] = MODEL.flatMap((l): ListingLine[] =>
+    l === MODEL_WHERE
+      ? [
+          { text: l, swaps: [{ at: gteAt, text: MODEL_AT_LEAST }, { at: thisAt, text: l }] },
+          { text: MODEL_INTERVAL, growAt: overlapAt + 2, closeAt: thisAt },
+        ]
+      : [l],
+  );
 
   const rows = (k: number) => (
     <>
@@ -265,7 +313,7 @@ export const FilterScene: React.FC = () => {
           </span>
         </Note>
         <SqlListing
-          lines={MODEL}
+          lines={model}
           x={MODEL_X}
           top={LIST_TOP}
           width={MODEL_W}
@@ -274,6 +322,8 @@ export const FilterScene: React.FC = () => {
           step={2}
           marks={[
             { line: "{% if is_incremental() %}", at: guardAt, out: pageAt },
+            { line: "WHERE event_at >", text: ">=", at: gteAt + 8, out: overlapAt },
+            { line: "INTERVAL", text: MODEL_INTERVAL.trim(), at: overlapAt + 14, out: microAt },
             { line: "{% endif %}", at: guardAt + 4, out: pageAt },
             { line: "WHERE event_at >", at: newerAt, out: pageAt },
             { line: "WHERE event_at >", text: "{{ this }}", at: tableAt, out: firstAt },
@@ -327,7 +377,7 @@ export const FilterScene: React.FC = () => {
               position: "absolute",
               left: bandLeft,
               top: RULE_TOP,
-              width: BEFORE(24) - bandLeft,
+              width: bandRight - bandLeft,
               height: RULE_BOT - RULE_TOP,
               background: HIGHLIGHT,
               borderRadius: 4,
@@ -340,9 +390,9 @@ export const FilterScene: React.FC = () => {
           <div
             style={{
               position: "absolute",
-              left: BEFORE(23),
+              left: BEFORE(LAST_DAY - LOOKBACK),
               top: RULE_TOP,
-              width: AFTER(25) - BEFORE(23),
+              width: AFTER(LAST_DAY) - BEFORE(LAST_DAY - LOOKBACK),
               height: RULE_BOT - RULE_TOP,
               background: HIGHLIGHT,
               borderRadius: 4,
@@ -350,8 +400,8 @@ export const FilterScene: React.FC = () => {
             }}
           />
         ) : null}
-        <Note at={lookbackAt + 4} x={BEFORE(23) + 6} y={RULE_TOP - 34} out={reset}>
-          <span style={{ ...label(20, inkOf.yellow), fontWeight: 600, whiteSpace: "nowrap" }}>lookback</span>
+        <Note at={lookbackAt + 4} x={BEFORE(LAST_DAY - LOOKBACK) + 6} y={RULE_TOP - 34} out={reset}>
+          <span style={{ ...label(20, inkOf.yellow), fontWeight: 600, whiteSpace: "nowrap" }}>lookback, {LOOKBACK} batches here</span>
         </Note>
         {dividersP > 0 ? (
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: dividersP }}>
@@ -373,8 +423,11 @@ export const FilterScene: React.FC = () => {
             )}
           </svg>
         ) : null}
-        <Note at={threeDaysAt} x={(bandLeft + BEFORE(24)) / 2 - 36} y={RULE_TOP - 34} out={wideAt - 4}>
-          <span style={{ ...label(20, inkOf.yellow), fontWeight: 600, whiteSpace: "nowrap" }}>3 days</span>
+        <Note at={threeDaysAt} x={BEFORE(WINDOW_START) + 6} y={RULE_TOP - 34} out={wideAt - 4}>
+          <span style={{ ...label(20, inkOf.yellow), fontWeight: 600, whiteSpace: "nowrap" }}>{WINDOW_DAYS} days back</span>
+        </Note>
+        <Note at={wideAt + 10} x={BEFORE(WINDOW_START - WINDOW_DAYS) + 6} y={RULE_TOP - 34} out={microAt}>
+          <span style={{ ...label(20, inkOf.yellow), fontWeight: 600, whiteSpace: "nowrap" }}>a wider window</span>
         </Note>
         {/* The watermark. */}
         {ruleP > 0 ? (
@@ -526,7 +579,7 @@ export const FilterScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={overlapAt} x={X0} y={VERDICT} out={microAt - 4}>
+        <Note at={overlapAt} x={X0} y={VERDICT} out={wideAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             A three-day overlap
             <span style={{ opacity: ease(frame, keyAt, 10) }}>
@@ -540,7 +593,7 @@ export const FilterScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={wideAt} x={X0} y={VERDICT2} out={seqAt - 4}>
+        <Note at={wideAt} x={X0} y={VERDICT} out={microAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             As wide as data arrives late
             <span style={{ opacity: ease(frame, moreAt, 10), color: INK_SOFT }}>: more re-read every run</span>

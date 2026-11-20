@@ -138,6 +138,8 @@ export const LATE = {
   atLeastNew: ids("late", "atLeastNew"),
   /** A three-day overlap: 21 to 27 read, 25, 26 and 27 new. */
   overlap: ids("late", "overlap"),
+  /** The overlap's rows, with their event_at. */
+  overlapRows: asResult(ok("late", "overlap")),
   overlapNew: ids("late", "overlapNew"),
 };
 
