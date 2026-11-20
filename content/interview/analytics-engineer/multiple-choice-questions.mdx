@@ -471,7 +471,7 @@ this track do, and is standard except where a question says otherwise.
 - It generates Python and runs it.
   > Python models exist on some adapters, but SQL compilation is the core.
 - It executes the transformation on dbt's own compute.
-  > dbt Cloud runs the orchestration, never the query.
+  > The dbt platform (formerly dbt Cloud) runs the orchestration, never the query.
 - [o] It compiles SQL and runs it inside your warehouse.
   > The result is a \`CREATE TABLE AS\` or \`CREATE VIEW AS\`. The data never leaves the warehouse, which is why dbt has no processing engine of its own.
 - It moves data between systems.
@@ -627,7 +627,7 @@ this track do, and is standard except where a question says otherwise.
 - \`dbt run --select my_model --downstream\`
   > There is no \`--downstream\` flag.
 - \`dbt run --models all\`
-  > \`all\` is read as a model name, matches nothing, and the run does nothing. \`--models\` is also the old spelling of \`--select\`.
+  > \`all\` is read as a model name, matches nothing, and the run does nothing. \`--models\` is also the old spelling of \`--select\`, which dbt v2 rejects.
 - \`dbt run --select my_model --full-refresh\`
   > \`--full-refresh\` changes how incremental models rebuild; it selects nothing extra.
 - [o] \`dbt run --select my_model+\`

@@ -44,20 +44,43 @@ drift has nowhere to start.
 
 ### What is the dbt Semantic Layer / MetricFlow?
 
-It lets you define **semantic models** (entities, dimensions, measures) and
-**metrics** in YAML alongside your dbt project; MetricFlow then compiles a
-requested metric-by-dimension query into correct warehouse SQL at run time,
-handling joins and aggregation. BI tools query the layer via an API and all get
+It lets you declare **entities**, **dimensions**, and **metrics** in the YAML
+of the dbt model they describe; MetricFlow then compiles a requested
+metric-by-dimension query into correct warehouse SQL at run time, handling
+joins and aggregation. BI tools query the layer via an API and all get
 identical, governed results, so the metric lives in one versioned place.
 
 ```yaml
-metrics:
-  - name: completed_revenue
-    type: simple
-    label: Completed Revenue
-    type_params:
-      measure: order_amount   # SUM defined on the semantic model, filtered to completed
+models:
+  - name: fct_orders
+    semantic_model:
+      enabled: true
+    agg_time_dimension: ordered_at
+    columns:
+      - name: order_id
+        entity:
+          name: order
+          type: primary
+      - name: ordered_at
+        granularity: day
+        dimension:
+          type: time
+      - name: status
+        dimension:
+          type: categorical
+    metrics:
+      - name: completed_revenue
+        type: simple
+        label: Completed Revenue
+        agg: sum
+        expr: amount
+        filter: "{{ Dimension('order__status') }} = 'completed'"
 ```
+
+Older projects define a separate `semantic_models:` block with `measures:`,
+and a metric that points at one through `type_params`. That is the legacy
+spec: since dbt 1.12 a simple metric carries its own aggregation, and
+measures are deprecated.
 
 ### What is LookML, and how does Looker's semantic layer work?
 
@@ -66,6 +89,18 @@ LookML is Looker's modeling language: you declare **dimensions** and
 generates SQL from user selections. It was an early, influential semantic layer,
 centralizing metric logic so every Look and dashboard derives from the same
 governed definitions rather than ad-hoc SQL.
+
+### Where else can a semantic layer live?
+
+In the warehouse itself. Snowflake's **semantic views** are schema-level
+objects (`CREATE SEMANTIC VIEW`) that declare logical tables, facts,
+dimensions, and metrics, and Databricks has **metric views** in Unity
+Catalog. Many "ask your data" assistants query one of these rather than a
+BI tool's model. The trade-off to name is portability: a definition written
+for one engine does not move to another. **Apache Ossie**, which began as the
+Open Semantic Interchange initiative, is a vendor-neutral specification for
+exchanging those definitions between platforms, with contributors from
+Snowflake, Databricks, Salesforce, and dbt Labs among others.
 
 ### What is a fan-out join (fan trap), and why is it dangerous?
 
@@ -207,7 +242,10 @@ across tools into a managed, auditable asset.
 are the attributes you group and filter by (region, status, date), and
 **measures** are the aggregatable quantities (amount, count). Declaring these
 lets the semantic layer know how tables relate and how to aggregate, so it can
-safely assemble any metric-by-dimension query, joining without fan traps.
+safely assemble any metric-by-dimension query, joining without fan traps. The
+triad is LookML's and the original MetricFlow spec's; in dbt's current spec
+the measure is folded into a simple metric, so there it reads entities,
+dimensions, and metrics.
 
 ### What is a cumulative or time-window metric, and why define it centrally?
 

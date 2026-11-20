@@ -188,7 +188,8 @@ They extend the four built-ins with reusable checks: `dbt_utils`'
 `accepted_range`, `expression_is_true`, `not_null_proportion`, and
 `unique_combination_of_columns`; `dbt_expectations` ports Great Expectations
 assertions like value-set membership, row-count bounds, and distributional
-checks. They cover the "is this value in a sane range / does this expression
+checks (the maintained package is `metaplane/dbt_expectations`; the original
+`calogica` one is no longer updated). They cover the "is this value in a sane range / does this expression
 hold" gap the built-ins leave.
 
 ### What are dbt unit tests, and how do they differ from data tests?
@@ -198,6 +199,25 @@ Unit tests (dbt 1.8+) validate a model's **transformation logic** against
 in CI without real data. Data tests validate **actual data** in the warehouse.
 Use unit tests to lock down tricky SQL (a `CASE` expression, a window function)
 and data tests to catch bad values in production.
+
+```yaml
+unit_tests:
+  - name: flags_invalid_emails
+    model: dim_customers
+    given:
+      - input: ref('stg_customers')
+        rows:
+          - {customer_id: 1, email: "ada@example.com"}
+          - {customer_id: 2, email: "not-an-email"}
+    expect:
+      rows:
+        - {customer_id: 1, is_valid_email: true}
+        - {customer_id: 2, is_valid_email: false}
+```
+
+`given` mocks each input the model reads and `expect` lists the rows it should
+produce; nothing is read from the warehouse's real tables. On dbt v2,
+`dbt build` runs every unit test first and only then starts building the DAG.
 
 ### What is `store_failures`, and why enable it?
 
