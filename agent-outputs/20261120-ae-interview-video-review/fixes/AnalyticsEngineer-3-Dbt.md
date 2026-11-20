@@ -53,4 +53,30 @@ and `materializations.tableRebuilt.steps.plan` (Seq Scan on dim_customer,
 
 ## Checks
 
-CHECKS_PENDING
+All run on the final code, through `out/entries/AnalyticsEngineer-3-Dbt.tsx`
+and the render queue.
+
+| Check | Result |
+| --- | --- |
+| typecheck (`tsc --noEmit`, errors naming `ae-dbt`) | pass, none |
+| lint (`eslint src/videos/ae-dbt`) | pass |
+| `check:cues` | pass |
+| `npm test` | pass, 79 of 79 |
+| `check:frames` (`CHECK_SCALE=1`) | pass: 4 illustrations, 41 arrows (largest bend 6.2°), spacing, sizes and cue checks all clean |
+| `check:motion` | pass after one more change (below). Longest still 2.8 s, over the opening of Q12. |
+| `check:sync` | pass: 49 beats, worst +0.05 s (`r-seeds`); `env-profile` +0.00 |
+| `check:mix` | pass: effects 29.4 LU under the narration, speech a median 28.5 dB above them, closest 12.9 dB |
+
+**One change the checks asked for.** The first `check:motion` on the new
+timeline failed: the page held still for 3.0 s from 476.8 s while Question 12
+was read. The builder's run measured the same stretch at 2.8 s, so it sat on
+the limit. Q12's first line ("A reusable Jinja function that writes SQL") now
+inks in 24 frames before "A macro is", in the pause after the question, and
+its listing at + 2 (was + 6). The stretch is now 2.8 s and the check passes
+(stills at 478.2, 479.3 and 480.6 s).
+
+Stills are in `video/out/review/AnalyticsEngineer-3-Dbt/`, at every place I
+changed: 14.1, 14.4, 17, 68, 100, 188, 205, 244, 269, 271.5, 272.3, 336,
+369.5, 371, 372.5, 396, 401, 404, 414, 424, 455, 478.2, 479.3, 480.6, 494.6,
+499, 500.4, 562.9, 566.1, 601.5, 603.4, 632, 653 and 666 s. I looked at each.
+I deleted the WAVs and the preview the checks left in `video/out/`.
