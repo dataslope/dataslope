@@ -463,7 +463,7 @@ export const script: NarrationScript = {
     },
     {
       id: "cv-when",
-      text: "Use it when data is too scarce to set a validation set aside, or to compare models reliably. When a training run takes days, k folds cost k runs.",
+      text: "Use it when data is too scarce to set a validation set aside, or to compare models reliably. When a training run takes days, k folds cost k runs, and one hold-out wins.",
       pauseAfter: 0.6,
     },
     {
@@ -500,7 +500,7 @@ export const script: NarrationScript = {
     },
     {
       id: "pr-cost",
-      text: "Which matters is a cost question: a false alarm blocks a good customer's card, and a miss loses the money. F one weighs them equally, which a business rarely does.",
+      text: "Favor precision when false alarms are costly, recall when misses are: here, a false alarm blocks a good customer's card, and a miss loses the money. F one weighs them equally, which a business rarely does.",
       pauseAfter: 0.6,
     },
     {
@@ -573,7 +573,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-r2",
-      text: "R squared compares your squared error with always predicting the mean: one is perfect, zero is the mean's own score, and on new data it can go negative.",
+      text: "R squared compares your squared error with always predicting the mean: one is perfect, zero is the mean's own score, and on new data it can go negative, so there, don't call it variance explained.",
       pauseAfter: 0.9,
     },
     {

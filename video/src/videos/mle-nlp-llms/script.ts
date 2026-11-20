@@ -223,18 +223,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     id" is ml-fundamentals' "a dedicated layer". "q3-cost": a contextual
  *     vector is computed by running the model, a static one is looked up;
  *     the engineering consequence of the page's definitions.
- *   - "q4", "q4-hop": the pages' formula and "one hop apart". "q4-scale": a
+ *   - "q4-a", "q4-hop": the pages' formula and "one hop apart". "q4-scale": a
  *     seeded simulation, queries and keys of 64 standard normal numbers,
  *     2,000 rows of 16 keys: raw dot products have a standard deviation of
  *     8.0 ("eight times wider"); unscaled, the largest weight in a row
  *     averages 0.853 ("eighty-five percent"; 58% of rows put over 90% on one
  *     key); divided by 8, it averages 0.249 ("twenty-five"). The pages: the
  *     scaling "keeps dot products from saturating the softmax".
- *   - "q5": the pages (heads specialize, "syntax" and "coreference"; "about
- *     the same" cost). Eight heads of 64 against one of 512: the projections
+ *   - "q5-a", "q5-cost": the pages (heads specialize, "syntax" and
+ *     "coreference"; "about the same" cost). Eight heads of 64 against one of 512: the projections
  *     are 4 x 512^2 = 1,048,576 weights either way, and a pair costs 512
  *     multiply-adds either way.
- *   - "q6", "q6-kinds", "q7": the pages.
+ *   - "q6-a", "q6-kinds", "q7-a": the pages.
  *   - "q8-a": a thousand tokens are a million pairs, two thousand four million;
  *     the page's "doubling the context roughly quadruples the attention
  *     cost". "q8-when": arithmetic from stated assumptions (width 4,096, a
@@ -243,7 +243,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     weighted sum 2 n d, equal at n = 6 d = 24,576 ("about twenty-five
  *     thousand"); masking, which halves the attention term in a decoder,
  *     is left out. "q8-fix": the page's variants and retrieval.
- *   - "q9", "q10", "q11": the pages.
+ *   - "q9-a", "q10-a", "q11-a": the pages.
  *   - "q12-math", "q12-ship": arithmetic from stated sizes. A 4,096 x 4,096
  *     matrix is 16,777,216 numbers ("nearly seventeen million"); rank 8 is
  *     2 x 4,096 x 8 = 65,536 ("sixty-five thousand"), 0.39% ("under half a
@@ -256,7 +256,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     after training, so a merged adapter costs nothing at inference, and a
  *     frozen base can serve many adapters kept apart; standard LoRA
  *     practice, not the page's.
- *   - "q13": the page's flow and reasons. "q13-miss": the track's 167
+ *   - "q13-a": the page's flow and reasons. "q13-miss": the track's 167
  *     answers (one per question) searched with TF-IDF cosine for "How do I
  *     stop an LLM making things up?" (terms: stop, llm, making, things): the
  *     top answer is "When should you not use an LLM?" (0.118); the

@@ -68,9 +68,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * series' meanings (interview.tsx): red the trap or the error, green the right
  * answer, yellow what the narration points at, blue data. The toucan hero
  * stands beside the opening and the close; the three spots are things the
- * narration names: a measuring tape ("scale", units), a paint palette of three
- * colours ("r-onehot", the colours) and a bundle of sticks ("bag", many models
- * together).
+ * narration names: a stack of coins ("scale-gd", dollars and cents), a stand
+ * of three trees ("forest") and three paint pots ("r-onehot", the colours).
  *   hook: two columns under one rule. Left, "Logistic regression": its eleven
  *     numbers (logit.weights and bias) set as a short column of values, in
  *     blue. Right, "Nearest neighbours": a block of 160 × 10 small cells, the
@@ -144,12 +143,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     three fit times as bars, the ratios ("× 3.x" from svm.doubling) over
  *     them, "measured once, browser Python" as a note.
  *   scale: question card; the customers' raw axes, age 20 to 70 years and
- *     income 20,000 to 150,000 dollars, drawn to scale: a flat smear. The
- *     measuring-tape spot.
+ *     income 20,000 to 150,000 dollars, drawn to scale: a flat smear.
  *   scale-knn: three bars, raw 74.5% (red), income alone 74.5% (ink),
  *     standardized 89.1% (green).
- *   scale-gd: "× 100 on one column": steps to settle, 8 against 79,315
- *     (scale.asIs, scale.times100), the second in red.
+ *   scale-gd: the coins spot; "× 100 on one column": steps to settle, 8
+ *     against 79,315 (scale.asIs, scale.times100), the second in red.
  *   scale-prod: "Needs it: distances, penalties, gradients · Trees: no", then
  *     "Fit on training data, ship with the model" in green.
  *   pca: question card; a cloud with its two component arrows, the first
@@ -159,15 +157,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   pca-trap: the simulated cloud (pca.trap), coloured by label, which splits
  *     across the short axis; the first component "97% of variance, 54.5%
  *     accuracy" in red, the second "3% of variance, 91% accuracy" in green.
- *   bag: question card; the bundle-of-sticks spot; two small diagrams,
+ *   bag: question card; two small diagrams,
  *     models side by side into an average (bagging) and models in a chain
  *     (boosting), outlined boxes, each lit as named.
  *   bag-floor: the page's formula as its chart draws it (ensemble.formula):
  *     the variance of an average against models averaged, at correlations
  *     0.6 and 0.3, each flattening onto its floor (dashed), "the page's
  *     formula, not a fit" as a note.
- *   forest: question card; one 8 × 8 digit, eight of its pixels lit yellow
- *     for one split.
+ *   forest: question card; the trees spot; one 8 × 8 digit, eight of its
+ *     pixels lit yellow for one split.
  *   forest-run: accuracy against trees averaged, 1 to 300 (ensemble
  *     baggedCurve and forestCurve): the forest starting below (73% against
  *     78% at one tree) and finishing above (97.8% against 95.9%); "one tree:
@@ -188,9 +186,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   r-kmeans: the stretched clusters (kmeans): true clusters as shapes,
  *     k-means' assignment as colours, the 19% assigned wrong ringed red;
  *     "round clusters: 100%" as a note.
- *   r-onehot: the palette spot; the page's block: "red, green, blue, red" →
- *     its encoded rows (onehot.encoded), columns blue, green, red; then
- *     "purple → 0 0 0" in green.
+ *   r-onehot: the paint-pots spot; the page's block: "red, green, blue,
+ *     red" → its encoded rows (onehot.encoded), columns blue, green, red;
+ *     then "purple → 0 0 0" in green.
  *   r-fe: the examples as a line of words.
  *   next: the five groups, all lit, the toucan returning; <NextLine> "Next:
  *     coding for machine learning" on "Next".
@@ -389,7 +387,7 @@ export const script: NarrationScript = {
     },
     {
       id: "logit-prod",
-      text: "It's a classifier despite its name, and a strong baseline: serving it is one dot product, its weights can be read, and where to cut its probability is a separate decision, made from the cost of each error.",
+      text: "It's a classifier despite its name, and a strong baseline: one dot product to serve, weights you can read, and a threshold set separately, from the cost of each error.",
       pauseAfter: 0.8,
     },
 
@@ -434,7 +432,7 @@ export const script: NarrationScript = {
     },
     {
       id: "knn-trade",
-      text: "There's no training step, but inference is slow, and high dimensions hurt, because every point ends up about equally far away. Pick k by cross-validation. At scale, approximate nearest-neighbour indexes trade a little accuracy for a lot of speed.",
+      text: "There's no training step, but inference is slow, and in high dimensions every point ends up about equally far away. Pick k by cross-validation. At scale, approximate nearest-neighbour indexes trade a little accuracy for a lot of speed.",
       pauseAfter: 0.8,
     },
 
@@ -534,7 +532,7 @@ export const script: NarrationScript = {
     },
     {
       id: "gb-rate",
-      text: "The follow-up is how many trees. On a synthetic benchmark, with each tree scaled by a learning rate of one, validation error is lowest after twelve trees. At point one, it keeps falling until seven hundred and eighty-four, to less than half the error.",
+      text: "The follow-up is how many trees. On a synthetic benchmark, with each tree scaled by a learning rate of one, validation error is lowest after twelve trees, then climbs. At point one, it keeps falling until seven hundred and eighty-four, to less than half the error.",
       pauseAfter: 0.7,
     },
     {
@@ -567,7 +565,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-onehot",
-      text: "One-hot encoding gives each of a category's values its own column of zeros and ones, implying no order. A value unseen in training becomes all zeros, not an error at serving time. For thousands of values, use hashing or embeddings.",
+      text: "One-hot encoding gives each category its own column of zeros and ones, implying no order: red, green and blue become three columns. Purple, unseen in training, becomes all zeros, not an error at serving time. For thousands of values, use hashing or embeddings.",
       pauseAfter: 0.6,
     },
     {
