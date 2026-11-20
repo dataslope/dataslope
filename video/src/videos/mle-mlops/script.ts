@@ -318,7 +318,7 @@ export const script: NarrationScript = {
     {
       id: "q1",
       scene: true,
-      text: "Question one. What is MLOps, and how does it differ from traditional DevOps? It brings DevOps practices to machine learning: automation, monitoring, and continuous integration and delivery, or CI/CD. But it adds a moving part: data.",
+      text: "Question one. What is MLOps, and how does it differ from traditional DevOps? It brings DevOps practices to machine learning: automation, monitoring, and continuous integration and delivery, or CI CD. But it adds a moving part: data.",
       pauseAfter: 0.6,
     },
     {
@@ -359,7 +359,7 @@ export const script: NarrationScript = {
     {
       id: "q4",
       scene: true,
-      text: "Questions four and five. How do you design a CI/CD pipeline for ML? And what is an evaluation gate, and why is it essential? The pipeline validates the new data, tests the feature transforms, trains on a versioned dataset, gates the result, promotes it in the registry, and rolls it out in stages: shadow, canary, full.",
+      text: "Questions four and five. How do you design a CI CD pipeline for ML? And what is an evaluation gate, and why is it essential? The pipeline validates the new data, tests the feature transforms, trains on a versioned dataset, gates the result, promotes it in the registry, and rolls it out in stages: shadow, canary, full.",
       pauseAfter: 0.6,
     },
     {

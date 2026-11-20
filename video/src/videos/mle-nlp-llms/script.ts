@@ -176,7 +176,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     retrieval.top): "When should you not use an LLM?" first; the
  *     hallucination answer far below at "0.000" in red, with "shares none of
  *     the words" beside it; "word counts stand in for an embedding model
- *     here" as its note; "+ keyword search" as a small badge on "keyword".
+ *     here" as its note. Nothing new for "keyword search": the list is
+ *     already four long titles, and the words carry it.
  *   q14, q14-a: two columns with a vertical hairline: "RAG: knowledge" (facts that
  *     change, private, too many) and "Fine-tuning: behavior" (style,
  *     vocabulary, format); "fine-tune for behavior, retrieve for facts"
@@ -309,7 +310,7 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "A language model never sees your text. Text is cut into tokens, tokens become vectors, and attention lets every vector look at every other. Each step is a choice with a cost, and this round asks you to defend it.",
+      text: "A language model never sees your text. It's cut into tokens, tokens become vectors, and attention lets every vector look at every other. Each step is a choice with a cost, and this round asks you to defend it.",
       pauseAfter: 0.7,
     },
     { id: "plan", text: "Nineteen questions: fourteen worked through, and five quickly at the end.", pauseAfter: 0.7 },

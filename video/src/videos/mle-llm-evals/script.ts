@@ -64,7 +64,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     input, one label, a tick. "Assistant": one question and three
  *     different answers, two of them good (green) and one wrong (red).
  *   q1: question card; an empty ladder of five numbered rungs, "cheap" at
- *     the bottom and "expensive" at the top.
+ *     the bottom and "expensive" at the top. Only the rung being said keeps
+ *     its chips and notes: when the next rung inks in, the one before fades
+ *     back to its title (rung 2 keeps its judge chip, which q1-human points
+ *     back at), so the finished ladder is five titles with
+ *     q1-agree's arrow and q1-bench's chip beside it, not twenty-odd labels
+ *     on one page.
  *   q1-set: rung 1, "Offline eval set: realistic inputs, a reference or a
  *     rubric"; "100–200 well-chosen > thousands synthetic" under it;
  *     "grows from production failures" with a small arrow feeding back in.
@@ -85,11 +90,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     online" in red, and "Fix the eval set" in green.
  *   q1-bench: a "Public benchmarks" chip set apart from the ladder, in grey,
  *     with "saturated" and "may have leaked into training" under it.
- *   q2: question card; the balance-scale spot; three rows lit as named,
- *     "Position: the first answer shown", "Verbosity: the longer answer",
+ *   q2: question card; the balance-scale spot. q2-bias: three rows lit as
+ *     named, "Position: the first answer shown", "Verbosity: the longer answer",
  *     "Self-enhancement: its own model family", with the source line
  *     "Zheng et al., NeurIPS 2023 Datasets and Benchmarks".
- *   q2-case: two bars, both 100% wide, split by winner. "A shown first": A
+ *   q2-case: two bars, both 100% wide, split by winner, the first-shown
+ *     answer named on each bar's left. "A shown first": A
  *     70, B 30. "B shown first": B 65, A 35 (results.json position). A is
  *     blue and B a light blue in both bars (two data series, so neither red
  *     nor green, and not yellow, which means "pointed at"), with each bar's
@@ -146,8 +152,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     five links at "95%" → "77%", both green; "Fewer, more reliable steps"
  *     as the line under them.
  *   q5: question card; three outcome checks as rows with ticks, "ticket
- *     filed", "tests pass", "database in the expected state"; "checked with
- *     code, not a judge" under them on "code".
+ *     filed", "tests pass", "database in the expected state", each on its
+ *     words. q5-code: "checked with code, not a judge" under them on
+ *     "code".
  *   q5-traj: the agent's steps as a row of chips (tool, arguments, steps,
  *     cost), and one trajectory that reaches the green outcome through a red
  *     step ("a path you'd never allow"), on "never".
@@ -159,8 +166,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     k = 1; at k = 4, the two points ringed in yellow as said, "99.8%" and
  *     "41%" (pass@k reaches 99.999% by k = 7: label it "≈100%", never
  *     "100%").
- *   q5-which: the pass^k curve turns green ("customer-facing: pass^k") and
- *     its k = 8 point is marked "17%".
+ *   q5-which: the label "Customer-facing: pass^k" in green beside the
+ *     pass^k curve, which stays ink (a falling curve drawn green would read
+ *     as a good result); its k = 8 point ringed in yellow, "17%", on
+ *     "seventeen".
  *   q6: question card; "a smaller model or a rule" as the headline's answer.
  *   q6-list: four rows, each inked on its words: "Tabular prediction",
  *     "Strict latency or cost budget", "Calibrated probabilities, or
@@ -336,12 +345,17 @@ export const script: NarrationScript = {
     {
       id: "q2",
       scene: true,
-      text: "Question two. When can you trust an LLM as a judge? Only after you've measured it. Zheng and colleagues documented three biases. Position: favoring the answer shown first. Verbosity: favoring the longer one. And self-enhancement: favoring text from its own model family.",
+      text: "Question two. When can you trust an LLM as a judge? Only after you've measured it.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q2-bias",
+      text: "Zheng and colleagues documented three biases: position, favoring the answer shown first; verbosity, favoring the longer one; and self-enhancement, favoring text from its own model family.",
       pauseAfter: 0.7,
     },
     {
       id: "q2-case",
-      text: "Here's position bias in numbers. A judge prefers version A of the assistant over version B in seventy percent of pairs. Rerun every pair with B shown first, and B wins sixty-five percent.",
+      text: "Here's position bias in numbers. A judge prefers version A of the assistant, shown first, over version B in seventy percent of pairs. Rerun every pair with B shown first, and B wins sixty-five percent.",
       pauseAfter: 0.6,
     },
     {
@@ -385,7 +399,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q3-generation",
-      text: "Then generation. Faithfulness: is every claim supported by the retrieved passages? Answer relevance. And citation accuracy.",
+      text: "Then generation. Faithfulness: is every claim supported by the retrieved passages? Answer relevance: does it address the question? And citation accuracy.",
       pauseAfter: 0.6,
     },
     {
@@ -409,7 +423,7 @@ export const script: NarrationScript = {
     {
       id: "q4",
       scene: true,
-      text: "Question four. What is an agent, and how does tool calling work? Tool calling lets a model request an action instead of answering. It emits a structured call, a tool name and JSON arguments. The application runs it, and the result goes back into the context.",
+      text: "Question four. What is an agent, and how does tool calling work? Tool calling lets a model request an action instead of answering: it emits a structured call, a tool name and JSON arguments, and the application runs it and puts the result back into the context.",
       pauseAfter: 0.6,
     },
     {
@@ -443,7 +457,12 @@ export const script: NarrationScript = {
     {
       id: "q5",
       scene: true,
-      text: "Question five. How do you evaluate an agent? Check outcomes, not prose. Did the ticket get filed? Do the tests pass? Is the database in the state you expected? Those are checked with code, not a judge: the ticket exists with the right fields, or it doesn't.",
+      text: "Question five. How do you evaluate an agent? Check outcomes, not prose: did the ticket get filed, do the tests pass, is the database in the state you expected?",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q5-code",
+      text: "Those are checked with code, not a judge: the ticket exists with the right fields, or it doesn't.",
       pauseAfter: 0.6,
     },
     {
@@ -453,7 +472,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q5-repeat",
-      text: "Runs aren't deterministic, so repeat each task. The authors of tau-bench separate two scores. Pass at k: at least one of k attempts succeeds. Pass hat k: all k succeed.",
+      text: "Runs aren't deterministic, so repeat each task. The authors of tau-bench separate two scores: pass at k, at least one of k attempts succeeds, and pass hat k, all k succeed.",
       pauseAfter: 0.6,
     },
     {
