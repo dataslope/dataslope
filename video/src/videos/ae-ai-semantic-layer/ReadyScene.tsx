@@ -248,7 +248,7 @@ export const ReadyScene: React.FC = () => {
               stop a query). */}
           <Spot id="ae-ai-semantic-layer-padlock" at={martsAt + 26} left={ASST_X - padlock.width - 36} top={asstTop + modelH / 2 - padlock.height / 2} {...padlock} />
           {/* What private does do, under the private models. */}
-          <Ink at={buildAt} dur={12} style={{ left: modelX(0), top: modelTop + modelH + h(20) }}>
+          <Ink at={buildAt} dur={12} style={{ left: modelX(0), top: modelTop + modelH + h(12) }}>
             <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Private stops ref(),</div>
             <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, queriesAt, 12) }}>not queries</div>
           </Ink>
