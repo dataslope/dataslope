@@ -9,8 +9,8 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { mb, SELECT_STAR, TABLE } from "./data";
-import { COLUMN_TINT, Drift, FileBar, Listing, MARK_OK, Mark, OK_INK, READ, READ_BAD, READ_OK, ReadMark, SmallMono, X0, KindTag } from "./parts";
+import { kb, mb, SELECT_STAR, TABLE } from "./data";
+import { COLUMN_TINT, Drift, FileBar, Listing, MARK_BAD, MARK_OK, Mark, OK_INK, READ, READ_BAD, READ_OK, ReadMark, SmallMono, X0, KindTag } from "./parts";
 
 const MODEL_Y = 396;
 const STRIP_W = 5;
@@ -32,8 +32,10 @@ const DBT_Y = 742;
  * SELECT *. Then the million sales, measured: six bars, one per column of the
  * Parquet file at its real size, and what DuckDB read for three queries:
  * SELECT * (the whole file), units by region (two thin columns, under 800
- * kB) and revenue by region (the wide amount column, 4.6 MB): bytes, not a
- * count of columns. Then the habit in a dbt model: name the columns.
+ * kB) and revenue by region (the wide amount column, 4.6 MB), kept as a
+ * tally so the two two-column reads sit side by side: bytes, not a count of
+ * columns; and a LIMIT, on BigQuery, bills the same scan. Then the habit in
+ * a dbt model: name the columns.
  */
 export const StarScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -62,6 +64,8 @@ export const StarScene: React.FC = () => {
   const halfAt = n.word("star-wide", "nearly half the file");
   const revenueAt = n.word("star-wide", "revenue by region");
   const fourAt = n.word("star-wide", "four point six megabytes");
+  const limitAt = n.word("star-limit", "a limit doesn't help");
+  const rowsAt = n.word("star-limit", "not the rows returned");
   const projectAt = n.word("star-dbt", "In a project, name the columns");
   const tableAt = n.word("star-dbt", "a model built as a table from select star");
   const everyAt = n.word("star-dbt", "every column of its source");
@@ -93,7 +97,11 @@ export const StarScene: React.FC = () => {
     names.map((name) => <ReadMark key={`${name}${at}`} x={BAR_X} y={barTop(idx(name))} width={w(cols[idx(name)].bytes)} height={barH} at={at} out={out} color={color} />);
 
   const dbtBad = ["{{ config(materialized='table') }}", "SELECT * FROM {{ source('shop', 'sales') }}"];
-  const dbtGood = ["SELECT sale_id, sale_date, region, amount", "FROM {{ source('shop', 'sales') }}"];
+  // The same model both times; only the select list differs.
+  const dbtGood = ["{{ config(materialized='table') }}", "SELECT region, amount FROM {{ source('shop', 'sales') }}"];
+  // The tally of what each query read: it grows, so the two two-column
+  // queries end up side by side.
+  const tally = (i: number) => readTop + i * h(44);
 
   return (
     <AbsoluteFill>
@@ -107,6 +115,7 @@ export const StarScene: React.FC = () => {
       <Sfx name="el-tap" at={underAt} level={-33} />
       <Sfx name="el-pencil" at={halfAt} level={-35} />
       <Sfx name="el-tap" at={fourAt} level={-33} />
+      <Sfx name="el-tap" at={limitAt} level={-34} />
       <Sfx name="el-scratch" at={tableAt + 6} level={-35} />
       <Sfx name="el-pencil" at={everyAt + 6} level={-35} />
 
@@ -209,34 +218,43 @@ export const StarScene: React.FC = () => {
         <Listing lines={q.star} x={Q_X} top={qTop} width={Q_W} size={21} at={starAt} out={unitsAt - 2} />
         <Listing lines={q.units} x={Q_X} top={qTop} width={Q_W} size={21} at={unitsAt} out={revenueAt - 2} marks={[{ line: "SELECT", text: "region, SUM(units)", at: twoColsAt, color: MARK_OK }]} />
         <Listing lines={q.amount} x={Q_X} top={qTop} width={Q_W} size={21} at={revenueAt} dim={dim} marks={[{ line: "SELECT", text: "region, SUM(amount)", at: revenueAt + 6 }]} />
-        <Note at={nineAt} x={Q_X} y={readTop} out={unitsAt - 2}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            Read: <b style={{ color: ACCENT_INK }}>{mb(SELECT_STAR.star.read)}</b>
+        <Note at={nineAt} x={Q_X} y={tally(0)} dim={dim}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <SmallMono>SELECT *</SmallMono>: <b style={{ color: ACCENT_INK }}>{mb(SELECT_STAR.star.read)}</b>
             <span style={{ color: INK_SOFT }}>, the whole file</span>
           </span>
         </Note>
-        <Note at={underAt} x={Q_X} y={readTop} out={revenueAt - 2}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            Read: <b style={{ color: OK_INK }}>{mb(SELECT_STAR.regionUnits.read, 2)}</b>
+        <Note at={underAt} x={Q_X} y={tally(1)} dim={dim}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            Units by region: <b style={{ color: OK_INK }}>{kb(SELECT_STAR.regionUnits.read)}</b>
             <span style={{ color: INK_SOFT }}>, two thin columns</span>
           </span>
         </Note>
-        <Note at={fourAt} x={Q_X} y={readTop} dim={dim}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            Read: <Mark at={fourAt + 4}>{mb(SELECT_STAR.regionAmount.read)}</Mark>
+        <Note at={fourAt} x={Q_X} y={tally(2)} dim={dim}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            Revenue by region: <Mark at={fourAt + 4}>{mb(SELECT_STAR.regionAmount.read)}</Mark>
             <span style={{ color: INK_SOFT }}>, two columns again</span>
           </span>
         </Note>
-        <Note at={bytesAt} x={Q_X} y={readTop + h(46)} dim={dim}>
+        <Note at={fourAt + 12} x={Q_X} y={tally(3) + h(6)} dim={dim}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Bytes, not a count of columns</span>
+        </Note>
+        {/* A LIMIT returns fewer rows, not fewer columns. */}
+        <Note at={limitAt} x={Q_X} y={tally(4) + h(6)} dim={dim}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <SmallMono>LIMIT</SmallMono> on BigQuery
+            <span style={{ opacity: ease(frame, rowsAt, 10) }}>
+              : <b style={{ color: ACCENT_INK }}>the same scan</b>
+            </span>
+          </span>
         </Note>
 
         {/* ── In a dbt project: name the columns ── */}
         <Note at={projectAt} x={X0} y={y(DBT_Y) - h(40)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>In a dbt model, name the columns</span>
         </Note>
-        <Listing lines={dbtBad} x={X0} top={y(DBT_Y)} width={760} size={21} at={tableAt - 4} strikes={[{ line: "SELECT *", at: everyAt + 4 }]} />
-        <Listing lines={dbtGood} x={960} top={y(DBT_Y)} width={840} size={21} at={projectAt + 6} marks={[{ line: "SELECT", text: "sale_id, sale_date, region, amount", at: projectAt + 14, color: MARK_OK }]} />
+        <Listing lines={dbtBad} x={X0} top={y(DBT_Y)} width={760} size={21} at={tableAt - 4} marks={[{ line: "SELECT *", text: "SELECT *", at: everyAt + 4, color: MARK_BAD }]} />
+        <Listing lines={dbtGood} x={960} top={y(DBT_Y)} width={840} size={21} at={projectAt + 6} marks={[{ line: "SELECT", text: "region, amount", at: projectAt + 14, color: MARK_OK }]} />
         <Note at={everyAt + 2} x={X0} y={y(DBT_Y) + h(110)}>
           <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Every column of its source<span style={{ opacity: ease(frame, buildAt, 10) }}>, on every build</span>

@@ -238,7 +238,7 @@ export const Type1Scene: React.FC = () => {
         <Note at={revAt} x={1100} y={y(LOW - 4)} out={chartOut}>
           <span style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 21, whiteSpace: "nowrap" }}>
             <span style={{ width: 22, height: 14, background: WAS, borderRadius: 2 }} />
-            <span style={{ ...label(21, INK_SOFT) }}>as it was (Type 2)</span>
+            <span style={{ ...label(21, INK_SOFT) }}>as it was (history kept)</span>
             <span style={{ width: 22, height: 14, background: BAR, borderRadius: 2, marginLeft: 22 }} />
             <span style={{ ...label(21, BLUE_INK) }}>as it is (Type 1)</span>
           </span>

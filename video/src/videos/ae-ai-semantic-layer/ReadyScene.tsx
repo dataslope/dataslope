@@ -65,10 +65,10 @@ export const ReadyScene: React.FC = () => {
   const freshAt = n.word("ready-rest", "check source freshness");
   const asOfAt = n.word("ready-rest", "as of when");
   const staleAt = n.word("ready-rest", "refuse to answer from stale data");
-  const inputFrom = n.beat("ready-input").from;
-  const inputAt = n.word("ready-input", "documentation is now an input");
+  const inputFrom = n.beat("ready-caution").from;
+  const inputAt = n.word("ready-caution", "documentation is now an input");
   const dropAt = n.word("ready-input", "Drop the words");
-  const letterAt = n.word("ready-input", "follows it to the letter");
+  const letterAt = n.word("ready-input", "writing its own SQL from it");
   const reportsAt = n.word("ready-input", "eleven hundred ninety");
   const reviewAt = n.word("ready-review", "review them like code");
   const end = n.beat("ready-review").to;
@@ -120,7 +120,7 @@ export const ReadyScene: React.FC = () => {
           <span style={line(28, INK)}>
             What helps a new analyst helps an assistant,{" "}
             <span style={{ opacity: ease(frame, gapsAt - 2, 12) }}>
-              with less tolerance for gaps: <Mark at={askAt}>it won&apos;t ask.</Mark>
+              with less tolerance for gaps: <Mark at={askAt} out={describeAt}>it won&apos;t ask.</Mark>
             </span>
           </span>
         </Ink>
@@ -202,10 +202,7 @@ export const ReadyScene: React.FC = () => {
             private, the secondary point, restricts ref(), not queries. */}
         <Clear at={inputFrom - 4}>
           <Ink at={grantAt} dur={14} style={{ left: R_X, top: accessTop }}>
-            <div style={{ ...line(26, INK), fontWeight: 500 }}>
-              Access boundaries{" "}
-              <span style={{ color: INK_SOFT, fontWeight: 400, opacity: ease(frame, queriesAt, 12) }}>· private stops ref(), not queries</span>
-            </div>
+            <div style={{ ...line(26, INK), fontWeight: 500 }}>Access boundaries</div>
           </Ink>
           {MODELS.map((m, i) => (
             <React.Fragment key={m.name}>
@@ -246,7 +243,15 @@ export const ReadyScene: React.FC = () => {
               <Cross at={martsAt + 26} size={26} />
             </div>
           ) : null}
-          <Spot id="ae-ai-semantic-layer-padlock" at={markAt + 6} left={modelX(0) + MODEL_W / 2 - padlock.width / 2} top={modelTop + modelH + 82} {...padlock} />
+          {/* The lock is the grant's: it pops with the stopped arrow, beside
+              the assistant, never under a private model (private does not
+              stop a query). */}
+          <Spot id="ae-ai-semantic-layer-padlock" at={martsAt + 26} left={ASST_X - padlock.width - 36} top={asstTop + modelH / 2 - padlock.height / 2} {...padlock} />
+          {/* What private does do, under the private models. */}
+          <Ink at={buildAt} dur={12} style={{ left: modelX(0), top: modelTop + modelH + h(20) }}>
+            <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Private stops ref(),</div>
+            <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, queriesAt, 12) }}>not queries</div>
+          </Ink>
           <Ink at={removesAt} dur={14} style={{ left: ASST_X, top: asstTop + modelH + h(20) }}>
             <span style={line(23, INK_SOFT)}>No wrong model to choose</span>
           </Ink>
@@ -272,7 +277,7 @@ export const ReadyScene: React.FC = () => {
         </Ink>
         <Flow points={[[desc.x1 + 14, desc.mid], [R_X - 14, desc.mid]]} at={letterAt - 10} color={INK_SOFT} head={11} width={2} />
         <Ink at={letterAt - 6} dur={12} style={{ left: R_X, top: desc.mid - h(64) }}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Net revenue, followed to the letter</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Net revenue, in SQL written from the description</span>
         </Ink>
         <Swap at={reportsAt} left={R_X} top={desc.mid - 22} from={READY.asWritten.toFixed(2)} to={READY.withoutCut.toFixed(2)} fromColor={OK_INK} toColor={ACCENT_INK} showAt={letterAt} />
         <Ink at={reviewAt - 4} dur={16} style={{ left: R_X, top: desc.mid + h(118) }}>

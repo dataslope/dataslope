@@ -126,7 +126,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     `fct_orders+` beside it lights fct_orders and the dashboard.
  *   - "env": QuestionCard 9; two targets as two short column blocks under a
  *     hairline, dev (schema dbt_alice) and prod (schema analytics), each with
- *     "database, schema, credentials". "env-ref": `{{ ref('stg_orders') }}`
+ *     "database, schema, credentials". "env-profile" (voiced on its own after
+ *     the independent review, 2026-11-20, which found the answer never said
+ *     where targets live or what "environments" adds, the page's own
+ *     distinction): both are targets in profiles.yml, picked with --target
+ *     (the flag is dbt's, not the page's), and the dbt platform's name for
+ *     the split is environments. "env-ref": `{{ ref('stg_orders') }}`
  *     compiling to `dbt_alice.stg_orders` under dev and
  *     `analytics.stg_orders` under prod (drawn from the page's two names, not
  *     compiled by dbt). "env-hard": `analytics.stg_orders` typed into Alice's
@@ -144,7 +149,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     from Postgres side by side, 19.99 (green) and 19 (red). "r-exposures":
  *     the graph's dashboard node, lit back along its two edges.
  *     "r-v2": the page's answer as key facts: the engine rewritten in Rust,
- *     generally available since September 2026; `dbt` the main distribution
+ *     generally available since September 2026, and on screen the name it
+ *     first shipped under, the Fusion engine (read from the page by check.mjs;
+ *     added after the review, on screen only, since "r-v2" was voiced on its
+ *     own and a word changed there re-voices all of it); `dbt` the main distribution
  *     and `dbt Core` the Python 1.x line ending at 1.13; a misspelled column
  *     caught at compile time; `tests:` becoming `data_tests:`, the page's own
  *     first example of a 1.x deprecation a strict v2 refuses.
@@ -397,6 +405,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "env-profile",
+      text: "Each is a target in your profile, picked with the target flag, and the hosted dbt platform sets up the same split as environments.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "env-ref",
       text: "Ref resolves to the active target's schema. The same reference to the staging model reads Alice's schema in development and the production schema in the nightly job, with no code change.",
       pauseAfter: 0.7,
@@ -432,7 +445,7 @@ export const script: NarrationScript = {
     {
       id: "r-macros",
       text: "Question twelve. How do macros work in dbt? A macro is a reusable Jinja function that writes SQL: cents to dollars emits amount cents over a hundred point oh, wherever it's called. Written once, it's right everywhere. Typed by hand over a plain hundred, Postgres divides integers, and nineteen ninety-nine cents becomes nineteen dollars.",
-      pauseAfter: 0.9,
+      pauseAfter: 1.6,
     },
     {
       id: "r-packages",
@@ -452,7 +465,7 @@ export const script: NarrationScript = {
     {
       id: "r-docs",
       text: "Question sixteen. How does dbt manage documentation and lineage? dbt docs generate builds a site from the descriptions in YAML and markdown doc blocks, and dbt docs serve opens it, with an interactive graph drawn from the same ref and source calls.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.4,
     },
     {
       id: "r-project",
@@ -462,7 +475,7 @@ export const script: NarrationScript = {
     {
       id: "r-version",
       text: "Question eighteen. How do you version a dbt model? Since dbt one point five, declare versions in YAML, each with its own SQL file. Consumers pin one with ref and a version number, so a breaking change rolls out without forcing everyone across at once.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.4,
     },
     {
       id: "r-debug",

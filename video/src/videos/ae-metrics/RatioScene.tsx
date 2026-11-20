@@ -8,7 +8,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { Drift, Flow, Node, noteLine, OK, pulse, Strike, X0 } from "./parts";
+import { Drift, Flow, Node, noteLine, OK, pulse, Svg, X0 } from "./parts";
 
 const DAYS_Y = 330;
 const DAY_ROW = 34;
@@ -18,6 +18,8 @@ const NUM_Y = 330;
 const DEN_Y = 470;
 const DIV_X = 940;
 const RESULT_X = 1060;
+/** The bracket that gathers the week's days, just right of their names. */
+const BRACKET_X = X0 + 70;
 const STRUCK_Y = 620;
 const LIMIT_Y = 720;
 
@@ -70,10 +72,10 @@ export const RatioScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-pop" at={keepsAt} level={-31} />
       <Sfx name="el-pop" at={dividesAt} level={-32} />
-      <Sfx name="el-scratch" at={nothingAt + 6} level={-32} />
+      <Sfx name="el-tap" at={nothingAt + 2} level={-33} />
       <Sfx name="el-sprinkle" at={weekAt} level={-34} />
       <Sfx name="el-tap" at={onceAt + 4} level={-32} />
-      <Sfx name="el-scratch" at={avgAt + 6} level={-32} />
+      <Sfx name="el-tap" at={avgAt + 2} level={-33} />
       <Sfx name="el-pencil" at={filtersAt} level={-35} />
 
       <Drift from={from} to={end + 40}>
@@ -144,22 +146,28 @@ export const RatioScene: React.FC = () => {
             <span style={{ ...note(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap", lineHeight: `${dayRow}px` }}>{d}</span>
           </Ink>
         ))}
-        <Flow points={[[X0 + 80, daysMid - h(14)], [X0 + 190, daysMid - h(14)], [X0 + 190, numTop + boxH / 2], [BOX_X - 12, numTop + boxH / 2]]} at={sumsAt} dur={14} color={BAR} />
-        <Flow points={[[X0 + 80, daysMid + h(14)], [X0 + 190, daysMid + h(14)], [X0 + 190, denTop + boxH / 2], [BOX_X - 12, denTop + boxH / 2]]} at={sumsAt + 6} dur={14} color={BAR} />
+        {/* The whole week gathered by a bracket, both sums leaving its middle. */}
+        <Svg opacity={ease(frame, sumsAt - 4, 10)}>
+          <path
+            d={`M${BRACKET_X - 10},${daysTop + 6} L${BRACKET_X},${daysTop + 6} L${BRACKET_X},${daysTop + days.length * dayRow - 6} L${BRACKET_X - 10},${daysTop + days.length * dayRow - 6} M${BRACKET_X},${daysMid} L${BRACKET_X + 12},${daysMid}`}
+            fill="none"
+            stroke={BAR}
+            strokeWidth={2.4}
+            strokeLinejoin="round"
+          />
+        </Svg>
+        <Flow points={[[BRACKET_X + 12, daysMid], [X0 + 190, daysMid], [X0 + 190, numTop + boxH / 2], [BOX_X - 12, numTop + boxH / 2]]} at={sumsAt} dur={14} color={BAR} />
+        <Flow points={[[BRACKET_X + 12, daysMid], [X0 + 190, daysMid], [X0 + 190, denTop + boxH / 2], [BOX_X - 12, denTop + boxH / 2]]} at={sumsAt + 6} dur={14} color={BAR} />
         <Note at={sumsAt + 4} x={X0 + 206} y={numTop - h(36)}>
           <span style={noteLine(21, BLUE_INK)}>sum first</span>
         </Note>
 
         {/* ── Never pre-divided, never averaged ── */}
         <Ink at={nothingAt} dur={12} style={{ left: BOX_X, top: struckTop }}>
-          <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
-            <Strike at={nothingAt + 6}>a stored, pre-divided rate</Strike>
-          </span>
+          <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>never a stored, pre-divided rate</span>
         </Ink>
-        <Ink at={avgAt} dur={12} style={{ left: BOX_X + 400, top: struckTop }}>
-          <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
-            <Strike at={avgAt + 6}>an average of daily rates</Strike>
-          </span>
+        <Ink at={avgAt} dur={12} style={{ left: BOX_X + 450, top: struckTop }}>
+          <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>never an average of daily rates</span>
         </Ink>
 
         {/* ── What no layer can rescue ── */}

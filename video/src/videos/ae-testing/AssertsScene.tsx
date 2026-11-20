@@ -34,7 +34,7 @@ import {
 const FIG_Y = 344;
 const LIST_SIZE = 22;
 const TABLE_X = 930;
-const PIPE = { x: 1370, w: 270, h: 58 };
+const PIPE = { x: 1370, w: 270, h: 58, modelH: 84 };
 
 /**
  * Questions 1 and 2. The assumption "order_id is unique" becomes the query
@@ -107,11 +107,15 @@ export const AssertsScene: React.FC = () => {
   };
   const linkAt = [twoAt, elevenAt, nineteenAt];
 
-  // ── The pipeline: fct_orders to a dashboard, through the test ──
+  // ── The pipeline: fct_orders, built and then tested, stops before the
+  //    mart a dashboard reads. dbt build materializes a model before its
+  //    tests run, so the tested table itself already holds the duplicates;
+  //    what a failing test keeps clean is everything downstream of it. ──
   const srcY = top;
-  const modelY = top + h(150);
-  const stopY = top + h(310);
-  const dashY = top + h(420);
+  const modelY = top + h(130);
+  const stopY = top + h(275);
+  const martY = top + h(370);
+  const dashY = top + h(480);
   const pipeMid = PIPE.x + PIPE.w / 2;
   const busX = (g.right + PIPE.x) / 2 + 10;
 
@@ -195,7 +199,9 @@ export const AssertsScene: React.FC = () => {
         </Note>
 
         {/* ── The table, untouched ── */}
-        <TableName g={g} at={queryAt + 6}>
+        {/* The rows arrive with the failures, so "0 rows: pass" is shown as
+            the rule on the query alone, never beside rows that fail it. */}
+        <TableName g={g} at={anyAt}>
           fct_orders · <span style={{ color: BLUE_INK }}><Num>{UNIQUE.after}</Num> rows</span>
           <span style={{ color: INK_SOFT, opacity: ease(frame, neverAt + 6, 10) }}>, unchanged</span>
         </TableName>
@@ -206,8 +212,8 @@ export const AssertsScene: React.FC = () => {
             { name: "order_id", numeric: true },
             { name: "amount", numeric: true },
           ]}
-          rows={UNIQUE.table.rows.map((cells, i) => ({ cells, at: queryAt + 8 + i * 1 }))}
-          at={queryAt + 6}
+          rows={UNIQUE.table.rows.map((cells, i) => ({ cells, at: anyAt + 2 + i * 1 }))}
+          at={anyAt}
           bands={DUPLICATES.flatMap((id, k) => pairRows(id).map((row) => ({ row, at: linkAt[k] + 6, color: MARK_RED })))}
         />
         {DUPLICATES.map((id, k) => (
@@ -215,8 +221,8 @@ export const AssertsScene: React.FC = () => {
         ))}
 
         {/* ── The pipeline stops at the failing test ── */}
-        <Box x={PIPE.x} y={modelY} w={PIPE.w} h={h(PIPE.h)} at={runFailsAt - 4} title="fct_orders" mono size={22} />
-        <Flow points={[[pipeMid, modelY + h(PIPE.h) + 6], [pipeMid, stopY - 10]]} at={runFailsAt} color={INK} noHead />
+        <Box x={PIPE.x} y={modelY} w={PIPE.w} h={h(PIPE.modelH)} at={runFailsAt - 4} title="fct_orders" sub="built, then tested" mono size={22} />
+        <Flow points={[[pipeMid, modelY + h(PIPE.modelH) + 6], [pipeMid, stopY - 10]]} at={runFailsAt} color={INK} noHead />
         <StopBar x={pipeMid} y={stopY} at={runFailsAt + 10} />
         <Ink at={runFailsAt + 12} dur={12} style={{ left: pipeMid + 34, top: stopY - 22, whiteSpace: "nowrap" }}>
           <Chip tone="red" size={22}>
@@ -226,7 +232,14 @@ export const AssertsScene: React.FC = () => {
         <Note at={stopsAt + 8} x={pipeMid + 34} y={stopY + h(26)}>
           <span style={{ ...note(21, ACCENT_INK), whiteSpace: "nowrap" }}>Stopped, loudly</span>
         </Note>
-        <Flow points={[[pipeMid, stopY + 14], [pipeMid, dashY - 10]]} at={dashAt} color={ds("gray", 400)} dash="6 7" noHead />
+        <Flow points={[[pipeMid, stopY + 14], [pipeMid, martY - 10]]} at={stopsAt + 6} color={ds("gray", 400)} dash="6 7" noHead />
+        <Box x={PIPE.x} y={martY} w={PIPE.w} h={h(PIPE.h)} at={stopsAt + 10} title="fct_revenue" mono tones={[{ at: stopsAt + 10, tone: "off" }]} size={22} />
+        <Ink at={stopsAt + 16} dur={10} style={{ left: PIPE.x + PIPE.w + 18, top: martY + h(PIPE.h) / 2 - 18, whiteSpace: "nowrap" }}>
+          <Chip tone="gray" size={21}>
+            skipped
+          </Chip>
+        </Ink>
+        <Flow points={[[pipeMid, martY + h(PIPE.h) + 6], [pipeMid, dashY - 10]]} at={dashAt} color={ds("gray", 400)} dash="6 7" noHead />
         <Box x={PIPE.x} y={dashY} w={PIPE.w} h={h(PIPE.h)} at={dashAt + 4} title="Dashboard" tones={[{ at: dashAt, tone: "off" }]} size={22} />
         <Note at={dashAt + 10} x={PIPE.x} y={dashY + h(PIPE.h) + h(14)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>No bad rows reach it</span>

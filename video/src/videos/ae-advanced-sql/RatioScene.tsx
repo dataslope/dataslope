@@ -1,8 +1,9 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -20,7 +21,6 @@ import {
   MARK_RED,
   OK_INK,
   rowsAt,
-  StrikeBar,
   X0,
 } from "./parts";
 
@@ -37,6 +37,7 @@ const money = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 
  * Then the model keeps the two components and drops the stored ratio.
  */
 export const RatioScene: React.FC = () => {
+  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
@@ -68,8 +69,8 @@ export const RatioScene: React.FC = () => {
   const sg = geoOf(S, R_X, sTop + listingHeight(S.lines.length, SIZE) + h(20), h, { rowH: 50 });
   const revenue = D.rows.reduce((s, r) => s + Number(r[c("revenue")]), 0);
   const orders = D.rows.reduce((s, r) => s + Number(r[c("orders")]), 0);
-  const aovX = dg.xs[c("aov")] + dg.pad - 6;
-  const aovW = dg.widths[c("aov")] - 2 * dg.pad + 12;
+  const aovX = dg.xs[c("aov")];
+  const aovW = dg.widths[c("aov")];
 
   return (
     <AbsoluteFill>
@@ -103,10 +104,19 @@ export const RatioScene: React.FC = () => {
             ...D.rows.map((_, row) => ({ row, col: c("orders"), at: keepsAt + 2, color: MARK_GREEN })),
           ]}
         />
-        <StrikeBar x={aovX} y={dg.top + dg.headH / 2} w={aovW} at={keepsAt + 10} />
-        {D.rows.map((_, row) => (
-          <StrikeBar key={row} x={aovX} y={dg.rowMid(row)} w={aovW} at={keepsAt + 14 + row * 3} />
-        ))}
+        {/* The stored ratio drops out of the model: each day's value is
+            right at its own grain, so it fades rather than being struck. */}
+        <div
+          style={{
+            position: "absolute",
+            left: aovX,
+            top: dg.top + 3,
+            width: aovW,
+            height: dg.rowTop(D.rows.length) - dg.top - 5,
+            background: PAPER,
+            opacity: 0.7 * ease(frame, keepsAt + 10, 16),
+          }}
+        />
         <Note at={nextAt + 10} x={X0} y={dg.rowTop(D.rows.length) + h(24)} out={keepsAt}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Two rows, weighed the same by an average</span>
         </Note>

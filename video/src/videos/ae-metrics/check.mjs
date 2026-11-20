@@ -82,6 +82,10 @@ results.figures.fan = await figure(PAGE_TABLES, {
   testItemsNotNull: "SELECT * FROM order_items WHERE order_id IS NULL;",
   testRelationships:
     "SELECT i.* FROM order_items i LEFT JOIN orders o ON o.order_id = i.order_id WHERE o.order_id IS NULL;",
+  // The same unique test, run on what the join produces instead of on an
+  // input: it fails, once for each order that has more than one item.
+  testJoinedUnique:
+    "SELECT o.order_id, COUNT(*) AS n\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id\nGROUP BY o.order_id\nHAVING COUNT(*) > 1;",
   // 3. The page's fix, as written; and after a join, a distinct count of
   // orders and a sum of a measure native to the item rows.
   fix: PAGE_FIX,
@@ -199,6 +203,7 @@ expect("fan: more than double", rows("fan", "multiple"), [["2.34"]]);
 for (const t of ["testUnique", "testNotNull", "testItemsNotNull", "testRelationships"]) {
   expect(`fan: ${t} passes`, rows("fan", t), []);
 }
+expect("fan: unique on the joined rows fails, eight orders repeat", rows("fan", "testJoinedUnique").length, 8);
 expect("fan: the page's fix, 1,949.25 and 38 units", rows("fan", "fix"), [["1949.25", 38]]);
 expect("fan: after the join, 12 orders and 38 units", rows("fan", "afterJoin"), [[12, 38]]);
 expect("fan: by order, each at its own grain", rows("fan", "byOrderTotals"), [[12, "1949.25", "38"]]);

@@ -204,16 +204,20 @@ if (JSON.stringify(R.obt.starQuery.rows) !== JSON.stringify(R.obt.obtQuery.rows)
 // row; the one big table updates every sale in the category, and they sit
 // in every row group of the file (rows were written in sale_id order,
 // 122,880 to a group).
-const RENAME_STAR = "UPDATE dim_category\nSET category = 'Home & Garden'\nWHERE category = 'Home';";
-const RENAME_OBT = "UPDATE obt_sales\nSET category = 'Home & Garden'\nWHERE category = 'Home';";
+// The new name is one no other category is part of ('Home & Garden' sat
+// beside 'Garden' and read as a merge).
+const NEW_NAME = "Home & Kitchen";
+const RENAME_STAR = `UPDATE dim_category\nSET category = '${NEW_NAME}'\nWHERE category = 'Home';`;
+const RENAME_OBT = `UPDATE obt_sales\nSET category = '${NEW_NAME}'\nWHERE category = 'Home';`;
 const rowGroupRows = Number(await one("SELECT max(row_group_num_rows) FROM parquet_metadata('obt_sales.parquet')"));
 R.rename = {
   star: { sql: RENAME_STAR, rows: Number(await one(RENAME_STAR)) },
   obt: { sql: RENAME_OBT, rows: Number(await one(RENAME_OBT)) },
+  newName: NEW_NAME,
   rowGroupRows,
   rowGroups: Number(await one("SELECT count(DISTINCT row_group_id) FROM parquet_metadata('obt_sales.parquet')")),
   rowGroupsTouched: Number(
-    await one(`SELECT count(DISTINCT (sale_id - 1) // ${rowGroupRows}) FROM obt_sales WHERE category = 'Home & Garden'`),
+    await one(`SELECT count(DISTINCT (sale_id - 1) // ${rowGroupRows}) FROM obt_sales WHERE category = '${NEW_NAME}'`),
   ),
 };
 
@@ -249,8 +253,11 @@ R.pruneModel = {
 // per second while running, so auto-suspend saves money). The assumption is
 // the video's own, said aloud: the dashboard's queries keep it busy for two
 // minutes in the hour. Left running, the hour is billed; suspended when idle,
-// the busy minutes are. No suspend delay is modelled: the page gives none.
-R.computeModel = { busyMinutes: 2, hourMinutes: 60, ratio: 60 / 2 };
+// the busy minutes are, plus the wait before each suspend. The page gives no
+// wait; one minute is drawn, the shortest timeout in common use (Snowflake's
+// default AUTO_SUSPEND is ten minutes, and it bills at least a minute each
+// time a warehouse resumes), so the picture understates the wait if anything.
+R.computeModel = { busyMinutes: 2, hourMinutes: 60, ratio: 60 / 2, suspendWaitMinutes: 1 };
 
 // ── Checks: the narration says these, so a change must fail here ───────────
 

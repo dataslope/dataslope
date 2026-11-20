@@ -152,13 +152,14 @@
   },
   "rename": {
     "star": {
-      "sql": "UPDATE dim_category\nSET category = 'Home & Garden'\nWHERE category = 'Home';",
+      "sql": "UPDATE dim_category\nSET category = 'Home & Kitchen'\nWHERE category = 'Home';",
       "rows": 1
     },
     "obt": {
-      "sql": "UPDATE obt_sales\nSET category = 'Home & Garden'\nWHERE category = 'Home';",
+      "sql": "UPDATE obt_sales\nSET category = 'Home & Kitchen'\nWHERE category = 'Home';",
       "rows": 199786
     },
+    "newName": "Home & Kitchen",
     "rowGroupRows": 122880,
     "rowGroups": 9,
     "rowGroupsTouched": 9
@@ -175,6 +176,7 @@
   "computeModel": {
     "busyMinutes": 2,
     "hourMinutes": 60,
-    "ratio": 30
+    "ratio": 30,
+    "suspendWaitMinutes": 1
   }
 }

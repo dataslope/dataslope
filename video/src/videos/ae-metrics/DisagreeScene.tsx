@@ -40,7 +40,7 @@ export const DisagreeScene: React.FC = () => {
   const textAt = n.word("disagree", "What causes");
   const handAt = n.word("disagree", "Two hand-written definitions");
   const causes = [
-    { title: "Filters", detail: "refunds, tax or cancelled orders, counted by one", at: n.word("disagree-how", "One counts refunds") },
+    { title: "Filters", detail: "refunds, tax, cancelled orders: one counts them", at: n.word("disagree-how", "One counts refunds") },
     { title: "Date logic", detail: "order date, or ship date", at: n.word("disagree-how", "One goes by order date") },
     { title: "Grain", detail: "aggregated at different grains", at: n.word("disagree-how", "They aggregate at different grains") },
     { title: "A fan trap", detail: "one of them hits it", at: n.word("disagree-how", "Or one of them hits a fan trap") },
@@ -194,6 +194,13 @@ export const DisagreeScene: React.FC = () => {
           ) : null}
           <text x={CHART.x + CHART.w + 14} y={base + 7} textAnchor="start" style={svgText(note(21, INK_SOFT))} opacity={ease(frame, widenAt + 20, 10)}>
             time
+          </text>
+          {/* Which line is which: one per hand-written definition. */}
+          <text x={nowX - 8} y={lineA(1) - 18} textAnchor="end" style={svgText(note(21, INK_SOFT))} opacity={ease(frame, driftAt, 12)}>
+            definition A
+          </text>
+          <text x={nowX - 8} y={lineB(1) + 32} textAnchor="end" style={svgText(note(21, INK_SOFT))} opacity={ease(frame, driftAt + 4, 12)}>
+            definition B
           </text>
         </Svg>
       </Drift>

@@ -32,7 +32,6 @@ import {
   Spot,
   spotH,
   Stage,
-  StrikeBar,
   SyntaxBreak,
   type SynPart,
   TableName,
@@ -145,7 +144,6 @@ export const LatestScene: React.FC = () => {
     headSize: 19,
     bodySize: 19,
   });
-  const emailX = mg.xs[2] + mg.pad;
 
   // ── The tie ──
   const T = { cols: ["updated_at", "email", "rank", "row_number"], rows: CUSTOMER3.tie };
@@ -286,7 +284,6 @@ export const LatestScene: React.FC = () => {
             at={maxAt + 6}
             rows={rowsAt(mRows, maxAt + 10, 1)}
           />
-          <StrikeBar x={emailX - 6} y={mg.top + mg.headH / 2} w={5 * 0.6 * 19 + 12} at={losesAt + 6} />
           <Note at={losesAt + 8} x={mg.right + 30} y={mg.top + h(4)}>
             <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>The email that goes with it is gone</span>
           </Note>

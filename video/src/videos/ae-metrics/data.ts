@@ -84,6 +84,8 @@ export const FAN = {
     sql: lines("fan", id),
     passes: table("fan", id).rows.length === 0,
   })),
+  /** The same unique test on the joined rows: the orders that repeat (8). */
+  joinedRepeats: table("fan", "testJoinedUnique").rows.length,
 };
 
 /** The opening's two dashboards: orders alone, and the page's join. */

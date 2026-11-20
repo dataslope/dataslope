@@ -45,13 +45,17 @@ export const HookScene: React.FC = () => {
   const top = y(372);
   const ordered = sliceLayout({ left: X0, top, sources: false, pitch: BIG.pitch, w: BIG.w, row: h(92) });
   // In no order: the fact first, the staging models apart, before dbt has
-  // read a single ref.
+  // read a single ref. Each box sits where its straight path into build
+  // order crosses no other box's, so the slide never piles them up (the
+  // review saw three names overprinted mid-slide): the fact keeps to the
+  // middle row, stg_orders to the top one, and the customers branch moves
+  // left along the bottom in step.
   const loose: Record<string, Slot> = {
     ...ordered,
-    fct_orders: { x: X0 + 10, cy: top - 6, w: ordered.fct_orders.w },
-    stg_customers: { x: X0 + 520, cy: top - 20, w: ordered.stg_customers.w },
-    dim_customer: { x: X0 + 150, cy: top + 150, w: ordered.dim_customer.w },
-    stg_orders: { x: X0 + 600, cy: top + 120, w: ordered.stg_orders.w },
+    fct_orders: { x: X0 + 30, cy: top + 98, w: ordered.fct_orders.w },
+    stg_orders: { x: X0 + 470, cy: top - 12, w: ordered.stg_orders.w },
+    stg_customers: { x: X0 + 310, cy: top + 200, w: ordered.stg_customers.w },
+    dim_customer: { x: X0 + 650, cy: top + 176, w: ordered.dim_customer.w },
   };
   const slide = ease(frame, workAt, 24);
   const at = lerpLayout(loose, ordered, slide);

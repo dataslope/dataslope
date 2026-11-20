@@ -77,9 +77,9 @@ export const T2sScene: React.FC = () => {
   const fluentAt = n.word("t2s-name", "a fluent, plausible, wrong number");
   const pastAt = n.beat("t2s-past").from;
   const noQueryAt = n.word("t2s-past", "no query can find the right one");
-  const decisionAt = n.word("t2s-past", "a company decision");
-  const writtenAt = n.word("t2s-past", "written down");
-  const end = n.beat("t2s-past").to;
+  const decisionAt = n.word("t2s-decision", "a company decision");
+  const writtenAt = n.word("t2s-decision", "written down");
+  const end = n.beat("t2s-decision").to;
 
   // The rows: orders on the left, customers on the right until the query
   // takes its place.
@@ -97,7 +97,9 @@ export const T2sScene: React.FC = () => {
     dimAt: leftOut(r[3]) ? completedAt + 6 : testIds.has(r[1]) ? notTestAt + 4 : undefined,
   }));
   const custCol = ordersCols.findIndex((c) => c.name === "customer_id");
-  const testMarks = READINGS.orders.rows.flatMap((r, i) => (testIds.has(r[1]) ? [{ row: i, col: custCol, at: testAt + 4, out: runFrom }] : []));
+  // Customer 4's two cells stay marked through the run, so the rows "not
+  // from the test account" leaves out are the ones still lit.
+  const testMarks = READINGS.orders.rows.flatMap((r, i) => (testIds.has(r[1]) ? [{ row: i, col: custCol, at: testAt + 4, out: nameAt }] : []));
   const custCols: Col[] = READINGS.customers.columns.map((c) => ({ name: c }));
   const custG = tableGeometry({ x: R_X, top, cols: custCols, rows: READINGS.customers.rows.map((r) => r.map(String)), headH, rowH, headSize: 20, bodySize: 22, pad: 16 });
   const custRows: TableRow[] = READINGS.customers.rows.map((r, i) => ({ cells: r.map(String), at: fiveAt + 4 + i * 2 }));
@@ -209,11 +211,11 @@ export const T2sScene: React.FC = () => {
         <Bracket x0={resG.colMid(0)} x1={resG.colMid(2)} y={bracketY} at={timesAt} lip={-10} />
         <Ink at={timesAt + 6} dur={12} style={{ left: resG.colMid(0), width: resG.colMid(2) - resG.colMid(0), top: bracketY + h(10), textAlign: "center" }}>
           <span style={{ ...label(26, INK), whiteSpace: "nowrap" }}>
-            <Num>{`${READINGS.ratio}×`}</Num> apart
+            The biggest is <Num>{`${READINGS.ratio}×`}</Num> the smallest
           </span>
         </Ink>
         <Ink at={validAt} dur={12} style={{ left: resG.right + 50, top: resG.top + headH / 2 - 16 }}>
-          <span style={line(24, INK)}>Every query runs: no error</span>
+          <span style={line(24, INK)}>Each reading runs: no error</span>
         </Ink>
         <Ink at={nothingAt} dur={12} style={{ left: resG.right + 50, top: resG.rowTop(0) + h(40) / 2 - 16 }}>
           <span style={line(24, INK_SOFT)}>Nothing looks wrong</span>

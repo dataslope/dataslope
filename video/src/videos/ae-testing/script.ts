@@ -110,8 +110,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (raw.orders, raw.customers, stg_orders, stg_customers, dim_customer,
  *     fct_orders); a "production manifest" beside it; stg_customers marked
  *     changed, then it and its two descendants lit (yellow), "3 of 4 models";
- *     stg_orders grey. ci-slim: a merge button, blocked (red) by a failing
- *     test badge.
+ *     stg_orders grey. ci-defer: the stg_orders edge into fct_orders labelled
+ *     "--defer: read from production". ci-slim: a merge button, blocked (red)
+ *     by a failing test badge.
  *   prod: QuestionCard 8. Two columns, "CI" and "production". prod-sev: the
  *     same DAG built in order, a test on stg_customers failing (error, red):
  *     everything downstream skipped (grey), the mart labelled "keeps
@@ -160,9 +161,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     accepted_values with its four statuses, relationships to dim_customer),
  *     on the video's own eight rows. unique returns order 3 (n = 2); not_null
  *     the row with no order_id; accepted_values order 5 ('returned');
- *     relationships order 6 (customer 99). The null id is a group of one, so
- *     unique does not return it; "unique + not_null on a key assert a valid
- *     primary key" is the page's.
+ *     relationships order 6 (customer 99). unique keeps dbt's own null filter
+ *     (default__test_unique: `where <column> is not null` before its group
+ *     by, in dbt-core and dbt-adapters alike), so the null id never reaches
+ *     it; with a second null key added (check.mjs's uniqueTwoNulls) it still
+ *     returns only order 3: "even two of them would pass". "unique +
+ *     not_null on a key assert a valid primary key" is the page's.
  *   - "singular": the page's tests/assert_no_negative_amounts.sql, its ref()
  *     compiled to fct_orders, on the same rows: order 7, -25.00. "Your own
  *     generic tests are macros": the page ("custom ones you define as
@@ -182,7 +186,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "ci": dbt.mdx's lineage figure, parsed by check.mjs: four models; a
  *     change to stg_customers selects stg_customers, dim_customer and
  *     fct_orders (3 of 4), and stg_orders is not selected. The command and
- *     the production manifest are the page's.
+ *     the production manifest are the page's. "ci-defer" is the video's: the
+ *     page's command has no --defer, but fct_orders reads stg_orders, which
+ *     this run does not build, so its ref() resolves to production's only
+ *     with --defer (dbt's slim-CI command, and what dbt Cloud CI jobs do).
  *   - "prod": the page's answer. "The marts keep yesterday's rows": dbt.mdx's
  *     dbt build ("runs the model, then immediately tests it before moving to
  *     downstream nodes") with the page's "an error should halt downstream
@@ -291,7 +298,12 @@ export const script: NarrationScript = {
     },
     {
       id: "builtins-pair",
-      text: "Notice that unique let the missing ID through: a single null isn't a duplicate. That's why unique and not null go together on a key. Together, they say it's a valid primary key.",
+      text: "Notice that unique let the missing ID through: it skips nulls, so even two of them would pass.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "builtins-key",
+      text: "That's why unique and not null go together on a key. Together, they say it's a valid primary key.",
       pauseAfter: 0.8,
     },
     {
@@ -362,6 +374,11 @@ export const script: NarrationScript = {
     {
       id: "ci-state",
       text: "It finds the changes by comparing the project with production's manifest, its record of what's deployed. Change the customer staging model here, and three of the four models are built and tested. Orders staging is left alone.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "ci-defer",
+      text: "With the defer flag, the orders fact table reads it from production instead.",
       pauseAfter: 0.7,
     },
     {
@@ -423,12 +440,17 @@ export const script: NarrationScript = {
     {
       id: "metric-why",
       text: "The model joined each order to its items, so an order with three items counted three times.",
-      pauseAfter: 0.6,
+      pauseAfter: 0.9,
     },
     {
       id: "metric-unit",
-      text: "And a unit test would have caught it before it shipped: one mocked order of a hundred dollars, with three items, comes out at three hundred.",
-      pauseAfter: 0.8,
+      text: "And a unit test would have caught it before it shipped:",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "metric-unit-run",
+      text: "one mocked order of a hundred dollars, with three items, comes out at three hundred.",
+      pauseAfter: 2.4,
     },
 
     // ── Quick ─────────────────────────────────────────────────────────────
@@ -436,7 +458,7 @@ export const script: NarrationScript = {
     {
       id: "r-source",
       text: "Question eleven. What is the difference between a source test and a model test? A source test checks raw data as it lands, and points straight at ingestion. A model test guards your own logic. Do both.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
     {
       id: "r-where",
@@ -451,12 +473,12 @@ export const script: NarrationScript = {
     {
       id: "r-severity",
       text: "Question fourteen. What is test severity, and when do you use warn versus error? Error, the default, fails the run: use it for invariants like a unique key. Warn logs and carries on, for soft signals. Thresholds can warn at one failing row and error at a hundred.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
     {
       id: "r-fatigue",
       text: "Question fifteen. How do you avoid alert fatigue from noisy tests? Choose those severities deliberately, use the thresholds, and fix or delete tests that fail for known reasons. A suite that cries wolf gets ignored.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
     {
       id: "r-packages",
@@ -471,12 +493,12 @@ export const script: NarrationScript = {
     {
       id: "r-store",
       text: "Question eighteen. What is store failures, and why enable it? It writes the failing rows to a table instead of just counting them, so a red check becomes a dataset you can query.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
     {
       id: "r-upstream",
       text: "Question nineteen. Why prefer fixing data upstream over patching it in a downstream model? A coalesce in one model hides the defect, has to be copied into every consumer, and anything reading the source still gets bad data. Fix it once, at the source.",
-      pauseAfter: 1.0,
+      pauseAfter: 1.6,
     },
     {
       id: "next",

@@ -270,14 +270,16 @@ export const MatScene: React.FC = () => {
             <Line at={twelveAt - 6} x={PLAN_X} y={tableY + 4} size={22} color={INK_SOFT}>
               Every read
             </Line>
+            {/* The table's read, and the same read once the next run has
+                rebuilt it: its plan moves with its count. */}
             <PlanBox
-              lines={MATERIALIZE.tablePlan}
+              lines={rebuilt ? MATERIALIZE.tablePlanRebuilt : MATERIALIZE.tablePlan}
               x={PLAN_X}
               top={tablePlanTop}
               width={590}
               size={PLAN_SIZE}
               at={twelveAt - 4}
-              hot={[{ text: `rows=${MATERIALIZE.customers}`, color: BLUE_INK }]}
+              hot={rebuilt ? [{ text: `rows=${MATERIALIZE.tableRebuilt}`, color: OK_INK }] : [{ text: `rows=${MATERIALIZE.customers}`, color: BLUE_INK }]}
               marks={[{ line: "Seq Scan", text: `rows=${MATERIALIZE.customers}`, at: twelveAt + 8, out: missesAt }]}
             />
             <Line at={tableAt + 6} x={COUNT_X} y={tableY + 4} size={22} color={INK_SOFT}>
@@ -309,8 +311,9 @@ export const MatScene: React.FC = () => {
 
             {/* The rule, and the concept check's case. */}
             <Line at={chooseAt} x={X0} y={pickY} size={24}>
-              Choose by <Mark at={chooseAt + 6}>read frequency</Mark>, <Mark at={costAt}>compute cost</Mark> and <Mark at={volumeAt}>data volume</Mark>
-              <span style={{ opacity: ease(frame, habitAt, 10) }}>, not habit</span>
+              Choose by <Mark at={chooseAt + 6}>read frequency,</Mark> <Mark at={costAt}>compute cost</Mark> and{" "}
+              <Mark at={volumeAt}>data volume,</Mark>
+              <span style={{ opacity: ease(frame, habitAt, 10) }}> not habit</span>
             </Line>
             <Line at={expensiveAt} x={X0} y={pickY + h(44)} size={24}>
               Expensive<span style={{ opacity: ease(frame, allDayAt, 10) }}>, read all day</span>
@@ -329,7 +332,7 @@ export const MatScene: React.FC = () => {
           top={ephTop}
           width={ephW}
           size={CODE_SIZE}
-          at={q6At + 6}
+          at={text6At + 8}
           marks={[{ line: "config(", text: "materialized='ephemeral'", at: cteAt + 2 }]}
         />
         <Line at={commonAt} x={R_X} y={ephTop - h(4)} size={22} color={INK_SOFT} out={inOut}>

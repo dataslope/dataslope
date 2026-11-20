@@ -11,7 +11,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SANS } from "../../theme/fonts";
 import { BRIDGE, type Table } from "./data";
-import { Caption, colsOf, DataTable, Drift, geoOf, KEY, KeyArrow, Listing, MARK, MARK_BAD, MARK_OK, money, Mono, OK_INK, Spot, TableName, Verdict, X0 } from "./parts";
+import { Caption, colsOf, DataTable, Drift, geoOf, KEY, KeyArrow, Listing, MARK, MARK_OK, money, Mono, OK_INK, Spot, TableName, Verdict, X0 } from "./parts";
 
 const ERD_Y = 330;
 const FACT_W = 330;
@@ -216,8 +216,10 @@ export const BridgeScene: React.FC = () => {
           at={touchedAt - 4}
           rows={perPromo.rows.map((cells, i) => ({ cells, at: touchedAt + i * 2 }))}
           marks={[
+            // The touched sums are a right answer to their own question, so
+            // they stay pointed at; only their total is the trap, which the
+            // red note above them says.
             ...perPromo.rows.map((_, row) => ({ row, col: touchedCol, at: touchedAt + 8 + row * 2 })),
-            ...perPromo.rows.map((_, row) => ({ row, col: touchedCol, at: neverAt + 2, color: MARK_BAD })),
             ...perPromo.rows.map((_, row) => ({ row, col: allocCol, at: neverAt + 10, color: MARK_OK })),
           ]}
         />

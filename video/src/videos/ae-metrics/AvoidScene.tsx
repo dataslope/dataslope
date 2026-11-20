@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT } from "../../editorial/style";
 import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -20,7 +20,6 @@ import {
   Node,
   noteLine,
   OK_INK,
-  Strike,
   TableName,
   tableGeometry,
   X0,
@@ -93,7 +92,7 @@ export const AvoidScene: React.FC = () => {
       <Sfx name="el-pencil" at={mustAt} level={-35} />
       <Sfx name="el-tap" at={twelveAt} level={-33} />
       <Sfx name="el-tap" at={quantityAt} level={-33} />
-      <Sfx name="el-scratch" at={qtyAt + 14} level={-32} />
+      <Sfx name="el-tap" at={qtyAt + 12} level={-33} />
       <Sfx name="el-pop" at={layerAt} level={-31} />
 
       <Drift from={from} to={end + 40}>
@@ -164,10 +163,10 @@ export const AvoidScene: React.FC = () => {
         />
         <Note at={qtyAt + 12} x={R_X} y={ag.rowTop(1) + h(26)}>
           <span style={noteLine(23, INK)}>
-            <Strike at={qtyAt + 14}>
-              <Mono>SUM(o.amount)</Mono>
-            </Strike>{" "}
-            <span style={{ color: INK_SOFT }}>repeats per item</span>
+            <b style={{ color: ACCENT_INK }}>
+              not <Mono>SUM(o.amount)</Mono>
+            </b>
+            <span style={{ color: INK_SOFT }}>: it repeats per item</span>
           </span>
         </Note>
 

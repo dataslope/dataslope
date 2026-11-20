@@ -78,9 +78,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "snap" to "snap-model": the page's snapshots/snap_customers.yml (the
  *     YAML form dbt has used since 1.9), with strategy: timestamp and
  *     updated_at: updated_at in yellow; beside it a
- *     drawn snapshot table, columns dbt_valid_from and dbt_valid_to, rows
- *     labelled by run ("run 1", "run 2"), no dates or times (dbt does not run
- *     here); a camera spot. "snap-strategy": the two strategies as two short
+ *     drawn snapshot table, columns dbt_valid_from and dbt_valid_to, each
+ *     stamp the source row's updated_at ("East's updated_at", "West's
+ *     updated_at"), as the timestamp strategy stamps it, no dates or times
+ *     (dbt does not run here); a camera spot. "snap-strategy": the two strategies as two short
  *     columns with a hairline between. "snap-gap": a timeline of three source
  *     states (East, West, North) and two run ticks; West, under no tick, drawn
  *     dashed and grey, labelled "never recorded" (not struck: it was true).
@@ -88,9 +89,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     tick, its box "North stays open" in grey, then hard_deletes: invalidate
  *     and "North closed at run 3" in green. "snap-keep": the source box
  *     holding only "now" (no row for 42 any more), the snapshot box holding
- *     every version it recorded. "snap-model": an arrow
- *     from the snapshot to dim_customer, the two timestamp columns becoming
- *     valid_from and valid_to.
+ *     every version it recorded ("East, closed by North"; "North, closed
+ *     at run 3", since invalidate stamps the run's time). "snap-model": an
+ *     arrow from the snapshot to dim_customer, the two timestamp columns
+ *     becoming valid_from and valid_to, and the current version's null
+ *     becoming 9999-12-31, as "t2-rows" argued.
  *   - "late" to "late-watch": the three staged orders (201, 202, 203) and the
  *     dimension (customers 42 and 99, and the unknown member, -1);
  *     "late-drop": the inner-join load, 203 missing, "700.00 of 1,110.00" in
@@ -120,8 +123,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     a signup channel column beside a versioned region; the
  *     mini-dimension, 5 age bands by 4 income tiers, "20 rows", and the fact
  *     carrying both keys.
- *   - "next": the order the tables are built in, snapshot, dimensions,
- *     facts, as three outlined boxes joined left to right; NextLine.
+ *   - "next" and "next-dbt": the order the tables are updated in, snapshot,
+ *     dimensions, facts, as three outlined boxes joined left to right;
+ *     NextLine. "Updated", never "rebuilt": the snapshot answer says it
+ *     can't be rebuilt from the source (review 2026-11-20).
  *
  * Facts. Every table, listing and number ran in Postgres (PGlite 0.5.16,
  * PostgreSQL 18.6, the engine of the page's <SqlCodeBlock dialect="postgres">
@@ -260,7 +265,8 @@ export const script: NarrationScript = {
     {
       id: "t2-load",
       text: "Each change is two statements, run together: close the current row, its end date the day before the move, then insert the new version.",
-      pauseAfter: 0.7,
+      // Long enough to read the INSERT's result before the trap clears it.
+      pauseAfter: 1.4,
     },
     {
       id: "t2-trap",
@@ -412,7 +418,12 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
-      text: "Every table here is rebuilt each day, in order: the snapshot first, then the dimensions, then the facts that look them up. Running that order is dbt's job. Next: how dbt builds a project.",
+      text: "Every table here is updated each day, in order: the snapshot first, then the dimensions, then the facts that look them up.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "next-dbt",
+      text: "Running that order is dbt's job. Next: how dbt builds a project.",
     },
   ],
 };

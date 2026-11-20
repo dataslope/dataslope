@@ -24,7 +24,7 @@ type Figure = { setup: string; version: string; steps: Record<string, Step> };
 type Selection = { selector: string; models: string[]; sources: string[]; exposures: string[] };
 
 const R = results as unknown as {
-  dbtV2: { language: string; generallyAvailable: string; coreLine: string; coreEndsAt: string; testsKey: string };
+  dbtV2: { language: string; engineName: string; generallyAvailable: string; coreLine: string; coreEndsAt: string; testsKey: string };
   graph: {
     sources: string[];
     models: string[];
@@ -107,6 +107,8 @@ export const MATERIALIZE = {
   tablePlan: plan(table, "plan"),
   /** The table after the new event, before a run: still Seq Scan (12). */
   tablePlanAfter: plan(table, "planAfter"),
+  /** The table rebuilt by the next run: Seq Scan on dim_customer (13). */
+  tablePlanRebuilt: plan(R.materializations.tableRebuilt, "plan"),
   /** The video's own new event, for a 13th customer. */
   newEvent: lines(ok(view, "arrive").sql),
   /** Customers after it lands: view 13, table 12, the table rebuilt 13. */
@@ -135,7 +137,8 @@ export const MACRO = {
 
 // ── 20. dbt v2 ──────────────────────────────────────────────────────────────
 
-/** The page's dbt v2 answer: the engine's language, when it became generally
+/** The page's dbt v2 answer: the engine's language, the name it first shipped
+ *  under ("Fusion", of the "Fusion engine"), when it became generally
  *  available, the Python line dbt Core names and the release it ends at, and
  *  the YAML key the page gives first among the 1.x deprecations. */
 export const DBT_V2 = R.dbtV2;

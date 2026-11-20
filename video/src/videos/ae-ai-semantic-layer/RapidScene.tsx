@@ -130,12 +130,13 @@ export const RapidScene: React.FC = () => {
             </Chip>
           </Ink>
         </div>
-        <Ink at={logAt + 4} dur={12} style={{ left: MCP.x, top: whTop + whH + h(26) }}>
+        {/* Logged where every request passes: under MCP. */}
+        <Ink at={logAt + 4} dur={12} style={{ left: MCP.x, top: mcpTop + boxH + h(100) }}>
           <Chip tone="green" size={22}>
             logged
           </Chip>
         </Ink>
-        <Ink at={auditAt} dur={12} style={{ left: MCP.x, top: whTop + whH + h(76) }}>
+        <Ink at={auditAt} dur={12} style={{ left: MCP.x, top: mcpTop + boxH + h(150) }}>
           <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>For audit, and the golden set</span>
         </Ink>
       </Drift>

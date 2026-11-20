@@ -310,7 +310,9 @@ export const RefreshScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <CostChart x0={CH.x0} x1={CH.x1} top={top} bottom={bottom} at={costAt + 4} fullAt={costAt + 4} fullDur={20} incAt={costAt + 10} incDur={24} lastAt={lastAt} />
+        {/* The incremental model's own runs only: the nightly rebuild's line
+            would end beside the last refresh's label, unlabeled. */}
+        <CostChart x0={CH.x0} x1={CH.x1} top={top} bottom={bottom} at={costAt + 4} incAt={costAt + 10} incDur={24} lastAt={lastAt} />
         <Note at={lastAt} x={CH.x1 + 26} y={s.ly(COST.lastRefresh.rows) - 16}>
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             Last refresh, day <Num>{COST.lastRefresh.day}</Num>

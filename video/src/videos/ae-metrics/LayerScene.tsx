@@ -112,6 +112,13 @@ export const LayerScene: React.FC = () => {
         {models.map((m, i) => (
           <Node key={m} x={boxX(i)} y={modelsTop} w={BOX_W} h={boxH} at={modelsAt + i * 3} title={m} mono size={22} />
         ))}
+        {/* Each tier named as the narration names it. */}
+        <Ink at={modelsAt + 8} dur={12} style={{ left: X0 + wide + 24, top: modelsTop + boxH / 2 - 15 }}>
+          <span style={noteLine(22, INK_SOFT)}>models</span>
+        </Ink>
+        <Ink at={biAt + 8} dur={12} style={{ left: X0 + wide + 24, top: toolsTop + boxH / 2 - 15 }}>
+          <span style={noteLine(22, INK_SOFT)}>BI tools</span>
+        </Ink>
         {/* Tools ask the layer; the layer writes SQL against the models. */}
         {[0, 1, 2].map((i) => (
           <Flow key={`down${i}`} points={[[mid(i), toolsTop + boxH + 6], [mid(i), layerTop - 8]]} at={i === 0 ? monthAt : i === 2 ? regionAt : everyAt} dur={10} color={i === 1 ? INK : inkOf.yellow} width={i === 1 ? 2 : 3} />
@@ -123,12 +130,14 @@ export const LayerScene: React.FC = () => {
         {/* ── Two requests, and the SQL the layer writes for each ── */}
         <Ink at={monthAt} dur={12} style={{ left: R_X, top: toolsTop - h(4) }}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <span style={{ color: INK_SOFT }}>Dashboard: </span>
             <b>completed revenue by month</b>
           </span>
         </Ink>
         <Listing lines={LAYER_SQL.byMonth} x={R_X} top={monthTop} width={640} size={SQL_SIZE} at={writesAt} marks={sqlMarks(LAYER_SQL.byMonth, 0)} />
         <Ink at={regionAt} dur={12} style={{ left: R_X, top: regionLabel }}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <span style={{ color: INK_SOFT }}>Spreadsheet: </span>
             <b>completed revenue by region</b>
           </span>
         </Ink>

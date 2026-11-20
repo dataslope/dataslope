@@ -20,8 +20,8 @@ const OVERLAP = 6;
 
 /**
  * "Metrics and the semantic layer" (16:9), Part 8 of the Analytics Engineer
- * interview prep videos, on the editorial page. All eighteen of the page's
- * questions: eight worked through, a scene each, then ten quick ones. Every
+ * interview prep videos, on the editorial page. All nineteen of the page's
+ * questions: eight worked through, a scene each, then eleven quick ones. Every
  * table, total and multiple ran on the site's Postgres (check.mjs,
  * results.json, data.ts), most on the page's own twelve orders; the layer,
  * the semantic model and the drift are the page's answers, drawn.

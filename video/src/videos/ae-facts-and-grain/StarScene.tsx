@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -200,8 +200,9 @@ export const StarScene: React.FC = () => {
           Both return these six rows
         </TableName>
         <DataTable g={rg} cols={colsOf(R)} at={sameAt - 4} rows={R.rows.map((cells, i) => ({ cells, at: sameAt + i * 2 }))} />
-        <Note at={sameAt + 14} x={rg.right + 40} y={rg.rowTop(0) + h(4)} out={defaultAt - 4}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+        {/* On the caption's line, clear of the verdict, so it stays up. */}
+        <Note at={sameAt + 14} x={rg.right + 40} y={rg.top - 38}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
             Rows one read has and the other lacks: <Num>{SNOW.differ}</Num>
           </span>
         </Note>
@@ -219,7 +220,7 @@ export const StarScene: React.FC = () => {
         <Note at={onlyAt} x={VERDICT_X} y={rg.rowTop(0) + h(170)}>
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>
             Snowflake: only when huge
-            <span style={{ opacity: ease(frame, sharedAt, 10) }}>, or shared</span>
+            <span style={{ opacity: ease(frame, sharedAt, 10) }}>, or shared by several dimensions</span>
           </span>
         </Note>
       </Drift>

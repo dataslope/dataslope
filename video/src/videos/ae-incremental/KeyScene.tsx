@@ -17,6 +17,7 @@ import {
   Count,
   DataTable,
   Drift,
+  type ListingLine,
   MARK_BAD,
   MARK_OK,
   PgError,
@@ -30,6 +31,10 @@ import {
 
 /** The model's config, as dbt.mdx writes it. */
 const CONFIG = DBT_MODEL.slice(DBT_MODEL.findIndex((l) => l === "{{"), DBT_MODEL.findIndex((l) => l === "}}") + 1);
+/** The key's own setting in that config, which the append run goes without. */
+const KEY_SETTING = ", unique_key='event_id'";
+const CONFIG_LINE = CONFIG.find((l) => l.includes(KEY_SETTING));
+if (!CONFIG_LINE) throw new Error("dbt.mdx's config no longer sets unique_key='event_id'");
 const TL = 300;
 const P = 44;
 /** The column of event `id`. */
@@ -37,6 +42,9 @@ const X = (id: number) => TL + (id - 0.5) * P;
 /** Layout values (through `y()`). */
 const ROW_C = { answer: 267, config: 320, spot: 368, dup: 544, batch: 583, base: 715, bottom: 769 };
 const LEDGER_X = 1240;
+/** The uniqueness test, clear of the error box on its left and of the
+ *  table's count on its right. */
+const TEST_X = 980;
 
 /**
  * Question 4. What `unique_key` is for (an update-or-replace strategy
@@ -178,7 +186,7 @@ export const KeyScene: React.FC = () => {
 
   const testCols: Col[] = DUP_KEY.test.found.cols.map((c) => ({ name: c, numeric: true }));
   const testRows: TableRow[] = DUP_KEY.test.found.rows.map((r) => ({ cells: r, at: testAt + 10 }));
-  const testG = tableGeometry({ x: 1160, top: row("bottom") + 44, cols: testCols, rows: testRows.map((r) => r.cells), headH: 36, rowH: 36, headSize: 20, bodySize: 22 });
+  const testG = tableGeometry({ x: TEST_X, top: row("bottom") + 44, cols: testCols, rows: testRows.map((r) => r.cells), headH: 36, rowH: 36, headSize: 20, bodySize: 22 });
 
   const counts = (
     first: number,
@@ -216,7 +224,13 @@ export const KeyScene: React.FC = () => {
 
         {/* The config, and the key it names. */}
         <SqlListing
-          lines={CONFIG}
+          lines={CONFIG.map((l): ListingLine =>
+            l === CONFIG_LINE
+              ? // "Without it": the append run's config has no key; "Set the
+                // unique key" puts it back.
+                { text: l, swaps: [{ at: appendedAt, text: l.replace(KEY_SETTING, "") }, { at: keyAt, text: l }] }
+              : l,
+          )}
           x={X0}
           top={row("config")}
           width={720}
@@ -324,7 +338,7 @@ export const KeyScene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>The next run&apos;s merge</span>
         </Note>
         <PgError x={X0} top={row("bottom") + 40} width={760} at={refusesAt} message={DUP_KEY.error} size={20} />
-        <Note at={testAt} x={1160} y={row("bottom")}>
+        <Note at={testAt} x={TEST_X} y={row("bottom")}>
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
             A <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 500, color: OK_INK }}>unique</span> test on <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 500 }}>event_id</span> finds it
           </span>

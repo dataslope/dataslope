@@ -14,25 +14,29 @@ import { Arrow, Band, Box, colsOf, DataTable, Drift, geoOf, lineOf, Listing, lis
 const SIZE = 20;
 const ROWS = { headH: 42, rowH: 48, bodySize: 22, headSize: 20 } as const;
 
-/** The snapshot's own rows, drawn: dbt does not run here, so each version is
- *  stamped with the run that wrote it, not a time. */
+/** The snapshot's own rows, drawn: dbt does not run here, so no times. With
+ *  the listing's timestamp strategy, dbt stamps a version with the source
+ *  row's updated_at, and closes the old one at the new one's: the run only
+ *  finds the change (review 2026-11-20; the run's own time is what the check
+ *  strategy, and a hard-delete invalidation, stamp). */
 const SNAP = {
   cols: ["customer_id", "region", "dbt_valid_from", "dbt_valid_to"],
   rows: [
-    ["42", "East", "run 1", "run 2"],
-    ["42", "West", "run 2", "null"],
+    ["42", "East", "East’s updated_at", "West’s updated_at"],
+    ["42", "West", "West’s updated_at", "null"],
   ],
 };
 
 /**
  * Question 4. The page's snap_customers beside the table it keeps: run 1
  * records East; run 2 compares the source with it, closes that version and
- * inserts West, each stamped with the run that wrote it. The two strategies,
+ * inserts West, each stamped with the source's updated_at. The two strategies,
  * with the listing's own strategy lines marked. Then what a snapshot cannot
  * see: three source values and two runs, West changed and changed again in
  * between, never recorded. Then why it is precious, as a flow: the source
  * holds only now, the snapshot holds what it saw, and the dimension model
- * downstream reads its two timestamps as each version's window.
+ * downstream reads its two timestamps as each version's window, the
+ * current version's null closed at 9999-12-31.
  */
 export const SnapScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -73,7 +77,7 @@ export const SnapScene: React.FC = () => {
   const L = SNAPSHOT.lines;
   const listTop = y(330);
   const listW = listingWidth(L, SIZE);
-  const TX = 900;
+  const TX = 780;
   const gs = geoOf(SNAP, TX, y(420), h, ROWS);
   const col = (c: string) => SNAP.cols.indexOf(c);
   const one = SNAP.rows[0].map((v, j) => (j === col("dbt_valid_to") ? "null" : v));
@@ -101,7 +105,7 @@ export const SnapScene: React.FC = () => {
 
   // ── Phase 3: source, snapshot, model ──
   const flowTop = y(600);
-  const boxH = h(150);
+  const boxH = h(180);
   const B = [
     { x: X0, w: 400 },
     { x: 640, w: 470 },
@@ -249,8 +253,8 @@ export const SnapScene: React.FC = () => {
         <Arrow points={[[B[0].x + B[0].w + 12, mid], [B[1].x - 12, mid]]} at={onlyAt - 4} />
         <Box x={B[1].x} y={flowTop} w={B[1].w} h={boxH} at={onlyAt} align="left">
           <span style={{ ...label(22, INK_SOFT) }}>Snapshot: snap_customers</span>
-          <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · East · run 1 to run 2</span>
-          <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · North · run 2 to run 3</span>
+          <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · East · closed by North</span>
+          <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · North · closed at run 3</span>
         </Box>
         <Note at={onlyAt + 6} x={B[1].x} y={flowTop + boxH + h(22)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>The only copy of this history</span>
@@ -266,6 +270,9 @@ export const SnapScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT) }}>Model: dim_customer</span>
           <span style={{ fontFamily: MONO, fontSize: 23, opacity: ease(frame, becomeAt, 10) }}>dbt_valid_from → valid_from</span>
           <span style={{ fontFamily: MONO, fontSize: 23, opacity: ease(frame, becomeAt + 6, 10) }}>dbt_valid_to → valid_to</span>
+          {/* The current version's null, closed off as Question 2 argued,
+              so one BETWEEN still covers every version (review 2026-11-20). */}
+          <span style={{ fontFamily: MONO, fontSize: 23, opacity: ease(frame, becomeAt + 12, 10) }}>null → 9999-12-31</span>
         </Box>
         <Note at={becomeAt + 10} x={B[2].x} y={flowTop + boxH + h(22)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Each version&rsquo;s window</span>

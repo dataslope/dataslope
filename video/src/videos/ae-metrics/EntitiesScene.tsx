@@ -104,7 +104,6 @@ export const EntitiesScene: React.FC = () => {
   const originalAt = n.word("entities-dbt", "the original MetricFlow spec's");
   const currentAt = n.word("entities-dbt", "In dbt's current spec");
   const foldedAt = n.word("entities-dbt", "the measure is folded into a simple metric");
-  const declaredAt = n.word("entities-run", "Declared on the page's two tables");
   const entitiesRunAt = n.beat("entities-run").from;
   const revenueAt = n.word("entities-run", "revenue lives on orders");
   const unitsOnAt = n.word("entities-run", "units on items");
@@ -141,7 +140,8 @@ export const EntitiesScene: React.FC = () => {
       {cols.map((c) => (
         <Sfx key={c.title} name="el-tap" at={c.at} level={-33} />
       ))}
-      <Sfx name="el-pop" at={declaredAt} level={-31} />
+      <Sfx name="el-tap" at={revenueAt} level={-33} />
+      <Sfx name="el-tap" at={unitsOnAt} level={-33} />
       <Sfx name="el-pencil" at={grainAt} level={-35} />
       <Sfx name="el-sprinkle" at={joinsAt + 4} level={-34} />
       <Sfx name="el-tap" at={totalAt} level={-32} />
@@ -188,34 +188,35 @@ export const EntitiesScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={foldedAt} dur={14} style={{ left: colX(2), top: colsTop + h(146) }}>
-          <span style={{ ...note(22, BLUE_INK), whiteSpace: "nowrap" }}>In dbt today: inside a simple metric</span>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>In dbt today: inside a simple metric</span>
         </Ink>
 
-        {/* ── The page's two tables, declared ── */}
+        {/* ── The page's two tables, each role filled in as it is defined,
+            so the definitions land on real columns; lit once declared ── */}
         <ModelBox
           x={X0}
           y={ordersTop}
           w={470}
-          at={declaredAt}
+          at={cols[0].at}
           name="orders"
           rows={[
-            { role: "entity", name: "order", at: declaredAt + 6 },
-            { role: "measure", name: "revenue = SUM(amount)", at: revenueAt },
+            { role: "entity", name: "order", at: cols[0].exAt + 4 },
+            { role: "measure", name: "revenue = SUM(amount)", at: cols[2].exAt },
           ]}
-          lit={grainAt}
+          lit={revenueAt}
         />
         <ModelBox
           x={X0}
           y={itemsTop}
           w={470}
-          at={declaredAt + 6}
+          at={cols[0].at + 6}
           name="order_items"
           rows={[
-            { role: "entity", name: "order", at: declaredAt + 12 },
-            { role: "dimension", name: "item", at: declaredAt + 16 },
-            { role: "measure", name: "units = SUM(qty)", at: unitsOnAt },
+            { role: "entity", name: "order", at: cols[0].exAt + 8 },
+            { role: "dimension", name: "item", at: cols[1].exAt },
+            { role: "measure", name: "units = SUM(qty)", at: cols[2].exAt + 4 },
           ]}
-          lit={grainAt + 6}
+          lit={unitsOnAt}
         />
 
         {/* ── Both by order: each at its own grain, then the join ── */}

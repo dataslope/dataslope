@@ -93,9 +93,12 @@ INSERT INTO fct_orders VALUES
   (6, 'delivered', 99, 55.00),
   (7, 'placed', 12, -25.00);`;
 
-/** What each generic test compiles to, roughly; unique is the page's own. */
+/** What each generic test compiles to, roughly. unique keeps dbt's own null
+ *  filter (default__test_unique has `where <column> is not null` before its
+ *  group by): it skips nulls, so no number of null keys fails it, which is
+ *  why it is paired with not_null. */
 const COMPILED = {
-  unique: "SELECT order_id, COUNT(*) AS n\nFROM fct_orders\nGROUP BY order_id\nHAVING COUNT(*) > 1;",
+  unique: "SELECT order_id, COUNT(*) AS n\nFROM fct_orders\nWHERE order_id IS NOT NULL\nGROUP BY order_id\nHAVING COUNT(*) > 1;",
   notNull: "SELECT *\nFROM fct_orders\nWHERE order_id IS NULL;",
   acceptedValues:
     "SELECT *\nFROM fct_orders\nWHERE status NOT IN\n  ('placed', 'shipped', 'delivered', 'cancelled');",
@@ -113,6 +116,12 @@ results.figures.builtins = await figure(BUILTINS, {
   table: "SELECT order_id, status, customer_id, amount FROM fct_orders ORDER BY ctid;",
   dim: "SELECT customer_id, name FROM dim_customer ORDER BY customer_id;",
   ...COMPILED,
+  // "even two of them would pass": the same unique test on the eight rows
+  // with a second null key added, still only order 3.
+  uniqueTwoNulls: COMPILED.unique.replace(
+    "FROM fct_orders",
+    "FROM (SELECT order_id FROM fct_orders UNION ALL SELECT NULL) t",
+  ),
   singular: `${SINGULAR};`,
 });
 results.figures.builtins.yaml = fence(TESTING, "# models/schema.yml");
@@ -324,6 +333,7 @@ expect("unique: orders 2, 11 and 19, twice each", rows("unique", "test"), [[2, 2
 expect("unique: 335 too high", rows("unique", "revenue")[0][2], "335.00");
 expect("unique: unchanged after the test", rows("unique", "after"), [[24]]);
 expect("builtins: unique returns order 3", rows("builtins", "unique"), [[3, 2]]);
+expect("builtins: unique skips nulls, even two of them", rows("builtins", "uniqueTwoNulls"), [[3, 2]]);
 expect("builtins: not_null returns the row with no id", rows("builtins", "notNull"), [[null, "delivered", 10, "15.00"]]);
 expect("builtins: accepted_values returns 'returned'", rows("builtins", "acceptedValues"), [[5, "returned", 11, "30.00"]]);
 expect("builtins: relationships returns customer 99", rows("builtins", "relationships"), [[6, "delivered", 99, "55.00"]]);

@@ -10,12 +10,14 @@ import { ColumnRule, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID, SNOW } from "./data";
-import { Box, Caption, colsOf, DataTable, Drift, Flow, geoOf, Kicker, KeyArrow, MARK_OK, money, Mono, OK_INK, SERIES, Strike, TableName, Verdict } from "./parts";
+import { Box, Caption, colsOf, DataTable, Drift, Flow, geoOf, Headline, Kicker, KeyArrow, MARK_OK, money, Mono, OK_INK, SERIES, Strike, TableName, Verdict } from "./parts";
 import { LIST_W, LIST_X, Q, R_X, ROW, RULE_X, type Ctx } from "./rapid";
 
 const ROWS = { headH: 40, rowH: 40, bodySize: 22, headSize: 20 } as const;
-const LIST_TOP = 250;
-const BODY_TOP = 270;
+/** Page one's geometry, headline included, so the page turn changes only
+ *  the rows. */
+const LIST_TOP = 300;
+const BODY_TOP = 300;
 
 // ── 17. Confirmed or conformed ──────────────────────────────────────────────
 
@@ -129,6 +131,8 @@ const Agg: React.FC<{ c: Ctx }> = ({ c }) => {
   const intoAt = c.w("r-agg", "twenty-four orders into six categories");
   const martAt = c.w("r-agg", "That mart's own grain");
   const keepsAt = c.w("r-agg", "the fact keeps every order");
+  const joinBackAt = c.w("r-agg-why", "Join the mart back to the orders");
+  const onceAt = c.w("r-agg-why", "counted once per order");
   const [orders] = SNOW.counts.rows[0];
   const count = Number(orders);
   const M = RAPID.mart;
@@ -150,7 +154,7 @@ const Agg: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Caption>
       {Array.from({ length: count }, (_, i) => {
-        const p = Math.min(1, pop(frame, orderAt + Math.floor(i / 2), fps, 16));
+        const p = Math.min(1, pop(frame, grainAt + Math.floor(i / 2), fps, 16));
         return (
           <div
             key={i}
@@ -181,6 +185,12 @@ const Agg: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={martAt} x={mg.x} y={mg.rowTop(M.rows.length) + c.h(20)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           Its own grain: <b>one row per category</b>
+        </span>
+      </Note>
+      {/* Why it matters: the page's double-counting at the wrong level. */}
+      <Note at={joinBackAt} x={mg.x} y={mg.rowTop(M.rows.length) + c.h(64)}>
+        <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
+          Joined back to the orders<span style={{ opacity: ease(frame, onceAt, 10) }}>: each total counted once per order</span>
         </span>
       </Note>
       <Note at={keepsAt} x={R_X} y={top + gridRows * (SQ + GAP) + c.h(64)}>
@@ -354,7 +364,7 @@ const Kimball: React.FC<{ c: Ctx }> = ({ c }) => {
         Conformed dimensions
       </Box>
       <Note at={fastAt} x={kx} y={lowerY + BOX_H + c.h(30)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Value comes fast</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Value comes fast</span>
       </Note>
 
       <ColumnRule x={ix - GAP / 2} top={top} height={c.h(380)} at={askIAt} />
@@ -399,7 +409,8 @@ export const RapidTwoScene: React.FC = () => {
   const c: Ctx = { w: (b, p, o) => n.word(b, p, o), y, h, top: y(BODY_TOP) };
 
   const from = n.beat("r-confirmed").from;
-  const end = n.beat("r-kimball").to + 30;
+  // The last answer holds until the page's own cross-fade (to + 40..46).
+  const end = n.beat("r-kimball").to + 44;
 
   const items: RapidItem[] = [
     { n: 17, label: <Q>What is the difference between a confirmed vs. a conformed dimension?</Q>, beat: "r-confirmed", body: <Confirmed c={c} /> },
@@ -429,6 +440,8 @@ export const RapidTwoScene: React.FC = () => {
 
       <Drift from={from} to={end + 40} scale={0.02}>
         <Kicker at={from - 8}>{SERIES} · Questions 17 to 22, quick</Kicker>
+        {/* Page one's headline, already inked at the cut. */}
+        <Headline lead="Thirteen quick ones," turn="a sentence or two each." at={from - 40} turnAt={from - 40} size={60} />
         <RapidFire items={items} x={LIST_X} top={y(LIST_TOP)} rowH={h(ROW)} width={LIST_W} at={from - 6} end={end} />
         <ColumnRule x={RULE_X} top={y(LIST_TOP)} height={items.length * h(ROW)} at={from} />
       </Drift>

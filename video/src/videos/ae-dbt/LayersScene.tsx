@@ -24,7 +24,9 @@ const LIT = ds("yellow", 600);
  * dashed), marts (the dimension and the fact), and the dashboard they feed.
  * Each column's rule from the page inks in under it as it is said. Then what
  * a change costs: `stg_customers+` lights the three models downstream of it
- * and the dashboard, `fct_orders+` only the fact and the dashboard. Last, how
+ * and the dashboard they reach, `fct_orders+` only the fact and the
+ * dashboard (an exposure is selected, never built, so the line says the
+ * change reaches it, not that it rebuilds it). Last, how
  * often each layer changes, beside its heading.
  */
 export const LayersScene: React.FC = () => {
@@ -208,7 +210,7 @@ export const LayersScene: React.FC = () => {
                   <b>
                     <Num>{down}</Num> of <Num>{GRAPH.models.length}</Num> models
                   </b>
-                  <span style={{ color: INK_SOFT }}>, and the dashboard</span>
+                  <span style={{ color: INK_SOFT }}>, reaching the dashboard</span>
                 </span>
               </span>
             </Note>

@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { MERGE, PAGE_MERGE } from "./data";
-import { type Col, Count, DataTable, Drift, MARK, MARK_BAD, MARK_OK, SmallMono, SqlListing, tableGeometry, TableName, type TableRow, X0 } from "./parts";
+import { type Col, Count, DataTable, Drift, Mark, MARK, MARK_BAD, MARK_OK, SmallMono, SqlListing, tableGeometry, TableName, type TableRow, X0 } from "./parts";
 
 const SIZE = 19;
 const STAGED_X = X0;
@@ -29,8 +29,9 @@ const day = (rows: string[][], col: number) => rows.map((r) => r.map((v, j) => (
  * Dee inserted, four rows; merged again, both matched, nothing inserted,
  * the same four. The same batch inserted blindly, twice: seven rows. Then
  * where dbt runs it (a merge-style strategy keyed on unique_key, which one
- * depending on the adapter), and what it cannot do: a row deleted at the
- * source never reaches the batch, so the target keeps it.
+ * depending on the adapter), and what it never sees: a row deleted at the
+ * source never reaches the batch, so the target keeps it, unless the source
+ * sends its deletes as flagged rows; otherwise a full refresh.
  */
 export const MergeScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -65,11 +66,14 @@ export const MergeScene: React.FC = () => {
   const uniqueAt = n.word("merge-dbt", "keyed on the unique key");
   const adapterAt = n.word("merge-dbt", "depends on the adapter");
 
-  const deleteAt = n.word("merge-delete", "What a merge can't do is delete");
-  const removedAt = n.word("merge-delete", "A row removed from the source");
-  const batchAt = n.word("merge-delete", "never reaches the batch");
-  const keepsAt = n.word("merge-delete", "the target keeps it");
-  const end = n.beat("merge-delete").to;
+  const deleteAt = n.word("merge-delete", "What this merge never sees is a delete");
+  const removedAt = n.word("merge-delete-batch", "A row removed from the source");
+  const batchAt = n.word("merge-delete-batch", "never reaches the batch");
+  const keepsAt = n.word("merge-delete-batch", "the target keeps it");
+  const flagAt = n.word("merge-delete-flag", "send each delete as a row");
+  const flaggedAt = n.word("merge-delete-flag", "flagged");
+  const otherwiseAt = n.word("merge-delete-flag", "Otherwise, it takes a full refresh");
+  const end = n.beat("merge-delete-flag").to;
 
   const row = (k: keyof typeof ROW_C) => y(ROW_C[k]);
   const top = row("tables");
@@ -79,12 +83,10 @@ export const MergeScene: React.FC = () => {
   const staged = day(MERGE.staged.rows, 2);
   const before = day(MERGE.before.rows, 2);
   const after = day(MERGE.after.rows, 2);
-  // Cy's row, deleted at the source: drawn where the batch would carry it.
+  // Cy's row, deleted at the source: named under the batch, which never
+  // carries it.
   const cy = before.find((r) => r[1] === "Cy") ?? before[before.length - 1];
-  const stagedRows: TableRow[] = [
-    ...staged.map((cells, i) => ({ cells, at: stagedAt + 6 + i * 4 })),
-    { cells: cy, at: removedAt + 4, strikeAt: batchAt, dimAt: batchAt + 10 },
-  ];
+  const stagedRows: TableRow[] = staged.map((cells, i) => ({ cells, at: stagedAt + 6 + i * 4 }));
   const stagedG = tableGeometry({ x: STAGED_X, top, cols, rows: stagedRows.map((r) => r.cells), headH: 36, rowH: 34, headSize: 20, bodySize: 21, pad: 16 });
   const benRow = before.findIndex((r) => r[0] === "2");
   const cyRow = before.indexOf(cy);
@@ -150,7 +152,13 @@ export const MergeScene: React.FC = () => {
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Which strategy you get: the adapter, and your config</span>
         </Note>
         <Note at={deleteAt} x={NOTE_X} y={row("dbt") + 112}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A merge can&apos;t delete</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>This merge never sees a delete</span>
+        </Note>
+        <Note at={flagAt} x={NOTE_X} y={row("dbt") + 156}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            Unless deletes arrive as <Mark at={flaggedAt}>flagged rows</Mark>
+            <span style={{ color: INK_SOFT, opacity: ease(frame, otherwiseAt, 10) }}>; otherwise, a full refresh</span>
+          </span>
         </Note>
 
         {/* staged_customers: the batch. */}
@@ -167,10 +175,10 @@ export const MergeScene: React.FC = () => {
             { row: 1, col: 1, at: deeAt, color: MARK, out: insertsDeeAt },
           ]}
         />
-        <Note at={removedAt + 8} x={STAGED_X} y={stagedG.rowTop(3) + 10}>
+        <Note at={removedAt + 4} x={STAGED_X} y={stagedG.rowTop(staged.length) + 14}>
           <span style={{ ...note(21, ACCENT_INK), whiteSpace: "nowrap" }}>
-            Deleted at the source
-            <span style={{ opacity: ease(frame, batchAt, 10) }}>, so not in the batch</span>
+            {cy[1]}, deleted at the source
+            <span style={{ opacity: ease(frame, batchAt, 10) }}>: not in the batch</span>
           </span>
         </Note>
 

@@ -433,6 +433,48 @@
           ],
           "rows": []
         },
+        "testJoinedUnique": {
+          "sql": "SELECT o.order_id, COUNT(*) AS n\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id\nGROUP BY o.order_id\nHAVING COUNT(*) > 1;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "n"
+          ],
+          "rows": [
+            [
+              1,
+              3
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              6,
+              3
+            ],
+            [
+              8,
+              2
+            ],
+            [
+              10,
+              3
+            ],
+            [
+              11,
+              2
+            ],
+            [
+              12,
+              3
+            ]
+          ]
+        },
         "fix": {
           "sql": "-- Aggregate each grain independently, then join the summaries\nWITH order_rev AS (\n  SELECT SUM(amount) AS revenue FROM orders\n),\nitem_qty AS (\n  SELECT SUM(qty) AS units FROM order_items\n)\nSELECT revenue, units FROM order_rev, item_qty;",
           "ok": true,

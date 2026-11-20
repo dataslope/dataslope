@@ -61,7 +61,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   hook-meaning: under the tiles, the two queries, small: SUM(amount) FROM
  *     orders, and the page's join, each aliased "revenue" as a dashboard
  *     would (check.mjs runs both as written); neither marked wrong.
- *   plan: eight numbered squares and ten smaller ones.
+ *   plan: eight numbered squares and eleven smaller ones.
  *   disagree: QuestionCard 1. disagree-how: four causes as a ruled list,
  *     each inking in as it is read: filters (refunds, tax, cancelled),
  *     date logic (order date or ship date), grain, a fan trap.
@@ -198,13 +198,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - Quick: the page's answers. MetricFlow's YAML is the page's, read from
  *     it by check.mjs. LookML is described, not shown, as on the page.
  *
- * The page's fan-trap block is wrong about itself: its comment says "True
- * revenue is 100 + 50 = 150, but this returns 350", and the prose says the
- * block shows "real revenue of 150 balloon to 350". On the twelve orders it
- * now holds, the query returns 4,555.25 against a true 1,949.25; 150 and 350
- * are orders 1 and 2 alone. The video follows the run (check.mjs records it
- * as pageNote), shows orders 1 and 2 as the zoom, and the twelve as the
- * whole.
+ * The page's fan-trap block once described itself on orders 1 and 2 alone
+ * ("150 becomes 350"); since the 2026-11-20 review its comment and prose
+ * give the twelve orders' 1,949.25 and 4,555.25, as the run does (check.mjs
+ * still reports a pageNote if the old wording comes back). The video shows
+ * orders 1 and 2 as the zoom and the twelve as the whole.
+ *
+ * Review fixes (agent-outputs/20261120-ae-interview-video-review/): "fan-test"
+ * closes the opening's "every test passes" (each test checked an input; the
+ * same unique test on the joined rows fails, 8 orders repeat, check.mjs
+ * testJoinedUnique). Question 9's three revenues are drawn in ink, none marked
+ * right, and become "the layer's revenue", not SUM(amount): no reading of
+ * revenue is crowned (Part 9 governs net revenue). No label is struck through.
  *
  * Written for Drew's ear: SQL, BI, API and YAML in plain caps (SQL and YAML
  * are said by the lexicon); BI expanded once, in question five; LookML as
@@ -287,6 +292,11 @@ export const script: NarrationScript = {
     {
       id: "fan-tell",
       text: "The tell is the row count. Twelve orders went into the join, and twenty-four rows came out.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "fan-test",
+      text: "Every test passed because each one checked an input table. Run a unique test on order ID against the joined rows, and it fails: eight orders repeat.",
       pauseAfter: 0.8,
     },
     {
@@ -449,7 +459,7 @@ export const script: NarrationScript = {
       id: "r-measure",
       take: true,
       text: "Question thirteen. What is the difference between a measure and a metric? A measure is a raw aggregate on one table, like the sum of amount. A metric is the business number built from measures, with filters, ratios or time logic, like completed revenue.",
-      pauseAfter: 1.2,
+      pauseAfter: 1.8,
     },
     {
       id: "r-contains",

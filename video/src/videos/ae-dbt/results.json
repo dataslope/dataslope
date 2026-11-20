@@ -134,6 +134,7 @@
   },
   "dbtV2": {
     "language": "Rust",
+    "engineName": "Fusion",
     "generallyAvailable": "September 2026",
     "coreLine": "1.x",
     "coreEndsAt": "1.13",
@@ -366,6 +367,18 @@
           "rows": [
             [
               13
+            ]
+          ]
+        },
+        "plan": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT * FROM dim_customer",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Seq Scan on dim_customer (actual rows=13.00 loops=1)"
             ]
           ]
         }

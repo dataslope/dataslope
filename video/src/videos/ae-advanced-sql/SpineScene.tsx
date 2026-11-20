@@ -347,7 +347,7 @@ export const SpineScene: React.FC = () => {
             </span>
           </Note>
           <Note at={vanishAt} x={mx(mini - 1) + MC + 40} y={miniTop + h(4)}>
-            <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>An empty last day: outside the spine</span>
+            <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>An empty last day: outside <QMono>MIN</QMono> to <QMono>MAX</QMono></span>
           </Note>
           <Bracket x0={mx(0)} x1={mx(mini - 1) + MC} y={miniTop + miniH + h(44)} at={reportAt + 4} color={OK} />
           <Note at={reportAt + 10} x={mx(0)} y={miniTop + miniH + h(56)}>

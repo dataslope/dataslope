@@ -5,10 +5,10 @@ import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, Note, Num } from "../../editorial/ui";
+import { Badge, Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { FAN, money } from "./data";
 import {
   DataTable,
@@ -42,7 +42,8 @@ const BAR_ROW = 26;
  * 4,555.25 over 24 rows, against 1,949.25 for the orders alone, 2.34 times.
  * The danger is that nothing errors: each order is counted once per item,
  * drawn as one bar of copies per order. The tell is the row count, 12 orders
- * in and 24 rows out.
+ * in and 24 rows out. And why every test passed: each checked an input
+ * table; the same unique test on the joined rows fails, 8 orders repeating.
  */
 export const FanScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -73,7 +74,11 @@ export const FanScene: React.FC = () => {
   const tellAt = n.word("fan-tell", "The tell is the row count");
   const inAt = n.word("fan-tell", "Twelve orders went into the join");
   const outAt = n.word("fan-tell", "twenty-four rows came out");
-  const end = n.beat("fan-tell").to;
+  const inputsAt = n.word("fan-test", "each one checked an input table");
+  const uniqueAt = n.word("fan-test", "Run a unique test on order ID");
+  const failsAt = n.word("fan-test", "it fails");
+  const repeatAt = n.word("fan-test", "eight orders repeat");
+  const end = n.beat("fan-test").to;
   const returnsAt = n.word("fan-all", "the join returns");
   // Orders 1 and 2 stay up for two seconds after their 350.00, then clear.
   const phaseOut = returnsAt - 4;
@@ -350,6 +355,27 @@ export const FanScene: React.FC = () => {
         </Note>
         <Note at={outAt + 12} x={RESULT_X + 104} y={tellTop + h(52)}>
           <span style={{ fontFamily: MONO, fontSize: 21, color: INK_SOFT, whiteSpace: "nowrap" }}>JOIN</span>
+        </Note>
+
+        {/* ── Why every test passed, and the one that fails ── */}
+        <Note at={inputsAt} x={RESULT_X} y={tellTop + h(166)}>
+          <span style={noteLine(22, INK_SOFT)}>Every test ran on an input table</span>
+        </Note>
+        <Note at={uniqueAt} x={RESULT_X} y={tellTop + h(208)}>
+          <span style={{ ...noteLine(22, INK), display: "inline-flex", alignItems: "center", gap: "0.45em" }}>
+            <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500 }}>unique</span>
+            on the joined rows
+            <Badge tone="red" size={22} style={{ fontFamily: SANS, opacity: ease(frame, failsAt, 8) }}>
+              fail
+            </Badge>
+          </span>
+        </Note>
+        <Note at={repeatAt} x={RESULT_X} y={tellTop + h(252)}>
+          <span style={noteLine(22, ACCENT_INK)}>
+            <b>
+              <Num>{FAN.joinedRepeats}</Num> orders repeat
+            </b>
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

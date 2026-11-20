@@ -194,7 +194,13 @@
         "runs": true,
         "sameResult": false
       }
-    ]
+    ],
+    "withoutTest": {
+      "sql": "DELETE FROM orders\nWHERE customer_id IN (SELECT customer_id FROM customers WHERE is_test);",
+      "orders": 6,
+      "A": "440.00",
+      "C": "440.00"
+    }
   },
   "review": {
     "asWritten": "{{ config(materialized='incremental') }}\n\nselect order_id, order_date, amount\nfrom analytics.raw_orders\n{% if is_incremental() %}\nwhere order_date > (select max(order_date) from {{ this }})\n{% endif %}",

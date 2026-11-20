@@ -31,7 +31,7 @@ import {
   X0,
 } from "./parts";
 
-const FIG_Y = 330;
+const FIG_Y = 300;
 const YAML_SIZE = 20;
 /** The page's YAML is seventeen lines: set a size smaller and a little higher. */
 const SCHEMA = { y: 306, size: 19 };
@@ -76,9 +76,9 @@ export const BuiltinsScene: React.FC = () => {
     n.word("builtins-each", "customer ninety-nine"),
   ];
   const letAt = n.word("builtins-pair", "unique let the missing ID through");
-  const singleAt = n.word("builtins-pair", "a single null isn't a duplicate");
-  const togetherAt = n.word("builtins-pair", "unique and not null go together");
-  const pkAt = n.word("builtins-pair", "a valid primary key");
+  const singleAt = n.word("builtins-pair", "it skips nulls");
+  const togetherAt = n.word("builtins-key", "unique and not null go together");
+  const pkAt = n.word("builtins-key", "a valid primary key");
   const q4At = n.word("singular", "Question four");
   const q4TextAt = n.word("singular", "Generic versus singular");
   const genericAt = n.word("singular", "Those four are generic");
@@ -111,7 +111,8 @@ export const BuiltinsScene: React.FC = () => {
 
   // ── Four tests, each as the clause it compiles to, beside its one row ──
   const panes: Pane[] = [
-    { name: "unique", test: BUILTINS.unique, lines: linesFrom(BUILTINS.unique.sql, "GROUP BY", "HAVING"), at: compilesAt, litAt: each[0] },
+    // unique from its null filter: dbt's own test skips nulls before it groups.
+    { name: "unique", test: BUILTINS.unique, lines: linesFrom(BUILTINS.unique.sql, "WHERE", "HAVING"), at: compilesAt, litAt: each[0] },
     { name: "not_null", test: BUILTINS.notNull, lines: linesFrom(BUILTINS.notNull.sql, "WHERE"), at: compilesAt + 6, litAt: each[1] },
     { name: "accepted_values", test: BUILTINS.acceptedValues, lines: linesFrom(BUILTINS.acceptedValues.sql, "WHERE"), at: compilesAt + 12, litAt: each[2] },
     { name: "relationships", test: BUILTINS.relationships, lines: linesFrom(BUILTINS.relationships.sql, "LEFT JOIN"), at: compilesAt + 18, litAt: each[3] },
@@ -122,7 +123,9 @@ export const BuiltinsScene: React.FC = () => {
   const resultH = h(34) + h(36);
   const paneTops: number[] = [];
   panes.forEach((p, i) => {
-    paneTops.push(i === 0 ? top : paneTops[i - 1] + Math.max(listH(panes[i - 1].lines.length), resultH) + h(60));
+    // Each result's verdict badge sits above its table, so the result's
+    // room includes clear space for the next pane's badge.
+    paneTops.push(i === 0 ? top : paneTops[i - 1] + Math.max(listH(panes[i - 1].lines.length), resultH + h(24)) + h(60));
   });
   const paneResult = (p: Pane, i: number) =>
     tableGeometry({ x: resultX, top: paneTops[i], cols: p.test.result.cols.map((name) => ({ name })), rows: p.test.result.rows, headH: h(34), rowH: h(36), headSize: 19, bodySize: PANE_SIZE, pad: 12 });
@@ -239,7 +242,16 @@ export const BuiltinsScene: React.FC = () => {
               <ListingTitle x={X0} top={paneTops[i]} at={p.at} out={q3Out}>
                 <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 500, background: lit > 0.01 ? `color-mix(in srgb, ${inkOf.yellow} ${30 * lit}%, transparent)` : undefined, borderRadius: 4, padding: "0 4px", margin: "0 -4px" }}>{p.name}</span>
               </ListingTitle>
-              <Listing lines={p.lines} x={X0} top={paneTops[i]} width={paneW} size={PANE_SIZE} at={p.at} out={q3Out} />
+              <Listing
+                lines={p.lines}
+                x={X0}
+                top={paneTops[i]}
+                width={paneW}
+                size={PANE_SIZE}
+                at={p.at}
+                out={q3Out}
+                marks={i === 0 ? [{ line: "WHERE order_id IS NOT NULL", at: singleAt }] : undefined}
+              />
               <TestResult
                 g={rg}
                 cols={p.test.result.cols.map((name) => ({ name, numeric: name !== "status" }))}
@@ -256,11 +268,11 @@ export const BuiltinsScene: React.FC = () => {
         {/* unique's pane holds only order 3: the null went through. */}
         <Note at={singleAt} x={resultX + paneResult(panes[0], 0).width + 30} y={paneTops[0] + h(10)} out={q3Out}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            Not here: the null row
+            Not here: <SmallMono>unique</SmallMono> skips nulls
           </span>
         </Note>
-        <Bracket x={resultX + 500} top={paneTops[0] - h(46)} bottom={paneTops[1] + resultH} at={togetherAt + 4} out={q3Out}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 600, opacity: ease(frame, pkAt - 2, 10) }}>= a valid primary key</span>
+        <Bracket x={resultX + 515} top={paneTops[0] - h(46)} bottom={paneTops[1] + resultH} at={togetherAt + 4} out={q3Out}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, opacity: ease(frame, pkAt - 2, 10) }}>Both passing: a valid primary key</span>
         </Bracket>
 
         {/* ── The eight rows, one problem for each test ── */}
@@ -336,7 +348,8 @@ export const BuiltinsScene: React.FC = () => {
         {/* ── Which to reach for ── */}
         <TwoColumns top={colsTop} xs={COL_X} heads={[{ head: "Generic", sub: "Reusable rules", at: reuseAt }, { head: "Singular", sub: "Bespoke business checks", at: bespokeAt }]} />
         <Copies x={COL_X[1]} top={colsTop + h(96)} at={copyingAt} names={["fct_orders", "fct_refunds", "fct_invoices"]} />
-        <Flow points={[[COL_X[1] - 24, colsTop + h(114)], [COL_X[0] + 330, colsTop + h(114)]]} at={becomeAt} dur={16} color={INK} />
+        {/* Ends just clear of "Make it generic" (22px, about 165px wide). */}
+        <Flow points={[[COL_X[1] - 24, colsTop + h(114)], [COL_X[0] + 190, colsTop + h(114)]]} at={becomeAt} dur={16} color={INK} />
         <Note at={becomeAt + 8} x={COL_X[0]} y={colsTop + h(96)}>
           <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Make it generic</span>
         </Note>

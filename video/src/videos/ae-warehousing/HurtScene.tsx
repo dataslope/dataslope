@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { kb, mb, SMALL, TABLE } from "./data";
+import { kb, mb, SMALL, TABLE, TARGET_TEXT } from "./data";
 import { Box, COLUMN_TINT, Cog, Drift, OK, OK_INK, SmallMono, X0 } from "./parts";
 
 const GRID_Y = 334;
@@ -32,7 +32,10 @@ const FOOTER = ds("blue", 800);
  * footer, against the same rows as one file; the footers alone, and the
  * files a scan of the year opens, from DuckDB's runs. Then a cluster key no
  * filter names, its cog still turning. Then the rule, with the year as
- * twelve month files of about 780 kB beside the day files.
+ * twelve month files of about 780 kB beside the day files, and the point
+ * that even they are far under the usual target size: a table this small is
+ * best left as one file. The day files are drawn larger than the one file
+ * they equal, so each side carries its total.
  */
 export const HurtScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -56,7 +59,10 @@ export const HurtScene: React.FC = () => {
   const ruleAt = n.word("hurt-rule", "Partition and cluster on the columns filters actually use");
   const grainAt = n.word("hurt-rule", "match the grain to the volume");
   const fewAt = n.word("hurt-rule", "too few to split by day");
-  const end = n.beat("hurt-rule").to;
+  const tinyMonthAt = n.word("hurt-month", "each file is tiny");
+  const sizeAt = n.word("hurt-month", "At this size");
+  const wholeAt = n.word("hurt-month", "don't partition at all");
+  const end = n.beat("hurt-month").to;
 
   const gridY = y(GRID_Y);
   const pitchY = h(PITCH);
@@ -75,7 +81,8 @@ export const HurtScene: React.FC = () => {
       <Sfx name="el-tap" at={clusterAt} level={-33} />
       <Sfx name="el-scratch" at={nothingAt} level={-36} />
       <Sfx name="el-sprinkle" at={grainAt} level={-34} />
-      <Sfx name="el-chime" at={fewAt + 4} level={-33} />
+      <Sfx name="el-tap" at={tinyMonthAt} level={-34} />
+      <Sfx name="el-chime" at={wholeAt + 4} level={-33} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={8} at={qAt - 4} textAt={qTextAt - 2} size={60}>
@@ -97,7 +104,7 @@ export const HurtScene: React.FC = () => {
             return (
               <g key={d} opacity={p}>
                 <rect x={x} y={yy} width={CELL} height={cellH} rx={2} fill={COLUMN_TINT.sale_date} />
-                <rect x={x + CELL - 5} y={yy} width={5} height={cellH} rx={1} fill={FOOTER} opacity={footer} />
+                <rect x={x + CELL - 2} y={yy} width={2} height={cellH} fill={FOOTER} opacity={footer} />
                 {opened > 0 ? <rect x={x - 2} y={yy - 2} width={CELL + 4} height={cellH + 4} rx={3} fill="none" stroke={ACCENT} strokeWidth={1.6} opacity={opened} /> : null}
               </g>
             );
@@ -105,12 +112,16 @@ export const HurtScene: React.FC = () => {
           {/* The same rows, one file. */}
           <g opacity={ease(frame, tinyAt + 4, 12)}>
             <rect x={ONE_X} y={gridY} width={ONE_W} height={oneH} rx={4} fill={COLUMN_TINT.sale_date} />
-            <rect x={ONE_X + ONE_W - 7} y={gridY} width={7} height={oneH} rx={2} fill={FOOTER} opacity={ease(frame, footersAt + 8, 10)} />
+            <rect x={ONE_X + ONE_W - 3} y={gridY} width={3} height={oneH} fill={FOOTER} opacity={ease(frame, footersAt + 8, 10)} />
             <rect x={ONE_X - 3} y={gridY - 3} width={ONE_W + 6} height={oneH + 6} rx={5} fill="none" stroke={OK} strokeWidth={2.2} opacity={ease(frame, opensAt + 26, 10)} />
           </g>
         </svg>
         <div style={{ position: "absolute", left: ONE_X, top: gridY - h(42), ...label(22, INK), whiteSpace: "nowrap", opacity: ease(frame, tinyAt + 4, 12) }}>
           One file
+        </div>
+        {/* The day files' total, so the grid is not read by its area. */}
+        <div style={{ position: "absolute", left: X0, top: gridY + Math.ceil(SMALL.day.files / COLS) * pitchY + h(8), ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, kbAt + 6, 12) }}>
+          <Num>{mb(SMALL.day.bytes)}</Num> in all
         </div>
         <div style={{ position: "absolute", left: ONE_X, top: gridY + oneH + h(10), ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, tinyAt + 10, 12) }}>
           <Num>{mb(SMALL.one.bytes)}</Num>
@@ -146,9 +157,13 @@ export const HurtScene: React.FC = () => {
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>A footer: the file&rsquo;s schema and statistics, read before any data</span>
         </Note>
 
-        {/* ── By month: the grain this volume wants ── */}
+        {/* ── By month: coarser, and still far too small for this volume ── */}
         <div style={{ position: "absolute", left: ONE_X, top: y(MONTH_Y), ...label(22, INK), whiteSpace: "nowrap", opacity: ease(frame, grainAt, 12) }}>
-          By month <span style={{ color: OK_INK, fontWeight: 500 }}>· <Num>{SMALL.month.files}</Num> files of about <Num>{kb(SMALL.month.avg)}</Num></span>
+          By month{" "}
+          <span style={{ color: INK_SOFT, fontWeight: 500 }}>
+            · <Num>{SMALL.month.files}</Num> files of about <Num>{kb(SMALL.month.avg)}</Num>
+          </span>
+          <span style={{ color: ACCENT_INK, fontWeight: 500, opacity: ease(frame, tinyMonthAt, 10) }}>, still far under the usual {TARGET_TEXT}</span>
         </div>
         {Array.from({ length: SMALL.month.files }, (_, m) => {
           const p = ease(frame, grainAt + 4 + m * 1.5, 10);
@@ -170,6 +185,26 @@ export const HurtScene: React.FC = () => {
             />
           );
         })}
+
+        {/* At this size, the answer is not to split at all. */}
+        <div
+          style={{
+            position: "absolute",
+            left: ONE_X + SMALL.month.files * (MONTH_W + MONTH_GAP) + 22,
+            top: monthTop + h(22) - 15,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            ...note(23, INK),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, sizeAt, 12),
+          }}
+        >
+          <Tick at={wholeAt} size={23} color={OK} />
+          <span>
+            At this size, <b style={{ color: OK_INK }}>one file</b>
+          </span>
+        </div>
 
         {/* ── A cluster key nothing filters on ── */}
         <Box x={X0} y={y(KEY_Y)} w={340} h={h(64)} at={clusterAt} title={<>Cluster key: <span style={{ fontFamily: MONO }}>sale_id</span></>} size={22} tone="bad" />

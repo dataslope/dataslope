@@ -80,7 +80,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     42) and lights customer_id as the lookup column.
  *   - "hash" to "hash-pick": the page's two key queries as listings, md5 on
  *     the left, row_number on the right. The md5 of 42 written out under the
- *     left one, with "dev, prod, rebuild" beside it. "hash-size": two bars,
+ *     left one, with "dev, prod, rebuild" beside it; "hash-versions" adds that
+ *     a versioned dimension hashes the ID with valid_from, and a fact still
+ *     finds its version by date (a review's fix, 2026-11-20: "no lookup"
+ *     holds only at one row per customer). "hash-size": two bars,
  *     the primary-key index over 100,000 keys, integer 2.3 MB and md5 7.8 MB.
  *     "hash-trap": the integer keys on Monday (1 Initech, 2 Umbrella, 3 Acme
  *     Corp) and Tuesday (12 Massive Dyn takes 1, Acme becomes 4), order 5002
@@ -97,8 +100,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "role" to "role-view": the page's role-playing listing, its three JOIN
  *     dim_date lines lit in turn, the ERD with three relations from
  *     fact_orders to one dim_date box labelled order, ship, delivery; order
- *     101's row (2024-03-01, 2024-03-03, 2024-03-07). "role-why": "order to
- *     delivery: 6.7 days on average, 9 at most". "role-view": the
+ *     101's row (2024-03-01, 2024-03-03, 2024-03-07). "role-why": one table,
+ *     one calendar for every role (the reason to keep it once; a review's
+ *     fix, 2026-11-20). "role-span": "order to delivery: 6.7 days on
+ *     average, 9 at most", which the roles answer together. "role-view": the
  *     dim_ship_date view listing, its renamed columns in yellow.
  *   - "bridge" to "bridge-touched": the ERD fact_orders, bridge, dim_promotion;
  *     order 201's two bridge rows, 0.6 and 0.4. "bridge-fan": three totals
@@ -114,7 +119,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the 2024-07-04 row of the date dimension, is_holiday in yellow, "366
  *     rows"; dim_date between two fact boxes; the word "conformed" with
  *     "confirmed" struck; two facts each rolled up, then a full outer join;
- *     24 orders into 6 categories; the bank bridge with 0.50, 0.50, 1.00 and
+ *     24 orders into 6 categories, and "r-agg-why", the mart joined back to
+ *     the orders counting each category's total once per order (the page's
+ *     "double-counting when joining at the wrong level"); the bank bridge with 0.50, 0.50, 1.00 and
  *     the balances 2,400.00 (red) and 900.00 plus 500.00 (green); product
  *     with category folded in; two arrows, bottom-up and top-down.
  *   - "next": the star again, customer 42's two rows lit, NextLine.
@@ -241,7 +248,7 @@ export const script: NarrationScript = {
     {
       id: "grain-fix",
       text: "Move it to a fact at order grain, or split it across the lines so the shares add back to five.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.0,
     },
     {
       id: "grain-why",
@@ -293,9 +300,14 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "hash-versions",
+      text: "For a versioned dimension, hash the ID together with the version's start date, and a fact still finds its version by date.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "hash-size",
       text: "Integers are compact: a hundred thousand integer keys built an index under a third the size of the same number of hashes.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.4,
     },
     {
       id: "hash-trap",
@@ -341,9 +353,10 @@ export const script: NarrationScript = {
     },
     {
       id: "ratio-fix",
-      text: "So store the additive parts, gross revenue and cost of goods sold, and divide after summing. A ratio of sums weighs each order by its revenue. A stored percentage has forgotten that weight.",
-      pauseAfter: 0.8,
+      text: "So store the additive parts, gross revenue and cost of goods sold, and divide after summing.",
     },
+    { id: "ratio-weight", text: "A ratio of sums weights each order by its revenue." },
+    { id: "ratio-forgot", text: "A stored percentage has forgotten that weight.", pauseAfter: 0.8 },
 
     // ── 8. Role-playing dimensions ────────────────────────────────────────
     {
@@ -359,7 +372,12 @@ export const script: NarrationScript = {
     },
     {
       id: "role-why",
-      text: "Kept once, it answers what no single role can: order to delivery took six point seven days on average, nine at most.",
+      text: "One table means one calendar: every role reads the same holidays and fiscal periods.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "role-span",
+      text: "Together, the roles answer what no single role can: order to delivery took six point seven days on average, nine at most.",
       pauseAfter: 0.6,
     },
     {
@@ -411,7 +429,7 @@ export const script: NarrationScript = {
     {
       id: "r-periodic",
       text: "Question eleven. When would you choose a periodic snapshot over a transaction fact? When the question is where things stood. Ben made no transaction in February, and his February balance, five hundred dollars, is still a row.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.4,
     },
     {
       id: "r-factless",
@@ -421,7 +439,7 @@ export const script: NarrationScript = {
     {
       id: "r-degen",
       text: "Question thirteen. What is a degenerate dimension? A key with no table behind it, like an order number on the order-line fact. It has nothing to describe, so it stays on the fact, and you still group by it.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.4,
     },
     {
       id: "r-junk",
@@ -431,7 +449,7 @@ export const script: NarrationScript = {
     {
       id: "r-date",
       text: "Question fifteen. What is the purpose of a date dimension, and what columns does it typically include? One row per day, three hundred sixty-six for 2024, with year, quarter, month, week and weekend worked out once. The columns that matter most are the ones no function knows: holidays and the fiscal calendar.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.4,
     },
     {
       id: "r-conformed",
@@ -442,27 +460,32 @@ export const script: NarrationScript = {
       id: "r-confirmed",
       scene: true,
       text: "Question seventeen. What is the difference between a confirmed versus a conformed dimension? It's a vocabulary check: conformed is the term, and confirmed isn't one.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.4,
     },
     {
       id: "r-drill",
       text: "Question eighteen. What does drilling across mean in dimensional modeling? Combining metrics from two facts, like sales and returns. Roll each fact up to the conformed dimension on its own, then full outer join the results on its key. Joined row to row, the facts would multiply.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.4,
     },
     {
       id: "r-agg",
       text: "Question nineteen. What is the difference between a fact's grain and its level of aggregation? The grain is the finest detail a fact stores: one row per order. Aggregation is how far a mart rolls it up, here twenty-four orders into six categories. That mart's own grain is one row per category, and the fact keeps every order.",
-      pauseAfter: 0.8,
+      pauseAfter: 0.6,
+    },
+    {
+      id: "r-agg-why",
+      text: "Join the mart back to the orders, and each category's total is counted once per order.",
+      pauseAfter: 1.4,
     },
     {
       id: "r-bank",
       text: "Question twenty. How would you model a many-to-many relationship between customers and accounts in a bank data warehouse? A bridge between customers and the balance fact, with each owner's share. Unweighted, a joint account counts twice. Weighted, the customers add back to the bank's total.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.6,
     },
     {
       id: "r-3nf",
       text: "Question twenty-one. What is normalization in third normal form, and why does dimensional modeling deliberately avoid it for dimensions? In third normal form, every column depends on the key, the whole key, and nothing but the key, so each fact is stored once. Dimensions break it on purpose, folding category into product, to save joins. The copies stay consistent, because one pipeline writes them.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.4,
     },
     {
       id: "r-kimball",

@@ -17,6 +17,7 @@ import {
   Listing,
   ListingTitle,
   listingWidth,
+  MARK_GREEN,
   MARK_RED,
   money,
   resultGeometry,
@@ -63,10 +64,10 @@ export const MetricScene: React.FC = () => {
   const joinedAt = n.word("metric-why", "The model joined each order to its items");
   const threeAt = n.word("metric-why", "counted three times");
   const unitAt = n.word("metric-unit", "a unit test would have caught it");
-  const mockedAt = n.word("metric-unit", "one mocked order of a hundred dollars");
-  const itemsAt = n.word("metric-unit", "with three items");
-  const outAt = n.word("metric-unit", "comes out at three hundred");
-  const end = n.beat("metric-unit").to;
+  const mockedAt = n.word("metric-unit-run", "one mocked order of a hundred dollars");
+  const itemsAt = n.word("metric-unit-run", "with three items");
+  const outAt = n.word("metric-unit-run", "comes out at three hundred");
+  const end = n.beat("metric-unit-run").to;
 
   const top = y(TOP_Y);
   const low = y(LOW_Y);
@@ -187,7 +188,8 @@ export const MetricScene: React.FC = () => {
           verdictSize={20}
           marks={[
             { row: 0, col: 1, at: againstAt - 6, color: MARK_RED },
-            { row: 0, col: 2, at: againstAt + 2, color: MARK_RED },
+            // Finance's figure is the truth the model is checked against.
+            { row: 0, col: 2, at: againstAt + 2, color: MARK_GREEN },
           ]}
           out={reconOut}
         />

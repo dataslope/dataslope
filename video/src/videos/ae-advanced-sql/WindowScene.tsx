@@ -18,6 +18,7 @@ import {
   geoOf,
   Listing,
   listingHeight,
+  listingLineMid,
   MARK,
   MARK_KEY,
   MARK_OK,
@@ -108,7 +109,6 @@ export const WindowScene: React.FC = () => {
   const shareAt = n.word("mix-run", "North's share");
   const dropAt = n.word("mix-trap", "Drop the outer sum");
   const refusesAt = n.word("mix-trap", "Postgres refuses");
-  const noAmountAt = n.word("mix-trap", "no single amount left");
   const end = n.beat("mix-trap").to;
 
   const out1 = q2At - 4;
@@ -160,6 +160,8 @@ export const WindowScene: React.FC = () => {
   const bareH = listingHeight(B.lines.length, SIZE);
   const notesX = TRAP_X;
   const windowLine = "SUM(SUM(amount)) OVER () AS grand_total";
+  const groupLine = M.lines.findIndex((l) => l.startsWith("GROUP BY region"));
+  const sumsLine = M.lines.findIndex((l) => l.includes(windowLine));
 
   return (
     <AbsoluteFill>
@@ -351,10 +353,12 @@ export const WindowScene: React.FC = () => {
               { row: northRow, col: mc("pct"), at: shareAt + 4, color: MARK },
             ]}
           />
-          <Note at={byRegionAt + 4} x={notesX} y={y(TOP) + h(6)} out={dropAt - 2}>
+          {/* Each step beside the line that does it: the window is written
+              above the GROUP BY it runs after. */}
+          <Note at={byRegionAt + 4} x={notesX} y={listingLineMid(y(TOP), groupLine, MIX_SIZE) - 16} out={dropAt - 2}>
             <span style={{ ...note(24, BLUE_INK), whiteSpace: "nowrap" }}>1. Group: one row per region</span>
           </Note>
-          <Note at={sumsAt + 4} x={notesX} y={y(TOP) + h(52)} out={dropAt - 2}>
+          <Note at={sumsAt + 4} x={notesX} y={listingLineMid(y(TOP), sumsLine, MIX_SIZE) - 16} out={dropAt - 2}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>2. Window: summed over the groups</span>
           </Note>
           <Note at={shareAt + 6} x={mg.right + 30} y={mg.rowTop(northRow) + h(6)} dim={dropAt + 2}>
@@ -368,7 +372,7 @@ export const WindowScene: React.FC = () => {
             <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>Without the outer SUM</span>
           </Note>
           <Listing lines={B.lines} x={TRAP_X} top={y(TOP)} size={SIZE} at={dropAt + 2} marks={[{ line: "OVER () AS grand_total", at: refusesAt, color: MARK_RED }]} />
-          <ErrorBox x={TRAP_X} top={y(TOP) + bareH + h(24)} width={680} at={refusesAt + 4} kind={B.kind} message={B.message} size={20} markAt={noAmountAt + 2} />
+          <ErrorBox x={TRAP_X} top={y(TOP) + bareH + h(24)} width={680} at={refusesAt + 4} kind={B.kind} message={B.message} size={20} />
         </Stage>
       </Drift>
     </AbsoluteFill>

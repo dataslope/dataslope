@@ -48,7 +48,10 @@ const TypeZero: React.FC<{ c: Ctx; at: number }> = ({ c, at }) => {
   const [east, west] = A.versions;
   const bandH = c.h(52);
   const fixedTop = c.y(470);
-  const verTop = c.y(570);
+  // The note on the fixed column sits right under it, so the region's
+  // versions below never read as what it captions (review 2026-11-20).
+  const noteTop = fixedTop + bandH + c.h(18);
+  const verTop = c.y(640);
   const axisTop = verTop + bandH + c.h(12);
   return (
     <>
@@ -74,7 +77,7 @@ const TypeZero: React.FC<{ c: Ctx; at: number }> = ({ c, at }) => {
       <InBadge at={versionsAt + 10} x1={A.x1} top={verTop} h={bandH}>
         Type 2
       </InBadge>
-      <Note at={ignoreAt} x={R_X} y={axisTop + c.h(56)}>
+      <Note at={ignoreAt} x={R_X} y={noteTop}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Later loads: ignored for this column</span>
       </Note>
     </>
@@ -193,13 +196,13 @@ export const RapidScene: React.FC = () => {
   const twoAt = n.word("rapid-in", "Two quick ones");
   const q8At = n.word("r-t0", "Question eight");
   const q9At = n.word("r-mini", "Question nine");
-  const rebuiltAt = n.word("next", "Every table here is rebuilt each day");
+  const bridgeAt = n.word("next", "Every table here is updated each day");
   const snapAt = n.word("next", "the snapshot first");
   const dimsAt = n.word("next", "then the dimensions");
   const factsAt = n.word("next", "then the facts that look them up");
-  const dbtAt = n.word("next", "Running that order is dbt's job");
-  const nextAt = n.word("next", "Next:");
-  const end = rebuiltAt - 4;
+  const dbtAt = n.word("next-dbt", "Running that order is dbt's job");
+  const nextAt = n.word("next-dbt", "Next:");
+  const end = bridgeAt - 4;
 
   const items: RapidItem[] = [
     { n: 8, label: "SCD Type 0", at: q8At, body: <TypeZero c={c} at={q8At} /> },
@@ -226,14 +229,14 @@ export const RapidScene: React.FC = () => {
       ))}
       <Sfx name="el-pop" at={nextAt} level={-31} />
 
-      <Drift from={from} to={n.beat("next").to + 40}>
+      <Drift from={from} to={n.beat("next-dbt").to + 40}>
         <Kicker at={twoAt}>Quick round</Kicker>
         <Headline lead="Two quick ones to finish" at={twoAt + 2} size={64} />
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={twoAt + 6} end={end} />
 
         {/* ── The bridge: the order the tables are built in ── */}
-        <Note at={rebuiltAt} x={R_X} y={y(LIST_TOP - 4)}>
-          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>Rebuilt every day, in order</span>
+        <Note at={bridgeAt} x={R_X} y={y(LIST_TOP - 4)}>
+          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>Updated every day, in order</span>
         </Note>
         {steps.map((s, i) => (
           <Box key={s.text} x={R_X + i * (boxW + gap)} y={boxTop} w={boxW} h={boxH} at={s.at} size={25}>

@@ -59,11 +59,15 @@ const WINDOW_DAYS = Number(SQL.OVERLAP.join("\n").match(/INTERVAL '(\d+) days'/)
 const WINDOW_START = WM_DAY - WINDOW_DAYS;
 /** Every row the overlap's run read (LATE.overlap), by the day it sits at. */
 const READ = LATE.overlapRows.rows.map((r) => ({ id: Number(r[0]), day: dayOf(r[1]) }));
-/** The microbatch figure's lookback: the page gives no count, so the band's
- *  label says how many it draws. */
-const LOOKBACK = 2;
+/** The microbatch figure's lookback: the page gives no count, so it takes the
+ *  overlap's own width, which reaches back to 26's day, and the band's label
+ *  says how many it draws. */
+const LOOKBACK = WINDOW_DAYS;
 /** The latest day any event sits at: the current batch. */
 const LAST_DAY = Math.max(...ARRIVALS.map((a) => a.day));
+/** The latest event the table holds once the overlap has run (27): the
+ *  maximum `{{ this }}` hands the filter in question 3. */
+const LATEST = LATE.arrived.rows.reduce((a, r) => (dayOf(r[1]) > dayOf(a[1]) ? r : a));
 
 /** The model's filter in the three forms the scene walks through: the page's
  *  strict `>`, `>=`, and `>=` reaching back over the window, its interval on a
@@ -144,6 +148,7 @@ export const FilterScene: React.FC = () => {
   const slipsAt = n.word("filter-width", "an event later than the window");
 
   const seqAt = n.word("filter-seq", "a change sequence");
+  const growsAt = n.word("filter-seq", "only ever grows");
   const behindAt = n.word("filter-seq", "nothing can land behind the watermark");
 
   const microAt = n.word("filter-micro", "the microbatch strategy");
@@ -158,6 +163,7 @@ export const FilterScene: React.FC = () => {
   const thisTextAt = n.word("this", "What is the");
   const tableAt = n.word("this", "the model's own table");
   const maxAt = n.word("this", "takes its maximum from");
+  const refAt = n.word("this-ref", "It isn't a ref");
   const firstAt = n.word("this-first", "On the very first run");
   const notYetAt = n.word("this-first", "doesn't exist yet");
   const falseAt = n.word("this-first", "returns false");
@@ -218,6 +224,8 @@ export const FilterScene: React.FC = () => {
       [gteAt, BEFORE(WM_DAY)],
       // The overlap: the watermark is the window's far end.
       [overlapAt, AFTER(WM_DAY)],
+      // Question 3, while it is hidden: the table's maximum now, 27's day.
+      [thisAt - 20, AFTER(dayOf(LATEST[1]))],
     ];
     let x = steps[0][1];
     for (let i = 1; i < steps.length; i++) x = x + (steps[i][1] - x) * ease(frame, steps[i][0], 18);
@@ -236,7 +244,7 @@ export const FilterScene: React.FC = () => {
   // Microbatch: a batch per day, and the last few re-processed.
   const dividersP = ease(frame, batchAt, 16) * (1 - ease(frame, reset, 12));
   const lookbackP = ease(frame, lookbackAt, 12) * (1 - ease(frame, reset, 12));
-  const wmText = frame < afterAt + 26 ? date(FILTER.watermarkBefore) : date(FILTER.watermarkAfter);
+  const wmText = frame < afterAt + 26 ? date(FILTER.watermarkBefore) : frame < thisAt - 20 ? date(FILTER.watermarkAfter) : date(LATEST[1]);
 
   // `{{ this }}` in the model, and the arrow to the table it names.
   const thisLine = MODEL.findIndex((l) => l.includes("{{ this }}"));
@@ -248,11 +256,13 @@ export const FilterScene: React.FC = () => {
 
   // The compiled SQL: the filter's line changes in place, and the overlap
   // opens a line under it. ORDER BY, which only sorts the page's output, is
-  // left out: this is the statement the model runs.
+  // left out: this is the statement the model runs. Its select list is the
+  // model's own (`SELECT *` compiles to itself; raw_events has exactly the
+  // page's two columns, so the rows are the ones the page's block returns).
   // Both go back to the page's strict form for question 3, which asks about
   // the page's model.
   const compiled = [
-    WATERMARK_SQL[0],
+    MODEL.find((l) => l.startsWith("SELECT")) ?? WATERMARK_SQL[0],
     WATERMARK_SQL[1],
     { text: WATERMARK_SQL[2], swaps: [{ at: gteAt, text: SQL.AT_LEAST[2] }, { at: thisAt, text: WATERMARK_SQL[2] }] },
     { text: SQL.OVERLAP[3], growAt: overlapAt + 2, closeAt: thisAt },
@@ -323,13 +333,19 @@ export const FilterScene: React.FC = () => {
           marks={[
             { line: "{% if is_incremental() %}", at: guardAt, out: pageAt },
             { line: "WHERE event_at >", text: ">=", at: gteAt + 8, out: overlapAt },
-            { line: "INTERVAL", text: MODEL_INTERVAL.trim(), at: overlapAt + 14, out: microAt },
+            { line: "INTERVAL", text: MODEL_INTERVAL.trim(), at: overlapAt + 14, out: wideAt },
             { line: "{% endif %}", at: guardAt + 4, out: pageAt },
             { line: "WHERE event_at >", at: newerAt, out: pageAt },
             { line: "WHERE event_at >", text: "{{ this }}", at: tableAt, out: firstAt },
             { line: "WHERE event_at >", text: "MAX(event_at)", at: maxAt, out: firstAt },
           ]}
           dims={[
+            // Microbatch writes the filter itself: the hand-written one set
+            // aside while it is described.
+            { line: "{% if is_incremental() %}", at: handsAt, out: thisAt },
+            { line: "WHERE event_at >", at: handsAt + 2, out: thisAt },
+            { line: "INTERVAL", at: handsAt + 4, out: thisAt },
+            { line: "{% endif %}", at: handsAt + 6, out: thisAt },
             { line: "{% if is_incremental() %}", at: skippedAt },
             { line: "WHERE event_at >", at: skippedAt + 3 },
             { line: "{% endif %}", at: skippedAt + 6 },
@@ -349,7 +365,13 @@ export const FilterScene: React.FC = () => {
             { line: "WHERE event_at >", text: "(SELECT MAX(event_at) FROM fct_events)", at: loadedAt, out: newerAt },
             { line: "WHERE event_at >", text: ">", at: strictAt, out: gteAt - 2 },
             { line: "WHERE event_at >", text: ">=", at: gteAt + 8, out: overlapAt },
-            { line: "INTERVAL", text: "- INTERVAL '3 days'", at: overlapAt + 14, out: microAt },
+            { line: "INTERVAL", text: "- INTERVAL '3 days'", at: overlapAt + 14, out: wideAt },
+          ]}
+          dims={[
+            { line: "WHERE event_at", at: handsAt + 2, out: thisAt },
+            { line: "INTERVAL", at: handsAt + 4, out: thisAt },
+            // The first run: no table, so no filter.
+            { line: "WHERE event_at", at: skippedAt + 3 },
           ]}
         />
         <Note at={newerAt} x={SQL_X} y={y(LANES_C.src)}>
@@ -360,6 +382,9 @@ export const FilterScene: React.FC = () => {
         <Note at={ownAt} x={SQL_X} y={y(LANES_C.own)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
             <SmallMono color={INK}>{"{{ this }}"}</SmallMono> is <SmallMono color={INK}>fct_events</SmallMono>
+            <span style={{ opacity: ease(frame, refAt, 10) }}>
+              , not <SmallMono color={INK}>ref(&apos;fct_events&apos;)</SmallMono>: a model can&apos;t depend on itself
+            </span>
           </span>
         </Note>
         {/* The first run: the check is false. */}
@@ -606,6 +631,7 @@ export const FilterScene: React.FC = () => {
         <Note at={seqAt} x={X0} y={VERDICT2} out={setAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Or: <Mark at={seqAt + 6}>a change sequence that only grows</Mark>
+            <span style={{ opacity: ease(frame, growsAt, 10) }}>, stamped on arrival</span>
             <span style={{ color: INK_SOFT, opacity: ease(frame, behindAt, 10) }}>, so nothing lands behind the watermark</span>
           </span>
         </Note>

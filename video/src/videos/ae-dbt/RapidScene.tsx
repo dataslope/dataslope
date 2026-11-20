@@ -94,7 +94,6 @@ const Macros: React.FC<{ c: Ctx }> = ({ c }) => {
   const onceAt = c.w("r-macros", "Written once");
   const handAt = c.w("r-macros", "Typed by hand over a plain hundred");
   const intAt = c.w("r-macros", "Postgres divides integers");
-  const nineteenAt = c.w("r-macros", "becomes nineteen dollars");
   const lines = LISTING.macro;
   const top = c.y(LIST_TOP) + c.h(56);
   const resY = top + listingHeight(lines.length, SIZE) + c.h(36);
@@ -134,12 +133,15 @@ const Macros: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={handAt} x={COL2} y={resY + c.h(40)} size={22} color={INK_SOFT}>
         <Code>{byHand}</Code>, by hand
       </Line>
-      <Line at={nineteenAt} x={COL2} y={resY + c.h(78)} size={36} weight={600} color={ACCENT_INK}>
-        <Mark at={nineteenAt + 6} color={MARK_RED}>
+      {/* The result arrives as the division is named, so its label never
+          stands beside an empty slot, and it holds through "nineteen
+          dollars" and the pause after. */}
+      <Line at={intAt + 4} x={COL2} y={resY + c.h(78)} size={36} weight={600} color={ACCENT_INK}>
+        <Mark at={intAt + 10} color={MARK_RED}>
           <Num>{MACRO.integer}</Num>
         </Mark>
       </Line>
-      <Line at={intAt} x={COL2 + 100} y={resY + c.h(90)} color={ACCENT_INK}>
+      <Line at={intAt + 10} x={COL2 + 100} y={resY + c.h(90)} color={ACCENT_INK}>
         Integer division
       </Line>
     </>
@@ -281,7 +283,6 @@ const Docs: React.FC<{ c: Ctx }> = ({ c }) => {
   const blocksAt = c.w("r-docs", "markdown doc blocks");
   const serveAt = c.w("r-docs", "dbt docs serve opens it");
   const graphAt = c.w("r-docs", "an interactive graph");
-  const sameAt = c.w("r-docs", "the same ref and source calls");
   const frame = useCurrentFrame();
   const cmds = ["dbt docs generate", "dbt docs serve"];
   const top = c.y(LIST_TOP) + c.h(56);
@@ -293,7 +294,9 @@ const Docs: React.FC<{ c: Ctx }> = ({ c }) => {
   const nodes: GNode[] = ids.map((id, i) => ({ id, slot: lay[id], at: graphAt + i * 2, size: 20, h: 44 }));
   const edges: GEdge[] = GRAPH.edges
     .filter(([a, b]) => (ids as readonly string[]).includes(a) && (ids as readonly string[]).includes(b))
-    .map(([a, b], i) => ({ from: a, to: b, at: sameAt + i * 3, ...SLICE_EDGE[edgeKey(a, b)] }));
+    // Whole by "the same ref and source calls", so it is up for about 3.5 s
+    // before Question 17 rather than 1.5.
+    .map(([a, b], i) => ({ from: a, to: b, at: graphAt + 8 + i * 4, ...SLICE_EDGE[edgeKey(a, b)] }));
   return (
     <>
       <Fact at={genAt} c={c}>
@@ -503,7 +506,7 @@ const V2: React.FC<{ c: Ctx }> = ({ c }) => {
         The engine, rewritten in {DBT_V2.language}
       </Fact>
       <Line at={gaAt} x={R_X} y={top + c.h(42)} color={INK_SOFT}>
-        Generally available since {DBT_V2.generallyAvailable}
+        The <span style={{ color: INK, fontWeight: 600 }}>{DBT_V2.engineName}</span> engine, generally available since {DBT_V2.generallyAvailable}
       </Line>
       <Line at={distAt} x={R_X} y={top + c.h(92)} size={24}>
         <Code>dbt</Code>
@@ -543,7 +546,7 @@ const V2: React.FC<{ c: Ctx }> = ({ c }) => {
 };
 
 /**
- * The quick round: nine questions down the left, each row the question as it
+ * The quick round: ten questions down the left, each row the question as it
  * is read; each answer's key fact on the right while it is current, with its
  * evidence under it (the page's listings, the macro's two results from
  * Postgres, the exposure lit back along its edges). Then the bridge into

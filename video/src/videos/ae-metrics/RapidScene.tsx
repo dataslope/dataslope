@@ -35,16 +35,23 @@ const Line: React.FC<{ at: number; x?: number; top: number; size?: number; color
 
 // ── 9. A single source of truth ─────────────────────────────────────────────
 
-const Truth: React.FC<{ c: Ctx; unifyAt: number }> = ({ c, unifyAt }) => {
+const Truth: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
-  const unify = ease(frame, unifyAt, 14);
   const withoutAt = c.w("r-truth", "Without one");
   const reimplAt = c.w("r-truth", "re-implements revenue slightly differently");
   const oneAt = c.w("r-truth", "One definition means");
   const placeAt = c.w("r-truth", "one place to change it");
   const sameAt = c.w("r-truth", "the same answer everywhere");
   const versionedAt = c.w("r-truth", "versioned code instead of tribal knowledge");
+  // On "the same answer everywhere" the three copies give way to one: the
+  // old line fades out before the new one fades in, so they never overprint.
+  const unifyAt = sameAt;
+  const off = ease(frame, unifyAt, 8);
+  const on = ease(frame, unifyAt + 6, 10);
   const top = c.y(BODY_Y);
+  // Three readings of revenue, none of them marked right: the trap is that
+  // there are three, not which one is correct (Part 9's governed metric is
+  // net revenue, so no reading here is crowned).
   const tools = [
     { name: "Dashboard", sql: "SUM(amount)" },
     { name: "Notebook", sql: "SUM(amount - tax)" },
@@ -65,16 +72,15 @@ const Truth: React.FC<{ c: Ctx; unifyAt: number }> = ({ c, unifyAt }) => {
           at={reimplAt + i * 5}
           title={t.name}
           sub={
-            <span style={{ position: "relative", display: "inline-block", fontFamily: MONO, fontSize: 19 }}>
-              <span style={{ color: i ? ACCENT_INK : INK, opacity: 1 - unify }}>{t.sql}</span>
-              {/* Once said, the one definition replaces all three. */}
-              <span style={{ position: "absolute", left: 0, right: 0, top: 0, textAlign: "center", color: OK_INK, opacity: unify }}>{tools[0].sql}</span>
+            <span style={{ display: "inline-grid", justifyItems: "center", alignItems: "center" }}>
+              <span style={{ gridArea: "1 / 1", fontFamily: MONO, fontSize: 19, color: INK, opacity: 1 - off, whiteSpace: "nowrap" }}>{t.sql}</span>
+              <span style={{ gridArea: "1 / 1", fontSize: 21, fontWeight: 500, color: OK_INK, opacity: on, whiteSpace: "nowrap" }}>the layer&rsquo;s revenue</span>
             </span>
           }
           size={22}
           tone="plain"
           toneTo="ok"
-          toneAt={unifyAt + 4}
+          toneAt={unifyAt + 6}
         />
       ))}
       <Line at={oneAt} top={top + c.h(186)} color={OK_INK} bold>
@@ -316,7 +322,7 @@ const MeasureMetric: React.FC<{ c: Ctx }> = ({ c }) => {
       <Ink at={sumAt} dur={12} style={{ left: R_X, top: top + c.h(100) }}>
         <span style={{ fontFamily: MONO, fontSize: 26, color: BLUE_INK, fontWeight: 500 }}>SUM(amount)</span>
       </Ink>
-      <ColumnRule x={col2 - 40} top={top + 4} height={c.h(150)} at={metricAt} />
+      <ColumnRule x={col2 - 40} top={top + 4} height={c.h(200)} at={metricAt} />
       <Line at={metricAt} x={col2} top={top} size={28} bold>
         Metric
       </Line>
@@ -329,6 +335,12 @@ const MeasureMetric: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={completedAt} x={col2} top={top + c.h(130)} size={26} bold>
         completed revenue
       </Line>
+      {/* What it is built from: the measure on the left, plus a filter. */}
+      <Ink at={completedAt + 4} dur={12} style={{ left: col2, top: top + c.h(176) }}>
+        <span style={{ fontFamily: MONO, fontSize: 21, color: INK_SOFT, fontWeight: 500, whiteSpace: "nowrap" }}>
+          <span style={{ color: BLUE_INK }}>SUM(amount)</span> where status = &apos;completed&apos;
+        </span>
+      </Ink>
     </>
   );
 };
@@ -355,7 +367,7 @@ const Contains: React.FC<{ c: Ctx }> = ({ c }) => {
           </div>
         </Ink>
       ))}
-      <Line at={ratioAt} top={top + 5 * c.h(46) + c.h(24)} color={BLUE_INK}>
+      <Line at={ratioAt} top={top + 5 * c.h(46) + c.h(24)}>
         A ratio adds a numerator and a denominator
       </Line>
     </>
@@ -365,6 +377,7 @@ const Contains: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 15. Additive, semi-additive, non-additive ───────────────────────────────
 
 const Additive: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
   const revenueAt = c.w("r-additive", "Revenue sums across everything");
   const balanceAt = c.w("r-additive", "An account balance sums across accounts");
   const monthsAt = c.w("r-additive", "but not across months");
@@ -394,8 +407,14 @@ const Additive: React.FC<{ c: Ctx }> = ({ c }) => {
             <div style={noteLine(24, INK)}>{r.name}</div>
             <div style={{ ...noteLine(21, INK_SOFT), marginTop: 6 }}>{r.kind}</div>
           </Ink>
-          <div style={{ position: "absolute", left: colA + 40, top: rowTop(i) + 4 }}>{r.a ? <Tick at={r.at + 4} size={28} /> : <Cross at={r.at + 4} size={26} />}</div>
-          <div style={{ position: "absolute", left: colB + 50, top: rowTop(i) + 4 }}>{r.b ? <Tick at={r.bAt + 4} size={28} /> : <Cross at={r.bAt + 4} size={26} />}</div>
+          {/* Each mark is hidden until its cue: a zero-length stroke with a
+              round cap still paints a dot. */}
+          <div style={{ position: "absolute", left: colA + 40, top: rowTop(i) + 4, opacity: ease(frame, r.at + 4, 3) }}>
+            {r.a ? <Tick at={r.at + 4} size={28} /> : <Cross at={r.at + 4} size={26} />}
+          </div>
+          <div style={{ position: "absolute", left: colB + 50, top: rowTop(i) + 4, opacity: ease(frame, r.bAt + 4, 3) }}>
+            {r.b ? <Tick at={r.bAt + 4} size={28} /> : <Cross at={r.bAt + 4} size={26} />}
+          </div>
           {r.note ? (
             <Line at={r.noteAt} x={colB + 104} top={rowTop(i) + 2} size={21} color={INK_SOFT}>
               {r.note}
@@ -543,7 +562,7 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
 };
 
 /**
- * The quick round: ten questions down the left, each read as "Question n."
+ * The quick round: eleven questions down the left, each read as "Question n."
  * and its question, each answer's key fact on the right while it is read;
  * then the bridge into Part 9, the pelican back on the page.
  */
@@ -562,7 +581,7 @@ export const RapidScene: React.FC = () => {
   const nextAt = n.word("next", "Next:");
 
   const items: RapidItem[] = [
-    { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "Why does a single source of truth"), body: <Truth c={c} unifyAt={n.beat("r-truth").to} /> },
+    { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "Why does a single source of truth"), body: <Truth c={c} /> },
     { n: 10, label: "Metric drift, and preventing it", at: n.word("r-drift", "What is metric drift"), body: <Drifting c={c} /> },
     { n: 11, label: "The dbt Semantic Layer, MetricFlow", at: n.word("r-metricflow", "What is the dbt Semantic Layer"), body: <MetricFlow c={c} askedAt={n.word("r-metricflow", "or MetricFlow")} /> },
     { n: 12, label: "LookML and Looker", at: n.word("r-lookml", "What is LookML"), body: <LookMl c={c} /> },

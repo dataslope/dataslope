@@ -88,6 +88,8 @@ export const BuildScene: React.FC = () => {
     { at: reset, tone: "plain" },
     { at: withAt + 4 + wave(m) * 6, tone: "data" },
     ...(m === "fct_orders" ? [{ at: fedAt + 4, tone: "bad" as const }] : []),
+    // Its test fails: the broken model in red, as in the build panel beside it.
+    ...(m === "stg_orders" ? [{ at: failsAt + 2, tone: "bad" as const }] : []),
   ];
   const buildStep = (k: number) => eachAt + 2 + k * 14;
   const failStep = (k: number) => buildTestsAt + k * 12;

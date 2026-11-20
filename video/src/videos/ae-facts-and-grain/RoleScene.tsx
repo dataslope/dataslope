@@ -36,10 +36,10 @@ const ROLES = [
  * keys, and one dim_date box takes three relations, labelled order, ship and
  * delivery. The page's query joins dim_date three times under three aliases,
  * each JOIN lit as its role is named, and order 101 comes back placed on
- * March 1, shipped on the 3rd, delivered on the 7th. Kept as one table, it
- * answers what no single role can (order to delivery, 6.7 days on average,
- * 9 at most), and each role gets a view of its own for BI tools, its
- * columns renamed for it.
+ * March 1, shipped on the 3rd, delivered on the 7th. One table is one
+ * calendar, the same for every role; together the roles answer what no
+ * single one can (order to delivery, 6.7 days on average, 9 at most); and
+ * each role gets a view of its own for BI tools, its columns renamed for it.
  */
 export const RoleScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -57,10 +57,12 @@ export const RoleScene: React.FC = () => {
   const aliasAt = n.word("role-join", "under three aliases");
   const placedAt = n.word("role-join", "Order one oh one was placed");
   const dayAt = [n.word("role-join", "on March first"), n.word("role-join", "shipped on the third"), n.word("role-join", "delivered on the seventh")];
-  const keptAt = n.word("role-why", "Kept once");
-  const noSingleAt = n.word("role-why", "what no single role can");
-  const tookAt = n.word("role-why", "order to delivery took");
-  const mostAt = n.word("role-why", "nine at most");
+  const calendarAt = n.word("role-why", "One table means one calendar");
+  const everyRoleAt = n.word("role-why", "every role reads the same holidays");
+  const togetherAt = n.word("role-span", "Together, the roles answer");
+  const noSingleAt = n.word("role-span", "what no single role can");
+  const tookAt = n.word("role-span", "order to delivery took");
+  const mostAt = n.word("role-span", "nine at most");
   const viewAt = n.word("role-view", "give each role its own view");
   const namedAt = n.word("role-view", "with columns named for it");
   const shipDateAt = n.word("role-view", "like ship date");
@@ -107,6 +109,7 @@ export const RoleScene: React.FC = () => {
       {dayAt.map((t, i) => (
         <Sfx key={`d${i}`} name="el-tap" at={t} level={-31} />
       ))}
+      <Sfx name="el-tap" at={calendarAt + 2} level={-31} />
       <Sfx name="el-pop" at={tookAt + 4} level={-30} />
       <Sfx name="el-whoosh" at={viewAt} level={-35} />
       <Sfx name="el-chime" at={wrongAt + 4} level={-35} />
@@ -134,6 +137,12 @@ export const RoleScene: React.FC = () => {
         ))}
         <Note at={rolesAt} x={date.left} y={date.bottom + h(22)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>One physical table, three roles</span>
+        </Note>
+        {/* Why one table: one calendar, the same for every role. */}
+        <Note at={calendarAt} x={date.left} y={date.bottom + h(58)}>
+          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            One calendar<span style={{ opacity: ease(frame, everyRoleAt, 10) }}> for every role</span>
+          </span>
         </Note>
         <Note at={threeAt} x={fact.left} y={fact.top - h(44)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Three date keys on each order</span>
@@ -165,7 +174,7 @@ export const RoleScene: React.FC = () => {
           marks={dayAt.map((at, i) => ({ row: 0, col: i + 1, at: at + 2, color: MARK }))}
         />
 
-        {/* Kept once: a question across roles. */}
+        {/* Together: a question across roles. */}
         <Verdict
           at={tookAt}
           x={X0}
@@ -176,9 +185,9 @@ export const RoleScene: React.FC = () => {
           size={26}
         />
         <Verdict at={mostAt} x={X0} y={rg.rowTop(1) + h(112)} label="At most" value={`${most} days`} size={26} />
-        <Note at={keptAt} x={X0} y={rg.rowTop(1) + h(16)} out={tookAt - 2}>
+        <Note at={togetherAt} x={X0} y={rg.rowTop(1) + h(16)} out={tookAt - 2}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            Kept once, it answers <span style={{ color: OK_INK, opacity: ease(frame, noSingleAt, 10) }}>across roles</span>
+            Together, they answer <span style={{ color: OK_INK, opacity: ease(frame, noSingleAt, 10) }}>across roles</span>
           </span>
         </Note>
 

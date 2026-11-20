@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, OutlineBadge } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
@@ -124,9 +124,9 @@ export const WhatScene: React.FC = () => {
         <Note at={elAt + 4} x={X0} y={bracketY + h(24)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Extract and load tools</span>
         </Note>
-        <Bracket x0={X0 + 2 * LETTER_W} x1={X0 + 2 * LETTER_W + 150} y={bracketY} at={moveAt + 4} color={BLUE_INK} />
+        <Bracket x0={X0 + 2 * LETTER_W} x1={X0 + 2 * LETTER_W + 150} y={bracketY} at={moveAt + 4} color={INK} />
         <Note at={moveAt + 8} x={X0 + 2 * LETTER_W} y={bracketY + h(24)}>
-          <span style={{ ...note(22, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>dbt</span>
+          <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>dbt</span>
         </Note>
 
         {/* A model is a SELECT. */}

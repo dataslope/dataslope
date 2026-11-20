@@ -101,11 +101,11 @@ const Zero: React.FC<{ c: Ctx }> = ({ c }) => {
         cols={colsOf(Z, { avg_order_value: { ink: BLUE_INK } })}
         at={wrapAt + 4}
         rows={rowsAt(Z.rows, wrapAt + 8)}
-        swaps={[{ row: empty, col: av, at: coalesceAt + 6, value: coalesced, color: INK }]}
         marks={[
           { row: empty, col: Z.cols.indexOf("order_count"), at: zeroAt + 2 },
-          { row: empty, col: av, at: nullAt + 4, out: coalesceAt + 2 },
-          { row: empty, col: av, at: coalesceAt + 8, color: MARK_GREEN },
+          // The listing's own result keeps its null; the COALESCE note below
+          // offers the zero as an option, not as the better answer.
+          { row: empty, col: av, at: nullAt + 4 },
         ]}
       />
       <Note at={stopAt - 4} x={errX} y={g.top + c.h(24)}>
@@ -116,7 +116,7 @@ const Zero: React.FC<{ c: Ctx }> = ({ c }) => {
       <ErrorBox x={errX} top={g.top + c.h(64)} width={400} at={stopAt} kind={RAPID.zeroBare.kind} message={RAPID.zeroBare.message} size={20} />
       <Note at={coalesceAt + 8} x={R_X} y={g.rowTop(Z.rows.length) + c.h(20)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          <QMono>COALESCE(…, 0)</QMono> turns the null into zero
+          <QMono>COALESCE(…, 0)</QMono> turns the null into {coalesced}
         </span>
       </Note>
     </>
@@ -181,6 +181,7 @@ const Rank: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 15. Top N per group ─────────────────────────────────────────────────────
 
 const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
   const rankInAt = c.w("r-topn", "Rank inside each group");
   const subAt = c.w("r-topn", "in a subquery");
   const keepAt = c.w("r-topn", "keep N or fewer");
@@ -190,9 +191,14 @@ const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
   const fiveAt = c.w("r-topn", "five rows instead of four");
   const RN = RAPID.topRowNumber;
   const RK = RAPID.topRank;
-  const filter = RN.lines.filter((l) => l.includes("WHERE rn <= 2"));
+  // The ranking inside each group, then the filter outside it: an excerpt of
+  // the statement that ran, the window's two lines brought to the margin.
+  const win = RN.lines.findIndex((l) => l.includes("OVER (PARTITION BY category"));
+  if (win < 0 || !RN.lines[win + 1]?.includes("ORDER BY revenue DESC")) throw new Error("the top-N listing's window has moved");
+  const indent = RN.lines[win].length - RN.lines[win].trimStart().length;
+  const shown = [RN.lines[win].slice(indent), RN.lines[win + 1].slice(indent), ...RN.lines.filter((l) => l.includes("WHERE rn <= 2"))];
   const top = body(c);
-  const tTop = top + listingHeight(1, SIZE) + c.h(70);
+  const tTop = top + listingHeight(shown.length, SIZE) + c.h(66);
   const rg = geo(c, RN, R_X, tTop);
   const kg = geo(c, RK, rg.right + 90, tTop);
   const prod = RK.cols.indexOf("product");
@@ -207,12 +213,13 @@ const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
         Rank inside each group, then keep <QMono>rn &lt;= N</QMono>
       </Fact>
       <Listing
-        lines={filter}
+        lines={shown}
         x={R_X}
         top={top}
         size={SIZE}
         at={rankInAt}
         marks={[
+          { line: "OVER (PARTITION BY category", text: "PARTITION BY category", at: rankInAt + 8, out: subAt },
           { line: "rn <= 2", text: "ranked", at: subAt + 2, out: keepAt },
           { line: "rn <= 2", text: "WHERE rn <= 2", at: keepAt },
         ]}
@@ -236,6 +243,7 @@ const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={pairAt - 4} x={kg.x} y={tTop - c.h(40)}>
         <span style={{ ...label(21, INK), whiteSpace: "nowrap", ...TABULAR }}>
           <QMono>RANK</QMono>: {RK.rows.length} rows
+          <span style={{ opacity: ease(frame, fiveAt + 4, 10) }}>, the tie kept</span>
         </span>
       </Note>
       <DataTable
@@ -248,9 +256,6 @@ const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
           { row: extra, at: pairAt + 10, color: MARK },
         ]}
       />
-      <Note at={fiveAt + 4} x={kg.right + 30} y={kg.rowTop(extra) + c.h(2)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>The tie, kept</span>
-      </Note>
     </>
   );
 };
@@ -308,9 +313,10 @@ const Recursive: React.FC<{ c: Ctx }> = ({ c }) => {
   const anchorAt = c.w("r-recursive", "An anchor query seeds it");
   const passAt = c.w("r-recursive", "a recursive one adds rows");
   const noneAt = c.w("r-recursive", "until a pass adds none");
-  const fiveAt = c.w("r-recursive", "Here it counts to five");
-  const orgAt = c.w("r-recursive", "on an org chart");
-  const levelsAt = c.w("r-recursive", "down five levels");
+  const fiveAt = c.w("r-depth", "Here it counts to five");
+  const depthAt = c.w("r-depth", "the depth isn't known in advance");
+  const orgAt = c.w("r-depth", "on an org chart");
+  const levelsAt = c.w("r-depth", "down five levels");
   const R = RAPID.recursive;
   const top = body(c);
   const lw = listingWidth(R.lines, SIZE);
@@ -352,10 +358,13 @@ const Recursive: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <DataTable g={ng} cols={colsOf(R)} at={fiveAt - 4} rows={rowsAt(R.rows, fiveAt, 3)} />
       <DataTable g={lg} cols={colsOf(L, { people: { ink: BLUE_INK } })} at={orgAt} rows={rowsAt(L.rows, orgAt + 4, 3)} />
-      <Note at={levelsAt - 2} x={lg.right + 30} y={rTop + c.h(4)}>
+      <Note at={depthAt} x={lg.right + 30} y={rTop + c.h(4)}>
+        <span style={{ ...note(23, OK_INK), whiteSpace: "nowrap" }}>When the depth isn&rsquo;t known in advance</span>
+      </Note>
+      <Note at={levelsAt - 2} x={lg.right + 30} y={rTop + c.h(44)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>Org chart: {people} people,</span>
       </Note>
-      <Note at={levelsAt + 4} x={lg.right + 30} y={rTop + c.h(44)}>
+      <Note at={levelsAt + 4} x={lg.right + 30} y={rTop + c.h(84)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>{L.rows.length} levels down</span>
       </Note>
     </>
@@ -482,10 +491,10 @@ export const RapidScene: React.FC = () => {
   const from = n.beat("rapid-in").from;
   const sevenAt = n.word("rapid-in", "Seven quick ones");
   const finishAt = n.word("rapid-in", "to finish");
-  const dozenAt = n.word("next", "a few dozen rows each");
+  const dozenAt = n.word("small", "a few dozen rows at most");
   const paysAt = n.word("next", "someone pays for the scan");
   const nextAt = n.word("next", "Next:");
-  const end = n.beat("next").from;
+  const end = n.beat("small").from;
 
   const items: RapidItem[] = [
     { n: 13, label: "Avoiding divide-by-zero", beat: "r-zero", body: <Zero c={c} /> },
@@ -536,7 +545,7 @@ export const RapidScene: React.FC = () => {
         </Fade>
 
         <Note at={dozenAt} x={X0} y={listBottom + h(40)}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>These tables: a few dozen rows each</span>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>These tables: a few dozen rows at most</span>
         </Note>
         <Note at={paysAt} x={X0} y={listBottom + h(76)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>A warehouse scans real ones, and bills it</span>

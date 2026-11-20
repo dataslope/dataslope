@@ -95,6 +95,9 @@ export const EVAL = {
       sameResult: c.sameResult,
     }),
   ),
+  /** A (the reference) and C (completed only) again, on the same orders with
+   *  the test account's deleted: both 440.00, so C would pass there. */
+  withoutTest: results.eval.withoutTest,
 } as const;
 
 // ── 5. The model an assistant wrote, and the reviewed one ───────────────────

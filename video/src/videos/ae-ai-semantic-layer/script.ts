@@ -98,12 +98,17 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "completed, refunded and cancelled". "ready-access": a lineage, the
  *     assistant's role granted SELECT on the mart alone, its arrow to an
  *     intermediate model stopped by the grant; then staging and
- *     intermediate "private" with the padlock spot
- *     (ae-ai-semantic-layer-padlock), "access: public" highlighted in the
- *     YAML, as the secondary point (it restricts ref(), not queries).
+ *     intermediate "private", "access: public" highlighted in the YAML, as
+ *     the secondary point (it restricts ref(), not queries: a note under
+ *     the private models says so). The padlock spot
+ *     (ae-ai-semantic-layer-padlock) belongs to the grant, beside the
+ *     assistant and the stopped arrow (review 2026-11-20: under a private
+ *     model it read as "private locks the assistant out").
  *     "ready-rest": "Semantic layer: every disputed number" and the
  *     hourglass spot (ae-ai-semantic-layer-hourglass) with "as of" and
- *     "refuse stale data". "ready-input": back on the YAML, "and test
+ *     "refuse stale data". "ready-caution" and "ready-input" (one beat
+ *     until the review: the second sentence was re-voiced, the first is cut
+ *     from the take): back on the YAML, "and test
  *     accounts" struck through on "Drop the words and test accounts" (here the
  *     strike is the edit being made, not a verdict on the words), and under
  *     it 440.00 turns into 1190.00 in red (READY.asWritten,
@@ -122,6 +127,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     as each is said (results.json): B's "Same text" cell a red cross (a
  *     right answer failed) and C's "Runs" a red tick (a wrong one passed);
  *     then the "Same result" column lit green, headed "Execution accuracy".
+ *     "eval-luck" (added in the review): under C, its result on the same
+ *     orders without the test account's, the same as A's, "a match by
+ *     luck", and "Test on data where the readings differ".
  *     "eval-decline": three more rows in the golden set, expected answer
  *     "Decline" (an unmodeled metric, data the user may not see, nonsense),
  *     and "refusal rate" beside them. "eval-slice": "By difficulty × domain"
@@ -137,7 +145,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (the hard-coded name underlined red, `{{ source('shop', 'orders') }}`
  *     written beside it in green), "review-incr" (the filter line, then the
  *     fixed one, `- interval '3 days'`, and `unique_key='order_id'` added to
- *     the config, green). "review-pair": a strip of days, October 30 to
+ *     the config, green). "review-pair", "review-strict", "review-look"
+ *     (one beat until the review split it at its sentences, so the miss
+ *     holds before the lookback replaces it): a strip of days, October 30 to
  *     November 4, the five loaded orders as dots; order 6 (November 4) and
  *     late order 7 (November 1) drop in; the strict window (after November
  *     3) shaded, catching 6 and missing 7 (red); the three-day window (after
@@ -195,7 +205,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the take it was voiced in. "ready-input": the page's caution, made
  *     concrete: the description as written ("excludes refunded and
  *     cancelled orders and test accounts") encodes to 440.00; without its
- *     last three words, "and test accounts", to 1190.00.
+ *     last three words, "and test accounts", to 1190.00. The beat says "an
+ *     assistant writing its own SQL from it": one that follows the
+ *     description to the letter calls the net_revenue metric and still gets
+ *     440 (the review's finding; the description is an input to SQL written
+ *     from it, as in the text-to-SQL fallback).
  *   - "eval" to "eval-regress": the page's six steps, in its words, and its
  *     second concept check (string comparison marks right answers wrong; a
  *     query that runs can return the wrong number). The three candidates are
@@ -205,6 +219,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     The grid is computed: text equal after collapsing whitespace and case
  *     (A only), ran without error (all three), same result set (A and B).
  *     No assistant is evaluated and no accuracy figure is given.
+ *     "eval-luck" is past the page: A and C run again on the same orders
+ *     with the test account's deleted, both 440.00, so execution accuracy
+ *     passes C there; the golden set's data has to tell readings apart.
  *   - "review" to "review-tests": the page's checklist in its order and
  *     words. "review-pair" is the video's own run, past the page (which
  *     lists the lookback and the unique_key as two items): seven orders, five
@@ -278,7 +295,7 @@ export const script: NarrationScript = {
     {
       id: "t2s-rows",
       text: "Here are eight orders from five customers, and one customer is a test account.",
-      pauseAfter: 0.5,
+      pauseAfter: 1.0,
     },
     {
       id: "t2s-run",
@@ -297,7 +314,12 @@ export const script: NarrationScript = {
     },
     {
       id: "t2s-past",
-      text: "And no query can find the right one in the rows. Which reading counts as revenue is a company decision, so it has to be written down where the assistant reads it.",
+      text: "And no query can find the right one in the rows.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "t2s-decision",
+      text: "Which reading counts as revenue is a company decision, so it has to be written down where the assistant reads it.",
       pauseAfter: 0.8,
     },
 
@@ -373,8 +395,13 @@ export const script: NarrationScript = {
       pauseAfter: 0.7,
     },
     {
+      id: "ready-caution",
+      text: "One caution: documentation is now an input.",
+      pauseAfter: 0.5,
+    },
+    {
       id: "ready-input",
-      text: "One caution: documentation is now an input. Drop the words and test accounts from the end of this description, and an assistant that follows it to the letter reports eleven hundred ninety.",
+      text: "Drop the words and test accounts from the end of this description, and an assistant writing its own SQL from it reports eleven hundred ninety.",
       pauseAfter: 0.6,
     },
     {
@@ -404,6 +431,11 @@ export const script: NarrationScript = {
     {
       id: "eval-score",
       text: "Compare the query text, and the second, which is right, fails. Count whatever runs, and the third, which is wrong, passes. Compare result sets, which is called execution accuracy, and both are scored correctly.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "eval-luck",
+      text: "One catch: a wrong query can match by luck. Without the test account's orders, the third returns four hundred forty too, so test on data where the readings differ.",
       pauseAfter: 0.8,
     },
     {
@@ -442,7 +474,13 @@ export const script: NarrationScript = {
     },
     {
       id: "review-pair",
-      text: "The two only work as a pair. Here, one order arrives late, dated two days before the newest row loaded. A filter for dates after the newest one loaded misses it. A three-day lookback catches it, but reads three orders it already loaded, and without a unique key appends them a second time: ten rows for seven orders. With the key, seven.",
+      text: "The two only work as a pair. Here, one order arrives late, dated two days before the newest row loaded.",
+      pauseAfter: 0.5,
+    },
+    { id: "review-strict", text: "A filter for dates after the newest one loaded misses it.", pauseAfter: 0.9 },
+    {
+      id: "review-look",
+      text: "A three-day lookback catches it, but reads three orders it already loaded, and without a unique key appends them a second time: ten rows for seven orders. With the key, seven.",
       pauseAfter: 0.8,
     },
     {

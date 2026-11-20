@@ -99,9 +99,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     all, "9.4 MB read"; SELECT region, SUM(units) lights two thin strips,
  *     "0.77 MB read" (green). star-wide: SELECT region, SUM(amount) lights
  *     region and the wide amount strip, "4.6 MB" (yellow): bytes, not
- *     column counts. star-dbt: a model's {{ config(materialized='table') }}
- *     over SELECT * FROM source, struck, and the named column list under it
- *     (green).
+ *     column counts. The three reads stay up as a tally, so the two
+ *     two-column queries sit side by side. star-limit: "LIMIT 10 on
+ *     BigQuery: the same scan" under the tally. star-dbt: a model's
+ *     {{ config(materialized='table') }} over SELECT * FROM source, SELECT *
+ *     banded red, and the same config over the named column list (green).
  *   prune: QuestionCard 6; the page's chart (charts/partition-pruning-scan:
  *     gigabytes scanned against days filtered, flat at 876 GB unpartitioned,
  *     rising from zero partitioned), the 7-day point marked "16.8 GB", and a
@@ -124,16 +126,19 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     against one. hurt-cluster: a cluster key on a column no filter names,
  *     a maintenance cog turning beside it, the query passing it by.
  *     hurt-rule: "Match the grain to the volume", and the twelve month files
- *     (about 780 kB each) beside the 366 day files.
+ *     (about 780 kB each) beside the 366 day files, in neutral ink, not
+ *     green. hurt-month: under them, "still far under the usual 128 MB to
+ *     1 GB a file" (de-warehousing's small.target): at this size, one file.
  *   compute: QuestionCard 9, the stopwatch spot beside it; the three
  *     billing lines from "arch" again,
  *     each now with its lever: "credits per second while running",
  *     "bytes scanned, or reserved slots", "provisioned nodes (or serverless
  *     RPUs)". compute-model: a model badge; one hour as sixty minute ticks,
  *     two of them busy (blue); billed by time and left running, all sixty
- *     lit (red); suspended when idle, two (green); billed by bytes on
- *     demand, the idle ticks grey and the scan bar the only thing that
- *     moves. compute-lever: "less data scanned" and "less compute time", the
+ *     lit (red); compute-suspend: suspended when idle, the two (green)
+ *     and a lighter tick after each for the wait before it suspends;
+ *     compute-bytes: billed by bytes on demand, the idle ticks grey and the
+ *     scan bar the only thing that moves. compute-lever: "less data scanned" and "less compute time", the
  *     one the billing model rewards in yellow.
  *   obt: QuestionCard 10 with the modeling page's heading as its second
  *     line; a star (fct_sales with category_id, and a five-row
@@ -208,9 +213,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *         query that genuinely reads all of history".
  *       - "compute-model": the video's own assumption, a dashboard keeping a
  *         cluster busy two minutes in an hour: sixty minutes billed left
- *         running, two when it suspends, no suspend delay modelled (the page
- *         gives none). On-demand bytes billing charges no idle time: the
- *         page's "pay per bytes scanned (or for reserved slots)".
+ *         running, two when it suspends, plus the wait before each suspend
+ *         ("compute-suspend"; drawn as one minute each, computeModel's
+ *         suspendWaitMinutes, the shortest timeout in common use: Snowflake's
+ *         default AUTO_SUSPEND is ten minutes, and it bills at least a minute
+ *         each time a warehouse resumes). On-demand bytes billing charges no
+ *         idle time: the page's "pay per bytes scanned (or for reserved
+ *         slots)".
+ *   - Beyond the page, as fact: "star-limit", on BigQuery a LIMIT does not
+ *     reduce the bytes read, since on-demand billing counts the columns
+ *     scanned (BigQuery's cost-control guidance); "hurt-month", the usual
+ *     target of about 128 MB to 1 GB a file, de-warehousing's small.target,
+ *     against 780 kB month files.
  *   - Reasoning, not a run: "a model built as a table from select star reads
  *     every column of its source on every build" (a table materialization
  *     rebuilds with CREATE TABLE AS SELECT, and SELECT * names every column;
@@ -371,6 +385,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "star-limit",
+      text: "And on BigQuery, a limit doesn't help: it bills the columns scanned, not the rows returned.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "star-dbt",
       text: "In a project, name the columns: a model built as a table from select star reads every column of its source on every build.",
       pauseAfter: 0.8,
@@ -412,7 +431,7 @@ export const script: NarrationScript = {
     {
       id: "cluster-def",
       text: "Clustering sorts rows inside storage, so the engine can skip blocks that can't match a filter. In the sales file, each block of rows records its first and last date. In date order, March overlaps two blocks of nine. Shuffled, every block spans the year, and the same query read five times the bytes.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.3,
     },
     {
       id: "cluster-diff",
@@ -445,6 +464,11 @@ export const script: NarrationScript = {
     {
       id: "hurt-rule",
       text: "Partition and cluster on the columns filters actually use, and match the grain to the volume: a million rows a year is too few to split by day.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "hurt-month",
+      text: "Even by month, each file is tiny. At this size, don't partition at all.",
       pauseAfter: 0.8,
     },
 
@@ -462,7 +486,17 @@ export const script: NarrationScript = {
     },
     {
       id: "compute-model",
-      text: "Here's a model, not a measurement. Say a dashboard keeps a cluster busy for two minutes an hour. Billed by time and left running, you pay for sixty minutes. Suspended when idle, about two. Billed by bytes on demand, idle time costs nothing, and only the scan counts.",
+      text: "Here's a model, not a measurement. Say a dashboard keeps a cluster busy for two minutes an hour. Billed by time and left running, you pay for sixty minutes.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "compute-suspend",
+      text: "Suspended when idle, about two, plus the wait before each suspend, so keep that wait short.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "compute-bytes",
+      text: "Billed by bytes on demand, idle time costs nothing, and only the scan counts.",
       pauseAfter: 0.7,
     },
     {

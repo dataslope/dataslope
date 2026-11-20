@@ -165,7 +165,15 @@ export const AdditiveScene: React.FC = () => {
             note={<span style={{ ...note(22, OK_INK), fontWeight: 500 }}>Sums across every dimension</span>}
           />
           <Gap at={kindAt[1]} />
-          <Kind at={kindAt[1]} litFrom={semiAt} litTo={nonAt} name="Semi-additive" eg="a balance" />
+          <Kind
+            at={kindAt[1]}
+            litFrom={semiAt}
+            litTo={nonAt}
+            name="Semi-additive"
+            eg="a balance"
+            noteAt={timeAt}
+            note={<span style={{ ...note(22, INK), fontWeight: 500 }}>Sums across accounts, not time</span>}
+          />
           <Gap at={kindAt[2]} />
           <Kind
             at={kindAt[2]}

@@ -262,7 +262,7 @@
           ]
         },
         "unique": {
-          "sql": "SELECT order_id, COUNT(*) AS n\nFROM fct_orders\nGROUP BY order_id\nHAVING COUNT(*) > 1;",
+          "sql": "SELECT order_id, COUNT(*) AS n\nFROM fct_orders\nWHERE order_id IS NOT NULL\nGROUP BY order_id\nHAVING COUNT(*) > 1;",
           "ok": true,
           "columns": [
             "order_id",
@@ -326,6 +326,20 @@
               "delivered",
               99,
               "55.00"
+            ]
+          ]
+        },
+        "uniqueTwoNulls": {
+          "sql": "SELECT order_id, COUNT(*) AS n\nFROM (SELECT order_id FROM fct_orders UNION ALL SELECT NULL) t\nWHERE order_id IS NOT NULL\nGROUP BY order_id\nHAVING COUNT(*) > 1;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "n"
+          ],
+          "rows": [
+            [
+              3,
+              2
             ]
           ]
         },

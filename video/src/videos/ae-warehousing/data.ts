@@ -96,7 +96,11 @@ export const SMALL = {
   day: de.small.day,
   month: de.small.month,
   one: de.small.one,
+  /** The usual size a file is aimed at, as de-warehousing gives it (bytes). */
+  target: de.small.target,
 };
+/** "128 MB to 1 GB", the target as de-warehousing writes it (binary units). */
+export const TARGET_TEXT = `${SMALL.target.lo / 2 ** 20} MB to ${SMALL.target.hi / 2 ** 30} GB`;
 
 // ── 9. Compute: a model ─────────────────────────────────────────────────────
 

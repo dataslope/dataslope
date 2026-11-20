@@ -105,7 +105,7 @@ export const Type2Scene: React.FC = () => {
   // ── Phase 2: the page's point-in-time join ──
   const P = TYPE2.read;
   const pRows = P.rows.slice(0, 2).map((r) => r.map((v, j) => (P.cols[j] === "amount" ? money(v) : v)));
-  const listTop = y(LOW - 10);
+  const listTop = low;
   const pW = listingWidth(P.lines, SIZE);
   const gp = geoOf({ cols: P.cols, rows: pRows }, X0 + pW + 70, low, h, ROWS);
   const pRegion = P.cols.indexOf("region_at_order_time");
@@ -264,10 +264,9 @@ export const Type2Scene: React.FC = () => {
               { x0: o1.x, x1: west.x0 + (A.x1 - west.x0) * 0.3 },
               { x0: o2.x, x1: east.x1 - (east.x1 - east.x0) * 0.22 },
             ].map((l, i) => (
-              <g key={i}>
-                <line x1={l.x0} y1={pinFoot} x2={l.x0 + (l.x1 - l.x0) * cross} y2={pinFoot + (A.bandTop - pinFoot) * cross} stroke={ACCENT} strokeWidth={2.4} strokeDasharray="7 6" />
-                <circle cx={l.x1} cy={A.bandTop} r={6} fill={ACCENT} opacity={cross >= 1 ? 1 : 0} />
-              </g>
+              // No dot at the far end: a dot on a band reads as one more
+              // order at that date (review 2026-11-20).
+              <line key={i} x1={l.x0} y1={pinFoot} x2={l.x0 + (l.x1 - l.x0) * cross} y2={pinFoot + (A.bandTop - pinFoot) * cross} stroke={ACCENT} strokeWidth={2.4} strokeDasharray="7 6" />
             ))}
           </svg>
         ) : null}
@@ -327,7 +326,7 @@ export const Type2Scene: React.FC = () => {
           size={SIZE}
           at={joinAt}
           out={joinOut}
-          title="The page’s point-in-time join"
+          title="The point-in-time join"
           marks={[{ line: lineOf(P.lines, "BETWEEN"), at: windowAt + 2 }]}
         />
         <TableName g={gp} at={eastAt - 6} out={joinOut}>
@@ -381,7 +380,7 @@ export const Type2Scene: React.FC = () => {
         </Note>
         <Note at={insertAt + 24} x={X0 + loadW + 60} y={insertTop + h(70)} out={loadOut}>
           <span style={{ ...note(25, OK_INK), whiteSpace: "nowrap" }}>
-            = the page&rsquo;s table (<Num>{TYPE2.samePage}</Num> rows differ)
+            = the two versions above (<Num>{TYPE2.samePage}</Num> rows differ)
           </span>
         </Note>
 

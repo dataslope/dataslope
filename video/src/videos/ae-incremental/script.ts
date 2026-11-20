@@ -78,7 +78,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     answer gained it): the microbatch strategy in a line, and its config
  *     keys, the step past the question.
  *   - "this": QuestionCard 3, under the same strips; `{{ this }}` in the
- *     listing ringed, an arrow to fct_events. "this-first": fct_events
+ *     listing ringed, an arrow to fct_events; the watermark at the table's
+ *     own maximum. "this-ref" (added in review): "not ref(...): a model
+ *     can't depend on itself" under the note. "this-first": fct_events
  *     emptied (dashed outline, "not there yet"); is_incremental() -> false;
  *     the guard's lines grey out; all of raw_events crosses.
  *   - "key": QuestionCard 4. "key-append": the overlap's seven re-read rows
@@ -108,9 +110,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     same batch again: both matched, nothing inserted, the same 4 rows; to
  *     the right, a blind insert of the batch twice: 7 rows, customer 2 three
  *     times, Dee twice (red). "merge-dbt": "merge-style strategy +
- *     unique_key" and "strategy depends on the adapter". "merge-delete": a
- *     source row struck out; it never reaches the batch, so the target keeps
- *     it.
+ *     unique_key" and "strategy depends on the adapter". "merge-delete"
+ *     (reworded in review: a MERGE can delete, this one never sees the
+ *     delete): "Cy, deleted at the source: not in the batch" under the
+ *     batch; the target keeps it. "merge-delete-flag": deletes sent as
+ *     flagged rows, or a full refresh.
  *   - "refresh": QuestionCard 7; two lines, "normal run: filter, merge in"
  *     and "--full-refresh: guard skipped, drop, rebuild from every row".
  *     "refresh-why": the data-warehousing card as a second line; the strict
@@ -173,7 +177,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "this", "this-first": dbt.mdx, "`{{ this }}` refers to the current
  *     model's table", and is_incremental() "returns true when the target
  *     relation exists, the model is configured as incremental, and the run is
- *     not a full refresh".
+ *     not a full refresh". "this-ref": a model that refs itself is a cycle
+ *     dbt refuses to compile (dbt's own rule, not the page's).
  *   - "key": dbt.mdx's unique_key answer. Run: the overlap appended, 31 rows
  *     for 27 events (21 to 24 twice), 38 after a retry; merged on event_id, 27
  *     and 27; delete-then-insert on event_id, 27 and 27. "key-dup": the
@@ -200,7 +205,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     The same batch inserted blindly, twice: 7 rows. "a merge-style
  *     strategy": dbt.mdx; data-warehousing's "This is how dbt handles
  *     incremental models with a unique_key" is narrower than dbt.mdx's
- *     answer, and the video follows dbt.mdx (reported).
+ *     answer, and the video follows dbt.mdx (reported). "merge-delete-flag":
+ *     MERGE's own DELETE action (SQL standard; Postgres 15 and later,
+ *     Snowflake, BigQuery) acts on deletes the source sends as rows; the
+ *     page's answer, a full refresh, is the fallback.
  *   - "merge-delete", "refresh-why", "refresh-fix": the strict run from
  *     question 2 (25 rows), then event 3 deleted from raw_events (26 rows):
  *     a normal run returns nothing; 25 and 26 are missing and 3 is extra;
@@ -304,7 +312,7 @@ export const script: NarrationScript = {
     {
       id: "filter-width",
       text: "Make the window as wide as your data arrives late. A wider one re-reads more on every run, and an event later than the window still slips past.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.0,
     },
     {
       id: "filter-seq",
@@ -321,6 +329,7 @@ export const script: NarrationScript = {
       text: "Question three. What is the \"this\" variable in dbt? It's the model's own table in the warehouse, the one the filter takes its maximum from.",
       pauseAfter: 0.6,
     },
+    { id: "this-ref", text: "It isn't a ref, because a model can't depend on itself.", pauseAfter: 0.6 },
     {
       id: "this-first",
       text: "On the very first run that table doesn't exist yet, so the incremental check returns false, the guard is skipped, and the model loads everything.",
@@ -366,7 +375,7 @@ export const script: NarrationScript = {
     {
       id: "idem-blind",
       text: "Load the page's customer dimension with a blind insert, and a retry doubles it: twelve customers become twenty-four rows.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.6,
     },
     {
       id: "idem-rebuild",
@@ -406,9 +415,15 @@ export const script: NarrationScript = {
       text: "It's the statement a merge-style incremental strategy runs, keyed on the unique key, though which strategy you get depends on the adapter and on your config.",
       pauseAfter: 0.6,
     },
+    { id: "merge-delete", text: "What this merge never sees is a delete.", pauseAfter: 0.6 },
     {
-      id: "merge-delete",
-      text: "What a merge can't do is delete. A row removed from the source never reaches the batch, so the target keeps it.",
+      id: "merge-delete-batch",
+      text: "A row removed from the source never reaches the batch, so the target keeps it.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "merge-delete-flag",
+      text: "To catch one, the source has to send each delete as a row, flagged, for the merge to act on. Otherwise, it takes a full refresh.",
       pauseAfter: 0.8,
     },
 

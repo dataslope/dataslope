@@ -148,6 +148,10 @@ export const ObserveScene: React.FC = () => {
           })}
           <line x1={DAY_X[0] - 20} y1={base} x2={DAY_X[1] + DAY_W - 20} y2={base} stroke={INK} strokeWidth={1.5} opacity={ease(frame, dropsAt - 6, 10)} />
         </Svg>
+        {/* What the bars count, level with them on the left. */}
+        <Note at={dropsAt} x={X0} y={base - h(100)}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Orders loaded</span>
+        </Note>
         <Note at={thirdAt} x={DAY_X[1] + DAY_W - 10} y={base - barH(OBSERVE.volume[1].rows) - h(10)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>-{OBSERVE.dropPct}%</Num>

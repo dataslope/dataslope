@@ -106,6 +106,8 @@ export const LATEST = {
   /** Customer 3's rows, with the video's own tie at 2024-05-18 16:45:00. */
   tieRows: table("own", "tie", "three"),
   tieRank: query("own", "tie", "rank"),
+  /** The page's ROW_NUMBER block on the table with the tie. */
+  tieRowNumber: query("own", "tie", "rowNumber"),
   tieRankCount: Number(scalar("own", "tie", "rankCount")),
   tieRowNumberCount: Number(scalar("own", "tie", "rowNumberCount")),
 };
@@ -218,23 +220,36 @@ export const POSTGRES_VERSION = (own.figures.window as Figure).version;
 // ── Views the scenes draw, derived from the results above ───────────────────
 
 /** Customer 3's rows, newest first, with the video's own tie (c4@x.com at
- *  the same second as c3@x.com): rank and row number computed from the
- *  order the engine printed them in. */
+ *  the same second as c3@x.com): RANK computed from updated_at, and
+ *  ROW_NUMBER as the tie's ROW_NUMBER run assigned it. That run kept one of
+ *  the pair as row 1 (the engine's choice; here c4@x.com, the row the
+ *  listing prints second), so the pair is numbered from the run, never from
+ *  the listing's order. */
 const TIE_EMAIL = "c4@x.com";
 const three = LATEST.tieRows;
 const at3 = three.cols.indexOf("updated_at");
+const em3 = three.cols.indexOf("email");
+const tieKept = LATEST.tieRowNumber.rows.find((r) => r[0] === "3")?.[LATEST.tieRowNumber.cols.indexOf("email")];
+if (!tieKept) throw new Error("the tie's ROW_NUMBER run kept no row for customer 3");
+/** Each row's ROW_NUMBER: newer rows first, and within the tied second the
+ *  row the run kept before the other. */
+const rowNumberOf = (r: readonly string[]) =>
+  1 +
+  three.rows.filter((o) => o[at3] > r[at3]).length +
+  (r[em3] === tieKept ? 0 : three.rows.filter((o) => o[at3] === r[at3] && o[em3] === tieKept).length);
 export const CUSTOMER3 = {
   /** The page's three rows (the tie left out), numbered from the newest. */
-  page: three.rows.filter((r) => !r.includes(TIE_EMAIL)).map((r, i) => [r[at3], r[three.cols.indexOf("email")], String(i + 1)]),
+  page: three.rows.filter((r) => !r.includes(TIE_EMAIL)).map((r, i) => [r[at3], r[em3], String(i + 1)]),
   /** All four rows, with RANK and ROW_NUMBER over updated_at DESC. */
-  tie: three.rows.map((r, i) => [
-    r[at3],
-    r[three.cols.indexOf("email")],
-    String(1 + three.rows.filter((o) => o[at3] > r[at3]).length),
-    String(i + 1),
-  ]),
+  tie: three.rows.map((r) => [r[at3], r[em3], String(1 + three.rows.filter((o) => o[at3] > r[at3]).length), String(rowNumberOf(r))]),
   tieEmail: TIE_EMAIL,
+  /** The row of the tied pair the ROW_NUMBER run kept. */
+  tieKept,
 };
+{
+  const numbers = CUSTOMER3.tie.map((r) => r[3]).sort();
+  if (JSON.stringify(numbers) !== JSON.stringify(three.rows.map((_, i) => String(i + 1)))) throw new Error("the tie's row numbers are not 1 to 4");
+}
 
 /** The page's logins, (user_id, login_date), read from the setup that ran. */
 const loginsSetup = (own.figures.spine as Figure).setup;

@@ -205,6 +205,8 @@ const materializations = { view: await materialize("VIEW"), table: await materia
 materializations.tableRebuilt = await figure(`${EVENTS_LOG};\n${NEW_EVENT};`, {
   create: `CREATE TABLE dim_customer AS\n${MODEL_SQL}`,
   count: COUNT,
+  // Its plan after the rebuild, so the screen's plan moves with its count.
+  plan: `${EXPLAIN}\n${READ}`,
 });
 
 // ── The macro, for the rapid round ──────────────────────────────────────────
@@ -235,6 +237,7 @@ check(planText(v, "plan").some((l) => /Seq Scan on customer_events \(actual rows
 check(planText(t, "plan").length === 1 && /Seq Scan on dim_customer \(actual rows=12/.test(planText(t, "plan")[0]), "the table reads 12 stored rows");
 check(Number(stepOk(v, "countAfter").rows[0][0]) === 13 && Number(stepOk(t, "countAfter").rows[0][0]) === 12, "after the new event: view 13, table 12");
 check(Number(stepOk(materializations.tableRebuilt, "count").rows[0][0]) === 13, "the rebuilt table: 13");
+check(planText(materializations.tableRebuilt, "plan").length === 1 && /Seq Scan on dim_customer \(actual rows=13/.test(planText(materializations.tableRebuilt, "plan")[0]), "the rebuilt table reads 13 stored rows");
 check(stepOk(macro, "expanded").rows[0][0] === "19.99" && Number(stepOk(macro, "integer").rows[0][0]) === 19, "the macro: 19.99; integer division: 19");
 
 const quoted = [
@@ -246,6 +249,8 @@ const quoted = [
   ["dbt", "`dbt_alice_staging`"],
   ["dbt", "The default behavior uses the `target.schema` from the profile plus any model-level schema override."],
   ["dbt", "`ref()` automatically resolves to the correct schema for the active target"],
+  ["dbt", "A **profile** groups targets, typically `dev`"],
+  ["dbt", "the hosted dbt platform configures the same split as **environments**"],
   ["dbt", "Configurations cascade: project-level defaults are overridden by directory-level, then model-level `config()` blocks."],
   ["dbt", "ref('model_name', version=1)"],
   ["dimensional-modeling", "**Staging**, one model per source table; light cleaning/renaming/typing, no business logic."],
@@ -268,6 +273,8 @@ const v2Quoted = [
 for (const text of v2Quoted) check(V2_SECTION.includes(text), `dbt.mdx's dbt v2 answer no longer says ${JSON.stringify(text.slice(0, 50))}`);
 const dbtV2 = {
   language: V2_SECTION.match(/a rewrite of the engine in (\w+)/)[1],
+  /** The name it first shipped under: "Fusion", of the "Fusion engine". */
+  engineName: V2_SECTION.match(/first shipped as the "(\w+) engine"/)[1],
   generallyAvailable: V2_SECTION.match(/generally available since (\w+ \d{4})/)[1],
   coreLine: V2_SECTION.match(/names only the Python ([\d.x]+) line/)[1],
   coreEndsAt: V2_SECTION.match(/still supported and ends at ([\d.]+)\./)[1],

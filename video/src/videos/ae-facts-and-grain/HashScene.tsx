@@ -42,7 +42,8 @@ const mb = (bytes: number) => `${(bytes / 1e6).toFixed(1)} MB`;
  * Question 5. The page's two key queries side by side: md5 of the natural
  * key on the left, row_number() on the right. The md5 of 42 is the same
  * string wherever and whenever it is computed (after the rebuild too, by the
- * run), so a fact can compute its own key. Integers are compact: the
+ * run), so a fact can compute its own key; with versions, the ID is hashed
+ * with valid_from and a fact still finds its version by date. Integers are compact: the
  * primary-key index over 100,000 keys, 2.3 MB against 7.8 MB. But numbered
  * by row_number() on every rebuild, the keys shift when customer 12
  * arrives: Monday's order, loaded with Acme's 3, reads back on Tuesday as
@@ -63,6 +64,9 @@ export const HashScene: React.FC = () => {
   const prodAt = n.word("hash", "in production");
   const rebuildAt = n.word("hash", "in tomorrow's rebuild");
   const lookupAt = n.word("hash", "without a lookup");
+  const versionsAt = n.word("hash-versions", "For a versioned dimension");
+  const startAt = n.word("hash-versions", "the version's start date");
+  const byDateAt = n.word("hash-versions", "finds its version by date");
   const intAt = n.word("hash-size", "a hundred thousand integer keys");
   const thirdAt = n.word("hash-size", "under a third the size");
   const hashesAt = n.word("hash-size", "the same number of hashes");
@@ -121,7 +125,8 @@ export const HashScene: React.FC = () => {
         <Sfx key={s.label} name="el-tap" at={s.at} level={-32} />
       ))}
       <Sfx name="el-pop" at={intAt} level={-31} />
-      <Sfx name="el-pop" at={hashesAt} level={-31} />
+      <Sfx name="el-pop" at={thirdAt - 2} level={-31} />
+      <Sfx name="el-tap" at={versionsAt} level={-32} />
       <Sfx name="el-whoosh" at={trapAt} level={-35} />
       <Sfx name="el-pencil" at={numberAt + 4} level={-36} />
       <Sfx name="el-tap" at={newAt + 2} level={-29} />
@@ -160,6 +165,17 @@ export const HashScene: React.FC = () => {
         <Note at={lookupAt - 4} x={X0} y={sameTop + 3 * h(46) + h(16)} out={leftOut}>
           <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A fact computes its key: no lookup</span>
         </Note>
+        {/* With versions (Question 4's customer 42), the ID alone repeats. */}
+        <Note at={versionsAt} x={X0} y={sameTop + 3 * h(46) + h(62)} out={leftOut}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            With versions: hash <Mono>customer_id</Mono>
+            <span style={{ opacity: ease(frame, startAt, 10) }}>
+              {" "}
+              with <Mono>valid_from</Mono>
+            </span>
+            <span style={{ opacity: ease(frame, byDateAt, 10) }}>, found by date</span>
+          </span>
+        </Note>
 
         {/* ── A sequence integer: compact ── */}
         <Caption at={detAt + 4} x={RIGHT_X} y={listTop - h(40)} out={suitAt - 4}>
@@ -190,13 +206,13 @@ export const HashScene: React.FC = () => {
           y={barsTop + h(92)}
           width={560}
           max={md5}
-          at={hashesAt}
+          at={thirdAt - 2}
           out={leftOut}
           label="The same 100,000 as md5 hashes"
           shown={mb(md5)}
           segments={[{ value: md5, color: BAR_BLUE }]}
         />
-        <Note at={thirdAt} x={RIGHT_X} y={barsTop + h(196)} out={leftOut}>
+        <Note at={hashesAt + 6} x={RIGHT_X} y={barsTop + h(196)} out={leftOut}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Under a third the size</span>
         </Note>
 

@@ -38,7 +38,7 @@ const QUICK = 11;
  * not the right answer here), and two dashboards titled "Revenue" read
  * 1,949.25 and 4,555.25. Under them, the two queries, small and unmarked as
  * wrong: orders alone, and the page's join. Then the promise, counted from
- * what the video does: eight numbered squares and ten smaller ones. The
+ * what the video does: eight numbered squares and eleven smaller ones. The
  * pelican, the hero, holds its one catch on the right.
  */
 export const HookScene: React.FC = () => {
@@ -141,7 +141,7 @@ export const HookScene: React.FC = () => {
           marks={[{ line: "JOIN", text: "JOIN", at: joinsAt + 4, out: end }]}
         />
 
-        {/* ── Eighteen questions: eight worked through, ten quick ── */}
+        {/* ── Nineteen questions: eight worked through, eleven quick ── */}
         {Array.from({ length: DEEP + QUICK }, (_, i) => {
           const deep = i < DEEP;
           const at = eighteenAt - 2 + i * 1.5;

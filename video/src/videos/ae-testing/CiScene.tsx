@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { CI, CI_SELECTED } from "./data";
-import { Box, Chip, Drift, Flow, Listing, ListingTitle, SmallMono, Spot, Strike, type Tone, X0 } from "./parts";
+import { Box, Chip, Drift, Flow, Listing, ListingTitle, SmallMono, Spot, Strike, Svg, type Tone, X0 } from "./parts";
 
 const NODE = { w: 220, h: 58 };
 const GAP_X = 80;
@@ -110,6 +110,8 @@ export const CiScene: React.FC = () => {
   const changeAt = n.word("ci-state", "Change the customer staging model");
   const threeAt = n.word("ci-state", "three of the four models");
   const leftAt = n.word("ci-state", "Orders staging is left alone");
+  const deferAt = n.word("ci-defer", "With the defer flag");
+  const prodCopyAt = n.word("ci-defer", "reads it from production");
   const slimAt = n.word("ci-slim", "That's slim CI");
   const fastAt = n.word("ci-slim", "fast feedback");
   const blocksAt = n.word("ci-slim", "a failing test blocks the merge");
@@ -136,7 +138,11 @@ export const CiScene: React.FC = () => {
   const cmdX = X0 + 300;
   const dagTop = y(500);
   const rowGap = h(112);
-  const manifest = { x: 1400, y: dagTop };
+  // The manifest is compared with the whole project: a dashed bracket down
+  // the right of the DAG, the manifest level with its middle.
+  const projectBracket = { x: X0 + 3 * (NODE.w + GAP_X) + NODE.w + 28, top: dagTop, bottom: dagTop + rowGap + h(NODE.h) };
+  const projectMid = (projectBracket.top + projectBracket.bottom) / 2;
+  const manifest = { x: 1400, y: projectMid - h(42) };
   const selected = new Set(CI_SELECTED);
   const ciState = (name: string): Partial<NodeState> => {
     if (!CI.models.includes(name)) return {};
@@ -228,9 +234,26 @@ export const CiScene: React.FC = () => {
           </Chip>
         </Ink>
         <Box x={manifest.x} y={manifest.y} w={330} h={h(84)} at={manifestAt - 2} title="Production manifest" sub={<span style={{ opacity: ease(frame, deployedAt, 10) }}>what&rsquo;s deployed</span>} size={22} out={q7Out} />
-        <Flow points={[[manifest.x - 12, manifest.y + h(42)], [nodeX("fct_orders", X0) + NODE.w + 14, manifest.y + h(42)]]} at={manifestAt + 6} color={ds("gray", 500)} dash="6 7" out={q7Out} noHead />
-        <Note at={manifestAt + 10} x={nodeX("fct_orders", X0) + NODE.w + 30} y={manifest.y + h(54)} out={q7Out}>
+        <Svg opacity={ease(frame, manifestAt + 2, 12) * (1 - ease(frame, q7Out, 10))}>
+          <path
+            d={`M${projectBracket.x - 12},${projectBracket.top} h12 V${projectBracket.bottom} h-12`}
+            fill="none"
+            stroke={ds("gray", 500)}
+            strokeWidth={2}
+            strokeDasharray="6 7"
+          />
+        </Svg>
+        <Flow points={[[manifest.x - 12, projectMid], [projectBracket.x + 6, projectMid]]} at={manifestAt + 6} color={ds("gray", 500)} dash="6 7" out={q7Out} noHead />
+        <Note at={manifestAt + 10} x={projectBracket.x + 24} y={projectMid + h(12)} out={q7Out}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>compared</span>
+        </Note>
+        {/* fct_orders reads stg_orders, which this run does not build: with
+            --defer its ref() resolves to production's copy. */}
+        <Note at={deferAt} x={nodeX("stg_orders", X0) + NODE.w + 40} y={nodeY("stg_orders", dagTop, rowGap) - h(36)} out={q7Out}>
+          <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>
+            <SmallMono>--defer</SmallMono>
+            <span style={{ opacity: ease(frame, prodCopyAt, 10) }}>: read from production</span>
+          </span>
         </Note>
         <Note at={threeAt + 10} x={X0} y={dagTop + rowGap + h(NODE.h) + h(62)} out={q7Out}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -243,11 +266,11 @@ export const CiScene: React.FC = () => {
         </Note>
 
         {/* ── Slim CI: a failing test blocks the merge ── */}
-        <Note at={slimAt} x={manifest.x} y={dagTop + h(140)} out={q7Out}>
+        <Note at={slimAt} x={manifest.x} y={projectBracket.bottom + h(10)} out={q7Out}>
           <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Slim CI</span>
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 8, opacity: ease(frame, fastAt, 10) }}>Fast, without rebuilding every model</div>
         </Note>
-        <MergeBlocked x={manifest.x} y={dagTop + h(250)} at={blocksAt} out={q7Out} h={h} />
+        <MergeBlocked x={manifest.x} y={projectBracket.bottom + h(120)} at={blocksAt} out={q7Out} h={h} />
 
         {/* ── Question 8: CI and production ── */}
         <Ink at={inCiAt - 4} dur={12} style={{ left: CI_COL, top: colsTop, whiteSpace: "nowrap" }}>

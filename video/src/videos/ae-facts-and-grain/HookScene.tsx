@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { GRAIN } from "./data";
-import { Drift, Kicker, Mark, OK_INK, SERIES, Spot, spotH, X0 } from "./parts";
+import { Drift, Kicker, Mark, SERIES, Spot, spotH, X0 } from "./parts";
 
 /** The hero at most half its pixels, as a 4K render needs: 1449x1024 → 640x452. */
 const HERO_W = 640;
@@ -134,7 +134,7 @@ export const HookScene: React.FC = () => {
           </div>
           <div style={{ opacity: ease(frame, quickAt - 2, 12), transform: `translateX(${(1 - ease(frame, quickAt - 2, 12)) * -16}px)` }}>
             <div style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-              <b style={{ color: OK_INK }}>
+              <b style={{ color: BLUE_INK }}>
                 <Num>13</Num>
               </b>{" "}
               quick ones

@@ -375,7 +375,8 @@ export const RapidOneScene: React.FC = () => {
   const from = n.beat("rapid-in").from;
   const thirteenAt = n.word("rapid-in", "Thirteen quick ones");
   const eachAt = n.word("rapid-in", "a sentence or two each");
-  const end = n.beat("r-conformed").to + 30;
+  // The last answer holds until the page's own cross-fade (to + 40..46).
+  const end = n.beat("r-conformed").to + 44;
 
   const items: RapidItem[] = [
     { n: 10, label: <Q>What are the three types of fact tables?</Q>, beat: "r-types", body: <Types c={c} /> },

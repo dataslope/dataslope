@@ -19,10 +19,10 @@ const OVERLAP = 6;
 
 /**
  * "How dbt builds a project" (16:9), Part 3 of the Analytics Engineer
- * interview prep videos, on the editorial page. Nineteen questions: ten
+ * interview prep videos, on the editorial page. Twenty questions: ten
  * worked through on the page's own lineage slice (ref and source, the DAG,
  * the layers, the materializations and ephemeral models, run, test and
- * build, selection, targets and schemas), then nine quick ones. The graph is
+ * build, selection, targets and schemas), then ten quick ones. The graph is
  * the page's (GRAPH in data.ts); the materializations ran on the site's
  * Postgres (check.mjs, results.json, data.ts); dbt itself does not run here.
  *

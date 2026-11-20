@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
+import { INK, INK_SOFT, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -48,7 +48,7 @@ export const ClosingScene: React.FC = () => {
         <Note at={stillAt} x={X0} y={y(260)}>
           <span style={{ ...note(34, INK), whiteSpace: "nowrap" }}>
             Every dimension here held still,
-            <span style={{ color: BLUE_INK, opacity: ease(frame, exceptAt, 10) }}> except one</span>
+            <span style={{ fontWeight: 500, opacity: ease(frame, exceptAt, 10) }}> except one</span>
           </span>
         </Note>
         <TableName g={g} at={exceptAt + 2}>

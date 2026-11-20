@@ -7,7 +7,7 @@ import { ACCENT_INK, INK, INK_SOFT, label } from "../../editorial/style";
 import { ColumnRule, Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CHASM, money } from "./data";
+import { CHASM, FAN, money } from "./data";
 import {
   DataTable,
   Drift,
@@ -214,7 +214,14 @@ export const ChasmScene: React.FC = () => {
             One many-side: <b style={{ color: ACCENT_INK }}>one measure</b> inflates
           </span>
         </Note>
-        <ColumnRule x={860} top={panelTop + 4} height={captionTop + h(32) - panelTop} at={chasmTwoAt - 2} />
+        {/* Each side's evidence, from this video's own runs, so the claim
+            keeps its numbers once Ada's tables have cleared. */}
+        <Note at={panelAt + 24} x={X0} y={captionTop + h(42)}>
+          <span style={noteLine(22, INK_SOFT)}>
+            <Num>{money(FAN.revenue)}</Num> became <b style={{ color: ACCENT_INK }}>{money(FAN.inflated)}</b>
+          </span>
+        </Note>
+        <ColumnRule x={860} top={panelTop + 4} height={captionTop + h(74) - panelTop} at={chasmTwoAt - 2} />
         <Ink at={chasmTwoAt - 4} dur={12} style={{ left: 940, top: panelTop }}>
           <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Chasm trap</span>
         </Ink>
@@ -226,6 +233,12 @@ export const ChasmScene: React.FC = () => {
         <Note at={bothAt - 4} x={940} y={captionTop}>
           <span style={noteLine(22, INK)}>
             Two many-sides: <b style={{ color: ACCENT_INK }}>both</b> inflate
+          </span>
+        </Note>
+        <Note at={bothAt + 6} x={940} y={captionTop + h(42)}>
+          <span style={noteLine(22, INK_SOFT)}>
+            <Num>{money(CHASM.paid)}</Num> became <b style={{ color: ACCENT_INK }}>{money(Number(CHASM.trap.result.rows[0][1]))}</b>,{" "}
+            <Num>{money(CHASM.refunded)}</Num> became <b style={{ color: ACCENT_INK }}>{money(Number(CHASM.trap.result.rows[0][2]))}</b>
           </span>
         </Note>
 

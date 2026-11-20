@@ -21,7 +21,6 @@ import {
   noteLine,
   OK,
   OK_INK,
-  Strike,
   Svg,
   TableName,
   tableGeometry,
@@ -132,7 +131,7 @@ export const NonaddScene: React.FC = () => {
       <Sfx name="el-whoosh" at={breakAt} level={-36} />
       <Sfx name="el-scratch" at={twentySixAt + 2} level={-31} />
       <Sfx name="el-tap" at={twoFiveAt + 2} level={-32} />
-      <Sfx name="el-scratch" at={storeAt + 12} level={-32} />
+      <Sfx name="el-tap" at={storeAt + 10} level={-33} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} size={62}>
@@ -240,6 +239,10 @@ export const NonaddScene: React.FC = () => {
           ))}
           <line x1={WEEK_X} y1={weekBottom - h(20)} x2={WEEK_X + 7 * DAY * ease(frame, dauAt, 16)} y2={weekBottom - h(20)} stroke={INK} strokeWidth={1.5} />
         </Svg>
+        {/* What a dot is, on the same line as the heading, at the chart's right. */}
+        <Note at={dauAt + 4} x={WEEK_X + 330} y={gridTop - h(2)} out={phaseOut}>
+          <span style={noteLine(21, INK_SOFT)}>a dot: one user active that day</span>
+        </Note>
         <Note at={twiceAt} x={dayX(twiceDays[twiceDays.length - 1]) + 28} y={userY(TWICE) - h(16)} out={phaseOut}>
           <span style={noteLine(22, ACCENT_INK)}>
             <b>counted twice</b>
@@ -309,9 +312,7 @@ export const NonaddScene: React.FC = () => {
           </Ink>
         ))}
         <Ink at={storeAt + 10} dur={12} style={{ left: STORE_X + 200, top: ratioTop + h(46) + 2 * h(42) }}>
-          <span style={{ fontFamily: MONO, fontSize: 22, color: ACCENT_INK, fontWeight: 500, whiteSpace: "nowrap" }}>
-            <Strike at={storeAt + 12}>rate</Strike>
-          </span>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>not a rate column</span>
         </Ink>
         <Note at={addAt} x={STORE_X + 200} y={ratioTop + h(46) + 3 * h(42) + h(10)}>
           <span style={noteLine(22, INK_SOFT)}>the parts add up</span>

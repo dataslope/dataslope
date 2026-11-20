@@ -82,7 +82,9 @@ export const RefScene: React.FC = () => {
   const sourceLine = LISTING.sourceLine;
   const fctFrom = LISTING.fctOrders[lineOf(LISTING.fctOrders, "ref('stg_orders')")].replace(/\s+--.*$/, "");
   const fctLines = [LISTING.fctOrders[0], fctFrom];
-  const hardLine = fctFrom.replace("{{ ref('stg_orders') }}", "analytics.stg_orders");
+  // The alias was aligned for the longer ref call; one space before it once
+  // the shorter name is in.
+  const hardLine = fctFrom.replace("{{ ref('stg_orders') }}", "analytics.stg_orders").replace(/\s{2,}AS /, " AS ");
   const swapped = frame >= hardAt + 4;
   const codeOut = q3At - 2;
 

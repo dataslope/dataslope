@@ -272,14 +272,15 @@ export const FreshScene: React.FC = () => {
           <rect x={sketch.x0} y={sy(FRESHNESS.errorHours)} width={sketch.x1 - sketch.x0} height={sy(FRESHNESS.warnHours) - sy(FRESHNESS.errorHours)} fill={WARN_FILL} />
           <line x1={sketch.x0} y1={sketch.bottom} x2={sketch.x1} y2={sketch.bottom} stroke={INK} strokeWidth={1.5} />
           <text x={sketch.x0 - 12} y={sy(FRESHNESS.warnHours) + 7} textAnchor="end" style={svgText(note(19, inkOf.yellow))}>
-            {FRESHNESS.warnHours} h
+            {FRESHNESS.warnHours} h old
           </text>
           <text x={sketch.x0 - 12} y={sy(FRESHNESS.errorHours) + 7} textAnchor="end" style={svgText(note(19, ACCENT_INK))}>
-            {FRESHNESS.errorHours} h
+            {FRESHNESS.errorHours} h old
           </text>
           <text x={sketch.x1} y={sketch.bottom + 28} textAnchor="end" style={svgText(note(19, INK_SOFT))}>
             days
           </text>
+
           {Array.from({ length: days }, (_, d) => {
             const p = ease(frame, slippingAt + d * 6, 8);
             return p > 0 ? <circle key={d} cx={sx(d)} cy={sy(delay(d))} r={6 * p} fill={BAR} /> : null;

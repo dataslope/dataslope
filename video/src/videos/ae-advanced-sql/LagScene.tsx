@@ -112,9 +112,6 @@ export const LagScene: React.FC = () => {
     return pts.reduce((m, p) => (p[1] < m[1] ? p : m), pts[0]);
   };
   const yearApex = apex(jan23, jan24, peak);
-  const marchApex = apex(at(wrongMarch.with), mar24, peak + 0);
-  // The highest of the eight wrong arcs: March's label sits above them all.
-  const wrongTop = Math.min(...LAG_WRONG.map((w, k) => apex(at(w.with), at(w.month), peak + (LAG_WRONG.length - 1 - k) * 6)[1]));
 
   // The line with every month, and the line once March 2023 is gone.
   const all = rev.map((_, i) => pt(i));
@@ -123,11 +120,21 @@ export const LagScene: React.FC = () => {
   const draw = ease(frame, qAt + 20, 40);
   const gone = ease(frame, takeAt + 10, 14);
 
+  // The expression that ran on these months (the page's block): one series,
+  // so its OVER has an ORDER BY and no PARTITION BY.
+  const OVER = "OVER (ORDER BY month)";
+  if (!LAG.mom.lines.some((l) => l.includes(`revenue - LAG(revenue) ${OVER}`))) throw new Error("the month-over-month listing has changed");
   const parts: SynPart[] = [
     { text: "revenue -", at: minusAt, hot: { at: minusAt, out: selfAt } },
     { text: "LAG(revenue)", label: "the value one period back", at: pullsAt, row: 1, hot: { at: pullsAt, out: minusAt } },
-    { text: "OVER (PARTITION BY region ORDER BY month)", label: "back within this region, by month", at: ontoAt + 6 },
+    { text: OVER, label: "one row back, in month order", at: ontoAt + 6 },
   ];
+  /** A month's revenue, written beside its point. */
+  const value = (i: number, dx: number, dy: number, shownAt: number) => (
+    <Note key={i} at={shownAt} x={px(i) + dx} y={py(rev[i]) + dy} out={takeAt}>
+      <span style={{ ...note(22, BLUE_INK), ...halo, whiteSpace: "nowrap", ...TABULAR }}>{rev[i]}</span>
+    </Note>
+  );
 
   return (
     <AbsoluteFill>
@@ -183,6 +190,10 @@ export const LagScene: React.FC = () => {
         <Note at={fallsAt + 4} x={px(jan24) + 18} y={py(rev[dec23]) - 40} out={takeAt}>
           <span style={{ ...note(24, ACCENT_INK), ...halo, whiteSpace: "nowrap" }}>{LAG.january.mom}</span>
         </Note>
+        {/* The revenue the two changes are taken between. */}
+        {value(dec23, -64, -34, fallsAt)}
+        {value(jan24, -62, 4, fallsAt + 4)}
+        {value(jan23, -20, 14, twelveAt + 6)}
         <Arc from={top(jan23)} to={top(jan24)} peak={peak} at={twelveAt + 2} color={INK} out={takeAt} />
         <Note at={downAt - 2} x={yearApex[0] - 24} y={yearApex[1] - 42} out={takeAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{LAG.january.yoy}</span>
@@ -217,7 +228,8 @@ export const LagScene: React.FC = () => {
         <Note at={eightAt + 2} x={X0} y={y(340)}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>{LAG_WRONG.length} comparisons land on the wrong month</span>
         </Note>
-        <Note at={marchAt + 6} x={marchApex[0] - 120} y={wrongTop - 46}>
+        {/* March's label beside its own arrowhead, right of every arc. */}
+        <Note at={marchAt + 6} x={px(mar24) + 26} y={py(rev[mar24]) - 150}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             {wrongMarch.change}, should be {rightMarch}
           </span>
@@ -226,7 +238,7 @@ export const LagScene: React.FC = () => {
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>Put the months on a spine first</span>
         </Note>
         <Note at={selfAt} x={NOTE_X} y={y(330)} out={momAt}>
-          <span style={{ ...note(24, BLUE_INK), whiteSpace: "nowrap" }}>No self join</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>No self join</span>
         </Note>
       </Drift>
     </AbsoluteFill>

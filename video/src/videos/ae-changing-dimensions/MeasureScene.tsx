@@ -114,7 +114,7 @@ export const MeasureScene: React.FC = () => {
             { row: 2, col: amount, at: correctedAt + 10, out: todayAt },
           ]}
         />
-        <Note at={todayAt} x={RX} y={tableTop + h(160)}>
+        <Note at={todayAt} x={RX} y={tableTop + h(160)} out={rulesAt - 4}>
           <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap" }}>
             Today&rsquo;s total: <Num>{money(MEASURE.today)}</Num>
           </span>

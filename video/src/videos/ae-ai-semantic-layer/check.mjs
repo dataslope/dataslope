@@ -22,7 +22,9 @@
 //   page's orders. Its description encoded twice: as written, and without
 //   its last three words.
 // - Question 4: three answers to "what was net revenue?", the video's own
-//   SQL on the page's tables, each run, then scored three ways.
+//   SQL on the page's tables, each run, then scored three ways; then the
+//   reference and the wrong one again, on the orders without the test
+//   account's, where they agree.
 // - Question 5: the video's own seven orders, loaded incrementally by the
 //   model an assistant wrote and by the reviewed one, each compiled as dbt
 //   compiles it with is_incremental() true, and applied the way dbt
@@ -136,6 +138,17 @@ const scored = CANDIDATES.map((c) => {
     sameResult: s.ok && JSON.stringify(s.rows) === JSON.stringify(evalFig.steps[ref.id].rows),
   };
 });
+/** Execution accuracy's blind spot: A and C again, on the same orders with
+ *  the test account's deleted. With nothing to tell the two readings apart,
+ *  the wrong query matches the reference by luck. */
+const WITHOUT_TEST = "DELETE FROM orders\nWHERE customer_id IN (SELECT customer_id FROM customers WHERE is_test);";
+const luckFig = await figure(`${INIT}\n${WITHOUT_TEST}`, { A: CANDIDATES[0].sql, C: CANDIDATES[2].sql, left: "SELECT COUNT(*) FROM orders;" });
+const luck = {
+  sql: WITHOUT_TEST,
+  orders: num(rowsOf(luckFig, "left")[0][0]),
+  A: String(rowsOf(luckFig, "A")[0][0]),
+  C: String(rowsOf(luckFig, "C")[0][0]),
+};
 
 // ── 5. The model an assistant wrote, and the reviewed one ───────────────────
 /** As the assistant wrote it: a hard-coded schema, no unique_key, and a
@@ -268,7 +281,7 @@ const results = {
     asWritten: { sql: ready.steps.asWritten.sql, netRevenue: describedAsWritten },
     withoutCut: { sql: ready.steps.cut.sql, netRevenue: describedCut },
   },
-  eval: { question: "What was net revenue?", candidates: scored },
+  eval: { question: "What was net revenue?", candidates: scored, withoutTest: luck },
   review: {
     asWritten: MODEL_AS_WRITTEN,
     reviewed: MODEL_REVIEWED,
@@ -305,6 +318,7 @@ console.log(
     statuses,
     described: [describedAsWritten, describedCut],
     eval: scored.map((c) => [c.id, c.result?.[0]?.[0], c.sameText, c.runs, c.sameResult]),
+    withoutTest: luck,
     review: { newest, lateDate, daysLate, strict: results.review.strict, append: results.review.append, merge: results.review.merge, deleteInsert: results.review.deleteInsert },
     practice,
   }),
@@ -324,6 +338,7 @@ expect(scored.map((c) => [c.sameText, c.runs, c.sameResult].join()).join("|") ==
 expect(results.review.strict.missing.join() === String(LATE_ID), "the strict filter does not miss exactly the late order");
 expect(results.review.append.orders === allOrders && results.review.merge.rows === allOrders && results.review.deleteInsert.rows === allOrders, "the loads do not hold every order");
 expect(results.review.append.rows === allOrders + results.review.append.reread, "the append's extra rows are not the re-read ones");
+expect(luck.A === luck.C && num(luck.C) === governed, "without the test account's orders, C no longer matches A at the governed reading");
 
 // ── What the narration quotes, still on the page ────────────────────────────
 const quotes = [
@@ -415,11 +430,12 @@ const claims = [
   ["eval-run", `three answers`],
   ["eval-run", `also returns ${money(scored[1].result[0][0] * 1)}`],
   ["eval-run", money(Number(scored[2].result[0][0]))],
+  ["eval-luck", `without the test account's orders, the third returns ${money(num(luck.C))} too`],
   ["review-pair", `${below100(daysLate)} days before the newest row loaded`],
-  ["review-pair", `${below100(r.lookbackDays)}-day lookback`],
-  ["review-pair", `reads ${below100(r.append.reread)} orders it already loaded`],
-  ["review-pair", `${below100(r.append.rows)} rows for ${below100(r.append.orders)} orders`],
-  ["review-pair", `with the key, ${below100(r.merge.rows)}`],
+  ["review-look", `${below100(r.lookbackDays)}-day lookback`],
+  ["review-look", `reads ${below100(r.append.reread)} orders it already loaded`],
+  ["review-look", `${below100(r.append.rows)} rows for ${below100(r.append.orders)} orders`],
+  ["review-look", `with the key, ${below100(r.merge.rows)}`],
   ["review-dup", `${money(completed)}, next to the governed ${money(governed)}`],
   ["close-practice", practice.conceptCheckPages === practice.topicPages ? "every topic page has concept checks" : "(not every page has concept checks)"],
   ["close-practice", `${below100(practice.challengePages)} have challenges`],

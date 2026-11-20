@@ -42,9 +42,9 @@ export const RatioScene: React.FC = () => {
   const carriesAt = n.word("ratio-sum", "carries nine-tenths of the revenue");
   const storeAt = n.word("ratio-fix", "So store the additive parts");
   const divideAt = n.word("ratio-fix", "divide after summing");
-  const weighsAt = n.word("ratio-fix", "A ratio of sums weighs each order");
-  const forgotAt = n.word("ratio-fix", "A stored percentage has forgotten that weight");
-  const end = n.beat("ratio-fix").to;
+  const weighsAt = n.word("ratio-weight", "A ratio of sums weights each order");
+  const forgotAt = n.word("ratio-forgot", "A stored percentage has forgotten that weight");
+  const end = n.beat("ratio-forgot").to;
 
   const T = RATIO.rows;
   const g = geoOf(T, X0, y(TABLE_Y), h, OPTS);
@@ -133,7 +133,7 @@ export const RatioScene: React.FC = () => {
           marks={[{ line: "SUM(gross_revenue)", text: "(SUM(gross_revenue) - SUM(cost_of_goods_sold))", at: divideAt + 4 }]}
         />
         <Note at={weighsAt} x={X0} y={listTop + listingHeight(L.length, LIST_SIZE) + h(30)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A ratio of sums weighs each order by its revenue.</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A ratio of sums weights each order by its revenue.</span>
         </Note>
         <Note at={forgotAt} x={X0} y={listTop + listingHeight(L.length, LIST_SIZE) + h(78)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>

@@ -13,6 +13,15 @@ import { artBox, Box, Chip, Clear, Cross, Drift, Flow, line, Listing, listingHei
 const SIZE = 19;
 const GAP = 60;
 
+/** The kinds of question a golden set mixes, each with an example from the
+ *  same orders. */
+const KINDS = [
+  { tag: "easy lookup", example: "Net revenue last week?" },
+  { tag: "multi-step comparison", example: "Net revenue this month against last?" },
+  { tag: "ambiguous phrasing", example: "How did we do?" },
+];
+const KIND_W = 300;
+
 /** A golden set, drawn as a two-column table: the question, and what the
  *  answer must be. Rows ink in on their own cues. */
 const Golden: React.FC<{
@@ -90,6 +99,10 @@ export const EvalScene: React.FC = () => {
   const setsAt = n.word("eval-score", "Compare result sets");
   const accuracyAt = n.word("eval-score", "execution accuracy");
   const bothAt = n.word("eval-score", "both are scored correctly");
+  const luckAt = n.word("eval-luck", "a wrong query can match by luck");
+  const withoutAt = n.word("eval-luck", "Without the test account's orders");
+  const tooAt = n.word("eval-luck", "four hundred forty too");
+  const dataAt = n.word("eval-luck", "test on data where the readings differ");
   const declineRowAt = [n.word("eval-decline", "metrics nobody has modeled"), n.word("eval-decline", "data the user may not see"), n.word("eval-decline", "and nonsense")];
   const refusesAt = n.word("eval-decline", "how often it refuses");
   const carefullyAt = n.word("eval-decline", "as carefully as accuracy");
@@ -167,15 +180,28 @@ export const EvalScene: React.FC = () => {
             <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>The golden set</span>
           </Ink>
           <Golden x={X0} top={top + h(44)} rowH={rowH} at={realAt} colW={[420, 260]} rows={[{ q: EVAL.question, a: reference.value ?? "", at: verifiedAt }]} />
-          <div style={{ position: "absolute", left: X0, top: top + h(44) + 2 * rowH + h(30), display: "flex", gap: 14, fontSize: 22 }}>
-            {["easy lookup", "multi-step comparison", "ambiguous phrasing"].map((t, i) => (
-              <span key={t} style={{ opacity: ease(frame, mixAt[i], 10), transform: `translateY(${(1 - ease(frame, mixAt[i], 10)) * 8}px)` }}>
+          {KINDS.map((k, i) => (
+            <div
+              key={k.tag}
+              style={{
+                position: "absolute",
+                left: X0,
+                top: top + h(44) + 2 * rowH + h(30) + i * h(50),
+                display: "flex",
+                alignItems: "center",
+                fontSize: 22,
+                opacity: ease(frame, mixAt[i], 10),
+                transform: `translateY(${(1 - ease(frame, mixAt[i], 10)) * 8}px)`,
+              }}
+            >
+              <span style={{ width: KIND_W }}>
                 <Chip tone="gray" size={22}>
-                  {t}
+                  {k.tag}
                 </Chip>
               </span>
-            ))}
-          </div>
+              <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>{k.example}</span>
+            </div>
+          ))}
           <Ink at={storeAt} dur={14} style={{ left: 940, top: top + h(44) }}>
             <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Stored with each question</span>
           </Ink>
@@ -190,7 +216,7 @@ export const EvalScene: React.FC = () => {
           <Ink at={manyAt} dur={14} style={{ left: 940, top: top + h(186) }}>
             <span style={line(24, INK_SOFT)}>Many different queries are correct</span>
           </Ink>
-          <Spot id="ae-ai-semantic-layer-golden" at={goldenAt} left={X0 + 340 - golden.width / 2} top={y(566)} {...golden} />
+          <Spot id="ae-ai-semantic-layer-golden" at={goldenAt} left={X0 + 340 - golden.width / 2} top={y(640)} {...golden} />
         </Clear>
 
         {/* Three answers to one question, each run. */}
@@ -256,6 +282,24 @@ export const EvalScene: React.FC = () => {
           </Ink>
           <Ink at={accuracyAt} dur={14} style={{ left: colX(2) + 140, top: gridTop + 6 }}>
             <span style={{ ...line(26, OK_INK), fontWeight: 500 }}>Same result: execution accuracy</span>
+          </Ink>
+
+          {/* Its blind spot: C again, on the orders without the test
+              account's, where it matches A by luck. */}
+          <Ink at={luckAt} dur={12} style={{ left: xs[2], top: valueTop + h(64) }}>
+            <span style={{ ...line(24, ACCENT_INK), fontWeight: 500 }}>A match by luck</span>
+          </Ink>
+          <Ink at={withoutAt} dur={12} style={{ left: xs[2], top: valueTop + h(64) + h(44) }}>
+            <span style={line(23, INK_SOFT)}>Without the test account&apos;s orders:</span>
+          </Ink>
+          <Ink at={tooAt} dur={12} style={{ left: xs[2], top: valueTop + h(64) + h(84) }}>
+            <span style={{ ...line(23, INK), whiteSpace: "nowrap" }}>
+              <span style={{ color: INK_SOFT }}>→ </span>
+              <span style={{ color: ACCENT_INK, fontWeight: 500 }}>{EVAL.withoutTest.C}</span>, the same as A&apos;s {EVAL.withoutTest.A}
+            </span>
+          </Ink>
+          <Ink at={dataAt} dur={14} style={{ left: xs[2], top: valueTop + h(64) + h(136) }}>
+            <span style={{ ...line(24, INK), fontWeight: 500 }}>Test on data where readings differ</span>
           </Ink>
         </Clear>
 

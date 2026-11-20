@@ -41,6 +41,9 @@ export const SubsetScene: React.FC = () => {
   const fourAt = n.word("subset-plus", "all four models build");
   const orderAt = n.word("subset-plus", "in order");
   const afterAt = n.word("subset-plus", "A plus after adds everything downstream");
+  // The upstream selection holds, all four lit, until the downstream one is
+  // named: about 2.7 s, not the 1.3 s it had when it cleared on "A plus".
+  const downAt = n.word("subset-plus", "adds everything downstream");
   const q4At = n.word("subset-plus", "which is how question four counted a change");
   const end = n.beat("subset-plus").to;
 
@@ -54,7 +57,7 @@ export const SubsetScene: React.FC = () => {
   const up = selection("+fct_orders");
   const down = selection("fct_orders+");
   const wave = (m: string) => GRAPH.waves.findIndex((w) => w.includes(m));
-  const upAt = (m: string) => fourAt + 2 + wave(m) * 10;
+  const upAt = (m: string) => fourAt + 2 + wave(m) * 8;
   const parents = GRAPH.edges.filter(([, b]) => b === "fct_orders").map(([a]) => a);
   const missing = "dim_customer";
 
@@ -62,8 +65,8 @@ export const SubsetScene: React.FC = () => {
     const t: ToneCue[] = [];
     if (id === "fct_orders") t.push({ at: rebuiltAt, tone: "lit" }, { at: frontAt, tone: "plain" });
     if (id === missing) t.push({ at: notYetAt, tone: "bad" }, { at: frontAt, tone: "plain" });
-    if ((up.models as string[]).includes(id)) t.push({ at: upAt(id), tone: "data" }, { at: afterAt, tone: "plain" });
-    if (id === "fct_orders" || down.exposures.map(nodeOf).includes(id)) t.push({ at: afterAt + 6 + (id === "fct_orders" ? 0 : 8), tone: "lit" });
+    if ((up.models as string[]).includes(id)) t.push({ at: upAt(id), tone: "data" }, { at: downAt, tone: "plain" });
+    if (id === "fct_orders" || down.exposures.map(nodeOf).includes(id)) t.push({ at: downAt + 6 + (id === "fct_orders" ? 0 : 8), tone: "lit" });
     return t;
   };
   const nodeIds = ["raw.orders", "raw.customers", "stg_orders", "stg_customers", "dim_customer", "fct_orders", "dashboard"] as const;
@@ -95,9 +98,9 @@ export const SubsetScene: React.FC = () => {
       <Sfx name="el-tap" at={rebuiltAt} level={-31} />
       <Sfx name="el-tap" at={notYetAt} level={-31} />
       {[0, 1, 2].map((k) => (
-        <Sfx key={k} name="el-tap" at={fourAt + 2 + k * 10} level={-33} />
+        <Sfx key={k} name="el-tap" at={fourAt + 2 + k * 8} level={-33} />
       ))}
-      <Sfx name="el-tap" at={afterAt + 6} level={-32} />
+      <Sfx name="el-tap" at={downAt + 6} level={-32} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4} size={58}>
@@ -125,17 +128,17 @@ export const SubsetScene: React.FC = () => {
         <Line at={rebuiltAt + 4} x={READ_X} y={listTop + h(54)} color={INK_SOFT} out={frontAt - 4}>
           Rebuilt alone
         </Line>
-        <Line at={frontAt} x={READ_X} y={listTop + h(6)} size={26} dim={afterAt}>
+        <Line at={frontAt} x={READ_X} y={listTop + h(6)} size={26} dim={downAt}>
           <Code>--select +fct_orders</Code>
         </Line>
-        <Line at={fourAt} x={READ_X} y={listTop + h(54)} color={INK_SOFT} dim={afterAt}>
+        <Line at={fourAt} x={READ_X} y={listTop + h(54)} color={INK_SOFT} dim={downAt}>
           All {up.models.length} models<span style={{ opacity: ease(frame, orderAt, 10) }}>, in order</span>
         </Line>
         <Line at={afterAt} x={READ_X + 420} y={listTop + h(6)} size={26}>
           <Code>--select fct_orders+</Code>
         </Line>
-        <Line at={afterAt + 8} x={READ_X + 420} y={listTop + h(54)} color={INK_SOFT}>
-          The fact and the dashboard
+        <Line at={downAt + 8} x={READ_X + 420} y={listTop + h(54)} color={INK_SOFT}>
+          The fact, and the dashboard it reaches
         </Line>
         <Line at={q4At} x={READ_X} y={listTop + h(54) + h(40)} color={INK_SOFT}>
           Question 4&rsquo;s count of what a change rebuilds

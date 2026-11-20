@@ -10,7 +10,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { READINGS, REVIEW } from "./data";
-import { artBox, Chip, Clear, Cross, Drift, Listing, listingWidth, Mark, OK_INK, spanAt, Spot, X0 } from "./parts";
+import { artBox, Chip, Clear, Cross, Drift, Listing, listingHeight, listingWidth, Mark, OK_INK, spanAt, Spot, X0 } from "./parts";
 
 const SIZE = 20;
 const R_X = 1190;
@@ -99,13 +99,14 @@ export const ReviewScene: React.FC = () => {
   const hereAt = n.word("review-pair", "Here,");
   const lateAt = n.word("review-pair", "one order arrives late");
   const twoDaysAt = n.word("review-pair", "two days before the newest row loaded");
-  const strictAt = n.word("review-pair", "A filter for dates after");
-  const missesAt = n.word("review-pair", "misses it");
-  const lookAt = n.word("review-pair", "A three-day lookback catches it");
-  const rereadAt = n.word("review-pair", "reads three orders it already loaded");
-  const appendsAt = n.word("review-pair", "appends them a second time");
-  const tenAt = n.word("review-pair", "ten rows for seven orders");
-  const withKeyAt = n.word("review-pair", "With the key, seven");
+  const strictAt = n.word("review-strict", "A filter for dates after");
+  const missesAt = n.word("review-strict", "misses it");
+  const lookAt = n.word("review-look", "A three-day lookback catches it");
+  const catchesAt = n.word("review-look", "catches it");
+  const rereadAt = n.word("review-look", "reads three orders it already loaded");
+  const appendsAt = n.word("review-look", "appends them a second time");
+  const tenAt = n.word("review-look", "ten rows for seven orders");
+  const withKeyAt = n.word("review-look", "With the key, seven");
   const dupFrom = n.beat("review-dup").from;
   const dupAt = n.word("review-dup", "Duplication");
   const nameAt = n.word("review-dup", "under another name");
@@ -123,6 +124,7 @@ export const ReviewScene: React.FC = () => {
   const configAt = lineOf2(lines, "config(");
   const whereAt = lineOf2(lines, "where ");
   const fromLine = lineOf2(lines, "from ");
+  const selectLine = lineOf2(lines, "select order_id");
   const configIns = insertion(lines[configAt], REVIEW.reviewed[lineOf2(REVIEW.reviewed, "config(")]);
   const whereIns = insertion(lines[whereAt], REVIEW.reviewed[lineOf2(REVIEW.reviewed, "where ")]);
   const sourceCall = REVIEW.reviewed[lineOf2(REVIEW.reviewed, "from ")].replace(/^from /, "");
@@ -135,7 +137,7 @@ export const ReviewScene: React.FC = () => {
     { t: "Grain", why: "no unique test", at: grainAt, markAt: uniqueAt },
     { t: "References", why: "a hard-coded schema", at: refsAt, markAt: hardAt },
     { t: "Incremental logic", why: "no lookback, no key", at: incrAt, markAt: incrAt + 10 },
-    { t: "Duplication", why: "revenue exists already", at: dupAt, markAt: nameAt },
+    { t: "Duplication", why: "does it exist already?", at: dupAt, markAt: undefined },
     { t: "Tests and docs", why: "", at: testsAt, markAt: undefined },
   ];
   const itemTop = top + h(46);
@@ -181,8 +183,16 @@ export const ReviewScene: React.FC = () => {
 
         {/* The model as the assistant wrote it, and the review's edits. */}
         <Ink at={checklistAt - 6} dur={12} style={{ left: X0, top: top - h(42) }}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>The model an assistant wrote</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            The model an assistant wrote<span style={{ color: OK_INK, opacity: ease(frame, lookbackAt, 10) }}> · reviewed</span>
+          </span>
         </Ink>
+        {/* The grain: one row per order_id, and nothing proving it. */}
+        <Clear at={pairFrom}>
+          <Ink at={uniqueAt} dur={12} style={{ left: X0, top: top + listingHeight(lines.length, SIZE) + h(24) }}>
+            <span style={{ ...line24, color: ACCENT_INK }}>No unique test on order_id</span>
+          </Ink>
+        </Clear>
         <Listing
           lines={lines}
           x={X0}
@@ -193,7 +203,7 @@ export const ReviewScene: React.FC = () => {
           at={checklistAt - 4}
           step={2}
           marks={[
-            { line: lines[configAt], at: grainAt + 6, out: refsAt },
+            { line: lines[selectLine], text: "order_id", at: grainAt + 6, out: refsAt },
             { line: lines[fromLine], text: hard, at: hardAt + 6, kind: "under" },
             { line: lines[whereAt], at: incrAt, out: lookbackAt },
           ]}
@@ -261,7 +271,7 @@ export const ReviewScene: React.FC = () => {
             if (frame < at) return null;
             const cx = dayX(o.date);
             const cy = dotRow(stack(o.id));
-            const missed = REVIEW.strict.missing.includes(o.id) && frame >= missesAt && frame < lookAt + 10;
+            const missed = REVIEW.strict.missing.includes(o.id) && frame >= missesAt && frame < catchesAt + 6;
             const reread = REVIEW.append.repeats.includes(o.id) && frame >= rereadAt;
             const late = o.id === REVIEW.lateId;
             const ring = missed ? ACCENT : reread ? ds("yellow", 600) : late && frame >= twoDaysAt ? INK : null;
@@ -293,11 +303,14 @@ export const ReviewScene: React.FC = () => {
             );
           })}
           <Ink at={missesAt} dur={12} style={{ left: dayX(REVIEW.lateDate) + 32, top: dotRow(1) - 16 }}>
-            <span style={{ ...label(21, ACCENT_INK), whiteSpace: "nowrap", opacity: 1 - ease(frame, lookAt, 10) }}>missed</span>
+            <span style={{ ...label(21, ACCENT_INK), whiteSpace: "nowrap", opacity: 1 - ease(frame, catchesAt, 10) }}>missed</span>
+          </Ink>
+          <Ink at={catchesAt + 6} dur={12} style={{ left: dayX(REVIEW.lateDate) + 32, top: dotRow(1) - 16 }}>
+            <span style={{ ...label(21, OK_INK), whiteSpace: "nowrap" }}>caught</span>
           </Ink>
           <Ink at={twoDaysAt} dur={12} style={{ left: X0, top: y(598) + h(38) }}>
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-              Order {REVIEW.lateId} is dated {day(REVIEW.lateDate)}, {REVIEW.daysLate} days before
+              Order {REVIEW.lateId} is dated {day(REVIEW.lateDate)}, {REVIEW.daysLate} days before {day(REVIEW.newestLoaded)}
             </span>
           </Ink>
 
@@ -320,7 +333,10 @@ export const ReviewScene: React.FC = () => {
           </Ink>
         </Clear>
 
-        {/* The second revenue. */}
+        {/* The second revenue: an example, not a defect of the model above. */}
+        <Ink at={nameAt} dur={12} style={{ left: X0, top: y(700) - h(46) }}>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>For example</span>
+        </Ink>
         <div style={{ position: "absolute", left: X0, top: y(700), display: "flex", alignItems: "center", gap: 28, fontSize: 26, opacity: ease(frame, nameAt, 12) }}>
           <MetricChip name="net_revenue" value={READINGS.governed.toFixed(2)} tone="green" note="governed" show={ease(frame, nameAt, 12)} noteShow={ease(frame, governedAt, 10)} />
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, secondAt, 10) }}>already exists</span>

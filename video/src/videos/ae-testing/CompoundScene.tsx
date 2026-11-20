@@ -93,7 +93,8 @@ export const CompoundScene: React.FC = () => {
 
   // ── The pair: the page's YAML, and the singular test that groups by both ──
   const pair = COMPOUND.pair;
-  const pairTop = y(570);
+  // Clear of the YAML listing above: at least 40px between the two groups.
+  const pairTop = y(600);
   const pairW = listingWidth(pair.sql, SIZE);
   const prg = resultGeometry(X0 + pairW + 28, pairTop, pair.result.cols, pair.result.rows, h, 20);
 

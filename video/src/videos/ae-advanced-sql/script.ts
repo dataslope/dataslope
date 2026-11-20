@@ -40,7 +40,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   CTE, and when do you prefer it over a subquery? ("r-cte"); 17. What is a
  *   recursive CTE, and when do you need one? ("r-recursive"); 18. How do you
  *   pivot rows into columns? ("r-pivot"); 19. How do you unpivot columns into
- *   rows? ("r-unpivot").
+ *   rows? ("r-unpivot"). Question 17's answer runs on into "r-depth" (when
+ *   you need one: a depth not known in advance).
  *
  * Why these twelve go deep: each has a mechanism or a trap an interviewer
  * follows up on (the error a grouped window raises, the tie that RANK keeps
@@ -178,9 +179,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     r-unpivot: the four-row pivot turned back into eight rows by the
  *     page's CROSS JOIN LATERAL (VALUES ...).
  *   next: the RapidFire list complete; NextLine "Next: warehouses and what
- *     they cost". ("These tables held a few dozen rows each": every table
- *     on screen; the million IDs behind DuckDB's estimate are a count, not a
- *     table shown.)
+ *     they cost". ("small", "These tables held a few dozen rows at most": the
+ *     largest table on screen holds 24 rows; the million IDs behind DuckDB's
+ *     estimate are a count, not a table shown.)
  *
  * Facts. Every statement ran, by check.mjs into results.json, which data.ts
  * reads: in Postgres (PGlite 0.5.16, PostgreSQL 18.6, the engine the page's
@@ -335,7 +336,7 @@ export const script: NarrationScript = {
     {
       id: "over-default",
       text: "Nobody wrote that frame. With order by, the default runs from the start of the partition to the current row, and question seven shows what it does with ties.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.2,
     },
     {
       id: "mix",
@@ -452,7 +453,7 @@ export const script: NarrationScript = {
     {
       id: "frame-default",
       text: "Leave the frame out, and you get range. On a date with several events, that's the total including the rest of the day, not the total so far.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "frame-pick",
@@ -601,8 +602,13 @@ export const script: NarrationScript = {
     },
     {
       id: "r-recursive",
-      text: "Question seventeen. What is a recursive CTE, and when do you need one? It refers to itself. An anchor query seeds it, and a recursive one adds rows from the last pass until a pass adds none. Here it counts to five; on an org chart, it walks twenty-four people down five levels.",
-      pauseAfter: 0.7,
+      text: "Question seventeen. What is a recursive CTE, and when do you need one? It refers to itself. An anchor query seeds it, and a recursive one adds rows from the last pass until a pass adds none.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "r-depth",
+      text: "Here it counts to five. You need one when the depth isn't known in advance: on an org chart, it walks twenty-four people down five levels.",
+      pauseAfter: 1.4,
     },
     {
       id: "r-pivot",
@@ -614,9 +620,10 @@ export const script: NarrationScript = {
       text: "Question nineteen. How do you unpivot columns into rows? Union all one select per column, or in Postgres, one lateral values list: four regions with two quarter columns become eight rows. Sources often arrive wide, and models want them long.",
       pauseAfter: 1.0,
     },
+    { id: "small", text: "These tables held a few dozen rows at most." },
     {
       id: "next",
-      text: "These tables held a few dozen rows each. In a warehouse, the same SQL scans real tables, and someone pays for the scan. Next: warehouses and what they cost.",
+      text: "In a warehouse, the same SQL scans real tables, and someone pays for the scan. Next: warehouses and what they cost.",
     },
   ],
 };

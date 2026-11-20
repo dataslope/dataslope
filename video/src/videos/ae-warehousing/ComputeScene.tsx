@@ -25,6 +25,8 @@ const TICK_W = 11;
 const TICK_H = 30;
 const RESULT_X = TICK_X + 60 * TICK_PITCH + 26;
 const LEVER_Y = 838;
+/** The wait before a suspend: billed like the busy minutes, drawn lighter. */
+const WAIT = ds("green", 300);
 /** The two minutes of the hour the dashboard keeps the cluster busy. */
 const BUSY = [14, 44];
 
@@ -33,7 +35,8 @@ const BUSY = [14, 44];
  * Snowflake's credits per second while running, BigQuery's bytes scanned (or
  * reserved slots), Redshift's provisioned nodes. Then the video's own model:
  * an hour as sixty minute ticks, two of them busy. Billed by time and left
- * running, all sixty count, in red; suspended when idle, the two, in green;
+ * running, all sixty count, in red; suspended when idle, the two, in green,
+ * and the wait before each suspend, billed too, a lighter tick after each;
  * billed by bytes on demand, the idle minutes cost nothing and only the scan
  * counts. Then the lever each billing model rewards.
  */
@@ -56,11 +59,12 @@ export const ComputeScene: React.FC = () => {
   const busyAt = n.word("compute-model", "busy for two minutes an hour");
   const leftAt = n.word("compute-model", "Billed by time and left running");
   const sixtyAt = n.word("compute-model", "sixty minutes");
-  const suspendAt = n.word("compute-model", "Suspended when idle");
-  const twoAt = n.word("compute-model", "about two");
-  const bytesAt = n.word("compute-model", "Billed by bytes on demand");
-  const idleAt = n.word("compute-model", "idle time costs nothing");
-  const scanAt = n.word("compute-model", "only the scan counts");
+  const suspendAt = n.word("compute-suspend", "Suspended when idle");
+  const twoAt = n.word("compute-suspend", "about two");
+  const waitAt = n.word("compute-suspend", "plus the wait before each suspend");
+  const bytesAt = n.word("compute-bytes", "Billed by bytes on demand");
+  const idleAt = n.word("compute-bytes", "idle time costs nothing");
+  const scanAt = n.word("compute-bytes", "only the scan counts");
   const mattersAt = n.word("compute-lever", "the billing model matters");
   const scannedAt = n.word("compute-lever", "less data scanned");
   const timeAt = n.word("compute-lever", "less compute time");
@@ -96,10 +100,16 @@ export const ComputeScene: React.FC = () => {
     {
       label: "Suspended when idle",
       at: suspendAt,
-      tick: (min) => (BUSY.includes(min) ? { color: OK, on: ease(frame, suspendAt + 6 + BUSY.indexOf(min) * 4, 8) } : null),
+      tick: (min) => {
+        if (BUSY.includes(min)) return { color: OK, on: ease(frame, suspendAt + 6 + BUSY.indexOf(min) * 4, 8) };
+        // The wait before each suspend, billed too: a lighter tick after each busy one.
+        const after = BUSY.findIndex((b) => min > b && min <= b + m.suspendWaitMinutes);
+        return after >= 0 ? { color: WAIT, on: ease(frame, waitAt + 4 + after * 4, 8) } : null;
+      },
       result: (
         <span style={{ color: OK_INK }}>
           about <Num>{m.busyMinutes}</Num> min
+          <span style={{ opacity: ease(frame, waitAt, 10) }}>, plus each wait</span>
         </span>
       ),
       resultAt: twoAt,
@@ -123,6 +133,7 @@ export const ComputeScene: React.FC = () => {
       <Sfx name="el-tap" at={busyAt + 6} level={-34} />
       <Sfx name="el-sprinkle" at={leftAt + 6} level={-33} />
       <Sfx name="el-tap" at={suspendAt + 6} level={-34} />
+      <Sfx name="el-tap" at={waitAt + 4} level={-35} />
       <Sfx name="el-pencil" at={bytesAt + 4} level={-35} />
       <Sfx name="el-pencil" at={scannedAt} level={-35} />
       <Sfx name="el-pencil" at={timeAt} level={-35} />
@@ -146,7 +157,7 @@ export const ComputeScene: React.FC = () => {
         {[
           { name: "Snowflake", line: "Credits per second while running", at: snowAt, lineAt: secondAt },
           { name: "BigQuery", line: "Bytes scanned, or reserved slots", at: bqAt, lineAt: bqAt + 10 },
-          { name: "Redshift", line: "Provisioned nodes (or serverless RPUs)", at: rsAt, lineAt: rsAt + 10 },
+          { name: "Redshift", line: "Provisioned nodes, or Serverless capacity (RPUs)", at: rsAt, lineAt: rsAt + 10 },
         ].map((c, i) => (
           <React.Fragment key={c.name}>
             <Note at={c.at - 2} x={COL_X[i]} y={y(HEAD_Y)}>

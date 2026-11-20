@@ -22,7 +22,8 @@ const Name: React.FC<{ at: number; x: number; y: number; color?: string; out?: n
 /**
  * Questions 9 and 10, on two targets side by side under a hairline: dev,
  * Alice's own schema, and prod, the production one, each a database, a
- * schema and credentials. One `ref('stg_orders')` resolves to
+ * schema and credentials; both targets in profiles.yml, picked with
+ * --target, and the hosted platform's name for the split, environments. One `ref('stg_orders')` resolves to
  * `dbt_alice.stg_orders` under dev and `analytics.stg_orders` under prod
  * (drawn from the page's two names; dbt does not run here). Hardcoded, Alice's
  * model reads prod's table, a red arrow across the gap. Then the schema
@@ -47,6 +48,10 @@ export const EnvScene: React.FC = () => {
   const devAt = n.word("env", "dev, where each developer");
   const ownAt = n.word("env", "their own schema");
   const prodAt = n.word("env", "and prod");
+  const profileAt = n.word("env-profile", "a target in your profile");
+  const flagAt = n.word("env-profile", "picked with the target flag");
+  const platformAt = n.word("env-profile", "the hosted dbt platform");
+  const envsAt = n.word("env-profile", "as environments");
   const resolvesAt = n.word("env-ref", "Ref resolves to the active target's schema");
   const aliceAt = n.word("env-ref", "reads Alice's schema in development");
   const nightlyAt = n.word("env-ref", "the production schema in the nightly job");
@@ -138,11 +143,15 @@ export const EnvScene: React.FC = () => {
         <Line at={prodAt + 4} x={COL[1]} y={schemaY} size={24}>
           Schema <Code color={BLUE_INK}>analytics</Code>
         </Line>
-        <Line at={ownAt + 4} x={COL[0]} y={restY} color={INK_SOFT}>
-          Plus its own database and credentials
+        {/* Where they live: targets in a profile; the platform's environments. */}
+        <Line at={profileAt} x={COL[0]} y={restY} color={INK_SOFT}>
+          Both are targets in <Code color={INK}>profiles.yml</Code>
+          <span style={{ opacity: ease(frame, flagAt, 10) }}>
+            , picked with <Code color={INK}>--target</Code>
+          </span>
         </Line>
-        <Line at={prodAt + 8} x={COL[1]} y={restY} color={INK_SOFT}>
-          Plus its own database and credentials
+        <Line at={platformAt} x={COL[1]} y={restY} color={INK_SOFT}>
+          On the hosted dbt platform: <span style={{ opacity: ease(frame, envsAt, 10) }}><Mark at={envsAt + 4}>environments</Mark></span>
         </Line>
         <VRule x={ruleX} top={headY} bottom={restY + h(30)} at={twoAt + 6} />
 
