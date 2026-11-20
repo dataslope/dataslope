@@ -425,7 +425,7 @@ CREATE VIEW fraud_summary AS
 const CREDIT_CARD_TABS: QueryTabSeed[] = [
   {
     title: "Explore users",
-    code: `-- Explore the users table\nSELECT *\nFROM users\nLIMIT 10;`,
+    code: `-- Explore the users table\nSELECT *\nFROM users\nORDER BY user_id\nLIMIT 10;`,
   },
   {
     title: "Flagged transactions",

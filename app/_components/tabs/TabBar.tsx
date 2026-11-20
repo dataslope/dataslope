@@ -60,7 +60,29 @@ export function TabBar({
     const el = stripRef.current?.querySelector<HTMLElement>(
       `[data-tab-id="${(window.CSS?.escape ?? ((s: string) => s))(activeTabId)}"]`,
     );
-    el?.scrollIntoView({ inline: "nearest", block: "nearest" });
+    if (!el) return;
+    const reveal = () =>
+      el.scrollIntoView({ inline: "nearest", block: "nearest" });
+    reveal();
+    // A tab that has just mounted is still growing in (`playground-tab-appear`
+    // animates its max-width up from 0), so that first reveal only uncovers
+    // its starting width and the rest of it, close button included, ends up
+    // under the "+" button. Reveal it again once it has reached full width.
+    const growing = el.getAnimations?.() ?? [];
+    if (growing.length === 0) return;
+    let cancelled = false;
+    Promise.all(growing.map((a) => a.finished)).then(
+      () => {
+        if (!cancelled) reveal();
+      },
+      () => {
+        // Cancelled (the tab closed or re-rendered mid-animation): nothing
+        // left to reveal.
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
   }, [activeTabId, tabs.length]);
 
   const strip = (

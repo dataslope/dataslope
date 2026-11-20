@@ -541,11 +541,12 @@
   white-space: nowrap;
 }
 
+/* Lowercase, like the results grid's header and the Add Row labels: one
+   spelling of a type name wherever it is only being shown. */
 .sql-tree-column-type {
   color: var(--text-dim);
   font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  text-transform: lowercase;
   flex-shrink: 0;
   /* Push the type label to the right edge of the column row so the
      name and type never compete for the same horizontal space. */
@@ -621,8 +622,7 @@
   font-weight: 400;
   font-size: 10px;
   color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  text-transform: lowercase;
 }
 
 .sql-tree-column-loading {
@@ -2033,7 +2033,6 @@ html[data-playground-theme="light"] .sql-result-ok {
 }
 
 .sql-modify-drawer-close:hover {
-  background: var(--bg3);
   color: var(--text);
 }
 
@@ -2660,11 +2659,13 @@ html[data-playground-theme="light"] .sql-result-ok {
   white-space: nowrap;
 }
 
+/* Lowercase, like the results grid's header and the schema tree: one
+   spelling of a type name wherever it is only being shown. */
 .sql-add-row-field-type {
-  font-size: 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
   color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  text-transform: lowercase;
 }
 
 .sql-add-row-field-input {
@@ -2675,34 +2676,118 @@ html[data-playground-theme="light"] .sql-result-ok {
   min-width: 0;
 }
 
-.sql-add-row-field input {
+.sql-add-row-field input,
+.sql-add-row-select-trigger {
   flex: 1;
   min-width: 0;
 }
 
-/* Per-field NULL / empty-string switch. */
-.sql-add-row-empty-toggle {
-  flex-shrink: 0;
-  font-family: var(--font-mono);
+/* A blank required field after Add Row was pressed. */
+.sql-add-row-field [aria-invalid="true"] {
+  box-shadow: 0 0 0 1.5px var(--red);
+}
+
+.sql-add-row-missing {
+  margin: 12px 0 0;
   font-size: 12px;
+  color: var(--red);
+}
+
+html[data-playground-theme="light"] .sql-add-row-missing {
+  color: var(--ds-red-ink);
+}
+
+/* Boolean fields: the site's own dropdown, dressed as the text inputs
+   beside it. */
+.sql-add-row-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sql-add-row-select-trigger svg {
+  flex-shrink: 0;
+  color: var(--text-dim);
+}
+
+.sql-add-row-select-placeholder {
+  color: color-mix(in srgb, var(--text-dim) 55%, transparent);
+}
+
+/* Above the drawer (z-index 401); the shared select popup sits at 200. */
+.sql-add-row-select-positioner,
+.sql-add-row-select-positioner .bui-select-popup {
+  z-index: 500;
+}
+
+/* Per-field NULL / empty-string switch. It used to read `''` alone; the
+   words say what it does, and it is a quiet text toggle until it is on. */
+.sql-add-row-empty-toggle,
+.sql-add-row-empty-slot {
+  flex-shrink: 0;
+  width: 92px;
+}
+
+.sql-add-row-empty-toggle {
+  font-family: var(--font-ui);
+  font-size: 11.5px;
   line-height: 1;
-  padding: 5px 7px;
+  padding: 7px 8px;
   border-radius: 5px;
   color: var(--text-dim);
-  background: var(--bg2);
-  border: 1px solid var(--border);
+  background: transparent;
+  border: 0;
   cursor: pointer;
+  transition:
+    color 0.12s,
+    background 0.12s;
 }
 
 .sql-add-row-empty-toggle:hover {
   color: var(--text);
-  background: var(--bg3);
 }
 
 .sql-add-row-empty-toggle.active {
-  color: var(--bg);
-  background: var(--primary);
-  border-color: var(--primary);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+html[data-playground-theme="light"] .sql-add-row-empty-toggle.active {
+  color: var(--ds-blue-700);
+}
+
+.sql-add-row-empty-toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+/* A phone has no room for a 160px label column beside the field: each label
+   goes above its field, and the toggle's spacer, which only lines up field
+   edges, gives its width back. */
+@media (max-width: 600px) {
+  .sql-add-row-field {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .sql-add-row-field-label {
+    width: auto;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .sql-add-row-empty-slot {
+    display: none;
+  }
+
+  .sql-add-row-empty-toggle {
+    width: auto;
+  }
 }
 
 .sql-add-row-another {
@@ -6107,4 +6192,73 @@ html[data-playground-theme="light"]
 .sql-import-warning,
 .sql-cell-modal-error {
   border: 0;
+}
+
+/* Close buttons are bare icons, like the editor's format and history
+   buttons: no chip at rest, and hover lifts only the icon's colour. The
+   dialogs and drawers already had the bare icon and only filled on hover;
+   the Workspaces dialog and the mobile menu sheet drew a grey disc, and the
+   Settings tab's close filled on hover. */
+.settings-close,
+.settings-close:hover,
+.settings-tabs-close:hover {
+  background: transparent;
+}
+
+.settings-close:hover,
+.settings-tabs-close:hover {
+  color: var(--text);
+}
+
+/* ─── Results pager on a phone ───
+   The pager wrapped wherever its items ran out of room: the filter, page
+   size and page controls filled the first row, which squeezed the row count
+   ("Rows 1–10 of 10") to nothing, and Refresh and Download dropped onto a
+   second row of their own. It now breaks on purpose: the filter with the
+   two actions that act on the whole result, then the count with the paging
+   controls. The page-size select keeps its accessible name; its visible
+   "Rows per page" caption is what gives way. */
+@media (max-width: 768px) {
+  .sql-result-pager {
+    row-gap: 0;
+  }
+
+  /* Desktop caps the filter at 140px so it does not take the footer; here
+     it has a row to itself apart from two small buttons. */
+  .sql-result-filter {
+    order: 0;
+    flex: 1 1 auto;
+    max-width: none;
+  }
+
+  .sql-result-refresh-btn {
+    order: 1;
+  }
+
+  .sql-result-export-btn {
+    order: 2;
+  }
+
+  /* The line break between the two rows. */
+  .sql-result-pager::after {
+    content: "";
+    order: 3;
+    flex-basis: 100%;
+    height: 0;
+  }
+
+  .sql-result-pager-info,
+  .sql-result-pager-size,
+  .sql-result-pager-controls {
+    order: 4;
+    margin-top: 8px;
+  }
+
+  .sql-result-pager-info {
+    flex: 1 1 auto;
+  }
+
+  .sql-result-pager-size > span {
+    display: none;
+  }
 }

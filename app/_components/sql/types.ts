@@ -191,6 +191,10 @@ export interface AddRowDialogState {
    *  the column default). A blank field is otherwise ambiguous, which left
    *  `''` — a real, distinct value for a text column — unreachable. */
   emptyAsText?: Record<string, boolean>;
+  /** Set once Add Row was pressed with a required field still blank, so the
+   *  blank required fields are marked instead of the insert being sent to
+   *  fail on the engine's NOT NULL check. */
+  showMissing?: boolean;
 }
 
 /** A single entry in the query execution history. */

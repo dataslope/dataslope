@@ -122,77 +122,8 @@ import {
   type ColumnStats,
 } from "../utils/columnStats";
 import { orderEditedStatementByPk } from "../utils/sqlAnalysis";
+import { cleanEngineError, getEngineErrorHint } from "../utils/engineErrors";
 import { DiamondMark } from "../../mdx/loadingAnimations";
-
-/** Friendly hint for a raw engine error string; shared across SQLite,
- *  DuckDB, and PostgreSQL. */
-function getEngineErrorHint(error: string): string | null {
-  // SQLite patterns
-  const nearMatch = error.match(/^near "(.+)": syntax error$/i);
-  if (nearMatch) {
-    return `Unexpected token "${nearMatch[1]}". Check for typos in SQL keywords or extra characters.`;
-  }
-  const noTableMatch = error.match(/^no such table: (.+)$/i);
-  if (noTableMatch) {
-    return `Table "${noTableMatch[1]}" does not exist. Check the Tables pane for available tables.`;
-  }
-  const noColumnMatch = error.match(/^no such column: (.+)$/i);
-  if (noColumnMatch) {
-    return `Column "${noColumnMatch[1]}" was not found. Verify column names with View Structure.`;
-  }
-  const uniqueMatch = error.match(/^UNIQUE constraint failed: (.+)$/i);
-  if (uniqueMatch) {
-    return `Duplicate value violates the UNIQUE constraint on "${uniqueMatch[1]}".`;
-  }
-  const notNullMatch = error.match(/^NOT NULL constraint failed: (.+)$/i);
-  if (notNullMatch) {
-    return `"${notNullMatch[1]}" requires a non-NULL value.`;
-  }
-  if (/^FOREIGN KEY constraint failed$/i.test(error)) {
-    return "The value does not exist in the referenced table.";
-  }
-  const ambiguousMatch = error.match(/^ambiguous column name: (.+)$/i);
-  if (ambiguousMatch) {
-    return `Column "${ambiguousMatch[1]}" is ambiguous. Use table-qualified names, e.g. table.column.`;
-  }
-  // DuckDB patterns
-  const duckdbNoTableMatch = error.match(/Table with name "(.+)" does not exist/i);
-  if (duckdbNoTableMatch) {
-    return `Table "${duckdbNoTableMatch[1]}" does not exist. Check the Tables pane for available tables.`;
-  }
-  const duckdbNoColMatch = error.match(/Referenced column "(.+)" not found in FROM clause/i);
-  if (duckdbNoColMatch) {
-    return `Column "${duckdbNoColMatch[1]}" was not found. Verify column names with View Structure.`;
-  }
-  const duckdbBinderColMatch = error.match(/Binder Error:.*column "(.+)" does not exist/i);
-  if (duckdbBinderColMatch) {
-    return `Column "${duckdbBinderColMatch[1]}" was not found. Verify column names with View Structure.`;
-  }
-  // PostgreSQL patterns
-  // Checked before the generic column patterns below, which would otherwise
-  // match this message's `column "x" is of type …` and give a hint about a
-  // missing column that exists.
-  const pgCastMatch = error.match(
-    /column "([^"]+)" (?:is of type|cannot be cast automatically to type) ([\w ]+?)(?: but expression is of type ([\w ]+))?$/im,
-  );
-  if (pgCastMatch) {
-    const [, column, targetType] = pgCastMatch;
-    return `Postgres will not convert "${column}" to ${targetType} on its own. Add a USING expression, e.g. USING ${column}::${targetType.trim().split(/\s+/)[0]}.`;
-  }
-  const pgNoTableMatch = error.match(/relation "(.+)" does not exist/i);
-  if (pgNoTableMatch) {
-    return `Table/view "${pgNoTableMatch[1]}" does not exist. Check the Tables pane for available tables.`;
-  }
-  const pgNoColMatch = error.match(/column "(.+)" does not exist/i);
-  if (pgNoColMatch) {
-    return `Column "${pgNoColMatch[1]}" was not found. Verify column names with View Structure.`;
-  }
-  const pgAmbiguousMatch = error.match(/column reference "(.+)" is ambiguous/i);
-  if (pgAmbiguousMatch) {
-    return `Column "${pgAmbiguousMatch[1]}" is ambiguous. Use table-qualified names, e.g. table.column.`;
-  }
-  return null;
-}
 
 /** Copies an error string to the clipboard with a brief confirmation. */
 function CopyErrorButton({ text }: { text: string }) {
@@ -1652,15 +1583,16 @@ function ResultViewImpl({
     );
   }
   if (result.error) {
+    const message = cleanEngineError(result.error);
     const hint = getEngineErrorHint(result.error);
     return (
       <div className="sql-result-error">
         <div className="sql-result-error-header">
           <span className="sql-result-error-title">Query failed</span>
           <span className="sql-result-error-engine">{engineLabel}</span>
-          <CopyErrorButton text={result.error} />
+          <CopyErrorButton text={message} />
         </div>
-        <pre className="sql-result-error-body">{result.error}</pre>
+        <pre className="sql-result-error-body">{message}</pre>
         {hint && <div className="sql-result-error-hint">{hint}</div>}
         {result.querySql && (
           // The statement that actually ran. With "Run selection" (or "Run

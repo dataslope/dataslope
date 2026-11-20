@@ -3332,14 +3332,19 @@ function DuckDbPlaygroundInner() {
   const submitAddRow = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine || !addRowDialog) return;
-    const { tableName, columns, values, addAnother } = addRowDialog;
+    const { tableName, columns, values, addAnother, emptyAsText } =
+      addRowDialog;
+    // Blank on a column with a default (a sequence's nextval, now(), …):
+    // omit it so the default applies. Otherwise blank means NULL, unless the
+    // field's empty-string toggle is on.
     const columnNames: string[] = [];
     const rowValues: unknown[] = [];
     for (const c of columns) {
       const raw = values[c.name] ?? "";
-      if (raw === "" && c.defaultValue !== null) continue;
+      const wantsEmptyString = raw === "" && (emptyAsText?.[c.name] ?? false);
+      if (raw === "" && c.defaultValue !== null && !wantsEmptyString) continue;
       columnNames.push(c.name);
-      rowValues.push(raw === "" ? null : raw);
+      rowValues.push(raw === "" && !wantsEmptyString ? null : raw);
     }
     try {
       await engine.insertRow(tableName, columnNames, rowValues, selectedSchemaRef.current);
@@ -5098,6 +5103,7 @@ function DuckDbPlaygroundInner() {
 
         {/* ── Add Row drawer ── */}
         <AddRowDialog
+          dialect="duckdb"
           state={addRowDialog}
           setState={setAddRowDialog}
           onSubmit={() => void submitAddRow()}

@@ -70,16 +70,16 @@ export function SqlSettingsConfirmDialogs({
             <Dialog.Backdrop className="confirm-backdrop" />
             <Dialog.Popup className="confirm-popup" role="alertdialog">
               <Dialog.Title className="confirm-title">
-                Clear all local data?
+                Delete everything saved in this browser?
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
                 This will permanently delete every saved setting, query,
                 {" "}<strong>workspace</strong>, persisted{" "}
                 <strong>database</strong>, and uploaded{" "}
                 <strong>data file</strong> across{" "}
-                <strong>all Dataslope playgrounds</strong>, including
-                localStorage, OPFS, IndexedDB, and any cached assets. The
-                page will reload immediately. This cannot be undone.
+                <strong>all Dataslope playgrounds</strong>, along with the
+                downloads this site has cached. The page will reload
+                immediately. This cannot be undone.
               </Dialog.Description>
               <div className="confirm-actions">
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
@@ -105,12 +105,12 @@ export function SqlSettingsConfirmDialogs({
           <Dialog.Backdrop className="confirm-backdrop" />
           <Dialog.Popup className="confirm-popup" role="alertdialog">
             <Dialog.Title className="confirm-title">
-              Clear all localStorage data?
+              Clear saved settings and code?
             </Dialog.Title>
             <Dialog.Description className="confirm-desc">
               Settings, saved queries, and per-database state for every
-              Dataslope playground will be erased. This action cannot be undone
-, the page will reload immediately afterwards.
+              Dataslope playground will be erased. The page reloads
+              immediately afterwards, and this can&rsquo;t be undone.
             </Dialog.Description>
             <div className="confirm-actions">
               <Dialog.Close className="confirm-btn confirm-btn-secondary">

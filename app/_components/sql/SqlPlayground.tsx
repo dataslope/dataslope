@@ -89,6 +89,7 @@ import {
 } from "./utils/importUtils";
 import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
+import { AddRowDialog } from "./components/AddRowDialog";
 import {
   findSampleDatabase,
   isSqliteSampleId,
@@ -3342,106 +3343,12 @@ function SqlPlaygroundInner() {
         </Dialog.Root>
 
         {/* ── Add Row drawer ── */}
-        <Dialog.Root
-          open={addRowDialog !== null}
-          onOpenChange={(next) => {
-            if (!next) setAddRowDialog(null);
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
-            <Dialog.Popup className="sql-modify-drawer">
-              <header className="sql-modify-drawer-header">
-                <div className="sql-modify-drawer-heading">
-                  <Dialog.Title className="sql-modify-drawer-title">
-                    Add Row
-                  </Dialog.Title>
-                  <Dialog.Description className="sql-modify-drawer-subtitle">
-                    {addRowDialog?.tableName ?? ""}
-                  </Dialog.Description>
-                </div>
-                <Dialog.Close
-                  className="sql-modify-drawer-close"
-                  aria-label="Close"
-                >
-                  <X size={16} aria-hidden="true" />
-                </Dialog.Close>
-              </header>
-              {addRowDialog && (
-                <div className="sql-modify-body">
-                  <div className="sql-add-row-fields">
-                    {addRowDialog.columns.map((c) => {
-                      const hasDefault = c.defaultValue !== null;
-                      const placeholder = hasDefault
-                        ? `auto (${c.defaultValue})`
-                        : c.notNull
-                          ? "required"
-                          : "NULL if empty";
-                      return (
-                        <label key={c.name} className="sql-add-row-field">
-                          <span className="sql-add-row-field-label">
-                            <span className="sql-add-row-field-name">
-                              {c.name}
-                            </span>
-                            <span className="sql-add-row-field-type">
-                              {c.type || "—"}
-                            </span>
-                          </span>
-                          <input
-                            className="sql-rename-input"
-                            value={addRowDialog.values[c.name] ?? ""}
-                            onChange={(e) =>
-                              setAddRowDialog((prev) =>
-                                prev
-                                  ? {
-                                      ...prev,
-                                      values: {
-                                        ...prev.values,
-                                        [c.name]: e.target.value,
-                                      },
-                                    }
-                                  : null,
-                              )
-                            }
-                            placeholder={placeholder}
-                            aria-label={c.name}
-                          />
-                        </label>
-                      );
-                    })}
-                  </div>
-                  <label className="sql-add-row-another">
-                    <input
-                      type="checkbox"
-                      checked={addRowDialog.addAnother}
-                      onChange={(e) =>
-                        setAddRowDialog((prev) =>
-                          prev
-                            ? { ...prev, addAnother: e.target.checked }
-                            : null,
-                        )
-                      }
-                    />
-                    Keep open to add another row
-                  </label>
-                </div>
-              )}
-              <footer className="sql-modify-drawer-footer">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-primary"
-                  onClick={submitAddRow}
-                  disabled={!addRowDialog}
-                >
-                  Add Row
-                </button>
-              </footer>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+        <AddRowDialog
+          dialect="sqlite"
+          state={addRowDialog}
+          setState={setAddRowDialog}
+          onSubmit={submitAddRow}
+        />
 
         {/* ── Add Table drawer ── */}
         <Dialog.Root

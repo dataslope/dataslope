@@ -22,6 +22,7 @@ import {
   validateSqliteStructure,
 } from "../utils/structureValidation";
 import { dbScopedKey } from "../../sqlitePlaygroundTabs";
+import { blankMeaning } from "../components/AddRowDialog";
 
 function newDraftId(): string {
   return `c_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
@@ -464,16 +465,21 @@ export function useSidebarActions(
     const engine = engineRef.current;
     const dialog = useDialogStore.getState().addRowDialog;
     if (!engine || !dialog) return;
-    const { tableName, columns, values, addAnother } = dialog;
-    // For a blank input on a column with a DEFAULT, omit it so SQLite
-    // applies the default (otherwise we'd insert NULL).
+    const { tableName, columns, values, addAnother, emptyAsText } = dialog;
+    // A blank input on the rowid alias or on a column with a DEFAULT is
+    // omitted, so SQLite assigns the next rowid or applies the default.
+    // Otherwise blank means NULL, unless the field's empty-string toggle is
+    // on.
     const colNames: string[] = [];
     const rowValues: unknown[] = [];
     for (const c of columns) {
       const raw = values[c.name] ?? "";
-      if (raw === "" && c.defaultValue !== null) continue;
+      const wantsEmptyString = raw === "" && (emptyAsText?.[c.name] ?? false);
+      const blank = blankMeaning(c, "sqlite", columns);
+      const fillsItself = blank === "rowid" || blank === "default";
+      if (raw === "" && fillsItself && !wantsEmptyString) continue;
       colNames.push(c.name);
-      rowValues.push(raw === "" ? null : raw);
+      rowValues.push(raw === "" && !wantsEmptyString ? null : raw);
     }
     void (async () => {
     try {

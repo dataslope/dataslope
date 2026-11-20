@@ -3076,16 +3076,18 @@ function PostgresPlaygroundInner() {
     if (!engine || !addRowDialog) return;
     const { tableName, columns, values, addAnother, emptyAsText } =
       addRowDialog;
-    // For a blank input on a column with a server-side default, omit the
-    // column so the default (nextval, now(), explicit DEFAULT) applies.
-    // Otherwise blank means NULL — unless the field's `''` toggle is on, in
-    // which case blank is the empty string, which nothing else could express.
+    // For a blank input on an identity column or a column with a server-side
+    // default, omit the column so the database fills it in (the identity's
+    // next value, nextval, now(), explicit DEFAULT). Otherwise blank means
+    // NULL — unless the field's empty-string toggle is on, in which case blank
+    // is the empty string, which nothing else could express.
     const columnNames: string[] = [];
     const rowValues: unknown[] = [];
     for (const c of columns) {
       const raw = values[c.name] ?? "";
       const wantsEmptyString = raw === "" && (emptyAsText?.[c.name] ?? false);
-      if (raw === "" && c.defaultValue !== null && !wantsEmptyString) continue;
+      const fillsItself = c.identity === true || c.defaultValue !== null;
+      if (raw === "" && fillsItself && !wantsEmptyString) continue;
       columnNames.push(c.name);
       rowValues.push(raw === "" && !wantsEmptyString ? null : raw);
     }
@@ -4732,6 +4734,7 @@ function PostgresPlaygroundInner() {
 
         {/* ── Add Row drawer ── */}
         <AddRowDialog
+          dialect="postgres"
           state={addRowDialog}
           setState={setAddRowDialog}
           onSubmit={() => void submitAddRow()}
