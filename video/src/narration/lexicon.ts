@@ -66,6 +66,7 @@ export const SAY: Readonly<Record<string, string>> = {
   MLOps: "em-el-ops",
   MLflow: "em-el-flow",
   ONNX: "onyx",
+  XGBoost: "ex-gee-boost",
 };
 
 /** Longest first, so DAGs is matched before DAG. A key matches as a whole
