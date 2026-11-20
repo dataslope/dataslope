@@ -131,9 +131,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q8-paired: a 2×2 table of agreement: both right 1,806, both wrong 176,
  *     only old 4, only new 14, the two off-diagonal cells lit yellow; the
  *     paired null (PERM_MODELS.pairedNull, a narrow spike train) with the
- *     gap out in its tail, "p = 0.03", green; "Same gap, different test";
- *     "Reject at α = 5%" on "rejects the null". Not "it's real": that is the
- *     p-value's own misreading, which "q6-not" has just ruled out.
+ *     gap out in its tail, "p = 0.03 < α: reject" in green on "rejects the
+ *     null" (one line, not a new one: the page is full); "Same gap,
+ *     different test". Not "it's real": that is the p-value's own
+ *     misreading, which "q6-not" has just ruled out.
  *   q9: question card; the page's two-worlds picture: the null and
  *     alternative curves, a critical line, α (red tail) and β (red area
  *     under the alternative), power (green area).
