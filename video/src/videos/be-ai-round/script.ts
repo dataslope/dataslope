@@ -138,7 +138,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the cost and 87% of the tokens (results.json; not said). "cost-cent":
  *     3,500 over a million requests is 0.0035 dollars, "about a third of a
  *     cent" (results.json).
- *   - "inj": OWASP's ranking ([^owasp]; "the security project OWASP" is the
+ *   - "inj", "inj-rank": OWASP's ranking ([^owasp]: first in each of the
+ *     2023, 2025 and 2026 editions; "the security project OWASP" is the
  *     video's gloss), direct and indirect, the defenses, and the dangerous
  *     combination, as the page words them; the refund email is the page's own
  *     concept check, and "inj-weak" is that check's three wrong answers and
@@ -369,7 +370,15 @@ export const script: NarrationScript = {
     {
       id: "inj",
       scene: true,
-      text: "Question six. What is prompt injection, and how do you defend against it? It's input that the model follows as instructions. It's first on the twenty twenty-five top ten risks for LLM applications, from the security project OWASP.",
+      text: "Question six. What is prompt injection, and how do you defend against it? It's input that the model follows as instructions.",
+      pauseAfter: 0.35,
+    },
+    {
+      // Split from "inj" and voiced alone (2026-11-20): it named the 2025
+      // edition, and a 2026 edition has since come out with the same top
+      // entry. The page now says what stays true.
+      id: "inj-rank",
+      text: "The security project OWASP ranked it first in each of the first three editions of its top ten risks for LLM applications.",
       pauseAfter: 0.6,
     },
     {

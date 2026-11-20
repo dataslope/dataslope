@@ -673,7 +673,7 @@ search are divide and conquer; Fibonacci and Knapsack are DP.
 ### How do bit manipulation tricks speed up algorithms?
 
 Bit ops (AND, OR, XOR, shifts) are single CPU instructions. Useful tricks:
-`n & (n - 1)` clears the lowest set bit (test if power of two: `n & (n-1) == 0`),
+`n & (n - 1)` clears the lowest set bit (test if power of two: `n > 0 and n & (n - 1) == 0`),
 `x ^ x == 0` cancels pairs (find the single non-duplicate in $O(n)$ time
 and $O(1)$ space), and left-shifting by k multiplies by $2^k$. Bit sets
 can represent subsets in $O(1)$ space per subset. The `single_number`

@@ -6,7 +6,7 @@ description: Analytics Engineer interview questions on the layer that AI analyti
 Companies are putting "ask your data" assistants in front of their
 warehouses, and the assistant is only as reliable as the models and metric
 definitions underneath it. Those are an analytics engineer's work. So
-interviews now ask how you would make a dbt project safe for an LLM to query,
+interviews ask how you would make a dbt project safe for an LLM to query,
 and how you would know whether its answers are right. The skills are familiar
 (grain, tests, documentation, governed metrics); the new part is that a model
 reads them, takes them literally, and answers thousands of questions nobody
@@ -98,10 +98,11 @@ gaps, because a model will not ask:
 - **Tests that encode the facts the description claims**: primary keys
   `unique` and `not_null`, `relationships` for foreign keys, and
   `accepted_values` so the model knows the real status values.
-- **Clear access boundaries**: staging and intermediate models marked
-  `private` or `protected` (dbt's model access, which limits who may
-  `ref()` them), the assistant's warehouse role granted read access to the
-  public marts only, and deprecated models removed or marked as such.
+- **Clear access boundaries**: the assistant's warehouse role is granted
+  `SELECT` on the public marts only (dbt's `grants` config). Marking staging
+  and intermediate models `private` keeps other projects from building on
+  them, but it restricts `ref()`, not queries. Deprecated models are removed
+  or marked as such.
 - **Metrics in the semantic layer** for every number the business argues about.
 - **Freshness**: source freshness checks, so an answer can say "as of" and the
   assistant can refuse to answer from stale data.
@@ -112,7 +113,8 @@ models:
     description: >
       One row per order. For revenue, use the net_revenue metric,
       which excludes refunded and cancelled orders and test accounts.
-    access: public
+    config:
+      access: public
     columns:
       - name: order_id
         description: Primary key.
@@ -121,7 +123,8 @@ models:
         description: Lifecycle state at the latest load.
         data_tests:
           - accepted_values:
-              values: [completed, refunded, cancelled]
+              arguments:
+                values: [completed, refunded, cancelled]
 ```
 
 One caution: documentation becomes an input, so a wrong description now
@@ -150,9 +153,9 @@ With a golden set of real questions whose answers you have verified:
 
 Through the same interfaces BI tools use: a semantic layer API that takes
 metric and dimension names and returns results, and catalog metadata for
-discovery. The Model Context Protocol (MCP) has become a common way to expose
-those to assistants, and dbt Labs publishes an MCP server for project metadata
-and Semantic Layer queries. Design points interviewers look for:
+discovery. The Model Context Protocol (MCP) is a common way to expose those to
+assistants, and dbt publishes an MCP server for project metadata and Semantic
+Layer queries. Design points interviewers look for:
 
 - **The assistant runs as the user**, with the user's row-level and column-level
   permissions, never a superuser service account.
@@ -215,8 +218,8 @@ models tend to get wrong:
   > More randomness increases the chance of picking the wrong model.
 - Renaming the mart to a longer, more descriptive name.
   > Helpful at the margin, but the model can still see and query the intermediate one.
-- [o] Restricting the intermediate model's access so only public marts are exposed.
-  > Access boundaries remove the option entirely, which beats hoping the model chooses well.`}
+- [o] Granting the assistant's warehouse role access to the published marts only.
+  > Removing the option at the warehouse beats hoping the model chooses well. A dbt \`access\` modifier alone restricts \`ref()\`, not queries.`}
 />
 
 ## Go deeper

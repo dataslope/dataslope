@@ -249,7 +249,7 @@ n = 500
 X = rng.normal(10, 3, n)          # pre-experiment covariate
 Y = 0.7 * X + rng.normal(0, 2, n) # outcome correlated with X
 
-theta = np.cov(Y, X)[0, 1] / np.var(X)
+theta = np.cov(Y, X)[0, 1] / np.var(X, ddof=1)
 Y_adj = Y - theta * (X - X.mean())
 print(f"Original variance: {Y.var():.2f}")
 print(f"CUPED variance:    {Y_adj.var():.2f}")  # should be lower
@@ -355,7 +355,7 @@ It is especially important for small experiments where chance imbalances can ske
 
 ### What is a Switchback experiment?
 
-A **switchback experiment** (also called a time-series or interleaved design) alternates the treatment and control conditions over time periods rather than across users simultaneously.
+A **switchback experiment** (also called a time-split design) alternates the treatment and control conditions over time periods rather than across users simultaneously.
 It is used when user-level randomization is infeasible (e.g., marketplace experiments where supply and demand are coupled).
 Analysis must account for carryover effects between periods.
 

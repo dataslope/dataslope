@@ -214,9 +214,9 @@ SELECT * FROM dim_customer ORDER BY customer_id;`}
 `MERGE` matches source rows against a target on a key: matched rows `UPDATE`,
 unmatched rows `INSERT`. Because it keys on the unique id, rerunning the same
 batch overwrites in place instead of duplicating, which is what makes it
-idempotent. It is what dbt's `merge` incremental strategy runs for a model
-with a `unique_key`; whether a model uses `merge`, `delete+insert` or another
-strategy depends on the adapter and the model's config.
+idempotent. This is what dbt's `merge` incremental strategy generates for a
+model with a `unique_key`; other strategies, such as delete-then-insert, reach
+the same end state.
 
 ```sql
 -- Upsert: Snowflake, BigQuery and Postgres all accept this form

@@ -229,16 +229,16 @@ says otherwise.
 />
 
 <MultipleChoice
-  markdown={`\`SELECT AVG(rating) FROM reviews\` returns \`4\` when you expected \`4.33\`. What is the likely cause?
+  markdown={`On Postgres, \`SELECT SUM(rating) / COUNT(rating) FROM reviews\` returns \`4\` when you expected \`4.33\`. What is the likely cause?
 
-- \`AVG\` rounds to the nearest whole number by design.
-  > \`AVG\` returns the true mean; the rounding comes from the type it was given.
+- The \`/\` operator rounds to the nearest whole number by design.
+  > It never rounds. With two integer operands it truncates, and with a decimal operand it keeps the fraction.
 - [o] \`rating\` is an integer column.
-  > The division is therefore integer division on some engines. Cast first: \`AVG(rating * 1.0)\` or \`AVG(CAST(rating AS DECIMAL))\`. The same trap turns a conversion rate into \`0\`.
-- \`AVG\` requires an \`ORDER BY\` to be accurate.
-  > Ordering has no bearing on an average.
-- The column contains \`NULL\`s, which \`AVG\` counts as zero.
-  > \`AVG\` skips \`NULL\`s entirely rather than treating them as zero.`}
+  > \`SUM\` and \`COUNT\` are then both integers, and Postgres (like SQL Server and SQLite) truncates integer division. Cast one side first, \`SUM(rating) * 1.0 / COUNT(rating)\`, or use \`AVG(rating)\`, which returns a decimal on Postgres. The same trap turns a conversion rate into \`0\`.
+- The division requires an \`ORDER BY\` to be accurate.
+  > Ordering has no bearing on a sum or a count.
+- The column contains \`NULL\`s, which \`SUM\` counts as zero.
+  > \`SUM\` and \`COUNT(rating)\` both skip \`NULL\`s entirely rather than treating them as zero.`}
 />
 
 ## Advanced SQL
@@ -370,7 +370,7 @@ says otherwise.
 - \`GROUP BY category HAVING COUNT(*) <= 3\`
   > This filters categories by how many products they have, and returns no product rows at all.
 - [o] \`ROW_NUMBER()\` partitioned by category, filtered to \`<= 3\`.
-  > The filter has to sit outside the window's own \`SELECT\`, or in \`QUALIFY\` where it exists. Numbering restarts inside each category, and the filter has to sit outside the window's own \`SELECT\` (or in \`QUALIFY\`, where it exists).`}
+  > Numbering restarts inside each category, and the filter has to sit outside the window's own \`SELECT\` (or in \`QUALIFY\`, where it exists).`}
 />
 
 <MultipleChoice
@@ -419,7 +419,7 @@ says otherwise.
   > \`LIMIT 1\` applies to the entire result, leaving one row overall.
 - [o] \`ROW_NUMBER()\` per customer, newest first, filtered to \`= 1\`.
   > The whole winning row survives intact. \`RANK\` would be the wrong choice here: ties would return several rows per customer.
-- \`SELECT DISTINCT customer_id, MAX(updated_at) FROM events\`.
+- \`SELECT customer_id, MAX(updated_at) FROM events GROUP BY customer_id\`.
   > This returns the timestamp but discards every other column of the winning row.
 - \`SELECT DISTINCT ON\` is the only portable way to do it.
   > \`DISTINCT ON\` does solve it, but it is a Postgres/DuckDB extension rather than the portable answer.`}
@@ -470,7 +470,7 @@ says otherwise.
   markdown={`What does \`pd.concat([df1, df2])\` do by default?
 
 - [o] Stacks them vertically, aligning on column names.
-  > The original index values are kept, so \`ignore_index=True\` is usually wanted. The default is \`axis=0\`. Duplicate index labels are preserved, so \`ignore_index=True\` is usually wanted after a vertical stack.
+  > The default is \`axis=0\`. The original index labels are kept, duplicates included, so \`ignore_index=True\` is usually wanted after a vertical stack.
 - Joins them side by side on the index.
   > Concatenating along the columns needs \`axis=1\`.
 - Merges them on a shared key column.
@@ -480,10 +480,10 @@ says otherwise.
 />
 
 <MultipleChoice
-  markdown={`\`df[df["region"] == "North"]["amount"] = 0\` raises a \`SettingWithCopyWarning\` and the DataFrame is unchanged. Why?
+  markdown={`\`df[df["region"] == "North"]["amount"] = 0\` runs, pandas warns about chained assignment, and the DataFrame is unchanged. Why?
 
-- [o] Chained indexing may produce a copy, not a view.
-  > The assignment can then land on a temporary rather than on \`df\`. Write it as a single indexing operation: \`df.loc[df["region"] == "North", "amount"] = 0\`.
+- [o] Chained indexing assigns to a temporary copy.
+  > The first \`[]\` returns a new object and the second assigns into it, so \`df\` is never touched. Since pandas 3.0 that always happens and the warning is \`ChainedAssignmentError\`; before 3.0 it sometimes worked, which is what \`SettingWithCopyWarning\` flagged. Write it as a single indexing operation: \`df.loc[df["region"] == "North", "amount"] = 0\`.
 - Boolean masks are read-only in pandas.
   > Boolean masks assign fine when used inside a single \`.loc\` call.
 - \`amount\` has the wrong dtype for assignment.
@@ -500,7 +500,7 @@ says otherwise.
 - [o] Every row that contains at least one \`NaN\`, in any column.
   > The defaults are \`axis=0\` and \`how="any"\`. Use \`how="all"\` for rows that are entirely missing, or \`subset=[...]\` to restrict which columns count.
 - Nothing, unless \`inplace=True\` is passed.
-  > Without \`inplace=True\`, it returns a cleaned DataFrame and leaves \`df\` unchanged. With \`inplace=True\`, it modifies \`df\` and returns \`None\`; rebinding is not involved.
+  > Without \`inplace=True\`, it returns a cleaned DataFrame and leaves \`df\` unchanged. With \`inplace=True\`, it modifies \`df\` and returns \`None\`, though pandas 3.1 deprecates that form for \`dropna\`; assign the result back instead.
 - Every column containing at least one \`NaN\` value.
   > Dropping columns requires \`axis=1\`; the default axis is rows.`}
 />
@@ -548,7 +548,7 @@ says otherwise.
   markdown={`Why is \`df["price"] * 1.2\` preferred over looping over the rows and multiplying each one?
 
 - [o] The loop runs in compiled C rather than the interpreter.
-  > Over a contiguous array, typically 10–100x faster, and \`iterrows\` also copies each row into a new Series. It is also shorter and harder to get wrong. \`iterrows\` in particular also copies each row into a new Series.
+  > Over a contiguous array, typically 10–100x faster. It is also shorter and harder to get wrong. \`iterrows\` in particular also copies each row into a new Series.
 - Looping produces a different numerical result.
   > Both compute the same numbers; the difference is how long it takes.
 - Vectorized operations skip the missing values automatically.
@@ -580,7 +580,7 @@ says otherwise.
 - The merge dropped unmatched orders.
   > A left merge never drops left rows, and dropping could not raise the count.
 - The join key has a different dtype on each side.
-  > A dtype mismatch causes rows to fail to match, which would leave the count unchanged with \`NaN\` columns.`}
+  > pandas raises a \`ValueError\` when one key is an integer and the other a string, and a mismatch it does accept, such as int against float, can only fail to match. Neither adds rows.`}
 />
 
 <MultipleChoice
@@ -710,7 +710,7 @@ says otherwise.
 - The two variables are independent.
   > Independence is stronger than zero correlation; a perfect U-shaped relationship can correlate at \`0\` while being entirely predictable.
 - [o] There is no strong **linear** relationship.
-  > A non-linear one may still exist, which is why plotting the data matters as much as the number. Pearson's coefficient only measures straight-line association, which is why plotting the data matters as much as computing the number.
+  > A non-linear one may still exist: Pearson's coefficient only measures straight-line association, which is why plotting the data matters as much as computing the number.
 - One variable causes no change at all in the other.
   > Correlation says nothing about causation in either direction.`}
 />
@@ -760,7 +760,7 @@ says otherwise.
 - The segment was responding to a competitor's change.
   > Possible, but it invents an external cause for a pattern that noise alone produces.
 - [o] Regression to the mean, on a reading selected for being extreme.
-  > Any metric picked *because* it was extreme is partly extreme by luck, and the luck does not repeat. Any metric selected *because* it was extreme is partly extreme by luck, and the luck does not repeat. It is why "worst performers improved after the intervention" is such a weak claim.
+  > Any metric picked *because* it was extreme is partly extreme by luck, and the luck does not repeat. It is why "worst performers improved after the intervention" is such a weak claim.
 - Seasonality.
   > Seasonality could explain it, but it would move comparable segments too.
 - The metric definition changed.
@@ -857,7 +857,7 @@ says otherwise.
 - To measure how much revenue the experiment produced.
   > That is the job of a primary or secondary business metric.
 - [o] To catch collateral damage the change must not cause.
-  > Latency, refund rate, and support contacts are typical, and a primary-metric win with a guardrail regression is not a win. Latency, refund rate, unsubscribe rate, and support contacts are typical guardrails. A win on the primary metric with a guardrail regression is not a win.`}
+  > Latency, refund rate, unsubscribe rate, and support contacts are typical guardrails. A win on the primary metric with a guardrail regression is not a win.`}
 />
 
 <MultipleChoice
@@ -892,7 +892,7 @@ says otherwise.
 - Checkout conversion rate.
   > A rate tied to a specific funnel step maps directly onto actions a team can take.
 - [o] Cumulative registered accounts since launch.
-  > A cumulative total can only go up, so it looks good regardless. A cumulative total can only go up, so it looks good regardless of what is actually happening and cannot distinguish a good week from a bad one.
+  > A cumulative total can only go up, so it looks good regardless of what is actually happening and cannot distinguish a good week from a bad one.
 - Seven-day retention, split by acquisition channel.
   > Retention by cohort is one of the more decision-relevant metrics available.
 - Weekly active users for a product measured on weekly engagement.
@@ -931,7 +931,7 @@ says otherwise.
 - Nothing; small imbalances are expected.
   > Small *absolute* imbalance is not the test. What matters is how improbable the split is given the sample size.
 - [o] Treat it as a sample ratio mismatch and investigate.
-  > Bot filtering, redirect failures, and one-sided logging all produce it, and all skew the metric. At realistic sample sizes a 52/48 split is far outside chance. Bot filtering, redirect failures, and logging that fires only on one variant all produce it, and all of them skew the metric.
+  > At realistic sample sizes a 52/48 split is far outside chance. Bot filtering, redirect failures, and logging that fires only on one variant all produce it, and all of them skew the metric.
 - Stop the experiment and declare the result a null.
   > Diagnosing the cause usually salvages the experiment; discarding it loses the information.
 - Reweight the groups and read the result.
@@ -939,7 +939,7 @@ says otherwise.
 />
 
 <MultipleChoice
-  markdown={`Why is a ratio metric such as revenue-per-user awkward to test?
+  markdown={`Why is a ratio metric such as revenue-per-session awkward to test?
 
 - [o] The denominator can shift between the variants.
   > The ratio then moves without the numerator changing at all. A change that quietly suppresses low-value sessions raises revenue-per-session while total revenue falls. Reporting numerator and denominator alongside the ratio makes that visible.
@@ -1035,7 +1035,7 @@ says otherwise.
   markdown={`When is a pie chart a defensible choice?
 
 - [o] For a part-to-whole split with few, clearly different slices.
-  > Angles are hard to compare, so a pie fails once slices are numerous or similar. Angles are hard to compare precisely, so a pie survives two or three obviously different parts and fails once slices are numerous or similar.
+  > Angles are hard to compare precisely, so a pie survives two to four obviously different parts and fails once slices are numerous or similar.
 - Whenever the values are percentages.
   > Percentages alone do not make a pie readable; the number of slices and the size differences do.
 - For comparing one single category across several time periods.
@@ -1143,7 +1143,7 @@ says otherwise.
 - Legends are not supported on mobile.
   > Legends render fine; they just cost more effort to use.
 - [o] It puts the name where the reader's eye already is.
-  > No back-and-forth matching a color swatch to a line, and it survives readers who cannot distinguish the palette. It also survives readers who cannot distinguish the palette's colors, which a color-only legend does not.
+  > No back-and-forth matching a color swatch to a line, and it survives readers who cannot distinguish the palette's colors, which a color-only legend does not.
 - Legends are only for bar charts.
   > Legends are used across every chart type.`}
 />
@@ -1258,7 +1258,7 @@ says otherwise.
   markdown={`What does a pivot table's "Values" area do with a text field dropped into it?
 
 - [o] It falls back to \`Count\`, since the rest need numbers.
-  > This is why a pivot that should show revenue sometimes shows a row count instead. This is why a pivot that should show revenue sometimes shows a row count instead: the underlying column is text, usually because of a stray currency symbol or a thousands separator.
+  > This is why a pivot that should show revenue sometimes shows a row count instead: the underlying column is text, usually because of a stray currency symbol or a thousands separator.
 - It concatenates all of the text values it finds.
   > Spreadsheets offer no concatenating aggregation in a pivot's Values area.
 - It raises an error.
@@ -1277,7 +1277,7 @@ says otherwise.
 - Pivot tables cap out at 40,000 rows.
   > No such limit exists at that size.
 - [o] The pivot's source range never grew with the data.
-  > Basing it on a named table means new rows are picked up on refresh. Basing the pivot on a named table means new rows are picked up on refresh instead of silently excluded.`}
+  > Basing the pivot on a named table means new rows are picked up on refresh instead of silently excluded.`}
 />
 
 <MultipleChoice
@@ -1297,7 +1297,7 @@ says otherwise.
   markdown={`Which is the strongest sign that an analysis should move from a spreadsheet into SQL?
 
 - [o] The same manual steps repeat against a queryable source.
-  > Every refresh is a chance to make a new mistake, and none of it is reviewable. Repeated manual steps against a queryable source is the case where a spreadsheet costs the most: every refresh is a chance to make a new mistake, and none of it is reviewable.
+  > Repeated manual steps against a queryable source is the case where a spreadsheet costs the most: every refresh is a chance to make a new mistake, and none of it is reviewable.
 - The workbook contains \`VLOOKUP\` formulas.
   > Lookups are ordinary spreadsheet work and fine at small scale.
 - The file has more than ten sheets.
@@ -1452,7 +1452,7 @@ says otherwise.
 />
 
 <MultipleChoice
-  markdown={`Why do many interviewers now follow a SQL take-home with a live walkthrough of the candidate's own query?
+  markdown={`Why do many interviewers follow a SQL take-home with a live walkthrough of the candidate's own query?
 
 - To test the query's performance on a larger dataset.
   > Performance can be tested without the candidate present.

@@ -361,7 +361,9 @@ export const script: NarrationScript = {
     },
     {
       id: "batch-builtin",
-      text: "Since Python three twelve, itertools batched does exactly this.",
+      // Re-voiced 2026-11-20: it said "does exactly this", and the page's
+      // helper yields lists where itertools.batched yields tuples.
+      text: "Since Python three twelve, itertools batched does the same job, but it hands back tuples.",
       pauseAfter: 0.8,
     },
     { id: "retry-in", text: "And when a call fails, you retry it, carefully." },

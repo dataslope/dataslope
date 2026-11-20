@@ -207,7 +207,8 @@ works on the variance; correlated models are why it stops working.
 ### How does a Random Forest work?
 
 Random Forest builds many decision trees on bootstrap samples of the training data.
-At each split it considers only a random subset of features ($\sqrt{p}$ for classification, $p/3$ for regression by default), which decorrelates the trees.
+At each split it considers only a random subset of features, which decorrelates the trees.
+The classic defaults are $\sqrt{p}$ for classification and $p/3$ for regression; scikit-learn uses $\sqrt{p}$ for `RandomForestClassifier` but all $p$ features for `RandomForestRegressor`, so set `max_features` yourself for regression.
 Final predictions are made by majority vote (classification) or averaging (regression).
 The combination of row sampling and feature sampling reduces variance without greatly increasing bias.
 
@@ -492,6 +493,7 @@ rather than a minimum.
 **Elastic net** combines L1 (lasso) and L2 (ridge) penalties: $\alpha \cdot \text{L1} + (1-\alpha)\cdot \text{L2}$.
 It inherits lasso's sparsity (feature selection) and ridge's stability when features are highly correlated.
 It is useful when you have many correlated features and want a sparse but stable solution.
+In scikit-learn 1.8 and later, `LogisticRegression` chooses the mix with `l1_ratio` (0 is L2, the default; 1 is L1; anything between is elastic net) and its strength with `C`; the older `penalty=` argument is deprecated.
 
 ### What is feature selection and what methods exist?
 
@@ -589,6 +591,14 @@ flattened high is bias, and more data will not.
 **Bagged (mean decrease impurity) feature importance** from random forests counts how much each feature reduces node impurity across all trees; it is fast but biased toward high-cardinality features.
 **SHAP (SHapley Additive exPlanations)** values fairly distribute the model's prediction among features based on cooperative game theory, giving consistent, locally faithful explanations.
 SHAP is preferred for model explanation; tree impurity importance is fine for a quick relative ranking.
+
+### How do you monitor a model after it ships?
+
+A model degrades when the world moves away from its training data, so watch three things.
+**Input drift**: a feature's distribution shifts (compare production against a training reference with a population stability index or a Kolmogorov–Smirnov test).
+**Concept drift**: the relationship between features and the target changes, which only shows up in the outcome metric once labels arrive, often days later.
+**Data quality**: nulls, new categories, and broken upstream joins, which cause more incidents than either kind of drift.
+Decide in advance what triggers a retrain or a rollback; the ML Engineer track's [MLOps](/interview-prep/machine-learning-engineer/mlops) page goes deeper.
 
 ## Concept checks
 

@@ -127,6 +127,11 @@ Other levers worth naming: prefix caching for a shared system prompt, routing
 easy requests to a smaller model, distilling a large model into a small one for
 a narrow task, and streaming to cut perceived latency.
 
+On a model that reasons before it answers, the **reasoning budget** is a lever
+of its own. Reasoning tokens are generated one at a time and billed like any
+other output, so they are decode time the user waits through before the first
+visible token. Spend them on the requests that need them.
+
 ### How do you evaluate an LLM application?
 
 In layers, from cheap to expensive:
@@ -149,10 +154,11 @@ test items may have leaked into training data.
 
 ### When can you trust an LLM as a judge?
 
-Only after you have measured it. Zheng et al. documented three systematic
-biases in LLM judges: **position** (favoring the first answer shown),
-**verbosity** (favoring longer answers), and **self-enhancement** (favoring
-text from their own model family).[^judge] Mitigations:
+Only after you have measured it. Zheng et al. tested LLM judges for three
+biases: **position** (favoring the first answer shown), **verbosity**
+(favoring longer answers), and **self-enhancement** (favoring their own
+answers). They found the first two clearly; their evidence on the third was
+inconclusive, though it is still worth guarding against.[^judge] Mitigations:
 
 - Score each pair in both orders and count a win only when the verdicts agree.
 - Use a specific rubric with pass/fail criteria rather than a 1-to-10 score.
@@ -183,13 +189,19 @@ earns its latency.
 Tool calling lets a model request an action instead of answering: it emits a
 structured call (a tool name and JSON arguments), the application runs it, and
 the result goes back into the context for the next step. An **agent** is that
-loop, repeated until the model decides it is done. The Model Context Protocol
-(MCP) is an open standard for exposing tools and data sources to models, so one
-integration serves many clients.
+loop, repeated until the model decides it is done. Open protocols standardize
+both edges of it: the Model Context Protocol (MCP) exposes tools and data
+sources to a model, so one integration serves many clients, and Agent2Agent
+(A2A) lets one agent hand a task to another.
 
 Design concerns interviewers listen for: a step and cost budget; timeouts and
 retries per tool; idempotent tools, since a step may run twice; permissions
-scoped to the user; and a trace of every step for debugging. Reliability
+scoped to the user; and a trace of every step for debugging. Add prompt
+injection to that list: a tool result or a retrieved document is untrusted
+input that the model may follow as instructions, so an agent that reads
+outside content should not also hold tools that can do damage unconfirmed (the
+Backend track's [AI-assisted coding](/interview-prep/backend-engineer/ai-assisted-coding)
+page covers the defenses). Reliability
 compounds: if each step succeeds 95% of the time, a ten-step task succeeds
 about $0.95^{10} \approx 60\%$ of the time. Fewer, more reliable steps beat a
 clever long chain.

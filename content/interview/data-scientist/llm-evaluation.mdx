@@ -5,7 +5,7 @@ description: Data Scientist interview questions on measuring AI features. Eval-s
 
 When a company ships features built on large language models, someone has to
 answer "is it any good, and is the new version better?". That is a measurement
-problem, which makes it a data scientist's problem, and interviews now ask it
+problem, which makes it a data scientist's problem, and interviews ask it
 directly. The statistics are the ones you already know (sampling error,
 agreement, power, bias); what is new is applying them to outputs that are text,
 vary run to run, and are often graded by another model.
@@ -76,6 +76,14 @@ help more than brute size. **Pair the comparison**: run both versions on the
 same items and test only the items where they disagree (McNemar's test), which
 removes the item-to-item variance. And **stratify**, so a regression on a small
 but important slice is not averaged away.
+
+The binomial formula also assumes independent items with fixed scores, and
+both assumptions fail in ways interviewers probe.[^error-bars] If items come
+in groups (several questions about one document, several turns of one
+conversation), they are not independent, so cluster the standard error on the
+group or the interval will be too narrow. And because the same input can
+score differently on a rerun, sample each item several times and average per
+item before computing the interval.
 
 ### How do you know whether an LLM judge can be trusted?
 
@@ -172,6 +180,18 @@ places assistants tend to slip:
 Then reproduce the headline number by an independent route, such as a second
 query, a different tool, or a total someone else already trusts.
 
+### How do you evaluate a retrieval-augmented (RAG) feature?
+
+Score the two stages separately, because they fail differently. For
+retrieval: is the retrieved context relevant to the question, and did the
+passage that holds the answer make the cut? For generation: is every claim in
+the answer supported by that context (**faithfulness**), and does the answer
+address the question (**answer relevance**)? A wrong answer with good context
+is a generation problem; a faithful answer to bad context is a retrieval
+problem, and only the split tells you which to fix. The
+[ML Engineer track](/interview-prep/machine-learning-engineer/llm-systems-and-evals)
+covers the retrieval metrics.
+
 ### What is benchmark contamination, and why does it matter to you?
 
 If a public benchmark's test items appeared in a model's training data, its
@@ -216,7 +236,7 @@ and never feed it into fine-tuning or few-shot prompts.
 - Users will notice and churn, causing a novelty effect.
   > Possible, but secondary to the treatment itself changing.
 - The control group is contaminated by the new model.
-  > The control arm does not use the assistant, so it is unaffected.
+  > Assignment did not change, so no control user started receiving treatment. The problem is inside the treatment arm.
 - [o] The treatment changed during the test, so the estimate blends two different treatments.
   > Pin model versions, log the version per request, and analyze or restart around the change.`}
 />
@@ -226,3 +246,7 @@ and never feed it into fine-tuning or few-shot prompts.
 - [How Large Language Models Work](/courses/how-llms-work), especially [what benchmarks measure](/courses/how-llms-work/what-benchmarks-measure), [benchmark pitfalls](/courses/how-llms-work/benchmark-pitfalls), and [evaluating for your task](/courses/how-llms-work/evaluating-for-your-task)
 - [Experimentation](/interview-prep/data-scientist/experimentation) on this track, for power, A/A tests, and guardrail metrics
 - [LLM systems & evals](/interview-prep/machine-learning-engineer/llm-systems-and-evals) on the ML Engineer track, for judges, retrieval metrics, and agents
+
+[^error-bars]:
+    Miller, ["Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations"](https://arxiv.org/abs/2411.00640),
+    2024.

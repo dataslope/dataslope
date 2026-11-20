@@ -25,6 +25,30 @@ version control, modularity, testing, continuous integration (CI), to
 SQL analytics. It transforms data already in the warehouse; it doesn't
 move data (that's EL tools).
 
+### What is dbt v2, and how does it relate to dbt Core?
+
+dbt v2 is a rewrite of the engine in Rust, first shipped as the "Fusion
+engine" and generally available since September 2026. Three things about it
+come up in interviews:
+
+- **Naming and licensing.** The main distribution is now called just **dbt**
+  and ships under dbt's own product license. **dbt OSS** is the subset built
+  entirely from Apache 2.0 code. **dbt Core** names only the Python 1.x line,
+  which is still supported and ends at 1.13. dbt Labs itself merged with
+  Fivetran in June 2026.
+- **It understands SQL.** The engine parses and type-checks each model
+  instead of only templating strings, so a misspelled column is caught at
+  compile time rather than by the warehouse.
+- **It validates YAML strictly.** v1 silently ignored a misspelled config or
+  an unexpected key; v2 raises an error. Every deprecation warning a 1.x
+  project prints has to be resolved before it will run, which in practice
+  means `data_tests:`, test arguments nested under `arguments:`, properties
+  such as `freshness` and `access` nested under `config:`, and `--select` in
+  place of `--models`.
+
+The YAML on this track is written in that stricter layout, which current
+dbt Core 1.x releases accept too.
+
 ### What do `ref()` and `source()` do?
 
 `ref('stg_orders')` references another **model**; `source('raw', 'orders')`
@@ -64,7 +88,7 @@ SELECT * FROM {{ source('raw', 'orders') }}
 ### How do dbt tests work?
 
 Tests **assert** conditions and fail the run when violated, they don't
-modify data. Built-in **schema tests** (`unique`, `not_null`,
+modify data. Built-in **generic data tests** (`unique`, `not_null`,
 `accepted_values`, `relationships`) guard keys and referential integrity;
 **singular tests** are custom SQL that should return zero rows. They
 encode your assumptions so bad data fails loudly.
@@ -123,27 +147,39 @@ FROM {{ source('raw', 'events') }}
 
 `{{ this }}` refers to the current model's table in the warehouse.
 
+For large time-series tables, the **microbatch** strategy (dbt 1.9 and later)
+takes that filter out of your hands. You set
+`incremental_strategy='microbatch'` with an `event_time` column, a `begin`
+date, and a `batch_size` such as `day`; dbt then builds one independent,
+idempotent batch per period, filters every upstream model that declares an
+`event_time` to that period, and re-processes `lookback` batches to catch
+late rows. A backfill is the same model run with `--event-time-start` and
+`--event-time-end`, with no `is_incremental()` branch to get wrong.
+
 ### What is `dbt snapshot`, and what SCD type does it implement?
 
-`dbt snapshot` implements **Slowly Changing Dimension (SCD) Type 2**: it checks a source table for changed rows on each run, closes the current version of a changed row (setting its `dbt_valid_to`) and inserts a new one with `dbt_valid_from`, rather than overwriting. You configure it with a `strategy`, `timestamp` (compares an `updated_at` column) or `check` (compares a list of columns). Snapshots are defined in `.sql` files under the `snapshots/` directory.
+`dbt snapshot` implements **Slowly Changing Dimension (SCD) Type 2**: it checks a source table for changed rows on each run, closes the current version of a changed row (setting its `dbt_valid_to`) and inserts a new one with `dbt_valid_from`, rather than overwriting. You configure it with a `strategy`, `timestamp` (compares an `updated_at` column) or `check` (compares a list of columns). Since dbt 1.9 a snapshot is configured in YAML; the `{% snapshot %}` block in a `.sql` file is the legacy form you will still meet in older projects.
 
 This `snap_customers` snapshot uses the `timestamp` strategy on the
 `updated_at` column, keyed by `customer_id`, to record history of the
 raw `customers` source:
 
-```sql
-{% snapshot snap_customers %}
-  {{
-    config(
-      target_schema='snapshots',
-      unique_key='customer_id',
-      strategy='timestamp',
-      updated_at='updated_at',
-    )
-  }}
-  SELECT * FROM {{ source('raw', 'customers') }}
-{% endsnapshot %}
+```yaml
+# snapshots/snap_customers.yml
+snapshots:
+  - name: snap_customers
+    relation: source('raw', 'customers')
+    config:
+      schema: snapshots
+      unique_key: customer_id
+      strategy: timestamp
+      updated_at: updated_at
 ```
+
+The current version of a row is the one whose `dbt_valid_to` is `NULL`. A
+row deleted at the source is ignored by default; set `hard_deletes` to
+`invalidate` to close its last version, or to `new_record` to add a row that
+marks the deletion.
 
 ### What are seeds in dbt?
 
@@ -152,7 +188,7 @@ Seeds are **CSV files** checked into the repository and loaded into the warehous
 ### What is the difference between `dbt run`, `dbt test`, and `dbt build`?
 
 - `dbt run`, executes model SQL and materializes results.
-- `dbt test`, runs schema and singular tests against already-materialized models.
+- `dbt test`, runs data tests (generic and singular) against already-materialized models, and unit tests against mocked inputs.
 - `dbt build`, combines both in dependency order: for each node it runs the model, then immediately tests it before moving to downstream nodes. It also runs seeds and snapshots. `dbt build` is the preferred CI command.
 
 ### What are generic (schema) tests vs. singular tests?
@@ -169,18 +205,20 @@ models:
   - name: fct_orders
     columns:
       - name: order_id
-        tests:
+        data_tests:
           - unique
           - not_null
       - name: status
-        tests:
+        data_tests:
           - accepted_values:
-              values: ['placed', 'shipped', 'delivered', 'cancelled']
+              arguments:
+                values: ['placed', 'shipped', 'delivered', 'cancelled']
       - name: customer_id
-        tests:
+        data_tests:
           - relationships:
-              to: ref('dim_customer')
-              field: customer_id
+              arguments:
+                to: ref('dim_customer')
+                field: customer_id
 ```
 
 The singular test below is just a query: any `fct_orders` row with a
@@ -215,14 +253,14 @@ the division expression, so models call it instead of repeating the
 
 Packages are **shared dbt projects** (macros, models, tests) installed from the dbt Hub or a Git repo. You declare them in `packages.yml` and run `dbt deps` to install. The most common package is `dbt_utils`, which provides macros like `generate_surrogate_key`, `pivot`, and `date_spine`.
 
-This `packages.yml` pins `dbt-labs/dbt_utils` to version `1.1.1`; `dbt
+This `packages.yml` pins `dbt-labs/dbt_utils` to version `1.4.1`; `dbt
 deps` then fetches that exact release into the project:
 
 ```yaml
 # packages.yml
 packages:
   - package: dbt-labs/dbt_utils
-    version: 1.1.1
+    version: 1.4.1
 ```
 
 ### What is source freshness, and how do you configure it?
@@ -237,10 +275,11 @@ sources:
   - name: raw
     tables:
       - name: orders
-        loaded_at_field: _loaded_at
-        freshness:
-          warn_after: {count: 6, period: hour}
-          error_after: {count: 12, period: hour}
+        config:
+          loaded_at_field: _loaded_at
+          freshness:
+            warn_after: {count: 6, period: hour}
+            error_after: {count: 12, period: hour}
 ```
 
 ### What are exposures in dbt?
@@ -268,7 +307,7 @@ dbt generates a **documentation site** (`dbt docs generate` + `dbt docs serve`) 
 
 ### What are environments and targets in dbt?
 
-A **target** is a named warehouse connection configuration (database, schema, credentials). An **environment** groups targets together, typically `dev` (each developer's own schema) and `prod` (the production schema). The key pattern is that `ref()` automatically resolves to the correct schema for the active target, so models reference each other correctly in both environments without code changes.
+A **target** is a named warehouse connection configuration (database, schema, credentials). A **profile** groups targets, typically `dev` (each developer's own schema) and `prod` (the production schema); the hosted dbt platform configures the same split as **environments**. The key pattern is that `ref()` automatically resolves to the correct schema for the active target, so models reference each other correctly in both environments without code changes.
 
 ### What is the `{{ this }}` variable in dbt?
 
@@ -480,5 +519,5 @@ Use the `generate_schema_name` macro (customizable) and the `schema` config. In 
 - A performance index on \`id\`.
   > Tests aren't indexes; they don't change physical storage.
 - [o] A check that fails the run if \`id\` has duplicates or nulls, guarding the model's grain and key integrity.
-  > These schema tests validate that \`id\` is a valid primary key and fail loudly when violated.`}
+  > These generic data tests validate that \`id\` is a valid primary key and fail loudly when violated.`}
 />

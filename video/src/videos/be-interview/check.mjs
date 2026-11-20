@@ -79,20 +79,20 @@ if (PARTS.some((x) => x.page === LEFT_OUT)) problems.push("a part answers from t
 
 // What the narration quotes, still on the pages.
 const quotes = [
-  ["ai-assisted-coding.mdx", "Since 2025 the coding interview has split in two"],
+  ["ai-assisted-coding.mdx", "The coding interview comes in two kinds"],
   ["ai-assisted-coding.mdx", "expected to use their usual AI tools"],
-  ["ai-assisted-coding.mdx", "One of the two onsite coding rounds became a 60-minute AI-enabled round: a multi-file project in CoderPad with a built-in assistant"],
-  ["ai-assisted-coding.mdx", '"code comprehension" round where candidates read, debug, and optimize existing code'],
-  ["ai-assisted-coding.mdx", "Using unapproved generative AI during an interview can disqualify a candidate"],
-  ["ai-assisted-coding.mdx", "No AI in take-homes or live interviews unless the interviewer says otherwise"],
-  ["ai-assisted-coding.mdx", "At least one round is back in person"],
-  ["ai-assisted-coding.mdx", "because an assistant can complete them and the reviewer\ncannot see how"],
-  ["ai-assisted-coding.mdx", "Karat's 2026 survey of 400 engineering leaders, 71% said AI\nmakes technical skills harder to assess, and 62% of organizations still\nprohibited AI in technical interviews"],
+  ["ai-assisted-coding.mdx", "one of the two onsite coding rounds became a 60-minute AI-enabled round: a multi-file project in CoderPad with a built-in assistant"],
+  ["ai-assisted-coding.mdx", "You read, debug, and optimize existing code with an approved assistant"],
+  ["ai-assisted-coding.mdx", "using unapproved generative AI during an interview can disqualify a candidate"],
+  ["ai-assisted-coding.mdx", "no AI in take-homes or live interviews unless the interviewer says otherwise"],
+  ["ai-assisted-coding.mdx", "at least one round is back in person"],
+  ["ai-assisted-coding.mdx", "because an assistant can complete them and the reviewer cannot see how"],
+  ["ai-assisted-coding.mdx", "Engineering Interview Trends 2026*](https://karat.com/engineering-interview-trends-2026/), January 2026, a survey of 400 engineering leaders in the US, India, and China: 71% said AI makes technical skills harder to assess, and 62% of organizations prohibited AI in technical interviews"],
   ["ai-assisted-coding.mdx", "sells interviewing services, so read the figures as one vendor's survey"],
   ["ai-assisted-coding.mdx", "Ask the recruiter, for every round, whether AI is allowed."],
   // "ai-ask-practice", and the take-home line's "or an online test".
   ["ai-assisted-coding.mdx", "algorithm practice still matters for AI-off rounds and phone screens"],
-  ["ai-assisted-coding.mdx", "take-home projects and automated code tests have lost"],
+  ["ai-assisted-coding.mdx", "Take-home projects and automated code tests have lost"],
   ["index.mdx", "multi-file projects to extend"],
   ["index.mdx", "streaming, retries, cost measured in tokens, and prompt injection"],
   ["index.mdx", "**Fewer take-homes**"],
@@ -107,9 +107,12 @@ const quotes = [
   ["concurrency.mdx", "### Processes vs threads, how do they differ?"],
   ["concurrency.mdx", "### When do you choose threads vs multiprocessing vs async?"],
 ];
-for (const [file, phrase] of quotes) if (!read(file).includes(phrase)) problems.push(`${file} no longer says: ${phrase}`);
+// Compared with every run of whitespace read as one space, so a rewrap of the
+// page (or a fact moved into an indented footnote) is not a failure.
+const flat = (t) => t.replace(/\s+/g, " ");
+for (const [file, phrase] of quotes) if (!flat(read(file)).includes(flat(phrase))) problems.push(`${file} no longer says: ${phrase}`);
 // The two follow-ups the hook asks, in the AI page's words.
-if (!read("ai-assisted-coding.mdx").includes('"why this\napproach?" and "what breaks under load?"')) problems.push("the AI page no longer quotes the hook's two follow-ups");
+if (!flat(read("ai-assisted-coding.mdx")).includes('"why this approach?" and "what breaks under load?"')) problems.push("the AI page no longer quotes the hook's two follow-ups");
 
 // The numbers the narration says in words.
 const ONES = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
@@ -136,7 +139,7 @@ const claims = [
   ["ai-allowed-who", "unfamiliar code to read, debug and speed up"],
   ["ai-banned", "without permission can disqualify you"],
   ["ai-banned", "back in person"],
-  ["ai", "since 2025"],
+  ["ai", "two kinds"],
   ["ai-ask-practice", "and in phone screens"],
 ];
 for (const [id, phrase] of claims) if (!text(id).includes(phrase)) problems.push(`script.ts "${id}" no longer says "${phrase}"`);

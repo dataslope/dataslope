@@ -73,6 +73,22 @@ it searches any direction, defaults to exact match, and has a built-in
 
 It's the modern default: as readable as INDEX/MATCH but in one function.
 
+### What are dynamic arrays, and what is a spill error?
+
+In Excel 365 and Excel 2021 or later, one formula can return a whole range
+that **spills** into the cells below and beside it. That is what makes
+`FILTER`, `UNIQUE`, and `SORT` possible: `=SORT(UNIQUE(A2:A500))` returns a
+sorted, de-duplicated list from a single cell and resizes itself as the
+source changes. A `#SPILL!` error means something is already in the cells the
+result needs; clear them and the formula fills in. Refer to a spilled result
+with a trailing `#`, as in `=COUNTA(D2#)`.
+
+Two neighbors come up in the same conversation. `LET` names an intermediate
+value inside a formula, so a long expression is computed once and reads
+top to bottom. **Power Query** is the tool for repeatable cleanup: it records
+the steps (import, unpivot, merge, change type) and reruns them on refresh,
+which beats redoing the same manual fixes every month.
+
 ### What's the difference between exact and approximate match?
 
 Exact match (`FALSE`/`0` in VLOOKUP/MATCH, the default in XLOOKUP)

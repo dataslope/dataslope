@@ -316,7 +316,7 @@ A junk dimension bundles **miscellaneous low-cardinality flags and indicators** 
 
 A factless fact table records **events or coverage** with no numeric measure, just foreign keys. Examples: student course enrollments (the fact is attendance, not a count), or a coverage fact listing which products are on promotion in which stores on which days. You derive counts by querying "how many rows match this criteria."
 
-Because there is no measure to sum, you answer questions by **counting rows**. The query below counts how many distinct products were on promotion in one store over a week, the kind of coverage question a factless fact exists to answer:
+Because there is no measure to sum, you answer questions by **counting rows**, or the distinct keys in them. The query below counts how many distinct products were on promotion in one store over a week, the kind of coverage question a factless fact exists to answer. The grain is one row per product per store per day, so a plain `COUNT(*)` would count product-days instead:
 
 ```sql
 -- Factless fact: which products were on promotion per store per day

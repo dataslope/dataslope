@@ -58,7 +58,7 @@ A composite index covers multiple columns in a defined order:
   parts={[
     { text: "CREATE INDEX idx_name ON people (" },
     { text: "last_name,", label: "usable on its own" },
-    { text: "first_name", label: "only usable alongside the one before it" },
+    { text: "first_name", label: "efficient only alongside the one before it" },
     { text: ")" },
   ]}
 />
@@ -250,6 +250,11 @@ another table, enforcing **referential integrity**, you cannot insert an
 order for a customer that does not exist, and (with cascade rules) deletes can
 propagate. Foreign keys are how the relational model encodes relationships.
 
+A common follow-up is what to use as the key when ids are generated outside
+the database. Prefer a time-ordered UUID (`uuidv7()`, built into PostgreSQL
+18) over a random UUIDv4: random keys scatter inserts across the B-tree,
+while time-ordered ones append near its end the way a sequence does.
+
 ### What is a covering index?
 
 A covering index includes every column a query needs (in the key or as
@@ -278,7 +283,7 @@ optimization for hot read paths, at the cost of a wider index to maintain.
 - \`WHERE email = 'ada@example.com'\`
   > \`email\` is not in the index at all, so this needs a separate index or a scan.
 - \`WHERE first_name = 'Ada'\`
-  > The index is ordered by \`last_name\` first, so a filter on \`first_name\` alone cannot use it (leftmost-prefix rule).
+  > The index is ordered by \`last_name\` first, so a filter on \`first_name\` alone cannot seek straight to its rows (the leftmost-prefix rule). PostgreSQL 18 can still use the index through a skip scan, which repeats the search for every distinct \`last_name\` and is far slower than a full-prefix match.
 - [o] \`WHERE last_name = 'Lovelace' AND first_name = 'Ada'\`
   > This matches the full index prefix in order, so the B-tree narrows on both columns.
 - Any query on the table, since the table is now indexed.
@@ -337,8 +342,9 @@ ORDER BY c.id;`}
   ]}
 />
 
-The second challenge looks like a simple aggregate and hides a fan-out
-trap. Read the join carefully before you write the `SUM`.
+The second challenge is the aggregate that join sets up. Joining fans each
+customer out to one row per order, so group back to one row per customer
+before you report the `SUM`.
 
 <SqlChallengeCard
   dialect="postgres"

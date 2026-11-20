@@ -39,8 +39,9 @@ const LOG_HI = Math.log10(12_000_000);
  * Question 6. What a backfill is for, and the design that makes it a loop:
  * the Pipelines page's task, parameterized by its date and overwriting its
  * own partition; a year of 2025 as 365 daily partitions, run four at a time
- * (Pyodide, check.mjs: 92 waves) by max_active_runs; catchup only runs dates
- * that never ran, the backfill command reruns past ones; and why the loop
+ * (Pyodide, check.mjs: 92 waves) by max_active_runs; in Airflow 3 the backfill
+ * command schedules the range, and catchup (off by default) only creates dates
+ * that never ran; and why the loop
  * keeps each run small, on a log scale,
  * from charts/incremental-vs-full-refresh.mjs: at 8,000 rows a day, a full
  * rebuild on day 730 reprocesses 6,040,000 rows, 755 times one partition.
@@ -65,11 +66,11 @@ export const BackfillScene: React.FC = () => {
   const ownAt = n.word("backfill", "each partition runs on its own");
   const yearAt = n.word("bf-year", "a year of history");
   const runsAt = n.word("bf-year", "three hundred sixty-five daily runs");
-  const airAt = n.word("bf-year", "In Airflow, catchup");
-  const dagAt = n.word("bf-year", "in Dagster, partitioned assets");
-  const thrAt = n.word("bf-year", "Throttle them");
-  const fourAt = n.word("bf-year", "four at a time");
-  const keepAt = n.word("bf-year", "the source and the warehouse keep up");
+  const airAt = n.word("bf-tools", "In Airflow, the backfill command");
+  const dagAt = n.word("bf-tools", "in Dagster, partitioned assets");
+  const thrAt = n.word("bf-throttle", "Throttle them");
+  const fourAt = n.word("bf-throttle", "four at a time");
+  const keepAt = n.word("bf-throttle", "the source and the warehouse keep up");
   const loopAt = n.word("bf-cost", "That loop keeps each run small");
   const modelAt = n.word("bf-cost", "Model a table");
   const eightAt = n.word("bf-cost", "eight thousand rows a day");
@@ -198,7 +199,7 @@ export const BackfillScene: React.FC = () => {
         </svg>
         <Note at={airAt} x={GRID_X - 44} y={y(572)}>
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
-            Airflow: <CodeSpan>catchup=True</CodeSpan>, a <CodeSpan>start_date</CodeSpan>
+            Airflow: <CodeSpan>airflow backfill create</CodeSpan>
             <span style={{ opacity: ease(frame, dagAt, 10) }}> · Dagster: partitioned assets</span>
           </span>
         </Note>
