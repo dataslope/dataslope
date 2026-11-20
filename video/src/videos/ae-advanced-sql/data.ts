@@ -16,7 +16,7 @@ export const VIDEO = "ae-advanced-sql";
  * Whether public/images/ae-advanced-sql/ holds the watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 type Value = string | number | boolean | null;
 type Step = { sql: string; ok: boolean; columns?: string[]; rows?: Value[][]; error?: string };
@@ -164,6 +164,8 @@ export const SPINE = {
   countStar: query("own", "spine", "countStar"),
   emptyDays: spine.rows.filter((r) => r[1] === "0").map((r) => r[0]),
   type: table("own", "spine", "type").rows[0][0],
+  /** pg_typeof over generate_series from DATE bounds. */
+  typeQuery: query("own", "spine", "type"),
   pageSeries: query("own", "spine", "pageSeries"),
 };
 
@@ -212,3 +214,47 @@ same(RAPID.pivotCase, RAPID.pivotFilter, "CASE WHEN and FILTER pivots");
 same(RAPID.pivotCase, table("daAdv", "pivot", "pivot"), "this pivot and DA Part 4's");
 
 export const POSTGRES_VERSION = (own.figures.window as Figure).version;
+
+// ── Views the scenes draw, derived from the results above ───────────────────
+
+/** Customer 3's rows, newest first, with the video's own tie (c4@x.com at
+ *  the same second as c3@x.com): rank and row number computed from the
+ *  order the engine printed them in. */
+const TIE_EMAIL = "c4@x.com";
+const three = LATEST.tieRows;
+const at3 = three.cols.indexOf("updated_at");
+export const CUSTOMER3 = {
+  /** The page's three rows (the tie left out), numbered from the newest. */
+  page: three.rows.filter((r) => !r.includes(TIE_EMAIL)).map((r, i) => [r[at3], r[three.cols.indexOf("email")], String(i + 1)]),
+  /** All four rows, with RANK and ROW_NUMBER over updated_at DESC. */
+  tie: three.rows.map((r, i) => [
+    r[at3],
+    r[three.cols.indexOf("email")],
+    String(1 + three.rows.filter((o) => o[at3] > r[at3]).length),
+    String(i + 1),
+  ]),
+  tieEmail: TIE_EMAIL,
+};
+
+/** The page's logins, (user_id, login_date), read from the setup that ran. */
+const loginsSetup = (own.figures.spine as Figure).setup;
+export const LOGINS = [...loginsSetup.matchAll(/\((\d+), DATE '([\d-]+)'\)/g)].map((m) => ({ user: m[1], day: m[2] }));
+if (LOGINS.length !== Number(scalar("own", "distinct", "rows"))) throw new Error("the logins setup does not parse to its row count");
+
+/** Each login day's distinct users, in the order they first log in that day. */
+export const USERS_BY_DAY = DISTINCT.daily.rows.map((r) => ({
+  day: r[0],
+  users: [...new Set(LOGINS.filter((l) => l.day === r[0]).map((l) => l.user))],
+  count: Number(r[1]),
+}));
+for (const d of USERS_BY_DAY) if (d.users.length !== d.count) throw new Error(`${d.day}: the setup and COUNT(DISTINCT) disagree`);
+/** Users who logged in on more than one day. */
+export const RETURNING = [...new Set(LOGINS.map((l) => l.user))].filter((u) => USERS_BY_DAY.filter((d) => d.users.includes(u)).length > 1);
+if (String(RETURNING.length) !== DISTINCT.repeatUsers) throw new Error("returning users disagree with the run");
+
+/** The months LAG(revenue, 12) compares with the wrong month once March 2023
+ *  is gone: those whose comparison is not twelve months back. */
+const monthsBack = (a: string, b: string) => (Number(a.slice(0, 4)) - Number(b.slice(0, 4))) * 12 + Number(a.slice(5, 7)) - Number(b.slice(5, 7));
+export const LAG_WRONG = LAG.gap.rows
+  .filter((r) => r[2] !== "null" && monthsBack(r[0], r[2]) !== 12)
+  .map((r) => ({ month: r[0], with: r[2], change: r[3] }));

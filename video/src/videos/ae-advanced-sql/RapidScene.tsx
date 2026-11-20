@@ -1,0 +1,502 @@
+import React from "react";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
+import { RapidFire, type RapidItem } from "../../editorial/interview";
+import { type Layout, useLayout } from "../../editorial/layout";
+import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { Badge, ColumnRule, NextLine, Note } from "../../editorial/ui";
+import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
+import { RAPID } from "./data";
+import {
+  colsOf,
+  DataTable,
+  Drift,
+  ErrorBox,
+  Flow,
+  geoOf,
+  Headline,
+  Kicker,
+  Listing,
+  listingHeight,
+  listingLineMid,
+  listingWidth,
+  MARK,
+  MARK_BLUE,
+  MARK_GREEN,
+  OK_INK,
+  QMono,
+  rowsAt,
+  Spot,
+  SyntaxBreak,
+  type SynPart,
+  X0,
+} from "./parts";
+
+/** Where the answers go: right of the list. */
+const R_X = 720;
+const TOP = 300;
+const LIST_TOP = 300;
+const ROW = 52;
+const SIZE = 19;
+
+type Ctx = { w: (beat: string, phrase: string, o?: { nth?: number }) => number; y: Layout["y"]; h: Layout["h"]; T: number };
+
+/** A result in the round's compact rows. */
+const geo = (c: Ctx, t: { cols: readonly string[]; rows: readonly (readonly string[])[] }, x: number, top: number, rowH = 40) =>
+  geoOf(t, x, top, c.h, { headH: 40, rowH, bodySize: 21, headSize: 20 });
+
+/** The answer's key fact, the first line of each answer. */
+const Fact: React.FC<{ c: Ctx; at: number; children: React.ReactNode }> = ({ c, at, children }) => (
+  <Note at={at} x={R_X} y={c.T}>
+    <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>{children}</span>
+  </Note>
+);
+
+/** Where an answer's evidence starts, under its key fact. */
+const body = (c: Ctx) => c.T + c.h(62);
+
+// ── 13. Divide by zero ──────────────────────────────────────────────────────
+
+const Zero: React.FC<{ c: Ctx }> = ({ c }) => {
+  const wrapAt = c.w("r-zero", "Wrap the denominator in null if");
+  const nullAt = c.w("r-zero", "a day with no orders gives null");
+  const stopAt = c.w("r-zero", "instead of stopping the query");
+  const coalesceAt = c.w("r-zero", "coalesce can turn that into zero");
+  const Z = RAPID.zeroNullif;
+  const top = body(c);
+  const g = geo(c, Z, R_X, top + listingHeight(Z.lines.length, SIZE) + c.h(18));
+  const av = Z.cols.indexOf("avg_order_value");
+  const empty = Z.rows.findIndex((r) => r[av] === "null");
+  const coalesced = RAPID.zeroCoalesce.rows[empty][RAPID.zeroCoalesce.cols.indexOf("avg_order_value")];
+  const errX = g.right + 50;
+  return (
+    <>
+      <Fact c={c} at={wrapAt - 2}>
+        Wrap the denominator in <QMono>NULLIF(…, 0)</QMono>
+      </Fact>
+      <Listing lines={Z.lines} x={R_X} top={top} size={SIZE} at={wrapAt - 2} marks={[{ line: "NULLIF(order_count, 0)", text: "NULLIF(order_count, 0)", at: wrapAt + 8 }]} />
+      <DataTable
+        g={g}
+        cols={colsOf(Z, { avg_order_value: { ink: BLUE_INK } })}
+        at={wrapAt + 4}
+        rows={rowsAt(Z.rows, wrapAt + 8)}
+        swaps={[{ row: empty, col: av, at: coalesceAt + 6, value: coalesced, color: INK }]}
+        marks={[
+          { row: empty, col: av, at: nullAt + 4, out: coalesceAt + 2 },
+          { row: empty, col: av, at: coalesceAt + 8, color: MARK_GREEN },
+        ]}
+      />
+      <Note at={stopAt - 4} x={errX} y={g.top - c.h(40)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          Without <QMono>NULLIF</QMono>:
+        </span>
+      </Note>
+      <ErrorBox x={errX} top={g.top} width={400} at={stopAt} kind={RAPID.zeroBare.kind} message={RAPID.zeroBare.message} size={20} />
+      <Note at={coalesceAt + 8} x={errX} y={g.rowTop(empty) + c.h(4)}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <QMono>COALESCE(…, 0)</QMono>: zero instead
+        </span>
+      </Note>
+    </>
+  );
+};
+
+// ── 14. ROW_NUMBER, RANK, DENSE_RANK ────────────────────────────────────────
+
+const Rank: React.FC<{ c: Ctx }> = ({ c }) => {
+  const booksAt = c.w("r-rank", "four books with a tie");
+  const rnAt = c.w("r-rank", "row number goes one");
+  const rankAt = c.w("r-rank", "rank shares two", { nth: 1 });
+  const skipAt = c.w("r-rank", "skips to four");
+  const denseAt = c.w("r-rank", "dense rank shares two");
+  const threeAt = c.w("r-rank", "then three");
+  const pickAt = c.w("r-rank", "Row number picks one per key");
+  const boardAt = c.w("r-rank", "the others make leaderboards");
+  const B = RAPID.rank;
+  const g = geo(c, B, R_X, body(c), 48);
+  const col = (name: string) => B.cols.indexOf(name);
+  const last = B.rows.length - 1;
+  const tied = B.rows.flatMap((r, i) => (r[col("rank")] === B.rows[1][col("rank")] ? [i] : []));
+  const notesY = g.rowTop(B.rows.length) + c.h(30);
+  return (
+    <>
+      <Fact c={c} at={booksAt - 4}>
+        On a tie, only <QMono>ROW_NUMBER</QMono> stays unique
+      </Fact>
+      <DataTable
+        g={g}
+        cols={colsOf(B, {
+          row_number: { at: rnAt, ink: BLUE_INK },
+          rank: { at: rankAt, ink: BLUE_INK },
+          dense_rank: { at: denseAt, ink: BLUE_INK },
+        })}
+        at={booksAt}
+        rows={rowsAt(B.rows, booksAt + 4)}
+        bands={tied.map((row) => ({ row, at: booksAt + 12, color: MARK_BLUE }))}
+        marks={[
+          { row: last, col: col("rank"), at: skipAt, color: MARK },
+          { row: last, col: col("dense_rank"), at: threeAt, color: MARK },
+        ]}
+      />
+      <Spot art="books" at={booksAt} left={g.right + 100} top={body(c) + c.h(10)} width={200} />
+      <Note at={pickAt} x={R_X} y={notesY}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <QMono>ROW_NUMBER</QMono>: exactly one per key
+        </span>
+      </Note>
+      <Note at={boardAt} x={R_X} y={notesY + c.h(42)}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <QMono>RANK</QMono>, <QMono>DENSE_RANK</QMono>: leaderboards
+        </span>
+      </Note>
+    </>
+  );
+};
+
+// ── 15. Top N per group ─────────────────────────────────────────────────────
+
+const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
+  const rankInAt = c.w("r-topn", "Rank inside each group");
+  const keepAt = c.w("r-topn", "keep N or fewer");
+  const exactlyAt = c.w("r-topn", "Row number keeps exactly two per category");
+  const pairAt = c.w("r-topn", "rank keeps the tied pair of books");
+  const fiveAt = c.w("r-topn", "five rows instead of four");
+  const RN = RAPID.topRowNumber;
+  const RK = RAPID.topRank;
+  const filter = RN.lines.filter((l) => l.includes("WHERE rn <= 2"));
+  const top = body(c);
+  const tTop = top + listingHeight(1, SIZE) + c.h(70);
+  const rg = geo(c, RN, R_X, tTop);
+  const kg = geo(c, RK, rg.right + 90, tTop);
+  const prod = RK.cols.indexOf("product");
+  const extra = RK.rows.findIndex((r) => !RN.rows.some((o) => o[prod] === r[prod]));
+  const tie = RN.rows.findIndex((r) => r[prod] === RK.rows[extra - 1]?.[prod]);
+  return (
+    <>
+      <Fact c={c} at={rankInAt - 4}>
+        Rank inside each group, then keep <QMono>rn &lt;= N</QMono>
+      </Fact>
+      <Listing lines={filter} x={R_X} top={top} size={SIZE} at={rankInAt} marks={[{ line: "rn <= 2", text: "WHERE rn <= 2", at: keepAt }]} />
+      <Note at={exactlyAt - 4} x={R_X} y={tTop - c.h(40)}>
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <QMono>ROW_NUMBER</QMono>: {RN.rows.length} rows
+        </span>
+      </Note>
+      <DataTable
+        g={rg}
+        cols={colsOf(RN, { rn: { ink: BLUE_INK } })}
+        at={exactlyAt - 2}
+        rows={rowsAt(RN.rows, exactlyAt + 2)}
+        marks={tie >= 0 ? [{ row: tie, col: prod, at: pairAt + 4, color: MARK }] : []}
+      />
+      <ColumnRule x={rg.right + 45} top={tTop - c.h(40)} height={c.h(40) + rg.headH + RK.rows.length * rg.rowH} at={pairAt - 4} />
+      <Note at={pairAt - 4} x={kg.x} y={tTop - c.h(40)}>
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <QMono>RANK</QMono>: {RK.rows.length} rows
+        </span>
+      </Note>
+      <DataTable
+        g={kg}
+        cols={colsOf(RK, { rn: { ink: BLUE_INK } })}
+        at={pairAt - 2}
+        rows={rowsAt(RK.rows, pairAt + 2)}
+        bands={[
+          { row: extra - 1, at: pairAt + 10, color: MARK },
+          { row: extra, at: pairAt + 10, color: MARK },
+        ]}
+      />
+      <Note at={fiveAt + 4} x={kg.right + 30} y={kg.rowTop(extra) + c.h(2)}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>The tie, kept</span>
+      </Note>
+    </>
+  );
+};
+
+// ── 16. CTEs ────────────────────────────────────────────────────────────────
+
+const Cte: React.FC<{ c: Ctx }> = ({ c }) => {
+  const namedAt = c.w("r-cte", "a named result");
+  const upFrontAt = c.w("r-cte", "declared up front");
+  const usedAt = c.w("r-cte", "used like a table");
+  const preferAt = c.w("r-cte", "Prefer it when steps are reused or nested");
+  const readerAt = c.w("r-cte", "it helps the reader");
+  const promiseAt = c.w("r-cte", "doesn't promise the step runs once");
+  const parts: SynPart[] = [
+    { text: "WITH" },
+    { text: "recent", label: "the name you choose", at: namedAt, row: 1 },
+    { text: "AS (SELECT ... )", label: "the query it stands for", at: upFrontAt },
+    { text: "SELECT * FROM recent", label: "referenced like a table", at: usedAt },
+  ];
+  const C = RAPID.cte;
+  const rTop = body(c) + c.h(170);
+  const g = geo(c, C, R_X, rTop, 36);
+  return (
+    <>
+      <Fact c={c} at={namedAt - 4}>
+        A named result, declared up front
+      </Fact>
+      <SyntaxBreak parts={parts} x={R_X} top={body(c)} at={namedAt - 4} size={26} labelSize={21} pitch={40} />
+      <DataTable g={g} cols={colsOf(C)} at={usedAt + 4} rows={rowsAt(C.rows, usedAt + 8, 2)} />
+      <Note at={usedAt + 10} x={g.right + 30} y={rTop + c.h(4)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+          <QMono>recent</QMono>: {C.rows.length} updates since May
+        </span>
+      </Note>
+      <Note at={preferAt} x={g.right + 30} y={rTop + c.h(70)}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>For steps reused or nested</span>
+      </Note>
+      <Note at={readerAt} x={g.right + 30} y={rTop + c.h(116)}>
+        <span style={{ ...note(23, OK_INK), whiteSpace: "nowrap" }}>Helps the reader</span>
+      </Note>
+      <Note at={promiseAt} x={g.right + 30} y={rTop + c.h(162)}>
+        <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>No promise it runs once, or faster</span>
+      </Note>
+    </>
+  );
+};
+
+// ── 17. Recursive CTEs ──────────────────────────────────────────────────────
+
+const Recursive: React.FC<{ c: Ctx }> = ({ c }) => {
+  const selfAt = c.w("r-recursive", "It refers to itself");
+  const anchorAt = c.w("r-recursive", "An anchor query seeds it");
+  const passAt = c.w("r-recursive", "a recursive one adds rows");
+  const noneAt = c.w("r-recursive", "until a pass adds none");
+  const fiveAt = c.w("r-recursive", "Here it counts to five");
+  const orgAt = c.w("r-recursive", "on an org chart");
+  const levelsAt = c.w("r-recursive", "down five levels");
+  const R = RAPID.recursive;
+  const top = body(c);
+  const lw = listingWidth(R.lines, SIZE);
+  const L = RAPID.orgLevels;
+  const people = L.rows.reduce((s, r) => s + Number(r[1]), 0);
+  const rTop = top + listingHeight(R.lines.length, SIZE) + c.h(24);
+  const ng = geo(c, R, R_X, rTop, 36);
+  const lg = geo(c, L, R_X + 260, rTop, 36);
+  return (
+    <>
+      <Fact c={c} at={selfAt - 4}>
+        A CTE that refers to itself
+      </Fact>
+      <Listing
+        lines={R.lines}
+        x={R_X}
+        top={top}
+        size={SIZE}
+        at={selfAt - 2}
+        marks={[
+          { line: "RECURSIVE nums", text: "nums", at: selfAt + 6, out: anchorAt },
+          { line: "FROM nums", text: "nums", at: selfAt + 10, out: anchorAt },
+          { line: "SELECT 1", at: anchorAt + 2, color: MARK_BLUE },
+          { line: "SELECT n + 1", at: passAt + 2 },
+          { line: "WHERE n < 5", text: "WHERE n < 5", at: noneAt + 2, color: MARK_GREEN },
+        ]}
+      />
+      <Note at={anchorAt + 4} x={R_X + lw + 30} y={listingLineMid(top, 1, SIZE) - 16}>
+        <span style={{ ...note(22, BLUE_INK), whiteSpace: "nowrap" }}>anchor: seeds it</span>
+      </Note>
+      <Note at={passAt + 4} x={R_X + lw + 30} y={listingLineMid(top, 3, SIZE) - 16}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>recursive: adds rows from the last pass</span>
+      </Note>
+      <Note at={noneAt + 4} x={R_X + lw + 30} y={listingLineMid(top, 3, SIZE) + 22}>
+        <span style={{ ...note(22, OK_INK), whiteSpace: "nowrap" }}>until a pass adds none</span>
+      </Note>
+      <DataTable g={ng} cols={colsOf(R)} at={fiveAt - 4} rows={rowsAt(R.rows, fiveAt, 3)} />
+      <DataTable g={lg} cols={colsOf(L, { people: { ink: BLUE_INK } })} at={orgAt} rows={rowsAt(L.rows, orgAt + 4, 3)} />
+      <Note at={levelsAt - 2} x={lg.right + 30} y={rTop + c.h(4)}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>Org chart: {people} people,</span>
+      </Note>
+      <Note at={levelsAt + 4} x={lg.right + 30} y={rTop + c.h(44)}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>{L.rows.length} levels down</span>
+      </Note>
+    </>
+  );
+};
+
+// ── 18. Pivot ───────────────────────────────────────────────────────────────
+
+const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const caseAt = c.w("r-pivot", "Sum a case expression");
+  const rowAt = c.w("r-pivot", "grouped by the row");
+  const clauseAt = c.w("r-pivot", "have a pivot clause");
+  const notAt = c.w("r-pivot", "Postgres doesn't");
+  const everyAt = c.w("r-pivot", "the case form runs everywhere");
+  const spellsAt = c.w("r-pivot", "spells out each output column");
+  const P = RAPID.pivotCase;
+  const top = body(c);
+  const lw = listingWidth(P.lines, SIZE);
+  const g = geo(c, P, R_X + lw + 50, top, 44);
+  const under = top + listingHeight(P.lines.length, SIZE) + c.h(26);
+  return (
+    <>
+      <Fact c={c} at={caseAt - 4}>
+        One <QMono>SUM(CASE ...)</QMono> per new column
+      </Fact>
+      <Listing
+        lines={P.lines}
+        x={R_X}
+        top={top}
+        size={SIZE}
+        at={caseAt - 2}
+        marks={[
+          { line: "'Q1' THEN", at: caseAt + 6, out: spellsAt },
+          { line: "'Q2' THEN", at: caseAt + 10, out: spellsAt },
+          { line: "GROUP BY region", at: rowAt },
+          { line: "'Q1' THEN", text: "AS q1", at: spellsAt + 2, color: MARK_GREEN },
+          { line: "'Q2' THEN", text: "AS q2", at: spellsAt + 6, color: MARK_GREEN },
+        ]}
+      />
+      <DataTable g={g} cols={colsOf(P)} at={rowAt + 2} rows={rowsAt(P.rows, rowAt + 6)} />
+      <div style={{ position: "absolute", left: R_X, top: under, display: "flex", alignItems: "center", gap: 12, fontSize: 22, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, clauseAt - 2, 10) }}>
+          <QMono>PIVOT</QMono> clause:
+        </span>
+        {RAPID.pivotEngines.map((e, i) => (
+          <span key={e} style={{ opacity: ease(frame, clauseAt + i * 4, 10) }}>
+            <Badge tone="blue" size={22}>
+              {e}
+            </Badge>
+          </span>
+        ))}
+      </div>
+      <Note at={notAt - 2} x={R_X} y={under + c.h(56)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>In Postgres:</span>
+      </Note>
+      <ErrorBox x={R_X + 150} top={under + c.h(46)} width={500} at={notAt} kind={RAPID.pivotClause.kind} message={RAPID.pivotClause.message} size={20} />
+      <Note at={everyAt} x={R_X} y={under + c.h(130)}>
+        <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
+          <QMono>CASE</QMono> runs everywhere, one column at a time
+        </span>
+      </Note>
+    </>
+  );
+};
+
+// ── 19. Unpivot ─────────────────────────────────────────────────────────────
+
+const Unpivot: React.FC<{ c: Ctx }> = ({ c }) => {
+  const unionAt = c.w("r-unpivot", "Union all one select per column");
+  const lateralAt = c.w("r-unpivot", "one lateral values list");
+  const fourAt = c.w("r-unpivot", "four regions with two quarter columns");
+  const eightAt = c.w("r-unpivot", "become eight rows");
+  const wideAt = c.w("r-unpivot", "Sources often arrive wide");
+  const longAt = c.w("r-unpivot", "models want them long");
+  const U = RAPID.unpivot;
+  const from = U.lines.findIndex((l) => l.startsWith("SELECT region, u.quarter"));
+  const lines = U.lines.slice(from);
+  const top = body(c);
+  const tTop = top + listingHeight(lines.length, SIZE) + c.h(30);
+  const P = RAPID.pivotCase;
+  const wg = geo(c, P, R_X, tTop, 40);
+  const lg = geo(c, U, wg.right + 130, tTop, 34);
+  return (
+    <>
+      <Fact c={c} at={unionAt - 2}>
+        <QMono>UNION ALL</QMono> a select per column, or one <QMono>VALUES</QMono> list
+      </Fact>
+      <Listing lines={lines} x={R_X} top={top} size={SIZE} at={lateralAt - 6} marks={[{ line: "CROSS JOIN LATERAL", text: "CROSS JOIN LATERAL (VALUES ('Q1', q1), ('Q2', q2))", at: lateralAt + 4 }]} />
+      <Note at={fourAt - 4} x={R_X} y={tTop - c.h(38)}>
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
+          <QMono>wide</QMono>: the pivot
+        </span>
+      </Note>
+      <DataTable g={wg} cols={colsOf(P)} at={fourAt - 4} rows={rowsAt(P.rows, fourAt)} />
+      <Flow points={[[wg.right + 24, wg.top + wg.headH + wg.rowH * 2], [lg.x - 24, wg.top + wg.headH + wg.rowH * 2]]} at={eightAt - 4} color={BAR} width={2.6} head={13} />
+      <DataTable g={lg} cols={colsOf(U, { amt: { ink: BLUE_INK } })} at={eightAt - 2} rows={rowsAt(U.rows, eightAt, 2)} />
+      <Note at={wideAt} x={lg.right + 40} y={tTop + c.h(4)}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Sources arrive wide</span>
+      </Note>
+      <Note at={longAt} x={lg.right + 40} y={tTop + c.h(48)}>
+        <span style={{ ...note(23, OK_INK), whiteSpace: "nowrap" }}>Models want them long</span>
+      </Note>
+    </>
+  );
+};
+
+/**
+ * The quick round, questions 13 to 19: the numbered list down the left, each
+ * question's answer on the right while it is read, its key fact first, then
+ * the evidence that ran. The last answer stays up through the bridge.
+ */
+export const RapidScene: React.FC = () => {
+  const n = useNarration();
+  const { y, h } = useLayout();
+  const c: Ctx = { w: (b, p, o) => n.word(b, p, o), y, h, T: y(TOP) };
+
+  const from = n.beat("rapid-in").from;
+  const sevenAt = n.word("rapid-in", "Seven quick ones");
+  const finishAt = n.word("rapid-in", "to finish");
+  const dozenAt = n.word("next", "a few dozen rows each");
+  const paysAt = n.word("next", "someone pays for the scan");
+  const nextAt = n.word("next", "Next:");
+  const end = n.beat("next").from;
+
+  const items: RapidItem[] = [
+    { n: 13, label: "Avoiding divide-by-zero", beat: "r-zero", body: <Zero c={c} /> },
+    {
+      n: 14,
+      label: (
+        <>
+          <QMono>ROW_NUMBER</QMono>, <QMono>RANK</QMono>, <QMono>DENSE_RANK</QMono>
+        </>
+      ),
+      beat: "r-rank",
+      body: <Rank c={c} />,
+    },
+    { n: 15, label: "Top N rows per group", beat: "r-topn", body: <TopN c={c} /> },
+    { n: 16, label: "A CTE, or a subquery?", beat: "r-cte", body: <Cte c={c} /> },
+    { n: 17, label: "Recursive CTEs", beat: "r-recursive", body: <Recursive c={c} /> },
+    { n: 18, label: "Pivoting rows into columns", beat: "r-pivot", body: <Pivot c={c} /> },
+    { n: 19, label: "Unpivoting columns into rows", beat: "r-unpivot", body: <Unpivot c={c} /> },
+  ].map(({ beat, ...item }) => ({ ...item, at: n.beat(beat).from }));
+  const lastAt = n.beat("r-unpivot").from;
+  const listBottom = y(LIST_TOP) + items.length * h(ROW);
+
+  return (
+    <AbsoluteFill>
+      <Sfx name="el-whoosh" at={from} level={-35} />
+      {items.map((it) => (
+        <Sfx key={it.n} name="el-tap" at={it.at} level={-33} />
+      ))}
+      <Sfx name="el-pop" at={n.word("r-rank", "four books with a tie")} level={-30} />
+      <Sfx name="el-pencil" at={nextAt} level={-34} />
+
+      <Drift from={from} to={n.beat("next").to + 40} scale={0.015}>
+        <Kicker at={from}>Questions 13 to 19</Kicker>
+        <Headline lead="Seven quick ones" turn="to finish." at={sevenAt - 4} turnAt={finishAt - 2} size={64} />
+
+        {/* The last answer stays up through the bridge, so its body sits outside the list. */}
+        <RapidFire
+          items={items.map((it) => (it.n === 19 ? { ...it, body: undefined } : it))}
+          x={X0}
+          top={y(LIST_TOP)}
+          rowH={h(ROW)}
+          width={540}
+          at={finishAt}
+          end={end}
+        />
+        <Fade from={lastAt - 6}>
+          <Unpivot c={c} />
+        </Fade>
+
+        <Note at={dozenAt} x={X0} y={listBottom + h(40)}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>These tables: a few dozen rows each</span>
+        </Note>
+        <Note at={paysAt} x={X0} y={listBottom + h(76)}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>A warehouse scans real ones, and bills it</span>
+        </Note>
+        <NextLine at={nextAt} x={X0} y={listBottom + h(128)} width={540}>
+          warehouses and what they cost
+        </NextLine>
+      </Drift>
+    </AbsoluteFill>
+  );
+};
+
+const Fade: React.FC<{ from: number; children: React.ReactNode }> = ({ from, children }) => {
+  const frame = useCurrentFrame();
+  const o = ease(frame, from, 8);
+  return o > 0 ? <AbsoluteFill style={{ opacity: o }}>{children}</AbsoluteFill> : null;
+};

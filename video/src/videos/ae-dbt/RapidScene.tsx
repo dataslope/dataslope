@@ -1,0 +1,570 @@
+import React from "react";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
+import { QMono, RapidFire, type RapidItem, Tick } from "../../editorial/interview";
+import { type Layout, useLayout } from "../../editorial/layout";
+import { ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
+import { NextLine, Note, Num } from "../../editorial/ui";
+import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
+import { GRAPH, LISTING, MACRO } from "./data";
+import {
+  Arrow,
+  artBox,
+  BOX_H,
+  Code,
+  DASH_W,
+  Drift,
+  edgeKey,
+  Graph,
+  type GEdge,
+  type GNode,
+  Headline,
+  Kicker,
+  Line,
+  Listing,
+  listingHeight,
+  listingWidth,
+  Mark,
+  MARK_GREEN,
+  MARK_RED,
+  MODEL_W,
+  OK_INK,
+  sliceLayout,
+  SLICE_EDGE,
+  Spot,
+  VRule,
+  X0,
+} from "./parts";
+
+const R_X = 1000;
+const LIST_TOP = 290;
+const ROW = 52;
+const SIZE = 19;
+
+type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"] };
+
+/** The key fact of an answer: the first line of every body, in ink. */
+const Fact: React.FC<{ at: number; c: Ctx; dy?: number; children: React.ReactNode }> = ({ at, c, dy = 0, children }) => (
+  <Line at={at} x={R_X} y={c.y(LIST_TOP) + c.h(dy)} size={26} weight={600}>
+    {children}
+  </Line>
+);
+
+// ── 11. Seeds ───────────────────────────────────────────────────────────────
+
+const Seeds: React.FC<{ c: Ctx }> = ({ c }) => {
+  const csvAt = c.w("r-seeds", "CSV files kept in the repository");
+  const loadedAt = c.w("r-seeds", "loaded as tables by dbt seed");
+  const refAt = c.w("r-seeds", "small reference data");
+  const codesAt = c.w("r-seeds", "like country codes");
+  const largeAt = c.w("r-seeds", "Nothing large");
+  const top = c.y(LIST_TOP) + c.h(80);
+  const mid = top + BOX_H / 2;
+  const nodes: GNode[] = [
+    { id: "csv", title: "country_codes.csv", slot: { x: R_X, cy: mid, w: 262 }, at: csvAt + 4, base: "soft" },
+    { id: "table", title: "country_codes", slot: { x: R_X + 520, cy: mid, w: 206 }, at: loadedAt + 10 },
+  ];
+  return (
+    <>
+      <Fact at={csvAt} c={c}>
+        CSV files in the repository, loaded as tables
+      </Fact>
+      <Graph nodes={nodes} edges={[{ from: "csv", to: "table", at: loadedAt + 2, dur: 16 }]} />
+      <Line at={loadedAt + 4} x={R_X + 300} y={mid - c.h(48)} color={INK}>
+        <Code>dbt seed</Code>
+      </Line>
+      <Line at={refAt} x={R_X} y={top + c.h(96)}>
+        Small reference data with no source system<span style={{ opacity: ease(useCurrentFrame(), codesAt, 10) }}>: country codes</span>
+      </Line>
+      <Line at={largeAt} x={R_X} y={top + c.h(136)} color={INK_SOFT}>
+        Nothing large, nothing that changes often
+      </Line>
+    </>
+  );
+};
+
+// ── 12. Macros ──────────────────────────────────────────────────────────────
+
+const Macros: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const jinjaAt = c.w("r-macros", "A macro is a reusable Jinja function");
+  const emitsAt = c.w("r-macros", "emits amount cents over a hundred point oh");
+  const calledAt = c.w("r-macros", "wherever it's called");
+  const onceAt = c.w("r-macros", "Written once");
+  const handAt = c.w("r-macros", "Typed by hand over a plain hundred");
+  const intAt = c.w("r-macros", "Postgres divides integers");
+  const nineteenAt = c.w("r-macros", "becomes nineteen dollars");
+  const lines = LISTING.macro;
+  const top = c.y(LIST_TOP) + c.h(56);
+  const resY = top + listingHeight(lines.length, SIZE) + c.h(40);
+  const COL2 = R_X + 420;
+  return (
+    <>
+      <Fact at={jinjaAt} c={c}>
+        A reusable Jinja function that writes SQL
+      </Fact>
+      <Listing
+        lines={lines}
+        x={R_X}
+        top={top}
+        width={listingWidth(lines, SIZE)}
+        size={SIZE}
+        at={jinjaAt + 6}
+        marks={[
+          { line: "/ 100.0", text: "({{ column_name }} / 100.0)", at: emitsAt + 4 },
+          { line: "-- SELECT", text: "{{ cents_to_dollars('amount_cents') }}", at: calledAt },
+        ]}
+      />
+      <Line at={onceAt} x={R_X} y={resY} size={22} color={INK_SOFT}>
+        <Code>{MACRO.expandedSql[0].replace(/^SELECT /, "").replace(/::numeric\(10, 2\)/, "").replace(/ AS amount_usd FROM orders$/, "")}</Code> on 1999
+      </Line>
+      <Line at={onceAt + 4} x={R_X} y={resY + c.h(40)} size={36} weight={600} color={OK_INK}>
+        <Mark at={onceAt + 10} color={MARK_GREEN}>
+          <Num>{MACRO.expanded}</Num>
+        </Mark>
+      </Line>
+      <VRule x={COL2 - 30} top={resY} bottom={resY + c.h(90)} at={handAt} />
+      <Line at={handAt} x={COL2} y={resY} size={22} color={INK_SOFT}>
+        <Code>{MACRO.integerSql[0].replace(/^SELECT /, "").replace(/ AS amount_usd FROM orders$/, "")}</Code> on 1999, by hand
+      </Line>
+      <Line at={intAt} x={COL2} y={resY + c.h(40)} size={36} weight={600} color={ACCENT_INK}>
+        <span style={{ opacity: ease(frame, nineteenAt, 8) }}>
+          <Mark at={nineteenAt + 4} color={MARK_RED}>
+            <Num>{MACRO.integer}</Num>
+          </Mark>
+        </span>
+      </Line>
+      <Line at={intAt + 4} x={COL2 + 110} y={resY + c.h(52)} color={ACCENT_INK}>
+        Integer division
+      </Line>
+    </>
+  );
+};
+
+// ── 13. Packages ────────────────────────────────────────────────────────────
+
+const Packages: React.FC<{ c: Ctx }> = ({ c }) => {
+  const sharedAt = c.w("r-packages", "Shared dbt projects");
+  const listAt = c.w("r-packages", "List one in packages dot YAML");
+  const pinnedAt = c.w("r-packages", "pinned to a version");
+  const depsAt = c.w("r-packages", "run dbt deps");
+  const utilsAt = c.w("r-packages", "The most common is dbt utils");
+  const lines = LISTING.packages;
+  const top = c.y(LIST_TOP) + c.h(96);
+  const depsY = top + listingHeight(lines.length, SIZE) + c.h(36);
+  const parcel = artBox("parcel", 200);
+  return (
+    <>
+      <Fact at={sharedAt} c={c}>
+        Shared dbt projects
+      </Fact>
+      <Line at={sharedAt + 6} x={R_X} y={c.y(LIST_TOP) + c.h(42)} color={INK_SOFT}>
+        Macros, models and tests
+      </Line>
+      <Listing
+        lines={lines}
+        x={R_X}
+        top={top}
+        width={listingWidth(lines, SIZE) + 20}
+        size={SIZE}
+        at={listAt}
+        marks={[
+          { line: "version:", text: "1.1.1", at: pinnedAt + 2 },
+          { line: "package:", text: "dbt-labs/dbt_utils", at: utilsAt + 2 },
+        ]}
+      />
+      <Listing lines={["dbt deps"]} x={R_X} top={depsY} width={listingWidth(["dbt deps"], SIZE) + 20} size={SIZE} at={depsAt} />
+      <Line at={depsAt + 6} x={R_X + 160} y={depsY + 6} color={INK_SOFT}>
+        Installs it
+      </Line>
+      <Spot id="parcel" at={sharedAt + 4} left={1560} top={c.y(LIST_TOP) + c.h(90)} {...parcel} />
+    </>
+  );
+};
+
+// ── 14. Variables ───────────────────────────────────────────────────────────
+
+const Vars: React.FC<{ c: Ctx }> = ({ c }) => {
+  const readAt = c.w("r-vars", "Read one with var in the model");
+  const defaultAt = c.w("r-vars", "give it a default in the project file");
+  const overrideAt = c.w("r-vars", "override it on the command line");
+  const jsonAt = c.w("r-vars", "as JSON");
+  const model = LISTING.varsModel;
+  const cli = LISTING.varsCli;
+  const top = c.y(LIST_TOP) + c.h(56);
+  const defY = top + listingHeight(model.length, SIZE) + c.h(30);
+  const cliTop = defY + c.h(56);
+  return (
+    <>
+      <Fact at={readAt} c={c}>
+        <Code>var()</Code> in the model, overridden at run time
+      </Fact>
+      <Listing lines={model} x={R_X} top={top} width={listingWidth(model, SIZE)} size={SIZE} at={readAt + 4} marks={[{ line: "var(", text: `var("start_date")`, at: readAt + 10 }]} />
+      <Line at={defaultAt} x={R_X} y={defY} size={22}>
+        A default: <Code>vars:</Code> in <Code>dbt_project.yml</Code>
+      </Line>
+      <Listing lines={cli} x={R_X} top={cliTop} width={listingWidth(cli, SIZE)} size={SIZE} at={overrideAt} marks={[{ line: "--vars", text: `'{"start_date": "2024-01-01"}'`, at: jsonAt }]} />
+    </>
+  );
+};
+
+// ── 15. Exposures ───────────────────────────────────────────────────────────
+
+const Exposures: React.FC<{ c: Ctx }> = ({ c }) => {
+  const yamlAt = c.w("r-exposures", "YAML entries for what reads your models");
+  const dashAt = c.w("r-exposures", "a dashboard");
+  const mlAt = c.w("r-exposures", "a machine learning model");
+  const etlAt = c.w("r-exposures", "a reverse ETL sync");
+  const sitAt = c.w("r-exposures", "They sit in the lineage graph");
+  const reachedAt = c.w("r-exposures", "reached the revenue dashboard");
+  const frame = useCurrentFrame();
+  const lines = LISTING.exposure;
+  const top = c.y(LIST_TOP) + c.h(92);
+  const gTop = top + listingHeight(lines.length, SIZE) + c.h(46);
+  const dash = artBox("dashboard", 200);
+  const deps = GRAPH.exposure.dependsOn;
+  const slots = {
+    fct_orders: { x: R_X, cy: gTop + BOX_H / 2, w: MODEL_W },
+    dim_customer: { x: R_X, cy: gTop + BOX_H / 2 + c.h(74), w: MODEL_W },
+    dashboard: { x: R_X + 380, cy: gTop + BOX_H / 2 + c.h(37), w: DASH_W },
+  };
+  const nodes: GNode[] = [
+    { id: "fct_orders", slot: slots.fct_orders, at: sitAt, tones: [{ at: reachedAt + 10, tone: "lit" }] },
+    { id: "dim_customer", slot: slots.dim_customer, at: sitAt + 3, tones: [{ at: reachedAt + 10, tone: "lit" }] },
+    { id: "dashboard", slot: slots.dashboard, at: sitAt + 6, exposure: true, title: "Revenue Dashboard", tones: [{ at: reachedAt, tone: "lit" }] },
+  ];
+  const edges: GEdge[] = deps.map((d, i) => ({
+    from: d,
+    to: "dashboard",
+    at: sitAt + 8 + i * 4,
+    toPort: { side: "left", d: i === 0 ? -12 : 12 },
+    tones: [{ at: reachedAt + 4, color: "var(--ds-yellow-600)" }],
+  }));
+  return (
+    <>
+      <Fact at={yamlAt} c={c}>
+        YAML for what reads your models
+      </Fact>
+      <Line at={dashAt} x={R_X} y={c.y(LIST_TOP) + c.h(42)} color={INK_SOFT}>
+        A dashboard<span style={{ opacity: ease(frame, mlAt, 10) }}>, a machine learning model</span>
+        <span style={{ opacity: ease(frame, etlAt, 10) }}>, a reverse ETL sync</span>
+      </Line>
+      <Listing
+        lines={lines}
+        x={R_X}
+        top={top}
+        width={listingWidth(lines, SIZE) + 20}
+        size={SIZE}
+        at={dashAt + 4}
+        marks={[
+          { line: "type:", text: "dashboard", at: dashAt + 12 },
+          { line: "ref('fct_orders')", text: "ref('fct_orders')", at: sitAt + 2 },
+          { line: "ref('dim_customer')", text: "ref('dim_customer')", at: sitAt + 6 },
+        ]}
+      />
+      <Graph nodes={nodes} edges={edges} />
+      <Spot id="dashboard" at={dashAt} left={1560} top={c.y(LIST_TOP) + c.h(110)} {...dash} />
+    </>
+  );
+};
+
+// ── 16. Docs ────────────────────────────────────────────────────────────────
+
+const Docs: React.FC<{ c: Ctx }> = ({ c }) => {
+  const genAt = c.w("r-docs", "dbt docs generate builds a site");
+  const descAt = c.w("r-docs", "from the descriptions in YAML");
+  const blocksAt = c.w("r-docs", "markdown doc blocks");
+  const serveAt = c.w("r-docs", "dbt docs serve opens it");
+  const graphAt = c.w("r-docs", "an interactive graph");
+  const sameAt = c.w("r-docs", "the same ref and source calls");
+  const frame = useCurrentFrame();
+  const cmds = ["dbt docs generate", "dbt docs serve"];
+  const top = c.y(LIST_TOP) + c.h(56);
+  const descY = top + listingHeight(2, SIZE) + c.h(30);
+  const gTop = descY + c.h(96);
+  const row = c.h(52);
+  const lay = sliceLayout({ left: R_X, top: gTop, pitch: 205, row, w: 174 });
+  const ids = ["raw.orders", "raw.customers", "stg_orders", "stg_customers", "dim_customer", "fct_orders"] as const;
+  const nodes: GNode[] = ids.map((id, i) => ({ id, slot: lay[id], at: graphAt + i * 2, size: 19, h: 40, base: id.startsWith("raw.") ? "soft" : "plain" }));
+  const edges: GEdge[] = GRAPH.edges
+    .filter(([, b]) => b !== GRAPH.exposure.name)
+    .map(([a, b], i) => ({ from: a, to: b, at: sameAt + i * 3, ...SLICE_EDGE[edgeKey(a, b)] }));
+  return (
+    <>
+      <Fact at={genAt} c={c}>
+        A documentation site, with the lineage graph
+      </Fact>
+      <Listing
+        lines={cmds}
+        x={R_X}
+        top={top}
+        width={listingWidth(cmds, SIZE) + 20}
+        size={SIZE}
+        at={genAt + 2}
+        lineAt={[genAt + 6, serveAt]}
+      />
+      <Line at={genAt + 10} x={R_X + 300} y={top + c.h(8)} color={INK_SOFT}>
+        Builds the site
+      </Line>
+      <Line at={serveAt + 4} x={R_X + 300} y={top + c.h(46)} color={INK_SOFT}>
+        Opens it
+      </Line>
+      <Line at={descAt} x={R_X} y={descY}>
+        From descriptions in YAML<span style={{ opacity: ease(frame, blocksAt, 10) }}> and markdown doc blocks</span>
+      </Line>
+      <Line at={graphAt} x={R_X} y={descY + c.h(40)} color={INK_SOFT}>
+        A graph from the same <Code>ref</Code> and <Code>source</Code> calls
+      </Line>
+      <Graph nodes={nodes} edges={edges} />
+    </>
+  );
+};
+
+// ── 17. dbt_project.yml ─────────────────────────────────────────────────────
+
+const Project: React.FC<{ c: Ctx }> = ({ c }) => {
+  const rootAt = c.w("r-project", "The root configuration");
+  const nameAt = c.w("r-project", "the project's name");
+  const foldersAt = c.w("r-project", "its folders");
+  const defaultsAt = c.w("r-project", "default configs by folder");
+  const matAt = c.w("r-project", "such as a materialization");
+  const folderAt = c.w("r-project", "A folder's setting overrides the project's");
+  const modelAt = c.w("r-project", "a model's own config overrides both");
+  const frame = useCurrentFrame();
+  const top = c.y(LIST_TOP) + c.h(100);
+  const STEP = c.h(96);
+  const levels = [
+    { id: "project", title: "The project's defaults", sub: <Code>dbt_project.yml</Code>, at: defaultsAt },
+    { id: "folder", title: "A folder's setting", sub: <Code>models/marts/</Code>, at: folderAt },
+    { id: "model", title: "A model's own config", sub: <Code>{"{{ config(...) }}"}</Code>, at: modelAt },
+  ];
+  const nodes: GNode[] = levels.map((l, i) => ({
+    id: l.id,
+    title: l.title,
+    sans: true,
+    slot: { x: R_X + i * 60, cy: top + i * STEP + BOX_H / 2, w: 330 },
+    at: l.at,
+    tones: i === 2 ? [{ at: modelAt + 8, tone: "lit" as const }] : [],
+  }));
+  return (
+    <>
+      <Fact at={rootAt} c={c}>
+        The root configuration
+      </Fact>
+      <Line at={nameAt} x={R_X} y={c.y(LIST_TOP) + c.h(42)} color={INK_SOFT}>
+        The project&rsquo;s name<span style={{ opacity: ease(frame, foldersAt, 10) }}>, its folders</span>
+        <span style={{ opacity: ease(frame, defaultsAt, 10) }}>, default configs by folder</span>
+        <span style={{ opacity: ease(frame, matAt, 10) }}>: a materialization</span>
+      </Line>
+      <Graph nodes={nodes} edges={[]} />
+      {levels.map((l, i) => (
+        <React.Fragment key={l.id}>
+          <Line at={l.at + 4} x={R_X + i * 60 + 350} y={top + i * STEP + 12} color={INK_SOFT}>
+            {l.sub}
+          </Line>
+          {i > 0 ? (
+            <>
+              <Arrow
+                points={[
+                  [R_X + (i - 1) * 60 + 30, top + (i - 1) * STEP + BOX_H + 6],
+                  [R_X + (i - 1) * 60 + 30, top + i * STEP + BOX_H / 2],
+                  [R_X + i * 60 - 8, top + i * STEP + BOX_H / 2],
+                ]}
+                at={l.at - 2}
+              />
+              <Line at={l.at + 6} x={R_X + (i - 1) * 60 + 44} y={top + (i - 1) * STEP + BOX_H + c.h(4)} size={20} color={INK_SOFT}>
+                overridden by
+              </Line>
+            </>
+          ) : null}
+        </React.Fragment>
+      ))}
+    </>
+  );
+};
+
+// ── 18. Versions ────────────────────────────────────────────────────────────
+
+const Versions: React.FC<{ c: Ctx }> = ({ c }) => {
+  const sinceAt = c.w("r-version", "Since dbt one point five");
+  const yamlAt = c.w("r-version", "declare versions in YAML");
+  const fileAt = c.w("r-version", "each with its own SQL file");
+  const pinAt = c.w("r-version", "Consumers pin one with ref and a version number");
+  const breakAt = c.w("r-version", "a breaking change rolls out");
+  const forcingAt = c.w("r-version", "without forcing everyone across at once");
+  const top = c.y(LIST_TOP) + c.h(80);
+  const v = [
+    { id: "v1", file: "dim_customer_v1.sql", at: fileAt },
+    { id: "v2", file: "dim_customer_v2.sql", at: fileAt + 8 },
+  ];
+  const vy = (i: number) => top + c.h(30) + i * c.h(76) + BOX_H / 2;
+  const nodes: GNode[] = [
+    { id: "dim_customer", slot: { x: R_X, cy: top + c.h(68) + BOX_H / 2, w: MODEL_W }, at: yamlAt },
+    ...v.map((x, i) => ({
+      id: x.id,
+      title: x.file,
+      slot: { x: R_X + 300, cy: vy(i), w: 290 },
+      at: x.at,
+      tones: i === 0 ? [{ at: pinAt + 10, tone: "lit" as const }] : i === 1 ? [{ at: breakAt, tone: "data" as const }] : [],
+    })),
+  ];
+  const edges: GEdge[] = v.map((x, i) => ({ from: "dim_customer", to: x.id, at: x.at - 4, toPort: { side: "left" }, turnX: R_X + 250 + (i ? 0 : 0) }));
+  const pinY = vy(1) + c.h(92);
+  return (
+    <>
+      <Fact at={sinceAt} c={c}>
+        Versions in YAML, since dbt 1.5
+      </Fact>
+      <Graph nodes={nodes} edges={edges} />
+      <Line at={pinAt} x={R_X} y={pinY} size={22}>
+        A consumer pins one: <Code>{"ref('dim_customer', version=1)"}</Code>
+      </Line>
+      <Line at={breakAt} x={R_X} y={pinY + c.h(44)} color={INK_SOFT}>
+        v2 can break things<span style={{ opacity: ease(useCurrentFrame(), forcingAt, 10) }}>; nobody moves until they choose to</span>
+      </Line>
+    </>
+  );
+};
+
+// ── 19. dbt debug ───────────────────────────────────────────────────────────
+
+const Debug: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const checksAt = c.w("r-debug", "It checks your connection setup");
+  const profilesAt = c.w("r-debug", "that the profiles file is valid");
+  const reachAt = c.w("r-debug", "dbt can reach the warehouse");
+  const runAt = c.w("r-debug", "Run it on a new environment");
+  const errAt = c.w("r-debug", "on a connection error");
+  const beforeAt = c.w("r-debug", "before you debug any model");
+  const top = c.y(LIST_TOP) + c.h(64);
+  const checksY = top + listingHeight(1, SIZE) + c.h(36);
+  const plug = artBox("plug", 210);
+  const checks = [
+    { t: <><Code>profiles.yml</Code> is valid</>, at: profilesAt },
+    { t: <>dbt can reach the warehouse</>, at: reachAt },
+  ];
+  return (
+    <>
+      <Fact at={checksAt} c={c}>
+        Checks the connection, not the models
+      </Fact>
+      <Listing lines={["dbt debug"]} x={R_X} top={top} width={listingWidth(["dbt debug"], SIZE) + 20} size={SIZE} at={checksAt + 4} />
+      {checks.map((k, i) => (
+        <React.Fragment key={i}>
+          <div style={{ position: "absolute", left: R_X, top: checksY + i * c.h(44) + 4, opacity: ease(frame, k.at, 8) }}>
+            <Tick at={k.at + 4} size={24} />
+          </div>
+          <Line at={k.at} x={R_X + 40} y={checksY + i * c.h(44)} size={24}>
+            {k.t}
+          </Line>
+        </React.Fragment>
+      ))}
+      <Line at={runAt} x={R_X} y={checksY + c.h(116)}>
+        When: a new environment<span style={{ opacity: ease(frame, errAt, 10) }}>, or a connection error</span>
+      </Line>
+      <Line at={beforeAt} x={R_X} y={checksY + c.h(156)} color={INK_SOFT}>
+        Before you debug any model
+      </Line>
+      <Spot id="plug" at={checksAt + 4} left={1530} top={c.y(LIST_TOP) + c.h(80)} {...plug} />
+    </>
+  );
+};
+
+/**
+ * The quick round: nine questions down the left, each row the question as it
+ * is read; each answer's key fact on the right while it is current, with its
+ * evidence under it (the page's listings, the macro's two results from
+ * Postgres, the exposure lit back along its edges). Then the bridge into
+ * incremental models, the weaver bird back on the page.
+ */
+export const RapidScene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const n = useNarration();
+  const { y, h } = useLayout();
+  const c: Ctx = { w: n.word, y, h };
+
+  const from = n.beat("rapid-in").from;
+  const nineAt = n.word("rapid-in", "Nine quick ones");
+  const end = n.beat("next").from - 4;
+  const tableAt = n.word("next", "A table materialization recomputes everything");
+  const billionAt = n.word("next", "For a billion-row table");
+  const nightAt = n.word("next", "every night");
+  const cutAt = n.word("next", "that's the cost incremental models cut");
+  const nextAt = n.word("next", "Next:");
+
+  const at = (beat: string, q: string) => n.word(beat, q);
+  const items: RapidItem[] = [
+    { n: 11, label: "What are seeds in dbt?", at: at("r-seeds", "Question eleven"), body: <Seeds c={c} /> },
+    { n: 12, label: "How do macros work in dbt?", at: at("r-macros", "Question twelve"), body: <Macros c={c} /> },
+    { n: 13, label: "What are dbt packages, and how do you add one?", at: at("r-packages", "Question thirteen"), body: <Packages c={c} /> },
+    { n: 14, label: "How do you pass variables into dbt models?", at: at("r-vars", "Question fourteen"), body: <Vars c={c} /> },
+    { n: 15, label: "What are exposures in dbt?", at: at("r-exposures", "Question fifteen"), body: <Exposures c={c} /> },
+    { n: 16, label: "How does dbt manage documentation and lineage?", at: at("r-docs", "Question sixteen"), body: <Docs c={c} /> },
+    {
+      n: 17,
+      label: (
+        <>
+          What is the <QMono>dbt_project.yml</QMono> file, and what does it control?
+        </>
+      ),
+      at: at("r-project", "Question seventeen"),
+      body: <Project c={c} />,
+    },
+    { n: 18, label: "How do you version a dbt model?", at: at("r-version", "Question eighteen"), body: <Versions c={c} /> },
+    {
+      n: 19,
+      label: (
+        <>
+          What is <QMono>dbt debug</QMono>, and when do you use it?
+        </>
+      ),
+      at: at("r-debug", "Question nineteen"),
+      body: <Debug c={c} />,
+    },
+  ];
+  const bird = artBox("weaver-bird", 360);
+  const listBottom = y(LIST_TOP) + items.length * h(ROW);
+
+  return (
+    <AbsoluteFill>
+      <Sfx name="el-chime" at={nineAt} level={-33} />
+      {items.map((it) => (
+        <Sfx key={it.n} name="el-tap" at={it.at} level={-32} />
+      ))}
+      <Sfx name="el-pop" at={at("r-packages", "Shared dbt projects") + 4} level={-31} />
+      <Sfx name="el-pop" at={at("r-exposures", "a dashboard")} level={-31} />
+      <Sfx name="el-pop" at={at("r-debug", "It checks your connection setup") + 4} level={-31} />
+      <Sfx name="el-pop" at={billionAt} level={-31} />
+      <Sfx name="el-pencil" at={nextAt} level={-34} />
+
+      <Drift from={from} to={n.beat("next").to + 40}>
+        <Kicker at={nineAt}>Quick round</Kicker>
+        <Headline lead="Nine quick ones" turn="to finish." at={nineAt} turnAt={nineAt + 8} size={64} />
+        <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={780} at={nineAt + 6} end={end} />
+        <VRule x={950} top={y(LIST_TOP)} bottom={listBottom} at={items[0].at} />
+
+        {/* The bridge: a table rebuilds everything, every night. */}
+        <Note at={tableAt} x={R_X} y={y(LIST_TOP)}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            A <Code>table</Code> recomputes everything, every run
+          </span>
+        </Note>
+        <Note at={billionAt} x={R_X} y={y(LIST_TOP) + h(52)}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            A billion rows<span style={{ opacity: ease(frame, nightAt, 10) }}>, every night</span>
+          </span>
+        </Note>
+        <Note at={cutAt} x={R_X} y={y(LIST_TOP) + h(104)}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            The cost <Mark at={cutAt + 6}>incremental models</Mark> cut
+          </span>
+        </Note>
+        <NextLine at={nextAt} x={R_X} y={y(LIST_TOP) + h(190)} width={520}>
+          Incremental models
+        </NextLine>
+        <Spot id="weaver-bird" at={billionAt} left={1400} top={y(640)} {...bird} />
+      </Drift>
+    </AbsoluteFill>
+  );
+};

@@ -542,6 +542,33 @@
             ]
           ]
         },
+        "validity": {
+          "sql": "SELECT customer_sk, customer_id, region, valid_from, valid_to\nFROM dim_customer\nWHERE customer_id = 42\nORDER BY valid_from;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "customer_id",
+            "region",
+            "valid_from",
+            "valid_to"
+          ],
+          "rows": [
+            [
+              1001,
+              42,
+              "East",
+              "2020-01-01",
+              "2023-06-14"
+            ],
+            [
+              1002,
+              42,
+              "West",
+              "2023-06-15",
+              "9999-12-31"
+            ]
+          ]
+        },
         "orders": {
           "sql": "SELECT f.order_id, f.order_date, c.customer_sk, c.region\nFROM fact_orders f\nJOIN dim_customer c\n    ON  c.customer_id = f.customer_id\n    AND f.order_date BETWEEN c.valid_from AND c.valid_to\nWHERE f.customer_id = 42\nORDER BY f.order_id;",
           "ok": true,
@@ -2146,6 +2173,50 @@
           "rows": [
             [
               "1400.00"
+            ]
+          ]
+        },
+        "bridge": {
+          "sql": "SELECT account_sk, customer_sk, ownership_pct\nFROM bridge_customer_account\nORDER BY account_sk, customer_sk;",
+          "ok": true,
+          "columns": [
+            "account_sk",
+            "customer_sk",
+            "ownership_pct"
+          ],
+          "rows": [
+            [
+              10,
+              1,
+              "0.50"
+            ],
+            [
+              10,
+              2,
+              "0.50"
+            ],
+            [
+              11,
+              1,
+              "1.00"
+            ]
+          ]
+        },
+        "balances": {
+          "sql": "SELECT account_sk, balance FROM fact_account_balance ORDER BY account_sk;",
+          "ok": true,
+          "columns": [
+            "account_sk",
+            "balance"
+          ],
+          "rows": [
+            [
+              10,
+              "1000.00"
+            ],
+            [
+              11,
+              "400.00"
             ]
           ]
         },

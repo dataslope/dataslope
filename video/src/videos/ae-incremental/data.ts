@@ -15,7 +15,7 @@ export const VIDEO = "ae-incremental";
  * illustrations.json. Phase 2 generates them; until then every frame is laid
  * out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 type Value = string | number | null;
 type Ok = { sql: string; ok: true; columns: string[]; rows: Value[][] };

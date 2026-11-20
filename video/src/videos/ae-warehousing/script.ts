@@ -286,6 +286,7 @@ export const script: NarrationScript = {
     },
     {
       id: "arch",
+      scene: true,
       text: "Question two. How do Snowflake, BigQuery, and Redshift differ architecturally?",
       pauseAfter: 0.5,
     },
@@ -329,6 +330,7 @@ export const script: NarrationScript = {
     },
     {
       id: "cols",
+      scene: true,
       text: "Question four. What is columnar storage, and why does it matter for analytics?",
       pauseAfter: 0.5,
     },
@@ -349,6 +351,7 @@ export const script: NarrationScript = {
     },
     {
       id: "star",
+      scene: true,
       text: "Question five. Why does select star cost more in a columnar warehouse?",
       pauseAfter: 0.5,
     },
@@ -402,6 +405,7 @@ export const script: NarrationScript = {
     },
     {
       id: "cluster",
+      scene: true,
       text: "Question seven. What is clustering, and how does it differ from partitioning?",
       pauseAfter: 0.5,
     },

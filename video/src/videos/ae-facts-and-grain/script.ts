@@ -439,6 +439,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-confirmed",
+      scene: true,
       text: "Question seventeen. What is the difference between a confirmed versus a conformed dimension? It's a vocabulary check: conformed is the term, and confirmed isn't one.",
       pauseAfter: 0.8,
     },
@@ -469,6 +470,7 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
+      scene: true,
       text: "Every dimension here held still, except one: customer forty-two already has two rows, because Acme Corp moved. Next: dimensions that change.",
     },
   ],

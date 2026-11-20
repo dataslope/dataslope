@@ -8,9 +8,10 @@ import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "ae-ai-semantic-layer";
 
-/** The dolphin and the small spots in illustrations.json, once generated
- *  into public/images/ae-ai-semantic-layer/. Phase 2 sets this. */
-export const ILLUSTRATIONS = false;
+/** The dolphin and the small spots in illustrations.json, generated into
+ *  public/images/ae-ai-semantic-layer/ (the padlock, the golden cards and
+ *  the magnifier are placed; the easel and the hourglass are not). */
+export const ILLUSTRATIONS = true;
 
 /** The Postgres the statements ran on ("PostgreSQL 18.6 (PGlite …)"). */
 export const ENGINE: string = results.version;
@@ -120,6 +121,9 @@ export const REVIEW = {
   /** The lookback, merged on order_id (and deleted then inserted): 7 rows. */
   merge: { rows: V.merge.rows, orders: V.merge.orders },
   deleteInsert: V.deleteInsert,
+  /** The seven orders and their dates, as the raw table was loaded (read out
+   *  of the statements check.mjs ran): five first, then 6 and the late 7. */
+  orders: [...V.raw.matchAll(/\((\d+), DATE '(\d{4}-\d{2}-\d{2})', [\d.]+\)/g)].map((m) => ({ id: Number(m[1]), date: m[2] })),
 } as const;
 
 // ── The close ───────────────────────────────────────────────────────────────

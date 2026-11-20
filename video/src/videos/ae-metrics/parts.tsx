@@ -9,6 +9,7 @@ import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
+import { Mark as MarkInline } from "../da-sql/parts";
 
 /**
  * Pieces this video needs beyond the shared editorial kit and the interview
@@ -432,9 +433,11 @@ export const Tile: React.FC<{
   valueAt?: number;
   swap?: { at: number; value: string };
   tones?: readonly { at: number; tone: Tone; out?: number }[];
+  /** A highlight on the title, from `at` to `out`. */
+  titleMark?: { at: number; out?: number };
   dim?: number;
   out?: number;
-}> = ({ x, y, w, h, at, title, value, valueAt, swap, tones = [], dim, out }) => {
+}> = ({ x, y, w, h, at, title, value, valueAt, swap, tones = [], titleMark, dim, out }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
@@ -462,7 +465,15 @@ export const Tile: React.FC<{
         transform: `scale(${0.92 + 0.08 * Math.min(1, p)})`,
       }}
     >
-      <div style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...label(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+        {titleMark ? (
+          <MarkInline at={titleMark.at} out={titleMark.out}>
+            {title}
+          </MarkInline>
+        ) : (
+          title
+        )}
+      </div>
       <div style={{ position: "relative", marginTop: 18, height: 64 }}>
         {!swapped ? (
           <span style={{ position: "absolute", left: 0, top: 0, ...label(58, t.ink), fontWeight: 600, fontVariantNumeric: "tabular-nums lining-nums", opacity: v * fadeOld, whiteSpace: "nowrap", lineHeight: 1.1 }}>

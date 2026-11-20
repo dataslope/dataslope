@@ -16,7 +16,7 @@ export const VIDEO = "ae-warehousing";
  * Whether public/images/ae-warehousing/ holds the watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 export const ENGINE = `DuckDB ${own.engine.duckdb}`;
 
@@ -38,6 +38,14 @@ export const TABLE = {
 };
 
 // ── 4. Columnar storage: one column as text against one encoded column ──────
+
+/** The table's first four sales, as de-warehousing printed them. */
+export const SAMPLE = {
+  cols: de.table.sample.columns,
+  rows: de.table.sample.rows.map((r) => r.map(String)),
+};
+/** The four regions, in the order they first appear: the dictionary. */
+export const REGIONS = de.table.regions;
 
 const region = de.columns.find((c) => c.name === "region")!;
 export const COLUMNAR = {
@@ -63,6 +71,8 @@ export const PRUNE = {
   /** A model: the page's chart's own constants, read by check.mjs. */
   model: own.pruneModel,
   files: de.partition.files,
+  /** "2024-03", one per folder, in order. */
+  months: de.partition.names.map((n) => n.match(/sale_month=([\d-]+)/)?.[1] ?? n),
   march: de.partition.march,
   region: de.partition.region,
 };

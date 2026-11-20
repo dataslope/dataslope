@@ -231,6 +231,8 @@ INSERT INTO staged_orders VALUES
   (201, 42, 200.00), (202, 99, 500.00), (203, 77, 410.00);`,
   {
     staged: "SELECT order_id, customer_id, amount FROM staged_orders ORDER BY order_id;",
+    // The dimension the load looks keys up in: the unknown member, 42 and 99.
+    dim: "SELECT customer_sk, customer_id, region FROM dim_customer ORDER BY customer_sk;",
     // The trap: the key lookup as an inner join.
     load: "SELECT o.order_id, d.customer_sk, o.amount\nFROM staged_orders o\nJOIN dim_customer d\n  ON d.customer_id = o.customer_id\nORDER BY o.order_id;",
     loadSum:
@@ -245,6 +247,7 @@ INSERT INTO staged_orders VALUES
       "SELECT d.region, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN dim_customer d USING (customer_sk)\nGROUP BY d.region\nORDER BY d.region;",
     // Customer 77 lands.
     arrive: "INSERT INTO dim_customer VALUES (1025, 77, 'Bluth Co', 'South');",
+    dimAfter: "SELECT customer_sk, customer_id, region FROM dim_customer ORDER BY customer_sk;",
     // The correction job: re-key the facts still on the unknown member.
     correct:
       "UPDATE fact_orders f\nSET customer_sk = d.customer_sk\nFROM dim_customer d\nWHERE f.customer_sk = -1\n  AND d.customer_id = f.customer_id;",

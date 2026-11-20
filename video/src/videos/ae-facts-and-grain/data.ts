@@ -16,10 +16,20 @@ export const VIDEO = "ae-facts-and-grain";
  * illustrations.json. Phase 2 generates them and turns this on; every frame
  * is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** The hero's prompt id in illustrations.json. */
 export const HERO_ID = "ae-facts-and-grain-sparrow";
+
+/** Each watercolor's trimmed size in pixels (public/images/ae-facts-and-grain/),
+ *  so a figure keeps its aspect and is never drawn past half its pixels on
+ *  the 1080p layout (a 4K render doubles it). */
+export const ART = {
+  sparrow: { id: HERO_ID, w: 1449, h: 1024 },
+  parcel: { id: "ae-facts-and-grain-parcel", w: 991, h: 857 },
+  key: { id: "ae-facts-and-grain-key", w: 1018, h: 1011 },
+  bridge: { id: "ae-facts-and-grain-bridge", w: 1024, h: 434 },
+} as const;
 
 type Value = string | number | boolean | null;
 type Step = { sql: string; ok: boolean; columns?: string[]; rows?: Value[][]; error?: string };
@@ -76,6 +86,8 @@ export const STAR = {
   facts: table("star", "facts"),
   /** 24 orders, 6 dates, 6 products. */
   counts: table("star", "counts"),
+  /** The star read's row count and revenue: 24 rows. */
+  readRows: table("star", "pageRows"),
   /** The page's star read and its 24 rows. */
   read: query("star", "page"),
 };
@@ -107,6 +119,8 @@ export const SNOW = {
   snow: query("challenge", "snow"),
   /** Rows one read returns that the other does not: 0. */
   differ: Number(value("challenge", "differ")),
+  /** 24 orders, 12 products, 6 categories. */
+  counts: table("challenge", "counts"),
 };
 
 // ── 4. Surrogate keys: the page's customer 42 ───────────────────────────────
@@ -114,6 +128,8 @@ export const SNOW = {
 export const KEYS = {
   /** 1001 East, 1002 West. */
   versions: table("keys", "versions"),
+  /** The same two rows with valid_from and valid_to. */
+  validity: table("keys", "validity"),
   /** 5001 (2022) carries 1001, 5002 (2024) carries 1002. */
   orders: query("keys", "orders"),
   /** 24 rows, 15 customers. */
@@ -202,6 +218,8 @@ export const BRIDGE = {
 // ── Rapid round ─────────────────────────────────────────────────────────────
 
 export const RAPID = {
+  /** 10: the account's deposits and withdrawals, one row per event. */
+  transactions: table("account", "transactions"),
   /** 10: the loan application's milestones, 7 and 9 days. */
   loan: table("account", "funded"),
   loanStages: table("account", "stages"),
@@ -213,6 +231,7 @@ export const RAPID = {
   factlessByProduct: table("factless", "store5"),
   /** 13: the page's degenerate-dimension query on three lines. */
   degenerate: query("degenerate", "page"),
+  degenerateLines: table("degenerate", "lines"),
   /** 14: the junk dimension over the page's three flags: eight rows. */
   junk: table("junk", "rows"),
   /** 15: a 2024 date dimension, 366 rows, and its July 4 row. */
@@ -223,6 +242,9 @@ export const RAPID = {
   /** 20: the bank: 1,400.00 held, 2,400.00 unweighted, Ada 900.00 and Ben
    *  500.00 weighted. */
   bank: value("bank", "bank"),
+  /** The two accounts' balances, and the bridge's owners and shares. */
+  bankBalances: table("bank", "balances"),
+  bankBridge: table("bank", "bridge"),
   bankUnweighted: table("bank", "unweighted"),
   bankUnweightedTotal: value("bank", "unweightedTotal"),
   bankWeighted: table("bank", "weighted"),

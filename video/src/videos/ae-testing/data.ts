@@ -12,7 +12,7 @@ export const VIDEO = "ae-testing";
  * illustrations.json. Phase 2 sets it once they are generated; every frame
  * is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 type Value = string | number | null;
 type Step = { sql: string; ok: boolean; columns?: string[]; rows?: Value[][]; error?: string };

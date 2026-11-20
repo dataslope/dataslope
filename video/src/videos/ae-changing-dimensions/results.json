@@ -831,6 +831,32 @@
             ]
           ]
         },
+        "dim": {
+          "sql": "SELECT customer_sk, customer_id, region FROM dim_customer ORDER BY customer_sk;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "customer_id",
+            "region"
+          ],
+          "rows": [
+            [
+              -1,
+              null,
+              "Unknown"
+            ],
+            [
+              1002,
+              42,
+              "West"
+            ],
+            [
+              1003,
+              99,
+              "North"
+            ]
+          ]
+        },
         "load": {
           "sql": "SELECT o.order_id, d.customer_sk, o.amount\nFROM staged_orders o\nJOIN dim_customer d\n  ON d.customer_id = o.customer_id\nORDER BY o.order_id;",
           "ok": true,
@@ -951,6 +977,37 @@
           "rows": [
             [
               1
+            ]
+          ]
+        },
+        "dimAfter": {
+          "sql": "SELECT customer_sk, customer_id, region FROM dim_customer ORDER BY customer_sk;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "customer_id",
+            "region"
+          ],
+          "rows": [
+            [
+              -1,
+              null,
+              "Unknown"
+            ],
+            [
+              1002,
+              42,
+              "West"
+            ],
+            [
+              1003,
+              99,
+              "North"
+            ],
+            [
+              1025,
+              77,
+              "South"
             ]
           ]
         },

@@ -10,12 +10,10 @@ import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "ae-dbt";
 
-/**
- * Whether public/images/ae-dbt/ holds the watercolors from illustrations.json.
- * Phase 2 generates them; until then every frame is laid out with room for
- * them either way.
- */
-export const ILLUSTRATIONS = false;
+/** Whether public/images/ae-dbt/ holds the watercolors from
+ *  illustrations.json: the weaver bird and the three spots the quick round
+ *  places (the parcel, the dashboard and the plug). */
+export const ILLUSTRATIONS = true;
 
 type Value = string | number | null;
 type Ok = { sql: string; ok: true; columns: string[]; rows: Value[][] };
@@ -101,8 +99,13 @@ export const MATERIALIZE = {
   /** The view regroups every event on every read: HashAggregate (12) over a
    *  Seq Scan on customer_events (24). */
   viewPlan: plan(view, "plan"),
+  /** The same read after the new event: HashAggregate (13) over a Seq Scan
+   *  on customer_events (25). */
+  viewPlanAfter: plan(view, "planAfter"),
   /** The table reads its stored rows: Seq Scan on dim_customer (12). */
   tablePlan: plan(table, "plan"),
+  /** The table after the new event, before a run: still Seq Scan (12). */
+  tablePlanAfter: plan(table, "planAfter"),
   /** The video's own new event, for a 13th customer. */
   newEvent: lines(ok(view, "arrive").sql),
   /** Customers after it lands: view 13, table 12, the table rebuilt 13. */

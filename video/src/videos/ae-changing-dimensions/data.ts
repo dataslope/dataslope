@@ -17,7 +17,7 @@ export const VIDEO = "ae-changing-dimensions";
  * illustrations.json. Phase 2 generates them and turns this on; every frame
  * is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** The hero's prompt id in illustrations.json. */
 export const HERO_ID = "ae-changing-dimensions-hermit-crab";
@@ -141,6 +141,10 @@ export const TYPE3 = {
 
 export const LATE = {
   staged: table("late", "staged"),
+  /** The dimension the load looks keys up in: -1 (Unknown), 1002 (42),
+   *  1003 (99); and after customer 77 lands, 1025 (South) too. */
+  dim: table("late", "dim"),
+  dimAfter: table("late", "dimAfter"),
   /** The inner-join load: 203 is dropped. */
   load: query("late", "load"),
   /** 700.00 loaded of 1,110.00 staged. */
@@ -190,3 +194,36 @@ export const MEASURE = {
 
 /** 9: five age bands by four income tiers, 20 rows. */
 export const MINI_ROWS = Number(value("mini", "mini"));
+
+/** The bands the count ran over, read from its own SQL: each VALUES list. */
+const valuesOf = (sql: string, alias: string): string[] => {
+  const m = sql.match(new RegExp(`\\(VALUES ([^)]*\\)(?:, \\([^)]*\\))*)\\) ${alias}\\(`));
+  if (!m) throw new Error(`no VALUES list ${alias} in the mini-dimension's SQL`);
+  return [...m[1].matchAll(/'([^']*)'/g)].map((v) => v[1]);
+};
+const MINI_SQL = step("mini", "mini").sql;
+export const MINI = {
+  ages: valuesOf(MINI_SQL, "a"),
+  incomes: valuesOf(MINI_SQL, "i"),
+  rows: MINI_ROWS,
+};
+if (MINI.ages.length * MINI.incomes.length !== MINI.rows) throw new Error("the mini-dimension's bands no longer multiply to its count");
+
+// ── 4. The dbt snapshot: drawn, not run ─────────────────────────────────────
+
+/**
+ * dbt.mdx's snap_customers, as the page prints it, with its config call
+ * folded onto fewer lines (whitespace only) so it is a short listing. dbt
+ * does not run here; nothing below is measured.
+ */
+export const SNAPSHOT_LINES = [
+  "{% snapshot snap_customers %}",
+  "{{ config(",
+  "    target_schema='snapshots',",
+  "    unique_key='customer_id',",
+  "    strategy='timestamp',",
+  "    updated_at='updated_at',",
+  ") }}",
+  "SELECT * FROM {{ source('raw', 'customers') }}",
+  "{% endsnapshot %}",
+];

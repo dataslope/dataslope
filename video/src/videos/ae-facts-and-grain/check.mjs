@@ -191,6 +191,10 @@ CREATE TABLE fact_orders AS SELECT * FROM (VALUES
 F.keys = await figure(PAGE_SCD, {
   // One natural key, two rows: the surrogate is what tells them apart.
   versions: "SELECT customer_sk, customer_id, customer_name, region\nFROM dim_customer\nWHERE customer_id = 42\nORDER BY valid_from;",
+  // The same two rows with the dates each version is valid between, as the
+  // video draws them (Question 4, "sk").
+  validity:
+    "SELECT customer_sk, customer_id, region, valid_from, valid_to\nFROM dim_customer\nWHERE customer_id = 42\nORDER BY valid_from;",
   // The surrogate each of customer 42's orders resolves to, by the page's
   // own point-in-time join.
   orders: `SELECT f.order_id, f.order_date, c.customer_sk, c.region
@@ -606,6 +610,9 @@ CREATE TABLE bridge_customer_account (account_sk INTEGER, customer_sk INTEGER, o
 INSERT INTO bridge_customer_account VALUES (10, 1, 0.50), (10, 2, 0.50), (11, 1, 1.00);`,
   {
     bank: "SELECT SUM(balance) AS balance FROM fact_account_balance;",
+    // The bridge's rows, each owner's share, as the video draws them.
+    bridge: "SELECT account_sk, customer_sk, ownership_pct\nFROM bridge_customer_account\nORDER BY account_sk, customer_sk;",
+    balances: "SELECT account_sk, balance FROM fact_account_balance ORDER BY account_sk;",
     unweighted: `SELECT c.customer_name, SUM(f.balance) AS balance
 FROM fact_account_balance f
 JOIN bridge_customer_account b ON b.account_sk = f.account_sk

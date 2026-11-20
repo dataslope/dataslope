@@ -39,6 +39,7 @@ export {
   Strike,
   Svg,
   tableGeometry,
+  TableName,
   X0,
   type Col,
   type TableGeometry,
@@ -61,7 +62,11 @@ export const MARK_GREEN = `color-mix(in srgb, ${OK} 24%, transparent)`;
  * the render instead of marking the wrong line.
  */
 export const lineOf = (lines: readonly string[], text: string): number => {
-  const i = lines.findIndex((l) => l.includes(text));
+  // A line that is exactly the text (its indent aside) wins over one that
+  // only contains it: "SUM(o.amount) FILTER (" is also the start of the line
+  // above it.
+  const exact = lines.findIndex((l) => l.trim() === text.trim());
+  const i = exact >= 0 ? exact : lines.findIndex((l) => l.includes(text));
   if (i < 0) throw new Error(`no listing line holds ${JSON.stringify(text)}`);
   return i;
 };
@@ -299,8 +304,8 @@ export const Listing: React.FC<{
       {lines.map((l, i) => {
         const cue = lineAt?.[i] ?? at + 4 + i * step;
         if (frame < cue - 1 || !l) return null;
-        const ins = inserts.find((s) => l.includes(s.line));
-        const fade = fades.find((f) => l.includes(f.line));
+        const ins = inserts.find((s) => lineOf(lines, s.line) === i);
+        const fade = fades.find((f) => lineOf(lines, f.line) === i);
         const faded = fade ? ease(frame, fade.at, 12) * (fade.out === undefined ? 1 : 1 - ease(frame, fade.out, 12)) : 0;
         return (
           <Ink key={i} at={cue} dur={14} style={{ left: g.padX, top: g.padY + i * g.lineH, height: g.lineH, display: "flex", alignItems: "center", opacity: 1 - 0.6 * faded }}>
@@ -576,6 +581,9 @@ export const Spot: React.FC<{
  *  and stays under half of them (a 4K render doubles the 1080p layout). */
 export const ART: Record<string, readonly [number, number]> = {
   "ae-ai-semantic-layer-dolphin": [1104, 1024],
+  "ae-ai-semantic-layer-padlock": [774, 1024],
+  "ae-ai-semantic-layer-golden": [998, 904],
+  "ae-ai-semantic-layer-magnifier": [1024, 994],
   "ae-interview-platypus": [1516, 1000],
   "ae-facts-and-grain-sparrow": [1449, 1024],
   "ae-changing-dimensions-hermit-crab": [1536, 691],
