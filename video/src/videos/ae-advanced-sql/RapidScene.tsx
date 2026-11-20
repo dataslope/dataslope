@@ -263,6 +263,7 @@ const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 16. CTEs ────────────────────────────────────────────────────────────────
 
 const Cte: React.FC<{ c: Ctx }> = ({ c }) => {
+  const cteAt = c.w("r-cte", "A common table expression");
   const namedAt = c.w("r-cte", "a named result");
   const upFrontAt = c.w("r-cte", "declared up front");
   const usedAt = c.w("r-cte", "used like a table");
@@ -283,7 +284,9 @@ const Cte: React.FC<{ c: Ctx }> = ({ c }) => {
       <Asked c={c} beat="r-cte" from="What is a CTE" until="A common table expression">
         What is a CTE, and when do you prefer it over a subquery?
       </Asked>
-      <Fact c={c} at={namedAt - 4}>
+      {/* The definition starts with its first word, so the page moves on
+          as soon as the question has been read. */}
+      <Fact c={c} at={cteAt - 2}>
         A named result, declared up front
       </Fact>
       <SyntaxBreak parts={parts} x={R_X} top={body(c)} at={namedAt - 4} size={26} labelSize={21} pitch={40} />

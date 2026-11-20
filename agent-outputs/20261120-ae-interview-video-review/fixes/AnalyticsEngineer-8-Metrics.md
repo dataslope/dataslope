@@ -34,4 +34,17 @@ Housekeeping, not findings: stale comments now say nineteen questions and eleven
 
 ## Checks
 
-CHECKS_PLACEHOLDER
+All on the final code, through `out/entries/AnalyticsEngineer-8-Metrics.tsx` and the render queue.
+
+| Check | Result |
+| --- | --- |
+| `tsc --noEmit` (errors in `ae-metrics`) | none |
+| `eslint src/videos/ae-metrics` | clean |
+| `check:cues` | pass ("every word cue names a phrase its beat says") |
+| `npm test` | 79 of 79 pass |
+| `check:frames` (`CHECK_SCALE=1`) | pass: 4 illustrations, 28 arrows (0.0° bend), ERD ends straight, no word collisions, one size and family per line |
+| `check:motion` | pass: nothing still for 3 s (longest 2.8 s, in the quick round) |
+| `check:sync` | pass: 52 beats, worst +0.04 s (`r-where`); `fan-test` +0.00 |
+| `check:mix` | pass: effects 29.0 LU under the narration, median 29.9 dB below the voice |
+
+Stills were rendered and looked at for every change (46, 74, 131, 137.3, 166, 174, 211, 218, 227, 245, 262, 271, 275, 280, 294, 311, 341, 348, 370, 394, 405, 415, 422, 426.5, 506.5, 524, 529, 536 s, in `video/out/review/AnalyticsEngineer-8-Metrics/`). The grain-test lines were moved once after the first still (they sat too close to "24 rows out") and checked again at 137.3 s. The WAVs and preview the checks left in `video/out/` are deleted.
