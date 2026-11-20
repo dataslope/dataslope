@@ -111,7 +111,8 @@ export const ChangeScene: React.FC = () => {
       {/* ── The versions, one per request ── */}
       {versions.map((v, i) => (
         <Ink key={v.text} at={v.at - 4} dur={14} style={{ left: CHIP_X[i], top: y(CHIP_Y), whiteSpace: "nowrap" }}>
-          <Chip tone={i === 0 ? "soft" : "ink"} size={21} width={CHIP_W - 24}>
+          {/* Outlined in the ink, v1 included (the owner, 2026-11-13). */}
+          <Chip outline="clear" size={21} width={CHIP_W - 24}>
             {v.text}
           </Chip>
         </Ink>

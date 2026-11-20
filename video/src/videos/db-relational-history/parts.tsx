@@ -360,6 +360,7 @@ export const Cross: React.FC<{ x: number; y: number; at: number; size?: number; 
 /**
  * One record of the navigational tree, centered on (x, y): a box with its
  * value in the monospace face. `wash` lays a tone over it from a frame on;
+ * a wash with an `ink` recolors the border and the text instead of filling.
  * `dx`/`dy` move it (a reorganized file), in px.
  */
 export const RecordNode: React.FC<{
@@ -371,7 +372,7 @@ export const RecordNode: React.FC<{
   at: number;
   out?: number;
   dim?: number;
-  wash?: { at: number; color: string; out?: number };
+  wash?: { at: number; color?: string; ink?: string; out?: number };
   swell?: number;
   dx?: number;
   dy?: number;
@@ -385,6 +386,7 @@ export const RecordNode: React.FC<{
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
   if (p <= 0.001 || o >= 1) return null;
   const tone = wash ? shown(frame, wash.at, wash.out) : 0;
+  const ink = wash?.ink && tone > 0 ? `color-mix(in srgb, ${wash.ink} ${Math.round(tone * 100)}%, ${color})` : color;
   return (
     <div
       style={{
@@ -394,9 +396,12 @@ export const RecordNode: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        // Fill only: a record is a gray block with no outline.
+        // Outlined (the owner, 2026-11-13: "black border, black text" for the
+        // gray records, "red border, red text" for the two that break). On
+        // paper, not clear: the walked route runs under the records.
+        border: `2px solid ${ink}`,
         borderRadius: 5,
-        background: ds("gray", 100),
+        background: PAPER,
         opacity: p * (1 - o) * (1 - d),
         transform: `scale(${(0.85 + 0.15 * p) * (1 + swell * 0.08)})`,
         display: "flex",
@@ -405,8 +410,8 @@ export const RecordNode: React.FC<{
         overflow: "hidden",
       }}
     >
-      {tone > 0 ? <div style={{ position: "absolute", inset: 0, background: wash!.color, opacity: tone }} /> : null}
-      <span style={{ position: "relative", fontFamily: MONO, fontSize: size, color, whiteSpace: "nowrap" }}>{text}</span>
+      {tone > 0 && wash!.color ? <div style={{ position: "absolute", inset: 0, background: wash!.color, opacity: tone }} /> : null}
+      <span style={{ position: "relative", fontFamily: MONO, fontSize: size, color: ink, whiteSpace: "nowrap" }}>{text}</span>
     </div>
   );
 };

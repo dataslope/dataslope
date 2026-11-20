@@ -122,7 +122,7 @@ const Encap: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
 
       {/* The withdraw door checks. */}
-      <Box x={shell.x + shell.w - 10} y={mid - 30} w={26} h={60} at={checkAt} tone="ok" radius={6} />
+      <Box x={shell.x + shell.w - 10} y={mid - 30} w={26} h={60} at={checkAt} tone="ok" radius={6} framed />
       <Line x={shell.x + shell.w + 40} y={mid - 112} at={checkAt + 4} size={22} color={OK_INK} weight={500}>
         withdraw: checks
       </Line>
@@ -284,7 +284,9 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
   const inOrder = tests(SINGLETON.inOrder);
   const alone = tests(SINGLETON.alone);
   if (inOrder.length !== 2 || alone.length !== 1) throw new Error("the singleton run changed shape");
-  const cfg = { x: 1180, y: c.y(430), w: 220, h: 66 };
+  // Taller than a user's box, centred where the 66px one was: air above and
+  // below its two lines (the owner, 2026-11-13: "add vertical padding").
+  const cfg = { x: 1180, y: c.y(430) - 9, w: 220, h: 84 };
   const users = [
     { t: "pricing", x: R_X, y: c.y(380) },
     { t: "checkout", x: R_X, y: c.y(470) },
@@ -295,7 +297,19 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
   const testTop = c.y(600);
   return (
     <>
-      <Box x={cfg.x} y={cfg.y} w={cfg.w} h={cfg.h} at={oneAt} title="Config" sub={<span style={{ opacity: ease(frame, mutableAt, 10) }}>one, mutable</span>} tone="look" lit={pulse(frame, configAt, 20)} />
+      {/* Outlined in ink, both lines in ink (the owner, 2026-11-13: "use a
+          black border and text with transparent background"). */}
+      <Box
+        x={cfg.x}
+        y={cfg.y}
+        w={cfg.w}
+        h={cfg.h}
+        at={oneAt}
+        title="Config"
+        sub={<span style={{ color: INK, opacity: ease(frame, mutableAt, 10) }}>one, mutable</span>}
+        outline
+        lit={pulse(frame, configAt, 20)}
+      />
       {users.map((u, i) => {
         const left = u.x < cfg.x;
         const from: [number, number] = [left ? u.x + 200 + 6 : u.x - 6, u.y + 28];

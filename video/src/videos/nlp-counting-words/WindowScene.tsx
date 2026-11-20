@@ -103,7 +103,7 @@ export const WindowScene: React.FC = () => {
     ).map((t, i) => {
       const m = marks?.(i);
       return (
-        <Tile key={t.text} text={t.text} x={t.x} y={t.y} size={CHIP} at={ats[i] + 4} marks={m === undefined ? [] : [{ at: m, out: overlapOut }]} />
+        <Tile key={t.text} text={t.text} x={t.x} y={t.y} size={CHIP} at={ats[i] + 4} marks={m === undefined ? [] : [{ at: m, out: overlapOut }]} outline />
       );
     });
   const biRight = LIST_X + WINDOW.bigrams.reduce((s, g) => s + tileW(g.join(" "), CHIP) + 14, 0);
@@ -174,6 +174,7 @@ export const WindowScene: React.FC = () => {
           y={t.y}
           size={SIZE}
           at={tileAts[i] - 4}
+          outline
           marks={[
             ...(i === 1 ? [{ at: overlapAt - 2, out: overlapOut }] : []),
             // "Five words": each tile counted in turn.

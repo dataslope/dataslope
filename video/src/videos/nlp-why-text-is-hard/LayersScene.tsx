@@ -73,7 +73,9 @@ const ChipRow: React.FC<{ words: readonly string[]; at: number; top: number; tag
         x += ws[i] + 8;
         return (
           <React.Fragment key={i}>
-            <Chip text={w} x={left} y={top} at={at + i * 3} size={CHIP} />
+            {/* Outlined, unfilled (the owner, 2026-11-13: "black border, black
+                text, and a transparent background"). */}
+            <Chip text={w} x={left} y={top} at={at + i * 3} size={CHIP} kind="outline" />
             {tags ? (
               <div
                 style={{

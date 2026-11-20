@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { INK, INK_SOFT, label, note, PAPER, TABULAR, svgText } from "../../editorial/style";
-import { ColumnRule, FigLabel, Ink } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -213,7 +213,9 @@ const SweFlow: React.FC<{ x: number; y: number; issueAt: number; patchAt: number
   const frame = useCurrentFrame();
   const { h } = useLayout();
   const step = h(66);
-  const box = (at: number, i: number, text: string, mono = false) => (
+  const box = (at: number, i: number, text: string, mono = false) => {
+    const passed = i === 2 && frame >= testsAt + 6;
+    return (
     <Ink at={at - 2} dur={12} style={{ left: x, top: y + i * step, whiteSpace: "nowrap" }}>
       <div
         style={{
@@ -222,14 +224,17 @@ const SweFlow: React.FC<{ x: number; y: number; issueAt: number; patchAt: number
           padding: "8px 16px",
           borderRadius: 5,
           // A step is a fill, no outline: gray, and green once the tests pass.
-          background: i === 2 && frame >= testsAt + 6 ? `color-mix(in srgb, ${OK} 22%, ${PAPER})` : STEP_FILL,
-          ...(mono ? { fontFamily: MONO, fontSize: 21, color: INK } : { ...label(22, INK), fontWeight: 500 }),
+          background: passed ? `color-mix(in srgb, ${OK} 22%, ${PAPER})` : STEP_FILL,
+          // Green text once it is green (the owner, 2026-11-13: "use a green
+          // text color for the project's tests badge").
+          ...(mono ? { fontFamily: MONO, fontSize: 21, color: INK } : { ...label(22, passed ? outlineInk("green") : INK), fontWeight: 500 }),
         }}
       >
         {text}
       </div>
     </Ink>
-  );
+    );
+  };
   return (
     <>
       {box(issueAt, 0, "GitHub issue")}

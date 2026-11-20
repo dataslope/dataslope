@@ -6,6 +6,7 @@ import { body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { badgeStyle, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { SANS } from "../../theme/fonts";
 import { A, A_INK, Arrow, B, Check, Cross, Drift, Headline, Marked, OK, Spot, Svg, Tag, TRAP, TRAP_INK, X0 } from "./parts";
 
 const SRC = { x: X0, y: 420, w: 470 };
@@ -142,24 +143,35 @@ export const MismatchScene: React.FC = () => {
         const last = i === 3;
         return (
           <React.Fragment key={q.q}>
-            <Ink at={at} dur={12} style={{ left: X0, top: ry - 20, whiteSpace: "nowrap" }}>
-              {/* The numeral on a tinted disc, no ring, in the question's own
-                  face at 36px: within 12% of the 40px line. */}
+            <Ink at={at} dur={12} style={{ left: X0, top: ry - 20, whiteSpace: "nowrap", display: "flex", alignItems: "center" }}>
+              {/* The numeral on a tinted disc, no ring, in the sans at 30px,
+                  the disc centred on the question's line (the owner,
+                  2026-11-13: "use a sans-serif font for the numberings, and
+                  make them slightly smaller. Ensure that the circle is
+                  vertically centered in the middle with the text to the
+                  right"). Line height 1 puts Inter's figures in the middle
+                  of the disc. The sans numeral beside the 40px serif breaks
+                  "one line, one size, one family", at the owner's word, so
+                  the disc stands clear of its question, a marker in a
+                  column of its own: more than the 1.2em the [mixed] audit
+                  reads as two words on one line. */}
               <span
                 style={{
-                  ...badgeStyle("blue", 36),
-                  ...body(36),
+                  ...badgeStyle("blue", 30),
+                  fontFamily: SANS,
+                  fontSize: 30,
+                  lineHeight: 1,
                   color: A_INK,
                   fontWeight: 500,
-                  width: 52,
-                  height: 52,
+                  width: 46,
+                  height: 46,
+                  flex: "none",
                   padding: 0,
-                  borderRadius: 26,
+                  borderRadius: 23,
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  verticalAlign: "middle",
-                  marginRight: 16,
+                  marginRight: 36,
                 }}
               >
                 {i + 1}

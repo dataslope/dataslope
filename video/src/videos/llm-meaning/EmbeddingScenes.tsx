@@ -69,7 +69,8 @@ const Pin: React.FC<{ x: number; base: number; text: string; id: number; at: num
           gap: 8,
         }}
       >
-        <TokenChip text={text} size={28} border={glow > 0.05 ? POINT : INK} />
+        {/* Outlined, ink at rest and red while named (the owner, 2026-11-13). */}
+        <TokenChip text={text} size={28} border={glow > 0.05 ? POINT : INK} outline />
         <span style={{ ...note(24, tone), fontWeight: 500, ...TABULAR }}>{id}</span>
       </div>
       <Svg opacity={p}>
@@ -431,7 +432,8 @@ export const SpaceScene: React.FC = () => {
         return (
           <div key={w.word} style={{ position: "absolute", left: 0, top: rowTop(i), width: 1000, height: ROW_H, opacity: p }}>
             <div style={{ position: "absolute", left: X0, top: 8 }}>
-              <TokenChip text={w.word} size={24} border={glow > 0.05 ? POINT : w.word === "cat" ? DATA : INK} />
+              {/* Outlined: cat, the word measured from, in red; the rest in ink (the owner, 2026-11-13). */}
+              <TokenChip text={w.word} size={24} border={glow > 0.05 || w.word === "cat" ? POINT : INK} outline />
             </div>
             {w.vec.map((v, j) => (
               <span key={j} style={{ position: "absolute", left: VEC_X[j], top: 14, fontFamily: MONO, fontWeight: 500, fontSize: 26, color: INK }}>
@@ -669,9 +671,12 @@ const Card: React.FC<{
         gap: 12,
       }}
     >
-      <TokenChip text={word} size={28} border={ring > 0.05 ? POINT : INK} />
+      {/* All six chips outlined in ink, dog included: its ring on the vector
+          below already marks it (the owner, 2026-11-13). The vector keeps its
+          blue cells with its numbers in blue. */}
+      <TokenChip text={word} size={28} outline />
       <div style={{ borderRadius: 4, boxShadow: ring > 0.02 ? `0 0 0 ${3 + 3 * ring}px color-mix(in srgb, ${POINT} ${Math.round(ring * 100)}%, transparent)` : undefined }}>
-        <VectorCells values={shown} size={24} highlight={changed.map((c) => c * flash)} />
+        <VectorCells values={shown} size={24} color={DATA} highlight={changed.map((c) => c * flash)} />
       </div>
     </div>
   );
@@ -767,12 +772,14 @@ export const OrderScene: React.FC = () => {
           const x0 = SLOT_X[0] - 120;
           const x1 = SLOT_X[2] + 120;
           return (
+            // A little more air above and below the cards than the 16px it
+            // had (the owner, 2026-11-13: "too cramped").
             <rect
               key={r}
               x={x0}
-              y={top - 16}
+              y={top - 24}
               width={(x1 - x0) * p}
-              height={132}
+              height={148}
               rx={10}
               fill="none"
               stroke={INK_SOFT}

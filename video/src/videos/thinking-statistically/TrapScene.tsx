@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, headline, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note, outlineBadgeStyle, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -30,23 +30,20 @@ const mono = (size: number, color: string = INK, weight = 500): React.CSSPropert
   whiteSpace: "nowrap",
 });
 
-const GRAY_BADGE = badgeStyle("gray", 21);
-const LIT_BADGE = badgeStyle("yellow", 21);
+const DTYPE_BADGE = outlineBadgeStyle("ink", 21);
 
-/** A dtype as pandas prints it, in a gray house badge that turns the
- *  highlighter's yellow while the narration points at it. */
-const Dtype: React.FC<{ children: React.ReactNode; lit?: number }> = ({ children, lit = 0 }) => (
-  <span
-    style={{
-      ...mono(21, INK_SOFT),
-      ...GRAY_BADGE,
-      background: `color-mix(in srgb, ${LIT_BADGE.background} ${Math.round(lit * 100)}%, ${GRAY_BADGE.background})`,
-      color: `color-mix(in srgb, ${LIT_BADGE.color} ${Math.round(lit * 100)}%, ${GRAY_BADGE.color})`,
-    }}
-  >
-    {children}
-  </span>
-);
+/** A dtype as pandas prints it, in an outlined badge whose border and text
+ *  darken from gray to ink while the narration points at it. The owner,
+ *  2026-11-13: "use black border, transparent background, and black text",
+ *  so the cue now moves the outline's color rather than a yellow fill. */
+const Dtype: React.FC<{ children: React.ReactNode; lit?: number }> = ({ children, lit = 0 }) => {
+  const ink = `color-mix(in srgb, ${outlineInk("ink")} ${Math.round(lit * 100)}%, ${outlineInk("gray")})`;
+  return (
+    <span style={{ ...mono(21, INK_SOFT), ...DTYPE_BADGE, border: `2px solid ${ink}`, color: ink }}>
+      {children}
+    </span>
+  );
+};
 
 /**
  * Part 3: the lesson's zip codes, stored as int64 and averaged without a

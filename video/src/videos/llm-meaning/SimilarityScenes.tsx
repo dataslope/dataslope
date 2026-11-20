@@ -509,7 +509,8 @@ const Box: React.FC<{ x: number; y: number; w: number; at: number; title: string
       }}
     >
       <div style={{ ...label(25, accent ? POINT_INK : INK) }}>{title}</div>
-      {children ? <div style={{ marginTop: 10 }}>{children}</div> : null}
+      {/* More room under each title (the owner, 2026-11-13); was 10. */}
+      {children ? <div style={{ marginTop: 20 }}>{children}</div> : null}
     </div>
   </Fade>
 );

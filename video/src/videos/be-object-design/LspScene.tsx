@@ -152,7 +152,8 @@ export const LspScene: React.FC = () => {
         <Line x={X0} y={lowRow + NODE.h + 18} at={equalAt} size={21} color={INK_SOFT} weight={500} out={dontAt}>
           keeps width and height equal
         </Line>
-        <Box x={shapeBox.x} y={shapeBox.y} w={shapeBox.w} h={shapeBox.h} at={siblingsAt} title="Shape" tone="ok" sub="each works out its own area" subSize={20} />
+        {/* Its note in the box's green, not gray (the owner, 2026-11-13). */}
+        <Box x={shapeBox.x} y={shapeBox.y} w={shapeBox.w} h={shapeBox.h} at={siblingsAt} title="Shape" tone="ok" sub={<span style={{ color: OK_INK }}>each works out its own area</span>} subSize={20} />
         <Flow points={[[X0 + NODE.w / 2, lowRow - 8], [X0 + NODE.w / 2, topRow + NODE.h + 8]]} at={siblingsAt + 14} dur={10} width={2.2} head={12} />
         <Flow points={[[X0 + 250 + NODE.w / 2, lowRow - 8], [X0 + 250 + NODE.w / 2, topRow + NODE.h + 8]]} at={siblingsAt + 18} dur={10} width={2.2} head={12} />
         <Line x={X0} y={lowRow + NODE.h + 18} at={resizedAt} size={22} weight={500} color={OK_INK}>

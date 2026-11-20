@@ -116,8 +116,9 @@ export const ExamplesScene: React.FC = () => {
         <FigLabel n="10" title="The whole method" at={from + 2} x={X0} y={y(282)} />
         {STEPS.map((s, i) => (
           <React.Fragment key={s.text}>
-            <Tag at={stepAt[i]} x={stepX[i]} y={y(340)} width={s.w}>
-              <span style={{ ...label(22, A_INK), fontWeight: 500, marginRight: 10 }}>{i + 1}</span>
+            {/* Outlined in ink, its number too (the owner, 2026-11-13). */}
+            <Tag at={stepAt[i]} x={stepX[i]} y={y(340)} width={s.w} outline>
+              <span style={{ ...label(22, INK), fontWeight: 500, marginRight: 10 }}>{i + 1}</span>
               {i === 0 ? <Marked at={howAt - 2}>{s.text}</Marked> : s.text}
             </Tag>
             {i > 0 ? (

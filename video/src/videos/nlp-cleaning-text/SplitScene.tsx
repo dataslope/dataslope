@@ -148,6 +148,7 @@ export const SplitScene: React.FC = () => {
       />
       {WORDS.split.map((w, i) => (
         <Chip
+          look="tinted"
           key={i}
           text={w}
           x={row1[i].x}
@@ -181,6 +182,7 @@ export const SplitScene: React.FC = () => {
       />
       {WORDS.tokens.map((w, j) => (
         <Chip
+          look="tinted"
           key={j}
           text={w}
           x={row2[j].x}
