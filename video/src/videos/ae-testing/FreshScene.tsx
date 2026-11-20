@@ -98,7 +98,8 @@ export const FreshScene: React.FC = () => {
   // ── Freshness first, and a feed slipping (drawn, not measured) ──
   const yamlOut = beforeAt - 4;
   const flowTop = yamlTop;
-  const sketch = { x0: X0 + 60, x1: 700, top: y(640), bottom: y(860) };
+  // x0 leaves room for "12 h old" on the y axis, still right of the margin.
+  const sketch = { x0: X0 + 80, x1: 700, top: y(640), bottom: y(860) };
   const days = 7;
   // Arrival delay in hours, drawn: a feed that slips about two hours a day.
   const delay = (d: number) => 1 + d * 2.1;
@@ -280,7 +281,6 @@ export const FreshScene: React.FC = () => {
           <text x={sketch.x1} y={sketch.bottom + 28} textAnchor="end" style={svgText(note(19, INK_SOFT))}>
             days
           </text>
-
           {Array.from({ length: days }, (_, d) => {
             const p = ease(frame, slippingAt + d * 6, 8);
             return p > 0 ? <circle key={d} cx={sx(d)} cy={sy(delay(d))} r={6 * p} fill={BAR} /> : null;

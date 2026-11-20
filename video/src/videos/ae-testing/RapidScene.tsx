@@ -428,7 +428,8 @@ const Upstream: React.FC<{ c: Ctx }> = ({ c }) => {
   const top = c.y(B_TOP + 10);
   const src = { x: BX, y: top + c.h(120), w: 210 };
   const models = ["fct_orders", "fct_revenue", "dim_customer"];
-  const mx = BX + 400;
+  // The patch chips end about 110px clear of the frame edge.
+  const mx = BX + 340;
   const my = (i: number) => top + i * c.h(120);
   const fixed = ease(frame, onceAt, 12);
   return (
