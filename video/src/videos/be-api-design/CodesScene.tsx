@@ -21,7 +21,7 @@ const COLUMNS: Column[] = [
     name: "Client error",
     x: 880,
     w: 420,
-    codes: ["400 Bad Request", "401 Unauthorized", "403 Forbidden", "404 Not Found", "409 Conflict", "422 Unprocessable Entity", "429 Too Many Requests"],
+    codes: ["400 Bad Request", "401 Unauthorized", "403 Forbidden", "404 Not Found", "409 Conflict", "422 Unprocessable Content", "429 Too Many Requests"],
   },
   { cls: "5xx", name: "Server error", x: 1360, w: 420, codes: ["500 Internal Server Error", "503 Service Unavailable"] },
 ];

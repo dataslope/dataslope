@@ -52,7 +52,7 @@ export const TopicScene: React.FC = () => {
   const orderAt = n.word("topic-key", "in the order they arrived");
   const insideAt = n.word("topic-key", "Order holds inside a partition");
   const acrossAt = n.word("topic-key", "never across them");
-  const noKeyAt = n.word("topic-key", "A message with no key");
+  const noKeyAt = n.word("topic-nokey", "A message with no key");
   const q2At = n.word("parts", "Question two");
   const q2TextAt = n.word("parts", "Why does the number");
   const capAt = n.word("parts-cap", "Partitions cap how many consumers");
@@ -150,7 +150,7 @@ export const TopicScene: React.FC = () => {
           </span>
         </Box>
         <Note at={noKeyAt} x={PROD.x} y={prodTop + h(160)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>No key: round-robin</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>No key: one partition per batch</span>
         </Note>
 
         {/* The lanes: one log, then three partitions. */}

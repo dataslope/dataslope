@@ -2,18 +2,50 @@
 
 Written 2026-11-20, after the interview prep review in
 [dataslope/dataslope#746](https://github.com/dataslope/dataslope/pull/746)
-corrected and reworded pages that 43 videos narrate from. Nothing under
-`video/` was changed by that pull request. This report says which videos now
-disagree with a page, line by line, and what each one needs.
+corrected and reworded pages that 43 videos narrate from. This report says
+which videos disagreed with a page, line by line, and what each one needed.
 
-## Summary
+## Resolved the same day
+
+Every mismatch below was fixed in the same pull request, by re-voicing the
+affected sentences rather than only re-anchoring the checks. Each changed
+sentence was split into its own beat where it shared a beat with others, so
+the unchanged sentences were cut from the existing takes for free; about 610
+characters were voiced in all.
+
+| Video | Beat voiced | Now says | Also changed |
+| --- | --- | --- | --- |
+| `be-interview` | `ai` | "What has changed is the coding round. It comes in two kinds." | Headline "One round, two kinds."; `check.mjs` re-anchored and made whitespace-tolerant |
+| `be-ai-round` | `inj-rank` (split from `inj`) | "The security project OWASP ranked it first in each of the first three editions of its top ten risks for LLM applications." | On screen: "in OWASP's Top 10 for LLM applications: 2023, 2025, 2026"; `check.mjs` re-anchored |
+| `be-code-review` | `bugs-survey-debug` (split from `bugs-survey`) | "Forty-five percent said debugging AI-generated code is more time-consuming." | The same wording on screen (the survey's own option); `check.mjs` re-anchored |
+| `de-streaming` | `topic-nokey` (split from `topic-key`) | "A message with no key sticks to one partition until a batch fills, then moves on." | Label "No key: one partition per batch" |
+| `de-orchestration` | `bf-tools` (split from `bf-year`) | "In Airflow, the backfill command schedules them over the date range; in Dagster, partitioned assets do." | Note shows `airflow backfill create` |
+| `de-python` | `batch-builtin` | "Since Python three twelve, itertools batched does the same job, but it hands back tuples." | The existing "batched gives tuples" note is cued to "hands back tuples" |
+| `da-ai-assisted` | `hook` (split into `hook` and `hook-test`) | "Analysts draft queries with an AI assistant that writes code from a plain request." | None |
+| `be-api-design` | none | Not narrated | On screen: "422 Unprocessable Content" in two scenes |
+
+Left as they are, on purpose:
+
+- **`be-ai-round` `daily-vague`** still says "like I use Claude Code a lot",
+  the wording the owner chose on 2026-11-11. The page's example became "I use
+  an assistant a lot". It is an example, not a claim, and no check pins it.
+- **Dated citations** such as "Stack Overflow's twenty twenty-five developer
+  survey", "Google's twenty twenty-six pilot rubric" and "METR's twenty
+  twenty-five randomized trial" stay. They name when a source said something,
+  which stays true; the page keeps the same dates in its footnotes.
+- **`be-concurrency`** needed nothing. Section 3 below was wrong about it: the
+  video already has a `gil-free` beat ("Since Python three fourteen, there's
+  also an officially supported build with no GIL"). The search that listed it
+  was truncated before that line.
+
+## Summary (as found, before the fixes)
 
 | Result | Videos | Count |
 | --- | --- | --- |
 | `check.mjs` fails: the page was reworded and the check pins the old wording | `be-interview`, `be-ai-round`, `be-code-review` | 3 |
 | `check.mjs` passes, but a narrated line is now wrong or out of date | `de-streaming`, `de-orchestration`, `de-python` | 3 |
-| `check.mjs` passes, narration still true but narrower than the page | `be-concurrency`, `da-ai-assisted` | 2 |
-| Still match | the other 35 | 35 |
+| `check.mjs` passes, narration still true but narrower than the page | `da-ai-assisted` (`be-concurrency` was listed here in error) | 1 |
+| Still match | the other 36 (35 once `be-api-design`'s on-screen 422 label was found) | 36 |
 
 No video narrates a number that a page correction changed. The three failing
 checks all come from one page, `backend-engineer/ai-assisted-coding.mdx`,
@@ -100,7 +132,7 @@ narration never said "SLA callback".
 
 | Video | Beats | What the page now adds |
 | --- | --- | --- |
-| `be-concurrency` | `gil`, `gil-cost`, `gil-proc` | The GIL answers now say they describe the default build, and that the free-threaded build (officially supported since Python 3.14) runs CPU-bound threads in parallel. The narration describes the default build only, which is still what most candidates run. |
+| `be-concurrency` | `gil`, `gil-cost`, `gil-proc` | Listed in error: the video's `gil-free` beat already covers the free-threaded build. |
 | `da-ai-assisted` | `hook` | Narration: "Most analysts now draft queries with an AI assistant". Page: "Analysts draft queries, formulas, and chart code with an AI assistant". The dated "now" is the only difference. |
 
 ## 4. Found on the way, not caused by this pull request
@@ -137,9 +169,13 @@ videos:
 are independent of the evergreen question: the pages were corrected because
 the old statements were wrong or superseded.
 
-## Videos that still match (35)
+## Videos that already matched (35)
 
-`be-algorithms`, `be-api-design`, `be-databases`, `be-object-design`,
+This list is corrected: it first included `be-api-design`, whose narration
+matched but whose screen still showed "422 Unprocessable Entity" (fixed, see
+the top), and left out `be-concurrency`, which matched all along.
+
+`be-algorithms`, `be-concurrency`, `be-databases`, `be-object-design`,
 `be-scaling`, `be-system-design`, `da-ab-testing`, `da-advanced-sql`,
 `da-interview`, `da-pandas`, `da-spreadsheets`, `da-sql`,
 `da-statistics-communication`, `da-visualization`, `de-dimensional-modeling`,

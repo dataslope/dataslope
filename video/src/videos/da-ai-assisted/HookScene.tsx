@@ -32,7 +32,7 @@ export const HookScene: React.FC = () => {
   const from = n.beat("hook").from;
   const draftAt = n.word("hook", "draft queries");
   const requestAt = n.word("hook", "a plain request");
-  const rightAt = n.word("hook", "whether it's right");
+  const rightAt = n.word("hook-test", "whether it's right");
   const nineAt = n.word("plan", "Nine questions");
   const sixAt = n.word("plan", "Six get a full answer");
   const threeAt = n.word("plan", "The last three are short");

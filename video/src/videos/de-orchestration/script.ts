@@ -69,7 +69,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     checked against its caption: 1,000 clients without jitter land 1,000 in
  *     one 100 ms window against a capacity of 90; with jitter the peaks are
  *     261, 134 and 75 over the three rounds.
- *   - "bf-year": a 2025 backfill in Pyodide: 365 daily partitions, four at a
+ *   - "bf-year", "bf-throttle": a 2025 backfill in Pyodide: 365 daily partitions, four at a
  *     time (the video's own throttle), 92 waves.
  *   - "bf-cost": charts/incremental-vs-full-refresh.mjs: 8,000 rows a day on
  *     200,000; a full rebuild at day 730 reprocesses 6,040,000 rows, 755 times
@@ -215,7 +215,21 @@ export const script: NarrationScript = {
     },
     {
       id: "bf-year",
-      text: "Then a year of history is three hundred sixty-five daily runs. In Airflow, catchup with a sensible start date schedules them; in Dagster, partitioned assets do. Throttle them, here four at a time, so the source and the warehouse keep up.",
+      text: "Then a year of history is three hundred sixty-five daily runs.",
+      pauseAfter: 0.35,
+    },
+    {
+      // Split from "bf-year" and voiced alone (2026-11-20). It said catchup
+      // schedules a backfill, which Airflow 3 changed: catchup is off by
+      // default and only creates missed runs, and a backfill is its own
+      // command, run by the scheduler (orchestration-and-reliability.mdx).
+      id: "bf-tools",
+      text: "In Airflow, the backfill command schedules them over the date range; in Dagster, partitioned assets do.",
+      pauseAfter: 0.35,
+    },
+    {
+      id: "bf-throttle",
+      text: "Throttle them, here four at a time, so the source and the warehouse keep up.",
       pauseAfter: 0.6,
     },
     {
