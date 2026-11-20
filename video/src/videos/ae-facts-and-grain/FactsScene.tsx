@@ -115,6 +115,8 @@ export const FactsScene: React.FC = () => {
   const col = (c: string) => F.cols.indexOf(c);
   const rowsOut = askAt - 6;
   const [orders] = STAR.counts.rows[0];
+  // What each kind answers, on one line under the lowest box.
+  const labelsY = Math.max(fact.bottom, date.bottom, prod.bottom) + h(18);
 
   // The three names start in a row between the two heads, then sort.
   const chipY = y(SORT_Y) + h(132);
@@ -161,11 +163,11 @@ export const FactsScene: React.FC = () => {
         <Relation name="product" points={[prod.anchor("left", "product_sk"), fact.anchor("right", "product_sk")]} from="exactly-one" to="zero-or-many" at={prodKeyAt + 4} />
 
         {/* What each kind answers, under it. */}
-        <Note at={howAt} x={fact.left} y={fact.bottom + h(18)} out={rowsOut + 40}>
+        <Note at={howAt} x={fact.left} y={labelsY} out={rowsOut + 40}>
           <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>how much</span>
         </Note>
         {[date, prod].map((e, i) => (
-          <Note key={i} at={byAt + i * 4} x={e.left} y={e.bottom + h(18)} out={rowsOut + 40}>
+          <Note key={i} at={byAt + i * 4} x={e.left} y={labelsY} out={rowsOut + 40}>
             <span style={{ ...note(26, INK), fontWeight: 500, whiteSpace: "nowrap" }}>by what</span>
           </Note>
         ))}

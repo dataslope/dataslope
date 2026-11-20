@@ -4,11 +4,11 @@ import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Badge, Ink } from "../../editorial/ui";
+import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EVAL } from "./data";
-import { artBox, Box, Clear, Cross, Drift, Flow, line, Listing, listingHeight, listingWidth, Mark, MARK_GREEN, OK_INK, Spot, Wash, X0 } from "./parts";
+import { artBox, Box, Chip, Clear, Cross, Drift, Flow, line, Listing, listingHeight, listingWidth, Mark, MARK_GREEN, OK_INK, Spot, Wash, X0 } from "./parts";
 
 const SIZE = 19;
 const GAP = 60;
@@ -170,9 +170,9 @@ export const EvalScene: React.FC = () => {
           <div style={{ position: "absolute", left: X0, top: top + h(44) + 2 * rowH + h(30), display: "flex", gap: 14, fontSize: 22 }}>
             {["easy lookup", "multi-step comparison", "ambiguous phrasing"].map((t, i) => (
               <span key={t} style={{ opacity: ease(frame, mixAt[i], 10), transform: `translateY(${(1 - ease(frame, mixAt[i], 10)) * 8}px)` }}>
-                <Badge tone="gray" size={22}>
+                <Chip tone="gray" size={22}>
                   {t}
-                </Badge>
+                </Chip>
               </span>
             ))}
           </div>

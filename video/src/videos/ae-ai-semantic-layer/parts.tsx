@@ -5,9 +5,9 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Badge, type BadgeTone, Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -49,6 +49,14 @@ export { OK, OK_INK };
 
 /** The series' kicker, the same on every scene that carries one. */
 export const SERIES = "Analytics engineer interview questions";
+
+/** The house badge (editorial/ui.tsx) in the label face: Badge sets no
+ *  family of its own, and on the editorial page it would inherit the serif. */
+export const Chip: React.FC<{ tone: BadgeTone; size?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({ tone, size = 24, style, children }) => (
+  <Badge tone={tone} size={size} style={{ fontFamily: SANS, ...style }}>
+    {children}
+  </Badge>
+);
 
 /** A plain sentence on the page. */
 export const line = (size = 26, color: string = INK): React.CSSProperties => ({ ...note(size, color), whiteSpace: "nowrap" });

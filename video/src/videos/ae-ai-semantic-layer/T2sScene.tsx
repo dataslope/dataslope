@@ -83,7 +83,8 @@ export const T2sScene: React.FC = () => {
 
   // The rows: orders on the left, customers on the right until the query
   // takes its place.
-  const top = y(338);
+  const aTop = y(350);
+  const top = y(318);
   const headH = h(38);
   const rowH = h(36);
   const ordersCols: Col[] = READINGS.orders.columns.map((c) => ({ name: c, numeric: c === "amount" }));
@@ -114,7 +115,7 @@ export const T2sScene: React.FC = () => {
   const bracketY = resG.rowTop(1) + h(22);
 
   // The verdict and the decision, on the left once the rows have gone.
-  const verdictTop = y(338);
+  const verdictTop = y(330);
 
   return (
     <AbsoluteFill>
@@ -138,24 +139,24 @@ export const T2sScene: React.FC = () => {
 
         {/* The hard part, and the guesses it forces. */}
         <Clear at={rowsAt - 10}>
-          <Ink at={hardAt} dur={12} style={{ left: X0, top: y(338) }}>
-            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>The hard part</span>
+          <Ink at={hardAt} dur={12} style={{ left: X0, top: aTop }}>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>The hard part</span>
           </Ink>
-          <Ink at={sqlAt} dur={14} style={{ left: X0, top: y(338) + h(50) }}>
-            <span style={line(36, INK_SOFT)}>Not the syntax</span>
+          <Ink at={sqlAt} dur={14} style={{ left: X0, top: aTop + h(58) }}>
+            <span style={line(42, INK_SOFT)}>Not the syntax</span>
           </Ink>
-          <Ink at={defsAt} dur={14} style={{ left: X0, top: y(338) + h(110) }}>
-            <span style={{ ...line(36, INK), fontSize: 36 }}>
+          <Ink at={defsAt} dur={14} style={{ left: X0 - 6, top: aTop + h(128) }}>
+            <span style={{ ...line(42, INK), fontSize: 42 }}>
               <Mark at={encodeAt}>The definitions</Mark>
             </span>
           </Ink>
-          <ColumnRule x={R_X - 50} top={y(338)} height={h(50) + 5 * h(54)} at={revenueAt} />
-          <Ink at={revenueAt} dur={12} style={{ left: R_X, top: y(338) }}>
-            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Ask for revenue, and it has to guess</span>
+          <ColumnRule x={R_X - 50} top={aTop} height={h(58) + 5 * h(64) - h(20)} at={revenueAt} />
+          <Ink at={revenueAt} dur={12} style={{ left: R_X, top: aTop }}>
+            <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>Ask for revenue, and it has to guess</span>
           </Ink>
           {GUESSES.map((g, i) => (
-            <Ink key={g} at={guessAt[i]} dur={12} style={{ left: R_X, top: y(338) + h(50) + i * h(54) }}>
-              <span style={line(30, INK)}>{g}</span>
+            <Ink key={g} at={guessAt[i]} dur={12} style={{ left: R_X, top: aTop + h(58) + i * h(64) }}>
+              <span style={line(34, INK)}>{g}</span>
             </Ink>
           ))}
         </Clear>
@@ -192,9 +193,6 @@ export const T2sScene: React.FC = () => {
             { line: "AS governed_net_revenue", at: governedAt + 8 },
           ]}
         />
-        <Ink at={validAt} dur={12} style={{ left: R_X + qW - 140, top: top + listingHeight(q.length, SIZE) + h(16) }}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>No error</span>
-        </Ink>
 
         {/* The result, a cell for each reading as it is said. */}
         <TableName g={resG} at={everyAt}>
@@ -214,7 +212,10 @@ export const T2sScene: React.FC = () => {
             <Num>{READINGS.ratio}</Num>× apart
           </span>
         </Ink>
-        <Ink at={nothingAt} dur={12} style={{ left: resG.right + 50, top: resG.rowTop(0) + h(4) }}>
+        <Ink at={validAt} dur={12} style={{ left: resG.right + 50, top: resG.top + headH / 2 - 16 }}>
+          <span style={line(24, INK)}>Every query runs: no error</span>
+        </Ink>
+        <Ink at={nothingAt} dur={12} style={{ left: resG.right + 50, top: resG.rowTop(0) + h(40) / 2 - 16 }}>
           <span style={line(24, INK_SOFT)}>Nothing looks wrong</span>
         </Ink>
 

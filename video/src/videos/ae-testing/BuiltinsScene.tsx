@@ -154,7 +154,8 @@ export const BuiltinsScene: React.FC = () => {
   const singTop = y(540);
   const singW = listingWidth(singLines, YAML_SIZE);
   const sr = BUILTINS.singular.result;
-  const srg = resultGeometry(X0 + singW + 28, singTop, sr.cols, sr.rows, h, 20);
+  // Clear of the file name over the listing, which runs wider than its code.
+  const srg = resultGeometry(X0 + Math.max(singW, 600) + 40, singTop, sr.cols, sr.rows, h, 20);
   const colsTop = y(726);
   const COL_X = [X0, 700];
 
@@ -238,7 +239,7 @@ export const BuiltinsScene: React.FC = () => {
               <Listing lines={p.lines} x={X0} top={paneTops[i]} width={paneW} size={PANE_SIZE} at={p.at} out={q3Out} />
               <TestResult
                 g={rg}
-                cols={p.test.result.cols.map((name) => ({ name }))}
+                cols={p.test.result.cols.map((name) => ({ name, numeric: name !== "status" }))}
                 rows={p.test.result.rows}
                 at={exactlyAt + i * 6}
                 verdict={[{ at: exactlyAt + 4 + i * 6, tone: "bad", text: "1 row: fail" }]}
@@ -292,7 +293,7 @@ export const BuiltinsScene: React.FC = () => {
         </Note>
 
         {/* ── Question 4: generic tests are one query, the column a slot ── */}
-        <ListingTitle x={X0} top={tmplTop} at={genericAt} out={fileAt - 4} dim={fileAt - 4}>
+        <ListingTitle x={X0} top={tmplTop} at={genericAt} dim={fileAt + 10}>
           Generic: written once, the column a parameter
         </ListingTitle>
         <Listing lines={tmplLines} x={X0} top={tmplTop} size={YAML_SIZE} at={genericAt + 2} dim={fileAt + 10} />

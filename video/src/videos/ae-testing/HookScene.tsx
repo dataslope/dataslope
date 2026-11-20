@@ -78,7 +78,7 @@ export const HookScene: React.FC = () => {
     rowH: h(22.6),
     headSize: 19,
     bodySize: 19,
-    pad: 18,
+    pad: 24,
   });
   const dupRows = UNIQUE.table.rows.map((r, i) => (DUPLICATES.includes(Number(r[0])) ? i : -1)).filter((i) => i >= 0);
   const pairs = DUPLICATES.map((id) => dupRows.filter((i) => Number(UNIQUE.table.rows[i][0]) === id));
@@ -151,7 +151,7 @@ export const HookScene: React.FC = () => {
         <div style={{ position: "absolute", left: g.x - 200, top: tableBottom + h(10), width: g.width + 200, textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: h(6) }}>
           <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, ...TABULAR, opacity: ease(frame, revenueAt + 2, 10) }}>{money(UNIQUE.everyRow)}</span>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, revenueAt + 10, 10) }}>
-            against <Num>{money(UNIQUE.onePerOrder)}</Num>, once per order
+            one per order: <Num>{money(UNIQUE.onePerOrder)}</Num>
           </span>
           <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, tooHighAt - 2, 10) }}>
             <Num>{money(UNIQUE.tooHigh)}</Num> too high

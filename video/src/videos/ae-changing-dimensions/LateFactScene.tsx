@@ -193,6 +193,16 @@ export const LateFactScene: React.FC = () => {
           </svg>
         ) : null}
 
+        {/* The answer, before the order it is argued on. */}
+        <Note at={eventAt} x={X0} y={low} out={curAt - 4}>
+          <span style={{ ...note(28, OK_INK), whiteSpace: "nowrap" }}>Load it at its own event time</span>
+        </Note>
+        <Note at={todayAt + 6} x={X0} y={low + h(56)} out={curAt - 4}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            Dated <Num>{order.date}</Num>, loaded today
+          </span>
+        </Note>
+
         {/* ── Two lookups ── */}
         <Listing lines={C.lines} x={X0} top={low} width={listW} size={SIZE} at={curAt - 2} out={trapOut} title="By the current row" marks={[{ line: lineOf(C.lines, "is_current"), at: curAt + 14 }]} />
         <TableName g={gc} at={gets1002At - 4} out={trapOut}>

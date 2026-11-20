@@ -197,7 +197,7 @@ export const LayersScene: React.FC = () => {
         <Note at={costAt} x={X0} y={selY}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>What a change rebuilds</span>
         </Note>
-        {sel.map(({ s, at }, i) => {
+        {sel.map(({ s }, i) => {
           const down = s.models.length;
           return (
             <Note key={s.selector} at={i === 0 ? plusAt + 4 : factAt} x={X0} y={selY + h(40) + i * h(38)} dim={i === 0 ? factAt : undefined}>

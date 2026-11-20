@@ -4,18 +4,18 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Badge, Ink } from "../../editorial/ui";
+import { Ink } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COMPILED } from "./data";
-import { Box, Clear, Drift, Flow, line, Listing, listingHeight, listingWidth, OK_INK, Strike, X0 } from "./parts";
+import { Box, Chip, Clear, Drift, Flow, line, Listing, listingHeight, listingWidth, OK_INK, Strike, X0 } from "./parts";
 
 /** The three columns: the assistant's request, the layer, what comes out. */
 const SLOT_X = 262;
 const SLOT_W = 208;
-const LAYER = { x: 560, w: 540 };
-const OUT_X = 1190;
+const LAYER = { x: 550, w: 520 };
+const OUT_X = 1150;
 const SIZE = 20;
 
 /** Question 1's guesses, which the layer settles. */
@@ -140,7 +140,7 @@ export const SemScene: React.FC = () => {
   const consumerW = 250;
   const consumerGap = 50;
   const consumerX = (i: number) => LAYER.x + LAYER.w / 2 - (3 * consumerW + 2 * consumerGap) / 2 + i * (consumerW + consumerGap);
-  const forkTop = y(704);
+  const forkTop = top + h(100);
 
   return (
     <AbsoluteFill>
@@ -176,7 +176,7 @@ export const SemScene: React.FC = () => {
         ))}
 
         {/* The layer, and the definition that replaces them. */}
-        <Box x={LAYER.x} y={layerTop} w={LAYER.w} h={layerH} at={codeAt - 6} title="Semantic layer" size={26} align="top" dim={tradeFrom + 10} />
+        <Box x={LAYER.x} y={layerTop} w={LAYER.w} h={layerH} at={codeAt - 6} title="Semantic layer" size={26} align="top" />
         <Ink at={codeAt + 8} dur={14} style={{ left: LAYER.x + 30, top: defTop }}>
           <div style={{ fontFamily: MONO, fontSize: 26, fontWeight: 500, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>net_revenue</div>
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 6 }}>completed orders, test accounts excluded</div>
@@ -184,9 +184,9 @@ export const SemScene: React.FC = () => {
         <div style={{ position: "absolute", left: LAYER.x + 30, top: badgeTop - h(20), width: LAYER.w - 60, height: 1, background: HAIRLINE, opacity: 0.6 * ease(frame, declaredAt[0] - 4, 12) }} />
         {DECLARED.map((d, i) => (
           <Ink key={d} at={declaredAt[i]} dur={12} style={{ left: LAYER.x + 30 + (i % 2) * 240, top: badgeTop + Math.floor(i / 2) * h(56) }}>
-            <Badge tone="gray" size={24}>
+            <Chip tone="gray" size={24}>
               {d}
-            </Badge>
+            </Chip>
           </Ink>
         ))}
         <Ink at={onceAt} dur={12} style={{ left: LAYER.x + 30, top: badgeTop + h(124) }}>
@@ -289,17 +289,17 @@ export const SemScene: React.FC = () => {
         </Ink>
 
         {/* The price: coverage, and the fork around it. */}
-        <Ink at={coverageAt} dur={12} style={{ left: X0, top: forkTop }}>
+        <Ink at={coverageAt} dur={12} style={{ left: OUT_X, top }}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>The price: coverage</span>
         </Ink>
-        <Ink at={onlyAt} dur={12} style={{ left: X0, top: forkTop + h(40) }}>
+        <Ink at={onlyAt} dur={12} style={{ left: OUT_X, top: top + h(40) }}>
           <span style={line(22, INK_SOFT)}>Only what has been modeled</span>
         </Ink>
-        <Box x={X0} y={forkTop + h(96)} w={230} h={h(64)} at={routeAt - 6} title="A question" size={24} />
-        <Flow points={[[X0 + 240, forkTop + h(128)], [X0 + 300, forkTop + h(128)], [X0 + 300, forkTop + h(62)], [X0 + 370, forkTop + h(62)]]} at={routeAt} />
-        <Box x={X0 + 380} y={forkTop + h(32)} w={460} h={h(60)} at={routeAt + 8} title="Modeled: through the layer" tone="ok" size={24} />
-        <Flow points={[[X0 + 240, forkTop + h(128)], [X0 + 300, forkTop + h(128)], [X0 + 300, forkTop + h(196)], [X0 + 370, forkTop + h(196)]]} at={fallAt} />
-        <Box x={X0 + 380} y={forkTop + h(166)} w={460} h={h(60)} at={fallAt + 8} title="Exploratory: text-to-SQL, labeled" size={24} />
+        <Box x={OUT_X} y={forkTop} w={220} h={h(60)} at={routeAt - 6} title="A question" size={24} />
+        <Flow points={[[OUT_X + 40, forkTop + h(60) + 8], [OUT_X + 40, forkTop + h(130)], [OUT_X + 82, forkTop + h(130)]]} at={routeAt} />
+        <Box x={OUT_X + 90} y={forkTop + h(100)} w={470} h={h(60)} at={routeAt + 8} title="Modeled: through the layer" tone="ok" size={24} />
+        <Flow points={[[OUT_X + 40, forkTop + h(60) + 8], [OUT_X + 40, forkTop + h(230)], [OUT_X + 82, forkTop + h(230)]]} at={fallAt} />
+        <Box x={OUT_X + 90} y={forkTop + h(200)} w={470} h={h(60)} at={fallAt + 8} title="Exploratory: text-to-SQL, labeled" size={24} />
       </Drift>
     </AbsoluteFill>
   );

@@ -228,7 +228,7 @@ export const RefreshScene: React.FC = () => {
         </div>
 
         {/* ── The price ── */}
-        <Note at={costAt + 2} x={X0} y={row("chartLabel")}>
+        <Note at={chartAt - 2} x={X0} y={row("chartLabel")}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             Rows one run processes
             <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>

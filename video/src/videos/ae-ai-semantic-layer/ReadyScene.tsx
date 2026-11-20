@@ -4,11 +4,11 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Badge, Ink } from "../../editorial/ui";
+import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { READY } from "./data";
-import { artBox, Box, Clear, Drift, Flow, line, Listing, listingWidth, Mark, OK_INK, spanAt, Spot, X0 } from "./parts";
+import { artBox, Box, Chip, Clear, Drift, Flow, line, Listing, listingWidth, Mark, OK_INK, spanAt, Spot, X0 } from "./parts";
 
 const SIZE = 19;
 /** The right column, beside the YAML. */
@@ -139,14 +139,14 @@ export const ReadyScene: React.FC = () => {
         />
         {/* Each test passes on the page's orders. */}
         <Ink at={uniqueAt + 10} dur={12} style={{ left: keyTests.x1 + 28, top: keyTests.mid - 17 }}>
-          <Badge tone="green" size={21}>
+          <Chip tone="green" size={21}>
             {passOf("unique") && passOf("not_null") ? "pass" : "fail"}
-          </Badge>
+          </Chip>
         </Ink>
         <Ink at={acceptedAt + 10} dur={12} style={{ left: valuesSpan.x1 + 28, top: valuesSpan.mid - 17 }}>
-          <Badge tone="green" size={21}>
+          <Chip tone="green" size={21}>
             {passOf("accepted_values") ? "pass" : "fail"}
-          </Badge>
+          </Chip>
         </Ink>
 
         {/* What the YAML gives the assistant: descriptions, then tests. */}
@@ -197,9 +197,9 @@ export const ReadyScene: React.FC = () => {
             <React.Fragment key={m.name}>
               <Box x={modelX(i)} y={modelTop} w={MODEL_W} h={modelH} at={markAt + i * 5} title={m.name} mono size={22} toTone={m.access === "public" ? "ok" : "soft"} toAt={m.access === "public" ? exposeAt : privateAt} />
               <Ink at={m.access === "public" ? exposeAt : privateAt + i * 4} dur={12} style={{ left: modelX(i), width: MODEL_W, top: modelTop - h(50), textAlign: "center" }}>
-                <Badge tone={m.access === "public" ? "green" : "gray"} size={21}>
+                <Chip tone={m.access === "public" ? "green" : "gray"} size={21}>
                   {m.access}
-                </Badge>
+                </Chip>
               </Ink>
               {i < MODELS.length - 1 ? (
                 <Flow points={[[modelX(i) + MODEL_W + 6, modelTop + modelH / 2], [modelX(i + 1) - 6, modelTop + modelH / 2]]} at={markAt + 4 + i * 5} color={INK_SOFT} head={11} width={2} />

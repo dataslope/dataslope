@@ -193,6 +193,7 @@ export const script: NarrationScript = {
   voice: "drew",
   minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
+  takeChars: 1950,
   beats: [
     // ── Opening ───────────────────────────────────────────────────────────
     {

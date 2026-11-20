@@ -25,7 +25,7 @@ const PLAN = [
   "Reviewing a model it wrote",
   "Connecting to governed metrics",
 ];
-const PLAN_ROW = 38;
+const PLAN_ROW = 36;
 const QUICK_X = 700;
 
 /**
@@ -56,8 +56,8 @@ export const HookScene: React.FC = () => {
   const xs = MODELS.map((_, i) => X0 + i * (MODEL_W + MODEL_GAP));
   const lineageRight = xs[2] + MODEL_W;
   const dolphin = artBox("ae-ai-semantic-layer-dolphin", 440);
-  const planTop = y(652);
-  const rowsTop = y(736);
+  const planTop = y(630);
+  const rowsTop = y(708);
 
   return (
     <AbsoluteFill>

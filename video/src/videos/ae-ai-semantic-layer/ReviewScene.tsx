@@ -4,13 +4,13 @@ import { ease, pop } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
-import { Badge, Ink } from "../../editorial/ui";
+import { Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { READINGS, REVIEW } from "./data";
-import { artBox, Clear, Cross, Drift, Listing, listingWidth, Mark, OK_INK, spanAt, Spot, X0 } from "./parts";
+import { artBox, Chip, Clear, Cross, Drift, Listing, listingWidth, Mark, OK_INK, spanAt, Spot, X0 } from "./parts";
 
 const SIZE = 20;
 const R_X = 1190;
@@ -362,9 +362,9 @@ const Window: React.FC<{ x0: number; x1: number; y0: number; y1: number; at: num
  *  badge's tint, with a note under it. */
 const MetricChip: React.FC<{ name: string; value: string; tone: "green" | "red"; note: string; show: number }> = ({ name, value, tone, note: sub, show }) => (
   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 14, opacity: show }}>
-    <Badge tone={tone} size={26}>
+    <Chip tone={tone} size={26}>
       <span style={{ fontFamily: MONO, fontSize: 25 }}>{name}</span> {value}
-    </Badge>
+    </Chip>
     <span style={{ ...note(21, tone === "green" ? OK_INK : ACCENT_INK), whiteSpace: "nowrap" }}>{sub}</span>
   </div>
 );

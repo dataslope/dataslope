@@ -10,10 +10,10 @@ import { Sfx } from "../../sound/Sfx";
 import { GRAIN } from "./data";
 import { colsOf, Cross, DataTable, Drift, geoOf, KeyArrow, Mark, MARK_OK, money, Mono, OK, OK_INK, Spot, TableName, X0 } from "./parts";
 
-const TABLE_Y = 470;
+const TABLE_Y = 450;
 const GRAIN_Y = 290;
 const RIGHT_X = 1170;
-const OPTS = { headH: 52, rowH: 62, bodySize: 27, headSize: 22 } as const;
+const OPTS = { headH: 52, rowH: 58, bodySize: 27, headSize: 22 } as const;
 
 /**
  * Question 2. The grain said first, "one row per order line", as the order-
@@ -59,7 +59,7 @@ export const GrainScene: React.FC = () => {
   const O = GRAIN.orderGrain;
   const og = geoOf(O, RIGHT_X, y(TABLE_Y), h, OPTS);
   const S = GRAIN.split;
-  const sg = geoOf(S, RIGHT_X, og.rowTop(1) + h(96), h, { headH: 46, rowH: 50, bodySize: 24, headSize: 21 });
+  const sg = geoOf(S, RIGHT_X, og.rowTop(1) + h(80), h, { headH: 46, rowH: 50, bodySize: 24, headSize: 21 });
   const total = GRAIN.totals.rows[0][GRAIN.totals.cols.indexOf("shipping_fee")];
   const paid = O.rows[0][O.cols.indexOf("shipping_fee")];
   const share = S.cols.indexOf("fee_share");
@@ -142,12 +142,12 @@ export const GrainScene: React.FC = () => {
         </Note>
 
         {/* What a sum makes of it. */}
-        <Note at={fifteenAt} x={g.xs[fee]} y={below + h(28)}>
+        <Note at={fifteenAt} x={g.xs[fee]} y={below + h(24)}>
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mono>SUM(shipping_fee)</Mono> = <span style={{ color: ACCENT_INK, fontWeight: 500 }}>{money(total)}</span>
           </span>
         </Note>
-        <Note at={fifteenAt + 10} x={g.xs[fee]} y={below + h(72)}>
+        <Note at={fifteenAt + 10} x={g.xs[fee]} y={below + h(66)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>for one fee of {money(paid)}</span>
         </Note>
 
@@ -190,7 +190,7 @@ export const GrainScene: React.FC = () => {
         </Note>
 
         {/* Why it matters: nothing errors. */}
-        <Note at={errorsAt} x={X0} y={below + h(140)}>
+        <Note at={errorsAt} x={X0} y={below + h(124)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             Nothing errors.
             <span style={{ opacity: ease(frame, wrongAt, 10) }}>
@@ -199,7 +199,7 @@ export const GrainScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={catchesAt} x={X0} y={below + h(188)}>
+        <Note at={catchesAt} x={X0} y={below + h(172)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>A declared grain catches it before anyone sums.</span>
         </Note>
       </Drift>

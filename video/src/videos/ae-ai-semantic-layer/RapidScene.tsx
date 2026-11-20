@@ -3,10 +3,10 @@ import { AbsoluteFill } from "remotion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Badge, ColumnRule, Ink } from "../../editorial/ui";
+import { ColumnRule, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Box, Drift, Flow, Headline, Kicker, X0 } from "./parts";
+import { Box, Chip, Drift, Flow, Headline, Kicker, X0 } from "./parts";
 
 const LIST_TOP = 380;
 const ROW = 66;
@@ -104,9 +104,9 @@ export const RapidScene: React.FC = () => {
 
         {/* The design points, on the parts of the path they govern. */}
         <Ink at={userAt + 4} dur={12} style={{ left: ASST.x, top: mid + asstH / 2 + h(26) }}>
-          <Badge tone="green" size={22}>
+          <Chip tone="green" size={22}>
             as the user
-          </Badge>
+          </Chip>
         </Ink>
         <Ink at={permsAt} dur={12} style={{ left: ASST.x, top: mid + asstH / 2 + h(76) }}>
           <div style={{ ...note(21, INK), whiteSpace: "nowrap" }}>their row and</div>
@@ -117,20 +117,20 @@ export const RapidScene: React.FC = () => {
         </Ink>
         <div style={{ position: "absolute", left: IFACE.x, top: whTop + whH + h(26), display: "flex", gap: 14, fontSize: 22 }}>
           <Ink at={readOnlyAt + 4} dur={12} style={{ position: "relative" }}>
-            <Badge tone="green" size={22}>
+            <Chip tone="green" size={22}>
               read-only
-            </Badge>
+            </Chip>
           </Ink>
           <Ink at={limitsAt + 4} dur={12} style={{ position: "relative" }}>
-            <Badge tone="green" size={22}>
+            <Chip tone="green" size={22}>
               cost and timeout limits
-            </Badge>
+            </Chip>
           </Ink>
         </div>
         <Ink at={logAt + 4} dur={12} style={{ left: MCP.x, top: whTop + whH + h(26) }}>
-          <Badge tone="green" size={22}>
+          <Chip tone="green" size={22}>
             logged
-          </Badge>
+          </Chip>
         </Ink>
         <Ink at={auditAt} dur={12} style={{ left: MCP.x, top: whTop + whH + h(76) }}>
           <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>For audit, and the golden set</span>

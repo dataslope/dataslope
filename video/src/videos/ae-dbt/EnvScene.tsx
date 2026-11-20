@@ -126,11 +126,11 @@ export const EnvScene: React.FC = () => {
         </Line>
 
         {/* Dev and prod, side by side. */}
-        <Line at={devAt} x={COL[0]} y={headY} size={28} weight={600}>
-          <Code>dev</Code> <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, ownAt, 10) }}>· each developer&rsquo;s own schema</span>
+        <Line at={twoAt} x={COL[0]} y={headY} size={28} weight={600}>
+          <Code>dev</Code> <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, devAt, 10) }}>· each developer&rsquo;s own schema</span>
         </Line>
-        <Line at={prodAt} x={COL[1]} y={headY} size={28} weight={600}>
-          <Code>prod</Code> <span style={{ color: INK_SOFT, fontWeight: 500 }}>· the production schema</span>
+        <Line at={twoAt + 6} x={COL[1]} y={headY} size={28} weight={600}>
+          <Code>prod</Code> <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, prodAt, 10) }}>· the production schema</span>
         </Line>
         <Line at={ownAt} x={COL[0]} y={schemaY} size={24}>
           Schema <Code color={BLUE_INK}>dbt_alice</Code>
@@ -144,7 +144,7 @@ export const EnvScene: React.FC = () => {
         <Line at={prodAt + 8} x={COL[1]} y={restY} color={INK_SOFT}>
           Plus its own database and credentials
         </Line>
-        <VRule x={ruleX} top={headY} bottom={restY + h(30)} at={prodAt} />
+        <VRule x={ruleX} top={headY} bottom={restY + h(30)} at={twoAt + 6} />
 
         {/* ── Question 9: one ref, resolved per target ── */}
         <Line at={resolvesAt} x={refX} y={refTop - h(40)} color={INK_SOFT} out={q9Out}>
