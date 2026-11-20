@@ -61,7 +61,9 @@ export const AiScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const from = n.beat("ai").from;
-  const coreAt = n.word("ai", "that core");
+  // The core and the stack ink on the scene's first words, so the cut never
+  // leaves an empty page while "that core" points back at the probes.
+  const coreAt = n.word("ai", "AI has added");
   const replacedAt = n.word("ai", "not replaced it");
   const core = [
     { text: "Modeling,", at: n.word("ai", "Modeling") },
@@ -92,8 +94,8 @@ export const AiScene: React.FC = () => {
       n: 2,
       title: "AI-ready modeling",
       at: n.word("ai-ready", "AI-ready modeling"),
-      sub: "Written for a reader that is a language model",
-      subAt: n.word("ai-ready", "a reader that is a language model"),
+      sub: "Docs, tests, access rules for a language model",
+      subAt: n.word("ai-ready", "documentation"),
     },
     {
       n: 3,
@@ -123,7 +125,7 @@ export const AiScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {[0, 1, 2].map((i) => (
-        <Sfx key={`m${i}`} name="el-tap" at={coreAt + i * 4} level={-36} />
+        <Sfx key={`m${i}`} name="el-tap" at={coreAt + 6 + i * 4} level={-36} />
       ))}
       {core.map((c) => (
         <Sfx key={c.text} name="el-tap" at={c.at} level={-33} />
@@ -142,7 +144,7 @@ export const AiScene: React.FC = () => {
         <Kicker at={from}>How AI has changed the interview</Kicker>
 
         {/* Still the core: one line, in the serif. */}
-        <div style={{ position: "absolute", left: COL_X, top: y(CORE_LABEL_Y), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, coreAt - 2, 12) }}>
+        <div style={{ position: "absolute", left: COL_X, top: y(CORE_LABEL_Y), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, coreAt + 4, 12) }}>
           Still the core
         </div>
         <div style={{ position: "absolute", left: COL_X - 3, top: y(CORE_Y), ...headline(56), whiteSpace: "nowrap", display: "flex", gap: "0.24em" }}>
@@ -167,7 +169,9 @@ export const AiScene: React.FC = () => {
             background: HAIRLINE,
           }}
         />
-        <div style={{ position: "absolute", left: COL_X, top: y(ADDED_Y), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, replacedAt + 4, 12) }}>
+        {/* "Added on top" waits for the list it heads ("So expect four more
+            topics"), so it never stands over an empty column. */}
+        <div style={{ position: "absolute", left: COL_X, top: y(ADDED_Y), ...label(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, n.beat("ai-four").from - 4, 12) }}>
           <span style={{ marginLeft: "-0.14em" }}>
             <Mark at={fourAt} out={topics[0].at}>
               Added on top
@@ -225,14 +229,16 @@ export const AiScene: React.FC = () => {
         <div style={{ position: "absolute", left: COL_X, top: y(ASK_Y), ...note(26, INK), whiteSpace: "nowrap" }}>
           <span style={{ opacity: ease(frame, roundsAt - 2, 12) }}>Some coding rounds allow an assistant. </span>
           <span style={{ opacity: ease(frame, askAt - 2, 12) }}>
-            <Mark at={askAt + 2}>Ask the recruiter, round by round.</Mark>
+            <Mark at={askAt + 2} out={moreAt - 4}>
+              Ask the recruiter, round by round.
+            </Mark>
           </span>
         </div>
 
         {/* The figure: the models from the hook, then the assistant over
             them, reading through the metric definitions on top. */}
         {["Staging", "Intermediate", "Marts"].map((name, i) => (
-          <Box key={name} x={FIG_X} y={modelTop(i)} w={FIG_W} h={MODEL_H} at={coreAt + i * 4}>
+          <Box key={name} x={FIG_X} y={modelTop(i)} w={FIG_W} h={MODEL_H} at={coreAt + 6 + i * 4}>
             {name}
           </Box>
         ))}

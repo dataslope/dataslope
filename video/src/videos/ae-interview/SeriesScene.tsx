@@ -61,7 +61,7 @@ const Rule: React.FC<{ at: number }> = ({ at }) => {
  * with code only as evidence under it. Then the nine topic videos in series
  * order, each a column with its part number and title under the baseline, a
  * bar for the questions it answers and its own watercolor hero standing on
- * the bar. The names ink in along the baseline as "nine videos" is said, and
+ * the bar. The names ink in along the baseline as "This series" is said, and
  * each bar rises, its hero with it, as the narration names that video. Under
  * the names, the total they answer, 147, and on the right the one this
  * overview answers. Then the practice on the pages, as three columns, and the
@@ -77,7 +77,9 @@ export const SeriesScene: React.FC = () => {
   const failAt = n.word("series", "the ways they fail");
   const codeAt = n.word("series", "Code comes on screen");
   const evidenceAt = n.word("series", "only as evidence");
-  const nineAt = n.word("series-parts", "nine videos");
+  // The map of the nine is drawn as the series is named, so the headline
+  // never stands over an empty page; the bars wait for "series-list".
+  const mapAt = n.word("series", "This series");
   const totalAt = n.word("series-parts", "hundred and forty-seven");
   const onceAt = n.word("series-parts", "each once");
   const riseAt = [
@@ -100,7 +102,7 @@ export const SeriesScene: React.FC = () => {
 
   const colX = (i: number) => LEFT + i * (COL_W + GAP);
   const base = y(BASE);
-  const nameAt = (i: number) => nineAt + 2 + i * 3;
+  const nameAt = (i: number) => mapAt + 2 + i * 3;
   const barH = (i: number) => h(BAR_MAX) * (questionsOf(TOPIC_PARTS[i]) / MOST);
   const lit = (i: number) => (i === 0 ? ease(frame, grainAt - 2, 12) : 0);
   const dimmed = (i: number) => (i === 0 ? 0 : ease(frame, grainAt, 16) * 0.55);
@@ -135,7 +137,7 @@ export const SeriesScene: React.FC = () => {
             top: base,
             height: 1.5,
             background: HAIRLINE,
-            opacity: ease(frame, nineAt, 16),
+            opacity: ease(frame, mapAt, 16),
           }}
         />
 

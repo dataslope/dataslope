@@ -220,6 +220,23 @@ export const HookScene: React.FC = () => {
               {name}
             </Box>
           ))}
+          {/* The page's name for the layer the role owns, over the stack. It
+              steps back with the hook's words: after the slide it would sit
+              level with the kicker. */}
+          <div
+            style={{
+              position: "absolute",
+              left: STACK_X - 100,
+              width: STACK_W + 200,
+              top: stackTop - 20 - 31,
+              textAlign: "center",
+              ...note(24, INK_SOFT),
+              whiteSpace: "nowrap",
+              opacity: ease(frame, layerAt + 6, 12) * (1 - ease(frame, wordsOut, 10)),
+            }}
+          >
+            The transformation layer
+          </div>
           <Flow
             points={[
               [RAW_X + RAW_W + 14, rowY],
@@ -276,7 +293,9 @@ export const HookScene: React.FC = () => {
             Usually built with <Badge tone="gray" size={24} style={{ marginLeft: 6, opacity: ease(frame, dbtAt - 2, 10) }}>dbt</Badge>
           </div>
 
-          {/* The two ends take their names. */}
+          {/* The two ends take their names, and keep them: they ride up
+              with the row and stay over the probes, since "between data
+              engineering and analytics" is the role's definition. */}
           {[
             { text: "Data engineering", x: RAW_X, w: RAW_W, at: deAt },
             { text: "Analytics", x: DASH_X, w: DASH_W, at: analyticsAt },
@@ -291,7 +310,7 @@ export const HookScene: React.FC = () => {
                 textAlign: "center",
                 ...note(24, INK_SOFT),
                 whiteSpace: "nowrap",
-                opacity: ease(frame, c.at - 2, 12) * (1 - ease(frame, wordsOut, 10)),
+                opacity: ease(frame, c.at - 2, 12),
                 transform: `translateY(${(1 - ease(frame, c.at - 2, 12)) * 8}px)`,
               }}
             >
@@ -324,7 +343,7 @@ export const HookScene: React.FC = () => {
                 style={{
                   position: "absolute",
                   left: LIST_X,
-                  top: top + 18,
+                  top: top + 22,
                   width: LIST_R - LIST_X,
                   opacity: q,
                   transform: `translateY(${(1 - q) * -10}px)`,

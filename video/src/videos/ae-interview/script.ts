@@ -25,12 +25,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     tables", an empty middle, "Dashboard" (the easel spot,
  *     ae-interview-dashboard, beside it), inking in on "raw tables" and
  *     "dashboard"; on "layer of models" the middle box draws itself as a
- *     small stack of three model boxes, and the platypus settles beside it
- *     on "owns it". "hook-more": the three words "clean", "tested",
+ *     small stack of three model boxes, named over it with the page's term,
+ *     "The transformation layer", and the platypus settles beside it on
+ *     "owns it". "hook-more": the three words "clean", "tested",
  *     "documented" ink in under the stack, and a small "dbt" badge on "dbt";
  *     on "between data engineering and analytics" the two outer boxes take
- *     the captions "Data engineering" and "Analytics". "probe": the row
- *     slides up, and the page's four probes come in as a ruled list, one per
+ *     the captions "Data engineering" and "Analytics", which stay through
+ *     the probes (the review of 2026-11-20). "probe": the row slides up, and the page's four probes come in as a ruled list, one per
  *     beat, each with its topics as a line of words in the page's order,
  *     the head words under the yellow highlighter as they are said: SQL and
  *     modeling (facts and dimensions, star schemas, grain, slowly changing
@@ -50,7 +51,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "ai-review"), each short ("Text-to-SQL or a semantic layer", "AI-ready
  *     modeling", "Evaluating an assistant", "Reviewing AI-written models"),
  *     the words the beat dwells on below each ("confident wrong answers";
- *     "a reader that is a language model"; "verified answers, and ones to
+ *     "docs, tests, access rules for a language model"; "verified answers, and ones to
  *     decline"; "grain, incremental logic, duplicate metrics"). "ai-ask":
  *     the line "Ask the recruiter, round by round" under the list.
  *     "ai-more": a bracket gathers the four and labels them "Part 9"
