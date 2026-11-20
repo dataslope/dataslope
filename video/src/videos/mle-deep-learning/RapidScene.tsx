@@ -260,7 +260,7 @@ export const RapidScene: React.FC = () => {
         <Sfx key={item.n} name="el-tap" at={item.at} level={-32} />
       ))}
       <Sfx name="el-pop" at={c.w("r-transfer", "freeze it")} level={-31} />
-      <Sfx name="el-pop" at={c.w("r-softmax", "applied twice over ten classes")} level={-31} />
+      <Sfx name="el-pop" at={c.w("r-softmax", "applied twice over ten classes")} level={-34} />
       <Sfx name="el-chime" at={end + 4} level={-33} />
 
       <Drift from={from} to={n.beat("rnn-in").to + 40} scale={0.015}>

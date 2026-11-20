@@ -117,7 +117,7 @@ const Reason: React.FC<{ c: Ctx }> = ({ c }) => {
   const thinkEnd = sx(THINK) - 8;
   return (
     <>
-      <Line at={budgetAt} x={R_X} y={top - c.h(48)} size={24} color={INK}>
+      <Line at={budgetAt} x={R_X} y={top - c.h(84)} size={24} color={INK}>
         One request, as question <Num>1</Num> drew it
       </Line>
       <Svg>

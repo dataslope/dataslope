@@ -72,6 +72,8 @@ export const WindowScene: React.FC = () => {
   const edge = FRAME.x + frameW + 4;
   const loose = ease(frame, looseAt, 16);
   const worse = ease(frame, worseAt, 14);
+  // The two labels that swap places are hidden while they pass each other.
+  const swapShown = wide < 0.2 ? 1 - wide / 0.2 : wide > 0.8 ? (wide - 0.8) / 0.2 : 0;
   const squeeze = 1 - 0.04 * Math.sin(Math.min(1, Math.max(0, (frame - competeAt) / 24)) * Math.PI);
 
   return (
@@ -120,7 +122,8 @@ export const WindowScene: React.FC = () => {
             <line x1={edge} x2={edge} y1={top - h(26)} y2={top + H + h(26)} stroke={ACCENT} strokeWidth={3 + 3 * pulse(frame, learnsAt, 30)} opacity={ease(frame, pastAt + 6, 10)} />
           ) : null}
         </Svg>
-        {segs.map((s) => (
+        {segs.map((s) =>
+          s === ans && swapShown <= 0 ? null : (
           <div
             key={s.text}
             style={{
@@ -130,15 +133,18 @@ export const WindowScene: React.FC = () => {
               ...label(22, INK),
               fontWeight: 500,
               whiteSpace: "nowrap",
-              opacity: ease(frame, s.at + 6, 12),
+              opacity: ease(frame, s.at + 6, 12) * (s === ans ? swapShown : 1),
             }}
           >
             {s.text}
           </div>
-        ))}
-        <div style={{ position: "absolute", left: overX + 6, top: top - h(40), ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, pastAt + 4, 12) }}>
-          more documents
-        </div>
+          ),
+        )}
+        {swapShown > 0 ? (
+          <div style={{ position: "absolute", left: overX + 6, top: top - h(40), ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, pastAt + 4, 12) * swapShown }}>
+            more documents
+          </div>
+        ) : null}
         <div style={{ position: "absolute", left: over.x + 6, top: top + H + h(18), ...label(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, invisAt, 12) * (1 - wide) }}>
           invisible
         </div>

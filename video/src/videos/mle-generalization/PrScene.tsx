@@ -246,24 +246,18 @@ export const PrScene: React.FC = () => {
                   <circle cx={mx} cy={at(cy, m.t.precision)} r={8 * ease(frame, m.pAt, 8)} fill={BAR} />
                   <circle cx={mx} cy={at(cy, m.t.recall)} r={8 * ease(frame, m.rAt, 8)} fill={SERIES2} />
                 </Svg>
-                {/* Each label on the side its line leaves clear: precision
-                    rises to the right, recall falls. */}
+                {/* Each label on the side its lines leave clear, and at 0.1
+                    left of the dashed line, clear of the top-1,000 band. */}
                 <Say
                   at={m.pAt}
-                  x={m.t.t > 0.3 ? mx - 12 : mx + 12}
-                  y={at(cy, m.t.precision) + (m.t.t > 0.3 ? -42 : 8)}
+                  x={m.t.t > 0.3 ? mx - 12 : mx - 6}
+                  y={at(cy, m.t.precision) - (m.t.t > 0.3 ? 42 : 40)}
                   width={80}
-                  align={m.t.t > 0.3 ? "right" : "left"}
+                  align="right"
                 >
                   <span style={{ ...line(24, BLUE_INK), ...TABULAR }}>{pct(m.t.precision)}</span>
                 </Say>
-                <Say
-                  at={m.rAt}
-                  x={m.t.t > 0.3 ? mx - 12 : mx + 12}
-                  y={at(cy, m.t.recall) + (m.t.t > 0.3 ? 8 : -40)}
-                  width={80}
-                  align={m.t.t > 0.3 ? "right" : "left"}
-                >
+                <Say at={m.rAt} x={m.t.t > 0.3 ? mx - 12 : mx - 6} y={at(cy, m.t.recall) + 8} width={80} align="right">
                   <span style={{ ...line(24, SERIES2_INK), ...TABULAR }}>{pct(m.t.recall)}</span>
                 </Say>
               </React.Fragment>

@@ -78,6 +78,7 @@ export const BatchScene: React.FC = () => {
   const s37At = n.word("q3-sim", "thirty-seven percent");
   const c99At = n.word("q3-sim", "Continuous batching, ninety-nine");
   const memAt = n.word("q3-mem", "Every busy slot needs cache memory");
+  const knowsAt = n.word("q3-mem", "no one knows in advance");
   const reserveAt = n.word("q3-mem", "Reserve eight K tokens");
   const usingAt = n.word("q3-mem", "ends up using two thousand");
   const quartersAt = n.word("q3-mem", "three quarters of its buffer");
@@ -276,10 +277,27 @@ export const BatchScene: React.FC = () => {
 
         {/* ── Part B: the cache's memory ── */}
         <Enter at={clearA + 6}>
-          <Line at={reserveAt - 4} x={X0} y={bufTop - h(46)} size={24} color={INK}>
-            One request&apos;s cache, reserved up front: <Num>{commas(PAGING.reservedTokens)}</Num> tokens
+          <Line at={memAt + 4} x={X0} y={bufTop - h(46)} size={24} color={INK}>
+            One request&apos;s cache
+            <span style={{ opacity: ease(frame, reserveAt - 4, 12) }}>
+              , reserved up front: <Num>{commas(PAGING.reservedTokens)}</Num> tokens
+            </span>
           </Line>
           <Svg>
+            {frame < reserveAt + 12 ? (
+              <rect
+                x={X0}
+                y={bufTop}
+                width={(0.25 + 0.6 * ease(frame, knowsAt, 30) + 0.12 * Math.sin((frame - knowsAt) / 9) * ease(frame, knowsAt, 30)) * BUF_W * ease(frame, memAt + 6, 14)}
+                height={bufH}
+                rx={8}
+                fill="none"
+                stroke={INK_SOFT}
+                strokeWidth={2}
+                strokeDasharray="8 6"
+                opacity={1 - ease(frame, reserveAt, 12)}
+              />
+            ) : null}
             <rect x={X0} y={bufTop} width={BUF_W * ease(frame, reserveAt, 16)} height={bufH} rx={8} fill="none" stroke={INK} strokeWidth={2} />
             <rect x={X0 + 4} y={bufTop + 4} width={(BUF_W - 8) * ease(frame, reserveAt + 6, 16) * (1 - more * 0)} height={bufH - 8} rx={4} fill={IDLE} opacity={ease(frame, usingAt, 12)} />
             <rect x={X0 + 4} y={bufTop + 4} width={(usedW - 4) * ease(frame, usingAt, 16)} height={bufH - 8} rx={4} fill={DATA} />
@@ -287,6 +305,9 @@ export const BatchScene: React.FC = () => {
               <rect key={k} x={X0 + 4 + k * (usedW + 2)} y={bufTop + 4} width={usedW * ease(frame, lessAt + 6 + k * 6, 14)} height={bufH - 8} rx={4} fill={DATA} />
             ))}
           </Svg>
+          <Line at={knowsAt} x={X0} y={bufTop + bufH + h(14)} size={24} color={INK_SOFT} out={reserveAt}>
+            How long will the answer be?
+          </Line>
           <Line at={usingAt + 4} x={X0} y={bufTop + bufH + h(14)} size={24} color={INK}>
             <Num>{commas(PAGING.usedTokens)}</Num> used
           </Line>

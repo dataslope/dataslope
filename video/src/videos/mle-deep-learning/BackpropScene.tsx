@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { MathRun } from "../../editorial/math";
+import { I, MathRun } from "../../editorial/math";
 import { label } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BACKPROP } from "./data";
-import { at, BAR, BLUE_FILL, Box, Drift, Flow, HBar, INK, INK_SOFT, int, Line, LOOK, LOOK_INK, OK_INK, pulse, type Scale, Svg } from "./parts";
+import { at, BAR, BLUE_FILL, Box, Drift, Fade, Flow, HBar, INK, INK_SOFT, int, Line, LOOK, LOOK_INK, Mark, OK_INK, pulse, type Scale, Svg } from "./parts";
 
 const STACK_X = 200;
 const STACK_W = 230;
@@ -155,6 +155,46 @@ export const BackpropScene: React.FC = () => {
         <Line at={sweepAt} x={SLAB_X + SLAB_W + 32} y={rowY(0) + BH / 2 + h(14)} size={22} color={LOOK_INK}>
           one sweep
         </Line>
+
+        {/* ── The chain rule: one local derivative per layer, multiplied ── */}
+        <Fade at={bwdAt} out={paramsAt - 10}>
+          <Line at={bwdAt} x={RIGHT_X} y={y(296)} size={22} color={INK_SOFT}>
+            The chain rule, for the first layer&apos;s weights
+          </Line>
+          <Line at={bwdAt + 6} x={RIGHT_X} y={y(346)} size={34}>
+            <MathRun>
+              ∂<I>L</I>/∂<I>W</I>
+              <sub>1</sub> ={" "}
+              {[
+                <>
+                  ∂<I>L</I>/∂<I>o</I>
+                </>,
+                <>
+                  ∂<I>o</I>/∂<I>h</I>
+                  <sub>2</sub>
+                </>,
+                <>
+                  ∂<I>h</I>
+                  <sub>2</sub>/∂<I>h</I>
+                  <sub>1</sub>
+                </>,
+                <>
+                  ∂<I>h</I>
+                  <sub>1</sub>/∂<I>W</I>
+                  <sub>1</sub>
+                </>,
+              ].map((f, k) => (
+                <React.Fragment key={k}>
+                  {k ? " × " : ""}
+                  <Mark at={multAt + k * 8}>{f}</Mark>
+                </React.Fragment>
+              ))}
+            </MathRun>
+          </Line>
+          <Line at={multAt + 30} x={RIGHT_X} y={y(420)} size={22} color={INK_SOFT}>
+            Each factor is one layer&apos;s local derivative, computed on the way down
+          </Line>
+        </Fade>
 
         {/* ── What one gradient costs ── */}
         <Line at={paramsAt - 2} x={RIGHT_X} y={y(290)} size={24} color={INK}>

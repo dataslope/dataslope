@@ -163,7 +163,7 @@ export const CnnScene: React.FC = () => {
       <Sfx name="el-tap" at={edgesAt} level={-30} />
       <Sfx name="el-whoosh" at={shiftAt} level={-35} />
       <Sfx name="el-pop" at={poolAt} level={-31} />
-      <Sfx name="el-pop" at={hundredAt} level={-31} />
+      <Sfx name="el-pop" at={hundredAt} level={-34} />
       <Sfx name="el-pop" at={fourAt} level={-31} />
       <Sfx name="el-tap" at={fiveAt} level={-30} />
       <Sfx name="el-tap" at={twentyTwoAt} level={-30} />

@@ -142,7 +142,7 @@ export const RnnScene: React.FC = () => {
       <Sfx name="el-whoosh" at={attnAt} level={-35} />
       <Sfx name="el-sprinkle" at={everyAt} level={-33} />
       <Sfx name="el-pop" at={attnAt + 6} level={-30} />
-      <Sfx name="el-chime" at={nextAt} level={-32} />
+      <Sfx name="el-chime" at={end + 6} level={-32} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={14} at={qAt - 4} textAt={textAt - 4} out={leave1} size={62}>

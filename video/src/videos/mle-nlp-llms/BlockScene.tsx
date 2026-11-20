@@ -21,16 +21,16 @@ const Disc: React.FC<{ x: number; y: number; k: number; at: number }> = ({ x, y,
     <div
       style={{
         position: "absolute",
-        left: x - 15,
-        top: y - 15,
-        width: 30,
-        height: 30,
-        borderRadius: 15,
+        left: x - 16,
+        top: y - 16,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
         background: ds("yellow", 300),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        ...label(20, INK),
+        ...label(22, INK),
         fontWeight: 700,
         transform: `scale(${Math.min(1.15, p)})`,
         opacity: Math.min(1, p),
@@ -253,7 +253,7 @@ export const BlockScene: React.FC = () => {
           { k: 3, t: "A gated activation instead of ReLU", at: gatedAt },
         ].map((c, i) => (
           <React.Fragment key={c.k}>
-            <Disc x={COLS[0] + 15} y={y(732) + h(52) + i * h(40) + 14} k={c.k} at={c.at} />
+            <Disc x={COLS[0] + 16} y={y(732) + h(52) + i * h(40) + 15} k={c.k} at={c.at} />
             <Line at={c.at + 2} x={COLS[0] + 44} y={y(732) + h(52) + i * h(40)} size={23}>
               {c.t}
             </Line>

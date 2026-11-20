@@ -192,7 +192,7 @@ export const ActScene: React.FC = () => {
           {plots.map((pl, i) => (
             <React.Fragment key={i}>
               <Frame plot={pl.fn} from={colAt[i] - 6} ticks={i === 2 ? [0, 5] : [-1, 1]} />
-              <Frame plot={pl.slope} from={gradAt - 6 + i * 3} ticks={[0, 1]} />
+              <Frame plot={pl.slope} from={i === 2 ? reluAt - 4 : gradAt - 6 + i * 3} ticks={[0, 1]} />
               <Curve plot={pl.fn} values={curves[i].fn} from={colAt[i]} color={BAR} />
               {i < 2 ? (
                 <Curve plot={pl.slope} values={curves[i].slope} from={gradAt + i * 4} color={BAR} />
@@ -200,6 +200,7 @@ export const ActScene: React.FC = () => {
                 <>
                   <Curve plot={pl.slope} values={curves[i].slope} from={reluAt + 2} color={BAR} />
                   {/* The step's right half, lit: a slope of 1 for any positive input. */}
+                  {stepLit > 0 ? (
                   <line
                     x1={at(pl.slope.x, 0)}
                     x2={at(pl.slope.x, 0) + (pl.slope.x.b - at(pl.slope.x, 0)) * stepLit}
@@ -209,6 +210,7 @@ export const ActScene: React.FC = () => {
                     strokeWidth={5}
                     strokeLinecap="round"
                   />
+                  ) : null}
                 </>
               )}
               {[-5, 0, 5].map((z) => (
@@ -217,7 +219,7 @@ export const ActScene: React.FC = () => {
                   x={at(pl.slope.x, z)}
                   y={slTop + slH + 28}
                   textAnchor="middle"
-                  style={{ ...label(20, INK_SOFT), fill: INK_SOFT, ...TABULAR, opacity: ease(frame, gradAt + i * 3, 10) }}
+                  style={{ ...label(20, INK_SOFT), fill: INK_SOFT, ...TABULAR, opacity: ease(frame, i === 2 ? reluAt : gradAt + i * 3, 10) }}
                 >
                   {z < 0 ? `−${-z}` : z}
                 </text>
@@ -245,7 +247,7 @@ export const ActScene: React.FC = () => {
           })()}
         </Svg>
         {["Slope", "Slope", "Slope"].map((t, i) => (
-          <Line key={i} at={gradAt - 4 + i * 3} x={COL_X[i]} y={slTop - h(40)} size={22} color={INK_SOFT}>
+          <Line key={i} at={i === 2 ? reluAt - 4 : gradAt - 4 + i * 3} x={COL_X[i]} y={slTop - h(40)} size={22} color={INK_SOFT}>
             {t}
           </Line>
         ))}
