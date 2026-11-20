@@ -13,7 +13,9 @@
 
 .sql-shell {
   display: grid;
-  grid-template-columns: var(--sql-sidebar-width, 270px) 6px 1fr;
+  /* The middle track holds the sidebar's drag handle, which overlaps the
+     sidebar's border instead of taking width of its own. */
+  grid-template-columns: var(--sql-sidebar-width, 270px) 0 1fr;
   height: 100%;
   min-height: 0;
   overflow: hidden;
@@ -1772,30 +1774,22 @@ html[data-playground-theme="light"] .sql-result-ok {
   color: var(--danger, #e35a5a);
 }
 
-/* ─── Corner action button group (Format / Query History / future buttons) ───
-   Positioned at the top-right corner of the editor pane. Renders above the
-   editor content (z-index: 5, inside the isolated sql-editor-pane stacking
-   context) while portalled popovers escape that context and appear in the
-   document root. The corner-positioner class (z-index: 500) keeps those
-   tooltip popovers below the Import / Export / Settings menus (z-index: 9999)
-   but visible above all editor content. */
+/* ─── Editor actions (Format / Query History / future buttons) ───
+   The left end of the toolbar docked under the editor (SqlEditorToolbar's
+   `leadingActions`). They are flex children of the bar, so they sit on its
+   vertical centre with Run and Explain, and `margin-right: auto` keeps the
+   rest of the bar to the right. Their tooltips are portalled; the
+   corner-positioner class (z-index: 500) keeps those below the Import /
+   Export / Settings menus (z-index: 9999) but above all editor content. */
 .sql-editor-corner-actions {
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  margin-top: 4px;
-  margin-right: 4px;
-  z-index: 5;
   display: flex;
   align-items: center;
-  gap: 0;
-  padding: 2px;
-  background: color-mix(in srgb, var(--bg2) 92%, transparent);
-  backdrop-filter: blur(6px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  gap: 4px;
+  margin-right: auto;
 }
 
+/* Bare icons: no fill at rest or on hover. Hover only lifts the icon from
+   the dim grey to the body text colour. */
 .sql-editor-corner-btn {
   display: inline-flex;
   align-items: center;
@@ -1808,14 +1802,11 @@ html[data-playground-theme="light"] .sql-result-ok {
   color: var(--text-dim);
   cursor: pointer;
   padding: 0;
-  transition:
-    color 0.15s,
-    background 0.15s;
+  transition: color 0.15s;
 }
 
-.sql-editor-corner-btn:hover {
+.sql-editor-corner-btn:hover:not(:disabled) {
   color: var(--text);
-  background: var(--bg3);
 }
 
 .sql-editor-corner-btn:focus-visible {
@@ -1825,14 +1816,6 @@ html[data-playground-theme="light"] .sql-result-ok {
 
 .sql-editor-corner-btn svg {
   display: block;
-}
-
-.sql-editor-corner-sep {
-  width: 1px;
-  height: 14px;
-  background: var(--border);
-  flex-shrink: 0;
-  margin: 0 1px;
 }
 
 /* Positioner for editor-corner tooltip popovers. z-index: 500 ensures they
@@ -5718,7 +5701,7 @@ html[data-playground-theme="dark"] .sql-result-th-type {
    Everything below adjusts something that already existed; it is kept
    in one block so the intent of each change can be read next to the
    others, and because several of them only make sense together (the
-   docked toolbar, the corner actions that move into it, the hairline
+   docked toolbar, the editor actions that move into it, the hairline
    splitter above it). This stylesheet is loaded by the SQL playgrounds
    alone, so nothing here reaches the other languages' playgrounds.
    ════════════════════════════════════════════════════════════════════ */
@@ -5749,8 +5732,15 @@ html[data-playground-theme="dark"] .sql-result-th-type {
   height: 1px;
 }
 
-/* The sidebar already draws its own right border; the handle sits over it. */
+/* The sidebar already draws its own right border, so this handle owns no
+   width in the layout: its grid track is 0 (see `.sql-shell`) and its 6px
+   grab area straddles that border, half over the sidebar and half over the
+   panes. A 6px track left a strip of bare background between the border
+   and the panes, which the tab strip's, toolbar's and result grid's rules
+   all stopped short of. */
 .sql-sidebar-resizer {
+  justify-self: start;
+  width: 6px;
   margin-left: -3px;
   z-index: 3;
 }
@@ -5783,7 +5773,7 @@ html[data-playground-theme="dark"] .sql-result-th-type {
   flex-shrink: 0;
   gap: 8px;
   min-height: 41px;
-  padding: 6px 10px 6px 84px;
+  padding: 6px 10px;
   border-top: 1px solid var(--border);
   border-radius: 0;
   background: var(--bg);
@@ -5797,20 +5787,6 @@ html[data-playground-theme="dark"] .sql-result-th-type {
   background: transparent;
   backdrop-filter: none;
   border-radius: 0;
-}
-
-/* The pane is a flex column, so the bar's z-index applies to it even
-   though it is no longer positioned; the buttons need to out-rank it. */
-.sql-editor-pane > .sql-editor-corner-actions {
-  top: auto;
-  right: auto;
-  left: 10px;
-  bottom: 7px;
-  margin: 0;
-  z-index: 6;
-  background: transparent;
-  backdrop-filter: none;
-  border-color: transparent;
 }
 
 /* Run and Explain stood 26px and 28px tall side by side. */

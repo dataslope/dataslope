@@ -5518,96 +5518,97 @@ function PostgresPlaygroundInner() {
               }
             >
               <div className="editor-wrap" ref={editorHostRef} />
-              <div className="sql-editor-corner-actions">
-                <Popover.Root
-                  open={isFormatting ? false : formatPopoverOpen}
-                  onOpenChange={setFormatPopoverOpen}
-                >
-                  <Popover.Trigger
-                    openOnHover
-                    delay={150}
-                    closeDelay={100}
-                    render={(triggerProps) => (
-                      <button
-                        {...triggerProps}
-                        type="button"
-                        className="sql-editor-corner-btn"
-                        aria-label="Format code"
-                        aria-busy={isFormatting}
-                        disabled={!loaded || isFormatting}
-                        onClick={() => void handleFormatCode()}
-                      >
-                        {isFormatting ? (
-                          <svg
-                            viewBox="0 0 13 13"
-                            width={13}
-                            height={13}
-                            className="run-btn-spinner"
-                            aria-hidden="true"
-                          >
-                            <circle
-                              cx="6.5"
-                              cy="6.5"
-                              r="5"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeDasharray="15 9"
-                            />
-                          </svg>
-                        ) : (
-                          <Wand2 size={13} aria-hidden="true" />
-                        )}
-                      </button>
-                    )}
-                  />
-                  <Popover.Portal>
-                    <Popover.Positioner
-                      sideOffset={6}
-                      align="center"
-                      side="bottom"
-                      className="sql-corner-positioner"
-                    >
-                      <Popover.Popup className="bui-popup sql-corner-popover">
-                        Format code
-                      </Popover.Popup>
-                    </Popover.Positioner>
-                  </Popover.Portal>
-                </Popover.Root>
-                <div className="sql-editor-corner-sep" aria-hidden="true" />
-                <Popover.Root>
-                  <Popover.Trigger
-                    openOnHover
-                    delay={150}
-                    closeDelay={100}
-                    render={(triggerProps) => (
-                      <button
-                        {...triggerProps}
-                        type="button"
-                        className="sql-editor-corner-btn"
-                        aria-label="View Query History"
-                        onClick={openQueryHistoryTab}
-                      >
-                        <History size={13} aria-hidden="true" />
-                      </button>
-                    )}
-                  />
-                  <Popover.Portal>
-                    <Popover.Positioner
-                      sideOffset={6}
-                      align="center"
-                      side="bottom"
-                      className="sql-corner-positioner"
-                    >
-                      <Popover.Popup className="bui-popup sql-corner-popover">
-                        Query history
-                      </Popover.Popup>
-                    </Popover.Positioner>
-                  </Popover.Portal>
-                </Popover.Root>
-              </div>
               <SqlEditorToolbar
+                leadingActions={
+                  <div className="sql-editor-corner-actions">
+                    <Popover.Root
+                      open={isFormatting ? false : formatPopoverOpen}
+                      onOpenChange={setFormatPopoverOpen}
+                    >
+                      <Popover.Trigger
+                        openOnHover
+                        delay={150}
+                        closeDelay={100}
+                        render={(triggerProps) => (
+                          <button
+                            {...triggerProps}
+                            type="button"
+                            className="sql-editor-corner-btn"
+                            aria-label="Format code"
+                            aria-busy={isFormatting}
+                            disabled={!loaded || isFormatting}
+                            onClick={() => void handleFormatCode()}
+                          >
+                            {isFormatting ? (
+                              <svg
+                                viewBox="0 0 13 13"
+                                width={13}
+                                height={13}
+                                className="run-btn-spinner"
+                                aria-hidden="true"
+                              >
+                                <circle
+                                  cx="6.5"
+                                  cy="6.5"
+                                  r="5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeDasharray="15 9"
+                                />
+                              </svg>
+                            ) : (
+                              <Wand2 size={13} aria-hidden="true" />
+                            )}
+                          </button>
+                        )}
+                      />
+                      <Popover.Portal>
+                        <Popover.Positioner
+                          sideOffset={6}
+                          align="center"
+                          side="bottom"
+                          className="sql-corner-positioner"
+                        >
+                          <Popover.Popup className="bui-popup sql-corner-popover">
+                            Format code
+                          </Popover.Popup>
+                        </Popover.Positioner>
+                      </Popover.Portal>
+                    </Popover.Root>
+                    <Popover.Root>
+                      <Popover.Trigger
+                        openOnHover
+                        delay={150}
+                        closeDelay={100}
+                        render={(triggerProps) => (
+                          <button
+                            {...triggerProps}
+                            type="button"
+                            className="sql-editor-corner-btn"
+                            aria-label="View Query History"
+                            onClick={openQueryHistoryTab}
+                          >
+                            <History size={13} aria-hidden="true" />
+                          </button>
+                        )}
+                      />
+                      <Popover.Portal>
+                        <Popover.Positioner
+                          sideOffset={6}
+                          align="center"
+                          side="bottom"
+                          className="sql-corner-positioner"
+                        >
+                          <Popover.Popup className="bui-popup sql-corner-popover">
+                            Query history
+                          </Popover.Popup>
+                        </Popover.Positioner>
+                      </Popover.Portal>
+                    </Popover.Root>
+                  </div>
+                }
                 loaded={loaded}
                 running={statusState === "running"}
                 hasEditorSelection={hasEditorSelection}
