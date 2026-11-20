@@ -37,13 +37,13 @@ One more change, from `check:motion`: after the re-timing, Question 16 held stil
 
 ## Checks (final code, through `out/entries/AnalyticsEngineer-5-AdvancedSql.tsx` and the queue)
 
-- typecheck: no errors in `src/videos/ae-advanced-sql/` (or anywhere)
+- typecheck: no errors in `src/videos/ae-advanced-sql/`
 - lint (`eslint src/videos/ae-advanced-sql`): clean
 - `check:cues`: pass
 - `npm test`: 79 pass, 0 fail
 - `check:frames` (`CHECK_SCALE=1`): pass (4 images, largest stretch 0.41; 15 arrows, 0.0° bend; spacing, sizes, tabular hyphens, cues all clean)
 - `check:sync`: pass, 66 beats, worst +0.04 s (`window-why`); `r-depth` +0.01, `small` +0.03
 - `check:mix`: pass, effects 28.9 LU under the narration, speech a median 29.0 dB above them
-- `check:motion`: MOTION_RESULT
+- `check:motion`: pass, nothing still for 2 s or more over 10:57.8 (the first run, before the Question 16 change, failed on that one 3.0 s stretch)
 - Stills looked at: 118.5, 125.5, 156.5, 170.8, 324.5, 336.5, 351.0, 418.5, 503.0, 522.5, 560.5, 605.0, 650.0 s (`video/out/review/AnalyticsEngineer-5-AdvancedSql/`), and the Question 16 change in the motion preview.
 - The WAVs and the preview the checks left in `video/out/` are deleted.

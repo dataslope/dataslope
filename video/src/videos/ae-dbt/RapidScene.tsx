@@ -105,7 +105,7 @@ const Macros: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {/* In as the answer starts, so the page does not hold still for 3 s
           while the question is read (check:motion). */}
-      <Fact at={jinjaAt - 12} c={c}>
+      <Fact at={jinjaAt - 24} c={c}>
         A reusable Jinja function that writes SQL
       </Fact>
       <Listing

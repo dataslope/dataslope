@@ -42,4 +42,19 @@ All 13 findings are fixed (1 P1, 5 P2, 7 P3). The new length is **9:53.3** (593.
 
 ## Checks
 
-CHECKS_PLACEHOLDER
+All checks were run on the final code, through `out/entries/AnalyticsEngineer-6-Warehousing.tsx` and the render queue.
+
+- **tsc** (this folder only, through a scratch tsconfig) and **eslint** (`src/videos/ae-warehousing`): clean.
+- **`npm run check:cues`**: pass.
+- **`npm test`**: 79 pass, 0 fail.
+- **`check:frames`** (`CHECK_SCALE=1`): pass.
+  - 3 illustrations checked, largest stretch 0.40.
+  - 18 arrows, up to 0.0° of bend.
+  - No word-gap or mixed-size failures.
+- **`check:motion`**: pass. Nothing holds still for 3 s.
+- **`check:sync`**: pass. 55 beats, worst +0.04 s (`cols`); the new beats are `star-limit` +0.02, `hurt-month` +0.00 and `compute-suspend` −0.01.
+- **`check:mix`**: run, no failure. The effects sit 30.0 LU under the narration, and the speech is a median 30.5 dB above them (5th percentile 16.2 dB).
+- **Stills:** looked at in `out/review/AnalyticsEngineer-6-Warehousing/` and its `fix2/` subfolder, at every changed place. The times are 39.5, 50.5, 72, 108.5, 121.5, 124, 151.5, 189.5, 235.8, 243, 252, 336.5, 338.9, 353.5, 377.5, 394.8, 401.3, 443.5, 449.5, 457.5 and 509 s.
+  - After the first round I raised the tally by about 20 px, so its last line clears the dbt listing by about 40 px, and thinned the month files' footers.
+  - I shortened the Redshift line so it keeps a margin on the right edge like the left one.
+- The WAVs and the preview the checks left in `out/` are deleted.
