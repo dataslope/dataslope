@@ -15,6 +15,10 @@
       "watercolor illustration": {
         "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
         "softAlphaWarn": 0.3
+      },
+      "pen-and-ink drawing": {
+        "constraints": "Draw it as a detailed pen-and-ink line drawing, the way a careful engraver or technical illustrator works: crisp dark ink outlines of varied weight, fine parallel hatching and cross-hatching to model every form and its shading, and small mechanical details drawn precisely. Use one deep near-black ink and nothing else: never color, never a wash, never a tinted or grey fill, so every area between the lines stays empty. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece. Ignore the brand colors listed below; this drawing is ink only.",
+        "softAlphaWarn": 0.3
       }
     }
   },
@@ -42,6 +46,12 @@
       "category": "video-hero",
       "style": "watercolor illustration",
       "subject": "a sturdy wooden control console seen from the front with six chunky levers standing in a row, descending in size from a tall lever on the left to a short one on the right, each lever topped with a round knob in a different brand color, the tallest lever pulled forward"
+    },
+    {
+      "id": "llm-cost-model",
+      "category": "video-hero",
+      "style": "pen-and-ink drawing",
+      "subject": "a compact metal clockwork engine shaped like a squat box, a round intake port with a short pipe on its left face, its front cut away to reveal layered gear trains, springs and a spinning governor inside, and a flared output spout on its right face"
     }
   ]
 }

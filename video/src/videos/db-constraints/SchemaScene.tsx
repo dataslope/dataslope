@@ -107,7 +107,6 @@ export const SchemaScene: React.FC = () => {
       <RuleTags
         layout={card}
         row="price"
-        outline="code"
         chips={[{ code: "CHECK (price >= 0)", at: constraintAt, pulses: [everyAt, zeroAt, namingAt + 4], out: singleAt + 4 }]}
       />
       {(["id", "name", "price"] as const).map((r, i) => (

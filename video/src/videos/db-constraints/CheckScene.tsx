@@ -110,11 +110,10 @@ export const CheckScene: React.FC = () => {
       <FigLabel n="11" title="Checks on a price and a status" at={checkAt - 4} x={X0} y={y(FIG_Y)} out={outA} />
       <Entity layout={card} at={checkAt - 2} out={outA} />
       {/* Outlined, syntax colors kept (the owner, 2026-11-13). */}
-      <RuleTags layout={card} row="price" outline="code" chips={[{ code: "CHECK (price >= 0)", at: priceAt - 2, pulses: [oneAt] }]} out={outA} />
+      <RuleTags layout={card} row="price" chips={[{ code: "CHECK (price >= 0)", at: priceAt - 2, pulses: [oneAt] }]} out={outA} />
       <RuleTags
         layout={card}
         row="status"
-        outline="code"
         chips={[
           {
             code: "CHECK (status IN (\n  'draft', 'active', 'archived'))",
@@ -161,7 +160,6 @@ export const CheckScene: React.FC = () => {
         layout={events}
         row="start_date"
         span="end_date"
-        outline="code"
         chips={[{ code: "CHECK (end_date > start_date)", at: columnsAt + 12, pulses: [endAt, neverAt + 4] }]}
       />
       <DbTable

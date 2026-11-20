@@ -81,13 +81,16 @@ export const ReportingScene: React.FC = () => {
       <Headline at={from - 6} second={launchAt - 4} italic="What a launch post picks.">
         Three, selective reporting.
       </Headline>
-      {/* The launch post, and what it picks. */}
-      <Tag at={launchAt - 2} x={X0} y={y(300)}>
+      {/* The launch post, and what it picks: outlined, in ink and the last
+          in red (the owner, 2026-11-13: "launch post, its benchmarks, its
+          rivals: black border and text color with a transparent background.
+          its settings: red border and text color"). */}
+      <Tag at={launchAt - 2} x={X0} y={y(300)} outline>
         launch post
       </Tag>
       <Arrow from={[X0 + 172, y(300) + 24]} to={[X0 + 238, y(300) + 24]} at={picksAt - 4} dur={10} width={2} />
       {picks.map((p, i) => (
-        <Tag key={p.text} at={p.at} x={p.x} y={y(300)} tone={i === 2 ? "red" : "gray"}>
+        <Tag key={p.text} at={p.at} x={p.x} y={y(300)} tone={i === 2 ? "red" : "gray"} outline>
           {p.text}
         </Tag>
       ))}

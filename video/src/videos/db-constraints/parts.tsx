@@ -413,12 +413,12 @@ export const RuleTags: React.FC<{
   chips: readonly Chip[];
   dim?: number;
   out?: number;
-  /** Outlined, not filled (the owner, 2026-11-13): a black border on a
-   *  transparent background. "code" keeps the SQL's own syntax colors ("keep
-   *  the current font colors"); "ink" sets the text black too. The swell
-   *  moves the border (and black text) toward the yellow's ink instead of
-   *  washing the fill, as `Pill` does. */
-  outline?: "code" | "ink";
+  /** Outlined, not filled (the owner, 2026-11-13): a black border, black
+   *  text, no fill. The swell moves border and text toward the yellow's ink
+   *  instead of washing the fill, as `Pill` does. A tag whose code keeps its
+   *  syntax colors stays filled: a black border around colored code did not
+   *  work (the owner, 2026-11-20). */
+  outline?: boolean;
 }> = ({ layout, row, span, chips, dim, out, outline }) => {
   const frame = useCurrentFrame();
   const i0 = layout.columns.findIndex((c) => c.name === row);
@@ -478,7 +478,7 @@ export const RuleTags: React.FC<{
                   : ruleBadge(TAG_SIZE, swell)),
               }}
             >
-              <Code size={TAG_SIZE} color={outline === "ink" ? ink : undefined}>
+              <Code size={TAG_SIZE} color={outline ? ink : undefined}>
                 {c.code}
               </Code>
             </div>

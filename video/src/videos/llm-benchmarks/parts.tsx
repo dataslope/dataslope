@@ -442,9 +442,11 @@ export const Tag: React.FC<{
   width?: number;
   /** A brief swell when the tag is named again. */
   pulseAt?: number;
-  /** Outlined in ink, no fill, with roomier padding that fills the whole 48px
-   *  box (the owner, 2026-11-13, on Fig. 10's steps: "black border, black
-   *  text, and a transparent background … add more padding"). */
+  /** Outlined, no fill, with roomier padding that fills the whole 48px box
+   *  (the owner, 2026-11-13, on Fig. 10's steps: "black border, black text,
+   *  and a transparent background … add more padding"). In ink for a gray
+   *  tag, in its hue's ink otherwise (the owner, 2026-11-13, on Figs. 6 and
+   *  7: "red border and text color with a transparent background"). */
   outline?: boolean;
   children: React.ReactNode;
 }> = ({ at, x, y, out, dim, tone = "gray", light = false, width, pulseAt, outline = false, children }) => {
@@ -453,7 +455,7 @@ export const Tag: React.FC<{
   const o = out === undefined ? 0 : ease(frame, out, 10);
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.65;
   if (p <= 0 || o >= 1) return null;
-  const badge = outline ? { ...outlineBadgeStyle("ink", 22), padding: `${OUTLINE_PAD_Y}px ${OUTLINE_PAD_X}px` } : badgeStyle(tone, 22);
+  const badge = outline ? { ...outlineBadgeStyle(tone === "gray" ? "ink" : tone, 22), padding: `${OUTLINE_PAD_Y}px ${OUTLINE_PAD_X}px` } : badgeStyle(tone, 22);
   const outer = outline ? 22 * 1.15 + 2 * OUTLINE_PAD_Y + 4 : 22 * 1.15 + 2 * Math.round(22 * 0.21);
   return (
     <div

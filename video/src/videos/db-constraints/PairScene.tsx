@@ -204,7 +204,6 @@ export const PairScene: React.FC = () => {
         layout={enrollments}
         row="student_id"
         span="course_id"
-        outline="code"
         chips={[{ code: "UNIQUE (student_id, course_id)", at: eachPairAt - 2, pulses: [bouncesAt + 4] }]}
         out={outA}
       />

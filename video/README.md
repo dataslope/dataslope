@@ -387,7 +387,10 @@ Every video follows these rules.
   size)`, no fill, a 2px border and text in one ink, `"ink"` for near-black
   or a hue for an accent. The owner chooses per slide which badges take it;
   where a tinted badge stays, its text may take its hue's ink
-  (`outlineInk(tone)`) rather than black.
+  (`outlineInk(tone)`) rather than black. A black border holds black text
+  only (the owner, 2026-11-20: a black border around purple and orange
+  code "doesn't work"): a badge whose text keeps colors of its own, such as
+  syntax-colored SQL, stays tinted.
   **A diagram's boxes are outlined, not filled** (the owner, 2026-11-12: "I
   actually like the old badge design with a transparent background and
   black border better"): the nodes of a causal sketch or a flow, the cells

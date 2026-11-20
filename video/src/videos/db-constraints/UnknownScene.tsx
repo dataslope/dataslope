@@ -105,7 +105,6 @@ export const UnknownScene: React.FC = () => {
       <RuleTags
         layout={card}
         row="price"
-        outline="code"
         chips={[
           { code: "CHECK (price >= 0)", at: open + 4, pulses: [falseAt, rangeAt] },
           { code: "NOT NULL", at: notNullAt - 2, pulses: [thereAt + 4] },
