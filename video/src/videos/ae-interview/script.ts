@@ -192,7 +192,7 @@ export const script: NarrationScript = {
     },
     {
       id: "practice",
-      text: "Every topic page has concept checks, three add challenges that run in the browser, and a bank of a hundred and ten multiple-choice questions covers the whole track.",
+      text: "Every topic page has concept checks, three of them add challenges that run in the browser, and a bank of a hundred and ten multiple-choice questions covers the whole track.",
       pauseAfter: 0.8,
     },
     {

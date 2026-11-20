@@ -124,7 +124,7 @@ const claims = [
   ["ai-more", `part ${below100(partOf("ae-ai-semantic-layer"))} covers all four`],
   ["ai-four", "four more topics"],
   ["practice", results.conceptCheckPages === results.topicPages ? "every topic page has concept checks" : "(not every page has concept checks)"],
-  ["practice", `${below100(results.challengePages)} add challenges`],
+  ["practice", `${below100(results.challengePages)} of them add challenges`],
   ["practice", `${said(bank)} multiple-choice questions`],
   ["next", "next: facts, dimensions and grain"],
 ];

@@ -15,9 +15,10 @@ import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "ae-interview";
 
-/** The platypus and the small spots in illustrations.json, once generated
- *  into public/images/ae-interview/. Phase 2 sets this. */
-export const ILLUSTRATIONS = false;
+/** The platypus and the two small spots in illustrations.json (the easel
+ *  beside the dashboard, the assistant's speech bubble) are generated and
+ *  imported (public/images/ae-interview/). */
+export const ILLUSTRATIONS = true;
 
 /** A topic page of the track, by its file stem under
  *  content/interview/analytics-engineer/. */
