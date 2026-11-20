@@ -38,10 +38,12 @@ drift underneath you.
 
 A centralized store that versions trained model artifacts alongside their
 metadata: training-data version, hyperparameters, evaluation metrics, and
-deployment history. It enforces a promotion workflow (staging →
-production), gives you a single source of truth for "what's deployed," and
-makes rollback a lookup rather than a rebuild. Examples: MLflow Model
-Registry, SageMaker Model Registry, Vertex AI Model Registry.
+deployment history. It supports a promotion workflow (staging →
+production, often by moving an alias such as `champion` to a new version),
+gives you a single source of truth for "what's deployed," and makes rollback
+a lookup rather than a rebuild. Examples: MLflow Model Registry, SageMaker
+Model Registry, and the Model Registry on Google's Gemini Enterprise Agent
+Platform (formerly Vertex AI).
 
 ### What is a feature store, and what problem does it solve?
 
@@ -140,7 +142,7 @@ Watch distributions as proxy signals, not as a replacement for accuracy.
 Compare production feature and
 prediction distributions against a training reference using the
 **population stability index (PSI)**, KL divergence, or a
-Kolmogorov–Smirnov test per feature. Thresholds such as PSI above 0.2 are
+Kolmogorov–Smirnov test per feature. Thresholds such as PSI above 0.25 are
 heuristics and should be calibrated to normal variation, sample size, and
 business impact. These signals can reveal covariate or prediction shift before
 labels arrive, but they cannot by themselves prove concept drift or a loss of
@@ -175,7 +177,7 @@ finer-grained, gradual variant of the same idea.
 ### How do you roll back a model safely?
 
 Keep the previous artifact and its serving config in the registry. Most
-platforms (SageMaker, Vertex, Kubernetes + Seldon) support weighted or
+platforms (SageMaker, Google's Agent Platform, Kubernetes + Seldon) support weighted or
 blue/green traffic switching, so rollback is a **config change, not a
 redeploy**. Account for downstream state, feature-store writes, A/B
 assignment logs, and caches, that a rolled-back model may interact with.
@@ -201,8 +203,8 @@ the audit trail that ties a deployed model back to how it was made.
 
 ### How do you package a model for deployment?
 
-Serialize the trained artifact (pickle/joblib, SavedModel,
-TorchScript/ONNX), pin the runtime and dependencies, and wrap it in a
+Serialize the trained artifact (pickle/joblib, SavedModel, a `torch.export`
+program, or ONNX), pin the runtime and dependencies, and wrap it in a
 container so the serving environment matches training exactly. Exporting
 to a framework-neutral format like **ONNX** decouples the model from the
 training framework and enables optimized runtimes (ONNX Runtime,

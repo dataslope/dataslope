@@ -37,7 +37,7 @@ const SIZE = 20;
  *  Overflow, 2025 Developer Survey, AI section). */
 const SURVEY = [
   { pct: 66, text: "named AI solutions that are almost right, but not quite, their top frustration" },
-  { pct: 45, text: "said debugging AI-generated code takes longer than expected" },
+  { pct: 45, text: "said debugging AI-generated code is more time-consuming" },
 ];
 
 /** A row of a card: words at the card's own size, set as running text.
@@ -114,7 +114,7 @@ export const BugsScene: React.FC = () => {
   const textAt = n.word("bugs", "What kinds of bugs");
   const almostAt = n.word("bugs", "Code that is almost right");
   const sixtyAt = n.word("bugs-survey", "sixty-six percent");
-  const fortyAt = n.word("bugs-survey", "Forty-five percent");
+  const fortyAt = n.word("bugs-survey-debug", "Forty-five percent");
   const suspectsAt = n.word("bugs-edge", "The usual suspects");
   const boundAt = n.word("bugs-edge", "Boundaries");
   const offAt = n.word("bugs-edge", "an off-by-one");

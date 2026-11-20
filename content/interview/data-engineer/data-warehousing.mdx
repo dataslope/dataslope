@@ -259,6 +259,14 @@ metadata layer (Delta Lake, Iceberg, Hudi) over lake storage, giving ACID
 transactions, schema enforcement, time travel, and efficient upserts,
 warehouse reliability on lake-cost open storage.
 
+Expect a follow-up on how those upserts and deletes work when the data files
+are immutable. **Copy-on-write** rewrites every data file a change touches:
+slow writes, fast reads. **Merge-on-read** writes a small delete record beside
+the file and reconciles at read time: fast writes, slower reads until
+compaction. Iceberg's version 3 spec stores those deletes as compact
+**deletion vectors**, and also adds row lineage and a `variant` type for
+semi-structured data.
+
 ## Concept checks
 
 <MultipleChoice
@@ -280,7 +288,7 @@ warehouse reliability on lake-cost open storage.
 - ORC for the Kafka messages, CSV for the analytics.
   > ORC is columnar (wrong for per-record streaming) and CSV is a poor analytical format.
 - [o] Avro (row-based) for the Kafka messages, Parquet (columnar) for the analytical scans.
-  > Avro's self-describing rows and schema evolution fit streaming; Parquet's columnar layout fits large scans.
+  > Avro's compact row encoding and reader/writer schema evolution fit streaming; Parquet's columnar layout fits large scans.
 - CSV for both, for simplicity.
   > CSV is untyped, uncompressed, and row-oriented, poor for both high-throughput streaming and analytical scans.
 - Parquet for the Kafka messages, Avro for the analytics.

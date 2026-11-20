@@ -15,8 +15,9 @@ not just syntax. Review the Q&A, then the concept checks.
 
 ### Mutable vs immutable types, why does it matter?
 
-Immutable values (`int`, `str`, `tuple`, `frozenset`) can't change after
-creation; mutable ones (`list`, `dict`, `set`) can. It matters for
+Immutable values (`int`, `str`, `tuple`, `frozenset`, and from Python 3.15
+`frozendict`) can't change after creation; mutable ones (`list`, `dict`,
+`set`) can. It matters for
 **aliasing** (two names referencing the same list see each other's
 edits), for **dict/set keys** (must be hashable → immutable), and for
 **function arguments** (a function can mutate a list you passed in).
@@ -124,11 +125,16 @@ print(passthrough(sorted, [3, 1, 2], reverse=True))   # [3, 2, 1]`,
 ### What is the GIL, and when does it bite?
 
 CPython's **Global Interpreter Lock (GIL)** lets only one thread execute
-Python bytecode at a time. So threads don't speed up **CPU-bound** work,
-use
-`multiprocessing` (separate processes) for that. Threads still help
-**I/O-bound** work (network, disk), where they wait, not compute; `async`
-is another I/O-bound option.
+Python bytecode at a time. So on the default build threads don't speed up
+**CPU-bound** work; use `multiprocessing` (separate processes) for that.
+Threads still help **I/O-bound** work (network, disk), where they wait, not
+compute; `async` is another I/O-bound option.
+
+The follow-up to expect: a **free-threaded** build without the GIL was
+experimental in Python 3.13 and has been officially supported since 3.14
+(PEP 779). On it, threads do run CPU-bound Python in parallel, at a
+single-threaded cost of roughly 5–10%. It is a separate build that you opt
+into; the default interpreter still has the GIL.
 
 ### What are Python's dunder (magic) methods?
 
@@ -179,7 +185,7 @@ before and/or after the call. It is syntactic sugar for
 <SyntaxBreakdown
   parts={[
     { text: "@timer", label: "the decorator, applied last-in first-out" },
-    { text: "def slow(n):", label: "the function it replaces" },
+    { text: "def slow():", label: "the function it replaces" },
   ]}
 />
 
@@ -253,8 +259,8 @@ works automatically.
 
 ### How does threading differ from multiprocessing in Python?
 
-Threads share the same process memory and are lightweight, but the GIL
-prevents true parallel CPU execution. `multiprocessing` spawns separate
+Threads share the same process memory and are lightweight, but on the
+default build the GIL prevents true parallel CPU execution. `multiprocessing` spawns separate
 processes with their own memory space, bypassing the GIL and achieving
 real parallelism for CPU-bound work, at the cost of inter-process
 communication overhead and higher memory usage. `asyncio` is a third
@@ -268,7 +274,9 @@ an I/O operation, the event loop runs another coroutine instead of
 blocking. Use it for high-concurrency network servers (web APIs, websockets)
 where most time is spent waiting on I/O. Avoid it for CPU-bound code.
 Below, `asyncio.gather` runs both `fetch` coroutines concurrently and
-`asyncio.run` drives the `main` coroutine on the event loop.
+`asyncio.run` drives the `main` coroutine on the event loop. In new code,
+`asyncio.TaskGroup` (Python 3.11 and later) is the safer way to start the
+tasks: if one fails it cancels the rest, which `gather` does not.
 
 <CodeBlock
   adapter="python"
@@ -351,7 +359,8 @@ print("deep    :", deep)      # [[1, 2], [3, 4, 99]]`,
 
 `list` is a dynamic array backed by a C array of object pointers. Indexed
 access is $O(1)$. Appending is amortized $O(1)$ due to over-allocation
-(capacity roughly doubles on resize). Inserting or deleting at an
+(CPython grows the capacity by about an eighth on each resize; any constant
+factor keeps the average constant). Inserting or deleting at an
 arbitrary position is $O(n)$ because all subsequent pointers shift. Slicing
 creates a new list in $O(k)$ where k is the slice length.
 
@@ -419,8 +428,10 @@ Type hints (introduced in PEP 484) annotate variable, parameter, and
 return types using syntax like `def greet(name: str) -> str`. They are
 **not enforced at runtime** by default, Python remains dynamically typed.
 Their value is for static analysis tools (mypy, pyright), IDE completion,
-and documentation. `from __future__ import annotations` defers evaluation
-of annotations.
+and documentation. Since Python 3.14, annotations are evaluated lazily by
+default (PEP 649 and PEP 749), so a forward reference needs no quotes. On
+older versions `from __future__ import annotations` defers them by storing
+them as strings.
 
 <CodeBlock
   adapter="python"
@@ -516,8 +527,9 @@ print(list(Range3()))  # [1, 2, 3]`,
 ### Explain f-strings and their performance advantage.
 
 F-strings (formatted string literals, PEP 498) embed expressions directly
-in string literals: `f"Hello, {name}!"`. They are evaluated at parse time
-into efficient bytecode, faster than `%`-formatting and `str.format()`,
+in string literals: `f"Hello, {name}!"`. They are compiled into efficient
+bytecode, and their expressions are evaluated each time the line runs, which
+is faster than `%`-formatting and `str.format()`,
 and support arbitrary expressions, method calls, and format specs
 (`f"{value:.2f}"`). They are the preferred formatting method in modern
 Python.
@@ -563,8 +575,8 @@ print(Date.is_leap(2023))      # False`,
 `__repr__` is meant for **developers**, it should return an unambiguous
 string, ideally one that could be passed to `eval()` to recreate the
 object. `__str__` is for **end users**, a readable, human-friendly
-representation. `repr()` falls back to `__repr__` if `__str__` is
-missing. In an interactive REPL, the result of `repr()` is displayed.
+representation. `str()` falls back to `__repr__` if `__str__` is
+missing, never the other way round. In an interactive REPL, the result of `repr()` is displayed.
 
 ### How does Python handle exceptions, what is the exception hierarchy?
 

@@ -94,7 +94,7 @@ ORDER BY user_id;`}
 Use `ROW_NUMBER` (not `RANK`) so exact-tie timestamps still collapse to
 one row. A window function can't appear in `WHERE`, which is why it sits in
 the subquery. Engines with `QUALIFY` (Snowflake, BigQuery, Databricks) drop
-the subquery and filter in place, as the next answer shows.
+the subquery and filter in place, as the `QUALIFY` answer further down shows.
 
 ### What's the difference between a CTE and a subquery? When is a CTE worth it?
 
@@ -491,7 +491,7 @@ JOIN dept_avgs d ON d.department = e.department;
 
 ### What is the difference between a clustered and a non-clustered index?
 
-A **clustered index** physically orders the table's rows on disk in the index's key order, there can only be one per table. A **non-clustered index** is a separate structure that stores pointers back to the table rows. SQL Server keeps its clustered index ordered as rows change, and MySQL's InnoDB clusters every table by its primary key. Postgres has no clustered index: its `CLUSTER` command sorts the table by an index once, rows written afterwards land wherever there is room, and the order decays until it is run again. In BigQuery/Snowflake parlance, `CLUSTER BY` / `ORDER BY` on a table serves a similar purpose to a clustered index.
+A **clustered index** physically orders the table's rows on disk in the index's key order, there can only be one per table. A **non-clustered index** is a separate structure that stores pointers back to the table rows. SQL Server keeps its clustered index ordered as rows change, and MySQL's InnoDB clusters every table by its primary key. Postgres has no clustered index: its `CLUSTER` command (`REPACK ... USING INDEX` from PostgreSQL 19) sorts the table by an index once, rows written afterwards land wherever there is room, and the order decays until it is run again. In BigQuery/Snowflake parlance, `CLUSTER BY` / `ORDER BY` on a table serves a similar purpose to a clustered index.
 
 ### How do you write a query that returns only rows that exist in one table but not another?
 

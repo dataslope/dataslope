@@ -114,7 +114,16 @@ export const script: NarrationScript = {
     },
     {
       id: "topic-key",
-      text: "The producer hashes each message's key to pick a partition, so all of ava's clicks land in one, in the order they arrived. Order holds inside a partition, never across them. A message with no key goes round-robin.",
+      text: "The producer hashes each message's key to pick a partition, so all of ava's clicks land in one, in the order they arrived. Order holds inside a partition, never across them.",
+      pauseAfter: 0.35,
+    },
+    {
+      // Split from "topic-key" and voiced alone (2026-11-20). It said a
+      // keyless message "goes round-robin", which has not been the default
+      // since Kafka 2.4 (KIP-480): the default partitioner keeps a keyless
+      // message on one partition until its batch fills (streaming.mdx).
+      id: "topic-nokey",
+      text: "A message with no key sticks to one partition until a batch fills, then moves on.",
       pauseAfter: 0.8,
     },
     {

@@ -30,7 +30,7 @@ What has been added:
 - **Vector search trade-offs**: exact versus approximate search, index types,
   and filtering.
 - **AI in your own workflow**: assistant-written pipeline code is common, and
-  some coding rounds now allow an assistant and grade how you verify what it
+  some coding rounds allow an assistant and grade how you verify what it
   produces (see [AI-assisted coding](/interview-prep/backend-engineer/ai-assisted-coding)).
   For pipeline code, verification means idempotency, partition overwrite
   behavior, time zones, and schema drift.
@@ -165,6 +165,11 @@ large scale, very high query rates, or when you need features such as built-in
 hybrid search and multi-tenancy at that scale. Say which way you would lean and
 what evidence would change your mind.
 
+Know one limit before you propose it: a pgvector HNSW or IVFFlat index covers
+at most 2,000 dimensions on a `vector` column (4,000 on the half-precision
+`halfvec` type), so a wider embedding has to be shortened or stored at half
+precision before it can be indexed.
+
 ### Why do metadata filters make vector search harder?
 
 Because the index is built for similarity, not for your filter. **Post-filtering**
@@ -172,7 +177,10 @@ Because the index is built for similarity, not for your filter. **Post-filtering
 results when the filter is selective. **Pre-filtering** (restrict, then
 search) is correct but can defeat the approximate index. Good answers mention
 partitioning by tenant, indexes or engines that filter during the search, and
-testing with realistic, selective filters rather than none.
+testing with realistic, selective filters rather than none. pgvector is a
+post-filtering engine: with an approximate index the `WHERE` clause is applied
+after the index scan, and its iterative index scans keep scanning until enough
+rows pass the filter.
 
 ### What is hybrid search, and when do embeddings alone fail?
 

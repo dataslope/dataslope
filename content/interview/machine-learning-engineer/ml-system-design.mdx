@@ -83,10 +83,11 @@ with training orchestration (Airflow, Kubeflow, SageMaker Pipelines).
 
 A model registry is a centralized store that versions trained model
 artifacts alongside metadata: training data version, hyperparameters,
-evaluation metrics, and deployment history. It enforces a promotion
-workflow (staging → production) and provides auditability and rollback.
-Examples: MLflow Model Registry, SageMaker Model Registry, Vertex AI
-Model Registry.
+evaluation metrics, and deployment history. It supports a promotion
+workflow (staging → production, often by moving an alias such as `champion`
+to a new version) and provides auditability and rollback. Examples: MLflow
+Model Registry, SageMaker Model Registry, and the Model Registry on Google's
+Gemini Enterprise Agent Platform (formerly Vertex AI).
 
 ### How do you handle the cold-start problem in a recommendation system?
 
@@ -136,8 +137,9 @@ After deployment, you collect labels by observing the outcome triggered by
 the model's prediction (click, purchase, fraud confirmed). This closes the
 feedback loop. Risks include: **delayed labels** (purchase happens days
 later), **survivorship bias** (you only see outcomes for requests the model
-acted on), and **label shift** (the model's actions change future
-distribution). Careful logging and held-out exploration help mitigate these.
+acted on), and **feedback-induced shift** (the model's actions change the
+data it is later trained and evaluated on). Careful logging and held-out
+exploration help mitigate these.
 
 ### How do you reduce model serving latency?
 
@@ -203,7 +205,7 @@ A single inference request leaves most GPU cores idle. By queuing
 incoming requests and forwarding a batch to the GPU, you saturate the
 hardware and amortize fixed overhead. Dynamic batching (waiting up to a
 few milliseconds to fill a batch) is standard in serving frameworks like
-Triton Inference Server and TorchServe.
+Triton Inference Server (now NVIDIA Dynamo-Triton) and Ray Serve.
 
 ### What is shadow deployment?
 
@@ -225,8 +227,8 @@ incumbent (rollback). It is the standard step after shadow validation.
 ### How do you do rollback for a model?
 
 Keep the previous model artifact in the registry with its serving
-configuration. Most serving platforms (SageMaker, Vertex, Kubernetes +
-Seldon) support blue/green or weighted traffic switching, flipping back
+configuration. Most serving platforms (SageMaker, Google's Agent Platform,
+Kubernetes + Seldon) support blue/green or weighted traffic switching, flipping back
 to the old version is a configuration change, not a re-deployment. Ensure
 that any downstream state (feature store writes, A/B assignment logs) is
 accounted for when rolling back.
@@ -300,7 +302,7 @@ PSI quantifies the shift between a reference distribution (training) and
 a current distribution (production) for a single feature. Buckets are
 defined on the reference; the fraction of examples per bucket is compared
 between reference and current using a symmetric KL-divergence-like formula.
-Rules such as "below 0.1 is stable" and "above 0.2 needs action" are industry
+Rules such as "below 0.1 is stable" and "above 0.25 needs action" are industry
 conventions, not calibrated significance levels. PSI depends on bin boundaries,
 sample size, smoothing, and feature distribution, and it does not say whether a
 shift harms the model. Establish feature-specific baselines and connect alerts
@@ -311,12 +313,13 @@ $$
 $$
 
 The `compute_psi` function below implements exactly this: it bins the
-reference (training) distribution into deciles via `np.percentile`, opens
-the two outer buckets so a value beyond anything seen in training still
-counts (`np.histogram` silently drops values outside its edges, which hides
-exactly the drift PSI is for), compares the fraction of examples per bucket between `reference` and
-`current`, and returns the summed PSI value, the demo prints a `stable`
-case under 0.1 and a `drifted` case above 0.2.
+reference (training) distribution into deciles via `np.percentile`,
+compares the fraction of examples per bucket between `reference` and
+`current`, and returns the summed PSI value. The two outer buckets are left
+open-ended, because production values that fall outside the range seen in
+training are the drift you most need to count; closed edges would silently
+drop them. The demo prints a `stable` case under 0.1 and a `drifted` case
+above 0.25.
 
 <CodeBlock
   adapter="python"
@@ -328,10 +331,10 @@ case under 0.1 and a `drifted` case above 0.2.
 rng = np.random.default_rng(42)
 reference = rng.normal(loc=0.0, scale=1.0, size=1000)   # training distribution
 stable    = rng.normal(loc=0.1, scale=1.0, size=1000)   # slight shift  → PSI < 0.1
-drifted   = rng.normal(loc=1.5, scale=1.5, size=1000)   # large shift   → PSI > 0.2`,
+drifted   = rng.normal(loc=1.5, scale=1.5, size=1000)   # large shift   → PSI > 0.25`,
       starterCode: `def compute_psi(reference, current, n_bins=10, eps=1e-8):
     breakpoints = np.percentile(reference, np.linspace(0, 100, n_bins + 1))
-    breakpoints[0], breakpoints[-1] = -np.inf, np.inf   # open outer buckets
+    breakpoints[0], breakpoints[-1] = -np.inf, np.inf   # keep out-of-range values
     ref_counts = np.histogram(reference, bins=breakpoints)[0] + eps
     cur_counts = np.histogram(current,   bins=breakpoints)[0] + eps
     ref_pct = ref_counts / ref_counts.sum()
@@ -339,7 +342,7 @@ drifted   = rng.normal(loc=1.5, scale=1.5, size=1000)   # large shift   → PSI 
     return np.sum((cur_pct - ref_pct) * np.log(cur_pct / ref_pct))
 
 print(f"PSI (stable):  {compute_psi(reference, stable):.4f}   # < 0.1 → OK")
-print(f"PSI (drifted): {compute_psi(reference, drifted):.4f}  # > 0.2 → action needed")
+print(f"PSI (drifted): {compute_psi(reference, drifted):.4f}  # > 0.25 → action needed")
 `,
     },
   ]}
@@ -349,7 +352,7 @@ print(f"PSI (drifted): {compute_psi(reference, drifted):.4f}  # > 0.2 → action
 
 Use auto-scaling based on GPU/CPU utilization or request queue depth.
 Horizontal pod autoscaler (Kubernetes) adds replicas when utilization
-exceeds a target. Managed services (SageMaker Autoscaling, Vertex AI,
+exceeds a target. Managed services (SageMaker, Google's Agent Platform,
 Azure ML) handle this natively. For bursty traffic, combine with a
 request queue (SQS, Kafka) so spikes don't drop requests while new
 replicas warm up.

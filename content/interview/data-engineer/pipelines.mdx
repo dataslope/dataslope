@@ -107,7 +107,7 @@ tasks and wires them with `load(transform(extract()))`, so the scheduler
 derives the dependency order from that call rather than from cron timing.
 
 ```python
-from airflow.decorators import dag, task
+from airflow.sdk import dag, task
 from datetime import datetime
 
 @dag(schedule="@daily", start_date=datetime(2024, 1, 1), catchup=False)
@@ -188,7 +188,7 @@ Common strategies: (1) set a generous **allowed lateness window** so the engine 
 
 ### What is a backfill and how do you design for it?
 
-A **backfill** reprocesses historical data through a pipeline, usually to populate a new table, fix a bug, or apply a schema change. Design for it by making pipelines **parameterized by date range** and **idempotent** (safe to run multiple times). In Airflow, set `catchup=True` and choose a sensible `start_date`; in Dagster, use partitioned assets. Backfills of years of data may require throttling to avoid overwhelming source systems.
+A **backfill** reprocesses historical data through a pipeline, usually to populate a new table, fix a bug, or apply a schema change. Design for it by making pipelines **parameterized by date range** and **idempotent** (safe to run multiple times). In Airflow 3, start one from the UI or with `airflow backfill create` over a date range, and the scheduler runs it; `catchup=True` (off by default since Airflow 3) only creates the runs missed since `start_date`. In Dagster, use partitioned assets. Backfills of years of data may require throttling to avoid overwhelming source systems.
 
 The `process_partition` task below takes the run's logical date `ds` and
 deletes-then-reinserts only that `event_date` slice of `events_clean`, so
@@ -279,7 +279,7 @@ wait_for_file = S3KeySensor(
 
 ### How does Dagster model pipelines differently from Airflow?
 
-Dagster uses **software-defined assets** as the primary abstraction: you declare the data assets a function produces (a table, a file) and Dagster infers the dependency graph from asset lineage rather than explicit task wiring. This makes lineage and freshness tracking first-class. Airflow is more task-centric (what to run and when); Dagster is more asset-centric (what data exists and how it was produced). Dagster also has stronger typing and testing primitives.
+Dagster uses **software-defined assets** as the primary abstraction: you declare the data assets a function produces (a table, a file) and Dagster infers the dependency graph from asset lineage rather than explicit task wiring. This makes lineage and freshness tracking first-class. Airflow is more task-centric (what to run and when); Dagster is more asset-centric (what data exists and how it was produced). Dagster also has stronger typing and testing primitives. Airflow 3 narrowed the gap: it has an `@asset` decorator and asset-triggered schedules, and it pins each run to the DAG version it started with, but its unit of work is still the task.
 
 ### What is data quality testing in a pipeline context?
 
@@ -349,7 +349,7 @@ A **circuit breaker** stops a pipeline from propagating bad data downstream when
 
 ### What is an SLA in a data pipeline, and how do you enforce it?
 
-An **SLA (Service Level Agreement)** in pipeline context is a commitment that a table or dataset will be ready by a certain time (e.g., "the daily_orders table is ready by 06:00 UTC"). Enforce it by: setting **SLA callbacks** in Airflow that trigger alerts when a task misses its deadline; monitoring **data freshness** in the warehouse (e.g., `MAX(updated_at)` checks); and using **priority queues** to ensure critical pipelines get compute resources ahead of lower-priority jobs.
+An **SLA (Service Level Agreement)** in pipeline context is a commitment that a table or dataset will be ready by a certain time (e.g., "the daily_orders table is ready by 06:00 UTC"). Enforce it by: setting a **Deadline Alert** on the DAG in Airflow (3.1 and later; it replaced the SLA callbacks that Airflow 3.0 removed) so a run that finishes late fires a callback; monitoring **data freshness** in the warehouse (e.g., `MAX(updated_at)` checks); and using **priority queues** to ensure critical pipelines get compute resources ahead of lower-priority jobs.
 
 ### What is event time vs processing time in streaming?
 

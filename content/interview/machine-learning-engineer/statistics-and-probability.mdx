@@ -228,7 +228,8 @@ The probability of observing data **at least as extreme** as yours,
 **assuming the null hypothesis is true**. A small p-value means your data
 would be surprising under the null, so you reject it at your significance
 level $\alpha$. It is **not** the probability the null is true, nor the
-probability your result is a fluke, both are computed *given* the null.
+probability your result is a fluke: the p-value is computed *assuming* the
+null, so it cannot be a probability *of* the null.
 
 The definition as an area. The p-value is the shaded tail under the null,
 not the height of the curve where your observation landed.
@@ -335,8 +336,8 @@ $$
 
 It underpins spam filters, medical diagnosis, and Bayesian inference (prior
 → posterior after data). The classic trap: with a rare condition, even a
-very accurate test yields a low posterior probability of being positive,
-because base rates dominate.
+very accurate test leaves a low posterior probability of actually having the
+condition after a positive result, because base rates dominate.
 
 The classic interview application, counted out one dot at a time: everyone
 who tests positive out of 100,000 people.

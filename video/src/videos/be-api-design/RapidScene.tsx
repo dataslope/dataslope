@@ -195,7 +195,7 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 14. Errors ──────────────────────────────────────────────────────────────
 
 const ERROR_BODY = [
-  "422 Unprocessable Entity",
+  "422 Unprocessable Content",
   "{",
   '  "error": {',
   '    "code": "validation_failed",',

@@ -180,7 +180,10 @@ print(f"P(disease | positive) = {p_disease_given_pos:.3f}")
   ]}
 />
 
-The classic interview version, counted out one dot at a time.
+A common interview version makes the disease rarer and the test more
+specific (1 in 1,000 prevalence, 99% sensitivity and specificity). Counted
+out one dot at a time, a positive result there means about a 9% chance of
+disease.
 
 <Chart slug="base-rate-grid" />
 
@@ -410,8 +413,12 @@ Large values indicate the null is implausible. The test requires expected
 cell counts of at least 5 in most cells.
 
 The code below applies it to an A/B conversion table: `chi2_contingency`
-computes the $\chi^2$ statistic above, its p-value, and the degrees of
-freedom for a 2×2 table of variant vs. converted/not-converted.
+returns the $\chi^2$ statistic, its p-value, and the degrees of freedom for
+a 2×2 table of variant vs. converted/not-converted. For a 2×2 table SciPy
+applies Yates' continuity correction by default, so the printed statistic
+(3.601, $p = 0.058$) is a little smaller than the formula above gives (3.854,
+$p = 0.050$); pass `correction=False` for the uncorrected value. A result
+that close to the threshold is one to report with both numbers.
 
 <CodeBlock
   adapter="python"
@@ -613,8 +620,8 @@ can accept a controlled proportion of them.
 
 The code below applies the Benjamini-Hochberg procedure to five raw
 p-values: it returns which hypotheses to reject and the adjusted p-values,
-which are larger than the originals because the correction makes each test
-stricter.
+which are never smaller than the originals (the largest is left unchanged)
+because the correction makes each test stricter.
 
 <CodeBlock
   adapter="python"

@@ -121,7 +121,11 @@ Replication keeps copies of the data on multiple nodes. In **leader-follower**
 read-only followers. This scales **reads** (fan them out to replicas) and
 adds **availability** (promote a follower if the leader dies). The catch is
 **replication lag**: a read from a follower may not yet reflect the latest
-write, so a user can fail to see their own update.
+write, so a user can fail to see their own update. The fixes for that
+**read-your-writes** problem are to send a user's reads to the leader for a
+short time after they write, or to have the follower wait until it has
+replayed that write before answering (PostgreSQL 19 added a `WAIT FOR LSN`
+command for exactly this).
 
 ### What is sharding, and how does it differ from partitioning?
 
