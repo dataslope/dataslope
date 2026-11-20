@@ -35,7 +35,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     The classic prompt stays in full ink: it is still asked ("just as
  *     often"), so it is not struck or faded. "hook-both" lights the classic
  *     prompt and then the two new ones, on "still asks" and "added".
- *   - "rounds", "rounds-probe": the three rounds as three columns with
+ *   - "rounds" to "rounds-more": the three rounds as three columns with
  *     hairlines between, "Coding", "ML concepts", "ML system design", the
  *     marker spot beside the third; then,
  *     on "four areas", a ruled list under them, the page's four probes, each
@@ -46,7 +46,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     inference, monitoring and drift"; "reproducibility, versioning data and
  *     models, CI/CD, latency and cost"). Each row carries, small and
  *     right-aligned, the parts that answer it (data.ts PROBES): "Parts 1 and
- *     2", "Part 3", "Part 7", "Part 8". So the map starts here.
+ *     2", "Part 3", "Parts 7 and 8" (monitoring and drift are Part 8's),
+ *     "Part 8". So the map starts here. The first two rows ink in on
+ *     "rounds-probe", the last two on "rounds-ops".
  *     "rounds-more" adds one more row under a hairline, set apart, "Also on
  *     the track: statistics, deep learning, NLP and LLMs", with "Parts 4,
  *     5 and 6".
@@ -81,7 +83,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     and an ML system design round". The page names three rounds and four
  *     areas probed across them; the plan's "the four rounds" is the four
  *     areas, and the narration says it the page's way.
- *   - "rounds-probe": index.mdx, "What interviewers probe", the four bullets.
+ *   - "rounds-probe", "rounds-ops": index.mdx, "What interviewers probe",
+ *     the four bullets, two to a beat.
  *     "rounds-more": the index's "Topics" list, whose statistics, deep
  *     learning and NLP pages are none of the four probes; the plan gives
  *     each a part (4, 5 and 6).
@@ -150,7 +153,12 @@ export const script: NarrationScript = {
     },
     {
       id: "rounds-probe",
-      text: "ML fundamentals: supervised and unsupervised learning, over- and underfitting, regularization, metrics and leakage. Coding: data structures and algorithms, plus NumPy and pandas. System design: training and serving pipelines, feature stores, batch or online inference, monitoring and drift. And MLOps: reproducibility, versioning data and models, CI/CD, latency and cost.",
+      text: "ML fundamentals: supervised and unsupervised learning, over- and underfitting, regularization, metrics and leakage. Coding: data structures and algorithms, plus NumPy and pandas.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "rounds-ops",
+      text: "System design: training and serving pipelines, feature stores, batch or online inference, monitoring and drift. And MLOps: reproducibility, versioning data and models, CI/CD, latency and cost.",
       pauseAfter: 0.6,
     },
     {

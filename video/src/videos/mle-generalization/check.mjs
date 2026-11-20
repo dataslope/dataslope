@@ -447,6 +447,10 @@ if (!(E.long.best === E.globalBest && E.short.best < E.globalBest && E.short.bes
 const li = R.fit.linear.sizes.indexOf(250);
 if (Math.abs(R.fit.linear.validation[li] - R.fit.linear.train[li]) > 1) problems.push("the line's curves have not met by 250 rows");
 if (R.reg.ridgeUselessMaxAbs >= 0.25) problems.push(`ridge's useless weights reach ${R.reg.ridgeUselessMaxAbs}, not under a quarter`);
+// "That won't win back the ranking, so try just lowering the plain model's
+// threshold first": the plain model must rank better than the reweighted one.
+if (!(R.fraud.prAuc > R.fraud.weighted.prAuc)) problems.push(`the reweighted model's PR-AUC ${R.fraud.weighted.prAuc} is not below the plain ${R.fraud.prAuc}`);
+if (!text("imb-prod").includes("lowering the plain model's threshold")) problems.push(`script.ts "imb-prod" no longer says "lowering the plain model's threshold"`);
 
 for (const p of problems) console.error(p);
 if (problems.length) process.exit(1);

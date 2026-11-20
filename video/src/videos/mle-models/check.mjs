@@ -493,6 +493,14 @@ fact(R.svm.doubling.every((x) => x > 3), `"doubling the rows more than tripled t
 fact(B01.bestValidation < B1.bestValidation / 2, `"less than half the error": ${B01.bestValidation} against ${B1.bestValidation}`);
 fact(B1.atEnd > B1.bestValidation, "a rate of one does not overfit past its best");
 fact(E.forestCurve["1"] < E.baggedCurve["1"] && E.forest > E.bagged, "the forest does not start below bagging and finish above it");
+// "Single rows wander, get about as far": the three runs end
+// within 0.2 of each other, from about 2.2 away.
+const ends = Object.values(R.batch.runs).map((r) => r.distance);
+fact(Math.max(...ends) - Math.min(...ends) < 0.2, `"about as far": the three runs end ${ends} from the answer`);
+fact(text("batch-run").includes("get about as far"), `script.ts "batch-run" no longer says "get about as far"`);
+// "Set the encoder to ignore unknowns": the page's encoder does.
+fact(page("ml-fundamentals.mdx").includes('handle_unknown="ignore"'), `the page's one-hot block no longer sets handle_unknown="ignore", which "r-onehot" names`);
+fact(text("r-onehot").includes("ignore unknowns"), `script.ts "r-onehot" no longer names the ignore setting`);
 const wrong = 1 - R.kmeans.stretched;
 fact(R.kmeans.round === 1 && wrong > 0.15 && wrong < 0.25, `"about one point in five lands wrong": ${wrong}`);
 

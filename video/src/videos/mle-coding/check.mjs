@@ -428,8 +428,8 @@ const claims = [
   ["q9", pctWords(R.shuffle.aligned)],
   ["q9", pctWords(R.shuffle.separate)],
   ["q9", `guessing ${R.shuffle.majorityClass}, at ${words(Math.round(R.shuffle.majority * 100))}`],
-  ["q10-why", "twenty thousand streams of a thousand"],
-  ["q10-why", "ten percent"],
+  ["q10-sim", "twenty thousand streams of a thousand"],
+  ["q10-sim", "ten percent"],
   ["q10-alt", `${words(R.reservoir.coinSizes.p5)} to ${words(R.reservoir.coinSizes.p95)}`],
   ["r-hash", `${R.rapid.majority}, ${R.rapid.majorityShare === 0.5 ? "half" : "(the share changed)"} the time`],
 ];

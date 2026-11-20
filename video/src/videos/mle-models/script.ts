@@ -93,15 +93,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     one rate (batch.runs): batch smooth, mini-batch a little wobbly, single
  *     rows wandering, each drawn as it is named; "32 to 512 rows" under
  *     mini-batch, which is ringed green as the default.
- *   batch-run: beside each path, "rows read: 3,000", "300", "30".
+ *   batch-run: beside each path, "rows read: 3,000", "300", "30"; the three
+ *     paths end about as far along (0.27, 0.26 and 0.12 from the answer), so
+ *     no ending point is lit as better.
  *   lr: question card (both pages' headings read as one question).
  *   lr-band: the loss against steps (log scale) for three rates: 0.01 (the
  *     page's, crawling), 0.9 (settled in 9) in green, 2.5 (gd.lossDiverge,
  *     climbing) in red; "limit ≈ 2" as a dashed line on a small rate axis
  *     beneath, the three rates placed on it.
  *   lr-range: the range test (lr.range): loss against a log rate axis, one
- *     run; the flat bottom from about 0.5 to 1.7 shaded green, the turn at 2
- *     marked yellow, the climb after it red.
+ *     run; the flat bottom from about 0.5 to 1.7 shaded green, its low end
+ *     ringed on "well short", the turn at 2 marked yellow, the climb after it
+ *     red.
  *   lr-sched: the schedule's shape (lr.schedule): a short ramp, "warmup", then
  *     a cosine to zero, "decay". Then two bars, the distance left after twenty
  *     passes of single-row SGD: constant 0.03 (ink), cosine 0.001 (green).
@@ -134,8 +137,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     about equally far" as a short list; then "k: by cross-validation" and
  *     "At scale: approximate nearest-neighbour index" in green.
  *   svm: question card; the rings (svm.x, svm.y) with the RBF boundary
- *     (svm.gridRbf) and its margin, support vectors (svm.support) ringed in
- *     yellow on "support vectors".
+ *     (svm.gridRbf) and its margin, support vectors (svm.support, on and
+ *     inside the margin, since the rings overlap) ringed in yellow on
+ *     "support vectors".
  *   svm-kernel: the linear boundary (svm.gridLinear), "54%" in red, beside
  *     the RBF boundary, "89%" in green.
  *   svm-cost: support vectors against rows: 90 of 200, 590 of 2,000, 5,308 of
@@ -189,7 +193,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "round clusters: 100%" as a note.
  *   r-onehot: the paint-pots spot; the page's block: "red, green, blue,
  *     red" → its encoded rows (onehot.encoded), columns blue, green, red;
- *     then "purple → 0 0 0" in green.
+ *     then 'handle_unknown="ignore"' in mono on "ignore unknowns" and
+ *     "purple → 0 0 0" in green under it.
  *   r-fe: the examples as a line of words.
  *   next: the five groups, all lit, the toucan returning; <NextLine> "Next:
  *     coding for machine learning" on "Next".
@@ -212,7 +217,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     curvature, 1.016, puts the limit at 2 / 1.016 = 1.97 ("past about
  *     two"); at 2.0 and above it never settles. The range test (batches of
  *     ten, the rate rising from 0.0001 to 10 over a hundred steps): lowest
- *     near 0.55, flat to about 1.75, up at 1.96 and climbing after. Single-row
+ *     near 0.55, flat to about 1.75, up at 1.96 and climbing after ("well
+ *     short of the turn": the usual advice, a rate below where the loss
+ *     starts to climb, not at its edge; this run's limit is 1.97). Single-row
  *     SGD at 0.1 for twenty passes, twenty seeds: 0.030 from the least-squares
  *     answer at a constant rate, 0.0013 decayed on a cosine. Warmup and decay
  *     shapes: the deep-learning page ("ramp up over the first few hundred
@@ -222,7 +229,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - batch: the page's definitions and "32–512"; one row's noise shaking a
  *     run out of a shallow minimum is the page's "can help escape local
  *     minima". Thirty steps each at 0.1 from zero; rows read is arithmetic
- *     (30 × 100, 30 × 1).
+ *     (30 × 100, 30 × 1). From 2.2 away, batch ends 0.27 from the answer,
+ *     mini-batch 0.26, single rows 0.12 ("about as far": in
+ *     expectation a single row's step is the full gradient's; check.mjs
+ *     asserts the three end within 0.2 of each other).
  *   - ce: the page's answer ("larger gradients when the model is wrong and
  *     confident"). The squared error's gradient on the score is 2(p − y)
  *     σ'(z); cross-entropy's, p − y: calculus. The run: the page's model
@@ -237,7 +247,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     standardized, the first swept point whose fifteen neighbours split
  *     11 to 4. Approximate nearest-neighbour indexes are the standard answer
  *     to the page's "scales poorly at inference", named without a product.
- *   - svm: the page's answer. Two noisy rings (make_circles, noise 0.2,
+ *   - svm: the page's answer; "on or inside the margin" is the soft-margin
+ *     definition, which the overlap in "svm-cost" needs. Two noisy rings (make_circles, noise 0.2,
  *     factor 0.5, 2,000 points, half held out): linear 54.3%, RBF 88.7%.
  *     Support vectors when fitted on 200, 2,000 and 20,000 points: 90, 590,
  *     5,308. Fit times on 4,000, 8,000 and 16,000 points, measured once in
@@ -274,7 +285,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - quick: the page's answers. k-means on scikit-learn's three blobs
  *     (seed 170): 100% agreement round, 81.2% once stretched ("about one
  *     point in five" wrong). The page's one-hot block: categories blue,
- *     green, red; purple, unseen, encodes as all zeros. Feature engineering's
+ *     green, red; purple, unseen, encodes as all zeros because the page
+ *     sets handle_unknown="ignore" (scikit-learn's default raises an error,
+ *     so the narration names the setting). Feature engineering's
  *     examples and "good features often matter more than choice of
  *     algorithm": the page.
  *
@@ -318,7 +331,7 @@ export const script: NarrationScript = {
     },
     {
       id: "gd-run",
-      text: "The page's run: a hundred noisy rows made from three weights, one, two and minus one, and a start at zero. Five hundred steps at a rate of point oh one reach point nine nine, one point nine three and minus point nine four: close, and still moving.",
+      text: "The page's run: a hundred noisy rows made from three weights, one, two and minus one. From zero, five hundred steps at a rate of point oh one reach point nine nine, one point nine three and minus point nine four: close, and still moving.",
       pauseAfter: 0.8,
     },
 
@@ -341,7 +354,7 @@ export const script: NarrationScript = {
     },
     {
       id: "batch-run",
-      text: "Thirty steps each: batch's path is smooth, and reads three thousand rows. Single rows wander, and read thirty.",
+      text: "Thirty steps each: batch's path is smooth, and reads three thousand rows. Single rows wander, get about as far, and read thirty.",
       pauseAfter: 0.8,
     },
 
@@ -359,7 +372,7 @@ export const script: NarrationScript = {
     },
     {
       id: "lr-range",
-      text: "A real network's limit is unknown, so run a range test: one short run with the rate rising across orders of magnitude. Here the loss bottoms out from about point five, and turns up at two. Pick a rate on the flat stretch.",
+      text: "A real network's limit is unknown, so run a range test: one short run with the rate rising across orders of magnitude. Here the loss bottoms out from about point five, and turns up at two. Pick a rate on the flat stretch, well short of the turn.",
       pauseAfter: 0.6,
     },
     {
@@ -441,7 +454,7 @@ export const script: NarrationScript = {
     {
       id: "svm",
       scene: true,
-      text: "Question eight. How does a support vector machine, an SVM, work? It finds the boundary with the widest margin between the classes. The points on the margin's edge are the support vectors, and they alone fix it.",
+      text: "Question eight. How does a support vector machine, an SVM, work? It finds the boundary with the widest margin between the classes. The points on or inside the margin are the support vectors, and they alone fix it.",
       pauseAfter: 0.6,
     },
     {
@@ -483,7 +496,7 @@ export const script: NarrationScript = {
     {
       id: "pca",
       scene: true,
-      text: "Question ten. What is PCA, and what does it do? Principal component analysis finds the directions of greatest variance, each at right angles to the last, and projects the data onto the first few, to compress, plot or decorrelate it.",
+      text: "Question ten. What is PCA, and what does it do? Principal component analysis finds the directions of greatest variance, each at right angles to those before, and projects the data onto the first few, to compress, plot or decorrelate it.",
       pauseAfter: 0.6,
     },
     {
@@ -566,7 +579,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-onehot",
-      text: "One-hot encoding gives each category its own column of zeros and ones, implying no order: red, green and blue become three columns. Purple, unseen in training, becomes all zeros, not an error at serving time. For thousands of values, use hashing or embeddings.",
+      text: "One-hot encoding gives each category its own column of zeros and ones, implying no order: red, green and blue become three columns. Set to ignore unknowns, it encodes purple, unseen in training, as all zeros, not an error at serving time. For thousands of values, use hashing or embeddings.",
       pauseAfter: 0.6,
     },
     {

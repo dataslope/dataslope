@@ -134,8 +134,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     reservoir; the rain barrel spot); "Keep with probability k / i" lit as
  *     a line replaces a slot.
  *   q10-why: the product written as a chain, k/i × i/(i+1) × … × (n−1)/n
- *     = k/n, collapsing on "every item"; then ten bars, one per tenth of the
- *     stream (RESERVOIR.tenths), all at about 10%, labelled "Simulation:
+ *     = k/n, collapsing on "every item". q10-sim: ten bars, one per tenth of
+ *     the stream (RESERVOIR.tenths), all at about 10%, labelled "Simulation:
  *     20,000 streams of 1,000 lines".
  *   q10-alt: two red alternatives under the bars: "First 10" (all from the
  *     first tenth) and "Each with p = 1%" (a spread of sample sizes, 5 to
@@ -196,7 +196,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - q5: the (n, n, d) broadcast and the norm identity: the page.
  *     Arithmetic: 10,000² × 128 × 8 bytes = 102.4 GB; 10,000² × 8 = 800 MB.
  *     The video's own 1,000 seeded rows of 128 standard normals in float32:
- *     the identity's distance from a row to itself is negative for 409 of
+ *     the identity's squared distance from a row to itself is negative for 409 of
  *     them ("four in ten"), nan after the root (the same draws kept in
  *     float64: 411, so the narration does not name the dtype); clipped at
  *     zero, none, and the distances match the broadcast ones to within 0.1%
@@ -344,7 +344,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q5-neg",
-      text: "The catch is rounding. On a thousand random rows, the distance from a row to itself, which should be zero, came out negative for four in ten. The square root turned them into not a number. So clip at zero, before the root.",
+      text: "The catch is rounding. On a thousand random rows, the squared distance from a row to itself, which should be zero, came out negative for four in ten. The square root turned them into not a number. So clip at zero, before the root.",
       pauseAfter: 0.8,
     },
 
@@ -411,7 +411,12 @@ export const script: NarrationScript = {
     },
     {
       id: "q10-why",
-      text: "The follow-up is why that's uniform. Item i gets in with chance k over i. Then each later item, j, knocks it out with chance one over j. Multiply it through, and every item ends at k over n. In a simulation of twenty thousand streams of a thousand log lines, each tenth of the stream supplied ten percent of the sample.",
+      text: "The follow-up is why that's uniform. Item i gets in with chance k over i. Then each later item, j, knocks it out with chance one over j. Multiply it through, and every item ends at k over n.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q10-sim",
+      text: "In a simulation of twenty thousand streams of a thousand log lines, each tenth of the stream supplied ten percent of the sample.",
       pauseAfter: 0.6,
     },
     {

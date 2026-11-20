@@ -166,8 +166,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   imb-trap: a small table, plain against balanced weights: recall at 0.5,
  *     24% → 84% (yellow); average predicted probability, 1% → 22% (red, the
  *     true rate 1% beside it); PR-AUC, 0.46 → 0.32 (red).
- *   imb-prod: "Recalibrate" and "Resample training only; test keeps 1%" in
- *     green.
+ *   imb-prod: "Recalibrate", then "Try the plain model's threshold first"
+ *     (recalibrating keeps the order, so it can't win back the PR-AUC), then
+ *     "Resample training only; test keeps 1%", all three in green.
  *   rapid-in: RapidFire, rows 11 and 12.
  *   r-early: the small network's training and validation loss by epoch
  *     (early.train, early.validation), "patience" as a bracket of epochs after
@@ -245,7 +246,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     466 frauds. ROC-AUC 0.907, PR-AUC (average precision) 0.461, chance
  *     0.01. Everything legitimate: 99.0% accurate. Balanced class weights:
  *     recall at 0.5 84.3%, mean predicted probability 22.1% (plain 0.96%),
- *     PR-AUC 0.322. "A thousand alerts a day" is the video's assumption,
+ *     PR-AUC 0.322 (ROC-AUC 0.929). Recalibrating is monotone, so it cannot
+ *     win back the plain model's better PR-AUC; lowering the plain model's
+ *     threshold keeps it (threshold moving is standard practice, said as
+ *     advice; check.mjs asserts the plain PR-AUC is the higher). "A thousand
+ *     alerts a day" is the video's assumption,
  *     said as one ("if reviewers can check").
  *   - auc: the page's definition (TPR against FPR; the AUC as the chance a
  *     random positive outranks a random negative; "FPR stays low even with
@@ -311,7 +316,7 @@ export const script: NarrationScript = {
     },
     {
       id: "bias-def",
-      text: "Bias is error from a model too simple for the pattern; variance, from fitting one training sample's quirks. With noise no model can remove, the three sum to the expected squared error on new data.",
+      text: "Bias is error from a model too simple for the pattern; variance, from fitting one training sample's quirks. With noise no model can remove, bias squared, variance and noise sum to the expected squared error on new data.",
       pauseAfter: 0.7,
     },
     {
@@ -550,7 +555,7 @@ export const script: NarrationScript = {
     },
     {
       id: "imb-prod",
-      text: "So if anything downstream reads those as probabilities, recalibrate. And resample only the training set: the test set keeps production's one percent.",
+      text: "So if anything downstream reads those as probabilities, recalibrate. That won't win back the ranking, so try lowering the plain model's threshold first. And resample only the training set: the test set keeps production's one percent.",
       pauseAfter: 0.8,
     },
 
@@ -572,7 +577,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-metrics",
-      text: "RMSE squares errors before averaging, so one big miss dominates it. MAE weighs every error alike, so it shrugs off outliers. Trained on squared error, a model predicts the mean; on absolute error, the median.",
+      text: "RMSE squares errors before averaging, so one big miss dominates it. MAE counts every unit of error alike, so one outlier moves it far less. Trained on squared error, a model predicts the mean; on absolute error, the median.",
       pauseAfter: 0.6,
     },
     {

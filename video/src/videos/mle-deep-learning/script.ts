@@ -178,9 +178,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q9-dash: two numbers, "accuracy 98% / 97%" (neutral ink: the trap is
  *     that it barely moves), then "1 image in 10 changes its answer" in red;
  *     "Serve in evaluation mode" green.
- *   q9-l2: L2 as weights shrinking toward zero on a small bar row; early
- *     stopping as a validation curve with its low point marked and the
- *     weights taken from there.
+ *   q9-l2: L2 as weights shrinking toward zero on a small bar row, with
+ *     "Adam: decoupled weight decay (AdamW)" as a line under it on "decay
+ *     the weights directly"; early stopping as a validation curve with its
+ *     low point marked and the weights taken from there.
  *   q10, q10-a: question card; the digit zero as an 8x8 grid (results.json
  *     cnn.image), a 3x3 window sliding across it, the filter's nine weights
  *     beside it; the feature map filling in cell by cell (results.json
@@ -248,8 +249,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     forward passes per gradient. A forward pass is 25,856 multiply-adds; the
  *     backward pass 43,520 (the weight gradients plus the input gradients of
  *     layers 2 and 3), 1.68 times a forward pass ("one point seven"). The
- *     page says backprop costs "about the same as one forward pass"; the
- *     count says the same order, 1.7 here (see the report). "q4-check": a
+ *     page says backprop costs "a small multiple of one forward pass (about
+ *     two, since each layer needs the gradient for its inputs and for its
+ *     weights)" (fixed 2026-11-20); the count agrees, 1.7 here, because the
+ *     first layer needs no input gradient. "q4-check": a
  *     central-difference check on 20 random weights, on 32 digits, agrees
  *     with backprop to a worst relative error of 2.9e-7. "q4-memory": the
  *     page's "the forward pass caches intermediate activations".
@@ -288,7 +291,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     and 1 twice; across the test set, 10.2% of images change their answer
  *     at least once in ten calls ("one image in ten"), two calls disagree on
  *     3.5%, and accuracy is 97.2% ("ninety-eight to ninety-seven"). "q9":
- *     the pages (commonly 0.2 to 0.5; inverted dropout). "q9-l2": the page.
+ *     the pages (commonly 0.2 to 0.5; inverted dropout). "q9-l2": the page;
+ *     that L2 equals weight decay only for plain SGD, and that Adam wants the
+ *     decay applied to the weights directly (AdamW), is standard, not the
+ *     page's, said because the page's "L2 (weight decay)" is the line an
+ *     interviewer corrects. "q8-rms": RMSProp divides by the root of the
+ *     average, as the page's formula has it (its prose says "by a running
+ *     average", see the report).
  *   - "q10": the digits' first image, a 0, under a 3x3 vertical-edge filter
  *     (Sobel's), padding 1. "q10-props": shifted two pixels right, its map
  *     equals the original's shifted two, away from the edge the shift
@@ -475,7 +484,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q8-rms",
-      text: "RMSProp divides each parameter's step by a running average of its squared gradients; Adam does both. Give two parameters gradients a hundred times apart: SGD's steps are a hundred and four times apart, Adam's, one point oh three.",
+      text: "RMSProp divides each parameter's step by the root of a running average of its squared gradients; Adam does both. Give two parameters gradients a hundred times apart: SGD's steps are a hundred and four times apart, Adam's, one point oh three.",
       pauseAfter: 0.7,
     },
     {
@@ -508,7 +517,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q9-l2",
-      text: "L2, or weight decay, penalizes squared weights, pulling them toward zero; early stopping keeps the weights from the best validation epoch. All three limit what a network can memorize.",
+      text: "L2 penalizes squared weights, pulling them toward zero. With plain SGD that's the same as weight decay; with Adam it isn't, so decay the weights directly. Early stopping keeps the weights from the best validation epoch, and all three limit what a network can memorize.",
       pauseAfter: 0.7,
     },
     { id: "cnn-in", text: "Then, architectures shaped to their data." },

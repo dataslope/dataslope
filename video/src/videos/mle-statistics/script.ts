@@ -131,7 +131,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q8-paired: a 2×2 table of agreement: both right 1,806, both wrong 176,
  *     only old 4, only new 14, the two off-diagonal cells lit yellow; the
  *     paired null (PERM_MODELS.pairedNull, a narrow spike train) with the
- *     gap out in its tail, "p = 0.03", green; "Same gap, different test".
+ *     gap out in its tail, "p = 0.03", green; "Same gap, different test";
+ *     "Reject at α = 5%" on "rejects the null". Not "it's real": that is the
+ *     p-value's own misreading, which "q6-not" has just ruled out.
  *   q9: question card; the page's two-worlds picture: the null and
  *     alternative curves, a critical line, α (red tail) and β (red area
  *     under the alternative), power (green area).
@@ -203,7 +205,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     Arithmetic: the SD of a right-or-wrong at 91% is √(0.91 × 0.09) =
  *     0.286; over √2,000, 0.0064 ("two thirds of a percentage point"); at
  *     8,000, 0.0032 ("a third of a point").
- *   - q2: the page's own block (exponential, scale 3, 100,000; 3,000
+ *   - q2: "as long as its variance is finite" is the theorem's condition,
+ *     standard rather than the page's, said because heavy-tailed latencies
+ *     are where an ML engineer meets it. The page's own block (exponential,
+ *     scale 3, 100,000; 3,000
  *     samples of 40, seed 42): SE 0.477 by the formula, 0.475 simulated;
  *     population skewness 2.0, the means' 0.33. "Means and sums" and the
  *     median and percentile as statistics without such a formula: the
@@ -321,7 +326,7 @@ export const script: NarrationScript = {
     {
       id: "q2",
       scene: true,
-      text: "Question two. What does the Central Limit Theorem say, and why does it matter? For a large enough sample, the sample mean is approximately normal, whatever the population's shape. That justifies normal intervals and tests, even on skewed data.",
+      text: "Question two. What does the Central Limit Theorem say, and why does it matter? For a large enough sample, the sample mean is approximately normal, whatever the population's shape, as long as its variance is finite. That justifies normal intervals and tests, even on skewed data.",
       pauseAfter: 0.6,
     },
     {
@@ -354,7 +359,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q4-slice",
-      text: "The follow-up is where it breaks. On a slice of forty examples, with a model that's ninety-seven percent right, three slices in ten score forty out of forty, and the interval shrinks to a point. It covers the truth only seventy percent of the time. Wilson's score interval doesn't collapse, and covers ninety-seven.",
+      text: "The follow-up is where it breaks. On a slice of forty examples, with a model that's ninety-seven percent right, three slices in ten score forty out of forty, and the textbook interval shrinks to a point. Across all slices, it covers the truth only seventy percent of the time. Wilson's score interval doesn't collapse, and covers ninety-seven.",
       pauseAfter: 0.8,
     },
 
@@ -413,7 +418,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q8-paired",
-      text: "But they answered the same two thousand examples, and disagree on only eighteen, of which the new model wins fourteen. Shuffle within each pair instead, swapping which model gave which answer, and p is point oh three. Same gap: the paired test uses how the data was collected, and says it's real.",
+      text: "But they answered the same two thousand examples, and disagree on only eighteen, of which the new model wins fourteen. Shuffle within each pair instead, swapping which model gave which answer, and p is point oh three. Same gap, but the paired test uses how the data was collected, and at five percent it rejects the null.",
       pauseAfter: 0.8,
     },
 
