@@ -12,7 +12,7 @@ export const VIDEO = "ae-metrics";
  * illustrations.json. Phase 2 sets it once they are generated; every frame
  * is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 type Value = string | number | null;
 type Step = { sql: string; ok: boolean; columns?: string[]; rows?: Value[][]; error?: string };
@@ -86,6 +86,12 @@ export const FAN = {
   })),
 };
 
+/** The opening's two dashboards: orders alone, and the page's join. */
+export const DASHBOARDS = {
+  a: { sql: lines("fan", "dashboardA"), value: scalar("fan", "dashboardA") },
+  b: { sql: lines("fan", "dashboardB"), value: scalar("fan", "dashboardB") },
+};
+
 export const FIX = {
   /** The page's "aggregate each grain independently" listing, as written. */
   page: run("fan", "fix"),
@@ -141,6 +147,13 @@ export const RATIO = {
   pooledPct: scalar("ratio", "pooled"),
   conversions: scalar("ratio", "parts", "conversions"),
   sessions: scalar("ratio", "parts", "sessions"),
+};
+
+// ── 5. The SQL the layer writes (drawn: run on empty tables, no values) ──────
+
+export const LAYER_SQL = {
+  byMonth: lines("layer", "byMonth"),
+  byRegion: lines("layer", "byRegion"),
 };
 
 // ── Quick. The page's MetricFlow definition ─────────────────────────────────

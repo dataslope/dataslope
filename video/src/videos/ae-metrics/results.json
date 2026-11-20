@@ -218,6 +218,30 @@
             ]
           ]
         },
+        "dashboardA": {
+          "sql": "SELECT SUM(amount) AS revenue\nFROM orders;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "1949.25"
+            ]
+          ]
+        },
+        "dashboardB": {
+          "sql": "SELECT SUM(o.amount) AS revenue\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "4555.25"
+            ]
+          ]
+        },
         "joinedRows": {
           "sql": "SELECT COUNT(*) AS rows\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id;",
           "ok": true,
@@ -883,6 +907,30 @@
               1010
             ]
           ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "layer": {
+      "setup": "CREATE TABLE customers (customer_id INTEGER, region TEXT);\nCREATE TABLE orders (order_id INTEGER, customer_id INTEGER, order_date DATE, status TEXT, amount DECIMAL(10,2));",
+      "steps": {
+        "byMonth": {
+          "sql": "SELECT date_trunc('month', o.order_date) AS month,\n  SUM(o.amount) AS completed_revenue\nFROM orders o\nWHERE o.status = 'completed'\nGROUP BY 1;",
+          "ok": true,
+          "columns": [
+            "month",
+            "completed_revenue"
+          ],
+          "rows": []
+        },
+        "byRegion": {
+          "sql": "SELECT c.region,\n  SUM(o.amount) AS completed_revenue\nFROM orders o\nJOIN customers c ON c.customer_id = o.customer_id\nWHERE o.status = 'completed'\nGROUP BY c.region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "completed_revenue"
+          ],
+          "rows": []
         }
       },
       "version": "PostgreSQL 18.6 (PGlite 0.5.16)"

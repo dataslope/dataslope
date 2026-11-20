@@ -60,6 +60,11 @@ results.figures.fan = await figure(PAGE_TABLES, {
   revenue: "SELECT COUNT(*) AS orders, SUM(amount) AS revenue\nFROM orders;",
   // Dashboard two: the page's query, as written (comments and all).
   page: PAGE_QUERY,
+  // The opening's two dashboard queries, each aliased the way a dashboard
+  // would alias it (the page's alias, inflated_revenue, names the answer):
+  // orders alone, and the page's join.
+  dashboardA: "SELECT SUM(amount) AS revenue\nFROM orders;",
+  dashboardB: "SELECT SUM(o.amount) AS revenue\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id;",
   joinedRows: "SELECT COUNT(*) AS rows\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id;",
   // The zoom: orders 1 and 2, the rows the page's comment describes.
   firstTwo: "SELECT o.order_id, o.amount, i.item\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id\nWHERE o.order_id IN (1, 2)\nORDER BY o.order_id, i.item;",
@@ -145,6 +150,21 @@ results.figures.ratio = await figure(DAYS, {
   parts: "SELECT SUM(conversions) AS conversions, SUM(sessions) AS sessions\nFROM daily;",
 });
 
+// ── 5. What the layer writes for completed revenue, by month and by region ──
+//
+// Drawn, not measured: the page's tables have no status, date or region. The
+// two statements the screen shows run here on empty tables of that shape, so
+// they are at least valid Postgres; no number comes from them.
+
+const LAYER = `CREATE TABLE customers (customer_id INTEGER, region TEXT);
+CREATE TABLE orders (order_id INTEGER, customer_id INTEGER, order_date DATE, status TEXT, amount DECIMAL(10,2));`;
+results.figures.layer = await figure(LAYER, {
+  byMonth:
+    "SELECT date_trunc('month', o.order_date) AS month,\n  SUM(o.amount) AS completed_revenue\nFROM orders o\nWHERE o.status = 'completed'\nGROUP BY 1;",
+  byRegion:
+    "SELECT c.region,\n  SUM(o.amount) AS completed_revenue\nFROM orders o\nJOIN customers c ON c.customer_id = o.customer_id\nWHERE o.status = 'completed'\nGROUP BY c.region;",
+});
+
 // ── The definitions the screen shows as the page writes them ────────────────
 
 results.definitions = {
@@ -168,6 +188,8 @@ for (const [f, fig] of Object.entries(results.figures)) {
 }
 expect("fan: twelve orders, 1,949.25", rows("fan", "revenue"), [[12, "1949.25"]]);
 expect("fan: the page's query returns 4,555.25", rows("fan", "page"), [["4555.25"]]);
+expect("fan: dashboard A reads 1,949.25", rows("fan", "dashboardA"), [["1949.25"]]);
+expect("fan: dashboard B reads 4,555.25", rows("fan", "dashboardB"), [["4555.25"]]);
 expect("fan: 24 rows", rows("fan", "joinedRows"), [[24]]);
 expect("fan: orders 1 and 2, 150 becomes 350", rows("fan", "firstTwoSums"), [["150.00", "350.00"]]);
 expect("fan: more than double", rows("fan", "multiple"), [["2.34"]]);

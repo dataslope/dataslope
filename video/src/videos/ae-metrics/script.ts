@@ -269,6 +269,7 @@ export const script: NarrationScript = {
     },
     {
       id: "avoid",
+      scene: true,
       text: "Question three. How do you avoid double counting from a fan-out? Aggregate each grain before you join. Sum revenue from orders alone, units from the items alone, then put the two summaries together.",
       pauseAfter: 0.6,
     },
@@ -331,6 +332,7 @@ export const script: NarrationScript = {
     },
     {
       id: "entities",
+      scene: true,
       text: "Question six. What are entities, dimensions, and measures in a semantic model? Entities are the join keys, and they set the grain: an order, a customer. Dimensions are what you group and filter by: status, region, date. Measures are what you aggregate: an amount, a count.",
       pauseAfter: 0.6,
     },
@@ -369,6 +371,7 @@ export const script: NarrationScript = {
     },
     {
       id: "ratio",
+      scene: true,
       text: "Question eight. How does a semantic layer handle a ratio metric correctly? It keeps the numerator and the denominator as two separate measures, and divides at query time, at whatever grain is asked for. Nothing is pre-divided.",
       pauseAfter: 0.6,
     },
