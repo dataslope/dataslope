@@ -12,9 +12,9 @@ const LIST_TOP = 380;
 const ROW = 66;
 /** The path's boxes, left to right: the assistant, MCP, the two interfaces
  *  stacked, and the warehouse under them. */
-const ASST = { x: 790, w: 180 };
+const ASST = { x: 776, w: 172 };
 const MCP = { x: 1010, w: 286 };
-const IFACE = { x: 1360, w: 330 };
+const IFACE = { x: 1392, w: 330 };
 
 /**
  * The quick round: one question, read aloud, then its answer drawn as a
@@ -89,8 +89,8 @@ export const RapidScene: React.FC = () => {
         <Flow
           points={[
             [IFACE.x + IFACE.w + 8, apiTop + boxH / 2],
-            [IFACE.x + IFACE.w + 60, apiTop + boxH / 2],
-            [IFACE.x + IFACE.w + 60, whTop + whH / 2],
+            [IFACE.x + IFACE.w + 50, apiTop + boxH / 2],
+            [IFACE.x + IFACE.w + 50, whTop + whH / 2],
             [IFACE.x + IFACE.w + 8, whTop + whH / 2],
           ]}
           at={apiAt + 14}
@@ -98,8 +98,8 @@ export const RapidScene: React.FC = () => {
         />
         <Box x={MCP.x} y={mcpTop} w={MCP.w} h={boxH} at={mcpAt} title="MCP" sub="Model Context Protocol" size={24} subSize={20} />
         <Flow points={[[ASST.x + ASST.w + 8, mid], [MCP.x - 8, mid]]} at={mcpAt + 6} />
-        <Flow points={[[MCP.x + MCP.w + 8, mid - h(14)], [MCP.x + MCP.w + 34, mid - h(14)], [MCP.x + MCP.w + 34, apiTop + boxH / 2], [IFACE.x - 8, apiTop + boxH / 2]]} at={exposeAt} />
-        <Flow points={[[MCP.x + MCP.w + 8, mid + h(14)], [MCP.x + MCP.w + 34, mid + h(14)], [MCP.x + MCP.w + 34, catTop + boxH / 2], [IFACE.x - 8, catTop + boxH / 2]]} at={exposeAt + 6} />
+        <Flow points={[[MCP.x + MCP.w + 8, mid - h(14)], [MCP.x + MCP.w + 24, mid - h(14)], [MCP.x + MCP.w + 24, apiTop + boxH / 2], [IFACE.x - 8, apiTop + boxH / 2]]} at={exposeAt} />
+        <Flow points={[[MCP.x + MCP.w + 8, mid + h(14)], [MCP.x + MCP.w + 24, mid + h(14)], [MCP.x + MCP.w + 24, catTop + boxH / 2], [IFACE.x - 8, catTop + boxH / 2]]} at={exposeAt + 6} />
         <Ink at={dbtAt} dur={14} style={{ left: MCP.x, top: mcpTop + boxH + h(18) }}>
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>dbt Labs publishes</div>
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>an MCP server</div>

@@ -62,7 +62,7 @@ export const HurtScene: React.FC = () => {
   const pitchY = h(PITCH);
   const cellH = h(CELL);
   const oneH = h(ONE_W);
-  const textTop = (i: number) => gridY + [0, 52, 130][i] * (h(100) / 100);
+  const textTop = (i: number) => gridY + h([0, 52, 130][i]);
   const monthTop = y(MONTH_Y) + h(40);
 
   return (
