@@ -196,7 +196,7 @@ this track do, and is standard except where a question says otherwise.
 - With the \`PIVOT\` keyword, which is part of standard SQL.
   > \`PIVOT\` exists in DuckDB, Snowflake, and SQL Server, but it is not portable.
 - [o] Conditional aggregation, one \`SUM(CASE WHEN ...)\` per column.
-  > Verbose, and it runs everywhere. Verbose but it runs everywhere, and it makes the grain of each output column explicit.
+  > Verbose, but it runs everywhere, and it makes the grain of each output column explicit.
 - With \`GROUP BY\` alone.
   > Grouping collapses rows; it cannot create new columns.`}
 />
@@ -341,7 +341,7 @@ this track do, and is standard except where a question says otherwise.
 - It only works on partitioned tables.
   > Partitioning is not required.
 - [o] It matches on a key, updating on a match and inserting otherwise.
-  > Re-running the same batch therefore converges to the same state. The key has to be genuinely unique in the source, or a single incoming row can match several targets and the behavior becomes engine-specific.
+  > Re-running the same batch therefore converges to the same state. The key has to be genuinely unique in the source, or several incoming rows can match one target row and the behavior becomes engine-specific.
 - It appends rows and deduplicates them later.
   > Deferred deduplication leaves a window in which the table is wrong.`}
 />
@@ -456,7 +456,7 @@ this track do, and is standard except where a question says otherwise.
 - A warehouse that has been moved into object storage, with no other change.
   > Storage location alone is not the distinction.
 - [o] Open table formats layered over object storage.
-  > Delta, Iceberg, and Hudi add ACID transactions, schema enforcement, and time travel to lake-scale files. Delta Lake, Iceberg, and Hudi are the common implementations, and they are what let one copy of the data serve both SQL and non-SQL engines.
+  > Delta Lake, Iceberg, and Hudi add ACID transactions, schema enforcement, and time travel to lake-scale files, and they are what let one copy of the data serve both SQL and non-SQL engines.
 - A warehouse that only stores unstructured data.
   > The point is structured, queryable tables on lake storage.
 - A data lake with a BI tool connected to it.
@@ -575,7 +575,7 @@ this track do, and is standard except where a question says otherwise.
 - Which column the table is partitioned by.
   > Partitioning is configured separately.
 - [o] Which key dbt matches on when updating existing rows.
-  > Without it, an incremental run appends duplicates. Without it, an incremental run appends, so a restated source row appears twice. With it, dbt issues a merge or delete-then-insert.
+  > Without it, an incremental run appends, so a restated source row appears twice. With it, dbt issues a merge or delete-then-insert.
 - The order in which rows are inserted.
   > Insert order is not configurable and would not matter.
 - Which column each of the model's tests is run against.
@@ -592,7 +592,7 @@ this track do, and is standard except where a question says otherwise.
 - Recording a model's row count over time.
   > Metrics about runs are stored in artifacts, not snapshots.
 - [o] Capturing how a mutable source row changes over time.
-  > It is SCD Type 2, with validity ranges and a current-row flag. It is the answer to "the source overwrites the record, but we need to know what it said last quarter".`}
+  > It is SCD Type 2: each version carries \`dbt_valid_from\` and \`dbt_valid_to\`, and the current row is the one whose \`dbt_valid_to\` is \`NULL\`. It is the answer to "the source overwrites the record, but we need to know what it said last quarter".`}
 />
 
 <MultipleChoice
@@ -603,7 +603,7 @@ this track do, and is standard except where a question says otherwise.
 - The first models built in a run.
   > Build order comes from the DAG.
 - [o] Small CSV files in the repo, loaded in as tables.
-  > They suit static reference data such as country-code or category mappings, and they are version controlled. They are version controlled, which is the point. They are the wrong tool for anything large or frequently changing.
+  > They suit static reference data such as country-code or category mappings, and they are version controlled, which is the point. They are the wrong tool for anything large or frequently changing.
 - Sample rows generated for testing.
   > No data is generated.`}
 />
@@ -627,7 +627,7 @@ this track do, and is standard except where a question says otherwise.
 - \`dbt run --select my_model --downstream\`
   > There is no \`--downstream\` flag.
 - \`dbt run --models all\`
-  > This builds the entire project rather than one subgraph.
+  > \`all\` is read as a model name, matches nothing, and the run does nothing. \`--models\` is also the old spelling of \`--select\`.
 - \`dbt run --select my_model --full-refresh\`
   > \`--full-refresh\` changes how incremental models rebuild; it selects nothing extra.
 - [o] \`dbt run --select my_model+\`
@@ -783,7 +783,7 @@ this track do, and is standard except where a question says otherwise.
   markdown={`What does SCD Type 1 do, and what is the cost?
 
 - It refuses the change and raises an error.
-  > That is Type 0.
+  > No SCD type raises an error. Type 0 comes closest: it keeps the original value and ignores the change.
 - [o] It overwrites the attribute in place, losing the history.
   > One row per entity is simple, but past reporting silently changes. Fine for correcting a typo in a name; wrong for a customer's region, where historical reporting would silently shift.
 - It adds a previous-value column.
@@ -850,7 +850,7 @@ this track do, and is standard except where a question says otherwise.
 - Storing data of unknown quality.
   > Quality is not what the name refers to.
 - [o] It collapses scattered low-cardinality flags into one dimension.
-  > The dimension holds their distinct combinations, keeping the fact table narrow. It keeps the fact table narrow and gives those flags one place to be described.
+  > The dimension holds their distinct combinations, which keeps the fact table narrow and gives those flags one place to be described.
 - It archives the dimension rows that are no longer in use.
   > Retired rows stay in place, usually marked inactive.
 - It holds rows that failed a quality test.
@@ -861,7 +861,7 @@ this track do, and is standard except where a question says otherwise.
   markdown={`What is a factless fact table?
 
 - [o] A table recording that something occurred, with no measure.
-  > The count of rows is the measure. Attendance and promotion eligibility are the classic examples. Student attendance and promotion eligibility are the classic examples: the useful questions are "how many" and, harder, "which ones did *not* happen".
+  > The count of rows is the measure. Student attendance and promotion eligibility are the classic examples: the useful questions are "how many" and, harder, "which ones did *not* happen".
 - A dimension misclassified as a fact.
   > It is a genuine fact table by grain and purpose.
 - A fact table with no foreign keys.
@@ -969,7 +969,7 @@ this track do, and is standard except where a question says otherwise.
 - A measure is computed at query time and a metric is materialized.
   > Either can be materialized.
 - [o] One is a raw column, the other a defined calculation.
-  > \`order_amount\` is a measure; net revenue excluding refunds is a metric, with its own filters and grain. "Sum of order amount" is a measure aggregation; "net revenue, excluding refunds and internal accounts" is a metric.
+  > "Sum of order amount" is a measure aggregation; "net revenue, excluding refunds and internal accounts" is a metric, with its own filters and grain.
 - They are synonyms.
   > The distinction matters once definitions are centralized.
 - A metric is always a ratio.
@@ -1114,7 +1114,7 @@ this track do, and is standard except where a question says otherwise.
 - A SQL query and nothing else.
   > A raw query loses the parts that make the metric composable.
 - [o] The measure, its aggregation, filters, and valid dimensions.
-  > The source model and the time grain too. Naming the valid dimensions is what stops a fan-out. Naming the valid dimensions is what stops a metric being sliced in a way that produces a fan-out.
+  > The source model and the time grain too. Naming the valid dimensions is what stops a metric being sliced in a way that produces a fan-out.
 - The chart type the metric should be displayed as.
   > Presentation is a consumer concern.`}
 />
@@ -1399,8 +1399,8 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`An assistant keeps querying \`int_orders_unioned\`, an intermediate model, instead of \`fct_orders\`. What is the most reliable fix?
 
-- [o] Mark intermediate models private so only public marts are exposed.
-  > Removing the option is more reliable than hoping the model chooses well.
+- [o] Grant the assistant's warehouse role \`SELECT\` on the public marts only.
+  > Removing the option is more reliable than hoping the model chooses well. Marking a model \`private\` in dbt limits \`ref()\`, not warehouse queries.
 - Ask users to name the right model explicitly in each question they ask.
   > Pushes the modeling knowledge back onto the users.
 - Raise the model's temperature so it explores other models.

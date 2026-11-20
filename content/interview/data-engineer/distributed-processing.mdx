@@ -51,6 +51,11 @@ Datasets) for almost everything, they are faster and let Spark reason
 about your query. Drop to RDDs only for custom logic the DataFrame API
 can't express.
 
+Two Spark 4 changes come up in interviews. ANSI SQL mode is on by default
+since 4.0, so an overflow, an invalid cast, or a division by zero raises an
+error where Spark 3 returned `NULL`. And under Spark Connect the RDD API is
+not available at all, which is one more reason to stay in DataFrames.
+
 ### What is the difference between a transformation and an action in Spark?
 
 **Transformations** (`select`, `filter`, `join`, `groupBy`) are **lazy**:
@@ -126,9 +131,10 @@ usually because a join or group key is unevenly distributed (a null key, a
 "guest" user, one huge customer). Those straggler tasks dominate runtime
 while other cores sit idle. Fixes: **salting** (append a random suffix to
 the hot key to spread it across partitions, then aggregate in two steps);
-filtering or handling null/sentinel keys separately; enabling Spark's
-**Adaptive Query Execution (AQE)** skew-join handling, which splits large
-partitions automatically.
+filtering or handling null/sentinel keys separately; and, for joins, Spark's
+**Adaptive Query Execution (AQE)**, on by default since Spark 3.2, which
+splits a skewed sort-merge join partition automatically. AQE does not split a
+skewed `groupBy`; salting is still the fix there.
 
 Skew is the reason an average partition size tells you nothing about how
 long a stage takes. Four groups with an identical mean and four

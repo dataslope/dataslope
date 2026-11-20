@@ -64,7 +64,7 @@ SELECT * FROM {{ source('raw', 'orders') }}
 ### How do dbt tests work?
 
 Tests **assert** conditions and fail the run when violated, they don't
-modify data. Built-in **schema tests** (`unique`, `not_null`,
+modify data. Built-in **generic data tests** (`unique`, `not_null`,
 `accepted_values`, `relationships`) guard keys and referential integrity;
 **singular tests** are custom SQL that should return zero rows. They
 encode your assumptions so bad data fails loudly.
@@ -152,7 +152,7 @@ Seeds are **CSV files** checked into the repository and loaded into the warehous
 ### What is the difference between `dbt run`, `dbt test`, and `dbt build`?
 
 - `dbt run`, executes model SQL and materializes results.
-- `dbt test`, runs schema and singular tests against already-materialized models.
+- `dbt test`, runs data tests (generic and singular) against already-materialized models, and unit tests against mocked inputs.
 - `dbt build`, combines both in dependency order: for each node it runs the model, then immediately tests it before moving to downstream nodes. It also runs seeds and snapshots. `dbt build` is the preferred CI command.
 
 ### What are generic (schema) tests vs. singular tests?
@@ -169,18 +169,20 @@ models:
   - name: fct_orders
     columns:
       - name: order_id
-        tests:
+        data_tests:
           - unique
           - not_null
       - name: status
-        tests:
+        data_tests:
           - accepted_values:
-              values: ['placed', 'shipped', 'delivered', 'cancelled']
+              arguments:
+                values: ['placed', 'shipped', 'delivered', 'cancelled']
       - name: customer_id
-        tests:
+        data_tests:
           - relationships:
-              to: ref('dim_customer')
-              field: customer_id
+              arguments:
+                to: ref('dim_customer')
+                field: customer_id
 ```
 
 The singular test below is just a query: any `fct_orders` row with a
@@ -213,7 +215,7 @@ the division expression, so models call it instead of repeating the
 
 ### What are dbt packages, and how do you add one?
 
-Packages are **shared dbt projects** (macros, models, tests) installed from the dbt Hub or a Git repo. You declare them in `packages.yml` and run `dbt deps` to install. The most common package is `dbt_utils`, which provides macros like `surrogate_key`, `pivot`, and `date_spine`.
+Packages are **shared dbt projects** (macros, models, tests) installed from the dbt Hub or a Git repo. You declare them in `packages.yml` and run `dbt deps` to install. The most common package is `dbt_utils`, which provides macros like `generate_surrogate_key`, `pivot`, and `date_spine`.
 
 This `packages.yml` pins `dbt-labs/dbt_utils` to version `1.1.1`; `dbt
 deps` then fetches that exact release into the project:
@@ -237,10 +239,11 @@ sources:
   - name: raw
     tables:
       - name: orders
-        loaded_at_field: _loaded_at
-        freshness:
-          warn_after: {count: 6, period: hour}
-          error_after: {count: 12, period: hour}
+        config:
+          loaded_at_field: _loaded_at
+          freshness:
+            warn_after: {count: 6, period: hour}
+            error_after: {count: 12, period: hour}
 ```
 
 ### What are exposures in dbt?
@@ -268,7 +271,7 @@ dbt generates a **documentation site** (`dbt docs generate` + `dbt docs serve`) 
 
 ### What are environments and targets in dbt?
 
-A **target** is a named warehouse connection configuration (database, schema, credentials). An **environment** groups targets together, typically `dev` (each developer's own schema) and `prod` (the production schema). The key pattern is that `ref()` automatically resolves to the correct schema for the active target, so models reference each other correctly in both environments without code changes.
+A **target** is a named warehouse connection configuration (database, schema, credentials). A **profile** groups targets, typically `dev` (each developer's own schema) and `prod` (the production schema); the hosted dbt platform configures the same split as **environments**. The key pattern is that `ref()` automatically resolves to the correct schema for the active target, so models reference each other correctly in both environments without code changes.
 
 ### What is the `{{ this }}` variable in dbt?
 
@@ -350,7 +353,7 @@ models:
 
 On a pull request, CI runs `dbt build --select state:modified+`, building and testing only models changed in the PR plus their downstream dependents. This uses **state comparison** (`--state`) against the production manifest artifact to determine what changed. It catches breakage early without rebuilding every model, keeping CI fast.
 
-### What is the `dbt-project.yml` file, and what does it control?
+### What is the `dbt_project.yml` file, and what does it control?
 
 `dbt_project.yml` is the root configuration file. It defines the project name, dbt version, model directories, and **default configurations** for models by directory path (materialization, tags, schema overrides). Configurations cascade: project-level defaults are overridden by directory-level, then model-level `config()` blocks.
 
@@ -480,5 +483,5 @@ Use the `generate_schema_name` macro (customizable) and the `schema` config. In 
 - A performance index on \`id\`.
   > Tests aren't indexes; they don't change physical storage.
 - [o] A check that fails the run if \`id\` has duplicates or nulls, guarding the model's grain and key integrity.
-  > These schema tests validate that \`id\` is a valid primary key and fail loudly when violated.`}
+  > These generic data tests validate that \`id\` is a valid primary key and fail loudly when violated.`}
 />

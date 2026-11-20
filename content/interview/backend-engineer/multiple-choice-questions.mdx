@@ -348,7 +348,7 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Which status code fits a request that is syntactically valid but semantically wrong, such as an end date before its start date?
 
-- [o] 400 Bad Request, or 422 Unprocessable Entity where that distinction is used.
+- [o] 400 Bad Request, or 422 Unprocessable Content where that distinction is used.
   > 422 signals "I parsed it, but it does not make sense", which is more informative for validation failures.
 - 404 Not Found.
   > Nothing is missing.
@@ -692,8 +692,8 @@ reasoning and runnable code.
 
 - It does not; the planner reorders as needed.
   > The physical sort order is fixed at creation.
-- [o] It is sorted by \`a\` first, so \`b\` alone cannot use it.
-  > The leftmost-prefix rule: it serves filters on \`a\`, or on \`a\` and \`b\` together. It is the leftmost-prefix rule, and it is why an index on \`(a, b)\` often makes a separate index on \`a\` redundant.
+- [o] It is sorted by \`a\` first, so \`b\` alone cannot seek into it.
+  > The leftmost-prefix rule: it serves filters on \`a\`, or on \`a\` and \`b\` together, which is why an index on \`(a, b)\` often makes a separate index on \`a\` redundant. A filter on \`b\` alone gets at best a skip scan (PostgreSQL 18), which repeats the search for every distinct \`a\`.
 - The order affects storage size, but never query plans.
   > It affects which queries can use the index at all.
 - Only the first column is actually indexed.
@@ -721,7 +721,7 @@ reasoning and runnable code.
 - That the database is isolated from network failures.
   > Durability and replication cover failure scenarios.
 - [o] That transactions do not see each other's partial state.
-  > To a degree determined by the isolation level, which is the important qualifier. "To a degree" is the important qualifier: only \`SERIALIZABLE\` gives the full guarantee, and most databases default to something weaker.
+  > "To a degree" is the important qualifier: only \`SERIALIZABLE\` gives the full guarantee, and most databases default to something weaker.
 - That each transaction sees a completely private copy of the data.
   > That describes snapshot isolation specifically, not isolation in general.`}
 />
@@ -769,7 +769,7 @@ reasoning and runnable code.
   markdown={`A query is slow. What does the plan's "Seq Scan on a large table" line most likely tell you?
 
 - [o] No usable index exists, or the planner judged a scan cheaper.
-  > A non-sargable filter is a common cause: \`WHERE DATE(created_at) = ...\` defeats an index on \`created_at\`. \`WHERE DATE(created_at) = '2026-01-01'\` defeats an index on \`created_at\`; a range predicate on the bare column does not.
+  > A non-sargable filter is a common cause: \`WHERE DATE(created_at) = '2026-01-01'\` defeats an index on \`created_at\`; a range predicate on the bare column does not.
 - The query is returning far too many columns.
   > Column count affects width, not scan choice.
 - The table needs to be vacuumed.
@@ -929,7 +929,7 @@ reasoning and runnable code.
 - When many objects have to be notified of a change.
   > That is Observer.
 - [o] When interchangeable algorithms are chosen at runtime.
-  > It replaces a growing conditional. Pricing rules, sort orders, and retry policies are typical. Pricing rules, sorting orders, and retry policies are typical. In languages with first-class functions, a function parameter often suffices.
+  > It replaces a growing conditional. Pricing rules, sort orders, and retry policies are typical. In languages with first-class functions, a function parameter often suffices.
 - When object creation is expensive.
   > That points at a factory, a pool, or lazy initialization.
 - When you need exactly one instance of a class.
@@ -1072,7 +1072,7 @@ reasoning and runnable code.
 - That its block runs only when no exception was raised.
   > It runs in either case; that is the point.
 - [o] That its block runs on the way out of the \`try\`.
-  > Normal completion, an exception, and a \`return\` all count. A \`return\` inside \`finally\` will even override one from the \`try\` block. That is legal, and a reliable way to confuse the next reader.
+  > Normal completion, an exception, and a \`return\` all count. A \`return\` inside \`finally\` will even override one from the \`try\` block. That still runs, but since Python 3.14 the compiler emits a \`SyntaxWarning\` for it (PEP 765).
 - That the code runs in a separate thread.
   > No concurrency is involved.
 - That exceptions in the \`try\` block are suppressed.
@@ -1310,7 +1310,7 @@ reasoning and runnable code.
 - Document a manual recovery procedure.
   > Useful, but it leaves the outage lasting as long as a human takes.
 - [o] Add redundancy, and exercise the failover path.
-  > An untested standby is a single point of failure with extra steps. An untested standby is a single point of failure with extra steps.
+  > An untested standby is a single point of failure with extra steps.
 - Add monitoring so that you know when it fails.
   > Monitoring shortens the outage; it does not prevent one.`}
 />

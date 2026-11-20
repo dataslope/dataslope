@@ -232,7 +232,7 @@ reasoning and runnable examples.
   markdown={`What is the difference between a star and a snowflake schema?
 
 - [o] A snowflake normalizes its dimensions; a star does not.
-  > The star trades redundancy for fewer joins and simpler queries. The star trades some redundancy for fewer joins and simpler queries, which is usually the right trade in a warehouse.
+  > The star trades some redundancy for fewer joins and simpler queries, which is usually the right trade in a warehouse.
 - A star cannot express hierarchies.
   > Hierarchies live inside the flat dimension as columns.
 - A snowflake schema can support more fact tables than a star.
@@ -795,7 +795,7 @@ reasoning and runnable examples.
   markdown={`What is Change Data Capture, and when do you use it?
 
 - [o] Reading the database's transaction log as changes happen.
-  > Inserts, updates, and crucially deletes all stream out, which is what query-based incremental extraction misses. Query-based incremental extraction misses hard deletes entirely, which is the usual reason to reach for CDC.
+  > Inserts, updates, and crucially deletes all stream out. Query-based incremental extraction misses hard deletes entirely, which is the usual reason to reach for CDC.
 - A method for detecting drift in a model.
   > That is a machine-learning concept.
 - A batch job that compares today's full export against yesterday's.
@@ -840,7 +840,7 @@ reasoning and runnable examples.
 - Narrow dependencies use fewer columns.
   > Column count is irrelevant.
 - [o] Whether an output partition draws from one input or many.
-  > Narrow needs no shuffle; wide forces one, and starts a new stage. \`map\` and \`filter\` are narrow; \`groupBy\` and \`join\` on an unpartitioned key are wide, and each wide dependency starts a new stage.
+  > Narrow needs no shuffle; wide forces one. \`map\` and \`filter\` are narrow; \`groupBy\` and \`join\` on an unpartitioned key are wide, and each wide dependency starts a new stage.
 - Wide dependencies apply only to joins.
   > Aggregations and repartitions are wide too.`}
 />
@@ -952,14 +952,14 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`How does Spark differ most from classic Hadoop MapReduce?
 
-- MapReduce cannot handle failures.
+- MapReduce cannot recover when a worker node fails.
   > Fault tolerance was one of its central features.
 - Spark is single-node and MapReduce is distributed.
   > Both are distributed.
 - Spark uses SQL and MapReduce does not.
   > Hive provided SQL over MapReduce.
-- [o] Spark keeps intermediate results in memory across stages.
-  > It also optimizes a whole DAG at once, where MapReduce writes to disk between every map and reduce. It is why iterative workloads (machine learning, graph algorithms) improved by an order of magnitude.`}
+- [o] Spark chains steps in one job, without HDFS writes between.
+  > MapReduce runs each step as its own job and writes the result to HDFS for the next job to read back. Spark chains narrow transformations in memory within a stage, writes only shuffle output to local disk between stages, and can cache a dataset for reuse. It is why iterative workloads (machine learning, graph algorithms) improved by an order of magnitude.`}
 />
 
 <MultipleChoice
@@ -1009,7 +1009,7 @@ reasoning and runnable examples.
 - Global ordering across the whole topic.
   > Ordering is per partition only.
 - [o] Ordering within the partition, and one consumer per group.
-  > Messages that must stay ordered relative to each other therefore need a shared partition key. It is why messages that must stay ordered relative to each other need a shared partition key.
+  > It is why messages that must stay ordered relative to each other need a shared partition key.
 - Exactly-once delivery.
   > That requires transactions and idempotent producers on top.
 - That each message is delivered to every consumer.
@@ -1059,7 +1059,7 @@ reasoning and runnable examples.
   markdown={`What is the difference between event time and processing time?
 
 - [o] When it happened, against when you got round to it.
-  > Windowing on event time stays correct across replays and delays; processing time does not. Windowing on event time gives results that stay correct across replays and delays; processing time does not.
+  > Windowing on event time gives results that stay correct across replays and delays; processing time does not.
 - Processing time is only relevant in batch systems.
   > It is a streaming concept.
 - Event time is when the record was written to Kafka.
@@ -1104,7 +1104,7 @@ reasoning and runnable examples.
 - Discard it silently.
   > Silent loss is the outcome you are trying to avoid noticing too late.
 - [o] Choose deliberately, rather than defaulting.
-  > Allow a grace period, route to a side output, or drop with a metric. Update the emitted result, route it aside for separate handling, or drop it with a metric so the volume stays visible. The wrong answer is having no policy, which usually means dropping it invisibly.`}
+  > Update the emitted result, route it aside for separate handling, or drop it with a metric so the volume stays visible. The wrong answer is having no policy, which usually means dropping it invisibly.`}
 />
 
 <MultipleChoice
@@ -1180,7 +1180,7 @@ reasoning and runnable examples.
 - It determines how long messages are retained.
   > Retention is configured separately.
 - [o] It caps parallelism and fixes the unit of ordering.
-  > Increasing it later changes key-to-partition mapping, breaking per-key ordering for existing keys, which is why it is chosen with headroom. That last point is why partition count is chosen with headroom rather than tuned reactively.
+  > Increasing it later changes key-to-partition mapping, breaking per-key ordering for existing keys. That is why partition count is chosen with headroom rather than tuned reactively.
 - More partitions always mean higher throughput.
   > Past a point, more partitions add broker overhead and rebalance cost.`}
 />
@@ -1219,7 +1219,7 @@ reasoning and runnable examples.
 - An iterator can be indexed and an iterable cannot.
   > Neither guarantees indexing; sequences do.
 - Iterables are lazy and iterators are eager.
-  > Laziness belongs to generators specifically.
+  > Neither label fits: any iterator (a generator, \`map\`, \`zip\`, an open file) yields on demand, and an iterable such as a list already holds its items.
 - [o] One can produce the other, which is the stateful cursor.
   > An iterable supplies an iterator via \`__iter__\`; the iterator has \`__next__\` and yields until exhausted. A list can be iterated repeatedly; the iterator it hands out can be consumed only once, which is the source of many "the second loop found nothing" bugs.
 - They are synonyms.
@@ -1310,7 +1310,7 @@ reasoning and runnable examples.
 - Using too many functions.
   > Function call overhead is rarely the bottleneck.
 - [o] Doing per-row work in the interpreter needlessly.
-  > \`iterrows\`, \`apply(axis=1)\`, and appending to a DataFrame in a loop are the usual culprits, and the last is quadratic. Appending to a DataFrame in a loop is quadratic, since each append copies the whole frame.
+  > \`iterrows\`, \`apply(axis=1)\`, and appending to a DataFrame in a loop are the usual culprits. Appending in a loop is quadratic, since each append copies the whole frame.
 - Using generators instead of lists.
   > Generators are usually the improvement.
 - Reading files instead of databases.

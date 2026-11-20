@@ -98,9 +98,11 @@ gaps, because a model will not ask:
 - **Tests that encode the facts the description claims**: primary keys
   `unique` and `not_null`, `relationships` for foreign keys, and
   `accepted_values` so the model knows the real status values.
-- **Clear access boundaries**: staging and intermediate models marked
-  `private` or `protected` so the assistant only queries public marts, and
-  deprecated models removed or marked as such.
+- **Clear access boundaries**: the assistant's warehouse role is granted
+  `SELECT` on the public marts only (dbt's `grants` config). Marking staging
+  and intermediate models `private` keeps other projects from building on
+  them, but it restricts `ref()`, not queries. Deprecated models are removed
+  or marked as such.
 - **Metrics in the semantic layer** for every number the business argues about.
 - **Freshness**: source freshness checks, so an answer can say "as of" and the
   assistant can refuse to answer from stale data.
@@ -111,7 +113,8 @@ models:
     description: >
       One row per order. For revenue, use the net_revenue metric,
       which excludes refunded and cancelled orders and test accounts.
-    access: public
+    config:
+      access: public
     columns:
       - name: order_id
         description: Primary key.
@@ -120,7 +123,8 @@ models:
         description: Lifecycle state at the latest load.
         data_tests:
           - accepted_values:
-              values: [completed, refunded, cancelled]
+              arguments:
+                values: [completed, refunded, cancelled]
 ```
 
 One caution: documentation becomes an input, so a wrong description now
@@ -214,8 +218,8 @@ models tend to get wrong:
   > More randomness increases the chance of picking the wrong model.
 - Renaming the mart to a longer, more descriptive name.
   > Helpful at the margin, but the model can still see and query the intermediate one.
-- [o] Restricting the intermediate model's access so only public marts are exposed.
-  > Access boundaries remove the option entirely, which beats hoping the model chooses well.`}
+- [o] Granting the assistant's warehouse role access to the published marts only.
+  > Removing the option at the warehouse beats hoping the model chooses well. A dbt \`access\` modifier alone restricts \`ref()\`, not queries.`}
 />
 
 ## Go deeper

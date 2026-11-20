@@ -47,8 +47,8 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Why split data into train, validation, and test rather than just train and test?
 
-- [o] Repeated tuning leaks information into the validation set.
-  > The test set stays untouched so the final estimate is honest. Every decision made by looking at the test set spends a little of its credibility.
+- [o] Repeated tuning overfits the validation set it is scored on.
+  > Each tuning decision fits the validation set a little, so its score turns optimistic. The test set stays untouched so the final estimate is honest. Every decision made by looking at the test set spends a little of its credibility.
 - Because k-fold cross-validation requires exactly three splits.
   > Cross-validation replaces the validation split, using the folds instead.
 - It leaves more data available for training.
@@ -247,7 +247,7 @@ reasoning and runnable code.
 - They have far more parameters, so they capture much finer detail.
   > They have far fewer, which is part of the advantage.
 - [o] Local receptive fields and weight sharing are a correct prior.
-  > They encode translation equivariance and cut the parameter count enormously. A fully-connected layer on a 224×224 image would need tens of millions of parameters in the first layer alone.
+  > They encode translation equivariance and cut the parameter count enormously. A fully-connected layer of 1,000 units on a 224×224 RGB image would need about 150 million weights in the first layer alone.
 - They do not need non-linear activation functions.
   > They need them exactly as much as any network.
 - They process the pixels one after another.
@@ -457,7 +457,7 @@ reasoning and runnable code.
 - It guarantees every token is a real morpheme.
   > The splits are learned from frequency, not linguistics.
 - [o] It bounds the vocabulary while still spelling any string.
-  > Rare and unseen words decompose into known pieces instead of collapsing to one unknown token. BPE, WordPiece, and SentencePiece are the common algorithms, and they handle morphology and code reasonably too.
+  > Rare and unseen words decompose into known pieces instead of collapsing to one unknown token. BPE, WordPiece, and the unigram model are the common algorithms, and they handle morphology and code reasonably too.
 - It removes the need for an embedding layer.
   > Tokens are still embedded.
 - It produces markedly shorter sequences than word-level tokenization.
@@ -539,7 +539,7 @@ reasoning and runnable code.
 - Top-p restricts the vocabulary to the p most frequent tokens overall.
   > That is top-k; top-p is defined by cumulative probability.
 - [o] Temperature scales the logits; top-p bounds the candidate pool.
-  > Lower temperature is more deterministic, and top-p samples from the smallest set of tokens whose cumulative probability exceeds p, adapting per step. Temperature 0 makes decoding greedy, usually what you want for extraction and classification.`}
+  > Lower temperature is more deterministic, and top-p samples from the smallest set of tokens whose cumulative probability exceeds p, adapting per step. Temperature 0 makes decoding greedy, usually what you want for extraction and classification, on models that expose the setting.`}
 />
 
 <MultipleChoice
@@ -600,7 +600,7 @@ reasoning and runnable code.
 - Three alternative decoding strategies.
   > Decoding is controlled separately by temperature and top-p.
 - [o] Instruction only, instruction plus examples, and reasoning first.
-  > Zero-shot gives the instruction alone, few-shot adds worked examples, and chain-of-thought asks for intermediate reasoning. Chain-of-thought helps most on multi-step problems and costs more tokens, a real latency and price consideration.
+  > Zero-shot gives the instruction alone, few-shot adds worked examples, and chain-of-thought asks for intermediate reasoning. Chain-of-thought helps most on multi-step problems and costs more tokens, a real latency and price consideration. A model that already reasons before answering gains little from being asked.
 - Three different sizes of training dataset.
   > None of them involve training.
 - Three different names for one and the same underlying prompting technique.
@@ -769,7 +769,7 @@ reasoning and runnable code.
   markdown={`What belongs in a model registry?
 
 - [o] Versioned models with their full lineage.
-  > Training data and code versions, hyperparameters, evaluation metrics, stage transitions, and approval history. It is the artifact that answers "what exactly is in production and how was it made" during an incident.
+  > Training data and code versions, hyperparameters, evaluation metrics, promotion history, and approvals. It is the artifact that answers "what exactly is in production and how was it made" during an incident.
 - The live prediction logs.
   > Those go to monitoring.
 - Only the serialized model weights.
@@ -1273,7 +1273,7 @@ reasoning and runnable code.
 - Sort the rows first, then compare each adjacent neighbour.
   > Sorting does not give all pairwise distances.
 - [o] Expand the square, or call \`scipy.spatial.distance.cdist\`.
-  > Both compute every pair in compiled code with one matrix multiplication. The expansion trick can produce small negative values from floating-point error, so clip at zero before taking the square root.`}
+  > The expansion needs one matrix multiplication, and \`cdist\` loops over the pairs in compiled code. The expansion can produce small negative values from floating-point error, so clip at zero before taking the square root.`}
 />
 
 <MultipleChoice

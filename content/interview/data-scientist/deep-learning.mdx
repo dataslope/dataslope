@@ -134,8 +134,9 @@ curves that met early and flattened high is bias.
 During training it randomly sets a fraction $p$ of activations to zero on
 each forward pass, forcing the network to spread representation across units
 rather than co-adapting on a few. It approximates training an ensemble of
-sub-networks. At inference dropout is turned off and activations are scaled
-so expected magnitudes match.
+sub-networks. At inference dropout is turned off. Frameworks use *inverted*
+dropout: the surviving activations are scaled up by $1/(1-p)$ during
+training, so nothing needs rescaling at inference.
 
 ```python
 # PyTorch-style: dropout is active in train() mode, off in eval().

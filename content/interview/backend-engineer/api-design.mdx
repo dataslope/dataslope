@@ -42,6 +42,11 @@ change (`PATCH /articles/42 {"status": "published"}`).
 - **PUT**, replace a resource wholesale; idempotent.
 - **PATCH**, partially update a resource; not necessarily idempotent.
 - **DELETE**, remove a resource; idempotent.
+- **QUERY**, a read whose parameters travel in the request body; safe,
+  idempotent, and cacheable (RFC 10008, published in 2026). It is the
+  standard answer to the `POST /search` workaround for a query too large or
+  too structured for a URL, though support in servers, proxies, and clients
+  is still arriving.
 
 "Safe" means no server state changes; "idempotent" means repeating the request
 has the same effect as making it once.
@@ -51,7 +56,7 @@ has the same effect as making it once.
 The first digit tells the story: **2xx** success (`200 OK`, `201 Created`,
 `204 No Content`), **3xx** redirection (`301`, `304 Not Modified`), **4xx**
 client error (`400 Bad Request`, `401 Unauthorized`, `403 Forbidden`,
-`404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `429 Too Many
+`404 Not Found`, `409 Conflict`, `422 Unprocessable Content`, `429 Too Many
 Requests`), and **5xx** server error (`500`, `503 Service Unavailable`).
 Returning the right code lets clients handle failures programmatically instead
 of parsing error strings.
@@ -157,7 +162,7 @@ Never leak stack traces or internal identifiers. Consistency lets clients
 branch on `error.code` rather than fragile string matching.
 
 ```text
-422 Unprocessable Entity
+422 Unprocessable Content
 {
   "error": {
     "code": "validation_failed",
@@ -169,12 +174,13 @@ branch on `error.code` rather than fragile string matching.
 
 ### How do you rate-limit an API, and how should clients learn their limits?
 
-A client should never have to guess. Three response headers carry the whole contract:
+A client should never have to guess. Four response headers carry the whole contract:
 
 <SyntaxBreakdown
   parts={[
     { text: "X-RateLimit-Limit", label: "the ceiling for this window" },
     { text: "X-RateLimit-Remaining", label: "what is left" },
+    { text: "X-RateLimit-Reset", label: "when the window refills" },
     { text: "Retry-After", label: "how long to wait after a 429" },
   ]}
 />

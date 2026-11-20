@@ -80,11 +80,11 @@ pipeline = only_valid(parse(read_lines("events.csv")))
 ### What's the difference between an iterable and an iterator?
 
 An **iterable** implements `__iter__` and can produce a fresh iterator
-(lists, dicts, files). An **iterator** implements `__next__` and is
+(lists, dicts, sets, strings). An **iterator** implements `__next__` and is
 **consumed once**, it tracks position and raises `StopIteration` when
-exhausted. A generator is an iterator, so iterating it twice yields
-nothing the second time. If you need multiple passes, materialize to a
-list or re-create the generator.
+exhausted. Generators and open files are iterators, so looping over one
+twice yields nothing the second time. If you need multiple passes,
+materialize to a list, re-create the generator, or reopen the file.
 
 ### How do you deduplicate records in memory?
 
@@ -186,7 +186,8 @@ for batch in batched(range(7), 3):
   ]}
 />
 
-Python 3.12+ ships `itertools.batched`, which does exactly this.
+Python 3.12+ ships `itertools.batched`, which does the same job but yields
+tuples, `(0, 1, 2)`, not lists.
 
 ### How do you make a network call resilient with retries and backoff?
 
@@ -403,6 +404,12 @@ The big ones: (1) membership checks against a `list` inside a loop (use a
 column operation exists (often 10-100x faster); (4) growing a DataFrame
 row by row with `concat` in a loop (collect rows, build once); (5) loading
 an entire file when you only need to stream it.
+
+pandas 3.0 also changed three defaults that older pipeline code trips on:
+strings load as a dedicated `str` dtype instead of `object`, chained
+assignment (`df[mask]["col"] = x`) no longer updates the frame, and parsed
+datetimes default to microseconds, so casting them to integers gives epoch
+values 1,000 times smaller than before.
 
 ### How do generator pipelines compare to building intermediate lists?
 

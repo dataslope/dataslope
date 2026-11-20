@@ -217,8 +217,8 @@ ORDER BY spend DESC;`}
 
 They return a specific row's value from within the frame. `LAST_VALUE`
 surprises people: with the default frame ending at `CURRENT ROW`, the
-"last value" is always the current row. To get the true partition
-maximum, widen the frame to `ROWS BETWEEN UNBOUNDED PRECEDING AND
+"last value" is always the current row. To get the partition's actual last
+value, widen the frame to `ROWS BETWEEN UNBOUNDED PRECEDING AND
 UNBOUNDED FOLLOWING`.
 
 ### Can you use a window function in a WHERE or HAVING clause?

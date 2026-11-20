@@ -274,8 +274,8 @@ single-head attention because each head works in a smaller dimension.
 A transformer stacks blocks of **multi-head self-attention** and a
 position-wise **feed-forward network**, each wrapped with a **residual
 connection** and **layer normalization**. Because attention is
-order-agnostic, **positional encodings** (sinusoidal or learned) inject
-sequence order. Encoder-only models (BERT) use bidirectional attention for
+order-agnostic, **positional encodings** (sinusoidal, learned, or rotary)
+inject sequence order. Encoder-only models (BERT) use bidirectional attention for
 understanding; decoder-only models (GPT) use causal (masked) attention for
 generation; encoder-decoder models (T5) do both for sequence-to-sequence
 tasks. Removing recurrence makes training fully parallel across positions.
