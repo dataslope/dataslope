@@ -37,13 +37,17 @@ const Arc: React.FC<{ from: readonly [number, number]; to: readonly [number, num
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || o >= 1) return null;
   const head = 13;
-  const curve: Cubic = [from, [from[0], peak], [to[0], peak], to];
-  const line = sampleCubic(curve);
+  // The curve stops a straight drop short of the tip, so it has finished
+  // turning before the head starts (README, "An arrowhead sits on a straight end").
+  const RUN = 26;
+  const end: readonly [number, number] = [to[0], to[1] - RUN];
+  const curve: Cubic = [from, [from[0], peak], [to[0], peak], end];
+  const line = [...sampleCubic(curve), to];
   const len = lineLength(line);
   const reach = (len - head + 1) / len;
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: (1 - o) * opacity }}>
-      <path d={cubicPath(curve)} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" pathLength={1} strokeDasharray={`${p * reach} 1`} />
+      <path d={`${cubicPath(curve)} L${to[0]},${to[1]}`} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" pathLength={1} strokeDasharray={`${p * reach} 1`} />
       <path d={arrowHead(line, head, 7, { filled: true })} fill={color} opacity={ease(frame, at + 12, 5)} />
     </svg>
   );
@@ -109,6 +113,8 @@ export const LagScene: React.FC = () => {
   };
   const yearApex = apex(jan23, jan24, peak);
   const marchApex = apex(at(wrongMarch.with), mar24, peak + 0);
+  // The highest of the eight wrong arcs: March's label sits above them all.
+  const wrongTop = Math.min(...LAG_WRONG.map((w, k) => apex(at(w.with), at(w.month), peak + (LAG_WRONG.length - 1 - k) * 6)[1]));
 
   // The line with every month, and the line once March 2023 is gone.
   const all = rev.map((_, i) => pt(i));
@@ -211,7 +217,7 @@ export const LagScene: React.FC = () => {
         <Note at={eightAt + 2} x={X0} y={y(340)}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>{LAG_WRONG.length} comparisons land on the wrong month</span>
         </Note>
-        <Note at={marchAt + 6} x={marchApex[0] - 120} y={marchApex[1] - 44}>
+        <Note at={marchAt + 6} x={marchApex[0] - 120} y={wrongTop - 46}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             {wrongMarch.change}, should be {rightMarch}
           </span>

@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -112,7 +112,7 @@ export const StarScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={5} at={qAt - 4} textAt={qTextAt - 2} size={60}>
-          Why does <QMono>SELECT *</QMono> cost more in a columnar warehouse?
+          Why does <SmallMono>SELECT *</SmallMono> cost more in a columnar warehouse?
         </QuestionCard>
 
         {/* ── The page's model: 200 columns, 3 named ── */}

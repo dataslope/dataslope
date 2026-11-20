@@ -60,8 +60,8 @@ export const LayersScene: React.FC = () => {
   const end = n.beat("layers-rule").to;
 
   const headY = y(270);
-  const ruleY = headY + h(34);
-  const top = y(378);
+  const ruleY = headY + h(44);
+  const top = y(392);
   const row = h(70);
   const slot: Record<string, Slot> = {
     stg_orders: { x: COL[0], cy: top, w: MODEL_W },
@@ -168,12 +168,12 @@ export const LayersScene: React.FC = () => {
             <Note at={hd.at} x={COL[i]} y={headY}>
               <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 26, whiteSpace: "nowrap" }}>
                 <span style={{ ...label(26, INK), fontWeight: 600 }}>{hd.t}</span>
-                <Badge tone={hd.badge.tone} size={23} style={{ fontFamily: SANS, opacity: ease(frame, hd.badge.at, 10), transform: `translateY(${(1 - ease(frame, hd.badge.at, 10)) * 6}px)` }}>
+                <Badge tone={hd.badge.tone} size={24} style={{ fontFamily: SANS, opacity: ease(frame, hd.badge.at, 10), transform: `translateY(${(1 - ease(frame, hd.badge.at, 10)) * 6}px)` }}>
                   {hd.badge.t}
                 </Badge>
               </div>
             </Note>
-            <HRule x={COL[i]} y={ruleY} width={COL_W - 40} at={hd.at + 2} color={INK} weight={1.5} />
+            <HRule x={COL[i]} y={ruleY} width={COL_W - 10} at={hd.at + 2} color={INK} weight={1.5} />
           </React.Fragment>
         ))}
         {rules.map((r) =>
@@ -189,7 +189,7 @@ export const LayersScene: React.FC = () => {
         {/* Small, testable, written once. */}
         <Note at={smallAt - 4} x={X0} y={dryY}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            Each step: <Mark at={smallAt}>small</Mark>, <Mark at={testableAt}>testable</Mark>, <Mark at={onceAt}>written once</Mark>
+            Each step: <Mark at={smallAt}>small,</Mark> <Mark at={testableAt}>testable,</Mark> <Mark at={onceAt}>written once</Mark>
           </span>
         </Note>
 
@@ -217,7 +217,7 @@ export const LayersScene: React.FC = () => {
         <Note at={downAt} x={X0 + 640} y={selY} out={custAt}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>A plus after it: everything downstream</span>
         </Note>
-        <Note at={weeklyAt} x={COL[1]} y={selY + h(40) + 2 * h(38)}>
+        <Note at={weeklyAt} x={X0} y={selY + h(40) + 2 * h(38) + h(10)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Logic that changes weekly sits downstream, <span style={{ opacity: ease(frame, lessAt, 10) }}>where a change rebuilds less</span></span>
         </Note>
       </Drift>

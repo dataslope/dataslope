@@ -56,7 +56,7 @@ export const MeasureScene: React.FC = () => {
 
   // ── Row A: the ledger, and the INSERT that corrects it ──
   const Lg = withMoney(MEASURE.rows);
-  const tableTop = y(330);
+  const tableTop = y(350);
   const gl = geoOf(Lg, X0, tableTop, h, ROWS);
   const amount = Lg.cols.indexOf("amount");
   const RX = gl.right + 110;
@@ -64,7 +64,7 @@ export const MeasureScene: React.FC = () => {
   const rW = listingWidth(R.lines, 21);
 
   // ── Row B: March, rerun two ways ──
-  const rowB = y(610);
+  const rowB = y(600);
   // The rerun is the March report's own SQL, run again after the correction.
   const M = MEASURE.marchReport;
   const O = MEASURE.overwrite;
@@ -72,7 +72,7 @@ export const MeasureScene: React.FC = () => {
   const MR = withMoney({ cols: ["march_revenue"], rows: [[MEASURE.marchRerun]] });
   const bW = Math.max(listingWidth(M.lines, SIZE), listingWidth(O.lines, SIZE));
   const BX = X0 + bW + 120;
-  const resTop = rowB + listingHeight(3, SIZE) + h(64);
+  const resTop = rowB + listingHeight(3, SIZE) + h(56);
   const gm = geoOf(MR, X0, resTop, h, ROWS);
   const go = geoOf(MO, BX, resTop, h, ROWS);
 
@@ -93,7 +93,7 @@ export const MeasureScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── Row A ── */}
-        <Note at={fixedAt} x={X0} y={y(258)}>
+        <Note at={fixedAt} x={X0} y={y(250)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>A measure is fixed when the event happens</span>
         </Note>
         <TableName g={gl} at={marchAt - 4}>
@@ -114,7 +114,7 @@ export const MeasureScene: React.FC = () => {
             { row: 2, col: amount, at: correctedAt + 10, out: todayAt },
           ]}
         />
-        <Note at={todayAt} x={X0} y={gl.rowTop(3) + h(20)}>
+        <Note at={todayAt} x={RX} y={tableTop + h(186)}>
           <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap" }}>
             Today&rsquo;s total: <Num>{money(MEASURE.today)}</Num>
           </span>
@@ -131,6 +131,9 @@ export const MeasureScene: React.FC = () => {
 
         {/* ── Row B: March, rerun ── */}
         <Listing lines={M.lines} x={X0} top={rowB} width={bW} size={SIZE} at={rerunAt - 2} title="March’s report, run again on the ledger" />
+        <TableName g={gm} at={stillAt - 4}>
+          March, as it runs today
+        </TableName>
         <DataTable g={gm} cols={colsOf(MR)} at={stillAt - 4} rows={[{ cells: MR.rows[0], at: stillAt }]} marks={[{ row: 0, col: 0, at: stillAt + 6, color: MARK_OK }]} />
         <Note at={stillAt + 10} x={gm.right + 30} y={gm.rowTop(0) + h(8)}>
           <span style={{ ...note(23, OK_INK), whiteSpace: "nowrap" }}>As published</span>

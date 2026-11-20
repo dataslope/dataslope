@@ -7,9 +7,9 @@ import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds, inkOf } from "../../theme/brand";
+import { ds } from "../../theme/brand";
 import { CI, CI_SELECTED } from "./data";
-import { Box, Chip, Drift, Flow, Listing, ListingTitle, Spot, Strike, type Tone, X0 } from "./parts";
+import { Box, Chip, Drift, Flow, Listing, ListingTitle, SmallMono, Spot, Strike, type Tone, X0 } from "./parts";
 
 const NODE = { w: 220, h: 58 };
 const GAP_X = 80;
@@ -37,7 +37,7 @@ const Dag: React.FC<{
   out?: number;
   edgeColor?: (from: string, to: string) => string;
   h: (v: number) => number;
-}> = ({ x, top, rowGap, at, state = () => ({}), out, edgeColor = () => INK, h }) => {
+}> = ({ x, top, rowGap, at, state, out, edgeColor = () => INK, h }) => {
   const nodeH = h(NODE.h);
   const pos = (name: string) => {
     const p = place(name);
@@ -59,7 +59,7 @@ const Dag: React.FC<{
       })}
       {CI.nodes.map((node) => {
         const p = pos(node.name);
-        const s = state(node.name);
+        const s: Partial<NodeState> = state ? state(node.name) : {};
         return (
           <Box
             key={node.name}
@@ -244,7 +244,7 @@ export const CiScene: React.FC = () => {
               {CI_SELECTED.length} of {CI.models.length} models
             </b>{" "}
             built and tested
-            <span style={{ color: INK_SOFT, opacity: ease(frame, leftAt, 10) }}>; stg_orders left alone</span>
+            <span style={{ color: INK_SOFT, opacity: ease(frame, leftAt, 10) }}>; <SmallMono>stg_orders</SmallMono> left alone</span>
           </span>
         </Note>
 
@@ -340,4 +340,3 @@ const MergeBlocked: React.FC<{ x: number; y: number; at: number; out?: number; h
   );
 };
 
-export { inkOf };

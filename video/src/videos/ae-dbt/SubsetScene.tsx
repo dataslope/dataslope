@@ -125,10 +125,10 @@ export const SubsetScene: React.FC = () => {
         <Line at={rebuiltAt + 4} x={READ_X} y={listTop + h(54)} color={INK_SOFT} out={frontAt - 4}>
           Rebuilt alone
         </Line>
-        <Line at={frontAt} x={READ_X} y={listTop + h(6)} size={26}>
+        <Line at={frontAt} x={READ_X} y={listTop + h(6)} size={26} dim={afterAt}>
           <Code>--select +fct_orders</Code>
         </Line>
-        <Line at={fourAt} x={READ_X} y={listTop + h(54)} color={INK_SOFT}>
+        <Line at={fourAt} x={READ_X} y={listTop + h(54)} color={INK_SOFT} dim={afterAt}>
           All {up.models.length} models<span style={{ opacity: ease(frame, orderAt, 10) }}>, in order</span>
         </Line>
         <Line at={afterAt} x={READ_X + 420} y={listTop + h(6)} size={26}>

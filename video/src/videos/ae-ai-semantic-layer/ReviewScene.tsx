@@ -321,10 +321,10 @@ export const ReviewScene: React.FC = () => {
         </Clear>
 
         {/* The second revenue. */}
-        <div style={{ position: "absolute", left: X0, top: y(700), display: "flex", alignItems: "center", gap: 28, fontSize: 26, opacity: ease(frame, secondAt, 12) }}>
-          <MetricChip name="net_revenue" value={READINGS.governed.toFixed(2)} tone="green" note="governed" show={ease(frame, governedAt, 12)} />
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, governedAt + 10, 10) }}>already exists</span>
-          <MetricChip name="revenue" value={READINGS.completed.toFixed(2)} tone="red" note="the assistant's" show={ease(frame, ninetyAt, 12)} />
+        <div style={{ position: "absolute", left: X0, top: y(700), display: "flex", alignItems: "center", gap: 28, fontSize: 26, opacity: ease(frame, nameAt, 12) }}>
+          <MetricChip name="net_revenue" value={READINGS.governed.toFixed(2)} tone="green" note="governed" show={ease(frame, nameAt, 12)} noteShow={ease(frame, governedAt, 10)} />
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, secondAt, 10) }}>already exists</span>
+          <MetricChip name="revenue" value={READINGS.completed.toFixed(2)} tone="red" note="the assistant's" show={ease(frame, ninetyAt, 12)} noteShow={ease(frame, ninetyAt + 8, 10)} />
         </div>
       </Drift>
     </AbsoluteFill>
@@ -360,12 +360,12 @@ const Window: React.FC<{ x0: number; x1: number; y0: number; y1: number; at: num
 
 /** A metric as a chip: its name in the mono face and its value, on the
  *  badge's tint, with a note under it. */
-const MetricChip: React.FC<{ name: string; value: string; tone: "green" | "red"; note: string; show: number }> = ({ name, value, tone, note: sub, show }) => (
+const MetricChip: React.FC<{ name: string; value: string; tone: "green" | "red"; note: string; show: number; noteShow: number }> = ({ name, value, tone, note: sub, show, noteShow }) => (
   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 14, opacity: show }}>
     <Chip tone={tone} size={26}>
       <span style={{ fontFamily: MONO, fontSize: 25 }}>{name}</span> {value}
     </Chip>
-    <span style={{ ...note(21, tone === "green" ? OK_INK : ACCENT_INK), whiteSpace: "nowrap" }}>{sub}</span>
+    <span style={{ ...note(21, tone === "green" ? OK_INK : ACCENT_INK), whiteSpace: "nowrap", opacity: noteShow }}>{sub}</span>
   </div>
 );
 

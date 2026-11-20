@@ -149,32 +149,27 @@ export const Type3Scene: React.FC = () => {
         <TableName g={gt} at={addsAt}>
           dim_customer_t3
         </TableName>
+        {/* The second move re-runs the UPDATE on the row as it stands: the
+            row closes up as its successor opens under it, and that one's
+            cells swap from the last values. */}
         <DataTable
           g={gt}
           cols={colsOf(T, { prev_region: { at: addsAt + 4 } })}
           at={addsAt}
-          out={againAt + 4}
-          rows={[{ cells: before, at: addsAt + 2 }]}
+          rows={[
+            { cells: before, at: addsAt + 2, collapseAt: againAt + 2 },
+            { cells: T.rows[0], at: againAt + 6, grow: true },
+          ]}
           swaps={[
             { row: 0, col: tRegion, at: readsAt + 2, value: T.rows[0][tRegion] },
             { row: 0, col: tPrev, at: prevAt - 2, value: T.rows[0][tPrev] },
-          ]}
-          marks={[{ row: 0, col: tPrev, at: prevAt, out: limitAt }]}
-        />
-        {/* The second move, run on the row as it stands: the same table,
-            taken over in place so each cell swaps from its last value. */}
-        <DataTable
-          g={gt}
-          cols={colsOf(T)}
-          at={againAt}
-          rows={[{ cells: T.rows[0], at: againAt }]}
-          swaps={[
-            { row: 0, col: tRegion, at: againAt + 8, value: twice[tRegion] },
-            { row: 0, col: tPrev, at: becomesAt + 4, value: twice[tPrev] },
+            { row: 1, col: tRegion, at: againAt + 14, value: twice[tRegion] },
+            { row: 1, col: tPrev, at: becomesAt + 4, value: twice[tPrev] },
           ]}
           marks={[
-            { row: 0, col: tPrev, at: becomesAt - 8, out: becomesAt + 4, color: MARK_BAD },
-            { row: 0, col: tPrev, at: becomesAt + 8, out: goneAt + 20 },
+            { row: 0, col: tPrev, at: prevAt, out: limitAt },
+            { row: 1, col: tPrev, at: becomesAt - 8, out: becomesAt + 4, color: MARK_BAD },
+            { row: 1, col: tPrev, at: becomesAt + 8, out: goneAt + 20 },
           ]}
         />
         <Listing

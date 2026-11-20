@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, RapidFire, type RapidItem, Tick } from "../../editorial/interview";
+import { RapidFire, type RapidItem, Tick } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { NextLine, Note, Num } from "../../editorial/ui";
@@ -87,7 +87,6 @@ const Seeds: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 12. Macros ──────────────────────────────────────────────────────────────
 
 const Macros: React.FC<{ c: Ctx }> = ({ c }) => {
-  const frame = useCurrentFrame();
   const jinjaAt = c.w("r-macros", "A macro is a reusable Jinja function");
   const emitsAt = c.w("r-macros", "emits amount cents over a hundred point oh");
   const calledAt = c.w("r-macros", "wherever it's called");
@@ -97,8 +96,11 @@ const Macros: React.FC<{ c: Ctx }> = ({ c }) => {
   const nineteenAt = c.w("r-macros", "becomes nineteen dollars");
   const lines = LISTING.macro;
   const top = c.y(LIST_TOP) + c.h(56);
-  const resY = top + listingHeight(lines.length, SIZE) + c.h(40);
+  const resY = top + listingHeight(lines.length, SIZE) + c.h(36);
   const COL2 = R_X + 420;
+  /** The expression each way, as Postgres ran it on the video's 1999 cents. */
+  const viaMacro = MACRO.expandedSql[0].replace(/^SELECT /, "").replace(/::numeric\(10, 2\)/, "").replace(/ AS amount_usd FROM orders$/, "");
+  const byHand = MACRO.integerSql[0].replace(/^SELECT /, "").replace(/ AS amount_usd FROM orders$/, "");
   return (
     <>
       <Fact at={jinjaAt} c={c}>
@@ -116,26 +118,27 @@ const Macros: React.FC<{ c: Ctx }> = ({ c }) => {
           { line: "-- SELECT", text: "{{ cents_to_dollars('amount_cents') }}", at: calledAt },
         ]}
       />
-      <Line at={onceAt} x={R_X} y={resY} size={22} color={INK_SOFT}>
-        <Code>{MACRO.expandedSql[0].replace(/^SELECT /, "").replace(/::numeric\(10, 2\)/, "").replace(/ AS amount_usd FROM orders$/, "")}</Code> on 1999
+      <Line at={onceAt} x={R_X} y={resY} size={22}>
+        On 1999 cents, in Postgres
       </Line>
-      <Line at={onceAt + 4} x={R_X} y={resY + c.h(40)} size={36} weight={600} color={OK_INK}>
-        <Mark at={onceAt + 10} color={MARK_GREEN}>
+      <Line at={onceAt + 2} x={R_X} y={resY + c.h(40)} size={22} color={INK_SOFT}>
+        <Code>{viaMacro}</Code>, the macro
+      </Line>
+      <Line at={onceAt + 6} x={R_X} y={resY + c.h(78)} size={36} weight={600} color={OK_INK}>
+        <Mark at={onceAt + 12} color={MARK_GREEN}>
           <Num>{MACRO.expanded}</Num>
         </Mark>
       </Line>
-      <VRule x={COL2 - 30} top={resY} bottom={resY + c.h(90)} at={handAt} />
-      <Line at={handAt} x={COL2} y={resY} size={22} color={INK_SOFT}>
-        <Code>{MACRO.integerSql[0].replace(/^SELECT /, "").replace(/ AS amount_usd FROM orders$/, "")}</Code> on 1999, by hand
+      <VRule x={COL2 - 30} top={resY + c.h(40)} bottom={resY + c.h(128)} at={handAt} />
+      <Line at={handAt} x={COL2} y={resY + c.h(40)} size={22} color={INK_SOFT}>
+        <Code>{byHand}</Code>, by hand
       </Line>
-      <Line at={intAt} x={COL2} y={resY + c.h(40)} size={36} weight={600} color={ACCENT_INK}>
-        <span style={{ opacity: ease(frame, nineteenAt, 8) }}>
-          <Mark at={nineteenAt + 4} color={MARK_RED}>
-            <Num>{MACRO.integer}</Num>
-          </Mark>
-        </span>
+      <Line at={nineteenAt} x={COL2} y={resY + c.h(78)} size={36} weight={600} color={ACCENT_INK}>
+        <Mark at={nineteenAt + 6} color={MARK_RED}>
+          <Num>{MACRO.integer}</Num>
+        </Mark>
       </Line>
-      <Line at={intAt + 4} x={COL2 + 110} y={resY + c.h(52)} color={ACCENT_INK}>
+      <Line at={intAt} x={COL2 + 100} y={resY + c.h(90)} color={ACCENT_INK}>
         Integer division
       </Line>
     </>
@@ -284,11 +287,11 @@ const Docs: React.FC<{ c: Ctx }> = ({ c }) => {
   const descY = top + listingHeight(2, SIZE) + c.h(30);
   const gTop = descY + c.h(96);
   const row = c.h(52);
-  const lay = sliceLayout({ left: R_X, top: gTop, pitch: 205, row, w: 174 });
-  const ids = ["raw.orders", "raw.customers", "stg_orders", "stg_customers", "dim_customer", "fct_orders"] as const;
-  const nodes: GNode[] = ids.map((id, i) => ({ id, slot: lay[id], at: graphAt + i * 2, size: 19, h: 40, base: id.startsWith("raw.") ? "soft" : "plain" }));
+  const lay = sliceLayout({ left: R_X, top: gTop, pitch: 270, row, w: 190, sources: false });
+  const ids = ["stg_orders", "stg_customers", "dim_customer", "fct_orders"] as const;
+  const nodes: GNode[] = ids.map((id, i) => ({ id, slot: lay[id], at: graphAt + i * 2, size: 20, h: 44 }));
   const edges: GEdge[] = GRAPH.edges
-    .filter(([, b]) => b !== GRAPH.exposure.name)
+    .filter(([a, b]) => (ids as readonly string[]).includes(a) && (ids as readonly string[]).includes(b))
     .map(([a, b], i) => ({ from: a, to: b, at: sameAt + i * 3, ...SLICE_EDGE[edgeKey(a, b)] }));
   return (
     <>
@@ -335,9 +338,9 @@ const Project: React.FC<{ c: Ctx }> = ({ c }) => {
   const top = c.y(LIST_TOP) + c.h(100);
   const STEP = c.h(96);
   const levels = [
-    { id: "project", title: "The project's defaults", sub: <Code>dbt_project.yml</Code>, at: defaultsAt },
-    { id: "folder", title: "A folder's setting", sub: <Code>models/marts/</Code>, at: folderAt },
-    { id: "model", title: "A model's own config", sub: <Code>{"{{ config(...) }}"}</Code>, at: modelAt },
+    { id: "project", title: "The project\u2019s defaults", sub: <Code>dbt_project.yml</Code>, at: defaultsAt },
+    { id: "folder", title: "A folder\u2019s setting", sub: <Code>models/marts/</Code>, at: folderAt },
+    { id: "model", title: "A model\u2019s own config", sub: <Code>{"{{ config(...) }}"}</Code>, at: modelAt },
   ];
   const nodes: GNode[] = levels.map((l, i) => ({
     id: l.id,
@@ -439,7 +442,7 @@ const Debug: React.FC<{ c: Ctx }> = ({ c }) => {
   const beforeAt = c.w("r-debug", "before you debug any model");
   const top = c.y(LIST_TOP) + c.h(64);
   const checksY = top + listingHeight(1, SIZE) + c.h(36);
-  const plug = artBox("plug", 210);
+  const plug = artBox("plug", 190);
   const checks = [
     { t: <><Code>profiles.yml</Code> is valid</>, at: profilesAt },
     { t: <>dbt can reach the warehouse</>, at: reachAt },
@@ -466,7 +469,7 @@ const Debug: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={beforeAt} x={R_X} y={checksY + c.h(156)} color={INK_SOFT}>
         Before you debug any model
       </Line>
-      <Spot id="plug" at={checksAt + 4} left={1530} top={c.y(LIST_TOP) + c.h(80)} {...plug} />
+      <Spot id="plug" at={checksAt + 4} left={1610} top={c.y(LIST_TOP) + c.h(56)} {...plug} />
     </>
   );
 };
@@ -505,7 +508,7 @@ export const RapidScene: React.FC = () => {
       n: 17,
       label: (
         <>
-          What is the <QMono>dbt_project.yml</QMono> file, and what does it control?
+          What is the <Code>dbt_project.yml</Code> file, and what does it control?
         </>
       ),
       at: at("r-project", "Question seventeen"),
@@ -516,14 +519,14 @@ export const RapidScene: React.FC = () => {
       n: 19,
       label: (
         <>
-          What is <QMono>dbt debug</QMono>, and when do you use it?
+          What is <Code>dbt debug</Code>, and when do you use it?
         </>
       ),
       at: at("r-debug", "Question nineteen"),
       body: <Debug c={c} />,
     },
   ];
-  const bird = artBox("weaver-bird", 360);
+  const bird = artBox("weaver-bird", 330);
   const listBottom = y(LIST_TOP) + items.length * h(ROW);
 
   return (
@@ -563,7 +566,7 @@ export const RapidScene: React.FC = () => {
         <NextLine at={nextAt} x={R_X} y={y(LIST_TOP) + h(190)} width={520}>
           Incremental models
         </NextLine>
-        <Spot id="weaver-bird" at={billionAt} left={1400} top={y(640)} {...bird} />
+        <Spot id="weaver-bird" at={billionAt} left={1480} top={y(600)} {...bird} />
       </Drift>
     </AbsoluteFill>
   );

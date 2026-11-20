@@ -354,7 +354,7 @@ export const Type2Scene: React.FC = () => {
         </Note>
 
         {/* ── Phase 3: the two statements, replayed on the figure ── */}
-        <Note at={twoAt} x={X0 + loadW + 60} y={low} out={loadOut}>
+        <Note at={closeAt + 6} x={X0 + loadW + 60} y={low} out={loadOut}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>For each row whose tracked columns changed</span>
         </Note>
         <Listing

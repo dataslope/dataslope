@@ -793,6 +793,10 @@
         }
       },
       "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "quick": {
+      "contract": "models:\n  - name: fct_orders\n    config:\n      contract: {enforced: true}\n    columns:\n      - name: order_id\n        data_type: bigint\n        constraints:\n          - type: not_null\n      - name: amount_usd\n        data_type: numeric",
+      "severity": "- name: customer_email\n  tests:\n    - not_null:\n        config:\n          severity: warn"
     }
   }
 }

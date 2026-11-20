@@ -15,7 +15,7 @@ import { Cell, type Col, Count, DataTable, Drift, Mark, MARK_RED, PgError, SqlLi
  *  which only shows the table, is the result tables on the right). */
 const BLOCK = REBUILD.block.slice(0, -1).flatMap((stmt) => stmt.split("\n"));
 const SIZE = 19;
-const TABLE_X = [840, 1200];
+const TABLE_X = [880, 1240];
 /** Layout values (through `y()`). */
 const ROW_C = { def: 236, why: 276, fig: 330, blindRows: 378, failLabel: 627, fail: 661, back: 717, two: 778 };
 
@@ -180,7 +180,6 @@ export const IdemScene: React.FC = () => {
             <DataTable g={r.g} cols={cols} rows={r.rows} at={r.at} />
           </React.Fragment>
         ))}
-        <ColumnRule x={(results[0].g.right + TABLE_X[1]) / 2} top={row("fig")} height={results[0].g.rowTop(ids.length) - row("fig")} at={results[1].at} />
         <Note at={identicalAt - 4} x={TABLE_X[0]} y={fingerprintTop}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             <Num>{REBUILD.customers}</Num> rows each, one md5 fingerprint:{" "}
@@ -197,10 +196,10 @@ export const IdemScene: React.FC = () => {
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 500 }}>ROLLBACK</span>
             <span style={{ opacity: ease(frame, stillAt, 10) }}>
-              : <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 500 }}>dim_customer</span> is still there
+              : <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 500 }}>dim_customer</span> is back
             </span>
-            <b style={{ color: OK_INK, opacity: ease(frame, allAt, 10) }}>
-              , <Num>{REBUILD.rowsAfterFail}</Num> rows{REBUILD.rolledBack ? ", the same fingerprint" : ""}
+            <b style={{ color: REBUILD.rolledBack ? OK_INK : ACCENT_INK, opacity: ease(frame, allAt, 10) }}>
+              , <Num>{REBUILD.rowsAfterFail}</Num> rows
             </b>
           </span>
         </Note>

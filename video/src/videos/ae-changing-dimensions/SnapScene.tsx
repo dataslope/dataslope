@@ -201,7 +201,13 @@ export const SnapScene: React.FC = () => {
             </Note>
           </React.Fragment>
         ))}
-        <Note at={neverAt + 4} x={states[1].x0 + 16} y={gapTop + bandH + h(24)}>
+        {/* What each run wrote to the snapshot, under its tick. */}
+        {runs.map((r, i) => (
+          <Box key={r.name} x={r.x - 120} y={gapTop + bandH + h(40)} w={240} h={h(50)} at={r.at + 10} size={22}>
+            Recorded: {states[i === 0 ? 0 : 2].name}
+          </Box>
+        ))}
+        <Note at={neverAt + 4} x={states[1].x0 + 16} y={gapTop + bandH + h(50)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Never recorded</span>
         </Note>
 

@@ -15,12 +15,12 @@ import { Cell, type CellTone, Count, costScale, CostChart, Drift, Mark, X0 } fro
 const TL = 330;
 const P = 46;
 const X = (id: number) => TL + (id - 0.5) * P;
-const COL2 = 980;
+const COL2 = 800;
 const CH = { x0: 230, x1: 860 };
 const SPLIT_X = 1200;
 const SPLIT_W = 520;
 /** Layout values (through `y()`). */
-const ROW_C = { cols: 286, follow: 382, answer: 418, fct: 486, raw: 546, note1: 606, note2: 642, chartLabel: 296, chartTop: 352, chartBot: 580, split: 340, rule: 680, rule2: 720, next: 778 };
+const ROW_C = { cols: 286, follow: 382, answer: 418, fct: 486, raw: 546, note1: 606, note2: 642, chartLabel: 296, chartTop: 352, chartBot: 580, split: 340, rule: 680, rule2: 720, next: 778, fixes: 574 };
 
 /**
  * Question 7. A normal run filters and merges; --full-refresh skips the
@@ -121,7 +121,7 @@ export const RefreshScene: React.FC = () => {
 
       <Drift from={from} to={n.beat("next").to + 60}>
         <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} size={52}>
-          What is the difference between <QMono>dbt run --full-refresh</QMono> and a normal incremental run?
+          What is the difference between <span style={{ whiteSpace: "nowrap" }}><QMono>dbt run --full-refresh</QMono></span> and a normal incremental run?
         </QuestionCard>
 
         {/* ── Two runs, side by side ── */}
@@ -132,8 +132,8 @@ export const RefreshScene: React.FC = () => {
               filters to new rows<span style={{ opacity: ease(frame, mergesAt, 10) }}>, and merges them in</span>
             </div>
           </Note>
-          <ColumnRule x={(X0 + 620 + COL2) / 2 - 40} top={row("cols")} height={70} at={fullAt - 2} />
-          <Note at={fullAt - 2} x={COL2 - 80} y={row("cols")}>
+          <ColumnRule x={COL2 - 125} top={row("cols")} height={70} at={fullAt - 2} />
+          <Note at={fullAt - 2} x={COL2} y={row("cols")}>
             <div style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 600 }}>--full-refresh</span>
             </div>
@@ -285,13 +285,13 @@ export const RefreshScene: React.FC = () => {
             <span style={{ opacity: ease(frame, largestAt, 10) }}>, and the largest models may not afford one</span>
           </span>
         </Note>
-        <Note at={fixesAt} x={1060} y={row("next") - 4}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            Every fix, a query:
-            <span style={{ color: INK, opacity: ease(frame, filterAt, 8) }}> a filter</span>
-            <span style={{ color: INK, opacity: ease(frame, dedupAt, 8) }}>, a deduplication</span>
-            <span style={{ color: INK, opacity: ease(frame, mergeAt, 8) }}>, a merge on a key</span>
-          </span>
+        <Note at={fixesAt} x={SPLIT_X} y={row("fixes")}>
+          <div style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Every fix here was a query:</div>
+          <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 6 }}>
+            <span style={{ opacity: ease(frame, filterAt, 8) }}>a filter</span>
+            <span style={{ opacity: ease(frame, dedupAt, 8) }}>, a deduplication</span>
+            <span style={{ opacity: ease(frame, mergeAt, 8) }}>, a merge on a key</span>
+          </div>
         </Note>
         <NextLine at={nextAt} x={X0} y={row("next")} width={860}>
           Advanced SQL

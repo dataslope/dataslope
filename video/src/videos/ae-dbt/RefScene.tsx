@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { GRAPH, LISTING } from "./data";
-import { Arrow, Code, Drift, edgeKey, Graph, type GEdge, type GNode, lerpLayout, lineOf, Listing, listingWidth, Mark, MARK_RED, MODEL_W, sliceLayout, SLICE_EDGE, X0 } from "./parts";
+import { Arrow, Code, Drift, edgeKey, Graph, type GEdge, type GNode, BIG, lerpLayout, lineOf, Listing, listingWidth, Mark, MARK_RED, sliceLayout, SLICE_EDGE, X0 } from "./parts";
 
 const SIZE = 20;
 
@@ -68,9 +68,9 @@ export const RefScene: React.FC = () => {
   const neitherAt = n.word("dag-acyclic", "neither could go first");
   const end = n.beat("dag-acyclic").to;
 
-  const top = y(372);
-  const row = h(84);
-  const slice = sliceLayout({ left: X0, top, row });
+  const top = y(394);
+  const row = h(92);
+  const slice = sliceLayout({ left: X0, top, row, pitch: BIG.pitch, w: BIG.w });
   // Question 2 keeps the fact on the orders row, straight after its parent;
   // Question 3 drops it to where both branches meet.
   const refLayout = { ...slice, fct_orders: { ...slice.fct_orders, cy: top } };
@@ -78,7 +78,7 @@ export const RefScene: React.FC = () => {
   const at = lerpLayout(refLayout, slice, drop);
 
   // ── Question 2's code, under each box ──
-  const codeTop = top + h(52);
+  const codeTop = top + h(58);
   const sourceLine = LISTING.sourceLine;
   const fctFrom = LISTING.fctOrders[lineOf(LISTING.fctOrders, "ref('stg_orders')")].replace(/\s+--.*$/, "");
   const fctLines = [LISTING.fctOrders[0], fctFrom];
@@ -87,7 +87,7 @@ export const RefScene: React.FC = () => {
   const codeOut = q3At - 2;
 
   // ── The build order, Question 2 ──
-  const orderY = y(640);
+  const orderY = y(690);
   const ORDER_X = X0 + 170;
   const SLOT = 250;
   const swap = ease(frame, beforeAt + 2, 18);
@@ -103,12 +103,12 @@ export const RefScene: React.FC = () => {
     ...(m === "stg_orders" || m === "fct_orders" ? [{ at: neitherAt, tone: "bad" as const }] : []),
   ];
   const nodes: GNode[] = [
-    { id: "raw.orders", slot: at["raw.orders"], at: sourceAt + 4, base: "soft" },
-    { id: "raw.customers", slot: at["raw.customers"], at: parsesAt + 4, base: "soft" },
-    { id: "stg_orders", slot: at.stg_orders, at: stgAt, tones: modelTones("stg_orders") },
-    { id: "stg_customers", slot: at.stg_customers, at: parsesAt + 8, tones: modelTones("stg_customers") },
-    { id: "dim_customer", slot: at.dim_customer, at: parsesAt + 12, tones: modelTones("dim_customer") },
-    { id: "fct_orders", slot: at.fct_orders, at: factAt, tones: [{ at: hardAt + 4, tone: "bad" }, { at: q3At + 4, tone: "plain" }, ...modelTones("fct_orders")] },
+    { id: "raw.orders", slot: at["raw.orders"], size: BIG.size, h: BIG.h, at: sourceAt + 4, base: "soft" },
+    { id: "raw.customers", slot: at["raw.customers"], size: BIG.size, h: BIG.h, at: parsesAt + 4, base: "soft" },
+    { id: "stg_orders", slot: at.stg_orders, size: BIG.size, h: BIG.h, at: stgAt, tones: modelTones("stg_orders") },
+    { id: "stg_customers", slot: at.stg_customers, size: BIG.size, h: BIG.h, at: parsesAt + 8, tones: modelTones("stg_customers") },
+    { id: "dim_customer", slot: at.dim_customer, size: BIG.size, h: BIG.h, at: parsesAt + 12, tones: modelTones("dim_customer") },
+    { id: "fct_orders", slot: at.fct_orders, size: BIG.size, h: BIG.h, at: factAt, tones: [{ at: hardAt + 4, tone: "bad" }, { at: q3At + 4, tone: "plain" }, ...modelTones("fct_orders")] },
   ];
   const edgeCue: Record<string, number> = {
     [edgeKey("raw.orders", "stg_orders")]: throughSourceAt,
@@ -134,9 +134,9 @@ export const RefScene: React.FC = () => {
   const stepY = top - h(66);
   const colMid = (m: "stg_orders" | "dim_customer" | "fct_orders") => slice[m].x + slice[m].w / 2;
   const loopY = top - h(50);
-  const fx = slice.fct_orders.x + MODEL_W / 2 + 30;
-  const sx = slice.stg_orders.x + MODEL_W / 2 + 30;
-  const gapMid = (slice.stg_orders.x + MODEL_W + slice.fct_orders.x) / 2;
+  const fx = slice.fct_orders.x + BIG.w / 2 + 30;
+  const sx = slice.stg_orders.x + BIG.w / 2 + 30;
+  const gapMid = (slice.stg_orders.x + BIG.w + slice.fct_orders.x) / 2;
 
   return (
     <AbsoluteFill>
@@ -215,7 +215,7 @@ export const RefScene: React.FC = () => {
         </Note>
 
         {/* ── Question 3 ── */}
-        <Note at={namesAt} x={slice.stg_orders.x + MODEL_W + 18} y={top - h(40)} out={bothAt - 4}>
+        <Note at={namesAt} x={slice.stg_orders.x + BIG.w + 18} y={top - h(40)} out={bothAt - 4}>
           <span style={{ fontFamily: SANS, whiteSpace: "nowrap", fontSize: 20 }}>
             <Code color={INK_SOFT}>{"{{ ref('stg_orders') }}"}</Code>
           </span>
@@ -257,7 +257,7 @@ export const RefScene: React.FC = () => {
         ))}
 
         {/* A cycle: neither model could go first. */}
-        <Arrow points={[[fx, slice.fct_orders.cy - 31], [fx, loopY], [sx, loopY], [sx, top - 31]]} at={eachOtherAt + 4} dur={20} color={ACCENT} dash="8 8" />
+        <Arrow points={[[fx, slice.fct_orders.cy - BIG.h / 2 - 5], [fx, loopY], [sx, loopY], [sx, top - BIG.h / 2 - 5]]} at={eachOtherAt + 4} dur={20} color={ACCENT} dash="8 8" />
         <Note at={neitherAt + 2} x={(fx + sx) / 2 - 130} y={loopY - h(46)} width={260} style={{ textAlign: "center" }}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>No first model</span>
         </Note>

@@ -62,7 +62,6 @@ export const FanScene: React.FC = () => {
   const joinAt = n.word("fan-two", "Join the items");
   const threeAt = n.word("fan-two", "appears three times");
   const inflatedAt = n.word("fan-two", "three hundred fifty");
-  const allAt = n.word("fan-all", "Across all twelve orders");
   const rowsAt = n.word("fan-all", "twenty-four rows");
   const becomesAt = n.word("fan-all", "nineteen hundred forty-nine dollars becomes");
   const bigAt = n.word("fan-all", "forty-five hundred fifty-five");
@@ -75,7 +74,9 @@ export const FanScene: React.FC = () => {
   const inAt = n.word("fan-tell", "Twelve orders went into the join");
   const outAt = n.word("fan-tell", "twenty-four rows came out");
   const end = n.beat("fan-tell").to;
-  const phaseOut = allAt - 8;
+  const returnsAt = n.word("fan-all", "the join returns");
+  // Orders 1 and 2 stay up for two seconds after their 350.00, then clear.
+  const phaseOut = returnsAt - 4;
 
   // ── Phase A: the schema, then orders 1 and 2 ──
   const orders = useEntityLayout({
@@ -134,7 +135,7 @@ export const FanScene: React.FC = () => {
       <Sfx name="el-tap" at={worthAt} level={-33} />
       <Sfx name="el-pencil" at={joinAt + 4} level={-35} />
       <Sfx name="el-scratch" at={inflatedAt + 2} level={-31} />
-      <Sfx name="el-whoosh" at={allAt - 4} level={-36} />
+      <Sfx name="el-whoosh" at={phaseOut} level={-36} />
       <Sfx name="el-tap" at={bigAt} level={-32} />
       <Sfx name="el-sprinkle" at={onceAt} level={-34} />
       <Sfx name="el-tap" at={inAt} level={-33} />
@@ -236,7 +237,7 @@ export const FanScene: React.FC = () => {
           top={listTop}
           width={1060}
           size={20}
-          at={allAt}
+          at={phaseOut + 8}
           marks={[{ line: "JOIN", at: tellAt + 2, color: MARK }]}
         />
         <TableName g={rg} at={bigAt - 6}>

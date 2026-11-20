@@ -87,6 +87,8 @@ const Types: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 11. Periodic snapshot or transaction fact ───────────────────────────────
 
 const Periodic: React.FC<{ c: Ctx }> = ({ c }) => {
+  const askSnapAt = c.w("r-periodic", "a periodic snapshot");
+  const askTxAt = c.w("r-periodic", "a transaction fact");
   const stoodAt = c.w("r-periodic", "where things stood");
   const benAt = c.w("r-periodic", "Ben made no transaction in February");
   const balAt = c.w("r-periodic", "his February balance");
@@ -100,17 +102,17 @@ const Periodic: React.FC<{ c: Ctx }> = ({ c }) => {
   const [txns, balance] = RAPID.benFebruary.rows[0];
   return (
     <>
-      <TableName g={tg} at={benAt - 6}>
+      <TableName g={tg} at={askTxAt}>
         Ben&apos;s transactions
       </TableName>
-      <DataTable g={tg} cols={colsOf(T)} at={benAt - 6} rows={T.rows.map((cells, i) => ({ cells, at: benAt - 2 + i * 4 }))} />
-      <TableName g={bg} at={stoodAt}>
+      <DataTable g={tg} cols={colsOf(T)} at={askTxAt} rows={T.rows.map((cells, i) => ({ cells, at: benAt - 2 + i * 4 }))} />
+      <TableName g={bg} at={askSnapAt}>
         Ben&apos;s month-ends
       </TableName>
       <DataTable
         g={bg}
         cols={colsOf(B)}
-        at={stoodAt}
+        at={askSnapAt}
         rows={B.rows.map((cells, i) => ({ cells, at: stoodAt + 4 + i * 3 }))}
         marks={[{ row: feb, col: 2, at: balAt + 2 }]}
       />
@@ -266,6 +268,7 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 15. Date dimension ──────────────────────────────────────────────────────
 
 const DateDim: React.FC<{ c: Ctx }> = ({ c }) => {
+  const askAt = c.w("r-date", "what columns does it typically include");
   const dayAt = c.w("r-date", "One row per day");
   const yearAt = c.w("r-date", "three hundred sixty-six for 2024");
   const worked = [c.w("r-date", "with year"), c.w("r-date", "quarter"), c.w("r-date", "month,"), c.w("r-date", "week"), c.w("r-date", "and weekend")];
@@ -282,13 +285,13 @@ const DateDim: React.FC<{ c: Ctx }> = ({ c }) => {
   const NOTE_X = tg.right + 70;
   return (
     <>
-      <TableName g={tg} at={dayAt}>
+      <TableName g={tg} at={askAt}>
         <Mono>dim_date</Mono>, its row for {R.rows[0][R.cols.indexOf("full_date")]}
       </TableName>
       <DataTable
         g={tg}
         cols={colsOf(T)}
-        at={dayAt}
+        at={askAt}
         rows={T.rows.map((cells, i) => ({ cells, at: dayAt + 4 + i }))}
         marks={[
           ...workedCols.map((col, k) => ({ row: at(col), col: 1, at: worked[k] + 2, out: noFnAt, color: MARK_OK })),

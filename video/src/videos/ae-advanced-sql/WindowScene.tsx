@@ -368,7 +368,7 @@ export const WindowScene: React.FC = () => {
             <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>Without the outer SUM</span>
           </Note>
           <Listing lines={B.lines} x={TRAP_X} top={y(TOP)} size={SIZE} at={dropAt + 2} marks={[{ line: "OVER () AS grand_total", at: refusesAt, color: MARK_RED }]} />
-          <ErrorBox x={TRAP_X} top={y(TOP) + bareH + h(24)} width={720} at={refusesAt + 4} kind={B.kind} message={B.message} size={20} markAt={noAmountAt + 2} />
+          <ErrorBox x={TRAP_X} top={y(TOP) + bareH + h(24)} width={680} at={refusesAt + 4} kind={B.kind} message={B.message} size={20} markAt={noAmountAt + 2} />
         </Stage>
       </Drift>
     </AbsoluteFill>

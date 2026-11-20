@@ -215,3 +215,13 @@ export const UNIT_TEST = {
   const sum = METRIC.joined.reduce((s, r) => s + Number(r.amount), 0);
   if (Math.abs(sum - METRIC.revenue) > 1e-9) throw new Error(`the join's rows sum to ${sum}, not ${METRIC.revenue}`);
 }
+
+// ── The quick round ─────────────────────────────────────────────────────────
+
+const quick = results.figures.quick as unknown as { contract: string; severity: string };
+export const QUICK = {
+  /** The page's contract YAML: enforced, a data_type per column. */
+  contract: quick.contract.split("\n"),
+  /** The page's severity YAML: a not_null at warn. */
+  severity: quick.severity.split("\n"),
+};

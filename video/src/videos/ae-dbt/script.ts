@@ -327,7 +327,7 @@ export const script: NarrationScript = {
     {
       id: "mat-pick",
       text: "Choose by read frequency, compute cost and data volume, not habit. An expensive model that dashboards read all day, from a source that changes nightly, should be a table.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.4,
     },
     {
       id: "eph",

@@ -162,7 +162,7 @@ export const BuildScene: React.FC = () => {
           <React.Fragment key={m}>
             <TestMark slot={lay[0][m]} at={builtAt + 4 + MODELS.indexOf(m) * 4} out={reset} ok />
             <TestMark slot={lay[1][m]} at={buildStep(wave(m)) + 8} out={reset} ok />
-            {m === "stg_orders" ? <TestMark slot={lay[0][m]} at={failsAt + 2} ok={false} /> : null}
+            {m === "fct_orders" ? null : <TestMark slot={lay[0][m]} at={failsAt + 2 + (m === "stg_orders" ? 0 : 4 + MODELS.indexOf(m) * 3)} ok={m !== "stg_orders"} />}
             {m === "fct_orders" ? null : <TestMark slot={lay[1][m]} at={failStep(wave(m)) + 8} ok={m !== "stg_orders"} />}
           </React.Fragment>
         ))}

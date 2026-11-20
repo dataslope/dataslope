@@ -144,7 +144,7 @@ const Band: React.FC<{ lines: readonly string[]; mark: LineMark; size: number; p
   const w = ease(frame, mark.at, 12);
   const o = mark.out === undefined ? 0 : ease(frame, mark.out, 10);
   if (w <= 0 || o >= 1) return null;
-  const i = lineOf(lines, mark.text ?? mark.line);
+  const i = lineOf(lines, mark.line);
   const line = lines[i];
   const start = mark.text === undefined ? line.length - line.trimStart().length : line.indexOf(mark.text);
   if (start < 0) throw new Error(`line ${JSON.stringify(line)} has no ${JSON.stringify(mark.text)}`);
@@ -381,6 +381,8 @@ export const BOX_SIZE = 21;
  *  and 20px either side), so every model box is one width. */
 export const MODEL_W = 206;
 export const DASH_W = 262;
+/** The large graph, where the slice is the whole figure: 23px names. */
+export const BIG = { w: 228, h: 56, size: 23, pitch: 330 } as const;
 
 /** The page's lineage slice, read from the page (GRAPH in data.ts), and the
  *  dashboard its one exposure names. */

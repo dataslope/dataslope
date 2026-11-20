@@ -84,7 +84,8 @@ export const NonaddScene: React.FC = () => {
   const addAt = n.word("nonadd-store", "which do add up");
   const endDivAt = n.word("nonadd-store", "divide at the end");
   const end = n.beat("nonadd-store").to;
-  const phaseOut = breakAt - 8;
+  const phaseOut = breakAt;
+  const ratioAt = breakAt + 10;
 
   // ── The grid: orders by products ──
   const products = DISTINCT.perProduct.map((p) => p.item);
@@ -128,7 +129,7 @@ export const NonaddScene: React.FC = () => {
       <Sfx name="el-pencil" at={productAAt} level={-35} />
       <Sfx name="el-sprinkle" at={dauAt + 2} level={-34} />
       <Sfx name="el-tap" at={twiceAt} level={-33} />
-      <Sfx name="el-whoosh" at={breakAt - 6} level={-36} />
+      <Sfx name="el-whoosh" at={breakAt} level={-36} />
       <Sfx name="el-scratch" at={twentySixAt + 2} level={-31} />
       <Sfx name="el-tap" at={twoFiveAt + 2} level={-32} />
       <Sfx name="el-scratch" at={storeAt + 12} level={-32} />
@@ -259,13 +260,13 @@ export const NonaddScene: React.FC = () => {
         </Note>
 
         {/* ── Ratios: averaged, and summed then divided ── */}
-        <TableName g={dg} at={breakAt}>
+        <TableName g={dg} at={ratioAt}>
           daily
         </TableName>
         <DataTable
           g={dg}
           cols={days.cols.map((name, j) => ({ name, numeric: j > 0 }))}
-          at={breakAt}
+          at={ratioAt}
           rows={days.rows.map((cells, i) => ({ cells, at: i === 0 ? fiveOfAt : twentyOfAt }))}
           marks={[
             { row: 0, col: 3, at: avgAt, color: MARK_BAD, out: sumBothAt },

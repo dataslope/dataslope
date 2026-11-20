@@ -75,7 +75,9 @@ export const ChasmScene: React.FC = () => {
   const benAt = n.word("chasm-left", "Ben paid forty dollars");
   const dropsAt = n.word("chasm-left", "an inner join drops him");
   const end = n.beat("chasm-left").to;
-  const phaseOut = fanOneAt - 8;
+  // The six rows and their sums stay up two seconds, then clear.
+  const phaseOut = fanOneAt + 2;
+  const panelAt = fanOneAt + 8;
 
   // ── Phase A: the three tables, and Ada's rows joined at once ──
   const chip = (x: number, top: number, name: string, width: number) => ({ x, y: y(top), width, name, columns: [] });
@@ -125,7 +127,7 @@ export const ChasmScene: React.FC = () => {
       <Sfx name="el-tap" at={thirtyAt} level={-33} />
       <Sfx name="el-sprinkle" at={pairsAt} level={-34} />
       <Sfx name="el-scratch" at={paySumAt + 4} level={-31} />
-      <Sfx name="el-whoosh" at={fanOneAt - 6} level={-36} />
+      <Sfx name="el-whoosh" at={phaseOut} level={-36} />
       <Sfx name="el-pencil" at={branchAt} level={-35} />
       <Sfx name="el-tap" at={h180At} level={-32} />
       <Sfx name="el-tap" at={benAt + 4} level={-32} />
@@ -201,13 +203,13 @@ export const ChasmScene: React.FC = () => {
         </Note>
 
         {/* ── One many-side, or two ── */}
-        <Ink at={fanOneAt - 4} dur={12} style={{ left: X0, top: panelTop }}>
+        <Ink at={panelAt} dur={12} style={{ left: X0, top: panelTop }}>
           <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Fan trap</span>
         </Ink>
-        <Entity layout={fOrders} at={fanOneAt} />
-        <Entity layout={fItems} at={fanOneAt + 4} />
-        <Relation name="fan-orders-items" points={[fOrders.anchor("right"), fItems.anchor("left")]} from="exactly-one" to="one-or-many" at={fanOneAt + 6} />
-        <Note at={fanOneAt + 12} x={X0} y={captionTop}>
+        <Entity layout={fOrders} at={panelAt + 4} />
+        <Entity layout={fItems} at={panelAt + 8} />
+        <Relation name="fan-orders-items" points={[fOrders.anchor("right"), fItems.anchor("left")]} from="exactly-one" to="one-or-many" at={panelAt + 10} />
+        <Note at={panelAt + 16} x={X0} y={captionTop}>
           <span style={noteLine(22, INK)}>
             One many-side: <b style={{ color: ACCENT_INK }}>one measure</b> inflates
           </span>

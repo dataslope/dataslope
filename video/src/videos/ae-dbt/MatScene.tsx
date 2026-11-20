@@ -117,12 +117,12 @@ export const MatScene: React.FC = () => {
   // ── Question 5 ──
   const headY = y(290);
   const viewY = y(352);
-  const viewPlanTop = viewY + h(40);
+  const viewPlanTop = viewY + h(38);
   const viewPlan = frame >= onceAt + 6 ? MATERIALIZE.viewPlanAfter : MATERIALIZE.viewPlan;
-  const tableY = viewPlanTop + planHeight(viewPlan.length, PLAN_SIZE) + h(40);
-  const tablePlanTop = tableY + h(40);
-  const restY = tablePlanTop + planHeight(MATERIALIZE.tablePlan.length, PLAN_SIZE) + h(44);
-  const pickY = restY + h(84);
+  const tableY = viewPlanTop + planHeight(viewPlan.length, PLAN_SIZE) + h(34);
+  const tablePlanTop = tableY + h(38);
+  const restY = tablePlanTop + planHeight(MATERIALIZE.tablePlan.length, PLAN_SIZE) + h(32);
+  const pickY = restY + h(98);
   const LINE = h(32);
   const rebuilt = frame >= nextRunAt + 16;
 
@@ -377,7 +377,7 @@ export const MatScene: React.FC = () => {
           const cy = modelsTop + i * MODEL_PITCH + BOX_H / 2;
           return (
             <React.Fragment key={i}>
-              <Arrow points={[[X0 + ephW + 10, ephMid], [R_X - 20, ephMid], [R_X - 20, cy], [R_X + 34, cy]]} at={c.at - 4} dur={12} color={c.bad ? ACCENT : INK} />
+              <Arrow points={c.bad ? [[R_X - 20, ephMid + 8], [R_X - 20, cy], [R_X + 34, cy]] : [[X0 + ephW + 10, ephMid], [R_X - 20, ephMid], [R_X - 20, cy], [R_X + 34, cy]]} at={c.at - 4} dur={12} color={c.bad ? ACCENT : INK} />
               <Listing
                 lines={copyLine}
                 x={R_X + 230}

@@ -47,7 +47,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     dashboard tiles side by side, both titled "Revenue", one reading
  *     1,949.25 and one 4,555.25; the dials spot between them.
  *   hook-meaning: under the tiles, the two queries, small: SUM(amount) FROM
- *     orders, and the page's join; neither marked yet.
+ *     orders, and the page's join, each aliased "revenue" as a dashboard
+ *     would (check.mjs runs both as written); neither marked wrong.
  *   plan: eight numbered squares and ten smaller ones.
  *   disagree: QuestionCard 1. disagree-how: four causes as a ruled list,
  *     each inking in as it is read: filters (refunds, tax, cancelled),
@@ -55,8 +56,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     disagree-here: "a fan trap" lit (red), with an arrow to the second tile.
  *     disagree-cure: one shared definition box (the orders-grain sum, "SUM(amount)
  *     FROM orders", not labelled as the one true revenue) with two arrows down
- *     to the two tiles, which now both read 1,949.25 (green);
- *     the rubber-stamp spot on "certified". disagree-widen: two lines that
+ *     to the two tiles, which now both read 1,949.25 (green). (The
+ *     rubber-stamp spot moved to Question 16's certification: the right
+ *     side of this page has no clear 80px for it.) disagree-widen: two lines that
  *     start close and spread apart over time, unlabelled, no axis numbers
  *     (drawn: the page's claim, not data).
  *   fan: QuestionCard 2; orders (one) and order_items (many) as two ERD
@@ -93,7 +95,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     itself: Part 9 shows other governed readings, such as net revenue);
  *     two requests arriving ("completed revenue by month", "... by
  *     region"), the layer
- *     emitting SQL for each, its join, aggregation and filter in yellow.
+ *     emitting SQL for each, its join, aggregation and filter in yellow
+ *     (drawn; check.mjs runs both statements on empty tables of that shape,
+ *     so they are valid Postgres, and no number comes from them).
  *     layer-why: "what it means" and "how it's computed" separated by a
  *     hairline.
  *   entities: QuestionCard 6. Three labelled columns, entities, dimensions,
@@ -121,8 +125,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     and "explore: joins" (no code: the page shows none). r-measure: SUM(amount)
  *     against "completed revenue". r-additive: three rows (revenue, a
  *     balance, a ratio), ticks across dimensions and time. r-cumulative: a
- *     28-day window sliding along a day axis.
- *   next: the list complete; NextLine "Next: AI and the semantic layer".
+ *     28-day window sliding along a day axis. r-governance: the five parts
+ *     ticked, the rubber-stamp spot on "certification".
+ *   next: the list complete; the pelican back; NextLine "Next: AI and the
+ *     semantic layer".
  *
  * Facts. Every query ran on the site's Postgres (PGlite 0.5.16, PostgreSQL
  * 18.6) by check.mjs into results.json, which data.ts reads; check.mjs fails
@@ -250,7 +256,7 @@ export const script: NarrationScript = {
     {
       id: "fan-two",
       text: "Orders one and two are worth a hundred fifty dollars. Order one has three items, order two has one. Join the items, and order one's hundred dollars appears three times: three hundred fifty.",
-      pauseAfter: 0.7,
+      pauseAfter: 0.9,
     },
     {
       id: "fan-all",
@@ -295,7 +301,7 @@ export const script: NarrationScript = {
     {
       id: "chasm-run",
       text: "Ada made three payments, a hundred eighty dollars, and got two refunds, thirty. Join all three, and every payment pairs with every refund: six rows. Payments sum to three hundred sixty, refunds to ninety.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.5,
     },
     {
       id: "chasm-diff",
@@ -357,7 +363,7 @@ export const script: NarrationScript = {
     {
       id: "nonadd-users",
       text: "Daily active users summed into a month fail the same way: someone active on two days counts twice. Recount from the rows for the month, or merge distinct-count sketches, small summaries built to combine.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
     {
       id: "nonadd-ratio",
@@ -391,48 +397,48 @@ export const script: NarrationScript = {
     {
       id: "r-truth",
       text: "Question nine. Why does a single source of truth for metrics matter? Without one, every dashboard and notebook re-implements revenue slightly differently. One definition means one place to change it, the same answer everywhere, and versioned code instead of tribal knowledge.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "r-drift",
       text: "Question ten. What is metric drift, and how do you prevent it? It's one metric slowly coming to mean different things in different places, as copies of its logic spread and mutate. Define it once, under version control and review, and point every consumer at that.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "r-metricflow",
       text: "Question eleven. What is the dbt Semantic Layer, or MetricFlow? Semantic models and metrics, declared in YAML beside the dbt project. MetricFlow, the layer's query compiler, turns a request for a metric by a dimension into warehouse SQL, and BI tools ask for it through an API.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "r-lookml",
       text: "Question twelve. What is LookML, and how does Looker's semantic layer work? LookML is the modeling language of Looker, a BI tool: dimensions and measures in views, joins in explores. Looker writes the SQL from what a user picks. It was an early, influential semantic layer.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "r-measure",
       take: true,
       text: "Question thirteen. What is the difference between a measure and a metric? A measure is a raw aggregate on one table, like the sum of amount. A metric is the business number built from measures, with filters, ratios or time logic, like completed revenue.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "r-contains",
       text: "Question fourteen. What does a metric definition contain? The aggregation, the entity and grain it lives on, the dimensions it can be sliced by, its filters, and its time grain. A ratio adds a numerator and a denominator.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "r-additive",
       text: "Question fifteen. What is the difference between additive, semi-additive, and non-additive metrics? Revenue sums across everything. An account balance sums across accounts but not across months: take the latest, or the average. Ratios and distinct counts never sum; recompute them from the rows.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "r-governance",
       text: "Question sixteen. What is governance in the metrics context? An owner for each metric, code review on every change, certification of the trusted ones, documented meaning and lineage, and access controls.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "r-cumulative",
       text: "Question seventeen. What is a cumulative or time-window metric, and why define it centrally? It aggregates over a trailing window, like rolling twenty-eight-day active users, or month-to-date revenue. Windows are easy to get subtly different by hand, so define the grain and the window once.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "r-wide",

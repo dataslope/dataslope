@@ -7,10 +7,10 @@ import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GRAPH } from "./data";
-import { artBox, Drift, edgeKey, Graph, type GEdge, type GNode, Headline, Kicker, lerpLayout, Mark, MODELS, SERIES, sliceLayout, SLICE_EDGE, type Slot, Spot, X0 } from "./parts";
+import { artBox, BIG, Drift, edgeKey, Graph, type GEdge, type GNode, Headline, Kicker, lerpLayout, Mark, MODELS, SERIES, sliceLayout, SLICE_EDGE, type Slot, Spot, X0 } from "./parts";
 
 /** The plan: ten worked through, nine quick. */
-const BIG = 44;
+const SQ = 44;
 const SMALL = 30;
 
 /**
@@ -41,7 +41,7 @@ export const HookScene: React.FC = () => {
   const end = n.beat("plan").to;
 
   const top = y(372);
-  const ordered = sliceLayout({ left: X0, top, sources: false });
+  const ordered = sliceLayout({ left: X0, top, sources: false, pitch: BIG.pitch, w: BIG.w, row: h(92) });
   // In no order: the fact first, the staging models apart, before dbt has
   // read a single ref.
   const loose: Record<string, Slot> = {
@@ -67,6 +67,8 @@ export const HookScene: React.FC = () => {
   const nodes: GNode[] = MODELS.map((m, i) => ({
     id: m,
     slot: { ...at[m], cy: at[m].cy + sway(i) },
+    size: BIG.size,
+    h: BIG.h,
     at: appear[m],
     tones: [
       { at: othersAt + i * 3, tone: "lit" as const },
@@ -78,8 +80,8 @@ export const HookScene: React.FC = () => {
   const edges: GEdge[] = modelEdges.map(([a, b], i) => ({ from: a, to: b, at: workAt + 22 + i * 6, ...SLICE_EDGE[edgeKey(a, b)] }));
 
   const bird = artBox("weaver-bird", 470);
-  const lineY = top + 2 * h(84) + h(66);
-  const planTop = y(800);
+  const lineY = top + 2 * h(92) + h(70);
+  const planTop = y(790);
   const stepY = top - h(70);
   const colX = [ordered.stg_orders, ordered.dim_customer, ordered.fct_orders].map((s) => s.x + s.w / 2);
 
@@ -124,7 +126,7 @@ export const HookScene: React.FC = () => {
             const big = i < 10;
             const a = big ? tenAt + i * 2 : nineAt + (i - 10) * 2;
             const p = ease(frame, Math.max(a, nineteenAt), 8);
-            const s = big ? BIG : SMALL;
+            const s = big ? SQ : SMALL;
             return (
               <React.Fragment key={i}>
                 {i === 10 ? <span style={{ width: 18 }} /> : null}
@@ -151,7 +153,7 @@ export const HookScene: React.FC = () => {
             );
           })}
         </div>
-        <Note at={tenAt + 6} x={X0} y={planTop + BIG + h(16)}>
+        <Note at={tenAt + 6} x={X0} y={planTop + SQ + h(16)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: BLUE_INK }}>
               <Num>10</Num>
@@ -159,7 +161,7 @@ export const HookScene: React.FC = () => {
             worked through
           </span>
         </Note>
-        <Note at={nineAt + 6} x={X0 + 10 * (BIG + 10) + 18} y={planTop + BIG + h(16)}>
+        <Note at={nineAt + 6} x={X0 + 10 * (SQ + 10) + 18} y={planTop + SQ + h(16)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: INK }}>
               <Num>9</Num>

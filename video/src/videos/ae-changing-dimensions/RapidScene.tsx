@@ -138,7 +138,7 @@ const Mini: React.FC<{ c: Ctx; at: number }> = ({ c, at }) => {
             </div>
           </React.Fragment>
         ))}
-        <div style={{ ...note(40, INK_SOFT), margin: "40px 22px 0 50px", opacity: ease(frame, everyAt, 10) }}>=</div>
+        <div style={{ ...note(46, INK_SOFT), margin: "36px 22px 0 50px", opacity: ease(frame, everyAt, 10) }}>=</div>
         <div style={{ marginTop: 36, opacity: ease(frame, twentyAt - 2, 10), whiteSpace: "nowrap" }}>
           <div style={{ ...note(46, BLUE_INK) }}>
             <Num>{MINI.rows}</Num>

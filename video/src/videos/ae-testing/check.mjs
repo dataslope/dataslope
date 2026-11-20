@@ -293,6 +293,16 @@ INSERT INTO order_items VALUES (1, 'A'), (1, 'B'), (1, 'C');`,
   { actual: MODEL, expected: "SELECT DATE '2026-03-02' AS day, 100.00 AS revenue;" },
 );
 
+// ── The quick round: the page's own YAML, shown as written ──────────────────
+//
+// Nothing runs: these are the contract and the severity blocks the quick
+// round puts on screen, read from the page so the two cannot drift.
+
+results.figures.quick = {
+  contract: fence(TESTING, "models:\n  - name: fct_orders\n    config:"),
+  severity: fence(TESTING, "- name: customer_email"),
+};
+
 // ── Checks ──────────────────────────────────────────────────────────────────
 
 const out = new URL("./results.json", import.meta.url);

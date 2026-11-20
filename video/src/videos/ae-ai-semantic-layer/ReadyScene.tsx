@@ -209,7 +209,7 @@ export const ReadyScene: React.FC = () => {
           <Spot id="ae-ai-semantic-layer-padlock" at={privateAt} left={R_X + MODEL_W + MODEL_GAP / 2 - padlock.width / 2} top={modelTop + modelH + 70} {...padlock} />
           <Box x={modelX(2)} y={asstTop} w={MODEL_W} h={modelH} at={exposeAt} title="Assistant" size={24} />
           <Flow points={[[modelX(2) + MODEL_W / 2, asstTop - 8], [modelX(2) + MODEL_W / 2, modelTop + modelH + 8]]} at={exposeAt + 8} />
-          <Ink at={removesAt} dur={14} style={{ left: modelX(2), top: asstTop + modelH + h(22) }}>
+          <Ink at={removesAt} dur={14} style={{ left: modelX(2) + MODEL_W, top: asstTop + modelH + h(22), transform: "translateX(-100%)" }}>
             <span style={line(23, INK_SOFT)}>No wrong model to choose</span>
           </Ink>
 

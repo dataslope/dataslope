@@ -6,7 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { Arrow, Code, Drift, Line, Listing, listingHeight, listingWidth, Mark, MARK_GREEN, MARK_RED, OK_INK, VRule, X0 } from "./parts";
 
 const COL = [X0, 1010];
@@ -82,10 +82,10 @@ export const EnvScene: React.FC = () => {
   const refLine = ["FROM {{ ref('stg_orders') }}"];
   const refW = listingWidth(refLine, SIZE);
   const refX = ruleX - refW / 2;
-  const refTop = y(520);
+  const refTop = y(572);
   const refH = listingHeight(1, SIZE);
-  const nameY = y(650);
-  const hardTop = y(752);
+  const nameY = y(690);
+  const hardTop = y(796);
   const hardLine = ["FROM analytics.stg_orders"];
   const hardW = listingWidth(hardLine, SIZE);
 
@@ -93,7 +93,7 @@ export const EnvScene: React.FC = () => {
   const cfgLine = ["{{ config(schema='staging') }}"];
   const cfgW = listingWidth(cfgLine, SIZE);
   const cfgX = ruleX - cfgW / 2;
-  const row1 = y(640);
+  const row1 = y(702);
   const row2 = row1 + h(62);
 
   return (
@@ -121,8 +121,8 @@ export const EnvScene: React.FC = () => {
         </QuestionCard>
 
         {/* A target: a named connection. */}
-        <Line at={targetAt} x={X0} y={lineY} size={26} out={q9Out}>
-          A target: a named warehouse connection, <Mark at={databaseAt}>database</Mark>, <Mark at={schemaWordAt}>schema</Mark>, <Mark at={credsAt}>credentials</Mark>
+        <Line at={targetAt} x={X0} y={lineY} size={26}>
+          A target, a named warehouse connection: <Mark at={databaseAt}>database,</Mark> <Mark at={schemaWordAt}>schema,</Mark> <Mark at={credsAt}>credentials</Mark>
         </Line>
 
         {/* Dev and prod, side by side. */}
@@ -202,7 +202,7 @@ export const EnvScene: React.FC = () => {
           <span style={{ color: INK_SOFT }}>→</span> <span style={{ opacity: ease(frame, landAt, 10) }}><Mark at={aliceStgAt}>dbt_alice_staging</Mark></span>
         </Name>
         <Name at={neverAt - 4} x={COL[0]} y={row2} size={26}>
-          <span style={{ color: INK_SOFT }}>Bob&rsquo;s:</span> dbt_bob_staging
+          <span style={{ color: INK_SOFT, fontFamily: SANS, fontWeight: 500 }}>Bob&rsquo;s:</span> dbt_bob_staging
         </Name>
         <Line at={neverAt} x={COL[0]} y={row2 + h(50)} color={INK_SOFT}>
           Two developers, two schemas: nobody overwrites anybody

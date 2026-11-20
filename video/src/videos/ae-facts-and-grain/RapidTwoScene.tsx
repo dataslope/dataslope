@@ -21,21 +21,28 @@ const BODY_TOP = 270;
 
 const Confirmed: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
+  const askConfirmedAt = c.w("r-confirmed", "a confirmed versus");
+  const askConformedAt = c.w("r-confirmed", "a conformed dimension");
   const vocabAt = c.w("r-confirmed", "It's a vocabulary check");
   const termAt = c.w("r-confirmed", "conformed is the term");
   const notAt = c.w("r-confirmed", "confirmed isn't one");
   const top = c.top + c.h(60);
+  // Both words arrive in ink as the question names them; the answer then
+  // ticks one green and strikes the other red.
+  const ok = ease(frame, termAt, 12);
+  const bad = ease(frame, notAt, 12);
+  const mixInk = (to: string, p: number) => (p > 0 ? `color-mix(in srgb, ${to} ${Math.round(p * 100)}%, ${INK})` : INK);
   return (
     <>
       <Caption at={vocabAt} x={R_X} y={top}>
         A vocabulary check
       </Caption>
-      <div style={{ position: "absolute", left: R_X, top: top + c.h(64), display: "flex", alignItems: "center", gap: 20, fontSize: 44, opacity: ease(frame, termAt, 12) }}>
-        <span style={{ ...note(44, OK_INK), fontWeight: 500 }}>Conformed</span>
+      <div style={{ position: "absolute", left: R_X, top: top + c.h(64), display: "flex", alignItems: "center", gap: 20, fontSize: 44, opacity: ease(frame, askConformedAt, 12) }}>
+        <span style={{ ...note(44, mixInk(OK_INK, ok)), fontWeight: 500 }}>Conformed</span>
         {frame >= termAt + 4 ? <Tick at={termAt + 4} size={36} /> : null}
       </div>
-      <div style={{ position: "absolute", left: R_X, top: top + c.h(150), opacity: ease(frame, notAt, 12), fontSize: 44 }}>
-        <span style={{ ...note(44, ACCENT_INK) }}>
+      <div style={{ position: "absolute", left: R_X, top: top + c.h(150), opacity: ease(frame, askConfirmedAt, 12), fontSize: 44 }}>
+        <span style={{ ...note(44, mixInk(ACCENT_INK, bad)) }}>
           <Strike at={notAt + 8}>Confirmed</Strike>
         </span>
       </div>
@@ -49,7 +56,7 @@ const Confirmed: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 18. Drilling across ─────────────────────────────────────────────────────
 
 const Drill: React.FC<{ c: Ctx }> = ({ c }) => {
-  const combineAt = c.w("r-drill", "Combining metrics from two facts");
+  const askAt = c.w("r-drill", "drilling across");
   const salesAt = c.w("r-drill", "like sales and returns");
   const rollAt = c.w("r-drill", "Roll each fact up");
   const ownAt = c.w("r-drill", "on its own");
@@ -80,7 +87,7 @@ const Drill: React.FC<{ c: Ctx }> = ({ c }) => {
   ];
   return (
     <>
-      <Entity layout={sales} at={salesAt} />
+      <Entity layout={sales} at={salesAt - 2} />
       <Entity layout={returns} at={salesAt + 8} />
       <Flow points={down(mid(L), sales.bottom + 8, rollY - 8)} at={rollAt + 2} />
       <Flow points={down(mid(Rx), returns.bottom + 8, rollY - 8)} at={rollAt + 8} />
@@ -95,7 +102,7 @@ const Drill: React.FC<{ c: Ctx }> = ({ c }) => {
       <Box x={joinX} y={joinY} w={joinW} h={BOX_H} at={keyAt} tone="ok" mono size={21}>
         FULL OUTER JOIN ON date_sk
       </Box>
-      <Note at={combineAt + 2} x={L} y={top - c.h(44)}>
+      <Note at={askAt} x={L} y={top - c.h(44)}>
         <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Two facts, one report</span>
       </Note>
       <Note at={multAt} x={L} y={joinY + BOX_H + c.h(40)}>
@@ -110,6 +117,7 @@ const Drill: React.FC<{ c: Ctx }> = ({ c }) => {
 const Agg: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const askAt = c.w("r-agg", "a fact's grain");
   const grainAt = c.w("r-agg", "The grain is the finest detail");
   const orderAt = c.w("r-agg", "one row per order");
   const aggAt = c.w("r-agg", "Aggregation is how far a mart rolls it up");
@@ -130,8 +138,11 @@ const Agg: React.FC<{ c: Ctx }> = ({ c }) => {
   const lit = ease(frame, keepsAt, 10) * (1 - ease(frame, keepsAt + 24, 14));
   return (
     <>
-      <Caption at={grainAt} x={R_X} y={top - c.h(42)}>
-        <Mono>fact_orders</Mono>: <Num>{orders}</Num> rows
+      <Caption at={askAt} x={R_X} y={top - c.h(42)}>
+        <Mono>fact_orders</Mono>
+        <span style={{ opacity: ease(frame, grainAt, 10) }}>
+          : <Num>{orders}</Num> rows
+        </span>
       </Caption>
       {Array.from({ length: count }, (_, i) => {
         const p = Math.min(1, pop(frame, orderAt + Math.floor(i / 2), fps, 16));
@@ -177,6 +188,7 @@ const Agg: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 20. Customers and accounts in a bank ────────────────────────────────────
 
 const Bank: React.FC<{ c: Ctx }> = ({ c }) => {
+  const askAt = c.w("r-bank", "in a bank data warehouse");
   const bridgeAt = c.w("r-bank", "A bridge between customers and the balance fact");
   const shareAt = c.w("r-bank", "with each owner's share");
   const unAt = c.w("r-bank", "Unweighted, a joint account counts twice");
@@ -196,14 +208,14 @@ const Bank: React.FC<{ c: Ctx }> = ({ c }) => {
   const per = (t: typeof RAPID.bankWeighted) => t.rows.map((r) => `${r[0]} ${money(r[1])}`).join(" + ");
   return (
     <>
-      <TableName g={balG} at={bridgeAt - 4}>
+      <TableName g={balG} at={askAt}>
         <Mono>fact_account_balance</Mono>
       </TableName>
       <DataTable
         g={balG}
         cols={colsOf(Bal)}
-        at={bridgeAt - 4}
-        rows={Bal.rows.map((cells, i) => ({ cells, at: bridgeAt + i * 3 }))}
+        at={askAt}
+        rows={Bal.rows.map((cells, i) => ({ cells, at: askAt + 6 + i * 3 }))}
         marks={Bal.rows.map((r, row) => (r[0] === joint ? { row, col: 0, at: unAt + 2 } : null)).filter((m) => m !== null)}
       />
       <TableName g={brG} at={bridgeAt + 4}>
@@ -250,6 +262,7 @@ const CATEGORY_3NF: EntityColumn[] = [
 const PRODUCT_FOLDED: EntityColumn[] = [{ name: "product_id", key: "PK" }, { name: "category" }];
 
 const Third: React.FC<{ c: Ctx }> = ({ c }) => {
+  const askAt = c.w("r-3nf", "normalization in third normal form");
   const keyAt = c.w("r-3nf", "every column depends on the key");
   const onceAt = c.w("r-3nf", "so each fact is stored once");
   const breakAt = c.w("r-3nf", "Dimensions break it on purpose");
@@ -262,12 +275,12 @@ const Third: React.FC<{ c: Ctx }> = ({ c }) => {
   const folded = useEntityLayout({ x: R_X + 460, y: top + c.h(90), width: 320, name: "dim_product", columns: PRODUCT_FOLDED });
   return (
     <>
-      <Caption at={keyAt} x={R_X} y={top - c.h(42)}>
+      <Caption at={askAt} x={R_X} y={top - c.h(42)}>
         Third normal form
       </Caption>
-      <Entity layout={product} at={keyAt} />
-      <Entity layout={category} at={keyAt + 6} marks={{ category: { at: onceAt + 2, tone: "note" } }} />
-      <Relation name="3nf" points={[product.anchor("bottom"), category.anchor("top")]} from="zero-or-many" to="exactly-one" at={keyAt + 10} />
+      <Entity layout={product} at={askAt + 4} />
+      <Entity layout={category} at={askAt + 10} marks={{ category: { at: onceAt + 2, tone: "note" } }} />
+      <Relation name="3nf" points={[product.anchor("bottom"), category.anchor("top")]} from="zero-or-many" to="exactly-one" at={keyAt} />
       <Note at={onceAt} x={R_X} y={category.bottom + c.h(18)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Each name stored once</span>
       </Note>
@@ -289,6 +302,9 @@ const Third: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 22. Kimball and Inmon ───────────────────────────────────────────────────
 
 const Kimball: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const askKAt = c.w("r-kimball", "How does Kimball's approach");
+  const askIAt = c.w("r-kimball", "differ from Inmon's");
   const kAt = c.w("r-kimball", "Kimball is bottom-up");
   const starAt = c.w("r-kimball", "a star per business process");
   const conformedAt = c.w("r-kimball", "joined by conformed dimensions");
@@ -309,8 +325,8 @@ const Kimball: React.FC<{ c: Ctx }> = ({ c }) => {
   const small = (x: number, i: number) => x + i * 130;
   return (
     <>
-      <Caption at={kAt} x={kx} y={top} color={INK}>
-        Kimball: bottom-up
+      <Caption at={askKAt + 4} x={kx} y={top} color={INK}>
+        Kimball<span style={{ opacity: ease(frame, kAt, 10) }}>: bottom-up</span>
       </Caption>
       {[0, 1, 2].map((i) => (
         <Box key={i} x={small(kx, i)} y={lowerY} w={110} h={BOX_H} at={starAt + i * 4}>
@@ -327,9 +343,9 @@ const Kimball: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Value comes fast</span>
       </Note>
 
-      <ColumnRule x={ix - GAP / 2} top={top} height={c.h(380)} at={iAt} />
-      <Caption at={iAt} x={ix} y={top} color={INK}>
-        Inmon: top-down
+      <ColumnRule x={ix - GAP / 2} top={top} height={c.h(380)} at={askIAt} />
+      <Caption at={askIAt + 2} x={ix} y={top} color={INK}>
+        Inmon<span style={{ opacity: ease(frame, iAt, 10) }}>: top-down</span>
       </Caption>
       <Box x={ix} y={upperY} w={370} h={BOX_H} at={ewAt}>
         Normalized warehouse

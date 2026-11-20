@@ -105,7 +105,14 @@ export const LateFactScene: React.FC = () => {
   const year = order.date.slice(0, 4);
   const accTop = low + h(190);
   const acc = [
-    { text: <>Order <Num>{order.id}</Num></>, w: 210 },
+    {
+      text: (
+        <span>
+          Order <Num>{order.id}</Num>
+        </span>
+      ),
+      w: 210,
+    },
     {
       text: (
         <span>
@@ -199,7 +206,7 @@ export const LateFactScene: React.FC = () => {
         </Note>
         <Note at={todayAt + 6} x={X0} y={low + h(56)} out={curAt - 4}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            Dated <Num>{order.date}</Num>, loaded today
+            Dated {order.date}, loaded today
           </span>
         </Note>
 
@@ -256,7 +263,7 @@ export const LateFactScene: React.FC = () => {
                 <rect x={win.x0} y={trackY - h(28)} width={win.x1 - win.x0} height={h(56)} rx={6} fill="none" stroke={INK} strokeWidth={2} opacity={ease(frame, skipsAt - 4, 10)} />
                 <circle cx={t.dot} cy={trackY} r={8} fill={hit > 0 ? color : INK} opacity={p} />
               </svg>
-              <div style={{ position: "absolute", left: t.ok ? undefined : t.dot + 20, right: t.ok ? 1920 - win.x0 + 20 : undefined, top: trackY - 16, ...note(23, t.ok ? OK_INK : ACCENT_INK), whiteSpace: "nowrap", opacity: hit }}>
+              <div style={{ position: "absolute", left: t.ok ? undefined : t.dot - 14, right: t.ok ? 1920 - A.x1 : undefined, top: trackY - h(28) - 40, ...note(23, t.ok ? OK_INK : ACCENT_INK), whiteSpace: "nowrap", opacity: hit }}>
                 {t.ok ? "Arrived today: picked up" : "Dated 2022: outside the window, skipped"}
               </div>
             </div>

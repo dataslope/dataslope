@@ -401,7 +401,7 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
   const driftAt = c.w("r-wide", "one more place to drift");
   const top = c.y(BODY_Y);
   const cols = ["order_id", "date", "customer", "region", "status", "amount", "units", "…"];
-  const colW = 112;
+  const colW = 118;
   const gridTop = top + c.h(4);
   const headH = c.h(40);
   const gridH = c.h(120);

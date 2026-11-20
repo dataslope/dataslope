@@ -37,7 +37,6 @@ export {
   MARK,
   MARK_BAD,
   MARK_OK,
-  Mono,
   pulse,
   Strike,
   Svg,
@@ -76,6 +75,10 @@ export const SmallMono: React.FC<{ children: React.ReactNode; color?: string }> 
     {children}
   </span>
 );
+
+/** Code in a line of type: SmallMono, so `check:frames` reads one size on the
+ *  line (da-sql's 0.88em Mono sat 12% under a 23px line). */
+export const Mono = SmallMono;
 
 // ── SQL and YAML listings ────────────────────────────────────────────────────
 
