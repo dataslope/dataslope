@@ -3,7 +3,7 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { badgeStyle, FigLabel, Ink, NextLine } from "../../editorial/ui";
+import { FigLabel, Ink, NextLine, outlineBadgeStyle } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -105,13 +105,16 @@ export const ChooseScene: React.FC = () => {
               <React.Fragment key={a.action}>
                 <ElbowArrow points={i === 1 ? [pts[0], [ANSWER_X - 14, by]] : pts} at={a.at - 2} color={INK} width={2.2} dur={14} />
                 <Ink at={a.at} dur={14} style={{ left: ANSWER_X, top: by - 28, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
-                  <span style={{ ...body(38, true), color: INK }}>{a.q}</span>
+                  {/* 34, down from 38 with its badge, so the pair stays one
+                      line at one size (within 12%). */}
+                  <span style={{ ...body(34, true), color: INK }}>{a.q}</span>
                   <span style={{ opacity: ease(frame, a.actAt - 4, 10), transform: `translateY(${(1 - ease(frame, a.actAt - 4, 10)) * 8}px)`, display: "inline-block" }}>
                     <span
                       style={{
-                        // A red house badge, within 12% of the question it
-                        // answers: one line, one size.
-                        ...badgeStyle("red", 35),
+                        // Black border, black text, no fill, and a step
+                        // smaller than the 35 it was (the owner, 2026-11-13);
+                        // within 12% of the question beside it.
+                        ...outlineBadgeStyle("ink", 31),
                         fontFamily: MONO,
                       }}
                     >
@@ -129,8 +132,9 @@ export const ChooseScene: React.FC = () => {
           {/* ── ON UPDATE: the same question, set apart by space alone (the
               owner: no rule above it, more room instead) ── */}
           <Ink at={changingAt - 2} dur={16} style={{ left: ROOT_X, top: y(766), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 16 }}>
-            {/* At the sentence's own size, less the 12% a line may vary. */}
-            <Tag color={INK} size={29} mono>
+            {/* At the sentence's own size, less the 12% a line may vary;
+                outlined in black, no fill (the owner, 2026-11-13). */}
+            <Tag color={INK} size={29} mono outline>
               ON UPDATE
             </Tag>
             <span style={{ ...body(32, true), color: INK }}>

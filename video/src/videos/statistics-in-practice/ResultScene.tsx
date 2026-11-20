@@ -31,10 +31,10 @@ const CARD_END = 804;
  *  (it was 14 and 50). */
 const NAME_DY = 26;
 const COUNT_DY = 76;
-/** The button's padding grows by this much each way (the owner: "slight more
- *  vertical padding"), so its top moves up by as much to stay centred on
- *  the name beside it. */
+/** The button's vertical padding (the owner: "slight more vertical padding";
+ *  it was 4), and its top, set so its middle meets the name's beside it. */
 const BUTTON_PAD = 7;
+const BUTTON_DY = NAME_DY - 6;
 
 const pp = (v: number) => v * 100;
 const num = (v: number) => Math.round(v).toLocaleString("en-US");
@@ -187,7 +187,7 @@ export const ResultScene: React.FC = () => {
             style={{
               position: "absolute",
               left: a.x + 228,
-              top: top + gridH + NAME_DY - 6 - (BUTTON_PAD - 4),
+              top: top + gridH + BUTTON_DY,
               opacity: p,
               transform: `translateY(${(1 - p) * 10}px)`,
               ...label(20, i ? PAPER : INK),

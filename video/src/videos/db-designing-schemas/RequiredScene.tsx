@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, body, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { ds } from "../../theme/brand";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -158,9 +158,12 @@ export const RequiredScene: React.FC = () => {
                 width: 34,
                 height: 34,
                 borderRadius: "50%",
-                // A tinted disc with no ring, filling solid once the step is done.
-                background: `color-mix(in srgb, ${KEY} ${Math.round(24 + done * 76)}%, ${PAPER})`,
-                color: done > 0.5 ? PAPER : BLUE_INK,
+                boxSizing: "border-box",
+                // A black ring and number on no fill (the owner, 2026-11-13);
+                // the ring darkens to full ink once the step is done, where
+                // the disc used to fill solid.
+                border: `2px solid color-mix(in srgb, ${INK} ${Math.round(40 + done * 60)}%, transparent)`,
+                color: INK,
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",

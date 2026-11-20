@@ -734,11 +734,11 @@ export const DbTable: React.FC<{
             <div style={inner}>
             <span style={{ fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 500, color: isGhost(j) ? ACCENT_INK : INK_SOFT }}>{c}</span>
             {badge && bIn > 0 ? (
-              // The key badge, a blue house badge at 20px: within 12% of the
-              // 22px name.
+              // The key badge at 20px, within 12% of the 22px name: black
+              // border, black text, no fill (the owner, 2026-11-13).
               <span
                 style={{
-                  ...badgeStyle("blue", 20),
+                  ...outlineBadgeStyle("ink", 20),
                   fontFamily: SANS,
                   opacity: bIn,
                   transform: `scale(${0.8 + 0.2 * bIn})`,
