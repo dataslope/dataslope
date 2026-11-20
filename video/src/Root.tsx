@@ -116,6 +116,29 @@ import { BeAlgorithms } from "./videos/be-algorithms/Video";
 import { script as beAlgorithmsScript } from "./videos/be-algorithms/script";
 import { BeAiRound } from "./videos/be-ai-round/Video";
 import { script as beAiRoundScript } from "./videos/be-ai-round/script";
+// Machine Learning Engineer interview questions, one video per part.
+import { MleInterview } from "./videos/mle-interview/Video";
+import { script as mleInterviewScript } from "./videos/mle-interview/script";
+import { MleGeneralization } from "./videos/mle-generalization/Video";
+import { script as mleGeneralizationScript } from "./videos/mle-generalization/script";
+import { MleModels } from "./videos/mle-models/Video";
+import { script as mleModelsScript } from "./videos/mle-models/script";
+import { MleCoding } from "./videos/mle-coding/Video";
+import { script as mleCodingScript } from "./videos/mle-coding/script";
+import { MleStatistics } from "./videos/mle-statistics/Video";
+import { script as mleStatisticsScript } from "./videos/mle-statistics/script";
+import { MleDeepLearning } from "./videos/mle-deep-learning/Video";
+import { script as mleDeepLearningScript } from "./videos/mle-deep-learning/script";
+import { MleNlpLlms } from "./videos/mle-nlp-llms/Video";
+import { script as mleNlpLlmsScript } from "./videos/mle-nlp-llms/script";
+import { MleSystemDesign } from "./videos/mle-system-design/Video";
+import { script as mleSystemDesignScript } from "./videos/mle-system-design/script";
+import { MleMlops } from "./videos/mle-mlops/Video";
+import { script as mleMlopsScript } from "./videos/mle-mlops/script";
+import { MleServingLlms } from "./videos/mle-serving-llms/Video";
+import { script as mleServingLlmsScript } from "./videos/mle-serving-llms/script";
+import { MleLlmEvals } from "./videos/mle-llm-evals/Video";
+import { script as mleLlmEvalsScript } from "./videos/mle-llm-evals/script";
 import { DeInterview } from "./videos/de-interview/Video";
 import { script as deInterviewScript } from "./videos/de-interview/script";
 import { DeSqlPatterns } from "./videos/de-sql-patterns/Video";
@@ -1086,6 +1109,118 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(beAiRoundScript)}
+      />
+    </Folder>
+    <Folder name="Interview-Machine-Learning-Engineer">
+      <Composition
+        id="MachineLearningEngineer-0-Interview"
+        component={MleInterview}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(mleInterviewScript)}
+      />
+      <Composition
+        id="MachineLearningEngineer-1-Generalization"
+        component={MleGeneralization}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(mleGeneralizationScript)}
+      />
+      <Composition
+        id="MachineLearningEngineer-2-Models"
+        component={MleModels}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(mleModelsScript)}
+      />
+      <Composition
+        id="MachineLearningEngineer-3-Coding"
+        component={MleCoding}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(mleCodingScript)}
+      />
+      <Composition
+        id="MachineLearningEngineer-4-Statistics"
+        component={MleStatistics}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(mleStatisticsScript)}
+      />
+      <Composition
+        id="MachineLearningEngineer-5-DeepLearning"
+        component={MleDeepLearning}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(mleDeepLearningScript)}
+      />
+      <Composition
+        id="MachineLearningEngineer-6-NlpAndLlms"
+        component={MleNlpLlms}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(mleNlpLlmsScript)}
+      />
+      <Composition
+        id="MachineLearningEngineer-7-SystemDesign"
+        component={MleSystemDesign}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(mleSystemDesignScript)}
+      />
+      <Composition
+        id="MachineLearningEngineer-8-Mlops"
+        component={MleMlops}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(mleMlopsScript)}
+      />
+      <Composition
+        id="MachineLearningEngineer-9-ServingLlms"
+        component={MleServingLlms}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(mleServingLlmsScript)}
+      />
+      <Composition
+        id="MachineLearningEngineer-10-LlmEvals"
+        component={MleLlmEvals}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(mleLlmEvalsScript)}
       />
     </Folder>
     <Folder name="Interview-Data-Engineer">
