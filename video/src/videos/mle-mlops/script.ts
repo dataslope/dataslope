@@ -537,6 +537,7 @@ export const script: NarrationScript = {
     },
     {
       id: "close",
+      scene: true,
       text: "Versioned, gated, watched and reversible: that's a model you can leave running.",
       pauseAfter: 0.7,
     },

@@ -10,9 +10,9 @@ import results from "./results.json" with { type: "json" };
 export const VIDEO = "mle-mlops";
 
 /** Whether public/images/mle-mlops/ holds the watercolors from
- *  illustrations.json (the walrus and four spots). The builder generates
- *  them and sets this. */
-export const ILLUSTRATIONS = false;
+ *  illustrations.json: the walrus and three spots (the container, the coin
+ *  and the lever). */
+export const ILLUSTRATIONS = true;
 
 /** Pyodide's Python, scikit-learn and NumPy versions the runs used. */
 export const RUNTIME = results.runtime as { python: string; sklearn: string; numpy: string };
