@@ -3,11 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { ColumnRule, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Box, Drift, Wire } from "./parts";
+import { inkOf } from "../../theme/brand";
+import { Box, Drift, READ, Wire } from "./parts";
 
 const COL_X = [120, 700, 1280];
 const COL_W = 480;
@@ -140,20 +141,24 @@ export const ArchScene: React.FC = () => {
                 width={SLOT}
                 height={SLOT}
                 rx={4}
-                fill={`color-mix(in srgb, ${BAR} ${Math.round(85 * on)}%, transparent)`}
-                stroke={on > 0.5 ? BAR : INK}
+                fill={`color-mix(in srgb, ${READ} ${Math.round(85 * on)}%, transparent)`}
+                stroke={on > 0.5 ? inkOf.yellow : INK}
                 strokeWidth={2}
                 opacity={p}
               />
             );
           })}
         </svg>
-        <Note at={noClusterAt + 10} x={COL_X[1] + 20 + 8 * (SLOT + SLOT_GAP) + 16} y={figBottom - h(86)}>
+        {/* A slot is compute, not data: lent slots are lit yellow, never blue. */}
+        <Note at={noClusterAt + 10} x={COL_X[1] + 20 + 8 * (SLOT + SLOT_GAP) + 16} y={figBottom - h(100)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>A pool of slots,</span>
         </Note>
-        <Note at={noClusterAt + 14} x={COL_X[1] + 20 + 8 * (SLOT + SLOT_GAP) + 16} y={figBottom - h(56)}>
+        <Note at={noClusterAt + 12} x={COL_X[1] + 20 + 8 * (SLOT + SLOT_GAP) + 16} y={figBottom - h(70)}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>units of compute,</span>
+        </Note>
+        <Note at={noClusterAt + 14} x={COL_X[1] + 20 + 8 * (SLOT + SLOT_GAP) + 16} y={figBottom - h(40)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            lent to <span style={{ color: BLUE_INK, fontWeight: 500 }}>each query</span>
+            lent to <span style={{ color: INK, fontWeight: 500 }}>each query</span>
           </span>
         </Note>
         <Wire points={[[COL_X[1] + 20 + 4 * (SLOT + SLOT_GAP) - SLOT_GAP / 2, figBottom + 2], [COL_X[1] + 20 + 4 * (SLOT + SLOT_GAP) - SLOT_GAP / 2, storeTop - 2]]} at={byteAt} />

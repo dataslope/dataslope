@@ -92,11 +92,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (green); the page's listing; "24 rows in, 12 out". latest-where: the
  *     same window moved into WHERE, Postgres's error in red: "window
  *     functions are not allowed in WHERE". latest-max: GROUP BY with MAX:
- *     twelve times, no email column (the empty column struck in red).
+ *     twelve times, no email (an empty email column, a red note beside).
  *     latest-tie: customer 3's rows again with the video's own fourth row,
  *     c4@x.com at the same 2024-05-18 16:45:00; under RANK both get 1 and
- *     the count reads 13 (red); under ROW_NUMBER, 12, one of the pair kept
- *     and a "?" on which; the keys spot (two identical keys) beside the
+ *     the count reads 13 (red); under ROW_NUMBER, 12, the pair numbered as
+ *     the run numbered it (c4@x.com 1, though the listing prints it second)
+ *     and "which of the pair is 1?"; the keys spot (two identical keys) beside the
  *     pair. latest-break: "ORDER BY updated_at DESC, <tiebreaker>" with the
  *     slot in yellow. latest-on: DISTINCT ON in one line, its twelve
  *     rows ticked against the first twelve, and the page's engines: Postgres
@@ -124,8 +125,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     unchanged from RANGE, both 425s now red: "the total including the
  *     rest of the day". frame-pick: "ROWS + a unique ORDER BY" (green) and
  *     "RANGE: a span of values" beside it.
- *   lag: QuestionCard 8; the page's SyntaxBreakdown (revenue - LAG(revenue)
- *     OVER (PARTITION BY region ORDER BY month)); the page's 24 months as a
+ *   lag: QuestionCard 8; a SyntaxBreakdown of the expression the page's block
+ *     runs (revenue - LAG(revenue) OVER (ORDER BY month): one series, so no
+ *     PARTITION BY); the page's 24 months as a
  *     line chart, the first month's change "null". lag-season: January
  *     2024's two arrows, one back a month to December's 385 (-285, red),
  *     one back twelve rows to January 2023's 145 (-45). lag-gap: March 2023
@@ -157,15 +159,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     10,000 orders for 500,000.00, each day's order value (200.00, 50.00);
  *     their average, 125.00 (red). ratio-sum: SUM(revenue) /
  *     NULLIF(SUM(orders), 0): 50.01 (green). ratio-store: a model's two
- *     columns, revenue and orders, kept; a ratio column struck.
+ *     columns, revenue and orders, kept; the ratio column faded out.
  *   rapid-in: the RapidFire list, 13 to 19.
  *     r-zero: the video's own three days; gross_revenue / order_count, and
  *     Postgres's "ERROR: division by zero" (red); with NULLIF, 150.00, null,
- *     150.00; with COALESCE, 0 for the empty day.
+ *     150.00, the null kept; a note that COALESCE turns it into 0.
  *     r-rank: DA Part 4's four books (Dune 420, Emma 310, Ulysses 310,
  *     Beloved 150) with three columns: 1 2 3 4; 1 2 2 4; 1 2 2 3, the 4 and
  *     the 3 in yellow; the books spot beside the list.
- *     r-topn: DA Part 4's eight products: ROW_NUMBER <= 2 keeps four rows
+ *     r-topn: DA Part 4's eight products, its listing's window lines and its
+ *     filter: ROW_NUMBER <= 2 keeps four rows
  *     (Emma, not Ulysses); RANK <= 2 keeps five.
  *     r-cte: the page's SyntaxBreakdown (WITH recent AS (SELECT ...) SELECT
  *     * FROM recent), run on the page's updates since May: six rows.
@@ -204,7 +207,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     DISTINCT ON the same twelve rows. The video's own tie, a second row
  *     for customer 3 at 2024-05-18 16:45:00 (c4@x.com): RANK keeps 13 rows,
  *     ROW_NUMBER 12 (it kept c4 in this run; which one is the engine's
- *     choice, so the screen marks it "?").
+ *     choice: the screen numbers the pair as this run did, c4 first).
  *   - "qualify": the page's QUALIFY snippet, refused by Postgres ("syntax
  *     error at or near "ROW_NUMBER""), and run as written (with an ORDER BY
  *     added to print in key order) in DuckDB on the page's table: the same

@@ -65,7 +65,6 @@ export const SplitScene: React.FC = () => {
   const qTextAt = n.word("split", "What makes a modern");
   const sepAt = n.word("split-new", "Storage is separate from compute");
   const vendorsAt = n.word("split-new", "Snowflake, BigQuery and Databricks");
-  const storeAt = n.word("split-new", "cheap object storage");
   const startAt = n.word("split-new", "start compute that reads it");
   const scaleAt = n.word("split-new", "scale query power");
   const movingAt = n.word("split-new", "without moving data");
@@ -88,7 +87,10 @@ export const SplitScene: React.FC = () => {
   const storeH = h(STORE.h);
   const fusedTop = y(FUSED_Y);
   const half = h(FUSED_HALF);
-  const boxAt = [startAt, manyAt + 2, manyAt + 8];
+  // Storage and one cluster are drawn apart as the separation is named; the
+  // cluster's wire to the data comes on "start compute that reads it".
+  const boxAt = [sepAt + 24, manyAt + 2, manyAt + 8];
+  const wireAt = [startAt + 4, manyAt + 6, manyAt + 12];
   const titles = ["Loading", "Dashboards", "Ad hoc"];
   // The size of the first cluster, before and after it is scaled up.
   const scaled = ease(frame, scaleAt, 14);
@@ -98,8 +100,9 @@ export const SplitScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-tap" at={storeAt} level={-33} />
-      <Sfx name="el-tap" at={startAt} level={-33} />
+      <Sfx name="el-tap" at={sepAt + 6} level={-33} />
+      <Sfx name="el-tap" at={sepAt + 24} level={-33} />
+      <Sfx name="el-pencil" at={startAt + 4} level={-35} />
       <Sfx name="el-whoosh" at={scaleAt} level={-36} />
       <Sfx name="el-tap" at={manyAt + 2} level={-34} />
       <Sfx name="el-tap" at={manyAt + 8} level={-34} />
@@ -121,13 +124,13 @@ export const SplitScene: React.FC = () => {
         <Note at={vendorsAt} x={X0} y={y(HEAD_Y) + h(40)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Snowflake, BigQuery, Databricks</span>
         </Note>
-        <Cylinder x={STORE.x} y={storeTop} w={STORE.w} h={storeH} at={storeAt - 2} title="Object storage" tone="data" />
+        <Cylinder x={STORE.x} y={storeTop} w={STORE.w} h={storeH} at={sepAt + 6} title="Object storage" tone="data" />
         {titles.map((t, i) => {
           const cx = BOX_XS[i] + BOX_W / 2;
           const tx = STORE.x + STORE.w * (0.18 + 0.32 * i);
           return (
             <React.Fragment key={t}>
-              <Wire points={[[cx, boxTop + boxH + 4], [tx, storeTop + h(6)]]} at={boxAt[i] + 4} />
+              <Wire points={[[cx, boxTop + boxH + 4], [tx, storeTop + h(6)]]} at={wireAt[i]} />
               <Box
                 x={BOX_XS[i]}
                 y={boxTop}
@@ -135,7 +138,15 @@ export const SplitScene: React.FC = () => {
                 h={boxH}
                 at={boxAt[i]}
                 title="Compute"
-                sub={titles[i]}
+                sub={
+                  i === 0 ? (
+                    <>
+                      {titles[i]}, size <span style={{ fontWeight: 600 }}>{scaled < 0.5 ? "M" : "L"}</span>
+                    </>
+                  ) : (
+                    titles[i]
+                  )
+                }
                 tones={[{ at: leaveAt, tone: i === 2 ? "look" : "off" }]}
                 scale={i === 0 ? 1 + 0.12 * scaled : 1}
               />

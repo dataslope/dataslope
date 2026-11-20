@@ -75,7 +75,7 @@ export const OltpScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-tap" at={pgAt} level={-34} />
+      <Sfx name="el-tap" at={smallAt - 4} level={-34} />
       <Sfx name="el-sprinkle" at={smallAt + 2} level={-34} />
       <Sfx name="el-sprinkle" at={whAt} level={-34} />
       <Sfx name="el-pencil" at={scansAt + 4} level={-35} />
@@ -103,10 +103,22 @@ export const OltpScene: React.FC = () => {
             Strict consistency<span style={{ opacity: ease(frame, byRowAt, 10) }}>, stored by row</span>
           </span>
         </Note>
-        <Box x={CHIP.x} y={mid - h(CHIP.h) / 2} w={CHIP.w} h={h(CHIP.h)} at={pgAt - 2} title="App" icon={AppWindow} size={24} sub="Postgres" />
+        {/* The app and its rows come first, so the requests below have a
+            source and a target; "Postgres" inks in when it is named. */}
+        <Box
+          x={CHIP.x}
+          y={mid - h(CHIP.h) / 2}
+          w={CHIP.w}
+          h={h(CHIP.h)}
+          at={smallAt - 4}
+          title="App"
+          icon={AppWindow}
+          size={24}
+          sub={<span style={{ opacity: ease(frame, pgAt, 10) }}>Postgres</span>}
+        />
         {Array.from({ length: ROWS }, (_, r) =>
           cols.map((c, j) => {
-            const p = ease(frame, pgAt + r * 2 + j * 0.5, 10);
+            const p = ease(frame, smallAt + r * 2 + j * 0.5, 10);
             if (p <= 0) return null;
             return (
               <div
@@ -127,7 +139,7 @@ export const OltpScene: React.FC = () => {
           }),
         )}
         {order.map((r, k) => {
-          const at = smallAt + 4 + k * 5;
+          const at = smallAt + 14 + k * 5;
           const slow = heavy > 0.5;
           return (
             <Flow

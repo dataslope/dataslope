@@ -226,15 +226,31 @@ export const ColsScene: React.FC = () => {
             </div>
           ))}
         </div>
-        <div style={{ position: "absolute", left: DICT_X + 200, top: cmpTop(0) - h(46), opacity: ease(frame, encodedAt + 6, 12) }}>
-          <div style={{ ...label(21, INK_SOFT), marginBottom: 8, whiteSpace: "nowrap" }}>Rows</div>
+        {/* The codes the rows store, in row order: one run under the
+            dictionary, not a column beside it, so they cannot be read as
+            its mapping. */}
+        <div
+          style={{
+            position: "absolute",
+            left: DICT_X,
+            top: cmpTop(0) - h(46) + 37 + REGIONS.length * h(30) + h(16),
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            fontFamily: MONO,
+            fontSize: 21,
+            color: INK,
+            whiteSpace: "nowrap",
+            opacity: ease(frame, encodedAt + 6, 12),
+          }}
+        >
+          <span style={{ ...label(21, INK_SOFT), marginRight: 6 }}>Each row, a code:</span>
           {rows.map((r, i) => (
-            <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", height: h(30), fontFamily: MONO, fontSize: 21, color: INK, whiteSpace: "nowrap" }}>
-              <span style={{ display: "inline-block", minWidth: 26, padding: "0 6px", borderRadius: 4, background: COLUMN_TINT.region, textAlign: "center" }}>
-                {REGIONS.indexOf(r[regionCol])}
-              </span>
-            </div>
+            <span key={i} style={{ display: "inline-block", minWidth: 26, padding: "0 6px", borderRadius: 4, background: COLUMN_TINT.region, textAlign: "center" }}>
+              {REGIONS.indexOf(r[regionCol])}
+            </span>
           ))}
+          <span style={{ color: INK_SOFT }}>…</span>
         </div>
 
         {/* ── What each is for ── */}

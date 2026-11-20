@@ -18,7 +18,8 @@ const LOW_Y = 630;
 const BAR_X = 520;
 const PX_PER_KB = 0.8;
 const FLOW_Y = 790;
-const NEW_NAME = "Home & Garden";
+/** The new name from check.mjs's rename (one no other category is part of). */
+const NEW_NAME = OBT.rename.newName;
 
 /**
  * Question 10, with the modeling page's one-big-table question as the card's
