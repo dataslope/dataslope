@@ -106,7 +106,7 @@ export const ImbScene: React.FC = () => {
       {steps.map((s) => (
         <Sfx key={s.text} name="el-pop" at={s.at + 2} level={-32} />
       ))}
-      <Sfx name="el-chime" at={end + 6} level={-34} />
+      <Sfx name="el-chime" at={end} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.016}>
         <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE}>

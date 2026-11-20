@@ -130,7 +130,7 @@ export const RegScene: React.FC = () => {
       <Sfx name="el-tap" at={oneAt} level={-32} />
       <Sfx name="el-tap" at={groupAt} level={-32} />
       <Sfx name="el-whoosh" at={mapAt - 2} level={-37} />
-      <Sfx name="el-chime" at={honestAt + 10} level={-34} />
+      <Sfx name="el-chime" at={end} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.016}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} out={mapAt - 6} size={Q_SIZE}>

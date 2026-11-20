@@ -107,7 +107,7 @@ export const CvScene: React.FC = () => {
       <Sfx name="el-tap" at={fiftyAt} level={-30} />
       <Sfx name="el-pencil" at={timeAt} level={-35} />
       <Sfx name="el-whoosh" at={mapAt - 2} level={-37} />
-      <Sfx name="el-chime" at={whichAt + 8} level={-34} />
+      <Sfx name="el-chime" at={end} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.016}>
         <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} out={mapAt - 6} size={Q_SIZE}>

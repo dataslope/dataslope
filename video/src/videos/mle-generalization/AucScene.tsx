@@ -70,11 +70,11 @@ export const AucScene: React.FC = () => {
       <Sfx name="el-pencil" at={everyAt} level={-35} />
       <Sfx name="el-whoosh" at={areaAt} level={-37} />
       <Sfx name="el-tap" at={nineOneAt} level={-30} />
-      <Sfx name="el-pop" at={onePctAt + 2} level={-30} />
+      <Sfx name="el-pop" at={onePctAt + 2} level={-34} />
       <Sfx name="el-pencil" at={prAt + 6} level={-35} />
       <Sfx name="el-tap" at={fourSixAt} level={-30} />
       <Sfx name="el-tap" at={reportAt} level={-30} />
-      <Sfx name="el-chime" at={end + 6} level={-34} />
+      <Sfx name="el-chime" at={end} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.016}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE}>

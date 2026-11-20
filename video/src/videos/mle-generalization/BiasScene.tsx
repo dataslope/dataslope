@@ -187,7 +187,7 @@ export const BiasScene: React.FC = () => {
       <Sfx name="el-pop" at={threeAt + 2} level={-30} />
       <Sfx name="el-tap" at={fallsAt} level={-30} />
       <Sfx name="el-tap" at={notAt} level={-30} />
-      <Sfx name="el-chime" at={end + 4} level={-34} />
+      <Sfx name="el-chime" at={end} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.016}>
         <QuestionCard n={1} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE}>

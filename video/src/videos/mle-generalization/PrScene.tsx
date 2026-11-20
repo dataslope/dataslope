@@ -107,7 +107,7 @@ export const PrScene: React.FC = () => {
       <Sfx name="el-tap" at={blocksAt} level={-34} />
       <Sfx name="el-tap" at={lossAt} level={-34} />
       <Sfx name="el-pop" at={catchesAt} level={-30} />
-      <Sfx name="el-chime" at={end + 6} level={-34} />
+      <Sfx name="el-chime" at={end} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.016}>
         <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE}>

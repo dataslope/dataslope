@@ -102,12 +102,12 @@ export const SplitScene: React.FC = () => {
       ))}
       <Sfx name="el-tap" at={coinAt} level={-32} />
       <Sfx name="el-sprinkle" at={fiftyAt} level={-36} />
-      <Sfx name="el-pop" at={bestAt + 2} level={-30} />
+      <Sfx name="el-pop" at={bestAt + 2} level={-33} />
       <Sfx name="el-whoosh" at={repeatsAt} level={-37} />
       <Sfx name="el-tap" at={sixtyAt} level={-30} />
       <Sfx name="el-tap" at={testFiftyAt + 4} level={-30} />
       <Sfx name="el-pencil" at={timeAt} level={-35} />
-      <Sfx name="el-chime" at={end + 6} level={-34} />
+      <Sfx name="el-chime" at={end} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.016}>
         <QuestionCard n={5} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE}>

@@ -81,7 +81,7 @@ export const LeakScene: React.FC = () => {
       <Sfx name="el-whoosh" at={fitAt - 4} level={-37} />
       <Sfx name="el-tap" at={refundAt} level={-32} />
       <Sfx name="el-tap" at={totalAt} level={-32} />
-      <Sfx name="el-chime" at={end + 6} level={-34} />
+      <Sfx name="el-chime" at={end} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.016}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE} width={1400}>

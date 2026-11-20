@@ -257,8 +257,8 @@ export const RapidScene: React.FC = () => {
       {items.map((item) => (
         <Sfx key={item.n} name="el-tap" at={item.at} level={-32} />
       ))}
-      <Sfx name="el-pop" at={nextFrom + 2} level={-30} />
-      <Sfx name="el-chime" at={nextAt + 4} level={-32} />
+      <Sfx name="el-pop" at={nextFrom + 2} level={-34} />
+      <Sfx name="el-chime" at={end} level={-32} />
 
       <Drift from={from} to={end + 40} scale={0.014}>
         <Kicker at={from} out={nextFrom - 4}>
