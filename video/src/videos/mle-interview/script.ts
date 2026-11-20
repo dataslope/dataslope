@@ -118,9 +118,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Written for Drew's ear: ML, LLM, AI, GPU and NLP in plain caps (LLM is
  * expanded once, in "hook-both", the first time it is said outside the
  * quoted prompt: expanding it inside "hook-now" would break the prompt's
- * own words); MLOps is listed
- * for the lexicon ("em el ops"), and CI/CD too (letters, "C I C D", so the
- * slash is not read); NumPy and pandas as written; no sentence opens with
+ * own words); MLOps is in the lexicon ("em-el-ops"); CI/CD is written "CI
+ * CD" in the narration only (two plain-caps initialisms, so the voice reads
+ * the letters and no slash, as Part 8 does), and stays "CI/CD" on screen
+ * and in check.mjs's page quote; NumPy and pandas as written; no sentence opens with
  * "A" before an initialism; numbers as they are said.
  */
 export const script: NarrationScript = {
@@ -158,7 +159,7 @@ export const script: NarrationScript = {
     },
     {
       id: "rounds-ops",
-      text: "System design: training and serving pipelines, feature stores, batch or online inference, monitoring and drift. And MLOps: reproducibility, versioning data and models, CI/CD, latency and cost.",
+      text: "System design: training and serving pipelines, feature stores, batch or online inference, monitoring and drift. And MLOps: reproducibility, versioning data and models, CI CD, latency and cost.",
       pauseAfter: 0.6,
     },
     {

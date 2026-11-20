@@ -153,7 +153,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   r-knn: "n·d" over a wide bar, "n log n" and "n log k" over shorter ones
  *     (RAPID.knn.ms, the distances' bar the longest); "KD-tree · ball tree ·
  *     HNSW" on "index".
- *   next: <NextLine> "Next: statistics and probability" on "Statistics".
+ *   next: <NextLine> "Next: statistics and probability" on "Next" (not on
+ *     "Statistics", which the beat says first in "Statistics says").
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a
  * cue whose word disappears throws in the Studio rather than silently

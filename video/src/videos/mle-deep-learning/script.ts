@@ -221,7 +221,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     figure holds under them until the cut.
  *   next: one row of tokens with every position joined to every other in one
  *     step (yellow lines), all lit at once; the orangutan; <NextLine> "Next:
- *     NLP and LLMs" on "Next".
+ *     NLP and LLMs" on "Next" (Part 6's title in series.ts; only the
+ *     narration expands it, "NLP and large language models").
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
