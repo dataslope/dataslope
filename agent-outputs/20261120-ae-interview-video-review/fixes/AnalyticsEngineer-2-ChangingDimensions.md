@@ -32,6 +32,17 @@ No change to `check.mjs`, `results.json` or `data.ts`. `results.json` is byte-id
 
 ## Checks (on the final code, through `out/entries/AnalyticsEngineer-2-ChangingDimensions.tsx` and the queue)
 
-CHECKS_PLACEHOLDER
+| Check | Result |
+| --- | --- |
+| `tsc --noEmit`, errors in this folder | none |
+| `eslint src/videos/ae-changing-dimensions` | pass |
+| `check:cues` | nothing in this folder (its failures are in `ae-testing`) |
+| `npm test` | 77 pass, 2 fail. Both failures are the cue tests, and every line they list belongs to another video (`ae-ai-semantic-layer`, `ae-facts-and-grain`, `ae-incremental`, `ae-testing`). None names this folder. |
+| `check:frames` (`CHECK_SCALE=1`) | pass: 2 images, 5 arrows, spacing, one size and one family per line, tabular figures |
+| `check:motion` | pass: 8:04.8 checked, no still stretch of 2 s or more |
+| `check:sync` | pass: 38 beats, worst +0.03 s (`late-fact`); `next` −0.00, `next-dbt` +0.02 |
+| `check:mix` | pass: speech a median 29.9 dB over the effects (5th percentile 14.1 dB) |
+
+The WAVs and the preview the checks left in `video/out/` are deleted.
 
 Stills looked at, rendered from the final code: 66 (legend), 131.5 (join titles aligned, new title), 141.5 (load result, new label), 150.5 (trap with no dots), 231.5 and 241 (snapshot stamps, table clears the camera), 277.6 (flow box and the null line), 419.5 (no "Today's total" under the restatement), 440.5 (Type 0 note under its column), 474.5 and 481 (bridge heading, NextLine). Each of them is in `video/out/review/AnalyticsEngineer-2-ChangingDimensions/`.
