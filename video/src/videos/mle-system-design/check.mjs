@@ -93,7 +93,7 @@ const QUOTES = [
   [MSD, "you collect labels by observing the outcome triggered by the model's prediction (click, purchase, fraud confirmed)"],
   [MSD, "delayed labels (purchase happens days later)"],
   [MSD, "survivorship bias (you only see outcomes for requests the model acted on)"],
-  [MSD, "label shift (the model's actions change future distribution)"],
+  [MSD, "feedback-induced shift (the model's actions change the data it is later trained and evaluated on)"],
   [MSD, "Careful logging and held-out exploration help mitigate these"],
   // Question 9.
   [MSD, "velocity features (number of transactions in last 1 h / 24 h)"],

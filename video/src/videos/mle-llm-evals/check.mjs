@@ -117,7 +117,8 @@ const quotes = [
   "many are saturated, and their\ntest items may have leaked into training data",
   "connecting offline scores to online outcomes",
   "Only after you have measured it.",
-  "**position** (favoring the first answer shown),\n**verbosity** (favoring longer answers), and **self-enhancement** (favoring\ntext from their own model family)",
+  "**position** (favoring the first answer shown), **verbosity**\n(favoring longer answers), and **self-enhancement** (favoring their own\nanswers)",
+  "They found the first two clearly; their evidence on the third was\ninconclusive, though it is still worth guarding against.",
   "Score each pair in both orders and count a win only when the verdicts agree.",
   "Use a specific rubric with pass/fail criteria rather than a 1-to-10 score.",
   "Use a judge from a different model family than the system under test.",
@@ -135,8 +136,9 @@ const quotes = [
   "Tool calling lets a model request an action instead of answering",
   "a tool name and JSON arguments), the application runs it, and\nthe result goes back into the context for the next step",
   "An **agent** is that\nloop, repeated until the model decides it is done.",
-  "open standard for exposing tools and data sources to models, so one\nintegration serves many clients",
+  "Open protocols standardize\nboth edges of it: the Model Context Protocol (MCP) exposes tools and data\nsources to a model, so one integration serves many clients",
   "a step and cost budget; timeouts and\nretries per tool; idempotent tools, since a step may run twice; permissions\nscoped to the user; and a trace of every step for debugging",
+  "Add prompt\ninjection to that list: a tool result or a retrieved document is untrusted\ninput that the model may follow as instructions, so an agent that reads\noutside content should not also hold tools that can do damage unconfirmed",
   "$0.95^{10} \\approx 60\\%$",
   "Fewer, more reliable steps beat a\nclever long chain.",
   "did the ticket get filed, do the tests pass, is\nthe database in the expected state?",
@@ -149,7 +151,7 @@ const quotes = [
   "the question that\n  separates candidates who have shipped from those who have only prototyped",
 ];
 for (const q of quotes) check(page.includes(q), `${PAGE} no longer says: ${q}`);
-check(page.includes("Zheng et al. documented three systematic\nbiases in LLM judges"), `${PAGE} no longer credits the judge biases to Zheng et al.`);
+check(page.includes("Zheng et al. tested LLM judges for three\nbiases"), `${PAGE} no longer credits the judge biases to Zheng et al.`);
 check(page.includes("The τ-bench authors distinguish"), `${PAGE} no longer credits pass^k to the τ-bench authors`);
 
 // ── What the narration says, checked against the numbers ────────────────────

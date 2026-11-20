@@ -73,7 +73,6 @@ const Blocks: React.FC<{ x: number; top: number; height: number; at: number; tra
           left: x + (lockSpan * (BLOCK_W + BLOCK_GAP) - BLOCK_GAP) / 2 - 16,
           top: top + height / 2 - 16,
           opacity: lock,
-          transition: "none",
         }}
       >
         <Lock size={32} color={INK} strokeWidth={2.2} />
@@ -138,7 +137,7 @@ const Softmax: React.FC<{ c: Ctx }> = ({ c }) => {
   const topsAt = c.w("r-softmax", "tops out at twenty-three percent");
   const lossAt = c.w("r-softmax", "can't drop below");
   const rowA = c.y(352);
-  const rowB = c.y(590);
+  const rowB = c.y(626);
   const BH = c.h(50);
   const pipe = (top: number, at: number, extra: boolean) => {
     const xs = extra
@@ -187,8 +186,8 @@ const Softmax: React.FC<{ c: Ctx }> = ({ c }) => {
   // Ten classes after a second softmax: the right one capped, the rest level.
   const best = DOUBLE_SOFTMAX.bestP;
   const rest = (1 - best) / (DOUBLE_SOFTMAX.classes - 1);
-  const barTop = c.y(690);
-  const BAR_MAX = c.h(150);
+  const barTop = c.y(712);
+  const BAR_MAX = c.h(128);
   const bars = Array.from({ length: DOUBLE_SOFTMAX.classes }, (_, k) => (k === 0 ? best : rest));
   return (
     <>
@@ -203,11 +202,11 @@ const Softmax: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={wrongAt} x={R_X} y={rowA + c.h(92)} size={22} color={INK_SOFT}>
         Largest when the model is confidently wrong
       </Line>
-      <Line at={fuseAt} x={R_X} y={rowA + c.h(140)} size={24} color={OK_INK}>
+      <Line at={fuseAt} x={R_X} y={rowA + c.h(136)} size={24} color={OK_INK}>
         <Mark at={fuseAt + 4}>Libraries fuse the two, on raw logits</Mark>
       </Line>
 
-      <Line at={firstAt} x={R_X} y={rowB - c.h(56)} size={22} color={ACCENT_INK}>
+      <Line at={firstAt} x={R_X} y={rowB - c.h(62)} size={22} color={ACCENT_INK}>
         Softmax applied first, so twice
       </Line>
       {pipe(rowB, firstAt + 4, true)}

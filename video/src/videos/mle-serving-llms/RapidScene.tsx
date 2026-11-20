@@ -136,6 +136,8 @@ export const RapidScene: React.FC = () => {
   const fourAt = n.word("rapid-in", "Four more levers");
   const lineAt = n.word("rapid-in", "one line each");
   const end = n.beat("r-stream").to;
+  /** The last lever stays current until the cut, so the page never empties. */
+  const cutAt = n.beat("close").from;
 
   const items: RapidItem[] = [
     { n: 1, label: "Prefix caching", beat: "r-prefix", body: <Prefix c={c} /> },
@@ -154,7 +156,7 @@ export const RapidScene: React.FC = () => {
       <Drift from={from} to={end + 40}>
         <Kicker at={fourAt - 6}>Other levers worth naming</Kicker>
         <Headline lead="Four more levers," turn="one line each" at={fourAt - 4} turnAt={lineAt - 2} size={60} />
-        <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={fourAt + 6} end={end + 20} />
+        <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={fourAt + 6} end={cutAt} />
       </Drift>
     </AbsoluteFill>
   );

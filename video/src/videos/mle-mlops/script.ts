@@ -155,8 +155,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     × ln(current / training)", each term lit as said.
  *   q9-example: the bars for the slight shift (results.json psi
  *     stableShares) and the large one (driftedShares), "0.01" and "1.4"
- *     under them; then a scale from 0 to 0.3 with ticks at 0.1 ("stable")
- *     and 0.2 ("needs action"), labelled "conventions".
+ *     under them; then (q9-conv) a scale from 0 to 0.4 with ticks at 0.1
+ *     ("stable") and 0.25 ("needs action", the page's line since #746),
+ *     labelled "conventions".
  *   q9-labels: per-feature monitors in a column, "PSI · KS" beside each and
  *     one for "predictions"; "warning, not proof" in yellow; then three
  *     badges under it, "delayed labels", "audits", "randomized slice", in
@@ -169,7 +170,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     wall at the training maximum; a fifth of the window's dots arrive
  *     beyond it and vanish, "closed edges: 0.03" in red; the wall opens
  *     into an arrow to infinity and the dots land in the last bucket, "open
- *     edges: 0.25" in green (results.json psiEdges).
+ *     edges: 0.25" in green (q9-open), "right at the action line"
+ *     (results.json psiEdges).
  *   q11: question card; "In stages" writes the loop's ship stage as three
  *     steps. q11-shadow: traffic as a band of arrows into the current
  *     model, "returned to users"; on "shadow", a mirrored copy of the band
@@ -195,8 +197,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     crown on "beating it on live traffic".
  *   rapid-in: the quick round's five numbered rows (RapidFire), 13 to 17.
  *   r-registry: a shelf of versioned artifacts, each with a tag of data
- *     version, hyperparameters, metrics and history; "staging →
- *     production" as two shelf labels; "rollback = lookup" in green.
+ *     version, hyperparameters, metrics and history; r-registry-promo:
+ *     "staging → production" and a "champion" alias moving to the new
+ *     version; "rollback = lookup" in green.
  *   r-retrain: four trigger icons (a calendar, a drift alarm, a falling
  *     line, a stack of new labels), each lit as named, all feeding one
  *     arrow through the gate from q4.
@@ -271,7 +274,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     against a reference of 1,000: a window of 100 scores over 0.1 in 46%
  *     of tries, a window of 1,000 in none. The edges: a window of 1,000
  *     with 200 values beyond the reference's maximum scores 0.03 with
- *     closed edges and 0.25 with open ones.
+ *     closed edges and 0.25 with open ones (0.2471: at the pages' action
+ *     line of 0.25, which #746 moved up from 0.2; said "right at the line").
  *     The page's compute_psi used to bin the current values on the
  *     reference's percentiles, from its minimum to its maximum, and
  *     np.histogram drops values outside that range: in the page's own
@@ -287,7 +291,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     champion and challenger: mlops. "Nobody can click a recommendation
  *     they were never shown" is the page's "users only see the champion's
  *     predictions" applied to a recommender.
- *   - quick: the pages' answers.
+ *   - quick: the pages' answers. The registry "supports a promotion
+ *     workflow (staging → production, often by moving an alias such as
+ *     `champion` to a new version)": both pages since #746, which dropped
+ *     "enforces".
  *
  * Written for Drew's ear: ML, A B, DVC, PSI, CI/CD and LLMs in plain caps,
  * with MLOps, CI/CD, MLflow and ONNX listed in the report for the lexicon
@@ -448,7 +455,14 @@ export const script: NarrationScript = {
     },
     {
       id: "q9-example",
-      text: "In a simulation, a slight shift scores point oh one, and a large one, one point four. Under point one is called stable, and over point two needs action, but those are conventions, not significance tests.",
+      text: "In a simulation, a slight shift scores point oh one, and a large one, one point four.",
+      pauseAfter: 0.4,
+    },
+    {
+      // Split from q9-example when the page moved its action line from 0.2
+      // to 0.25 (#746): only this sentence was voiced again.
+      id: "q9-conv",
+      text: "Under point one is called stable, and over point two five needs action, but those are conventions, not significance tests.",
       pauseAfter: 0.6,
     },
     {
@@ -463,7 +477,14 @@ export const script: NarrationScript = {
     },
     {
       id: "q9-edges",
-      text: "And leave the outer buckets open. Edges cut at the training minimum and maximum drop anything beyond them from the count. Simulate a fifth of values arriving past anything seen in training: closed edges read point oh three, stable. Open ones read point two five.",
+      text: "And leave the outer buckets open. Edges cut at the training minimum and maximum drop anything beyond them from the count. Simulate a fifth of values arriving past anything seen in training: closed edges read point oh three, stable.",
+      pauseAfter: 0.4,
+    },
+    {
+      // Split from q9-edges when the action line moved to 0.25 (#746): the
+      // open edges' 0.2471 now sits at it rather than past it.
+      id: "q9-open",
+      text: "Open ones read point two five, right at the line for action.",
       pauseAfter: 0.8,
     },
 
@@ -512,7 +533,14 @@ export const script: NarrationScript = {
     { id: "rapid-in", scene: true, text: "Five more, quickly.", pauseAfter: 0.5 },
     {
       id: "r-registry",
-      text: "A model registry versions trained artifacts with their metadata: the data version, hyperparameters, evaluation metrics and deployment history. It enforces promotion from staging to production, and turns a rollback into a lookup rather than a rebuild.",
+      text: "A model registry versions trained artifacts with their metadata: the data version, hyperparameters, evaluation metrics and deployment history.",
+      pauseAfter: 0.4,
+    },
+    {
+      // Split from r-registry when the pages stopped saying a registry
+      // "enforces" promotion (#746): only this sentence was voiced again.
+      id: "r-registry-promo",
+      text: "It supports promotion from staging to production, often by moving an alias such as champion to the new version, and turns a rollback into a lookup rather than a rebuild.",
       pauseAfter: 0.6,
     },
     {

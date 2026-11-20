@@ -404,24 +404,24 @@ export const KvScene: React.FC = () => {
 
         {/* ── The count, then the long context, then grouped-query attention ── */}
         <Clear at={elevenAt - 4}>
-          <Line at={fitAt} x={barX} y={y(820)} size={32}>
+          <Line at={fitAt} x={barX} y={y(806)} size={32}>
             At most <b style={{ color: BLUE_INK, fontWeight: 600 }}><Num>{KV.fit8k}</Num></b> requests of <Num>8</Num>K tokens
           </Line>
         </Clear>
         <Clear at={gqaAt - 4}>
-          <Line at={elevenAt} x={barX} y={y(820)} size={32}>
+          <Line at={elevenAt} x={barX} y={y(806)} size={32}>
             At <Num>128</Num>K tokens each: <b style={{ color: BLUE_INK, fontWeight: 600 }}><Num>{KV.fit128k}</Num></b>
           </Line>
         </Clear>
-        <Line at={memAt} x={barX} y={y(884)} size={32}>
+        <Line at={memAt} x={barX} y={y(866)} size={32}>
           <MarkAt amount={Math.max(ease(frame, goesAt, 12) * (1 - ease(frame, gqaAt, 12)), ease(frame, capsAt, 12))}>Memory caps concurrency</MarkAt>
         </Line>
         <Enter at={gqaAt}>
-          <Line at={gqaAt} x={barX} y={y(820)} size={30} color={OK_INK}>
+          <Line at={gqaAt} x={barX} y={y(806)} size={30} color={OK_INK}>
             <Num>{KV.kvHeads}</Num> KV heads (grouped-query): <b style={{ fontWeight: 600 }}><Num>{KV.fit8k}</Num></b>
           </Line>
-          <VRule x={barX + 640} top={y(816)} bottom={y(868)} at={t23At} />
-          <Line at={t23At} x={barX + 700} y={y(820)} size={30} color={INK}>
+          <VRule x={barX + 640} top={y(802)} bottom={y(854)} at={t23At} />
+          <Line at={t23At} x={barX + 700} y={y(806)} size={30} color={INK}>
             <Num>{KV.queryHeads}</Num> KV heads: <b style={{ fontWeight: 600 }}><Num>{KV.fitNoGqa8k}</Num></b>
             <span style={{ color: INK_SOFT, opacity: ease(frame, not186At, 12) }}> requests of <Num>8</Num>K tokens</span>
           </Line>
@@ -431,11 +431,11 @@ export const KvScene: React.FC = () => {
         <Enter at={gqaAt}>
           <Svg>
             {Array.from({ length: 4 }, (_, i) => {
-              const qx = 1500 + i * 80;
+              const qx = 1480 + i * 80;
               const p = ease(frame, gqaAt + 4 + i * 3, 10);
               const lp = ease(frame, shareAt + i * 3, 12);
               const ly = y(300) + 56;
-              const tx = 1650;
+              const tx = 1630;
               const ty = y(420) - 2;
               return (
                 <g key={i}>
@@ -444,14 +444,14 @@ export const KvScene: React.FC = () => {
                 </g>
               );
             })}
-            <rect x={1582} y={y(420)} width={136} height={54} rx={8} fill="none" stroke={OK} strokeWidth={2} opacity={ease(frame, shareAt, 12)} />
+            <rect x={1562} y={y(420)} width={136} height={54} rx={8} fill="none" stroke={OK} strokeWidth={2} opacity={ease(frame, shareAt, 12)} />
           </Svg>
           {Array.from({ length: 4 }, (_, i) => (
             <div
               key={i}
               style={{
                 position: "absolute",
-                left: 1500 + i * 80,
+                left: 1480 + i * 80,
                 top: y(300),
                 width: 60,
                 height: 54,
@@ -469,7 +469,7 @@ export const KvScene: React.FC = () => {
           <div
             style={{
               position: "absolute",
-              left: 1582,
+              left: 1562,
               top: y(420),
               width: 136,
               height: 54,
@@ -483,7 +483,7 @@ export const KvScene: React.FC = () => {
           >
             K, V
           </div>
-          <Line at={shareAt + 10} x={1650} width={400} align="center" y={y(420) + 66} size={22} color={INK_SOFT}>
+          <Line at={shareAt + 10} x={1630} width={400} align="center" y={y(420) + 66} size={22} color={INK_SOFT}>
             one shared key and value head
           </Line>
         </Enter>

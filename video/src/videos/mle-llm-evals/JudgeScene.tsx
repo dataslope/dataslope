@@ -91,7 +91,8 @@ const SplitBar: React.FC<{
 
 /**
  * Question 2. The answer first ("only after you've measured it"), then the
- * three biases Zheng and colleagues documented, each named as said. The
+ * three biases Zheng and colleagues tested, each named as said, the third
+ * marked inconclusive in grey as the page now says. The
  * page's position case worked in numbers: two bars split by winner, A in the
  * data blue and B in its light step in both, the first-shown share underlined
  * in yellow, so the eye sees the first-shown answer win about two thirds of
@@ -112,14 +113,17 @@ export const JudgeScene: React.FC = () => {
   const onlyAt = n.word("q2", "Only after");
 
   const zhengAt = n.word("q2-bias", "Zheng and colleagues");
+  /** The page (after #746): the first two found clearly, the third
+   *  inconclusive, so it reads as a guard, not a finding. */
+  const unsureAt = n.word("q2-bias", "the third was inconclusive");
   const biases = [
     { name: "Position", rest: "the answer shown first", at: n.word("q2-bias", "position"), restAt: n.word("q2-bias", "the answer shown first") },
     { name: "Verbosity", rest: "the longer answer", at: n.word("q2-bias", "verbosity"), restAt: n.word("q2-bias", "the longer one") },
     {
       name: "Self-enhancement",
-      rest: "its own model family",
+      rest: "its own answers",
       at: n.word("q2-bias", "self-enhancement"),
-      restAt: n.word("q2-bias", "its own model family"),
+      restAt: n.word("q2-bias", "favoring its own answers"),
     },
   ];
 
@@ -188,10 +192,16 @@ export const JudgeScene: React.FC = () => {
 
         {/* The three biases, each named as said. */}
         {biases.map((b, i) => {
+          const quiet = i === 2 ? ease(frame, unsureAt + 4, 14) : 0;
           const words = (
-            <>
+            <span style={{ color: quiet > 0 ? `color-mix(in srgb, ${INK_SOFT} ${Math.round(quiet * 100)}%, ${INK})` : undefined }}>
               <b>{b.name}:</b> <Fade at={b.restAt}>favors {b.rest}</Fade>
-            </>
+              {i === 2 ? (
+                <span style={{ color: INK_SOFT, fontWeight: 500 }}>
+                  <Fade at={unsureAt + 4}> · inconclusive</Fade>
+                </span>
+              ) : null}
+            </span>
           );
           return (
             <Line key={b.name} x={X0} y={ry(i) - 17} at={b.at - 2} size={26} style={i === 0 ? { marginLeft: "-0.14em" } : undefined}>

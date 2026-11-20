@@ -12,6 +12,7 @@ import { KV, QUANT, SPECULATIVE } from "./data";
 import {
   ACCENT_INK,
   Box,
+  OK,
   Bracket,
   CACHE,
   Clear,
@@ -95,8 +96,8 @@ export const QuantScene: React.FC = () => {
   const clearA = specAt - 8;
 
   // ── Part A: the weights at 16, 8 and 4 bits ──
-  const blockTop = y(334);
-  const blockH = h(70);
+  const blockTop = y(332);
+  const blockH = h(104);
   const widths = [QUANT.weights16GB, QUANT.weights8GB, QUANT.weights4GB].map((gb) => gb * PX_BLOCK);
   const bx = [X0, X0 + widths[0] + 80, X0 + widths[0] + widths[1] + 160];
   const blockAt = [storesAt, bitsAt, bitsAt + 8];
@@ -115,12 +116,12 @@ export const QuantScene: React.FC = () => {
   const gbAt = [w140At, w35At + 6, w35At];
 
   // One GPU: 4-bit weights and 16 requests, beside 16-bit weights that overflow it.
-  const gpuTop = y(574);
+  const gpuTop = y(622);
   const gpuH = h(60);
   const gpuW = KV.gpuGB * PX_GPU;
   const gpu2X = 860;
   const cellW = (KV.per8kBytes / 1e9) * PX_GPU;
-  const riskTop = y(740);
+  const riskTop = y(756);
 
   // ── Part B: a draft, checked in one pass ──
   const draftY = y(330);
@@ -178,29 +179,29 @@ export const QuantScene: React.FC = () => {
               {g}
             </Line>
           ))}
-          <Line at={kvAt} x={bx[2] + widths[2] + 60} y={blockTop + h(8)} size={22} color={INK_SOFT}>
+          <Line at={kvAt} x={bx[2] + widths[2] + 60} y={blockTop + h(18)} size={22} color={INK_SOFT}>
             The weights,
           </Line>
-          <Line at={kvAt + 4} x={bx[2] + widths[2] + 60} y={blockTop + h(40)} size={22} color={INK_SOFT}>
+          <Line at={kvAt + 4} x={bx[2] + widths[2] + 60} y={blockTop + h(52)} size={22} color={INK_SOFT}>
             sometimes the KV cache
           </Line>
-          <Line at={quarterAt} x={X0} y={y(474)} size={26} color={INK}>
+          <Line at={quarterAt} x={X0} y={y(512)} size={26} color={INK}>
             Decode is bandwidth-bound: at <Num>4</Num> bits, each step reads <Mark at={quarterAt + 4}>¼ of the weight bytes</Mark>
           </Line>
-          <Line at={bandAt} x={X0} y={y(474)} size={26} color={INK} out={quarterAt - 4}>
+          <Line at={bandAt} x={X0} y={y(512)} size={26} color={INK} out={quarterAt - 4}>
             Decode is bandwidth-bound:<span style={{ opacity: ease(frame, fasterAt, 10) }}> fewer bytes, faster as well as smaller</span>
           </Line>
 
           {/* One GPU: 35 GB of weights and sixteen 8K requests; 140 GB does not fit. */}
-          <Line at={fitAt} x={X0} y={gpuTop - h(42)} size={24} color={INK}>
+          <Line at={w35At} x={X0} y={gpuTop - h(42)} size={24} color={INK}>
             One <Num>{KV.gpuGB}</Num> GB GPU, <Num>4</Num>-bit weights
           </Line>
-          <Line at={fitAt + 10} x={gpu2X} y={gpuTop - h(42)} size={24} color={IDLE_INK}>
+          <Line at={w140At} x={gpu2X} y={gpuTop - h(42)} size={24} color={IDLE_INK}>
             The same GPU, <Num>16</Num>-bit weights
           </Line>
           <Svg>
-            <g opacity={ease(frame, fitAt, 12)}>
-              <rect x={X0 + 3} y={gpuTop + 3} width={QUANT.weights4GB * PX_GPU - 3} height={gpuH - 6} rx={4} fill={DATA} />
+            <g opacity={ease(frame, w35At, 12)}>
+              <rect x={X0 + 3} y={gpuTop + 3} width={(QUANT.weights4GB * PX_GPU - 3) * ease(frame, w35At + 4, 14)} height={gpuH - 6} rx={4} fill={DATA} />
               {Array.from({ length: QUANT.oneGpu4bit }, (_, k) => (
                 <rect
                   key={k}
@@ -212,17 +213,20 @@ export const QuantScene: React.FC = () => {
                   fill={CACHE}
                 />
               ))}
-              <rect x={X0} y={gpuTop} width={gpuW} height={gpuH} rx={8} fill="none" stroke={INK} strokeWidth={2} />
+              <rect x={X0} y={gpuTop} width={gpuW} height={gpuH} rx={8} fill="none" stroke={`color-mix(in srgb, ${OK} ${ease(frame, fitAt, 12) * 100}%, ${INK})`} strokeWidth={2} />
             </g>
-            <g opacity={ease(frame, fitAt + 10, 12)}>
-              <rect x={gpu2X + 3} y={gpuTop + 3} width={(QUANT.weights16GB * PX_GPU - 3) * ease(frame, fitAt + 14, 22)} height={gpuH - 6} rx={4} fill={IDLE} />
+            <g opacity={ease(frame, w140At, 12)}>
+              <rect x={gpu2X + 3} y={gpuTop + 3} width={(QUANT.weights16GB * PX_GPU - 3) * ease(frame, w140At + 4, 22)} height={gpuH - 6} rx={4} fill={IDLE} />
               <rect x={gpu2X} y={gpuTop} width={gpuW} height={gpuH} rx={8} fill="none" stroke={INK} strokeWidth={2} />
             </g>
           </Svg>
-          <Line at={sixteenAt} x={X0} y={gpuTop + gpuH + h(12)} size={24} color={INK}>
-            <Num>{QUANT.weights4GB}</Num> GB of weights, <span style={{ color: OK_INK }}>room for <Num>{QUANT.oneGpu4bit}</Num> requests of <Num>8</Num>K tokens</span>
+          <Line at={w35At + 8} x={X0} y={gpuTop + gpuH + h(12)} size={24} color={INK}>
+            <Num>{QUANT.weights4GB}</Num> GB of weights
+            <span style={{ color: OK_INK, opacity: ease(frame, sixteenAt, 10) }}>
+              , room for <Num>{QUANT.oneGpu4bit}</Num> requests of <Num>8</Num>K tokens
+            </span>
           </Line>
-          <Line at={fitAt + 30} x={gpu2X} y={gpuTop + gpuH + h(12)} size={24} color={IDLE_INK}>
+          <Line at={w140At + 20} x={gpu2X} y={gpuTop + gpuH + h(12)} size={24} color={IDLE_INK}>
             <Num>{QUANT.weights16GB}</Num> GB of weights: over the <Num>{KV.gpuGB}</Num> GB
           </Line>
 

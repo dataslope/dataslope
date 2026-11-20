@@ -92,8 +92,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     with "saturated" and "may have leaked into training" under it.
  *   q2: question card; the balance-scale spot. q2-bias: three rows lit as
  *     named, "Position: the first answer shown", "Verbosity: the longer answer",
- *     "Self-enhancement: its own model family", with the source line
- *     "Zheng et al., NeurIPS 2023 Datasets and Benchmarks".
+ *     "Self-enhancement: its own answers" with "inconclusive" beside it in
+ *     grey (the page, after #746: the first two found clearly, the third
+ *     inconclusive), with the source line "Zheng et al., NeurIPS 2023
+ *     Datasets and Benchmarks".
  *   q2-case: two bars, both 100% wide, split by winner, the first-shown
  *     answer named on each bar's left. "A shown first": A
  *     70, B 30. "B shown first": B 65, A 35 (results.json position). A is
@@ -145,6 +147,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     user", "a trace of every step".
  *   q4-idem: "file ticket" called twice by a retry; one ticket results,
  *     green, "Idempotent".
+ *   q4-inject: the loop's result box lit as what a tool brings back; a
+ *     retrieved page's injected instruction in red, "Untrusted input"; and
+ *     "No damaging tool without a confirmation" in green.
  *   q4-compound: a chain of ten drawn links (the chain spot beside it),
  *     each "95%", the product "≈ 60%" at the end in red (results.json
  *     chain).
@@ -216,7 +221,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - q1-ours: the page's scoring rule (exact match for structured output,
  *     a rubric judge for open-ended text) applied to the assistant's two
  *     outputs.
- *   - q2: "Only after you have measured it", Zheng et al.'s three biases,
+ *   - q2: "Only after you have measured it", the three biases Zheng et al.
+ *     tested, the first two found clearly and the third inconclusive,
  *     the four mitigations, Cohen's kappa and the pointer to the Data
  *     Scientist track: the page. The case is its third concept check: A
  *     preferred in 70% of pairs, then B wins 65% shown first. Arithmetic:
@@ -237,7 +243,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     faithfulness fails a true but unsupported claim follows from the
  *     page's definition ("supported by the retrieved passages").
  *   - q4: tool calling, the loop, MCP, the five design concerns, "a step may
- *     run twice", and 0.95^10 ≈ 60%: the page. Arithmetic on the page's
+ *     run twice", prompt injection (a tool result or retrieved document is
+ *     untrusted input; an agent that reads outside content should not also
+ *     hold damaging tools unconfirmed), and 0.95^10 ≈ 60%: the page. Arithmetic on the page's
  *     formula: 0.95^10 = 0.599, 0.99^10 = 0.904 ("ninety"), 0.95^5 = 0.774
  *     ("seventy-seven"). Filing one ticket twice is the video's example of
  *     an idempotent tool.
@@ -350,7 +358,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-bias",
-      text: "Zheng and colleagues documented three biases: position, favoring the answer shown first; verbosity, favoring the longer one; and self-enhancement, favoring text from its own model family.",
+      text: "Zheng and colleagues tested judges for three biases: position, favoring the answer shown first; verbosity, favoring the longer one; and self-enhancement, favoring its own answers. The first two showed up clearly; the third was inconclusive, but worth guarding against.",
       pauseAfter: 0.7,
     },
     {
@@ -439,6 +447,11 @@ export const script: NarrationScript = {
     {
       id: "q4-idem",
       text: "And idempotent tools, since a retried step can run twice. Filing the same ticket twice should still leave one ticket.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q4-inject",
+      text: "And treat what a tool brings back as untrusted: a retrieved page can carry instructions the model may follow, so an agent that reads outside content shouldn't also hold tools that do damage without a confirmation.",
       pauseAfter: 1.4,
     },
     {

@@ -239,7 +239,7 @@ export const RnnScene: React.FC = () => {
           </Box>
           {/* The cell state: one line straight through, changed by addition. */}
           <Flow points={[[LSTM_X - 40, lineY], [LSTM_X + PANEL_W + 44, lineY]]} at={cellAt} dur={20} color={BAR} width={5} head={16} />
-          <Line at={cellAt + 6} x={LSTM_X - 40} y={lineY - h(44)} size={22} color={INK_SOFT}>
+          <Line at={cellAt + 6} x={LSTM_X + 400} y={lineY + h(12)} size={22} color={INK_SOFT}>
             cell state
           </Line>
           {[
@@ -283,7 +283,7 @@ export const RnnScene: React.FC = () => {
             </React.Fragment>
           ))}
           {/* The gradient back along the cell line meets one gate. */}
-          <Flow points={[[LSTM_X + PANEL_W - 20, lineY - h(30)], [LSTM_X + 40, lineY - h(30)]]} at={alongAt} dur={24} color={LOOK} width={4} head={14} />
+          <Flow points={[[LSTM_X + PANEL_W - 30, lineY - h(30)], [LSTM_X + 30, lineY - h(30)]]} at={alongAt} dur={24} color={LOOK} width={4} head={14} />
           <Line at={ninetyAt} x={LSTM_X} y={pTop + pH + h(30)} size={30} color={OK_INK}>
             <MathRun>
               0.95<sup>50</sup> = 0.077
@@ -305,13 +305,16 @@ export const RnnScene: React.FC = () => {
             {null}
           </Box>
           <Flow points={[[GRU_X - 26, lineY], [GRU_X + PANEL_W - 10, lineY]]} at={gruAt + 6} dur={18} color={INK} width={2.4} head={13} />
-          <Line at={gruAt + 8} x={GRU_X + 20} y={lineY + h(10)} size={22} color={INK_SOFT}>
-            hidden state, no separate cell
+          <Line at={gruAt + 8} x={GRU_X} y={pTop + pH + h(30)} size={24} color={INK}>
+            Hidden state only: no separate cell
           </Line>
           {["reset", "update"].map((g, k) => (
-            <Box key={g} x={GRU_X + 80 + k * 220} y={gateTop} w={150} h={GH} at={twoGatesAt + k * 4} size={22}>
-              {g}
-            </Box>
+            <React.Fragment key={g}>
+              <Box x={GRU_X + 80 + k * 220} y={gateTop} w={150} h={GH} at={twoGatesAt + k * 4} size={22}>
+                {g}
+              </Box>
+              <Flow points={[[GRU_X + 155 + k * 220, gateTop - 4], [GRU_X + 155 + k * 220, lineY + 6]]} at={twoGatesAt + k * 4 + 4} width={2.2} head={12} />
+            </React.Fragment>
           ))}
           <Line at={threeAt} x={GRU_X} y={pTop + pH + h(124)} size={24}>
             <Num>{RNN.gruBlocks}</Num> blocks

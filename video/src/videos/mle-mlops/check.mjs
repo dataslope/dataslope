@@ -93,7 +93,8 @@ const QUOTES = [
   [MSD, "Responses range from alerting to automated retraining to feature redesign if the drift is structural"],
   // Questions 9 and 10.
   [MSD, "PSI quantifies the shift between a reference distribution (training) and a current distribution (production) for a single feature"],
-  [MSD, "Rules such as \"below 0.1 is stable\" and \"above 0.2 needs action\" are industry conventions, not calibrated significance levels"],
+  [MSD, "Rules such as \"below 0.1 is stable\" and \"above 0.25 needs action\" are industry conventions, not calibrated significance levels"],
+  [MLOPS, "Thresholds such as PSI above 0.25"],
   [MSD, "PSI depends on bin boundaries, sample size, smoothing, and feature distribution"],
   [MLOPS, "population stability index (PSI), KL divergence, or a Kolmogorov–Smirnov test per feature"],
   [MLOPS, "should be calibrated to normal variation, sample size, and business impact"],
@@ -116,7 +117,8 @@ const QUOTES = [
   [MLOPS, "not just an offline benchmark"],
   // Quick round.
   [MLOPS, "makes rollback a lookup rather than a rebuild"],
-  [MSD, "It enforces a promotion workflow (staging → production)"],
+  [MSD, "It supports a promotion workflow (staging → production, often by moving an alias such as `champion` to a new version)"],
+  [MLOPS, "It supports a promotion workflow (staging → production, often by moving an alias such as `champion` to a new version)"],
   [MSD, "(1) schedule, retrain weekly/monthly regardless; (2) drift alert"],
   [MSD, "(3) performance degradation, live accuracy or a proxy metric drops below a threshold; (4) data volume, enough new labeled examples have accumulated"],
   [MLOPS, "always routes the candidate through the same evaluation gate and staged rollout"],
@@ -333,6 +335,10 @@ const pct1 = (v) => Math.round(v * 1000) / 10;
 const r2 = (v) => Math.round(v * 100) / 100;
 const r1 = (v) => Math.round(v * 10) / 10;
 const G = R.gate;
+// The pages' two PSI conventions, read from the sentence that states them.
+const lines = MSD.match(/"below (\d\.\d+) is stable" and "above (\d\.\d+) needs action"/);
+const STABLE_LINE = lines ? Number(lines[1]) : NaN;
+const ACTION_LINE = lines ? Number(lines[2]) : NaN;
 const D = R.drift;
 const said = [
   ["q2-seed", "twenty times", 20, R.seeds.accuracy.length],
@@ -352,12 +358,16 @@ const said = [
   ["q7-concept", "accuracy falls to sixty-one", 61, pct(D.concept.accuracy)],
   ["q9-example", "a slight shift scores point oh one", 0.01, r2(R.psi.openStable)],
   ["q9-example", "a large one, one point four", 1.4, r1(R.psi.openDrifted)],
+  ["q9-conv", "Under point one is called stable", 0.1, STABLE_LINE],
+  ["q9-conv", "over point two five needs action", 0.25, ACTION_LINE],
   ["q9-noise", "a window of a hundred values scores over point one almost half the time", 1, Number(R.psiNoise.bySize["100"].over01 > 0.4 && R.psiNoise.bySize["100"].over01 < 0.5)],
   ["q9-noise", "A window of a thousand: never, in two thousand tries", 0, R.psiNoise.bySize["1000"].over01],
   ["q9-noise", "A window of a thousand: never, in two thousand tries", 2000, R.psiNoise.tries],
   ["q9-edges", "a fifth of values", 0.2, R.psiEdges.beyond / R.psiEdges.window],
   ["q9-edges", "closed edges read point oh three", 0.03, r2(R.psiEdges.closed)],
-  ["q9-edges", "Open ones read point two five", 0.25, r2(R.psiEdges.open)],
+  ["q9-edges", "closed edges read point oh three, stable", 1, Number(R.psiEdges.closed < STABLE_LINE)],
+  ["q9-open", "Open ones read point two five", 0.25, r2(R.psiEdges.open)],
+  ["q9-open", "right at the line for action", 1, Number(Math.abs(R.psiEdges.open - ACTION_LINE) < 0.01)],
   ["q11-canary", "one to five percent", 5, 5],
 ];
 for (const [id, words, means, value] of said) {

@@ -8,7 +8,7 @@ import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CNN } from "./data";
-import { BAR, Box, Drift, Fade, Flow, INK, INK_SOFT, int, Line, LOOK, Mark, OK_INK, pixelFill, Pow10, Svg } from "./parts";
+import { Art, BAR, Box, Drift, Fade, Flow, INK, INK_SOFT, int, Line, LOOK, Mark, OK_INK, pixelFill, Pow10, Svg } from "./parts";
 
 const CELL = 40;
 const IMG_X = 120;
@@ -158,6 +158,7 @@ export const CnnScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      <Sfx name="el-pop" at={slidesAt} level={-30} />
       <Sfx name="el-sprinkle" at={slideFrom} level={-35} />
       <Sfx name="el-tap" at={edgesAt} level={-30} />
       <Sfx name="el-whoosh" at={shiftAt} level={-35} />
@@ -188,6 +189,9 @@ export const CnnScene: React.FC = () => {
               <rect x={IMG_X + (wc - 1) * CELL - 2} y={top + (wr - 1) * CELL - 2} width={3 * CELL + 2} height={3 * CELL + 2} rx={4} fill="none" stroke={LOOK} strokeWidth={4} />
             ) : null}
           </Svg>
+
+          {/* A filter looks at one small patch at a time. */}
+          <Art name="magnifier" at={slidesAt} out={leaveAt} left={210} top={y(690)} h={170} />
 
           <Line at={localAt - 4} x={FIL_X} y={y(296)} size={22} color={INK_SOFT}>
             Filter

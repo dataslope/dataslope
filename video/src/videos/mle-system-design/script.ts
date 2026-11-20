@@ -284,7 +284,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     layer: 8 bits 97.8% with no answer changed, 4 bits 97.8% with 2
  *     changed (1 fixed, 1 broken), 3 bits 95.7% (shown, not said), 2 bits
  *     28.9%. Biases stay 32-bit (202 of them, not counted in the sizes).
- *   - q8: outcome labels, delayed labels, survivorship bias, label shift,
+ *   - q8: outcome labels, delayed labels, survivorship bias, feedback-induced shift,
  *     logging and held-out exploration: the page. "Outcomes the model let
  *     happen" is the page's "requests the model acted on", worded so the
  *     blocked transaction does not read as an action whose outcome is seen. "A transaction it blocked
