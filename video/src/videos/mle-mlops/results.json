@@ -1,0 +1,326 @@
+{
+  "runtime": {
+    "python": "3.14.2",
+    "sklearn": "1.8.0",
+    "numpy": "2.4.6"
+  },
+  "seeds": {
+    "trees": 50,
+    "train": 1257,
+    "test": 540,
+    "accuracy": [
+      0.9685,
+      0.9741,
+      0.963,
+      0.9685,
+      0.9704,
+      0.9611,
+      0.9685,
+      0.9704,
+      0.9667,
+      0.9667,
+      0.9648,
+      0.9741,
+      0.9722,
+      0.9667,
+      0.9685,
+      0.9685,
+      0.9778,
+      0.9759,
+      0.9667,
+      0.9722
+    ],
+    "min": 0.9611,
+    "max": 0.9778,
+    "sameSeedIdentical": true,
+    "digestA": "ca90245b8b4dddd9",
+    "digestB": "ca90245b8b4dddd9"
+  },
+  "gate": {
+    "incumbent": {
+      "overall": 0.7474,
+      "rest": 0.7451,
+      "group": 0.7932
+    },
+    "candidate": {
+      "overall": 0.7661,
+      "rest": 0.7815,
+      "group": 0.4557
+    },
+    "trainYear": 20000,
+    "trainMonth": 4000,
+    "groupRowsYear": 1048,
+    "groupRowsMonth": 11,
+    "holdout": 10000,
+    "groupHoldout": 474,
+    "groupShare": 0.047,
+    "groupPositiveRate": 0.511
+  },
+  "drift": {
+    "train": 5000,
+    "window": 2000,
+    "coef": [
+      1.991,
+      1.003
+    ],
+    "intercept": -0.042,
+    "same": {
+      "psiX1": 0.012,
+      "psiX2": 0.005,
+      "psiPred": 0.004,
+      "accuracy": 0.7995,
+      "positiveRate": 0.5
+    },
+    "data": {
+      "psiX1": 0.913,
+      "psiX2": 0.005,
+      "psiPred": 0.76,
+      "accuracy": 0.8395,
+      "positiveRate": 0.761
+    },
+    "concept": {
+      "psiX1": 0.008,
+      "psiX2": 0.012,
+      "psiPred": 0.005,
+      "accuracy": 0.607,
+      "positiveRate": 0.394
+    },
+    "x1Shares": {
+      "same": [
+        0.0995,
+        0.0955,
+        0.098,
+        0.0905,
+        0.11,
+        0.1305,
+        0.0975,
+        0.0895,
+        0.094,
+        0.095
+      ],
+      "data": [
+        0.013,
+        0.02,
+        0.0265,
+        0.0425,
+        0.058,
+        0.074,
+        0.086,
+        0.1185,
+        0.18,
+        0.3815
+      ],
+      "concept": [
+        0.09,
+        0.098,
+        0.0895,
+        0.0975,
+        0.0915,
+        0.116,
+        0.0935,
+        0.1135,
+        0.108,
+        0.1025
+      ]
+    }
+  },
+  "psi": {
+    "pageStable": 0.0143,
+    "pageDrifted": 1.1276,
+    "openStable": 0.0143,
+    "openDrifted": 1.4101,
+    "pageDroppedDrifted": 143,
+    "stableShares": [
+      0.105,
+      0.087,
+      0.104,
+      0.09,
+      0.1,
+      0.099,
+      0.077,
+      0.119,
+      0.109,
+      0.11
+    ],
+    "driftedShares": [
+      0.036,
+      0.03,
+      0.023,
+      0.025,
+      0.031,
+      0.043,
+      0.042,
+      0.076,
+      0.109,
+      0.585
+    ]
+  },
+  "psiNoise": {
+    "reference": 1000,
+    "tries": 2000,
+    "bySize": {
+      "100": {
+        "over01": 0.464,
+        "over02": 0.048,
+        "median": 0.0961,
+        "p95": 0.1981,
+        "max": 2.1821
+      },
+      "300": {
+        "over01": 0.0075,
+        "over02": 0,
+        "median": 0.036,
+        "p95": 0.0738,
+        "max": 0.1325
+      },
+      "1000": {
+        "over01": 0,
+        "over02": 0,
+        "median": 0.0169,
+        "p95": 0.034,
+        "max": 0.0695
+      }
+    }
+  },
+  "psiEdges": {
+    "reference": 1000,
+    "window": 1000,
+    "beyond": 200,
+    "closed": 0.0325,
+    "open": 0.2471,
+    "openShares": [
+      0.073,
+      0.097,
+      0.064,
+      0.107,
+      0.082,
+      0.084,
+      0.063,
+      0.09,
+      0.063,
+      0.277
+    ]
+  },
+  "said": [
+    {
+      "beat": "q2-seed",
+      "words": "twenty times",
+      "means": 20
+    },
+    {
+      "beat": "q2-seed",
+      "words": "from ninety-six point one",
+      "means": 96.1
+    },
+    {
+      "beat": "q2-seed",
+      "words": "to ninety-seven point eight percent",
+      "means": 97.8
+    },
+    {
+      "beat": "q2-seed",
+      "words": "every prediction matches",
+      "means": 1
+    },
+    {
+      "beat": "q4-slice",
+      "words": "seventy-seven percent to seventy-five",
+      "means": 77
+    },
+    {
+      "beat": "q4-slice",
+      "words": "seventy-seven percent to seventy-five",
+      "means": 75
+    },
+    {
+      "beat": "q4-slice",
+      "words": "one customer in twenty",
+      "means": 5
+    },
+    {
+      "beat": "q4-slice",
+      "words": "from seventy-nine percent to forty-six",
+      "means": 79
+    },
+    {
+      "beat": "q4-slice",
+      "words": "from seventy-nine percent to forty-six",
+      "means": 46
+    },
+    {
+      "beat": "q4-slice",
+      "words": "worse than a coin flip",
+      "means": 1
+    },
+    {
+      "beat": "q7-data",
+      "words": "reads point nine one",
+      "means": 0.91
+    },
+    {
+      "beat": "q7-rises",
+      "words": "from eighty percent to eighty-four",
+      "means": 80
+    },
+    {
+      "beat": "q7-rises",
+      "words": "from eighty percent to eighty-four",
+      "means": 84
+    },
+    {
+      "beat": "q7-concept",
+      "words": "stays under point oh two",
+      "means": 1
+    },
+    {
+      "beat": "q7-concept",
+      "words": "accuracy falls to sixty-one",
+      "means": 61
+    },
+    {
+      "beat": "q9-example",
+      "words": "a slight shift scores point oh one",
+      "means": 0.01
+    },
+    {
+      "beat": "q9-example",
+      "words": "a large one, one point four",
+      "means": 1.4
+    },
+    {
+      "beat": "q9-noise",
+      "words": "a window of a hundred values scores over point one almost half the time",
+      "means": 1
+    },
+    {
+      "beat": "q9-noise",
+      "words": "A window of a thousand: never, in two thousand tries",
+      "means": 0
+    },
+    {
+      "beat": "q9-noise",
+      "words": "A window of a thousand: never, in two thousand tries",
+      "means": 2000
+    },
+    {
+      "beat": "q9-edges",
+      "words": "a fifth of values",
+      "means": 0.2
+    },
+    {
+      "beat": "q9-edges",
+      "words": "closed edges read point oh three",
+      "means": 0.03
+    },
+    {
+      "beat": "q9-edges",
+      "words": "Open ones read point two five",
+      "means": 0.25
+    },
+    {
+      "beat": "q11-canary",
+      "words": "one to five percent",
+      "means": 5
+    }
+  ]
+}

@@ -44,6 +44,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *       ("q14").
  *   15. "How do LSTMs and GRUs address that?" ("q15").
  *
+ * Each deep dive reads its question in a beat of its own ("q4") when the
+ * answer runs past it ("q4-a"), and a one-line turn closes a scene before
+ * the next topic ("act-in", "backprop-in", "norm-in", "opt-in", "reg-in",
+ * "cnn-in", "rnn-in"), so the fifteen read as one argument: what a unit
+ * computes, which non-linearity, how the weights learn, what breaks that,
+ * how to keep it steady, how each step moves, what stops memorizing, then
+ * architectures shaped to their data.
+ *
  * The angle is the ML engineer's, which is what this track's page adds over
  * the Data Scientist one: what each idea costs in memory or compute, and how
  * each one breaks in a training job or behind a serving endpoint (a dead
@@ -74,7 +82,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   plan: fifteen numbered chips: thirteen blue, two grey (quick, 12 and
  *     13), lit in groups as the beat names them; a small grid of digit
  *     images (scikit-learn's digits, blue) on "handwritten digits".
- *   q1: question card; one perceptron box: two inputs, weights, a sum, a
+ *   q1, q1-a: question card; one perceptron box: two inputs, weights, a sum, a
  *     step. Beside it, XOR's four points on a unit square: (0,1) and (1,0)
  *     filled blue (output one), (0,0) and (1,1) hollow (output zero).
  *   q1-xor: a line sweeps across the square and settles; the one point on
@@ -101,7 +109,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q3-fix: leaky ReLU and GELU curves faded in over ReLU's, each labelled;
  *     "GELU: transformers" beside it; "Softmax: the multi-class output" as a
  *     line under the three.
- *   q4: question card; a three-layer stack, the forward pass inked upward
+ *   q4, q4-a: question card; a three-layer stack, the forward pass inked upward
  *     (blue), each layer's activations kept as a small stacked slab beside
  *     it; then the backward pass inked downward (yellow) on "multiplying".
  *   q4-cost: two bars on one axis, in forward passes per gradient: "nudge
@@ -124,7 +132,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q5-fix: the five fixes as a list, each lit as named; under clipping, an
  *     arrow longer than a dashed circle shrunk onto its rim, same direction.
  *   q5-watch: "Log the gradient norm every step" as the takeaway line.
- *   q6: question card; the exploding line from q5 shown small, lit yellow
+ *   q6, q6-a: question card; the exploding line from q5 shown small, lit yellow
  *     on "starting scale". Then two formulas as text, "Xavier: variance 2 /
  *     (inputs + outputs)" and "He: variance 2 / inputs", tanh and sigmoid
  *     under the first and ReLU under the second.
@@ -133,7 +141,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the constant row identical (red ring round all four, "16 copies"), the
  *     Xavier row all different; "38%" red and "98%" green under them.
  *   q6-why: "Equal units, equal gradients" as a line.
- *   q7: question card; a batch as eight 8x8 digit images in a row, one
+ *   q7, q7-a: question card; a batch as eight 8x8 digit images in a row, one
  *     pixel's column picked out across them (yellow).
  *   q7-batch: the same digit (a 6, pixel at row 4, column 4, brightness
  *     0.5) in two batches, seven bright neighbours above and seven dark ones
@@ -144,7 +152,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     red.
  *   q7-ln: the digit's own 64 pixels normalized across its row: "0.45" in
  *     both batches and alone, green.
- *   q8: question card; four labelled rows, SGD, momentum, RMSProp, Adam,
+ *   q8, q8-a: question card; four labelled rows, SGD, momentum, RMSProp, Adam,
  *     each with what it keeps per weight drawn as small outlined boxes:
  *     nothing, a velocity, a squared-gradient average, both.
  *   q8-rms: two bars per optimizer for the two parameters' average step
@@ -155,7 +163,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     billion weights": 8 GB, 12 GB, 16 GB; "float32, before activations" as
  *     its note.
  *   q8-choice: Adam's bar lit "default"; SGD with momentum's lit "vision".
- *   q9: question card; a layer of twelve units with a random half greyed on
+ *   q9, q9-a: question card; a layer of twelve units with a random half greyed on
  *     each of three frames (training steps), survivors drawn thicker
  *     ("scaled up").
  *   q9-bug: the digit (an 8, results.json dropout.image) and ten "calls" as
@@ -168,7 +176,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q9-l2: L2 as weights shrinking toward zero on a small bar row; early
  *     stopping as a validation curve with its low point marked and the
  *     weights taken from there.
- *   q10: question card; the digit zero as an 8x8 grid (results.json
+ *   q10, q10-a: question card; the digit zero as an 8x8 grid (results.json
  *     cnn.image), a 3x3 window sliding across it, the filter's nine weights
  *     beside it; the feature map filling in cell by cell (results.json
  *     cnn.map, diverging blue and red would read as right and wrong, so one
@@ -176,7 +184,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q10-props: "local", "shared", "found anywhere" lit in turn; the digit
  *     shifts two cells right and the map shifts with it (cnn.shiftedMap);
  *     a 2x2 pooling grid on "Pooling".
- *   q11: question card; two numbers set as bars on a log axis, "dense to
+ *   q11, q11-a: question card; on "Count weights", two numbers set as bars
+ *     on a log axis, "dense to
  *     1,000 units: 150,529,000" and "first convolution: 448" (green).
  *   q11-cost: the page's listing as four outlined boxes with their counts
  *     (448, 4,640, 330, total 5,418); then "each weight used at 50,176
@@ -189,19 +198,21 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   r-softmax: logits, softmax, probabilities, loss as a row; "prediction
  *     minus target" under it; then a second softmax box inserted (red) and
  *     the best probability bar capped at 23%, "loss never below 1.46" in red.
- *   q14: question card; a row of RNN cells unrolled over steps, the same
+ *   q14, q14-a: question card; a row of RNN cells unrolled over steps, the same
  *     weights badge on each, the hidden state passed along.
  *   q14-why: the gradient arrow travelling back from step 50 to step 1,
  *     thinning; "0.5^50 = 8.9e-16" (red), "assumed: each step halves it" as
  *     its note.
  *   q14-slow: the cells lighting one after another, a clock beside them.
- *   q15: question card; an LSTM cell with its cell-state line running
+ *   q15, q15-a: question card; an LSTM cell with its cell-state line running
  *     straight through the top and three gates (input, forget, output) as
  *     outlined boxes; the gradient along the cell line, "0.95^50 = 0.077"
  *     (green), "assumed: forget gate at 0.95" as its note.
  *   q15-gru: a GRU cell beside it, two gates, no cell line; "4 blocks / 3
  *     blocks" under the two.
  *   q15-limit: both rows of cells still lighting one at a time.
+ *   The turns ("act-in" and the rest) add nothing on screen: the finished
+ *     figure holds under them until the cut.
  *   next: one row of tokens with every position joined to every other in one
  *     step (yellow lines), all lit at once; the orangutan; <NextLine> "Next:
  *     NLP and LLMs" on "Next".
@@ -311,29 +322,28 @@ export const script: NarrationScript = {
   minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
-    // ── Opening ───────────────────────────────────────────────────────────
+    // ── Opening ──────────────────────────────────────────────────────────
     {
       id: "hook",
       scene: true,
-      text: "Training a deep network is still maximum likelihood: weights that make the labels most probable, found by following the gradient. What changes is the scale: many layers, millions of weights, and a gradient that must make it back through all of them.",
+      text: "Training a deep network is still maximum likelihood, the weights that make the labels most probable. The difference is scale: many layers, millions of weights, and a gradient that must make it back through all of them.",
       pauseAfter: 0.7,
     },
     {
       id: "plan",
-      text: "Fifteen questions about what happens inside: thirteen worked through, several on networks that read handwritten digits, and two quick ones.",
+      text: "Fifteen questions about what happens inside: thirteen worked through, several on small digit networks, and two quick ones.",
       pauseAfter: 0.7,
     },
-
-    // ── 1, 2. The perceptron and XOR ──────────────────────────────────────
+    // ── 1, 2. The perceptron and XOR ─────────────────────────────────────
+    { id: "q1", scene: true, text: "Question one. What is a perceptron?" },
     {
-      id: "q1",
-      scene: true,
-      text: "Question one. What is a perceptron? A weighted sum of its inputs plus a bias, passed through an activation. Alone, it's a linear classifier: it draws one straight line.",
+      id: "q1-a",
+      text: "A weighted sum of its inputs plus a bias, passed through an activation. Alone, it's a linear classifier: it draws one straight line.",
       pauseAfter: 0.6,
     },
     {
       id: "q1-xor",
-      text: "So it famously can't learn XOR, which is one when exactly one input is one. No line separates the ones from the zeros: the best gets three of the four.",
+      text: "So it famously can't learn XOR, one when exactly one input is one: no line separates the ones from the zeros, and the best gets three of the four.",
       pauseAfter: 0.7,
     },
     {
@@ -346,39 +356,35 @@ export const script: NarrationScript = {
       text: "Take the ReLU out, and the same weights collapse to one linear function, minus each input, plus two: one line again. Without a non-linearity, stacked layers are one layer; with one, a wide network can approximate almost any function.",
       pauseAfter: 0.7,
     },
-
-    // ── 3. Activations ────────────────────────────────────────────────────
-    {
-      id: "q3",
-      scene: true,
-      text: "Question three. Compare sigmoid, tanh, and ReLU.",
-    },
+    { id: "act-in", text: "So, which non-linearity?" },
+    // ── 3. Activations ───────────────────────────────────────────────────
+    { id: "q3", scene: true, text: "Question three. Compare sigmoid, tanh, and ReLU." },
     {
       id: "q3-sat",
-      text: "Sigmoid maps to zero to one, and tanh to minus one to one, centered on zero. Both go flat at the ends and pass almost no gradient there: the page's code finds sigmoid's slope peaks at a quarter, and tanh's peaks at one but is point oh seven by an input of two.",
+      text: "Sigmoid maps to zero to one, and tanh to minus one to one, centered on zero. Both flatten at the ends, passing almost no gradient: the page's code finds sigmoid's slope peaks at a quarter, and tanh's, peaking at one, is point oh seven by an input of two.",
       pauseAfter: 0.6,
     },
     {
       id: "q3-relu",
-      text: "ReLU has a slope of exactly one for every positive input, costs one comparison, and is the default for hidden layers. Its catch: a unit whose input is always negative outputs zero, gets zero gradient, and never recovers.",
+      text: "ReLU's slope is one for any positive input, it costs one comparison, and it's the default for hidden layers. The catch: a unit whose input is always negative outputs zero, gets zero gradient, and never recovers.",
       pauseAfter: 0.6,
     },
     {
       id: "q3-fix",
       text: "Leaky ReLU keeps a small slope below zero; ELU and GELU bend smoothly, and GELU is the usual choice in transformers. Softmax belongs at a multi-class output.",
-      pauseAfter: 0.8,
+      pauseAfter: 0.7,
     },
-
-    // ── 4. Backpropagation ────────────────────────────────────────────────
+    { id: "backprop-in", text: "Next, how the weights learn." },
+    // ── 4. Backpropagation ───────────────────────────────────────────────
+    { id: "q4", scene: true, text: "Question four. Explain backpropagation and the chain rule." },
     {
-      id: "q4",
-      scene: true,
-      text: "Question four. Explain backpropagation and the chain rule. The forward pass computes each layer and keeps its activations. The backward pass runs from the loss down, multiplying local derivatives, so every weight gets its gradient in one sweep.",
+      id: "q4-a",
+      text: "The forward pass computes each layer and keeps its activations. The backward pass runs from the loss down, multiplying local derivatives, so every weight gets its gradient in one sweep.",
       pauseAfter: 0.6,
     },
     {
       id: "q4-cost",
-      text: "Why it matters: this digit network has twenty-six thousand parameters. Nudging each one to measure its effect takes twenty-six thousand forward passes per step. Backprop takes one, plus a backward pass worth one point seven, counting multiply-adds.",
+      text: "This digit network has twenty-six thousand parameters. Nudging each one to measure its effect takes twenty-six thousand forward passes per step. Backprop takes one, plus a backward pass worth one point seven, counting multiply-adds.",
       pauseAfter: 0.7,
     },
     {
@@ -388,11 +394,10 @@ export const script: NarrationScript = {
     },
     {
       id: "q4-memory",
-      text: "The price is memory: the kept activations grow with batch size and depth, so training a model takes far more memory than serving it.",
+      text: "The price is memory: kept activations grow with batch size and depth, so training takes far more memory than serving.",
       pauseAfter: 0.8,
     },
-
-    // ── 5. Vanishing and exploding gradients ──────────────────────────────
+    // ── 5. Vanishing and exploding gradients ─────────────────────────────
     {
       id: "q5",
       scene: true,
@@ -411,20 +416,19 @@ export const script: NarrationScript = {
     },
     {
       id: "q5-fix",
-      text: "The fixes: ReLU-family activations, careful initialization, residual connections, which give the gradient a path with a derivative of one, and normalization. For explosions, clipping: past a threshold, scale the gradient down, keeping its direction.",
+      text: "The fixes: ReLU-family activations, careful initialization, residual connections, which give the gradient a path with a derivative of one, and normalization. For explosions, clip: past a threshold, scale the gradient down, keeping its direction.",
       pauseAfter: 0.6,
     },
     {
       id: "q5-watch",
-      text: "Log the gradient norm every step of a training job: a slide toward zero, or a spike before the loss breaks, shows there first.",
+      text: "Log the gradient norm every training step: a slide toward zero, or a spike before the loss breaks, shows there first.",
       pauseAfter: 0.8,
     },
-
-    // ── 6. Initialization ─────────────────────────────────────────────────
+    // ── 6. Initialization ────────────────────────────────────────────────
+    { id: "q6", scene: true, text: "Question six. Why does weight initialization matter? Xavier versus He." },
     {
-      id: "q6",
-      scene: true,
-      text: "Question six. Why does weight initialization matter? Xavier versus He. That explosion was the starting scale alone. Xavier sets the variance to two over inputs plus outputs, for tanh and sigmoid; He to two over inputs, larger, since ReLU zeroes half of what it sees.",
+      id: "q6-a",
+      text: "That explosion was the starting scale alone. Xavier sets the variance to two over inputs plus outputs, for tanh and sigmoid; He, two over inputs, since ReLU zeroes half of what it sees.",
       pauseAfter: 0.6,
     },
     {
@@ -432,17 +436,13 @@ export const script: NarrationScript = {
       text: "And never start the weights equal. Sixteen hidden units started at point oh one end a thousand steps as exact copies, one unit in effect, scoring thirty-eight percent on held-out digits. From Xavier's random start, ninety-eight.",
       pauseAfter: 0.6,
     },
+    { id: "q6-why", text: "Equal units get equal gradients, so nothing ever breaks the tie.", pauseAfter: 0.7 },
+    { id: "norm-in", text: "Normalization keeps that scale steady in training." },
+    // ── 7. Batch norm and layer norm ─────────────────────────────────────
+    { id: "q7", scene: true, text: "Question seven. What is batch normalization, and how does layer norm differ?" },
     {
-      id: "q6-why",
-      text: "Equal units get equal gradients, so nothing ever breaks the tie.",
-      pauseAfter: 0.8,
-    },
-
-    // ── 7. Batch norm and layer norm ──────────────────────────────────────
-    {
-      id: "q7",
-      scene: true,
-      text: "Question seven. What is batch normalization, and how does layer norm differ? Batch norm shifts and scales each feature to mean zero and variance one across the mini-batch, then applies a learned scale and shift.",
+      id: "q7-a",
+      text: "Batch norm shifts and scales each feature to mean zero and variance one across the mini-batch, then applies a learned scale and shift.",
       pauseAfter: 0.6,
     },
     {
@@ -452,20 +452,20 @@ export const script: NarrationScript = {
     },
     {
       id: "q7-one",
-      text: "In a batch of one, a feature is its own mean, so it normalizes to zero whatever the input. That's why inference uses running averages saved in training. Left in training mode and served one request at a time, that layer ignores its input.",
+      text: "In a batch of one, a feature is its own mean, so it normalizes to zero whatever the input; hence running averages at inference. Left in training mode and served one request at a time, that layer ignores its input.",
       pauseAfter: 0.7,
     },
     {
       id: "q7-ln",
-      text: "Layer norm normalizes across one example's features instead, so this pixel gets the same value in any batch, or alone. It ignores batch size, which is why transformers use it.",
-      pauseAfter: 0.8,
+      text: "Layer norm normalizes across one example's features instead: this pixel gets the same value in any batch, or alone. Free of batch size, it's what transformers use.",
+      pauseAfter: 0.7,
     },
-
-    // ── 8. Optimizers ─────────────────────────────────────────────────────
+    { id: "opt-in", text: "Then, how each step moves." },
+    // ── 8. Optimizers ────────────────────────────────────────────────────
+    { id: "q8", scene: true, text: "Question eight. What is the difference between SGD, Momentum, RMSProp, and Adam?" },
     {
-      id: "q8",
-      scene: true,
-      text: "Question eight. What is the difference between SGD, Momentum, RMSProp, and Adam? Stochastic gradient descent steps straight against each mini-batch's gradient. Momentum keeps a decaying average of past gradients, which damps the zigzag.",
+      id: "q8-a",
+      text: "Stochastic gradient descent steps against each mini-batch's gradient. Momentum keeps a decaying average of past gradients, which damps the zigzag.",
       pauseAfter: 0.6,
     },
     {
@@ -475,25 +475,25 @@ export const script: NarrationScript = {
     },
     {
       id: "q8-mem",
-      text: "The engineer's follow-up is memory. In thirty-two-bit floats, a weight and its gradient take eight bytes; momentum adds four, and Adam eight. So a billion weights need eight gigabytes with SGD and sixteen with Adam, before any activations.",
+      text: "The follow-up is memory. In thirty-two-bit floats, a weight and its gradient take eight bytes; momentum adds four, Adam eight. A billion weights need eight gigabytes with SGD and sixteen with Adam, before any activations.",
       pauseAfter: 0.7,
     },
     {
       id: "q8-choice",
-      text: "Adam is the usual default. Well-tuned SGD with momentum often generalizes slightly better on vision tasks, in a quarter less memory.",
-      pauseAfter: 0.8,
+      text: "Adam is the usual default; well-tuned SGD with momentum often generalizes slightly better on vision, in a quarter less memory.",
+      pauseAfter: 0.7,
     },
-
-    // ── 9. Regularizers ───────────────────────────────────────────────────
+    { id: "reg-in", text: "A network that trains well can still memorize." },
+    // ── 9. Regularizers ──────────────────────────────────────────────────
+    { id: "q9", scene: true, text: "Question nine. Explain dropout, L2, and early stopping as regularizers." },
     {
-      id: "q9",
-      scene: true,
-      text: "Question nine. Explain dropout, L2, and early stopping as regularizers. Dropout zeroes a random share of units each training step, commonly a fifth to a half, so none can rely on particular others. Survivors are usually scaled up in training, so at inference it's simply off.",
+      id: "q9-a",
+      text: "Dropout zeroes a random share of units each training step, commonly a fifth to a half, so none can rely on particular others. Survivors are usually scaled up in training, so at inference it's simply off.",
       pauseAfter: 0.6,
     },
     {
       id: "q9-bug",
-      text: "Leave it on, and a digit classifier trained with it misbehaves. Ten calls on one image of an eight: eight say eight, at forty-eight to ninety-three percent, and two say one. Across the test set, one image in ten changes its answer within ten calls.",
+      text: "Leave it on in a digit classifier trained with it. Ten calls on one image of an eight: eight say eight, at forty-eight to ninety-three percent, and two say one. Across the test set, one image in ten changes its answer within ten calls.",
       pauseAfter: 0.7,
     },
     {
@@ -503,30 +503,31 @@ export const script: NarrationScript = {
     },
     {
       id: "q9-l2",
-      text: "L2, or weight decay, adds the squared weights to the loss, pulling them toward zero. Early stopping halts when validation loss stops improving and restores the best weights. All three limit what a network can memorize.",
-      pauseAfter: 0.8,
+      text: "L2, or weight decay, penalizes the squared weights, pulling them toward zero; early stopping keeps the weights from the best validation epoch. All three limit what a network can memorize.",
+      pauseAfter: 0.7,
     },
-
-    // ── 10, 11. CNNs ──────────────────────────────────────────────────────
+    { id: "cnn-in", text: "Then, architectures shaped to their data." },
+    // ── 10, 11. CNNs ─────────────────────────────────────────────────────
+    { id: "q10", scene: true, text: "Question ten. How does a convolutional neural network, or CNN, work?" },
     {
-      id: "q10",
-      scene: true,
-      text: "Question ten. How does a convolutional neural network, or CNN, work? It slides small learned filters over the image, each computing a local weighted sum. This three-by-three filter lights up on a handwritten zero's vertical edges.",
+      id: "q10-a",
+      text: "It slides small learned filters over the image, each computing a local weighted sum. This three-by-three filter lights up on a handwritten zero's vertical edges.",
       pauseAfter: 0.6,
     },
     {
       id: "q10-props",
-      text: "Each output sees a small patch, and one filter is shared across the image, so a pattern is found anywhere: shift the digit two pixels right, and the map shifts with it. Pooling then shrinks the map and tolerates small shifts.",
+      text: "Each output sees a small patch through one shared filter, so a pattern is found anywhere: shift the digit two pixels right, and the map shifts with it. Pooling then shrinks the map and tolerates small shifts.",
       pauseAfter: 0.7,
     },
+    { id: "q11", text: "Question eleven. Why are CNNs well suited to images compared to a fully-connected net?" },
     {
-      id: "q11",
-      text: "Question eleven. Why are CNNs well suited to images compared to a fully-connected net? Count weights. For a color image two hundred and twenty-four pixels square, a dense layer to a thousand units needs a hundred and fifty million; the page's first convolution, four hundred and forty-eight.",
+      id: "q11-a",
+      text: "Count weights. For a color image two hundred and twenty-four pixels square, a dense layer to a thousand units needs a hundred and fifty million; the page's first convolution, four hundred and forty-eight.",
       pauseAfter: 0.7,
     },
     {
       id: "q11-cost",
-      text: "The page's whole network has five thousand four hundred and eighteen. But each weight is reused at fifty thousand positions, so that first layer is still twenty-two million multiply-adds: cheap to store, not to compute.",
+      text: "The page's whole network has five thousand four hundred and eighteen. But each is reused at fifty thousand positions, so that first layer still takes twenty-two million multiply-adds: cheap to store, not to compute.",
       pauseAfter: 0.7,
     },
     {
@@ -534,30 +535,33 @@ export const script: NarrationScript = {
       text: "That built-in assumption, that nearby pixels belong together, is why a CNN needs far less data.",
       pauseAfter: 0.8,
     },
-
-    // ── Quick ─────────────────────────────────────────────────────────────
+    // ── Quick: 12, 13 ────────────────────────────────────────────────────
     { id: "rapid-in", scene: true, text: "Two quick ones.", pauseAfter: 0.5 },
     {
       id: "r-transfer",
-      text: "Transfer learning: start from a network pretrained on a large dataset. With little data, freeze it and train a new head; with more, fine-tune some or all layers. It cuts data and compute, and one frozen backbone can serve many heads.",
+      text: "Transfer learning: start from a pretrained network. With little data, freeze it and train a new head; with more, fine-tune some or all layers. It cuts data and compute, and one frozen backbone can serve many heads.",
       pauseAfter: 0.6,
     },
     {
       id: "r-softmax",
-      text: "Why pair softmax with cross-entropy? Together, their gradient is prediction minus target, large exactly when the model is confidently wrong. Libraries fuse them on raw logits, so don't apply softmax first: done twice with ten classes, the right class tops out at twenty-three percent, and the loss never drops below one point four six.",
-      pauseAfter: 0.9,
+      text: "Why pair softmax with cross-entropy? Their combined gradient is prediction minus target, large exactly when the model is confidently wrong. Libraries fuse them on raw logits, so don't add a softmax: done twice with ten classes, the right class tops out at twenty-three percent, and the loss never drops below one point four six.",
+      pauseAfter: 0.8,
     },
-
-    // ── 14, 15. RNNs, LSTMs and GRUs ──────────────────────────────────────
+    { id: "rnn-in", text: "Last, sequences." },
+    // ── 14, 15. RNNs, LSTMs and GRUs ─────────────────────────────────────
     {
       id: "q14",
       scene: true,
-      text: "Question fourteen. What is an RNN, and why does it struggle with long sequences? A recurrent neural network reads a sequence one step at a time, updating one hidden state with the same weights each step.",
+      text: "Question fourteen. What is an RNN, and why does it struggle with long sequences?",
+    },
+    {
+      id: "q14-a",
+      text: "A recurrent neural network reads a sequence one step at a time, updating one hidden state with the same weights each step.",
       pauseAfter: 0.6,
     },
     {
       id: "q14-why",
-      text: "So the gradient from step fifty back to step one passes through fifty similar factors. If each one halves it, about one part in a thousand trillion is left. Long-range patterns are forgotten, or, with factors above one, they explode.",
+      text: "So the gradient from step fifty back to step one passes through fifty similar factors. If each halves it, one part in a thousand trillion is left: long-range patterns are forgotten, or, with factors above one, they explode.",
       pauseAfter: 0.6,
     },
     {
@@ -565,14 +569,15 @@ export const script: NarrationScript = {
       text: "And step fifty can't start until step forty-nine is done, so a GPU can't work on a sequence's steps in parallel.",
       pauseAfter: 0.7,
     },
+    { id: "q15", text: "Question fifteen. How do LSTMs and GRUs address that?" },
     {
-      id: "q15",
-      text: "Question fifteen. How do LSTMs and GRUs address that? The LSTM, or long short-term memory, adds a cell state changed mostly by addition, under input, forget and output gates. Along it, the gradient meets only the forget gate: at point nine five, fifty steps keep about eight percent.",
+      id: "q15-a",
+      text: "The LSTM, or long short-term memory, adds a cell state changed mostly by addition, under input, forget and output gates. Along it, the gradient meets only the forget gate: at point nine five, fifty steps keep about eight percent.",
       pauseAfter: 0.6,
     },
     {
       id: "q15-gru",
-      text: "The GRU, or gated recurrent unit, uses two gates and no separate cell: three blocks of weights to the LSTM's four, for similar results.",
+      text: "The GRU, gated recurrent unit, uses two gates and no separate cell: three blocks of weights to the LSTM's four, for similar results.",
       pauseAfter: 0.6,
     },
     { id: "q15-limit", text: "But both still read one step at a time.", pauseAfter: 0.7 },

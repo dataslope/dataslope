@@ -23,7 +23,7 @@
 //
 // Then it fails (exit 1) if a page stops saying what the narration quotes
 // from it, or the narration stops saying the numbers measured here.
-/* global console, process, fetch */
+/* global console, process, fetch, URL */
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -246,8 +246,8 @@ const says = [
   ["q4-scale", "twenty-five", Math.round(R.scaling.topScaled * 100) === 25],
   ["q5-cost", "eight heads of sixty-four", R.heads.heads === 8 && R.heads.headWidth === 64],
   ["q5-cost", "five hundred and twelve", R.heads.pairMacsOne === R.heads.pairMacsMulti && R.heads.width === 512],
-  ["q8", "a million pairs", R.cost.pairs["1000"] === 1e6],
-  ["q8", "four million", R.cost.pairs["2000"] === 4e6],
+  ["q8-a", "a million pairs", R.cost.pairs["1000"] === 1e6],
+  ["q8-a", "four million", R.cost.pairs["2000"] === 4e6],
   ["q8-when", "twenty-five thousand", Math.round(R.cost.crossover / 1000) === 25],
   ["q12-math", "seventeen million", Math.round(R.lora.full / 1e6) === 17],
   ["q12-math", "sixty-five thousand", Math.round(R.lora.adapter / 1000) === 66 || Math.floor(R.lora.adapter / 1000) === 65],

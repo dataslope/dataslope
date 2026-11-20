@@ -20,7 +20,7 @@
 //
 // Then it fails (exit 1) if a page stops saying what the narration quotes
 // from it, or the narration stops saying the numbers measured here.
-/* global console, process */
+/* global console, process, URL */
 import { readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
@@ -403,15 +403,15 @@ const says = [
   ["q9-dash", "ninety-eight to ninety-seven", Math.round(R.dropout.evalAcc * 100) === 98 && Math.round(R.dropout.onAcc * 100) === 97],
   ["q9-bug", "one image in ten", Math.round(R.dropout.flipIn10 * 10) === 1],
   ["q10-props", "two pixels", R.cnn.shift === 2 && R.cnn.equivariant],
-  ["q11", "a hundred and fifty million", Math.round(R.cnn.dense / 1e7) === 15],
-  ["q11", "four hundred and forty-eight", R.cnn.conv1 === 448],
+  ["q11-a", "a hundred and fifty million", Math.round(R.cnn.dense / 1e7) === 15],
+  ["q11-a", "four hundred and forty-eight", R.cnn.conv1 === 448],
   ["q11-cost", "five thousand four hundred and eighteen", R.cnn.total === 5418],
   ["q11-cost", "fifty thousand", Math.round(R.cnn.conv1Positions / 1000) === 50],
   ["q11-cost", "twenty-two million", Math.round(R.cnn.conv1Macs / 1e6) === 22],
   ["r-softmax", "twenty-three percent", Math.round(R.doubleSoftmax.bestP * 100) === 23],
   ["r-softmax", "one point four six", R.doubleSoftmax.lossFloor === 1.46],
   ["q14-why", "a thousand trillion", R.rnn.rnnProduct > 5e-16 && R.rnn.rnnProduct < 2e-15],
-  ["q15", "about eight percent", Math.round(R.rnn.lstmProduct * 100) === 8],
+  ["q15-a", "about eight percent", Math.round(R.rnn.lstmProduct * 100) === 8],
 ];
 for (const [id, words, ok] of says) {
   if (!beat(id).includes(words)) problems.push(`beat "${id}" no longer says "${words}"`);

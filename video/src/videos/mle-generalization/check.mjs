@@ -366,52 +366,63 @@ const text = (id) => {
   return b.text.toLowerCase();
 };
 const B = R.bias;
-const d1 = B.rows[0], d3 = B.rows.find((r) => r.depth === B.best), d12 = B.rows.at(-1);
-const big1 = B.tenfold.rows[0], big12 = B.tenfold.rows.at(-1);
+const at = (rows, d) => rows.find((r) => r.depth === d);
+const d1 = at(B.rows, 1), d3 = at(B.rows, B.best), d6 = at(B.rows, 6);
+const big1 = at(B.tenfold.rows, 1), big6 = at(B.tenfold.rows, 6);
 const T = (t) => R.fraud.thresholds.find((x) => x.t === t);
+/** A share from its counts, so 534 / 1,546 is "thirty-five", not a rounded 0.345's "thirty-four". */
+const share = (a, b) => whole(Math.round((100 * a) / b));
+/** An epoch as it is said: 168 is "one sixty-eight". */
+const epoch = (n) => (n < 100 ? whole(n) : `${ONES[Math.floor(n / 100)]} ${whole(n % 100)}`);
+/** 6.888 is "six point nine". */
+const tenths = (v) => `${whole(Math.floor(Math.round(v * 10) / 10))} point ${ONES[Math.round(v * 10) % 10]}`;
+const E = R.early;
 const claims = [
-  ["hook", `${pct(R.leak.leaky)} percent`],
-  ["leak-hook", pct(R.leak.leaky)],
-  ["leak-hook", `scores ${pct(R.leak.honest)}`],
+  ["hook", `scores ${pct(R.leak.leaky)} percent`],
+  ["hook-why", `the ${pct(R.leak.leaky)} came from`],
+  ["leak-hook", `the ${pct(R.leak.leaky)} from the opening`],
+  ["leak-hook", `the ${whole(R.leak.kept)} columns most related to the label`],
+  ["leak-fold", `it scores ${pct(R.leak.honest)}`],
   ["leak-forms", `${pct(R.leak.scalerLeaky)} percent either way`],
-  ["bias-sim", "five hundred training sets of fifty points"],
-  ["bias-sum", point(d1.sum.toFixed(2))],
+  ["bias-sim", `${whole(B.reps)} training sets of ${whole(B.n)} points`],
+  ["bias-sum", `error is ${point(d1.sum.toFixed(2))}`],
   ["bias-sum", `${point(d1.bias2.toFixed(2))} bias`],
   ["bias-sum", `${point(d1.variance.toFixed(2))} variance`],
   ["bias-sum", `${point(d1.noise.toFixed(2))} noise`],
   ["bias-sum", `depth ${whole(B.best)} is lowest, at ${point(d3.sum.toFixed(2))}`],
-  ["bias-sum", `climbs back to ${point(d12.sum.toFixed(2))}`],
-  ["bias-data", `from ${point(d12.variance.toFixed(2))} to ${point(big12.variance.toFixed(2))}`],
-  ["bias-data", `stays at ${point(big1.bias2.toFixed(2))}`],
-  ["fit-curves", `still falling at ${whole(SIZESMAX())} rows`],
-  ["under-fix", `from six point ${Math.round(R.fit.plain * 10) % 10 === 9 ? "nine" : "?"}`],
-  ["under-fix", `to ${whole(Math.floor(R.fit.engineered))} point ${ONES[Math.round(R.fit.engineered * 10) % 10]}`],
+  ["bias-data", `from ${point(d6.variance.toFixed(2))} to ${point(big6.variance.toFixed(2))}`],
+  ["fit-curves", `still falling at ${whole(R.fit.tree.sizes.at(-1))} rows`],
+  ["under-line", "both near seven"],
+  ["under-fix", `from ${tenths(R.fit.plain)} to ${tenths(R.fit.engineered)}`],
+  ["reg-run", `has ${whole(R.reg.features)} features, ${whole(R.reg.informative.length)} of them informative`],
   ["reg-run", `keeps all ${whole(R.reg.ridgeNonZero)}`],
   ["reg-run", `exactly the ${whole(R.reg.lassoNonZero)}`],
-  ["split", "a hundred and twenty"],
-  ["split-sim", `averages ${pct(R.split.meanWinnerVal)} percent`],
-  ["split-sim", `and ${pct(R.split.meanWinnerTest)} on the test set`],
-  ["cv-run", `from ${pct(Math.min(...R.cv.folds))} to eighty-seven and a half`],
-  ["cv-run", "seventy-nine and a half"],
-  ["cv-groups", `${pct(R.cv.shuffled)} percent`],
+  ["reg-prod", `${whole(R.reg.lassoNonZero)} features to compute at serving time, not ${whole(R.reg.features)}`],
+  ["split-sim", `try ${whole(R.split.settings)} settings`],
+  ["split-sim", `the ${whole(R.split.sizes[1])} validation rows`],
+  ["split-result", `over ${whole(R.split.repeats)} repeats`],
+  ["split-result", `averages ${pct(R.split.meanWinnerVal)} percent on validation, and ${pct(R.split.meanWinnerTest)} on the test set`],
+  ["split-prod", `report ${pct(R.split.meanWinnerVal)} and ship ${pct(R.split.meanWinnerTest)}`],
+  ["cv-run", `from ${pct(Math.min(...R.cv.folds))} to eighty-seven and a half percent`],
+  ["cv-run", "seventy-nine and a half, give or take four"],
+  ["cv-groups", `${whole(R.cv.users)} users, ${whole(R.cv.rowsPerUser)} rows each`],
+  ["cv-groups", `scores ${pct(R.cv.shuffled)} percent`],
   ["cv-groups", `it scores ${pct(R.cv.grouped)}`],
-  ["pr-page", point(R.page.f1.toFixed(3).replace(/0+$/, ""))],
-  ["pr-thresh", `precision is ${pct(T(0.5).precision)} percent and recall ${pct(T(0.5).recall)}`],
-  ["pr-thresh", `${pct(T(0.1).precision)} and ${pct(T(0.1).recall)}`],
-  ["pr-cost", `${whole(R.fraud.top1000.caught)} of the ${whole(R.fraud.fraud)}`],
-  ["auc-fraud", point(R.fraud.rocAuc.toFixed(2))],
-  ["auc-fraud", "a thousand false alarms"],
-  ["auc-pr", point(R.fraud.prAuc.toFixed(2))],
-  ["imb", `${pct(R.fraud.allLegitAccuracy)} percent`],
-  ["imb-trap", `from ${pct(T(0.5).recall)} percent to ${pct(R.fraud.weighted.at.recall)}`],
+  ["pr-page", `${whole(R.page.tp)} caught, ${whole(R.page.fn)} missed and ${whole(R.page.fp)} false alarm`],
+  ["pr-page", point(String(R.page.f1))],
+  ["pr-thresh", `precision is ${share(T(0.5).tp, T(0.5).flagged)} percent and recall ${share(T(0.5).tp, R.fraud.fraud)}`],
+  ["pr-thresh", `at point one, ${share(T(0.1).tp, T(0.1).flagged)} and ${share(T(0.1).tp, R.fraud.fraud)}`],
+  ["pr-capacity", `${whole(R.fraud.top1000.caught)} of the ${whole(R.fraud.fraud)} frauds`],
+  ["auc-fraud", `is ${point(R.fraud.rocAuc.toFixed(2))}`],
+  ["auc-fraud", "ninety-nine thousand legitimate transactions"],
+  ["auc-pr", `${point(R.fraud.prAuc.toFixed(2))}, against a chance level of ${point(R.fraud.rate.toFixed(2))}`],
+  ["imb", `scores ${pct(R.fraud.allLegitAccuracy)} percent`],
+  ["imb-trap", `from ${share(T(0.5).tp, R.fraud.fraud)} percent to ${share(R.fraud.weighted.at.tp, R.fraud.fraud)}`],
   ["imb-trap", `${pct(R.fraud.weighted.meanProbability)} percent likely`],
   ["imb-trap", `from ${point(R.fraud.prAuc.toFixed(2))} to ${point(R.fraud.weighted.prAuc.toFixed(2))}`],
-  ["r-early", `epoch ${whole(R.early.best)}`],
-  ["r-early", `stops at ${whole(R.early.stop)}`],
+  ["r-early-plateau", `patience of ${whole(E.short.patience)}, stops at epoch ${epoch(E.short.stop)}`],
+  ["r-early-plateau", `its best is epoch ${epoch(E.globalBest)}`],
 ];
-function SIZESMAX() {
-  return R.fit.tree.sizes.at(-1);
-}
 for (const [id, phrase] of claims) if (!text(id).includes(phrase)) problems.push(`script.ts "${id}" no longer says "${phrase}"`);
 
 // Facts the narration rests on, beyond its words.
@@ -423,7 +434,18 @@ if (R.fit.tree.train.some((v) => v !== 0)) problems.push("the unpruned tree's tr
 const tv = R.fit.tree.validation;
 if (!(tv.at(-1) < tv.at(-2))) problems.push("the tree's validation error is no longer falling at the largest size");
 if (Math.abs(R.fit.linear.validation.at(-1) - 7) > 0.5 || Math.abs(R.fit.linear.train.at(-1) - 7) > 0.5) problems.push(`the line's curves end at ${R.fit.linear.train.at(-1)} and ${R.fit.linear.validation.at(-1)}, not near seven`);
-if (R.leak.draws.some(([a, b]) => a < 0.7 || b > 0.6)) problems.push(`a draw where the leak is not dramatic: ${JSON.stringify(R.leak.draws)}`);
+if (R.leak.draws.some(([a, b]) => a < 0.75 || b > 0.65)) problems.push(`a draw where the leak is not dramatic: ${JSON.stringify(R.leak.draws)}`);
+// "about what always guessing the commoner label gets"
+const common = Math.max(R.leak.positives, R.leak.rows - R.leak.positives) / R.leak.rows;
+if (Math.abs(R.leak.honest - common) > 0.02) problems.push(`the honest score ${R.leak.honest} is not near the commoner label's ${common}`);
+// "the stump's bias doesn't fall at all"; "almost all of it variance" past depth three
+if (!(big1.bias2 >= d1.bias2 * 0.95)) problems.push(`the stump's bias falls with more data: ${d1.bias2} → ${big1.bias2}`);
+if (B.rows.filter((r) => r.depth > 3).some((r) => r.bias2 > 0.1 * r.variance)) problems.push("past depth three, bias is not negligible next to variance");
+// "stops on a plateau": the short patience keeps a worse epoch than the long one finds
+if (!(E.long.best === E.globalBest && E.short.best < E.globalBest && E.short.bestValidation > E.globalBestValidation + 1)) problems.push(`patience: ${JSON.stringify([E.short, E.long, E.globalBest])}`);
+// "within a few hundred rows": the line's two curves within 1 of each other by 250 rows
+const li = R.fit.linear.sizes.indexOf(250);
+if (Math.abs(R.fit.linear.validation[li] - R.fit.linear.train[li]) > 1) problems.push("the line's curves have not met by 250 rows");
 if (R.reg.ridgeUselessMaxAbs >= 0.25) problems.push(`ridge's useless weights reach ${R.reg.ridgeUselessMaxAbs}, not under a quarter`);
 
 for (const p of problems) console.error(p);

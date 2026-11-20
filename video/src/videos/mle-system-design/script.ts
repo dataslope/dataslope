@@ -95,15 +95,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the two count histograms side by side, training (no bar at 0) and
  *     serving (60% of rows at 0, that bar red), on "never zero" and "six
  *     times in ten".
- *   q2-silent: the "served" bar keeps its red; a dashboard with every light
- *     green and "no error" under it (the trap is that it's silent); then the
- *     fork's two arrows merge into one "shared feature path" box, green, and
- *     a small "logged serving features vs training features" comparison
- *     arrow under it.
- *   q3: question card. The shared path from q2 becomes a "Feature store"
- *     box; two teams' models drawing the same
- *     feature from it on "reuse"; the train and serve arrows from the same
- *     box on "one transformation".
+ *   q2-silent: the "served" bar keeps its red; a log with "no errors" and
+ *     the offline report still reading 60% (the trap is that it's silent);
+ *     then the fork's two arrows merge into one "shared feature path" box,
+ *     green, and a small "logged serving features vs training features"
+ *     comparison arrow under it.
+ *   q3: question card. q3-what: the shared path from q2 becomes a "Feature
+ *     store" box; two teams' models drawing the same feature from it on
+ *     "reuse"; the train and serve arrows from the same box on "one
+ *     transformation".
  *   q3-stores: the box splits into two below it, "Offline store" (a long
  *     table of dated rows, "full history", blue) and "Online store" (one
  *     row per key, "latest value · milliseconds"), the pipeline's arrow
@@ -117,13 +117,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "Latency: one request's time, judged at p95 and p99", a skewed latency
  *     histogram with its tail shaded yellow on "the tail"; "Throughput:
  *     requests per second, across the system".
- *   q5-gpu: the page's chart (batch-size-throughput) redrawn from
- *     results.json batching.chart: throughput and latency per pass, each as
- *     a multiple of batch 1, against batch size 1 to 128 on a log axis;
+ *   q5-gpu: the site's batching chart (charts/batch-size-throughput.mjs,
+ *     placed on the mlops page) redrawn from results.json batching.chart:
+ *     throughput and latency per pass, each as a multiple of batch 1,
+ *     against batch size 1 to 128 on a log axis;
  *     the knee at 32 marked, "7.8× throughput" in blue and "4.1× latency"
  *     beside it on "thirty-two"; the flattening and the climb lit on "Past
- *     that". A "cost model from the page's chart: 2.8 ms a pass + 0.31 ms a
- *     request" note.
+ *     that". A "cost model: 2.8 ms a pass + 0.31 ms a request" note, lit on
+ *     "a fixed cost per pass".
  *   q5-sim: one GPU box with a queue of dots in front, a "simulation: 1,000
  *     requests/s, random arrivals" note. Left, "one at a time": the queue
  *     grows off the frame, "capacity 320/s" and "+680 waiting every second"
@@ -162,18 +163,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     named: features (amount, merchant category, time since last,
  *     device and location, velocity 1 h / 24 h, the last lit yellow, the
  *     credit-card spot beside it).
- *   q9-serve: "Gradient boosting" and "or a sequence model" as two badges;
- *     the model box at "authorization", "< 100 ms" in yellow; the velocity
- *     counts arriving from the online store (q3's box, small).
+ *   q9-serve: "Gradient boosting" and "or a neural net over the history"
+ *     as two badges; the model box at "authorization", "< 100 ms" in
+ *     yellow; the velocity counts arriving from the online store (q3's box,
+ *     small).
  *   q9-labels: a timeline: transactions on the left, their chargebacks
  *     arriving weeks to the right; a "train on" bracket that stops where
  *     labels are complete, green; the recent stretch past it, where a fraud
  *     has no chargeback yet, marked "looks honest" in red.
  *   q9-watch: two monitors under the flow, "precision and recall (as
  *     labels arrive)" and "drift in velocity features (before they do)".
- *   q10: question card. A funnel (the funnel spot), "millions of items" at
- *     the top, "retrieval: nearest-neighbour search over embeddings" at the
- *     first narrowing, "a few hundred candidates" under it.
+ *   q10: question card; the funnel spot on "funnel". q10-retrieve: the
+ *     funnel drawn as outlined stages, "millions of items" at the top,
+ *     "retrieval: nearest-neighbor search over embeddings" at the first
+ *     narrowing, "a few hundred candidates" under it.
  *   q10-rank: two more narrowings, "ranking: P(click or purchase), rich
  *     cross features" and "re-ranking: diversity, freshness, promotions",
  *     the "final list" at the tip; "A B tests on revenue, engagement"
@@ -250,7 +253,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     but increase per-request latency", "a single inference request leaves
  *     most GPU cores idle", "waiting up to a few milliseconds", replicas
  *     add throughput "without hurting per-replica latency": the page. The
- *     cost model is the page's chart (batch-size-throughput.mjs): a batch of
+ *     cost model is the one behind the batching chart on mlops.mdx
+ *     (charts/batch-size-throughput.mjs, "a simple cost model" aloud, since
+ *     this video plays on ml-system-design.mdx): a batch of
  *     b takes (b + 9) / 3200 s; batch 32 gives 7.8 times batch 1's
  *     throughput for 4.1 times its latency per pass, checked against the
  *     chart's caption. The simulation (seeded, 60 s of random arrivals,
@@ -259,6 +264,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     still waiting when the stream stops); up to 32 at once, taking what
  *     has queued, p50 6.5 ms and p99 10.3 ms, mean batch 4.1. At 100 a
  *     second, the median is 3.1 ms with no wait and 8.1 ms with a 5 ms wait.
+ *     (results.json also holds four replicas each taking 250 a second one
+ *     at a time, p99 32 ms, for a builder who wants it; it is not said.)
  *   - q7: 32-bit float to 8-bit int or 4-bit, size, bandwidth, speed,
  *     minimal accuracy loss, post-training against quantization-aware: the
  *     page. The run (scikit-learn's 1,797 digits, 30% held out, seed 0): an
@@ -331,7 +338,7 @@ export const script: NarrationScript = {
       text: "So choose by how fresh the answer must be and how fast it must arrive. Batch also needs its inputs known in advance: you can't precompute a reply to a search nobody has typed yet. Many systems mix the two, with features cached in batch and light scoring online.",
       pauseAfter: 0.8,
     },
-    { id: "q2-in", text: "Serving online brings this round's favourite bug." },
+    { id: "q2-in", text: "Serving online brings this round's favorite bug." },
 
     // ── 2. Training-serving skew ──────────────────────────────────────────
     {
@@ -342,7 +349,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-sim",
-      text: "Simulate a fraud model with one feature that matters: the card's transactions in the past hour. Training builds it from the warehouse, where the current transaction is already logged, so the count includes it. The serving path counts before it's written. Off by one.",
+      text: "Simulate a fraud model whose most telling feature is the card's transactions in the past hour. Training builds it from the warehouse, where the current transaction is already logged, so the count includes it. The serving path counts before it's written. Off by one.",
       pauseAfter: 0.6,
     },
     {
@@ -352,7 +359,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-silent",
-      text: "Nothing errors and nothing alerts, because the offline numbers used the training definition. So build every feature through one shared path, and compare logged serving features with the training ones.",
+      text: "Nothing errors, and offline evaluation can't see it, because it used the training definition. So build every feature through one shared path, and compare logged serving features with the training ones.",
       pauseAfter: 0.8,
     },
 
@@ -360,7 +367,12 @@ export const script: NarrationScript = {
     {
       id: "q3",
       scene: true,
-      text: "Questions three and four. What is a feature store, and why use one? And what are its offline and online stores? It's one place to define, store and serve features, for training and serving alike. Teams reuse vetted features instead of rewriting them, and one transformation backs both paths, which is the cure for question two.",
+      text: "Questions three and four. What is a feature store, and why use one? And what are its offline and online stores?",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q3-what",
+      text: "It's one place to define, store and serve features, for training and serving alike. Teams reuse vetted features instead of rewriting them, and one transformation backs both paths, which is the cure for question two.",
       pauseAfter: 0.6,
     },
     {
@@ -384,7 +396,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q5-gpu",
-      text: "One request leaves most of a GPU idle, and every pass has a fixed cost. In the cost model behind the page's chart, a batch of thirty-two gets about eight times the throughput of one at a time, for four times the latency per pass. Past that, throughput flattens and latency keeps climbing.",
+      text: "One request leaves most of a GPU idle, and every pass has a fixed cost. In a simple cost model, a fixed cost per pass plus a little per request, a batch of thirty-two gets about eight times the throughput of one at a time, for four times the latency per pass. Past that, throughput flattens and latency keeps climbing.",
       pauseAfter: 0.7,
     },
     {
@@ -467,7 +479,12 @@ export const script: NarrationScript = {
     {
       id: "q10",
       scene: true,
-      text: "Questions ten and eleven. Sketch a recommendation or ranking system. And how do you handle the cold-start problem? The standard design is a funnel. Retrieval, a light model searching embeddings for nearest neighbours, narrows millions of items to a few hundred candidates.",
+      text: "Questions ten and eleven. Sketch a recommendation or ranking system. And how do you handle the cold-start problem? The standard design is a funnel.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q10-retrieve",
+      text: "Retrieval, a light model searching embeddings for nearest neighbors, narrows millions of items to a few hundred candidates.",
       pauseAfter: 0.6,
     },
     {

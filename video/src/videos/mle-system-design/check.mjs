@@ -21,7 +21,7 @@
 //     the soft target a distilled student would learn from.
 //   - A seeded queue simulation (charts/_theme.mjs's rng, the generator the
 //     site's charts use) of one GPU serving requests, on the cost model the
-//     page's own chart uses (charts/batch-size-throughput.mjs: a batch of b
+//     batching chart on mlops.mdx uses (charts/batch-size-throughput.mjs: a batch of b
 //     takes (b + 9) / 3200 seconds, so a fixed 2.8 ms a pass plus 0.31 ms a
 //     request), one at a time against dynamic batching, checked against the
 //     chart's caption.
@@ -70,6 +70,7 @@ const QUOTES = [
   [MSD, "hybrids (cached batch features + online scoring) are common"],
   [MLOPS, "Choose by the freshness and latency the product needs"],
   [MSD, "Feasible only for tiny input spaces"],
+  [MLOPS, "<Chart slug=\"batch-size-throughput\" />"],
   // Question 2, both pages.
   [MSD, "When a feature is computed differently at training time than at serving time (different code, data, or timing)"],
   [MSD, "Offline metrics look fine; production underperforms"],
@@ -244,7 +245,7 @@ json.dumps(R)
 const R = JSON.parse(out);
 
 // ── Questions 5 and 6: one GPU, one request at a time or in batches ────────
-// The page's chart (charts/batch-size-throughput.mjs): a batch of b takes
+// The batching chart on mlops.mdx (charts/batch-size-throughput.mjs): a batch of b takes
 // (b + 9) / 3200 seconds, so throughput is 3200 b / (b + 9) a second.
 {
   const PEAK = 3200;

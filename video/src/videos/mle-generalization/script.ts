@@ -43,8 +43,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Overlap with the Data Scientist series (ds-ml-evaluation answers several of
  * the same questions): none of its worked examples is reused. It used a sine
  * and polynomials for bias and variance, the diabetes set for L1 and L2, the
- * breast cancer set for folds, two Gaussian classes at 2% and x² for the
- * learning rate. This video measures the decomposition itself with trees,
+ * breast cancer set for folds and two Gaussian classes at 2% for the metrics.
+ * This video measures the decomposition itself with trees,
  * uses the page's own blocks and data, Friedman #1, and its own simulations,
  * and argues the engineer's side: what ships, what it costs at serving time,
  * what a fold must not split, what a review queue can hold, and what class
@@ -53,10 +53,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * On screen, beat by beat (for phase 2; nothing is built yet). Colors keep the
  * series' meanings (interview.tsx): red the trap or the error, green the right
  * answer, yellow what the narration points at, blue data. The flamingo hero
- * stands beside the opening and the close; the two spots are the dartboard
- * ("bias-sim") and the stopwatch ("r-early").
+ * stands beside the opening and the close; the three spots are things the
+ * narration names: the coin ("hook", "split-sim"), the target with its darts
+ * ("bias-dart") and the payment card ("pr-cost").
  *   hook: a block of tiny cells, "200 rows × 10,000 columns" in blue, with a
- *     label column of 0s and 1s and a coin beside it; "Cross-validated
+ *     label column of 0s and 1s and the coin spot beside it; "Cross-validated
  *     accuracy" over a large "85%" in ink. hook-why: a dashed line "50%: a
  *     coin flip" under it, and the 85% turns red on "Nothing". hook-round:
  *     "Does it work on data it hasn't seen?" as the headline, the flamingo
@@ -69,12 +70,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     removes it).
  *   bias-sim: the curve (ink) with one training set's fifty points (blue), a
  *     stump's two-step fit and a depth-6 tree's jagged fit drawn over it.
- *     Then, at x = 0.25 where the curve is 1, a number line from 0 to 2 with
- *     the target marked: sixty stumps' predictions (bias.dart["1"].first) as
- *     a tight cluster near 0.65, a yellow bracket from their mean to the
+ *   bias-dart: at x = 0.25, where the curve is 1, a number line from 0 to 2
+ *     with the target marked: sixty stumps' predictions (bias.dart["1"].first)
+ *     as a tight cluster near 0.65, a yellow bracket from their mean to the
  *     target on "bias"; sixty depth-6 trees' predictions (dart["6"]) spread
- *     around 1.0, a yellow span over their spread on "variance". The
- *     dartboard spot beside the line.
+ *     around 0.97, a yellow span over their spread on "variance". The
+ *     target spot beside the line.
  *   bias-sum: depth 1 to 12 on the x axis: bias² falling, variance rising
  *     (dashed), noise a flat grey band at 0.09, their sum solid; depth 3, the
  *     minimum, ringed green. Beside it depth 1's stacked bar, 0.07 + 0.04 +
@@ -87,12 +88,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     bridge to the next figure.
  *   fit: question card. fit-curves: Friedman #1 learning curves for an
  *     unpruned tree: training error flat at 0 (blue), validation (ink) falling
- *     from 25.6 at 30 rows to 7.7 at 2,000; the gap shaded yellow, "variance",
- *     an arrow on its right end, "still closing". Noise floor dashed at 1.0.
+ *     from 25.6 at 30 rows to 7.7 at 2,000. fit-gap: the gap shaded yellow,
+ *     "variance", an arrow on its right end, "still closing". Noise floor
+ *     dashed at 1.0.
  *   fit-fix: the remedies as a ruled list, each inking on its words.
- *   under: question card swaps to 3; the straight line's two curves beside
- *     the tree's, meeting by a few hundred rows and flattening near 7, the
- *     level bracketed yellow, "bias".
+ *   under: question card swaps to 3. under-line: the straight line's two
+ *     curves beside the tree's, meeting by a few hundred rows and flattening
+ *     near 7, the level bracketed yellow, "bias".
  *   under-fix: the remedies; then the line's error as two bars, 6.9 → 4.6
  *     (green), labelled "+ x1·x2, + x3²".
  *   reg: question card. reg-run: the page's block, twenty coefficients as two
@@ -105,23 +107,26 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     20" in green; then two correlated features, lasso keeping one, elastic
  *     net both.
  *   measure-in: the plan's three groups again, the second lit.
- *   split: question card; one bar split 120 / 40 / 40, "Train", "Validation",
- *     "Test", each inking as named; a lock on Test, "touched once".
- *   split-sim: the label column becomes coin flips; fifty settings as fifty
- *     dots on a validation-accuracy line, the best ringed (split.first). Then
- *     two histograms of the 200 repeats: winners' validation scores (red,
- *     centred near 64%) and the same winners' test scores (blue, near 50%);
- *     a dashed "50%: a coin flip".
+ *   split: question card; one bar split 60 / 20 / 20, "Train 120",
+ *     "Validation 40", "Test 40" (the page's block), each inking as named; a
+ *     lock on Test, "touched once".
+ *   split-sim: the coin spot; the label column becomes coin flips; fifty
+ *     settings as fifty dots on a validation-accuracy line, the best ringed
+ *     (split.first).
+ *   split-result: two histograms of the 200 repeats: winners' validation
+ *     scores (red, centred near 64%) and the same winners' test scores
+ *     (blue, near 50%); a dashed "50%: a coin flip".
  *   split-prod: "Reported: 64%" (red) and "In production: 50%"; then a
  *     timeline, past → future, cut into train, validation, test in that order.
  *   leak: question card. leak-hook: the opening's block: twenty columns lit
  *     yellow down every row, including the fold held out (those cells red),
- *     "85%" red; then the selection redrawn inside one fold's training rows
- *     only (green), "54%", beside "54.5%: always guess the commoner label".
- *   leak-forms: a small row, "Scaler fitted on all rows: 80% / 80%" (ink),
- *     then the fixes as a list: "One pipeline, fitted on the training split",
- *     "Audit for proxies of the label" with a refund flag in a fraud model,
- *     and a total computed from later data (red until fixed).
+ *     "85%" red. leak-fold: the selection redrawn inside one fold's training
+ *     rows only (green), "54%", beside "54.5%: always guess the commoner
+ *     label".
+ *   leak-forms: a small row, "Scaler fitted on all rows: 80% / 80%" (ink).
+ *   leak-fix: the fixes as a list: "One pipeline, fitted on the training
+ *     split", "Audit for proxies of the label" with a refund flag in a fraud
+ *     model, and a total computed from later data (both red, the leaks).
  *   cv: question card; five outlined fold boxes rotating, the held-out one
  *     yellow. cv-run: each fold's score appears as it is held out, 75, 77.5,
  *     87.5, 77.5, 80; then "79.5% ± 4.3", the page's printed line in mono
@@ -130,19 +135,22 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "A training run that takes days: one hold-out" (ink).
  *   cv-groups: sixty users as sixty short columns of eight dots; shuffled
  *     folds colour a user's dots both train and validation (red), "97%";
- *     grouped folds keep each column whole (green), "50%". Then a time series
- *     with forward folds (train left, validate right of it).
+ *     grouped folds keep each column whole (green), "50%".
+ *   cv-keep: a time series with forward folds (train left, validate to its
+ *     right), under "User, session, patient: one fold each".
  *   score-in: the plan's third group lit.
  *   pr: question card; the page's confusion matrix, TP 3, FN 1, FP 1, TN 3,
  *     with precision (the TP over the predicted-positive column) and recall
  *     (the TP over the actually-positive row) traced as named.
- *   pr-page: "Precision 0.75 · Recall 0.75 · F1 0.75".
+ *   pr-page: "F1 = harmonic mean", then "Precision 0.75 · Recall 0.75 · F1
+ *     0.75".
  *   pr-thresh: the fraud model's precision and recall against the threshold
  *     (fraud.sweep), two lines crossing; markers at 0.5 (84% / 24%) and at
  *     0.1 (35% / 54%), each lit as said.
- *   pr-cost: a card icon with a block mark (false alarm) and a coin stack
- *     (a miss), neither green; then "Top 1,000 alerts a day: 466 of 995
- *     caught" in green.
+ *   pr-cost: the card spot, "False alarm: a good customer blocked" and
+ *     "Miss: the money lost" beside it, neither green.
+ *   pr-capacity: "Top 1,000 alerts a day: 466 of 995 caught" in green, the
+ *     top 1,000 scores lit on the threshold line.
  *   auc: question card (read "ar-oh-see ay-you-see" and "pee-ar ay-you-see";
  *     the screen says ROC-AUC and PR-AUC); the fraud model's ROC curve
  *     (fraud.roc) over the diagonal, its area shaded blue, "0.91".
@@ -160,12 +168,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     green.
  *   rapid-in: RapidFire, rows 11 and 12.
  *   r-early: the small network's training and validation loss by epoch
- *     (early.train, early.validation); patience 20's stop at 66 and its kept
- *     epoch 46 in red ("stopped on a plateau"), the best epoch, 168, in green,
- *     reached with a patience of 50. The stopwatch spot.
+ *     (early.train, early.validation), "patience" as a bracket of epochs after
+ *     the best so far.
+ *   r-early-plateau: patience 20's stop at epoch 68, keeping epoch 48, in red
+ *     ("stopped on a plateau"); the best epoch, 168, in green (a patience of
+ *     50 reaches it).
  *   r-metrics: the page's chart redrawn from errors.sweep: MAE and RMSE as one
- *     residual of fifty grows from 0 to 40 (RMSE 2.7 → 6.3, MAE 2.2 → 3.0);
- *     then "R² = 0: the mean's own score" and "below 0: worse than the mean".
+ *     residual of fifty grows from 0 to 40 (RMSE 2.7 → 6.3, MAE 2.2 → 3.0).
+ *   r-r2: "R² = 0: the mean's own score" and "Below 0: worse than the mean".
  *   next: the plan's three groups, all lit, the flamingo returning;
  *     <NextLine> "Next: models and how they learn" on "Next".
  *
@@ -244,7 +254,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - r-early: the page's definition (patience, best weights restored). The
  *     video's own small network: one hidden layer of 300 units, no penalty,
  *     150 rows of Friedman #1, 1,000 validation rows, 400 epochs. Patience
- *     20 stops at epoch 66 keeping 46 (loss 8.0, a plateau); the best epoch
+ *     20 stops at epoch 68 keeping 48 (loss 8.0, a plateau); the best epoch
  *     is 168 (6.3), which a patience of 50 finds.
  *   - r-metrics: the page's definitions, its R² caution ("most natural for
  *     ordinary least squares with an intercept"; "can be negative"), and its
@@ -252,10 +262,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     2.7 → 6.3. Training on squared error predicts the conditional mean, on
  *     absolute error the median: the standard result, said without a number.
  *
- * Written for Drew's ear: initialisms in plain caps (ML, ROC respelled with
- * AUC and PR as the README's "ar-oh-see ay-you-see", RMSE, MAE, SMOTE, kNN
- * not said), "L one", "L two" and "F one" as words, R² as "R squared", no
- * sentence opening "A" before an initialism, numbers as they are said.
+ * Written for Drew's ear: ML, ROC (the curve), RMSE and MAE in plain caps, read
+ * as letters; SMOTE said as a word ("smote", for the lexicon); ROC-AUC and
+ * PR-AUC respelled as the README asks, "ar-oh-see ay-you-see" and "pee-ar
+ * ay-you-see", which the cue phrases quote; "L one", "L two" and "F one" as
+ * words, R² as "R squared"; no sentence opening "A" before an initialism;
+ * numbers as they are said.
  */
 export const script: NarrationScript = {
   id: "mle-generalization",
