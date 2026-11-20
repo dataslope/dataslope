@@ -571,7 +571,7 @@ export const script: NarrationScript = {
     {
       id: "r-fe",
       text: "Feature engineering turns raw data into useful inputs: interactions, the hour or weekday, logs of skewed values, bins, rolling aggregates. Good features often matter more than the algorithm.",
-      pauseAfter: 0.9,
+      pauseAfter: 0.7,
     },
     {
       id: "next",

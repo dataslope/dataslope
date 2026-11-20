@@ -132,7 +132,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     87.5, 77.5, 80; then "79.5% ± 4.3", the page's printed line in mono
  *     (cv.printed), set as the block's output.
  *   cv-when: two short lines, "Scarce data, model comparison" (green) and
- *     "A training run that takes days: one hold-out" (ink).
+ *     "A training run that takes days: one hold-out" (green too: both are
+ *     right, each in its case).
  *   cv-groups: sixty users as sixty short columns of eight dots; shuffled
  *     folds colour a user's dots both train and validation (red), "97%";
  *     grouped folds keep each column whole (green), "50%".
@@ -147,7 +148,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   pr-thresh: the fraud model's precision and recall against the threshold
  *     (fraud.sweep), two lines crossing; markers at 0.5 (84% / 24%) and at
  *     0.1 (35% / 54%), each lit as said.
- *   pr-cost: the card spot, "False alarm: a good customer blocked" and
+ *   pr-cost: "Precision: when false alarms cost", "Recall: when misses
+ *     cost"; then the card spot, "False alarm: a good customer blocked" and
  *     "Miss: the money lost" beside it, neither green.
  *   pr-capacity: "Top 1,000 alerts a day: 466 of 995 caught" in green, the
  *     top 1,000 scores lit on the threshold line.
@@ -175,7 +177,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     50 reaches it).
  *   r-metrics: the page's chart redrawn from errors.sweep: MAE and RMSE as one
  *     residual of fifty grows from 0 to 40 (RMSE 2.7 → 6.3, MAE 2.2 → 3.0).
- *   r-r2: "R² = 0: the mean's own score" and "Below 0: worse than the mean".
+ *   r-r2: "R² = 0: the mean's own score" and "Below 0: worse than the mean";
+ *     "a share of variance explained" struck in red on "no share" (the page's
+ *     caution: misleading out of sample).
  *   next: the plan's three groups, all lit, the flamingo returning;
  *     <NextLine> "Next: models and how they learn" on "Next".
  *
@@ -573,8 +577,8 @@ export const script: NarrationScript = {
     },
     {
       id: "r-r2",
-      text: "R squared compares your squared error with always predicting the mean: one is perfect, zero is the mean's own score, and on new data it can go negative, so there, don't call it variance explained.",
-      pauseAfter: 0.9,
+      text: "R squared compares your squared error with always predicting the mean: one is perfect, zero is the mean's own score, and on new data it can go negative, which no share of variance explained could.",
+      pauseAfter: 0.7,
     },
     {
       id: "next",
