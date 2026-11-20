@@ -101,6 +101,23 @@ R["tokens"] = {
     "pieces": {w: pieces(w) for w in ["hallucination", "tokenization", "unhappiness", "GloVe", "LoRA", "embeddings"]},
     "embeddingWidth": WIDTH, "embeddingTable": enc.n_vocab * WIDTH,
 }
+# The hook's sentence as o200k_base cuts it, so the chips on screen are real tokens.
+HOOK = "A language model never sees your text."
+R["hook"] = {"sentence": HOOK, "pieces": [enc.decode([t]) for t in enc.encode(HOOK)]}
+
+# Two figures drawn from stated, illustrative scores (the screen says so):
+# one query's four attention scores (question 4), and eight next-token
+# scores for the temperature dial (the quick round). Softmaxed here.
+sm = lambda v: (lambda e: e / e.sum())(np.exp(np.array(v) - max(v)))
+ATT = {"words": ["the", "river", "bank", "flooded"], "query": 2, "scores": [0.2, 2.1, 1.3, 0.9]}
+ATT["weights"] = [r3(v) for v in sm(ATT["scores"])]
+NEXT = [3.0, 2.3, 1.7, 1.2, 0.7, 0.3, -0.2, -0.7]
+p1 = sm(NEXT)
+R["illustrative"] = {
+    "attention": ATT,
+    "nextScores": NEXT, "nextProbs": [r3(v) for v in p1],
+    "topK": 3, "topP": 0.9, "topPCount": int(np.searchsorted(np.cumsum(p1), 0.9) + 1),
+}
 
 # ── 13. Retrieval by shared words over the track's 167 answers ──
 docs = []

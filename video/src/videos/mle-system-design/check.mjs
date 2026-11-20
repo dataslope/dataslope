@@ -211,6 +211,7 @@ base_pred = net.predict(Xte)
 base_acc = float((base_pred == yte).mean())
 rows = [{"bits": 32, "weightBytes": weights * 4, "accuracy": r4(base_acc), "changed": 0, "fixed": 0, "broke": 0}]
 saved = [w.copy() for w in net.coefs_]
+preds = {}
 for bits in [8, 4, 3, 2]:
     levels = 2 ** (bits - 1) - 1  # symmetric: -levels .. +levels
     q = []
@@ -220,13 +221,22 @@ for bits in [8, 4, 3, 2]:
     net.coefs_ = q
     pred = net.predict(Xte)
     net.coefs_ = saved
+    preds[bits] = pred
     changed = pred != base_pred
     rows.append({
         "bits": bits, "weightBytes": weights * bits // 8, "accuracy": r4((pred == yte).mean()),
         "changed": int(changed.sum()),
         "fixed": int((changed & (pred == yte)).sum()), "broke": int((changed & (base_pred == yte)).sum()),
     })
-R["quant"] = {"weights": weights, "biases": biases, "test": int(len(yte)), "train": int(len(ytr)), "rows": rows}
+# For the figure: the first eight held-out digits as the network reads them
+# (8x8 pixels, 0 to 16, row by row), and the two whose answers change at 4
+# bits, with the 32-bit and 4-bit answers.
+img = lambda i: [int(v) for v in (Xte[i] * 16).round()]
+gallery = [{"image": img(i), "label": int(yte[i]), "pred": int(base_pred[i])} for i in range(8)]
+moved = [{"index": int(i), "image": img(i), "label": int(yte[i]), "pred32": int(base_pred[i]), "pred4": int(preds[4][i])}
+         for i in np.where(preds[4] != base_pred)[0]]
+R["quant"] = {"weights": weights, "biases": biases, "test": int(len(yte)), "train": int(len(ytr)), "rows": rows,
+              "gallery": gallery, "changed4": moved}
 
 # ── Quick round, distillation: the soft target for one held-out nine ──
 P = net.predict_proba(Xte)

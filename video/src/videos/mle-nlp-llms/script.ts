@@ -354,7 +354,7 @@ export const script: NarrationScript = {
       text: "word2vec learns word vectors by prediction: a shallow network, given a word, predicts its neighbors. GloVe counts how often words occur together across the whole corpus, and factorizes that table. Both give each word one fixed vector.",
       pauseAfter: 0.7,
     },
-    { id: "q3", text: "Question three. What is the difference between static and contextual embeddings?" },
+    { id: "q3", scene: true, text: "Question three. What is the difference between static and contextual embeddings?" },
     {
       id: "q3-a",
       text: "A static vector puts bank at one point, river or money. A transformer computes a fresh vector for each occurrence from the words around it, so the two banks separate. That's a big reason transformers won.",
@@ -383,7 +383,7 @@ export const script: NarrationScript = {
       text: "Every pair of tokens is one hop apart, so distance costs nothing, but the pairs grow with the square of the length.",
       pauseAfter: 0.7,
     },
-    { id: "q5", text: "Question five. What is multi-head attention, and why use it?" },
+    { id: "q5", scene: true, text: "Question five. What is multi-head attention, and why use it?" },
     {
       id: "q5-a",
       text: "Give each head its own smaller query, key and value, run attention in each, in parallel, and concatenate the results. One head can track syntax, another which noun a pronoun means.",
@@ -407,7 +407,7 @@ export const script: NarrationScript = {
       text: "Encoder-only models like BERT attend both ways, for understanding. Decoder-only models like GPT mask the future, for generation. Encoder-decoder models like T5 turn one sequence into another.",
       pauseAfter: 0.7,
     },
-    { id: "q7", text: "Question seven. Why did transformers replace RNNs for most NLP?" },
+    { id: "q7", scene: true, text: "Question seven. Why did transformers replace RNNs for most NLP?" },
     {
       id: "q7-a",
       text: "An RNN squeezes everything through one hidden state, one step at a time: slow to train, and forgetful over distance. A transformer links any two tokens directly and, in training, processes every position at once, which is what a GPU is built for.",
@@ -431,7 +431,7 @@ export const script: NarrationScript = {
       text: "Past that, teams reach for sparse, sliding-window or linear attention, or retrieve the passages that matter instead of pasting in everything.",
       pauseAfter: 0.6,
     },
-    { id: "q9", text: "Question nine. What is a context window, and why does its size matter?" },
+    { id: "q9", scene: true, text: "Question nine. What is a context window, and why does its size matter?" },
     {
       id: "q9-a",
       text: "It's the most tokens, prompt and output together, that the model can attend to at once. Instructions, documents and history all compete for it, a longer one costs more, and anything past the limit is invisible.",
@@ -445,7 +445,7 @@ export const script: NarrationScript = {
       text: "Training on a huge unlabeled corpus, where the text is its own label. Masked language modeling, BERT's, hides tokens and predicts them from both sides. Causal language modeling, GPT's, predicts the next token from the left alone, which is what lets it generate.",
       pauseAfter: 0.6,
     },
-    { id: "q11", text: "Question eleven. What is the difference between pretraining and fine-tuning?" },
+    { id: "q11", scene: true, text: "Question eleven. What is the difference between pretraining and fine-tuning?" },
     {
       id: "q11-a",
       text: "Pretraining is the expensive phase, once per model. Fine-tuning cheaply adapts it to one task, on a much smaller labeled set. Instruction tuning and RLHF, reinforcement learning from human feedback, then teach it to follow instructions and match human preferences.",
@@ -487,7 +487,7 @@ export const script: NarrationScript = {
       text: "But the answer is only as good as the retrieval. Search this track's hundred and sixty-seven answers by shared words for how to stop an LLM making things up: the hallucination answer scores zero, sharing none of those words. Retrieval has to match meaning, which is what embeddings are for, usually alongside keyword search for exact names.",
       pauseAfter: 0.7,
     },
-    { id: "q14", text: "Question fourteen. When would you choose RAG over fine-tuning, and vice versa?" },
+    { id: "q14", scene: true, text: "Question fourteen. When would you choose RAG over fine-tuning, and vice versa?" },
     {
       id: "q14-a",
       text: "RAG for knowledge: facts that change, are private, or are too many to memorize, since updating the store needs no training. Fine-tuning for behavior: a style, a vocabulary, an output format. They compose: fine-tune for behavior, retrieve for facts.",
@@ -527,6 +527,7 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
+      scene: true,
       text: "But a model in a notebook isn't a product yet. Next: ML system design, the system around it.",
     },
   ],

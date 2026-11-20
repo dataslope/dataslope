@@ -98,3 +98,18 @@ export const LORA = results.lora as {
   copyGB: number;
   adapterMB: number;
 };
+
+/** The hook's sentence and its o200k_base tokens (each with its leading space). */
+export const HOOK = results.hook as { sentence: string; pieces: string[] };
+
+/** Stated, illustrative scores (the screen says so), softmaxed in check.mjs:
+ *  one query's four attention scores (question 4), and eight next-token
+ *  scores for the temperature dial (question 18). */
+export const ILLUS = results.illustrative as {
+  attention: { words: string[]; query: number; scores: number[]; weights: number[] };
+  nextScores: number[];
+  nextProbs: number[];
+  topK: number;
+  topP: number;
+  topPCount: number;
+};
