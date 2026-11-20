@@ -193,7 +193,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     on a log axis, "dense to
  *     1,000 units: 150,529,000" and "first convolution: 448" (green).
  *   q11-cost: the page's listing as four outlined boxes with their counts
- *     (448, 4,640, 330, total 5,418); then "each weight used at 50,176
+ *     (448, 4,640, 330, total 5,418); then "first layer: each weight used at 50,176
  *     positions" and "21.7 million multiply-adds" (yellow).
  *   q11-bias: "Nearby pixels belong together" as the takeaway line.
  *   rapid-in: RapidFire rows 12 and 13.
