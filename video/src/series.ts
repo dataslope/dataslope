@@ -152,6 +152,22 @@ export const SERIES = {
       { n: 9, title: "The AI-allowed round", videos: ["BackendEngineer-9-AiRound"] },
     ],
   },
+  AnalyticsEngineer: {
+    kind: "interview",
+    name: "Analytics Engineer Interview Questions",
+    units: [
+      { n: 0, title: "The interview, now", videos: ["AnalyticsEngineer-0-Interview"] },
+      { n: 1, title: "Facts, dimensions and grain", videos: ["AnalyticsEngineer-1-FactsAndGrain"] },
+      { n: 2, title: "Dimensions that change", videos: ["AnalyticsEngineer-2-ChangingDimensions"] },
+      { n: 3, title: "How dbt builds a project", videos: ["AnalyticsEngineer-3-Dbt"] },
+      { n: 4, title: "Incremental models", videos: ["AnalyticsEngineer-4-Incremental"] },
+      { n: 5, title: "Advanced SQL", videos: ["AnalyticsEngineer-5-AdvancedSql"] },
+      { n: 6, title: "Warehouses and what they cost", videos: ["AnalyticsEngineer-6-Warehousing"] },
+      { n: 7, title: "Testing and data quality", videos: ["AnalyticsEngineer-7-Testing"] },
+      { n: 8, title: "Metrics and the semantic layer", videos: ["AnalyticsEngineer-8-Metrics"] },
+      { n: 9, title: "AI and the semantic layer", videos: ["AnalyticsEngineer-9-AiSemanticLayer"] },
+    ],
+  },
 } satisfies Record<string, SeriesDef>;
 
 export type SeriesKey = keyof typeof SERIES;

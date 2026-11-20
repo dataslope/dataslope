@@ -48,6 +48,9 @@ export const SAY: Readonly<Record<string, string>> = {
   ASCII: "ask-ee",
   XOR: "ex-or",
   deque: "deck",
+  // The Analytics Engineer series (2026-11-20). dbt, SCD, OLTP, CTE and KPI
+  // are read letter by letter, as people say them.
+  YAML: "yammel",
 };
 
 /** Longest first, so DAGs is matched before DAG. A key matches as a whole
