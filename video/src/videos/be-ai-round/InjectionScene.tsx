@@ -67,7 +67,7 @@ export const InjectionScene: React.FC = () => {
   const qAt = n.word("inj", "Question six");
   const textAt = n.word("inj", "What is prompt injection");
   const inputAt = n.word("inj", "It's input that the model follows");
-  const owaspAt = n.word("inj", "It's first on the twenty twenty-five");
+  const owaspAt = n.word("inj-rank", "ranked it first");
   const directAt = n.word("inj-kinds", "Direct injection comes from the user");
   const indirectAt = n.word("inj-kinds", "Indirect injection hides in content");
   const sources = [
@@ -184,7 +184,7 @@ export const InjectionScene: React.FC = () => {
           <Note at={owaspAt} x={1120} y={y(292)}>
             <div style={{ ...note(54, ACCENT_INK), fontWeight: 500, lineHeight: 1.05 }}>1st</div>
             <div style={{ ...label(21, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>
-              on OWASP&apos;s 2025 Top 10 for LLM applications
+              in OWASP&apos;s Top 10 for LLM applications: 2023, 2025, 2026
             </div>
           </Note>
           <Node x={MODEL.x} y={modelTop} w={MODEL.w} h={modelH} at={inputAt + 6} title="Model" tone="plain" size={26} />

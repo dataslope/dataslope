@@ -27,7 +27,7 @@ const GREEN_TINT = `color-mix(in srgb, ${ds("green", 400)} 24%, ${PAPER})`;
  * trips, a million rows in batches of 1,000 are 1,000 calls (counted by the
  * page's generator). Then the page's batched(): islice pulls three at a time
  * from one iterator, and seven items split into three, three and one, until
- * a pull comes back empty; itertools.batched does the same since 3.12.
+ * a pull comes back empty; itertools.batched does the same since 3.12, in tuples.
  */
 export const BatchScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -53,7 +53,8 @@ export const BatchScene: React.FC = () => {
   const frontAt = n.word("batch-iter", "starts at the front every time");
   const neverAt = n.word("batch-iter", "the loop never ends");
   const sinceAt = n.word("batch-builtin", "Since Python three twelve");
-  const exactlyAt = n.word("batch-builtin", "does exactly this");
+  const exactlyAt = n.word("batch-builtin", "does the same job");
+  const tuplesAt = n.word("batch-builtin", "hands back tuples");
   const end = n.beat("retry-in").to;
 
   const F = BATCH.fn;
@@ -237,7 +238,7 @@ export const BatchScene: React.FC = () => {
         {/* ── itertools.batched, since 3.12 ── */}
         <Listing lines={BATCH.builtin.lines} x={X0} top={builtinTop} width={760} size={SIZE} at={sinceAt} marks={[{ line: lineOf(BATCH.builtin.lines, "itertools.batched"), at: exactlyAt, color: MARK }]} />
         <Console lines={BATCH.builtin.out} x={RIGHT_X + 340} top={outTop} width={300} at={exactlyAt - 2} />
-        <Note at={exactlyAt + 4} x={RIGHT_X + 340} y={outTop + consoleHeight(BATCH.builtin.out.length) + h(14)}>
+        <Note at={tuplesAt} x={RIGHT_X + 340} y={outTop + consoleHeight(BATCH.builtin.out.length) + h(14)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>batched gives tuples</span>
         </Note>
       </Drift>

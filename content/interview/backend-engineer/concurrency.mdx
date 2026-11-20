@@ -48,6 +48,10 @@ consequence: threads give **no speedup for CPU-bound** Python code, they take
 turns. They still help **I/O-bound** work, because a thread releases the GIL
 while waiting on the network or disk.
 
+All of that describes the default build. The **free-threaded** build,
+officially supported since Python 3.14, removes the GIL: threads then run
+CPU-bound Python in parallel, and unlocked shared state races for real.
+
 ### What is a race condition?
 
 A race condition is when the result depends on the **timing** of concurrent
@@ -138,7 +142,9 @@ run on an **event loop**; when a coroutine `await`s an I/O operation, it
 instead of blocking. There is no preemption, a coroutine that never awaits
 (e.g. a tight CPU loop) starves all others. It shines for high-concurrency
 I/O: thousands of sockets on one thread. Below, `gather` runs both coroutines
-concurrently and returns their results **in order**:
+concurrently and returns their results **in order** (`asyncio.TaskGroup`,
+in Python 3.11 and later, does the same job and also cancels the remaining
+tasks when one fails):
 
 <CodeBlock
   adapter="python"
@@ -205,7 +211,10 @@ Match the tool to the bottleneck:
 - **I/O-bound, blocking libraries** → **threads** (they release the GIL while
   waiting; a thread pool caps concurrency).
 - **CPU-bound** → **multiprocessing** (separate processes sidestep the GIL for
-  true parallelism).
+  true parallelism). Python 3.14 added two alternatives inside one process:
+  threads on a free-threaded build, and
+  `concurrent.futures.InterpreterPoolExecutor`, which runs several
+  interpreters that each have their own GIL.
 
 The deciding question is always: is the program waiting on I/O, or burning
 CPU?
@@ -247,7 +256,7 @@ around the whole operation so it appears atomic to other threads.
 - A larger thread pool.
   > More threads do not bypass the GIL; the CPU work is still serialized.
 - \`threading\` with one thread per core.
-  > CPython's GIL serializes bytecode execution, so threads give no parallel speedup for CPU-bound work.`}
+  > On the default CPython build the GIL serializes bytecode execution, so threads give no parallel speedup for CPU-bound work. They do on a free-threaded build, which is not what you get by default.`}
 />
 
 <MultipleChoice
@@ -260,7 +269,7 @@ around the whole operation so it appears atomic to other threads.
 - Threads silently drop iterations under load.
   > The iterations all run; the increments collide on shared state without mutual exclusion.
 - The GIL guarantees only one increment ever runs.
-  > The GIL serializes *bytecode*, but a single \`+=\` spans multiple bytecodes, so a thread switch mid-operation still loses updates.`}
+  > The GIL serializes *bytecode*, but a single \`+=\` spans multiple bytecodes, and nothing guarantees a thread switch cannot land between them. On a free-threaded build the loss shows up immediately.`}
 />
 
 <MultipleChoice

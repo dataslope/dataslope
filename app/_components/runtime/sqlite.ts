@@ -21,6 +21,15 @@ import type {
   TableColumnInfo,
 } from "./sqlite-core";
 
+/** sqlite-wasm prefixes every message with its result code twice over
+ *  (`SQLITE_ERROR: sqlite3 result code 1: no such table: x`). The code says
+ *  nothing a reader can act on, so errors leave the worker without it. */
+const SQLITE_CODE_PREFIX = /^SQLITE_[A-Z_]+:\s*sqlite3 result code \d+:\s*/;
+
+export function stripSqliteCodePrefix(message: string): string {
+  return message.replace(SQLITE_CODE_PREFIX, "");
+}
+
 type SqliteEngineMethod = keyof SqliteEngine;
 
 type SqliteWorkerRequest = {
@@ -71,7 +80,7 @@ export async function createSqliteEngine(
     if (!callbacks) return;
     pending.delete(msg.id);
     if (msg.ok) callbacks.resolve(msg.result);
-    else callbacks.reject(new Error(msg.error));
+    else callbacks.reject(new Error(stripSqliteCodePrefix(msg.error)));
   });
 
   worker.addEventListener("error", (ev) => {

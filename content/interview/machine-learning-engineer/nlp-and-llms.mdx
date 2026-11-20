@@ -3,7 +3,7 @@ title: NLP & LLMs
 description: Machine Learning Engineer interview questions on tokenization, embeddings, self-attention, transformers, pretraining vs fine-tuning, prompting, RAG, and hallucination.
 ---
 
-Large language models are now a standard interview topic even for
+Large language models are a standard interview topic, even for
 non-NLP roles. Expect questions on how text becomes vectors, how attention
 and transformers work, and how you adapt, prompt, ground, and evaluate an
 LLM. Review the Q&A, then take the concept checks.
@@ -20,7 +20,7 @@ LLM. Review the Q&A, then take the concept checks.
 Tokenization splits text into the units a model actually consumes.
 Word-level tokenization has huge vocabularies and no way to handle
 out-of-vocabulary words; character-level keeps sequences very long.
-**Subword** schemes, byte-pair encoding (BPE), WordPiece, SentencePiece,
+**Subword** schemes, byte-pair encoding (BPE), WordPiece, the unigram model,
 strike the balance: frequent words stay whole, rare words split into
 reusable pieces, so any string is representable with a fixed, modest
 vocabulary.
@@ -45,7 +45,8 @@ vectors capturing analogies like $\text{king} - \text{man} + \text{woman} \appro
 
 A static embedding (word2vec, GloVe) gives a word **one** vector regardless
 of context, so "bank" (river vs money) collapses into a single point.
-**Contextual** embeddings from transformers (ELMo, BERT) produce a
+**Contextual** embeddings (ELMo from a bidirectional LSTM, then BERT and
+other transformers) produce a
 **different** vector for each occurrence, computed from the surrounding
 words, so the two senses of "bank" get different representations. This
 context-sensitivity is a big reason transformers outperformed earlier
@@ -91,6 +92,14 @@ connection** and **layer normalization**. Since attention ignores order,
 sequence-to-sequence. Dropping recurrence makes training parallel across
 all positions.
 
+The LLMs built since kept that skeleton and changed three details, which is
+a common follow-up. Normalization moved in front of each sub-layer
+(**pre-norm**, usually RMSNorm), which trains more stably at depth. **Rotary
+position embeddings** rotate the queries and keys by an angle that depends on
+position, so attention sees relative distance instead of an absolute index
+added to the input. And a gated activation such as SwiGLU replaced ReLU in
+the feed-forward network.[^llama]
+
 ### Why did transformers replace RNNs for most NLP?
 
 RNNs process tokens sequentially and pass information through a single
@@ -134,8 +143,9 @@ Prompting steers a frozen model with the input text alone, no weight
 updates. **Zero-shot** just describes the task; **few-shot** includes a few
 worked examples in the prompt so the model infers the pattern in-context;
 **chain-of-thought** asks the model to reason step by step, which improves
-multi-step and arithmetic tasks. Prompt design is often the cheapest lever
-before reaching for fine-tuning.
+multi-step and arithmetic tasks. A model that already reasons before it
+answers does this internally, so asking again mostly adds tokens and latency.
+Prompt design is often the cheapest lever before reaching for fine-tuning.
 
 ### What is retrieval-augmented generation (RAG), and why use it?
 
@@ -172,6 +182,12 @@ it. It matters because self-attention scales **quadratically** with
 sequence length, so longer windows cost more compute and memory, and
 information beyond the limit is simply invisible to the model.
 
+A window large enough to hold every document does not make retrieval
+unnecessary, which is the usual follow-up. Every token in the prompt is paid
+for on every request, and answer quality tends to fall as the context fills
+with loosely relevant text. Choosing what goes into the window still matters
+when everything would fit.
+
 ### What causes hallucination, and how do you mitigate it?
 
 LLMs are trained to produce fluent, probable text, not to verify facts, so
@@ -191,6 +207,11 @@ most likely tokens; **top-p (nucleus)** sampling keeps the smallest set of
 tokens whose cumulative probability exceeds p. Use low temperature for
 factual/extraction tasks and higher for brainstorming.
 
+These are settings of the sampler, so you control them fully on a model you
+serve yourself. A hosted model may fix them: reasoning models in particular
+often reject a request that sets them, and there you steer with the prompt, a
+reasoning-effort setting, and structured outputs.
+
 Top-k and top-p are the two truncation rules, and they diverge exactly
 where the model's confidence does.
 
@@ -201,8 +222,8 @@ where the model's confidence does.
 It depends on the task. **Perplexity** measures language-modeling quality
 intrinsically. Generation uses reference-overlap metrics, **BLEU** for
 translation, **ROUGE** for summarization, plus **exact match** and **F1**
-for extractive QA. Because overlap metrics miss meaning, teams increasingly
-rely on **human evaluation** and **LLM-as-judge** (a strong model scores
+for extractive QA. Because overlap metrics miss meaning, teams also rely on
+**human evaluation** and **LLM-as-judge** (a strong model scores
 outputs against a rubric), ideally on a held-out, task-representative set.
 
 ### What are embeddings used for beyond input representation?
@@ -267,3 +288,7 @@ prompt.
 
 - [Natural Language Processing with Python](/courses/natural-language-processing-python)
 - [Machine Learning with scikit-learn](/courses/machine-learning-scikit-learn)
+
+[^llama]:
+    Touvron et al., ["LLaMA: Open and Efficient Foundation Language Models"](https://arxiv.org/abs/2302.13971),
+    2023, section 2.2, which lists the three changes together.

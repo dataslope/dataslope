@@ -4108,7 +4108,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <Dialog.Backdrop className="confirm-backdrop" />
             <Dialog.Popup className="confirm-popup" role="alertdialog">
               <Dialog.Title className="confirm-title">
-                Clear all localStorage data?
+                Clear saved settings and code?
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
                 This will permanently delete every saved setting and code
@@ -4142,15 +4142,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <Dialog.Backdrop className="confirm-backdrop" />
             <Dialog.Popup className="confirm-popup" role="alertdialog">
               <Dialog.Title className="confirm-title">
-                Clear all local data?
+                Delete everything saved in this browser?
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
                 This will permanently delete every saved setting, code snippet,{" "}
                 <strong>workspace</strong>, persisted <strong>database</strong>,
                 and uploaded <strong>data file</strong> across{" "}
-                <strong>all playgrounds</strong>, including localStorage, OPFS,
-                IndexedDB, and any cached assets. The page will reload
-                immediately. This can&rsquo;t be undone.
+                <strong>all playgrounds</strong>, along with the downloads this
+                site has cached. The page will reload immediately. This
+                can&rsquo;t be undone.
               </Dialog.Description>
               <div className="confirm-actions">
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">

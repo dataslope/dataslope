@@ -392,7 +392,7 @@ function seedCreditCard(db: Database): void {
 const CC_DEFAULT_TABS: QueryTabSeed[] = [
   {
     title: "Explore users",
-    code: `-- Explore the users table\nSELECT *\nFROM users\nLIMIT 10;`,
+    code: `-- Explore the users table\nSELECT *\nFROM users\nORDER BY user_id\nLIMIT 10;`,
   },
   {
     title: "High income, low FICO",

@@ -66,7 +66,14 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "Most analysts now draft queries with an AI assistant that writes code from a plain request. Interviewers know it, and it has changed what they test: less can you write this query, more can you tell whether it's right.",
+      // Re-voiced 2026-11-20 without "Most analysts now", as the page's own
+      // opening was made evergreen; the second sentence is cut from the take.
+      text: "Analysts draft queries with an AI assistant that writes code from a plain request.",
+      pauseAfter: 0.35,
+    },
+    {
+      id: "hook-test",
+      text: "Interviewers know it, and it has changed what they test: less can you write this query, more can you tell whether it's right.",
       pauseAfter: 0.6,
     },
     {
