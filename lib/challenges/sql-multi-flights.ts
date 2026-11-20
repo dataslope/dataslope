@@ -11,16 +11,19 @@
  * Shared constants carry each step's accepted query into the next step's
  * starter and CTE, so a fix in step 1 cannot leave step 3 quoting a version
  * that no longer exists. `__tests__/challengeSolutions` runs every step's
- * solution against node:sqlite.
+ * solution against PGlite.
  */
 
 import { indentSql, sqlSteps } from "./authoring";
 import { FLIGHTS } from "./dataset-flights";
 import type { Challenge, SqlChallengeTest } from "./types";
 
-/** Whole minutes between two timestamps, rounded before the cast. */
+/**
+ * Whole minutes between two timestamps. Every time in the dataset is on the
+ * minute, so the cast loses nothing.
+ */
 function minutes(from: string, to: string): string {
-  return `CAST(ROUND((julianday(${to}) - julianday(${from})) * 1440) AS INTEGER)`;
+  return `(EXTRACT(EPOCH FROM ${to} - ${from}) / 60)::integer`;
 }
 
 /** Columns, row count and values, with the row-count check explained. */
@@ -97,9 +100,9 @@ const PUNCTUALITY_LEAGUE = sqlSteps(
       title: "Arrival delay per flight",
       short: "Delays",
       solutionNote:
-        "NULL is the honest delay for a flight that never arrived: no number of minutes describes it. Keeping the row now, rather than filtering it out, is what lets step 3 count it against its route. Rounding before the `CAST` matters too: HL303's 16 minutes is 15.9999997 in raw `julianday` arithmetic.",
+        "NULL is the honest delay for a flight that never arrived: no number of minutes describes it, and subtracting a NULL timestamp gives NULL without any special handling. Keeping the row now, rather than filtering it out, is what lets step 3 count it against its route.",
       prompt: [
-        "Start with how late each flight arrived: `actual_arr` minus `scheduled_arr`, in whole minutes. `julianday()` arithmetic is not exact, so `ROUND` the difference before casting it to an integer. Early arrivals are negative.",
+        "Start with how late each flight arrived: `actual_arr` minus `scheduled_arr`, in whole minutes. Subtracting two timestamps gives an `interval`; `EXTRACT(EPOCH FROM ...)` turns it into seconds, so divide by 60 and cast to an `integer`. Early arrivals are negative.",
         "Keep all 25 flights. A cancelled flight has no arrival, so its delay is NULL; do not drop it, because the league needs it later. Sort by `scheduled_dep`.",
       ],
       columns: [
@@ -128,7 +131,7 @@ ORDER BY scheduled_dep
         "Test for the cancellation first. `CASE` takes the first branch that is true, and `NULL <= 15` is not true, so without a branch of its own a cancelled flight falls through to `ELSE` and is labelled late. HL104 is the boundary: exactly 15 minutes late, and on time.",
       prompt: [
         "Add a `status` column: `'cancelled'` when the flight has no actual arrival, `'on time'` when it arrived no more than 15 minutes after schedule (early counts as on time), and `'late'` otherwise.",
-        "Compare the whole-minute delay, not the raw difference. Keep every row and every column from step 1.",
+        "Compare the whole-minute delay from step 1, not the raw interval. Keep every row and every column from step 1.",
       ],
       columns: [
         { name: "flight_no", type: "text" },
@@ -164,7 +167,7 @@ ORDER BY scheduled_dep
         { name: "destination", type: "text" },
         { name: "flights", type: "integer" },
         { name: "on_time", type: "integer" },
-        { name: "on_time_pct", type: "real" },
+        { name: "on_time_pct", type: "numeric" },
       ],
       starter: `${LABELLED_CTE}
 SELECT origin, destination, status
@@ -174,7 +177,7 @@ FROM labelled
 routes AS (
   SELECT origin, destination,
          COUNT(*)                AS flights,
-         SUM(status = 'on time') AS on_time
+         COUNT(*) FILTER (WHERE status = 'on time') AS on_time
   FROM labelled
   GROUP BY origin, destination
 )
@@ -235,7 +238,7 @@ const HUB_CONNECTIONS = sqlSteps(
       title: "Every connection at the hub",
       short: "Pairs",
       solutionNote:
-        "Joining `flights` to itself pairs every inbound flight with every outbound one, and the conditions cut that down to what a passenger could actually do. Filter on the rounded minutes: HL201 into HL202 is exactly 40 minutes and belongs in the list. Leaving the cancelled flights in would add eight connections that nobody could have made that day.",
+        "Joining `flights` to itself pairs every inbound flight with every outbound one, and the conditions cut that down to what a passenger could actually do. Filter on the whole minutes: HL201 into HL202 is exactly 40 minutes, and `BETWEEN` includes both ends, so it belongs in the list. Leaving the cancelled flights in would add eight connections that nobody could have made that day.",
       prompt: [
         "A passenger landing at Bramwick (`BRK`) can connect to a later departure from it. Pair every flight that lands at BRK with every flight that leaves BRK between 40 and 180 minutes later, both ends included, measured from the inbound's `scheduled_arr` to the outbound's `scheduled_dep` in whole minutes.",
         "Leave out cancelled flights on either side, and leave out an onward flight that goes back where the passenger came from: Tollmere to Bramwick to Tollmere is not a connection.",
@@ -246,8 +249,8 @@ const HUB_CONNECTIONS = sqlSteps(
         { name: "outbound", type: "text" },
         { name: "origin", type: "text" },
         { name: "destination", type: "text" },
-        { name: "departs", type: "text" },
-        { name: "arrives", type: "text" },
+        { name: "departs", type: "timestamp" },
+        { name: "arrives", type: "timestamp" },
         { name: "layover_min", type: "integer" },
       ],
       starter: `SELECT i.flight_no AS inbound, o.flight_no AS outbound
@@ -313,8 +316,8 @@ ORDER BY origin, destination`,
         { name: "destination", type: "text" },
         { name: "inbound", type: "text" },
         { name: "outbound", type: "text" },
-        { name: "departs", type: "text" },
-        { name: "arrives", type: "text" },
+        { name: "departs", type: "timestamp" },
+        { name: "arrives", type: "timestamp" },
         { name: "layover_min", type: "integer" },
       ],
       starter: `${CONNECTIONS_CTE}

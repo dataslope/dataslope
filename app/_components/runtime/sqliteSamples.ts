@@ -391,19 +391,19 @@ function seedCreditCard(db: Database): void {
 
 const CC_DEFAULT_TABS: QueryTabSeed[] = [
   {
-    title: "Query 1",
+    title: "Explore users",
     code: `-- Explore the users table\nSELECT *\nFROM users\nLIMIT 10;`,
   },
   {
-    title: "Query 2",
+    title: "High income, low FICO",
     code: `-- Find high-income users with low FICO scores\nSELECT name, annual_income, FICO_score, total_debt\nFROM users\nWHERE annual_income > 80000\n  AND FICO_score < 650\nORDER BY FICO_score ASC;`,
   },
   {
-    title: "Query 3",
+    title: "Transactions by user",
     code: `-- Join transactions with users\nSELECT\n  u.name,\n  t.transaction_id,\n  t.amount,\n  t.merchant_city,\n  t.transaction_date\nFROM transactions t\nJOIN users u ON t.user_id = u.user_id\nORDER BY t.amount DESC\nLIMIT 20;`,
   },
   {
-    title: "Query 4",
+    title: "Vendor summary",
     code: `-- Vendor spending summary\nSELECT *\nFROM vendor_summary\nORDER BY total_revenue DESC;`,
   },
 ];

@@ -11,7 +11,7 @@
  * Shared constants carry each step's accepted query into the next step's
  * starter and CTE, so a fix in step 1 cannot leave step 3 quoting a version
  * that no longer exists. `__tests__/challengeSolutions` runs every step's
- * solution against node:sqlite.
+ * solution against PGlite.
  */
 
 import { indentSql, sqlSteps } from "./authoring";
@@ -24,7 +24,7 @@ const AS_OF = "2024-03-22 18:00:00";
 // ─── First-response SLA ──────────────────────────────────────────────
 
 const DUE_BODY = `SELECT t.ticket_id, t.agent_id, t.priority, t.first_response_at,
-       datetime(t.opened_at, '+' || s.first_response_hours || ' hours') AS respond_by
+       t.opened_at + s.first_response_hours * INTERVAL '1 hour' AS respond_by
 FROM tickets t
 JOIN sla_targets s ON s.priority = t.priority`;
 
@@ -72,9 +72,9 @@ const FIRST_RESPONSE_SLA = sqlSteps(
       title: "Every ticket's deadline",
       short: "Deadlines",
       solutionNote:
-        "Adding hours with a `datetime()` modifier keeps the deadline in the same text format as every other timestamp in the table, and that format compares correctly as text, so the next step can put the two side by side with `<=`. Keeping the unanswered tickets now matters later: they are the ones most likely to breach.",
+        "A timestamp plus an interval is another timestamp, so the deadline has the same type as `first_response_at` and the next step can put the two side by side with `<=`. Keeping the unanswered tickets now matters later: they are the ones most likely to breach.",
       prompt: [
-        "Each priority promises a first response within `first_response_hours` (in `sla_targets`). For every ticket, work out `respond_by`: `opened_at` plus that many hours, built with `datetime(opened_at, '+' || first_response_hours || ' hours')`.",
+        "Each priority promises a first response within `first_response_hours` (in `sla_targets`). For every ticket, work out `respond_by`: `opened_at` plus that many hours, built with `opened_at + first_response_hours * INTERVAL '1 hour'`.",
         "Show it next to `first_response_at`, which is NULL for tickets nobody has answered yet. Keep those.",
         "All 29 tickets, sorted by `ticket_id`.",
       ],
@@ -82,8 +82,8 @@ const FIRST_RESPONSE_SLA = sqlSteps(
         { name: "ticket_id", type: "integer" },
         { name: "agent_id", type: "integer" },
         { name: "priority", type: "text" },
-        { name: "first_response_at", type: "text" },
-        { name: "respond_by", type: "text" },
+        { name: "first_response_at", type: "timestamp" },
+        { name: "respond_by", type: "timestamp" },
       ],
       starter: `SELECT t.ticket_id, t.agent_id, t.priority, t.first_response_at
 FROM tickets t
@@ -174,7 +174,7 @@ ORDER BY d.ticket_id
         { name: "agent", type: "text" },
         { name: "decided", type: "integer" },
         { name: "breached", type: "integer" },
-        { name: "breach_pct", type: "real" },
+        { name: "breach_pct", type: "numeric" },
       ],
       starter: `${STATUS_CTE}
 SELECT agent, COUNT(*) AS decided
@@ -215,10 +215,9 @@ ORDER BY breach_pct DESC, agent`,
 
 // ─── Daily backlog ───────────────────────────────────────────────────
 
-const DAYS_CTE = `WITH RECURSIVE days(day) AS (
-  SELECT '2024-03-04'
-  UNION ALL
-  SELECT date(day, '+1 day') FROM days WHERE day < '2024-03-22'
+const DAYS_CTE = `WITH days AS (
+  SELECT d::date AS day
+  FROM generate_series(TIMESTAMP '2024-03-04', TIMESTAMP '2024-03-22', INTERVAL '1 day') AS d
 )`;
 
 const DAYS = `${DAYS_CTE}
@@ -227,8 +226,8 @@ SELECT day FROM days ORDER BY day`;
 const BACKLOG_BODY = `SELECT d.day, COUNT(t.ticket_id) AS open_tickets
 FROM days d
 LEFT JOIN tickets t
-  ON t.opened_at < datetime(d.day, '+1 day')
- AND (t.resolved_at IS NULL OR t.resolved_at >= datetime(d.day, '+1 day'))
+  ON t.opened_at < d.day + 1
+ AND (t.resolved_at IS NULL OR t.resolved_at >= d.day + 1)
 GROUP BY d.day`;
 
 const BACKLOG = `${DAYS_CTE}
@@ -256,17 +255,14 @@ const DAILY_BACKLOG = sqlSteps(
       title: "One row per day",
       short: "Days",
       solutionNote:
-        "A recursive CTE is a seed row plus a rule for the next row, repeated until the rule's `WHERE` stops producing any. The dates are generated rather than read from `tickets` because the tickets only know about days on which something happened, and a backlog carries over the days on which nothing did.",
+        "`generate_series` returns one row per step from a start to an end, both included, so the calendar comes from the range itself rather than from any table. The dates are generated rather than read from `tickets` because the tickets only know about days on which something happened, and a backlog carries over the days on which nothing did.",
       prompt: [
-        "A backlog chart needs a row for every day, including days when nothing happened. Generate every date from `'2024-03-04'` to `'2024-03-22'` with a recursive CTE, adding one day at a time with `date(day, '+1 day')`.",
+        "A backlog chart needs a row for every day, including days when nothing happened. Generate every date from `'2024-03-04'` to `'2024-03-22'` with `generate_series`: `generate_series(TIMESTAMP '2024-03-04', TIMESTAMP '2024-03-22', INTERVAL '1 day')` steps one day at a time, and `::date` turns each step into a date.",
         "Return the single column `day`, in order.",
       ],
-      columns: [{ name: "day", type: "text" }],
-      starter: `WITH RECURSIVE days(day) AS (
-  SELECT '2024-03-04'
-  -- Add one day at a time until 2024-03-22.
-)
-SELECT day FROM days ORDER BY day
+      columns: [{ name: "day", type: "date" }],
+      starter: `-- One row per date, from 2024-03-04 to 2024-03-22.
+SELECT DATE '2024-03-04' AS day
 `,
       solution: DAYS,
       tests: [
@@ -295,12 +291,12 @@ SELECT day FROM days ORDER BY day
       solutionNote:
         "The join condition is an interval test, not an equality: a ticket belongs to every day its open interval spans, so one ticket joins many days. `resolved_at IS NULL OR ...` is the part that is easy to lose, because a bare `resolved_at >= midnight` is NULL for an open ticket and drops exactly the tickets a backlog is made of.",
       prompt: [
-        "A ticket is in the backlog at the end of a day if it was opened before the following midnight and not resolved before it: `opened_at` earlier than `datetime(day, '+1 day')`, and `resolved_at` either NULL or at or after that midnight.",
+        "A ticket is in the backlog at the end of a day if it was opened before the following midnight and not resolved before it: `opened_at` earlier than `day + 1`, and `resolved_at` either NULL or at or after that midnight. Adding an integer to a date moves it that many days, and a date compares with a timestamp as its midnight.",
         "Use `resolved_at` as `tickets` records it, the final resolution, even for a ticket that was reopened on the way.",
         "Left-join the tickets onto the days so every day appears, and count them as `open_tickets`. Sort by `day`.",
       ],
       columns: [
-        { name: "day", type: "text" },
+        { name: "day", type: "date" },
         { name: "open_tickets", type: "integer" },
       ],
       starter: `${DAYS_CTE}
@@ -339,7 +335,7 @@ ORDER BY d.day
         "Sort by `day`.",
       ],
       columns: [
-        { name: "day", type: "text" },
+        { name: "day", type: "date" },
         { name: "open_tickets", type: "integer" },
         { name: "opened", type: "integer" },
         { name: "resolved", type: "integer" },
@@ -351,8 +347,8 @@ ORDER BY day
 `,
       solution: `${BACKLOG_CTE}
 SELECT b.day, b.open_tickets,
-       (SELECT COUNT(*) FROM tickets t WHERE date(t.opened_at)   = b.day) AS opened,
-       (SELECT COUNT(*) FROM tickets t WHERE date(t.resolved_at) = b.day) AS resolved
+       (SELECT COUNT(*) FROM tickets t WHERE t.opened_at::date   = b.day) AS opened,
+       (SELECT COUNT(*) FROM tickets t WHERE t.resolved_at::date = b.day) AS resolved
 FROM backlog b
 WHERE b.open_tickets = (SELECT MAX(open_tickets) FROM backlog)
 ORDER BY b.day`,

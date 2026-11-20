@@ -11,7 +11,7 @@
  * Shared constants carry each step's accepted query into the next step's
  * starter and CTE, so a fix in step 1 cannot leave step 3 quoting a version
  * that no longer exists. `__tests__/challengeSolutions` runs every step's
- * solution against node:sqlite.
+ * solution against Postgres (PGlite).
  */
 
 import { indentSql, sqlSteps } from "./authoring";
@@ -71,7 +71,7 @@ const STUDENT_TRANSCRIPT = sqlSteps(
         { name: "course_code", type: "text" },
         { name: "credits", type: "integer" },
         { name: "grade", type: "text" },
-        { name: "quality_points", type: "real" },
+        { name: "quality_points", type: "numeric" },
       ],
       starter: `SELECT s.full_name, e.term, c.course_code, c.credits, e.grade
 FROM enrollments e
@@ -120,7 +120,7 @@ ORDER BY s.full_name, e.term, c.course_code
         { name: "full_name", type: "text" },
         { name: "term", type: "text" },
         { name: "term_credits", type: "integer" },
-        { name: "term_gpa", type: "real" },
+        { name: "term_gpa", type: "numeric" },
       ],
       starter: `${GRADED_CTE}
 SELECT full_name, term
@@ -168,8 +168,8 @@ ORDER BY full_name, term`,
       columns: [
         { name: "full_name", type: "text" },
         { name: "term", type: "text" },
-        { name: "term_gpa", type: "real" },
-        { name: "cumulative_gpa", type: "real" },
+        { name: "term_gpa", type: "numeric" },
+        { name: "cumulative_gpa", type: "numeric" },
       ],
       starter: `${TERMS_CTE}
 SELECT full_name, term,
@@ -352,7 +352,7 @@ ORDER BY s.full_name, r.department
       title: "What is still missing",
       short: "Missing",
       solutionNote:
-        "`GROUP_CONCAT` skips NULLs, so feeding it `CASE WHEN met = 0 THEN department END` lists only the shortfalls, and a student with none gets NULL rather than an empty string. The `ORDER BY` inside the aggregate makes the list deterministic; without it the departments come out in whatever order the engine reads them.",
+        "`FILTER (WHERE met = 0)` hands `STRING_AGG` only the shortfalls, and a student with none gets NULL rather than an empty string, because an aggregate over no rows is NULL. The `ORDER BY` inside the aggregate makes the list deterministic; without it the departments come out in whatever order the engine reads them.",
       prompt: [
         "Summarise the audit per student: their major, `requirements_met` (how many of their requirements are met), and `missing`, the departments where they are still short, in alphabetical order and separated by a comma and a space.",
         "A student who has met everything has nothing missing: leave `missing` NULL for them. Every student appears, including the ones with no credits at all.",
@@ -373,7 +373,7 @@ ORDER BY requirements_met DESC, full_name
       solution: `${AUDIT_CTE}
 SELECT full_name, major,
        SUM(met) AS requirements_met,
-       GROUP_CONCAT(CASE WHEN met = 0 THEN department END, ', ' ORDER BY department) AS missing
+       STRING_AGG(department, ', ' ORDER BY department) FILTER (WHERE met = 0) AS missing
 FROM audit
 GROUP BY full_name, major
 ORDER BY requirements_met DESC, full_name`,

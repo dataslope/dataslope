@@ -5,9 +5,10 @@
  * builders/parsers the browser uses — against real engines, without a
  * browser:
  *
- *  - SQL runs on `node:sqlite`. The browser ships SQLite 3.53 via WASM and
- *    Node here carries 3.4x; both have window functions, CTEs and `strftime`,
- *    which is the whole surface the pilot uses.
+ *  - SQL runs on PGlite, the same Postgres 18 compiled to WASM that the
+ *    browser loads, and its results go through the browser's own converter
+ *    (`resultToQueryExecResult`), so a `date` reaches the grader as
+ *    `YYYY-MM-DD` here exactly as it does on the page.
  *  - Python and JavaScript run as subprocesses. The harness builders emit
  *    plain Python and plain ES-module JavaScript with no runtime-specific
  *    API, so `python3` and `node` execute exactly what Pyodide and the JS
@@ -26,7 +27,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DatabaseSync } from "node:sqlite";
+import { PGlite } from "@electric-sql/pglite";
 import { describe, expect, it } from "vitest";
 import {
   buildHarness,
@@ -42,6 +43,7 @@ import {
   type SqlEngineLike,
   type SqlResult,
 } from "@/app/_components/sqlChallengeHarness";
+import { resultToQueryExecResult } from "@/app/_components/runtime/postgres";
 import {
   getChallenge,
   getChallengeSlugs,
@@ -51,61 +53,74 @@ import {
   type ChallengeTask,
 } from "@/lib/challenges";
 
-// ─── A node:sqlite engine that looks like the browser's ──────────────
+// ─── A PGlite engine that looks like the browser's ──────────────────
 
 /**
- * Split a script into statements so `exec` can return one result set per
- * statement, the way the browser engine does. Quote-aware so a semicolon
- * inside a string literal does not split a statement in half.
+ * One Postgres for the whole sweep, with each dataset seeded once into its own
+ * schema. Booting PGlite takes seconds, and there are a few hundred SQL tasks,
+ * so a database per task would dominate the run.
+ *
+ * Isolation comes from transactions instead: every task opens one, points its
+ * `search_path` at the dataset's schema (so unqualified names resolve the way
+ * they do in the browser's `public`), and rolls back on release. Nothing a
+ * task does can be seen by the next one.
  */
-function splitStatements(sql: string): string[] {
-  const out: string[] = [];
-  let current = "";
-  let quote: string | null = null;
-  for (let i = 0; i < sql.length; i++) {
-    const ch = sql[i];
-    if (quote) {
-      current += ch;
-      if (ch === quote) quote = sql[i + 1] === quote ? (i++, current += ch, quote) : null;
-      continue;
-    }
-    if (ch === "'" || ch === '"') {
-      quote = ch;
-      current += ch;
-      continue;
-    }
-    if (ch === ";") {
-      if (current.trim()) out.push(current.trim());
-      current = "";
-      continue;
-    }
-    current += ch;
-  }
-  if (current.trim()) out.push(current.trim());
-  return out;
+let pgPromise: Promise<PGlite> | null = null;
+const datasetSchemas = new Map<string, Promise<string>>();
+
+function postgres(): Promise<PGlite> {
+  pgPromise ??= PGlite.create();
+  return pgPromise;
 }
 
-function nodeSqlEngine(initSql: string): SqlEngineLike {
-  const db = new DatabaseSync(":memory:");
-  db.exec(initSql);
+/** The schema holding this seed, seeding it on first use. */
+function datasetSchema(initSql: string): Promise<string> {
+  let schema = datasetSchemas.get(initSql);
+  if (!schema) {
+    const name = `dataset_${datasetSchemas.size + 1}`;
+    schema = (async () => {
+      const db = await postgres();
+      await db.exec(`CREATE SCHEMA ${name}; SET search_path TO ${name};`);
+      await db.exec(initSql);
+      await db.exec("SET search_path TO public;");
+      return name;
+    })();
+    datasetSchemas.set(initSql, schema);
+  }
+  return schema;
+}
+
+interface TaskEngine extends SqlEngineLike {
+  /** Roll the task's transaction back. Must be called before the next task. */
+  release: () => Promise<void>;
+}
+
+async function taskEngine(initSql: string): Promise<TaskEngine> {
+  const schema = await datasetSchema(initSql);
+  const db = await postgres();
+  await db.exec(`BEGIN; SET LOCAL search_path TO ${schema};`);
   return {
-    label: "SQLite",
+    label: "PostgreSQL",
     version: "node",
     exec: async (sql: string): Promise<SqlResult[]> =>
-      splitStatements(sql).map((statement) => {
-        const prepared = db.prepare(statement);
-        // `.all()` throws on a statement that returns nothing (INSERT, DDL);
-        // run it instead and report an empty result, like the browser does.
-        try {
-          const rows = prepared.all() as Record<string, unknown>[];
-          const columns = prepared.columns().map((c) => c.name);
-          return { columns, values: rows.map((r) => columns.map((c) => r[c])) };
-        } catch {
-          prepared.run();
-          return { columns: [], values: [] };
-        }
-      }),
+      (await db.exec(sql)).map(
+        (r) => resultToQueryExecResult(r) ?? { columns: [], values: [] },
+      ),
+    release: async () => {
+      await db.exec("ROLLBACK;");
+    },
   };
+}
+
+/** Run a task's SQL on a fresh transaction and keep its last result set. */
+async function lastResultOf(initSql: string, sql: string): Promise<SqlResult | null> {
+  const engine = await taskEngine(initSql);
+  try {
+    const results = await engine.exec(sql);
+    return [...results].reverse().find((r) => r.columns.length > 0) ?? null;
+  } finally {
+    await engine.release();
+  }
 }
 
 // ─── Running code the way the browser runtime would ──────────────────
@@ -155,24 +170,28 @@ function runJavaScript(source: string, timeout = 30_000): CodeRun {
 
 async function checkSqlTask(challenge: Challenge, task: ChallengeTask, label: string) {
   if (challenge.runtime.kind !== "sql") throw new Error("not a sql challenge");
-  const engine = nodeSqlEngine(challenge.runtime.initSql);
-  const results = await engine.exec(task.solutionCode);
-  const finalResult =
-    [...results].reverse().find((r) => r.columns.length > 0) ?? null;
+  const engine = await taskEngine(challenge.runtime.initSql);
+  try {
+    const results = await engine.exec(task.solutionCode);
+    const finalResult =
+      [...results].reverse().find((r) => r.columns.length > 0) ?? null;
 
-  expect(finalResult, `${label}: the reference solution returned no result set`).not.toBeNull();
-  expect(finalResult!.values.length, `${label}: the reference solution returned no rows`).toBeGreaterThan(0);
+    expect(finalResult, `${label}: the reference solution returned no result set`).not.toBeNull();
+    expect(finalResult!.values.length, `${label}: the reference solution returned no rows`).toBeGreaterThan(0);
 
-  for (const test of task.tests as SqlChallengeTest[]) {
-    const { pass, detail } = await evaluateSqlTest(test, {
-      engine,
-      finalResult,
-      // The solution is being graded against itself, which is what makes
-      // `matchesSolution` meaningful here: it proves the check is runnable
-      // and self-consistent, and every other check does the real work.
-      solutionResult: finalResult,
-    });
-    expect(pass, `${label} · ${test.name}: ${detail ?? "failed"}`).toBe(true);
+    for (const test of task.tests as SqlChallengeTest[]) {
+      const { pass, detail } = await evaluateSqlTest(test, {
+        engine,
+        finalResult,
+        // The solution is being graded against itself, which is what makes
+        // `matchesSolution` meaningful here: it proves the check is runnable
+        // and self-consistent, and every other check does the real work.
+        solutionResult: finalResult,
+      });
+      expect(pass, `${label} · ${test.name}: ${detail ?? "failed"}`).toBe(true);
+    }
+  } finally {
+    await engine.release();
   }
 }
 
@@ -217,22 +236,27 @@ function checkCodeTask(lang: ChallengeLanguage, label: string) {
  */
 async function starterPassesSql(challenge: Challenge, task: ChallengeTask): Promise<boolean> {
   if (challenge.runtime.kind !== "sql") throw new Error("not a sql challenge");
-  const engine = nodeSqlEngine(challenge.runtime.initSql);
-  let finalResult: SqlResult | null = null;
+  const { initSql } = challenge.runtime;
+  // The solution first, on its own transaction: the two share one database,
+  // so they cannot both hold one open.
+  const solutionResult = await lastResultOf(initSql, task.solutionCode);
+  const engine = await taskEngine(initSql);
   try {
-    const results = await engine.exec(task.starterCode);
-    finalResult = [...results].reverse().find((r) => r.columns.length > 0) ?? null;
-  } catch {
-    return false;
+    let finalResult: SqlResult | null = null;
+    try {
+      const results = await engine.exec(task.starterCode);
+      finalResult = [...results].reverse().find((r) => r.columns.length > 0) ?? null;
+    } catch {
+      return false;
+    }
+    for (const test of task.tests as SqlChallengeTest[]) {
+      const { pass } = await evaluateSqlTest(test, { engine, finalResult, solutionResult });
+      if (!pass) return false;
+    }
+    return true;
+  } finally {
+    await engine.release();
   }
-  const solutionResults = await nodeSqlEngine(challenge.runtime.initSql).exec(task.solutionCode);
-  const solutionResult =
-    [...solutionResults].reverse().find((r) => r.columns.length > 0) ?? null;
-  for (const test of task.tests as SqlChallengeTest[]) {
-    const { pass } = await evaluateSqlTest(test, { engine, finalResult, solutionResult });
-    if (!pass) return false;
-  }
-  return true;
 }
 
 // The slowest starter that finishes takes ~0.3 s; six loop forever on purpose,
@@ -333,10 +357,15 @@ describe("challenge starters", () => {
 /**
  * The schema browser is authored by hand beside the seed it describes, so the
  * two can disagree: a column renamed in the `CREATE TABLE` but not in the
- * browser, or a row count left over from before a few inserts were added.
- * The learner reads the browser, then writes a query against the seed.
+ * browser, a type changed in one place, or a row count left over from before
+ * a few inserts were added. The learner reads the browser, then writes a
+ * query against the seed.
  */
 describe("challenge datasets", () => {
+  /** information_schema's spelling, shortened to what the browser shows. */
+  const shownType = (dataType: string) =>
+    dataType === "timestamp without time zone" ? "timestamp" : dataType;
+
   const seen = new Set<string>();
   for (const slug of SLUGS) {
     const challenge = getChallenge(slug)!;
@@ -345,27 +374,42 @@ describe("challenge datasets", () => {
     if (seen.has(initSql)) continue;
     seen.add(initSql);
 
-    it(`${slug}'s dataset matches its schema browser`, () => {
-      const db = new DatabaseSync(":memory:");
-      db.exec(initSql);
+    it(`${slug}'s dataset matches its schema browser`, async () => {
+      const schema = await datasetSchema(initSql);
+      const db = await postgres();
       const tables = (
-        db
-          .prepare("SELECT name FROM sqlite_schema WHERE type = 'table' ORDER BY name")
-          .all() as { name: string }[]
-      ).map((t) => t.name);
+        await db.query<{ table_name: string }>(
+          `SELECT table_name FROM information_schema.tables
+            WHERE table_schema = $1 AND table_type = 'BASE TABLE'
+            ORDER BY table_name`,
+          [schema],
+        )
+      ).rows.map((t) => t.table_name);
       expect(tables, `${slug}: tables`).toEqual(
         challenge.schema.map((t) => t.name).sort(),
       );
       for (const table of challenge.schema) {
         const columns = (
-          db.prepare(`PRAGMA table_info(${table.name})`).all() as { name: string }[]
-        ).map((c) => c.name);
-        expect(columns, `${slug}: ${table.name} columns`).toEqual(
-          table.columns.map((c) => c.name),
-        );
-        const { n } = db.prepare(`SELECT COUNT(*) AS n FROM ${table.name}`).get() as {
-          n: number;
-        };
+          await db.query<{ column_name: string; data_type: string }>(
+            `SELECT column_name, data_type FROM information_schema.columns
+              WHERE table_schema = $1 AND table_name = $2
+              ORDER BY ordinal_position`,
+            [schema, table.name],
+          )
+        ).rows;
+        expect(
+          columns.map((c) => c.column_name),
+          `${slug}: ${table.name} columns`,
+        ).toEqual(table.columns.map((c) => c.name));
+        expect(
+          columns.map((c) => shownType(c.data_type)),
+          `${slug}: ${table.name} column types`,
+        ).toEqual(table.columns.map((c) => c.type));
+        const [{ n }] = (
+          await db.query<{ n: number }>(
+            `SELECT COUNT(*)::int AS n FROM ${schema}.${table.name}`,
+          )
+        ).rows;
         expect(n, `${slug}: ${table.name} row count`).toBe(
           Number(table.rows.replace(/,/g, "")),
         );

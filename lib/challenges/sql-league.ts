@@ -13,7 +13,7 @@
  * reading a season in order (unbeaten runs) and a match minute by minute
  * (comebacks).
  *
- * Every solution is executed against node:sqlite by
+ * Every solution is executed against Postgres (PGlite) by
  * `__tests__/challengeSolutions`, so a wrong expectation fails CI.
  */
 
@@ -62,7 +62,7 @@ export const SQL_LEAGUE: Challenge[] = [
     },
     {
       prompt: [
-        "Who scored the most goals this season? Each row in `goals` names a `player_id`, but when `is_own_goal` is 1 the player put the ball into their own net, and it is not a goal to their name.",
+        "Who scored the most goals this season? Each row in `goals` names a `player_id`, but when `is_own_goal` is true the player put the ball into their own net, and it is not a goal to their name.",
         "Show the player, their team and their goal count, for every player with at least one goal. Most goals first; players level on goals in alphabetical order of name.",
       ],
       columns: [
@@ -81,7 +81,7 @@ ORDER BY goals DESC, p.player_name
 FROM goals g
 JOIN players p ON p.player_id = g.player_id
 JOIN teams   t ON t.team_id   = p.team_id
-WHERE g.is_own_goal = 0
+WHERE NOT g.is_own_goal
 GROUP BY p.player_id, p.player_name, t.team_name
 ORDER BY goals DESC, p.player_name`,
       tests: shape(
@@ -111,7 +111,7 @@ ORDER BY goals DESC, p.player_name`,
         "Show the date, the home team, the away team, the score as home goals and away goals joined by a hyphen (like `3-1`), and the margin. Biggest margin first, then by date, then by home team.",
       ],
       columns: [
-        { name: "played_on", type: "text" },
+        { name: "played_on", type: "date" },
         { name: "home_team", type: "text" },
         { name: "away_team", type: "text" },
         { name: "score", type: "text" },
@@ -152,12 +152,12 @@ ORDER BY margin DESC, m.played_on, home_team`,
       dataset: LEAGUE,
       description: "Count how often each scoreline came up, whichever side won.",
       solutionNote:
-        "Normalising before grouping is the whole trick: `MAX(home_goals, away_goals) || '-' || MIN(home_goals, away_goals)` turns 1-2 and 2-1 into the same string. With one argument, `MAX` is an aggregate over rows; with two or more, it compares values within a row.",
+        "Normalising before grouping is the whole trick: `GREATEST(home_goals, away_goals) || '-' || LEAST(home_goals, away_goals)` turns 1-2 and 2-1 into the same string. `MAX` and `MIN` cannot do this: they are aggregates, comparing one column across rows, where `GREATEST` and `LEAST` compare values within a row.",
     },
     {
       prompt: [
         "How often did each scoreline come up this season? Count a 2-1 home win and a 1-2 away win as the same scoreline, written with the higher score first (`2-1`), so a draw is simply `1-1`.",
-        "In SQLite, `MAX` and `MIN` with two arguments are ordinary functions that compare values within one row, not aggregates.",
+        "In Postgres, `GREATEST` and `LEAST` compare values within one row; `MAX` and `MIN` are aggregates over rows.",
         "Show the scoreline and the number of matches, most common first; scorelines with the same count in text order.",
       ],
       columns: [
@@ -169,7 +169,7 @@ FROM matches
 GROUP BY scoreline
 ORDER BY matches DESC, scoreline
 `,
-      solution: `SELECT MAX(home_goals, away_goals) || '-' || MIN(home_goals, away_goals) AS scoreline,
+      solution: `SELECT GREATEST(home_goals, away_goals) || '-' || LEAST(home_goals, away_goals) AS scoreline,
        COUNT(*) AS matches
 FROM matches
 GROUP BY scoreline
@@ -247,14 +247,14 @@ ORDER BY clean_sheets DESC, t.team_name`,
       columns: [
         { name: "player_name", type: "text" },
         { name: "team_name", type: "text" },
-        { name: "played_on", type: "text" },
+        { name: "played_on", type: "date" },
         { name: "opponent", type: "text" },
         { name: "goals", type: "integer" },
       ],
       starter: `SELECT p.player_name, COUNT(*) AS goals
 FROM goals g
 JOIN players p ON p.player_id = g.player_id
-WHERE g.is_own_goal = 0
+WHERE NOT g.is_own_goal
 GROUP BY p.player_id, p.player_name
 HAVING COUNT(*) >= 2
 ORDER BY goals DESC, p.player_name
@@ -270,7 +270,7 @@ JOIN teams opp ON opp.team_id = CASE
                                   WHEN m.home_team_id = p.team_id THEN m.away_team_id
                                   ELSE m.home_team_id
                                 END
-WHERE g.is_own_goal = 0
+WHERE NOT g.is_own_goal
 GROUP BY g.match_id, p.player_id, p.player_name, t.team_name, m.played_on, opp.team_name
 HAVING COUNT(*) >= 2
 ORDER BY goals DESC, m.played_on, p.player_name`,
@@ -293,7 +293,7 @@ ORDER BY goals DESC, m.played_on, p.player_name`,
       dataset: LEAGUE,
       description: "Count the goals in each 15-minute band of a match, stoppage time included.",
       solutionNote:
-        "Integer division buckets numbers, but only after shifting them to start at zero: `(minute - 1) / 15` puts minutes 1 to 15 in band 0 and 76 to 90 in band 5, where `minute / 15` pushes minutes 30, 45, 60 and 90 into the next band up. The two-argument `MIN(..., 5)` then folds stoppage time into the last band.",
+        "Integer division buckets numbers, but only after shifting them to start at zero: `(minute - 1) / 15` puts minutes 1 to 15 in band 0 and 76 to 90 in band 5, where `minute / 15` pushes minutes 30, 45, 60 and 90 into the next band up. `LEAST(..., 5)` then folds stoppage time into the last band.",
     },
     {
       prompt: [
@@ -310,12 +310,12 @@ FROM goals
 GROUP BY band
 ORDER BY band
 `,
-      solution: `SELECT printf('%d-%d', b * 15 + 1, b * 15 + 15) AS band,
+      solution: `SELECT format('%s-%s', b * 15 + 1, b * 15 + 15) AS band,
        COUNT(*) AS goals
 FROM (
-  SELECT MIN((minute - 1) / 15, 5) AS b
+  SELECT LEAST((minute - 1) / 15, 5) AS b
   FROM goals
-)
+) AS banded
 GROUP BY b
 ORDER BY b`,
       tests: shape(
@@ -373,11 +373,11 @@ WHERE h.team_name = 'Millbrook Rovers'
   SELECT away_team_id, away_goals, home_goals FROM meetings
 )
 SELECT t.team_name,
-       SUM(s.gf > s.ga) AS won,
-       SUM(s.gf = s.ga) AS drawn,
-       SUM(s.gf < s.ga) AS lost,
-       SUM(s.gf)        AS goals_for,
-       SUM(s.ga)        AS goals_against
+       COUNT(*) FILTER (WHERE s.gf > s.ga) AS won,
+       COUNT(*) FILTER (WHERE s.gf = s.ga) AS drawn,
+       COUNT(*) FILTER (WHERE s.gf < s.ga) AS lost,
+       SUM(s.gf)                           AS goals_for,
+       SUM(s.ga)                           AS goals_against
 FROM sides s
 JOIN teams t ON t.team_id = s.team_id
 GROUP BY t.team_id, t.team_name
@@ -477,8 +477,8 @@ ORDER BY t.team_name`,
       columns: [
         { name: "team_name", type: "text" },
         { name: "unbeaten", type: "integer" },
-        { name: "run_start", type: "text" },
-        { name: "run_end", type: "text" },
+        { name: "run_start", type: "date" },
+        { name: "run_end", type: "date" },
       ],
       starter: `${SIDES_CTE}
 SELECT t.team_name, COUNT(*) AS unbeaten
@@ -541,11 +541,11 @@ ORDER BY b.unbeaten DESC, t.team_name`,
     {
       prompt: [
         "A comeback is a win for a team that was losing at some point during the match. Replay each match goal by goal, in order of `minute`, keeping the running score.",
-        "An own goal (`is_own_goal = 1`) counts for the team the scorer was playing against, not for the scorer's own team. No match has two goals in the same minute.",
+        "An own goal (`is_own_goal` is true) counts for the team the scorer was playing against, not for the scorer's own team. No match has two goals in the same minute.",
         "Show the date, the home team, the away team, the final score as home and away goals joined by a hyphen (like `2-1`), and the winner. Sort by date, then home team.",
       ],
       columns: [
-        { name: "played_on", type: "text" },
+        { name: "played_on", type: "date" },
         { name: "home_team", type: "text" },
         { name: "away_team", type: "text" },
         { name: "score", type: "text" },
@@ -564,7 +564,7 @@ ORDER BY m.played_on, home_team
       solution: `WITH credited AS (
   SELECT g.match_id, g.minute,
          CASE
-           WHEN g.is_own_goal = 0            THEN p.team_id
+           WHEN NOT g.is_own_goal          THEN p.team_id
            WHEN p.team_id = m.home_team_id THEN m.away_team_id
            ELSE m.home_team_id
          END AS team_id,

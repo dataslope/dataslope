@@ -290,7 +290,7 @@ export interface Challenge {
   difficulty: Difficulty;
   /** This challenge's row in the catalog list. */
   catalog: ChallengeCatalogMeta;
-  /** Subtitle beside the difficulty meter on mobile, e.g. "SQLite". */
+  /** Subtitle beside the difficulty meter on mobile, e.g. "PostgreSQL". */
   languageLabel: string;
   description: string;
   runtime: ChallengeRuntimeSpec;

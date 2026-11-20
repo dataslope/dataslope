@@ -11,7 +11,7 @@
  *
  * Later steps quote the earlier accepted query inside a `WITH`, so each step
  * reads as the previous answer plus one idea. `__tests__/challengeSolutions`
- * runs every step's solution against node:sqlite.
+ * runs every step's solution against PGlite.
  */
 
 import { indentSql, resultShape, sqlSteps } from "./authoring";
@@ -96,7 +96,7 @@ const LISTENING_RECAP = sqlSteps(
         { name: "listener_id", type: "integer" },
         { name: "username", type: "text" },
         { name: "full_plays", type: "integer" },
-        { name: "minutes", type: "real" },
+        { name: "minutes", type: "numeric" },
         { name: "artists", type: "integer" },
       ],
       starter: `SELECT l.listener_id, l.username, COUNT(*) AS full_plays
@@ -131,10 +131,10 @@ ORDER BY l.username
         { name: "listener_id", type: "integer" },
         { name: "username", type: "text" },
         { name: "full_plays", type: "integer" },
-        { name: "minutes", type: "real" },
+        { name: "minutes", type: "numeric" },
         { name: "artists", type: "integer" },
         { name: "top_artist", type: "text" },
-        { name: "top_share_pct", type: "real" },
+        { name: "top_share_pct", type: "numeric" },
       ],
       starter: `WITH totals AS (
 ${indentSql(RECAP_TOTALS)}
@@ -171,9 +171,9 @@ ORDER BY t.username
       ],
       columns: [
         { name: "username", type: "text" },
-        { name: "minutes", type: "real" },
+        { name: "minutes", type: "numeric" },
         { name: "top_artist", type: "text" },
-        { name: "top_share_pct", type: "real" },
+        { name: "top_share_pct", type: "numeric" },
         { name: "persona", type: "text" },
       ],
       starter: `WITH recap AS (
@@ -200,11 +200,10 @@ ORDER BY username
 const SESSION_GAP_MIN = 30;
 
 const SESSION_GAPS = `SELECT p.play_id, l.username, p.played_at,
-       ROUND((unixepoch(p.played_at)
-              - unixepoch(LAG(p.played_at) OVER (
-                  PARTITION BY p.listener_id
-                  ORDER BY p.played_at
-                ))) / 60.0, 1) AS gap_min
+       ROUND(EXTRACT(EPOCH FROM p.played_at - LAG(p.played_at) OVER (
+               PARTITION BY p.listener_id
+               ORDER BY p.played_at
+             )) / 60, 1) AS gap_min
 FROM plays p
 JOIN listeners l ON l.listener_id = p.listener_id
 ORDER BY l.username, p.played_at`;
@@ -230,7 +229,7 @@ ${indentSql(SESSION_NUMBERS)}
 )
 SELECT n.username, n.session_no,
        MIN(n.played_at) AS started_at,
-       datetime(MAX(unixepoch(n.played_at) + p.ms_played / 1000), 'unixepoch') AS ended_at,
+       MAX(n.played_at + p.ms_played / 1000 * INTERVAL '1 second') AS ended_at,
        COUNT(*) AS plays,
        ROUND(SUM(p.ms_played) / 60000.0, 1) AS minutes
 FROM numbered n
@@ -248,7 +247,7 @@ const LISTENING_SESSIONS = sqlSteps(
     description:
       "Split each listener's plays into sessions wherever they paused for more than half an hour.",
     solutionNote:
-      "A session is defined by the pauses between events, not by the calendar, which is why the build goes through `LAG` and a running sum instead of `date(played_at)`. Grouping by day merges two of ravenwing's sessions on 2 March and cuts lunapark's late session in half at midnight.",
+      "A session is defined by the pauses between events, not by the calendar, which is why the build goes through `LAG` and a running sum instead of `played_at::date`. Grouping by day merges two of ravenwing's sessions on 2 March and cuts lunapark's late session in half at midnight.",
   },
   [
     {
@@ -258,14 +257,14 @@ const LISTENING_SESSIONS = sqlSteps(
         "`LAG(played_at)` reads the previous row of the window, and `PARTITION BY listener_id` is what stops it reaching into another listener's history. Without it, each listener's first play gets a gap measured from somebody else's last one instead of NULL.",
       prompt: [
         "A listening session is a run of plays with no long pause between them. Start by measuring the pauses: for every play, the minutes since the same listener's previous play started, rounded to 1 decimal place.",
-        "A listener's first play has no previous play, so its gap is NULL. `unixepoch()` turns a timestamp into seconds, which makes the difference easy to take.",
+        "A listener's first play has no previous play, so its gap is NULL. Subtracting two timestamps gives an `interval`, and `EXTRACT(EPOCH FROM ...)` turns that into seconds.",
         "Return all fifty plays, sorted by username and then `played_at`.",
       ],
       columns: [
         { name: "play_id", type: "integer" },
         { name: "username", type: "text" },
-        { name: "played_at", type: "text" },
-        { name: "gap_min", type: "real" },
+        { name: "played_at", type: "timestamp" },
+        { name: "gap_min", type: "numeric" },
       ],
       starter: `SELECT p.play_id, l.username, p.played_at
 FROM plays p
@@ -293,8 +292,8 @@ ORDER BY l.username, p.played_at
       columns: [
         { name: "play_id", type: "integer" },
         { name: "username", type: "text" },
-        { name: "played_at", type: "text" },
-        { name: "gap_min", type: "real" },
+        { name: "played_at", type: "timestamp" },
+        { name: "gap_min", type: "numeric" },
         { name: "session_no", type: "integer" },
       ],
       starter: `${SESSION_GAPS}
@@ -314,16 +313,16 @@ ORDER BY l.username, p.played_at
         "With a session number on every play, the summary is an ordinary `GROUP BY username, session_no`, and the end time is the latest `played_at` plus `ms_played` in the group. lunapark's fourth session shows why the numbering was worth it: it starts on 5 March and ends on 6 March, and it is still one row.",
       prompt: [
         "Collapse the plays into one row per session: the username, the session number, when it started, when it ended, how many plays it holds, and the minutes listened (`ms_played` summed, divided by 60,000 and rounded to 1 decimal place).",
-        "A session ends when its last play stops: that play's `played_at` plus its `ms_played / 1000` seconds. Format both times like `played_at` (`YYYY-MM-DD HH:MM:SS`); `datetime(seconds, 'unixepoch')` turns a count of seconds back into that format.",
+        "A session ends when its last play stops: that play's `played_at` plus its `ms_played / 1000` seconds. Multiplying `INTERVAL '1 second'` by a number gives an interval you can add to a timestamp, so both times stay timestamps like `played_at`.",
         "Sort by username and session number.",
       ],
       columns: [
         { name: "username", type: "text" },
         { name: "session_no", type: "integer" },
-        { name: "started_at", type: "text" },
-        { name: "ended_at", type: "text" },
+        { name: "started_at", type: "timestamp" },
+        { name: "ended_at", type: "timestamp" },
         { name: "plays", type: "integer" },
-        { name: "minutes", type: "real" },
+        { name: "minutes", type: "numeric" },
       ],
       starter: `WITH numbered AS (
 ${indentSql(SESSION_NUMBERS)}

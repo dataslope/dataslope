@@ -61,6 +61,19 @@ export function classifyCellEditor(sqlType: string | undefined): CellEditorKind 
   return "text";
 }
 
+/** Whether a column's SQL type holds numbers. The grid right-aligns those
+ *  and sets them in tabular figures, so magnitudes line up down a column the
+ *  way a spreadsheet's do; left-aligned in a proportional face, 7929.51 and
+ *  43.2 start in the same place and say nothing about their size. Arrays of
+ *  numbers are not numbers. */
+export function isNumericSqlType(sqlType: string | undefined): boolean {
+  const t = (sqlType ?? "").trim().toLowerCase();
+  if (!t || t.endsWith("[]") || t.startsWith("list")) return false;
+  return /^(u?(tiny|small|big|huge)?int(eger)?\d*|u?int\d+|serial\d*|(small|big)serial|real|float\d*|double( precision)?|numeric|decimal|number|money)\b/.test(
+    t,
+  );
+}
+
 /** Normalize an array cell's stored value (JSON string or live JS array) to
  *  JSON text for editing. */
 export function arrayEditorText(value: unknown): string {

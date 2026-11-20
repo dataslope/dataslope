@@ -18,13 +18,13 @@ export const PYODIDE_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VE
 
 // PGlite (PostgreSQL 18 in WASM). npm supplies only the types; the runtime
 // is fetched from jsDelivr. Kept equal to the lockfile by `wasmCdnPins.test.ts`.
-export const PGLITE_VERSION = "0.5.8";
+export const PGLITE_VERSION = "0.5.16";
 export const PGLITE_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pglite@${PGLITE_VERSION}/dist/index.js`;
 export const PGLITE_WORKER_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pglite@${PGLITE_VERSION}/dist/worker/index.js`;
 
 // The official SQLite WASM build. As with PGlite, npm supplies only the types
 // and the runtime comes from jsDelivr; `wasmCdnPins.test.ts` keeps the two equal.
-export const SQLITE_WASM_VERSION = "3.53.4-build1";
+export const SQLITE_WASM_VERSION = "3.54.1-build1";
 export const SQLITE_WASM_CDN = `https://cdn.jsdelivr.net/npm/@sqlite.org/sqlite-wasm@${SQLITE_WASM_VERSION}/dist/index.mjs`;
 
 // Java's tools.jar (~18 MB), published as the `dataslope-tools-jar` npm
@@ -51,7 +51,7 @@ export const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSI
 // TYPESCRIPT_VERSION in sync with `typescript` in package.json, and keep
 // it on the 5.x/6.x line: typescript@7 on npm is the native (Go) compiler,
 // shipped as platform binaries with no `lib/typescript.js` to import.
-export const TYPESCRIPT_VERSION = "5.9.3";
+export const TYPESCRIPT_VERSION = "6.0.3";
 export const TYPESCRIPT_CDN_BASE = `https://cdn.jsdelivr.net/npm/typescript@${TYPESCRIPT_VERSION}`;
 
 // esbuild-wasm powers the React/TSX transform + bundle step (see

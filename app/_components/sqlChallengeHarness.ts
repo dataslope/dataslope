@@ -81,7 +81,7 @@ export interface SqlEngineLike {
   destroy?: () => Promise<void>;
   /** Display name for the topbar. */
   label: string;
-  /** Engine version (e.g. "3.53"). */
+  /** Engine version (e.g. "3.54"). */
   version: string;
 }
 

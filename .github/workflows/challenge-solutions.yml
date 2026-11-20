@@ -2,7 +2,7 @@ name: Challenge solutions
 
 # Runs __tests__/challengeSolutions.test.ts (`npm run test:challenges`): every
 # /challenges reference solution must pass its own checks and every starter
-# must fail at least one, on real python3 / node / node:sqlite. It takes about
+# must fail at least one, on real python3 / node / PGlite. It takes about
 # a minute and nothing outside the paths below can change its result, so it
 # is kept out of `npm test` (checks.yml) and runs here instead.
 #
@@ -15,6 +15,8 @@ on:
       - "lib/challenges/**"
       - "app/_components/challengeHarness.ts"
       - "app/_components/sqlChallengeHarness.ts"
+      - "app/_components/runtime/postgres.ts"
+      - "app/_components/runtime/valueFormat.ts"
       - "__tests__/challengeSolutions.test.ts"
       - "vitest.config.ts"
       - "vitest.challenges.config.ts"
@@ -25,6 +27,8 @@ on:
       - "lib/challenges/**"
       - "app/_components/challengeHarness.ts"
       - "app/_components/sqlChallengeHarness.ts"
+      - "app/_components/runtime/postgres.ts"
+      - "app/_components/runtime/valueFormat.ts"
       - "__tests__/challengeSolutions.test.ts"
   schedule:
     # 05:10 UTC Sundays, off the hour, before the content sweeps.

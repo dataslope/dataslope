@@ -14,9 +14,13 @@ import {
 import { useEngineStore } from "../stores/useEngineStore";
 import { useDialogStore } from "../stores/useDialogStore";
 import { useTabStore } from "../stores/useTabStore";
-import { DROP_KIND_LABELS, FK_ACTIONS } from "../constants";
+import { DROP_KIND_LABELS } from "../constants";
 import type { ModifyColumnDraft } from "../types";
 import { modifyDialogSignature } from "../types";
+import {
+  buildSqliteCreateTableSql,
+  validateSqliteStructure,
+} from "../utils/structureValidation";
 import { dbScopedKey } from "../../sqlitePlaygroundTabs";
 
 function newDraftId(): string {
@@ -349,17 +353,18 @@ export function useSidebarActions(
     const dialog = useDialogStore.getState().modifyDialog;
     if (!engine || !dialog) return;
     const trimmedName = dialog.newName.trim();
-    if (!trimmedName) {
-      showToast("Table name cannot be empty.", "warn");
-      return;
-    }
-    // Only validate names for non-generated columns; generated column
-    // names cannot be changed through the UI.
-    const blankCols = dialog.columns.filter((c) => !c.generated && !c.name.trim());
-    if (blankCols.length > 0) {
-      showToast("Column names cannot be empty.", "warn");
-      setModifyInvalidColIds(new Set(blankCols.map((c) => c.id)));
-      return;
+    {
+      const { tables: existingTables, views: existingViews } =
+        useEngineStore.getState();
+      const validation = validateSqliteStructure(dialog, [
+        ...existingTables,
+        ...existingViews,
+      ]);
+      if (!validation.isValid) {
+        showToast(validation.errors[0], "warn");
+        setModifyInvalidColIds(validation.invalidColumnIds);
+        return;
+      }
     }
     const spec = {
       originalName: dialog.originalName,
@@ -489,7 +494,7 @@ export function useSidebarActions(
   }, [engineRef, showToast, setAddRowDialog]);
 
   const openAddTable = useCallback(() => {
-    setAddTableDialog({
+    const initial = {
       originalName: "",
       newName: "new_table",
       columns: [
@@ -512,6 +517,10 @@ export function useSidebarActions(
       ],
       // New tables are always dirty (there's no previous state to compare).
       originalSignature: "",
+    };
+    setAddTableDialog({
+      ...initial,
+      pristineSignature: modifyDialogSignature(initial),
     });
   }, [setAddTableDialog]);
 
@@ -520,39 +529,18 @@ export function useSidebarActions(
     const dialog = useDialogStore.getState().addTableDialog;
     if (!engine || !dialog) return;
     const trimmedName = dialog.newName.trim();
-    if (!trimmedName) {
-      showToast("Table name cannot be empty.", "warn");
+    const { tables: existingTables, views: existingViews } =
+      useEngineStore.getState();
+    const validation = validateSqliteStructure(
+      { ...dialog, originalName: "" },
+      [...existingTables, ...existingViews],
+    );
+    if (!validation.isValid) {
+      showToast(validation.errors[0], "warn");
+      setAddTableInvalidColIds(validation.invalidColumnIds);
       return;
     }
-    const cols = dialog.columns;
-    const blankCols = cols.filter((c) => !c.name.trim());
-    if (blankCols.length > 0) {
-      showToast("Column names cannot be empty.", "warn");
-      setAddTableInvalidColIds(new Set(blankCols.map((c) => c.id)));
-      return;
-    }
-    const quoteIdent = (s: string) => `"${s.replace(/"/g, '""')}"`;
-    const normalizeFkAction = (a: string): string =>
-      (FK_ACTIONS as readonly string[]).includes(a) ? a : "NO ACTION";
-    const colDefs = cols.map((c) => {
-      const parts: string[] = [`${quoteIdent(c.name.trim())} ${c.type}`];
-      if (c.notNull) parts.push("NOT NULL");
-      if (c.primaryKey) {
-        parts.push("PRIMARY KEY");
-        if (c.autoIncrement) parts.push("AUTOINCREMENT");
-      }
-      if (c.unique && !c.primaryKey) parts.push("UNIQUE");
-      if (c.defaultValue.trim()) parts.push(`DEFAULT ${c.defaultValue.trim()}`);
-      return parts.join(" ");
-    });
-    const fkConstraints = cols
-      .filter((c) => c.fkTable && c.fkColumn)
-      .map(
-        (c) =>
-          `FOREIGN KEY (${quoteIdent(c.name.trim())}) REFERENCES ${quoteIdent(c.fkTable)}(${quoteIdent(c.fkColumn)}) ON DELETE ${normalizeFkAction(c.fkOnDelete)} ON UPDATE ${normalizeFkAction(c.fkOnUpdate)}`,
-      );
-    const allDefs = [...colDefs, ...fkConstraints].join(", ");
-    const sql = `CREATE TABLE ${quoteIdent(trimmedName)} (${allDefs})`;
+    const sql = buildSqliteCreateTableSql(dialog);
     void (async () => {
     try {
       await engine.exec(sql);

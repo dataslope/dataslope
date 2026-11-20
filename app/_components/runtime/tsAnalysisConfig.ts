@@ -39,7 +39,10 @@ export function compilerOptionsFor(
   const base: tsModule.CompilerOptions = {
     target: ts.ScriptTarget.ES2022,
     // almostnode executes CommonJS output; Node10 resolution makes
-    // `./utils` find /utils.ts without package.json machinery.
+    // `./utils` find /utils.ts without package.json machinery. TypeScript 6
+    // deprecates node10 and 7 removes it: 6 only says so in the options
+    // diagnostics, which the worker never shows, but moving past 6 means
+    // replacing this first.
     module: ts.ModuleKind.CommonJS,
     moduleResolution: ts.ModuleResolutionKind.Node10,
     allowJs: true,

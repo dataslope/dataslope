@@ -110,6 +110,9 @@ export interface ModifyDialogState {
    *  An empty string means the dialog is for a brand-new table and is
    *  always considered dirty. */
   originalSignature: string;
+  /** Signature of a new-table form as it first opened. The unsaved-changes
+   *  guard compares against it, since `originalSignature` is empty there. */
+  pristineSignature?: string;
 }
 
 /** Stable JSON string of every user-editable ModifyDialogState field;

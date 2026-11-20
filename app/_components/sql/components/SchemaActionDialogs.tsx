@@ -42,8 +42,10 @@ export function SchemaActionDialogs({
             </Dialog.Title>
             <Dialog.Description className="confirm-desc">
               This will permanently drop{" "}
-              <strong>{dropEntityPending?.name ?? ""}</strong> from the
-              in-memory database. Reload the page to restore the sample.
+              <strong>{dropEntityPending?.name ?? ""}</strong>. The change is
+              saved with this workspace, so reloading the page will not bring
+              it back. To get a sample database back, pick it again in the
+              database menu.
             </Dialog.Description>
             {dropDetail && <p className="confirm-desc-note">{dropDetail}</p>}
             <div className="confirm-actions">
@@ -73,8 +75,10 @@ export function SchemaActionDialogs({
             </Dialog.Title>
             <Dialog.Description className="confirm-desc">
               Truncate table <strong>{truncatePending}</strong>? This deletes
-              every row but keeps the schema. The change is in-memory only and
-              will be undone next page load.
+              every row but keeps the schema. The change is saved with this
+              workspace, so reloading the page will not bring the rows back.
+              To get a sample database back, pick it again in the database
+              menu.
             </Dialog.Description>
             {truncateDetail && (
               <p className="confirm-desc-note">{truncateDetail}</p>

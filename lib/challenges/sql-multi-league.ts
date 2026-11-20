@@ -10,7 +10,7 @@
  *
  * Later steps quote the earlier accepted query inside a `WITH`, like
  * `sql-multi-library.ts`. `__tests__/challengeSolutions` runs every step's
- * solution against node:sqlite.
+ * solution against Postgres (PGlite).
  */
 
 import { indentSql, resultShape, sqlSteps } from "./authoring";
@@ -41,14 +41,15 @@ const STANDINGS = `WITH results AS (
 ${indentSql(TEAM_RESULTS)}
 )
 SELECT team_name,
-       COUNT(*)                                 AS played,
-       SUM(result = 'W')                        AS won,
-       SUM(result = 'D')                        AS drawn,
-       SUM(result = 'L')                        AS lost,
-       SUM(goals_for)                           AS goals_for,
-       SUM(goals_against)                       AS goals_against,
-       SUM(goals_for) - SUM(goals_against)      AS goal_diff,
-       3 * SUM(result = 'W') + SUM(result = 'D') AS points
+       COUNT(*)                                AS played,
+       COUNT(*) FILTER (WHERE result = 'W')    AS won,
+       COUNT(*) FILTER (WHERE result = 'D')    AS drawn,
+       COUNT(*) FILTER (WHERE result = 'L')    AS lost,
+       SUM(goals_for)                          AS goals_for,
+       SUM(goals_against)                      AS goals_against,
+       SUM(goals_for) - SUM(goals_against)     AS goal_diff,
+       3 * COUNT(*) FILTER (WHERE result = 'W')
+         + COUNT(*) FILTER (WHERE result = 'D') AS points
 FROM results
 GROUP BY team_name
 ORDER BY team_name`;
@@ -100,7 +101,7 @@ const LEAGUE_TABLE = sqlSteps(
       ],
       columns: [
         { name: "match_id", type: "integer" },
-        { name: "played_on", type: "text" },
+        { name: "played_on", type: "date" },
         { name: "team_name", type: "text" },
         { name: "venue", type: "text" },
         { name: "goals_for", type: "integer" },
@@ -138,7 +139,7 @@ ORDER BY m.match_id, t.team_name
       title: "Standings",
       short: "Standings",
       solutionNote:
-        "With one row per team per match, the table is a single `GROUP BY` of sums: each result becomes a 1 or a 0 through a comparison, and points are `3 * won + drawn`. Against `matches` directly, every one of these columns would need a `CASE` for each side of the match.",
+        "With one row per team per match, the table is a single `GROUP BY`: `COUNT(*) FILTER (WHERE result = 'W')` counts the wins, the same with `'D'` and `'L'` counts the rest, and points are `3 * won + drawn`. Against `matches` directly, every one of these columns would need a `CASE` for each side of the match.",
       prompt: [
         "Roll the results up into one row per team: matches played, won, drawn and lost, goals for and against, goal difference (for minus against), and points, with 3 for a win and 1 for a draw.",
         "Sort by team name for now; ordering the table is the next step.",

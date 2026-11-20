@@ -57,7 +57,7 @@ CREATE TABLE albums (
   album_id    INTEGER PRIMARY KEY,
   artist_id   INTEGER NOT NULL REFERENCES artists(artist_id),
   album_title TEXT    NOT NULL,
-  released_on TEXT    NOT NULL
+  released_on DATE    NOT NULL
 );
 INSERT INTO albums VALUES
   (1, 1, 'Harbour Lights',  '2021-04-16'),
@@ -101,7 +101,7 @@ CREATE TABLE listeners (
   listener_id  INTEGER PRIMARY KEY,
   username     TEXT NOT NULL,
   country      TEXT NOT NULL,
-  signed_up_on TEXT NOT NULL
+  signed_up_on DATE NOT NULL
 );
 INSERT INTO listeners VALUES
   (1, 'ravenwing', 'GB', '2024-01-08'),
@@ -117,7 +117,7 @@ CREATE TABLE plays (
   play_id     INTEGER PRIMARY KEY,
   listener_id INTEGER NOT NULL REFERENCES listeners(listener_id),
   track_id    INTEGER NOT NULL REFERENCES tracks(track_id),
-  played_at   TEXT    NOT NULL,
+  played_at   TIMESTAMP NOT NULL,
   ms_played   INTEGER NOT NULL
 );
 INSERT INTO plays VALUES
@@ -183,7 +183,7 @@ export const MUSIC: ChallengeDataset = {
         { name: "play_id", type: "integer", key: "pk" },
         { name: "listener_id", type: "integer", key: "fk" },
         { name: "track_id", type: "integer", key: "fk" },
-        { name: "played_at", type: "text" },
+        { name: "played_at", type: "timestamp" },
         { name: "ms_played", type: "integer" },
       ],
     },
@@ -205,7 +205,7 @@ export const MUSIC: ChallengeDataset = {
         { name: "album_id", type: "integer", key: "pk" },
         { name: "artist_id", type: "integer", key: "fk" },
         { name: "album_title", type: "text" },
-        { name: "released_on", type: "text" },
+        { name: "released_on", type: "date" },
       ],
     },
     {
@@ -224,7 +224,7 @@ export const MUSIC: ChallengeDataset = {
         { name: "listener_id", type: "integer", key: "pk" },
         { name: "username", type: "text" },
         { name: "country", type: "text" },
-        { name: "signed_up_on", type: "text" },
+        { name: "signed_up_on", type: "date" },
       ],
     },
   ],

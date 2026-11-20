@@ -71,7 +71,7 @@ const GRAMMARS: Record<CodeLanguage, Grammar> = {
       with as on and or not in is case when then else end union all
       desc asc over inner left right outer having limit offset distinct`),
     // Aggregates and window functions only. The prototypes leave scalar
-    // functions (strftime, cast, coalesce) in the body color.
+    // functions (to_char, cast, coalesce) in the body color.
     builtins: words(`sum count avg min max rank row_number dense_rank`),
     literals: words("null true false"),
     // Matched before single words, so "group by" wins over "group".

@@ -29,6 +29,29 @@ describe("computeVisibleTypeGroups", () => {
     const groups = computeVisibleTypeGroups(PG_GROUPS, PG_OPTIONS, "var", "text");
     expect(groups).toEqual([{ label: "Text", types: ["varchar", "varchar(255)"] }]);
   });
+
+  it("puts the best match first, because Enter takes the first row", () => {
+    // Typing `int` listed `smallint` first, and Enter committed it.
+    const typed = computeVisibleTypeGroups(PG_GROUPS, PG_OPTIONS, "int", "text");
+    expect(typed[0].types[0]).toBe("integer");
+    expect(typed[0].types).toEqual(["integer", "smallint", "bigint"]);
+  });
+
+  it("keeps filtering when a complete built-in type has been typed", () => {
+    // An exact match used to bring the whole list back, with its first row
+    // (not the typed type) highlighted.
+    const groups = computeVisibleTypeGroups(PG_GROUPS, PG_OPTIONS, "TEXT", "integer");
+    expect(groups).toEqual([{ label: "Text", types: ["text"] }]);
+    const partial = computeVisibleTypeGroups(PG_GROUPS, PG_OPTIONS, "varchar", "integer");
+    expect(partial[0].types[0]).toBe("varchar");
+  });
+
+  it("orders groups by their best match", () => {
+    const groups = computeVisibleTypeGroups(PG_GROUPS, PG_OPTIONS, "t", "integer");
+    // `text` and `timestamp` start with the fragment; the number types only
+    // contain it.
+    expect(groups.map((g) => g.label)).toEqual(["Text", "Date / time", "Numbers"]);
+  });
 });
 
 describe("withCurrentTypeOption", () => {

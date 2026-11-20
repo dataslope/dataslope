@@ -4,7 +4,15 @@ import { memo, useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { ContextMenu } from "@base-ui/react/context-menu";
 import { Menu } from "@base-ui/react/menu";
-import { ChevronDown, ChevronRight, Plus, Search, Table, View } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Table,
+  View,
+} from "lucide-react";
 import { IoLink } from "react-icons/io5";
 import { MdOutlineKey } from "react-icons/md";
 import type { ForeignKeyInfo, TableColumnInfo } from "../../runtime/sqlite";
@@ -295,6 +303,33 @@ function SchemaItemImpl({
                     </Popover.Portal>
                   </Popover.Root>
                 )}
+                {/* The row's actions (structure, DDL, export, drop…) lived
+                    only behind a right-click, which nothing on the page
+                    hinted at and a touch screen cannot do. This opens the
+                    same menu, by sending the row the event a right-click
+                    would, so there is one menu to maintain. */}
+                <button
+                  type="button"
+                  className="sql-tree-entity-action-btn sql-tree-entity-more-btn"
+                  aria-label={`More actions for ${name}`}
+                  aria-haspopup="menu"
+                  title="More actions"
+                  onClick={(event) => {
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    event.currentTarget
+                      .closest(".sql-tree-entity-trigger")
+                      ?.dispatchEvent(
+                        new MouseEvent("contextmenu", {
+                          bubbles: true,
+                          cancelable: true,
+                          clientX: rect.left,
+                          clientY: rect.bottom,
+                        }),
+                      );
+                  }}
+                >
+                  <MoreHorizontal size={13} aria-hidden="true" />
+                </button>
               </div>
               {expanded && (
                 <ul className="sql-tree-columns" role="list">
@@ -405,7 +440,7 @@ function SchemaItemImpl({
                           />
                           <ContextMenu.Portal>
                             <ContextMenu.Positioner sideOffset={6}>
-                              <ContextMenu.Popup className="bui-popup examples-dropdown">
+                              <ContextMenu.Popup className="bui-popup examples-dropdown sql-ctx-menu">
                                 <div className="ctx-table-name">
                                   {name}.{c.name}
                                   <span className="ctx-table-type">
@@ -445,7 +480,7 @@ function SchemaItemImpl({
         />
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={6}>
-            <ContextMenu.Popup className="bui-popup examples-dropdown">
+            <ContextMenu.Popup className="bui-popup examples-dropdown sql-ctx-menu">
               <div className="ctx-table-name">
                 <EntityIcon size={12} className="ctx-name-icon" aria-hidden="true" />
                 {name}
@@ -513,7 +548,7 @@ function SchemaItemImpl({
                 <Menu.Portal>
                   <Menu.Positioner side="right" align="start" sideOffset={4}>
                     <Menu.Popup
-                      className="bui-popup examples-dropdown export-dropdown"
+                      className="bui-popup examples-dropdown sql-ctx-menu export-dropdown"
                       onPointerEnter={handleExportPointerEnter}
                       onPointerLeave={handleExportPointerLeave}
                     >
@@ -583,16 +618,18 @@ function SchemaItemImpl({
                   </Menu.Positioner>
                 </Menu.Portal>
               </Menu.Root>
+              {/* Destructive actions sit apart from the rest and look it. */}
+              <div className="ctx-separator" role="separator" />
               {kind === "table" && onTruncate && (
                 <ContextMenu.Item
-                  className="example-item"
+                  className="example-item sql-ctx-danger"
                   onClick={() => onTruncate(name)}
                 >
                   <div className="ex-title">Truncate</div>
                 </ContextMenu.Item>
               )}
               <ContextMenu.Item
-                className="example-item"
+                className="example-item sql-ctx-danger"
                 onClick={() => onDrop(name, kind)}
               >
                 <div className="ex-title">

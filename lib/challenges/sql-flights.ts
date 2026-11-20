@@ -8,12 +8,11 @@
  * a cancelled flight belongs in it: it counts towards what was scheduled, never
  * towards what was flown, and its fares are refunds rather than revenue.
  *
- * The other thread is time arithmetic. Timestamps are text, `julianday()`
- * turns them into fractional days, and a fraction of a day is rarely exact in
- * floating point, so every delay is rounded to whole minutes before it is
- * compared or cast.
+ * The other thread is time arithmetic. Subtracting two timestamps gives an
+ * interval, and `EXTRACT(EPOCH FROM ...)` turns it into seconds, so every
+ * delay is a whole number of minutes the solution can sort and compare.
  *
- * Every solution is executed against node:sqlite by
+ * Every solution is executed against PGlite by
  * `__tests__/challengeSolutions`, so a wrong expectation fails CI.
  */
 
@@ -21,9 +20,12 @@ import { resultShape, sqlChallenge } from "./authoring";
 import { FLIGHTS } from "./dataset-flights";
 import type { Challenge } from "./types";
 
-/** Whole minutes between two timestamps, rounded before the cast. */
+/**
+ * Whole minutes between two timestamps. Every time in the dataset is on the
+ * minute, so the cast loses nothing.
+ */
 function minutes(from: string, to: string): string {
-  return `CAST(ROUND((julianday(${to}) - julianday(${from})) * 1440) AS INTEGER)`;
+  return `(EXTRACT(EPOCH FROM ${to} - ${from}) / 60)::integer`;
 }
 
 export const SQL_FLIGHTS: Challenge[] = [
@@ -36,12 +38,12 @@ export const SQL_FLIGHTS: Challenge[] = [
       dataset: FLIGHTS,
       description: "Work out how many minutes late, or early, each flight left.",
       solutionNote:
-        "A difference of two `julianday()` values is a fraction of a day, and fractions of a day are rarely exact in floating point: HL103's 27 minutes comes out as 26.9999997. `CAST` on its own truncates that to 26, which is why the `ROUND` comes first. `(unixepoch(actual_dep) - unixepoch(scheduled_dep)) / 60` avoids the problem by working in whole seconds.",
+        "Subtracting one `timestamp` from another gives an `interval`, such as `00:27:00` for HL103, and an interval is not a number: it will not compare with a count of minutes or sum like one. `EXTRACT(EPOCH FROM ...)` turns it into seconds, which divide cleanly into minutes because every time in the timetable falls on the minute.",
     },
     {
       prompt: [
         "For every flight that actually took off, work out its departure delay: `actual_dep` minus `scheduled_dep`, in whole minutes. A flight that left early has a negative delay.",
-        "`julianday()` turns a timestamp into a number of days, so multiply the difference by 1440 (minutes in a day) and `ROUND` it before casting to an integer.",
+        "Subtracting two timestamps gives an `interval`. `EXTRACT(EPOCH FROM ...)` turns an interval into seconds, so divide by 60 and cast the result to an `integer`.",
         "Cancelled flights have no `actual_dep`; leave them out. Most delayed first, ties by `flight_no`.",
       ],
       columns: [
@@ -77,12 +79,12 @@ ORDER BY dep_delay_min DESC, flight_no`,
       dataset: FLIGHTS,
       description: "Count how many flights actually took off in each hour of the day.",
       solutionNote:
-        "`strftime` on a NULL timestamp returns NULL, and `GROUP BY` puts every NULL in one group, so without the `WHERE` the three cancelled flights turn up as a row with no hour. Grouping on the actual time rather than the timetable also moves HL301 into hour 6: it was due at 07:00 and left at 06:58.",
+        "`EXTRACT` on a NULL timestamp returns NULL, and `GROUP BY` puts every NULL in one group, so without the `WHERE` the three cancelled flights turn up as a row with no hour. Grouping on the actual time rather than the timetable also moves HL301 into hour 6: it was due at 07:00 and left at 06:58.",
     },
     {
       prompt: [
         "Count the flights that actually took off in each hour of the day, going by the hour of `actual_dep`: a take-off at 06:47 counts in hour 6.",
-        "`strftime('%H', actual_dep)` extracts the hour as text such as `'06'`; cast it to an integer.",
+        "`EXTRACT(HOUR FROM actual_dep)` pulls the hour out of a timestamp as a number; cast it to an `integer`.",
         "Cancelled flights never took off, so leave them out rather than letting them form a group of their own. Only hours with at least one take-off appear. Sort by hour.",
       ],
       columns: [
@@ -93,7 +95,7 @@ ORDER BY dep_delay_min DESC, flight_no`,
 FROM flights
 -- turn actual_dep into an hour, then count the flights in each hour
 `,
-      solution: `SELECT CAST(strftime('%H', actual_dep) AS INTEGER) AS dep_hour,
+      solution: `SELECT EXTRACT(HOUR FROM actual_dep)::integer AS dep_hour,
        COUNT(*) AS departures
 FROM flights
 WHERE actual_dep IS NOT NULL
@@ -278,7 +280,7 @@ ORDER BY airport_a, airport_b`,
         { name: "destination", type: "text" },
         { name: "seats_flown", type: "integer" },
         { name: "seats_booked", type: "integer" },
-        { name: "load_factor_pct", type: "real" },
+        { name: "load_factor_pct", type: "numeric" },
       ],
       starter: `SELECT f.flight_id, f.origin, f.destination, a.seats
 FROM flights f
@@ -387,7 +389,7 @@ ORDER BY arr_delay_min DESC, origin, destination`,
       columns: [
         { name: "origin", type: "text" },
         { name: "destination", type: "text" },
-        { name: "revenue", type: "real" },
+        { name: "revenue", type: "numeric" },
       ],
       starter: `SELECT f.origin, f.destination, SUM(b.fare) AS revenue
 FROM flights f

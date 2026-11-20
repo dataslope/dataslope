@@ -9,7 +9,7 @@
  * stayed away, which a table built from activity alone has no row for.
  *
  * `__tests__/challengeSolutions` runs every step's solution against
- * node:sqlite.
+ * Postgres (PGlite).
  */
 
 import { indentSql, sqlSteps } from "./authoring";
@@ -17,7 +17,7 @@ import { RIDES } from "./dataset-rides";
 import type { Challenge } from "./types";
 
 /** The Monday a timestamp's week starts on. */
-const WEEK_OF = (col: string) => `date(${col}, 'weekday 0', '-6 days')`;
+const WEEK_OF = (col: string) => `date_trunc('week', ${col})::date`;
 /** A completed week of this many trips earns the bonus. */
 const BONUS_TRIPS = 5;
 /** The flat weekly bonus. */
@@ -78,15 +78,15 @@ const DRIVER_PAYOUTS = sqlSteps(
         "A lookup table joins like any other: `drivers.tier` to `tiers.tier` brings the rate alongside the fare. Rounding each share to the cent here, where the money is actually split, means the weekly totals in the next step add up exactly what was paid out.",
       prompt: [
         "The company keeps a commission on every completed trip, and the rate depends on the driver's tier: look it up in `tiers` through `drivers.tier`. The driver keeps the rest of the fare.",
-        "For every completed trip, return the `trip_id`, the `driver_name`, the trip's `week_start`, the `fare`, the `commission_rate` and the `driver_share`, rounded to 2 decimal places. `week_start` is the Monday of the week the trip was requested in: `date(requested_at, 'weekday 0', '-6 days')`. Sort by `trip_id`.",
+        "For every completed trip, return the `trip_id`, the `driver_name`, the trip's `week_start`, the `fare`, the `commission_rate` and the `driver_share`, rounded to 2 decimal places. `week_start` is the Monday of the week the trip was requested in: `date_trunc('week', requested_at)::date`. Sort by `trip_id`.",
       ],
       columns: [
         { name: "trip_id", type: "integer" },
         { name: "driver_name", type: "text" },
-        { name: "week_start", type: "text" },
-        { name: "fare", type: "real" },
-        { name: "commission_rate", type: "real" },
-        { name: "driver_share", type: "real" },
+        { name: "week_start", type: "date" },
+        { name: "fare", type: "numeric" },
+        { name: "commission_rate", type: "numeric" },
+        { name: "driver_share", type: "numeric" },
       ],
       starter: `SELECT t.trip_id, d.driver_name, t.fare
 FROM trips t
@@ -133,10 +133,10 @@ ORDER BY t.trip_id
       ],
       columns: [
         { name: "driver_name", type: "text" },
-        { name: "week_start", type: "text" },
+        { name: "week_start", type: "date" },
         { name: "trips", type: "integer" },
-        { name: "fares", type: "real" },
-        { name: "driver_share", type: "real" },
+        { name: "fares", type: "numeric" },
+        { name: "driver_share", type: "numeric" },
       ],
       starter: `${SHARES_CTE}
 SELECT driver_name, week_start
@@ -175,11 +175,11 @@ FROM shares
       ],
       columns: [
         { name: "driver_name", type: "text" },
-        { name: "week_start", type: "text" },
+        { name: "week_start", type: "date" },
         { name: "trips", type: "integer" },
-        { name: "driver_share", type: "real" },
-        { name: "bonus", type: "real" },
-        { name: "payout", type: "real" },
+        { name: "driver_share", type: "numeric" },
+        { name: "bonus", type: "numeric" },
+        { name: "payout", type: "numeric" },
       ],
       starter: `${WEEKLY_CTE}
 SELECT driver_name, week_start, trips, driver_share
@@ -240,8 +240,7 @@ ${indentSql(COHORTS_BODY)}
 
 const ACTIVITY_BODY = `SELECT DISTINCT c.rider_name, c.cohort_week,
        ${WEEK_OF("t.requested_at")} AS active_week,
-       CAST((julianday(${WEEK_OF("t.requested_at")})
-             - julianday(c.cohort_week)) / 7 AS INTEGER) AS week_offset
+       (${WEEK_OF("t.requested_at")} - c.cohort_week) / 7 AS week_offset
 FROM cohorts c
 JOIN trips t ON t.rider_id = c.rider_id
 WHERE t.started_at IS NOT NULL`;
@@ -271,16 +270,16 @@ const RIDER_RETENTION = sqlSteps(
       title: "Find each rider's cohort",
       short: "Cohorts",
       solutionNote:
-        "The first week is `MIN` of the week label, since ISO dates compare in date order. Filtering to completed trips before taking the minimum is what puts Grace Lindqvist in the right cohort; without it, her cancelled request would already have set her start a week early.",
+        "The first week is `MIN` of the week label, since dates compare in calendar order. Filtering to completed trips before taking the minimum is what puts Grace Lindqvist in the right cohort; without it, her cancelled request would already have set her start a week early.",
       prompt: [
-        "A rider's cohort is the week, starting on Monday, of their first completed trip. A trip's week is `date(requested_at, 'weekday 0', '-6 days')`.",
+        "A rider's cohort is the week, starting on Monday, of their first completed trip. A trip's week is `date_trunc('week', requested_at)::date`.",
         "A cancelled request does not start anyone's history: Grace Lindqvist's first request was cancelled the week before her first trip. Riders who have never completed a trip have no cohort and are left out.",
         "Return `rider_id`, `rider_name` and `cohort_week`, sorted by `cohort_week`, then `rider_name`.",
       ],
       columns: [
         { name: "rider_id", type: "integer" },
         { name: "rider_name", type: "text" },
-        { name: "cohort_week", type: "text" },
+        { name: "cohort_week", type: "date" },
       ],
       starter: `SELECT r.rider_id, r.rider_name
 FROM riders r
@@ -313,15 +312,15 @@ GROUP BY r.rider_id, r.rider_name
       title: "Weeks each rider was active",
       short: "Activity",
       solutionNote:
-        "`SELECT DISTINCT` collapses a busy week to one row per rider, which is what makes the next step's count a count of riders rather than of trips. Week starts are exactly seven days apart, so the difference in `julianday` divided by 7 is a whole number of weeks.",
+        "`SELECT DISTINCT` collapses a busy week to one row per rider, which is what makes the next step's count a count of riders rather than of trips. Week starts are exactly seven days apart, and subtracting one date from another gives a whole number of days, so that difference divided by 7 is a whole number of weeks.",
       prompt: [
         "Now list the weeks in which each rider completed at least one trip, with `week_offset`: how many weeks after their cohort week that was, 0 for the cohort week itself.",
         "A rider who took three trips in a week was active that week once. Return `rider_name`, `cohort_week`, `active_week` and `week_offset`, sorted by `cohort_week`, then `rider_name`, then `active_week`.",
       ],
       columns: [
         { name: "rider_name", type: "text" },
-        { name: "cohort_week", type: "text" },
-        { name: "active_week", type: "text" },
+        { name: "cohort_week", type: "date" },
+        { name: "active_week", type: "date" },
         { name: "week_offset", type: "integer" },
       ],
       starter: `${COHORTS_CTE}
@@ -362,11 +361,11 @@ WHERE t.started_at IS NOT NULL
         "Return `cohort_week`, `week_offset`, `cohort_size`, `active_riders` and `retention_pct`, sorted by `cohort_week`, then `week_offset`.",
       ],
       columns: [
-        { name: "cohort_week", type: "text" },
+        { name: "cohort_week", type: "date" },
         { name: "week_offset", type: "integer" },
         { name: "cohort_size", type: "integer" },
         { name: "active_riders", type: "integer" },
-        { name: "retention_pct", type: "real" },
+        { name: "retention_pct", type: "numeric" },
       ],
       starter: `${ACTIVITY_CTE}
 SELECT cohort_week, week_offset, COUNT(*) AS active_riders
@@ -385,7 +384,7 @@ GROUP BY cohort_week, week_offset
   JOIN weeks w ON w.week >= s.cohort_week
 )
 SELECT g.cohort_week,
-       CAST((julianday(g.week) - julianday(g.cohort_week)) / 7 AS INTEGER) AS week_offset,
+       (g.week - g.cohort_week) / 7 AS week_offset,
        g.cohort_size,
        COUNT(a.rider_name) AS active_riders,
        ROUND(100.0 * COUNT(a.rider_name) / g.cohort_size, 1) AS retention_pct

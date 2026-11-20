@@ -10,8 +10,7 @@
  * anyone, because the same NULL is late in one case and not yet due in
  * another.
  *
- * `__tests__/challengeSolutions` runs every step's solution against
- * node:sqlite.
+ * `__tests__/challengeSolutions` runs every step's solution against PGlite.
  */
 
 import { indentSql, sqlSteps } from "./authoring";
@@ -142,7 +141,7 @@ ORDER BY p.sku
         { name: "on_hand", type: "integer" },
         { name: "on_order", type: "integer" },
         { name: "sold_14d", type: "integer" },
-        { name: "daily_usage", type: "real" },
+        { name: "daily_usage", type: "numeric" },
       ],
       starter: `${POSITION_CTE}
 SELECT sp.sku, sp.on_hand, sp.on_order
@@ -185,7 +184,7 @@ ORDER BY sp.sku
         { name: "sku", type: "text" },
         { name: "on_hand", type: "integer" },
         { name: "on_order", type: "integer" },
-        { name: "days_of_cover", type: "real" },
+        { name: "days_of_cover", type: "numeric" },
         { name: "reorder_qty", type: "integer" },
       ],
       starter: `${DEMAND_CTE}
@@ -225,8 +224,8 @@ ORDER BY days_of_cover, sku`,
 // ─── Supplier scorecard ──────────────────────────────────────────────
 
 const LEAD_BODY = `SELECT po.po_id, s.supplier_name, po.ordered_on, po.expected_on,
-       date(MIN(m.moved_at)) AS first_received,
-       CAST(julianday(date(MIN(m.moved_at))) - julianday(po.ordered_on) AS INTEGER) AS lead_days
+       MIN(m.moved_at)::date AS first_received,
+       MIN(m.moved_at)::date - po.ordered_on AS lead_days
 FROM purchase_orders po
 JOIN suppliers s ON s.supplier_id = po.supplier_id
 LEFT JOIN stock_movements m
@@ -242,9 +241,9 @@ ${indentSql(LEAD_BODY)}
 
 const JUDGED_BODY = `SELECT po_id, supplier_name, expected_on, first_received, lead_days,
        CASE
-         WHEN first_received IS NOT NULL
-           THEN IIF(first_received <= expected_on, 1, 0)
-         WHEN expected_on < '${AS_OF}' THEN 0
+         WHEN first_received <= expected_on THEN 1
+         WHEN first_received > expected_on THEN 0
+         WHEN expected_on < DATE '${AS_OF}' THEN 0
        END AS on_time
 FROM lead_times`;
 
@@ -273,7 +272,7 @@ const SUPPLIER_SCORECARD = sqlSteps(
       title: "Lead time per order",
       short: "Lead time",
       solutionNote:
-        "`LEFT JOIN` keeps the orders nothing has arrived for, and `GROUP BY` with `MIN(m.moved_at)` folds a split delivery back into one row dated by its first drop. Without the grouping, the box order delivered in two drops appears twice. `date()` strips the time of day so the lead time is a whole number of days.",
+        "`LEFT JOIN` keeps the orders nothing has arrived for, and `GROUP BY` with `MIN(m.moved_at)` folds a split delivery back into one row dated by its first drop. Without the grouping, the box order delivered in two drops appears twice. Casting to `date` drops the time of day, and subtracting one `date` from another gives a whole number of days.",
       prompt: [
         "Receipts in `stock_movements` carry the purchase order they delivered in `ref`. Some orders arrived in more than one delivery, and some have not arrived at all.",
         "For every purchase order, return the `po_id`, the `supplier_name`, `ordered_on`, `expected_on`, the date of its first receipt as `first_received` (the date only), and `lead_days`: the days from `ordered_on` to that date. An order with no receipt yet has NULL in both. One row per order, sorted by `po_id`.",
@@ -281,9 +280,9 @@ const SUPPLIER_SCORECARD = sqlSteps(
       columns: [
         { name: "po_id", type: "text" },
         { name: "supplier_name", type: "text" },
-        { name: "ordered_on", type: "text" },
-        { name: "expected_on", type: "text" },
-        { name: "first_received", type: "text" },
+        { name: "ordered_on", type: "date" },
+        { name: "expected_on", type: "date" },
+        { name: "first_received", type: "date" },
         { name: "lead_days", type: "integer" },
       ],
       starter: `SELECT po.po_id, s.supplier_name, po.ordered_on, po.expected_on
@@ -324,7 +323,7 @@ ORDER BY po.po_id
       title: "On time or late",
       short: "On time",
       solutionNote:
-        "A `CASE` with no `ELSE` returns NULL for anything its branches do not cover, which is exactly the right label for an order that cannot be judged yet. Comparing the dates as text works because `YYYY-MM-DD` sorts in date order.",
+        "A `CASE` with no `ELSE` returns NULL for anything its branches do not cover, which is exactly the right label for an order that cannot be judged yet. `first_received` and `expected_on` are both `date`s, so `<=` compares calendar days, and an order that arrived counts in exactly one of the first two branches.",
       prompt: [
         "An order is on time when its first delivery arrived on or before `expected_on`. Add an `on_time` column that is 1 for on time and 0 for late.",
         `The open orders need a decision too. One whose \`expected_on\` is before the count date, \`'${AS_OF}'\`, is already late and scores 0. One that is not due yet has not been judged, so it gets NULL.`,
@@ -333,8 +332,8 @@ ORDER BY po.po_id
       columns: [
         { name: "po_id", type: "text" },
         { name: "supplier_name", type: "text" },
-        { name: "expected_on", type: "text" },
-        { name: "first_received", type: "text" },
+        { name: "expected_on", type: "date" },
+        { name: "first_received", type: "date" },
         { name: "lead_days", type: "integer" },
         { name: "on_time", type: "integer" },
       ],
@@ -385,9 +384,9 @@ ORDER BY po_id
       columns: [
         { name: "supplier_name", type: "text" },
         { name: "pos_due", type: "integer" },
-        { name: "on_time_pct", type: "real" },
-        { name: "fill_pct", type: "real" },
-        { name: "avg_lead_days", type: "real" },
+        { name: "on_time_pct", type: "numeric" },
+        { name: "fill_pct", type: "numeric" },
+        { name: "avg_lead_days", type: "numeric" },
       ],
       starter: `${JUDGED_CTE}
 SELECT j.supplier_name, COUNT(*) AS pos_due

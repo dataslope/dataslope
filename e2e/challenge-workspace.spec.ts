@@ -3,7 +3,7 @@ import { test, expect, type Page } from "@playwright/test";
 // Drives the full-page challenge workspace at /challenges/<slug> in a real
 // browser: loads each task's reference solution, submits it, and asserts every
 // declared check passes. `__tests__/challengeSolutions` already proves the
-// solutions are correct against node:sqlite, python3 and node; what only a
+// solutions are correct against PGlite, python3 and node; what only a
 // browser can prove is that the workspace actually boots those runtimes, feeds
 // them the editor buffer, and grades what comes back.
 //
@@ -12,7 +12,7 @@ import { test, expect, type Page } from "@playwright/test";
 // challenge-solutions.spec.ts drives the lesson cards.
 //
 // LANGS=javascript narrows the sweep to challenges whose runtime is reachable
-// — useful in a sandbox with no route to the CDN that serves the SQLite and
+// — useful in a sandbox with no route to the CDN that serves the PGlite and
 // Pyodide WASM builds. The JavaScript worker is served from this origin, so it
 // runs anywhere.
 
@@ -448,7 +448,9 @@ test.describe("Challenge workspace", () => {
     expect(counts).toHaveLength(labels.length - 1);
     for (const count of counts) expect(count).toMatch(/^\d+$/);
     expect(labels.some((l) => l.startsWith("Python"))).toBe(true);
-    expect(labels.some((l) => l.startsWith("PostgreSQL"))).toBe(false);
+    // Every SQL challenge is written for Postgres; SQLite and DuckDB have none.
+    expect(labels.some((l) => l.startsWith("PostgreSQL"))).toBe(true);
+    expect(labels.some((l) => l.startsWith("SQLite"))).toBe(false);
     expect(labels.some((l) => l.startsWith("DuckDB"))).toBe(false);
   });
 

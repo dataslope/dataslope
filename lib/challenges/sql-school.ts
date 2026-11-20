@@ -12,7 +12,7 @@
  * catalogue brings with it: a prerequisite graph to walk recursively, and
  * "passed every course in the department", which is relational division.
  *
- * Every solution is executed against node:sqlite by
+ * Every solution is executed against Postgres (PGlite) by
  * `__tests__/challengeSolutions`, so a wrong expectation fails CI.
  */
 
@@ -174,7 +174,7 @@ ORDER BY credits DESC, s.full_name`,
       columns: [
         { name: "full_name", type: "text" },
         { name: "credits", type: "integer" },
-        { name: "gpa", type: "real" },
+        { name: "gpa", type: "numeric" },
       ],
       starter: `SELECT s.full_name, AVG(g.points) AS gpa
 FROM enrollments e
@@ -378,7 +378,7 @@ ORDER BY s.full_name, c.course_code`,
       columns: [
         { name: "course_code", type: "text" },
         { name: "title", type: "text" },
-        { name: "avg_points", type: "real" },
+        { name: "avg_points", type: "numeric" },
       ],
       starter: `SELECT c.course_code, c.title, ROUND(AVG(g.points), 2) AS avg_points
 FROM enrollments e

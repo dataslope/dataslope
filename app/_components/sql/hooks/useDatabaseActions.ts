@@ -81,7 +81,6 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     [toastManager],
   );
 
-  const activeDbId = useEngineStore((s) => s.activeDbId);
   const customDbFilename = useEngineStore((s) => s.customDbFilename);
   const tables = useEngineStore((s) => s.tables);
   const setTables = useEngineStore((s) => s.setTables);
@@ -487,12 +486,12 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
 
   const requestDbSwitch = useCallback(
     (nextId: string) => {
-      // For blank database, always show the dialog (it's always a "switch").
-      // For sample databases, skip if already active.
-      if (nextId !== "__blank__" && nextId === activeDbId) return;
+      // Picking the database that is already open is allowed: the dialog
+      // then offers to reload a fresh copy, which is the way back to the
+      // original sample after a change that was kept with the workspace.
       setPendingDbId(nextId);
     },
-    [activeDbId, setPendingDbId],
+    [setPendingDbId],
   );
 
   const exportDatabase = useCallback(() => {
