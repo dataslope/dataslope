@@ -28,6 +28,7 @@ const Types: React.FC<{ c: Ctx }> = ({ c }) => {
   const txAt = c.w("r-types", "Transaction: one row per event");
   const depositAt = c.w("r-types", "like a deposit");
   const periodicAt = c.w("r-types", "Periodic snapshot: one row per entity per period");
+  const perPeriodAt = c.w("r-types", "per entity per period");
   const monthAt = c.w("r-types", "like a month-end balance");
   const accAt = c.w("r-types", "Accumulating snapshot: one row per process");
   const loanAt = c.w("r-types", "like a loan application");
@@ -68,7 +69,7 @@ const Types: React.FC<{ c: Ctx }> = ({ c }) => {
         g={bg}
         cols={colsOf(B)}
         at={periodicAt}
-        rows={B.rows.map((cells, i) => ({ cells, at: periodicAt + 4 + i * 3 }))}
+        rows={B.rows.map((cells, i) => ({ cells, at: perPeriodAt + i * 8 }))}
         marks={B.rows.map((_, row) => ({ row, col: 2, at: monthAt + 2 + row * 3 }))}
       />
       <TableName g={lg} at={accAt}>
@@ -218,7 +219,7 @@ const Degenerate: React.FC<{ c: Ctx }> = ({ c }) => {
 const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const smallAt = c.w("r-junk", "Small flags");
+  const askAt = c.w("r-junk", "a junk dimension");
   const flagAt = [c.w("r-junk", "is promo"), c.w("r-junk", "is gift wrap"), c.w("r-junk", "is expedited")];
   const everyAt = c.w("r-junk", "one table of every combination");
   const eightAt = c.w("r-junk", "eight rows");
@@ -228,7 +229,7 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
   const jg = geoOf(J, R_X, c.top + c.h(110), c.h, { headH: 40, rowH: 36, bodySize: 21, headSize: 19 });
   return (
     <>
-      <Caption at={smallAt} x={R_X} y={c.top}>
+      <Caption at={askAt} x={R_X} y={c.top}>
         Three flags on the fact
       </Caption>
       <div style={{ position: "absolute", left: R_X, top: c.top + c.h(36), display: "flex", gap: 14, fontSize: 22 }}>
@@ -393,7 +394,7 @@ export const RapidOneScene: React.FC = () => {
         <Sfx key={item.n} name="el-tap" at={item.at} level={-33} />
       ))}
 
-      <Drift from={from} to={end + 40} scale={0.01}>
+      <Drift from={from} to={end + 40} scale={0.02}>
         <Kicker at={from - 6}>{SERIES} · Questions 10 to 22, quick</Kicker>
         <Headline lead="Thirteen quick ones," turn="a sentence or two each." at={thirteenAt - 4} turnAt={eachAt - 2} size={60} />
         <RapidFire items={items} x={LIST_X} top={y(LIST_TOP)} rowH={h(ROW)} width={LIST_W} at={eachAt + 4} end={end} />

@@ -56,8 +56,11 @@ const Confirmed: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 18. Drilling across ─────────────────────────────────────────────────────
 
 const Drill: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
   const askAt = c.w("r-drill", "drilling across");
-  const salesAt = c.w("r-drill", "like sales and returns");
+  const combineAt = c.w("r-drill", "Combining metrics");
+  const twoAt = c.w("r-drill", "from two facts");
+  const returnsAt = c.w("r-drill", "and returns");
   const rollAt = c.w("r-drill", "Roll each fact up");
   const ownAt = c.w("r-drill", "on its own");
   const joinAt = c.w("r-drill", "full outer join the results");
@@ -87,8 +90,8 @@ const Drill: React.FC<{ c: Ctx }> = ({ c }) => {
   ];
   return (
     <>
-      <Entity layout={sales} at={salesAt - 2} />
-      <Entity layout={returns} at={salesAt + 8} />
+      <Entity layout={sales} at={twoAt} />
+      <Entity layout={returns} at={returnsAt} />
       <Flow points={down(mid(L), sales.bottom + 8, rollY - 8)} at={rollAt + 2} />
       <Flow points={down(mid(Rx), returns.bottom + 8, rollY - 8)} at={rollAt + 8} />
       <Box x={L} y={rollY} w={W} h={BOX_H} at={rollAt + 10}>
@@ -103,7 +106,9 @@ const Drill: React.FC<{ c: Ctx }> = ({ c }) => {
         FULL OUTER JOIN ON date_sk
       </Box>
       <Note at={askAt} x={L} y={top - c.h(44)}>
-        <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>Two facts, one report</span>
+        <span style={{ ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+          Drilling across<span style={{ opacity: ease(frame, combineAt, 10) }}>: two facts, one report</span>
+        </span>
       </Note>
       <Note at={multAt} x={L} y={joinY + BOX_H + c.h(40)}>
         <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>Joined row to row first, the facts would multiply</span>
@@ -188,7 +193,10 @@ const Agg: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 20. Customers and accounts in a bank ────────────────────────────────────
 
 const Bank: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
   const askAt = c.w("r-bank", "in a bank data warehouse");
+  const manyAt = c.w("r-bank", "a many-to-many relationship");
+  const custAt = c.w("r-bank", "between customers and accounts");
   const bridgeAt = c.w("r-bank", "A bridge between customers and the balance fact");
   const shareAt = c.w("r-bank", "with each owner's share");
   const unAt = c.w("r-bank", "Unweighted, a joint account counts twice");
@@ -196,7 +204,7 @@ const Bank: React.FC<{ c: Ctx }> = ({ c }) => {
   const totalAt = c.w("r-bank", "the bank's total");
   const Bal = RAPID.bankBalances;
   const Br = RAPID.bankBridge;
-  const top = c.top + c.h(40);
+  const top = c.top + c.h(110);
   const balG = geoOf(Bal, R_X, top, c.h, ROWS);
   const brG = geoOf(Br, balG.right + 60, top, c.h, { headH: 40, rowH: 40, bodySize: 21, headSize: 19 });
   const acc = Br.cols.indexOf("account_sk");
@@ -208,6 +216,12 @@ const Bank: React.FC<{ c: Ctx }> = ({ c }) => {
   const per = (t: typeof RAPID.bankWeighted) => t.rows.map((r) => `${r[0]} ${money(r[1])}`).join(" + ");
   return (
     <>
+      <Note at={manyAt} x={R_X} y={c.top}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          One account, several owners
+          <span style={{ opacity: ease(frame, custAt, 10) }}>; one owner, several accounts</span>
+        </span>
+      </Note>
       <TableName g={balG} at={askAt}>
         <Mono>fact_account_balance</Mono>
       </TableName>
@@ -413,7 +427,7 @@ export const RapidTwoScene: React.FC = () => {
         <Sfx key={item.n} name="el-tap" at={item.at} level={-33} />
       ))}
 
-      <Drift from={from} to={end + 40} scale={0.01}>
+      <Drift from={from} to={end + 40} scale={0.02}>
         <Kicker at={from - 8}>{SERIES} · Questions 17 to 22, quick</Kicker>
         <RapidFire items={items} x={LIST_X} top={y(LIST_TOP)} rowH={h(ROW)} width={LIST_W} at={from - 6} end={end} />
         <ColumnRule x={RULE_X} top={y(LIST_TOP)} height={items.length * h(ROW)} at={from} />

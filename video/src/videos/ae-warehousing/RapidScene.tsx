@@ -89,7 +89,6 @@ const Cache: React.FC<{ c: Ctx }> = ({ c }) => {
   const freeAt = c.w("r-cache", "often for free");
   const rewardsAt = c.w("r-cache", "rewards queries that don't vary");
   const changeAt = c.w("r-cache", "any change to an underlying table");
-  const invalidAt = c.w("r-cache", "invalidates it");
   const top = c.y(R_TOP);
   const boxH = c.h(58);
   const cacheX = 1420;
@@ -117,8 +116,8 @@ const Cache: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <Flow points={[[R_X + 392, top + boxH / 2], [cacheX - 14, cacheTop + cacheH * 0.3]]} at={sameAt + 4} width={2.4} head={12} />
       <Flow points={[[R_X + 392, top + c.h(84) + boxH / 2], [cacheX - 14, cacheTop + cacheH * 0.7]]} at={unchangedAt + 4} width={2.4} head={12} />
-      <Box x={cacheX} y={cacheTop} w={cacheW} h={cacheH} at={storedAt} title="Result cache" sub="a stored result" size={24} tones={[{ at: instantAt, tone: "ok" }, { at: invalidAt, tone: "bad" }]} />
-      <div style={{ opacity: 1 - ease(frame, invalidAt, 10) }}>
+      <Box x={cacheX} y={cacheTop} w={cacheW} h={cacheH} at={storedAt} title="Result cache" sub="a stored result" size={24} tones={[{ at: instantAt, tone: "ok" }, { at: changeAt + 10, tone: "bad" }]} />
+      <div style={{ opacity: 1 - ease(frame, changeAt + 10, 10) }}>
         <Item x={R_X} top={top + c.h(196)} at={instantAt} color={OK_INK}>
           <b>Returned at once</b>
           <span style={{ opacity: ease(frame, freeAt, 10) }}>, often for free</span>
@@ -128,8 +127,7 @@ const Cache: React.FC<{ c: Ctx }> = ({ c }) => {
         It rewards queries that don&rsquo;t vary
       </Item>
       <Item x={R_X} top={top + c.h(292)} at={changeAt + 4} color={ACCENT_INK}>
-        <b>A table changes:</b>
-        <span style={{ opacity: ease(frame, invalidAt, 10) }}> the cached result is invalidated</span>
+        <b>A table changes:</b> the cached result is invalidated
       </Item>
     </>
   );

@@ -66,7 +66,6 @@ export const PruneScene: React.FC = () => {
   const monthAt = n.word("prune-run", "a folder per month");
   const marchAt = n.word("prune-run", "a query for March");
   const oneAt = n.word("prune-run", "scans one file of twelve");
-  const regionAt = n.word("prune-run", "Filter on region instead");
   const allAt = n.word("prune-run", "reads all twelve");
   const onlyAt = n.word("prune-run", "pruning only works on the partition column");
   const historyAt = n.word("prune-not", "a query over all of history");
@@ -87,7 +86,7 @@ export const PruneScene: React.FC = () => {
   // it, and every folder for the region filter (red).
   const defLit = during(frame, matchAt, modelAt, 10);
   const defSkip = during(frame, skipsAt, modelAt, 10);
-  const marchLit = during(frame, oneAt - 2, regionAt, 10);
+  const marchLit = during(frame, oneAt - 2, allAt - 2, 10);
   const regionLit = ease(frame, allAt - 2, 10);
   const folderX = (i: number) => FX + (i % 4) * (FOLDER_W + FOLDER_GX);
   const folderY = (i: number) => y(FOLDER_Y) + Math.floor(i / 4) * h(FOLDER_STEP);
@@ -153,9 +152,9 @@ export const PruneScene: React.FC = () => {
         <Note at={marchAt} x={FX} y={y(PLAN_Y) - h(4)} out={oneAt - 6}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>DuckDB&rsquo;s plan</span>
         </Note>
-        <Listing lines={marchPlan} x={FX} top={y(PLAN_Y) + h(40)} width={740} size={21} at={oneAt - 6} out={regionAt - 2} marks={[{ line: "Scanning Files", at: oneAt + 4 }]} />
-        <Listing lines={regionPlan} x={FX} top={y(PLAN_Y) + h(40)} width={740} size={21} at={regionAt} marks={[{ line: "Total Files Read", at: allAt + 4, color: MARK_BAD }]} />
-        <Note at={oneAt + 6} x={FX} y={y(PLAN_Y) - h(4)} out={regionAt - 2}>
+        <Listing lines={marchPlan} x={FX} top={y(PLAN_Y) + h(40)} width={740} size={21} at={oneAt - 6} out={allAt - 4} marks={[{ line: "Scanning Files", at: oneAt + 4 }]} />
+        <Listing lines={regionPlan} x={FX} top={y(PLAN_Y) + h(40)} width={740} size={21} at={allAt - 2} marks={[{ line: "Total Files Read", at: allAt + 6, color: MARK_BAD }]} />
+        <Note at={oneAt + 6} x={FX} y={y(PLAN_Y) - h(4)} out={allAt - 4}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             March: <Num>{readOne}</Num> file of <Num>{ofAll}</Num>
           </span>
