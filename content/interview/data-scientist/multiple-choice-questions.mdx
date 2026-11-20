@@ -743,7 +743,7 @@ reasoning and runnable examples.
   markdown={`What does dropout do, and when is it active?
 
 - [o] It randomly zeroes activations during training only.
-  > That forces redundant representations. At inference it is disabled and activations are scaled accordingly. Forgetting to switch to evaluation mode is the classic bug; the model then makes stochastic predictions.
+  > That forces redundant representations. At inference it is disabled, and nothing needs rescaling because the surviving activations were already scaled up during training. Forgetting to switch to evaluation mode is the classic bug; the model then makes stochastic predictions.
 - It reduces the learning rate gradually over time.
   > That is a scheduler.
 - It removes unhelpful neurons permanently.
@@ -966,7 +966,7 @@ reasoning and runnable examples.
   markdown={`Why do network effects break the standard A/B assumption?
 
 - [o] One user's treatment leaks into another user's outcome.
-  > Control users end up partly exposed, so the measured effect is understated. Cluster randomization by network community, or switchback designs in marketplaces, are the usual mitigations.
+  > The arms are no longer independent, so the measured effect is biased: understated when treatment spills over to control users, and often overstated when the arms compete for the same supply. Cluster randomization by network community, or switchback designs in marketplaces, are the usual mitigations.
 - They cause a sample ratio mismatch.
   > Assignment stays balanced.
 - They only ever matter for social products.
@@ -1290,12 +1290,12 @@ reasoning and runnable examples.
 />
 
 <MultipleChoice
-  markdown={`How do you compute each group's share of the overall total in pandas?
+  markdown={`How do you compute each row's share of its group's total in pandas?
 
 - \`df.groupby("g")["x"].sum() / df["x"].sum()\`
-  > This works for a per-group result, but it does not align back to the original rows.
+  > That is each group's share of the overall total: one value per group, not one per row.
 - [o] Divide by \`df.groupby("g")["x"].transform("sum")\`.
-  > That gives a within-group share; divide by \`df["x"].sum()\` for a share of the overall total. \`transform\` is what broadcasts the group total back to each row so the division aligns.
+  > \`transform\` broadcasts the group total back to each row, so the division aligns. Divide by \`df["x"].sum()\` instead for a share of the overall total.
 - \`df["x"].pct_change()\`
   > That computes period-over-period change, not a share.
 - \`df.groupby("g")["x"].apply(lambda s: s / s.sum())\`
@@ -1308,7 +1308,7 @@ reasoning and runnable examples.
 - [o] Expressing a transformation as one pipeline of calls.
   > It avoids naming a dozen intermediate frames and reads top to bottom. \`assign\`, \`pipe\`, and \`query\` exist largely to keep operations chainable; the cost is that debugging a long chain is harder.
 - Chaining indexers such as \`df[...][...]\`.
-  > That is chained *indexing*, the thing that triggers \`SettingWithCopyWarning\`.
+  > That is chained *indexing*. Assigning through it never updates the original in pandas 3, which warns with \`ChainedAssignmentError\`; older versions showed \`SettingWithCopyWarning\`.
 - Calling several methods on different objects in sequence.
   > The chain operates on one flowing result.
 - A way of parallelizing pandas operations.
@@ -1334,7 +1334,7 @@ reasoning and runnable examples.
   markdown={`A prompt change raises an eval pass rate from 76% to 80% on the same 100 items. Roughly how wide is the 95% interval on each rate?
 
 - About ±1 percentage point.
-  > That precision would need tens of thousands of items.
+  > That precision would need about 6,000 items.
 - [o] About ±8 percentage points.
   > $1.96\sqrt{0.8 \cdot 0.2 / 100} \approx 0.078$, so the four-point gap sits well inside the noise.
 - About ±20 percentage points.

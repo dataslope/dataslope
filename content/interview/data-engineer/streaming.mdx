@@ -33,8 +33,10 @@ into **partitions**, the unit of parallelism and ordering: messages within
 a partition are strictly ordered and each has a monotonically increasing
 **offset** (its position). There is **no global order** across
 partitions, only within one. A message's partition is chosen by its key's
-hash (or round-robin if keyless), so all messages with the same key land
-in the same partition and stay ordered relative to each other.
+hash, so all messages with the same key land in the same partition and stay
+ordered relative to each other. A keyless message goes to a "sticky"
+partition that the producer keeps filling until a batch is full and then
+switches; round-robin was the default only before Kafka 2.4.
 
 ```mermaid
 flowchart LR
@@ -55,6 +57,13 @@ count, adding consumers beyond the number of partitions leaves some idle.
 Different groups reading the same topic each get **all** messages
 independently (pub/sub), which is how you fan a stream out to multiple
 independent pipelines.
+
+Two Kafka 4 changes are worth knowing for the follow-up. ZooKeeper is gone:
+since 4.0, KRaft is the only way to run the cluster's metadata. And the
+one-consumer-per-partition rule belongs to consumer groups only. **Share
+groups** ("queues for Kafka", production-ready in Kafka 4.2) let several
+consumers read the same partition and acknowledge each record individually,
+which gives up per-partition ordering in exchange for queue-style scaling.
 
 ### What are consumer offsets and why commit them?
 
@@ -228,7 +237,7 @@ partition indefinitely or cause an infinite retry loop.
 - Aggregate by processing time and finalize each window immediately.
   > Processing time puts late mobile events in the wrong window, undercounting the window they truly belong to.
 - [o] Aggregate by **event time** with a watermark that allows ~90s of lateness before closing the window.
-  > Event-time windowing plus an allowed-lateness margin lets late events land in their correct window before it's finalized.
+  > Event-time windowing with the watermark held about 90 seconds behind the newest event lets the buffered mobile events land in their correct window before it closes.
 - Drop any event whose processing time is after the window end.
   > That discards exactly the late-but-valid events you need, biasing the counts low.
 - Use a session window keyed on nothing.

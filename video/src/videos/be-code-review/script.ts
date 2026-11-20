@@ -189,7 +189,15 @@ export const script: NarrationScript = {
     },
     {
       id: "bugs-survey",
-      text: "In Stack Overflow's twenty twenty-five developer survey, sixty-six percent of respondents named AI solutions that are almost right, but not quite, as their top frustration. Forty-five percent said debugging AI-generated code takes longer than expected.",
+      text: "In Stack Overflow's twenty twenty-five developer survey, sixty-six percent of respondents named AI solutions that are almost right, but not quite, as their top frustration.",
+      pauseAfter: 0.35,
+    },
+    {
+      // Split from "bugs-survey" and voiced alone (2026-11-20): it said
+      // "takes longer than expected", a paraphrase; this is the survey's own
+      // option, as the page's footnote now quotes it.
+      id: "bugs-survey-debug",
+      text: "Forty-five percent said debugging AI-generated code is more time-consuming.",
       pauseAfter: 0.7,
     },
     {

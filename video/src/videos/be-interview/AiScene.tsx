@@ -167,8 +167,7 @@ export const AiScene: React.FC = () => {
 
   const from = n.beat("ai").from;
   const roundAt = n.word("ai", "the coding round");
-  const sinceAt = n.word("ai", "Since 2025");
-  const splitAt = n.word("ai", "split in two");
+  const splitAt = n.word("ai", "two kinds");
   const someAt = n.word("ai-allowed", "Some rounds hand you");
   const gradeAt = n.word("ai-allowed", "grade how you drive");
   const othersAt = n.word("ai-banned", "Others ban assistants");
@@ -263,7 +262,7 @@ export const AiScene: React.FC = () => {
 
       <Drift from={from} to={end + 40} scale={0.015}>
         <Kicker at={from}>How AI has changed the interview</Kicker>
-        <Headline lead="Since 2025," turn="it has split in two." at={sinceAt} turnAt={splitAt} size={62} />
+        <Headline lead="One round," turn="two kinds." at={roundAt} turnAt={splitAt} size={62} />
 
         {/* The coding round, a plain heading, then the fork into its two
             kinds. */}

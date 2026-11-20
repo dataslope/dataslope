@@ -86,9 +86,11 @@ it.
 A **backfill** reprocesses historical data, to populate a new table, fix a
 bug, or apply a schema change. Design for it by making pipelines
 **parameterized by date range** and **idempotent**, so each partition runs
-independently and re-runs safely. In Airflow, `catchup=True` with a
-sensible `start_date` schedules the historical runs; partitioned assets do
-this in Dagster. Backfilling years of data often needs **throttling** so
+independently and re-runs safely. In Airflow 3 a backfill is started from
+the UI or with `airflow backfill create` over a date range and run by the
+scheduler, with its own cap on concurrent runs; `catchup=True` (off by
+default since Airflow 3) only creates the runs missed since `start_date`.
+Partitioned assets do this in Dagster. Backfilling years of data often needs **throttling** so
 you don't overwhelm source systems or the warehouse.
 
 The cost that decides the design. A run that reprocesses everything grows
@@ -169,9 +171,9 @@ validation, complementing quality checks that inspect the data present.
 
 When pipeline B depends on pipeline A's output, avoid guessing with a cron
 offset. Options: (1) a **sensor** that waits for A's completion or its
-output to land (a file, a partition, a marker); (2) a **dataset/asset
-trigger** where B runs when A publishes the dataset it consumes (Airflow
-Datasets, Dagster assets); (3) merging both into one DAG if they're tightly
+output to land (a file, a partition, a marker); (2) an **asset trigger**
+where B runs when A publishes the data it consumes (Airflow Assets, named
+Datasets before Airflow 3, and Dagster assets); (3) merging both into one DAG if they're tightly
 coupled. Explicit data dependencies beat time-based coupling, which breaks
 whenever A runs late.
 

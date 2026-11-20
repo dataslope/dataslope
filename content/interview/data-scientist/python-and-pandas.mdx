@@ -137,7 +137,8 @@ your expectation.
   value lookups and substitutions.
 - `DataFrame.apply(func, axis=0|1)`, applies along an axis (per column or
   per row).
-- `DataFrame.map(func)` (pandas 2.1+, formerly `applymap`), element-wise
+- `DataFrame.map(func)` (pandas 2.1+; the old name `applymap` was removed in
+  3.0), element-wise
   across **every** cell.
 
 <CodeBlock
@@ -259,17 +260,29 @@ display(df)`,
   ]}
 />
 
-### What is the `SettingWithCopyWarning`, and how do you avoid it?
+### What happened to `SettingWithCopyWarning`, and how do you assign safely?
 
-It warns that you may be writing to a **view** (a slice) rather than the
-original frame, so the assignment might not stick. Avoid it by writing
-through a single `.loc` on the original, or by taking an explicit `.copy()`
-when you deliberately want an independent subset.
+Before pandas 3.0 it warned that you might be writing to a temporary copy of
+a slice, so the assignment might not stick. pandas 3.0 made **copy-on-write**
+the only behavior: every indexing result behaves as a copy, chained
+assignment such as `df[mask]["amount"] = 0` never updates `df` (pandas warns
+with `ChainedAssignmentError`), and `SettingWithCopyWarning` is gone.
+Interviewers still ask about it, and older codebases still raise it. Write
+through a single `.loc` on the original; a filtered subset is already
+independent, so the defensive `.copy()` is no longer needed.
 
 ```python
-df.loc[df["region"] == "North", "amount"] = 0   # unambiguous, in place
-subset = df[df["region"] == "North"].copy()      # independent copy
+df.loc[df["region"] == "North", "amount"] = 0   # one step, updates df
+subset = df[df["region"] == "North"]             # independent under copy-on-write
+subset["amount"] = 99                            # changes subset only, no warning
 ```
+
+### What dtype does a text column have in pandas 3?
+
+`str`, a dedicated string dtype, not `object`. A check such as
+`df[col].dtype == object` is now `False` for text; use
+`pd.api.types.is_string_dtype(df[col])` or `df.select_dtypes("str")`. Missing
+values in a `str` column are `NaN`, and `isna()` finds them as before.
 
 ### How do you compute a percentage of total within each group?
 

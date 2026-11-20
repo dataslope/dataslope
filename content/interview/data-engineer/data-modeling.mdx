@@ -451,7 +451,7 @@ A **measure** is a raw numeric column on a fact table (e.g., `revenue`, `quantit
 
 ### What is the purpose of a surrogate key sequence vs a UUID?
 
-An **auto-increment integer** surrogate key is compact, fast to join, and naturally ordered, ideal for dimension tables in a warehouse. A **UUID** (128-bit) is globally unique across systems and generated client-side without a sequence, making it better for distributed systems where multiple sources insert concurrently. The trade-off: UUIDs are larger, slower to join, and fragment indexes more than integers.
+An **auto-increment integer** surrogate key is compact, fast to join, and naturally ordered, ideal for dimension tables in a warehouse. A **UUID** (128-bit) is globally unique across systems and generated client-side without a sequence, making it better for distributed systems where multiple sources insert concurrently. The trade-off: UUIDs are larger, slower to join, and fragment indexes more than integers. The fragmentation cost belongs to random (version 4) UUIDs; a time-ordered UUIDv7, built into PostgreSQL 18 as `uuidv7()`, keeps new keys next to each other in the index.
 
 ### How do you model a many-to-many relationship between facts and dimensions?
 

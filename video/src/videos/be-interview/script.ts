@@ -67,8 +67,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * data.ts reads; check.mjs fails if a page stops saying what the narration
  * quotes, or the narration stops saying what was counted):
  *   - "probe": index.mdx, intro and "What interviewers probe".
- *   - "ai": ai-assisted-coding.mdx's intro, "Since 2025 the coding interview
- *     has split in two".
+ *   - "ai": ai-assisted-coding.mdx's intro, "The coding interview comes in
+ *     two kinds". It said "Since 2025, it has split in two" until 2026-11-20,
+ *     when the page was made evergreen and this beat re-voiced to match.
  *   - "ai-allowed": the index's "give you an assistant and grade how you
  *     drive and verify it". "ai-allowed-who", "ai-banned": the AI page's
  *     table, generalized to formats at the owner's request (2026-11-06) so
@@ -136,7 +137,7 @@ export const script: NarrationScript = {
       text: "The ground is data structures and algorithms, complexity in Big-O, and your language's fundamentals, usually in live coding. Backend roles add system and API design, SQL, caching and concurrency.",
       pauseAfter: 0.8,
     },
-    { id: "ai", scene: true, text: "What has changed is the coding round. Since 2025, it has split in two.", pauseAfter: 0.6 },
+    { id: "ai", scene: true, text: "What has changed is the coding round. It comes in two kinds.", pauseAfter: 0.6 },
     {
       id: "ai-allowed",
       text: "Some rounds hand you an assistant and grade how you drive and check it.",

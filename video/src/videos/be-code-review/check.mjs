@@ -49,11 +49,12 @@ const PAGE_CODE = fence[1];
  *  written (line breaks in the page read as spaces). */
 const prose = page.replace(/\s+/g, " ");
 const PAGE_SAYS = {
-  survey66: '66% of respondents named "AI solutions that are almost right, but not quite" as their top frustration',
-  survey45: "45% said debugging AI-generated code takes longer than expected",
-  surveyName: "Stack Overflow's 2025 developer survey",
+  survey66: '66% of respondents chose "almost right, but not quite"',
+  surveyTop: 'the answer chosen most often was "AI solutions that are almost right, but not quite"',
+  survey45: "45% said debugging AI-generated code is more time-consuming",
+  surveyName: "Stack Overflow, [2025 Developer Survey, AI section]",
   readDebugOptimize: 'frames the task as "read, debug and optimize" an existing codebase',
-  assistantAllowed: "allows an approved assistant",
+  assistantAllowed: "with an approved assistant",
   fewHundred: "often a few hundred lines",
   stranger: "Like a pull request from a capable stranger",
   supplyChain: "A hallucinated package name is also a supply-chain risk, because an attacker can register it",
@@ -373,7 +374,7 @@ const claims = [
   ["plan", `${WORDS[results.lines]} lines`],
   ["plan", "both pass"],
   ["bugs-survey", "sixty-six percent"],
-  ["bugs-survey", "forty-five percent"],
+  ["bugs-survey-debug", "forty-five percent"],
   ["debug-report", "from eight to six"],
   ["debug-repro", "three to two"],
   ["debug-symptom", "empty list"],

@@ -12,7 +12,7 @@ Q&A, then solve the challenges.
   alt="A stepped platform where a ranked column of numbered blocks feeds into a spiral rail that loops back on itself, a transparent window frame hovering over three of the blocks"
 />
 
-> **SQL dialect:** the runnable blocks on this page execute in your browser on **PostgreSQL**, so the SQL targets Postgres. It is standard SQL except where noted (`DISTINCT ON`, `FILTER`, `generate_series`). `QUALIFY` and native `PIVOT`, which Postgres lacks, are shown as illustrative snippets.
+> **SQL dialect:** the runnable blocks on this page execute in your browser on **PostgreSQL**, so the SQL targets Postgres. It is standard SQL except where noted (`DISTINCT ON`, `generate_series`); `FILTER` is standard, but few warehouses implement it. `QUALIFY` and native `PIVOT`, which Postgres lacks, are shown as illustrative snippets.
 
 ## Q&A
 
@@ -105,8 +105,9 @@ ORDER BY customer_id;`}
 
 Postgres also has a shortcut for exactly this shape: `SELECT DISTINCT ON
 (customer_id) * FROM customer_updates ORDER BY customer_id, updated_at DESC`
-keeps the first row of each `customer_id` in the sort order. It is
-Postgres-only, so the `ROW_NUMBER` form is the one to know for a warehouse.
+keeps the first row of each `customer_id` in the sort order. Postgres and
+DuckDB accept it but the big cloud warehouses do not, so the `ROW_NUMBER` form
+is the one to know for a warehouse.
 
 ### What does `QUALIFY` do, and how does it relate to `WHERE` and `HAVING`?
 
