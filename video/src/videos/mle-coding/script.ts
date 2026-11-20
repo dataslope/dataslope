@@ -171,7 +171,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     locality; reserve loops for steps that can't be array math). The
  *     timing is the video's own: 100,000 seeded rows of 64 numbers against
  *     one vector, as a pure Python loop, as np.dot per row, and as E @ q,
- *     best of several runs (15 for the product), measured once. Over five
+ *     best of several runs (1,000 for the product, whose single runs swing
+ *     from 3 to 14 ms on a busy shared machine; with 15, three reruns on
+ *     2026-11-20 came out 31 to 38 times), measured once. Over five
  *     runs on this machine the loop came out 85 to 118 times the product and
  *     per-row NumPy 29 to 38 times (the committed run: VECTOR.ratio);
  *     check.mjs fails if a rerun leaves "roughly a hundred times" (50 to

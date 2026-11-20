@@ -77,7 +77,11 @@ def per_row():
 def matrix():
     return E @ q
 agree = float(np.max(np.abs(np.array(pure()) - matrix())))
-t_pure, t_row, t_vec = best(pure, 3), best(per_row, 3), best(matrix, 15)
+# The product takes a few milliseconds, and on a shared machine one run of it
+# swings from 3 to 14 ms (2026-11-20, while other jobs ran): fifteen runs left
+# its best near 10 ms three times in a row and the ratios a third of the
+# writer's. The best of a thousand finds the machine's own speed again.
+t_pure, t_row, t_vec = best(pure, 3), best(per_row, 3), best(matrix, 1000)
 R["vector"] = {
     "items": N, "dims": D, "maxDiff": agree,
     "ms": {"loop": r2(t_pure), "perRow": r2(t_row), "matrix": r2(t_vec)},
