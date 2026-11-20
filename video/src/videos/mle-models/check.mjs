@@ -394,7 +394,7 @@ const quotes = [
   ["ml-fundamentals.mdx", "emit all-zeros for any category unseen at fit time"],
   ["ml-fundamentals.mdx", "### What is feature engineering?"],
   ["ml-fundamentals.mdx", "Good features often matter more than\nchoice of algorithm"],
-  ["ml-fundamentals.mdx", "variance falls with the number of models onto a floor set by how\ncorrelated their errors are"],
+  ["ml-fundamentals.mdx", "variance falls with the number of\nmodels onto a floor set by how correlated their errors are"],
 ];
 for (const [file, phrase] of quotes) if (!page(file).includes(phrase)) problems.push(`${file} no longer says: ${phrase.replace(/\n/g, " ")}`);
 // The page's ensemble chart, whose formula and correlations bag-floor draws.

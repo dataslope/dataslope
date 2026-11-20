@@ -73,7 +73,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * On screen, beat by beat (for the builder; nothing is built yet). Colors keep
  * the series' meanings (interview.tsx): red the trap or the error, green the
  * right answer, yellow what the narration points at, blue data. The
- * orangutan hero sits beside the opening and the close only.
+ * orangutan hero sits beside the opening and the close only. Four small
+ * watercolor spots (illustrations.json), each beside the figure it names: a
+ * chain at "q4" (the chain rule), dice at "q9-bug" (ten calls, ten draws), a
+ * magnifying glass at "q10-a" (a filter's small patch), a padlock at
+ * "r-transfer" (a frozen backbone).
  *   hook: three small diagrams in a row, inked as named: a logistic
  *     regression (inputs, one weighted sum, a sigmoid), then the same thing
  *     stacked many layers deep, then a gradient arrow running back down the
@@ -344,7 +348,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q1-xor",
-      text: "So it famously can't learn XOR, one when exactly one input is one: no line separates the ones from the zeros, and the best gets three of the four.",
+      text: "So it famously can't learn XOR, which is one when exactly one input is one: no line separates the ones from the zeros, and the best gets three of the four.",
       pauseAfter: 0.7,
     },
     {
@@ -528,7 +532,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q11-cost",
-      text: "The page's whole network has five thousand four hundred and eighteen. But each is reused at fifty thousand positions, so that first layer still takes twenty-two million multiply-adds: cheap to store, not to compute.",
+      text: "The page's whole network has five thousand four hundred and eighteen. But its first layer reuses each weight at fifty thousand positions: twenty-two million multiply-adds, cheap to store, not to compute.",
       pauseAfter: 0.7,
     },
     {
@@ -545,7 +549,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-softmax",
-      text: "Why pair softmax with cross-entropy? Their combined gradient is prediction minus target, large exactly when the model is confidently wrong. Libraries fuse them on raw logits, so don't add a softmax: applied twice over ten classes, the right class tops out at twenty-three percent, and the loss can't drop below one point four six.",
+      text: "Why pair softmax with cross-entropy? Their combined gradient is prediction minus target, large exactly when the model is confidently wrong. Libraries fuse them on raw logits, so don't apply softmax first: applied twice over ten classes, the right class tops out at twenty-three percent, and the loss can't drop below one point four six.",
       pauseAfter: 0.8,
     },
     { id: "rnn-in", text: "Last, sequences." },

@@ -70,7 +70,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * On screen, beat by beat (for the builder; nothing is built yet). Colors keep
  * the series' meanings (interview.tsx): red the trap or the error, green the
  * right answer, yellow what the narration points at, blue data. The dolphin
- * hero sits beside the opening and the close only.
+ * hero sits beside the opening and the close only. Three small watercolor
+ * spots (illustrations.json), each beside the figure it names: scissors at
+ * "q1-a" (text cut into units), a card-catalog cabinet at "q13-a" (the
+ * store passages are fetched from), a plug at "q12-serve" (adapters plugged
+ * into one base model).
  *   hook: one sentence of text cut into token chips, the chips turning into
  *     small vectors (blue bars), then thin lines from one vector to every
  *     other (yellow), each stage inked on its words.
@@ -340,7 +344,7 @@ export const script: NarrationScript = {
     { id: "q4", scene: true, text: "Question four. What is self-attention?" },
     {
       id: "q4-a",
-      text: "Each token is projected into a query, a key and a value. One token's weight on another is their query-key dot product, divided by the square root of the key's length and softmaxed. Its output is the weighted sum of the values.",
+      text: "Each token is projected into a query, a key and a value. One token's weight on another is its query dotted with the other's key, divided by the square root of the key's length, and softmaxed. Its output is the weighted sum of the values.",
       pauseAfter: 0.6,
     },
     {
