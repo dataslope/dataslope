@@ -2,7 +2,8 @@
 
 Folder `video/src/videos/ae-interview/`. Review report:
 `agent-outputs/20261120-ae-interview-video-review/AnalyticsEngineer-0-Interview.md`
-(0 P1, 1 P2, 7 P3). Nothing committed.
+(0 P1, 1 P2, 7 P3). Nothing committed by me. The pre-fix baseline is `0f98e6f4`;
+the coordinator's checkpoint `5ff616cb` holds this work as it stands.
 
 Order worked: finding 1 (P2), then the explanation findings (2 and 7), then the other P3s.
 
@@ -43,7 +44,7 @@ number was needed.
 - `check:cues`: pass ("every word cue names a phrase its beat says").
 - `npm test`: 79 of 79 pass.
 - `check:frames` (`CHECK_SCALE=1`, own entry, through the queue): pass. 12 illustrations, largest stretch 0.22; 3 arrows, 0.0 degrees of bend; spacing, mixed-size and tabular-hyphen audits clean.
-- `check:motion`: MOTION_RESULT
+- `check:motion` (own entry, through the queue): pass. 2:46.5 checked, 0 stretches still for 2 s or more. The preview it left (`out/AnalyticsEngineer-0-Interview-preview.mp4`) is deleted.
 - `check:sync` / `check:mix`: not run, since nothing was re-voiced and no sound effect moved except the AI scene's three stack taps, which moved 1.2 s earlier with the boxes.
 - Stills, each looked at: 8, 20, 21.5, 53, 55, 57, 74, 76.5, 90, 90.5, 112.9, 113, 115.5 and 122 s (`video/out/review/AnalyticsEngineer-0-Interview/`).
 
