@@ -100,7 +100,21 @@ const Cache: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Box x={R_X} y={top} w={380} h={boxH} at={sameAt - 2} title="The same query text" size={22} />
-      <Box x={R_X} y={top + c.h(84)} w={380} h={boxH} at={unchangedAt} title="Its tables, unchanged" size={22} tones={[{ at: changed, tone: "bad" }]} />
+      <Box
+        x={R_X}
+        y={top + c.h(84)}
+        w={380}
+        h={boxH}
+        at={unchangedAt}
+        title={
+          <span style={{ display: "grid" }}>
+            <span style={{ gridArea: "1 / 1", opacity: 1 - ease(frame, changed, 8) }}>Its tables, unchanged</span>
+            <span style={{ gridArea: "1 / 1", opacity: ease(frame, changed, 8) }}>A table changed</span>
+          </span>
+        }
+        size={22}
+        tones={[{ at: changed, tone: "bad" }]}
+      />
       <Flow points={[[R_X + 392, top + boxH / 2], [cacheX - 14, cacheTop + cacheH * 0.3]]} at={sameAt + 4} width={2.4} head={12} />
       <Flow points={[[R_X + 392, top + c.h(84) + boxH / 2], [cacheX - 14, cacheTop + cacheH * 0.7]]} at={unchangedAt + 4} width={2.4} head={12} />
       <Box x={cacheX} y={cacheTop} w={cacheW} h={cacheH} at={storedAt} title="Result cache" sub="a stored result" size={24} tones={[{ at: instantAt, tone: "ok" }, { at: invalidAt, tone: "bad" }]} />
@@ -189,6 +203,7 @@ const Dist: React.FC<{ c: Ctx }> = ({ c }) => {
           h={nodeH}
           at={decidesAt - 4 + i * 3}
           title={`Node ${i + 1}`}
+          titleTop
           size={22}
           tones={i === 0 ? [{ at: mostAt, tone: "bad" }] : [{ at: dominatesAt + 10, tone: "off" }]}
         />

@@ -13,6 +13,7 @@ import {
   Flow,
   Listing,
   listingHeight,
+  listingCharX,
   listingLineMid,
   MARK_OK,
   Mono,
@@ -61,6 +62,8 @@ export const AvoidScene: React.FC = () => {
   const end = n.beat("avoid-layer").to;
 
   const fix = FIX.page.sql;
+  // The CTE labels sit just past the longest line either ring holds.
+  const cteWidth = Math.max(...fix.filter((l) => l.includes("SUM(")).map((l) => l.trimEnd().length));
   const top = y(LIST_Y);
   const fixH = listingHeight(fix.length, SIZE);
   const after = FIX.afterJoin.sql;
@@ -71,7 +74,7 @@ export const AvoidScene: React.FC = () => {
 
   // A CTE's label sits inside its ring, at the right end of its first line.
   const cteLabel = (text: string, line: string, at: number, color: string) => (
-    <Note at={at + 6} x={X0 + 640} y={listingLineMid(top, fix.findIndex((l) => l.includes(line)), SIZE) - 14}>
+    <Note at={at + 6} x={listingCharX(X0, cteWidth + 3, SIZE)} y={listingLineMid(top, fix.findIndex((l) => l.includes(line)), SIZE) - 14}>
       <span style={noteLine(21, color)}>{text}</span>
     </Note>
   );

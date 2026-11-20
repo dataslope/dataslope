@@ -144,14 +144,14 @@ export const ReviewScene: React.FC = () => {
   // Seven orders on a strip of days.
   const days = Array.from({ length: 6 }, (_, i) => addDays(REVIEW.orders[0].date, i));
   const dayX = (iso: string) => X0 + 80 + days.indexOf(iso) * 160;
-  const axisY = y(818);
+  const axisY = y(830);
   const dotR = 17;
   const dotRow = (k: number) => axisY - h(40) - k * h(46);
   const firstIds = REVIEW.orders.slice(0, REVIEW.firstBuilt).map((o) => o.id);
   const stack = (id: number) => REVIEW.orders.filter((o) => o.id < id && o.date === REVIEW.orders.find((x) => x.id === id)!.date).length;
   const lookbackFrom = addDays(REVIEW.newestLoaded, -REVIEW.lookbackDays);
   const boundary = (iso: string) => dayX(iso) + 80;
-  const winTop = y(668);
+  const winTop = y(716);
   const winBottom = axisY - 4;
   const newIdAt = (id: number) => (id === REVIEW.lateId ? lateAt : hereAt);
   const appendIds = [...firstIds, ...REVIEW.append.selected];
@@ -237,7 +237,7 @@ export const ReviewScene: React.FC = () => {
 
         {/* The pair, on seven orders. */}
         <Clear at={dupFrom + 40}>
-          <Ink at={pairAt} dur={12} style={{ left: X0, top: y(628) }}>
+          <Ink at={pairAt} dur={12} style={{ left: X0, top: y(598) }}>
             <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
               Loaded through <span style={{ color: BAR }}>{day(REVIEW.newestLoaded)}</span>, then two more arrive
             </span>
@@ -295,7 +295,7 @@ export const ReviewScene: React.FC = () => {
           <Ink at={missesAt} dur={12} style={{ left: dayX(REVIEW.lateDate) + 32, top: dotRow(1) - 16 }}>
             <span style={{ ...label(21, ACCENT_INK), whiteSpace: "nowrap", opacity: 1 - ease(frame, lookAt, 10) }}>missed</span>
           </Ink>
-          <Ink at={twoDaysAt} dur={12} style={{ left: X0, top: y(628) + h(36) }}>
+          <Ink at={twoDaysAt} dur={12} style={{ left: X0, top: y(598) + h(38) }}>
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
               Order {REVIEW.lateId} is dated {day(REVIEW.lateDate)}, {REVIEW.daysLate} days before
             </span>
@@ -351,7 +351,7 @@ const Window: React.FC<{ x0: number; x1: number; y0: number; y1: number; at: num
   return (
     <>
       <div style={{ position: "absolute", left: x0, top: y0, width: (x1 - x0) * p, height: y1 - y0, background: HIGHLIGHT, borderLeft: `2px solid ${ds("yellow", 600)}`, opacity: 1 - o }} />
-      <div style={{ position: "absolute", left: x0 + 12, top: y0 + 8, opacity: ease(frame, at + 8, 10) * (1 - o), ...label(21, INK), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: x0 + 2, top: y0 - 34, opacity: ease(frame, at + 8, 10) * (1 - o), ...label(21, INK), whiteSpace: "nowrap" }}>
         {children}
       </div>
     </>

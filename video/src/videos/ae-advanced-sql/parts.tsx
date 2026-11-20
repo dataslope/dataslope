@@ -4,9 +4,9 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BAR, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, note } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Badge, type BadgeTone, Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -544,3 +544,11 @@ export const StrikeBar: React.FC<{ x: number; y: number; w: number; at: number; 
   if (p <= 0 || o >= 1) return null;
   return <div style={{ position: "absolute", left: x, top: y - 1.5, width: w * p, height: 3, borderRadius: 2, background: ACCENT, opacity: 1 - o }} />;
 };
+
+/** The house badge (editorial/ui.tsx) in the label face: on its own it takes
+ *  the page's serif. */
+export const Chip: React.FC<{ tone: BadgeTone; size?: number; children: React.ReactNode }> = ({ tone, size = 24, children }) => (
+  <Badge tone={tone} size={size} style={{ fontFamily: SANS }}>
+    {children}
+  </Badge>
+);

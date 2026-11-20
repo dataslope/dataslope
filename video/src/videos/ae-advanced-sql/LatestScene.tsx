@@ -4,13 +4,14 @@ import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { Badge, Note } from "../../editorial/ui";
+import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { CUSTOMER3, LATEST, QUALIFY } from "./data";
 import {
+  Chip,
   Box,
   colsOf,
   DataTable,
@@ -43,7 +44,7 @@ const TOP = 330;
 const LIST_TOP = 300;
 const SIZE = 19;
 const R_X = 760;
-const KEYS = { left: 1540, width: 180 };
+const KEYS = { left: 1590, width: 180 };
 
 /**
  * Questions 4 and 5 on the page's customer_updates, 24 rows from 12
@@ -164,7 +165,7 @@ export const LatestScene: React.FC = () => {
     { text: "HAVING SUM(amount) > 0", label: "filters aggregated groups", at: havingAt, hot: { at: havingAt, out: qualAt } },
     { text: "QUALIFY rn = 1", label: "filters on the window result", at: qualAt, hot: { at: qualAt } },
   ];
-  const stepsY = y(480);
+  const stepsY = y(470);
   const stepH = h(60);
   const steps = [
     { w: 170, at: step1At, text: <QMono>WHERE</QMono> },
@@ -184,7 +185,7 @@ export const LatestScene: React.FC = () => {
   const stepX = steps.map((_, i) => X0 + steps.slice(0, i).reduce((s, st) => s + st.w + STEP_GAP, 0));
   const PG = QUALIFY.postgres;
   const DK = QUALIFY.duckdb;
-  const qTop = y(600);
+  const qTop = y(614);
   const qRight = 700;
 
   return (
@@ -337,9 +338,9 @@ export const LatestScene: React.FC = () => {
             <span style={{ ...note(25, INK), whiteSpace: "nowrap", ...TABULAR }}>The same {D.rows.length} rows as the page&rsquo;s block</span>
           </div>
           <div style={{ position: "absolute", left: R_X, top: y(TOP) + listingHeight(D.lines.length, SIZE) + h(92), fontSize: 24, opacity: ease(frame, onlyAt, 10) }}>
-            <Badge tone="gray" size={24}>
+            <Chip tone="gray" size={24}>
               Postgres only
-            </Badge>
+            </Chip>
           </div>
         </Stage>
 
@@ -409,18 +410,18 @@ export const LatestScene: React.FC = () => {
             const p = ease(frame, cloudAt + i * 5, 10);
             return (
               <span key={e} style={{ opacity: p, transform: `translateY(${(1 - p) * 8}px)` }}>
-                <Badge tone="blue" size={24}>
+                <Chip tone="blue" size={24}>
                   {e}
-                </Badge>
+                </Chip>
               </span>
             );
           })}
         </div>
         <Note at={keepSubAt - 4} x={qRight + 100} y={qTop + h(186)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <Badge tone="gray" size={24}>
+            <Chip tone="gray" size={24}>
               Postgres
-            </Badge>{" "}
+            </Chip>{" "}
             keep the subquery
           </span>
         </Note>

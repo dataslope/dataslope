@@ -254,11 +254,9 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
           <Num>{RAPID.junk.rows.length}</Num> rows
         </span>
       </Note>
-      <Note at={oneAt} x={jg.right + 40} y={jg.rowTop(2)}>
+      <Note at={oneAt} x={R_X} y={jg.rowTop(J.rows.length) + c.h(20)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          The fact keeps one key,
-          <br />
-          <Mono>flags_sk</Mono>, not three flags
+          The fact keeps one key, <Mono>flags_sk</Mono>, not three flags
         </span>
       </Note>
     </>
@@ -330,8 +328,8 @@ const Conformed: React.FC<{ c: Ctx }> = ({ c }) => {
   const keysAt = c.w("r-conformed", "the same keys");
   const meaningsAt = c.w("r-conformed", "the same meanings");
   const lineAt = c.w("r-conformed", "so their numbers line up");
-  const W = 230;
-  const GAP = 140;
+  const W = 210;
+  const GAP = 110;
   const top = c.top + c.h(140);
   const sales = useEntityLayout({ x: R_X, y: top, width: W, name: "fact_sales", columns: [] });
   const date = useEntityLayout({ x: R_X + W + GAP, y: top, width: W, name: "dim_date", columns: [] });

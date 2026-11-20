@@ -272,7 +272,10 @@ export const Box: React.FC<{
   out?: number;
   dashed?: boolean;
   scale?: number;
-}> = ({ x, y, w, h, at, title, sub, tone = "plain", tones = [], icon: Icon, size = 23, subSize = 20, mono, dim, out, dashed, scale = 1 }) => {
+  /** The title at the top of the box, not its middle: a box that holds
+   *  something drawn under its name. */
+  titleTop?: boolean;
+}> = ({ x, y, w, h, at, title, sub, tone = "plain", tones = [], icon: Icon, size = 23, subSize = 20, mono, dim, out, dashed, scale = 1, titleTop }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
@@ -299,9 +302,9 @@ export const Box: React.FC<{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: titleTop ? "flex-start" : "center",
         gap: 4,
-        padding: "0 14px",
+        padding: titleTop ? "10px 14px 0" : "0 14px",
         opacity: Math.min(1, p) * (1 - d) * (1 - o),
         transform: `scale(${(0.9 + 0.1 * Math.min(1, p)) * scale})`,
         transformOrigin: "50% 50%",

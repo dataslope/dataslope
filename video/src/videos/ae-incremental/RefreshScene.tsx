@@ -16,9 +16,9 @@ const TL = 330;
 const P = 46;
 const X = (id: number) => TL + (id - 0.5) * P;
 const COL2 = 980;
-const CH = { x0: 230, x1: 940 };
-const SPLIT_X = 1090;
-const SPLIT_W = 640;
+const CH = { x0: 230, x1: 860 };
+const SPLIT_X = 1200;
+const SPLIT_W = 520;
 /** Layout values (through `y()`). */
 const ROW_C = { cols: 286, follow: 382, answer: 418, fct: 486, raw: 546, note1: 606, note2: 642, chartLabel: 296, chartTop: 352, chartBot: 580, split: 340, rule: 680, rule2: 720, next: 778 };
 
@@ -238,14 +238,22 @@ export const RefreshScene: React.FC = () => {
           </span>
         </Note>
         <CostChart x0={CH.x0} x1={CH.x1} top={top} bottom={bottom} at={costAt + 4} fullAt={costAt + 4} fullDur={20} incAt={costAt + 10} incDur={24} lastAt={lastAt} />
-        <Note at={sixAt - 4} x={s.dx(COST.lastRefresh.day) - 300} y={s.ly(COST.lastRefresh.rows) - 52}>
-          <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            Day <Num>{COST.lastRefresh.day}</Num>: <b><Num>{thousands(COST.lastRefresh.rows)}</Num> rows</b>
+        <Note at={lastAt} x={CH.x1 + 26} y={s.ly(COST.lastRefresh.rows) - 16}>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            Last refresh, day <Num>{COST.lastRefresh.day}</Num>
+          </div>
+          <div style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, sixAt - 4, 10) }}>
+            <Num>{thousands(COST.lastRefresh.rows)}</Num> rows
+          </div>
+        </Note>
+        <Note at={costAt + 24} x={CH.x1 + 26} y={s.ly(COST.daily) - 15}>
+          <span style={{ ...note(22, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
+            A day: <Num>{thousands(COST.daily)}</Num>
           </span>
         </Note>
         <Note at={twoYearsAt} x={SPLIT_X} y={row("split")}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
-            Two years of the incremental model: <Num>{thousands(COST.incrementalTotal)}</Num> rows
+            Two years, incremental: <Num>{thousands(COST.incrementalTotal)}</Num> rows
           </span>
         </Note>
         {bars.map((b, i) => {

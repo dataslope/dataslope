@@ -155,8 +155,8 @@ export const PruneScene: React.FC = () => {
         <Note at={marchAt} x={FX} y={y(PLAN_Y) - h(4)} out={oneAt - 6}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>DuckDB&rsquo;s plan</span>
         </Note>
-        <Listing lines={marchPlan} x={FX} top={y(PLAN_Y) + h(30)} width={740} size={21} at={oneAt - 6} out={regionAt - 2} marks={[{ line: "Scanning Files", at: oneAt + 4 }]} />
-        <Listing lines={regionPlan} x={FX} top={y(PLAN_Y) + h(30)} width={740} size={21} at={regionAt} marks={[{ line: "Total Files Read", at: allAt + 4, color: MARK_BAD }]} />
+        <Listing lines={marchPlan} x={FX} top={y(PLAN_Y) + h(40)} width={740} size={21} at={oneAt - 6} out={regionAt - 2} marks={[{ line: "Scanning Files", at: oneAt + 4 }]} />
+        <Listing lines={regionPlan} x={FX} top={y(PLAN_Y) + h(40)} width={740} size={21} at={regionAt} marks={[{ line: "Total Files Read", at: allAt + 4, color: MARK_BAD }]} />
         <Note at={oneAt + 6} x={FX} y={y(PLAN_Y) - h(4)} out={regionAt - 2}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             March: <Num>{readOne}</Num> file of <Num>{ofAll}</Num>

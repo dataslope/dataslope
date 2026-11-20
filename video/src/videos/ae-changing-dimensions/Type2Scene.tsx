@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
-import { Badge, Note, Num } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SANS } from "../../theme/fonts";
@@ -31,6 +31,7 @@ import {
   useAcme,
   X0,
   YEARS,
+  Pill,
 } from "./parts";
 
 const ROWS = { headH: 42, rowH: 48, bodySize: 22, headSize: 20 } as const;
@@ -142,7 +143,7 @@ export const Type2Scene: React.FC = () => {
   const months = g("months");
   const rate = g("monthly_change");
   const final = g("type2_rows");
-  const CH = { x0: 1060, x1: 1640, top: y(LOW + 10), bottom: y(LOW + 250) };
+  const CH = { x0: 1060, x1: 1580, top: y(LOW + 10), bottom: y(LOW + 250) };
   const yMax = 130_000;
   const cy = (v: number) => CH.bottom - (v / yMax) * (CH.bottom - CH.top);
   const cx = (m: number) => CH.x0 + (m / months) * (CH.x1 - CH.x0);
@@ -368,15 +369,15 @@ export const Type2Scene: React.FC = () => {
           marks={[{ line: lineOf(C.lines, "valid_to"), at: beforeAt }]}
         />
         <Note at={closeAt + 14} x={X0 + loadW + 60} y={low + h(54)} out={loadOut}>
-          <Badge tone="gray" size={22}>
+          <Pill size={22}>
             <Num>{TYPE2.closed}</Num> row
-          </Badge>
+          </Pill>
         </Note>
         <Listing lines={I.lines} x={X0} top={insertTop} width={loadW} size={LOAD_SIZE} at={insertAt - 2} out={loadOut} title="2. Insert the new version" />
         <Note at={insertAt + 14} x={X0 + loadW + 60} y={insertTop + h(8)} out={loadOut}>
-          <Badge tone="gray" size={22}>
+          <Pill size={22}>
             <Num>{TYPE2.inserted}</Num> row
-          </Badge>
+          </Pill>
         </Note>
         <Note at={insertAt + 24} x={X0 + loadW + 60} y={insertTop + h(70)} out={loadOut}>
           <span style={{ ...note(25, OK_INK), whiteSpace: "nowrap" }}>

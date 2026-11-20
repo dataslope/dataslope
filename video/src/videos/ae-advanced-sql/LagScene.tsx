@@ -102,6 +102,13 @@ export const LagScene: React.FC = () => {
   if (!wrongMarch) throw new Error("no wrong comparison for March 2024");
   const rightMarch = M.rows[mar24][M.cols.indexOf("yoy_change")];
   const top = (i: number): [number, number] => [px(i), py(rev[i]) - 12];
+  /** Where an arc from month a to month b is highest, for its label. */
+  const apex = (a: number, b: number, pk: number) => {
+    const pts = sampleCubic([top(a), [px(a), pk], [px(b), pk], top(b)], 60);
+    return pts.reduce((m, p) => (p[1] < m[1] ? p : m), pts[0]);
+  };
+  const yearApex = apex(jan23, jan24, peak);
+  const marchApex = apex(at(wrongMarch.with), mar24, peak + 0);
 
   // The line with every month, and the line once March 2023 is gone.
   const all = rev.map((_, i) => pt(i));
@@ -131,7 +138,7 @@ export const LagScene: React.FC = () => {
         <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4} size={60}>
           How do you compute a period-over-period change?
         </QuestionCard>
-        <SyntaxBreak parts={parts} x={X0} top={y(296)} at={pullsAt - 8} size={26} dim={momAt} />
+        <SyntaxBreak parts={parts} x={X0} top={y(296)} at={pullsAt - 8} size={26} dim={momAt} out={rowsAt - 4} />
 
         {/* ── The page's 24 months ── */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
@@ -171,7 +178,7 @@ export const LagScene: React.FC = () => {
           <span style={{ ...note(24, ACCENT_INK), ...halo, whiteSpace: "nowrap", ...TABULAR }}>{LAG.january.mom}</span>
         </Note>
         <Arc from={top(jan23)} to={top(jan24)} peak={peak} at={twelveAt + 2} color={INK} out={takeAt} />
-        <Note at={downAt - 2} x={(px(jan23) + px(jan24)) / 2 - 24} y={peak - 44} out={takeAt}>
+        <Note at={downAt - 2} x={yearApex[0] - 24} y={yearApex[1] - 42} out={takeAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>{LAG.january.yoy}</span>
         </Note>
         <Note at={twelveAt + 6} x={NOTE_X} y={y(330)} out={takeAt}>
@@ -198,18 +205,18 @@ export const LagScene: React.FC = () => {
             />
           );
         })}
-        <Note at={rowsAt} x={NOTE_X} y={y(330)}>
+        <Note at={rowsAt} x={X0} y={y(300)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Lag counts rows, not months</span>
         </Note>
-        <Note at={eightAt + 2} x={NOTE_X} y={y(370)}>
+        <Note at={eightAt + 2} x={X0} y={y(340)}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>{LAG_WRONG.length} comparisons land on the wrong month</span>
         </Note>
-        <Note at={marchAt + 6} x={px(mar24) - 120} y={peak - 50}>
+        <Note at={marchAt + 6} x={marchApex[0] - 120} y={marchApex[1] - 44}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
             {wrongMarch.change}, should be {rightMarch}
           </span>
         </Note>
-        <Note at={spineAt} x={NOTE_X} y={y(410)}>
+        <Note at={spineAt} x={X0} y={y(380)}>
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>Put the months on a spine first</span>
         </Note>
         <Note at={selfAt} x={NOTE_X} y={y(330)} out={momAt}>

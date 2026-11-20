@@ -4,12 +4,12 @@ import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Badge, badgeStyle, NextLine, Note, Num } from "../../editorial/ui";
+import { badgeStyle, NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { MINI } from "./data";
-import { acme, Arrow, Axis, Band, Box, Drift, Headline, Kicker, OK_INK, QMono, Spot, X0, YEARS } from "./parts";
+import { acme, Arrow, Axis, Band, Box, Drift, Headline, Kicker, OK_INK, QMono, Spot, X0, YEARS, Pill } from "./parts";
 
 const R_X = 820;
 const R_X1 = 1780;
@@ -25,9 +25,9 @@ const InBadge: React.FC<{ at: number; x1: number; top: number; h: number; childr
   if (p <= 0) return null;
   return (
     <div style={{ position: "absolute", right: 1920 - x1 + 14, top, height: h, display: "flex", alignItems: "center", opacity: p, transform: `scale(${0.85 + 0.15 * p})` }}>
-      <Badge tone="gray" size={21}>
+      <Pill size={21}>
         {children}
-      </Badge>
+      </Pill>
     </div>
   );
 };

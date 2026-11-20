@@ -21,7 +21,6 @@ import {
   OK_INK,
   rowsAt,
   StrikeBar,
-  TableName,
   X0,
 } from "./parts";
 
@@ -88,9 +87,6 @@ export const RatioScene: React.FC = () => {
 
         {/* ── Two days, and each day's order value ── */}
         <Listing lines={D.lines} x={X0} top={y(TOP)} size={SIZE} at={asked} marks={[{ line: "AS aov", at: sameAt + 2, out: oneAt }]} />
-        <TableName g={dg} at={asked + 6}>
-          daily_orders
-        </TableName>
         <DataTable
           g={dg}
           cols={colsOf(D, { aov: { ink: BLUE_INK } })}

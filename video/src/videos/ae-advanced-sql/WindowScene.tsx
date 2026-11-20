@@ -4,12 +4,13 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
-import { Badge, Note } from "../../editorial/ui";
+import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { GRAND_TOTAL, NORTH_PCT, WINDOW } from "./data";
 import {
+  Chip,
   colsOf,
   DataTable,
   Drift,
@@ -36,8 +37,13 @@ const LIST_X = 640;
 const SIZE = 21;
 /** Question 2's listing and result: smaller, so all six columns fit. */
 const RUN_SIZE = 20;
+/** Question 2's run, under the breakdown: the listing left, its result right. */
+const RUN_TOP = 470;
+const RUN_X = 1000;
+/** Question 3's listing, larger: it has the page to itself until the trap. */
+const MIX_SIZE = 23;
 /** Question 3's trap, beside the query that works. */
-const TRAP_X = 1060;
+const TRAP_X = 1120;
 
 /**
  * Questions 1, 2 and 3 on Data Analyst Part 4's six sales. GROUP BY folds the
@@ -131,21 +137,28 @@ export const WindowScene: React.FC = () => {
     { text: ")" },
   ];
   const P = WINDOW.parts;
-  const pg = geoOf(P, X0, under(P.lines.length, RUN_SIZE), h, { rowH: 44, bodySize: 22, headSize: 20 });
+  const runTop = y(RUN_TOP);
+  const pg = geoOf(P, RUN_X, runTop, h, { rowH: 44, bodySize: 22, headSize: 20 });
   const pc = (name: string) => P.cols.indexOf(name);
   const southFirst = P.rows.findIndex((r) => r[pc("region")] === "South");
-  const clauseX = pg.right + 70;
-  const clauseTop = pg.top + h(10);
+  const clauseX = X0;
+  const clauseTop = runTop + listingHeight(P.lines.length, RUN_SIZE) + h(34);
+  const windowLines = ["AS all_rows", "AS by_region", "AS running"];
+  const windowAt = [nothingAt, partedAt, orderedAt];
+  const runLineAt = P.lines.map((l) => {
+    const k = windowLines.findIndex((w) => l.includes(w));
+    return k < 0 ? stackAt : windowAt[k] - 2;
+  });
   const SLOT = 150;
 
   // ── Question 3 ──
   const M = WINDOW.share;
-  const mg = geoOf(M, X0, y(TOP) + listingHeight(M.lines.length, SIZE) + h(22), h);
+  const mg = geoOf(M, X0, y(TOP) + listingHeight(M.lines.length, MIX_SIZE) + h(26), h, { rowH: 54, bodySize: 26, headSize: 22 });
   const mc = (name: string) => M.cols.indexOf(name);
   const northRow = M.rows.findIndex((r) => r[0] === "North");
   const B = WINDOW.shareBare;
   const bareH = listingHeight(B.lines.length, SIZE);
-  const notesX = 1040;
+  const notesX = TRAP_X;
   const windowLine = "SUM(SUM(amount)) OVER () AS grand_total";
 
   return (
@@ -229,23 +242,24 @@ export const WindowScene: React.FC = () => {
             const p = ease(frame, w.at - 2, 10) * (1 - ease(frame, out1, 10));
             return (
               <span key={w.text} style={{ opacity: p, transform: `translateY(${(1 - p) * 8}px)` }}>
-                <Badge tone="blue" size={24}>
+                <Chip tone="blue" size={24}>
                   {w.text}
-                </Badge>
+                </Chip>
               </span>
             );
           })}
         </div>
 
         {/* ── 2. The three parts of OVER ── */}
-        <SyntaxBreak parts={parts} x={X0} top={y(TOP) - h(10)} at={q2At + 10} out={stackAt - 4} />
-        <Stage from={stackAt - 4} to={out2}>
+        <SyntaxBreak parts={parts} x={X0} top={y(TOP) - h(10)} at={q2At + 10} out={out2} />
+        <Stage from={partAt - 4} to={out2}>
           <Listing
             lines={P.lines}
             x={X0}
-            top={y(TOP)}
+            top={runTop}
             size={RUN_SIZE}
             at={stackAt - 4}
+            lineAt={runLineAt}
             marks={[
               { line: "OVER () AS all_rows", at: nothingAt + 2, out: partedAt },
               { line: "AS by_region", at: partedAt + 2, out: orderedAt },
@@ -260,9 +274,9 @@ export const WindowScene: React.FC = () => {
               by_region: { at: partedAt, ink: BLUE_INK },
               running: { at: orderedAt, ink: BLUE_INK },
             })}
-            at={stackAt}
-            rows={rowsAt(P.rows, stackAt + 4)}
-            bands={north.map((row) => ({ row, at: partedAt + 4, color: MARK_KEY }))}
+            at={partAt - 4}
+            rows={rowsAt(P.rows, partAt)}
+            bands={north.map((row) => ({ row, at: partAt + 8, color: MARK_KEY }))}
             marks={[
               ...P.rows.map((_, row) => ({ row, col: pc("all_rows"), at: tenAt + row * 2, out: partedAt })),
               ...P.rows.map((_, row) => ({ row, col: pc("by_region"), at: ownAt + row * 2, out: orderedAt })),
@@ -300,13 +314,10 @@ export const WindowScene: React.FC = () => {
               <span>)</span>
             </div>
           </Note>
-          <Note at={startAt} x={clauseX} y={clauseTop + h(108)}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>The default: start of the partition</span>
+          <Note at={startAt} x={clauseX} y={clauseTop + h(94)}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>The default: from the start of the partition to the current row</span>
           </Note>
-          <Note at={startAt + 8} x={clauseX} y={clauseTop + h(146)}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>to the current row</span>
-          </Note>
-          <Note at={tiesAt} x={clauseX} y={clauseTop + h(210)}>
+          <Note at={tiesAt} x={clauseX} y={clauseTop + h(134)}>
             <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>With ties: question 7</span>
           </Note>
         </Stage>
@@ -317,7 +328,7 @@ export const WindowScene: React.FC = () => {
             lines={M.lines}
             x={X0}
             top={y(TOP)}
-            size={SIZE}
+            size={MIX_SIZE}
             at={collapsesAt - 6}
             dim={dropAt + 2}
             marks={[

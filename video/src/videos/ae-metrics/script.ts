@@ -410,6 +410,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-measure",
+      take: true,
       text: "Question thirteen. What is the difference between a measure and a metric? A measure is a raw aggregate on one table, like the sum of amount. A metric is the business number built from measures, with filters, ratios or time logic, like completed revenue.",
       pauseAfter: 0.7,
     },

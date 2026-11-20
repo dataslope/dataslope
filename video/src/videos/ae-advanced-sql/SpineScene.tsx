@@ -31,7 +31,7 @@ import {
 const STRIP_X = 400;
 const CELL = 86;
 const GAP = 8;
-const CAL = { left: 1580, width: 190 };
+const CAL = { left: 1580, top: 92, width: 190 };
 const SIZE = 19;
 
 /** "May 1" for the first day, the day number after it. */
@@ -65,7 +65,6 @@ export const SpineScene: React.FC = () => {
   const joinAt = n.word("spine-join", "Left join the logins onto the spine");
   const fifteenAt = n.word("spine-join", "all fifteen days are there");
   const zeroAt = n.word("spine-join", "zero on the empty five");
-  const rightAt = n.word("spine-count", "count the right thing");
   const starAt = n.word("spine-count", "Count star counts");
   const oneAt = n.word("spine-count", "every empty day says one");
   const itsZeroAt = n.word("spine-count", "it's zero");
@@ -130,7 +129,7 @@ export const SpineScene: React.FC = () => {
   const mini = 16;
   const MC = 62;
   const mx = (i: number) => X0 + i * (MC + 8);
-  const miniTop = qTop + listingHeight(TY.lines.length, SIZE) + h(70);
+  const miniTop = qTop + listingHeight(TY.lines.length, SIZE) + h(92);
   const miniH = h(52);
   const miniDays = Array.from({ length: mini }, (_, i) => i);
   const present = (i: number) => i < days.length && !empty.has(days[i]);
@@ -157,7 +156,7 @@ export const SpineScene: React.FC = () => {
         <QuestionCard n={10} at={q10At} textAt={q10TextAt - 2} size={60}>
           How do you generate a series of dates in Postgres?
         </QuestionCard>
-        <Spot art="calendar" at={calendarAt} left={CAL.left} top={y(108)} width={CAL.width} out={out9} />
+        <Spot art="calendar" at={calendarAt} left={CAL.left} top={CAL.top} width={CAL.width} out={out9} />
 
         <Stage from={rowAt - 6} to={out9}>
           {/* ── Fifteen days, a dot per login ── */}
@@ -275,9 +274,6 @@ export const SpineScene: React.FC = () => {
           {SPINE.countStar.rows.map((r, i) => (
             <Value key={i} x={mid(i)} y={rowB} at={starAt + i} text={r[cs]} tone={empty.has(r[0]) ? "bad" : "plain"} pulseAt={empty.has(r[0]) ? oneAt : undefined} />
           ))}
-          <Note at={rightAt} x={X0} y={rowA - h(66)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>On the spine:</span>
-          </Note>
         </Stage>
 
         {/* ── 10. generate_series ── */}

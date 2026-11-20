@@ -17,7 +17,7 @@ const STRIP_H = 46;
 const CW = 52;
 const CELL = 48;
 const SEP = 16;
-const SIDE_X = 1450;
+const SIDE_X = 1480;
 const CMP_Y = 610;
 const CMP_STEP = 52;
 const BAR_X = 340;
@@ -63,7 +63,7 @@ export const ColsScene: React.FC = () => {
   const sh = h(STRIP_H);
   const rowX = (r: number, c: number) => X0 + r * (cols.length * CW + SEP) + c * CW;
   const colX = (r: number, c: number) => X0 + c * (rows.length * CW + SEP) + r * CW;
-  const stripEnd = X0 + rows.length * (cols.length * CW + SEP) - SEP - (CW - CELL);
+  const colEnd = X0 + cols.length * (rows.length * CW + SEP) - SEP - (CW - CELL);
   const READS = ["region", "units"];
   const ONE = 1;
   const SUMMED = cols.indexOf("amount");
@@ -160,7 +160,7 @@ export const ColsScene: React.FC = () => {
         <div
           style={{
             position: "absolute",
-            left: stripEnd + 26,
+            left: colEnd + 24,
             top: colY + sh / 2 - 15,
             ...note(24, OK_INK),
             fontWeight: 500,

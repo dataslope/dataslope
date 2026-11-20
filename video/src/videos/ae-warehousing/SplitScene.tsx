@@ -137,14 +137,11 @@ export const SplitScene: React.FC = () => {
                 title="Compute"
                 sub={titles[i]}
                 tones={[{ at: leaveAt, tone: i === 2 ? "look" : "off" }]}
-                scale={i === 0 ? 1 + 0.12 * scaled * (1 - ease(frame, manyAt, 12)) : 1}
+                scale={i === 0 ? 1 + 0.12 * scaled : 1}
               />
             </React.Fragment>
           );
         })}
-        <Note at={scaleAt + 4} x={X0} y={boxTop - h(46)} out={manyAt}>
-          <span style={{ ...note(21, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Resized, no data moved</span>
-        </Note>
         <Note at={movingAt} x={STORE.x + STORE.w + 30} y={storeTop + storeH / 2 - h(30)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>The data stays put</span>
         </Note>

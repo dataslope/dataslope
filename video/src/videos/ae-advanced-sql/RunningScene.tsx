@@ -148,7 +148,7 @@ export const RunningScene: React.FC = () => {
 
   // ── 7. The payments ──
   const PR = FRAME.rows;
-  const lowTop = y(510);
+  const lowTop = y(540);
   const pg = geoOf(PR, 930, lowTop, h, { rowH: 50 });
   const tc = PR.cols.indexOf("total");
   const peers = PR.rows.flatMap((r, i) => (r[1] === PR.rows[1][1] ? [i] : []));

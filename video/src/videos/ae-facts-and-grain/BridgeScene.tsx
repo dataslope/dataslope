@@ -9,6 +9,7 @@ import { ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { badgeStyle, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { SANS } from "../../theme/fonts";
 import { BRIDGE, type Table } from "./data";
 import { Caption, colsOf, DataTable, Drift, geoOf, KEY, KeyArrow, Listing, MARK, MARK_BAD, MARK_OK, money, Mono, OK_INK, Spot, TableName, Verdict, X0 } from "./parts";
 
@@ -18,9 +19,9 @@ const BRIDGE_X = 720;
 const BRIDGE_W = 400;
 const PROMO_X = 1330;
 const PROMO_W = 360;
-const LOW_Y = 640;
+const LOW_Y = 590;
 const ROWS = { headH: 42, rowH: 46, bodySize: 22, headSize: 20 } as const;
-const TOTALS_X = 1000;
+const TOTALS_X = 900;
 
 const FACT_ONE: EntityColumn[] = [{ name: "order_sk", key: "PK" }, { name: "order_id" }, { name: "amount" }, { name: "promotion_sk", key: "FK" }];
 const FACT: EntityColumn[] = [{ name: "order_sk", key: "PK" }, { name: "order_id" }, { name: "amount" }];
@@ -92,13 +93,13 @@ export const BridgeScene: React.FC = () => {
   const names = BRIDGE.read.rows.filter((r) => r[0] === orderId).map((r) => r[1]);
   const fan = BRIDGE.fanout.lines;
   const weighted = BRIDGE.weighted.lines;
-  const listTop = y(LOW_Y) + h(196);
+  const listTop = y(760);
   const lowOut = stillAt - 2;
 
   // ── Per promotion: touched against allocated ──
   const P = BRIDGE.byPromotion;
   const perPromo: Table = { cols: P.cols, rows: P.rows.map((r) => [r[0], money(r[1]), money(r[2])]) };
-  const pg = geoOf(perPromo, X0, y(LOW_Y) - h(20), h, ROWS);
+  const pg = geoOf(perPromo, X0, y(LOW_Y) + h(14), h, { headH: 38, rowH: 40, bodySize: 22, headSize: 20 });
   const touchedCol = P.cols.indexOf("touched");
   const allocCol = P.cols.indexOf("allocated");
   const touchedSum = P.rows.reduce((t, r) => t + Number(r[touchedCol]), 0);
@@ -135,7 +136,7 @@ export const BridgeScene: React.FC = () => {
           <span style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 24, whiteSpace: "nowrap" }}>
             <span style={{ ...note(24, INK) }}>Order {orderId}:</span>
             {names.map((name, i) => (
-              <span key={name} style={{ ...badgeStyle("blue", 24), opacity: ease(frame, twoAt + 4 + i * 6, 10) }}>
+              <span key={name} style={{ ...badgeStyle("blue", 24), fontFamily: SANS, opacity: ease(frame, twoAt + 4 + i * 6, 10) }}>
                 {name}
               </span>
             ))}
@@ -166,7 +167,7 @@ export const BridgeScene: React.FC = () => {
         {B.rows.map((_, i) => (
           <KeyArrow key={i} from={[og.right + 12, og.rowMid(0)]} to={[bg.x - 12, bg.rowMid(i)]} at={perAt + 12 + i * 5} color={KEY} out={lowOut} />
         ))}
-        <Note at={addAt} x={bg.right + 36} y={bg.rowTop(0) + h(16)} out={lowOut}>
+        <Note at={addAt} x={bg.right + 36} y={bg.rowTop(0) + h(8)} out={lowOut}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             {weights.map((v, i) => (
               <React.Fragment key={i}>
@@ -177,7 +178,7 @@ export const BridgeScene: React.FC = () => {
             = <b style={{ color: OK_INK }}>1</b>
           </span>
         </Note>
-        <Note at={addAt + 10} x={bg.right + 36} y={bg.rowTop(0) + h(58)} out={lowOut}>
+        <Note at={addAt + 10} x={bg.right + 36} y={bg.rowTop(1) + h(8)} out={lowOut}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>For every one of the {orders}</span>
         </Note>
 
@@ -196,11 +197,11 @@ export const BridgeScene: React.FC = () => {
           marks={[{ line: "weight_factor", text: "f.amount * b.weight_factor", at: multAt + 8, color: MARK_OK }]}
         />
         <Verdict at={twelveAt} x={TOTALS_X} y={listTop + h(4)} label={`${orders} orders, in the fact`} value={money(BRIDGE.total)} size={25} />
-        <Verdict at={reportAt} x={TOTALS_X} y={listTop + h(54)} label="Joined and summed" value={money(BRIDGE.fanout.rows[0][0])} tone="bad" size={25} />
-        <Note at={looksAt} x={TOTALS_X} y={listTop + h(98)} out={multAt}>
+        <Verdict at={reportAt} x={TOTALS_X} y={listTop + h(50)} label="Joined and summed" value={money(BRIDGE.fanout.rows[0][0])} tone="bad" size={25} />
+        <Note at={looksAt} x={TOTALS_X} y={listTop + h(98)} out={multAt - 4}>
           <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>No error, no warning</span>
         </Note>
-        <Verdict at={shareAt} x={TOTALS_X} y={listTop + h(104)} label="Weighted first" value={money(BRIDGE.weighted.rows[0][0])} tone="ok" size={25} />
+        <Verdict at={shareAt} x={TOTALS_X} y={listTop + h(96)} label="Weighted first" value={money(BRIDGE.weighted.rows[0][0])} tone="ok" size={25} />
 
         {/* ── Per promotion: what each one touched ── */}
         <TableName g={pg} at={touchedAt - 4}>

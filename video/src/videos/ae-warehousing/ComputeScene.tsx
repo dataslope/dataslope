@@ -24,7 +24,7 @@ const TICK_PITCH = 16;
 const TICK_W = 11;
 const TICK_H = 30;
 const RESULT_X = TICK_X + 60 * TICK_PITCH + 26;
-const LEVER_Y = 800;
+const LEVER_Y = 838;
 /** The two minutes of the hour the dashboard keeps the cluster busy. */
 const BUSY = [14, 44];
 

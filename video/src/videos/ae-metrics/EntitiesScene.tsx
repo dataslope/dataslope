@@ -11,10 +11,10 @@ import { MONO, SANS } from "../../theme/fonts";
 import { BY_ORDER, money } from "./data";
 import { DataTable, Drift, Flow, Mono, noteLine, OK_INK, TableName, tableGeometry, X0 } from "./parts";
 
-const COLS_Y = 330;
+const COLS_Y = 290;
 const COL_W = 500;
 const COL_GAP = 60;
-const RUN_Y = 560;
+const RUN_Y = 500;
 const MID_X = 690;
 const TABLE_X = 1150;
 

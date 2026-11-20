@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, label, note, svgText
 import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { inkOf } from "../../theme/brand";
+import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { DISTINCT, FAN, RATIO } from "./data";
 import {
@@ -35,7 +35,7 @@ const WEEK_X = 1120;
 const WEEK_Y = 420;
 const DAY = 96;
 const RATIO_Y = 340;
-const STORE_X = 1180;
+const STORE_X = 1100;
 
 /** A week of daily active users, drawn without numbers: which user (by row)
  *  is active on which day. User 0, the yellow one, is there on two days. */
@@ -116,7 +116,7 @@ export const NonaddScene: React.FC = () => {
   const avgTop = dg.rowTop(days.rows.length) + h(56);
   const avgH = listingHeight(RATIO.averaged.sql.length, 20);
   const poolTop = avgTop + avgH + h(40);
-  const resX = X0 + 720;
+  const resX = X0 + 800;
   const ag = tableGeometry({ x: resX, top: avgTop, cols: RATIO.averaged.result.cols.map((name) => ({ name })), rows: RATIO.averaged.result.rows, headH: h(36), rowH: h(46), bodySize: 26 });
   const pg = tableGeometry({ x: resX, top: poolTop, cols: RATIO.pooled.result.cols.map((name) => ({ name })), rows: RATIO.pooled.result.rows, headH: h(36), rowH: h(46), bodySize: 26 });
 
@@ -135,7 +135,7 @@ export const NonaddScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} size={62}>
-          Why can&apos;t you simply sum pre-aggregated distinct counts or ratios?
+          Why can&rsquo;t you simply sum pre-aggregated distinct counts or ratios?
         </QuestionCard>
         <Note at={becauseAt} x={WEEK_X} y={gridTop - h(6)} out={phaseOut}>
           <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Non-additive</span>
@@ -178,7 +178,7 @@ export const NonaddScene: React.FC = () => {
                   {o.id}
                 </text>
                 {products.map((prod, j) =>
-                  has.has(`${o.id}:${prod}`) ? <circle key={prod} cx={colMid(j)} cy={rowMid(i)} r={8.5} fill={j === aCol && lit > 0.5 ? inkOf.yellow : BAR} /> : null,
+                  has.has(`${o.id}:${prod}`) ? <circle key={prod} cx={colMid(j)} cy={rowMid(i)} r={8.5} fill={j === aCol && lit > 0.5 ? ds("yellow", 600) : BAR} /> : null,
                 )}
                 <text x={countX + 70} y={rowMid(i) + 7} textAnchor="end" style={svgText({ ...note(21, INK), fontVariantNumeric: "tabular-nums" })} opacity={ease(frame, addUpAt - 10 + i, 8)}>
                   {o.count}
@@ -226,7 +226,7 @@ export const NonaddScene: React.FC = () => {
             return (
               <g key={d} opacity={p}>
                 {users.map((u) => (
-                  <circle key={u} cx={dayX(d)} cy={userY(u)} r={10} fill={u === TWICE && ease(frame, twoDaysAt, 10) > 0.5 ? inkOf.yellow : BAR} />
+                  <circle key={u} cx={dayX(d)} cy={userY(u)} r={10} fill={u === TWICE && ease(frame, twoDaysAt, 10) > 0.5 ? ds("yellow", 600) : BAR} />
                 ))}
                 <text x={dayX(d)} y={weekBottom + 6} textAnchor="middle" style={svgText(note(20, INK_SOFT))}>
                   {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][d]}
@@ -276,7 +276,7 @@ export const NonaddScene: React.FC = () => {
             { row: 1, col: 2, at: sumBothAt + 4, color: MARK_OK },
           ]}
         />
-        <Listing lines={RATIO.averaged.sql} x={X0} top={avgTop} width={640} size={20} at={avgAt - 2} />
+        <Listing lines={RATIO.averaged.sql} x={X0} top={avgTop} width={740} size={20} at={avgAt - 2} />
         <DataTable
           g={ag}
           cols={RATIO.averaged.result.cols.map((name) => ({ name, numeric: true }))}
@@ -284,7 +284,7 @@ export const NonaddScene: React.FC = () => {
           rows={RATIO.averaged.result.rows.map((cells) => ({ cells, at: twentySixAt - 2 }))}
           marks={[{ row: 0, col: 0, at: twentySixAt + 2, color: MARK_BAD }]}
         />
-        <Listing lines={RATIO.pooled.sql} x={X0} top={poolTop} width={640} size={20} at={sumBothAt - 2} />
+        <Listing lines={RATIO.pooled.sql} x={X0} top={poolTop} width={740} size={20} at={sumBothAt - 2} />
         <DataTable
           g={pg}
           cols={RATIO.pooled.result.cols.map((name) => ({ name, numeric: true }))}

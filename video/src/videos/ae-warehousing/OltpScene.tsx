@@ -4,7 +4,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -189,6 +189,9 @@ export const OltpScene: React.FC = () => {
             />
           );
         })}
+
+        {/* The scan: one long arrow down the column, in the page's white. */}
+        <Flow points={[[stripX(AMOUNT) + STRIP_W / 2, gridTop + 8], [stripX(AMOUNT) + STRIP_W / 2, gridBottom - (rowH - cellH) - 8]]} at={byColAt + 10} dur={20} color={PAPER} width={3} head={12} />
 
         {/* ── Extract, load, and the transform inside ── */}
         <Flow points={[[ROW_X + cols.length * CELL_W + 14, mid], [COL_X - 16, mid]]} at={extractAt} dur={24} color={INK} width={2.6} />

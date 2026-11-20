@@ -12,7 +12,7 @@ import { MONO } from "../../theme/fonts";
 import { mb, SELECT_STAR, TABLE } from "./data";
 import { COLUMN_TINT, Drift, FileBar, Listing, MARK_OK, Mark, OK_INK, READ, READ_BAD, READ_OK, ReadMark, SmallMono, X0 } from "./parts";
 
-const MODEL_Y = 352;
+const MODEL_Y = 396;
 const STRIP_W = 5;
 const PITCH = 8;
 const STRIP_H = 110;
@@ -119,7 +119,7 @@ export const StarScene: React.FC = () => {
         <Note at={followsAt} x={X0} y={y(BADGE_Y)} out={runOut}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>The scan follows the columns you name.</span>
         </Note>
-        <Note at={modelAt} x={X0 + 440} y={y(BADGE_Y)} out={runOut}>
+        <Note at={modelAt} x={X0} y={y(BADGE_Y) + h(46)} out={runOut}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.6em", fontSize: 23 }}>
             <Badge tone="purple" size={23}>
               model

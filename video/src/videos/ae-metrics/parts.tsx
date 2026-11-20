@@ -251,13 +251,14 @@ export const Listing: React.FC<{
         if (a <= 0 || ro >= 1) return null;
         const i0 = lineOf(lines, r.from);
         const i1 = lineOf(lines, r.to);
+        const chars = Math.max(...lines.slice(i0, i1 + 1).map((l) => l.trimEnd().length));
         return (
           <div
             key={`o${k}`}
             style={{
               position: "absolute",
               left: g.padX - 10,
-              right: 10,
+              width: chars * 0.6 * size + 22,
               top: g.padY + i0 * g.lineH + 3,
               height: (i1 - i0 + 1) * g.lineH - 6,
               boxSizing: "border-box",

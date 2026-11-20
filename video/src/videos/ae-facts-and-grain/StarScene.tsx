@@ -12,10 +12,11 @@ import { SNOW } from "./data";
 import { Caption, colsOf, DataTable, Drift, geoOf, KeyArrow, Listing, listingHeight, listingWidth, Mono, OK_INK, TableName, X0 } from "./parts";
 
 const ROWS = { headH: 42, rowH: 38, bodySize: 22, headSize: 20 } as const;
+const RESULT = { headH: 40, rowH: 35, bodySize: 22, headSize: 20 } as const;
 const TOP = 300;
 const CAT_X = 640;
 /** The small schema on the right: the fact and what it joins. */
-const CHIP_FACT_X = 1130;
+const CHIP_FACT_X = 1100;
 const CHIP_DIM_X = 1480;
 const CHIP_W = 300;
 const LIST_SIZE = 20;
@@ -68,7 +69,7 @@ export const StarScene: React.FC = () => {
   const booksCat = C.rows.findIndex((r) => r[1] === "Books");
   const tablesOut = revAt - 4;
 
-  const fact = useEntityLayout({ x: CHIP_FACT_X, y: y(TOP + 40), width: CHIP_W - 40, name: "fact_orders", columns: [] });
+  const fact = useEntityLayout({ x: CHIP_FACT_X, y: y(TOP + 40), width: CHIP_W - 70, name: "fact_orders", columns: [] });
   const dim = useEntityLayout({ x: CHIP_DIM_X, y: y(TOP + 40), width: CHIP_W, name: "dim_product", columns: [] });
   const dimSf = useEntityLayout({ x: CHIP_DIM_X, y: y(TOP + 40), width: CHIP_W, name: "dim_product_sf", columns: [] });
   const catChip = useEntityLayout({ x: CHIP_DIM_X, y: y(TOP + 220), width: CHIP_W, name: "dim_category", columns: [] });
@@ -80,9 +81,9 @@ export const StarScene: React.FC = () => {
   const starW = listingWidth(starL, LIST_SIZE);
   const snowX = X0 + starW + 60;
   const listTop = y(TOP + 10);
-  const resTop = listTop + listingHeight(snowL.length, LIST_SIZE) + h(84);
+  const resTop = listTop + listingHeight(snowL.length, LIST_SIZE) + h(60);
   const R = SNOW.snow;
-  const rg = geoOf(R, X0, resTop, h, ROWS);
+  const rg = geoOf(R, X0, resTop, h, RESULT);
   const VERDICT_X = rg.right + 120;
   const joins = snowL.filter((l) => l.startsWith("JOIN"));
 

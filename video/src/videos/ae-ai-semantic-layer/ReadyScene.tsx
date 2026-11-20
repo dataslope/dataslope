@@ -85,8 +85,8 @@ export const ReadyScene: React.FC = () => {
   const modelH = h(62);
   const modelX = (i: number) => R_X + i * (MODEL_W + MODEL_GAP);
   const asstTop = modelTop + modelH + h(96);
-  const padlock = artBox("ae-ai-semantic-layer-padlock", 120);
-  const restTop = y(742);
+  const padlock = artBox("ae-ai-semantic-layer-padlock", 92);
+  const restTop = y(758);
 
   return (
     <AbsoluteFill>
@@ -206,10 +206,10 @@ export const ReadyScene: React.FC = () => {
               ) : null}
             </React.Fragment>
           ))}
-          <Spot id="ae-ai-semantic-layer-padlock" at={privateAt} left={R_X + MODEL_W + MODEL_GAP / 2 - padlock.width / 2} top={asstTop - h(6)} {...padlock} />
+          <Spot id="ae-ai-semantic-layer-padlock" at={privateAt} left={R_X + MODEL_W + MODEL_GAP / 2 - padlock.width / 2} top={modelTop + modelH + 70} {...padlock} />
           <Box x={modelX(2)} y={asstTop} w={MODEL_W} h={modelH} at={exposeAt} title="Assistant" size={24} />
           <Flow points={[[modelX(2) + MODEL_W / 2, asstTop - 8], [modelX(2) + MODEL_W / 2, modelTop + modelH + 8]]} at={exposeAt + 8} />
-          <Ink at={removesAt} dur={14} style={{ left: R_X, top: asstTop + modelH + h(30) }}>
+          <Ink at={removesAt} dur={14} style={{ left: modelX(2), top: asstTop + modelH + h(22) }}>
             <span style={line(23, INK_SOFT)}>No wrong model to choose</span>
           </Ink>
 
@@ -237,7 +237,7 @@ export const ReadyScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Net revenue, followed to the letter</span>
         </Ink>
         <Swap at={reportsAt} left={R_X} top={desc.mid - 22} from={READY.asWritten.toFixed(2)} to={READY.withoutCut.toFixed(2)} fromColor={OK_INK} toColor={ACCENT_INK} showAt={letterAt} />
-        <Ink at={reviewAt - 4} dur={16} style={{ left: R_X, top: desc.mid + h(70) }}>
+        <Ink at={reviewAt - 4} dur={16} style={{ left: R_X, top: desc.mid + h(118) }}>
           <span style={{ ...line(30, INK), fontWeight: 500 }}>
             <Mark at={reviewAt + 4}>Review descriptions like code</Mark>
           </span>
@@ -267,6 +267,7 @@ const Swap: React.FC<{ at: number; showAt: number; left: number; top: number; fr
     <div style={{ position: "absolute", left, top, opacity: shown }}>
       <span style={{ ...style, opacity: 1 - k, transform: `translateY(${-k * 14}px)` }}>{from}</span>
       <span style={{ ...style, color: toColor, opacity: k, transform: `translateY(${(1 - k) * 14}px)` }}>{to}</span>
+      <span style={{ ...note(23, INK_SOFT), position: "absolute", left: 0, top: 62, whiteSpace: "nowrap", opacity: ease(frame, at + 16, 12) }}>As written, {from}</span>
     </div>
   );
 };

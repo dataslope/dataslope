@@ -93,15 +93,17 @@ export const ChasmScene: React.FC = () => {
   const refChip = useEntityLayout(chip(rg.x + rg.width / 2 - 130, CHIPS_Y, "refunds", 260));
   const ada = pay.rows[0][1];
   const benRow = pay.rows.findIndex((r) => r[1] !== ada);
+  const adaPayments = pay.rows.filter((r) => r[1] === ada).length;
+  const adaRefunds = ref.rows.filter((r) => r[1] === ada).length;
 
   // ── Phase B: fan trap against chasm trap ──
   const panelTop = y(PANEL_Y);
   const chipsB = PANEL_Y + 50;
-  const fOrders = useEntityLayout(chip(X0, chipsB, "orders", 210));
-  const fItems = useEntityLayout(chip(X0 + 320, chipsB, "order_items", 250));
-  const cPay = useEntityLayout(chip(940, chipsB, "payments", 230));
-  const cCust = useEntityLayout(chip(1255, chipsB, "customer", 220));
-  const cRef = useEntityLayout(chip(1560, chipsB, "refunds", 230));
+  const fOrders = useEntityLayout(chip(X0, chipsB, "orders", 190));
+  const fItems = useEntityLayout(chip(X0 + 330, chipsB, "order_items", 240));
+  const cPay = useEntityLayout(chip(940, chipsB, "payments", 200));
+  const cCust = useEntityLayout(chip(1265, chipsB, "customer", 190));
+  const cRef = useEntityLayout(chip(1580, chipsB, "refunds", 190));
   const captionTop = cPay.bottom + h(26);
 
   // ── Phase C: each branch totalled, then joined ──
@@ -188,16 +190,13 @@ export const ChasmScene: React.FC = () => {
         />
         <Note at={sixAt} x={jg.x} y={jg.rowTop(joined.rows.length) + h(14)} out={phaseOut}>
           <span style={noteLine(22, INK_SOFT)}>
-            <Num>{joined.rows.length}</Num> rows: <Num>{pay.rows.length - 1}</Num> payments × <Num>{ref.rows.length}</Num> refunds
+            <Num>{joined.rows.length}</Num> rows: <Num>{adaPayments}</Num> payments × <Num>{adaRefunds}</Num> refunds
           </span>
         </Note>
         <Note at={paySumAt} x={jg.x} y={jg.rowTop(joined.rows.length) + h(52)} out={phaseOut}>
           <span style={noteLine(24, INK)}>
             paid <b style={{ color: ACCENT_INK }}>{money(Number(CHASM.trap.result.rows[0][1]))}</b>
-            <span style={{ opacity: 1 }}>
-              {" "}
-              refunded <b style={{ color: ACCENT_INK }}>{money(Number(CHASM.trap.result.rows[0][2]))}</b>
-            </span>
+            , refunded <b style={{ color: ACCENT_INK }}>{money(Number(CHASM.trap.result.rows[0][2]))}</b>
           </span>
         </Note>
 

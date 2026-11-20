@@ -6,7 +6,7 @@ import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
 import { useLayout } from "../../editorial/layout";
-import { Ink } from "../../editorial/ui";
+import { Ink, OutlineBadge } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
 import { LISTING_PAPER, MARK } from "../da-sql/parts";
@@ -221,6 +221,18 @@ export const Listing: React.FC<{
     </div>
   );
 };
+
+/**
+ * The house's outlined badge (README, "Or outlined"): no fill, a 2px border
+ * and the text in one ink, here near-black, matching the video's outlined
+ * boxes. Set in Inter: the badge sets no face of its own, so inside a note
+ * it took the page's serif.
+ */
+export const Pill: React.FC<{ size?: number; children: React.ReactNode }> = ({ size = 22, children }) => (
+  <OutlineBadge tone="ink" size={size} style={{ fontFamily: SANS }}>
+    {children}
+  </OutlineBadge>
+);
 
 // ── Tones: one meaning per color ─────────────────────────────────────────────
 
@@ -607,7 +619,7 @@ export const VMark: React.FC<{ x: number; top: number; bottom: number; at: numbe
  *  the 1080p layout (a 4K render doubles it). */
 export const ART = {
   crab: { id: "ae-changing-dimensions-hermit-crab", w: 1536, h: 691 },
-  camera: { id: "ae-changing-dimensions-camera", w: 1024, h: 1024 },
+  camera: { id: "ae-changing-dimensions-camera", w: 1004, h: 861 },
 } as const;
 export type ArtName = keyof typeof ART;
 

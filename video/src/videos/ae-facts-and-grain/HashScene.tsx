@@ -4,10 +4,10 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
-import { Badge, Note } from "../../editorial/ui";
+import { Note, OutlineBadge } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { HASH } from "./data";
 import {
   Bar,
@@ -33,7 +33,7 @@ import {
 const LIST_Y = 340;
 const SIZE = 20;
 const RIGHT_X = 920;
-const ROWS = { headH: 42, rowH: 44, bodySize: 22, headSize: 20 } as const;
+const ROWS = { headH: 40, rowH: 40, bodySize: 22, headSize: 20 } as const;
 
 /** "2.3 MB" from a byte count, as the narration rounds it. */
 const mb = (bytes: number) => `${(bytes / 1e6).toFixed(1)} MB`;
@@ -100,11 +100,11 @@ export const HashScene: React.FC = () => {
   const mon = HASH.seqBefore;
   const tue = HASH.seqAfter;
   const mg = geoOf(mon, X0, y(LIST_Y), h, ROWS);
-  const tg = geoOf(tue, X0, y(590), h, ROWS);
+  const tg = geoOf(tue, X0, y(566), h, ROWS);
   const fact = HASH.factMonday;
-  const fg = geoOf(fact, RIGHT_X, y(630), h, ROWS);
+  const fg = geoOf(fact, RIGHT_X, y(606), h, ROWS);
   const bad = HASH.misread;
-  const bg = geoOf(bad, RIGHT_X, y(790), h, ROWS);
+  const bg = geoOf(bad, RIGHT_X, y(746), h, ROWS);
   const sk = mon.cols.indexOf("customer_sk");
   const id = mon.cols.indexOf("customer_id");
   const factKey = fact.rows[0][fact.cols.indexOf("customer_sk")];
@@ -162,7 +162,7 @@ export const HashScene: React.FC = () => {
         </Note>
 
         {/* ── A sequence integer: compact ── */}
-        <Caption at={detAt + 4} x={RIGHT_X} y={listTop - h(40)}>
+        <Caption at={detAt + 4} x={RIGHT_X} y={listTop - h(40)} out={suitAt - 4}>
           Sequence integer, numbered in order
         </Caption>
         <Listing
@@ -171,6 +171,7 @@ export const HashScene: React.FC = () => {
           top={listTop}
           size={SIZE}
           at={detAt + 4}
+          out={suitAt - 4}
           marks={[{ line: "row_number()", text: "row_number() OVER (ORDER BY customer_id)", at: numberAt + 2 }]}
         />
         <Bar
@@ -200,7 +201,7 @@ export const HashScene: React.FC = () => {
         </Note>
 
         {/* ── The trap: renumbered on every rebuild ── */}
-        <Note at={keptAt} x={RIGHT_X} y={listTop + listingHeight(seqL.length, SIZE) + h(22)}>
+        <Note at={keptAt} x={RIGHT_X} y={listTop + listingHeight(seqL.length, SIZE) + h(22)} out={suitAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Handed out once, by one counter, <b>and kept</b>
           </span>
@@ -254,17 +255,18 @@ export const HashScene: React.FC = () => {
         />
 
         {/* ── The pick ── */}
-        <Note at={suitAt} x={X0} y={y(898)}>
+        <Note at={suitAt + 4} x={RIGHT_X} y={listTop + h(10)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>Hashes</b> suit rebuilding often, in many environments
-            <span style={{ color: INK_SOFT, opacity: ease(frame, dbtAt, 10) }}>: common in dbt</span>
+            <br />
+            <span style={{ color: INK_SOFT, opacity: ease(frame, dbtAt, 10) }}>and are common in dbt</span>
           </span>
         </Note>
         <div
           style={{
             position: "absolute",
-            left: X0,
-            top: y(946),
+            left: RIGHT_X,
+            top: listTop + h(112),
             display: "flex",
             alignItems: "center",
             gap: 16,
@@ -277,9 +279,9 @@ export const HashScene: React.FC = () => {
             They can <span style={{ color: ACCENT_INK }}>collide</span>, rarely, so either way
           </span>
           <span style={{ opacity: ease(frame, testAt, 10), transform: `scale(${0.85 + 0.15 * ease(frame, testAt, 10)})` }}>
-            <Badge tone="green" size={24}>
+            <OutlineBadge tone="green" size={24} style={{ fontFamily: SANS }}>
               test: <Mono>unique</Mono>
-            </Badge>
+            </OutlineBadge>
           </span>
         </div>
       </Drift>

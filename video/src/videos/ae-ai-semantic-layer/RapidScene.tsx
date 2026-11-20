@@ -12,8 +12,8 @@ const LIST_TOP = 380;
 const ROW = 66;
 /** The path's boxes, left to right: the assistant, MCP, the two interfaces
  *  stacked, and the warehouse under them. */
-const ASST = { x: 800, w: 190 };
-const MCP = { x: 1040, w: 250 };
+const ASST = { x: 790, w: 180 };
+const MCP = { x: 1010, w: 286 };
 const IFACE = { x: 1360, w: 330 };
 
 /**
@@ -73,7 +73,10 @@ export const RapidScene: React.FC = () => {
         <Kicker at={moreAt}>Quick round</Kicker>
         <Headline lead="One more," turn="quickly." at={moreAt} turnAt={quickAt - 2} size={64} />
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={moreAt + 6} end={end + 20} />
-        <ColumnRule x={740} top={y(330)} height={y(LIST_TOP) + h(ROW) - y(330)} at={sixAt} />
+        <Ink at={sixAt + 8} dur={16} style={{ left: X0 + 40, top: y(LIST_TOP) + h(ROW) + h(24), width: 540 }}>
+          <span style={{ ...note(26, INK_SOFT), textWrap: "balance" }}>How do AI assistants connect to the warehouse and to governed metrics?</span>
+        </Ink>
+        <ColumnRule x={720} top={y(330)} height={y(LIST_TOP) + h(ROW) + h(110) - y(330)} at={sixAt} />
 
         {/* The path: assistant, MCP, the interfaces, the warehouse. */}
         <Box x={ASST.x} y={mid - asstH / 2} w={ASST.w} h={asstH} at={throughAt} title="Assistant" size={24} />

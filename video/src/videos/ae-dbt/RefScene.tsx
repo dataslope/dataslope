@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { badgeStyle, Note, Num } from "../../editorial/ui";
+import { Note, Num, outlineBadgeStyle } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -121,7 +121,9 @@ export const RefScene: React.FC = () => {
     .filter(([a, b]) => edgeCue[edgeKey(a, b)] !== undefined)
     .map(([a, b]) => {
       const k = edgeKey(a, b);
-      const e: GEdge = { from: a, to: b, at: edgeCue[k], dur: 16, ...(drop > 0 ? SLICE_EDGE[k] : {}) };
+      // The two edges into the fact part as it drops, each to its own port.
+      const port = SLICE_EDGE[k]?.toPort;
+      const e: GEdge = { from: a, to: b, at: edgeCue[k], dur: 16, ...(port ? { toPort: { ...port, d: (port.d ?? 0) * drop } } : {}) };
       if (k === edgeKey("stg_orders", "fct_orders")) return { ...e, gone: seesAt + 2, back: q3At + 2 };
       return e;
     });
@@ -202,7 +204,7 @@ export const RefScene: React.FC = () => {
           const bad = m === "fct_orders" ? ease(frame, beforeAt + 6, 10) : 0;
           return (
             <Note key={m} at={dependsAt + 6 + (m === "fct_orders" ? 6 : 0)} x={ORDER_X + orderIdx[m] * SLOT} y={orderY - 4} out={codeOut}>
-              <span style={{ ...badgeStyle(bad > 0.5 ? "red" : "gray", 22), fontFamily: SANS }}>
+              <span style={{ ...outlineBadgeStyle(bad > 0.5 ? "red" : "ink", 22), fontFamily: SANS }}>
                 <Num>{(orderIdx[m] < 0.5 ? 1 : 2).toString()}</Num> <Code>{m}</Code>
               </span>
             </Note>

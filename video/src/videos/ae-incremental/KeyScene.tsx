@@ -34,7 +34,7 @@ const P = 44;
 /** The column of event `id`. */
 const X = (id: number) => TL + (id - 0.5) * P;
 /** Layout values (through `y()`). */
-const ROW_C = { answer: 271, config: 297, batch: 557, dup: 518, stack: 609, base: 648, bottom: 684 };
+const ROW_C = { answer: 267, config: 320, spot: 368, dup: 544, batch: 583, base: 715, bottom: 769 };
 const LEDGER_X = 1240;
 
 /**
@@ -223,7 +223,7 @@ export const KeyScene: React.FC = () => {
           at={matchAt}
           marks={[{ line: "unique_key", text: "unique_key='event_id'", at: keyAt + 4 }]}
         />
-        <Spot art="key" at={keyAt} left={940} top={row("config") - 14} width={150} />
+        <Spot art="key" at={keyAt} left={940} top={row("spot")} width={150} />
 
         {/* The three strategies' results. */}
         <DataTable

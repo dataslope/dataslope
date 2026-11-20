@@ -3,19 +3,19 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Badge, ColumnRule, Note, Num } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ColumnRule, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { DISTINCT, LOGINS, RETURNING, USERS_BY_DAY } from "./data";
-import { Box, Cross, Drift, Flow, OK_INK, QMono, X0 } from "./parts";
+import { Chip, Box, Cross, Drift, Flow, OK_INK, QMono, X0 } from "./parts";
 
 const CELL = 130;
 const GAP = 24;
 const ID_PITCH = 30;
-const PANEL_X = 1120;
+const PANEL_X = 1100;
 
 const thousands = (s: string) => Number(s).toLocaleString("en-US");
 
@@ -68,7 +68,7 @@ export const DistinctScene: React.FC = () => {
   const fixTop = y(660);
   const A = { x: X0, y: fixTop, w: 230, h: h(58) };
   const B = { x: X0, y: fixTop + h(116), w: 230, h: h(58) };
-  const C = { x: 620, y: fixTop + h(58), w: 300, h: h(58) };
+  const C = { x: 560, y: fixTop + h(58), w: 250, h: h(58) };
   const aMid = A.y + A.h / 2;
   const bMid = B.y + B.h / 2;
   const cMid = C.y + C.h / 2;
@@ -76,7 +76,7 @@ export const DistinctScene: React.FC = () => {
   // ── The approximate count ──
   const [exact, approx] = DISTINCT.approx.rows[0];
   const lowPct = ((1 - Number(approx) / Number(exact)) * 100).toFixed(1);
-  const BAR_W = 520;
+  const BAR_W = 440;
 
   return (
     <AbsoluteFill>
@@ -186,8 +186,8 @@ export const DistinctScene: React.FC = () => {
         </Note>
         <Note at={sixAt + 4} x={1080} y={countY + h(62)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            <span style={{ background: HIGHLIGHT, padding: "0 6px", borderRadius: 4 }}>{DISTINCT.repeatUsers} came back</span>
-            <span style={{ opacity: ease(frame, againAt, 10) }}>: {DISTINCT.extraCounts} extra counts</span>
+            {DISTINCT.repeatUsers} came back on other days
+            <span style={{ color: ACCENT_INK, opacity: ease(frame, againAt, 10) }}>: {DISTINCT.extraCounts} extra counts</span>
           </span>
         </Note>
         <Note at={sixAt + 2} x={sumX} y={countY + h(36)} out={monthlyAt}>
@@ -240,7 +240,7 @@ export const DistinctScene: React.FC = () => {
         </Note>
 
         {/* ── At scale: exact against approximate ── */}
-        <ColumnRule x={PANEL_X - 40} top={fixTop} height={h(190)} at={expensiveAt} />
+        <ColumnRule x={PANEL_X - 50} top={fixTop} height={h(190)} at={expensiveAt} />
         <Note at={tracksAt - 2} x={PANEL_X} y={fixTop - h(6)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Exact: the engine tracks every value</span>
         </Note>
@@ -248,9 +248,9 @@ export const DistinctScene: React.FC = () => {
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 12 }}>
             <QMono>approx_count_distinct</QMono>
             <span style={{ opacity: ease(frame, hllAt - 2, 10) }}>
-              <Badge tone="blue" size={23}>
+              <Chip tone="blue" size={23}>
                 HyperLogLog
-              </Badge>
+              </Chip>
             </span>
           </span>
         </Note>

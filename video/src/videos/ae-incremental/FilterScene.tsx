@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { OK_INK, QMono, QuestionCard } from "../../editorial/interview";
 import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
-import { Badge, Note, Num } from "../../editorial/ui";
+import { Note, Num, OutlineBadge } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
@@ -299,9 +299,9 @@ export const FilterScene: React.FC = () => {
         </Note>
         {/* The first run: the check is false. */}
         <Note at={falseAt} x={guardEnd + 22} y={listingLineMid(LIST_TOP, guardLine, SIZE) - 15}>
-          <Badge tone="gray" size={20} style={{ fontFamily: MONO }}>
+          <OutlineBadge tone="ink" size={20} style={{ fontFamily: MONO }}>
             false
-          </Badge>
+          </OutlineBadge>
         </Note>
 
         {/* ── The timeline ── */}

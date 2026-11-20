@@ -16,7 +16,7 @@ const LAYER_Y = 440;
 const MODELS_Y = 640;
 const BOX_W = 220;
 const BOX_GAP = 30;
-const R_X = 1000;
+const R_X = 1060;
 const SQL_SIZE = 19;
 const WHY_Y = 790;
 

@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Badge, Note } from "../../editorial/ui";
+import { Note, OutlineBadge } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -184,9 +184,9 @@ export const WhatScene: React.FC = () => {
             { t: "Tests", at: testAt },
             { t: "CI", at: ciAt },
           ].map((b) => (
-            <Badge key={b.t} tone="gray" size={23} style={{ fontFamily: SANS, opacity: ease(frame, b.at, 10), transform: `translateY(${(1 - ease(frame, b.at, 10)) * 8}px)` }}>
+            <OutlineBadge key={b.t} tone="ink" size={23} style={{ fontFamily: SANS, opacity: ease(frame, b.at, 10), transform: `translateY(${(1 - ease(frame, b.at, 10)) * 8}px)` }}>
               {b.t}
-            </Badge>
+            </OutlineBadge>
           ))}
         </div>
       </Drift>

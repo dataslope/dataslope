@@ -4,11 +4,12 @@ import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { Badge, ColumnRule, NextLine, Note } from "../../editorial/ui";
+import { ColumnRule, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
 import {
+  Chip,
   colsOf,
   DataTable,
   Drift,
@@ -87,15 +88,15 @@ const Zero: React.FC<{ c: Ctx }> = ({ c }) => {
           { row: empty, col: av, at: coalesceAt + 8, color: MARK_GREEN },
         ]}
       />
-      <Note at={stopAt - 4} x={errX} y={g.top - c.h(40)}>
+      <Note at={stopAt - 4} x={errX} y={g.top + c.h(24)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           Without <QMono>NULLIF</QMono>:
         </span>
       </Note>
-      <ErrorBox x={errX} top={g.top} width={400} at={stopAt} kind={RAPID.zeroBare.kind} message={RAPID.zeroBare.message} size={20} />
-      <Note at={coalesceAt + 8} x={errX} y={g.rowTop(empty) + c.h(4)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-          <QMono>COALESCE(…, 0)</QMono>: zero instead
+      <ErrorBox x={errX} top={g.top + c.h(64)} width={400} at={stopAt} kind={RAPID.zeroBare.kind} message={RAPID.zeroBare.message} size={20} />
+      <Note at={coalesceAt + 8} x={R_X} y={g.rowTop(Z.rows.length) + c.h(20)}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <QMono>COALESCE(…, 0)</QMono> turns the null into zero
         </span>
       </Note>
     </>
@@ -355,9 +356,9 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
         {RAPID.pivotEngines.map((e, i) => (
           <span key={e} style={{ opacity: ease(frame, clauseAt + i * 4, 10) }}>
-            <Badge tone="blue" size={22}>
+            <Chip tone="blue" size={22}>
               {e}
-            </Badge>
+            </Chip>
           </span>
         ))}
       </div>
@@ -367,7 +368,7 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
       <ErrorBox x={R_X + 150} top={under + c.h(46)} width={500} at={notAt} kind={RAPID.pivotClause.kind} message={RAPID.pivotClause.message} size={20} />
       <Note at={everyAt} x={R_X} y={under + c.h(130)}>
         <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
-          <QMono>CASE</QMono> runs everywhere, one column at a time
+          <QMono>CASE</QMono> runs everywhere, each output column spelled out
         </span>
       </Note>
     </>
@@ -387,7 +388,7 @@ const Unpivot: React.FC<{ c: Ctx }> = ({ c }) => {
   const from = U.lines.findIndex((l) => l.startsWith("SELECT region, u.quarter"));
   const lines = U.lines.slice(from);
   const top = body(c);
-  const tTop = top + listingHeight(lines.length, SIZE) + c.h(30);
+  const tTop = top + listingHeight(lines.length, SIZE) + c.h(76);
   const P = RAPID.pivotCase;
   const wg = geo(c, P, R_X, tTop, 40);
   const lg = geo(c, U, wg.right + 130, tTop, 34);

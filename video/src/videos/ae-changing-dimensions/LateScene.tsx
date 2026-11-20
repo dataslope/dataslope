@@ -4,13 +4,13 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
-import { Badge, Note, Num } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { SANS } from "../../theme/fonts";
 import { LATE, money } from "./data";
-import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, listingWidth, MARK_BAD, MARK_KEY, MARK_OK, OK_INK, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, listingWidth, MARK_BAD, MARK_KEY, MARK_OK, OK_INK, TableName, X0, Pill } from "./parts";
 
 const ROW1 = 300;
 const ROW2 = 580;
@@ -246,9 +246,9 @@ export const LateScene: React.FC = () => {
         </Note>
         <Note at={rekeyAt + 14} x={gf.x} y={gf.rowTop(3) + h(18)}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 14, fontSize: 24 }}>
-            <Badge tone="gray" size={22}>
+            <Pill size={22}>
               <Num>{LATE.corrected}</Num> row re-keyed
-            </Badge>
+            </Pill>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
               <Num>{LATE.stillUnknown}</Num> left on −1
             </span>

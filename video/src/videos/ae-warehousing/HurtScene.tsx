@@ -62,7 +62,7 @@ export const HurtScene: React.FC = () => {
   const pitchY = h(PITCH);
   const cellH = h(CELL);
   const oneH = h(ONE_W);
-  const textTop = (i: number) => gridY + i * h(46);
+  const textTop = (i: number) => gridY + [0, 52, 130][i] * (h(100) / 100);
   const monthTop = y(MONTH_Y) + h(40);
 
   return (
@@ -142,7 +142,7 @@ export const HurtScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={footersAt + 14} x={TEXT_X + 22} y={textTop(1) + h(34)}>
+        <Note at={footersAt + 14} x={TEXT_X + 22} y={textTop(1) + h(38)}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>A footer: the file&rsquo;s schema and statistics, read before any data</span>
         </Note>
 
@@ -190,7 +190,7 @@ export const HurtScene: React.FC = () => {
             <b style={{ color: OK_INK }}>The columns filters use</b>
             <span style={{ opacity: ease(frame, grainAt, 10) }}>, and the grain the volume needs</span>
             <span style={{ color: INK_SOFT, opacity: ease(frame, fewAt, 10) }}>
-              : <Num>{(TABLE.rows / 1e6).toFixed(0)}</Num> million rows a year is too few to split by day
+              : {TABLE.rows === 1e6 ? "a million" : TABLE.rows.toLocaleString("en-US")} rows a year is too few to split by day
             </span>
           </span>
         </div>

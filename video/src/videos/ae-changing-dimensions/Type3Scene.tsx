@@ -144,9 +144,6 @@ export const Type3Scene: React.FC = () => {
         <Band x0={later.x0} x1={later.x1} top={G.bandTop} h={G.bandH} at={againAt + 2} label={twice[tRegion]} />
         <Bracket name="region" at={readsAt + 4} x0={westBand.x0} x1={westBand.x1} moveAt={becomesAt - 6} to={later} top={bracketTop} />
         <Bracket name="prev_region" at={prevAt + 2} x0={eastBand.x0} x1={eastBand.x1} moveAt={becomesAt} to={westBand} top={bracketTop} />
-        <Note at={goneAt + 2} x={eastBand.x0 + 14} y={G.bandTop + G.bandH + h(44)}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>No column holds the East</span>
-        </Note>
 
         {/* ── Lower left: the row ── */}
         <TableName g={gt} at={addsAt}>
@@ -230,7 +227,10 @@ export const Type3Scene: React.FC = () => {
         <Note at={limitAt} x={RX} y={low - h(4)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>One step of history</span>
         </Note>
-        <Note at={thirdAt} x={RX} y={low + h(58)}>
+        <Note at={goneAt} x={RX} y={low + h(58)}>
+          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>The East is gone: no column holds it</span>
+        </Note>
+        <Note at={thirdAt} x={RX} y={low + h(116)}>
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>A third column: the same loss, one move later</span>
         </Note>
       </Drift>

@@ -165,7 +165,7 @@ export const ClusterScene: React.FC = () => {
         <div style={{ position: "absolute", left: X0, top: y(SORTED_Y) - 4, width: AX0 - X0 - 20, opacity: ease(frame, orderAt - 2, 12) * (1 - 0.55 * ease(frame, dim, 14)) }}>
           <div style={{ ...label(23, INK) }}>In date order</div>
           <div style={{ ...note(20, INK_SOFT), marginTop: 6 }}>
-            <Num>{CLUSTER.groups.length}</Num> blocks, about six weeks each
+            <Num>{CLUSTER.groups.length}</Num> blocks, six weeks each
           </div>
         </div>
         {panel(SORTED_Y, SORTED_STEP, SORTED_BAR, CLUSTER.groups, recordsAt + 4, twoAt, BAR, true)}

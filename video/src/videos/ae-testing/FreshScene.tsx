@@ -9,14 +9,14 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds, inkOf } from "../../theme/brand";
 import { FRESHNESS, type FreshnessCheck } from "./data";
-import { Box, Chip, Drift, Flow, Listing, ListingTitle, pulse, SmallMono, Spot, spotH, Svg, X0 } from "./parts";
+import { Box, Chip, Drift, Flow, Listing, ListingTitle, pulse, SmallMono, Spot, Svg, X0 } from "./parts";
 
 const COLS_Y = 286;
 const COL_X = [X0, 760];
 const YAML_Y = 470;
 const YAML_SIZE = 20;
-const AXIS = { x0: 830, x1: 1770, y: 610, from: 0, to: 15 };
-const CLOCK = { x: 1590, w: 150 };
+const AXIS = { x0: 830, x1: 1770, y: 630, from: 0, to: 15 };
+const CLOCK = { x: 1630, w: 130 };
 const WARN_FILL = `color-mix(in srgb, ${ds("yellow", 400)} 34%, transparent)`;
 const ERROR_FILL = `color-mix(in srgb, ${ds("red", 400)} 26%, transparent)`;
 const VERDICT_INK: Record<FreshnessCheck["verdict"], string> = { pass: OK, warn: inkOf.yellow, error: ACCENT };
@@ -76,7 +76,7 @@ export const FreshScene: React.FC = () => {
   const newest = hourOf(FRESHNESS.newest);
   const warnFrom = newest + FRESHNESS.warnHours;
   const errorFrom = newest + FRESHNESS.errorHours;
-  const zoneTop = axisY - h(120);
+  const zoneTop = axisY - h(100);
   const checkAt = [newestAt + 18, nineAt, twoAt];
   const verdictAt = [newestAt + 26, warningAt, anErrorAt];
   const axisDraw = ease(frame, newestAt - 8, 18);
@@ -88,12 +88,12 @@ export const FreshScene: React.FC = () => {
     { name: "accepted_values", t: FRESHNESS.tests.acceptedValues },
     { name: "relationships", t: FRESHNESS.tests.relationships },
   ];
-  const testsTop = y(756);
+  const testsTop = axisY + h(108);
 
   // ── Freshness first, and a feed slipping (drawn, not measured) ──
   const yamlOut = beforeAt - 4;
   const flowTop = yamlTop;
-  const sketch = { x0: X0 + 60, x1: 700, top: y(610), bottom: y(880) };
+  const sketch = { x0: X0 + 60, x1: 700, top: y(640), bottom: y(860) };
   const days = 7;
   // Arrival delay in hours, drawn: a feed that slips about two hours a day.
   const delay = (d: number) => 1 + d * 2.1;
@@ -141,7 +141,7 @@ export const FreshScene: React.FC = () => {
             </span>
           </div>
         </Ink>
-        <Spot art="clock" at={clockAt + 4} left={CLOCK.x} top={colsTop - h(20)} width={CLOCK.w} />
+        <Spot art="clock" at={clockAt + 4} left={CLOCK.x} top={colsTop - h(16)} width={CLOCK.w} />
 
         {/* ── The page's thresholds ── */}
         <ListingTitle x={X0} top={yamlTop} at={sourceAt} out={yamlOut}>
@@ -185,7 +185,7 @@ export const FreshScene: React.FC = () => {
           {/* The newest row. */}
           <circle cx={ax(newest)} cy={axisY} r={9 * ease(frame, newestAt, 10)} fill={BAR} />
         </Svg>
-        <Note at={newestAt + 4} x={ax(newest) - 60} y={axisY + h(48)}>
+        <Note at={newestAt + 4} x={ax(newest) + 16} y={axisY - h(44)}>
           <span style={{ ...note(21, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             newest row, {clockOf(FRESHNESS.newest)}
           </span>
@@ -197,10 +197,10 @@ export const FreshScene: React.FC = () => {
           return (
             <React.Fragment key={c.checkedAt}>
               <Svg opacity={p}>
-                <line x1={x} y1={axisY + 4} x2={x} y2={zoneTop - h(18) + 30 * (1 - p)} stroke={color} strokeWidth={2.5} strokeDasharray="5 5" />
+                <line x1={x} y1={axisY + 4} x2={x} y2={zoneTop - h(8) + 30 * (1 - p)} stroke={color} strokeWidth={2.5} strokeDasharray="5 5" />
                 <circle cx={x} cy={axisY} r={6} fill={color} />
               </Svg>
-              <Ink at={verdictAt[i]} dur={10} style={{ left: x - 70, top: zoneTop - h(70), width: 140, textAlign: "center", whiteSpace: "nowrap" }}>
+              <Ink at={verdictAt[i]} dur={10} style={{ left: x - 70, top: zoneTop - h(52), width: 140, textAlign: "center", whiteSpace: "nowrap" }}>
                 <Chip tone={VERDICT_TONE[c.verdict]} size={21} style={{ transform: `scale(${1 + 0.1 * pulse(frame, verdictAt[i] + 4, 16)})` }}>
                   {c.hours} h: {c.verdict}
                 </Chip>
@@ -210,7 +210,7 @@ export const FreshScene: React.FC = () => {
         })}
 
         {/* ── The four tests, on the same stale rows ── */}
-        <Note at={fourAt - 2} x={AXIS.x0} y={testsTop - h(50)}>
+        <Note at={fourAt - 2} x={AXIS.x0} y={testsTop - h(44)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>The four tests, on the same rows</span>
         </Note>
         {tests.map((tt, i) => (
@@ -219,13 +219,13 @@ export const FreshScene: React.FC = () => {
               <SmallMono color={INK}>{tt.name}</SmallMono>
             </div>
             <div style={{ marginTop: h(12) }}>
-              <Chip tone="neutral" size={20}>
+              <Chip tone="gray" size={20}>
                 {tt.t.result.rows.length} rows: pass
               </Chip>
             </div>
           </Ink>
         ))}
-        <Note at={validAt} x={AXIS.x0} y={testsTop + h(100)}>
+        <Note at={validAt} x={AXIS.x0} y={testsTop + h(92)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             Valid rows<span style={{ color: INK_SOFT, opacity: ease(frame, justOldAt, 10) }}>, just old</span>
           </span>
@@ -284,4 +284,3 @@ export const FreshScene: React.FC = () => {
   );
 };
 
-export { spotH };

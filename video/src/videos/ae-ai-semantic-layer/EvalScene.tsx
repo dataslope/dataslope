@@ -190,15 +190,15 @@ export const EvalScene: React.FC = () => {
           <Ink at={manyAt} dur={14} style={{ left: 940, top: top + h(186) }}>
             <span style={line(24, INK_SOFT)}>Many different queries are correct</span>
           </Ink>
-          <Spot id="ae-ai-semantic-layer-golden" at={goldenAt} left={1600} top={y(560)} {...golden} />
+          <Spot id="ae-ai-semantic-layer-golden" at={goldenAt} left={X0 + 340 - golden.width / 2} top={y(566)} {...golden} />
         </Clear>
 
         {/* Three answers to one question, each run. */}
         <Clear at={declineRowAt[0]}>
           <Ink at={runFrom} dur={14} style={{ left: X0, top }}>
-            <span style={line(28, INK)}>
-              <span style={{ ...label(22, INK_SOFT) }}>One question:</span>{" "}
-              <span style={{ opacity: ease(frame, oneQAt, 10) }}>{EVAL.question}</span>
+            <span style={line(28, INK_SOFT)}>
+              One question:{" "}
+              <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, oneQAt, 10) }}>{EVAL.question}</span>
             </span>
           </Ink>
           {EVAL.candidates.map((c, i) => {
@@ -329,15 +329,14 @@ export const EvalScene: React.FC = () => {
           width={2}
           head={11}
         />
-        <Ink at={prodAt} dur={14} style={{ left: BOXES[2].x + BOXES[2].w + 120, top: loopTop + h(6) }}>
-          <span style={{ ...line(24, INK), fontWeight: 500 }}>Production questions</span>
-        </Ink>
-        <Ink at={prodAt + 8} dur={14} style={{ left: BOXES[2].x + BOXES[2].w + 120, top: loopTop + h(40) }}>
-          <span style={line(24, INK_SOFT)}>that went wrong</span>
+        <Ink at={prodAt} dur={14} style={{ left: BOXES[2].x + BOXES[2].w + 60, top: loopTop - h(30) - 16 }}>
+          <span style={{ ...line(24, INK), fontWeight: 500 }}>
+            Production questions <span style={{ opacity: ease(frame, prodAt + 10, 10) }}>that went wrong</span>
+          </span>
         </Ink>
         <Flow
           points={[
-            [BOXES[2].x + BOXES[2].w + 110, loopTop - h(30)],
+            [BOXES[2].x + BOXES[2].w + 46, loopTop - h(30)],
             [BOXES[1].x + BOXES[1].w / 2, loopTop - h(30)],
             [BOXES[1].x + BOXES[1].w / 2, loopTop - 8],
           ]}

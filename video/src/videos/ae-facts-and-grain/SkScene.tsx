@@ -115,7 +115,7 @@ export const SkScene: React.FC = () => {
             ...dimT.rows.map((_, row) => ({ row, col: id, at: staysAt + row * 4, color: MARK })),
           ]}
         />
-        <Note at={nothingAt + 4} x={dg.x} y={dg.rowTop(2) + h(26)} out={eachAt}>
+        <Note at={nothingAt + 4} x={dg.right + 40} y={dg.rowTop(0) + h(14)} out={twoRowsAt}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Made up here, means nothing</span>
         </Note>
 
