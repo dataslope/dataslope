@@ -40,7 +40,10 @@ const MODEL = { x: 692, w: 210, aspect: 911 / 1536, portY: 0.4, lineY: 530 };
 const GAP = 24;
 const HEAD_Y = 378;
 const LEFT_ROWS = [452, 530];
-const RIGHT_X = 990;
+const RIGHT_X = 1026;
+/** Clear space between the orange arrow's tip and the answer column (the
+ *  owner, 2026-11-20: "more spacing after the orange arrow"). */
+const AFTER_ARROW = 38;
 const RIGHT_ROW = 492;
 const COUNT_Y = 646;
 const METER_W = 240;
@@ -170,7 +173,7 @@ export const WhyScene: React.FC = () => {
       <Ink at={answerAt - 4} dur={12} style={{ left: RIGHT_X, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...label(25, OUTPUT_INK), fontWeight: 500 }}>Writing the answer</span>
       </Ink>
-      <Arrow from={[MODEL.x + MODEL.w + GAP, midY]} to={[RIGHT_X - 2, midY]} at={oneAt - 10} dur={10} color={OUTPUT} width={3} />
+      <Arrow from={[MODEL.x + MODEL.w + GAP, midY]} to={[RIGHT_X - AFTER_ARROW, midY]} at={oneAt - 10} dur={10} color={OUTPUT} width={3} />
       <div style={{ position: "absolute", left: RIGHT_X, top: y(RIGHT_ROW), display: "flex", gap: 6 }}>
         {answer.map((t, k) => {
           const p = ease(frame, outAt(k), 8);
