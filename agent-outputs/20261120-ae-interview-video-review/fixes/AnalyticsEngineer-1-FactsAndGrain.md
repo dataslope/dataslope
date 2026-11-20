@@ -38,7 +38,18 @@ All 14 findings fixed (5 P2, 9 P3). New length **705.0 s (11:45)**, up from 674.
 
 ## Checks (final code, through `out/entries/AnalyticsEngineer-1-FactsAndGrain.tsx` and the queue)
 
-CHECKS_PENDING
+| Check | Result |
+| --- | --- |
+| typecheck (`tsc --noEmit`, errors naming the folder) | pass, none |
+| lint (`eslint src/videos/ae-facts-and-grain`) | pass |
+| `check:cues` | pass: every word cue names a phrase its beat says |
+| `npm test` | pass (79/79) |
+| `check:frames` (`CHECK_SCALE=1`) | pass: 4 illustrations within their pixels (largest stretch 0.44); 20 arrows within 10°; ERD ends straight; spacing, tabular and one-face checks clean |
+| `check:motion` | pass: 11:45.0 checked; nothing still for 3 s (one 2.0 s stretch, 9:20 to 9:22, in `r-confirmed` while the question is read) |
+| `check:sync` | pass: 55 beats; worst +0.05 s (`rapid-in`). The new beats sit at `hash-versions` +0.04, `role-why` −0.00, `role-span` −0.01, `ratio-weight` −0.00, `r-agg-why` +0.00 |
+| `check:mix` | pass: effects −49.0 LUFS, 29.1 LU under the narration (−19.9 LUFS); speech a median 28.9 dB above the effects where both sound |
+
+The check WAVs and the preview (`out/AnalyticsEngineer-1-FactsAndGrain-{dry,wet,fx}.wav`, `-preview.mp4`) were deleted.
 
 Stills at every changed place (24, 122.8, 135.5, 206.5, 212.8, 215.5, 278, 334.5, 366.5, 376, 384.5, 436, 478.3, 509.5, 546.8, 557.8, 559.6, 570.9, 590.8, 599, 620.7, 640.5, 667.9, 690.4 and 700 s) were rendered and looked at. They are in `video/out/review/AnalyticsEngineer-1-FactsAndGrain/`. Two placements were corrected after looking:
 - "One calendar for every role" sat tight against order 101's table, so it moved above `dim_date`.

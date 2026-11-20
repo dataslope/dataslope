@@ -103,7 +103,9 @@ const Macros: React.FC<{ c: Ctx }> = ({ c }) => {
   const byHand = MACRO.integerSql[0].replace(/^SELECT /, "").replace(/ AS amount_usd FROM orders$/, "");
   return (
     <>
-      <Fact at={jinjaAt} c={c}>
+      {/* In as the answer starts, so the page does not hold still for 3 s
+          while the question is read (check:motion). */}
+      <Fact at={jinjaAt - 12} c={c}>
         A reusable Jinja function that writes SQL
       </Fact>
       <Listing
@@ -112,7 +114,7 @@ const Macros: React.FC<{ c: Ctx }> = ({ c }) => {
         top={top}
         width={listingWidth(lines, SIZE)}
         size={SIZE}
-        at={jinjaAt + 6}
+        at={jinjaAt + 2}
         marks={[
           { line: "/ 100.0", text: "({{ column_name }} / 100.0)", at: emitsAt + 4 },
           { line: "-- SELECT", text: "{{ cents_to_dollars('amount_cents') }}", at: calledAt },

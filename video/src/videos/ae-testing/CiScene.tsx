@@ -142,7 +142,7 @@ export const CiScene: React.FC = () => {
   // the right of the DAG, the manifest level with its middle.
   const projectBracket = { x: X0 + 3 * (NODE.w + GAP_X) + NODE.w + 34, top: dagTop, bottom: dagTop + rowGap + h(NODE.h) };
   const projectMid = (projectBracket.top + projectBracket.bottom) / 2;
-  const manifest = { x: 1400, y: projectMid - h(42) };
+  const manifest = { x: 1420, y: projectMid - h(42) };
   const selected = new Set(CI_SELECTED);
   const ciState = (name: string): Partial<NodeState> => {
     if (!CI.models.includes(name)) return {};
@@ -244,7 +244,7 @@ export const CiScene: React.FC = () => {
           />
         </Svg>
         <Flow points={[[manifest.x - 12, projectMid], [projectBracket.x + 6, projectMid]]} at={manifestAt + 6} color={ds("gray", 500)} dash="6 7" out={q7Out} noHead />
-        <Note at={manifestAt + 10} x={projectBracket.x + 24} y={projectMid + h(12)} out={q7Out}>
+        <Note at={manifestAt + 10} x={projectBracket.x + 20} y={projectMid + h(12)} out={q7Out}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>compared</span>
         </Note>
         {/* fct_orders reads stg_orders, which this run does not build: with
