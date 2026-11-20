@@ -26,16 +26,16 @@ import {
 } from "./parts";
 
 /**
- * The model: llm-tokens' pen-and-ink machine (copied in as llm-cost-model, so
+ * The model: llm-tokens' pen-and-ink printing press (copied in as llm-cost-model, so
  * the two videos draw the same model) with its label under it, in place of
  * the plain gray box (the owner, 2026-11-13: "remove the gray box and use the
  * image along with the model label", with clear horizontal space between the
- * arrows, the drawing and the label). Its intake pipe and output spout sit
- * about 42% of the way down it, so it hangs with that height on the arrows'
- * line, the box's old middle. 210 wide is 420 device pixels at 4K, inside the
- * art's 1531x970.
+ * arrows, the drawing and the label). Its feed and delivery trays sit about
+ * 40% of the way down it, so it hangs with that height on the arrows' line,
+ * the box's old middle. 210 wide is 420 device pixels at 4K, inside the art's
+ * 1536x911.
  */
-const MODEL = { x: 692, w: 210, aspect: 970 / 1531, portY: 0.42, lineY: 530 };
+const MODEL = { x: 692, w: 210, aspect: 911 / 1536, portY: 0.4, lineY: 530 };
 /** Clear space between an arrow's tip or tail and the drawing. */
 const GAP = 24;
 const HEAD_Y = 378;

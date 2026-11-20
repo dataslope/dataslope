@@ -11,15 +11,16 @@ import { DIST, ILLUSTRATIONS, num, SHOWN_SUM, VIDEO, VOCAB } from "./data";
 import { Arrow, ChipFace, Drift, FIG_Y, FOCUS_INK, Headline, Kicker, Mark, pulse, Spot, TOKEN, X0 } from "./parts";
 
 /**
- * The model: a pen-and-ink drawing of a machine (llm-tokens-model) with its
+ * The model: a pen-and-ink drawing of a printing press (llm-tokens-model; the
+ * owner picked it from three candidates, 2026-11-20) with its
  * label under it, in place of the plain gray box (the owner, 2026-11-13: "remove
  * the gray box and use the image along with the model label", with clear
  * horizontal space between the arrows, the drawing and the label). The
- * drawing's intake pipe and output spout sit about 42% of the way down it, so
- * it is hung with that height on the arrows' line. 300 wide is 600 device
- * pixels at 4K, inside the art's 1531x970.
+ * press's feed and delivery trays sit about 40% of the way down it, so it is
+ * hung with that height on the arrows' line. 300 wide is 600 device pixels at
+ * 4K, inside the art's 1536x911.
  */
-const MODEL = { x: 332, w: 300, aspect: 970 / 1531, portY: 0.42 };
+const MODEL = { x: 332, w: 300, aspect: 911 / 1536, portY: 0.4 };
 /** Clear space between an arrow's tip or tail and the drawing. */
 const GAP = 26;
 /** The context it reads: one token, the lesson's toy loop's first. */

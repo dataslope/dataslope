@@ -38,13 +38,11 @@ import {
   X0,
 } from "./kit";
 
-/**
- * A bubble is an outline, not a fill (the owner, 2026-11-13: "System prompt:
- * use blue border and text color with a transparent background. Other gray
- * ones: use black border and text color with a transparent background"): ink
- * until it is sent, then the blue the sent part of Fig. 3 takes.
- */
-const BUBBLE_BLUE = outlineInk("blue");
+/** A bubble before it fills: a light gray, no outline. */
+const BUBBLE_GRAY = `color-mix(in srgb, ${LINE_EDGE} 12%, ${PAPER})`;
+/** A sent bubble's blue, lighter than Fig. 3's SENT (the owner, 2026-11-20:
+ *  "make the background color of the badges lighter"). */
+const BUBBLE_SENT = `color-mix(in srgb, ${NEW} 16%, ${PAPER})`;
 
 /** The chat as the app sends it: role, x, width (layout px). */
 const BUBBLES = [
@@ -258,18 +256,16 @@ export const StairsScene: React.FC = () => {
               height: BUBBLE_H,
               borderRadius: b.r,
               boxSizing: "border-box",
-              // An outline on no fill: ink until it is sent, then blue,
-              // border and text together. The new message alone fills, in
-              // Fig. 3's solid blue, so "new this turn" still reads apart
-              // from "sent before".
-              border: `2px solid ${mix(INK, BUBBLE_BLUE, fill)}`,
-              background: isNew ? mix("transparent", NEW, fill) : "transparent",
+              // A fill, no outline: gray until it takes its hue.
+              background: `color-mix(in srgb, ${isNew ? NEW : BUBBLE_SENT} ${Math.round(fill * 100)}%, ${BUBBLE_GRAY})`,
               display: "flex",
               alignItems: "center",
-              // 18 less the border, so the text stays where it was.
-              paddingLeft: 16,
+              paddingLeft: 18,
               opacity: p * (1 - o),
-              ...note(22, isNew ? mix(INK, PAPER, fill) : mix(INK, BUBBLE_BLUE, fill)),
+              // A sent bubble's text turns blue with its fill (the owner,
+              // 2026-11-13: "use a blue text color for 'system prompt'"),
+              // so every light blue bubble reads the same way.
+              ...note(22, isNew ? mix(INK, PAPER, fill) : mix(INK, outlineInk("blue"), fill)),
               fontWeight: isNew ? 500 : undefined,
             }}
           >
