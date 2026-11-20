@@ -202,8 +202,8 @@ export const PlanMap: React.FC<{
         );
       })}
       <Ink at={groupAt[3]} dur={14} style={{ left: x, top: top + 3 * pitch + 6, whiteSpace: "nowrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, ...label(26, INK_SOFT) }}>
-          <span style={line(26, INK_SOFT)}>{quickLit === undefined ? "Quick:" : <Mark at={quickLit}>Quick:</Mark>}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, ...label(24, INK_SOFT) }}>
+          <span style={line(24, INK_SOFT)}>{quickLit === undefined ? "Quick:" : <Mark at={quickLit}>Quick:</Mark>}</span>
           <OutlineBadge tone="gray" size={22}>
             11
           </OutlineBadge>

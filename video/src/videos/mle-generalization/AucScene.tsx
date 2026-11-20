@@ -32,6 +32,8 @@ export const AucScene: React.FC = () => {
   const textAt = n.word("auc", "What is ar-oh-see");
   const rocAt = n.word("auc", "The ROC curve plots");
   const everyAt = n.word("auc", "at every threshold");
+  const tprAt = n.word("auc", "true positive rate");
+  const fprAt = n.word("auc", "false positive rate");
   const areaAt = n.word("auc", "Its area is the chance");
   const nineOneAt = n.word("auc-fraud", "point nine one");
   const dividesAt = n.word("auc-fraud", "divides by ninety-nine thousand");
@@ -98,13 +100,6 @@ export const AucScene: React.FC = () => {
             area <span style={{ display: "inline-block", transform: `scale(${1 + 0.12 * pulse(frame, nineOneAt, 20)})` }}>{fmt(FRAUD.rocAuc)}</span>
           </span>
         </Say>
-        <Say at={areaAt + 10} x={at(rx, 0.42)} y={at(ry, 0.36) + h(50)}>
-          <span style={line(21, INK_SOFT)}>
-            the chance a random fraud
-            <br />
-            outscores a random legitimate one
-          </span>
-        </Say>
         <Svg opacity={ease(frame, onePctAt, 10)}>
           <circle cx={markX} cy={markY} r={13 + 5 * pulse(frame, onePctAt, 20)} fill="none" stroke={ACCENT} strokeWidth={3.4} />
         </Svg>
@@ -113,9 +108,22 @@ export const AucScene: React.FC = () => {
         </Say>
         <Say at={dividesAt - 2} x={ROC.left} y={y(758)}>
           <span style={line(24, INK)}>
-            False positive rate: false alarms ÷ <span style={TABULAR}>{commas(FRAUD.legit)}</span> legitimate
+            Its false positive rate divides by <span style={TABULAR}>{commas(FRAUD.legit)}</span> legitimate
           </span>
         </Say>
+
+        {/* ── What the ROC curve is, where the PR curve will go ── */}
+        {[
+          { at: tprAt, text: <><b style={{ fontWeight: 500 }}>True positive rate:</b> frauds caught ÷ all frauds</> },
+          { at: fprAt, text: <><b style={{ fontWeight: 500 }}>False positive rate:</b> false alarms ÷ all legitimate</> },
+          { at: areaAt, text: <><b style={{ fontWeight: 500, color: BLUE_INK }}>Area:</b> the chance a random fraud</> },
+          { at: areaAt + 8, text: <>is scored above a random legitimate one</> },
+          { at: nineOneAt, text: <><span style={TABULAR}>{fmt(FRAUD.rocAuc)}</span> sounds strong</> },
+        ].map((r, i) => (
+          <Say key={i} at={r.at - 2} x={PR.left - 40} y={top + i * h(60) + (i >= 3 ? -h(16) : 0) + (i === 4 ? h(40) : 0)} out={prAt - 8}>
+            <span style={line(26, INK, 400)}>{r.text}</span>
+          </Say>
+        ))}
         <Say at={onePctAt - 2} x={ROC.left} y={y(758) + h(48)}>
           <span style={line(26, ACCENT_INK)}>
             At 1%: <span style={TABULAR}>{commas(at1.fp)}</span> false alarms

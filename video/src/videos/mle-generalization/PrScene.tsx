@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { M } from "../../editorial/math";
+import { I, M, MathRun } from "../../editorial/math";
 import { BAR, BLUE_INK, fmt, HIGHLIGHT, INK, INK_SOFT, TABULAR } from "../../editorial/style";
 import { ColumnRule } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -200,7 +200,10 @@ export const PrScene: React.FC = () => {
           </Say>
           <Say at={f1At - 2} x={1050} y={y(670)}>
             <span style={line(34, INK)}>
-              <M>F1 = 2PR / (P + R)</M>
+              <MathRun>
+                F1 = 2<I>P</I>
+                <I>R</I> / (<I>P</I> + <I>R</I>)
+              </MathRun>
             </span>
           </Say>
           <Say at={bothAt - 2} x={1050} y={y(670) + h(52)}>
@@ -243,16 +246,24 @@ export const PrScene: React.FC = () => {
                   <circle cx={mx} cy={at(cy, m.t.precision)} r={8 * ease(frame, m.pAt, 8)} fill={BAR} />
                   <circle cx={mx} cy={at(cy, m.t.recall)} r={8 * ease(frame, m.rAt, 8)} fill={SERIES2} />
                 </Svg>
-                <Say at={m.pAt} x={mx + 14} y={at(cy, m.t.precision) - 36}>
+                {/* Each label on the side its line leaves clear: precision
+                    rises to the right, recall falls. */}
+                <Say
+                  at={m.pAt}
+                  x={m.t.t > 0.3 ? mx - 12 : mx + 12}
+                  y={at(cy, m.t.precision) + (m.t.t > 0.3 ? -42 : 8)}
+                  width={80}
+                  align={m.t.t > 0.3 ? "right" : "left"}
+                >
                   <span style={{ ...line(24, BLUE_INK), ...TABULAR }}>{pct(m.t.precision)}</span>
                 </Say>
-                <Say at={m.rAt} x={mx + 14} y={at(cy, m.t.recall) + 4}>
+                <Say at={m.rAt} x={mx - 12} y={at(cy, m.t.recall) + 8} width={80} align="right">
                   <span style={{ ...line(24, SERIES2_INK), ...TABULAR }}>{pct(m.t.recall)}</span>
                 </Say>
               </React.Fragment>
             );
           })}
-          <Say at={thousandAt + 4} x={t1000X + 10} y={y(CHART.top) - h(34)}>
+          <Say at={thousandAt + 4} x={t1000X + 12} y={y(CHART.top) + 6}>
             <span style={line(22, INK)}>top 1,000</span>
           </Say>
 

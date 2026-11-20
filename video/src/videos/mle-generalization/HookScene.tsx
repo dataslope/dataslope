@@ -185,8 +185,8 @@ export const HookScene: React.FC = () => {
   const BX = X0;
   const BTOP = y(336);
   // ── The score, on the right ──
-  const SX = 1030;
-  const SW = 690;
+  const SX = 1110;
+  const SW = 620;
   const scaleY = y(700);
   const xAt = (v: number) => SX + SW * v;
   const count = Math.round(LEAK.leaky * 100 * ease(frame, eightyAt - 4, 20));
@@ -266,6 +266,9 @@ export const HookScene: React.FC = () => {
 
         {/* ── B: the question every round starts on, and the round ── */}
         <Spot id="mle-generalization-flamingo" at={langAt} x={1400} y={y(268)} w={300} />
+        <Say at={langAt + 2} x={X0} y={y(270)} out={twelveAt - 8}>
+          <span style={line(30, INK, 400)}>Language models didn’t retire classical machine learning</span>
+        </Say>
         <Say at={firstAt - 4} x={92} y={y(150)}>
           <span style={{ ...headline(66), whiteSpace: "nowrap" }}>Does it work on data it hasn’t seen?</span>
         </Say>

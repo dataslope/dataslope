@@ -137,9 +137,31 @@ export const RegScene: React.FC = () => {
         <Say at={bothAt - 2} x={X0} y={y(262)} out={outProd}>
           <span style={line(30, INK, 400)}>
             Both add a penalty on the weights to the loss
-            <span style={{ opacity: ease(frame, smallAt - 2, 10) }}>; they differ on a small weight</span>
           </span>
         </Say>
+
+        {/* ── The two penalties, while the question is asked ── */}
+        <Fade from={bothAt - 4} out={runAt - 6}>
+          {[
+            { tag: "L2", name: "Ridge", pen: <>loss + λ Σ <I>w</I>²</> },
+            { tag: "L1", name: "Lasso", pen: <>loss + λ Σ |<I>w</I>|</> },
+          ].map((r, i) => (
+            <Say key={r.tag} at={bothAt + 6 + i * 8} x={X0} y={y(400) + i * h(110)}>
+              <span style={{ ...line(44, INK), display: "inline-flex", alignItems: "center", gap: "0.4em" }}>
+                <OutlineBadge tone="ink" size={44}>
+                  {r.tag}
+                </OutlineBadge>
+                <span style={{ width: "4.2em" }}>{r.name}</span>
+                <MathRun>{r.pen}</MathRun>
+              </span>
+            </Say>
+          ))}
+          <Say at={smallAt} x={X0} y={y(400) + 2 * h(110) + h(20)}>
+            <span style={line(30, INK_SOFT, 400)}>
+              What happens to a <b style={{ color: INK, fontWeight: 500 }}>small</b> weight?
+            </span>
+          </Say>
+        </Fade>
 
         {/* ── The page's run: twenty coefficients under each penalty ── */}
         <Fade from={runAt - 4} out={outRun}>

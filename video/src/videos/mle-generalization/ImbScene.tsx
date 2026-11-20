@@ -67,7 +67,7 @@ export const ImbScene: React.FC = () => {
   // ── The table ──
   const T = { x: X0, top: y(330), w: 1420 };
   const COL = [X0 + 20, 860, 1150];
-  const rowH = h(78);
+  const rowH = h(96);
   const rows = [
     { name: "Recall at threshold 0.5", plain: pct(FRAUD.thresholds[0].recall), bal: pct(FRAUD.weighted.at.recall), at: recallAt, balAt: eightyAt, mark: HIGHLIGHT, ink: INK, note: "" },
     {
@@ -166,10 +166,10 @@ export const ImbScene: React.FC = () => {
           </div>
         ) : null}
         <Say at={trapAt} x={COL[1]} y={T.top + h(14)}>
-          <span style={line(24, INK_SOFT)}>Plain</span>
+          <span style={line(26, INK_SOFT)}>Plain</span>
         </Say>
         <Say at={balancedAt - 2} x={COL[2]} y={T.top + h(14)}>
-          <span style={line(24, INK_SOFT)}>Balanced class weights</span>
+          <span style={line(26, INK_SOFT)}>Balanced class weights</span>
         </Say>
         {rows.map((r, i) => {
           const top = T.top + h(60) + i * rowH;
@@ -177,19 +177,19 @@ export const ImbScene: React.FC = () => {
           return (
             <React.Fragment key={r.name}>
               {i > 0 ? <div style={{ position: "absolute", left: T.x, top, width: T.w, height: 1, background: `color-mix(in srgb, ${INK} 16%, transparent)`, opacity: ease(frame, r.at - 4, 10) }} /> : null}
-              <div style={{ position: "absolute", left: COL[2] - 14, top: top + h(14), width: 230 * mark, height: rowH - h(28), background: r.mark, borderRadius: 4 }} />
-              <Say at={r.at - 4} x={COL[0]} y={top + rowH / 2 - 19}>
-                <span style={line(29, INK)}>{r.name}</span>
+              <div style={{ position: "absolute", left: COL[2] - 14, top: top + h(20), width: 124 * mark, height: rowH - h(40), background: r.mark, borderRadius: 4 }} />
+              <Say at={r.at - 4} x={COL[0]} y={top + rowH / 2 - 21}>
+                <span style={line(32, INK)}>{r.name}</span>
               </Say>
-              <Say at={r.at} x={COL[1]} y={top + rowH / 2 - 19}>
-                <span style={{ ...line(29, INK), ...TABULAR }}>{r.plain}</span>
+              <Say at={r.at} x={COL[1]} y={top + rowH / 2 - 21}>
+                <span style={{ ...line(32, INK), ...TABULAR }}>{r.plain}</span>
               </Say>
-              <Say at={r.balAt - 2} x={COL[2]} y={top + rowH / 2 - 19}>
-                <span style={{ ...line(29, r.ink), ...TABULAR }}>{r.bal}</span>
+              <Say at={r.balAt - 2} x={COL[2]} y={top + rowH / 2 - 21}>
+                <span style={{ ...line(32, r.ink), ...TABULAR }}>{r.bal}</span>
               </Say>
               {r.note && r.noteAt ? (
-                <Say at={r.noteAt - 2} x={COL[2] + 120} y={top + rowH / 2 - 19}>
-                  <span style={{ ...line(26, INK_SOFT), ...TABULAR }}>{r.note}</span>
+                <Say at={r.noteAt - 2} x={COL[2] + 170} y={top + rowH / 2 - 21}>
+                  <span style={{ ...line(30, INK_SOFT), ...TABULAR }}>{r.note}</span>
                 </Say>
               ) : null}
             </React.Fragment>
@@ -198,7 +198,7 @@ export const ImbScene: React.FC = () => {
 
         {/* ── What to do ── */}
         {steps.map((s, i) => (
-          <Say key={s.text} at={(s.lead ?? s.at) - 2} x={X0} y={y(680) + i * h(64)}>
+          <Say key={s.text} at={(s.lead ?? s.at) - 2} x={X0} y={y(720) + i * h(66)}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 16, fontSize: 28 }}>
               <Tick at={s.at} size={26} color={OK} />
               <span style={line(28, OK_INK)}>{s.text}</span>

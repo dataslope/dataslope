@@ -66,7 +66,7 @@ export const SplitScene: React.FC = () => {
   const segX = segW.map((_, i) => BAR_L + segW.slice(0, i).reduce((a, b) => a + b, 0));
   const segs = [
     { name: "Train", size: SPLIT.sizes[0], role: "fits the parameters", at: trainAt, fill: ds("blue", 500) },
-    { name: "Validation", size: SPLIT.sizes[1], role: "chooses models and settings", at: valAt, fill: ds("blue", 300) },
+    { name: "Validation", size: SPLIT.sizes[1], role: <>chooses models<br />and settings</>, at: valAt, fill: ds("blue", 300) },
     { name: "Test", size: SPLIT.sizes[2], role: "touched once", at: testAt, fill: ds("blue", 200) },
   ];
   const barTop = y(330);
@@ -74,8 +74,8 @@ export const SplitScene: React.FC = () => {
   const rolesOut = chooseAt - 6;
 
   // ── One repeat: fifty settings as fifty dots ──
-  const dotBase = y(650);
-  const pitch = h(13);
+  const dotBase = y(690);
+  const pitch = h(10);
   const counts = new Map<number, number>();
   const dots = SPLIT.first.val.map((v, i) => {
     const k = Math.round(v / BIN);
@@ -88,10 +88,10 @@ export const SplitScene: React.FC = () => {
 
   // ── Two hundred repeats: two histograms ──
   const rows = [
-    { name: "The winner, on validation", vals: SPLIT.winnerVal, base: y(612), color: ACCENT, ink: ACCENT_INK, mean: SPLIT.meanWinnerVal, at: repeatsAt, meanAt: sixtyAt, prod: "Reported", prodAt: reportAt },
-    { name: "The same winner, on test", vals: SPLIT.winnerTest, base: y(830), color: BAR, ink: BLUE_INK, mean: SPLIT.meanWinnerTest, at: testFiftyAt - 6, meanAt: testFiftyAt, prod: "In production", prodAt: shipAt },
+    { name: "The winner, on validation", vals: SPLIT.winnerVal, base: y(616), color: ACCENT, ink: ACCENT_INK, mean: SPLIT.meanWinnerVal, at: repeatsAt, meanAt: sixtyAt, prod: "Reported", prodAt: reportAt },
+    { name: "The same winner, on test", vals: SPLIT.winnerTest, base: y(836), color: BAR, ink: BLUE_INK, mean: SPLIT.meanWinnerTest, at: testFiftyAt - 6, meanAt: testFiftyAt, prod: "In production", prodAt: shipAt },
   ];
-  const unit = h(140) / 53;
+  const unit = h(110) / 53;
   const binW = ((HX.b - HX.a) * BIN) / (HX.hi - HX.lo);
   const halfX = at(HX, 0.5);
 
@@ -126,9 +126,9 @@ export const SplitScene: React.FC = () => {
                 </span>
               </Say>
               <Say at={s.at + 4} x={segX[i] + 4} y={barTop + barH + h(16)} out={rolesOut}>
-                <span style={{ ...line(24, INK_SOFT), display: "inline-flex", alignItems: "center", gap: "0.35em" }}>
+                <span style={{ ...line(24, INK_SOFT), display: "inline-flex", alignItems: "flex-start", gap: "0.35em" }}>
                   {s.name === "Test" ? <Lock size={24} strokeWidth={2.2} color={INK} /> : null}
-                  {s.role}
+                  <span>{s.role}</span>
                 </span>
               </Say>
             </React.Fragment>
@@ -140,7 +140,7 @@ export const SplitScene: React.FC = () => {
 
         {/* ── One repeat: fifty settings, the best kept ── */}
         <Fade from={chooseAt - 4} out={dotsOut}>
-          <Say at={coinAt - 2} x={X0} y={y(452)}>
+          <Say at={coinAt - 2} x={X0} y={y(424)}>
             <span style={line(26, INK)}>
               Labels made coin flips<span style={{ opacity: ease(frame, fiftyAt - 2, 10) }}>: fifty settings, each scored on the 40 validation rows</span>
             </span>
@@ -150,10 +150,10 @@ export const SplitScene: React.FC = () => {
             {[0.3, 0.4, 0.5, 0.6, 0.7].map((v) => (
               <line key={v} x1={at(HX, v)} x2={at(HX, v)} y1={dotBase} y2={dotBase + 8} stroke={INK} strokeWidth={1.4} />
             ))}
-            <line x1={halfX} x2={halfX} y1={dotBase} y2={dotBase - h(190) * ease(frame, worthAt, 16)} stroke={INK_SOFT} strokeWidth={2.4} strokeDasharray="7 6" />
+            <line x1={halfX} x2={halfX} y1={dotBase} y2={dotBase - h(170) * ease(frame, worthAt, 16)} stroke={INK_SOFT} strokeWidth={2.4} strokeDasharray="7 6" />
             {dots.map((d, i) => {
               const s = ease(frame, d.at, 8);
-              return s > 0 ? <circle key={i} cx={d.x} cy={d.y} r={6 * s} fill={BAR} opacity={0.85} /> : null;
+              return s > 0 ? <circle key={i} cx={d.x} cy={d.y} r={5 * s} fill={BAR} opacity={0.85} /> : null;
             })}
             <circle cx={best.x} cy={best.y} r={(14 + 5 * pulse(frame, bestAt, 20)) * ease(frame, bestAt, 10)} fill="none" stroke={LIT_LINE} strokeWidth={3.4} />
           </Svg>
@@ -162,7 +162,7 @@ export const SplitScene: React.FC = () => {
               <span style={{ ...label(21, INK_SOFT), ...TABULAR }}>{pct(v)}</span>
             </Say>
           ))}
-          <Say at={worthAt} x={halfX + 14} y={dotBase - h(214)}>
+          <Say at={worthAt} x={halfX + 14} y={dotBase - h(196)}>
             <span style={line(23, INK_SOFT)}>every model’s true worth</span>
           </Say>
           <Say at={bestAt + 4} x={best.x + 22} y={best.y - h(44)}>
@@ -196,7 +196,7 @@ export const SplitScene: React.FC = () => {
                     x1={at(HX, r.mean)}
                     x2={at(HX, r.mean)}
                     y1={r.base + 4}
-                    y2={r.base - h(146) * ease(frame, r.meanAt, 14)}
+                    y2={r.base - h(122) * ease(frame, r.meanAt, 14)}
                     stroke={INK}
                     strokeWidth={2.6}
                   />

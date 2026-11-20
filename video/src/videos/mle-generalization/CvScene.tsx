@@ -5,7 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { M } from "../../editorial/math";
 import { ACCENT, ACCENT_INK, BAR, HAIRLINE, headline, INK, INK_SOFT, label, TABULAR } from "../../editorial/style";
-import { ColumnRule } from "../../editorial/ui";
+import { ColumnRule, OutlineBadge } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -13,7 +13,7 @@ import { Sfx } from "../../sound/Sfx";
 import { CV } from "./data";
 import { Drift, Fade, line, LIT_INK, LIT_LINE, mulberry32, OK, OK_INK, pct, PlanMap, Q_SIZE, Say, StraightArrow, Svg, X0 } from "./parts";
 
-const FOLD_W = 104;
+const FOLD_W = 130;
 const FOLD_GAP = 12;
 const K = 5;
 
@@ -72,8 +72,8 @@ export const CvScene: React.FC = () => {
   const end = n.beat("score-in").to;
 
   const gridTop = y(336);
-  const rowP = h(66);
-  const boxH = h(46);
+  const rowP = h(72);
+  const boxH = h(52);
   const roundAt = (r: number) => (r === 0 ? splitAt : rotateAt + (r - 1) * ((onceAt - rotateAt) / 3));
   const scoreTimes = CV.folds.map((_, i) => fromAt + i * ((toAt + 16 - fromAt) / 4));
   const lo = Math.min(...CV.folds);
@@ -152,17 +152,17 @@ export const CvScene: React.FC = () => {
                         alignItems: "center",
                         justifyContent: "center",
                         opacity: p,
-                        ...label(20, held && lit > 0.5 ? LIT_INK : INK_SOFT),
+                        ...label(22, held && lit > 0.5 ? LIT_INK : INK_SOFT),
                       }}
                     >
                       {held && lit > 0.5 ? "validate" : marked > 0.5 || r > 0 ? "train" : `fold ${f + 1}`}
                     </div>
                   );
                 })}
-                <Say at={scoreTimes[r]} x={SCORE_X} y={rowTop + boxH / 2 - 17}>
+                <Say at={scoreTimes[r]} x={SCORE_X} y={rowTop + boxH / 2 - 19}>
                   <span
                     style={{
-                      ...line(28, CV.folds[r] === lo || CV.folds[r] === hi ? INK : INK_SOFT),
+                      ...line(30, CV.folds[r] === lo || CV.folds[r] === hi ? INK : INK_SOFT),
                       ...TABULAR,
                       fontWeight: CV.folds[r] === lo || CV.folds[r] === hi ? 600 : 500,
                     }}
@@ -176,27 +176,39 @@ export const CvScene: React.FC = () => {
           <Say at={scoreAt} x={SCORE_X} y={gridTop - h(56)}>
             <span style={line(24, INK_SOFT)}>the page’s scores</span>
           </Say>
-          <Say at={anyAt - 2} x={SCORE_X + 120} y={gridTop + 2 * rowP + boxH / 2 - 30}>
-            <span style={line(24, INK_SOFT)}>
-              any one could have
-              <br />
-              been your only one
-            </span>
+          <Say at={anyAt - 2} x={X0} y={gridTop + K * rowP + h(10)}>
+            <span style={line(26, INK_SOFT)}>Any one could have been your only validation set</span>
           </Say>
-          <Say at={meanAt - 2} x={X0} y={gridTop + K * rowP + h(30)}>
+          <Say at={meanAt - 2} x={X0} y={gridTop + K * rowP + h(60)}>
             <span style={line(32, INK)}>
               Mean <span style={TABULAR}>{pct(CV.mean, 1)}</span> ± <span style={TABULAR}>{(CV.std * 100).toFixed(1)}</span>
               <span style={{ opacity: ease(frame, steadyAt - 2, 10), color: OK_INK }}>: steadier than any one fold</span>
             </span>
           </Say>
-          <Say at={meanAt + 10} x={X0} y={gridTop + K * rowP + h(96)}>
+          <Say at={meanAt + 10} x={X0} y={gridTop + K * rowP + h(118)}>
             <div style={{ background: ds("gray", 50), borderLeft: `4px solid ${HAIRLINE}`, padding: "10px 18px", fontFamily: MONO, fontSize: 24, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
               {CV.printed}
             </div>
           </Say>
 
+          {/* The procedure, beside the folds, until when to use it */}
+          <ColumnRule x={1120} top={gridTop - h(56)} height={h(420)} at={splitAt + 4} />
+          {[
+            { at: splitAt, text: <>Split the data into <M>k</M> folds</> },
+            { at: trainAt, text: <>Train on all but one, validate on it</> },
+            { at: rotateAt, text: <>Rotate until each is held out once</> },
+          ].map((r, i) => (
+            <Say key={i} at={r.at - 2} x={1180} y={gridTop + i * h(80)} out={scarceAt - 8}>
+              <span style={{ ...line(28, INK, 400), display: "inline-flex", alignItems: "center", gap: "0.5em" }}>
+                <OutlineBadge tone="ink" size={28}>
+                  {i + 1}
+                </OutlineBadge>
+                {r.text}
+              </span>
+            </Say>
+          ))}
+
           {/* When to use it, beside the folds */}
-          <ColumnRule x={1135} top={gridTop - h(56)} height={h(420)} at={scarceAt - 4} />
           <Say at={scarceAt - 6} x={1180} y={gridTop - h(56)}>
             <span style={line(24, INK_SOFT)}>When to use it</span>
           </Say>
@@ -298,20 +310,20 @@ export const CvScene: React.FC = () => {
             </span>
           </Say>
           {Array.from({ length: 4 }, (_, r) => {
-            const top = y(480) + r * h(70);
+            const top = y(480) + r * h(74);
             const unit = 300;
             const trainW = unit * (r + 1);
-            const p = ease(frame, forwardAt - 10 + r * 5, 14);
+            const p = ease(frame, timeAt + 6 + r * 6, 14);
             return (
               <React.Fragment key={r}>
-                <div style={{ position: "absolute", left: X0, top, width: trainW * p, height: h(40), background: ds("blue", 500), borderRadius: 4 }} />
+                <div style={{ position: "absolute", left: X0, top, width: trainW * p, height: h(48), background: ds("blue", 500), borderRadius: 4 }} />
                 <div
                   style={{
                     position: "absolute",
                     left: X0 + trainW + 8,
                     top,
-                    width: (unit - 8) * ease(frame, forwardAt - 4 + r * 5, 12),
-                    height: h(40),
+                    width: (unit - 8) * ease(frame, timeAt + 14 + r * 6, 12),
+                    height: h(48),
                     background: `color-mix(in srgb, ${ds("yellow", 300)} 75%, transparent)`,
                     borderRadius: 4,
                   }}
@@ -319,11 +331,11 @@ export const CvScene: React.FC = () => {
               </React.Fragment>
             );
           })}
-          <StraightArrow from={[X0, y(480) + 4 * h(70) + h(10)]} to={[X0 + 1540, y(480) + 4 * h(70) + h(10)]} at={timeAt} color={INK} width={2.4} />
-          <Say at={timeAt + 6} x={X0 + 1560} y={y(480) + 4 * h(70) - h(6)}>
+          <StraightArrow from={[X0, y(480) + 4 * h(74) + h(10)]} to={[X0 + 1540, y(480) + 4 * h(74) + h(10)]} at={timeAt} color={INK} width={2.4} />
+          <Say at={timeAt + 6} x={X0 + 1560} y={y(480) + 4 * h(74) - h(6)}>
             <span style={line(22, INK_SOFT)}>time</span>
           </Say>
-          <Say at={forwardAt + 4} x={X0} y={y(480) + 4 * h(70) + h(30)}>
+          <Say at={forwardAt - 4} x={X0} y={y(480) + 4 * h(74) + h(30)}>
             <div style={{ display: "flex", gap: 30, alignItems: "center", ...label(22, INK_SOFT) }}>
               <span style={{ display: "inline-flex", gap: 10, alignItems: "center" }}>
                 <span style={{ width: 26, height: 14, background: ds("blue", 500), borderRadius: 3, display: "inline-block" }} />

@@ -3,7 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, headline, INK, INK_SOFT, label, TABULAR } from "../../editorial/style";
+import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LEAK } from "./data";
@@ -59,11 +60,12 @@ export const LeakScene: React.FC = () => {
   const pitchY = h(GRID.ch) + GRID.gap;
   const blockOut = fitAt - 6;
   const RX = 1060;
-  const majority = 1 - LEAK.positives / LEAK.rows;
+  // The commoner label: 109 of the 200 rows are ones.
+  const majority = Math.max(LEAK.positives / LEAK.rows, 1 - LEAK.positives / LEAK.rows);
 
   const cols = [
-    ...LEAKY_COLS.map((col) => ({ col, at: pickedAt + 4, color: HIGHLIGHT, out: insideAt })),
-    ...LEAKY_COLS.map((col) => ({ col, at: heldAt + 4, color: `color-mix(in srgb, ${ACCENT} 70%, transparent)`, rows: HELD, out: insideAt })),
+    ...LEAKY_COLS.map((col) => ({ col, at: pickedAt + 4, color: ds("yellow", 400), out: insideAt })),
+    ...LEAKY_COLS.map((col) => ({ col, at: heldAt + 4, color: `color-mix(in srgb, ${ACCENT} 90%, transparent)`, rows: HELD, out: insideAt })),
     ...HONEST_COLS.map((col) => ({ col, at: trainRowsAt, color: `color-mix(in srgb, ${OK} 60%, transparent)`, rows: [0, HELD[0]] as const })),
   ];
 
@@ -117,13 +119,13 @@ export const LeakScene: React.FC = () => {
               <span style={{ opacity: ease(frame, insideAt - 2, 10), color: INK_SOFT }}>; the pick now never sees it</span>
             </span>
           </Say>
-          <Say at={everyAt - 2} x={BX + 340} y={BTOP - h(48)}>
-            <span style={{ ...line(24, INK), opacity: 1 - ease(frame, insideAt, 10) }}>
-              <span style={{ background: HIGHLIGHT, padding: "0 0.2em", margin: "0 0.2em", borderRadius: 4 }}>20 columns</span> picked on every row
+          <Say at={everyAt - 2} x={BX} y={BTOP + GRID.rows * pitchY + h(56)}>
+            <span style={{ ...line(23, INK), opacity: 1 - ease(frame, insideAt, 10) }}>
+              <span style={{ background: ds("yellow", 400), padding: "0 0.2em", margin: "0 0.2em 0 0", borderRadius: 4 }}>20 columns</span> picked using every row
             </span>
           </Say>
-          <Say at={trainRowsAt + 2} x={BX + 340} y={BTOP - h(48)}>
-            <span style={line(24, OK_INK)}>picked on the training rows only</span>
+          <Say at={trainRowsAt + 2} x={BX} y={BTOP + GRID.rows * pitchY + h(56)}>
+            <span style={line(23, OK_INK)}>The pick redone on each fold’s training rows only</span>
           </Say>
         </Fade>
 

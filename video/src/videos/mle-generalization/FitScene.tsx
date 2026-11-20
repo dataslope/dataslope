@@ -168,8 +168,11 @@ export const FitScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Sfx name="el-tap" at={memAt} level={-32} />
-      <Sfx name="el-pencil" at={zeroAt} level={-36} />
-      <Sfx name="el-pencil" at={valAt} level={-36} />
+      <Sfx name="el-pencil" at={lowAt} level={-36} />
+      <Sfx name="el-pencil" at={highAt} level={-36} />
+      <Sfx name="el-tap" at={curvesAt} level={-34} />
+      <Sfx name="el-tap" at={zeroAt} level={-34} />
+      <Sfx name="el-tap" at={valAt} level={-34} />
       <Sfx name="el-whoosh" at={gapAt} level={-37} />
       {fixes.map((f) => (
         <Sfx key={f.text} name="el-tap" at={f.at} level={-34} />
@@ -207,11 +210,11 @@ export const FitScene: React.FC = () => {
         </Say>
 
         {/* ── The unpruned tree's learning curves ── */}
-        <Fade from={curvesAt - 4} out={treeOut}>
+        <Fade from={memAt - 4} out={treeOut}>
           <Say at={benchAt - 2} x={TREE.left} y={y(TREE.top) - h(92)}>
             <span style={line(24, INK_SOFT)}>Squared error on Friedman #1: 10 inputs, 5 of them noise</span>
           </Say>
-          <Say at={benchAt + 4} x={TREE.left} y={y(TREE.top) - h(50)}>
+          <Say at={memAt} x={TREE.left} y={y(TREE.top) - h(50)}>
             <div style={{ display: "flex", gap: 28, alignItems: "center", fontSize: 22 }}>
               <span style={line(24, INK)}>Unpruned tree</span>
               <Key color={BAR}>training</Key>
@@ -227,30 +230,30 @@ export const FitScene: React.FC = () => {
             xTicks={[]}
             yTicks={[0, 10, 20]}
             xTitle="training rows"
-            at={curvesAt}
+            at={memAt}
           />
-          <Svg opacity={ease(frame, curvesAt + 8, 12)}>
+          <Svg opacity={ease(frame, memAt + 8, 12)}>
             {SIZE_TICKS.map((v) => (
               <line key={v} x1={atLog(tx, v)} x2={atLog(tx, v)} y1={y(TREE.bottom) + 1} y2={y(TREE.bottom) + 7} stroke={INK} strokeWidth={1.2} />
             ))}
           </Svg>
           {SIZE_TICKS.map((v) => (
-            <Say key={v} at={curvesAt + 8} x={atLog(tx, v)} y={y(TREE.bottom) + 10} width={90} align="center">
+            <Say key={v} at={memAt + 8} x={atLog(tx, v)} y={y(TREE.bottom) + 10} width={90} align="center">
               <span style={{ ...label(20, INK_SOFT), ...TABULAR }}>{v.toLocaleString("en-US")}</span>
             </Say>
           ))}
           {/* The noise floor: what no model gets under. */}
-          <Svg opacity={ease(frame, curvesAt + 10, 12)}>
+          <Svg opacity={ease(frame, memAt + 10, 12)}>
             <line x1={TREE.left} x2={TREE.right} y1={at(ty, FIT.noise)} y2={at(ty, FIT.noise)} stroke={NOISE_C} strokeWidth={2.4} strokeDasharray="7 6" />
           </Svg>
           <Svg opacity={gapP * 0.9 * (1 - ease(frame, q3At - 6, 12))}>
             <polygon points={gapPoly} fill={HIGHLIGHT} style={{ clipPath: `inset(0 ${(1 - gapP) * 100}% 0 0)` }} />
           </Svg>
-          <LearningCurves c={FIT.tree} box={TREE} at={zeroAt} valAt={valAt} y={y} />
+          <LearningCurves c={FIT.tree} box={TREE} at={lowAt} valAt={highAt} y={y} />
           <Say at={stillAt - 2} x={lastX + 16} y={at(ty, FIT.tree.validation[last]) - 16}>
             <span style={{ ...line(23, INK), ...TABULAR }}>{fmt(FIT.tree.validation[last], 1)}</span>
           </Say>
-          <Say at={valAt + 6} x={atLog(tx, sizes[0]) + 22} y={at(ty, FIT.tree.validation[0]) - 30}>
+          <Say at={highAt + 6} x={atLog(tx, sizes[0]) + 22} y={at(ty, FIT.tree.validation[0]) - 30}>
             <span style={{ ...line(23, INK), ...TABULAR }}>{fmt(FIT.tree.validation[0], 1)}</span>
           </Say>
           <Say at={gapAt + 2} x={atLog(tx, 300) - 10} y={at(ty, 6.6)} out={q3At - 6}>
@@ -315,7 +318,7 @@ export const FitScene: React.FC = () => {
           <Say at={sevenAt + 10} x={bx + 14} y={(bTop + bBottom) / 2 - 18}>
             <span style={line(26, LIT_INK)}>bias</span>
           </Say>
-          <Say at={sevenAt} x={LINE.left + 190} y={at(ly, 16)}>
+          <Say at={sevenAt} x={LINE.left + 190} y={at(ly, 11.8)}>
             <span style={line(23, INK)}>
               both near <span style={TABULAR}>7</span>
               <span style={{ opacity: ease(frame, moveAt - 2, 10) }}>, and more rows won’t move them</span>
@@ -331,35 +334,35 @@ export const FitScene: React.FC = () => {
           items={needs.map((f, i) => ({ ...f, lit: i === 3 ? addAt : undefined }))}
           x={X0}
           top={y(TREE.top) - h(20)}
-          width={720}
-          pitch={h(82)}
-          size={30}
+          width={760}
+          pitch={h(100)}
+          size={32}
         />
         <Fade from={addAt - 4}>
           <Say at={addAt - 2} x={BAR_L} y={y(TREE.top) - h(92)}>
             <span style={line(24, INK_SOFT)}>The line’s squared error on 1,000 new rows</span>
           </Say>
           {bars.map((b, i) => {
-            const top = y(TREE.top) + h(20) + i * h(150);
+            const top = y(TREE.top) + h(20) + i * h(180);
             const g = ease(frame, b.at - 4, 18);
             return (
               <React.Fragment key={i}>
                 <Say at={b.at - 6} x={BAR_L} y={top}>
-                  <span style={line(26, INK)}>{b.name}</span>
+                  <span style={line(28, INK)}>{b.name}</span>
                 </Say>
                 <div
                   style={{
                     position: "absolute",
                     left: BAR_L,
-                    top: top + h(48),
+                    top: top + h(52),
                     width: (b.v / 7.5) * BAR_MAX * g,
-                    height: h(46),
+                    height: h(60),
                     background: b.color,
                     borderRadius: "0 4px 4px 0",
                   }}
                 />
-                <Say at={b.at + 4} x={BAR_L + (b.v / 7.5) * BAR_MAX + 18} y={top + h(48) + h(6)}>
-                  <span style={{ ...line(30, b.ink), ...TABULAR }}>{fmt(b.v, 1)}</span>
+                <Say at={b.at + 4} x={BAR_L + (b.v / 7.5) * BAR_MAX + 18} y={top + h(52) + h(10)}>
+                  <span style={{ ...line(34, b.ink), ...TABULAR }}>{fmt(b.v, 1)}</span>
                 </Say>
               </React.Fragment>
             );
