@@ -114,7 +114,9 @@ export const RegScene: React.FC = () => {
 
   const outRun = l2At - 6;
   const outWhy = prodAt - 6;
-  const outProd = mapAt - 6;
+  // The prod page stays until the map's headline arrives, so the group
+  // elastic net keeps is up for a moment after it is said.
+  const outProd = mapAt + 10;
 
   return (
     <AbsoluteFill>
@@ -131,10 +133,10 @@ export const RegScene: React.FC = () => {
       <Sfx name="el-chime" at={honestAt + 10} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.016}>
-        <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} out={outProd} size={Q_SIZE}>
+        <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} out={mapAt - 6} size={Q_SIZE}>
           L1 vs L2 regularization?
         </QuestionCard>
-        <Say at={bothAt - 2} x={X0} y={y(262)} out={outProd}>
+        <Say at={bothAt - 2} x={X0} y={y(262)} out={mapAt - 6}>
           <span style={line(30, INK, 400)}>
             Both add a penalty on the weights to the loss
           </span>
@@ -319,7 +321,7 @@ export const RegScene: React.FC = () => {
               <Say at={c.at - 2} x={c.x} y={y(560)}>
                 <span style={line(30, INK)}>{c.name}</span>
               </Say>
-              <Say at={(k === 1 ? groupAt : c.at) + 4} x={c.x} y={y(560) + h(66)}>
+              <Say at={(k === 1 ? elasticAt + 8 : c.at) + 4} x={c.x} y={y(560) + h(66)}>
                 <div style={{ display: "flex", gap: 18, fontSize: 30, alignItems: "center" }}>
                   {c.keep.map((kept, i) => (
                     <OutlineBadge key={i} tone={kept ? "blue" : "gray"} size={30} style={{ borderStyle: kept ? "solid" : "dashed", opacity: kept ? 1 : 0.7 }}>
@@ -332,7 +334,7 @@ export const RegScene: React.FC = () => {
                   ))}
                 </div>
               </Say>
-              <Say at={(k === 1 ? groupAt : c.at) + 8} x={c.x} y={y(560) + h(140)}>
+              <Say at={(k === 1 ? elasticAt + 14 : c.at) + 8} x={c.x} y={y(560) + h(140)}>
                 <span style={line(26, INK_SOFT)}>{c.note}</span>
               </Say>
             </React.Fragment>
@@ -340,10 +342,10 @@ export const RegScene: React.FC = () => {
         </Fade>
 
         {/* ── The round's map: the first movement done, the second lit ── */}
-        <Say at={fixAt - 2} x={92} y={y(150)}>
+        <Say at={fixAt + 4} x={92} y={y(150)}>
           <span style={{ ...headline(58), whiteSpace: "nowrap" }}>Every fix so far was judged on validation data</span>
         </Say>
-        <PlanMap x={X0} top={y(336)} width={1080} groupAt={[mapAt, mapAt + 3, mapAt + 6, mapAt + 9]} done={{ 0: fixAt + 6 }} lit={{ 1: honestAt }} />
+        <PlanMap x={X0} top={y(336)} width={1080} groupAt={[mapAt + 18, mapAt + 21, mapAt + 24, mapAt + 27]} done={{ 0: mapAt + 30 }} lit={{ 1: honestAt }} />
       </Drift>
     </AbsoluteFill>
   );

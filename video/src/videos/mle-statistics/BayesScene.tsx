@@ -9,7 +9,7 @@ import { ColumnRule, Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BAYES } from "./data";
-import { DATA, DATA_INK, Drift, Heading, HIGHLIGHT, Line, Mark, MUTED, Svg, X0 } from "./parts";
+import { DATA, DATA_INK, Drift, Heading, HIGHLIGHT, Line, Mark, MUTED, Svg, X0, QMark } from "./parts";
 
 const COLS = 64;
 const PITCH = 12;
@@ -74,7 +74,7 @@ export const BayesScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={12} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is <Mark at={n.word("q12", "Bayes' theorem?")}>Bayes&apos; theorem</Mark>?
+          What is <QMark at={n.word("q12", "Bayes' theorem?")} after="?">Bayes&apos; theorem</QMark>
         </QuestionCard>
 
         {/* ── The theorem: lower and larger while it is alone on the page,

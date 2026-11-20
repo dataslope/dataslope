@@ -10,7 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MODELS, PERM_MODELS, PERM_PAGE } from "./data";
-import { Baseline, DATA, Drift, Heading, Hist, Line, Mark, mulberry32, OK_INK, POINT, Svg, X0 } from "./parts";
+import { Baseline, DATA, Drift, Heading, Hist, Line, Mark, mulberry32, OK_INK, POINT, Svg, X0, QMark } from "./parts";
 
 const GROUP_B = ds("teal", 500);
 const DOT = 14;
@@ -118,7 +118,7 @@ export const PermScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is a <Mark at={n.word("q8", "a permutation test?")}>permutation test</Mark>?
+          What is a <QMark at={n.word("q8", "a permutation test?")} after="?">permutation test</QMark>
         </QuestionCard>
 
         {/* ── The page's two groups, shuffled ── */}

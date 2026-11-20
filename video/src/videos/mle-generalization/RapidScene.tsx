@@ -38,7 +38,7 @@ import {
 /** Where the answers go: right of the list. */
 const R_X = 800;
 const LOSS: Box = { left: 860, right: 1720, top: 440, bottom: 780 };
-const Y_LO = 5;
+const Y_LO = 2;
 const Y_HI = 11;
 
 /** 11. Early stopping, on a small network's validation loss. */
@@ -81,7 +81,7 @@ const Early: React.FC = () => {
           <Key color={INK}>validation</Key>
         </div>
       </Say>
-      <Axes x={ex} y={ey} xTicks={[1, 100, 200, 300, 400]} yTicks={[6, 8, 10]} xTitle="epoch" at={haltsAt - 2} />
+      <Axes x={ex} y={ey} xTicks={[1, 100, 200, 300, 400]} yTicks={[4, 6, 8, 10]} xTitle="epoch" at={haltsAt - 2} />
       <Curve points={train} x={ex} y={ey} at={haltsAt + 4} dur={30} color={BAR} width={3} clip={clip} />
       <Curve points={val} x={ex} y={ey} at={haltsAt + 10} dur={30} color={INK} width={3.4} clip={clip} />
       {/* Patience: the epochs after the best so far that it waits. */}
@@ -96,7 +96,7 @@ const Early: React.FC = () => {
         <line x1={stopX} x2={stopX} y1={y(LOSS.top)} y2={y(LOSS.bottom)} stroke={ACCENT} strokeWidth={2.4} strokeDasharray="6 6" opacity={red} />
         <circle cx={gX} cy={gY} r={(13 + 5 * pulse(frame, bestAt, 20)) * ease(frame, bestAt, 10)} fill="none" stroke={OK} strokeWidth={3.4} />
       </Svg>
-      <Say at={patienceAt + 4} x={(bestX + stopX) / 2} y={bestY - h(96)} width={240} align="center">
+      <Say at={patienceAt + 4} x={stopX + 14} y={bestY - h(70)}>
         <span style={line(23, red > 0.5 ? ACCENT_INK : LIT_INK)}>
           patience <span style={TABULAR}>{s.patience}</span>
         </span>
@@ -112,7 +112,7 @@ const Early: React.FC = () => {
           </span>
         </span>
       </Say>
-      <Say at={bestAt + 4} x={gX - 140} y={gY + h(26)} width={280} align="center">
+      <Say at={bestAt + 4} x={gX} y={gY - h(64)} width={280} align="center">
         <span style={line(23, OK_INK)}>
           epoch <span style={TABULAR}>{EARLY.globalBest}</span>
         </span>
@@ -164,10 +164,10 @@ const Metrics: React.FC = () => {
         <Axes x={xs} y={ys} xTicks={[0, 10, 20, 30, 40]} yTicks={[0, 2, 4, 6]} xTitle="the one big error" at={rmseAt - 2} />
         <Curve points={rmse} x={xs} y={ys} at={rmseAt + 4} dur={dominatesAt + 10 - rmseAt} color={SERIES2} width={3.6} />
         <Curve points={mae} x={xs} y={ys} at={maeAt} dur={lessAt + 8 - maeAt} color={BAR} width={3.6} />
-        <Say at={rmseAt + 4} x={B.left - 70} y={at(ys, rmse0) - 34}>
+        <Say at={rmseAt + 4} x={B.left + 12} y={at(ys, rmse0) - 36}>
           <span style={{ ...line(23, SERIES2_INK), ...TABULAR }}>{fmt(rmse0, 1)}</span>
         </Say>
-        <Say at={maeAt} x={B.left - 70} y={at(ys, mae0) - 4}>
+        <Say at={maeAt} x={B.left + 12} y={at(ys, mae0) + 12}>
           <span style={{ ...line(23, BLUE_INK), ...TABULAR }}>{fmt(mae0, 1)}</span>
         </Say>
         <Say at={dominatesAt} x={B.right + 16} y={at(ys, rmse1) - 18}>
@@ -187,7 +187,7 @@ const Metrics: React.FC = () => {
       </Fade>
       <Fade from={r2At - 4}>
         <Say at={r2At - 2} x={R_X + 40} y={y(380)}>
-          <span style={line(40, INK)}>
+          <span style={line(34, INK)}>
             <MathRun>
               <I>R</I>² = 1 − <span>your squared error</span> ÷ <span>the mean’s squared error</span>
             </MathRun>
@@ -196,7 +196,7 @@ const Metrics: React.FC = () => {
         {[
           { at: oneAt, v: "1", text: "perfect", ink: INK },
           { at: zeroAt, v: "0", text: "the mean’s own score", ink: INK },
-          { at: negAt, v: "Below 0", text: "on new data: worse than the mean", ink: INK },
+          { at: negAt, v: "Below 0", text: "worse than the mean, on new data", ink: INK },
         ].map((r, i) => (
           <Say key={r.v} at={r.at - 2} x={R_X + 40} y={y(500) + i * h(66)}>
             <span style={line(30, r.ink, 400)}>

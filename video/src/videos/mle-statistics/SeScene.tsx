@@ -9,7 +9,7 @@ import { ColumnRule, Ink, Leader, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MODELS, SE } from "./data";
-import { Area, Baseline, Curve, DATA, Drift, Heading, Line, Mark, MUTED, mulberry32, normalPoints, POINT, pulse, Svg, X0 } from "./parts";
+import { Area, Baseline, Curve, DATA, Drift, Heading, Line, Mark, MUTED, mulberry32, normalPoints, POINT, pulse, Svg, X0, QMark } from "./parts";
 
 const COLS = 50;
 const ROWS = 40;
@@ -109,8 +109,8 @@ export const SeScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={1} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is the difference between <Mark at={n.word("q1", "standard deviation and standard error", { nth: 1 })}>standard deviation</Mark> and{" "}
-          <Mark at={n.word("q1", "standard error?")}>standard error</Mark>?
+          What is the difference between <QMark at={n.word("q1", "standard deviation and standard error", { nth: 1 })}>standard deviation</QMark> and{" "}
+          <QMark at={n.word("q1", "standard error?")} after="?">standard error</QMark>
         </QuestionCard>
 
         {/* ── Left: the standard deviation ── */}
@@ -156,7 +156,7 @@ export const SeScene: React.FC = () => {
             <MathRun>
               <I>σ</I> = √(0.91 × 0.09) =
             </MathRun>{" "}
-            <span style={{ display: "inline-block", transform: `scale(${1 + 0.12 * pulse(frame, neverAt + 4, 20)})` }}>
+            <span style={{ display: "inline-block", transform: `scale(${1 + 0.12 * pulse(frame, neverAt + 4, 20)})`, transformOrigin: "0% 60%" }}>
               <Mark at={sdValueAt + 2}>
                 <MathRun style={{ fontWeight: 600 }}>{SE.sd.toFixed(2)}</MathRun>
               </Mark>

@@ -9,7 +9,7 @@ import { ColumnRule, Ink, Num, OutlineBadge } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { POWER } from "./data";
-import { Area, BAD, BAD_FILL, BAD_INK, Baseline, Curve, DATA, Drift, Line, Mark, normalPoints, OK_FILL, OK_INK, POINT, pulse, Svg, X0 } from "./parts";
+import { Area, BAD, BAD_FILL, BAD_INK, Baseline, Curve, DATA, Drift, Line, Mark, normalPoints, OK_FILL, OK_INK, POINT, pulse, Svg, X0, QMark } from "./parts";
 
 const L_X1 = 1000;
 const R_X0 = 1100;
@@ -128,8 +128,8 @@ export const PowerScene: React.FC = () => {
       <Drift from={from} to={end + 40}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.5 * ease(frame, trustedAt, Math.max(60, rightOneAt + 20 - trustedAt)) }}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What are <Mark at={n.word("q9", "type one and type two errors")}>Type I and Type II errors</Mark>, and what is{" "}
-          <Mark at={n.word("q9", "what is power?")}>power</Mark>?
+          What are <QMark at={n.word("q9", "type one and type two errors")} after=",">Type I and Type II errors</QMark> and what is{" "}
+          <QMark at={n.word("q9", "what is power?")} after="?">power</QMark>
         </QuestionCard>
 
         {/* ── The two worlds ── */}

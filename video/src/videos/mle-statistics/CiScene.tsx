@@ -9,7 +9,7 @@ import { ColumnRule, Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CI, SLICE } from "./data";
-import { BAD, BAD_INK, Baseline, DATA, Drift, Heading, HIGHLIGHT, Line, Mark, mulberry32, OK, OK_INK, POINT, pulse, Svg, X0 } from "./parts";
+import { BAD, BAD_INK, Baseline, DATA, Drift, Heading, HIGHLIGHT, Line, Mark, mulberry32, OK, OK_INK, POINT, pulse, Svg, X0, QMark } from "./parts";
 
 const STACK_X1 = 980;
 const LO = 0.874;
@@ -115,8 +115,8 @@ export const CiScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is a <Mark at={n.word("q4", "confidence interval, really?")}>confidence interval</Mark>,{" "}
-          <Mark at={n.word("q4", "really?")}>really</Mark>?
+          What is a <QMark at={n.word("q4", "confidence interval, really?")} after=",">confidence interval</QMark>{" "}
+          <QMark at={n.word("q4", "really?")} after="?">really</QMark>
         </QuestionCard>
 
         {/* ── A procedure ── */}

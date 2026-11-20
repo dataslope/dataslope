@@ -9,7 +9,7 @@ import { ColumnRule, Ink, Leader, Num, OutlineBadge } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CLT, LLN } from "./data";
-import { Baseline, Curve, DATA, Drift, Heading, Hist, Line, Mark, normalPoints, Svg, X0 } from "./parts";
+import { Baseline, Curve, DATA, Drift, Heading, Hist, Line, Mark, normalPoints, Svg, X0, QMark } from "./parts";
 
 const L_X1 = 780;
 const R_X0 = 960;
@@ -108,12 +108,12 @@ export const CltScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={2} at={qAt - 4} textAt={textAt - 4} out={q2Out} size={60}>
-          What does the <Mark at={n.word("q2", "Central Limit Theorem")}>Central Limit Theorem</Mark> say, and{" "}
-          <Mark at={n.word("q2", "why does it matter?")}>why does it matter</Mark>?
+          What does the <QMark at={n.word("q2", "Central Limit Theorem")}>Central Limit Theorem</QMark> say, and{" "}
+          <QMark at={n.word("q2", "why does it matter?")} after="?">why does it matter</QMark>
         </QuestionCard>
         <QuestionCard n={3} at={q3At} textAt={q3TextAt - 2} size={60}>
-          What is the <Mark at={n.word("q3", "Law of Large Numbers")}>Law of Large Numbers</Mark>, and how is it different from the{" "}
-          <Mark at={n.word("q3", "CLT?", { nth: 1 })}>CLT</Mark>?
+          What is the <QMark at={n.word("q3", "Law of Large Numbers")} after=",">Law of Large Numbers</QMark> and how is it different from the{" "}
+          <QMark at={n.word("q3", "CLT?", { nth: 1 })} after="?">CLT</QMark>
         </QuestionCard>
 
         {/* ── The theorem, in a line and a half ── */}

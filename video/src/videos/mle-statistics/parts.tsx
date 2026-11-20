@@ -6,6 +6,7 @@ import { OK, OK_INK } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
+import { Mark } from "../da-pandas/parts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -341,3 +342,15 @@ export const Spot: React.FC<{ id: SpotId; at: number; out?: number; x: number; y
 /** Red and green as the series means them, for a tone picked by name. */
 export const TONE_INK = { bad: BAD_INK, ok: OK_INK, point: POINT_INK, data: DATA_INK, ink: INK, soft: INK_SOFT } as const;
 export const TONE_LINE = { bad: BAD, ok: OK, point: POINT, data: DATA, ink: INK, soft: INK_SOFT } as const;
+
+/**
+ * A question's key term, highlighted as it is read (the page moves while the
+ * question is spoken). The punctuation after it stays with it on one line and
+ * takes back the highlight's bleed, so "error?" does not read "error ?".
+ */
+export const QMark: React.FC<{ at: number; after?: string; children: React.ReactNode }> = ({ at, after, children }) => (
+  <span style={{ whiteSpace: "nowrap" }}>
+    <Mark at={at}>{children}</Mark>
+    {after ? <span style={{ marginLeft: "-0.12em" }}>{after}</span> : null}
+  </span>
+);

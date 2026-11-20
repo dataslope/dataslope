@@ -9,7 +9,7 @@ import { ColumnRule, Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MLE } from "./data";
-import { BAD, BAD_INK, Baseline, Curve, DATA, Drift, Heading, Line, Mark, OK, OK_INK, POINT, Svg, X0 } from "./parts";
+import { BAD, BAD_INK, Baseline, Curve, DATA, Drift, Heading, Line, Mark, OK, OK_INK, POINT, Svg, X0, QMark } from "./parts";
 
 const P_X1 = 880;
 const R_X0 = 1000;
@@ -72,7 +72,7 @@ export const MleScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={11} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is <Mark at={n.word("q11", "maximum likelihood estimation?")}>Maximum Likelihood Estimation</Mark> (MLE)?
+          What is <QMark at={n.word("q11", "maximum likelihood estimation?")}>Maximum Likelihood Estimation</QMark> (MLE)?
         </QuestionCard>
         <Line at={pickAt} x={X0} y={y(282)} size={28}>
           Pick the parameters that make the observed data{" "}

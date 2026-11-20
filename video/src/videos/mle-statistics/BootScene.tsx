@@ -10,7 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { BOOT_P95, CLUSTER } from "./data";
-import { BAD, BAD_INK, Baseline, DATA, DATA_FILL, Drift, Heading, Hist, Line, Mark, MUTED, mulberry32, OK, OK_INK, POINT, Svg, X0 } from "./parts";
+import { BAD, BAD_INK, Baseline, DATA, DATA_FILL, Drift, Heading, Hist, Line, Mark, MUTED, mulberry32, OK, OK_INK, POINT, Svg, X0, QMark } from "./parts";
 
 const R_X0 = 980;
 const R_X1 = 1780;
@@ -119,8 +119,8 @@ export const BootScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={5} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is <Mark at={n.word("q5", "bootstrapping, and")}>bootstrapping</Mark>, and{" "}
-          <Mark at={n.word("q5", "when do you use it?")}>when do you use it</Mark>?
+          What is <QMark at={n.word("q5", "bootstrapping, and")} after=",">bootstrapping</QMark> and{" "}
+          <QMark at={n.word("q5", "when do you use it?")} after="?">when do you use it</QMark>
         </QuestionCard>
 
         {/* ── Left: ten points, resampled ── */}

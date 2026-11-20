@@ -257,7 +257,13 @@ export const PrScene: React.FC = () => {
                 >
                   <span style={{ ...line(24, BLUE_INK), ...TABULAR }}>{pct(m.t.precision)}</span>
                 </Say>
-                <Say at={m.rAt} x={mx - 12} y={at(cy, m.t.recall) + 8} width={80} align="right">
+                <Say
+                  at={m.rAt}
+                  x={m.t.t > 0.3 ? mx - 12 : mx + 12}
+                  y={at(cy, m.t.recall) + (m.t.t > 0.3 ? 8 : -40)}
+                  width={80}
+                  align={m.t.t > 0.3 ? "right" : "left"}
+                >
                   <span style={{ ...line(24, SERIES2_INK), ...TABULAR }}>{pct(m.t.recall)}</span>
                 </Say>
               </React.Fragment>
