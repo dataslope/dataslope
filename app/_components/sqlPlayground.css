@@ -6031,3 +6031,80 @@ html[data-playground-theme="light"]
     bottom: 72px;
   }
 }
+
+/* ─── Modals ───
+   Every dialog and side drawer sat on the grey `--bg2` surface inside a
+   1px frame, split into bands by rules under the header and over the
+   action row, with its read-only code boxed in white. They are now one
+   page-background surface (white, or the dark theme's own page colour)
+   with no frame and no rules: spacing separates the header, body and
+   actions. Borders stay only where they mark a field to type into or a
+   target to drop on, and on the structure grid, whose lines are the edges
+   of its seamless in-cell fields. */
+.confirm-popup,
+.sql-modify-drawer {
+  background: var(--bg);
+  border: 0;
+}
+
+.sql-modify-drawer-header,
+.sql-modify-drawer-footer,
+.sql-structure-drawer .sql-modify-drawer-footer,
+.sql-create-popup .confirm-actions,
+.sql-duplicate-popup .confirm-actions {
+  border-top: 0;
+  border-bottom: 0;
+  background: var(--bg);
+}
+
+/* The structure grid's header rows lose their grey band too; the rules
+   between cells still mark where each field starts. */
+.sql-modify-table thead th,
+.sql-modify-group-row th {
+  background: var(--bg);
+}
+
+/* Read-only code (a query plan, a CREATE statement, the SQL a dialog is
+   about to run) is set in the mono face, which already says what it is;
+   it no longer needs a box around it. Its padding goes with the box, so
+   it lines up with the label above it. */
+.sql-explain-plan {
+  border-top: 0;
+  border-bottom: 0;
+}
+
+.sql-ddl-code-wrap {
+  border: 0;
+  border-radius: 0;
+}
+
+.sql-create-preview {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* The index dialog's column checklist: rows separated by spacing alone.
+   The list reaches 9px past the body's edges so its checkboxes line up
+   with the labels while a hovered row's tint still has room around it.
+   It no longer scrolls on its own: without a frame, a 168px window cut a
+   row in half with nothing to say there was more, so a long table's
+   columns scroll with the rest of the dialog body instead. */
+.sql-create-cols {
+  margin: 0 -9px;
+  max-height: none;
+  overflow: visible;
+  border: 0;
+  border-radius: 6px;
+}
+
+.sql-create-col {
+  border-bottom: 0;
+  border-radius: 5px;
+}
+
+/* Tinted notices keep their tint and drop their outline. */
+.sql-import-warning,
+.sql-cell-modal-error {
+  border: 0;
+}
