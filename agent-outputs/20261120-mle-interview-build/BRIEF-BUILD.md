@@ -48,6 +48,44 @@ video, on a 4-core machine. The coordinator commits; you never do.
    through, colors against their meanings, payoffs that leave after a
    second, near-empty pages while an answer starts, lines through labels.
 
+## The owner's newest preferences (main, 2026-11-20, "badge review, rounds 1–4")
+
+The owner reviewed every series slide by slide (152 requests, #741). What
+they asked for, applied from your first draft:
+
+- **Badges: outlined or tinted, chosen per slide.** `OutlineBadge` /
+  `outlineBadgeStyle(tone, size)` from `src/editorial/ui.tsx`: no fill, a
+  2px border and text in one ink (`"ink"` near-black, or a hue). It was
+  asked for on many slides; prefer it for a tag that labels a thing. A
+  tinted `Badge` stays where a fill reads better, with its text in the
+  hue's ink (`outlineInk(tone)`), never black on a tint. **A black border
+  holds black text only**: a badge whose text keeps colors of its own
+  (syntax-colored code) stays tinted, never outlined in black.
+- **Outlined diagram boxes, black or blue edges.** Nodes, cells and chips:
+  no fill, black text, 2px near-black outline (a highlight colors outline
+  and text together). The lines that join them are black, or blue where
+  they carry data. Program and tool chips may carry a Lucide icon
+  (`lucide-react`), names in Title Case.
+- **Filled shapes have no outline.** Bars, grid squares, blocks, files and
+  folders are filled (a step deeper, such as blue 200, where they must hold
+  their shape on white) and carry no border.
+- **Corner radii are small**: 8 on boxes, 5 or 4 on small illustrative
+  blocks. Pills, discs and highlight bands keep their shapes.
+- **Math in the math face.** Formulas, big-O, Greek letters, p, H0,
+  sigma over root n, R², log loss, softmax: `<M>` (or `MathRun` and `I` for
+  live numbers and highlights, `mathText()` for notation inside a string)
+  from `src/editorial/math.tsx`, the house serif at Inter's x-height. A
+  display formula gets its own line; inline, `<M>` sits beside Inter
+  legally (`check:frames` allows `data-math`). Code stays in the mono face
+  at 0.92em in prose.
+- **Arrows meet the edges they connect**, and leave clear space after the
+  tip (about 38px before the next thing).
+- **Watercolors above column titles**, with room above and below, when a
+  scene of columns gets one image per column (columns that carry an image
+  or logo need no hairline between them).
+- **Lines that stand on their own start with a capital** (the README's
+  rule), and step notes under numbered steps sit at 24px.
+
 ## What you own, and what you must not touch
 
 You may create and edit only `V/src/videos/<folder>/` (replace the
