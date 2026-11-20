@@ -102,6 +102,26 @@ export const BATCHING = results.batching as {
   continuousSteps: number;
   continuousBusy: number;
   firstGroups: number[][];
+  /** The first 64 answer lengths in queue order (the continuous figure). */
+  firstLengths: number[];
+};
+
+/** Continuous batching on the queue's first answers, as check.mjs runs it:
+ *  each step a free slot takes the next waiting request, then every busy
+ *  slot makes one token. Each request's slot and its first and last step,
+ *  up to `horizon` steps. */
+export const continuousSchedule = (lengths: readonly number[], slots: number, horizon: number) => {
+  const out: { slot: number; start: number; end: number; len: number }[] = [];
+  const freeAt = Array.from({ length: slots }, () => 0);
+  for (const len of lengths) {
+    let j = 0;
+    for (let k = 1; k < slots; k++) if (freeAt[k] < freeAt[j]) j = k;
+    const start = freeAt[j];
+    if (start >= horizon) break;
+    out.push({ slot: j, start, end: start + len, len });
+    freeAt[j] = start + len;
+  }
+  return out;
 };
 
 /** "q4-sim": the speculative-decoding simulation (seed 11), 4-token drafts,

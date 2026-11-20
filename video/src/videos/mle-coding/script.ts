@@ -401,6 +401,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q9",
+      scene: true,
       text: "Question nine. How do you shuffle features and labels together correctly? One permutation, applied to both. Shuffle them separately, and every row gets another row's label. On the breast cancer data, logistic regression drops from ninety-six percent to fifty-three percent, worse than always guessing benign, at sixty-three.",
       pauseAfter: 0.8,
     },

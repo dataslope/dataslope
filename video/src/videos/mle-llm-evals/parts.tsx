@@ -8,7 +8,7 @@ import { OK, OK_INK } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { badgeStyle, type BadgeTone, outlineBadgeStyle, outlineInk, type OutlineTone } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -159,6 +159,7 @@ export const Tag: React.FC<{
     <span
       style={{
         ...base,
+        fontFamily: SANS,
         opacity: p * (1 - o) * (1 - d),
         transform: `translateY(${(1 - p) * 8}px)`,
         ...style,
@@ -170,8 +171,15 @@ export const Tag: React.FC<{
 };
 
 /** A numbered disc: a tint of its hue with the numeral in the hue's ink, no
- *  ring (README, "a numbered badge is a tinted disc"). */
-export const Disc: React.FC<{ n: React.ReactNode; size?: number; tone?: BadgeTone; lit?: number }> = ({ n, size = 44, tone = "gray", lit = 0 }) => {
+ *  ring (README, "a numbered badge is a tinted disc"). `text` is the size of
+ *  the line it sits on. */
+export const Disc: React.FC<{ n: React.ReactNode; size?: number; text?: number; tone?: BadgeTone; lit?: number }> = ({
+  n,
+  size = 44,
+  text,
+  tone = "gray",
+  lit = 0,
+}) => {
   const base = badgeStyle(tone, 24);
   return (
     <span
@@ -184,8 +192,9 @@ export const Disc: React.FC<{ n: React.ReactNode; size?: number; tone?: BadgeTon
         borderRadius: "50%",
         background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, ${base.background})` : base.background,
         color: base.color,
-        fontFamily: label().fontFamily,
-        fontSize: Math.round(size * 0.5),
+        fontFamily: SANS,
+        // The numeral matches the line beside it (one line, one size).
+        fontSize: text ?? Math.round(size * 0.5),
         fontWeight: 600,
         lineHeight: 1,
         flex: "none",
@@ -315,7 +324,7 @@ export const Box: React.FC<{
         }}
       >
         {Icon ? <Icon size={size} color={ink} strokeWidth={2} style={{ flex: "none" }} /> : null}
-        {title}
+        <span>{title}</span>
       </span>
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", lineHeight: 1.15 }}>{sub}</span> : null}
     </div>

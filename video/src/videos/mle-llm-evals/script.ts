@@ -439,7 +439,7 @@ export const script: NarrationScript = {
     {
       id: "q4-idem",
       text: "And idempotent tools, since a retried step can run twice. Filing the same ticket twice should still leave one ticket.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
     {
       id: "q4-compound",

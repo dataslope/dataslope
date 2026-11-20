@@ -463,6 +463,7 @@ export const script: NarrationScript = {
     },
     {
       id: "close",
+      scene: true,
       text: "Most of these come down to bytes: the weights each step reads, and the cache each request holds.",
       pauseAfter: 0.7,
     },

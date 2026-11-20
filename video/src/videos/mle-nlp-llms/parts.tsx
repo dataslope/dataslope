@@ -9,7 +9,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, outlineBadgeStyle, type OutlineTone } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -302,7 +302,7 @@ export const Chip: React.FC<{
         ...style,
       }}
     >
-      <span style={{ ...outlineBadgeStyle(tone, size), fontFamily: mono ? MONO : undefined, fontVariantLigatures: "none", whiteSpace: "pre" }}>
+      <span style={{ ...outlineBadgeStyle(tone, size), fontFamily: mono ? MONO : SANS, fontVariantLigatures: "none", whiteSpace: "pre" }}>
         {children}
       </span>
     </div>
@@ -532,4 +532,4 @@ export const ColHead: React.FC<{ at: number; x: number; y: number; w: number; co
   );
 };
 
-export { INK as TEXT, headline };
+

@@ -108,7 +108,7 @@ def settle(lr, X=Xg, y=yg, tol=1e-3, cap=200000):
     return None
 H = Xg.T @ Xg / 100
 eig = np.linalg.eigvalsh(H)
-_, _, page_loss = full_run(0.01, 500)
+_, page_path, page_loss = full_run(0.01, 500)
 _, _, div_loss = full_run(2.5, 30)
 _, fast_path, fast_loss = full_run(0.9, 30)
 R["gd"] = {
@@ -118,6 +118,12 @@ R["gd"] = {
     "eigenvalues": [r4(v) for v in eig], "limit": r3(2 / eig.max()),
     "settle": {str(lr): settle(lr) for lr in [0.01, 0.1, 0.5, 0.9, 1.5, 1.9]}, "diverges": {str(lr): settle(lr) is None for lr in [2.0, 2.05, 2.5]},
     "minLoss": r4(loss(ols)),
+    # The bowl the video draws over (theta1, theta2): the loss's curvature in
+    # the two weights with the bias held at its best, so a contour of loss L
+    # is (d^T H d) = L - minLoss around the least-squares answer.
+    "bowl": [[r4(v) for v in row] for row in H[1:, 1:]],
+    # The page's run in (theta1, theta2), every tenth step.
+    "pagePath": [[r3(p[1]), r3(p[2])] for p in page_path[::10]],
 }
 # Batch, mini-batch and single-row steps: thirty updates each at one rate,
 # from zeros, rows shuffled each pass (seed 0). Path in (theta1, theta2).
@@ -300,6 +306,10 @@ R["ensemble"] = {
     "tree": r3(tree.score(Xde, yde)), "bagged": r3(bag.score(Xde, yde)), "forest": r3(forest.score(Xde, yde)),
     "baggedCurve": bag_curve, "forestCurve": forest_curve,
     "baggedSingle": bag_single, "forestSingle": forest_single,
+    # The first image (a zero), and the eight pixels one split may try, drawn
+    # at random (seeded) as a forest draws them: the square root of 64.
+    "digit": [int(v) for v in Xd[0]], "digitLabel": int(yd[0]),
+    "split": sorted(int(i) for i in np.random.default_rng(0).choice(64, 8, replace=False)),
     # The page's chart of the same formula: the variance of an average of n
     # equally correlated models, in units of one model's, at its correlations.
     "formula": {str(rho): [[k, r4(rho + (1 - rho) / k)] for k in range(1, 41)] for rho in (0.6, 0.3)},

@@ -62,7 +62,7 @@ console.log(JSON.stringify({ ...results, pages: undefined }));
 
 // Node strips the types from script.ts and data.ts.
 const { script } = await import(new URL("./script.ts", import.meta.url).href);
-const { PARTS, ANSWERED_HERE, QUESTIONS, ANSWERS, TOGETHER, questionsOf, PROBES, ALSO_ON_TRACK, ADDED } = await import(new URL("./data.ts", import.meta.url).href);
+const { PARTS, ANSWERED_HERE, QUESTIONS, ANSWERS, TOGETHER, questionsOf, PROBES, ALSO_ON_TRACK, ADDED, STILL_ASKED, HEROES_IN } = await import(new URL("./data.ts", import.meta.url).href);
 const problems = [];
 const warnings = [];
 
@@ -77,7 +77,7 @@ if (results.indexQuestions !== 0) problems.push(`index.mdx now asks ${results.in
 if (QUESTIONS + ANSWERED_HERE.questions !== results.totalQuestions) problems.push(`the parts and this video answer ${QUESTIONS} + 1, the pages ask ${results.totalQuestions}`);
 for (const x of PARTS) if (x.together < 0 || x.together >= questionsOf(x)) problems.push(`Part ${x.n} answers ${x.together} together out of ${questionsOf(x)}`);
 // Every part a label points at exists.
-for (const row of [...PROBES, ALSO_ON_TRACK, ...ADDED]) for (const n of row.parts) if (!PARTS.some((x) => x.n === n)) problems.push(`"${row.name}" points at Part ${n}, which is not in PARTS`);
+for (const row of [...PROBES, ALSO_ON_TRACK, ...ADDED, ...STILL_ASKED]) for (const n of row.parts) if (!PARTS.some((x) => x.n === n)) problems.push(`"${row.name}" points at Part ${n}, which is not in PARTS`);
 
 // PARTS against the plan's "Check" line, when the plan is there.
 const planUrl = new URL("../../../../agent-outputs/20261120-1400-machine-learning-engineer-interview-video-plan.md", import.meta.url);
@@ -112,6 +112,16 @@ for (const x of PARTS) {
   const ids = JSON.parse(readFileSync(file, "utf8")).prompts.map((p) => p.id);
   if (!ids.includes(x.hero)) warnings.push(`Part ${x.n}: ${x.video}/illustrations.json has no "${x.hero}" (it has ${ids.join(", ")})`);
 }
+
+// The heroes the series chart draws (data.ts HEROES_IN), against the files:
+// a listed hero with no file would fail every render, and a file not listed
+// is a hero left off the chart.
+for (const x of PARTS) {
+  const there = existsSync(new URL(`../../../public/images/${x.video}/${x.hero}.webp`, import.meta.url));
+  if (HEROES_IN.has(x.video) && !there) problems.push(`Part ${x.n}: HEROES_IN lists ${x.video}, but public/images/${x.video}/${x.hero}.webp is not there`);
+  if (!HEROES_IN.has(x.video) && there) warnings.push(`Part ${x.n}: ${x.hero}.webp is in public/images/ now; add "${x.video}" to HEROES_IN in data.ts`);
+}
+for (const v of HEROES_IN) if (!PARTS.some((x) => x.video === v)) problems.push(`HEROES_IN lists ${v}, which is not a part`);
 
 // What the narration quotes, still on the pages.
 const quotes = [

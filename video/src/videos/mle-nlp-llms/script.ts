@@ -50,7 +50,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Each deep dive reads its question in a beat of its own ("q4") and answers
  * from the next ("q4-a"); a one-line turn closes a scene before the next
  * topic ("emb-in", "attn-in", "tf-in", "cost-in", "train-in", "lora-in",
- * "rag-in"), so the nineteen read as one argument.
+ * "rag-in"), so the nineteen read as one argument. Every question opens a
+ * scene of its own (the builder marked q3, q5, q7, q9, q11, q14 and the
+ * bridge `scene: true` too), so each gets a full page and the scene gap.
  *
  * The angle is the ML engineer's: what each choice costs (vocabulary against
  * sequence length against the embedding table, attention's pairs against

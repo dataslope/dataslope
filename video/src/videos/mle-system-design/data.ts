@@ -11,9 +11,8 @@ import results from "./results.json" with { type: "json" };
 export const VIDEO = "mle-system-design";
 
 /** Whether public/images/mle-system-design/ holds the watercolors from
- *  illustrations.json (the giraffe and four spots). The builder generates
- *  them and sets this. */
-export const ILLUSTRATIONS = false;
+ *  illustrations.json (the giraffe and four spots). */
+export const ILLUSTRATIONS = true;
 
 /** Pyodide's Python, scikit-learn and NumPy versions the runs used. */
 export const RUNTIME = results.runtime as { python: string; sklearn: string; numpy: string };
@@ -82,6 +81,11 @@ export const QUANT = results.quant as {
   test: number;
   train: number;
   rows: { bits: number; weightBytes: number; accuracy: number; changed: number; fixed: number; broke: number }[];
+  /** The first eight held-out digits (8x8 pixels, 0 to 16, row by row), with
+   *  the 32-bit network's answer. */
+  gallery: { image: number[]; label: number; pred: number }[];
+  /** The held-out digits whose answer changes at 4 bits, both answers. */
+  changed4: { index: number; image: number[]; label: number; pred32: number; pred4: number }[];
 };
 
 /** Quick round, distillation: the same network's probabilities (digits 0 to

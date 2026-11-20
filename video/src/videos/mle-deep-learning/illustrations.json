@@ -26,12 +26,6 @@
       "subject": "an orangutan sitting upright with its long arms resting loosely across its knees, its shaggy reddish-orange coat hanging in soft strands, its broad face turned slightly toward us with a calm, thoughtful expression; one large, bold, simple silhouette that reads at a small size"
     },
     {
-      "id": "mle-deep-learning-chain",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a short length of thick metal chain, five large oval links lying in a gentle curve"
-    },
-    {
       "id": "mle-deep-learning-dice",
       "category": "video-icon",
       "style": "watercolor illustration",
@@ -44,10 +38,10 @@
       "subject": "a round magnifying glass with a thick handle, lying at a slight tilt, its lens clear and empty"
     },
     {
-      "id": "mle-deep-learning-padlock",
+      "id": "mle-deep-learning-dominoes",
       "category": "video-icon",
       "style": "watercolor illustration",
-      "subject": "a sturdy closed padlock with a thick rounded shackle and a plain keyhole"
+      "subject": "a short row of five thick wooden dominoes standing on their ends in a gentle curve, the first one tipped over against the second, the second just starting to lean onto the third, the rest still upright, their faces plain with no dots"
     }
   ]
 }

@@ -26,22 +26,16 @@
       "subject": "a flamingo standing calmly on one leg, its long neck curved in a gentle S and its head turned slightly to one side, looking ahead with a patient, attentive expression; one large, bold, simple silhouette that reads at a small size"
     },
     {
-      "id": "mle-generalization-coin",
+      "id": "mle-generalization-faucet",
       "category": "video-icon",
       "style": "watercolor illustration",
-      "subject": "a single thick round coin standing on its edge, tilted slightly, with a plain raised rim and a smooth blank face"
+      "subject": "a single old-fashioned water tap on a short length of thick pipe, seen from the side, its round handle on top and its curved spout pointing down, one fat drop of water falling from the spout"
     },
     {
       "id": "mle-generalization-target",
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a round target board with three thick concentric rings, a tight cluster of four darts stuck just off its centre"
-    },
-    {
-      "id": "mle-generalization-card",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a thick plain payment card lying at a slight tilt, a small square chip on its face and no writing or numbers on it"
     }
   ]
 }

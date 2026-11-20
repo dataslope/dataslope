@@ -60,6 +60,8 @@ export const BACKPROP = results.backprop as {
   checked: number;
   worstRelError: number;
   batch: number;
+  /** Each checked weight's gradient: [by nudging, by backprop]. */
+  pairs: [number, number][];
 };
 
 /** Question 5: the gradient reaching each layer, as a share of what left the

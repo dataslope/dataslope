@@ -559,6 +559,7 @@ export const script: NarrationScript = {
     },
     {
       id: "close",
+      scene: true,
       text: "Features in, predictions out, labels back: that's the system around the model.",
       pauseAfter: 0.7,
     },

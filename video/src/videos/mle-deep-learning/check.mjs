@@ -123,6 +123,7 @@ for i in reversed(range(len(Ws))):
     if i > 0:
         g = (g @ Ws[i].T) * (As[i - 1] > 0)
 errs = []
+pairs = []
 eps = 1e-6
 for k in range(20):
     li = int(rng.integers(0, len(Ws))); W = Ws[li]
@@ -132,11 +133,14 @@ for k in range(20):
     W[i, j] = old - eps; down = loss(Ws, bs)
     W[i, j] = old
     num = (up - down) / (2 * eps)
+    pairs.append([float(f"{num:.4g}"), float(f"{gW[li][i, j]:.4g}")])
     errs.append(abs(num - gW[li][i, j]) / max(1e-12, abs(num) + abs(gW[li][i, j])))
 R["backprop"] = {
     "sizes": sizes, "params": int(params), "forwardMacs": int(fwd), "backwardMacs": int(bwd),
     "backwardOverForward": r2(bwd / fwd), "nudgePasses": int(params + 1),
     "checked": len(errs), "worstRelError": float(f"{max(errs):.2g}"), "batch": int(len(yb)),
+    # Each checked weight's gradient, measured by nudging and by backprop.
+    "pairs": pairs,
 }
 
 # ── 5. Vanishing and exploding: a seeded simulation, 20 layers of 128 ──

@@ -7,8 +7,8 @@ import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "mle-llm-evals";
 
-/** The pelican and the three spots (balance scale, wrench, chain) in
- *  illustrations.json; generated and imported by the builder. */
+/** The pelican and the two spots (balance scale, chain) in
+ *  illustrations.json, in public/images/mle-llm-evals/. */
 export const ILLUSTRATIONS = true;
 
 /** "q2-case", "q2-read": the page's third concept check. Shares of pairs:

@@ -61,6 +61,26 @@ export const PARTS: readonly Part[] = [
   { n: 10, title: "LLM evals", video: "mle-llm-evals", hero: "mle-llm-evals-pelican", from: { "llm-systems-and-evals": 6 }, together: 0 },
 ];
 
+/** The topic videos whose hero is in public/images/<video>/<hero>.webp
+ *  already. The ten parts are drawn alongside this one, and a render cannot
+ *  look for a file that may not be there (a missing image fails it), so the
+ *  series chart draws a part's hero only once its folder is listed here, and
+ *  leaves the rest out. check.mjs fails when a listed hero's file is missing
+ *  and warns when a hero's file is there but not listed, so switching one on
+ *  is one line. */
+export const HEROES_IN: ReadonlySet<string> = new Set([
+  "mle-generalization",
+  "mle-models",
+  "mle-coding",
+  "mle-statistics",
+  "mle-deep-learning",
+  "mle-nlp-llms",
+  "mle-system-design",
+  "mle-mlops",
+  "mle-serving-llms",
+  "mle-llm-evals",
+]);
+
 /** A part's page questions: the height of its bar (13 to 31; 4 and 6 for
  *  the LLM parts). */
 export const questionsOf = (p: Part): number => Object.values(p.from).reduce((a, b) => a + (b ?? 0), 0);
@@ -119,6 +139,17 @@ export const PROBES: readonly { name: string; topics: string; parts: number[] }[
   { name: "MLOps", topics: "reproducibility, versioning data and models, CI/CD, latency and cost", parts: [8] },
 ];
 export const ALSO_ON_TRACK = { name: "Also on the track", topics: "statistics, deep learning, NLP and LLMs", parts: [4, 5, 6] } as const;
+
+/** What the LLM page says is still asked ("llm": "Classical ML did not
+ *  leave: expect bias and variance, leakage, metrics, and a coding round"),
+ *  and the parts that answer each: the first three are Part 1's, the coding
+ *  round Part 3's. */
+export const STILL_ASKED: readonly { name: string; parts: number[] }[] = [
+  { name: "Bias and variance", parts: [1] },
+  { name: "Leakage", parts: [1] },
+  { name: "Metrics", parts: [1] },
+  { name: "A coding round", parts: [3] },
+];
 
 /** What LLMs added ("llm-design" to "llm-not"), the LLM page's four items,
  *  and the parts that answer each. */

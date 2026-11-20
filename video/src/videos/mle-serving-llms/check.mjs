@@ -147,9 +147,9 @@ R["batching"] = {
     "staticSteps": static_steps, "staticBusy": round(tokens / (SLOTS * static_steps), 4),
     "continuousSteps": steps, "continuousBusy": round(tokens / (SLOTS * steps), 4),
     "firstGroups": [[int(v) for v in lengths[i:i + SLOTS]] for i in (0, SLOTS)],
-    # The first 48 answer lengths in queue order, for the continuous-batching
+    # The first 64 answer lengths in queue order, for the continuous-batching
     # figure, which keeps admitting from the queue across the static figure's span.
-    "firstLengths": [int(v) for v in lengths[:48]],
+    "firstLengths": [int(v) for v in lengths[:64]],
 }
 
 # ── Simulation: speculative decoding ────────────────────────────────────────
