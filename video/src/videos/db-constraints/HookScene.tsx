@@ -216,6 +216,7 @@ export const HookScene: React.FC = () => {
               pulses={[ruleAt + i * 3]}
               strikeAt={forgot ? forgetsAt : undefined}
               dim={forgot ? forgetsAt + 10 : undefined}
+              outline
             >
               {"price >= 0"}
             </Pill>

@@ -154,7 +154,10 @@ export const FlavorScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 ...headline(58),
-                color: `color-mix(in srgb, ${INK} ${Math.round(100 - asLabels * 55)}%, transparent)`,
+                // The code itself stays near-black throughout, rather than
+                // fading as the names take over. The owner, 2026-11-13: "use
+                // black font color for the number inside the boxes".
+                color: INK,
               }}
             >
               {code}

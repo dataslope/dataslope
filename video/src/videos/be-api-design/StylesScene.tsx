@@ -8,7 +8,7 @@ import { Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Flow, Mark, METHOD_INK, Node, OK, Pill, X0, LISTING_PAPER, VRule } from "./parts";
+import { Drift, Flow, Mark, METHOD_INK, Node, Pill, X0, LISTING_PAPER, VRule } from "./parts";
 
 const COLS = [X0, 710, 1300];
 const COL_W = 500;
@@ -211,23 +211,27 @@ export const StylesScene: React.FC = () => {
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>a binary stream, both ways</span>
         </Note>
 
-        {/* The split: REST at the edge, gRPC inside. */}
+        {/* The split: REST at the edge, gRPC inside. The lines are ink and each
+            label sits near the middle of its straight run (the owner,
+            2026-11-13: "Change the green lines to black lines. The REST and
+            gRPC arrow labels need to move slightly to the right"; they were
+            green, at X0 + 300 and 880). */}
         <Node x={X0} y={mixTop} w={250} h={h(72)} at={mixAt + 2} tone="plain" title="public clients" size={23} />
-        <Flow points={[[X0 + 258, mixMid], [600, mixMid]]} at={publicAt} color={OK} width={3} head={14} />
-        <Pill x={X0 + 300} y={mixMid - h(44)} at={publicAt + 4} tone="ok" size={21}>
+        <Flow points={[[X0 + 258, mixMid], [600, mixMid]]} at={publicAt} color={INK} width={3} head={14} />
+        <Pill x={X0 + 345} y={mixMid - h(44)} at={publicAt + 4} tone="ok" size={21}>
           REST
         </Pill>
         <Node x={610} y={mixTop} w={240} h={h(72)} at={publicAt + 6} tone="data" title="your API" size={23} />
         {/* gRPC fans out to each of its own services, stacked in a column. */}
-        <Flow points={[[858, mixMid], [FORK_X, mixMid]]} at={betweenAt} color={OK} width={3} cut={1} />
-        <Pill x={880} y={mixMid - h(44)} at={betweenAt + 4} tone="ok" size={21}>
+        <Flow points={[[858, mixMid], [FORK_X, mixMid]]} at={betweenAt} color={INK} width={3} cut={1} />
+        <Pill x={902} y={mixMid - h(44)} at={betweenAt + 4} tone="ok" size={21}>
           gRPC
         </Pill>
         {["orders", "search", "billing"].map((s, i) => {
           const boxTop = svcMid - (3 * svcH + 2 * svcGap) / 2 + i * (svcH + svcGap);
           return (
             <React.Fragment key={s}>
-              <Flow points={[[FORK_X, mixMid], [SVC_X - 10, boxTop + svcH / 2]]} at={betweenAt + 8 + i * 4} color={OK} width={3} head={14} />
+              <Flow points={[[FORK_X, mixMid], [SVC_X - 10, boxTop + svcH / 2]]} at={betweenAt + 8 + i * 4} color={INK} width={3} head={14} />
               <Node x={SVC_X} y={boxTop} w={185} h={svcH} at={betweenAt + 6 + i * 4} tone="data" title={s} size={23} />
             </React.Fragment>
           );

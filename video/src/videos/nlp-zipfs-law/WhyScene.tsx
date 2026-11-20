@@ -3,17 +3,19 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { HAIRLINE, INK, TABULAR } from "../../editorial/style";
-import { FigLabel } from "../../editorial/ui";
+import { FigLabel, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA, pct } from "./data";
-import { DATA_INK, DATA_WASH, Headline, Mark, POINT, POINT_INK, Spot, Strike, Tag } from "./kit";
+import { DATA_INK, Headline, Mark, POINT, POINT_INK, Spot, Strike, Tag } from "./kit";
 
 /** The top hundred as a 10 by 10 grid of word chips, in rank order. */
 const GX = 96;
-/** A plain chip: the gray badge's tint. */
-const CHIP_GRAY = "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)";
+/** A plain chip's ink: near-black border and text, no fill (the owner,
+ *  2026-11-13: "black border, black text, and a transparent background for
+ *  all badges"). */
+const CHIP_INK = outlineInk("ink");
 const CHIP_W = 126;
 const CHIP_H = 38;
 const COL = CHIP_W + 6;
@@ -82,9 +84,10 @@ export const WhyScene: React.FC = () => {
               height: CHIP_H,
               boxSizing: "border-box",
               borderRadius: 4,
-              // Fill only: gray for every word, a blue tint for the book's
-              // own words once the stopwords are struck (no ring).
-              background: kept > 0 ? `color-mix(in srgb, ${DATA_WASH} ${(100 * kept).toFixed(0)}%, ${CHIP_GRAY})` : CHIP_GRAY,
+              // Outline only: near-black for every word, turning blue for the
+              // book's own words once the stopwords are struck.
+              border: `2px solid ${kept > 0 ? `color-mix(in srgb, ${DATA_INK} ${(100 * kept).toFixed(0)}%, ${CHIP_INK})` : CHIP_INK}`,
+              background: "transparent",
               opacity: p * (1 - 0.55 * struck),
               display: "flex",
               alignItems: "center",
@@ -92,7 +95,7 @@ export const WhyScene: React.FC = () => {
               fontFamily: SANS,
               fontSize: 20,
               fontWeight: 500,
-              color: kept > 0 ? DATA_INK : INK,
+              color: kept > 0 ? `color-mix(in srgb, ${DATA_INK} ${(100 * kept).toFixed(0)}%, ${CHIP_INK})` : CHIP_INK,
             }}
           >
             {isStop ? <Strike at={strikeAt(stopIndex[i])} color={POINT}>{w}</Strike> : w}

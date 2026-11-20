@@ -192,6 +192,8 @@ export const SentenceScene: React.FC = () => {
 
       {/* Fig. 4: the pos-tagging lesson's sentence, row by row. */}
       <FigLabel n="4" title="The runners sentence, tagged and lemmatized" at={from} x={X0} y={y(FIG_Y)} />
+      {/* Every chip in this figure is outlined, unfilled (the owner,
+          2026-11-13); a cut Penn tag's faint letters stay faint. */}
       {rowLabel(ROW.word, from + 6, "Word")}
       {S.tokens.map((t, i) => (
         <Chip
@@ -201,6 +203,7 @@ export const SentenceScene: React.FC = () => {
           y={rowTop(ROW.word)}
           at={wordAt[i]}
           size={SIZE}
+          outline
           marks={said.filter((s) => s.i === i).map((s) => ({ at: s.word - 2, out: s.word + 24 }))}
         />
       ))}
@@ -214,6 +217,7 @@ export const SentenceScene: React.FC = () => {
           y={rowTop(ROW.penn)}
           at={pennAt + i * 3}
           size={SIZE}
+          outline
           content={<TagText tag={t} cutAt={firstAt + i * 2} />}
           marks={said.filter((s) => s.i === i).map((s) => ({ at: s.tag - 2, out: s.tag + 24 }))}
         />
@@ -244,6 +248,7 @@ export const SentenceScene: React.FC = () => {
           y={rowTop(ROW.pos)}
           at={posAt[i]}
           size={SIZE}
+          outline
           marks={[
             { at: thoseAt + i * 2, out: thoseAt + i * 2 + 30 },
             { at: neededAt + i * 2, out: neededAt + 50 },
@@ -261,6 +266,7 @@ export const SentenceScene: React.FC = () => {
           y={rowTop(ROW.naive)}
           at={naiveAt[i]}
           size={SIZE}
+          outline
           marks={naiveSaid[S.tokens[i]] !== undefined && RESCUED[i] ? [{ at: naiveSaid[S.tokens[i]] - 2, out: unchangedAt + 16 }] : []}
         />
       ))}
@@ -274,6 +280,7 @@ export const SentenceScene: React.FC = () => {
           y={rowTop(ROW.aware)}
           at={lemmaAt[i]}
           size={SIZE}
+          outline
           marks={[
             ...(RESCUED[i] ? [{ at: lemmaAt[i], out: lemmaAt[i] + 30 }] : []),
             ...missed(i),
@@ -291,6 +298,7 @@ export const SentenceScene: React.FC = () => {
           y={rowTop(ROW.porter)}
           at={stemAt[i]}
           size={SIZE}
+          outline
           marks={porterSaid[s] !== undefined ? [{ at: porterSaid[s] - 2, out: porterSaid[s] + 30 }] : []}
         />
       ))}
@@ -309,7 +317,7 @@ export const SentenceScene: React.FC = () => {
         </div>
       </Ink>
       <Arrow from={[callArrowX, callTop + chipH / 2]} to={[callResultX - 2, callTop + chipH / 2]} at={neededAt + 8} dur={10} />
-      <Chip text={fix.lemma} x={callResultX} y={callTop} at={neededAt + 14} size={SIZE} />
+      <Chip text={fix.lemma} x={callResultX} y={callTop} at={neededAt + 14} size={SIZE} outline />
 
       {/* Fig. 5: the lesson's to_wordnet_pos, as a legend. */}
       <FigLabel n="5" title="First letter to WordNet" at={fourAt} x={LEGEND_X} y={y(FIG_Y)} />
@@ -327,7 +335,7 @@ export const SentenceScene: React.FC = () => {
                 chip's edge. */}
             <Arrow from={[LEGEND_X + m.letter.length * 0.6 * 26 + 12, mid]} to={[LEGEND_X + 128, mid]} at={at + 4} dur={8} />
             {/* The code as the WordNet pos row draws it, so "a" reads as a code. */}
-            <Chip text={m.pos} x={LEGEND_X + 130} y={top} at={at + 8} size={SIZE} />
+            <Chip text={m.pos} x={LEGEND_X + 130} y={top} at={at + 8} size={SIZE} outline />
             <Ink at={at + 10} dur={10} style={{ left: LEGEND_X + 130 + chipWidth(m.pos, SIZE) + 14, ...middle }}>
               <span style={label(26, INK)}>
                 <Mark at={at + 8} out={at + 32}>

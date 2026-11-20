@@ -257,6 +257,39 @@ export const badgeStyle = (tone: BadgeTone, size = 24): React.CSSProperties => {
   };
 };
 
+/**
+ * The outlined badge (the owner, 2026-11-13: "I like the badge or pill design
+ * with transparent (white) background and black text and border, or colored
+ * border with colored text with transparent background"): no fill, a 2px
+ * border and text in one ink. `tone` "ink" is the near-black page ink; a hue
+ * uses the same ink `badgeStyle` gives its text. The outer box matches
+ * `badgeStyle`'s at the same size: the border comes out of the padding.
+ */
+export type OutlineTone = BadgeTone | "ink";
+export const outlineInk = (tone: OutlineTone): string =>
+  tone === "ink" ? "var(--ds-gray-900)" : tone === "gray" ? "var(--ds-gray-700)" : tone === "yellow" ? "var(--ds-yellow-800)" : tone === "green" ? "var(--ds-green-700)" : tone === "teal" ? "var(--ds-teal-700)" : `var(--ds-${tone}-500)`;
+export const outlineBadgeStyle = (tone: OutlineTone, size = 24): React.CSSProperties => {
+  const ink = outlineInk(tone);
+  return {
+    display: "inline-block",
+    padding: `${Math.max(0, Math.round(size * 0.21) - 2)}px ${Math.round(size * 0.55) - 2}px`,
+    borderRadius: Math.round(size / 3),
+    border: `2px solid ${ink}`,
+    background: "transparent",
+    color: ink,
+    fontSize: size,
+    fontWeight: 500,
+    lineHeight: 1.15,
+    whiteSpace: "nowrap",
+  };
+};
+export const OutlineBadge: React.FC<{ tone?: OutlineTone; size?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({
+  tone = "ink",
+  size = 24,
+  style,
+  children,
+}) => <span style={{ ...outlineBadgeStyle(tone, size), ...style }}>{children}</span>;
+
 /** A badge as an element; `style` adds position or motion. */
 export const Badge: React.FC<{ tone: BadgeTone; size?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({
   tone,

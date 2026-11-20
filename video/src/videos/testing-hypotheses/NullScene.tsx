@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, HAIRLINE, INK, INK_SOFT } from "../../editorial/style";
-import { badgeStyle, Ink } from "../../editorial/ui";
+import { Ink, outlineBadgeStyle } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Arrow, H0, Head, Label, Mark, pulse, Spot, STAT } from "./parts";
@@ -155,8 +155,10 @@ export const NullScene: React.FC = () => {
           Very surprising
         </Label>
       </Ink>
+      {/* The two outcomes as outlined badges, each in its arrow's ink (the
+          owner, 2026-11-13: outlined, no fill). */}
       <Ink at={rejectAt - 4} dur={14} style={{ left: leftX - 30, top: outTop + 40 }}>
-        <span style={{ ...body(38, true), ...badgeStyle("red", 38) }}>
+        <span style={{ ...body(38, true), ...outlineBadgeStyle("red", 38) }}>
           Reject <H0 />
         </span>
       </Ink>
@@ -166,7 +168,7 @@ export const NullScene: React.FC = () => {
         </Label>
       </Ink>
       <Ink at={failAt - 4} dur={14} style={{ left: rightX + 60, top: outTop + 40 }}>
-        <span style={{ ...body(38, true), ...badgeStyle("gray", 38) }}>
+        <span style={{ ...body(38, true), ...outlineBadgeStyle("ink", 38) }}>
           Fail to reject <H0 />
         </span>
       </Ink>

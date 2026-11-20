@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Ink, Note, Num } from "../../editorial/ui";
+import { Ink, Note, Num, outlineInk } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -35,6 +35,9 @@ const BODY = 26;
 const PIECE_ROW = 50;
 const PIECE_LABEL = 34;
 const PIECE_GAP = 30;
+/** A split row's text, on its light blue wash (the owner, 2026-11-13). */
+const ROW_INK = outlineInk("blue");
+const ROW_INDEX_INK = `color-mix(in srgb, ${ROW_INK} 70%, ${PAPER})`;
 /** The stage heads' line, between the question and the pieces. */
 const STAGE_Y = 300;
 
@@ -268,7 +271,10 @@ export const GroupbyScene: React.FC = () => {
                       textAlign: j === 2 ? "right" : "left",
                       top: "50%",
                       transform: "translateY(-50%)",
-                      color: j === 0 ? INK_SOFT : INK,
+                      // A row on the light blue wash is set in the blue ink, its
+                      // index a softer blue (the owner, 2026-11-13: "use blue font
+                      // color when any row is highlighted with a light blue background").
+                      color: j === 0 ? ROW_INDEX_INK : ROW_INK,
                     }}
                   >
                     {r[j]}

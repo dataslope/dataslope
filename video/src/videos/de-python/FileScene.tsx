@@ -39,6 +39,8 @@ const TOP = 322;
 const SIZE = 21;
 const RIGHT_X = 1000;
 const CHUNK_X = 1110;
+/** The totals' match mark: half MARK_OK's tint, so green text reads on it. */
+const MARK_OK_LIGHT = `color-mix(in srgb, ${OK} 12%, transparent)`;
 const TOTALS_X = 1340;
 
 /**
@@ -112,7 +114,10 @@ export const FileScene: React.FC = () => {
   // ── Question 4 ──
   const C = FILE.chunks.lines;
   const cH = listingHeight(C.length, SIZE);
-  const chunkH = h(30);
+  // Each chunk's badge is 4px taller than it was, the gap under it the same
+  // 5px (the owner, 2026-11-13: "Add slight more vertical padding to each
+  // '100,000 rows' badge"); the lines below move down with the column.
+  const chunkH = h(34);
   const chunkTop = rTop + h(6);
   // Each chunk in turn is grouped and folded, one every 8 frames.
   const foldK = frame < foldAt ? -1 : Math.min(FILE.nChunks - 1, Math.floor((frame - foldAt) / 8));
@@ -323,10 +328,17 @@ export const FileScene: React.FC = () => {
         </TableName>
         <DataTable
           g={tg}
-          cols={colsOf(T, { qty: { ink: BLUE_INK, numeric: true } }).map((c, j) => (j === 0 ? { ...c, ink: INK } : c))}
+          // The matching totals turn green on a lighter green mark as they
+          // are marked (the owner, 2026-11-13: "The blue text on green
+          // highlight in the totals table don't work. Use ... a lighter green
+          // highlight and change the text to green on highlight"). The ink
+          // moves for the whole column over the four marks' stagger.
+          cols={colsOf(T, { qty: { ink: `color-mix(in srgb, ${OK_INK} ${Math.round(ease(frame, matchAt + 6, 18) * 100)}%, ${BLUE_INK})`, numeric: true } }).map((c, j) =>
+            j === 0 ? { ...c, ink: INK } : c,
+          )}
           at={foldAt}
           rows={T.rows.map((cells, i) => ({ cells, at: totalsAt + i * 3 }))}
-          marks={T.rows.map((_, row) => ({ row, col: 1, at: matchAt + 6 + row * 2, color: MARK_OK }))}
+          marks={T.rows.map((_, row) => ({ row, col: 1, at: matchAt + 6 + row * 2, color: MARK_OK_LIGHT }))}
         />
         <Note at={matchAt + 4} x={TOTALS_X} y={tg.rowTop(T.rows.length) + h(14)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The same as the whole read</span>

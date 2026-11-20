@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { OK, OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { Note, Num, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
@@ -29,9 +29,13 @@ const money = (v: number) => {
   return `${thousands(Number(whole))}.${tenth}`;
 };
 
-/** One order as a chip: its amount, in mono. */
+/** One order as a chip: its amount, in mono, in its tint's own ink, with no
+ *  border (the owner, 2026-11-13: "Remove the borders around each badge.
+ *  Change the text color of the badges to have a matching hues with the
+ *  backgrounds"). The chip is border-box, so its size is unchanged. */
 const Chip: React.FC<{ x: number; y: number; amount: number; tone: "data" | "bad" | "ok" | "sara"; opacity: number; behind?: boolean }> = ({ x, y, amount, tone, opacity, behind }) => {
   const line = tone === "bad" ? ACCENT : tone === "ok" ? OK : tone === "sara" ? inkOf.yellow : BAR;
+  const ink = outlineInk(tone === "bad" ? "red" : tone === "ok" ? "green" : tone === "sara" ? "yellow" : "blue");
   return (
     <div
       style={{
@@ -42,7 +46,9 @@ const Chip: React.FC<{ x: number; y: number; amount: number; tone: "data" | "bad
         height: CHIP_H,
         boxSizing: "border-box",
         borderRadius: 3,
-        border: `2px solid ${line}`,
+        // A ring of paper, invisible on the page, keeps the copies in a stack
+        // apart now that no border edges them.
+        boxShadow: `0 0 0 2px ${PAPER}`,
         background: tone === "sara" ? `color-mix(in srgb, ${inkOf.yellow} 22%, ${PAPER})` : `color-mix(in srgb, ${line} 9%, ${PAPER})`,
         display: "flex",
         alignItems: "center",
@@ -50,7 +56,7 @@ const Chip: React.FC<{ x: number; y: number; amount: number; tone: "data" | "bad
         fontFamily: MONO,
         fontSize: 19,
         fontWeight: 500,
-        color: INK,
+        color: ink,
         fontVariantLigatures: "none",
         opacity,
       }}

@@ -91,7 +91,9 @@ export const BfsScene: React.FC = () => {
   const shown = Math.max(1, Math.round(dfsP * path.length));
 
   // The queue rows: a list's pop shifts every cell; a deque's front detaches.
-  const rowY1 = y(754);
+  // The owner, 2026-11-13: more room under the "Also asked" line, so the
+  // rows sit lower and the line keeps its place under the DFS line.
+  const rowY1 = y(774);
   const rowY2 = rowY1 + 90;
   const cx0 = 360;
   const pop1 = ease(frame, poppingAt + 8, 12);
@@ -195,7 +197,7 @@ export const BfsScene: React.FC = () => {
             , DFS <b style={{ ...TABULAR, color: ACCENT_INK }}>{int(CHAIN.dfsPath)}</b>
           </span>
         </Line>
-        <Line at={dequeAt - 4} x={140} y={rowY1 - 48} size={22} weight={500} color={ACCENT_INK}>
+        <Line at={dequeAt - 4} x={140} y={rowY1 - 68} size={22} weight={500} color={ACCENT_INK}>
           Also asked: What is a deque, and when should you prefer it over a list?
         </Line>
 

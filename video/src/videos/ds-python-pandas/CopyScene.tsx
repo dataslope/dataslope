@@ -22,6 +22,7 @@ import {
   MARK_OK,
   OK_INK,
   TableName,
+  useRedUnderMarks,
   X0,
 } from "./parts";
 import { CODE_BADGE, Mono } from "./mono";
@@ -78,6 +79,8 @@ export const CopyScene: React.FC = () => {
   const sel = { cols: F.cols, rows: north.map((i) => F.rows[i]) };
   const sg = geoOf(sel, SEL_X, y(FRAME_Y), h, { rowH: 52 });
   const L = COPY.loc;
+  const badMarks = north.map((row) => ({ row, col: amount, at: origAt + 4, out: fixAt, color: MARK_BAD }));
+  const redInk = useRedUnderMarks(F.rows, badMarks, BLUE_INK);
 
   // The two steps of the chained line, bracketed by character.
   const line = COPY.chained.lines[0];
@@ -145,11 +148,12 @@ export const CopyScene: React.FC = () => {
           at={asked - 6}
           rows={F.rows.map((cells, i) => ({ cells, at: asked - 2 + i * 2 }))}
           bands={north.map((row) => ({ row, at: selectAt + 2, out: secondAt, color: MARK }))}
-          marks={[
-            ...north.map((row) => ({ row, col: amount, at: origAt + 4, out: fixAt, color: MARK_BAD })),
-            ...north.map((row) => ({ row, col: amount, at: zeroAt + 6, color: MARK_OK })),
-          ]}
-          swaps={north.map((row, k) => ({ row, col: amount, at: zeroAt + k * 4, value: L.rows[row][amount], color: OK_INK }))}
+          marks={[...badMarks, ...north.map((row) => ({ row, col: amount, at: zeroAt + 6, color: MARK_OK }))]}
+          swaps={
+            // Red ink under the red mark until the mark has gone, then the
+            // fix's zeros (one swap per cell, so one or the other).
+            frame < zeroAt - 6 ? redInk : north.map((row, k) => ({ row, col: amount, at: zeroAt + k * 4, value: L.rows[row][amount], color: OK_INK }))
+          }
         />
         <TableName g={sg} at={selectAt + 6} out={neverAt + 10}>
           the selection, <Mark at={copyMayAt}>a copy</Mark>

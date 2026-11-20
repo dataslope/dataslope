@@ -80,7 +80,7 @@ export const StopScene: React.FC = () => {
       {/* Fig. 9: the list, its first examples, and its size. */}
       <FigLabel n="9" title="NLTK's English stopwords" at={from} x={X0} y={y(FIG9_Y)} />
       {["the", "is", "of"].map((w, i) => (
-        <Chip key={w} text={w} x={sample[i].x} y={y(SAMPLE_Y)} at={sampleAt[i]} size={SIZE} marks={[{ at: stopwordsAt + i * 3, out: filterAt }]} />
+        <Chip look="outline" key={w} text={w} x={sample[i].x} y={y(SAMPLE_Y)} at={sampleAt[i]} size={SIZE} marks={[{ at: stopwordsAt + i * 3, out: filterAt }]} />
       ))}
       <Ink at={countAt - 2} dur={18} style={{ left: COUNT_X, top: y(FIG9_Y) + COUNT_DY, whiteSpace: "nowrap" }}>
         <div style={{ ...headline(104), ...TABULAR, color: INK }}>
@@ -104,12 +104,13 @@ export const StopScene: React.FC = () => {
         if (p.stop) {
           const f = ease(frame, dropAt + p.k * 3, 16);
           return (
-            <Chip key={i} text={t} x={row[i].x} y={lerp(y(ROW_Y), y(GHOST_Y), f)} at={rowAt[i]} size={SIZE} gone={dropAt + p.k * 3} />
+            <Chip look="outline" key={i} text={t} x={row[i].x} y={lerp(y(ROW_Y), y(GHOST_Y), f)} at={rowAt[i]} size={SIZE} gone={dropAt + p.k * 3} />
           );
         }
         const mark = named.find((m) => m.w === t);
         return (
           <Chip
+            look="outline"
             key={i}
             text={t}
             x={lerp(row[i].x, final[p.k].x, close)}

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { halo, headline, label, note, TABULAR } from "../../editorial/style";
-import { FigLabel, Note } from "../../editorial/ui";
+import { FigLabel, Note, outlineInk } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CACHE, int, LAST, NAME, pct, PRICE, TURNS, usd } from "./data";
@@ -226,7 +226,10 @@ export const CacheScene: React.FC = () => {
               alignItems: "center",
               paddingLeft: 12,
               opacity: p,
-              ...note(20, row.cached ? INK : mix(INK, PAPER, fill)),
+              // The cached rows' text in the cache's green (the owner,
+              // 2026-11-13: "use a green/emerald for the system prompt and
+              // earlier turn badges"): teal's ink, the hue of their fill.
+              ...note(20, row.cached ? outlineInk("teal") : mix(INK, PAPER, fill)),
               fontWeight: 500,
               whiteSpace: "nowrap",
             }}

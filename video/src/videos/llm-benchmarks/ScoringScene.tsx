@@ -109,7 +109,10 @@ export const ScoringScene: React.FC = () => {
                 at={t.at}
               />
             ) : null}
-            <Ink at={t.at} dur={14} style={{ left: COL_X[i], top: y(TITLE_Y) - 4, whiteSpace: "nowrap" }}>
+            {/* A flex row, so the disc's middle is the title's middle (the
+                owner, 2026-11-13: "the 1, 2, 3 badges should vertically align
+                with the titles in the middle"). */}
+            <Ink at={t.at} dur={14} style={{ left: COL_X[i], top: y(TITLE_Y) - 4, whiteSpace: "nowrap", display: "flex", alignItems: "center" }}>
               {/* The approach's number on a tinted disc, 26px beside the 28px title. */}
               <span
                 style={{
@@ -124,7 +127,7 @@ export const ScoringScene: React.FC = () => {
                   padding: 0,
                   borderRadius: 20,
                   marginRight: 14,
-                  verticalAlign: "middle",
+                  flex: "none",
                 }}
               >
                 {i + 1}
@@ -152,7 +155,9 @@ export const ScoringScene: React.FC = () => {
         </Ink>
 
         {/* 2. Properties of the text, each a yes or no: here, of a summary. */}
-        <Ink at={summaryAt - 2} dur={12} style={{ left: COL_X[1], top: y(TITLE_Y) + 46, whiteSpace: "nowrap" }}>
+        {/* 10px further under its title than it was (the owner, 2026-11-13:
+            "add more bottom spacing to Score properties"). */}
+        <Ink at={summaryAt - 2} dur={12} style={{ left: COL_X[1], top: y(TITLE_Y) + 56, whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, INK_SOFT) }}>of a summary</span>
         </Ink>
         {[

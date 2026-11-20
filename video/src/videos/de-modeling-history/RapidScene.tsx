@@ -66,6 +66,9 @@ const Chip: React.FC<{ children: React.ReactNode; at: number }> = ({ children, a
     <div
       style={{
         ...badgeStyle("gray", 22),
+        // More air above and below the value (the owner, 2026-11-13: "Add
+        // more vertical padding to each gray badge"; badgeStyle gives 5px).
+        padding: "9px 12px",
         display: "block",
         fontFamily: MONO,
         textAlign: "center",
@@ -101,11 +104,13 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* Three columns of value chips, a "×" between them, then "=" and
           the count on a line of its own with its label under it. Every gap
           is wide enough that the operators, the values and the count, set
-          at different sizes, never read as one line of type. */}
+          at different sizes, never read as one line of type. The operators
+          and the count sit 9px lower than they did, with the chips' taller
+          rows, so they stay centred on them. */}
       <div style={{ position: "absolute", left: R_X, top, display: "flex", alignItems: "flex-start" }}>
         {groups.map((g, i) => (
           <React.Fragment key={g.name}>
-            {i ? <div style={{ ...note(34, INK_SOFT), margin: "50px 44px 0", opacity: ease(frame, g.at, 10) }}>×</div> : null}
+            {i ? <div style={{ ...note(34, INK_SOFT), margin: "59px 44px 0", opacity: ease(frame, g.at, 10) }}>×</div> : null}
             <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "stretch" }}>
               <div style={{ ...label(21, INK_SOFT), fontWeight: 500, opacity: ease(frame, g.at - 2, 10), whiteSpace: "nowrap" }}>{g.name}</div>
               {g.values.map((v, j) => (
@@ -116,8 +121,8 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
             </div>
           </React.Fragment>
         ))}
-        <div style={{ ...note(42, INK_SOFT), margin: "34px 18px 0 54px", opacity: ease(frame, everyAt, 10) }}>=</div>
-        <div style={{ marginTop: 30, opacity: ease(frame, twelveAt - 2, 10), whiteSpace: "nowrap" }}>
+        <div style={{ ...note(42, INK_SOFT), margin: "43px 18px 0 54px", opacity: ease(frame, everyAt, 10) }}>=</div>
+        <div style={{ marginTop: 39, opacity: ease(frame, twelveAt - 2, 10), whiteSpace: "nowrap" }}>
           <div style={{ ...note(46, BLUE_INK), fontWeight: 500 }}>
             <Num>{RAPID.junk}</Num>
           </div>
