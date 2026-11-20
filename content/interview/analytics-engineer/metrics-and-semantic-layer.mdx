@@ -73,7 +73,8 @@ A fan trap happens when you join a table to a **one-to-many** detail table and
 then aggregate a measure from the "one" side, the join **duplicates** those rows
 once per child, so summing inflates the total. Joining `orders` to
 `order_items` and summing `orders.amount` counts each order's amount once per
-item. The block below shows real revenue of 150 balloon to 350:
+item. The block below shows real revenue of 1,949.25 balloon to 4,555.25
+(orders 1 and 2 alone: 150 becomes 350):
 
 <SqlCodeBlock
   dialect="postgres"
@@ -95,7 +96,7 @@ CREATE TABLE order_items AS SELECT * FROM (VALUES
 SELECT SUM(o.amount) AS inflated_revenue
 FROM orders o
 JOIN order_items i ON i.order_id = o.order_id;
--- True revenue is 100 + 50 = 150, but this returns 350.`}
+-- True revenue is 1,949.25 (SUM over orders alone), but this returns 4,555.25.`}
 />
 
 What makes it dangerous rather than merely wrong is that the overcount scales

@@ -1,0 +1,2337 @@
+{
+  "figures": {
+    "window": {
+      "setup": "CREATE TABLE sales (day DATE, region TEXT, amount INTEGER);\nINSERT INTO sales VALUES\n  ('2024-01-01', 'North', 100), ('2024-01-02', 'North', 250), ('2024-01-03', 'North', 75),\n  ('2024-01-01', 'South', 180), ('2024-01-02', 'South', 320), ('2024-01-03', 'South', 140);",
+      "steps": {
+        "parts": {
+          "sql": "SELECT day, region, amount,\n  SUM(amount) OVER () AS all_rows,\n  SUM(amount) OVER (PARTITION BY region) AS by_region,\n  SUM(amount) OVER (PARTITION BY region ORDER BY day) AS running\nFROM sales\nORDER BY region, day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "region",
+            "amount",
+            "all_rows",
+            "by_region",
+            "running"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "North",
+              100,
+              1065,
+              425,
+              100
+            ],
+            [
+              "2024-01-02",
+              "North",
+              250,
+              1065,
+              425,
+              350
+            ],
+            [
+              "2024-01-03",
+              "North",
+              75,
+              1065,
+              425,
+              425
+            ],
+            [
+              "2024-01-01",
+              "South",
+              180,
+              1065,
+              640,
+              180
+            ],
+            [
+              "2024-01-02",
+              "South",
+              320,
+              1065,
+              640,
+              500
+            ],
+            [
+              "2024-01-03",
+              "South",
+              140,
+              1065,
+              640,
+              640
+            ]
+          ]
+        },
+        "share": {
+          "sql": "SELECT region,\n  SUM(amount) AS total,\n  SUM(SUM(amount)) OVER () AS grand_total,\n  ROUND(100.0 * SUM(amount) / SUM(SUM(amount)) OVER (), 1) AS pct\nFROM sales\nGROUP BY region\nORDER BY region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "total",
+            "grand_total",
+            "pct"
+          ],
+          "rows": [
+            [
+              "North",
+              425,
+              "1065",
+              "39.9"
+            ],
+            [
+              "South",
+              640,
+              "1065",
+              "60.1"
+            ]
+          ]
+        },
+        "shareBare": {
+          "sql": "SELECT region,\n  SUM(amount) AS total,\n  SUM(amount) OVER () AS grand_total\nFROM sales\nGROUP BY region;",
+          "ok": false,
+          "error": "ERROR: column \"sales.amount\" must appear in the GROUP BY clause or be used in an aggregate function"
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "latest": {
+      "setup": "CREATE TABLE customer_updates AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 10:00:00', 'a@x.com'),\n  (1, TIMESTAMP '2024-03-01 09:00:00', 'a2@x.com'),\n  (2, TIMESTAMP '2024-02-01 08:00:00', 'b@x.com'),\n  (2, TIMESTAMP '2024-02-15 08:00:00', 'b2@x.com'),\n  (3, TIMESTAMP '2024-01-20 12:00:00', 'c@x.com'),\n  (3, TIMESTAMP '2024-04-02 07:30:00', 'c2@x.com'),\n  (3, TIMESTAMP '2024-05-18 16:45:00', 'c3@x.com'),\n  (4, TIMESTAMP '2024-01-09 11:15:00', 'd@x.com'),\n  (4, TIMESTAMP '2024-03-22 14:20:00', 'd2@x.com'),\n  (5, TIMESTAMP '2024-02-07 09:40:00', 'e@x.com'),\n  (5, TIMESTAMP '2024-04-11 13:05:00', 'e2@x.com'),\n  (5, TIMESTAMP '2024-06-01 08:55:00', 'e3@x.com'),\n  (6, TIMESTAMP '2024-01-14 15:30:00', 'f@x.com'),\n  (7, TIMESTAMP '2024-02-23 10:10:00', 'g@x.com'),\n  (7, TIMESTAMP '2024-05-04 12:25:00', 'g2@x.com'),\n  (8, TIMESTAMP '2024-03-08 07:45:00', 'h@x.com'),\n  (8, TIMESTAMP '2024-04-27 17:00:00', 'h2@x.com'),\n  (9, TIMESTAMP '2024-01-31 09:20:00', 'i@x.com'),\n  (9, TIMESTAMP '2024-03-15 11:35:00', 'i2@x.com'),\n  (9, TIMESTAMP '2024-06-09 14:50:00', 'i3@x.com'),\n  (10, TIMESTAMP '2024-02-12 08:05:00', 'j@x.com'),\n  (10, TIMESTAMP '2024-05-26 16:15:00', 'j2@x.com'),\n  (11, TIMESTAMP '2024-04-03 13:40:00', 'k@x.com'),\n  (12, TIMESTAMP '2024-05-11 10:55:00', 'l@x.com')\n) AS t(customer_id, updated_at, email);",
+      "steps": {
+        "counts": {
+          "sql": "SELECT COUNT(*) AS rows, COUNT(DISTINCT customer_id) AS customers\nFROM customer_updates;",
+          "ok": true,
+          "columns": [
+            "rows",
+            "customers"
+          ],
+          "rows": [
+            [
+              24,
+              12
+            ]
+          ]
+        },
+        "latest": {
+          "sql": "SELECT customer_id, updated_at, email\nFROM (\n  SELECT\n    *,\n    ROW_NUMBER() OVER (\n      PARTITION BY customer_id\n      ORDER BY updated_at DESC\n    ) AS rn\n  FROM customer_updates\n) ranked\nWHERE rn = 1\nORDER BY customer_id;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "updated_at",
+            "email"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-03-01 09:00:00",
+              "a2@x.com"
+            ],
+            [
+              2,
+              "2024-02-15 08:00:00",
+              "b2@x.com"
+            ],
+            [
+              3,
+              "2024-05-18 16:45:00",
+              "c3@x.com"
+            ],
+            [
+              4,
+              "2024-03-22 14:20:00",
+              "d2@x.com"
+            ],
+            [
+              5,
+              "2024-06-01 08:55:00",
+              "e3@x.com"
+            ],
+            [
+              6,
+              "2024-01-14 15:30:00",
+              "f@x.com"
+            ],
+            [
+              7,
+              "2024-05-04 12:25:00",
+              "g2@x.com"
+            ],
+            [
+              8,
+              "2024-04-27 17:00:00",
+              "h2@x.com"
+            ],
+            [
+              9,
+              "2024-06-09 14:50:00",
+              "i3@x.com"
+            ],
+            [
+              10,
+              "2024-05-26 16:15:00",
+              "j2@x.com"
+            ],
+            [
+              11,
+              "2024-04-03 13:40:00",
+              "k@x.com"
+            ],
+            [
+              12,
+              "2024-05-11 10:55:00",
+              "l@x.com"
+            ]
+          ]
+        },
+        "inWhere": {
+          "sql": "SELECT customer_id, updated_at, email\nFROM customer_updates\nWHERE ROW_NUMBER() OVER (\n  PARTITION BY customer_id\n  ORDER BY updated_at DESC\n) = 1;",
+          "ok": false,
+          "error": "ERROR: window functions are not allowed in WHERE"
+        },
+        "groupMax": {
+          "sql": "SELECT customer_id, MAX(updated_at) AS updated_at\nFROM customer_updates\nGROUP BY customer_id\nORDER BY customer_id;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "updated_at"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-03-01 09:00:00"
+            ],
+            [
+              2,
+              "2024-02-15 08:00:00"
+            ],
+            [
+              3,
+              "2024-05-18 16:45:00"
+            ],
+            [
+              4,
+              "2024-03-22 14:20:00"
+            ],
+            [
+              5,
+              "2024-06-01 08:55:00"
+            ],
+            [
+              6,
+              "2024-01-14 15:30:00"
+            ],
+            [
+              7,
+              "2024-05-04 12:25:00"
+            ],
+            [
+              8,
+              "2024-04-27 17:00:00"
+            ],
+            [
+              9,
+              "2024-06-09 14:50:00"
+            ],
+            [
+              10,
+              "2024-05-26 16:15:00"
+            ],
+            [
+              11,
+              "2024-04-03 13:40:00"
+            ],
+            [
+              12,
+              "2024-05-11 10:55:00"
+            ]
+          ]
+        },
+        "distinctOn": {
+          "sql": "SELECT DISTINCT ON (customer_id) customer_id, updated_at, email\nFROM customer_updates\nORDER BY customer_id, updated_at DESC;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "updated_at",
+            "email"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-03-01 09:00:00",
+              "a2@x.com"
+            ],
+            [
+              2,
+              "2024-02-15 08:00:00",
+              "b2@x.com"
+            ],
+            [
+              3,
+              "2024-05-18 16:45:00",
+              "c3@x.com"
+            ],
+            [
+              4,
+              "2024-03-22 14:20:00",
+              "d2@x.com"
+            ],
+            [
+              5,
+              "2024-06-01 08:55:00",
+              "e3@x.com"
+            ],
+            [
+              6,
+              "2024-01-14 15:30:00",
+              "f@x.com"
+            ],
+            [
+              7,
+              "2024-05-04 12:25:00",
+              "g2@x.com"
+            ],
+            [
+              8,
+              "2024-04-27 17:00:00",
+              "h2@x.com"
+            ],
+            [
+              9,
+              "2024-06-09 14:50:00",
+              "i3@x.com"
+            ],
+            [
+              10,
+              "2024-05-26 16:15:00",
+              "j2@x.com"
+            ],
+            [
+              11,
+              "2024-04-03 13:40:00",
+              "k@x.com"
+            ],
+            [
+              12,
+              "2024-05-11 10:55:00",
+              "l@x.com"
+            ]
+          ]
+        },
+        "qualify": {
+          "sql": "SELECT customer_id, updated_at, email\nFROM customer_updates\nQUALIFY ROW_NUMBER() OVER (\n  PARTITION BY customer_id\n  ORDER BY updated_at DESC\n) = 1;",
+          "ok": false,
+          "error": "ERROR: syntax error at or near \"ROW_NUMBER\""
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "tie": {
+      "setup": "CREATE TABLE customer_updates AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 10:00:00', 'a@x.com'),\n  (1, TIMESTAMP '2024-03-01 09:00:00', 'a2@x.com'),\n  (2, TIMESTAMP '2024-02-01 08:00:00', 'b@x.com'),\n  (2, TIMESTAMP '2024-02-15 08:00:00', 'b2@x.com'),\n  (3, TIMESTAMP '2024-01-20 12:00:00', 'c@x.com'),\n  (3, TIMESTAMP '2024-04-02 07:30:00', 'c2@x.com'),\n  (3, TIMESTAMP '2024-05-18 16:45:00', 'c3@x.com'),\n  (4, TIMESTAMP '2024-01-09 11:15:00', 'd@x.com'),\n  (4, TIMESTAMP '2024-03-22 14:20:00', 'd2@x.com'),\n  (5, TIMESTAMP '2024-02-07 09:40:00', 'e@x.com'),\n  (5, TIMESTAMP '2024-04-11 13:05:00', 'e2@x.com'),\n  (5, TIMESTAMP '2024-06-01 08:55:00', 'e3@x.com'),\n  (6, TIMESTAMP '2024-01-14 15:30:00', 'f@x.com'),\n  (7, TIMESTAMP '2024-02-23 10:10:00', 'g@x.com'),\n  (7, TIMESTAMP '2024-05-04 12:25:00', 'g2@x.com'),\n  (8, TIMESTAMP '2024-03-08 07:45:00', 'h@x.com'),\n  (8, TIMESTAMP '2024-04-27 17:00:00', 'h2@x.com'),\n  (9, TIMESTAMP '2024-01-31 09:20:00', 'i@x.com'),\n  (9, TIMESTAMP '2024-03-15 11:35:00', 'i2@x.com'),\n  (9, TIMESTAMP '2024-06-09 14:50:00', 'i3@x.com'),\n  (10, TIMESTAMP '2024-02-12 08:05:00', 'j@x.com'),\n  (10, TIMESTAMP '2024-05-26 16:15:00', 'j2@x.com'),\n  (11, TIMESTAMP '2024-04-03 13:40:00', 'k@x.com'),\n  (12, TIMESTAMP '2024-05-11 10:55:00', 'l@x.com')\n) AS t(customer_id, updated_at, email);\nINSERT INTO customer_updates VALUES (3, TIMESTAMP '2024-05-18 16:45:00', 'c4@x.com');",
+      "steps": {
+        "three": {
+          "sql": "SELECT customer_id, updated_at, email\nFROM customer_updates\nWHERE customer_id = 3\nORDER BY updated_at DESC, email;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "updated_at",
+            "email"
+          ],
+          "rows": [
+            [
+              3,
+              "2024-05-18 16:45:00",
+              "c3@x.com"
+            ],
+            [
+              3,
+              "2024-05-18 16:45:00",
+              "c4@x.com"
+            ],
+            [
+              3,
+              "2024-04-02 07:30:00",
+              "c2@x.com"
+            ],
+            [
+              3,
+              "2024-01-20 12:00:00",
+              "c@x.com"
+            ]
+          ]
+        },
+        "rowNumber": {
+          "sql": "SELECT customer_id, updated_at, email\nFROM (\n  SELECT\n    *,\n    ROW_NUMBER() OVER (\n      PARTITION BY customer_id\n      ORDER BY updated_at DESC\n    ) AS rn\n  FROM customer_updates\n) ranked\nWHERE rn = 1\nORDER BY customer_id;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "updated_at",
+            "email"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-03-01 09:00:00",
+              "a2@x.com"
+            ],
+            [
+              2,
+              "2024-02-15 08:00:00",
+              "b2@x.com"
+            ],
+            [
+              3,
+              "2024-05-18 16:45:00",
+              "c4@x.com"
+            ],
+            [
+              4,
+              "2024-03-22 14:20:00",
+              "d2@x.com"
+            ],
+            [
+              5,
+              "2024-06-01 08:55:00",
+              "e3@x.com"
+            ],
+            [
+              6,
+              "2024-01-14 15:30:00",
+              "f@x.com"
+            ],
+            [
+              7,
+              "2024-05-04 12:25:00",
+              "g2@x.com"
+            ],
+            [
+              8,
+              "2024-04-27 17:00:00",
+              "h2@x.com"
+            ],
+            [
+              9,
+              "2024-06-09 14:50:00",
+              "i3@x.com"
+            ],
+            [
+              10,
+              "2024-05-26 16:15:00",
+              "j2@x.com"
+            ],
+            [
+              11,
+              "2024-04-03 13:40:00",
+              "k@x.com"
+            ],
+            [
+              12,
+              "2024-05-11 10:55:00",
+              "l@x.com"
+            ]
+          ]
+        },
+        "rank": {
+          "sql": "SELECT customer_id, updated_at, email\nFROM (\n  SELECT\n    *,\n    RANK() OVER (\n      PARTITION BY customer_id\n      ORDER BY updated_at DESC\n    ) AS rn\n  FROM customer_updates\n) ranked\nWHERE rn = 1\nORDER BY customer_id;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "updated_at",
+            "email"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-03-01 09:00:00",
+              "a2@x.com"
+            ],
+            [
+              2,
+              "2024-02-15 08:00:00",
+              "b2@x.com"
+            ],
+            [
+              3,
+              "2024-05-18 16:45:00",
+              "c4@x.com"
+            ],
+            [
+              3,
+              "2024-05-18 16:45:00",
+              "c3@x.com"
+            ],
+            [
+              4,
+              "2024-03-22 14:20:00",
+              "d2@x.com"
+            ],
+            [
+              5,
+              "2024-06-01 08:55:00",
+              "e3@x.com"
+            ],
+            [
+              6,
+              "2024-01-14 15:30:00",
+              "f@x.com"
+            ],
+            [
+              7,
+              "2024-05-04 12:25:00",
+              "g2@x.com"
+            ],
+            [
+              8,
+              "2024-04-27 17:00:00",
+              "h2@x.com"
+            ],
+            [
+              9,
+              "2024-06-09 14:50:00",
+              "i3@x.com"
+            ],
+            [
+              10,
+              "2024-05-26 16:15:00",
+              "j2@x.com"
+            ],
+            [
+              11,
+              "2024-04-03 13:40:00",
+              "k@x.com"
+            ],
+            [
+              12,
+              "2024-05-11 10:55:00",
+              "l@x.com"
+            ]
+          ]
+        },
+        "rankCount": {
+          "sql": "SELECT COUNT(*) AS rows FROM (\nSELECT customer_id, updated_at, email\nFROM (\n  SELECT\n    *,\n    RANK() OVER (\n      PARTITION BY customer_id\n      ORDER BY updated_at DESC\n    ) AS rn\n  FROM customer_updates\n) ranked\nWHERE rn = 1\nORDER BY customer_id\n) kept;",
+          "ok": true,
+          "columns": [
+            "rows"
+          ],
+          "rows": [
+            [
+              13
+            ]
+          ]
+        },
+        "rowNumberCount": {
+          "sql": "SELECT COUNT(*) AS rows FROM (\nSELECT customer_id, updated_at, email\nFROM (\n  SELECT\n    *,\n    ROW_NUMBER() OVER (\n      PARTITION BY customer_id\n      ORDER BY updated_at DESC\n    ) AS rn\n  FROM customer_updates\n) ranked\nWHERE rn = 1\nORDER BY customer_id\n) kept;",
+          "ok": true,
+          "columns": [
+            "rows"
+          ],
+          "rows": [
+            [
+              12
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "running": {
+      "setup": "CREATE TABLE daily AS SELECT * FROM (VALUES\n  (DATE '2024-01-01', 10), (DATE '2024-01-02', 20), (DATE '2024-01-03', 5),\n  (DATE '2024-01-04', 15), (DATE '2024-01-05', 32), (DATE '2024-01-06', 14),\n  (DATE '2024-01-07', 9),  (DATE '2024-01-08', 21), (DATE '2024-01-09', 6),\n  (DATE '2024-01-10', 27), (DATE '2024-01-11', 13), (DATE '2024-01-12', 18),\n  (DATE '2024-01-13', 34), (DATE '2024-01-14', 5),  (DATE '2024-01-15', 22),\n  (DATE '2024-01-16', 16), (DATE '2024-01-17', 9),  (DATE '2024-01-18', 30),\n  (DATE '2024-01-19', 12), (DATE '2024-01-20', 24), (DATE '2024-01-21', 7),\n  (DATE '2024-01-22', 19), (DATE '2024-01-23', 15), (DATE '2024-01-24', 28)\n) AS t(day, amt);",
+      "steps": {
+        "running": {
+          "sql": "SELECT\n  day,\n  amt,\n  SUM(amt) OVER (\n    ORDER BY day\n    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  ) AS running_total\nFROM daily\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amt",
+            "running_total"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              10,
+              10
+            ],
+            [
+              "2024-01-02",
+              20,
+              30
+            ],
+            [
+              "2024-01-03",
+              5,
+              35
+            ],
+            [
+              "2024-01-04",
+              15,
+              50
+            ],
+            [
+              "2024-01-05",
+              32,
+              82
+            ],
+            [
+              "2024-01-06",
+              14,
+              96
+            ],
+            [
+              "2024-01-07",
+              9,
+              105
+            ],
+            [
+              "2024-01-08",
+              21,
+              126
+            ],
+            [
+              "2024-01-09",
+              6,
+              132
+            ],
+            [
+              "2024-01-10",
+              27,
+              159
+            ],
+            [
+              "2024-01-11",
+              13,
+              172
+            ],
+            [
+              "2024-01-12",
+              18,
+              190
+            ],
+            [
+              "2024-01-13",
+              34,
+              224
+            ],
+            [
+              "2024-01-14",
+              5,
+              229
+            ],
+            [
+              "2024-01-15",
+              22,
+              251
+            ],
+            [
+              "2024-01-16",
+              16,
+              267
+            ],
+            [
+              "2024-01-17",
+              9,
+              276
+            ],
+            [
+              "2024-01-18",
+              30,
+              306
+            ],
+            [
+              "2024-01-19",
+              12,
+              318
+            ],
+            [
+              "2024-01-20",
+              24,
+              342
+            ],
+            [
+              "2024-01-21",
+              7,
+              349
+            ],
+            [
+              "2024-01-22",
+              19,
+              368
+            ],
+            [
+              "2024-01-23",
+              15,
+              383
+            ],
+            [
+              "2024-01-24",
+              28,
+              411
+            ]
+          ]
+        },
+        "trailing": {
+          "sql": "SELECT day, amt,\n  COUNT(*) OVER w AS n_rows,\n  ROUND(AVG(amt) OVER w, 2) AS avg_7\nFROM daily\nWINDOW w AS (ORDER BY day\n  ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amt",
+            "n_rows",
+            "avg_7"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              10,
+              1,
+              "10.00"
+            ],
+            [
+              "2024-01-02",
+              20,
+              2,
+              "15.00"
+            ],
+            [
+              "2024-01-03",
+              5,
+              3,
+              "11.67"
+            ],
+            [
+              "2024-01-04",
+              15,
+              4,
+              "12.50"
+            ],
+            [
+              "2024-01-05",
+              32,
+              5,
+              "16.40"
+            ],
+            [
+              "2024-01-06",
+              14,
+              6,
+              "16.00"
+            ],
+            [
+              "2024-01-07",
+              9,
+              7,
+              "15.00"
+            ],
+            [
+              "2024-01-08",
+              21,
+              7,
+              "16.57"
+            ],
+            [
+              "2024-01-09",
+              6,
+              7,
+              "14.57"
+            ],
+            [
+              "2024-01-10",
+              27,
+              7,
+              "17.71"
+            ],
+            [
+              "2024-01-11",
+              13,
+              7,
+              "17.43"
+            ],
+            [
+              "2024-01-12",
+              18,
+              7,
+              "15.43"
+            ],
+            [
+              "2024-01-13",
+              34,
+              7,
+              "18.29"
+            ],
+            [
+              "2024-01-14",
+              5,
+              7,
+              "17.71"
+            ],
+            [
+              "2024-01-15",
+              22,
+              7,
+              "17.86"
+            ],
+            [
+              "2024-01-16",
+              16,
+              7,
+              "19.29"
+            ],
+            [
+              "2024-01-17",
+              9,
+              7,
+              "16.71"
+            ],
+            [
+              "2024-01-18",
+              30,
+              7,
+              "19.14"
+            ],
+            [
+              "2024-01-19",
+              12,
+              7,
+              "18.29"
+            ],
+            [
+              "2024-01-20",
+              24,
+              7,
+              "16.86"
+            ],
+            [
+              "2024-01-21",
+              7,
+              7,
+              "17.14"
+            ],
+            [
+              "2024-01-22",
+              19,
+              7,
+              "16.71"
+            ],
+            [
+              "2024-01-23",
+              15,
+              7,
+              "16.57"
+            ],
+            [
+              "2024-01-24",
+              28,
+              7,
+              "19.29"
+            ]
+          ]
+        },
+        "defaulted": {
+          "sql": "SELECT day, amt,\n  SUM(amt) OVER (ORDER BY day) AS running_total\nFROM daily\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amt",
+            "running_total"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              10,
+              10
+            ],
+            [
+              "2024-01-02",
+              20,
+              30
+            ],
+            [
+              "2024-01-03",
+              5,
+              35
+            ],
+            [
+              "2024-01-04",
+              15,
+              50
+            ],
+            [
+              "2024-01-05",
+              32,
+              82
+            ],
+            [
+              "2024-01-06",
+              14,
+              96
+            ],
+            [
+              "2024-01-07",
+              9,
+              105
+            ],
+            [
+              "2024-01-08",
+              21,
+              126
+            ],
+            [
+              "2024-01-09",
+              6,
+              132
+            ],
+            [
+              "2024-01-10",
+              27,
+              159
+            ],
+            [
+              "2024-01-11",
+              13,
+              172
+            ],
+            [
+              "2024-01-12",
+              18,
+              190
+            ],
+            [
+              "2024-01-13",
+              34,
+              224
+            ],
+            [
+              "2024-01-14",
+              5,
+              229
+            ],
+            [
+              "2024-01-15",
+              22,
+              251
+            ],
+            [
+              "2024-01-16",
+              16,
+              267
+            ],
+            [
+              "2024-01-17",
+              9,
+              276
+            ],
+            [
+              "2024-01-18",
+              30,
+              306
+            ],
+            [
+              "2024-01-19",
+              12,
+              318
+            ],
+            [
+              "2024-01-20",
+              24,
+              342
+            ],
+            [
+              "2024-01-21",
+              7,
+              349
+            ],
+            [
+              "2024-01-22",
+              19,
+              368
+            ],
+            [
+              "2024-01-23",
+              15,
+              383
+            ],
+            [
+              "2024-01-24",
+              28,
+              411
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "lag": {
+      "setup": "CREATE TABLE monthly AS SELECT * FROM (VALUES\n  (DATE '2022-07-01', 180), (DATE '2022-08-01', 155), (DATE '2022-09-01', 210),\n  (DATE '2022-10-01', 195), (DATE '2022-11-01', 240), (DATE '2022-12-01', 330),\n  (DATE '2023-01-01', 145), (DATE '2023-02-01', 165), (DATE '2023-03-01', 220),\n  (DATE '2023-04-01', 205), (DATE '2023-05-01', 275), (DATE '2023-06-01', 250),\n  (DATE '2023-07-01', 190), (DATE '2023-08-01', 175), (DATE '2023-09-01', 235),\n  (DATE '2023-10-01', 260), (DATE '2023-11-01', 290), (DATE '2023-12-01', 385),\n  (DATE '2024-01-01', 100), (DATE '2024-02-01', 130), (DATE '2024-03-01', 120),\n  (DATE '2024-04-01', 165), (DATE '2024-05-01', 205), (DATE '2024-06-01', 185)\n) AS t(month, revenue);",
+      "steps": {
+        "mom": {
+          "sql": "SELECT\n  month,\n  revenue,\n  revenue - LAG(revenue) OVER (ORDER BY month) AS mom_change\nFROM monthly\nORDER BY month;",
+          "ok": true,
+          "columns": [
+            "month",
+            "revenue",
+            "mom_change"
+          ],
+          "rows": [
+            [
+              "2022-07-01",
+              180,
+              null
+            ],
+            [
+              "2022-08-01",
+              155,
+              -25
+            ],
+            [
+              "2022-09-01",
+              210,
+              55
+            ],
+            [
+              "2022-10-01",
+              195,
+              -15
+            ],
+            [
+              "2022-11-01",
+              240,
+              45
+            ],
+            [
+              "2022-12-01",
+              330,
+              90
+            ],
+            [
+              "2023-01-01",
+              145,
+              -185
+            ],
+            [
+              "2023-02-01",
+              165,
+              20
+            ],
+            [
+              "2023-03-01",
+              220,
+              55
+            ],
+            [
+              "2023-04-01",
+              205,
+              -15
+            ],
+            [
+              "2023-05-01",
+              275,
+              70
+            ],
+            [
+              "2023-06-01",
+              250,
+              -25
+            ],
+            [
+              "2023-07-01",
+              190,
+              -60
+            ],
+            [
+              "2023-08-01",
+              175,
+              -15
+            ],
+            [
+              "2023-09-01",
+              235,
+              60
+            ],
+            [
+              "2023-10-01",
+              260,
+              25
+            ],
+            [
+              "2023-11-01",
+              290,
+              30
+            ],
+            [
+              "2023-12-01",
+              385,
+              95
+            ],
+            [
+              "2024-01-01",
+              100,
+              -285
+            ],
+            [
+              "2024-02-01",
+              130,
+              30
+            ],
+            [
+              "2024-03-01",
+              120,
+              -10
+            ],
+            [
+              "2024-04-01",
+              165,
+              45
+            ],
+            [
+              "2024-05-01",
+              205,
+              40
+            ],
+            [
+              "2024-06-01",
+              185,
+              -20
+            ]
+          ]
+        },
+        "yoy": {
+          "sql": "SELECT month, revenue,\n  revenue - LAG(revenue) OVER (ORDER BY month) AS mom_change,\n  revenue - LAG(revenue, 12) OVER (ORDER BY month) AS yoy_change\nFROM monthly\nORDER BY month;",
+          "ok": true,
+          "columns": [
+            "month",
+            "revenue",
+            "mom_change",
+            "yoy_change"
+          ],
+          "rows": [
+            [
+              "2022-07-01",
+              180,
+              null,
+              null
+            ],
+            [
+              "2022-08-01",
+              155,
+              -25,
+              null
+            ],
+            [
+              "2022-09-01",
+              210,
+              55,
+              null
+            ],
+            [
+              "2022-10-01",
+              195,
+              -15,
+              null
+            ],
+            [
+              "2022-11-01",
+              240,
+              45,
+              null
+            ],
+            [
+              "2022-12-01",
+              330,
+              90,
+              null
+            ],
+            [
+              "2023-01-01",
+              145,
+              -185,
+              null
+            ],
+            [
+              "2023-02-01",
+              165,
+              20,
+              null
+            ],
+            [
+              "2023-03-01",
+              220,
+              55,
+              null
+            ],
+            [
+              "2023-04-01",
+              205,
+              -15,
+              null
+            ],
+            [
+              "2023-05-01",
+              275,
+              70,
+              null
+            ],
+            [
+              "2023-06-01",
+              250,
+              -25,
+              null
+            ],
+            [
+              "2023-07-01",
+              190,
+              -60,
+              10
+            ],
+            [
+              "2023-08-01",
+              175,
+              -15,
+              20
+            ],
+            [
+              "2023-09-01",
+              235,
+              60,
+              25
+            ],
+            [
+              "2023-10-01",
+              260,
+              25,
+              65
+            ],
+            [
+              "2023-11-01",
+              290,
+              30,
+              50
+            ],
+            [
+              "2023-12-01",
+              385,
+              95,
+              55
+            ],
+            [
+              "2024-01-01",
+              100,
+              -285,
+              -45
+            ],
+            [
+              "2024-02-01",
+              130,
+              30,
+              -35
+            ],
+            [
+              "2024-03-01",
+              120,
+              -10,
+              -100
+            ],
+            [
+              "2024-04-01",
+              165,
+              45,
+              -40
+            ],
+            [
+              "2024-05-01",
+              205,
+              40,
+              -70
+            ],
+            [
+              "2024-06-01",
+              185,
+              -20,
+              -65
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "lagGap": {
+      "setup": "CREATE TABLE monthly AS SELECT * FROM (VALUES\n  (DATE '2022-07-01', 180), (DATE '2022-08-01', 155), (DATE '2022-09-01', 210),\n  (DATE '2022-10-01', 195), (DATE '2022-11-01', 240), (DATE '2022-12-01', 330),\n  (DATE '2023-01-01', 145), (DATE '2023-02-01', 165), (DATE '2023-03-01', 220),\n  (DATE '2023-04-01', 205), (DATE '2023-05-01', 275), (DATE '2023-06-01', 250),\n  (DATE '2023-07-01', 190), (DATE '2023-08-01', 175), (DATE '2023-09-01', 235),\n  (DATE '2023-10-01', 260), (DATE '2023-11-01', 290), (DATE '2023-12-01', 385),\n  (DATE '2024-01-01', 100), (DATE '2024-02-01', 130), (DATE '2024-03-01', 120),\n  (DATE '2024-04-01', 165), (DATE '2024-05-01', 205), (DATE '2024-06-01', 185)\n) AS t(month, revenue);\nDELETE FROM monthly WHERE month = DATE '2023-03-01';",
+      "steps": {
+        "rows": {
+          "sql": "SELECT COUNT(*) AS months FROM monthly;",
+          "ok": true,
+          "columns": [
+            "months"
+          ],
+          "rows": [
+            [
+              23
+            ]
+          ]
+        },
+        "yoy": {
+          "sql": "SELECT month, revenue,\n  LAG(month, 12) OVER (ORDER BY month) AS compared_with,\n  revenue - LAG(revenue, 12) OVER (ORDER BY month) AS yoy_change\nFROM monthly\nORDER BY month;",
+          "ok": true,
+          "columns": [
+            "month",
+            "revenue",
+            "compared_with",
+            "yoy_change"
+          ],
+          "rows": [
+            [
+              "2022-07-01",
+              180,
+              null,
+              null
+            ],
+            [
+              "2022-08-01",
+              155,
+              null,
+              null
+            ],
+            [
+              "2022-09-01",
+              210,
+              null,
+              null
+            ],
+            [
+              "2022-10-01",
+              195,
+              null,
+              null
+            ],
+            [
+              "2022-11-01",
+              240,
+              null,
+              null
+            ],
+            [
+              "2022-12-01",
+              330,
+              null,
+              null
+            ],
+            [
+              "2023-01-01",
+              145,
+              null,
+              null
+            ],
+            [
+              "2023-02-01",
+              165,
+              null,
+              null
+            ],
+            [
+              "2023-04-01",
+              205,
+              null,
+              null
+            ],
+            [
+              "2023-05-01",
+              275,
+              null,
+              null
+            ],
+            [
+              "2023-06-01",
+              250,
+              null,
+              null
+            ],
+            [
+              "2023-07-01",
+              190,
+              null,
+              null
+            ],
+            [
+              "2023-08-01",
+              175,
+              "2022-07-01",
+              -5
+            ],
+            [
+              "2023-09-01",
+              235,
+              "2022-08-01",
+              80
+            ],
+            [
+              "2023-10-01",
+              260,
+              "2022-09-01",
+              50
+            ],
+            [
+              "2023-11-01",
+              290,
+              "2022-10-01",
+              95
+            ],
+            [
+              "2023-12-01",
+              385,
+              "2022-11-01",
+              145
+            ],
+            [
+              "2024-01-01",
+              100,
+              "2022-12-01",
+              -230
+            ],
+            [
+              "2024-02-01",
+              130,
+              "2023-01-01",
+              -15
+            ],
+            [
+              "2024-03-01",
+              120,
+              "2023-02-01",
+              -45
+            ],
+            [
+              "2024-04-01",
+              165,
+              "2023-04-01",
+              -40
+            ],
+            [
+              "2024-05-01",
+              205,
+              "2023-05-01",
+              -70
+            ],
+            [
+              "2024-06-01",
+              185,
+              "2023-06-01",
+              -65
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "spine": {
+      "setup": "CREATE TABLE logins AS SELECT * FROM (VALUES\n  (101, DATE '2024-05-01'), (102, DATE '2024-05-01'), (101, DATE '2024-05-01'),\n  (103, DATE '2024-05-03'), (101, DATE '2024-05-04'), (104, DATE '2024-05-03'),\n  (102, DATE '2024-05-04'), (105, DATE '2024-05-05'), (101, DATE '2024-05-05'),\n  (106, DATE '2024-05-07'), (103, DATE '2024-05-07'), (107, DATE '2024-05-08'),\n  (102, DATE '2024-05-08'), (108, DATE '2024-05-08'), (101, DATE '2024-05-10'),\n  (109, DATE '2024-05-10'), (104, DATE '2024-05-11'), (110, DATE '2024-05-11'),\n  (105, DATE '2024-05-14'), (102, DATE '2024-05-14'), (111, DATE '2024-05-14'),\n  (106, DATE '2024-05-15'), (101, DATE '2024-05-15'), (112, DATE '2024-05-15')\n) AS t(user_id, login_date);",
+      "steps": {
+        "without": {
+          "sql": "SELECT login_date AS day,\n  COUNT(DISTINCT user_id) AS active_users\nFROM logins\nGROUP BY login_date\nORDER BY login_date;",
+          "ok": true,
+          "columns": [
+            "day",
+            "active_users"
+          ],
+          "rows": [
+            [
+              "2024-05-01",
+              2
+            ],
+            [
+              "2024-05-03",
+              2
+            ],
+            [
+              "2024-05-04",
+              2
+            ],
+            [
+              "2024-05-05",
+              2
+            ],
+            [
+              "2024-05-07",
+              2
+            ],
+            [
+              "2024-05-08",
+              3
+            ],
+            [
+              "2024-05-10",
+              2
+            ],
+            [
+              "2024-05-11",
+              2
+            ],
+            [
+              "2024-05-14",
+              3
+            ],
+            [
+              "2024-05-15",
+              3
+            ]
+          ]
+        },
+        "spine": {
+          "sql": "WITH bounds AS (\n  SELECT MIN(login_date) AS lo, MAX(login_date) AS hi FROM logins\n),\nspine AS (\n  SELECT CAST(g AS DATE) AS day\n  FROM bounds, generate_series(bounds.lo, bounds.hi, INTERVAL '1 day') AS gs(g)\n)\nSELECT\n  s.day,\n  COUNT(DISTINCT l.user_id) AS active_users\nFROM spine s\nLEFT JOIN logins l ON l.login_date = s.day\nGROUP BY s.day\nORDER BY s.day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "active_users"
+          ],
+          "rows": [
+            [
+              "2024-05-01",
+              2
+            ],
+            [
+              "2024-05-02",
+              0
+            ],
+            [
+              "2024-05-03",
+              2
+            ],
+            [
+              "2024-05-04",
+              2
+            ],
+            [
+              "2024-05-05",
+              2
+            ],
+            [
+              "2024-05-06",
+              0
+            ],
+            [
+              "2024-05-07",
+              2
+            ],
+            [
+              "2024-05-08",
+              3
+            ],
+            [
+              "2024-05-09",
+              0
+            ],
+            [
+              "2024-05-10",
+              2
+            ],
+            [
+              "2024-05-11",
+              2
+            ],
+            [
+              "2024-05-12",
+              0
+            ],
+            [
+              "2024-05-13",
+              0
+            ],
+            [
+              "2024-05-14",
+              3
+            ],
+            [
+              "2024-05-15",
+              3
+            ]
+          ]
+        },
+        "countStar": {
+          "sql": "WITH bounds AS (\n  SELECT MIN(login_date) AS lo, MAX(login_date) AS hi FROM logins\n),\nspine AS (\n  SELECT CAST(g AS DATE) AS day\n  FROM bounds, generate_series(bounds.lo, bounds.hi, INTERVAL '1 day') AS gs(g)\n)\nSELECT\n  s.day,\n  COUNT(*) AS active_users\nFROM spine s\nLEFT JOIN logins l ON l.login_date = s.day\nGROUP BY s.day\nORDER BY s.day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "active_users"
+          ],
+          "rows": [
+            [
+              "2024-05-01",
+              3
+            ],
+            [
+              "2024-05-02",
+              1
+            ],
+            [
+              "2024-05-03",
+              2
+            ],
+            [
+              "2024-05-04",
+              2
+            ],
+            [
+              "2024-05-05",
+              2
+            ],
+            [
+              "2024-05-06",
+              1
+            ],
+            [
+              "2024-05-07",
+              2
+            ],
+            [
+              "2024-05-08",
+              3
+            ],
+            [
+              "2024-05-09",
+              1
+            ],
+            [
+              "2024-05-10",
+              2
+            ],
+            [
+              "2024-05-11",
+              2
+            ],
+            [
+              "2024-05-12",
+              1
+            ],
+            [
+              "2024-05-13",
+              1
+            ],
+            [
+              "2024-05-14",
+              3
+            ],
+            [
+              "2024-05-15",
+              3
+            ]
+          ]
+        },
+        "type": {
+          "sql": "SELECT pg_typeof(g) AS type, g\nFROM generate_series(DATE '2024-05-01', DATE '2024-05-03', INTERVAL '1 day') AS gs(g);",
+          "ok": true,
+          "columns": [
+            "type",
+            "g"
+          ],
+          "rows": [
+            [
+              "timestamp with time zone",
+              "2024-05-01 00:00:00+00"
+            ],
+            [
+              "timestamp with time zone",
+              "2024-05-02 00:00:00+00"
+            ],
+            [
+              "timestamp with time zone",
+              "2024-05-03 00:00:00+00"
+            ]
+          ]
+        },
+        "pageSeries": {
+          "sql": "WITH bounds AS (SELECT MIN(login_date) AS lo, MAX(login_date) AS hi FROM logins)\nSELECT CAST(g AS DATE) AS day\nFROM bounds, generate_series(bounds.lo, bounds.hi, INTERVAL '1 day') AS gs(g);",
+          "ok": true,
+          "columns": [
+            "day"
+          ],
+          "rows": [
+            [
+              "2024-05-01"
+            ],
+            [
+              "2024-05-02"
+            ],
+            [
+              "2024-05-03"
+            ],
+            [
+              "2024-05-04"
+            ],
+            [
+              "2024-05-05"
+            ],
+            [
+              "2024-05-06"
+            ],
+            [
+              "2024-05-07"
+            ],
+            [
+              "2024-05-08"
+            ],
+            [
+              "2024-05-09"
+            ],
+            [
+              "2024-05-10"
+            ],
+            [
+              "2024-05-11"
+            ],
+            [
+              "2024-05-12"
+            ],
+            [
+              "2024-05-13"
+            ],
+            [
+              "2024-05-14"
+            ],
+            [
+              "2024-05-15"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "distinct": {
+      "setup": "CREATE TABLE logins AS SELECT * FROM (VALUES\n  (101, DATE '2024-05-01'), (102, DATE '2024-05-01'), (101, DATE '2024-05-01'),\n  (103, DATE '2024-05-03'), (101, DATE '2024-05-04'), (104, DATE '2024-05-03'),\n  (102, DATE '2024-05-04'), (105, DATE '2024-05-05'), (101, DATE '2024-05-05'),\n  (106, DATE '2024-05-07'), (103, DATE '2024-05-07'), (107, DATE '2024-05-08'),\n  (102, DATE '2024-05-08'), (108, DATE '2024-05-08'), (101, DATE '2024-05-10'),\n  (109, DATE '2024-05-10'), (104, DATE '2024-05-11'), (110, DATE '2024-05-11'),\n  (105, DATE '2024-05-14'), (102, DATE '2024-05-14'), (111, DATE '2024-05-14'),\n  (106, DATE '2024-05-15'), (101, DATE '2024-05-15'), (112, DATE '2024-05-15')\n) AS t(user_id, login_date);",
+      "steps": {
+        "daily": {
+          "sql": "SELECT login_date, COUNT(DISTINCT user_id) AS users\nFROM logins\nGROUP BY login_date\nORDER BY login_date;",
+          "ok": true,
+          "columns": [
+            "login_date",
+            "users"
+          ],
+          "rows": [
+            [
+              "2024-05-01",
+              2
+            ],
+            [
+              "2024-05-03",
+              2
+            ],
+            [
+              "2024-05-04",
+              2
+            ],
+            [
+              "2024-05-05",
+              2
+            ],
+            [
+              "2024-05-07",
+              2
+            ],
+            [
+              "2024-05-08",
+              3
+            ],
+            [
+              "2024-05-10",
+              2
+            ],
+            [
+              "2024-05-11",
+              2
+            ],
+            [
+              "2024-05-14",
+              3
+            ],
+            [
+              "2024-05-15",
+              3
+            ]
+          ]
+        },
+        "summed": {
+          "sql": "SELECT SUM(users) AS summed_daily FROM (\n  SELECT COUNT(DISTINCT user_id) AS users\n  FROM logins\n  GROUP BY login_date\n) d;",
+          "ok": true,
+          "columns": [
+            "summed_daily"
+          ],
+          "rows": [
+            [
+              "23"
+            ]
+          ]
+        },
+        "whole": {
+          "sql": "SELECT COUNT(DISTINCT user_id) AS users\nFROM logins;",
+          "ok": true,
+          "columns": [
+            "users"
+          ],
+          "rows": [
+            [
+              12
+            ]
+          ]
+        },
+        "rows": {
+          "sql": "SELECT COUNT(*) AS logins FROM logins;",
+          "ok": true,
+          "columns": [
+            "logins"
+          ],
+          "rows": [
+            [
+              24
+            ]
+          ]
+        },
+        "repeat": {
+          "sql": "SELECT COUNT(*) AS users, SUM(days - 1) AS extra_counts FROM (\n  SELECT user_id, COUNT(DISTINCT login_date) AS days\n  FROM logins\n  GROUP BY user_id\n  HAVING COUNT(DISTINCT login_date) > 1\n) r;",
+          "ok": true,
+          "columns": [
+            "users",
+            "extra_counts"
+          ],
+          "rows": [
+            [
+              6,
+              "11"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "ratio": {
+      "setup": "CREATE TABLE daily_orders (day DATE, revenue NUMERIC(12,2), orders INTEGER);\nINSERT INTO daily_orders VALUES\n  ('2024-01-01', 200.00, 1),\n  ('2024-01-02', 500000.00, 10000);",
+      "steps": {
+        "perDay": {
+          "sql": "SELECT day, revenue, orders,\n  ROUND(revenue / NULLIF(orders, 0), 2) AS aov\nFROM daily_orders\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "revenue",
+            "orders",
+            "aov"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "200.00",
+              1,
+              "200.00"
+            ],
+            [
+              "2024-01-02",
+              "500000.00",
+              10000,
+              "50.00"
+            ]
+          ]
+        },
+        "averaged": {
+          "sql": "SELECT ROUND(AVG(revenue / NULLIF(orders, 0)), 2) AS avg_of_ratios\nFROM daily_orders;",
+          "ok": true,
+          "columns": [
+            "avg_of_ratios"
+          ],
+          "rows": [
+            [
+              "125.00"
+            ]
+          ]
+        },
+        "summed": {
+          "sql": "SELECT ROUND(SUM(revenue) / NULLIF(SUM(orders), 0), 2) AS ratio_of_sums\nFROM daily_orders;",
+          "ok": true,
+          "columns": [
+            "ratio_of_sums"
+          ],
+          "rows": [
+            [
+              "50.01"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "divide": {
+      "setup": "CREATE TABLE daily_summary (day DATE, gross_revenue NUMERIC(10,2), order_count INTEGER);\nINSERT INTO daily_summary VALUES\n  ('2024-01-01', 1200.00, 8),\n  ('2024-01-02', 0.00, 0),\n  ('2024-01-03', 450.00, 3);",
+      "steps": {
+        "bare": {
+          "sql": "SELECT gross_revenue, order_count,\n  gross_revenue / order_count AS avg_order_value\nFROM daily_summary;",
+          "ok": false,
+          "error": "ERROR: division by zero"
+        },
+        "nullif": {
+          "sql": "SELECT\n  gross_revenue,\n  order_count,\n  ROUND(gross_revenue / NULLIF(order_count, 0), 2) AS avg_order_value\nFROM daily_summary\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "gross_revenue",
+            "order_count",
+            "avg_order_value"
+          ],
+          "rows": [
+            [
+              "1200.00",
+              8,
+              "150.00"
+            ],
+            [
+              "0.00",
+              0,
+              null
+            ],
+            [
+              "450.00",
+              3,
+              "150.00"
+            ]
+          ]
+        },
+        "coalesce": {
+          "sql": "SELECT day,\n  COALESCE(ROUND(gross_revenue / NULLIF(order_count, 0), 2), 0) AS avg_order_value\nFROM daily_summary\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "avg_order_value"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "150.00"
+            ],
+            [
+              "2024-01-02",
+              "0"
+            ],
+            [
+              "2024-01-03",
+              "150.00"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "rank": {
+      "setup": "CREATE TABLE products (category TEXT, product TEXT, revenue INTEGER);\nINSERT INTO products VALUES\n  ('Books', 'Dune', 420), ('Books', 'Emma', 310), ('Books', 'Ulysses', 310), ('Books', 'Beloved', 150),\n  ('Games', 'Chess', 500), ('Games', 'Go', 260), ('Games', 'Risk', 180), ('Games', 'Uno', 90);",
+      "steps": {
+        "books": {
+          "sql": "SELECT product, revenue,\n  ROW_NUMBER() OVER (ORDER BY revenue DESC) AS row_number,\n  RANK()       OVER (ORDER BY revenue DESC) AS rank,\n  DENSE_RANK() OVER (ORDER BY revenue DESC) AS dense_rank\nFROM products\nWHERE category = 'Books'\nORDER BY revenue DESC, product;",
+          "ok": true,
+          "columns": [
+            "product",
+            "revenue",
+            "row_number",
+            "rank",
+            "dense_rank"
+          ],
+          "rows": [
+            [
+              "Dune",
+              420,
+              1,
+              1,
+              1
+            ],
+            [
+              "Emma",
+              310,
+              2,
+              2,
+              2
+            ],
+            [
+              "Ulysses",
+              310,
+              3,
+              2,
+              2
+            ],
+            [
+              "Beloved",
+              150,
+              4,
+              4,
+              3
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "cte": {
+      "setup": "CREATE TABLE customer_updates AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 10:00:00', 'a@x.com'),\n  (1, TIMESTAMP '2024-03-01 09:00:00', 'a2@x.com'),\n  (2, TIMESTAMP '2024-02-01 08:00:00', 'b@x.com'),\n  (2, TIMESTAMP '2024-02-15 08:00:00', 'b2@x.com'),\n  (3, TIMESTAMP '2024-01-20 12:00:00', 'c@x.com'),\n  (3, TIMESTAMP '2024-04-02 07:30:00', 'c2@x.com'),\n  (3, TIMESTAMP '2024-05-18 16:45:00', 'c3@x.com'),\n  (4, TIMESTAMP '2024-01-09 11:15:00', 'd@x.com'),\n  (4, TIMESTAMP '2024-03-22 14:20:00', 'd2@x.com'),\n  (5, TIMESTAMP '2024-02-07 09:40:00', 'e@x.com'),\n  (5, TIMESTAMP '2024-04-11 13:05:00', 'e2@x.com'),\n  (5, TIMESTAMP '2024-06-01 08:55:00', 'e3@x.com'),\n  (6, TIMESTAMP '2024-01-14 15:30:00', 'f@x.com'),\n  (7, TIMESTAMP '2024-02-23 10:10:00', 'g@x.com'),\n  (7, TIMESTAMP '2024-05-04 12:25:00', 'g2@x.com'),\n  (8, TIMESTAMP '2024-03-08 07:45:00', 'h@x.com'),\n  (8, TIMESTAMP '2024-04-27 17:00:00', 'h2@x.com'),\n  (9, TIMESTAMP '2024-01-31 09:20:00', 'i@x.com'),\n  (9, TIMESTAMP '2024-03-15 11:35:00', 'i2@x.com'),\n  (9, TIMESTAMP '2024-06-09 14:50:00', 'i3@x.com'),\n  (10, TIMESTAMP '2024-02-12 08:05:00', 'j@x.com'),\n  (10, TIMESTAMP '2024-05-26 16:15:00', 'j2@x.com'),\n  (11, TIMESTAMP '2024-04-03 13:40:00', 'k@x.com'),\n  (12, TIMESTAMP '2024-05-11 10:55:00', 'l@x.com')\n) AS t(customer_id, updated_at, email);",
+      "steps": {
+        "cte": {
+          "sql": "WITH recent AS (\n  SELECT * FROM customer_updates\n  WHERE updated_at >= TIMESTAMP '2024-05-01'\n)\nSELECT * FROM recent\nORDER BY updated_at;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "updated_at",
+            "email"
+          ],
+          "rows": [
+            [
+              7,
+              "2024-05-04 12:25:00",
+              "g2@x.com"
+            ],
+            [
+              12,
+              "2024-05-11 10:55:00",
+              "l@x.com"
+            ],
+            [
+              3,
+              "2024-05-18 16:45:00",
+              "c3@x.com"
+            ],
+            [
+              10,
+              "2024-05-26 16:15:00",
+              "j2@x.com"
+            ],
+            [
+              5,
+              "2024-06-01 08:55:00",
+              "e3@x.com"
+            ],
+            [
+              9,
+              "2024-06-09 14:50:00",
+              "i3@x.com"
+            ]
+          ]
+        },
+        "recursive": {
+          "sql": "WITH RECURSIVE nums(n) AS (\n  SELECT 1\n  UNION ALL\n  SELECT n + 1 FROM nums WHERE n < 5\n)\nSELECT * FROM nums;",
+          "ok": true,
+          "columns": [
+            "n"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "pivot": {
+      "setup": "CREATE TABLE sales (region TEXT, quarter TEXT, amount INTEGER);\nINSERT INTO sales VALUES\n  ('North','Q1',100), ('North','Q2',140), ('South','Q1',80),\n  ('South','Q2',120), ('North','Q1',60),  ('South','Q2',30),\n  ('East','Q1',95),   ('East','Q2',175),  ('West','Q1',110),\n  ('West','Q2',65),   ('North','Q2',85),  ('South','Q1',145),\n  ('East','Q1',40),   ('West','Q2',200),  ('North','Q1',75),\n  ('South','Q2',55),  ('East','Q2',130),  ('West','Q1',90),\n  ('North','Q2',115), ('South','Q1',35),  ('East','Q1',160),\n  ('West','Q2',105),  ('North','Q1',50),  ('South','Q2',185);",
+      "steps": {
+        "rows": {
+          "sql": "SELECT COUNT(*) AS rows FROM sales;",
+          "ok": true,
+          "columns": [
+            "rows"
+          ],
+          "rows": [
+            [
+              24
+            ]
+          ]
+        },
+        "pivotCase": {
+          "sql": "SELECT region,\n  SUM(CASE WHEN quarter = 'Q1' THEN amount END) AS q1,\n  SUM(CASE WHEN quarter = 'Q2' THEN amount END) AS q2\nFROM sales\nGROUP BY region\nORDER BY region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "q1",
+            "q2"
+          ],
+          "rows": [
+            [
+              "East",
+              295,
+              305
+            ],
+            [
+              "North",
+              285,
+              340
+            ],
+            [
+              "South",
+              260,
+              390
+            ],
+            [
+              "West",
+              200,
+              370
+            ]
+          ]
+        },
+        "pivotFilter": {
+          "sql": "SELECT region,\n  SUM(amount) FILTER (WHERE quarter = 'Q1') AS q1,\n  SUM(amount) FILTER (WHERE quarter = 'Q2') AS q2\nFROM sales\nGROUP BY region\nORDER BY region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "q1",
+            "q2"
+          ],
+          "rows": [
+            [
+              "East",
+              295,
+              305
+            ],
+            [
+              "North",
+              285,
+              340
+            ],
+            [
+              "South",
+              260,
+              390
+            ],
+            [
+              "West",
+              200,
+              370
+            ]
+          ]
+        },
+        "pivotClause": {
+          "sql": "SELECT *\nFROM sales\nPIVOT (SUM(amount) FOR quarter IN ('Q1', 'Q2'));",
+          "ok": false,
+          "error": "ERROR: syntax error at or near \"(\""
+        },
+        "unpivot": {
+          "sql": "WITH wide AS (\n  SELECT region,\n    SUM(amount) FILTER (WHERE quarter = 'Q1') AS q1,\n    SUM(amount) FILTER (WHERE quarter = 'Q2') AS q2\n  FROM sales\n  GROUP BY region\n  ORDER BY region\n)\nSELECT region, u.quarter, u.amt\nFROM wide CROSS JOIN LATERAL (VALUES ('Q1', q1), ('Q2', q2)) AS u(quarter, amt)\nORDER BY region, u.quarter;",
+          "ok": true,
+          "columns": [
+            "region",
+            "quarter",
+            "amt"
+          ],
+          "rows": [
+            [
+              "East",
+              "Q1",
+              295
+            ],
+            [
+              "East",
+              "Q2",
+              305
+            ],
+            [
+              "North",
+              "Q1",
+              285
+            ],
+            [
+              "North",
+              "Q2",
+              340
+            ],
+            [
+              "South",
+              "Q1",
+              260
+            ],
+            [
+              "South",
+              "Q2",
+              390
+            ],
+            [
+              "West",
+              "Q1",
+              200
+            ],
+            [
+              "West",
+              "Q2",
+              370
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "qualify": {
+      "setup": "CREATE TABLE customer_updates AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 10:00:00', 'a@x.com'),\n  (1, TIMESTAMP '2024-03-01 09:00:00', 'a2@x.com'),\n  (2, TIMESTAMP '2024-02-01 08:00:00', 'b@x.com'),\n  (2, TIMESTAMP '2024-02-15 08:00:00', 'b2@x.com'),\n  (3, TIMESTAMP '2024-01-20 12:00:00', 'c@x.com'),\n  (3, TIMESTAMP '2024-04-02 07:30:00', 'c2@x.com'),\n  (3, TIMESTAMP '2024-05-18 16:45:00', 'c3@x.com'),\n  (4, TIMESTAMP '2024-01-09 11:15:00', 'd@x.com'),\n  (4, TIMESTAMP '2024-03-22 14:20:00', 'd2@x.com'),\n  (5, TIMESTAMP '2024-02-07 09:40:00', 'e@x.com'),\n  (5, TIMESTAMP '2024-04-11 13:05:00', 'e2@x.com'),\n  (5, TIMESTAMP '2024-06-01 08:55:00', 'e3@x.com'),\n  (6, TIMESTAMP '2024-01-14 15:30:00', 'f@x.com'),\n  (7, TIMESTAMP '2024-02-23 10:10:00', 'g@x.com'),\n  (7, TIMESTAMP '2024-05-04 12:25:00', 'g2@x.com'),\n  (8, TIMESTAMP '2024-03-08 07:45:00', 'h@x.com'),\n  (8, TIMESTAMP '2024-04-27 17:00:00', 'h2@x.com'),\n  (9, TIMESTAMP '2024-01-31 09:20:00', 'i@x.com'),\n  (9, TIMESTAMP '2024-03-15 11:35:00', 'i2@x.com'),\n  (9, TIMESTAMP '2024-06-09 14:50:00', 'i3@x.com'),\n  (10, TIMESTAMP '2024-02-12 08:05:00', 'j@x.com'),\n  (10, TIMESTAMP '2024-05-26 16:15:00', 'j2@x.com'),\n  (11, TIMESTAMP '2024-04-03 13:40:00', 'k@x.com'),\n  (12, TIMESTAMP '2024-05-11 10:55:00', 'l@x.com')\n) AS t(customer_id, updated_at, email);",
+      "steps": {
+        "qualify": {
+          "sql": "SELECT customer_id, updated_at, email\nFROM customer_updates\nQUALIFY ROW_NUMBER() OVER (\n  PARTITION BY customer_id\n  ORDER BY updated_at DESC\n) = 1\nORDER BY customer_id;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "updated_at",
+            "email"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-03-01 09:00:00",
+              "a2@x.com"
+            ],
+            [
+              2,
+              "2024-02-15 08:00:00",
+              "b2@x.com"
+            ],
+            [
+              3,
+              "2024-05-18 16:45:00",
+              "c3@x.com"
+            ],
+            [
+              4,
+              "2024-03-22 14:20:00",
+              "d2@x.com"
+            ],
+            [
+              5,
+              "2024-06-01 08:55:00",
+              "e3@x.com"
+            ],
+            [
+              6,
+              "2024-01-14 15:30:00",
+              "f@x.com"
+            ],
+            [
+              7,
+              "2024-05-04 12:25:00",
+              "g2@x.com"
+            ],
+            [
+              8,
+              "2024-04-27 17:00:00",
+              "h2@x.com"
+            ],
+            [
+              9,
+              "2024-06-09 14:50:00",
+              "i3@x.com"
+            ],
+            [
+              10,
+              "2024-05-26 16:15:00",
+              "j2@x.com"
+            ],
+            [
+              11,
+              "2024-04-03 13:40:00",
+              "k@x.com"
+            ],
+            [
+              12,
+              "2024-05-11 10:55:00",
+              "l@x.com"
+            ]
+          ]
+        },
+        "subquery": {
+          "sql": "SELECT customer_id, updated_at, email\nFROM (\n  SELECT\n    *,\n    ROW_NUMBER() OVER (\n      PARTITION BY customer_id\n      ORDER BY updated_at DESC\n    ) AS rn\n  FROM customer_updates\n) ranked\nWHERE rn = 1\nORDER BY customer_id;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "updated_at",
+            "email"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-03-01 09:00:00",
+              "a2@x.com"
+            ],
+            [
+              2,
+              "2024-02-15 08:00:00",
+              "b2@x.com"
+            ],
+            [
+              3,
+              "2024-05-18 16:45:00",
+              "c3@x.com"
+            ],
+            [
+              4,
+              "2024-03-22 14:20:00",
+              "d2@x.com"
+            ],
+            [
+              5,
+              "2024-06-01 08:55:00",
+              "e3@x.com"
+            ],
+            [
+              6,
+              "2024-01-14 15:30:00",
+              "f@x.com"
+            ],
+            [
+              7,
+              "2024-05-04 12:25:00",
+              "g2@x.com"
+            ],
+            [
+              8,
+              "2024-04-27 17:00:00",
+              "h2@x.com"
+            ],
+            [
+              9,
+              "2024-06-09 14:50:00",
+              "i3@x.com"
+            ],
+            [
+              10,
+              "2024-05-26 16:15:00",
+              "j2@x.com"
+            ],
+            [
+              11,
+              "2024-04-03 13:40:00",
+              "k@x.com"
+            ],
+            [
+              12,
+              "2024-05-11 10:55:00",
+              "l@x.com"
+            ]
+          ]
+        }
+      },
+      "version": "DuckDB v1.4.3"
+    },
+    "approx": {
+      "setup": "CREATE TABLE ids AS SELECT i AS user_id FROM range(1000000) t(i);",
+      "steps": {
+        "both": {
+          "sql": "SELECT COUNT(DISTINCT user_id) AS exact,\n  approx_count_distinct(user_id) AS approx\nFROM ids;",
+          "ok": true,
+          "columns": [
+            "exact",
+            "approx"
+          ],
+          "rows": [
+            [
+              1000000,
+              962761
+            ]
+          ]
+        }
+      },
+      "version": "DuckDB v1.4.3"
+    }
+  }
+}

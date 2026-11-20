@@ -141,7 +141,7 @@ SCD Type 1 **overwrites** the old attribute value with the new one, preserving n
 
 ### What is SCD Type 2, and how is it implemented?
 
-SCD Type 2 adds a **new row** for each attribute change, preserving the full history. Each row gets its own surrogate key plus `valid_from`, `valid_to`, and `is_current` columns. Fact rows joined to their surrogate key automatically reflect the attribute values that were true at event time.
+SCD Type 2 adds a **new row** for each attribute change, preserving the full history. Each row gets its own surrogate key plus `valid_from`, `valid_to`, and `is_current` columns. A fact row that stores the surrogate key of the version current when its event happened reflects the attribute values that were true at event time; without one, join on the natural key with the event date between `valid_from` and `valid_to`, as the block below does.
 
 Follow-ups usually go to what that costs. Type 1 keeps one row per entity
 forever; Type 2 keeps one row per *version*, so the table grows with the
@@ -323,7 +323,7 @@ Because there is no measure to sum, you answer questions by **counting rows**. T
 -- fact_promotion_coverage(date_sk, store_sk, product_sk), no measures
 
 -- "How many distinct products were promoted in store 5 last week?"
-SELECT COUNT(*) AS promoted_products
+SELECT COUNT(DISTINCT pc.product_sk) AS promoted_products
 FROM fact_promotion_coverage pc
 JOIN dim_date d ON d.date_sk = pc.date_sk
 WHERE pc.store_sk = 5
@@ -381,7 +381,7 @@ ORDER BY f.order_id, p.promotion_name;`}
 
 ### What is normalization in 3NF, and why does dimensional modeling deliberately avoid it for dimensions?
 
-Third Normal Form (3NF) eliminates all non-key dependencies and redundancy to optimize for write performance and consistency. Dimensional modeling denormalizes dimensions intentionally, collapsing hierarchies into one wide table, to minimize joins, simplify BI tool queries, and improve query readability at the cost of some redundancy.
+Third Normal Form (3NF) removes transitive dependencies: every non-key column depends on the key, the whole key, and nothing but the key, so each fact (a category's name, say) is stored once, which keeps writes consistent. Dimensional modeling denormalizes dimensions intentionally, collapsing hierarchies into one wide table, to minimize joins, simplify BI tool queries, and improve query readability at the cost of some redundancy.
 
 ### What is a wide (one-big-table) approach, and when is it appropriate?
 
@@ -423,7 +423,7 @@ Measures in fact tables are generally fixed at event time and should not change.
 
 **Hash surrogates** (e.g., `MD5(natural_key)`) are deterministic, you can compute the same key in any environment without a central sequence, which helps distributed/incremental builds. **Integer sequences** are more compact, faster for joins, and easier to debug, but require a coordination mechanism. Hashes can collide (rare but possible) and are larger in storage. Most modern data warehouses use either approach; hashes are common in dbt pipelines.
 
-The two queries below contrast the approaches: the first hashes the natural key (computable anywhere, no central counter), while the second assigns a sequential integer with `row_number()` (compact and human-readable, but dependent on a single ordering pass):
+The two queries below contrast the approaches: the first hashes the natural key (computable anywhere, no central counter), while the second assigns a sequential integer with `row_number()` (compact and human-readable, but dependent on a single ordering pass: rerun it after a new customer with a lower id arrives and every later key shifts, so facts already loaded point at the wrong customer. A real integer key is assigned once from a sequence and kept):
 
 ```sql
 -- Hash surrogate: deterministic, no sequence needed

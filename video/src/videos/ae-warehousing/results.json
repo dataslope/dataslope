@@ -1,0 +1,180 @@
+{
+  "engine": {
+    "duckdbWasm": "1.32.0",
+    "duckdb": "v1.4.3"
+  },
+  "table": {
+    "seed": 0.42,
+    "rows": 1000000,
+    "checksum": "252235844.17",
+    "parquet": 9355298,
+    "columns": [
+      "sale_id",
+      "sale_date",
+      "region",
+      "category",
+      "units",
+      "amount"
+    ]
+  },
+  "columnBytes": {
+    "sale_id": 4000488,
+    "sale_date": 3087,
+    "region": 379876,
+    "category": 379975,
+    "units": 379705,
+    "amount": 4205471
+  },
+  "select": {
+    "star": {
+      "sql": "SELECT *\nFROM 'sales.parquet';",
+      "read": 9367575,
+      "total": 9355298,
+      "resultRows": 1000000
+    },
+    "regionAmount": {
+      "sql": "SELECT region, SUM(amount) AS revenue\nFROM 'sales.parquet'\nGROUP BY region;",
+      "read": 4594594,
+      "total": 9355298,
+      "resultRows": 4
+    },
+    "regionUnits": {
+      "sql": "SELECT region, SUM(units) AS units\nFROM 'sales.parquet'\nGROUP BY region;",
+      "read": 769028,
+      "total": 9355298,
+      "resultRows": 4
+    }
+  },
+  "selectModel": {
+    "columns": 200,
+    "selected": 3,
+    "share": 0.015
+  },
+  "obt": {
+    "dimension": {
+      "sql": "SELECT * FROM dim_category ORDER BY category_id;",
+      "columns": [
+        "category_id",
+        "category",
+        "department"
+      ],
+      "rows": [
+        [
+          1,
+          "Electronics",
+          "Tech"
+        ],
+        [
+          2,
+          "Books",
+          "Media"
+        ],
+        [
+          3,
+          "Home",
+          "Living"
+        ],
+        [
+          4,
+          "Garden",
+          "Living"
+        ],
+        [
+          5,
+          "Toys",
+          "Kids"
+        ]
+      ]
+    },
+    "starFile": 9355042,
+    "obtFile": 9736493,
+    "keyBytes": 379707,
+    "nameBytes": 379975,
+    "departmentBytes": 379981,
+    "starQuery": {
+      "sql": "SELECT d.category, SUM(f.amount) AS revenue\nFROM fct_sales f\nJOIN dim_category d ON d.category_id = f.category_id\nGROUP BY d.category\nORDER BY revenue DESC;",
+      "columns": [
+        "category",
+        "revenue"
+      ],
+      "rows": [
+        [
+          "Electronics",
+          "50711848.03"
+        ],
+        [
+          "Toys",
+          "50477511.43"
+        ],
+        [
+          "Home",
+          "50396236.78"
+        ],
+        [
+          "Books",
+          "50325490.87"
+        ],
+        [
+          "Garden",
+          "50324757.06"
+        ]
+      ]
+    },
+    "obtQuery": {
+      "sql": "SELECT category, SUM(amount) AS revenue\nFROM obt_sales\nGROUP BY category\nORDER BY revenue DESC;",
+      "columns": [
+        "category",
+        "revenue"
+      ],
+      "rows": [
+        [
+          "Electronics",
+          "50711848.03"
+        ],
+        [
+          "Toys",
+          "50477511.43"
+        ],
+        [
+          "Home",
+          "50396236.78"
+        ],
+        [
+          "Books",
+          "50325490.87"
+        ],
+        [
+          "Garden",
+          "50324757.06"
+        ]
+      ]
+    }
+  },
+  "rename": {
+    "star": {
+      "sql": "UPDATE dim_category\nSET category = 'Home & Garden'\nWHERE category = 'Home';",
+      "rows": 1
+    },
+    "obt": {
+      "sql": "UPDATE obt_sales\nSET category = 'Home & Garden'\nWHERE category = 'Home';",
+      "rows": 199786
+    },
+    "rowGroupRows": 122880,
+    "rowGroups": 9,
+    "rowGroupsTouched": 9
+  },
+  "pruneModel": {
+    "source": "charts/partition-pruning-scan.mjs",
+    "days": 365,
+    "gbPerDay": 2.4,
+    "typicalDays": 7,
+    "fullGb": 876,
+    "typicalGb": 16.8,
+    "ratio": 52.14285714285714
+  },
+  "computeModel": {
+    "busyMinutes": 2,
+    "hourMinutes": 60,
+    "ratio": 30
+  }
+}

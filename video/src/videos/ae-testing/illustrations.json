@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "model": "gpt-image-2.6-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "ae-testing-woodpecker",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a green woodpecker clinging upright to the side of a short, thick tree trunk, its stiff tail braced against the bark and its head drawn back mid-tap, its back and folded wings in soft green washes, a bright red crown and a pale yellow rump, its long beak pointed at the bark; one large, bold, simple silhouette that reads at a small size"
+    },
+    {
+      "id": "ae-testing-clock",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a round wind-up alarm clock with two bells on top and two short stubby feet, its plain face showing just two hands and no numbers"
+    },
+    {
+      "id": "ae-testing-ledger",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a thick hardbound ledger book lying open, its two pages ruled into a few plain columns with no writing"
+    },
+    {
+      "id": "ae-testing-pager",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a chunky old belt pager, a rounded plastic box with a small blank screen and one large button, a short clip on its back, lying at a slight tilt"
+    }
+  ]
+}

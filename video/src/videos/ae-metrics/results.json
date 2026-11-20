@@ -1,0 +1,895 @@
+{
+  "figures": {
+    "fan": {
+      "setup": "CREATE TABLE orders AS SELECT * FROM (VALUES\n  (1, 100.00), (2, 50.00), (3, 275.00), (4, 130.00),\n  (5, 62.50), (6, 410.00), (7, 95.00), (8, 220.00),\n  (9, 48.75), (10, 315.00), (11, 155.00), (12, 88.00)\n) AS t(order_id, amount);\n\nCREATE TABLE order_items AS SELECT * FROM (VALUES\n  (1, 'A', 1), (1, 'B', 2), (1, 'C', 1), (2, 'D', 1),\n  (3, 'A', 3), (3, 'E', 1), (4, 'B', 2), (4, 'F', 1),\n  (5, 'C', 1), (6, 'A', 2), (6, 'D', 4), (6, 'G', 1),\n  (7, 'B', 1), (8, 'E', 2), (8, 'F', 3), (9, 'C', 1),\n  (10, 'A', 1), (10, 'B', 1), (10, 'G', 2), (11, 'D', 2),\n  (11, 'E', 1), (12, 'F', 1), (12, 'G', 1), (12, 'A', 2)\n) AS t(order_id, item, qty);",
+      "steps": {
+        "orders": {
+          "sql": "SELECT order_id, amount FROM orders ORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              1,
+              "100.00"
+            ],
+            [
+              2,
+              "50.00"
+            ],
+            [
+              3,
+              "275.00"
+            ],
+            [
+              4,
+              "130.00"
+            ],
+            [
+              5,
+              "62.50"
+            ],
+            [
+              6,
+              "410.00"
+            ],
+            [
+              7,
+              "95.00"
+            ],
+            [
+              8,
+              "220.00"
+            ],
+            [
+              9,
+              "48.75"
+            ],
+            [
+              10,
+              "315.00"
+            ],
+            [
+              11,
+              "155.00"
+            ],
+            [
+              12,
+              "88.00"
+            ]
+          ]
+        },
+        "items": {
+          "sql": "SELECT order_id, item, qty FROM order_items ORDER BY ctid;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "item",
+            "qty"
+          ],
+          "rows": [
+            [
+              1,
+              "A",
+              1
+            ],
+            [
+              1,
+              "B",
+              2
+            ],
+            [
+              1,
+              "C",
+              1
+            ],
+            [
+              2,
+              "D",
+              1
+            ],
+            [
+              3,
+              "A",
+              3
+            ],
+            [
+              3,
+              "E",
+              1
+            ],
+            [
+              4,
+              "B",
+              2
+            ],
+            [
+              4,
+              "F",
+              1
+            ],
+            [
+              5,
+              "C",
+              1
+            ],
+            [
+              6,
+              "A",
+              2
+            ],
+            [
+              6,
+              "D",
+              4
+            ],
+            [
+              6,
+              "G",
+              1
+            ],
+            [
+              7,
+              "B",
+              1
+            ],
+            [
+              8,
+              "E",
+              2
+            ],
+            [
+              8,
+              "F",
+              3
+            ],
+            [
+              9,
+              "C",
+              1
+            ],
+            [
+              10,
+              "A",
+              1
+            ],
+            [
+              10,
+              "B",
+              1
+            ],
+            [
+              10,
+              "G",
+              2
+            ],
+            [
+              11,
+              "D",
+              2
+            ],
+            [
+              11,
+              "E",
+              1
+            ],
+            [
+              12,
+              "F",
+              1
+            ],
+            [
+              12,
+              "G",
+              1
+            ],
+            [
+              12,
+              "A",
+              2
+            ]
+          ]
+        },
+        "revenue": {
+          "sql": "SELECT COUNT(*) AS orders, SUM(amount) AS revenue\nFROM orders;",
+          "ok": true,
+          "columns": [
+            "orders",
+            "revenue"
+          ],
+          "rows": [
+            [
+              12,
+              "1949.25"
+            ]
+          ]
+        },
+        "page": {
+          "sql": "-- FAN TRAP: order 1's amount is counted once per item -> inflated\nSELECT SUM(o.amount) AS inflated_revenue\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id;\n-- True revenue is 1,949.25 (SUM over orders alone), but this returns 4,555.25.",
+          "ok": true,
+          "columns": [
+            "inflated_revenue"
+          ],
+          "rows": [
+            [
+              "4555.25"
+            ]
+          ]
+        },
+        "joinedRows": {
+          "sql": "SELECT COUNT(*) AS rows\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id;",
+          "ok": true,
+          "columns": [
+            "rows"
+          ],
+          "rows": [
+            [
+              24
+            ]
+          ]
+        },
+        "firstTwo": {
+          "sql": "SELECT o.order_id, o.amount, i.item\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id\nWHERE o.order_id IN (1, 2)\nORDER BY o.order_id, i.item;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "amount",
+            "item"
+          ],
+          "rows": [
+            [
+              1,
+              "100.00",
+              "A"
+            ],
+            [
+              1,
+              "100.00",
+              "B"
+            ],
+            [
+              1,
+              "100.00",
+              "C"
+            ],
+            [
+              2,
+              "50.00",
+              "D"
+            ]
+          ]
+        },
+        "firstTwoSums": {
+          "sql": "SELECT (SELECT SUM(amount) FROM orders WHERE order_id IN (1, 2)) AS revenue,\n  SUM(o.amount) AS joined\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id\nWHERE o.order_id IN (1, 2);",
+          "ok": true,
+          "columns": [
+            "revenue",
+            "joined"
+          ],
+          "rows": [
+            [
+              "150.00",
+              "350.00"
+            ]
+          ]
+        },
+        "perOrder": {
+          "sql": "SELECT o.order_id, o.amount, COUNT(*) AS items,\n  SUM(o.amount) AS counted\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id\nGROUP BY o.order_id, o.amount\nORDER BY o.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "amount",
+            "items",
+            "counted"
+          ],
+          "rows": [
+            [
+              1,
+              "100.00",
+              3,
+              "300.00"
+            ],
+            [
+              2,
+              "50.00",
+              1,
+              "50.00"
+            ],
+            [
+              3,
+              "275.00",
+              2,
+              "550.00"
+            ],
+            [
+              4,
+              "130.00",
+              2,
+              "260.00"
+            ],
+            [
+              5,
+              "62.50",
+              1,
+              "62.50"
+            ],
+            [
+              6,
+              "410.00",
+              3,
+              "1230.00"
+            ],
+            [
+              7,
+              "95.00",
+              1,
+              "95.00"
+            ],
+            [
+              8,
+              "220.00",
+              2,
+              "440.00"
+            ],
+            [
+              9,
+              "48.75",
+              1,
+              "48.75"
+            ],
+            [
+              10,
+              "315.00",
+              3,
+              "945.00"
+            ],
+            [
+              11,
+              "155.00",
+              2,
+              "310.00"
+            ],
+            [
+              12,
+              "88.00",
+              3,
+              "264.00"
+            ]
+          ]
+        },
+        "multiple": {
+          "sql": "SELECT ROUND(\n  (SELECT SUM(o.amount) FROM orders o JOIN order_items i ON i.order_id = o.order_id)\n  / (SELECT SUM(amount) FROM orders), 2) AS times;",
+          "ok": true,
+          "columns": [
+            "times"
+          ],
+          "rows": [
+            [
+              "2.34"
+            ]
+          ]
+        },
+        "testUnique": {
+          "sql": "SELECT order_id, COUNT(*) AS n FROM orders GROUP BY order_id HAVING COUNT(*) > 1;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "n"
+          ],
+          "rows": []
+        },
+        "testNotNull": {
+          "sql": "SELECT * FROM orders WHERE order_id IS NULL OR amount IS NULL;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "amount"
+          ],
+          "rows": []
+        },
+        "testItemsNotNull": {
+          "sql": "SELECT * FROM order_items WHERE order_id IS NULL;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "item",
+            "qty"
+          ],
+          "rows": []
+        },
+        "testRelationships": {
+          "sql": "SELECT i.* FROM order_items i LEFT JOIN orders o ON o.order_id = i.order_id WHERE o.order_id IS NULL;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "item",
+            "qty"
+          ],
+          "rows": []
+        },
+        "fix": {
+          "sql": "-- Aggregate each grain independently, then join the summaries\nWITH order_rev AS (\n  SELECT SUM(amount) AS revenue FROM orders\n),\nitem_qty AS (\n  SELECT SUM(qty) AS units FROM order_items\n)\nSELECT revenue, units FROM order_rev, item_qty;",
+          "ok": true,
+          "columns": [
+            "revenue",
+            "units"
+          ],
+          "rows": [
+            [
+              "1949.25",
+              38
+            ]
+          ]
+        },
+        "afterJoin": {
+          "sql": "SELECT COUNT(DISTINCT o.order_id) AS orders,\n  SUM(i.qty) AS units\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id;",
+          "ok": true,
+          "columns": [
+            "orders",
+            "units"
+          ],
+          "rows": [
+            [
+              12,
+              38
+            ]
+          ]
+        },
+        "byOrder": {
+          "sql": "WITH revenue AS (\n  SELECT order_id, SUM(amount) AS revenue\n  FROM orders GROUP BY order_id\n),\nunits AS (\n  SELECT order_id, SUM(qty) AS units\n  FROM order_items GROUP BY order_id\n)\nSELECT r.order_id, r.revenue, u.units\nFROM revenue r\nJOIN units u ON u.order_id = r.order_id\nORDER BY r.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "revenue",
+            "units"
+          ],
+          "rows": [
+            [
+              1,
+              "100.00",
+              4
+            ],
+            [
+              2,
+              "50.00",
+              1
+            ],
+            [
+              3,
+              "275.00",
+              4
+            ],
+            [
+              4,
+              "130.00",
+              3
+            ],
+            [
+              5,
+              "62.50",
+              1
+            ],
+            [
+              6,
+              "410.00",
+              7
+            ],
+            [
+              7,
+              "95.00",
+              1
+            ],
+            [
+              8,
+              "220.00",
+              5
+            ],
+            [
+              9,
+              "48.75",
+              1
+            ],
+            [
+              10,
+              "315.00",
+              4
+            ],
+            [
+              11,
+              "155.00",
+              3
+            ],
+            [
+              12,
+              "88.00",
+              4
+            ]
+          ]
+        },
+        "byOrderTotals": {
+          "sql": "WITH revenue AS (\n  SELECT order_id, SUM(amount) AS revenue\n  FROM orders GROUP BY order_id\n),\nunits AS (\n  SELECT order_id, SUM(qty) AS units\n  FROM order_items GROUP BY order_id\n)\nSELECT COUNT(*) AS orders, SUM(r.revenue) AS revenue, SUM(u.units) AS units\nFROM revenue r\nJOIN units u ON u.order_id = r.order_id;",
+          "ok": true,
+          "columns": [
+            "orders",
+            "revenue",
+            "units"
+          ],
+          "rows": [
+            [
+              12,
+              "1949.25",
+              "38"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "chasm": {
+      "setup": "CREATE TABLE customer (customer_id INTEGER, name TEXT);\nINSERT INTO customer VALUES (1, 'Ada'), (2, 'Ben');\nCREATE TABLE payments (payment_id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO payments VALUES (1, 1, 100.00), (2, 1, 50.00), (3, 1, 30.00), (4, 2, 40.00);\nCREATE TABLE refunds (refund_id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO refunds VALUES (1, 1, 20.00), (2, 1, 10.00);",
+      "steps": {
+        "payments": {
+          "sql": "SELECT payment_id, customer_id, amount FROM payments ORDER BY payment_id;",
+          "ok": true,
+          "columns": [
+            "payment_id",
+            "customer_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "100.00"
+            ],
+            [
+              2,
+              1,
+              "50.00"
+            ],
+            [
+              3,
+              1,
+              "30.00"
+            ],
+            [
+              4,
+              2,
+              "40.00"
+            ]
+          ]
+        },
+        "refunds": {
+          "sql": "SELECT refund_id, customer_id, amount FROM refunds ORDER BY refund_id;",
+          "ok": true,
+          "columns": [
+            "refund_id",
+            "customer_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "20.00"
+            ],
+            [
+              2,
+              1,
+              "10.00"
+            ]
+          ]
+        },
+        "truth": {
+          "sql": "SELECT (SELECT SUM(amount) FROM payments WHERE customer_id = 1) AS paid,\n  (SELECT SUM(amount) FROM refunds WHERE customer_id = 1) AS refunded;",
+          "ok": true,
+          "columns": [
+            "paid",
+            "refunded"
+          ],
+          "rows": [
+            [
+              "180.00",
+              "30.00"
+            ]
+          ]
+        },
+        "joined": {
+          "sql": "SELECT c.name, p.amount AS payment, r.amount AS refund\nFROM customer c\nJOIN payments p ON p.customer_id = c.customer_id\nJOIN refunds r ON r.customer_id = c.customer_id\nORDER BY p.payment_id, r.refund_id;",
+          "ok": true,
+          "columns": [
+            "name",
+            "payment",
+            "refund"
+          ],
+          "rows": [
+            [
+              "Ada",
+              "100.00",
+              "20.00"
+            ],
+            [
+              "Ada",
+              "100.00",
+              "10.00"
+            ],
+            [
+              "Ada",
+              "50.00",
+              "20.00"
+            ],
+            [
+              "Ada",
+              "50.00",
+              "10.00"
+            ],
+            [
+              "Ada",
+              "30.00",
+              "20.00"
+            ],
+            [
+              "Ada",
+              "30.00",
+              "10.00"
+            ]
+          ]
+        },
+        "trap": {
+          "sql": "SELECT c.name, SUM(p.amount) AS paid, SUM(r.amount) AS refunded\nFROM customer c\nJOIN payments p ON p.customer_id = c.customer_id\nJOIN refunds r ON r.customer_id = c.customer_id\nGROUP BY c.name;",
+          "ok": true,
+          "columns": [
+            "name",
+            "paid",
+            "refunded"
+          ],
+          "rows": [
+            [
+              "Ada",
+              "360.00",
+              "90.00"
+            ]
+          ]
+        },
+        "fixInner": {
+          "sql": "WITH paid AS (\n  SELECT customer_id, SUM(amount) AS paid\n  FROM payments GROUP BY customer_id\n),\nrefunded AS (\n  SELECT customer_id, SUM(amount) AS refunded\n  FROM refunds GROUP BY customer_id\n)\nSELECT c.name, p.paid, r.refunded\nFROM customer c\nJOIN paid p ON p.customer_id = c.customer_id\nJOIN refunded r ON r.customer_id = c.customer_id\nORDER BY c.customer_id;",
+          "ok": true,
+          "columns": [
+            "name",
+            "paid",
+            "refunded"
+          ],
+          "rows": [
+            [
+              "Ada",
+              "180.00",
+              "30.00"
+            ]
+          ]
+        },
+        "fix": {
+          "sql": "WITH paid AS (\n  SELECT customer_id, SUM(amount) AS paid\n  FROM payments GROUP BY customer_id\n),\nrefunded AS (\n  SELECT customer_id, SUM(amount) AS refunded\n  FROM refunds GROUP BY customer_id\n)\nSELECT c.name, COALESCE(p.paid, 0.00) AS paid,\n  COALESCE(r.refunded, 0.00) AS refunded\nFROM customer c\nLEFT JOIN paid p ON p.customer_id = c.customer_id\nLEFT JOIN refunded r ON r.customer_id = c.customer_id\nORDER BY c.customer_id;",
+          "ok": true,
+          "columns": [
+            "name",
+            "paid",
+            "refunded"
+          ],
+          "rows": [
+            [
+              "Ada",
+              "180.00",
+              "30.00"
+            ],
+            [
+              "Ben",
+              "40.00",
+              "0.00"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "distinct": {
+      "setup": "CREATE TABLE orders AS SELECT * FROM (VALUES\n  (1, 100.00), (2, 50.00), (3, 275.00), (4, 130.00),\n  (5, 62.50), (6, 410.00), (7, 95.00), (8, 220.00),\n  (9, 48.75), (10, 315.00), (11, 155.00), (12, 88.00)\n) AS t(order_id, amount);\n\nCREATE TABLE order_items AS SELECT * FROM (VALUES\n  (1, 'A', 1), (1, 'B', 2), (1, 'C', 1), (2, 'D', 1),\n  (3, 'A', 3), (3, 'E', 1), (4, 'B', 2), (4, 'F', 1),\n  (5, 'C', 1), (6, 'A', 2), (6, 'D', 4), (6, 'G', 1),\n  (7, 'B', 1), (8, 'E', 2), (8, 'F', 3), (9, 'C', 1),\n  (10, 'A', 1), (10, 'B', 1), (10, 'G', 2), (11, 'D', 2),\n  (11, 'E', 1), (12, 'F', 1), (12, 'G', 1), (12, 'A', 2)\n) AS t(order_id, item, qty);\nCREATE TABLE order_summary AS\nSELECT order_id, COUNT(DISTINCT item) AS products\nFROM order_items\nGROUP BY order_id;",
+      "steps": {
+        "summary": {
+          "sql": "SELECT order_id, products FROM order_summary ORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "products"
+          ],
+          "rows": [
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              6,
+              3
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              8,
+              2
+            ],
+            [
+              9,
+              1
+            ],
+            [
+              10,
+              3
+            ],
+            [
+              11,
+              2
+            ],
+            [
+              12,
+              3
+            ]
+          ]
+        },
+        "summed": {
+          "sql": "SELECT SUM(products) AS products\nFROM order_summary;",
+          "ok": true,
+          "columns": [
+            "products"
+          ],
+          "rows": [
+            [
+              "24"
+            ]
+          ]
+        },
+        "recount": {
+          "sql": "SELECT COUNT(DISTINCT item) AS products\nFROM order_items;",
+          "ok": true,
+          "columns": [
+            "products"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        },
+        "perProduct": {
+          "sql": "SELECT item, COUNT(DISTINCT order_id) AS orders\nFROM order_items\nGROUP BY item\nORDER BY item;",
+          "ok": true,
+          "columns": [
+            "item",
+            "orders"
+          ],
+          "rows": [
+            [
+              "A",
+              5
+            ],
+            [
+              "B",
+              4
+            ],
+            [
+              "C",
+              3
+            ],
+            [
+              "D",
+              3
+            ],
+            [
+              "E",
+              3
+            ],
+            [
+              "F",
+              3
+            ],
+            [
+              "G",
+              3
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "ratio": {
+      "setup": "CREATE TABLE daily (day DATE, sessions INTEGER, conversions INTEGER);\nINSERT INTO daily VALUES ('2026-01-05', 10, 5), ('2026-01-06', 1000, 20);",
+      "steps": {
+        "table": {
+          "sql": "SELECT day, sessions, conversions,\n  ROUND(100.0 * conversions / sessions, 1) AS rate_pct\nFROM daily ORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "sessions",
+            "conversions",
+            "rate_pct"
+          ],
+          "rows": [
+            [
+              "2026-01-05",
+              10,
+              5,
+              "50.0"
+            ],
+            [
+              "2026-01-06",
+              1000,
+              20,
+              "2.0"
+            ]
+          ]
+        },
+        "averaged": {
+          "sql": "SELECT ROUND(AVG(100.0 * conversions / sessions), 1)\n  AS avg_of_rates_pct\nFROM daily;",
+          "ok": true,
+          "columns": [
+            "avg_of_rates_pct"
+          ],
+          "rows": [
+            [
+              "26.0"
+            ]
+          ]
+        },
+        "pooled": {
+          "sql": "SELECT ROUND(100.0 * SUM(conversions) / SUM(sessions), 1)\n  AS overall_rate_pct\nFROM daily;",
+          "ok": true,
+          "columns": [
+            "overall_rate_pct"
+          ],
+          "rows": [
+            [
+              "2.5"
+            ]
+          ]
+        },
+        "parts": {
+          "sql": "SELECT SUM(conversions) AS conversions, SUM(sessions) AS sessions\nFROM daily;",
+          "ok": true,
+          "columns": [
+            "conversions",
+            "sessions"
+          ],
+          "rows": [
+            [
+              25,
+              1010
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    }
+  },
+  "definitions": {
+    "metricflow": "metrics:\n  - name: completed_revenue\n    type: simple\n    label: Completed Revenue\n    type_params:\n      measure: order_amount   # SUM defined on the semantic model, filtered to completed"
+  },
+  "pageNote": null
+}
