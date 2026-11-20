@@ -86,8 +86,10 @@ export const PAIRWISE = results.pairwise as {
   rows: number;
   cols: number;
   dtype: string;
-  /** Rows whose distance to themselves came out negative. */
+  /** Rows whose distance to themselves came out negative (float32). */
   selfNegative: number;
+  /** The same rows, in float64. */
+  selfNegative64: number;
   nanAfterRoot: number;
   nanAfterClip: number;
   /** The largest distance from a row to itself, after clipping. */

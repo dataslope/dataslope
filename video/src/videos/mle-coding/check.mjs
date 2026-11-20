@@ -13,7 +13,8 @@
 //
 // Timings are the one thing a rerun does not reproduce: they vary from run
 // to run and machine to machine, so the narration argues from ratios only
-// ("dozens of times", "more than ten times", "about ten times"), and this
+// ("roughly a hundred times", "roughly thirty times", "more than ten
+// times"), and this
 // script fails if a run stops fitting those words. Each timing is the best of
 // several runs after a warm-up.
 //
@@ -145,7 +146,8 @@ R["broadcast"] = {
 # ── 5. Pairwise distances: the memory, and the identity's rounding ──
 n, d = 10_000, 128
 rp = np.random.default_rng(5)
-Xp = rp.normal(size=(1000, 128)).astype(np.float32)    # the video's own thousand rows
+Xp64 = rp.normal(size=(1000, 128))                     # the video's own thousand rows,
+Xp = Xp64.astype(np.float32)                            # stored as float32
 sq = (Xp ** 2).sum(1)
 D2 = sq[:, None] + sq[None, :] - 2 * Xp @ Xp.T
 diag = np.diag(D2)
@@ -158,6 +160,7 @@ R["pairwise"] = {
     "broadcastBytes": n * n * d * 8, "identityBytes": n * n * 8,
     "rows": 1000, "cols": 128, "dtype": "float32",
     "selfNegative": int((diag < 0).sum()), "nanAfterRoot": int(np.isnan(Dr).sum()),
+    "selfNegative64": int((np.diag((lambda X64: (X64 ** 2).sum(1)[:, None] + (X64 ** 2).sum(1)[None, :] - 2 * X64 @ X64.T)(Xp64)) < 0).sum()),
     "nanAfterClip": int(np.isnan(Dc).sum()),
     "selfWorst": r4(np.sqrt(np.abs(diag).max())),
     "typical": r2(np.median(Dc[np.triu_indices(1000, 1)])),
@@ -399,6 +402,7 @@ const claims = [
   ["q5", R.pairwise.broadcastBytes === 102_400_000_000 ? "about a hundred gigabytes" : "(the broadcast bytes changed)"],
   ["q5-identity", R.pairwise.identityBytes === 800_000_000 ? "eight hundred megabytes" : "(the identity bytes changed)"],
   ["q5-neg", `${words(Math.round((R.pairwise.selfNegative / R.pairwise.rows) * 10))} in ten`],
+  ["q5-neg", `${words(Math.round((R.pairwise.selfNegative64 / R.pairwise.rows) * 10))} in ten`],
   ["q6", R.floats.bytes32 === 5_120_000_000 && R.floats.bytes64 === 10_240_000_000 ? "about five gigabytes in float thirty-two, and ten" : "(the float bytes changed)"],
   ["q6-cost", `one million ${words(Math.round((R.floats.running32 - 1e6) / 1000))} thousand`],
   ["q6-cost", pctWords(R.floats.runningError)],

@@ -50,19 +50,19 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   hook: a single user's vector (a short arrow, blue) beside a tall column
  *     of thin item rows, "100,000 items" under it; the ten nearest rows lift
  *     out to the right on "ten closest". The tree frog at the right. On
- *     "three lines", three short code lines ink in, small, in the mono face:
+ *     "a few lines", three short code lines ink in, small, in the mono face:
  *     normalize, one product, argpartition; they fade before "q1".
  *   plan: fifteen numbered dots in a row, ten blue, five grey (quick).
  *   q1: question card.
  *   q1-time: three horizontal bars from VECTOR.ms (results.json), in this
  *     order: "Python loop", "NumPy per row", "one matrix product"; the loop's
- *     bar drawn first, the matrix product's last and green; on "dozens" the
- *     ratio "×{VECTOR.ratio.loop}" in yellow beside the loop bar; a note
+ *     bar drawn first, the matrix product's last and green; on "hundred"
+ *     the ratio "×{VECTOR.ratio.loop}" in yellow beside the loop bar; a note
  *     under the axis: "Timed once in Pyodide, the browser's Python; the
- *     ratio is the point". On "same answers", a small "max difference
- *     < 1e-9" note (maxDiff).
+ *     ratio is the point", with the stopwatch spot beside it on "Timed".
+ *     On "same answers", a small "Max difference < 1e-9" note (maxDiff).
  *   q1-why: two short lanes under the bars: the loop as a row of cells each
- *     passing through an "interpreter" box one at a time; the product as one
+ *     passing through an "Interpreter" box one at a time; the product as one
  *     arrow over a contiguous strip of cells, four lit at once on "several
  *     numbers at once".
  *   q1-row: the middle bar lit yellow, "×{VECTOR.ratio.perRow}" beside it;
@@ -73,13 +73,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (COSINE.guardedScores, except item 4) written at its tip as "one matrix
  *     product" is said. Item 4 is a dot at the origin, unlabelled for now.
  *   q2-zero: the dot at the origin labelled "new item: all zeros"; its score
- *     appears as "nan" in red; then a "top 3" list beside it, built with the
+ *     appears as "nan" in red; then a "Top 3" list beside it, built with the
  *     page's own idiom (COSINE.pageTop), with the empty item first, in red,
- *     on "first"; "for every user" under it.
+ *     on "first"; "For every user" under it.
  *   q2-guard: "+ 1e-12" lights in the formula's denominator, green; the red
  *     row's score becomes 0 and the list re-ranks to COSINE.guardedTop, green.
- *   q3: question card; a row of a million-cell strip (drawn as a long bar)
- *     with "sort: n log n" over it; then `np.argpartition(scores, -k)[-k:]`
+ *   q3: question card; a million scores drawn as one long strip, "sort: n
+ *     log n" over it; then `np.argpartition(scores, -k)[-k:]`
  *     on one line, the k cells pulled to the right end, unordered, then
  *     sorted among themselves on "only those k" (the page's five scores,
  *     TOPK.scores, as the worked strip: 0.9 and 0.7 end up at the right).
@@ -105,7 +105,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "float32: 5.12 GB" (FLOATS.bytes64, bytes32), the second half the
  *     first's height.
  *   q6-cost: a counter running up, "+0.1 × 10,000,000", ending at
- *     "1,087,937" in red, against "should be 1,000,000"; "+9%" in red; then
+ *     "1,087,937" in red, against "Should be 1,000,000"; "+9%" in red; then
  *     a number line near a million with ticks a sixteenth apart, "0.1 lands
  *     on 0.125" on "an eighth".
  *   q6-fix: "np.sum, adds in pairs: 1,000,000.125" in green;
@@ -128,24 +128,25 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     with short lines; shuffled with one permutation, the lines stay; then
  *     shuffled separately, the lines cross and break, red. Two bars:
  *     "shuffled together 95.9%" green, "shuffled apart 52.6%" red, and a
- *     dashed line "always guess benign: 62.6%" (grey, a baseline).
+ *     dashed line "always guess benign: 62.6%" (grey, a baseline). The
+ *     cards spot on "Shuffle them separately".
  *   q10: question card; a stream of lines flowing past ten slots (the
- *     reservoir; the rain barrel spot); "keep with probability k / i" lit as
+ *     reservoir; the rain barrel spot); "Keep with probability k / i" lit as
  *     a line replaces a slot.
  *   q10-why: the product written as a chain, k/i × i/(i+1) × … × (n−1)/n
- *     = k/n, collapsing on "everyone"; then ten bars, one per tenth of the
- *     stream (RESERVOIR.tenths), all at about 10%, labelled "simulation:
+ *     = k/n, collapsing on "every item"; then ten bars, one per tenth of the
+ *     stream (RESERVOIR.tenths), all at about 10%, labelled "Simulation:
  *     20,000 streams of 1,000 lines".
- *   q10-alt: two red alternatives under the bars: "first 10" (all from the
- *     first tenth) and "each with p = 1%" (a spread of sample sizes, 5 to
+ *   q10-alt: two red alternatives under the bars: "First 10" (all from the
+ *     first tenth) and "Each with p = 1%" (a spread of sample sizes, 5 to
  *     15, RESERVOIR.coinSizes).
  *   rapid-in: the quick round's five numbered rows (RapidFire), 11 to 15.
  *   r-hash: the page's six labels counted into a small table, cat 3, dog 2,
- *     bird 1; "baseline: cat, 50%".
+ *     bird 1; "Baseline: cat, 50%".
  *   r-dedup: b a b c a → b a c, the repeats struck as they are skipped.
  *   r-argmax: a 4×3 probability matrix (RAPID.probs), each row's largest lit
  *     green on "axis one", the answer "(4,)"; then the column maxima lit
- *     yellow, "(3,)", on "axis zero".
+ *     red, "(3,)", on "axis zero" (the wrong axis: the trap).
  *   r-metrics: two rows of 0/1, true and predicted, masks lit; then
  *     predictions all zero, "precision = 0 / 0", "NumPy: nan" and
  *     "scikit-learn: 0, with a warning".
@@ -169,11 +170,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     locality; reserve loops for steps that can't be array math). The
  *     timing is the video's own: 100,000 seeded rows of 64 numbers against
  *     one vector, as a pure Python loop, as np.dot per row, and as E @ q,
- *     best of several runs, measured once. On the run committed, the loop is
- *     about 50 to 80 times the product and per-row NumPy about 15 to 25
- *     times; check.mjs fails if a rerun leaves "dozens of times" (24 to 200)
- *     or "more than ten times" (10 to 60). The page's own range, "one to two
- *     orders of magnitude", agrees.
+ *     best of several runs (15 for the product), measured once. Over five
+ *     runs on this machine the loop came out 85 to 118 times the product and
+ *     per-row NumPy 29 to 38 times (the committed run: VECTOR.ratio);
+ *     check.mjs fails if a rerun leaves "roughly a hundred times" (50 to
+ *     200) or "roughly thirty times" (15 to 60). The page's own range, "one
+ *     to two orders of magnitude", agrees.
  *   - q2: the formula, normalize once and one product, and "the guard on the
  *     denominator is the one people forget": the page. The catalog is the
  *     video's own six two-dimensional items, one all zeros (a new item with
@@ -184,8 +186,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     it scores 0 and leaves the top three.
  *   - q3: O(n log n), argpartition O(n) and unordered, sort only the k,
  *     heapq.nlargest O(n log k): the page. Its five scores give indices 1 and
- *     3. Timed on a million seeded scores: a full argsort is about ten times
- *     argpartition (check.mjs: 7 to 14).
+ *     3. Timed on a million seeded scores: a full argsort took 13 to 16
+ *     times as long as argpartition over five runs ("more than ten times";
+ *     check.mjs: 10 to 40).
  *   - q4: the page's 3×2 standardization (column means 3 and 4, Z = ±1.225
  *     and 0). The bug is the video's own seeded 1,000 labels and a model's
  *     column of predictions: (1000, 1) minus (1000,) broadcasts to (1000,
@@ -193,9 +196,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - q5: the (n, n, d) broadcast and the norm identity: the page.
  *     Arithmetic: 10,000² × 128 × 8 bytes = 102.4 GB; 10,000² × 8 = 800 MB.
  *     The video's own 1,000 seeded rows of 128 standard normals in float32:
- *     the identity's distance from a row to itself is negative for 400 of
- *     them (about 0.4), nan after the root; clipped at zero, none, and the
- *     distances match the broadcast ones to 0.01.
+ *     the identity's distance from a row to itself is negative for 409 of
+ *     them ("four in ten"), nan after the root (the same draws kept in
+ *     float64: 411, so the narration does not name the dtype); clipped at
+ *     zero, none, and the distances match the broadcast ones to within 0.1%
+ *     of a typical distance.
  *   - q6: halves memory and bandwidth, GPUs, precision lost when
  *     accumulating, reductions in float64: the page. Arithmetic: 10 million
  *     × 128 × 4 bytes = 5.12 GB, × 8 = 10.24 GB. Measured: a float32 running
@@ -288,7 +293,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-zero",
-      text: "The guard on the denominator is the one people forget. A new item with no history has an embedding of all zeros, so its similarity is zero over zero: not a number. NumPy sorts that after every real number, so a descending top three puts the empty item first, for every single user.",
+      text: "The guard on the denominator is the one people forget. Say a new item, with no history yet, has an embedding of all zeros. Its similarity is zero over zero: not a number. NumPy sorts that after every real number, so a descending top three puts the empty item first, for every single user.",
       pauseAfter: 0.6,
     },
     {

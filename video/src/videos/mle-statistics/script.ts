@@ -66,14 +66,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * right answer, yellow what the narration points at, blue data. The two
  * models are "old" and "new" in neutral ink throughout (neither is the
  * answer until question eight).
- *   hook: two rows, "old model 90.5%" and "new model 91.0%", "on the same
+ *   hook: two rows, "Old model 90.5%" and "New model 91.0%", "on the same
  *     2,000 test examples" under them; "Ship it?" on "Ship". The zebra at
  *     the right.
  *   plan: seventeen numbered dots, twelve blue and five grey.
  *   q1: question card; a strip of 2,000 tiny cells, right (blue) and wrong
  *     (grey), "SD 0.29" over it, on "point two nine".
  *   q1-se: the accuracy's sampling spread, a narrow normal curve centred on
- *     91.0%, "SE = SD / √n = 0.64 points" (SE.se) under it.
+ *     91.0%, "SE = SD / √n = 0.64 points" (SE.se) under it; on "the gap",
+ *     the half-point gap between the two models drawn beside it, shorter,
+ *     in yellow.
  *   q1-n: the curve of SE against n (SE.curve), dots at 2,000 and 8,000, the
  *     second labelled "a third of a point" on "eight thousand"; "4× the
  *     data, ½ the error" in yellow.
@@ -95,7 +97,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q4-sim: "The 95% belongs to the procedure" under the stack, green.
  *   q4-slice: ten slices of 40, three of them scoring "40 / 40"
  *     (SLICE.perfect); their textbook intervals collapse to a dot on 100%,
- *     red (the formula's failure, not the slice's); "textbook interval:
+ *     red (the formula's failure, not the slice's); "Textbook interval:
  *     covers 70%" in red, "Wilson: 97%" in green, each beside an interval
  *     drawn for one perfect slice.
  *   q5: question card; a row of ten data dots, resampled with replacement
@@ -114,11 +116,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     fluke)" (the struck lines are wrong, so strikes are right here).
  *   q7: question card; four numbered steps inked in turn: state H0 and H1;
  *     fix α and n; compute the statistic and p; reject if p < α. On
- *     "for the two models", H0 reads "old and new equally accurate", α 5%,
+ *     "Here", H0 reads "old and new equally accurate", α 5%,
  *     n the 2,000.
- *   q7-peek: a line of ten looks at 200, 400 … 2,000 labels; a simulation
- *     note "two equally good models, 10,000 runs"; "stop at the first
- *     p < 0.05: 19% false positives" (PEEK.everyLook) in red, "decide once
+ *   q7-peek: a line of ten looks at 200, 400 … 2,000 labels; a note
+ *     "Simulation: two equally good models, 10,000 runs"; "Stop at the first
+ *     p < 0.05: 19% false positives" (PEEK.everyLook) in red, "Decide once
  *     at 2,000: 5%" (PEEK.onceAtEnd) in green.
  *   q8: question card; the page's two groups as dots, the labels shuffled
  *     once; the null histogram (PERM_PAGE.null) with the observed 5.9 marked
@@ -136,7 +138,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q9-trade: the critical line slides right on "lowering alpha": the red α
  *     tail shrinks and the β area grows.
  *   q9-online: power against users per arm (POWER.curve), 80% dashed, the
- *     crossing at about 31,000 lit; "5% → 5.5% click rate"; "half the lift:
+ *     crossing at about 31,000 lit; "5% → 5.5% click rate"; "Half the lift:
  *     ×4 users" in yellow.
  *   q9-null: the curve's point at 5,000 lit, "20%" in red; "Found nothing ≠
  *     no difference" as a line under it.
@@ -148,7 +150,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (SELECTION.bySize), all at about 5.5%, none moving toward 11.6%.
  *     A "Simulation" note.
  *   q10-fix: a scatter of a few dots outside the outline, "approved at
- *     random: 2%", their rate "11.8%" in green beside the true 11.6%; "the
+ *     random: 2%", their rate "11.8%" in green beside the true 11.6%; "The
  *     price: some bad loans", grey.
  *   q11: question card; a likelihood curve over a click rate, its peak
  *     marked "maximum likelihood" (MLE.grid, MLE.curveSmoothed).
@@ -163,7 +165,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     prior / evidence. The credit card spot.
  *   q12-fraud: the page's base-rate grid, redrawn as fraud: 1,098 dots, one
  *     per flagged transaction, 99 fraud in blue and 999 honest in grey,
- *     "Flagged: 1,098 of 100,000"; "a flag is fraud: 9%" in yellow
+ *     "Flagged: 1,098 of 100,000"; "A flag is fraud: 9%" in yellow
  *     (BAYES.rare). The model is not at fault, so nothing is red.
  *   q12-shift: the same model at 1 in 100: 990 and 990, "50%"
  *     (BAYES.common); under both grids, "precision 9% → 50%" in yellow and
@@ -203,7 +205,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     8,000, 0.0032 ("a third of a point").
  *   - q2: the page's own block (exponential, scale 3, 100,000; 3,000
  *     samples of 40, seed 42): SE 0.477 by the formula, 0.475 simulated;
- *     population skewness 2.0, the means' 0.32. "Means and sums" and the
+ *     population skewness 2.0, the means' 0.33. "Means and sums" and the
  *     median and percentile as statistics without such a formula: the
  *     page's bootstrap answer.
  *   - q3: the page's "where" and "what shape"; the running mean drawn is
@@ -401,7 +403,7 @@ export const script: NarrationScript = {
     {
       id: "q8",
       scene: true,
-      text: "Question eight. What is a permutation test? It builds the null distribution by shuffling the group labels, which are interchangeable if there's no effect. On the page's two groups of fifty, the difference is five point nine, and ten thousand shuffles beat it two point four percent of the time.",
+      text: "Question eight. What is a permutation test? It builds the null distribution by shuffling the group labels, which are interchangeable if there's no effect. On the page's two groups of fifty, the difference is five point nine, and ten thousand shuffles match or beat it two point four percent of the time.",
       pauseAfter: 0.6,
     },
     {
@@ -429,7 +431,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q9-online",
-      text: "Whether users notice is an online question, and there you choose the sample size. To catch a click rate moving from five percent to five and a half, at eighty percent power, you need about thirty-one thousand users per arm. Half that lift needs four times the users.",
+      text: "Whether users notice is an online test, where you choose the sample size. Catching a click rate moving from five percent to five and a half, at eighty percent power, takes about thirty-one thousand users per arm. Half that lift takes four times the users.",
       pauseAfter: 0.6,
     },
     {
@@ -440,7 +442,7 @@ export const script: NarrationScript = {
     {
       id: "q10-in",
       text: "Every test so far trusted the sample. Next, whether it's the right one.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.55,
     },
 
     // ── 10. Selection bias ────────────────────────────────────────────────
@@ -452,7 +454,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q10-loans",
-      text: "In a simulation, a lender only learns whether a loan defaults if it approved the loan. Among the approved, five point three percent default. Across every applicant, it's eleven point six percent. Sixty times as many approved loans don't close that gap.",
+      text: "In a simulation, a lender only sees defaults on the loans it approved. Among those, five point three percent default. Across every applicant, it's eleven point six percent. Sixty times as many approved loans don't close that gap.",
       pauseAfter: 0.7,
     },
     {
