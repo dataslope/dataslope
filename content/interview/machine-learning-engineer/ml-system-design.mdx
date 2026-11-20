@@ -311,8 +311,10 @@ $$
 $$
 
 The `compute_psi` function below implements exactly this: it bins the
-reference (training) distribution into deciles via `np.percentile`,
-compares the fraction of examples per bucket between `reference` and
+reference (training) distribution into deciles via `np.percentile`, opens
+the two outer buckets so a value beyond anything seen in training still
+counts (`np.histogram` silently drops values outside its edges, which hides
+exactly the drift PSI is for), compares the fraction of examples per bucket between `reference` and
 `current`, and returns the summed PSI value, the demo prints a `stable`
 case under 0.1 and a `drifted` case above 0.2.
 
@@ -329,6 +331,7 @@ stable    = rng.normal(loc=0.1, scale=1.0, size=1000)   # slight shift  → PSI 
 drifted   = rng.normal(loc=1.5, scale=1.5, size=1000)   # large shift   → PSI > 0.2`,
       starterCode: `def compute_psi(reference, current, n_bins=10, eps=1e-8):
     breakpoints = np.percentile(reference, np.linspace(0, 100, n_bins + 1))
+    breakpoints[0], breakpoints[-1] = -np.inf, np.inf   # open outer buckets
     ref_counts = np.histogram(reference, bins=breakpoints)[0] + eps
     cur_counts = np.histogram(current,   bins=breakpoints)[0] + eps
     ref_pct = ref_counts / ref_counts.sum()

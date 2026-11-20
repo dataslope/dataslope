@@ -126,9 +126,11 @@
   },
   "psi": {
     "pageStable": 0.0143,
-    "pageDrifted": 1.1276,
+    "pageDrifted": 1.4101,
     "openStable": 0.0143,
     "openDrifted": 1.4101,
+    "closedStable": 0.0143,
+    "closedDrifted": 1.1276,
     "pageDroppedDrifted": 143,
     "stableShares": [
       0.105,

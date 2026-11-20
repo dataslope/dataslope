@@ -22,7 +22,8 @@
 //         on the predictions.
 //   - PSI itself, computed exactly on simulated bins (NumPy in the same
 //     Pyodide): the page's own example draws (seed 42), scored with the
-//     page's compute_psi and with open-ended outer buckets; how often two
+//     page's compute_psi (which opens its outer buckets) and with closed
+//     edges at the training minimum and maximum; how often two
 //     samples from one distribution score over 0.1 at window sizes of 100,
 //     300 and 1,000 against a reference of 1,000 (2,000 tries each, seeded);
 //     and a current window where a fifth of the values fall beyond the
@@ -171,7 +172,7 @@ const block = (name) => {
 };
 const PAGE_INIT = block("initCode");
 const PAGE_PSI = block("starterCode").split("\nprint(")[0];
-check(PAGE_PSI.includes("np.histogram(current,   bins=breakpoints)"), "the page's compute_psi no longer bins current on the reference's breakpoints");
+check(PAGE_PSI.includes("breakpoints[0], breakpoints[-1] = -np.inf, np.inf"), "the page's compute_psi no longer opens its outer buckets, which the video teaches");
 
 // ── Pyodide ────────────────────────────────────────────────────────────────
 const { loadPyodide } = require("pyodide");
@@ -192,9 +193,11 @@ R = {"runtime": {"python": sys.version.split()[0], "sklearn": sklearn.__version_
 r3 = lambda v: round(float(v), 3)
 r4 = lambda v: round(float(v), 4)
 
-# The page's PSI, exactly as written, and the same with open outer buckets
-# (values below the training minimum or above its maximum land in the end
-# buckets instead of falling out of the count).
+# The page's PSI, exactly as written (open outer buckets since 2026-11-20,
+# when this video's writer found the page dropping out-of-range values), the
+# video's own open-bucket PSI, which must agree with it, and the closed-edge
+# version the video warns against: edges at the training minimum and maximum,
+# where np.histogram drops anything beyond them from the count.
 page = {}
 exec(PAGE_INIT, page)
 exec(PAGE_PSI, page)
@@ -206,6 +209,12 @@ def open_psi(reference, current, n_bins=10, eps=1e-8):
     cur = np.histogram(current, bins=edges)[0] + eps
     ref, cur = ref / ref.sum(), cur / cur.sum()
     return float(np.sum((cur - ref) * np.log(cur / ref))), cur, ref
+def closed_psi(reference, current, n_bins=10, eps=1e-8):
+    edges = np.percentile(reference, np.linspace(0, 100, n_bins + 1))
+    ref = np.histogram(reference, bins=edges)[0] + eps
+    cur = np.histogram(current, bins=edges)[0] + eps
+    ref, cur = ref / ref.sum(), cur / cur.sum()
+    return float(np.sum((cur - ref) * np.log(cur / ref)))
 
 # ── Questions 2 and 3: what an unlogged seed moves ──
 X, y = load_digits(return_X_y=True)
@@ -285,6 +294,7 @@ d_open, d_cur, d_ref = open_psi(reference, drifted)
 R["psi"] = {
     "pageStable": r4(page_psi(reference, stable)), "pageDrifted": r4(page_psi(reference, drifted)),
     "openStable": r4(s_open), "openDrifted": r4(d_open),
+    "closedStable": r4(closed_psi(reference, stable)), "closedDrifted": r4(closed_psi(reference, drifted)),
     "pageDroppedDrifted": int((drifted > reference.max()).sum() + (drifted < reference.min()).sum()),
     "stableShares": [r4(v) for v in s_cur], "driftedShares": [r4(v) for v in d_cur],
 }
@@ -304,11 +314,12 @@ beyond = np.concatenate([rng.normal(size=800), ref.max() + 0.5 + rng.random(200)
 b_open, b_cur, _ = open_psi(ref, beyond)
 R["psiEdges"] = {
     "reference": 1_000, "window": 1_000, "beyond": int((beyond > ref.max()).sum()),
-    "closed": r4(page_psi(ref, beyond)), "open": r4(b_open), "openShares": [r4(v) for v in b_cur],
+    "closed": r4(closed_psi(ref, beyond)), "open": r4(b_open), "openShares": [r4(v) for v in b_cur],
 }
 json.dumps(R)
 `);
 const R = JSON.parse(out);
+check(R.psi.pageStable === R.psi.openStable && R.psi.pageDrifted === R.psi.openDrifted, "the page's compute_psi and the video's open-bucket PSI disagree");
 
 // ── What the narration says, checked against the numbers ────────────────────
 const { script } = await import(pathToFileURL(join(here, "script.ts")).href);

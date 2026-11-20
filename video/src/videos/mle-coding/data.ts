@@ -141,7 +141,7 @@ export const BATCHES = results.batches as {
   epoch1: number[][];
   /** Called again with the default seed: the same order. */
   epoch2: number[][];
-  epoch2Seed1: number[][];
+  epoch2Shared: number[][];
   sizes: number[];
 };
 

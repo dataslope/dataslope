@@ -256,17 +256,19 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     audits, or randomized outcome measurement": mlops. The
  *     numbers: the page's own draws (seed 42), with open outer buckets:
  *     0.014 and 1.41 (said "a simulation"; the page's compute_psi prints
- *     0.0143 and 1.1276, see the next point). No drift, 2,000 tries
+ *     the same, 0.0143 and 1.4101, since the fix below; with closed edges
+ *     it printed 1.1276). No drift, 2,000 tries
  *     against a reference of 1,000: a window of 100 scores over 0.1 in 46%
  *     of tries, a window of 1,000 in none. The edges: a window of 1,000
  *     with 200 values beyond the reference's maximum scores 0.03 with
  *     closed edges and 0.25 with open ones.
- *     The page's compute_psi bins the current values on the reference's
- *     percentiles, from its minimum to its maximum, and np.histogram drops
- *     values outside that range: in the page's own drifted demo, 143 of
- *     the 1,000 values fall above the reference's maximum and are not
- *     counted. Open outer buckets are the standard fix; the narration
- *     gives the rule without blaming the page, and the report flags it.
+ *     The page's compute_psi used to bin the current values on the
+ *     reference's percentiles, from its minimum to its maximum, and
+ *     np.histogram drops values outside that range: in the page's own
+ *     drifted demo, 143 of the 1,000 values fall above the reference's
+ *     maximum and were not counted. The page opens its outer buckets since
+ *     2026-11-20 (found by this video's writer), and check.mjs fails if it
+ *     stops doing so or stops agreeing with the video's own PSI.
  *   - q11: shadow (logged, never returned, outputs, latency and errors
  *     under real traffic), canary (1 to 5%, guardrails, ramp or shift
  *     back), rollback (the previous artifact and its config in the

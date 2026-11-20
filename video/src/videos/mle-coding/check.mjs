@@ -201,16 +201,28 @@ R["softmax"] = {
 }
 
 # ── 8, 9. Mini-batches, and shuffling features and labels together ──
-def iterate_minibatches(X, y, batch_size, seed=0):
+# The trap: a generator that seeds itself on every call (the page's own
+# version until 2026-11-20, when this video's writer found it) deals every
+# epoch in the same order. The page's fix: one generator for the whole run,
+# passed in, so each call draws a new permutation.
+def reseeding_minibatches(X, y, batch_size, seed=0):
     rng = np.random.default_rng(seed)
     idx = rng.permutation(len(X))
     for start in range(0, len(X), batch_size):
         batch = idx[start:start + batch_size]
         yield X[batch], y[batch]
+def iterate_minibatches(X, y, batch_size, rng):
+    idx = rng.permutation(len(X))
+    for start in range(0, len(X), batch_size):
+        batch = idx[start:start + batch_size]
+        yield X[batch], y[batch]
 Xm = np.arange(10).reshape(10, 1); ym = np.arange(10)
-epoch1 = [yb.tolist() for _, yb in iterate_minibatches(Xm, ym, batch_size=4)]
-epoch2 = [yb.tolist() for _, yb in iterate_minibatches(Xm, ym, batch_size=4)]
-epoch2b = [yb.tolist() for _, yb in iterate_minibatches(Xm, ym, batch_size=4, seed=1)]
+epoch1 = [yb.tolist() for _, yb in reseeding_minibatches(Xm, ym, batch_size=4)]
+epoch2 = [yb.tolist() for _, yb in reseeding_minibatches(Xm, ym, batch_size=4)]
+shared = np.random.default_rng(0)
+page1 = [yb.tolist() for _, yb in iterate_minibatches(Xm, ym, batch_size=4, rng=shared)]
+page2 = [yb.tolist() for _, yb in iterate_minibatches(Xm, ym, batch_size=4, rng=shared)]
+assert page1 == epoch1 and page2 != epoch1, "the page's first epoch should match the reseeding one, and its second should not"
 bc = load_breast_cancer()
 Xb, yb_ = bc.data, bc.target                          # 1 is benign in scikit-learn
 Xtr, Xte, ytr, yte = train_test_split(Xb, yb_, test_size=0.3, random_state=0, stratify=yb_)
@@ -219,7 +231,7 @@ rs = np.random.default_rng(0)
 idx = rs.permutation(len(Xtr))
 aligned = model().fit(Xtr[idx], ytr[idx]).score(Xte, yte)
 separate = model().fit(Xtr[rs.permutation(len(Xtr))], ytr[rs.permutation(len(Xtr))]).score(Xte, yte)
-R["batches"] = {"epoch1": epoch1, "epoch2": epoch2, "epoch2Seed1": epoch2b, "sizes": [len(b) for b in epoch1]}
+R["batches"] = {"epoch1": epoch1, "epoch2": epoch2, "epoch2Shared": page2, "sizes": [len(b) for b in epoch1]}
 R["shuffle"] = {
     "train": int(len(ytr)), "test": int(len(yte)),
     "aligned": r3(aligned), "separate": r3(separate), "majority": r3(max(yte.mean(), 1 - yte.mean())),
@@ -315,7 +327,8 @@ const quotes = [
   "the guard on the denominator is the one people forget",
   "L2-normalize the rows once, then a single matrix\nmultiply gives every pairwise similarity",
   "Shuffle the row indices once per epoch",
-  "rng = np.random.default_rng(seed)",
+  "one generator for the whole run",
+  "a function that seeds itself on every call deals every epoch in the\nsame order",
   "`exp(1000)` is beyond\nfloat64",
   "softmax is invariant to a constant shift",
   "`(n, n, d)` array",

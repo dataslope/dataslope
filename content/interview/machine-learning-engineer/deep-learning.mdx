@@ -90,8 +90,10 @@ $$
 \frac{\partial L}{\partial w^{(l)}} = \frac{\partial L}{\partial a^{(l)}} \cdot \frac{\partial a^{(l)}}{\partial z^{(l)}} \cdot \frac{\partial z^{(l)}}{\partial w^{(l)}}
 $$
 
-It's just the chain rule applied systematically, and it costs about the
-same as one forward pass, which is why training deep nets is feasible.
+It's just the chain rule applied systematically, and it costs only a small
+multiple of one forward pass (about two, since each layer needs the gradient
+for its inputs and for its weights), which is why training deep nets is
+feasible.
 
 ### What is the difference between SGD, Momentum, RMSProp, and Adam?
 

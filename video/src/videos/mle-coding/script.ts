@@ -122,8 +122,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the last one short (no color: a short batch is normal); a label row
  *     under the feature row, moving with it.
  *   q8-seed: "epoch 2" under "epoch 1", the same order again, yellow;
- *     "seed = epoch" in green beside it, and epoch 2 reshuffled
- *     (BATCHES.epoch2Seed1).
+ *     "one generator for the run" in green beside it, and epoch 2
+ *     reshuffled (BATCHES.epoch2Shared).
  *   q9: question card; two columns, features and labels, joined row by row
  *     with short lines; shuffled with one permutation, the lines stay; then
  *     shuffled separately, the lines cross and break, red. Two bars:
@@ -214,9 +214,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     probability is 0.0 and its log −inf, log-softmax −900. "A loss should
  *     take the raw scores" is the consequence, said as a rule, not as any
  *     framework's API.
- *   - q8: the page's generator on its own ten rows: batches [4, 6, 2, 7],
- *     [3, 5, 9, 0], [8, 1]; called again with its default seed, the same
- *     three; with seed 1, a different order.
+ *   - q8: the page's ten rows: batches [4, 6, 2, 7], [3, 5, 9, 0], [8, 1].
+ *     A generator that reseeds itself (the page's own until 2026-11-20,
+ *     when this video's writer found it) deals the same three again; the
+ *     page's fix, one random generator passed through the run, deals
+ *     [2, 9, 3, 6], [0, 4, 8, 7], [5, 1] the second time.
  *   - q9: one permutation for both: the page. Measured: scikit-learn's
  *     breast cancer set (398 training, 171 test, stratified, seed 0),
  *     standardized logistic regression: 95.9% trained on aligned rows, 52.6%
@@ -391,7 +393,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q8-seed",
-      text: "But seed each epoch differently. A generator that seeds itself the same way on every call deals every epoch in the same order.",
+      text: "But don't reseed on every call. A generator that seeds itself the same way each time deals every epoch in the same order. Pass one random generator through the whole run, and each epoch gets a new order.",
       pauseAfter: 0.7,
     },
     {
