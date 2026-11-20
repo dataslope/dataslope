@@ -90,7 +90,7 @@ export const LatestScene: React.FC = () => {
   const sameRowAt = n.word("latest-break", "every run keeps the same row");
   const onAt = n.word("latest-on", "distinct on");
   const lineAt1 = n.word("latest-on", "in one line");
-  const onlyAt = n.word("latest-on", "only Postgres has it");
+  const cloudNoAt = n.word("latest-on", "the big cloud warehouses");
 
   // ── Question 5 ──
   const q5At = n.word("qualify", "Question five");
@@ -337,11 +337,18 @@ export const LatestScene: React.FC = () => {
             <Tick at={lineAt1 + 8} size={26} />
             <span style={{ ...note(25, INK), whiteSpace: "nowrap", ...TABULAR }}>The same {D.rows.length} rows as the page&rsquo;s block</span>
           </div>
-          <div style={{ position: "absolute", left: R_X, top: y(TOP) + listingHeight(D.lines.length, SIZE) + h(92), fontSize: 24, opacity: ease(frame, onlyAt, 10) }}>
-            <Chip tone="gray" size={24}>
-              Postgres only
+          <div style={{ position: "absolute", left: R_X, top: y(TOP) + listingHeight(D.lines.length, SIZE) + h(92), display: "flex", alignItems: "center", gap: 14, fontSize: 24, whiteSpace: "nowrap", opacity: ease(frame, cloudNoAt - 4, 10) }}>
+            <span style={{ ...note(24, INK_SOFT) }}>Has it:</span>
+            <Chip tone="ink" size={24}>
+              Postgres
+            </Chip>
+            <Chip tone="ink" size={24}>
+              DuckDB
             </Chip>
           </div>
+          <Note at={cloudNoAt + 4} x={R_X} y={y(TOP) + listingHeight(D.lines.length, SIZE) + h(150)}>
+            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>The big cloud warehouses don&rsquo;t</span>
+          </Note>
         </Stage>
 
         {/* ── 5. Three filters, and the order they run in ── */}

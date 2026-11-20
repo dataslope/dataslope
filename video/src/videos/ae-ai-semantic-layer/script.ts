@@ -95,10 +95,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     to use it". "ready-tests": "[unique, not_null]" and the
  *     accepted_values block highlighted in turn, each with a small "pass"
  *     badge (0 failing rows, results.json), and the three values set off on
- *     "completed, refunded and cancelled". "ready-access": "access: public"
- *     highlighted in the YAML, then a lineage, staging and intermediate
- *     with the padlock spot (ae-ai-semantic-layer-padlock) and "private",
- *     the mart "public"; the assistant's arrow can reach only the mart.
+ *     "completed, refunded and cancelled". "ready-access": a lineage, the
+ *     assistant's role granted SELECT on the mart alone, its arrow to an
+ *     intermediate model stopped by the grant; then staging and
+ *     intermediate "private" with the padlock spot
+ *     (ae-ai-semantic-layer-padlock), "access: public" highlighted in the
+ *     YAML, as the secondary point (it restricts ref(), not queries).
  *     "ready-rest": "Semantic layer: every disputed number" and the
  *     hourglass spot (ae-ai-semantic-layer-hourglass) with "as of" and
  *     "refuse stale data". "ready-input": back on the YAML, "and test
@@ -183,14 +185,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     run as the SQL dbt's generic tests compile to (the unique, not_null
  *     and accepted_values macros' shape), on fct_orders built from the
  *     page's orders: 0 failing rows each; the statuses are exactly
- *     completed, refunded and cancelled. "ready-access" adds the page's third
- *     concept check ("remove the option entirely, which beats hoping the
- *     model chooses well"). It says "and expose only the public marts"
- *     where the page says the marking makes the assistant "only query public
- *     marts": dbt's access setting governs which models may ref() a model
- *     (and protected is its default), not what a warehouse login can read,
- *     so the boundary is what the assistant is given, which the marking
- *     tells its tools. "ready-input": the page's caution, made
+ *     completed, refunded and cancelled. "ready-access" is the page's access
+ *     boundary as #746 rewrote it: the assistant's warehouse role granted
+ *     SELECT on the public marts only (dbt's grants config), and marking
+ *     staging and intermediate models private restricts ref(), not queries;
+ *     "ready-access-why" is the page's third concept check ("Removing the
+ *     option at the warehouse beats hoping the model chooses well"). The two
+ *     were one beat until the page changed; the second sentence is cut from
+ *     the take it was voiced in. "ready-input": the page's caution, made
  *     concrete: the description as written ("excludes refunded and
  *     cancelled orders and test accounts") encodes to 440.00; without its
  *     last three words, "and test accounts", to 1190.00.
@@ -215,8 +217,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     orders. Merged on order_id (Postgres's MERGE), or deleted and
  *     re-inserted, as dbt does with one: 7 rows. "review-dup" is Question
  *     1's completed reading beside its governed one.
- *   - "r-connect": the page's answer, its interfaces, MCP, dbt Labs' MCP
- *     server, and its three design points, in its words.
+ *   - "r-connect": the page's answer, its interfaces, MCP, the MCP server
+ *     dbt publishes (said "dbt Labs", the company, as voiced before the page
+ *     said "dbt"), and its three design points, in its words.
  *   - "close-practice": counted by check.mjs over the track's pages:
  *     concept checks on all 7 topic pages, runnable challenges on 3
  *     (SqlChallengeCards), and a bank of 110 multiple-choice questions.
@@ -360,9 +363,10 @@ export const script: NarrationScript = {
     },
     {
       id: "ready-access",
-      text: "Mark staging and intermediate models private or protected, and expose only the public marts to the assistant. That removes the wrong choice, rather than hoping it makes the right one.",
-      pauseAfter: 0.6,
+      text: "Grant the assistant's warehouse role the public marts only. Marking staging models private stops other models building on them, not queries.",
+      pauseAfter: 0.5,
     },
+    { id: "ready-access-why", text: "That removes the wrong choice, rather than hoping it makes the right one.", pauseAfter: 0.6 },
     {
       id: "ready-rest",
       text: "Put every number the business argues about in the semantic layer. And check source freshness, so an answer can say as of when, and the assistant can refuse to answer from stale data.",

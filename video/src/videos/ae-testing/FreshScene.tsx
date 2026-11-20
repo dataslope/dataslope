@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds, inkOf } from "../../theme/brand";
 import { FRESHNESS, type FreshnessCheck } from "./data";
-import { Box, Chip, Drift, Flow, Listing, ListingTitle, pulse, SmallMono, Spot, Svg, X0 } from "./parts";
+import { Box, Chip, DataTable, Drift, Flow, Listing, ListingTitle, MARK, pulse, SmallMono, Spot, Svg, TableName, tableGeometry, X0 } from "./parts";
 
 const COLS_Y = 286;
 const COL_X = [X0, 760];
@@ -90,6 +90,11 @@ export const FreshScene: React.FC = () => {
   ];
   const testsTop = axisY + h(108);
 
+  // ── The raw rows, before the axis takes their place ──
+  const rawRows = FRESHNESS.raw.map((r) => [r[0], r[r.length - 1]]);
+  const rawG = tableGeometry({ x: AXIS.x0, top: y(480), cols: [{ name: "order_id" }, { name: "_loaded_at" }], rows: rawRows, headH: h(36), rowH: h(34), headSize: 19, bodySize: 20, pad: 16 });
+  const newestRow = rawRows.findIndex((r) => FRESHNESS.newest.startsWith(r[1]));
+
   // ── Freshness first, and a feed slipping (drawn, not measured) ──
   const yamlOut = beforeAt - 4;
   const flowTop = yamlTop;
@@ -142,6 +147,22 @@ export const FreshScene: React.FC = () => {
           </div>
         </Ink>
         <Spot art="clock" at={clockAt + 4} left={CLOCK.x} top={colsTop - h(16)} width={CLOCK.w} />
+
+        {/* ── The raw rows' load times: freshness reads the newest ── */}
+        <TableName g={rawG} at={loadedAt - 4} out={newestAt - 10}>
+          <SmallMono>raw.orders</SmallMono>
+        </TableName>
+        <DataTable
+          g={rawG}
+          cols={[{ name: "order_id", numeric: true }, { name: "_loaded_at" }]}
+          rows={rawRows.map((cells, i) => ({ cells, at: loadedAt + i * 3 }))}
+          at={loadedAt - 4}
+          bands={[{ row: newestRow, at: loadedAt + 18, color: MARK }]}
+          out={newestAt - 10}
+        />
+        <Note at={loadedAt + 22} x={rawG.right + 30} y={rawG.rowMid(newestRow) - h(14)} out={newestAt - 10}>
+          <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>The newest: its age is the freshness</span>
+        </Note>
 
         {/* ── The page's thresholds ── */}
         <ListingTitle x={X0} top={yamlTop} at={sourceAt} out={yamlOut}>
@@ -237,7 +258,7 @@ export const FreshScene: React.FC = () => {
         <Flow points={[[X0 + 300 + 10, flowTop + h(29)], [X0 + 400, flowTop + h(29)]]} at={beforeAt + 6} />
         <Box x={X0 + 410} y={flowTop} w={190} h={h(58)} at={beforeAt + 12} title="dbt build" mono size={21} />
         <Note at={beforeAt + 16} x={X0} y={flowTop + h(74)}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Stale data stops before any model is built on it</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Checked before any model is built</span>
         </Note>
 
         {/* ── A feed slipping later each day: drawn, not measured ── */}
@@ -277,9 +298,12 @@ export const FreshScene: React.FC = () => {
         <Note at={catchesAt + 6} x={sx(warnDay) + 26} y={sy(FRESHNESS.warnHours) + h(6)}>
           <span style={{ ...note(21, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>The warning catches the slip</span>
         </Note>
-        <Note at={outageAt} x={sx(errorDay) - 220} y={sy(FRESHNESS.errorHours + 2) - h(36)}>
+        <Note at={outageAt} x={sx(warnDay) + 26} y={sy(FRESHNESS.warnHours) + h(40)}>
           <span style={{ ...note(21, ACCENT_INK), whiteSpace: "nowrap" }}>before the outage</span>
         </Note>
+        <Svg opacity={ease(frame, outageAt, 10)}>
+          <circle cx={sx(errorDay)} cy={sy(FRESHNESS.errorHours)} r={14} fill="none" stroke={ACCENT} strokeWidth={2.4} />
+        </Svg>
       </Drift>
     </AbsoluteFill>
   );

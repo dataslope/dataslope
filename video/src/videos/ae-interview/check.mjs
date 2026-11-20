@@ -101,7 +101,7 @@ const quotes = [
   ["index.mdx", "**Evaluating an analytics assistant** by comparing result sets with verified answers, including questions it should decline."],
   ["index.mdx", "**AI-written dbt models** reviewed for grain, incremental logic, and duplicate metrics"],
   // "ai-ask", "ai-more"
-  ["index.mdx", "some coding rounds now allow an assistant. Ask the recruiter about each round."],
+  ["index.mdx", "some coding rounds allow an assistant. Ask the recruiter about each round."],
   ["index.mdx", "[AI & the semantic layer](/interview-prep/analytics-engineer/ai-and-the-semantic-layer) covers these questions in depth."],
   // "practice"
   ["index.mdx", "110 rapid-fire questions spanning every topic above"],

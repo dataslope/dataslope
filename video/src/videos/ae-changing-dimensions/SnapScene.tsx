@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { ColumnRule, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { SNAPSHOT_LINES } from "./data";
+import { SNAPSHOT } from "./data";
 import { Arrow, Band, Box, colsOf, DataTable, Drift, geoOf, lineOf, Listing, listingWidth, OK_INK, QMono, Spot, TableName, VMark, X0 } from "./parts";
 
 const SIZE = 20;
@@ -57,6 +57,10 @@ export const SnapScene: React.FC = () => {
   const seesAt = n.word("snap-gap", "it only sees what's there when it runs");
   const twiceAt = n.word("snap-gap", "Change a row twice between runs");
   const neverAt = n.word("snap-gap", "the middle value is never recorded");
+  const deletedAt = n.word("snap-delete", "A row deleted at the source");
+  const ignoredAt = n.word("snap-delete", "is ignored by default");
+  const invalidateAt = n.word("snap-delete", "set hard deletes to invalidate");
+  const closesLastAt = n.word("snap-delete", "the snapshot closes its last version");
   const presentAt = n.word("snap-keep", "the source keeps only the present");
   const onlyAt = n.word("snap-keep", "the snapshot is the only copy");
   const rebuildAt = n.word("snap-keep", "It can't be rebuilt from the source");
@@ -66,7 +70,7 @@ export const SnapScene: React.FC = () => {
   const end = n.beat("snap-model").to;
 
   // ── Phase 1: the listing and the table it keeps ──
-  const L = SNAPSHOT_LINES;
+  const L = SNAPSHOT.lines;
   const listTop = y(330);
   const listW = listingWidth(L, SIZE);
   const TX = 900;
@@ -85,10 +89,15 @@ export const SnapScene: React.FC = () => {
     { name: "West", x0: 704, x1: 1120, at: twiceAt },
     { name: "North", x0: 1124, x1: 1760, at: twiceAt + 8 },
   ];
+  /** Where North ends once the row is deleted at the source. */
+  const deletedX = 1480;
   const runs = [
     { name: "Run 1", x: 430, at: seesAt + 8 },
-    { name: "Run 2", x: 1440, at: twiceAt + 18 },
+    { name: "Run 2", x: 1290, at: twiceAt + 18 },
+    { name: "Run 3", x: 1690, at: ignoredAt },
   ];
+  const recTop = gapTop + bandH + h(40);
+  const recH = h(50);
 
   // ── Phase 3: source, snapshot, model ──
   const flowTop = y(600);
@@ -111,6 +120,8 @@ export const SnapScene: React.FC = () => {
       <Sfx name="el-tap" at={seesAt + 8} level={-35} />
       <Sfx name="el-tap" at={twiceAt + 18} level={-35} />
       <Sfx name="el-scratch" at={neverAt + 2} level={-35} />
+      <Sfx name="el-scratch" at={deletedAt + 2} level={-35} />
+      <Sfx name="el-tap" at={invalidateAt + 4} level={-35} />
       <Sfx name="el-pop" at={presentAt} level={-35} />
       <Sfx name="el-pop" at={onlyAt} level={-35} />
       <Sfx name="el-whoosh" at={readsAt} level={-36} />
@@ -129,10 +140,10 @@ export const SnapScene: React.FC = () => {
           size={SIZE}
           at={runAt}
           out={p1Out}
-          title="snapshots/snap_customers.sql"
+          title={SNAPSHOT.file}
           marks={[
-            { line: lineOf(L, "strategy="), at: tsAt + 2 },
-            { line: lineOf(L, "updated_at="), at: updAt + 2 },
+            { line: lineOf(L, "strategy:"), at: tsAt + 2 },
+            { line: lineOf(L, "updated_at:"), at: updAt + 2 },
           ]}
         />
         <Note at={typeAt} x={TX} y={y(296)} out={p1Out}>
@@ -190,7 +201,7 @@ export const SnapScene: React.FC = () => {
               <Band x0={s.x0} x1={s.x1} top={gapTop} h={bandH} at={neverAt} label={s.name} tone="off" dashed />
             </React.Fragment>
           ) : (
-            <Band key={s.name} x0={s.x0} x1={s.x1} top={gapTop} h={bandH} at={s.at} label={s.name} />
+            <Band key={s.name} x0={s.x0} x1={s.x1} top={gapTop} h={bandH} at={s.at} label={s.name} ends={i === 2 ? [{ at: deletedAt + 4, x1: deletedX }] : []} />
           ),
         )}
         {runs.map((r) => (
@@ -202,11 +213,27 @@ export const SnapScene: React.FC = () => {
           </React.Fragment>
         ))}
         {/* What each run wrote to the snapshot, under its tick. */}
-        {runs.map((r, i) => (
-          <Box key={r.name} x={r.x - 120} y={gapTop + bandH + h(40)} w={240} h={h(50)} at={r.at + 10} size={22}>
+        {runs.slice(0, 2).map((r, i) => (
+          <Box key={r.name} x={r.x - 120} y={recTop} w={240} h={recH} at={r.at + 10} size={22}>
             Recorded: {states[i === 0 ? 0 : 2].name}
           </Box>
         ))}
+        {/* The row deleted at the source: run 3 finds nothing, and by
+            default leaves North open; with hard_deletes: invalidate it
+            closes it. */}
+        <VMark x={deletedX + 4} top={gapTop - h(10)} bottom={gapTop + bandH + h(10)} at={deletedAt + 4} color={ACCENT} />
+        <Note at={deletedAt + 8} x={deletedX + 20} y={gapTop + bandH / 2 - 16}>
+          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>Deleted</span>
+        </Note>
+        <Box x={runs[2].x - 120} y={recTop} w={240} h={recH} at={ignoredAt + 10} size={22} tone="off" dashed out={invalidateAt + 2}>
+          North stays open
+        </Box>
+        <Box x={runs[2].x - 120} y={recTop} w={240} h={recH} at={closesLastAt - 2} size={22} tone="ok">
+          North closed
+        </Box>
+        <Note at={invalidateAt} x={runs[2].x + 120} y={recTop + recH + h(16)} align="right" from="right">
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 500, color: INK, whiteSpace: "nowrap" }}>hard_deletes: invalidate</span>
+        </Note>
         <Note at={neverAt + 4} x={states[1].x0 + 16} y={gapTop + bandH + h(50)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Never recorded</span>
         </Note>
@@ -214,7 +241,7 @@ export const SnapScene: React.FC = () => {
         {/* ── Phase 3: the source, the snapshot, the model ── */}
         <Box x={B[0].x} y={flowTop} w={B[0].w} h={boxH} at={presentAt} align="left">
           <span style={{ ...label(22, INK_SOFT) }}>Source: customers</span>
-          <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · North</span>
+          <span style={{ ...note(23, INK) }}>No row for 42 now</span>
         </Box>
         <Note at={presentAt + 6} x={B[0].x} y={flowTop + boxH + h(22)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Only the present</span>
@@ -223,7 +250,7 @@ export const SnapScene: React.FC = () => {
         <Box x={B[1].x} y={flowTop} w={B[1].w} h={boxH} at={onlyAt} align="left">
           <span style={{ ...label(22, INK_SOFT) }}>Snapshot: snap_customers</span>
           <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · East · run 1 to run 2</span>
-          <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · North · from run 2</span>
+          <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · North · run 2 to run 3</span>
         </Box>
         <Note at={onlyAt + 6} x={B[1].x} y={flowTop + boxH + h(22)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>The only copy of this history</span>

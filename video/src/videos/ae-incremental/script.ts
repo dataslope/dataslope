@@ -74,7 +74,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     three new ones cross (green), "27 of 27". "filter-width": the band
  *     stretches wider (more grey re-reads) and a cell further back stays
  *     outside it, red. "filter-seq": a second line, "or: a change sequence
- *     that only grows".
+ *     that only grows". "filter-micro" (added in phase 2, when dbt.mdx's
+ *     answer gained it): the microbatch strategy in a line, and its config
+ *     keys, the step past the question.
  *   - "this": QuestionCard 3, under the same strips; `{{ this }}` in the
  *     listing ringed, an arrow to fct_events. "this-first": fct_events
  *     emptied (dashed outline, "not there yet"); is_incremental() -> false;
@@ -163,7 +165,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     deduplication if events can share the boundary timestamp", dbt.mdx's
  *     "re-read an overlap window and merge on a stable key"; "filter-seq" is
  *     the page's other way, "consume a source change sequence that is
- *     reliably monotonic".
+ *     reliably monotonic". "filter-micro": dbt.mdx's microbatch paragraph
+ *     ("the **microbatch** strategy (dbt 1.9 and later)", "one independent,
+ *     idempotent batch per period", "re-processes `lookback` batches to
+ *     catch late rows", a backfill run "with `--event-time-start` and
+ *     `--event-time-end`"); the day is the page's own example batch_size.
  *   - "this", "this-first": dbt.mdx, "`{{ this }}` refers to the current
  *     model's table", and is_incremental() "returns true when the target
  *     relation exists, the model is configured as incremental, and the run is
@@ -303,6 +309,11 @@ export const script: NarrationScript = {
     {
       id: "filter-seq",
       text: "The other way out is a change sequence the source guarantees only ever grows, so nothing can land behind the watermark.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "filter-micro",
+      text: "Since dbt one point nine, the microbatch strategy takes the filter out of your hands: set an event time and a batch size, and dbt builds one idempotent batch per day, re-processes lookback batches for late rows, and backfills any date range.",
       pauseAfter: 0.8,
     },
     {

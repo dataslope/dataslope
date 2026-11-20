@@ -116,6 +116,7 @@ export const CiScene: React.FC = () => {
   const blocksAt = n.word("ci-slim", "a failing test blocks the merge");
   const q8At = n.word("prod", "Question eight");
   const q8TextAt = n.word("prod", "How do you respond");
+  const inProdAt = n.word("prod", "in production");
   const inCiAt = n.word("prod", "In CI, the merge is blocked");
   const fixAt = n.word("prod", "fix the model or the test");
   const sevAt = n.word("prod-sev", "In production, go by severity");
@@ -224,10 +225,10 @@ export const CiScene: React.FC = () => {
         </Note>
 
         {/* ── The project against production's manifest ── */}
-        <Note at={compareAt - 2} x={X0} y={dagTop - h(52)} out={q7Out}>
+        <Note at={changedAt + 2} x={X0} y={dagTop - h(52)} out={q7Out}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>The project, on this pull request</span>
         </Note>
-        <Dag x={X0} top={dagTop} rowGap={rowGap} at={compareAt} state={ciState} out={q7Out} h={h} />
+        <Dag x={X0} top={dagTop} rowGap={rowGap} at={changedAt + 6} state={ciState} out={q7Out} h={h} />
         <Ink at={changeAt + 6} dur={10} out={q7Out} style={{ left: nodeX(CI.changed, X0) + 20, top: nodeY(CI.changed, dagTop, rowGap) + h(NODE.h) + h(10) }}>
           <Chip tone="yellow" size={20}>
             changed
@@ -265,12 +266,12 @@ export const CiScene: React.FC = () => {
           <div style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Fix the model or the test</div>
           <div style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", marginTop: 6 }}>before it ships</div>
         </Note>
-        <div style={{ position: "absolute", left: PROD_COL - 48, top: colsTop + 2, width: 1, height: h(330) * ease(frame, sevAt - 4, 16), background: HAIRLINE }} />
-        <Ink at={sevAt - 2} dur={12} style={{ left: PROD_COL, top: colsTop, whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: PROD_COL - 48, top: colsTop + 2, width: 1, height: h(330) * ease(frame, inProdAt - 2, 16), background: HAIRLINE }} />
+        <Ink at={inProdAt} dur={12} style={{ left: PROD_COL, top: colsTop, whiteSpace: "nowrap" }}>
           <div style={{ ...label(26, INK), fontWeight: 600 }}>Production</div>
-          <div style={{ ...note(23, INK_SOFT), marginTop: 10 }}>Go by severity</div>
+          <div style={{ ...note(23, INK_SOFT), marginTop: 10, opacity: ease(frame, sevAt, 10) }}>Go by severity</div>
         </Ink>
-        <Dag x={prodDag.x} top={prodDag.top} rowGap={prodDag.gap} at={sevAt + 8} state={prodState} h={h} edgeColor={(a) => (a === failing || downstream.includes(a) ? ds("gray", 400) : INK)} />
+        <Dag x={prodDag.x} top={prodDag.top} rowGap={prodDag.gap} at={sevAt + 8} state={prodState} h={h} edgeColor={(a, b) => (a === failing || downstream.includes(b) ? ds("gray", 400) : INK)} />
         <Ink at={haltsAt + 2} dur={10} style={{ left: nodeX(failing, prodDag.x) + 20, top: nodeY(failing, prodDag.top, prodDag.gap) + h(NODE.h) + h(10) }}>
           <Chip tone="red" size={20}>
             test: error
@@ -287,6 +288,9 @@ export const CiScene: React.FC = () => {
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Keeps yesterday&rsquo;s rows</span>
         </Note>
         <Spot art="pager" at={pagesAt} left={1600} top={prodDag.top + prodDag.gap + h(122)} width={130} />
+        <Note at={pagesAt + 4} x={1600 - 40} y={prodDag.top + prodDag.gap + h(160)} align="right">
+          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>Pages the owner</span>
+        </Note>
         <Ink at={warningAt} dur={10} style={{ left: PROD_COL, top: prodDag.top + prodDag.gap + h(NODE.h) + h(78), whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, INK), display: "inline-flex", alignItems: "center", gap: "0.5em", fontSize: 22 }}>
             <Chip tone="yellow" size={22}>

@@ -33,6 +33,8 @@ import {
 
 const FIG_Y = 330;
 const YAML_SIZE = 20;
+/** The page's YAML is seventeen lines: set a size smaller and a little higher. */
+const SCHEMA = { y: 306, size: 19 };
 const PANE_SIZE = 19;
 const TABLE = { x: 1310, y: 540 };
 
@@ -98,7 +100,8 @@ export const BuiltinsScene: React.FC = () => {
 
   // ── The page's YAML, and what each test checks ──
   const yaml = BUILTINS.yaml;
-  const yamlW = listingWidth(yaml, YAML_SIZE);
+  const yamlTop = y(SCHEMA.y);
+  const yamlW = listingWidth(yaml, SCHEMA.size);
   const checks = [
     { name: "unique", text: "every value is distinct", at: uniqueAt + 4 },
     { name: "not_null", text: "no nulls", at: notNullAt + 4 },
@@ -122,11 +125,11 @@ export const BuiltinsScene: React.FC = () => {
     paneTops.push(i === 0 ? top : paneTops[i - 1] + Math.max(listH(panes[i - 1].lines.length), resultH) + h(60));
   });
   const paneResult = (p: Pane, i: number) =>
-    tableGeometry({ x: resultX, top: paneTops[i], cols: p.test.result.cols.map((name) => ({ name })), rows: p.test.result.rows, headH: h(34), rowH: h(36), headSize: 18, bodySize: PANE_SIZE, pad: 12 });
+    tableGeometry({ x: resultX, top: paneTops[i], cols: p.test.result.cols.map((name) => ({ name })), rows: p.test.result.rows, headH: h(34), rowH: h(36), headSize: 19, bodySize: PANE_SIZE, pad: 12 });
 
   // ── The video's own eight rows ──
   const t = BUILTINS.table;
-  const tg = tableGeometry({ x: TABLE.x, top: y(TABLE.y), cols: t.cols.map((name) => ({ name })), rows: t.rows, headH: h(34), rowH: h(36), headSize: 18, bodySize: PANE_SIZE, pad: 12 });
+  const tg = tableGeometry({ x: TABLE.x, top: y(TABLE.y), cols: t.cols.map((name) => ({ name })), rows: t.rows, headH: h(34), rowH: h(36), headSize: 19, bodySize: PANE_SIZE, pad: 12 });
   const rowOf = (pred: (r: string[]) => boolean) => t.rows.findIndex(pred);
   const firstThree = rowOf((r) => r[0] === BUILTINS.unique.result.rows[0][0]);
   const nullRow = rowOf((r) => r[0] === "null");
@@ -195,31 +198,31 @@ export const BuiltinsScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── The page's YAML, each test named as it is read ── */}
-        <ListingTitle x={X0} top={top} at={yamlAt} out={compilesAt - 4}>
+        <ListingTitle x={X0} top={yamlTop} at={yamlAt} out={compilesAt - 4}>
           <SmallMono>models/schema.yml</SmallMono>, on the page
         </ListingTitle>
         <Listing
           lines={yaml}
           lang="yaml"
           x={X0}
-          top={top}
-          size={YAML_SIZE}
+          top={yamlTop}
+          size={SCHEMA.size}
           at={yamlAt}
           step={2}
           out={compilesAt - 4}
           marks={[
-            { line: "tests: [unique", text: "unique", at: uniqueAt },
-            { line: "tests: [unique", text: "not_null", at: notNullAt },
+            { line: "data_tests: [unique", text: "unique", at: uniqueAt },
+            { line: "data_tests: [unique", text: "not_null", at: notNullAt },
             { line: "- accepted_values", text: "accepted_values", at: acceptedAt },
             { line: "- relationships", text: "relationships", at: relAt },
             { line: "to: ref('dim_customer')", text: "ref('dim_customer')", at: dimAt },
           ]}
         />
-        <Note at={uniqueAt} x={X0 + yamlW + 70} y={top - h(40)} out={compilesAt - 4}>
+        <Note at={uniqueAt} x={X0 + yamlW + 70} y={yamlTop - h(40)} out={compilesAt - 4}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>What each checks</span>
         </Note>
         {checks.map((c, i) => (
-          <Note key={c.name} at={c.at} x={X0 + yamlW + 70} y={top + h(8) + i * h(64)} out={compilesAt - 4}>
+          <Note key={c.name} at={c.at} x={X0 + yamlW + 70} y={yamlTop + h(8) + i * h(64)} out={compilesAt - 4}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
               <SmallMono>{c.name}</SmallMono>
               <span style={{ color: INK_SOFT }}>: {c.text}</span>

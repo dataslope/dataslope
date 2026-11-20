@@ -121,6 +121,14 @@ export const FilterScene: React.FC = () => {
   const seqAt = n.word("filter-seq", "a change sequence");
   const behindAt = n.word("filter-seq", "nothing can land behind the watermark");
 
+  const microAt = n.word("filter-micro", "the microbatch strategy");
+  const handsAt = n.word("filter-micro", "takes the filter out of your hands");
+  const setAt = n.word("filter-micro", "set an event time");
+  const sizeAt = n.word("filter-micro", "a batch size");
+  const batchAt = n.word("filter-micro", "one idempotent batch per day");
+  const lookbackAt = n.word("filter-micro", "re-processes lookback batches");
+  const backfillAt = n.word("filter-micro", "backfills any date range");
+
   const thisAt = n.word("this", "Question three");
   const thisTextAt = n.word("this", "What is the");
   const tableAt = n.word("this", "the model's own table");
@@ -185,9 +193,13 @@ export const FilterScene: React.FC = () => {
     for (let i = 1; i < steps.length; i++) x = x + (steps[i][1] - x) * ease(frame, steps[i][0], 18);
     return x;
   })();
-  const ruleP = ease(frame, loadedAt, 14) * (1 - ease(frame, goneAt, 12));
+  // No watermark while microbatch filters by period; back for `{{ this }}`.
+  const ruleP = ease(frame, loadedAt, 14) * (1 - ease(frame, goneAt, 12)) * (1 - ease(frame, microAt, 12) + ease(frame, thisAt, 12));
   const bandLeft = BEFORE(24) - (BEFORE(24) - BEFORE(21)) * ease(frame, overlapAt, 18) - (BEFORE(21) - BEFORE(18)) * ease(frame, wideAt, 18);
-  const bandP = ease(frame, overlapAt, 10) * (1 - ease(frame, reset, 12));
+  const bandP = ease(frame, overlapAt, 10) * (1 - ease(frame, microAt, 12));
+  // Microbatch: a batch per day, and the last few re-processed.
+  const dividersP = ease(frame, batchAt, 16) * (1 - ease(frame, reset, 12));
+  const lookbackP = ease(frame, lookbackAt, 12) * (1 - ease(frame, reset, 12));
   const wmText = frame < afterAt + 26 ? date(FILTER.watermarkBefore) : date(FILTER.watermarkAfter);
 
   // `{{ this }}` in the model, and the arrow to the table it names.
@@ -232,6 +244,8 @@ export const FilterScene: React.FC = () => {
       <Sfx name="el-tap" at={allAt} level={-32} />
       <Sfx name="el-whoosh" at={wideAt} level={-38} />
       <Sfx name="el-scratch" at={slipsAt + 6} level={-36} />
+      <Sfx name="el-whoosh" at={microAt} level={-38} />
+      <Sfx name="el-sprinkle" at={batchAt} level={-37} />
       <Sfx name="el-pencil" at={tableAt} level={-36} />
       <Sfx name="el-scratch" at={notYetAt} level={-37} />
       <Sfx name="el-sprinkle" at={everythingAt} level={-35} />
@@ -321,6 +335,31 @@ export const FilterScene: React.FC = () => {
             }}
           />
         ) : null}
+        {/* Microbatch: one batch a day, the latest few re-processed. */}
+        {lookbackP > 0 ? (
+          <div
+            style={{
+              position: "absolute",
+              left: BEFORE(23),
+              top: RULE_TOP,
+              width: AFTER(25) - BEFORE(23),
+              height: RULE_BOT - RULE_TOP,
+              background: HIGHLIGHT,
+              borderRadius: 4,
+              opacity: lookbackP * 0.8,
+            }}
+          />
+        ) : null}
+        <Note at={lookbackAt + 4} x={BEFORE(23) + 6} y={RULE_TOP - 34} out={reset}>
+          <span style={{ ...label(20, inkOf.yellow), fontWeight: 600, whiteSpace: "nowrap" }}>lookback</span>
+        </Note>
+        {dividersP > 0 ? (
+          <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: dividersP }}>
+            {Array.from({ length: 24 }, (_, i) => (
+              <line key={i} x1={AFTER(i + 1)} x2={AFTER(i + 1)} y1={RULE_TOP} y2={RULE_TOP + (RULE_BOT - RULE_TOP) * ease(frame, batchAt + i * 0.8, 10)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="3 4" />
+            ))}
+          </svg>
+        ) : null}
         <Note at={threeDaysAt} x={(bandLeft + BEFORE(24)) / 2 - 36} y={RULE_TOP - 34} out={wideAt - 4}>
           <span style={{ ...label(20, inkOf.yellow), fontWeight: 600, whiteSpace: "nowrap" }}>3 days</span>
         </Note>
@@ -409,7 +448,7 @@ export const FilterScene: React.FC = () => {
           <Cell key={`a${a.id}`} size={TS} x={X(a.day)} y={RAW_NEW} at={landAt + k * 5} label={a.id} tones={rawTones(a.id)} />
         ))}
         {/* An event later than even the wide window. */}
-        <Cell size={TS} x={X(16)} y={RAW_NEW} at={slipsAt + 6} out={reset} label="?" dashed tones={[{ at: slipsAt + 6, tone: "bad" }]} />
+        <Cell size={TS} x={X(16)} y={RAW_NEW} at={slipsAt + 6} out={microAt} label="?" dashed tones={[{ at: slipsAt + 6, tone: "bad" }]} />
 
         {/* fct_events: what is there, and what crosses. */}
         {copies.map((c, k) => {
@@ -474,7 +513,7 @@ export const FilterScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={overlapAt} x={X0} y={VERDICT} out={thisAt - 6}>
+        <Note at={overlapAt} x={X0} y={VERDICT} out={microAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             A three-day overlap
             <span style={{ opacity: ease(frame, keyAt, 10) }}>
@@ -498,10 +537,41 @@ export const FilterScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={seqAt} x={X0} y={VERDICT2} out={thisAt - 6}>
+        <Note at={seqAt} x={X0} y={VERDICT2} out={setAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Or: <Mark at={seqAt + 6}>a change sequence that only grows</Mark>
             <span style={{ color: INK_SOFT, opacity: ease(frame, behindAt, 10) }}>, so nothing lands behind the watermark</span>
+          </span>
+        </Note>
+
+        <Note at={microAt - 2} x={X0} y={VERDICT} out={thisAt - 6}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            Since dbt 1.9, microbatch
+            <span style={{ opacity: ease(frame, handsAt, 10) }}> writes the filter for you</span>
+            <span style={{ opacity: ease(frame, batchAt, 10) }}>
+              : <Mark at={batchAt + 6}>one idempotent batch per day</Mark>
+            </span>
+            <span style={{ opacity: ease(frame, lookbackAt, 10) }}>, lookback batches re-run</span>
+            <span style={{ opacity: ease(frame, backfillAt, 10) }}>, any date range backfilled</span>
+          </span>
+        </Note>
+        <Note at={setAt - 2} x={X0} y={VERDICT2} out={thisAt - 6}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            <SmallMono color={INK}>incremental_strategy=&apos;microbatch&apos;</SmallMono>
+            <span style={{ margin: "0 0.5em" }}>·</span>
+            <SmallMono color={INK}>event_time</SmallMono>
+            <span style={{ opacity: ease(frame, sizeAt, 10) }}>
+              <span style={{ margin: "0 0.5em" }}>·</span>
+              <SmallMono color={INK}>batch_size=&apos;day&apos;</SmallMono>
+            </span>
+            <span style={{ opacity: ease(frame, lookbackAt, 10) }}>
+              <span style={{ margin: "0 0.5em" }}>·</span>
+              <SmallMono color={INK}>lookback</SmallMono>
+            </span>
+            <span style={{ opacity: ease(frame, backfillAt, 10) }}>
+              <span style={{ margin: "0 0.5em" }}>·</span>
+              <SmallMono color={INK}>--event-time-start</SmallMono>, <SmallMono color={INK}>--event-time-end</SmallMono>
+            </span>
           </span>
         </Note>
 

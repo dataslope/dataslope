@@ -98,7 +98,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     and a "?" on which; the keys spot (two identical keys) beside the
  *     pair. latest-break: "ORDER BY updated_at DESC, <tiebreaker>" with the
  *     slot in yellow. latest-on: DISTINCT ON in one line, its twelve
- *     rows ticked against the first twelve, and "Postgres only".
+ *     rows ticked against the first twelve, and the page's engines: Postgres
+ *     and DuckDB have it, the big cloud warehouses don't.
  *   qualify: QuestionCard 5; the page's second SyntaxBreakdown (WHERE
  *     status = 'paid' "filters raw rows", HAVING SUM(amount) > 0 "filters
  *     aggregated groups", QUALIFY rn = 1 "filters on the window result"),
@@ -386,7 +387,7 @@ export const script: NarrationScript = {
     },
     {
       id: "latest-on",
-      text: "Postgres's distinct on does the same in one line, but only Postgres has it.",
+      text: "Postgres's distinct on does the same in one line, but the big cloud warehouses don't have it.",
       pauseAfter: 0.8,
     },
     {

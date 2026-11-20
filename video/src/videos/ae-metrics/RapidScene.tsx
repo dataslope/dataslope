@@ -3,17 +3,17 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem, Tick } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
 import { ColumnRule, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { METRICFLOW_YAML } from "./data";
-import { Cross, Drift, Flow, Headline, Kicker, Listing, Mono, Node, noteLine, OK_INK, Spot, Svg, X0 } from "./parts";
+import { Cross, Drift, Flow, Headline, Kicker, Listing, listingHeight, Mono, Node, noteLine, OK_INK, Spot, Svg, X0 } from "./parts";
 
 const R_X = 820;
 const LIST_TOP = 320;
-const ROW = 50;
+const ROW = 48;
 const BODY_Y = 320;
 
 type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"] };
@@ -140,43 +140,124 @@ const Drifting: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 11. The dbt Semantic Layer and MetricFlow ───────────────────────────────
 
+/** A contiguous slice of the page's YAML, from the line holding `from` to
+ *  the line holding `to`, its common indent taken off. */
+const slice = (lines: readonly string[], from: string, to: string) => {
+  const i0 = lines.findIndex((l) => l.includes(from));
+  const i1 = lines.findIndex((l, i) => i >= i0 && l.includes(to));
+  if (i0 < 0 || i1 < 0) throw new Error(`the YAML has no ${from} … ${to}`);
+  const part = lines.slice(i0, i1 + 1);
+  const indent = Math.min(...part.map((l) => l.length - l.trimStart().length));
+  return part.map((l) => l.slice(indent));
+};
+
 const MetricFlow: React.FC<{ c: Ctx }> = ({ c }) => {
-  const yamlAt = c.w("r-metricflow", "Semantic models and metrics");
-  const besideAt = c.w("r-metricflow", "beside the dbt project");
-  const compilerAt = c.w("r-metricflow", "the layer's query compiler");
-  const requestAt = c.w("r-metricflow", "a request for a metric by a dimension");
-  const sqlAt = c.w("r-metricflow", "into warehouse SQL");
-  const apiAt = c.w("r-metricflow", "through an API");
+  const entitiesAt = c.w("r-metricflow-yaml", "Entities");
+  const dimensionsAt = c.w("r-metricflow-yaml", "dimensions");
+  const metricsAt = c.w("r-metricflow-yaml", "metrics");
+  const modelAt = c.w("r-metricflow-yaml", "the dbt model they describe");
+  const compilerAt = c.w("r-metricflow-sql", "the layer's query compiler");
+  const requestAt = c.w("r-metricflow-sql", "a request for a metric by a dimension");
+  const sqlAt = c.w("r-metricflow-sql", "into warehouse SQL");
+  const apiAt = c.w("r-metricflow-sql", "through an API");
   const top = c.y(BODY_Y);
-  const x = 790;
-  const flowTop = top + c.h(300);
-  const boxH = c.h(58);
+  const size = 19;
+  const model = METRICFLOW_YAML.find((l) => l.includes("- name:"))!.split("name:")[1].trim();
+  const entity = slice(METRICFLOW_YAML, "- name: order_id", "type: primary");
+  const dimension = slice(METRICFLOW_YAML, "- name: status", "type: categorical");
+  const metric = slice(METRICFLOW_YAML, "metrics:", "filter:");
+  const partsTop = top + c.h(50);
+  const metricTop = partsTop + listingHeight(entity.length, size) + c.h(46);
+  const flowTop = metricTop + listingHeight(metric.length, size) + c.h(30);
+  const tag = (at: number, x: number, y: number, text: string) => (
+    <Line at={at} x={x} top={y} size={21} color={BLUE_INK}>
+      {text}
+    </Line>
+  );
   return (
     <>
+      <Line at={modelAt} top={top}>
+        In the YAML of the model they describe, <Mono>{model}</Mono>
+      </Line>
+      <Listing lines={entity} x={R_X} top={partsTop} width={320} size={size} at={entitiesAt - 2} yaml marks={[{ line: "entity:", text: "entity", at: entitiesAt + 4 }]} />
+      {tag(entitiesAt + 6, R_X + 340, partsTop + c.h(10), "an entity")}
+      <Listing lines={dimension} x={R_X + 520} top={partsTop} width={320} size={size} at={dimensionsAt - 2} yaml marks={[{ line: "dimension:", text: "dimension", at: dimensionsAt + 4 }]} />
+      {tag(dimensionsAt + 6, R_X + 860, partsTop + c.h(10), "a dimension")}
       <Listing
-        lines={METRICFLOW_YAML}
-        x={x}
-        top={top}
-        width={1034}
-        size={19}
-        at={yamlAt - 2}
+        lines={metric}
+        x={R_X}
+        top={metricTop}
+        width={810}
+        size={size}
+        at={metricsAt - 2}
         yaml
         marks={[
-          { line: "name: completed_revenue", text: "completed_revenue", at: besideAt },
-          { line: "measure: order_amount", text: "order_amount", at: besideAt + 10 },
+          { line: "- name: completed_revenue", text: "completed_revenue", at: metricsAt + 4 },
+          { line: "agg: sum", text: "sum", at: metricsAt + 10 },
+          { line: "expr: amount", text: "amount", at: metricsAt + 14 },
         ]}
       />
-      <Ink at={requestAt} dur={12} style={{ left: x, top: flowTop + boxH / 2 - 15 }}>
+      <Ink at={requestAt} dur={12} style={{ left: R_X, top: flowTop }}>
         <span style={noteLine(22, INK)}>metric by dimension</span>
       </Ink>
-      <Flow points={[[x + 230, flowTop + boxH / 2], [x + 300, flowTop + boxH / 2]]} at={requestAt + 6} dur={8} />
-      <Node x={x + 312} y={flowTop} w={210} h={boxH} at={compilerAt} title="MetricFlow" size={23} />
-      <Flow points={[[x + 534, flowTop + boxH / 2], [x + 604, flowTop + boxH / 2]]} at={sqlAt} dur={8} />
-      <Ink at={sqlAt + 4} dur={12} style={{ left: x + 616, top: flowTop + boxH / 2 - 15 }}>
+      <Flow points={[[R_X + 230, flowTop + c.h(14)], [R_X + 296, flowTop + c.h(14)]]} at={requestAt + 6} dur={8} />
+      <Ink at={compilerAt} dur={12} style={{ left: R_X + 312, top: flowTop }}>
+        <span style={{ ...noteLine(22, INK), fontWeight: 600 }}>MetricFlow</span>
+      </Ink>
+      <Flow points={[[R_X + 450, flowTop + c.h(14)], [R_X + 516, flowTop + c.h(14)]]} at={sqlAt} dur={8} />
+      <Ink at={sqlAt + 4} dur={12} style={{ left: R_X + 532, top: flowTop }}>
         <span style={noteLine(22, BLUE_INK)}>warehouse SQL</span>
       </Ink>
-      <Line at={apiAt} x={x} top={flowTop + boxH + c.h(30)} size={22} color={INK_SOFT}>
+      <Line at={apiAt} top={flowTop + c.h(44)} size={22} color={INK_SOFT}>
         BI tools ask for it through an API
+      </Line>
+    </>
+  );
+};
+
+// ── 19. Where else a semantic layer can live ────────────────────────────────
+
+const Where: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const warehouseAt = c.w("r-where", "In the warehouse itself");
+  const snowAt = c.w("r-where", "Snowflake's semantic views");
+  const dbxAt = c.w("r-where", "Databricks' metric views");
+  const askAt = c.w("r-where", "which many ask-your-data assistants query");
+  const tradeAt = c.w("r-where", "The trade-off is portability");
+  const moveAt = c.w("r-where", "doesn't move to another");
+  const ossieAt = c.w("r-where", "Apache Ossie");
+  const specAt = c.w("r-where", "a vendor-neutral spec");
+  const top = c.y(BODY_Y);
+  const boxTop = top + c.h(56);
+  const boxH = c.h(84);
+  const w = 290;
+  const xB = R_X + w + 150;
+  const mid = boxTop + boxH / 2;
+  return (
+    <>
+      <Line at={warehouseAt} top={top}>
+        In the warehouse itself
+      </Line>
+      <Node x={R_X} y={boxTop} w={w} h={boxH} at={snowAt} title="Snowflake" sub="semantic views" size={23} />
+      <Node x={xB} y={boxTop} w={w} h={boxH} at={dbxAt} title="Databricks" sub="metric views" size={23} />
+      <Flow points={[[R_X + w + 14, mid], [xB - 14, mid]]} at={moveAt - 10} dur={10} color={ACCENT} />
+      <div style={{ position: "absolute", left: R_X + w + 64, top: mid - 26, opacity: ease(frame, moveAt, 6) }}>
+        <Cross at={moveAt} size={22} />
+      </div>
+      <Line at={askAt} top={boxTop + boxH + c.h(26)} color={INK_SOFT} size={22}>
+        Many ask-your-data assistants query these
+      </Line>
+      <Line at={tradeAt} top={boxTop + boxH + c.h(78)} color={ACCENT_INK}>
+        The trade-off: portability
+      </Line>
+      <Line at={moveAt} top={boxTop + boxH + c.h(118)} color={INK_SOFT} size={22}>
+        one engine&rsquo;s definition doesn&rsquo;t move to another
+      </Line>
+      <Line at={ossieAt} top={boxTop + boxH + c.h(178)} bold>
+        Apache Ossie, begun as the Open Semantic Interchange
+      </Line>
+      <Line at={specAt} top={boxTop + boxH + c.h(220)} color={OK_INK}>
+        a vendor-neutral spec for exchanging definitions
       </Line>
     </>
   );
@@ -468,10 +549,11 @@ export const RapidScene: React.FC = () => {
   const c: Ctx = { w: n.word, y, h };
 
   const from = n.beat("rapid-in").from;
-  const tenAt = n.word("rapid-in", "Ten quick ones");
+  const tenAt = n.word("rapid-in", "Eleven quick ones");
   const finishAt = n.word("rapid-in", "to finish");
-  const end = n.beat("next").from - 4;
   const peopleAt = n.word("next", "written for people reading dashboards");
+  // The last answer stays up into the bridge's first words, then clears for it.
+  const end = peopleAt - 12;
   const modelAt = n.word("next", "Now the reader is a language model");
   const nextAt = n.word("next", "Next:");
 
@@ -486,6 +568,7 @@ export const RapidScene: React.FC = () => {
     { n: 16, label: "Governance", at: n.word("r-governance", "What is governance"), body: <Governance c={c} /> },
     { n: 17, label: "Cumulative, time-window metrics", at: n.word("r-cumulative", "What is a cumulative"), body: <Cumulative c={c} /> },
     { n: 18, label: "A wide mart, or the layer", at: n.word("r-wide", "When is a wide"), body: <Wide c={c} /> },
+    { n: 19, label: "Where else a semantic layer lives", at: n.word("r-where", "Where else can a semantic layer live"), body: <Where c={c} /> },
   ];
   const heroW = 280;
 
@@ -500,7 +583,7 @@ export const RapidScene: React.FC = () => {
 
       <Drift from={from} to={n.beat("next").to + 40}>
         <Kicker at={tenAt - 4}>Quick round</Kicker>
-        <Headline lead="Ten quick ones" turn="to finish." at={tenAt - 2} turnAt={finishAt} size={64} />
+        <Headline lead="Eleven quick ones" turn="to finish." at={tenAt - 2} turnAt={finishAt} size={64} />
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={620} at={tenAt + 6} end={end} />
 
         {/* ── The bridge ── */}

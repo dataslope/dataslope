@@ -121,6 +121,11 @@ const quoted = [
   ["advanced-sql", "Use `>=` plus deduplication\nif events can share the boundary timestamp"],
   ["dbt", "re-read an overlap window\nand merge on a stable key"],
   ["dbt", "consume a source change sequence that is reliably\nmonotonic"],
+  // "filter-micro", the microbatch strategy.
+  ["dbt", "the **microbatch** strategy (dbt 1.9 and later)"],
+  ["dbt", "dbt then builds one independent,\nidempotent batch per period"],
+  ["dbt", "re-processes `lookback` batches to catch\nlate rows"],
+  ["dbt", "A backfill is the same model run with `--event-time-start` and\n`--event-time-end`"],
   ["dbt", "equal timestamps, late events, and corrections to older\nrecords can be missed"],
   ["dbt", "It does not validate that\nthe key is unique, so duplicate source keys can fail a warehouse `MERGE` or\nproduce unexpected results."],
   ["dbt", "the target relation exists"],

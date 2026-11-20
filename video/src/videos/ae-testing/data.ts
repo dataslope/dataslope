@@ -51,6 +51,17 @@ const test = (figure: string, id: string): Test => {
   return { sql: lines(figure, id), result, passes: result.rows.length === 0 };
 };
 
+/** The rows a setup inserted into `name`, as printed cells, read from the
+ *  setup SQL that ran (results.json), so the figure's inputs are the run's. */
+const inserted = (setup: string, name: string): string[][] => {
+  const m = setup.match(new RegExp(`INSERT INTO ${name} VALUES ([^;]*);`));
+  if (!m) throw new Error(`the setup inserts nothing into ${name}`);
+  return [...m[1].matchAll(/\(([^()]*)\)/g)].map((t) => t[1].split(",").map((v) => v.trim().replace(/^'|'$/g, "")));
+};
+/** Each order beside each of its items: what the model's join produced. */
+const joined = (orders: string[][], items: string[][]) =>
+  orders.flatMap(([id, , amount]) => items.filter(([oid]) => oid === id).map(([, item]) => ({ order: id, amount, item })));
+
 /** "3,569.50". */
 export const money = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -116,6 +127,8 @@ export const FRESHNESS = {
   warnHours: 6,
   errorHours: 12,
   newest: table("freshness", "newest").rows[0][0],
+  /** The raw rows, their load times as the setup wrote them. */
+  raw: inserted(FIGURES.freshness.setup, "raw_orders"),
   checks: table("freshness", "checks").rows.map(
     ([checkedAt, age, verdict]): FreshnessCheck => ({
       checkedAt,
@@ -174,16 +187,6 @@ export const OBSERVE = {
 
 // ── 10. Testing that a metric is correct ────────────────────────────────────
 
-/** The rows a setup inserted into `name`, as printed cells, read from the
- *  setup SQL that ran (results.json), so the figure's inputs are the run's. */
-const inserted = (setup: string, name: string): string[][] => {
-  const m = setup.match(new RegExp(`INSERT INTO ${name} VALUES ([^;]*);`));
-  if (!m) throw new Error(`the setup inserts nothing into ${name}`);
-  return [...m[1].matchAll(/\(([^()]*)\)/g)].map((t) => t[1].split(",").map((v) => v.trim().replace(/^'|'$/g, "")));
-};
-/** Each order beside each of its items: what the model's join produced. */
-const joined = (orders: string[][], items: string[][]) =>
-  orders.flatMap(([id, , amount]) => items.filter(([oid]) => oid === id).map(([, item]) => ({ order: id, amount, item })));
 
 const metric = results.figures.metric as unknown as Figure & { modelSql: string };
 export const METRIC = {

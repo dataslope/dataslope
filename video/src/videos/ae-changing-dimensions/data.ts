@@ -209,21 +209,14 @@ export const MINI = {
 };
 if (MINI.ages.length * MINI.incomes.length !== MINI.rows) throw new Error("the mini-dimension's bands no longer multiply to its count");
 
-// ── 4. The dbt snapshot: drawn, not run ─────────────────────────────────────
+// ── 4. The dbt snapshot: the page's words, drawn, not run ───────────────────
+
+type Page = { file: string; lines: string[]; quotes: string[] };
+const PAGES = (results as unknown as { pages: Record<string, Page> }).pages;
 
 /**
- * dbt.mdx's snap_customers, as the page prints it, with its config call
- * folded onto fewer lines (whitespace only) so it is a short listing. dbt
- * does not run here; nothing below is measured.
+ * dbt.mdx's snap_customers, the YAML block as the page prints it (dbt 1.9
+ * and up), read from the page by check.mjs: its file name, for the listing's
+ * title, and its lines. dbt does not run here; nothing in it is measured.
  */
-export const SNAPSHOT_LINES = [
-  "{% snapshot snap_customers %}",
-  "{{ config(",
-  "    target_schema='snapshots',",
-  "    unique_key='customer_id',",
-  "    strategy='timestamp',",
-  "    updated_at='updated_at',",
-  ") }}",
-  "SELECT * FROM {{ source('raw', 'customers') }}",
-  "{% endsnapshot %}",
-];
+export const SNAPSHOT = { file: PAGES.snapshot.file, lines: PAGES.snapshot.lines };

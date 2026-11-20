@@ -324,6 +324,10 @@ const Packages: React.FC<{ c: Ctx }> = ({ c }) => {
           ))}
         </React.Fragment>
       ))}
+      <Note at={distAt + 10} x={BX + 450} y={top + c.h(56) + 3 * c.h(46) + c.h(8)}>
+        <div style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>The maintained one:</div>
+        <div style={{ fontFamily: MONO, fontSize: 19, color: INK, whiteSpace: "nowrap", marginTop: 6 }}>metaplane/dbt_expectations</div>
+      </Note>
       <Note at={leaveAt} x={BX} y={top + c.h(300)}>
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>The sanity checks the four built-ins leave out</span>
       </Note>
@@ -448,12 +452,19 @@ const Upstream: React.FC<{ c: Ctx }> = ({ c }) => {
         return (
           <React.Fragment key={m}>
             <Flow
-              points={[
-                [src.x + src.w + 6, src.y + c.h(28)],
-                [src.x + src.w + 80, src.y + c.h(28)],
-                [src.x + src.w + 80, my(i) + c.h(28)],
-                [mx - 8, my(i) + c.h(28)],
-              ]}
+              points={
+                Math.abs(my(i) - src.y) < 1
+                  ? [
+                      [src.x + src.w + 6, src.y + c.h(28)],
+                      [mx - 8, my(i) + c.h(28)],
+                    ]
+                  : [
+                      [src.x + src.w + 6, src.y + c.h(28)],
+                      [src.x + src.w + 80, src.y + c.h(28)],
+                      [src.x + src.w + 80, my(i) + c.h(28)],
+                      [mx - 8, my(i) + c.h(28)],
+                    ]
+              }
               at={coalesceAt - 4 + i * 3}
               color={fixed > 0.5 ? OK : INK}
             />
@@ -554,7 +565,7 @@ export const RapidScene: React.FC = () => {
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={880} at={nineAt + 6} end={end} />
 
         {/* ── The bridge ── */}
-        <Spot art="woodpecker" at={expectedAt + 4} left={1560} top={y(330)} width={230} />
+        <Spot art="woodpecker" at={expectedAt + 4} left={1570} top={y(330)} width={210} />
         <Note at={expectedAt} x={BX} y={y(380)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Tests check each model</span>
           <div style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap", marginTop: 6 }}>against what you expected</div>
@@ -562,10 +573,10 @@ export const RapidScene: React.FC = () => {
         <Note at={passAt} x={BX} y={y(520)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>All can pass</span>
         </Note>
-        <Note at={disagreeAt} x={BX} y={y(580)}>
+        <Note at={disagreeAt} x={BX} y={y(520) + h(42)}>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>while two dashboards disagree</span>
         </Note>
-        <NextLine at={nextAt} x={BX} y={y(720)} width={700}>
+        <NextLine at={nextAt} x={BX} y={y(740)} width={700}>
           metrics and the semantic layer
         </NextLine>
       </Drift>

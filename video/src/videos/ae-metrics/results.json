@@ -207,7 +207,7 @@
           ]
         },
         "page": {
-          "sql": "-- FAN TRAP: order 1's amount is counted once per item -> inflated\nSELECT SUM(o.amount) AS inflated_revenue\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id;\n-- True revenue is 1,949.25 (SUM over orders alone), but this returns 4,555.25.",
+          "sql": "-- FAN TRAP: order 1's amount is counted once per item -> inflated\nSELECT SUM(o.amount) AS inflated_revenue\nFROM orders o\nJOIN order_items i ON i.order_id = o.order_id;\n-- True revenue is SUM(amount) over orders alone, 1949.25, but this returns 4555.25.",
           "ok": true,
           "columns": [
             "inflated_revenue"
@@ -937,7 +937,7 @@
     }
   },
   "definitions": {
-    "metricflow": "metrics:\n  - name: completed_revenue\n    type: simple\n    label: Completed Revenue\n    type_params:\n      measure: order_amount   # SUM defined on the semantic model, filtered to completed"
+    "metricflow": "models:\n  - name: fct_orders\n    semantic_model:\n      enabled: true\n    agg_time_dimension: ordered_at\n    columns:\n      - name: order_id\n        entity:\n          name: order\n          type: primary\n      - name: ordered_at\n        granularity: day\n        dimension:\n          type: time\n      - name: status\n        dimension:\n          type: categorical\n    metrics:\n      - name: completed_revenue\n        type: simple\n        label: Completed Revenue\n        agg: sum\n        expr: amount\n        filter: \"{{ Dimension('order__status') }} = 'completed'\""
   },
   "pageNote": null
 }

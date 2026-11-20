@@ -75,15 +75,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "t3-use": two columns of the same revenue, "old regions" and "new
  *     regions", with no join drawn between them. "t3-limit": the second
  *     UPDATE, the row now North and West, East struck in red as it leaves.
- *   - "snap" to "snap-model": the page's snap_customers listing, with
- *     strategy='timestamp' and updated_at='updated_at' in yellow; beside it a
+ *   - "snap" to "snap-model": the page's snapshots/snap_customers.yml (the
+ *     YAML form dbt has used since 1.9), with strategy: timestamp and
+ *     updated_at: updated_at in yellow; beside it a
  *     drawn snapshot table, columns dbt_valid_from and dbt_valid_to, rows
  *     labelled by run ("run 1", "run 2"), no dates or times (dbt does not run
  *     here); a camera spot. "snap-strategy": the two strategies as two short
  *     columns with a hairline between. "snap-gap": a timeline of three source
  *     states (East, West, North) and two run ticks; West, under no tick, drawn
- *     dashed and grey, labelled "never recorded" (not struck: it was true). "snap-keep": the source box holding only
- *     "now", the snapshot box holding every version. "snap-model": an arrow
+ *     dashed and grey, labelled "never recorded" (not struck: it was true).
+ *     "snap-delete": the row deleted at the source after North, a third run
+ *     tick, its box "North stays open" in grey, then hard_deletes: invalidate
+ *     and "North closed at run 3" in green. "snap-keep": the source box
+ *     holding only "now" (no row for 42 any more), the snapshot box holding
+ *     every version it recorded. "snap-model": an arrow
  *     from the snapshot to dim_customer, the two timestamp columns becoming
  *     valid_from and valid_to.
  *   - "late" to "late-watch": the three staged orders (201, 202, 203) and the
@@ -152,7 +157,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     own, North with West.
  *   - "snap": dbt.mdx's answer (Type 2, dbt_valid_from and dbt_valid_to,
  *     the timestamp and check strategies, files under snapshots/) and its
- *     snap_customers listing. Not run: dbt does not run here. "snap-gap",
+ *     snap_customers listing, the YAML block as the page prints it, read
+ *     from dbt.mdx by check.mjs into results.json. "snap-delete" is the
+ *     page's "A row deleted at the source is ignored by default; set
+ *     `hard_deletes` to `invalidate` to close its last version" (added to
+ *     the page 2026-11-20, #746), which check.mjs quotes and checks with the
+ *     rest. Not run: dbt does not run here. "snap-gap",
  *     "snap-keep" and "snap-model" follow from the page's mechanism (it
  *     "checks a source table for changed rows on each run"), with no
  *     numbers.
@@ -296,6 +306,11 @@ export const script: NarrationScript = {
     {
       id: "snap-gap",
       text: "Either way, it only sees what's there when it runs. Change a row twice between runs, and the middle value is never recorded.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "snap-delete",
+      text: "A row deleted at the source is ignored by default; set hard deletes to invalidate, and the snapshot closes its last version.",
       pauseAfter: 0.6,
     },
     {

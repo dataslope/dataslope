@@ -58,7 +58,7 @@ export const PARTS: readonly Part[] = [
   {
     n: 3,
     title: "dbt",
-    from: { dbt: 18, "dimensional-modeling": 1, "data-warehousing": 1 },
+    from: { dbt: 19, "dimensional-modeling": 1, "data-warehousing": 1 },
     video: "ae-dbt",
     hero: "ae-dbt-weaver-bird",
   },
@@ -84,7 +84,7 @@ export const PARTS: readonly Part[] = [
     video: "ae-testing",
     hero: "ae-testing-woodpecker",
   },
-  { n: 8, title: "Metrics", from: { "metrics-and-semantic-layer": 18 }, video: "ae-metrics", hero: "ae-metrics-pelican" },
+  { n: 8, title: "Metrics", from: { "metrics-and-semantic-layer": 19 }, video: "ae-metrics", hero: "ae-metrics-pelican" },
   {
     n: 9,
     title: "AI layer",
@@ -101,11 +101,11 @@ export const questionsOf = (p: Part): number => Object.values(p.from).reduce((a,
 export const TOPIC_PARTS: readonly Part[] = PARTS.filter((p) => p.n > 0);
 
 /** Every question the pages ask, each answered once: the sum of PARTS
- *  (146). */
+ *  (148). */
 export const ALL_QUESTIONS = PARTS.reduce((a, p) => a + questionsOf(p), 0);
 
 /** The questions the nine topic videos answer, after the one this overview
- *  takes (145): what "series-parts" says. */
+ *  takes (147): what "series-parts" says. */
 export const QUESTIONS = TOPIC_PARTS.reduce((a, p) => a + questionsOf(p), 0);
 
 /** The part number of each video, by its folder, so a label that points at
@@ -116,7 +116,7 @@ export const partOf = (video: string): number => {
   return part.n;
 };
 
-/** The `###` headings the seven topic pages hold (146), counted by
+/** The `###` headings the seven topic pages hold (148), counted by
  *  check.mjs. */
 export const PAGE_QUESTIONS: number = results.pageQuestions;
 

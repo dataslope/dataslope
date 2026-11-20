@@ -168,7 +168,10 @@ results.figures.layer = await figure(LAYER, {
 // ── The definitions the screen shows as the page writes them ────────────────
 
 results.definitions = {
-  metricflow: fence("metrics:\n  - name: completed_revenue"),
+  // The page's MetricFlow block, in dbt's current spec (since 1.12): entities
+  // and dimensions on the model's columns, the metric inline with its own
+  // aggregation (measures are deprecated).
+  metricflow: fence("models:\n  - name: fct_orders"),
 };
 
 // ── Checks ──────────────────────────────────────────────────────────────────

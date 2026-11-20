@@ -218,7 +218,7 @@ export const script: NarrationScript = {
     },
     {
       id: "plan",
-      text: "Eighteen questions on metrics and the semantic layer. Eight are worked through, most on the page's own orders in Postgres, and ten come quickly at the end.",
+      text: "Nineteen questions on metrics and the semantic layer. Eight are worked through, most on the page's own orders in Postgres, and eleven come quickly at the end.",
       pauseAfter: 0.7,
     },
 
@@ -343,6 +343,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "entities-dbt",
+      text: "That triad is LookML's and the original MetricFlow spec's. In dbt's current spec, the measure is folded into a simple metric.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "entities-run",
       text: "Declared on the page's two tables, they tell the layer that revenue lives on orders and units on items. Ask for both by order, and it sums each at its own grain before it joins: nineteen hundred forty-nine dollars and thirty-eight units, with no fan trap.",
       pauseAfter: 0.8,
@@ -393,7 +398,7 @@ export const script: NarrationScript = {
     },
 
     // ── Quick ─────────────────────────────────────────────────────────────
-    { id: "rapid-in", scene: true, text: "Ten quick ones to finish.", pauseAfter: 0.5 },
+    { id: "rapid-in", scene: true, text: "Eleven quick ones to finish.", pauseAfter: 0.5 },
     {
       id: "r-truth",
       text: "Question nine. Why does a single source of truth for metrics matter? Without one, every dashboard and notebook re-implements revenue slightly differently. One definition means one place to change it, the same answer everywhere, and versioned code instead of tribal knowledge.",
@@ -406,7 +411,17 @@ export const script: NarrationScript = {
     },
     {
       id: "r-metricflow",
-      text: "Question eleven. What is the dbt Semantic Layer, or MetricFlow? Semantic models and metrics, declared in YAML beside the dbt project. MetricFlow, the layer's query compiler, turns a request for a metric by a dimension into warehouse SQL, and BI tools ask for it through an API.",
+      text: "Question eleven. What is the dbt Semantic Layer, or MetricFlow?",
+      pauseAfter: 0.4,
+    },
+    {
+      id: "r-metricflow-yaml",
+      text: "Entities, dimensions and metrics, declared in the YAML of the dbt model they describe.",
+      pauseAfter: 0.4,
+    },
+    {
+      id: "r-metricflow-sql",
+      text: "MetricFlow, the layer's query compiler, turns a request for a metric by a dimension into warehouse SQL, and BI tools ask for it through an API.",
       pauseAfter: 1.2,
     },
     {
@@ -443,7 +458,12 @@ export const script: NarrationScript = {
     {
       id: "r-wide",
       text: "Question eighteen. When is a wide, pre-joined mart preferable to querying through a semantic layer? For a heavy BI workload, or a tool that struggles with dynamic joins: reads are fast and predictable. It costs flexibility and storage, and its logic must still come from the governed definitions, or it becomes one more place to drift.",
-      pauseAfter: 1.0,
+      pauseAfter: 1.2,
+    },
+    {
+      id: "r-where",
+      text: "Question nineteen. Where else can a semantic layer live? In the warehouse itself: Snowflake's semantic views, or Databricks' metric views, which many ask-your-data assistants query. The trade-off is portability: a definition written for one engine doesn't move to another. Apache Ossie, begun as the Open Semantic Interchange, is a vendor-neutral spec for exchanging them.",
+      pauseAfter: 1.2,
     },
     {
       id: "next",

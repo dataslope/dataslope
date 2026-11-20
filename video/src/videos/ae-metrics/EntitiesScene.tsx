@@ -100,6 +100,8 @@ export const EntitiesScene: React.FC = () => {
       exAt: n.word("entities", "an amount, a count"),
     },
   ];
+  const triadAt = n.word("entities-dbt", "That triad is LookML's");
+  const foldedAt = n.word("entities-dbt", "the measure is folded into a simple metric");
   const declaredAt = n.word("entities-run", "Declared on the page's two tables");
   const revenueAt = n.word("entities-run", "revenue lives on orders");
   const unitsOnAt = n.word("entities-run", "units on items");
@@ -165,6 +167,14 @@ export const EntitiesScene: React.FC = () => {
             </div>
           </React.Fragment>
         ))}
+
+        {/* ── Whose triad it is, and where dbt puts the measure now ── */}
+        <Ink at={triadAt} dur={14} style={{ left: X0, top: colsTop + h(146) }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>LookML&rsquo;s triad, and the original MetricFlow spec&rsquo;s</span>
+        </Ink>
+        <Ink at={foldedAt} dur={14} style={{ left: colX(2), top: colsTop + h(146) }}>
+          <span style={{ ...note(22, BLUE_INK), whiteSpace: "nowrap" }}>In dbt today: inside a simple metric</span>
+        </Ink>
 
         {/* ── The page's two tables, declared ── */}
         <ModelBox

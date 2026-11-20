@@ -59,8 +59,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (with "Code only as evidence" under it); then the nine topic videos as
  *     a bar chart of the questions each answers (TOPIC_PARTS, questionsOf),
  *     each bar topped by its own small hero, in series order, rising as
- *     "series-parts" names them; the total, 145, under the axis, and on the
- *     right "+1 here", for the question this overview answers (146 in all,
+ *     "series-list" names them; the total, 147, under the axis, and on the
+ *     right "+1 here", for the question this overview answers (148 in all,
  *     the pages' headings, results.json). The practice line beneath:
  *     "Concept checks on every page", then the three challenge pages by name
  *     (CHALLENGE_LABELS), then "110 in the bank". <NextLine> on "Next", with
@@ -86,14 +86,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     comparing result sets with verified answers, including questions it
  *     should decline"; AI-written models "reviewed for grain, incremental
  *     logic, and duplicate metrics"). "ai-ask": the index's "some coding
- *     rounds now allow an assistant. Ask the recruiter about each round."
+ *     rounds allow an assistant. Ask the recruiter about each round."
  *     "ai-more": the index's "AI & the semantic layer covers these questions
  *     in depth", which is Part 9 (check.mjs reads the number from PARTS).
  *   - "series": the plan's "modeling decisions and their failure modes",
  *     with code on screen "short, and as evidence".
- *   - "series-parts": nine videos after this one, 145 questions, each
- *     answered once: the plan's table, held in data.ts (PARTS, by page). The
- *     seven topic pages ask 146 (check.mjs counts their `###` headings, and
+ *   - "series-parts", "series-list": nine videos after this one, 147
+ *     questions, each answered once: the plan's table, held in data.ts
+ *     (PARTS, by page), with the two questions the pages added on 2026-11-20
+ *     (dbt v2 in Part 3, where else a semantic layer can live in Part 8). The
+ *     seven topic pages ask 148 (check.mjs counts their `###` headings, and
  *     fails if any page's count stops matching the parts that answer it);
  *     this overview answers one. A near-identical pair on two pages (the
  *     materializations, the incremental filter, the full refresh, freshness,
@@ -177,7 +179,7 @@ export const script: NarrationScript = {
       text: "And reviewing a dbt model an assistant wrote, for its grain, its incremental logic and duplicate metrics.",
       pauseAfter: 0.6,
     },
-    { id: "ai-ask", text: "Some coding rounds now allow an assistant, so ask the recruiter about each round." },
+    { id: "ai-ask", text: "Some coding rounds allow an assistant, so ask the recruiter about each round." },
     { id: "ai-more", text: "Part nine covers all four in depth.", pauseAfter: 0.8 },
     {
       id: "series",
@@ -187,7 +189,13 @@ export const script: NarrationScript = {
     },
     {
       id: "series-parts",
-      text: "After this one, nine videos answer the track's other hundred and forty-five questions, each once: facts and grain, dimensions that change, how dbt builds a project, incremental models, advanced SQL, warehouses and what they cost, testing, metrics, and the assistants that read them.",
+      text: "After this one, nine videos answer the track's other hundred and forty-seven questions, each once:",
+    },
+    {
+      // Split from "series-parts" at its colon, so the list is still cut
+      // from the take and only the count was voiced again.
+      id: "series-list",
+      text: "facts and grain, dimensions that change, how dbt builds a project, incremental models, advanced SQL, warehouses and what they cost, testing, metrics, and the assistants that read them.",
       pauseAfter: 0.6,
     },
     {

@@ -9,16 +9,18 @@ import { Sfx } from "../../sound/Sfx";
 import { GRAPH } from "./data";
 import { artBox, BIG, Drift, edgeKey, Graph, type GEdge, type GNode, Headline, Kicker, lerpLayout, Mark, MODELS, SERIES, sliceLayout, SLICE_EDGE, type Slot, Spot, X0 } from "./parts";
 
-/** The plan: ten worked through, nine quick. */
+/** The plan: ten worked through, ten quick. */
 const SQ = 44;
 const SMALL = 30;
+/** Questions in the round: ten worked through, the rest quick. */
+const ROUND = 20;
 
 /**
  * The opening: the page's four models as outlined boxes, in no order, the
  * weaver bird beside them; each is built from others, so they must run in
  * order. On "working out that order" they slide into build order and their
  * edges draw in; on "running it" each step lights as it builds. Then the
- * round: nineteen questions, ten big and nine small.
+ * round: twenty questions, ten big and ten small.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -35,9 +37,9 @@ export const HookScene: React.FC = () => {
   const workAt = n.word("hook-dbt", "Working out that order");
   const runAt = n.word("hook-dbt", "and running it");
   const jobAt = n.word("hook-dbt", "is dbt's job");
-  const nineteenAt = n.word("plan", "Nineteen questions");
+  const twentyAt = n.word("plan", "Twenty questions");
   const tenAt = n.word("plan", "ten worked through");
-  const nineAt = n.word("plan", "nine quick ones");
+  const quickAt = n.word("plan", "ten quick ones");
   const end = n.beat("plan").to;
 
   const top = y(372);
@@ -97,7 +99,7 @@ export const HookScene: React.FC = () => {
         <Sfx key={i} name="el-tap" at={runAt + 4 + i * 10} level={-31} />
       ))}
       <Sfx name="el-sprinkle" at={tenAt} level={-32} />
-      <Sfx name="el-chime" at={nineteenAt} level={-33} />
+      <Sfx name="el-chime" at={twentyAt} level={-33} />
 
       <Drift from={0} to={end + 20}>
         <Kicker at={nightAt}>{SERIES} · dbt</Kicker>
@@ -120,12 +122,12 @@ export const HookScene: React.FC = () => {
 
         <Spot id="weaver-bird" at={modelsAt} left={1290} top={y(300)} {...bird} />
 
-        {/* The round: nineteen questions, ten big and nine small. */}
+        {/* The round: twenty questions, ten big and ten small. */}
         <div style={{ position: "absolute", left: X0, top: planTop, display: "flex", alignItems: "center", gap: 10, fontSize: 21 }}>
-          {Array.from({ length: 19 }, (_, i) => {
+          {Array.from({ length: ROUND }, (_, i) => {
             const big = i < 10;
-            const a = big ? tenAt + i * 2 : nineAt + (i - 10) * 2;
-            const p = ease(frame, Math.max(a, nineteenAt), 8);
+            const a = big ? tenAt + i * 2 : quickAt + (i - 10) * 2;
+            const p = ease(frame, Math.max(a, twentyAt), 8);
             const s = big ? SQ : SMALL;
             return (
               <React.Fragment key={i}>
@@ -161,10 +163,10 @@ export const HookScene: React.FC = () => {
             worked through
           </span>
         </Note>
-        <Note at={nineAt + 6} x={X0 + 10 * (SQ + 10) + 18} y={planTop + SQ + h(16)}>
+        <Note at={quickAt + 6} x={X0 + 10 * (SQ + 10) + 18} y={planTop + SQ + h(16)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: INK }}>
-              <Num>9</Num>
+              <Num>{ROUND - 10}</Num>
             </b>{" "}
             quick
           </span>

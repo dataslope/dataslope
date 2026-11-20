@@ -63,7 +63,7 @@ const Rule: React.FC<{ at: number }> = ({ at }) => {
  * bar for the questions it answers and its own watercolor hero standing on
  * the bar. The names ink in along the baseline as "nine videos" is said, and
  * each bar rises, its hero with it, as the narration names that video. Under
- * the names, the total they answer, 145, and on the right the one this
+ * the names, the total they answer, 147, and on the right the one this
  * overview answers. Then the practice on the pages, as three columns, and the
  * bridge, which lights Part 1 on "grain" and dims the rest.
  */
@@ -78,18 +78,18 @@ export const SeriesScene: React.FC = () => {
   const codeAt = n.word("series", "Code comes on screen");
   const evidenceAt = n.word("series", "only as evidence");
   const nineAt = n.word("series-parts", "nine videos");
-  const totalAt = n.word("series-parts", "hundred and forty-five");
+  const totalAt = n.word("series-parts", "hundred and forty-seven");
   const onceAt = n.word("series-parts", "each once");
   const riseAt = [
-    n.word("series-parts", "facts and grain"),
-    n.word("series-parts", "dimensions that change"),
-    n.word("series-parts", "how dbt builds a project"),
-    n.word("series-parts", "incremental models"),
-    n.word("series-parts", "advanced SQL"),
-    n.word("series-parts", "warehouses and what they cost"),
-    n.word("series-parts", "testing"),
-    n.word("series-parts", "metrics"),
-    n.word("series-parts", "the assistants that read them"),
+    n.word("series-list", "facts and grain"),
+    n.word("series-list", "dimensions that change"),
+    n.word("series-list", "how dbt builds a project"),
+    n.word("series-list", "incremental models"),
+    n.word("series-list", "advanced SQL"),
+    n.word("series-list", "warehouses and what they cost"),
+    n.word("series-list", "testing"),
+    n.word("series-list", "metrics"),
+    n.word("series-list", "the assistants that read them"),
   ];
   const checksAt = n.word("practice", "concept checks");
   const challengesAt = n.word("practice", "three of them add challenges");

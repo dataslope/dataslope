@@ -345,6 +345,26 @@ expect("r-t3: after a second move, East is gone", one("type3", "twice"), [["42",
 expect("t1-mix: the name fixed on both versions", [one("t1mix", "fix"), one("t1mix", "after").map((r) => [r[1], r[2]])], [[["2"]], [["Acme Corp", "East"], ["Acme Corp", "West"]]]);
 expect("r-mini: twenty rows", one("mini", "mini"), [["20"]]);
 
+// ── Question 4: the page's dbt snapshot (dbt.mdx), quoted, not run ───────
+// dbt does not run here, so the snapshot is the page's own words and its
+// YAML block, read from the page so a listing on screen cannot drift from
+// it. Since #746 the page configures the snapshot in YAML (dbt 1.9 and up)
+// and adds what a hard delete does.
+const dbtPage = readFileSync(new URL("../../../../content/interview/analytics-engineer/dbt.mdx", import.meta.url), "utf8");
+const flat = dbtPage.replace(/\s+/g, " ");
+const SNAP_QUOTES = [
+  "`dbt snapshot` implements **Slowly Changing Dimension (SCD) Type 2**",
+  "closes the current version of a changed row (setting its `dbt_valid_to`) and inserts a new one with `dbt_valid_from`",
+  "`timestamp` (compares an `updated_at` column) or `check` (compares a list of columns)",
+  "Since dbt 1.9 a snapshot is configured in YAML",
+  "The current version of a row is the one whose `dbt_valid_to` is `NULL`.",
+  "A row deleted at the source is ignored by default; set `hard_deletes` to `invalidate` to close its last version",
+];
+for (const q of SNAP_QUOTES) if (!flat.includes(q)) throw new Error(`dbt.mdx no longer says: ${q}`);
+const yaml = dbtPage.match(/```yaml\n# (snapshots\/snap_customers\.yml)\n([\s\S]*?)```/);
+if (!yaml) throw new Error("dbt.mdx has no snapshots/snap_customers.yml block");
+results.pages = { snapshot: { file: yaml[1], lines: yaml[2].trimEnd().split("\n"), quotes: SNAP_QUOTES } };
+
 const out = {
   natural: nat,
   truth,

@@ -1234,5 +1234,28 @@
       },
       "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
     }
+  },
+  "pages": {
+    "snapshot": {
+      "file": "snapshots/snap_customers.yml",
+      "lines": [
+        "snapshots:",
+        "  - name: snap_customers",
+        "    relation: source('raw', 'customers')",
+        "    config:",
+        "      schema: snapshots",
+        "      unique_key: customer_id",
+        "      strategy: timestamp",
+        "      updated_at: updated_at"
+      ],
+      "quotes": [
+        "`dbt snapshot` implements **Slowly Changing Dimension (SCD) Type 2**",
+        "closes the current version of a changed row (setting its `dbt_valid_to`) and inserts a new one with `dbt_valid_from`",
+        "`timestamp` (compares an `updated_at` column) or `check` (compares a list of columns)",
+        "Since dbt 1.9 a snapshot is configured in YAML",
+        "The current version of a row is the one whose `dbt_valid_to` is `NULL`.",
+        "A row deleted at the source is ignored by default; set `hard_deletes` to `invalidate` to close its last version"
+      ]
+    }
   }
 }

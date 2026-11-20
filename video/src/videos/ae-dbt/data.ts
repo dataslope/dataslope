@@ -24,6 +24,7 @@ type Figure = { setup: string; version: string; steps: Record<string, Step> };
 type Selection = { selector: string; models: string[]; sources: string[]; exposures: string[] };
 
 const R = results as unknown as {
+  dbtV2: { language: string; generallyAvailable: string; coreLine: string; coreEndsAt: string; testsKey: string };
   graph: {
     sources: string[];
     models: string[];
@@ -131,3 +132,10 @@ export const MACRO = {
   expandedSql: lines(ok(R.macro, "expanded").sql),
   integerSql: lines(ok(R.macro, "integer").sql),
 };
+
+// ── 20. dbt v2 ──────────────────────────────────────────────────────────────
+
+/** The page's dbt v2 answer: the engine's language, when it became generally
+ *  available, the Python line dbt Core names and the release it ends at, and
+ *  the YAML key the page gives first among the 1.x deprecations. */
+export const DBT_V2 = R.dbtV2;

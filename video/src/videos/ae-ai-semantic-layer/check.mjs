@@ -350,11 +350,12 @@ const quotes = [
   "which is metric drift by design.",
   // 3
   "with less tolerance for\ngaps, because a model will not ask",
-  "public marts only",
+  "`SELECT` on the public marts only",
+  "it restricts `ref()`, not queries.",
   "so an answer can say \"as of\" and the\n  assistant can refuse to answer from stale data.",
   "documentation becomes an input, so a wrong description now\nproduces wrong answers",
   "review them like code.",
-  "Access boundaries remove the option entirely, which beats hoping the model chooses well.",
+  "Removing the option at the warehouse beats hoping the model chooses well.",
   // 4
   "compare **result sets** (execution accuracy),\n   not query strings.",
   "Measure the refusal rate on those as carefully as\n   accuracy on the rest.",
@@ -370,8 +371,8 @@ const quotes = [
   "tests that would fail\n  without the change.",
   // 6
   "Through the same interfaces BI tools use",
-  "The Model Context Protocol (MCP) has become a common way to expose",
-  "dbt Labs publishes an MCP server",
+  "The Model Context Protocol (MCP) is a common way to expose",
+  "dbt publishes an MCP server",
   "never a superuser service account.",
   "a model can\n  write an expensive cross join as easily as a cheap lookup.",
   "for audit and\n  for growing the eval set.",

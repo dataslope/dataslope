@@ -3,12 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { MONO } from "../../theme/fonts";
 import { READY } from "./data";
-import { artBox, Box, Chip, Clear, Drift, Flow, line, Listing, listingWidth, Mark, OK_INK, spanAt, Spot, X0 } from "./parts";
+import { artBox, Box, Chip, Clear, Cross, Drift, Flow, line, Listing, listingWidth, Mark, OK, OK_INK, spanAt, Spot, X0 } from "./parts";
 
 const SIZE = 19;
 /** The right column, beside the YAML. */
@@ -54,10 +55,12 @@ export const ReadyScene: React.FC = () => {
   const knowsAt = n.word("ready-tests", "so the assistant knows");
   const valueAt = [n.word("ready-tests", "completed"), n.word("ready-tests", "refunded"), n.word("ready-tests", "cancelled")];
   const accessFrom = n.beat("ready-access").from;
-  const markAt = n.word("ready-access", "Mark staging and intermediate models");
-  const privateAt = n.word("ready-access", "private or protected");
-  const exposeAt = n.word("ready-access", "expose only the public marts");
-  const removesAt = n.word("ready-access", "removes the wrong choice");
+  const grantAt = n.word("ready-access", "Grant the assistant's warehouse role");
+  const martsAt = n.word("ready-access", "the public marts only");
+  const markAt = n.word("ready-access", "Marking staging models private");
+  const buildAt = n.word("ready-access", "stops other models building on them");
+  const queriesAt = n.word("ready-access", "not queries");
+  const removesAt = n.word("ready-access-why", "removes the wrong choice");
   const restAt = n.word("ready-rest", "Put every number the business argues about");
   const freshAt = n.word("ready-rest", "check source freshness");
   const asOfAt = n.word("ready-rest", "as of when");
@@ -84,8 +87,9 @@ export const ReadyScene: React.FC = () => {
   const modelTop = accessTop + h(108);
   const modelH = h(62);
   const modelX = (i: number) => R_X + i * (MODEL_W + MODEL_GAP);
-  const asstTop = modelTop + modelH + h(96);
-  const padlock = artBox("ae-ai-semantic-layer-padlock", 92);
+  const asstTop = modelTop + modelH + h(82);
+  const ASST_X = modelX(1) + MODEL_W / 2 + 25;
+  const padlock = artBox("ae-ai-semantic-layer-padlock", 88);
   const restTop = y(758);
 
   return (
@@ -95,10 +99,11 @@ export const ReadyScene: React.FC = () => {
       <Sfx name="el-tap" at={uniqueAt + 10} level={-31} />
       <Sfx name="el-tap" at={acceptedAt + 10} level={-31} />
       {MODELS.map((m, i) => (
-        <Sfx key={m.name} name="el-tap" at={markAt + i * 5} level={-33} />
+        <Sfx key={m.name} name="el-tap" at={grantAt + i * 5} level={-33} />
       ))}
-      <Sfx name="el-pop" at={privateAt} level={-30} />
-      <Sfx name="el-pencil" at={exposeAt + 8} level={-35} />
+      <Sfx name="el-pencil" at={martsAt + 6} level={-35} />
+      <Sfx name="el-scratch" at={martsAt + 26} level={-34} />
+      <Sfx name="el-pop" at={markAt + 6} level={-30} />
       <Sfx name="el-scratch" at={dropAt + 8} level={-34} />
       <Sfx name="el-tap" at={reportsAt} level={-30} />
       <Sfx name="el-chime" at={reviewAt + 6} level={-33} />
@@ -131,9 +136,10 @@ export const ReadyScene: React.FC = () => {
             { line: "use the net_revenue metric", text: "use the net_revenue metric", at: metricAt, out: testAt },
             { line: "data_tests: [unique, not_null]", text: "[unique, not_null]", at: uniqueAt, out: acceptedAt },
             { line: "- accepted_values:", at: acceptedAt, out: knowsAt },
+            ...(lines.some((l) => l.trim() === "arguments:") ? [{ line: "arguments:", at: acceptedAt + 2, out: knowsAt }] : []),
             { line: valuesLine, at: acceptedAt + 4, out: knowsAt },
             ...READY.accepted.map((v, i) => ({ line: valuesLine, text: v, at: valueAt[i], out: accessFrom })),
-            { line: "access: public", at: exposeAt, out: inputFrom },
+            { line: "access: public", at: markAt + 6, out: inputFrom },
             { line: READY.description, text: READY.cut, at: dropAt + 8, color: INK, kind: "strike" as const },
           ]}
         />
@@ -188,28 +194,56 @@ export const ReadyScene: React.FC = () => {
           </Ink>
         </Clear>
 
-        {/* Access: only the public mart is the assistant's to read. */}
+        {/* Access: the assistant's role is granted the public mart alone;
+            private, the secondary point, restricts ref(), not queries. */}
         <Clear at={inputFrom - 4}>
-          <Ink at={markAt} dur={14} style={{ left: R_X, top: accessTop }}>
-            <div style={{ ...line(26, INK), fontWeight: 500 }}>Access boundaries</div>
+          <Ink at={grantAt} dur={14} style={{ left: R_X, top: accessTop }}>
+            <div style={{ ...line(26, INK), fontWeight: 500 }}>
+              Access boundaries{" "}
+              <span style={{ color: INK_SOFT, fontWeight: 400, opacity: ease(frame, queriesAt, 12) }}>· private stops ref(), not queries</span>
+            </div>
           </Ink>
           {MODELS.map((m, i) => (
             <React.Fragment key={m.name}>
-              <Box x={modelX(i)} y={modelTop} w={MODEL_W} h={modelH} at={markAt + i * 5} title={m.name} mono size={22} toTone={m.access === "public" ? "ok" : "soft"} toAt={m.access === "public" ? exposeAt : privateAt} />
-              <Ink at={m.access === "public" ? exposeAt : privateAt + i * 4} dur={12} style={{ left: modelX(i), width: MODEL_W, top: modelTop - h(50), textAlign: "center" }}>
-                <Chip tone={m.access === "public" ? "green" : "gray"} size={21}>
+              <Box
+                x={modelX(i)}
+                y={modelTop}
+                w={MODEL_W}
+                h={modelH}
+                at={grantAt + i * 5}
+                title={m.name}
+                mono
+                size={22}
+                toTone={m.access === "public" ? "ok" : "soft"}
+                toAt={m.access === "public" ? martsAt + 6 : markAt + 6}
+              />
+              <Ink at={m.access === "public" ? buildAt : markAt + 6 + i * 4} dur={12} style={{ left: modelX(i), width: MODEL_W, top: modelTop - h(50), textAlign: "center" }}>
+                <Chip tone="gray" size={21}>
                   {m.access}
                 </Chip>
               </Ink>
               {i < MODELS.length - 1 ? (
-                <Flow points={[[modelX(i) + MODEL_W + 6, modelTop + modelH / 2], [modelX(i + 1) - 6, modelTop + modelH / 2]]} at={markAt + 4 + i * 5} color={INK_SOFT} head={11} width={2} />
+                <Flow points={[[modelX(i) + MODEL_W + 6, modelTop + modelH / 2], [modelX(i + 1) - 6, modelTop + modelH / 2]]} at={grantAt + 4 + i * 5} color={INK_SOFT} head={11} width={2} />
               ) : null}
             </React.Fragment>
           ))}
-          <Spot id="ae-ai-semantic-layer-padlock" at={privateAt} left={R_X + MODEL_W + MODEL_GAP / 2 - padlock.width / 2} top={modelTop + modelH + 70} {...padlock} />
-          <Box x={modelX(2)} y={asstTop} w={MODEL_W} h={modelH} at={exposeAt} title="Assistant" size={24} />
-          <Flow points={[[modelX(2) + MODEL_W / 2, asstTop - 8], [modelX(2) + MODEL_W / 2, modelTop + modelH + 8]]} at={exposeAt + 8} />
-          <Ink at={removesAt} dur={14} style={{ left: modelX(2) + MODEL_W, top: asstTop + modelH + h(22), transform: "translateX(-100%)" }}>
+          <Box x={ASST_X} y={asstTop} w={MODEL_W} h={modelH} at={grantAt + 10} title="Assistant" size={24} />
+          {/* Granted: SELECT on the mart. */}
+          <Flow points={[[ASST_X + MODEL_W - 40, asstTop - 8], [modelX(2) + MODEL_W / 2, modelTop + modelH + 8]]} at={martsAt} color={OK} />
+          <Ink at={martsAt + 8} dur={12} style={{ left: modelX(2) + MODEL_W / 2 + 34, top: (asstTop + modelTop + modelH) / 2 - 18 }}>
+            <Chip tone="green" size={21}>
+              <span style={{ fontFamily: MONO }}>SELECT</span> granted
+            </Chip>
+          </Ink>
+          {/* Not granted: the arrow to an intermediate model stops. */}
+          <Flow points={[[ASST_X + 40, asstTop - 8], [modelX(1) + MODEL_W / 2, modelTop + modelH + 8]]} at={martsAt + 14} cut={0.5} color={ACCENT} />
+          {frame >= martsAt + 26 ? (
+            <div style={{ position: "absolute", left: (ASST_X + 40 + modelX(1) + MODEL_W / 2) / 2 - 13, top: (asstTop - 8 + modelTop + modelH + 8) / 2 - 13 }}>
+              <Cross at={martsAt + 26} size={26} />
+            </div>
+          ) : null}
+          <Spot id="ae-ai-semantic-layer-padlock" at={markAt + 6} left={modelX(0) + MODEL_W / 2 - padlock.width / 2} top={modelTop + modelH + 82} {...padlock} />
+          <Ink at={removesAt} dur={14} style={{ left: ASST_X + MODEL_W, top: asstTop + modelH + h(22), transform: "translateX(-100%)" }}>
             <span style={line(23, INK_SOFT)}>No wrong model to choose</span>
           </Ink>
 

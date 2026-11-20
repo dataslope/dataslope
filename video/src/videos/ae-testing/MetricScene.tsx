@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -194,7 +194,7 @@ export const MetricScene: React.FC = () => {
         <Spot art="ledger" at={ledgerAt} out={reconOut} left={1560} top={low - h(20)} width={210} />
 
         {/* ── Why: one row per item ── */}
-        <ListingTitle x={R_X} top={top} at={joinedAt} out={unitAt + 40}>
+        <ListingTitle x={R_X} top={top} at={joinedAt}>
           The model&rsquo;s SQL
         </ListingTitle>
         <Listing lines={model} x={R_X} top={top} size={SIZE} at={joinedAt} marks={[{ line: "JOIN order_items", at: joinedAt + 10, color: MARK_RED }]} />
@@ -229,17 +229,20 @@ export const MetricScene: React.FC = () => {
             </span>
           </div>
         </Ink>
-        <Flow points={[[X0 + 470, low + h(52)], [X0 + 590, low + h(52)]]} at={itemsAt + 6} />
-        <Ink at={itemsAt + 10} dur={12} style={{ left: X0 + 610, top: low + h(8), whiteSpace: "nowrap" }}>
-          <div style={{ ...note(20, INK_SOFT) }}>Expected</div>
-          <div style={{ ...note(24, OK_INK), fontWeight: 600, marginTop: h(8), ...TABULAR }}>{money(UNIT_TEST.expected)}</div>
-        </Ink>
-        <div style={{ position: "absolute", left: X0 + 800, top: low + h(10), width: 1, height: h(66) * ease(frame, outAt - 4, 12), background: "var(--ds-gray-400)" }} />
-        <Ink at={outAt} dur={12} style={{ left: X0 + 840, top: low + h(8), whiteSpace: "nowrap" }}>
+        <Flow points={[[X0 + 470, low + h(52)], [X0 + 600, low + h(52)]]} at={itemsAt + 6} />
+        <Note at={itemsAt + 8} x={X0 + 474} y={low + h(6)}>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the model</span>
+        </Note>
+        <Ink at={outAt} dur={12} style={{ left: X0 + 620, top: low + h(8), whiteSpace: "nowrap" }}>
           <div style={{ ...note(20, INK_SOFT) }}>Actual</div>
           <div style={{ ...note(24, ACCENT_INK), fontWeight: 600, marginTop: h(8), ...TABULAR }}>{money(UNIT_TEST.actual)}</div>
         </Ink>
-        <Ink at={outAt + 10} dur={10} style={{ left: X0 + 1030, top: low + h(40), whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: X0 + 790, top: low + h(10), width: 1, height: h(66) * ease(frame, itemsAt + 6, 12), background: HAIRLINE }} />
+        <Ink at={itemsAt + 8} dur={12} style={{ left: X0 + 830, top: low + h(8), whiteSpace: "nowrap" }}>
+          <div style={{ ...note(20, INK_SOFT) }}>Expected</div>
+          <div style={{ ...note(24, OK_INK), fontWeight: 600, marginTop: h(8), ...TABULAR }}>{money(UNIT_TEST.expected)}</div>
+        </Ink>
+        <Ink at={outAt + 10} dur={10} style={{ left: X0 + 1010, top: low + h(40), whiteSpace: "nowrap" }}>
           <Chip tone="red" size={22}>
             unit test: fail
           </Chip>

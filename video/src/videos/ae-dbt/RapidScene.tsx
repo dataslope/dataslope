@@ -7,7 +7,7 @@ import { ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { GRAPH, LISTING, MACRO } from "./data";
+import { DBT_V2, GRAPH, LISTING, MACRO } from "./data";
 import {
   Arrow,
   artBox,
@@ -24,6 +24,7 @@ import {
   Line,
   Listing,
   listingHeight,
+  lineOf,
   listingWidth,
   Mark,
   MARK_GREEN,
@@ -39,7 +40,7 @@ import {
 
 const R_X = 1000;
 const LIST_TOP = 290;
-const ROW = 52;
+const ROW = 50;
 const SIZE = 19;
 
 type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"] };
@@ -173,7 +174,7 @@ const Packages: React.FC<{ c: Ctx }> = ({ c }) => {
         size={SIZE}
         at={listAt}
         marks={[
-          { line: "version:", text: "1.1.1", at: pinnedAt + 2 },
+          { line: "version:", text: lines[lineOf(lines, "version:")].split("version: ")[1], at: pinnedAt + 2 },
           { line: "package:", text: "dbt-labs/dbt_utils", at: utilsAt + 2 },
         ]}
       />
@@ -474,6 +475,73 @@ const Debug: React.FC<{ c: Ctx }> = ({ c }) => {
   );
 };
 
+// ── 20. dbt v2 ──────────────────────────────────────────────────────────────
+
+/** The video's own misspelled column, in a model that refs the page's
+ *  staging model. */
+const TYPO = "custmer_id";
+const TYPO_LINE = [`SELECT ${TYPO} FROM {{ ref('stg_customers') }}`];
+
+const V2: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const rustAt = c.w("r-v2", "It's the engine rewritten in Rust");
+  const gaAt = c.w("r-v2", "generally available since September 2026");
+  const distAt = c.w("r-v2", "the main distribution is now just called dbt");
+  const coreAt = c.w("r-v2", "dbt Core names the Python");
+  const endsAt = c.w("r-v2", "ending at one point thirteen");
+  const parsesAt = c.w("r-v2", "It parses and type-checks your SQL");
+  const typoAt = c.w("r-v2", "a misspelled column is caught at compile time");
+  const yamlAt = c.w("r-v2", "it validates YAML strictly");
+  const fixedAt = c.w("r-v2", "has to be fixed first");
+  const top = c.y(LIST_TOP);
+  const NAME_X = R_X + 150;
+  const sqlTop = top + c.h(186);
+  const yamlY = sqlTop + listingHeight(1, SIZE) + c.h(76);
+  return (
+    <>
+      <Fact at={rustAt} c={c}>
+        The engine, rewritten in {DBT_V2.language}
+      </Fact>
+      <Line at={gaAt} x={R_X} y={top + c.h(42)} color={INK_SOFT}>
+        Generally available since {DBT_V2.generallyAvailable}
+      </Line>
+      <Line at={distAt} x={R_X} y={top + c.h(92)} size={24}>
+        <Code>dbt</Code>
+      </Line>
+      <Line at={distAt + 4} x={NAME_X} y={top + c.h(92)} size={24}>
+        The main distribution
+      </Line>
+      <Line at={coreAt} x={R_X} y={top + c.h(130)} size={24}>
+        <Code>dbt Core</Code>
+      </Line>
+      <Line at={coreAt + 4} x={NAME_X} y={top + c.h(130)} size={24}>
+        The Python {DBT_V2.coreLine} line<span style={{ color: INK_SOFT, opacity: ease(frame, endsAt, 10) }}>, ending at {DBT_V2.coreEndsAt}</span>
+      </Line>
+      <Listing
+        lines={TYPO_LINE}
+        x={R_X}
+        top={sqlTop}
+        width={listingWidth(TYPO_LINE, SIZE) + 20}
+        size={SIZE}
+        at={parsesAt}
+        marks={[{ line: TYPO, text: TYPO, at: typoAt + 4, color: MARK_RED }]}
+      />
+      <Line at={typoAt + 10} x={R_X} y={sqlTop + listingHeight(1, SIZE) + c.h(14)} color={OK_INK} weight={600}>
+        Caught at compile time, not by the warehouse
+      </Line>
+      <Line at={yamlAt} x={R_X} y={yamlY} size={24}>
+        Strict YAML: <Code color={ACCENT_INK}>tests:</Code>
+        <span style={{ opacity: ease(frame, fixedAt - 6, 10) }}>
+          {" "}→ <Code color={OK_INK}>{DBT_V2.testsKey}:</Code>
+        </span>
+      </Line>
+      <Line at={fixedAt} x={R_X} y={yamlY + c.h(40)} color={INK_SOFT}>
+        Every {DBT_V2.coreLine} deprecation warning, fixed first
+      </Line>
+    </>
+  );
+};
+
 /**
  * The quick round: nine questions down the left, each row the question as it
  * is read; each answer's key fact on the right while it is current, with its
@@ -488,7 +556,7 @@ export const RapidScene: React.FC = () => {
   const c: Ctx = { w: n.word, y, h };
 
   const from = n.beat("rapid-in").from;
-  const nineAt = n.word("rapid-in", "Nine quick ones");
+  const quickAt = n.word("rapid-in", "Ten quick ones");
   const end = n.beat("next").from - 4;
   const tableAt = n.word("next", "A table materialization recomputes everything");
   const billionAt = n.word("next", "For a billion-row table");
@@ -525,13 +593,14 @@ export const RapidScene: React.FC = () => {
       at: at("r-debug", "Question nineteen"),
       body: <Debug c={c} />,
     },
+    { n: 20, label: "What is dbt v2, and how does it relate to dbt Core?", at: at("r-v2", "Question twenty"), body: <V2 c={c} /> },
   ];
   const bird = artBox("weaver-bird", 330);
   const listBottom = y(LIST_TOP) + items.length * h(ROW);
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-chime" at={nineAt} level={-33} />
+      <Sfx name="el-chime" at={quickAt} level={-33} />
       {items.map((it) => (
         <Sfx key={it.n} name="el-tap" at={it.at} level={-32} />
       ))}
@@ -542,9 +611,9 @@ export const RapidScene: React.FC = () => {
       <Sfx name="el-pencil" at={nextAt} level={-34} />
 
       <Drift from={from} to={n.beat("next").to + 40}>
-        <Kicker at={nineAt}>Quick round</Kicker>
-        <Headline lead="Nine quick ones" turn="to finish." at={nineAt} turnAt={nineAt + 8} size={64} />
-        <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={780} at={nineAt + 6} end={end} />
+        <Kicker at={quickAt}>Quick round</Kicker>
+        <Headline lead="Ten quick ones" turn="to finish." at={quickAt} turnAt={quickAt + 8} size={64} />
+        <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={780} at={quickAt + 6} end={end} />
         <VRule x={950} top={y(LIST_TOP)} bottom={listBottom} at={items[0].at} />
 
         {/* The bridge: a table rebuilds everything, every night. */}

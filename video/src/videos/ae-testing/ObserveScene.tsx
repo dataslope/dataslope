@@ -157,7 +157,7 @@ export const ObserveScene: React.FC = () => {
         {/* ── The four tests, each day: zero rows ── */}
         {OBSERVE.tests.map((t, i) => (
           <React.Fragment key={t.id}>
-            <Ink at={zeroAt - 4 + i * 3} dur={10} style={{ left: X0, top: rowY(i), height: h(ROW), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
+            <Ink at={assertAt + 8 + i * 4} dur={10} style={{ left: X0, top: rowY(i), height: h(ROW), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
               <span style={{ fontFamily: MONO, fontSize: 20, color: INK }}>{TEST_NAMES[t.id]}</span>
             </Ink>
             {t.failing.map((f, k) => (
@@ -173,7 +173,7 @@ export const ObserveScene: React.FC = () => {
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>The rows that did arrive are fine</span>
         </Note>
         {/* The bound a test could add, once someone thinks of it. */}
-        <Ink at={boundAt} dur={12} style={{ left: X0 - 10, top: rowY(4) + h(4), whiteSpace: "nowrap" }}>
+        <Ink at={boundAt} dur={12} style={{ left: X0 - 10, top: rowY(4) + h(14), whiteSpace: "nowrap" }}>
           <span
             style={{
               display: "inline-block",

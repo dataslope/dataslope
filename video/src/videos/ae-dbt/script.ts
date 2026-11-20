@@ -9,9 +9,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * dbt.mdx's eighteen questions the plan gives this part, with
  * dimensional-modeling.mdx's "How do staging, intermediate, and mart layers
  * differ?" and data-warehousing.mdx's "Compare the materializations: view vs
- * table vs incremental.": twenty headings, nineteen questions read aloud. Ten
- * are worked through, then nine go quickly; all nineteen are numbered aloud,
- * "Question n." and then the question in the page's words.
+ * table vs incremental.": twenty-one headings, twenty questions read aloud.
+ * Ten are worked through, then ten go quickly; all twenty are numbered aloud,
+ * "Question n." and then the question in the page's words. (Question 20, dbt
+ * v2, was added on 2026-11-20 after the interview-prep review rewrote
+ * dbt.mdx; it and the two beats that count the round, "plan" and
+ * "rapid-in", were voiced on their own after the take.)
  *
  *   1. What is dbt, and what does it actually do? ("what")
  *   2. What do `ref()` and `source()` do? ("ref"), read "ref and source".
@@ -37,6 +40,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   YAML file"; the file is dbt_project.yml, as the answer itself spells it:
  *   the card should take the answer's spelling, reported) 18. How do you
  *   version a dbt model? 19. What is `dbt debug`, and when do you use it?
+ *   20. What is dbt v2, and how does it relate to dbt Core? ("r-v2")
  *
  * The rest of dbt.mdx is answered elsewhere, by the plan: snapshots in Part 2;
  * the five incremental questions in Part 4; tests, freshness, contracts and CI
@@ -139,6 +143,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     plug on dbt debug. "r-macros": the page's macro, and its two results
  *     from Postgres side by side, 19.99 (green) and 19 (red). "r-exposures":
  *     the graph's dashboard node, lit back along its two edges.
+ *     "r-v2": the page's answer as key facts: the engine rewritten in Rust,
+ *     generally available since September 2026; `dbt` the main distribution
+ *     and `dbt Core` the Python 1.x line ending at 1.13; a misspelled column
+ *     caught at compile time; `tests:` becoming `data_tests:`, the page's own
+ *     first example of a 1.x deprecation a strict v2 refuses.
  *   - "next": the list complete; NextLine "Next: Incremental models".
  *
  * Facts (check.mjs into results.json, which data.ts reads; check.mjs reads
@@ -169,6 +178,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "inlined as a CTE ... not materialized or queryable": dbt.mdx; "Choose
  *     by read frequency, compute cost, and data volume, not habit": the
  *     warehousing page; "mat-pick" is dbt.mdx's first concept check.
+ *   - "r-v2": dbt.mdx's "What is dbt v2" answer, quoted (check.mjs reads
+ *     the engine's language, its general availability and the last dbt Core
+ *     release out of the page, and fails if the sentences move): a rewrite
+ *     in Rust, generally available since September 2026; "dbt" the main
+ *     distribution, dbt Core the Python 1.x line, "still supported and ends
+ *     at 1.13"; a misspelled column "caught at compile time"; every 1.x
+ *     deprecation warning resolved first, "`data_tests:`" the page's first.
+ *     The misspelled column on screen is the video's own example.
  *   - "r-macros": the page's cents_to_dollars, expanded as the page writes
  *     it, `(amount_cents / 100.0)`, on the video's own 1999 cents in
  *     Postgres: 19.99 (printed at two places); the same with `/ 100`: 19.
@@ -227,7 +244,7 @@ export const script: NarrationScript = {
     { id: "hook-dbt", text: "Working out that order, and running it, is dbt's job.", pauseAfter: 0.7 },
     {
       id: "plan",
-      text: "Nineteen questions on how it builds a project: ten worked through on the page's own models, and nine quick ones to finish.",
+      text: "Twenty questions on how it builds a project: ten worked through on the page's own models, and ten quick ones to finish.",
       pauseAfter: 0.7,
     },
 
@@ -406,7 +423,7 @@ export const script: NarrationScript = {
     },
 
     // ── Quick ─────────────────────────────────────────────────────────────
-    { id: "rapid-in", scene: true, text: "Nine quick ones to finish.", pauseAfter: 0.6 },
+    { id: "rapid-in", scene: true, text: "Ten quick ones to finish.", pauseAfter: 0.6 },
     {
       id: "r-seeds",
       text: "Question eleven. What are seeds in dbt? CSV files kept in the repository and loaded as tables by dbt seed: small reference data with no source system, like country codes. Nothing large, and nothing that changes often.",
@@ -450,6 +467,11 @@ export const script: NarrationScript = {
     {
       id: "r-debug",
       text: "Question nineteen. What is dbt debug, and when do you use it? It checks your connection setup: that the profiles file is valid, and that dbt can reach the warehouse. Run it on a new environment, or on a connection error, before you debug any model.",
+      pauseAfter: 0.8,
+    },
+    {
+      id: "r-v2",
+      text: "Question twenty. What is dbt v2, and how does it relate to dbt Core? It's the engine rewritten in Rust, generally available since September 2026: the main distribution is now just called dbt, and dbt Core names the Python one point x line, still supported, and ending at one point thirteen. It parses and type-checks your SQL, so a misspelled column is caught at compile time, and it validates YAML strictly, so every one point x deprecation warning has to be fixed first.",
       pauseAfter: 1.0,
     },
 

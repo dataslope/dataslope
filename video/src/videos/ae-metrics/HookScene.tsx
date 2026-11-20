@@ -30,7 +30,7 @@ const SQUARES_Y = 800;
 const SQ = 48;
 const SMALL = 36;
 const DEEP = 8;
-const QUICK = 10;
+const QUICK = 11;
 
 /**
  * The opening, the plan's bridge from Part 7: every test on the page's two
@@ -55,10 +55,10 @@ export const HookScene: React.FC = () => {
   const wrongAt = n.word("hook-meaning", "neither looks wrong");
   const definesAt = n.word("hook-meaning", "who defines a number");
   const joinsAt = n.word("hook-meaning", "the joins that quietly change it");
-  const eighteenAt = n.word("plan", "Eighteen questions");
+  const eighteenAt = n.word("plan", "Nineteen questions");
   const eightAt = n.word("plan", "Eight are worked through");
   const pageAt = n.word("plan", "the page's own orders in Postgres");
-  const tenAt = n.word("plan", "ten come quickly");
+  const tenAt = n.word("plan", "eleven come quickly");
   const end = n.beat("plan").to;
 
   const testsTop = y(TESTS_Y);
@@ -179,12 +179,12 @@ export const HookScene: React.FC = () => {
         })}
         <Note at={eightAt} x={squaresEnd + 34} y={sqTop - h(36)}>
           <span style={noteLine(23, INK)}>
-            <b>8</b> worked through
+            <b>{DEEP}</b> worked through
           </span>
         </Note>
         <Note at={tenAt} x={squaresEnd + 34} y={sqTop + h(4)}>
           <span style={noteLine(23, INK)}>
-            <b>10</b> quickly, at the end
+            <b>{QUICK}</b> quickly, at the end
           </span>
         </Note>
         <Note at={pageAt} x={squaresEnd + 34} y={sqTop + h(44)}>

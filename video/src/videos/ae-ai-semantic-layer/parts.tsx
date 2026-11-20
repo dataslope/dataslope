@@ -445,9 +445,11 @@ export const Flow: React.FC<{
   dash?: string;
   dim?: number;
   out?: number;
-}> = ({ points, at, dur = 14, color = INK, width = 2.4, head = 14, dash, dim, out }) => {
+  /** Stops the line this far along (0 to 1), with no head: a path refused. */
+  cut?: number;
+}> = ({ points, at, dur = 14, color = INK, width = 2.4, head = 14, dash, dim, out, cut }) => {
   const frame = useCurrentFrame();
-  const p = ease(frame, at, dur);
+  const p = ease(frame, at, dur) * (cut ?? 1);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
   if (p <= 0 || o >= 1) return null;
@@ -458,7 +460,7 @@ export const Flow: React.FC<{
       ? samples
       : Array.from({ length: 41 }, (_, i) => [points[0][0] + ((points[1][0] - points[0][0]) * i) / 40, points[0][1] + ((points[1][1] - points[0][1]) * i) / 40] as Pt);
   const len = lineLength(line);
-  const reach = Math.max(0, (len - head + 1) / len);
+  const reach = cut === undefined ? Math.max(0, (len - head + 1) / len) : 1;
   const [sx, sy] = points[0];
   const [tx, ty] = points[points.length - 1];
   const across = Math.abs(tx - sx) >= Math.abs(ty - sy);
@@ -479,7 +481,7 @@ export const Flow: React.FC<{
       ) : (
         <path d={path} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={`${p * reach} 1`} />
       )}
-      <path d={arrowHead(line, head, 7, { filled: true })} fill={color} opacity={ease(frame, at + dur - 4, 5)} />
+      {cut === undefined ? <path d={arrowHead(line, head, 7, { filled: true })} fill={color} opacity={ease(frame, at + dur - 4, 5)} /> : null}
     </svg>
   );
 };

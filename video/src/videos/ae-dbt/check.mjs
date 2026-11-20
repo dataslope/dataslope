@@ -253,6 +253,29 @@ const quoted = [
 ];
 for (const [name, text] of quoted) check(page(name).includes(text), `${name}.mdx no longer says ${JSON.stringify(text.slice(0, 50))}`);
 
+// Question 20, dbt v2 (added to the page on 2026-11-20): its answer's
+// sentences, compared with line breaks folded to spaces, and the three facts
+// the screen prints, read out of the page so a later edit fails here first.
+const flat = (text) => text.replace(/\s+/g, " ");
+const V2_SECTION = flat(section("dbt", "What is dbt v2, and how does it relate to dbt Core?"));
+const v2Quoted = [
+  'dbt v2 is a rewrite of the engine in Rust, first shipped as the "Fusion engine" and generally available since September 2026.',
+  "The main distribution is now called just **dbt**",
+  "**dbt Core** names only the Python 1.x line, which is still supported and ends at 1.13.",
+  "so a misspelled column is caught at compile time rather than by the warehouse.",
+  "Every deprecation warning a 1.x project prints has to be resolved before it will run, which in practice means `data_tests:`",
+];
+for (const text of v2Quoted) check(V2_SECTION.includes(text), `dbt.mdx's dbt v2 answer no longer says ${JSON.stringify(text.slice(0, 50))}`);
+const dbtV2 = {
+  language: V2_SECTION.match(/a rewrite of the engine in (\w+)/)[1],
+  generallyAvailable: V2_SECTION.match(/generally available since (\w+ \d{4})/)[1],
+  coreLine: V2_SECTION.match(/names only the Python ([\d.x]+) line/)[1],
+  coreEndsAt: V2_SECTION.match(/still supported and ends at ([\d.]+)\./)[1],
+  /** The page's first example of a 1.x deprecation v2 refuses: `tests:`
+   *  (its generic-tests block, before the review) now `data_tests:`. */
+  testsKey: V2_SECTION.match(/means `(data_tests):`/)[1],
+};
+
 // The page's listings the video puts on screen, read verbatim, so the screen
 // and the page cannot drift apart.
 const REF_SECTION = section("dbt", "What do `ref()` and `source()` do?");
@@ -272,6 +295,7 @@ check(listings.ephemeral.includes("materialized='ephemeral'"), "the page's ephem
 
 const results = {
   graph,
+  dbtV2,
   materializations,
   macro,
   listings,
