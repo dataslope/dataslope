@@ -1,0 +1,414 @@
+{
+  "graph": {
+    "sources": [
+      "raw.orders",
+      "raw.customers"
+    ],
+    "models": [
+      "stg_orders",
+      "stg_customers",
+      "fct_orders",
+      "dim_customer"
+    ],
+    "exposure": {
+      "name": "weekly_revenue_dashboard",
+      "dependsOn": [
+        "fct_orders",
+        "dim_customer"
+      ]
+    },
+    "edges": [
+      [
+        "raw.orders",
+        "stg_orders"
+      ],
+      [
+        "raw.customers",
+        "stg_customers"
+      ],
+      [
+        "stg_orders",
+        "fct_orders"
+      ],
+      [
+        "stg_customers",
+        "dim_customer"
+      ],
+      [
+        "dim_customer",
+        "fct_orders"
+      ],
+      [
+        "fct_orders",
+        "weekly_revenue_dashboard"
+      ],
+      [
+        "dim_customer",
+        "weekly_revenue_dashboard"
+      ]
+    ],
+    "waves": [
+      [
+        "stg_orders",
+        "stg_customers"
+      ],
+      [
+        "dim_customer"
+      ],
+      [
+        "fct_orders"
+      ]
+    ],
+    "selections": [
+      {
+        "selector": "+fct_orders",
+        "models": [
+          "stg_orders",
+          "stg_customers",
+          "dim_customer",
+          "fct_orders"
+        ],
+        "sources": [
+          "raw.orders",
+          "raw.customers"
+        ],
+        "exposures": []
+      },
+      {
+        "selector": "+dim_customer",
+        "models": [
+          "stg_customers",
+          "dim_customer"
+        ],
+        "sources": [
+          "raw.customers"
+        ],
+        "exposures": []
+      },
+      {
+        "selector": "stg_orders+",
+        "models": [
+          "stg_orders",
+          "fct_orders"
+        ],
+        "sources": [],
+        "exposures": [
+          "weekly_revenue_dashboard"
+        ]
+      },
+      {
+        "selector": "stg_customers+",
+        "models": [
+          "stg_customers",
+          "dim_customer",
+          "fct_orders"
+        ],
+        "sources": [],
+        "exposures": [
+          "weekly_revenue_dashboard"
+        ]
+      },
+      {
+        "selector": "dim_customer+",
+        "models": [
+          "dim_customer",
+          "fct_orders"
+        ],
+        "sources": [],
+        "exposures": [
+          "weekly_revenue_dashboard"
+        ]
+      },
+      {
+        "selector": "fct_orders+",
+        "models": [
+          "fct_orders"
+        ],
+        "sources": [],
+        "exposures": [
+          "weekly_revenue_dashboard"
+        ]
+      }
+    ],
+    "selectorsListing": "# Run one model and all its upstream dependencies\ndbt run --select +fct_orders\n\n# Run all models in the marts directory\ndbt run --select marts\n\n# Run models tagged \"nightly\"\ndbt run --select tag:nightly"
+  },
+  "materializations": {
+    "view": {
+      "setup": "CREATE TABLE customer_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (1, TIMESTAMP '2024-02-01 00:00:00'),\n  (1, TIMESTAMP '2024-03-05 00:00:00'), (2, TIMESTAMP '2024-01-15 00:00:00'),\n  (2, TIMESTAMP '2024-02-20 00:00:00'), (3, TIMESTAMP '2024-01-08 00:00:00'),\n  (3, TIMESTAMP '2024-03-12 00:00:00'), (3, TIMESTAMP '2024-04-18 00:00:00'),\n  (4, TIMESTAMP '2024-01-22 00:00:00'), (4, TIMESTAMP '2024-02-27 00:00:00'),\n  (5, TIMESTAMP '2024-01-03 00:00:00'), (5, TIMESTAMP '2024-03-19 00:00:00'),\n  (6, TIMESTAMP '2024-02-06 00:00:00'), (6, TIMESTAMP '2024-04-02 00:00:00'),\n  (7, TIMESTAMP '2024-01-29 00:00:00'), (7, TIMESTAMP '2024-03-26 00:00:00'),\n  (8, TIMESTAMP '2024-02-13 00:00:00'), (8, TIMESTAMP '2024-04-09 00:00:00'),\n  (9, TIMESTAMP '2024-01-11 00:00:00'), (9, TIMESTAMP '2024-03-01 00:00:00'),\n  (10, TIMESTAMP '2024-02-24 00:00:00'), (10, TIMESTAMP '2024-04-15 00:00:00'),\n  (11, TIMESTAMP '2024-01-17 00:00:00'), (12, TIMESTAMP '2024-03-08 00:00:00')\n) AS t(customer_id, updated_at);;",
+      "steps": {
+        "events": {
+          "sql": "SELECT COUNT(*) AS events, COUNT(DISTINCT customer_id) AS customers FROM customer_events",
+          "ok": true,
+          "columns": [
+            "events",
+            "customers"
+          ],
+          "rows": [
+            [
+              24,
+              12
+            ]
+          ]
+        },
+        "create": {
+          "sql": "CREATE VIEW dim_customer AS\nSELECT customer_id, MAX(updated_at) AS updated_at\nFROM customer_events\nGROUP BY customer_id",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "plan": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT * FROM dim_customer",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "HashAggregate (actual rows=12.00 loops=1)"
+            ],
+            [
+              "  Group Key: customer_events.customer_id"
+            ],
+            [
+              "  Batches: 1  Memory Usage: 32kB"
+            ],
+            [
+              "  ->  Seq Scan on customer_events (actual rows=24.00 loops=1)"
+            ]
+          ]
+        },
+        "count": {
+          "sql": "SELECT COUNT(*) AS customers FROM dim_customer",
+          "ok": true,
+          "columns": [
+            "customers"
+          ],
+          "rows": [
+            [
+              12
+            ]
+          ]
+        },
+        "arrive": {
+          "sql": "INSERT INTO customer_events\nVALUES (13, TIMESTAMP '2024-05-02 00:00:00')",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "countAfter": {
+          "sql": "SELECT COUNT(*) AS customers FROM dim_customer",
+          "ok": true,
+          "columns": [
+            "customers"
+          ],
+          "rows": [
+            [
+              13
+            ]
+          ]
+        },
+        "planAfter": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT * FROM dim_customer",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "HashAggregate (actual rows=13.00 loops=1)"
+            ],
+            [
+              "  Group Key: customer_events.customer_id"
+            ],
+            [
+              "  Batches: 1  Memory Usage: 32kB"
+            ],
+            [
+              "  ->  Seq Scan on customer_events (actual rows=25.00 loops=1)"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "table": {
+      "setup": "CREATE TABLE customer_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (1, TIMESTAMP '2024-02-01 00:00:00'),\n  (1, TIMESTAMP '2024-03-05 00:00:00'), (2, TIMESTAMP '2024-01-15 00:00:00'),\n  (2, TIMESTAMP '2024-02-20 00:00:00'), (3, TIMESTAMP '2024-01-08 00:00:00'),\n  (3, TIMESTAMP '2024-03-12 00:00:00'), (3, TIMESTAMP '2024-04-18 00:00:00'),\n  (4, TIMESTAMP '2024-01-22 00:00:00'), (4, TIMESTAMP '2024-02-27 00:00:00'),\n  (5, TIMESTAMP '2024-01-03 00:00:00'), (5, TIMESTAMP '2024-03-19 00:00:00'),\n  (6, TIMESTAMP '2024-02-06 00:00:00'), (6, TIMESTAMP '2024-04-02 00:00:00'),\n  (7, TIMESTAMP '2024-01-29 00:00:00'), (7, TIMESTAMP '2024-03-26 00:00:00'),\n  (8, TIMESTAMP '2024-02-13 00:00:00'), (8, TIMESTAMP '2024-04-09 00:00:00'),\n  (9, TIMESTAMP '2024-01-11 00:00:00'), (9, TIMESTAMP '2024-03-01 00:00:00'),\n  (10, TIMESTAMP '2024-02-24 00:00:00'), (10, TIMESTAMP '2024-04-15 00:00:00'),\n  (11, TIMESTAMP '2024-01-17 00:00:00'), (12, TIMESTAMP '2024-03-08 00:00:00')\n) AS t(customer_id, updated_at);;",
+      "steps": {
+        "events": {
+          "sql": "SELECT COUNT(*) AS events, COUNT(DISTINCT customer_id) AS customers FROM customer_events",
+          "ok": true,
+          "columns": [
+            "events",
+            "customers"
+          ],
+          "rows": [
+            [
+              24,
+              12
+            ]
+          ]
+        },
+        "create": {
+          "sql": "CREATE TABLE dim_customer AS\nSELECT customer_id, MAX(updated_at) AS updated_at\nFROM customer_events\nGROUP BY customer_id",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "plan": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT * FROM dim_customer",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Seq Scan on dim_customer (actual rows=12.00 loops=1)"
+            ]
+          ]
+        },
+        "count": {
+          "sql": "SELECT COUNT(*) AS customers FROM dim_customer",
+          "ok": true,
+          "columns": [
+            "customers"
+          ],
+          "rows": [
+            [
+              12
+            ]
+          ]
+        },
+        "arrive": {
+          "sql": "INSERT INTO customer_events\nVALUES (13, TIMESTAMP '2024-05-02 00:00:00')",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "countAfter": {
+          "sql": "SELECT COUNT(*) AS customers FROM dim_customer",
+          "ok": true,
+          "columns": [
+            "customers"
+          ],
+          "rows": [
+            [
+              12
+            ]
+          ]
+        },
+        "planAfter": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT * FROM dim_customer",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Seq Scan on dim_customer (actual rows=12.00 loops=1)"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "tableRebuilt": {
+      "setup": "CREATE TABLE customer_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (1, TIMESTAMP '2024-02-01 00:00:00'),\n  (1, TIMESTAMP '2024-03-05 00:00:00'), (2, TIMESTAMP '2024-01-15 00:00:00'),\n  (2, TIMESTAMP '2024-02-20 00:00:00'), (3, TIMESTAMP '2024-01-08 00:00:00'),\n  (3, TIMESTAMP '2024-03-12 00:00:00'), (3, TIMESTAMP '2024-04-18 00:00:00'),\n  (4, TIMESTAMP '2024-01-22 00:00:00'), (4, TIMESTAMP '2024-02-27 00:00:00'),\n  (5, TIMESTAMP '2024-01-03 00:00:00'), (5, TIMESTAMP '2024-03-19 00:00:00'),\n  (6, TIMESTAMP '2024-02-06 00:00:00'), (6, TIMESTAMP '2024-04-02 00:00:00'),\n  (7, TIMESTAMP '2024-01-29 00:00:00'), (7, TIMESTAMP '2024-03-26 00:00:00'),\n  (8, TIMESTAMP '2024-02-13 00:00:00'), (8, TIMESTAMP '2024-04-09 00:00:00'),\n  (9, TIMESTAMP '2024-01-11 00:00:00'), (9, TIMESTAMP '2024-03-01 00:00:00'),\n  (10, TIMESTAMP '2024-02-24 00:00:00'), (10, TIMESTAMP '2024-04-15 00:00:00'),\n  (11, TIMESTAMP '2024-01-17 00:00:00'), (12, TIMESTAMP '2024-03-08 00:00:00')\n) AS t(customer_id, updated_at);;\nINSERT INTO customer_events\nVALUES (13, TIMESTAMP '2024-05-02 00:00:00');",
+      "steps": {
+        "create": {
+          "sql": "CREATE TABLE dim_customer AS\nSELECT customer_id, MAX(updated_at) AS updated_at\nFROM customer_events\nGROUP BY customer_id",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "count": {
+          "sql": "SELECT COUNT(*) AS customers FROM dim_customer",
+          "ok": true,
+          "columns": [
+            "customers"
+          ],
+          "rows": [
+            [
+              13
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    }
+  },
+  "macro": {
+    "setup": "CREATE TABLE orders (order_id INTEGER, amount_cents INTEGER);\nINSERT INTO orders VALUES (1, 1999);",
+    "steps": {
+      "expanded": {
+        "sql": "SELECT (amount_cents / 100.0)::numeric(10, 2) AS amount_usd FROM orders",
+        "ok": true,
+        "columns": [
+          "amount_usd"
+        ],
+        "rows": [
+          [
+            "19.99"
+          ]
+        ]
+      },
+      "integer": {
+        "sql": "SELECT amount_cents / 100 AS amount_usd FROM orders",
+        "ok": true,
+        "columns": [
+          "amount_usd"
+        ],
+        "rows": [
+          [
+            19
+          ]
+        ]
+      }
+    },
+    "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+  },
+  "listings": {
+    "fctOrders": "-- models/marts/fct_orders.sql\nSELECT\n    o.order_id,\n    o.ordered_at,\n    c.customer_name\nFROM {{ ref('stg_orders') }}    AS o   -- references another model\nJOIN {{ ref('stg_customers') }} AS c   ON c.customer_id = o.customer_id;",
+    "sourceLine": "-- Referencing a raw source table\nSELECT * FROM {{ source('raw', 'orders') }}",
+    "ephemeral": "-- models/intermediate/int_orders_cleaned.sql\n{{ config(materialized='ephemeral') }}\n\nSELECT\n    order_id,\n    customer_id,\n    amount_cents / 100.0 AS amount_usd\nFROM {{ source('raw', 'orders') }}\nWHERE amount_cents > 0",
+    "macro": "-- macros/cents_to_dollars.sql\n{% macro cents_to_dollars(column_name) %}\n  ({{ column_name }} / 100.0)\n{% endmacro %}\n\n-- Usage in a model:\n-- SELECT {{ cents_to_dollars('amount_cents') }} AS amount_usd",
+    "packages": "# packages.yml\npackages:\n  - package: dbt-labs/dbt_utils\n    version: 1.1.1",
+    "varsModel": "-- In a model\nWHERE order_date >= '{{ var(\"start_date\") }}'",
+    "varsCli": "# Override on the CLI\ndbt run --vars '{\"start_date\": \"2024-01-01\"}'",
+    "exposure": "exposures:\n  - name: weekly_revenue_dashboard\n    type: dashboard\n    owner:\n      email: analyst@company.com\n    depends_on:\n      - ref('fct_orders')\n      - ref('dim_customer')",
+    "selectors": "# Run one model and all its upstream dependencies\ndbt run --select +fct_orders\n\n# Run all models in the marts directory\ndbt run --select marts\n\n# Run models tagged \"nightly\"\ndbt run --select tag:nightly"
+  },
+  "modelSql": "SELECT customer_id, MAX(updated_at) AS updated_at\nFROM customer_events\nGROUP BY customer_id",
+  "postgres": [
+    "PostgreSQL 18.6 (PGlite 0.5.16)"
+  ]
+}

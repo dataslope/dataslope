@@ -213,7 +213,7 @@ the division expression, so models call it instead of repeating the
 
 ### What are dbt packages, and how do you add one?
 
-Packages are **shared dbt projects** (macros, models, tests) installed from the dbt Hub or a Git repo. You declare them in `packages.yml` and run `dbt deps` to install. The most common package is `dbt_utils`, which provides macros like `surrogate_key`, `pivot`, and `date_spine`.
+Packages are **shared dbt projects** (macros, models, tests) installed from the dbt Hub or a Git repo. You declare them in `packages.yml` and run `dbt deps` to install. The most common package is `dbt_utils`, which provides macros like `generate_surrogate_key`, `pivot`, and `date_spine`.
 
 This `packages.yml` pins `dbt-labs/dbt_utils` to version `1.1.1`; `dbt
 deps` then fetches that exact release into the project:
@@ -350,7 +350,7 @@ models:
 
 On a pull request, CI runs `dbt build --select state:modified+`, building and testing only models changed in the PR plus their downstream dependents. This uses **state comparison** (`--state`) against the production manifest artifact to determine what changed. It catches breakage early without rebuilding every model, keeping CI fast.
 
-### What is the `dbt-project.yml` file, and what does it control?
+### What is the `dbt_project.yml` file, and what does it control?
 
 `dbt_project.yml` is the root configuration file. It defines the project name, dbt version, model directories, and **default configurations** for models by directory path (materialization, tags, schema overrides). Configurations cascade: project-level defaults are overridden by directory-level, then model-level `config()` blocks.
 

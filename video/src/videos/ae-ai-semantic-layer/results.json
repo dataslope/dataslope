@@ -1,0 +1,254 @@
+{
+  "version": "PostgreSQL 18.6 (PGlite 0.5.16)",
+  "readings": {
+    "initSql": "CREATE TABLE customers AS SELECT * FROM (VALUES\n  (1, FALSE), (2, FALSE), (3, FALSE), (4, TRUE), (5, FALSE)\n) AS t(customer_id, is_test);\n\nCREATE TABLE orders AS SELECT * FROM (VALUES\n  (101, 1, 120.00, 'completed'), (102, 2, 80.00, 'completed'),\n  (103, 3, 200.00, 'refunded'),  (104, 4, 500.00, 'completed'),\n  (105, 5, 60.00, 'cancelled'),  (106, 1, 150.00, 'completed'),\n  (107, 3, 90.00, 'completed'),  (108, 4, 250.00, 'completed')\n) AS t(order_id, customer_id, amount, status);",
+    "query": "-- Three defensible readings of \"revenue\", from the same rows.\nSELECT\n  SUM(o.amount) AS every_order,\n  SUM(o.amount) FILTER (WHERE o.status = 'completed') AS completed_orders,\n  SUM(o.amount) FILTER (\n    WHERE o.status = 'completed' AND NOT c.is_test\n  ) AS governed_net_revenue\nFROM orders o\nJOIN customers c USING (customer_id);",
+    "customers": {
+      "columns": [
+        "customer_id",
+        "is_test"
+      ],
+      "rows": [
+        [
+          1,
+          false
+        ],
+        [
+          2,
+          false
+        ],
+        [
+          3,
+          false
+        ],
+        [
+          4,
+          true
+        ],
+        [
+          5,
+          false
+        ]
+      ]
+    },
+    "orders": {
+      "columns": [
+        "order_id",
+        "customer_id",
+        "amount",
+        "status"
+      ],
+      "rows": [
+        [
+          101,
+          1,
+          "120.00",
+          "completed"
+        ],
+        [
+          102,
+          2,
+          "80.00",
+          "completed"
+        ],
+        [
+          103,
+          3,
+          "200.00",
+          "refunded"
+        ],
+        [
+          104,
+          4,
+          "500.00",
+          "completed"
+        ],
+        [
+          105,
+          5,
+          "60.00",
+          "cancelled"
+        ],
+        [
+          106,
+          1,
+          "150.00",
+          "completed"
+        ],
+        [
+          107,
+          3,
+          "90.00",
+          "completed"
+        ],
+        [
+          108,
+          4,
+          "250.00",
+          "completed"
+        ]
+      ]
+    },
+    "result": {
+      "columns": [
+        "every_order",
+        "completed_orders",
+        "governed_net_revenue"
+      ],
+      "rows": [
+        [
+          "1450.00",
+          "1190.00",
+          "440.00"
+        ]
+      ]
+    },
+    "every": 1450,
+    "completed": 1190,
+    "governed": 440,
+    "ratio": 3.3,
+    "orderCount": 8,
+    "customerCount": 5,
+    "testAccounts": 1
+  },
+  "compiled": {
+    "sql": "SELECT SUM(o.amount) AS net_revenue\nFROM orders o\nJOIN customers c ON c.customer_id = o.customer_id\nWHERE o.status = 'completed'\n  AND NOT c.is_test;",
+    "netRevenue": 440
+  },
+  "ready": {
+    "yaml": "models:\n  - name: fct_orders\n    description: >\n      One row per order. For revenue, use the net_revenue metric,\n      which excludes refunded and cancelled orders and test accounts.\n    access: public\n    columns:\n      - name: order_id\n        description: Primary key.\n        data_tests: [unique, not_null]\n      - name: status\n        description: Lifecycle state at the latest load.\n        data_tests:\n          - accepted_values:\n              values: [completed, refunded, cancelled]",
+    "accepted": [
+      "completed",
+      "refunded",
+      "cancelled"
+    ],
+    "statuses": [
+      "cancelled",
+      "completed",
+      "refunded"
+    ],
+    "tests": {
+      "unique": {
+        "sql": "SELECT order_id AS unique_field, COUNT(*) AS n_records\nFROM fct_orders\nWHERE order_id IS NOT NULL\nGROUP BY order_id\nHAVING COUNT(*) > 1;",
+        "failing": 0
+      },
+      "not_null": {
+        "sql": "SELECT order_id\nFROM fct_orders\nWHERE order_id IS NULL;",
+        "failing": 0
+      },
+      "accepted_values": {
+        "sql": "WITH all_values AS (\n  SELECT status AS value_field, COUNT(*) AS n_records\n  FROM fct_orders\n  GROUP BY status\n)\nSELECT * FROM all_values\nWHERE value_field NOT IN ('completed', 'refunded', 'cancelled');",
+        "failing": 0
+      }
+    },
+    "description": "which excludes refunded and cancelled orders and test accounts.",
+    "cut": "and test accounts",
+    "asWritten": {
+      "sql": "SELECT SUM(o.amount) AS net_revenue\nFROM fct_orders o\nJOIN customers c USING (customer_id)\nWHERE o.status NOT IN ('refunded', 'cancelled')\n  AND NOT c.is_test;",
+      "netRevenue": 440
+    },
+    "withoutCut": {
+      "sql": "SELECT SUM(amount) AS net_revenue\nFROM fct_orders\nWHERE status NOT IN ('refunded', 'cancelled');",
+      "netRevenue": 1190
+    }
+  },
+  "eval": {
+    "question": "What was net revenue?",
+    "candidates": [
+      {
+        "id": "A",
+        "label": "The reference",
+        "sql": "SELECT SUM(o.amount) AS net_revenue\nFROM orders o\nJOIN customers c ON c.customer_id = o.customer_id\nWHERE o.status = 'completed'\n  AND NOT c.is_test;",
+        "result": [
+          [
+            "440.00"
+          ]
+        ],
+        "sameText": true,
+        "runs": true,
+        "sameResult": true
+      },
+      {
+        "id": "B",
+        "label": "A different join and aliases",
+        "sql": "SELECT SUM(ord.amount) AS revenue\nFROM customers cust\nJOIN orders ord\n  ON ord.customer_id = cust.customer_id\n AND ord.status = 'completed'\nWHERE cust.is_test = FALSE;",
+        "result": [
+          [
+            "440.00"
+          ]
+        ],
+        "sameText": false,
+        "runs": true,
+        "sameResult": true
+      },
+      {
+        "id": "C",
+        "label": "Completed orders only",
+        "sql": "SELECT SUM(amount) AS net_revenue\nFROM orders\nWHERE status = 'completed';",
+        "result": [
+          [
+            "1190.00"
+          ]
+        ],
+        "sameText": false,
+        "runs": true,
+        "sameResult": false
+      }
+    ]
+  },
+  "review": {
+    "asWritten": "{{ config(materialized='incremental') }}\n\nselect order_id, order_date, amount\nfrom analytics.raw_orders\n{% if is_incremental() %}\nwhere order_date > (select max(order_date) from {{ this }})\n{% endif %}",
+    "reviewed": "{{ config(materialized='incremental', unique_key='order_id') }}\n\nselect order_id, order_date, amount\nfrom {{ source('shop', 'orders') }}\n{% if is_incremental() %}\nwhere order_date > (select max(order_date) - interval '3 days' from {{ this }})\n{% endif %}",
+    "compiledAsWritten": "select order_id, order_date, amount\nfrom analytics.raw_orders\nwhere order_date > (select max(order_date) from fct_orders)",
+    "compiledReviewed": "select order_id, order_date, amount\nfrom analytics.raw_orders\nwhere order_date > (select max(order_date) - interval '3 days' from fct_orders)",
+    "lookbackDays": 3,
+    "raw": "CREATE SCHEMA analytics;\nCREATE TABLE analytics.raw_orders (order_id integer, order_date date, amount numeric(10,2));\nINSERT INTO analytics.raw_orders VALUES\n  (1, DATE '2026-10-30', 40.00), (2, DATE '2026-10-31', 25.00),\n  (3, DATE '2026-11-01', 60.00), (4, DATE '2026-11-02', 35.00),\n  (5, DATE '2026-11-03', 50.00);\nCREATE TABLE fct_orders AS SELECT order_id, order_date, amount FROM analytics.raw_orders;\nINSERT INTO analytics.raw_orders VALUES\n  (6, DATE '2026-11-04', 45.00), (7, DATE '2026-11-01', 30.00);",
+    "firstBuilt": 5,
+    "newestLoaded": "2026-11-03",
+    "lateId": 7,
+    "lateDate": "2026-11-01",
+    "daysLate": 2,
+    "allOrders": 7,
+    "strict": {
+      "selected": [
+        6
+      ],
+      "rows": 6,
+      "missing": [
+        7
+      ]
+    },
+    "append": {
+      "selected": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "reread": 3,
+      "rows": 10,
+      "orders": 7,
+      "repeats": [
+        3,
+        4,
+        5
+      ]
+    },
+    "merge": {
+      "rows": 7,
+      "orders": 7,
+      "sql": "MERGE INTO fct_orders t\nUSING batch s ON t.order_id = s.order_id\nWHEN MATCHED THEN UPDATE SET order_date = s.order_date, amount = s.amount\nWHEN NOT MATCHED THEN INSERT VALUES (s.order_id, s.order_date, s.amount);"
+    },
+    "deleteInsert": {
+      "rows": 7,
+      "orders": 7
+    }
+  },
+  "practice": {
+    "topicPages": 7,
+    "conceptCheckPages": 7,
+    "challengePages": 3,
+    "bank": 110
+  }
+}

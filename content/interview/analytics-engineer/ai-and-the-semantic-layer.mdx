@@ -99,8 +99,9 @@ gaps, because a model will not ask:
   `unique` and `not_null`, `relationships` for foreign keys, and
   `accepted_values` so the model knows the real status values.
 - **Clear access boundaries**: staging and intermediate models marked
-  `private` or `protected` so the assistant only queries public marts, and
-  deprecated models removed or marked as such.
+  `private` or `protected` (dbt's model access, which limits who may
+  `ref()` them), the assistant's warehouse role granted read access to the
+  public marts only, and deprecated models removed or marked as such.
 - **Metrics in the semantic layer** for every number the business argues about.
 - **Freshness**: source freshness checks, so an answer can say "as of" and the
   assistant can refuse to answer from stale data.
