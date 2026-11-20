@@ -103,7 +103,10 @@ export const ModelScene: React.FC = () => {
             transform: `scale(${0.96 + boxIn * 0.04 + think * 0.02})`,
           }}
         >
-          <span style={{ ...body(34), color: INK, opacity: ease(frame, modelAt - 2, 12) }}>language model</span>
+          {/* In the sans face, at the size of the "the" chip on its line (the
+              owner, 2026-11-13: "use a sans-serif font for the language
+              model"). */}
+          <span style={{ ...note(32, INK), whiteSpace: "nowrap", opacity: ease(frame, modelAt - 2, 12) }}>language model</span>
         </div>
         <Arrow from={[BOX.x + BOX.w + 1, y(CTX.y) + 24]} to={[BARS.x - 6, y(CTX.y) + 24]} at={probAt - 6} dur={12} />
 

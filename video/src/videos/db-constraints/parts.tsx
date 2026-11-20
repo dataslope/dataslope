@@ -413,7 +413,13 @@ export const RuleTags: React.FC<{
   chips: readonly Chip[];
   dim?: number;
   out?: number;
-}> = ({ layout, row, span, chips, dim, out }) => {
+  /** Outlined, not filled (the owner, 2026-11-13): a black border on a
+   *  transparent background. "code" keeps the SQL's own syntax colors ("keep
+   *  the current font colors"); "ink" sets the text black too. The swell
+   *  moves the border (and black text) toward the yellow's ink instead of
+   *  washing the fill, as `Pill` does. */
+  outline?: "code" | "ink";
+}> = ({ layout, row, span, chips, dim, out, outline }) => {
   const frame = useCurrentFrame();
   const i0 = layout.columns.findIndex((c) => c.name === row);
   const i1 = span ? layout.columns.findIndex((c) => c.name === span) : i0;
@@ -458,6 +464,7 @@ export const RuleTags: React.FC<{
           const o = c.out === undefined ? 0 : ease(frame, c.out, 10);
           if (p <= 0 || o >= 1) return null;
           const swell = Math.max(0, ...(c.pulses ?? []).map((t) => pulse(frame, t, 22)));
+          const ink = `color-mix(in srgb, ${outlineInk("yellow")} ${Math.round(swell * 100)}%, ${outlineInk("ink")})`;
           return (
             <div
               key={k}
@@ -466,10 +473,14 @@ export const RuleTags: React.FC<{
                 opacity: p * (1 - o),
                 transform: `translateX(${(1 - p) * -10}px) scale(${1 + swell * 0.08})`,
                 transformOrigin: "0 50%",
-                ...ruleBadge(TAG_SIZE, swell),
+                ...(outline
+                  ? { ...outlineBadgeStyle("ink", TAG_SIZE), borderColor: ink, color: ink, lineHeight: 1.2 }
+                  : ruleBadge(TAG_SIZE, swell)),
               }}
             >
-              <Code size={TAG_SIZE}>{c.code}</Code>
+              <Code size={TAG_SIZE} color={outline === "ink" ? ink : undefined}>
+                {c.code}
+              </Code>
             </div>
           );
         })}

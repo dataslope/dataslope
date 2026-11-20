@@ -158,7 +158,9 @@ export const DesignScene: React.FC = () => {
                 transformOrigin: "50% 50%",
                 display: "flex",
                 flexDirection: "column",
-                gap: 12,
+                // The owner, 2026-11-13: "add more vertical spacing around
+                // the button rows" (the gap was 12).
+                gap: 20,
               }}
             >
               <span style={label(21, INK_SOFT)}>{g === "A" ? "A: the old button" : "B: the new one"}</span>
@@ -170,14 +172,17 @@ export const DesignScene: React.FC = () => {
                   justifyContent: "center",
                   gap: 10,
                   width: 240,
-                  padding: "16px 0",
+                  // "Slight more vertical padding" (the owner, 2026-11-13; was 16px).
+                  padding: "20px 0",
                   borderRadius: g === "A" ? 4 : 30,
                   background: g === "A" ? `color-mix(in srgb, ${INK_SOFT} 22%, ${PAPER})` : BAR,
                 }}
               >
                 {/* A cart before the label, in the label's ink (the owner,
-                    2026-11-13: "add a shopping cart lucide icon"). */}
-                <ShoppingCart size={26} strokeWidth={2} color={g === "A" ? INK : PAPER} style={{ flex: "none" }} />
+                    2026-11-13: "add a shopping cart lucide icon"), a little
+                    under the label's size ("make the cart icons slightly
+                    smaller"). */}
+                <ShoppingCart size={22} strokeWidth={2} color={g === "A" ? INK : PAPER} style={{ flex: "none" }} />
                 Buy now
               </span>
             </div>

@@ -86,9 +86,11 @@ export const UniqueScene: React.FC = () => {
         marks={{ id: { at: primaryAt, tone: "key", out: uniqueAt } }}
         dim={evenAt}
       />
+      {/* Outlined in black, black text (the owner, 2026-11-13). */}
       <RuleTags
         layout={card}
         row="email"
+        outline="ink"
         chips={[
           { code: "NOT NULL", at: open + 8 },
           // On the card before the attempt, so the refusal has its cause.
@@ -99,6 +101,7 @@ export const UniqueScene: React.FC = () => {
       <RuleTags
         layout={card}
         row="username"
+        outline="ink"
         chips={[
           { code: "NOT NULL", at: open + 12 },
           { code: "UNIQUE", at: everythingAt - 2, pulses: [repeatAt] },

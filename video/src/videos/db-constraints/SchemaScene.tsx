@@ -103,9 +103,11 @@ export const SchemaScene: React.FC = () => {
 
       <FigLabel n="3" title="The rule in the schema, and the row it refuses" at={schemaAt - 8} x={X0} y={y(FIG_Y)} />
       <Entity layout={card} at={schemaAt - 6} marks={{ price: { at: thatsAt, out: zeroAt } }} />
+      {/* Outlined, syntax colors kept (the owner, 2026-11-13). */}
       <RuleTags
         layout={card}
         row="price"
+        outline="code"
         chips={[{ code: "CHECK (price >= 0)", at: constraintAt, pulses: [everyAt, zeroAt, namingAt + 4], out: singleAt + 4 }]}
       />
       {(["id", "name", "price"] as const).map((r, i) => (

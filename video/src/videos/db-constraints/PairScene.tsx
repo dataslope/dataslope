@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, note } from "../../editorial/style";
-import { badgeStyle, FigLabel, Ink } from "../../editorial/ui";
+import { INK, note } from "../../editorial/style";
+import { FigLabel, Ink, outlineBadgeStyle } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -199,10 +199,12 @@ export const PairScene: React.FC = () => {
         at={hasAt}
         out={outA}
       />
+      {/* Outlined, syntax colors kept (the owner, 2026-11-13). */}
       <RuleTags
         layout={enrollments}
         row="student_id"
         span="course_id"
+        outline="code"
         chips={[{ code: "UNIQUE (student_id, course_id)", at: eachPairAt - 2, pulses: [bouncesAt + 4] }]}
         out={outA}
       />
@@ -285,10 +287,11 @@ export const PairScene: React.FC = () => {
       />
 
       {/* ── Missing and repeated are covered; wrong values are next ── */}
-      <Pill x={RECAP_X} y={y(480)} at={missingAt - 2} size={26}>
+      {/* Outlined in black, black text (the owner, 2026-11-13). */}
+      <Pill x={RECAP_X} y={y(480)} at={missingAt - 2} size={26} outline>
         NOT NULL
       </Pill>
-      <Pill x={RECAP_X + 250} y={y(480)} at={repeatedAt - 2} size={26}>
+      <Pill x={RECAP_X + 250} y={y(480)} at={repeatedAt - 2} size={26} outline>
         UNIQUE
       </Pill>
       <Tick x={RECAP_X + 170} y={y(480)} at={missingAt + 6} size={22} />
@@ -301,8 +304,9 @@ export const PairScene: React.FC = () => {
         ] as const
       ).map(([v, at], i) => (
         <Ink key={String(v)} at={at - 2} dur={12} style={{ left: RECAP_X + i * 250, top: y(560), whiteSpace: "nowrap" }}>
-          {/* A wrong value as a red house badge. */}
-          <span style={{ ...note(34, ACCENT_INK), ...badgeStyle("red", 34), fontWeight: 500 }}>
+          {/* A wrong value as a badge: black border, black text, no fill
+              (the owner, 2026-11-13). */}
+          <span style={{ ...note(34, INK), ...outlineBadgeStyle("ink", 34), fontWeight: 500 }}>
             <span style={{ fontFamily: MONO }}>{v}</span>
           </span>
         </Ink>
