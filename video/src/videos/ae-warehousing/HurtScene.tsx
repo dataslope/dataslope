@@ -179,7 +179,7 @@ export const HurtScene: React.FC = () => {
                 height: h(44),
                 borderRadius: 3,
                 background: COLUMN_TINT.sale_date,
-                boxShadow: `inset -6px 0 0 ${FOOTER}`,
+                boxShadow: `inset -2px 0 0 ${FOOTER}`,
                 opacity: p,
               }}
             />

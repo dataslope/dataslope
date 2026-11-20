@@ -132,8 +132,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   compute: QuestionCard 9, the stopwatch spot beside it; the three
  *     billing lines from "arch" again,
  *     each now with its lever: "credits per second while running",
- *     "bytes scanned, or reserved slots", "provisioned nodes (or serverless
- *     RPUs)". compute-model: a model badge; one hour as sixty minute ticks,
+ *     "bytes scanned, or reserved slots", "provisioned nodes, or Serverless
+ *     capacity" (the page's "serverless RPUs", without the undefined
+ *     initialism). compute-model: a model badge; one hour as sixty minute ticks,
  *     two of them busy (blue); billed by time and left running, all sixty
  *     lit (red); compute-suspend: suspended when idle, the two (green)
  *     and a lighter tick after each for the wait before it suspends;

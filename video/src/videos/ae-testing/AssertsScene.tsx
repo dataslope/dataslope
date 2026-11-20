@@ -34,7 +34,7 @@ import {
 const FIG_Y = 344;
 const LIST_SIZE = 22;
 const TABLE_X = 930;
-const PIPE = { x: 1370, w: 270, h: 58, modelH: 84 };
+const PIPE = { x: 1370, w: 270, h: 58, modelH: 78 };
 
 /**
  * Questions 1 and 2. The assumption "order_id is unique" becomes the query
@@ -112,10 +112,10 @@ export const AssertsScene: React.FC = () => {
   //    tests run, so the tested table itself already holds the duplicates;
   //    what a failing test keeps clean is everything downstream of it. ──
   const srcY = top;
-  const modelY = top + h(130);
-  const stopY = top + h(275);
-  const martY = top + h(370);
-  const dashY = top + h(480);
+  const modelY = top + h(120);
+  const stopY = top + h(240);
+  const martY = top + h(320);
+  const dashY = top + h(410);
   const pipeMid = PIPE.x + PIPE.w / 2;
   const busX = (g.right + PIPE.x) / 2 + 10;
 

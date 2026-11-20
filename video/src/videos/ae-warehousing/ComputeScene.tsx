@@ -157,7 +157,7 @@ export const ComputeScene: React.FC = () => {
         {[
           { name: "Snowflake", line: "Credits per second while running", at: snowAt, lineAt: secondAt },
           { name: "BigQuery", line: "Bytes scanned, or reserved slots", at: bqAt, lineAt: bqAt + 10 },
-          { name: "Redshift", line: "Provisioned nodes, or Serverless capacity (RPUs)", at: rsAt, lineAt: rsAt + 10 },
+          { name: "Redshift", line: "Provisioned nodes, or Serverless capacity", at: rsAt, lineAt: rsAt + 10 },
         ].map((c, i) => (
           <React.Fragment key={c.name}>
             <Note at={c.at - 2} x={COL_X[i]} y={y(HEAD_Y)}>

@@ -90,7 +90,7 @@ export const StarScene: React.FC = () => {
     amount: lines(SELECT_STAR.regionAmount.sql),
   };
   const qTop = y(BARS_Y) - h(6);
-  const readTop = qTop + h(170);
+  const readTop = qTop + h(156);
   const dim = projectAt - 2;
 
   const marks = (names: readonly string[], at: number, out: number | undefined, color: string) =>
@@ -236,11 +236,11 @@ export const StarScene: React.FC = () => {
             <span style={{ color: INK_SOFT }}>, two columns again</span>
           </span>
         </Note>
-        <Note at={fourAt + 12} x={Q_X} y={tally(3) + h(6)} dim={dim}>
+        <Note at={fourAt + 12} x={Q_X} y={tally(3) + h(4)} dim={dim}>
           <span style={{ ...note(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Bytes, not a count of columns</span>
         </Note>
         {/* A LIMIT returns fewer rows, not fewer columns. */}
-        <Note at={limitAt} x={Q_X} y={tally(4) + h(6)} dim={dim}>
+        <Note at={limitAt} x={Q_X} y={tally(4) + h(4)} dim={dim}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <SmallMono>LIMIT</SmallMono> on BigQuery
             <span style={{ opacity: ease(frame, rowsAt, 10) }}>

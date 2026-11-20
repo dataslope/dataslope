@@ -188,7 +188,7 @@ const Agg: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       {/* Why it matters: the page's double-counting at the wrong level. */}
-      <Note at={joinBackAt} x={mg.x} y={mg.rowTop(M.rows.length) + c.h(64)}>
+      <Note at={joinBackAt} x={R_X} y={mg.rowTop(M.rows.length) + c.h(74)}>
         <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
           Joined back to the orders<span style={{ opacity: ease(frame, onceAt, 10) }}>: each total counted once per order</span>
         </span>

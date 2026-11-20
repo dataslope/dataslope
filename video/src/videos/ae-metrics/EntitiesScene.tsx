@@ -197,7 +197,7 @@ export const EntitiesScene: React.FC = () => {
           x={X0}
           y={ordersTop}
           w={470}
-          at={cols[0].at}
+          at={cols[0].exAt - 2}
           name="orders"
           rows={[
             { role: "entity", name: "order", at: cols[0].exAt + 4 },
@@ -209,7 +209,7 @@ export const EntitiesScene: React.FC = () => {
           x={X0}
           y={itemsTop}
           w={470}
-          at={cols[0].at + 6}
+          at={cols[0].exAt + 4}
           name="order_items"
           rows={[
             { role: "entity", name: "order", at: cols[0].exAt + 8 },

@@ -140,7 +140,7 @@ export const CiScene: React.FC = () => {
   const rowGap = h(112);
   // The manifest is compared with the whole project: a dashed bracket down
   // the right of the DAG, the manifest level with its middle.
-  const projectBracket = { x: X0 + 3 * (NODE.w + GAP_X) + NODE.w + 28, top: dagTop, bottom: dagTop + rowGap + h(NODE.h) };
+  const projectBracket = { x: X0 + 3 * (NODE.w + GAP_X) + NODE.w + 34, top: dagTop, bottom: dagTop + rowGap + h(NODE.h) };
   const projectMid = (projectBracket.top + projectBracket.bottom) / 2;
   const manifest = { x: 1400, y: projectMid - h(42) };
   const selected = new Set(CI_SELECTED);
@@ -236,11 +236,11 @@ export const CiScene: React.FC = () => {
         <Box x={manifest.x} y={manifest.y} w={330} h={h(84)} at={manifestAt - 2} title="Production manifest" sub={<span style={{ opacity: ease(frame, deployedAt, 10) }}>what&rsquo;s deployed</span>} size={22} out={q7Out} />
         <Svg opacity={ease(frame, manifestAt + 2, 12) * (1 - ease(frame, q7Out, 10))}>
           <path
-            d={`M${projectBracket.x - 12},${projectBracket.top} h12 V${projectBracket.bottom} h-12`}
+            d={`M${projectBracket.x - 16},${projectBracket.top} h16 V${projectBracket.bottom} h-16`}
             fill="none"
-            stroke={ds("gray", 500)}
+            stroke={ds("gray", 400)}
             strokeWidth={2}
-            strokeDasharray="6 7"
+            strokeLinejoin="round"
           />
         </Svg>
         <Flow points={[[manifest.x - 12, projectMid], [projectBracket.x + 6, projectMid]]} at={manifestAt + 6} color={ds("gray", 500)} dash="6 7" out={q7Out} noHead />

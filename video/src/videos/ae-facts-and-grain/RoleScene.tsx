@@ -138,8 +138,9 @@ export const RoleScene: React.FC = () => {
         <Note at={rolesAt} x={date.left} y={date.bottom + h(22)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>One physical table, three roles</span>
         </Note>
-        {/* Why one table: one calendar, the same for every role. */}
-        <Note at={calendarAt} x={date.left} y={date.bottom + h(58)}>
+        {/* Why one table: one calendar, the same for every role. Over the
+            box it describes, clear of order 101's table below. */}
+        <Note at={calendarAt} x={date.left} y={date.top - h(46)}>
           <span style={{ ...note(23, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             One calendar<span style={{ opacity: ease(frame, everyRoleAt, 10) }}> for every role</span>
           </span>

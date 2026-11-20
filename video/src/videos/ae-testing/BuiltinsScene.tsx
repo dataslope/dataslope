@@ -31,7 +31,7 @@ import {
   X0,
 } from "./parts";
 
-const FIG_Y = 300;
+const FIG_Y = 285;
 const YAML_SIZE = 20;
 /** The page's YAML is seventeen lines: set a size smaller and a little higher. */
 const SCHEMA = { y: 306, size: 19 };
@@ -125,7 +125,7 @@ export const BuiltinsScene: React.FC = () => {
   panes.forEach((p, i) => {
     // Each result's verdict badge sits above its table, so the result's
     // room includes clear space for the next pane's badge.
-    paneTops.push(i === 0 ? top : paneTops[i - 1] + Math.max(listH(panes[i - 1].lines.length), resultH + h(24)) + h(60));
+    paneTops.push(i === 0 ? top : paneTops[i - 1] + Math.max(listH(panes[i - 1].lines.length), resultH + h(16)) + h(60));
   });
   const paneResult = (p: Pane, i: number) =>
     tableGeometry({ x: resultX, top: paneTops[i], cols: p.test.result.cols.map((name) => ({ name })), rows: p.test.result.rows, headH: h(34), rowH: h(36), headSize: 19, bodySize: PANE_SIZE, pad: 12 });
@@ -271,7 +271,7 @@ export const BuiltinsScene: React.FC = () => {
             Not here: <SmallMono>unique</SmallMono> skips nulls
           </span>
         </Note>
-        <Bracket x={resultX + 515} top={paneTops[0] - h(46)} bottom={paneTops[1] + resultH} at={togetherAt + 4} out={q3Out}>
+        <Bracket x={resultX + 500} top={paneTops[0] - h(46)} bottom={paneTops[1] + resultH} at={togetherAt + 4} out={q3Out}>
           <span style={{ ...note(24, OK_INK), fontWeight: 600, opacity: ease(frame, pkAt - 2, 10) }}>Both passing: a valid primary key</span>
         </Bracket>
 
