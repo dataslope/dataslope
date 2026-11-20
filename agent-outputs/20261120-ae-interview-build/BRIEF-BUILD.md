@@ -24,7 +24,9 @@ per video. The coordinator commits; you never do.
 3. **`video/README.md`, all of it**: the house manual, and the authority
    on every rule below. "What goes on screen" is where most review
    findings come from: one line, one size, one family; a space stays a
-   space; no cards (small borderless badges stay); **a diagram's boxes are
+   space; no cards (small badges stay: borderless tinted, or outlined with
+   `OutlineBadge` from `ui.tsx`, the owner's badge review merged from main
+   on 2026-11-20; a black border holds black text only); **a diagram's boxes are
    outlined in ink (2px `INK`, no fill, black text, a highlight colors the
    outline and text together)**; vertical hairlines between side-by-side
    columns; at least 40px between groups; a line that stands on its own
