@@ -104,7 +104,6 @@ export const CiScene: React.FC = () => {
   const prAt = n.word("ci", "On every pull request");
   const runsAt = n.word("ci", "runs dbt build");
   const changedAt = n.word("ci", "the models that changed");
-  const downAt = n.word("ci", "everything downstream of them");
   const compareAt = n.word("ci-state", "comparing the project");
   const manifestAt = n.word("ci-state", "production's manifest");
   const deployedAt = n.word("ci-state", "its record of what's deployed");
@@ -173,7 +172,6 @@ export const CiScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-pop" at={prAt} level={-32} />
       <Sfx name="el-pencil" at={runsAt} level={-35} />
-      <Sfx name="el-pencil" at={downAt + 2} level={-36} />
       <Sfx name="el-sprinkle" at={compareAt} level={-35} />
       <Sfx name="el-pop" at={manifestAt} level={-32} />
       <Sfx name="el-tap" at={changeAt + 2} level={-33} />
@@ -218,11 +216,6 @@ export const CiScene: React.FC = () => {
             { line: "dbt build", text: "--state ./prod-artifacts", at: manifestAt + 4 },
           ]}
         />
-        <Note at={downAt + 4} x={cmdX} y={cmdTop + h(118)} out={compareAt}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            Changed models, and everything downstream of them
-          </span>
-        </Note>
 
         {/* ── The project against production's manifest ── */}
         <Note at={changedAt + 2} x={X0} y={dagTop - h(52)} out={q7Out}>

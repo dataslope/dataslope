@@ -122,7 +122,8 @@ export const EntitiesScene: React.FC = () => {
   const result = BY_ORDER.query.result;
   const tg = tableGeometry({
     x: TABLE_X,
-    top: runTop,
+    // Below the measures column's dbt note, which sits over its name.
+    top: runTop + h(44),
     cols: result.cols.map((name) => ({ name })),
     rows: result.rows,
     headH: h(34),

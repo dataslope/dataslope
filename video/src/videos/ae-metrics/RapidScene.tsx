@@ -245,7 +245,7 @@ const Where: React.FC<{ c: Ctx }> = ({ c }) => {
       <Node x={R_X} y={boxTop} w={w} h={boxH} at={snowAt} title="Snowflake" sub="semantic views" size={23} />
       <Node x={xB} y={boxTop} w={w} h={boxH} at={dbxAt} title="Databricks" sub="metric views" size={23} />
       <Flow points={[[R_X + w + 14, mid], [xB - 14, mid]]} at={moveAt - 10} dur={10} color={ACCENT} />
-      <div style={{ position: "absolute", left: R_X + w + 64, top: mid - 26, opacity: ease(frame, moveAt, 6) }}>
+      <div style={{ position: "absolute", left: R_X + w + 64, top: mid - 11, opacity: ease(frame, moveAt, 6) }}>
         <Cross at={moveAt} size={22} />
       </div>
       <Line at={askAt} top={boxTop + boxH + c.h(26)} color={INK_SOFT} size={22}>
@@ -564,7 +564,7 @@ export const RapidScene: React.FC = () => {
   const items: RapidItem[] = [
     { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "Why does a single source of truth"), body: <Truth c={c} unifyAt={n.beat("r-truth").to} /> },
     { n: 10, label: "Metric drift, and preventing it", at: n.word("r-drift", "What is metric drift"), body: <Drifting c={c} /> },
-    { n: 11, label: "The dbt Semantic Layer, MetricFlow", at: n.word("r-metricflow", "What is the dbt Semantic Layer"), body: <MetricFlow c={c} askedAt={n.beat("r-metricflow").to - 4} /> },
+    { n: 11, label: "The dbt Semantic Layer, MetricFlow", at: n.word("r-metricflow", "What is the dbt Semantic Layer"), body: <MetricFlow c={c} askedAt={n.word("r-metricflow", "or MetricFlow")} /> },
     { n: 12, label: "LookML and Looker", at: n.word("r-lookml", "What is LookML"), body: <LookMl c={c} /> },
     { n: 13, label: "Measure or metric", at: n.word("r-measure", "What is the difference between a measure and a metric"), body: <MeasureMetric c={c} /> },
     { n: 14, label: "What a metric definition holds", at: n.word("r-contains", "What does a metric definition contain"), body: <Contains c={c} /> },
