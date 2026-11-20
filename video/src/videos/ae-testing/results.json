@@ -345,7 +345,7 @@
         }
       },
       "version": "PostgreSQL 18.6 (PGlite 0.5.16)",
-      "yaml": "# models/schema.yml\nmodels:\n  - name: fct_orders\n    columns:\n      - name: order_id\n        tests: [unique, not_null]\n      - name: status\n        tests:\n          - accepted_values:\n              values: ['placed', 'shipped', 'delivered', 'cancelled']\n      - name: customer_id\n        tests:\n          - relationships:\n              to: ref('dim_customer')\n              field: customer_id",
+      "yaml": "# models/schema.yml\nmodels:\n  - name: fct_orders\n    columns:\n      - name: order_id\n        data_tests: [unique, not_null]\n      - name: status\n        data_tests:\n          - accepted_values:\n              arguments:\n                values: ['placed', 'shipped', 'delivered', 'cancelled']\n      - name: customer_id\n        data_tests:\n          - relationships:\n              arguments:\n                to: ref('dim_customer')\n                field: customer_id",
       "singularFile": "-- tests/assert_no_negative_amounts.sql (singular: returns rows on failure)\nSELECT order_id, amount\nFROM {{ ref('fct_orders') }}\nWHERE amount < 0"
     },
     "compound": {
@@ -433,7 +433,7 @@
         }
       },
       "version": "PostgreSQL 18.6 (PGlite 0.5.16)",
-      "yaml": "- name: fct_order_lines\n  tests:\n    - dbt_utils.unique_combination_of_columns:\n        combination_of_columns: [order_id, line_number]"
+      "yaml": "- name: fct_order_lines\n  data_tests:\n    - dbt_utils.unique_combination_of_columns:\n        arguments:\n          combination_of_columns: [order_id, line_number]"
     },
     "freshness": {
       "setup": "CREATE TABLE dim_customer (customer_id INTEGER);\nINSERT INTO dim_customer VALUES (10), (11), (12);\nCREATE TABLE raw_orders (order_id INTEGER, status TEXT, customer_id INTEGER, _loaded_at TIMESTAMP);\nINSERT INTO raw_orders VALUES\n  (101, 'placed', 10, '2026-03-01 23:10'),\n  (102, 'shipped', 11, '2026-03-01 23:40'),\n  (103, 'placed', 12, '2026-03-02 00:15'),\n  (104, 'delivered', 10, '2026-03-02 00:30'),\n  (105, 'cancelled', 11, '2026-03-02 01:00');",
@@ -520,7 +520,7 @@
         }
       },
       "version": "PostgreSQL 18.6 (PGlite 0.5.16)",
-      "yaml": "sources:\n  - name: raw\n    tables:\n      - name: orders\n        loaded_at_field: _loaded_at\n        freshness:\n          warn_after: {count: 6, period: hour}\n          error_after: {count: 12, period: hour}"
+      "yaml": "sources:\n  - name: raw\n    tables:\n      - name: orders\n        config:\n          loaded_at_field: _loaded_at\n          freshness:\n            warn_after: {count: 6, period: hour}\n            error_after: {count: 12, period: hour}"
     },
     "ci": {
       "command": "# Slim CI: build + test only what changed and its children\ndbt build --select state:modified+ --state ./prod-artifacts",
@@ -796,7 +796,7 @@
     },
     "quick": {
       "contract": "models:\n  - name: fct_orders\n    config:\n      contract: {enforced: true}\n    columns:\n      - name: order_id\n        data_type: bigint\n        constraints:\n          - type: not_null\n      - name: amount_usd\n        data_type: numeric",
-      "severity": "- name: customer_email\n  tests:\n    - not_null:\n        config:\n          severity: warn"
+      "severity": "- name: customer_email\n  data_tests:\n    - not_null:\n        config:\n          severity: warn"
     }
   }
 }

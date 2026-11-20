@@ -116,7 +116,7 @@
     "netRevenue": 440
   },
   "ready": {
-    "yaml": "models:\n  - name: fct_orders\n    description: >\n      One row per order. For revenue, use the net_revenue metric,\n      which excludes refunded and cancelled orders and test accounts.\n    access: public\n    columns:\n      - name: order_id\n        description: Primary key.\n        data_tests: [unique, not_null]\n      - name: status\n        description: Lifecycle state at the latest load.\n        data_tests:\n          - accepted_values:\n              values: [completed, refunded, cancelled]",
+    "yaml": "models:\n  - name: fct_orders\n    description: >\n      One row per order. For revenue, use the net_revenue metric,\n      which excludes refunded and cancelled orders and test accounts.\n    config:\n      access: public\n    columns:\n      - name: order_id\n        description: Primary key.\n        data_tests: [unique, not_null]\n      - name: status\n        description: Lifecycle state at the latest load.\n        data_tests:\n          - accepted_values:\n              arguments:\n                values: [completed, refunded, cancelled]",
     "accepted": [
       "completed",
       "refunded",

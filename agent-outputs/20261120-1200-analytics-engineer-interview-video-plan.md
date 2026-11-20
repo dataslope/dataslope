@@ -10,7 +10,9 @@ openers and the thumbnails.
 ## What the series is for
 
 The source is the site's track, `content/interview/analytics-engineer/`
-(seven topic pages and an overview, about 19,000 words, 146 questions).
+(seven topic pages and an overview, about 19,000 words, 146 questions when
+planned; 148 since the interview-prep review merged from main on 2026-11-20
+added one to dbt and one to metrics).
 Every claim and number in a video comes from those pages or from a run, as
 in the other four interview series.
 
@@ -64,7 +66,7 @@ overview has no question cards.
 
 ## Which video answers which question
 
-Each of the pages' 146 questions is answered once, by its heading. Several
+Each of the pages' 148 questions is answered once, by its heading. Several
 are asked twice in near-identical words on two pages; those are answered
 together, in the video named below, and the pair counts once.
 
@@ -94,7 +96,8 @@ together, in the video named below, and the pair counts once.
   ephemeral models; `dbt run`, `test` and `build`; selecting a subset;
   seeds; macros; packages; variables; exposures; environments and
   targets; environment-specific schemas; `dbt_project.yml`; versioning a
-  model; `dbt debug`.
+  model; `dbt debug`; and, added on 2026-11-20, "What is dbt v2, and how
+  does it relate to dbt Core?".
 - **4, Incremental models** (dbt, 5; data-warehousing, 5; advanced-sql's "How
   do you select new rows since the last load (incremental filtering)?"):
   when incremental and what's the catch, and when incremental over a full
@@ -135,14 +138,15 @@ together, in the video named below, and the pair counts once.
   additive, semi-additive and non-additive metrics; why pre-aggregated
   distinct counts and ratios can't be summed; ratio metrics; two
   dashboards that disagree; governance; entities, dimensions and
-  measures; cumulative metrics; when a wide mart beats the semantic layer.
+  measures; cumulative metrics; when a wide mart beats the semantic layer;
+  and, added on 2026-11-20, "Where else can a semantic layer live?".
 - **9, AI and the semantic layer** (ai-and-the-semantic-layer, 6): why
   text-to-SQL over raw tables is confidently wrong; what a semantic layer
   changes for an assistant; an AI-ready dbt project; evaluating an
   analytics assistant; how assistants connect to the warehouse and
   governed metrics; reviewing a dbt model an assistant wrote.
 
-Counted: 1 + 22 + 9 + 20 + 11 + 19 + 14 + 26 + 18 + 6 = 146.
+Counted: 1 + 22 + 9 + 21 + 11 + 19 + 14 + 26 + 19 + 6 = 148.
 
 ## How the videos join up
 

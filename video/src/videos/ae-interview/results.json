@@ -1,7 +1,7 @@
 {
   "bank": 110,
   "topicPages": 7,
-  "pageQuestions": 146,
+  "pageQuestions": 148,
   "conceptCheckPages": 7,
   "challengePages": 3,
   "challengePageNames": [
@@ -19,7 +19,7 @@
     },
     {
       "page": "dbt",
-      "questions": 31,
+      "questions": 32,
       "conceptChecks": 3,
       "challenges": 0
     },
@@ -43,7 +43,7 @@
     },
     {
       "page": "metrics-and-semantic-layer",
-      "questions": 18,
+      "questions": 19,
       "conceptChecks": 3,
       "challenges": 0
     },

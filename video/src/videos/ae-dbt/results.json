@@ -401,7 +401,7 @@
     "sourceLine": "-- Referencing a raw source table\nSELECT * FROM {{ source('raw', 'orders') }}",
     "ephemeral": "-- models/intermediate/int_orders_cleaned.sql\n{{ config(materialized='ephemeral') }}\n\nSELECT\n    order_id,\n    customer_id,\n    amount_cents / 100.0 AS amount_usd\nFROM {{ source('raw', 'orders') }}\nWHERE amount_cents > 0",
     "macro": "-- macros/cents_to_dollars.sql\n{% macro cents_to_dollars(column_name) %}\n  ({{ column_name }} / 100.0)\n{% endmacro %}\n\n-- Usage in a model:\n-- SELECT {{ cents_to_dollars('amount_cents') }} AS amount_usd",
-    "packages": "# packages.yml\npackages:\n  - package: dbt-labs/dbt_utils\n    version: 1.1.1",
+    "packages": "# packages.yml\npackages:\n  - package: dbt-labs/dbt_utils\n    version: 1.4.1",
     "varsModel": "-- In a model\nWHERE order_date >= '{{ var(\"start_date\") }}'",
     "varsCli": "# Override on the CLI\ndbt run --vars '{\"start_date\": \"2024-01-01\"}'",
     "exposure": "exposures:\n  - name: weekly_revenue_dashboard\n    type: dashboard\n    owner:\n      email: analyst@company.com\n    depends_on:\n      - ref('fct_orders')\n      - ref('dim_customer')",
