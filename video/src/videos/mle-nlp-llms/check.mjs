@@ -182,6 +182,7 @@ const problems = [];
 const quotes = [
   ["nlp-and-llms.mdx", "### What is tokenization, and why is subword tokenization standard?"],
   ["nlp-and-llms.mdx", "frequent words stay whole, rare words split into reusable pieces"],
+  ["nlp-and-llms.mdx", "no way to handle out-of-vocabulary words"],
   ["nlp-and-llms.mdx", "### What are word embeddings? Contrast word2vec and GloVe."],
   ["nlp-and-llms.mdx", "skip-gram predicts context words from a target"],
   ["nlp-and-llms.mdx", "factorizing a global word co-occurrence matrix"],
@@ -198,6 +199,7 @@ const quotes = [
   ["nlp-and-llms.mdx", "### Describe the transformer architecture."],
   ["deep-learning.mdx", "### Describe the transformer architecture."],
   ["nlp-and-llms.mdx", "encoder-decoder models (T5) do sequence-to-sequence"],
+  ["nlp-and-llms.mdx", "Dropping recurrence makes training parallel across all positions"],
   ["nlp-and-llms.mdx", "### Why did transformers replace RNNs for most NLP?"],
   ["nlp-and-llms.mdx", "### Why is attention's cost a scaling bottleneck for long documents?"],
   ["nlp-and-llms.mdx", "Doubling the context roughly quadruples the attention cost"],
@@ -212,6 +214,7 @@ const quotes = [
   ["nlp-and-llms.mdx", "### What is retrieval-augmented generation (RAG), and why use it?"],
   ["nlp-and-llms.mdx", "### When would you choose RAG over fine-tuning, and vice versa?"],
   ["nlp-and-llms.mdx", "They compose: fine-tune for behavior, retrieve for facts."],
+  ["llm-systems-and-evals.mdx", "hybrid keyword search"],
   ["nlp-and-llms.mdx", "### What are embeddings used for beyond input representation?"],
   ["nlp-and-llms.mdx", "### What causes hallucination, and how do you mitigate it?"],
   ["nlp-and-llms.mdx", "No method eliminates hallucination entirely"],

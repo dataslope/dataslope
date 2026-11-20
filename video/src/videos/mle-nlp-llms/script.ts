@@ -82,15 +82,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q1: question card; a balance with "vocabulary" on one pan and "sequence
  *     length" on the other.
  *   q1-word: two stacks of pages (the seven other topic pages, then the NLP
- *     page); "word vocabulary: 3,020" under the first; the NLP page's
- *     unseen words struck through in red as a few examples fly out
- *     (hallucination, autoregressive, few-shot, RLHF, LoRA, bank:
- *     results.json tokens.unseenExamples), "15% of words never seen" in red.
+ *     page); "word vocabulary: 3,028" under the first; a few of the NLP
+ *     page's unseen words fly out (hallucination, autoregressive, few-shot,
+ *     RLHF, LoRA, bank: results.json tokens.unseenExamples) and each turns
+ *     into the same red "unknown" chip on "unknown token" (not struck
+ *     through: the words are right, the vocabulary can't hold them);
+ *     "15% of words never seen" in red.
  *   q1-char: the same page as characters: a bar "11,727 characters" beside
  *     "2,330 tokens", "5x the positions", then a square grid growing to
  *     "25x the pairs" (red), the grid a square of positions.
  *   q1-sub: "hallucination" split into two chips, " halluc" and "ination"
- *     (results.json tokens.pieces, o200k_base), green; "1.36 tokens a word";
+ *     (results.json tokens.pieces, o200k_base), green; "1.36 tokens a word
+ *     on this page";
  *     "o200k_base: 200,019 pieces" as its note.
  *   q1-cost: a tall table of rows, "200,019 rows x 4,096" and "819 million
  *     weights" (yellow); the balance tips back.
@@ -109,15 +112,17 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     lookup", each a short line; neither colored (it is a trade-off).
  *   q4, q4-a: question card; four token chips, each sprouting three small bars,
  *     query, key and value; one query's dot products against every key; the
- *     division by the square root lit on "divided"; a row of softmax weights
+ *     division by the square root of the key's dimension, "√d_k", lit on
+ *     "divided"; a row of softmax weights
  *     summing to one; the weighted blend of values.
  *   q4-scale: two rows of sixteen weights from the simulation (results.json
  *     scaling.exampleRow): unscaled, one tall bar (red, "85% on one key, on
  *     average"); scaled, spread (green, "25%"); "simulation: 2,000 rows of
  *     16 keys, 64 numbers each" as its note.
  *   q4-hop: an n by n grid of pairs filling in.
- *   q5, q5-a, q5-cost: question card; the 512-wide vector split into eight 64-wide pieces,
- *     eight small attention grids side by side, then concatenated; two of
+ *   q5, q5-a, q5-cost: question card; the 512-wide vector projected into
+ *     eight 64-wide heads, each its own query, key and value, eight small
+ *     attention grids side by side, then concatenated; two of
  *     the grids labelled "syntax" and "which noun 'it' means"; then, on
  *     "five hundred and twelve", "8 x 64 = 512 multiply-adds per pair, as for
  *     one head" (green).
@@ -130,7 +135,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     as named.
  *   q7, q7-a: an RNN row of cells passing one state along, lighting one by one
  *     (slow); beside it, a transformer row where every pair is joined and all
- *     light at once (green).
+ *     light at once (green), "in training" under it on "in training"
+ *     (generation still runs one token at a time, Part 9's subject).
  *   q8, q8-a: question card; the pair grid at 1,000 (a million cells) then at 2,000
  *     (four million), the larger one four times the area; "2x length, 4x
  *     attention".
@@ -138,8 +144,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (results.json cost.curve): a flat line "the rest of the layer" and a
  *     rising line "attention", crossing at about 24,576 (yellow); "width
  *     4,096, feed-forward 4x: assumptions" as its note.
- *   q8-fix: three small mask grids (sparse, sliding window, linear) and a
- *     retrieval icon.
+ *   q8-fix: two small mask grids (sparse, sliding window) and, for linear
+ *     attention, which is not a mask, a straight row of n cells against the
+ *     n by n square ("n, not n²"); then the card-catalog spot for retrieval
+ *     on "retrieve".
  *   q9, q9-a: question card; a long bar of fixed width (the window) filled from
  *     the left by instructions, retrieved documents, history and the answer,
  *     each a labelled segment; what doesn't fit greys out past the edge (red
@@ -168,7 +176,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     retrieval.top): "When should you not use an LLM?" first; the
  *     hallucination answer far below at "0.000" in red, with "shares none of
  *     the words" beside it; "word counts stand in for an embedding model
- *     here" as its note.
+ *     here" as its note; "+ keyword search" as a small badge on "keyword".
  *   q14, q14-a: two columns with a vertical hairline: "RAG: knowledge" (facts that
  *     change, private, too many) and "Fine-tuning: behavior" (style,
  *     vocabulary, format); "fine-tune for behavior, retrieve for facts"
@@ -201,15 +209,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * a page stops saying what is quoted or the narration stops saying what was
  * measured. No language model runs here, and none is claimed to:
  *   - "q1-word": prose of the track's seven other topic pages (code, math
- *     and components stripped) gives a vocabulary of 3,020 words; the NLP
- *     page's 1,709 running words include 194 of its 708 distinct ones never
- *     seen, 14.9% of the running words ("fifteen percent"), among them
+ *     and components stripped) gives a vocabulary of 3,028 words; the NLP
+ *     page's 1,709 running words include 192 of its 708 distinct ones never
+ *     seen, 14.8% of the running words ("fifteen percent"), among them
  *     hallucination. A real word vocabulary is far larger; the point is the
- *     mechanism, and the beat says the vocabulary's size.
+ *     mechanism, and the beat says the vocabulary's size. A word-level model
+ *     maps every word outside its vocabulary to one shared unknown token
+ *     (the page's "no way to handle out-of-vocabulary words").
  *   - "q1-char", "q1-sub": the NLP page's prose is 11,727 characters and
  *     2,330 o200k_base tokens, 5.03 characters a token ("five times as many
- *     positions"), so 25 times the pairs; 1.36 tokens a word ("one point
- *     four"); o200k_base has 200,019 tokens ("two hundred thousand pieces",
+ *     positions", said "five times as long as subword tokens"), so 25
+ *     times the pairs; 1.36 tokens a word on this page ("one point four");
+ *     o200k_base has 200,019 tokens ("two hundred thousand pieces",
  *     glossed as a production tokenizer; the screen names it), and splits
  *     " hallucination" into " halluc" and "ination". The page's own
  *     illustration "tokenization" -> "token", "ization" matches o200k; its
@@ -228,21 +239,32 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     2,000 rows of 16 keys: raw dot products have a standard deviation of
  *     8.0 ("eight times wider"); unscaled, the largest weight in a row
  *     averages 0.853 ("eighty-five percent"; 58% of rows put over 90% on one
- *     key); divided by 8, it averages 0.249 ("twenty-five"). The pages: the
- *     scaling "keeps dot products from saturating the softmax".
+ *     key); divided by 8, the square root of 64, it averages 0.249
+ *     ("twenty-five"). The pages: the scaling "keeps dot products from
+ *     saturating the softmax". "The key's dimension" is d_k, the number of
+ *     values in a key, not its length as a vector.
  *   - "q5-a", "q5-cost": the pages (heads specialize, "syntax" and
- *     "coreference"; "about the same" cost). Eight heads of 64 against one of 512: the projections
+ *     "coreference"; "about the same" cost). Each head has its own learned
+ *     projections; "splits the representation into several subspaces" is
+ *     the page's wording of the same thing. Eight heads of 64 against one
+ *     of 512: the projections
  *     are 4 x 512^2 = 1,048,576 weights either way, and a pair costs 512
  *     multiply-adds either way.
- *   - "q6-a", "q6-kinds", "q7-a": the pages.
+ *   - "q6-a", "q6-kinds", "q7-a": the pages. "In training": the page's
+ *     "Dropping recurrence makes training parallel across all positions";
+ *     generation stays one token at a time.
  *   - "q8-a": a thousand tokens are a million pairs, two thousand four million;
  *     the page's "doubling the context roughly quadruples the attention
  *     cost". "q8-when": arithmetic from stated assumptions (width 4,096, a
  *     feed-forward four times as wide): the projections and feed-forward
  *     cost 12 d^2 multiply-adds per token per layer, the scores and the
  *     weighted sum 2 n d, equal at n = 6 d = 24,576 ("about twenty-five
- *     thousand"); masking, which halves the attention term in a decoder,
- *     is left out. "q8-fix": the page's variants and retrieval.
+ *     thousand"), said as attention's "arithmetic" because the crossover is
+ *     in multiply-adds, not memory. It is per token at that position, so it
+ *     holds for a decoder's newest token too; averaged over a masked
+ *     sequence the attention term halves. "q8-fix": the page's variants and
+ *     retrieval ("retrieval instead of stuffing everything into the
+ *     prompt").
  *   - "q9-a", "q10-a", "q11-a": the pages.
  *   - "q12-math", "q12-ship": arithmetic from stated sizes. A 4,096 x 4,096
  *     matrix is 16,777,216 numbers ("nearly seventeen million"); rank 8 is
@@ -262,7 +284,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     top answer is "When should you not use an LLM?" (0.118); the
  *     hallucination answer scores 0.000 and shares none of the terms, with
  *     13 answers above it. Word counts stand in for the retriever, and the
- *     screen says so; no embedding model's score is shown or claimed.
+ *     screen says so; no embedding model's score is shown or claimed. That
+ *     production retrievers usually combine embeddings with keyword search
+ *     (hybrid search) is llm-systems-and-evals' "hybrid keyword search",
+ *     which Part 10 recommends; said here so the two parts agree.
  *   - "q14-a", and the quick round: the page. "q14-cost": RAG's retrieval
  *     and longer prompts are paid per request, fine-tuning per training
  *     run; reasoning from the two mechanisms, with no number attached. "Temperature divides the
@@ -284,7 +309,7 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "A language model never reads a word. Text is cut into tokens, tokens become vectors, and attention lets every vector look at every other. Each step is a choice with a cost, and this round asks you to defend it.",
+      text: "A language model never sees your text. Text is cut into tokens, tokens become vectors, and attention lets every vector look at every other. Each step is a choice with a cost, and this round asks you to defend it.",
       pauseAfter: 0.7,
     },
     { id: "plan", text: "Nineteen questions: fourteen worked through, and five quickly at the end.", pauseAfter: 0.7 },
@@ -297,17 +322,17 @@ export const script: NarrationScript = {
     },
     {
       id: "q1-word",
-      text: "Whole words need a vast vocabulary and still miss new ones. Build one from this track's seven other pages, three thousand words, and read the NLP page with it: fifteen percent of its words were never seen, hallucination among them.",
+      text: "Whole words need a vast vocabulary and still miss new ones. Build one from this track's seven other pages, three thousand words, and read the NLP page with it: fifteen percent of its words were never seen, hallucination among them, and each becomes the same unknown token.",
       pauseAfter: 0.7,
     },
     {
       id: "q1-char",
-      text: "Characters never miss, but the page has five times as many characters as tokens, and attention's cost grows with the square: twenty-five times.",
+      text: "Characters never miss, but they make the page five times as long as subword tokens do, and attention's cost grows with the square: twenty-five times.",
       pauseAfter: 0.7,
     },
     {
       id: "q1-sub",
-      text: "Subwords split the difference: frequent words stay whole, and rare ones break into known pieces. A production tokenizer with two hundred thousand pieces cuts hallucination in two, and averages one point four tokens a word.",
+      text: "Subwords split the difference: frequent words stay whole, and rare ones break into known pieces. A production tokenizer with two hundred thousand pieces cuts hallucination in two, and averages one point four tokens a word on this page.",
       pauseAfter: 0.6,
     },
     {
@@ -344,12 +369,12 @@ export const script: NarrationScript = {
     { id: "q4", scene: true, text: "Question four. What is self-attention?" },
     {
       id: "q4-a",
-      text: "Each token is projected into a query, a key and a value. One token's weight on another is its query dotted with the other's key, divided by the square root of the key's length, and softmaxed. Its output is the weighted sum of the values.",
+      text: "Each token is projected into a query, a key and a value. One token's weight on another is its query dotted with the other's key, divided by the square root of the key's dimension, and softmaxed. Its output is the weighted sum of the values.",
       pauseAfter: 0.6,
     },
     {
       id: "q4-scale",
-      text: "Why divide? Simulate queries and keys of sixty-four random numbers: their dot products spread eight times wider than the numbers do, and softmax puts on average eighty-five percent of a row's weight on one key, where its gradient is small. Divided by eight, the top weight averages twenty-five percent.",
+      text: "Why divide? Simulate queries and keys of sixty-four random numbers: their dot products spread eight times wider than the numbers do, and softmax puts on average eighty-five percent of a row's weight on one key, where its gradient is small. Divided by eight, the square root of sixty-four, the top weight averages twenty-five percent.",
       pauseAfter: 0.7,
     },
     {
@@ -360,7 +385,7 @@ export const script: NarrationScript = {
     { id: "q5", text: "Question five. What is multi-head attention, and why use it?" },
     {
       id: "q5-a",
-      text: "Split each vector into smaller ones, run attention in each, in parallel, and concatenate. One head can track syntax, another which noun a pronoun means.",
+      text: "Give each head its own smaller query, key and value, run attention in each, in parallel, and concatenate the results. One head can track syntax, another which noun a pronoun means.",
       pauseAfter: 0.6,
     },
     {
@@ -384,7 +409,7 @@ export const script: NarrationScript = {
     { id: "q7", text: "Question seven. Why did transformers replace RNNs for most NLP?" },
     {
       id: "q7-a",
-      text: "An RNN squeezes everything through one hidden state, one step at a time: slow to train, and forgetful over distance. A transformer links any two tokens directly and processes every position at once, which is what a GPU is built for.",
+      text: "An RNN squeezes everything through one hidden state, one step at a time: slow to train, and forgetful over distance. A transformer links any two tokens directly and, in training, processes every position at once, which is what a GPU is built for.",
       pauseAfter: 0.7,
     },
     { id: "cost-in", text: "The trade-off is attention's own cost." },
@@ -397,12 +422,12 @@ export const script: NarrationScript = {
     },
     {
       id: "q8-when",
-      text: "The rest of a layer only grows linearly, though. For a model four thousand and ninety-six wide, with the usual feed-forward four times that, attention outweighs the rest only past about twenty-five thousand tokens.",
+      text: "The rest of a layer only grows linearly, though. For a model four thousand and ninety-six wide, with the usual feed-forward four times that, attention's arithmetic outweighs the rest only past about twenty-five thousand tokens.",
       pauseAfter: 0.7,
     },
     {
       id: "q8-fix",
-      text: "Past that, teams reach for sparse, sliding-window or linear attention, or retrieve less instead of pasting in more.",
+      text: "Past that, teams reach for sparse, sliding-window or linear attention, or retrieve the passages that matter instead of pasting in everything.",
       pauseAfter: 0.6,
     },
     { id: "q9", text: "Question nine. What is a context window, and why does its size matter?" },
@@ -458,7 +483,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q13-miss",
-      text: "But the answer is only as good as the retrieval. Search this track's hundred and sixty-seven answers by shared words for how to stop an LLM making things up: the hallucination answer scores zero, sharing none of those words. Retrieval has to match meaning, which is what embeddings are for.",
+      text: "But the answer is only as good as the retrieval. Search this track's hundred and sixty-seven answers by shared words for how to stop an LLM making things up: the hallucination answer scores zero, sharing none of those words. Retrieval has to match meaning, which is what embeddings are for, usually alongside keyword search for exact names.",
       pauseAfter: 0.7,
     },
     { id: "q14", text: "Question fourteen. When would you choose RAG over fine-tuning, and vice versa?" },
@@ -491,7 +516,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-random",
-      text: "Randomness: temperature divides the scores before the softmax, so near zero is almost greedy, and higher is more varied. Top-k keeps the k likeliest tokens; top-p, the smallest set whose probability passes p. Keep it low for extraction, higher for brainstorming.",
+      text: "Randomness: temperature divides the scores before the softmax, so near zero is almost greedy, and higher is more varied. Top-k keeps the k likeliest tokens; top-p, the smallest set whose probabilities add up past p. Keep it low for extraction, higher for brainstorming.",
       pauseAfter: 0.6,
     },
     {

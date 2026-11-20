@@ -99,7 +99,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     seeds 0 to 19" is. Then two dots for seed 0 landing on the same spot,
  *     "identical" in green.
  *   q2-why: a "+1 point" arrow drawn across the spread of the twenty dots,
- *     in yellow: it fits inside the noise. "Same code + data + config →
+ *     in yellow: it fits inside the noise; "Judge a change over several
+ *     seeds" in green on "several seeds". "Same code + data + config →
  *     same artifact" under it.
  *   q4: question card. The page's pipeline (its mermaid flowchart) as
  *     outlined boxes left to right: validate data, test transforms, train
@@ -136,16 +137,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     training rows, windows of 2,000"). The first feature's training
  *     histogram and the next quarter's, shifted right; "PSI 0.91" in yellow
  *     (an alarm, not an error); then "accuracy 80% → 84%" in blue beside
- *     it on "q7-rises", "the model was right out there too".
+ *     it on "q7-rises", and "this time, the learned rule still holds there"
+ *     under it on "This time" (data drift can hurt; here it did not).
  *   q7-concept: the third quarter's histograms lying on the training ones,
  *     "PSI < 0.02" on each feature and on the predictions, in grey; the
  *     boundary turns; "accuracy 80% → 61%" in red.
  *   q7-respond: a two-by-two, "inputs alarm" against "accuracy fell":
  *     data drift in the alarm-but-fine cell, concept drift in the
- *     silent-but-worse cell, red; "labels confirm it" under the grid in
- *     green; a time-sliced accuracy line with a "stable cohort" line beside
- *     it; then three responses as badges, "alert", "retrain on recent
- *     data", "redesign features", lit in turn.
+ *     silent-but-worse cell, red; "labels confirm it: accuracy and
+ *     calibration over time" under the grid in green; then three responses
+ *     as badges, "alert", "retrain on recent data", "redesign features",
+ *     lit in turn. (No separate time-sliced chart here: with the grid and
+ *     the badges, one more chart would crowd the page; the words carry it.)
  *   q9: question card. q9-how: ten training buckets of equal share as ten
  *     bars at 10%; the current window's shares as bars beside them; the
  *     formula in words under them, "sum over buckets: (current − training)
@@ -197,9 +200,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   r-retrain: four trigger icons (a calendar, a drift alarm, a falling
  *     line, a stack of new labels), each lit as named, all feeding one
  *     arrow through the gate from q4.
- *   r-bluegreen: two environments, blue and green outlines (labels, not
- *     fills), traffic flipping in one switch and flipping back; a canary
- *     slice drawn small beside it, "the gradual version".
+ *   r-bluegreen: two environments as ink outlines labelled "Blue
+ *     (current)" and "Green (new)": the names are words, not colors, since
+ *     green means the answer and blue means data in this series; traffic
+ *     flipping in one switch and flipping back; a canary slice drawn small
+ *     beside it, "the gradual version".
  *   r-tracking: a table of runs (run, hyperparameters, metric, commit),
  *     one row linked by a line to "in production".
  *   r-package: artifact, pinned runtime and dependencies, a container
@@ -225,7 +230,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     held-out accuracy from 96.1% to 97.8%; seed 0 twice gives identical
  *     probabilities on every held-out digit. "Reproducible means the same
  *     code, data and config give back the same artifact": the
- *     ml-system-design page.
+ *     ml-system-design page. Judging a change over several seeds is the
+ *     standard follow-up the spread argues for (the page logs seeds; it does
+ *     not say this).
  *   - q4: the stages, the triggers, the gate on a fixed holdout, slices,
  *     "silently ship a regression": both pages. The simulation (seed 3):
  *     last year's 20,000 rows (one group in twenty with its own rule) train
@@ -246,7 +253,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     responses: ml-system-design. The simulation (seed 0): a logistic
  *     regression on 5,000 rows (label from 2 x1 + x2), windows of 2,000:
  *     the same quarter scores 79.9%; x1's mean up by one gives PSI 0.91 on
- *     x1 and 84.0%; the rule changed to 2 x1 - 1.5 x2 - 1 with no input
+ *     x1 and 84.0% (the true rule is linear, so the logistic regression
+ *     still holds where x1 moved: "this time", since drift into a region
+ *     the model learned badly would hurt); the rule changed to
+ *     2 x1 - 1.5 x2 - 1 with no input
  *     moved gives PSI under 0.02 on both inputs and the predictions, and
  *     60.7% (said "sixty-one").
  *   - q9: the definition, buckets on the reference, the formula,
@@ -341,7 +351,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-why",
-      text: "So a one-point gain you can't reproduce may just be a lucky seed. Reproducible means the same code, data and config give back the same artifact.",
+      text: "So a one-point gain may just be a lucky seed: judge a change over several seeds, not one. And reproducible means the same code, data and config give back the same artifact.",
       pauseAfter: 0.8,
     },
 
@@ -410,7 +420,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q7-rises",
-      text: "Yet accuracy rises, from eighty percent to eighty-four. The model was right out there too.",
+      text: "Yet accuracy rises, from eighty percent to eighty-four. This time, the rule the model learned still held where the inputs moved.",
       pauseAfter: 0.7,
     },
     {

@@ -263,7 +263,7 @@ const said = [
   ["q3-paged", "blocks of sixteen tokens", 16, R.paging.blockTokens],
   ["q3-paged", "under one percent", 1, R.paging.worstWasteShare < 0.01 ? 1 : 0],
   ["q4-bytes", "about a hundred and forty gigabytes to thirty-five", 35, R.quant.weights4GB],
-  ["q4-bytes", "a quarter of the bytes", 0.25, R.quant.shareOfBytes4],
+  ["q4-bytes", "a quarter of the weight bytes", 0.25, R.quant.shareOfBytes4],
   ["q4-fit", "fit on one of those GPUs", 1, R.quant.weights4GB < R.kv.gpuGB ? 1 : 0],
   ["q4-fit", "room left for sixteen eight K requests", 16, R.quant.oneGpu4bit],
   ["q4-sim", "four-token drafts", 4, R.speculative.draftTokens],

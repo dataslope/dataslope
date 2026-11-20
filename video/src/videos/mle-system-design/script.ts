@@ -75,11 +75,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     request feeds the model, lit on "what's in the cart"; under the box
  *     three small labels, "latency budget", "scaling", "uptime", on "you
  *     own".
- *   q1-choose: a two-by-two, "how fresh" across and "how fast" down, batch
- *     in the stale and slow corner, online in the fresh and fast one, lit
- *     as said; a search box with a blinking cursor beside batch's row and
- *     "can't precompute" in red on "nobody has typed yet"; then a third row,
- *     "Hybrid: features in batch, scoring online", in green.
+ *   q1-choose: no grid that puts batch in a "slow" corner: a stored answer
+ *     is the fastest thing to serve. On the batch row, the 18:00 request's
+ *     read of its row labelled "lookup: fast" in blue on "lookup", and "16 h
+ *     old" from q1 lit again on "yesterday's"; on the online row, "compute
+ *     inside the budget" under the model service. Then a search box with a
+ *     blinking cursor beside batch's row and "can't precompute" in red on
+ *     "nobody has typed yet"; then a third row, "Hybrid: features in batch,
+ *     scoring online", in green.
  *   q2-in: the map lights "Features".
  *   q2: question card. One feature definition ("transactions in the past
  *     hour") forking into two arrows, "training pipeline" and "serving
@@ -166,7 +169,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q9-serve: "Gradient boosting" and "or a neural net over the history"
  *     as two badges; the model box at "authorization", "< 100 ms" in
  *     yellow; the velocity counts arriving from the online store (q3's box,
- *     small).
+ *     small); on "threshold", a short line under the model box, "Threshold:
+ *     a missed fraud vs a good customer declined", in ink (a trade-off, so
+ *     neither red nor green).
  *   q9-labels: a timeline: transactions on the left, their chargebacks
  *     arriving weeks to the right; a "train on" bracket that stops where
  *     labels are complete, green; the recent stretch past it, where a fraud
@@ -211,7 +216,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     pixels: bars at "9: 0.65" and "3: 0.35", the rest near zero
  *     (results.json soft); beside it the hard label "9: 1" alone.
  *   r-latency: the levers as a list, each inking in as named: "compress
- *     (quantize, distill)", "batch", "cache repeated inputs", "faster
+ *     (quantize, distill)", "batch under load", "cache repeated inputs", "faster
  *     runtime or hardware", "co-locate with callers", "simpler model on the
  *     hot path"; "measure first" above them in yellow.
  *   r-scale: replicas joining a row behind a queue over a load curve with a
@@ -229,10 +234,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * the narration's numbers stop matching:
  *   - q1: batch's schedule, cost and staleness, "unable to use request-time
  *     features", online's latency, scaling and availability, choosing by
- *     freshness and latency, the hybrid: both pages. "Can't precompute a
- *     reply to a search nobody has typed yet": the page's concept check
- *     ("Feasible only for tiny input spaces; large/contextual inputs need
- *     online inference").
+ *     freshness and latency, the hybrid: both pages. That a stored answer is
+ *     a lookup, so batch is the fast option at request time and suits a
+ *     model too heavy to run inside the budget, is what "precomputes
+ *     predictions ... and stores them" means for latency; the page lists
+ *     latency as a criterion without saying which way it points, and an
+ *     earlier draft of this figure put batch in a "slow" corner. "Can't
+ *     precompute a reply to a search nobody has typed yet": the page's
+ *     concept check ("Feasible only for tiny input spaces; large/contextual
+ *     inputs need online inference").
  *   - q2: the definition and "offline metrics look fine; production
  *     underperforms": both pages; one shared path: the pages' fix.
  *     Comparing logged serving features with training ones is the standard
@@ -275,12 +285,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     changed (1 fixed, 1 broken), 3 bits 95.7% (shown, not said), 2 bits
  *     28.9%. Biases stay 32-bit (202 of them, not counted in the sizes).
  *   - q8: outcome labels, delayed labels, survivorship bias, label shift,
- *     logging and held-out exploration: the page. "A transaction it blocked
+ *     logging and held-out exploration: the page. "Outcomes the model let
+ *     happen" is the page's "requests the model acted on", worded so the
+ *     blocked transaction does not read as an action whose outcome is seen. "A transaction it blocked
  *     never shows whether it was fraud" is the page's survivorship bias
  *     applied to fraud, where the label is a chargeback (q9).
  *   - q9: features, models, sub-100 ms at authorization, chargebacks,
  *     monitoring: the page. Velocity counts from the online store follows
- *     from q3. Training only on transactions whose labels have matured
+ *     from q3. The threshold set by the cost of each error is the standard
+ *     follow-up to a fraud sketch, from Part 1's precision and recall, not
+ *     this page; no costs or threshold are given. Training only on transactions whose labels have matured
  *     follows from "confirmed fraud from chargebacks (delayed)": a fraud
  *     whose chargeback has not arrived is labeled honest.
  *   - q10: retrieval, ranking, re-ranking, the feature store, A B tests, and
@@ -289,7 +303,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     20,000 is their ratio. Cold start and its fallbacks: the page. That a
  *     never-shown item never earns clicks is q8's survivorship bias applied
  *     to items; giving new items exposure is q8's "held-out exploration".
- *   - quick: the page's answers. "r-distill": the q7 network's
+ *   - quick: the page's answers. "r-latency": "batching under load" is the
+ *     page's "batching requests at the server to amortize overhead", worded
+ *     for q5, which shows a batch raising each pass's latency and cutting
+ *     the queue's. "r-distill": the q7 network's
  *     probabilities for the held-out nine it is least sure of among the
  *     nines it gets right: 0.646 nine, 0.353 three (results.json soft); the
  *     median top probability over all 540 is 0.9998, so most targets look
@@ -335,7 +352,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q1-choose",
-      text: "So choose by how fresh the answer must be and how fast it must arrive. Batch also needs its inputs known in advance: you can't precompute a reply to a search nobody has typed yet. Many systems mix the two, with features cached in batch and light scoring online.",
+      text: "So choose by freshness and latency. A stored answer is only a lookup, so batch suits a heavy model on a tight budget, if yesterday's answer will do and every input is known in advance: you can't precompute a reply to a search nobody has typed yet. Many systems mix the two, with features cached in batch and light scoring online.",
       pauseAfter: 0.8,
     },
     { id: "q2-in", text: "Serving online brings this round's favorite bug." },
@@ -443,7 +460,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q8-risks",
-      text: "Three things bend that loop. Labels arrive late: a purchase days after the click. You only see outcomes for what the model acted on: a transaction it blocked never shows whether it was fraud. And its actions change the data it sees next.",
+      text: "Three things bend that loop. Labels arrive late: a purchase days after the click. You only see outcomes the model let happen: a transaction it blocked never shows whether it was fraud. And its actions change the data it sees next.",
       pauseAfter: 0.7,
     },
     {
@@ -461,7 +478,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q9-serve",
-      text: "The model is gradient boosting, which suits tabular data like this, or a neural network over the card's history. It runs online, at authorization, in under a hundred milliseconds, so the velocity counts come from the online store.",
+      text: "The model is gradient boosting, which suits tabular data like this, or a neural network over the card's history. It runs online, at authorization, in under a hundred milliseconds, so the velocity counts come from the online store. Its threshold is set by cost: a missed fraud against a good customer declined.",
       pauseAfter: 0.6,
     },
     {
@@ -532,7 +549,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-latency",
-      text: "To cut serving latency, find where the time goes, then pull these levers: a compressed model, batching, a cache for repeated inputs, a faster runtime or hardware, the model placed beside its callers, and a simpler model on the paths that can't wait.",
+      text: "To cut serving latency, find where the time goes, then pull these levers: a compressed model, batching under load, a cache for repeated inputs, a faster runtime or hardware, the model placed beside its callers, and a simpler model on the paths that can't wait.",
       pauseAfter: 0.6,
     },
     {

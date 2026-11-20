@@ -95,7 +95,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q2-fit: the node: eight GPU outlines merged into one bar, "8 × 80 GB =
  *     640 GB", the weights' 140 GB shaded, "500 GB free" in yellow; the free
  *     part fills with 186 small cells on "a hundred and eighty-six", "8K
- *     tokens each" (the block's last line).
+ *     tokens each" (the block's last line), "at most" beside the count on
+ *     "at most".
  *   q2-long: the same bar refilled with 11 wide cells, "128K each", on
  *     "eleven"; "Memory caps concurrency" as a line of its own.
  *   q2-gqa: a small diagram of four query heads drawing lines to one shared
@@ -124,15 +125,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     block part-filled, "At most part of one block: < 1%" in green on
  *     "under one percent"; two requests' rows pointing at the same first
  *     blocks on "share", labelled "shared prompt prefix".
- *   q3-paper: "Kwon et al., SOSP 2023 (vLLM): 2–4× throughput at the same
- *     latency", the source line in the figure's note style.
+ *   q3-paper: on "Less waste", the 8K buffer of q3-mem shrinks to its used
+ *     blocks and the freed space takes three more requests' rows (an
+ *     illustration, no number); then "Kwon et al., SOSP 2023 (vLLM): 2–4×
+ *     throughput at the same latency", the source line in the figure's note
+ *     style.
  *   q3-latency: "at the same latency" under the yellow highlighter; a small
  *     two-axis sketch, batch size along the bottom, throughput rising and
  *     time per token rising with it, no numbers (a mechanism, not data).
  *   q4: question card; three blocks of the weights side by side, "16-bit",
  *     "8-bit", "4-bit", their widths halving.
  *   q4-bytes: "~140 GB → 35 GB" under the 4-bit block (results.json
- *     quant), "¼ of the bytes per step" in yellow.
+ *     quant), "¼ of the weight bytes per step" in yellow.
  *   q4-fit: one GPU outline, "80 GB": the 35 GB of weights and 16 cells of
  *     8K requests (results.json oneGpu4bit), green on "sixteen"; beside it,
  *     the 16-bit weights overflowing the same outline (140 > 80), grey.
@@ -141,8 +145,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     first two in red; "Evaluate on your own task" in green.
  *   q4-spec: a small "draft" box writing four pale tokens ahead (the pencil
  *     spot); one large-model pass checking them, ticks green, the first
- *     rejected token red and replaced; "Same output distribution" as a line
- *     of its own.
+ *     rejected token red and replaced; under the pass, "≈ one decode step:
+ *     one read of the weights" on "one decode step"; "Same output
+ *     distribution" as a line of its own.
  *   q4-sim: two rows, "accepted 9 in 10: ~4.1 tokens per pass" and
  *     "accepted 1 in 2: ~1.9", from results.json speculative (simulated and
  *     the closed form both, asserted equal), with "Simulation: 4-token
@@ -194,7 +199,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     128K context against about 140 GB of weights, "Memory, not compute,
  *     usually caps how many requests a GPU can serve at once": the page.
  *     The block prints 320 KiB, 40 GiB, 320 GiB without GQA and 186 8K-token
- *     requests in 500 GB (640 GB less 140 GB). check.mjs adds, with the
+ *     requests in 500 GB (640 GB less 140 GB), said "at most" because the
+ *     block subtracts only the weights (activations and the runtime take
+ *     their share in practice). check.mjs adds, with the
  *     block's function: 11 requests at 128K (500e9 // 42,949,672,960) and
  *     23 at 8K with 64 KV heads (the page's "eight times", 500e9 //
  *     21,474,836,480). Grouped-query attention and its 64 against 8: the
@@ -212,7 +219,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     numbers are arithmetic on assumptions said aloud: an 8K reservation
  *     (the block's request size) for a request that uses 2,000 tokens leaves
  *     76% empty ("three quarters"); blocks of 16 tokens (an assumption)
- *     waste at most 15 tokens, 0.75% of 2,000. That throughput rises with
+ *     waste at most 15 tokens, 0.75% of 2,000. "Less waste means more
+ *     requests in the batch" joins the page's "removes most fragmentation"
+ *     to its "Memory, not compute, usually caps how many requests a GPU can
+ *     serve at once"; no number is put on it. That throughput rises with
  *     batch size while each sequence's time per token rises too is the
  *     system design page's "larger batches improve throughput but increase
  *     per-request latency", applied to decode.
@@ -222,8 +232,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     benchmark"; the draft model, one forward pass, the standard acceptance
  *     rule leaving the distribution unchanged, the speedup depending on how
  *     often the draft is right: the page. Arithmetic: 140 GB at 4 bits is 35
- *     GB, a quarter; an 80 GB GPU less 35 GB holds 16 8K requests by the
- *     block's own method (weights subtracted, nothing else). The
+ *     GB, a quarter of the weight bytes each step reads (the cache is read
+ *     too, so not a quarter of all of them); an 80 GB GPU less 35 GB holds
+ *     16 8K requests by the
+ *     block's own method (weights subtracted, nothing else). That checking
+ *     a few drafted tokens costs about one decode step is question one's
+ *     argument applied to a pass over five tokens: the step's time is
+ *     reading the weights, and the five share that read, as a prompt's
+ *     tokens do in prefill. The
  *     speculative simulation is the video's own (seed 11): 4-token drafts,
  *     each drafted token accepted independently with probability 0.9 or 0.5
  *     until the first rejection, and every verifying pass adding one token
@@ -325,7 +341,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-fit",
-      text: "Now the last step, the one to do on the whiteboard: how many requests fit? Eight eighty-gigabyte GPUs, minus the weights, leave five hundred gigabytes. At eight K tokens a request, a hundred and eighty-six fit.",
+      text: "Now the last step, the one to do on the whiteboard: how many requests fit? Eight eighty-gigabyte GPUs, minus the weights, leave five hundred gigabytes. At eight K tokens a request, at most a hundred and eighty-six fit.",
       pauseAfter: 0.6,
     },
     {
@@ -374,7 +390,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q3-paper",
-      text: "It came with vLLM, an open-source serving engine, whose paper reported two to four times the throughput of earlier systems at the same latency.",
+      text: "Less waste means more requests in the batch. PagedAttention came with vLLM, an open-source serving engine, whose paper reported two to four times the throughput of earlier systems at the same latency.",
       pauseAfter: 0.6,
     },
     {
@@ -393,7 +409,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q4-bytes",
-      text: "Decode is bound by bandwidth, so moving fewer bytes makes it faster as well as smaller. At four bits, this model's weights shrink from about a hundred and forty gigabytes to thirty-five, a quarter of the bytes every step reads.",
+      text: "Decode is bound by bandwidth, so moving fewer bytes makes it faster as well as smaller. At four bits, this model's weights shrink from about a hundred and forty gigabytes to thirty-five, a quarter of the weight bytes every step reads.",
       pauseAfter: 0.6,
     },
     {
@@ -408,7 +424,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q4-spec",
-      text: "Speculative decoding lets a small draft model propose several tokens, and the large model verify them all in one forward pass. With the standard acceptance rule, the output distribution doesn't change, so quality isn't the price.",
+      text: "Speculative decoding lets a small draft model propose several tokens, and the large model verify them all in one forward pass, which costs about one decode step, since reading the weights dominates either way. With the standard acceptance rule, the output distribution doesn't change, so quality isn't the price.",
       pauseAfter: 0.6,
     },
     {

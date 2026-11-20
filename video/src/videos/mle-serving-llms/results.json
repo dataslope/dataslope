@@ -283,7 +283,7 @@
     },
     {
       "beat": "q4-bytes",
-      "words": "a quarter of the bytes",
+      "words": "a quarter of the weight bytes",
       "means": 0.25
     },
     {
