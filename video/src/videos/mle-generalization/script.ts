@@ -368,7 +368,7 @@ export const script: NarrationScript = {
     },
     {
       id: "under-line",
-      text: "A straight line on the same data meets its validation curve within a few hundred rows, both near seven, and more rows won't move it.",
+      text: "A straight line on the same data has two curves that meet within a few hundred rows, both near seven, and more rows won't move them.",
       pauseAfter: 0.6,
     },
     {
@@ -522,7 +522,7 @@ export const script: NarrationScript = {
     },
     {
       id: "auc-fraud",
-      text: "The fraud model's is point nine one, which sounds strong. But the false positive rate divides by ninety-nine thousand legitimate transactions. At one percent, that's a thousand false alarms, nearly twice the frauds caught.",
+      text: "The fraud model's area is point nine one, which sounds strong. But the false positive rate divides by ninety-nine thousand legitimate transactions. At one percent, that's a thousand false alarms, nearly twice the frauds caught.",
       pauseAfter: 0.7,
     },
     {

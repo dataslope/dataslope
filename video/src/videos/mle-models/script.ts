@@ -145,7 +145,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   scale: question card; the customers' raw axes, age 20 to 70 years and
  *     income 20,000 to 150,000 dollars, drawn to scale: a flat smear.
  *   scale-knn: three bars, raw 74.5% (red), income alone 74.5% (ink),
- *     standardized 89.1% (green).
+ *     standardized 89.1% (green); under them, "50 years of age = 50 dollars of
+ *     distance" on "whole span" (ages run 20 to 70).
  *   scale-gd: the coins spot; "× 100 on one column": steps to settle, 8
  *     against 79,315 (scale.asIs, scale.times100), the second in red.
  *   scale-prod: "Needs it: distances, penalties, gradients · Trees: no", then
@@ -464,7 +465,7 @@ export const script: NarrationScript = {
     },
     {
       id: "scale-knn",
-      text: "Unscaled, kNN scores seventy-four and a half percent, exactly what income alone scores: next to a dollar, a year is nothing. Standardized, eighty-nine.",
+      text: "Unscaled, kNN scores seventy-four and a half percent, exactly what income alone scores: in raw distance, the whole span of ages counts for no more than fifty dollars. Standardized, eighty-nine.",
       pauseAfter: 0.7,
     },
     {
