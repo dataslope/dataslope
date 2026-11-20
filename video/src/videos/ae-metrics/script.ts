@@ -6,9 +6,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Analytics Engineer interview prep videos
  * (agent-outputs/20261120-1200-analytics-engineer-interview-video-plan.md,
  * "8, Metrics and the semantic layer"), after
- * content/interview/analytics-engineer/metrics-and-semantic-layer.mdx, all 18
- * questions. Eight are worked through, numbered aloud and read in the page's
- * words; ten go quickly at the end, read the same way.
+ * content/interview/analytics-engineer/metrics-and-semantic-layer.mdx, all 19
+ * questions (the 2026-11-20 review of the page added "Where else can a
+ * semantic layer live?"). Eight are worked through, numbered aloud and read
+ * in the page's words; eleven go quickly at the end, read the same way.
  *
  *   1. "What causes two dashboards to report different numbers for the same
  *      metric?" ("disagree"), first because the opening asks it.
@@ -31,8 +32,19 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   what a metric definition contains; 15 additive, semi-additive and
  *   non-additive metrics; 16 governance; 17 cumulative or time-window
  *   metrics; 18 a wide, pre-joined mart against querying through a semantic
- *   layer.
- *   All 18 answered; none left out.
+ *   layer; 19 where else a semantic layer can live (in the warehouse:
+ *   Snowflake's semantic views, Databricks' metric views; portability;
+ *   Apache Ossie, begun as the Open Semantic Interchange).
+ *   All 19 answered; none left out.
+ *
+ * After the page's review (#746): the MetricFlow listing is the current
+ * spec (entities and dimensions on the model's columns, a simple metric with
+ * its own agg, expr and filter; measures deprecated since dbt 1.12), so
+ * r-metricflow says "declared in the YAML of the dbt model they describe"
+ * (r-metricflow-yaml, voiced alone; its two neighbours cut from the take),
+ * and entities-dbt adds the page's new clause: the entities, dimensions and
+ * measures triad is LookML's and the original MetricFlow spec's, and dbt now
+ * folds the measure into a simple metric.
  *
  * Opening: the plan's bridge from Part 7 (every test passes and two
  * dashboards still disagree), on the page's own twelve orders: one dashboard
@@ -119,14 +131,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the division after both. ratio-week: a week's days summed into the two
  *     boxes, then one division. ratio-limit: two parts with different
  *     filters, joined by a red "≠".
- *   rapid-in: the RapidFire list, 9 to 18, each item lit as it is read.
- *     r-metricflow: the page's MetricFlow YAML (completed_revenue, its
- *     measure in yellow). r-lookml: two boxes, "view: dimensions, measures"
- *     and "explore: joins" (no code: the page shows none). r-measure: SUM(amount)
- *     against "completed revenue". r-additive: three rows (revenue, a
+ *   rapid-in: the RapidFire list, 9 to 19, each item lit as it is read.
+ *     r-metricflow: three contiguous slices of the page's
+ *     MetricFlow YAML (the order entity, the status dimension, the metrics
+ *     block with completed_revenue, its agg and expr lit) under the model's
+ *     name, then request, MetricFlow, warehouse SQL. r-lookml: two boxes,
+ *     "view: dimensions, measures" and "explore: joins" (no code: the page
+ *     shows none). r-measure: SUM(amount) against "completed revenue". r-additive: three rows (revenue, a
  *     balance, a ratio), ticks across dimensions and time. r-cumulative: a
  *     28-day window sliding along a day axis. r-governance: the five parts
- *     ticked, the rubber-stamp spot on "certification".
+ *     ticked, the rubber-stamp spot on "certification". r-where: Snowflake
+ *     and Databricks as two boxes, a red arrow between them crossed out
+ *     (portability), then Apache Ossie in green.
  *   next: the list complete; the pelican back; NextLine "Next: AI and the
  *     semantic layer".
  *
