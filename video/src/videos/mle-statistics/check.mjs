@@ -351,7 +351,8 @@ const quotes = [
   "maximizing the log-likelihood of the labels *is* the training\nobjective",
   "can overfit\nsmall samples",
   // "q12"
-  "with a rare condition, even a\nvery accurate test yields a low posterior",
+  "with a rare condition, even a\nvery accurate test leaves a low posterior probability",
+  "the p-value is computed *assuming* the\nnull, so it cannot be a probability *of* the null",
   // the quick round
   "$P(X = x) = 0$\nfor any single point",
   "a density\nis free to go above 1",

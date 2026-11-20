@@ -290,6 +290,16 @@
       "means": 1.4
     },
     {
+      "beat": "q9-conv",
+      "words": "Under point one is called stable",
+      "means": 0.1
+    },
+    {
+      "beat": "q9-conv",
+      "words": "over point two five needs action",
+      "means": 0.25
+    },
+    {
       "beat": "q9-noise",
       "words": "a window of a hundred values scores over point one almost half the time",
       "means": 1
@@ -316,8 +326,18 @@
     },
     {
       "beat": "q9-edges",
+      "words": "closed edges read point oh three, stable",
+      "means": 1
+    },
+    {
+      "beat": "q9-open",
       "words": "Open ones read point two five",
       "means": 0.25
+    },
+    {
+      "beat": "q9-open",
+      "words": "right at the line for action",
+      "means": 1
     },
     {
       "beat": "q11-canary",

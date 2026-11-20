@@ -213,7 +213,7 @@ export const SkewScene: React.FC = () => {
             />
             {/* The two counts, as brackets under the dots. */}
             {[
-              { at: warehouseAt + 10, x1: DOTS[0] - 18, x2: NOW_X + 18, yy: y(500) },
+              { at: includesAt, x1: DOTS[0] - 18, x2: NOW_X + 18, yy: y(500) },
               { at: servingAt + 6, x1: DOTS[0] - 18, x2: DOTS[3] + 18, yy: y(596) },
             ].map((b, i) => {
               const p = ease(frame, b.at, 14);
@@ -242,8 +242,11 @@ export const SkewScene: React.FC = () => {
               {frame < includesAt ? "this one" : <Mark at={includesAt}>counts itself</Mark>}
             </span>
           </Ink>
-          <Line at={warehouseAt + 14} x={RX} y={y(500) + h(18)} size={22}>
-            Training, from the warehouse: <b><Num>{DOTS.length + 1}</Num></b>
+          <Line at={warehouseAt + 6} x={RX} y={y(500) + h(18)} size={22}>
+            Training, from the warehouse
+            <b style={{ opacity: ease(frame, includesAt + 8, 10) }}>
+              : <Num>{DOTS.length + 1}</Num>
+            </b>
           </Line>
           <Line at={servingAt + 10} x={RX} y={y(596) + h(18)} size={22}>
             Serving path: <b style={{ color: ACCENT_INK }}><Num>{DOTS.length}</Num></b>

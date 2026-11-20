@@ -7,7 +7,7 @@ import { label } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
-import { ACCENT, ACCENT_INK, Drift, GOLD, INK, INK_SOFT, Line, Mark, pulse, Q_SIZE, QUIET, Svg, X0 } from "./parts";
+import { ACCENT, ACCENT_INK, Drift, GOLD, INK, INK_SOFT, lerp, Line, Mark, pulse, Q_SIZE, QUIET, Svg, X0 } from "./parts";
 
 const FRAME = { x: X0, w: 1380 };
 const PAD = 6;
@@ -36,6 +36,11 @@ export const WindowScene: React.FC = () => {
   const longerAt = n.word("q9-a", "a longer one costs more");
   const pastAt = n.word("q9-a", "anything past the limit");
   const invisAt = n.word("q9-a", "is invisible");
+  const windowAt = n.word("q9-rag", "big enough for every document");
+  const retireAt = n.word("q9-rag", "doesn't retire retrieval");
+  const paidAt = n.word("q9-rag", "every prompt token");
+  const worseAt = n.word("q9-rag", "answers tend to get worse");
+  const looseAt = n.word("q9-rag", "loosely relevant text");
   const shapeAt = n.word("train-in", "the shape");
   const learnsAt = n.word("train-in", "how it learns");
   const end = n.beat("train-in").to;
@@ -56,6 +61,17 @@ export const WindowScene: React.FC = () => {
     return { ...s, x, px: s.w * inner };
   });
   const over = { x: FRAME.x + FRAME.w + 10, w: 300 };
+  // A window big enough for everything: it widens over what did not fit, and
+  // the answer moves to its new end.
+  const wide = ease(frame, windowAt, 24);
+  const frameW = FRAME.w + wide * (over.w + 14);
+  const ans = segs[3];
+  const ansX = lerp(ans.x, FRAME.x + frameW - PAD - (ans.px - 4), wide);
+  const overX = lerp(over.x, ans.x, wide);
+  const overW = lerp(over.w, ans.px - 4, wide);
+  const edge = FRAME.x + frameW + 4;
+  const loose = ease(frame, looseAt, 16);
+  const worse = ease(frame, worseAt, 14);
   const squeeze = 1 - 0.04 * Math.sin(Math.min(1, Math.max(0, (frame - competeAt) / 24)) * Math.PI);
 
   return (
@@ -66,6 +82,8 @@ export const WindowScene: React.FC = () => {
       <Sfx name="el-tap" at={histAt} level={-32} />
       <Sfx name="el-whoosh" at={pastAt} level={-36} />
       <Sfx name="el-tap" at={invisAt} level={-30} />
+      <Sfx name="el-whoosh" at={windowAt} level={-36} />
+      <Sfx name="el-tap" at={worseAt} level={-32} />
 
       <Drift from={from} to={end + 40} scale={0.014}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE}>
@@ -81,14 +99,16 @@ export const WindowScene: React.FC = () => {
           {segs.map((s) => {
             const p = ease(frame, s.at, 16);
             if (p <= 0) return null;
-            return <rect key={s.text} x={s.x} y={top + PAD} width={Math.max(0, s.px * p * squeeze - 4)} height={H - 2 * PAD} rx={4} fill={s.fill} />;
+            const isAns = s === ans;
+            const fill = isAns && worse > 0 ? `color-mix(in srgb, ${ds("red", 200)} ${worse * 100}%, ${s.fill})` : s.fill;
+            return <rect key={s.text} x={isAns ? ansX : s.x} y={top + PAD} width={Math.max(0, s.px * p * squeeze - 4)} height={H - 2 * PAD} rx={4} fill={fill} />;
           })}
           {/* What does not fit: past the edge, grayed out. */}
-          {ease(frame, pastAt, 14) > 0 ? <rect x={over.x} y={top + PAD} width={over.w * ease(frame, pastAt, 18)} height={H - 2 * PAD} rx={4} fill={QUIET} /> : null}
+          {ease(frame, pastAt, 14) > 0 ? <rect x={overX} y={top + PAD} width={overW * ease(frame, pastAt, 18)} height={H - 2 * PAD} rx={4} fill={loose > 0 ? `color-mix(in srgb, ${ds("blue", 100)} ${loose * 100}%, ${QUIET})` : QUIET} /> : null}
           <rect
             x={FRAME.x}
             y={top}
-            width={FRAME.w}
+            width={frameW}
             height={H}
             rx={8}
             fill="none"
@@ -97,7 +117,7 @@ export const WindowScene: React.FC = () => {
             opacity={ease(frame, mostAt + 4, 14)}
           />
           {ease(frame, pastAt + 6, 10) > 0 ? (
-            <line x1={FRAME.x + FRAME.w + 4} x2={FRAME.x + FRAME.w + 4} y1={top - h(26)} y2={top + H + h(26)} stroke={ACCENT} strokeWidth={3 + 3 * pulse(frame, learnsAt, 30)} opacity={ease(frame, pastAt + 6, 10)} />
+            <line x1={edge} x2={edge} y1={top - h(26)} y2={top + H + h(26)} stroke={ACCENT} strokeWidth={3 + 3 * pulse(frame, learnsAt, 30)} opacity={ease(frame, pastAt + 6, 10)} />
           ) : null}
         </Svg>
         {segs.map((s) => (
@@ -105,7 +125,7 @@ export const WindowScene: React.FC = () => {
             key={s.text}
             style={{
               position: "absolute",
-              left: s.x + 6,
+              left: (s === ans ? ansX : s.x) + 6,
               top: top - h(40),
               ...label(22, INK),
               fontWeight: 500,
@@ -116,29 +136,29 @@ export const WindowScene: React.FC = () => {
             {s.text}
           </div>
         ))}
-        <div style={{ position: "absolute", left: over.x + 6, top: top - h(40), ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, pastAt + 4, 12) }}>
+        <div style={{ position: "absolute", left: overX + 6, top: top - h(40), ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, pastAt + 4, 12) }}>
           more documents
         </div>
-        <div style={{ position: "absolute", left: over.x + 6, top: top + H + h(18), ...label(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, invisAt, 12) }}>
+        <div style={{ position: "absolute", left: over.x + 6, top: top + H + h(18), ...label(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, invisAt, 12) * (1 - wide) }}>
           invisible
         </div>
-        <div style={{ position: "absolute", left: FRAME.x + FRAME.w - 146, top: top - h(78), width: 150, textAlign: "right", ...label(21, ACCENT_INK), fontWeight: 500, opacity: ease(frame, pastAt + 8, 12) }}>
+        <div style={{ position: "absolute", left: edge - 150, top: top - h(78), width: 150, textAlign: "right", ...label(21, ACCENT_INK), fontWeight: 500, opacity: ease(frame, pastAt + 8, 12) }}>
           the limit
         </div>
 
         {/* Prompt and output, bracketed under the window. */}
         <Svg opacity={ease(frame, promptAt + 8, 14)}>
           {[
-            [segs[0].x, segs[2].x + segs[2].px - 8],
-            [segs[3].x, segs[3].x + segs[3].px - 8],
+            [segs[0].x, lerp(segs[2].x + segs[2].px - 8, overX + overW - 4, wide)],
+            [ansX, ansX + ans.px - 8],
           ].map(([a, b], i) => (
             <path key={i} d={`M${a},${top + H + h(14)} L${a},${top + H + h(26)} L${b},${top + H + h(26)} L${b},${top + H + h(14)}`} fill="none" stroke={INK_SOFT} strokeWidth={2} />
           ))}
         </Svg>
-        <Line at={promptAt + 10} x={(segs[0].x + segs[2].x + segs[2].px) / 2} y={top + H + h(36)} size={22} align="center" width={200} color={INK_SOFT}>
+        <Line at={promptAt + 10} x={(segs[0].x + lerp(segs[2].x + segs[2].px, overX + overW, wide)) / 2} y={top + H + h(36)} size={22} align="center" width={200} color={INK_SOFT}>
           prompt
         </Line>
-        <Line at={promptAt + 14} x={segs[3].x + segs[3].px / 2} y={top + H + h(36)} size={22} align="center" width={200} color={INK_SOFT}>
+        <Line at={promptAt + 14} x={ansX + ans.px / 2} y={top + H + h(36)} size={22} align="center" width={200} color={INK_SOFT}>
           output
         </Line>
 
@@ -147,6 +167,17 @@ export const WindowScene: React.FC = () => {
         </Line>
         <Line at={longerAt} x={X0} y={y(736)} size={26}>
           A longer window <Mark at={longerAt + 8}>costs more</Mark>
+        </Line>
+
+        {/* A window big enough for everything still doesn't retire retrieval. */}
+        <Line at={retireAt} x={X0} y={y(800)} size={26} weight={600}>
+          Big enough for everything, it still doesn&apos;t retire retrieval:
+        </Line>
+        <Line at={paidAt} x={X0 + 30} y={y(846)} size={24}>
+          every prompt token is paid for on every request
+        </Line>
+        <Line at={worseAt} x={X0 + 30} y={y(886)} size={24} color={ACCENT_INK}>
+          answers tend to get worse as loosely relevant text fills it
         </Line>
 
       </Drift>

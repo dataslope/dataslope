@@ -79,9 +79,9 @@ export const PsiScene: React.FC = () => {
   const logAt = n.word("q9-how", "the log of their ratio");
   const slightAt = n.word("q9-example", "a slight shift scores point oh one");
   const largeAt = n.word("q9-example", "a large one, one point four");
-  const stableAt = n.word("q9-example", "Under point one is called stable");
-  const actionAt = n.word("q9-example", "over point two needs action");
-  const convAt = n.word("q9-example", "those are conventions");
+  const stableAt = n.word("q9-conv", "Under point one is called stable");
+  const actionAt = n.word("q9-conv", "over point two five needs action");
+  const convAt = n.word("q9-conv", "those are conventions");
   const lateAt = n.word("q9-labels", "With labels late");
   const ksAt = n.word("q9-labels", "PSI or a Kolmogorov-Smirnov test");
   const inputAt = n.word("q9-labels", "on each input");
@@ -106,8 +106,9 @@ export const PsiScene: React.FC = () => {
   const fifthAt = n.word("q9-edges", "Simulate a fifth of values");
   const closedAt = n.word("q9-edges", "closed edges read point oh three");
   const stableEAt = n.word("q9-edges", "stable");
-  const openReadAt = n.word("q9-edges", "Open ones read point two five");
-  const end = n.beat("q9-edges").to;
+  const openReadAt = n.word("q9-open", "Open ones read point two five");
+  const atLineAt = n.word("q9-open", "right at the line for action");
+  const end = n.beat("q9-open").to;
 
   // ── A and B: the buckets and the formula ──
   const chart = { x: X0 + 10, top: y(420), w: 720, h: h(220) };
@@ -119,8 +120,13 @@ export const PsiScene: React.FC = () => {
     const s = PSI.stableShares[i];
     return lerp(lerp(d, s, toSlight), d, toLarge);
   });
+  // The pages' two conventions (below 0.1 stable, above 0.25 action, since
+  // #746) on a scale to 0.4, so the action band reads as more than a sliver.
+  const STABLE = 0.1;
+  const ACTION = 0.25;
+  const TOP = 0.4;
   const scale = { x: RIGHT_X + 20, w: 680, top: y(650) };
-  const sx = (v: number) => scale.x + (v / 0.3) * scale.w;
+  const sx = (v: number) => scale.x + (v / TOP) * scale.w;
 
   // ── D: the noise ──
   const noise100 = PSI_NOISE.bySize["100"];
@@ -200,21 +206,21 @@ export const PsiScene: React.FC = () => {
           </Line>
           <Svg opacity={ease(frame, stableAt - 4, 10)}>
             <line x1={scale.x} x2={scale.x + scale.w} y1={scale.top} y2={scale.top} stroke={INK_SOFT} strokeWidth={1.6} />
-            {[0, 0.1, 0.2, 0.3].map((v) => (
+            {[0, STABLE, ACTION, TOP].map((v) => (
               <React.Fragment key={v}>
                 <line x1={sx(v)} x2={sx(v)} y1={scale.top - 8} y2={scale.top + 8} stroke={INK_SOFT} strokeWidth={1.6} />
                 <text x={sx(v)} y={scale.top + 34} textAnchor="middle" style={svgText(label(21, INK_SOFT))}>
-                  {v === 0 ? "0" : v.toFixed(1)}
+                  {v === 0 ? "0" : String(v)}
                 </text>
               </React.Fragment>
             ))}
-            <rect x={sx(0)} y={scale.top - 5} width={(sx(0.1) - sx(0)) * ease(frame, stableAt, 14)} height={10} rx={3} fill={BLOCK_SOFT} />
-            <rect x={sx(0.2)} y={scale.top - 5} width={(sx(0.3) - sx(0.2)) * ease(frame, actionAt, 14)} height={10} rx={3} fill={ACCENT} opacity={0.75} />
+            <rect x={sx(0)} y={scale.top - 5} width={(sx(STABLE) - sx(0)) * ease(frame, stableAt, 14)} height={10} rx={3} fill={BLOCK_SOFT} />
+            <rect x={sx(ACTION)} y={scale.top - 5} width={(sx(TOP) - sx(ACTION)) * ease(frame, actionAt, 14)} height={10} rx={3} fill={ACCENT} opacity={0.75} />
           </Svg>
-          <Line at={stableAt} x={(sx(0) + sx(0.1)) / 2} width={220} align="center" y={scale.top - h(46)} size={21} color={INK}>
+          <Line at={stableAt} x={(sx(0) + sx(STABLE)) / 2} width={220} align="center" y={scale.top - h(46)} size={21} color={INK}>
             stable
           </Line>
-          <Line at={actionAt} x={(sx(0.2) + sx(0.3)) / 2} width={220} align="center" y={scale.top - h(46)} size={21} color={ACCENT_INK}>
+          <Line at={actionAt} x={(sx(ACTION) + sx(TOP)) / 2} width={220} align="center" y={scale.top - h(46)} size={21} color={ACCENT_INK}>
             needs action
           </Line>
           <Line at={convAt - 2} x={RIGHT_X} y={scale.top + h(64)} size={23} color={YELLOW_INK}>
@@ -372,6 +378,9 @@ export const PsiScene: React.FC = () => {
           </Line>
           <Line at={openReadAt - 2} x={1390} y={y(500) + h(50)} size={26} color={OK_INK}>
             Open edges: <b><Num>{PSI_EDGES.open.toFixed(2)}</Num></b>
+          </Line>
+          <Line at={atLineAt - 2} x={1390} y={y(500) + h(96)} size={23} color={INK}>
+            right at the action line, <Num>{ACTION}</Num>
           </Line>
         </Phase>
       </Drift>

@@ -461,7 +461,8 @@ export const RapidScene: React.FC = () => {
 
   const from = n.beat("rapid-in").from;
   const sixAt = n.word("rapid-in", "Six more");
-  const end = n.beat("r-scale").to + 20;
+  // The last answer stays up until the cut into the close.
+  const end = n.beat("close").from - 2;
 
   const items: RapidItem[] = [
     { n: 12, label: "Online and offline features", at: n.word("r-features", "Offline features are computed"), body: <Features c={c} /> },

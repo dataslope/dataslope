@@ -320,8 +320,10 @@ export const RecScene: React.FC = () => {
             <span style={{ ...label(20, INK_SOFT), marginRight: 18 }}>interaction</span>
             <span style={{ width: 20, height: 20, borderRadius: 4, background: ds("blue", 200), display: "inline-block" }} />
             <span style={{ ...label(20, INK_SOFT) }}>fallback guess</span>
-            <span style={{ width: 20, height: 20, borderRadius: 4, background: OK, display: "inline-block", marginLeft: 18, opacity: ease(frame, purposeAt, 10) }} />
-            <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, purposeAt, 10) }}>shown on purpose</span>
+          </Ink>
+          <Ink at={purposeAt} dur={12} style={{ left: GRID.x, top: gy(GRID.users) + h(56) + 36, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 10, fontSize: 20 }}>
+            <span style={{ width: 20, height: 20, borderRadius: 4, background: OK, display: "inline-block" }} />
+            <span style={{ ...label(20, INK_SOFT) }}>shown on purpose</span>
           </Ink>
         </Fade>
       </Drift>

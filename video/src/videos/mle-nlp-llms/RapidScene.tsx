@@ -134,12 +134,14 @@ const Halluc: React.FC<{ c: Ctx }> = ({ c }) => {
 const Prompting: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const steersAt = c.w("r-prompt", "steers a frozen model");
-  const zeroAt = c.w("r-prompt", "Zero-shot describes the task");
-  const fewAt = c.w("r-prompt", "few-shot adds worked examples");
-  const cotAt = c.w("r-prompt", "chain-of-thought asks");
-  const multiAt = c.w("r-prompt", "multi-step problems");
-  const cheapAt = c.w("r-prompt", "the cheapest lever");
-  const beforeAt = c.w("r-prompt", "try it before fine-tuning");
+  const zeroAt = c.w("r-prompt-kinds", "Zero-shot describes the task");
+  const fewAt = c.w("r-prompt-kinds", "few-shot adds worked examples");
+  const cotAt = c.w("r-prompt-kinds", "chain-of-thought asks");
+  const multiAt = c.w("r-prompt-kinds", "multi-step problems");
+  const reasonsAt = c.w("r-prompt-kinds", "a model that already reasons");
+  const latencyAt = c.w("r-prompt-kinds", "tokens and latency");
+  const cheapAt = c.w("r-prompt-cheap", "the cheapest lever");
+  const beforeAt = c.w("r-prompt-cheap", "try it before fine-tuning");
   const CX = [R_X, R_X + 330, R_X + 660];
   const top = c.y(500);
   const bar = (x: number, yy: number, w: number, fill: string, at: number, key: string) => {
@@ -194,6 +196,12 @@ const Prompting: React.FC<{ c: Ctx }> = ({ c }) => {
       </div>
       <Line at={multiAt} x={CX[2]} y={top + 4 * step + c.h(46)} size={21} color={OK_INK}>
         Helps on multi-step problems
+      </Line>
+      <Line at={reasonsAt} x={CX[2]} y={top + 4 * step + c.h(80)} size={21} color={ACCENT_INK}>
+        Reasoning models: little gain,
+      </Line>
+      <Line at={latencyAt} x={CX[2]} y={top + 4 * step + c.h(110)} size={21} color={ACCENT_INK}>
+        just tokens and latency
       </Line>
       <Line at={cheapAt} x={R_X} y={c.y(780)} size={26} weight={600}>
         <Mark at={cheapAt + 6}>The cheapest lever:</Mark>

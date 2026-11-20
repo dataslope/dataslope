@@ -56,7 +56,7 @@ export const NormScene: React.FC = () => {
   const end = n.beat("opt-in").to;
 
   const rows = [
-    { title: "A mini-batch", more: ": seven brighter at this pixel", moreAt: brighterAt, ids: NORM.brightBatch, vals: NORM.brightValues, top: y(400), at: acrossAt - 6, bn: NORM.bnBright, bnAt: minusAt, bnInk: INK },
+    { title: "A mini-batch", more: ": seven brighter at this pixel", moreAt: brighterAt, ids: NORM.brightBatch, vals: NORM.brightValues, top: y(400), at: shiftsAt + 6, bn: NORM.bnBright, bnAt: minusAt, bnInk: INK },
     { title: "Another", more: ": seven darker", moreAt: darkerAt, ids: NORM.darkBatch, vals: NORM.darkValues, top: y(580), at: neighborsAt, bn: NORM.bnDark, bnAt: plusAt, bnInk: INK },
     { title: "Alone", more: "", moreAt: oneAt, ids: [NORM.image], vals: [NORM.value], top: y(760), at: oneAt, bn: NORM.bnAlone, bnAt: zeroAt, bnInk: ACCENT_INK },
   ];

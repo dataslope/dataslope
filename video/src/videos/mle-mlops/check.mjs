@@ -381,7 +381,9 @@ const aloud = script.beats
   .filter(Boolean)
   .flatMap((m) => [m[1], m[2]].filter(Boolean));
 if (aloud.join() !== WORDS.join()) problems.push(`the questions read aloud are ${aloud.join(", ")}`);
-const quick = script.beats.filter((b) => b.id.startsWith("r-")).length;
+// One answer per question; a beat split at a sentence break (r-registry-promo)
+// continues its answer.
+const quick = new Set(script.beats.filter((b) => b.id.startsWith("r-")).map((b) => b.id.split("-").slice(0, 2).join("-"))).size;
 if (quick !== 5) problems.push(`the quick round has ${quick} answers, not five`);
 if (!beat("plan").includes("Twelve questions are worked through here, and five go quickly")) problems.push("plan: the count changed");
 R.said = said.map(([beatId, words, means]) => ({ beat: beatId, words, means }));

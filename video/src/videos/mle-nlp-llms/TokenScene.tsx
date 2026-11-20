@@ -78,9 +78,9 @@ export const TokenScene: React.FC = () => {
   const subAt = n.word("q1-sub", "Subwords split the difference");
   const freqAt = n.word("q1-sub", "frequent words stay whole");
   const rareAt = n.word("q1-sub", "rare ones break");
-  const prodAt = n.word("q1-sub", "two hundred thousand pieces");
-  const cutsAt = n.word("q1-sub", "cuts hallucination in two");
-  const avgAt = n.word("q1-sub", "one point four");
+  const prodAt = n.word("q1-piece", "two hundred thousand pieces");
+  const cutsAt = n.word("q1-piece", "the word hallucination");
+  const avgAt = n.word("q1-piece", "one point four");
   const priceAt = n.word("q1-cost", "has a price too");
   const rowAt = n.word("q1-cost", "a row of the embedding table");
   const widthAt = n.word("q1-cost", "a width of four thousand");

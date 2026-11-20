@@ -213,7 +213,7 @@ export const BootScene: React.FC = () => {
 
         {/* ── Right: a p95 with no formula ── */}
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, out, 12) }}>
-          <ColumnRule x={(DISC_X0 + 10 * DISC_PITCH + 90 + R_X0) / 2} top={y(286)} height={y(880) - y(286)} at={latAt} />
+          <ColumnRule x={(DISC_X0 + 10 * DISC_PITCH + 90 + R_X0) / 2} top={y(286)} height={y(880) - y(286)} at={thousandsAt} />
           <Heading at={latAt} x={R_X0} y={y(286)}>
             <Num>1,000</Num> simulated request latencies
           </Heading>

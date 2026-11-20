@@ -31,7 +31,7 @@ const P = ({ children }: { children: React.ReactNode }) => (
 export const BayesScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y } = useLayout();
+  const { y, h } = useLayout();
 
   const from = n.beat("q12").from;
   const qAt = n.word("q12", "Question twelve");
@@ -55,6 +55,7 @@ export const BayesScene: React.FC = () => {
   const end = n.beat("q12-shift").to;
 
   const bottom = y(820);
+  const rise = ease(frame, sayAt - 14, 22);
   const grids = [
     { f: BAYES.rare, x: X0, fraudAt: fraudsAt, honestAt, at: thousandAt, resultAt: nineAt, head: "Base rate: 1 in 1,000 is fraud" },
     { f: BAYES.common, x: R_X0, fraudAt: risesAt + 10, honestAt: risesAt + 22, at: risesAt, resultAt: halfAt, head: "Base rate: 1 in 100 is fraud" },
@@ -76,7 +77,16 @@ export const BayesScene: React.FC = () => {
           What is Bayes&apos; theorem?
         </QuestionCard>
 
-        {/* ── The theorem ── */}
+        {/* ── The theorem: lower and larger while it is alone on the page,
+            rising to the top as the fraud example starts ── */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            transform: `translateY(${(1 - rise) * h(150)}px) scale(${1 + 0.18 * (1 - rise)})`,
+            transformOrigin: `${X0}px ${y(276)}px`,
+          }}
+        >
         <Line at={updatesAt} x={X0} y={y(276)} size={28} color={INK_SOFT}>
           It updates a prior belief with evidence
         </Line>
@@ -107,6 +117,7 @@ export const BayesScene: React.FC = () => {
             </MathRun>
           </span>
         </Ink>
+        </div>
 
         {/* ── Precision and recall, top right ── */}
         <Line at={precisionAt} x={R_X0} y={y(282)} size={28} weight={600}>

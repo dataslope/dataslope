@@ -207,6 +207,9 @@ const quotes = [
   "With the standard acceptance\nrule the output distribution is unchanged",
   "it helps most on predictable text",
   "prefix caching for a shared system prompt, routing\neasy requests to a smaller model, distilling a large model into a small one for\na narrow task, and streaming to cut perceived latency",
+  // r-reason: the reasoning budget, added to the page by #746.
+  "the **reasoning budget** is a lever\nof its own",
+  "so they are decode time the user waits through before the first\nvisible token. Spend them on the requests that need them.",
   // q1-follow: the first concept check and its explanations.
   "takes several seconds before any text appears, although answers then stream quickly",
   "Prefix caching and shorter prompts cut it directly",

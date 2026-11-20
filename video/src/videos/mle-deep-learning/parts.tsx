@@ -492,18 +492,12 @@ export const tickStyle = (size = 20, color: string = INK_SOFT): React.CSSPropert
   ...TABULAR,
 });
 
-/** A power of ten as SVG text: "10" with the exponent raised, a true minus. */
-export const Pow10: React.FC<{ e: number; size?: number }> = ({ e, size = 20 }) =>
-  e === 0 ? (
-    <>1</>
-  ) : (
-    <>
-      10
-      <tspan dy={-size * 0.4} style={{ fontSize: size * 0.72 }}>
-        {e < 0 ? `−${-e}` : e}
-      </tspan>
-    </>
-  );
+/** A power of ten as tick text: "10" and the exponent in Unicode
+ *  superscripts, one run in one size (a smaller tspan reads as a second size
+ *  on the line, and falls under the 19px floor). */
+const SUPERS: Record<string, string> = { "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹", "-": "⁻" };
+export const pow10 = (e: number) => (e === 0 ? "1" : `10${String(e).split("").map((c) => SUPERS[c]).join("")}`);
+export const Pow10: React.FC<{ e: number }> = ({ e }) => <>{pow10(e)}</>;
 
 // ── The spot art ─────────────────────────────────────────────────────────────
 

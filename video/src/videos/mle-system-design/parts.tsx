@@ -378,10 +378,12 @@ export const Cross: React.FC<{ at: number; size?: number; color?: string }> = ({
   const frame = useCurrentFrame();
   const a = ease(frame, at, 7);
   const b = ease(frame, at + 5, 7);
+  // A zero-length dash with a round cap still paints a dot: draw nothing
+  // until the stroke starts.
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: "block", overflow: "visible" }}>
+    <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: "block", overflow: "visible", opacity: a > 0 ? 1 : 0 }}>
       <path d="M6 6 L18 18" fill="none" stroke={color} strokeWidth={3.2} strokeLinecap="round" pathLength={1} strokeDasharray={`${a} 1`} />
-      <path d="M18 6 L6 18" fill="none" stroke={color} strokeWidth={3.2} strokeLinecap="round" pathLength={1} strokeDasharray={`${b} 1`} />
+      <path d="M18 6 L6 18" fill="none" stroke={color} strokeWidth={3.2} strokeLinecap="round" pathLength={1} strokeDasharray={`${b} 1`} opacity={b > 0 ? 1 : 0} />
     </svg>
   );
 };

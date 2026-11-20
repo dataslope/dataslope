@@ -1,13 +1,45 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
+import { ease, pop } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { M } from "../../editorial/math";
+import { label } from "../../editorial/style";
 import { ColumnRule } from "../../editorial/ui";
+import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BAR, Box, Chip, DATA_DEEP, Drift, Flow, Grid, INK, INK_SOFT, Line, Q_SIZE, Svg } from "./parts";
+
+/** A numbered marker: a gold disc with its numeral, no ring, centred on (x, y). */
+const Disc: React.FC<{ x: number; y: number; k: number; at: number }> = ({ x, y, k, at }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const p = pop(frame, at, fps, 12);
+  if (p <= 0.001) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x - 15,
+        top: y - 15,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        background: ds("yellow", 300),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        ...label(20, INK),
+        fontWeight: 700,
+        transform: `scale(${Math.min(1.15, p)})`,
+        opacity: Math.min(1, p),
+      }}
+    >
+      {k}
+    </div>
+  );
+};
 
 /** The block, in the layout's coordinates: boxes from the top down. */
 const BX = 220;
@@ -47,7 +79,11 @@ export const BlockScene: React.FC = () => {
   const edAt = n.word("q6-kinds", "Encoder-decoder models");
   const t5At = n.word("q6-kinds", "like T5");
   const seqAt = n.word("q6-kinds", "turn one sequence into another");
-  const end = n.beat("q6-kinds").to;
+  const modernAt = n.word("q6-modern", "Today's LLMs keep that skeleton");
+  const preAt = n.word("q6-modern", "the norm before each sub-layer");
+  const rotaryAt = n.word("q6-modern", "rotary embeddings");
+  const gatedAt = n.word("q6-modern", "a gated activation");
+  const end = n.beat("q6-modern").to;
 
   // Boxes, top to bottom.
   const B = {
@@ -77,6 +113,9 @@ export const BlockScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={bothAt} level={-34} />
       <Sfx name="el-sprinkle" at={maskAt} level={-34} />
       <Sfx name="el-sprinkle" at={seqAt} level={-34} />
+      <Sfx name="el-tap" at={preAt + 6} level={-32} />
+      <Sfx name="el-tap" at={rotaryAt + 6} level={-32} />
+      <Sfx name="el-tap" at={gatedAt + 6} level={-32} />
 
       <Drift from={from} to={end + 40} scale={0.014}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE}>
@@ -171,8 +210,8 @@ export const BlockScene: React.FC = () => {
         </Svg>
 
         {/* The three kinds, by what each position may attend to. */}
-        <ColumnRule x={(COLS[0] + COL_W + COLS[1]) / 2 - 6} top={y(330)} height={h(420)} at={decAt} />
-        <ColumnRule x={(COLS[1] + COL_W + COLS[2]) / 2 - 6} top={y(330)} height={h(420)} at={edAt} />
+        <ColumnRule x={(COLS[0] + COL_W + COLS[1]) / 2 - 6} top={y(330)} height={h(378)} at={decAt} />
+        <ColumnRule x={(COLS[1] + COL_W + COLS[2]) / 2 - 6} top={y(330)} height={h(378)} at={edAt} />
         {[
           { title: "Encoder-only", model: "BERT", at: encAt, modelAt: bertAt, lines: ["Attends both ways,", "for understanding"] },
           { title: "Decoder-only", model: "GPT", at: decAt, modelAt: gptAt, lines: ["Masks the future,", "for generation"] },
@@ -203,6 +242,27 @@ export const BlockScene: React.FC = () => {
         <Line at={seqAt + 12} x={COLS[2] + 144} y={mTop + 145} size={20} color={INK_SOFT} align="center" width={100}>
           decoder
         </Line>
+
+        {/* Today's LLMs: the same skeleton, three changes, each numbered on the block. */}
+        <Line at={modernAt} x={COLS[0]} y={y(732)} size={24} weight={600}>
+          Today&apos;s LLMs keep the skeleton, with three changes
+        </Line>
+        {[
+          { k: 1, t: "Norm before each sub-layer", at: preAt },
+          { k: 2, t: "Rotary embeddings: relative position", at: rotaryAt },
+          { k: 3, t: "A gated activation instead of ReLU", at: gatedAt },
+        ].map((c, i) => (
+          <React.Fragment key={c.k}>
+            <Disc x={COLS[0] + 15} y={y(732) + h(52) + i * h(40) + 14} k={c.k} at={c.at} />
+            <Line at={c.at + 2} x={COLS[0] + 44} y={y(732) + h(52) + i * h(40)} size={23}>
+              {c.t}
+            </Line>
+          </React.Fragment>
+        ))}
+        <Disc x={BX} y={B.norm1} k={1} at={preAt + 6} />
+        <Disc x={BX} y={B.norm2} k={1} at={preAt + 10} />
+        <Disc x={BX + 200} y={B.emb} k={2} at={rotaryAt + 6} />
+        <Disc x={BX} y={B.ff} k={3} at={gatedAt + 6} />
       </Drift>
     </AbsoluteFill>
   );

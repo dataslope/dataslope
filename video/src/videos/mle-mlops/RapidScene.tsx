@@ -5,8 +5,10 @@ import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { BAR, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { OutlineBadge } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { SANS } from "../../theme/fonts";
 import { BadgeRow, BLOCK, BLOCK_SOFT, Box, Drift, Flow, Headline, Kicker, Line, LIT_LINE, Mark, OK_INK, Svg, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
@@ -28,13 +30,15 @@ const Registry: React.FC<{ c: Ctx }> = ({ c }) => {
     { text: "evaluation metrics", at: c.w("r-registry", "evaluation metrics") },
     { text: "deployment history", at: c.w("r-registry", "deployment history") },
   ];
-  const promoAt = c.w("r-registry", "enforces promotion");
-  const prodAt = c.w("r-registry", "to production");
-  const lookupAt = c.w("r-registry", "turns a rollback into a lookup");
-  const rebuildAt = c.w("r-registry", "rather than a rebuild");
+  const promoAt = c.w("r-registry-promo", "It supports promotion");
+  const prodAt = c.w("r-registry-promo", "to production");
+  const aliasAt = c.w("r-registry-promo", "moving an alias such as champion");
+  const lookupAt = c.w("r-registry-promo", "turns a rollback into a lookup");
+  const rebuildAt = c.w("r-registry-promo", "rather than a rebuild");
   const top = c.y(350);
   const bh = c.h(70);
-  const promote = ease(frame, prodAt, 20);
+  // The champion alias: on v2, moved to the new version as it is said.
+  const moved = ease(frame, aliasAt + 4, 20);
   return (
     <>
       {["v1", "v2", "v3"].map((v, i) => (
@@ -55,7 +59,11 @@ const Registry: React.FC<{ c: Ctx }> = ({ c }) => {
       <Box x={R_X + 150} y={c.y(648)} w={160} h={c.h(56)} at={promoAt + 2} title="Staging" size={22} />
       <Flow points={[[R_X + 314, c.y(648) + c.h(28)], [R_X + 377, c.y(648) + c.h(28)]]} at={prodAt - 4} head={12} />
       <Box x={R_X + 380} y={c.y(648)} w={180} h={c.h(56)} at={prodAt - 2} title="Production" size={22} tone="plain" to="ok" toAt={prodAt + 8} />
-      <div style={{ position: "absolute", left: R_X + 150 + 30 + 230 * promote, top: c.y(648) - 30, ...label(20, INK_SOFT), opacity: ease(frame, promoAt + 6, 10) }}>v3</div>
+      <div style={{ position: "absolute", left: R_X + 190 + 190 * moved, top: top - 48, width: 170, display: "flex", justifyContent: "center", opacity: ease(frame, aliasAt - 6, 10) }}>
+        <OutlineBadge size={21} style={{ fontFamily: SANS }}>
+          champion
+        </OutlineBadge>
+      </div>
       <Line at={lookupAt - 2} x={R_X} y={c.y(760)} size={26} color={OK_INK}>
         <Mark at={lookupAt + 6}>A rollback is a lookup</Mark>
         <span style={{ opacity: ease(frame, rebuildAt - 2, 10) }}>, not a rebuild</span>

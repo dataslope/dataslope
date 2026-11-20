@@ -293,14 +293,14 @@ export const ActScene: React.FC = () => {
         ))}
 
         {/* ── The dead unit, then the fixes ── */}
-        <Node x={COL_X[2] + 30} y={y(722)} r={28} at={negAt} hue="gray" hueAt={neverAt} size={20}>
+        <Node x={COL_X[2] + 34} y={y(722)} r={34} at={negAt} hue="gray" hueAt={neverAt} size={22}>
           unit
         </Node>
-        <Line at={negAt + 4} x={COL_X[2] + 76} y={y(722) - 16} size={24} color={INK}>
+        <Line at={negAt + 4} x={COL_X[2] + 84} y={y(722) - 16} size={24} color={INK}>
           Input below 0
           <span style={{ opacity: ease(frame, zeroGradAt, 10) }}>: output 0, slope 0</span>
         </Line>
-        <div style={{ position: "absolute", left: COL_X[2] + 76, top: y(722) + h(30), opacity: dead, transform: `translateY(${(1 - dead) * 8}px)` }}>
+        <div style={{ position: "absolute", left: COL_X[2] + 84, top: y(722) + h(30), opacity: dead, transform: `translateY(${(1 - dead) * 8}px)` }}>
           <Tag tone="red" size={24}>
             dead
           </Tag>

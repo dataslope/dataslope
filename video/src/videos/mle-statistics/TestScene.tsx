@@ -85,13 +85,13 @@ export const TestScene: React.FC = () => {
   const curveY = (z: number) => base - Math.exp(-0.5 * z * z) * height;
 
   // ── The steps ──
-  const stepY = [y(316), y(420), y(524), y(598)];
+  const stepY = [y(316), y(426), y(536), y(626)];
   const stepAt = [stateAt, fixAt, computeAt, rejectAt];
   /** Where a step's text starts: after its disc (45px) and the gap. */
   const STEP_TEXT_X = X0 + 45 + 18;
 
   // ── The looks ──
-  const lookY = y(776);
+  const lookY = y(790);
   const tx0 = X0 + 20;
   const tx1 = C_X1;
   const tx = (k: number) => tx0 + ((k - PEEK.step) / (PEEK.step * (PEEK.looks - 1))) * (tx1 - tx0);
@@ -230,7 +230,7 @@ export const TestScene: React.FC = () => {
         </Line>
 
         {/* ── Peeking ── */}
-        <Heading at={simAt} x={X0} y={y(684)}>
+        <Heading at={simAt} x={X0} y={y(704)}>
           Simulation: two equally good models, <Num>{PEEK.runs.toLocaleString("en-US")}</Num> runs
         </Heading>
         <Svg opacity={ease(frame, everyAt - 2, 10)}>
@@ -252,8 +252,8 @@ export const TestScene: React.FC = () => {
         <Line at={everyAt + 10} x={tx0} y={lookY + h(62)} size={22} color={INK_SOFT}>
           A look every <Num>{PEEK.step}</Num> labels
         </Line>
-        <ColumnRule x={(C_X1 + 60 + R_X0) / 2 + 20} top={y(684)} height={y(880) - y(684)} at={stopAt} />
-        <Line at={stopAt} x={R_X0 + 40} y={y(740)} size={26} color={BAD_INK} weight={600}>
+        <ColumnRule x={(C_X1 + 60 + R_X0) / 2 + 20} top={y(704)} height={y(880) - y(704)} at={stopAt} />
+        <Line at={stopAt} x={R_X0 + 40} y={y(756)} size={26} color={BAD_INK} weight={600}>
           Stop at the first{" "}
           <MathRun>
             <I>p</I> &lt; 0.05
@@ -263,7 +263,7 @@ export const TestScene: React.FC = () => {
             <Num>{Math.round(PEEK.everyLook * 100)}%</Num> false positives
           </span>
         </Line>
-        <Line at={notFiveAt} x={R_X0 + 40} y={y(800)} size={26} color={OK_INK} weight={600}>
+        <Line at={notFiveAt} x={R_X0 + 40} y={y(812)} size={26} color={OK_INK} weight={600}>
           Decide once at <Num>{MODELS.n.toLocaleString("en-US")}</Num>: <Num>{Math.round(PEEK.onceAtEnd * 100)}%</Num>
         </Line>
       </Drift>

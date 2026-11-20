@@ -164,7 +164,8 @@ export const CltScene: React.FC = () => {
               <Num>{CLT.seSimulated.toFixed(3)}</Num>
             </Mark>
             <span style={{ opacity: ease(frame, formulaAt - 2, 10) }}>
-              , formula{" "}
+              {" "}
+              against the formula&apos;s{" "}
               <MathRun>
                 <I>σ</I> / √<I>n</I>
               </MathRun>{" "}

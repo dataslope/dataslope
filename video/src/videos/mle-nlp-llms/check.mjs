@@ -238,6 +238,15 @@ const quotes = [
   ["nlp-and-llms.mdx", "### What is prompting, and what are zero-shot, few-shot, and chain-of-thought?"],
   ["nlp-and-llms.mdx", "### How do you control an LLM's output randomness?"],
   ["nlp-and-llms.mdx", "### How do you evaluate an LLM or NLP model?"],
+  // The follow-ups main's page review (#746) added, said in q6-modern, q9-rag and r-prompt-kinds.
+  ["nlp-and-llms.mdx", "kept that skeleton and changed three details, which is a common follow-up"],
+  ["nlp-and-llms.mdx", "Normalization moved in front of each sub-layer"],
+  ["nlp-and-llms.mdx", "so attention sees relative distance instead of an absolute index"],
+  ["nlp-and-llms.mdx", "a gated activation such as SwiGLU replaced ReLU"],
+  ["nlp-and-llms.mdx", "does not make retrieval unnecessary, which is the usual follow-up"],
+  ["nlp-and-llms.mdx", "Every token in the prompt is paid for on every request"],
+  ["nlp-and-llms.mdx", "answer quality tends to fall as the context fills with loosely relevant text"],
+  ["nlp-and-llms.mdx", "A model that already reasons before it answers does this internally, so asking again mostly adds tokens and latency"],
 ];
 for (const [file, phrase] of quotes) if (!page(file).includes(phrase.replace(/\s+/g, " "))) problems.push(`${file} no longer says: ${phrase}`);
 
@@ -256,9 +265,9 @@ const says = [
   ["q1-word", "hallucination", T.unseenExamples.includes("hallucination")],
   ["q1-char", "five times", Math.round(T.charPositionsOverTokens) === 5],
   ["q1-char", "twenty-five times", T.charPairsOverTokens === 25],
-  ["q1-sub", "two hundred thousand", Math.round(T.vocabSize / 1000) === 200],
-  ["q1-sub", "in two", T.pieces.hallucination.length === 2],
-  ["q1-sub", "one point four", Math.round(T.tokensPerWord * 10) === 14],
+  ["q1-piece", "two hundred thousand", Math.round(T.vocabSize / 1000) === 200],
+  ["q1-piece", "in two", T.pieces.hallucination.length === 2],
+  ["q1-piece", "one point four", Math.round(T.tokensPerWord * 10) === 14],
   ["q1-cost", "eight hundred million", Math.floor(T.embeddingTable / 1e8) === 8],
   ["q4-scale", "sixty-four", R.scaling.dk === 64],
   ["q4-scale", "eighty-five percent", Math.round(R.scaling.topUnscaled * 100) === 85],

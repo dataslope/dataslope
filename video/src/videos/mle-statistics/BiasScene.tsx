@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { SELECTION } from "./data";
-import { BAD, BAD_INK, DATA, Drift, Heading, Line, Mark, MUTED, mulberry32, OK, OK_INK, pulse, Spot, Svg, X0 } from "./parts";
+import { BAD, BAD_INK, DATA, Drift, Heading, Line, MUTED, mulberry32, OK, OK_INK, pulse, Spot, Svg, X0 } from "./parts";
 
 const COLS = 25;
 const ROWS = 16;
@@ -240,9 +240,7 @@ export const BiasScene: React.FC = () => {
           <rect x={BAR_X0} y={exploreY - 9} width={(bx(SELECTION.exploreRate) - BAR_X0) * ease(frame, rateAt - 4, 16)} height={18} fill={OK} />
         </Svg>
         <Line at={rateAt + 6} x={bx(SELECTION.exploreRate) + 26} y={exploreY - 14} size={24} color={OK_INK} weight={600}>
-          <Mark at={rateAt + 10}>
-            <Num>{(SELECTION.exploreRate * 100).toFixed(1)}%</Num>
-          </Mark>
+          <Num>{(SELECTION.exploreRate * 100).toFixed(1)}%</Num>
         </Line>
         <Line at={priceAt} x={X0} y={top + ROWS * PITCH + h(58)} size={22} color={INK_SOFT}>
           The price: some bad loans,{" "}

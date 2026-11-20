@@ -21,7 +21,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   4. "What do quantization and speculative decoding trade?" ("q4").
  *   Quick ("rapid-in"): the page's "Other levers worth naming": prefix
  *   caching, routing easy requests to a smaller model, distillation for a
- *   narrow task, streaming ("r-prefix" to "r-stream").
+ *   narrow task, the reasoning budget (added to the page by #746, voiced
+ *   on its own as "r-reason"), streaming ("r-prefix" to "r-stream").
  *
  * One argument, on one model: the page's 70B-class model on its node of
  * eight 80 GB GPUs. Decode reads every weight per token (1), so memory is
@@ -154,13 +155,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     drafts" as the note.
  *   q4-cost: "Draft costs time and memory" under both rows; the 1-in-2 row
  *     dimmed on "lose".
- *   rapid-in: the quick round's four rows (RapidFire), headed "Other levers".
+ *   rapid-in: the quick round's five rows (RapidFire), headed "Other levers".
  *   r-prefix: a shared system prompt's cache drawn once, three requests'
  *     prefill bars starting after it; the row ticks.
  *   r-route: an arrow splitting, easy requests to a small model box, hard
  *     ones to the large one.
  *   r-distill: a large box and a small one, an arrow "imitates" between them,
  *     "narrow task".
+ *   r-reason: a request's timeline as question 1 drew it: prefill, then grey
+ *     decode steps of thinking, then the first visible tokens; the wait
+ *     bracketed; "Spend them only where a request needs them" in green.
  *   r-stream: the decode ticks appearing one by one on a reader's line;
  *     "Same work, earlier start".
  *   close: the node bar from "q2-fit" small at the left, "Weights read per
@@ -253,7 +257,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     whole cached context"); "q3-in" its "Memory, not compute, usually caps
  *     how many requests a GPU can serve at once"; "q4-in" sums up question
  *     four (fewer bytes per step; more tokens per pass).
- *   - quick: the page's "Other levers worth naming", one line each.
+ *   - quick: the page's "Other levers worth naming", one line each, and its
+ *     reasoning budget ("decode time the user waits through before the first
+ *     visible token. Spend them on the requests that need them").
  *   - close and bridge: the video's own summary; the plan's bridge.
  *
  * Written for Drew's ear: LLM, GPU, KV, TTFT (expanded once: "time to first
@@ -442,7 +448,7 @@ export const script: NarrationScript = {
     {
       id: "rapid-in",
       scene: true,
-      text: "Four more levers, one line each.",
+      text: "Five more levers, one line each.",
       pauseAfter: 0.5,
     },
     {
@@ -454,6 +460,11 @@ export const script: NarrationScript = {
     {
       id: "r-distill",
       text: "Distillation: train a small model to imitate the large one on a narrow task.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "r-reason",
+      text: "Reasoning budget: a model's thinking tokens are decode steps the user waits through before the first visible word, so spend them only on requests that need them.",
       pauseAfter: 0.6,
     },
     {

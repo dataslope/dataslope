@@ -84,17 +84,17 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q1: question card; a balance with "vocabulary" on one pan and "sequence
  *     length" on the other.
  *   q1-word: two stacks of pages (the seven other topic pages, then the NLP
- *     page); "word vocabulary: 3,028" under the first; a few of the NLP
+ *     page); "3,063 words" under the first; a few of the NLP
  *     page's unseen words fly out (hallucination, autoregressive, few-shot,
  *     RLHF, LoRA, bank: results.json tokens.unseenExamples) and each turns
  *     into the same red "unknown" chip on "unknown token" (not struck
  *     through: the words are right, the vocabulary can't hold them);
  *     "15% of words never seen" in red.
- *   q1-char: the same page as characters: a bar "11,727 characters" beside
- *     "2,330 tokens", "5x the positions", then a square grid growing to
+ *   q1-char: the same page as characters: a bar "13,094 characters" beside
+ *     "2,618 tokens", "5x the positions", then a square grid growing to
  *     "25x the pairs" (red), the grid a square of positions.
  *   q1-sub: "hallucination" split into two chips, " halluc" and "ination"
- *     (results.json tokens.pieces, o200k_base), green; "1.36 tokens a word
+ *     (results.json tokens.pieces, o200k_base), green; "1.35 tokens a word
  *     on this page";
  *     "o200k_base: 200,019 pieces" as its note.
  *   q1-cost: a tall table of rows, "200,019 rows x 4,096" and "819 million
@@ -135,6 +135,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q6-kinds: three attention masks as small grids: full (encoder, BERT),
  *     lower triangle (decoder, GPT), and both (encoder-decoder, T5), each lit
  *     as named.
+ *   q6-modern (added after main's page review, #746): three numbered gold
+ *     discs on the block (the norm boxes, the positional encodings, the
+ *     feed-forward box), and the three changes listed under the masks.
  *   q7, q7-a: an RNN row of cells passing one state along, lighting one by one
  *     (slow); beside it, a transformer row where every pair is joined and all
  *     light at once (green), "in training" under it on "in training"
@@ -154,6 +157,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the left by instructions, retrieved documents, history and the answer,
  *     each a labelled segment; what doesn't fit greys out past the edge (red
  *     edge line, "invisible").
+ *   q9-rag (#746): the window widens until every document fits, the red
+ *     limit moving with it; the answer segment turns red; "every prompt
+ *     token, on every request" and "answers tend to get worse" beside it.
  *   q10, q10-a: question card; one sentence twice: with a masked slot predicted from
  *     both sides (arrows from left and right), and with the next slot
  *     predicted from the left only (arrows from the left), "BERT" and "GPT"
@@ -175,7 +181,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     vector search, top passages, prompt, answer, inked in order.
  *   q13-miss: the query "How do I stop an LLM making things up?" over a
  *     ranked list of the track's answers by shared words (results.json
- *     retrieval.top): "When should you not use an LLM?" first; the
+ *     retrieval.top): "What are embeddings used for beyond input
+ *     representation?" first; the
  *     hallucination answer far below at "0.000" in red, with "shares none of
  *     the words" beside it; "word counts stand in for an embedding model
  *     here" as its note. Nothing new for "keyword search": the list is
@@ -212,17 +219,17 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * a page stops saying what is quoted or the narration stops saying what was
  * measured. No language model runs here, and none is claimed to:
  *   - "q1-word": prose of the track's seven other topic pages (code, math
- *     and components stripped) gives a vocabulary of 3,028 words; the NLP
- *     page's 1,709 running words include 192 of its 708 distinct ones never
- *     seen, 14.8% of the running words ("fifteen percent"), among them
+ *     and components stripped) gives a vocabulary of 3,063 words; the NLP
+ *     page's 1,933 running words include 222 of its 787 distinct ones never
+ *     seen, 14.6% of the running words ("fifteen percent"), among them
  *     hallucination. A real word vocabulary is far larger; the point is the
  *     mechanism, and the beat says the vocabulary's size. A word-level model
  *     maps every word outside its vocabulary to one shared unknown token
  *     (the page's "no way to handle out-of-vocabulary words").
- *   - "q1-char", "q1-sub": the NLP page's prose is 11,727 characters and
- *     2,330 o200k_base tokens, 5.03 characters a token ("five times as many
+ *   - "q1-char", "q1-sub": the NLP page's prose is 13,094 characters and
+ *     2,618 o200k_base tokens, 5.0 characters a token ("five times as many
  *     positions", said "five times as long as subword tokens"), so 25
- *     times the pairs; 1.36 tokens a word on this page ("one point four");
+ *     times the pairs; 1.35 tokens a word on this page ("one point four");
  *     o200k_base has 200,019 tokens ("two hundred thousand pieces",
  *     glossed as a production tokenizer; the screen names it), and splits
  *     " hallucination" into " halluc" and "ination". The page's own
@@ -284,7 +291,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "q13-a": the page's flow and reasons. "q13-miss": the track's 167
  *     answers (one per question) searched with TF-IDF cosine for "How do I
  *     stop an LLM making things up?" (terms: stop, llm, making, things): the
- *     top answer is "When should you not use an LLM?" (0.118); the
+ *     top answer is "What are embeddings used for beyond input
+ *     representation?" (0.119; "When should you not use an LLM?" 0.118); the
  *     hallucination answer scores 0.000 and shares none of the terms, with
  *     13 answers above it. Word counts stand in for the retriever, and the
  *     screen says so; no embedding model's score is shown or claimed. That
@@ -295,6 +303,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     and longer prompts are paid per request, fine-tuning per training
  *     run; reasoning from the two mechanisms, with no number attached. "Temperature divides the
  *     scores" is the page's "scales the logits", said as what it does.
+ *   - Added after main's page review (#746), which gave the page three
+ *     follow-ups: "q6-modern" is its "a common follow-up" paragraph (pre-norm,
+ *     rotary position embeddings for relative distance, a gated activation
+ *     such as SwiGLU in place of ReLU; the page cites the LLaMA paper, 2.2);
+ *     "q9-rag" is its "the usual follow-up" paragraph (every prompt token
+ *     paid for on every request, answer quality tending to fall as loosely
+ *     relevant text fills the window); "r-prompt-kinds" adds its "a model
+ *     that already reasons before it answers does this internally". The
+ *     second half of "q1-sub" became its own beat, "q1-piece", saying "splits
+ *     the word hallucination in two", since "cuts hallucination in two"
+ *     sounded like halving hallucinations. Re-running check.mjs on the
+ *     reviewed pages moved the measured tokenization and retrieval numbers
+ *     (the figures above are the new ones; the two top answers swapped
+ *     places); every number said aloud still holds.
  *
  * Written for Drew's ear: initialisms in plain caps (NLP, LLM, RNN, GPU,
  * GPT, RLHF, RAG, BLEU, ROUGE, F1, ML), each expanded the first time a
@@ -333,9 +355,10 @@ export const script: NarrationScript = {
       text: "Characters never miss, but they make the page five times as long as subword tokens do, and attention's cost grows with the square: twenty-five times.",
       pauseAfter: 0.7,
     },
+    { id: "q1-sub", text: "Subwords split the difference: frequent words stay whole, and rare ones break into known pieces." },
     {
-      id: "q1-sub",
-      text: "Subwords split the difference: frequent words stay whole, and rare ones break into known pieces. A production tokenizer with two hundred thousand pieces cuts hallucination in two, and averages one point four tokens a word on this page.",
+      id: "q1-piece",
+      text: "A production tokenizer with two hundred thousand pieces splits the word hallucination in two, and averages one point four tokens a word on this page.",
       pauseAfter: 0.6,
     },
     {
@@ -409,6 +432,11 @@ export const script: NarrationScript = {
       text: "Encoder-only models like BERT attend both ways, for understanding. Decoder-only models like GPT mask the future, for generation. Encoder-decoder models like T5 turn one sequence into another.",
       pauseAfter: 0.7,
     },
+    {
+      id: "q6-modern",
+      text: "Today's LLMs keep that skeleton, with three changes: the norm before each sub-layer, rotary embeddings for relative position, and a gated activation instead of ReLU.",
+      pauseAfter: 0.7,
+    },
     { id: "q7", scene: true, text: "Question seven. Why did transformers replace RNNs for most NLP?" },
     {
       id: "q7-a",
@@ -437,6 +465,11 @@ export const script: NarrationScript = {
     {
       id: "q9-a",
       text: "It's the most tokens, prompt and output together, that the model can attend to at once. Instructions, documents and history all compete for it, a longer one costs more, and anything past the limit is invisible.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "q9-rag",
+      text: "A window big enough for every document still doesn't retire retrieval: every prompt token is paid for on every request, and answers tend to get worse as loosely relevant text fills it.",
       pauseAfter: 0.7,
     },
     { id: "train-in", text: "So much for the shape. Next, how it learns." },
@@ -512,11 +545,12 @@ export const script: NarrationScript = {
       text: "Hallucination: a model is trained to write probable text, not true text, so it invents fluently, most of all on niche facts. Ground it with retrieval and citations, lower the temperature for facts, add checks, and keep a human in the loop where stakes are high. Nothing removes it entirely.",
       pauseAfter: 0.6,
     },
+    { id: "r-prompt", text: "Prompting steers a frozen model with text alone." },
     {
-      id: "r-prompt",
-      text: "Prompting steers a frozen model with text alone. Zero-shot describes the task, few-shot adds worked examples, and chain-of-thought asks for step-by-step reasoning, which helps on multi-step problems. It's the cheapest lever, so try it before fine-tuning.",
-      pauseAfter: 0.6,
+      id: "r-prompt-kinds",
+      text: "Zero-shot describes the task, few-shot adds worked examples, and chain-of-thought asks for step-by-step reasoning, which helps on multi-step problems, though a model that already reasons gains little from it but tokens and latency.",
     },
+    { id: "r-prompt-cheap", text: "It's the cheapest lever, so try it before fine-tuning.", pauseAfter: 0.6 },
     {
       id: "r-random",
       text: "Randomness: temperature divides the scores before the softmax, so near zero is almost greedy, and higher is more varied. Top-k keeps the k likeliest tokens; top-p, the smallest set whose probabilities add up past p. Keep it low for extraction, higher for brainstorming.",

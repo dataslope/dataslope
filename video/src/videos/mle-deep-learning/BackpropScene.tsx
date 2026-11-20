@@ -208,10 +208,10 @@ export const BackpropScene: React.FC = () => {
             return s > 0 ? <circle key={i} cx={at(sx, num)} cy={at(sy, bp)} r={6 * s} fill={BAR} opacity={0.85} /> : null;
           })}
         </Svg>
-        <Line at={agreeAt} x={RIGHT_X + PLOT + 150} y={plotTop + h(60)} size={24} color={INK}>
+        <Line at={agreeAt} x={RIGHT_X + PLOT + 196} y={plotTop + h(60)} size={24} color={INK}>
           All on the diagonal
         </Line>
-        <Line at={millionAt} x={RIGHT_X + PLOT + 150} y={plotTop + h(104)} size={24} color={OK_INK}>
+        <Line at={millionAt} x={RIGHT_X + PLOT + 196} y={plotTop + h(104)} size={24} color={OK_INK}>
           Worst gap:{" "}
           <MathRun>
             <Num>2.9</Num> × 10<sup>−7</sup>
