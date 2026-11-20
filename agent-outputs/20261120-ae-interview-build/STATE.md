@@ -27,7 +27,10 @@ with its fixes, followed (see
 | 9 | AnalyticsEngineer-9-AiSemanticLayer | 8:20 | 46 | 7,183 |
 | | **Total** | **1:30:02** | **462** | **74,617** |
 
-Every video is under the 9,500-character cap. Every quick-round question is
+After the independent review's fixes the series runs **1:32:08** (487 beats,
+75,898 characters): 2:46, 11:45, 8:04, 11:10, 8:18, 10:58, 9:53, 9:53,
+10:45 and 8:35. Every video was under the 9,500-character cap as built;
+Part 1 is 194 over it after its answer fixes. Every quick-round question is
 read aloud ("Question n." and the question), a choice made for this series:
 the earlier series showed the number only, and their reviews kept finding
 quick-round text that left the screen before it could be read.
@@ -53,7 +56,8 @@ About 75,000 characters across the ten scripts, plus re-voices for the
 interview-prep review merged from main (#746) and for new beats. The account
 reported 33,913 credits used after the first takes (about 0.46 credits a
 character on `eleven_v4_turbo`, twice the 0.22 measured on earlier series),
-well inside its 162,141. The lexicon gained YAML ("yammel"); a test take
+well inside its 162,141; 37,301 after every re-voice, the review's 1,994
+characters included. The lexicon gained YAML ("yammel"); a test take
 confirmed that dbt, LookML, OLTP, MetricFlow, Jinja and HyperLogLog need
 nothing.
 
