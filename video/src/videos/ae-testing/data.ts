@@ -174,6 +174,17 @@ export const OBSERVE = {
 
 // ── 10. Testing that a metric is correct ────────────────────────────────────
 
+/** The rows a setup inserted into `name`, as printed cells, read from the
+ *  setup SQL that ran (results.json), so the figure's inputs are the run's. */
+const inserted = (setup: string, name: string): string[][] => {
+  const m = setup.match(new RegExp(`INSERT INTO ${name} VALUES ([^;]*);`));
+  if (!m) throw new Error(`the setup inserts nothing into ${name}`);
+  return [...m[1].matchAll(/\(([^()]*)\)/g)].map((t) => t[1].split(",").map((v) => v.trim().replace(/^'|'$/g, "")));
+};
+/** Each order beside each of its items: what the model's join produced. */
+const joined = (orders: string[][], items: string[][]) =>
+  orders.flatMap(([id, , amount]) => items.filter(([oid]) => oid === id).map(([, item]) => ({ order: id, amount, item })));
+
 const metric = results.figures.metric as unknown as Figure & { modelSql: string };
 export const METRIC = {
   /** The model's SQL: a join to the items, then a sum of the order amount. */
@@ -186,9 +197,21 @@ export const METRIC = {
   /** Against finance's ledger at a 1% tolerance: the day comes back. */
   reconcile: test("metric", "reconcile"),
   finance: Number(table("metric", "reconcile").rows[0][2]),
+  /** The model's inputs, and the rows its join made: one per item. */
+  orders: inserted(FIGURES.metric.setup, "orders"),
+  items: inserted(FIGURES.metric.setup, "order_items"),
+  joined: joined(inserted(FIGURES.metric.setup, "orders"), inserted(FIGURES.metric.setup, "order_items")),
 };
 export const UNIT_TEST = {
   /** One mocked order of 100.00 with three items, through the model's SQL. */
   actual: Number(table("unit", "actual").rows[0][1]),
   expected: Number(table("unit", "expected").rows[0][1]),
+  /** The mocked inputs: one order, and its items. */
+  orders: inserted(FIGURES.unit.setup, "orders"),
+  items: inserted(FIGURES.unit.setup, "order_items"),
 };
+{
+  // The joined rows sum to the revenue the model returned.
+  const sum = METRIC.joined.reduce((s, r) => s + Number(r.amount), 0);
+  if (Math.abs(sum - METRIC.revenue) > 1e-9) throw new Error(`the join's rows sum to ${sum}, not ${METRIC.revenue}`);
+}

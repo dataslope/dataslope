@@ -175,11 +175,11 @@ export const LagScene: React.FC = () => {
         {/* ── January 2024: a month back, and twelve back ── */}
         <Arc from={top(dec23)} to={top(jan24)} peak={py(rev[dec23]) - 50} at={fallsAt - 4} color={ACCENT} out={takeAt} />
         <Note at={fallsAt + 4} x={px(jan24) + 18} y={py(rev[dec23]) - 40} out={takeAt}>
-          <span style={{ ...note(24, ACCENT_INK), ...halo, whiteSpace: "nowrap", ...TABULAR }}>{LAG.january.mom}</span>
+          <span style={{ ...note(24, ACCENT_INK), ...halo, whiteSpace: "nowrap" }}>{LAG.january.mom}</span>
         </Note>
         <Arc from={top(jan23)} to={top(jan24)} peak={peak} at={twelveAt + 2} color={INK} out={takeAt} />
         <Note at={downAt - 2} x={yearApex[0] - 24} y={yearApex[1] - 42} out={takeAt}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>{LAG.january.yoy}</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{LAG.january.yoy}</span>
         </Note>
         <Note at={twelveAt + 6} x={NOTE_X} y={y(330)} out={takeAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -212,7 +212,7 @@ export const LagScene: React.FC = () => {
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>{LAG_WRONG.length} comparisons land on the wrong month</span>
         </Note>
         <Note at={marchAt + 6} x={marchApex[0] - 120} y={marchApex[1] - 44}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             {wrongMarch.change}, should be {rightMarch}
           </span>
         </Note>
