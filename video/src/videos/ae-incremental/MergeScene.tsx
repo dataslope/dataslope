@@ -41,6 +41,8 @@ export const MergeScene: React.FC = () => {
   const qAt = n.word("merge", "Question six");
   const textAt = n.word("merge", "How does a merge");
   const matchesAt = n.word("merge", "It matches each staged row");
+  const stagedAt = n.word("merge", "each staged row");
+  const targetAt = n.word("merge", "to the target");
   const keyAt = n.word("merge", "on a key");
   const updatesAt = n.word("merge", "A match updates");
   const insertsAt = n.word("merge", "no match inserts");
@@ -80,14 +82,14 @@ export const MergeScene: React.FC = () => {
   // Cy's row, deleted at the source: drawn where the batch would carry it.
   const cy = before.find((r) => r[1] === "Cy") ?? before[before.length - 1];
   const stagedRows: TableRow[] = [
-    ...staged.map((cells, i) => ({ cells, at: hereAt + 4 + i * 6 })),
+    ...staged.map((cells, i) => ({ cells, at: stagedAt + 6 + i * 4 })),
     { cells: cy, at: removedAt + 4, strikeAt: batchAt, dimAt: batchAt + 10 },
   ];
   const stagedG = tableGeometry({ x: STAGED_X, top, cols, rows: stagedRows.map((r) => r.cells), headH: 36, rowH: 34, headSize: 20, bodySize: 21, pad: 16 });
   const benRow = before.findIndex((r) => r[0] === "2");
   const cyRow = before.indexOf(cy);
   const dimRows: TableRow[] = [
-    ...before.map((cells, i) => ({ cells, at: hereAt + i * 3 })),
+    ...before.map((cells, i) => ({ cells, at: targetAt + 6 + i * 3 })),
     { cells: after[after.length - 1], at: insertsDeeAt + 4, grow: true },
   ];
   const dimG = tableGeometry({ x: DIM_X, top, cols, rows: dimRows.map((r) => r.cells), extra: after, headH: 36, rowH: 34, headSize: 20, bodySize: 21, pad: 16 });
@@ -100,7 +102,8 @@ export const MergeScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Sfx name="el-pencil" at={matchesAt} level={-37} />
-      <Sfx name="el-tap" at={hereAt + 4} level={-35} />
+      <Sfx name="el-tap" at={stagedAt + 6} level={-35} />
+      <Sfx name="el-tap" at={targetAt + 6} level={-35} />
       <Sfx name="el-tap" at={firstAt + 8} level={-33} />
       <Sfx name="el-tap" at={insertsDeeAt + 4} level={-33} />
       <Sfx name="el-pencil" at={bothAt} level={-37} />
@@ -151,14 +154,14 @@ export const MergeScene: React.FC = () => {
         </Note>
 
         {/* staged_customers: the batch. */}
-        <TableName g={stagedG} at={hereAt}>
+        <TableName g={stagedG} at={stagedAt}>
           <span style={{ fontFamily: MONO, fontSize: 21 }}>staged_customers</span>
         </TableName>
         <DataTable
           g={stagedG}
           cols={cols}
           rows={stagedRows}
-          at={hereAt}
+          at={stagedAt + 2}
           marks={[
             { row: 0, col: 1, at: hereAt + 10, color: MARK, out: firstAt },
             { row: 1, col: 1, at: deeAt, color: MARK, out: insertsDeeAt },
@@ -172,14 +175,14 @@ export const MergeScene: React.FC = () => {
         </Note>
 
         {/* dim_customer: merged into, twice. */}
-        <TableName g={dimG} at={hereAt}>
+        <TableName g={dimG} at={targetAt}>
           <span style={{ fontFamily: MONO, fontSize: 21 }}>dim_customer</span>
         </TableName>
         <DataTable
           g={dimG}
           cols={cols}
           rows={dimRows}
-          at={hereAt}
+          at={targetAt + 2}
           swaps={[
             { row: benRow, col: 1, at: firstAt + 8, value: after[benRow][1] },
             { row: benRow, col: 2, at: firstAt + 12, value: after[benRow][2] },

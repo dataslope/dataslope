@@ -177,7 +177,7 @@ export const CompoundScene: React.FC = () => {
         <ListingTitle x={X0} top={top} at={pairAt}>
           The page&rsquo;s YAML: <SmallMono>dbt_utils</SmallMono>
         </ListingTitle>
-        <Listing lines={COMPOUND.yaml} lang="yaml" x={X0} top={top} size={SIZE} at={pairAt + 2} marks={[{ line: "combination_of_columns", text: "[order_id, line_number]", at: utilsAt + 4 }]} />
+        <Listing lines={COMPOUND.yaml} lang="yaml" x={X0} top={top} size={SIZE} at={pairAt + 2} marks={[{ line: "combination_of_columns: [", text: "[order_id, line_number]", at: utilsAt + 4 }]} />
         <ListingTitle x={X0} top={pairTop} at={singularAt}>
           Or a singular test, grouped by both
         </ListingTitle>

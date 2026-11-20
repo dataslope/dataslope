@@ -15,7 +15,7 @@ import { Cell, type CellTone, Count, costScale, CostChart, Drift, Flow, Mark, Sm
 const TL = 330;
 const P = 46;
 const X = (id: number) => TL + (id - 0.5) * P;
-const COL2 = 800;
+const COL2 = 860;
 const CH = { x0: 230, x1: 860 };
 const SPLIT_X = 1200;
 const SPLIT_W = 520;
@@ -189,7 +189,7 @@ export const RefreshScene: React.FC = () => {
             arrow="new rows only"
             end={
               <>
-                Merged into <SmallMono>fct_events</SmallMono>
+                Merged into{" "}<SmallMono>fct_events</SmallMono>
               </>
             }
           />
