@@ -12,9 +12,9 @@ import { METRICFLOW_YAML } from "./data";
 import { Cross, Drift, Flow, Headline, Kicker, Listing, Mono, Node, noteLine, OK_INK, Spot, Svg, X0 } from "./parts";
 
 const R_X = 820;
-const LIST_TOP = 372;
+const LIST_TOP = 320;
 const ROW = 50;
-const BODY_Y = 340;
+const BODY_Y = 320;
 
 type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"] };
 
@@ -46,7 +46,7 @@ const Truth: React.FC<{ c: Ctx }> = ({ c }) => {
   const tools = [
     { name: "Dashboard", sql: "SUM(amount)" },
     { name: "Notebook", sql: "SUM(amount - tax)" },
-    { name: "Dashboard", sql: "SUM(amount) - refunds" },
+    { name: "Dashboard", sql: "SUM(amount - refunds)" },
   ];
   return (
     <>
@@ -62,7 +62,7 @@ const Truth: React.FC<{ c: Ctx }> = ({ c }) => {
           h={c.h(84)}
           at={reimplAt + i * 5}
           title={t.name}
-          sub={<span style={{ fontFamily: MONO, fontSize: 20, color: i ? ACCENT_INK : INK }}>{t.sql}</span>}
+          sub={<span style={{ fontFamily: MONO, fontSize: 19, color: i ? ACCENT_INK : INK }}>{t.sql}</span>}
           size={22}
         />
       ))}
@@ -276,8 +276,8 @@ const Additive: React.FC<{ c: Ctx }> = ({ c }) => {
   const ratiosAt = c.w("r-additive", "Ratios and distinct counts never sum");
   const recomputeAt = c.w("r-additive", "recompute them from the rows");
   const top = c.y(BODY_Y);
-  const colA = R_X + 400;
-  const colB = R_X + 600;
+  const colA = R_X + 330;
+  const colB = R_X + 510;
   const rowTop = (i: number) => top + c.h(56) + i * c.h(92);
   const rows = [
     { name: "Revenue", kind: "additive", a: true, b: true, at: revenueAt, bAt: revenueAt + 8, note: "", noteAt: 0 },
@@ -301,7 +301,7 @@ const Additive: React.FC<{ c: Ctx }> = ({ c }) => {
           <div style={{ position: "absolute", left: colA + 40, top: rowTop(i) + 4 }}>{r.a ? <Tick at={r.at + 4} size={28} /> : <Cross at={r.at + 4} size={26} />}</div>
           <div style={{ position: "absolute", left: colB + 50, top: rowTop(i) + 4 }}>{r.b ? <Tick at={r.bAt + 4} size={28} /> : <Cross at={r.bAt + 4} size={26} />}</div>
           {r.note ? (
-            <Line at={r.noteAt} x={colB + 120} top={rowTop(i) + 2} size={21} color={INK_SOFT}>
+            <Line at={r.noteAt} x={colB + 104} top={rowTop(i) + 2} size={21} color={INK_SOFT}>
               {r.note}
             </Line>
           ) : null}
@@ -322,7 +322,7 @@ const Governance: React.FC<{ c: Ctx }> = ({ c }) => {
     { text: "Access controls", at: c.w("r-governance", "access controls") },
   ];
   const top = c.y(BODY_Y);
-  const stampW = 150;
+  const stampW = 170;
   return (
     <>
       {parts.map((p, i) => (
@@ -400,18 +400,27 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
   const governedAt = c.w("r-wide", "its logic must still come from the governed definitions");
   const driftAt = c.w("r-wide", "one more place to drift");
   const top = c.y(BODY_Y);
-  const cols = ["order_id", "order_date", "customer", "region", "status", "amount", "units", "completed_revenue"];
-  const colW = 124;
+  const cols = ["order_id", "date", "customer", "region", "status", "amount", "units", "…"];
+  const colW = 112;
   const gridTop = top + c.h(4);
+  const headH = c.h(40);
   const gridH = c.h(120);
+  const gridW = cols.length * colW;
   return (
     <>
       <Svg opacity={ease(frame, heavyAt, 12)}>
-        <rect x={R_X} y={gridTop} width={cols.length * colW} height={gridH} fill="none" stroke={INK} strokeWidth={2} rx={6} />
-        <line x1={R_X} y1={gridTop + c.h(40)} x2={R_X + cols.length * colW} y2={gridTop + c.h(40)} stroke={INK} strokeWidth={1.2} />
-        {cols.map((_, i) => (i > 0 ? <line key={i} x1={R_X + i * colW} y1={gridTop} x2={R_X + i * colW} y2={gridTop + gridH} stroke={HAIRLINE} strokeWidth={1} /> : null))}
+        <rect x={R_X} y={gridTop} width={gridW} height={gridH} fill="none" stroke={INK} strokeWidth={2} rx={6} />
+        <line x1={R_X} y1={gridTop + headH} x2={R_X + gridW} y2={gridTop + headH} stroke={INK} strokeWidth={1.2} />
+        {cols.map((name, i) => (
+          <React.Fragment key={name}>
+            {i > 0 ? <line x1={R_X + i * colW} y1={gridTop} x2={R_X + i * colW} y2={gridTop + gridH} stroke={HAIRLINE} strokeWidth={1} /> : null}
+            <text x={R_X + i * colW + colW / 2} y={gridTop + headH / 2 + 7} textAnchor="middle" style={svgText({ ...note(19, INK_SOFT), fontFamily: MONO })}>
+              {name}
+            </text>
+          </React.Fragment>
+        ))}
         {[1, 2].map((r) => (
-          <line key={r} x1={R_X} y1={gridTop + c.h(40) + r * c.h(27)} x2={R_X + cols.length * colW} y2={gridTop + c.h(40) + r * c.h(27)} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} />
+          <line key={r} x1={R_X} y1={gridTop + headH + r * c.h(27)} x2={R_X + gridW} y2={gridTop + headH + r * c.h(27)} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} />
         ))}
       </Svg>
       <Line at={heavyAt + 4} top={gridTop + gridH + c.h(14)} size={21} color={INK_SOFT}>
@@ -456,16 +465,16 @@ export const RapidScene: React.FC = () => {
   const nextAt = n.word("next", "Next:");
 
   const items: RapidItem[] = [
-    { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "Question nine"), body: <Truth c={c} /> },
-    { n: 10, label: "Metric drift, and preventing it", at: n.word("r-drift", "Question ten"), body: <Drifting c={c} /> },
-    { n: 11, label: "The dbt Semantic Layer, MetricFlow", at: n.word("r-metricflow", "Question eleven"), body: <MetricFlow c={c} /> },
-    { n: 12, label: "LookML and Looker", at: n.word("r-lookml", "Question twelve"), body: <LookMl c={c} /> },
-    { n: 13, label: "Measure or metric", at: n.word("r-measure", "Question thirteen"), body: <MeasureMetric c={c} /> },
-    { n: 14, label: "What a metric definition holds", at: n.word("r-contains", "Question fourteen"), body: <Contains c={c} /> },
-    { n: 15, label: "Additive, semi-, non-additive", at: n.word("r-additive", "Question fifteen"), body: <Additive c={c} /> },
-    { n: 16, label: "Governance", at: n.word("r-governance", "Question sixteen"), body: <Governance c={c} /> },
-    { n: 17, label: "Cumulative, time-window metrics", at: n.word("r-cumulative", "Question seventeen"), body: <Cumulative c={c} /> },
-    { n: 18, label: "A wide mart, or the layer", at: n.word("r-wide", "Question eighteen"), body: <Wide c={c} /> },
+    { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "Why does a single source of truth"), body: <Truth c={c} /> },
+    { n: 10, label: "Metric drift, and preventing it", at: n.word("r-drift", "What is metric drift"), body: <Drifting c={c} /> },
+    { n: 11, label: "The dbt Semantic Layer, MetricFlow", at: n.word("r-metricflow", "What is the dbt Semantic Layer"), body: <MetricFlow c={c} /> },
+    { n: 12, label: "LookML and Looker", at: n.word("r-lookml", "What is LookML"), body: <LookMl c={c} /> },
+    { n: 13, label: "Measure or metric", at: n.word("r-measure", "What is the difference between a measure and a metric"), body: <MeasureMetric c={c} /> },
+    { n: 14, label: "What a metric definition holds", at: n.word("r-contains", "What does a metric definition contain"), body: <Contains c={c} /> },
+    { n: 15, label: "Additive, semi-, non-additive", at: n.word("r-additive", "What is the difference between additive"), body: <Additive c={c} /> },
+    { n: 16, label: "Governance", at: n.word("r-governance", "What is governance"), body: <Governance c={c} /> },
+    { n: 17, label: "Cumulative, time-window metrics", at: n.word("r-cumulative", "What is a cumulative"), body: <Cumulative c={c} /> },
+    { n: 18, label: "A wide mart, or the layer", at: n.word("r-wide", "When is a wide"), body: <Wide c={c} /> },
   ];
   const heroW = 280;
 

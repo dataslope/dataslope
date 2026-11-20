@@ -107,8 +107,8 @@ export const RatioScene: React.FC = () => {
           toneAt={separateAt + 4}
         />
         {/* ── Divided at query time ── */}
-        <Flow points={[[BOX_X + BOX_W + 8, numTop + boxH / 2], [DIV_X - 60, numTop + boxH / 2], [DIV_X - 60, divY], [DIV_X - 40, divY]]} at={dividesAt - 6} dur={12} />
-        <Flow points={[[BOX_X + BOX_W + 8, denTop + boxH / 2], [DIV_X - 60, denTop + boxH / 2], [DIV_X - 60, divY], [DIV_X - 40, divY]]} at={dividesAt - 4} dur={12} />
+        <Flow points={[[BOX_X + BOX_W + 8, numTop + boxH / 2], [DIV_X, numTop + boxH / 2], [DIV_X, divY - 42]]} at={dividesAt - 6} dur={12} />
+        <Flow points={[[BOX_X + BOX_W + 8, denTop + boxH / 2], [DIV_X, denTop + boxH / 2], [DIV_X, divY + 42]]} at={dividesAt - 4} dur={12} />
         <div
           style={{
             position: "absolute",

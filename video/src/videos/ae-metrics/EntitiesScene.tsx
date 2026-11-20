@@ -4,7 +4,7 @@ import { ease, pop } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Badge, ColumnRule, Ink, Num } from "../../editorial/ui";
+import { ColumnRule, Ink, Num, OutlineBadge } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO, SANS } from "../../theme/fonts";
@@ -158,9 +158,9 @@ export const EntitiesScene: React.FC = () => {
             </Ink>
             <div style={{ position: "absolute", left: colX(i), top: colsTop + h(92), display: "flex", gap: 12, fontSize: 22 }}>
               {c.examples.map((e, k) => (
-                <Badge key={e} tone="blue" size={22} style={{ fontFamily: MONO, opacity: ease(frame, c.exAt + k * 5, 10) }}>
+                <OutlineBadge key={e} tone="blue" size={22} style={{ fontFamily: MONO, opacity: ease(frame, c.exAt + k * 5, 10) }}>
                   {e}
-                </Badge>
+                </OutlineBadge>
               ))}
             </div>
           </React.Fragment>

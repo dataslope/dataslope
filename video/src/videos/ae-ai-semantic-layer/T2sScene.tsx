@@ -209,7 +209,7 @@ export const T2sScene: React.FC = () => {
         <Bracket x0={resG.colMid(0)} x1={resG.colMid(2)} y={bracketY} at={timesAt} lip={-10} />
         <Ink at={timesAt + 6} dur={12} style={{ left: resG.colMid(0), width: resG.colMid(2) - resG.colMid(0), top: bracketY + h(10), textAlign: "center" }}>
           <span style={{ ...label(26, INK), whiteSpace: "nowrap" }}>
-            <Num>{READINGS.ratio}</Num>× apart
+            <Num>{`${READINGS.ratio}×`}</Num> apart
           </span>
         </Ink>
         <Ink at={validAt} dur={12} style={{ left: resG.right + 50, top: resG.top + headH / 2 - 16 }}>
