@@ -93,7 +93,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     output with its weights (W1 all ones, biases 0 and -1, output weights 1
  *     and -2, from results.json); each point's output written beside it as
  *     the beat says "zero, one, one, zero", green.
- *   q2-collapse: the two ReLU marks struck in red; the diagram folds into one
+ *   q2-collapse: the two ReLU marks fade out (removed, not struck: nothing
+ *     wrong is being crossed out); the diagram folds into one
  *     box, "-x1 - x2 + 2" (outlined, mono), and the square returns with one
  *     line and one red ring: "3 of 4" again; on "with one", the box
  *     unfolds and "Non-linear between layers" is written under it.
@@ -148,16 +149,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     below (results.json norm.brightBatch, darkBatch); its normalized value
  *     "-2.43" and "+2.62" beside each, the digit ringed yellow in both.
  *   q7-one: the digit alone, "0" (red); then "running averages" as a small
- *     note; "Training mode, batch of 1: every input gives the same output" in
- *     red.
+ *     note; "Training mode, batch of 1: the layer ignores its input" in red.
  *   q7-ln: the digit's own 64 pixels normalized across its row: "0.45" in
  *     both batches and alone, green.
  *   q8, q8-a: question card; four labelled rows, SGD, momentum, RMSProp, Adam,
  *     each with what it keeps per weight drawn as small outlined boxes:
  *     nothing, a velocity, a squared-gradient average, both.
  *   q8-rms: two bars per optimizer for the two parameters' average step
- *     (results.json optim): SGD's 0.0102 and 0.0000985 ("104x", the small
- *     bar barely visible), Adam's 0.00988 and 0.00956 ("1.03x"), green.
+ *     (results.json optim), all blue (data; neither optimizer is wrong):
+ *     SGD's 0.0102 and 0.0000985 ("104x", the small bar barely visible),
+ *     Adam's 0.00988 and 0.00956 ("1.03x"), each ratio lit yellow as said.
  *   q8-mem: a stacked bar per optimizer in bytes per weight, weights 4 and
  *     gradient 4 for all, then +4 momentum, +8 Adam; a second axis "for a
  *     billion weights": 8 GB, 12 GB, 16 GB; "float32, before activations" as
@@ -326,19 +327,19 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "Training a deep network is still maximum likelihood, the weights that make the labels most probable. The difference is scale: many layers, millions of weights, and a gradient that must make it back through all of them.",
+      text: "Training a deep network is still maximum likelihood: find the weights that make the labels most probable. The difference is scale: many layers, millions of weights, and a gradient that must make it back through all of them.",
       pauseAfter: 0.7,
     },
     {
       id: "plan",
-      text: "Fifteen questions about what happens inside: thirteen worked through, several on small digit networks, and two quick ones.",
+      text: "Fifteen questions: thirteen worked through, several on small digit networks, and two quick ones.",
       pauseAfter: 0.7,
     },
     // ── 1, 2. The perceptron and XOR ─────────────────────────────────────
     { id: "q1", scene: true, text: "Question one. What is a perceptron?" },
     {
       id: "q1-a",
-      text: "A weighted sum of its inputs plus a bias, passed through an activation. Alone, it's a linear classifier: it draws one straight line.",
+      text: "A weighted sum of its inputs plus a bias, through an activation. Alone, it's a linear classifier: one straight line.",
       pauseAfter: 0.6,
     },
     {
@@ -361,7 +362,7 @@ export const script: NarrationScript = {
     { id: "q3", scene: true, text: "Question three. Compare sigmoid, tanh, and ReLU." },
     {
       id: "q3-sat",
-      text: "Sigmoid maps to zero to one, and tanh to minus one to one, centered on zero. Both flatten at the ends, passing almost no gradient: the page's code finds sigmoid's slope peaks at a quarter, and tanh's, peaking at one, is point oh seven by an input of two.",
+      text: "Sigmoid maps to zero to one, tanh to minus one to one, centered on zero. Both flatten at the ends, passing almost no gradient: the page's code finds sigmoid's slope peaks at a quarter, and tanh's, peaking at one, is point oh seven by an input of two.",
       pauseAfter: 0.6,
     },
     {
@@ -384,7 +385,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q4-cost",
-      text: "This digit network has twenty-six thousand parameters. Nudging each one to measure its effect takes twenty-six thousand forward passes per step. Backprop takes one, plus a backward pass worth one point seven, counting multiply-adds.",
+      text: "This digit network has twenty-six thousand parameters. Nudging each to measure its effect takes twenty-six thousand forward passes per step. Backprop takes one, plus a backward pass worth one point seven, counting multiply-adds.",
       pauseAfter: 0.7,
     },
     {
@@ -406,7 +407,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q5-sim",
-      text: "Simulate twenty layers of a hundred and twenty-eight units. With sigmoid, under a trillionth of the gradient reaches the first layer, so the early layers barely learn. With ReLU and He initialization, it arrives about the size it left.",
+      text: "Simulate twenty layers of a hundred and twenty-eight units. With sigmoid, under a trillionth of the gradient reaches the first layer, so early layers barely learn. With ReLU and He initialization, it arrives about the size it left.",
       pauseAfter: 0.7,
     },
     {
@@ -470,7 +471,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q8-rms",
-      text: "RMSProp divides each parameter's step by a running average of its squared gradients; Adam does both. Simulate two parameters with gradients a hundred times apart: SGD's steps are a hundred and four times apart, Adam's, one point oh three.",
+      text: "RMSProp divides each parameter's step by a running average of its squared gradients; Adam does both. Give two parameters gradients a hundred times apart: SGD's steps are a hundred and four times apart, Adam's, one point oh three.",
       pauseAfter: 0.7,
     },
     {
@@ -503,7 +504,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q9-l2",
-      text: "L2, or weight decay, penalizes the squared weights, pulling them toward zero; early stopping keeps the weights from the best validation epoch. All three limit what a network can memorize.",
+      text: "L2, or weight decay, penalizes squared weights, pulling them toward zero; early stopping keeps the weights from the best validation epoch. All three limit what a network can memorize.",
       pauseAfter: 0.7,
     },
     { id: "cnn-in", text: "Then, architectures shaped to their data." },
@@ -516,7 +517,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q10-props",
-      text: "Each output sees a small patch through one shared filter, so a pattern is found anywhere: shift the digit two pixels right, and the map shifts with it. Pooling then shrinks the map and tolerates small shifts.",
+      text: "Each output sees a small patch through one shared filter, so a pattern is found anywhere: shift the digit two pixels right, and the map shifts with it. Pooling then shrinks it, tolerating small shifts.",
       pauseAfter: 0.7,
     },
     { id: "q11", text: "Question eleven. Why are CNNs well suited to images compared to a fully-connected net?" },
@@ -544,7 +545,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-softmax",
-      text: "Why pair softmax with cross-entropy? Their combined gradient is prediction minus target, large exactly when the model is confidently wrong. Libraries fuse them on raw logits, so don't add a softmax: done twice with ten classes, the right class tops out at twenty-three percent, and the loss never drops below one point four six.",
+      text: "Why pair softmax with cross-entropy? Their combined gradient is prediction minus target, large exactly when the model is confidently wrong. Libraries fuse them on raw logits, so don't add a softmax: applied twice over ten classes, the right class tops out at twenty-three percent, and the loss can't drop below one point four six.",
       pauseAfter: 0.8,
     },
     { id: "rnn-in", text: "Last, sequences." },

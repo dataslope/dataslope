@@ -345,7 +345,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q4-scale",
-      text: "Why divide? Simulate queries and keys of sixty-four random numbers: the raw dot products spread eight times wider, and softmax puts on average eighty-five percent of a row's weight on one key, where its gradient is small. Divided by eight, the top weight averages twenty-five percent.",
+      text: "Why divide? Simulate queries and keys of sixty-four random numbers: their dot products spread eight times wider than the numbers do, and softmax puts on average eighty-five percent of a row's weight on one key, where its gradient is small. Divided by eight, the top weight averages twenty-five percent.",
       pauseAfter: 0.7,
     },
     {
@@ -497,7 +497,7 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
-      text: "But a model in a notebook isn't a product yet. Next: the system around it, in ML system design.",
+      text: "But a model in a notebook isn't a product yet. Next: ML system design, the system around it.",
     },
   ],
 };

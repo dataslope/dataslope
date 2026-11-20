@@ -346,3 +346,156 @@ const R = JSON.parse(out);
 writeFileSync(join(here, "results.json"), JSON.stringify(R) + "\n");
 const brief = (o) => JSON.stringify(o, (k, v) => (Array.isArray(v) && v.length > 12 ? `[${v.length} items]` : v));
 for (const k of Object.keys(R)) console.log(k, brief(R[k]));
+
+// ── What the narration quotes, still on the pages ──────────────────────────
+const dir = join(here, "../../../../content/interview/machine-learning-engineer");
+const page = (file) => readFileSync(join(dir, file), "utf8");
+const problems = [];
+const quotes = [
+  ["ml-fundamentals.mdx", "### How does gradient descent work?"],
+  ["ml-fundamentals.mdx", "### What is the difference between batch gradient descent, SGD, and mini-batch GD?"],
+  ["ml-fundamentals.mdx", "(e.g., 32–512 examples)"],
+  ["ml-fundamentals.mdx", "which can help escape local minima"],
+  ["ml-fundamentals.mdx", "### How do you choose the learning rate?"],
+  ["deep-learning.mdx", "### How do you choose and schedule the learning rate?"],
+  ["deep-learning.mdx", "ramp up over the first few hundred steps to avoid early\ninstability"],
+  ["deep-learning.mdx", "(step, cosine, or linear)"],
+  ["deep-learning.mdx", "Adaptive optimizers reduce but don't eliminate\nthe need to tune the base rate"],
+  ["ml-fundamentals.mdx", "### How does logistic regression work?"],
+  ["ml-fundamentals.mdx", "It is trained by minimizing binary cross-entropy (log loss)"],
+  ["ml-fundamentals.mdx", "Despite its name it is a\n**classification** model"],
+  ["ml-fundamentals.mdx", "### What is cross-entropy loss and why is it preferred over MSE for classification?"],
+  ["ml-fundamentals.mdx", "giving larger gradients\nwhen the model is wrong and confident"],
+  ["ml-fundamentals.mdx", "### What is the difference between a parametric and a non-parametric model?"],
+  ["ml-fundamentals.mdx", "**Non-parametric** models (kNN, kernel SVM)"],
+  ["ml-fundamentals.mdx", "### How does k-nearest neighbours (kNN) work?"],
+  ["ml-fundamentals.mdx", "scales poorly at inference"],
+  ["ml-fundamentals.mdx", "### How does a support vector machine (SVM) work?"],
+  ["ml-fundamentals.mdx", "Support vectors are the training points closest to the boundary"],
+  ["ml-fundamentals.mdx", "slow on large datasets"],
+  ["ml-fundamentals.mdx", "### What is feature scaling and why does it matter?"],
+  ["ml-fundamentals.mdx", "Tree-based models are\nscale-invariant"],
+  ["ml-fundamentals.mdx", "`X_val` and `X_test`, the discipline that prevents leakage"],
+  ["ml-fundamentals.mdx", "### What is PCA and what does it do?"],
+  ["ml-fundamentals.mdx", "decorrelating features"],
+  ["ml-fundamentals.mdx", "### What are ensembles? Explain bagging and boosting."],
+  ["ml-fundamentals.mdx", "but can overfit\nif not regularized"],
+  ["ml-fundamentals.mdx", "### How does a Random Forest differ from a single decision tree?"],
+  ["ml-fundamentals.mdx", "The\nrandomness decorrelates the trees"],
+  ["ml-fundamentals.mdx", "### What is gradient boosting?"],
+  ["ml-fundamentals.mdx", "Modern implementations (XGBoost, LightGBM,\nCatBoost) add column subsampling, row subsampling, L1/L2 regularization,\nand efficient histogram-based splitting"],
+  ["ml-fundamentals.mdx", "### Supervised vs unsupervised vs reinforcement learning?"],
+  ["ml-fundamentals.mdx", "### What loss functions are used for regression vs classification?"],
+  ["ml-fundamentals.mdx", "Huber loss (combines both)"],
+  ["ml-fundamentals.mdx", "hinge loss, contrastive loss, or\ntriplet loss"],
+  ["ml-fundamentals.mdx", "### What is k-means clustering?"],
+  ["ml-fundamentals.mdx", "spherical, equally-sized clusters"],
+  ["ml-fundamentals.mdx", "### What is one-hot encoding?"],
+  ["ml-fundamentals.mdx", "emit all-zeros for any category unseen at fit time"],
+  ["ml-fundamentals.mdx", "### What is feature engineering?"],
+  ["ml-fundamentals.mdx", "Good features often matter more than\nchoice of algorithm"],
+  ["ml-fundamentals.mdx", "variance falls with the number of models onto a floor set by how\ncorrelated their errors are"],
+];
+for (const [file, phrase] of quotes) if (!page(file).includes(phrase)) problems.push(`${file} no longer says: ${phrase.replace(/\n/g, " ")}`);
+// The page's ensemble chart, whose formula and correlations bag-floor draws.
+const chart = readFileSync(join(here, "../../../../charts/ensemble-variance.mjs"), "utf8");
+if (!chart.includes("variance: rho + (1 - rho) / n") || !chart.includes("const RHOS = [0, 0.3, 0.6];")) problems.push("charts/ensemble-variance.mjs no longer draws rho + (1 - rho) / n at 0.3 and 0.6");
+
+// The page's blocks print what the page says they print.
+if (R.onehot.encoded.map((r) => r.join("")).join() !== "001,010,100,001") problems.push(`one-hot rows are ${JSON.stringify(R.onehot.encoded)}, not the page's [[0,0,1], [0,1,0], [1,0,0], [0,0,1]]`);
+if (!page("ml-fundamentals.mdx").includes("# [[0,0,1], [0,1,0], [1,0,0], [0,0,1]]")) problems.push("the page no longer comments its one-hot output");
+if (R.onehot.purple.some((v) => v !== 0)) problems.push("purple does not encode as all zeros");
+if (R.logit.parameters !== 11 || R.logit.trainRows !== 160) problems.push(`the logistic model has ${R.logit.parameters} numbers and ${R.logit.trainRows} training rows`);
+
+// ── The numbers the narration says, in words ─────────────────────────────────
+const { script } = await import(pathToFileURL(join(here, "script.ts")).href);
+const ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+const whole = (n) => {
+  if (n < 20) return ONES[n];
+  if (n < 100) return TENS[Math.floor(n / 10)] + (n % 10 ? `-${ONES[n % 10]}` : "");
+  if (n < 1000) return `${ONES[Math.floor(n / 100)]} hundred${n % 100 ? ` and ${whole(n % 100)}` : ""}`;
+  return `${whole(Math.floor(n / 1000))} thousand${n % 1000 ? (n % 1000 < 100 ? ` and ${whole(n % 1000)}` : ` ${whole(n % 1000)}`) : ""}`;
+};
+/** "0.94" -> "point nine four"; "0.03" -> "point oh three". */
+const point = (s) => `point ${[...s.split(".")[1]].map((d) => (d === "0" ? "oh" : ONES[Number(d)])).join(" ")}`;
+/** 1.93 -> "one point nine three"; -0.94 -> "minus point nine four". */
+const decimal = (v, places) => {
+  const s = Math.abs(v).toFixed(places);
+  const [i] = s.split(".");
+  return `${v < 0 ? "minus " : ""}${i === "0" ? "" : `${whole(Number(i))} `}${point(s)}`;
+};
+const pct = (v) => whole(Math.round(v * 100));
+const text = (id) => {
+  const b = script.beats.find((x) => x.id === id);
+  if (!b) throw new Error(`script.ts has no beat "${id}"`);
+  return b.text.toLowerCase();
+};
+const L = R.gd.learned;
+const vote = R.knn.vote;
+const E = R.ensemble;
+const B1 = R.boost.runs["1.0"], B01 = R.boost.runs["0.1"];
+const claims = [
+  ["hook", `all of it: ${whole(R.logit.parameters)} numbers`],
+  ["hook", `every one of its ${whole(R.logit.trainRows).replace(/^one /, "")} training rows`],
+  ["param-cost", `still ${whole(R.logit.parameters)} numbers`],
+  ["param-in", `kept ${whole(R.logit.parameters)} numbers`],
+  ["gd-run", `reach ${decimal(L[0], 2)}, ${decimal(L[1], 2)} and ${decimal(L[2], 2)}`],
+  ["gd-run", "one, two and minus one"],
+  ["gd-run", `${whole(R.gd.rows).replace(/^one /, "a ")} noisy rows`],
+  ["batch-mini", "thirty-two to five hundred and twelve rows"],
+  ["batch-run", `${whole(R.batch.updates)} steps each`],
+  ["batch-run", `reads ${whole(R.batch.runs.batch.rowsRead)} rows`],
+  ["batch-run", `read ${whole(R.batch.runs.single.rowsRead)}`],
+  ["lr-band", "nearly twelve hundred steps"],
+  ["lr-band", `at point nine, it settles in ${whole(R.gd.settle["0.9"])}`],
+  ["lr-band", "past about two"],
+  ["lr-range", "from about point five, and turns up at two"],
+  ["lr-sched", `about ${point(R.lr.constant.toFixed(2))} from the best answer`],
+  ["lr-sched", `about ${point(R.lr.cosine.toFixed(3))}`],
+  ["logit-run", `scores ${pct(R.logit.accuracy)} percent on ${whole(R.logit.testRows)} held-out rows`],
+  ["logit-run", `${point(R.logit.first5[0].toFixed(2))} and ${point(R.logit.first5[1].toFixed(2))}`],
+  ["ce-run", `right on ${pct(R.ce.start)} percent of rows`],
+  ["ce-run", `reaches ${pct(R.ce.target)} percent in ${whole(R.ce.ceSteps)} steps`],
+  ["ce-run", `at the same rate, takes ${whole(R.ce.mseSteps)}`],
+  ["knn", `${whole(R.knn.k)} neighbours vote ${whole(Math.max(vote.ones, vote.zeros))} to ${whole(Math.min(vote.ones, vote.zeros))}`],
+  ["svm-kernel", `scores ${pct(R.svm.linear)} percent`],
+  ["svm-kernel", `kernel, ${pct(R.svm.rbf)}`],
+  ["svm-cost", `${whole(Math.round(R.svm.supportVectors["20000"] / 100) * 100)} of twenty thousand`],
+  ["scale-knn", `scores ${R.knn.raw === 0.745 ? "seventy-four and a half" : pct(R.knn.raw)} percent`],
+  ["scale-knn", `standardized, ${pct(R.knn.scaled)}`],
+  ["scale-gd", `from ${whole(R.scale.asIs.steps)} steps to nearly eighty thousand`],
+  ["pca-run", `keep ${pct(R.pca.total)} percent of the variance`],
+  ["pca-run", `the last ${whole(R.pca.zero)} keep none`],
+  ["pca-trap", `holds ${pct(R.pca.trap.ratio[0])} percent of the variance`],
+  ["pca-trap", `the other ${pct(R.pca.trap.ratio[1])} percent predicts it at ${pct(R.pca.trap.second)}`],
+  ["forest", `${whole(E.tried)} of the sixty-four pixels`],
+  ["forest-run", `one tree scores ${pct(E.tree)} percent`],
+  ["forest-run", `${pct(E.forestSingle)} percent against ${pct(E.baggedSingle)}`],
+  ["forest-run", `score ${pct(E.forest)} against ${pct(E.bagged)}`],
+  ["gb-rate", `lowest after ${whole(B1.best)} trees`],
+  ["gb-rate", `until ${whole(B01.best)}`],
+];
+for (const [id, phrase] of claims) if (!text(id).includes(phrase)) problems.push(`script.ts "${id}" no longer says "${phrase}"`);
+
+// Facts the narration rests on, beyond its words.
+const fact = (ok, what) => ok || problems.push(what);
+fact(R.gd.settle["0.01"] > 1100 && R.gd.settle["0.01"] < 1200, `"nearly twelve hundred steps": ${R.gd.settle["0.01"]}`);
+fact(R.gd.limit > 1.9 && R.gd.limit < 2.05 && R.gd.diverges["2.0"] && R.gd.diverges["2.5"], `"past about two": limit ${R.gd.limit}, ${JSON.stringify(R.gd.diverges)}`);
+fact(R.lr.lowest[0] > 0.4 && R.lr.lowest[0] < 0.7, `the range test bottoms out at ${R.lr.lowest[0]}, not "about point five"`);
+const turn = R.lr.range.find((r) => r[0] > R.lr.lowest[0] && r[1] > 2 * R.lr.lowest[1] && r[0] > 1.5);
+fact(turn && turn[0] > 1.8 && turn[0] < 2.2, `the range test turns up at ${turn && turn[0]}, not "at two"`);
+fact(R.ce.ceSteps < R.ce.mseSteps / 5, "cross-entropy is not far quicker than squared error");
+fact(R.knn.raw === R.knn.incomeOnly, `"exactly what income alone scores": ${R.knn.raw} against ${R.knn.incomeOnly}`);
+fact(R.scale.times100.steps > 70000 && R.scale.times100.steps < 80000, `"nearly eighty thousand": ${R.scale.times100.steps}`);
+fact(R.pca.trap.first < 0.6, `"barely better than a coin flip": ${R.pca.trap.first}`);
+fact(R.svm.doubling.every((x) => x > 3), `"doubling the rows more than tripled the fit time": ${R.svm.doubling} (timings; rerun if this machine was busy)`);
+fact(B01.bestValidation < B1.bestValidation / 2, `"less than half the error": ${B01.bestValidation} against ${B1.bestValidation}`);
+fact(B1.atEnd > B1.bestValidation, "a rate of one does not overfit past its best");
+fact(E.forestCurve["1"] < E.baggedCurve["1"] && E.forest > E.bagged, "the forest does not start below bagging and finish above it");
+const wrong = 1 - R.kmeans.stretched;
+fact(R.kmeans.round === 1 && wrong > 0.15 && wrong < 0.25, `"about one point in five lands wrong": ${wrong}`);
+
+for (const p of problems) console.error(p);
+if (problems.length) process.exit(1);
+console.error("ok: every quoted phrase is on the page, and every measured number is said");
