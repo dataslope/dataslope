@@ -207,8 +207,9 @@ export const TokenScene: React.FC = () => {
           <Num>{Math.round(T.unseenRunningShare * 100)}%</Num> of its words never seen
         </Line>
         {unseen.map((w, i) => {
-          const at = hallAt + i * 4;
-          const fly = ease(frame, at, 16);
+          // One word in flight at a time, so no two chips cross on the way.
+          const at = hallAt + i * 8;
+          const fly = ease(frame, at, 9);
           if (fly <= 0) return null;
           const fx = lerp(nlpX, COL.words, fly);
           const fy = lerp(stackTop + 20, rowY(i), fly);
