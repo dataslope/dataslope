@@ -36,7 +36,14 @@ These were cut free from the kept takes with `--recut`: `builtins-key` (take 2),
 
 ## Checks (on the final code, through `out/entries/AnalyticsEngineer-7-Testing.tsx` and the queue)
 
-CHECKS_PLACEHOLDER
+- tsc and eslint report no errors in `src/videos/ae-testing/`.
+- `check:cues` passes: every word cue names a phrase its beat says.
+- `npm test`: 79 pass, 0 fail.
+- `check:frames` (`CHECK_SCALE=1`) passes: 4 images, 26 arrows, spacing, sizes and families all clean.
+- `check:motion` passes: 9:53.0, with no still stretch of 2 s or more.
+- `check:sync` passes: 53 beats, worst +0.03 s at `builtins-key`.
+- `check:mix` passes: speech is a median 30.3 dB above the effects, and at least 10.9 dB above them while the voice is speaking.
+- The WAVs and the preview the checks left in `out/` are deleted.
 
 Stills looked at: 49, 52, 61.8, 62, 91.5, 121, 140.5, 148.4, 185.5, 223.5, 272, 305.3, 313, 388, 415, 431.5, 449, 574 and 578.5 s. They show:
 

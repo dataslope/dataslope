@@ -124,7 +124,7 @@
           ]
         },
         "test": {
-          "sql": "-- What a dbt 'unique' test on order_id checks: return duplicate keys\nSELECT order_id, COUNT(*) AS n\nFROM fct_orders\nGROUP BY order_id\nHAVING COUNT(*) > 1\nORDER BY order_id;",
+          "sql": "-- What a dbt 'unique' test on order_id checks: return duplicate keys\n-- (nulls are skipped; not_null is the test that catches those)\nSELECT order_id, COUNT(*) AS n\nFROM fct_orders\nWHERE order_id IS NOT NULL\nGROUP BY order_id\nHAVING COUNT(*) > 1\nORDER BY order_id;",
           "ok": true,
           "columns": [
             "order_id",
