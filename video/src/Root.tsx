@@ -116,6 +116,27 @@ import { BeAlgorithms } from "./videos/be-algorithms/Video";
 import { script as beAlgorithmsScript } from "./videos/be-algorithms/script";
 import { BeAiRound } from "./videos/be-ai-round/Video";
 import { script as beAiRoundScript } from "./videos/be-ai-round/script";
+// Analytics Engineer interview prep (2026-11-20).
+import { AeInterview } from "./videos/ae-interview/Video";
+import { script as aeInterviewScript } from "./videos/ae-interview/script";
+import { AeFactsAndGrain } from "./videos/ae-facts-and-grain/Video";
+import { script as aeFactsAndGrainScript } from "./videos/ae-facts-and-grain/script";
+import { AeChangingDimensions } from "./videos/ae-changing-dimensions/Video";
+import { script as aeChangingDimensionsScript } from "./videos/ae-changing-dimensions/script";
+import { AeDbt } from "./videos/ae-dbt/Video";
+import { script as aeDbtScript } from "./videos/ae-dbt/script";
+import { AeIncremental } from "./videos/ae-incremental/Video";
+import { script as aeIncrementalScript } from "./videos/ae-incremental/script";
+import { AeAdvancedSql } from "./videos/ae-advanced-sql/Video";
+import { script as aeAdvancedSqlScript } from "./videos/ae-advanced-sql/script";
+import { AeWarehousing } from "./videos/ae-warehousing/Video";
+import { script as aeWarehousingScript } from "./videos/ae-warehousing/script";
+import { AeTesting } from "./videos/ae-testing/Video";
+import { script as aeTestingScript } from "./videos/ae-testing/script";
+import { AeMetrics } from "./videos/ae-metrics/Video";
+import { script as aeMetricsScript } from "./videos/ae-metrics/script";
+import { AeAiSemanticLayer } from "./videos/ae-ai-semantic-layer/Video";
+import { script as aeAiSemanticLayerScript } from "./videos/ae-ai-semantic-layer/script";
 // Machine Learning Engineer interview questions, one video per part.
 import { MleInterview } from "./videos/mle-interview/Video";
 import { script as mleInterviewScript } from "./videos/mle-interview/script";
@@ -1221,6 +1242,108 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(mleLlmEvalsScript)}
+      />
+    </Folder>
+    <Folder name="Interview-Analytics-Engineer">
+      <Composition
+        id="AnalyticsEngineer-0-Interview"
+        component={AeInterview}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(aeInterviewScript)}
+      />
+      <Composition
+        id="AnalyticsEngineer-1-FactsAndGrain"
+        component={AeFactsAndGrain}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(aeFactsAndGrainScript)}
+      />
+      <Composition
+        id="AnalyticsEngineer-2-ChangingDimensions"
+        component={AeChangingDimensions}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(aeChangingDimensionsScript)}
+      />
+      <Composition
+        id="AnalyticsEngineer-3-Dbt"
+        component={AeDbt}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(aeDbtScript)}
+      />
+      <Composition
+        id="AnalyticsEngineer-4-Incremental"
+        component={AeIncremental}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(aeIncrementalScript)}
+      />
+      <Composition
+        id="AnalyticsEngineer-5-AdvancedSql"
+        component={AeAdvancedSql}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(aeAdvancedSqlScript)}
+      />
+      <Composition
+        id="AnalyticsEngineer-6-Warehousing"
+        component={AeWarehousing}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(aeWarehousingScript)}
+      />
+      <Composition
+        id="AnalyticsEngineer-7-Testing"
+        component={AeTesting}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(aeTestingScript)}
+      />
+      <Composition
+        id="AnalyticsEngineer-8-Metrics"
+        component={AeMetrics}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(aeMetricsScript)}
+      />
+      <Composition
+        id="AnalyticsEngineer-9-AiSemanticLayer"
+        component={AeAiSemanticLayer}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(aeAiSemanticLayerScript)}
       />
     </Folder>
     <Folder name="Interview-Data-Engineer">

@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "model": "gpt-image-2.6-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "ae-ai-semantic-layer-dolphin",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a bottlenose dolphin rising in a gentle arc as if mid-leap, its smooth body curved, flippers spread, its rounded beak and bright eye turned toward the viewer with a friendly, attentive expression; one large, bold, simple silhouette that reads at a small size"
+    },
+    {
+      "id": "ae-ai-semantic-layer-easel",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a presentation easel holding one large blank board with a single tall bar painted on it"
+    },
+    {
+      "id": "ae-ai-semantic-layer-padlock",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a heavy closed padlock with a thick rounded shackle"
+    },
+    {
+      "id": "ae-ai-semantic-layer-hourglass",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "an hourglass with a sturdy wooden frame, most of its sand already run into the lower bulb"
+    },
+    {
+      "id": "ae-ai-semantic-layer-golden",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small open wooden box holding a neat upright row of plain blank cards with golden edges"
+    },
+    {
+      "id": "ae-ai-semantic-layer-magnifier",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a large magnifying glass with a thick round rim and a short sturdy handle, lying at a slight tilt"
+    }
+  ]
+}

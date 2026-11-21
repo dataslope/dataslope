@@ -48,6 +48,9 @@ export const SAY: Readonly<Record<string, string>> = {
   ASCII: "ask-ee",
   XOR: "ex-or",
   deque: "deck",
+  // The Analytics Engineer series (2026-11-20). dbt, SCD, OLTP, CTE and KPI
+  // are read letter by letter, as people say them.
+  YAML: "yammel",
   // The Machine Learning Engineer series (2026-11-20). RAG, ReLU, GELU and
   // tanh are left out: they are already voiced in de-interview,
   // de-pipelines-for-ai and ds-deep-learning, where Drew says the first two

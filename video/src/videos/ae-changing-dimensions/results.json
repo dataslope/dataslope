@@ -1,0 +1,1261 @@
+{
+  "figures": {
+    "scd": {
+      "setup": "CREATE TABLE dim_customer AS SELECT * FROM (VALUES\n  (1001, 42, 'Acme Corp', 'East', DATE '2020-01-01', DATE '2023-06-14', FALSE),\n  (1002, 42, 'Acme Corp', 'West', DATE '2023-06-15', DATE '9999-12-31', TRUE),\n  (1003, 99, 'Globex', 'North', DATE '2021-03-01', DATE '9999-12-31', TRUE),\n  (1004, 17, 'Initech', 'South', DATE '2019-04-01', DATE '2022-08-31', FALSE),\n  (1005, 17, 'Initech', 'East', DATE '2022-09-01', DATE '9999-12-31', TRUE),\n  (1006, 23, 'Umbrella', 'West', DATE '2020-06-15', DATE '2023-01-31', FALSE),\n  (1007, 23, 'Umbrella', 'North', DATE '2023-02-01', DATE '9999-12-31', TRUE),\n  (1008, 31, 'Hooli', 'East', DATE '2021-01-01', DATE '9999-12-31', TRUE),\n  (1009, 55, 'Stark Ind', 'South', DATE '2018-03-01', DATE '2021-11-30', FALSE),\n  (1010, 55, 'Stark Ind', 'West', DATE '2021-12-01', DATE '2023-09-30', FALSE),\n  (1011, 55, 'Stark Ind', 'North', DATE '2023-10-01', DATE '9999-12-31', TRUE),\n  (1012, 68, 'Wayne Ent', 'East', DATE '2020-02-01', DATE '9999-12-31', TRUE),\n  (1013, 74, 'Cyberdyne', 'West', DATE '2019-09-01', DATE '2022-04-30', FALSE),\n  (1014, 74, 'Cyberdyne', 'South', DATE '2022-05-01', DATE '9999-12-31', TRUE),\n  (1015, 86, 'Tyrell Corp', 'North', DATE '2021-07-01', DATE '9999-12-31', TRUE),\n  (1016, 91, 'Soylent', 'South', DATE '2020-10-01', DATE '2023-03-31', FALSE),\n  (1017, 91, 'Soylent', 'East', DATE '2023-04-01', DATE '9999-12-31', TRUE),\n  (1018, 12, 'Massive Dyn', 'West', DATE '2019-01-01', DATE '9999-12-31', TRUE),\n  (1019, 28, 'Aperture', 'North', DATE '2021-05-01', DATE '2022-12-31', FALSE),\n  (1020, 28, 'Aperture', 'South', DATE '2023-01-01', DATE '9999-12-31', TRUE),\n  (1021, 39, 'Vandelay', 'East', DATE '2020-08-01', DATE '9999-12-31', TRUE),\n  (1022, 47, 'Duff Beer', 'West', DATE '2018-11-01', DATE '2021-06-30', FALSE),\n  (1023, 47, 'Duff Beer', 'North', DATE '2021-07-01', DATE '9999-12-31', TRUE),\n  (1024, 63, 'Gringotts', 'South', DATE '2022-02-01', DATE '9999-12-31', TRUE)\n) AS t(customer_sk, customer_id, customer_name, region, valid_from, valid_to, is_current);\n\nCREATE TABLE fact_orders AS SELECT * FROM (VALUES\n  (5001, 42, DATE '2022-05-10', 1200.00), (5002, 42, DATE '2024-02-20', 850.00),\n  (5003, 99, DATE '2023-11-01', 320.00),  (5004, 17, DATE '2021-07-14', 640.00),\n  (5005, 17, DATE '2023-03-08', 415.00),  (5006, 23, DATE '2022-04-19', 980.00),\n  (5007, 23, DATE '2023-08-22', 275.00),  (5008, 31, DATE '2022-10-05', 1530.00),\n  (5009, 55, DATE '2020-06-11', 720.00),  (5010, 55, DATE '2022-09-27', 460.00),\n  (5011, 55, DATE '2024-01-16', 1105.00), (5012, 68, DATE '2023-05-30', 385.00),\n  (5013, 74, DATE '2021-03-24', 890.00),  (5014, 74, DATE '2023-12-09', 540.00),\n  (5015, 86, DATE '2022-11-18', 1250.00), (5016, 91, DATE '2021-12-02', 305.00),\n  (5017, 91, DATE '2024-03-15', 770.00),  (5018, 12, DATE '2022-06-07', 1420.00),\n  (5019, 28, DATE '2022-03-21', 195.00),  (5020, 28, DATE '2023-09-13', 660.00),\n  (5021, 39, DATE '2023-02-26', 1080.00), (5022, 47, DATE '2020-09-04', 425.00),\n  (5023, 47, DATE '2023-06-17', 935.00),  (5024, 63, DATE '2023-10-28', 580.00)\n) AS t(order_id, customer_id, order_date, amount);",
+      "steps": {
+        "orders42": {
+          "sql": "SELECT order_id, order_date, amount\nFROM fact_orders\nWHERE customer_id = 42\nORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "order_date",
+            "amount"
+          ],
+          "rows": [
+            [
+              5001,
+              "2022-05-10",
+              "1200.00"
+            ],
+            [
+              5002,
+              "2024-02-20",
+              "850.00"
+            ]
+          ]
+        },
+        "rows42": {
+          "sql": "SELECT customer_sk, region, valid_from, valid_to, is_current\nFROM dim_customer\nWHERE customer_id = 42\nORDER BY valid_from;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "region",
+            "valid_from",
+            "valid_to",
+            "is_current"
+          ],
+          "rows": [
+            [
+              1001,
+              "East",
+              "2020-01-01",
+              "2023-06-14",
+              false
+            ],
+            [
+              1002,
+              "West",
+              "2023-06-15",
+              "9999-12-31",
+              true
+            ]
+          ]
+        },
+        "page": {
+          "sql": "SELECT\n    f.order_id,\n    c.region       AS region_at_order_time,\n    f.amount\nFROM fact_orders f\nJOIN dim_customer c\n    ON  c.customer_id = f.customer_id\n    AND f.order_date BETWEEN c.valid_from AND c.valid_to\nORDER BY f.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "region_at_order_time",
+            "amount"
+          ],
+          "rows": [
+            [
+              5001,
+              "East",
+              "1200.00"
+            ],
+            [
+              5002,
+              "West",
+              "850.00"
+            ],
+            [
+              5003,
+              "North",
+              "320.00"
+            ],
+            [
+              5004,
+              "South",
+              "640.00"
+            ],
+            [
+              5005,
+              "East",
+              "415.00"
+            ],
+            [
+              5006,
+              "West",
+              "980.00"
+            ],
+            [
+              5007,
+              "North",
+              "275.00"
+            ],
+            [
+              5008,
+              "East",
+              "1530.00"
+            ],
+            [
+              5009,
+              "South",
+              "720.00"
+            ],
+            [
+              5010,
+              "West",
+              "460.00"
+            ],
+            [
+              5011,
+              "North",
+              "1105.00"
+            ],
+            [
+              5012,
+              "East",
+              "385.00"
+            ],
+            [
+              5013,
+              "West",
+              "890.00"
+            ],
+            [
+              5014,
+              "South",
+              "540.00"
+            ],
+            [
+              5015,
+              "North",
+              "1250.00"
+            ],
+            [
+              5016,
+              "South",
+              "305.00"
+            ],
+            [
+              5017,
+              "East",
+              "770.00"
+            ],
+            [
+              5018,
+              "West",
+              "1420.00"
+            ],
+            [
+              5019,
+              "North",
+              "195.00"
+            ],
+            [
+              5020,
+              "South",
+              "660.00"
+            ],
+            [
+              5021,
+              "East",
+              "1080.00"
+            ],
+            [
+              5022,
+              "West",
+              "425.00"
+            ],
+            [
+              5023,
+              "North",
+              "935.00"
+            ],
+            [
+              5024,
+              "South",
+              "580.00"
+            ]
+          ]
+        },
+        "matched": {
+          "sql": "SELECT COUNT(*) AS matched, COUNT(DISTINCT f.order_id) AS orders\nFROM fact_orders f\nJOIN dim_customer c\n  ON  c.customer_id = f.customer_id\n  AND f.order_date BETWEEN c.valid_from AND c.valid_to;",
+          "ok": true,
+          "columns": [
+            "matched",
+            "orders"
+          ],
+          "rows": [
+            [
+              24,
+              24
+            ]
+          ]
+        },
+        "seams": {
+          "sql": "SELECT COUNT(*) AS seams,\n  COUNT(*) FILTER (WHERE next_from <> valid_to + 1) AS bad_seams\nFROM (\n  SELECT valid_to, LEAD(valid_from) OVER (PARTITION BY customer_id ORDER BY valid_from) AS next_from\n  FROM dim_customer\n) s WHERE next_from IS NOT NULL;",
+          "ok": true,
+          "columns": [
+            "seams",
+            "bad_seams"
+          ],
+          "rows": [
+            [
+              9,
+              0
+            ]
+          ]
+        },
+        "current": {
+          "sql": "SELECT\n    customer_sk,\n    customer_id,\n    customer_name,\n    region,\n    valid_from,\n    valid_to,\n    is_current\nFROM dim_customer\nWHERE is_current = TRUE;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "customer_id",
+            "customer_name",
+            "region",
+            "valid_from",
+            "valid_to",
+            "is_current"
+          ],
+          "rows": [
+            [
+              1002,
+              42,
+              "Acme Corp",
+              "West",
+              "2023-06-15",
+              "9999-12-31",
+              true
+            ],
+            [
+              1003,
+              99,
+              "Globex",
+              "North",
+              "2021-03-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1005,
+              17,
+              "Initech",
+              "East",
+              "2022-09-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1007,
+              23,
+              "Umbrella",
+              "North",
+              "2023-02-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1008,
+              31,
+              "Hooli",
+              "East",
+              "2021-01-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1011,
+              55,
+              "Stark Ind",
+              "North",
+              "2023-10-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1012,
+              68,
+              "Wayne Ent",
+              "East",
+              "2020-02-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1014,
+              74,
+              "Cyberdyne",
+              "South",
+              "2022-05-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1015,
+              86,
+              "Tyrell Corp",
+              "North",
+              "2021-07-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1017,
+              91,
+              "Soylent",
+              "East",
+              "2023-04-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1018,
+              12,
+              "Massive Dyn",
+              "West",
+              "2019-01-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1020,
+              28,
+              "Aperture",
+              "South",
+              "2023-01-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1021,
+              39,
+              "Vandelay",
+              "East",
+              "2020-08-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1023,
+              47,
+              "Duff Beer",
+              "North",
+              "2021-07-01",
+              "9999-12-31",
+              true
+            ],
+            [
+              1024,
+              63,
+              "Gringotts",
+              "South",
+              "2022-02-01",
+              "9999-12-31",
+              true
+            ]
+          ]
+        },
+        "currentCount": {
+          "sql": "SELECT COUNT(*) AS current_rows, COUNT(DISTINCT customer_id) AS customers\nFROM dim_customer WHERE is_current;",
+          "ok": true,
+          "columns": [
+            "current_rows",
+            "customers"
+          ],
+          "rows": [
+            [
+              15,
+              15
+            ]
+          ]
+        },
+        "versions": {
+          "sql": "SELECT COUNT(*) AS rows, COUNT(DISTINCT customer_id) AS customers,\n  COUNT(DISTINCT customer_id) FILTER (WHERE NOT is_current) AS customers_who_changed\nFROM dim_customer;",
+          "ok": true,
+          "columns": [
+            "rows",
+            "customers",
+            "customers_who_changed"
+          ],
+          "rows": [
+            [
+              24,
+              15,
+              8
+            ]
+          ]
+        },
+        "natural": {
+          "sql": "SELECT COUNT(*) AS rows, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN dim_customer c ON c.customer_id = f.customer_id;",
+          "ok": true,
+          "columns": [
+            "rows",
+            "revenue"
+          ],
+          "rows": [
+            [
+              44,
+              "31580.00"
+            ]
+          ]
+        },
+        "truth": {
+          "sql": "SELECT COUNT(*) AS rows, SUM(amount) AS revenue FROM fact_orders;",
+          "ok": true,
+          "columns": [
+            "rows",
+            "revenue"
+          ],
+          "rows": [
+            [
+              24,
+              "17930.00"
+            ]
+          ]
+        },
+        "t2Regions2022": {
+          "sql": "SELECT c.region, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN dim_customer c\n  ON  c.customer_id = f.customer_id\n  AND f.order_date BETWEEN c.valid_from AND c.valid_to\nWHERE f.order_date BETWEEN DATE '2022-01-01' AND DATE '2022-12-31'\nGROUP BY c.region\nORDER BY c.region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "East",
+              "2730.00"
+            ],
+            [
+              "North",
+              "1445.00"
+            ],
+            [
+              "West",
+              "2860.00"
+            ]
+          ]
+        },
+        "t1Build": {
+          "sql": "CREATE TABLE dim_customer_t1 AS\nSELECT customer_id, customer_name, region\nFROM dim_customer\nWHERE is_current;",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "t1Rows42": {
+          "sql": "SELECT customer_id, customer_name, region\nFROM dim_customer_t1\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "customer_name",
+            "region"
+          ],
+          "rows": [
+            [
+              42,
+              "Acme Corp",
+              "West"
+            ]
+          ]
+        },
+        "t1Orders42": {
+          "sql": "SELECT f.order_id, f.order_date, c.region, f.amount\nFROM fact_orders f\nJOIN dim_customer_t1 c ON c.customer_id = f.customer_id\nWHERE f.customer_id = 42\nORDER BY f.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "order_date",
+            "region",
+            "amount"
+          ],
+          "rows": [
+            [
+              5001,
+              "2022-05-10",
+              "West",
+              "1200.00"
+            ],
+            [
+              5002,
+              "2024-02-20",
+              "West",
+              "850.00"
+            ]
+          ]
+        },
+        "t1Regions2022": {
+          "sql": "SELECT c.region, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN dim_customer_t1 c ON c.customer_id = f.customer_id\nWHERE f.order_date BETWEEN DATE '2022-01-01' AND DATE '2022-12-31'\nGROUP BY c.region\nORDER BY c.region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "East",
+              "1530.00"
+            ],
+            [
+              "North",
+              "2690.00"
+            ],
+            [
+              "South",
+              "195.00"
+            ],
+            [
+              "West",
+              "2620.00"
+            ]
+          ]
+        },
+        "lateCurrent": {
+          "sql": "SELECT customer_sk, region\nFROM dim_customer\nWHERE customer_id = 42\n  AND is_current;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "region"
+          ],
+          "rows": [
+            [
+              1002,
+              "West"
+            ]
+          ]
+        },
+        "latePit": {
+          "sql": "SELECT customer_sk, region\nFROM dim_customer\nWHERE customer_id = 42\n  AND DATE '2022-05-10' BETWEEN valid_from AND valid_to;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "region"
+          ],
+          "rows": [
+            [
+              1001,
+              "East"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "t1mix": {
+      "setup": "CREATE TABLE dim_customer AS SELECT * FROM (VALUES\n  (1001, 42, 'Acme Corp', 'East', DATE '2020-01-01', DATE '2023-06-14', FALSE),\n  (1002, 42, 'Acme Corp', 'West', DATE '2023-06-15', DATE '9999-12-31', TRUE),\n  (1003, 99, 'Globex', 'North', DATE '2021-03-01', DATE '9999-12-31', TRUE),\n  (1004, 17, 'Initech', 'South', DATE '2019-04-01', DATE '2022-08-31', FALSE),\n  (1005, 17, 'Initech', 'East', DATE '2022-09-01', DATE '9999-12-31', TRUE),\n  (1006, 23, 'Umbrella', 'West', DATE '2020-06-15', DATE '2023-01-31', FALSE),\n  (1007, 23, 'Umbrella', 'North', DATE '2023-02-01', DATE '9999-12-31', TRUE),\n  (1008, 31, 'Hooli', 'East', DATE '2021-01-01', DATE '9999-12-31', TRUE),\n  (1009, 55, 'Stark Ind', 'South', DATE '2018-03-01', DATE '2021-11-30', FALSE),\n  (1010, 55, 'Stark Ind', 'West', DATE '2021-12-01', DATE '2023-09-30', FALSE),\n  (1011, 55, 'Stark Ind', 'North', DATE '2023-10-01', DATE '9999-12-31', TRUE),\n  (1012, 68, 'Wayne Ent', 'East', DATE '2020-02-01', DATE '9999-12-31', TRUE),\n  (1013, 74, 'Cyberdyne', 'West', DATE '2019-09-01', DATE '2022-04-30', FALSE),\n  (1014, 74, 'Cyberdyne', 'South', DATE '2022-05-01', DATE '9999-12-31', TRUE),\n  (1015, 86, 'Tyrell Corp', 'North', DATE '2021-07-01', DATE '9999-12-31', TRUE),\n  (1016, 91, 'Soylent', 'South', DATE '2020-10-01', DATE '2023-03-31', FALSE),\n  (1017, 91, 'Soylent', 'East', DATE '2023-04-01', DATE '9999-12-31', TRUE),\n  (1018, 12, 'Massive Dyn', 'West', DATE '2019-01-01', DATE '9999-12-31', TRUE),\n  (1019, 28, 'Aperture', 'North', DATE '2021-05-01', DATE '2022-12-31', FALSE),\n  (1020, 28, 'Aperture', 'South', DATE '2023-01-01', DATE '9999-12-31', TRUE),\n  (1021, 39, 'Vandelay', 'East', DATE '2020-08-01', DATE '9999-12-31', TRUE),\n  (1022, 47, 'Duff Beer', 'West', DATE '2018-11-01', DATE '2021-06-30', FALSE),\n  (1023, 47, 'Duff Beer', 'North', DATE '2021-07-01', DATE '9999-12-31', TRUE),\n  (1024, 63, 'Gringotts', 'South', DATE '2022-02-01', DATE '9999-12-31', TRUE)\n) AS t(customer_sk, customer_id, customer_name, region, valid_from, valid_to, is_current);\n\nCREATE TABLE fact_orders AS SELECT * FROM (VALUES\n  (5001, 42, DATE '2022-05-10', 1200.00), (5002, 42, DATE '2024-02-20', 850.00),\n  (5003, 99, DATE '2023-11-01', 320.00),  (5004, 17, DATE '2021-07-14', 640.00),\n  (5005, 17, DATE '2023-03-08', 415.00),  (5006, 23, DATE '2022-04-19', 980.00),\n  (5007, 23, DATE '2023-08-22', 275.00),  (5008, 31, DATE '2022-10-05', 1530.00),\n  (5009, 55, DATE '2020-06-11', 720.00),  (5010, 55, DATE '2022-09-27', 460.00),\n  (5011, 55, DATE '2024-01-16', 1105.00), (5012, 68, DATE '2023-05-30', 385.00),\n  (5013, 74, DATE '2021-03-24', 890.00),  (5014, 74, DATE '2023-12-09', 540.00),\n  (5015, 86, DATE '2022-11-18', 1250.00), (5016, 91, DATE '2021-12-02', 305.00),\n  (5017, 91, DATE '2024-03-15', 770.00),  (5018, 12, DATE '2022-06-07', 1420.00),\n  (5019, 28, DATE '2022-03-21', 195.00),  (5020, 28, DATE '2023-09-13', 660.00),\n  (5021, 39, DATE '2023-02-26', 1080.00), (5022, 47, DATE '2020-09-04', 425.00),\n  (5023, 47, DATE '2023-06-17', 935.00),  (5024, 63, DATE '2023-10-28', 580.00)\n) AS t(order_id, customer_id, order_date, amount);\nUPDATE dim_customer SET customer_name = 'Acme Crop' WHERE customer_id = 42;",
+      "steps": {
+        "before": {
+          "sql": "SELECT customer_sk, customer_name, region\nFROM dim_customer\nWHERE customer_id = 42\nORDER BY valid_from;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "customer_name",
+            "region"
+          ],
+          "rows": [
+            [
+              1001,
+              "Acme Crop",
+              "East"
+            ],
+            [
+              1002,
+              "Acme Crop",
+              "West"
+            ]
+          ]
+        },
+        "fix": {
+          "sql": "UPDATE dim_customer\nSET customer_name = 'Acme Corp'\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        },
+        "after": {
+          "sql": "SELECT customer_sk, customer_name, region\nFROM dim_customer\nWHERE customer_id = 42\nORDER BY valid_from;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "customer_name",
+            "region"
+          ],
+          "rows": [
+            [
+              1001,
+              "Acme Corp",
+              "East"
+            ],
+            [
+              1002,
+              "Acme Corp",
+              "West"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "type2": {
+      "setup": "CREATE TABLE dim_customer AS SELECT * FROM (VALUES\n  (1001, 42, 'Acme Corp', 'East', DATE '2020-01-01', DATE '2023-06-14', FALSE),\n  (1002, 42, 'Acme Corp', 'West', DATE '2023-06-15', DATE '9999-12-31', TRUE),\n  (1003, 99, 'Globex', 'North', DATE '2021-03-01', DATE '9999-12-31', TRUE),\n  (1004, 17, 'Initech', 'South', DATE '2019-04-01', DATE '2022-08-31', FALSE),\n  (1005, 17, 'Initech', 'East', DATE '2022-09-01', DATE '9999-12-31', TRUE),\n  (1006, 23, 'Umbrella', 'West', DATE '2020-06-15', DATE '2023-01-31', FALSE),\n  (1007, 23, 'Umbrella', 'North', DATE '2023-02-01', DATE '9999-12-31', TRUE),\n  (1008, 31, 'Hooli', 'East', DATE '2021-01-01', DATE '9999-12-31', TRUE),\n  (1009, 55, 'Stark Ind', 'South', DATE '2018-03-01', DATE '2021-11-30', FALSE),\n  (1010, 55, 'Stark Ind', 'West', DATE '2021-12-01', DATE '2023-09-30', FALSE),\n  (1011, 55, 'Stark Ind', 'North', DATE '2023-10-01', DATE '9999-12-31', TRUE),\n  (1012, 68, 'Wayne Ent', 'East', DATE '2020-02-01', DATE '9999-12-31', TRUE),\n  (1013, 74, 'Cyberdyne', 'West', DATE '2019-09-01', DATE '2022-04-30', FALSE),\n  (1014, 74, 'Cyberdyne', 'South', DATE '2022-05-01', DATE '9999-12-31', TRUE),\n  (1015, 86, 'Tyrell Corp', 'North', DATE '2021-07-01', DATE '9999-12-31', TRUE),\n  (1016, 91, 'Soylent', 'South', DATE '2020-10-01', DATE '2023-03-31', FALSE),\n  (1017, 91, 'Soylent', 'East', DATE '2023-04-01', DATE '9999-12-31', TRUE),\n  (1018, 12, 'Massive Dyn', 'West', DATE '2019-01-01', DATE '9999-12-31', TRUE),\n  (1019, 28, 'Aperture', 'North', DATE '2021-05-01', DATE '2022-12-31', FALSE),\n  (1020, 28, 'Aperture', 'South', DATE '2023-01-01', DATE '9999-12-31', TRUE),\n  (1021, 39, 'Vandelay', 'East', DATE '2020-08-01', DATE '9999-12-31', TRUE),\n  (1022, 47, 'Duff Beer', 'West', DATE '2018-11-01', DATE '2021-06-30', FALSE),\n  (1023, 47, 'Duff Beer', 'North', DATE '2021-07-01', DATE '9999-12-31', TRUE),\n  (1024, 63, 'Gringotts', 'South', DATE '2022-02-01', DATE '9999-12-31', TRUE)\n) AS t(customer_sk, customer_id, customer_name, region, valid_from, valid_to, is_current);\n\nCREATE TABLE fact_orders AS SELECT * FROM (VALUES\n  (5001, 42, DATE '2022-05-10', 1200.00), (5002, 42, DATE '2024-02-20', 850.00),\n  (5003, 99, DATE '2023-11-01', 320.00),  (5004, 17, DATE '2021-07-14', 640.00),\n  (5005, 17, DATE '2023-03-08', 415.00),  (5006, 23, DATE '2022-04-19', 980.00),\n  (5007, 23, DATE '2023-08-22', 275.00),  (5008, 31, DATE '2022-10-05', 1530.00),\n  (5009, 55, DATE '2020-06-11', 720.00),  (5010, 55, DATE '2022-09-27', 460.00),\n  (5011, 55, DATE '2024-01-16', 1105.00), (5012, 68, DATE '2023-05-30', 385.00),\n  (5013, 74, DATE '2021-03-24', 890.00),  (5014, 74, DATE '2023-12-09', 540.00),\n  (5015, 86, DATE '2022-11-18', 1250.00), (5016, 91, DATE '2021-12-02', 305.00),\n  (5017, 91, DATE '2024-03-15', 770.00),  (5018, 12, DATE '2022-06-07', 1420.00),\n  (5019, 28, DATE '2022-03-21', 195.00),  (5020, 28, DATE '2023-09-13', 660.00),\n  (5021, 39, DATE '2023-02-26', 1080.00), (5022, 47, DATE '2020-09-04', 425.00),\n  (5023, 47, DATE '2023-06-17', 935.00),  (5024, 63, DATE '2023-10-28', 580.00)\n) AS t(order_id, customer_id, order_date, amount);\nCREATE TABLE page_dim AS SELECT * FROM dim_customer;\nDELETE FROM dim_customer WHERE customer_sk = 1002;\nUPDATE dim_customer SET valid_to = DATE '9999-12-31', is_current = TRUE WHERE customer_sk = 1001;",
+      "steps": {
+        "before": {
+          "sql": "SELECT customer_sk, region, valid_from, valid_to, is_current\nFROM dim_customer\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "region",
+            "valid_from",
+            "valid_to",
+            "is_current"
+          ],
+          "rows": [
+            [
+              1001,
+              "East",
+              "2020-01-01",
+              "9999-12-31",
+              true
+            ]
+          ]
+        },
+        "close": {
+          "sql": "UPDATE dim_customer\nSET valid_to = DATE '2023-06-14',\n    is_current = FALSE\nWHERE customer_id = 42 AND is_current;",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "insert": {
+          "sql": "INSERT INTO dim_customer VALUES\n  (1002, 42, 'Acme Corp', 'West',\n   DATE '2023-06-15', DATE '9999-12-31', TRUE);",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "after": {
+          "sql": "SELECT customer_sk, region, valid_from, valid_to, is_current\nFROM dim_customer\nWHERE customer_id = 42\nORDER BY valid_from;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "region",
+            "valid_from",
+            "valid_to",
+            "is_current"
+          ],
+          "rows": [
+            [
+              1001,
+              "East",
+              "2020-01-01",
+              "2023-06-14",
+              false
+            ],
+            [
+              1002,
+              "West",
+              "2023-06-15",
+              "9999-12-31",
+              true
+            ]
+          ]
+        },
+        "samePage": {
+          "sql": "SELECT COUNT(*) AS differ FROM (\n  (SELECT * FROM dim_customer EXCEPT ALL SELECT * FROM page_dim)\n  UNION ALL\n  (SELECT * FROM page_dim EXCEPT ALL SELECT * FROM dim_customer)\n) x;",
+          "ok": true,
+          "columns": [
+            "differ"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "growth": {
+      "setup": "SELECT 1;",
+      "steps": {
+        "model": {
+          "sql": "SELECT 50000 AS customers, 0.04 AS monthly_change, 36 AS months,\n  ROUND(50000 * (1 + 0.04 * 36)) AS type2_rows,\n  ROUND((1 + 0.04 * 36)::numeric, 2) AS times",
+          "ok": true,
+          "columns": [
+            "customers",
+            "monthly_change",
+            "months",
+            "type2_rows",
+            "times"
+          ],
+          "rows": [
+            [
+              50000,
+              "0.04",
+              36,
+              "122000",
+              "2.44"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "type3": {
+      "setup": "CREATE TABLE dim_customer_t3 (customer_id INTEGER, customer_name VARCHAR, region VARCHAR, prev_region VARCHAR);\nINSERT INTO dim_customer_t3 VALUES (42, 'Acme Corp', 'East', NULL);",
+      "steps": {
+        "before": {
+          "sql": "SELECT customer_id, region, prev_region FROM dim_customer_t3;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "region",
+            "prev_region"
+          ],
+          "rows": [
+            [
+              42,
+              "East",
+              null
+            ]
+          ]
+        },
+        "move": {
+          "sql": "UPDATE dim_customer_t3\nSET prev_region = region, region = 'West'\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "after": {
+          "sql": "SELECT customer_id, region, prev_region FROM dim_customer_t3;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "region",
+            "prev_region"
+          ],
+          "rows": [
+            [
+              42,
+              "West",
+              "East"
+            ]
+          ]
+        },
+        "again": {
+          "sql": "UPDATE dim_customer_t3\nSET prev_region = region, region = 'North'\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "twice": {
+          "sql": "SELECT customer_id, region, prev_region FROM dim_customer_t3;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "region",
+            "prev_region"
+          ],
+          "rows": [
+            [
+              42,
+              "North",
+              "West"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "late": {
+      "setup": "CREATE TABLE dim_customer (customer_sk INTEGER, customer_id INTEGER, customer_name VARCHAR, region VARCHAR);\nINSERT INTO dim_customer VALUES\n  (-1,   NULL, 'Unknown',   'Unknown'),\n  (1002, 42,   'Acme Corp', 'West'),\n  (1003, 99,   'Globex',    'North');\nCREATE TABLE staged_orders (order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2));\nINSERT INTO staged_orders VALUES\n  (201, 42, 200.00), (202, 99, 500.00), (203, 77, 410.00);",
+      "steps": {
+        "staged": {
+          "sql": "SELECT order_id, customer_id, amount FROM staged_orders ORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "customer_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              201,
+              42,
+              "200.00"
+            ],
+            [
+              202,
+              99,
+              "500.00"
+            ],
+            [
+              203,
+              77,
+              "410.00"
+            ]
+          ]
+        },
+        "dim": {
+          "sql": "SELECT customer_sk, customer_id, region FROM dim_customer ORDER BY customer_sk;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "customer_id",
+            "region"
+          ],
+          "rows": [
+            [
+              -1,
+              null,
+              "Unknown"
+            ],
+            [
+              1002,
+              42,
+              "West"
+            ],
+            [
+              1003,
+              99,
+              "North"
+            ]
+          ]
+        },
+        "load": {
+          "sql": "SELECT o.order_id, d.customer_sk, o.amount\nFROM staged_orders o\nJOIN dim_customer d\n  ON d.customer_id = o.customer_id\nORDER BY o.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "customer_sk",
+            "amount"
+          ],
+          "rows": [
+            [
+              201,
+              1002,
+              "200.00"
+            ],
+            [
+              202,
+              1003,
+              "500.00"
+            ]
+          ]
+        },
+        "loadSum": {
+          "sql": "SELECT SUM(o.amount) AS loaded,\n  (SELECT SUM(amount) FROM staged_orders) AS staged\nFROM staged_orders o\nJOIN dim_customer d ON d.customer_id = o.customer_id;",
+          "ok": true,
+          "columns": [
+            "loaded",
+            "staged"
+          ],
+          "rows": [
+            [
+              "700.00",
+              "1110.00"
+            ]
+          ]
+        },
+        "loadUnknown": {
+          "sql": "CREATE TABLE fact_orders AS\nSELECT o.order_id, o.customer_id,\n       COALESCE(d.customer_sk, -1) AS customer_sk,\n       o.amount\nFROM staged_orders o\nLEFT JOIN dim_customer d\n  ON d.customer_id = o.customer_id;",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "facts": {
+          "sql": "SELECT order_id, customer_id, customer_sk, amount FROM fact_orders ORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "customer_id",
+            "customer_sk",
+            "amount"
+          ],
+          "rows": [
+            [
+              201,
+              42,
+              1002,
+              "200.00"
+            ],
+            [
+              202,
+              99,
+              1003,
+              "500.00"
+            ],
+            [
+              203,
+              77,
+              -1,
+              "410.00"
+            ]
+          ]
+        },
+        "factsSum": {
+          "sql": "SELECT SUM(amount) AS loaded FROM fact_orders;",
+          "ok": true,
+          "columns": [
+            "loaded"
+          ],
+          "rows": [
+            [
+              "1110.00"
+            ]
+          ]
+        },
+        "reportBefore": {
+          "sql": "SELECT d.region, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN dim_customer d USING (customer_sk)\nGROUP BY d.region\nORDER BY d.region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "North",
+              "500.00"
+            ],
+            [
+              "Unknown",
+              "410.00"
+            ],
+            [
+              "West",
+              "200.00"
+            ]
+          ]
+        },
+        "arrive": {
+          "sql": "INSERT INTO dim_customer VALUES (1025, 77, 'Bluth Co', 'South');",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "dimAfter": {
+          "sql": "SELECT customer_sk, customer_id, region FROM dim_customer ORDER BY customer_sk;",
+          "ok": true,
+          "columns": [
+            "customer_sk",
+            "customer_id",
+            "region"
+          ],
+          "rows": [
+            [
+              -1,
+              null,
+              "Unknown"
+            ],
+            [
+              1002,
+              42,
+              "West"
+            ],
+            [
+              1003,
+              99,
+              "North"
+            ],
+            [
+              1025,
+              77,
+              "South"
+            ]
+          ]
+        },
+        "correct": {
+          "sql": "UPDATE fact_orders f\nSET customer_sk = d.customer_sk\nFROM dim_customer d\nWHERE f.customer_sk = -1\n  AND d.customer_id = f.customer_id;",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "factsAfter": {
+          "sql": "SELECT order_id, customer_id, customer_sk, amount FROM fact_orders ORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "customer_id",
+            "customer_sk",
+            "amount"
+          ],
+          "rows": [
+            [
+              201,
+              42,
+              1002,
+              "200.00"
+            ],
+            [
+              202,
+              99,
+              1003,
+              "500.00"
+            ],
+            [
+              203,
+              77,
+              1025,
+              "410.00"
+            ]
+          ]
+        },
+        "reportAfter": {
+          "sql": "SELECT d.region, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN dim_customer d USING (customer_sk)\nGROUP BY d.region\nORDER BY d.region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "North",
+              "500.00"
+            ],
+            [
+              "South",
+              "410.00"
+            ],
+            [
+              "West",
+              "200.00"
+            ]
+          ]
+        },
+        "stillUnknown": {
+          "sql": "SELECT COUNT(*) AS on_unknown FROM fact_orders WHERE customer_sk = -1;",
+          "ok": true,
+          "columns": [
+            "on_unknown"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "measure": {
+      "setup": "CREATE TABLE fact_sales (order_id INTEGER, amount DECIMAL(10,2), posted_on DATE, entry VARCHAR);\nINSERT INTO fact_sales VALUES (7001, 900.00, DATE '2024-03-01', 'original');\nCREATE TABLE fact_sales_overwritten AS SELECT * FROM fact_sales;",
+      "steps": {
+        "before": {
+          "sql": "SELECT order_id, amount, posted_on, entry FROM fact_sales;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "amount",
+            "posted_on",
+            "entry"
+          ],
+          "rows": [
+            [
+              7001,
+              "900.00",
+              "2024-03-01",
+              "original"
+            ]
+          ]
+        },
+        "marchReport": {
+          "sql": "SELECT SUM(amount) AS march_revenue\nFROM fact_sales\nWHERE posted_on <= DATE '2024-03-31';",
+          "ok": true,
+          "columns": [
+            "march_revenue"
+          ],
+          "rows": [
+            [
+              "900.00"
+            ]
+          ]
+        },
+        "reverse": {
+          "sql": "INSERT INTO fact_sales VALUES\n  (7001, -900.00, DATE '2024-04-02', 'reversal'),\n  (7001,  800.00, DATE '2024-04-02', 'correction');",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        },
+        "rows": {
+          "sql": "SELECT order_id, amount, posted_on, entry FROM fact_sales ORDER BY posted_on, amount;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "amount",
+            "posted_on",
+            "entry"
+          ],
+          "rows": [
+            [
+              7001,
+              "900.00",
+              "2024-03-01",
+              "original"
+            ],
+            [
+              7001,
+              "-900.00",
+              "2024-04-02",
+              "reversal"
+            ],
+            [
+              7001,
+              "800.00",
+              "2024-04-02",
+              "correction"
+            ]
+          ]
+        },
+        "today": {
+          "sql": "SELECT SUM(amount) AS revenue FROM fact_sales WHERE order_id = 7001;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "800.00"
+            ]
+          ]
+        },
+        "marchRerun": {
+          "sql": "SELECT SUM(amount) AS march_revenue\nFROM fact_sales\nWHERE posted_on <= DATE '2024-03-31';",
+          "ok": true,
+          "columns": [
+            "march_revenue"
+          ],
+          "rows": [
+            [
+              "900.00"
+            ]
+          ]
+        },
+        "overwrite": {
+          "sql": "UPDATE fact_sales_overwritten\nSET amount = 800.00\nWHERE order_id = 7001;",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "marchOverwritten": {
+          "sql": "SELECT SUM(amount) AS march_revenue\nFROM fact_sales_overwritten\nWHERE posted_on <= DATE '2024-03-31';",
+          "ok": true,
+          "columns": [
+            "march_revenue"
+          ],
+          "rows": [
+            [
+              "800.00"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "mini": {
+      "setup": "SELECT 1;",
+      "steps": {
+        "mini": {
+          "sql": "SELECT COUNT(*) AS mini_rows\nFROM (VALUES ('18-24'), ('25-34'), ('35-49'), ('50-64'), ('65+')) a(age_band),\n     (VALUES ('low'), ('middle'), ('high'), ('top')) i(income_tier);",
+          "ok": true,
+          "columns": [
+            "mini_rows"
+          ],
+          "rows": [
+            [
+              20
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    }
+  },
+  "pages": {
+    "snapshot": {
+      "file": "snapshots/snap_customers.yml",
+      "lines": [
+        "snapshots:",
+        "  - name: snap_customers",
+        "    relation: source('raw', 'customers')",
+        "    config:",
+        "      schema: snapshots",
+        "      unique_key: customer_id",
+        "      strategy: timestamp",
+        "      updated_at: updated_at"
+      ],
+      "quotes": [
+        "`dbt snapshot` implements **Slowly Changing Dimension (SCD) Type 2**",
+        "closes the current version of a changed row (setting its `dbt_valid_to`) and inserts a new one with `dbt_valid_from`",
+        "`timestamp` (compares an `updated_at` column) or `check` (compares a list of columns)",
+        "Since dbt 1.9 a snapshot is configured in YAML",
+        "The current version of a row is the one whose `dbt_valid_to` is `NULL`.",
+        "A row deleted at the source is ignored by default; set `hard_deletes` to `invalidate` to close its last version"
+      ]
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "bank": 110,
+  "topicPages": 7,
+  "pageQuestions": 148,
+  "conceptCheckPages": 7,
+  "challengePages": 3,
+  "challengePageNames": [
+    "dimensional-modeling",
+    "advanced-sql",
+    "data-warehousing"
+  ],
+  "challenges": 4,
+  "pages": [
+    {
+      "page": "dimensional-modeling",
+      "questions": 32,
+      "conceptChecks": 1,
+      "challenges": 1
+    },
+    {
+      "page": "dbt",
+      "questions": 32,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "advanced-sql",
+      "questions": 20,
+      "conceptChecks": 3,
+      "challenges": 2
+    },
+    {
+      "page": "data-warehousing",
+      "questions": 19,
+      "conceptChecks": 3,
+      "challenges": 1
+    },
+    {
+      "page": "testing-and-data-quality",
+      "questions": 19,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "metrics-and-semantic-layer",
+      "questions": 19,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "ai-and-the-semantic-layer",
+      "questions": 7,
+      "conceptChecks": 3,
+      "challenges": 0
+    }
+  ]
+}

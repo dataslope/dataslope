@@ -1,0 +1,1811 @@
+{
+  "figures": {
+    "filter": {
+      "setup": "-- fct_events is the table as it stood after the last successful run;\n-- raw_events has since gained ten more rows.\nCREATE TABLE fct_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00')\n) AS t(event_id, event_at);\n\nCREATE TABLE raw_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00'),\n  (15, TIMESTAMP '2024-01-15 00:00:00'), (16, TIMESTAMP '2024-01-16 00:00:00'),\n  (17, TIMESTAMP '2024-01-17 00:00:00'), (18, TIMESTAMP '2024-01-18 00:00:00'),\n  (19, TIMESTAMP '2024-01-19 00:00:00'), (20, TIMESTAMP '2024-01-20 00:00:00'),\n  (21, TIMESTAMP '2024-01-21 00:00:00'), (22, TIMESTAMP '2024-01-22 00:00:00'),\n  (23, TIMESTAMP '2024-01-23 00:00:00'), (24, TIMESTAMP '2024-01-24 00:00:00')\n) AS t(event_id, event_at);;",
+      "steps": {
+        "before": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              24,
+              14,
+              14
+            ]
+          ]
+        },
+        "beforeWatermark": {
+          "sql": "SELECT MAX(event_at) AS watermark FROM fct_events",
+          "ok": true,
+          "columns": [
+            "watermark"
+          ],
+          "rows": [
+            [
+              "2024-01-14 00:00:00"
+            ]
+          ]
+        },
+        "watermark": {
+          "sql": "SELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events)\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "event_at"
+          ],
+          "rows": [
+            [
+              15,
+              "2024-01-15 00:00:00"
+            ],
+            [
+              16,
+              "2024-01-16 00:00:00"
+            ],
+            [
+              17,
+              "2024-01-17 00:00:00"
+            ],
+            [
+              18,
+              "2024-01-18 00:00:00"
+            ],
+            [
+              19,
+              "2024-01-19 00:00:00"
+            ],
+            [
+              20,
+              "2024-01-20 00:00:00"
+            ],
+            [
+              21,
+              "2024-01-21 00:00:00"
+            ],
+            [
+              22,
+              "2024-01-22 00:00:00"
+            ],
+            [
+              23,
+              "2024-01-23 00:00:00"
+            ],
+            [
+              24,
+              "2024-01-24 00:00:00"
+            ]
+          ]
+        },
+        "run": {
+          "sql": "INSERT INTO fct_events\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              10
+            ]
+          ]
+        },
+        "after": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              24,
+              24,
+              24
+            ]
+          ]
+        },
+        "afterWatermark": {
+          "sql": "SELECT MAX(event_at) AS watermark FROM fct_events",
+          "ok": true,
+          "columns": [
+            "watermark"
+          ],
+          "rows": [
+            [
+              "2024-01-24 00:00:00"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "late": {
+      "setup": "-- fct_events is the table as it stood after the last successful run;\n-- raw_events has since gained ten more rows.\nCREATE TABLE fct_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00')\n) AS t(event_id, event_at);\n\nCREATE TABLE raw_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00'),\n  (15, TIMESTAMP '2024-01-15 00:00:00'), (16, TIMESTAMP '2024-01-16 00:00:00'),\n  (17, TIMESTAMP '2024-01-17 00:00:00'), (18, TIMESTAMP '2024-01-18 00:00:00'),\n  (19, TIMESTAMP '2024-01-19 00:00:00'), (20, TIMESTAMP '2024-01-20 00:00:00'),\n  (21, TIMESTAMP '2024-01-21 00:00:00'), (22, TIMESTAMP '2024-01-22 00:00:00'),\n  (23, TIMESTAMP '2024-01-23 00:00:00'), (24, TIMESTAMP '2024-01-24 00:00:00')\n) AS t(event_id, event_at);;\nINSERT INTO fct_events\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events);\nINSERT INTO raw_events VALUES\n  (25, TIMESTAMP '2024-01-24 00:00:00'),\n  (26, TIMESTAMP '2024-01-22 12:00:00'),\n  (27, TIMESTAMP '2024-01-25 00:00:00');",
+      "steps": {
+        "watermark": {
+          "sql": "SELECT MAX(event_at) AS watermark FROM fct_events",
+          "ok": true,
+          "columns": [
+            "watermark"
+          ],
+          "rows": [
+            [
+              "2024-01-24 00:00:00"
+            ]
+          ]
+        },
+        "arrived": {
+          "sql": "SELECT event_id, event_at FROM raw_events WHERE event_id > 24 ORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "event_at"
+          ],
+          "rows": [
+            [
+              25,
+              "2024-01-24 00:00:00"
+            ],
+            [
+              26,
+              "2024-01-22 12:00:00"
+            ],
+            [
+              27,
+              "2024-01-25 00:00:00"
+            ]
+          ]
+        },
+        "strict": {
+          "sql": "SELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events)\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "event_at"
+          ],
+          "rows": [
+            [
+              27,
+              "2024-01-25 00:00:00"
+            ]
+          ]
+        },
+        "atLeast": {
+          "sql": "SELECT event_id, event_at\nFROM raw_events\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events)\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "event_at"
+          ],
+          "rows": [
+            [
+              24,
+              "2024-01-24 00:00:00"
+            ],
+            [
+              25,
+              "2024-01-24 00:00:00"
+            ],
+            [
+              27,
+              "2024-01-25 00:00:00"
+            ]
+          ]
+        },
+        "atLeastNew": {
+          "sql": "SELECT event_id, event_at\nFROM raw_events r\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events)\n  AND NOT EXISTS (SELECT 1 FROM fct_events f WHERE f.event_id = r.event_id)\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "event_at"
+          ],
+          "rows": [
+            [
+              25,
+              "2024-01-24 00:00:00"
+            ],
+            [
+              27,
+              "2024-01-25 00:00:00"
+            ]
+          ]
+        },
+        "overlap": {
+          "sql": "SELECT event_id, event_at\nFROM raw_events\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events)\n                  - INTERVAL '3 days'\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "event_at"
+          ],
+          "rows": [
+            [
+              21,
+              "2024-01-21 00:00:00"
+            ],
+            [
+              22,
+              "2024-01-22 00:00:00"
+            ],
+            [
+              23,
+              "2024-01-23 00:00:00"
+            ],
+            [
+              24,
+              "2024-01-24 00:00:00"
+            ],
+            [
+              25,
+              "2024-01-24 00:00:00"
+            ],
+            [
+              26,
+              "2024-01-22 12:00:00"
+            ],
+            [
+              27,
+              "2024-01-25 00:00:00"
+            ]
+          ]
+        },
+        "overlapNew": {
+          "sql": "SELECT event_id, event_at\nFROM raw_events r\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events) - INTERVAL '3 days'\n  AND NOT EXISTS (SELECT 1 FROM fct_events f WHERE f.event_id = r.event_id)\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "event_at"
+          ],
+          "rows": [
+            [
+              25,
+              "2024-01-24 00:00:00"
+            ],
+            [
+              26,
+              "2024-01-22 12:00:00"
+            ],
+            [
+              27,
+              "2024-01-25 00:00:00"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "strictAppend": {
+      "setup": "-- fct_events is the table as it stood after the last successful run;\n-- raw_events has since gained ten more rows.\nCREATE TABLE fct_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00')\n) AS t(event_id, event_at);\n\nCREATE TABLE raw_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00'),\n  (15, TIMESTAMP '2024-01-15 00:00:00'), (16, TIMESTAMP '2024-01-16 00:00:00'),\n  (17, TIMESTAMP '2024-01-17 00:00:00'), (18, TIMESTAMP '2024-01-18 00:00:00'),\n  (19, TIMESTAMP '2024-01-19 00:00:00'), (20, TIMESTAMP '2024-01-20 00:00:00'),\n  (21, TIMESTAMP '2024-01-21 00:00:00'), (22, TIMESTAMP '2024-01-22 00:00:00'),\n  (23, TIMESTAMP '2024-01-23 00:00:00'), (24, TIMESTAMP '2024-01-24 00:00:00')\n) AS t(event_id, event_at);;\nINSERT INTO fct_events\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events);\nINSERT INTO raw_events VALUES\n  (25, TIMESTAMP '2024-01-24 00:00:00'),\n  (26, TIMESTAMP '2024-01-22 12:00:00'),\n  (27, TIMESTAMP '2024-01-25 00:00:00');",
+      "steps": {
+        "batch": {
+          "sql": "CREATE TABLE batch AS\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "batchRows": {
+          "sql": "SELECT COUNT(*) AS batch_rows FROM batch",
+          "ok": true,
+          "columns": [
+            "batch_rows"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "write1": {
+          "sql": "INSERT INTO fct_events\nSELECT event_id, event_at FROM batch",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "counts1": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              27,
+              25,
+              25
+            ]
+          ]
+        },
+        "retry1": {
+          "sql": "INSERT INTO fct_events\nSELECT event_id, event_at FROM batch",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "counts2": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              27,
+              26,
+              25
+            ]
+          ]
+        },
+        "missing": {
+          "sql": "SELECT event_id FROM raw_events\nEXCEPT\nSELECT event_id FROM fct_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": [
+            [
+              25
+            ],
+            [
+              26
+            ]
+          ]
+        },
+        "extra": {
+          "sql": "SELECT event_id FROM fct_events\nEXCEPT\nSELECT event_id FROM raw_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": []
+        },
+        "dupes": {
+          "sql": "SELECT event_id, COUNT(*) AS copies\nFROM fct_events\nGROUP BY event_id\nHAVING COUNT(*) > 1\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "copies"
+          ],
+          "rows": [
+            [
+              27,
+              2
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "atLeastMerge": {
+      "setup": "-- fct_events is the table as it stood after the last successful run;\n-- raw_events has since gained ten more rows.\nCREATE TABLE fct_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00')\n) AS t(event_id, event_at);\n\nCREATE TABLE raw_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00'),\n  (15, TIMESTAMP '2024-01-15 00:00:00'), (16, TIMESTAMP '2024-01-16 00:00:00'),\n  (17, TIMESTAMP '2024-01-17 00:00:00'), (18, TIMESTAMP '2024-01-18 00:00:00'),\n  (19, TIMESTAMP '2024-01-19 00:00:00'), (20, TIMESTAMP '2024-01-20 00:00:00'),\n  (21, TIMESTAMP '2024-01-21 00:00:00'), (22, TIMESTAMP '2024-01-22 00:00:00'),\n  (23, TIMESTAMP '2024-01-23 00:00:00'), (24, TIMESTAMP '2024-01-24 00:00:00')\n) AS t(event_id, event_at);;\nINSERT INTO fct_events\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events);\nINSERT INTO raw_events VALUES\n  (25, TIMESTAMP '2024-01-24 00:00:00'),\n  (26, TIMESTAMP '2024-01-22 12:00:00'),\n  (27, TIMESTAMP '2024-01-25 00:00:00');",
+      "steps": {
+        "batch": {
+          "sql": "CREATE TABLE batch AS\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "batchRows": {
+          "sql": "SELECT COUNT(*) AS batch_rows FROM batch",
+          "ok": true,
+          "columns": [
+            "batch_rows"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        },
+        "write1": {
+          "sql": "MERGE INTO fct_events t\nUSING batch s\n  ON t.event_id = s.event_id\nWHEN MATCHED THEN UPDATE SET event_at = s.event_at\nWHEN NOT MATCHED THEN INSERT (event_id, event_at)\n  VALUES (s.event_id, s.event_at)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        },
+        "counts1": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              27,
+              26,
+              26
+            ]
+          ]
+        },
+        "retry1": {
+          "sql": "MERGE INTO fct_events t\nUSING batch s\n  ON t.event_id = s.event_id\nWHEN MATCHED THEN UPDATE SET event_at = s.event_at\nWHEN NOT MATCHED THEN INSERT (event_id, event_at)\n  VALUES (s.event_id, s.event_at)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        },
+        "counts2": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              27,
+              26,
+              26
+            ]
+          ]
+        },
+        "missing": {
+          "sql": "SELECT event_id FROM raw_events\nEXCEPT\nSELECT event_id FROM fct_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": [
+            [
+              26
+            ]
+          ]
+        },
+        "extra": {
+          "sql": "SELECT event_id FROM fct_events\nEXCEPT\nSELECT event_id FROM raw_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": []
+        },
+        "dupes": {
+          "sql": "SELECT event_id, COUNT(*) AS copies\nFROM fct_events\nGROUP BY event_id\nHAVING COUNT(*) > 1\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "copies"
+          ],
+          "rows": []
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "overlapAppend": {
+      "setup": "-- fct_events is the table as it stood after the last successful run;\n-- raw_events has since gained ten more rows.\nCREATE TABLE fct_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00')\n) AS t(event_id, event_at);\n\nCREATE TABLE raw_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00'),\n  (15, TIMESTAMP '2024-01-15 00:00:00'), (16, TIMESTAMP '2024-01-16 00:00:00'),\n  (17, TIMESTAMP '2024-01-17 00:00:00'), (18, TIMESTAMP '2024-01-18 00:00:00'),\n  (19, TIMESTAMP '2024-01-19 00:00:00'), (20, TIMESTAMP '2024-01-20 00:00:00'),\n  (21, TIMESTAMP '2024-01-21 00:00:00'), (22, TIMESTAMP '2024-01-22 00:00:00'),\n  (23, TIMESTAMP '2024-01-23 00:00:00'), (24, TIMESTAMP '2024-01-24 00:00:00')\n) AS t(event_id, event_at);;\nINSERT INTO fct_events\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events);\nINSERT INTO raw_events VALUES\n  (25, TIMESTAMP '2024-01-24 00:00:00'),\n  (26, TIMESTAMP '2024-01-22 12:00:00'),\n  (27, TIMESTAMP '2024-01-25 00:00:00');",
+      "steps": {
+        "batch": {
+          "sql": "CREATE TABLE batch AS\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events) - INTERVAL '3 days'",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "batchRows": {
+          "sql": "SELECT COUNT(*) AS batch_rows FROM batch",
+          "ok": true,
+          "columns": [
+            "batch_rows"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        },
+        "write1": {
+          "sql": "INSERT INTO fct_events\nSELECT event_id, event_at FROM batch",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        },
+        "counts1": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              27,
+              31,
+              27
+            ]
+          ]
+        },
+        "retry1": {
+          "sql": "INSERT INTO fct_events\nSELECT event_id, event_at FROM batch",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        },
+        "counts2": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              27,
+              38,
+              27
+            ]
+          ]
+        },
+        "missing": {
+          "sql": "SELECT event_id FROM raw_events\nEXCEPT\nSELECT event_id FROM fct_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": []
+        },
+        "extra": {
+          "sql": "SELECT event_id FROM fct_events\nEXCEPT\nSELECT event_id FROM raw_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": []
+        },
+        "dupes": {
+          "sql": "SELECT event_id, COUNT(*) AS copies\nFROM fct_events\nGROUP BY event_id\nHAVING COUNT(*) > 1\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "copies"
+          ],
+          "rows": [
+            [
+              21,
+              3
+            ],
+            [
+              22,
+              3
+            ],
+            [
+              23,
+              3
+            ],
+            [
+              24,
+              3
+            ],
+            [
+              25,
+              2
+            ],
+            [
+              26,
+              2
+            ],
+            [
+              27,
+              2
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "overlapMerge": {
+      "setup": "-- fct_events is the table as it stood after the last successful run;\n-- raw_events has since gained ten more rows.\nCREATE TABLE fct_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00')\n) AS t(event_id, event_at);\n\nCREATE TABLE raw_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00'),\n  (15, TIMESTAMP '2024-01-15 00:00:00'), (16, TIMESTAMP '2024-01-16 00:00:00'),\n  (17, TIMESTAMP '2024-01-17 00:00:00'), (18, TIMESTAMP '2024-01-18 00:00:00'),\n  (19, TIMESTAMP '2024-01-19 00:00:00'), (20, TIMESTAMP '2024-01-20 00:00:00'),\n  (21, TIMESTAMP '2024-01-21 00:00:00'), (22, TIMESTAMP '2024-01-22 00:00:00'),\n  (23, TIMESTAMP '2024-01-23 00:00:00'), (24, TIMESTAMP '2024-01-24 00:00:00')\n) AS t(event_id, event_at);;\nINSERT INTO fct_events\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events);\nINSERT INTO raw_events VALUES\n  (25, TIMESTAMP '2024-01-24 00:00:00'),\n  (26, TIMESTAMP '2024-01-22 12:00:00'),\n  (27, TIMESTAMP '2024-01-25 00:00:00');",
+      "steps": {
+        "batch": {
+          "sql": "CREATE TABLE batch AS\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events) - INTERVAL '3 days'",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "batchRows": {
+          "sql": "SELECT COUNT(*) AS batch_rows FROM batch",
+          "ok": true,
+          "columns": [
+            "batch_rows"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        },
+        "write1": {
+          "sql": "MERGE INTO fct_events t\nUSING batch s\n  ON t.event_id = s.event_id\nWHEN MATCHED THEN UPDATE SET event_at = s.event_at\nWHEN NOT MATCHED THEN INSERT (event_id, event_at)\n  VALUES (s.event_id, s.event_at)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        },
+        "counts1": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              27,
+              27,
+              27
+            ]
+          ]
+        },
+        "retry1": {
+          "sql": "MERGE INTO fct_events t\nUSING batch s\n  ON t.event_id = s.event_id\nWHEN MATCHED THEN UPDATE SET event_at = s.event_at\nWHEN NOT MATCHED THEN INSERT (event_id, event_at)\n  VALUES (s.event_id, s.event_at)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        },
+        "counts2": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              27,
+              27,
+              27
+            ]
+          ]
+        },
+        "missing": {
+          "sql": "SELECT event_id FROM raw_events\nEXCEPT\nSELECT event_id FROM fct_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": []
+        },
+        "extra": {
+          "sql": "SELECT event_id FROM fct_events\nEXCEPT\nSELECT event_id FROM raw_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": []
+        },
+        "dupes": {
+          "sql": "SELECT event_id, COUNT(*) AS copies\nFROM fct_events\nGROUP BY event_id\nHAVING COUNT(*) > 1\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "copies"
+          ],
+          "rows": []
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "overlapDeleteInsert": {
+      "setup": "-- fct_events is the table as it stood after the last successful run;\n-- raw_events has since gained ten more rows.\nCREATE TABLE fct_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00')\n) AS t(event_id, event_at);\n\nCREATE TABLE raw_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00'),\n  (15, TIMESTAMP '2024-01-15 00:00:00'), (16, TIMESTAMP '2024-01-16 00:00:00'),\n  (17, TIMESTAMP '2024-01-17 00:00:00'), (18, TIMESTAMP '2024-01-18 00:00:00'),\n  (19, TIMESTAMP '2024-01-19 00:00:00'), (20, TIMESTAMP '2024-01-20 00:00:00'),\n  (21, TIMESTAMP '2024-01-21 00:00:00'), (22, TIMESTAMP '2024-01-22 00:00:00'),\n  (23, TIMESTAMP '2024-01-23 00:00:00'), (24, TIMESTAMP '2024-01-24 00:00:00')\n) AS t(event_id, event_at);;\nINSERT INTO fct_events\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events);\nINSERT INTO raw_events VALUES\n  (25, TIMESTAMP '2024-01-24 00:00:00'),\n  (26, TIMESTAMP '2024-01-22 12:00:00'),\n  (27, TIMESTAMP '2024-01-25 00:00:00');",
+      "steps": {
+        "batch": {
+          "sql": "CREATE TABLE batch AS\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events) - INTERVAL '3 days'",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "batchRows": {
+          "sql": "SELECT COUNT(*) AS batch_rows FROM batch",
+          "ok": true,
+          "columns": [
+            "batch_rows"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        },
+        "write1": {
+          "sql": "DELETE FROM fct_events\nWHERE event_id IN (SELECT event_id FROM batch)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        },
+        "write2": {
+          "sql": "INSERT INTO fct_events\nSELECT event_id, event_at FROM batch",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        },
+        "counts1": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              27,
+              27,
+              27
+            ]
+          ]
+        },
+        "retry1": {
+          "sql": "DELETE FROM fct_events\nWHERE event_id IN (SELECT event_id FROM batch)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        },
+        "retry2": {
+          "sql": "INSERT INTO fct_events\nSELECT event_id, event_at FROM batch",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        },
+        "counts2": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              27,
+              27,
+              27
+            ]
+          ]
+        },
+        "missing": {
+          "sql": "SELECT event_id FROM raw_events\nEXCEPT\nSELECT event_id FROM fct_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": []
+        },
+        "extra": {
+          "sql": "SELECT event_id FROM fct_events\nEXCEPT\nSELECT event_id FROM raw_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": []
+        },
+        "dupes": {
+          "sql": "SELECT event_id, COUNT(*) AS copies\nFROM fct_events\nGROUP BY event_id\nHAVING COUNT(*) > 1\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "copies"
+          ],
+          "rows": []
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "dupKey": {
+      "setup": "-- fct_events is the table as it stood after the last successful run;\n-- raw_events has since gained ten more rows.\nCREATE TABLE fct_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00')\n) AS t(event_id, event_at);\n\nCREATE TABLE raw_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00'),\n  (15, TIMESTAMP '2024-01-15 00:00:00'), (16, TIMESTAMP '2024-01-16 00:00:00'),\n  (17, TIMESTAMP '2024-01-17 00:00:00'), (18, TIMESTAMP '2024-01-18 00:00:00'),\n  (19, TIMESTAMP '2024-01-19 00:00:00'), (20, TIMESTAMP '2024-01-20 00:00:00'),\n  (21, TIMESTAMP '2024-01-21 00:00:00'), (22, TIMESTAMP '2024-01-22 00:00:00'),\n  (23, TIMESTAMP '2024-01-23 00:00:00'), (24, TIMESTAMP '2024-01-24 00:00:00')\n) AS t(event_id, event_at);;\nINSERT INTO fct_events\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events);\nINSERT INTO raw_events VALUES\n  (25, TIMESTAMP '2024-01-24 00:00:00'),\n  (26, TIMESTAMP '2024-01-22 12:00:00'),\n  (27, TIMESTAMP '2024-01-25 00:00:00');\nINSERT INTO raw_events VALUES (27, TIMESTAMP '2024-01-25 00:00:00');",
+      "steps": {
+        "sourceCopies": {
+          "sql": "SELECT event_id, COUNT(*) AS copies FROM raw_events WHERE event_id = 27 GROUP BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "copies"
+          ],
+          "rows": [
+            [
+              27,
+              2
+            ]
+          ]
+        },
+        "batch": {
+          "sql": "CREATE TABLE batch AS\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events) - INTERVAL '3 days'",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "merge1": {
+          "sql": "MERGE INTO fct_events t\nUSING batch s\n  ON t.event_id = s.event_id\nWHEN MATCHED THEN UPDATE SET event_at = s.event_at\nWHEN NOT MATCHED THEN INSERT (event_id, event_at)\n  VALUES (s.event_id, s.event_at)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              8
+            ]
+          ]
+        },
+        "counts1": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              28,
+              28,
+              27
+            ]
+          ]
+        },
+        "dupes1": {
+          "sql": "SELECT event_id, COUNT(*) AS copies\nFROM fct_events\nGROUP BY event_id\nHAVING COUNT(*) > 1\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "copies"
+          ],
+          "rows": [
+            [
+              27,
+              2
+            ]
+          ]
+        },
+        "merge2": {
+          "sql": "MERGE INTO fct_events t\nUSING batch s\n  ON t.event_id = s.event_id\nWHEN MATCHED THEN UPDATE SET event_at = s.event_at\nWHEN NOT MATCHED THEN INSERT (event_id, event_at)\n  VALUES (s.event_id, s.event_at)",
+          "ok": false,
+          "error": "ERROR: MERGE command cannot affect row a second time"
+        },
+        "reset": {
+          "sql": "DELETE FROM fct_events WHERE event_id = 27",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        },
+        "seedOnce": {
+          "sql": "INSERT INTO fct_events VALUES (27, TIMESTAMP '2024-01-25 00:00:00')",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "merge3": {
+          "sql": "MERGE INTO fct_events t\nUSING batch s\n  ON t.event_id = s.event_id\nWHEN MATCHED THEN UPDATE SET event_at = s.event_at\nWHEN NOT MATCHED THEN INSERT (event_id, event_at)\n  VALUES (s.event_id, s.event_at)",
+          "ok": false,
+          "error": "ERROR: MERGE command cannot affect row a second time"
+        },
+        "uniqueTest": {
+          "sql": "SELECT event_id, COUNT(*) AS copies\nFROM batch\nGROUP BY event_id\nHAVING COUNT(*) > 1",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "copies"
+          ],
+          "rows": [
+            [
+              27,
+              2
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "rebuild": {
+      "setup": "CREATE TABLE customer_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (1, TIMESTAMP '2024-02-01 00:00:00'),\n  (1, TIMESTAMP '2024-03-05 00:00:00'), (2, TIMESTAMP '2024-01-15 00:00:00'),\n  (2, TIMESTAMP '2024-02-20 00:00:00'), (3, TIMESTAMP '2024-01-08 00:00:00'),\n  (3, TIMESTAMP '2024-03-12 00:00:00'), (3, TIMESTAMP '2024-04-18 00:00:00'),\n  (4, TIMESTAMP '2024-01-22 00:00:00'), (4, TIMESTAMP '2024-02-27 00:00:00'),\n  (5, TIMESTAMP '2024-01-03 00:00:00'), (5, TIMESTAMP '2024-03-19 00:00:00'),\n  (6, TIMESTAMP '2024-02-06 00:00:00'), (6, TIMESTAMP '2024-04-02 00:00:00'),\n  (7, TIMESTAMP '2024-01-29 00:00:00'), (7, TIMESTAMP '2024-03-26 00:00:00'),\n  (8, TIMESTAMP '2024-02-13 00:00:00'), (8, TIMESTAMP '2024-04-09 00:00:00'),\n  (9, TIMESTAMP '2024-01-11 00:00:00'), (9, TIMESTAMP '2024-03-01 00:00:00'),\n  (10, TIMESTAMP '2024-02-24 00:00:00'), (10, TIMESTAMP '2024-04-15 00:00:00'),\n  (11, TIMESTAMP '2024-01-17 00:00:00'), (12, TIMESTAMP '2024-03-08 00:00:00')\n) AS t(customer_id, updated_at);;",
+      "steps": {
+        "events": {
+          "sql": "SELECT COUNT(*) AS events, COUNT(DISTINCT customer_id) AS customers FROM customer_events",
+          "ok": true,
+          "columns": [
+            "events",
+            "customers"
+          ],
+          "rows": [
+            [
+              24,
+              12
+            ]
+          ]
+        },
+        "begin1": {
+          "sql": "BEGIN",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "drop1": {
+          "sql": "DROP TABLE IF EXISTS dim_customer",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "create1": {
+          "sql": "CREATE TABLE dim_customer AS\nSELECT customer_id, MAX(updated_at) AS updated_at\nFROM customer_events\nGROUP BY customer_id",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "commit1": {
+          "sql": "COMMIT",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "show1": {
+          "sql": "SELECT * FROM dim_customer ORDER BY customer_id",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "updated_at"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-03-05 00:00:00"
+            ],
+            [
+              2,
+              "2024-02-20 00:00:00"
+            ],
+            [
+              3,
+              "2024-04-18 00:00:00"
+            ],
+            [
+              4,
+              "2024-02-27 00:00:00"
+            ],
+            [
+              5,
+              "2024-03-19 00:00:00"
+            ],
+            [
+              6,
+              "2024-04-02 00:00:00"
+            ],
+            [
+              7,
+              "2024-03-26 00:00:00"
+            ],
+            [
+              8,
+              "2024-04-09 00:00:00"
+            ],
+            [
+              9,
+              "2024-03-01 00:00:00"
+            ],
+            [
+              10,
+              "2024-04-15 00:00:00"
+            ],
+            [
+              11,
+              "2024-01-17 00:00:00"
+            ],
+            [
+              12,
+              "2024-03-08 00:00:00"
+            ]
+          ]
+        },
+        "print1": {
+          "sql": "SELECT COUNT(*) AS customers,\n  md5(string_agg(customer_id || '|' || updated_at, ',' ORDER BY customer_id)) AS fingerprint\nFROM dim_customer",
+          "ok": true,
+          "columns": [
+            "customers",
+            "fingerprint"
+          ],
+          "rows": [
+            [
+              12,
+              "77932b1fd4e5eb081aa96336d24ec84c"
+            ]
+          ]
+        },
+        "begin2": {
+          "sql": "BEGIN",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "drop2": {
+          "sql": "DROP TABLE IF EXISTS dim_customer",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "create2": {
+          "sql": "CREATE TABLE dim_customer AS\nSELECT customer_id, MAX(updated_at) AS updated_at\nFROM customer_events\nGROUP BY customer_id",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "commit2": {
+          "sql": "COMMIT",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "show2": {
+          "sql": "SELECT * FROM dim_customer ORDER BY customer_id",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "updated_at"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-03-05 00:00:00"
+            ],
+            [
+              2,
+              "2024-02-20 00:00:00"
+            ],
+            [
+              3,
+              "2024-04-18 00:00:00"
+            ],
+            [
+              4,
+              "2024-02-27 00:00:00"
+            ],
+            [
+              5,
+              "2024-03-19 00:00:00"
+            ],
+            [
+              6,
+              "2024-04-02 00:00:00"
+            ],
+            [
+              7,
+              "2024-03-26 00:00:00"
+            ],
+            [
+              8,
+              "2024-04-09 00:00:00"
+            ],
+            [
+              9,
+              "2024-03-01 00:00:00"
+            ],
+            [
+              10,
+              "2024-04-15 00:00:00"
+            ],
+            [
+              11,
+              "2024-01-17 00:00:00"
+            ],
+            [
+              12,
+              "2024-03-08 00:00:00"
+            ]
+          ]
+        },
+        "print2": {
+          "sql": "SELECT COUNT(*) AS customers,\n  md5(string_agg(customer_id || '|' || updated_at, ',' ORDER BY customer_id)) AS fingerprint\nFROM dim_customer",
+          "ok": true,
+          "columns": [
+            "customers",
+            "fingerprint"
+          ],
+          "rows": [
+            [
+              12,
+              "77932b1fd4e5eb081aa96336d24ec84c"
+            ]
+          ]
+        },
+        "blindTable": {
+          "sql": "CREATE TABLE dim_customer_appended (customer_id INTEGER, updated_at TIMESTAMP)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "blind1": {
+          "sql": "INSERT INTO dim_customer_appended\nSELECT customer_id, MAX(updated_at) AS updated_at\nFROM customer_events\nGROUP BY customer_id",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              12
+            ]
+          ]
+        },
+        "blindCount1": {
+          "sql": "SELECT COUNT(*) AS rows, COUNT(DISTINCT customer_id) AS customers FROM dim_customer_appended",
+          "ok": true,
+          "columns": [
+            "rows",
+            "customers"
+          ],
+          "rows": [
+            [
+              12,
+              12
+            ]
+          ]
+        },
+        "blind2": {
+          "sql": "INSERT INTO dim_customer_appended\nSELECT customer_id, MAX(updated_at) AS updated_at\nFROM customer_events\nGROUP BY customer_id",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              12
+            ]
+          ]
+        },
+        "blindCount2": {
+          "sql": "SELECT COUNT(*) AS rows, COUNT(DISTINCT customer_id) AS customers FROM dim_customer_appended",
+          "ok": true,
+          "columns": [
+            "rows",
+            "customers"
+          ],
+          "rows": [
+            [
+              24,
+              12
+            ]
+          ]
+        },
+        "failBegin": {
+          "sql": "BEGIN",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "failDrop": {
+          "sql": "DROP TABLE IF EXISTS dim_customer",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "failCreate": {
+          "sql": "CREATE TABLE dim_customer AS\nSELECT customer_id, MAX(updated_at) AS updated_at\nFROM customer_events_missing\nGROUP BY customer_id",
+          "ok": false,
+          "error": "ERROR: relation \"customer_events_missing\" does not exist"
+        },
+        "failRollback": {
+          "sql": "ROLLBACK",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "afterFail": {
+          "sql": "SELECT COUNT(*) AS customers,\n  md5(string_agg(customer_id || '|' || updated_at, ',' ORDER BY customer_id)) AS fingerprint\nFROM dim_customer",
+          "ok": true,
+          "columns": [
+            "customers",
+            "fingerprint"
+          ],
+          "rows": [
+            [
+              12,
+              "77932b1fd4e5eb081aa96336d24ec84c"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "merge": {
+      "setup": "CREATE TABLE dim_customer (customer_id INTEGER, name TEXT, updated_at TIMESTAMP);\nINSERT INTO dim_customer VALUES\n  (1, 'Ada', TIMESTAMP '2024-01-05 00:00:00'),\n  (2, 'Ben', TIMESTAMP '2024-01-09 00:00:00'),\n  (3, 'Cy',  TIMESTAMP '2024-01-12 00:00:00');\nCREATE TABLE staged_customers (customer_id INTEGER, name TEXT, updated_at TIMESTAMP);\nINSERT INTO staged_customers VALUES\n  (2, 'Benedict', TIMESTAMP '2024-02-01 00:00:00'),\n  (4, 'Dee',      TIMESTAMP '2024-02-01 00:00:00');\nCREATE TABLE dim_customer_blind AS SELECT * FROM dim_customer;",
+      "steps": {
+        "before": {
+          "sql": "SELECT customer_id, name, updated_at FROM dim_customer ORDER BY customer_id",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "name",
+            "updated_at"
+          ],
+          "rows": [
+            [
+              1,
+              "Ada",
+              "2024-01-05 00:00:00"
+            ],
+            [
+              2,
+              "Ben",
+              "2024-01-09 00:00:00"
+            ],
+            [
+              3,
+              "Cy",
+              "2024-01-12 00:00:00"
+            ]
+          ]
+        },
+        "staged": {
+          "sql": "SELECT customer_id, name, updated_at FROM staged_customers ORDER BY customer_id",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "name",
+            "updated_at"
+          ],
+          "rows": [
+            [
+              2,
+              "Benedict",
+              "2024-02-01 00:00:00"
+            ],
+            [
+              4,
+              "Dee",
+              "2024-02-01 00:00:00"
+            ]
+          ]
+        },
+        "merge1": {
+          "sql": "MERGE INTO dim_customer t\nUSING staged_customers s\n  ON t.customer_id = s.customer_id\nWHEN MATCHED THEN UPDATE SET name = s.name, updated_at = s.updated_at\nWHEN NOT MATCHED THEN INSERT (customer_id, name, updated_at)\n  VALUES (s.customer_id, s.name, s.updated_at)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        },
+        "after1": {
+          "sql": "SELECT customer_id, name, updated_at FROM dim_customer ORDER BY customer_id",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "name",
+            "updated_at"
+          ],
+          "rows": [
+            [
+              1,
+              "Ada",
+              "2024-01-05 00:00:00"
+            ],
+            [
+              2,
+              "Benedict",
+              "2024-02-01 00:00:00"
+            ],
+            [
+              3,
+              "Cy",
+              "2024-01-12 00:00:00"
+            ],
+            [
+              4,
+              "Dee",
+              "2024-02-01 00:00:00"
+            ]
+          ]
+        },
+        "merge2": {
+          "sql": "MERGE INTO dim_customer t\nUSING staged_customers s\n  ON t.customer_id = s.customer_id\nWHEN MATCHED THEN UPDATE SET name = s.name, updated_at = s.updated_at\nWHEN NOT MATCHED THEN INSERT (customer_id, name, updated_at)\n  VALUES (s.customer_id, s.name, s.updated_at)",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        },
+        "after2": {
+          "sql": "SELECT customer_id, name, updated_at FROM dim_customer ORDER BY customer_id",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "name",
+            "updated_at"
+          ],
+          "rows": [
+            [
+              1,
+              "Ada",
+              "2024-01-05 00:00:00"
+            ],
+            [
+              2,
+              "Benedict",
+              "2024-02-01 00:00:00"
+            ],
+            [
+              3,
+              "Cy",
+              "2024-01-12 00:00:00"
+            ],
+            [
+              4,
+              "Dee",
+              "2024-02-01 00:00:00"
+            ]
+          ]
+        },
+        "blindBefore": {
+          "sql": "SELECT COUNT(*) AS rows FROM dim_customer_blind",
+          "ok": true,
+          "columns": [
+            "rows"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        },
+        "blind1": {
+          "sql": "INSERT INTO dim_customer_blind SELECT * FROM staged_customers",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        },
+        "blind2": {
+          "sql": "INSERT INTO dim_customer_blind SELECT * FROM staged_customers",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        },
+        "blindAfter": {
+          "sql": "SELECT customer_id, name FROM dim_customer_blind ORDER BY customer_id, name",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Ada"
+            ],
+            [
+              2,
+              "Ben"
+            ],
+            [
+              2,
+              "Benedict"
+            ],
+            [
+              2,
+              "Benedict"
+            ],
+            [
+              3,
+              "Cy"
+            ],
+            [
+              4,
+              "Dee"
+            ],
+            [
+              4,
+              "Dee"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    },
+    "refresh": {
+      "setup": "-- fct_events is the table as it stood after the last successful run;\n-- raw_events has since gained ten more rows.\nCREATE TABLE fct_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00')\n) AS t(event_id, event_at);\n\nCREATE TABLE raw_events AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),\n  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),\n  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),\n  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),\n  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),\n  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),\n  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00'),\n  (15, TIMESTAMP '2024-01-15 00:00:00'), (16, TIMESTAMP '2024-01-16 00:00:00'),\n  (17, TIMESTAMP '2024-01-17 00:00:00'), (18, TIMESTAMP '2024-01-18 00:00:00'),\n  (19, TIMESTAMP '2024-01-19 00:00:00'), (20, TIMESTAMP '2024-01-20 00:00:00'),\n  (21, TIMESTAMP '2024-01-21 00:00:00'), (22, TIMESTAMP '2024-01-22 00:00:00'),\n  (23, TIMESTAMP '2024-01-23 00:00:00'), (24, TIMESTAMP '2024-01-24 00:00:00')\n) AS t(event_id, event_at);;\nINSERT INTO fct_events\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events);\nINSERT INTO raw_events VALUES\n  (25, TIMESTAMP '2024-01-24 00:00:00'),\n  (26, TIMESTAMP '2024-01-22 12:00:00'),\n  (27, TIMESTAMP '2024-01-25 00:00:00');\nCREATE TABLE batch AS\nSELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events);\nINSERT INTO fct_events\nSELECT event_id, event_at FROM batch;\nDROP TABLE batch;",
+      "steps": {
+        "afterStrict": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              27,
+              25,
+              25
+            ]
+          ]
+        },
+        "hardDelete": {
+          "sql": "DELETE FROM raw_events WHERE event_id = 3",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "normal": {
+          "sql": "SELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events)\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id",
+            "event_at"
+          ],
+          "rows": []
+        },
+        "drift": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              26,
+              25,
+              25
+            ]
+          ]
+        },
+        "missing": {
+          "sql": "SELECT event_id FROM raw_events\nEXCEPT\nSELECT event_id FROM fct_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": [
+            [
+              25
+            ],
+            [
+              26
+            ]
+          ]
+        },
+        "extra": {
+          "sql": "SELECT event_id FROM fct_events\nEXCEPT\nSELECT event_id FROM raw_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        },
+        "drop": {
+          "sql": "DROP TABLE fct_events",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "rebuild": {
+          "sql": "CREATE TABLE fct_events AS\nSELECT event_id, event_at\nFROM raw_events",
+          "ok": true,
+          "columns": [
+            "rows affected"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "refreshed": {
+          "sql": "SELECT\n  (SELECT COUNT(*) FROM raw_events) AS source_rows,\n  (SELECT COUNT(*) FROM fct_events) AS target_rows,\n  (SELECT COUNT(DISTINCT event_id) FROM fct_events) AS distinct_ids",
+          "ok": true,
+          "columns": [
+            "source_rows",
+            "target_rows",
+            "distinct_ids"
+          ],
+          "rows": [
+            [
+              26,
+              26,
+              26
+            ]
+          ]
+        },
+        "missingAfter": {
+          "sql": "SELECT event_id FROM raw_events\nEXCEPT\nSELECT event_id FROM fct_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": []
+        },
+        "extraAfter": {
+          "sql": "SELECT event_id FROM fct_events\nEXCEPT\nSELECT event_id FROM raw_events\nORDER BY event_id",
+          "ok": true,
+          "columns": [
+            "event_id"
+          ],
+          "rows": []
+        }
+      },
+      "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
+    }
+  },
+  "cost": {
+    "days": 730,
+    "daily": 8000,
+    "seedRows": 200000,
+    "every": 60,
+    "refreshDays": [
+      60,
+      120,
+      180,
+      240,
+      300,
+      360,
+      420,
+      480,
+      540,
+      600,
+      660,
+      720
+    ],
+    "fullAtEnd": 6040000,
+    "ratio": 755,
+    "lastRefresh": {
+      "day": 720,
+      "rows": 5960000
+    },
+    "rebuildTotal": 2280520000,
+    "incrementalTotal": 45584000,
+    "totalRatio": 50,
+    "refreshTotal": 39840000,
+    "refreshShare": 87
+  },
+  "postgres": [
+    "PostgreSQL 18.6 (PGlite 0.5.16)"
+  ],
+  "page": {
+    "dbtModel": "-- models/fct_events.sql\n{{\n  config(materialized='incremental', unique_key='event_id')\n}}\n\nSELECT *\nFROM {{ source('raw', 'events') }}\n\n{% if is_incremental() %}\n  WHERE event_at > (SELECT MAX(event_at) FROM {{ this }})\n{% endif %}",
+    "watermark": "SELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events)\nORDER BY event_id",
+    "merge": "MERGE INTO dim_customer t\nUSING staged_customers s\n  ON t.customer_id = s.customer_id\nWHEN MATCHED THEN UPDATE SET name = s.name, updated_at = s.updated_at\nWHEN NOT MATCHED THEN INSERT (customer_id, name, updated_at)\n  VALUES (s.customer_id, s.name, s.updated_at)"
+  },
+  "statements": {
+    "STRICT": "SELECT event_id, event_at\nFROM raw_events\nWHERE event_at > (SELECT MAX(event_at) FROM fct_events)\nORDER BY event_id",
+    "AT_LEAST": "SELECT event_id, event_at\nFROM raw_events\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events)\nORDER BY event_id",
+    "AT_LEAST_NEW": "SELECT event_id, event_at\nFROM raw_events r\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events)\n  AND NOT EXISTS (SELECT 1 FROM fct_events f WHERE f.event_id = r.event_id)\nORDER BY event_id",
+    "OVERLAP": "SELECT event_id, event_at\nFROM raw_events\nWHERE event_at >= (SELECT MAX(event_at) FROM fct_events)\n                  - INTERVAL '3 days'\nORDER BY event_id",
+    "APPEND": "INSERT INTO fct_events\nSELECT event_id, event_at FROM batch",
+    "MERGE_KEY": "MERGE INTO fct_events t\nUSING batch s\n  ON t.event_id = s.event_id\nWHEN MATCHED THEN UPDATE SET event_at = s.event_at\nWHEN NOT MATCHED THEN INSERT (event_id, event_at)\n  VALUES (s.event_id, s.event_at)",
+    "DELETE_KEYS": "DELETE FROM fct_events\nWHERE event_id IN (SELECT event_id FROM batch)",
+    "FULL_REBUILD": "CREATE TABLE fct_events AS\nSELECT event_id, event_at\nFROM raw_events"
+  }
+}

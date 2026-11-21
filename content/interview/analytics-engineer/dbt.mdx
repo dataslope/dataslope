@@ -158,7 +158,7 @@ late rows. A backfill is the same model run with `--event-time-start` and
 
 ### What is `dbt snapshot`, and what SCD type does it implement?
 
-`dbt snapshot` implements **Slowly Changing Dimension (SCD) Type 2**: it checks a source table for changed rows on each run and inserts new history rows with `dbt_valid_from` and `dbt_valid_to` timestamps rather than overwriting. You configure it with a `strategy`, `timestamp` (compares an `updated_at` column) or `check` (compares a list of columns). Since dbt 1.9 a snapshot is configured in YAML; the `{% snapshot %}` block in a `.sql` file is the legacy form you will still meet in older projects.
+`dbt snapshot` implements **Slowly Changing Dimension (SCD) Type 2**: it checks a source table for changed rows on each run, closes the current version of a changed row (setting its `dbt_valid_to`) and inserts a new one with `dbt_valid_from`, rather than overwriting. You configure it with a `strategy`, `timestamp` (compares an `updated_at` column) or `check` (compares a list of columns). Since dbt 1.9 a snapshot is configured in YAML; the `{% snapshot %}` block in a `.sql` file is the legacy form you will still meet in older projects.
 
 This `snap_customers` snapshot uses the `timestamp` strategy on the
 `updated_at` column, keyed by `customer_id`, to record history of the

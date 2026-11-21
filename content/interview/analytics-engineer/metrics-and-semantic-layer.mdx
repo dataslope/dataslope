@@ -108,7 +108,8 @@ A fan trap happens when you join a table to a **one-to-many** detail table and
 then aggregate a measure from the "one" side, the join **duplicates** those rows
 once per child, so summing inflates the total. Joining `orders` to
 `order_items` and summing `orders.amount` counts each order's amount once per
-item. The block below shows real revenue of 1,949.25 balloon to 4,555.25:
+item. The block below shows real revenue of 1,949.25 balloon to 4,555.25
+(orders 1 and 2 alone: 150 becomes 350):
 
 <SqlCodeBlock
   dialect="postgres"
