@@ -89,6 +89,7 @@ import {
 } from "./utils/importUtils";
 import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
+import { AddRowDialog } from "./components/AddRowDialog";
 import {
   findSampleDatabase,
   isSqliteSampleId,
@@ -3342,106 +3343,12 @@ function SqlPlaygroundInner() {
         </Dialog.Root>
 
         {/* ── Add Row drawer ── */}
-        <Dialog.Root
-          open={addRowDialog !== null}
-          onOpenChange={(next) => {
-            if (!next) setAddRowDialog(null);
-          }}
-        >
-          <Dialog.Portal>
-            <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
-            <Dialog.Popup className="sql-modify-drawer">
-              <header className="sql-modify-drawer-header">
-                <div className="sql-modify-drawer-heading">
-                  <Dialog.Title className="sql-modify-drawer-title">
-                    Add Row
-                  </Dialog.Title>
-                  <Dialog.Description className="sql-modify-drawer-subtitle">
-                    {addRowDialog?.tableName ?? ""}
-                  </Dialog.Description>
-                </div>
-                <Dialog.Close
-                  className="sql-modify-drawer-close"
-                  aria-label="Close"
-                >
-                  <X size={16} aria-hidden="true" />
-                </Dialog.Close>
-              </header>
-              {addRowDialog && (
-                <div className="sql-modify-body">
-                  <div className="sql-add-row-fields">
-                    {addRowDialog.columns.map((c) => {
-                      const hasDefault = c.defaultValue !== null;
-                      const placeholder = hasDefault
-                        ? `auto (${c.defaultValue})`
-                        : c.notNull
-                          ? "required"
-                          : "NULL if empty";
-                      return (
-                        <label key={c.name} className="sql-add-row-field">
-                          <span className="sql-add-row-field-label">
-                            <span className="sql-add-row-field-name">
-                              {c.name}
-                            </span>
-                            <span className="sql-add-row-field-type">
-                              {c.type || "—"}
-                            </span>
-                          </span>
-                          <input
-                            className="sql-rename-input"
-                            value={addRowDialog.values[c.name] ?? ""}
-                            onChange={(e) =>
-                              setAddRowDialog((prev) =>
-                                prev
-                                  ? {
-                                      ...prev,
-                                      values: {
-                                        ...prev.values,
-                                        [c.name]: e.target.value,
-                                      },
-                                    }
-                                  : null,
-                              )
-                            }
-                            placeholder={placeholder}
-                            aria-label={c.name}
-                          />
-                        </label>
-                      );
-                    })}
-                  </div>
-                  <label className="sql-add-row-another">
-                    <input
-                      type="checkbox"
-                      checked={addRowDialog.addAnother}
-                      onChange={(e) =>
-                        setAddRowDialog((prev) =>
-                          prev
-                            ? { ...prev, addAnother: e.target.checked }
-                            : null,
-                        )
-                      }
-                    />
-                    Keep open to add another row
-                  </label>
-                </div>
-              )}
-              <footer className="sql-modify-drawer-footer">
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className="confirm-btn confirm-btn-primary"
-                  onClick={submitAddRow}
-                  disabled={!addRowDialog}
-                >
-                  Add Row
-                </button>
-              </footer>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+        <AddRowDialog
+          dialect="sqlite"
+          state={addRowDialog}
+          setState={setAddRowDialog}
+          onSubmit={submitAddRow}
+        />
 
         {/* ── Add Table drawer ── */}
         <Dialog.Root
@@ -3777,96 +3684,97 @@ function SqlPlaygroundInner() {
               }
             >
               <div className="editor-wrap" ref={editorHostRef} />
-              <div className="sql-editor-corner-actions">
-                <Popover.Root
-                  open={isFormatting ? false : formatPopoverOpen}
-                  onOpenChange={setFormatPopoverOpen}
-                >
-                  <Popover.Trigger
-                    openOnHover
-                    delay={150}
-                    closeDelay={100}
-                    render={(triggerProps) => (
-                      <button
-                        {...triggerProps}
-                        type="button"
-                        className="sql-editor-corner-btn"
-                        aria-label="Format code"
-                        aria-busy={isFormatting}
-                        disabled={!loaded || isFormatting}
-                        onClick={() => void handleFormatCode()}
-                      >
-                        {isFormatting ? (
-                          <svg
-                            viewBox="0 0 13 13"
-                            width={13}
-                            height={13}
-                            className="run-btn-spinner"
-                            aria-hidden="true"
-                          >
-                            <circle
-                              cx="6.5"
-                              cy="6.5"
-                              r="5"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeDasharray="15 9"
-                            />
-                          </svg>
-                        ) : (
-                          <Wand2 size={13} aria-hidden="true" />
-                        )}
-                      </button>
-                    )}
-                  />
-                  <Popover.Portal>
-                    <Popover.Positioner
-                      sideOffset={6}
-                      align="center"
-                      side="bottom"
-                      className="sql-corner-positioner"
-                    >
-                      <Popover.Popup className="bui-popup sql-corner-popover">
-                        Format code
-                      </Popover.Popup>
-                    </Popover.Positioner>
-                  </Popover.Portal>
-                </Popover.Root>
-                <div className="sql-editor-corner-sep" aria-hidden="true" />
-                <Popover.Root>
-                  <Popover.Trigger
-                    openOnHover
-                    delay={150}
-                    closeDelay={100}
-                    render={(triggerProps) => (
-                      <button
-                        {...triggerProps}
-                        type="button"
-                        className="sql-editor-corner-btn"
-                        aria-label="View Query History"
-                        onClick={openQueryHistoryTab}
-                      >
-                        <History size={13} aria-hidden="true" />
-                      </button>
-                    )}
-                  />
-                  <Popover.Portal>
-                    <Popover.Positioner
-                      sideOffset={6}
-                      align="center"
-                      side="bottom"
-                      className="sql-corner-positioner"
-                    >
-                      <Popover.Popup className="bui-popup sql-corner-popover">
-                        Query history
-                      </Popover.Popup>
-                    </Popover.Positioner>
-                  </Popover.Portal>
-                </Popover.Root>
-              </div>
               <SqlEditorToolbar
+                leadingActions={
+                  <div className="sql-editor-corner-actions">
+                    <Popover.Root
+                      open={isFormatting ? false : formatPopoverOpen}
+                      onOpenChange={setFormatPopoverOpen}
+                    >
+                      <Popover.Trigger
+                        openOnHover
+                        delay={150}
+                        closeDelay={100}
+                        render={(triggerProps) => (
+                          <button
+                            {...triggerProps}
+                            type="button"
+                            className="sql-editor-corner-btn"
+                            aria-label="Format code"
+                            aria-busy={isFormatting}
+                            disabled={!loaded || isFormatting}
+                            onClick={() => void handleFormatCode()}
+                          >
+                            {isFormatting ? (
+                              <svg
+                                viewBox="0 0 13 13"
+                                width={13}
+                                height={13}
+                                className="run-btn-spinner"
+                                aria-hidden="true"
+                              >
+                                <circle
+                                  cx="6.5"
+                                  cy="6.5"
+                                  r="5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeDasharray="15 9"
+                                />
+                              </svg>
+                            ) : (
+                              <Wand2 size={13} aria-hidden="true" />
+                            )}
+                          </button>
+                        )}
+                      />
+                      <Popover.Portal>
+                        <Popover.Positioner
+                          sideOffset={6}
+                          align="center"
+                          side="bottom"
+                          className="sql-corner-positioner"
+                        >
+                          <Popover.Popup className="bui-popup sql-corner-popover">
+                            Format code
+                          </Popover.Popup>
+                        </Popover.Positioner>
+                      </Popover.Portal>
+                    </Popover.Root>
+                    <Popover.Root>
+                      <Popover.Trigger
+                        openOnHover
+                        delay={150}
+                        closeDelay={100}
+                        render={(triggerProps) => (
+                          <button
+                            {...triggerProps}
+                            type="button"
+                            className="sql-editor-corner-btn"
+                            aria-label="View Query History"
+                            onClick={openQueryHistoryTab}
+                          >
+                            <History size={13} aria-hidden="true" />
+                          </button>
+                        )}
+                      />
+                      <Popover.Portal>
+                        <Popover.Positioner
+                          sideOffset={6}
+                          align="center"
+                          side="bottom"
+                          className="sql-corner-positioner"
+                        >
+                          <Popover.Popup className="bui-popup sql-corner-popover">
+                            Query history
+                          </Popover.Popup>
+                        </Popover.Positioner>
+                      </Popover.Portal>
+                    </Popover.Root>
+                  </div>
+                }
                 loaded={loaded}
                 running={statusState === "running"}
                 hasEditorSelection={hasEditorSelection}

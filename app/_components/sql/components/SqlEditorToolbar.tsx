@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Menu } from "@base-ui/react/menu";
 import { ChevronDown, ListTree, Play, Square } from "lucide-react";
 import { stopRunningQuery } from "../utils/stopQuery";
 
 export interface SqlEditorToolbarProps {
+  /** Editor actions pinned to the bar's left edge (format, query history).
+   *  They are flex children of the bar rather than floated over it, so they
+   *  share its vertical centre with Run and Explain at any bar height. */
+  leadingActions?: ReactNode;
   loaded: boolean;
   running: boolean;
   hasEditorSelection: boolean;
@@ -152,6 +156,7 @@ function RunSplit({
 }
 
 export function SqlEditorToolbar({
+  leadingActions,
   loaded,
   running,
   hasEditorSelection,
@@ -169,6 +174,7 @@ export function SqlEditorToolbar({
 
   return (
     <div className="sql-toolbar">
+      {leadingActions}
       <div className="sql-toolbar-shortcuts">
         <span
           className="kbd-group"

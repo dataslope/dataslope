@@ -1,0 +1,391 @@
+{
+  "runtime": {
+    "python": "3.14.2",
+    "numpy": "2.4.6"
+  },
+  "kv": {
+    "layers": 80,
+    "kvHeads": 8,
+    "headDim": 128,
+    "bytesPerValue": 2,
+    "queryHeads": 64,
+    "perTokenBytes": 327680,
+    "perTokenKiB": 320,
+    "context128kTokens": 131072,
+    "context128kGiB": 40,
+    "noGqa128kGiB": 320,
+    "gqaFactor": 8,
+    "weightsGB": 140,
+    "gpus": 8,
+    "gpuGB": 80,
+    "nodeGB": 640,
+    "freeGB": 500,
+    "per8kBytes": 2684354560,
+    "per8kGiB": 2.5,
+    "fit8k": 186,
+    "fit128k": 11,
+    "fitNoGqa8k": 23
+  },
+  "reuse": {
+    "promptTokens": 2000,
+    "prefill": 2000,
+    "decode": 1
+  },
+  "quant": {
+    "weights16GB": 140,
+    "weights8GB": 70,
+    "weights4GB": 35,
+    "shareOfBytes4": 0.25,
+    "gpusFor16bitWeights": 2,
+    "oneGpu4bitFreeGB": 45,
+    "oneGpu4bit": 16,
+    "kv8bitKiBPerToken": 160
+  },
+  "paging": {
+    "reservedTokens": 8192,
+    "usedTokens": 2000,
+    "emptyShare": 0.7559,
+    "blockTokens": 16,
+    "worstWasteTokens": 15,
+    "worstWasteShare": 0.0075
+  },
+  "batching": {
+    "seed": 7,
+    "slots": 8,
+    "requests": 1000,
+    "meanTarget": 200,
+    "min": 10,
+    "max": 1000,
+    "mean": 194.7,
+    "median": 136,
+    "shortShare": 0.64,
+    "tokens": 194683,
+    "staticSteps": 65065,
+    "staticBusy": 0.374,
+    "continuousSteps": 24534,
+    "continuousBusy": 0.9919,
+    "firstGroups": [
+      [
+        142,
+        205,
+        114,
+        179,
+        41,
+        677,
+        10,
+        562
+      ],
+      [
+        115,
+        60,
+        108,
+        62,
+        180,
+        215,
+        377,
+        44
+      ]
+    ],
+    "firstLengths": [
+      142,
+      205,
+      114,
+      179,
+      41,
+      677,
+      10,
+      562,
+      115,
+      60,
+      108,
+      62,
+      180,
+      215,
+      377,
+      44,
+      629,
+      147,
+      70,
+      177,
+      15,
+      12,
+      245,
+      155,
+      439,
+      95,
+      104,
+      236,
+      105,
+      10,
+      59,
+      203,
+      127,
+      279,
+      10,
+      181,
+      50,
+      71,
+      615,
+      281,
+      759,
+      350,
+      449,
+      29,
+      61,
+      48,
+      230,
+      245,
+      25,
+      77,
+      214,
+      14,
+      20,
+      174,
+      375,
+      539,
+      141,
+      261,
+      153,
+      187,
+      29,
+      499,
+      177,
+      175
+    ]
+  },
+  "speculative": {
+    "seed": 11,
+    "draftTokens": 4,
+    "passes": 200000,
+    "runs": [
+      {
+        "accept": 0.9,
+        "tokensPerPass": 4.09,
+        "closedForm": 4.095,
+        "allAccepted": 0.654
+      },
+      {
+        "accept": 0.5,
+        "tokensPerPass": 1.936,
+        "closedForm": 1.938,
+        "allAccepted": 0.062
+      }
+    ]
+  },
+  "block": {
+    "page": "content/interview/machine-learning-engineer/llm-systems-and-evals.mdx",
+    "printed": [
+      "per token:        320 KiB",
+      "one 128K context: 40 GiB",
+      "same, no GQA:     320 GiB",
+      "8K-token requests that fit: 186"
+    ]
+  },
+  "said": [
+    {
+      "beat": "hook-cost",
+      "words": "eight GPUs",
+      "means": 8
+    },
+    {
+      "beat": "q1-reuse",
+      "words": "With a two-thousand-token prompt",
+      "means": 2000
+    },
+    {
+      "beat": "q1-reuse",
+      "words": "to work two thousand times",
+      "means": 2000
+    },
+    {
+      "beat": "q1-reuse",
+      "words": "uses it once",
+      "means": 1
+    },
+    {
+      "beat": "q2-model",
+      "words": "eighty layers",
+      "means": 80
+    },
+    {
+      "beat": "q2-model",
+      "words": "eight KV heads",
+      "means": 8
+    },
+    {
+      "beat": "q2-model",
+      "words": "dimension a hundred and twenty-eight",
+      "means": 128
+    },
+    {
+      "beat": "q2-model",
+      "words": "at sixteen bits",
+      "means": 16
+    },
+    {
+      "beat": "q2-model",
+      "words": "three hundred and twenty kibibytes for every token",
+      "means": 320
+    },
+    {
+      "beat": "q2-context",
+      "words": "a hundred and twenty-eight K tokens",
+      "means": 131072
+    },
+    {
+      "beat": "q2-context",
+      "words": "forty gibibytes",
+      "means": 40
+    },
+    {
+      "beat": "q2-context",
+      "words": "about a hundred and forty gigabytes of weights",
+      "means": 140
+    },
+    {
+      "beat": "q2-fit",
+      "words": "Eight eighty-gigabyte GPUs",
+      "means": 8
+    },
+    {
+      "beat": "q2-fit",
+      "words": "Eight eighty-gigabyte GPUs",
+      "means": 80
+    },
+    {
+      "beat": "q2-fit",
+      "words": "leave five hundred gigabytes",
+      "means": 500
+    },
+    {
+      "beat": "q2-fit",
+      "words": "a hundred and eighty-six fit",
+      "means": 186
+    },
+    {
+      "beat": "q2-long",
+      "words": "At a hundred and twenty-eight K, eleven",
+      "means": 11
+    },
+    {
+      "beat": "q2-gqa",
+      "words": "sixty-four query heads",
+      "means": 64
+    },
+    {
+      "beat": "q2-gqa",
+      "words": "the cache grows eight times",
+      "means": 8
+    },
+    {
+      "beat": "q2-gqa",
+      "words": "twenty-three of those eight K requests",
+      "means": 23
+    },
+    {
+      "beat": "q2-gqa",
+      "words": "not a hundred and eighty-six",
+      "means": 186
+    },
+    {
+      "beat": "q3-sim",
+      "words": "eight slots",
+      "means": 8
+    },
+    {
+      "beat": "q3-sim",
+      "words": "a thousand requests",
+      "means": 1000
+    },
+    {
+      "beat": "q3-sim",
+      "words": "from ten to a thousand tokens",
+      "means": 10
+    },
+    {
+      "beat": "q3-sim",
+      "words": "from ten to a thousand tokens",
+      "means": 1000
+    },
+    {
+      "beat": "q3-sim",
+      "words": "busy thirty-seven percent of the time",
+      "means": 37
+    },
+    {
+      "beat": "q3-sim",
+      "words": "Continuous batching, ninety-nine",
+      "means": 99
+    },
+    {
+      "beat": "q3-mem",
+      "words": "Reserve eight K tokens",
+      "means": 8192
+    },
+    {
+      "beat": "q3-mem",
+      "words": "using two thousand",
+      "means": 2000
+    },
+    {
+      "beat": "q3-mem",
+      "words": "three quarters of its buffer sits empty",
+      "means": 0.75
+    },
+    {
+      "beat": "q3-paged",
+      "words": "blocks of sixteen tokens",
+      "means": 16
+    },
+    {
+      "beat": "q3-paged",
+      "words": "under one percent",
+      "means": 1
+    },
+    {
+      "beat": "q4-bytes",
+      "words": "about a hundred and forty gigabytes to thirty-five",
+      "means": 35
+    },
+    {
+      "beat": "q4-bytes",
+      "words": "a quarter of the weight bytes",
+      "means": 0.25
+    },
+    {
+      "beat": "q4-fit",
+      "words": "fit on one of those GPUs",
+      "means": 1
+    },
+    {
+      "beat": "q4-fit",
+      "words": "room left for sixteen eight K requests",
+      "means": 16
+    },
+    {
+      "beat": "q4-sim",
+      "words": "four-token drafts",
+      "means": 4
+    },
+    {
+      "beat": "q4-sim",
+      "words": "accepted nine times in ten",
+      "means": 0.9
+    },
+    {
+      "beat": "q4-sim",
+      "words": "yields about four tokens",
+      "means": 4
+    },
+    {
+      "beat": "q4-sim",
+      "words": "At half, under two",
+      "means": 0.5
+    },
+    {
+      "beat": "q4-sim",
+      "words": "At half, under two",
+      "means": 1
+    }
+  ]
+}

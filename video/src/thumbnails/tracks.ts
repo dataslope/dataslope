@@ -52,4 +52,14 @@ export const TRACKS: Record<string, Track> = {
   // of "Backend Engineer", which ends at x 730.
   BackendEngineer: { kind: "interview", title: ["Backend Engineer"], art: { video: "thumbnails", id: "thumb-beaver" }, artWidth: 440 },
   AnalyticsEngineer: { kind: "interview", title: ["Analytics Engineer"], art: { video: "thumbnails", id: "thumb-platypus" } },
+  // The role takes two lines: "Machine Learning Engineer" is too wide for
+  // one at SIZE. The red panda is the series' own hero (mle-interview), a
+  // tall, solid figure: at full size it covers 122k pixels of the box where
+  // the others cover 66k to 83k, so it is drawn at 80% (about 78k).
+  MachineLearningEngineer: {
+    kind: "interview",
+    title: ["Machine Learning", "Engineer"],
+    art: { video: "mle-interview", id: "mle-interview-red-panda" },
+    artScale: 0.8,
+  },
 };

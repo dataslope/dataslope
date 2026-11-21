@@ -474,7 +474,7 @@ export function SettingsPanelContent({
                   <Trash2 size={14} />
                 </span>
                 <span className="settings-action-label">
-                  Clear all localStorage data
+                  Clear saved settings and code
                 </span>
               </button>
               {onClearAllLocalData && (
@@ -487,7 +487,7 @@ export function SettingsPanelContent({
                     <Trash2 size={14} />
                   </span>
                   <span className="settings-action-label">
-                    Clear all local data (storage + OPFS)
+                    Delete everything saved in this browser
                   </span>
                 </button>
               )}

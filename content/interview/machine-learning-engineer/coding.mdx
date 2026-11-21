@@ -151,10 +151,10 @@ retrieval over embeddings.
 
 def cosine_sim_matrix(X):
     norms = np.linalg.norm(X, axis=1, keepdims=True)
-    Xn = X / norms                    # L2-normalize each row
+    Xn = X / (norms + 1e-12)          # L2-normalize; an all-zero row stays zero
     return Xn @ Xn.T                  # all pairwise cosine sims
 
-X = np.array([[1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+X = np.array([[1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [0.0, 0.0]])
 print(cosine_sim_matrix(X).round(3))
 `,
     },
@@ -162,7 +162,10 @@ print(cosine_sim_matrix(X).round(3))
 />
 
 Normalizing the rows to unit length turns the matrix product `Xn @ Xn.T`
-into a full cosine-similarity matrix in one vectorized operation.
+into a full cosine-similarity matrix in one vectorized operation. The last
+row is an item with no signal yet, all zeros: without the `1e-12` its row and
+column would be `nan`, and NumPy sorts `nan` after every number, so a
+descending top-k would rank it first for everyone. With the guard it scores 0.
 
 ### How do you implement mini-batching for training?
 
@@ -181,7 +184,9 @@ Shuffle the row indices once per epoch, then slice fixed-size chunks and
 index the data with them. Shuffling by index (not by copying rows) keeps
 features and labels aligned and avoids materializing shuffled copies. A
 generator yields batches lazily so you never hold more than one batch of
-extra state.
+extra state. Pass it one random generator for the whole run rather than a
+seed: a function that seeds itself on every call deals every epoch in the
+same order, which is no shuffle at all after the first.
 
 <CodeBlock
   adapter="python"
@@ -190,17 +195,18 @@ extra state.
       filename: "main.py",
       starterCode: `import numpy as np
 
-def iterate_minibatches(X, y, batch_size, seed=0):
-    rng = np.random.default_rng(seed)
-    idx = rng.permutation(len(X))               # shuffle once per epoch
+def iterate_minibatches(X, y, batch_size, rng):
+    idx = rng.permutation(len(X))               # a new order on every call
     for start in range(0, len(X), batch_size):
         batch = idx[start:start + batch_size]
         yield X[batch], y[batch]
 
 X = np.arange(10).reshape(10, 1)
 y = np.arange(10)
-for xb, yb in iterate_minibatches(X, y, batch_size=4):
-    print("batch labels:", yb.tolist())
+rng = np.random.default_rng(0)                  # one generator for the whole run
+for epoch in range(2):
+    for xb, yb in iterate_minibatches(X, y, batch_size=4, rng=rng):
+        print(f"epoch {epoch} batch labels:", yb.tolist())
 `,
     },
   ]}

@@ -863,14 +863,15 @@ would also time every video, and log a 404 for each one with no recorded
 narration. A PNG is about 200 to
 300 kB, well inside YouTube's 2 MB limit.
 
-Each track has its own watercolor animal, so the nine read apart at a
+Each track has its own watercolor animal, so the ten read apart at a
 glance in a list of results: an owl on a die (Statistics), an elephant at a
 card catalog (Database Design), a llama with books (LLMs), a parrot (NLP), a
 raccoon (Data Analyst), the otter and meerkat of the Data Scientist and
 Data Engineer overviews, a beaver with a log beside a stack of servers
-(Backend Engineer), and a platypus beside three blocks of rising height
-(Analytics Engineer: the overview's platypus is a wide picture, which reads
-small in the corner, so the thumbnail has its own).
+(Backend Engineer), the red panda of the Machine Learning Engineer
+overview, whose role takes two lines, and a platypus beside three blocks of
+rising height (Analytics Engineer: the overview's platypus is a wide
+picture, which reads small in the corner, so the thumbnail has its own).
 
 A white page, the Dataslope mark alone in the top-left corner (no
 wordmark), the words low on the left and the animal on the right: standing
@@ -884,6 +885,8 @@ the mark and as far in from the edge.
 - **One size of animal.** The raccoon is drawn at 86% of its box
   (`artScale` in `TRACKS`): its body fills more of its picture than the
   otter's or the meerkat's, and at full size it read larger than them.
+  The red panda is drawn at 80% for the same reason: at full size its tall,
+  solid figure covers about half as much again of the box as the others.
 - **Seen small.** A thumbnail is about 168x94 on a phone, where 80px is about
   10px, so the words are few. "Interview Questions", the widest line at
   about 730px, fits beside the animal hung top-right; "Interview

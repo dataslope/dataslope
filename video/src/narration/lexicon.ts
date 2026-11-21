@@ -51,6 +51,25 @@ export const SAY: Readonly<Record<string, string>> = {
   // The Analytics Engineer series (2026-11-20). dbt, SCD, OLTP, CTE and KPI
   // are read letter by letter, as people say them.
   YAML: "yammel",
+  // The Machine Learning Engineer series (2026-11-20). RAG, ReLU, GELU and
+  // tanh are left out: they are already voiced in de-interview,
+  // de-pipelines-for-ai and ds-deep-learning, where Drew says the first two
+  // as words unaided (RAG 0.24 s and ReLU 0.32 s mid-sentence), and an
+  // entry would mark those videos' beats for re-voicing.
+  LoRA: "laura",
+  GloVe: "glove",
+  BERT: "bert",
+  BLEU: "blue",
+  ROUGE: "rooj",
+  ELU: "ee-loo",
+  SMOTE: "smote",
+  SIMD: "sim-dee",
+  argmax: "arg max",
+  argpartition: "arg partition",
+  MLOps: "em-el-ops",
+  MLflow: "em-el-flow",
+  ONNX: "onyx",
+  XGBoost: "ex-gee-boost",
 };
 
 /** Longest first, so DAGs is matched before DAG. A key matches as a whole

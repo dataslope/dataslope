@@ -1,0 +1,64 @@
+{
+  "bank": 110,
+  "topicPages": 8,
+  "totalQuestions": 167,
+  "indexQuestions": 0,
+  "conceptCheckPages": 8,
+  "challengePages": 3,
+  "challengePageNames": [
+    "ml-fundamentals",
+    "coding",
+    "statistics-and-probability"
+  ],
+  "challenges": 5,
+  "pages": [
+    {
+      "page": "ml-fundamentals",
+      "questions": 34,
+      "conceptChecks": 2,
+      "challenges": 1
+    },
+    {
+      "page": "coding",
+      "questions": 15,
+      "conceptChecks": 2,
+      "challenges": 3
+    },
+    {
+      "page": "statistics-and-probability",
+      "questions": 18,
+      "conceptChecks": 3,
+      "challenges": 1
+    },
+    {
+      "page": "deep-learning",
+      "questions": 19,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "nlp-and-llms",
+      "questions": 19,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "ml-system-design",
+      "questions": 31,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "mlops",
+      "questions": 20,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "llm-systems-and-evals",
+      "questions": 11,
+      "conceptChecks": 4,
+      "challenges": 0
+    }
+  ]
+}

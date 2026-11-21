@@ -213,7 +213,9 @@ print(f"95% bootstrap CI: ({low:.2f}, {high:.2f})")
 
 Each resample is the same size as the original with replacement, so some
 rows repeat and others drop out; the 2.5th and 97.5th percentiles of the
-5,000 resampled means bracket the true mean with 95% coverage.
+5,000 resampled means give an approximate 95% confidence interval for the
+mean. As with any confidence interval, the 95% describes the procedure:
+intervals built this way cover the true mean about 95% of the time.
 
 What the resampling produces: five thousand bootstrap medians, with the
 95% interval read straight off as two percentiles.
