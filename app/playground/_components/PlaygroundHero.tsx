@@ -2,7 +2,7 @@
 
 import { TabbiedPattern } from "tabbied/react";
 import { fadedbar } from "tabbied/patterns";
-import imageManifest from "@/lib/generated/images";
+import { CutoutImage } from "@/app/_components/CutoutImage";
 
 /**
  * Full-bleed decorative band between the `/playground` title block and the
@@ -12,17 +12,13 @@ import imageManifest from "@/lib/generated/images";
  * because it washes out at the others'). Redraw is deliberately faster than
  * the footer's (2.5s vs 18s) — Tabbied skips ticks under reduced-motion,
  * hidden tabs, and off-screen elements, so it costs nothing when unseen.
+ * The artwork is animated (static under reduced motion; see `CutoutImage`).
  * `aria-hidden` throughout: pure decoration.
  */
 
 const ART_SLUG = "playground-hero-cutout";
 
 export function PlaygroundHero() {
-  const art = imageManifest[ART_SLUG];
-  const artSrc = art
-    ? `/images/${ART_SLUG}.${art.formats[art.formats.length - 1]}`
-    : null;
-
   return (
     <div
       aria-hidden="true"
@@ -50,17 +46,11 @@ export function PlaygroundHero() {
           upper edge; the percentage height keeps the overhang proportional at
           every breakpoint. */}
       <div className="absolute inset-x-0 bottom-0 flex h-[260px] items-end justify-center">
-        {artSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={artSrc}
-            width={art!.width}
-            height={art!.height}
-            alt=""
-            decoding="async"
-            className="h-[115%] w-auto max-w-[min(100%,52rem)] object-contain"
-          />
-        ) : null}
+        <CutoutImage
+          slug={ART_SLUG}
+          decoding="async"
+          className="h-[115%] w-auto max-w-[min(100%,52rem)] object-contain"
+        />
       </div>
     </div>
   );

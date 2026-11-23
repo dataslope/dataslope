@@ -1,5 +1,5 @@
-import imageManifest from "@/lib/generated/images";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
+import { cutoutImage, CutoutImage } from "@/app/_components/CutoutImage";
 import {
   DiamondBackground,
   TestRailBackground,
@@ -10,21 +10,17 @@ import {
 /**
  * Turns a generated illustration into the `Icon` component `<BentoCard>`
  * wants (it renders `<Icon className={…} />` with its own sizing classes).
- * A slug with no manifest entry renders nothing rather than a broken image.
- * Eager/non-lazy: all four sit near the top of the home page.
+ * Each one is animated (`<CutoutImage>` serves `<id>-animated.webp`, static
+ * under reduced motion). A slug with no manifest entry renders nothing rather
+ * than a broken image. Eager/non-lazy: all four sit near the top of the home
+ * page.
  */
 function illustrationIcon(slug: string) {
-  const entry = imageManifest[slug];
-  if (!entry) return () => null;
-  const src = `/images/${slug}.${entry.formats[entry.formats.length - 1]}`;
+  if (!cutoutImage(slug)) return () => null;
   return function IllustrationIcon({ className }: { className?: string }) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={src}
-        width={entry.width}
-        height={entry.height}
-        alt=""
+      <CutoutImage
+        slug={slug}
         aria-hidden="true"
         decoding="async"
         className={className}

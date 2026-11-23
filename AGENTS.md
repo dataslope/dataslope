@@ -222,6 +222,53 @@ cut-out by width (`<Figure>`, the course-card thumbnails) or letterboxes it
 before a sweep reaches its slugs: `StatsBento` sizes the four `home-icon-*`
 cut-outs `h-40 w-40` with no `object-fit`.
 
+### Animated cut-outs
+
+A few promoted cut-outs also have an animated version: the four home bento
+marmots and the playground hero (marmot, fox and penguin). GPT Image 2.6 draws
+the animation itself. `/v1/images/edits` with `output_format: "gif"` and
+`frame_count` (2 to 16) takes the served cut-out as its reference image and
+returns a looping GIF. The motion for each id lives in
+`data/illustration-animations.json`, on the same model, `low` quality and
+transparent background as everything else.
+
+```bash
+node scripts/animate-illustrations.mjs generate --only home-icon-courses   # GIF into generated-illustrations/animations/
+node scripts/animate-illustrations.mjs encode   --only home-icon-courses   # -> public/images/<id>-animated.webp
+node scripts/build-images.mjs
+```
+
+`encode` writes `<id>-animated.webp` laid out on the static cut-out's own
+footprint (same aspect, subject width and baseline), so the static manifest
+entry's width and height reserve the box for either file.
+`app/_components/CutoutImage.tsx` serves it through a `<picture>` whose
+`<source>` is gated on `prefers-reduced-motion: no-preference`, so readers
+who ask for less motion get the static cut-out, with no JavaScript.
+`__tests__/illustrationAnimations.test.ts` fails when an entry has no encoded
+file or its aspect ratio drifts from the static one.
+
+Things learned getting there:
+
+- **The frames come back as a sheet four across**, and the sheet's longest
+  edge is capped at 3840px, so a frame is at most 960px wide: 16 frames fit at
+  512x512, and the 3:2 hero fits 8 at 960x640. 16 hero frames at 768x512 were
+  accepted and came back worse (a wavy platform edge, smudges). Every frame is
+  200ms.
+- **GIF alpha is on or off.** The edges carry no halo on the dark page, and
+  the downscale to display size softens them, but they are not the soft
+  edges of a PNG cut-out.
+- **Every frame is a redraw**, so WebP finds little to share between frames
+  and the bytes scale with the frame count: about 155-200 KB for a 16-frame
+  icon capped at `maxWidth: 320` (2x its 160px slot), against 60-90 KB for the
+  static one.
+- **Ask for no sparkles** when the motion is a celebration. "Lifts the trophy
+  in celebration" came back with spark strokes, which the house style rules
+  out.
+- **An animated file is not a `-cutout`.** It ends in `-animated` so that
+  `trim-cutouts.mjs`, which trims every `*-cutout.webp`, never re-crops it
+  away from its static footprint. Re-trimming a static cut-out means
+  re-running `encode` for its animation.
+
 ### Reviewing, and the regeneration queue
 
 `/dashboard/admin/illustration-prompts` is the review surface and is

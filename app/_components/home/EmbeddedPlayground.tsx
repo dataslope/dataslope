@@ -3,24 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
-import imageManifest from "@/lib/generated/images";
+import { cutoutImage, CutoutImage } from "@/app/_components/CutoutImage";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "../languageIcons";
 
-/** Playground illustration over the facade's CTA (same cut-out as the
- *  /playground hero). `null` when the slug is missing renders nothing. */
+/** Playground illustration over the facade's CTA (same animated cut-out as the
+ *  /playground hero). Renders nothing when the slug is missing. */
 const PLAYGROUND_ART_SLUG = "playground-hero-cutout";
-const playgroundArt = (() => {
-  const entry = imageManifest[PLAYGROUND_ART_SLUG];
-  if (!entry) return null;
-  return {
-    src: `/images/${PLAYGROUND_ART_SLUG}.${entry.formats[entry.formats.length - 1]}`,
-    width: entry.width,
-    height: entry.height,
-  };
-})();
+const hasPlaygroundArt = cutoutImage(PLAYGROUND_ART_SLUG) !== null;
 
 /**
  * Showcase embed of the real playground in a same-origin <iframe> — the
@@ -110,13 +102,9 @@ function PlaygroundFacade({
               the button onto the illustration (the cut-out's transparent
               margin would otherwise leave a gap). Rests at 80% opacity so
               the CTA stays loudest. */}
-          {playgroundArt && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={playgroundArt.src}
-              width={playgroundArt.width}
-              height={playgroundArt.height}
-              alt=""
+          {hasPlaygroundArt && (
+            <CutoutImage
+              slug={PLAYGROUND_ART_SLUG}
               aria-hidden="true"
               loading="lazy"
               decoding="async"

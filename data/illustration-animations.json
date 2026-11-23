@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "model": "gpt-image-2.6-flare",
+    "quality": "low",
+    "background": "transparent",
+    "promptTemplate": "Animate this exact illustration as a seamless looping animation: {motion} Keep everything else identical: same art style, same colors, same framing{keep}. Empty transparent background. No text."
+  },
+  "animations": [
+    {
+      "id": "playground-hero",
+      "size": "960x640",
+      "frames": 8,
+      "motion": "the seesaw rocks gently up and down with the fox and the penguin riding it, and the marmot wiggles happily on the slide with its arms up.",
+      "keep": "same slide, platform and yellow block"
+    },
+    {
+      "id": "home-icon-courses",
+      "size": "512x512",
+      "frames": 16,
+      "motion": "the marmot gently breathes, blinks once, and the tassel on its graduation cap sways.",
+      "maxWidth": 320
+    },
+    {
+      "id": "home-icon-interview-prep",
+      "size": "512x512",
+      "frames": 16,
+      "motion": "the marmot gently breathes, blinks once, and the briefcase swings slightly.",
+      "maxWidth": 320
+    },
+    {
+      "id": "home-icon-challenges",
+      "size": "512x512",
+      "frames": 16,
+      "motion": "the marmot proudly lifts the trophy a little higher and lowers it again, and blinks once. No sparkles, no motion lines, no extra marks.",
+      "maxWidth": 320
+    },
+    {
+      "id": "home-icon-code-blocks",
+      "size": "512x512",
+      "frames": 16,
+      "motion": "the marmot gently breathes and blinks once, and the green caret on the terminal screen blinks on and off.",
+      "maxWidth": 320
+    }
+  ]
+}
