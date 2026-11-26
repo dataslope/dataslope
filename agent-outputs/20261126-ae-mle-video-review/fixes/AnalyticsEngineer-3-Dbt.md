@@ -60,7 +60,7 @@ and the queues.
 | lint (`eslint src/videos/ae-dbt`) | pass |
 | `check:cues` | pass: every word cue names a phrase its beat says |
 | `npm test` | pass, 79 of 79 |
-| `check:frames` (`CHECK_SCALE=1`) | **not run**: it waited in the render queue behind the other agents' jobs until its background job hit the 2-hour limit and was stopped, before it started (its log is empty). Per the harness, a job stopped at the longest timeout is not restarted, so the coordinator needs to run it. What it would check on the changed screens, I looked at by eye in the stills: no text under 19px (the new lines are 22 and 24px, code at 19px minimum), nothing past the page edge (the longest new line ends at x = 1814), no line through a label, no new arrows. |
+| `check:frames` (`CHECK_SCALE=1`) | **pass**, run by the coordinator on the final code after this agent's own run timed out in the render queue: 4 illustrations within their pixels, 41 arrows straight under their heads, no hyphen in tabular figures, every word spaced, every line one size and family. |
 | `check:motion` | pass: nothing holds still for 3 s; longest 2.8 s (r-macros, unchanged) |
 | `check:sync` | pass: 50 beats, worst +0.05 s (`r-seeds`, unchanged); `r-version-latest` −0.01 s |
 | `check:mix` | pass: effects 29.4 LU under the narration, speech a median 28.5 dB above them, closest 12.9 dB |
