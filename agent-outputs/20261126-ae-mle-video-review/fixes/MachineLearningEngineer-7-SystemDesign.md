@@ -32,7 +32,7 @@ The length was 655.9 s (10:55.9) and is now 656.8 s (10:56.8). The extra 0.9 s i
 - `npm run check:cues`: passed ("every word cue names a phrase its beat says, and says which one").
 - `npm test`: 79 tests, 79 passed, 0 failed.
 - `CHECK_SCALE=1 npm run check:frames -- MachineLearningEngineer-7-SystemDesign`: passed. It checked 5 illustrations and 39 arrows (bend up to 0.0°), found no tabular hyphens, kept a space between every pair of words, set every line in one size and family, and every word cue names its occurrence.
-- `npm run check:motion -- MachineLearningEngineer-7-SystemDesign`: see below.
+- `npm run check:motion -- MachineLearningEngineer-7-SystemDesign`: passed ("nothing holds still for 3 s"). Five stretches are still for 2 s or more, 11.0 s in all, the longest 2.8 s over `r-latency`/`r-scale`. The preview was deleted after reading.
 - `check:sync` and `check:mix`: not run, because nothing was re-voiced.
 - Stills were rendered and checked at every changed moment: 74, 243, 303.5, 392, 441, 461, 536, 573, 609.6, 609.9, and 635.2 to 640.4 s.
 
