@@ -39,7 +39,7 @@ None generated.
 | `eslint src/videos/ae-changing-dimensions` | pass |
 | `check:cues` | pass ("every word cue names a phrase its beat says") |
 | `npm test` | 79 pass, 0 fail |
-| `CHECK_SCALE=1 check:frames` | **not run.** The job waited 2 h for a render slot (the slot script polls rather than queues, and about ten other checks were waiting) and was stopped at the 2 h background limit before it started. The harness says not to restart a job that already had the longest limit. The coordinator should run it: `CHECK_SCALE=1 VIDEO_ENTRY=out/entries/AnalyticsEngineer-2-ChangingDimensions.tsx out/render-slot.sh npm run check:frames -- AnalyticsEngineer-2-ChangingDimensions`. It passed on 2026-11-20. Since then only text changed, plus one more listing line in three Question 5 listings and the flow boxes' top alignment. All of it was looked at in 1080p stills. |
+| `CHECK_SCALE=1 check:frames` | pass: 2 illustrations, 5 arrows, word spacing, one size and one family per line, tabular figures, cue occurrences. The first submission waited 2 h in the old unordered render queue and was stopped before it started. It passed once resubmitted under the coordinator's FIFO queue. |
 | `check:motion` | pass: 8:04.8 checked, 0 still stretches of 2 s or more |
 | `check:sync`, `check:mix` | not needed: nothing re-voiced |
 
