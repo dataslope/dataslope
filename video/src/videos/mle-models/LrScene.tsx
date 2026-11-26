@@ -23,7 +23,6 @@ import {
   int,
   Line,
   Mark,
-  MARK_OK,
   OK,
   OK_INK,
   POINT,
@@ -35,13 +34,15 @@ import {
 } from "./parts";
 
 const LOG_TICK = (v: number) => (v >= 1 ? int(v) : String(v));
+/** The range test's bottom: a neutral wash, since it is not the pick. */
+const FLOOR = `color-mix(in srgb, ${INK} 7%, transparent)`;
 
 /**
  * Question 3, in three figures that take the same place in turn. The page's
  * rows at three rates (0.01 crawling, 0.9 settled in nine steps, 2.5
  * climbing), with the stability limit on a rate axis under them. Then the
- * range test: one run with the rate rising, its flat stretch and the turn at
- * two. Then a schedule's shape, warmup and cosine decay, with what decay does
+ * range test: one run with the rate rising, its bottom, the turn at two, and
+ * the pick on the steep stretch, a tenth of the turn. Then a schedule's shape, warmup and cosine decay, with what decay does
  * for single-row SGD; and Adam in one line.
  */
 export const LrScene: React.FC = () => {
@@ -62,14 +63,14 @@ export const LrScene: React.FC = () => {
   const twoAt = n.word("lr-band", "past about two");
   const nineAt = n.word("lr-band", "At point nine");
   const ninesAt = n.word("lr-band", "settles in nine");
-  // B: the range test.
+  // B: the range test, and where to read it.
   const rangeFrom = n.beat("lr-range").from;
   const testAt = n.word("lr-range", "run a range test");
   const risingAt = n.word("lr-range", "the rate rising across orders of magnitude");
-  const bottomsAt = n.word("lr-range", "bottoms out from about point five");
-  const turnsAt = n.word("lr-range", "turns up at two");
-  const pickAt = n.word("lr-range", "Pick a rate on the flat stretch");
-  const shortAt = n.word("lr-range", "well short of the turn");
+  const bottomsAt = n.word("lr-range-read", "bottoms out from about point five");
+  const turnsAt = n.word("lr-range-read", "turns up at two");
+  const pickAt = n.word("lr-range-pick", "Pick a rate where it's still falling steeply");
+  const tenthAt = n.word("lr-range-pick", "about a tenth of where it turns up");
   // C: the schedule.
   const schedFrom = n.beat("lr-sched").from;
   const warmAt = n.word("lr-sched", "a short warmup");
@@ -109,7 +110,7 @@ export const LrScene: React.FC = () => {
       <Sfx name="el-tap" at={ninesAt} level={-30} />
       <Sfx name="el-pencil" at={testAt} level={-36} />
       <Sfx name="el-tap" at={turnsAt} level={-30} />
-      <Sfx name="el-pop" at={shortAt} level={-32} />
+      <Sfx name="el-pop" at={tenthAt} level={-32} />
       <Sfx name="el-pencil" at={warmAt} level={-36} />
       <Sfx name="el-tap" at={constAt} level={-31} />
       <Sfx name="el-tap" at={cosineAt} level={-31} />
@@ -170,6 +171,14 @@ export const LrScene: React.FC = () => {
               2 / <I>λ</I>
               <sub style={{ fontSize: "0.68em" }}>max</sub> ≈ {limit.toFixed(2)}
             </MathRun>
+            <span style={{ color: INK_SOFT }}>
+              ,{" "}
+              <MathRun>
+                <I>λ</I>
+                <sub style={{ fontSize: "0.68em" }}>max</sub>
+              </MathRun>{" "}
+              the loss&apos;s largest curvature
+            </span>
           </Line>
           {[
             { v: 0.01, c: INK, a: smallAt },
@@ -184,8 +193,10 @@ export const LrScene: React.FC = () => {
 
         {/* ── B: the range test ── */}
         <Fade at={rangeFrom - 4} out={schedFrom - 6}>
+          {/* The bottom, in a neutral tint: where the loss is lowest is not
+              where to pick (that is the steep stretch, ringed green below). */}
           <Svg opacity={ease(frame, bottomsAt, 12)}>
-            <rect x={at(B.x, flatLo)} y={box.top} width={at(B.x, flatHi) - at(B.x, flatLo)} height={box.height} fill={MARK_OK} />
+            <rect x={at(B.x, flatLo)} y={box.top} width={at(B.x, flatHi) - at(B.x, flatLo)} height={box.height} fill={FLOOR} />
           </Svg>
           <Axes
             x={B.x}
@@ -203,8 +214,8 @@ export const LrScene: React.FC = () => {
           <Svg opacity={ease(frame, turnsAt - 2, 10)}>
             <line x1={at(B.x, turn)} x2={at(B.x, turn)} y1={box.top} y2={box.top + box.height} stroke={POINT} strokeWidth={3} />
           </Svg>
-          <Svg opacity={ease(frame, shortAt - 2, 10)}>
-            <circle cx={at(B.x, LR.lowest[0])} cy={at(B.y, LR.lowest[1])} r={16} fill="none" stroke={OK} strokeWidth={3} />
+          <Svg opacity={ease(frame, tenthAt - 2, 10)}>
+            <circle cx={at(B.x, LR.tenth[0])} cy={at(B.y, LR.tenth[1])} r={16} fill="none" stroke={OK} strokeWidth={3} />
           </Svg>
           <Line at={testAt} x={R} y={y(340)} size={26}>
             One short run, the rate rising
@@ -212,20 +223,23 @@ export const LrScene: React.FC = () => {
           <Line at={risingAt} x={R} y={y(384)} size={24} color={INK_SOFT}>
             from 0.0001 to 10 in 100 steps
           </Line>
-          <Line at={bottomsAt} x={R} y={y(470)} size={26} color={OK_INK}>
-            Flat from about 0.5
+          <Line at={bottomsAt} x={R} y={y(470)} size={26}>
+            Bottoms out from about 0.5
           </Line>
           <Line at={turnsAt} x={R} y={y(520)} size={26} color={POINT_INK}>
             Turns up at 2
           </Line>
-          <Line at={pickAt} x={R} y={y(610)} size={28}>
-            <Mark at={shortAt}>Pick well short of the turn</Mark>
+          <Line at={pickAt - 2} x={R} y={y(610)} size={28}>
+            <Mark at={pickAt + 6}>Pick where it&apos;s still falling steeply</Mark>
+          </Line>
+          <Line at={tenthAt - 2} x={R} y={y(664)} size={26} color={OK_INK}>
+            About a tenth of the turn: {LR.tenth[0].toFixed(2)} here
           </Line>
         </Fade>
 
         {/* ── C: a schedule ── */}
         <Fade at={schedFrom - 4}>
-          <Axes x={C.x} y={C.y} xTicks={[0, 250, 500, 750, 1000]} yTicks={[0, 0.5, 1]} yFormat={(v) => (v === 1 ? "Base" : String(v))} xTitle="Step" yTitle="Rate" at={schedFrom} />
+          <Axes x={C.x} y={C.y} xTicks={[0, 250, 500, 750, 1000]} yTicks={[0, 0.5, 1]} yFormat={(v) => (v === 1 ? "Base" : v === 0.5 ? "Half" : String(v))} xTitle="Step" yTitle="Rate" at={schedFrom} />
           <Curve points={LR.schedule.filter(([k]) => k <= LR.warmup)} x={C.x} y={C.y} at={warmAt} dur={10} color={POINT} width={4} />
           <Curve points={LR.schedule.filter(([k]) => k >= LR.warmup)} x={C.x} y={C.y} at={decayAt} dur={34} color={DATA} width={4} />
           <Line at={warmAt + 4} x={at(C.x, LR.warmup) + 16} y={at(C.y, 1) - 46} size={22} color={POINT_INK}>

@@ -122,22 +122,26 @@ export const BlockScene: React.FC = () => {
           Describe the transformer architecture.
         </QuestionCard>
 
-        {/* The stack: two blocks behind the one drawn. */}
+        {/* The stack: two blocks behind the one drawn, only their top and
+            right edges, the parts that would show behind it (a full outline
+            ran its bottom edge along the residual line). */}
         <Svg opacity={ease(frame, stackAt, 14)}>
-          {[2, 1].map((k) => (
-            <rect
-              key={k}
-              x={BX - 50 + k * 12}
-              y={B.group[0] - k * 12}
-              width={BW + 200}
-              height={B.group[1] - B.group[0]}
-              rx={10}
-              fill="none"
-              stroke={INK_SOFT}
-              strokeWidth={1.5}
-              opacity={0.45}
-            />
-          ))}
+          {[2, 1].map((k) => {
+            const x0 = BX - 50 + k * 12;
+            const x1 = x0 + BW + 200;
+            const y0 = B.group[0] - k * 12;
+            const y1 = B.group[1] - k * 12;
+            return (
+              <path
+                key={k}
+                d={`M${x0},${B.group[0]} L${x0},${y0 + 10} Q${x0},${y0} ${x0 + 10},${y0} L${x1 - 10},${y0} Q${x1},${y0} ${x1},${y0 + 10} L${x1},${y1 - 10} Q${x1},${y1} ${x1 - 10},${y1} L${Math.min(x1 - 10, BX - 50 + BW + 200)},${y1}`}
+                fill="none"
+                stroke={INK_SOFT}
+                strokeWidth={1.5}
+                opacity={0.45}
+              />
+            );
+          })}
           <rect x={BX - 50} y={B.group[0]} width={BW + 200} height={B.group[1] - B.group[0]} rx={10} fill="none" stroke={INK} strokeWidth={2} strokeDasharray="7 6" />
         </Svg>
         <Line at={stackAt + 8} x={BX + BW + 196} y={(B.group[0] + B.group[1]) / 2 - 18} size={28}>

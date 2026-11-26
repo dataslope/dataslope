@@ -338,7 +338,7 @@ export const script: NarrationScript = {
     {
       id: "q2-limit",
       text: "It covers means and sums, so accuracy and average loss. For a median, or a ninety-fifth percentile latency, there's no such formula.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.2,
     },
     {
       id: "q3",
@@ -392,7 +392,7 @@ export const script: NarrationScript = {
     {
       id: "q6-not",
       text: "[slowly] Because it assumes the null, it can't be the probability that the null is true, or that your result is a fluke.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "q7",
@@ -414,12 +414,17 @@ export const script: NarrationScript = {
     },
     {
       id: "q8-models",
-      text: "Now the two models. Pool their four thousand right-or-wrong answers and shuffle, and p is point six two. Nothing there.",
+      text: "Now the two models. Pool their four thousand right-or-wrong answers and shuffle, and p is point six two.",
       pauseAfter: 0.6,
     },
     {
       id: "q8-paired",
       text: "But they answered the same two thousand examples, and disagree on only eighteen, of which the new model wins fourteen. Shuffle within each pair instead, swapping which model gave which answer, and p is point oh three. Same gap, but the paired test uses how the data was collected, and at five percent it rejects the null.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "q8-ship",
+      text: "So, ship it? Offline, the new model passes; an online test gets the final say.",
       pauseAfter: 0.8,
     },
 
@@ -478,7 +483,17 @@ export const script: NarrationScript = {
     },
     {
       id: "q11-log",
-      text: "You maximize the log of the likelihood, because the product underflows. Give each of two thousand labels a probability of one half, and float sixty-four rounds their product to exactly zero. Its log is just minus thirteen hundred and eighty-six.",
+      text: "You maximize the log of the likelihood, because the product underflows.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "q11-log-peak",
+      text: "The log only ever rises, so the peak stays put.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "q11-log-zero",
+      text: "Give each of two thousand labels a probability of one half, and float sixty-four rounds their product to exactly zero. Its log is just minus thirteen hundred and eighty-six.",
       pauseAfter: 0.6,
     },
     {
@@ -539,7 +554,17 @@ export const script: NarrationScript = {
     },
     {
       id: "r-cause",
-      text: "And correlation isn't causation: a confounder can drive both, as hot weather drives ice cream sales and drownings. A model can predict from a correlation. Deciding what to change needs a randomized experiment, or a causal method that rules confounders out.",
+      text: "And correlation isn't causation: a confounder can drive both, as hot weather drives ice cream sales and drownings.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "r-cause-other",
+      text: "Or the cause runs the other way, or it's chance.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-cause-act",
+      text: "A model can predict from a correlation. Deciding what to change needs a randomized experiment, or a causal method that rules confounders out.",
       pauseAfter: 0.9,
     },
     {

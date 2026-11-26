@@ -226,6 +226,9 @@ const Exposures: React.FC<{ c: Ctx }> = ({ c }) => {
   const etlAt = c.w("r-exposures", "a reverse ETL sync");
   const sitAt = c.w("r-exposures", "They sit in the lineage graph");
   const reachedAt = c.w("r-exposures", "reached the revenue dashboard");
+  // The path lights from "question four's change", so it is whole by
+  // "reached" and holds about 3.5 s, not the 1.5 s it had lit on "reached".
+  const changeAt = c.w("r-exposures", "question four's change");
   const frame = useCurrentFrame();
   const lines = LISTING.exposure;
   const top = c.y(LIST_TOP) + c.h(92);
@@ -238,16 +241,16 @@ const Exposures: React.FC<{ c: Ctx }> = ({ c }) => {
     dashboard: { x: R_X + 380, cy: gTop + BOX_H / 2 + c.h(37), w: DASH_W },
   };
   const nodes: GNode[] = [
-    { id: "fct_orders", slot: slots.fct_orders, at: sitAt, tones: [{ at: reachedAt + 10, tone: "lit" }] },
-    { id: "dim_customer", slot: slots.dim_customer, at: sitAt + 3, tones: [{ at: reachedAt + 10, tone: "lit" }] },
-    { id: "dashboard", slot: slots.dashboard, at: sitAt + 6, exposure: true, title: "Revenue Dashboard", tones: [{ at: reachedAt, tone: "lit" }] },
+    { id: "fct_orders", slot: slots.fct_orders, at: sitAt, tones: [{ at: reachedAt, tone: "lit" }] },
+    { id: "dim_customer", slot: slots.dim_customer, at: sitAt + 3, tones: [{ at: reachedAt, tone: "lit" }] },
+    { id: "dashboard", slot: slots.dashboard, at: sitAt + 6, exposure: true, title: "Revenue Dashboard", tones: [{ at: changeAt, tone: "lit" }] },
   ];
   const edges: GEdge[] = deps.map((d, i) => ({
     from: d,
     to: "dashboard",
     at: sitAt + 8 + i * 4,
     toPort: { side: "left", d: i === 0 ? -12 : 12 },
-    tones: [{ at: reachedAt + 4, color: "var(--ds-yellow-600)" }],
+    tones: [{ at: changeAt + 6, color: "var(--ds-yellow-600)" }],
   }));
   return (
     <>
@@ -395,13 +398,25 @@ const Project: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 18. Versions ────────────────────────────────────────────────────────────
 
+/** The model's own versions config, as an unpinned ref meets it. */
+const LATEST = "latest_version: 1";
+
 const Versions: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
   const sinceAt = c.w("r-version", "Since dbt one point five");
   const yamlAt = c.w("r-version", "declare versions in YAML");
   const fileAt = c.w("r-version", "each with its own SQL file");
   const pinAt = c.w("r-version", "Consumers pin one with ref and a version number");
   const breakAt = c.w("r-version", "a breaking change rolls out");
   const forcingAt = c.w("r-version", "without forcing everyone across at once");
+  // What a ref with no version gets (dbt's documented default, not the
+  // page's): the latest version, by default the highest, so every unpinned
+  // consumer is on v2 at once unless latest_version is held back.
+  const noneAt = c.w("r-version-latest", "A ref with no version");
+  const latestAt = c.w("r-version-latest", "gets the latest version");
+  const highestAt = c.w("r-version-latest", "defaults to the highest number");
+  const setAt = c.w("r-version-latest", "set latest version to one");
+  const movedAt = c.w("r-version-latest", "until consumers have moved");
   const top = c.y(LIST_TOP) + c.h(80);
   const v = [
     { id: "v1", file: "dim_customer_v1.sql", at: fileAt },
@@ -415,11 +430,13 @@ const Versions: React.FC<{ c: Ctx }> = ({ c }) => {
       title: x.file,
       slot: { x: R_X + 300, cy: vy(i), w: 290 },
       at: x.at,
-      tones: i === 0 ? [{ at: pinAt + 10, tone: "lit" as const }] : i === 1 ? [{ at: breakAt, tone: "data" as const }] : [],
+      // The pinned one in yellow, as it is named; the new one stays in ink.
+      tones: i === 0 ? [{ at: pinAt + 10, tone: "lit" as const }] : [],
     })),
   ];
-  const edges: GEdge[] = v.map((x, i) => ({ from: "dim_customer", to: x.id, at: x.at - 4, toPort: { side: "left" }, turnX: R_X + 250 + (i ? 0 : 0) }));
+  const edges: GEdge[] = v.map((x) => ({ from: "dim_customer", to: x.id, at: x.at - 4, toPort: { side: "left" }, turnX: R_X + 250 }));
   const pinY = vy(1) + c.h(92);
+  const noneY = pinY + c.h(104);
   return (
     <>
       <Fact at={sinceAt} c={c}>
@@ -430,7 +447,20 @@ const Versions: React.FC<{ c: Ctx }> = ({ c }) => {
         A consumer pins one: <Code>{"ref('dim_customer', version=1)"}</Code>
       </Line>
       <Line at={breakAt} x={R_X} y={pinY + c.h(44)} color={INK_SOFT}>
-        v2 can break things<span style={{ opacity: ease(useCurrentFrame(), forcingAt, 10) }}>; nobody moves until they choose to</span>
+        Breaking changes go in v2<span style={{ opacity: ease(frame, forcingAt, 10) }}>; pinned consumers move when they choose to</span>
+      </Line>
+      <Line at={noneAt} x={R_X} y={noneY} size={22}>
+        No version: <Code>{"ref('dim_customer')"}</Code>
+        <span style={{ opacity: ease(frame, latestAt, 10) }}>
+          {" "}→ <Code>latest_version</Code>
+        </span>
+      </Line>
+      <Line at={highestAt} x={R_X} y={noneY + c.h(44)} color={ACCENT_INK} weight={600}>
+        By default the highest: v2, for everyone at once
+      </Line>
+      <Line at={setAt} x={R_X} y={noneY + c.h(88)} color={OK_INK} weight={600}>
+        <Code color={OK_INK}>{LATEST}</Code>
+        <span style={{ opacity: ease(frame, movedAt, 10) }}> until consumers have moved</span>
       </Line>
     </>
   );
@@ -500,7 +530,9 @@ const V2: React.FC<{ c: Ctx }> = ({ c }) => {
   const fixedAt = c.w("r-v2", "has to be fixed first");
   const top = c.y(LIST_TOP);
   const NAME_X = R_X + 150;
-  const sqlTop = top + c.h(186);
+  // Three names under the engine: dbt, dbt OSS and dbt Core, a row each.
+  const ROW_H = c.h(38);
+  const sqlTop = top + c.h(186) + ROW_H;
   const yamlY = sqlTop + listingHeight(1, SIZE) + c.h(76);
   return (
     <>
@@ -514,12 +546,21 @@ const V2: React.FC<{ c: Ctx }> = ({ c }) => {
         <Code>dbt</Code>
       </Line>
       <Line at={distAt + 4} x={NAME_X} y={top + c.h(92)} size={24}>
-        The main distribution
+        The main distribution<span style={{ color: INK_SOFT, opacity: ease(frame, distAt + 14, 10) }}>, under dbt&rsquo;s own license</span>
       </Line>
-      <Line at={coreAt} x={R_X} y={top + c.h(130)} size={24}>
+      {/* The licence half of the page's "Naming and licensing", on screen
+          only: "r-v2" was voiced on its own, and these rows are up for
+          about 20 s. */}
+      <Line at={distAt + 24} x={R_X} y={top + c.h(92) + ROW_H} size={24}>
+        <Code>dbt OSS</Code>
+      </Line>
+      <Line at={distAt + 28} x={NAME_X} y={top + c.h(92) + ROW_H} size={24}>
+        Its {DBT_V2.ossLicense} subset
+      </Line>
+      <Line at={coreAt} x={R_X} y={top + c.h(130) + ROW_H} size={24}>
         <Code>dbt Core</Code>
       </Line>
-      <Line at={coreAt + 4} x={NAME_X} y={top + c.h(130)} size={24}>
+      <Line at={coreAt + 4} x={NAME_X} y={top + c.h(130) + ROW_H} size={24}>
         The Python {DBT_V2.coreLine} line<span style={{ color: INK_SOFT, opacity: ease(frame, endsAt, 10) }}>, ending at {DBT_V2.coreEndsAt}</span>
       </Line>
       <Listing

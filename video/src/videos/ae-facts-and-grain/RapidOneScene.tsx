@@ -25,6 +25,7 @@ const where = (t: Table, col: string, value: string): Table => {
 // ── 10. The three types of fact tables ─────────────────────────────────────
 
 const Types: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
   const txAt = c.w("r-types", "Transaction: one row per event");
   const depositAt = c.w("r-types", "like a deposit");
   const periodicAt = c.w("r-types", "Periodic snapshot: one row per entity per period");
@@ -76,9 +77,14 @@ const Types: React.FC<{ c: Ctx }> = ({ c }) => {
         Accumulating snapshot: one row per application
       </TableName>
       <DataTable g={lg} cols={colsOf(L)} at={accAt} rows={first.map((cells) => ({ cells, at: loanAt }))} swaps={swaps} />
-      <Note at={milestoneAt + 12} x={R_X} y={lg.rowTop(1) + c.h(18)}>
+      {/* Each half lands with its cell's swap, so the row's two milestones
+          are read as they arrive rather than after both. */}
+      <Note at={placeAt + 8} x={R_X} y={lg.rowTop(1) + c.h(18)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          Approved after <Num>{days1}</Num> days, funded <Num>{days2}</Num> days later: the same row
+          Approved after <Num>{days1}</Num> days
+          <span style={{ opacity: ease(frame, milestoneAt + 6, 10) }}>
+            , funded <Num>{days2}</Num> days later: the same row
+          </span>
         </span>
       </Note>
     </>

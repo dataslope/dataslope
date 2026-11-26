@@ -30,10 +30,12 @@ const KX = [1120, 1280, 1440, 1600];
  * when it is named. Four tokens each sprout a query, a key and a value; the
  * query of "bank" is dotted with every key; its four scores (illustrative,
  * and labelled so) are softmaxed into weights that sum to one; and its
- * output is the weighted blend of the values. Then why divide: one row of
- * the seeded simulation (results.json scaling), unscaled with nearly all its
- * weight on one key (red), scaled spread out (green), with the averages over
- * 2,000 rows; and every pair of tokens one hop apart, as a grid of pairs.
+ * output is the weighted blend of the values. Then why divide: at the right,
+ * how widely one random number and a dot product of 64 of them spread (8
+ * times, results.json scaling), back to 1 once divided; one row of the seeded
+ * simulation, unscaled with nearly all its weight on one key (red), scaled
+ * spread out (green), with the averages over 2,000 rows; and every pair of
+ * tokens one hop apart, as a grid of pairs, where the spread was.
  */
 export const AttnScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -88,6 +90,12 @@ export const AttnScene: React.FC = () => {
   const rowMax = h(190);
   const panel = [X0, 690];
   const grid = { x: 1410, y: y(476), size: 354 };
+  // The spread, in the right column until the pair grid takes it: a bar one
+  // standard deviation either side, the dot products' 8 times as wide, back
+  // to one number's width once divided by √64.
+  const SP = { x: 1300, mid: 1550, unit: 54 };
+  const spreadW =
+    SP.unit * (1 + (S.rawSd - 1) * ease(frame, spreadAt + 2, 20) + (S.scaledSd - S.rawSd) * ease(frame, divEightAt + 4, 20));
 
   return (
     <AbsoluteFill>
@@ -125,7 +133,8 @@ export const AttnScene: React.FC = () => {
           </span>
         </Ink>
 
-        <Clear at={whyAt - 6}>
+        {/* Held through "Why divide?", so the output stays up a few seconds. */}
+        <Clear at={simAt - 6}>
           {/* Four tokens, each projected into a query, a key and a value. */}
           {A.words.map((w, t) => (
             <Chip key={w} x={tokX(t)} y={chipY} at={projAt + t * 3} tone={t === QI ? "ink" : "blue"} size={24} mono>
@@ -262,7 +271,37 @@ export const AttnScene: React.FC = () => {
         </Line>
 
         {/* ── Every pair one hop apart ── */}
-        <ColumnRule x={1240} top={y(470)} height={h(380)} at={pairAt} />
+        {/* ── How widely the scores spread: one number against a dot product of 64 ── */}
+        <ColumnRule x={1240} top={y(470)} height={h(380)} at={simAt + 6} />
+        <Clear at={pairAt - 8}>
+          <Line at={simAt + 6} x={SP.x} y={y(470)} size={22}>
+            One random number
+          </Line>
+          <Line at={spreadAt} x={SP.x} y={y(570)} size={22}>
+            A dot product of <Num>{S.dk}</Num> of them
+          </Line>
+          <Svg>
+            <line x1={SP.mid} x2={SP.mid} y1={y(500)} y2={y(650)} stroke={INK_SOFT} strokeWidth={1.2} opacity={0.6 * ease(frame, simAt + 6, 10)} />
+            {[
+              { y: y(512), w: SP.unit, at: simAt + 10 },
+              { y: y(612), w: spreadW, at: spreadAt + 2 },
+            ].map((b, i) => {
+              const p = ease(frame, b.at, 12);
+              if (p <= 0) return null;
+              return <rect key={i} x={SP.mid - b.w / 2} y={b.y} width={b.w} height={h(24)} rx={4} fill={BAR} opacity={p} />;
+            })}
+          </Svg>
+          <Line at={spreadAt + 14} out={divEightAt} x={SP.x} y={y(676)} size={23} weight={600}>
+            <Num>{S.rawSd}</Num>× wider
+          </Line>
+          <Line at={divEightAt + 8} x={SP.x} y={y(676)} size={23} color={OK_INK} weight={600}>
+            Divided by <Num>{S.rootDk}</Num>: <Num>{S.scaledSd}</Num>× again
+          </Line>
+          <Line at={spreadAt + 24} x={SP.x} y={y(730)} size={20} color={INK_SOFT}>
+            Each bar: one standard deviation either side
+          </Line>
+        </Clear>
+
         <Grid x={grid.x} y={grid.y} n={4} size={grid.size} gap={6} at={pairAt + 4} dur={16} color={GOLD} />
         {A.words.map((w, t) => (
           <React.Fragment key={w}>

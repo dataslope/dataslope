@@ -50,7 +50,8 @@ const Cell: React.FC<{ x: number; y: number; h: number; word: string; at: number
 
 /**
  * Question 7. Two rows of the same eight words. The RNN passes one hidden
- * state along, lighting one box at a time; its costs in red. The transformer
+ * state along (a labelled dot, thinning as it goes), lighting one box at a
+ * time; its costs in red, "forgetful" with its reason, vanishing gradients. The transformer
  * joins every pair directly and lights every box at once (green), "in
  * training" marked as it is said, since generation still runs one token at a
  * time.
@@ -67,11 +68,12 @@ export const RnnScene: React.FC = () => {
   const hiddenAt = n.word("q7-a", "one hidden state");
   const slowAt = n.word("q7-a", "slow to train");
   const forgetAt = n.word("q7-a", "forgetful over distance");
-  const transAt = n.word("q7-a", "A transformer links");
-  const directAt = n.word("q7-a", "any two tokens directly");
-  const trainingAt = n.word("q7-a", "in training");
-  const onceAt = n.word("q7-a", "every position at once");
-  const gpuAt = n.word("q7-a", "what a GPU is built for");
+  const gradAt = n.word("q7-grad", "gradients shrink");
+  const transAt = n.word("q7-tf", "A transformer links");
+  const directAt = n.word("q7-tf", "any two tokens directly");
+  const trainingAt = n.word("q7-tf", "in training");
+  const onceAt = n.word("q7-tf", "every position at once");
+  const gpuAt = n.word("q7-tf", "what a GPU is built for");
   const costAt = n.word("cost-in", "attention's own cost");
   const end = n.beat("cost-in").to;
 
@@ -88,6 +90,7 @@ export const RnnScene: React.FC = () => {
     return cellX(0) + CW / 2 + i * STEP;
   })();
   const fade = Math.max(0.15, 1 - Math.max(0, (frame - walk(0)) / 9) * 0.13);
+  const stateIn = ease(frame, walk(0), 6) * (1 - ease(frame, transAt, 10) * 0.6);
   const all = ease(frame, onceAt, 10);
   const red = ease(frame, costAt, 18);
 
@@ -117,14 +120,18 @@ export const RnnScene: React.FC = () => {
           <Flow key={i} points={[[cellX(i) + CW + 4, r1 + CH / 2], [cellX(i + 1) - 6, r1 + CH / 2]]} at={walk(i) + 2} dur={8} head={10} width={2} />
         ))}
         {/* The state: what it carries of the first word thins as it goes. */}
-        <Svg opacity={ease(frame, walk(0), 6) * (1 - ease(frame, transAt, 10) * 0.6)}>
+        <Svg opacity={stateIn}>
           <circle cx={stateX} cy={r1 - h(18)} r={9} fill={BAR} opacity={fade} />
         </Svg>
+        {/* Named, so the faint dot at the end reads as the state that thinned. */}
+        <div style={{ position: "absolute", left: stateX + 20, top: r1 - h(18) - 14, opacity: stateIn, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          hidden state
+        </div>
         <Line at={slowAt} x={CX} y={r1 + CH + h(24)} size={24} color={ACCENT_INK} weight={600}>
           One step at a time: slow to train
         </Line>
         <Line at={forgetAt} x={CX} y={r1 + CH + h(62)} size={24} color={ACCENT_INK} weight={600}>
-          Forgetful over distance
+          Forgetful over distance<span style={{ opacity: ease(frame, gradAt, 12) }}>: gradients vanish</span>
         </Line>
 
         {/* ── The transformer: every pair joined, every box at once ── */}

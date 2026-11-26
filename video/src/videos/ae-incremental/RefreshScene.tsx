@@ -20,7 +20,7 @@ const CH = { x0: 230, x1: 860 };
 const SPLIT_X = 1200;
 const SPLIT_W = 520;
 /** Layout values (through `y()`). */
-const ROW_C = { cols: 286, flow: 330, follow: 425, answer: 460, fct: 515, raw: 568, note1: 625, note2: 660, chartLabel: 296, chartTop: 352, chartBot: 580, split: 340, rule: 680, rule2: 720, next: 778, fixes: 574 };
+const ROW_C = { cols: 286, flow: 330, follow: 425, answer: 460, fct: 515, raw: 568, note1: 625, note2: 660, note3: 695, chartLabel: 296, chartTop: 352, chartBot: 580, split: 340, rule: 680, rule2: 720, next: 778, fixes: 574 };
 
 /**
  * One run drawn as two steps: the source, an arrow carrying what the run
@@ -107,6 +107,8 @@ export const RefreshScene: React.FC = () => {
   const readsAt = n.word("refresh-fix", "A full refresh reads all twenty-six");
   const exactlyAt = n.word("refresh-fix", "matches the source exactly");
   const schemaAt = n.word("refresh-fix", "a schema change");
+  const configAt = n.word("refresh-schema", "the on schema change config");
+  const emptyAt = n.word("refresh-schema", "leaves it empty in the old rows");
 
   const costAt = n.word("refresh-cost", "But it's the expensive run");
   const chartAt = n.word("refresh-cost", "On the chart's table");
@@ -297,6 +299,14 @@ export const RefreshScene: React.FC = () => {
           </Note>
           <Note at={schemaAt} x={X0} y={row("note2")}>
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>It&apos;s also how a schema change gets applied</span>
+          </Note>
+          {/* The follow-up to that: on_schema_change adds the column on a
+              normal run, but never backfills the rows already loaded. */}
+          <Note at={configAt - 2} x={X0} y={row("note3")}>
+            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+              Without one, <SmallMono color={INK}>on_schema_change</SmallMono> can add a new column
+              <span style={{ opacity: ease(frame, emptyAt, 10) }}>, but leaves it empty in old rows</span>
+            </span>
           </Note>
         </div>
 

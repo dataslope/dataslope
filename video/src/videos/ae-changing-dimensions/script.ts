@@ -95,7 +95,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     becoming valid_from and valid_to, and the current version's null
  *     becoming 9999-12-31, as "t2-rows" argued.
  *   - "late" to "late-watch": the three staged orders (201, 202, 203) and the
- *     dimension (customers 42 and 99, and the unknown member, -1);
+ *     dimension's current rows (customers 42 and 99, and the unknown member,
+ *     -1); 42's East version is in the table too, so every lookup says
+ *     is_current, never the customer ID alone (review 2026-11-26);
  *     "late-drop": the inner-join load, 203 missing, "700.00 of 1,110.00" in
  *     red. "late-fix": the left-join load listing, 203 on -1 with
  *     customer_id 77 kept, 1,110.00 in green; the region report with an

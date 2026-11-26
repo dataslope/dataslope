@@ -89,7 +89,10 @@ export const CvScene: React.FC = () => {
     { name: "Shuffled folds", held: (u: number, r: number) => SHUFFLED[u][r], top: y(400), at: shuffledAt, score: CV.shuffled, scoreAt: ninetyAt, ink: ACCENT_INK, mark: ACCENT, markAt: bothAt },
     { name: "Grouped by user", held: (u: number) => GROUPED[u], top: y(650), at: groupedAt, score: CV.grouped, scoreAt: fiftyAt, ink: OK_INK, mark: OK, markAt: groupedAt + 8 },
   ];
-  const usersOut = keepAt - 6;
+  // The two panels stay up through "keep each user … inside one fold", the
+  // conclusion they are the evidence for; only their title gives way to it.
+  const titleOut = keepAt - 12;
+  const usersOut = timeAt - 12;
 
   return (
     <AbsoluteFill>
@@ -147,7 +150,8 @@ export const CvScene: React.FC = () => {
                         boxSizing: "border-box",
                         border: `2px solid ${color}`,
                         borderRadius: 8,
-                        background: lit > 0 ? `color-mix(in srgb, ${ds("yellow", 300)} ${45 * lit}%, transparent)` : "transparent",
+                        // A highlight colours the outline and the text, never a fill.
+                        background: "transparent",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -199,11 +203,13 @@ export const CvScene: React.FC = () => {
             { at: rotateAt, text: <>Rotate until each is held out once</> },
           ].map((r, i) => (
             <Say key={i} at={r.at - 2} x={1180} y={gridTop + i * h(80)} out={scarceAt - 8}>
+              {/* The flex gap sits between the badge and one span of text, not
+                  around every word of it (the k). */}
               <span style={{ ...line(28, INK, 400), display: "inline-flex", alignItems: "center", gap: "0.5em" }}>
-                <OutlineBadge tone="ink" size={28}>
+                <OutlineBadge tone="ink" size={28} style={TABULAR}>
                   {i + 1}
                 </OutlineBadge>
-                {r.text}
+                <span>{r.text}</span>
               </span>
             </Say>
           ))}
@@ -233,7 +239,7 @@ export const CvScene: React.FC = () => {
 
         {/* ── What a fold must not split: users ── */}
         <Fade from={groupsAt - 4} out={usersOut}>
-          <Say at={simAt - 2} x={X0} y={y(296)}>
+          <Say at={simAt - 2} x={X0} y={y(296)} out={titleOut}>
             <span style={line(26, INK)}>
               <span style={TABULAR}>{CV.users}</span> simulated users, <span style={TABULAR}>{CV.rowsPerUser}</span> rows each; the label is the user’s own
             </span>
@@ -272,7 +278,7 @@ export const CvScene: React.FC = () => {
                 <span style={line(26, INK)}>
                   {pnl.name}
                   <span style={{ ...line(24, INK_SOFT), opacity: ease(frame, pnl.markAt, 10) }}>
-                    {k === 0 ? ": every user on both sides" : ": each user on one side"}
+                    {k === 0 ? ": users on both sides" : ": each user on one side"}
                   </span>
                 </span>
               </Say>
@@ -301,7 +307,7 @@ export const CvScene: React.FC = () => {
 
         {/* ── One fold each; and time only forward ── */}
         <Fade from={keepAt - 4} out={mapAt - 6}>
-          <Say at={keepAt - 2} x={X0} y={y(300)}>
+          <Say at={keepAt} x={X0} y={y(280)}>
             <span style={line(34, OK_INK)}>User, session, patient: each inside one fold</span>
           </Say>
           <Say at={timeAt - 2} x={X0} y={y(410)}>

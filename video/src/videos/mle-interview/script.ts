@@ -47,17 +47,21 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     models, CI/CD, latency and cost"). Each row carries, small and
  *     right-aligned, the parts that answer it (data.ts PROBES): "Parts 1 and
  *     2", "Part 3", "Parts 7 and 8" (monitoring and drift are Part 8's),
- *     "Part 8". So the map starts here. The first two rows ink in on
+ *     "Parts 7 and 8" (latency and cost are Part 7's). So the map starts
+ *     here. The first two rows ink in on
  *     "rounds-probe", the last two on "rounds-ops".
  *     "rounds-more" adds one more row under a hairline, set apart, "Also on
  *     the track: statistics, deep learning, NLP and LLMs", with "Parts 4,
  *     5 and 6".
  *   - "llm" to "llm-ask": "Classical ML didn't leave" as the headline; under
- *     it the page's four additions as a numbered list, each inking in on its
- *     beat with its part right-aligned (data.ts ADDED): application design,
+ *     it the page's four additions as a numbered list, the four names inking
+ *     on "four things" and each lit, with its part right-aligned (data.ts
+ *     ADDED) and its topics, on its own beat: application design,
  *     "Parts 6 and 10" (retrieval in 6, tool use and agents in 10);
- *     inference economics, "Part 9"; evaluation, "Part 10"; when not to use
- *     an LLM, "Part 10". "llm-ask" sets "Ask the recruiter about each round"
+ *     inference economics, "Part 9", its topics in the index's words (the
+ *     KV cache; batching, quantization and speculative decoding); evaluation,
+ *     "Part 10"; when not to use an LLM, "Part 10", with the cases
+ *     "llm-not-when" names. "llm-ask" sets "Ask the recruiter about each round"
  *     under the list, with "AI-on coding rounds at some companies" above it.
  *   - "series" to "next": "Decisions, and how you'd know" as the headline,
  *     with the four phrases of "series" as a line of words under it, each lit
@@ -93,7 +97,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "llm" to "llm-not": llm-systems-and-evals.mdx, "How has the ML Engineer
  *     interview changed with LLMs?" ("Classical ML did not leave: expect bias
  *     and variance, leakage, metrics, and a coding round"; the four bold
- *     items, nearly verbatim).
+ *     items, nearly verbatim). On screen, "llm-econ"'s topics take the
+ *     index's wording of the same item ("where GPU memory goes (the KV
+ *     cache), and what batching, quantization, and speculative decoding
+ *     buy").
+ *   - "llm-not-when": the same answer's "which is the question that
+ *     separates candidates who have shipped from those who have only
+ *     prototyped", and the cases from the page's "When should you not use an
+ *     LLM?" ("When a smaller model or a rule does the job better ...: tabular
+ *     prediction, strict latency or cost budgets, ... or a task a regular
+ *     expression solves").
  *   - "llm-ask": index.mdx, "AI-on coding rounds at some companies. Ask the
  *     recruiter about each round."
  *   - "series": the plan's "What the series is for" ("why a model fails on
@@ -188,7 +201,15 @@ export const script: NarrationScript = {
       text: "Evaluation with no single right answer: building a test set, trusting or distrusting an automated judge, and tying offline scores to online outcomes.",
       pauseAfter: 0.5,
     },
-    { id: "llm-not", text: "And judgment about when not to use an LLM at all.", pauseAfter: 0.7 },
+    { id: "llm-not", text: "And judgment about when not to use an LLM at all.", pauseAfter: 0.55 },
+    {
+      // Added in review (2026-11-26): the page's own reason for asking it, and
+      // the cases from its "When should you not use an LLM?", so the answer
+      // survives "so when wouldn't you?".
+      id: "llm-not-when",
+      text: "It's the question that separates candidates who've shipped from those who've only prototyped. Often a smaller model or a rule does the job better: tabular prediction, a strict latency or cost budget, or a task a regular expression solves.",
+      pauseAfter: 0.7,
+    },
     {
       id: "llm-ask",
       text: "Some companies also run coding rounds with an AI assistant allowed, so ask the recruiter about each round.",

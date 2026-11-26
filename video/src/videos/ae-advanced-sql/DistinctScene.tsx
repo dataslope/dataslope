@@ -22,8 +22,8 @@ const thousands = (s: string) => Number(s).toLocaleString("en-US");
 /**
  * Question 11 on the same logins. The ten days that have any, each with its
  * distinct users: the counts sum to 23, against 12 people over the range.
- * User 101's five days light up, then the other five who came back: six
- * people, eleven extra counts. The fix as a flow: the month recounted from
+ * User 101's IDs light up, then the other five who came back: six people,
+ * eleven extra counts (no label singles 101 out; the narration doesn't). The fix as a flow: the month recounted from
  * the logins, never summed from the daily table. Then the cost at scale and
  * DuckDB's approximate count on a million distinct IDs.
  */
@@ -61,7 +61,6 @@ export const DistinctScene: React.FC = () => {
   const countY = stripTop + cellH + h(46);
   const firstUser = RETURNING[0];
   const others = RETURNING.slice(1);
-  const days101 = USERS_BY_DAY.filter((d) => d.users.includes(firstUser)).length;
   const sumX = cellX(USERS_BY_DAY.length - 1) + CELL + 24;
 
   // ── The fix, as a flow ──
@@ -188,11 +187,6 @@ export const DistinctScene: React.FC = () => {
           <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
             {DISTINCT.repeatUsers} came back on other days
             <span style={{ color: ACCENT_INK, opacity: ease(frame, againAt, 10) }}>: {DISTINCT.extraCounts} extra counts</span>
-          </span>
-        </Note>
-        <Note at={sixAt + 2} x={sumX} y={countY + h(36)} out={monthlyAt}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-            {firstUser}: {days101} days
           </span>
         </Note>
 

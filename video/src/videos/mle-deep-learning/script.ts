@@ -125,6 +125,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q4-memory: the kept activation slabs grow taller as "batch size" and
  *     "depth" are named; "Training" and "Serving" columns, serving with no
  *     slabs.
+ *   q4-ckpt: every other layer's slabs fade on "keep only some";
+ *     "Checkpointing: keep a few, recompute the rest" in green (added in the
+ *     2026-11-26 review: the follow-up to "far more memory than serving").
  *   q5: question card; a chain of twenty layer boxes with a gradient arrow
  *     travelling down it.
  *   q5-sim: a log-scale chart, gradient size against layer (20 back to 1),
@@ -256,7 +259,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     first layer needs no input gradient. "q4-check": a
  *     central-difference check on 20 random weights, on 32 digits, agrees
  *     with backprop to a worst relative error of 2.9e-7. "q4-memory": the
- *     page's "the forward pass caches intermediate activations".
+ *     page's "the forward pass caches intermediate activations". "q4-ckpt":
+ *     gradient checkpointing is standard practice, not the page's.
  *   - "q5-sim", "q5-explode": a seeded simulation, 20 layers of 128 units, a
  *     batch of 256 random inputs, a random gradient at the top. What reaches
  *     the first layer, as a share of what left the top: sigmoid with Xavier
@@ -410,6 +414,11 @@ export const script: NarrationScript = {
     {
       id: "q4-memory",
       text: "The price is memory: kept activations grow with batch size and depth, so training takes far more memory than serving.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q4-ckpt",
+      text: "Gradient checkpointing buys some of it back: keep only some layers' activations, and recompute the rest on the way down.",
       pauseAfter: 0.8,
     },
     // ── 5. Vanishing and exploding gradients ─────────────────────────────
@@ -532,7 +541,7 @@ export const script: NarrationScript = {
     {
       id: "q10-props",
       text: "Each output sees a small patch through one shared filter, so a pattern is found anywhere: shift the digit two pixels right, and the map shifts with it. Pooling then shrinks it, tolerating small shifts.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
     { id: "q11", text: "Question eleven. Why are CNNs well suited to images compared to a fully-connected net?" },
     {
@@ -582,7 +591,7 @@ export const script: NarrationScript = {
     {
       id: "q14-slow",
       text: "And step fifty can't start until step forty-nine is done, so a GPU can't work on a sequence's steps in parallel.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.6,
     },
     { id: "q15", text: "Question fifteen. How do LSTMs and GRUs address that?" },
     {
@@ -595,7 +604,7 @@ export const script: NarrationScript = {
       text: "The GRU, gated recurrent unit, uses two gates and no separate cell: three blocks of weights to the LSTM's four, for similar results.",
       pauseAfter: 0.6,
     },
-    { id: "q15-limit", text: "But both still read one step at a time.", pauseAfter: 0.7 },
+    { id: "q15-limit", text: "But both still read one step at a time.", pauseAfter: 1.5 },
     {
       id: "next",
       text: "Attention did it better: every position reaches every other in one step, all at once, and language models are built on it. Next: NLP and large language models.",

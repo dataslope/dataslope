@@ -187,7 +187,9 @@ const Severity: React.FC<{ c: Ctx }> = ({ c }) => {
   const top = c.y(B_TOP + 30);
   const lines = QUICK.severity;
   // The dial: failing rows on a log scale, 0 at the left.
-  const dial = { x0: BX + 20, x1: BX + 720, y: c.y(B_TOP + 470) };
+  // Lowered 20 px from where it first sat, to make room for the caption that
+  // names the two threshold keys between the listing and the dial's labels.
+  const dial = { x0: BX + 20, x1: BX + 720, y: c.y(B_TOP + 490) };
   const pos = (rows: number) => (rows === 0 ? dial.x0 : dial.x0 + 120 + (Math.log10(rows) / 3) * (dial.x1 - dial.x0 - 120));
   const p = ease(frame, thresholdsAt - 4, 16);
   return (
@@ -210,6 +212,17 @@ const Severity: React.FC<{ c: Ctx }> = ({ c }) => {
         </div>
       </Note>
       <Listing lines={lines} lang="yaml" x={BX} top={top + c.h(130)} size={19} at={warnAt + 4} marks={[{ line: "severity: warn", text: "severity: warn", at: warnAt + 16 }]} />
+      {/* The dial is not the listing above it: dbt ignores error_if on a
+          warn-severity test, so the thresholds are named, with the severity
+          they need. */}
+      <Note at={thresholdsAt - 4} x={BX} y={dial.y - c.h(124)}>
+        <div style={{ ...note(21, INK), whiteSpace: "nowrap" }}>
+          Thresholds: <SmallMono>warn_if</SmallMono>, <SmallMono>error_if</SmallMono>
+          <span style={{ color: INK_SOFT }}>
+            , at the default <SmallMono>error</SmallMono> severity
+          </span>
+        </div>
+      </Note>
       <Svg opacity={p}>
         <rect x={pos(1)} y={dial.y - 26} width={(pos(100) - pos(1)) * p} height={26} fill={`color-mix(in srgb, ${ds("yellow", 400)} 40%, transparent)`} />
         <rect x={pos(100)} y={dial.y - 26} width={(dial.x1 - pos(100)) * ease(frame, hundredAt, 14)} height={26} fill={`color-mix(in srgb, ${ds("red", 400)} 30%, transparent)`} />
@@ -572,7 +585,7 @@ export const RapidScene: React.FC = () => {
           <div style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap", marginTop: 6 }}>against what you expected</div>
         </Note>
         <Note at={passAt} x={BX} y={y(520)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>All can pass</span>
+          <span style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>All can pass</span>
         </Note>
         <Note at={disagreeAt} x={BX} y={y(520) + h(42)}>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>while two dashboards disagree</span>

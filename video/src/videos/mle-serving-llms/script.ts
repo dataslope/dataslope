@@ -97,11 +97,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     640 GB", the weights' 140 GB shaded, "500 GB free" in yellow; the free
  *     part fills with 186 small cells on "a hundred and eighty-six", "8K
  *     tokens each" (the block's last line), "at most" beside the count on
- *     "at most".
+ *     "at most". The 2026-11-26 review added the GB the count is made in
+ *     ("2.5 GiB = 2.68 GB each", so 500 GB holds 186, not the 200 that
+ *     500 / 2.5 suggests) and why it is "at most" ("before activations and
+ *     runtime overhead"); the caption under the cells follows each refill
+ *     (40 GiB at 128K, 20 GiB with 64 KV heads).
  *   q2-long: the same bar refilled with 11 wide cells, "128K each", on
  *     "eleven"; "Memory caps concurrency" as a line of its own.
- *   q2-gqa: a small diagram of four query heads drawing lines to one shared
- *     key/value head on "share"; then the 186 cells regroup into 23
+ *   q2-gqa: a small diagram of eight query heads (the model's group: 64
+ *     over 8) drawing lines to one shared key/value head on "share"; then the 186 cells regroup into 23
  *     eight-times-wider ones on "eight times" (results.json fitNoGqa8k),
  *     labelled "64 KV heads: 23" in ink beside "8 KV heads (grouped-query):
  *     186" in green. The 64-head case is the ordinary design, not an error,
@@ -149,6 +153,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     rejected token red and replaced; under the pass, "≈ one decode step:
  *     one read of the weights" on "one decode step"; "Same output
  *     distribution" as a line of its own.
+ *   q4-verify (added by the 2026-11-26 review): the verify step said aloud,
+ *     since it is the follow-up an interviewer asks and what makes 4.1 tokens
+ *     a pass add up: the draft "word" turns red and is struck on "rejects",
+ *     the draft "fast" greys with "dropped" on "drops the rest", and the large
+ *     model's own "tokens" arrives on "one token of its own".
+ *   q4-rule: "Same output distribution" as a line of its own.
  *   q4-sim: two rows, "accepted 9 in 10: ~4.1 tokens per pass" and
  *     "accepted 1 in 2: ~1.9", from results.json speculative (simulated and
  *     the closed form both, asserted equal), with "Simulation: 4-token
@@ -243,7 +253,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     a few drafted tokens costs about one decode step is question one's
  *     argument applied to a pass over five tokens: the step's time is
  *     reading the weights, and the five share that read, as a prompt's
- *     tokens do in prefill. The
+ *     tokens do in prefill. "q4-verify" is the verify step the simulation
+ *     below models and the standard rule (Leviathan et al. 2023; Chen et al.
+ *     2023) defines: drafted tokens are kept up to the first rejection, the
+ *     rest are dropped, and the pass adds one token of the large model's own
+ *     (the correction, or one more when every draft is kept). The
  *     speculative simulation is the video's own (seed 11): 4-token drafts,
  *     each drafted token accepted independently with probability 0.9 or 0.5
  *     until the first rejection, and every verifying pass adding one token
@@ -430,7 +444,17 @@ export const script: NarrationScript = {
     },
     {
       id: "q4-spec",
-      text: "Speculative decoding lets a small draft model propose several tokens, and the large model verify them all in one forward pass, which costs about one decode step, since reading the weights dominates either way. With the standard acceptance rule, the output distribution doesn't change, so quality isn't the price.",
+      text: "Speculative decoding lets a small draft model propose several tokens, and the large model verify them all in one forward pass, which costs about one decode step, since reading the weights dominates either way.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q4-verify",
+      text: "It keeps the drafted tokens up to the first one it rejects, drops the rest, and adds one token of its own.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q4-rule",
+      text: "With the standard acceptance rule, the output distribution doesn't change, so quality isn't the price.",
       pauseAfter: 0.6,
     },
     {

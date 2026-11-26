@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BROADCAST } from "./data";
-import { ACCENT_INK, BLUE_FILL, BLUE_INK, Cell, Drift, Fade, INK, INK_SOFT, Line, Mark, MARK_BAD, OK_INK, RED_FILL, VRule, X0 } from "./parts";
+import { ACCENT_INK, BLUE_FILL, BLUE_INK, Cell, Drift, Fade, INK, INK_SOFT, Line, Mark, MARK_BAD, Mono, OK_INK, RED_FILL, VRule, X0 } from "./parts";
 
 const CW = 84;
 const GAP = 8;
@@ -156,10 +156,26 @@ export const BroadcastScene: React.FC = () => {
           <div style={{ position: "absolute", left: xRes, top: rowY(3) + h(4), width: 2 * CW + GAP, textAlign: "center", opacity: ease(frame, reusedAt + 28, 10) }}>
             <Shape dims={[3, 2]} />
           </div>
-          <Line at={reusedAt + 4} x={xRes + 2 * CW + GAP + 70} y={rowY(1) + ch / 2 - 16} size={23} color={BLUE_INK}>
+          {/* The rule behind both halves of the scene (review 2026-11-26):
+              shapes are compared from the right, and a missing leading
+              dimension counts as 1, so (2,) is a (1, 2) row, and the trap's
+              (1000,) is a (1, 1000) row. */}
+          <Line at={sizeOneAt} x={xRes + 2 * CW + GAP + 70} y={rowY(0) + ch / 2 - 16} size={23} color={INK}>
+            Shapes line up from the right; a missing dimension counts as 1
+          </Line>
+          <div style={{ position: "absolute", left: xRes + 2 * CW + GAP + 70, top: rowY(0) + ch / 2 - 16 + h(42), opacity: ease(frame, rowTwoAt + 8, 10), whiteSpace: "nowrap" }}>
+            <Shape dims={[2]} color={BLUE_INK} />
+            <span style={{ ...note(22, INK_SOFT) }}>{"  →  "}</span>
+            <Shape dims={[1, 2]} color={BLUE_INK} />
+            <Fade at={reusedAt + 2}>
+              <span style={{ ...note(22, INK_SOFT) }}>{"  →  "}</span>
+              <Shape dims={[3, 2]} color={BLUE_INK} />
+            </Fade>
+          </div>
+          <Line at={reusedAt + 4} x={xRes + 2 * CW + GAP + 70} y={rowY(0) + ch / 2 - 16 + h(104)} size={23} color={BLUE_INK}>
             Dashed: the same row, reused
           </Line>
-          <Line at={reusedAt + 10} x={xRes + 2 * CW + GAP + 70} y={rowY(1) + ch / 2 - 16 + h(40)} size={23} color={INK_SOFT}>
+          <Line at={reusedAt + 10} x={xRes + 2 * CW + GAP + 70} y={rowY(0) + ch / 2 - 16 + h(144)} size={23} color={INK_SOFT}>
             never copied in memory
           </Line>
         </div>
@@ -179,8 +195,12 @@ export const BroadcastScene: React.FC = () => {
           −
         </Op>
         <div style={{ position: "absolute", left: flatX, top: bTop + side / 2 - thin / 2, width: side * ease(frame, labelsAt + 2, 16), height: thin, background: BLUE_FILL, borderRadius: 3 }} />
-        <div style={{ position: "absolute", left: flatX, top: bTop + side / 2 - thin / 2 - 38, width: side, textAlign: "center", ...label(22, INK_SOFT), opacity: ease(frame, labelsAt + 6, 10), whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: flatX, top: bTop + side / 2 - thin / 2 - 72, width: side, textAlign: "center", ...label(22, INK_SOFT), opacity: ease(frame, labelsAt + 6, 10), whiteSpace: "nowrap" }}>
           labels
+        </div>
+        {/* Why the square: (1000,) lines up from the right as a row. */}
+        <div style={{ position: "absolute", left: flatX - 40, top: bTop + side / 2 - thin / 2 - 38, width: side + 80, textAlign: "center", ...label(22, ACCENT_INK), opacity: ease(frame, broadcastAt + 6, 10), whiteSpace: "nowrap" }}>
+          read as <Shape dims={[1, BROADCAST.n]} color={ACCENT_INK} />
         </div>
         <div style={{ position: "absolute", left: flatX, top: bTop + side + h(12), width: side, textAlign: "center", opacity: ease(frame, labelsAt + 6, 10) }}>
           <Shape dims={BROADCAST.yShape} color={INK} />
@@ -212,13 +232,17 @@ export const BroadcastScene: React.FC = () => {
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 600 }}>
             <Num>{BROADCAST.mseWrong.toFixed(2)}</Num>
           </span>
-          <span style={{ ...note(24, INK_SOFT) }}>from the (1000, 1000) square</span>
+          <span style={{ ...note(24, INK_SOFT) }}>
+            <Mono>pred - y</Mono>: the (1000, 1000) square
+          </span>
         </div>
         <div style={{ position: "absolute", left: R_X, top: y(664) + h(94), display: "flex", alignItems: "baseline", gap: 18, fontSize: 26, whiteSpace: "nowrap", opacity: ease(frame, insteadAt - 2, 10) }}>
           <span style={{ ...note(26, OK_INK), fontWeight: 600 }}>
             <Num>{BROADCAST.mseRight.toFixed(2)}</Num>
           </span>
-          <span style={{ ...note(24, INK_SOFT) }}>the real one, row against its own label</span>
+          <span style={{ ...note(24, INK_SOFT) }}>
+            <Mono>pred.ravel() - y</Mono>: each row against its own label
+          </span>
         </div>
         <Line at={nothingAt} x={R_X} y={y(664) + h(146)} size={24} color={ACCENT_INK}>
           No error raised

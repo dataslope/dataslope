@@ -101,10 +101,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     page's, crawling), 0.9 (settled in 9) in green, 2.5 (gd.lossDiverge,
  *     climbing) in red; "limit ≈ 2" as a dashed line on a small rate axis
  *     beneath, the three rates placed on it.
- *   lr-range: the range test (lr.range): loss against a log rate axis, one
- *     run; the flat bottom from about 0.5 to 1.7 shaded green, its low end
- *     ringed on "well short", the turn at 2 marked yellow, the climb after it
- *     red.
+ *   lr-range, lr-range-read, lr-range-pick: the range test (lr.range): loss
+ *     against a log rate axis, one run; the bottom from about 0.5 to 1.7
+ *     shaded in a neutral tint, the turn at 2 marked yellow, the climb after
+ *     it red; the pick, the step nearest a tenth of the turn (lr.tenth, about
+ *     0.2, still falling steeply), ringed green.
  *   lr-sched: the schedule's shape (lr.schedule): a short ramp, "warmup", then
  *     a cosine to zero, "decay". Then two bars, the distance left after twenty
  *     passes of single-row SGD: constant 0.03 (ink), cosine 0.001 (green).
@@ -217,9 +218,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     curvature, 1.016, puts the limit at 2 / 1.016 = 1.97 ("past about
  *     two"); at 2.0 and above it never settles. The range test (batches of
  *     ten, the rate rising from 0.0001 to 10 over a hundred steps): lowest
- *     near 0.55, flat to about 1.75, up at 1.96 and climbing after ("well
- *     short of the turn": the usual advice, a rate below where the loss
- *     starts to climb, not at its edge; this run's limit is 1.97). Single-row
+ *     near 0.55, flat to about 1.75, up at 1.96 and climbing after. "About a
+ *     tenth of where it turns up", on the stretch where the loss is still
+ *     falling steeply, is the usual reading of the test (Smith's range test,
+ *     fastai's lr_find), not its minimum, which on a real network sits close
+ *     to the edge; here the step nearest a tenth of the turn is 0.19, its
+ *     loss 28 times the bottom's and halving within two steps. Single-row
  *     SGD at 0.1 for twenty passes, twenty seeds: 0.030 from the least-squares
  *     answer at a constant rate, 0.0013 decayed on a cosine. Warmup and decay
  *     shapes: the deep-learning page ("ramp up over the first few hundred
@@ -372,8 +376,13 @@ export const script: NarrationScript = {
     },
     {
       id: "lr-range",
-      text: "A real network's limit is unknown, so run a range test: one short run with the rate rising across orders of magnitude. Here the loss bottoms out from about point five, and turns up at two. Pick a rate on the flat stretch, well short of the turn.",
-      pauseAfter: 0.6,
+      text: "A real network's limit is unknown, so run a range test: one short run with the rate rising across orders of magnitude.",
+    },
+    { id: "lr-range-read", text: "Here the loss bottoms out from about point five, and turns up at two.", pauseAfter: 0.7 },
+    {
+      id: "lr-range-pick",
+      text: "Pick a rate where it's still falling steeply, about a tenth of where it turns up.",
+      pauseAfter: 0.8,
     },
     {
       id: "lr-sched",
@@ -575,7 +584,7 @@ export const script: NarrationScript = {
     {
       id: "r-kmeans",
       text: "k-means assigns each point to the nearest centroid, moves each centroid to its points' mean, and repeats to a local minimum, so run several starts, and pick k by the elbow or the silhouette. It assumes round clusters: on stretched ones, about one point in five lands wrong.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.2,
     },
     {
       id: "r-onehot",

@@ -81,6 +81,9 @@ export const COST = results.cost as {
   linearPerToken: number;
   crossover: number;
   curve: { n: number; attention: number; rest: number }[];
+  /** The same over a whole context of n tokens, per layer: attention 2 n² d,
+   *  the rest 12 n d² (what question 8's chart draws). */
+  totals: { n: number; attention: number; rest: number }[];
 };
 
 /** Question 12: LoRA's sizes, from stated assumptions. */

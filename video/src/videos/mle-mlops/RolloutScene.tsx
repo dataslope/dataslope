@@ -165,10 +165,12 @@ export const RolloutScene: React.FC = () => {
         </Line>
         {/* In a canary, its slice does reach users. */}
         <Flow points={[[MODEL.x + MODEL.w + 4, newMid - 16], [MODEL.x + MODEL.w + 44, newMid - 16], [MODEL.x + MODEL.w + 44, curMid + 26], [OUT_X - 8, curMid + 26]]} at={sliceAt + 6} color={BAR} width={2 + 4 * share} head={12} out={momentAt + 6} radius={12} />
-        <Line at={compareAt - 2} x={LOG.x + LOG.w + 50} y={newMid - 36} size={23} color={INK}>
+        {/* The shadow's claim leaves with the shadow: a canary does expose
+            users, so "no user exposed" must not sit beside it. */}
+        <Line at={compareAt - 2} out={canaryAt} x={LOG.x + LOG.w + 50} y={newMid - 36} size={23} color={INK}>
           Compare outputs, latency, errors
         </Line>
-        <Line at={loadAt - 2} x={LOG.x + LOG.w + 50} y={newMid - 2} size={23} color={INK}>
+        <Line at={loadAt - 2} out={canaryAt} x={LOG.x + LOG.w + 50} y={newMid - 2} size={23} color={INK}>
           under real load<span style={{ color: OK_INK, opacity: ease(frame, exposedAt - 2, 10) }}>, no user exposed</span>
         </Line>
 

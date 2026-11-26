@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { RETRIEVAL } from "./data";
 import { ACCENT_INK, Box, Dim, Drift, Flow, INK, INK_SOFT, Line, Mark, MARK_BAD, MARK_OK, OK_INK, Q_SIZE, Spot, X0 } from "./parts";
 
-const STEPS = ["Query", "Embed", "Vector Search", "Top Passages", "Prompt", "Answer"];
+const STEPS = ["Query", "Embed", "Vector search", "Top passages", "Prompt", "Answer"];
 const BW = 214;
 const STEP = 282;
 /** The question's words the search can match on (results.json queryTerms). */
@@ -162,7 +162,7 @@ export const RagScene: React.FC = () => {
           </Mark>
         </Line>
         <Line at={searchAt + 14} x={RIGHT_X} y={listTop + 4} size={20} color={INK_SOFT} align="right" width={600}>
-          Word counts stand in for an embedding model here
+          Scored by shared words, not by an embedding model
         </Line>
       </Drift>
     </AbsoluteFill>

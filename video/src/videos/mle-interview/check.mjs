@@ -133,6 +133,12 @@ const quotes = [
   ["llm-systems-and-evals.mdx", "**Inference economics**: why generation is slow, what the GPU memory is\n  spent on, and which lever buys what."],
   ["llm-systems-and-evals.mdx", "**Evaluation design**: building a test set, trusting or distrusting an\n  automated judge, and connecting offline scores to online outcomes."],
   ["llm-systems-and-evals.mdx", "**Judgment about when not to use an LLM**"],
+  // "llm-not-when", and item 4's cases on screen.
+  ["llm-systems-and-evals.mdx", "which is the question that\n  separates candidates who have shipped from those who have only prototyped."],
+  ["llm-systems-and-evals.mdx", "When a smaller model or a rule does the job better on the axes that matter:\ntabular prediction, strict latency or cost budgets"],
+  ["llm-systems-and-evals.mdx", "or a task a regular\nexpression solves"],
+  // Item 2's topics on screen, in the index's words.
+  ["index.mdx", "- **Inference economics**: why generation is slow, where GPU memory goes (the KV cache), and what batching, quantization, and speculative decoding buy."],
   ["index.mdx", "Expect a coding/DSA round, an\nML-concepts round, and an ML system design round"],
   ["index.mdx", "- **ML fundamentals**, supervised vs unsupervised, over/underfitting, regularization, evaluation metrics, data leakage."],
   ["index.mdx", "- **Coding**, data structures & algorithms (see the [Backend track](/interview-prep/backend-engineer)), plus NumPy/pandas."],

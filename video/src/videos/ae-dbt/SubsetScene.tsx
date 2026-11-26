@@ -140,7 +140,8 @@ export const SubsetScene: React.FC = () => {
         <Line at={downAt + 8} x={READ_X + 420} y={listTop + h(54)} color={INK_SOFT}>
           The fact, and the dashboard it reaches
         </Line>
-        <Line at={q4At} x={READ_X} y={listTop + h(54) + h(40)} color={INK_SOFT}>
+        {/* Under the downstream selector it describes. */}
+        <Line at={q4At} x={READ_X + 420} y={listTop + h(54) + h(40)} color={INK_SOFT}>
           Question 4&rsquo;s count of what a change rebuilds
         </Line>
 

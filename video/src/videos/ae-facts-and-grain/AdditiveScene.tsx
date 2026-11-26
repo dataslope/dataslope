@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SANS } from "../../theme/fonts";
 import { ADDITIVE } from "./data";
-import { colsOf, DataTable, Drift, geoOf, MARK_BAD, MARK_OK, money, Mono, OK_INK, Strike, TableName, Verdict, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, MARK_BAD, MARK_OK, money, Mono, OK_INK, TableName, Verdict, X0 } from "./parts";
 
 const R_X = 680;
 /** The remedy's column, right of the visitors. */
@@ -142,10 +142,10 @@ export const AdditiveScene: React.FC = () => {
       <Sfx name="el-tap" at={revenueAt} level={-29} />
       <Sfx name="el-tap" at={semiAt} level={-29} />
       <Sfx name="el-pop" at={sixteenAt} level={-30} />
-      <Sfx name="el-scratch" at={nobodyAt} level={-34} />
+      <Sfx name="el-tap" at={nobodyAt} level={-32} />
       <Sfx name="el-pop" at={closingAt + 6} level={-30} />
       <Sfx name="el-sprinkle" at={monAt} level={-33} />
-      <Sfx name="el-scratch" at={fourAt + 8} level={-35} />
+      <Sfx name="el-tap" at={fourAt + 6} level={-33} />
       <Sfx name="el-chime" at={recountAt + 4} level={-35} />
 
       <Drift from={from} to={end + 30}>
@@ -220,7 +220,6 @@ export const AdditiveScene: React.FC = () => {
           }
           value={money(ADDITIVE.overTime)}
           tone="bad"
-          strikeAt={nobodyAt + 4}
         />
         <Note at={nobodyAt} x={R_X} y={y(552)}>
           <span style={{ ...note(22, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>Money nobody ever had</span>
@@ -274,12 +273,13 @@ export const AdditiveScene: React.FC = () => {
           <span style={{ ...note(25, OK_INK), fontWeight: 500, marginLeft: 12 }}>
             <Num>{ADDITIVE.visitsBoth}</Num> people
           </span>
-          <span style={{ ...note(25, ACCENT_INK), marginLeft: 18, opacity: ease(frame, fourAt + 6, 10) }}>
-            <Strike at={fourAt + 8}>
-              <Num>
-                {perDay.Mon} + {perDay.Tue} = {sumOfDays}
-              </Num>
-            </Strike>
+          {/* The sum is right; reading it as people is the trap, so it is
+              set beside the count as what the count is not, never struck. */}
+          <span style={{ ...note(25, ACCENT_INK), marginLeft: 18, whiteSpace: "nowrap", opacity: ease(frame, fourAt + 6, 10) }}>
+            not{" "}
+            <Num>
+              {perDay.Mon} + {perDay.Tue} = {sumOfDays}
+            </Num>
           </span>
         </div>
         <Note at={recountAt} x={FIX_X} y={y(742) - h(6)}>

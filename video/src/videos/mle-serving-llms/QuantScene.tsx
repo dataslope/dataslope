@@ -10,6 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { KV, QUANT, SPECULATIVE } from "./data";
 import {
+  ACCENT,
   ACCENT_INK,
   Box,
   OK,
@@ -48,8 +49,12 @@ const TPP = (v: number) => (Math.round(v * 10) / 10).toFixed(1);
  * the bytes each decode step reads at 4 bits, the 35 GB that fit one GPU with
  * room for 16 requests, and the price in quality. Then speculative decoding:
  * a draft proposes four tokens, one pass of the large model checks them,
- * accepted until the first miss, which it replaces; the simulation's tokens
- * per pass at two acceptance rates; and the draft's own cost.
+ * accepted until the first miss ("q4-verify": the rejected draft stays red
+ * and struck, the one after it greys, "dropped", and the large model's own
+ * token takes the miss's place); the simulation's tokens per pass at two
+ * acceptance rates; and the draft's own cost, where a draft that is usually
+ * wrong can lose (said of no row: 1.9 tokens a pass is still a gain unless
+ * the draft is expensive).
  */
 export const QuantScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -80,9 +85,12 @@ export const QuantScene: React.FC = () => {
   const verifyAt = n.word("q4-spec", "the large model verify them all");
   const stepAt = n.word("q4-spec", "costs about one decode step");
   const dominatesAt = n.word("q4-spec", "reading the weights dominates");
-  const ruleAt = n.word("q4-spec", "With the standard acceptance rule");
-  const distAt = n.word("q4-spec", "the output distribution doesn't change");
-  const notPriceAt = n.word("q4-spec", "so quality isn't the price");
+  const rejectsAt = n.word("q4-verify", "the first one it rejects");
+  const dropsAt = n.word("q4-verify", "drops the rest");
+  const ownAt = n.word("q4-verify", "one token of its own");
+  const ruleAt = n.word("q4-rule", "With the standard acceptance rule");
+  const distAt = n.word("q4-rule", "the output distribution doesn't change");
+  const notPriceAt = n.word("q4-rule", "so quality isn't the price");
   const dependsAt = n.word("q4-sim", "The speedup depends on how often the draft is right");
   const simAt = n.word("q4-sim", "In a simulation with four-token drafts");
   const nineAt = n.word("q4-sim", "accepted nine times in ten");
@@ -151,7 +159,8 @@ export const QuantScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={proposeAt} level={-34} />
       <Sfx name="el-tap" at={verifyAt + 10} level={-33} />
       <Sfx name="el-tap" at={verifyAt + 16} level={-33} />
-      <Sfx name="el-scratch" at={verifyAt + 22} level={-34} />
+      <Sfx name="el-scratch" at={rejectsAt + 4} level={-34} />
+      <Sfx name="el-tap" at={ownAt + 2} level={-32} />
       <Sfx name="el-pencil" at={stepAt} level={-36} />
       <Sfx name="el-tap" at={fourTokAt} level={-31} />
       <Sfx name="el-tap" at={halfAt} level={-31} />
@@ -256,27 +265,32 @@ export const QuantScene: React.FC = () => {
         <Enter at={clearA + 6}>
           <Box x={X0} y={draftY - 2} w={230} h={52} at={specAt} title="Draft model" size={24} />
           <Flow points={[[X0 + 236, draftY + 24], [tokX(0) - 12, draftY + 24]]} at={proposeAt - 4} />
-          {DRAFT.map((t, i) => (
-            <div key={t} style={{ position: "absolute", left: tokX(i), width: SLOT - 20, top: draftY, display: "flex", justifyContent: "center", fontSize: 28 }}>
-              <span style={{ ...tokenStyle("pale", 28), background: "transparent", opacity: ease(frame, proposeAt + i * 5, 8), border: `2px dashed ${ds("blue", 400)}`, padding: "4px 11px" }}>{t}</span>
-            </div>
-          ))}
-          <Box x={X0} y={largeY - 8} w={230} h={68} at={verifyAt} title="Large model" sub="one forward pass" size={24} subSize={20} />
-          <Flow points={[[X0 + 236, largeY + 24], [tokX(0) - 12, largeY + 24]]} at={verifyAt + 4} />
           {DRAFT.map((t, i) => {
-            const v = verdict(i);
-            const tone = i < 2 ? "ok" : i === 2 ? "bad" : "idle";
-            const swap = i === 2 ? ease(frame, verifyAt + 46, 12) : 0;
+            // The verify step, held: the first rejected draft in red and
+            // struck (the error), the one after it grey (dropped, not wrong).
+            const bad = i === 2 ? ease(frame, rejectsAt, 10) : 0;
+            const gone = i === 3 ? ease(frame, dropsAt, 10) : 0;
+            const edge = bad > 0 ? `color-mix(in srgb, ${ACCENT} ${bad * 100}%, ${ds("blue", 400)})` : gone > 0 ? `color-mix(in srgb, ${ds("gray", 400)} ${gone * 100}%, ${ds("blue", 400)})` : ds("blue", 400);
+            const ink = bad > 0 ? `color-mix(in srgb, ${ACCENT_INK} ${bad * 100}%, ${ds("blue", 500)})` : gone > 0 ? `color-mix(in srgb, ${IDLE_INK} ${gone * 100}%, ${ds("blue", 500)})` : ds("blue", 500);
             return (
-              <div key={t} style={{ position: "absolute", left: tokX(i), width: SLOT - 20, top: largeY, display: "flex", justifyContent: "center", fontSize: 28, opacity: v }}>
-                <span style={{ ...tokenStyle(tone, 28), opacity: (i === 3 ? 0.5 : 1) * (1 - swap) }}>{i === 2 ? <Strike at={verifyAt + 24}>{t}</Strike> : t}</span>
-                {i === 2 ? (
-                  <span style={{ ...tokenStyle("ok", 28), position: "absolute", opacity: swap, transform: `translateY(${(1 - swap) * 10}px)` }}>tokens</span>
-                ) : null}
+              <div key={t} style={{ position: "absolute", left: tokX(i), width: SLOT - 20, top: draftY, display: "flex", justifyContent: "center", fontSize: 28 }}>
+                <span style={{ ...tokenStyle("pale", 28), color: ink, background: "transparent", opacity: ease(frame, proposeAt + i * 5, 8), border: `2px dashed ${edge}`, padding: "4px 11px" }}>
+                  {i === 2 ? <Strike at={rejectsAt + 4}>{t}</Strike> : t}
+                </span>
               </div>
             );
           })}
-          {/* Ticks over the two it keeps; the first miss is replaced, the rest dropped. */}
+          <Box x={X0} y={largeY - 8} w={230} h={68} at={verifyAt} title="Large model" sub="one forward pass" size={24} subSize={20} />
+          <Flow points={[[X0 + 236, largeY + 24], [tokX(0) - 12, largeY + 24]]} at={verifyAt + 4} />
+          {["the", "next", "tokens"].map((t, i) => {
+            const p = i < 2 ? verdict(i) : ease(frame, ownAt, 12);
+            return (
+              <div key={t} style={{ position: "absolute", left: tokX(i), width: SLOT - 20, top: largeY, display: "flex", justifyContent: "center", fontSize: 28, opacity: p }}>
+                <span style={{ ...tokenStyle("ok", 28), transform: `translateY(${(1 - p) * 10}px)` }}>{t}</span>
+              </div>
+            );
+          })}
+          {/* Ticks over the two it keeps; the first miss is replaced by its own token, the rest dropped. */}
           {[0, 1].map((i) =>
             verdict(i) > 0 ? (
               <div key={i} style={{ position: "absolute", left: tokX(i) + (SLOT - 20) / 2 - 13, top: largeY - h(34) }}>
@@ -284,8 +298,14 @@ export const QuantScene: React.FC = () => {
               </div>
             ) : null,
           )}
-          <Line at={verifyAt + 50} x={tokX(2) + (SLOT - 20) / 2} width={240} align="center" y={largeY - h(34)} size={21} color={OK_INK}>
+          <Line at={rejectsAt + 4} out={ownAt - 6} x={tokX(2) + (SLOT - 20) / 2} width={240} align="center" y={largeY - h(34)} size={21} color={ACCENT_INK}>
+            rejected
+          </Line>
+          <Line at={ownAt} x={tokX(2) + (SLOT - 20) / 2} width={240} align="center" y={largeY - h(34)} size={21} color={OK_INK}>
             its own token
+          </Line>
+          <Line at={dropsAt + 4} x={tokX(3) + (SLOT - 20) / 2} width={240} align="center" y={largeY - h(34)} size={21} color={IDLE_INK}>
+            dropped
           </Line>
           <Bracket x1={tokX(0) + 10} x2={tokX(3) + SLOT - 30} y={largeY + h(72)} at={stepAt} />
           <Line at={stepAt + 4} x={tokX(0) + 10} y={largeY + h(88)} size={26} color={INK}>
@@ -302,7 +322,7 @@ export const QuantScene: React.FC = () => {
 
           {/* The simulation: tokens per pass of the large model. */}
           <Line at={simAt} x={X0} y={simTop - h(44)} size={22} color={INK_SOFT}>
-            Simulation, <Num>4</Num>-token drafts: tokens per pass of the large model
+            Simulation, <Num>4</Num>-token drafts: tokens per pass, the accepted drafts plus its own
           </Line>
           <Line at={dependsAt} x={X0} y={simTop - h(44)} size={22} color={INK_SOFT} out={simAt - 4}>
             The speedup depends on how often the draft is right
@@ -310,11 +330,10 @@ export const QuantScene: React.FC = () => {
           <Svg>
             {rows.map((r, j) => {
               const p = ease(frame, r.at, 18);
-              const dim = j === 2 ? ease(frame, loseAt, 12) : 0;
               const whole = Math.floor(r.tpp);
               const frac = r.tpp - whole;
               return (
-                <g key={j} opacity={(1 - 0.6 * dim) * Math.min(1, p * 2)}>
+                <g key={j} opacity={Math.min(1, p * 2)}>
                   {Array.from({ length: Math.ceil(r.tpp) }, (_, k) => {
                     const w = k < whole ? SQ : SQ * frac;
                     const show = ease(frame, r.at + k * 4, 8);
@@ -325,13 +344,12 @@ export const QuantScene: React.FC = () => {
             })}
           </Svg>
           {rows.map((r, j) => {
-            const dim = j === 2 ? ease(frame, loseAt, 12) : 0;
             return (
               <React.Fragment key={j}>
-                <Line at={r.at} x={X0} y={simTop + j * h(52) + 4} size={24} color={j === 0 ? IDLE_INK : INK} opacity={1 - 0.6 * dim}>
+                <Line at={r.at} x={X0} y={simTop + j * h(52) + 4} size={24} color={j === 0 ? IDLE_INK : INK}>
                   {r.label}
                 </Line>
-                <Line at={j === 1 ? fourTokAt : r.at + 16} x={480 + 5 * (SQ + 8) + 10} y={simTop + j * h(52) + 4} size={24} color={j === 0 ? IDLE_INK : INK} opacity={1 - 0.6 * dim}>
+                <Line at={j === 1 ? fourTokAt : r.at + 16} x={480 + 5 * (SQ + 8) + 10} y={simTop + j * h(52) + 4} size={24} color={j === 0 ? IDLE_INK : INK}>
                   {j === 0 ? (
                     <>
                       <Num>1</Num> token
@@ -342,13 +360,13 @@ export const QuantScene: React.FC = () => {
                     </>
                   )}
                   {j === 1 ? <span style={{ color: OK_INK, opacity: ease(frame, predictAt, 10) }}> · predictable text: helps most</span> : null}
-                  {j === 2 ? <span style={{ color: ACCENT_INK, opacity: ease(frame, loseAt, 10) }}> · draft usually wrong: can lose</span> : null}
                 </Line>
               </React.Fragment>
             );
           })}
           <Line at={costAt} x={X0} y={simTop + 3 * h(52) + h(16)} size={24} color={INK}>
             The draft model costs time and memory of its own
+            <span style={{ color: ACCENT_INK, opacity: ease(frame, loseAt, 10) }}>, so a draft that is usually wrong can lose</span>
           </Line>
         </Enter>
 

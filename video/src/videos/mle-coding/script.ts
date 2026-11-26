@@ -177,8 +177,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     runs on this machine the loop came out 85 to 118 times the product and
  *     per-row NumPy 29 to 38 times (the committed run: VECTOR.ratio);
  *     check.mjs fails if a rerun leaves "roughly a hundred times" (50 to
- *     200) or "roughly thirty times" (15 to 60). The page's own range, "one
- *     to two orders of magnitude", agrees.
+ *     200) or "roughly forty times" (30 to 55). The committed run's per-row
+ *     ratio is 38, drawn as ×38, so the 2026-11-26 review re-voiced the
+ *     sentence from "roughly thirty" to match the bar. The page's own range,
+ *     "one to two orders of magnitude", agrees.
  *   - q2: the formula, normalize once and one product, and "the guard on the
  *     denominator is the one people forget": the page. The catalog is the
  *     video's own six two-dimensional items, one all zeros (a new item with
@@ -285,7 +287,19 @@ export const script: NarrationScript = {
     },
     {
       id: "q1-row",
-      text: "The follow-up: what about calling NumPy once per row? Still roughly thirty times slower, because the interpreter still runs once per row. Put the whole step in one array operation, and keep loops for steps that depend on the step before.",
+      text: "The follow-up: what about calling NumPy once per row?",
+      pauseAfter: 0.6,
+    },
+    {
+      // Re-voiced on its own (2026-11-26 review): the bar it lands on reads
+      // ×38 (VECTOR.ratio.perRow), which "roughly thirty" undersold.
+      id: "q1-row-ratio",
+      text: "Still roughly forty times slower, because the interpreter still runs once per row.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q1-row-rule",
+      text: "Put the whole step in one array operation, and keep loops for steps that depend on the step before.",
       pauseAfter: 0.8,
     },
 
@@ -459,7 +473,8 @@ export const script: NarrationScript = {
     {
       id: "r-knn",
       text: "And k-nearest neighbors. The n distances cost n times d. Then a full sort costs n log n, or a heap of size k, n log k. Either way, computing the distances costs more than choosing among them, so repeated queries need an index: a KD-tree, a ball tree, or an approximate one like HNSW.",
-      pauseAfter: 0.9,
+      // Time to read which index suits which data, under the badges.
+      pauseAfter: 1.5,
     },
     {
       id: "next",

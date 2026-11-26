@@ -98,7 +98,9 @@ export const DataBlock: React.FC<{
               const p = ease(frame, heldOut.at, 14);
               const ho = heldOut.out === undefined ? 0 : ease(frame, heldOut.out, 10);
               if (p <= 0 || ho >= 1) return null;
-              const y0 = top + heldOut.from * pitchY - 7;
+              // The top edge runs in the gap between rows, clear of the label
+              // digit of the row above it.
+              const y0 = top + heldOut.from * pitchY - GRID.gap / 2;
               const y1 = top + heldOut.to * pitchY - GRID.gap + 7;
               const right = labelX + 44;
               return (

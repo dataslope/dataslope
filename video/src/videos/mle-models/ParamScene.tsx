@@ -10,7 +10,10 @@ import { LOGIT, SERVING } from "./data";
 import { ROWS } from "./HookScene";
 import { ACCENT_INK, Drift, ElevenNumbers, int, Line, Mark, RowsBlock, VRule, X0 } from "./parts";
 
-const COL_R = ROWS.x;
+/** The right column sits 40 px right of the hook's, so the longest line on
+ *  the left ("A fixed set of numbers, and only those") keeps clear of the
+ *  hairline, which is centred in the gap. */
+const COL_R = ROWS.x + 40;
 const COLS = 9;
 
 /**
@@ -78,7 +81,7 @@ export const ParamScene: React.FC = () => {
           <Mark at={stillAt}>Still {LOGIT.parameters} numbers</Mark>
         </Line>
 
-        <VRule x={COL_R - 70} top={colTop} bottom={y(860)} at={nonAt - 2} />
+        <VRule x={COL_R - 62} top={colTop} bottom={y(860)} at={nonAt - 2} />
 
         {/* ── Non-parametric ── */}
         <Line at={nonAt - 2} x={COL_R} y={colTop} size={30}>

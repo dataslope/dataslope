@@ -49,8 +49,9 @@ const CASED: Record<string, string> = { rlhf: "RLHF", lora: "LoRA" };
  * track's seven other pages and read against the NLP page, where the unseen
  * words all become one red "unknown"; characters, five times the positions
  * and twenty-five times the pairs; subwords, "hallucination" cut in two by
- * o200k_base. Then the vocabulary's own price, the embedding table, at the
- * right, and the balance tips back.
+ * o200k_base, and where such pieces come from (byte-pair encoding, with the
+ * page's other two schemes named). Then the vocabulary's own price, the
+ * embedding table, at the right, and the balance tips back.
  */
 export const TokenScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -81,6 +82,10 @@ export const TokenScene: React.FC = () => {
   const prodAt = n.word("q1-piece", "two hundred thousand pieces");
   const cutsAt = n.word("q1-piece", "the word hallucination");
   const avgAt = n.word("q1-piece", "one point four");
+  const bpeAt = n.word("q1-bpe", "byte-pair encoding");
+  const bytesAt = n.word("q1-bpe", "start from single bytes");
+  const mergeAt = n.word("q1-bpe", "keep merging");
+  const fullAt = n.word("q1-bpe", "until the vocabulary is full");
   const priceAt = n.word("q1-cost", "has a price too");
   const rowAt = n.word("q1-cost", "a row of the embedding table");
   const widthAt = n.word("q1-cost", "a width of four thousand");
@@ -336,12 +341,29 @@ export const TokenScene: React.FC = () => {
         </Line>
         <Line at={avgAt} x={COL.subs} y={y(560)} size={24} weight={600}>
           <span style={{ color: OK_INK }}>
-            <Num>{T.tokensPerWord}</Num>
+            {/* One decimal, as it is said ("one point four"). */}
+            <Num>{(Math.round(T.tokensPerWord * 10) / 10).toFixed(1)}</Num>
           </span>{" "}
           tokens a word on this page
         </Line>
         <Line at={prodAt} x={COL.subs} y={y(610)} size={21} color={INK_SOFT}>
           <Code>{T.encoding}</Code>: <Num>{commas(T.vocabSize)}</Num> pieces
+        </Line>
+        {/* Where the pieces come from: byte-pair encoding, and the page's other two schemes. */}
+        <Line at={bpeAt} x={COL.subs} y={y(676)} size={24} weight={600}>
+          Byte-pair encoding
+        </Line>
+        <Line at={bytesAt} x={COL.subs} y={y(676) + h(38)} size={21} color={INK_SOFT}>
+          Start from single bytes,
+        </Line>
+        <Line at={mergeAt} x={COL.subs} y={y(676) + h(66)} size={21} color={INK_SOFT}>
+          merge the most frequent pair
+        </Line>
+        <Line at={fullAt} x={COL.subs} y={y(676) + h(94)} size={21} color={INK_SOFT}>
+          until the vocabulary is full
+        </Line>
+        <Line at={fullAt + 20} x={COL.subs} y={y(676) + h(136)} size={21} color={INK_SOFT}>
+          Also: WordPiece, unigram
         </Line>
 
         {/* ── The vocabulary's price: one row per piece ── */}

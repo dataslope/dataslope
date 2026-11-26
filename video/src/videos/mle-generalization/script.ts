@@ -112,7 +112,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     lock on Test, "touched once".
  *   split-sim: the coin spot; the label column becomes coin flips; fifty
  *     settings as fifty dots on a validation-accuracy line, the best ringed
- *     (split.first).
+ *     (split.shown: the repeat whose fifty scores average closest to 50%, so
+ *     the one draw drawn looks like the experiment; repeat 0's sat mostly
+ *     below its own 50% line).
  *   split-result: two histograms of the 200 repeats: winners' validation
  *     scores (red, centred near 64%) and the same winners' test scores
  *     (blue, near 50%); a dashed "50%: a coin flip".
@@ -164,8 +166,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     caught" in red.
  *   imb-fix: the remedies as a ruled list, each inking as named.
  *   imb-trap: a small table, plain against balanced weights: recall at 0.5,
- *     24% → 84% (yellow); average predicted probability, 1% → 22% (red, the
- *     true rate 1% beside it); PR-AUC, 0.46 → 0.32 (red).
+ *     24% → 84% (yellow). imb-trade: precision at 0.5, 84% → 5% (red): the
+ *     price, flagging 15,439 instead of 288. imb-cost: average predicted
+ *     probability, 1% → 22% (red, the true rate 1% beside it); PR-AUC, 0.46 →
+ *     0.32 (red).
  *   imb-prod: "Recalibrate", then "Try the plain model's threshold first"
  *     (recalibrating keeps the order, so it can't win back the PR-AUC), then
  *     "Resample training only; test keeps 1%", all three in green.
@@ -245,8 +249,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     alarms against 534 caught ("nearly twice"). The top 1,000 scores hold
  *     466 frauds. ROC-AUC 0.907, PR-AUC (average precision) 0.461, chance
  *     0.01. Everything legitimate: 99.0% accurate. Balanced class weights:
- *     recall at 0.5 84.3%, mean predicted probability 22.1% (plain 0.96%),
- *     PR-AUC 0.322 (ROC-AUC 0.929). Recalibrating is monotone, so it cannot
+ *     recall at 0.5 84.3% at a precision of 5.4% (15,439 flagged; plain:
+ *     84.4% of 288), mean predicted probability 22.1% (plain 0.96%), PR-AUC
+ *     0.322 (ROC-AUC 0.929). Recalibrating is monotone, so it cannot
  *     win back the plain model's better PR-AUC; lowering the plain model's
  *     threshold keeps it (threshold moving is standard practice, said as
  *     advice; check.mjs asserts the plain PR-AUC is the higher). "A thousand
@@ -327,7 +332,8 @@ export const script: NarrationScript = {
     {
       id: "bias-dart",
       text: "At one point on the curve, the stumps' predictions bunch together, off target: that's bias. Trees six deep centre on the target, and scatter: that's variance.",
-      pauseAfter: 0.7,
+      // The finished dart figure holds before the depth chart replaces it.
+      pauseAfter: 1.4,
     },
     {
       id: "bias-sum",
@@ -396,7 +402,13 @@ export const script: NarrationScript = {
     },
     {
       id: "reg-why",
-      text: "L two pulls in proportion to the weight, so the pull fades as the weight shrinks. L one pulls just as hard all the way down, so a weight that isn't earning its keep lands on zero.",
+      text: "L two pulls in proportion to the weight, so the pull fades as the weight shrinks.",
+      // A breath between the two mechanisms: the L2 panel finishes first.
+      pauseAfter: 0.8,
+    },
+    {
+      id: "reg-why-l1",
+      text: "L one pulls just as hard all the way down, so a weight that isn't earning its keep lands on zero.",
       pauseAfter: 0.7,
     },
     {
@@ -550,7 +562,16 @@ export const script: NarrationScript = {
     },
     {
       id: "imb-trap",
-      text: "The follow-up is what reweighting does. With balanced class weights, recall at point five jumps from twenty-four percent to eighty-four. But the model now calls the average transaction twenty-two percent likely to be fraud, when one percent is, and its pee-ar ay-you-see falls from point four six to point three two.",
+      text: "The follow-up is what reweighting does. With balanced class weights, recall at point five jumps from twenty-four percent to eighty-four.",
+    },
+    {
+      // The precision the recall cost: the question an interviewer asks next.
+      id: "imb-trade",
+      text: "That's the usual trade: precision falls from eighty-four percent to five.",
+    },
+    {
+      id: "imb-cost",
+      text: "But the model now calls the average transaction twenty-two percent likely to be fraud, when one percent is, and its pee-ar ay-you-see falls from point four six to point three two.",
       pauseAfter: 0.7,
     },
     {

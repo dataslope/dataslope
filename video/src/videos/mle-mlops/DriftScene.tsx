@@ -39,18 +39,42 @@ const turnRule = (t: number) => {
   return { nx: vx / len, ny: vy / len, off: lerp(BEFORE.c / na, AFTER.c / nb, t) };
 };
 
-/** A small scatter of the two features, its decision boundary drawn across. */
-const Scatter: React.FC<{ x: number; y: number; w: number; h: number; at: number; shift: number; turn: number }> = ({ x, y, w, h, at, shift, turn }) => {
+/** A rule's boundary, as a long segment through the plot (clipped to its frame). */
+const boundary = (rule: ReturnType<typeof turnRule>, X: (v: number) => number, Y: (v: number) => number) => {
+  const px = -rule.off * rule.nx;
+  const py = -rule.off * rule.ny;
+  const dx = -rule.ny;
+  const dy = rule.nx;
+  return { x1: X(px - 6 * dx), y1: Y(py - 6 * dy), x2: X(px + 6 * dx), y2: Y(py + 6 * dy) };
+};
+/** The model's boundary once the world's has turned away from it: pale. */
+const MODEL_LINE = ds("gray", 400);
+const GHOST = ds("gray", 200);
+
+/**
+ * A small scatter of the two features, the true boundary drawn across; each
+ * point is colored by its label under that rule (blue y = 1, grey y = 0).
+ * `model` (0 → 1) keeps the boundary the model learned, pale, where the true
+ * one has turned away from it: the points on the wrong side of it are what
+ * the model now gets wrong.
+ */
+const Scatter: React.FC<{ x: number; y: number; w: number; h: number; at: number; shift: number; turn: number; model?: number }> = ({
+  x,
+  y,
+  w,
+  h,
+  at,
+  shift,
+  turn,
+  model = 0,
+}) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 14);
   const X = (v: number) => x + ((v + 2.6) / 6.2) * w;
   const Y = (v: number) => y + h - ((v + 2.4) / 4.8) * h;
   const rule = turnRule(turn);
-  // The boundary, as a long segment through the plot, clipped to its frame.
-  const px = -rule.off * rule.nx;
-  const py = -rule.off * rule.ny;
-  const dx = -rule.ny;
-  const dy = rule.nx;
+  const line = boundary(rule, X, Y);
+  const learned = boundary(turnRule(0), X, Y);
   const id = `clip-${Math.round(x)}`;
   return (
     <Svg opacity={p}>
@@ -67,12 +91,13 @@ const Scatter: React.FC<{ x: number; y: number; w: number; h: number; at: number
           const pos = rule.nx * ax + rule.ny * b + rule.off > 0;
           return (
             <React.Fragment key={i}>
-              {shift > 0 ? <circle cx={X(a)} cy={Y(b)} r={6} fill={ds("gray", 200)} /> : null}
+              {shift > 0 ? <circle cx={X(a)} cy={Y(b)} r={6} fill={GHOST} /> : null}
               <circle cx={X(ax)} cy={Y(b)} r={7} fill={pos ? BAR : NEG} />
             </React.Fragment>
           );
         })}
-        <line x1={X(px - 6 * dx)} y1={Y(py - 6 * dy)} x2={X(px + 6 * dx)} y2={Y(py + 6 * dy)} stroke={INK} strokeWidth={2.6} strokeDasharray="8 6" />
+        {model > 0 ? <line {...learned} stroke={MODEL_LINE} strokeWidth={2.6} strokeDasharray="8 6" opacity={model} /> : null}
+        <line {...line} stroke={INK} strokeWidth={2.6} strokeDasharray="8 6" />
       </g>
       <text x={x + w} y={y + h + 30} textAnchor="end" style={svgText(label(20, INK_SOFT))}>
         first feature
@@ -80,6 +105,20 @@ const Scatter: React.FC<{ x: number; y: number; w: number; h: number; at: number
     </Svg>
   );
 };
+
+/** A scatter's key: a dot of each color and what it is, inking in on `at`. */
+const Key: React.FC<{ x: number; y: number; at: number; items: readonly { color: string; text: React.ReactNode }[] }> = ({ x, y, at, items }) => (
+  <Line at={at} x={x} y={y} size={21} color={INK_SOFT}>
+    {items.map((it, i) => (
+      <span key={i} style={{ display: "inline-flex", alignItems: "center", marginLeft: i ? 24 : 0 }}>
+        <svg width={14} height={14} style={{ marginRight: 8, flex: "none" }}>
+          <circle cx={7} cy={7} r={7} fill={it.color} />
+        </svg>
+        {it.text}
+      </span>
+    ))}
+  </Line>
+);
 
 /** The window's share of the first feature in each training decile, against
  *  the 10% each held in training (the dashed line). */
@@ -206,19 +245,42 @@ export const DriftScene: React.FC = () => {
           <Line at={tacticsAt - 2} x={PANEL_B} y={y(330) + h(44)} size={22} color={INK_SOFT}>
             Fraud tactics evolve<span style={{ opacity: ease(frame, meanAt - 2, 10) }}>: the same features mean something new</span>
           </Line>
-          <Scatter x={PANEL_B + 20} y={sc.top} w={sc.w} h={sc.h} at={conceptDefAt} shift={0} turn={turn} />
+          <Scatter x={PANEL_B + 20} y={sc.top} w={sc.w} h={sc.h} at={conceptDefAt} shift={0} turn={turn} model={ease(frame, conceptDefAt + 10, 12)} />
           <Line at={dataDefAt + 30} x={X0 + 20 + sc.w + 30} y={sc.top + sc.h * 0.3} size={21} color={INK_SOFT}>
             the points move,
           </Line>
           <Line at={dataDefAt + 40} x={X0 + 20 + sc.w + 30} y={sc.top + sc.h * 0.3 + 30} size={21} color={INK_SOFT}>
             the boundary stays
           </Line>
+          {/* What the colors are: each point's label under the true rule. */}
+          <Key
+            x={X0 + 20 + sc.w + 30}
+            y={sc.top + sc.h * 0.3 + 100}
+            at={dataDefAt + 48}
+            items={[
+              { color: BAR, text: <M>y = 1</M> },
+              { color: NEG, text: <M>y = 0</M> },
+            ]}
+          />
+          <Key x={X0 + 20 + sc.w + 30} y={sc.top + sc.h * 0.3 + 130} at={dataDefAt + 54} items={[{ color: GHOST, text: "before the shift" }]} />
           <Line at={conceptDefAt + 40} x={PANEL_B + 20 + sc.w + 30} y={sc.top + sc.h * 0.3} size={21} color={INK_SOFT}>
             the points stay,
           </Line>
           <Line at={conceptDefAt + 50} x={PANEL_B + 20 + sc.w + 30} y={sc.top + sc.h * 0.3 + 30} size={21} color={INK_SOFT}>
-            the boundary turns
+            the true boundary turns;
           </Line>
+          <Line at={conceptDefAt + 58} x={PANEL_B + 20 + sc.w + 30} y={sc.top + sc.h * 0.3 + 60} size={21} color={INK_SOFT}>
+            the model&apos;s (pale) stays
+          </Line>
+          <Key
+            x={PANEL_B + 20 + sc.w + 30}
+            y={sc.top + sc.h * 0.3 + 100}
+            at={conceptDefAt + 64}
+            items={[
+              { color: BAR, text: <M>y = 1</M> },
+              { color: NEG, text: <M>y = 0</M> },
+            ]}
+          />
           <Line at={degAt - 2} x={X0} y={sc.top + sc.h + h(70)} size={26} color={INK}>
             Degradation: <Mark at={degAt + 10}>the drop in quality either can cause</Mark>
           </Line>

@@ -55,7 +55,10 @@ export const BackpropScene: React.FC = () => {
   const batchAt = n.word("q4-memory", "batch size");
   const depthAt = n.word("q4-memory", "and depth");
   const servingAt = n.word("q4-memory", "than serving");
-  const end = n.beat("q4-memory").to;
+  const ckptAt = n.word("q4-ckpt", "Gradient checkpointing");
+  const someAt = n.word("q4-ckpt", "keep only some");
+  const recomputeAt = n.word("q4-ckpt", "recompute the rest");
+  const end = n.beat("q4-ckpt").to;
 
   // ── The stack, from the input up to the loss ──
   const sizes = BACKPROP.sizes;
@@ -69,6 +72,9 @@ export const BackpropScene: React.FC = () => {
   const rowY = (i: number) => y(716) - i * h(86);
   const lossY = rowY(4);
   const kept = [0, 1, 2, 3];
+  /** Checkpointing keeps every other layer's activations; the rest fade. */
+  const dropped = [1, 3];
+  const thin = ease(frame, someAt, 14);
   const grow = ease(frame, batchAt, 16);
   const sheets = 3 + Math.round(3 * grow);
 
@@ -88,6 +94,7 @@ export const BackpropScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={twentyAt} level={-34} />
       <Sfx name="el-chime" at={millionAt + 20} level={-33} />
       <Sfx name="el-tap" at={servingAt} level={-31} />
+      <Sfx name="el-tap" at={someAt} level={-32} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4}>
@@ -129,7 +136,7 @@ export const BackpropScene: React.FC = () => {
                 height={10}
                 rx={2}
                 fill={lit > 0 ? `color-mix(in srgb, ${LOOK} ${Math.round(lit * 100)}%, ${BAR})` : s < k - 1 ? BLUE_FILL : BAR}
-                opacity={p}
+                opacity={p * (dropped.includes(i) ? 1 - 0.8 * thin : 1)}
               />
             ));
           })}
@@ -239,7 +246,7 @@ export const BackpropScene: React.FC = () => {
             <text x={sx.b + 10} y={at(sy, 0) + 7} style={{ ...label(20, INK_SOFT), fill: INK_SOFT }}>
               nudging
             </text>
-            <text x={at(sx, 0) + 10} y={sy.b + 4} style={{ ...label(20, INK_SOFT), fill: INK_SOFT }}>
+            <text x={at(sx, 0) - 10} y={sy.b + 4} textAnchor="end" style={{ ...label(20, INK_SOFT), fill: INK_SOFT }}>
               backprop
             </text>
           </g>
@@ -276,8 +283,12 @@ export const BackpropScene: React.FC = () => {
           Kept activations grow with batch size
           <span style={{ opacity: ease(frame, depthAt - 2, 10) }}> and depth</span>
         </Line>
-        <Line at={servingAt} x={STACK_X - 50} y={y(826) + h(46)} size={26} color={INK}>
-          Serving keeps none
+        <Line at={servingAt} x={SERVE_X} y={rowY(0) + BH / 2 + h(14)} size={22} color={INK_SOFT}>
+          keeps none
+        </Line>
+        <Line at={ckptAt} x={STACK_X - 50} y={y(826) + h(46)} size={26} color={OK_INK}>
+          Checkpointing: keep a few
+          <span style={{ opacity: ease(frame, recomputeAt, 10) }}>, recompute the rest</span>
         </Line>
       </Drift>
     </AbsoluteFill>

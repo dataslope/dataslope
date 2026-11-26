@@ -149,7 +149,7 @@ export const OptScene: React.FC = () => {
           Average step, two parameters
         </Line>
         <Line at={giveAt + 6} x={PANEL_X} y={y(350)} size={22} color={INK_SOFT}>
-          with gradients <Num>100</Num>× apart
+          with gradients <Num>{OPTIM.gradientScale[0]}</Num> and <Num>{OPTIM.gradientScale[1]}</Num>
         </Line>
         {groups.map((g) => {
           const p = ease(frame, g.at, 18);
@@ -170,8 +170,14 @@ export const OptScene: React.FC = () => {
                   }}
                 />
               ))}
-              <div style={{ position: "absolute", left: g.x, width: 112, top: base + 10, textAlign: "center", ...note(24, INK), opacity: ease(frame, g.at - 4, 10) }}>{g.name}</div>
-              <div style={{ position: "absolute", left: g.x - 20, width: 152, top: base + h(52), textAlign: "center", ...note(26, INK), fontWeight: 600, ...TABULAR, opacity: ease(frame, g.ratioAt, 10) }}>
+              {/* Each bar's gradient, under it. */}
+              {OPTIM.gradientScale.map((gs, k) => (
+                <div key={k} style={{ position: "absolute", left: g.x + k * 62 - 15, width: 80, top: base + 6, textAlign: "center", ...note(20, INK_SOFT), ...TABULAR, opacity: ease(frame, g.at, 10) }}>
+                  {gs}
+                </div>
+              ))}
+              <div style={{ position: "absolute", left: g.x, width: 112, top: base + h(40), textAlign: "center", ...note(24, INK), opacity: ease(frame, g.at - 4, 10) }}>{g.name}</div>
+              <div style={{ position: "absolute", left: g.x - 20, width: 152, top: base + h(86), textAlign: "center", ...note(26, INK), fontWeight: 600, ...TABULAR, opacity: ease(frame, g.ratioAt, 10) }}>
                 <Mark at={g.ratioAt + 2}>{g.ratio}</Mark>
               </div>
             </React.Fragment>

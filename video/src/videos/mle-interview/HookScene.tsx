@@ -95,7 +95,7 @@ export const HookScene: React.FC = () => {
             <Mark at={addedAt + 4}>This LLM feature is too slow</Mark>
           </span>
         </Ink>
-        <div style={{ position: "absolute", left: LEFT_X, top: y(PROMPT_3B), display: "flex", gap: "0.26em", ...prompt }}>
+        <div style={{ position: "absolute", left: LEFT_X, top: y(PROMPT_3B), display: "flex", ...prompt }}>
           <Ink at={expensiveAt - 6} dur={18} style={{ position: "relative", color: INK }}>
             <span style={{ display: "inline-block", marginLeft: "-0.14em" }}>
               <Mark at={addedAt + 8}>and too expensive.</Mark>

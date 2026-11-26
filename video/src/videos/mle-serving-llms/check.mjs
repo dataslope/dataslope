@@ -91,6 +91,11 @@ R["kv"] = {
     "weightsGB": WEIGHTS16 / 1e9, "gpus": GPUS, "gpuGB": GPU_BYTES / 1e9,
     "nodeGB": GPUS * GPU_BYTES / 1e9, "freeGB": free / 1e9,
     "per8kBytes": per8k, "per8kGiB": per8k / GiB,
+    # The same 8K request in decimal GB, which is what makes 500 GB hold 186
+    # of them rather than the 200 that 500 / 2.5 suggests.
+    "per8kGB": round(per8k / 1e9, 2),
+    # An 8K request with a KV head per query head (64): the 23 cells' size.
+    "per8kNoGqaGiB": kv_cache_bytes(L, QUERY_HEADS, D, 8192) / GiB,
     "fit8k": int(free // per8k),
     "fit128k": int(free // ctx128k),
     "fitNoGqa8k": int(free // kv_cache_bytes(L, QUERY_HEADS, D, 8192)),
@@ -119,6 +124,8 @@ RESERVED, USED, BLOCK = 8192, 2000, 16
 R["paging"] = {
     "reservedTokens": RESERVED, "usedTokens": USED, "emptyShare": round((RESERVED - USED) / RESERVED, 4),
     "blockTokens": BLOCK, "worstWasteTokens": BLOCK - 1, "worstWasteShare": round((BLOCK - 1) / USED, 4),
+    # How many blocks the 2,000 tokens take, and how full the last one ends.
+    "blocksUsed": -(-USED // BLOCK), "lastBlockTokens": USED - (-(-USED // BLOCK) - 1) * BLOCK,
 }
 
 # ── Simulation: static against continuous batching ──────────────────────────

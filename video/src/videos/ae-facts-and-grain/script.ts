@@ -93,7 +93,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the March column summed, 1,600.00 (green), the three month-ends
  *     summed, 4,800.00 (red, "never existed"), then the closing balances,
  *     900.00 and 700.00. "nonadd": Monday 3, Tuesday 3, and "both days: 4"
- *     with 6 struck through.
+ *     with "not 3 + 3 = 6" beside it (a review's fix, 2026-11-26: neither
+ *     sum is struck, since both are right as arithmetic).
  *   - "ratio" to "ratio-fix": the two orders (gross_revenue,
  *     cost_of_goods_sold, margin_pct); sum 60.0 and average 30.0 in red, the
  *     ratio of sums 14.0 in green, with "order 2: 90% of revenue" beside it.
@@ -424,7 +425,7 @@ export const script: NarrationScript = {
     {
       id: "r-types",
       text: "Question ten. What are the three types of fact tables? Transaction: one row per event, like a deposit. Periodic snapshot: one row per entity per period, like a month-end balance. Accumulating snapshot: one row per process, like a loan application, updated in place as each milestone lands.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.6,
     },
     {
       id: "r-periodic",

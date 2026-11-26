@@ -199,6 +199,14 @@ R["split"] = {
     "meanWinnerVal": r3(np.mean([t[1] for t in trials])), "meanWinnerTest": r3(np.mean([t[2] for t in trials])),
     "first": {"val": [r3(v) for v in trials[0][0]], "winnerVal": r3(trials[0][1]), "winnerTest": r3(trials[0][2])},
 }
+# The repeat drawn as fifty dots: the one whose fifty scores average closest
+# to the 50% every model is worth, with a winner closest to the 200 winners'
+# mean, so the single draw on screen looks like the experiment it stands for.
+# Chosen from the repeats above; nothing is redrawn.
+mwv = np.mean([t[1] for t in trials])
+shown = min(range(len(trials)), key=lambda i: (round(abs(np.mean(trials[i][0]) - 0.5) + abs(trials[i][1] - mwv), 6), i))
+R["split"]["shown"] = {"repeat": shown, "val": [r3(v) for v in trials[shown][0]], "mean": r3(np.mean(trials[shown][0])),
+                       "winnerVal": r3(trials[shown][1]), "winnerTest": r3(trials[shown][2])}
 
 # ── Question seven: the page's five folds, and folds that split a user ──
 scores = cross_val_score(LogisticRegression(), Xp, yp, cv=kf, scoring="accuracy")
@@ -418,8 +426,9 @@ const claims = [
   ["auc-pr", `${point(R.fraud.prAuc.toFixed(2))}, against a chance level of ${point(R.fraud.rate.toFixed(2))}`],
   ["imb", `scores ${pct(R.fraud.allLegitAccuracy)} percent`],
   ["imb-trap", `from ${share(T(0.5).tp, R.fraud.fraud)} percent to ${share(R.fraud.weighted.at.tp, R.fraud.fraud)}`],
-  ["imb-trap", `${pct(R.fraud.weighted.meanProbability)} percent likely`],
-  ["imb-trap", `from ${point(R.fraud.prAuc.toFixed(2))} to ${point(R.fraud.weighted.prAuc.toFixed(2))}`],
+  ["imb-trade", `precision falls from ${share(T(0.5).tp, T(0.5).flagged)} percent to ${share(R.fraud.weighted.at.tp, R.fraud.weighted.at.flagged)}`],
+  ["imb-cost", `${pct(R.fraud.weighted.meanProbability)} percent likely`],
+  ["imb-cost", `from ${point(R.fraud.prAuc.toFixed(2))} to ${point(R.fraud.weighted.prAuc.toFixed(2))}`],
   ["r-early-plateau", `patience of ${whole(E.short.patience)}, stops at epoch ${epoch(E.short.stop)}`],
   ["r-early-plateau", `its best is epoch ${epoch(E.globalBest)}`],
 ];
@@ -447,6 +456,10 @@ if (!(E.long.best === E.globalBest && E.short.best < E.globalBest && E.short.bes
 const li = R.fit.linear.sizes.indexOf(250);
 if (Math.abs(R.fit.linear.validation[li] - R.fit.linear.train[li]) > 1) problems.push("the line's curves have not met by 250 rows");
 if (R.reg.ridgeUselessMaxAbs >= 0.25) problems.push(`ridge's useless weights reach ${R.reg.ridgeUselessMaxAbs}, not under a quarter`);
+// The draw shown for "every model is worth fifty percent" must look like it.
+if (Math.abs(R.split.shown.mean - 0.5) > 0.03) problems.push(`the split draw shown averages ${R.split.shown.mean}, not about 50%`);
+// "the usual trade": the reweighted model at 0.5 flags far more, so precision falls.
+if (!(R.fraud.weighted.at.flagged > 10 * T(0.5).flagged && R.fraud.weighted.at.precision < T(0.5).precision / 5)) problems.push(`reweighting's precision at 0.5: ${JSON.stringify(R.fraud.weighted.at)}`);
 // "That won't win back the ranking, so try just lowering the plain model's
 // threshold first": the plain model must rank better than the reweighted one.
 if (!(R.fraud.prAuc > R.fraud.weighted.prAuc)) problems.push(`the reweighted model's PR-AUC ${R.fraud.weighted.prAuc} is not below the plain ${R.fraud.prAuc}`);

@@ -183,8 +183,14 @@ export const BridgeScene: React.FC = () => {
         </Note>
 
         {/* ── Summed through it: unweighted, then weighted ── */}
-        <Caption at={joinAt} x={X0} y={listTop - h(38)} out={lowOut}>
+        {/* Each listing carries its own caption, matching the label of the
+            total it gives: the red "Joined and summed", then the green
+            "Weighted first". */}
+        <Caption at={joinAt} x={X0} y={listTop - h(38)} out={multAt + 2}>
           Joined and summed
+        </Caption>
+        <Caption at={multAt + 10} x={X0} y={listTop - h(38)} out={lowOut}>
+          Weighted first, then summed
         </Caption>
         <Listing lines={fan} x={X0} top={listTop} size={19} at={joinAt} out={multAt + 2} marks={[{ line: "SUM(f.amount)", text: "SUM(f.amount)", at: onceAt }]} />
         <Listing

@@ -33,10 +33,11 @@ const SYNTAX = 2;
 const PRONOUN = 5;
 
 /**
- * Question 5. One 512-wide vector split into eight 64-wide heads, each with
- * its own query, key and value; eight small attention grids filling at once
- * (the patterns are illustrative); two named for what a head can track; the
- * eight outputs joined back into 512. Then the cost: 8 × 64 = 512
+ * Question 5. One 512-wide vector, whole, reaching all eight heads, each
+ * projecting it into its own 64-wide query, key and value (a head reads the
+ * whole vector, not a slice of it); eight small attention grids filling at
+ * once (the patterns are illustrative); two named for what a head can track;
+ * the eight outputs joined back into 512. Then the cost: 8 × 64 = 512
  * multiply-adds per pair, as for one head (green).
  */
 export const HeadsScene: React.FC = () => {
@@ -62,7 +63,7 @@ export const HeadsScene: React.FC = () => {
   const H = HEADS;
   const inTop = y(300);
   const BAR_H = h(24);
-  const split = ease(frame, giveAt + 4, 18);
+  const fan = ease(frame, giveAt + 4, 18);
   const vecBase = y(450);
   const gridTop = y(512);
   const GRID = 112;
@@ -86,19 +87,27 @@ export const HeadsScene: React.FC = () => {
           What is multi-head attention, and why use it?
         </QuestionCard>
 
-        {/* The input vector, 512 wide, split into eight heads of 64. */}
+        {/* The input vector, 512 wide and whole, reaching every head. */}
         <Line at={qAt + 10} x={X0} y={inTop - 2} size={22} color={INK_SOFT}>
           <Num>{H.width}</Num> wide
         </Line>
         <Svg>
+          {ease(frame, qAt + 10, 16) > 0 ? (
+            <rect x={headX(0) + 7} y={inTop} width={(H.heads * HEAD_W - 14) * ease(frame, qAt + 10, 16)} height={BAR_H} rx={4} fill={BAR} />
+          ) : null}
+          {/* One line from the whole vector to each head's projections. */}
           {Array.from({ length: H.heads }, (_, i) => {
-            const s = seg(i, 14 * split);
-            const p = ease(frame, qAt + 10 + i, 12);
-            return p > 0 ? <rect key={i} x={s.x} y={inTop} width={s.w * p} height={BAR_H} rx={4} fill={BAR} /> : null;
+            const p = ease(frame, giveAt + 4 + i, 14) * fan;
+            if (p <= 0) return null;
+            const x1 = headX(H.heads / 2);
+            const y1 = inTop + BAR_H + 6;
+            const x2 = headX(i) + HEAD_W / 2;
+            const y2 = vecBase - h(40) - 12;
+            return <line key={i} x1={x1} y1={y1} x2={lerp(x1, x2, p)} y2={lerp(y1, y2, p)} stroke={BAR} strokeWidth={1.6} opacity={0.75} />;
           })}
         </Svg>
-        <Line at={giveAt + 14} x={headX(0) + HEAD_W / 2} y={inTop + BAR_H + 6} size={21} color={INK_SOFT} align="center" width={120}>
-          <Num>{H.headWidth}</Num>
+        <Line at={smallerAt + 8} x={X0} y={vecBase - h(34)} size={22} color={INK_SOFT}>
+          <Num>{H.headWidth}</Num> each
         </Line>
 
         {/* Each head: its own query, key and value, and its own attention. */}
@@ -143,14 +152,18 @@ export const HeadsScene: React.FC = () => {
           </Line>
         ))}
 
-        {/* The eight outputs, joined back into one vector of 512. */}
+        {/* The eight outputs, joined back into one vector of 512: one bar once joined. */}
         <Svg>
-          {Array.from({ length: H.heads }, (_, i) => {
-            const p = ease(frame, concatAt + i, 10);
-            if (p <= 0) return null;
-            const s = seg(i, lerp(26, 0, join));
-            return <rect key={i} x={s.x} y={outTop} width={s.w} height={BAR_H} rx={join > 0.95 && i > 0 && i < H.heads - 1 ? 0 : 4} fill={ds("purple", 500)} opacity={p} />;
-          })}
+          {join >= 1 ? (
+            <rect x={seg(0, 0).x} y={outTop} width={H.heads * HEAD_W} height={BAR_H} rx={4} fill={ds("purple", 500)} />
+          ) : (
+            Array.from({ length: H.heads }, (_, i) => {
+              const p = ease(frame, concatAt + i, 10);
+              if (p <= 0) return null;
+              const s = seg(i, lerp(26, 0, join));
+              return <rect key={i} x={s.x} y={outTop} width={s.w + (join > 0.9 ? 1 : 0)} height={BAR_H} rx={4} fill={ds("purple", 500)} opacity={p} />;
+            })
+          )}
         </Svg>
         <Svg>
           <rect x={headX(0)} y={outTop + BAR_H + 10} width={H.heads * HEAD_W * ease(frame, wholeAt, 24)} height={5} rx={2.5} fill={GOLD} />

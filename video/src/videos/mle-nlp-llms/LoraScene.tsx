@@ -125,10 +125,11 @@ export const LoraScene: React.FC = () => {
         <Line at={seventeenAt} x={W.x} y={top + side + h(54)} size={26} weight={600}>
           <Num>{commas(L.full)}</Num>
         </Line>
-        <Line at={rankAt} x={bx} y={top + side + h(20)} size={22} color={INK_SOFT}>
+        {/* These name the thin pair, so they go with it when it merges. */}
+        <Line at={rankAt} out={mergeAt + 16} x={bx} y={top + side + h(20)} size={22} color={INK_SOFT}>
           rank <Num>{L.rank}</Num>
         </Line>
-        <Line at={sixtyAt} x={bx} y={top + side + h(54)} size={26} weight={600} color={BLUE_INK}>
+        <Line at={sixtyAt} out={mergeAt + 16} x={bx} y={top + side + h(54)} size={26} weight={600} color={BLUE_INK}>
           <Num>{commas(L.adapter)}</Num>
         </Line>
         <Line at={halfAt} x={W.x} y={top + side + h(100)} size={28} weight={600} color={OK_INK}>
@@ -138,6 +139,10 @@ export const LoraScene: React.FC = () => {
         </Line>
         <Line at={mergeAt + 24} x={W.x} y={top + side + h(150)} size={22} color={INK}>
           Merged: <span style={{ color: OK_INK, opacity: ease(frame, latencyAt, 10) }}>no added latency</span>
+        </Line>
+        {/* The family the question asks about: LoRA is one member (the page's "similar ideas"). */}
+        <Line at={productAt + 24} x={W.x} y={top + side + h(204)} size={21} color={INK_SOFT}>
+          Other parameter-efficient methods: adapters, prefix tuning
         </Line>
 
         {/* What you train, and what you ship. */}

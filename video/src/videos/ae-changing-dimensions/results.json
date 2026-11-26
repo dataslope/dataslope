@@ -803,7 +803,7 @@
       "version": "PostgreSQL 18.6 (PGlite 0.5.16)"
     },
     "late": {
-      "setup": "CREATE TABLE dim_customer (customer_sk INTEGER, customer_id INTEGER, customer_name VARCHAR, region VARCHAR);\nINSERT INTO dim_customer VALUES\n  (-1,   NULL, 'Unknown',   'Unknown'),\n  (1002, 42,   'Acme Corp', 'West'),\n  (1003, 99,   'Globex',    'North');\nCREATE TABLE staged_orders (order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2));\nINSERT INTO staged_orders VALUES\n  (201, 42, 200.00), (202, 99, 500.00), (203, 77, 410.00);",
+      "setup": "CREATE TABLE dim_customer (customer_sk INTEGER, customer_id INTEGER, customer_name VARCHAR, region VARCHAR, is_current BOOLEAN);\nINSERT INTO dim_customer VALUES\n  (-1,   NULL, 'Unknown',   'Unknown', TRUE),\n  (1001, 42,   'Acme Corp', 'East',    FALSE),\n  (1002, 42,   'Acme Corp', 'West',    TRUE),\n  (1003, 99,   'Globex',    'North',   TRUE);\nCREATE TABLE staged_orders (order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2));\nINSERT INTO staged_orders VALUES\n  (201, 42, 200.00), (202, 99, 500.00), (203, 77, 410.00);",
       "steps": {
         "staged": {
           "sql": "SELECT order_id, customer_id, amount FROM staged_orders ORDER BY order_id;",
@@ -832,7 +832,7 @@
           ]
         },
         "dim": {
-          "sql": "SELECT customer_sk, customer_id, region FROM dim_customer ORDER BY customer_sk;",
+          "sql": "SELECT customer_sk, customer_id, region FROM dim_customer WHERE is_current ORDER BY customer_sk;",
           "ok": true,
           "columns": [
             "customer_sk",
@@ -857,8 +857,20 @@
             ]
           ]
         },
+        "versions42": {
+          "sql": "SELECT COUNT(*) AS versions FROM dim_customer WHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "versions"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        },
         "load": {
-          "sql": "SELECT o.order_id, d.customer_sk, o.amount\nFROM staged_orders o\nJOIN dim_customer d\n  ON d.customer_id = o.customer_id\nORDER BY o.order_id;",
+          "sql": "SELECT o.order_id, d.customer_sk, o.amount\nFROM staged_orders o\nJOIN dim_customer d\n  ON d.customer_id = o.customer_id\n AND d.is_current\nORDER BY o.order_id;",
           "ok": true,
           "columns": [
             "order_id",
@@ -879,7 +891,7 @@
           ]
         },
         "loadSum": {
-          "sql": "SELECT SUM(o.amount) AS loaded,\n  (SELECT SUM(amount) FROM staged_orders) AS staged\nFROM staged_orders o\nJOIN dim_customer d ON d.customer_id = o.customer_id;",
+          "sql": "SELECT SUM(o.amount) AS loaded,\n  (SELECT SUM(amount) FROM staged_orders) AS staged\nFROM staged_orders o\nJOIN dim_customer d ON d.customer_id = o.customer_id AND d.is_current;",
           "ok": true,
           "columns": [
             "loaded",
@@ -893,7 +905,7 @@
           ]
         },
         "loadUnknown": {
-          "sql": "CREATE TABLE fact_orders AS\nSELECT o.order_id, o.customer_id,\n       COALESCE(d.customer_sk, -1) AS customer_sk,\n       o.amount\nFROM staged_orders o\nLEFT JOIN dim_customer d\n  ON d.customer_id = o.customer_id;",
+          "sql": "CREATE TABLE fact_orders AS\nSELECT o.order_id, o.customer_id,\n       COALESCE(d.customer_sk, -1) AS customer_sk,\n       o.amount\nFROM staged_orders o\nLEFT JOIN dim_customer d\n  ON d.customer_id = o.customer_id\n AND d.is_current;",
           "ok": true,
           "columns": [
             "rows affected"
@@ -969,7 +981,7 @@
           ]
         },
         "arrive": {
-          "sql": "INSERT INTO dim_customer VALUES (1025, 77, 'Bluth Co', 'South');",
+          "sql": "INSERT INTO dim_customer VALUES (1025, 77, 'Bluth Co', 'South', TRUE);",
           "ok": true,
           "columns": [
             "rows affected"
@@ -981,7 +993,7 @@
           ]
         },
         "dimAfter": {
-          "sql": "SELECT customer_sk, customer_id, region FROM dim_customer ORDER BY customer_sk;",
+          "sql": "SELECT customer_sk, customer_id, region FROM dim_customer WHERE is_current ORDER BY customer_sk;",
           "ok": true,
           "columns": [
             "customer_sk",
@@ -1012,7 +1024,7 @@
           ]
         },
         "correct": {
-          "sql": "UPDATE fact_orders f\nSET customer_sk = d.customer_sk\nFROM dim_customer d\nWHERE f.customer_sk = -1\n  AND d.customer_id = f.customer_id;",
+          "sql": "UPDATE fact_orders f\nSET customer_sk = d.customer_sk\nFROM dim_customer d\nWHERE f.customer_sk = -1\n  AND d.customer_id = f.customer_id\n  AND d.is_current;",
           "ok": true,
           "columns": [
             "rows affected"

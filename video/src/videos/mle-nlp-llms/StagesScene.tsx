@@ -41,8 +41,8 @@ export const StagesScene: React.FC = () => {
   const STAGES = [
     { title: "Pretraining", w: 700, at: preAt, until: ftAt, fill: ds("blue", 300), lines: [{ t: "Huge, unlabeled text", at: preAt + 10 }, { t: "Expensive, once per model", at: onceAt }] },
     { title: "Fine-tuning", w: 250, at: ftAt, until: itAt, fill: ds("blue", 200), lines: [{ t: "Small, labeled set", at: smallAt }, { t: "One task, cheap", at: smallAt + 10 }] },
-    { title: "Instruction tuning", w: 250, at: itAt, until: rlhfAt, fill: ds("teal", 200), lines: [{ t: "Follow", at: followAt }, { t: "instructions", at: followAt + 4 }] },
-    { title: "RLHF", w: 250, at: rlhfAt, until: evenAt, fill: ds("purple", 200), lines: [{ t: "Match human", at: prefAt }, { t: "preferences", at: prefAt + 4 }] },
+    { title: "Instruction tuning", w: 250, at: itAt, until: rlhfAt, fill: ds("teal", 200), lines: [{ t: "Follow instructions", at: followAt }] },
+    { title: "RLHF", w: 250, at: rlhfAt, until: evenAt, fill: ds("purple", 200), lines: [{ t: "Match human preferences", at: prefAt }] },
   ];
   let x = X0;
   const placed = STAGES.map((s) => {
@@ -65,7 +65,7 @@ export const StagesScene: React.FC = () => {
         </QuestionCard>
 
         <Line at={preAt} x={X0} y={y(330)} size={21} color={INK_SOFT}>
-          Each block&apos;s width: what the stage costs
+          Each block&apos;s width: what the stage costs, not to scale
         </Line>
 
         <Svg>
@@ -78,7 +78,7 @@ export const StagesScene: React.FC = () => {
             return (
               <React.Fragment key={s.title}>
                 <rect x={s.x} y={top} width={s.w * p * narrow} height={BH} rx={5} fill={s.fill} />
-                <rect x={s.x} y={top + BH + 10} width={s.w * p} height={5} rx={2.5} fill={GOLD} opacity={lit} />
+                <rect x={s.x} y={top + BH + 10} width={s.w * p * narrow} height={5} rx={2.5} fill={GOLD} opacity={lit} />
               </React.Fragment>
             );
           })}

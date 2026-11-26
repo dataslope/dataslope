@@ -134,8 +134,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     each now with its lever: "credits per second while running",
  *     "bytes scanned, or reserved slots", "provisioned nodes, or Serverless
  *     capacity" (the page's "serverless RPUs", without the undefined
- *     initialism). compute-model: a model badge; one hour as sixty minute ticks,
- *     two of them busy (blue); billed by time and left running, all sixty
+ *     initialism). compute-size: under Snowflake's line, "Each size up
+ *     doubles the rate: the same bill only at twice the speed".
+ *     compute-vendors: BigQuery's and Redshift's lines.
+ *     compute-model: a model badge; one hour as sixty minute ticks,
+ *     two of them busy (ink: compute time, not data); billed by time and
+ *     left running, all sixty
  *     lit (red); compute-suspend: suspended when idle, the two (green)
  *     and a lighter tick after each for the wait before it suspends;
  *     compute-bytes: billed by bytes on demand, the idle ticks grey and the
@@ -225,7 +229,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     reduce the bytes read, since on-demand billing counts the columns
  *     scanned (BigQuery's cost-control guidance); "hurt-month", the usual
  *     target of about 128 MB to 1 GB a file, de-warehousing's small.target,
- *     against 780 kB month files.
+ *     against 780 kB month files; "compute-size", each Snowflake warehouse
+ *     size up doubles the credits it bills per hour (Snowflake's
+ *     "Overview of warehouses": X-Small 1, Small 2, Medium 4, Large 8, and
+ *     so on), so with cost as rate times time, a bigger warehouse costs no
+ *     more only if it finishes at least twice as fast. Said as a word
+ *     ("doubles"), and no vendor number is drawn.
  *   - Reasoning, not a run: "a model built as a table from select star reads
  *     every column of its source on every build" (a table materialization
  *     rebuilds with CREATE TABLE AS SELECT, and SELECT * names every column;
@@ -482,7 +491,17 @@ export const script: NarrationScript = {
     },
     {
       id: "compute-def",
-      text: "It's the compute that runs the queries, sized apart from the storage. Snowflake bills credits per second while a warehouse runs. BigQuery bills the bytes scanned, on demand, or reserved slots. Redshift bills its provisioned nodes.",
+      text: "It's the compute that runs the queries, sized apart from the storage. Snowflake bills credits per second while a warehouse runs.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "compute-size",
+      text: "Each size up doubles that rate, so a bigger warehouse costs no more only if it finishes twice as fast.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "compute-vendors",
+      text: "BigQuery bills the bytes scanned, on demand, or reserved slots. Redshift bills its provisioned nodes.",
       pauseAfter: 0.7,
     },
     {

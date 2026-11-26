@@ -7,7 +7,7 @@ import { INK, INK_SOFT, note, TABULAR } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SVM } from "./data";
-import { ACCENT_INK, at, type Box, CLASS, DATA, DATA_FILL, Dots, Drift, Fade, int, Line, Mark, OK_INK, PanelTitle, POINT, Q_SIZE, Regions, scales, Svg, X0 } from "./parts";
+import { ACCENT_INK, at, type Box, CLASS, Contours, DATA, DATA_FILL, Dots, Drift, Fade, int, Line, Mark, OK_INK, PanelTitle, POINT, Q_SIZE, Regions, scales, Svg, X0 } from "./parts";
 
 const SIDE = 440;
 
@@ -56,6 +56,7 @@ export const SvmScene: React.FC = () => {
   const qAt = n.word("svm", "Question eight");
   const textAt = n.word("svm", "How does a support vector machine");
   const widestAt = n.word("svm", "the boundary with the widest margin");
+  const marginAt = n.word("svm", "widest margin");
   const onAt = n.word("svm", "The points on or inside the margin");
   const svAt = n.word("svm", "are the support vectors");
   const aloneAt = n.word("svm", "they alone fix it");
@@ -76,8 +77,9 @@ export const SvmScene: React.FC = () => {
 
   const top = y(400);
   const panels = [
-    { key: "rbf", left: X0 + 40, grid: SVM.gridRbf, title: "Radial basis function kernel", at: from + 8, score: SVM.rbf, scoreAt: rbfAt, ink: OK_INK },
-    { key: "lin", left: X0 + 40 + SIDE + 110, grid: SVM.gridLinear, title: "Straight boundary", at: straightAt - 4, score: SVM.linear, scoreAt: straightAt + 10, ink: ACCENT_INK },
+    // The first panel is named for its kernel only once the kernel is.
+    { key: "rbf", left: X0 + 40, grid: SVM.gridRbf, f: SVM.decisionRbf, title: "Radial basis function kernel", at: from + 8, titleAt: kernelAt - 2, score: SVM.rbf, scoreAt: rbfAt, ink: OK_INK },
+    { key: "lin", left: X0 + 40 + SIDE + 110, grid: SVM.gridLinear, f: SVM.decisionLinear, title: "Straight boundary", at: straightAt - 4, titleAt: straightAt - 4, score: SVM.linear, scoreAt: straightAt + 10, ink: ACCENT_INK },
   ];
   const sv = new Set(SVM.support);
   const R = 1290;
@@ -126,10 +128,25 @@ export const SvmScene: React.FC = () => {
             const dots = SVM.x.map((v, i) => ({ x: at(sx, v), y: at(sy, SVM.y[i]), at: p.at + 4 + (i / SVM.x.length) * 16, color: CLASS[SVM.label[i]] }));
             return (
               <React.Fragment key={p.key}>
-                <PanelTitle x={box.left} y={box.top - h(46)} at={p.at}>
+                <PanelTitle x={box.left} y={box.top - h(46)} at={p.titleAt}>
                   {p.title}
                 </PanelTitle>
-                <Regions grid={p.grid} box={box} at={p.key === "rbf" ? widestAt : p.at + 4} dur={20} edge={INK} />
+                <Regions grid={p.grid} box={box} at={p.key === "rbf" ? widestAt : p.at + 4} dur={20} />
+                {/* The boundary is the decision function's zero contour, drawn
+                    smooth; the margin its contours at −1 and +1, dashed. */}
+                <Contours
+                  f={p.f}
+                  box={box}
+                  lines={
+                    p.key === "rbf"
+                      ? [
+                          { level: 0, color: INK, width: 2.6, at: widestAt },
+                          { level: -1, color: INK, width: 2, dash: "7 7", at: marginAt + 6 },
+                          { level: 1, color: INK, width: 2, dash: "7 7", at: marginAt + 6 },
+                        ]
+                      : [{ level: 0, color: INK, width: 2.6, at: p.at + 4 }]
+                  }
+                />
                 <Dots dots={dots} r={4} opacity={0.85} />
                 {p.key === "rbf" ? (
                   <Svg opacity={ease(frame, svAt - 2, 12)}>
@@ -148,7 +165,7 @@ export const SvmScene: React.FC = () => {
             <Mark at={svAt}>Support vectors</Mark>
           </Line>
           <Line at={onAt} x={M} y={top + h(92)} size={26} color={INK_SOFT} out={straightAt - 8}>
-            On or inside the margin
+            On or inside the margin, dashed
           </Line>
           <Line at={aloneAt - 2} x={M} y={top + h(140)} size={26} out={straightAt - 8}>
             They alone fix the boundary
@@ -167,7 +184,7 @@ export const SvmScene: React.FC = () => {
         {/* ── The follow-up: cost ── */}
         <Fade at={costFrom - 4}>
           <Line at={overlapAt} x={X0} y={y(330)} size={26}>
-            Support vectors, fitted on the rings
+            Support vectors, as a share of the rows
           </Line>
           {svs.map((s, i) => (
             <ShareBar

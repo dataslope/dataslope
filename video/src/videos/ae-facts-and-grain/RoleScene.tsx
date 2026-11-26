@@ -186,7 +186,8 @@ export const RoleScene: React.FC = () => {
           size={26}
         />
         <Verdict at={mostAt} x={X0} y={rg.rowTop(1) + h(112)} label="At most" value={`${most} days`} size={26} />
-        <Note at={togetherAt} x={X0} y={rg.rowTop(1) + h(16)} out={tookAt - 2}>
+        {/* Stays as the heading of the two numbers it introduces. */}
+        <Note at={togetherAt} x={X0} y={rg.rowTop(1) + h(16)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Together, they answer <span style={{ color: OK_INK, opacity: ease(frame, noSingleAt, 10) }}>across roles</span>
           </span>

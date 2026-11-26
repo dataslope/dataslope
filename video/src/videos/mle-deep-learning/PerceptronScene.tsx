@@ -299,7 +299,8 @@ export const PerceptronScene: React.FC = () => {
           One line again: <Num>3</Num> of 4
         </Line>
 
-        {/* Each point's output: 0, 1, 1, 0 with the ReLU, 2, 1, 1, 0 without. */}
+        {/* Each point's output: 0, 1, 1, 0 with the ReLU, 2, 1, 1, 0 without,
+            swapped the moment the ReLU comes out of the boxes. */}
         {pts.map((p, i) => {
           const dx = p.x < px(0.5) ? -34 : 34;
           const place: React.CSSProperties = {
@@ -314,12 +315,12 @@ export const PerceptronScene: React.FC = () => {
           const on = (a: number, o?: number) => ease(frame, a, 8) * (o === undefined ? 1 : 1 - ease(frame, o, 8));
           return (
             <React.Fragment key={i}>
-              <div style={{ ...place, opacity: on(outsAt + i * 7, collapseAt) }}>{XOR.withRelu[i]}</div>
+              <div style={{ ...place, opacity: on(outsAt + i * 7, reluOutAt + 4) }}>{XOR.withRelu[i]}</div>
               <div
                 style={{
                   ...place,
                   color: XOR.withoutRelu[i] === XOR.labels[i] ? INK : ACCENT_INK,
-                  opacity: on(collapseAt + 6 + i * 2, withOneAt),
+                  opacity: on(reluOutAt + 10 + i * 2, withOneAt),
                 }}
               >
                 {XOR.withoutRelu[i]}

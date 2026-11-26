@@ -468,7 +468,7 @@ export const script: NarrationScript = {
     {
       id: "r-contract",
       text: "Question thirteen. What is a data contract in dbt? An enforced declaration of a model's column names, types and constraints. If the SQL produces a different shape, the build fails, before any consumer sees it.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
     {
       id: "r-severity",

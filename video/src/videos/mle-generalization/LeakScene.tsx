@@ -163,8 +163,8 @@ export const LeakScene: React.FC = () => {
         {[
           { text: "Fit every transform inside the training split, as one pipeline", at: fitAt, color: OK_INK, top: y(430), rule: true },
           { text: "Audit features for proxies of the label, such as", at: auditAt, color: INK, top: y(540), rule: true },
-          { text: "A refund flag, in a fraud model", at: refundAt, color: ACCENT_INK, top: y(540) + h(56), rule: false },
-          { text: "A total computed with data from after the prediction", at: totalAt, color: ACCENT_INK, top: y(540) + h(104), rule: false },
+          { text: "a refund flag, in a fraud model", at: refundAt, color: ACCENT_INK, top: y(540) + h(56), rule: false },
+          { text: "a total computed with data from after the prediction", at: totalAt, color: ACCENT_INK, top: y(540) + h(104), rule: false },
         ].map((f) => (
           <React.Fragment key={f.text}>
             {f.rule ? (

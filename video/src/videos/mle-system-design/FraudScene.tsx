@@ -117,23 +117,42 @@ export const FraudScene: React.FC = () => {
         <Line at={featuresAt} x={X0} y={y(318)} size={24}>
           Features
         </Line>
-        <Ink at={amountAt} dur={10} style={{ left: X0, top: chipY, whiteSpace: "nowrap", display: "flex", gap: 14, fontSize: 22 }}>
-          {chips.map((c) => (
-            <span key={c.t} style={{ opacity: ease(frame, c.at, 10), transform: `translateY(${(1 - ease(frame, c.at, 10)) * 8}px)`, display: "inline-block" }}>
-              {c.lit ? (
-                <Mark at={hourAt}>
+        <Ink at={amountAt} dur={10} style={{ left: X0, top: chipY, whiteSpace: "nowrap", fontSize: 22 }}>
+          <div style={{ position: "relative", display: "flex", gap: 14, fontSize: 22 }}>
+            {chips.map((c) => (
+              <span key={c.t} style={{ opacity: ease(frame, c.at, 10), transform: `translateY(${(1 - ease(frame, c.at, 10)) * 8}px)`, display: "inline-block" }}>
+                {c.lit ? (
+                  <Mark at={hourAt}>
+                    <Tag size={22}>{c.t}</Tag>
+                  </Mark>
+                ) : (
                   <Tag size={22}>{c.t}</Tag>
-                </Mark>
-              ) : (
-                <Tag size={22}>{c.t}</Tag>
-              )}
-            </span>
-          ))}
+                )}
+              </span>
+            ))}
+            {/* A bracket under the whole row, so the arrow into the model
+                leaves from every feature rather than from the chip above it. */}
+            <div
+              style={{
+                position: "absolute",
+                left: 2,
+                right: 2,
+                top: 56 - 12,
+                height: 12,
+                boxSizing: "border-box",
+                borderLeft: `2px solid ${BAR}`,
+                borderRight: `2px solid ${BAR}`,
+                borderBottom: `2px solid ${BAR}`,
+                borderRadius: "0 0 4px 4px",
+                opacity: ease(frame, boostAt - 4, 10),
+              }}
+            />
+          </div>
         </Ink>
         <Spot id="card" at={velocityAt + 4} x={1260} y={y(318)} w={170} />
 
         {/* ── Serving: at authorization, in under 100 ms ── */}
-        <Flow points={[[MODEL.x + MODEL.w / 2, chipY + 50], [MODEL.x + MODEL.w / 2, mid - 45]]} at={boostAt} color={BAR} />
+        <Flow points={[[MODEL.x + MODEL.w / 2, chipY + 56], [MODEL.x + MODEL.w / 2, mid - 45]]} at={boostAt} color={BAR} />
         <Node x={MODEL.x} y={mid - 42} w={MODEL.w} h={84} at={boostAt} title="Model" sub="at authorization" lit={onlineAt} litOut={storeAt} />
         <Ink at={boostAt + 6} dur={12} style={{ left: MODEL.x, top: mid + 42 + h(22), whiteSpace: "nowrap" }}>
           <Tag size={21}>gradient boosting</Tag>

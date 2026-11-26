@@ -265,7 +265,8 @@ const flat = (text) => text.replace(/\s+/g, " ");
 const V2_SECTION = flat(section("dbt", "What is dbt v2, and how does it relate to dbt Core?"));
 const v2Quoted = [
   'dbt v2 is a rewrite of the engine in Rust, first shipped as the "Fusion engine" and generally available since September 2026.',
-  "The main distribution is now called just **dbt**",
+  "The main distribution is now called just **dbt** and ships under dbt's own product license.",
+  "**dbt OSS** is the subset built entirely from Apache 2.0 code.",
   "**dbt Core** names only the Python 1.x line, which is still supported and ends at 1.13.",
   "so a misspelled column is caught at compile time rather than by the warehouse.",
   "Every deprecation warning a 1.x project prints has to be resolved before it will run, which in practice means `data_tests:`",
@@ -278,6 +279,9 @@ const dbtV2 = {
   generallyAvailable: V2_SECTION.match(/generally available since (\w+ \d{4})/)[1],
   coreLine: V2_SECTION.match(/names only the Python ([\d.x]+) line/)[1],
   coreEndsAt: V2_SECTION.match(/still supported and ends at ([\d.]+)\./)[1],
+  /** The licence of dbt OSS, the subset of the new distribution the page
+   *  sets against dbt's own product license: "Apache 2.0". */
+  ossLicense: V2_SECTION.match(/\*\*dbt OSS\*\* is the subset built entirely from (Apache [\d.]+) code/)[1],
   /** The page's first example of a 1.x deprecation v2 refuses: `tests:`
    *  (its generic-tests block, before the review) now `data_tests:`. */
   testsKey: V2_SECTION.match(/means `(data_tests):`/)[1],

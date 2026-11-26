@@ -16,7 +16,8 @@ const COL_X = [120, 700, 1280] as const;
 const COL_W = 440;
 const C = ACTIVATIONS.curves;
 /** Leaky ReLU drawn with a slope of 0.1 below zero, ten times the usual
- *  0.01, which at this scale would sit on ReLU's own line; labelled so. */
+ *  0.01 (check.mjs's curves.leaky), which at this scale would sit on ReLU's
+ *  own line. The label names no slope: the drawn one is a schematic. */
 const LEAKY_SLOPE = 0.1;
 const LEAKY = C.z.map((z) => (z < 0 ? LEAKY_SLOPE * z : z));
 const TEAL = ds("teal", 500);
@@ -308,7 +309,7 @@ export const ActScene: React.FC = () => {
           </Tag>
         </div>
         <Line at={leakyAt + 4} x={COL_X[2]} y={y(812)} size={24} color={ds("teal", 700)}>
-          Leaky: slope <span style={TABULAR}>{LEAKY_SLOPE}</span> below 0
+          Leaky: a small slope below 0
         </Line>
         <Line at={smoothAt + 4} x={COL_X[2]} y={y(852)} size={24} color={inkOf.purple}>
           GELU

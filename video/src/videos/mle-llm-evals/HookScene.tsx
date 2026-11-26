@@ -38,6 +38,10 @@ const BIRD = { left: 1450, top: 300, w: 320, h: 479 };
 /** The two panels of hook-hard: their left edges and the rule between. */
 const PANEL_A = X0;
 const PANEL_B = 720;
+/** The assistant's answers: the first row's offset under the panel title,
+ *  and the step between rows. */
+const ANSWER_TOP = 126;
+const ANSWER_DY = 46;
 
 /**
  * The opening. The page's design prompt as the headline, and the assistant
@@ -46,7 +50,7 @@ const PANEL_B = 720;
  * Fast and cheap get their ticks (what serving it bought); "any good" gets
  * the yellow question mark. Then why that is hard to measure, as two panels
  * side by side: a classifier's one right label against the assistant's many
- * answers, two good and one wrong. The six questions close it.
+ * answers, two good and three wrong. The six questions close it.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -89,6 +93,8 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-tap" at={labelAt + 6} level={-31} />
       <Sfx name="el-tap" at={thisAt + 10} level={-32} />
       <Sfx name="el-scratch" at={badAt + 4} level={-34} />
+      <Sfx name="el-tap" at={badAt + 12} level={-34} />
+      <Sfx name="el-tap" at={badAt + 20} level={-34} />
       <Sfx name="el-chime" at={sixAt + 10} level={-33} />
 
       <Drift from={0} to={end + 40}>
@@ -153,19 +159,22 @@ export const HookScene: React.FC = () => {
           One right label per example
         </Line>
 
-        <ColumnRule x={(PANEL_A + 470 + PANEL_B) / 2} top={y(330)} height={y(560) - y(330)} at={thisAt} />
+        <ColumnRule x={(PANEL_A + 470 + PANEL_B) / 2} top={y(330)} height={ANSWER_TOP + 4 * ANSWER_DY + 40} at={thisAt} />
         <Line x={PANEL_B} y={y(330)} at={thisAt} size={28} weight={600}>
           Assistant
         </Line>
         <Line x={PANEL_B} y={y(330) + 66} at={thisAt + 4} size={26} color={INK_SOFT}>
           Can I expense a monitor?
         </Line>
+        {/* Two good answers, and more bad ones than good. */}
         {[
           { text: "Yes, up to $300, with a receipt.", ok: true, at: thisAt + 12 },
           { text: "Yes: log it as equipment, $300 at most.", ok: true, at: thisAt + 20 },
           { text: "No, equipment isn't covered.", ok: false, at: badAt },
+          { text: "Yes, any monitor, no receipt needed.", ok: false, at: badAt + 8 },
+          { text: "Only if your manager buys it.", ok: false, at: badAt + 16 },
         ].map((a, i) => (
-          <Line key={a.text} x={PANEL_B} y={y(330) + 126 + i * 48} at={a.at} size={26} color={a.ok ? GOOD_INK : BAD_INK}>
+          <Line key={a.text} x={PANEL_B} y={y(330) + ANSWER_TOP + i * ANSWER_DY} at={a.at} size={26} color={a.ok ? GOOD_INK : BAD_INK}>
             <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
               {a.ok ? <Tick at={a.at + 4} size={24} /> : <Cross at={a.at + 4} size={24} />}
               {a.text}
@@ -173,16 +182,16 @@ export const HookScene: React.FC = () => {
           </Line>
         ))}
 
-        <Line x={PANEL_A} y={y(640)} at={designAt - 6} size={32}>
+        <Line x={PANEL_A} y={y(690)} at={designAt - 6} size={32}>
           Measuring it is <Mark at={designAt + 4}>a design problem</Mark> of its own
         </Line>
-        <div style={{ position: "absolute", left: PANEL_A, top: y(740), display: "flex", alignItems: "center", gap: 16, fontSize: 28 }}>
+        <div style={{ position: "absolute", left: PANEL_A, top: y(780), display: "flex", alignItems: "center", gap: 16, fontSize: 28 }}>
           <span style={{ ...note(28, INK), fontWeight: 500, opacity: ease(frame, sixAt - 2, 10) }}>
             Six questions
           </span>
           {[1, 2, 3, 4, 5, 6].map((k) => (
             <span key={k} style={{ opacity: ease(frame, sixAt + 4 + k * 3, 8) }}>
-              <Disc n={k} size={44} text={26} tone="green" />
+              <Disc n={k} size={44} text={26} />
             </span>
           ))}
         </div>

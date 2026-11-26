@@ -233,8 +233,13 @@ export const TopkScene: React.FC = () => {
             <div key={i} style={{ position: "absolute", left: cx - 26, top: cy - 26, width: 52, height: 52, borderRadius: 26, boxSizing: "border-box", border: `2px solid ${INK}`, background: "var(--ds-white)", opacity: Math.min(1, p), transform: `scale(${0.8 + 0.2 * Math.min(1, p)})` }} />
           );
         })}
-        <Line at={heapAt + 6} x={1606} y={y(690) - 15} size={22} color={INK}>
-          <M>k</M> slots
+        {/* Which heap: a min-heap, so the weakest of the k kept sits at the
+            root and is the one a better score replaces (review 2026-11-26). */}
+        <Line at={heapAt + 6} x={1606} y={y(690) - 36} size={22} color={INK}>
+          min-heap of <M>k</M>
+        </Line>
+        <Line at={heapAt + 12} x={1606} y={y(690) + 6} size={22} color={INK_SOFT}>
+          smallest on top
         </Line>
         <Line at={nlogkAt} x={R_X} y={y(846)} size={24}>
           <M>O(n log k)</M> time<span style={{ opacity: ease(frame, memAt, 10) }}>, <M>O(k)</M> memory</span>

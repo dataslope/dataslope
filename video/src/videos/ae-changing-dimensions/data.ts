@@ -141,8 +141,9 @@ export const TYPE3 = {
 
 export const LATE = {
   staged: table("late", "staged"),
-  /** The dimension the load looks keys up in: -1 (Unknown), 1002 (42),
-   *  1003 (99); and after customer 77 lands, 1025 (South) too. */
+  /** The dimension's current rows, which the load looks keys up in: -1
+   *  (Unknown), 1002 (42), 1003 (99); and after customer 77 lands, 1025
+   *  (South) too. 42's East version, 1001, is in the table but not current. */
   dim: table("late", "dim"),
   dimAfter: table("late", "dimAfter"),
   /** The inner-join load: 203 is dropped. */

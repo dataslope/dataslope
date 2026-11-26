@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { I, M, MathRun } from "../../editorial/math";
-import { BAR, BLUE_INK, fmt, HIGHLIGHT, INK, INK_SOFT, TABULAR } from "../../editorial/style";
+import { BAR, BLUE_INK, fmt, halo, HIGHLIGHT, INK, INK_SOFT, TABULAR } from "../../editorial/style";
 import { ColumnRule } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -116,10 +116,11 @@ export const PrScene: React.FC = () => {
 
         {/* ── The page's eight examples ── */}
         <Fade from={precAt - 8} out={matrixOut}>
-          <Say at={precAt - 6} x={CELL_X} y={mTop - h(84)} width={CELL_W} align="center">
+          {/* A centred Say centres on x: each header over its column's middle. */}
+          <Say at={precAt - 6} x={CELL_X + CELL_W / 2} y={mTop - h(84)} width={CELL_W} align="center">
             <span style={line(22, INK_SOFT)}>flagged</span>
           </Say>
-          <Say at={precAt - 6} x={CELL_X + CELL_W + 14} y={mTop - h(84)} width={CELL_W} align="center">
+          <Say at={precAt - 6} x={CELL_X + CELL_W + 14 + CELL_W / 2} y={mTop - h(84)} width={CELL_W} align="center">
             <span style={line(22, INK_SOFT)}>not flagged</span>
           </Say>
           {["actually positive", "actually negative"].map((t, r) => (
@@ -257,8 +258,17 @@ export const PrScene: React.FC = () => {
                 >
                   <span style={{ ...line(24, BLUE_INK), ...TABULAR }}>{pct(m.t.precision)}</span>
                 </Say>
-                <Say at={m.rAt} x={m.t.t > 0.3 ? mx - 12 : mx - 6} y={at(cy, m.t.recall) + 8} width={80} align="right">
-                  <span style={{ ...line(24, SERIES2_INK), ...TABULAR }}>{pct(m.t.recall)}</span>
+                {/* At 0.5 under its dot. At 0.1 the dot sits just above the 50%
+                    gridline, beside the axis's own "50%": the label goes level
+                    with the dot, haloed, so the gridline stops short of it. */}
+                <Say
+                  at={m.rAt}
+                  x={m.t.t > 0.3 ? mx - 12 : mx - 18}
+                  y={m.t.t > 0.3 ? at(cy, m.t.recall) + 8 : at(cy, m.t.recall) - 17}
+                  width={80}
+                  align="right"
+                >
+                  <span style={{ ...line(24, SERIES2_INK), ...TABULAR, ...(m.t.t > 0.3 ? {} : halo) }}>{pct(m.t.recall)}</span>
                 </Say>
               </React.Fragment>
             );

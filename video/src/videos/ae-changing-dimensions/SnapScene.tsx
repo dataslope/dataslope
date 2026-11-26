@@ -27,6 +27,13 @@ const SNAP = {
   ],
 };
 
+/** A flow box's lines, started at one height rather than centred on each
+ *  box's own line count, so the three titles share a line (review
+ *  2026-11-26). */
+const Top: React.FC<{ pad: number; children: React.ReactNode }> = ({ pad, children }) => (
+  <div style={{ alignSelf: "stretch", flex: 1, display: "flex", flexDirection: "column", gap: 8, paddingTop: pad }}>{children}</div>
+);
+
 /**
  * Question 4. The page's snap_customers beside the table it keeps: run 1
  * records East; run 2 compares the source with it, closes that version and
@@ -112,6 +119,7 @@ export const SnapScene: React.FC = () => {
     { x: 1250, w: 560 },
   ];
   const mid = flowTop + boxH / 2;
+  const topPad = h(26);
 
   return (
     <AbsoluteFill>
@@ -177,7 +185,9 @@ export const SnapScene: React.FC = () => {
           ]}
         />
         <Note at={comparesAt} x={TX} y={gs.rowTop(2) + h(16)} out={tsAt - 2}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Run 2: the source now says West</span>
+          {/* "Next run", not "Run 2": the gap figure below has its own run 2,
+              which sees North (review 2026-11-26). */}
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Next run: the source now says West</span>
         </Note>
         <Spot art="camera" at={runAt} out={p1Out} left={camera.left} top={gs.top - h(6)} width={camera.width} />
         {/* The two strategies, side by side. */}
@@ -196,7 +206,7 @@ export const SnapScene: React.FC = () => {
 
         {/* ── Phase 2: what it never sees ── */}
         <Note at={seesAt} x={states[0].x0} y={gapTop - h(70)}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Customer 42 in the source</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Customer 42 in the source, moving twice between runs</span>
         </Note>
         {states.map((s, i) =>
           i === 1 ? (
@@ -244,17 +254,21 @@ export const SnapScene: React.FC = () => {
 
         {/* ── Phase 3: the source, the snapshot, the model ── */}
         <Box x={B[0].x} y={flowTop} w={B[0].w} h={boxH} at={presentAt} align="left">
-          <span style={{ ...label(22, INK_SOFT) }}>Source: customers</span>
-          <span style={{ ...note(23, INK) }}>No row for 42 now</span>
+          <Top pad={topPad}>
+            <span style={{ ...label(22, INK_SOFT) }}>Source: customers</span>
+            <span style={{ ...note(23, INK) }}>No row for 42 now</span>
+          </Top>
         </Box>
         <Note at={presentAt + 6} x={B[0].x} y={flowTop + boxH + h(22)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Only the present</span>
         </Note>
         <Arrow points={[[B[0].x + B[0].w + 12, mid], [B[1].x - 12, mid]]} at={onlyAt - 4} />
         <Box x={B[1].x} y={flowTop} w={B[1].w} h={boxH} at={onlyAt} align="left">
-          <span style={{ ...label(22, INK_SOFT) }}>Snapshot: snap_customers</span>
-          <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · East · closed by North</span>
-          <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · North · closed at run 3</span>
+          <Top pad={topPad}>
+            <span style={{ ...label(22, INK_SOFT) }}>Snapshot: snap_customers</span>
+            <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · East · closed by North</span>
+            <span style={{ fontFamily: MONO, fontSize: 23 }}>42 · North · closed at run 3</span>
+          </Top>
         </Box>
         <Note at={onlyAt + 6} x={B[1].x} y={flowTop + boxH + h(22)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>The only copy of this history</span>
@@ -267,12 +281,14 @@ export const SnapScene: React.FC = () => {
         </Note>
         <Arrow points={[[B[1].x + B[1].w + 12, mid], [B[2].x - 12, mid]]} at={readsAt} />
         <Box x={B[2].x} y={flowTop} w={B[2].w} h={boxH} at={readsAt + 6} align="left">
-          <span style={{ ...label(22, INK_SOFT) }}>Model: dim_customer</span>
-          <span style={{ fontFamily: MONO, fontSize: 23, opacity: ease(frame, becomeAt, 10) }}>dbt_valid_from → valid_from</span>
-          <span style={{ fontFamily: MONO, fontSize: 23, opacity: ease(frame, becomeAt + 6, 10) }}>dbt_valid_to → valid_to</span>
-          {/* The current version's null, closed off as Question 2 argued,
-              so one BETWEEN still covers every version (review 2026-11-20). */}
-          <span style={{ fontFamily: MONO, fontSize: 23, opacity: ease(frame, becomeAt + 12, 10) }}>null → 9999-12-31</span>
+          <Top pad={topPad}>
+            <span style={{ ...label(22, INK_SOFT) }}>Model: dim_customer</span>
+            <span style={{ fontFamily: MONO, fontSize: 23, opacity: ease(frame, becomeAt, 10) }}>dbt_valid_from → valid_from</span>
+            <span style={{ fontFamily: MONO, fontSize: 23, opacity: ease(frame, becomeAt + 6, 10) }}>dbt_valid_to → valid_to</span>
+            {/* The current version's null, closed off as Question 2 argued,
+                so one BETWEEN still covers every version (review 2026-11-20). */}
+            <span style={{ fontFamily: MONO, fontSize: 23, opacity: ease(frame, becomeAt + 12, 10) }}>null → 9999-12-31</span>
+          </Top>
         </Box>
         <Note at={becomeAt + 10} x={B[2].x} y={flowTop + boxH + h(22)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Each version&rsquo;s window</span>

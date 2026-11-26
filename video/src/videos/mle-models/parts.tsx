@@ -547,6 +547,131 @@ export const Regions: React.FC<{
   );
 };
 
+// ── Smooth contours of a function sampled on a grid ─────────────────────────
+
+/** A contour's polylines in grid units (column, row; row 0 the bottom row),
+ *  by marching squares with linear interpolation along each cell edge, the
+ *  segments chained through the edges they share, so a dashed line keeps its
+ *  rhythm. A saddle cell is resolved by its centre's value. Cached per grid
+ *  and level: the scenes ask for the same contour on every frame. */
+const contourCache = new WeakMap<readonly (readonly number[])[], Map<number, [number, number][][]>>();
+export const contour = (f: readonly (readonly number[])[], level: number): [number, number][][] => {
+  let byLevel = contourCache.get(f);
+  if (!byLevel) {
+    byLevel = new Map();
+    contourCache.set(f, byLevel);
+  }
+  const hit = byLevel.get(level);
+  if (hit) return hit;
+  const ny = f.length;
+  const nx = f[0].length;
+  const v = (r: number, c: number) => f[r][c] - level;
+  // An edge: "h r c" joins (r, c)-(r, c+1); "v r c" joins (r, c)-(r+1, c).
+  const point = (id: string): [number, number] => {
+    const [k, rs, cs] = id.split(" ");
+    const r = Number(rs);
+    const c = Number(cs);
+    const a = v(r, c);
+    const b = k === "h" ? v(r, c + 1) : v(r + 1, c);
+    const t = a / (a - b);
+    return k === "h" ? [c + t, r] : [c, r + t];
+  };
+  const links = new Map<string, string[]>();
+  const link = (a: string, b: string) => {
+    links.set(a, [...(links.get(a) ?? []), b]);
+    links.set(b, [...(links.get(b) ?? []), a]);
+  };
+  for (let r = 0; r + 1 < ny; r++) {
+    for (let c = 0; c + 1 < nx; c++) {
+      const bl = v(r, c) >= 0;
+      const br = v(r, c + 1) >= 0;
+      const tr = v(r + 1, c + 1) >= 0;
+      const tl = v(r + 1, c) >= 0;
+      const b = `h ${r} ${c}`;
+      const t = `h ${r + 1} ${c}`;
+      const l = `v ${r} ${c}`;
+      const rt = `v ${r} ${c + 1}`;
+      const cut = [bl !== br ? b : null, br !== tr ? rt : null, tr !== tl ? t : null, tl !== bl ? l : null].filter((e): e is string => e !== null);
+      if (cut.length === 2) link(cut[0], cut[1]);
+      else if (cut.length === 4) {
+        const centre = (v(r, c) + v(r, c + 1) + v(r + 1, c + 1) + v(r + 1, c)) / 4 >= 0;
+        if (centre === bl) {
+          link(b, rt);
+          link(l, t);
+        } else {
+          link(b, l);
+          link(rt, t);
+        }
+      }
+    }
+  }
+  const seen = new Set<string>();
+  const lines: [number, number][][] = [];
+  // Open lines start at an edge with one neighbour; closed loops anywhere.
+  const starts = [...links.keys()].sort((a, b) => (links.get(a)!.length === 1 ? 0 : 1) - (links.get(b)!.length === 1 ? 0 : 1));
+  for (const s0 of starts) {
+    if (seen.has(s0)) continue;
+    const ids = [s0];
+    seen.add(s0);
+    let cur = s0;
+    for (;;) {
+      const next = (links.get(cur) ?? []).find((e) => !seen.has(e));
+      if (!next) break;
+      ids.push(next);
+      seen.add(next);
+      cur = next;
+    }
+    if ((links.get(cur) ?? []).includes(s0) && ids.length > 2) ids.push(s0);
+    if (ids.length > 1) lines.push(ids.map(point));
+  }
+  byLevel.set(level, lines);
+  return lines;
+};
+
+/**
+ * Contours of a function on a grid over `range` (both axes, as `Regions`),
+ * drawn smooth in page pixels and wiped in left to right on `at` like the
+ * regions under them: the boundary as a solid line, a margin dashed.
+ */
+export const Contours: React.FC<{
+  f: readonly (readonly number[])[];
+  box: Box;
+  lines: readonly { level: number; color: string; width: number; dash?: string; at: number }[];
+  dur?: number;
+  out?: number;
+  dim?: number;
+}> = ({ f, box, lines, dur = 20, out, dim }) => {
+  const frame = useCurrentFrame();
+  const id = useId().replace(/:/g, "");
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
+  if (o >= 1) return null;
+  const nx = f[0].length;
+  const ny = f.length;
+  const px = ([c, r]: [number, number]) => `${(box.left + (c / (nx - 1)) * box.width).toFixed(1)},${(box.top + box.height - (r / (ny - 1)) * box.height).toFixed(1)}`;
+  return (
+    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: (1 - o) * (1 - d) }}>
+      {lines.map((ln, k) => {
+        const p = ease(frame, ln.at, dur);
+        if (p <= 0) return null;
+        const d0 = contour(f, ln.level)
+          .map((pl) => `M${pl.map(px).join(" L")}`)
+          .join(" ");
+        return (
+          <g key={k}>
+            <defs>
+              <clipPath id={`c${id}${k}`}>
+                <rect x={box.left} y={box.top} width={box.width * p} height={box.height} rx={8} />
+              </clipPath>
+            </defs>
+            <path d={d0} clipPath={`url(#c${id}${k})`} fill="none" stroke={ln.color} strokeWidth={ln.width} strokeDasharray={ln.dash} strokeLinecap="round" strokeLinejoin="round" />
+          </g>
+        );
+      })}
+    </svg>
+  );
+};
+
 /** A small title over a panel, in the chart face. */
 export const PanelTitle: React.FC<{
   x: number;

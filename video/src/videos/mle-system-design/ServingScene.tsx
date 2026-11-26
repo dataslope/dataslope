@@ -148,7 +148,7 @@ export const ServingScene: React.FC = () => {
           What is throughput vs latency in model serving,{" "}
           <span style={{ opacity: ease(frame, q6At, 14) }}>and how does request batching improve GPU throughput?</span>
         </QuestionCard>
-        <MiniMap at={qAt} lit={[["model", qAt + 10]]} />
+        <MiniMap at={qAt} store lit={[["model", qAt + 10]]} />
 
         {/* ── The two definitions ── */}
         <Fade out={idleAt - 4}>

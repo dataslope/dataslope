@@ -216,41 +216,48 @@ F.type3 = await figure(
 
 // ── Question 5. A late-arriving dimension record ────────────────────────────
 // de-modeling-history's three staged orders (customer 77 is not in the
-// dimension yet), against this page's rows for customers 42 and 99. The
-// page's answer: an unknown member, then a correction job that re-keys the
-// fact once the customer lands; never drop the fact. Customer 77's key, 1025,
-// is the next after the page's 1024; its region is the video's own.
+// dimension yet), against this page's rows for customers 42 and 99: both of
+// 42's versions, as Question 2 drew them, so the lookup has to say which
+// version it means, and it says is_current (review 2026-11-26: on customer_id
+// alone it was the trap Question 2 names). The page's answer: an unknown
+// member, then a correction job that re-keys the fact once the customer
+// lands; never drop the fact. Customer 77's key, 1025, is the next after the
+// page's 1024; its region is the video's own.
 F.late = await figure(
-  `CREATE TABLE dim_customer (customer_sk INTEGER, customer_id INTEGER, customer_name VARCHAR, region VARCHAR);
+  `CREATE TABLE dim_customer (customer_sk INTEGER, customer_id INTEGER, customer_name VARCHAR, region VARCHAR, is_current BOOLEAN);
 INSERT INTO dim_customer VALUES
-  (-1,   NULL, 'Unknown',   'Unknown'),
-  (1002, 42,   'Acme Corp', 'West'),
-  (1003, 99,   'Globex',    'North');
+  (-1,   NULL, 'Unknown',   'Unknown', TRUE),
+  (1001, 42,   'Acme Corp', 'East',    FALSE),
+  (1002, 42,   'Acme Corp', 'West',    TRUE),
+  (1003, 99,   'Globex',    'North',   TRUE);
 CREATE TABLE staged_orders (order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2));
 INSERT INTO staged_orders VALUES
   (201, 42, 200.00), (202, 99, 500.00), (203, 77, 410.00);`,
   {
     staged: "SELECT order_id, customer_id, amount FROM staged_orders ORDER BY order_id;",
-    // The dimension the load looks keys up in: the unknown member, 42 and 99.
-    dim: "SELECT customer_sk, customer_id, region FROM dim_customer ORDER BY customer_sk;",
+    // The rows the load looks keys up in: the unknown member, and the
+    // current versions of 42 and 99.
+    dim: "SELECT customer_sk, customer_id, region FROM dim_customer WHERE is_current ORDER BY customer_sk;",
+    // Without the version predicate, 42's order would match both versions.
+    versions42: "SELECT COUNT(*) AS versions FROM dim_customer WHERE customer_id = 42;",
     // The trap: the key lookup as an inner join.
-    load: "SELECT o.order_id, d.customer_sk, o.amount\nFROM staged_orders o\nJOIN dim_customer d\n  ON d.customer_id = o.customer_id\nORDER BY o.order_id;",
+    load: "SELECT o.order_id, d.customer_sk, o.amount\nFROM staged_orders o\nJOIN dim_customer d\n  ON d.customer_id = o.customer_id\n AND d.is_current\nORDER BY o.order_id;",
     loadSum:
-      "SELECT SUM(o.amount) AS loaded,\n  (SELECT SUM(amount) FROM staged_orders) AS staged\nFROM staged_orders o\nJOIN dim_customer d ON d.customer_id = o.customer_id;",
+      "SELECT SUM(o.amount) AS loaded,\n  (SELECT SUM(amount) FROM staged_orders) AS staged\nFROM staged_orders o\nJOIN dim_customer d ON d.customer_id = o.customer_id AND d.is_current;",
     // The fix: every fact loads; a missing customer gets the unknown member,
     // and the fact keeps the customer's own ID for the correction.
     loadUnknown:
-      "CREATE TABLE fact_orders AS\nSELECT o.order_id, o.customer_id,\n       COALESCE(d.customer_sk, -1) AS customer_sk,\n       o.amount\nFROM staged_orders o\nLEFT JOIN dim_customer d\n  ON d.customer_id = o.customer_id;",
+      "CREATE TABLE fact_orders AS\nSELECT o.order_id, o.customer_id,\n       COALESCE(d.customer_sk, -1) AS customer_sk,\n       o.amount\nFROM staged_orders o\nLEFT JOIN dim_customer d\n  ON d.customer_id = o.customer_id\n AND d.is_current;",
     facts: "SELECT order_id, customer_id, customer_sk, amount FROM fact_orders ORDER BY order_id;",
     factsSum: "SELECT SUM(amount) AS loaded FROM fact_orders;",
     reportBefore:
       "SELECT d.region, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN dim_customer d USING (customer_sk)\nGROUP BY d.region\nORDER BY d.region;",
     // Customer 77 lands.
-    arrive: "INSERT INTO dim_customer VALUES (1025, 77, 'Bluth Co', 'South');",
-    dimAfter: "SELECT customer_sk, customer_id, region FROM dim_customer ORDER BY customer_sk;",
+    arrive: "INSERT INTO dim_customer VALUES (1025, 77, 'Bluth Co', 'South', TRUE);",
+    dimAfter: "SELECT customer_sk, customer_id, region FROM dim_customer WHERE is_current ORDER BY customer_sk;",
     // The correction job: re-key the facts still on the unknown member.
     correct:
-      "UPDATE fact_orders f\nSET customer_sk = d.customer_sk\nFROM dim_customer d\nWHERE f.customer_sk = -1\n  AND d.customer_id = f.customer_id;",
+      "UPDATE fact_orders f\nSET customer_sk = d.customer_sk\nFROM dim_customer d\nWHERE f.customer_sk = -1\n  AND d.customer_id = f.customer_id\n  AND d.is_current;",
     factsAfter: "SELECT order_id, customer_id, customer_sk, amount FROM fact_orders ORDER BY order_id;",
     reportAfter:
       "SELECT d.region, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN dim_customer d USING (customer_sk)\nGROUP BY d.region\nORDER BY d.region;",
@@ -332,6 +339,7 @@ expect("t2-trap: the natural-key join", nat, ["44", "31580.00"]);
 expect("t1-history: every region's 2022 total changes", ["East", "North", "South", "West"].filter((r) => t1[r] !== t2[r]).length, 4);
 expect("t2-cost: the page's chart", one("growth", "model")[0].slice(3), ["122000", "2.44"]);
 expect("late-drop: 700 of 1,110", one("late", "loadSum"), [["700.00", "1110.00"]]);
+expect("late: 42 has two versions, so the lookup needs is_current", one("late", "versions42"), [["2"]]);
 expect("late-fix: all 1,110 load", one("late", "factsSum"), [["1110.00"]]);
 expect("late-correct: one row re-keyed, none left", [one("late", "correct"), one("late", "stillUnknown")], [[["1"]], [["0"]]]);
 expect("late-fact: current lookup", one("scd", "lateCurrent"), [["1002", "West"]]);

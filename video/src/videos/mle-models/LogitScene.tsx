@@ -48,7 +48,9 @@ export const LogitScene: React.FC = () => {
   const costAt = n.word("logit-prod", "from the cost of each error");
   const end = n.beat("logit-prod").to;
 
-  const box: Box = { left: X0 + 60, top: y(440), width: 700, height: h(300) };
+  // Its top 22 px under the formula's line, its bottom where it was, so the
+  // axis title clears "Probability: p = σ(z)" above it.
+  const box: Box = { left: X0 + 60, top: y(462), width: 700, height: h(278) };
   const { x: sx, y: sy } = scales(box, [-6, 6], [0, 1]);
   const curve = Array.from({ length: 121 }, (_, i) => {
     const z = -6 + i * 0.1;

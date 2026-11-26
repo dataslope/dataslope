@@ -121,7 +121,8 @@ const Chain: React.FC<{
  * name and JSON arguments), the application runs it, and the result goes
  * back into the context. Then a request rides the loop, its steps counted,
  * and MCP beside it: one tool, many clients. The design around the loop as
- * four chips, an idempotent tool (one ticket from two calls), and what a
+ * four chips, an idempotent tool (one ticket from two calls that carry the
+ * same idempotency key), and what a
  * tool brings back treated as untrusted input: a page's injected instruction
  * in red, and no damaging tool without a confirmation. Then, on a
  * clean page, reliability compounding: ten links at 95% come to about 60%
@@ -156,9 +157,9 @@ export const AgentScene: React.FC = () => {
   ];
 
   const idemAt = n.word("q4-idem", "idempotent tools");
-  const twiceAt = n.word("q4-idem", "run twice");
-  const sameAt = n.word("q4-idem", "Filing the same ticket twice");
-  const oneAt = n.word("q4-idem", "leave one ticket");
+  const keyAt = n.word("q4-idem-key", "an idempotency key");
+  const sameAt = n.word("q4-idem-key", "filing the same ticket twice");
+  const oneAt = n.word("q4-idem-key", "leaves one ticket");
   const backInAt = n.word("q4-inject", "what a tool brings back");
   const untrustedAt = n.word("q4-inject", "as untrusted");
   const pageAt = n.word("q4-inject", "a retrieved page can carry instructions");
@@ -217,6 +218,12 @@ export const AgentScene: React.FC = () => {
   const laps = ride < 0 ? 0 : Math.min(3, Math.floor(ride / lap));
   const riding = ride >= 0 && ride < 3 * lap;
   const step = ride < 0 ? 1 : Math.min(3, laps + 1);
+  const dotAt = along(ring, (ride % lap) / lap);
+  // The dot rides the arrows and passes behind the boxes, never over their
+  // words: inside a box (and a little around it) it is not drawn.
+  const inBox = [model, call, app, result].some(
+    (r) => Math.abs(dotAt[0] - r.cx) < r.w / 2 + 14 && Math.abs(dotAt[1] - r.cy) < r.h / 2 + 14,
+  );
 
   // MCP: one tool, three clients.
   const tool: Rect = { cx: 1420, cy: y(500), w: 230, h: 64 };
@@ -239,7 +246,8 @@ export const AgentScene: React.FC = () => {
         <Sfx key={c.text} name="el-tap" at={c.at} level={-31} />
       ))}
       <Sfx name="el-tap" at={idemAt + 2} level={-31} />
-      <Sfx name="el-tap" at={twiceAt + 2} level={-32} />
+      <Sfx name="el-tap" at={keyAt + 2} level={-32} />
+      <Sfx name="el-tap" at={sameAt + 6} level={-32} />
       <Sfx name="el-pop" at={oneAt + 2} level={-31} />
       <Sfx name="el-whoosh" at={clearAt} level={-37} />
       <Sfx name="el-pop" at={compAt} level={-30} />
@@ -284,7 +292,7 @@ export const AgentScene: React.FC = () => {
           <Arrow points={home} at={backAt + 4} color={DATA} />
 
           {/* The loop, repeated: a step counter and a dot going round. */}
-          {riding ? <Dot at={along(ring, (ride % lap) / lap)} color={DATA} r={8} /> : null}
+          {riding && !inBox ? <Dot at={dotAt} color={DATA} r={8} /> : null}
           <Line x={(model.cx + app.cx) / 2} width={200} align="center" y={model.cy - 16} at={loopAt} size={24} weight={600}>
             {frame >= doneAt ? (
               <span>done</span>
@@ -332,11 +340,11 @@ export const AgentScene: React.FC = () => {
           {/* An idempotent tool: two calls, one ticket. */}
           <div style={{ position: "absolute", left: X0, top: y(788), display: "flex", alignItems: "center", gap: 16, fontSize: 26 }}>
             <span style={{ ...note(26, GOOD_INK), fontWeight: 600, width: LABEL_W, opacity: ease(frame, idemAt - 2, 10) }}>Idempotent tools</span>
-            <Tag at={sameAt - 2} size={26}>
-              <Code>file_ticket</Code>
+            <Tag at={keyAt - 2} size={26}>
+              <Code>file_ticket(key=&quot;7f3&quot;)</Code>
             </Tag>
-            <Tag at={twiceAt} size={26}>
-              <Code>file_ticket</Code> <span style={{ color: INK_SOFT }}>retry</span>
+            <Tag at={sameAt + 4} size={26}>
+              <Code>file_ticket(key=&quot;7f3&quot;)</Code> <span style={{ color: INK_SOFT }}>retry</span>
             </Tag>
             <span style={{ opacity: ease(frame, oneAt - 6, 8) }}>
               <InlineArrow at={oneAt - 6} size={26} />

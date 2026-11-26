@@ -65,7 +65,8 @@ export const BATCH = results.batch as {
   target: [number, number];
 };
 
-/** Question three: the range test ([rate, loss after that step]), the
+/** Question three: the range test ([rate, loss after that step]), its
+ *  bottom, its turn and the step nearest a tenth of the turn (the pick), the
  *  distance single-row SGD ends from the answer at a constant rate and on a
  *  cosine, and a warmup-then-cosine schedule's shape ([step, multiple of the
  *  base rate]). */
@@ -73,6 +74,8 @@ export const LR = results.lr as {
   range: [number, number][];
   lowest: [number, number];
   blowup: [number, number];
+  turn: [number, number];
+  tenth: [number, number];
   constant: number;
   cosine: number;
   decayPasses: number;
@@ -128,10 +131,11 @@ export const SERVING = results.serving as {
 };
 
 /** Question eight: two noisy rings. Up to 400 training points with the RBF
- *  model's support vectors among them, each model's prediction on a 64 × 64
- *  grid over `range` (row-major, bottom row first), support-vector counts by
- *  training size, and fit times measured once (seconds; only the ratios are
- *  said). */
+ *  model's support vectors among them, each model's prediction and decision
+ *  function on a 64 × 64 grid over `range` (row-major, bottom row first; the
+ *  boundary is the function's zero contour, the margin its contours at ±1),
+ *  support-vector counts by training size, and fit times measured once
+ *  (seconds; only the ratios are said). */
 export const SVM = results.svm as {
   linear: number;
   rbf: number;
@@ -142,6 +146,8 @@ export const SVM = results.svm as {
   range: [number, number];
   gridLinear: string[];
   gridRbf: string[];
+  decisionLinear: number[][];
+  decisionRbf: number[][];
   supportVectors: Record<"200" | "2000" | "20000", number>;
   fitSeconds: Record<"4000" | "8000" | "16000", number>;
   doubling: [number, number];

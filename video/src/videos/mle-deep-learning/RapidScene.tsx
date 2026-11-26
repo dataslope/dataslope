@@ -204,6 +204,7 @@ const Softmax: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
       <Line at={fuseAt} x={R_X} y={rowA + c.h(136)} size={24} color={OK_INK}>
         <Mark at={fuseAt + 4}>Libraries fuse the two, on raw logits</Mark>
+        <span style={{ opacity: ease(frame, fuseAt + 16, 10) }}>, for numerical stability</span>
       </Line>
 
       <Line at={firstAt} x={R_X} y={rowB - c.h(62)} size={22} color={ACCENT_INK}>

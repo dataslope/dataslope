@@ -50,8 +50,8 @@ export const RegScene: React.FC = () => {
   const exactAt = n.word("reg-run", "keeps exactly the five");
   const l2At = n.word("reg-why", "L two pulls");
   const fadesAt = n.word("reg-why", "the pull fades");
-  const l1At = n.word("reg-why", "L one pulls");
-  const zeroAt = n.word("reg-why", "lands on zero");
+  const l1At = n.word("reg-why-l1", "L one pulls");
+  const zeroAt = n.word("reg-why-l1", "lands on zero");
   const prodAt = n.word("reg-prod", "In production");
   const fiveFeatAt = n.word("reg-prod", "five features to compute");
   const corrAt = n.word("reg-prod", "With correlated features");

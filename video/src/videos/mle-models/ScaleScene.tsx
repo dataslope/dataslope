@@ -174,6 +174,12 @@ export const ScaleScene: React.FC = () => {
             color={ACCENT}
             ink={ACCENT_INK}
           />
+          {/* What makes the two fair: each at its own best rate, which the
+              ×100 column caps (results.json, scale.*.condition). */}
+          <Line at={eightyAt + 20} x={X0} y={y(560)} size={24} color={INK_SOFT}>
+            Each at its best rate, which the ×100 column caps: condition number {SCALE.asIs.condition.toFixed(1)} →{" "}
+            {int(SCALE.times100.condition)}
+          </Line>
 
           {/* ── In production ── */}
           <Line at={needAt - 2} x={X0} y={y(640)} size={28}>

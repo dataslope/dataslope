@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { ColumnRule, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -15,8 +15,12 @@ const COL_X = [120, 700, 1280];
 const RULES = [650, 1230];
 const INTRO_Y = 300;
 const HEAD_Y = 352;
-const BADGE_Y = 488;
-const ROW_Y = 548;
+/** Under Snowflake's line, what its size does to the rate. */
+const SIZE_Y = [84, 116];
+/** The column rules run down past Snowflake's two size lines. */
+const RULE_H = 146;
+const BADGE_Y = 524;
+const ROW_Y = 584;
 const ROW_STEP = 60;
 const LABEL_W = 380;
 const TICK_X = 520;
@@ -24,7 +28,7 @@ const TICK_PITCH = 16;
 const TICK_W = 11;
 const TICK_H = 30;
 const RESULT_X = TICK_X + 60 * TICK_PITCH + 26;
-const LEVER_Y = 838;
+const LEVER_Y = 874;
 /** The wait before a suspend: billed like the busy minutes, drawn lighter. */
 const WAIT = ds("green", 300);
 /** The two minutes of the hour the dashboard keeps the cluster busy. */
@@ -32,8 +36,10 @@ const BUSY = [14, 44];
 
 /**
  * Question 9. What each warehouse bills its compute by, in three columns:
- * Snowflake's credits per second while running, BigQuery's bytes scanned (or
- * reserved slots), Redshift's provisioned nodes. Then the video's own model:
+ * Snowflake's credits per second while running (and, under it, what a size
+ * up does to that rate: doubles it, so the bill holds only if the query
+ * runs twice as fast), BigQuery's bytes scanned (or reserved slots),
+ * Redshift's provisioned nodes. Then the video's own model:
  * an hour as sixty minute ticks, two of them busy. Billed by time and left
  * running, all sixty count, in red; suspended when idle, the two, in green,
  * and the wait before each suspend, billed too, a lighter tick after each;
@@ -52,9 +58,11 @@ export const ComputeScene: React.FC = () => {
   const apartAt = n.word("compute-def", "sized apart from the storage");
   const snowAt = n.word("compute-def", "Snowflake bills credits");
   const secondAt = n.word("compute-def", "per second");
-  const bqAt = n.word("compute-def", "BigQuery bills the bytes scanned");
-  const slotsAt = n.word("compute-def", "reserved slots");
-  const rsAt = n.word("compute-def", "Redshift bills its provisioned nodes");
+  const sizeAt = n.word("compute-size", "Each size up doubles that rate");
+  const fastAt = n.word("compute-size", "costs no more only if it finishes twice as fast");
+  const bqAt = n.word("compute-vendors", "BigQuery bills the bytes scanned");
+  const slotsAt = n.word("compute-vendors", "reserved slots");
+  const rsAt = n.word("compute-vendors", "Redshift bills its provisioned nodes");
   const modelAt = n.word("compute-model", "Here's a model, not a measurement");
   const busyAt = n.word("compute-model", "busy for two minutes an hour");
   const leftAt = n.word("compute-model", "Billed by time and left running");
@@ -78,9 +86,11 @@ export const ComputeScene: React.FC = () => {
     {
       label: "Busy",
       at: busyAt,
-      tick: (min) => (BUSY.includes(min) ? { color: BAR, on: ease(frame, busyAt + 6 + BUSY.indexOf(min) * 4, 8) } : null),
+      // Busy minutes are compute time, so ink: blue is kept for the bytes
+      // scanned, the meter in the last row.
+      tick: (min) => (BUSY.includes(min) ? { color: INK, on: ease(frame, busyAt + 6 + BUSY.indexOf(min) * 4, 8) } : null),
       result: (
-        <span style={{ color: BLUE_INK }}>
+        <span style={{ color: INK }}>
           <Num>{m.busyMinutes}</Num> min
         </span>
       ),
@@ -127,6 +137,7 @@ export const ComputeScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-pop" at={secondAt} level={-30} />
       <Sfx name="el-tap" at={snowAt} level={-34} />
+      <Sfx name="el-tap" at={sizeAt} level={-35} />
       <Sfx name="el-tap" at={bqAt} level={-34} />
       <Sfx name="el-tap" at={rsAt} level={-34} />
       <Sfx name="el-tap" at={modelAt} level={-33} />
@@ -152,7 +163,7 @@ export const ComputeScene: React.FC = () => {
 
         {/* ── What each bills ── */}
         {RULES.map((x, i) => (
-          <ColumnRule key={x} x={x} top={y(HEAD_Y)} height={h(84)} at={i === 0 ? bqAt : rsAt} />
+          <ColumnRule key={x} x={x} top={y(HEAD_Y)} height={h(RULE_H)} at={i === 0 ? bqAt : rsAt} />
         ))}
         {[
           { name: "Snowflake", line: "Credits per second while running", at: snowAt, lineAt: secondAt },
@@ -176,6 +187,13 @@ export const ComputeScene: React.FC = () => {
             </Note>
           </React.Fragment>
         ))}
+        {/* What a size up does to Snowflake's rate. */}
+        <Note at={sizeAt} x={COL_X[0]} y={y(HEAD_Y) + h(SIZE_Y[0])}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Each size up doubles the rate:</span>
+        </Note>
+        <Note at={fastAt} x={COL_X[0]} y={y(HEAD_Y) + h(SIZE_Y[1])}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the same bill only at twice the speed</span>
+        </Note>
 
         {/* ── A model: one hour, two busy minutes ── */}
         <Note at={modelAt} x={X0} y={y(BADGE_Y)}>
