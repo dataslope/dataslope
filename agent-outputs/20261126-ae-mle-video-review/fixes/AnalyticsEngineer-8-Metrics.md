@@ -42,13 +42,13 @@ All on the final code, through `out/entries/AnalyticsEngineer-8-Metrics.tsx` and
 | `tsc --noEmit` (errors in `ae-metrics`) | none |
 | `eslint src/videos/ae-metrics` | clean (exit 0) |
 | `check:cues` | pass ("every word cue names a phrase its beat says, and says which one") |
-| `npm test` | 79 of 79 pass |
+| `npm test` | 79 of 79 pass (run again after the retime) |
 | `check:sync` | pass: 54 beats within ±0.12 s of their cues, worst +0.03 s (`avoid`); `r-cumulative` +0.00, `r-cumulative-window` +0.03, `r-cumulative-once` +0.01 |
 | `check:mix` | pass: effects 29.0 LU under the narration, median 30.0 dB below the voice |
-| `check:frames` (`CHECK_SCALE=1`) | PENDING |
-| `check:motion` | PENDING |
+| `check:frames` (`CHECK_SCALE=1`) | pass: 4 illustrations, 28 arrows (0.0° bend), ERD ends straight, no word collisions, one size and family per line |
+| `check:motion` | pass on the final code: nothing still for 3 s (longest 2.8 s, 7:06.8 to 7:09.5, unchanged from the first review). The first run failed at 6:52.5 to 6:55.5 (3.0 s); see the retime above. |
 
-Stills were rendered and looked at for every change: 226.5, 229.6, 322, 331, 350, 371.6, 427.6, 575, 580, 584 and 589.5 s, in `video/out/review/AnalyticsEngineer-8-Metrics/` and copied to `$S/after/AnalyticsEngineer-8-Metrics/`. After the first look, the "1st" tick was moved so it no longer runs up through the trailing band; it now drops from the axis only. The 589.5 still shows that version.
+Stills were rendered and looked at for every change: 226.5, 229.6, 322, 331, 350, 371.6, 427.6, 575, 580, 584 and 589.5 s, plus 409.8, 411.5 and 414 s for the quick-round retime, in `video/out/review/AnalyticsEngineer-8-Metrics/` and copied to `$S/after/AnalyticsEngineer-8-Metrics/`. After the first look, the "1st" tick was moved so it no longer runs up through the trailing band; it now drops from the axis only. The 589.5 still shows that version.
 
 ## Comparisons
 
