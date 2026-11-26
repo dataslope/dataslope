@@ -124,7 +124,16 @@ export const RnnScene: React.FC = () => {
           <circle cx={stateX} cy={r1 - h(18)} r={9} fill={BAR} opacity={fade} />
         </Svg>
         {/* Named, so the faint dot at the end reads as the state that thinned. */}
-        <div style={{ position: "absolute", left: stateX + 20, top: r1 - h(18) - 14, opacity: stateIn, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div
+          style={{
+            position: "absolute",
+            left: stateX + 20,
+            top: r1 - h(18) - 14,
+            opacity: ease(frame, walk(0), 6) * (1 - ease(frame, transAt, 10) * 0.35),
+            ...label(21, INK_SOFT),
+            whiteSpace: "nowrap",
+          }}
+        >
           hidden state
         </div>
         <Line at={slowAt} x={CX} y={r1 + CH + h(24)} size={24} color={ACCENT_INK} weight={600}>

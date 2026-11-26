@@ -70,7 +70,8 @@ export const CostScene: React.FC = () => {
   const at = (n: number) => C.totals.find((p) => p.n === n) ?? C.totals[C.totals.length - 1];
   const cross = at(C.crossover);
   const xTicks = [0, 10000, 20000, 30000, 40000];
-  const yTicks = [0, 5e12, 10e12, 15e12, 20e12];
+  // Every 4 trillion, so no rule runs through a curve's label.
+  const yTicks = [0, 4e12, 8e12, 12e12, 16e12, 20e12];
   // Where the two labels sit: "attention" left of the parabola near its top,
   // "the rest of the layer" under its line toward the right.
   const attnLabel = at(45056);
@@ -164,10 +165,10 @@ export const CostScene: React.FC = () => {
             </g>
           ) : null}
         </Svg>
-        <Line at={restAt + 16} x={px(restLabel.n)} y={py(restLabel.rest) + h(14)} size={22}>
+        <Line at={restAt + 16} x={px(restLabel.n)} y={py(restLabel.rest) + h(18)} size={22}>
           the rest of the layer
         </Line>
-        <Line at={arithAt + 16} x={px(attnLabel.n) - 24} y={py(attnLabel.attention) - h(16)} size={22} color={BLUE_INK} align="right" width={160}>
+        <Line at={arithAt + 16} x={px(attnLabel.n) - 24} y={py(attnLabel.attention) - h(30)} size={22} color={BLUE_INK} align="right" width={160}>
           attention
         </Line>
         <Line at={pastAt + 4} x={px(C.crossover) + 20} y={py(cross.rest) + h(30)} size={24} weight={600}>

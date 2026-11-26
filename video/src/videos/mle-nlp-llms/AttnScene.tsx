@@ -281,7 +281,10 @@ export const AttnScene: React.FC = () => {
             A dot product of <Num>{S.dk}</Num> of them
           </Line>
           <Svg>
-            <line x1={SP.mid} x2={SP.mid} y1={y(500)} y2={y(650)} stroke={INK_SOFT} strokeWidth={1.2} opacity={0.6 * ease(frame, simAt + 6, 10)} />
+            {/* The common centre, a short tick through each bar only, clear of the labels. */}
+            {[y(512), y(612)].map((by) => (
+              <line key={by} x1={SP.mid} x2={SP.mid} y1={by - 12} y2={by + h(24) + 12} stroke={INK_SOFT} strokeWidth={1.2} opacity={0.6 * ease(frame, simAt + 6, 10)} />
+            ))}
             {[
               { y: y(512), w: SP.unit, at: simAt + 10 },
               { y: y(612), w: spreadW, at: spreadAt + 2 },
