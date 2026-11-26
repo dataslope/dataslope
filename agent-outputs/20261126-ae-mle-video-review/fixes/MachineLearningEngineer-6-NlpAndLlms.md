@@ -58,9 +58,28 @@ Every existing value came back identical (checked key by key); one key added, `c
 - `npm test`: 79/79 pass.
 - `check:sync`: pass, 70 beats, worst +0.03 s (`q1-bpe`).
 - `check:mix`: speech a median 30.3 dB above the effects, closest 11.6 dB at 9:25.6; WAVs deleted.
-- `CHECK_SCALE=1 check:frames`: PENDING
-- `check:motion`: PENDING
+- `CHECK_SCALE=1 check:frames`: pass (4 illustrations, 42 arrows, spacing, one size per line, cue occurrences).
+- `check:motion`: pass; nothing holds still 3 s (seven 2.0-2.8 s holds in the quick round, all under narration); preview deleted.
 
 ## Comparisons
 
-`$S/compare/MachineLearningEngineer-6-NlpAndLlms/` (13 PNGs): PENDING
+`/tmp/claude-0/-home-user-dataslope/a7697946-07dc-5861-b60b-4725a18149d6/scratchpad/compare/MachineLearningEngineer-6-NlpAndLlms/` (13 PNGs, `compare.json` beside them; after stills in `/tmp/claude-0/-home-user-dataslope/a7697946-07dc-5861-b60b-4725a18149d6/scratchpad/after/MachineLearningEngineer-6-NlpAndLlms/`):
+
+- `01-question-8-s-chart-per-token-became-the-whole-co.png` (finding 1)
+- `02-question-5-the-heads-read-the-whole-vector-not-s.png` (2, 15)
+- `03-question-13-the-note-no-longer-undercuts-the-dem.png` (3, 16)
+- `04-question-1-byte-pair-encoding-named-and-explaine.png` (4, 17)
+- `05-question-18-the-hosted-model-follow-up-the-build.png` (5)
+- `06-question-7-why-the-rnn-forgets-and-the-state-lab.png` (6, 13)
+- `07-question-4-the-worked-example-s-output-held-thro.png` (7, timing)
+- `07-question-4-the-8-spread-drawn-while-it-is-descri.png` (7, the spread)
+- `08-question-2-arrows-clear-of-the-heading-rule-skip.png` (8, 9)
+- `10-question-12-orphan-labels-gone-the-other-peft-me.png` (10, 11)
+- `12-question-3-no-lines-to-words-outside-the-sentenc.png` (12)
+- `14-question-6-the-residual-line-no-longer-tangles-w.png` (14)
+- `18-question-11-one-line-stage-notes-an-honest-width.png` (18)
+
+## Notes
+
+- The page is not wrong anywhere this video quotes it. How BPE builds its vocabulary (merging from single bytes) is standard and not on the page; said as the general mechanism, which o200k_base follows.
+- No shared-kit bug found; nothing in `src/editorial/` or `src/components/` needs a change for this video.
