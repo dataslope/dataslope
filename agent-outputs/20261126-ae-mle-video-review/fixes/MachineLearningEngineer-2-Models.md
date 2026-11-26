@@ -51,7 +51,18 @@ None generated.
 
 ## Checks
 
-CHECKS
+All on the final code, through the private entry and the queues:
+
+- Typecheck (`tsc --noEmit`, filtered to `src/videos/mle-models/`): no errors.
+- ESLint on `src/videos/mle-models`: clean.
+- `check:cues`: pass ("every word cue names a phrase its beat says").
+- `npm test`: 79 tests, 0 failures.
+- `CHECK_SCALE=1 check:frames`: pass (spacing, one size and family per line, no tabular hyphens, arrows straight under their heads, illustrations not upscaled).
+- `check:sync`: pass, 55 beats, worst +0.03 s (`batch-each`); the three `lr-range` pieces +0.00, +0.01, +0.01.
+- `check:mix`: pass, effects 30.0 LU under the narration, speech a median 29.7 dB above them. WAVs deleted.
+- `check:motion`: MOTION
+- `check.mjs`: pass.
+- Stills at every changed place rendered and looked at (in `$S/after/MachineLearningEngineer-2-Models/`).
 
 ## Shared kit
 
@@ -61,4 +72,25 @@ Nothing needed. The smooth contours are local (`Contours` and `contour` in `part
 
 `/tmp/claude-0/-home-user-dataslope/a7697946-07dc-5861-b60b-4725a18149d6/scratchpad/compare/MachineLearningEngineer-2-Models/`, 20 PNGs plus `compare.json`:
 
-PNGS
+- `01-the-range-test-is-read-on-its-steep-stretch-not-.png`
+- `02-the-svm-s-margin-is-drawn-and-its-boundary-is-sm.png`
+- `02-both-svm-boundaries-drawn-smooth.png`
+- `03-cross-entropy-labels-moved-off-the-gridlines.png`
+- `03-run-chart-labels-moved-off-the-75-gridline.png`
+- `03-12-trees-4-68-moved-off-the-4-gridline.png`
+- `03-the-floor-note-lifted-off-the-0-75-gridline.png`
+- `04-no-stray-axis-label-before-the-gradient-descent-.png`
+- `05-the-residuals-before-the-first-tree-are-seen-who.png`
+- `06-steps-to-settle-each-at-its-best-rate.png`
+- `07-the-left-column-s-text-clears-the-hairline.png`
+- `08-what-are-ensembles-answered-on-screen.png`
+- `10-the-sigmoid-s-formula-clears-the-axis-title.png`
+- `11-max-named.png`
+- `12-the-schedule-s-rate-axis.png`
+- `13-single-trees-on-average.png`
+- `14-the-plot-s-1-and-2-tied-to-the-three-weights.png`
+- `15-k-means-shapes-readable-and-the-round-result-hel.png`
+- `16-the-support-vector-bars-say-they-are-shares.png`
+- `17-why-pca-ran-on-scaled-features.png`
+
+Findings 9 and 18 share comparisons 02 (the title) and 01 (the split); every other finding has its own.
