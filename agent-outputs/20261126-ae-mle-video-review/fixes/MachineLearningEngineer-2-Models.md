@@ -60,7 +60,7 @@ All on the final code, through the private entry and the queues:
 - `CHECK_SCALE=1 check:frames`: pass (spacing, one size and family per line, no tabular hyphens, arrows straight under their heads, illustrations not upscaled).
 - `check:sync`: pass, 55 beats, worst +0.03 s (`batch-each`); the three `lr-range` pieces +0.00, +0.01, +0.01.
 - `check:mix`: pass, effects 30.0 LU under the narration, speech a median 29.7 dB above them. WAVs deleted.
-- `check:motion`: MOTION
+- `check:motion`: pass, 11:26.8 checked, nothing holds still for 2 s or more. Preview deleted.
 - `check.mjs`: pass.
 - Stills at every changed place rendered and looked at (in `$S/after/MachineLearningEngineer-2-Models/`).
 
