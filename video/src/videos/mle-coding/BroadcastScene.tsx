@@ -232,7 +232,7 @@ export const BroadcastScene: React.FC = () => {
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 600 }}>
             <Num>{BROADCAST.mseWrong.toFixed(2)}</Num>
           </span>
-          <span style={{ ...note(24, INK_SOFT) }}>
+          <span style={{ ...note(26, INK_SOFT) }}>
             <Mono>pred - y</Mono>: the (1000, 1000) square
           </span>
         </div>
@@ -240,7 +240,7 @@ export const BroadcastScene: React.FC = () => {
           <span style={{ ...note(26, OK_INK), fontWeight: 600 }}>
             <Num>{BROADCAST.mseRight.toFixed(2)}</Num>
           </span>
-          <span style={{ ...note(24, INK_SOFT) }}>
+          <span style={{ ...note(26, INK_SOFT) }}>
             <Mono>pred.ravel() - y</Mono>: each row against its own label
           </span>
         </div>

@@ -57,4 +57,20 @@ CHECKS_PLACEHOLDER
 
 ## Comparisons
 
-COMPARISONS_PLACEHOLDER
+Folder: `/tmp/claude-0/-home-user-dataslope/a7697946-07dc-5861-b60b-4725a18149d6/scratchpad/compare/MachineLearningEngineer-1-Generalization/` (`compare.json` beside them).
+
+- `01-confusion-matrix-headers-over-their-columns.png`
+- `02-reweighting-s-recall-jump-now-shows-the-precisio.png`
+- `03-r-a-true-statement-no-longer-struck-through.png`
+- `04-the-draw-shown-now-centres-on-its-own-50-line.png`
+- `05-grouped-folds-50-stays-up-under-its-conclusion.png`
+- `06-held-out-fold-box-clear-of-the-label-digit.png`
+- `07-underfitting-label-off-the-gridline.png`
+- `08-the-54-label-clear-of-the-50-gridline.png`
+- `10-fold-boxes-outlined-not-filled-even-spacing-arou.png`
+- `11-the-finished-dart-figure-holds-before-the-depth-.png`
+- `12-a-breath-between-l2-s-pull-and-l1-s.png`
+- `14-room-between-the-time-arrow-and-the-histograms.png`
+- `15-examples-that-continue-such-as-in-lowercase.png`
+
+Finding 9 shares comparison 05 (box 2) and finding 13 shares comparison 10 (box 2); finding 10's table half (84% in yellow ink) is box 2 of comparison 02.
