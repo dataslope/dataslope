@@ -43,10 +43,25 @@ None generated.
 
 ## Checks
 
-CHECKS_PLACEHOLDER
+- `check.mjs`: passes (41 spoken numbers match; the block reproduces the site's output).
+- Typecheck (`tsc --noEmit`): no errors in `src/videos/mle-serving-llms/` (the whole run exits 0). Lint (`eslint src/videos/mle-serving-llms`): clean.
+- `npm run check:cues`: passes. `npm test`: passes.
+- `CHECK_SCALE=1 npm run check:frames -- MachineLearningEngineer-9-ServingLlms`: passes (19 arrows within 10° under their heads, word spacing, one size and family per line, no tabular hyphens, 4 illustrations not upscaled).
+- `npm run check:sync`: passes, all 43 beats within ±0.03 s of their cues (`q4-verify` +0.01).
+- `npm run check:mix`: narration −20.0 LUFS, effects 29.4 LU under it, speech a median 29.9 dB above the effects. WAVs deleted.
+- `npm run check:motion`: MOTION_PLACEHOLDER
+- Stills looked at, after the fixes: 122, 141, 158, 168, 179, 199, 246, 282, 379.8, 384, 404 and 414.5 s.
 
 ## Comparisons
 
 `$S/compare/MachineLearningEngineer-9-ServingLlms/` (`S` = the session scratchpad):
 
-COMPARE_PLACEHOLDER
+- `01-the-verify-step-is-said-aloud-and-held-on-screen.png` (finding 1, with the narration diff)
+- `02-can-lose-moves-off-the-1-in-2-row-the-simulation.png` (finding 2, plus finding 1's simulation note)
+- `03-the-186-is-counted-in-gb-and-at-most-is-explaine.png` (finding 3)
+- `04-the-caption-under-the-cells-follows-each-refill-.png` (finding 4, the 128K fill)
+- `04-the-caption-follows-the-64-head-refill-the-gqa-g.png` (finding 4, the 64-head fill, plus finding 7)
+- `05-the-attention-arcs-reach-their-arrowheads-zoomed.png` (finding 5; both frames cropped and enlarged 1.6× so the heads are visible)
+- `06-the-question-waits-where-its-answer-will-appear.png` (finding 6)
+- `08-the-batching-simulation-names-its-full-queue.png` (finding 8)
+- `09-the-paged-grid-s-last-block-matches-2-000-tokens.png` (finding 9, enlarged 1.6×)
