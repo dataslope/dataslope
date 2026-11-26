@@ -12,6 +12,8 @@ All 5 findings fixed (2 P2, 3 P3). All 13 fixes from the first review were check
 | 4 | P3 | fixed | "Non-additive" now sits at the left, under the question and over the product grid, instead of alone over the empty right half from 321 to 336 s. The week chart gets its own heading, "Daily active users", on the words that name it, on the line its legend already uses. |
 | 5 | P3 | fixed | On "not a rate column", the two `rate_pct` cells of the `daily` table turn red again. The advice now points at the column it rules out. |
 
+A fix for a check, not a finding: the first `check:motion` run failed on one stretch, 412.5 to 415.5 s (3.0 s still, over `r-truth`). The quick-round list was already built and item 9 lit on "Why does", and nothing moved until "Without one". I did not change the Question 9 panel. The list now builds on "Question nine" instead of on "Eleven quick ones", and item 9 lights on "source of truth for metrics", about 0.9 s later than before. The pause after the headline is now about 1.3 s, and the one after item 9 lights about 2.4 s.
+
 Housekeeping, not findings: the script header describes the two windows and has a "Second review" note. `NonaddScene`'s doc comment no longer says the stored rate is struck (no strikes since the first review).
 
 ## Voice
@@ -42,7 +44,7 @@ All on the final code, through `out/entries/AnalyticsEngineer-8-Metrics.tsx` and
 | `check:cues` | pass ("every word cue names a phrase its beat says, and says which one") |
 | `npm test` | 79 of 79 pass |
 | `check:sync` | pass: 54 beats within ±0.12 s of their cues, worst +0.03 s (`avoid`); `r-cumulative` +0.00, `r-cumulative-window` +0.03, `r-cumulative-once` +0.01 |
-| `check:mix` | PENDING |
+| `check:mix` | pass: effects 29.0 LU under the narration, median 30.0 dB below the voice |
 | `check:frames` (`CHECK_SCALE=1`) | PENDING |
 | `check:motion` | PENDING |
 

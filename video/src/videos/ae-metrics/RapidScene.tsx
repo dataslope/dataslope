@@ -606,7 +606,11 @@ export const RapidScene: React.FC = () => {
   const nextAt = n.word("next", "Next:");
 
   const items: RapidItem[] = [
-    { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "Why does a single source of truth"), body: <Truth c={c} /> },
+    // Lit on "source of truth" rather than "Why does" (2026-11-26 review), with
+    // the list built on "Question nine": the question is read over a page that
+    // has nothing else to move until "Without one", and check:motion found it
+    // still for 3 s.
+    { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "source of truth for metrics"), body: <Truth c={c} /> },
     { n: 10, label: "Metric drift, and preventing it", at: n.word("r-drift", "What is metric drift"), body: <Drifting c={c} /> },
     { n: 11, label: "The dbt Semantic Layer, MetricFlow", at: n.word("r-metricflow", "What is the dbt Semantic Layer"), body: <MetricFlow c={c} askedAt={n.word("r-metricflow", "or MetricFlow")} /> },
     { n: 12, label: "LookML and Looker", at: n.word("r-lookml", "What is LookML"), body: <LookMl c={c} /> },
@@ -632,7 +636,7 @@ export const RapidScene: React.FC = () => {
       <Drift from={from} to={n.beat("next").to + 40}>
         <Kicker at={tenAt - 4}>Quick round</Kicker>
         <Headline lead="Eleven quick ones" turn="to finish." at={tenAt - 2} turnAt={finishAt} size={64} />
-        <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={620} at={tenAt + 6} end={end} />
+        <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={620} at={n.word("r-truth", "Question nine") - 4} end={end} />
 
         {/* ── The bridge ── */}
         <Note at={peopleAt} x={R_X} y={y(BODY_Y)}>
