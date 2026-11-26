@@ -500,8 +500,9 @@ const Cumulative: React.FC<{ c: Ctx }> = ({ c }) => {
         <text x={winX + 14 * px} y={axisY - c.h(58)} textAnchor="middle" style={svgText(label(21, INK))} opacity={ease(frame, trailingAt + 4, 10)}>
           trailing 28 days
         </text>
-        {/* The 1st: a tick through the axis, named under the band's left edge. */}
-        <line x1={toDateX} y1={axisY - 14} x2={toDateX} y2={axisY + toDateH + 8} stroke={INK} strokeWidth={1.5} opacity={ease(frame, startAt, 8)} />
+        {/* The 1st: a tick down from the axis (clear of the trailing band
+            above it), named under the band's left edge. */}
+        <line x1={toDateX} y1={axisY} x2={toDateX} y2={axisY + toDateH + 8} stroke={INK} strokeWidth={1.5} opacity={ease(frame, startAt, 8)} />
         <text x={toDateX} y={axisY + toDateH + 34} textAnchor="middle" style={svgText(note(20, INK_SOFT))} opacity={ease(frame, startAt + 4, 10)}>
           the 1st
         </text>

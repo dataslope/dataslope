@@ -44,7 +44,7 @@ const USERS = (() => {
 const Hat: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <span style={{ position: "relative", display: "inline-block" }}>
     {children}
-    <span style={{ position: "absolute", left: "0.14em", right: 0, top: "-0.36em", textAlign: "center", fontStyle: "normal", lineHeight: 1 }}>ˆ</span>
+    <span style={{ position: "absolute", left: "0.14em", right: 0, top: "-0.24em", textAlign: "center", fontStyle: "normal", lineHeight: 1 }}>ˆ</span>
   </span>
 );
 

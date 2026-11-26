@@ -36,12 +36,14 @@ for vid, folder in order:
         rows.append((vid, 0, {}))
         continue
     spec = json.load(open(cj))
-    pngs = {int(m.group(1)): f for f in os.listdir(d) if (m := re.match(r"^(\d\d)-.*\.png$", f))}
     items, counts = [], {}
     for k, item in enumerate(spec["items"]):
         n = int(item.get("n", k + 1))
-        f = pngs.get(n)
-        if not f:
+        # The name compare.py gives it: two comparisons may share a finding number.
+        slug = re.sub(r"[^a-z0-9]+", "-", item.get("title", "item").lower()).strip("-")[:48]
+        f = f"{n:02d}-{slug}.png"
+        if not os.path.exists(os.path.join(d, f)):
+            print(f"missing {vid}/{f}", file=sys.stderr)
             continue
         jpg = f"{vid}-{f[:-4]}.jpg"
         im = Image.open(os.path.join(d, f)).convert("RGB")
@@ -57,7 +59,7 @@ for vid, folder in order:
                 f'<span class="new">After: “{html.escape(nar.get("after") or "")}”</span></p>'
             )
         items.append(
-            f'<figure id="{vid}-{n}"><figcaption><span class="sev" style="color:{SEV.get(sev, "#333")}">{html.escape(sev)}</span> '
+            f'<figure id="{vid}-{f[:-4]}"><figcaption><span class="sev" style="color:{SEV.get(sev, "#333")}">{html.escape(sev)}</span> '
             f'<b>Finding {n}.</b> {html.escape(item.get("title", ""))}</figcaption>'
             f'<a href="img/{jpg}"><img loading="lazy" src="img/{jpg}" alt="Before and after: {html.escape(item.get("title", ""))}"></a>'
             f'<ul>{changed}</ul>{nar_html}</figure>'

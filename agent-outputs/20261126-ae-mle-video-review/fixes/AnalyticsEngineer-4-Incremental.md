@@ -31,10 +31,24 @@ No new number. `results.json`, `data.ts`, `check.mjs` and `illustrations.json` a
 
 ## Checks (final code, own entry, through the queues)
 
-CHECKS
+- **typecheck** (`tsc --noEmit`, filtered to `src/videos/ae-incremental/`): no errors.
+- **eslint** `src/videos/ae-incremental`: clean.
+- **check:cues**: "every word cue names a phrase its beat says, and says which one".
+- **npm test**: 79 pass, 0 fail.
+- **check:frames** (`CHECK_SCALE=1`): pass (exit 0). All ticks: illustrations, arrows, spacing, one size and family per line, cue occurrences.
+  - The log also carries 92 `[overlap]` audit lines, all of one kind: "day" and "730" against "day 730", in frames 195-870. That is the hook's yellow-lit `day 730` axis tick (`CostChart`), which is untouched here; they are not counted as failures.
+- **check:sync**: 46 beats, worst +0.03 s (`merge-delete`). `refresh-schema` is at +0.03. All within ±0.12 s.
+- **check:mix**: narration -19.7 LUFS; effects 30.7 LU under it; speech a median 31.1 dB above the effects.
+- **check:motion**: pass. 8:26.5 checked; the one still stretch over 2 s is 2.8 s at 1:34.5 (`filter`, unchanged); nothing holds still for 3 s.
+- I looked at stills at the two places I changed: 332 s (the new label, clear of the tables) and 455, 460.5 and 463.6 s (the new line inking in and finished) in `$S/after/AnalyticsEngineer-4-Incremental/`.
+  - Those stills were rendered before `refresh-schema`'s pauseAfter went from 0.7 to 1.0. That change only moves the next beat 0.3 s later. Before it, 463.6 s was the first frame of the phase's fade, and the frame showed it at full strength.
+- The WAVs and the preview the checks left are deleted.
 
 ## Comparisons
 
 `/tmp/claude-0/-home-user-dataslope/a7697946-07dc-5861-b60b-4725a18149d6/scratchpad/compare/AnalyticsEngineer-4-Incremental/`:
 
-PNGS
+- `/tmp/claude-0/-home-user-dataslope/a7697946-07dc-5861-b60b-4725a18149d6/scratchpad/compare/AnalyticsEngineer-4-Incremental/01-schema-changes-the-on-schema-change-follow-up-is.png` (finding 1: the new on_schema_change line, with the narration before and after)
+- `/tmp/claude-0/-home-user-dataslope/a7697946-07dc-5861-b60b-4725a18149d6/scratchpad/compare/AnalyticsEngineer-4-Incremental/02-the-failed-rebuild-s-label-says-why-it-fails.png` (finding 2: the reworded label)
+
+The before frames are the one-a-second review frames at 455 s and 332 s. Those beats' times are unchanged.

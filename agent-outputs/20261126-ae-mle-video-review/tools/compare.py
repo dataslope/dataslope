@@ -25,7 +25,8 @@ compare.json:
   ]
 }
 
-Box coordinates are in the frame's own 1920x1080 pixels. "after" may be
+Box coordinates are in the frame's own 1920x1080 pixels. A box may set "tag": "above"
+(default), "below", "left" or "right" to move its number off nearby text. "after" may be
 omitted for a change heard rather than seen; the before frame is then shown
 alone with the narration diff. "image" may be a 1080p JPEG or PNG.
 """
@@ -88,10 +89,18 @@ def panel(spec, color):
         lab = str(b.get("label", ""))
         if lab:
             r = 19
-            cx = min(max(x0, r + 2), PANEL_W - r - 2)
-            cy = y0 - r - 4 if y0 - 2 * r - 6 > 0 else y1 + r + 4
-            if cy + r > PANEL_H:
-                cy = y0 + r + 4
+            where = b.get("tag", "above")  # above | below | left | right
+            if where == "left":
+                cx, cy = x0 - r - 6, (y0 + y1) / 2
+            elif where == "right":
+                cx, cy = x1 + r + 6, (y0 + y1) / 2
+            elif where == "below":
+                cx, cy = x0, y1 + r + 4
+            else:
+                cx = x0
+                cy = y0 - r - 4 if y0 - 2 * r - 6 > 0 else y1 + r + 4
+            cx = min(max(cx, r + 2), PANEL_W - r - 2)
+            cy = min(max(cy, r + 2), PANEL_H - r - 2)
             d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color)
             d.text((cx, cy), lab, fill="white", font=F_TAG, anchor="mm")
     return im
