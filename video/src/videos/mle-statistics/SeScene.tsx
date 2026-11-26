@@ -184,7 +184,7 @@ export const SeScene: React.FC = () => {
               <MathRun>
                 {SE.sd.toFixed(2)} / √{SE.n.toLocaleString("en-US")}
               </MathRun>{" "}
-              = <Mark at={thirdsAt + 4}>{sePts.toFixed(2)} points</Mark>
+              = <MathRun>{SE.se.toFixed(4)}</MathRun>, or <Mark at={thirdsAt + 4}>{sePts.toFixed(2)} points</Mark>
             </span>
           </span>
         </Ink>

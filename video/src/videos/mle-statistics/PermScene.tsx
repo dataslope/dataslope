@@ -34,9 +34,11 @@ const SHUFFLED = (() => {
  * Question 8. The page's two groups of fifty as dots, their labels shuffled
  * once; the null distribution 10,000 shuffles build, with the observed 5.9
  * out in its tails (p = 0.024). Then the two models: pooled and shuffled, a
- * wide null with the half-point gap in its middle (p = 0.62); paired, the
- * 2×2 of agreement (only 18 disagreements, 14 to the new model) and a narrow
- * null with the same gap in its tail (p = 0.03, below α).
+ * wide null with the half-point gap in its middle (p = 0.62: no evidence of
+ * a gap, which is not evidence of none); paired, the 2×2 of agreement (only
+ * 18 disagreements, 14 to the new model) and a narrow null with the same gap
+ * in its tail (p = 0.03, below α). On "ship it?" the verdict is marked: the
+ * offline test passes, and an online test decides.
  */
 export const PermScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -55,7 +57,6 @@ export const PermScene: React.FC = () => {
   const modelsAt = n.word("q8-models", "Now the two models");
   const poolAt = n.word("q8-models", "Pool their four thousand");
   const sixTwoAt = n.word("q8-models", "point six two");
-  const nothingAt = n.word("q8-models", "Nothing there");
   const sameAt = n.word("q8-paired", "the same two thousand examples");
   const eighteenAt = n.word("q8-paired", "only eighteen");
   const fourteenAt = n.word("q8-paired", "wins fourteen");
@@ -63,7 +64,8 @@ export const PermScene: React.FC = () => {
   const ohThreeAt = n.word("q8-paired", "point oh three");
   const sameGapAt = n.word("q8-paired", "Same gap");
   const rejectsAt = n.word("q8-paired", "rejects the null");
-  const end = n.beat("q8-paired").to;
+  const passesAt = n.word("q8-ship", "the new model passes");
+  const end = n.beat("q8-ship").to;
 
   const out = modelsAt - 4;
 
@@ -79,8 +81,12 @@ export const PermScene: React.FC = () => {
   };
   const tail = ease(frame, twoFourAt - 6, 10);
 
-  // ── The two models, on one scale: accuracy difference in points ──
-  const dx = (x0: number, x1: number) => (v: number) => x0 + ((v + 0.02) / 0.04) * (x1 - x0);
+  // ── The two models, on one scale: accuracy difference in points. ±3
+  // points holds the whole pooled null (its spread is about 0.9 points). ──
+  const SPAN = 0.03;
+  const dx = (x0: number, x1: number) => (v: number) => x0 + ((v + SPAN) / (2 * SPAN)) * (x1 - x0);
+  const pointTicks = (x: (v: number) => number) =>
+    [-0.03, -0.02, -0.01, 0, 0.01, 0.02, 0.03].map((v) => ({ v, x: x(v), text: v === 0 ? "0" : `${v > 0 ? "+" : "−"}${Math.round(Math.abs(v * 100))}` }));
   const ux = dx(X0, L_X1);
   const px = dx(R_X0, R_X1);
   const histBase = y(700);
@@ -160,7 +166,7 @@ export const PermScene: React.FC = () => {
             grow={(i) => ease(frame, tenKAt + 2 + i * 0.6, 10)}
             ink={(i) => (pageTail(i) && tail > 0.5 ? POINT : DATA)}
           />
-          <Baseline x0={R_X0} x1={R_X1} base={nullBase} at={tenKAt} ticks={[-10, -5, 0, 5, 10].map((v) => ({ v, x: nullX(v), text: v > 0 ? `+${v}` : `${v}` }))} />
+          <Baseline x0={R_X0} x1={R_X1} base={nullBase} at={tenKAt} ticks={[-10, -5, 0, 5, 10].map((v) => ({ v, x: nullX(v), text: v > 0 ? `+${v}` : v < 0 ? `−${-v}` : "0" }))} />
           <Svg opacity={ease(frame, diffAt, 10)}>
             <line x1={nullX(PERM_PAGE.observed)} x2={nullX(PERM_PAGE.observed)} y1={nullBase} y2={nullBase - h(170)} stroke={POINT} strokeWidth={3} />
           </Svg>
@@ -192,7 +198,7 @@ export const PermScene: React.FC = () => {
           height={h(200)}
           grow={(i) => ease(frame, poolAt + 6 + i * 0.5, 10)}
         />
-        <Baseline x0={X0} x1={L_X1} base={histBase} at={poolAt} ticks={[-0.02, -0.01, 0, 0.01, 0.02].map((v) => ({ v, x: ux(v), text: v === 0 ? "0" : `${v > 0 ? "+" : "−"}${Math.abs(v * 100)}` }))} title="Accuracy difference, points" />
+        <Baseline x0={X0} x1={L_X1} base={histBase} at={poolAt} ticks={pointTicks(ux)} title="Accuracy difference, points" />
         {gapLine(ux, sixTwoAt - 10, h(250))}
         <Line at={sixTwoAt - 8} x={ux(PERM_MODELS.gap) + 12} y={histBase - h(250)} size={22}>
           The gap
@@ -201,7 +207,7 @@ export const PermScene: React.FC = () => {
           <MathRun>
             <I>p</I> = <Num>{PERM_MODELS.unpaired.toFixed(2)}</Num>
           </MathRun>
-          <span style={{ ...note(28, INK_SOFT), fontWeight: 500, opacity: ease(frame, nothingAt - 2, 10) }}>: nothing there</span>
+          <span style={{ ...note(28, INK_SOFT), fontWeight: 500, opacity: ease(frame, sixTwoAt + 10, 10) }}>: no evidence of a gap</span>
         </Line>
 
         <ColumnRule x={(L_X1 + R_X0) / 2} top={y(300)} height={y(860) - y(300)} at={sameAt} />
@@ -269,7 +275,7 @@ export const PermScene: React.FC = () => {
           grow={(i) => ease(frame, withinAt + 6 + i * 0.8, 10)}
           ink={(i) => (pairedTail(i) && ease(frame, ohThreeAt - 4, 8) > 0.5 ? POINT : DATA)}
         />
-        <Baseline x0={R_X0} x1={R_X1} base={histBase} at={withinAt} ticks={[-0.02, -0.01, 0, 0.01, 0.02].map((v) => ({ v, x: px(v), text: v === 0 ? "0" : `${v > 0 ? "+" : "−"}${Math.abs(v * 100)}` }))} title="Accuracy difference, points" />
+        <Baseline x0={R_X0} x1={R_X1} base={histBase} at={withinAt} ticks={pointTicks(px)} title="Accuracy difference, points" />
         {gapLine(px, ohThreeAt - 10, h(150))}
         <Line at={ohThreeAt - 8} x={px(PERM_MODELS.gap) + 12} y={histBase - h(150)} size={22}>
           The same gap
@@ -287,7 +293,7 @@ export const PermScene: React.FC = () => {
             <MathRun>
               <I>α</I>
             </MathRun>
-            : reject the null
+            : <Mark at={passesAt}>reject the null</Mark>
           </span>
         </Line>
         <Line at={sameGapAt} x={R_X0} y={y(844)} size={24} color={INK_SOFT}>

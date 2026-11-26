@@ -545,8 +545,9 @@ export const script: NarrationScript = {
     {
       id: "r-distill",
       text: "Knowledge distillation trains a small student to match a large teacher's probabilities, not just the labels. Shown one held-out nine, our digit network says sixty-five percent nine, thirty-five percent three. That tells a student nines can look like threes; the hard label says only nine.",
-      // Holds the finished soft-against-hard pair long enough to read.
-      pauseAfter: 1.2,
+      // Holds the finished soft-against-hard pair long enough to read
+      // "Only nine" before the next answer replaces it.
+      pauseAfter: 1.5,
     },
     {
       id: "r-latency",

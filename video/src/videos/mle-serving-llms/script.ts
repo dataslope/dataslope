@@ -450,7 +450,7 @@ export const script: NarrationScript = {
     {
       id: "q4-verify",
       text: "It keeps the drafted tokens up to the first one it rejects, drops the rest, and adds one token of its own.",
-      pauseAfter: 0.6,
+      pauseAfter: 0.9,
     },
     {
       id: "q4-rule",

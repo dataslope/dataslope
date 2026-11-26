@@ -39,6 +39,15 @@ const USERS = (() => {
   });
 })();
 
+/** A hat drawn over its letter. The combining circumflex (θ̂) lands to the
+ *  right of an italic θ in the serif, over the subscript that follows it. */
+const Hat: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span style={{ position: "relative", display: "inline-block" }}>
+    {children}
+    <span style={{ position: "absolute", left: "0.14em", right: 0, top: "-0.36em", textAlign: "center", fontStyle: "normal", lineHeight: 1 }}>ˆ</span>
+  </span>
+);
+
 /**
  * Question 5. The bootstrap as a picture: ten points, resampled with
  * replacement three times (repeats stacked, dropouts faded), the statistic
@@ -66,14 +75,17 @@ export const BootScene: React.FC = () => {
   const p95At = n.word("q5-p95", "a hundred and ten milliseconds");
   const fiveKAt = n.word("q5-p95", "five thousand resamples");
   const betweenAt = n.word("q5-p95", "between a hundred and one");
-  const unitAt = n.word("q5-unit", "resample the unit");
+  const ifAt = n.word("q5-unit", "If two thousand test rows");
+  const testRowsAt = n.word("q5-unit", "test rows come");
   const usersAt = n.word("q5-unit", "two hundred users");
   const rowsAt = n.word("q5-unit", "resampling rows treats them");
   const narrowAt = n.word("q5-unit", "a third too narrow");
   const wholeAt = n.word("q5-unit", "Resample whole users");
   const end = n.beat("q5-unit").to;
 
-  const out = unitAt - 6;
+  // The bootstrap figure stays up while the follow-up's rule is said, and
+  // gives way only as the rows it is about are named.
+  const out = ifAt - 6;
   const rowY = [y(360), y(450), y(520), y(590)];
 
   // ── Right: latencies and their bootstrap ──
@@ -195,7 +207,9 @@ export const BootScene: React.FC = () => {
                   >
                     →{" "}
                     <MathRun>
-                      <I>θ̂</I>
+                      <Hat>
+                        <I>θ</I>
+                      </Hat>
                       <sub style={{ fontSize: "0.7em" }}>{r}</sub>
                     </MathRun>
                   </div>
@@ -277,14 +291,14 @@ export const BootScene: React.FC = () => {
         </div>
 
         {/* ── The follow-up: resample the unit that was sampled ── */}
-        <Heading at={unitAt} x={X0} y={y(296)}>
+        <Heading at={ifAt + 2} x={X0} y={y(296)}>
           <Num>{CLUSTER.rows.toLocaleString("en-US")}</Num> test rows from <Num>{CLUSTER.users}</Num> users
         </Heading>
         <Svg>
           {USERS.map((rowsOf, u) => {
             const c = u % uCols;
             const r = Math.floor(u / uCols);
-            const p = ease(frame, usersAt + c * 0.5 + r * 0.8, 10);
+            const p = ease(frame, testRowsAt + c * 0.5 + r * 0.8, 10);
             if (p <= 0) return null;
             const bx0 = X0 + c * (uW + uGap);
             const by0 = uTop + r * (uH + h(12));

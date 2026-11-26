@@ -57,7 +57,6 @@ export const TestScene: React.FC = () => {
   const becauseAt = n.word("q6-not", "Because it assumes the null");
   const nullTrueAt = n.word("q6-not", "the probability that the null is true");
   const flukeAt = n.word("q6-not", "your result is a fluke");
-  const notEnd = n.beat("q6-not").to;
   const q7At = n.word("q7", "Question seven");
   const q7TextAt = n.word("q7", "What is hypothesis testing");
   const stateAt = n.word("q7", "State the null");
@@ -174,7 +173,7 @@ export const TestScene: React.FC = () => {
               </Strike>
             </span>
           </Ink>
-          <Line at={notEnd - 10} x={R_X0} y={y(766)} size={22} color={INK_SOFT}>
+          <Line at={flukeAt + 24} x={R_X0} y={y(766)} size={22} color={INK_SOFT}>
             Both read it backwards
           </Line>
         </div>

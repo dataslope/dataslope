@@ -259,7 +259,7 @@ export const PowerScene: React.FC = () => {
             <Num>{POWER.perArm.toLocaleString("en-US")}</Num> per arm
           </Mark>
         </Line>
-        <Line at={inFiveAt} x={at5[0] + 18} y={at5[1] - h(4)} size={24} color={BAD_INK} weight={600}>
+        <Line at={inFiveAt} x={at5[0] + 18} y={at5[1] + h(8)} size={24} color={BAD_INK} weight={600}>
           <Num>5,000</Num> per arm: <Num>{Math.round(POWER.powerSmall * 100)}%</Num>
         </Line>
         <Line at={smallAt} x={X0} y={y(810)} size={28} weight={600}>

@@ -127,7 +127,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     and the tails beyond it shaded, "p = 0.024".
  *   q8-models: the two models' 4,000 answers pooled and shuffled; the null
  *     histogram (PERM_MODELS.unpairedNull) wide, the 0.5-point gap in the
- *     middle of it, "p = 0.62".
+ *     middle of it, "p = 0.62: no evidence of a gap" (never "nothing there":
+ *     a large p is no evidence of a difference, not evidence of none, which
+ *     is q9-null's point).
  *   q8-paired: a 2×2 table of agreement: both right 1,806, both wrong 176,
  *     only old 4, only new 14, the two off-diagonal cells lit yellow; the
  *     paired null (PERM_MODELS.pairedNull, a narrow spike train) with the
@@ -135,6 +137,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     null" (one line, not a new one: the page is full); "Same gap,
  *     different test". Not "it's real": that is the p-value's own
  *     misreading, which "q6-not" has just ruled out.
+ *   q8-ship: the hook's "Ship it?" answered over the finished page, "reject
+ *     the null" marked on "passes": offline it passes, and an online test
+ *     (q9-online) decides.
  *   q9: question card; the page's two-worlds picture: the null and
  *     alternative curves, a critical line, α (red tail) and β (red area
  *     under the alternative), power (green area).
@@ -158,12 +163,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q11: question card; a likelihood curve over a click rate, its peak
  *     marked "maximum likelihood" (MLE.grid, MLE.curveSmoothed).
  *   q11-log: "0.5 × 0.5 × … (2,000 times) = 0.0" in red; "log: −1,386.29"
- *     in green.
+ *     in green. q11-log-peak: "The log only ever rises, so the peak stays
+ *     put", the follow-up an interviewer asks.
  *   q11-loss: two lines: "Normal likelihood → squared error",
  *     "Bernoulli likelihood → log loss", each lit as said.
  *   q11-small: the likelihood for 3 clicks in 3 views (MLE.curve33) piling
  *     against 100%, red; the smoothed curve (4 in 5) peaking at 80%, green;
- *     "L2 = a normal prior on the weights" under it.
+ *     "L2 = a normal prior on the weights" under it. The heading turns to
+ *     "Likelihood by click rate" and the "Maximum likelihood" tag leaves, so
+ *     the prior's 80% is never labelled the maximum likelihood.
  *   q12: question card; the formula in words: posterior = likelihood ×
  *     prior / evidence. The credit card spot.
  *   q12-fraud: the page's base-rate grid, redrawn as fraud: 1,098 dots, one
@@ -187,7 +195,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     scatter, "r = 0".
  *   r-cause: three outlined boxes, "Hot weather" with arrows to "Ice cream
  *     sales" and "Drownings", the arrow between those two dashed and
- *     struck; the ice cream spot beside the first box.
+ *     struck; the ice cream spot beside the first box. r-cause-other: "Or
+ *     reverse causation, or chance", the page's other two reasons.
  *   next: <NextLine> "Next: deep learning" on "deep learning".
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a

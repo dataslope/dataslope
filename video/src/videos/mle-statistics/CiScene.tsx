@@ -245,11 +245,12 @@ export const CiScene: React.FC = () => {
         <Line at={sevenAt + 4} x={sx(SLICE.p) - 10} y={rowY(0) - h(64)} size={22} align="right" width={300}>
           True <Num>97%</Num>
         </Line>
-        <Line at={pointAt + 6} x={sx(1) + 18} y={rowY(perfect.indexOf(true)) - 16} size={22} color={BAD_INK}>
+        <Line at={pointAt + 6} x={sx(1) + 14} y={rowY(perfect.indexOf(true)) - 16} size={22} color={BAD_INK}>
           A point
         </Line>
 
-        <ColumnRule x={(sx1 + 60 + R_X0) / 2} top={y(372) - h(30)} height={rowY(9) + h(30) - y(372) + h(30)} at={acrossAt} />
+        {/* Centred between "A point" (ends about sx1 + 91) and the right column. */}
+        <ColumnRule x={(sx1 + 92 + R_X0) / 2} top={y(372) - h(30)} height={rowY(9) + h(30) - y(372) + h(30)} at={acrossAt} />
 
         <Line at={threeAt} x={R_X0} y={y(372) - 16} size={26}>
           <Num>3</Num> in <Num>10</Num> score <Mark at={threeAt + 6}>40 / 40</Mark>
@@ -277,7 +278,9 @@ export const CiScene: React.FC = () => {
             strokeLinecap="round"
             opacity={ease(frame, wilsonAt + 4, 4)}
           />
-          <line x1={rx(SLICE.p)} x2={rx(SLICE.p)} y1={y(490)} y2={y(660) * ease(frame, acrossAt, 12) + y(490) * (1 - ease(frame, acrossAt, 12))} stroke={INK} strokeWidth={2} strokeDasharray="7 6" />
+          {ease(frame, acrossAt, 12) > 0 ? (
+            <line x1={rx(SLICE.p)} x2={rx(SLICE.p)} y1={y(490)} y2={y(660) * ease(frame, acrossAt, 12) + y(490) * (1 - ease(frame, acrossAt, 12))} stroke={INK} strokeWidth={2} strokeDasharray="7 6" />
+          ) : null}
         </Svg>
         <Baseline x0={rx0} x1={rx1} base={y(670)} at={acrossAt} ticks={[0.8, 0.9, 1].map((v) => ({ v, x: rx(v), text: `${Math.round(v * 100)}%` }))} />
         <Line at={acrossAt} x={R_X0} y={y(470)} size={22} color={INK_SOFT}>
