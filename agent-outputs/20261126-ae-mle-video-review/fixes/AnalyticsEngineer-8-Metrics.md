@@ -41,7 +41,7 @@ All on the final code, through `out/entries/AnalyticsEngineer-8-Metrics.tsx` and
 | `eslint src/videos/ae-metrics` | clean (exit 0) |
 | `check:cues` | pass ("every word cue names a phrase its beat says, and says which one") |
 | `npm test` | 79 of 79 pass |
-| `check:sync` | PENDING |
+| `check:sync` | pass: 54 beats within ±0.12 s of their cues, worst +0.03 s (`avoid`); `r-cumulative` +0.00, `r-cumulative-window` +0.03, `r-cumulative-once` +0.01 |
 | `check:mix` | PENDING |
 | `check:frames` (`CHECK_SCALE=1`) | PENDING |
 | `check:motion` | PENDING |
