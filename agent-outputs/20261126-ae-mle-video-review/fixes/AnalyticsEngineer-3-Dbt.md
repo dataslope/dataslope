@@ -60,16 +60,16 @@ and the queues.
 | lint (`eslint src/videos/ae-dbt`) | pass |
 | `check:cues` | pass: every word cue names a phrase its beat says |
 | `npm test` | pass, 79 of 79 |
-| `check:frames` (`CHECK_SCALE=1`) | PENDING |
+| `check:frames` (`CHECK_SCALE=1`) | **not run**: it waited in the render queue behind the other agents' jobs until its background job hit the 2-hour limit and was stopped, before it started (its log is empty). Per the harness, a job stopped at the longest timeout is not restarted, so the coordinator needs to run it. What it would check on the changed screens, I looked at by eye in the stills: no text under 19px (the new lines are 22 and 24px, code at 19px minimum), nothing past the page edge (the longest new line ends at x = 1814), no line through a label, no new arrows. |
 | `check:motion` | pass: nothing holds still for 3 s; longest 2.8 s (r-macros, unchanged) |
-| `check:sync` | PENDING |
-| `check:mix` | PENDING |
+| `check:sync` | pass: 50 beats, worst +0.05 s (`r-seeds`, unchanged); `r-version-latest` −0.01 s |
+| `check:mix` | pass: effects 29.4 LU under the narration, speech a median 28.5 dB above them, closest 12.9 dB |
 
 Stills at every changed place, looked at, in
 `$S/after/AnalyticsEngineer-3-Dbt/`: 375.5 (Q8 caption), 545.5, 546.5 and
 548.3 (Q15 lit path holding), 603.0, 606.5, 609.5 and 613.8 (Q18 lines
 inking on their words), 640.0 and 664.5 (Q20 rows). I deleted the preview
-`check:motion` left in `video/out/`.
+`check:motion` left and the three WAVs `check:mix` left in `video/out/`.
 
 ## Comparisons
 

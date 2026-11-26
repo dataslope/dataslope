@@ -33,7 +33,17 @@ None generated.
 
 ## Checks (final code, through `out/entries/AnalyticsEngineer-2-ChangingDimensions.tsx` and the queues)
 
-CHECKS_TABLE
+| Check | Result |
+| --- | --- |
+| `tsc --noEmit`, errors in this folder | none |
+| `eslint src/videos/ae-changing-dimensions` | pass |
+| `check:cues` | pass ("every word cue names a phrase its beat says") |
+| `npm test` | 79 pass, 0 fail |
+| `CHECK_SCALE=1 check:frames` | **not run.** The job waited 2 h for a render slot (the slot script polls rather than queues, and about ten other checks were waiting) and was stopped at the 2 h background limit before it started. The harness says not to restart a job that already had the longest limit. The coordinator should run it: `CHECK_SCALE=1 VIDEO_ENTRY=out/entries/AnalyticsEngineer-2-ChangingDimensions.tsx out/render-slot.sh npm run check:frames -- AnalyticsEngineer-2-ChangingDimensions`. It passed on 2026-11-20. Since then only text changed, plus one more listing line in three Question 5 listings and the flow boxes' top alignment. All of it was looked at in 1080p stills. |
+| `check:motion` | pass: 8:04.8 checked, 0 still stretches of 2 s or more |
+| `check:sync`, `check:mix` | not needed: nothing re-voiced |
+
+The preview MP4 `check:motion` left in `video/out/` is deleted.
 
 Stills looked at, all from the final code (`$S/after/AnalyticsEngineer-2-ChangingDimensions/`): 231 (the "Next run" note), 249.5 (the gap figure's title), 278.5 (the flow boxes top-aligned), 297.5 (the lookup with `AND d.is_current`, "dim_customer, current rows"), 307.5 (the left-join load), 318 (the correction job; its 6-line listing clears the row above), 330.5 (the late-watch chart, unchanged) and 375.5 (the new caption).
 

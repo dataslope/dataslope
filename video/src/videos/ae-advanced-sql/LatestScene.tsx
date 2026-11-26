@@ -27,6 +27,7 @@ import {
   MARK_GREEN,
   MARK_RED,
   OK_INK,
+  pulse,
   QMono,
   rowsAt,
   Spot,
@@ -73,6 +74,7 @@ export const LatestScene: React.FC = () => {
   const twelveAt = n.word("latest-how", "twelve rows come out");
   const wrapAt = n.word("latest-where", "a wrapping query");
   const cantAt = n.word("latest-where", "where can't see a window function");
+  const saysAt = n.word("latest-where", "Postgres says so");
   const maxAt = n.word("latest-max", "Group by with max");
   const timeAt = n.word("latest-max", "latest time");
   const losesAt = n.word("latest-max", "loses the email");
@@ -273,8 +275,18 @@ export const LatestScene: React.FC = () => {
           <Listing lines={Wh.lines} x={R_X} top={y(TOP)} size={SIZE} at={cantAt - 4} marks={[{ line: "WHERE ROW_NUMBER()", at: cantAt + 6, color: MARK_RED }]} />
           {/* Up while the reason is given, after the red band reaches the WHERE
               line, so Postgres's words are still there on "Postgres says
-              so"; wide enough for the message on one line. */}
-          <ErrorBox x={R_X} top={y(TOP) + whH + h(22)} width={660} at={cantAt + 16} kind={Wh.kind} message={Wh.message} size={21} />
+              so", when the box nods once; wide enough for the message on
+              one line. */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              transform: `scale(${1 + 0.035 * pulse(frame, saysAt, 18)})`,
+              transformOrigin: `${R_X}px ${y(TOP) + whH + h(52)}px`,
+            }}
+          >
+            <ErrorBox x={R_X} top={y(TOP) + whH + h(22)} width={660} at={cantAt + 16} kind={Wh.kind} message={Wh.message} size={21} />
+          </div>
         </Stage>
 
         {/* ── GROUP BY with MAX: the times, not the email ── */}

@@ -1,17 +1,6 @@
 #!/bin/bash
-# Runs a command in one of 2 "voice" slots, first come first served, so many
-# reviewers on one 4-core machine queue rather than contend.
-#   out/voice-slot.sh <command...>     (from video/)
-D=/tmp/claude-0/-home-user-dataslope/a7697946-07dc-5861-b60b-4725a18149d6/scratchpad/slots
-mkdir -p "$D"
-while true; do
-  for i in $(seq 1 2); do
-    exec {fd}>"$D/voice$i.lock"
-    if flock -n "$fd"; then
-      "$@"
-      exit $?
-    fi
-    exec {fd}>&-
-  done
-  sleep 3
-done
+# Runs a command in one of 2 "voice" slots, first come first served by arrival
+# (tools/fifo.py in agent-outputs/20261126-ae-mle-video-review), so many
+# reviewers on one 4-core machine queue in order.   out/voice-slot.sh <command...>
+args=("$@")
+exec python3 -I /home/user/dataslope/agent-outputs/20261126-ae-mle-video-review/tools/fifo.py voice 2 "${args[@]:-$@}"
