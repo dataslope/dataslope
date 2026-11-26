@@ -51,7 +51,7 @@ const Hat: React.FC<{ children: React.ReactNode }> = ({ children }) => (
       preserveAspectRatio="none"
       style={{ position: "absolute", left: "0.2em", top: "-0.12em", width: "0.36em", height: "0.16em", overflow: "visible" }}
     >
-      <polyline points="0,5 5,0 10,5" fill="none" stroke="currentColor" strokeWidth={1.1} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+      <polyline points="0,5 5,0 10,5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
     </svg>
   </span>
 );
