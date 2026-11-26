@@ -8,7 +8,7 @@ Review: `agent-outputs/20261126-ae-mle-video-review/MachineLearningEngineer-3-Co
 | --- | --- | --- | --- | --- |
 | 1 | P1 | "0 / 0 = 0" after the guard | fixed | Once guarded, the line reads "0 / (0 + 10⁻¹²) = 0", with the guard green like the formula's (`CosineScene.tsx`). |
 | 2 | P2 | "roughly thirty" said over ×38 | fixed | `q1-row` split in three at its sentence breaks. The two unchanged sentences were cut from take-1 for free. The middle one was re-voiced as "Still roughly forty times slower, …". `check.mjs` now checks that phrase, and its range is 30 to 55. |
-| 3 | P2 | Broadcasting: no shape rule, no fix | fixed | On "along its size-one dimensions": "Shapes line up from the right; a missing dimension counts as 1". Then "(2,) → (1, 2) → (3, 2)" as the row is stamped. Over the labels bar, on "a thousand by a thousand", a red "read as (1, 1000)". The two MSEs are attributed to code: "2.29 `pred - y`: the (1000, 1000) square" and "0.24 `pred.ravel() - y`: each row against its own label" (the expression check.mjs computes it with). |
+| 3 | P2 | Broadcasting: no shape rule, no fix | fixed | On "along its size-one dimensions": "Shapes line up from the right; a missing dimension counts as 1". Then "(2,) → (1, 2) → (3, 2)" as the row is stamped. Over the labels bar, on "a thousand by a thousand", a red "read as (1, 1000)". The two MSEs are attributed to code: "2.29 `pred - y`: the (1000, 1000) square" and "0.24 `pred.ravel() - y`: each row against its own label" (the expression check.mjs computes it with). The descriptions are set at 26 px so the code is 24 px, within check:frames' 12% of the number beside it. |
 | 4 | P2 | Log-softmax "computed directly", never how | fixed | Two math lines under it: log p = (z − max) − log Σ e^(z − max), and 100 − 1000 − log(e⁰ + e⁻⁹⁰⁰) = −900 (from SOFTMAX.z2 and logSoftmax). "A loss should take the raw scores" moved down. Set at 26 px, so the superscripts stay above 19 px. |
 | 5 | P2 | Reservoir: 1/j asserted, factors unlinked | fixed | Under "knocks it out: 1 / j", a soft continuation: "it gets in with k / j, then takes that slot with 1 / k". On "Multiply it through": "So item i survives each one: (j − 1) / j". The chain moved down to make room. |
 | 6 | P2 | Metrics: no accuracy, no mask | fixed | Added "accuracy `(y_pred == y_true).mean()`". The mask line is now "each count a mask, summed, no loop: `TP = ((y_pred == 1) & (y_true == 1)).sum()`" (the page's own lines). Each line inks on the word that names it. The empty case moved down a row, and the block now dims to 65% rather than 50%. |
@@ -48,8 +48,39 @@ None generated.
 
 ## Checks
 
-(filled in below)
+All of these ran on the final code, through the queues.
+
+- Typecheck (`tsc --noEmit`, this folder): clean. Lint (`eslint src/videos/mle-coding`): clean.
+- `npm run check:cues`: pass.
+- `npm test`: 79 of 79 pass.
+- `CHECK_SCALE=1 npm run check:frames -- MachineLearningEngineer-3-Coding`: pass, every ✓. The first run failed one rule: the new `pred - y` code was 22 px beside the 26 px number. That was fixed and the check re-run. The audit still logs a few one-sample overlaps, all mid-animation and none a ✗: cells crossing at 126 s (top-k), labels sliding at 337.5 s (batches) and at 372 to 374.5 s (the shuffle).
+- `npm run check:motion -- MachineLearningEngineer-3-Coding`: pass. Nothing holds still for 3 s, and no stretch is still for 2 s or more.
+- `npm run check:sync -- MachineLearningEngineer-3-Coding`: pass. All 38 beats are within ±0.12 s; the worst is +0.03 s (q1-row-rule). The re-voiced q1-row-ratio is +0.01 s.
+- `npm run check:mix -- MachineLearningEngineer-3-Coding`: narration −19.6 LUFS, effects −48.2 LUFS (28.6 LU under), and the speech a median 29.3 dB above the effects. No sound effect changed.
+- `node video/src/videos/mle-coding/check.mjs`: "ok: the page and the narration agree with the run" (see results.json above).
+- I looked at stills at every changed place: 14, 65.5, 115.5, 148.5, 158.5, 167, 186.5, 331, 386.5, 443.9, 487.5, 494.4, 505.5 and 529.5 s. They are in `video/out/review/MachineLearningEngineer-3-Coding/`.
+
+One stills job was killed after 2 h waiting in the render queue. It was re-run, and those stills are now in place.
 
 ## Comparisons
 
-(filled in below)
+In `/tmp/claude-0/-home-user-dataslope/a7697946-07dc-5861-b60b-4725a18149d6/scratchpad/compare/MachineLearningEngineer-3-Coding/` (`compare.json` beside them):
+
+- `01-the-guarded-score-no-longer-reads-0-0-0.png` (findings 1 and 8)
+- `02-the-per-row-ratio-said-matches-the-38-shown.png` (finding 2, with the narration before and after)
+- `03-broadcasting-states-the-shape-rule-as-it-is-said.png` (finding 3, the rule as it is said)
+- `03-why-the-trap-is-a-square-and-the-fix-on-screen.png` (finding 3, the finished scene)
+- `04-log-softmax-shows-how-it-gets-900.png` (finding 4)
+- `05-reservoir-where-1-j-and-the-chain-s-factors-come.png` (findings 5 and 12)
+- `06-metrics-from-scratch-shows-accuracy-and-the-mask.png` (finding 6)
+- `07-axis-0-no-longer-turns-right-answers-red.png` (finding 7)
+- `09-the-heap-is-a-min-heap.png` (finding 9)
+- `10-which-index-suits-64-dimensional-rows.png` (finding 10; the after frame is caught as the quick round fades out)
+- `11-every-shuffled-apart-row-gets-another-row-s-labe.png` (finding 11)
+- `13-the-hook-points-at-where-the-code-breaks.png` (finding 13)
+
+Before frames are the review's one-a-second frames. After frames are in `$S/after/MachineLearningEngineer-3-Coding/`.
+
+## Shared kit
+
+Nothing needed: every fix is inside `src/videos/mle-coding/`.
