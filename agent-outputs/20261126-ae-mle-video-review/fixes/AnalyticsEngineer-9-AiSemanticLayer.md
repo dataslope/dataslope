@@ -48,8 +48,8 @@ None generated.
 | lint (my folder) | pass |
 | `check:cues` | pass |
 | `npm test` | 79 of 79 pass |
-| `check:frames` (`CHECK_SCALE=1`) | CHECK_FRAMES |
-| `check:motion` | CHECK_MOTION |
+| `check:frames` (`CHECK_SCALE=1`) | pass (13 images, largest stretch 0.40; 24 arrows, worst 2.6°; spacing, mixed-face and tabular checks all pass). Two transient `[overlap]` audit lines at frame 11760 (392.0 s): the inserted `unique_key='order_id'` growing into the config line, the same lines the first pass recorded at 391.5 s. Not a failure, and that code is untouched. |
+| `check:motion` | pass: 8:36.0 checked, nothing holds still for 3 s (the preview is deleted) |
 | `check:sync`, `check:mix` | not run: nothing was re-voiced |
 
 I looked at stills at every changed place: 150.5, 178, 216.2, 230.7, 246.5,
