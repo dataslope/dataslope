@@ -27,7 +27,19 @@ None.
 
 ## Checks (final code, through `out/entries/AnalyticsEngineer-1-FactsAndGrain.tsx` and the queues)
 
-CHECKS_TABLE
+| Check | Result |
+| --- | --- |
+| typecheck (`tsc --noEmit`, errors naming the folder) | pass, none |
+| lint (`eslint src/videos/ae-facts-and-grain`) | pass |
+| `check:cues` | pass: every word cue names a phrase its beat says |
+| `npm test` | pass (79/79) |
+| `check:frames` (`CHECK_SCALE=1`) | pass: 4 illustrations within their pixels (largest stretch 0.44); 20 arrows within 10°; ERD ends straight; tabular, spacing and one-face checks clean |
+| `check:motion` | pass: 11:46.0 checked; nothing still for 3 s. Two 2 s stretches: 7:23.8 to 7:25.8, the new `r-types` hold (the point of finding 1), and 9:20.8 to 9:23.0 in `r-confirmed` while the question is read (as before) |
+| `check:sync`, `check:mix` | not run: nothing was re-voiced |
+
+The preview `check:motion` left (`out/AnalyticsEngineer-1-FactsAndGrain-preview.mp4`) was deleted.
+
+Stills at every changed place (276.5, 294, 370, 375.5, 428.5, 436, 461.2, 462.5, 464.4 and 465.6 s) were rendered and looked at. They are in `/tmp/claude-0/-home-user-dataslope/a7697946-07dc-5861-b60b-4725a18149d6/scratchpad/after/AnalyticsEngineer-1-FactsAndGrain/`. One placement was corrected after looking: the kept "Together, they answer across roles" sat 24 px under the table's rule, so it and the two verdicts moved down (finding 4's numbers above), and 370 and 375.5 s were rendered again.
 
 ## Comparisons
 
