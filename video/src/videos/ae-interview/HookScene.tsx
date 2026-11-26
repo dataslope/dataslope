@@ -101,7 +101,7 @@ export const HookScene: React.FC = () => {
       at: n.word("probe-model", "SQL and modeling"),
       parts: [partOf("ae-facts-and-grain"), partOf("ae-changing-dimensions"), partOf("ae-advanced-sql")],
       topics: [
-        { text: "facts and dimensions", at: n.word("probe-model", "facts and dimensions") },
+        { text: "Facts and dimensions", at: n.word("probe-model", "facts and dimensions") },
         { text: "star schemas", at: n.word("probe-model", "star schemas") },
         { text: "grain", at: n.word("probe-model", "the grain") },
         { text: "slowly changing dimensions", at: n.word("probe-model", "slowly changing dimensions") },
@@ -112,7 +112,7 @@ export const HookScene: React.FC = () => {
       at: n.word("probe-dbt", "dbt itself"),
       parts: [partOf("ae-dbt"), partOf("ae-incremental"), partOf("ae-testing")],
       topics: [
-        { text: "models", at: n.word("probe-dbt", "models") },
+        { text: "Models", at: n.word("probe-dbt", "models") },
         { text: "refs", at: n.word("probe-dbt", "refs") },
         { text: "sources", at: n.word("probe-dbt", "sources") },
         { text: "tests", at: n.word("probe-dbt", "tests") },
@@ -125,7 +125,7 @@ export const HookScene: React.FC = () => {
       at: n.word("probe-practice", "Software practice"),
       parts: [partOf("ae-dbt"), partOf("ae-testing")],
       topics: [
-        { text: "version control", at: n.word("probe-practice", "version control") },
+        { text: "Version control", at: n.word("probe-practice", "version control") },
         { text: "continuous integration", at: n.word("probe-practice", "continuous integration") },
         { text: "staging to marts", at: stagingAt },
         { text: "DRY SQL", at: n.word("probe-practice", "SQL that doesn't repeat itself") },
@@ -136,7 +136,7 @@ export const HookScene: React.FC = () => {
       at: n.word("probe-tradeoffs", "trade-offs"),
       parts: [partOf("ae-dbt"), partOf("ae-incremental"), partOf("ae-warehousing")],
       topics: [
-        { text: "view, table or incremental", at: n.word("probe-tradeoffs", "a view") },
+        { text: "View, table or incremental", at: n.word("probe-tradeoffs", "a view") },
         { text: "cost against freshness", at: n.word("probe-tradeoffs", "cost against freshness") },
       ],
     },

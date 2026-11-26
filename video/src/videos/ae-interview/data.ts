@@ -87,7 +87,7 @@ export const PARTS: readonly Part[] = [
   { n: 8, title: "Metrics", from: { "metrics-and-semantic-layer": 19 }, video: "ae-metrics", hero: "ae-metrics-pelican" },
   {
     n: 9,
-    title: "AI layer",
+    title: "AI assistants",
     from: { "ai-and-the-semantic-layer": 6 },
     video: "ae-ai-semantic-layer",
     hero: "ae-ai-semantic-layer-dolphin",

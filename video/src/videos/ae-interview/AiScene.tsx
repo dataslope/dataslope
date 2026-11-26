@@ -87,7 +87,7 @@ export const AiScene: React.FC = () => {
       n: 1,
       title: "Text-to-SQL or a semantic layer",
       at: n.word("ai-sql", "Why text-to-SQL"),
-      sub: "Confident wrong answers",
+      sub: "Confident wrong answers from raw tables",
       subAt: n.word("ai-sql", "confident wrong answers"),
     },
     {
@@ -247,8 +247,10 @@ export const AiScene: React.FC = () => {
         </Box>
         <Spot id="ae-interview-assistant" at={readerAt} left={cx - BUBBLE_W / 2} top={bubbleTop} width={BUBBLE_W} height={BUBBLE_H} phase={30} amp={3} />
         <Flow
+          // It leaves about 15px under the drawn bubble, which ends 30px
+          // above its image's frame, so it reads as the assistant's.
           points={[
-            [cx, bubbleTop + BUBBLE_H + 40],
+            [cx, bubbleTop + BUBBLE_H - 16],
             [cx, metricTop - 14],
           ]}
           at={underAt}
