@@ -57,7 +57,18 @@ Re-run in Pyodide (`node video/src/videos/mle-statistics/check.mjs`: "ok: the pa
 
 ## Checks
 
-CHECKS_PLACEHOLDER
+All checks ran on the final code, through my entry and the queues:
+
+- Typecheck (`tsc --noEmit`, my folder) and `eslint src/videos/mle-statistics`: clean.
+- `npm run check:cues`: pass ("every word cue names a phrase its beat says").
+- `npm test`: pass (79 of 79).
+- `node video/src/videos/mle-statistics/check.mjs`: pass ("the page and the narration agree with the run").
+- `CHECK_SCALE=1 npm run check:frames -- MachineLearningEngineer-4-Statistics`: pass, with no audit warnings. An earlier run flagged the first drawn hat (a "ˆ" glyph over "θ") as `[overlap]`. The hat is now an SVG chevron, and the re-run is clean.
+- `npm run check:sync`: pass, 49 beats, worst +0.04 s (`rapid-in`). The three new beats are at +0.01, +0.00 and +0.01.
+- `npm run check:mix`: narration −19.9 LUFS, effects 29.7 LU under it. Where both sound, the speech is a median 29.8 dB above the effects (5th percentile 13.4 dB).
+- MOTION_PLACEHOLDER
+
+Stills at every changed place were rendered and looked at (`$S/after/MachineLearningEngineer-4-Statistics/`). The WAVs from `check:sync` and `check:mix` are deleted.
 
 ## Comparisons
 
