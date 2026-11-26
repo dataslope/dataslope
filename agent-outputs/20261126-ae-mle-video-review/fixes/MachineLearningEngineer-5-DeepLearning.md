@@ -36,11 +36,22 @@ None generated.
 
 ## Checks
 
-CHECKS_PLACEHOLDER
+All on the final code, through the queues; all pass.
+
+- `npx tsc --noEmit`: no errors in `src/videos/mle-deep-learning/`.
+- `npx eslint src/videos/mle-deep-learning`: clean.
+- `npm run check:cues`: every word cue names a phrase its beat says.
+- `npm test`: 79 of 79 pass.
+- `CHECK_SCALE=1 npm run check:frames -- MachineLearningEngineer-5-DeepLearning`: pass (spacing, one size and family per line, arrowheads 0.0° of bend, 4 illustrations within their pixels).
+- `npm run check:motion`: pass, 11:51.5 checked, nothing still for 2 s or more.
+- `npm run check:sync`: pass, 67 beats, worst +0.03 s (the new `q4-ckpt`).
+- `npm run check:mix`: narration −19.9 LUFS, effects 28.4 LU under it, speech a median 29.9 dB above the effects (closest 10.6 dB for 50 ms at 10:51.8).
+- `node video/src/videos/mle-deep-learning/check.mjs`: "ok: every quoted phrase is on its page, and every number said matches results.json".
+- Stills looked at for every change: 60.5, 129, 189.5, 359.2, 425.2, 500.2, 533.5, 535, 575, 616, 660.5, 696.5 s.
 
 ## `results.json`
 
-RESULTS_PLACEHOLDER
+`check.mjs` was rerun after the changes and wrote a `results.json` byte-identical to the one before the review (`cmp` against a saved copy). Every existing value came back identical.
 
 No new number was typed by hand: the per-bar gradients come from `OPTIM.gradientScale`, the caption from `DROPOUT.image.label`, the pooled grid is derived in the scene from `CNN.shiftedMap` (as it was before), and one hand-typed number (the leaky slope 0.1) left the screen.
 
