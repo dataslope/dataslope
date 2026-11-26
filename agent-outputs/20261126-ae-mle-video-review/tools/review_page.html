@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interview videos reviewed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: an editor's review report: the result first, then the evidence, calm and exact.
+   IDEA: a proof sheet with markup: each fix shown as the frame before and after, boxed.
+   PICTURE: per-video bars of findings stacked by severity, which double as the index.
+   COLOUR and TYPE: Dataslope's white page and ink, brand red/amber/grey for P1/P2/P3, brand blue for links; Source Serif 4 headings, Inter text.
+   LAYOUT: title and figures, the chart, a sticky filter row, then one section per video with full-width comparisons. */
+:root{color-scheme:light dark;--bg:light-dark(#fff,#121212);--ink:light-dark(#18181b,#ececef);--soft:light-dark(#5b5b66,#a1a1aa);--rule:light-dark(#e4e4e7,#2e2e33);--blue:light-dark(#0064BD,#5BA7FF);--p1:light-dark(#BA303A,#FF807F);--p2:light-dark(#C36400,#EB9558);--p3:light-dark(#a1a1aa,#6b6b74);--chip:light-dark(#f4f4f5,#202024)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(28px,4vw,56px) max(5vw,16px);max-width:1440px;margin:0 auto}
+h1,h2{font-family:"Source Serif 4",Georgia,serif;font-weight:600;line-height:1.08;text-wrap:balance;margin:0}
+h1{font-size:clamp(32px,4.4vw,50px);max-width:24ch}
+h2{font-size:clamp(24px,2.6vw,32px)}
+.kick{color:var(--soft);font-size:15px;margin:0 0 14px}
+.lede{font-size:17px;max-width:68ch;margin:18px 0 0;color:var(--soft)}
+.figs{display:flex;flex-wrap:wrap;gap:12px 40px;margin:30px 0 0;padding:22px 0 0;border-top:1px solid var(--rule)}
+.fig1 b{display:block;font-size:clamp(28px,3vw,36px);font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.fig1 span{font-size:14px;color:var(--soft)}
+.p1{color:var(--p1)}.p2{color:var(--p2)}
+.chart{margin-top:40px}
+.chart h3,.lst h3{font:600 15px/1.3 Inter,sans-serif;margin:26px 0 10px}
+.row{display:grid;grid-template-columns:minmax(0,19em) minmax(0,1fr) 7.5em 6em;gap:14px;align-items:center;padding:5px 0;text-decoration:none;color:inherit;border-radius:6px}
+.row:hover{background:var(--chip)}
+.row .nm{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .nm i{font-style:normal;color:var(--soft)}
+.bar{display:flex;height:18px;gap:2px}
+.bar s{display:block;text-decoration:none;height:100%;border-radius:3px}
+.row .len,.row .vo{font-size:13px;color:var(--soft);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--soft);margin-top:12px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.filters{position:sticky;top:0;z-index:2;background:var(--bg);border-bottom:1px solid var(--rule);padding:10px max(5vw,16px)}
+.filters .in{max-width:1440px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:500 15px Inter,sans-serif;min-height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--rule);background:none;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.count{font-size:14px;color:var(--soft)}
+section.v{padding-top:28px;margin-top:28px;border-top:1px solid var(--rule)}
+.meta{font-size:14px;color:var(--soft);margin:8px 0 0}
+.head{font-size:17px;margin:10px 0 0;max-width:80ch}
+figure{margin:26px 0 0}
+figcaption{font-size:16px;margin-bottom:8px}
+figcaption .sev{font-weight:600;margin-right:8px}
+figure a{display:block}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:6px;background:#fff}
+a{color:var(--blue)}
+.note{font-size:14px;color:var(--soft);margin-top:40px;max-width:80ch}
+html{scroll-padding-top:72px}
+@media(max-width:700px){.row{grid-template-columns:minmax(0,1fr) auto;gap:4px 10px}.row .bar{grid-column:1/-1;grid-row:2}.row .vo{display:none}}
+@media(prefers-reduced-motion:no-preference){.row{transition:background .15s}}
+</style>
+</head>
+<body>
+<header class="band">
+  <p class="kick">Dataslope video review · 26 November 2026</p>
+  <h1 id="title">Every finding in 21 interview videos is fixed</h1>
+  <p class="lede" id="lede"></p>
+  <div class="figs" id="figs"></div>
+  <div class="chart" id="chart"></div>
+  <div class="legend"><span><i style="background:var(--p1)"></i>P1: a viewer would learn something wrong, or an obvious defect</span><span><i style="background:var(--p2)"></i>P2: noticeable, hurts the video</span><span><i style="background:var(--p3)"></i>P3: polish</span></div>
+</header>
+<nav class="filters" aria-label="Filter the comparisons">
+  <div class="in">
+    <div class="seg" id="fs" role="group" aria-label="Series"></div>
+    <div class="seg" id="fv" role="group" aria-label="Severity"></div>
+    <span class="count" id="count"></span>
+  </div>
+</nav>
+<main class="band" id="list"></main>
+<script>
+{
+const V = /*DATA*/[];
+const SER = { mle: "Machine Learning Engineer", ae: "Analytics Engineer" };
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const mmss = (t) => { t = Math.round(t); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`; };
+const hms = (t) => { t = Math.round(t); return `${Math.floor(t / 3600)}:${String(Math.floor((t % 3600) / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`; };
+const ALL_CHARS = /*CHARS*/0;
+const sum = (xs, f) => xs.reduce((a, x) => a + f(x), 0);
+const tot = (s) => { const vs = V.filter((v) => !s || v.series === s); return { p1: sum(vs, (v) => v.findings.P1), p2: sum(vs, (v) => v.findings.P2), p3: sum(vs, (v) => v.findings.P3), chars: sum(vs, (v) => v.chars), before: sum(vs, (v) => v.before), after: sum(vs, (v) => v.after), n: sum(vs, (v) => v.items.length), vids: vs.length }; };
+const T = tot(), M = tot("mle"), A = tot("ae");
+
+document.getElementById("lede").textContent =
+  `${T.p1 + T.p2 + T.p3} findings across the Machine Learning Engineer series (11 videos, first review) and the Analytics Engineer series (10 videos, second review). ` +
+  `Each was reviewed frame by frame against its script, its measured results and the interview page it answers, then fixed. ` +
+  `Below, ${T.n} before-and-after comparisons show what changed.`;
+
+document.getElementById("figs").innerHTML = [
+  [T.p1 + T.p2 + T.p3, "findings, all fixed"],
+  [T.p1, "P1", "p1"], [T.p2, "P2", "p2"], [T.p3, "P3"],
+  [T.chars.toLocaleString("en-US"), `characters re-voiced, of ${ALL_CHARS.toLocaleString("en-US")} narrated`],
+  ["0", "images regenerated"],
+  [`${hms(T.before)} → ${hms(T.after)}`, "total running time"],
+].map(([b, s, c]) => `<div class="fig1"><b class="${c || ""}">${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+
+const maxF = Math.max(...V.map((v) => v.findings.P1 + v.findings.P2 + v.findings.P3));
+const row = (v) => {
+  const f = v.findings, w = (n) => `${(100 * n) / maxF}%`;
+  const segs = [["P1", "var(--p1)"], ["P2", "var(--p2)"], ["P3", "var(--p3)"]].filter(([k]) => f[k]).map(([k, c]) => `<s style="width:${w(f[k])};background:${c}" title="${f[k]} ${k}"></s>`).join("");
+  return `<a class="row" href="#${v.anchor}"><span class="nm"><i>Part ${v.part}</i> ${esc(v.name)}</span><span class="bar" role="img" aria-label="${f.P1} P1, ${f.P2} P2, ${f.P3} P3">${segs}</span><span class="len">${mmss(v.before)} → ${mmss(v.after)}</span><span class="vo">${v.chars ? v.chars + " chars" : "no re-voice"}</span></a>`;
+};
+document.getElementById("chart").innerHTML = ["mle", "ae"].map((s) => {
+  const t = s === "mle" ? M : A;
+  return `<div class="lst"><h3>${SER[s]} · ${t.p1 + t.p2 + t.p3} findings · ${hms(t.before)} → ${hms(t.after)} · ${t.chars.toLocaleString("en-US")} characters re-voiced</h3>${V.filter((v) => v.series === s).map(row).join("")}</div>`;
+}).join("");
+
+let fs = "all", fv = "all";
+const seg = (el, opts, get, set) => {
+  const draw = () => { el.innerHTML = opts.map(([k, l]) => `<button type="button" data-k="${k}" aria-pressed="${get() === k}">${esc(l)}</button>`).join(""); };
+  el.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; set(b.dataset.k); draw(); render(); });
+  draw();
+};
+seg(document.getElementById("fs"), [["all", "Both series"], ["mle", "Machine Learning Engineer"], ["ae", "Analytics Engineer"]], () => fs, (k) => (fs = k));
+seg(document.getElementById("fv"), [["all", "All"], ["P1", "P1"], ["P2", "P2"], ["P3", "P3"]], () => fv, (k) => (fv = k));
+
+function render() {
+  let shown = 0;
+  const html = V.filter((v) => fs === "all" || v.series === fs).map((v) => {
+    const items = v.items.filter((i) => fv === "all" || i.sev === fv);
+    shown += items.length;
+    const f = v.findings;
+    const figs = items.map((i) => `<figure><figcaption><span class="sev ${i.sev.toLowerCase()}">${esc(i.sev)}</span>Finding ${i.n}: ${esc(i.title)}</figcaption><a href="${esc(i.img)}" target="_blank" rel="noopener"><img loading="lazy" src="${esc(i.img)}" alt="Before and after: ${esc(i.title)}"></a></figure>`).join("");
+    return `<section class="v" id="${v.anchor}"><h2>${SER[v.series]}, Part ${v.part}: ${esc(v.name)}</h2>` +
+      `<p class="meta">${f.P1} P1 · ${f.P2} P2 · ${f.P3} P3, all fixed · ${mmss(v.before)} → ${mmss(v.after)} · ${v.chars ? v.chars + " characters re-voiced" : "nothing re-voiced"} · ${v.series === "ae" ? "second review" : "first review"}</p>` +
+      `<p class="head">${esc(v.headline)}</p>${figs || `<p class="meta">No ${esc(fv)} comparisons in this video.</p>`}</section>`;
+  }).join("");
+  document.getElementById("list").innerHTML = html + `<p class="note">Each picture: the frame before the fix on the left with red boxes, the same moment after it on the right with green boxes, numbered to match the notes under it, with the narration before and after when its words changed. Open a picture for full size. A comparison can cover more than one finding, so the counts above are findings and the pictures number ${T.n}.</p>`;
+  document.getElementById("count").textContent = `${shown} comparison${shown === 1 ? "" : "s"}`;
+}
+render();
+const go = () => { const el = location.hash && document.getElementById(location.hash.slice(1)); if (el) el.scrollIntoView(); };
+window.addEventListener("hashchange", go);
+if (location.hash) setTimeout(go, 50);
+}
+</script>
+</body>
+</html>
