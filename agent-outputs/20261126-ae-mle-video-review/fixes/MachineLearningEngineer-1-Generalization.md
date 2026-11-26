@@ -53,7 +53,21 @@ None generated.
 
 ## Checks
 
-CHECKS_PLACEHOLDER
+All on the final code, through the private entry and the queues.
+
+| Check | Result |
+| --- | --- |
+| `tsc --noEmit` (folder) | pass: no errors in `src/videos/mle-generalization/` |
+| `eslint src/videos/mle-generalization` | pass |
+| `npm run check:cues` | pass: every word cue names a phrase its beat says |
+| `npm test` | pass: 0 failures |
+| `CHECK_SCALE=1 npm run check:frames` | pass: 3 images, 21 arrows within 10°, no tabular hyphen, every word spaced, one size and family per line |
+| `npm run check:motion` | pass: nothing holds still for 3 s (longest 2.8 s, the imbalance table at 9:07) |
+| `npm run check:sync` | pass: 59 beats, worst +0.03 s |
+| `npm run check:mix` | pass: effects 30.2 LU under the narration, closest 11.9 dB |
+| `check.mjs` | ok, every existing value identical |
+
+Stills were looked at for every changed place (78.3, 168.7, 214.2, 268.6, 287.6, 331.6, 344.6, 374.6, 409.2, 445.6, 462.6, 584.5, 611.8, 666.9 s). The WAVs and the preview the checks left were deleted.
 
 ## Comparisons
 
