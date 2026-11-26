@@ -43,12 +43,12 @@ the two splits add.
 ## Checks (final code, through the queues)
 
 - `tsc --noEmit` (folder): clean. `eslint src/videos/mle-llm-evals`: clean.
-- `check:cues`: CUES
-- `npm test`: TEST
+- `check:cues`: pass (every word cue names a phrase its beat says).
+- `npm test`: 79/79 pass.
 - `CHECK_SCALE=1 check:frames`: pass (3 images, 23 arrows, spacing, one size per line).
-- `check:motion`: MOTION
-- `check:sync`: SYNC
-- `check:mix`: MIX
+- `check:motion`: pass (9:29.5 checked, 0 stretches still for 2 s or more).
+- `check:sync`: pass (53 beats, worst +0.07 s at `q1-ours`; the new beats `q1-agree-fix`, `q2-bar`, `q4-idem-key` within ±0.02 s).
+- `check:mix`: pass (speech a median 27.1 dB above the effects, closest 11.9 dB at 0:24.6). WAVs and the motion preview deleted.
 - `check.mjs`: "48 quotes on the page, 22 spoken numbers match"; `results.json` byte-identical (no new number, no value changed).
 
 ## Comparisons
