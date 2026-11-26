@@ -40,8 +40,11 @@ No new number. `results.json`, `data.ts`, `check.mjs` and `illustrations.json` a
 - **check:sync**: 46 beats, worst +0.03 s (`merge-delete`). `refresh-schema` is at +0.03. All within ±0.12 s.
 - **check:mix**: narration -19.7 LUFS; effects 30.7 LU under it; speech a median 31.1 dB above the effects.
 - **check:motion**: pass. 8:26.5 checked; the one still stretch over 2 s is 2.8 s at 1:34.5 (`filter`, unchanged); nothing holds still for 3 s.
-- I looked at stills at the two places I changed: 332 s (the new label, clear of the tables) and 455, 460.5 and 463.6 s (the new line inking in and finished) in `$S/after/AnalyticsEngineer-4-Incremental/`.
-  - Those stills were rendered before `refresh-schema`'s pauseAfter went from 0.7 to 1.0. That change only moves the next beat 0.3 s later. Before it, 463.6 s was the first frame of the phase's fade, and the frame showed it at full strength.
+- I looked at stills of the final code at both places I changed. They are in `$S/after/AnalyticsEngineer-4-Incremental/`:
+  - 332 s: the new label, clear of the tables.
+  - 455 s and 460.5 s: the new line inking in.
+  - 463.6 s: the line finished, the whole phase still at full strength.
+  - 465.5 s: the phase cleared, and the chart arriving.
 - The WAVs and the preview the checks left are deleted.
 
 ## Comparisons
