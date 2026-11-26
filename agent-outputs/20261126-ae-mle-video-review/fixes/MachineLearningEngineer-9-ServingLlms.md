@@ -49,7 +49,7 @@ None generated.
 - `CHECK_SCALE=1 npm run check:frames -- MachineLearningEngineer-9-ServingLlms`: passes (19 arrows within 10° under their heads, word spacing, one size and family per line, no tabular hyphens, 4 illustrations not upscaled).
 - `npm run check:sync`: passes, all 43 beats within ±0.03 s of their cues (`q4-verify` +0.01).
 - `npm run check:mix`: narration −20.0 LUFS, effects 29.4 LU under it, speech a median 29.9 dB above the effects. WAVs deleted.
-- `npm run check:motion`: MOTION_PLACEHOLDER
+- `npm run check:motion`: passes. Nothing holds still for 3 s. Three stretches of 2.0 to 2.3 s, all in question openings (1:50, 5:17, 5:25), none of them new. Preview deleted.
 - Stills looked at, after the fixes: 122, 141, 158, 168, 179, 199, 246, 282, 379.8, 384, 404 and 414.5 s.
 
 ## Comparisons
