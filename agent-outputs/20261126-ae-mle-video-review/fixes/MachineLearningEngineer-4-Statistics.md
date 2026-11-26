@@ -16,7 +16,7 @@ Review: `agent-outputs/20261126-ae-mle-video-review/MachineLearningEngineer-4-St
 | 8 | P3 | "No formula" overstated | fixed | Now "No simple formula" (`CltScene.tsx`) |
 | 9 | P3 | Correlation and causation gives only the confounder | fixed | New beat `r-cause-other`: "Or the cause runs the other way, or it's chance." A soft line reads "Or reverse causation, or chance" (`RapidScene.tsx`) |
 | 10 | P3 | Unnarrated lines leave too soon; new questions after short gaps | fixed | "Both read it backwards" is now cued on "fluke" + 24 frames. `pauseAfter` rose from 0.6 to 1.2 on `q2-limit` and from 0.7 to 1.2 on `q6-not` (`TestScene.tsx`, `script.ts`) |
-| 11 | P3 | θ̂ hat lands after the subscript | fixed | Local `Hat` draws the circumflex over θ (`BootScene.tsx`) |
+| 11 | P3 | θ̂ hat lands after the subscript | fixed | Local `Hat` draws the hat as a small SVG chevron over θ, so the page audit reports no glyph overlap (`BootScene.tsx`) |
 | 12 | P3 | Hyphens for minus signs on the permutation axis | fixed | "−10", "−5" (`PermScene.tsx`) |
 | 13 | P3 | "5,000 per arm: 20%" grazes the gridline | fixed | Label moved down about 12 px (`PowerScene.tsx`) |
 | 14 | P3 | "A point" 7 px from the column rule | fixed | Label 4 px closer to its dot. The rule is centred at 1080: about 30 px from the label and 20 px from the right column (`CiScene.tsx`) |
@@ -66,7 +66,7 @@ All checks ran on the final code, through my entry and the queues:
 - `CHECK_SCALE=1 npm run check:frames -- MachineLearningEngineer-4-Statistics`: pass, with no audit warnings. An earlier run flagged the first drawn hat (a "ˆ" glyph over "θ") as `[overlap]`. The hat is now an SVG chevron, and the re-run is clean.
 - `npm run check:sync`: pass, 49 beats, worst +0.04 s (`rapid-in`). The three new beats are at +0.01, +0.00 and +0.01.
 - `npm run check:mix`: narration −19.9 LUFS, effects 29.7 LU under it. Where both sound, the speech is a median 29.8 dB above the effects (5th percentile 13.4 dB).
-- MOTION_PLACEHOLDER
+- `npm run check:motion`: pass. 10:59.8 checked, with no stretch still for 2 s or more. The preview MP4 is deleted.
 
 Stills at every changed place were rendered and looked at (`$S/after/MachineLearningEngineer-4-Statistics/`). The WAVs from `check:sync` and `check:mix` are deleted.
 
