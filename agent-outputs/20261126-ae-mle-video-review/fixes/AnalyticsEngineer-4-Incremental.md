@@ -21,7 +21,9 @@ None.
 
 ## Length
 
-498.5 s (8:18.5) to **506.4 s (8:26.4)**: +7.1 s for the new beat, +0.6 s for its pauses, +0.3 s for the longer pause after it.
+498.5 s (8:18.5) to **506.4 s (8:26.4)**, 7.9 s longer:
+- 7.1 s for the new beat.
+- 0.9 s more pause. Before, `refresh-fix` had 0.7 s after it. Now it has 0.6 s, and the new beat has 1.0 s after it.
 
 ## Data
 
