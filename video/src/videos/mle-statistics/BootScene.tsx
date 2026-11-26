@@ -40,11 +40,19 @@ const USERS = (() => {
 })();
 
 /** A hat drawn over its letter. The combining circumflex (θ̂) lands to the
- *  right of an italic θ in the serif, over the subscript that follows it. */
+ *  right of an italic θ in the serif, over the subscript that follows it, so
+ *  the hat is a small stroked chevron instead (a shape, not a second glyph
+ *  on top of the first, which the page audit would report as an overlap). */
 const Hat: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <span style={{ position: "relative", display: "inline-block" }}>
     {children}
-    <span style={{ position: "absolute", left: "0.14em", right: 0, top: "-0.24em", textAlign: "center", fontStyle: "normal", lineHeight: 1 }}>ˆ</span>
+    <svg
+      viewBox="0 0 10 5"
+      preserveAspectRatio="none"
+      style={{ position: "absolute", left: "0.2em", top: "-0.12em", width: "0.36em", height: "0.16em", overflow: "visible" }}
+    >
+      <polyline points="0,5 5,0 10,5" fill="none" stroke="currentColor" strokeWidth={1.1} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+    </svg>
   </span>
 );
 
