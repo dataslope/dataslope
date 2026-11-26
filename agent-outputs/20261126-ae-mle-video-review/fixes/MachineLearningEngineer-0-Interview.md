@@ -53,11 +53,35 @@ The one changed value is a mapping in `data.ts` (MLOps to Parts 7 and 8, finding
 - Typecheck (`tsc --noEmit`, filtered to `mle-interview/`) and eslint on the folder: clean.
 - `check:cues`: pass. `npm test`: 79 of 79 pass.
 - `check:frames` (`CHECK_SCALE=1`, own entry, through the queue): pass. 13 illustrations, largest stretch 0.49; the word-gap, one-size-per-line and tabular-hyphen audits are clean.
-- `check:motion`: PENDING
-- `check:sync`: PENDING
-- `check:mix`: PENDING
+- `check:motion` (own entry, through the queue): pass. 3:22.5 checked, 0 stretches still for 2 s or more. The preview it left is deleted.
+- `check:sync`: pass. 19 beats, worst +0.04 s (`hook-both`); the new `llm-not-when` lands at -0.00 s.
+- `check:mix`: pass. Narration -19.7 LUFS, effects 31.4 LU under it, median 29.9 dB of speech over effects where both sound. The closest moment, 2:45.2 (7.4 dB, 50 ms), is the series chart's existing pop on "First generalization", moved 16.4 s later by the new beat; the one new effect (a tap at -34 on "four things") is not among the five closest. The WAVs are deleted.
 - Stills, each looked at: 20, 25, 70, 83, 84.4, 85.5, 101.8, 118, 124.5, 131.8, 139.5 and 196 s (`video/out/review/MachineLearningEngineer-0-Interview/`).
 
 ## Comparisons
 
-`$S/compare/MachineLearningEngineer-0-Interview/`, PENDING
+`/tmp/claude-0/-home-user-dataslope/a7697946-07dc-5861-b60b-4725a18149d6/scratchpad/compare/MachineLearningEngineer-0-Interview/`
+(each looked at, its boxes on target):
+
+- `01-when-not-to-use-an-llm-a-case-and-the-reason.png` (finding 1, with the narration before and after)
+- `02-inference-economics-names-the-kv-cache-and-the-l.png` (finding 2)
+- `03-the-four-additions-ink-on-four-things.png` (finding 3)
+- `04-mlops-points-at-parts-7-and-8.png` (finding 4)
+- `05-probe-rows-sit-evenly-between-their-rules.png` (finding 5)
+- `06-one-space-before-fix-it.png` (finding 6)
+
+The before frames are the review's one-a-second frames (`element-025`,
+`-070`, `-084`, `-122`). The after frames are stills rendered from the
+current code through my entry (`$S/after/MachineLearningEngineer-0-Interview/`,
+copied from `video/out/review/MachineLearningEngineer-0-Interview/`), taken
+at the same beat and word, with the LLM scene 16.4 s later.
+
+## Noticed
+
+- The render queue held each check for 30 to 70 minutes. I cancelled my own
+  queued re-render of after stills that I already had from the same code,
+  and re-queued `check:sync`, `check:mix` and `check:motion` as separate jobs
+  so a 2-hour limit on one chain could not cut them off.
+- Not changed, for the coordinator: the overview never names the one
+  question it answers ("1 answered here"). The Analytics Engineer overview
+  does the same, and its review left it, so I did too.
