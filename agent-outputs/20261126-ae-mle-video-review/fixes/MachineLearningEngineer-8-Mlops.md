@@ -24,7 +24,14 @@ Review: `agent-outputs/20261126-ae-mle-video-review/MachineLearningEngineer-8-Ml
 
 ## Checks (final code, through the entry and the queues)
 
-CHECKS_PLACEHOLDER
+- Typecheck (`tsc --noEmit`, this folder): pass, no errors.
+- Lint (`eslint src/videos/mle-mlops`): pass.
+- `npm run check:cues`: pass ("every word cue names a phrase its beat says").
+- `npm test`: 79 of 79 pass.
+- `CHECK_SCALE=1 npm run check:frames -- MachineLearningEngineer-8-Mlops`: pass (4 images, 58 arrows, spacing, one size and family per line).
+- `npm run check:motion -- MachineLearningEngineer-8-Mlops`: pass (nothing still for 3 s; two 2.0 to 2.3 s holds in `r-retrain`, unchanged by this pass).
+- `check:sync`, `check:mix`: not run, as nothing was re-voiced.
+- Stills looked at, at every place changed: 262, 270, 356, 369, 457, 480, 498, 509, 574, 576, 583 s.
 
 `results.json`, `data.ts` and `check.mjs` were not touched, so every existing value comes back identical. No new number was added; the new labels carry no numbers.
 
