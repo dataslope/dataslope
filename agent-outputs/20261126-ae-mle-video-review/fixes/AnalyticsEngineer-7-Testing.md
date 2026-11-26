@@ -33,8 +33,8 @@ None of the five fixes touches `check.mjs` or `data.ts`. `check.mjs` was run aga
 - tsc: no errors in `src/videos/ae-testing/` (exit 0). eslint `src/videos/ae-testing`: clean (exit 0).
 - `check:cues`: passes ("every word cue names a phrase its beat says").
 - `npm test`: 79 pass, 0 fail.
-- `CHECK_SCALE=1 check:frames`: CHECK_FRAMES
-- `check:motion`: CHECK_MOTION
+- `CHECK_SCALE=1 check:frames`: passes: 4 images, 26 arrows; spacing, sizes, families and cue occurrences clean.
+- `check:motion`: passes: 9:53.8 checked, nothing still for 3 s. One stretch of 2.3 s, 7:16.3 to 7:18.5, falls while `r-source`'s question is read. Nothing at that moment changed in this pass.
 - `check:sync` / `check:mix`: not run, because nothing was re-voiced and no audio changed.
 
 Stills looked at (after): 236.5, 238.5, 388, 481.4, 482.1, 501.5 and 590.7 s.
