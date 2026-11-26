@@ -23,8 +23,9 @@ const thousands = (s: string) => Number(s).toLocaleString("en-US");
  * Question 11 on the same logins. The ten days that have any, each with its
  * distinct users: the counts sum to 23, against 12 people over the range.
  * User 101's IDs light up, then the other five who came back: six people,
- * eleven extra counts (no label singles 101 out; the narration doesn't). The fix as a flow: the month recounted from
- * the logins, never summed from the daily table. Then the cost at scale and
+ * eleven extra counts (no label singles 101 out; the narration doesn't).
+ * The fix as a flow: the month recounted from the logins, never summed from
+ * the daily table. Then the cost at scale and
  * DuckDB's approximate count on a million distinct IDs.
  */
 export const DistinctScene: React.FC = () => {
