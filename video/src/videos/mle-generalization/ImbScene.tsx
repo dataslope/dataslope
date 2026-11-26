@@ -68,9 +68,10 @@ export const ImbScene: React.FC = () => {
   const gridOut = trapAt - 6;
 
   // ── The table ──
-  const T = { x: X0, top: y(330), w: 1420 };
+  // Four rows and the three steps under them fit above the page's foot.
+  const T = { x: X0, top: y(310), w: 1420 };
   const COL = [X0 + 20, 860, 1150];
-  const rowH = h(84);
+  const rowH = h(76);
   const rows = [
     // A tinted mark's text takes its hue's ink, never black.
     { name: "Recall at threshold 0.5", plain: pct(FRAUD.thresholds[0].recall), bal: pct(FRAUD.weighted.at.recall), at: recallAt, balAt: eightyAt, mark: HIGHLIGHT, ink: LIT_INK, note: "" },
@@ -183,7 +184,7 @@ export const ImbScene: React.FC = () => {
           return (
             <React.Fragment key={r.name}>
               {i > 0 ? <div style={{ position: "absolute", left: T.x, top, width: T.w, height: 1, background: `color-mix(in srgb, ${INK} 16%, transparent)`, opacity: ease(frame, r.at - 4, 10) }} /> : null}
-              <div style={{ position: "absolute", left: COL[2] - 14, top: top + h(20), width: 124 * mark, height: rowH - h(40), background: r.mark, borderRadius: 4 }} />
+              <div style={{ position: "absolute", left: COL[2] - 14, top: top + h(15), width: 124 * mark, height: rowH - h(30), background: r.mark, borderRadius: 4 }} />
               <Say at={r.at - 4} x={COL[0]} y={top + rowH / 2 - 21}>
                 <span style={line(32, INK)}>{r.name}</span>
               </Say>
@@ -204,7 +205,7 @@ export const ImbScene: React.FC = () => {
 
         {/* ── What to do ── */}
         {steps.map((s, i) => (
-          <Say key={s.text} at={(s.lead ?? s.at) - 2} x={X0} y={T.top + h(60) + rows.length * rowH + h(42) + i * h(66)}>
+          <Say key={s.text} at={(s.lead ?? s.at) - 2} x={X0} y={T.top + h(60) + rows.length * rowH + h(42) + i * h(62)}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 16, fontSize: 28 }}>
               <Tick at={s.at} size={26} color={OK} />
               <span style={line(28, OK_INK)}>{s.text}</span>

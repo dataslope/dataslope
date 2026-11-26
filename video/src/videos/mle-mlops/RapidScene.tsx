@@ -149,16 +149,19 @@ const BlueGreen: React.FC<{ c: Ctx }> = ({ c }) => {
   const toGreen = ease(frame, flipAt, 8);
   const live = toGreen > 0.5 ? greenY : blueY;
   const trMid = tr.y + env.h / 2;
-  const BACK_X = 1050;
+  // The switch turns down to green clear of the note under Traffic; the
+  // way back turns up to blue before it.
+  const SWITCH_X = 1100;
+  const BACK_X = 1040;
   return (
     <>
       <Box x={tr.x} y={tr.y} w={tr.w} h={env.h} at={twoAt - 4} title="Traffic" size={24} />
       <Box x={env.x} y={blueY} w={env.w} h={env.h} at={twoAt} title="Blue (current)" sub={<span style={{ opacity: ease(frame, servesAt, 10) }}>{toGreen > 0.5 ? "standing by" : "serving"}</span>} size={24} lit={toGreen > 0.5 ? undefined : servesAt} litOut={flipAt} />
       <Box x={env.x} y={greenY} w={env.w} h={env.h} at={twoAt + 6} title="Green (new)" sub={<span style={{ opacity: ease(frame, warmAt - 4, 10) }}>{toGreen > 0.5 ? "serving" : "new model, warming up"}</span>} size={24} lit={flipAt} litOut={downAt} />
       {/* The one switch, redrawn when it flips. */}
-      <Flow key={live} points={[[tr.x + tr.w + 4, trMid], [1000, trMid], [1000, live + env.h / 2], [env.x - 3, live + env.h / 2]]} at={live === blueY ? servesAt : flipAt} dur={8} color={BAR} width={5} head={16} radius={14} />
+      <Flow key={live} points={[[tr.x + tr.w + 4, trMid], [SWITCH_X, trMid], [SWITCH_X, live + env.h / 2], [env.x - 3, live + env.h / 2]]} at={live === blueY ? servesAt : flipAt} dur={8} color={BAR} width={5} head={16} radius={14} />
       {/* The way back to blue, ready if anything breaks. */}
-      <Flow points={[[tr.x + tr.w + 4, trMid - 16], [BACK_X, trMid - 16], [BACK_X, blueY + env.h / 2], [env.x - 3, blueY + env.h / 2]]} at={backAt} dur={14} color={BAR} width={3} head={13} radius={12} dash="9 7" />
+      <Flow points={[[tr.x + tr.w + 4, trMid - 18], [BACK_X, trMid - 18], [BACK_X, blueY + env.h / 2], [env.x - 3, blueY + env.h / 2]]} at={backAt} dur={14} color={BAR} width={3} head={13} radius={12} dash="9 7" />
       <Line at={flipAt + 4} x={tr.x} y={tr.y + env.h + c.h(20)} size={21} color={INK_SOFT}>
         One switch
         <span style={{ opacity: ease(frame, backAt, 10) }}>, and back</span>

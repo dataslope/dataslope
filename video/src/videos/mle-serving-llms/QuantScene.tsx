@@ -366,7 +366,9 @@ export const QuantScene: React.FC = () => {
           })}
           <Line at={costAt} x={X0} y={simTop + 3 * h(52) + h(16)} size={24} color={INK}>
             The draft model costs time and memory of its own
-            <span style={{ color: ACCENT_INK, opacity: ease(frame, loseAt, 10) }}>, so a draft that is usually wrong can lose</span>
+            <span style={{ opacity: ease(frame, loseAt, 10) }}>
+              , <span style={{ color: ACCENT_INK }}>so a draft that is usually wrong can lose</span>
+            </span>
           </Line>
         </Enter>
 

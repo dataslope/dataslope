@@ -255,14 +255,14 @@ export const DriftScene: React.FC = () => {
           {/* What the colors are: each point's label under the true rule. */}
           <Key
             x={X0 + 20 + sc.w + 30}
-            y={sc.top + sc.h * 0.3 + 100}
+            y={sc.top + sc.h * 0.3 + 120}
             at={dataDefAt + 48}
             items={[
               { color: BAR, text: <M>y = 1</M> },
               { color: NEG, text: <M>y = 0</M> },
             ]}
           />
-          <Key x={X0 + 20 + sc.w + 30} y={sc.top + sc.h * 0.3 + 130} at={dataDefAt + 54} items={[{ color: GHOST, text: "before the shift" }]} />
+          <Key x={X0 + 20 + sc.w + 30} y={sc.top + sc.h * 0.3 + 150} at={dataDefAt + 54} items={[{ color: GHOST, text: "before the shift" }]} />
           <Line at={conceptDefAt + 40} x={PANEL_B + 20 + sc.w + 30} y={sc.top + sc.h * 0.3} size={21} color={INK_SOFT}>
             the points stay,
           </Line>
@@ -274,7 +274,7 @@ export const DriftScene: React.FC = () => {
           </Line>
           <Key
             x={PANEL_B + 20 + sc.w + 30}
-            y={sc.top + sc.h * 0.3 + 100}
+            y={sc.top + sc.h * 0.3 + 120}
             at={conceptDefAt + 64}
             items={[
               { color: BAR, text: <M>y = 1</M> },

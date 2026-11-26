@@ -460,7 +460,7 @@ export const script: NarrationScript = {
     {
       id: "refresh-schema",
       text: "Without a refresh, the on schema change config can add a new column, but leaves it empty in the old rows.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.0,
     },
     {
       id: "refresh-cost",

@@ -179,15 +179,15 @@ export const RoleScene: React.FC = () => {
         <Verdict
           at={tookAt}
           x={X0}
-          y={rg.rowTop(1) + h(60)}
+          y={rg.rowTop(1) + h(68)}
           label="Order to delivery, on average"
           value={`${avg} days`}
           tone="ok"
           size={26}
         />
-        <Verdict at={mostAt} x={X0} y={rg.rowTop(1) + h(112)} label="At most" value={`${most} days`} size={26} />
+        <Verdict at={mostAt} x={X0} y={rg.rowTop(1) + h(120)} label="At most" value={`${most} days`} size={26} />
         {/* Stays as the heading of the two numbers it introduces. */}
-        <Note at={togetherAt} x={X0} y={rg.rowTop(1) + h(16)}>
+        <Note at={togetherAt} x={X0} y={rg.rowTop(1) + h(22)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Together, they answer <span style={{ color: OK_INK, opacity: ease(frame, noSingleAt, 10) }}>across roles</span>
           </span>
