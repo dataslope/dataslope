@@ -32,7 +32,22 @@ None generated.
 
 All checks were run on the final code, through `out/entries/AnalyticsEngineer-6-Warehousing.tsx` and the queues.
 
-CHECKS_PLACEHOLDER
+- **tsc**: no error in `src/videos/ae-warehousing/`.
+- **eslint** (`src/videos/ae-warehousing`): clean.
+- **`npm run check:cues`**: pass. Every word cue names a phrase its beat says, including the new `compute-size` and `compute-vendors` cues.
+- **`npm test`**: 79 pass, 0 fail.
+- **`check:frames`** (`CHECK_SCALE=1`): pass.
+  - 3 illustrations, largest stretch 0.40.
+  - 18 arrows, up to 0.0° of bend.
+  - No word-gap, mixed-size or cue-occurrence failure.
+- **`check:motion`**: pass. 10:02.3 checked, 0 stretches still for 2 s or more.
+- **`check:sync`**: pass. 57 beats, worst +0.04 s (`cols`). The new and recut beats are `compute-def` −0.01, `compute-size` −0.00 and `compute-vendors` −0.00.
+- **`check:mix`**: run, no failure. The effects sit 30.0 LU under the narration. The speech is a median 30.5 dB above them, with the 5th percentile at 16.0 dB.
+- **Stills:** in `video/out/review/AnalyticsEngineer-6-Warehousing/`, at 140, 143.5, 151.5, 420.5, 424, 427, 434.5, 440 and 466 s, and all were looked at.
+  - The size lines ink in on their words and clear the model badge by about 30 px.
+  - The warehouse edge clears the Load label, the OLAP lines above and the heavy-query box below.
+  - Nothing is under 21 px.
+- The WAVs and the preview the checks left in `out/` are deleted.
 
 ## Comparisons
 
